@@ -462,7 +462,8 @@ static s32 GetConditionCureMessage(u32 condition, BOOL alt) {
     return -1;
 }
 
-BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mon, u16 count, BattleHandlerString *string) {
+BOOL Condition_SetCureMessage(u32 condition, BattleCondition cont, BattleMon *mon, u16 count,
+                              BattleHandlerString *string) {
     BOOL hasCount = count != 0;
     s32 message = GetConditionCureMessage(condition, hasCount);
 

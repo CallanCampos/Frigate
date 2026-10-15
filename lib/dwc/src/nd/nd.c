@@ -193,7 +193,7 @@ static void NdFree(void *ptr) {
 
 // Ends the thread and gives its memory back, and tells NdReportResults that the library has ended
 static void NdFreeWork(void) {
-    func_0207a800(&sDwcNdState.work->thread);
+    OS_JoinThread(&sDwcNdState.work->thread);
     NdFree(sDwcNdState.work);
     sDwcNdState.work = NULL;
     OS_LockMutex(&sNdMutex);

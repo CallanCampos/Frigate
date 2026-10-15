@@ -27,7 +27,7 @@ BOOL NHTTPi_createCommThread(NHttpThreadInfo *info, int priority, void *stack) {
 void NHTTPi_destroyCommThread(NHttpThreadInfo *info, NHttpState *state) {
     state->quit = TRUE;
     NHTTPi_kickCommThread(&info->queue);
-    func_0207a800(&info->thread);
+    OS_JoinThread(&info->thread);
 }
 
 // Waits for a message, which is the thread's way to sleep until there is a request

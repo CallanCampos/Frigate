@@ -6,7 +6,8 @@
 // SSL's state and helpers, shared by its files
 
 // The C library's string functions the main module links, under their own names (ssl.c's certificate and session
-// matching needs them; sys_memcpy and sys_memset, with the reversed argument order, cover the rest)
+// matching and biginteger.c need them; sys_memcpy and sys_memset, with the reversed argument order, cover the rest)
+void *memmove(void *dest, const void *src, u32 size);
 int memcmp(const void *a, const void *b, u32 size);
 int strcmp(const char *a, const char *b);
 u32 strlen(const char *s);

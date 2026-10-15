@@ -7751,7 +7751,7 @@ static void HandlerEntrainment(BattleEventItem *item, BtlServerFlow *flow, u8 mo
 
     if (BattleEventVar_GetValue(3) == monId) {
         ability = GetBattleMonStat(GetBattleMon(flow, monId), 0x10);
-        if (!func_ov169_0689cac4(ability)) {
+        if (!IsEntrainmentExcludedAbility(ability)) {
             count = BattleEventVar_GetValue(5);
             for (i = 0; i < count; i++) {
                 targetId = BattleEventVar_GetValue(6 + i);

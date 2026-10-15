@@ -1,9 +1,7 @@
+#include "gfl/std.h"
 #include "ssl_internal.h"
 
-#include "gfl/std.h"
-
-// SSL's own MD5, the public-domain algorithm from RFC 1321, written with the usual table-driven round loop and the
-// no-swap trick of rotating which variable FF/GG/HH/II writes.
+// SSL's own MD5 (RFC 1321), written from the asm. The ROM names none of it, so the names are the algorithm's.
 
 // The per-round rotation amounts, repeated every four steps
 #define S11 7
@@ -37,12 +35,14 @@
 
 // Which of the 16 message words each of the 64 steps mixes in: i for round 1, (5i + 1) % 16 for round 2,
 // (3i + 5) % 16 for round 3 and (7i) % 16 for round 4
+// clang-format off
 static u8 sMD5WordIndex[64] = {
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, //
     1,  6,  11, 0,  5,  10, 15, 4,  9,  14, 3,  8,  13, 2,  7,  12, //
     5,  8,  11, 14, 1,  4,  7,  10, 13, 0,  3,  6,  9,  12, 15, 2,  //
     0,  7,  14, 5,  12, 3,  10, 1,  8,  15, 6,  13, 4,  11, 2,  9,
 };
+// clang-format on
 
 // The 64 additive constants, floor(abs(sin(i + 1)) * 2^32)
 static u32 sMD5Constants[64] = {

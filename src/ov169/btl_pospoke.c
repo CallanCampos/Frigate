@@ -135,8 +135,8 @@ u8 BtlPosPoke_GetEmptyPositions(BtlPosPoke *posPoke, u8 clientId, u8 *positions)
     u32 i;
 
     for (i = 0; i < BTL_POSPOKE_NUM_POS; i++) {
-        if (posPoke->entries[i].exists && posPoke->entries[i].clientId == clientId
-            && posPoke->entries[i].monId == BTL_POSPOKE_NO_MON) {
+        if (posPoke->entries[i].exists && posPoke->entries[i].clientId == clientId &&
+            posPoke->entries[i].monId == BTL_POSPOKE_NO_MON) {
             positions[count++] = i;
         }
     }

@@ -1171,7 +1171,6 @@ void BtlvMcss_Transform(BtlvMcss *work, int targetPos, int pos) {
         work->entries[index].info.bin = work->entries[target].info.bin - 9;
     }
     work->entries[index].mon = work->entries[target].mon;
-    // dst must be assigned here, not at its declaration: only this form CSEs &entries[index] with the stores above
     dst = &work->entries[index].info;
     func_02019bd8(work->mcssSys, work->entries[index].mcss, dst);
 }

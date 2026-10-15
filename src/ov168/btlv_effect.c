@@ -291,8 +291,8 @@ void BtlvEffect_Init(BtlvEffectSetup *setup, Font *font, HeapID heapId) {
         Light light;
         BtlvEffectLightColors colors;
 
-        FieldLightStatus_Get(setup->fieldEnv.zoneId, setup->fieldEnv.hour, setup->fieldEnv.minute, setup->fieldEnv.weather,
-                      setup->fieldEnv.season, colors.colors, sBtlvEffect->heapId);
+        FieldLightStatus_Get(setup->fieldEnv.zoneId, setup->fieldEnv.hour, setup->fieldEnv.minute,
+                             setup->fieldEnv.weather, setup->fieldEnv.season, colors.colors, sBtlvEffect->heapId);
         light.color = colors.colors[0];
         light.direction.x = 0;
         light.direction.y = -FX16_ONE;

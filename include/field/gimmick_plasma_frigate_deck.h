@@ -5,8 +5,8 @@
 #include "struct_decls.h"
 
 // The gimmick of the Plasma Frigate's deck (zone 552, gimmick 45), overlay 118. Overlay 36's gimmick table calls these
-void func_ov118_021eec80(Field *field);
-void func_ov118_021eecb4(Field *field);
-void func_ov118_021eeccc(Field *field);
+void GimmickPlasmaFrigateDeck_Setup(Field *field);
+void GimmickPlasmaFrigateDeck_End(Field *field);
+void GimmickPlasmaFrigateDeck_Update(Field *field);
 
 #endif // POKEBW2_FIELD_GIMMICK_PLASMA_FRIGATE_DECK_H

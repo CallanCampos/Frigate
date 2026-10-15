@@ -1,6 +1,6 @@
+#include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
-#include "nitro/os.h"
 
 // SOCL's bind and connect: SOCL_Bind and SOCL_Connect set the socket's ports and address, and for a socket that
 // blocks they have its receive pipe's thread bind it in CPS, and for TCP connect it (SOCLi_ExecBindCommand and

@@ -1,8 +1,8 @@
-#include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "dwc/wcm.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
+#include "socl_internal.h"
 
 // SOCL's shutdown and its address calls: SOCL_Cleanup waits for SOCL_CalmDown to close every socket (SOCL_CloseAll,
 // then the UDP send socket) and ends CPS. The resolver and host address calls follow. pokediamond's NitroWiFi names the

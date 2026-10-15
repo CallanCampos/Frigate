@@ -92,7 +92,12 @@ Reject these, from the permuter or anywhere else:
 - arithmetic on casts that the types don't call for;
 - the same expression split into pointless temporaries;
 - code moved into a branch where it doesn't belong;
-- a type that breaks the code's meaning, such as a `u8` that would clip a value.
+- a type that breaks the code's meaning, such as a `u8` that would clip a value;
+- pointer arithmetic standing in for plain indexing to force a specific address computation, such as
+  `(ptr + n - 1)->field` or `*(ptr + n - 1) = x` in place of `ptr[n - 1].field` or `ptr[n - 1] = x`, even when it
+  gives a full byte match. `docs/nonmatching-functions.md` has several rows where this exact trick reproduces the
+  ROM's fold of a `- 1` into a load/store offset and is still rejected; keep the plain indexed form and document the
+  fold as found-but-not-kept, the same as those rows.
 
 A `goto` is fine where it is the plain way to say the flow, such as one shared exit. Static inline helpers are fine;
 Game Freak used many.

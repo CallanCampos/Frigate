@@ -2,12 +2,14 @@
 #define POKEBW2_DWC_VCT_INTERNAL_H
 
 #include "types.h"
-
 #include "dwc/vct.h"
 
 // The voice chat library libVCT (the ROM carries its version string, "[SDK+Nintendo:libVCT 1.4.1]"), which sends the
 // microphone's sound to the machines of a Wi-Fi match and plays what they send. Overlay 29 holds it. The ROM names none
 // of its functions, so these names say what the code does.
+
+// libVCT's signature, "[SDK+Nintendo:libVCT 1.4.1]", in the main module, which VCT_Init registers
+extern const char VCTi_Signature[];
 
 // Sound is cut into frames of 0x440 bytes of 16-bit samples (544 samples) at 8 kHz, and each frame goes out as one
 // packet. A packet starts with a 12-byte header, then holds the frame coded in one of five ways (see VCTCodec).
@@ -156,14 +158,12 @@ extern VCTSettings gVCTSettings;
 BOOL func_ov011_02168b18(u8 aid, const void *data, int size);
 BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
 
-// Copies size bytes, a multiple of 4, 32 bytes at a time where it can: NitroSDK's MIi_CpuCopyFast (not in nitro/mi.h yet)
+// Copies size bytes, a multiple of 4, 32 bytes at a time where it can: NitroSDK's MIi_CpuCopyFast (not in nitro/mi.h
+// yet)
 void sys_memcpy32_fast(const void *src, void *dest, u32 size);
 
 // The C library's memset
 void *memset(void *dest, int value, u32 size);
-
-// The compiler's count-leading-zeros intrinsic
-int __clz(u32 x);
 
 // The timer count, which seeds the packets' sequence numbers
 u16 func_0207bb84(void);

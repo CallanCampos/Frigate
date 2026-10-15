@@ -1026,7 +1026,7 @@ static fx32 func_ov167_021af8c4(BtlServerFlow *flow, BattleMon *mon, BattleMon *
         if (field->env.bgType == 4 || field->env.bgType == 5) {
             return FX32_CONST(3.5);
         }
-        if (func_ov169_0689cb28(field->env.bgType) && (period == 3 || period == 4)) {
+        if (IsDuskBallBackground(field->env.bgType) && (period == 3 || period == 4)) {
             return FX32_CONST(3.5);
         }
         break;
@@ -1322,7 +1322,7 @@ static BOOL func_ov167_021aff14(BtlServerFlow *flow, BattleMon *mon, u16 item, s
         cured = FALSE;
         i = 0;
         while (TRUE) {
-            condition = func_ov169_0689cb6c(i++);
+            condition = GetMentalHerbCondition(i++);
             if (condition == CONDITION_NONE) {
                 break;
             }
@@ -1366,7 +1366,7 @@ static BOOL func_ov167_021b0028(BtlServerFlow *flow, BattleMon *mon, u16 item, s
     u8 monId;
     u8 result;
 
-    if (!func_ov169_0689ca84(GetBattleMonHeldItem(mon))) {
+    if (!IsReactiveHeldItem(GetBattleMonHeldItem(mon))) {
         monId = GetMonID(mon);
         result = func_ov167_021abfec(flow, mon, &flag);
         if (!result) {

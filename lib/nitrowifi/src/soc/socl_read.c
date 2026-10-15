@@ -1,7 +1,7 @@
-#include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
+#include "socl_internal.h"
 
 // SOCL's reads: SOCLi_ReadFrom takes data from a socket, under its receive pipe's mutex. A TCP socket reads from
 // CPS's receive buffer (SOCLi_CopyCPSBuffer) or, when it has to wait for data, through a command in its receive pipe
@@ -52,7 +52,7 @@ int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSIn
     }
     pipe = SOCLi_GetRecvPipe(socket);
     if (!(block & 1)) {
-        if (!func_0207aeec(&pipe->base.mutex)) {
+        if (!OS_TryLockMutex(&pipe->base.mutex)) {
             return SOCL_EAGAIN;
         }
     } else {
@@ -150,7 +150,8 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
 
 // Where CPS's receive buffer stands for the socket: the data not yet read (avail, -1 when CPS has gone ahead of the
 // pipe) and the ports and address of its sender. NULL when there is nothing to read or the connection has gone
-static u8 *SOCLi_ReadCPSBuffer(SOCLSocket *socket, int *avail, u16 *local_port, u16 *remote_port, CPSInAddr *remote_ip) {
+static u8 *SOCLi_ReadCPSBuffer(SOCLSocket *socket, int *avail, u16 *local_port, u16 *remote_port,
+                               CPSInAddr *remote_ip) {
     SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
     CPSSoc *soc = (CPSSoc *)pipe->base.thread.specific[0];
     int read_len = pipe->cps_read_len;
@@ -312,7 +313,8 @@ static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket) {
     return consume_len;
 }
 
-static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int block) {
+static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
+                               int block) {
     SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
     SOCLUdpPacket *packet;
     u32 irq = CPU_IRQDisable();

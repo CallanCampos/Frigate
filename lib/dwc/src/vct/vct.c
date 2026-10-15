@@ -1,7 +1,6 @@
-#include "vct_internal.h"
-
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_internal.h"
 
 // The library's entry points: starting and stopping it, running it a tick, and sorting what the network gives it.
 
@@ -14,15 +13,10 @@ typedef struct VCTLibrary {
 static VCTLibrary sLibrary;
 VCTSettings gVCTSettings;
 
-// A function that does nothing but be called with the signature of a library, which keeps the library in the link
-void func_02004eb0(const char *signature);
-extern const char func_02005108[];
-
 static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result);
 
-BOOL VCT_Init(VCTConfig *config)
-{
-    func_02004eb0(func_02005108);
+BOOL VCT_Init(VCTConfig *config) {
+    OSi_ReferSymbol(VCTi_Signature);
     if (config == NULL) {
         return FALSE;
     }
@@ -67,8 +61,7 @@ BOOL VCT_Init(VCTConfig *config)
     return FALSE;
 }
 
-void VCT_Shutdown(void)
-{
+void VCT_Shutdown(void) {
     VCT_ClearSessionCount();
     VCT_ClearSessions();
     VCT_ClearPacketPool();
@@ -76,8 +69,7 @@ void VCT_Shutdown(void)
     sLibrary.initialized = FALSE;
 }
 
-void VCT_Tick(void)
-{
+void VCT_Tick(void) {
     if (!sLibrary.initialized) {
         return;
     }
@@ -90,8 +82,7 @@ void VCT_Tick(void)
     }
 }
 
-BOOL VCT_ReceivePacket(u8 aid, void *data, int size)
-{
+BOOL VCT_ReceivePacket(u8 aid, void *data, int size) {
     VCTEventResult result;
 
     switch (DispatchPacket(aid, data, size, &result)) {
@@ -108,8 +99,7 @@ BOOL VCT_ReceivePacket(u8 aid, void *data, int size)
 
 // Hands a packet to the voice or the control side by its type, returning 0 for one that has been dealt with, 1 for
 // one that has given an event and 2 for one that does not belong to the library
-static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result)
-{
+static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result) {
     VCTVoicePacket *packet = data;
     u64 now;
     u8 type;

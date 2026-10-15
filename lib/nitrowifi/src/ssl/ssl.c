@@ -1,5 +1,5 @@
-#include "nitrowifi/cps.h"
 #include "nitro/mi.h"
+#include "nitrowifi/cps.h"
 #include "ssl_internal.h"
 #include "system/rtc.h"
 
@@ -60,7 +60,7 @@ typedef struct SSLRsaPrivateKey {
 // A connection, DER-parsed certificate fields included. 0x830 bytes
 typedef struct SSLContext {
     u8 secret[0x30]; // The pre-master secret, overwritten with the master secret once derived
-    u8 resumed;       // TRUE once a cached session's secret was restored
+    u8 resumed;      // TRUE once a cached session's secret was restored
     u8 unk_031;
     u16 cipher_suite;
     u8 client_random[0x20];
@@ -91,8 +91,8 @@ typedef struct SSLContext {
                                          // scratch storage
     MD5Context handshake_md5;
     MD5Context handshake_md5_snapshot;
-    u8 is_server; // Descriptive role name: nonzero selects the server handshake path
-    u8 state;     // SSLI_STATE_*, read back by SSLi_ReceiveRecord's caller
+    u8 is_server;                // Descriptive role name: nonzero selects the server handshake path
+    u8 state;                    // SSLI_STATE_*, read back by SSLi_ReceiveRecord's caller
     u8 application_record_ready; // TRUE when read_buf holds a complete application record retained by dispatch
     u8 pad_457;
     s32 signature_algorithm; // 0x458: OID index 3 (MD5) or 4 (SHA1)
@@ -616,7 +616,7 @@ static int SSLi_VerifyCertificateSignature(SSLContext *ctx, const SSLRsaPublicKe
     }
 
     n = (key->modulus_len * 2) / 2;
-    digits = (u16 *)CPSiAlloc(n * 8);
+    digits = CPSiAlloc(n * 8);
     if (digits == NULL) {
         return 2;
     }
@@ -917,7 +917,7 @@ static void SSLi_DecryptPreMasterSecret(SSLContext *ctx, u8 *encrypted, void *ke
     }
 
     n = (key->modulus_len * 2) / 2 + 1;
-    buf = (u16 *)CPSiAlloc(20 * n);
+    buf = CPSiAlloc(20 * n);
     if (buf == NULL) {
         return;
     }
@@ -1426,7 +1426,7 @@ static int SSLi_ReceiveRecord(CPSSoc *soc) {
         }
 #endif
         CPSi_TcpConsume(2, soc);
-        record = (u8 *)CPSiAlloc(len);
+        record = CPSiAlloc(len);
         if (record == NULL) {
             ctx->state = SSLI_STATE_ERROR;
             return SSLI_STATE_ERROR;
@@ -1444,7 +1444,7 @@ static int SSLi_ReceiveRecord(CPSSoc *soc) {
             ctx->state = SSLI_STATE_ERROR;
             return SSLI_STATE_ERROR;
         }
-        record = (u8 *)CPSiAlloc(len);
+        record = CPSiAlloc(len);
         if (record == NULL) {
             ctx->state = SSLI_STATE_ERROR;
             return SSLI_STATE_ERROR;
@@ -1519,7 +1519,7 @@ void CPS_SslAddRandomSeed(const void *seed, u32 len) {
 // Finished MAC halves, encrypted and MACed with the new write keys since ChangeCipherSpec already took effect)
 static void SSLi_SendChangeCipherSpecAndFinished(CPSSoc *soc) {
     SSLContext *ctx = (SSLContext *)soc->con;
-    u8 *packet = (u8 *)CPSiAlloc(0x83);
+    u8 *packet = CPSiAlloc(0x83);
     u32 len;
     if (packet == NULL) {
         ctx->state = SSLI_STATE_ERROR;
@@ -1557,7 +1557,7 @@ static void SSLi_SendChangeCipherSpecAndFinished(CPSSoc *soc) {
 // session id for this peer if there is one, and the 2 cipher suites this connection offers
 static void SSLi_SendClientHello(CPSSoc *soc) {
     SSLContext *ctx = (SSLContext *)soc->con;
-    u8 *packet = (u8 *)CPSiAlloc(0x98);
+    u8 *packet = CPSiAlloc(0x98);
     u8 *p;
     u32 time;
     int len, i;
@@ -1624,7 +1624,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
     SSLi_GetRandomBytes(ctx->secret + 2, 0x2e);
     len = ctx->certificate_key.modulus_len;
     n = (len * 2) / 2;
-    padded = (u8 *)CPSiAlloc(len);
+    padded = CPSiAlloc(len);
     if (padded == NULL) {
         ctx->state = SSLI_STATE_ERROR;
         return;
@@ -1634,7 +1634,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
     SSLi_GetRandomBytes(padded + 2, len - 0x33);
     padded[len - 0x31] = 0;
     sys_memcpy(ctx->secret, padded + len - 0x30, 0x30);
-    digits = (u16 *)CPSiAlloc(n * 8);
+    digits = CPSiAlloc(n * 8);
     if (digits == NULL) {
         CPSiFree(padded);
         ctx->state = SSLI_STATE_ERROR;
@@ -1649,7 +1649,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
     priority = SSLi_ApplyConfiguredPriority();
     BigInt_ModExp(digits, base, exponent, n, modulus);
     SSLi_RestorePriority(priority);
-    packet = (u8 *)CPSiAlloc(len + 0x49);
+    packet = CPSiAlloc(len + 0x49);
     if (packet == NULL) {
         CPSiFree(padded);
         CPSiFree(digits);
@@ -1806,7 +1806,7 @@ static void SSLi_FillReadBuffer(CPSSoc *soc) {
             ctx->state = SSLI_STATE_ERROR;
             return;
         }
-        ctx->read_buf = (u8 *)CPSiAlloc(len);
+        ctx->read_buf = CPSiAlloc(len);
         if (ctx->read_buf == NULL) {
             ctx->state = SSLI_STATE_ERROR;
             return;
@@ -1866,7 +1866,7 @@ u32 CPS_SslWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
         u8 *buf;
         u32 first, second, sentNow;
         chunk = total > 0xb4f ? 0xb4f : total;
-        buf = (u8 *)CPSiAlloc(chunk + 0x19);
+        buf = CPSiAlloc(chunk + 0x19);
         if (buf == NULL)
             break;
         first = chunk;
@@ -1932,7 +1932,7 @@ void CPS_SetSsl(BOOL enable) {
     OSThread *thread;
     CPSSoc *soc;
 
-    func_02004eb0(sSslSignature);
+    OSi_ReferSymbol(sSslSignature);
     thread = OS_GetCurrentThread();
     soc = (CPSSoc *)thread->specific[0];
     if (soc != NULL) {

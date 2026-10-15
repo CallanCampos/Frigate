@@ -1,10 +1,12 @@
 #include "nitrowifi/wcm.h"
-#include "nitrowifi/wcm_internal.h"
+#include "gfl/std.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
 #include "nitrowifi/wcm_dsi.h"
+#include "nitrowifi/wcm_internal.h"
+#include <stddef.h>
 
 // NitroWiFi's WCM (overlay 11), over NitroSDK's WM. dsd splits this range into 93 pieces; eight Thumb/ARM pairs among
 // them are the linker's long-branch veneers to the DSi WCM backend physically placed in LTD. This file calls
@@ -12,54 +14,41 @@
 // names are kept where identified. WCM_StopSearchAsync, WCM_RestoreIdleAsync, WCM_GetConnectedApSsid and
 // WCM_ReleaseIrqOwnedMutex, along with the private helper/callback names, are descriptive reconstructions.
 
-// sys_memcpy_fast and sys_memcpy32_fast: like sys_memcpy and MI_CpuFillFast's sys_memset32_fast, a multiple of 4
-// bytes at a time where they can (MIi_CpuCopyFast and MIi_CpuCopy32Fast). Not yet in nitro/mi.h
-void sys_memcpy_fast(const void *src, void *dest, u32 size);
-void sys_memcpy32_fast(const void *src, void *dest, u32 size);
-
-// NitroSDK's WM internals this file calls that nitro/wm.h does not yet declare
-s32 func_02080758(void *buf, u16 dmaNo);
-BOOL func_02080908(void);
-void *func_02080dbc(void);
-int func_02081348(WMCallbackFunc callback);
-int func_02081398(WMCallbackFunc callback);
-int func_02081b94(WMCallbackFunc callback);
-int func_02081ab0(WMCallbackFunc callback, void *buffer, u16 bufferSize);
-int func_02082470(WMCallbackFunc callback, u8 mode, u8 argument, void *data);
-int func_020812fc(WMCallbackFunc callback);
-int func_02081370(WMCallbackFunc callback);
-
-// NitroSDK's alarm-adjacent OS calls that nitro/os.h does not yet declare
-void func_0207bbf4(void);
-BOOL func_0207bc18(void);
-
-// NitroWiFi's own IE reader, elsewhere in main; not yet decompiled
-void *func_02703250(const void *frame, u32 tag, void *out);
+// Vendor OUIs, each followed by a type byte, that WCM_FillApEntry and WCM_FindVendorIE look for among a beacon's
+// vendor-specific information elements: Nintendo's (00:09:BF), and Microsoft's (00:50:F2) WPA (type 1) and WMM
+// (type 2, subtype 0). Defined with their bytes after WCMiAnyEssid, at the end of the file
+static const u8 sNintendoOui[4];
+static const u8 sWpaOui[4];
+static const u8 sWmmOui[8];
 
 // An access point WCM found during a search, in a doubly linked list off the caller's apBuffer. WCM_PointApList's
 // result points at record, past this header
-// Nintendo's and Microsoft's OUIs, that WCM_FillApEntry and WCM_FindVendorIE look for among a beacon's vendor
-// information elements (Nintendo's own, and WPA's and WMM's)
-static const u8 data_ov011_02185004[4];
-static const u8 data_ov011_02185008[4];
-static const u8 data_ov011_0218500c[8];
-
 typedef struct WCMApEntry WCMApEntry;
 struct WCMApEntry {
     u8 inUse;
     u8 unk_01;
     u16 scanLinkLevel; // DS scan link level; the DSi producer's value domain is unconfirmed
-    s32 id; // the AP list header's count when this entry was allocated or reused
+    s32 id;            // the AP list header's count when this entry was allocated or reused
     WCMApEntry *prev;
     WCMApEntry *next;
     WMBssDesc record; // Retained prefix; bytes 0x40..0xbf hold packed IEs rather than WMGameInfo.
 };
+
+// The vendor-specific information element that carries a DSi beacon's game info, which starts with the info's magic
+// number
+typedef struct WCMVendorIE {
+    u8 id;
+    u8 length;
+    u8 unk_02[8];
+    u16 magicNumber;
+} WCMVendorIE;
 
 // The caller's AP list buffer (WCMConfig.pbdbuffer), read as a header followed by up to apMax WCMApEntry records
 typedef struct WCMApListHeader {
     u32 count;
     WCMApEntry *head; // the oldest entry (WCM_GetOldestApEntry's result)
     WCMApEntry *tail; // the newest
+    WCMApEntry entries[];
 } WCMApListHeader;
 
 // Recovered DCF receive-record prefix, named here for its WCM consumer rather than as an established SDK type.
@@ -91,6 +80,13 @@ typedef struct WCMDcfCallbackView {
     WCMReceiveRecord *record; // 0x08, borrowed WM buffer, dispatched synchronously
 } WCMDcfCallbackView;
 
+// The 802.3 header of a mode 2 frame. Only the length, big-endian, is filled in here
+typedef struct WCMEthernetHeader {
+    u8 destination[6];
+    u8 source[6];
+    u16 length;
+} WCMEthernetHeader;
+
 // WCM's mapped work prefix follows the DS allocation (WCM_WORK_SIZE bytes). Mode 2 allocates 0x4800 bytes;
 // its additional tail and most of the connect/search scratch area remain unmapped.
 struct WCMWork {
@@ -106,56 +102,56 @@ struct WCMWork {
         u8 mode;     // Secondary descriptor mode.
         u8 argument; // Legacy key index or variable-copy byte count; mode zero retains the previous byte.
         u8 padding[2];
-    } connectionStorage; // 0x1240..0x1293; no original SDK type identity established
-    OSAlarm alarm; // 0x1294
-    s32 dmaNo; // 0x12c0, from WCMConfig.dmano
-    void *apBuffer; // 0x12c4, from WCMConfig.pbdbuffer: a WCMApListHeader followed by its entries
-    u32 apBufferBytes; // 0x12c8, from WCMConfig.nbdbuffer
-    u32 scanMode; // 0x12cc, from WCMConfig.nbdmode
-    WCMNotify notify; // 0x12d0
-    u32 searchOption; // 0x12d4
-    u16 scanChannelTime; // 0x12d8, zero selects the WM default
-    s16 pendingNotify; // 0x12da, notification ID consumed by WCM_NotifyResult
-    u8 apListLocked; // 0x12dc
-    u8 resetPending; // 0x12dd, set before reset submission; successful reset completion clears it
-    u8 state; // 0x12de
-    u8 wirelessMode;              // 0x12df, selected by WCM_InitCore: 1 for DS, 2 for DSi
-    u8 unk_12e0[0xc0];            // BSS data and notification storage
-    u8 startupBuffer[0xf00];      // 0x13a0, passed to WM initialization
-    WMScanExParam scanRequest;    // 0x22a0, including the 16-byte SSID match mask
-    u32 scanCount;                // 0x22e4
-    u16 associationId;            // 0x22e8, from the successful connection callback; cleared on disconnect or reset
-    u16 connectionFailureReason;  // 0x22ea, retained across reset for retry and notification
+    } connectionStorage;         // 0x1240..0x1293; no original SDK type identity established
+    OSAlarm alarm;               // 0x1294
+    s32 dmaNo;                   // 0x12c0, from WCMConfig.dmano
+    void *apBuffer;              // 0x12c4, from WCMConfig.pbdbuffer: a WCMApListHeader followed by its entries
+    u32 apBufferBytes;           // 0x12c8, from WCMConfig.nbdbuffer
+    u32 scanMode;                // 0x12cc, from WCMConfig.nbdmode
+    WCMNotify notify;            // 0x12d0
+    u32 searchOption;            // 0x12d4
+    u16 scanChannelTime;         // 0x12d8, zero selects the WM default
+    s16 pendingNotify;           // 0x12da, notification ID consumed by WCM_NotifyResult
+    u8 apListLocked;             // 0x12dc
+    u8 resetPending;             // 0x12dd, set before reset submission; successful reset completion clears it
+    u8 state;                    // 0x12de
+    u8 wirelessMode;             // 0x12df, selected by WCM_InitCore: 1 for DS, 2 for DSi
+    WMBssDesc connectBss;        // 0x12e0, the access point's description, copied from WCM_ConnectAsync's argument
+    u8 startupBuffer[0xf00];     // 0x13a0, passed to WM initialization
+    WMScanExParam scanRequest;   // 0x22a0, including the 16-byte SSID match mask
+    u32 scanCount;               // 0x22e4
+    u16 associationId;           // 0x22e8, from the successful connection callback; cleared on disconnect or reset
+    u16 connectionFailureReason; // 0x22ea, retained across reset for retry and notification
     u8 unk_22ec[WCM_WORK_SIZE - 0x22ec];
 };
 
 // WCM's own small globals, zeroed with the rest of .bss
-// data_ov011_0218df74: the anchor WCM_Init and WCM_Finish set and clear
+// sWcmAnchor: the anchor WCM_Init and WCM_Finish set and clear
 typedef struct WCMAnchor {
     u8 preferredMode; // 0x00, read when the requested mode is zero; no writer identified
     u8 unk_01[3];
     WCMWork *work; // 0x04
 } WCMAnchor;
 
-// data_ov011_0218df7c, right after WCMAnchor: the globals WCM_InitOnce sets up once
+// sWcmGlobal, right after WCMAnchor: the globals WCM_InitOnce sets up once
 struct WCMGlobal {
     u8 initialized; // 0x00, set once WCM_InitOnce has initialized the send state
     u8 unk_01[3];
     OSThreadQueue sendQueue; // 0x04
-    OSMutex mutex; // 0x0c
-    u16 sendStatus; // 0x24
+    OSMutex mutex;           // 0x0c
+    u16 sendStatus;          // 0x24
     u8 padding_26[2];
     void (*recvCallback)(u8 *src, u8 *dst, u8 *data, u32 len); // 0x28
     void (*sendCompletion)(s32);                               // 0x2c
-    u8 ownMac[6]; // 0x30
+    u8 ownMac[6];                                              // 0x30
     u8 unk_36[2];
     u8 rssiSampleCursor; // 0x38, count until full, then 16 | the next ring index
     u8 rssiSamples[16];  // 0x39
     u8 unk_49[3];
 };
 
-static WCMAnchor sWork;
-static WCMGlobal sWcm;
+static WCMAnchor sWcmAnchor;
+static WCMGlobal sWcmGlobal;
 
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
@@ -211,7 +207,7 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
     s32 result;
 
     irq = CPU_IRQDisable();
-    if (sWork.work != NULL) {
+    if (sWcmAnchor.work != NULL) {
         CPU_SetIRQMask(irq);
         return 1;
     }
@@ -225,7 +221,7 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
     }
     sys_memset(work, 0, size);
     if (mode == 0) {
-        mode = sWork.preferredMode;
+        mode = sWcmAnchor.preferredMode;
         if (mode == 0) {
             mode = WCM_GetDefaultWirelessMode();
         }
@@ -238,22 +234,22 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
         CPU_SetIRQMask(irq);
         return 6;
     }
-    sWork.work = work;
-    sWork.work->state = 1;
-    sWork.work->pendingNotify = 0;
-    sWork.work->scanChannelTime = 0;
-    sWork.work->apListLocked = 0;
-    sWork.work->resetPending = 0;
-    sWork.work->wirelessMode = mode;
+    sWcmAnchor.work = work;
+    sWcmAnchor.work->state = 1;
+    sWcmAnchor.work->pendingNotify = 0;
+    sWcmAnchor.work->scanChannelTime = 0;
+    sWcmAnchor.work->apListLocked = 0;
+    sWcmAnchor.work->resetPending = 0;
+    sWcmAnchor.work->wirelessMode = mode;
     WCM_ResetSearchOption();
     WCM_InitOnce();
     if (!clock_is_inited()) {
         clock_init();
     }
-    if (!func_0207bc18()) {
-        func_0207bbf4();
+    if (!OS_IsAlarmAvailable()) {
+        OS_InitAlarm();
     }
-    func_0207bc24(&sWork.work->alarm);
+    OS_CreateAlarm(&sWcmAnchor.work->alarm);
     CPU_SetIRQMask(irq);
     return 0;
 }
@@ -263,7 +259,7 @@ void WCM_Finish(void) {
     WCMWork *work;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
         return;
@@ -272,7 +268,7 @@ void WCM_Finish(void) {
         CPU_SetIRQMask(irq);
         return;
     }
-    sWork.work = NULL;
+    sWcmAnchor.work = NULL;
     CPU_SetIRQMask(irq);
 }
 
@@ -299,7 +295,7 @@ s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
     s32 result;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
         return 1;
@@ -348,7 +344,7 @@ s32 WCM_CleanupAsync(void) {
     s32 result;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
         return 1;
@@ -399,7 +395,7 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
     s32 result;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
         return 1;
@@ -425,7 +421,7 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
 
 s32 WCM_StopSearchAsync(void) {
     u32 irq = CPU_IRQDisable();
-    WCMWork *work = sWork.work;
+    WCMWork *work = sWcmAnchor.work;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
         return 1;
@@ -436,7 +432,7 @@ s32 WCM_StopSearchAsync(void) {
         return 0;
     case 6:
         WCM_SetState(7);
-        sWork.work->pendingNotify = WCM_NOTIFY_END_SEARCH;
+        sWcmAnchor.work->pendingNotify = WCM_NOTIFY_END_SEARCH;
         CPU_SetIRQMask(irq);
         return 3;
     case 7:
@@ -495,7 +491,7 @@ s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
         } else {
             sys_memset(&work->connectionStorage, 0, sizeof(work->connectionStorage));
         }
-        sys_memcpy(bssDesc, work->unk_12e0, sizeof(work->unk_12e0));
+        sys_memcpy(bssDesc, &work->connectBss, sizeof(work->connectBss));
         WCM_SetSearchOption(option);
         break;
     case 8:
@@ -534,7 +530,7 @@ s32 WCM_DisconnectAsync(void) {
     s32 result = 0;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     if (work == NULL) {
         CPU_SetIRQMask(irq);
         return 1;
@@ -555,7 +551,7 @@ s32 WCM_DisconnectAsync(void) {
 
     if (work->resetPending == 1) {
         WCM_SetState(10);
-        sWork.work->pendingNotify = 6;
+        sWcmAnchor.work->pendingNotify = 6;
     } else {
         switch (work->wirelessMode) {
         case 1:
@@ -639,7 +635,7 @@ s32 WCM_GetState(void) {
     s32 state;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     state = 0;
     if (work != NULL) {
         state = work->state;
@@ -655,7 +651,7 @@ s32 WCM_SetSearchOption(u32 option) {
     u32 old;
 
     irq = CPU_IRQDisable();
-    work = sWork.work;
+    work = sWcmAnchor.work;
     // BUG: The original reads the search option before checking whether WCM has been initialized.
 #ifdef BUGFIX
     if (work == NULL) {
@@ -714,11 +710,11 @@ s32 WCM_GetChannelMask(void) {
 }
 
 WCMWork *WCM_GetWork(void) {
-    return sWork.work;
+    return sWcmAnchor.work;
 }
 
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify) {
-    WCMWork *work = sWork.work;
+    WCMWork *work = sWcmAnchor.work;
 
     if (config == NULL) {
         work->dmaNo = 3;
@@ -754,7 +750,7 @@ u16 WCM_PickChannel(s32 channelIndex) {
 
     for (i = 0; i < 13; i++) {
         channel = (channelIndex + i) % 13;
-        if (sWork.work->searchOption & (1 << (channel + 1))) {
+        if (sWcmAnchor.work->searchOption & (1 << (channel + 1))) {
             if (WCM_GetChannelMask() & (1 << channel)) {
                 break;
             }
@@ -764,7 +760,7 @@ u16 WCM_PickChannel(s32 channelIndex) {
 }
 
 void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line) {
-    WCMWork *work = sWork.work;
+    WCMWork *work = sWcmAnchor.work;
     s16 notify = work->pendingNotify;
 
     work->pendingNotify = 0;
@@ -773,7 +769,7 @@ void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line) {
 }
 
 void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2) {
-    WCMWork *work = sWork.work;
+    WCMWork *work = sWcmAnchor.work;
     struct {
         WCMNotice notice;
         void *param1;
@@ -794,26 +790,26 @@ void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2)
 void WCM_SetState(s32 newState) {
     u32 irq = CPU_IRQDisable();
 
-    if (sWork.work->state == 9 && newState != 9) {
-        func_0207bd3c(&sWork.work->alarm);
+    if (sWcmAnchor.work->state == 9 && newState != 9) {
+        OS_CancelAlarm(&sWcmAnchor.work->alarm);
     }
-    if (sWork.work->state != 11) {
-        sWork.work->state = newState;
+    if (sWcmAnchor.work->state != 11) {
+        sWcmAnchor.work->state = newState;
     }
     if (newState == 9) {
-        func_0207bd3c(&sWork.work->alarm);
-        func_0207bcf4(&sWork.work->alarm, 0x22f5341, (void (*)(void *))WCM_TimeoutAlarmHandler, NULL);
+        OS_CancelAlarm(&sWcmAnchor.work->alarm);
+        OS_SetAlarm(&sWcmAnchor.work->alarm, 0x22f5341, (void (*)(void *))WCM_TimeoutAlarmHandler, NULL);
     }
     CPU_SetIRQMask(irq);
 }
 
 void WCM_CancelTimeout(void) {
-    WCMWork *work = sWork.work;
+    WCMWork *work = sWcmAnchor.work;
     u32 irq = CPU_IRQDisable();
 
-    func_0207bd3c(&work->alarm);
+    OS_CancelAlarm(&work->alarm);
     if (work->state == 9) {
-        func_0207bcf4(&work->alarm, 0x22f5341, (void (*)(void *))WCM_TimeoutAlarmHandler, NULL);
+        OS_SetAlarm(&work->alarm, 0x22f5341, (void (*)(void *))WCM_TimeoutAlarmHandler, NULL);
     }
     CPU_SetIRQMask(irq);
 }
@@ -843,7 +839,7 @@ s32 WCM_CountApList(void) {
 
     if (work != NULL) {
         WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
-        if (header != NULL && work->apBufferBytes > 0xc) {
+        if (header != NULL && work->apBufferBytes > sizeof(WCMApListHeader)) {
             count = header->count;
         }
     }
@@ -926,14 +922,14 @@ static WCMApEntry *WCM_AllocApEntry(void) {
     if (header == NULL) {
         return NULL;
     }
-    if (work->apBufferBytes <= 0xc) {
+    if (work->apBufferBytes <= sizeof(WCMApListHeader)) {
         return NULL;
     }
-    max = (work->apBufferBytes - 0xc) / sizeof(WCMApEntry);
+    max = (work->apBufferBytes - sizeof(WCMApListHeader)) / sizeof(WCMApEntry);
     if (max == 0 || header->count >= max) {
         return NULL;
     }
-    entries = (WCMApEntry *)((u8 *)header + 0xc);
+    entries = header->entries;
     for (i = 0; i < max; i++) {
         entry = &entries[i];
         if (!entry->inUse) {
@@ -961,7 +957,7 @@ static WCMApEntry *WCM_GetOldestApEntry(void) {
     WCMWork *work = WCM_GetWork();
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
 
-    if (header != NULL && work->apBufferBytes > 0xc) {
+    if (header != NULL && work->apBufferBytes > sizeof(WCMApListHeader)) {
         return header->head;
     }
     return NULL;
@@ -975,10 +971,9 @@ static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid) {
     if (bssid == NULL) {
         return NULL;
     }
-    if (header != NULL && work->apBufferBytes > 0xc) {
+    if (header != NULL && work->apBufferBytes > sizeof(WCMApListHeader)) {
         for (entry = header->head; entry != NULL; entry = entry->next) {
-            u8 *record = (u8 *)&entry->record;
-            if (WCM_CompareBssID(record + 4, bssid)) {
+            if (WCM_CompareBssID(entry->record.bssid, bssid)) {
                 break;
             }
         }
@@ -991,7 +986,7 @@ static WCMApEntry *WCM_FindApEntryById(s32 id) {
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
     WCMApEntry *entry = NULL;
 
-    if (header != NULL && work->apBufferBytes > 0xc) {
+    if (header != NULL && work->apBufferBytes > sizeof(WCMApListHeader)) {
         for (entry = header->head; entry != NULL; entry = entry->next) {
             if (entry->id == id) {
                 break;
@@ -1009,7 +1004,7 @@ static void WCM_TouchApEntry(WCMApEntry *entry) {
     if (entry == NULL) {
         return;
     }
-    if (header == NULL || work->apBufferBytes <= 0xc) {
+    if (header == NULL || work->apBufferBytes <= sizeof(WCMApListHeader)) {
         return;
     }
     walk = header->head;
@@ -1050,13 +1045,13 @@ static void WCM_TouchApEntry(WCMApEntry *entry) {
 // Copies the descriptor prefix and retains selected IEs in the destination's raw 0x40..0xbf tail.
 void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination) {
     WCMWork *work = WCM_GetWork();
-    const u8 *ie = (const u8 *)source + 0x40;
-    u8 *output = (u8 *)destination + 0x40;
+    const u8 *ie = (const u8 *)&source->gameInfo;
+    u8 *output = (u8 *)&destination->gameInfo;
     u8 total = 0;
     u16 n;
 
     sys_memset32_fast(0, destination, sizeof(*destination));
-    sys_memcpy32_fast(source, destination, 0x40);
+    sys_memcpy32_fast(source, destination, offsetof(WMBssDesc, gameInfo));
     destination->otherElementCount = 0;
     destination->length = work->wirelessMode == 1 ? 0x20 : 0x40;
     for (n = 0; n < source->otherElementCount; n++) {
@@ -1065,8 +1060,7 @@ void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination) {
         BOOL retain = tag == 0x32 || tag == 0x2a || tag == 0x2f || tag == 7 || tag == 0x30;
 
         if (tag == 0xdd) {
-            retain = sys_memcmp(ie + 2, data_ov011_02185008, 4) == 0 ||
-                     sys_memcmp(ie + 2, data_ov011_0218500c, 5) == 0;
+            retain = sys_memcmp(ie + 2, sWpaOui, 4) == 0 || sys_memcmp(ie + 2, sWmmOui, 5) == 0;
         }
         if (retain) {
             sys_memcpy_fast(ie, output, (u8)ieLen);
@@ -1081,18 +1075,17 @@ void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination) {
 
 static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     WCMWork *work = WCM_GetWork();
-    const u8 *bytes = (const u8 *)bss;
     u8 buf[4];
 
-    sys_memcpy_fast(data_ov011_02185004, buf, 4);
+    sys_memcpy_fast(sNintendoOui, buf, 4);
     if (bss == NULL) {
         return NULL;
     }
     if (hw_isDSi()) {
         if (work->wirelessMode == 2 && bss->otherElementCount != 0) {
-            void *ie = WCM_GetInformationElement(bss, 0xdd, buf);
-            if (ie != NULL && *(u16 *)((u8 *)ie + 0xa) == 1) {
-                return (u8 *)ie + 0xa;
+            WCMVendorIE *ie = WCM_GetInformationElement(bss, 0xdd, buf);
+            if (ie != NULL && ie->magicNumber == 1) {
+                return &ie->magicNumber;
             }
         }
         return NULL;
@@ -1100,9 +1093,9 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     if (work->wirelessMode == 1) {
         u16 len = bss->gameInfoLength;
         if (len != 0 && len >= 0x10 && len <= 0x80) {
-            if (len == bytes[0x4a] + 0x10 && *(const u16 *)(bytes + 0x40) == 1 &&
-                bss->length == (len + 1 + 0x40) / 2) {
-                return (u8 *)bss + 0x40;
+            if (len == bss->gameInfo.userGameInfoLength + 0x10 && bss->gameInfo.magicNumber == 1 &&
+                bss->length == (len + 1 + offsetof(WMBssDesc, gameInfo)) / 2) {
+                return (void *)&bss->gameInfo;
             }
         }
     }
@@ -1114,23 +1107,23 @@ static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out) {
 }
 
 static void WCM_InitOnce(void) {
-    if (!sWcm.initialized) {
-        sWcm.initialized = TRUE;
-        sWcm.sendStatus = 0;
-        sys_memset(sWcm.ownMac, 0, 6);
-        OS_InitThreadQueue(&sWcm.sendQueue);
-        OS_InitMutex(&sWcm.mutex);
+    if (!sWcmGlobal.initialized) {
+        sWcmGlobal.initialized = TRUE;
+        sWcmGlobal.sendStatus = 0;
+        sys_memset(sWcmGlobal.ownMac, 0, 6);
+        OS_InitThreadQueue(&sWcmGlobal.sendQueue);
+        OS_InitMutex(&sWcmGlobal.mutex);
     }
 }
 
 void WCM_DispatchRecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
-    if (sWcm.recvCallback != NULL) {
-        sWcm.recvCallback(src, dst, data, len);
+    if (sWcmGlobal.recvCallback != NULL) {
+        sWcmGlobal.recvCallback(src, dst, data, len);
     }
 }
 
 WCMGlobal *WCM_GetGlobal(void) {
-    return &sWcm;
+    return &sWcmGlobal;
 }
 
 const u8 *WCM_GetApMacAddress(void) {
@@ -1139,7 +1132,7 @@ const u8 *WCM_GetApMacAddress(void) {
     u32 irq = CPU_IRQDisable();
 
     if (work != NULL && work->state == 9 && work->resetPending == 0) {
-        mac = work->unk_12e0 + 4;
+        mac = work->connectBss.bssid;
     }
     CPU_SetIRQMask(irq);
     return mac;
@@ -1153,7 +1146,7 @@ const u8 *WCM_GetConnectedApSsid(u16 *ssidLength) {
     u32 irq = CPU_IRQDisable();
 
     if (work != NULL && work->state == 9 && work->resetPending == 0) {
-        const WMBssDesc *bss = (const WMBssDesc *)work->unk_12e0;
+        const WMBssDesc *bss = &work->connectBss;
         length = bss->ssidLength;
         ssid = bss->ssid;
     }
@@ -1166,7 +1159,7 @@ const u8 *WCM_GetConnectedApSsid(u16 *ssidLength) {
 
 void WCM_SetRecvDCFCallback(void (*callback)(u8 *src, u8 *dst, u8 *data, u32 len)) {
     u32 irq = CPU_IRQDisable();
-    sWcm.recvCallback = callback;
+    sWcmGlobal.recvCallback = callback;
     CPU_SetIRQMask(irq);
 }
 
@@ -1181,15 +1174,15 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
         CPU_SetIRQMask(irq);
         return -1;
     }
-    OS_LockMutex(&sWcm.mutex);
+    OS_LockMutex(&sWcmGlobal.mutex);
     work = WCM_GetWork();
     if (work == NULL) {
-        OS_UnlockMutex(&sWcm.mutex);
+        OS_UnlockMutex(&sWcmGlobal.mutex);
         CPU_SetIRQMask(irq);
         return -1;
     }
     if (work->state != 9 || work->resetPending == 1) {
-        OS_UnlockMutex(&sWcm.mutex);
+        OS_UnlockMutex(&sWcmGlobal.mutex);
         CPU_SetIRQMask(irq);
         return -4;
     }
@@ -1206,7 +1199,7 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
     default:
         break;
     }
-    OS_UnlockMutex(&sWcm.mutex);
+    OS_UnlockMutex(&sWcmGlobal.mutex);
     CPU_SetIRQMask(irq);
     return headerLen + dataLen;
 }
@@ -1223,11 +1216,11 @@ void WCM_ReleaseIrqOwnedMutex(OSMutex *mutex) {
 }
 
 void WCM_SetMacAddress(const u8 *mac) {
-    sys_memcpy_fast(mac, sWcm.ownMac, 6);
+    sys_memcpy_fast(mac, sWcmGlobal.ownMac, 6);
 }
 
 void WCM_GetMacAddress(u8 *mac) {
-    sys_memcpy_fast(sWcm.ownMac, mac, 6);
+    sys_memcpy_fast(sWcmGlobal.ownMac, mac, 6);
 }
 
 static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
@@ -1236,10 +1229,11 @@ static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 h
     s32 total = headerLen + dataLen;
 
     if (mode == 2) {
+        WCMEthernetHeader *ether = dest;
         u16 length = (u16)total;
-        *(u16 *)((u8 *)dest + 0xc) = (u16)((length >> 8) | (length << 8));
-        payload += 0xe;
-        total += 0xe;
+        ether->length = (u16)((length >> 8) | (length << 8));
+        payload += sizeof(*ether);
+        total += sizeof(*ether);
     }
     sys_memcpy_fast(header, payload, headerLen);
     if (data != NULL && dataLen != 0) {
@@ -1304,17 +1298,17 @@ static s32 WCM_RssiToQuality(u32 rssi) {
 
 static u8 WCM_GetAverageRssi(void) {
     s32 sum = 0;
-    u8 count = sWcm.rssiSampleCursor;
+    u8 count = sWcmGlobal.rssiSampleCursor;
     int i;
 
     if (count > 0x10) {
         for (i = 0; i < 0x10; i++) {
-            sum += sWcm.rssiSamples[i];
+            sum += sWcmGlobal.rssiSamples[i];
         }
         sum /= 0x10;
     } else if (count != 0) {
         for (i = 0; i < count; i++) {
-            sum += sWcm.rssiSamples[i];
+            sum += sWcmGlobal.rssiSamples[i];
         }
         sum /= count;
     }
@@ -1335,12 +1329,12 @@ void WCM_AddRssiSample(s32 rawSample) {
     } else {
         sample = (u8)((rawSample >> 2) + 25);
     }
-    cursor = sWcm.rssiSampleCursor;
-    sWcm.rssiSamples[cursor % 16] = sample;
+    cursor = sWcmGlobal.rssiSampleCursor;
+    sWcmGlobal.rssiSamples[cursor % 16] = sample;
     if (cursor < 16) {
-        sWcm.rssiSampleCursor = cursor + 1;
+        sWcmGlobal.rssiSampleCursor = cursor + 1;
     } else {
-        sWcm.rssiSampleCursor = 16 + ((cursor + 1) % 16);
+        sWcmGlobal.rssiSampleCursor = 16 + ((cursor + 1) % 16);
     }
 }
 
@@ -1430,7 +1424,7 @@ static s32 WCM_StartConnectStep(void) {
     WCMWork *work = WCM_GetWork();
 
     if (work->state == 3) {
-        WMBssDesc *bss = (WMBssDesc *)work->unk_12e0;
+        WMBssDesc *bss = &work->connectBss;
         bss->rateSetSupport = bss->rateSetBasic | 3;
     }
     switch (func_02082560((WMCallbackFunc)WCM_OnWmControlComplete, 0xffff, 0x50, 0xffff, 0xffff)) {
@@ -1558,10 +1552,10 @@ static void WCM_RequestReset(void) {
 
 // WM's indication callback, installed in WCM_StartupStep1: dispatches disconnect indications by the current state
 static void WCM_OnWmIndication(void *ind) {
-    u16 type = ((u16 *)ind)[1];
+    const WMIndCallback *indication = ind;
     WCMWork *work;
 
-    if (type != 8 || ((u16 *)ind)[2] != 0x16 || ((u16 *)ind)[3] != 0x25) {
+    if (indication->errcode != 8 || indication->state != 0x16 || indication->unk_06 != 0x25) {
         return;
     }
     work = WCM_GetWork();
@@ -1619,8 +1613,7 @@ static void WCM_OnWmControlComplete(void *ind) {
             u32 options = work->searchOption;
             u16 option = (options & 0xc0000) == 0xc0000;
             BOOL mode = (options & 0x30000) != 0x30000;
-            result = func_020816dc((WMCallbackFunc)WCM_OnConnectStatus, (const WMBssDesc *)work->unk_12e0, NULL, mode,
-                                   option);
+            result = func_020816dc((WMCallbackFunc)WCM_OnConnectStatus, &work->connectBss, NULL, mode, option);
             break;
         }
         }
@@ -1629,23 +1622,23 @@ static void WCM_OnWmControlComplete(void *ind) {
             return;
         case 8:
             WCM_SetState(12);
-            parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? work->unk_12e0 : NULL;
+            parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL;
             WCM_NotifyResult(1, parameter, 0, 0x2f0);
             return;
         default:
             WCM_SetState(11);
-            parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? work->unk_12e0 : NULL;
+            parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL;
             WCM_NotifyResult(7, parameter, 0, 0x2f9);
             return;
         }
     case 1:
         WCM_SetState(12);
-        parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? work->unk_12e0 : NULL;
+        parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL;
         WCM_NotifyResult(1, parameter, 0, 0x31f);
         return;
     default:
         WCM_SetState(11);
-        parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? work->unk_12e0 : NULL;
+        parameter = work->pendingNotify == WCM_NOTIFY_CONNECT ? &work->connectBss : NULL;
         WCM_NotifyResult(7, parameter, 0, 0x329);
         return;
     }
@@ -1653,11 +1646,12 @@ static void WCM_OnWmControlComplete(void *ind) {
 
 static void WCM_ConnectStep4(void *ind) {
     WCMWork *work = WCM_GetWork();
+    const WMStartScanExCallback *callback = ind;
     int result = 0x14;
     int i;
     u32 count;
 
-    switch (((u16 *)ind)[1]) {
+    switch (callback->errcode) {
     case 0:
         if (work->state == 5) {
             WCM_SetState(6);
@@ -1666,11 +1660,11 @@ static void WCM_ConnectStep4(void *ind) {
         switch (work->state) {
         case 6:
             work->pendingNotify = 7;
-            if (((u16 *)ind)[4] == 5) {
+            if (callback->state == WM_STATECODE_PARENT_FOUND) {
                 cp15_invalidateDC(work->scanRequest.scanBuf, work->scanRequest.scanBufSize);
-                for (i = 0; i < ((u16 *)ind)[7]; i++) {
-                    void *bssDesc = ((void **)ind)[4 + i];
-                    WCM_OnBeaconReceived(bssDesc, ((u16 *)((u8 *)ind + 0x50))[i]);
+                for (i = 0; i < callback->bssDescCount; i++) {
+                    WMBssDesc *bssDesc = callback->bssDesc[i];
+                    WCM_OnBeaconReceived(bssDesc, callback->linkLevel[i]);
                     WCM_Notify(7, 0, (s32)bssDesc, ind, 0x35c);
                 }
             }
@@ -1681,7 +1675,7 @@ static void WCM_ConnectStep4(void *ind) {
                 }
             }
             work->scanRequest.channelList =
-                (u16)((1 << WCM_PickChannel((u16)(32 - MATH_CountLeadingZerosFunc(((u16 *)ind)[5])))) >> 1);
+                (u16)((1 << WCM_PickChannel((u16)(32 - MATH_CountLeadingZerosFunc(callback->channel)))) >> 1);
             cp15_cleanDC(work->scanRequest.scanBuf, work->scanRequest.scanBufSize);
             work->scanCount++;
             result = func_020815c8((WMCallbackFunc)WCM_ConnectStep4, &work->scanRequest);
@@ -1717,7 +1711,7 @@ static void WCM_ConnectStep4(void *ind) {
 }
 
 static void WCM_ConnectStep5(void *ind) {
-    switch (((const u16 *)ind)[1]) {
+    switch (((const WMCallback *)ind)->errcode) {
     case 0:
         WCM_SetState(3);
         WCM_NotifyResult(0, NULL, 0, 0x3c5);
@@ -1776,10 +1770,10 @@ static void WCM_OnConnectStatus(void *ind) {
             }
             if (result == 8) {
                 WCM_SetState(0xc);
-                WCM_NotifyResult(1, work->unk_12e0, 0, 0x430);
+                WCM_NotifyResult(1, &work->connectBss, 0, 0x430);
             } else {
                 WCM_SetState(0xb);
-                WCM_NotifyResult(7, work->unk_12e0, 0, 0x439);
+                WCM_NotifyResult(7, &work->connectBss, 0, 0x439);
             }
             break;
         case 6:
@@ -1787,7 +1781,7 @@ static void WCM_OnConnectStatus(void *ind) {
             break;
         default:
             WCM_SetState(0xb);
-            WCM_NotifyResult(7, work->unk_12e0, callback->base.state, 0x447);
+            WCM_NotifyResult(7, &work->connectBss, callback->base.state, 0x447);
             break;
         }
         break;
@@ -1801,7 +1795,7 @@ static void WCM_OnConnectStatus(void *ind) {
         break;
     default:
         WCM_SetState(0xb);
-        WCM_NotifyResult(7, work->unk_12e0, 0, 0x45e);
+        WCM_NotifyResult(7, &work->connectBss, 0, 0x45e);
         break;
     }
 }
@@ -1818,7 +1812,7 @@ static void WCM_OnDisconnectComplete(void *ind) {
         } else {
             work->associationId = 0;
             WCM_SetState(3);
-            WCM_NotifyResult(0, work->unk_12e0, 0, 0x481);
+            WCM_NotifyResult(0, &work->connectBss, 0, 0x481);
         }
         break;
     case 1:
@@ -1828,7 +1822,7 @@ static void WCM_OnDisconnectComplete(void *ind) {
         break;
     default:
         WCM_SetState(0xb);
-        WCM_NotifyResult(7, work->unk_12e0, 0, 0x493);
+        WCM_NotifyResult(7, &work->connectBss, 0, 0x493);
         break;
     }
 }
@@ -1846,7 +1840,7 @@ static void WCM_OnDcfReceive(void *ind) {
                 WCM_RequestReset();
             } else {
                 WCM_SetState(9);
-                WCM_NotifyResult(0, work->unk_12e0, 0, 0x4b7);
+                WCM_NotifyResult(0, &work->connectBss, 0, 0x4b7);
             }
             break;
         case 0xf: {
@@ -1859,13 +1853,13 @@ static void WCM_OnDcfReceive(void *ind) {
         }
         default:
             WCM_SetState(0xb);
-            WCM_NotifyResult(7, work->unk_12e0, callback->state, 0x4c6);
+            WCM_NotifyResult(7, &work->connectBss, callback->state, 0x4c6);
             break;
         }
         break;
     default:
         WCM_SetState(0xb);
-        WCM_NotifyResult(7, work->unk_12e0, 0, 0x4d1);
+        WCM_NotifyResult(7, &work->connectBss, 0, 0x4d1);
         break;
     }
 }
@@ -1890,11 +1884,11 @@ static void WCM_OnDisconnectPreparationComplete(void *ind) {
             return;
         case 8:
             WCM_SetState(0xc);
-            WCM_NotifyResult(1, work->unk_12e0, 0, 0x4fa);
+            WCM_NotifyResult(1, &work->connectBss, 0, 0x4fa);
             return;
         default:
             WCM_SetState(0xb);
-            WCM_NotifyResult(7, work->unk_12e0, 0, 0x506);
+            WCM_NotifyResult(7, &work->connectBss, 0, 0x506);
             return;
         }
     case 1:
@@ -1904,7 +1898,7 @@ static void WCM_OnDisconnectPreparationComplete(void *ind) {
         return;
     default:
         WCM_SetState(0xb);
-        WCM_NotifyResult(7, work->unk_12e0, 0, 0x519);
+        WCM_NotifyResult(7, &work->connectBss, 0, 0x519);
         return;
     }
 }
@@ -1937,35 +1931,35 @@ static void WCM_OnResetComplete(void *ind) {
     case 8:
         reason = work->connectionFailureReason;
         work->connectionFailureReason = 0;
-        if (reason == 0x12 && (*(u16 *)((u8 *)work + 0x1310) & 0x24) != 0x24) {
-            *(u16 *)((u8 *)work + 0x1310) |= 0x24;
+        if (reason == 0x12 && (work->connectBss.rateSetSupport & 0x24) != 0x24) {
+            work->connectBss.rateSetSupport |= 0x24;
             authMode = ((work->searchOption & 0xc0000) == 0xc0000);
             powerSave = ((work->searchOption & 0x30000) != 0x30000);
-            result = func_020816dc((WMCallbackFunc)WCM_OnConnectStatus, (const WMBssDesc *)work->unk_12e0, NULL,
-                                   powerSave, (u16)authMode);
+            result =
+                func_020816dc((WMCallbackFunc)WCM_OnConnectStatus, &work->connectBss, NULL, powerSave, (u16)authMode);
             if (result == 2) {
                 break;
             }
             if (result == 8) {
                 WCM_SetState(0xc);
-                WCM_NotifyResult(1, work->unk_12e0, reason, 0x563);
+                WCM_NotifyResult(1, &work->connectBss, reason, 0x563);
             } else {
                 WCM_SetState(0xb);
-                WCM_NotifyResult(7, work->unk_12e0, reason, 0x56c);
+                WCM_NotifyResult(7, &work->connectBss, reason, 0x56c);
             }
         } else {
             WCM_SetState(3);
-            WCM_NotifyResult(1, work->unk_12e0, reason, 0x574);
+            WCM_NotifyResult(1, &work->connectBss, reason, 0x574);
         }
         break;
     case 9:
     case 12:
         WCM_SetState(3);
-        WCM_NotifyResult(0, work->unk_12e0, 1, 0x57c);
+        WCM_NotifyResult(0, &work->connectBss, 1, 0x57c);
         break;
     case 10:
         WCM_SetState(3);
-        WCM_NotifyResult(0, work->unk_12e0, 0, 0x583);
+        WCM_NotifyResult(0, &work->connectBss, 0, 0x583);
         break;
     case 13:
         result = func_02081398((WMCallbackFunc)WCM_OnWmControlComplete);
@@ -2058,11 +2052,11 @@ static void WCM_OnSendCompleteWithCallback(void *ind) {
 }
 
 // The "any" BSSID and ESSID that a search takes when the caller gives none
-const u8 WCMiAnyBssid[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00};
+const u8 WCMiAnyBssid[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00 };
 const u8 WCMiAnyEssid[] = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 };
-static const u8 data_ov011_02185004[] = {0x00, 0x09, 0xbf, 0x00};
-static const u8 data_ov011_02185008[] = {0x00, 0x50, 0xf2, 0x01};
-static const u8 data_ov011_0218500c[] = {0x00, 0x50, 0xf2, 0x02, 0x00, 0x00, 0x00, 0x00};
+static const u8 sNintendoOui[] = { 0x00, 0x09, 0xbf, 0x00 };
+static const u8 sWpaOui[] = { 0x00, 0x50, 0xf2, 0x01 };
+static const u8 sWmmOui[] = { 0x00, 0x50, 0xf2, 0x02, 0x00, 0x00, 0x00, 0x00 };

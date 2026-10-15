@@ -90,9 +90,21 @@ u32 MATH_CountLeadingZerosFunc(u32 x);
 // The number of set bits
 u8 MATH_CountPopulation(u32 x);
 
+#ifdef __thumb
 static inline u32 MATH_CountLeadingZeros(u32 x) {
     return MATH_CountLeadingZerosFunc(x);
 }
+#else
+// ARM code has the CLZ instruction, which the SDK's inline puts in place: assembly a library inlines at its call sites
+// (libVCT's VCT_SendPending is one), so a static inline with an asm block, as lib/ allows. MWCC defines __thumb only
+// for Thumb code
+static inline u32 MATH_CountLeadingZeros(u32 x) {
+    asm {
+        clz x, x
+    }
+    return x;
+}
+#endif
 
 // math_md5.c (MD5) and math_sha1.c (SHA-1 and HMAC-SHA1); the ROM's data order says they are two files, not one
 void MATH_MD5Init(MATHMD5Context *context);

@@ -26,11 +26,8 @@ static void HandlerPosBatonPass(BattleEventItem *item, BtlServerFlow *flow, u8 p
 
 // Each position effect and the function that returns its handlers
 static const PosEventAddEntry sPosEventAddTable[] = {
-    { 0, EventAddPosWish },
-    { 1, EventAddPosLunarDance },
-    { 2, EventAddPosHealingWish },
-    { 3, EventAddPosFutureSight },
-    { 4, EventAddPosBatonPass },
+    { 0, EventAddPosWish },        { 1, EventAddPosLunarDance }, { 2, EventAddPosHealingWish },
+    { 3, EventAddPosFutureSight }, { 4, EventAddPosBatonPass },
 };
 
 BOOL PosEventAdd(u32 effect, u8 pos, u8 monId, const u32 *args, u8 argCount) {

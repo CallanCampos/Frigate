@@ -9,10 +9,10 @@
 
 // The one engine this build creates (sEngine); every function below reaches it through Gt2_GetEngine
 typedef struct GT2Engine {
-    void *socket;                       // the lower layer's socket handle
-    void *connections;                  // GT2Connection array, the established connections, keyed by ip and port
-    void *pending;                      // GT2PendingConnect array, keyed by its 16-byte header
-    BOOL initialized;                   // whether Gt2_CreateSocket completed successfully
+    void *socket;      // the lower layer's socket handle
+    void *connections; // GT2Connection array, the established connections, keyed by ip and port
+    void *pending;     // GT2PendingConnect array, keyed by its 16-byte header
+    BOOL initialized;  // whether Gt2_CreateSocket completed successfully
     Gt2AttemptResultCallback onAttemptResult;
     Gt2ClosedCallback onClosed;
     Gt2PingCallback onPing;
@@ -30,7 +30,7 @@ typedef struct GT2Engine {
 typedef struct GT2Connection {
     u32 ip;
     u16 port;
-    void *handle;                       // the lower layer's per-connection handle
+    void *handle; // the lower layer's per-connection handle
 } GT2Connection;
 
 // A pending connect with a fixed 16-byte init message and header
@@ -234,8 +234,8 @@ static void Gt2_OnConnectAttemptDone(void *addr, int rawResult, const void *mess
         if (index != -1) {
             if (pending->onAttemptResult != NULL) {
                 func_ov011_0216cca8(0xc, 0, 0x10, "[Udp Engine] Passing connect result to message handler\n");
-                pending->onAttemptResult(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason,
-                                         rawResult == 2, pending->userData);
+                pending->onAttemptResult(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, rawResult == 2,
+                                         pending->userData);
             }
             func_ov011_02171668(pending->attempts, index);
             return;

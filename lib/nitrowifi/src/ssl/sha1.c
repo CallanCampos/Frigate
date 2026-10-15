@@ -1,8 +1,7 @@
-#include "ssl_internal.h"
 #include "gfl/std.h"
+#include "ssl_internal.h"
 
-// SSL's own SHA-1 (FIPS 180). No swan name for the object or any of its functions; everything here is named for the
-// algorithm rather than copied from a reference implementation.
+// SSL's own SHA-1 (FIPS 180), written from the asm. The ROM names none of it, so the names are the algorithm's.
 
 #define SHA1_BLOCK_SIZE 64
 

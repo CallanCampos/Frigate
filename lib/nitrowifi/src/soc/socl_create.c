@@ -1,7 +1,7 @@
-#include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
+#include "socl_internal.h"
 
 // SOCL's socket creation: SOCL_CreateSocket gets the memory for a socket and its pipes and buffers (their sizes come
 // from a SOCLSocketParam), then has the socket's control pipe register it with CPS. pokediamond's NitroWiFi names the
@@ -145,7 +145,8 @@ static u8 *SOCLi_InitCommandPipe(u8 *data, SOCLCommandPipe *pipe, const SOCLPipe
 
     func_0207acc4(&pipe->queue, (OSMessage *)data, param->queue_length);
     OS_InitMutex(&pipe->mutex);
-    scheduler_init_thread(&pipe->thread, (void (*)(void *))SOCLi_CommandPacketHandler, pipe, data + size, param->stack_size, param->priority);
+    scheduler_init_thread(&pipe->thread, (void (*)(void *))SOCLi_CommandPacketHandler, pipe, data + size,
+                          param->stack_size, param->priority);
     scheduler_start_thread(&pipe->thread);
     return data + size;
 }

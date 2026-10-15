@@ -155,7 +155,7 @@ prints the tables below from the configs and the ROM:
 | `symbol_map.c` | `0x02160668`–`0x021609b4` | 12 | complete | string at `0x0216e2d0` |
 | `event_royal_unova.c` | `0x021609b4`–`0x02160b80` | 8 | complete | descriptive |
 | `scrcmd_unity_tower.c` | `0x02160b80`–`0x02160dc8` | 7 | complete | descriptive |
-| `building_enter_effect.c` | `0x02160dc8`–`0x02160eb4` | 3 | complete | descriptive |
+| `building_enter_effect.c` | `0x02160dc8`–`0x02160eb4` | 3 | partial | descriptive |
 | `townmap_util.c` | `0x02160eb4`–`0x02160ff4` | 2 | complete | descriptive |
 | `scrcmd_phrase_select.c` | `0x02160ff4`–`0x021611e0` | 2 | complete | descriptive |
 | `scrcmd_weather.c` | `0x021611e0`–`0x02161260` | 1 | complete | descriptive |
@@ -988,7 +988,7 @@ prints the tables below from the configs and the ROM:
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | complete | descriptive |
+| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | partial | descriptive |
 
 ### Overlay 103
 

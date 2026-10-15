@@ -4,6 +4,7 @@
 . 0x02004fb4 reloc_addend 0x988
 . 0x020050ac add_data CPSi_Signature
 . 0x020050c4 add_data SOCLi_Signature
+. 0x02005108 add_data VCTi_Signature
 . 0x0200587c reloc_addend 0x4
 . 0x02005880 reloc_addend 0xc
 . 0x02005884 reloc_addend 0x10
@@ -910,6 +911,7 @@ overlays/ov023 0x0216f720 reloc_module overlay(325)
 overlays/ov026 0x0216f926 reloc_module overlay(12)
 overlays/ov028 0x02171cfa reloc_module overlay(69)
 overlays/ov028 0x021723e8 reloc_module overlay(167)
+overlays/ov029 0x02196fe0 add_reloc load,main,0x02005108
 overlays/ov029 0x0219729c remove_reloc
 overlays/ov029 0x02197424 add_data data_ov029_02197424
 overlays/ov033 0x02176e82 reloc_module overlay(130)

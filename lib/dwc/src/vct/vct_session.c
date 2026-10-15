@@ -1,7 +1,6 @@
-#include "vct_internal.h"
-
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_internal.h"
 
 // The machines the voice chat talks to. Machines ask each other for voice with small control packets, and a table of
 // what each packet does to a machine's state decides whether to carry on, to refuse, or to give the application an
@@ -49,31 +48,31 @@ static BOOL HandleClosePacket(VCTControlPacket *packet, VCTEventResult *result);
 static BOOL HandleCommand4(VCTControlPacket *packet, VCTEventResult *result);
 
 // The events that a packet gives the application, by the command of the broadcast and of the direct packet
-static const u8 sBroadcastEvents[5] = {1, 8, 4, 10, 0};
-static const u8 sDirectEvents[7] = {7, 12, 2, 3, 9, 2, 0};
+static const u8 sBroadcastEvents[5] = { 1, 8, 4, 10, 0 };
+static const u8 sDirectEvents[7] = { 7, 12, 2, 3, 9, 2, 0 };
 
 // What a control packet does to a machine in each state (a row each), by the command (a column each: those of a
 // broadcast packet, then those of a direct one): the next state, -1 to take no notice, or -2 to refuse. The first two
 // tables are for when the packet is a reply, the others for when it is a request, one of each for the first mode.
 static const s8 sReplyTableOther[6][11] = {
-    {-2, -2, -2, 3, -1, -1, 0, -1, -1, -1, -1}, {-2, -2, -2, -3, -1, 2, 0, 0, 0, -1, 0},
-    {-2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1}, {-2, 0, -2, -3, -1, -1, -1, -1, -1, -1, -1},
-    {-2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1}, {-2, -2, -2, -3, -1, 0, 0, -1, -1, 0, -1},
+    { -2, -2, -2, 3, -1, -1, 0, -1, -1, -1, -1 },   { -2, -2, -2, -3, -1, 2, 0, 0, 0, -1, 0 },
+    { -2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1 }, { -2, 0, -2, -3, -1, -1, -1, -1, -1, -1, -1 },
+    { -2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -3, -1, 0, 0, -1, -1, 0, -1 },
 };
 static const s8 sCheckTableMode1[6][11] = {
-    {1, -2, -2, -2, -2, -2, 0, 0, 0, -2, -2}, {-2, -2, 5, -2, -2, -2, 0, -2, -2, -2, -2},
-    {-2, 5, -2, -2, -2, -2, 0, -2, -2, -2, -2}, {-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2},
-    {-2, -2, -2, -2, -2, 2, 0, 0, 0, -2, 0}, {-2, -2, -2, -2, -2, 0, 0, -2, -2, 0, -2},
+    { 1, -2, -2, -2, -2, -2, 0, 0, 0, -2, -2 },   { -2, -2, 5, -2, -2, -2, 0, -2, -2, -2, -2 },
+    { -2, 5, -2, -2, -2, -2, 0, -2, -2, -2, -2 }, { -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 },
+    { -2, -2, -2, -2, -2, 2, 0, 0, 0, -2, 0 },    { -2, -2, -2, -2, -2, 0, 0, -2, -2, 0, -2 },
 };
 static const s8 sCheckTableOther[6][11] = {
-    {-2, -2, -2, 1, -1, -2, 0, 0, 0, -2, -2}, {-2, 5, 5, -2, -1, -2, 0, -2, -2, -2, -2},
-    {-2, 5, -2, -2, -1, -2, 0, -2, -2, -2, -2}, {-2, -2, -2, -2, -1, -2, 0, -2, -2, -2, -2},
-    {-2, -2, -2, -2, -1, 3, 0, 0, 0, -2, 0}, {-2, -2, -2, -2, -1, 0, 0, -2, -2, 0, -2},
+    { -2, -2, -2, 1, -1, -2, 0, 0, 0, -2, -2 },   { -2, 5, 5, -2, -1, -2, 0, -2, -2, -2, -2 },
+    { -2, 5, -2, -2, -1, -2, 0, -2, -2, -2, -2 }, { -2, -2, -2, -2, -1, -2, 0, -2, -2, -2, -2 },
+    { -2, -2, -2, -2, -1, 3, 0, 0, 0, -2, 0 },    { -2, -2, -2, -2, -1, 0, 0, -2, -2, 0, -2 },
 };
 static const s8 sReplyTableMode1[6][11] = {
-    {4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1}, {-2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0},
-    {-2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1}, {-2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1},
-    {-2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1}, {-2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1},
+    { 4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0 },
+    { -2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1 },  { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1 },
+    { -2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1 },
 };
 
 // How long to wait for an answer, in clock ticks
@@ -82,16 +81,14 @@ static u64 sRequestTimeout = 15709687;
 static VCTSessionPool sSessionPool;
 static VCTSessionState sSessionState;
 
-VCTSession *VCT_AllocSession(u8 aid)
-{
+VCTSession *VCT_AllocSession(u8 aid) {
     if (gVCTSettings.mode == 0 || gVCTSettings.mode == 2) {
         return NULL;
     }
     return AllocFromPool(aid);
 }
 
-BOOL VCT_ReleaseSession(VCTSession *session)
-{
+BOOL VCT_ReleaseSession(VCTSession *session) {
     VCTSession *previous = NULL;
     VCTSession *current = sSessionPool.usedList;
 
@@ -125,8 +122,7 @@ BOOL VCT_ReleaseSession(VCTSession *session)
 }
 
 // Makes a control packet to send as a request, returning 0 or what is wrong with it
-static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size)
-{
+static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size) {
     if (session == NULL) {
         return -1;
     }
@@ -152,8 +148,7 @@ static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *pack
     return 0;
 }
 
-int VCT_Request(VCTSession *session, int command)
-{
+int VCT_Request(VCTSession *session, int command) {
     if (gVCTSettings.mode == 2) {
         return -3;
     }
@@ -161,8 +156,7 @@ int VCT_Request(VCTSession *session, int command)
 }
 
 // Makes a control packet to send as a reply
-static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size)
-{
+static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size) {
     if (session == NULL) {
         return -1;
     }
@@ -188,16 +182,14 @@ static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *pac
     return 0;
 }
 
-int VCT_Respond(VCTSession *session, int command)
-{
+int VCT_Respond(VCTSession *session, int command) {
     if (gVCTSettings.mode == 2) {
         return -3;
     }
     return SendResponse(session, command);
 }
 
-int VCT_AddSession(u8 aid)
-{
+int VCT_AddSession(u8 aid) {
     VCTSession *session;
 
     if (gVCTSettings.mode != 3) {
@@ -225,8 +217,7 @@ int VCT_AddSession(u8 aid)
     return 0;
 }
 
-int VCT_RemoveSession(u8 aid)
-{
+int VCT_RemoveSession(u8 aid) {
     VCTSession *session;
 
     if (gVCTSettings.mode != 3) {
@@ -241,8 +232,7 @@ int VCT_RemoveSession(u8 aid)
     return 0;
 }
 
-BOOL VCT_InitSessions(VCTConfig *config)
-{
+BOOL VCT_InitSessions(VCTConfig *config) {
     u32 i;
 
     if (config->sessions == NULL || config->sessionCount == 0 || config->sessionCount > 8) {
@@ -266,15 +256,13 @@ BOOL VCT_InitSessions(VCTConfig *config)
     return TRUE;
 }
 
-void VCT_ClearSessions(void)
-{
+void VCT_ClearSessions(void) {
     sSessionPool.usedList = NULL;
     sSessionPool.freeList = NULL;
 }
 
 // Gives up on a request that has gone unanswered for too long
-void VCT_CheckTimeout(void)
-{
+void VCT_CheckTimeout(void) {
     u64 now = clock();
 
     if (gVCTSettings.mode != 2) {
@@ -297,8 +285,7 @@ void VCT_CheckTimeout(void)
 }
 
 // Takes in a control packet, returning whether it has given the application an event
-BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEventResult *result)
-{
+BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEventResult *result) {
     if (size != sizeof(VCTControlPacket)) {
         return FALSE;
     }
@@ -314,8 +301,7 @@ BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEve
     return HandleHostPacket(packet, result);
 }
 
-static VCTSession *AllocFromPool(u8 aid)
-{
+static VCTSession *AllocFromPool(u8 aid) {
     VCTSession *session;
 
     if (aid >= VCT_AID_MAX) {
@@ -335,8 +321,7 @@ static VCTSession *AllocFromPool(u8 aid)
     return session;
 }
 
-static int SendRequest(VCTSession *session, int command)
-{
+static int SendRequest(VCTSession *session, int command) {
     VCTControlPacket packet;
     int result = BuildRequest(session, command, &packet, sizeof(packet));
 
@@ -349,8 +334,7 @@ static int SendRequest(VCTSession *session, int command)
     return 0;
 }
 
-static int SendResponse(VCTSession *session, int command)
-{
+static int SendResponse(VCTSession *session, int command) {
     VCTControlPacket packet;
     int result = BuildResponse(session, command, &packet, sizeof(packet));
 
@@ -363,8 +347,7 @@ static int SendResponse(VCTSession *session, int command)
     return 0;
 }
 
-static void FillBroadcastFields(VCTSession *session, VCTControlPacket *packet)
-{
+static void FillBroadcastFields(VCTSession *session, VCTControlPacket *packet) {
     if (packet->flag == 1) {
         packet->origin = session->aid;
         packet->argument = sSessionState.mask;
@@ -372,8 +355,7 @@ static void FillBroadcastFields(VCTSession *session, VCTControlPacket *packet)
 }
 
 // Sends a control packet to every machine of the voice chat, returning 0 if there was one it reached
-static int SendBroadcast(VCTSession *session, VCTControlPacket *packet)
-{
+static int SendBroadcast(VCTSession *session, VCTControlPacket *packet) {
     int sent = 0;
     u8 aid;
 
@@ -394,8 +376,7 @@ static int SendBroadcast(VCTSession *session, VCTControlPacket *packet)
     return sent == 0 ? -4 : 0;
 }
 
-static void BroadcastCommand(int flag)
-{
+static void BroadcastCommand(int flag) {
     VCTControlPacket packet;
 
     packet.type = VCT_TYPE_BROADCAST;
@@ -404,16 +385,14 @@ static void BroadcastCommand(int flag)
     SendBroadcast(&sSessionPool.host, &packet);
 }
 
-static void InitSession(VCTSession *session, u8 aid)
-{
+static void InitSession(VCTSession *session, u8 aid) {
     memset(session, 0, sizeof(VCTSession));
     session->active = gVCTSettings.mode;
     session->state = 0;
     session->aid = aid;
 }
 
-static BOOL SendControl(VCTSession *session, VCTControlPacket *packet)
-{
+static BOOL SendControl(VCTSession *session, VCTControlPacket *packet) {
     if (packet->type == VCT_TYPE_BROADCAST && packet->command == 4) {
         SendBroadcast((VCTSession *)session, packet);
     } else {
@@ -425,8 +404,7 @@ static BOOL SendControl(VCTSession *session, VCTControlPacket *packet)
 }
 
 // The event that a control packet gives the application, if any
-static int GetEvent(VCTControlPacket *packet, VCTSession *session)
-{
+static int GetEvent(VCTControlPacket *packet, VCTSession *session) {
     session->origin = packet->origin;
     if (packet->type == VCT_TYPE_BROADCAST) {
         if (packet->command == 0) {
@@ -446,8 +424,7 @@ static int GetEvent(VCTControlPacket *packet, VCTSession *session)
     return 12;
 }
 
-static void InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command)
-{
+static void InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command) {
     packet->magic = VCT_PACKET_MAGIC;
     packet->length = sizeof(VCTControlPacket);
     packet->command = command;
@@ -459,8 +436,7 @@ static void InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 
 }
 
 // Moves a session on by a reply, returning what the table says
-static int ReplyTransition(VCTSession *session, VCTControlPacket *packet)
-{
+static int ReplyTransition(VCTSession *session, VCTControlPacket *packet) {
     int column = packet->command;
     const s8(*table)[11];
     int next;
@@ -497,8 +473,7 @@ static int ReplyTransition(VCTSession *session, VCTControlPacket *packet)
     }
 }
 
-static BOOL CanStart(VCTSession *session)
-{
+static BOOL CanStart(VCTSession *session) {
     VCTSession *other;
 
     for (other = sSessionPool.usedList; other != NULL; other = other->next) {
@@ -510,8 +485,7 @@ static BOOL CanStart(VCTSession *session)
 }
 
 // Moves a session on by a request, returning 0 if it is refused
-static int CheckTransition(VCTSession *session, VCTControlPacket *packet)
-{
+static int CheckTransition(VCTSession *session, VCTControlPacket *packet) {
     int column = packet->command;
     const s8(*table)[11];
     int next;
@@ -537,8 +511,7 @@ static int CheckTransition(VCTSession *session, VCTControlPacket *packet)
     return TRUE;
 }
 
-static VCTSession *FindSession(int aid)
-{
+static VCTSession *FindSession(int aid) {
     VCTSession *session = sSessionPool.usedList;
 
     if (gVCTSettings.mode == 2) {
@@ -555,8 +528,7 @@ static VCTSession *FindSession(int aid)
     return NULL;
 }
 
-static BOOL HandlePeerPacket(VCTControlPacket *packet, VCTEventResult *result)
-{
+static BOOL HandlePeerPacket(VCTControlPacket *packet, VCTEventResult *result) {
     VCTSession *session;
     int next;
 
@@ -602,8 +574,7 @@ static BOOL HandlePeerPacket(VCTControlPacket *packet, VCTEventResult *result)
     return result->event != 0;
 }
 
-static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result)
-{
+static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
     VCTSession *host = &sSessionPool.host;
     int next;
 
@@ -644,7 +615,7 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result)
     host->state = next;
     if (result->event == 10) {
         BroadcastCommand(1);
-        sSessionState.requestTime = clock();
+        sSessionState.requestTime = sSessionPool.clock();
     } else {
         BroadcastCommand(0);
         sSessionState.requestTime = 0;
@@ -652,8 +623,7 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result)
     return TRUE;
 }
 
-static BOOL HandleClosePacket(VCTControlPacket *packet, VCTEventResult *result)
-{
+static BOOL HandleClosePacket(VCTControlPacket *packet, VCTEventResult *result) {
     VCTSession *session;
 
     if (packet->type == VCT_TYPE_BROADCAST && packet->command == 4) {
@@ -672,8 +642,7 @@ static BOOL HandleClosePacket(VCTControlPacket *packet, VCTEventResult *result)
     return FALSE;
 }
 
-static BOOL HandleCommand4(VCTControlPacket *packet, VCTEventResult *result)
-{
+static BOOL HandleCommand4(VCTControlPacket *packet, VCTEventResult *result) {
     if (gVCTSettings.mode != 2) {
         return FALSE;
     }

@@ -801,8 +801,8 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         }
     }
 
-    // The ride's sound is louder the faster the car goes: how far the car moves in a frame, as RollerCoaster_UpdateAmbience
-    // works it out for the nearest car
+    // The ride's sound is louder the faster the car goes: how far the car moves in a frame, as
+    // RollerCoaster_UpdateAmbience works it out for the nearest car
     {
         G3DActor *g3dActor = FieldExpObj_GetActor(expObj, 0, actor);
         fx32 lastFrame;
@@ -985,90 +985,79 @@ static void RollerCoaster_GetJointTrans(const NNSG3dResJntAnm *anm, u32 node, fx
 }
 
 // A translation component at a frame, from values stored every 1, 2 or 4 frames and interpolated between, as
-// NitroSystem's joint animation reads them. The two gotos are the shared ends that the original jumps to from several
-// branches: written as calls of inline helpers, each branch gets a copy and the function is 0x90 bytes longer. The
-// interpolation reads its pair of values as `*(array + index)` and `*(array + index + 1)`, which offsets the second
-// read from the first, as the original does; `array[index + 1]` computes its address again
+// NitroSystem's joint animation reads them.
 static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data, const NNSG3dResJntAnm *anm) {
-    u32 whole = frame >> FX32_SHIFT;
+    u32 index = frame >> FX32_SHIFT;
     const void *values = (const u8 *)anm + data[1];
-    u32 lastInterp;
-    u32 index;
-    u32 subIndex;
+    BOOL interp = FALSE;
+    u32 pairIndex;
 
-    if (!(data[0] & NNS_G3D_JNTANM_TINFO_STEP_MASK)) {
-        index = whole;
-        goto noInterp;
-    }
-    lastInterp = (data[0] & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-    if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_2) {
-        if (whole & 1) {
-            if (whole > lastInterp) {
-                index = (lastInterp >> 1) + 1;
-                goto noInterp;
+    if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
+        u32 lastInterp = (data[0] & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+
+        if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_2) {
+            if (index & 1) {
+                if (index > lastInterp) {
+                    index = (lastInterp >> 1) + 1;
+                } else {
+                    pairIndex = index >> 1;
+                    interp = TRUE;
+                }
             } else {
-                index = whole >> 1;
-                goto interp2;
+                index >>= 1;
             }
         } else {
-            index = whole >> 1;
-            goto noInterp;
-        }
-    } else {
-        if (whole & 3) {
-            if (whole > lastInterp) {
-                index = (lastInterp >> 2) + (whole & 3);
-                goto noInterp;
-            }
-            if (whole & 1) {
-                fx32 v;
-                fx32 subV;
+            if (index & 3) {
+                if (index > lastInterp) {
+                    index = (lastInterp >> 2) + (index & 3);
+                } else if (index & 1) {
+                    u32 first;
+                    u32 second;
+                    fx32 v;
+                    fx32 subV;
 
-                if (whole & 2) {
-                    subIndex = whole >> 2;
-                    index = subIndex + 1;
+                    if (index & 2) {
+                        second = index >> 2;
+                        first = second + 1;
+                    } else {
+                        first = index >> 2;
+                        second = first + 1;
+                    }
+                    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+                        const fx16 *array = values;
+
+                        v = array[first];
+                        subV = array[second];
+                        *value = (v + v + v + subV) >> 2;
+                    } else {
+                        const fx32 *array = values;
+                        fx64 tripled = (fx64)array[first] * 3;
+                        fx64 sub = array[second];
+
+                        *value = (fx32)((tripled + sub) >> 2);
+                    }
+                    return;
                 } else {
-                    index = whole >> 2;
-                    subIndex = index + 1;
+                    pairIndex = index >> 2;
+                    interp = TRUE;
                 }
-                if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-                    const fx16 *array = values;
-
-                    v = array[index];
-                    subV = array[subIndex];
-                    *value = (v + v + v + subV) >> 2;
-                } else {
-                    const fx32 *array = values;
-                    fx64 tripled = (fx64)array[index] * 3;
-                    fx64 sub = array[subIndex];
-
-                    *value = (fx32)((tripled + sub) >> 2);
-                }
-                return;
             } else {
-                index = whole >> 2;
-                goto interp2;
+                index >>= 2;
             }
-        } else {
-            index = whole >> 2;
-            goto noInterp;
         }
     }
 
-interp2:
-    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-        const fx16 *array = values;
+    if (interp) {
+        if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+            const fx16 *pair = &((const fx16 *)values)[pairIndex];
 
-        *value = (*(array + index) + *(array + index + 1)) >> 1;
-    } else {
-        const fx32 *array = values;
+            *value = (pair[0] + pair[1]) >> 1;
+        } else {
+            const fx32 *pair = &((const fx32 *)values)[pairIndex];
 
-        *value = (*(array + index) >> 1) + (*(array + index + 1) >> 1);
-    }
-    return;
-
-noInterp:
-    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+            *value = (pair[0] >> 1) + (pair[1] >> 1);
+        }
+    } else if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
         *value = ((const fx16 *)values)[index];
     } else {
         *value = ((const fx32 *)values)[index];

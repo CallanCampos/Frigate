@@ -29,14 +29,10 @@ static void HandlerFieldMagicRoom(BattleEventItem *item, BtlServerFlow *flow, u8
 
 // Each field effect and the function that returns its handlers
 static const FieldEffectEventAddEntry sFieldEffectEventAddTable[] = {
-    { FIELD_CONDITION_WEATHER, EventAddFieldWeather },
-    { FIELD_CONDITION_TRICK_ROOM, EventAddFieldTrickRoom },
-    { FIELD_CONDITION_GRAVITY, EventAddFieldGravity },
-    { FIELD_CONDITION_IMPRISON, EventAddFieldImprison },
-    { FIELD_CONDITION_WATER_SPORT, EventAddFieldWaterSport },
-    { FIELD_CONDITION_MUD_SPORT, EventAddFieldMudSport },
-    { FIELD_CONDITION_WONDER_ROOM, EventAddFieldWonderRoom },
-    { FIELD_CONDITION_MAGIC_ROOM, EventAddFieldMagicRoom },
+    { FIELD_CONDITION_WEATHER, EventAddFieldWeather },        { FIELD_CONDITION_TRICK_ROOM, EventAddFieldTrickRoom },
+    { FIELD_CONDITION_GRAVITY, EventAddFieldGravity },        { FIELD_CONDITION_IMPRISON, EventAddFieldImprison },
+    { FIELD_CONDITION_WATER_SPORT, EventAddFieldWaterSport }, { FIELD_CONDITION_MUD_SPORT, EventAddFieldMudSport },
+    { FIELD_CONDITION_WONDER_ROOM, EventAddFieldWonderRoom }, { FIELD_CONDITION_MAGIC_ROOM, EventAddFieldMagicRoom },
 };
 
 BattleEventItem *FieldEffectEventAdd(u32 effect, u8 monId) {

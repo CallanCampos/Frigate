@@ -1,13 +1,9 @@
-#include "ssl_internal.h"
-
 #include "gfl/std.h"
 #include "nitrowifi/cps.h"
+#include "ssl_internal.h"
 
 // A multi-precision integer is a little-endian array of n u16 digits, every length given explicitly by the caller.
 // No swan name for the object or any of its functions; named for what each does from the asm's shape
-
-// The C library's memmove, which the main module links
-void *memmove(void *dest, const void *src, u32 size);
 
 static int BigInti_GetLength(const u16 *digits, int n) {
     while (n != 0 && digits[n - 1] == 0) {
@@ -250,8 +246,7 @@ void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *rem
                 u32 digit;
 
                 memmove(qbuf + 1, qbuf, span);
-                numerator =
-                    (u64)top[-3] + ((u64)top[-2] << 16) + ((u64)top[-1] << 32) + ((u64)top[0] << 48);
+                numerator = (u64)top[-3] + ((u64)top[-2] << 16) + ((u64)top[-1] << 32) + ((u64)top[0] << 48);
                 digit = (u32)(numerator / divisorTop);
                 if (digit > 0xffff) {
                     digit = 0xffff;

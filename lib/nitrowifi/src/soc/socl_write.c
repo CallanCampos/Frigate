@@ -1,7 +1,7 @@
-#include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
+#include "socl_internal.h"
 
 // SOCL's writes: SOCL_WriteTo puts the data in the send pipe's ring buffer (SOCLi_WriteBuffer, which waits for room
 // when the socket blocks) and queues a command (SOCLi_ExecWriteCommand) for the pipe's thread, which copies it to
@@ -35,7 +35,7 @@ int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CP
     }
     pipe = SOCLi_GetSendPipe(socket);
     if ((flags & SOCLI_WRITE_NOBLOCK) || socket->flag_block == 0) {
-        if (!func_0207aeec(&pipe->base.mutex)) {
+        if (!OS_TryLockMutex(&pipe->base.mutex)) {
             return SOCL_EAGAIN;
         }
         block = 0;

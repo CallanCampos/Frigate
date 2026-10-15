@@ -6018,7 +6018,7 @@ static BOOL func_ov167_021b88ec(BtlClient *client, s32 *seq, const u32 *args) {
         if (func_ov167_021b1990(client)) {
             return TRUE;
         }
-        if (!func_ov167_0219bd88(client->mainModule) && func_ov169_0689cb5c(args[1])) {
+        if (!func_ov167_0219bd88(client->mainModule) && IsStatEffectId(args[1])) {
             return TRUE;
         }
         func_ov167_021cff78(client->viewCore, pos, args[1]);
@@ -6243,7 +6243,7 @@ static BOOL func_ov167_021b8dac(BtlClient *client, s32 *seq, const u32 *args) {
 
     func_ov167_021bd8b8(args[2], monIds);
     for (i = 0; i < numConditions; i++) {
-        u32 condition = func_ov169_0689cb80(i);
+        u32 condition = GetConditionByIndex(i);
 
         if (condition == 0) {
             break;

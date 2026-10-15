@@ -1,7 +1,7 @@
-#include "nitrowifi/soc.h"
-#include "socl_internal.h"
 #include "gfl/std.h"
 #include "nitro/os.h"
+#include "nitrowifi/soc.h"
+#include "socl_internal.h"
 
 // SOCL's lists of sockets: the live ones, and the closed ones that SOCLi_TrashSocket frees. The singly linked lists
 // chain through SOCLSocket.next. pokediamond's NitroWiFi names the object socl_list.o; this version adds the socket
