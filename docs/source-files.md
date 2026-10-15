@@ -1889,7 +1889,7 @@ prints the tables below from the configs and the ROM:
 | `gsync_disp.c` | `0x021b4b48`–`0x021b5bfc` | 36 | complete | string at `0x021b9b40` |
 | `gsync_state.c` | `0x021b5bfc`–`0x021b8238` | 98 | complete | string at `0x021b9b50` |
 | `pdwacc_message.c` | `0x021b8238`–`0x021b88d0` | 13 | complete | string at `0x021b9b98` |
-| `pdwacc_disp.c` | `0x021b88d0`–`0x021b8f4c` | 8 | partial | string at `0x021b9bec` |
+| `pdwacc_disp.c` | `0x021b88d0`–`0x021b8f4c` | 8 | complete | string at `0x021b9bec` |
 | `pdwacc_state.c` | `0x021b8f4c`–`0x021b95ac` | 27 | complete | descriptive |
 
 ### Overlay 200

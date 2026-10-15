@@ -57,6 +57,8 @@ struct PdwAccDisp {
 };
 
 static void PdwAccDisp_CreateBGs(PdwAccDisp *disp);
+static inline void PdwAccDisp_CreateBG7(void);
+static inline void PdwAccDisp_CreateBG6(void);
 static void PdwAccDisp_VBlank(TCB *task, void *work);
 static void PdwAccDisp_LoadGraphics(PdwAccDisp *disp);
 static void PdwAccDisp_CyclePalette(TCB *task, void *work);
@@ -265,50 +267,56 @@ static void PdwAccDisp_CreateBGs(PdwAccDisp *disp) {
         GFL_BGSysFillScrArea(5, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
         GFL_BGSysLoadScr(5);
     }
-    {
-        BGSetup setup = {
-            0,
-            0,
-            0x800,
-            0,
-            BGRES_256x256,
-            GX_BG_COLORMODE_16,
-            GX_BG_SCRBASE(0xe000),
-            GX_BG_CHARBASE(0x10000),
-            0x8000,
-            GX_BG_EXTPLTT_01,
-            0,
-            GX_BG_AREAOVER_XLU,
-            FALSE,
-        };
-        GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
-        GFL_BGSysSetBGEnabled(6, TRUE);
-        GFL_BGSysFillChar(6, 0, 1, 0);
-        GFL_BGSysFillScrArea(6, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
-        GFL_BGSysLoadScr(6);
-    }
-    {
-        BGSetup setup = {
-            0,
-            0,
-            0x800,
-            0,
-            BGRES_256x256,
-            GX_BG_COLORMODE_16,
-            GX_BG_SCRBASE(0xe800),
-            GX_BG_CHARBASE(0x18000),
-            0x8000,
-            GX_BG_EXTPLTT_01,
-            3,
-            GX_BG_AREAOVER_XLU,
-            FALSE,
-        };
-        GFL_BGSysCreateBG(7, &setup, BGMODE_TEXT);
-        GFL_BGSysSetBGEnabled(7, TRUE);
-        GFL_BGSysFillChar(7, 0, 1, 0);
-        GFL_BGSysFillScrArea(7, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
-        GFL_BGSysLoadScr(7);
-    }
+    PdwAccDisp_CreateBG6();
+    PdwAccDisp_CreateBG7();
+}
+
+// BGs 6 and 7 are set up in helpers defined after PdwAccDisp_CreateBGs, BG 7's first: a helper's setup takes
+// its place in the data where the helper is defined, and this is what lays the eight setups out in the ROM's order.
+static inline void PdwAccDisp_CreateBG7(void) {
+    BGSetup setup = {
+        0,
+        0,
+        0x800,
+        0,
+        BGRES_256x256,
+        GX_BG_COLORMODE_16,
+        GX_BG_SCRBASE(0xe800),
+        GX_BG_CHARBASE(0x18000),
+        0x8000,
+        GX_BG_EXTPLTT_01,
+        3,
+        GX_BG_AREAOVER_XLU,
+        FALSE,
+    };
+    GFL_BGSysCreateBG(7, &setup, BGMODE_TEXT);
+    GFL_BGSysSetBGEnabled(7, TRUE);
+    GFL_BGSysFillChar(7, 0, 1, 0);
+    GFL_BGSysFillScrArea(7, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
+    GFL_BGSysLoadScr(7);
+}
+
+static inline void PdwAccDisp_CreateBG6(void) {
+    BGSetup setup = {
+        0,
+        0,
+        0x800,
+        0,
+        BGRES_256x256,
+        GX_BG_COLORMODE_16,
+        GX_BG_SCRBASE(0xe000),
+        GX_BG_CHARBASE(0x10000),
+        0x8000,
+        GX_BG_EXTPLTT_01,
+        0,
+        GX_BG_AREAOVER_XLU,
+        FALSE,
+    };
+    GFL_BGSysCreateBG(6, &setup, BGMODE_TEXT);
+    GFL_BGSysSetBGEnabled(6, TRUE);
+    GFL_BGSysFillChar(6, 0, 1, 0);
+    GFL_BGSysFillScrArea(6, 0, 0, 0, 32, 32, BGSYS_FILL_TILE_PALETTE);
+    GFL_BGSysLoadScr(6);
 }
 
 static void PdwAccDisp_VBlank(TCB *task, void *work) {
