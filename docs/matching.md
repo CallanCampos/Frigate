@@ -561,6 +561,12 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A local of an inlined helper is slotted after the function's optimizer temporaries, where the same local in the
+  function's body is slotted among its named locals: overlay 197's `MysteryCardView_DrawCard` gets its archive
+  handle the original's slot, above the card and `iconCellAnims` temporaries, only with the icon loading in a
+  `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
+  is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
+  argument's common subexpressions after the call, where the nested call computes them before it.
 - A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
   saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
   a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
