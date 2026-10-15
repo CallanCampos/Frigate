@@ -389,6 +389,75 @@ static void MBWm_ChildCallback(void *arg) {
             return;
         }
         switch (scan->state) {
+        case 3:
+            return;
+        case WM_STATECODE_PARENT_FOUND: {
+            u8 usable = 0;
+            u8 i;
+
+            // The first parent found or added ends the walk. Both loops are entered at their test, as 0/1 tests give
+            for (i = 0; i < scan->bssDescCount ? TRUE : FALSE; i++) {
+                WMBssDesc *desc = scan->bssDesc[i];
+                MBScanEntry *entries = work->scanEntries;
+                BOOL valid;
+                int k;
+
+                valid = desc->gameInfoLength >= 0x10 && desc->gameInfoLength <= 0x80
+                     && desc->gameInfoLength == desc->gameInfo.userGameInfoLength + 0x10
+                     && desc->gameInfo.magicNumber == 1
+                     && desc->length == (desc->gameInfoLength + 1 + offsetof(WMBssDesc, gameInfo)) / sizeof(u16);
+                if (!valid || !MBWm_IsMultibootBeacon(desc)) {
+                    usable++;
+                    continue;
+                }
+                if (sFilterGgid == 1
+                    && (desc->gameInfo.ggid & sWmConfig.ggidMask) == (sWmConfig.ggid & sWmConfig.ggidMask)) {
+                    usable++;
+                    continue;
+                }
+                for (k = 0; k < work->scanCount ? TRUE : FALSE; k++) {
+                    BOOL same = desc->bssid[0] == entries[k].bssid[0]
+                             && desc->bssid[1] == entries[k].bssid[1]
+                             && desc->bssid[2] == entries[k].bssid[2]
+                             && desc->bssid[3] == entries[k].bssid[3]
+                             && desc->bssid[4] == entries[k].bssid[4]
+                             && desc->bssid[5] == entries[k].bssid[5];
+
+                    if (same) {
+                        entries[k].gameInfoLength = desc->gameInfoLength;
+                        entries[k].gameInfo = desc->gameInfo;
+                        cp15_invalidateDC(&work->scanEntries[k], 0xc0);
+                        func_020780e8(sDmaNo, desc, &work->scanEntries[k], 0xc0, TRUE);
+                        work->lastScanIndex = k;
+                        work->commCallback(MB_WM_EVENT_SCAN_FOUND, &scan->linkLevel[i]);
+                        goto restart;
+                    }
+                }
+                if (k < 16) {
+                    work->scanCount = k + 1;
+                    sys_memcpy(desc->bssid, entries[k].bssid, sizeof(desc->bssid));
+                    entries[k].channel = desc->channel;
+                    entries[k].linkLevel = scan->linkLevel[i];
+                    MI_CpuCopy16(&desc->gameInfo, &entries[k].gameInfo, sizeof(WMGameInfo));
+                    cp15_invalidateDC(&work->scanEntries[k], 0xc0);
+                    func_020780e8(sDmaNo, desc, &work->scanEntries[k], 0xc0, TRUE);
+                    work->lastScanIndex = k;
+                    work->commCallback(MB_WM_EVENT_SCAN_FOUND, &scan->linkLevel[i]);
+                    goto restart;
+                }
+            }
+            if (scan->bssDescCount == usable) {
+                work->commCallback(MB_WM_EVENT_SCAN_NONE, arg);
+            }
+        restart:
+            if (work->scanning != 0) {
+                if (work->scanSwitchChannel != 0 && !MBWm_NextChannel(&sScanParam)) {
+                    MBWm_End();
+                }
+                MBWm_ReportError(MB_WM_API_START_SCAN, func_020815c8(MBWm_ChildCallback, &sScanParam));
+            }
+            return;
+        }
         case WM_STATECODE_PARENT_NOT_FOUND:
             work->commCallback(MB_WM_EVENT_SCAN_NONE, arg);
             if (work->scanning == 0) {
@@ -398,91 +467,6 @@ static void MBWm_ChildCallback(void *arg) {
                 MBWm_End();
             }
             MBWm_ReportError(MB_WM_API_START_SCAN, func_020815c8(MBWm_ChildCallback, &sScanParam));
-            return;
-        case WM_STATECODE_PARENT_FOUND: {
-            u8 usable = 0;
-            u8 i;
-
-            for (i = 0; i < scan->bssDescCount; i++) {
-                WMBssDesc *desc = scan->bssDesc[i];
-                BOOL sizeOk = FALSE;
-                BOOL lengthOk = FALSE;
-                BOOL magicOk = FALSE;
-                u16 infoLength = desc->gameInfoLength;
-                int k;
-
-                if (infoLength >= 0x10 && infoLength <= 0x80) {
-                    sizeOk = TRUE;
-                }
-                if (sizeOk && infoLength == desc->gameInfo.userGameInfoLength + 0x10) {
-                    lengthOk = TRUE;
-                }
-                if (lengthOk && desc->gameInfo.magicNumber == 1) {
-                    magicOk = TRUE;
-                }
-                if (!magicOk || desc->length != (desc->gameInfoLength + 1 + 0x40) / 2 || !MBWm_IsMultibootBeacon(desc)) {
-                    usable++;
-                    continue;
-                }
-                if (sFilterGgid == 1
-                    && (desc->gameInfo.ggid & sWmConfig.ggidMask) == (sWmConfig.ggid & sWmConfig.ggidMask)) {
-                    usable++;
-                    continue;
-                }
-                for (k = 0; k < work->scanCount; k++) {
-                    MBScanEntry *entry = &work->scanEntries[k];
-                    BOOL same = FALSE;
-                    int b;
-
-                    for (b = 0; b < 6; b++) {
-                        if (desc->bssid[b] != entry->bssid[b]) {
-                            break;
-                        }
-                    }
-                    if (b == 6) {
-                        same = TRUE;
-                    }
-                    if (same) {
-                        entry->gameInfoLength = desc->gameInfoLength;
-                        entry->gameInfo = desc->gameInfo;
-                        cp15_invalidateDC(entry, 0xc0);
-                        func_020780e8(sDmaNo, desc, entry, 0xc0, TRUE);
-                        work->lastScanIndex = k;
-                        work->commCallback(MB_WM_EVENT_SCAN_FOUND, &scan->linkLevel[i]);
-                        break;
-                    }
-                }
-                if (k < work->scanCount) {
-                    continue;
-                }
-                if (k < 16) {
-                    MBScanEntry *entry = &work->scanEntries[k];
-
-                    work->scanCount = k + 1;
-                    sys_memcpy(desc->bssid, entry->bssid, sizeof(entry->bssid));
-                    entry->channel = desc->channel;
-                    entry->linkLevel = scan->linkLevel[i];
-                    MI_CpuCopy16(&desc->gameInfo, &entry->gameInfo, sizeof(entry->gameInfo));
-                    cp15_invalidateDC(entry, 0xc0);
-                    func_020780e8(sDmaNo, desc, entry, 0xc0, TRUE);
-                    work->lastScanIndex = k;
-                    work->commCallback(MB_WM_EVENT_SCAN_FOUND, &scan->linkLevel[i]);
-                    break;
-                }
-            }
-            if (scan->bssDescCount == usable) {
-                work->commCallback(MB_WM_EVENT_SCAN_NONE, arg);
-            }
-            if (work->scanning != 0) {
-                if (work->scanSwitchChannel != 0 && !MBWm_NextChannel(&sScanParam)) {
-                    MBWm_End();
-                }
-                MBWm_ReportError(MB_WM_API_START_SCAN, func_020815c8(MBWm_ChildCallback, &sScanParam));
-                return;
-            }
-            return;
-        }
-        case WM_STATECODE_BEACON_SENT:
             return;
         default:
             work->commCallback(MB_WM_EVENT_WM_ERROR, arg);
@@ -505,10 +489,14 @@ static void MBWm_ChildCallback(void *arg) {
             return;
         }
         switch (connect->state) {
+        case 6:
+            work->connectedMask = 0;
+            work->mpStarted = 1;
+            return;
         case WM_STATECODE_CONNECTED:
             work->connectedAid = connect->aid;
             work->commCallback(MB_WM_EVENT_CONNECT_PARENT, arg);
-            work->mpStarted = 1;
+            work->connectedMask = 1;
             if (func_02080eac(1, MBWm_ChildPortCallback, NULL) == 0) {
                 BOOL singleMode = FALSE;
 
@@ -525,10 +513,6 @@ static void MBWm_ChildCallback(void *arg) {
             work->commCallback(MB_WM_EVENT_CONNECT_LOST, arg);
             work->connectedMask = 0;
             work->mpStarted = 0;
-            return;
-        case 6:
-            work->connectedMask = 0;
-            work->mpStarted = 1;
             return;
         case WM_STATECODE_DISCONNECTED_FROM_MYSELF:
             return;
@@ -556,19 +540,19 @@ static void MBWm_ChildCallback(void *arg) {
         }
     }
     case MB_WM_API_SET_MP_DATA: {
-        int event;
+        u16 event;
 
         work->sending = 0;
         if (cb->errcode == 0) {
-            event = MB_WM_EVENT_MP_SENT_OK;
+            event = MB_WM_EVENT_CHILD_MP_SENT_OK;
         } else if (cb->errcode == 9) {
-            event = MB_WM_EVENT_MP_SEND_BUSY;
+            event = MB_WM_EVENT_CHILD_MP_SEND_BUSY;
         } else {
-            event = MB_WM_EVENT_MP_SEND_FAILED;
+            event = MB_WM_EVENT_CHILD_MP_SEND_FAILED;
         }
         work->commCallback(event, arg);
         if (sWmWork->ending == 0) {
-            sWmWork->commCallback(MB_WM_EVENT_MP_READY, NULL);
+            work->commCallback(MB_WM_EVENT_MP_READY, NULL);
         }
         return;
     }
@@ -578,8 +562,8 @@ static void MBWm_ChildCallback(void *arg) {
             work->commCallback(MB_WM_EVENT_WM_ERROR, arg);
             return;
         }
-        work->connectedMask = 0;
-        work->mpStarted = 0;
+        sWmWork->connectedMask = 0;
+        sWmWork->mpStarted = 0;
         MBWm_ReportError(MB_WM_API_END, func_02081448(MBWm_ChildCallback));
         return;
     case MB_WM_API_END:
@@ -596,8 +580,12 @@ static void MBWm_ChildCallback(void *arg) {
         }
         return;
     case MB_WM_API_INDICATION:
-        if (((WMIndCallback *)arg)->state == 0x16) {
+        switch (((WMIndCallback *)arg)->state) {
+        case 0x16:
             sys_exit();
+            return;
+        case 0x17:
+            return;
         }
         return;
     default:
@@ -625,6 +613,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     u32 irq;
     u16 *name;
     int i;
+    const u16 *src;
 
     if (gMBCommWork != NULL && gMBCommWork->initialized != 0) {
         return MB_ERRCODE_INVALID_STATE;
@@ -650,14 +639,13 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
         *name++ = user->name[i];
     }
     name = wmWork->gameName;
+    src = sWmConfig.name;
     for (i = 0; i < 16; i++) {
-        u16 c = *sWmConfig.name;
-
-        if (c == 0) {
+        if (*src == 0) {
             break;
         }
-        sWmConfig.name++;
-        *name++ = c;
+        *name++ = *src++;
+        sWmConfig.name = src;
     }
     sys_memcpy(user, &commWork->user, sizeof(MBUserInfo));
     if (user->nameLength < MB_USER_NAME_LENGTH) {
