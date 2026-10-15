@@ -80,7 +80,7 @@ static BigNum *CryptExpand(BigNum *n, int words);
 static BigNum *CryptCopy(BigNum *dest, BigNum *src);
 static void CryptClear(BigNum *n);
 static BOOL CryptSetWord(BigNum *n, u32 word);
-static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out);
+static BigNum *FromBytes(const u8 *bytes, u32 size, BigNum *out);
 static int ToBytes(BigNum *n, u8 *out);
 static int CryptCompare(BigNum *a, BigNum *b);
 static BOOL CryptSetBit(BigNum *n, int bit);
@@ -123,7 +123,7 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
 static asm u32 MulAddWords(u32 *dest, const u32 *a, int size, u32 word);
 static asm u32 MulWord(u32 *dest, const u32 *a, int size, u32 word);
 static asm void SquareDigits(u32 *dest, const u32 *a, int size);
-static u64 DivWords(u32 high, u32 low, u32 divisor);
+static asm u64 DivWords(u32 high, u32 low, u32 divisor);
 static asm u32 AddWords(u32 *dest, const u32 *a, const u32 *b, int size);
 static asm u32 SubWords(u32 *dest, const u32 *a, const u32 *b, int size);
 static BOOL ReadAsn1(const u8 **data, u32 *size, int tag, u32 *length);
@@ -429,10 +429,10 @@ static int BitLength32(u32 x) {
         shift = (x & 0xff00) != 0 ? 8 : 0;
     }
     rest = x >> shift;
-    if ((rest & 0xf0) == 0) {
-        return sNibbleBits[rest] + shift;
+    if ((rest & 0xf0) != 0) {
+        return sNibbleBits[rest >> 4] + shift + 4;
     }
-    return sNibbleBits[rest >> 4] + shift + 4;
+    return sNibbleBits[rest] + shift;
 }
 
 static int BitLength(BigNum *n) {
@@ -614,7 +614,7 @@ static BOOL CryptSetWord(BigNum *n, u32 word) {
 }
 
 // Reads size bytes, the most significant first, into out or into a new number
-static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out) {
+static BigNum *FromBytes(const u8 *bytes, u32 size, BigNum *out) {
     u32 word;
     int words;
     int phase;
@@ -633,9 +633,9 @@ static BigNum *FromBytes(const u8 *bytes, int size, BigNum *out) {
     if (ReserveBits(out, (size + 2) * 8) == NULL) {
         return NULL;
     }
-    words = (u32)(size - 1) / 4 + 1;
+    words = (size - 1) / 4 + 1;
     out->length = words;
-    phase = (u32)(size - 1) % 4;
+    phase = (size - 1) % 4;
     while (size-- != 0) {
         word = *bytes++ | (word << 8);
         if (phase-- == 0) {
@@ -980,8 +980,8 @@ static BOOL AddMagnitude(BigNum *dest, BigNum *a, BigNum *b) {
 
 // Subtracts a smaller size from a bigger one
 static BOOL SubMagnitude(BigNum *dest, BigNum *a, BigNum *b) {
-    int max = a->length;
-    int min = b->length;
+    int max;
+    int min;
     int i;
     int borrow;
     u32 x;
@@ -990,9 +990,11 @@ static BOOL SubMagnitude(BigNum *dest, BigNum *a, BigNum *b) {
     u32 *bDigits;
     u32 *destDigits;
 
-    if (max < min) {
+    if (a->length < b->length) {
         return FALSE;
     }
+    max = a->length;
+    min = b->length;
     if (Reserve(dest, max) == NULL) {
         return FALSE;
     }
@@ -1486,15 +1488,22 @@ static void MontReduce(u32 *dest, u32 *product, const u32 *modulus, int size, u3
 
 // The inverse of 2^32 modulo a word, by Euclid's algorithm, or 0 when they have a common factor
 static u32 InverseOfWord(u32 x) {
-    u32 b = -x % x;
-    u32 a = x;
-    u32 prev = 1;
-    u32 prevPrev = 0;
-    int sign = -1;
+    u32 b;
+    u32 a;
+    u32 prev;
+    u32 prevPrev;
+    int sign;
+
+    b = -x % x;
+    a = x;
+    prevPrev = 0;
+    prev = 1;
+    sign = -1;
 
     while (b != 0) {
         u32 remainder = a % b;
-        u32 next = a / b * prev + prevPrev;
+        u32 q = a / b;
+        u32 next = q * prev + prevPrev;
 
         prevPrev = prev;
         a = b;
@@ -2320,9 +2329,20 @@ SquareDigits_Loop:
     ldmia sp!, {r4, r5, pc}
 }
 
-// Divides a double word by a word; the quotient comes back as a double word with a zero high word
-static u64 DivWords(u32 high, u32 low, u32 divisor) {
-    return (u32)((((u64)high << 32) | low) / divisor);
+// Divides a double word by a word; the quotient comes back as a double word with a zero high word. Assembly as well:
+// it swaps the halves through r4, which it saves, where MWCC would use a scratch register and move the 64-bit halves
+// with `orr #0`, and it sits among the assembly helpers. It calls the runtime's unsigned 64-bit division.
+extern u64 _ll_udiv(u64 numerator, u64 denominator);
+
+static asm u64 DivWords(u32 high, u32 low, u32 divisor) {
+    stmdb sp!, {r4, lr}
+    mov r4, r0
+    mov r0, r1
+    mov r1, r4
+    mov r3, #0x0
+    bl _ll_udiv
+    mov r1, #0x0
+    ldmia sp!, {r4, pc}
 }
 
 static asm u32 AddWords(u32 *dest, const u32 *a, const u32 *b, int size) {

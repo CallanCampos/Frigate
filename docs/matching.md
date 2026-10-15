@@ -8,6 +8,11 @@ tools that show the differences.
 
 ## Registers
 
+- An inline function copies its argument into the parameter (`mov r3, r6`) before testing it, where a macro tests
+  the loaded value itself and gives each arm of its conditional a register of its own. DWC's `NHTTPi_compareToken`
+  (`nhttp_stdlib.c`) matches only with its case folding as a macro (`TO_LOWER`) in the `while` condition, which also
+  gives the original's rotated loop. And `return count == 0 ? -1 : value;` lowers `value`'s priority against
+  `if (count == 0) value = -1; return value;` (`NHTTPi_strtonum`).
 - A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
   taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
@@ -467,6 +472,9 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
+  declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
+  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
   `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
@@ -561,6 +569,26 @@ Same code, other `sp` offsets or frame size.
   `entries[prev]`/`entries[j]`; `upper`/`lower` pointer locals, with or without the variable, copy early, and
   `j - 1` written at each use makes MWCC rebuild one pointer from the other. `#pragma optimization_level 1` moves
   the copy too, a sign that the CSE and copy propagation passes place it.
+- A local of an inlined helper is slotted after the function's optimizer temporaries, where the same local in the
+  function's body is slotted among its named locals: overlay 197's `MysteryCardView_DrawCard` gets its archive
+  handle the original's slot, above the card and `iconCellAnims` temporaries, only with the icon loading in a
+  `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
+  is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
+  argument's common subexpressions after the call, where the nested call computes them before it.
+- A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
+  saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
+  a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
+  123's `func_ov123_021eed54` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
+  with its own `u8 index` parameter (`for (; index < GROUP_MODEL_COUNT; index++)`): the earlier loop then loads its
+  zeros from that slot and keeps the 1 for `SetPaused` in `r7`, as the original does. A local counter set from a
+  parameter (`i = first`) doesn't.
+- MWCC derives a large constant offset from one built earlier (`subs r6, #0x80` for 0x1cc from 0x24c) across calls
+  and the fall-through of conditional branches, whatever pointer it is added to, and stops only at a join: a label
+  reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
+  `if`s, dead stores and one-pass loops are removed before that and don't stop it. Where the original builds an
+  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it: overlay 173's
+  `WifiP2PMatch_StateRecruitingFriendMenu` gets its voice-chat store in the common tail with the next state set in
+  both branches and stored once after them.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
@@ -718,6 +746,10 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- A sum of several terms in one expression has its right-hand terms evaluated first; accumulating it in separate
+  statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
+  (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
+  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
   `readSize = romfs_fread(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
@@ -1012,6 +1044,9 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
+  one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
+  parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
 - A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
   `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
   task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
@@ -1475,6 +1510,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- With constant arguments, the order of an inline's `if`/`else` arms decides how much MWCC folds. NitroSDK's
+  `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `SetAffinedOamPosition_`
+  only when written `if (effect != AFFINE && effect != AFFINE_DOUBLE) { plain store } else { store with the
+  parameter }`; the `==`/`||` order folds into one store.
 - When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
   value on the condition, and the else-value last, so the condition's direction decides which constant comes first:
   `b_bag_anm.c`'s button animation needs `if (button >= 10) palette = 2; else palette = 5;`, and `< 10`, a ternary
@@ -1906,6 +1945,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
       _pDLWork->error = error;                              ...
                                                             }
                                                             _pDLWork->error = result;
+- An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
+  branches become blocks and go only later, so it splits the code around it for CSE and register allocation and
+  emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first. `btl_monset.c`'s
+  `SortBySpeed` keeps `set + j * 2` from its speed comparison across `BattleRandom` into the swap, in a saved
+  register, only with `if (i && j && set) {}` between the swap's `damage[i]` and `speed[i]` stores, and nowhere
+  else; a real `if (set == NULL) { return; }` there gives the same registers plus its own 4 bytes. That points at
+  code the release build dropped, such as a debug print under a condition, so it is a probe for where the original
+  has a block boundary, not code to commit.
 - In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
   `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
   tree is split. At 53-bit x87 precision, two cases form a group up to a distance of 4; three cases within a span
@@ -2014,6 +2061,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
   `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
   `sWcm`, the ROM's order backwards.
+- MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
+  first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
+  count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of
+  the ROM's order, then the count, then the table. `cgtool.c` declares its two 12-byte joint tables in reverse and
+  its 16-byte texture-matrix table after them, which the size puts last. The compiled object's symbol table shows the
+  order.
 - MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
   and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
   the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a

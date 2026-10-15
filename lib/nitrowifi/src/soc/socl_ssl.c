@@ -1,9 +1,10 @@
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
 
-// SOCL_EnableSsl: turns SSL on for a TCP socket that has not been bound, or off (with a NULL connection). It has the
-// receive pipe's thread, which owns CPS's socket, switch CPS's SSL layer (SOCLi_EnableSslCallBack). pokediamond's
-// NitroWiFi names the object socl_ssl.o and the three functions.
+// SOCL_EnableSsl switches SSL on/off for a created TCP-mode socket while its BINDING state bit is clear. The
+// receive pipe's thread, which owns CPS's socket, installs the borrowed connection pointer or detaches it for NULL
+// (SOCLi_EnableSslCallBack); this does not free/reset the old context. pokediamond's NitroWiFi names the object
+// socl_ssl.o and the three functions.
 
 static int SOCLi_ExecEnableSslCommand(SOCLSocket *socket, void *ssl);
 static int SOCLi_EnableSslCallBack(SOCLCommandPacket *packet);

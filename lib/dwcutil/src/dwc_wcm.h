@@ -41,6 +41,6 @@ BOOL DWC_Wcm_Disconnect(void);
 // Cleans the WCM up
 BOOL DWC_Wcm_Cleanup(void);
 // Connects to the access point with the description and the WEP key
-BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 wepMode);
+BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option);
 
 #endif // POKEBW2_DWCUTIL_DWC_WCM_H

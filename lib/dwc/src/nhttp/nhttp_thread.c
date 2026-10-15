@@ -224,7 +224,7 @@ static BOOL NHTTPi_BufFull(NHttpMutexInfo *mutexInfo, NHttpResponse *response) {
                 }
             }
         }
-    } else {
+    } else if (!full) {
         ready = TRUE;
     }
     return ready;
@@ -1469,29 +1469,37 @@ void NHTTPi_CommThreadProcMain(void) {
             switch (NHTTPi_ThreadProxyProc(&work)) {
             case 0:
                 break;
-            case 1:
-                NHTTPi_ThreadReqEnd(&work);
-                continue;
             case 2:
                 work.retry = 1;
+                continue;
+            case 1:
+                NHTTPi_ThreadReqEnd(&work);
                 continue;
             }
             switch (NHTTPi_ThreadSendProc(&work)) {
             case 0:
                 break;
+            case 2:
+                work.retry = 1;
+                continue;
             case 1:
             case 3:
                 NHTTPi_ThreadReqEnd(&work);
                 continue;
-            case 2:
-                work.retry = 1;
+            }
+            if (reqInfo->current->request->canceled != 0) {
+                NHTTPi_ThreadReqEnd(&work);
                 continue;
             }
-            if (reqInfo->current->request->canceled == 0) {
-                if (NHTTPi_ThreadRecvHeaderProc(&work) && NHTTPi_ThreadParseHeaderProc(&work)) {
-                    NHTTPi_ThreadRecvBodyProc(&work);
-                }
+            if (!NHTTPi_ThreadRecvHeaderProc(&work)) {
+                NHTTPi_ThreadReqEnd(&work);
+                continue;
             }
+            if (!NHTTPi_ThreadParseHeaderProc(&work)) {
+                NHTTPi_ThreadReqEnd(&work);
+                continue;
+            }
+            NHTTPi_ThreadRecvBodyProc(&work);
             NHTTPi_ThreadReqEnd(&work);
         } while (state->quit == 0);
     }

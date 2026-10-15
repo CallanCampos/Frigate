@@ -1015,17 +1015,21 @@ lib/nnsys/src/snd/snd_capture.c:
     .bss        start:0x02149874 end:0x02149910
 
 lib/nnsys/src/g3d/kernel.c:
+    complete
     .text       start:0x02064f8c end:0x02065698
 
 lib/nnsys/src/g3d/glbstate.c:
+    complete
     .text       start:0x02065698 end:0x02065c58
     .bss        start:0x02143a0c end:0x02143c70
 
 lib/nnsys/src/g3d/anm.c:
+    complete
     .text       start:0x02065c58 end:0x02066144
     .data       start:0x0209b284 end:0x0209b2f8
 
 lib/nnsys/src/g3d/cgtool.c:
+    complete
     .data       start:0x0209b2f8 end:0x0209b320
 
 lib/nnsys/src/g3d/sbc.c:
