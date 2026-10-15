@@ -4,6 +4,10 @@
 // Every struct type is declared here once, and defined in the header of the module that owns it, if its layout is
 // known
 
+typedef struct TradeBoxEntry TradeBoxEntry;
+
+typedef struct PokemonTradeWork PokemonTradeWork;
+
 typedef struct CDemoParam CDemoParam;
 typedef struct CDemoPalette CDemoPalette;
 typedef struct CDemoWork CDemoWork;

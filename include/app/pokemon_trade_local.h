@@ -2,6 +2,7 @@
 #define POKEBW2_APP_POKEMON_TRADE_LOCAL_H
 
 #include "types.h"
+#include "app/pokemon_trade/pokemontrade_proc.h"
 #include "app/pokemon_trade.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
@@ -56,8 +57,6 @@
 #define TRADE_NET_CMD_UNK16 (TRADE_NET_CMD_BASE + 0x16)
 #define TRADE_NET_CMD_UNK17 (TRADE_NET_CMD_BASE + 0x17)
 
-typedef struct PokemonTradeWork PokemonTradeWork;
-
 // The copies of the save's data that a trade changes, to restore if saving fails
 typedef struct {
     void *mail;
@@ -94,8 +93,6 @@ typedef struct {
     s8 start;
     s8 end;
 } TradeFade;
-
-typedef void (*PokemonTradeState)(PokemonTradeWork *wk);
 
 // Overlay 139's OBJ resources, and the actor made of them
 typedef struct {
@@ -180,13 +177,6 @@ enum {
 #define TRADE_OBJRES_PLTT TRADE_OBJRES_PLTT_ICON
 #define TRADE_OBJRES_CHAR TRADE_OBJRES_CHAR_SUB
 #define TRADE_OBJRES_CELL TRADE_OBJRES_CELL_ICON
-
-// A Pokémon's icon in the strip
-typedef struct {
-    u16 species;
-    u8 form;
-    u8 sex;
-} TradeBoxEntry;
 
 struct PokemonTradeWork {
     // The HTTP connection of a trade over Wi-Fi
@@ -465,38 +455,6 @@ static inline u32 PokemonTrade_GetPressedKeys(void) {
     }
     return keys;
 }
-
-// pokemontrade_proc.c
-void func_ov194_021b76e0(PokemonTradeWork *wk);
-void func_ov194_021b772c(PokemonTradeWork *wk);
-BOOL func_ov194_021b774c(const u8 *data);
-u8 func_ov194_021b7778(PokemonTradeWork *wk);
-// Whether the trade is with another machine
-BOOL PokemonTrade_IsNetwork(PokemonTradeWork *wk);
-BOOL PokemonTrade_IsNegoType(PokemonTradeWork *wk);
-BOOL func_ov194_021b783c(PokemonTradeWork *wk);
-int PokemonTrade_GetColumnBox(int a, PokemonTradeWork *wk);
-int PokemonTrade_GetColumnSlot(int a, int b);
-PartyPkm *PokemonTrade_CopyPartyPkm(BoxSaveAccessor *boxes, int box, int slot, PokemonTradeWork *wk);
-BoxPkm *PokemonTrade_GetBoxPkm(BoxSaveAccessor *boxes, int box, int slot, PokemonTradeWork *wk);
-TradeBoxEntry *PokemonTrade_GetBoxEntry(int box, int slot, PokemonTradeWork *wk);
-void PokemonTrade_SetState(PokemonTradeWork *wk, PokemonTradeState state);
-u32 func_ov194_021b7c80(PokemonTradeWork *wk, int side);
-void func_ov194_021b7cc0(PokemonTradeWork *wk, int side, u32 value);
-// The Pokémon of a side of the trade: this machine's (0) or the other's (1)
-PartyPkm *PokemonTrade_GetPkm(PokemonTradeWork *wk, int side);
-void PokemonTrade_FadeOutToEnd(PokemonTradeWork *wk);
-void func_ov194_021b81c8(PokemonTradeWork *wk, int side, PartyPkm *pkm);
-BOOL func_ov194_021b8234(PokemonTradeWork *wk);
-BOOL func_ov194_021b8330(PokemonTradeWork *wk);
-BOOL func_ov194_021b8350(PokemonTradeWork *wk);
-BOOL func_ov194_021b8370(PokemonTradeWork *wk);
-void func_ov194_021b9c44(PokemonTradeWork *wk);
-void func_ov194_021b9a38(PokemonTradeWork *wk);
-void func_ov194_021ba924(PokemonTradeWork *wk);
-
-void func_ov194_021b94c0(PokemonTradeWork *wk);
-void func_ov194_021bb4b4(PokemonTradeWork *wk);
 
 // pokemontrade_nego.c
 // Whether a Pokémon can't be offered in a negotiation
