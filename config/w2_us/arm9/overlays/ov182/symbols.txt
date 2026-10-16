@@ -1307,7 +1307,7 @@ data_ov182_021c0538 kind:data(any) addr:0x021c0578
 data_ov182_021c054e kind:data(any) addr:0x021c058e
 data_ov182_021c0550 kind:data(any) addr:0x021c0590
 data_ov182_021c0578 kind:data(any) addr:0x021c05b8
-data_ov182_021c0580 kind:data(any) addr:0x021c05c0
+sArchiveName kind:data(any) addr:0x021c05c0
 data_ov182_021c0584 kind:data(any) addr:0x021c05c4
 data_ov182_021c0588 kind:data(any) addr:0x021c05c8
 data_ov182_021c058c kind:data(any) addr:0x021c05cc
@@ -1668,7 +1668,7 @@ data_ov182_021c4178 kind:bss addr:0x021c41b8
 data_ov182_021c417c kind:bss addr:0x021c41bc
 gWork kind:bss addr:0x021c41c0
 sDownloadPlaySysWork kind:bss addr:0x021c41c8
-data_ov182_021c418c kind:bss addr:0x021c41cc
+sResource kind:bss addr:0x021c41cc
 data_ov182_021c4190 kind:bss addr:0x021c41d0
 data_ov182_021c4194 kind:bss addr:0x021c41d4
 data_ov182_021c419c kind:bss addr:0x021c41dc
