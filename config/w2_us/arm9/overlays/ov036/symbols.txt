@@ -5573,9 +5573,9 @@ BUBBLE_MDL_INDEX kind:data(any) addr:0x021d29e8
 BUBBLE_ANM_INDICES kind:data(any) addr:0x021d29ec
 BUBBLE_FILE_IDS kind:data(any) addr:0x021d29f4
 BUBBLE_TASK_VTABLE kind:data(any) addr:0x021d2a00
-data_ov036_021d29e0 kind:data(any) addr:0x021d2a14
-data_ov036_021d29e8 kind:data(any) addr:0x021d2a1c
-data_ov036_021d29f4 kind:data(any) addr:0x021d2a28
+SAVE_ANIME_PALETTE_OFFSETS kind:data(any) addr:0x021d2a14
+SAVE_ANIME_UP kind:data(any) addr:0x021d2a1c
+SAVE_ANIME_STEPS kind:data(any) addr:0x021d2a28
 data_ov036_021d29f6 kind:data(any) addr:0x021d2a2a
 MAP_HEIGHT_SLOPE_TABLE kind:data(any) addr:0x021d2a38
 MAP_HEIGHT_OFFSET_TABLE kind:data(any) addr:0x021d31a8

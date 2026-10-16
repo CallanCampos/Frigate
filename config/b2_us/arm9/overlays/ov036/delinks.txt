@@ -644,6 +644,7 @@ src/ov036/fldeff_bubble.c:
     .data       start:0x021d5674 end:0x021d56c0
 
 src/ov036/field_saveanime.c:
+    complete
     .text       start:0x021c6cc8 end:0x021c7028
     .rodata     start:0x021d29e0 end:0x021d2a04
     .data       start:0x021d56c0 end:0x021d56d4

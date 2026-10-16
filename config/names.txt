@@ -5188,6 +5188,9 @@ overlays/ov036 0x021d29b4 BUBBLE_MDL_INDEX
 overlays/ov036 0x021d29b8 BUBBLE_ANM_INDICES
 overlays/ov036 0x021d29c0 BUBBLE_FILE_IDS
 overlays/ov036 0x021d29cc BUBBLE_TASK_VTABLE
+overlays/ov036 0x021d29e0 SAVE_ANIME_PALETTE_OFFSETS
+overlays/ov036 0x021d29e8 SAVE_ANIME_UP
+overlays/ov036 0x021d29f4 SAVE_ANIME_STEPS
 overlays/ov036 0x021d5178 sMartWindows
 overlays/ov036 0x021d5194 sBPShopWindows
 overlays/ov036 0x021d51b0 sMoveTutorWindows
