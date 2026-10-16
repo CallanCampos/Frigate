@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_EXT_H
 
 #include "types.h"
+#include "dwc/darray.h"
 #include "dwc/error.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
@@ -41,7 +42,7 @@ char *strstr(const char *s, const char *find);
 
 // GameSpy's common code in overlay 11, used by the HTTP code: realloc and free (the ones beside the allocator above),
 // the clock in milliseconds and a sleep, and the sockets (the numbers that the socket functions return are -1 for an
-// error). The array functions are the ones of the library's dynamic arrays
+// error). The library's dynamic arrays are in dwc/darray.h
 void *func_ov011_0216ddec(void *ptr, u32 size);
 u32 func_ov011_0216e324(void);
 void func_ov011_0216e360(u32 milliseconds);
@@ -61,18 +62,6 @@ int func_ov011_0216e10c(int sock);
 void func_ov011_0216e2b4(void *lookup);
 int func_ov011_0216e26c(const char *host, void **lookup);
 int func_ov011_0216e2bc(void *lookup);
-void *func_ov011_02171514(int elementSize, int growBy, void (*freeFunc)(void *element));
-void func_ov011_02171558(void *array);
-int func_ov011_02171588(void *array);
-void *func_ov011_0217158c(void *array, int index);
-void func_ov011_021715a4(void *array, const void *element);
-void func_ov011_02171600(void *array, const void *element, int (*compare)(const void *a, const void *b));
-void func_ov011_02171668(void *array, int index);
-int func_ov011_021716ac(void *array, const void *element, int (*compare)(const void *a, const void *b), int start,
-                        int sorted);
-// Removes the element at index without calling the array's freeFunc on it (gt2.c's only caller frees it itself
-// first)
-void func_ov011_02171634(void *array, int index);
 
 // The formatted texts of NitroSDK's OS (OS_SPrintf, OS_SNPrintf and OS_VSNPrintf) are in nitro/os.h,
 // NitroSDK's STD's (STD_TSNPrintf) in nitro/std.h, and the Wi-Fi library's one error in dwc/error.h

@@ -2,6 +2,8 @@
 #define POKEBW2_DWC_SOAP_H
 
 #include "types.h"
+// The hash (MD5) that the signature check and the big numbers below use
+#include "dwc/md5.h"
 
 // Overlay 11's SOAP message writer and reader, with the hash and the big numbers of the signature check, which
 // GameSpy's services in overlay 260 (Sake, the competition and the authentication) talk through. The ROM names none
@@ -21,10 +23,6 @@ typedef struct RsaPublicKey {
     BigNum modulus;
     BigNum exponent;
 } RsaPublicKey;
-// The state of the hash that gives 16 bytes, and its digest
-typedef struct HashContext {
-    u32 words[0x16];
-} HashContext;
 
 // Starts a message with the declarations of its namespaces and how many they are; frees it; and ends it so that it
 // can be posted, which gives a BOOL
@@ -75,10 +73,6 @@ u16 *func_ov011_0216edd0(const char *text);
 // Sets a big number from a text of hexadecimal digits, and adds one to a hash
 BOOL func_ov011_0216dc38(BigNum *number, const char *hex);
 void func_ov011_0216dd04(const BigNum *number, HashContext *context);
-// Starts a hash, hashes a block of bytes and gives its 16 bytes
-void func_ov011_021719fc(HashContext *context);
-void func_ov011_02171a24(HashContext *context, const void *data, u32 size);
-void func_ov011_02171a9c(u8 *digest, HashContext *context);
 // Checks the signature of a digest with a public key, returning 0 when it is right
 int func_ov011_0216cac0(const RsaPublicKey *key, const u8 *digest, int digestSize, const u8 *signature,
                         int signatureSize);
