@@ -2089,6 +2089,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   external symbol, never the `clz` instruction. A bare `clz` in ARM library code is the SDK's `MATH_CountLeadingZeros`,
   which `nitro/math.h` inlines as the instruction in ARM code (MWCC defines `__thumb` only for Thumb) and as a call to
   `MATH_CountLeadingZerosFunc` in Thumb code: `vct_audio.c`'s `VCT_SendPending` uses it.
+- MWCC builds `memcpy` and `memset` of a size it knows in place, without the call, when a header named `string.h`
+  declares them; the same prototypes from any other header leave a call. `include/string.h` (MSL's) does it, so code
+  whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s `memset` of a `VCTSession`), `dwc_auth.c`,
+  `ghttpEncryption.c` and `poke_net.c`, declares the C library's string functions in its own header (`dwc/ext.h`)
+  and doesn't include `<string.h>`. MSL's own files include it.
 
 ## Data and sections
 

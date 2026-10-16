@@ -478,6 +478,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   off")
 - `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. A bare inlined `clz` in ARM library code is
   `nitro/math.h`'s `MATH_CountLeadingZeros`. (matching.md: "no count-leading-zeros intrinsic")
+- A `memcpy`/`memset` of a constant size inlined where the ROM calls it: `<string.h>` declares it; declare it in the
+  library's own header instead. (matching.md: "a header named `string.h`")
 
 ## Data and sections
 
