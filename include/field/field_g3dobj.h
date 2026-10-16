@@ -10,8 +10,6 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-typedef struct FieldG3DObjSystem FieldG3DObjSystem;
-
 // The archives and files of a resource group
 typedef struct {
     ArcTool *mdlArc;
@@ -28,6 +26,7 @@ void FieldG3DObjSystem_FreeResGroup(FieldG3DObjSystem *sys, u16 resGroupIdx);
 u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u16 resGroupIdx, u16 modelIdxInRes, const VecFx32 *pos);
 void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *sys, u16 objIdx);
 SRTMatrix *FieldG3DObjSystem_GetObjTransform(FieldG3DObjSystem *sys, u16 objIdx);
+void FieldG3DObjSystem_SetObjPosition(FieldG3DObjSystem *sys, u16 objIdx, const VecFx32 *pos);
 // Hide the object, or not
 void func_ov036_021c0154(FieldG3DObjSystem *sys, u16 objIdx, BOOL hidden);
 // TRUE until the object's animation ends

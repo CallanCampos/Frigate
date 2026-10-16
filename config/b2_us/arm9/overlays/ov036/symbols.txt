@@ -5229,7 +5229,7 @@ data_ov036_021cf910 kind:data(any) addr:0x021cf910
 data_ov036_021cf928 kind:data(any) addr:0x021cf928
 data_ov036_021cf940 kind:data(any) addr:0x021cf940
 data_ov036_021cf958 kind:data(any) addr:0x021cf958
-data_ov036_021cf970 kind:data(any) addr:0x021cf970
+RAIL_OBJ_ANIMS kind:data(any) addr:0x021cf970
 data_ov036_021cf9a0 kind:data(any) addr:0x021cf9a0
 data_ov036_021cf9b8 kind:data(any) addr:0x021cf9b8
 data_ov036_021cf9dc kind:data(any) addr:0x021cf9dc

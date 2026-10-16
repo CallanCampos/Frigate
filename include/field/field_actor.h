@@ -161,8 +161,20 @@ BOOL func_ov036_0218ed68(FieldActor *actor);
 u8 func_ov036_0219381c(FieldActor *actor);
 BlActSys *FieldBlAct_GetBlActSys(void *fieldBlAct);
 void FldAct_SwapObjCode(FieldActor *actor, u16 objCode);
-// Overlay 36's field_rail_loader.c, not written yet: sets a flag of the actor's rail billboard work
+// The creation of an actor's billboard actor into *index, and its deletion
+BOOL func_ov036_02193a00(FieldActor *actor, u16 *index);
+void func_ov036_02193ac0(FieldActor *actor, u32 index);
+// Overlay 36's field_rail_loader.c: sets a flag of the actor's rail billboard work
 void func_ov036_0219690c(FieldActor *actor, BOOL value);
+// The script call of an actor's script; the animation and frame of the billboard actors of object codes 0xd3 and 0xd5,
+// and of 0xdd and 0xde (FALSE without a billboard actor); and whether the billboard actor of object code 0x7b or 0x176
+// has run its animation, with the reset of that animation
+GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, u32 unused1, u32 scriptId, u32 unused3, FieldActor *actor,
+                                        HeapID heapId);
+BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step);
+BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step);
+BOOL func_ov036_02197238(FieldActor *actor);
+void func_ov036_02197288(FieldActor *actor);
 // Overlay 36's fldmmdl_g3dobj.c, not written yet: the start, update and end functions of the action commands that
 // the rail actors' tables in fld_act_rail.c name, and the jump along the rail that their start functions begin
 BOOL func_ov036_02194ee8(FieldActor *actor);
@@ -209,6 +221,12 @@ BOOL func_ov036_0219529c(FieldActor *actor);
 BOOL func_ov036_021952ac(FieldActor *actor);
 BOOL func_ov036_021952cc(FieldActor *actor);
 void func_ov036_02195354(FieldActor *actor, u16 dir, u32 a, u32 b, u16 s0, s16 s1, u16 s2);
+// Also fldmmdl_g3dobj.c's: the actors' 3D object system, the creation and deletion of an actor's 3D object, and the
+// direction an actor on the rails faces for a camera angle
+FieldG3DObjSystem *FldAct_GetG3DObjSystem(FieldActor *actor);
+u16 func_ov036_021948a0(FieldActor *actor);
+void func_ov036_021948ec(FieldActor *actor, u16 objIdx);
+u8 func_ov036_021949a4(FieldActor *actor, int angle);
 // The unit vector of a direction along the actor's rail
 void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest);
 void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest);
