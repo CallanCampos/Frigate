@@ -2,6 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
 
 #include "types.h"
+#include "dwc/bm.h"
 #include "dwc_util_cell.h"
 #include "dwc_util_display.h"
 #include "dwc_util_heap.h"
@@ -16,6 +17,15 @@
 #include "struct_decls.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
+
+// The copy of a connection of the console's Wi-Fi settings that the screens edit, and which connection it is
+struct DWCUtilSettingsEdit {
+    DWCBmConnection connection;
+    u8 unk_ef[5];
+    u8 index;
+};
+
+DWCUtilSettingsEdit *func_ov182_021b781c(void);
 
 // The rows of buttons of the two layouts
 void func_ov182_021b8154(int variant);

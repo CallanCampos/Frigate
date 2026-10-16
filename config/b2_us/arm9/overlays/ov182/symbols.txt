@@ -1352,7 +1352,7 @@ data_ov182_021c08d0 kind:data(any) addr:0x021c08d0 ambiguous
 data_ov182_021c08dc kind:data(any) addr:0x021c08dc
 data_ov182_021c08f4 kind:data(any) addr:0x021c08f4
 data_ov182_021c090c kind:data(any) addr:0x021c090c
-data_ov182_021c0924 kind:data(any) addr:0x021c0924
+sScreenPaths kind:data(any) addr:0x021c0924
 data_ov182_021c0974 kind:data(any) addr:0x021c0974
 data_ov182_021c0988 kind:data(any) addr:0x021c0988
 data_ov182_021c0994 kind:data(any) addr:0x021c0994
@@ -1614,7 +1614,7 @@ sUiObject kind:bss addr:0x021c4028
 sScreenActive kind:bss addr:0x021c402c
 sPath kind:bss addr:0x021c4030
 sButtonSprites kind:bss addr:0x021c4070
-data_ov182_021c4074 kind:bss addr:0x021c4074
+sOverlayScreen kind:bss addr:0x021c4074
 data_ov182_021c4078 kind:bss addr:0x021c4078
 data_ov182_021c407c kind:bss addr:0x021c407c
 data_ov182_021c4080 kind:bss addr:0x021c4080

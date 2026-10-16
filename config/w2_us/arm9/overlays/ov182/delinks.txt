@@ -150,6 +150,12 @@ lib/dwcutilui/src/dwc_util_button_sprites.c:
     .rodata     start:0x021bfbe4 end:0x021bfbf0
     .bss        start:0x021c40b0 end:0x021c40b4
 
+lib/dwcutilui/src/dwc_util_bg_overlay.c:
+    complete
+    .text       start:0x021ab94c end:0x021aba3c
+    .data       start:0x021c0794 end:0x021c09c8
+    .bss        start:0x021c40b4 end:0x021c40b8
+
 lib/dwcutilui/src/dwc_util_main.c:
     complete
     .text       start:0x021adc00 end:0x021ae0c4

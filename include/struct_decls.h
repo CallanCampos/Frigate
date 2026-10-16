@@ -244,6 +244,7 @@ typedef struct DWCUtilList DWCUtilList;
 typedef struct DWCUtilMsg DWCUtilMsg;
 typedef struct DWCUtilNode DWCUtilNode;
 typedef struct DWCUtilOamNode DWCUtilOamNode;
+typedef struct DWCUtilSettingsEdit DWCUtilSettingsEdit;
 typedef struct DWCUtilStack DWCUtilStack;
 typedef struct DWCUtilTask DWCUtilTask;
 typedef struct DWCUtilText DWCUtilText;
