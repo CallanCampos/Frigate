@@ -25,7 +25,7 @@ void BattleBoxSave_Init(BattleBoxSave *battleBox) {
     u32 i;
     MsgData *msgData;
 
-    sys_memset(battleBox, 0, sizeof(BattleBoxSave));
+    MI_CpuFill8(battleBox, 0, sizeof(BattleBoxSave));
     for (i = 0; i < BATTLE_BOX_SLOTS; i++) {
         PML_PkmInit(&battleBox->pkm[0][i]);
     }

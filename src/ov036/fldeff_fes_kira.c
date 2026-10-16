@@ -150,7 +150,7 @@ FieldEffectTask *func_ov036_021a5bb4(FieldEffects *effects) {
     if (effect == NULL) {
         return NULL;
     }
-    sys_memset(&params, 0, sizeof(FesKiraTaskParams));
+    MI_CpuFill8(&params, 0, sizeof(FesKiraTaskParams));
     params.effect = effect;
     params.actorSys = Field_GetActorSystem(field);
     return FieldEffects_TCBCreate(effects, &FES_KIRA_TASK_VTABLE, NULL, 0, &params, 0);

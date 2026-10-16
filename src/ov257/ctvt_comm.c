@@ -608,7 +608,7 @@ static void CtvtComm_UpdateTalk(CommTvtWork *sys, CtvtComm *comm) {
                 u32 jpegSize;
                 u16 width;
 
-                sys_memcpy32(picture, comm->photoRaw, size);
+                MIi_CpuCopy32(picture, comm->photoRaw, size);
                 width = CtvtCamera_GetWidth(sys, camera);
                 jpegSize = SSP_StartJpegEncoder(comm->photoRaw, comm->photoJpeg, size, comm->jpegWork, width,
                                                 CtvtCamera_GetHeight(sys, camera), CTVT_COMM_JPEG_QUALITY,
@@ -759,7 +759,7 @@ static void CtvtComm_ClearMember(CommTvtWork *sys, CtvtComm *comm, CtvtCommMembe
     member->wantsToTalk = FALSE;
     member->pictureBuffer = CTVT_COMM_NONE;
     member->pictureState = CTVT_PICTURE_NONE;
-    sys_memset(&member->info, 0, sizeof(CtvtCommMemberInfo));
+    MI_CpuFill8(&member->info, 0, sizeof(CtvtCommMemberInfo));
 }
 
 static void CtvtComm_UpdateMember(CommTvtWork *sys, CtvtComm *comm, CtvtCommMember *member, u8 netId) {
@@ -858,7 +858,7 @@ BOOL CtvtComm_SendPacketData(CommTvtWork *sys, CtvtComm *comm, u8 type, const vo
     CtvtCommPacket packet;
 
     packet.type = type;
-    sys_memcpy(value, &packet.value, sizeof(packet.value));
+    MI_CpuCopy8(value, &packet.value, sizeof(packet.value));
     return func_02042c18(handle, CTVT_COMM_SEND_ALL, CTVT_COMM_CMD_PACKET, sizeof(CtvtCommPacket), &packet, TRUE, FALSE,
                          FALSE);
 }
@@ -965,7 +965,7 @@ static void CtvtComm_RecvPacket(int netId, int size, const void *data, void *wor
             CtvtTalk_SetGameStarting(CommTvt_GetTalk(comm->sys), TRUE);
         }
         if (netId == 0) {
-            sys_memcpy(packet, comm->unk3dc, sizeof(comm->unk3dc));
+            MI_CpuCopy8(packet, comm->unk3dc, sizeof(comm->unk3dc));
         }
         break;
     case CTVT_PACKET_UNK_F:
@@ -1003,7 +1003,7 @@ static void *CtvtComm_GetVoiceBuffer(int netId, void *work, int size) {
     CtvtComm *comm = work;
 
     comm->voiceBusy = TRUE;
-    sys_memset32(0, comm->voicePacket, sizeof(CtvtVoicePacket));
+    MIi_CpuClear32(0, comm->voicePacket, sizeof(CtvtVoicePacket));
     return comm->voicePacket;
 }
 
@@ -1016,7 +1016,7 @@ static void CtvtComm_RecvVoice(int netId, int size, const void *data, void *work
     func_02042a6c(func_02040440());
     if (packet->chunk == 0) {
         Adpcm_ResetDecoder();
-        sys_memset32(0, comm->voiceBuffer, CTVT_COMM_VOICE_BUFFER_SIZE);
+        MIi_CpuClear32(0, comm->voiceBuffer, CTVT_COMM_VOICE_BUFFER_SIZE);
     }
     CtvtMic_Decode(mic, voice, (s16 *)((u8 *)comm->voiceBuffer + packet->chunk * CTVT_COMM_VOICE_CHUNK_SIZE),
                    packet->size);
@@ -1198,7 +1198,7 @@ static BOOL CtvtComm_SendGamePacket(CommTvtWork *sys, CtvtComm *comm) {
                               &comm->gamePacket, TRUE, TRUE, FALSE);
 
     if (sent) {
-        sys_memset(&comm->gamePacket, 0, sizeof(CtvtGamePacket));
+        MI_CpuFill8(&comm->gamePacket, 0, sizeof(CtvtGamePacket));
     }
     return sent;
 }

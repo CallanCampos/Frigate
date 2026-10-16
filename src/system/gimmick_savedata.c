@@ -13,7 +13,7 @@ u32 GimmickSave_GetBlockSize(void) {
 }
 
 void GimmickSave_Init(GimmickState *gimmick) {
-    sys_memset(gimmick, 0, sizeof(GimmickState));
+    MI_CpuFill8(gimmick, 0, sizeof(GimmickState));
     gimmick->id = -1;
 }
 
@@ -49,9 +49,9 @@ u32 GimmickState_GetID(GimmickState *gimmick) {
 }
 
 void GimmickState_StoreSave(const GimmickState *gimmick, SaveControl *save) {
-    sys_memcpy32(gimmick, SaveControl_GetBlockPtr(save, SAVE_BLOCK_GIMMICK), sizeof(GimmickState));
+    MIi_CpuCopy32(gimmick, SaveControl_GetBlockPtr(save, SAVE_BLOCK_GIMMICK), sizeof(GimmickState));
 }
 
 void GimmickState_LoadSave(SaveControl *save, GimmickState *gimmick) {
-    sys_memcpy32(SaveControl_GetBlockPtr(save, SAVE_BLOCK_GIMMICK), gimmick, sizeof(GimmickState));
+    MIi_CpuCopy32(SaveControl_GetBlockPtr(save, SAVE_BLOCK_GIMMICK), gimmick, sizeof(GimmickState));
 }

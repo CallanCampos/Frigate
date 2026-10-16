@@ -1011,7 +1011,7 @@ static BOOL PkwdBriefing_Init(GameProc *proc, u32 *state, void *param, void *wor
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PKWD_BRIEFING, 0x120000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PkwdBriefingWork), HEAPID_PKWD_BRIEFING);
-    sys_memset(wk, 0, sizeof(PkwdBriefingWork));
+    MI_CpuFill8(wk, 0, sizeof(PkwdBriefingWork));
     wk->heapId = HEAPID_PKWD_BRIEFING;
     wk->param = briefingParam;
     briefingParam->skip = FALSE;
@@ -1144,11 +1144,11 @@ static BOOL PkwdBriefing_CreditsMain(GameProc *proc, u32 *state, void *param, vo
         if ((wk->text.line & 1) == 0) {
             GFL_BGSysSetBGEnabled(1, TRUE);
             GFL_BGSysSetBGEnabled(2, FALSE);
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16);
         } else {
             GFL_BGSysSetBGEnabled(1, FALSE);
             GFL_BGSysSetBGEnabled(2, TRUE);
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG0, 0, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG0, 0, 16);
         }
         break;
     case STATE_WAIT_PRINT:
@@ -1221,8 +1221,8 @@ static BOOL PkwdBriefing_Exit(GameProc *proc, u32 *state, void *param, void *wor
 }
 
 static void PkwdBriefing_ResetDisplay(void) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
@@ -1720,7 +1720,7 @@ static void PkwdBriefing_RunBriefing(PkwdBriefingWork *wk) {
     case BRIEFING_START:
         GFL_BGSysSetBGEnabled(1, TRUE);
         GFL_BGSysSetBGEnabled(2, FALSE);
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16);
         wk->step = BRIEFING_WAIT;
         break;
     case BRIEFING_WAIT:
@@ -1731,7 +1731,7 @@ static void PkwdBriefing_RunBriefing(PkwdBriefingWork *wk) {
         break;
     case BRIEFING_FADE_OUT_BLANK:
         wk->text.alpha++;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16 - wk->text.alpha);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16 - wk->text.alpha);
         if (wk->text.alpha == 8) {
             wk->step = BRIEFING_WAIT_BLANK;
             wk->text.alpha = 0;
@@ -1744,12 +1744,12 @@ static void PkwdBriefing_RunBriefing(PkwdBriefingWork *wk) {
         }
         break;
     case BRIEFING_START_LINE:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 8);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 8);
         wk->step = BRIEFING_FADE_IN_LINE;
         break;
     case BRIEFING_FADE_IN_LINE:
         wk->text.alpha++;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, wk->text.alpha, 8);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, wk->text.alpha, 8);
         G2_SetBG1Offset((16 - wk->text.alpha) / 2, 0);
         if (wk->text.alpha == 16) {
             wk->step = BRIEFING_SHOW_LINE;
@@ -1763,7 +1763,7 @@ static void PkwdBriefing_RunBriefing(PkwdBriefingWork *wk) {
         break;
     case BRIEFING_FADE_OUT_LINE:
         wk->text.alpha--;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, wk->text.alpha, 8);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, wk->text.alpha, 8);
         G2_SetBG1Offset(-(16 - wk->text.alpha) / 2, 0);
         if (wk->text.alpha == 0) {
             wk->step = BRIEFING_NEXT_LINE;
@@ -2004,16 +2004,16 @@ static void PkwdBriefingAudience_LoadPalettes(PkwdBriefingAudience *audience, He
 
     audience->objPalettes =
         GFL_HeapAllocate(heapId, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES, FALSE, "pkwd_briefing.c", 2881);
-    sys_memset(audience->objPalettes, 0, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
+    MI_CpuFill8(audience->objPalettes, 0, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
     audience->bgPalettes =
         GFL_HeapAllocate(heapId, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES, FALSE, "pkwd_briefing.c", 2884);
-    sys_memset(audience->bgPalettes, 0, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
+    MI_CpuFill8(audience->bgPalettes, 0, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
 
     file = GFL_G2DIOReadNCLRArc(audience->arc, FILE_AUDIENCE_PALETTE, &objPalette, heapId);
-    sys_memcpy(objPalette->rawData, audience->objPalettes, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
+    MI_CpuCopy8(objPalette->rawData, audience->objPalettes, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
     GFL_HeapFree(file);
     file = GFL_G2DIOReadNCLRArc(audience->arc, FILE_AUDIENCE_BG_PALETTE, &bgPalette, heapId);
-    sys_memcpy(bgPalette->rawData, audience->bgPalettes, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
+    MI_CpuCopy8(bgPalette->rawData, audience->bgPalettes, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
     GFL_HeapFree(file);
 }
 
@@ -2029,8 +2029,8 @@ static void PkwdBriefingAudience_FreePalettes(PkwdBriefingAudience *audience) {
 }
 
 static void PkwdBriefingAudience_SetPalettes(PkwdBriefingAudience *audience, s32 frame) {
-    gfxUploadStdPaletteObjB(&audience->objPalettes[frame * AUDIENCE_OBJ_PALETTE_SIZE], 0, AUDIENCE_OBJ_PALETTE_SIZE);
-    gfxUploadStdPaletteBGB(&audience->bgPalettes[frame * AUDIENCE_BG_PALETTE_SIZE], 0, AUDIENCE_BG_PALETTE_SIZE);
+    GXS_LoadOBJPltt(&audience->objPalettes[frame * AUDIENCE_OBJ_PALETTE_SIZE], 0, AUDIENCE_OBJ_PALETTE_SIZE);
+    GXS_LoadBGPltt(&audience->bgPalettes[frame * AUDIENCE_BG_PALETTE_SIZE], 0, AUDIENCE_BG_PALETTE_SIZE);
 }
 
 // Steps the palettes' animation every 5 frames. A pattern plays a random number of times, then another is picked
@@ -2112,7 +2112,7 @@ static void PkwdBriefing_RunCredits(PkwdBriefingWork *wk) {
         break;
     case CREDITS_FADE_OUT_BLANK:
         wk->text.alpha++;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16 - wk->text.alpha);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 16 - wk->text.alpha);
         if (wk->text.alpha == 8) {
             wk->step = CREDITS_WAIT_BLANK;
             wk->text.alpha = 0;
@@ -2128,17 +2128,17 @@ static void PkwdBriefing_RunCredits(PkwdBriefingWork *wk) {
         if ((wk->text.line & 1) == 0) {
             GFL_BGSysSetBGEnabled(1, TRUE);
             GFL_BGSysSetBGEnabled(2, FALSE);
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 8);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 0, 8);
         } else {
             GFL_BGSysSetBGEnabled(1, FALSE);
             GFL_BGSysSetBGEnabled(2, TRUE);
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG0, 0, 8);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG0, 0, 8);
         }
         wk->step = CREDITS_FADE_IN;
         break;
     case CREDITS_FADE_IN:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2,
-                            wk->text.alpha, 8);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2,
+                           wk->text.alpha, 8);
         wk->text.alpha++;
         if (wk->text.alpha == 16) {
             wk->step = CREDITS_SCROLL;

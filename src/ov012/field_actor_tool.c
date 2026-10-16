@@ -126,7 +126,7 @@ void func_ov012_0215dc34(FieldActor *actor) {
 }
 
 void ActorTerrainEffect_InitParam(FieldActor *actor, ActorTerrainEffectParam *param) {
-    sys_memset_fast(param, 0, sizeof(ActorTerrainEffectParam));
+    MI_CpuFill(param, 0, sizeof(ActorTerrainEffectParam));
     param->tileTypeOrigY = GetCachedOrigYTileUnderActor(actor);
     param->tileType = GetCachedTileUnderActor(actor);
     if (param->tileType != -1) {

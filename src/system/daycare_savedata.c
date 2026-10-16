@@ -127,7 +127,7 @@ u32 getSizeofBreedingBlock(void) {
 }
 
 void setEggArea(DayCareSave *dayCare) {
-    sys_memset(dayCare, 0, sizeof(DayCareSave));
+    MI_CpuFill8(dayCare, 0, sizeof(DayCareSave));
     DayCareSave_GenSeed(dayCare);
 }
 

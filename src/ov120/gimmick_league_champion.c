@@ -322,7 +322,7 @@ static GameEventReturnCode GimmickChampion_OpenEvent(GameEvent *event, u32 *stat
         GimmickChampion_PlayAnimation(work->expObj, MODEL_3, 2, 0, FALSE);
         GimmickChampion_PlayAnimation(work->expObj, MODEL_1, 0, 0, FALSE);
         GimmickChampion_PlayAnimation(work->expObj, MODEL_1, 1, 0, FALSE);
-        sys_memset(&shake, 0, sizeof(shake));
+        MI_CpuFill8(&shake, 0, sizeof(shake));
         shake.amplitude = 1;
         shake.period = 3;
         shake.count = 22;

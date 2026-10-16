@@ -9,7 +9,6 @@
 extern const char SOCLi_Signature[];
 
 // socl_startup.c
-extern SOCLConfig *SOCLiConfigPtr;    // The config SOCL_Startup was given, NULL while SOCL is down
 extern u32 SOCLiDefaultLanBufferSize; // The LAN buffer's size when the config gives none
 extern CPSInAddr SOCLiRequestedIP;    // The address that DHCP asks for
 extern u32 SOCLiDhcpState;            // SOCLI_DHCP_*
@@ -239,7 +238,6 @@ int SOCL_Close(int socket);
 
 // socl_cleanup.c
 int SOCL_Cleanup(void);
-int SOCL_CalmDown(void);
 CPSInAddr SOCL_Resolve(const char *name);
 CPSInAddr SOCL_InetAtoH(const char *name);
 CPSInAddr SOCL_GetHostID(void);

@@ -646,7 +646,7 @@ static BOOL ZukanDetailForm_Init(ZukanDetailProcSys *sys, int *seq, void *param_
     ZukanDetailFormWork *wk = ZukanDetailProcSys_AllocWork(sys, sizeof(ZukanDetailFormWork), param->heapId);
     u8 i;
 
-    sys_memset(wk, 0, sizeof(ZukanDetailFormWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanDetailFormWork));
     wk->unit = ZukanDetailGraphic_GetClActUnit(ZukanDetailCommon_GetGraphic(common));
     wk->font = ZukanDetailCommon_GetFont(common);
     for (i = 0; i < SPRITE_COUNT; i++) {
@@ -733,7 +733,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         GFL_BGSysSetBGPriority(4, 3);
         GFL_BGSysSetBGPriority(7, 2);
         ZukanDetailTouchbar_SetBGPriority(touchbar, 2);
-        gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
+        GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
         ZukanDetailGraphic_Create3D(graphic, param->heapId);
         ZukanDetailForm_CreateMCSS(param, wk, common);
         ZukanDetailForm_CreateText(param, wk, common);
@@ -896,7 +896,7 @@ static BOOL ZukanDetailForm_Main(ZukanDetailProcSys *sys, int *seq, void *param_
         }
         ZukanDetailForm_FreeMCSS(param, wk, common);
         ZukanDetailGraphic_Free3D(graphic);
-        gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
+        GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
         return TRUE;
     }
     }
@@ -2288,7 +2288,7 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
     for (i = 0; i < ACTOR_COUNT; i++) {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = ZUKAN_DETAIL_FORM_ACTORS[i].x;
         setup.y = ZUKAN_DETAIL_FORM_ACTORS[i].y;
         setup.sequence = ZUKAN_DETAIL_FORM_ACTORS[i].sequence;
@@ -2370,7 +2370,7 @@ static void ZukanDetailForm_CreateActors(ZukanDetailFormParam *param, ZukanDetai
     for (i = 0; i < BUTTON_COUNT; i++) {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = wk->buttons[i].x;
         setup.y = wk->buttons[i].y;
         setup.sequence = wk->buttons[i].activeAnim;
@@ -3292,14 +3292,14 @@ static void ZukanDetailForm_SetActorsOpaque(ZukanDetailFormParam *param, ZukanDe
     for (i = 0; i < BUTTON_COUNT; i++) {
         func_0204c318(wk->buttons[i].actor, 0);
     }
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        12, 4);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        12, 4);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       12, 4);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       12, 4);
 }
 
 static void ZukanDetailForm_SetActorsBlended(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,

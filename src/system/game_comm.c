@@ -254,7 +254,7 @@ void GameCommSys_Boot(GameCommSys *comm, u8 commNo, void *param) {
     comm->commNo = commNo;
     comm->exitCallback = NULL;
     comm->exitCallbackArg = NULL;
-    sys_memset(&comm->seq, 0, sizeof(GameCommSeq));
+    MI_CpuFill8(&comm->seq, 0, sizeof(GameCommSeq));
     GameCommSys_ClearUnk24(comm);
 }
 
@@ -336,7 +336,7 @@ BOOL func_0202be3c(GameCommSys *comm) {
 }
 
 static void GameCommSys_ClearUnk24(GameCommSys *comm) {
-    sys_memset(comm->unk24, 0, sizeof(comm->unk24));
+    MI_CpuFill8(comm->unk24, 0, sizeof(comm->unk24));
 }
 
 static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u32 beaconType) {

@@ -39,7 +39,7 @@ BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     PhraseSelectEvent *data = GameEvent_GetData(event);
     PMSData sentence;
 
-    sys_memset(data, 0, sizeof(PhraseSelectEvent));
+    MI_CpuFill8(data, 0, sizeof(PhraseSelectEvent));
     data->mode = mode;
     data->result = result;
     data->result2 = result2;

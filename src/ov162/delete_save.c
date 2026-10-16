@@ -107,7 +107,7 @@ static WaitIcon *sWaitIcon;
 
 static BOOL DeleteSave_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_SAVEDATA_DELETE, 0x30000);
-    sys_memset(GFL_ProcInitSubsystem(proc, sizeof(DeleteSaveWork), HEAPID_SAVEDATA_DELETE), 0, sizeof(DeleteSaveWork));
+    MI_CpuFill8(GFL_ProcInitSubsystem(proc, sizeof(DeleteSaveWork), HEAPID_SAVEDATA_DELETE), 0, sizeof(DeleteSaveWork));
     return TRUE;
 }
 
@@ -234,7 +234,7 @@ static void DeleteSave_Delete(DeleteSaveWork *wk, u32 *state) {
             freeIntermediateSaveExtraBlksAfterLoad(save, i);
         }
         GFL_VBlankResetCallback();
-        sys_reset(0);
+        OS_ResetSystem(0);
     }
 }
 

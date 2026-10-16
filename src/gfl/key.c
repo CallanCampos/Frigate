@@ -5,7 +5,6 @@
 #include "gfl/ui.h"
 #include "nitro/os.h"
 
-#define reg_PAD_KEYINPUT (*(vu16 *)0x04000130)
 // The buttons and keys that PAD_Read reports, X and Y among them
 #define PAD_ALL_MASK 0x2fff
 
@@ -66,7 +65,7 @@ static inline u16 PAD_Read(void) {
 KeypadManager *GFL_HIDCreateKeypadManager(HeapID heapId) {
     KeypadManager *keypad = GFL_HeapAllocate(heapId, sizeof(KeypadManager), FALSE, "key.c", 68);
 
-    sys_memset(keypad, 0, sizeof(KeypadManager));
+    MI_CpuFill8(keypad, 0, sizeof(KeypadManager));
     keypad->repeatWait = 8;
     keypad->repeatStart = 15;
     return keypad;

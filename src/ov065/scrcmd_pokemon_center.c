@@ -210,7 +210,7 @@ static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, Hea
     int maxRank;
 
     GFL_ASSERT(p_sv);
-    sys_memset(&ctx, 0, sizeof(ctx));
+    MI_CpuFill8(&ctx, 0, sizeof(ctx));
     for (j = 0; j < TYPE_COUNT; j++) {
         ctx.typesCaught[j] = TRUE;
     }
@@ -473,7 +473,7 @@ static BOOL PokemonCenter_CountObtainedMedals(MedalCheckContext *ctx, GameData *
     if (ctx->obtainedCountsDone == FALSE) {
         defs = GFL_ArcSysReadHeapNewRange(ARCID_MEDAL_DEF, 0, heapId, 0,
                                           GFL_ArcSysGetDataMax(ARCID_MEDAL_DEF) * sizeof(MedalDef));
-        sys_memset(ctx->obtainedCounts, 0, sizeof(ctx->obtainedCounts));
+        MI_CpuFill8(ctx->obtainedCounts, 0, sizeof(ctx->obtainedCounts));
         for (i = 0; i < MEDAL_COUNT; i++) {
             category = PokemonCenter_GetMedalCategory(defs[i].category);
             if (MedalBox_GetMedalStatus(box, i) == MEDAL_STATUS_OBTAINED) {

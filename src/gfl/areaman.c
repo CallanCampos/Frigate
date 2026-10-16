@@ -113,7 +113,7 @@ AreaMan *GFL_AreaManCreate(u32 blocks, HeapID heapId) {
     man->magic = (u32 *)(man->bits + size);
     *man->magic = AREAMAN_MAGIC;
     man->debugPrint = FALSE;
-    sys_memset(man->bits, 0, size);
+    MI_CpuFill8(man->bits, 0, size);
     return man;
 }
 

@@ -71,7 +71,7 @@ BOOL EncSys_IsActive(EncountSystem *system, u32 a1) {
         return FALSE;
     }
     if (GetZoneEncID(Field_GetPlayerStateZoneID(system->field)) == 0x1fff) {
-        sys_memset(system->encData, 0, sizeof(EncData));
+        MI_CpuFill8(system->encData, 0, sizeof(EncData));
         return FALSE;
     }
     return TRUE;
@@ -145,7 +145,7 @@ GameEvent *EventWildBattleCall_CreateRandom(EncountSystem *system, u32 mode) {
     } else {
         int count;
 
-        sys_memset(params, 0, sizeof(params));
+        MI_CpuFill8(params, 0, sizeof(params));
         count = FieldEncount_GenWilds(system->encData, &manager, Field_GetPlayerStateZoneID(system->field), params);
         if (count == 0) {
             return NULL;
@@ -174,7 +174,7 @@ GameEvent *EventWildBattleCall_CreateStatic(EncountSystem *system, u16 species, 
     CreateEncountManager(&manager, system->gameData, 0xff, 0,
                          func_ov036_02199220(Field_GetWeatherSystem(system->field)));
     param = &params[0];
-    sys_memset(params, 0, sizeof(params));
+    MI_CpuFill8(params, 0, sizeof(params));
     param->species = species;
     param->level = level;
     param->form = form;
@@ -250,7 +250,7 @@ BtlSetup *BtlSetup_CreateFishing(EncountSystem *system, BOOL rare) {
             return NULL;
         }
     }
-    sys_memset(params, 0, sizeof(params));
+    MI_CpuFill8(params, 0, sizeof(params));
     if ((u32)FieldEncount_GenWilds(system->encData, &manager, Field_GetPlayerStateZoneID(system->field), params) <
         manager.pokeCount) {
         return NULL;
@@ -447,7 +447,7 @@ u32 ConvFieldWeatherToBtl(Field *field) {
 static void EncountState_SyncToPlayer(EncountState *state, FieldPlayer *player) {
     FieldActor *actor = FieldPlayer_GetActor(player);
 
-    sys_memset(state, 0, 0x14);
+    MI_CpuFill8(state, 0, 0x14);
     state->x = GetGPosX(actor);
     state->y = FldAct_GetGPosY(actor);
     state->z = GetGPosZ(actor);

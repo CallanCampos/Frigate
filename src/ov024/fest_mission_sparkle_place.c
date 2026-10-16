@@ -59,9 +59,9 @@ void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     work->zoneId = zoneId;
     work->unk2 = 0;
     work->count = 0;
-    sys_memset(work->places, 0, sizeof(work->places));
-    sys_memset(work->placeIndex, 0, sizeof(work->placeIndex));
-    sys_memset(work->values, 0, sizeof(work->values));
+    MI_CpuFill8(work->places, 0, sizeof(work->places));
+    MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
+    MI_CpuFill8(work->values, 0, sizeof(work->values));
     func_ov012_02168348(mission->unk1C, func_ov012_02168320(zoneId), &rand);
     FestSparklePlace_PickPlaces(gsys, work, mission, zoneId, &rand);
     FestSparklePlace_AddZone(work, zoneId);
@@ -166,7 +166,7 @@ static void FestSparklePlace_AddZone(FestSparkleWork *work, u16 zoneId) {
             work->zoneCount = index + 1;
         } else {
             index = 5;
-            sys_memcpy(&work->zones[1], &work->zones[0], sizeof(work->zones) - sizeof(work->zones[0]));
+            MI_CpuCopy8(&work->zones[1], &work->zones[0], sizeof(work->zones) - sizeof(work->zones[0]));
         }
     } else {
         index = 0;
@@ -174,7 +174,7 @@ static void FestSparklePlace_AddZone(FestSparkleWork *work, u16 zoneId) {
             index = work->zoneCount - 1;
         }
     }
-    sys_memset(&work->zones[index], 0, sizeof(FestSparkleZone));
+    MI_CpuFill8(&work->zones[index], 0, sizeof(FestSparkleZone));
     work->zones[index].zoneId = zoneId;
     work->zones[index].unk2 = work->count;
 }

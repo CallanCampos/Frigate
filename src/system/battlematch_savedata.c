@@ -25,7 +25,7 @@ u32 func_0200f29c(void) {
 void func_0200f2a0(RecordSave *record) {
     func_0200f1c4(&record->liveMatch);
     RndMatchData_Init(record->rndMatch);
-    func_0207c33c(record->macAddress);
+    OS_GetMacAddress(record->macAddress);
 }
 
 RecordSave *func_0200f2bc(SaveControl *save) {
@@ -49,7 +49,7 @@ void *func_0200f2d8(RecordSave *record) {
 }
 
 void func_0200f2dc(RecordSave *record) {
-    func_0207c33c(record->macAddress);
+    OS_GetMacAddress(record->macAddress);
     record->matchInProgress = TRUE;
     func_0200f368(record);
 }
@@ -65,7 +65,7 @@ u8 func_0200f300(RecordSave *record) {
 u32 func_0200f308(RecordSave *record) {
     u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
 
-    func_0207c33c(macAddress);
+    OS_GetMacAddress(macAddress);
     if (GFL_STD_MemCmp(record->macAddress, macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE) == 0) {
         return TRUE;
     }
@@ -99,5 +99,5 @@ static s64 getSeconds(void) {
     RTCTime time;
 
     RTC_GetCachedDateTime(&date, &time);
-    return func_0207d12c(&date, &time) - OS_GetOwnerRtcOffset();
+    return RTC_ConvertDateTimeToSecond(&date, &time) - OS_GetOwnerRtcOffset();
 }

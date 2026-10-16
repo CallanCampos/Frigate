@@ -35,10 +35,10 @@ void ErrorWindowScreen_Show(void) {
 
         GFL_BGSysSetVRAMBanks(&vramConfig);
     }
-    sys_memset32(0, (void *)HW_BG_VRAM, HW_BG_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_OBJ_VRAM, HW_OBJ_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_DB_OBJ_VRAM, HW_DB_OBJ_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_BG_VRAM, HW_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_OBJ_VRAM, HW_OBJ_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_OBJ_VRAM, HW_DB_OBJ_VRAM_SIZE);
     {
         BGSysLCDConfig lcdConfig = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
 
@@ -84,6 +84,6 @@ void ErrorWindowScreen_Show(void) {
     while (TRUE) {
         GCTX_HIDUpdate();
         GFL_FadeUpdate();
-        irq_waitFor(TRUE, OS_IE_V_BLANK);
+        OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     }
 }

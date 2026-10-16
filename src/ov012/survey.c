@@ -176,7 +176,7 @@ u16 detectLengthSinceLastSession(SaveControl *save) {
         return 0;
     }
     start = getSecondsFromTrainerCardData(info);
-    func_0207d244(&date, &time, RTC_ConvertSecondsCached() - start);
+    RTC_ConvertSecondToDateTime(&date, &time, RTC_ConvertSecondsCached() - start);
     if (date.year != 0 || date.month > 1 || date.day > 1) {
         return 24;
     }

@@ -116,7 +116,7 @@ EffectEncountState *EffectEncountState_Create(HeapID heapId) {
 }
 
 void EffectEncountState_Free(EffectEncountState *state) {
-    sys_memset(state, 0, sizeof(EffectEncountState));
+    MI_CpuFill8(state, 0, sizeof(EffectEncountState));
     GFL_HeapFree(state);
 }
 
@@ -361,7 +361,7 @@ static void func_ov036_021a241c(EncountSystem *system, EffectEncountState *state
         spot->suspended = 0;
         zoneId = Field_GetPlayerStateZoneID(system->field);
         if (zoneId != spot->zoneId || spot->triggered) {
-            sys_memset(spot, 0, sizeof(RareEncountSpot));
+            MI_CpuFill8(spot, 0, sizeof(RareEncountSpot));
         } else {
             func_ov036_021a288c(system, state, spot);
         }
@@ -435,7 +435,7 @@ static void positionShakingSpot(EncountSystem *system, EffectEncountState *state
     fx32 startX;
     s16 z;
 
-    sys_memset(&state->candidates, 0, sizeof(EffectEncountCandidates));
+    MI_CpuFill8(&state->candidates, 0, sizeof(EffectEncountCandidates));
     pos.y = 0;
     chunk = FieldG3DMapper_GetBasePosChunkHandleIdx(mapper);
     if (!FieldG3DMapper_CheckChunkHandleTerrainReady(mapper, chunk)) {
@@ -539,14 +539,14 @@ static void EncountSystem_CancelPhenomenonCore(EncountSystem *system, EffectEnco
     EncountState *encountState = GameData_GetEncountState(system->gameData);
 
     func_ov036_021a28c8(state);
-    sys_memset(&encountState->rareSpot, 0, sizeof(RareEncountSpot));
+    MI_CpuFill8(&encountState->rareSpot, 0, sizeof(RareEncountSpot));
 }
 
 static void func_ov036_021a288c(EncountSystem *system, EffectEncountState *state, RareEncountSpot *spot) {
     if (state->effect == NULL) {
         state->effect = func_ov036_021a53f8(system, state->fieldEffects, spot->x, spot->z, spot->height, spot->kind);
         if (state->effect == NULL) {
-            sys_memset(spot, 0, sizeof(RareEncountSpot));
+            MI_CpuFill8(spot, 0, sizeof(RareEncountSpot));
         }
     }
 }

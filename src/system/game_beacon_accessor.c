@@ -10,6 +10,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "nitro/mi.h"
+#include "nitro/os.h"
 #include "save/high_link.h"
 #include "save/survey_savedata.h"
 #include "system/game_beacon.h"
@@ -152,7 +153,7 @@ BOOL GameBeaconInfoTable_PopFront(GameBeaconInfoTable *table, GameBeacon *dest, 
         table->beacons[i - 1] = table->beacons[i];
         table->times[i - 1] = table->times[i];
     }
-    sys_memset(&table->beacons[GAME_BEACON_LOG_MAX - 1], 0, sizeof(GameBeacon));
+    MI_CpuFill8(&table->beacons[GAME_BEACON_LOG_MAX - 1], 0, sizeof(GameBeacon));
     return TRUE;
 }
 
@@ -181,8 +182,8 @@ static int GameBeaconInfoTable_Add(GameBeaconInfoTable *table, const GameBeacon 
         }
     }
     if (overwrite == TRUE) {
-        sys_memcpy32(&table->beacons[1], &table->beacons[0], sizeof(GameBeacon) * (GAME_BEACON_LOG_MAX - 1));
-        sys_memcpy16(&table->times[1], &table->times[0], sizeof(u16) * (GAME_BEACON_LOG_MAX - 1));
+        MIi_CpuCopy32(&table->beacons[1], &table->beacons[0], sizeof(GameBeacon) * (GAME_BEACON_LOG_MAX - 1));
+        MIi_CpuCopy16(&table->times[1], &table->times[0], sizeof(u16) * (GAME_BEACON_LOG_MAX - 1));
         table->beacons[GAME_BEACON_LOG_MAX - 1] = *beacon;
         table->times[GAME_BEACON_LOG_MAX - 1] = (time->hour << 8) | time->minute;
         return GAME_BEACON_LOG_MAX - 1;
@@ -350,7 +351,7 @@ u8 GameBeacon_GetSurveyRank(const GameBeacon *beacon) {
 
 void func_02013d38(u16 *dest, const GameBeacon *beacon) {
     u32 color = beacon->favoriteColor;
-    const u16 *colors = func_0207c3b4();
+    const u16 *colors = OS_GetFavoriteColorTable();
 
     *dest = colors[color & 0xf];
 }

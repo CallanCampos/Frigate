@@ -54,7 +54,7 @@ static BOOL BrBvSend_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     int i;
 
     p_wk = GFL_ProcInitSubsystem(proc, sizeof(BrBvSendWork), BrProcSys_GetHeapID(p_param->procSys));
-    sys_memset(p_wk, 0, sizeof(BrBvSendWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvSendWork));
     p_wk->p_param = p_param;
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 

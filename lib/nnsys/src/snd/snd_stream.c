@@ -93,12 +93,12 @@ BOOL NNS_SndStrmSetup(NNSSndStrm *stream, NNSSndStrmFormat format, void *buffer,
 
         sChInfo[chNo].buffer = (u8 *)buffer + stream->bufSize * i;
         sChInfo[chNo].volume = 0;
-        sndQueuePacket_PlaySamples(chNo, format, sChInfo[chNo].buffer, SND_CHANNEL_LOOP_REPEAT, 0,
-                                   stream->bufSize / sizeof(u32), SND_CHANNEL_VOLUME_MAX, 0, timer * 32,
-                                   SND_CHANNEL_PAN_CENTER);
+        SND_SetupChannelPcm(chNo, format, sChInfo[chNo].buffer, SND_CHANNEL_LOOP_REPEAT, 0,
+                            stream->bufSize / sizeof(u32), SND_CHANNEL_VOLUME_MAX, 0, timer * 32,
+                            SND_CHANNEL_PAN_CENTER);
     }
 
-    func_0207d450(stream->alarmNo, alarmPeriod, alarmPeriod, AlarmCallback, stream);
+    SND_SetupAlarm(stream->alarmNo, alarmPeriod, alarmPeriod, AlarmCallback, stream);
     NNS_FndAppendListObject(&sStrmList, stream);
 
     stream->format = format;
@@ -110,21 +110,21 @@ BOOL NNS_SndStrmSetup(NNSSndStrm *stream, NNSSndStrmFormat format, void *buffer,
     stream->active = TRUE;
 
     // The first call fills the whole buffer, as one block
-    oldIntr = CPU_IRQDisable();
+    oldIntr = OS_DisableInterrupts();
     stream->interval = 1;
     StrmCallback(stream, NNS_SND_STRM_CALLBACK_SETUP);
     stream->interval = interval;
-    CPU_SetIRQMask(oldIntr);
+    OS_RestoreInterrupts(oldIntr);
 
     return TRUE;
 }
 
 void NNS_SndStrmStart(NNSSndStrm *stream) {
-    func_0207d3f4(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
+    SND_StartTimer(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
 
     if (!stream->started) {
-        func_0207f5e8(&stream->preSleepInfo);
-        func_0207f600(&stream->postSleepInfo);
+        PM_PrependPreSleepCallback(&stream->preSleepInfo);
+        PM_AppendPostSleepCallback(&stream->postSleepInfo);
         stream->started = TRUE;
     }
 }
@@ -142,15 +142,15 @@ void NNS_SndStrmSetVolume(NNSSndStrm *stream, int volume) {
 
     for (i = 0; i < stream->numChannels; i++) {
         int chNo = stream->chNo[i];
-        u16 chVolume = func_0207dd2c(stream->volume + sChInfo[chNo].volume);
+        u16 chVolume = SND_CalcChannelVolume(stream->volume + sChInfo[chNo].volume);
 
-        sndSetVolume(1 << chNo, SND_CHANNEL_VOLUME(chVolume), SND_CHANNEL_DATASHIFT(chVolume));
+        SND_SetChannelVolume(1 << chNo, SND_CHANNEL_VOLUME(chVolume), SND_CHANNEL_DATASHIFT(chVolume));
     }
 }
 
 void NNS_SndStrmSetChannelPan(NNSSndStrm *stream, int index, int pan) {
     if (index <= stream->numChannels - 1) {
-        sndSetPan(1 << stream->chNo[index], pan);
+        SND_SetChannelPan(1 << stream->chNo[index], pan);
     }
 }
 
@@ -158,14 +158,14 @@ static void ForceStop(NNSSndStrm *stream) {
     if (stream->started) {
         u32 tag;
 
-        func_0207d410(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
-        func_0207f62c(&stream->preSleepInfo);
-        func_0207f63c(&stream->postSleepInfo);
+        SND_StopTimer(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
+        PM_DeletePreSleepCallback(&stream->preSleepInfo);
+        PM_DeletePostSleepCallback(&stream->postSleepInfo);
         stream->started = FALSE;
 
-        tag = sndGetSentPacketCount();
-        func_0207d864(SND_COMMAND_BLOCK);
-        func_0207d96c(tag);
+        tag = SND_GetCurrentCommandTag();
+        SND_FlushCommand(SND_COMMAND_BLOCK);
+        SND_WaitForCommandProc(tag);
     }
 
     Shutdown(stream);
@@ -207,10 +207,10 @@ static void StrmBeginSleep(void *arg) {
     u32 tag;
 
     if (stream->started) {
-        func_0207d410(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
-        tag = sndGetSentPacketCount();
-        func_0207d864(SND_COMMAND_BLOCK);
-        func_0207d96c(tag);
+        SND_StopTimer(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
+        tag = SND_GetCurrentCommandTag();
+        SND_FlushCommand(SND_COMMAND_BLOCK);
+        SND_WaitForCommandProc(tag);
     }
 }
 
@@ -220,11 +220,11 @@ static void StrmEndSleep(void *arg) {
 
     if (stream->started) {
         while (stream->curBlock != 0) {
-            u32 oldIntr = CPU_IRQDisable();
+            u32 oldIntr = OS_DisableInterrupts();
             StrmCallback(stream, NNS_SND_STRM_CALLBACK_INTERVAL);
-            CPU_SetIRQMask(oldIntr);
+            OS_RestoreInterrupts(oldIntr);
         }
 
-        func_0207d3f4(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
+        SND_StartTimer(stream->chBitMask, 0, 1 << stream->alarmNo, 0);
     }
 }

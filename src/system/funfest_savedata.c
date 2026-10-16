@@ -18,7 +18,7 @@ u32 func_02010dc0(void) {
 void func_02010dc4(FunfestSave *save) {
     int i;
 
-    sys_memset(save, 0, sizeof(FunfestSave));
+    MI_CpuFill8(save, 0, sizeof(FunfestSave));
     for (i = 0; i < FUNFEST_MISSION_COUNT; i++) {
         save->missions[i].isNew = TRUE;
     }

@@ -607,7 +607,7 @@ static GameEventReturnCode MistraltonTravelEvent_Run(GameEvent *event, u32 *stat
             FieldTaskManager_AddTask(Field_GetTaskManager(data->field), task, 0);
             SetActorFlag(data->actor, 0x200);
             if (!data->blocked) {
-                sys_memset(&shake, 0, sizeof(shake));
+                MI_CpuFill8(&shake, 0, sizeof(shake));
                 shake.amplitudeX = 0;
                 shake.amplitudeY = 2;
                 shake.period = 3;
@@ -963,7 +963,7 @@ static GameEventReturnCode MistraltonTriggerEvent_Run(GameEvent *event, u32 *sta
             task = Mistralton_CreateLerpTask(data->field, data->actor, 30, &pos);
             FieldTaskManager_AddTask(Field_GetTaskManager(data->field), task, 0);
             SetActorFlag(data->actor, 0x200);
-            sys_memset(&shake, 0, sizeof(shake));
+            MI_CpuFill8(&shake, 0, sizeof(shake));
             shake.amplitudeX = 0;
             shake.amplitudeY = 2;
             shake.period = 3;

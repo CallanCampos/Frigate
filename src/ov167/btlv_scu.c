@@ -572,7 +572,7 @@ BOOL func_ov167_021d12a0(BtlvScu *scu) {
 }
 
 static void func_ov167_021d12f8(s32 wait) {
-    if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR) <= 0) {
+    if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) <= 0) {
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, wait);
     } else {
         GFL_FadeSet(FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE, 16, 0, wait);
@@ -2284,7 +2284,7 @@ static void func_ov167_021d36ec(BtlvScuWinFade *fade, BmpWin *window) {
     fade->state = 0;
     fade->ev1 = FX32_CONST(31);
     fade->ev2 = FX32_CONST(7);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, WIN_FADE_PLANES, 31, 7);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, WIN_FADE_PLANES, 31, 7);
 }
 
 static void func_ov167_021d3718(BtlvScuWinFade *fade) {
@@ -2345,8 +2345,8 @@ static BOOL func_ov167_021d3798(BtlvScuWinFade *fade) {
         }
         break;
     }
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, WIN_FADE_PLANES, (u8)FX_Whole(fade->ev1),
-                        (u8)FX_Whole(fade->ev2));
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, WIN_FADE_PLANES, (u8)FX_Whole(fade->ev1),
+                       (u8)FX_Whole(fade->ev2));
     return FALSE;
 }
 
@@ -2640,7 +2640,7 @@ static void func_ov167_021d3ddc(BtlvScuAbilityWin *win) {
     int half;
 
     size = GFL_BitmapCalcPixelDataSize(win->bitmap);
-    sys_memcpy32((u8 *)win->scu->abilityChars->rawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap), size);
+    MIi_CpuCopy32((u8 *)win->scu->abilityChars->rawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap), size);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     func_ov167_021d4ec0(scu->abilityStrbuf, 0x67, 2, win->monId, win->ability);
     if ((u8)func_020228c0(scu->abilityStrbuf, scu->smallFont, 0, widths, 2) > 1) {
@@ -2768,7 +2768,7 @@ static void func_ov167_021d408c(BtlvScu *scu, BtlvBGaugeParam *status, u8 client
     s8 index;
     int i;
 
-    sys_memset(status, 0, sizeof(BtlvBGaugeParam));
+    MI_CpuFill8(status, 0, sizeof(BtlvBGaugeParam));
     parties[0] = GetClientParty(scu->pokeCon, clientId1);
     counts[0] = GetNumMonsInParty(parties[0]);
     if (clientId2 < 4) {

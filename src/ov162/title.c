@@ -316,7 +316,7 @@ static BOOL Title_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TITLE, 0x120000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TitleWork), HEAPID_TITLE);
-    sys_memset(wk, 0, sizeof(TitleWork));
+    MI_CpuFill8(wk, 0, sizeof(TitleWork));
     wk->heapId = HEAPID_TITLE;
     GFL_SndStreamInit(HEAPID_TITLE);
     return TRUE;
@@ -455,8 +455,8 @@ static BOOL Title_Exit(GameProc *proc, u32 *state, void *param, void *work) {
 }
 
 static void Title_ResetDisplay(void) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();

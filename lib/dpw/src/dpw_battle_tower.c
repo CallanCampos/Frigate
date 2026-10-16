@@ -71,7 +71,7 @@ void DpwBt_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -92,7 +92,7 @@ void DpwBt_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -123,7 +123,7 @@ void DpwBt_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -156,7 +156,7 @@ void DpwBt_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -189,7 +189,7 @@ void DpwBt_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwBtWork.state = 0xc;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwBtWork.result = DpwBtMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -340,7 +340,7 @@ void DpwBt_GetServerState(void) {
 }
 
 void DpwBt_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *result) {
-    func_0207c33c(profile->unk1C);
+    OS_GetMacAddress(profile->unk1C);
     memcpy(sDpwBtWork.request, profile, 0x64);
     sDpwBtWork.resultData = result;
     Gamestats_Start(sDpwBtServerType, DPW_GAMESTATS_KEY);
@@ -383,10 +383,10 @@ static int DpwBtMapGamestatsError(int group) {
         break;
     }
     if (result != -5) {
-        if (func_0205b5ec()) {
+        if (DWC_UpdateConnection()) {
             result = -6;
         }
-        func_02058490();
+        DWC_ClearError();
     }
     return result;
 }

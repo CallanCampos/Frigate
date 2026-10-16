@@ -81,7 +81,7 @@ void GFL_BGSysCreate(HeapID heapId) {
     int i;
 
     sBGSys = GFL_HeapAllocate(heapId, sizeof(BGSys), FALSE, "bg_sys.c", 134);
-    sys_memset(sBGSys, 0, sizeof(BGSys));
+    MI_CpuFill8(sBGSys, 0, sizeof(BGSys));
     sBGSys->heapId = heapId;
     sBGSys->transformRequests = 0;
     sBGSys->screenRequests = 0;
@@ -161,8 +161,8 @@ void GFL_BGSysFreeCharMemory(u32 bg, u32 pos, u32 size) {
 }
 
 void GFL_BGSysSetLCDConfig(const BGSysLCDConfig *config) {
-    gfxSetEngineModeA(config->displayMode, config->bgModeMain, config->bg0Is3D);
-    gfxSetBGModeB(config->bgModeSub);
+    GX_SetGraphicsMode(config->displayMode, config->bgModeMain, config->bg0Is3D);
+    GXS_SetGraphicsMode(config->bgModeSub);
     GX_SetBGScrOffset(GX_BGSCROFFSET_0x00000);
     GX_SetBGCharOffset(GX_BGCHAROFFSET_0x00000);
     GFL_BGSysDisableBGsA();
@@ -171,10 +171,10 @@ void GFL_BGSysSetLCDConfig(const BGSysLCDConfig *config) {
 
 void GFL_BGSysSetLCDConfigForEngine(const BGSysLCDConfig *config, u32 engine) {
     if (engine == BGSYS_ENGINE_MAIN) {
-        gfxSetEngineModeA(config->displayMode, config->bgModeMain, config->bg0Is3D);
+        GX_SetGraphicsMode(config->displayMode, config->bgModeMain, config->bg0Is3D);
         GFL_BGSysDisableAllA();
     } else {
-        gfxSetBGModeB(config->bgModeSub);
+        GXS_SetGraphicsMode(config->bgModeSub);
         GFL_BGSysDisableAllB();
     }
 }
@@ -277,7 +277,7 @@ void GFL_BGSysCreateBG(u8 bg, const BGSetup *setup, u8 mode) {
 
     if (setup->screenSize != 0) {
         sBGSys->bgs[bg].screen = GFL_HeapAllocate(sBGSys->heapId, setup->screenSize, FALSE, "bg_sys.c", 561);
-        sys_memset16(0, sBGSys->bgs[bg].screen, setup->screenSize);
+        MIi_CpuClear16(0, sBGSys->bgs[bg].screen, setup->screenSize);
         sBGSys->bgs[bg].screenSize = setup->screenSize;
         sBGSys->bgs[bg].screenOffset = setup->screenOffset;
     } else {
@@ -461,14 +461,14 @@ void GFL_BGSysSetBGTransform(u8 bg, const MtxFx22 *mtx, int centerX, int centerY
 
 static void GFL_BGSysTransferUncomp(const void *src, void *dest, u32 size) {
     if (size == 0) {
-        sys_uncomp_lz1x(src, dest);
+        MI_UncompressLZ8(src, dest);
         return;
     }
     if ((u32)src % 4 == 0 && (u32)dest % 4 == 0 && (u16)size % 4 == 0) {
-        sys_memcpy32(src, dest, size);
+        MIi_CpuCopy32(src, dest, size);
         return;
     }
-    sys_memcpy16(src, dest, size);
+    MIi_CpuCopy16(src, dest, size);
 }
 
 void GFL_BGSysLoadScr(u8 bg) {
@@ -522,7 +522,7 @@ u32 GFL_BGSysLoadCharDynamic(u32 bg, const void *src, u32 size) {
 void GFL_BGSysClearCharCore(u8 bg, u32 size, u32 offset, HeapID heapId) {
     void *buf = GFL_HeapAllocate(HEAPID_TAIL(heapId), size, FALSE, "bg_sys.c", 1362);
 
-    sys_memset(buf, 0, size);
+    MI_CpuFill8(buf, 0, size);
     GFL_BGSysUploadChar(bg, buf, offset, size);
     GFL_HeapFree(buf);
 }
@@ -566,7 +566,7 @@ void GFL_BGSysFillChar(u32 bg, u32 fillIndex, u32 tileCount, u32 offset) {
     } else {
         fillIndex = (fillIndex << 24) | (fillIndex << 16) | (fillIndex << 8) | fillIndex;
     }
-    sys_memset32_fast(fillIndex, buf, size);
+    MIi_CpuClearFast(fillIndex, buf, size);
     GFL_BGSysUploadChar(bg, buf, offset * sBGSys->bgs[bg].tileSize, size);
     GFL_HeapFree(buf);
 }
@@ -601,11 +601,11 @@ void GFL_BGSysFreeFilledChar(u32 bg, u32 tileCount, u32 offset) {
 }
 
 void GFL_BGSysUploadStdPalette(u8 bg, const void *src, u16 size, u16 offset) {
-    cp15_flushDC(src, size);
+    DC_FlushRange(src, size);
     if (bg < BGSYS_BG_SUB) {
-        gfxUploadStdPaletteBGA(src, offset, size);
+        GX_LoadBGPltt(src, offset, size);
     } else {
-        gfxUploadStdPaletteBGB(src, offset, size);
+        GXS_LoadBGPltt(src, offset, size);
     }
 }
 
@@ -758,21 +758,21 @@ void GFL_BGSysClearChar(u8 bg) {
 
 void GFL_BGSysClearScr(u8 bg) {
     if (sBGSys->bgs[bg].screen != NULL) {
-        sys_memset16(0, sBGSys->bgs[bg].screen, sBGSys->bgs[bg].screenSize);
+        MIi_CpuClear16(0, sBGSys->bgs[bg].screen, sBGSys->bgs[bg].screenSize);
         GFL_BGSysLoadScr(bg);
     }
 }
 
 void GFL_BGSysFillScr(u8 bg, u16 map) {
     if (sBGSys->bgs[bg].screen != NULL) {
-        sys_memset16(map, sBGSys->bgs[bg].screen, sBGSys->bgs[bg].screenSize);
+        MIi_CpuClear16(map, sBGSys->bgs[bg].screen, sBGSys->bgs[bg].screenSize);
         GFL_BGSysLoadScr(bg);
     }
 }
 
 void GFL_BGSysFillScrAsync(u8 bg, u16 map) {
     if (sBGSys->bgs[bg].screen != NULL) {
-        sys_memset16(map, sBGSys->bgs[bg].screen, sBGSys->bgs[bg].screenSize);
+        MIi_CpuClear16(map, sBGSys->bgs[bg].screen, sBGSys->bgs[bg].screenSize);
         GFL_BGSysQueueScrLoad(bg);
     }
 }
@@ -780,21 +780,21 @@ void GFL_BGSysFillScrAsync(u8 bg, u16 map) {
 void *GFL_BGSysGetBGCharAddress(u8 bg) {
     switch (bg) {
     case 0:
-        return gfxGetCharAddrBG0A();
+        return G2_GetBG0CharPtr();
     case 1:
-        return gfxGetCharAddrBG1A();
+        return G2_GetBG1CharPtr();
     case 2:
-        return gfxGetCharAddrBG2A();
+        return G2_GetBG2CharPtr();
     case 3:
-        return gfxGetCharAddrBG3A();
+        return G2_GetBG3CharPtr();
     case 4:
-        return gfxGetCharAddrBG0B();
+        return G2S_GetBG0CharPtr();
     case 5:
-        return gfxGetCharAddrBG1B();
+        return G2S_GetBG1CharPtr();
     case 6:
-        return gfxGetCharAddrBG2B();
+        return G2S_GetBG2CharPtr();
     case 7:
-        return gfxGetCharAddrBG3B();
+        return G2S_GetBG3CharPtr();
     }
     return NULL;
 }
@@ -1059,11 +1059,11 @@ BOOL GFL_BGSysIsPixelOfColor(u8 bg, u16 x, u16 y, const u16 *colors) {
             u16 *screen = sBGSys->bgs[bg].screen;
             u8 *tile = GFL_HeapAllocate(HEAPID_TAIL(sBGSys->heapId), 64, FALSE, "bg_sys.c", 2703);
 
-            // BUG: sys_memcpy takes the source first, so this copies the uninitialized buffer over the tile in VRAM
+            // BUG: MI_CpuCopy8 takes the source first, so this copies the uninitialized buffer over the tile in VRAM
 #ifdef BUGFIX
-            sys_memcpy(&chars[(screen[index] & 0x3ff) * BGSYS_TILE_SIZE_256], tile, 64);
+            MI_CpuCopy8(&chars[(screen[index] & 0x3ff) * BGSYS_TILE_SIZE_256], tile, 64);
 #else
-            sys_memcpy(tile, &chars[(screen[index] & 0x3ff) * BGSYS_TILE_SIZE_256], 64);
+            MI_CpuCopy8(tile, &chars[(screen[index] & 0x3ff) * BGSYS_TILE_SIZE_256], 64);
 #endif
             GFL_BGSysFlipTile((screen[index] >> 10) & 3, tile, sBGSys->heapId);
             color = tile[pixelX + pixelY * 8];
@@ -1197,31 +1197,31 @@ static void GFL_BGSysSetBGTransformIdentity(u8 bg) {
 }
 
 static void GFL_BGSysUploadScr(u8 bg, const void *src, u32 offset, u32 size) {
-    cp15_flushDC(src, size);
+    DC_FlushRange(src, size);
     switch (bg) {
     case 0:
-        gfxUploadBGScreen0A(src, offset, size);
+        GX_LoadBG0Scr(src, offset, size);
         break;
     case 1:
-        gfxUploadBGScreen1A(src, offset, size);
+        GX_LoadBG1Scr(src, offset, size);
         break;
     case 2:
-        gfxUploadBGScreen2A(src, offset, size);
+        GX_LoadBG2Scr(src, offset, size);
         break;
     case 3:
-        gfxUploadBGScreen3A(src, offset, size);
+        GX_LoadBG3Scr(src, offset, size);
         break;
     case 4:
-        gfxUploadBGScreen0B(src, offset, size);
+        GXS_LoadBG0Scr(src, offset, size);
         break;
     case 5:
-        gfxUploadBGScreen1B(src, offset, size);
+        GXS_LoadBG1Scr(src, offset, size);
         break;
     case 6:
-        gfxUploadBGScreen2B(src, offset, size);
+        GXS_LoadBG2Scr(src, offset, size);
         break;
     case 7:
-        gfxUploadBGScreen3B(src, offset, size);
+        GXS_LoadBG3Scr(src, offset, size);
         break;
     }
 }
@@ -1240,31 +1240,31 @@ static void GFL_BGSysLoadCharCore(u8 bg, const void *src, u32 size, u32 offset) 
 }
 
 static void GFL_BGSysUploadChar(u8 bg, const void *src, u32 offset, u32 size) {
-    cp15_flushDC(src, size);
+    DC_FlushRange(src, size);
     switch (bg) {
     case 0:
-        gfxUploadBGChar0A(src, offset, size);
+        GX_LoadBG0Char(src, offset, size);
         break;
     case 1:
-        gfxUploadBGChar1A(src, offset, size);
+        GX_LoadBG1Char(src, offset, size);
         break;
     case 2:
-        gfxUploadBGChar2A(src, offset, size);
+        GX_LoadBG2Char(src, offset, size);
         break;
     case 3:
-        gfxUploadBGChar3A(src, offset, size);
+        GX_LoadBG3Char(src, offset, size);
         break;
     case 4:
-        gfxUploadBGChar0B(src, offset, size);
+        GXS_LoadBG0Char(src, offset, size);
         break;
     case 5:
-        gfxUploadBGChar1B(src, offset, size);
+        GXS_LoadBG1Char(src, offset, size);
         break;
     case 6:
-        gfxUploadBGChar2B(src, offset, size);
+        GXS_LoadBG2Char(src, offset, size);
         break;
     case 7:
-        gfxUploadBGChar3B(src, offset, size);
+        GXS_LoadBG3Char(src, offset, size);
         break;
     }
 }
@@ -1543,12 +1543,12 @@ static void GFL_BGSysFlipTile(u8 flip, u8 *tile, u32 heapId) {
                 buf[i * 8 + j] = tile[i * 8 + (7 - j)];
             }
         }
-        // BUG: sys_memcpy takes the source first, so this copies the tile over the flipped one, and the tile is left
+        // BUG: MI_CpuCopy8 takes the source first, so this copies the tile over the flipped one, and the tile is left
         // as it was
 #ifdef BUGFIX
-        sys_memcpy(buf, tile, 64);
+        MI_CpuCopy8(buf, tile, 64);
 #else
-        sys_memcpy(tile, buf, 64);
+        MI_CpuCopy8(tile, buf, 64);
 #endif
     }
     if (flip & 2) {
@@ -1557,14 +1557,14 @@ static void GFL_BGSysFlipTile(u8 flip, u8 *tile, u32 heapId) {
         // uninitialized, and the tile gets its contents
 #ifdef BUGFIX
         for (i = 0; i < 8; i++) {
-            sys_memcpy(&tile[(7 - i) * 8], &buf[i * 8], 8);
+            MI_CpuCopy8(&tile[(7 - i) * 8], &buf[i * 8], 8);
         }
-        sys_memcpy(buf, tile, 64);
+        MI_CpuCopy8(buf, tile, 64);
 #else
         for (i = 0; i < 8; i++) {
-            sys_memcpy(&buf[i * 8], &tile[(7 - i) * 8], 8);
+            MI_CpuCopy8(&buf[i * 8], &tile[(7 - i) * 8], 8);
         }
-        sys_memcpy(tile, buf, 64);
+        MI_CpuCopy8(tile, buf, 64);
 #endif
     }
     GFL_HeapFree(buf);

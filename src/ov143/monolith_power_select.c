@@ -242,7 +242,7 @@ static BOOL MonolithPower_Init(GameProc *proc, u32 *state, void *param, void *wo
     switch (*state) {
     case 0:
         mpw = GFL_ProcInitSubsystem(proc, sizeof(MonolithPowerWork), HEAPID_MONOLITH);
-        sys_memset(mpw, 0, sizeof(MonolithPowerWork));
+        MI_CpuFill8(mpw, 0, sizeof(MonolithPowerWork));
         mpw->scroll = 8 << 8;
         mpw->selected = MONOLITH_POWER_NONE;
         mpw->prevCursor = MONOLITH_POWER_NONE;
@@ -1243,9 +1243,9 @@ static void MonolithPower_SetDim(MonolithPowerWork *mpw, BOOL dim) {
     if (dim == TRUE) {
         brightness = -10;
     }
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x1c, brightness);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x1c, brightness);
     if (dim == FALSE) {
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 15);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 15);
     }
 }
 

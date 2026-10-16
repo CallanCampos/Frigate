@@ -227,7 +227,7 @@ AppTaskMenu *GSyncMessage_CreateYesNo(GSyncMessage *msg, int pos) {
     menu = AppTaskMenu_Create(&init, msg->menuRes);
     GFL_StrBufFree(msg->yesNoItems[0].str);
     GFL_StrBufFree(msg->yesNoItems[1].str);
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG3, -8);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG3, -8);
     return menu;
 }
 

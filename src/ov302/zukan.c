@@ -137,7 +137,7 @@ static BOOL Zukan_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN, 0x10000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanWork), HEAPID_ZUKAN);
-    sys_memset(wk, 0, sizeof(ZukanWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanWork));
     wk->param = zukanParam;
     wk->procManager = CreateGameProcManager(HEAPID_ZUKAN);
     wk->count = ZukanCommon_CreateList(wk->param->pokedex, &wk->list, HEAPID_ZUKAN);
@@ -444,7 +444,7 @@ static u32 Zukan_StateHabitat(ZukanWork *work) {
     ZukanHabitatListParam *habitatList;
 
     work->subParam = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanHabitatListParam), FALSE, "zukan.c", 751);
-    sys_memset(work->subParam, 0, sizeof(ZukanHabitatListParam));
+    MI_CpuFill8(work->subParam, 0, sizeof(ZukanHabitatListParam));
     habitatList = work->subParam;
     habitatList->gameData = work->param->gameData;
     if (work->fromDetail == 1 && work->fromHabitat == 0) {
@@ -503,7 +503,7 @@ static u32 Zukan_StateAwards(ZukanWork *work) {
     ZukanHabitatSummaryParam *summary;
 
     work->subParam = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanHabitatSummaryParam), FALSE, "zukan.c", 860);
-    sys_memset(work->subParam, 0, sizeof(ZukanHabitatSummaryParam));
+    MI_CpuFill8(work->subParam, 0, sizeof(ZukanHabitatSummaryParam));
     summary = work->subParam;
     summary->gameData = work->param->gameData;
     Zukan_FreeList(work);

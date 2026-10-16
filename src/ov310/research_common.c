@@ -178,7 +178,7 @@ void ResearchCommon_SetForceExit(ResearchCommon *common) {
 }
 
 static void ResearchCommon_InitWork(ResearchCommon *common) {
-    sys_memset(common, 0, sizeof(ResearchCommon));
+    MI_CpuFill8(common, 0, sizeof(ResearchCommon));
     common->prevSeq = RESEARCH_SEQ_INIT;
     common->seq = RESEARCH_SEQ_INIT;
     ResearchCommon_ClearObjRes(common);

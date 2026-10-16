@@ -67,7 +67,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -121,7 +121,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -157,7 +157,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -191,7 +191,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -228,7 +228,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -261,7 +261,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -297,7 +297,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -329,7 +329,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -378,7 +378,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -405,7 +405,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -438,7 +438,7 @@ void DpwTr_Process(void) {
         switch (Gamestats_Poll()) {
         case GAMESTATS_STATE_FAILED:
             sDpwTrWork.state = 0x18;
-            func_020583b0(&type, &group);
+            DWC_GetLastErrorEx(&type, &group);
             sDpwTrWork.result = DpwTrMapGamestatsError(group);
             Gamestats_Close();
             break;
@@ -703,7 +703,7 @@ void DpwTr_GetServerState(void) {
 }
 
 void DpwTr_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *result) {
-    func_0207c33c(profile->unk1C);
+    OS_GetMacAddress(profile->unk1C);
     memcpy(sDpwTrWork.request, profile, 0x64);
     sDpwTrWork.resultData = result;
     Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);
@@ -746,10 +746,10 @@ static int DpwTrMapGamestatsError(int group) {
         break;
     }
     if (result != -13) {
-        if (func_0205b5ec()) {
+        if (DWC_UpdateConnection()) {
             result = -14;
         }
-        func_02058490();
+        DWC_ClearError();
     }
     return result;
 }

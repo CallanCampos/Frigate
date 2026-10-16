@@ -17,13 +17,13 @@ static void GFL_BGSysLoadNSCR(void *file, u32 bg, u32 offset, u32 palOffset, u32
 static void GFL_BGSysLoadNCLR(void *file, u32 type, u32 srcOffset, u32 offset, u32 size);
 
 static const VramLoadFunc obj_char_lut[] = {
-    gfxUploadObjCharA,
-    gfxUploadObjCharB,
+    GX_LoadOBJ,
+    GXS_LoadOBJ,
 };
 
 static const VramLoadFunc pltt_type_lut[] = {
-    gfxUploadStdPaletteBGA, gfxUploadStdPaletteObjA, gfxUploadExtPaletteBGA, gfxUploadExtPaletteObjA,
-    gfxUploadStdPaletteBGB, gfxUploadStdPaletteObjB, gfxUploadExtPaletteBGB, gfxUploadExtPaletteObjB,
+    GX_LoadBGPltt,  GX_LoadOBJPltt,  GX_LoadBGExtPltt,  GX_LoadOBJExtPltt,
+    GXS_LoadBGPltt, GXS_LoadOBJPltt, GXS_LoadBGExtPltt, GXS_LoadOBJExtPltt,
 };
 
 u32 GFL_BGSysLoadNCGRStatic(u32 arcId, u32 fileId, u8 bg, u32 offset, u32 size, BOOL compressed, HeapID heapId) {
@@ -105,7 +105,7 @@ static u32 unpackAndLoadOBJChar(void *file, u32 engine, u32 offset, u32 size) {
         if (size == 0) {
             size = character->size;
         }
-        cp15_flushDC(character->rawData, size);
+        DC_FlushRange(character->rawData, size);
         obj_char_lut[engine](character->rawData, offset, size);
     }
     GFL_HeapFree(file);
@@ -226,27 +226,27 @@ static void GFL_BGSysLoadNCLR(void *file, u32 type, u32 srcOffset, u32 offset, u
             }
             size -= srcOffset;
         }
-        cp15_flushDC(palette->rawData, size);
+        DC_FlushRange(palette->rawData, size);
         switch (type) {
         case PALTYPE_MAIN_BG_EX:
-            gfxBeginBGExtPltAUpload();
+            GX_BeginLoadBGExtPltt();
             pltt_type_lut[type](palette->rawData, offset, size);
-            gfxEndBGExtPltAUpload();
+            GX_EndLoadBGExtPltt();
             break;
         case PALTYPE_SUB_BG_EX:
-            gfxBeginBGExtPltBUpload();
+            GXS_BeginLoadBGExtPltt();
             pltt_type_lut[type](palette->rawData, offset, size);
-            gfxEndBGExtPltBUpload();
+            GXS_EndLoadBGExtPltt();
             break;
         case PALTYPE_MAIN_OBJ_EX:
-            gfxBeginObjExtPltAUpload();
+            GX_BeginLoadOBJExtPltt();
             pltt_type_lut[type](palette->rawData, offset, size);
-            gfxEndObjExtPltAUpload();
+            GX_EndLoadOBJExtPltt();
             break;
         case PALTYPE_SUB_OBJ_EX:
-            gfxBeginObjExtPltBUpload();
+            GXS_BeginLoadOBJExtPltt();
             pltt_type_lut[type](palette->rawData, offset, size);
-            gfxEndObjExtPltBUpload();
+            GXS_EndLoadOBJExtPltt();
             break;
         default:
             pltt_type_lut[type](palette->rawData, offset, size);
@@ -433,7 +433,7 @@ void *GFL_ArcSysReadHeapNewLZ(u32 arcId, u32 fileId, BOOL compressed, HeapID hea
     if (compressed) {
         void *uncompressed = GFL_HeapAllocate(heapId, LZ_UNCOMPRESSED_SIZE(data), FALSE, "arc_util.c", 1611);
 
-        sys_uncomp_lz1x(data, uncompressed);
+        MI_UncompressLZ8(data, uncompressed);
         GFL_HeapFree(data);
         data = uncompressed;
     }
@@ -455,7 +455,7 @@ void *GFL_ArcSysReadHeapNewLZGetLen(u32 arcId, u32 fileId, BOOL compressed, Heap
 
         *size = LZ_UNCOMPRESSED_SIZE(data);
         uncompressed = GFL_HeapAllocate(heapId, *size, FALSE, "arc_util.c", 1656);
-        sys_uncomp_lz1x(data, uncompressed);
+        MI_UncompressLZ8(data, uncompressed);
         GFL_HeapFree(data);
         data = uncompressed;
     }
@@ -485,7 +485,7 @@ void *GFL_ArcToolReadHeapNewLZGetLen(ArcTool *arc, u32 fileId, BOOL compressed, 
             *size = LZ_UNCOMPRESSED_SIZE(data);
             uncompressed = GFL_HeapAllocate(heapId, *size, FALSE, "arc_util.c", 1725);
             if (uncompressed != NULL) {
-                sys_uncomp_lz1x(data, uncompressed);
+                MI_UncompressLZ8(data, uncompressed);
                 GFL_HeapFree(data);
             }
             data = uncompressed;

@@ -20,7 +20,7 @@ GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     FieldMenuWork *work = GameEvent_GetData(event);
     u32 screenId;
 
-    sys_memset(work, 0, sizeof(FieldMenuWork));
+    MI_CpuFill8(work, 0, sizeof(FieldMenuWork));
     work->gameSystem = gsys;
     work->event = event;
     work->field = field;

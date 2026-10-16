@@ -59,7 +59,7 @@ void MedalBoxDataSys_Init(MedalBoxDataSys *data, GameData *gameData, HeapID heap
     data->count = MedalBox_GetObtainedCount(box, TRUE);
     count = 0;
     data->entries = GFL_HeapAllocate(heapId, data->count * sizeof(MedalBoxEntry), FALSE, "medalbox_data_sys.c", 45);
-    sys_memset(data->entries, 0, data->count * sizeof(MedalBoxEntry));
+    MI_CpuFill8(data->entries, 0, data->count * sizeof(MedalBoxEntry));
     MedalBoxDataSys_ClearOrder(data);
     arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_DEF, heapId);
     for (i = 0; i < MEDAL_COUNT; i++) {

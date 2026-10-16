@@ -909,7 +909,7 @@ void FieldG3DMapper_ResetDrawCalcState(FieldG3DMapper *mapper) {
     s32 elapsed;
     s32 vcount;
 
-    sys_memset(mapper->drawnChunkIndices, 0xff, mapper->chunkCapacity);
+    MI_CpuFill8(mapper->drawnChunkIndices, 0xff, mapper->chunkCapacity);
     mapper->drawnChunkCount = 0;
     mapper->lastDrawnCount = mapper->nowDrawnCount;
     mapper->nowDrawnCount = 0;

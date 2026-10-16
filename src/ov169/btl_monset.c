@@ -7,7 +7,7 @@
 #include "gfl/std.h"
 
 void BtlMonSet_Clear(BtlMonSet *set) {
-    sys_memset(set, 0, sizeof(BtlMonSet));
+    MI_CpuFill8(set, 0, sizeof(BtlMonSet));
 }
 
 void BtlMonSet_Add(BtlMonSet *set, BattleMon *mon) {

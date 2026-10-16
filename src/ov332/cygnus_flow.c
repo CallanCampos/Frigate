@@ -826,9 +826,9 @@ static void CygnusAppear_Load(CygnusAppear *appear, PartyPkm *pkm) {
     appear->offset = CygnusAppear_GetSpriteBottom(func_0201d624(pkm), appear->heapId) - 48;
     appear->offset = MATH_CLAMP(appear->offset, 0, 48);
     GFL_ArcToolFree(arc);
-    sys_memcpy((void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), appear->spritePalette,
-               sizeof(appear->spritePalette));
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuCopy8((void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), appear->spritePalette,
+                sizeof(appear->spritePalette));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 0;
     setup.y = 0;
     setup.bgPriority = 0;
@@ -859,10 +859,10 @@ static void CygnusAppear_Run(CygnusAppear *appear) {
     case 1:
         appear->timer = 0;
         appear->state = 4;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, 0x1f, 0, 16);
-        sys_memset16(0x7fff, (void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), 0x20);
-        sys_memcpy((void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), appear->whitePalette,
-                   sizeof(appear->whitePalette));
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, 0x1f, 0, 16);
+        MIi_CpuClear16(0x7fff, (void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), 0x20);
+        MI_CpuCopy8((void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), appear->whitePalette,
+                    sizeof(appear->whitePalette));
         KeySystemParticle_Emit(appear->particle, 0);
         KeySystemParticle_Emit(appear->particle, 1);
         KeySystemParticle_Emit(appear->particle, 2);
@@ -1173,7 +1173,7 @@ static void CygnusData_ReadEntries(CygnusData *data, const u32 *words, HeapID he
     int i;
     int j;
 
-    sys_memset(data->entries, 0, sizeof(data->entries));
+    MI_CpuFill8(data->entries, 0, sizeof(data->entries));
     data->count = 0;
     for (i = 0; i <= CYGNUS_WORD_POKEMON_END - 1; i++) {
         if (func_020115fc(words[i])) {
@@ -1379,7 +1379,7 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
     int posY;
     ClActorSetup setup;
 
-    sys_memset(icon, 0, sizeof(CygnusIcon));
+    MI_CpuFill8(icon, 0, sizeof(CygnusIcon));
     CygnusData_GetEntry(data, index, &type, &id);
     switch (type) {
     case CYGNUS_ENTRY_POKEMON:
@@ -1410,7 +1410,7 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
         break;
     }
     }
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     rowGap = 0;
     icon->pos.x = (index % 6) * 32 + 48 + x;
     row = index / 6;
@@ -1433,14 +1433,14 @@ static void CygnusIcon_Unload(CygnusIcon *icon) {
     func_0204bcd0(icon->palette);
     func_0204b98c(icon->chars);
     func_0204be64(icon->cellAnims);
-    sys_memset(icon, 0, sizeof(CygnusIcon));
+    MI_CpuFill8(icon, 0, sizeof(CygnusIcon));
 }
 
 static void CygnusIcon_Start(CygnusIcon *icon) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, 0xf, 0, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0xf, 0, 16);
     func_0204c124(icon->actor, TRUE);
     icon->falling = TRUE;
-    icon->startTime = OS_TicksToMilliSeconds(clock());
+    icon->startTime = OS_TicksToMilliSeconds(OS_GetTick());
 }
 
 static BOOL CygnusIcon_Update(CygnusIcon *icon) {
@@ -1449,7 +1449,7 @@ static BOOL CygnusIcon_Update(CygnusIcon *icon) {
     u64 alpha;
 
     if (icon->falling) {
-        elapsed = OS_TicksToMilliSeconds(clock()) - icon->startTime;
+        elapsed = OS_TicksToMilliSeconds(OS_GetTick()) - icon->startTime;
         if (elapsed > CYGNUS_ICON_TIME) {
             func_0204c140(icon->actor, &icon->pos, 0);
             func_0204c318(icon->actor, GX_OAM_MODE_NORMAL);

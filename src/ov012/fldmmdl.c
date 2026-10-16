@@ -202,7 +202,7 @@ void FldActSys_Free(MMSys *system) {
 }
 
 void FldActSys_ClearCache(MMSys *system) {
-    sys_memset(system->actorConfigCache, 0, 0x310);
+    MI_CpuFill8(system->actorConfigCache, 0, 0x310);
 }
 
 void FldActSys_AttachField(MMSys *system, HeapID heapId, GameData *gameData, Field *field, FieldG3DMapper *mapper,
@@ -247,7 +247,7 @@ void FldActSys_FinishAsyncMatLoadSafe(MMSys *system) {
 void FldActSys_ForceFullSync(MMSys *system) {
     while (FldActSys_IsAsyncLoadPending(system) == TRUE) {
         FldActSys_Update(system);
-        CPU_WaitIntrBit(TRUE, 1);
+        OS_WaitInterrupt(TRUE, 1);
         FldActSys_FinishAsyncMatLoadSafe(system);
     }
 }
@@ -288,7 +288,7 @@ FieldActor *CreateNewActorByParam(MMSys *mmSys, s16 x, s16 z, u16 dir, u16 id, u
     ZoneNPC npc;
     ZoneNPCGridPosition *pos;
 
-    sys_memset(&npc, 0, sizeof(ZoneNPC));
+    MI_CpuFill8(&npc, 0, sizeof(ZoneNPC));
     npc.uid = id;
     npc.modelId = objCode;
     npc.moveCode = moveCode;
@@ -348,7 +348,7 @@ void DeleteActor(FieldActor *actor) {
         RemoveActorTCB(actor);
     }
     actor->actorSystem->actorCount--;
-    sys_memset32(0, actor, sizeof(FieldActor));
+    MIi_CpuClear32(0, actor, sizeof(FieldActor));
 }
 
 void FldActSys_DeleteAllActors(MMSys *mmSys) {
@@ -884,7 +884,7 @@ MMSys *GetActorMModelSystem(FieldActor *actor) {
 ActorPositionRail *ClearActorPositionBlock(FieldActor *actor, u32 size) {
     ActorPositionRail *block = GetNPCRailPosPtrAddr(actor);
 
-    sys_memset(block, 0, size);
+    MI_CpuFill8(block, 0, size);
     return block;
 }
 
@@ -895,7 +895,7 @@ ActorPositionRail *GetNPCRailPosPtrAddr(FieldActor *actor) {
 void *func_ov012_02167120(FieldActor *actor, u32 size) {
     void *block = func_ov012_02167138(actor);
 
-    sys_memset(block, 0, size);
+    MI_CpuFill8(block, 0, size);
     return block;
 }
 
@@ -906,7 +906,7 @@ void *func_ov012_02167138(FieldActor *actor) {
 void *func_ov012_0216713c(FieldActor *actor, u32 size) {
     void *block = func_ov012_02167154(actor);
 
-    sys_memset(block, 0, size);
+    MI_CpuFill8(block, 0, size);
     return block;
 }
 
@@ -917,7 +917,7 @@ void *func_ov012_02167154(FieldActor *actor) {
 void *FldAct_ResetBlActWork(FieldActor *actor, u32 size) {
     void *work = FldAct_GetBlActWorkPtr(actor);
 
-    sys_memset(work, 0, size);
+    MI_CpuFill8(work, 0, size);
     return work;
 }
 
@@ -1537,7 +1537,7 @@ static s32 GetAllActorsOverGPos(MMSys *system, s16 x, s16 z, BOOL checkInit, Fie
     u32 index = 0;
     FieldActor *actor;
 
-    sys_memset(list, 0, sizeof(FieldActorList));
+    MI_CpuFill8(list, 0, sizeof(FieldActorList));
     while (NextActor(system, &actor, &index) == TRUE) {
         if (CheckActorVolumeOverGPos(actor, x, z, checkInit) == TRUE) {
             list->actors[list->count++] = actor;
@@ -1649,7 +1649,7 @@ void DeleteAllActors(MMSys *system) {
                 RemoveActorTCB(actor);
             }
             actor->actorSystem->actorCount--;
-            sys_memset32(0, actor, sizeof(FieldActor));
+            MIi_CpuClear32(0, actor, sizeof(FieldActor));
         }
     }
 }
@@ -1758,7 +1758,7 @@ void ChangeActorUID(FieldActor *actor, u16 uid) {
 }
 
 static void FldAct_Reset(FieldActor *actor) {
-    sys_memset(actor, 0, sizeof(FieldActor));
+    MI_CpuFill8(actor, 0, sizeof(FieldActor));
 }
 
 static void func_ov012_02167d74(FieldActor *actor) {
@@ -1943,7 +1943,7 @@ u32 func_ov012_02168064(void) {
 }
 
 void func_ov012_0216806c(StrengthRockSave *save) {
-    sys_memset16(STRENGTH_ROCK_POS_NONE, save, sizeof(StrengthRockSave));
+    MIi_CpuClear16(STRENGTH_ROCK_POS_NONE, save, sizeof(StrengthRockSave));
 }
 
 static BOOL IsStrengthRockLastPositionInSaveData(StrengthRockSave *save, s32 slot) {

@@ -138,8 +138,8 @@ PMSInputView *PMSIView_Create(const PMSInputWork *mwk, const PMSInputData *dwk) 
         vwk->actUnit = func_0204bf1c(128, 0, HEAPID_PMS_INPUT);
         GFL_BGSysCreate(HEAPID_PMS_INPUT);
         BmpWin_InitAllocator(HEAPID_PMS_INPUT);
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
         vwk->mainTask = GFL_TCBMgrAddTask(PMSInput_GetTCBManager(mwk), PMSIView_MainTask, vwk, 2);
         vwk->vintrTask = PMSIView_AddVTask(PMSIView_VintrTask, vwk, 1);
         for (i = 0; i < PMSIV_COMMAND_MAX; i++) {
@@ -358,7 +358,7 @@ static void PMSIView_CmdInit(TCB *tcb, void *data) {
     GFL_BGSysSetBGEnabled(0, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysLoadArcNCGRStatic(arc, 16, 3, 0, 0, FALSE, HEAPID_PMS_INPUT);
     GFL_BGSysLoadArcNCGRStatic(arc, 17, 3, 0x60, 0, FALSE, HEAPID_PMS_INPUT);
     GFL_ArcToolFree(arc);
@@ -1244,9 +1244,9 @@ ClActor *PMSIView_AddActor(PMSInputView *vwk, const PMSIVObjRes *res, u32 x, u32
     } else {
         surface = CLACT_SURFACE_MAIN;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     actor = func_0204c040(vwk->actUnit, res->chars, res->palette, res->cellAnims, &setup, surface, HEAPID_PMS_INPUT);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     if (actor) {
         func_0204c520(actor, TRUE);
         func_0204c53c(actor, FX32_ONE);

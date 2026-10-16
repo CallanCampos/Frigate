@@ -871,7 +871,7 @@ static BOOL WifiNote_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFI_NOTE, 0xc0000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiNoteWork), HEAPID_WIFI_NOTE);
-    sys_memset(wk, 0, sizeof(WifiNoteWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiNoteWork));
     wk->param = param;
     wk->vblankTask = NULL;
     WifiNoteData_Init(&wk->data, wk->param, HEAPID_WIFI_NOTE);
@@ -1007,7 +1007,7 @@ static void WifiNoteData_SetEntered(WifiNoteData *data, const StrBuf *name, cons
 static u32 WifiNoteData_AddFriend(WifiNoteData *data, StrBuf *code, StrBuf *name) {
     int i;
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
-    u64 myKey = func_02057ec4(func_02009f7c(wifiList));
+    u64 myKey = DWC_CreateFriendKey(func_02009f7c(wifiList));
 
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
         if (!func_0200a138(wifiList, i)) {
@@ -1016,13 +1016,13 @@ static u32 WifiNoteData_AddFriend(WifiNoteData *data, StrBuf *code, StrBuf *name
             u64 key = WifiNote_StrToFriendKey(code, &valid);
 
             if (valid == TRUE && key != myKey) {
-                if (!func_020578cc(func_02009f7c(wifiList), key)) {
+                if (!DWC_CheckFriendKey(func_02009f7c(wifiList), key)) {
                     return 1;
                 }
                 if (!func_02011980(wifiList, key, &index)) {
                     return 2;
                 }
-                func_02057ef8(func_0200a0e4(wifiList, i), key);
+                DWC_CreateFriendKeyToken(func_0200a0e4(wifiList, i), key);
                 func_0200a11c(wifiList, i, name);
                 func_0200a034(wifiList, i, WIFI_LIST_FRIEND_GENDER, WIFI_LIST_GENDER_UNKNOWN);
                 return 0;
@@ -1046,7 +1046,7 @@ static void WifiNoteData_MakeFriends(WifiNoteData *data) {
     int i;
     WifiList *wifiList;
 
-    sys_memset(&data->friends, 0, sizeof(WifiNoteFriends));
+    MI_CpuFill8(&data->friends, 0, sizeof(WifiNoteFriends));
     wifiList = GameData_GetWifiList(data->gameData);
     data->friends.count = 0;
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
@@ -1067,8 +1067,8 @@ static void WifiNoteDraw_Init(WifiNoteDraw *draw, WifiNoteData *data, HeapID hea
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetDisplayLayout(0);
     draw->arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_NOTE, heapId);
     draw->heapId = heapId;
@@ -2335,7 +2335,7 @@ static BOOL WifiNoteFriendList_ScrollEnd(WifiNoteFriendList *list, WifiNoteDraw 
 static u64 WifiNoteFriendList_GetFriendKey(WifiNoteFriendList *list, WifiNoteData *data) {
     WifiList *wifiList = GameData_GetWifiList(data->gameData);
 
-    return func_02057e3c(func_0200a0e4(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)]));
+    return DWC_GetFriendKey(func_0200a0e4(wifiList, data->friends.index[WifiNoteFriendList_GetFriend(list)]));
 }
 
 static void WifiNoteFriendList_StartMenuMessage(WifiNoteFriendList *list, WifiNoteData *data, WifiNoteDraw *draw,
@@ -2873,7 +2873,7 @@ static void WifiNoteMyCode_InitDraw(WifiNoteMyCode *myCode, WifiNoteData *data, 
     WifiNote_CreateWindow(draw, &myCode->codeWindow, 3, 9, 6, 14, 2, 10, 241, 0);
     str = GFL_StrBufCreate(192, heapId);
     temp = GFL_StrBufCreate(128, heapId);
-    code = func_02057ec4(func_02009f7c(GameData_GetWifiList(data->gameData)));
+    code = DWC_CreateFriendKey(func_02009f7c(GameData_GetWifiList(data->gameData)));
     if (code != 0) {
         GFL_MsgDataLoadStrbuf(draw->msgData, Bank0418_Text_ByExchangingFriendCodes, str);
         PrintStrAligned(&myCode->msgWindow, draw->queue, 4, 0, str, draw->font, WIFI_NOTE_COLOR_BLACK,
@@ -3688,11 +3688,11 @@ static void WifiNoteDraw_StartExitAnim(WifiNoteDraw *draw) {
 // Darkens the screen behind a message, or shows it as it is
 static void WifiNote_SetBrightness(BOOL normal) {
     if (normal == TRUE) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR,
-                                 GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 0);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR,
+                                GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 0);
     } else {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR,
-                                 GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR,
+                                GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
     }
 }
 

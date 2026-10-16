@@ -44,7 +44,7 @@ static BrFadeFunc BrFade_GetFadeFunc(u32 type);
 BrFade *BrFade_Init(HeapID heapId) {
     BrFade *p_wk = GFL_HeapAllocate(heapId, sizeof(BrFade), FALSE, "br_fade.c", 98);
 
-    sys_memset(p_wk, 0, sizeof(BrFade));
+    MI_CpuFill8(p_wk, 0, sizeof(BrFade));
     p_wk->unk3C = 0xffff;
     p_wk->pfd = PaletteFade_Create(heapId);
     PaletteFade_AllocBuffer(p_wk->pfd, PALFADE_BUFFER_MAIN_BG, 0x200, heapId);
@@ -114,8 +114,8 @@ void BrFade_FillColor(BrFade *p_wk, u32 display) {
 
 void BrFade_SetAlpha(BrFade *p_wk, u32 display, u32 ev) {
     if (display & BR_FADE_DISPLAY_MAIN) {
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
-                            BR_FADE_BLEND_ALL, ev, 16 - ev);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
+                           BR_FADE_BLEND_ALL, ev, 16 - ev);
         if (ev == 0) {
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, FALSE);
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1, FALSE);
@@ -127,8 +127,8 @@ void BrFade_SetAlpha(BrFade *p_wk, u32 display, u32 ev) {
         }
     }
     if (display & BR_FADE_DISPLAY_SUB) {
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1,
-                            GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2, ev, 16 - ev);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1,
+                           GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2, ev, 16 - ev);
         if (ev == 0) {
             GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0, FALSE);
             GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG1, FALSE);
@@ -226,13 +226,13 @@ static BOOL BrFade_Fade_Alpha_BG012(BrFade *p_wk, u32 *p_seq) {
             ev2 = 0;
         }
         if (p_wk->display & BR_FADE_DISPLAY_MAIN) {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
-                                BR_FADE_BLEND_ALL, ev1, ev2);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
+                               BR_FADE_BLEND_ALL, ev1, ev2);
         }
         if (p_wk->display & BR_FADE_DISPLAY_SUB) {
-            gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2, ev1, ev2);
+            G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2, ev1, ev2);
         }
         p_wk->cnt = 0;
         p_wk->cnt_max = p_wk->sync != 0 ? p_wk->sync : 16 / GFL_FadeGetUpdateFreq();
@@ -339,8 +339,8 @@ static BOOL BrFade_Fade_MasterBrightAndAlpha(BrFade *p_wk, u32 *p_seq) {
             evb = 0;
         }
         GFL_FadeSet(FADE_ENGINE_A_WHITE, start, end, p_wk->sync);
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1,
-                            GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2, eva, evb);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1,
+                           GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2, eva, evb);
         p_wk->cnt = 0;
         p_wk->cnt_max = p_wk->sync != 0 ? p_wk->sync : 16 / GFL_FadeGetUpdateFreq();
         *p_seq = 1;

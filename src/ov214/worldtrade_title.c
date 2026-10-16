@@ -129,7 +129,7 @@ int WorldTrade_Title_Init(WorldTradeWork *wk, int seq) {
         wk->openingFlag = 1;
         WorldTrade_HeroDemo(wk);
     } else {
-        if (wk->subOutFlag == 1 && gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+        if (wk->subOutFlag == 1 && GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
             WorldTrade_SetPartnerExchangePos(wk);
             GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {

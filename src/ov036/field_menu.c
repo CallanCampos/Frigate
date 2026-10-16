@@ -414,7 +414,7 @@ static void func_ov036_0219ff20(FieldMenu *menu, ArcTool *arc, u8 menuType, void
     ArcTool *common;
     ClActorSetup setup;
 
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysCreateBG(5, &data_ov036_021cfee0, 0);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysClearScr(5);
@@ -586,9 +586,9 @@ static void func_ov036_021a040c(TCB *tcb, void *data) {
     GXRgb colors[2];
 
     colors[1] = (t * 8 / 0x2000 + 9) | ((31 << 10) | ((t * 5 / 0x2000 + 18) << 5));
-    gfxUploadStdPaletteObjB(&colors[1], 0x142, sizeof(GXRgb));
+    GXS_LoadOBJPltt(&colors[1], 0x142, sizeof(GXRgb));
     colors[0] = (t * 31 / 0x2000) | (((t * 6 / 0x2000 + 25) << 10) | ((t * 13 / 0x2000 + 18) << 5));
-    gfxUploadStdPaletteObjB(&colors[0], 0x15e, sizeof(GXRgb));
+    GXS_LoadOBJPltt(&colors[0], 0x15e, sizeof(GXRgb));
     menu->cursorFadeFrame += 6;
 }
 

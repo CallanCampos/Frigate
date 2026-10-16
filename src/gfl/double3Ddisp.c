@@ -53,14 +53,14 @@ static void GFL_G3DDual3DInitOAM(void) {
             n++;
         }
     }
-    cp15_flushDC(sDual3D->oam, sizeof(sDual3D->oam));
-    gfxUploadOAMB(sDual3D->oam, OAM_FIRST * sizeof(GXOamAttr), sizeof(sDual3D->oam));
+    DC_FlushRange(sDual3D->oam, sizeof(sDual3D->oam));
+    GXS_LoadOAM(sDual3D->oam, OAM_FIRST * sizeof(GXOamAttr), sizeof(sDual3D->oam));
 }
 
 void GFL_G3DDual3DFree(void) {
-    gfxDisableLCDCBanks();
-    gfxDisableBGBanksB();
-    gfxDisableObjBanksB();
+    GX_DisableBankForLCDC();
+    GX_DisableBankForSubBG();
+    GX_DisableBankForSubOBJ();
     GFL_HeapFree(sDual3D);
     sDual3D = NULL;
 }
@@ -90,13 +90,13 @@ void GFL_G3DDual3DExecVBlank(void) {
 // VRAM C on the bottom screen
 static void GFL_G3DDual3DSetupTopScreen(void) {
     GX_SetDispSelect(GX_DISP_SELECT_MAIN_SUB);
-    gfxAcquireObjBanksB();
-    gfxSetBGBanksB(GX_VRAM_SUB_BG_128_C);
-    gfxSetLCDCBanks(GX_VRAM_D);
+    GX_ResetBankForSubOBJ();
+    GX_SetBankForSubBG(GX_VRAM_SUB_BG_128_C);
+    GX_SetBankForLCDC(GX_VRAM_D);
     GX_SetCapture(GX_CAPTURE_SIZE_256x192, GX_CAPTURE_MODE_A, GX_CAPTURE_SRCA_2D3D, GX_CAPTURE_SRCB_VRAM_0x00000,
                   GX_CAPTURE_DEST_VRAM_D_0x00000, 16, 0);
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
-    gfxSetBGModeB(GX_BGMODE_5);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
+    GXS_SetGraphicsMode(GX_BGMODE_5);
     GXS_SetVisiblePlane(GX_PLANEMASK_BG2);
     G2S_SetBG2ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x00000);
     G2S_BG2Mosaic(FALSE);
@@ -106,12 +106,12 @@ static void GFL_G3DDual3DSetupTopScreen(void) {
 // in VRAM D on the top screen
 static void GFL_G3DDual3DSetupBottomScreen(void) {
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
-    gfxAcquireBGBanksB();
-    gfxSetObjBanksB(GX_VRAM_SUB_OBJ_128_D);
-    gfxSetLCDCBanks(GX_VRAM_C);
+    GX_ResetBankForSubBG();
+    GX_SetBankForSubOBJ(GX_VRAM_SUB_OBJ_128_D);
+    GX_SetBankForLCDC(GX_VRAM_C);
     GX_SetCapture(GX_CAPTURE_SIZE_256x192, GX_CAPTURE_MODE_A, GX_CAPTURE_SRCA_2D3D, GX_CAPTURE_SRCB_VRAM_0x00000,
                   GX_CAPTURE_DEST_VRAM_C_0x00000, 16, 0);
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
-    gfxSetBGModeB(GX_BGMODE_5);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
+    GXS_SetGraphicsMode(GX_BGMODE_5);
     GXS_SetVisiblePlane(GX_PLANEMASK_OBJ);
 }

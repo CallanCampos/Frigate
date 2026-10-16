@@ -42,7 +42,7 @@ static const ItemShortcut sItemShortcuts[] = {
 };
 
 void ShortcutMenuPos_Init(ShortcutMenuPos *pos) {
-    sys_memset(pos, 0, sizeof(ShortcutMenuPos));
+    MI_CpuFill8(pos, 0, sizeof(ShortcutMenuPos));
 }
 
 u32 ShortcutUtil_GetItemShortcut(u16 item) {

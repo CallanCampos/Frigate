@@ -286,7 +286,7 @@ void WF_2DC_WkDel(WF_2DCWK *wk) {
         func_0204c108(wk->shadow);
     }
     func_0204c108(wk->actor);
-    sys_memset(wk, 0, sizeof(WF_2DCWK));
+    MI_CpuFill8(wk, 0, sizeof(WF_2DCWK));
 }
 
 void WF_2DC_WkMatrixSet(WF_2DCWK *wk, s16 x, s16 y) {

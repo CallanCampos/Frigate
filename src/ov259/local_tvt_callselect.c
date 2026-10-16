@@ -173,7 +173,7 @@ LocalTvtCallSelect *LocalTvtCallSelect_Create(const LocalTvtCallSelectSetup *set
     LocalTvtCallSelect_LoadResources(select, heapId);
     select->returnBar = LocalTvtReturnBar_Create(select->setup.unit, heapId);
     LocalTvtCallList_Init(&select->list, select, heapId);
-    sys_memset(&keyTouchSetup, 0, sizeof(keyTouchSetup));
+    MI_CpuFill8(&keyTouchSetup, 0, sizeof(keyTouchSetup));
     keyTouchSetup.work = select;
     keyTouchSetup.touch = LocalTvtCallSelect_Touch;
     keyTouchSetup.key = LocalTvtCallSelect_Key;
@@ -290,7 +290,7 @@ static void LocalTvtCallList_Init(LocalTvtCallList *list, const LocalTvtCallSele
     int i;
     WordSet *wordSet;
 
-    sys_memset(list, 0, sizeof(LocalTvtCallList));
+    MI_CpuFill8(list, 0, sizeof(LocalTvtCallList));
     list->count = select->setup.count;
     LocalTvtCallScrollBar_Init(&list->scrollBar, select, heapId);
     LocalTvtCallButton_Init(&list->button, select, heapId);
@@ -323,7 +323,7 @@ static void LocalTvtCallList_Exit(LocalTvtCallList *list) {
     }
     LocalTvtCallButton_Exit(&list->button);
     LocalTvtCallScrollBar_Exit(&list->scrollBar);
-    sys_memset(list, 0, sizeof(LocalTvtCallList));
+    MI_CpuFill8(list, 0, sizeof(LocalTvtCallList));
 }
 
 static void LocalTvtCallList_Main(LocalTvtCallList *list) {
@@ -564,7 +564,7 @@ static void LocalTvtCallItem_Init(LocalTvtCallItem *item, const LocalTvtCallSele
                                   StrBuf *name, LocalTvtMessage *message, BOOL disabled, HeapID heapId) {
     ClActorSetup setup;
 
-    sys_memset(item, 0, sizeof(LocalTvtCallItem));
+    MI_CpuFill8(item, 0, sizeof(LocalTvtCallItem));
     item->index = index;
     item->disabled = disabled;
     setup.bgPriority = 3;
@@ -592,7 +592,7 @@ static void LocalTvtCallItem_Exit(LocalTvtCallItem *item) {
     BmpWin_Free(item->window);
     func_0204c108(item->icon);
     func_0204c108(item->plate);
-    sys_memset(item, 0, sizeof(LocalTvtCallItem));
+    MI_CpuFill8(item, 0, sizeof(LocalTvtCallItem));
 }
 
 // Moves the plate with the list
@@ -665,7 +665,7 @@ static void LocalTvtCallItem_SetCursor(LocalTvtCallItem *item, BOOL cursor) {
 static void LocalTvtCallScrollBar_Init(LocalTvtCallScrollBar *bar, const LocalTvtCallSelect *select, HeapID heapId) {
     ClActorSetup setup;
 
-    sys_memset(bar, 0, sizeof(LocalTvtCallScrollBar));
+    MI_CpuFill8(bar, 0, sizeof(LocalTvtCallScrollBar));
     if (select->setup.count > LIST_VISIBLE) {
         bar->enabled = TRUE;
     }
@@ -685,7 +685,7 @@ static void LocalTvtCallScrollBar_Init(LocalTvtCallScrollBar *bar, const LocalTv
 
 static void LocalTvtCallScrollBar_Exit(LocalTvtCallScrollBar *bar) {
     func_0204c108(bar->actor);
-    sys_memset(bar, 0, sizeof(LocalTvtCallScrollBar));
+    MI_CpuFill8(bar, 0, sizeof(LocalTvtCallScrollBar));
 }
 
 static void LocalTvtCallScrollBar_Main(LocalTvtCallScrollBar *bar) {
@@ -782,7 +782,7 @@ static void LocalTvtCallScrollBar_SetTarget(LocalTvtCallScrollBar *bar, fx32 rat
 static void LocalTvtCallButton_Init(LocalTvtCallButton *button, const LocalTvtCallSelect *select, HeapID heapId) {
     MsgData *msgData;
 
-    sys_memset(button, 0, sizeof(LocalTvtCallButton));
+    MI_CpuFill8(button, 0, sizeof(LocalTvtCallButton));
     button->message = select->setup.message;
     button->heapId = heapId;
     button->res = AppTaskMenuRes_Create(4, 7, LocalTvtMessage_GetFont(button->message),
@@ -810,7 +810,7 @@ static void LocalTvtCallButton_Exit(LocalTvtCallButton *button) {
     GFL_BGSysLoadScr(4);
     GFL_BGSysMoveBGReq(4, BG_MOVE_SET_Y, 0);
     AppTaskMenuRes_Free(button->res);
-    sys_memset(button, 0, sizeof(LocalTvtCallButton));
+    MI_CpuFill8(button, 0, sizeof(LocalTvtCallButton));
 }
 
 static void LocalTvtCallButton_Main(LocalTvtCallButton *button) {
@@ -851,7 +851,7 @@ static void LocalTvtCallButton_SetShown(LocalTvtCallButton *button, BOOL shown) 
         if (button->button == NULL) {
             AppTaskMenuItem item;
 
-            sys_memset(&item, 0, sizeof(item));
+            MI_CpuFill8(&item, 0, sizeof(item));
             item.str = button->callStr;
             item.color = 0x39e3;
             item.type = 0;

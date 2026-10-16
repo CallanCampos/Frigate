@@ -443,7 +443,7 @@ static BOOL PkwdSelectScreen_Init(GameProc *proc, u32 *state, void *param, void 
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PKWD_SELECTSCREEN, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PkwdSelectScreenWork), HEAPID_PKWD_SELECTSCREEN);
-    sys_memset(wk, 0, sizeof(PkwdSelectScreenWork));
+    MI_CpuFill8(wk, 0, sizeof(PkwdSelectScreenWork));
     wk->heapId = HEAPID_PKWD_SELECTSCREEN;
     wk->param = param;
     wk->graphic = PkwdSelectScreenGraphic_Create(0, wk->heapId);
@@ -587,7 +587,7 @@ static void PkwdSelectScreenBG_Load(PkwdSelectScreenBG *bg, HeapID heapId) {
 static void PkwdSelectScreenBG_LoadPoster(PkwdSelectScreenBG *bg, s32 movie, s32 cursor) {
     ArcTool *arc;
 
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, 16);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, 16);
     arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_COUNT, HEAPID_PKWD_SELECTSCREEN);
     if (cursor == CURSOR_NONE || movie == MOVIE_NONE) {
         GFL_G2DIOLoadArcNCLRDefault(arc, POSTER_PALETTE_FILE_NONE, 4, 0, 0x20, HEAPID_PKWD_SELECTSCREEN);
@@ -626,7 +626,7 @@ static TouchBar *PkwdSelectScreen_CreateTouchBar(PkwdSelectScreenWork *wk, ClAct
         };
         TouchBarSetup setup;
 
-        sys_memset(&setup, 0, sizeof(TouchBarSetup));
+        MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
         setup.items = items;
         setup.count = NELEMS(items);
         setup.unit = unit;
@@ -704,7 +704,7 @@ static void PkwdSelectScreen_CreateNewMarks(PkwdSelectScreenWork *wk) {
     ClActorSetup setup;
     s32 i;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < PAGE_SIZE; i++) {
         setup.x = sPkwdSelectScreenNewMarkPos[i].x;
         setup.y = sPkwdSelectScreenNewMarkPos[i].y;
@@ -758,7 +758,7 @@ static void PkwdSelectScreen_CreateMarks(PkwdSelectScreenWork *wk) {
     ClActorSetup setup;
     s32 i;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < MARK_COUNT; i++) {
         setup.x = sPkwdSelectScreenMarkPos[i].x;
         setup.y = sPkwdSelectScreenMarkPos[i].y;

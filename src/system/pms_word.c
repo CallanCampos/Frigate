@@ -171,7 +171,7 @@ PMSData *PMSWordSave_GetSentence(PMSWordSave *save, int index) {
 
 void PMSWordSave_SetSentence(PMSWordSave *save, int index, const PMSData *sentence) {
     if (index >= 0 && index < PMS_SAVE_SENTENCE_COUNT) {
-        sys_memcpy(sentence, &save->sentences[index], sizeof(PMSData));
+        MI_CpuCopy8(sentence, &save->sentences[index], sizeof(PMSData));
     }
 }
 

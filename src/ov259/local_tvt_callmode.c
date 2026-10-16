@@ -129,7 +129,7 @@ static void LocalTvtCallMode_GetSelectSetup(LocalTvtCallMode *mode, LocalTvtCall
     int count = 0;
     u32 i;
 
-    sys_memset(setup, 0, sizeof(LocalTvtCallSelectSetup));
+    MI_CpuFill8(setup, 0, sizeof(LocalTvtCallSelectSetup));
     setup->rival = getHollow_RivalData(GameData_GetSaveControl(mode->setup.gameData));
     setup->message = mode->setup.message;
     setup->unit = mode->setup.unit;
@@ -173,8 +173,8 @@ static void LocalTvtCallMode_StartPerson(LocalTvtCallMode *mode, LocalTvtPersonF
     u16 zoneId;
     BOOL unk;
 
-    sys_memset(setups, 0, sizeof(setups));
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(setups, 0, sizeof(setups));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     for (i = 0; i < LOCAL_TVT_FACES; i++) {
         setups[i].nameMsg = LOCAL_TVT_NAME_DEFAULT;
     }
@@ -274,7 +274,7 @@ static void LocalTvtCallMode_SeqFadeInCall(LocalTvtSeq *seq, int *step, void *wo
         LocalTvtPersonSetup setup;
 
         LocalTvtCallMode_StartPerson(mode, &funcs);
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.message = mode->setup.message;
         setup.chara = mode->setup.chara;
         setup.unit = mode->setup.unit;
@@ -374,7 +374,7 @@ static void LocalTvtCallMode_SeqCall(LocalTvtSeq *seq, int *step, void *work) {
             LocalTvtPersonSetup setup;
 
             LocalTvtCallMode_StartPerson(mode, &funcs);
-            sys_memset(&setup, 0, sizeof(setup));
+            MI_CpuFill8(&setup, 0, sizeof(setup));
             setup.message = mode->setup.message;
             setup.chara = mode->setup.chara;
             setup.unit = mode->setup.unit;
@@ -439,7 +439,7 @@ static void LocalTvtCalling_Init(LocalTvtCalling *calling, LocalTvtMessage *mess
     BmpWin *window;
     LocalTvtMessage *printMessage;
 
-    sys_memset(calling, 0, sizeof(LocalTvtCalling));
+    MI_CpuFill8(calling, 0, sizeof(LocalTvtCalling));
     calling->message = message;
     calling->ringCount = ringCount;
     window = BmpWin_CreateDynamic(4, 2, 9, 28, 2, 15, TRUE);
@@ -467,7 +467,7 @@ static void LocalTvtCalling_Exit(LocalTvtCalling *calling) {
     BmpWin_ClearScreen(window);
     GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
     BmpWin_Free(calling->window);
-    sys_memset(calling, 0, sizeof(LocalTvtCalling));
+    MI_CpuFill8(calling, 0, sizeof(LocalTvtCalling));
 }
 
 static void LocalTvtCalling_Main(LocalTvtCalling *calling) {

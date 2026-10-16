@@ -161,7 +161,7 @@ BrBtnSys *BrBtnSys_Init(int menuID, ClActUnit *unit, BrRes *res, BrRecordInfo *r
 
     GFL_ASSERT(menuID < BR_MENUID_MAX);
     p_wk = GFL_HeapAllocate(heapId, sizeof(BrBtnSys), FALSE, "br_btn.c", 318);
-    sys_memset(p_wk, 0, sizeof(BrBtnSys));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBtnSys));
     p_wk->res = res;
     p_wk->unit = unit;
     p_wk->heapId = heapId;
@@ -173,7 +173,7 @@ BrBtnSys *BrBtnSys_Init(int menuID, ClActUnit *unit, BrRes *res, BrRecordInfo *r
     {
         BrBtnDataSetup setup;
 
-        sys_memset(&setup, 0, sizeof(BrBtnDataSetup));
+        MI_CpuFill8(&setup, 0, sizeof(BrBtnDataSetup));
         setup.recordInfo = recordInfo;
         p_wk->btnData = BrBtnData_Init(&setup, heapId);
     }
@@ -191,11 +191,11 @@ BrBtnSys *BrBtnSys_Init(int menuID, ClActUnit *unit, BrRes *res, BrRecordInfo *r
         u32 size = sizeof(BrBtnWork) * p_wk->btn_max;
 
         p_wk->btn = GFL_HeapAllocate(heapId, size, FALSE, "br_btn.c", 358);
-        sys_memset(p_wk->btn, 0, size);
+        MI_CpuFill8(p_wk->btn, 0, size);
     }
     p_wk->btn_stack_max = BR_BTN_SYS_STACK_MAX;
     p_wk->btn_stack = GFL_HeapAllocate(heapId, sizeof(BrBtnWork) * BR_BTN_SYS_STACK_MAX, FALSE, "br_btn.c", 368);
-    sys_memset(p_wk->btn_stack, 0, sizeof(BrBtnWork) * BR_BTN_SYS_STACK_MAX);
+    MI_CpuFill8(p_wk->btn_stack, 0, sizeof(BrBtnWork) * BR_BTN_SYS_STACK_MAX);
     p_wk->seq = BrSeq_Init(p_wk, BrBtnSys_Seq_Start, heapId);
 
     if (p_wk->recovery->stack_num != 0) {
@@ -207,7 +207,7 @@ BrBtnSys *BrBtnSys_Init(int menuID, ClActUnit *unit, BrRes *res, BrRecordInfo *r
             StrBuf *str = BrBtnData_CreateStr(p_wk->btnData, cp_data, msg, HEAPID_TAIL(heapId));
             BrBtnWork btn;
 
-            sys_memset(&btn, 0, sizeof(BrBtnWork));
+            MI_CpuFill8(&btn, 0, sizeof(BrBtnWork));
             BrBtnWork_Init(&btn, cp_data, unit, p_wk->bmpoam, res, str, p_wk->objID, heapId);
             BrBtnSys_PushStack(p_wk, &btn, CLACT_SURFACE_MAIN);
             GFL_StrBufFree(str);
@@ -302,7 +302,7 @@ static BOOL BrBtnSys_PopStack(BrBtnSys *p_wk, BrBtnWork *p_btn) {
     if (p_wk->btn_stack_num != 0) {
         p_wk->btn_stack_num--;
         *p_btn = p_wk->btn_stack[p_wk->btn_stack_num];
-        sys_memset(&p_wk->btn_stack[p_wk->btn_stack_num], 0, sizeof(BrBtnWork));
+        MI_CpuFill8(&p_wk->btn_stack[p_wk->btn_stack_num], 0, sizeof(BrBtnWork));
         return TRUE;
     }
     return FALSE;
@@ -495,7 +495,7 @@ static void BrBtnSys_Seq_Change(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         BrBtnSys_PushStack(p_wk, &p_wk->btn[p_wk->trgIdx], CLACT_SURFACE_SUB);
         BrBtnRecovery_Push(p_wk->recovery, BrBtnWork_GetParam(&p_wk->btn[p_wk->trgIdx], BR_BTN_PARAM_MENUID),
                            p_wk->trgIdx);
-        sys_memset(&p_wk->btn[p_wk->trgIdx], 0, sizeof(BrBtnWork));
+        MI_CpuFill8(&p_wk->btn[p_wk->trgIdx], 0, sizeof(BrBtnWork));
         pos.y = -32;
         BrBtnSys_LoadMenu(p_wk, nextMenuID, &pos);
         BrSeq_SetNext(p_seqwk, BrBtnSys_Seq_Stack);
@@ -526,7 +526,7 @@ static void BrBtnSys_Seq_Change(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         BrBtnSys_PushStack(p_wk, &p_wk->btn[p_wk->trgIdx], CLACT_SURFACE_SUB);
         BrBtnRecovery_Push(p_wk->recovery, BrBtnWork_GetParam(&p_wk->btn[p_wk->trgIdx], BR_BTN_PARAM_MENUID),
                            p_wk->trgIdx);
-        sys_memset(&p_wk->btn[p_wk->trgIdx], 0, sizeof(BrBtnWork));
+        MI_CpuFill8(&p_wk->btn[p_wk->trgIdx], 0, sizeof(BrBtnWork));
         for (i = 0; i < p_wk->btn_num; i++) {
             BrBtnWork_Exit(&p_wk->btn[i]);
         }
@@ -816,7 +816,7 @@ static void BrBtnSys_Seq_Close(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
 static void BrBtnWork_Init(BrBtnWork *p_wk, const BrBtnData *cp_data, ClActUnit *unit, BmpOamSys *bmpoam, BrRes *res,
                            const StrBuf *str, u32 objID, HeapID heapId) {
     GFL_ASSERT(p_wk->is_use == FALSE);
-    sys_memset(p_wk, 0, sizeof(BrBtnWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBtnWork));
     p_wk->is_use = TRUE;
     p_wk->display = CLACT_SURFACE_SUB;
     p_wk->data = cp_data;
@@ -830,7 +830,7 @@ static void BrBtnWork_Init(BrBtnWork *p_wk, const BrBtnData *cp_data, ClActUnit 
         ClActorSetup setup;
         BrResObjData obj;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = BrBtnData_GetParam(p_wk->data, BR_BTN_DATA_PARAM_X);
         setup.y = BrBtnData_GetParam(p_wk->data, BR_BTN_DATA_PARAM_Y);
         setup.sequence = BrBtnData_GetParam(p_wk->data, BR_BTN_DATA_PARAM_ANMSEQ);
@@ -845,7 +845,7 @@ static void BrBtnWork_Exit(BrBtnWork *p_wk) {
     if (p_wk->is_use) {
         GFL_StrBufFree(p_wk->str);
         BrBtn_Exit(p_wk->btn);
-        sys_memset(p_wk, 0, sizeof(BrBtnWork));
+        MI_CpuFill8(p_wk, 0, sizeof(BrBtnWork));
     }
 }
 
@@ -920,7 +920,7 @@ static void BrBtnWork_ChangeDisplay(BrBtnWork *p_wk, u32 display) {
         } else {
             ofs = -512;
         }
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = x;
         setup.y = y + ofs;
         setup.sequence = BrBtnData_GetParam(p_wk->data, BR_BTN_DATA_PARAM_ANMSEQ);
@@ -1239,7 +1239,7 @@ BrBtn *BrBtn_Init(const ClActorSetup *setup, const StrBuf *str, u16 width, u32 d
     BrBtn *p_wk = GFL_HeapAllocate(heapId, sizeof(BrBtn), FALSE, "br_btn.c", 2618);
     BmpOamActorSetup actorSetup;
 
-    sys_memset(p_wk, 0, sizeof(BrBtn));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBtn));
     p_wk->width = width;
     p_wk->display = display;
     p_wk->clwk = func_0204c040(unit, obj->chr, obj->plt, obj->cell, setup, display, heapId);
@@ -1247,7 +1247,7 @@ BrBtn *BrBtn_Init(const ClActorSetup *setup, const StrBuf *str, u16 width, u32 d
     p_wk->bmp = GFL_BitmapCreate(p_wk->width / 8, 2, 0x20, heapId);
     GFL_TextRendererDrawToBitmapEx(p_wk->bmp, 1, 0, str, font, 0x3da0);
 
-    sys_memset(&actorSetup, 0, sizeof(BmpOamActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(BmpOamActorSetup));
     actorSetup.bitmap = p_wk->bmp;
     actorSetup.x = setup->x + 32;
     actorSetup.y = setup->y - 8;

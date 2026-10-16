@@ -61,8 +61,8 @@ void *func_0200cd34(GameData *gameData, void *data, u32 size, HeapID heapId) {
 
     if (wk->block != NULL) {
         wk->header.size = size;
-        sys_memcpy(&wk->header, wk->block, sizeof(MusicalDistHeader));
-        sys_memcpy(data, wk->data, size);
+        MI_CpuCopy8(&wk->header, wk->block, sizeof(MusicalDistHeader));
+        MI_CpuCopy8(data, wk->data, size);
     }
     return wk;
 }

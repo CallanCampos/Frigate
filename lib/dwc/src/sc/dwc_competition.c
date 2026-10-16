@@ -1,6 +1,8 @@
 #include "dwc/competition.h"
+#include "dwc/dwc.h"
 #include "dwc/ext.h"
 #include "dwc/soap.h"
+#include "nitro/std.h"
 
 // GameSpy's competition service, as the Wi-Fi library of overlay 260 talks to it: a client with the three requests, and
 // the report that the game builds. The report's numbers are big-endian, as the service reads them; its first 0x44 bytes
@@ -97,22 +99,22 @@ static char sCompetitionUrl[128];
 void ScClient_SetServers(int server) {
     switch (server) {
     case 1:
-        func_0207a2c0(sCompetitionUrl, 128,
-                      "https://%s.secure2.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(sCompetitionUrl, 128,
+                    "https://%s.secure2.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(sCompetitionUrl);
-        func_0207a2c0(gAuthUrl, 128, "https://%s.secure2.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(gAuthUrl, 128, "https://%s.secure2.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     case 0:
     default:
-        func_0207a2c0(sCompetitionUrl, 128,
-                      "https://%s.secure.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(sCompetitionUrl, 128,
+                    "https://%s.secure.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(sCompetitionUrl);
-        func_0207a2c0(gAuthUrl, 128, "https://%s.secure.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(gAuthUrl, 128, "https://%s.secure.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     }
@@ -121,9 +123,9 @@ void ScClient_SetServers(int server) {
 static int ScClient_Alloc(ScClient **client) {
     if (data_ov011_02190698 == 1) {
         if (sCompetitionUrl[0] == '\0') {
-            func_0207a2c0(sCompetitionUrl, 128,
-                          "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                          data_ov011_0219069c);
+            OS_SNPrintf(sCompetitionUrl, 128,
+                        "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
+                        data_ov011_0219069c);
         }
     } else {
         return 1;
@@ -178,9 +180,9 @@ static void ScClient_CopyCcid(ScClient *client, const char *ccid) {
 static char *ScClient_BuildUrl(void) {
     if (data_ov011_02190698 == 1) {
         if (sCompetitionUrl[0] == '\0') {
-            func_0207a2c0(sCompetitionUrl, 128,
-                          "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                          data_ov011_0219069c);
+            OS_SNPrintf(sCompetitionUrl, 128,
+                        "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
+                        data_ov011_0219069c);
         }
         return sCompetitionUrl;
     }
@@ -594,12 +596,12 @@ static u8 *Sc_PutGuid(u8 *dest, const char *text) {
     ScGuidTail tail;
     int i;
 
-    func_0207fa4c(text, "%8x", &data1);
-    func_0207fa4c(text + 9, "%4x", &data2);
-    func_0207fa4c(text + 14, "%4x", &data3);
-    func_0207fa4c(text + 19, "%2x", &data4[0]);
-    func_0207fa4c(text + 21, "%2x", &data4[1]);
-    func_0207fa4c(text + 24, "%2x%2x%2x%2x%2x%2x", &data4[2], &data4[3], &data4[4], &data4[5], &data4[6], &data4[7]);
+    STD_TSScanf(text, "%8x", &data1);
+    STD_TSScanf(text + 9, "%4x", &data2);
+    STD_TSScanf(text + 14, "%4x", &data3);
+    STD_TSScanf(text + 19, "%2x", &data4[0]);
+    STD_TSScanf(text + 21, "%2x", &data4[1]);
+    STD_TSScanf(text + 24, "%2x%2x%2x%2x%2x%2x", &data4[2], &data4[3], &data4[4], &data4[5], &data4[6], &data4[7]);
     for (i = 0; i < 8; i++) {
         tail.data[i] = data4[i];
     }

@@ -402,9 +402,9 @@ void StaActing_Term(StaActing *stage) {
     if (stage->strmPlaying == TRUE) {
         func_02006588();
     }
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, 0, 31, 31);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0, 31, 31);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     StaActing_TermAppealEffect(stage);
     StaActScript_TermSystem(stage->scriptSys);
@@ -572,7 +572,7 @@ static void StaActing_InitGraphics(StaActing *stage) {
         GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, FX32_CONST(12), 0, 0, FX32_CONST(16), FX32_ONE, FX32_CONST(1000),
                             0, &STA_ACTING_CAMERA_POS, &STA_ACTING_CAMERA_UP, &STA_ACTING_CAMERA_TARGET, stage->heapId);
     GFL_G3DCameraFlush(stage->camera);
-    gfxSetEdgeColorTable(STA_ACTING_EDGE_COLORS);
+    G3X_SetEdgeColorTable(STA_ACTING_EDGE_COLORS);
     G3X_EdgeMarking(FALSE);
     G3X_AntiAlias(TRUE);
     G3X_AlphaBlend(TRUE);
@@ -587,7 +587,7 @@ static void StaActing_InitGraphics(StaActing *stage) {
     ClActSys_Create(&data_02093f08, &STA_ACTING_VRAM_CONFIG, stage->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG0, 0, 10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG0, 0, 10);
     GX_SetVisibleWnd(GX_WNDMASK_OW);
     G2_SetWndOBJInsidePlane(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, TRUE);
     G2_SetWndOutsidePlane(GX_PLANEMASK_ALL, TRUE);

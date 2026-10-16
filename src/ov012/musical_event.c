@@ -526,7 +526,7 @@ static void func_ov012_02151384(MusicalEventWork *work) {
             info = func_ov211_021ef9c4(work->comm, func_ov012_02151b88(work, pos));
         }
         if (info != NULL) {
-            sys_memcpy(info, shot->pokes[pos].name, sizeof(shot->pokes[pos].name));
+            MI_CpuCopy8(info, shot->pokes[pos].name, sizeof(shot->pokes[pos].name));
         } else {
             msgId = func_ov012_02152634(work->program, func_ov012_02151b14(work, func_ov012_02151b88(work, pos)));
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_9, HEAPID_GAMEEVENT);

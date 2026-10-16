@@ -73,8 +73,8 @@ static void PokemonTradeDemoCommon_UpdateFade(TradeFade *fade) {
         fade->frame++;
         step = ((fade->end - fade->start) << FX32_SHIFT) / fade->frames;
         brightness = step * fade->frame / FX32_ONE;
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, brightness);
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x1f, brightness);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, brightness);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x1f, brightness);
     }
 }
 

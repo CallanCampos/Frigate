@@ -31,7 +31,7 @@ GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, 
 
     event = GameEvent_Create(gsys, NULL, EncEffCaptureFlash_Callback, sizeof(EncEffCaptureWork));
     work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(EncEffCaptureWork));
+    MI_CpuFill8(work, 0, sizeof(EncEffCaptureWork));
     work->camPos = *pos;
     work->init = init;
     work->render = render;
@@ -45,7 +45,7 @@ GameEvent *EncEffCapture_CreateEvent(GameSystem *gsys, const VecFx32 *pos, GameE
 
     event = GameEvent_Create(gsys, NULL, EncEffCapture_Callback, sizeof(EncEffCaptureWork));
     work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(EncEffCaptureWork));
+    MI_CpuFill8(work, 0, sizeof(EncEffCaptureWork));
     work->camPos = *pos;
     work->init = init;
     work->render = render;
@@ -56,15 +56,15 @@ GameEvent *EncEffCapture_CreateEvent(GameSystem *gsys, const VecFx32 *pos, GameE
 void EncEffCapture_Draw(void *data) {
     EncEffCaptureWork *work = data;
 
-    gfxPerspective(FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)), FX32_ONE * 4 / 3, FX32_ONE, FX32_CONST(1024),
-                   FX32_ONE, TRUE, NULL);
-    gfxReset3D();
+    G3i_PerspectiveW_(FX_SinIdx(DEG_TO_IDX(20)), FX_CosIdx(DEG_TO_IDX(20)), FX32_ONE * 4 / 3, FX32_ONE,
+                      FX32_CONST(1024), FX32_ONE, TRUE, NULL);
+    G3X_Reset();
     {
         VecFx32 camUp = { 0, FX32_ONE, 0 };
         VecFx32 target = { 0, 0, 0 };
         VecFx32 camPos = work->camPos;
 
-        gfxLookAt(&camPos, &camUp, &target, TRUE, NULL);
+        G3i_LookAt_(&camPos, &camUp, &target, TRUE, NULL);
     }
     G3_TexImageParam(GX_TEXFMT_DIRECT, GX_TEXGEN_TEXCOORD, GX_TEXSIZE_S256, GX_TEXSIZE_T256, GX_TEXREPEAT_NONE,
                      GX_TEXFLIP_NONE, GX_TEXPLTTCOLOR0_USE, NNS_GfdGetTexKeyAddr(work->texKey));
@@ -110,14 +110,14 @@ static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *st
             GFL_BGSysSetBGPriority(0, 0);
             GFL_BGSysSetBGPriority(2, 3);
             work->renderMode = Field_GetRenderMode(field);
-            work->texBanks = gfxGetTextureBanks();
+            work->texBanks = GX_GetBankForTex();
             work->addedTexBank = FALSE;
             if (!(work->texBanks & GX_VRAM_D)) {
                 work->texBanks |= GX_VRAM_D;
                 work->addedTexBank = TRUE;
             }
-            gfxDisableLCDCBanks();
-            gfxSetTextureBanks(work->texBanks);
+            GX_DisableBankForLCDC();
+            GX_SetBankForTex(work->texBanks);
             work->texKey = EncEffCapture_GetTexKey();
             (*state)++;
         }
@@ -134,7 +134,7 @@ static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *st
     case 6:
         if (work->addedTexBank == TRUE) {
             work->texBanks &= ~GX_VRAM_D;
-            gfxSetTextureBanks(work->texBanks);
+            GX_SetBankForTex(work->texBanks);
         }
         Field_SetRenderMode(field, work->renderMode);
         return GAMEEVENT_DONE;
@@ -145,7 +145,7 @@ static GameEventReturnCode EncEffCaptureFlash_Callback(GameEvent *event, u32 *st
 // Turns bank D over to the LCDC and captures the 3D screen to it at the next V-blank
 static void EncEffCapture_StartCapture(EncEffCaptureWork *work) {
     work->captured = FALSE;
-    gfxSetLCDCBanks(GX_VRAM_D);
+    GX_SetBankForLCDC(GX_VRAM_D);
     GFL_VBlankTCBAdd(EncEffCapture_CaptureTask, &work->captured, 0);
 }
 
@@ -162,7 +162,7 @@ static void EncEffCapture_CaptureTask(TCB *tcb, void *data) {
 
 // The key of bank D in the texture VRAM: the texture image slots are the texture banks in order
 static NNSGfdTexKey EncEffCapture_GetTexKey(void) {
-    u32 texBanks = gfxGetTextureBanks();
+    u32 texBanks = GX_GetBankForTex();
     u32 offset = 0;
 
     // BUG: `|=` for `&`, which is always true, so banks A to C are all counted, texture banks or not. This is right
@@ -209,14 +209,14 @@ static GameEventReturnCode EncEffCapture_Callback(GameEvent *event, u32 *state, 
             GFL_BGSysSetBGPriority(0, 0);
             GFL_BGSysSetBGPriority(2, 3);
             work->renderMode = Field_GetRenderMode(field);
-            work->texBanks = gfxGetTextureBanks();
+            work->texBanks = GX_GetBankForTex();
             work->addedTexBank = FALSE;
             if (!(work->texBanks & GX_VRAM_D)) {
                 work->texBanks |= GX_VRAM_D;
                 work->addedTexBank = TRUE;
             }
-            gfxDisableLCDCBanks();
-            gfxSetTextureBanks(work->texBanks);
+            GX_DisableBankForLCDC();
+            GX_SetBankForTex(work->texBanks);
             work->texKey = EncEffCapture_GetTexKey();
             (*state)++;
         }
@@ -233,7 +233,7 @@ static GameEventReturnCode EncEffCapture_Callback(GameEvent *event, u32 *state, 
     case 3:
         if (work->addedTexBank == TRUE) {
             work->texBanks &= ~GX_VRAM_D;
-            gfxSetTextureBanks(work->texBanks);
+            GX_SetBankForTex(work->texBanks);
         }
         Field_SetRenderMode(field, work->renderMode);
         return GAMEEVENT_DONE;

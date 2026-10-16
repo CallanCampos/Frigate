@@ -98,7 +98,7 @@ static const BoxSearchBGSetup data_ov255_021d94ec[BG_COUNT] = {
 BoxSearchGraphic *func_ov255_021d6d28(u32 layout, HeapID heapId) {
     BoxSearchGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(BoxSearchGraphic), FALSE, "box_search_graphic.c", 449);
 
-    sys_memset(graphic, 0, sizeof(BoxSearchGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(BoxSearchGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -125,7 +125,7 @@ void func_ov255_021d6dc8(BoxSearchGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(BoxSearchGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(BoxSearchGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -154,7 +154,7 @@ static void func_ov255_021d6e44(TCB *tcb, void *data) {
 static void func_ov255_021d6e58(BoxSearchBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(BoxSearchBG));
+    MI_CpuFill8(bg, 0, sizeof(BoxSearchBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&data_ov255_021d9490);
@@ -173,7 +173,7 @@ static void func_ov255_021d6eb8(BoxSearchBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(BoxSearchBG));
+    MI_CpuFill8(bg, 0, sizeof(BoxSearchBG));
 }
 
 static void func_ov255_021d6ef0(BoxSearchBG *bg) {
@@ -184,7 +184,7 @@ static void func_ov255_021d6ef4(BoxSearchBG *bg) {
 }
 
 static void func_ov255_021d6efc(BoxSearchClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(BoxSearchClAct));
+    MI_CpuFill8(clact, 0, sizeof(BoxSearchClAct));
     ClActSys_Create(&data_ov255_021d94a0, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -195,7 +195,7 @@ static void func_ov255_021d6efc(BoxSearchClAct *clact, const BGSysVRAMConfig *vr
 static void func_ov255_021d6f3c(BoxSearchClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(BoxSearchClAct));
+    MI_CpuFill8(clact, 0, sizeof(BoxSearchClAct));
 }
 
 static void func_ov255_021d6f58(BoxSearchClAct *clact) {

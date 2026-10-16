@@ -101,11 +101,11 @@ static void PMSIVTool_BlendTask(TCB *tcb, void *data) {
     if (ev > 16) {
         ev = 16;
     }
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, wk->plane1, wk->plane2, ev, 16 - ev);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, wk->plane1, wk->plane2, ev, 16 - ev);
 }
 
 void PMSIVTool_SetupBrightWork(PMSIVToolBlendWork *wk, int plane, int start, int end, int wait) {
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, plane, start);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, plane, start);
     wk->plane1 = plane;
     wk->wait = wait;
     wk->ev = start << FX32_SHIFT;
@@ -139,5 +139,5 @@ static void PMSIVTool_BrightTask(TCB *tcb, void *data) {
     } else {
         brightness = wk->evEnd >> FX32_SHIFT;
     }
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, wk->plane1, brightness);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, wk->plane1, brightness);
 }

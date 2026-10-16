@@ -60,7 +60,7 @@ void BeaconView_PlaySE(u32 se);
 void BeaconView_SetActorPos(ClActor *actor, s16 x, s16 y);
 // Sets the actor's animation sequence and starts it over
 void BeaconView_SetActorAnim(ClActor *actor, u16 sequence);
-// How long a frame may spend printing: 2000 or 500 clock() ticks
+// How long a frame may spend printing: 2000 or 500 OS_GetTick() ticks
 void BeaconView_SetPrintTimeLimit(PrintQueue *queue, BOOL longer);
 
 BeaconViewMenu *BeaconViewMenu_Create(u8 bg, u8 palette, Font *font, PrintQueue *queue, HeapID heapId);

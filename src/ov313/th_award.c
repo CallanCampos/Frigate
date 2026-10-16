@@ -190,7 +190,7 @@ static BOOL ThAward_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_AWARD, 0x50000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ThAwardWork), HEAPID_AWARD);
-    sys_memset(wk, 0, sizeof(ThAwardWork));
+    MI_CpuFill8(wk, 0, sizeof(ThAwardWork));
     wk->heapId = HEAPID_AWARD;
     wk->param = param;
     wk->graphic = ThAwardGraphic_Create(1, wk->heapId);
@@ -214,7 +214,7 @@ static BOOL ThAward_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    gfxSetBGModeB(0);
+    GXS_SetGraphicsMode(0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sThAwardSubBGSetups); i++) {
         GFL_BGSysCreateBG(sThAwardSubBGSetups[i].bg, &sThAwardSubBGSetups[i].setup, sThAwardSubBGSetups[i].mode);
@@ -391,7 +391,7 @@ static void ThAward_InitIcons(ThAwardWork *wk) {
             func_0204b81c(arc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE, 0, wk->heapId);
         wk->icons[i].cellAnims =
             func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.x = positions[i].x;
         setup.y = positions[i].y;
         wk->iconActors[i] = func_0204c040(ThAwardGraphic_GetClActUnit(wk->graphic), wk->icons[i].chars,
@@ -435,7 +435,7 @@ static void ThAward_InitRankIcons(ThAwardWork *wk) {
     wk->rankChars = func_0204b81c(arc, 3, FALSE, 0, wk->heapId);
     wk->rankCellAnims = func_0204bde0(arc, 6, 7, wk->heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     for (i = 0; i < wk->rankIconCount; i++) {
         setup.x = sThAwardRankIconPositions[i].x;
         setup.y = sThAwardRankIconPositions[i].y;

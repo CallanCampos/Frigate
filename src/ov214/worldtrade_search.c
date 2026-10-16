@@ -396,7 +396,7 @@ static void Search_BgGraphicSet(WorldTradeWork *wk) {
 static void Search_SetCellActor(WorldTradeWork *wk) {
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = sSearchCursorPos[0][0];
     setup.y = sSearchCursorPos[0][1];
     wk->cursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
@@ -521,7 +521,7 @@ static void Search_InitWork(WorldTradeWork *wk) {
     wk->talkString = GFL_StrBufCreate(180, HEAPID_WORLDTRADE);
     wk->titleString = GFL_MsgDataLoadStrbufNew(wk->msgManager, 0x30);
     wk->dw = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(WorldTradeDepositWork), FALSE, "worldtrade_search.c", 849);
-    sys_memset32_fast(0, wk->dw, sizeof(WorldTradeDepositWork));
+    MIi_CpuClearFast(0, wk->dw, sizeof(WorldTradeDepositWork));
     wk->dw->sinouTable = WorldTrade_SinouZukanDataGet(HEAPID_WORLDTRADE);
     WorldTrade_SelectListPosInit(&wk->selectListPos);
 }
@@ -546,7 +546,7 @@ static int Search_SubSeqStart(WorldTradeWork *wk) {
         } else {
             Search_SubSeqMessagePrint(wk, 8, 1, 0, 0xf0f);
         }
-        if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR) == -16) {
+        if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) == -16) {
             GFL_WipeSet(0, 1, 1, 0, 16, 1, HEAPID_WORLDTRADE);
             wk->subprocessSeq = SEARCH_SEQ_RETURN_SCREEN2;
         } else {
@@ -778,7 +778,7 @@ static int Search_SubSeqServerQuery(WorldTradeWork *wk) {
     } else {
         Dpw_Tr_PokemonSearchDataEx searchEx;
 
-        sys_memset(&searchEx, 0, sizeof(Dpw_Tr_PokemonSearchDataEx));
+        MI_CpuFill8(&searchEx, 0, sizeof(Dpw_Tr_PokemonSearchDataEx));
         searchEx.characterNo = wk->search.characterNo;
         searchEx.gender = wk->search.gender;
         searchEx.level_min = wk->search.level_min;
@@ -1376,7 +1376,7 @@ static void Search_SlideScreenVFunc(WorldTradeWork *wk) {
 // Darkens the main screen behind the input
 static void Search_BgBlendSet(int rate) {
     if (rate) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3, rate);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3, rate);
     } else {
         G2_BlendNone();
     }

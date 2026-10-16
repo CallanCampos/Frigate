@@ -78,7 +78,7 @@ WbtPartyFilter *func_ov055_021e6b58(HeapID heapId, u32 tournament) {
     filter->species = GFL_HeapAllocate(heapId, 12 * sizeof(u16), TRUE, "wbt_party.c", 136);
     filter->items = GFL_HeapAllocate(heapId, 12 * sizeof(u16), TRUE, "wbt_party.c", 137);
     filter->files = GFL_HeapAllocate(heapId, 12 * sizeof(u16), FALSE, "wbt_party.c", 138);
-    sys_memset16(0xffff, filter->files, 12 * sizeof(u16));
+    MIi_CpuClear16(0xffff, filter->files, 12 * sizeof(u16));
     return filter;
 }
 
@@ -223,7 +223,7 @@ static void func_ov055_021e6e34(u16 *dest, WbtPartyChoices *choices, u32 count, 
     int j;
 
     i = 0;
-    sys_memset(picked, 0, sizeof(picked));
+    MI_CpuFill8(picked, 0, sizeof(picked));
     for (; i != count; i++) {
         u32 left = func_ov055_021e6d9c(choices, filter);
 
@@ -273,11 +273,11 @@ void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 f
                          u8 count, MATHRandContext32 *rand) {
     WbtPartyChoices *choices;
 
-    clock();
+    OS_GetTick();
     choices = func_ov055_021e6cfc(heapId, arcId, fileCount, files);
     func_ov055_021e6e34(dest, choices, count, filter, rand, heapId);
     func_ov055_021e6d88(choices);
-    clock();
+    OS_GetTick();
 }
 
 static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3, u8 count, const u16 *species) {
@@ -294,7 +294,7 @@ static void func_ov055_021e6f74(WbtSystem *sys, PokeParty *party, u32 a2, u8 a3,
             func_ov055_021e6c20(filter, species[i]);
         }
     }
-    sys_memset(picked, 0, sizeof(picked));
+    MI_CpuFill8(picked, 0, sizeof(picked));
     switch (sys->unk13E4) {
     case 0:
     default:
@@ -361,7 +361,7 @@ void func_ov055_021e71ec(WbtSystem *sys) {
     u16 species[6];
     int i;
 
-    sys_memset(species, 0, sizeof(species));
+    MI_CpuFill8(species, 0, sizeof(species));
     for (i = 0; i < n; i++) {
         species[i] = PokeParty_GetParam(PokeParty_GetPkm(sys->partyBC, i), PKM_PARAM_SPECIES, NULL);
     }

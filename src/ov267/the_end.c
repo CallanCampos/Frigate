@@ -87,7 +87,7 @@ static BOOL TheEnd_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_THE_END, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TheEndWork), HEAPID_THE_END);
-    sys_memset(wk, 0, sizeof(TheEndWork));
+    MI_CpuFill8(wk, 0, sizeof(TheEndWork));
     wk->heapId = HEAPID_THE_END;
     wk->param = param;
     wk->graphic = TheEndGraphic_Create(1, wk->heapId);
@@ -98,7 +98,7 @@ static BOOL TheEnd_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->vblankTask = GFL_VBlankTCBAdd(TheEnd_VBlank, wk, 1);
     TheEnd_LoadGraphics(wk);
     if (getGameVersion() == VERSION_WHITE2) {
-        gfxUploadStdPaletteBGB(color, 0, 2);
+        GXS_LoadBGPltt(color, 0, 2);
     }
     TheEnd_Fade(16, 0, 0);
     return TRUE;

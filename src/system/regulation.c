@@ -31,7 +31,7 @@ Regulation *Regulation_Create(HeapID heapId) {
 }
 
 void Regulation_Copy(const Regulation *src, Regulation *dest) {
-    sys_memcpy(src, dest, sizeof(Regulation));
+    MI_CpuCopy8(src, dest, sizeof(Regulation));
 }
 
 Regulation *func_0200b530(void *entry) {
@@ -241,12 +241,12 @@ BOOL Regulation_CheckParamBit(Regulation *regulation, u32 param, int index) {
 }
 
 void func_0200b760(Regulation *regulation, RegulationUnkAC *out) {
-    sys_memset(out, 0, sizeof(RegulationUnkAC));
+    MI_CpuFill8(out, 0, sizeof(RegulationUnkAC));
     out->unk7 = Regulation_GetParam(regulation, REGULATION_PARAM_13);
     if (out->unk7 >= 2) {
         out->unk7 = 1;
     }
-    sys_memcpy(regulation->unkAC, out->unk0, sizeof(out->unk0));
+    MI_CpuCopy8(regulation->unkAC, out->unk0, sizeof(out->unk0));
 }
 
 void *func_0200b794(void *entry) {
@@ -369,7 +369,7 @@ void TournamentBlock_SetEntry(void *block, u32 index, const void *entry) {
 }
 
 void TournamentTeam_Clear(void *record) {
-    sys_memset(record, 0, sizeof(TournamentTeam));
+    MI_CpuFill8(record, 0, sizeof(TournamentTeam));
 }
 
 void *TournamentBlock_GetTeam(void *block, u32 index) {
@@ -430,7 +430,7 @@ void TournamentTeam_SetFromParty(void *record, PokeParty *party) {
 }
 
 void clearTournamentBlock(void *block) {
-    sys_memset(block, 0, sizeof(TournamentBlock));
+    MI_CpuFill8(block, 0, sizeof(TournamentBlock));
 }
 
 void *getTournamentBlockAddress(SaveControl *save) {

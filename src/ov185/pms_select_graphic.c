@@ -91,7 +91,7 @@ static const PMSSelectBGSetup sPMSSelectBGSetups[] = {
 PMSSelectGraphic *PMSSelectGraphic_Create(u32 layout, HeapID heapId) {
     PMSSelectGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(PMSSelectGraphic), FALSE, "pms_select_graphic.c", 337);
 
-    sys_memset(graphic, 0, sizeof(PMSSelectGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PMSSelectGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -118,7 +118,7 @@ void PMSSelectGraphic_Delete(PMSSelectGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(PMSSelectGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PMSSelectGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -141,7 +141,7 @@ static void PMSSelectGraphic_VBlank(TCB *tcb, void *data) {
 static void PMSSelectGraphic_BGInit(PMSSelectBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(PMSSelectBG));
+    MI_CpuFill8(bg, 0, sizeof(PMSSelectBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPMSSelectLCDConfig);
@@ -160,7 +160,7 @@ static void PMSSelectGraphic_BGExit(PMSSelectBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(PMSSelectBG));
+    MI_CpuFill8(bg, 0, sizeof(PMSSelectBG));
 }
 
 static void PMSSelectGraphic_BGMain(PMSSelectBG *bg) {
@@ -171,7 +171,7 @@ static void PMSSelectGraphic_BGVBlank(PMSSelectBG *bg) {
 }
 
 static void PMSSelectGraphic_ClActInit(PMSSelectClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(PMSSelectClAct));
+    MI_CpuFill8(clact, 0, sizeof(PMSSelectClAct));
     ClActSys_Create(&sPMSSelectClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -182,7 +182,7 @@ static void PMSSelectGraphic_ClActInit(PMSSelectClAct *clact, const BGSysVRAMCon
 static void PMSSelectGraphic_ClActExit(PMSSelectClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(PMSSelectClAct));
+    MI_CpuFill8(clact, 0, sizeof(PMSSelectClAct));
 }
 
 static void PMSSelectGraphic_ClActMain(PMSSelectClAct *clact) {

@@ -58,9 +58,9 @@ void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u32 rank, u32 seed,
     for (floor = 0; floor < floorCount; floor++) {
         int count;
 
-        sys_memset(trainers, 0xff, 2000);
+        MI_CpuFill8(trainers, 0xff, 2000);
         count = InfinityDungeonCreator_PickTrainers(dungeon, rank, trainers, &rnd, heapId);
-        sys_memset(dungeon->trainerIds[floor], 0xff, sizeof(dungeon->trainerIds[floor]));
+        MI_CpuFill8(dungeon->trainerIds[floor], 0xff, sizeof(dungeon->trainerIds[floor]));
         func_ov127_021f0bfc(trainers, count, &rnd);
         for (i = 0; i < INFINITY_DUNGEON_FLOOR_TRAINER_MAX; i++) {
             dungeon->trainerIds[floor][i] = trainers[i];
@@ -80,8 +80,8 @@ void InfinityDungeonCreator_Create(InfinityDungeon *dungeon, u32 rank, u32 seed,
     specialCount = 0;
     InfinityDungeonCreator_PickSpecialTrainers(dungeon, rank, specials, &rnd);
     for (floor = 0; floor < floorCount; floor++) {
-        sys_memset(rooms, 0, sizeof(rooms));
-        sys_memset(counts, 0, sizeof(counts));
+        MI_CpuFill8(rooms, 0, sizeof(rooms));
+        MI_CpuFill8(counts, 0, sizeof(counts));
         roomCount = InfinityDungeonCreator_ListTrainerRooms(dungeon, floor, rooms, counts);
         if (roomCount <= 0) {
             return;
@@ -126,7 +126,7 @@ static int InfinityDungeonCreator_PickTrainers(InfinityDungeon *dungeon, u32 ran
             int groupCount = 0;
             int j;
 
-            sys_memset(group, 0, sizeof(u32));
+            MI_CpuFill8(group, 0, sizeof(u32));
             for (j = 0; j < candidateCount; j++) {
                 if (trainerClass == func_ov127_021f0a90(candidates[j])) {
                     group[groupCount] = candidates[j];

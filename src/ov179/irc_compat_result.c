@@ -286,7 +286,7 @@ static BOOL IrcCompatResult_Init(GameProc *proc, u32 *state, void *param, void *
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_IRC_COMPAT, 0x20000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcCompatResultWork), HEAPID_IRC_COMPAT);
-    sys_memset(wk, 0, sizeof(IrcCompatResultWork));
+    MI_CpuFill8(wk, 0, sizeof(IrcCompatResultWork));
     wk->param = resultParam;
     IrcCompatGraphic_Create(&wk->graphic, HEAPID_IRC_COMPAT);
     IrcCompatText_Init(&wk->text, FALSE, HEAPID_IRC_COMPAT);
@@ -389,7 +389,7 @@ static BOOL IrcCompatResult_Main(GameProc *proc, u32 *state, void *param, void *
 }
 
 static void IrcCompatGraphic_Create(IrcCompatGraphic *graphic, HeapID heapId) {
-    sys_memset(graphic, 0, sizeof(IrcCompatGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IrcCompatGraphic));
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
     GFL_BGSysSetVRAMBanks(&sIrcCompatVRAMConfig);
     GFL_BGSysSetDisplayLayout(0);
@@ -475,7 +475,7 @@ static void IrcCompatClAct_Init(IrcCompatClAct *clact, const BGSysVRAMConfig *vr
     ClActorSetup background;
     int i;
 
-    sys_memset(clact, 0, sizeof(IrcCompatClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcCompatClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -486,12 +486,12 @@ static void IrcCompatClAct_Init(IrcCompatClAct *clact, const BGSysVRAMConfig *vr
     clact->chars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_MAIN, heapId);
     clact->cellAnims = func_0204bde0(arc, 10, 9, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < 3; i++) {
         clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
                                          CLACT_SURFACE_MAIN, heapId);
     }
-    sys_memset(&background, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&background, 0, sizeof(ClActorSetup));
     background.x = 128;
     background.y = 96;
     clact->actors[ACTOR_BACKGROUND] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims,
@@ -521,7 +521,7 @@ static void IrcCompatClAct_Free(IrcCompatClAct *clact) {
     func_0204be64(clact->cellAnims);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(IrcCompatClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcCompatClAct));
 }
 
 static void IrcCompatClAct_Update(IrcCompatClAct *clact) {
@@ -541,7 +541,7 @@ static ClActUnit *IrcCompatClAct_GetUnit(IrcCompatClAct *clact) {
 }
 
 static void IrcCompatText_Init(IrcCompatText *text, BOOL keepFont, HeapID heapId) {
-    sys_memset(text, 0, sizeof(IrcCompatText));
+    MI_CpuFill8(text, 0, sizeof(IrcCompatText));
     func_020232d0();
     if (!keepFont) {
         text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
@@ -556,7 +556,7 @@ static void IrcCompatText_Free(IrcCompatText *text) {
     GFL_MsgDataFree(text->msgData);
     func_02021a18(text->queue);
     GFL_FontFree(text->font);
-    sys_memset(text, 0, sizeof(IrcCompatText));
+    MI_CpuFill8(text, 0, sizeof(IrcCompatText));
 }
 
 static BOOL IrcCompatText_Update(IrcCompatText *text) {
@@ -581,7 +581,7 @@ static WordSet *IrcCompatText_GetWordSet(IrcCompatText *text) {
 
 static void IrcCompatWindow_Init(IrcCompatWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height, u8 palette,
                                  HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcCompatWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcCompatWindow));
     win->color = 15;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, TRUE);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -592,7 +592,7 @@ static void IrcCompatWindow_Init(IrcCompatWindow *win, u8 bg, u8 x, u8 y, u8 wid
 
 static void IrcCompatWindow_InitWithColor(IrcCompatWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height, u8 palette,
                                           u16 color, u8 fromEnd, HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcCompatWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcCompatWindow));
     win->color = color;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, fromEnd);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -604,7 +604,7 @@ static void IrcCompatWindow_InitWithColor(IrcCompatWindow *win, u8 bg, u8 x, u8 
 static void IrcCompatWindow_Free(IrcCompatWindow *win) {
     GFL_StrBufFree(win->strbuf);
     BmpWin_Free(win->window);
-    sys_memset(win, 0, sizeof(IrcCompatWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcCompatWindow));
 }
 
 static BOOL IrcCompatWindow_Flush(IrcCompatWindow *win, IrcCompatText *text) {
@@ -856,7 +856,7 @@ static void IrcCompatResult_FinishStep(IrcCompatResultWork *wk, u16 *state) {
 static void IrcCompatDigits_Init(IrcCompatDigits *digits, IrcCompatGraphic *graphic, int score) {
     int i;
 
-    sys_memset(digits, 0, sizeof(IrcCompatDigits));
+    MI_CpuFill8(digits, 0, sizeof(IrcCompatDigits));
     for (i = 0; i < DIGIT_COUNT; i++) {
         ClActorPos pos;
 
@@ -930,7 +930,7 @@ static void IrcCompatFlash_Init(IrcCompatFlash *flash, u16 unk0, u8 score, HeapI
     u16 *src;
     int i;
 
-    sys_memset(flash, 0, sizeof(IrcCompatFlash));
+    MI_CpuFill8(flash, 0, sizeof(IrcCompatFlash));
     flash->unk0 = unk0;
     flash->lastStep = IrcCompat_GetTier(score, &flash->carry);
     if (flash->carry) {
@@ -942,10 +942,10 @@ static void IrcCompatFlash_Init(IrcCompatFlash *flash, u16 unk0, u8 score, HeapI
     GFL_ArcToolFree(arc);
     file = GFL_G2DIOReadNCLR(ARCID_IRC_COMPAT, 16, &palette, heapId);
     src = palette->rawData;
-    sys_memcpy(src, flash->target, sizeof(flash->target));
-    sys_memcpy(src + 0x80, flash->target, sizeof(flash->target));
+    MI_CpuCopy8(src, flash->target, sizeof(flash->target));
+    MI_CpuCopy8(src + 0x80, flash->target, sizeof(flash->target));
     GFL_HeapFree(file);
-    sys_memcpy(flash->target, flash->colors, sizeof(flash->colors));
+    MI_CpuCopy8(flash->target, flash->colors, sizeof(flash->colors));
     for (i = 0; i < 13; i++) {
         flash->colors[i] = GX_RGB(31, 31, 31);
     }
@@ -955,7 +955,7 @@ static void IrcCompatFlash_Init(IrcCompatFlash *flash, u16 unk0, u8 score, HeapI
 }
 
 static void IrcCompatFlash_Free(IrcCompatFlash *flash) {
-    sys_memset(flash, 0, sizeof(IrcCompatFlash));
+    MI_CpuFill8(flash, 0, sizeof(IrcCompatFlash));
 }
 
 static void IrcCompatFlash_Update(IrcCompatFlash *flash) {

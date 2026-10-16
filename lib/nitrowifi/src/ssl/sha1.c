@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "ssl_internal.h"
 
 // SSL's own SHA-1 (FIPS 180), written from the asm. The ROM names none of it, so the names are the algorithm's.
@@ -126,7 +126,7 @@ static void Sha1Transform(SHA1Context *context, const u8 *block) {
 }
 
 void SHA1Init(SHA1Context *context) {
-    sys_memset(context, 0, sizeof(SHA1Context));
+    MI_CpuFill8(context, 0, sizeof(SHA1Context));
     context->state[0] = 0x67452301;
     context->state[1] = 0xefcdab89;
     context->state[2] = 0x98badcfe;
@@ -148,7 +148,7 @@ void SHA1Update(SHA1Context *context, const u8 *data, u32 len) {
 
     space = SHA1_BLOCK_SIZE - index;
     if (len >= space) {
-        sys_memcpy(data, &context->buffer[index], space);
+        MI_CpuCopy8(data, &context->buffer[index], space);
         Sha1Transform(context, context->buffer);
         for (i = space; i + 0x3f < len; i += SHA1_BLOCK_SIZE) {
             Sha1Transform(context, data + i);
@@ -158,7 +158,7 @@ void SHA1Update(SHA1Context *context, const u8 *data, u32 len) {
         i = 0;
     }
 
-    sys_memcpy(data + i, &context->buffer[index], len - i);
+    MI_CpuCopy8(data + i, &context->buffer[index], len - i);
 }
 
 void SHA1Final(SHA1Context *context, u8 *digest) {

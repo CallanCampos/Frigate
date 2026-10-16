@@ -75,7 +75,7 @@ static void DigitalCardCheck_ClearMessage(DigitalCardCheck *check);
 DigitalCardCheck *DigitalCardCheck_Create(const DigitalCardCheckParam *param, HeapID heapId) {
     DigitalCardCheck *check = GFL_HeapAllocate(heapId, sizeof(DigitalCardCheck), FALSE, "digitalcardcheck.c", 155);
 
-    sys_memset(check, 0, sizeof(DigitalCardCheck));
+    MI_CpuFill8(check, 0, sizeof(DigitalCardCheck));
     check->param = *param;
     check->heapId = heapId;
     WifiBattleMatchRes_LoadBG(check->param.seq, 3, heapId);
@@ -618,8 +618,8 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         void *results;
         u32 first;
 
-        sys_memset(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
-        sys_memcpy(func_0200b794(entry), &info, 0x92);
+        MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
+        MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
         results = func_0200f2d0(record);
         info.unkA0 = RndMatchData_GetParam(results, 10, 0);
         first = RndMatchData_GetParam(results, 10, 1);
@@ -637,8 +637,8 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         WifiBattleMatchLiveCardInfo info;
         void *results;
 
-        sys_memset(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
-        sys_memcpy(func_0200b794(entry), &info, 0x92);
+        MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
+        MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
         results = func_0200f2d8(record);
         info.unkA0 = func_0200f1d8(results, 1);
         info.unkA2 = func_0200f1d8(results, 2);
@@ -696,7 +696,7 @@ static void DigitalCardCheck_OpenMenu(DigitalCardCheck *check, u32 kind) {
     if (check->menu != NULL) {
         return;
     }
-    sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
+    MI_CpuFill8(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = check->msgData;
     param.font = check->param.font;
     param.printQueue = check->param.printQueue;

@@ -422,13 +422,13 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights) {
     fx16 normalY;
     fx16 normalZ;
 
-    gfxReset3D();
+    G3X_Reset();
     scene->keepViewMtx = FALSE;
     GFL_G3DCameraGetLookatPos(camera, &camPos);
     GFL_G3DCameraGetLookatUpVector(camera, &camUp);
     GFL_G3DCameraGetLookatTarget(camera, &target);
     if (scene->keepViewMtx == FALSE) {
-        gfxLookAt(&camPos, &camUp, &target, TRUE, &lookAt);
+        G3i_LookAt_(&camPos, &camUp, &target, TRUE, &lookAt);
     } else {
         MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     }
@@ -499,8 +499,8 @@ void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights) {
         trans.x = FX_Div(actor->pos.x, scale);
         trans.y = FX_Div(actor->pos.y, scale);
         trans.z = FX_Div(actor->pos.z, scale);
-        gfxMultTransRot4x3(&rots[actor->type], &trans);
-        gfxRotateZ(-FX_SinIdx(actor->rotation), FX_CosIdx(actor->rotation));
+        G3_MultTransMtx33(&rots[actor->type], &trans);
+        G3_RotZ(-FX_SinIdx(actor->rotation), FX_CosIdx(actor->rotation));
         if (actor->type == BLACT_TYPE_FACE_CAMERA_Y_FLAT) {
             G3_Scale(actor->scaleX, FX32_ONE, actor->scaleY);
         } else {

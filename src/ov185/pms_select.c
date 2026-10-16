@@ -200,11 +200,11 @@ static BOOL PMSSelect_Init(GameProc *proc, u32 *state, void *param, void *work) 
     PMSSelectParam *selectParam = param;
 
     GFL_OvlLoad(OVERLAY_APP_UI);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PMS_SELECT, 0x1c000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PMSSelectWork), HEAPID_PMS_SELECT);
-    sys_memset(wk, 0, sizeof(PMSSelectWork));
+    MI_CpuFill8(wk, 0, sizeof(PMSSelectWork));
     wk->heapId = HEAPID_PMS_SELECT;
     wk->save = selectParam->save;
     wk->wordSave = getDexBlkAddress(selectParam->save);

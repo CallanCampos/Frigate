@@ -17,7 +17,7 @@ u32 EventWork_GetBlockSize(void) {
 }
 
 void EventWork_Init(EventWork *eventWork) {
-    sys_memset(eventWork, 0, sizeof(EventWork));
+    MI_CpuFill8(eventWork, 0, sizeof(EventWork));
 }
 
 BOOL EventWork_FlagGet(EventWork *eventWork, u16 flag) {
@@ -75,7 +75,7 @@ u16 *EventWork_GetWkPtr(EventWork *eventWork, u16 work) {
 
 // Clears the work values from first up to, but not including, last
 void EventWork_WorkResetRange(EventWork *eventWork, u16 first, u16 last) {
-    sys_memset(EventWork_GetWkPtr(eventWork, first), 0, (last - first) * sizeof(u16));
+    MI_CpuFill8(EventWork_GetWkPtr(eventWork, first), 0, (last - first) * sizeof(u16));
 }
 
 void EventWork_ResetDailyFlags(EventWork *eventWork) {

@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitrowifi/cps.h"
 #include "ssl_internal.h"
 
@@ -36,7 +36,7 @@ void BigInt_Add(u16 *dst, const u16 *a, const u16 *b, int n) {
         carry = sum >> 16;
     }
     if (dst != a && dst != b) {
-        sys_memset(dst + len, 0, (n - len) * 2);
+        MI_CpuFill8(dst + len, 0, (n - len) * 2);
     }
 }
 
@@ -87,7 +87,7 @@ void BigInt_Sub(u16 *dst, const u16 *a, const u16 *b, int n) {
         i++;
     }
     if (dst != a && dst != b) {
-        sys_memset(dst + i, 0, (n - i) * 2);
+        MI_CpuFill8(dst + i, 0, (n - i) * 2);
     }
 }
 
@@ -138,7 +138,7 @@ void BigInt_Mul(u16 *dst, const u16 *a, const u16 *b, int n) {
     int lenA, lenB;
     int i;
 
-    sys_memset(dst, 0, n * 2);
+    MI_CpuFill8(dst, 0, n * 2);
     lenA = BigInti_GetLength(a, n);
     lenB = BigInti_GetLength(b, n);
     for (i = 0; i < lenB; i++) {
@@ -164,7 +164,7 @@ static void BigInti_MulDigit(u16 *dst, const u16 *src, u32 value, int n) {
     if (i < n) {
         dst[i++] = (u16)carry;
     }
-    sys_memset(dst + i, 0, (n - i) * 2);
+    MI_CpuFill8(dst + i, 0, (n - i) * 2);
 }
 
 static void BigInti_Square(u16 *dst, const u16 *src, int n) {
@@ -174,7 +174,7 @@ static void BigInti_Square(u16 *dst, const u16 *src, int n) {
     int outer;
 
     if (doubleLen < n) {
-        sys_memset(dst + doubleLen, 0, (n - doubleLen) * 2);
+        MI_CpuFill8(dst + doubleLen, 0, (n - doubleLen) * 2);
     }
 
     for (k = 0; k < len; k++) {
@@ -217,19 +217,19 @@ void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *rem
     int lenA = BigInti_GetLength(dividend, n);
     int lenB = BigInti_GetLength(divisor, n);
 
-    sys_memset(qbuf, 0, n * 4);
+    MI_CpuFill8(qbuf, 0, n * 4);
 
     if (lenA > 0 && lenB > 0) {
         int pos = lenB + (n - lenA) - 1;
 
         if (pos >= n) {
-            sys_memcpy(dividend, rem, n * 2);
+            MI_CpuCopy8(dividend, rem, n * 2);
         } else {
             u64 divisorTop;
             u16 *top;
             int span = (2 * n - 1) * 2;
 
-            sys_memcpy(dividend, qbuf + pos, lenA * 2);
+            MI_CpuCopy8(dividend, qbuf + pos, lenA * 2);
 
             if (lenB > 2) {
                 divisorTop = ((u64)divisor[lenB - 1] << 32) + ((u64)divisor[lenB - 2] << 16) + divisor[lenB - 3];
@@ -266,10 +266,10 @@ void BigInt_Div(u16 *quotient, const u16 *dividend, const u16 *divisor, u16 *rem
     }
 
     if (quotient != NULL) {
-        sys_memcpy(qbuf, quotient, n * 2);
+        MI_CpuCopy8(qbuf, quotient, n * 2);
     }
     if (remainder != NULL) {
-        sys_memcpy(rem, remainder, n * 2);
+        MI_CpuCopy8(rem, remainder, n * 2);
     }
 }
 
@@ -285,7 +285,7 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
     }
     temp = work + n;
 
-    sys_memset(dst + 1, 0, (n - 1) * 2);
+    MI_CpuFill8(dst + 1, 0, (n - 1) * 2);
     dst[0] = 1;
 
     expLen = BigInti_GetLength(exponent, n);
@@ -294,7 +294,7 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
 
     while (bit < totalBits) {
         if (exponent[n - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
-            sys_memcpy(base, dst, n * 2);
+            MI_CpuCopy8(base, dst, n * 2);
             bit++;
             break;
         }
@@ -303,13 +303,13 @@ void BigInt_ModExp(u16 *dst, const u16 *base, const u16 *exponent, int n, const 
 
     while (bit < totalBits) {
         BigInti_Square(work, dst, n);
-        sys_memcpy(work, dst, n * 2);
+        MI_CpuCopy8(work, dst, n * 2);
         if (modulus != NULL) {
             BigInt_Div(NULL, dst, modulus, dst, n, temp);
         }
         if (exponent[n - (bit >> 4) - 1] & (0x8000u >> (bit & 0xf))) {
             BigInt_Mul(work, dst, base, n);
-            sys_memcpy(work, dst, n * 2);
+            MI_CpuCopy8(work, dst, n * 2);
             if (modulus != NULL) {
                 BigInt_Div(NULL, dst, modulus, dst, n, temp);
             }
@@ -332,19 +332,19 @@ static void BigInti_ModInverse(u16 *result, const u16 *value, const u16 *modulus
     u16 *temporary = scratch + n * 5;
     u16 *divisionWork = scratch + n * 6;
 
-    sys_memcpy(value, currentRemainder, n * 2);
-    sys_memcpy(modulus, previousRemainder, n * 2);
+    MI_CpuCopy8(value, currentRemainder, n * 2);
+    MI_CpuCopy8(modulus, previousRemainder, n * 2);
     currentCoefficient[0] = 1;
 
     if (BigInt_GetSign(currentRemainder, n) > 0) {
         do {
             BigInt_Div(quotient, previousRemainder, currentRemainder, temporary, n, divisionWork);
-            sys_memcpy(currentRemainder, previousRemainder, n * 2);
-            sys_memcpy(temporary, currentRemainder, n * 2);
+            MI_CpuCopy8(currentRemainder, previousRemainder, n * 2);
+            MI_CpuCopy8(temporary, currentRemainder, n * 2);
             BigInt_Mul(temporary, quotient, currentCoefficient, n);
             BigInt_Sub(temporary, previousCoefficient, temporary, n);
-            sys_memcpy(currentCoefficient, previousCoefficient, n * 2);
-            sys_memcpy(temporary, currentCoefficient, n * 2);
+            MI_CpuCopy8(currentCoefficient, previousCoefficient, n * 2);
+            MI_CpuCopy8(temporary, currentCoefficient, n * 2);
         } while (BigInt_GetSign(currentRemainder, n) > 0);
     }
 
@@ -357,7 +357,7 @@ static void BigInti_ModInverse(u16 *result, const u16 *value, const u16 *modulus
 // A NULL multiplier performs reduction alone; q and t are scratch. The names describe the recovered roles.
 static void BigInti_ModExpStep(u16 *acc, u16 *scratch, const u16 *multiplier, int n, int modLen, const u16 *modulus,
                                const u16 *mu, u16 *q, u16 *t) {
-    sys_memcpy(acc, scratch, n * 2);
+    MI_CpuCopy8(acc, scratch, n * 2);
     if (multiplier == BIGINT_SQUARE) {
         BigInti_Square(acc, scratch, n);
     } else if (multiplier != NULL) {
@@ -365,15 +365,15 @@ static void BigInti_ModExpStep(u16 *acc, u16 *scratch, const u16 *multiplier, in
     }
 
     BigInt_Mul(q, acc, mu, modLen);
-    sys_memset(q + modLen, 0, (n - modLen) * 2);
+    MI_CpuFill8(q + modLen, 0, (n - modLen) * 2);
     BigInt_Mul(t, q, modulus, n);
     BigInt_Add(acc, acc, t, n);
     memmove(acc, acc + modLen, (n - modLen) * 2);
-    sys_memset(acc + (n - modLen), 0, modLen * 2);
+    MI_CpuFill8(acc + (n - modLen), 0, modLen * 2);
 
     switch (BigInti_Compare(acc, modulus, n)) {
     case 0:
-        sys_memset(acc, 0, n * 2);
+        MI_CpuFill8(acc, 0, n * 2);
         break;
     case 1:
         BigInt_Sub(acc, acc, modulus, n);
@@ -396,7 +396,7 @@ void BigInt_ModExpFast(u16 *dst, const u16 *base, const u16 *exponent, int n, co
     if (work == NULL) {
         return;
     }
-    sys_memset(work, 0, n * 22);
+    MI_CpuFill8(work, 0, n * 22);
 
     mu = work + n;
     montBase = mu + n;
@@ -433,7 +433,7 @@ void BigInt_ModExpFast(u16 *dst, const u16 *base, const u16 *exponent, int n, co
 void BigInt_BytesToDigits(u16 *dst, const u8 *src, int nbytes, int n) {
     const u8 *p;
 
-    sys_memset(dst, 0, n * 2);
+    MI_CpuFill8(dst, 0, n * 2);
     p = &src[nbytes - 1];
     while (nbytes > 1) {
         u16 hi = p[-1];

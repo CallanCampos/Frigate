@@ -227,7 +227,7 @@ static BeaconSearchFound *func_ov012_0215f6c8(BeaconSearchWork *work, int *index
             if (beacon->unk2_0) {
                 func_ov030_02173bec(*index);
             } else if (beacon->unk2_1 == 1) {
-                sys_memset(found, 0, sizeof(BeaconSearchFound));
+                MI_CpuFill8(found, 0, sizeof(BeaconSearchFound));
                 found->type = beacon->type;
                 found->connectNum = beacon->connectNum;
                 found->connectMax = beacon->connectMax;
@@ -296,7 +296,7 @@ static void func_ov012_0215f810(BeaconSearchBeacon *beacon, GameData *gameData, 
     BOOL lidOpen = FALSE;
     BOOL flag;
 
-    sys_memset(beacon, 0, sizeof(BeaconSearchBeacon));
+    MI_CpuFill8(beacon, 0, sizeof(BeaconSearchBeacon));
     beacon->type = 3;
     beacon->connectNum = func_02042a78();
     beacon->connectMax = 3;
@@ -304,7 +304,7 @@ static void func_ov012_0215f810(BeaconSearchBeacon *beacon, GameData *gameData, 
     beacon->unk2_1 = 0;
     beacon->unk3_0 = func_0202be3c(commSys);
     beacon->trainerId = getIDAsUInt(GetGameDataPlayerInfo(gameData));
-    beacon->isDSi = hw_isDSi();
+    beacon->isDSi = OS_IsRunOnTwl();
     beacon->unk2_6 = FALSE;
     beacon->unk3_1 = TRUE;
     if (PAD_DetectFold() == FALSE) {
@@ -312,7 +312,7 @@ static void func_ov012_0215f810(BeaconSearchBeacon *beacon, GameData *gameData, 
     }
     beacon->lidOpen = lidOpen;
     if (beacon->isDSi == TRUE) {
-        if (func_0207c4b4()->unk0_0 && func_0207c4b4()->unk0_5) {
+        if (OS_GetParentalControlInfoPtr()->unk0_0 && OS_GetParentalControlInfoPtr()->unk0_5) {
             flag = TRUE;
         } else {
             flag = FALSE;

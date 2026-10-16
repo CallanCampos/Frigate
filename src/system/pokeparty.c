@@ -32,7 +32,7 @@ void PokeParty_Init(PokeParty *party) {
 void PokeParty_InitCore(PokeParty *party, u32 capacity) {
     int i;
 
-    sys_memset32_fast(0, party, sizeof(PokeParty));
+    MIi_CpuClearFast(0, party, sizeof(PokeParty));
     party->capacity = capacity;
     party->count = 0;
     party->slotExists = 0;
@@ -190,7 +190,7 @@ void func_0201fff8(PokeParty *party, u32 *order, HeapID heapId) {
         for (i = 0; i < party->count; i++) {
             copyPkmIntoPartyBlk(party, i, pkms[order[i]]);
             PokeParty_SetSlotExists(party, i, exists[order[i]]);
-            sys_memset(pkms[order[i]], 0xff, sizeof(PartyPkm));
+            MI_CpuFill8(pkms[order[i]], 0xff, sizeof(PartyPkm));
             GFL_HeapFree(pkms[order[i]]);
         }
     }

@@ -28,7 +28,7 @@ SaveDataTable *SaveData_InitTable(HeapID heapId, const SaveBlockDef *table, u32 
                                   u32 blockFooterSize, u32 extraSize) {
     SaveDataTable *svdt = GFL_HeapAllocate(heapId, sizeof(SaveDataTable), FALSE, "savedata.c", 73);
 
-    sys_memset32(0, svdt, sizeof(SaveDataTable));
+    MIi_CpuClear32(0, svdt, sizeof(SaveDataTable));
     svdt->table = table;
     svdt->table_max = count;
     svdt->savearea_size = saveareaSize;
@@ -49,11 +49,11 @@ void runSaveBlkInitializers(void *data, SaveDataTable *svdt) {
     u32 count = svdt->table_max;
     u32 i;
 
-    sys_memset32(0, data, svdt->savearea_size);
+    MIi_CpuClear32(0, data, svdt->savearea_size);
     for (i = 0; i < count; i++) {
         u32 offset = svdt->blocks[i].offset;
 
-        sys_memset32(0, (u8 *)data + offset, svdt->blocks[i].size);
+        MIi_CpuClear32(0, (u8 *)data + offset, svdt->blocks[i].size);
         table[i].init((u8 *)data + offset);
     }
 }

@@ -3,6 +3,7 @@
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "dpw/dpw_tr.h"
+#include "dwc/connectinet.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -83,7 +84,7 @@ static BOOL WorldTradeProc_Init(GameProc *proc, u32 *state, void *param, void *w
     GFL_OvlLoad(OVERLAY_ID(139));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WORLDTRADE, 0x30100);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WorldTradeWork), HEAPID_WORLDTRADE);
-    sys_memset(wk, 0, sizeof(WorldTradeWork));
+    MI_CpuFill8(wk, 0, sizeof(WorldTradeWork));
     sWorldTradeWork = wk;
 
     wk->demoPokemon = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
@@ -112,7 +113,7 @@ static BOOL WorldTradeProc_Main(GameProc *proc, u32 *state, void *param, void *w
     WorldTradeWork *wk = work;
 
     if (func_02042788()) {
-        func_0205b5ec();
+        DWC_UpdateConnection();
         func_0203e7f8(WorldTrade_WifiLinkLevel());
     }
     DpwTr_Process();
@@ -285,15 +286,15 @@ static void WorldTrade_InitCellActor(WorldTradeWork *wk, const BGSysVRAMConfig *
 
     // The Pokémon icons' palettes, and a copy at half brightness for icons that can't be chosen
     plttBuf = GFL_G2DIOReadNCLR(7, 0, &pltt, HEAPID_WORLDTRADE);
-    cp15_flushDC(pltt->rawData, 0x60);
-    gfxUploadStdPaletteObjA(pltt->rawData, 0xa0, 0x60);
+    DC_FlushRange(pltt->rawData, 0x60);
+    GX_LoadOBJPltt(pltt->rawData, 0xa0, 0x60);
     colors = pltt->rawData;
     for (i = 0; i < 48; i++) {
         colors[i] =
             (((colors[i] >> 10) & 0x1f) / 2 << 10) | (((colors[i] >> 5) & 0x1f) / 2 << 5) | (colors[i] & 0x1f) / 2;
     }
-    cp15_flushDC(pltt->rawData, 0x60);
-    gfxUploadStdPaletteObjA(pltt->rawData, 0x100, 0x60);
+    DC_FlushRange(pltt->rawData, 0x60);
+    GX_LoadOBJPltt(pltt->rawData, 0x100, 0x60);
     GFL_HeapFree(plttBuf);
 
     if ((u8)getTrainerGender(wk->param->mystatus) == 1) {
@@ -338,7 +339,7 @@ void WorldTrade_TouchWinYesNoMakeEx(WorldTradeWork *wk, int y, int cgx, int pale
         };
         AppTaskMenuInit init;
 
-        sys_memset(&init, 0, sizeof(AppTaskMenuInit));
+        MI_CpuFill8(&init, 0, sizeof(AppTaskMenuInit));
         items[0].str = GFL_MsgDataLoadStrbufNew(wk->msgManager, Bank0415_Text_Yes);
         items[1].str = GFL_MsgDataLoadStrbufNew(wk->msgManager, Bank0415_Text_No);
         init.heapId = HEAPID_WORLDTRADE;
@@ -408,7 +409,7 @@ void WorldTrade_SelBoxInit(WorldTradeWork *wk, u8 frame, int count, int y) {
         };
         AppTaskMenuInit init;
 
-        sys_memset(&init, 0, sizeof(AppTaskMenuInit));
+        MI_CpuFill8(&init, 0, sizeof(AppTaskMenuInit));
         // The assert prints its expression with these spaces
         // clang-format off
         GFL_ASSERT(count <= NELEMS( itemWork ));
@@ -468,7 +469,7 @@ void WorldTrade_ActPos(ClActor *act, int x, int y) {
 }
 
 static int WorldTrade_WifiLinkLevel(void) {
-    return 3 - func_0205b250();
+    return 3 - DWC_GetLinkLevel();
 }
 
 void WorldTrade_SubProcessChange(WorldTradeWork *wk, int subProcess, int mode) {
@@ -550,11 +551,11 @@ void WorldTrade_CLACT_PosChange(ClActor *act, int x, int y) {
 // Darkens a screen behind a menu
 static void WorldTrade_SetPassive(BOOL main) {
     if (main) {
-        gfxRegSetBrightnessBlend(
+        G2x_SetBlendBrightness_(
             REG_BLDCNT_ADDR,
             GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -7);
     } else {
-        gfxRegSetBrightnessBlend(
+        G2x_SetBlendBrightness_(
             REG_DB_BLDCNT_ADDR,
             GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -7);
     }
@@ -562,11 +563,11 @@ static void WorldTrade_SetPassive(BOOL main) {
 
 void WorldTrade_SetPassiveKeepBG2(BOOL main) {
     if (main) {
-        gfxRegSetBrightnessBlend(
+        G2x_SetBlendBrightness_(
             REG_BLDCNT_ADDR,
             GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -7);
     } else {
-        gfxRegSetBrightnessBlend(
+        G2x_SetBlendBrightness_(
             REG_DB_BLDCNT_ADDR,
             GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -7);
     }

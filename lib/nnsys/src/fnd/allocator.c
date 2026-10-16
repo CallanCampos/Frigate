@@ -48,11 +48,11 @@ static void UnitHeapAllocatorFree(NNSFndAllocator *allocator, void *memBlock) {
 
 // For a NitroSDK heap, pHeap holds the heap's handle and heapParam1 its arena
 static void *SystemHeapAllocator_Malloc(NNSFndAllocator *allocator, u32 size) {
-    return malloc_device((int)allocator->heapParam1, (int)allocator->pHeap, size);
+    return OS_AllocFromHeap((int)allocator->heapParam1, (int)allocator->pHeap, size);
 }
 
 static void SystemHeapAllocator_Free(NNSFndAllocator *allocator, void *memBlock) {
-    free_device((int)allocator->heapParam1, (int)allocator->pHeap, memBlock);
+    OS_FreeToHeap((int)allocator->heapParam1, (int)allocator->pHeap, memBlock);
 }
 
 void *NNS_FndAllocFromAllocator(NNSFndAllocator *allocator, u32 size) {

@@ -239,7 +239,7 @@ WifiLoginMessageMenu *WifiLoginMessage_CreateMenu(WifiLoginMessage *msg, u32 lay
         GFL_StrBufFree(menu->items[0].str);
         GFL_StrBufFree(menu->items[1].str);
         if (dimTopScreen) {
-            gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, -8);
+            G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, -8);
         }
         AppTaskMenu_SetCursorPos(menu->taskMenu, cursorPos);
         break;

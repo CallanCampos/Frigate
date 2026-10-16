@@ -121,7 +121,7 @@ void func_02040b94(int base, const void *list, int listNum, void *work, HeapID u
 
 void func_02040bfc(void) {
     if (_pCommandWork != NULL) {
-        sys_memset(_pCommandWork, 0, sizeof(NetCommandWork));
+        MI_CpuFill8(_pCommandWork, 0, sizeof(NetCommandWork));
         GFL_HeapFree(_pCommandWork);
         _pCommandWork = NULL;
     }
@@ -153,7 +153,7 @@ void func_02040c64(int base) {
 
         for (i = 0; i < COMMAND_TABLE_MAX; i++) {
             if (base == commandWork->tables[i].base) {
-                sys_memset(&commandWork->tables[i], 0, sizeof(NetCommandTable));
+                MI_CpuFill8(&commandWork->tables[i], 0, sizeof(NetCommandTable));
                 return;
             }
         }
@@ -275,10 +275,10 @@ void func_02040e10(int netId, int size, const void *data, void *work, NetHandle 
     }
     if (handle == func_02040440() && _pCommandWork->aNetHugeRecv[index].used) {
         if (_pCommandWork->aNetHugeRecv[index].data != NULL) {
-            sys_memcpy(data,
-                       _pCommandWork->aNetHugeRecv[index].data + _pCommandWork->aNetHugeRecv[index].chunksReceived *
-                                                                     _pCommandWork->aNetHugeRecv[index].chunkSize,
-                       size);
+            MI_CpuCopy8(data,
+                        _pCommandWork->aNetHugeRecv[index].data + _pCommandWork->aNetHugeRecv[index].chunksReceived *
+                                                                      _pCommandWork->aNetHugeRecv[index].chunkSize,
+                        size);
         }
         _pCommandWork->aNetHugeRecv[index].chunksReceived++;
         if (_pCommandWork->aNetHugeRecv[index].chunksReceived == _pCommandWork->aNetHugeRecv[index].chunkCount) {

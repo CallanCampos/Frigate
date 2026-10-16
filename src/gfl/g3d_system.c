@@ -123,7 +123,7 @@ void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u
     g_G3DSystem.sys->frmTexVramMgr = frmTexVramMgr;
     g_G3DSystem.sys->frmPltVramMgr = frmPltVramMgr;
     NNS_G3DInit();
-    gfxResetMatrixStack();
+    G3X_InitMtxStack();
     NNS_G3DRenderStateInit();
     if (dtcmAllocSize != 0) {
         u32 size = dtcmAllocSize;
@@ -182,8 +182,8 @@ void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u
         G3X_AlphaTest(FALSE, 0);
         G3X_AlphaBlend(FALSE);
         G3X_EdgeMarking(FALSE);
-        gfxSetFog(FALSE, 0, 0, 0);
-        gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+        G3X_SetFog(FALSE, 0, 0, 0);
+        G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
         G3_ViewPort(0, 0, 255, 191);
     }
     g_G3DSystem.sys->drawCallback = NULL;
@@ -450,7 +450,7 @@ BOOL GFL_G3DResUploadTexData(void *resource) {
         }
         NNS_G3DResTexSetGfdKeys(tex, texKey, tex4x4Key);
         NNS_G3DResTexSetPltGfdKey(tex, pltKey);
-        cp15_flushDC(data, data->fileSize);
+        DC_FlushRange(data, data->fileSize);
         NNS_G3DResTexUploadTex(tex, TRUE);
         NNS_G3DResTexUploadPlt(tex, TRUE);
         return TRUE;
@@ -517,7 +517,7 @@ BOOL GFL_G3DResUploadTexDataCore(void *resource) {
     NNSG3dResTex *tex = NNS_G3DResGetTexBlock(data);
 
     if (tex != NULL) {
-        cp15_flushDC(data, data->fileSize);
+        DC_FlushRange(data, data->fileSize);
         NNS_G3DResTexUploadTex(tex, TRUE);
         NNS_G3DResTexUploadPlt(tex, TRUE);
         return TRUE;
@@ -849,7 +849,7 @@ BOOL GFL_G3DActorStepAnmFrameLoop(G3DActor *actor, u16 anmIdx, fx32 addend) {
 }
 
 void GFL_G3DSysReset(void) {
-    gfxReset3D();
+    G3X_Reset();
 }
 
 void GFL_G3DSysReqSwapBuffers(void) {
@@ -938,7 +938,7 @@ static int TestModelBoundingBox(const s16 *box) {
     NNS_G3DExecOp(G3OP_END, NULL, 0);
     NNS_G3DExecOp(G3OP_BOX_TEST, (const u32 *)box, 3);
     NNS_G3DWaitFIFO();
-    while (gfxGetBoxTestResult(&result) != 0) {
+    while (G3X_GetBoxTestResult(&result) != 0) {
     }
     return result;
 }

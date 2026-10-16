@@ -20,7 +20,7 @@ void ResetMailData(MailData *mail) {
     mail->region = region;
     mail->gameVersion = game_version;
     mail->unk07 = 0xff;
-    sys_memset16(GFL_StrBufGetTerminator(), mail->trainerName, sizeof(mail->trainerName));
+    MIi_CpuClear16(GFL_StrBufGetTerminator(), mail->trainerName, sizeof(mail->trainerName));
     mail->unk1E = 0xffff;
     for (i = 0; i < 3; i++) {
         PMSData_Clear(&mail->message[i]);
@@ -41,7 +41,7 @@ MailData *CreateMailData(HeapID heapId) {
 }
 
 void copyMailMsg(const MailData *src, MailData *dest) {
-    sys_memcpy(src, dest, sizeof(MailData));
+    MI_CpuCopy8(src, dest, sizeof(MailData));
 }
 
 void func_020096f8(MailData *mail, u32 design, u32 unused, GameData *gameData) {
@@ -50,7 +50,7 @@ void func_020096f8(MailData *mail, u32 design, u32 unused, GameData *gameData) {
     ResetMailData(mail);
     mail->unk07 = design;
     info = GetGameDataPlayerInfo(gameData);
-    sys_memcpy(GetPlayerName(info), mail->trainerName, sizeof(mail->trainerName));
+    MI_CpuCopy8(GetPlayerName(info), mail->trainerName, sizeof(mail->trainerName));
     mail->trainerGender = getTrainerGender(info);
     mail->trainerId = getIDAsUInt(info);
 }
@@ -64,7 +64,7 @@ u16 *func_02009734(MailData *mail) {
 }
 
 void func_02009738(MailData *mail, const u16 *name) {
-    sys_memcpy(name, mail->trainerName, sizeof(mail->trainerName));
+    MI_CpuCopy8(name, mail->trainerName, sizeof(mail->trainerName));
 }
 
 u8 func_0200974c(const MailData *mail) {

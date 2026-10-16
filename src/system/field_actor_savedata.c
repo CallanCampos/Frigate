@@ -19,7 +19,7 @@ u32 ActorSave_GetBlockSize(void) {
 }
 
 void ActorSave_Init(FieldActorSave *save) {
-    sys_memset(save, 0, ActorSave_GetBlockSize());
+    MI_CpuFill8(save, 0, ActorSave_GetBlockSize());
 }
 
 void ActorSave_Save(MMSys *system, FieldActorSave *save) {
@@ -75,8 +75,8 @@ static void ActorSave_SaveActor(FieldActor *actor, FieldActorSaveEntry *entry) {
     entry->gPosY = actor->gPos.y;
     entry->gPosZ = actor->gPos.z;
     entry->wPosY = actor->wPos.y;
-    sys_memcpy(&actor->defaultRailPos, entry->railPos, sizeof(entry->railPos));
-    sys_memcpy(actor->unkA4, entry->unk40, sizeof(entry->unk40));
+    MI_CpuCopy8(&actor->defaultRailPos, entry->railPos, sizeof(entry->railPos));
+    MI_CpuCopy8(actor->unkA4, entry->unk40, sizeof(entry->unk40));
 }
 
 // Puts the actor at the center of its tile, at the saved height
@@ -95,7 +95,7 @@ static inline void ActorSave_SetActorPos(FieldActor *actor, const FieldActorSave
 static void ActorSave_LoadActor(FieldActor *actor, const FieldActorSaveEntry *entry, MMSys *system) {
     const FieldActorConfig *config;
 
-    sys_memset(actor, 0, sizeof(FieldActor));
+    MI_CpuFill8(actor, 0, sizeof(FieldActor));
     actor->flags = entry->flags;
     actor->collisionWidth = entry->collisionWidth;
     actor->collisionHeight = entry->collisionHeight;
@@ -120,8 +120,8 @@ static void ActorSave_LoadActor(FieldActor *actor, const FieldActorSaveEntry *en
     actor->gPos.x = entry->gPosX;
     actor->gPos.y = entry->gPosY;
     actor->gPos.z = entry->gPosZ;
-    sys_memcpy(entry->railPos, &actor->defaultRailPos, sizeof(entry->railPos));
-    sys_memcpy(entry->unk40, actor->unkA4, sizeof(entry->unk40));
+    MI_CpuCopy8(entry->railPos, &actor->defaultRailPos, sizeof(entry->railPos));
+    MI_CpuCopy8(entry->unk40, actor->unkA4, sizeof(entry->unk40));
     actor->actorSystem = system;
 
     ActorSave_SetActorPos(actor, entry);

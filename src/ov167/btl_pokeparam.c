@@ -60,8 +60,8 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     mon->comboMove = 0;
     mon->comboMonId = 0x1f;
     mon->unk142 = 0;
-    sys_memset(mon->turnFlags, 0, sizeof(mon->turnFlags));
-    sys_memset(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
+    MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
+    MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
     func_ov167_021bbff4(mon);
     func_ov167_021bc5c4(mon);
     return mon;
@@ -1314,7 +1314,7 @@ void ClearMoveStatusWork(BattleMon *mon, u32 flag) {
         mon->core.conditions[i].raw = 0;
         mon->core.conditions[i].common.type = 0;
     }
-    sys_memset(mon->core.conditionCounters, 0, 0x24);
+    MI_CpuFill8(mon->core.conditionCounters, 0, 0x24);
 }
 
 void func_ov167_021bbbec(BattleMon *mon, u16 turn) {
@@ -1325,7 +1325,7 @@ void func_ov167_021bbbec(BattleMon *mon, u16 turn) {
 }
 
 void func_ov167_021bbc08(BattleMon *mon) {
-    sys_memset(mon->turnFlags, 0, sizeof(mon->turnFlags));
+    MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     if (mon->unk146 < 9999) {
         mon->unk146++;
     }
@@ -1339,8 +1339,8 @@ void func_ov167_021bbc40(BattleMon *mon, u32 flag) {
 }
 
 void Clear_ForFainted(BattleMon *mon) {
-    sys_memset(mon->turnFlags, 0, sizeof(mon->turnFlags));
-    sys_memset(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
+    MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
+    MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
     ClearFormChange(mon);
     MoveWork_ClearSurface(mon);
     ClearUsedMoveFlag(mon);
@@ -1357,7 +1357,7 @@ void Clear_ForFainted(BattleMon *mon) {
 }
 
 void Clear_ForSwitch(BattleMon *mon) {
-    sys_memset(mon->turnFlags, 0, sizeof(mon->turnFlags));
+    MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     ClearFormChange(mon);
     MoveWork_ClearSurface(mon);
     ClearUsedMoveFlag(mon);
@@ -1368,7 +1368,7 @@ void Clear_ForSwitch(BattleMon *mon) {
         ResetSpActPriority(mon);
         ClearMoveStatusWork(mon, 0);
         func_ov167_021babc0(&mon->statStages);
-        sys_memset(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
+        MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
     }
     mon->form = mon->core.baseForm;
     mon->ability = mon->core.baseAbility;
@@ -1378,8 +1378,8 @@ void Clear_ForSwitch(BattleMon *mon) {
 
 void func_ov167_021bbd80(BattleMon *mon) {
     setupBySrcData(mon, mon->core.src, FALSE, TRUE);
-    sys_memset(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
-    sys_memset(mon->turnFlags, 0, sizeof(mon->turnFlags));
+    MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
+    MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
     ResetSpActPriority(mon);
     ClearUsedMoveFlag(mon);
     ClearMoveStatusWork(mon, 0);
@@ -1412,7 +1412,7 @@ void CopyBatonPassParams(BattleMon *target, BattleMon *source) {
     ResetSpActPriority(source);
     ClearMoveStatusWork(source, 0);
     func_ov167_021babc0(&source->statStages);
-    sys_memset(source->conditionFlags, 0, sizeof(source->conditionFlags));
+    MI_CpuFill8(source->conditionFlags, 0, sizeof(source->conditionFlags));
 }
 
 void ChangePokeType(BattleMon *mon, u16 type) {
@@ -1505,8 +1505,8 @@ u16 GetBattleMonWeight(BattleMon *mon) {
 }
 
 void func_ov167_021bbff4(BattleMon *mon) {
-    sys_memset(mon->damageRecords, 0, sizeof(mon->damageRecords));
-    sys_memset(mon->damageRecordCounts, 0, sizeof(mon->damageRecordCounts));
+    MI_CpuFill8(mon->damageRecords, 0, sizeof(mon->damageRecords));
+    MI_CpuFill8(mon->damageRecordCounts, 0, sizeof(mon->damageRecordCounts));
     mon->damageRecordTurn = 0;
     mon->unk1f0 = 0;
 }
@@ -1639,7 +1639,7 @@ BOOL func_ov167_021bc1b8(BattleMon *mon, u32 *exp, BattleMonLevelUp *levelUp) {
         PokeParty_SetParam(mon->core.src, PKM_PARAM_EXP, newExp);
     }
     if (levelUp != NULL) {
-        sys_memset(levelUp, 0, sizeof(BattleMonLevelUp));
+        MI_CpuFill8(levelUp, 0, sizeof(BattleMonLevelUp));
     }
     return FALSE;
 }
@@ -1701,18 +1701,18 @@ BOOL TransformSet(BattleMon *mon, BattleMon *target) {
     s32 i;
 
     if (!mon->core.transformed && !target->core.transformed && target->substituteHP == 0) {
-        sys_memcpy(mon->moves, sTransformMoveBackup, sizeof(mon->moves));
+        MI_CpuCopy8(mon->moves, sTransformMoveBackup, sizeof(mon->moves));
         sTransformCoreBackup = mon->core;
         substituteHP = mon->substituteHP;
         *mon = *target;
         mon->core = sTransformCoreBackup;
         mon->substituteHP = substituteHP;
-        sys_memcpy(sTransformMoveBackup, mon->moves, sizeof(mon->moves));
+        MI_CpuCopy8(sTransformMoveBackup, mon->moves, sizeof(mon->moves));
         for (i = 0; i < 4; i++) {
             MoveWork_UpdateNumber(&mon->moves[i], target->moves[i].surface.id, 5, FALSE);
         }
-        sys_memset(mon->turnFlags, 0, sizeof(mon->turnFlags));
-        sys_memset(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
+        MI_CpuFill8(mon->turnFlags, 0, sizeof(mon->turnFlags));
+        MI_CpuFill8(mon->conditionFlags, 0, sizeof(mon->conditionFlags));
         mon->unk148 = 10000;
         mon->unk146 = 0;
         mon->prevMoveUsed = 0;

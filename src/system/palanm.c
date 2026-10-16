@@ -79,7 +79,7 @@ static u32 g_FieldColorPostFXWeightB = 85;
 PaletteFade *PaletteFade_Create(u32 heapId) {
     PaletteFade *fade = GFL_HeapAllocate(heapId, sizeof(PaletteFade), FALSE, "palanm.c", 89);
 
-    sys_memset(fade, 0, sizeof(PaletteFade));
+    MI_CpuFill8(fade, 0, sizeof(PaletteFade));
     return fade;
 }
 
@@ -106,8 +106,8 @@ void PaletteFade_FreeBuffer(PaletteFade *fade, u32 buffer) {
 }
 
 void PaletteFade_LoadData(PaletteFade *fade, const void *src, u32 buffer, u16 offset, u16 size) {
-    sys_memcpy16(src, fade->buffers[buffer].unfaded + offset, size);
-    sys_memcpy16(src, fade->buffers[buffer].faded + offset, size);
+    MIi_CpuCopy16(src, fade->buffers[buffer].unfaded + offset, size);
+    MIi_CpuCopy16(src, fade->buffers[buffer].faded + offset, size);
 }
 
 void PaletteFade_LoadNCLREx(PaletteFade *fade, u32 arcId, u32 fileId, HeapID heapId, u32 buffer, u32 size, u16 offset,
@@ -412,69 +412,69 @@ void PaletteFade_Transfer(PaletteFade *fade) {
             (fade->buffers[i].faded == NULL || IsBitSet(fade->transferMask, i) == FALSE)) {
             continue;
         }
-        cp15_flushDC(fade->buffers[i].faded, fade->buffers[i].size);
+        DC_FlushRange(fade->buffers[i].faded, fade->buffers[i].size);
         switch (i) {
         case PALFADE_BUFFER_MAIN_BG:
-            gfxUploadStdPaletteBGA(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GX_LoadBGPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
             break;
         case PALFADE_BUFFER_SUB_BG:
-            gfxUploadStdPaletteBGB(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GXS_LoadBGPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
             break;
         case PALFADE_BUFFER_MAIN_OBJ:
-            gfxUploadStdPaletteObjA(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GX_LoadOBJPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
             break;
         case PALFADE_BUFFER_SUB_OBJ:
-            gfxUploadStdPaletteObjB(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GXS_LoadOBJPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
             break;
         case PALFADE_BUFFER_MAIN_BG_EX0:
-            gfxBeginBGExtPltAUpload();
-            gfxUploadExtPaletteBGA(fade->buffers[i].faded, 0, fade->buffers[i].size);
-            gfxEndBGExtPltAUpload();
+            GX_BeginLoadBGExtPltt();
+            GX_LoadBGExtPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GX_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_MAIN_BG_EX1:
-            gfxBeginBGExtPltAUpload();
-            gfxUploadExtPaletteBGA(fade->buffers[i].faded, 0x2000, fade->buffers[i].size);
-            gfxEndBGExtPltAUpload();
+            GX_BeginLoadBGExtPltt();
+            GX_LoadBGExtPltt(fade->buffers[i].faded, 0x2000, fade->buffers[i].size);
+            GX_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_MAIN_BG_EX2:
-            gfxBeginBGExtPltAUpload();
-            gfxUploadExtPaletteBGA(fade->buffers[i].faded, 0x4000, fade->buffers[i].size);
-            gfxEndBGExtPltAUpload();
+            GX_BeginLoadBGExtPltt();
+            GX_LoadBGExtPltt(fade->buffers[i].faded, 0x4000, fade->buffers[i].size);
+            GX_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_MAIN_BG_EX3:
-            gfxBeginBGExtPltAUpload();
-            gfxUploadExtPaletteBGA(fade->buffers[i].faded, 0x6000, fade->buffers[i].size);
-            gfxEndBGExtPltAUpload();
+            GX_BeginLoadBGExtPltt();
+            GX_LoadBGExtPltt(fade->buffers[i].faded, 0x6000, fade->buffers[i].size);
+            GX_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_SUB_BG_EX0:
-            gfxBeginBGExtPltBUpload();
-            gfxUploadExtPaletteBGB(fade->buffers[i].faded, 0, fade->buffers[i].size);
-            gfxEndBGExtPltBUpload();
+            GXS_BeginLoadBGExtPltt();
+            GXS_LoadBGExtPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GXS_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_SUB_BG_EX1:
-            gfxBeginBGExtPltBUpload();
-            gfxUploadExtPaletteBGB(fade->buffers[i].faded, 0x2000, fade->buffers[i].size);
-            gfxEndBGExtPltBUpload();
+            GXS_BeginLoadBGExtPltt();
+            GXS_LoadBGExtPltt(fade->buffers[i].faded, 0x2000, fade->buffers[i].size);
+            GXS_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_SUB_BG_EX2:
-            gfxBeginBGExtPltBUpload();
-            gfxUploadExtPaletteBGB(fade->buffers[i].faded, 0x4000, fade->buffers[i].size);
-            gfxEndBGExtPltBUpload();
+            GXS_BeginLoadBGExtPltt();
+            GXS_LoadBGExtPltt(fade->buffers[i].faded, 0x4000, fade->buffers[i].size);
+            GXS_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_SUB_BG_EX3:
-            gfxBeginBGExtPltBUpload();
-            gfxUploadExtPaletteBGB(fade->buffers[i].faded, 0x6000, fade->buffers[i].size);
-            gfxEndBGExtPltBUpload();
+            GXS_BeginLoadBGExtPltt();
+            GXS_LoadBGExtPltt(fade->buffers[i].faded, 0x6000, fade->buffers[i].size);
+            GXS_EndLoadBGExtPltt();
             break;
         case PALFADE_BUFFER_MAIN_OBJ_EX:
-            gfxBeginObjExtPltAUpload();
-            gfxUploadExtPaletteObjA(fade->buffers[i].faded, 0, fade->buffers[i].size);
-            gfxEndObjExtPltAUpload();
+            GX_BeginLoadOBJExtPltt();
+            GX_LoadOBJExtPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GX_EndLoadOBJExtPltt();
             break;
         case PALFADE_BUFFER_SUB_OBJ_EX:
-            gfxBeginObjExtPltBUpload();
-            gfxUploadExtPaletteObjB(fade->buffers[i].faded, 0, fade->buffers[i].size);
-            gfxEndObjExtPltBUpload();
+            GXS_BeginLoadOBJExtPltt();
+            GXS_LoadOBJExtPltt(fade->buffers[i].faded, 0, fade->buffers[i].size);
+            GXS_EndLoadOBJExtPltt();
             break;
         }
     }

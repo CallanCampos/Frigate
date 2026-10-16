@@ -22,21 +22,21 @@ static u16 MBComm_MaxBlock(u32 a, u32 b);
 static void MBComm_NotifyError(u16 aid, u16 errcode);
 
 void MB_CommSetParentStateCallback(MBCommPStateCallback callback) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     MB_PARENT_WORK->callback = callback;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 const MBUserInfo *MB_CommGetChildUser(u16 childAid) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)) {
-        sys_memcpy(&MB_PARENT_WORK->childUser[childAid - 1], &MB_PARENT_WORK->childUserCopy, sizeof(MBUserInfo));
-        CPU_SetIRQMask(irq);
+        MI_CpuCopy8(&MB_PARENT_WORK->childUser[childAid - 1], &MB_PARENT_WORK->childUserCopy, sizeof(MBUserInfo));
+        OS_RestoreInterrupts(irq);
         return &MB_PARENT_WORK->childUserCopy;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return NULL;
 }
 
@@ -49,7 +49,7 @@ BOOL MB_CommIsBootable(u16 childAid) {
 }
 
 BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     u16 response;
     u16 state;
 
@@ -71,16 +71,16 @@ BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
         response = MB_COMM_RESPONSE_BOOT;
         break;
     default:
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
 
     if (gMBCommWork != NULL && MBComm_IsValidAid(childAid) && state == MB_PARENT_WORK->childState[childAid - 1]) {
         MB_PARENT_WORK->response[childAid - 1] = response;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }
 
@@ -121,8 +121,8 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
             break;
         }
         MB_PARENT_WORK->childUnk148a[cb->aid - 1] = 0;
-        sys_memset(&MB_PARENT_WORK->childRequestGgid[cb->aid - 1], 0, sizeof(u32));
-        sys_memset(&MB_PARENT_WORK->childUser[cb->aid - 1], 0, sizeof(MBUserInfo));
+        MI_CpuFill8(&MB_PARENT_WORK->childRequestGgid[cb->aid - 1], 0, sizeof(u32));
+        MI_CpuFill8(&MB_PARENT_WORK->childUser[cb->aid - 1], 0, sizeof(MBUserInfo));
         MBFrame_ClearChild(cb->aid);
         MB_PARENT_WORK->response[cb->aid - 1] = 0;
         MBComm_LeaveFile(cb->aid);
@@ -239,10 +239,10 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
         if (state == MB_COMM_PSTATE_CONNECTED) {
             MBChildRequest req;
 
-            sys_memcpy(request, &req, MB_CHILD_REQUEST_SIZE);
+            MI_CpuCopy8(request, &req, MB_CHILD_REQUEST_SIZE);
             MB_PARENT_WORK->childRequestGgid[aid - 1] = req.ggid;
             MB_PARENT_WORK->childUnk148a[aid - 1] = req.unk_1a;
-            sys_memcpy(&req.user, &MB_PARENT_WORK->childUser[aid - 1], sizeof(MBUserInfo));
+            MI_CpuCopy8(&req.user, &MB_PARENT_WORK->childUser[aid - 1], sizeof(MBUserInfo));
             MB_PARENT_WORK->childUser[aid - 1].playerNo = aid;
             MBComm_SetState(aid, MB_COMM_PSTATE_REQUESTED, &req.user);
         }
@@ -345,7 +345,7 @@ static void MBComm_ReadMPData(const WMMpRecvBuf *mp) {
     }
     sBlockRequestMask = 0;
     for (aid = 1; aid <= 15; aid++) {
-        const WMMpRecvData *recv = func_02081040(mp, aid);
+        const WMMpRecvData *recv = WM_ReadMPData(mp, aid);
 
         if (recv != NULL && recv->length != 0xffff && recv->length != 0) {
             MBComm_ProcessChildFrame(recv, aid);
@@ -373,7 +373,7 @@ static int MBComm_SendFileInfo(void) {
     u8 i;
     MBCommParentWork *work;
 
-    sys_memset(count, 0, sizeof(count));
+    MI_CpuFill8(count, 0, sizeof(count));
     work = MB_PARENT_WORK;
     for (aid = 1; aid <= 15; aid++) {
         if (work->childState[aid - 1] == MB_COMM_PSTATE_REQ_ACCEPTED) {
@@ -404,7 +404,7 @@ static int MBComm_SendFileInfo(void) {
     frame.value = file;
     out = MBFrame_Encode(&frame, work->common.sendBuf);
     if (out != NULL) {
-        sys_memcpy(&MB_PARENT_WORK->files[file], out, 0xe4);
+        MI_CpuCopy8(&MB_PARENT_WORK->files[file], out, 0xe4);
     }
     return MBComm_FlushAndSend(0xea, aidBitmap, gMBCommWork->sendBuf);
 }
@@ -417,13 +417,13 @@ static void MBComm_LoadCacheBlock(MBTask *task) {
     FSFile file;
     FSArchive *archive;
 
-    archive = func_0207062c(cache->archiveName, cache->nameLength);
+    archive = FS_FindArchive(cache->archiveName, cache->nameLength);
     if (archive == NULL) {
         archive = cache->archive;
     }
-    if (hw_isDSi()) {
-        if (archive == func_0207062c("rom", 3)) {
-            const MBTwlRomHeader *header = func_0206eee8();
+    if (OS_IsRunOnTwl()) {
+        if (archive == FS_FindArchive("rom", 3)) {
+            const MBTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
             u32 firstEnd = header->ntrRegionOffset + header->ntrRegionSize;
             u32 secondEnd = header->twlRegionOffset + header->twlRegionSize;
             u32 offset = entry->offset;
@@ -435,12 +435,12 @@ static void MBComm_LoadCacheBlock(MBTask *task) {
             }
         }
     }
-    finit(&file);
-    if (fopen_raw(&file, archive, entry->offset, entry->offset + size, -1)) {
-        if (size == romfs_fread(&file, entry->buf, size)) {
+    FS_InitFile(&file);
+    if (FS_OpenFileDirect(&file, archive, entry->offset, entry->offset + size, -1)) {
+        if (size == FS_ReadFile(&file, entry->buf, size)) {
             entry->state = MB_CACHE_ENTRY_READY;
         }
-        romfs_fclose(&file);
+        FS_CloseFile(&file);
     }
     if (entry->state != MB_CACHE_ENTRY_READY) {
         entry->offset = 0;
@@ -505,7 +505,7 @@ static int MBComm_SendBlock(void) {
                     }
                 }
                 if (oldest == NULL) {
-                    sys_exit();
+                    OS_Terminate();
                 }
                 cache->missCounter = 2;
                 oldest->state = MB_CACHE_ENTRY_LOADING;
@@ -527,7 +527,7 @@ static void MBComm_SendNextFrame(void) {
     u16 aid;
     int result;
 
-    sys_memset16(0, want, sizeof(want));
+    MIi_CpuClear16(0, want, sizeof(want));
     for (aid = 1; aid <= 15; aid++) {
         switch (MB_PARENT_WORK->childState[aid - 1]) {
         case MB_COMM_PSTATE_CONNECTED:

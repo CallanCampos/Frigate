@@ -28,22 +28,22 @@ static u8 IrcReadCmd[0xb8];
 static u8 IrcWriteCmd[0xc8];
 
 static void IrcSpi_Wait60us(void) {
-    u64 start = clock();
+    u64 start = OS_GetTick();
 
-    while (OS_TicksToMicroSeconds(clock() - start) < 60) {
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 60) {
     }
 }
 
 void IrcSpi_Init(void) {
     IrcSpi.unk0 = 1;
     if (IrcLockId == 0xfffd) {
-        IrcLockId = cart_key_create();
+        IrcLockId = OS_GetLockID();
     }
 }
 
 void IrcSpi_Release(void) {
     if (IrcLockId != OS_LOCK_ID_ERROR) {
-        cart_key_release(IrcLockId);
+        OS_ReleaseLockID(IrcLockId);
         IrcLockId = 0xfffd;
     }
 }
@@ -53,8 +53,8 @@ static u8 IrcSpi_SendByte(IrcSpiData *transfer) {
     // Read from the data register into a volatile copy, which the original keeps on the stack
     vu16 data;
 
-    start = clock();
-    while (OS_TicksToMicroSeconds(clock() - start) < 50) {
+    start = OS_GetTick();
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 50) {
     }
     reg_MI_MCD0 = *transfer->send;
     transfer->send++;
@@ -65,9 +65,9 @@ static u8 IrcSpi_SendByte(IrcSpiData *transfer) {
 }
 
 static void IrcSpi_RecvByte(IrcSpiData *transfer) {
-    u64 start = clock();
+    u64 start = OS_GetTick();
 
-    while (OS_TicksToMicroSeconds(clock() - start) < 50) {
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 50) {
     }
     reg_MI_MCD0 = 0;
     while (reg_MI_MCCNT0 & REG_MI_MCCNT0_BUSY_MASK) {
@@ -84,8 +84,8 @@ u8 IrcSpi_Recv(u8 *buf) {
     IrcSpi.recv = buf;
     IrcReadCmd[0] = 1;
     buf[0] = 0;
-    func_0206ef4c(IrcLockId);
-    func_0207a178(IrcLockId);
+    CARD_LockBackup(IrcLockId);
+    OS_LockCard(IrcLockId);
     while (reg_MI_MCCNT0 & REG_MI_MCCNT0_BUSY_MASK) {
     }
     reg_MI_MCCNT0 = REG_MI_MCCNT0_E_MASK | REG_MI_MCCNT0_SEL_MASK | REG_MI_MCCNT0_MODE_MASK | 0x2;
@@ -116,8 +116,8 @@ u8 IrcSpi_Recv(u8 *buf) {
     }
     while (reg_MI_MCCNT0 & REG_MI_MCCNT0_BUSY_MASK) {
     }
-    func_0207a1a0(IrcLockId);
-    func_0206ef58(IrcLockId);
+    OS_UnLockCard(IrcLockId);
+    CARD_UnlockBackup(IrcLockId);
     return size;
 }
 
@@ -127,8 +127,8 @@ void IrcSpi_Send(const u8 *data, int size) {
     IrcSpi.send = IrcWriteCmd;
     IrcSpi.recv = NULL;
     IrcWriteCmd[0] = 2;
-    func_0206ef4c(IrcLockId);
-    func_0207a178(IrcLockId);
+    CARD_LockBackup(IrcLockId);
+    OS_LockCard(IrcLockId);
     while (reg_MI_MCCNT0 & REG_MI_MCCNT0_BUSY_MASK) {
     }
     reg_MI_MCCNT0 = REG_MI_MCCNT0_E_MASK | REG_MI_MCCNT0_SEL_MASK | REG_MI_MCCNT0_MODE_MASK | 0x2;
@@ -143,6 +143,6 @@ void IrcSpi_Send(const u8 *data, int size) {
     }
     while (reg_MI_MCCNT0 & REG_MI_MCCNT0_BUSY_MASK) {
     }
-    func_0207a1a0(IrcLockId);
-    func_0206ef58(IrcLockId);
+    OS_UnLockCard(IrcLockId);
+    CARD_UnlockBackup(IrcLockId);
 }

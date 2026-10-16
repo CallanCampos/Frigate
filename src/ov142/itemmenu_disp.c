@@ -839,11 +839,11 @@ void ItemMenuDisp_UpdateListRows(ItemMenuWork *work) {
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
         chars = func_0204bb80(work->rowNameChr[i], FALSE);
         pixels = GFL_BitmapGetPixelData(work->rowNameBitmaps[i]);
-        cp15_flushDC(pixels, GFL_BitmapCalcPixelDataSize(work->rowNameBitmaps[i]));
-        gfxUploadObjCharA(pixels + 0x100, chars + 0x80, 0x80);
-        gfxUploadObjCharA(pixels + 0x280, chars + 0x100, 0x80);
-        gfxUploadObjCharA(pixels, chars + 0x300, 0x100);
-        gfxUploadObjCharA(pixels + 0x180, chars + 0x400, 0x100);
+        DC_FlushRange(pixels, GFL_BitmapCalcPixelDataSize(work->rowNameBitmaps[i]));
+        GX_LoadOBJ(pixels + 0x100, chars + 0x80, 0x80);
+        GX_LoadOBJ(pixels + 0x280, chars + 0x100, 0x80);
+        GX_LoadOBJ(pixels, chars + 0x300, 0x100);
+        GX_LoadOBJ(pixels + 0x180, chars + 0x400, 0x100);
         if (work->rowMarkTypes[i] != 9) {
             if (work->rowMarkTypes[i] != 8) {
                 func_0204c488(work->rowMarks[i], work->rowMarkTypes[i]);
@@ -1374,7 +1374,7 @@ void ItemMenuDisp_SetButtonsActive(ItemMenuWork *work, BOOL active) {
     if (active == TRUE) {
         PaletteFade_StartFade(work->paletteFade, 4, 0x47cf, 0, 0, 0, 0, GFL_VBlankGetTCBMgr());
         PaletteFade_StartFade(work->paletteFade, 1, 1, 0, 0, 0, 0, GFL_VBlankGetTCBMgr());
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 6, 0);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 6, 0);
         ItemMenuDisp_UpdateSortButton(work);
         func_0204c488(work->buttons[0], 4);
         func_0204c488(work->buttons[1], 5);
@@ -1390,9 +1390,9 @@ void ItemMenuDisp_SetButtonsActive(ItemMenuWork *work, BOOL active) {
         PaletteFade_StartFade(work->paletteFade, 4, 0x47cf, 0, 8, 8, 0, GFL_VBlankGetTCBMgr());
         PaletteFade_StartFade(work->paletteFade, 1, 1, 0, 8, 8, 0, GFL_VBlankGetTCBMgr());
         if (work->mode == 4 && func_0204c138(work->buttons[0]) == FALSE) {
-            gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 2, -8);
+            G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 2, -8);
         } else {
-            gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 6, -8);
+            G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 6, -8);
         }
         func_0204c488(work->sortButton, 4);
         func_0204c488(work->filterButton, 2);

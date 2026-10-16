@@ -386,7 +386,7 @@ static BOOL IrcRhythmCheck_Init(GameProc *proc, u32 *state, void *param, void *w
 
     GFL_HeapCreateChild(HEAPID_USER, HEAP_ID, 0x20000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcRhythmCheckWork), HEAP_ID);
-    sys_memset(wk, 0, sizeof(IrcRhythmCheckWork));
+    MI_CpuFill8(wk, 0, sizeof(IrcRhythmCheckWork));
     wk->param = rhythmParam;
     IrcRhythmGraphic_Create(&wk->graphic, HEAP_ID);
     IrcRhythmText_Init(&wk->text, 0, HEAP_ID);
@@ -418,7 +418,7 @@ static BOOL IrcRhythmCheck_Init(GameProc *proc, u32 *state, void *param, void *w
     queue = IrcRhythmText_GetQueue(&wk->text);
     wk->button = IrcAppBar_Create(2, unit, 0, 14, 13, 2, font, queue, HEAP_ID);
     CompatibleIrcSys_SetCount(wk->param->sys, 1);
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x22, -8);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x22, -8);
     wk->vblankTask = GFL_VBlankTCBAdd(IrcRhythmCheck_VBlank, wk, 0);
     IrcRhythmCheck_SetStep(wk, IrcRhythmCheck_StepStart);
     return TRUE;
@@ -496,7 +496,7 @@ static BOOL IrcRhythmCheck_Main(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void IrcRhythmGraphic_Create(IrcRhythmGraphic *graphic, HeapID heapId) {
-    sys_memset(graphic, 0, sizeof(IrcRhythmGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IrcRhythmGraphic));
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
     GFL_BGSysSetVRAMBanks(&sIrcRhythmVRAMConfig);
     GFL_BGSysSetDisplayLayout(0);
@@ -582,7 +582,7 @@ static void IrcRhythmClAct_Init(IrcRhythmClAct *clact, const BGSysVRAMConfig *vr
     ClActorSetup setup;
     int i;
 
-    sys_memset(clact, 0, sizeof(IrcRhythmClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcRhythmClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -599,7 +599,7 @@ static void IrcRhythmClAct_Init(IrcRhythmClAct *clact, const BGSysVRAMConfig *vr
     clact->subChars = func_0204b81c(arc, 34, FALSE, CLACT_VRAM_SUB, heapId);
     clact->subCellAnims = func_0204bde0(arc, 33, 32, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < PARTICLE_COUNT; i++) {
         clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
                                          CLACT_SURFACE_MAIN, heapId);
@@ -638,7 +638,7 @@ static void IrcRhythmClAct_Free(IrcRhythmClAct *clact) {
     func_0204be64(clact->countdownCellAnims);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(IrcRhythmClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcRhythmClAct));
 }
 
 static void IrcRhythmClAct_Update(IrcRhythmClAct *clact) {
@@ -658,7 +658,7 @@ static ClActUnit *IrcRhythmClAct_GetUnit(IrcRhythmClAct *clact) {
 }
 
 static void IrcRhythmText_Init(IrcRhythmText *text, int fontType, HeapID heapId) {
-    sys_memset(text, 0, sizeof(IrcRhythmText));
+    MI_CpuFill8(text, 0, sizeof(IrcRhythmText));
     func_020232d0();
     switch (fontType) {
     case 0:
@@ -680,7 +680,7 @@ static void IrcRhythmText_Free(IrcRhythmText *text) {
     GFL_MsgDataFree(text->msgData);
     func_02021a18(text->queue);
     GFL_FontFree(text->font);
-    sys_memset(text, 0, sizeof(IrcRhythmText));
+    MI_CpuFill8(text, 0, sizeof(IrcRhythmText));
 }
 
 static BOOL IrcRhythmText_Update(IrcRhythmText *text) {
@@ -705,7 +705,7 @@ static WordSet *IrcRhythmText_GetWordSet(IrcRhythmText *text) {
 
 static void IrcRhythmWindow_Init(IrcRhythmWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height, u8 palette,
                                  HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcRhythmWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcRhythmWindow));
     win->color = 15;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, TRUE);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -716,7 +716,7 @@ static void IrcRhythmWindow_Init(IrcRhythmWindow *win, u8 bg, u8 x, u8 y, u8 wid
 
 static void IrcRhythmWindow_InitWithColor(IrcRhythmWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height, u8 palette,
                                           u16 color, u8 fromEnd, HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcRhythmWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcRhythmWindow));
     win->color = color;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, fromEnd);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -728,7 +728,7 @@ static void IrcRhythmWindow_InitWithColor(IrcRhythmWindow *win, u8 bg, u8 x, u8 
 static void IrcRhythmWindow_Free(IrcRhythmWindow *win) {
     GFL_StrBufFree(win->strbuf);
     BmpWin_Free(win->window);
-    sys_memset(win, 0, sizeof(IrcRhythmWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcRhythmWindow));
 }
 
 static BOOL IrcRhythmWindow_Flush(IrcRhythmWindow *win, IrcRhythmText *text) {
@@ -794,14 +794,14 @@ static void IrcRhythmWindow_Clear(IrcRhythmWindow *win) {
 static void IrcRhythmCountdown_Init(IrcRhythmCountdown *countdown, IrcRhythmGraphic *graphic, HeapID heapId) {
     int i;
 
-    sys_memset(countdown, 0, sizeof(IrcRhythmCountdown));
+    MI_CpuFill8(countdown, 0, sizeof(IrcRhythmCountdown));
     for (i = 0; i < COUNTDOWN_COUNT; i++) {
         countdown->actor = IrcRhythmGraphic_GetActor(graphic, COUNTDOWN_ACTOR + i);
     }
 }
 
 static void IrcRhythmCountdown_Free(IrcRhythmCountdown *countdown) {
-    sys_memset(countdown, 0, sizeof(IrcRhythmCountdown));
+    MI_CpuFill8(countdown, 0, sizeof(IrcRhythmCountdown));
 }
 
 static void IrcRhythmCountdown_Update(IrcRhythmCountdown *countdown) {
@@ -1035,20 +1035,20 @@ static void IrcRhythmCheck_StepInterrupted(IrcRhythmCheckWork *wk, u16 *state) {
 }
 
 static void IrcRhythmData_Clear(IrcRhythmData *data) {
-    sys_memset(data, 0, sizeof(IrcRhythmData));
+    MI_CpuFill8(data, 0, sizeof(IrcRhythmData));
 }
 
 // Starts the clock that the taps are timed from
 static void IrcRhythmData_Start(IrcRhythmData *data) {
     // BUG: the clock is only started if it already was
 #ifdef BUGFIX
-    if (!clock_is_inited()) {
+    if (!OS_IsTickAvailable()) {
 #else
-    if (clock_is_inited()) {
+    if (OS_IsTickAvailable()) {
 #endif
-        clock_init();
+        OS_InitTick();
     }
-    data->start = OS_TicksToMilliSeconds(clock());
+    data->start = OS_TicksToMilliSeconds(OS_GetTick());
 }
 
 static BOOL IrcRhythmData_IsFull(IrcRhythmData *data) {
@@ -1060,7 +1060,7 @@ static BOOL IrcRhythmData_IsFull(IrcRhythmData *data) {
 
 static void IrcRhythmData_AddTap(IrcRhythmData *data) {
     if (data->count < TAP_COUNT) {
-        data->taps[data->count].time = OS_TicksToMilliSeconds(clock()) - data->start;
+        data->taps[data->count].time = OS_TicksToMilliSeconds(OS_GetTick()) - data->start;
         if (data->count == 0) {
             data->taps[data->count].interval = 0;
         } else {
@@ -1109,14 +1109,14 @@ static int IrcRhythmData_GetTapGrade(IrcRhythmData *data) {
 }
 
 static void IrcRhythmNet_Init(IrcRhythmNet *net, CompatibleIrcSys *sys) {
-    sys_memset(net, 0, sizeof(IrcRhythmNet));
+    MI_CpuFill8(net, 0, sizeof(IrcRhythmNet));
     net->sys = sys;
     CompatibleIrcSys_AddCommands(sys, NET_COMMAND_BASE, sIrcRhythmCommands, 1, net);
 }
 
 static void IrcRhythmNet_Free(IrcRhythmNet *net) {
     CompatibleIrcSys_RemoveCommands(net->sys, NET_COMMAND_BASE);
-    sys_memset(net, 0, sizeof(IrcRhythmNet));
+    MI_CpuFill8(net, 0, sizeof(IrcRhythmNet));
 }
 
 // Sends the data, and returns TRUE once the other player's has also arrived
@@ -1271,7 +1271,7 @@ static void IrcRhythmParticles_Init(IrcRhythmParticles *particles, IrcRhythmGrap
                                     u32 surface) {
     int i;
 
-    sys_memset(particles, 0, sizeof(IrcRhythmParticles));
+    MI_CpuFill8(particles, 0, sizeof(IrcRhythmParticles));
     particles->mode = mode;
     particles->timer = 0;
     particles->interval = 10;
@@ -1281,7 +1281,7 @@ static void IrcRhythmParticles_Init(IrcRhythmParticles *particles, IrcRhythmGrap
 }
 
 static void IrcRhythmParticles_Free(IrcRhythmParticles *particles) {
-    sys_memset(particles, 0, sizeof(IrcRhythmParticles));
+    MI_CpuFill8(particles, 0, sizeof(IrcRhythmParticles));
 }
 
 static void IrcRhythmParticles_Update(IrcRhythmParticles *particles) {
@@ -1382,7 +1382,7 @@ static void IrcRhythmParticles_Burst(IrcRhythmParticles *particles, const IrcRhy
 }
 
 static void IrcRhythmParticle_Init(IrcRhythmParticle *particle, ClActor *actor, u32 surface) {
-    sys_memset(particle, 0, sizeof(IrcRhythmParticle));
+    MI_CpuFill8(particle, 0, sizeof(IrcRhythmParticle));
     particle->actor = actor;
     particle->surface = surface;
 }
@@ -1432,12 +1432,12 @@ static BOOL IrcRhythmParticle_IsActive(IrcRhythmParticle *particle) {
 }
 
 static void IrcRhythmFlash_Init(IrcRhythmFlash *flash, HeapID heapId) {
-    sys_memset(flash, 0, sizeof(IrcRhythmFlash));
+    MI_CpuFill8(flash, 0, sizeof(IrcRhythmFlash));
     flash->enabled = TRUE;
 }
 
 static void IrcRhythmFlash_Free(IrcRhythmFlash *flash) {
-    sys_memset(flash, 0, sizeof(IrcRhythmFlash));
+    MI_CpuFill8(flash, 0, sizeof(IrcRhythmFlash));
 }
 
 static void IrcRhythmFlash_Update(IrcRhythmFlash *flash) {

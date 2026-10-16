@@ -217,7 +217,7 @@ WifiBattleMatchRes *WifiBattleMatchRes_Create(ClActUnit *unit, u32 kind, HeapID 
     void *file;
     u8 *rawData;
 
-    sys_memset(res, 0, sizeof(WifiBattleMatchRes));
+    MI_CpuFill8(res, 0, sizeof(WifiBattleMatchRes));
     arc = GFL_ArcSysCreateFileHandle(ARCID_WIFIBATTLEMATCH, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_SUB_BG, 0, 0, HEAPID_TAIL(heapId));
@@ -232,8 +232,8 @@ WifiBattleMatchRes *WifiBattleMatchRes_Create(ClActUnit *unit, u32 kind, HeapID 
     res->res[RES_CELLS + CLACT_VRAM_SUB] = func_0204bde0(arc, 4, 11, HEAPID_TAIL(heapId));
     file = GFL_G2DIOReadNCLRArc(arc, 0, &palette, heapId);
     rawData = palette->rawData;
-    sys_memcpy(rawData, res->colorsA, sizeof(res->colorsA));
-    sys_memcpy(rawData + 0x120, res->colorsB, sizeof(res->colorsB));
+    MI_CpuCopy8(rawData, res->colorsA, sizeof(res->colorsA));
+    MI_CpuCopy8(rawData + 0x120, res->colorsB, sizeof(res->colorsB));
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, 0x1e0, 0x20, HEAPID_TAIL(heapId));
@@ -373,13 +373,13 @@ WifiBattleMatchCard *WifiBattleMatchRankCard_Create(const WifiBattleMatchRankInf
     u32 stars;
     u32 colorKind;
 
-    sys_memset(card, 0, sizeof(WifiBattleMatchCard));
+    MI_CpuFill8(card, 0, sizeof(WifiBattleMatchCard));
     card->bg = 5;
     card->palette = 15;
     card->iconPaletteSlot = 3;
     card->itemPaletteSlot = 7;
     card->surface = CLACT_VRAM_SUB;
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     colorKind = 1;
     stars = WifiBattleMatchView_GetStarCount(info->unkC, info->unk10, info->unk12);
     if (stars != 5) {
@@ -395,7 +395,7 @@ WifiBattleMatchCard *WifiBattleMatchRankCard_Create(const WifiBattleMatchRankInf
     GFL_BGSysSetScrPaletteNo(6, 0, 0, 32, 6, 1);
     GFL_BGSysSetScrPaletteNo(6, 0, 6, 32, 18, stars + 3);
     GFL_BGSysLoadScr(6);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     return card;
 }
 
@@ -416,7 +416,7 @@ WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCar
     ClActorPos pos;
     u32 frameBG;
 
-    sys_memset(card, 0, sizeof(WifiBattleMatchCard));
+    MI_CpuFill8(card, 0, sizeof(WifiBattleMatchCard));
     card->records = records;
     card->heapId = heapId;
     card->unit = unit;
@@ -427,7 +427,7 @@ WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCar
         card->iconPaletteSlot = 5;
         card->itemPaletteSlot = 9;
         card->surface = CLACT_VRAM_MAIN;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     } else {
         frameBG = 6;
         card->bg = 5;
@@ -435,7 +435,7 @@ WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCar
         card->iconPaletteSlot = 3;
         card->itemPaletteSlot = 7;
         card->surface = CLACT_VRAM_SUB;
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     }
     switch (info->variant) {
     case 0:
@@ -555,7 +555,7 @@ WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCar
     ClActorPos pos;
     u32 frameBG;
 
-    sys_memset(card, 0, sizeof(WifiBattleMatchCard));
+    MI_CpuFill8(card, 0, sizeof(WifiBattleMatchCard));
     card->records = records;
     card->heapId = heapId;
     card->unit = unit;
@@ -566,7 +566,7 @@ WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCar
         card->iconPaletteSlot = 5;
         card->itemPaletteSlot = 9;
         card->surface = CLACT_VRAM_MAIN;
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     } else {
         frameBG = 6;
         card->bg = 5;
@@ -574,7 +574,7 @@ WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCar
         card->iconPaletteSlot = 3;
         card->itemPaletteSlot = 7;
         card->surface = CLACT_VRAM_SUB;
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     }
     switch (info->variant) {
     case 0:
@@ -1090,7 +1090,7 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     card->itemChars = func_0204b81c(arc, func_0202d894(), FALSE, card->surface, HEAPID_TAIL(heapId));
     card->itemCells = func_0204bde0(arc, func_0202d898(2), func_0202d89c(2), heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.y = 168;
     setup.sequence = 1;
     setup.bgPriority = 1;
@@ -1156,7 +1156,7 @@ static void WifiBattleMatchView_CardLoadBadge(WifiBattleMatchCard *card, u32 loo
     card->badgeChars = func_0204b81c(arc, look + 49, FALSE, card->surface, heapId);
     card->badgeCells = func_0204bde0(arc, 65, 66, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.y = 0;
     setup.x = 0;
     setup.bgPriority = 1;
@@ -1176,7 +1176,7 @@ static void WifiBattleMatchView_CardLoadMark(WifiBattleMatchCard *card, ClActUni
                                              HeapID heapId) {
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 280;
     setup.y = 152;
     setup.sequence = 7;
@@ -1197,7 +1197,7 @@ static void WifiBattleMatchView_CardLoadStars(WifiBattleMatchCard *card, const W
     ClActorSetup setup;
     u32 i;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 256;
     setup.y = 16;
     for (i = 0; i < count; i++) {
@@ -1231,7 +1231,7 @@ WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMa
     u32 stars;
     u32 colorKind = 0;
 
-    sys_memset(card, 0, sizeof(WifiBattleMatchPartnerCard));
+    MI_CpuFill8(card, 0, sizeof(WifiBattleMatchPartnerCard));
     card->shown = shown;
     card->kind = kind;
     card->pmsDraw = PMSDraw_Create(unit, CLACT_VRAM_MAIN, printQueue, font, 5, 1, heapId);
@@ -1275,7 +1275,7 @@ WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMa
     GFL_BGSysLoadScr(2);
     GFL_BGSysMoveBG(2, BG_MOVE_SET_X, -256);
     GFL_BGSysMoveBG(1, BG_MOVE_SET_X, -256);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     return card;
 }
 
@@ -1477,7 +1477,7 @@ static void WifiBattleMatchView_PartnerLoadBadge(WifiBattleMatchPartnerCard *car
     card->badgeChars = func_0204b81c(arc, look + 49, FALSE, CLACT_VRAM_MAIN, heapId);
     card->badgeCells = func_0204bde0(arc, 65, 66, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 288;
     setup.y = 44;
     card->badge =
@@ -1499,7 +1499,7 @@ static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *car
     ClActorSetup setup;
     u32 i;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 256;
     setup.y = 16;
     for (i = 0; i < count; i++) {
@@ -1548,8 +1548,8 @@ WifiBattleMatchLinkIcon *WifiBattleMatchLinkIcon_Create(ClActUnit *unit, WifiBat
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchLinkIcon), FALSE, "wifibattlematch_view.c", 3055);
     ClActorSetup setup;
 
-    sys_memset(icon, 0, sizeof(WifiBattleMatchLinkIcon));
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(icon, 0, sizeof(WifiBattleMatchLinkIcon));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 1;
@@ -1610,7 +1610,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     PartyPkm *pkm;
     int i;
 
-    sys_memset(list, 0, sizeof(WifiBattleMatchTeamList));
+    MI_CpuFill8(list, 0, sizeof(WifiBattleMatchTeamList));
     party = convertBoxedPokeSetToParty(battleBox, HEAPID_TAIL(heapId));
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 7, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
@@ -1630,7 +1630,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     list->itemCells = func_0204bde0(arc, func_0202d898(2), func_0202d89c(2), HEAPID_TAIL(heapId));
     list->itemChars = func_0204b81c(arc, func_0202d894(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 24;
     setup.y = 44;
     setup.sequence = 1;
@@ -1696,7 +1696,7 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     GFL_BGSysMoveBG(2, BG_MOVE_SET_X, -256);
     GFL_BGSysMoveBG(1, BG_MOVE_SET_X, -256);
     GFL_HeapFree(party);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 15, 3);
     return list;
 }
 

@@ -194,14 +194,14 @@ void IntroMsg_OpenMenu(IntroMsg *msg, const IntroMenuItem *items, u32 count, BOO
     menu = &msg->menu;
     heapId = msg->heapId;
     window = msg->menuWindow;
-    sys_memset(menu, 0, sizeof(IntroMenu));
+    MI_CpuFill8(menu, 0, sizeof(IntroMenu));
     menu->options = ListMenuCore_CreateOptionList(count, heapId);
     for (i = 0; i < count; i++) {
         item = &items[i];
         GFL_MsgDataLoadStrbuf(msg->msgData, item->message, msg->strbuf);
         ListMenuCore_AppendStrBufOption(&menu->options[i], msg->strbuf, item->value, heapId);
     }
-    sys_memset(&header, 0, sizeof(BmpMenuListHeader));
+    MI_CpuFill8(&header, 0, sizeof(BmpMenuListHeader));
     header.options = menu->options;
     header.count = count;
     header.maxShown = 5;
@@ -246,7 +246,7 @@ void IntroMsg_CloseMenu(IntroMsg *msg) {
     BmpWin_FlushChar(msg->menuWindow);
     BmpMenuList_Free(msg->menu.list, NULL, NULL);
     ListMenuCore_FreeOptionList(menu->options);
-    sys_memset(menu, 0, sizeof(IntroMenu));
+    MI_CpuFill8(menu, 0, sizeof(IntroMenu));
 }
 
 void IntroMsg_UpdateMenu(IntroMsg *msg) {

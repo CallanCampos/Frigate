@@ -936,7 +936,7 @@ static void FMissionView_StartPanelMark(FMissionView *view, FMissionViewPanel *p
     }
     task = GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_MarkTask, sizeof(FMissionViewMarkTask), 0);
     data = GFL_TCBExGetData(task);
-    sys_memset(data, 0, sizeof(FMissionViewMarkTask));
+    MI_CpuFill8(data, 0, sizeof(FMissionViewMarkTask));
     data->view = view;
     data->panel = panel;
     data->timer = MESSAGE_WAIT;
@@ -1003,7 +1003,7 @@ static void FMissionView_AddPanel(FMissionView *view, FestMissionLogEntry *entry
     }
     data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_PanelTask, sizeof(FMissionViewPanelTask), 0));
-    sys_memset(data, 0, sizeof(FMissionViewPanelTask));
+    MI_CpuFill8(data, 0, sizeof(FMissionViewPanelTask));
     data->view = view;
     data->dir = dir;
     data->panel = panel;
@@ -1075,7 +1075,7 @@ static void FMissionView_StartMessage(FMissionView *view, StrBuf *strbuf, int *p
     FMissionViewMessageTask *data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_MessageTask, sizeof(FMissionViewMessageTask), 0));
 
-    sys_memset(data, 0, sizeof(FMissionViewMessageTask));
+    MI_CpuFill8(data, 0, sizeof(FMissionViewMessageTask));
     GFL_StrBufCopy(view->messageCopy, strbuf);
     data->view = view;
     data->timer = MESSAGE_WAIT;
@@ -1138,7 +1138,7 @@ static BOOL FMissionView_StartPassPower(FMissionView *view, u32 passPower, int r
     }
     data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_PassPowerTask, sizeof(FMissionViewPassPowerTask), 0));
-    sys_memset(data, 0, sizeof(FMissionViewPassPowerTask));
+    MI_CpuFill8(data, 0, sizeof(FMissionViewPassPowerTask));
     view->usePassPower = PASS_POWER_NONE;
     view->unk89 = 0;
     data->view = view;
@@ -1240,7 +1240,7 @@ static void FMissionView_StartQuitTask(FMissionView *view, int *pending) {
     FMissionViewQuitTask *data =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(view->tcbManager, FMissionView_QuitTask, sizeof(FMissionViewQuitTask), 0));
 
-    sys_memset(data, 0, sizeof(FMissionViewQuitTask));
+    MI_CpuFill8(data, 0, sizeof(FMissionViewQuitTask));
     data->view = view;
     data->timer = MESSAGE_WAIT;
     FMissionView_SetButtonState(view, FMISSION_VIEW_BUTTON_QUIT, FMISSION_VIEW_BUTTON_STATE_PRESSED);

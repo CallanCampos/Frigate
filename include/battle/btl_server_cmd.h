@@ -25,7 +25,7 @@ static inline void BtlServerCmdQueue_Init(BtlServerCmdQueue *queue) {
 
 // Fills the queue with a block of commands the server sent
 static inline void BtlServerCmdQueue_Setup(BtlServerCmdQueue *queue, const void *data, u16 size) {
-    sys_memcpy32(data, queue->buffer, size);
+    MIi_CpuCopy32(data, queue->buffer, size);
     queue->writePtr = size;
     queue->readPtr = 0;
 }

@@ -125,7 +125,7 @@ static BOOL CheckAnswer(char *data, int size) {
         return FALSE;
     }
     bodySize = size - 0x28;
-    buffer = func_020586e4(8, GamestatsEncodedSize(bodySize) + 0x29);
+    buffer = DWC_Alloc(8, GamestatsEncodedSize(bodySize) + 0x29);
     if (buffer == NULL) {
         return FALSE;
     }
@@ -133,7 +133,7 @@ static BOOL CheckAnswer(char *data, int size) {
     func_ov011_0216e878(data, buffer + 0x14, bodySize, 2);
     CopySecret(buffer + 0x14 + GamestatsEncodedSize(bodySize));
     MATH_CalcSHA1(digest, buffer, GamestatsEncodedSize(bodySize) + 0x28);
-    func_02058728(8, buffer, 0);
+    DWC_Free(8, buffer, 0);
     for (i = 0; i < 0x14; i++) {
         hash[i * 2] = digits[digest[i] >> 4];
         hash[i * 2 + 1] = digits[digest[i] & 0xf];
@@ -180,25 +180,25 @@ static void OnAnswered(char *data, int size, int status, void *arg) {
             } else {
                 SetFailed();
             }
-            func_02058814(data);
+            DWCi_GsFree(data);
             break;
         case 7:
             if (strncmp(data, "error:", strlen("error:")) == 0) {
-                func_02058814(data);
+                DWCi_GsFree(data);
                 SetFailed();
                 return;
             }
             if (sClient.answer != NULL) {
-                func_02058814(sClient.answer);
+                DWCi_GsFree(sClient.answer);
                 sClient.answer = NULL;
             }
             if (!CheckAnswer(data, size)) {
-                func_02058814(data);
+                DWCi_GsFree(data);
                 SetFailed();
                 return;
             }
             if (sClient.check != NULL && !sClient.check(data, size)) {
-                func_02058814(data);
+                DWCi_GsFree(data);
                 SetFailed();
                 return;
             }
@@ -220,7 +220,7 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     u32 sum = 0;
     int i;
 
-    buffer = func_020586e4(8, total + 4);
+    buffer = DWC_Alloc(8, total + 4);
     if (buffer == NULL) {
         return 2;
     }
@@ -243,7 +243,7 @@ static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 
     buffer[2] = sum >> 8;
     buffer[3] = sum;
     func_ov011_0216e878(buffer, dest, total + 4, 2);
-    func_02058728(8, buffer, 0);
+    DWC_Free(8, buffer, 0);
     dest[GamestatsEncodedSize(total + 4)] = '\0';
     return 0;
 }
@@ -287,8 +287,8 @@ void Gamestats_Start(int server, const char *key) {
 
 // Fails the call, and tells the Wi-Fi library unless it has an error
 static void SetFailed(void) {
-    if (!func_020584b0()) {
-        func_020584cc(6, -90040);
+    if (!DWCi_IsError()) {
+        DWCi_SetError(6, -90040);
     }
     sClient.state = 1;
 }
@@ -343,11 +343,11 @@ void Gamestats_Abort(void) {
 void Gamestats_Close(void) {
     if (sClient.active) {
         if (sClient.url != NULL) {
-            func_02058728(8, sClient.url, 0);
+            DWC_Free(8, sClient.url, 0);
             sClient.url = NULL;
         }
         if (sClient.answer != NULL) {
-            func_02058814(sClient.answer);
+            DWCi_GsFree(sClient.answer);
             sClient.answerSize = 0;
             sClient.answer = NULL;
         }
@@ -374,17 +374,17 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
         return 3;
     }
     if (sClient.url != NULL) {
-        func_02058728(8, sClient.url, 0);
+        DWC_Free(8, sClient.url, 0);
         sClient.url = NULL;
     }
-    sClient.url = func_020586e4(8, strlen(sBaseUrl) + strlen(sClient.gameName) + strlen(page) + strlen("?pid=") +
-                                       func_0207a2c0(pidText, 0x10, "%d", pid) + strlen("&hash=") + 0x28 +
-                                       strlen("&data=") + GamestatsEncodedSize(size + 0xc) + 1);
+    sClient.url = DWC_Alloc(8, strlen(sBaseUrl) + strlen(sClient.gameName) + strlen(page) + strlen("?pid=") +
+                                   OS_SNPrintf(pidText, 0x10, "%d", pid) + strlen("&hash=") + 0x28 + strlen("&data=") +
+                                   GamestatsEncodedSize(size + 0xc) + 1);
     if (sClient.url == NULL) {
         return 2;
     }
-    func_0207a290(sClient.url, "%s%s%s?pid=%d&hash=%s&data=", sBaseUrl, sClient.gameName, page, pid,
-                  "0000000000000000000000000000000000000000", "");
+    OS_SPrintf(sClient.url, "%s%s%s?pid=%d&hash=%s&data=", sBaseUrl, sClient.gameName, page, pid,
+               "0000000000000000000000000000000000000000", "");
     url = sClient.url;
     sClient.urlEnd = url + strlen(url);
     sClient.hashField = sClient.urlEnd - strlen("&data=") - 0x28;
@@ -392,7 +392,7 @@ static int Send(const char *page, int pid, const void *payload, int size, Gamest
     header[1] = size;
     result = EncodePayload(sClient.urlEnd, (u8 *)header, 8, payload, size);
     if (result == 2) {
-        func_02058728(8, sClient.url, 0);
+        DWC_Free(8, sClient.url, 0);
         sClient.url = NULL;
         return 2;
     }

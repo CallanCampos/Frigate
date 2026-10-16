@@ -92,7 +92,7 @@ TouchBar *TouchBar_Create(TouchBarSetup *setup, HeapID heapId) {
     u32 bgScreenType;
     u32 i;
 
-    sys_memset(bar, 0, size);
+    MI_CpuFill8(bar, 0, size);
     bar->count = setup->count;
     bar->state = sub;
     if (setup->bg >= 4) {
@@ -254,7 +254,7 @@ static void TouchBarGfx_Load(TouchBarGfx *gfx, u8 bg, u32 vramType, u32 bgScreen
                              u8 objPalette, BOOL noBg, HeapID heapId) {
     ArcTool *arc;
 
-    sys_memset(gfx, 0, sizeof(TouchBarGfx));
+    MI_CpuFill8(gfx, 0, sizeof(TouchBarGfx));
     gfx->bg = bg;
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     if (!noBg) {
@@ -274,7 +274,7 @@ static void TouchBarGfx_Unload(TouchBarGfx *gfx) {
     func_0204b98c(gfx->res[TOUCHBAR_RES_CHARS]);
     func_0204bcd0(gfx->res[TOUCHBAR_RES_PALETTE]);
     GFL_BGSysFreeCharMemory(gfx->bg, CHAR_POS(gfx->bgChars), CHAR_SIZE(gfx->bgChars));
-    sys_memset(gfx, 0, sizeof(TouchBarGfx));
+    MI_CpuFill8(gfx, 0, sizeof(TouchBarGfx));
 }
 
 static u32 TouchBarGfx_GetResource(const TouchBarGfx *gfx, u32 res) {
@@ -311,10 +311,10 @@ static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *
     u32 palette;
     u32 cellAnims;
 
-    sys_memset(icon, 0, sizeof(TouchBarIcon));
+    MI_CpuFill8(icon, 0, sizeof(TouchBarIcon));
     icon->item = *item;
     icon->active = TRUE;
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = item->pos.x;
     setup.y = item->pos.y;
     if (item->icon >= TOUCHBAR_ICON_CUSTOM) {
@@ -352,7 +352,7 @@ static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *
 
 static void TouchBarIcon_Delete(TouchBarIcon *icon) {
     func_0204c108(icon->actor);
-    sys_memset(icon, 0, sizeof(TouchBarIcon));
+    MI_CpuFill8(icon, 0, sizeof(TouchBarIcon));
 }
 
 // Whether the icon was touched or its key pressed, in which case its touch callback has run

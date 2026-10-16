@@ -86,7 +86,7 @@ static const BGSysVRAMConfig sBootVRAMConfig = {
 
 static BOOL BootScreens_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TITLE, 0x70000);
-    sys_memset(GFL_ProcInitSubsystem(proc, sizeof(BootScreensWork), HEAPID_TITLE), 0, sizeof(BootScreensWork));
+    MI_CpuFill8(GFL_ProcInitSubsystem(proc, sizeof(BootScreensWork), HEAPID_TITLE), 0, sizeof(BootScreensWork));
     return TRUE;
 }
 
@@ -109,12 +109,12 @@ static BOOL BootScreens_Main(GameProc *proc, u32 *state, void *param, void *work
         GFL_BGSysCreateBG(1, &sBootBGSetupMain, BGMODE_TEXT);
         GFL_BGSysCreateBG(5, &sBootBGSetupSub, BGMODE_TEXT);
         if (bootParam->skipLogos == TRUE) {
-            GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
             wk->state = STATE_LOAD_COPYRIGHT;
         } else {
-            GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 16);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 16);
+            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
             wk->state = STATE_LOAD_LOGOS;
         }
         break;

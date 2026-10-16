@@ -50,7 +50,7 @@ void GFL_StrBufClear(StrBuf *strbuf) {
 
 void GFL_StrBufCopy(StrBuf *dest, const StrBuf *src) {
     if (dest->size > src->length) {
-        sys_memcpy(src->chars, dest->chars, (src->length + 1) * sizeof(u16));
+        MI_CpuCopy8(src->chars, dest->chars, (src->length + 1) * sizeof(u16));
         dest->length = src->length;
     }
 }
@@ -114,7 +114,7 @@ void GFL_StrBufLoadFixedString(StrBuf *strbuf, const u16 *str, u32 length) {
 
 void GFL_StrBufCopyString(StrBuf *strbuf, const u16 *src, u32 length) {
     if (length != 0 && length <= strbuf->size) {
-        sys_memcpy(src, strbuf->chars, length * sizeof(u16));
+        MI_CpuCopy8(src, strbuf->chars, length * sizeof(u16));
         strbuf->length = length - 1;
     }
 }
@@ -143,7 +143,7 @@ u16 GFL_StrBufGetTerminator(void) {
 
 void GFL_StrBufConcat(StrBuf *dest, const StrBuf *src) {
     if (dest->length + src->length + 1 <= dest->size) {
-        sys_memcpy(src->chars, &dest->chars[dest->length], (src->length + 1) * sizeof(u16));
+        MI_CpuCopy8(src->chars, &dest->chars[dest->length], (src->length + 1) * sizeof(u16));
         dest->length += src->length;
     }
 }

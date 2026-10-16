@@ -182,7 +182,7 @@ static void PokeListBattle_LoadResources(PokeListWork *wk) {
     iconArc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
     wk->clResources[CL_RES_PLTT(7)] = func_0204bc48(iconArc, PokeIcon_GetPaletteFile(), 1, 0xc0, wk->heapId);
     GFL_ArcToolFree(iconArc);
-    sys_memcpy16((void *)(HW_DB_BG_PLTT + 0x40), wk->timerBaseColors, sizeof(wk->timerBaseColors));
+    MIi_CpuCopy16((void *)(HW_DB_BG_PLTT + 0x40), wk->timerBaseColors, sizeof(wk->timerBaseColors));
 }
 
 static void PokeListBattle_FreeResources(PokeListWork *wk) {

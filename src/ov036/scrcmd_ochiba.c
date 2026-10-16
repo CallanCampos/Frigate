@@ -154,7 +154,7 @@ BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env) {
     caught = ScriptReadAny(vm, env);
     result = ScriptReadVar(vm, env);
     arc = GFL_ArcSysCreateFileHandle(0x128, heapId);
-    sys_memset(&list, 0, sizeof(HabitatList));
+    MI_CpuFill8(&list, 0, sizeof(HabitatList));
     for (i = 0; i < 57; i++) {
         header = &HABITAT_LIST_HEADERS[i];
         if (header->zoneId == zoneId) {
@@ -173,7 +173,7 @@ BOOL CheckHabitatList(const HabitatList *list, PokeDexSave *pokedex, u8 time, u3
     u8 found[3];
 
     for (i = 0; i < list->count; i++) {
-        sys_memset(found, 0, sizeof(found));
+        MI_CpuFill8(found, 0, sizeof(found));
         for (j = 0; j < 4; j++) {
             found[time] |= list->entries[i].encounters[j][time];
         }

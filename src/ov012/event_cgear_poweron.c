@@ -63,7 +63,7 @@ GameEvent *EventCGearPowerOn_Create(GameSystem *gsys, BOOL bootComm) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventCGearPowerOn_Callback, sizeof(CGearPowerOnData));
     CGearPowerOnData *data = GameEvent_GetData(event);
 
-    sys_memset(data, 0, sizeof(CGearPowerOnData));
+    MI_CpuFill8(data, 0, sizeof(CGearPowerOnData));
     data->gsys = gsys;
     data->bootComm = bootComm;
     return event;

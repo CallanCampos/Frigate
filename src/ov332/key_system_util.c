@@ -185,7 +185,7 @@ KeySystemMsgWin *KeySystemMsgWin_Create(u16 bg, u16 x, u16 y, u16 width, u16 hei
                                         HeapID heapId) {
     KeySystemMsgWin *win = GFL_HeapAllocate(heapId, sizeof(KeySystemMsgWin), FALSE, "key_system_util.c", 98);
 
-    sys_memset(win, 0, sizeof(KeySystemMsgWin));
+    MI_CpuFill8(win, 0, sizeof(KeySystemMsgWin));
     win->font = font;
     win->printQueue = func_02021998(heapId);
     win->mode = KEY_SYSTEM_MSG_IDLE;
@@ -488,7 +488,7 @@ KeySystemMenu *KeySystemMenu_CreateAt(const KeySystemMenuSetup *setup, u8 x, u8 
     KeySystemMenu *menu = GFL_HeapAllocate(heapId, sizeof(KeySystemMenu), FALSE, "key_system_util.c", 741);
     BmpMenuListHeader header;
 
-    sys_memset(menu, 0, sizeof(KeySystemMenu));
+    MI_CpuFill8(menu, 0, sizeof(KeySystemMenu));
     menu->printQueue = setup->printQueue;
     menu->cancelValue = setup->cancelValue;
     menu->window = BmpWin_CreateDynamic(setup->bg, x, y, width, height, setup->palette, TRUE);
@@ -558,9 +558,9 @@ KeySystemList *KeySystemList_Create(const KeySystemListSetup *setup, HeapID heap
     list->cursor = setup->cursor;
     file = GFL_G2DIOReadNCLR(ARCID_KEY_SYSTEM, 1, &palette, heapId);
     colors = palette->rawData;
-    sys_memcpy(&colors[0], list->palettes[0], sizeof(list->palettes[0]));
-    sys_memcpy(&colors[16], list->palettes[1], sizeof(list->palettes[1]));
-    sys_memcpy(&colors[32], list->palettes[2], sizeof(list->palettes[2]));
+    MI_CpuCopy8(&colors[0], list->palettes[0], sizeof(list->palettes[0]));
+    MI_CpuCopy8(&colors[16], list->palettes[1], sizeof(list->palettes[1]));
+    MI_CpuCopy8(&colors[32], list->palettes[2], sizeof(list->palettes[2]));
     GFL_HeapFree(file);
     for (i = 0; i < setup->count; i++) {
         list->wins[i] = KeySystemMsgWin_Create(setup->bg, setup->items[i].x, setup->items[i].y, setup->items[i].width,
@@ -727,7 +727,7 @@ KeySystemSeq *KeySystemSeq_Create(u32 depth, void *work, KeySystemSeqFunc func, 
     u32 size = sizeof(KeySystemSeqEntry) * (depth + 1);
     KeySystemSeq *seq = GFL_HeapAllocate(heapId, size, FALSE, "key_system_util.c", 1294);
 
-    sys_memset(seq, 0, size);
+    MI_CpuFill8(seq, 0, size);
     seq->work = work;
     seq->depth = depth;
     KeySystemSeq_Set(seq, func);
@@ -758,7 +758,7 @@ BOOL KeySystemSeq_IsEmpty(KeySystemSeq *seq) {
 void KeySystemSeq_Set(KeySystemSeq *seq, KeySystemSeqFunc func) {
     KeySystemSeqEntry *entry = KeySystemSeq_GetEntry(seq, seq->current);
 
-    sys_memset(entry, 0, sizeof(KeySystemSeqEntry));
+    MI_CpuFill8(entry, 0, sizeof(KeySystemSeqEntry));
     entry->func = func;
 }
 
@@ -883,11 +883,11 @@ KeySystemOamText *KeySystemOamText_Create(const ClActorSetup *setup, u16 width, 
     KeySystemOamText *text = GFL_HeapAllocate(heapId, sizeof(KeySystemOamText), FALSE, "key_system_util.c", 1742);
     BmpOamActorSetup actorSetup;
 
-    sys_memset(text, 0, sizeof(KeySystemOamText));
+    MI_CpuFill8(text, 0, sizeof(KeySystemOamText));
     text->printQueue = func_02021998(heapId);
     text->str = GFL_StrBufCreate(128, heapId);
     text->bitmap = GFL_BitmapCreate(width, height, 32, heapId);
-    sys_memset(&actorSetup, 0, sizeof(BmpOamActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(BmpOamActorSetup));
     actorSetup.bitmap = text->bitmap;
     actorSetup.x = setup->x;
     actorSetup.y = setup->y;

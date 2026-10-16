@@ -418,7 +418,7 @@ static void BChoiceMain_Step(BChoiceWork *work) {
 
 static void BChoiceMain_Init(BChoiceWork *work) {
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->printQueue = func_02021998(work->param->heapId);
     work->positions = GFL_ArcSysReadHeapNew(ARCID_BATTLE_CHOICE, FILE_POSITIONS, work->param->heapId);
@@ -773,7 +773,7 @@ static void BChoiceMain_CreateActors(BChoiceWork *work, u32 surface, const BChoi
     ClActUnit *unit = work->unit;
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     ClActor **actors = work->actors;
     s16 palette = resources[0];
     s16 chars = resources[1];
@@ -906,7 +906,7 @@ static void BChoiceMain_UpdateFlash(BChoiceWork *work) {
         work->blend++;
     }
     blend = work->blend;
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 6, 0x39, 16 - blend, blend + 15);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 6, 0x39, 16 - blend, blend + 15);
     G2S_SetWnd0InsidePlane(0x1f, FALSE);
     if (work->blend > 10) {
         G2S_SetWndOutsidePlane(0x1d, TRUE);

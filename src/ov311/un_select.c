@@ -382,7 +382,7 @@ static TouchBar *UnSelect_CreateTouchBar(ClActUnit *unit, HeapID heapId) {
     TouchBarSetup setup;
     TouchBar *touchBar;
 
-    sys_memset(&setup, 0, sizeof(TouchBarSetup));
+    MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
     setup.items = items;
     setup.count = NELEMS(items);
     setup.unit = unit;
@@ -666,7 +666,7 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_UN_SELECT, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(UnSelectWork), HEAPID_UN_SELECT);
-    sys_memset(wk, 0, sizeof(UnSelectWork));
+    MI_CpuFill8(wk, 0, sizeof(UnSelectWork));
     wk->heapId = HEAPID_UN_SELECT;
     wk->param = param;
     for (i = 0; i < UN_SELECT_FLOOR_COUNT; i++) {
@@ -680,8 +680,8 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
         wk->visitorFloors[i] =
             param->visitorCountries[i] != 0 ? UnSelect_FindCountry(param->visitorCountries[i]) : UN_SELECT_NO_FLOOR;
     }
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     wk->graphic = UnSelectGraphic_Create(0, wk->heapId);
     wk->scene = UIScene_Create(wk->heapId, sUnSelectSteps, UN_SELECT_STEP_COUNT, UN_SELECT_STEP_LIST, wk);
     UnSelect_LoadBG(wk, wk->heapId);
@@ -694,7 +694,7 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
     UnSelect_CreateList(wk);
     UnSelect_CreateActors(wk);
     UnSelect_PlaceVisitors(wk);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
     wk->hblankTask = GFL_HBlankTCBAdd(UnSelect_HBlank, wk, 0);
     func_02042ba8(TRUE, wk->heapId);
     return wk;

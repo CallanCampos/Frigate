@@ -375,14 +375,14 @@ static BOOL MBParent_Main(MBParentWork *wk) {
         const char *path = GFL_ArcSysGetResourcePath(142);
         BOOL result;
 
-        finit(&file);
-        result = romfs_fopen(&file, path);
+        FS_InitFile(&file);
+        result = FS_OpenFile(&file, path);
         GFL_ASSERT(result);
-        romfs_fseek(&file, 0, 0);
-        wk->childRomSize = GetFileSize(&file);
+        FS_SeekFile(&file, 0, 0);
+        wk->childRomSize = FS_GetLength(&file);
         wk->childRom = GFL_HeapAllocate(wk->heapId, wk->childRomSize, TRUE, "mb_parent_sys.c", 665);
-        romfs_fread(&file, wk->childRom, wk->childRomSize);
-        result = romfs_fclose(&file);
+        FS_ReadFile(&file, wk->childRom, wk->childRomSize);
+        result = FS_CloseFile(&file);
         GFL_ASSERT(result);
         wk->state = MB_PARENT_STATE_CHILD_PROGRAM_LOADED;
         break;
@@ -801,8 +801,8 @@ static void MBParent_SetupGameInfo(MBParentWork *wk) {
 #endif
     nameLength = GFL_StrBufGetCharCount(name);
     introLength = GFL_StrBufGetCharCount(intro);
-    sys_memcpy16(GFL_StrBufGetStringPtr(name), wk->gameName, nameLength * 2);
-    sys_memcpy16(GFL_StrBufGetStringPtr(intro), wk->gameIntro, introLength * 2);
+    MIi_CpuCopy16(GFL_StrBufGetStringPtr(name), wk->gameName, nameLength * 2);
+    MIi_CpuCopy16(GFL_StrBufGetStringPtr(intro), wk->gameIntro, introLength * 2);
     GFL_StrBufFree(name);
     GFL_StrBufFree(intro);
     // The child's font has the characters of the game's charset at other codes
@@ -833,12 +833,12 @@ static void MBParent_SetupGameInfo(MBParentWork *wk) {
         GFL_BGSysSetBGEnabled(5, TRUE);
         GFL_BGSysSetBGEnabled(4, TRUE);
     }
-    func_0206ff50(MBParent_CardPulledOut);
+    CARD_SetPulledOutCallback(MBParent_CardPulledOut);
 }
 
 static void MBParent_FreeGameInfo(MBParentWork *wk) {
     GFL_OvlUnload(OVERLAY_ID(30));
-    func_0206ff50(NULL);
+    CARD_SetPulledOutCallback(NULL);
     GFL_HeapFree(wk->gameName);
     GFL_HeapFree(wk->gameIntro);
     if (wk->startMenu == FALSE) {
@@ -938,7 +938,7 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         }
         break;
     }
-    func_0203e7f8(WM_LINK_LEVEL_3 - func_020810fc());
+    func_0203e7f8(WM_LINK_LEVEL_3 - WM_GetLinkLevel());
     func_0203e838();
     return FALSE;
 }
@@ -953,7 +953,7 @@ static void MBParent_StartMBP(MBParentWork *wk) {
     };
     u16 channel = WH_GetMeasureChannel();
 
-    sys_memcpy(&registry, &wk->registry, sizeof(MBGameRegistry));
+    MI_CpuCopy8(&registry, &wk->registry, sizeof(MBGameRegistry));
     if (wk->startMenu == FALSE) {
         wk->registry.romFilePathp = romPaths[0];
     } else {
@@ -1112,15 +1112,15 @@ static void MBParent_SoftResetCallback(void *work) {
         MBP_Cancel();
     }
     while (MBP_GetState() != MBP_STATE_STOP && MBP_GetState() != MBP_STATE_COMPLETE) {
-        irq_waitFor(TRUE, OS_IE_V_BLANK);
+        OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     }
     if (wk->wirelessStarted == TRUE) {
         sWirelessDone = FALSE;
         while (WH_End(MBParent_OnWirelessDone)) {
-            irq_waitFor(TRUE, OS_IE_V_BLANK);
+            OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         }
         while (sWirelessDone == FALSE) {
-            irq_waitFor(TRUE, OS_IE_V_BLANK);
+            OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         }
     }
 }

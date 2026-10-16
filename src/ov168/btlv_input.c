@@ -813,7 +813,7 @@ void BtlvInput_StartFadeInWithGraphics(BtlvInput *work) {
     BtlvInputWorkTask *task;
 
     task = GFL_HeapAllocate(HEAPID_TAIL(work->heapId), sizeof(BtlvInputWorkTask), FALSE, "btlv_input.c", 0x5a2);
-    if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) <= 0) {
+    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) <= 0) {
         GFL_FadeSet(FADE_ENGINE_B_BLACK, 16, 0, 0);
     } else {
         GFL_FadeSet(FADE_ENGINE_B_WHITE, 16, 0, 0);
@@ -1371,7 +1371,8 @@ static void BtlvInput_LoadGraphics(BtlvInput *work) {
         loadBGScrToVramByFileNoReserveNegAlign(work->arc, BtlvInput_FileId(0x17e, work), 7, 0, 0, FALSE, work->heapId);
         PaletteFade_LoadArcNCLR(work->paletteFade, work->arc, palFile, work->heapId, 1, 0x1e0, 0);
         if (work->inBattle == TRUE) {
-            sys_memcpy16(PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 1) + 0x20, work->savedPalette, 0x20);
+            MIi_CpuCopy16(PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 1) + 0x20, work->savedPalette,
+                          0x20);
         }
     }
     work->chars = func_0204b81c(work->arc, 0x1a4, FALSE, 1, work->heapId);
@@ -1549,7 +1550,7 @@ static void BtlvInput_MovesToCommandTask(TCB *tcb, void *data) {
         if (param->work->subTaskCount == 0) {
             BtlvInput_SetPartyIconsActive(param->work, TRUE);
             if (param->work->iconActors[0].actor != NULL) {
-                gfxRegSetBrightnessBlend(0x4001050, 0x10, -8);
+                G2x_SetBlendBrightness_(0x4001050, 0x10, -8);
             }
             BmpWin_FlushChar(param->work->subWin);
             BtlvInput_EndTask(param->work, tcb);
@@ -1917,15 +1918,15 @@ static void BtlvInput_LoadTypePalettes(BtlvInput *work) {
     void *buf;
 
     work->typePalBuf = GFL_HeapAllocate(work->heapId, 0x180, FALSE, "btlv_input.c", 3411);
-    sys_memset(work->typePalBuf, 0, 0x180);
+    MI_CpuFill8(work->typePalBuf, 0, 0x180);
     work->typePalBuf2 = GFL_HeapAllocate(work->heapId, 0x1e0, FALSE, "btlv_input.c", 3414);
-    sys_memset(work->typePalBuf2, 0, 0x1e0);
+    MI_CpuFill8(work->typePalBuf2, 0, 0x1e0);
 
     buf = GFL_G2DIOReadNCLRArc(work->arc, 0x23a, &palette, work->heapId);
-    sys_memcpy(palette->rawData, work->typePalBuf, 0x180);
+    MI_CpuCopy8(palette->rawData, work->typePalBuf, 0x180);
     GFL_HeapFree(buf);
     buf = GFL_G2DIOReadNCLRArc(work->arc, 0x230, &palette2, work->heapId);
-    sys_memcpy(palette2->rawData, work->typePalBuf2, 0x1e0);
+    MI_CpuCopy8(palette2->rawData, work->typePalBuf2, 0x1e0);
     GFL_HeapFree(buf);
     work->typePalLoaded = TRUE;
 }
@@ -2416,7 +2417,7 @@ static void BtlvInput_WindowDarkenTask(TCB *tcb, void *data) {
     G2S_SetWnd0InsidePlane(0x1f, param->value > 1);
     G2S_SetWnd1InsidePlane(0x1f, param->value == 3);
     G2S_SetWndOutsidePlane(0x1f, FALSE);
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_OBJ, -8);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_OBJ, -8);
     BtlvInput_EndTask(param->work, tcb);
 }
 
@@ -2428,7 +2429,7 @@ static void BtlvInput_WindowClearTask(TCB *tcb, void *data) {
     G2S_SetWnd0InsidePlane(0, FALSE);
     G2S_SetWnd1InsidePlane(0, FALSE);
     G2S_SetWndOutsidePlane(0, FALSE);
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0, 0);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0, 0);
     BtlvInput_EndTask(param->work, tcb);
 }
 
@@ -2443,7 +2444,7 @@ static void BtlvInput_StartClearBlend(BtlvInput *work) {
 static void BtlvInput_ClearBlendTask(TCB *tcb, void *data) {
     BtlvInputSimpleTask *param = data;
 
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0, 0);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0, 0);
     BtlvInput_EndTask(param->work, tcb);
 }
 

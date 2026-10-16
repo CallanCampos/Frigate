@@ -257,7 +257,7 @@ static BOOL ShinkaDemo_Init(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_SHINKA_DEMO, 0x10000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ShinkaDemoWork), HEAPID_SHINKA_DEMO);
-    sys_memset(wk, 0, sizeof(ShinkaDemoWork));
+    MI_CpuFill8(wk, 0, sizeof(ShinkaDemoWork));
     wk->heapId = HEAPID_SHINKA_DEMO;
     wk->state = SHINKA_DEMO_WAIT;
     wk->wait = 5;
@@ -607,7 +607,7 @@ static BOOL ShinkaDemo_Main(GameProc *proc, u32 *state, void *param, void *work)
             ShinkaDemoGraphic_FreeSubBG(wk->graphic);
             wk->usingKeys = func_0203d554() == FALSE;
             wk->tcbBuffer = GFL_HeapAllocate(wk->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "shinka_demo.c", 1360);
-            sys_memset(wk->tcbBuffer, 0, GFL_TCBMgrCalcAllocSize(8));
+            MI_CpuFill8(wk->tcbBuffer, 0, GFL_TCBMgrCalcAllocSize(8));
             wk->tcbManager = GFL_TCBMgrCreate(8, wk->tcbBuffer);
             wk->paletteFade = PaletteFade_Create(wk->heapId);
             PaletteFade_SetTransferAll(wk->paletteFade, TRUE);
@@ -832,10 +832,10 @@ static void ShinkaDemo_InitGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
     } else {
         wk->effect = ShinkaDemoEffect_Create(wk->graphicHeapId, TRUE);
     }
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
-                        GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        0, 0);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                       GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
+                           GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       0, 0);
 }
 
 static void ShinkaDemo_FreeGraphics(ShinkaDemoParam *param, ShinkaDemoWork *wk) {

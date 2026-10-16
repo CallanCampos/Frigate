@@ -13,6 +13,7 @@
 #include "gfl/net_handle.h"
 #include "gfl/overlay.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
@@ -42,7 +43,7 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     PokeParty_Copy(GameData_GetParty(gameData), colosseum->party[self]);
     member = &colosseum->members[self];
     func_02008b34(info, &member->info);
-    func_0207c33c(member->mac);
+    OS_GetMacAddress(member->mac);
     member->unk26 = 1;
     value = 1;
     if (flag == 1) {
@@ -206,7 +207,7 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
     int selfTeam;
     int slot;
 
-    sys_memset(players, 0, sizeof(ColosseumPlayers));
+    MI_CpuFill8(players, 0, sizeof(ColosseumPlayers));
     players->battle.unk44 = 3;
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
         if (colosseum->partyReady[i] == 0) {
@@ -236,7 +237,7 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
 }
 
 void func_ov028_02172c60(ColosseumPlayers *players) {
-    sys_memset(players, 0, sizeof(ColosseumPlayers));
+    MI_CpuFill8(players, 0, sizeof(ColosseumPlayers));
 }
 
 static void Colosseum_SetPlayer(UnionColosseum *colosseum, BattlePlayer *player, u8 index, u32 unused) {

@@ -121,7 +121,7 @@ static BOOL TDownload_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_RECORD, 0x40000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TDownloadWork), HEAPID_WBT_RECORD);
-    sys_memset(wk, 0, sizeof(TDownloadWork));
+    MI_CpuFill8(wk, 0, sizeof(TDownloadWork));
     wk->heapId = HEAPID_WBT_RECORD;
     wk->param = param;
     wk->graphic = TDownloadGraphic_Create(0, wk->heapId);

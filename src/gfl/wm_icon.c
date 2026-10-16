@@ -126,10 +126,10 @@ static u32 func_0203e5ec(u32 engine, u32 charNo) {
     GXOBJVRamModeChar mode;
 
     if (engine == 1) {
-        gfxGetObjBanksA();
+        GX_GetBankForOBJ();
         mode = GX_GetOBJVRamModeChar();
     } else {
-        gfxGetObjBanksB();
+        GX_GetBankForSubOBJ();
         mode = GXS_GetOBJVRamModeChar();
     }
     switch (mode) {
@@ -177,9 +177,9 @@ static void func_0203e694(WmIcon *icon, BOOL top, HeapID heapId) {
 
 static u32 getObjBank(u32 engine) {
     if (engine == 1) {
-        gfxGetObjBanksA();
+        GX_GetBankForOBJ();
     } else {
-        gfxGetObjBanksB();
+        GX_GetBankForSubOBJ();
     }
     return 0;
 }
@@ -205,8 +205,8 @@ static void func_0203e6cc(u32 engine, u32 type, HeapID heapId) {
 }
 
 static void copyEmptyOAM(void) {
-    gfxUploadOAMA(sEmptyOam, 0, sizeof(sEmptyOam));
-    gfxUploadOAMB(sEmptyOam, 0, sizeof(sEmptyOam));
+    GX_LoadOAM(sEmptyOam, 0, sizeof(sEmptyOam));
+    GXS_LoadOAM(sEmptyOam, 0, sizeof(sEmptyOam));
 }
 
 void func_0203e76c(u32 x, u32 y, u32 type, HeapID heapId) {

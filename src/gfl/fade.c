@@ -22,7 +22,7 @@ static FadeMgr *sFadeMgr;
 
 void GFL_FadeCreate(u32 heapId) {
     sFadeMgr = GFL_HeapAllocate(heapId, sizeof(FadeMgr), FALSE, "fade.c", 50);
-    sys_memset(sFadeMgr, 0, sizeof(FadeMgr));
+    MI_CpuFill8(sFadeMgr, 0, sizeof(FadeMgr));
     GFL_FadeSetUpdateFreqOne();
 }
 
@@ -90,15 +90,15 @@ BOOL GFL_FadeIsRunning(void) {
 
 void GFL_FadeFlush(void) {
     if (sFadeMgr->mode & FADE_ENGINE_A_BLACK) {
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -sFadeMgr->brightness);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -sFadeMgr->brightness);
     }
     if (sFadeMgr->mode & FADE_ENGINE_B_BLACK) {
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -sFadeMgr->brightness);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -sFadeMgr->brightness);
     }
     if (sFadeMgr->mode & FADE_ENGINE_A_WHITE) {
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, sFadeMgr->brightness);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, sFadeMgr->brightness);
     }
     if (sFadeMgr->mode & FADE_ENGINE_B_WHITE) {
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, sFadeMgr->brightness);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, sFadeMgr->brightness);
     }
 }

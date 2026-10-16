@@ -151,7 +151,7 @@ static u32 sCompatibleIrcSysInfo = 13;
 CompatibleIrcSys *CompatibleIrcSys_Create(int unk40, GameData *gameData, HeapID heapId, BOOL disabled) {
     CompatibleIrcSys *sys = GFL_HeapAllocate(heapId, sizeof(CompatibleIrcSys), FALSE, "compatible_irc_sys.c", 275);
 
-    sys_memset(sys, 0, sizeof(CompatibleIrcSys));
+    MI_CpuFill8(sys, 0, sizeof(CompatibleIrcSys));
     sys->unk40 = unk40;
     sys->heapId = heapId;
     sys->syncStarted = FALSE;
@@ -522,7 +522,7 @@ static void CompatibleIrcSys_RecvId(int netId, int size, const void *data, void 
     u32 id;
 
     if (func_02042bc4()) {
-        sys_memcpy(data, &id, 4);
+        MI_CpuCopy8(data, &id, 4);
         sys->ids[netId] = id;
     }
 }
@@ -540,20 +540,20 @@ static void CompatibleIrcSys_RecvCount(int netId, int size, const void *data, vo
 
     if (handle == func_02040440()) {
         if (netId != func_0203ffc4()) {
-            sys_memcpy(data, &sys->receivedCount, 4);
+            MI_CpuCopy8(data, &sys->receivedCount, 4);
         }
     }
 }
 
 static void CompatibleIrcSync_Init(CompatibleIrcSync *sync, CompatibleIrcSys *sys, HeapID heapId) {
-    sys_memset(sync, 0, sizeof(CompatibleIrcSync));
+    MI_CpuFill8(sync, 0, sizeof(CompatibleIrcSync));
     sync->sys = sys;
     sync->ownProfile = GFL_HeapAllocate(heapId, sizeof(CompatibleIrcProfile), FALSE, "compatible_irc_sys.c", 1403);
-    sys_memset(sync->ownProfile, 0, sizeof(CompatibleIrcProfile));
+    MI_CpuFill8(sync->ownProfile, 0, sizeof(CompatibleIrcProfile));
     sync->recvProfileOwn = GFL_HeapAllocate(heapId, sizeof(CompatibleIrcProfile), FALSE, "compatible_irc_sys.c", 1405);
-    sys_memset(sync->recvProfileOwn, 0, sizeof(CompatibleIrcProfile));
+    MI_CpuFill8(sync->recvProfileOwn, 0, sizeof(CompatibleIrcProfile));
     sync->recvProfilePeer = GFL_HeapAllocate(heapId, sizeof(CompatibleIrcProfile), FALSE, "compatible_irc_sys.c", 1407);
-    sys_memset(sync->recvProfilePeer, 0, sizeof(CompatibleIrcProfile));
+    MI_CpuFill8(sync->recvProfilePeer, 0, sizeof(CompatibleIrcProfile));
     CompatibleIrcSys_AddCommands(sys, 0x1000, sCompatibleIrcSyncCommands, NELEMS(sCompatibleIrcSyncCommands), sync);
 }
 
@@ -562,7 +562,7 @@ static void CompatibleIrcSync_Exit(CompatibleIrcSync *sync) {
     GFL_HeapFree(sync->ownProfile);
     GFL_HeapFree(sync->recvProfileOwn);
     GFL_HeapFree(sync->recvProfilePeer);
-    sys_memset(sync, 0, sizeof(CompatibleIrcSync));
+    MI_CpuFill8(sync, 0, sizeof(CompatibleIrcSync));
 }
 
 static BOOL CompatibleIrcSync_SendSelection(CompatibleIrcSync *sync, u32 a, u32 b) {
@@ -633,7 +633,7 @@ static void CompatibleIrcSync_RecvSelection(int netId, int size, const void *dat
 
     if (handle == func_02040440()) {
         if (netId != func_0203ffc4()) {
-            sys_memcpy(data, sync->recvSelection, 8);
+            MI_CpuCopy8(data, sync->recvSelection, 8);
             sync->selectionReceived = TRUE;
         }
     }
@@ -666,7 +666,7 @@ static void CompatibleIrcSync_RecvProfile(int netId, int size, const void *data,
     if (sync->sys->gameData != NULL) {
         PlayerInfo *info = func_02017378(sync->sys->gameData, netId);
 
-        sys_memcpy(&profile->trainer, info, PlayerInfo_GetSize());
+        MI_CpuCopy8(&profile->trainer, info, PlayerInfo_GetSize());
     }
     if (handle == func_02040440()) {
         if (netId != func_0203ffc4()) {

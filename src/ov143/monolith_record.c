@@ -105,7 +105,7 @@ static BOOL MonolithRecord_Init(GameProc *proc, u32 *state, void *param, void *w
     switch (*state) {
     case 0:
         rw = GFL_ProcInitSubsystem(proc, sizeof(MonolithRecordWork), HEAPID_MONOLITH);
-        sys_memset(rw, 0, sizeof(MonolithRecordWork));
+        MI_CpuFill8(rw, 0, sizeof(MonolithRecordWork));
         MonolithRecord_CreateBGs();
         MonolithRecord_LoadScreen(screen->work);
         MonolithRecord_CreateWindows(screen->work, rw);

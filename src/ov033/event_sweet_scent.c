@@ -30,7 +30,7 @@ GameEvent *func_ov033_021785d4(GameSystem *gsys, Field *field, u8 partySlot) {
 
     event = GameEvent_Create(gsys, NULL, EventSweetScent_Callback, sizeof(SweetScentEventData));
     data = GameEvent_GetData(event);
-    sys_memset(data, 0, sizeof(SweetScentEventData));
+    MI_CpuFill8(data, 0, sizeof(SweetScentEventData));
     data->partySlot = partySlot;
     data->gsys = gsys;
     data->field = field;

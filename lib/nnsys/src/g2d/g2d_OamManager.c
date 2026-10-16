@@ -162,13 +162,13 @@ static inline void LoadOams_(u32 type, u16 from, u16 to) {
     u16 offset = from * sizeof(GXOamAttr);
     u16 size = (to - from + 1) * sizeof(GXOamAttr);
 
-    cp15_flushDC(src, size);
+    DC_FlushRange(src, size);
     switch (type) {
     case NNS_G2D_OAMTYPE_MAIN:
-        gfxUploadOAMA(src, offset, size);
+        GX_LoadOAM(src, offset, size);
         break;
     case NNS_G2D_OAMTYPE_SUB:
-        gfxUploadOAMB(src, offset, size);
+        GXS_LoadOAM(src, offset, size);
         break;
     }
 }
@@ -222,7 +222,7 @@ void NNS_G2dResetOamManagerBuffer(NNSG2dOamManagerInstance *man) {
         u32 size = GetOamSize_(&man->managedAttrRegion);
         GXOamAttr *oam = &GetOamBuffer_(man->type)->oamBuffer[man->managedAttrRegion.fromIdx];
 
-        cp15_invalidateDC(oam, size);
+        DC_InvalidateRange(oam, size);
         GXi_DmaFill32(GXi_DmaId, oam, 0xc0, size);
     } else {
         u16 i;

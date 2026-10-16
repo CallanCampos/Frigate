@@ -92,14 +92,14 @@ void *DWCRapCommon_Alloc(u32 name, u32 size, int align) {
     u32 mask;
 
     if (pDwcRapWork->headHandleSub != NULL && name == pDwcRapWork->subName && size > pDwcRapWork->subMinSize) {
-        mask = CPU_IRQDisable();
+        mask = OS_DisableInterrupts();
         ptr = NNS_FndAllocFromExpHeapEx(pDwcRapWork->headHandleSub, size, align);
-        CPU_SetIRQMask(mask);
+        OS_RestoreInterrupts(mask);
         pDwcRapWork->subCount++;
     } else {
-        mask = CPU_IRQDisable();
+        mask = OS_DisableInterrupts();
         ptr = NNS_FndAllocFromExpHeapEx(pDwcRapWork->heap, size, align);
-        CPU_SetIRQMask(mask);
+        OS_RestoreInterrupts(mask);
     }
 
     if (ptr == NULL) {
@@ -116,17 +116,17 @@ void DWCRapCommon_Free(u32 name, void *ptr, u32 size) {
     if (ptr != NULL) {
         if (NNS_FndGetExpHeapBlockGroup(ptr) == 0xea) {
             if (pDwcRapWork->headHandleSub != NULL) {
-                mask = CPU_IRQDisable();
+                mask = OS_DisableInterrupts();
                 NNS_FndFreeToExpHeap(pDwcRapWork->headHandleSub, ptr);
-                CPU_SetIRQMask(mask);
+                OS_RestoreInterrupts(mask);
                 pDwcRapWork->subCount--;
             } else {
                 func_020424ac(0, 0, 0, 0x3ee);
             }
         } else {
-            mask = CPU_IRQDisable();
+            mask = OS_DisableInterrupts();
             NNS_FndFreeToExpHeap(pDwcRapWork->heap, ptr);
-            CPU_SetIRQMask(mask);
+            OS_RestoreInterrupts(mask);
         }
     }
 }
@@ -158,23 +158,23 @@ static int DWCRapCommon_Init(HeapID heapId) {
     int result;
 
     DWCRapCommon_Create(heapId, 0x40000);
-    result = func_020584e4("syachi2ds", 0x4952414a, DWCRapCommon_Alloc, DWCRapCommon_Free);
+    result = DWC_InitForProduction("syachi2ds", 0x4952414a, DWCRapCommon_Alloc, DWCRapCommon_Free);
     DWCRapCommon_Delete();
     return result;
 }
 
 void DWCRapCommon_ResetUserData(void *userData) {
-    sys_memset32_fast(0, userData, 0x40);
-    if (!func_02057c90(userData)) {
-        func_02057c74(userData);
-        func_02057de8(userData);
+    MIi_CpuClearFast(0, userData, 0x40);
+    if (!DWC_CheckUserData(userData)) {
+        DWC_CreateUserData(userData);
+        DWC_ClearDirtyFlag(userData);
     }
 }
 
 static void DWCRapCommon_ShutdownLibrary(void) {
     func_020424e4();
     func_02042478();
-    func_02058490();
+    DWC_ClearError();
 }
 
 int DWCRapCommon_CheckError(u32 a0, u32 a1) {
@@ -193,7 +193,7 @@ int DWCRapCommon_CheckError(u32 a0, u32 a1) {
                     func_02012144();
                     return 1;
                 }
-                func_02058490();
+                DWC_ClearError();
                 // fall through
             case 3:
             case 4:

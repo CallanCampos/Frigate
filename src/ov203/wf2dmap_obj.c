@@ -140,7 +140,7 @@ WF2DMAP_OBJWK *WF2DMAP_OBJWkNew(WF2DMAP_OBJSYS *sys, const WF2DMAP_OBJDATA *data
 }
 
 void WF2DMAP_OBJWkDel(WF2DMAP_OBJWK *wk) {
-    sys_memset(wk, 0, sizeof(WF2DMAP_OBJWK));
+    MI_CpuFill8(wk, 0, sizeof(WF2DMAP_OBJWK));
 }
 
 WF2DMAP_OBJWK *WF2DMAP_OBJWkGet(WF2DMAP_OBJSYS *sys, u16 playId) {

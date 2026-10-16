@@ -34,7 +34,7 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
     int j;
     u32 code;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0; i < 6; i++) {
         if (sEmulatorMacMulti[i] != (mac[i] ^ 0xff)) {
             break;
@@ -68,7 +68,7 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     int j;
     u32 code;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0; i < 6; i++) {
         if (sEmulatorMacMulti[i] != (mac[i] ^ 0xff)) {
             break;
@@ -173,12 +173,12 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     u32 lockId;
     u32 i;
 
-    lockId = (u16)cart_key_create();
-    func_0206eef0(lockId);
+    lockId = (u16)OS_GetLockID();
+    CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (func_0206eed8()[0x14] + 17)), 0);
+        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
-        func_0206fd24(-1, address + offset, page, 0x200, 0, 0, 0);
+        CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
         if (i < 3) {
             address += 0x200;
@@ -193,7 +193,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     for (; i < 8; i++) {
         DSProt_ReadCardRaw(page, address, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
-        func_0206fd24(-1, address, page, 0x200, 0, 0, 0);
+        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
         address += 0x1000;
     }
@@ -201,12 +201,12 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     for (; i < 10; i++) {
         DSProt_ReadCardRaw(page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
-        func_0206fd24(-1, address, page, 0x200, 0, 0, 0);
+        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 10] = DSProt_Crc32Multi((u8 *)page, 0x200);
         address += 0x1000;
     }
-    func_0206ef38(lockId);
-    cart_key_release(lockId);
+    CARD_UnlockRom(lockId);
+    OS_ReleaseLockID(lockId);
     for (i = 0; i < 128; i++) {
         page[i] = i;
     }
@@ -244,12 +244,12 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     u32 lockId;
     u32 i;
 
-    lockId = (u16)cart_key_create();
-    func_0206eef0(lockId);
+    lockId = (u16)OS_GetLockID();
+    CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (func_0206eed8()[0x14] + 17)), 0);
+        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
-        func_0206fd24(-1, address + offset, page, 0x200, 0, 0, 0);
+        CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
         if (i < 3) {
             address += 0x200;
@@ -264,7 +264,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     for (; i < 8; i++) {
         DSProt_ReadCardRaw(page, address, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
-        func_0206fd24(-1, address, page, 0x200, 0, 0, 0);
+        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
         address += 0x1000;
     }
@@ -272,12 +272,12 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     for (; i < 10; i++) {
         DSProt_ReadCardRaw(page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
-        func_0206fd24(-1, address, page, 0x200, 0, 0, 0);
+        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 10] = DSProt_Crc32Multi((u8 *)page, 0x200);
         address += 0x1000;
     }
-    func_0206ef38(lockId);
-    cart_key_release(lockId);
+    CARD_UnlockRom(lockId);
+    OS_ReleaseLockID(lockId);
     for (i = 0; i < 128; i++) {
         page[i] = i;
     }

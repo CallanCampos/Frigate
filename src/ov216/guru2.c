@@ -82,7 +82,7 @@ static BOOL Guru2Proc_Init(GameProc *proc, u32 *state, void *param, void *work) 
     Guru2CallWork *wk;
 
     wk = GFL_ProcInitSubsystem(proc, sizeof(Guru2CallWork), HEAPID_GAMEEVENT);
-    sys_memset(wk, 0, sizeof(Guru2CallWork));
+    MI_CpuFill8(wk, 0, sizeof(Guru2CallWork));
     wk->gameData = g2param->gameData;
     wk->param = g2param;
     wk->procManager = CreateGameProcManager(HEAPID_USER);
@@ -118,7 +118,7 @@ static Guru2ProcWork *Guru2ProcWork_Create(Guru2Param *param, u32 heapId) {
     Guru2ProcWork *g2p;
 
     g2p = GFL_HeapAllocate(heapId, sizeof(Guru2ProcWork), FALSE, "guru2.c", 0xab);
-    sys_memset(g2p, 0, sizeof(Guru2ProcWork));
+    MI_CpuFill8(g2p, 0, sizeof(Guru2ProcWork));
     g2p->param = param;
     g2p->g2c = Guru2Comm_Create(g2p, heapId);
     return g2p;
@@ -178,7 +178,7 @@ static BOOL Guru2Seq_WaitPokeList(Guru2CallWork *wk) {
         GetGameDataPlayerInfo(wk->gameData);
         pokedex = GameData_GetPokedex(wk->gameData);
         wk->pokeStatus = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(PStatusParam), FALSE, "guru2.c", 0x147);
-        sys_memset(wk->pokeStatus, 0, sizeof(PStatusParam));
+        MI_CpuFill8(wk->pokeStatus, 0, sizeof(PStatusParam));
         party = GameData_GetParty(wk->gameData);
         wk->pokeStatus->party = party;
         wk->pokeStatus->gameData = wk->gameData;

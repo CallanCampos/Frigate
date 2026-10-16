@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "dwc/ext.h"
+#include "dwc/memfunc.h"
 
 // What the files of the GameSpy HTTP client share, in overlay 189 after the NHTTP client. The ROM names one of the
 // files, ghttpEncryption.c, so the others are named after the files of GameSpy's ghttp that pret/pokerevo's Wii build
@@ -178,9 +179,7 @@ struct GHIConnection {
     u32 lastRecvTime;
 };
 
-// The allocator that DWC's code gets its memory from (a heap of the game), and its free
-void *func_020586e4(int heap, u32 size);
-void func_02058728(int heap, void *ptr, int unused);
+// The allocator that DWC's code gets its memory from (a heap of the game), and its free, are in dwc/memfunc.h
 
 // ghttpBuffer
 BOOL ghiResizeBuffer(GHIBuffer *buffer, int count);

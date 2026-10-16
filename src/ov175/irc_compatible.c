@@ -123,10 +123,10 @@ static BOOL IrcCompatible_Init(GameProc *proc, u32 *state, void *param, void *wo
     GFL_HeapCreateChild(HEAPID_USER, HEAP_ID, 0x8000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcCompatibleWork), HEAP_ID);
     gameData = NULL;
-    sys_memset(wk, 0, sizeof(IrcCompatibleWork));
+    MI_CpuFill8(wk, 0, sizeof(IrcCompatibleWork));
     wk->param = param;
     wk->profile = GFL_HeapAllocate(HEAP_ID, sizeof(CompatibleIrcProfile), FALSE, "irc_compatible.c", 281);
-    sys_memset(wk->profile, 0, sizeof(CompatibleIrcProfile));
+    MI_CpuFill8(wk->profile, 0, sizeof(CompatibleIrcProfile));
     IrcCompatible_InitSubProc(&wk->subProc, HEAP_ID);
     if (wk->param->gsys != NULL) {
         gameData = GSYS_GetGameData(wk->param->gsys);
@@ -289,7 +289,7 @@ static void IrcCompatible_StepFlowB(IrcCompatibleWork *wk, u16 *state) {
 }
 
 static void IrcCompatible_InitSubProc(IrcCompatibleSubProc *subProc, HeapID heapId) {
-    sys_memset(subProc, 0, sizeof(IrcCompatibleSubProc));
+    MI_CpuFill8(subProc, 0, sizeof(IrcCompatibleSubProc));
     subProc->manager = CreateGameProcManager(heapId);
 }
 
@@ -299,7 +299,7 @@ static BOOL IrcCompatible_UpdateSubProc(IrcCompatibleSubProc *subProc) {
 
 static void IrcCompatible_FreeSubProc(IrcCompatibleSubProc *subProc) {
     FreeGameProcManager(subProc->manager);
-    sys_memset(subProc, 0, sizeof(IrcCompatibleSubProc));
+    MI_CpuFill8(subProc, 0, sizeof(IrcCompatibleSubProc));
 }
 
 // Runs a screen, and returns TRUE once it has ended and given its result back
@@ -334,7 +334,7 @@ static BOOL IrcCompatible_RunSubProc(IrcCompatibleSubProc *subProc, int index, H
 static void *IrcCompatible_CreateParam0(HeapID heapId, IrcCompatibleWork *wk) {
     IrcCompatibleParam0 *param = GFL_HeapAllocate(heapId, sizeof(IrcCompatibleParam0), FALSE, "irc_compatible.c", 878);
 
-    sys_memset(param, 0, sizeof(IrcCompatibleParam0));
+    MI_CpuFill8(param, 0, sizeof(IrcCompatibleParam0));
     param->gsys = wk->param->gsys;
     param->sys = wk->sys;
     param->profile = wk->profile;
@@ -362,7 +362,7 @@ static void IrcCompatible_FreeParam0(void *param, IrcCompatibleWork *wk) {
 static void *IrcCompatible_CreateParam1(HeapID heapId, IrcCompatibleWork *wk) {
     IrcCompatibleParam1 *param = GFL_HeapAllocate(heapId, sizeof(IrcCompatibleParam1), FALSE, "irc_compatible.c", 943);
 
-    sys_memset(param, 0, sizeof(IrcCompatibleParam1));
+    MI_CpuFill8(param, 0, sizeof(IrcCompatibleParam1));
     param->gsys = wk->param->gsys;
     param->sys = wk->sys;
     param->profile = wk->profile;
@@ -382,7 +382,7 @@ static void IrcCompatible_FreeParam1(void *param, IrcCompatibleWork *wk) {
 static void *IrcCompatible_CreateParam2(HeapID heapId, IrcCompatibleWork *wk) {
     IrcCompatibleParam2 *param = GFL_HeapAllocate(heapId, sizeof(IrcCompatibleParam2), FALSE, "irc_compatible.c", 996);
 
-    sys_memset(param, 0, sizeof(IrcCompatibleParam2));
+    MI_CpuFill8(param, 0, sizeof(IrcCompatibleParam2));
     param->gsys = wk->param->gsys;
     param->sys = wk->sys;
     param->profile = wk->profile;
@@ -401,7 +401,7 @@ static void IrcCompatible_FreeParam2(void *param, IrcCompatibleWork *wk) {
 static void *IrcCompatible_CreateParam3(HeapID heapId, IrcCompatibleWork *wk) {
     IrcCompatibleParam3 *param = GFL_HeapAllocate(heapId, sizeof(IrcCompatibleParam3), FALSE, "irc_compatible.c", 1048);
 
-    sys_memset(param, 0, sizeof(IrcCompatibleParam3));
+    MI_CpuFill8(param, 0, sizeof(IrcCompatibleParam3));
     param->gsys = wk->param->gsys;
     param->sys = wk->sys;
     param->profile = wk->profile;
@@ -441,7 +441,7 @@ static void IrcCompatible_FreeParam3(void *param, IrcCompatibleWork *wk) {
 static void *IrcCompatible_CreateParam4(HeapID heapId, IrcCompatibleWork *wk) {
     IrcCompatibleParam4 *param = GFL_HeapAllocate(heapId, sizeof(IrcCompatibleParam4), FALSE, "irc_compatible.c", 1179);
 
-    sys_memset(param, 0, sizeof(IrcCompatibleParam4));
+    MI_CpuFill8(param, 0, sizeof(IrcCompatibleParam4));
     param->gsys = wk->param->gsys;
     return param;
 }

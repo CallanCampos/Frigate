@@ -76,7 +76,7 @@ static const ThAwardBGSetup sThAwardBGSetups[3] = {
 ThAwardGraphic *ThAwardGraphic_Create(u32 layout, HeapID heapId) {
     ThAwardGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(ThAwardGraphic), FALSE, "th_award_graphic.c", 458);
 
-    sys_memset(graphic, 0, sizeof(ThAwardGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ThAwardGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -103,7 +103,7 @@ void ThAwardGraphic_Free(ThAwardGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(ThAwardGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ThAwardGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -126,7 +126,7 @@ static void ThAwardGraphic_VBlank(TCB *tcb, void *data) {
 static void ThAwardBG_Init(ThAwardBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(ThAwardBG));
+    MI_CpuFill8(bg, 0, sizeof(ThAwardBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sThAwardLCDConfig);
@@ -145,7 +145,7 @@ static void ThAwardBG_Free(ThAwardBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(ThAwardBG));
+    MI_CpuFill8(bg, 0, sizeof(ThAwardBG));
 }
 
 static void ThAwardBG_Update(ThAwardBG *bg) {
@@ -156,7 +156,7 @@ static void ThAwardBG_VBlank(ThAwardBG *bg) {
 }
 
 static void ThAwardClAct_Init(ThAwardClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(ThAwardClAct));
+    MI_CpuFill8(clact, 0, sizeof(ThAwardClAct));
     ClActSys_Create(&sThAwardClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -167,7 +167,7 @@ static void ThAwardClAct_Init(ThAwardClAct *clact, const BGSysVRAMConfig *vramCo
 static void ThAwardClAct_Free(ThAwardClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(ThAwardClAct));
+    MI_CpuFill8(clact, 0, sizeof(ThAwardClAct));
 }
 
 static void ThAwardClAct_Update(ThAwardClAct *clact) {

@@ -50,7 +50,7 @@ int NHTTPi_SocClose(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock) 
         int waited = 0;
 
         while ((result = SOC_Close(sock)) == -26 && waited <= 10000) {
-            func_0207aa04(500);
+            OS_Sleep(500);
             SOCLi_TrashSocket();
             waited += 500;
         }

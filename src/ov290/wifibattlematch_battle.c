@@ -67,7 +67,7 @@ static BOOL WifiBattleMatchSys_BattleProcInit(GameProc *proc, u32 *state, void *
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_BATTLE, 0x150);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchBattleWork), HEAPID_WIFIBATTLEMATCH_BATTLE);
-    sys_memset(wk, 0, sizeof(WifiBattleMatchBattleWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiBattleMatchBattleWork));
     battle->result = 0;
     wk->manager = CreateGameProcManager(HEAPID_WIFIBATTLEMATCH_BATTLE);
     GFL_SndBGMFadeOut(0x10);

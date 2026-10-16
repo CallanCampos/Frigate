@@ -313,7 +313,7 @@ static BOOL StaffRoll_Init(GameProc *proc, u32 *state, void *param, void *work) 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_STAFF_ROLL, 0x125000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(StaffRollWork), HEAPID_STAFF_ROLL);
-    sys_memset(wk, 0, sizeof(StaffRollWork));
+    MI_CpuFill8(wk, 0, sizeof(StaffRollWork));
     wk->param = param;
     return TRUE;
 }
@@ -347,8 +347,8 @@ static u32 StaffRollSeq_Init(StaffRollWork *work) {
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_MAIN_SUB);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
     work->arc = GFL_ArcSysCreateFileHandle(ARCID_THE_END, HEAPID_STAFF_ROLL);
     StaffRoll_InitVRAM();
     StaffRoll_InitBG();
@@ -383,8 +383,8 @@ static u32 StaffRollSeq_Exit(StaffRollWork *work) {
     StaffRollPicture_Free(&work->picture);
     StaffRoll_FreeClAct(&work->clact);
     StaffRoll_FreeBG();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, FADE_BRIGHTNESS(16));
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
@@ -984,12 +984,12 @@ static BOOL StaffRoll_FadeIn(StaffRollWork *work) {
     switch (work->fadeState) {
     case 0:
         if (work->fadeScreens & SCREEN_TOP) {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD,
-                                0, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD,
+                               0, 16);
         }
         if (work->fadeScreens & SCREEN_BOTTOM) {
-            gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD, 0, 16);
+            G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD, 0, 16);
         }
         work->flushScreens = work->fadeScreens;
         work->fadeState++;
@@ -1036,12 +1036,12 @@ static BOOL StaffRoll_FadeOut(StaffRollWork *work) {
     switch (work->fadeState) {
     case 0:
         if (work->fadeScreens & SCREEN_TOP) {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD,
-                                16, 0);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD,
+                               16, 0);
         }
         if (work->fadeScreens & SCREEN_BOTTOM) {
-            gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD, 16, 0);
+            G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BD, 16, 0);
         }
         work->fadeState++;
     case 1:
@@ -1096,10 +1096,10 @@ static BOOL StaffRoll_UpdateLogo(StaffRollWork *work) {
 
     switch (work->fadeState) {
     case 0:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BD, 0, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BD, 0, 16);
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG3, TRUE);
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
         work->logoFrame = 0;
         work->fadeState++;
         break;
@@ -1169,21 +1169,21 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
         return;
     case PICTURE_START:
         if (picture->screens & SCREEN_TOP) {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
-                                GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                                    GX_BLEND_PLANEMASK_BD,
-                                0, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                               GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
+                                   GX_BLEND_PLANEMASK_BD,
+                               0, 16);
         }
         if (picture->screens & SCREEN_BOTTOM) {
-            gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
-                                GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                                    GX_BLEND_PLANEMASK_BD,
-                                0, 16);
+            G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                               GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
+                                   GX_BLEND_PLANEMASK_BD,
+                               0, 16);
         }
         picture->state = PICTURE_LOAD_CHAR;
         return;
     case PICTURE_LAST_START:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, FADE_BRIGHTNESS(16));
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, FADE_BRIGHTNESS(16));
         func_0204c124(work->clact.actor, TRUE);
         func_0204c56c(work->clact.actor);
         picture->state = PICTURE_LOAD_CHAR;
@@ -1288,7 +1288,7 @@ static BOOL StaffRollPicture_Fade(StaffRollPicture *picture, BOOL out, u8 fastFo
         evb = 16;
     }
     if (picture->isLast == TRUE) {
-        gfxRegAdjustBrightnessBlend(REG_BLDCNT_ADDR, FADE_BRIGHTNESS(evb));
+        G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, FADE_BRIGHTNESS(evb));
     } else {
         if (picture->screens & SCREEN_TOP) {
             G2_ChangeBlendAlpha(eva, evb);

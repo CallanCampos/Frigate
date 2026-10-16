@@ -185,7 +185,7 @@ BOOL TrainerCard_Init(GameProc *proc, u32 *state, void *param, void *work) {
     Wipe_HideWindows(1);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TRAINER_CARD_SCREEN, 0x50000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TrainerCardWork), HEAPID_TRAINER_CARD_SCREEN);
-    sys_memset(wk, 0, sizeof(TrainerCardWork));
+    MI_CpuFill8(wk, 0, sizeof(TrainerCardWork));
     wk->heapId = HEAPID_TRAINER_CARD_SCREEN;
     wk->obj.heapId = HEAPID_TRAINER_CARD_SCREEN;
     wk->param = cardParam;
@@ -367,7 +367,7 @@ BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work) {
 
     if (!wk->data->unk04_5) {
         TrainerCard_PackSign(wk->signPixels, wk->data->unk74);
-        sys_memcpy(wk->data->unk74, func_020091a8(getTimeSigSaveBlock(wk->param->gameData)), TRCARD_SIGN_BYTES);
+        MI_CpuCopy8(wk->data->unk74, func_020091a8(getTimeSigSaveBlock(wk->param->gameData)), TRCARD_SIGN_BYTES);
     }
     if (cardParam->canEdit) {
         info = GetGameDataPlayerInfo(wk->param->gameData);
@@ -853,13 +853,13 @@ static void TrainerCard_SetSignWindow(int side) {
         return;
     }
     if (side == 0) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0xc, -8);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0xc, -8);
         G2S_SetWnd0Position(224, 0, 0, 168);
         G2S_SetWnd0InsidePlane(0x1c, TRUE);
         G2S_SetWndOutsidePlane(0x1f, FALSE);
         GXS_SetVisibleWnd(1);
     } else if (side == 1) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0xc, -8);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0xc, -8);
         G2S_SetWnd0Position(0, 0, 32, 168);
         G2S_SetWnd0InsidePlane(0x1c, TRUE);
         G2S_SetWndOutsidePlane(0x1f, FALSE);
@@ -1589,9 +1589,9 @@ static void TrainerCard_AnimatePalette(TrainerCardWork *wk) {
         wk->palFrame = 0;
     }
     if (wk->palFrame == 0) {
-        gfxUploadStdPaletteBGB(colors + 3, 6, 4);
+        GXS_LoadBGPltt(colors + 3, 6, 4);
     } else if (wk->palFrame == 4) {
-        gfxUploadStdPaletteBGB(colors + 5, 6, 4);
+        GXS_LoadBGPltt(colors + 5, 6, 4);
     }
 }
 
@@ -1870,8 +1870,8 @@ static void TrainerCard_LoadRankPalette(TrainerCardWork *wk) {
     void *file = GFL_G2DIOReadNCLR(ARCID_TRAINER_CARD_GRA, 15, &palette, HEAPID_TRAINER_CARD_SCREEN);
     u16 *colors = palette->rawData;
 
-    sys_memcpy(colors, wk->rankPalette[0], 0x20);
-    sys_memcpy(colors + 16, wk->rankPalette[1], 0x20);
+    MI_CpuCopy8(colors, wk->rankPalette[0], 0x20);
+    MI_CpuCopy8(colors + 16, wk->rankPalette[1], 0x20);
     GFL_HeapFree(file);
     wk->rankAngle = 0;
     TrainerCard_SetRankAnime(wk, TRUE);

@@ -76,13 +76,13 @@ BOOL NNS_SndWaveOutStart(NNSSndWaveOutHandle handle, int format, const void *dat
     }
 
     timer = CalcTimer(sampleRate, speed);
-    sndQueuePacket_PlaySamples(waveOut->chNo, format, data, loop ? SND_CHANNEL_LOOP_REPEAT : SND_CHANNEL_LOOP_1SHOT,
-                               loopStart, loopLen, volume, SND_CHANNEL_DATASHIFT_NONE, timer, pan);
-    func_0207d3f4(1 << waveOut->chNo, 0, 0, 0);
+    SND_SetupChannelPcm(waveOut->chNo, format, data, loop ? SND_CHANNEL_LOOP_REPEAT : SND_CHANNEL_LOOP_1SHOT, loopStart,
+                        loopLen, volume, SND_CHANNEL_DATASHIFT_NONE, timer, pan);
+    SND_StartTimer(1 << waveOut->chNo, 0, 0, 0);
 
     waveOut->playFlag = TRUE;
     waveOut->startFlag = FALSE;
-    waveOut->commandTag = sndGetSentPacketCount();
+    waveOut->commandTag = SND_GetCurrentCommandTag();
     waveOut->sampleRate = sampleRate;
     return TRUE;
 }
@@ -91,7 +91,7 @@ void NNS_SndWaveOutStop(NNSSndWaveOutHandle handle) {
     NNSSndWaveOut *waveOut = handle;
 
     if (waveOut->playFlag) {
-        func_0207d410(1 << waveOut->chNo, 0, 0, 0);
+        SND_StopTimer(1 << waveOut->chNo, 0, 0, 0);
         waveOut->playFlag = FALSE;
     }
 }
@@ -100,7 +100,7 @@ void NNS_SndWaveOutSetVolume(NNSSndWaveOutHandle handle, int volume) {
     NNSSndWaveOut *waveOut = handle;
 
     if (waveOut->playFlag) {
-        sndSetVolume(1 << waveOut->chNo, volume, SND_CHANNEL_DATASHIFT_NONE);
+        SND_SetChannelVolume(1 << waveOut->chNo, volume, SND_CHANNEL_DATASHIFT_NONE);
     }
 }
 
@@ -108,7 +108,7 @@ void NNS_SndWaveOutSetSpeed(NNSSndWaveOutHandle handle, int speed) {
     NNSSndWaveOut *waveOut = handle;
 
     if (waveOut->playFlag) {
-        sndSetRate(1 << waveOut->chNo, CalcTimer(waveOut->sampleRate, speed));
+        SND_SetChannelTimer(1 << waveOut->chNo, CalcTimer(waveOut->sampleRate, speed));
     }
 }
 
@@ -119,12 +119,12 @@ BOOL NNS_SndWaveOutIsPlaying(NNSSndWaveOutHandle handle) {
         return FALSE;
     }
     if (!waveOut->startFlag) {
-        if (!func_0207d9d0(waveOut->commandTag)) {
+        if (!SND_IsFinishedCommandTag(waveOut->commandTag)) {
             return TRUE;
         }
         waveOut->startFlag = TRUE;
     }
-    if (func_0207dbd0() & (1 << waveOut->chNo)) {
+    if (SND_GetChannelStatus() & (1 << waveOut->chNo)) {
         return TRUE;
     }
     waveOut->playFlag = FALSE;
@@ -136,17 +136,17 @@ void NNS_SndWaveOutWaitForChannelStop(NNSSndWaveOutHandle handle) {
     u32 tag;
 
     if (!waveOut->playFlag) {
-        if (func_0207dbd0() & (1 << waveOut->chNo)) {
-            tag = sndGetSentPacketCount();
-            func_0207d864(SND_COMMAND_BLOCK);
-            func_0207d96c(tag);
+        if (SND_GetChannelStatus() & (1 << waveOut->chNo)) {
+            tag = SND_GetCurrentCommandTag();
+            SND_FlushCommand(SND_COMMAND_BLOCK);
+            SND_WaitForCommandProc(tag);
         }
         return;
     }
     if (!waveOut->startFlag) {
-        func_0207d96c(waveOut->commandTag);
+        SND_WaitForCommandProc(waveOut->commandTag);
         waveOut->startFlag = TRUE;
     }
-    while (func_0207dbd0() & (1 << waveOut->chNo)) {
+    while (SND_GetChannelStatus() & (1 << waveOut->chNo)) {
     }
 }

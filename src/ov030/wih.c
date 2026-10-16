@@ -128,7 +128,7 @@ static BOOL WH_StateInSetParentParam(void) {
     int result;
 
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    result = func_02081474(WH_StateOutSetParentParam, &_pWmInfo->sParentParam);
+    result = WM_SetParentParameter(WH_StateOutSetParentParam, &_pWmInfo->sParentParam);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
@@ -156,7 +156,7 @@ static BOOL WH_StateInStartParent(void) {
     if (_pWmInfo->sSysState == WH_SYSSTATE_CONNECTED || _pWmInfo->sSysState == WH_SYSSTATE_DATASHARING) {
         return TRUE;
     }
-    result = func_02081594(WH_StateOutStartParent);
+    result = WM_StartParent(WH_StateOutStartParent);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -185,7 +185,7 @@ static void WH_StateOutStartParent(void *arg) {
             accept = _pWmInfo->sScanFilter(cb, func_02042d94());
         }
         if (!accept) {
-            int result = func_02081774(NULL, cb->aid);
+            int result = WM_Disconnect(NULL, cb->aid);
 
             if (result != WM_ERRCODE_OPERATING) {
                 WH_ReportError(result);
@@ -225,18 +225,18 @@ static BOOL WH_StateInStartParentMP(void) {
         return TRUE;
     }
     WH_ChangeSysState(WH_SYSSTATE_CONNECTED);
-    func_02080fbc();
-    func_02080f74();
+    WM_GetMPReceiveBufferSize();
+    WM_GetMPSendBufferSize();
     if (_pWmInfo->sRecvBuf != NULL) {
         func_02042ed0(_pWmInfo->sRecvBuf);
         func_02042ed0(_pWmInfo->sSendBuf);
     }
-    _pWmInfo->sRecvBufSize = func_02080fbc();
-    _pWmInfo->sSendBufSize = func_02080f74();
+    _pWmInfo->sRecvBufSize = WM_GetMPReceiveBufferSize();
+    _pWmInfo->sSendBufSize = WM_GetMPSendBufferSize();
     _pWmInfo->sRecvBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sRecvBufSize + 0x20, "wih.c", 1192);
     _pWmInfo->sSendBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sSendBufSize + 0x20, "wih.c", 1193);
-    result = func_0208195c(WH_StateOutStartParentMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
-                           _pWmInfo->sSendBufSize, func_02042d34() == 0x35 ? 1 : 2);
+    result = WM_StartMP(WH_StateOutStartParentMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
+                        _pWmInfo->sSendBufSize, func_02042d34() == 0x35 ? 1 : 2);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -268,7 +268,7 @@ static void WH_StateOutStartParentMP(void *arg) {
             if (func_02042d34() == 0x35) {
                 doubleMode = FALSE;
             }
-            result = func_02081bd8(&_pWmInfo->sDataSharing, 13, aidBitmap, machines, doubleMode);
+            result = WM_StartDataSharing(&_pWmInfo->sDataSharing, 13, aidBitmap, machines, doubleMode);
             if (result != 0) {
                 WH_ReportError(result);
                 WH_ChangeSysState(WH_SYSSTATE_ERROR);
@@ -290,7 +290,7 @@ static BOOL WH_StateInEndParentMP(void) {
     int result;
 
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    result = func_02081a68(WH_StateOutEndParentMP);
+    result = WM_EndMP(WH_StateOutEndParentMP);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -312,7 +312,7 @@ static void WH_StateOutEndParentMP(void *arg) {
 }
 
 static BOOL WH_StateInEndParent(void) {
-    int result = func_020815a0(WH_StateOutEndParent);
+    int result = WM_EndParent(WH_StateOutEndParent);
 
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
@@ -341,7 +341,7 @@ BOOL WH_ChildConnectAuto(u16 mode, const u8 *mac, u16 channel) {
         ((u16 *)_pWmInfo->sScanParam.bssid)[1] = bssid[1];
         ((u16 *)_pWmInfo->sScanParam.bssid)[0] = bssid[0];
     } else {
-        sys_memset(_pWmInfo->sScanParam.bssid, 0xff, 6);
+        MI_CpuFill8(_pWmInfo->sScanParam.bssid, 0xff, 6);
     }
     _pWmInfo->sConnectMode = mode;
     _pWmInfo->sScanCallback = NULL;
@@ -370,7 +370,7 @@ BOOL WH_StartScan(WHScanCallback callback, const u8 *mac, u16 channel) {
         ((u16 *)_pWmInfo->sScanParam.bssid)[1] = bssid[1];
         ((u16 *)_pWmInfo->sScanParam.bssid)[0] = bssid[0];
     } else {
-        sys_memset(_pWmInfo->sScanParam.bssid, 0xff, 6);
+        MI_CpuFill8(_pWmInfo->sScanParam.bssid, 0xff, 6);
     }
     if (!WH_StateInStartScan()) {
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
@@ -381,7 +381,7 @@ BOOL WH_StartScan(WHScanCallback callback, const u8 *mac, u16 channel) {
 
 // Starts a scan of the next channel, or of the one the channel given
 static BOOL WH_StateInStartScan(void) {
-    u16 allowed = func_020810cc();
+    u16 allowed = WM_GetAllowedChannel();
     int result;
     u32 channel;
 
@@ -418,12 +418,12 @@ static BOOL WH_StateInStartScan(void) {
     } else {
         _pWmInfo->sScanParam.channelList = 1 << (channel - 1);
     }
-    _pWmInfo->sScanParam.maxChannelTime = func_020811a4();
+    _pWmInfo->sScanParam.maxChannelTime = WM_GetDispersionScanPeriod();
     _pWmInfo->sScanParam.scanBuf = (WMBssDesc *)_pWmInfo->sScanBuf;
     _pWmInfo->sScanParam.scanBufSize = sizeof(_pWmInfo->sScanBuf);
     _pWmInfo->sScanParam.scanType = 1;
     _pWmInfo->sScanParam.ssidLength = 0;
-    result = func_020815c8(WH_StateOutStartScan, &_pWmInfo->sScanParam);
+    result = WM_StartScanEx(WH_StateOutStartScan, &_pWmInfo->sScanParam);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -434,7 +434,7 @@ static BOOL WH_StateInStartScan(void) {
 // WH_SetScanTarget: sets the channel and the MAC address that the scan looks for
 void WH_SetScanTarget(u16 channel, const u8 *mac) {
     _pWmInfo->sScanChannel = channel;
-    sys_memcpy(mac, _pWmInfo->sScanParam.bssid, 6);
+    MI_CpuCopy8(mac, _pWmInfo->sScanParam.bssid, 6);
 }
 
 // Whether the beacon is a valid one of this game's, from the length of its data, its magic number, its GGID and its
@@ -483,13 +483,13 @@ static void WH_StateOutStartScan(void *arg) {
         return;
     }
     if (cb->bssDescCount != 0) {
-        cp15_invalidateDC(_pWmInfo->sScanBuf, sizeof(_pWmInfo->sScanBuf));
+        DC_InvalidateRange(_pWmInfo->sScanBuf, sizeof(_pWmInfo->sScanBuf));
     }
     found = FALSE;
     for (i = 0; i < cb->bssDescCount; i++) {
         WMBssDesc *bssDesc = &_pWmInfo->sBssDesc;
 
-        sys_memcpy(cb->bssDesc[i], bssDesc, sizeof(WMBssDesc));
+        MI_CpuCopy8(cb->bssDesc[i], bssDesc, sizeof(WMBssDesc));
         func_02012ebc(cb->linkLevel[i]);
         if (_pWmInfo->sScanInfoCallback != NULL) {
             _pWmInfo->sScanInfoCallback(bssDesc, func_02042d94(), cb->linkLevel[i]);
@@ -514,7 +514,7 @@ BOOL WH_EndScan(void) {
     u32 irq;
     BOOL stopped = FALSE;
 
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
 
     if (_pWmInfo->sSysState == WH_SYSSTATE_SCANNING) {
         if (_pWmInfo->sScanWait != 0) {
@@ -528,12 +528,12 @@ BOOL WH_EndScan(void) {
         _pWmInfo->sScanEnding = TRUE;
         WH_ChangeSysState(WH_SYSSTATE_BUSY);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return stopped;
 }
 
 static BOOL WH_StateInEndScan(void) {
-    int result = func_020816b4(WH_StateOutEndScan);
+    int result = WM_EndScan(WH_StateOutEndScan);
 
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
@@ -566,7 +566,7 @@ static BOOL WH_StateInStartChild(void) {
         return TRUE;
     }
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    result = func_020816dc(WH_StateOutStartChild, &_pWmInfo->sBssDesc, _pWmInfo->sSsid, TRUE, 0);
+    result = WM_StartConnectEx(WH_StateOutStartChild, &_pWmInfo->sBssDesc, _pWmInfo->sSsid, TRUE, 0);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -618,18 +618,18 @@ static void WH_StateOutStartChild(void *arg) {
 static BOOL WH_StateInStartChildMP(void) {
     int result;
 
-    func_02080fbc();
-    func_02080f74();
+    WM_GetMPReceiveBufferSize();
+    WM_GetMPSendBufferSize();
     if (_pWmInfo->sRecvBuf != NULL) {
         func_02042ed0(_pWmInfo->sRecvBuf);
         func_02042ed0(_pWmInfo->sSendBuf);
     }
-    _pWmInfo->sRecvBufSize = func_02080fbc();
-    _pWmInfo->sSendBufSize = func_02080f74();
+    _pWmInfo->sRecvBufSize = WM_GetMPReceiveBufferSize();
+    _pWmInfo->sSendBufSize = WM_GetMPSendBufferSize();
     _pWmInfo->sRecvBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sRecvBufSize + 0x20, "wih.c", 2043);
     _pWmInfo->sSendBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sSendBufSize + 0x20, "wih.c", 2044);
-    result = func_0208195c(WH_StateOutStartChildMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
-                           _pWmInfo->sSendBufSize, func_02042d34() == 0x35 ? 1 : 2);
+    result = WM_StartMP(WH_StateOutStartChildMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
+                        _pWmInfo->sSendBufSize, func_02042d34() == 0x35 ? 1 : 2);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -664,7 +664,7 @@ static void WH_StateOutStartChildMP(void *arg) {
             if (func_02042d34() == 0x35) {
                 doubleMode = FALSE;
             }
-            result = func_02081bd8(&_pWmInfo->sDataSharing, 13, aidBitmap, machines, doubleMode);
+            result = WM_StartDataSharing(&_pWmInfo->sDataSharing, 13, aidBitmap, machines, doubleMode);
             if (result != 0) {
                 WH_ReportError(result);
                 WH_Finalize();
@@ -686,7 +686,7 @@ static BOOL WH_StateInEndChildMP(void) {
     int result;
 
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    result = func_02081a68(WH_StateOutEndChildMP);
+    result = WM_EndMP(WH_StateOutEndChildMP);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -711,7 +711,7 @@ static BOOL WH_StateInEndChild(void) {
     int result;
 
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    result = func_02081774(WH_StateOutEndChild, 0);
+    result = WM_Disconnect(WH_StateOutEndChild, 0);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         WH_Reset();
@@ -734,7 +734,7 @@ static BOOL WH_StateInReset(void) {
     int result;
 
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    result = func_02081424(WH_StateOutReset);
+    result = WM_Reset(WH_StateOutReset);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -755,8 +755,8 @@ static void WH_StateOutReset(void *arg) {
 
 // Sends the data to every machine on the port, and calls back once it is gone
 static BOOL WH_SendMPData(const void *data, u16 size, WHSendCallback callback) {
-    cp15_flushDC(_pWmInfo->sSendBuf, _pWmInfo->sSendBufSize);
-    if (func_02081998(WH_SendMPDataCallback, callback, data, size, 0xffff, 14, 2) == WM_ERRCODE_OPERATING) {
+    DC_FlushRange(_pWmInfo->sSendBuf, _pWmInfo->sSendBufSize);
+    if (WM_SetMPDataToPortEx(WH_SendMPDataCallback, callback, data, size, 0xffff, 14, 2) == WM_ERRCODE_OPERATING) {
         return TRUE;
     }
     return FALSE;
@@ -840,7 +840,7 @@ BOOL WH_StartMeasureChannel(void) {
     u16 mac[3];
     u16 result;
 
-    func_0207c33c((u8 *)mac);
+    OS_GetMacAddress((u8 *)mac);
     _pWmInfo->sSeed = OS_GetVBlankCount() + mac[0] + mac[1] + mac[2];
     _pWmInfo->sSeed = _pWmInfo->sSeed * 69069 + 12345;
     _pWmInfo->sChannel = 0;
@@ -862,7 +862,7 @@ BOOL WH_StartMeasureChannel(void) {
 
 // Measures the next channel that is allowed, from the one given. 0x18 once there are none left
 static u16 WH_StateInMeasureChannel(u16 channel) {
-    u16 allowed = func_020810cc();
+    u16 allowed = WM_GetAllowedChannel();
 
     if (allowed == 0x8000) {
         WH_ReportError(3);
@@ -915,7 +915,7 @@ static void WH_StateOutMeasureChannel(void *arg) {
 }
 
 static int WH_MeasureChannel(WMCallbackFunc callback, u16 channel) {
-    return func_0208259c(callback, 3, 0x11, channel, 30);
+    return WM_MeasureChannel(callback, 3, 0x11, channel, 30);
 }
 
 // WH_GetMeasureChannel: the channel to use, one of the least busy ones, chosen at random
@@ -960,7 +960,7 @@ BOOL WH_Initialize(HeapID heapId, WHCallback callback, u32 extended) {
         return FALSE;
     }
     _pWmInfo = allocConfigDSSoftwareFeature(heapId, sizeof(WIH) + 0x20, "wih.c", 3124);
-    sys_memset(_pWmInfo, 0, sizeof(WIH));
+    MI_CpuFill8(_pWmInfo, 0, sizeof(WIH));
     _pWmInfo->sScanTime = 1;
     _pWmInfo->sBitmap = 1;
     _pWmInfo->sLastError = 0;
@@ -996,9 +996,9 @@ static BOOL WH_StateInInitialize(WHCallback callback, u32 extended) {
 
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
     if (extended == 0) {
-        result = func_020813c4(_pWmInfo->sWmBuf, WH_StateOutInitialize, 2);
+        result = WM_Initialize(_pWmInfo->sWmBuf, WH_StateOutInitialize, 2);
     } else {
-        result = func_020813d0(_pWmInfo->sWmBuf, WH_StateOutInitialize, 2, 0);
+        result = WM_InitializeForListening(_pWmInfo->sWmBuf, WH_StateOutInitialize, 2, 0);
     }
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
@@ -1024,7 +1024,7 @@ static void WH_StateOutInitialize(void *arg) {
         }
         return;
     }
-    result = func_02080e7c(WH_IndicationCallback);
+    result = WM_SetIndCallback(WH_IndicationCallback);
     if (result != WM_ERRCODE_SUCCESS) {
         WH_ReportError(result);
         WH_ChangeSysState(WH_SYSSTATE_FATAL);
@@ -1034,7 +1034,7 @@ static void WH_StateOutInitialize(void *arg) {
         return;
     }
     WH_ChangeSysState(WH_SYSSTATE_IDLE);
-    func_02082560(WH_StateOutSetLifeTime, 0xffff, 40, 5, 40);
+    WM_SetLifeTime(WH_StateOutSetLifeTime, 0xffff, 40, 5, 40);
     if (_pWmInfo->sCallback != NULL) {
         _pWmInfo->sCallback(TRUE);
     }
@@ -1048,7 +1048,7 @@ BOOL WH_ParentConnect(u16 mode, u16 tgid, u16 channel, u16 maxEntry) {
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
     _pWmInfo->sParentParam.tgid = tgid;
     _pWmInfo->sParentParam.channel = channel;
-    _pWmInfo->sParentParam.beaconPeriod = func_0208115c();
+    _pWmInfo->sParentParam.beaconPeriod = WM_GetDispersionBeaconPeriod();
     if (func_02042df4() != 0) {
         _pWmInfo->sParentParam.parentMaxSize = func_02042df4();
     } else {
@@ -1074,7 +1074,7 @@ void WH_SetScanFilter(NetScanFilter filter) {
 // WH_SetReceiver
 void WH_SetReceiver(WHReceiver callback) {
     _pWmInfo->sReceiver = callback;
-    if (func_02080eac(14, WH_PortReceiveCallback, NULL) != WM_ERRCODE_SUCCESS) {
+    if (WM_SetPortCallback(14, WH_PortReceiveCallback, NULL) != WM_ERRCODE_SUCCESS) {
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
     }
 }
@@ -1089,12 +1089,12 @@ BOOL WH_SendData(u8 *data, u16 size, WHSendCallback callback) {
 
 // WH_GetSharedDataAdr: the data of the machine of the AID, from the last step of the data sharing
 u8 *WH_GetSharedDataAdr(u16 netId) {
-    return func_020823ac(&_pWmInfo->sDataSharing, &_pWmInfo->sDataSet, netId);
+    return WM_GetSharedDataAddress(&_pWmInfo->sDataSharing, &_pWmInfo->sDataSet, netId);
 }
 
 // WH_StepDS: shares the data given, for the machines to read the next step
 BOOL WH_StepDS(u8 *data) {
-    int result = func_02081df0(&_pWmInfo->sDataSharing, data, &_pWmInfo->sDataSet);
+    int result = WM_StepDataSharing(&_pWmInfo->sDataSharing, data, &_pWmInfo->sDataSet);
 
     if (result == 7) {
         return FALSE;
@@ -1132,7 +1132,7 @@ void WH_UpdateScan(void) {
 // WH_Reset: resets the wireless, ending the data sharing first
 void WH_Reset(void) {
     if (_pWmInfo->sSysState == WH_SYSSTATE_DATASHARING) {
-        int result = func_02081dbc(&_pWmInfo->sDataSharing);
+        int result = WM_EndDataSharing(&_pWmInfo->sDataSharing);
 
         if (result != WM_ERRCODE_SUCCESS) {
             WH_ReportError(result);
@@ -1175,7 +1175,7 @@ BOOL WH_Finalize(void) {
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
     switch (_pWmInfo->sConnectMode) {
     case WH_CONNECTMODE_DS_CHILD:
-        if (func_02081dbc(&_pWmInfo->sDataSharing) != 0) {
+        if (WM_EndDataSharing(&_pWmInfo->sDataSharing) != 0) {
             WH_Reset();
             break;
         }
@@ -1185,7 +1185,7 @@ BOOL WH_Finalize(void) {
         }
         break;
     case WH_CONNECTMODE_DS_PARENT:
-        if (func_02081dbc(&_pWmInfo->sDataSharing) != 0) {
+        if (WM_EndDataSharing(&_pWmInfo->sDataSharing) != 0) {
             WH_Reset();
             break;
         }
@@ -1202,7 +1202,7 @@ BOOL WH_Finalize(void) {
 BOOL WH_End(WHCallback callback) {
     _pWmInfo->sCallback = callback;
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
-    if (func_02081448(WH_StateOutEnd) != WM_ERRCODE_OPERATING) {
+    if (WM_End(WH_StateOutEnd) != WM_ERRCODE_OPERATING) {
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
         return FALSE;
     }
@@ -1226,7 +1226,7 @@ void WH_SetScanCallback(WHScanCallback callback) {
 void WH_SetGameInfo(const void *data, int size, u32 ggid, int tgid) {
     if (_pWmInfo != NULL &&
         (_pWmInfo->sSysState == WH_SYSSTATE_CONNECTED || _pWmInfo->sSysState == WH_SYSSTATE_DATASHARING)) {
-        func_020824bc(NULL, data, size, ggid, tgid, 1);
+        WM_SetGameInfo(NULL, data, size, ggid, tgid, 1);
     }
 }
 

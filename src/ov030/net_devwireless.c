@@ -275,7 +275,7 @@ static int NetDevWireless_GetSignalLevel(void) {
     if (func_02042d34() == 3) {
         return 3 - func_02012ea0();
     }
-    return 3 - func_020810fc();
+    return 3 - WM_GetLinkLevel();
 }
 
 static int NetDevWireless_GetError(void) {

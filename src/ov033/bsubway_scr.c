@@ -121,7 +121,7 @@ void func_ov033_0217b664(GameSystem *gsys, BSubwayScrWork *bsw) {
             BtlSetup_Free(bsw->btlSetup);
             bsw->btlSetup = NULL;
         }
-        sys_memset(bsw, 0, sizeof(BSubwayScrWork));
+        MI_CpuFill8(bsw, 0, sizeof(BSubwayScrWork));
         GFL_HeapFree(bsw);
     }
     func_02017954(GSYS_GetGameData(gsys), NULL);
@@ -599,13 +599,13 @@ void func_ov033_0217c010(BSubwayScrWork *bsw, SaveControl *save, u32 flag) {
     HeapID heapId = bsw->heapId;
 
     team = GFL_HeapAllocate(HEAPID_TAIL(heapId), sizeof(BSubwayPokemon) * 3, FALSE, "bsubway_scr.c", 0x8a1);
-    sys_memset(team, 0, sizeof(BSubwayPokemon) * 3);
+    MI_CpuFill8(team, 0, sizeof(BSubwayPokemon) * 3);
     party = func_ov033_0217bd60(bsw);
     for (i = 0; i < 3; i++) {
         func_ov033_0217bf04(&team[i], PokeParty_GetPkm(party, bsw->memberSlots[i]));
     }
     BSubwayScoreData_SetTeam(bsw->unk74, flag, team);
-    sys_memset(team, 0, sizeof(BSubwayPokemon) * 3);
+    MI_CpuFill8(team, 0, sizeof(BSubwayPokemon) * 3);
     GFL_HeapFree(team);
 }
 

@@ -16,7 +16,7 @@ BOOL func_0200ce5c(CGearPictureSave *picture) {
     u8 empty[0x20];
     BOOL valid = FALSE;
 
-    sys_memset(empty, 0, sizeof(empty));
+    MI_CpuFill8(empty, 0, sizeof(empty));
     if (GFL_STD_MemCmp(empty, &picture->chars[sizeof(picture->chars) - sizeof(empty)], sizeof(empty))) {
         valid = TRUE;
     }

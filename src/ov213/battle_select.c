@@ -68,7 +68,7 @@ static void BattleSelect_RecvParty(int netId, int size, const void *data, void *
 
 static BOOL BattleSelect_Init(GameProc *proc, u32 *state, void *param, void *work) {
     BattleSelectWork *wk = GFL_ProcInitSubsystem(proc, sizeof(BattleSelectWork), HEAPID_GAMEEVENT);
-    sys_memset(wk, 0, sizeof(BattleSelectWork));
+    MI_CpuFill8(wk, 0, sizeof(BattleSelectWork));
     wk->param = *(BattleSelectParam *)param;
     wk->heapId = HEAPID_GAMEEVENT;
     wk->procManager = CreateGameProcManager(wk->heapId);

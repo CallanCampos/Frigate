@@ -112,7 +112,7 @@ void IntroMcss_ClearAnimationEnded(IntroMcss *mcss, u8 index) {
 }
 
 void IntroMcss_SetAlpha(IntroMcss *mcss, u8 index, u32 alpha) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 1, 9, 0, 0);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 1, 9, 0, 0);
     if (alpha > 31) {
         alpha = 31;
     }

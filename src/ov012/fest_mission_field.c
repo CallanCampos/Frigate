@@ -60,7 +60,7 @@ void func_ov012_021683f4(GameSystem *gsys, u16 zoneId) {
     RivalEntry *entry = func_02014864(festival);
     FestMissionConfig *config;
 
-    clock();
+    OS_GetTick();
     if (getStatusOfFesMission(festival) == 0) {
         return;
     }

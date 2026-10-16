@@ -191,7 +191,7 @@ static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_FMISSION_APP, 0x30000);
     work = GFL_ProcInitSubsystem(proc, sizeof(FMissionApp), HEAPID_FMISSION_APP);
-    sys_memset(work, 0, sizeof(FMissionApp));
+    MI_CpuFill8(work, 0, sizeof(FMissionApp));
     work->heapId = HEAPID_FMISSION_APP;
     work->param = eventParam;
     work->wifiList = GameData_GetWifiList(eventParam->gameData);
@@ -213,8 +213,8 @@ static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data
     work->log = FMissionLogFApp_Create(work->heapId);
     LinkFestival_GetRanking(work->param->festival, &work->ranking);
     FMissionApp_InitWork(work);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 8, 15, 15);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 4, 8, 15, 15);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 8, 15, 15);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 4, 8, 15, 15);
     if (work->mode == FMISSION_APP_MODE_MISSION) {
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, work->heapId);
     } else {

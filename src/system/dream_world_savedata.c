@@ -20,7 +20,7 @@ u32 func_02009930(void) {
 void func_02009938(DreamWorldSave *dreamWorld) {
     u8 i = 0;
 
-    sys_memset(dreamWorld, 0, func_02009930());
+    MI_CpuFill8(dreamWorld, 0, func_02009930());
     func_02009ad4(dreamWorld, DREAM_WORLD_SYNC_DATE_NONE);
     dreamWorld->lastResultId = -1;
     dreamWorld->unk1A7 = 0;
@@ -37,7 +37,7 @@ PartyPkm *func_02009998(DreamWorldSave *dreamWorld) {
 }
 
 void func_0200999c(DreamWorldSave *dreamWorld, PartyPkm *pkm) {
-    sys_memcpy(pkm, &dreamWorld->pkm, PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(pkm, &dreamWorld->pkm, PokeParty_GetPkmRawSize());
 }
 
 BOOL func_020099b4(const u8 *flags, int species) {
@@ -138,7 +138,7 @@ u16 *func_02009a98(DreamWorldSave *dreamWorld, int index) {
 
 void func_02009ab0(DreamWorldSave *dreamWorld, int index, const void *entry) {
     if (index < DREAM_WORLD_RESULT_MAX) {
-        sys_memcpy(entry, dreamWorld->results[index], sizeof(dreamWorld->results[index]));
+        MI_CpuCopy8(entry, dreamWorld->results[index], sizeof(dreamWorld->results[index]));
     }
 }
 

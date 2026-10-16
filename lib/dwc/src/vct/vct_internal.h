@@ -48,9 +48,6 @@ extern VCTSettings gVCTSettings;
 BOOL func_ov011_02168b18(u8 aid, const void *data, int size);
 BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
 
-// The timer count, which seeds the packets' sequence numbers
-u16 func_0207bb84(void);
-
 // The hardware's divider and square root unit
 #define REG_DIVCNT (*(vu16 *)0x04000280)
 #define REG_DIV_NUMER_LO (*(vu32 *)0x04000290)

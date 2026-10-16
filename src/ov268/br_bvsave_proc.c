@@ -119,7 +119,7 @@ static BOOL BrBvSave_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     int i;
 
     p_wk = GFL_ProcInitSubsystem(proc, sizeof(BrBvSaveWork), BrProcSys_GetHeapID(p_param->procSys));
-    sys_memset(p_wk, 0, sizeof(BrBvSaveWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvSaveWork));
     p_wk->p_param = p_param;
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
@@ -218,7 +218,7 @@ static void BrBvSave_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     case SEQ_DOWNLOAD_START: {
         BrNetRequestParam req;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         req.dataNumber = p_wk->p_param->videoNumber;
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_3, &req);
         p_wk->cnt = 0;
@@ -555,7 +555,7 @@ static void BrBvSave_SeqSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     case SEQ_NOTIFY_START: {
         BrNetRequestParam req;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         req.dataNumber = func_0200c124(func_0200c0c0(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_8, &req);
         BrText_Print(p_wk->text, p_wk->p_param->res, 0x13f);
@@ -734,7 +734,7 @@ static void BrBvSave_CreateSelect(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_param
     str = GFL_StrBufCreate(0x80, p_wk->heapId);
     src = GFL_StrBufCreate(0x80, p_wk->heapId);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 48;
     setup.y = 40;
     setup.sequence = 11;

@@ -340,7 +340,7 @@ void func_ov137_021f1350(ResortPeople *people) {
     for (pos = 0; pos < 64; pos++) {
         if (!func_ov137_021f1808(people->setup.slots, row, pos)) {
             ResortPersonSource source;
-            sys_memset(&source, 0, sizeof(ResortPersonSource));
+            MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
             source.data = func_ov137_021f1824(people->setup.slots, row, pos);
             source.zone = people->setup.zone;
             func_ov137_021f1464(people, &source, TRUE, pos);
@@ -381,7 +381,7 @@ void func_ov137_021f13a4(ResortPeople *people) {
             }
         }
         if (create) {
-            sys_memset(&source, 0, sizeof(ResortPersonSource));
+            MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
             source.data = data;
             source.zone = people->setup.zone;
             func_ov137_021f1464(people, &source, FALSE, pos);
@@ -450,7 +450,7 @@ void func_ov137_021f1554(ResortPeople *people, ResortPerson *person) {
     ResortPersonSource source;
     ResortPersonSetup setup;
 
-    sys_memset(&source, 0, sizeof(ResortPersonSource));
+    MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
     source.data = func_ov137_021f1110(person);
     source.zone = func_ov137_021f10e8(person, 1, NULL);
     func_ov137_021f16d0(people, &source, pos, &setup);
@@ -517,7 +517,7 @@ static void func_ov137_021f1670(ResortPeople *people) {
 
 static void func_ov137_021f16d0(ResortPeople *people, const ResortPersonSource *source, u32 index,
                                 ResortPersonSetup *setup) {
-    sys_memset(setup, 0, sizeof(ResortPersonSetup));
+    MI_CpuFill8(setup, 0, sizeof(ResortPersonSetup));
     setup->data = source->data;
     setup->index = index;
     setup->zone = source->zone;

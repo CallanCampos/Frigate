@@ -16,7 +16,7 @@ u32 func_0200ac58(void) {
 void func_0200ac60(MusicalSave *musical) {
     u8 i;
 
-    sys_memset(musical, 0, sizeof(MusicalSave));
+    MI_CpuFill8(musical, 0, sizeof(MusicalSave));
     func_0200ad20(musical);
     for (i = 0; i < 10; i++) {
         musical->unk1E0[i].unk0 = 4;

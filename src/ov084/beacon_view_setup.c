@@ -34,6 +34,7 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
+#include "nitro/os.h"
 #include "nnsys/g2d.h"
 #include "save/high_link.h"
 #include "save/player_info.h"
@@ -249,7 +250,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
     case BEACON_VIEW_EVENT_MISSION_START: {
         FestMissionEventArgs args;
 
-        sys_memset(&args, 0, sizeof(args));
+        MI_CpuFill8(&args, 0, sizeof(args));
         args.config = work->mission;
         args.joined = TRUE;
         event =
@@ -262,7 +263,7 @@ GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled) {
     case BEACON_VIEW_EVENT_MISSION_MESSAGE: {
         FestMissionEventArgs args;
 
-        sys_memset(&args, 0, sizeof(args));
+        MI_CpuFill8(&args, 0, sizeof(args));
         args.config = work->mission;
         args.joined = TRUE;
         args.messageType = work->missionRefusal;
@@ -493,7 +494,7 @@ static void BeaconView_InitBG(BeaconViewWork *work, ArcTool *arc) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, 21, 5, 0, 0x800, TRUE, work->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 22, 6, 0, 0x800, TRUE, work->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 23, 7, 0, 0x800, TRUE, work->tmpHeapId);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 4, 0x1e, 13, 3);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 4, 0x1e, 13, 3);
     GFL_BGSysSetBGEnabled(4, TRUE);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysSetBGEnabled(6, TRUE);
@@ -557,7 +558,7 @@ static void BeaconView_LoadResources(BeaconViewWork *work, ArcTool *arc) {
         work->iconChars[i].file = GFL_ArcToolReadHeapNew(arc, i + 7, work->heapId);
         NNS_G2dGetUnpackedCharacterData(work->iconChars[i].file, &work->iconChars[i].data);
     }
-    cp15_invalidateDCAll();
+    DC_FlushAll();
     GFL_ArcToolFree(trainerArc);
 }
 
@@ -656,7 +657,7 @@ static void BeaconView_LoadRes(BeaconViewWork *work, BeaconViewRes *res, const B
                                ArcTool *arc) {
     int i;
 
-    sys_memset(res, 0, sizeof(BeaconViewRes));
+    MI_CpuFill8(res, 0, sizeof(BeaconViewRes));
     for (i = 0; i < BEACON_VIEW_RES_KINDS; i++) {
         res->lists[i].count = setup->lists[i].count;
         if (res->lists[i].count != 0) {
@@ -746,7 +747,7 @@ static void BeaconView_InitPanel(BeaconViewWork *work, u8 id) {
     BeaconViewPanel *panel = &work->panels[id];
     BmpOamActorSetup setup;
 
-    sys_memset(panel, 0, sizeof(BeaconViewPanel));
+    MI_CpuFill8(panel, 0, sizeof(BeaconViewPanel));
     panel->id = id;
     panel->dataIndex = 0xff;
     panel->line = 0;
@@ -821,5 +822,5 @@ static void BeaconView_FreePanel(BeaconViewWork *work, u8 id) {
     func_0204c108(panel->trainer);
     func_0204c124(panel->base, FALSE);
     func_0204c108(panel->base);
-    sys_memset(panel, 0, sizeof(BeaconViewPanel));
+    MI_CpuFill8(panel, 0, sizeof(BeaconViewPanel));
 }

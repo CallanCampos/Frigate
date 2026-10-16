@@ -238,7 +238,7 @@ void UnionSubdisp_Update(UnionSubdisp *work, BOOL active) {
     if (active == TRUE) {
         G2S_BlendNone();
     } else {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x3f, -8);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x3f, -8);
     }
     func_02021a3c(work->queue);
     PMSDraw_Main(work->pmsDraw);
@@ -328,14 +328,14 @@ static void UnionSubdisp_InitBG(UnionSubdisp *work, ArcTool *arc) {
     GFL_BGSysCreateBG(BG_FRAME, &sBGSetups[0], BGMODE_TEXT);
     GFL_BGSysCreateBG(BG_LINES, &sBGSetups[1], BGMODE_TEXT);
     GFL_BGSysCreateBG(BG_TEXT, &sBGSetups[2], BGMODE_TEXT);
-    sys_memset32(0, (void *)HW_DB_BG_VRAM, 0x20000);
+    MIi_CpuClear32(0, (void *)HW_DB_BG_VRAM, 0x20000);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     G2S_BlendNone();
     GFL_BGSysLoadArcNCGRStatic(arc, 0xf, BG_TEXT, 0, 0, FALSE, HEAPID_FIELDMAP);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 0x11, BG_TEXT, 0, 0x800, FALSE, HEAPID_FIELDMAP);
     lines = GFL_BGSysIsScrHeapExists(BG_LINES);
     screenBuffer = GFL_G2DIOReadNSCRArc(arc, 0x12, FALSE, &screen, HEAPID_FIELDMAP);
-    sys_memcpy(screen->rawData, lines, SCREEN_ROW_SIZE);
+    MI_CpuCopy8(screen->rawData, lines, SCREEN_ROW_SIZE);
     GFL_HeapFree(screenBuffer);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0x10, PALTYPE_SUB_BG, 0, 0xa0, HEAPID_FIELDMAP);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 15 * 32, 0x20, HEAPID_FIELDMAP);
@@ -368,7 +368,7 @@ static void UnionSubdisp_InitFrame(UnionSubdisp *work) {
     GFL_BGSysLoadArcNCGRStatic(arc, 0x1c, BG_FRAME, chars, 0x80, FALSE, HEAPID_FIELDMAP);
     screenBuffer = GFL_BGSysIsScrHeapExists(BG_FRAME);
     buffer = GFL_G2DIOReadNSCRArc(arc, 0x1d, FALSE, &screen, HEAPID_FIELDMAP);
-    sys_memcpy((u8 *)screen->rawData + 0x15 * 0x40, (u8 *)screenBuffer + 0x15 * 0x40, 0xc0);
+    MI_CpuCopy8((u8 *)screen->rawData + 0x15 * 0x40, (u8 *)screenBuffer + 0x15 * 0x40, 0xc0);
     GFL_HeapFree(buffer);
     for (i = 0; i < 0x60; i++) {
         screenBuffer[0x2a0 + i] = (screenBuffer[0x2a0 + i] & 0xfff) + chars + 0xd000;
@@ -541,7 +541,7 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
     StrBuf *strbuf;
     StrBuf *name;
 
-    sys_memcpy(screen, row, SCREEN_ROW_SIZE);
+    MI_CpuCopy8(screen, row, SCREEN_ROW_SIZE);
     GFL_BGSysSetScrPaletteNo(BG_LINES, 0, LINE_TILES * line, 32, LINE_TILES, palette);
     GFL_BGSysQueueScrLoad(BG_LINES);
     {
@@ -637,7 +637,7 @@ static void UnionSubdisp_MoveLine(UnionSubdisp *work, u8 from, u8 to, UnionVisit
 
     dst += SCREEN_ROW_WORDS * to;
     src += SCREEN_ROW_WORDS * from;
-    sys_memcpy(src, dst, SCREEN_ROW_SIZE);
+    MI_CpuCopy8(src, dst, SCREEN_ROW_SIZE);
     GFL_BGSysQueueScrLoad(BG_LINES);
     if (work->content[from] == CONTENT_SENTENCE && work->content[to] == CONTENT_SENTENCE) {
         PMSDraw_Copy(work->pmsDraw, from, to);
@@ -839,7 +839,7 @@ static BOOL UnionSubdisp_UpdateLineTouch(UnionSystem *sys, UnionSubdisp *work, U
         UnionSubdisp_StartFlash(work, list, index);
         visitor = func_ov036_021b4620(list, index);
         if (visitor != NULL) {
-            sys_memcpy(visitor->mac, sys->situ.mac78, 6);
+            MI_CpuCopy8(visitor->mac, sys->situ.mac78, 6);
         }
         UnionSubdisp_CancelOtherFlashes(work, list, index);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);

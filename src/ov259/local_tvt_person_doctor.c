@@ -104,7 +104,7 @@ static const LocalTvtEvolutionMsg sLocalTvtSpeciesMsgs[] = {
 };
 
 void LocalTvtDoctor_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     funcs->work = LocalTvtDoctor_Create(gameData, heapId);
     funcs->msgData = msgData;
     funcs->free = LocalTvtDoctor_Free;
@@ -217,7 +217,7 @@ static BOOL LocalTvtDoctor_Evolution(LocalTvtPerson *person, const LocalTvtPerso
         } else {
             LocalTvtPokeSelectSetup selectSetup;
 
-            sys_memset(&selectSetup, 0, sizeof(selectSetup));
+            MI_CpuFill8(&selectSetup, 0, sizeof(selectSetup));
             selectSetup.message = setup->message;
             selectSetup.unit = setup->unit;
             selectSetup.party = GameData_GetParty(doctor->gameData);

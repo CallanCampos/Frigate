@@ -417,7 +417,7 @@ BoxPkm *BoxSaveAccessor_GetPkm(BoxSaveAccessor *boxes, u32 trayNum, u32 pos) {
 BoxPkm *copyBoxedPkmToBuf(BoxSaveAccessor *boxes, u32 trayNum, u32 pos, HeapID heapId) {
     BoxPkm *pkm = GFL_HeapAllocate(heapId, sizeof(BoxPkm), FALSE, "box_savedata.c", 891);
 
-    sys_memcpy(BoxSaveAccessor_GetPkm(boxes, trayNum, pos), pkm, sizeof(BoxPkm));
+    MI_CpuCopy8(BoxSaveAccessor_GetPkm(boxes, trayNum, pos), pkm, sizeof(BoxPkm));
     return pkm;
 }
 

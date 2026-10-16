@@ -14,16 +14,4 @@ void func_020129f8(void);
 void setupDownloadPlayConfig(HeapID heapId);
 void downloadPlayConfigForWifi(void);
 
-// DWC's, in main: the size of the work that the next needs; what kind of access point a beacon is, FALSE if it is not
-// one that DWC knows; and reading the console's Wi-Fi connection settings.
-// These belong in lib/dwc/include/dwc/dwc.h
-typedef struct {
-    int apType;
-    u8 unk4[0x3c];
-} DWCApInfo;
-
-u32 func_0205b588(void);
-BOOL func_0205b594(void *work, const void *bssDesc, DWCApInfo *apInfo);
-void func_0205e038(void *config, int a1);
-
 #endif // POKEBW2_SYSTEM_WIH_DWC_H

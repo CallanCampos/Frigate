@@ -1313,7 +1313,7 @@ static void Input_HeadWord1Init(WorldTradeInputWork *wk, int type, int x) {
     BGWinFrame_GetScreen(wk->bgWinFrm, 0);
     Input_SelectBmpWinAdd(wk, type);
     Input_TouchPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[14], 0x4a, &wk->print);
-    sys_memset(wk->seeCheck, 1, sizeof(wk->seeCheck));
+    MI_CpuFill8(wk->seeCheck, 1, sizeof(wk->seeCheck));
     for (i = 0; i < 9; i++) {
         str = GFL_MsgDataLoadStrbufNew(wk->msgManager, i + 0x74);
         if (type == INPUT_MODE_HEADWORD_1) {
@@ -1520,7 +1520,7 @@ static u32 Input_SeqHead1Return(WorldTradeInputWork *wk) {
     BGWinFrame_GetScreen(wk->bgWinFrm, 0);
     Input_SelectBmpWinAdd(wk, INPUT_MODE_HEADWORD_1);
     Input_TouchPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[14], 0x4a, &wk->print);
-    sys_memset(wk->seeCheck, 1, sizeof(wk->seeCheck));
+    MI_CpuFill8(wk->seeCheck, 1, sizeof(wk->seeCheck));
     for (i = 0; i < 9; i++) {
         str = GFL_MsgDataLoadStrbufNew(wk->msgManager, i + 0x74);
         if (Input_PokeSeeCountCategory(wk, i) == TRUE) {
@@ -1556,7 +1556,7 @@ static u32 Input_SeqHead2Init(WorldTradeInputWork *wk) {
     BGWinFrame_LoadScreen(wk->bgWinFrm, 0, ARCID_WORLDTRADE, 0x1a, TRUE);
     BGWinFrame_GetScreen(wk->bgWinFrm, 0);
     Input_SelectBmpWinAdd(wk, INPUT_MODE_HEADWORD_2);
-    sys_memset(wk->seeCheck, 1, sizeof(wk->seeCheck));
+    MI_CpuFill8(wk->seeCheck, 1, sizeof(wk->seeCheck));
     Input_SystemPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[0], wk->head1 + 0x74, 2, INPUT_COLOR_NORMAL,
                       &wk->print);
     for (i = 1; i <= sHeadwordRange[wk->head1].count; i++) {
@@ -1889,7 +1889,7 @@ static u32 Input_SeqNationHead2Init(WorldTradeInputWork *wk) {
     BGWinFrame_LoadScreen(wk->bgWinFrm, 0, ARCID_WORLDTRADE, 0x1a, TRUE);
     BGWinFrame_GetScreen(wk->bgWinFrm, 0);
     Input_SelectBmpWinAdd(wk, INPUT_MODE_HEADWORD_2);
-    sys_memset(wk->seeCheck, 1, sizeof(wk->seeCheck));
+    MI_CpuFill8(wk->seeCheck, 1, sizeof(wk->seeCheck));
     Input_SystemPrint(wk->bgWinFrm, wk->msgManager, wk->menuWin[0], wk->head1 + 0x74, 2, INPUT_COLOR_NORMAL,
                       &wk->print);
     for (i = 1; i < 4; i++) {

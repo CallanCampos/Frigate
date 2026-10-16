@@ -97,7 +97,7 @@ CtvtGameCamGraphic *CtvtGameCamGraphic_Create(u32 layout, HeapID heapId) {
     CtvtGameCamGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(CtvtGameCamGraphic), FALSE, "ctvt_game_cam_graphic.c", 436);
 
-    sys_memset(graphic, 0, sizeof(CtvtGameCamGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(CtvtGameCamGraphic));
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
@@ -120,7 +120,7 @@ void CtvtGameCamGraphic_Free(CtvtGameCamGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(CtvtGameCamGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(CtvtGameCamGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -131,7 +131,7 @@ ClActUnit *CtvtGameCamGraphic_GetClActUnit(CtvtGameCamGraphic *graphic) {
 static void CtvtGameCamBG_Init(CtvtGameCamBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(CtvtGameCamBG));
+    MI_CpuFill8(bg, 0, sizeof(CtvtGameCamBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sCtvtGameCamLCDConfig);
@@ -150,11 +150,11 @@ static void CtvtGameCamBG_Free(CtvtGameCamBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(CtvtGameCamBG));
+    MI_CpuFill8(bg, 0, sizeof(CtvtGameCamBG));
 }
 
 static void CtvtGameCamClAct_Init(CtvtGameCamClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(CtvtGameCamClAct));
+    MI_CpuFill8(clact, 0, sizeof(CtvtGameCamClAct));
     ClActSys_Create(&sCtvtGameCamClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(16, 0, heapId);
     func_0204c028(clact->unit);
@@ -165,7 +165,7 @@ static void CtvtGameCamClAct_Init(CtvtGameCamClAct *clact, const BGSysVRAMConfig
 static void CtvtGameCamClAct_Free(CtvtGameCamClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(CtvtGameCamClAct));
+    MI_CpuFill8(clact, 0, sizeof(CtvtGameCamClAct));
 }
 
 static ClActUnit *CtvtGameCamClAct_GetUnit(CtvtGameCamClAct *clact) {

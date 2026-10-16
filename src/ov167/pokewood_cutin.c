@@ -459,7 +459,7 @@ static BOOL Cutin_CmdNudge(PokewoodCutin *cutin, u16 *seq, const u16 *args) {
 
     switch (*seq) {
     case 0:
-        sys_memset(&cutin->nudge, 0, sizeof(CutinNudge));
+        MI_CpuFill8(&cutin->nudge, 0, sizeof(CutinNudge));
         sNudgeFuncs[args[1]].init(cutin, &cutin->nudge, actor);
         sNudgeFuncs[args[1]].update(cutin, &cutin->nudge);
         sNudgeFuncs[args[1]].getPos(cutin, &cutin->nudge, &pos);

@@ -54,30 +54,30 @@ Demo3DCapture *Demo3DCapture_Create(TCBExManager *manager, const Demo3DCapturePa
     capture->param = *param;
     capture->task = task;
     capture->started = FALSE;
-    capture->lcdcBanks = gfxGetLCDCBanks();
+    capture->lcdcBanks = GX_GetBankForLCDC();
     Demo3DCapture_Begin(&capture->param);
     GFL_VBlankTCBAdd(Demo3DCapture_VBlank, capture, 0);
     return capture;
 }
 
 void Demo3DCapture_End(Demo3DCapture *capture, int dispMode, int bgMode, int bg0As3D) {
-    gfxSetEngineModeA(dispMode, bgMode, bg0As3D);
-    gfxSetLCDCBanks(capture->lcdcBanks);
+    GX_SetGraphicsMode(dispMode, bgMode, bg0As3D);
+    GX_SetBankForLCDC(capture->lcdcBanks);
     switch (capture->param.dispMode) {
     case GX_DISPMODE_VRAM_A:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_A, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_A, 0x20000);
         break;
     case GX_DISPMODE_VRAM_B:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_B, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_B, 0x20000);
         break;
     case GX_DISPMODE_VRAM_C:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_C, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_C, 0x20000);
         break;
     case GX_DISPMODE_VRAM_D:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_D, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_D, 0x20000);
         break;
     default:
-        gfxSetLCDCBanks(GX_VRAM_NONE);
+        GX_SetBankForLCDC(GX_VRAM_NONE);
         break;
     }
     GFL_TCBExRequestEnd(capture->task);
@@ -98,22 +98,22 @@ static void Demo3DCapture_VBlank(TCB *tcb, void *data) {
 
     switch (capture->param.dispMode) {
     case GX_DISPMODE_VRAM_A:
-        gfxSetLCDCBanks(GX_VRAM_A);
+        GX_SetBankForLCDC(GX_VRAM_A);
         break;
     case GX_DISPMODE_VRAM_B:
-        gfxSetLCDCBanks(GX_VRAM_B);
+        GX_SetBankForLCDC(GX_VRAM_B);
         break;
     case GX_DISPMODE_VRAM_C:
-        gfxSetLCDCBanks(GX_VRAM_C);
+        GX_SetBankForLCDC(GX_VRAM_C);
         break;
     case GX_DISPMODE_VRAM_D:
-        gfxSetLCDCBanks(GX_VRAM_D);
+        GX_SetBankForLCDC(GX_VRAM_D);
         break;
     default:
-        gfxSetLCDCBanks(GX_VRAM_NONE);
+        GX_SetBankForLCDC(GX_VRAM_NONE);
         break;
     }
-    gfxSetEngineModeA(capture->param.dispMode, capture->param.bgMode, capture->param.bg0As3D);
+    GX_SetGraphicsMode(capture->param.dispMode, capture->param.bgMode, capture->param.bg0As3D);
     capture->started = TRUE;
     GFL_TCBRemove(tcb);
 }
@@ -122,16 +122,16 @@ static void Demo3DCapture_VBlank(TCB *tcb, void *data) {
 static void Demo3DCapture_Begin(const Demo3DCaptureParam *param) {
     switch (param->dispMode) {
     case GX_DISPMODE_VRAM_A:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_A, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_A, 0x20000);
         break;
     case GX_DISPMODE_VRAM_B:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_B, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_B, 0x20000);
         break;
     case GX_DISPMODE_VRAM_C:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_C, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_C, 0x20000);
         break;
     case GX_DISPMODE_VRAM_D:
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM_D, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM_D, 0x20000);
         break;
     }
     GX_SetCapture(param->size, param->mode, param->sourceA, param->sourceB, param->dest, 16, 0);

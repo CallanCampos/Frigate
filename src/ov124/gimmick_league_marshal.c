@@ -348,7 +348,7 @@ static GameEventReturnCode func_ov124_021ef10c(GameEvent *event, u32 *state, voi
     switch (*state) {
     case 0:
         FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_PLATFORM, FALSE);
-        sys_memset(&shake, 0, sizeof(shake));
+        MI_CpuFill8(&shake, 0, sizeof(shake));
         shake.amplitude = 4;
         shake.period = 3;
         shake.count = 10;

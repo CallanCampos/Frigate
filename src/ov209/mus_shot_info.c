@@ -211,7 +211,7 @@ void MusShotInfo_Main(MusShotInfo *info) {
             pos = AppTaskMenu_GetCursorPos(info->menu);
             AppTaskMenu_Free(info->menu);
             if (pos == 0) {
-                sys_memcpy(info->shot, func_0200ad5c(info->save), sizeof(MusicalShot));
+                MI_CpuCopy8(info->shot, func_0200ad5c(info->save), sizeof(MusicalShot));
             }
             if (info->comm != NULL) {
                 info->state = MUS_SHOT_INFO_STATE_SYNC;

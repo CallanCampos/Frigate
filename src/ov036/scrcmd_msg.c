@@ -467,7 +467,7 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
         func_ov036_02188844(getMapDisplayInfoPtr(env), strbuf);
     } else {
         actorWork = GetFieldScriptActorWk(env);
-        sys_memset(actorWork, 0, sizeof(ScriptActorWork));
+        MI_CpuFill8(actorWork, 0, sizeof(ScriptActorWork));
         actorWork->actorId = actorId;
         if (pos == 0) {
             CopyActorWPos(actor, &actorPos);
@@ -614,7 +614,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     }
     actorWork = GetFieldScriptActorWk(env);
     winX = 0;
-    sys_memset(actorWork, 0, sizeof(ScriptActorWork));
+    MI_CpuFill8(actorWork, 0, sizeof(ScriptActorWork));
     actorWork->actorId = actorId;
     player = Field_GetPlayer(fieldWork->field);
     mmSys = GetScrEnvMMdlSys(env);

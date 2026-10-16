@@ -812,7 +812,7 @@ GameEvent *EventPokewood_CreateMoviePickerEvent(GameSystem *gsys, void *args) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventPokewood_RunPicker, sizeof(PokewoodPickerEvent));
     PokewoodPickerEvent *wk = GameEvent_GetData(event);
 
-    sys_memset(wk, 0, sizeof(PokewoodPickerEvent));
+    MI_CpuFill8(wk, 0, sizeof(PokewoodPickerEvent));
     wk->gsys = gsys;
     wk->field = field;
     wk->param = *(PkwdBookParam *)args;
@@ -846,7 +846,7 @@ GameEvent *EventPokewood_CreateMenuEvent(GameSystem *gsys, void *args) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventPokewood_RunMenu, sizeof(PokewoodMenuEvent));
     PokewoodMenuEvent *wk = GameEvent_GetData(event);
 
-    sys_memset(wk, 0, sizeof(PokewoodMenuEvent));
+    MI_CpuFill8(wk, 0, sizeof(PokewoodMenuEvent));
     wk->gsys = gsys;
     wk->field = field;
     wk->param = *(PokewoodMenuParam *)args;
@@ -998,7 +998,7 @@ GameEvent *EventPokewood_CreateScreenEvent(GameSystem *gsys, void *args) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventPokewood_RunScreen, sizeof(PokewoodScreenEvent));
     PokewoodScreenEvent *wk = GameEvent_GetData(event);
 
-    sys_memset(wk, 0, sizeof(PokewoodScreenEvent));
+    MI_CpuFill8(wk, 0, sizeof(PokewoodScreenEvent));
     wk->gsys = gsys;
     wk->field = field;
     wk->param = *(PkwdRecordMonitorParam *)args;

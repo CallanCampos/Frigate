@@ -33,7 +33,7 @@ MoveReminderProcessData *func_ov012_02169c7c(HeapID heapId) {
     MoveReminderProcessData *data =
         GFL_HeapAllocate(heapId, sizeof(MoveReminderProcessData), FALSE, "waza_oshie.c", 35);
 
-    sys_memset(data, 0, sizeof(MoveReminderProcessData));
+    MI_CpuFill8(data, 0, sizeof(MoveReminderProcessData));
     return data;
 }
 

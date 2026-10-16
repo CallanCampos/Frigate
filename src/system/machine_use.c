@@ -1,16 +1,21 @@
 #include "types.h"
 #include "gfl/ui.h"
+#include "nitro/ctrdg.h"
+#include "nitro/fs.h"
 #include "nitro/fx.h"
+#include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/mic.h"
 #include "nitro/os.h"
+#include "nitro/pm.h"
 #include "nitro/rtc.h"
 #include "nnsys/gfd.h"
 #include "system/dsi.h"
 #include "system/machine_use.h"
 #include "system/main.h"
 #include "twl/pm.h"
+#include "twl/scfg.h"
 
 // The game's setup of the console and the SDK, with what the main loop does for them each frame. The file name is a
 // guess after gfl_use.c, which follows it, as the ROM does not embed it; its statics have a base of their own, so it
@@ -26,9 +31,6 @@
 #define SCFG_EXT_COPY (*(vu32 *)0x02fffdf0)
 #define SCFG_EXT_VRAM 0x2000
 
-// The bits of the console type (func_0207ac24) that SystemInit checks
-#define CONSOLE_TYPE_DEV_MASK 0x3000000
-
 #define VRAM_TRANSFER_TASK_COUNT 48
 
 static void OnExitRequest(void *arg);
@@ -42,43 +44,43 @@ void SystemInit(void) {
     void *table;
     int amp;
 
-    os_init();
-    clock_init();
+    OS_Init();
+    OS_InitTick();
     OS_InitAlarm();
-    func_0207cb88();
-    gfxInit();
+    RTC_Init();
+    GX_Init();
     FX_Init();
 
-    if (func_0207ac24() & CONSOLE_TYPE_DEV_MASK) {
-        func_0207f6e8(1);
+    if (OS_GetConsoleType() & OS_CONSOLE_DEV_MASK) {
+        SCFG_SetCpuSpeed(SCFG_CPU_SPEED_2X);
         reg_SCFG_EXT &= ~SCFG_EXT_VRAM;
         SCFG_EXT_COPY &= ~SCFG_EXT_VRAM;
     }
 
     (void)OS_EnableIrq();
-    fs_init(1);
-    tableSize = func_02072358(NULL, 0);
-    table = mem_alloc_direct(OS_ARENA_MAIN, tableSize, 4);
-    func_02072358(table, tableSize);
+    FS_Init(1);
+    tableSize = FS_LoadTable(NULL, 0);
+    table = OS_AllocFromArenaLo(OS_ARENA_MAIN, tableSize, 4);
+    FS_LoadTable(table, tableSize);
 
     NNS_GfdInitVramTransferManager(sVramTransferTasks, VRAM_TRANSFER_TASK_COUNT);
 
     if (isRunningOnDSi()) {
         sExitRequested = FALSE;
         PM_SetExitCallbackInfo(&sExitCallbackInfo, OnExitRequest, NULL);
-        func_0276952c(&sExitCallbackInfo);
+        PM_AppendPreExitCallback(&sExitCallbackInfo);
     }
 
-    func_0207f0ac(&amp);
+    PM_GetAmp(&amp);
     if (amp == PM_AMP_ON) {
-        func_0207efc4(PM_AMP_OFF);
+        PM_SetAmp(PM_AMP_OFF);
     }
 }
 
 void func_02005430(void) {
-    if (sExitRequested && !GCTX_HIDIsSoftResetBlocked(2) && !func_02769594()) {
+    if (sExitRequested && !GCTX_HIDIsSoftResetBlocked(2) && !PM_GetAutoExit()) {
         MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
-        func_027694dc();
+        PM_ReadyToExit();
     }
 }
 
@@ -86,12 +88,12 @@ void SystemUpdateVBlank(void) {
     NNS_GfdDoVramTransfer();
 }
 
-void func_0200548c(void) {
-    func_020827d0();
+void CTRDG_Init(void) {
+    CTRDG_DummyInit();
 }
 
 // Called when the DSi is about to exit the game: keeps it from exiting until func_02005430 lets it
 static void OnExitRequest(void *arg) {
-    func_02769588(FALSE);
+    PM_SetAutoExit(FALSE);
     sExitRequested = TRUE;
 }

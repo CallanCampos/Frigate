@@ -125,7 +125,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     int i;
 
     work = GFL_HeapAllocate(heapId, sizeof(*work), FALSE, "shortcut_menu.c", 253);
-    sys_memset(work, 0, sizeof(*work));
+    MI_CpuFill8(work, 0, sizeof(*work));
     work->code = 0;
     work->item = 0xff;
     work->listPos = listPos;
@@ -145,7 +145,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     GFL_BGSysSetScrPaletteNo(BG, 0, 0xb, 0x20, 1, 0xa);
     GFL_ArcToolFree(arc);
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.y = 0x60;
     for (i = 0; i < ACTORS; i++) {
         setup.sequence = i;
@@ -163,7 +163,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     SetupMenu(work, work->listPos, work->menuMsgData, work->menuFont, work->menuQueue, shortcut, work->clactActors,
               heapId);
     GFL_BGSysQueueScrLoad(BG);
-    gfxRegSetAlphaBlend(0x4000050, 2, 0x11, 0xc, 4);
+    G2x_SetBlendAlpha_(0x4000050, 2, 0x11, 0xc, 4);
 
     if (mode == 0) {
         GFL_BGSysMoveBG(BG, BG_MOVE_SET_Y, -0xc0);
@@ -307,7 +307,7 @@ static void SetupMenu(ShortcutMenuApp *work, u16 *listPos, MsgData *msgData, Fon
 
     BmpWin *window;
 
-    sys_memset_fast(work, 0, 0x4c);
+    MI_CpuFill(work, 0, 0x4c);
     work->queue = queue;
     work->shortcut = shortcut;
     work->heapId = heapId;
@@ -329,7 +329,7 @@ static void SetupMenu(ShortcutMenuApp *work, u16 *listPos, MsgData *msgData, Fon
 static void FreeMenu(ShortcutMenuApp *work, u16 *listPos) {
     FreeList(work, listPos, listPos + 1);
     BmpWin_Free(work->window);
-    sys_memset(work, 0, 0x4c);
+    MI_CpuFill8(work, 0, 0x4c);
 }
 
 static void OnCursorUp(ShortcutMenuApp *work, u16 value, u32 count, u32 *handled) {

@@ -206,8 +206,8 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
 
     if (displayMode == CTDM_SINGLE) {
         if (work->dirtyMask != 0) {
-            cp15_flushDC(work->screen, CTVT_SCREEN_SIZE);
-            gfxUploadBGScreen3A(work->screen, 0, CTVT_SCREEN_SIZE);
+            DC_FlushRange(work->screen, CTVT_SCREEN_SIZE);
+            GX_LoadBG3Scr(work->screen, 0, CTVT_SCREEN_SIZE);
             work->dirtyMask = 0;
         }
     } else {
@@ -246,7 +246,7 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
                 work->updateDisplay = FALSE;
                 func_ov257_021aad48(sys);
             }
-            sys_memset32(0, gfxGetScreenAddrBG3A(), CTVT_SCREEN_SIZE);
+            MIi_CpuClear32(0, G2_GetBG3ScrPtr(), CTVT_SCREEN_SIZE);
             work->redrawAll = FALSE;
             if (work->zoomed != CommTvt_IsZoomed(sys)) {
                 work->zoomed = CommTvt_IsZoomed(sys);
@@ -321,13 +321,13 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
                         size = 0x1800;
                     }
                 }
-                cp15_flushDC((void *)src, size);
+                DC_FlushRange((void *)src, size);
                 for (row = 0; row < work->windows[i].cur.height; row++) {
                     int y = height - work->windows[i].cur.height + row;
 
-                    gfxUploadBGScreen3A((void *)(src + y * width * 2 + (width - work->windows[i].cur.width) * 2),
-                                        work->windows[i].cur.x * 2 + (work->windows[i].cur.y + row) * 512,
-                                        work->windows[i].cur.width * 2);
+                    GX_LoadBG3Scr((void *)(src + y * width * 2 + (width - work->windows[i].cur.width) * 2),
+                                  work->windows[i].cur.x * 2 + (work->windows[i].cur.y + row) * 512,
+                                  work->windows[i].cur.width * 2);
                 }
             }
             work->dirtyMask -= 1 << i;
@@ -370,7 +370,7 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
 
     if (func_ov257_021aab18(sys) == FALSE) {
         for (y = 0; y < 192; y++) {
-            sys_memcpy32((u16 *)frame + y * 256 + 64, work->frameCopy + y * 128, 256);
+            MIi_CpuCopy32((u16 *)frame + y * 256 + 64, work->frameCopy + y * 128, 256);
         }
     }
     if (displayMode == CTDM_SINGLE) {
@@ -396,8 +396,8 @@ static void CtvtCamera_OnFrame(void *frame, void *data) {
     if (func_ov257_021aab5c(sys) == FALSE) {
         func_ov257_021aab60(sys, TRUE);
         for (y = 0; y < height; y++) {
-            sys_memcpy32((void *)((u32)work->frameCopy + (top + y) * 256 + left * 2),
-                         (void *)((u32)work->screen + pos * (width * height * 2) + width * y * 2), width * 2);
+            MIi_CpuCopy32((void *)((u32)work->frameCopy + (top + y) * 256 + left * 2),
+                          (void *)((u32)work->screen + pos * (width * height * 2) + width * y * 2), width * 2);
         }
         func_ov257_021aab60(sys, FALSE);
         work->dirtyMask |= 1 << self;

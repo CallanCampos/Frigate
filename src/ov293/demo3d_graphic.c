@@ -136,8 +136,8 @@ static void Demo3DGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sDemo3DLights); i++) {
         GFL_G3DSysLightSet(i, &sDemo3DLights[i]);
@@ -148,7 +148,7 @@ static void Demo3DGraphic_G3DInit(void) {
 Demo3DGraphic *Demo3DGraphic_Create(u32 layout, u32 demoId, HeapID heapId) {
     Demo3DGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(Demo3DGraphic), FALSE, "demo3d_graphic.c", 346);
 
-    sys_memset(graphic, 0, sizeof(Demo3DGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(Demo3DGraphic));
     graphic->dual3D = Demo3DData_IsDual3D(demoId);
     G2_BlendNone();
     G2S_BlendNone();
@@ -184,7 +184,7 @@ void Demo3DGraphic_Free(Demo3DGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(Demo3DGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(Demo3DGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -240,7 +240,7 @@ static void Demo3DGraphic_VBlank(TCB *tcb, void *data) {
 static void Demo3DBG_Init(Demo3DBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(Demo3DBG));
+    MI_CpuFill8(bg, 0, sizeof(Demo3DBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sDemo3DLCDConfig);
@@ -262,7 +262,7 @@ static void Demo3DBG_Free(Demo3DBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(Demo3DBG));
+    MI_CpuFill8(bg, 0, sizeof(Demo3DBG));
 }
 
 static void Demo3DBG_Update(Demo3DBG *bg) {
@@ -273,7 +273,7 @@ static void Demo3DBG_VBlank(Demo3DBG *bg) {
 }
 
 static void Demo3DClAct_Init(Demo3DClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(Demo3DClAct));
+    MI_CpuFill8(clact, 0, sizeof(Demo3DClAct));
     ClActSys_Create(&sDemo3DClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(32, 0, heapId);
     func_0204c028(clact->unit);
@@ -284,7 +284,7 @@ static void Demo3DClAct_Init(Demo3DClAct *clact, const BGSysVRAMConfig *vramConf
 static void Demo3DClAct_Free(Demo3DClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(Demo3DClAct));
+    MI_CpuFill8(clact, 0, sizeof(Demo3DClAct));
 }
 
 static void Demo3DClAct_Update(Demo3DClAct *clact) {

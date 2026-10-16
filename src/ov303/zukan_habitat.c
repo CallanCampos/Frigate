@@ -374,7 +374,7 @@ static void ZukanHabitat_VBlank(TCB *tcb, void *data) {
 static ZukanHabitatWork *ZukanHabitat_CreateWork(GameProc *proc, ZukanHabitatListParam *param) {
     ZukanHabitatWork *wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanHabitatWork), HEAPID_ZUKAN_HABITAT);
 
-    sys_memset(wk, 0, sizeof(ZukanHabitatWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanHabitatWork));
     wk->param = param;
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0362, HEAPID_ZUKAN_HABITAT);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_HABITAT);
@@ -418,8 +418,8 @@ static void ZukanHabitat_SeqFadeIn(ZukanHabitatWork *wk) {
         break;
     case 1:
         if (!ZukanHabitatGraphic_IsFading(&wk->graphic)) {
-            GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
             wk->step++;
         }
         break;
@@ -461,7 +461,7 @@ static void ZukanHabitat_SeqFadeOut(ZukanHabitatWork *wk) {
             func_0204c124(ZukanHabitatGraphic_GetActor(&wk->graphic, ZUKAN_HABITAT_OBJ_INFO), FALSE);
             ZukanHabitatGraphic_SetNewMarksVisible(&wk->graphic, FALSE);
             backdrop = 0;
-            gfxUploadStdPaletteBGB(&backdrop, 0, sizeof(backdrop));
+            GXS_LoadBGPltt(&backdrop, 0, sizeof(backdrop));
             GFL_BGSysSetBGEnabled(6, FALSE);
             GFL_BGSysSetBGEnabled(7, FALSE);
             wk->step++;
@@ -470,8 +470,8 @@ static void ZukanHabitat_SeqFadeOut(ZukanHabitatWork *wk) {
     case 1:
         if (!ZukanHabitatGraphic_IsFading(&wk->graphic)) {
             if (wk->slideMain >= SLIDE_DISTANCE) {
-                GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-                GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
                 wk->finished = TRUE;
             } else {
                 ZukanHabitatGraphic_Scroll(&wk->graphic, SLIDE_SPEED, TRUE);
@@ -1350,7 +1350,7 @@ static void ZukanHabitat_LoadSpecies(ZukanHabitatWork *wk) {
     ZukanHabitatArea *area = ZukanHabitat_GetArea(wk);
     ZukanHabitatSpecies *list;
 
-    sys_memset(wk->species, 0, sizeof(wk->species));
+    MI_CpuFill8(wk->species, 0, sizeof(wk->species));
     list = area->species;
     for (i = 0; i < ZUKAN_HABITAT_ICON_COUNT; i++) {
         ZukanHabitatSpecies *species = &list[i];
@@ -1471,7 +1471,7 @@ static void ZukanHabitat_CheckTypes(ZukanHabitatWork *wk) {
     int season;
     ZukanHabitatSpecies *species = ZukanHabitat_GetArea(wk)->species;
 
-    sys_memset(wk->typeShown, 0, sizeof(wk->typeShown));
+    MI_CpuFill8(wk->typeShown, 0, sizeof(wk->typeShown));
     for (type = 0; type < TYPE_COUNT; type++) {
         BOOL seen = TRUE;
         BOOL caught = TRUE;

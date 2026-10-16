@@ -1,0 +1,26 @@
+// NitroSDK's file system (libfs): the entry points of the whole system, FS_Init and FS_IsAvailable. The file name is a
+// guess from NitroSDK's own layout (fs_api.c); no string in the ROM names it. The functions have NitroSDK's names where
+// they are known.
+
+#include "nitro/fs.h"
+
+// A word that follows the flag in the ROM and that nothing reads or writes, probably something that only code the link
+// dead-stripped used; the name is ours. MWCC drops a static that nothing reads, so it is a global, declared so that
+// .bss holds the file's objects in the ROM's order and size
+u32 FSi_UnusedWord;
+static BOOL sIsInitialized; // swan's g_IsFSInitialized
+
+// NitroSDK's FS_Init: makes the archive "rom", with the default DMA channel given, and the state of the overlays; only
+// the first call does
+void FS_Init(u32 dma) {
+    if (!sIsInitialized) {
+        sIsInitialized = TRUE;
+        FSi_InitRomArchive(dma);
+        FSi_InitOverlay();
+    }
+}
+
+// NitroSDK's FS_IsAvailable: whether FS_Init ran
+BOOL FS_IsAvailable(void) {
+    return sIsInitialized;
+}

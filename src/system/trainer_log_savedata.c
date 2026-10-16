@@ -149,7 +149,7 @@ u32 func_0200b240(void) {
 }
 
 void func_0200b248(TrainerLogSave *log) {
-    sys_memset(log, 0, sizeof(TrainerLogSave));
+    MI_CpuFill8(log, 0, sizeof(TrainerLogSave));
     log->lastSlot = TRAINER_LOG_NONE;
 }
 
@@ -168,10 +168,10 @@ u8 func_0200b26c(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
     }
     for (i = count - 1; i > slot; i--) {
         if (log->entries[i].count != 0 || log->entries[i - 1].count != 0) {
-            sys_memcpy(&log->entries[i - 1], &log->entries[i], sizeof(TrainerLogEntry));
+            MI_CpuCopy8(&log->entries[i - 1], &log->entries[i], sizeof(TrainerLogEntry));
         }
     }
-    sys_memcpy(entry, &log->entries[slot], sizeof(TrainerLogEntry));
+    MI_CpuCopy8(entry, &log->entries[slot], sizeof(TrainerLogEntry));
     return slot;
 }
 
@@ -188,7 +188,7 @@ BOOL func_0200b2fc(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry)
 
 void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 unk10_17, u8 unk10_18, u8 unk10_22,
                    u32 id, u16 unk18, u8 unk1A, u8 unk1B_0, u8 unk1B_6) {
-    sys_memset(entry, 0, sizeof(TrainerLogEntry));
+    MI_CpuFill8(entry, 0, sizeof(TrainerLogEntry));
     wcharsncpy(name, entry->name, 8);
     entry->value = value;
     entry->id = id;

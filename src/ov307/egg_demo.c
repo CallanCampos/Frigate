@@ -174,7 +174,7 @@ static BOOL EggDemo_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_EGG_DEMO, 0x50000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(EggDemoWork), HEAPID_EGG_DEMO);
-    sys_memset(wk, 0, sizeof(EggDemoWork));
+    MI_CpuFill8(wk, 0, sizeof(EggDemoWork));
     wk->heapId = HEAPID_EGG_DEMO;
     wk->state = EGG_DEMO_WAIT;
     wk->wait = 5;
@@ -410,10 +410,10 @@ static void EggDemo_InitGraphics(EggDemoParam *param, EggDemoWork *wk) {
     GFL_BGSysSetBGEnabled(0, TRUE);
     GFL_BGSysSetBGEnabled(2, TRUE);
     GFL_BGSysSetBGEnabled(4, TRUE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
-                        0, 0);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                       0, 0);
     GFL_BGSysResetStdPalette(0, GX_RGB(16, 16, 16));
     GFL_BGSysResetStdPalette(4, GX_RGB(0, 0, 0));
     wk->view = EggDemoView_Create(wk->heapId, param->pkm);

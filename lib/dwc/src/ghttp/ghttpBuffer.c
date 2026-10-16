@@ -229,7 +229,7 @@ BOOL ghiAppendCharToBuffer(GHIBuffer *buffer, int c) {
 BOOL ghiAppendIntToBuffer(GHIBuffer *buffer, int value) {
     char text[16];
 
-    func_0207a290(text, "%d", value);
+    OS_SPrintf(text, "%d", value);
     return ghiAppendDataToBuffer(buffer, text, 0);
 }
 

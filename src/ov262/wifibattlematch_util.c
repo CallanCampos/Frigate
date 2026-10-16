@@ -73,7 +73,7 @@ WifiBattleMatchMsgBox *WifiBattleMatchMsgBox_Create(u32 bg, u32 palette, u16 fra
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchMsgBox), FALSE, "wifibattlematch_util.c", 95);
     BmpWin *window;
 
-    sys_memset(p_wk, 0, sizeof(WifiBattleMatchMsgBox));
+    MI_CpuFill8(p_wk, 0, sizeof(WifiBattleMatchMsgBox));
     p_wk->bgColor = MSGBOX_BG_COLOR;
     p_wk->font = font;
     p_wk->queue = func_02021998(heapId);
@@ -244,7 +244,7 @@ WifiBattleMatchMenu *WifiBattleMatchMenu_Create(const WifiBattleMatchMenuParam *
     BmpWin *window;
     u32 i;
 
-    sys_memset(menu, 0, sizeof(WifiBattleMatchMenu));
+    MI_CpuFill8(menu, 0, sizeof(WifiBattleMatchMenu));
     menu->queue = param->printQueue;
     menu->cancelValue = param->cancelValue;
     menu->window = BmpWin_CreateDynamic(param->bg, x, y, width, height, param->palette, TRUE);
@@ -300,7 +300,7 @@ WifiBattleMatchTask *WifiBattleMatchTask_Create(void *work, WifiBattleMatchTaskF
     WifiBattleMatchTask *task =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchTask), FALSE, "wifibattlematch_util.c", 638);
 
-    sys_memset(task, 0, sizeof(WifiBattleMatchTask));
+    MI_CpuFill8(task, 0, sizeof(WifiBattleMatchTask));
     task->work = work;
     WifiBattleMatchTask_SetFunc(task, func);
     return task;

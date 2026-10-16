@@ -163,7 +163,7 @@ static int FormatDecimal64(char *dest, u64 value, int minDigits);
 static int FormatHex(char *dest, u32 value, int digits);
 
 static char sNdLogDataParam[0x59];
-static NdApInfo sNdApInfo;
+static DWCApInfo sNdApInfo;
 static char sNdUserAgent[0x21];
 static char sNdPasswordParam[25];
 static OSMutex sNdAttrMutex;
@@ -183,11 +183,11 @@ static const char sActionList[] = "bGlzdA**";
 static const char sActionContents[] = "Y29udGVudHM*";
 
 static void *NdAlloc(u32 size, int align) {
-    return func_020586f4(10, size, align);
+    return DWC_AllocEx(10, size, align);
 }
 
 static void NdFree(void *ptr) {
-    func_02058728(10, ptr, 0);
+    DWC_Free(10, ptr, 0);
 }
 
 // Ends the thread and gives its memory back, and tells NdReportResults that the library has ended
@@ -215,9 +215,9 @@ static void ThreadMain(void *arg) {
                 NdSetResult(DWC_ND_CBREASON_INITIALIZE, ND_ERROR_FATAL, -1);
                 return;
             }
-            func_0207a2c0(url, 0x100, "https://%s/download", work->host);
+            OS_SNPrintf(url, 0x100, "https://%s/download", work->host);
             work = sDwcNdState.work;
-            if (func_020580b8(work->authToken, strlen(work->authToken), token, 0x190) < 0) {
+            if (DWC_Base64Encode(work->authToken, strlen(work->authToken), token, 0x190) < 0) {
                 NdSetResult(DWC_ND_CBREASON_INITIALIZE, ND_ERROR_FATAL, -1);
                 return;
             }
@@ -232,8 +232,8 @@ static void ThreadMain(void *arg) {
         }
         case 4: {
             int code;
-            func_02058390(&code);
-            func_020584cc(13, code);
+            DWC_GetLastError(&code);
+            DWCi_SetError(13, code);
             NdSetResult(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_HTTP, -1);
             return;
         }
@@ -241,7 +241,7 @@ static void ThreadMain(void *arg) {
             NdSetResult(DWC_ND_CBREASON_INITIALIZE, DWC_ND_ERROR_CANCELED, -1);
             return;
         default:
-            func_0207aa04(100);
+            OS_Sleep(100);
             break;
         }
     }
@@ -264,7 +264,7 @@ static void NdSetResult(u32 reason, u32 error, int code) {
 }
 
 BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *password) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     OS_InitMutex(&sNdMutex);
@@ -286,7 +286,7 @@ BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *p
         SetWifiError(DWC_ND_ERROR_ALLOC, 0);
         return FALSE;
     }
-    sys_memset(sDwcNdState.work, 0, sizeof(NdWork));
+    MI_CpuFill8(sDwcNdState.work, 0, sizeof(NdWork));
     sDwcNdState.work->started = FALSE;
     strncpy(sDwcNdState.work->gameCode, gameCode, 0x1f);
     strncpy(sDwcNdState.work->password, password, 0x1f);
@@ -295,10 +295,9 @@ BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *p
         sDwcNdState.work = NULL;
         return FALSE;
     }
-    scheduler_init_thread(&sDwcNdState.work->thread, ThreadMain, NULL,
-                          sDwcNdState.work->stack + sizeof(sDwcNdState.work->stack), sizeof(sDwcNdState.work->stack),
-                          16);
-    scheduler_start_thread(&sDwcNdState.work->thread);
+    OS_CreateThread(&sDwcNdState.work->thread, ThreadMain, NULL,
+                    sDwcNdState.work->stack + sizeof(sDwcNdState.work->stack), sizeof(sDwcNdState.work->stack), 16);
+    OS_WakeupThreadDirect(&sDwcNdState.work->thread);
     return TRUE;
 }
 
@@ -353,14 +352,14 @@ BOOL DWC_NdCleanupAsync(void) {
 }
 
 BOOL DWC_NdSetAttr(const char *attr1, const char *attr2, const char *attr3) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     return SetAttrs(attr1, attr2, attr3);
 }
 
 BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     OS_LockMutex(&sNdMutex);
@@ -371,7 +370,7 @@ BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
     }
     sDwcNdState.phase = ND_PHASE_BUSY;
     OS_UnlockMutex(&sNdMutex);
-    sys_memset(files, 0, sizeof(DWCNdFileInfo) * count);
+    MI_CpuFill8(files, 0, sizeof(DWCNdFileInfo) * count);
     if (RequestFileList(files, offset, count)) {
         return TRUE;
     }
@@ -384,7 +383,7 @@ BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
 BOOL DWC_NdGetFileAsync(DWCNdFileInfo *file, void *buffer, u32 size) {
     BOOL result;
 
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     OS_LockMutex(&sNdMutex);
@@ -406,7 +405,7 @@ BOOL DWC_NdGetFileAsync(DWCNdFileInfo *file, void *buffer, u32 size) {
 }
 
 BOOL DWC_NdCancelAsync(void) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     OS_LockMutex(&sNdMutex);
@@ -422,7 +421,7 @@ BOOL DWC_NdCancelAsync(void) {
 }
 
 BOOL DWC_NdGetProgress(u32 *received, u32 *contentLength) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     OS_LockMutex(&sNdMutex);
@@ -721,28 +720,28 @@ static void SetWifiError(int error, int serverError) {
     case DWC_ND_ERROR_CANCELED:
         break;
     case DWC_ND_ERROR_ALLOC:
-        func_020584cc(9, -31001);
+        DWCi_SetError(DWC_ERROR_FATAL, -31001);
         break;
     case DWC_ND_ERROR_HTTP:
-        func_020584cc(14, -31020);
+        DWCi_SetError(14, -31020);
         break;
     case DWC_ND_ERROR_BUFFULL:
-        func_020584cc(13, -31040);
+        DWCi_SetError(13, -31040);
         break;
     case DWC_ND_ERROR_DLSERVER:
-        func_020584cc(13, -31000 - serverError);
+        DWCi_SetError(13, -31000 - serverError);
         break;
     case ND_ERROR_BAD_PARAMETER:
-        func_020584cc(13, -31040);
+        DWCi_SetError(13, -31040);
         break;
     case ND_ERROR_FATAL:
-        func_020584cc(9, -31009);
+        DWCi_SetError(DWC_ERROR_FATAL, -31009);
         break;
     case DWC_ND_ERROR_BUSY:
-        func_020584cc(13, -31010);
+        DWCi_SetError(13, -31010);
         break;
     default:
-        func_020584cc(9, -31009);
+        DWCi_SetError(DWC_ERROR_FATAL, -31009);
         break;
     }
 }
@@ -782,17 +781,17 @@ static BOOL CancelRequest(void) {
 static BOOL MakeApInfoParam(char *dest) {
     char info[13] = "00:0000000-00";
 
-    if (func_0205b29c(&sNdApInfo)) {
-        if (sNdApInfo.type >= 0 && sNdApInfo.type < 10) {
-            info[1] = '0' + sNdApInfo.type;
-        } else if (sNdApInfo.type >= 10 && sNdApInfo.type < 100) {
-            FormatInt(info, sNdApInfo.type);
+    if (DWC_GetApInfo(&sNdApInfo)) {
+        if (sNdApInfo.apType >= 0 && sNdApInfo.apType < 10) {
+            info[1] = '0' + sNdApInfo.apType;
+        } else if (sNdApInfo.apType >= 10 && sNdApInfo.apType < 100) {
+            FormatInt(info, sNdApInfo.apType);
         }
-        if (sNdApInfo.type == 4 || sNdApInfo.type == 8) {
-            if (sNdApInfo.unk4 >= 0 && sNdApInfo.unk4 < 10) {
-                info[3] = '0' + sNdApInfo.unk4;
+        if (sNdApInfo.apType == 4 || sNdApInfo.apType == 8) {
+            if (sNdApInfo.area >= 0 && sNdApInfo.area < 10) {
+                info[3] = '0' + sNdApInfo.area;
             }
-            MemCopy(info + 4, sNdApInfo.spot, 9);
+            MemCopy(info + 4, sNdApInfo.spotInfo, 9);
         }
         Base64Encode(dest, info, 13);
         return TRUE;
@@ -802,11 +801,11 @@ static BOOL MakeApInfoParam(char *dest) {
 
 // Writes the console's identifier and the game's code in base64, for the requests
 static BOOL MakeUserIdParams(char *gameCode, char *userId) {
-    NdConsoleIds ids;
+    DWCBmWifiIdInfo ids;
     char digits[13];
 
     MemZero(&ids, sizeof(ids));
-    func_02056a90(&ids);
+    DWCBm_GetWifiIdInfo(&ids);
     if (ids.id == 0) {
         return FALSE;
     }
@@ -851,7 +850,7 @@ static u8 sNdCertModulus[128] = {
 
 // Writes "Nitro WiFi SDK/5.3"
 static void MakeUserAgent(char *dest) {
-    func_0207a2c0(dest, 0x21, "Nitro WiFi SDK/%d.%d", 5, 3);
+    OS_SNPrintf(dest, 0x21, "Nitro WiFi SDK/%d.%d", 5, 3);
 }
 
 // The HTTP client's callback of every request: the answer of the server decides what the call ends with. The answer is
@@ -1504,7 +1503,7 @@ static void MakeMacParam(char *dest) {
     char digits[12];
     int i;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0; i < 6; i++) {
         FormatHex(digits + i * 2, mac[i], 2);
     }
@@ -1520,11 +1519,11 @@ static int StrNCmp(const char *a, const char *b, int size) {
 }
 
 static void MemZero(void *dest, int size) {
-    sys_memset(dest, 0, size);
+    MI_CpuFill8(dest, 0, size);
 }
 
 static void MemCopy(void *dest, const void *src, int size) {
-    sys_memcpy(src, dest, size);
+    MI_CpuCopy8(src, dest, size);
 }
 
 static int ParseInt(const char *text, int size) {

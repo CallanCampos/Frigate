@@ -373,13 +373,13 @@ static void IrcBattleMatch_FadeSubPalettes(IrcBattleMatch *work, u16 buffer, u32
     PaletteFade_LoadFromVRAM(fade, buffer, 0, size);
     PaletteFade_BlendBuffer(fade, buffer, 0, count * 16, 6, 0);
     faded = PaletteFade_GetFadedBuffer(fade, buffer);
-    cp15_flushDC(faded, size);
+    DC_FlushRange(faded, size);
     switch (buffer) {
     case PALFADE_BUFFER_SUB_OBJ:
-        gfxUploadStdPaletteObjB(faded, 0, size);
+        GXS_LoadOBJPltt(faded, 0, size);
         break;
     case PALFADE_BUFFER_SUB_BG:
-        gfxUploadStdPaletteBGB(faded, 0, size);
+        GXS_LoadBGPltt(faded, 0, size);
         break;
     }
     PaletteFade_FreeBuffer(fade, buffer);
@@ -389,10 +389,10 @@ static void IrcBattleMatch_FadeSubPalettes(IrcBattleMatch *work, u16 buffer, u32
 // Dims the sub screen's BG palette behind a menu, or brings it back
 static void IrcBattleMatch_DimBackground(IrcBattleMatch *work, BOOL dim) {
     if (dim) {
-        sys_memcpy((void *)HW_DB_BG_PLTT, work->paletteBackup, 0x200);
+        MI_CpuCopy8((void *)HW_DB_BG_PLTT, work->paletteBackup, 0x200);
         IrcBattleMatch_FadeSubPalettes(work, PALFADE_BUFFER_SUB_BG, 9);
     } else {
-        gfxUploadStdPaletteBGB(work->paletteBackup, 0, 0x120);
+        GXS_LoadBGPltt(work->paletteBackup, 0, 0x120);
     }
 }
 
@@ -550,7 +550,7 @@ static void IrcBattleMatch_RecvOrder(int netId, int size, const void *data, void
 
     if (handle == func_02040440()) {
         if (netId != func_0203ffc4()) {
-            sys_memcpy(data, work->param->order, sizeof(work->param->order));
+            MI_CpuCopy8(data, work->param->order, sizeof(work->param->order));
         }
     }
 }
@@ -692,7 +692,7 @@ static void IrcBattleMatch_StateSendMac(IrcBattleMatch *work) {
             IrcBattleMatch_SetState(work, IrcBattleMatch_StartWipeOut);
             return;
         }
-        func_0207c33c(mac);
+        OS_GetMacAddress(mac);
         if (func_02042be8(func_02040440(), IRCMATCH_CMD_MAC, sizeof(mac), mac)) {
             func_02040624(func_02040440(), IRCMATCH_TIMING_MAC, IRCMATCH_TIMING_GROUP);
             IrcBattleMatch_SetState(work, IrcBattleMatch_StateSendOrder);
@@ -1215,9 +1215,9 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     work->paletteHeapId = work->heapId;
     arc = GFL_ArcSysCreateFileHandle(IRCMATCH_ARCID, work->paletteHeapId);
     paletteFile = GFL_G2DIOReadNCLRArc(arc, 2, &palette, work->paletteHeapId);
-    sys_memcpy(palette->rawData, work->palettes, 0x120);
+    MI_CpuCopy8(palette->rawData, work->palettes, 0x120);
     for (i = 0; i < 9; i++) {
-        sys_memcpy(work->palettes[8 - i], work->palettes[9 + i], 0x20);
+        MI_CpuCopy8(work->palettes[8 - i], work->palettes[9 + i], 0x20);
     }
     GFL_HeapFree(paletteFile);
     GFL_ArcToolFree(arc);
@@ -1686,7 +1686,7 @@ static BOOL IrcBattleMatch_Init(GameProc *proc, u32 *state, void *param, void *w
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_IRC_BATTLE_MENU, 0x20000);
     work = GFL_ProcInitSubsystem(proc, sizeof(IrcBattleMatch), HEAPID_IRC_BATTLE_MENU);
-    sys_memset(work, 0, sizeof(IrcBattleMatch));
+    MI_CpuFill8(work, 0, sizeof(IrcBattleMatch));
     work->param = param;
     work->param->netError = FALSE;
     work->heapId = HEAPID_IRC_BATTLE_MENU;
@@ -1694,14 +1694,14 @@ static BOOL IrcBattleMatch_Init(GameProc *proc, u32 *state, void *param, void *w
     work->paletteBackup = GFL_HeapAllocate(work->heapId, 0x200, FALSE, "ircbattlematch.c", 2946);
     IrcBattleMatch_InitScreen(work);
     func_020429f0();
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0x10, 3, 9, 14);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0x10, 3, 9, 14);
     return TRUE;
 }
 
 // Cycles the palette of BG 0 every eighth frame, and says when it is halfway
 static inline BOOL IrcBattleMatch_CyclePalette(IrcBattleMatch *work) {
     if ((OS_GetVBlankCount() & 7) == 1) {
-        gfxUploadStdPaletteBGA(work->palettes[work->paletteFrame], 0, 0x20);
+        GX_LoadBGPltt(work->palettes[work->paletteFrame], 0, 0x20);
         work->paletteFrame++;
         if (work->paletteFrame == 9) {
             return TRUE;

@@ -19,7 +19,7 @@ u32 BattleExamination_GetSize(void) {
 }
 
 void BattleExamination_Init(BattleExaminationSave *examination) {
-    sys_memset(examination, 0, sizeof(BattleExaminationSave));
+    MI_CpuFill8(examination, 0, sizeof(BattleExaminationSave));
 }
 
 BOOL BattleExamination_IsValid(void *saveBuffer) {
@@ -61,13 +61,13 @@ void BattleExamination_Load(GameData *gameData, void *saveBuffer, HeapID heapId)
     void *buffer = GFL_HeapAllocate(heapId, BATTLE_EXAMINATION_LOAD_SIZE, FALSE, "battle_examination.c", 153);
 
     func_02007560(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, heapId, buffer, BATTLE_EXAMINATION_LOAD_SIZE);
-    sys_memcpy(saveBuffer, buffer, sizeof(BattleExaminationSave));
+    MI_CpuCopy8(saveBuffer, buffer, sizeof(BattleExaminationSave));
     func_020178c4(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
     for (;;) {
         if (func_020178f4(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION) == 2) {
             break;
         }
-        irq_waitFor(TRUE, 1);
+        OS_WaitIrq(TRUE, 1);
     }
     freeIntermediateSaveExtraBlksAfterLoad2(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
     GFL_HeapFree(buffer);

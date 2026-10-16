@@ -1,0 +1,59 @@
+# Metrowerks' MSL C library for NITRO (MSL_C_NITRO_Ai_LE.a), which ARM9 main links after NitroSDK: the ANSI C library,
+# its fdlibm math (src/math/) and the runtime support (src/runtime/). It is ARM code, built apart from the game, and
+# not with the game's compiler. Probed on 61 functions of string, memory, qsort, rand, printf, scanf, strtoul,
+# wide-character, floating-point classification and runtime code and of fdlibm (sin, cos, floor, frexp,
+# __ieee754_rem_pio2, __kernel_cos, __kernel_rem_pio2), in both versions:
+# - dsi/1.2, 1.2p1, 1.2p2, 1.3 and 1.3p1 compile all of them alike, and 57 of the 61 match byte for byte (the others
+#   differ in source shape only). dsi/1.1 and 1.1p1 (the game's) store a double with one stm where the ROM has two str
+#   (__ieee754_rem_pio2 and __kernel_rem_pio2 stay short), dsi/1.6sp1 and 1.6sp2 differ in sin, cos, scalbn and
+#   __ieee754_rem_pio2, and 1.2/base and 2.0/sp2p2 differ in strcpy, qsort, vsnprintf, floor, cos and __kernel_cos.
+#   The service pack among the five is a guess; the lowest is named.
+# - -O4,p and -O3,p compile alike; -O4,s and -O2 do not match (strstr, strcpy, __fill_mem, __kernel_rem_pio2).
+# - char is unsigned, which is the compiler's default: __StringRead and __mbtowc_noconv load their char with ldrb
+#   and no sign extension.
+# - No -ipa file: runtime/register_atexit.c reaches its two statics through two literals, not one base.
+# - Only functions declared inline are inlined (tolower in stricmp and __msl_strnicmp, the swap in qsort): -inline off
+#   leaves them as calls, and -inline auto inlines vsnprintf into sprintf and __kernel_sin into sin.
+compiler = "dsi/1.2"
+flags = [
+    "-O4,p",               # Optimize for speed
+    "-proc arm946e",       # ARM9 processor
+    "-nothumb",            # ARM code
+    "-interworking",       # ARM/Thumb interworking
+    "-enum int",           # Enums are int-sized
+    "-char unsigned",      # char is unsigned
+    "-fp soft",            # Software floating point
+    "-lang=c99",
+    "-Cpp_exceptions off", # No exception tables
+    "-gccext,on",          # GCC extensions
+    "-gccinc",             # #include "..." and <...> search the same paths
+    "-inline on,noauto",   # Inline only what is declared inline
+    "-sym on",             # Debug info for objdiff
+    "-requireprotos",      # Calling an undeclared function is an error
+    "-nolink",
+    "-msgstyle gcc",
+]
+
+# fdlibm is built with inlining off, as if its sources began with #pragma dont_inline on: __kernel_rem_pio2 matches
+# only then (also with -ipa file or #pragma inline_depth(0)); with inlining on the compiler drops two loop guards
+# that the ROM keeps (cmp r8, #0 / blt after the adds that sets m, and cmpgt r0, #0 before z = q[jz]). The other fdlibm
+# files match either way, so they follow it. fp/fp_fastI.c, the soft-float runtime, is hand-written assembly (mrs and
+# msr on the flags, several entry points per routine), not C.
+[file_flags]
+"math/e_pow.c" = ["-inline off"]
+"math/e_rem_pio2.c" = ["-inline off"]
+"math/k_cos.c" = ["-inline off"]
+"math/k_rem_pio2.c" = ["-inline off"]
+"math/k_sin.c" = ["-inline off"]
+"math/s_copysign.c" = ["-inline off"]
+"math/s_cos.c" = ["-inline off"]
+"math/s_fabs.c" = ["-inline off"]
+"math/s_floor.c" = ["-inline off"]
+"math/s_frexp.c" = ["-inline off"]
+"math/s_ldexp.c" = ["-inline off"]
+"math/s_sin.c" = ["-inline off"]
+"math/w_pow.c" = ["-inline off"]
+
+# locale.c's data is laid out as with -ipa file: _current_locale and the 192-byte table get sections of their own, and
+# the three statics share one. Without it the compiler puts them all in the shared section, sorted by size
+"locale.c" = ["-ipa file"]

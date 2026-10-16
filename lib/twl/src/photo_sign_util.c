@@ -71,8 +71,8 @@ void PhotoSign_InitLock(void) {
 }
 
 BOOL PhotoSign_TryLock(void) {
-    u32 enabled = CPU_IRQDisable();
-    OSThread *current = g_IsThreadSwitchRequested.current;
+    u32 enabled = OS_DisableInterrupts();
+    OSThread *current = OSi_ThreadInfo.current;
     BOOL result;
 
     if (sLock.owner == NULL) {
@@ -85,13 +85,13 @@ BOOL PhotoSign_TryLock(void) {
     } else {
         result = FALSE;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return result;
 }
 
 void PhotoSign_Lock(void) {
-    u32 enabled = CPU_IRQDisable();
-    OSThread *current = g_IsThreadSwitchRequested.current;
+    u32 enabled = OS_DisableInterrupts();
+    OSThread *current = OSi_ThreadInfo.current;
 
     while (TRUE) {
         OSThread *owner = sLock.owner;
@@ -104,26 +104,26 @@ void PhotoSign_Lock(void) {
             sLock.count++;
             break;
         }
-        scheduler_yield(&sLock.queue);
+        OS_SleepThread(&sLock.queue);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 void PhotoSign_Unlock(void) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     if (sLock.owner != NULL && --sLock.count == 0) {
         sLock.owner = NULL;
         OS_WakeupThread(&sLock.queue);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 void PhotoSign_FlushCache(const void *addr, u32 size) {
     if (size < DC_RANGE_MAX) {
-        cp15_flushDC(addr, size);
+        DC_FlushRange(addr, size);
     } else {
-        cp15_invalidateDCAll();
+        DC_FlushAll();
     }
 }
 
@@ -132,20 +132,20 @@ void PhotoSign_InvalidateCache(void *addr, u32 size) {
     u32 end;
 
     if (size < IC_RANGE_MAX) {
-        cp15_invalidateIC(addr, size);
+        IC_InvalidateRange(addr, size);
     } else {
-        cp15_invalidateICAll();
+        IC_InvalidateAll();
     }
     if (size < DC_RANGE_MAX) {
         end = (u32)addr + size;
         if ((u32)addr & CACHE_LINE_MASK) {
-            cp15_cleanDC(addr, 1);
+            DC_StoreRange(addr, 1);
         }
         if (end & CACHE_LINE_MASK) {
-            cp15_cleanDC((void *)(end - 1), 1);
+            DC_StoreRange((void *)(end - 1), 1);
         }
-        cp15_invalidateDC(addr, size);
+        DC_InvalidateRange(addr, size);
     } else {
-        cp15_invalidateDCAll();
+        DC_FlushAll();
     }
 }

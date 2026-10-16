@@ -18,7 +18,7 @@ u32 PlayerSave_GetBlockSize(void) {
 }
 
 void PlayerSave_Init(PlayerSave *playerSave) {
-    sys_memset(playerSave, 0, sizeof(PlayerSave));
+    MI_CpuFill8(playerSave, 0, sizeof(PlayerSave));
     playerSave->stepCounter = STEP_COUNTER_NONE;
     // The zone whose place name a new game starts with
     playerSave->placeNameZoneId = 0x267;

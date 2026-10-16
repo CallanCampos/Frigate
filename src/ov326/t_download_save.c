@@ -60,12 +60,12 @@ static BOOL TDownloadSave_LoadSlot(TDownloadWork *wk, int slot) {
 
     wk->savedData[slot] =
         GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), T_DOWNLOAD_TOURNAMENT_SIZE, FALSE, "t_download_save.c", 138);
-    sys_memset32(0, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
+    MIi_CpuClear32(0, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
     save = GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys));
     block = sTDownloadSaveBlocks[slot].block;
     if (func_020074ec(save, block, wk->heapId) == TRUE) {
         src = getAddressOfExtraSaveBlk(save, block, sTDownloadSaveBlocks[slot].offset);
-        sys_memcpy32(src, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
+        MIi_CpuCopy32(src, wk->savedData[slot], T_DOWNLOAD_TOURNAMENT_SIZE);
         loaded = TRUE;
     }
     freeIntermediateSaveExtraBlksAfterLoad(save, block);
@@ -194,8 +194,8 @@ void TDownloadSave_StartSave(TDownloadWork *wk, int src, int dest) {
         save = GameData_GetSaveControl(gameData);
         block = sTDownloadSaveBlocks[dest].block;
         func_020074ec(save, block, wk->heapId);
-        sys_memcpy32(data, getAddressOfExtraSaveBlk(save, block, sTDownloadSaveBlocks[dest].offset),
-                     T_DOWNLOAD_TOURNAMENT_SIZE);
+        MIi_CpuCopy32(data, getAddressOfExtraSaveBlk(save, block, sTDownloadSaveBlocks[dest].offset),
+                      T_DOWNLOAD_TOURNAMENT_SIZE);
         func_020178c4(gameData, block);
         wk->saveFlags |= T_DOWNLOAD_SAVE_FLAG_SAVING;
     }
@@ -267,7 +267,7 @@ static void TDownloadSave_CopyToSlot(TDownloadWork *wk) {
     int i;
     int count;
 
-    sys_memcpy32(wk->receivedData[wk->copySrc], wk->savedData[wk->copyDest], T_DOWNLOAD_TOURNAMENT_SIZE);
+    MIi_CpuCopy32(wk->receivedData[wk->copySrc], wk->savedData[wk->copyDest], T_DOWNLOAD_TOURNAMENT_SIZE);
     wk->saveFlags |= T_DOWNLOAD_SAVE_FLAG_SLOT(wk->copyDest);
     count = 0;
     for (i = 0; i < T_DOWNLOAD_SAVE_SLOTS; i++) {
@@ -330,7 +330,7 @@ static int TDownloadSave_LoadReceived(TDownloadWork *wk) {
         if (TDownloadSave_IsValid(data) == TRUE) {
             wk->receivedData[count] =
                 GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), T_DOWNLOAD_TOURNAMENT_SIZE, TRUE, "t_download_save.c", 695);
-            sys_memcpy32(data, wk->receivedData[count], T_DOWNLOAD_TOURNAMENT_SIZE);
+            MIi_CpuCopy32(data, wk->receivedData[count], T_DOWNLOAD_TOURNAMENT_SIZE);
             count++;
         }
     }

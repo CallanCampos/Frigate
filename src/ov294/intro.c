@@ -39,7 +39,7 @@ BOOL IntroProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_OvlLoad(OVERLAY_ID(139));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_INTRO, 0x100000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IntroWork), HEAPID_INTRO);
-    sys_memset(wk, 0, sizeof(IntroWork));
+    MI_CpuFill8(wk, 0, sizeof(IntroWork));
     wk->heapId = HEAPID_INTRO;
     wk->param = param;
     wk->graphic = IntroGraphic_Create(1, wk->param->mode, wk->heapId);

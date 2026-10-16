@@ -285,8 +285,8 @@ static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(FALSE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(TRUE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(TRUE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
         GFL_G3DSysLightSet(i, &sLights[i]);
@@ -389,7 +389,7 @@ void func_ov194_021c1db4(PokemonTrade3DWork *work) {
 
     work->resource = func_0204fdf8(0x68, 0x35, HEAPID_TAIL(work->heapId));
     for (i = 0; i < 4; i++) {
-        CPU_WaitIntrBit(TRUE, OS_IE_V_BLANK);
+        OS_WaitInterrupt(TRUE, OS_IE_V_BLANK);
         func_0204fee0(work->systems[i], work->resource, TRUE, GFL_VBlankGetTCBMgr());
     }
 }
@@ -398,7 +398,7 @@ void func_ov194_021c1e08(PokemonTrade3DWork *work) {
     int i;
 
     for (i = 4; i < 9; i++) {
-        CPU_WaitIntrBit(TRUE, OS_IE_V_BLANK);
+        OS_WaitInterrupt(TRUE, OS_IE_V_BLANK);
         func_0204fee0(work->systems[i], work->resource, TRUE, GFL_VBlankGetTCBMgr());
     }
 }
@@ -715,20 +715,20 @@ static void func_ov194_021c263c(PokemonTradeWork *wk, int count) {
     u16 *tex;
     int i;
 
-    gfxBeginTextureUpload();
+    GX_BeginLoadTex();
     tex = GFL_HeapAllocate(wk->heapId, CUBE_TEX_SIZE, TRUE, "pokemontrade_3d.c", 1296);
     for (i = 0; i < count; i++) {
-        sys_memset(tex, 0, CUBE_TEX_SIZE);
+        MI_CpuFill8(tex, 0, CUBE_TEX_SIZE);
         if (i == 0) {
             func_ov194_021c2610(tex, wk->boxColors[1].party, 2);
         } else {
             func_ov194_021c25dc(tex, wk->boxColors[1].boxes, i - 1, 2);
         }
-        cp15_flushDC(tex, CUBE_TEX_SIZE);
-        gfxUploadTexture(tex, i * CUBE_TEX_SIZE + CUBE_TEX_ADDR, CUBE_TEX_SIZE);
+        DC_FlushRange(tex, CUBE_TEX_SIZE);
+        GX_LoadTex(tex, i * CUBE_TEX_SIZE + CUBE_TEX_ADDR, CUBE_TEX_SIZE);
     }
     GFL_HeapFree(tex);
-    gfxEndTextureUpload();
+    GX_EndLoadTex();
     func_ov194_021c2930(wk);
 }
 
@@ -741,12 +741,12 @@ static void func_ov194_021c26dc(BOOL vtxColor, BOOL shininess) {
 static void func_ov194_021c2714(fx32 distance, int index, u16 angle, u16 rotation) {
     G3_PushMtx();
     G3_MtxMode(GX_MTXMODE_POSITION);
-    gfxRotateY(FX_SinIdx(rotation), FX_CosIdx(rotation));
+    G3_RotY(FX_SinIdx(rotation), FX_CosIdx(rotation));
     G3_PushMtx();
-    gfxRotateY(FX_SinIdx(angle), FX_CosIdx(angle));
+    G3_RotY(FX_SinIdx(angle), FX_CosIdx(angle));
     G3_Translate(0, 0, distance);
-    gfxRotateY(FX_SinIdx(sCubeParams.rotY), FX_CosIdx(sCubeParams.rotY));
-    gfxRotateX(FX_SinIdx(sCubeParams.rotX), FX_CosIdx(sCubeParams.rotX));
+    G3_RotY(FX_SinIdx(sCubeParams.rotY), FX_CosIdx(sCubeParams.rotY));
+    G3_RotX(FX_SinIdx(sCubeParams.rotX), FX_CosIdx(sCubeParams.rotX));
     G3_Scale(FX32_CONST(0.15), FX32_CONST(0.15), FX32_CONST(0.15));
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
@@ -786,8 +786,8 @@ static void func_ov194_021c2844(PokemonTradeWork *wk) {
     int end;
     int pos;
 
-    gfxReset3D();
-    gfxLookAt(&sCameraPos, &sCameraUp, &sCameraTarget, TRUE, NULL);
+    G3X_Reset();
+    G3i_LookAt_(&sCameraPos, &sCameraUp, &sCameraTarget, TRUE, NULL);
     G3_LightVector(GX_LIGHTID_0, FX16_CONST(0.577), -FX16_CONST(0.577), -FX16_CONST(0.577));
     G3_LightColor(GX_LIGHTID_0, GX_RGB(31, 31, 31));
     boxCount = func_ov194_021b7778(wk);
@@ -828,14 +828,14 @@ static void func_ov194_021c2930(PokemonTradeWork *wk) {
     void *file = GFL_G2DIOReadNCLRArc(arc, 0x48, &palette, wk->heapId);
     u16 *colors = palette->rawData;
 
-    cp15_flushDC(&colors[16], 16 * sizeof(GXRgb));
-    sys_memcpy_ex(&colors[16], &colors[17], 15 * sizeof(GXRgb));
+    DC_FlushRange(&colors[16], 16 * sizeof(GXRgb));
+    MI_CpuMove(&colors[16], &colors[17], 15 * sizeof(GXRgb));
     colors[16] = GX_RGB(5, 5, 5);
-    cp15_flushDC(&colors[16], 16 * sizeof(GXRgb));
-    gfxBeginPaletteUpload();
-    gfxUploadPalette(&colors[16], CUBE_PLTT_ADDR, 16 * sizeof(GXRgb));
-    gfxEndPaletteUpload();
-    sys_memcpy(&colors[16], wk->boxPalette, sizeof(wk->boxPalette));
+    DC_FlushRange(&colors[16], 16 * sizeof(GXRgb));
+    GX_BeginLoadTexPltt();
+    GX_LoadTexPltt(&colors[16], CUBE_PLTT_ADDR, 16 * sizeof(GXRgb));
+    GX_EndLoadTexPltt();
+    MI_CpuCopy8(&colors[16], wk->boxPalette, sizeof(wk->boxPalette));
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
 }
@@ -858,7 +858,7 @@ void func_ov194_021c29b4(PokemonTradeWork *wk) {
             wk->boxPaletteDim[i] |= (c & 0x1f) << shift;
         }
     }
-    gfxBeginPaletteUpload();
-    gfxUploadPalette(wk->boxPaletteDim, CUBE_PLTT_ADDR, sizeof(wk->boxPaletteDim));
-    gfxEndPaletteUpload();
+    GX_BeginLoadTexPltt();
+    GX_LoadTexPltt(wk->boxPaletteDim, CUBE_PLTT_ADDR, sizeof(wk->boxPaletteDim));
+    GX_EndLoadTexPltt();
 }

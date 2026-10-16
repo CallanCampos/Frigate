@@ -23,7 +23,7 @@ u32 func_02010ff4(void) {
 void func_02010ffc(PokewoodSave *save) {
     int i;
 
-    sys_memset(save, 0, sizeof(PokewoodSave));
+    MI_CpuFill8(save, 0, sizeof(PokewoodSave));
     for (i = 0; i < POKEWOOD_MOVIE_COUNT; i++) {
         save->records[i].score = POKEWOOD_SCORE_NONE;
     }

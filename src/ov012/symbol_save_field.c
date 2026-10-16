@@ -32,9 +32,9 @@ u32 func_ov012_0216127c(AreaNPCSave *npcData) {
 static u8 func_ov012_02161298(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int start, int count) {
     int i = 0;
 
-    sys_memset(dest, 0, max * sizeof(EntreeForestPokemon));
+    MI_CpuFill8(dest, 0, max * sizeof(EntreeForestPokemon));
     func_0200e904(npcData);
-    sys_memcpy(&npcData->pokemon[start], dest, count * sizeof(EntreeForestPokemon));
+    MI_CpuCopy8(&npcData->pokemon[start], dest, count * sizeof(EntreeForestPokemon));
     decryptNpcData(npcData);
     for (; i < count; i++) {
         if (dest[i].species == 0) {
@@ -72,7 +72,7 @@ u32 func_ov012_02161354(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max
     u8 extra = 0;
     u32 start;
 
-    sys_memset(dest, 0, max * sizeof(EntreeForestPokemon));
+    MI_CpuFill8(dest, 0, max * sizeof(EntreeForestPokemon));
     if (area == 0) {
         start = func_ov012_021612e4(npcData, dest, max, count);
         func_ov012_021612fc(npcData, dest + 10, max - 10, &extra);

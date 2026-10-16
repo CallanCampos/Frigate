@@ -129,7 +129,7 @@ u8 func_ov055_021e64f0(PokeParty *party, u64 seed) {
     u8 max;
     u8 n;
 
-    sys_memset(counts, 0, sizeof(counts));
+    MI_CpuFill8(counts, 0, sizeof(counts));
     count = PokeParty_GetPkmCount(party);
     for (i = 0; i < count; i++) {
         pkm = PokeParty_GetPkm(party, i);
@@ -144,7 +144,7 @@ u8 func_ov055_021e64f0(PokeParty *party, u64 seed) {
     }
     max = 0;
     n = 0;
-    sys_memset(types, 0, sizeof(types));
+    MI_CpuFill8(types, 0, sizeof(types));
     for (i = 0; i < 17; i++) {
         if (counts[i] > max) {
             max = counts[i];

@@ -76,7 +76,7 @@ MarineTubeBoardGraphic *MarineTubeBoardGraphic_Create(u32 layout, HeapID heapId)
     MarineTubeBoardGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(MarineTubeBoardGraphic), FALSE, "marine_tube_board_graphic.c", 453);
 
-    sys_memset(graphic, 0, sizeof(MarineTubeBoardGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(MarineTubeBoardGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -103,7 +103,7 @@ void MarineTubeBoardGraphic_Free(MarineTubeBoardGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(MarineTubeBoardGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(MarineTubeBoardGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -122,7 +122,7 @@ static void MarineTubeBoardGraphic_VBlank(TCB *tcb, void *data) {
 static void MarineTubeBoardBG_Init(MarineTubeBoardBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(MarineTubeBoardBG));
+    MI_CpuFill8(bg, 0, sizeof(MarineTubeBoardBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sMarineTubeBoardLCDConfig);
@@ -142,7 +142,7 @@ static void MarineTubeBoardBG_Free(MarineTubeBoardBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(MarineTubeBoardBG));
+    MI_CpuFill8(bg, 0, sizeof(MarineTubeBoardBG));
 }
 
 static void MarineTubeBoardBG_Update(MarineTubeBoardBG *bg) {
@@ -153,7 +153,7 @@ static void MarineTubeBoardBG_VBlank(MarineTubeBoardBG *bg) {
 }
 
 static void MarineTubeBoardClAct_Init(MarineTubeBoardClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(MarineTubeBoardClAct));
+    MI_CpuFill8(clact, 0, sizeof(MarineTubeBoardClAct));
     ClActSys_Create(&sMarineTubeBoardClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -164,7 +164,7 @@ static void MarineTubeBoardClAct_Init(MarineTubeBoardClAct *clact, const BGSysVR
 static void MarineTubeBoardClAct_Free(MarineTubeBoardClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(MarineTubeBoardClAct));
+    MI_CpuFill8(clact, 0, sizeof(MarineTubeBoardClAct));
 }
 
 static void MarineTubeBoardClAct_Update(MarineTubeBoardClAct *clact) {

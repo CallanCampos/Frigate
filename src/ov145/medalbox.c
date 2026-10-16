@@ -415,7 +415,7 @@ static BOOL MedalBoxApp_ProcInit(GameProc *proc, u32 *state, void *param, void *
     }
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MEDALBOX, 0x60000);
     work = GFL_ProcInitSubsystem(proc, sizeof(MedalBoxApp), HEAPID_MEDALBOX);
-    sys_memset(work, 0, sizeof(MedalBoxApp));
+    MI_CpuFill8(work, 0, sizeof(MedalBoxApp));
     work->param = boxParam;
     work->heapId = HEAPID_MEDALBOX;
     MedalBoxApp_InitData(work);
@@ -600,7 +600,7 @@ static void MedalBoxApp_InitBG(MedalBoxApp *work) {
     GFL_G2DIOLoadArcNCLR(arc, 0, 0, (MedalBoxApp_GetRankPalette(work->medalBox) + 1) * 0x20, 0x20, 0x20, heapId);
     GFL_ArcToolFree(arc);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x160, 0x20, work->heapId);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 2, 0x1d, 15, 15);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 2, 0x1d, 15, 15);
     GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 2);
     GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_CASE), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
     GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_CASE_BACK), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
@@ -635,7 +635,7 @@ static void MedalBoxApp_FreeBG(MedalBoxApp *work) {
         GFL_BGSysClearBG(bg);
         GFL_BGSysReleaseBG(bg);
     }
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0, 31, 0);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0, 31, 0);
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
 }
@@ -681,7 +681,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         GFL_ArcToolFree(arcs[i]);
     }
 
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     for (i = ACTOR_MEDAL; i < ACTOR_MEDAL + MEDAL_ACTOR_COUNT; i++) {
         MedalBoxApp_GetMedalPos(i, &pos);
         actorSetup.x = pos.x;
@@ -695,7 +695,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         func_0204c124(work->actors[i], FALSE);
     }
     for (i = ACTOR_SLIDER; i < ACTOR_RETURN; i++) {
-        sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 2;
         actorSetup.priority = 2;
         work->actors[i] = func_0204c040(work->unit, work->resources[RES_CHARS], work->resources[RES_PALETTE],
@@ -704,7 +704,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         func_0204c124(work->actors[i], TRUE);
     }
     for (i = ACTOR_RETURN; i < ACTOR_MENU; i++) {
-        sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 2;
         actorSetup.priority = 2;
         work->actors[i] =
@@ -713,7 +713,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         func_0204c488(work->actors[i], 0);
         func_0204c124(work->actors[i], TRUE);
     }
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.bgPriority = 2;
     actorSetup.priority = 2;
     work->actors[ACTOR_MENU] =
@@ -722,7 +722,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
     func_0204c488(work->actors[ACTOR_MENU], 0);
     func_0204c124(work->actors[ACTOR_MENU], TRUE);
 
-    sys_memset(&windowSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&windowSetup, 0, sizeof(ClActorSetup));
     for (j = ACTOR_MEDAL_WINDOW; j <= ACTOR_MEDAL_WINDOW + MEDAL_ACTOR_COUNT - 1; j++) {
         MedalBoxApp_GetMedalPos(j - ACTOR_MEDAL_WINDOW, &windowPos);
         windowSetup.x = windowPos.x;
@@ -2080,7 +2080,7 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 0);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), BG_MOVE_SET_X, 0);
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1d, -8);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1d, -8);
         GFL_BGSysClearBG(MedalBoxApp_GetBG(BG_MAIN_MESSAGE));
         MedalBoxApp_OpenMenu(work);
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), TRUE);
@@ -2099,7 +2099,7 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
         AppTaskMenuRes_Free(work->menuRes);
         BmpWin_Free(work->messageWindow);
         MedalBoxApp_ReloadMenuBG(work);
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0, 0);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0, 0);
         work->menuItemCount = 0;
         GX_SetVisibleWnd(GX_WNDMASK_OW);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 2);

@@ -157,7 +157,7 @@ static BOOL WifiBattleMatchLink_RandomInit(GameProc *proc, u32 *state, void *par
     GFL_OvlLoad(OVERLAY_ID(189));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_LINK, 0x35000);
     link = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchLinkRandom), HEAPID_WIFIBATTLEMATCH_LINK);
-    sys_memset(link, 0, sizeof(WifiBattleMatchLinkRandom));
+    MI_CpuFill8(link, 0, sizeof(WifiBattleMatchLinkRandom));
     link->param = linkParam;
     link->graphic = WifiBattleMatchGraphic_Create(1, HEAPID_WIFIBATTLEMATCH_LINK);
     link->res =
@@ -399,7 +399,7 @@ static void WifiBattleMatchLink_TaskRatingStart(WifiBattleMatchTask *task, u32 *
         WifiBattleMatchTask_SetReturnSeq(task, 3);
         break;
     case 3:
-        sys_memset(param->account, 0, sizeof(WifiBattleMatchLinkAccount));
+        MI_CpuFill8(param->account, 0, sizeof(WifiBattleMatchLinkAccount));
         WifiBattleMatchNet_StartAccountRequest(link->net, HEAPID_WIFIBATTLEMATCH_LINK);
         *seq = 4;
         break;
@@ -412,7 +412,7 @@ static void WifiBattleMatchLink_TaskRatingStart(WifiBattleMatchTask *task, u32 *
             *seq = 5;
             break;
         case 3:
-            sys_memset(link->param->account, 0, sizeof(WifiBattleMatchLinkAccount));
+            MI_CpuFill8(link->param->account, 0, sizeof(WifiBattleMatchLinkAccount));
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_TaskRelogin);
             break;
         case 2:
@@ -701,7 +701,7 @@ static void WifiBattleMatchLink_TaskRatingSearch(WifiBattleMatchTask *task, u32 
     case 4:
         if (WifiBattleMatchNet_TakePlayerInfo(link->net, &received)) {
             otherPlayer = param->otherPlayer;
-            sys_memcpy(received, otherPlayer, WifiBattleMatchLinkPlayer_GetSize());
+            MI_CpuCopy8(received, otherPlayer, WifiBattleMatchLinkPlayer_GetSize());
             fixCount = 0;
             noTerminator = TRUE;
             for (i = 0; i < 8; i++) {
@@ -1101,7 +1101,7 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         }
         break;
     case 10:
-        sys_memset(&reportBuf, 0, sizeof(reportBuf));
+        MI_CpuFill8(&reportBuf, 0, sizeof(reportBuf));
         reportBuf.report = *link->param->report;
         reportBuf.unk50 = *link->param->unk28;
         WifiBattleMatchNet_StartWrite(link->net, 3, &reportBuf);
@@ -1509,7 +1509,7 @@ static void WifiBattleMatchLink_TaskFreeSearch(WifiBattleMatchTask *task, u32 *s
     case 9:
         if (WifiBattleMatchNet_TakePlayerInfo(link->net, &received)) {
             otherPlayer = param->otherPlayer;
-            sys_memcpy(received, otherPlayer, WifiBattleMatchLinkPlayer_GetSize());
+            MI_CpuCopy8(received, otherPlayer, WifiBattleMatchLinkPlayer_GetSize());
             noTerminator = TRUE;
             for (i = 0; i < 8; i++) {
                 if (otherPlayer->info.name[i] == GFL_StrBufGetTerminator()) {
@@ -1959,7 +1959,7 @@ static void WifiBattleMatchLink_TaskSignTeam(WifiBattleMatchTask *task, u32 *seq
     switch (*seq) {
     case 0:
         link->timer = 0;
-        sys_memset(&link->signature, 0, sizeof(link->signature));
+        MI_CpuFill8(&link->signature, 0, sizeof(link->signature));
         (*seq)++;
         break;
     case 1:
@@ -1980,7 +1980,7 @@ static void WifiBattleMatchLink_TaskSignTeam(WifiBattleMatchTask *task, u32 *seq
         break;
     case 3:
         if (link->signature.status == 0) {
-            sys_memcpy(link->signature.signature, player->signature, sizeof(player->signature));
+            MI_CpuCopy8(link->signature.signature, player->signature, sizeof(player->signature));
             link->subTaskResult = 0;
             *seq = 4;
         } else {
@@ -2007,7 +2007,7 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
     gameData = link->param->param->gameData;
     playerInfo = GetGameDataPlayerInfo(gameData);
     unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
-    sys_memset(&info, 0, sizeof(info));
+    MI_CpuFill8(&info, 0, sizeof(info));
     if (kind == 0) {
         titleMsg = 1;
         info.titleMsg = link->param->param->unk4;
@@ -2155,7 +2155,7 @@ static void WifiBattleMatchLink_CreateMenu(WifiBattleMatchLinkRandom *link, u32 
     WifiBattleMatchMenuParam menuParam;
 
     if (link->menu == NULL) {
-        sys_memset(&menuParam, 0, sizeof(menuParam));
+        MI_CpuFill8(&menuParam, 0, sizeof(menuParam));
         menuParam.msgData = link->msgData;
         menuParam.font = link->font;
         menuParam.printQueue = link->printQueue;
@@ -2202,7 +2202,7 @@ static s32 WifiBattleMatchLink_GetMenuSelection(WifiBattleMatchLinkRandom *link)
 static void WifiBattleMatchLink_FillCondition(WifiBattleMatchNetKeys *condition, WifiBattleMatchLinkRandom *link) {
     WifiBattleMatchLinkParam *param;
 
-    sys_memset(condition, 0, sizeof(WifiBattleMatchNetKeys));
+    MI_CpuFill8(condition, 0, sizeof(WifiBattleMatchNetKeys));
     param = link->param;
     condition->disconnects = param->ratings->unk20;
     condition->cup = 0;
@@ -2237,7 +2237,7 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchLinkPlayer *player,
 
     player->unk44 = 100;
     info = GetGameDataPlayerInfo(gameData);
-    sys_memcpy(info, player, PlayerInfo_GetSize());
+    MI_CpuCopy8(info, player, PlayerInfo_GetSize());
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     if (link->param->mode == 0) {
         player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);

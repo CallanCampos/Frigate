@@ -113,7 +113,7 @@ CameraSystem *CameraSystem_Create(HeapID heapId) {
 
     result = CAMERA_Init();
     if (result == CAMERA_RESULT_FATAL_ERROR) {
-        sys_exit();
+        OS_Terminate();
     }
     if (result == CAMERA_RESULT_ILLEGAL_STATUS) {
         return NULL;
@@ -123,14 +123,14 @@ CameraSystem *CameraSystem_Create(HeapID heapId) {
     CAMERA_I2CAutoWhiteBalance(sys->camera, TRUE);
     result = CAMERA_I2CActivate(sys->camera);
     if (result == CAMERA_RESULT_FATAL_ERROR) {
-        sys_exit();
+        OS_Terminate();
     }
     if (result == CAMERA_RESULT_ILLEGAL_STATUS) {
         return NULL;
     }
 
     sys->frameCount = 0;
-    CPU_EnableInterrupts(OS_IE_NDMA1);
+    OS_EnableIrqMask(OS_IE_NDMA1);
     CAMERA_SetVsyncCallback(CameraSystem_OnVsync);
     CAMERA_SetBufferErrorCallback(CameraSystem_OnBufferError);
     CAMERA_SetRebootCallback(CameraSystem_OnReboot);
@@ -139,15 +139,15 @@ CameraSystem *CameraSystem_Create(HeapID heapId) {
 
     sys->soundData = NULL;
     sys->soundState = CAMERA_SOUND_STATE_NONE;
-    func_02768cf8(MI_WRAM_B, MI_WRAM_ARM9);
-    func_02769080(MI_WRAM_B, MI_WRAM_ARM9);
-    func_02769080(MI_WRAM_B, MI_WRAM_ARM7);
-    func_02768cf8(MI_WRAM_C, MI_WRAM_ARM9);
-    func_02769080(MI_WRAM_C, MI_WRAM_ARM9);
-    func_02769080(MI_WRAM_C, MI_WRAM_ARM7);
+    MI_FreeWram(MI_WRAM_B, MI_WRAM_ARM9);
+    MI_CancelWram(MI_WRAM_B, MI_WRAM_ARM9);
+    MI_CancelWram(MI_WRAM_B, MI_WRAM_ARM7);
+    MI_FreeWram(MI_WRAM_C, MI_WRAM_ARM9);
+    MI_CancelWram(MI_WRAM_C, MI_WRAM_ARM9);
+    MI_CancelWram(MI_WRAM_C, MI_WRAM_ARM7);
     DSP_OpenStaticComponentG711(&file);
     if (!DSP_LoadG711(&file, 0xff, 0xff)) {
-        sys_exit();
+        OS_Terminate();
     }
     GCTX_HIDSetSoftResetCallback(CameraSystem_OnSoftReset, sys);
     return sys;
@@ -157,12 +157,12 @@ static void CameraSystem_OnSoftReset(void *work) {
     CameraSystem *sys = work;
 
     while (DSP_IsShutterSoundPlaying() == TRUE) {
-        func_0207aa04(10);
+        OS_Sleep(10);
     }
     DSP_UnloadG711();
     CameraSystem_Stop(sys);
     CAMERA_I2CStop();
-    func_02768270(CAMERA_NDMA_NO);
+    MI_StopNDma(CAMERA_NDMA_NO);
     CAMERA_End();
 }
 
@@ -172,7 +172,7 @@ void CameraSystem_Delete(CameraSystem *sys) {
     DSP_UnloadG711();
     CameraSystem_Stop(sys);
     CAMERA_I2CStop();
-    func_02768270(CAMERA_NDMA_NO);
+    MI_StopNDma(CAMERA_NDMA_NO);
     CAMERA_End();
     CameraSystem_FreeSound(sys);
     CameraSystem_FreeBuffers(sys);
@@ -232,7 +232,7 @@ void CameraSystem_InitDsp(CameraSystem *sys) {
 
     DSP_OpenStaticComponentG711(&file);
     if (!DSP_LoadG711(&file, 0xff, 0xff)) {
-        sys_exit();
+        OS_Terminate();
     }
     GCTX_HIDSetSoftResetCallback(CameraSystem_OnSoftReset, sys);
 }
@@ -250,7 +250,7 @@ static void CameraSystem_LoadSound(CameraSystem *sys, BOOL start) {
     sys->soundSize = GFL_ArcSysGetDataLength(ARC_CAMERA_SOUND, file);
     sys->soundData = allocConfigDSSoftwareFeature(sys->heapId, sys->soundSize, "camera_system.c", 359);
     GFL_ArcSysRead(sys->soundData, ARC_CAMERA_SOUND, file);
-    cp15_flushDC(sys->soundData, sys->soundSize);
+    DC_FlushRange(sys->soundData, sys->soundSize);
 }
 
 static void CameraSystem_FreeSound(CameraSystem *sys) {
@@ -265,14 +265,14 @@ static void CameraSystem_LoadShutterSound(CameraSystem *sys) {
     sys->soundSize = GFL_ArcSysGetDataLength(ARC_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
     sys->soundData = allocConfigDSSoftwareFeature(sys->heapId, sys->soundSize, "camera_system.c", 381);
     GFL_ArcSysRead(sys->soundData, ARC_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
-    cp15_flushDC(sys->soundData, sys->soundSize);
+    DC_FlushRange(sys->soundData, sys->soundSize);
 }
 
 static void CameraSystem_OnBufferError(CAMERAResult result) {
     CameraSystem *sys = sCameraSystem;
 
     CAMERA_StopCapture();
-    func_02768270(CAMERA_NDMA_NO);
+    MI_StopNDma(CAMERA_NDMA_NO);
     CAMERA_ClearBuffer();
     sys->skipFrame = TRUE;
     sys->startCapture = TRUE;
@@ -293,7 +293,7 @@ static void CameraSystem_OnVsync(CAMERAResult result) {
         }
         if (sys->switchCamera) {
             if (CAMERA_I2CActivate(sys->camera) == CAMERA_RESULT_FATAL_ERROR) {
-                sys_exit();
+                OS_Terminate();
             }
             sys->frameCount = 0;
             sys->switchCamera = FALSE;
@@ -310,10 +310,10 @@ static void CameraSystem_OnVsync(CAMERAResult result) {
 static void CameraSystem_OnDmaDone(void *arg) {
     CameraSystem *sys = sCameraSystem;
 
-    func_02768270(CAMERA_NDMA_NO);
+    MI_StopNDma(CAMERA_NDMA_NO);
     if (CAMERA_IsBusy() == TRUE) {
-        if (func_02768234(CAMERA_NDMA_NO)) {
-            func_02768270(CAMERA_NDMA_NO);
+        if (MI_IsNDmaBusy(CAMERA_NDMA_NO)) {
+            MI_StopNDma(CAMERA_NDMA_NO);
         }
         if (sys->skipFrame) {
             sys->skipFrame = FALSE;
@@ -367,8 +367,8 @@ static void CameraSystem_FreeBuffers(CameraSystem *sys) {
 
 void CameraSystem_Start(CameraSystem *sys) {
     if (sys->capturing == FALSE && CAMERA_IsBusy() == FALSE) {
-        if (func_02768234(CAMERA_NDMA_NO) == TRUE) {
-            func_02768270(CAMERA_NDMA_NO);
+        if (MI_IsNDmaBusy(CAMERA_NDMA_NO) == TRUE) {
+            MI_StopNDma(CAMERA_NDMA_NO);
         }
         sys->capturing = TRUE;
         sys->startCapture = TRUE;
@@ -393,7 +393,7 @@ BOOL CameraSystem_IsSoundDone(CameraSystem *sys) {
 
 static void CameraSystem_SetupCapture(CameraSystem *sys) {
     u16 width, height;
-    u16 lines;
+    int lines;
 
     if (sys->capturing == FALSE && CAMERA_IsBusy() == FALSE) {
         CAMERA_SetTrimming(FALSE);

@@ -13,7 +13,7 @@ u32 func_0200f19c(void) {
 }
 
 void func_0200f1a0(TrialHouseSave *save) {
-    sys_memset(save, 0, sizeof(TrialHouseSave));
+    MI_CpuFill8(save, 0, sizeof(TrialHouseSave));
     func_0200fe80(save->unk5C);
 }
 

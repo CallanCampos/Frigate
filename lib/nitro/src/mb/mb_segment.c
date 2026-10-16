@@ -39,12 +39,12 @@ u32 MB_GetSegmentLength(FSFile *file) {
     u8 buf[0x60];
 
     if (file != NULL) {
-        u32 pos = romfs_ftell(file);
+        u32 pos = FS_GetFilePosition(file);
 
-        if (romfs_fread(file, buf, sizeof(buf)) >= sizeof(buf)) {
+        if (FS_ReadFile(file, buf, sizeof(buf)) >= sizeof(buf)) {
             header = (const ROMHeader *)buf;
         }
-        romfs_fseek(file, pos, FS_SEEK_SET);
+        FS_SeekFile(file, pos, FS_SEEK_SET);
     } else {
         header = (const ROMHeader *)MB_ROM_HEADER_BUF;
     }
@@ -65,7 +65,7 @@ static inline void MBCache_SetArchive(MBCache *cache, FSFile *file) {
     while (length < 3 && archive->name[length] != 0) {
         length++;
     }
-    sys_memcpy(archive->name, cache->archiveName, length);
+    MI_CpuCopy8(archive->name, cache->archiveName, length);
     cache->nameLength = length;
     cache->archive = archive;
 }
@@ -93,7 +93,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
     FSFile ownFileBuf;
 
     if (file == NULL) {
-        if (!(rom_get_header()->unitCode & 2)) {
+        if (!(CARD_GetOwnRomHeader()->unitCode & 2)) {
             sSecureAreaTable = sSecureAreaParts;
         } else {
             sSecureAreaTable = sSecureAreaPartsDSi;
@@ -106,8 +106,8 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
         dst = (u8 *)buf + sizeof(ROMHeader);
         remaining = len - sizeof(ROMHeader);
         if (file != NULL) {
-            pos = romfs_ftell(file);
-            if (romfs_fread(file, buf, 0x160) < 0x160) {
+            pos = FS_GetFilePosition(file);
+            if (FS_ReadFile(file, buf, 0x160) < 0x160) {
                 remaining = 0;
             }
             romSize = MBi_GetRomSize(header);
@@ -115,21 +115,21 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
             romSize = MBi_GetRomSize((const ROMHeader *)MB_ROM_HEADER_BUF);
             ownFile = TRUE;
             file = &ownFileBuf;
-            finit(file);
-            if (!fopen_raw(file, func_0207062c("rom", 3), 0, romSize + 0x88, -1)) {
+            FS_InitFile(file);
+            if (!FS_OpenFileDirect(file, FS_FindArchive("rom", 3), 0, romSize + 0x88, -1)) {
                 return FALSE;
             }
-            pos = romfs_ftell(file);
-            sys_memcpy((const void *)MB_ROM_HEADER_BUF, buf, 0x160);
-            header->unk_60 |= 0x406000;
+            pos = FS_GetFilePosition(file);
+            MI_CpuCopy8((const void *)MB_ROM_HEADER_BUF, buf, 0x160);
+            header->normalCommandControl |= 0x406000;
         }
 
         if (remaining >= 0x88) {
             if (ownFile) {
-                sys_memcpy(func_0206fed0(), dst, 0x88);
+                MI_CpuCopy8(CARDi_GetRomAuthCode(), dst, 0x88);
             } else {
-                romfs_fseek(file, pos + romSize, FS_SEEK_SET);
-                romfs_fread(file, dst, 0x88);
+                FS_SeekFile(file, pos + romSize, FS_SEEK_SET);
+                FS_ReadFile(file, dst, 0x88);
             }
             dst += 0x88;
             remaining -= 0x88;
@@ -151,8 +151,8 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
         if (remaining >= 0x10) {
             offsets = (MBRomOffsets *)dst;
             offsets->segment[0] = 0;
-            offsets->segment[1] = pos + func_02072010(file) + header->arm9RomOffset;
-            offsets->segment[2] = pos + func_02072010(file) + header->arm7RomOffset;
+            offsets->segment[1] = pos + FS_GetFileImageTop(file) + header->arm9RomOffset;
+            offsets->segment[2] = pos + FS_GetFileImageTop(file) + header->arm7RomOffset;
             dst += 0x10;
             remaining -= 0x10;
         } else {
@@ -160,7 +160,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
         }
 
         if (remaining >= header->arm9.size + header->arm7.size) {
-            u32 base = func_02072010(file);
+            u32 base = FS_GetFileImageTop(file);
             u32 arm9Size = header->arm9.size;
             u32 arm9Pos = offsets->segment[1] - base;
             u8 *arm9Dst = dst;
@@ -170,16 +170,16 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
                 arm9Dst = dst + (0x8000 - arm9Pos);
                 arm9Pos = 0x8000;
             }
-            romfs_fseek(file, arm9Pos, FS_SEEK_SET);
-            romfs_fread(file, arm9Dst, arm9Size);
+            FS_SeekFile(file, arm9Pos, FS_SEEK_SET);
+            FS_ReadFile(file, arm9Dst, arm9Size);
             MBCache_Add(cache, offsets->segment[1], header->arm9.size, dst, MB_CACHE_ENTRY_KEPT);
             arm9Size = header->arm9.size;
-            romfs_fseek(file, offsets->segment[2] - base, FS_SEEK_SET);
-            romfs_fread(file, dst + arm9Size, header->arm7.size);
+            FS_SeekFile(file, offsets->segment[2] - base, FS_SEEK_SET);
+            FS_ReadFile(file, dst + arm9Size, header->arm7.size);
             MBCache_Add(cache, offsets->segment[2], header->arm7.size, dst + arm9Size, MB_CACHE_ENTRY_KEPT);
             ok = TRUE;
         } else if (remaining >= 3 * MB_CACHE_BLOCK_SIZE) {
-            u32 base = func_02072010(file);
+            u32 base = FS_GetFileImageTop(file);
             u32 arm9Addr = offsets->segment[1];
             u32 arm9Pos = arm9Addr - base;
             u32 size = MB_CACHE_BLOCK_SIZE;
@@ -190,23 +190,23 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
                 arm9Dst = dst + (0x8000 - arm9Pos);
                 arm9Pos = 0x8000;
             }
-            romfs_fseek(file, arm9Pos, FS_SEEK_SET);
-            romfs_fread(file, arm9Dst, size);
+            FS_SeekFile(file, arm9Pos, FS_SEEK_SET);
+            FS_ReadFile(file, arm9Dst, size);
             MBCache_Add(cache, arm9Addr, MB_CACHE_BLOCK_SIZE, dst, MB_CACHE_ENTRY_KEPT);
-            romfs_fseek(file, arm9Addr + MB_CACHE_BLOCK_SIZE - base, FS_SEEK_SET);
-            romfs_fread(file, dst + MB_CACHE_BLOCK_SIZE, MB_CACHE_BLOCK_SIZE);
+            FS_SeekFile(file, arm9Addr + MB_CACHE_BLOCK_SIZE - base, FS_SEEK_SET);
+            FS_ReadFile(file, dst + MB_CACHE_BLOCK_SIZE, MB_CACHE_BLOCK_SIZE);
             MBCache_Add(cache, arm9Addr + MB_CACHE_BLOCK_SIZE, MB_CACHE_BLOCK_SIZE, dst + MB_CACHE_BLOCK_SIZE,
                         MB_CACHE_ENTRY_READY);
-            romfs_fseek(file, arm9Addr + 2 * MB_CACHE_BLOCK_SIZE - base, FS_SEEK_SET);
-            romfs_fread(file, dst + 2 * MB_CACHE_BLOCK_SIZE, MB_CACHE_BLOCK_SIZE);
+            FS_SeekFile(file, arm9Addr + 2 * MB_CACHE_BLOCK_SIZE - base, FS_SEEK_SET);
+            FS_ReadFile(file, dst + 2 * MB_CACHE_BLOCK_SIZE, MB_CACHE_BLOCK_SIZE);
             MBCache_Add(cache, arm9Addr + 2 * MB_CACHE_BLOCK_SIZE, MB_CACHE_BLOCK_SIZE, dst + 2 * MB_CACHE_BLOCK_SIZE,
                         MB_CACHE_ENTRY_READY);
             ok = TRUE;
         }
-        romfs_fseek(file, pos, FS_SEEK_SET);
+        FS_SeekFile(file, pos, FS_SEEK_SET);
 
         if (ownFile) {
-            romfs_fclose(&ownFileBuf);
+            FS_CloseFile(&ownFileBuf);
             if (ok) {
                 MBSecureWindow window;
                 const MBSecureAreaPart *part = sSecureAreaTable;
@@ -228,7 +228,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
             }
         }
         if (ok) {
-            cp15_flushDC(buf, len);
+            DC_FlushRange(buf, len);
         }
     }
     return ok;
@@ -253,9 +253,9 @@ static void MBSegment_CopyRange(const MBSecureWindow *window, u32 start, u32 end
     }
     if (start < end) {
         if (clear) {
-            sys_memset((void *)(window->dstBase + start), 0, end - start);
+            MI_CpuFill8((void *)(window->dstBase + start), 0, end - start);
         } else {
-            sys_memcpy((const void *)(window->srcBase + start), (void *)(window->dstBase + start), end - start);
+            MI_CpuCopy8((const void *)(window->srcBase + start), (void *)(window->dstBase + start), end - start);
         }
     }
 }
@@ -266,18 +266,18 @@ BOOL MB_RegisterFile(const MBGameRegistry *gameReg, const void *buf) {
     u8 i;
     MBCommFile *file;
 
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     if (!MBWm_IsStarted()) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     if (MB_PARENT_WORK->fileCount + 1 > MB_FILE_MAX) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     for (i = 0; i < MB_FILE_MAX; i++) {
         if (MB_PARENT_WORK->files[i].registry == gameReg) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return FALSE;
         }
         if (!MB_PARENT_WORK->files[i].valid) {
@@ -286,16 +286,16 @@ BOOL MB_RegisterFile(const MBGameRegistry *gameReg, const void *buf) {
         }
     }
     if (i == MB_FILE_MAX) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
 
     MB_PARENT_WORK->files[slot].registry = gameReg;
     file = &MB_PARENT_WORK->files[slot];
     MBFile_InitSegments(file, buf);
-    sys_memcpy(gameReg->userParam, file->userParam, sizeof(file->userParam));
+    MI_CpuCopy8(gameReg->userParam, file->userParam, sizeof(file->userParam));
     if (!MBFile_BuildLayout(&MB_PARENT_WORK->files[slot].layout, file)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     MBGameInfo_Build(&MB_PARENT_WORK->files[slot].record, gameReg, &gMBCommWork->user);
@@ -314,7 +314,7 @@ BOOL MB_RegisterFile(const MBGameRegistry *gameReg, const void *buf) {
     }
     MB_PARENT_WORK->files[slot].valid = 1;
     MB_PARENT_WORK->fileCount++;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return TRUE;
 }
 
@@ -334,7 +334,7 @@ static void MBFile_InitSegments(MBCommFile *file, const ROMHeader *header) {
         segment++;
         kind++;
     }
-    sys_memcpy((const u8 *)header + 0x160, file->romHeaderExtra, sizeof(file->romHeaderExtra));
+    MI_CpuCopy8((const u8 *)header + 0x160, file->romHeaderExtra, sizeof(file->romHeaderExtra));
 }
 
 // Describes where one segment is loaded in the child, and checks that it fits
@@ -349,7 +349,7 @@ static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegm
             segment->recvAddr = load->ramAddr;
             segment->isArm7 = FALSE;
         } else {
-            sys_exit();
+            OS_Terminate();
         }
         break;
     }
@@ -377,7 +377,7 @@ static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegm
             invalid = TRUE;
         }
         if (invalid == TRUE) {
-            sys_exit();
+            OS_Terminate();
         }
         segment->size = load->size;
         segment->ramAddr = load->ramAddr;
@@ -521,7 +521,7 @@ static BOOL MBFile_IsRecvArea(u32 index, u32 addr, u32 size) {
 
 // Sends a frame that is in memory to the children in a bitmap
 int MBComm_FlushAndSend(u32 length, u16 aidBitmap, void *buf) {
-    cp15_flushDC(buf, (length + 0x1f) & ~0x1f);
-    cp15_drainWriteBuffer();
+    DC_FlushRange(buf, (length + 0x1f) & ~0x1f);
+    DC_WaitWriteBufferEmpty();
     return MBWm_SendToChildren(buf, length, aidBitmap);
 }

@@ -96,8 +96,8 @@ static void SubwayMapGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sSubwayMapLights); i++) {
         GFL_G3DSysLightSet(i, &sSubwayMapLights[i]);
@@ -108,7 +108,7 @@ static void SubwayMapGraphic_G3DInit(void) {
 SubwayMapGraphic *SubwayMapGraphic_Create(u32 layout, HeapID heapId) {
     SubwayMapGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(SubwayMapGraphic), FALSE, "subway_map_graphic.c", 460);
 
-    sys_memset(graphic, 0, sizeof(SubwayMapGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(SubwayMapGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -137,7 +137,7 @@ void SubwayMapGraphic_Free(SubwayMapGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(SubwayMapGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(SubwayMapGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -156,7 +156,7 @@ static void SubwayMapGraphic_VBlank(TCB *tcb, void *data) {
 static void SubwayMapBG_Init(SubwayMapBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(SubwayMapBG));
+    MI_CpuFill8(bg, 0, sizeof(SubwayMapBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sSubwayMapLCDConfig);
@@ -175,7 +175,7 @@ static void SubwayMapBG_Free(SubwayMapBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(SubwayMapBG));
+    MI_CpuFill8(bg, 0, sizeof(SubwayMapBG));
 }
 
 static void SubwayMapBG_Update(SubwayMapBG *bg) {
@@ -186,7 +186,7 @@ static void SubwayMapBG_VBlank(SubwayMapBG *bg) {
 }
 
 static void SubwayMapClAct_Init(SubwayMapClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(SubwayMapClAct));
+    MI_CpuFill8(clact, 0, sizeof(SubwayMapClAct));
     ClActSys_Create(&sSubwayMapClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -197,7 +197,7 @@ static void SubwayMapClAct_Init(SubwayMapClAct *clact, const BGSysVRAMConfig *vr
 static void SubwayMapClAct_Free(SubwayMapClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(SubwayMapClAct));
+    MI_CpuFill8(clact, 0, sizeof(SubwayMapClAct));
 }
 
 static void SubwayMapClAct_Update(SubwayMapClAct *clact) {

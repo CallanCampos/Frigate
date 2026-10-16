@@ -40,7 +40,7 @@ GameEventReturnCode func_ov033_02176d9c(GameEvent *event, u32 *state, void *data
     switch (*state) {
     case 0:
         DisableAllActorsMovement(Field_GetActorSystem(field));
-        sys_memset(&args, 0, sizeof(args));
+        MI_CpuFill8(&args, 0, sizeof(args));
         args.config = *(FestMissionConfig *)GetFestMissionCfg(festival);
         args.joined = 0;
         next = GameEvent_CreateOverlayDelegate(gsys, OVERLAY_FUNFEST_MISSION, EventFestMissionStart_Create, &args);

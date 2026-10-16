@@ -93,8 +93,8 @@ void ZukanHabitatGraphic_Init(ZukanHabitatGraphic *graphic, GameData *gameData) 
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetDisplayLayout(0);
     graphic->townmap = TownMapData_Load(HEAPID_ZUKAN_HABITAT);
     graphic->iconArc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_ZUKAN_HABITAT);
@@ -121,8 +121,8 @@ void ZukanHabitatGraphic_Exit(ZukanHabitatGraphic *graphic) {
     ZukanHabitatGraphic_FreeBG();
     ZukanHabitatGraphic_FreeBlink(graphic);
     ZukanHabitatGraphic_FreePaletteFade(graphic);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
@@ -210,7 +210,7 @@ static void ZukanHabitatGraphic_SetVRAMBanks(void) {
 static void ZukanHabitatGraphic_InitBG(void) {
     u16 backdrop = 0;
 
-    gfxUploadStdPaletteBGB(&backdrop, 0, sizeof(backdrop));
+    GXS_LoadBGPltt(&backdrop, 0, sizeof(backdrop));
     GFL_BGSysCreate(HEAPID_ZUKAN_HABITAT);
     {
         BGSysLCDConfig config = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -842,7 +842,7 @@ void ZukanHabitatGraphic_SetArea(ZukanHabitatGraphic *graphic, u16 zone) {
 
     func_0204c488(graphic->actors[ZUKAN_HABITAT_OBJ_AREA],
                   TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_ANIM));
-    sys_memset(&pos, 0, sizeof(pos));
+    MI_CpuFill8(&pos, 0, sizeof(pos));
     pos.x = TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_X);
     pos.y = TownMapData_GetParam(graphic->townmap, place, TOWNMAP_PARAM_AREA_Y);
     pos.y += 24;
@@ -851,19 +851,19 @@ void ZukanHabitatGraphic_SetArea(ZukanHabitatGraphic *graphic, u16 zone) {
 }
 
 static void ZukanHabitatGraphic_UpdateGlow(ZukanHabitatGraphic *graphic) {
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_NONE,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        graphic->glowEv, 16 - graphic->glowEv);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_NONE,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       graphic->glowEv, 16 - graphic->glowEv);
     ZukanCommon_StepGlow(&graphic->glowPhase, &graphic->glowEv);
 }
 
 static void ZukanHabitatGraphic_StartGlow(ZukanHabitatGraphic *graphic) {
     ZukanCommon_StartGlow(&graphic->glowPhase, &graphic->glowEv);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_NONE,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        graphic->glowEv, 16 - graphic->glowEv);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_NONE,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       graphic->glowEv, 16 - graphic->glowEv);
 }
 
 void ZukanHabitatGraphic_SetMark(ZukanHabitatGraphic *graphic, u16 cell, u32 state) {

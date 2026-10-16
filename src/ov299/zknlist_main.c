@@ -373,7 +373,7 @@ void ZknListMain_StartFade(ZknListWork *wk, u8 start, u8 end) {
 }
 
 void ZknListMain_SetBlend(void) {
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
 }
 
 // The icons' windows on the top screen show the row under them unblended

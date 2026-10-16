@@ -2,6 +2,8 @@
 // for the manager's replies, the scan that the child side of the library starts, and the sending of frames (libmb).
 // The names are descriptive, except swan's MB_*
 #include "mb_private.h"
+#include "nitro/os.h"
+#include "nitro/pxi.h"
 
 // What the wireless manager is set up with: how long a connection may be silent, for the manager's four lifetimes
 // (table, cam, frame and mp), whether to start in power-save, and the parent's name (a wide string)
@@ -50,7 +52,7 @@ static BOOL MBWm_IsMultibootBeacon(const WMBssDesc *desc) {
 
 // Moves the scan on to the next channel that is allowed
 static int MBWm_NextChannel(WMScanExParam *param) {
-    u16 allowed = func_020810cc();
+    u16 allowed = WM_GetAllowedChannel();
     u16 channel;
     u16 i;
 
@@ -93,10 +95,10 @@ static BOOL MBWm_CanSend(void) {
 static void MBWm_SetLifeTime(void) {
     int result;
 
-    result = func_02080e7c(MBWm_ParentCallback);
+    result = WM_SetIndCallback(MBWm_ParentCallback);
     MBWm_ReportError(MB_WM_API_INDICATION, result);
-    result = func_02082560(MBWm_ParentCallback, sWmConfig.lifeTable, sWmConfig.lifeCam, sWmConfig.lifeFrame,
-                           sWmConfig.lifeMp);
+    result = WM_SetLifeTime(MBWm_ParentCallback, sWmConfig.lifeTable, sWmConfig.lifeCam, sWmConfig.lifeFrame,
+                            sWmConfig.lifeMp);
     MBWm_ReportError(MB_WM_API_SET_LIFETIME, result);
 }
 
@@ -126,11 +128,11 @@ static void MBWm_ParentCallback(void *arg) {
             sWmWork->commCallback(MB_WM_EVENT_WM_ERROR, arg);
             return;
         }
-        MBWm_ReportError(MB_WM_API_SET_PARENT_PARAM, func_02081474(MBWm_ParentCallback, &sWmWork->parentParam));
+        MBWm_ReportError(MB_WM_API_SET_PARENT_PARAM, WM_SetParentParameter(MBWm_ParentCallback, &sWmWork->parentParam));
         return;
     case MB_WM_API_SET_PARENT_PARAM:
         sWmWork->commCallback(MB_WM_EVENT_INIT_COMPLETE, arg);
-        MBWm_ReportError(MB_WM_API_BEACON_INDICATION, func_0208252c(MBWm_ParentCallback, TRUE));
+        MBWm_ReportError(MB_WM_API_BEACON_INDICATION, WM_SetBeaconIndication(MBWm_ParentCallback, TRUE));
         return;
     case MB_WM_API_BEACON_INDICATION:
         if (sWmWork->ending == 0) {
@@ -138,7 +140,7 @@ static void MBWm_ParentCallback(void *arg) {
                 sWmWork->commCallback(MB_WM_EVENT_WM_ERROR, arg);
                 return;
             }
-            MBWm_ReportError(MB_WM_API_START_PARENT, func_02081544(MBWm_ParentCallback, sWmConfig.powerOn));
+            MBWm_ReportError(MB_WM_API_START_PARENT, WMi_StartParentEx(MBWm_ParentCallback, sWmConfig.powerOn));
             return;
         } else {
             if (cb->errcode != 0) {
@@ -175,8 +177,8 @@ static void MBWm_ParentCallback(void *arg) {
                     singleMode = FALSE;
                 }
                 MBWm_ReportError(MB_WM_API_START_MP,
-                                 func_020818f8(MBWm_ParentCallback, sWmWork->recvBuf, sWmWork->recvBufSize,
-                                               sWmWork->sendBuf, sWmWork->sendBufSize, singleMode, 0, 0, 0, 1, 1));
+                                 WM_StartMPEx(MBWm_ParentCallback, sWmWork->recvBuf, sWmWork->recvBufSize,
+                                              sWmWork->sendBuf, sWmWork->sendBufSize, singleMode, 0, 0, 0, 1, 1));
                 return;
             }
             if (MBWm_CanSend()) {
@@ -233,7 +235,7 @@ static void MBWm_ParentCallback(void *arg) {
                 }
             }
             if (children == 1) {
-                func_0207c160(0x1964);
+                OS_SpinWaitSysCycles(0x1964);
             }
         }
         sWmWork->sending = 0;
@@ -263,17 +265,17 @@ static void MBWm_ParentCallback(void *arg) {
             }
             sWmWork->connectedMask = 0;
             sWmWork->mpStarted = 0;
-            MBWm_ReportError(MB_WM_API_END, func_02081448(MBWm_ParentCallback));
+            MBWm_ReportError(MB_WM_API_END, WM_End(MBWm_ParentCallback));
             return;
         } else {
-            func_02080eac(1, NULL, NULL);
-            func_02080e7c(NULL);
+            WM_SetPortCallback(1, NULL, NULL);
+            WM_SetIndCallback(NULL);
             if (cb->errcode != 0) {
                 sWmWork->ending = 0;
                 sWmWork->commCallback(MB_WM_EVENT_WM_ERROR, arg);
                 return;
             }
-            MBWm_ReportError(MB_WM_API_BEACON_INDICATION, func_0208252c(MBWm_ParentCallback, FALSE));
+            MBWm_ReportError(MB_WM_API_BEACON_INDICATION, WM_SetBeaconIndication(MBWm_ParentCallback, FALSE));
             return;
         }
     case MB_WM_API_END:
@@ -306,7 +308,7 @@ static void MBWm_ParentCallback(void *arg) {
             sWmWork->commCallback(MB_WM_EVENT_IND_3, arg);
             return;
         case 0x16:
-            sys_exit();
+            OS_Terminate();
             return;
         case 0x14:
         case 0x15:
@@ -354,8 +356,8 @@ static void MBWm_ChildCallback(void *arg) {
         }
         work->commCallback(MB_WM_EVENT_INIT_COMPLETE, arg);
         MBWm_ReportError(MB_WM_API_SET_LIFETIME,
-                         func_02082560(MBWm_ChildCallback, sWmConfig.lifeTable, sWmConfig.lifeCam, sWmConfig.lifeFrame,
-                                       sWmConfig.lifeMp));
+                         WM_SetLifeTime(MBWm_ChildCallback, sWmConfig.lifeTable, sWmConfig.lifeCam, sWmConfig.lifeFrame,
+                                        sWmConfig.lifeMp));
         return;
     case MB_WM_API_SET_LIFETIME:
         if (cb->errcode != 0) {
@@ -378,7 +380,7 @@ static void MBWm_ChildCallback(void *arg) {
         sScanParam.ssidLength = 0;
         work->scanning = 1;
         work->scanSwitchChannel = 1;
-        MBWm_ReportError(MB_WM_API_START_SCAN, func_020815c8(MBWm_ChildCallback, &sScanParam));
+        MBWm_ReportError(MB_WM_API_START_SCAN, WM_StartScanEx(MBWm_ChildCallback, &sScanParam));
         return;
     case MB_WM_API_START_SCAN: {
         WMStartScanExCallback *scan = arg;
@@ -422,8 +424,8 @@ static void MBWm_ChildCallback(void *arg) {
                     if (same) {
                         entries[k].gameInfoLength = desc->gameInfoLength;
                         entries[k].gameInfo = desc->gameInfo;
-                        cp15_invalidateDC(&work->scanEntries[k], 0xc0);
-                        func_020780e8(sDmaNo, desc, &work->scanEntries[k], 0xc0, TRUE);
+                        DC_InvalidateRange(&work->scanEntries[k], 0xc0);
+                        MIi_DmaCopy16(sDmaNo, desc, &work->scanEntries[k], 0xc0, TRUE);
                         work->lastScanIndex = k;
                         work->commCallback(MB_WM_EVENT_SCAN_FOUND, &scan->linkLevel[i]);
                         goto restart;
@@ -431,12 +433,12 @@ static void MBWm_ChildCallback(void *arg) {
                 }
                 if (k < 16) {
                     work->scanCount = k + 1;
-                    sys_memcpy(desc->bssid, entries[k].bssid, sizeof(desc->bssid));
+                    MI_CpuCopy8(desc->bssid, entries[k].bssid, sizeof(desc->bssid));
                     entries[k].channel = desc->channel;
                     entries[k].linkLevel = scan->linkLevel[i];
                     MI_CpuCopy16(&desc->gameInfo, &entries[k].gameInfo, sizeof(WMGameInfo));
-                    cp15_invalidateDC(&work->scanEntries[k], 0xc0);
-                    func_020780e8(sDmaNo, desc, &work->scanEntries[k], 0xc0, TRUE);
+                    DC_InvalidateRange(&work->scanEntries[k], 0xc0);
+                    MIi_DmaCopy16(sDmaNo, desc, &work->scanEntries[k], 0xc0, TRUE);
                     work->lastScanIndex = k;
                     work->commCallback(MB_WM_EVENT_SCAN_FOUND, &scan->linkLevel[i]);
                     goto restart;
@@ -450,7 +452,7 @@ static void MBWm_ChildCallback(void *arg) {
                 if (work->scanSwitchChannel != 0 && !MBWm_NextChannel(&sScanParam)) {
                     MBWm_End();
                 }
-                MBWm_ReportError(MB_WM_API_START_SCAN, func_020815c8(MBWm_ChildCallback, &sScanParam));
+                MBWm_ReportError(MB_WM_API_START_SCAN, WM_StartScanEx(MBWm_ChildCallback, &sScanParam));
             }
             return;
         }
@@ -462,7 +464,7 @@ static void MBWm_ChildCallback(void *arg) {
             if (work->scanSwitchChannel != 0 && !MBWm_NextChannel(&sScanParam)) {
                 MBWm_End();
             }
-            MBWm_ReportError(MB_WM_API_START_SCAN, func_020815c8(MBWm_ChildCallback, &sScanParam));
+            MBWm_ReportError(MB_WM_API_START_SCAN, WM_StartScanEx(MBWm_ChildCallback, &sScanParam));
             return;
         default:
             work->commCallback(MB_WM_EVENT_WM_ERROR, arg);
@@ -474,7 +476,7 @@ static void MBWm_ChildCallback(void *arg) {
             work->commCallback(MB_WM_EVENT_WM_ERROR, arg);
             return;
         }
-        MBWm_ReportError(MB_WM_API_START_CONNECT, func_020816dc(MBWm_ChildCallback, work->target, NULL, TRUE, 0));
+        MBWm_ReportError(MB_WM_API_START_CONNECT, WM_StartConnectEx(MBWm_ChildCallback, work->target, NULL, TRUE, 0));
         return;
     case MB_WM_API_START_CONNECT: {
         WMStartConnectCallback *connect = arg;
@@ -493,15 +495,15 @@ static void MBWm_ChildCallback(void *arg) {
             work->connectedAid = connect->aid;
             work->commCallback(MB_WM_EVENT_CONNECT_PARENT, arg);
             work->connectedMask = 1;
-            if (func_02080eac(1, MBWm_ChildPortCallback, NULL) == 0) {
+            if (WM_SetPortCallback(1, MBWm_ChildPortCallback, NULL) == 0) {
                 BOOL singleMode = FALSE;
 
                 if (work->mpFreq == 0) {
                     singleMode = TRUE;
                 }
                 MBWm_ReportError(MB_WM_API_START_MP,
-                                 func_020818f8(MBWm_ChildCallback, work->recvBuf, work->recvBufSize, work->sendBuf,
-                                               work->sendBufSize, singleMode, 0, 0, 0, 1, 1));
+                                 WM_StartMPEx(MBWm_ChildCallback, work->recvBuf, work->recvBufSize, work->sendBuf,
+                                              work->sendBufSize, singleMode, 0, 0, 0, 1, 1));
                 return;
             }
             return;
@@ -560,7 +562,7 @@ static void MBWm_ChildCallback(void *arg) {
         }
         sWmWork->connectedMask = 0;
         sWmWork->mpStarted = 0;
-        MBWm_ReportError(MB_WM_API_END, func_02081448(MBWm_ChildCallback));
+        MBWm_ReportError(MB_WM_API_END, WM_End(MBWm_ChildCallback));
         return;
     case MB_WM_API_END:
         if (cb->errcode != 0) {
@@ -578,7 +580,7 @@ static void MBWm_ChildCallback(void *arg) {
     case MB_WM_API_INDICATION:
         switch (((WMIndCallback *)arg)->state) {
         case 0x16:
-            sys_exit();
+            OS_Terminate();
             return;
         case 0x17:
             return;
@@ -596,7 +598,7 @@ static int MBWm_RandomBeaconPeriod(void) {
     u32 sum;
     int i;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0, sum = 0; i < 6; i++) {
         sum += mac[i];
     }
@@ -617,9 +619,9 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     wmWork = (MBWmWork *)(((u32)work + 0x1f) & ~0x1f);
     commWork = (MBCommWork *)(((u32)wmWork + sizeof(MBWmWork) + 0x1f) & ~0x1f);
     if (tgid == MB_TGID_AUTO) {
-        tgid = func_020812b8();
+        tgid = WM_GetNextTgid();
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     sWmConfig.lifeTable = 0xffff;
     sWmConfig.lifeFrame = 5;
     sWmConfig.lifeCam = 0x28;
@@ -643,7 +645,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
         *name++ = *src++;
         sWmConfig.name = src;
     }
-    sys_memcpy(user, &commWork->user, sizeof(MBUserInfo));
+    MI_CpuCopy8(user, &commWork->user, sizeof(MBUserInfo));
     if (user->nameLength < MB_USER_NAME_LENGTH) {
         commWork->user.name[user->nameLength] = 0;
     }
@@ -665,7 +667,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     wmWork->started = 0;
     commWork->initialized = 1;
     commWork->mpRequested = 0;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return MB_SUCCESS;
 }
 
@@ -684,20 +686,20 @@ static BOOL MBWm_CheckBufferSize(u32 parentSize, u32 childSize, u32 children) {
 }
 
 BOOL MB_SetParentCommParam(u16 sendSize, u16 maxChildren) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sWmWork->started != 0) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     if (!MBWm_CheckBufferSize(sendSize, 8, maxChildren)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     sWmWork->parentParam.maxEntry = maxChildren;
     sWmWork->parentSendSize = sendSize;
     sWmWork->childSendSize = 8;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return TRUE;
 }
 
@@ -712,16 +714,16 @@ static int MBWm_StartInit(void) {
     MBWm_SetScanTime(30);
     if (gMBCommWork->started == 0) {
         do {
-            result = func_020813c4(sWmBuf, sWmWork->wmCallback, sDmaNo);
+            result = WM_Initialize(sWmBuf, sWmWork->wmCallback, sDmaNo);
         } while (result == WM_ERRCODE_BUSY);
         if (result != WM_ERRCODE_OPERATING) {
             return MB_ERRCODE_WM_FAILURE;
         }
-        func_02080e7c(sWmWork->wmCallback);
+        WM_SetIndCallback(sWmWork->wmCallback);
         sWmWork->started = 1;
         return MB_SUCCESS;
     }
-    func_02080e7c(sWmWork->wmCallback);
+    WM_SetIndCallback(sWmWork->wmCallback);
     sWmWork->started = 1;
     MBWm_SetLifeTime();
     return MB_SUCCESS;
@@ -730,7 +732,7 @@ static int MBWm_StartInit(void) {
 // Sets the library's work up for a parent on a channel and starts the wireless manager
 static int MBWm_Start(int channel) {
     MBCommPStateCallback callback;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int result;
     int i;
 
@@ -748,7 +750,7 @@ static int MBWm_Start(int channel) {
     }
     MB_PARENT_WORK->fileCount = 0;
     MI_CpuClear16(MB_PARENT_WORK->files, sizeof(MB_PARENT_WORK->files));
-    sys_memset(MB_PARENT_WORK->response, 0, sizeof(MB_PARENT_WORK->response));
+    MI_CpuFill8(MB_PARENT_WORK->response, 0, sizeof(MB_PARENT_WORK->response));
     sWmWork->mode = 1;
     sWmWork->commCallback = MBComm_OnWmEvent;
     sWmWork->wmCallback = MBWm_ParentCallback;
@@ -758,8 +760,8 @@ static int MBWm_Start(int channel) {
     sWmWork->recvBufSize = (((sWmWork->parentParam.childMaxSize + 0xe) * 15 + 0x29) & ~0x1f) * 2;
     MBGameInfo_Init();
     result = MBWm_StartInit();
-    CPU_SetIRQMask(irq);
-    MB_PARENT_WORK->multiChild = func_0207ca48(15, 1);
+    OS_RestoreInterrupts(irq);
+    MB_PARENT_WORK->multiChild = PXI_IsCallbackReady(15, 1);
     return result;
 }
 
@@ -769,7 +771,7 @@ int MB_StartParent(int channel) {
 }
 
 static int MBWm_Reset(void) {
-    int result = func_02081424(sWmWork->wmCallback);
+    int result = WM_Reset(sWmWork->wmCallback);
 
     MBWm_ReportError(MB_WM_API_RESET, result);
     if (result == WM_ERRCODE_OPERATING) {
@@ -785,7 +787,7 @@ static void MBWm_ResetTask(MBTask *task) {
 // Asks the wireless manager to end, once what it is sending is done
 static BOOL MBWm_End(void) {
     BOOL result = TRUE;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sWmWork->started == 0) {
         MBWm_FinishEnd(NULL);
@@ -799,26 +801,26 @@ static BOOL MBWm_End(void) {
             result = MBWm_Reset();
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return result;
 }
 
 void MB_End(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (gMBCommWork->started == 0) {
-        sys_exit();
+        OS_Terminate();
     }
     MBWm_End();
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 void MB_DisconnectChild(u16 aid) {
-    func_02081774(MBWm_ParentCallback, aid);
+    WM_Disconnect(MBWm_ParentCallback, aid);
     if (aid != 0 && aid < 16) {
         MB_PARENT_WORK->childUnk148a[aid - 1] = 0;
-        sys_memset(&MB_PARENT_WORK->childRequestGgid[aid - 1], 0, sizeof(u32));
-        sys_memset(&MB_PARENT_WORK->childUser[aid - 1], 0, sizeof(MBUserInfo));
+        MI_CpuFill8(&MB_PARENT_WORK->childRequestGgid[aid - 1], 0, sizeof(u32));
+        MI_CpuFill8(&MB_PARENT_WORK->childUser[aid - 1], 0, sizeof(MBUserInfo));
         MBFrame_ClearChild(aid);
         MB_PARENT_WORK->response[aid - 1] = 0;
         MBComm_LeaveFile(aid);
@@ -835,7 +837,7 @@ static void MBWm_SetScanTime(u16 time) {
 }
 
 static int MBWm_SetMPData(WMCallbackFunc callback, const void *data, u16 size, u16 unused, u16 aidBitmap) {
-    int result = func_02081998(callback, NULL, data, size, aidBitmap, 1, 3);
+    int result = WM_SetMPDataToPortEx(callback, NULL, data, size, aidBitmap, 1, 3);
 
     MBWm_ReportError(MB_WM_API_SET_MP_DATA, result);
     return result;

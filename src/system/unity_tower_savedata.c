@@ -18,7 +18,7 @@ u32 func_02009b5c(void) {
 }
 
 void func_02009b64(UnityTowerSurveySave *save) {
-    sys_memset32(0, save, sizeof(UnityTowerSurveySave));
+    MIi_CpuClear32(0, save, sizeof(UnityTowerSurveySave));
 }
 
 UnityTowerSurveySave *getUnityTower_SurveySaveBlkAddrress(SaveControl *save) {

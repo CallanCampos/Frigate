@@ -563,7 +563,7 @@ void BtlvEffvm_Start(VM *vm, u32 attacker, u32 defender, u16 move, BtlvEffvmPara
     if (param != NULL) {
         wk->param = *param;
     } else {
-        sys_memset16(0, &wk->param, sizeof(BtlvEffvmParam));
+        MIi_CpuClear16(0, &wk->param, sizeof(BtlvEffvmParam));
     }
     wk->attacker = attacker;
     wk->defender = defender;
@@ -1960,9 +1960,9 @@ static BOOL BtlvEffvm_CmdSetAlphaBlend(VM *vm, void *env) {
     VM_Read32(vm);
     VM_Read32(vm);
     if (alpha == 31) {
-        gfxRegSetAlphaBlend(0x4000050, 2, 0x3d, 31, 7);
+        G2x_SetBlendAlpha_(0x4000050, 2, 0x3d, 31, 7);
     } else {
-        gfxRegSetAlphaBlend(0x4000050, 10, 0x35, 31, alpha);
+        G2x_SetBlendAlpha_(0x4000050, 10, 0x35, 31, alpha);
     }
     wk->alphaBlend = TRUE;
     return wk->ret;
@@ -2651,7 +2651,7 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
         GFL_BGSysMoveBG(3, 3, wk->bgY);
     }
     if (wk->alphaBlend) {
-        gfxRegSetAlphaBlend(0x4000050, 2, 0x3d, 0x1f, 7);
+        G2x_SetBlendAlpha_(0x4000050, 2, 0x3d, 0x1f, 7);
         wk->alphaBlend = FALSE;
     }
     if (wk->sePlayed) {
@@ -4416,8 +4416,8 @@ static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data) {
         }
         offset = (work->palettes[work->index] - 8) * 16;
         file = GFL_G2DIOReadNCLR(231, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
-        sys_memcpy16((u16 *)palette->rawData + offset,
-                     PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 0) + 0x80, 0x20);
+        MIi_CpuCopy16((u16 *)palette->rawData + offset,
+                      PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 0) + 0x80, 0x20);
         PaletteFade_ApplyPalette(BtlvEffect_GetPaletteFade(), 8, 0);
         GFL_HeapFree(file);
         work->timer = 0;

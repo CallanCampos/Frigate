@@ -306,7 +306,7 @@ static void CGHelp_InitBGs(CGHelp *help) {
     CGHelp_CreateBG(&sBGSetupMessage, BG_MESSAGE, BGMODE_TEXT);
     CGHelp_CreateBG(&sBGSetupFrame, BG_FRAME, BGMODE_TEXT);
     CGHelp_CreateBG(&sBGSetupScrolling, BG_SCROLLING, BGMODE_TEXT);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 4);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 4);
     clActSetup = data_02093f08;
     clActSetup.charCount = 0x40;
     ClActSys_Create(&clActSetup, &sVRAMConfig, help->heapId);

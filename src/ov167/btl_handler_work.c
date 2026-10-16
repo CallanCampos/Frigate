@@ -5,7 +5,7 @@
 
 void func_ov167_021b083c(BtlActionState *state) {
     state->raw = 0;
-    sys_memset(state->work, 0, sizeof(state->work));
+    MI_CpuFill8(state->work, 0, sizeof(state->work));
 }
 
 // Function name from swan.

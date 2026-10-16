@@ -33,7 +33,7 @@ static SystemUI *sSystemUI;
 void GFL_HIDInit(HeapID heapId, u32 mode) {
     SystemUI *ui = GFL_HeapAllocate(heapId, sizeof(SystemUI), FALSE, "ui.c", 58);
 
-    sys_memset(ui, 0, sizeof(SystemUI));
+    MI_CpuFill8(ui, 0, sizeof(SystemUI));
     ui->keypad = GFL_HIDCreateKeypadManager(heapId);
     ui->touchpad = initTouchpad(heapId);
     ui->usingTouch = FALSE;
@@ -211,7 +211,7 @@ KeypadManager *GFL_HIDGetKeypadManager(SystemUI *ui) {
 
 SystemUI *GCTX_HIDGetInstance(void) {
     if (sSystemUI == NULL) {
-        sys_exit();
+        OS_Terminate();
     }
     return sSystemUI;
 }
@@ -248,7 +248,7 @@ static void battery(void) {
     u32 battery;
 
     if (OS_GetVBlankCount() % 600 == 1) {
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             if (PM_GetBatteryLevel(&level) == PM_RESULT_SUCCESS) {
                 sSystemUI->batteryLevel = level;
             }
@@ -310,7 +310,7 @@ static void sleepSetup(void) {
         if (!IsSleepBlocked(ui)) {
             func_0203db7c();
             CallSleepCallback(ui);
-            PM_GoSleepMode(PM_TRIGGER_COVER_OPEN | PM_TRIGGER_CARTRIDGE, 0, 0);
+            PM_GoSleepMode(PM_TRIGGER_COVER_OPEN | PM_TRIGGER_CARD, 0, 0);
             CallInputCallback(ui);
             CallLidOpenCallback(ui);
             CallWakeCallback(ui);
@@ -337,15 +337,15 @@ static void sleepSetup(void) {
 void GFL_HIDDoSoftReset(u32 parameter) {
     SystemUI *ui = GCTX_HIDGetInstance();
 
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
     func_02042860(0);
     for (;;) {
-        if (func_02042ab8() && func_0206f890()) {
+        if (func_02042ab8() && CARD_TryWaitBackupAsync()) {
             setBacklightBothScreens(ui->backlight);
-            sys_reset(parameter);
+            OS_ResetSystem(parameter);
         }
-        irq_waitFor(TRUE, OS_IE_V_BLANK);
+        OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         func_020428e0();
         GFL_FadeUpdate();
     }

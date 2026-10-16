@@ -79,7 +79,7 @@ static BOOL BrMusicalSend_ProcInit(GameProc *proc, u32 *state, void *param, void
     GFL_OvlLoad(OVERLAY_ID(210));
 
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrMusicalSendWork), BrProcSys_GetHeapID(p->procSys));
-    sys_memset(wk, 0, sizeof(BrMusicalSendWork));
+    MI_CpuFill8(wk, 0, sizeof(BrMusicalSendWork));
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
     wk->param = p;
 
@@ -281,7 +281,7 @@ static void BrMusicalSend_SeqSend(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     case SEQ_SEND_START: {
         BrNetRequestParam req;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         req.data = wk->shot;
         BrNet_StartRequest(wk->param->net, 0, &req);
         wk->cnt = 0;
@@ -374,7 +374,7 @@ static void BrMusicalSend_CreateButtons(BrMusicalSendWork *wk, BrMusicalSendProc
         font = BrRes_GetFont(param->res);
         msg = BrRes_GetMsgData(param->res);
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.y = 168;
         setup.priority = 1;
         unit = BrGraphic_GetClunit(param->graphic);

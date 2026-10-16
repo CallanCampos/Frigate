@@ -278,7 +278,7 @@ static void SubLcd_FieldObjLoad(WorldTradeWork *wk) {
             GFL_G2DIOReadOBJNCGR(31, 0x31 + i, FALSE, &wk->fieldObjCharaData[i], HEAPID_WORLDTRADE);
     }
     for (i = 0; i < 16; i++) {
-        cp15_flushDC(wk->fieldObjCharaData[i]->rawData, 0x200);
+        DC_FlushRange(wk->fieldObjCharaData[i]->rawData, 0x200);
     }
 }
 
@@ -292,8 +292,8 @@ static void SubLcd_FieldObjTrans(NNSG2dCharacterData **charData, NNSG2dPaletteDa
         trainerType = 0;
     }
     palette = pltt->rawData;
-    gfxUploadObjCharB(charData[trainerType]->rawData, sFieldObjCharOffsets[index], 0x200);
-    gfxUploadStdPaletteObjB(palette + sFieldObjPalettes[trainerType] * 32, (index + 2) * 32, 32);
+    GXS_LoadOBJ(charData[trainerType]->rawData, sFieldObjCharOffsets[index], 0x200);
+    GXS_LoadOBJPltt(palette + sFieldObjPalettes[trainerType] * 32, (index + 2) * 32, 32);
 }
 
 void WorldTrade_FreeFieldObjData(WorldTradeWork *wk) {

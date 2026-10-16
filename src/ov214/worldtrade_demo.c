@@ -39,7 +39,7 @@ int WorldTrade_Demo_Init(WorldTradeWork *wk, int seq) {
     WorldTrade_ExitGraphics(wk);
     wk->subProcParam =
         GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(PokemonTradeGtsParam), FALSE, "worldtrade_demo.c", 94);
-    sys_memset(wk->subProcParam, 0, sizeof(PokemonTradeGtsParam));
+    MI_CpuFill8(wk->subProcParam, 0, sizeof(PokemonTradeGtsParam));
     param = wk->subProcParam;
     wk->sentPokemon = WorldTrade_AllocPartyPkm(HEAPID_WORLDTRADE);
     param->gameData = GSYS_GetGameData(wk->param->gsys);
@@ -114,7 +114,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                 }
                 wk->subProcParam =
                     GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(ShinkaDemoParam), FALSE, "worldtrade_demo.c", 235);
-                sys_memset(wk->subProcParam, 0, sizeof(ShinkaDemoParam));
+                MI_CpuFill8(wk->subProcParam, 0, sizeof(ShinkaDemoParam));
                 evolution = wk->subProcParam;
                 evolution->gameData = GSYS_GetGameData(wk->param->gsys);
                 evolution->party = PokeParty_Create(HEAPID_WORLDTRADE);
@@ -157,7 +157,7 @@ int WorldTrade_Demo_Main(WorldTradeWork *wk, int seq) {
                     }
                     wk->subProcParam =
                         GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(ShinkaDemoParam), FALSE, "worldtrade_demo.c", 304);
-                    sys_memset(wk->subProcParam, 0, sizeof(ShinkaDemoParam));
+                    MI_CpuFill8(wk->subProcParam, 0, sizeof(ShinkaDemoParam));
                     evolution = wk->subProcParam;
                     evolution->gameData = GSYS_GetGameData(wk->param->gsys);
                     evolution->party = PokeParty_Create(HEAPID_WORLDTRADE);

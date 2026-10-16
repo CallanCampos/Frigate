@@ -12,7 +12,7 @@ u32 func_020103f4(void) {
 }
 
 void func_020103f8(void *block) {
-    sys_memset(block, 0, func_020103f4());
+    MI_CpuFill8(block, 0, func_020103f4());
 }
 
 u32 func_0201040c(void) {
@@ -20,7 +20,7 @@ u32 func_0201040c(void) {
 }
 
 void func_02010414(void *block) {
-    sys_memset(block, 0, func_0201040c());
+    MI_CpuFill8(block, 0, func_0201040c());
 }
 
 BOOL func_02010428(void *data) {

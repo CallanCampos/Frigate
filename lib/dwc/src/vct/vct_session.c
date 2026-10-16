@@ -255,9 +255,9 @@ BOOL VCT_InitSessions(VCTConfig *config) {
         return FALSE;
     }
     sSessionPool.freeList = config->sessions;
-    sys_memset(config->sessions, 0, config->sessionCount * sizeof(VCTSession));
-    sys_memset(&sSessionPool.host, 0, sizeof(VCTSession));
-    sys_memset(&sSessionPool.pending, 0, sizeof(VCTSession));
+    MI_CpuFill8(config->sessions, 0, config->sessionCount * sizeof(VCTSession));
+    MI_CpuFill8(&sSessionPool.host, 0, sizeof(VCTSession));
+    MI_CpuFill8(&sSessionPool.pending, 0, sizeof(VCTSession));
     for (i = 0; i < config->sessionCount - 1; i++) {
         sSessionPool.freeList[i].next = &sSessionPool.freeList[i + 1];
     }
@@ -266,7 +266,7 @@ BOOL VCT_InitSessions(VCTConfig *config) {
     sSessionState.mask = 0;
     sSessionState.count = 0;
     gVCTSettings.unk14 = 0;
-    sSessionPool.clock = clock;
+    sSessionPool.clock = OS_GetTick;
     sSessionPool.randomMultiplier = 0x5d588b65;
     sSessionPool.randomIncrement = 0x269ec3;
     return TRUE;
@@ -279,7 +279,7 @@ void VCT_ClearSessions(void) {
 
 // Gives up on a request that has gone unanswered for too long
 void VCT_CheckTimeout(void) {
-    u64 now = clock();
+    u64 now = OS_GetTick();
 
     if (gVCTSettings.mode != 2) {
         return;
@@ -631,7 +631,7 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
     host->state = next;
     if (result->event == 10) {
         BroadcastCommand(1);
-        sSessionState.requestTime = clock();
+        sSessionState.requestTime = OS_GetTick();
     } else {
         BroadcastCommand(0);
         sSessionState.requestTime = 0;

@@ -162,8 +162,8 @@ void BmpOam_ActorBmpTrans(BmpOamActor *actor) {
     // The size of a row of the last cell of a row, which may be narrower
     u32 lastSize;
 
-    cp15_flushDC(pixels, GFL_BitmapCalcPixelDataSize(actor->bitmap));
-    upload = actor->vramType == CLACT_VRAM_MAIN ? gfxUploadObjCharA : gfxUploadObjCharB;
+    DC_FlushRange(pixels, GFL_BitmapCalcPixelDataSize(actor->bitmap));
+    upload = actor->vramType == CLACT_VRAM_MAIN ? GX_LoadOBJ : GXS_LoadOBJ;
     tilesWide = GFL_BitmapGetWidth(actor->bitmap) / 8;
     tilesHigh = GFL_BitmapGetHeight(actor->bitmap) / 8;
     lastSize = GFL_BitmapGetWidth(actor->bitmap) % 32 / 8 * 32;

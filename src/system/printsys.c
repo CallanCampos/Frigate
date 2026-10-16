@@ -233,7 +233,7 @@ BOOL func_02021a3c(PrintQueue *queue) {
         GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
     }
 
-    start = clock();
+    start = OS_GetTick();
     while (queue->job != NULL) {
         if (queue->job->colorState == TEXT_RND_COLOR_PENDING) {
             u8 jobLetter = TEXT_COLOR_LETTER(queue->job->defaultColor);
@@ -247,7 +247,7 @@ BOOL func_02021a3c(PrintQueue *queue) {
         }
         while (*queue->cursor != CHAR_EOM) {
             queue->cursor = GFL_TextRndDrawString(queue->job, queue->cursor, TRUE);
-            if (clock() - start > queue->timeLimit) {
+            if (OS_GetTick() - start > queue->timeLimit) {
                 timeout = TRUE;
                 break;
             }
@@ -1101,7 +1101,7 @@ static void func_02022c44(PrintQueue *queue, TextRenderer *renderer, const StrBu
         if (offset >= queue->size) {
             offset = 0;
         }
-        sys_memcpy(&job, queue->buffer + offset, sizeof(job));
+        MI_CpuCopy8(&job, queue->buffer + offset, sizeof(job));
     } else {
         queue->job = job;
         queue->cursor = queued;
@@ -1120,7 +1120,7 @@ static void *func_02022cd4(PrintQueue *queue, const void *src, u16 size, u16 chu
     start = queue->writePos;
     while (written < size) {
         pos = queue->writePos;
-        sys_memcpy(src, buffer + pos, chunk);
+        MI_CpuCopy8(src, buffer + pos, chunk);
         pos += chunk;
         if (pos >= queue->size) {
             pos = 0;

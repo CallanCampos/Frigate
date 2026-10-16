@@ -130,7 +130,7 @@ void CreateEncountManager(EncountManager *manager, GameData *gameData, int encTy
     PokeParty *party = GameData_GetParty(gameData);
     PartyPkm *lead;
 
-    sys_memset(manager, 0, sizeof(EncountManager));
+    MI_CpuFill8(manager, 0, sizeof(EncountManager));
     manager->encType = encType;
     manager->mode = mode;
     manager->gameData = gameData;
@@ -220,7 +220,7 @@ static int FieldEncount_GenWildsCore(EncountManager *manager, const WildEncSlot 
 int FieldEncount_GenWilds(EncData *encData, EncountManager *manager, u16 zoneId, WildPkmParam *params) {
     WildEncSlot slots[12];
 
-    sys_memset32(0, slots, sizeof(slots));
+    MIi_CpuClear32(0, slots, sizeof(slots));
     FieldEncount_PrepareActiveSlots(encData, manager, zoneId, slots);
     return FieldEncount_GenWildsCore(manager, slots, params);
 }
@@ -524,7 +524,7 @@ static u8 FieldEncount_PrepareActiveSlots(EncData *encData, EncountManager *mana
     }
     manager->slotFuncIndex = funcIndex;
     manager->slotCount = count;
-    sys_memcpy(src, slots, count * sizeof(WildEncSlot));
+    MI_CpuCopy8(src, slots, count * sizeof(WildEncSlot));
     return count;
 }
 
@@ -532,7 +532,7 @@ static void FieldEncount_SetupFromData(const WildEncSlot *slot, WildPkmParam *pa
     s16 range = slot->maxLevel - slot->minLevel;
     u8 formCount;
 
-    sys_memset(param, 0, sizeof(WildPkmParam));
+    MI_CpuFill8(param, 0, sizeof(WildPkmParam));
     if (range < 0) {
         range = 0;
     }

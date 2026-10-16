@@ -318,7 +318,7 @@ static BOOL PkwdCount_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_OvlLoad(OVERLAY_ID(139));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PKWD_COUNT, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PkwdCountWork), HEAPID_PKWD_COUNT);
-    sys_memset(wk, 0, sizeof(PkwdCountWork));
+    MI_CpuFill8(wk, 0, sizeof(PkwdCountWork));
     wk->heapId = HEAPID_PKWD_COUNT;
     wk->param = param;
     wk->graphic = PkwdCountGraphic_Create(1, wk->heapId);
@@ -397,7 +397,7 @@ static void PkwdCount_InitScreen(PkwdCountWork *wk) {
     PkwdCount_InitWindows(wk);
     PkwdCount_InitActors(wk);
     PkwdCount_InitPaletteFade(wk);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, 0x3f, 8, 6);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0x3f, 8, 6);
     GFL_BGSysSetBGEnabled(1, FALSE);
 }
 
@@ -619,7 +619,7 @@ static void PkwdCount_CreateActors(PkwdCountWork *wk, u32 surface, const PkwdCou
     s16 charsSlot;
     s16 cellSlot;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     isSub = group->isSub;
     paletteSlot = group->paletteSlot;
     charsSlot = group->charsSlot;

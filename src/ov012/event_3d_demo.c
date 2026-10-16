@@ -15,7 +15,7 @@
 GameEvent *Event3DDemo_Create(GameSystem *gsys, GameEvent *parent, u32 demoId, u32 param, u32 realTime) {
     GameEvent *event = GameEvent_Create(gsys, parent, Event3DDemo_Callback, sizeof(Event3DDemoWork));
     Event3DDemoWork *work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(Event3DDemoWork));
+    MI_CpuFill8(work, 0, sizeof(Event3DDemoWork));
     work->gameSystem = gsys;
     work->gameCommSys = GSYS_GetGameCommSystem(gsys);
     work->demoId = demoId;
@@ -74,7 +74,7 @@ GameEventReturnCode Event3DDemo_Callback(GameEvent *event, u32 *state, void *dat
 
 void CreateSeqLoadParam(Demo3DParam *out, GameSystem *gsys, u32 demoId, u8 param, u32 arg4, u8 hour, u8 minute,
                         u8 season) {
-    sys_memset(out, 0, sizeof(Demo3DParam));
+    MI_CpuFill8(out, 0, sizeof(Demo3DParam));
     out->gsys = gsys;
     out->demoId = demoId;
     out->param = param;

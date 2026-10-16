@@ -311,7 +311,7 @@ u8 func_02013cf0(GameBeacon *beacon);
 // The sender's C-Gear record
 void GameBeacon_GetCGearRecord(const GameBeacon *beacon, PMSData *dest);
 u8 GameBeacon_GetSurveyRank(const GameBeacon *beacon);
-// The color of func_0207c3b4's table that the sender's favorite color is shown in
+// The color of OS_GetFavoriteColorTable's table that the sender's favorite color is shown in
 void func_02013d38(u16 *dest, const GameBeacon *beacon);
 u8 GameBeacon_GetFavoriteColor(const GameBeacon *beacon);
 u16 GameBeacon_GetTrainerId(const GameBeacon *beacon);
@@ -343,8 +343,5 @@ u16 GameBeacon_GetGiftPassPower(const GameBeacon *beacon);
 u8 func_020140cc(int type);
 // Sets the words of the beacon's message: the sender's name as word 0 and what the type's format shows from word 1
 void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, HeapID heapId);
-
-// In another file of ARM9 main: a table of colors, by favorite color
-const u16 *func_0207c3b4(void);
 
 #endif // POKEBW2_SYSTEM_GAME_BEACON_H

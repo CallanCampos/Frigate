@@ -71,7 +71,7 @@ u8 BeaconStatus_GetRecord(BeaconStatus *status) {
 void BeaconStatus_PopRecord(BeaconStatus *status) {
     if (status->recordCount != 0) {
         status->recordCount--;
-        sys_memcpy(&status->records[1], &status->records[0], status->recordCount);
+        MI_CpuCopy8(&status->records[1], &status->records[0], status->recordCount);
         status->records[status->recordCount] = 0;
     }
 }

@@ -11,7 +11,6 @@ void SystemInit(void);
 void func_02005430(void);
 // Does the VRAM transfers queued during the frame
 void SystemUpdateVBlank(void);
-// Replaces NitroSDK's weak CTRDG_Init, which OS_Init calls, with one that leaves the Game Pak slot unused
-void func_0200548c(void);
+// The game's CTRDG_Init, which replaces the SDK's weak one, is declared in nitro/ctrdg.h
 
 #endif // POKEBW2_SYSTEM_MACHINE_USE_H

@@ -46,7 +46,7 @@ static const u32 sc_fade_color[BR_RES_COLOR_MAX] = { 0x1642, 0x7e05, 0x357f, 0x3
 BrRes *BrRes_Init(u32 color, BOOL isUseColor, HeapID heapId) {
     BrRes *p_wk = GFL_HeapAllocate(heapId, sizeof(BrRes), FALSE, "br_res.c", 96);
 
-    sys_memset(p_wk, 0, sizeof(BrRes));
+    MI_CpuFill8(p_wk, 0, sizeof(BrRes));
     p_wk->isUseColor = isUseColor;
     if (p_wk->isUseColor) {
         p_wk->color = color;

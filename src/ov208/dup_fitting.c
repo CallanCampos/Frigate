@@ -728,7 +728,7 @@ static void DupFitting_InitGraphics(DupFittingWork *work) {
                                        FX32_CONST(1000), 0, &DUP_FITTING_CAMERA_POSITION, &DUP_FITTING_CAMERA_UP,
                                        &DUP_FITTING_CAMERA_TARGET, work->heapId);
     GFL_G3DCameraFlush(work->camera);
-    gfxSetEdgeColorTable(DUP_FITTING_EDGE_COLORS);
+    G3X_SetEdgeColorTable(DUP_FITTING_EDGE_COLORS);
     G3X_EdgeMarking(FALSE);
     GFL_G3DSysSetSwapBufferParams(0, 0);
     GFL_BGSysCreate(work->heapId);
@@ -743,7 +743,7 @@ static void DupFitting_InitGraphics(DupFittingWork *work) {
     DupFitting_InitBG(&DUP_FITTING_BG5_SETUP, 5);
     DupFitting_InitBG(&DUP_FITTING_BG6_SETUP, 6);
     GFL_BGSysSetBGEnabled(0, TRUE);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0xf, 4, 16);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0xf, 4, 16);
     clactSetup = data_02093f08;
     clactSetup.oamStartMain = 16;
     clactSetup.oamCountMain = 112;
@@ -908,7 +908,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
         file = GFL_G3DResGetResData(res);
         tex = GFL_G3DResGetTexData(res);
         NNS_G3DResTexSetPltGfdKey(tex, dimPlttKey);
-        cp15_flushDC(file, file->fileSize);
+        DC_FlushRange(file, file->fileSize);
         NNS_G3DResTexUploadPlt(tex, TRUE);
         work->entries[n].dimMaterial =
             BlActScene_AddMaterialExistTex(work->blact, texKey, dimPlttKey, 0, size, width, height);

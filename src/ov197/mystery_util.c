@@ -174,7 +174,7 @@ MysteryTextLine *MysteryTextLine_Create(BOOL deferFlush, u16 bg, u8 x, u8 y, u8 
                                         PrintQueue *queue, HeapID heapId) {
     MysteryTextLine *line = GFL_HeapAllocate(heapId, sizeof(MysteryTextLine), FALSE, "mystery_util.c", 85);
 
-    sys_memset(line, 0, sizeof(MysteryTextLine));
+    MI_CpuFill8(line, 0, sizeof(MysteryTextLine));
     line->queue = queue;
     line->bg = bg;
     line->color = PRINT_COLOR(1, 2, 0);
@@ -298,7 +298,7 @@ MysteryMsgWin *MysteryMsgWin_Create(u16 bg, u8 palette, PrintQueue *queue, Font 
     MysteryMsgWin *win = GFL_HeapAllocate(heapId, sizeof(MysteryMsgWin), FALSE, "mystery_util.c", 388);
     BmpWin *window;
 
-    sys_memset(win, 0, sizeof(MysteryMsgWin));
+    MI_CpuFill8(win, 0, sizeof(MysteryMsgWin));
     win->bgColor = 15;
     win->font = font;
 #ifdef BUGFIX
@@ -322,7 +322,7 @@ MysteryMsgWin *MysteryMsgWin_CreateSmall(u16 bg, u8 palette, PrintQueue *queue, 
     MysteryMsgWin *win = GFL_HeapAllocate(heapId, sizeof(MysteryMsgWin), FALSE, "mystery_util.c", 430);
     BmpWin *window;
 
-    sys_memset(win, 0, sizeof(MysteryMsgWin));
+    MI_CpuFill8(win, 0, sizeof(MysteryMsgWin));
     win->bgColor = 15;
     win->font = font;
 #ifdef BUGFIX
@@ -451,7 +451,7 @@ MysteryYesNo *MysteryYesNo_Create(const MysteryYesNoSetup *setup, HeapID heapId)
     BmpWin *window;
     BmpMenuListHeader header;
 
-    sys_memset(menu, 0, sizeof(MysteryYesNo));
+    MI_CpuFill8(menu, 0, sizeof(MysteryYesNo));
     menu->queue = setup->queue;
     height = setup->count * 2;
     menu->window =
@@ -506,7 +506,7 @@ MysteryTextWin *MysteryTextWin_Create(BOOL deferFlush, const MysteryTextWinEntry
     MysteryTextWin *win = GFL_HeapAllocate(heapId, sizeof(MysteryTextWin) + count * sizeof(MysteryTextLine *), FALSE,
                                            "mystery_util.c", 894);
 
-    sys_memset(win, 0, sizeof(MysteryTextWin) + count * sizeof(MysteryTextLine *));
+    MI_CpuFill8(win, 0, sizeof(MysteryTextWin) + count * sizeof(MysteryTextLine *));
     win->entries = entries;
     win->count = count;
     win->font = font;
@@ -575,7 +575,7 @@ MysteryTextWinCopy *MysteryTextWinCopy_Create(MysteryTextWin *textWin, HeapID he
     MysteryTextWinCopy *copy = GFL_HeapAllocate(heapId, size, FALSE, "mystery_util.c", 1080);
     GFLBitmap *bitmap;
 
-    sys_memset(copy, 0, size);
+    MI_CpuFill8(copy, 0, size);
     copy->textWin = textWin;
     copy->heapId = heapId;
     for (i = 0; i < textWin->count; i++) {
@@ -636,7 +636,7 @@ MysteryList *MysteryList_Create(const MysteryListSetup *setup, HeapID heapId) {
     u32 i;
     ClActorPos pos;
 
-    sys_memset(list, 0, sizeof(MysteryList));
+    MI_CpuFill8(list, 0, sizeof(MysteryList));
     list->count = setup->count;
     list->cursor = setup->cursor;
     list->palette = setup->palette;
@@ -782,7 +782,7 @@ void MysteryList_SetItemGrayed(MysteryList *list, u32 item, BOOL grayed) {
 MysterySeq *MysterySeq_Create(void *work, MysterySeqFunc func, HeapID heapId) {
     MysterySeq *seq = GFL_HeapAllocate(heapId, sizeof(MysterySeq), FALSE, "mystery_util.c", 1574);
 
-    sys_memset(seq, 0, sizeof(MysterySeq));
+    MI_CpuFill8(seq, 0, sizeof(MysterySeq));
     seq->work = work;
     MysterySeq_SetNext(seq, func);
     return seq;
@@ -824,11 +824,11 @@ MysteryOamText *MysteryOamText_Create(const ClActorSetup *setup, u16 width, u16 
     MysteryOamText *oamText = GFL_HeapAllocate(heapId, sizeof(MysteryOamText), FALSE, "mystery_util.c", 1723);
     BmpOamActorSetup actorSetup;
 
-    sys_memset(oamText, 0, sizeof(MysteryOamText));
+    MI_CpuFill8(oamText, 0, sizeof(MysteryOamText));
     oamText->queue = queue;
     oamText->str = GFL_StrBufCreate(128, heapId);
     oamText->bitmap = GFL_BitmapCreate(width, height, 32, heapId);
-    sys_memset(&actorSetup, 0, sizeof(BmpOamActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(BmpOamActorSetup));
     actorSetup.bitmap = oamText->bitmap;
     actorSetup.x = setup->x;
     actorSetup.y = setup->y;

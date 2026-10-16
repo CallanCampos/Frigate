@@ -18,7 +18,7 @@ EncountSave *SaveControl_GetEncountSave(SaveControl *save) {
 }
 
 void EncountSave_Init(EncountSave *save) {
-    sys_memset(save, 0, sizeof(EncountSave));
+    MI_CpuFill8(save, 0, sizeof(EncountSave));
     save->swarmLocation = 0;
     save->repelSteps = 0;
     save->repelItem = 0;

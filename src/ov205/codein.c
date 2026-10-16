@@ -56,7 +56,7 @@ static BOOL CodeIn_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_CODEIN, 0x40000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(CodeInWork), HEAPID_CODEIN);
-    sys_memset(wk, 0, sizeof(CodeInWork));
+    MI_CpuFill8(wk, 0, sizeof(CodeInWork));
     if (param == NULL) {
         int blocks[CODEIN_BLOCK_COUNT];
         CodeInParam *friendCode;
@@ -85,8 +85,8 @@ static BOOL CodeIn_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     CodeInDisp_InitActors(wk, &sCodeInVRAMConfig);
     CodeIn_InitParam(wk);
     CodeIn_InitButtons(wk);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, 15, 7);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, 7, 8);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, 15, 7);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, 7, 8);
     wk->vblankTask = GFL_VBlankTCBAdd(CodeIn_VBlank, wk, 16);
     func_02042ba8(TRUE, HEAPID_CODEIN);
     return TRUE;
@@ -141,10 +141,10 @@ static BOOL CodeIn_ProcExit(GameProc *proc, u32 *state, void *param, void *work)
 static void CodeIn_InitBG(void) {
     GFL_BGSysDisableAllA();
     GFL_BGSysSetVRAMBanks(&sCodeInVRAMConfig);
-    sys_memset32(0, (void *)HW_BG_VRAM, HW_BG_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_OBJ_VRAM, HW_OBJ_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_DB_OBJ_VRAM, HW_DB_OBJ_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_BG_VRAM, HW_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_OBJ_VRAM, HW_OBJ_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_OBJ_VRAM, HW_DB_OBJ_VRAM_SIZE);
     {
         BGSetup setups[] = {
             { 0, 0, 0x800, 0, BGRES_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE(0x0000), GX_BG_CHARBASE(0x04000), 0x8000,

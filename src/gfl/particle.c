@@ -108,12 +108,12 @@ ParticleSystem *func_0204f980(void *work, u32 size, BOOL camera, u32 fixPolyID, 
         return NULL;
     }
     system = GFL_HeapAllocate(heapId, sizeof(ParticleSystem), FALSE, "particle.c", 285);
-    sys_memset(system, 0, sizeof(ParticleSystem));
+    MI_CpuFill8(system, 0, sizeof(ParticleSystem));
     system->cameraPos = sDefaultCameraPos;
     system->cameraUp = sDefaultCameraUp;
     system->cameraTarget = sDefaultCameraTarget;
     system->extResource = FALSE;
-    sys_memset(work, 0, size);
+    MI_CpuFill8(work, 0, size);
     system->workStart = work;
     system->work = work;
     system->workEnd = (u8 *)work + size;
@@ -674,21 +674,21 @@ u16 func_020503f0(const void *resource) {
 void *func_020503f4(u32 layer) {
     switch (layer) {
     case 0:
-        return gfxGetCharAddrBG0A();
+        return G2_GetBG0CharPtr();
     case 1:
-        return gfxGetCharAddrBG1A();
+        return G2_GetBG1CharPtr();
     case 2:
-        return gfxGetCharAddrBG2A();
+        return G2_GetBG2CharPtr();
     case 3:
-        return gfxGetCharAddrBG3A();
+        return G2_GetBG3CharPtr();
     case 4:
-        return gfxGetCharAddrBG0B();
+        return G2S_GetBG0CharPtr();
     case 5:
-        return gfxGetCharAddrBG1B();
+        return G2S_GetBG1CharPtr();
     case 6:
-        return gfxGetCharAddrBG2B();
+        return G2S_GetBG2CharPtr();
     case 7:
-        return gfxGetCharAddrBG3B();
+        return G2S_GetBG3CharPtr();
     }
     return NULL;
 }

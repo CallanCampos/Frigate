@@ -128,7 +128,7 @@ void func_ov072_021e8ddc(FesGimmick *gimmick, u16 *count, u16 *answer, u16 *answ
     u8 temp;
     u8 j;
 
-    sys_memset(quiz, 0, sizeof(FesMissionQuiz));
+    MI_CpuFill8(quiz, 0, sizeof(FesMissionQuiz));
     quiz->count = func_020145d8(gimmick->festival);
     if (quiz->count < 3) {
         quiz->count = 3;

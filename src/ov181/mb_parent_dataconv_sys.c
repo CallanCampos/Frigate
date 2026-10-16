@@ -189,7 +189,7 @@ static BOOL MBDataConv_Distribute(MBDataConv *conv, u32 *seq) {
         conv->wirelessStarted = FALSE;
         return TRUE;
     }
-    func_0203e7f8(WM_LINK_LEVEL_3 - func_020810fc());
+    func_0203e7f8(WM_LINK_LEVEL_3 - WM_GetLinkLevel());
     func_0203e838();
     return FALSE;
 }
@@ -274,11 +274,11 @@ static MBGameRegistry *MBDataConv_CreateRegistry(StrBuf *name, StrBuf *intro, He
     registry->romFilePathp = "/dl_rom/child2_r_eng.srl";
     registry->gameNamep = GFL_HeapAllocate(heapId, 0x60, TRUE, "mb_parent_dataconv_sys.c", 537);
     length = GFL_StrBufGetCharCount(name);
-    sys_memcpy16(GFL_StrBufGetStringPtr(name), registry->gameNamep, length * 2);
+    MIi_CpuCopy16(GFL_StrBufGetStringPtr(name), registry->gameNamep, length * 2);
     registry->gameNamep[length] = 0;
     registry->gameIntroductionp = GFL_HeapAllocate(heapId, 0xc0, TRUE, "mb_parent_dataconv_sys.c", 545);
     length = GFL_StrBufGetCharCount(intro);
-    sys_memcpy16(GFL_StrBufGetStringPtr(intro), registry->gameIntroductionp, length * 2);
+    MIi_CpuCopy16(GFL_StrBufGetStringPtr(intro), registry->gameIntroductionp, length * 2);
     registry->gameIntroductionp[length] = 0;
     // The child's font has the characters of the game's charset at other codes
     for (i = 0; i < 0x60; i++) {
@@ -348,15 +348,15 @@ static void MBDataConv_SoftResetCallback(void *work) {
         MBP_Cancel();
     }
     while (MBP_GetState() != MBP_STATE_STOP && MBP_GetState() != MBP_STATE_COMPLETE) {
-        irq_waitFor(TRUE, OS_IE_V_BLANK);
+        OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     }
     if (conv->wirelessStarted == TRUE) {
         sMBDataConvWirelessDone = FALSE;
         while (WH_End(MBDataConv_OnWirelessDone)) {
-            irq_waitFor(TRUE, OS_IE_V_BLANK);
+            OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         }
         while (sMBDataConvWirelessDone == FALSE) {
-            irq_waitFor(TRUE, OS_IE_V_BLANK);
+            OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         }
     }
 }

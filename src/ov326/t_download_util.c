@@ -549,7 +549,7 @@ static void TDownloadUtil_CreateActors(TDownloadWork *wk, u32 surface, const TDo
     s16 x, y;
     BOOL visible, autoAnim;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     pltt = res->pltt;
     chars = res->chars;
     cells = res->cells;
@@ -1088,8 +1088,8 @@ static void TDownloadUtil_LoadPalettes(TDownloadWork *wk) {
     void *file = GFL_G2DIOReadNCLR(ARCID_T_DOWNLOAD, 3, &palette, wk->heapId);
     u8 *colors = palette->rawData;
 
-    sys_memcpy(colors + 0x60, wk->palFadeFrom, 0x20);
-    sys_memcpy(colors + 0x80, wk->palFadeTo, 0x20);
+    MI_CpuCopy8(colors + 0x60, wk->palFadeFrom, 0x20);
+    MI_CpuCopy8(colors + 0x80, wk->palFadeTo, 0x20);
     GFL_HeapFree(file);
     wk->palAnimCount = 0;
     wk->objFlags |= T_DOWNLOAD_OBJ_FLAG_PALETTE_ANIM;
@@ -1352,7 +1352,7 @@ void TDownloadUtil_DimScreen(TDownloadWork *wk, BOOL show) {
     if (show == TRUE) {
         brightness = -8;
     }
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, brightness);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, brightness);
     TDownloadUtil_TransferTextPalette(wk, show);
 }
 
@@ -1363,12 +1363,12 @@ void TDownloadUtil_DimScreenUpload(TDownloadWork *wk, BOOL show) {
     if (show == TRUE) {
         brightness = -8;
     }
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, brightness);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, brightness);
     offset = 0;
     if (show == TRUE) {
         offset = 16;
     }
-    gfxUploadStdPaletteBGA(&wk->textPltt[0][offset], 0xe0, 0x20);
+    GX_LoadBGPltt(&wk->textPltt[0][offset], 0xe0, 0x20);
 }
 
 void TDownloadUtil_PauseActors(TDownloadWork *wk, BOOL show) {
@@ -1450,7 +1450,7 @@ static void TDownloadUtil_LoadTextPalette(TDownloadWork *wk) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLR(ARCID_T_DOWNLOAD, 2, &palette, wk->heapId);
 
-    sys_memcpy(palette->rawData, wk->textPltt, 0x40);
+    MI_CpuCopy8(palette->rawData, wk->textPltt, 0x40);
     GFL_HeapFree(file);
 }
 

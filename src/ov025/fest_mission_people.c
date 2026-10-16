@@ -209,10 +209,10 @@ void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     work->actorCount = 0;
     work->festival = festival;
     work->zoneId = zoneId;
-    sys_memset(work->places, 0, sizeof(work->places));
-    sys_memset(work->placeIndex, 0, sizeof(work->placeIndex));
-    sys_memset(work->params, 0, sizeof(work->params));
-    sys_memset(work->actors, 0, sizeof(work->actors));
+    MI_CpuFill8(work->places, 0, sizeof(work->places));
+    MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
+    MI_CpuFill8(work->params, 0, sizeof(work->params));
+    MI_CpuFill8(work->actors, 0, sizeof(work->actors));
     func_ov012_02168348(mission->unk1C, func_ov012_02168320(zoneId), &rand);
     FesMissionPeople_PickPlaces(gsys, work, mission, zoneId, &rand);
     FesMissionPeople_AddZone(work, zoneId);
@@ -283,7 +283,7 @@ static void FesMissionPeople_PlaceActors(GameSystem *gsys, FesMissionWork *work,
     ZoneNPC npc;
     int i;
 
-    sys_memset(&npc, 0, sizeof(ZoneNPC));
+    MI_CpuFill8(&npc, 0, sizeof(ZoneNPC));
     npc.modelId = FesMissionPeople_GetObjCode(work, mission);
     npc.direction = 1;
     npc.scrId = mission->target + 0x2a22;
@@ -502,7 +502,7 @@ static void FesMissionPeople_AddZone(FesMissionWork *work, u16 zoneId) {
             index = work->zoneCount++;
         } else {
             index = 5;
-            sys_memcpy(&work->zones[1], &work->zones[0], sizeof(work->zones) - sizeof(work->zones[0]));
+            MI_CpuCopy8(&work->zones[1], &work->zones[0], sizeof(work->zones) - sizeof(work->zones[0]));
         }
     } else {
         index = 0;
@@ -510,7 +510,7 @@ static void FesMissionPeople_AddZone(FesMissionWork *work, u16 zoneId) {
             index = work->zoneCount - 1;
         }
     }
-    sys_memset(&work->zones[index], 0, sizeof(FesMissionZone));
+    MI_CpuFill8(&work->zones[index], 0, sizeof(FesMissionZone));
     work->zones[index].zoneId = zoneId;
     work->zones[index].count = work->actorCount;
 }

@@ -17,7 +17,7 @@ static const u32 UNOVA_LINK_CITY_KEYS[KEY_INFO_CITY_COUNT] = { 0x34525, 0x11963 
 static const u32 sChamberKeys[KEY_INFO_CHAMBER_COUNT] = { 0x94525, 0x81963, 0x38569 };
 
 void func_02010448(void *a0) {
-    sys_memset(a0, 0, sizeof(KeySystemData));
+    MI_CpuFill8(a0, 0, sizeof(KeySystemData));
     func_02010474(func_0201046c(a0));
     zero476Bytes(func_02010470(a0));
 }
@@ -33,7 +33,7 @@ void *func_02010470(void *a0) {
 }
 
 void func_02010474(KeyInfoSave *keyInfo) {
-    sys_memset(keyInfo, 0, sizeof(KeyInfoSave));
+    MI_CpuFill8(keyInfo, 0, sizeof(KeyInfoSave));
     keyInfo->seed = GFL_RandomLC(0xffffffff);
 }
 

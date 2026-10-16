@@ -183,22 +183,22 @@ void PokeGra_CellCharsToImage(NNSG2dCharacterData *chars, HeapID heapId) {
     u32 offset;
     int i;
 
-    sys_memcpy32_fast(raw, buf, POKEGRA_CHARS_SIZE);
+    MIi_CpuCopyFast(raw, buf, POKEGRA_CHARS_SIZE);
     offset = 0;
     for (i = 0; i < 8; i++) {
-        sys_memcpy32_fast(buf + offset, raw + i * 0x180, 0x100);
+        MIi_CpuCopyFast(buf + offset, raw + i * 0x180, 0x100);
         offset += 0x100;
     }
     for (i = 0; i < 8; i++) {
-        sys_memcpy32_fast(buf + offset, raw + (i * 12 + 8) * 32, 0x80);
+        MIi_CpuCopyFast(buf + offset, raw + (i * 12 + 8) * 32, 0x80);
         offset += 0x80;
     }
     for (i = 0; i < 4; i++) {
-        sys_memcpy32_fast(buf + offset, raw + (i * 0x180 + 0xc00), 0x100);
+        MIi_CpuCopyFast(buf + offset, raw + (i * 0x180 + 0xc00), 0x100);
         offset += 0x100;
     }
     for (i = 0; i < 4; i++) {
-        sys_memcpy32_fast(buf + offset, raw + (i * 12 + 104) * 32, 0x80);
+        MIi_CpuCopyFast(buf + offset, raw + (i * 12 + 104) * 32, 0x80);
         offset += 0x80;
     }
     GFL_HeapFree(buf);
@@ -211,22 +211,22 @@ static void PokeGra_ImageToCellChars(NNSG2dCharacterData *chars, HeapID heapId) 
     u32 offset;
     int i;
 
-    sys_memcpy32_fast(raw, buf, POKEGRA_CHARS_SIZE);
+    MIi_CpuCopyFast(raw, buf, POKEGRA_CHARS_SIZE);
     offset = 0;
     for (i = 0; i < 8; i++) {
-        sys_memcpy32_fast(buf + i * 0x180, raw + offset, 0x100);
+        MIi_CpuCopyFast(buf + i * 0x180, raw + offset, 0x100);
         offset += 0x100;
     }
     for (i = 0; i < 8; i++) {
-        sys_memcpy32_fast(buf + (i * 12 + 8) * 32, raw + offset, 0x80);
+        MIi_CpuCopyFast(buf + (i * 12 + 8) * 32, raw + offset, 0x80);
         offset += 0x80;
     }
     for (i = 0; i < 4; i++) {
-        sys_memcpy32_fast(buf + (i * 0x180 + 0xc00), raw + offset, 0x100);
+        MIi_CpuCopyFast(buf + (i * 0x180 + 0xc00), raw + offset, 0x100);
         offset += 0x100;
     }
     for (i = 0; i < 4; i++) {
-        sys_memcpy32_fast(buf + (i * 12 + 104) * 32, raw + offset, 0x80);
+        MIi_CpuCopyFast(buf + (i * 12 + 104) * 32, raw + offset, 0x80);
         offset += 0x80;
     }
     GFL_HeapFree(buf);

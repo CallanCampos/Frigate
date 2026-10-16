@@ -280,7 +280,7 @@ u32 getSizeofPokedexData(void) {
 }
 
 void initPokedex(PokeDexSave *pokedex) {
-    sys_memset(pokedex, 0, sizeof(PokeDexSave));
+    MI_CpuFill8(pokedex, 0, sizeof(PokeDexSave));
     pokedex->magic = POKEDEX_MAGIC;
     givePlayerPokedex(pokedex);
 }

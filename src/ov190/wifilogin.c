@@ -292,7 +292,7 @@ static void WifiLogin_StateWaitMessageThenSave(WifiLoginWork *work) {
 
 // Starts the network library for the Wi-Fi connection
 static void WifiLogin_StateStartNet(WifiLoginWork *work) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         sNetInit.wifiHeapSize = 0x79000;
     } else {
         sNetInit.wifiHeapSize = 0x5e400;
@@ -648,7 +648,7 @@ static BOOL WifiLoginProc_Init(GameProc *proc, u32 *state, void *param, void *wo
                                           "\x82\xea\x82\xc4\x82\xad\x82\xbe\x82\xb3\x82\xa2\n");
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFILOGIN, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiLoginWork), HEAPID_WIFILOGIN);
-    sys_memset(wk, 0, sizeof(WifiLoginWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiLoginWork));
     wk->heapId = HEAPID_WIFILOGIN;
     wk->gameData = loginParam->gameData;
     wk->disp = WifiLoginDisp_Create(wk->heapId, loginParam->unk4, loginParam->unk8);

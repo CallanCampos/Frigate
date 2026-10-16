@@ -195,7 +195,7 @@ static BOOL BrBtlSubway_ProcInit(GameProc *proc, u32 *state, void *param, void *
     BrBtlSubwayWork *wk;
 
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrBtlSubwayWork), BrProcSys_GetHeapID(p->procSys));
-    sys_memset(wk, 0, sizeof(BrBtlSubwayWork));
+    MI_CpuFill8(wk, 0, sizeof(BrBtlSubwayWork));
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
     wk->bmpoam = BmpOam_Init(wk->heapId, p->unit);
@@ -677,7 +677,7 @@ static void BrBtlSubway_CreateMenu(BrBtlSubwayWork *wk, BrBtlSubwayProcParam *p)
     font = BrRes_GetFont(p->res);
     msg = BrRes_GetMsgData(p->res);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 80;
     setup.y = 168;
     setup.sequence = 0;
@@ -797,8 +797,8 @@ static void BrBtlSubwayBp_Init(BrBtlSubwayBp *bp, ClActUnit *unit, const BrResOb
     ClActorSetup setup;
     int i;
 
-    sys_memset(bp, 0, sizeof(BrBtlSubwayBp));
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(bp, 0, sizeof(BrBtlSubwayBp));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = x;
     setup.y = y;
     setup.sequence = 10;
@@ -825,7 +825,7 @@ static void BrBtlSubwayBp_Exit(BrBtlSubwayBp *bp) {
         }
     }
     func_0204c108(bp->icon);
-    sys_memset(bp, 0, sizeof(BrBtlSubwayBp));
+    MI_CpuFill8(bp, 0, sizeof(BrBtlSubwayBp));
 }
 
 static void BrBtlSubwayBp_SetValue(BrBtlSubwayBp *bp, u32 value) {

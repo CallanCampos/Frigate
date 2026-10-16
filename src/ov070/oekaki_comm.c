@@ -47,11 +47,11 @@ static void OekakiComm_RecvPicture(int netId, int size, const void *data, void *
     if (func_0203ffc4() != 0) {
         // A child puts the chunk into its picture
         if (chunk->index * OEKAKI_CHUNK_SIZE > OEKAKI_PICTURE_SIZE) {
-            sys_memcpy32_fast(chunk, wk->picture + chunk->index * OEKAKI_CHUNK_SIZE, 400);
+            MIi_CpuCopyFast(chunk, wk->picture + chunk->index * OEKAKI_CHUNK_SIZE, 400);
         } else {
-            sys_memcpy32_fast(chunk, wk->picture + chunk->index * OEKAKI_CHUNK_SIZE, OEKAKI_CHUNK_SIZE);
+            MIi_CpuCopyFast(chunk, wk->picture + chunk->index * OEKAKI_CHUNK_SIZE, OEKAKI_CHUNK_SIZE);
         }
-        sys_memcpy32_fast(wk->picture, GFL_BitmapGetPixelData(BmpWin_GetBitmap(wk->drawWindow)), OEKAKI_PICTURE_SIZE);
+        MIi_CpuCopyFast(wk->picture, GFL_BitmapGetPixelData(BmpWin_GetBitmap(wk->drawWindow)), OEKAKI_PICTURE_SIZE);
         BmpWin_TransferNow(wk->drawWindow);
     } else {
         // The parent sends the next one
@@ -88,7 +88,7 @@ static void OekakiComm_RecvPictureEnd(int netId, int size, const void *data, voi
     OekakiWork *wk = work;
 
     Oekaki_SetStatus(wk, OEKAKI_SEQ_NEWCOMER_END, 0);
-    sys_memset32_fast(0, wk->picture, OEKAKI_PICTURE_SIZE);
+    MIi_CpuClearFast(0, wk->picture, OEKAKI_PICTURE_SIZE);
     wk->shareNum = UnionApp_CountJoined(wk->param->app);
     wk->shareBit = UnionApp_GetJoined(wk->param->app);
     wk->banFlag = OEKAKI_BAN_NONE;
@@ -187,7 +187,7 @@ static void OekakiComm_SendPicture(OekakiWork *wk, int index, NetHandle *handle)
     u32 checksum;
     u8 joined;
 
-    sys_memcpy32_fast(pixels + index * OEKAKI_CHUNK_SIZE, wk->sendChunkData.data, OEKAKI_CHUNK_SIZE);
+    MIi_CpuCopyFast(pixels + index * OEKAKI_CHUNK_SIZE, wk->sendChunkData.data, OEKAKI_CHUNK_SIZE);
     data = wk->sendChunkData.data;
     for (checksum = 0, i = 0; i < OEKAKI_CHUNK_SIZE / 4; i++) {
         checksum ^= data[i];

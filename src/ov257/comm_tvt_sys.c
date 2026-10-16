@@ -505,8 +505,8 @@ static void CommTvt_InitGraphics(CommTvtWork *sys) {
     CommTvt_CreateBG(&sCommTvtBG7Setup, 7, BGMODE_TEXT);
     G2_SetBG2ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x10000);
     G2_SetBG3ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x28000);
-    sys_memset(gfxGetScreenAddrBG2A(), 0, 256 * 192 * 2);
-    sys_memset(gfxGetScreenAddrBG3A(), 0, 256 * 192 * 2);
+    MI_CpuFill8(G2_GetBG2ScrPtr(), 0, 256 * 192 * 2);
+    MI_CpuFill8(G2_GetBG3ScrPtr(), 0, 256 * 192 * 2);
     G2_SetBG2Priority(1);
     G2_SetBG3Priority(2);
     GFL_BGSysSetBGEnabled(2, TRUE);
@@ -601,7 +601,7 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
     func_0204c520(sys->talkerCursor, TRUE);
 
     file = GFL_G2DIOReadNCLRArc(sys->arc, getTrainerGender(player) == GENDER_MALE ? 7 : 6, &palette, sys->heapId);
-    sys_memcpy32((u8 *)palette->rawData + 0xc0, sys->palettes, sizeof(sys->palettes));
+    MIi_CpuCopy32((u8 *)palette->rawData + 0xc0, sys->palettes, sizeof(sys->palettes));
     GFL_HeapFree(file);
 }
 

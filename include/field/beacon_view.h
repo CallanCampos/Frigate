@@ -257,9 +257,6 @@ typedef struct BeaconViewWork {
     BeaconViewPalette commonPalette;
 } BeaconViewWork;
 
-// Missing from nitro/os.h: NitroSDK's DC_FlushAll
-void cp15_invalidateDCAll(void);
-
 // beacon_view_setup.c
 BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent);
 void BeaconView_Free(BeaconViewWork *work);

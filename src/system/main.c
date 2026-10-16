@@ -47,13 +47,13 @@ BOOL g_MainMemoryPriorityBlocked;
 void main(void) {
     SystemInit();
     GFLAppInit();
-    CPU_SetIRQFunc(OS_IE_H_BLANK, GFLAppIRQHBlank);
-    CPU_SetIRQFunc(OS_IE_V_BLANK, GFLAppIRQVBlank);
-    CPU_EnableInterrupts(OS_IE_V_BLANK | OS_IE_H_BLANK);
+    OS_SetIrqFunction(OS_IE_H_BLANK, GFLAppIRQHBlank);
+    OS_SetIrqFunction(OS_IE_V_BLANK, GFLAppIRQVBlank);
+    OS_EnableIrqMask(OS_IE_V_BLANK | OS_IE_H_BLANK);
     (void)OS_EnableIrq();
-    gfxSetHBlankIRQEnabled(TRUE);
-    gfxSetVBlankIRQEnabled(TRUE);
-    CPU_IRQEnable();
+    GX_HBlankIntr(TRUE);
+    GX_VBlankIntr(TRUE);
+    OS_EnableInterrupts();
     GameInit();
 
     while (TRUE) {
@@ -70,13 +70,13 @@ void main(void) {
         if (priority) {
             MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
         }
-        if (!scheduler_is_thread_ended(&g_GFLSndThread)) {
-            scheduler_join_thread(&g_GFLSndThread, NULL);
+        if (!OS_IsThreadTerminated(&g_GFLSndThread)) {
+            OS_SleepThreadDirect(&g_GFLSndThread, NULL);
         }
-        irq_waitFor(TRUE, OS_IE_V_BLANK);
+        OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         GameUpdateVBlank();
-        if (!scheduler_is_thread_ended(&g_GFLSndThread)) {
-            scheduler_start_thread(&g_GFLSndThread);
+        if (!OS_IsThreadTerminated(&g_GFLSndThread)) {
+            OS_WakeupThreadDirect(&g_GFLSndThread);
         }
         if (priority) {
             MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
@@ -115,7 +115,7 @@ static void GFLAppIRQHBlank(void) {
 static void GFLAppIRQVBlank(void) {
     GFL_VBlankExecCallback();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
-    func_0207829c(3);
+    MI_WaitDma(3);
 }
 
 static void GameUpdateVBlank(void) {

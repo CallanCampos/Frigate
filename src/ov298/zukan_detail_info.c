@@ -156,7 +156,7 @@ static BOOL ZukanDetailInfo_Init(ZukanDetailProcSys *sys, int *seq, void *param_
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_OvlLoad(OVERLAY_ZUKAN_INFO);
     wk = ZukanDetailProcSys_AllocWork(sys, sizeof(ZukanDetailInfoWork), param->heapId);
-    sys_memset(wk, 0, sizeof(ZukanDetailInfoWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanDetailInfoWork));
     wk->vblankTcb = GFL_VBlankTCBAdd(ZukanDetailInfo_VBlank, wk, 1);
     wk->pushed = LANGUAGE_NONE;
     wk->language = LANGUAGE_NONE;
@@ -581,7 +581,7 @@ static void ZukanDetailInfo_CreateButtons(ZukanDetailInfoParam *param, ZukanDeta
     GFL_ArcToolFree(arc);
 
     for (i = 0; i < LANGUAGE_BUTTON_COUNT; i++) {
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         wk->buttons[i].rect[0] = sZukanDetailInfoLanguageButtons[i].rect[0];
         wk->buttons[i].rect[1] = sZukanDetailInfoLanguageButtons[i].rect[1];
         wk->buttons[i].rect[2] = sZukanDetailInfoLanguageButtons[i].rect[2];
@@ -691,11 +691,11 @@ static void ZukanDetailInfo_InitGlow(ZukanDetailInfoParam *param, ZukanDetailInf
     void *file = GFL_G2DIOReadNCLR(ARCID_ZUKAN_GRA, 3, &palette, param->heapId);
     u16 *data = palette->rawData;
 
-    sys_memcpy(data + 16, wk->glowPalettes[0], 32);
-    sys_memcpy(data + 48, wk->glowPalettes[1], 32);
+    MI_CpuCopy8(data + 16, wk->glowPalettes[0], 32);
+    MI_CpuCopy8(data + 48, wk->glowPalettes[1], 32);
     GFL_HeapFree(file);
     wk->glowPhase = 0;
-    sys_memcpy(wk->glowPalettes[0], wk->glowPalette, 32);
+    MI_CpuCopy8(wk->glowPalettes[0], wk->glowPalette, 32);
     NNS_GfdRegisterNewVramTransferTask(14, 6 * 32, wk->glowPalette, 32);
 }
 

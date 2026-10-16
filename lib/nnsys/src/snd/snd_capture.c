@@ -46,7 +46,7 @@ void NNSi_SndCaptureMain(void) {
 
     volume = NNSi_SndFaderGet(fader) >> 8;
     if (volume != info->volume) {
-        sndSetVolume(info->chBitMask, volume, SND_CHANNEL_DATASHIFT_NONE);
+        SND_SetChannelVolume(info->chBitMask, volume, SND_CHANNEL_DATASHIFT_NONE);
         info->volume = volume;
     }
 }
@@ -61,11 +61,11 @@ static void StopCapture(void) {
     }
 
     alarmFlag = info->alarmNo >= 0 ? TRUE : FALSE;
-    func_0207d410(info->chBitMask, info->capBitMask, alarmFlag ? 1 << info->alarmNo : 0, 0);
+    SND_StopTimer(info->chBitMask, info->capBitMask, alarmFlag ? 1 << info->alarmNo : 0, 0);
     if (alarmFlag) {
-        tag = sndGetSentPacketCount();
-        func_0207d864(SND_COMMAND_BLOCK);
-        func_0207d96c(tag);
+        tag = SND_GetCurrentCommandTag();
+        SND_FlushCommand(SND_COMMAND_BLOCK);
+        SND_WaitForCommandProc(tag);
         while (OS_ReceiveMessage(&sMsgQ, NULL, OS_MESSAGE_NOBLOCK)) {
         }
     }
@@ -80,7 +80,7 @@ static void StopCapture(void) {
         NNSi_SndFreeAlarm(info->alarmNo);
     }
     if (info->type == NNSi_SND_CAPTURE_TYPE_EFFECT) {
-        func_0207d5b4(0, 0, 0, 0);
+        SND_SetOutputSelector(0, 0, 0, 0);
     }
     info->active = FALSE;
 }
@@ -92,11 +92,11 @@ void NNSi_SndCaptureBeginSleep(void) {
     if (!info->active) {
         return;
     }
-    func_0207d410(info->chBitMask, info->capBitMask, info->alarmNo >= 0 ? 1 << info->alarmNo : 0, 0);
+    SND_StopTimer(info->chBitMask, info->capBitMask, info->alarmNo >= 0 ? 1 << info->alarmNo : 0, 0);
 
-    tag = sndGetSentPacketCount();
-    func_0207d864(SND_COMMAND_BLOCK);
-    func_0207d96c(tag);
+    tag = SND_GetCurrentCommandTag();
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
 }
 
 void NNSi_SndCaptureEndSleep(void) {
@@ -108,8 +108,8 @@ void NNSi_SndCaptureEndSleep(void) {
     info->bufPos = 0;
     MI_CpuClear32(info->bufL, info->bufSize);
     MI_CpuClear32(info->bufR, info->bufSize);
-    cp15_flushDC(info->bufL, info->bufSize);
-    cp15_flushDC(info->bufR, info->bufSize);
+    DC_FlushRange(info->bufL, info->bufSize);
+    DC_FlushRange(info->bufR, info->bufSize);
 
-    func_0207d3f4(info->chBitMask, info->capBitMask, info->alarmNo >= 0 ? 1 << info->alarmNo : 0, 0);
+    SND_StartTimer(info->chBitMask, info->capBitMask, info->alarmNo >= 0 ? 1 << info->alarmNo : 0, 0);
 }

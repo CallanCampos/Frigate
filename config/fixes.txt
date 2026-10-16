@@ -2,6 +2,8 @@
 # module address(b2_us) action [argument]
 . 0x02004fb0 reloc_addend 0x948
 . 0x02004fb4 reloc_addend 0x988
+. 0x02005050 add_data DWCi_Signature
+. 0x02005094 add_data CARDi_BackupSignature
 . 0x020050ac add_data CPSi_Signature
 . 0x020050c4 add_data SOCLi_Signature
 . 0x02005108 add_data VCTi_Signature
@@ -200,6 +202,17 @@
 . 0x0204ffe4 reloc_addend 0xbc
 . 0x0204ffe8 reloc_addend 0x80
 . 0x0204ffec reloc_addend 0x4c
+. 0x02056b40 reloc_addend 0x4
+. 0x02056b48 reloc_addend 0x9
+. 0x02056b4c reloc_addend 0xe
+. 0x02056b50 reloc_addend 0x10
+. 0x02056ce4 reloc_addend 0x4
+. 0x02056d68 reloc_addend 0x4
+. 0x02056f2c reloc_addend 0x4
+. 0x02056f34 reloc_addend 0xa
+. 0x02056f38 reloc_addend 0x10
+. 0x02056f44 reloc_addend 0x4
+. 0x0205851c add_reloc load,main,0x02005050
 . 0x0205f5d8 reloc_addend 0x18
 . 0x0205f5dc reloc_addend 0x30
 . 0x0205fd68 reloc_addend 4
@@ -259,43 +272,166 @@
 . 0x02065c0c reloc_addend 0x200
 . 0x02065c54 reloc_addend 0x80
 . 0x02066864 reloc_addend 0x80
+. 0x02066d0c reloc_addend 0x1
+. 0x02066d10 reloc_addend 0x2
+. 0x02066d14 reloc_addend 0x3
 . 0x02066f00 reloc_addend 0x80
 . 0x02066f04 reloc_addend 0x4c
+. 0x02066f08 reloc_addend 0x30
+. 0x02066f0c reloc_addend 0x3c
+. 0x02066f14 reloc_addend 0x4
+. 0x02066f1c reloc_addend 0xc
+. 0x02067158 reloc_addend 0xc
 . 0x02067164 reloc_addend 0x80
 . 0x02067168 reloc_addend 0x4c
+. 0x0206716c reloc_addend 0x30
+. 0x02067170 reloc_addend 0x3c
+. 0x02067178 reloc_addend 0x4
+. 0x02067480 reloc_addend 0x40
+. 0x020678dc reloc_addend 0x4
 . 0x020678e0 reloc_addend 0x80
 . 0x020678e4 reloc_addend 0x4c
 . 0x020678e8 reloc_addend 0xbc
+. 0x02067b44 reloc_addend 0x4
 . 0x02067b4c reloc_addend 0x80
 . 0x02067b50 reloc_addend 0xe0
 . 0x02067b54 reloc_addend 0xbc
 . 0x02067f98 reloc_addend 0x8
 . 0x02067f9c reloc_addend 0x4c
+. 0x0206a124 reloc_addend 0xc
+. 0x0206a128 reloc_addend 0x10
+. 0x0206a12c reloc_addend 0x14
+. 0x0206aa48 reloc_addend 0x4
+. 0x0206aa4c reloc_addend 0x8
+. 0x0206aa50 reloc_addend 0xc
+. 0x0206aa54 reloc_addend 0x10
+. 0x0206aa58 reloc_addend 0x14
 . 0x0206e1dc reloc_addend 0x10c8
 . 0x0206e228 reloc_addend 0x10e0
 . 0x0206e3fc reloc_addend 0x10c8
 . 0x0206e4dc reloc_addend 0x10e0
+. 0x0206f294 add_reloc load,ltd_autoload(0),0x027674a0
+. 0x0206f308 reloc_addend 0x500
+. 0x0206f528 add_reloc load,main,0x02005094
+. 0x0206f804 add_reloc load,main,0x02005094
+. 0x0206f848 reloc_addend 0x480
+. 0x0206f84c reloc_addend 0x500
+. 0x0206fbec reloc_addend 0x500
+. 0x0206fc3c reloc_addend 0x500
+. 0x020711ec remove_reloc
+. 0x02076168 reloc_addend 0x2
+. 0x0207616c reloc_addend 0x4
+. 0x02076c48 reloc_addend 0x2
+. 0x02076c58 reloc_addend 0x4
+. 0x02076c7c reloc_addend 0xe
+. 0x02076c9c reloc_addend 0x10
+. 0x02076ca8 reloc_addend 0x8
+. 0x02076cb8 reloc_addend 0xa
+. 0x02076cc8 reloc_addend 0xc
+. 0x02076cd8 reloc_addend 0x12
+. 0x02076ce8 reloc_addend 0x14
+. 0x02076d0c reloc_addend 0x16
+. 0x02076d2c reloc_addend 0x18
+. 0x02076de4 reloc_addend 0x2
+. 0x02076df4 reloc_addend 0x4
+. 0x02076e18 reloc_addend 0xe
+. 0x02076e38 reloc_addend 0x10
+. 0x02076e44 reloc_addend 0x8
+. 0x02076e54 reloc_addend 0xa
+. 0x02076e64 reloc_addend 0xc
+. 0x02076e74 reloc_addend 0x6
+. 0x02076e94 reloc_addend 0x12
+. 0x02076ea4 reloc_addend 0x14
+. 0x02076ec8 reloc_addend 0x16
+. 0x02076ee8 reloc_addend 0x18
 . 0x02077cd4 add_data sha1_block_constants
+. 0x02078a80 add_function sys_memcpy_fast:arm:0x2f0
+. 0x02078d70 add_function sys_memcpy_ex:arm:0x314
+. 0x02079278 reloc_addend 0xc
+. 0x020792f0 reloc_addend 0x50
+. 0x02079350 reloc_addend 0x50
+. 0x020793dc reloc_addend 0x50
+. 0x02079454 reloc_addend 0x50
+. 0x0207969c reloc_addend 0xc
+. 0x020796b0 reloc_addend 0x50
+. 0x0207973c reloc_addend 0x50
+. 0x020797d0 reloc_addend 0x50
+. 0x020798a0 reloc_addend 0x50
+. 0x0207992c reloc_addend 0x50
+. 0x02079c70 reloc_addend 0x8
+. 0x02079c7c reloc_addend 0x4
+. 0x02079e10 reloc_addend 0x8
+. 0x02079e14 reloc_addend 0x4
+. 0x02079e44 reloc_addend 0x60
+. 0x02079e48 reloc_addend 0x68
+. 0x02079e4c reloc_addend 0x64
+. 0x0207a544 reloc_addend 0x4
+. 0x0207a55c reloc_addend 0x80
+. 0x0207a578 reloc_addend 0xc8
 . 0x0207ba60 add_reloc load,main,0x0207b9e8,0x50
+. 0x0207cd1c reloc_addend 0x4
+. 0x0207d060 reloc_addend 0x4
+. 0x0207d10c reloc_addend -4
+. 0x0207d72c reloc_addend 0x1780
+. 0x0207d730 reloc_addend 0x17e8
+. 0x0207e73c reloc_addend 0x1c
 . 0x0207e934 add_function MIC_StartAutoSampling:thumb:0x1c
 . 0x0207e958 add_function MIC_StopAutoSampling:thumb:0x18
+. 0x02080d94 reloc_addend 0x14
+. 0x02080d98 reloc_addend 0x24
+. 0x02080d9c reloc_addend 0x40
+. 0x02080e44 reloc_addend 0x8
+. 0x02080e50 reloc_addend 0x8
+. 0x02082640 reloc_addend 0x4
+. 0x0208344c reloc_addend 0x4c
+. 0x02083450 reloc_addend 0x98
+. 0x02083728 reloc_addend 0x4c
+. 0x0208372c reloc_addend 0x98
+. 0x02085b7c add_function qsort:arm:0x138
+. 0x02085cac remove_symbol
+. 0x02087c40 add_function __dorounddecup:arm:0x50
+. 0x02087c8c remove_symbol
+. 0x0208c224 add_function __aeabi_dadd:arm:0x10
 . 0x0208c224 add_label _dadd
+. 0x0208c234 add_function dadd_magnitudes:arm:0x308
+. 0x0208c554 add_function doubleSub:arm:0x10
 . 0x0208c554 add_label _dsub
+. 0x0208c564 add_function dsub_magnitudes:arm:0x3a4
 . 0x0208c908 add_label _dmul
 . 0x0208cc6c add_label _d2f
 . 0x0208cd70 add_label _dflt
 . 0x0208cdb0 add_label _dfltu
+. 0x0208cdec add_label _dgeq
 . 0x0208ce84 add_label _dgr
+. 0x0208cf1c add_label _dleq
+. 0x0208cfc0 add_label _dls
+. 0x0208d05c add_label _deq
+. 0x0208d0e8 add_label _dneq
 . 0x0208d2f0 add_label _f2d
 . 0x0208d374 add_label _fflt
+. 0x0208d404 add_function mod64Signed:arm:0x10
+. 0x0208d404 add_label _ll_mod
 . 0x0208d414 add_label _ll_sdiv
+. 0x0208d414 add_function _ll_sdiv:arm:0x10
+. 0x0208d424 add_function ll_div_body:arm:0x64
+. 0x0208d488 add_function ll_udiv_core:arm:0x13c
+. 0x0208d5c4 add_function __aeabi_uldivmod:arm:0xc
 . 0x0208d5c4 add_label _ll_udiv
 . 0x0208d5d0 add_label _ull_mod
+. 0x0208d5d0 add_function _ull_mod:arm:0x8
+. 0x0208d5d8 add_function ull_div_body:arm:0x34
 . 0x0208d60c add_label _ll_mul
 . 0x0208d62c add_label _ll_shl
+. 0x0208d868 add_function __aeabi_uidivmod:arm:0x8
 . 0x0208d868 add_label _u32_div_f
+. 0x0208d870 add_function u32_div_core:arm:0x1dc
 . 0x0208da80 add_label _ffixu
 . 0x0208dac0 add_label _dfix
+. 0x0208db0c add_label _ll_ufrom_d
+. 0x0208df14 add_function _fadd:arm:0xc
+. 0x0208df20 add_function fadd_magnitudes:arm:0x210
+. 0x0208e144 add_function _fsub:arm:0xc
+. 0x0208e150 add_function fsub_magnitudes:arm:0x26c
 . 0x0208e798 add_label _ddiv
 . 0x0208f021 remove_symbol
 . 0x0208f7c8 remove_reloc
@@ -388,6 +524,7 @@
 . 0x02093378 add_data sDaysBeforeMonth
 . 0x02093e0c add_data data_02093e0c
 . 0x02093e44 add_data data_02093e44
+. 0x020940b8 add_data WifiIdTool_InverseNibbleSubstitution
 . 0x020941b8 add_data NNSi_FndUnitHeapAllocatorFuncs
 . 0x020941c0 add_data NNSi_FndFrameHeapAllocatorFuncs
 . 0x020941d0 add_data NNSi_FndSystemHeapAllocatorFuncs
@@ -395,6 +532,9 @@
 . 0x02094364 add_data data_02094364
 . 0x02094384 add_data data_02094384
 . 0x02094390 add_data NNSi_G2dCharCanvasVTableOBJ2DRect
+. 0x02094435 remove_symbol
+. 0x02094436 remove_symbol
+. 0x02094437 remove_symbol
 . 0x020947fc remove_symbol
 . 0x0209497c remove_symbol
 . 0x02094a3c remove_symbol
@@ -403,6 +543,8 @@
 . 0x02097808 remove_reloc
 . 0x0209780c remove_reloc
 . 0x02097bfc remove_symbol
+. 0x020987d2 remove_symbol
+. 0x020987d4 remove_symbol
 . 0x0209a34a remove_symbol
 . 0x0209b1bc reloc_addend 0x48
 . 0x0209b1c0 reloc_addend 0x60
@@ -415,7 +557,24 @@
 . 0x0209b234 remove_symbol
 . 0x0209b258 add_data data_0209b258
 . 0x0209b2ac remove_symbol
+. 0x0209b324 remove_symbol
 . 0x0209b328 add_data sEnvMapCmd
+. 0x0209b32c remove_symbol
+. 0x0209b394 remove_symbol
+. 0x0209b39c remove_symbol
+. 0x0209b3c0 remove_symbol
+. 0x0209b3cc remove_symbol
+. 0x0209b3dc remove_symbol
+. 0x0209b3e4 remove_symbol
+. 0x0209b408 remove_symbol
+. 0x0209b414 remove_symbol
+. 0x0209b504 add_data sCachedPage
+. 0x0209b73c add_data OSi_GetPRFuncs
+. 0x0209b758 remove_symbol
+. 0x0209b790 add_data PMi_AutoExitFlag
+. 0x0209b7e4 remove_symbol
+. 0x0209b830 remove_symbol
+. 0x0209bc20 add_data data_0209bc20
 . 0x0209da80 remove_symbol
 . 0x0209da88 remove_symbol
 . 0x0209da8c remove_symbol
@@ -449,6 +608,12 @@
 . 0x02141810 add_data data_02141810
 . 0x021418d4 remove_symbol
 . 0x021418e4 remove_symbol
+. 0x0214195c remove_symbol
+. 0x02141961 remove_symbol
+. 0x02141962 remove_symbol
+. 0x02141966 remove_symbol
+. 0x02141968 remove_symbol
+. 0x02141978 add_data sStarted
 . 0x02141a58 remove_symbol
 . 0x02141a5c remove_symbol
 . 0x02141a74 remove_symbol
@@ -475,11 +640,147 @@
 . 0x02143c58 remove_symbol
 . 0x02143c64 remove_symbol
 . 0x0214409a remove_symbol
+. 0x02144a78 remove_symbol
+. 0x02144a7c remove_symbol
+. 0x02144a80 remove_symbol
+. 0x02144a84 remove_symbol
+. 0x02144a88 remove_symbol
+. 0x021450b4 remove_symbol
 . 0x0214697c add_data NNS_G3dFlagUseFastDma
 . 0x02149878 add_data sCaptureReserved
 . 0x0214989c add_data sCaptureMsgBuf
 . 0x0214b3b8 remove_symbol
 . 0x0214b3d0 remove_symbol
+. 0x0214b8c0 remove_symbol
+. 0x0214b940 remove_symbol
+. 0x0214b980 section_end lib/nitro/src/card/card_common.c:.bss
+. 0x0214b980 add_section lib/nitro/src/card/card_backup.c:.bss:0x100
+. 0x0214ba84 add_data sRomReader
+. 0x0214ba88 add_data sInvalidateIC
+. 0x0214ba8c add_data sRomDmaActive
+. 0x0214bfe4 add_data sCardLockId
+. 0x0214c048 add_data data_0214c048
+. 0x0214c054 add_data sObjExtPlttDestA
+. 0x0214c058 add_data sObjExtPlttBanksA
+. 0x0214c05c add_data sBGExtPlttOffsetA
+. 0x0214c060 add_data sBGExtPlttDestA
+. 0x0214c064 add_data sBGExtPlttBanksA
+. 0x0214c068 add_data sObjExtPlttBanksB
+. 0x0214c08e remove_symbol
+. 0x0214c090 remove_symbol
+. 0x0214c092 remove_symbol
+. 0x0214c094 remove_symbol
+. 0x0214c096 remove_symbol
+. 0x0214c098 remove_symbol
+. 0x0214c09a remove_symbol
+. 0x0214c09c remove_symbol
+. 0x0214c09e remove_symbol
+. 0x0214c0a0 remove_symbol
+. 0x0214c0a2 remove_symbol
+. 0x0214c0a4 remove_symbol
+. 0x0214c12c remove_symbol
+. 0x0214c170 remove_symbol
+. 0x0214c17c remove_symbol
+. 0x0214c180 remove_symbol
+. 0x0214c1a8 remove_symbol
+. 0x0214c1ac remove_symbol
+. 0x0214c1b0 remove_symbol
+. 0x0214c1d8 remove_symbol
+. 0x0214c1dc remove_symbol
+. 0x0214c1e0 remove_symbol
+. 0x0214c214 add_data sSchedulerLockCount
+. 0x0214c218 add_data sCurrentThreadPtr
+. 0x0214c220 add_data sThreadState
+. 0x0214c230 remove_symbol
+. 0x0214c37c remove_symbol
+. 0x0214c3bc add_data OSi_IdleThreadStack
+. 0x0214c4dc add_data data_0214c4dc
+. 0x0214c66c remove_symbol
+. 0x0214c66c add_data rtcWork
+. 0x0214c700 section_end lib/nitro/src/snd/nitro_snd_main.c:.bss
+. 0x0214c700 section_start lib/nitro/src/snd/snd_command.c:.bss
+. 0x0214e100 remove_symbol
+. 0x0214e168 remove_symbol
+. 0x0214e200 remove_symbol
+. 0x0214e248 add_data PMi_WokeUp
+. 0x0214e24c add_data PMi_ScreensOffCount
+. 0x0214e250 add_data PMi_DisplayOffCount
+. 0x0214e254 add_data PMi_ExitType
+. 0x0214e258 add_data PMi_Amp
+. 0x0214e2a0 remove_symbol
+. 0x0214e30c remove_symbol
+. 0x0214e31c remove_symbol
+. 0x0214e338 remove_symbol
+. 0x0214edc4 remove_symbol
+ltd_autoload_0 0x02700228 reloc_addend 0x1000
+ltd_autoload_0 0x0270022c reloc_addend 0x11b4
+ltd_autoload_0 0x027007bc reloc_addend 0x1000
+ltd_autoload_0 0x0270081c reloc_addend 0x1000
+ltd_autoload_0 0x02700928 reloc_addend 0x11b4
+ltd_autoload_0 0x02700930 reloc_addend 0x1000
+ltd_autoload_0 0x02700b08 reloc_addend 0x1000
+ltd_autoload_0 0x02700b14 reloc_addend 0x30
+ltd_autoload_0 0x02700b18 reloc_addend 0x40
+ltd_autoload_0 0x02700b20 reloc_addend 0x11b4
+ltd_autoload_0 0x02700b24 reloc_addend 0x11d4
+ltd_autoload_0 0x02700b28 reloc_addend 0x64
+ltd_autoload_0 0x02700b30 reloc_addend 0x1124
+ltd_autoload_0 0x02700bc4 reloc_addend 0x30
+ltd_autoload_0 0x02700bc8 reloc_addend 0x40
+ltd_autoload_0 0x02700bcc reloc_addend 0x64
+ltd_autoload_0 0x02700db4 reloc_addend 0x1000
+ltd_autoload_0 0x02700eb4 reloc_addend 0x1000
+ltd_autoload_0 0x02700fe0 reloc_addend 0x1000
+ltd_autoload_0 0x0270111c reloc_addend 0x1000
+ltd_autoload_0 0x02701244 reloc_addend 0x1000
+ltd_autoload_0 0x027013a0 reloc_addend 0x1000
+ltd_autoload_0 0x02701484 reloc_addend 0x1000
+ltd_autoload_0 0x0270156c reloc_addend 0x1000
+ltd_autoload_0 0x02701640 reloc_addend 0x1000
+ltd_autoload_0 0x02701714 reloc_addend 0x1000
+ltd_autoload_0 0x027017d8 reloc_addend 0x1000
+ltd_autoload_0 0x02701900 reloc_addend 0x1000
+ltd_autoload_0 0x027019b0 reloc_addend 0x1000
+ltd_autoload_0 0x02701fd0 reloc_addend 0x1000
+ltd_autoload_0 0x027028ac reloc_addend 0x4
+ltd_autoload_0 0x02702a6c reloc_addend 0x14
+ltd_autoload_0 0x02702a84 reloc_addend 0x14
+ltd_autoload_0 0x02702bf4 reloc_addend 0x4
+ltd_autoload_0 0x027041e4 reloc_addend 0x4c
+ltd_autoload_0 0x02704254 reloc_addend 0x4c
+ltd_autoload_0 0x0270430c reloc_addend 0x48
+ltd_autoload_0 0x02704310 reloc_addend 0x40
+ltd_autoload_0 0x02704440 reloc_addend 0x1c
+ltd_autoload_0 0x02704444 reloc_addend 0x3c
+ltd_autoload_0 0x027052fc add_function func_027052fc:arm:0x24
+ltd_autoload_0 0x0270531c remove_symbol
+ltd_autoload_0 0x027674a0 add_data CARDi_NdmaInterface
+ltd_autoload_0 0x027674a0 add_reloc load,ltd_autoload(0),0x02768371
+ltd_autoload_0 0x027674a4 add_reloc load,ltd_autoload(0),0x02768271
+ltd_autoload_0 0x027674fc reloc_addend 0x500
+ltd_autoload_0 0x027675cc reloc_addend 0x500
+ltd_autoload_0 0x027692e0 reloc_addend 0x30
+ltd_autoload_0 0x027692e4 reloc_addend 0x38
+ltd_autoload_0 0x027692e8 reloc_addend 0x34
+ltd_autoload_0 0x0276b108 add_data data_0276b108
+ltd_autoload_0 0x0276b13c remove_symbol
+ltd_autoload_0 0x0276b14c remove_symbol
+ltd_autoload_0 0x0276b170 remove_symbol
+ltd_autoload_0 0x0276c10c remove_symbol
+ltd_autoload_0 0x0276c230 remove_symbol
+ltd_autoload_0 0x0276c2c0 remove_symbol
+ltd_autoload_0 0x0276c2e0 remove_symbol
+ltd_autoload_0 0x0276c2ec remove_symbol
+ltd_autoload_0 0x0276c2fc remove_symbol
+ltd_autoload_0 0x0276c560 remove_symbol
+ltd_autoload_0 0x0276c568 remove_symbol
+ltd_autoload_0 0x0276c56c remove_symbol
+ltd_autoload_0 0x0276c5ac remove_symbol
+ltd_autoload_0 0x0276c5cc remove_symbol
+ltd_autoload_0 0x0276dbe0 add_data sGraphicsAsync
+ltd_autoload_0 0x0276dbe4 add_data sGraphicsCallback
+ltd_autoload_0 0x0276dbe8 add_data sGraphicsBusy
+ltd_autoload_0 0x0276dbec add_data sGraphicsLoaded
 overlays/ov000 0x0214f870 overlay_id 199
 overlays/ov000 0x0214f874 reloc_module overlay(199)
 overlays/ov000 0x0214f878 overlay_id 182
@@ -1657,6 +1958,7 @@ overlays/ov134 0x021f0774 reloc_module overlay(55)
 overlays/ov134 0x021f08cc reloc_module overlay(55)
 overlays/ov134 0x021f08f4 reloc_module overlay(55)
 overlays/ov134 0x021f093a reloc_module overlay(55)
+overlays/ov134 0x021f0ccc remove_reloc
 overlays/ov134 0x021f0dd4 remove_reloc
 overlays/ov135 0x021ef3ec reloc_module overlay(55)
 overlays/ov135 0x021ef656 reloc_module overlay(55)

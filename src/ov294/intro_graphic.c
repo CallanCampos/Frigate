@@ -125,8 +125,8 @@ static void IntroGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
         GFL_G3DSysLightSet(i, &sLights[i]);
@@ -137,7 +137,7 @@ static void IntroGraphic_G3DInit(void) {
 IntroGraphic *IntroGraphic_Create(u32 layout, u32 mode, HeapID heapId) {
     IntroGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(IntroGraphic), FALSE, "intro_graphic.c", 406);
 
-    sys_memset(graphic, 0, sizeof(IntroGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IntroGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -173,7 +173,7 @@ void IntroGraphic_Free(IntroGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(IntroGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IntroGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -204,7 +204,7 @@ static void IntroGraphic_VBlank(TCB *tcb, void *data) {
 static void IntroBG_Init(IntroBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(IntroBG));
+    MI_CpuFill8(bg, 0, sizeof(IntroBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -218,7 +218,7 @@ static void IntroBG_Init(IntroBG *bg, HeapID heapId) {
 static void IntroBG_Free(IntroBG *bg) {
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(IntroBG));
+    MI_CpuFill8(bg, 0, sizeof(IntroBG));
 }
 
 // Scrolls BG 2 to the right, one pixel each frame
@@ -233,7 +233,7 @@ static void IntroBG_VBlank(IntroBG *bg) {
 }
 
 static void IntroBG_InitNamed(IntroBG *bg, HeapID heapId) {
-    sys_memset(bg, 0, sizeof(IntroBG));
+    MI_CpuFill8(bg, 0, sizeof(IntroBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -324,7 +324,7 @@ static void IntroBG_InitNamed(IntroBG *bg, HeapID heapId) {
 }
 
 static void IntroClAct_Init(IntroClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(IntroClAct));
+    MI_CpuFill8(clact, 0, sizeof(IntroClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -335,7 +335,7 @@ static void IntroClAct_Init(IntroClAct *clact, const BGSysVRAMConfig *vramConfig
 static void IntroClAct_Free(IntroClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(IntroClAct));
+    MI_CpuFill8(clact, 0, sizeof(IntroClAct));
 }
 
 static void IntroClAct_Update(IntroClAct *clact) {

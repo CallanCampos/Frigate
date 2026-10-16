@@ -380,7 +380,7 @@ static BOOL GPowerApp_Init(GameProc *proc, u32 *state, void *param, void *data) 
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GPOWER_APP, 0x30000);
     work = GFL_ProcInitSubsystem(proc, sizeof(GPowerApp), HEAPID_GPOWER_APP);
-    sys_memset(work, 0, sizeof(GPowerApp));
+    MI_CpuFill8(work, 0, sizeof(GPowerApp));
     work->heapId = HEAPID_GPOWER_APP;
     work->param = param;
     work->graphic = GPowerAppGraphic_Create(0, work->heapId);
@@ -491,7 +491,7 @@ static void GPowerApp_InitWork(GPowerApp *work) {
     GPowerApp_Draw(work, 0);
     work->flags |= FLAG_REDRAW;
     GPowerApp_SetMessageVisible(work, FALSE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 3, 0x3f, 14, 2);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 3, 0x3f, 14, 2);
 }
 
 static void GPowerApp_Update(GPowerApp *work) {
@@ -738,7 +738,7 @@ static void GPowerApp_AddActors(GPowerApp *work, u32 vramType, const GPowerAppAc
     s16 cells;
     s16 type;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     palette = group->palette;
     chars = group->chars;
     cells = group->cells;
@@ -934,7 +934,7 @@ static void GPowerApp_AddLabels(GPowerApp *work, u32 vramType, const GPowerAppLa
         pos = setups->pos;
         x = GPowerApp_GetPos(work, pos * 2);
         y = GPowerApp_GetPos(work, pos * 2 + 1);
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.bitmap = work->labelBitmaps[i];
         setup.x = x;
         setup.y = y;
@@ -1306,8 +1306,8 @@ static void GPowerApp_InitPaletteAnim(GPowerApp *work) {
     void *file = GFL_G2DIOReadNCLR(ARCID_GPOWER_APP, 1, &palette, work->heapId);
     u16 *colors = palette->rawData;
 
-    sys_memcpy(&colors[1 * 16], work->paletteFrom, sizeof(work->paletteFrom));
-    sys_memcpy(&colors[2 * 16], work->paletteTo, sizeof(work->paletteTo));
+    MI_CpuCopy8(&colors[1 * 16], work->paletteFrom, sizeof(work->paletteFrom));
+    MI_CpuCopy8(&colors[2 * 16], work->paletteTo, sizeof(work->paletteTo));
     GFL_HeapFree(file);
     work->paletteAngle = 0;
     work->flags |= FLAG_PALETTE_ANIM;

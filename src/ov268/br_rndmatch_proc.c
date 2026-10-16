@@ -136,7 +136,7 @@ static BOOL BrRndMatch_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     BrRndMatchWork *wk;
 
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrRndMatchWork), BrProcSys_GetHeapID(p->procSys));
-    sys_memset(wk, 0, sizeof(BrRndMatchWork));
+    MI_CpuFill8(wk, 0, sizeof(BrRndMatchWork));
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
     wk->bmpoam = BmpOam_Init(wk->heapId, p->unit);
@@ -463,7 +463,7 @@ static void BrRndMatch_CreateMenu(BrRndMatchWork *wk, BrRndMatchProcParam *p) {
     msg = BrRes_GetMsgData(p->res);
     wordSet = BrRes_GetWordSet(p->res);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 80;
     setup.y = 168;
     setup.sequence = 0;

@@ -1535,7 +1535,7 @@ static u8 func_ov127_021f1308(u32 rank, u8 floor, u8 version, u8 *types) {
     const u8 *counts = func_ov127_021f0d88(rank, floor, version);
     int i;
 
-    sys_memset(types, INFINITY_DUNGEON_ROOM_TYPE_NONE, INFINITY_DUNGEON_ROOM_COUNT);
+    MI_CpuFill8(types, INFINITY_DUNGEON_ROOM_TYPE_NONE, INFINITY_DUNGEON_ROOM_COUNT);
     for (i = 0; i < 20; i++) {
         u8 n = counts[i];
 
@@ -1553,7 +1553,7 @@ static u8 func_ov127_021f1348(u32 rank, u8 floor, u8 version, u8 *types) {
     const u8 *counts = func_ov127_021f0d88(rank, floor, version);
     int i;
 
-    sys_memset(types, INFINITY_DUNGEON_ROOM_TYPE_NONE, INFINITY_DUNGEON_ROOM_COUNT);
+    MI_CpuFill8(types, INFINITY_DUNGEON_ROOM_TYPE_NONE, INFINITY_DUNGEON_ROOM_COUNT);
     for (i = 0; i < INFINITY_DUNGEON_ROOM_TYPE_NONE; i++) {
         if (counts[i] != 0 && InfinityDungeon_GetRoomTemplate(i)->kind == 4) {
             types[count++] = i;
@@ -1569,7 +1569,7 @@ static int func_ov127_021f1388(InfinityDungeonRoom *rooms, int *list, int width,
     int y;
     InfinityDungeonGridPos pos;
 
-    sys_memset(list, 16, 16 * sizeof(int));
+    MI_CpuFill8(list, 16, 16 * sizeof(int));
     for (y = 0; y < height - 1; y++) {
         for (x = 0; x < width; x++) {
             pos.x = x;
@@ -1632,7 +1632,7 @@ static int func_ov127_021f14c0(const InfinityDungeonGridPos *pos, const Infinity
     InfinityDungeonGridPos north;
     u8 kind;
 
-    sys_memset(directions, 4, 4 * sizeof(int));
+    MI_CpuFill8(directions, 4, 4 * sizeof(int));
     east = *pos;
     east.x++;
     if (east.x < width && func_ov127_021f13f8(&east, rooms)->kind != 1) {

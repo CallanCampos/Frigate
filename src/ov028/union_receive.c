@@ -29,6 +29,7 @@
 #include "gfl/sound.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
+#include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "save/join_avenue.h"
 #include "save/player_info.h"
@@ -118,15 +119,15 @@ void func_ov028_021711f8(int netId, int size, const void *data, void *work, NetH
     UnionSelf *self = &unisys->situ;
 
     if (netId != func_02042a6c(func_02040440())) {
-        sys_memcpy(data, self->mycomm.unk10, 8);
+        MI_CpuCopy8(data, self->mycomm.unk10, 8);
     }
 }
 
 BOOL func_ov028_02171220(void) {
     u8 mac[8];
 
-    sys_memset(mac, 0, sizeof(mac));
-    func_0207c33c(mac);
+    MI_CpuFill8(mac, 0, sizeof(mac));
+    OS_GetMacAddress(mac);
     mac[6] = 1;
     return func_02042be8(func_02040440(), UNION_NET_CMD_MAC, sizeof(mac), mac);
 }
@@ -163,7 +164,7 @@ void func_ov028_02171308(int netId, int size, const void *data, void *work, NetH
 
     if (netId != func_02042a6c(func_02040440())) {
         self->mycomm.recvFlag = 1;
-        sys_memcpy(data, unisys->alloc.target_card, size);
+        MI_CpuCopy8(data, unisys->alloc.target_card, size);
     }
 }
 
@@ -187,7 +188,7 @@ void func_ov028_021713e0(int netId, int size, const void *data, void *work, NetH
         GFL_ASSERT(0);
         return;
     }
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     func_ov036_021c3f34(colosseum->unk178, netId, GetGameDataPlayerInfo(gameData), ((const u8 *)data)[0x27], mac);
 }
 
@@ -342,9 +343,9 @@ void func_ov028_02171758(int netId, int size, const void *data, void *work, NetH
 BOOL UnionMain_SendAppProfile(u8 sendTo, const PlayerInfo *info) {
     UnionAppMember member;
 
-    sys_memset(&member, 0, sizeof(UnionAppMember));
+    MI_CpuFill8(&member, 0, sizeof(UnionAppMember));
     member.info = *info;
-    func_0207c33c(member.mac);
+    OS_GetMacAddress(member.mac);
     return func_02042c9c(func_02040440(), sendTo, UNION_NET_CMD_APP_PROFILE, sizeof(UnionAppMember), &member, TRUE,
                          FALSE, FALSE);
 }
@@ -380,9 +381,9 @@ void func_ov028_02171848(int netId, int size, const void *data, void *work, NetH
 BOOL UnionMain_SendConfirmProfile(u8 sendTo, const PlayerInfo *info) {
     UnionAppMember member;
 
-    sys_memset(&member, 0, sizeof(UnionAppMember));
+    MI_CpuFill8(&member, 0, sizeof(UnionAppMember));
     member.info = *info;
-    func_0207c33c(member.mac);
+    OS_GetMacAddress(member.mac);
     return func_02042c9c(func_02040440(), sendTo, UNION_NET_CMD_CONFIRM_PROFILE, sizeof(UnionAppMember), &member, TRUE,
                          FALSE, FALSE);
 }

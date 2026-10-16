@@ -102,7 +102,7 @@ static BOOL ZukanToroku_Init(GameProc *proc, u32 *state, void *param, void *work
     GFL_OvlLoad(OVERLAY_ID(296));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN_TOROKU, 0x80000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanTorokuWork), HEAPID_ZUKAN_TOROKU);
-    sys_memset(wk, 0, sizeof(ZukanTorokuWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanTorokuWork));
     wk->heapId = HEAPID_ZUKAN_TOROKU;
     wk->graphic = ZukanTorokuGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
@@ -199,7 +199,7 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
                 wk->blendTimer = 0;
                 wk->blend--;
             }
-            gfxRegSetBlend(REG_BLDCNT_ADDR, BLEND_BGS, BLEND_BGS, wk->blend, 0, wk->blend - 16);
+            G2x_SetBlendBrightnessExt_(REG_BLDCNT_ADDR, BLEND_BGS, BLEND_BGS, wk->blend, 0, wk->blend - 16);
             if (wk->blend == 0) {
                 func_ov296_0219ddcc(wk->info);
                 ZukanToroku_LoadCover(wk);
@@ -212,7 +212,7 @@ static BOOL ZukanToroku_Main(GameProc *proc, u32 *state, void *param, void *work
                 wk->blendTimer = 0;
                 wk->blend++;
             }
-            gfxRegSetBlend(REG_BLDCNT_ADDR, BLEND_BGS, BLEND_BGS, wk->blend, 0, wk->blend - 16);
+            G2x_SetBlendBrightnessExt_(REG_BLDCNT_ADDR, BLEND_BGS, BLEND_BGS, wk->blend, 0, wk->blend - 16);
             if (wk->blend == 16) {
                 wk->step = ENTRY_WAIT_DONE;
             }

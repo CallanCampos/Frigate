@@ -95,7 +95,7 @@ static int (*sPartnerSubSeqTable[])(WorldTradeWork *wk) = {
 int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     Partner_InitWork(wk);
     Partner_BgInit(-32 - wk->drawOffset);
-    if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) == 0) {
+    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == 0) {
         WorldTrade_SubLcdBgInit(wk, -32 - wk->drawOffset, 1);
     } else {
         WorldTrade_SubLcdBgInit(wk, -32 - wk->drawOffset, 0);
@@ -124,11 +124,11 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     func_02042ba8(TRUE, HEAPID_WORLDTRADE);
 
     if (wk->subProcessMode == PARTNER_MODE_FROM_PARTNER) {
-        if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR) == -16 &&
-            gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) != -16) {
+        if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) == -16 &&
+            GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != -16) {
             GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
-        } else if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR) != -16 &&
-                   gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) == -16) {
+        } else if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) != -16 &&
+                   GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == -16) {
             GFL_WipeSet(4, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
             GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
@@ -245,7 +245,7 @@ static void Partner_BgGraphicSet(WorldTradeWork *wk) {
 static void Partner_SetCellActor(WorldTradeWork *wk) {
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 208;
     setup.y = 58;
     wk->pokemonAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],

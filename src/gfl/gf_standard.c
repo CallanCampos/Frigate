@@ -122,7 +122,7 @@ void buildSeed(MATHRandContext32 *context) {
     MATH_SHA1Update(&sha1, digest, sizeof(digest));
     MATH_SHA1Update(&sha1, entropy, sizeof(entropy));
     MATH_SHA1GetHash(&sha1, digest);
-    sys_memcpy(digest, &seed, sizeof(seed));
+    MI_CpuCopy8(digest, &seed, sizeof(seed));
     MATH_InitRand32(context, seed);
 }
 

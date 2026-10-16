@@ -34,7 +34,7 @@ PrintQueue *func_020219a8(u16 size, HeapID heapId);
 void func_02021a18(PrintQueue *queue);
 // Whether strings go in the queue even while the game is not connected
 void func_02021a20(PrintQueue *queue, u32 queueAlways);
-// How long a frame may print for, as clock() counts
+// How long a frame may print for, as OS_GetTick() counts
 void func_02021a34(PrintQueue *queue, u64 timeLimit);
 // Prints what the queue holds until the frame's time runs out. Returns whether it is empty
 BOOL func_02021a3c(PrintQueue *queue);

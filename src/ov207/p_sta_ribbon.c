@@ -555,7 +555,7 @@ static void PStaRibbon_DrawRow(PStatusWork *wk, PStaRibbonWork *ribbon, RibbonRo
         if (row->entry == ribbon->cursorEntry) {
             src += ROW_CHAR_SIZE;
         }
-        sys_memcpy(src, dst, ROW_CHAR_SIZE);
+        MI_CpuCopy8(src, dst, ROW_CHAR_SIZE);
         format = GFL_MsgDataLoadStrbufNew(ribbon->msgData, MSG_CATEGORY_FIRST + entry->category);
         str = GFL_StrBufCreate(32, wk->heapId);
         wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);

@@ -138,7 +138,7 @@ static BOOL ChihouZukanAward_Init(GameProc *proc, u32 *state, void *param, void 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_AWARD, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ChihouZukanAwardWork), HEAPID_AWARD);
-    sys_memset(wk, 0, sizeof(ChihouZukanAwardWork));
+    MI_CpuFill8(wk, 0, sizeof(ChihouZukanAwardWork));
     wk->heapId = HEAPID_AWARD;
     wk->param = param;
     wk->graphic = ChihouZukanAwardGraphic_Create(1, wk->heapId);
@@ -156,7 +156,7 @@ static BOOL ChihouZukanAward_Init(GameProc *proc, u32 *state, void *param, void 
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    gfxSetBGModeB(0);
+    GXS_SetGraphicsMode(0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sChihouZukanAwardSubBGSetups); i++) {
         GFL_BGSysCreateBG(sChihouZukanAwardSubBGSetups[i].bg, &sChihouZukanAwardSubBGSetups[i].setup,

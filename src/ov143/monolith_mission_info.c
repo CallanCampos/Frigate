@@ -142,7 +142,7 @@ static BOOL MonolithMissionInfo_Init(GameProc *proc, u32 *state, void *param, vo
     switch (*state) {
     case 0:
         miw = GFL_ProcInitSubsystem(proc, sizeof(MonolithMissionInfoWork), HEAPID_MONOLITH);
-        sys_memset(miw, 0, sizeof(MonolithMissionInfoWork));
+        MI_CpuFill8(miw, 0, sizeof(MonolithMissionInfoWork));
         MonolithMissionInfo_Setup(screen, miw);
         (*state)++;
         break;

@@ -104,7 +104,7 @@ GameEvent *EventWbtList_Create(GameSystem *gsys, void *args) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventWbtList_Callback, sizeof(WbtListWork));
     WbtListWork *work = GameEvent_GetData(event);
 
-    sys_memset(work, 0, sizeof(WbtListWork));
+    MI_CpuFill8(work, 0, sizeof(WbtListWork));
     work->gsys = gsys;
     work->field = field;
     work->setup = setup;
@@ -172,7 +172,7 @@ GameEvent *EventWbtWinRecord_Create(GameSystem *gsys, void *args) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventWbtWinRecord_Callback, sizeof(WbtProcWork));
     WbtProcWork *work = GameEvent_GetData(event);
 
-    sys_memset(work, 0, sizeof(WbtProcWork));
+    MI_CpuFill8(work, 0, sizeof(WbtProcWork));
     work->gsys = gsys;
     work->field = field;
     work->param = args;
@@ -200,7 +200,7 @@ GameEvent *EventWbtDownload_Create(GameSystem *gsys, void *args) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventWbtDownload_Callback, sizeof(WbtProcWork));
     WbtProcWork *work = GameEvent_GetData(event);
 
-    sys_memset(work, 0, sizeof(WbtProcWork));
+    MI_CpuFill8(work, 0, sizeof(WbtProcWork));
     work->gsys = gsys;
     work->field = field;
     work->param = args;

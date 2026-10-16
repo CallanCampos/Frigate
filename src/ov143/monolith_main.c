@@ -140,20 +140,20 @@ static const BGSetup sMonolithBGSetupSub = {
 static BOOL Monolith_Init(GameProc *proc, u32 *state, void *param, void *work) {
     MonolithWork *wk;
 
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GX_SetVisiblePlane(0);
     GXS_SetVisiblePlane(0);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 15);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 15);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 15);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 15, 15);
     GFL_BGSysSetDisplayLayout(1);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MONOLITH, 0x100000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(MonolithWork), HEAPID_MONOLITH);
-    sys_memset(wk, 0, sizeof(MonolithWork));
+    MI_CpuFill8(wk, 0, sizeof(MonolithWork));
     wk->state.focusPower = HIGH_LINK_POWER_NONE;
     wk->arc = GFL_ArcSysCreateFileHandle(ARCID_MONOLITH, HEAPID_MONOLITH);
     Monolith_InitVRAM();
@@ -285,10 +285,10 @@ static void Monolith_InitVRAM(void) {
     GFL_BGSysSetVRAMBanks(&sMonolithVRAMConfig);
     GFL_BGSysCreate(HEAPID_MONOLITH);
     GFL_BGSysSetLCDConfig(&sMonolithLCDConfig);
-    sys_memset32(0, (void *)HW_BG_VRAM, HW_BG_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_OBJ_VRAM, HW_OBJ_VRAM_SIZE);
-    sys_memset32(0, (void *)HW_DB_OBJ_VRAM, HW_DB_OBJ_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_BG_VRAM, HW_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_OBJ_VRAM, HW_OBJ_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_OBJ_VRAM, HW_DB_OBJ_VRAM_SIZE);
 }
 
 static void Monolith_FreeBGSys(void) {

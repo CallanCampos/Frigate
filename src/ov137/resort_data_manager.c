@@ -320,7 +320,7 @@ void func_ov137_021f1ac0(ResortPersonData **datas) {
 
 ResortDataIter func_ov137_021f1ae0(ResortPersonData **datas, const u32 *kinds, u32 count) {
     ResortDataIter iter;
-    sys_memset(&iter, 0, sizeof(ResortDataIter));
+    MI_CpuFill8(&iter, 0, sizeof(ResortDataIter));
     iter.kindIndex = 0;
     iter.pos = sRanges[kinds[0]].start;
     return iter;

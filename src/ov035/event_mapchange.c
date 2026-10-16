@@ -153,9 +153,9 @@ void InitMapChangeEvent(EventMapChange *wk, GameSystem *gsys);
 GameEventReturnCode EventMapChangeBlackout_Callback(GameEvent *event, u32 *state, void *data);
 
 static inline void ClearLCDCVram(void) {
-    gfxSetLCDCBanks(0x1ff);
-    sys_memset32_fast(0, (void *)0x06800000, 0xa4000);
-    gfxDisableLCDCBanks();
+    GX_SetBankForLCDC(0x1ff);
+    MIi_CpuClearFast(0, (void *)0x06800000, 0xa4000);
+    GX_DisableBankForLCDC();
 }
 
 GameEvent *CreateGameEntryPointEvent(GameSystem *gsys, GameSystemProcData *procData) {

@@ -324,7 +324,7 @@ static FieldEffectTask *FieldTerrainEffectTCB_Create(FieldEffectTaskStore *store
     i = 0;
     do {
         if (!task->active) {
-            sys_memset(task, 0, sizeof(FieldEffectTask));
+            MI_CpuFill8(task, 0, sizeof(FieldEffectTask));
             task->active = TRUE;
             task->vtable = *vtable;
             task->param1 = param1;

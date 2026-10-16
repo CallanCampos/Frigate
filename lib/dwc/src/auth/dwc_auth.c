@@ -33,8 +33,8 @@ char gAuthUrl[128];
 static BOOL Auth_PrepareUrl(void) {
     if (data_ov011_02190698 == 1) {
         if (gAuthUrl[0] == '\0') {
-            func_0207a2c0(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                          data_ov011_0219069c);
+            OS_SNPrintf(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
+                        data_ov011_0219069c);
         }
         return TRUE;
     }
@@ -44,8 +44,8 @@ static BOOL Auth_PrepareUrl(void) {
 char *Auth_GetUrl(void) {
     if (data_ov011_02190698 == 1) {
         if (gAuthUrl[0] == '\0') {
-            func_0207a2c0(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                          data_ov011_0219069c);
+            OS_SNPrintf(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
+                        data_ov011_0219069c);
         }
         return gAuthUrl;
     }

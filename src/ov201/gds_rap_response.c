@@ -117,7 +117,7 @@ int GdsRapResponse_GetBattleVideoList(GdsRapWork *gdsrap, POKE_NET_GDS_BATTLEDAT
         count = max;
         GFL_ASSERT(0);
     }
-    sys_memset(list, 0, sizeof(POKE_NET_GDS_BATTLEDATA_OUTLINE) * max);
+    MI_CpuFill8(list, 0, sizeof(POKE_NET_GDS_BATTLEDATA_OUTLINE) * max);
 
     data = param->Data;
     for (i = 0; i < count; i++) {

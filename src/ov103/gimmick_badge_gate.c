@@ -313,7 +313,7 @@ GameEvent *BadgeGate_CreateCheckEvent(GameSystem *gsys, u8 badge) {
     event = GameEvent_Create(gsys, NULL, BadgeGate_CheckEvent, sizeof(BadgeGateCheckEventData));
     data = GameEvent_GetData(event);
     GSYS_GetGameData(gsys);
-    sys_memset(data, 0, sizeof(BadgeGateCheckEventData));
+    MI_CpuFill8(data, 0, sizeof(BadgeGateCheckEventData));
     data->badge = badge;
     data->state = 0;
     data->gimmickWork = Field_GetGimmickWorkBlock(field, 0);
@@ -412,7 +412,7 @@ GameEvent *BadgeGate_CreateLastGateEvent(GameSystem *gsys) {
     event = GameEvent_Create(gsys, NULL, BadgeGate_LastGateEvent, sizeof(BadgeGateLastEventData));
     data = GameEvent_GetData(event);
     GSYS_GetGameData(gsys);
-    sys_memset(data, 0, sizeof(BadgeGateLastEventData));
+    MI_CpuFill8(data, 0, sizeof(BadgeGateLastEventData));
     data->gimmickWork = Field_GetGimmickWorkBlock(field, 0);
     data->camera = Field_GetCameraSystem(field);
     data->field = field;

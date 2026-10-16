@@ -220,7 +220,7 @@ static void UnionEff_StartFocus(FocusMan *focus_man, FieldActor *actor) {
 }
 
 static void UnionEff_InitFocusSlot(FocusMan *focus_man, UnionEffSlot *slot, FieldActor *actor, u16 serial) {
-    sys_memset(slot, 0, sizeof(UnionEffSlot));
+    MI_CpuFill8(slot, 0, sizeof(UnionEffSlot));
     slot->actor = actor;
     slot->serial = serial;
     slot->model = GFL_G3DMdlCreate(focus_man->res_nsbmd, 0, focus_man->res_nsbmd);
@@ -233,7 +233,7 @@ static void UnionEff_FreeFocusSlot(UnionEffSlot *slot) {
     GFL_G3DAnmFree(slot->anm);
     GFL_G3DActorFree(slot->g3dActor);
     GFL_G3DMdlFree(slot->model);
-    sys_memset(slot, 0, sizeof(UnionEffSlot));
+    MI_CpuFill8(slot, 0, sizeof(UnionEffSlot));
 }
 
 static void UnionEff_StepFocusSlot(UnionEffSlot *slot) {
@@ -326,7 +326,7 @@ static void UnionEff_StartMark(MarkMan *mark_man, FieldActor *actor, BOOL asonda
 }
 
 static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldActor *actor, u16 serial, BOOL asonda) {
-    sys_memset(slot, 0, sizeof(UnionEffSlot));
+    MI_CpuFill8(slot, 0, sizeof(UnionEffSlot));
     slot->actor = actor;
     slot->serial = serial;
     if (asonda == FALSE) {
@@ -340,7 +340,7 @@ static void UnionEff_InitMarkSlot(MarkMan *mark_man, UnionEffSlot *slot, FieldAc
 static void UnionEff_FreeMarkSlot(UnionEffSlot *slot) {
     GFL_G3DActorFree(slot->g3dActor);
     GFL_G3DMdlFree(slot->model);
-    sys_memset(slot, 0, sizeof(UnionEffSlot));
+    MI_CpuFill8(slot, 0, sizeof(UnionEffSlot));
 }
 
 static void UnionEff_StepMarkSlot(UnionEffSlot *slot) {

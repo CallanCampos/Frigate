@@ -104,7 +104,7 @@ void AppMenuCommon_LoadBarScreen(ArcTool *arc, u8 bg, HeapID heapId, u32 charBas
     void *file = GFL_G2DIOReadNSCRArc(arc, BAR_SCREEN_FILE, FALSE, &screen, heapId);
     int i;
 
-    sys_memcpy((u16 *)screen->rawData + BAR_SCREEN_START, dest + BAR_SCREEN_START, BAR_SCREEN_TILES * sizeof(u16));
+    MI_CpuCopy8((u16 *)screen->rawData + BAR_SCREEN_START, dest + BAR_SCREEN_START, BAR_SCREEN_TILES * sizeof(u16));
     GFL_HeapFree(file);
 
     for (i = 0; i < BAR_SCREEN_TILES; i++) {

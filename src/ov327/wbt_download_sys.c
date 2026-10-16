@@ -102,7 +102,7 @@ static BOOL WbtDownload_Init(GameProc *proc, u32 *state, void *param, void *work
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_DOWNLOAD, 0x20000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WbtDownloadWork), HEAPID_WBT_DOWNLOAD);
-    sys_memset(wk, 0, sizeof(WbtDownloadWork));
+    MI_CpuFill8(wk, 0, sizeof(WbtDownloadWork));
     wk->buffer = GFL_HeapAllocate(HEAPID_WBT_DOWNLOAD, 0xe000, TRUE, "wbt_download_sys.c", 225);
     wk->param = param;
     WbtDownloadSeq_Init(&wk->seq, sWbtDownloadSteps, wk, HEAPID_WBT_DOWNLOAD);
@@ -141,7 +141,7 @@ static BOOL WbtDownload_Main(GameProc *proc, u32 *state, void *param, void *work
 
 static void WbtDownloadSeq_Init(WbtDownloadSeq *p_wk, const WbtDownloadStep *steps, WbtDownloadWork *p_userdata,
                                 HeapID heapId) {
-    sys_memset(p_wk, 0, sizeof(WbtDownloadSeq));
+    MI_CpuFill8(p_wk, 0, sizeof(WbtDownloadSeq));
     p_wk->p_manager = CreateGameProcManager(heapId);
     p_wk->p_userdata = p_userdata;
     p_wk->steps = steps;
@@ -199,7 +199,7 @@ static BOOL WbtDownloadSeq_Update(WbtDownloadSeq *p_wk) {
 static void WbtDownloadSeq_Free(WbtDownloadSeq *p_wk) {
     GFL_ASSERT(p_wk->p_proc_param == NULL);
     FreeGameProcManager(p_wk->p_manager);
-    sys_memset(p_wk, 0, sizeof(WbtDownloadSeq));
+    MI_CpuFill8(p_wk, 0, sizeof(WbtDownloadSeq));
 }
 
 static void WbtDownloadSeq_SetNext(WbtDownloadSeq *p_wk, u32 step) {

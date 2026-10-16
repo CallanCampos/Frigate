@@ -50,7 +50,7 @@ void FreeLinkFestival(LinkFestival *festival) {
     LinkFestivalBest_Free(festival->best);
     GFL_HeapFree(festival->headers);
     GFL_ArcToolFree(festival->archive);
-    sys_memset(festival, 0, sizeof(LinkFestival));
+    MI_CpuFill8(festival, 0, sizeof(LinkFestival));
     GFL_HeapFree(festival);
 }
 
@@ -107,7 +107,7 @@ void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *rankin
     int count;
     u8 order[LINK_FESTIVAL_RECORD_COUNT];
 
-    sys_memset(ranking, 0, sizeof(LinkFestivalRanking));
+    MI_CpuFill8(ranking, 0, sizeof(LinkFestivalRanking));
     ranking->count = festival->recordCount + 1;
     ranking->score = festival->config.missionId;
     ranking->total = LinkFestival_GetTotalScore(festival);
@@ -404,7 +404,7 @@ LinkFestivalBest *LinkFestivalBest_Create(HeapID heapId) {
 
 void LinkFestivalBest_Free(LinkFestivalBest *best) {
     GFL_StrBufFree(best->name);
-    sys_memset(best, 0, sizeof(LinkFestivalBest));
+    MI_CpuFill8(best, 0, sizeof(LinkFestivalBest));
     GFL_HeapFree(best);
 }
 
@@ -464,7 +464,7 @@ static void ClearLinkFestivalData(LinkFestival *festival) {
     festival->unk14 = 0;
     festival->lastTotal = 0;
     festival->zoneId = 0xffff;
-    sys_memset(festival->entries, 0, sizeof(festival->entries));
+    MI_CpuFill8(festival->entries, 0, sizeof(festival->entries));
     festival->bestChanged = FALSE;
     FestMissionLog_Clear(&festival->log);
     FestMissionLog_Clear(&festival->unk37C);
@@ -504,12 +504,12 @@ static BOOL FestMissionRecord_Matches(const FestMissionRecord *record, const Fes
 }
 
 static void FestMissionRecord_Clear(FestMissionRecord *record) {
-    sys_memset(record, 0, sizeof(FestMissionRecord));
+    MI_CpuFill8(record, 0, sizeof(FestMissionRecord));
     record->header.index = FEST_MISSION_NONE;
 }
 
 void func_02014c78(FestMissionEntry *entry) {
-    sys_memset(entry, 0, sizeof(FestMissionEntry));
+    MI_CpuFill8(entry, 0, sizeof(FestMissionEntry));
     ClearFesMissionCfg(&entry->config);
     FestMissionRecord_Clear(&entry->record);
 }

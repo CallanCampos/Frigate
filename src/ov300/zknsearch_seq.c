@@ -138,8 +138,8 @@ static int ZknSearchSeq_Init(ZknSearchWork *wk) {
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetDisplayLayout(0);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     if (func_0200d1f8(wk->param->pokedex) == 1) {
         wk->param->criteria->regional = 0;
     } else {
@@ -181,8 +181,8 @@ static int ZknSearchSeq_Exit(ZknSearchWork *wk) {
     ZknSearchBmp_Exit(wk);
     ZknSearchMain_ExitMsg(wk);
     ZknSearchMain_ExitBG();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
@@ -210,8 +210,8 @@ static int ZknSearchSeq_MainInit(ZknSearchWork *wk) {
     ZknSearchMain_RequestBGOn(wk);
     if (wk->page == ZKNSEARCH_NONE) {
         ZknSearchUI_InitCursor(wk, ZKNSEARCH_UI_ORDER);
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
         ZknSearchMain_StartFrameMove(wk, -8);
         ZknSearchMain_StartFade(wk, 16, 0);
         return SEQ_MAIN;

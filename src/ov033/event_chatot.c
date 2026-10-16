@@ -41,7 +41,7 @@ GameEvent *func_ov033_02178ca8(GameSystem *gsys, Field *field, u8 partyIndex) {
 
     event = GameEvent_Create(gsys, NULL, func_ov033_02178d10, sizeof(ChatotEventWork));
     work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(ChatotEventWork));
+    MI_CpuFill8(work, 0, sizeof(ChatotEventWork));
     work->gsys = gsys;
     work->gameData = GSYS_GetGameData(gsys);
     work->chatter = getChatterBlockAddress(GameData_GetSaveControl(work->gameData));

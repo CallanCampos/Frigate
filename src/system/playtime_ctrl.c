@@ -23,7 +23,7 @@ void GameSystemTimer_Start(void) {
     g_GameSysTimer.active = TRUE;
     g_GameSysTimer.lastTick = 0;
     g_GameSysTimer.seconds = 0;
-    g_GameSysTimer.startTick = clock();
+    g_GameSysTimer.startTick = OS_GetTick();
 }
 
 void GameSystemTimer_Update(GameData *gameData) {
@@ -33,7 +33,7 @@ void GameSystemTimer_Update(GameData *gameData) {
     if (g_GameSysTimer.active == FALSE) {
         return;
     }
-    tick = clock();
+    tick = OS_GetTick();
     if (tick < g_GameSysTimer.lastTick) {
         tick += g_GameSysTimer.lastTick;
     } else {
@@ -45,7 +45,7 @@ void GameSystemTimer_Update(GameData *gameData) {
         if (g_GameSysTimer.lastTick == tick) {
             g_GameSysTimer.seconds = seconds;
         } else {
-            tick = clock();
+            tick = OS_GetTick();
             g_GameSysTimer.startTick = tick;
             g_GameSysTimer.seconds = OS_TicksToSeconds(tick);
             g_GameSysTimer.lastTick = tick;

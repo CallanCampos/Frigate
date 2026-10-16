@@ -20,7 +20,7 @@ static BOOL DendouDemo_Init(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_DENDOU_DEMO, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(DDemoWork), HEAPID_DENDOU_DEMO);
-    sys_memset(wk, 0, sizeof(DDemoWork));
+    MI_CpuFill8(wk, 0, sizeof(DDemoWork));
     wk->param = param;
     func_02038bc8(1);
     return TRUE;

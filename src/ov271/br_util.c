@@ -230,7 +230,7 @@ static inline void BrList_UpdateArrow(BrList *p_wk) {
 BrMsgWin *BrMsgWin_Init(u16 frame, u8 x, u8 y, u8 w, u8 h, u8 plt, PrintQueue *que, HeapID heapId) {
     BrMsgWin *p_wk = GFL_HeapAllocate(heapId, sizeof(BrMsgWin), FALSE, "br_util.c", 95);
 
-    sys_memset(p_wk, 0, sizeof(BrMsgWin));
+    MI_CpuFill8(p_wk, 0, sizeof(BrMsgWin));
     p_wk->clear_color = 0;
     p_wk->que = que;
     p_wk->frame = frame;
@@ -308,7 +308,7 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
     int i;
 
     p_wk = GFL_HeapAllocate(heapId, size, FALSE, "br_util.c", 417);
-    sys_memset(p_wk, 0, size);
+    MI_CpuFill8(p_wk, 0, size);
     p_wk->param = *cp_param;
     p_wk->unk3C = 0;
     p_wk->list_max = cp_param->list_max;
@@ -355,7 +355,7 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
         u32 display;
         BOOL ret;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         if (cp_param->frame < BGSYS_BG_SUB) {
             BrRes_LoadOBJ(p_wk->param.res, 7, heapId);
             ret = BrRes_GetObjData(p_wk->param.res, 7, &obj);
@@ -387,7 +387,7 @@ BrList *BrList_Init(const BrListParam *cp_param, HeapID heapId) {
         BrResObjData obj;
         BOOL ret;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.y = 72;
         setup.sequence = 5;
         setup.priority = 0;
@@ -562,7 +562,7 @@ static void BrList_BlitBmp(GFLBitmap *src, GFLBitmap *dst, u16 src_x, u16 src_y,
     u8 *p_src = GFL_BitmapGetPixelData(src);
     u8 *p_dst = GFL_BitmapGetPixelData(dst);
 
-    sys_memcpy32(p_src + (w * src_y + src_x) * 0x20, p_dst + (w * dst_y + dst_x) * 0x20, w * h * 0x20);
+    MIi_CpuCopy32(p_src + (w * src_y + src_x) * 0x20, p_dst + (w * dst_y + dst_x) * 0x20, w * h * 0x20);
 }
 
 static BOOL BrList_Move_Touch(BrList *p_wk, s32 dir) {
@@ -676,7 +676,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
     WordSet *wordset;
 
     p_wk = GFL_HeapAllocate(heapId, sizeof(BrProfile), FALSE, "br_util.c", 1345);
-    sys_memset(p_wk, 0, sizeof(BrProfile));
+    MI_CpuFill8(p_wk, 0, sizeof(BrProfile));
     p_wk->res = res;
     font = BrRes_GetFont(res);
     p_wk->pms = PMSDraw_Create(unit, CLACT_VRAM_MAIN, que, font, 7, 1, heapId);
@@ -788,7 +788,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
                                               CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
             GFL_ArcToolFree(handle);
 
-            sys_memset(&setup, 0, sizeof(ClActorSetup));
+            MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
             setup.x = 75;
             setup.y = 64;
             setup.sequence = 1;
@@ -837,7 +837,7 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
     {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = 48;
         setup.y = 64;
         p_wk->trainer = func_0204c040(unit, p_wk->trainerChr, p_wk->trainerPlt, p_wk->trainerCel, &setup,
@@ -891,7 +891,7 @@ BOOL BrProfile_Main(BrProfile *p_wk) {
 BrSeq *BrSeq_Init(void *p_wk_adrs, BrSeqFunc seq_function, HeapID heapId) {
     BrSeq *p_wk = GFL_HeapAllocate(heapId, sizeof(BrSeq), FALSE, "br_util.c", 1698);
 
-    sys_memset(p_wk, 0, sizeof(BrSeq));
+    MI_CpuFill8(p_wk, 0, sizeof(BrSeq));
     p_wk->p_wk_adrs = p_wk_adrs;
     BrSeq_SetNext(p_wk, seq_function);
     return p_wk;
@@ -928,7 +928,7 @@ BrBallEffect *BrBallEff_Init(ClActUnit *unit, BrRes *res, u32 display, HeapID he
     BrBallEffect *p_wk = GFL_HeapAllocate(heapId, sizeof(BrBallEffect), FALSE, "br_util.c", 1994);
     int i;
 
-    sys_memset(p_wk, 0, sizeof(BrBallEffect));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBallEffect));
     p_wk->res = res;
     p_wk->display = display;
     p_wk->seq = BrSeq_Init(p_wk, BrBallEff_Seq_Wait, heapId);
@@ -938,7 +938,7 @@ BrBallEffect *BrBallEff_Init(ClActUnit *unit, BrRes *res, u32 display, HeapID he
         BrResObjData obj;
         BOOL ret;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         ret = BrRes_GetObjData(p_wk->res, display + 9, &obj);
         GFL_ASSERT(ret);
         for (i = 0; i < BR_BALL_NUM; i++) {
@@ -1337,7 +1337,7 @@ static void BrBallEff_Seq_Ring(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
 
 static void BrBallCircle_Init(BrBallCircle *p_wk, const BrPoint *cp_center, u16 r_start, u16 r_end, u16 rot_start,
                               u16 rot_end, s32 sync_max) {
-    sys_memset(p_wk, 0, sizeof(BrBallCircle));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBallCircle));
     p_wk->r_start = r_start;
     p_wk->r_end = r_end;
     p_wk->rot_start = rot_start;
@@ -1368,7 +1368,7 @@ static BOOL BrBallCircle_Main(BrBallCircle *p_wk, BrPoint *p_now, s32 sync) {
 }
 
 static void BrBallRot_Init(BrBallRot *p_wk, const BrPoint *cp_center, u16 r, u16 rot, s32 sync_max) {
-    sys_memset(p_wk, 0, sizeof(BrBallRot));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBallRot));
     p_wk->center = *cp_center;
     p_wk->sync_max = sync_max;
     p_wk->r = r;
@@ -1391,7 +1391,7 @@ static BOOL BrBallRot_Main(BrBallRot *p_wk, BrPoint *p_now, s32 sync) {
 
 static void BrBallLine_Init(BrBallLine *p_wk, const BrPoint *cp_start, const BrPoint *cp_end, s32 sync_start,
                             s32 sync_max) {
-    sys_memset(p_wk, 0, sizeof(BrBallLine));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBallLine));
     p_wk->start = *cp_start;
     p_wk->end = *cp_end;
     p_wk->sync_max = sync_max;
@@ -1419,7 +1419,7 @@ static BOOL BrBallLine_Main(BrBallLine *p_wk, BrPoint *p_now, s32 sync) {
 }
 
 static void BrBallFollow_Init(BrBallFollow *p_wk, const BrPoint *cp_target, const BrPoint *cp_start, fx32 speed) {
-    sys_memset(p_wk, 0, sizeof(BrBallFollow));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBallFollow));
     p_wk->target = cp_target;
     p_wk->x = FX32_CONST(cp_start->x);
     p_wk->y = FX32_CONST(cp_start->y);

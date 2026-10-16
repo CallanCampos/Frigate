@@ -350,7 +350,7 @@ static BOOL BtlRecSelProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BTL_REC_SEL, 0x50000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BtlRecSelWork), HEAPID_BTL_REC_SEL);
-    sys_memset(wk, 0, sizeof(BtlRecSelWork));
+    MI_CpuFill8(wk, 0, sizeof(BtlRecSelWork));
     wk->heapId = HEAPID_BTL_REC_SEL;
     for (i = 0; i <= BGSYS_BG_COUNT - 1; i++) {
         GFL_BGSysSetBGEnabled(i, FALSE);
@@ -1347,7 +1347,7 @@ static void BtlRecSel_InitSubBG(BtlRecSelParam *param, BtlRecSelWork *work) {
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    gfxSetBGModeB(0);
+    GXS_SetGraphicsMode(0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sBtlRecSelSubBGSetups); i++) {
         GFL_BGSysCreateBG(sBtlRecSelSubBGSetups[i].bg, &sBtlRecSelSubBGSetups[i].setup, sBtlRecSelSubBGSetups[i].mode);

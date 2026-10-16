@@ -287,7 +287,7 @@ int WorldTrade_Upload_Main(WorldTradeWork *wk, int seq) {
 }
 
 int WorldTrade_Upload_End(WorldTradeWork *wk, int seq) {
-    if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
         WorldTrade_SetPartnerExchangePosIsReturns(wk);
     }
     Upload_FreeWork(wk);
@@ -522,7 +522,7 @@ static int Upload_SubSeqEvilCheckResult(WorldTradeWork *wk) {
         case HTTP_STATUS_OK:
             wk->evilCheckStatus = NHttpRap_GetCheckStatus(body);
             wk->evilCheckResult = NHttpRap_GetCheckResult(body, 0);
-            sys_memcpy(NHttpRap_GetCheckSignature(body, 1), wk->evilCheckSign, sizeof(wk->evilCheckSign));
+            MI_CpuCopy8(NHttpRap_GetCheckSignature(body, 1), wk->evilCheckSign, sizeof(wk->evilCheckSign));
             NHttpRap_FreePostData(wk->evilCheck);
             NHttpRap_Destroy(wk->evilCheck);
             if (wk->evilCheckStatus == 0) {
@@ -566,7 +566,7 @@ static int Upload_SubSeqNameCheckStart(WorldTradeWork *wk) {
     u32 i;
 
     GFL_StrBufLoadFixedString(name, wk->uploadPokemonData.name, 8);
-    sys_memset(&wk->nameCheck, 0, sizeof(WorldTradeNameCheck));
+    MI_CpuFill8(&wk->nameCheck, 0, sizeof(WorldTradeNameCheck));
     wk->nameCheck.unk24 = HEAPID_WORLDTRADE;
     str = GFL_StrBufGetStringPtr(name);
     for (i = 0; i < (u32)GFL_StrBufGetCharCount(name) + 1; i++) {
@@ -1107,7 +1107,7 @@ static void Upload_MakeTradeExchangeInfo(WorldTradeWork *wk, PartyPkm *received,
     GFL_HeapFree(partner);
 
     visitorInfo = WorldTrade_MakePartnerStatus(trData);
-    sys_memset(&visitor, 0, sizeof(UnityTowerVisitor));
+    MI_CpuFill8(&visitor, 0, sizeof(UnityTowerVisitor));
     func_02008b34(visitorInfo, &visitor.info);
     visitor.sentSpecies =
         sent != NULL ? (u16)PokeParty_GetParam(sent, PKM_PARAM_SPECIES, NULL) : (u16)trData->postSimple.characterNo;
@@ -1456,7 +1456,7 @@ static int Upload_SubSeqTimeoutSaveWait(WorldTradeWork *wk) {
 static int Upload_SubSeqEnd(WorldTradeWork *wk) {
     WorldTrade_TimeIconDel(wk);
     if (wk->subOutFlag == 1) {
-        if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) == -16) {
+        if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == -16) {
             GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);

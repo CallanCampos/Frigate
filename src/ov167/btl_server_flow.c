@@ -74,10 +74,10 @@ void func_ov167_0219f400(BtlServerFlow *flow) {
     BtlWazaRec_Init(&flow->wazaRec);
     BtlFaintRec_Init(&flow->faintRec);
     BtlPosPoke_Init(&flow->posPoke, flow->mainModule, flow->pokeCon, BtlSetup_GetBattleStyle(flow->mainModule));
-    sys_memset(flow->unk7A9, 0, sizeof(flow->unk7A9));
-    sys_memset(flow->unk7C1, 0, sizeof(flow->unk7C1));
-    sys_memset(flow->unk7D9, 0, sizeof(flow->unk7D9));
-    sys_memset(flow->unk4D4, 0, sizeof(flow->unk4D4));
+    MI_CpuFill8(flow->unk7A9, 0, sizeof(flow->unk7A9));
+    MI_CpuFill8(flow->unk7C1, 0, sizeof(flow->unk7C1));
+    MI_CpuFill8(flow->unk7D9, 0, sizeof(flow->unk7D9));
+    MI_CpuFill8(flow->unk4D4, 0, sizeof(flow->unk4D4));
     func_ov167_021ab730(flow->unk1F80);
     func_ov167_021ac0c8(flow);
     func_ov167_021bda58(&flow->clientIdList);
@@ -7140,7 +7140,7 @@ void ServerEvent_NotifyAirLock(BtlServerFlow *flow) {
 }
 
 void func_ov167_021ab730(u16 *counts) {
-    sys_memset(counts, 0, 6 * sizeof(u16));
+    MI_CpuFill8(counts, 0, 6 * sizeof(u16));
 }
 
 // Counts the effectiveness of the hits between the player's mons and their opponents', for the records
@@ -7732,13 +7732,13 @@ void func_ov167_021ac114(BtlServerFlow *flow, u32 depth, BOOL clear) {
         BtlMonSet_Clear(flow->unk864);
         BtlMonSet_Clear(flow->unk868);
         func_ov167_021a0c88(flow->moveEffect);
-        sys_memset(flow->unk1AB0, 0, sizeof(BtlFlowMoveParam));
-        sys_memset(flow->unk1AB4, 0, sizeof(BtlFlowMoveParam));
-        sys_memset(flow->unk4B4, 0, sizeof(BtlFlowHitWork));
-        sys_memset(flow->unk4AC, 0, sizeof(BtlFlowReactionList));
-        sys_memset(flow->unk4B0, 0, sizeof(BtlFlowReactionList));
-        sys_memset(flow->unk86C, 0, sizeof(BtlFlowDamageList));
-        sys_memset(flow->unk870, 0, sizeof(BtlFlowDamageList));
+        MI_CpuFill8(flow->unk1AB0, 0, sizeof(BtlFlowMoveParam));
+        MI_CpuFill8(flow->unk1AB4, 0, sizeof(BtlFlowMoveParam));
+        MI_CpuFill8(flow->unk4B4, 0, sizeof(BtlFlowHitWork));
+        MI_CpuFill8(flow->unk4AC, 0, sizeof(BtlFlowReactionList));
+        MI_CpuFill8(flow->unk4B0, 0, sizeof(BtlFlowReactionList));
+        MI_CpuFill8(flow->unk86C, 0, sizeof(BtlFlowDamageList));
+        MI_CpuFill8(flow->unk870, 0, sizeof(BtlFlowDamageList));
         flow->unk77F = 6;
         flow->unk78A_3 = 0;
         flow->unk78A_4 = 0;
@@ -7746,7 +7746,7 @@ void func_ov167_021ac114(BtlServerFlow *flow, u32 depth, BOOL clear) {
 }
 
 void BattleHandler_StrClear(BattleHandlerString *string) {
-    sys_memset(string, 0, 0x28);
+    MI_CpuFill8(string, 0, 0x28);
     string->enabled = 0;
 }
 

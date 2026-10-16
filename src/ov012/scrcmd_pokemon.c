@@ -438,7 +438,7 @@ BOOL s010C_PokePartyAdd(VM *vm, FieldScriptEnv *env) {
     species = ScriptReadAny(vm, env);
     form = ScriptReadAny(vm, env);
     level = ScriptReadAny(vm, env);
-    sys_memset(&params, 0, sizeof(BoxPkmCreateParams));
+    MI_CpuFill8(&params, 0, sizeof(BoxPkmCreateParams));
     params.heapId = heapId;
     params.species = species;
     params.form = form;
@@ -480,7 +480,7 @@ BOOL s010E_PokePartyAddEx(VM *vm, FieldScriptEnv *env) {
     param1C = ScriptReadAny(vm, env);
     item = ScriptReadAny(vm, env);
     ball = ScriptReadAny(vm, env);
-    sys_memset(&params, 0, sizeof(BoxPkmCreateParams));
+    MI_CpuFill8(&params, 0, sizeof(BoxPkmCreateParams));
     params.heapId = heapId;
     params.species = species;
     params.form = form;
@@ -530,7 +530,7 @@ BOOL s02EA_PokePartyAddNPoke(VM *vm, FieldScriptEnv *env) {
     unk7 = ScriptReadAny(vm, env);
     unk6 = ScriptReadAny(vm, env);
     pkm = GFL_HeapAllocate(HEAPID_TAIL(heapId), PokeParty_GetPkmRawSize(), TRUE, "scrcmd_pokemon.c", 0x3bd);
-    sys_memset(&spec, 0, sizeof(NPokeSpec));
+    MI_CpuFill8(&spec, 0, sizeof(NPokeSpec));
     spec.species = species;
     spec.level = level;
     spec.nature = unk5;

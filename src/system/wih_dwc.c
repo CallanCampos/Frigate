@@ -1,5 +1,7 @@
 #include "types.h"
 #include "app/comm_tvt_field.h"
+#include "dwc/apinfo.h"
+#include "dwc/bm.h"
 #include "gfl/net.h"
 #include "gfl/net_whpipe.h"
 #include "gfl/overlay.h"
@@ -79,7 +81,7 @@ void *func_02012908(int num, HeapID heapId) {
     // clang-format on
     work = allocConfigDSSoftwareFeature(heapId, sizeof(WihDwcWork), "wih_dwc.c", 73);
     work->num = num;
-    work->parseWork = allocConfigDSSoftwareFeature(heapId, func_0205b588(), "wih_dwc.c", 76);
+    work->parseWork = allocConfigDSSoftwareFeature(heapId, DWCi_GetBssDescParseWorkSize(), "wih_dwc.c", 76);
     WH_SetScanInfoCallback(scanInfoCallback);
     _localWork = work;
     work->config = _localcfg;
@@ -112,7 +114,7 @@ void func_020129f8(void) {
 
 static void scanInfoCallback(const void *beacon, void *work, u16 linkLevel) {
     if (_localWork->num != 0 && _localWork->count < _localWork->num && _localWork->count < _ALLBEACON_MAX) {
-        sys_memcpy(beacon, &_localWork->bss[_localWork->count], sizeof(WMBssDesc));
+        MI_CpuCopy8(beacon, &_localWork->bss[_localWork->count], sizeof(WMBssDesc));
         _localWork->count++;
     }
 }
@@ -146,18 +148,18 @@ static BOOL isConfiguredAP(WMBssDesc *bss) {
     ssid[0x20] = '\0';
     for (i = 0; i < WIFI_SLOT_COUNT; i++) {
         for (j = 0; j < WIFI_SLOT_SSID_COUNT; j++) {
-            sys_memcpy(_localWork->config->slots[i].ssid[j], ssid, 0x20);
+            MI_CpuCopy8(_localWork->config->slots[i].ssid[j], ssid, 0x20);
             length = GFL_STD_StrLen(ssid);
             if (length > 0 && GFL_STD_MemCmp(ssid, bss->ssid, length) == 0) {
                 return TRUE;
             }
-            sys_memcpy(_localWork->config->slotsEx[i].base.ssid[j], ssid, 0x20);
+            MI_CpuCopy8(_localWork->config->slotsEx[i].base.ssid[j], ssid, 0x20);
             length = GFL_STD_StrLen(ssid);
             if (length > 0 && GFL_STD_MemCmp(ssid, bss->ssid, length) == 0) {
                 return TRUE;
             }
             if (_localWork->config->slotsEx[i].base.type == 0x11) {
-                sys_memcpy(_localWork->config->slotsEx[i].ex.ssid[j], ssid, 0x20);
+                MI_CpuCopy8(_localWork->config->slotsEx[i].ex.ssid[j], ssid, 0x20);
                 length = GFL_STD_StrLen(ssid);
                 if (length > 0 && GFL_STD_MemCmp(ssid, bss->ssid, length) == 0) {
                     return TRUE;
@@ -223,7 +225,7 @@ u32 func_02012be4(WifiList *wifiList) {
             _localWork->timers[AP_TIMER_KNOWN] = AP_KNOWN_FRAMES;
         } else if (isFreeSpot(bss)) {
             _localWork->timers[AP_TIMER_HOTSPOT] = AP_KNOWN_FRAMES;
-        } else if (func_0205b594(_localWork->parseWork, bss, &apInfo)) {
+        } else if (DWCi_BssDescToApInfo(_localWork->parseWork, bss, &apInfo)) {
             switch (apInfo.apType) {
             case 0:
             case 1:
@@ -293,7 +295,7 @@ int func_02012e54(WifiList *wifiList) {
 
     if (func_02042788()) {
         func_02042e84();
-        func_0207c33c(mac);
+        OS_GetMacAddress(mac);
         for (i = 0; i < 16; i++) {
             if (func_ov030_02173b78(i) == 0x20 && CtvtBeacon_IsFriendInvite(func_020428a8(i), wifiList, mac)) {
                 return i;

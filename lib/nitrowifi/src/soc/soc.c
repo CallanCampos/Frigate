@@ -1,6 +1,7 @@
 #include "nitrowifi/soc.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "socl_internal.h"
 
 // soc.c: the BSD-style SOC_ calls over SOCL, which NitroWiFi's SOC_ API is (pokediamond's soc.o: the same calls under
@@ -121,8 +122,8 @@ SocHostEnt *SOC_GetHostByName(const char *host) {
     if (addr == 0) {
         return NULL;
     }
-    sys_memset(sHostName, 0, 0x101);
-    func_0207f7cc(sHostName, host, 0x101);
+    MI_CpuFill8(sHostName, 0, 0x101);
+    STD_CopyLString(sHostName, host, 0x101);
     sHostEnt.name = sHostName;
     sHostEnt.aliases = NULL;
     sHostEnt.addrType = POKE_NET_SOC_AF_INET;
@@ -260,9 +261,9 @@ char *SOC_InetNtoP(int family, const void *address, char *buffer, u32 size) {
     if (size < 16) {
         return NULL;
     }
-    sys_memcpy(address, &ip, 4);
+    MI_CpuCopy8(address, &ip, 4);
     SOC_U32to4U8(ip, octets);
-    func_0207a2c0(buffer, 16, "%d.%d.%d.%d", octets[3], octets[2], octets[1], octets[0]);
+    OS_SNPrintf(buffer, 16, "%d.%d.%d.%d", octets[3], octets[2], octets[1], octets[0]);
     return buffer;
 }
 
@@ -301,7 +302,7 @@ int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks) {
         if (timed && ticks <= 0) {
             break;
         }
-        func_0207aa04(1);
+        OS_Sleep(1);
         ticks -= 523; // One millisecond of OS ticks
     }
     return ready;

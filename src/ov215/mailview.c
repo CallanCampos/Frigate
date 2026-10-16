@@ -223,7 +223,7 @@ static void MailView_ExitFade(MailSysWork *work) {
     GFL_TCBRemove(work->blinkTask);
     func_0203a610(work->tcbMgr);
     GFL_HeapFree(work->tcbBuffer);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, 0, 31, 0);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0, 31, 0);
 }
 
 static void MailView_CreateWindows(MailSysWork *work) {

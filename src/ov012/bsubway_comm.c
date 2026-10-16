@@ -9,6 +9,7 @@
 #include "gfl/net_handle.h"
 #include "gfl/net_system.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "save/player_info.h"
 #include "system/game_data.h"
@@ -96,7 +97,7 @@ static void *func_ov012_02161858(void *work) {
     BSubwayBeacon *beacon = &bsw->beacon;
 
     func_02008b34(GetGameDataPlayerInfo(bsw->gameData), &beacon->playerInfo);
-    func_0207c33c(beacon->mac);
+    OS_GetMacAddress(beacon->mac);
     beacon->gameId = 0x3a0b;
     return beacon;
 }
@@ -142,7 +143,7 @@ static void func_ov012_021618d8(BSubwayScrWork *bsw, GameData *gameData) {
 }
 
 static void func_ov012_02161930(BSubwayScrWork *bsw) {
-    sys_memcpy(bsw->unk32, bsw->sendBuf, 14 * sizeof(u16));
+    MI_CpuCopy8(bsw->unk32, bsw->sendBuf, 14 * sizeof(u16));
 }
 
 static void func_ov012_02161948(BSubwayScrWork *bsw, u16 retire) {
@@ -278,7 +279,7 @@ static void func_ov012_02161b4c(int netId, int size, const void *data, void *wor
     if (netId == func_0203ffc4() || func_0203ffc4() == 0) {
         return;
     }
-    sys_memcpy(data, bsw->unk32, 14 * sizeof(u16));
+    MI_CpuCopy8(data, bsw->unk32, 14 * sizeof(u16));
 }
 
 static void func_ov012_02161b80(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -302,7 +303,7 @@ static void func_ov012_02161bbc(int netId, int size, const void *data, void *wor
     if (netId == func_0203ffc4()) {
         return;
     }
-    sys_memcpy(data, &bsw->partner, sizeof(PlayerInfo));
+    MI_CpuCopy8(data, &bsw->partner, sizeof(PlayerInfo));
 }
 
 static void func_ov012_02161be8(int netId, int size, const void *data, void *work, NetHandle *handle) {

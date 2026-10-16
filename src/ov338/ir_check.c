@@ -33,25 +33,25 @@ static u8 IrCheck_ReadId(void) {
     sTransfer.send = sSendBuffer;
     sTransfer.recv = &id;
     sSendBuffer[0] = IR_COMMAND_ID;
-    func_0206ef4c(sLockId);
-    func_0207a178(sLockId);
+    CARD_LockBackup(sLockId);
+    OS_LockCard(sLockId);
 
-    start = clock();
-    while (OS_TicksToMicroSeconds(clock() - start) < 60) {
+    start = OS_GetTick();
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 60) {
     }
     IrCheck_WaitBusy();
     IrCheck_SetControl(REG_MI_MCCNT0_MODE_MASK | 0x2);
     id = IrCheck_SendByte(&sTransfer);
 
-    start = clock();
-    while (OS_TicksToMicroSeconds(clock() - start) < 60) {
+    start = OS_GetTick();
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 60) {
     }
     IrCheck_SetControl(0x2);
     IrCheck_RecvByte(&sTransfer);
     IrCheck_WaitBusy();
 
-    func_0207a1a0(sLockId);
-    func_0206ef58(sLockId);
+    OS_UnLockCard(sLockId);
+    CARD_UnlockBackup(sLockId);
     return id;
 }
 
@@ -69,8 +69,8 @@ static u8 IrCheck_SendByte(IrTransfer *transfer) {
     // Read from the data register into a volatile copy, which the original keeps on the stack
     vu16 data;
 
-    start = clock();
-    while (OS_TicksToMicroSeconds(clock() - start) < 50) {
+    start = OS_GetTick();
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 50) {
     }
     reg_MI_MCD0 = *transfer->send;
     transfer->send++;
@@ -82,8 +82,8 @@ static u8 IrCheck_SendByte(IrTransfer *transfer) {
 static void IrCheck_RecvByte(IrTransfer *transfer) {
     u64 start;
 
-    start = clock();
-    while (OS_TicksToMicroSeconds(clock() - start) < 50) {
+    start = OS_GetTick();
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 50) {
     }
     reg_MI_MCD0 = 0;
     IrCheck_WaitBusy();

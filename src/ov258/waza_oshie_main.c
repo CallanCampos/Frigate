@@ -440,7 +440,7 @@ static BOOL WazaOshieProc_Init(GameProc *proc, u32 *state, void *param, void *wo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WAZA_OSHIE, 0x50000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WazaOshieWork), HEAPID_WAZA_OSHIE);
-    sys_memset(wk, 0, sizeof(WazaOshieWork));
+    MI_CpuFill8(wk, 0, sizeof(WazaOshieWork));
     wk->param = param;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_WAZA_OSHIE);
     wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_WAZA_OSHIE, HEAPID_WAZA_OSHIE, 32, 32);
@@ -1842,7 +1842,7 @@ static u32 WazaOshie_SeqMoveChosen(WazaOshieWork *work) {
 // Darkens the touch screen behind the yes/no menu
 static void WazaOshie_SetDimmed(BOOL dimmed) {
     if (dimmed == TRUE) {
-        gfxRegSetBrightnessBlend(
+        G2x_SetBlendBrightness_(
             REG_DB_BLDCNT_ADDR,
             GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
     } else {

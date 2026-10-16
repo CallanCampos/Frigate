@@ -1,5 +1,4 @@
 #include "app/download_play_wih.h"
-#include "gfl/net.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
@@ -25,7 +24,7 @@ BOOL func_ov182_021ba1a8(void) {
     u16 mac[3];
     u16 result;
 
-    func_0207c33c((u8 *)mac);
+    OS_GetMacAddress((u8 *)mac);
     gWork.work->seed = OS_GetVBlankCount() + mac[0] + mac[1] + mac[2];
     gWork.work->seed = gWork.work->seed * 69069 + 12345;
     gWork.work->channel = 0;
@@ -47,7 +46,7 @@ BOOL func_ov182_021ba1a8(void) {
 
 // Measures the next channel that is allowed, from the one given. 0x18 once there are none left
 static u16 func_ov182_021ba238(u16 channel) {
-    u16 allowed = func_020810cc();
+    u16 allowed = WM_GetAllowedChannel();
 
     if (allowed == 0x8000) {
         func_ov182_021b9c34(3);
@@ -104,5 +103,5 @@ static void func_ov182_021ba2a8(void *arg) {
 }
 
 static int func_ov182_021ba33c(WMCallbackFunc callback, u16 channel) {
-    return func_0208259c(callback, 3, 0x11, channel, 30);
+    return WM_MeasureChannel(callback, 3, 0x11, channel, 30);
 }

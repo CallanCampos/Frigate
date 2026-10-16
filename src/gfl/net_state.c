@@ -207,7 +207,7 @@ void func_02041354(const u8 *mac, BOOL parent) {
     GFL_ASSERT(((u32)_pNetState->aMacAddress%2)==0);
     // clang-format on
     if (mac != NULL) {
-        sys_memcpy(mac, _pNetState->aMacAddress, sizeof(_pNetState->aMacAddress));
+        MI_CpuCopy8(mac, _pNetState->aMacAddress, sizeof(_pNetState->aMacAddress));
     }
     if (parent) {
         func_0204115c(_pNetState, func_02041324, 0, 390);
@@ -495,9 +495,9 @@ static void func_02041b70(int mode, int a1, const u8 *mac) {
     _pNetState->unk53 = a1;
     _pNetState->mode = mode;
     if (mac != NULL) {
-        sys_memcpy(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));
+        MI_CpuCopy8(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));
     } else {
-        sys_memset(_pNetState->parentMac, 0xff, sizeof(_pNetState->parentMac));
+        MI_CpuFill8(_pNetState->parentMac, 0xff, sizeof(_pNetState->parentMac));
     }
     func_0204115c(_pNetState, func_02041af4, 0, 1020);
     func_02041af4(_pNetState);
@@ -516,9 +516,9 @@ void func_02041c00(int mode, int a1, const u8 *mac) {
     _pNetState->unk53 = a1;
     _pNetState->mode = mode;
     if (mac != NULL) {
-        sys_memcpy(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));
+        MI_CpuCopy8(mac, _pNetState->parentMac, sizeof(_pNetState->parentMac));
     } else {
-        sys_memset(_pNetState->parentMac, 0xff, sizeof(_pNetState->parentMac));
+        MI_CpuFill8(_pNetState->parentMac, 0xff, sizeof(_pNetState->parentMac));
     }
     if (_pNetState->mode == NET_STATE_MODE_PARENT) {
         func_0204115c(_pNetState, func_020415ec, 0, 1062);

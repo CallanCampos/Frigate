@@ -104,7 +104,7 @@ static BOOL BrCore_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BATTLE_RECORDER, 0x90000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrCoreWork), HEAPID_BATTLE_RECORDER);
-    sys_memset(wk, 0, sizeof(BrCoreWork));
+    MI_CpuFill8(wk, 0, sizeof(BrCoreWork));
     wk->param = coreParam;
     coreParam->mainParam->result = 0;
 
@@ -463,14 +463,14 @@ static void BrCore_BvRankBefore(void *param, void *work, const void *preParam, u
 
         p->mode = menuParam->nextMode;
         wk->param->data->bvRankMode = menuParam->nextMode;
-        sys_memset(p->listPos, 0, sizeof(BrListPos));
+        MI_CpuFill8(p->listPos, 0, sizeof(BrListPos));
     } else if (preID == BR_PROCID_BV_SEARCH) {
         const BrBvSearchProcParam *searchParam = preParam;
 
         p->mode = 3;
         p->search = searchParam->search;
         wk->param->data->bvRankMode = 3;
-        sys_memset(p->listPos, 0, sizeof(BrListPos));
+        MI_CpuFill8(p->listPos, 0, sizeof(BrListPos));
     } else if (preID == BR_PROCID_RECORD) {
         p->mode = wk->param->data->bvRankMode;
         p->isReturn = TRUE;
@@ -638,7 +638,7 @@ static void BrCore_LoadRecordInfo(BrRecordInfo *info, BOOL keepLoaded, GameData 
                 }
             }
         }
-        sys_memset(info, 0, sizeof(BrRecordInfo));
+        MI_CpuFill8(info, 0, sizeof(BrRecordInfo));
 
         for (i = 0; i < BR_RECORD_NUM; i++) {
             func_0200bc9c(save, HEAPID_TAIL(heapId), &result, i);

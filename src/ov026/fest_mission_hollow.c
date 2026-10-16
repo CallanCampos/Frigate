@@ -33,7 +33,7 @@ void FesMissionHollow_Setup(RivalSelectContext *context) {
     u8 hollows[20];
     int i;
 
-    sys_memset(entries, 0, sizeof(RivalEntry) * 10);
+    MI_CpuFill8(entries, 0, sizeof(RivalEntry) * 10);
     func_ov012_02168348(mission->unk1C, 0, &rand);
     for (i = 0; i < 20; i++) {
         hollows[i] = i;

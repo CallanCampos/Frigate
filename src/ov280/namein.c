@@ -481,7 +481,7 @@ BOOL NameEntry_ProcInit(GameProc *proc, u32 *state, void *arg, void *unused) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_NAMEIN, 0x70000);
     work = GFL_ProcInitSubsystem(proc, sizeof(NameEntryWork), HEAPID_NAMEIN);
-    sys_memset(work, 0, sizeof(NameEntryWork));
+    MI_CpuFill8(work, 0, sizeof(NameEntryWork));
     work->param = param;
     if (param->mode == NAME_ENTRY_PASSERBY_MESSAGE || param->mode == NAME_ENTRY_TRAINER_MESSAGE) {
         work->usesPresetNames = TRUE;
@@ -615,7 +615,7 @@ static void NameEntryObjs_Init(NameEntryObjs *objs, ClActUnit *unit, HeapID heap
     objs->chars = func_0204b81c(arc, 8, FALSE, 0, heapId);
     GFL_ArcToolFree(arc);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.sequence = 0;
     for (i = 0; i < NAME_SLOT_COUNT; i++) {
         objs->actors[i] = func_0204c040(unit, objs->chars, objs->palette, objs->cellAnims, &setup, 0, heapId);
@@ -667,7 +667,7 @@ static void KeyHighlight_Init(KeyHighlight *highlight, u32 type, NameEntryObjs *
     int i;
     int j;
 
-    sys_memset(highlight, 0, sizeof(KeyHighlight));
+    MI_CpuFill8(highlight, 0, sizeof(KeyHighlight));
     highlight->type = type;
     for (i = 0; i < 2; i++) {
         highlight->actors[i] = NameEntryObjs_Get(objs, 18 + i);
@@ -684,7 +684,7 @@ static void KeyHighlight_Init(KeyHighlight *highlight, u32 type, NameEntryObjs *
 }
 
 static void KeyHighlight_Clear(KeyHighlight *highlight) {
-    sys_memset(highlight, 0, sizeof(KeyHighlight));
+    MI_CpuFill8(highlight, 0, sizeof(KeyHighlight));
 }
 
 static void KeyHighlight_Set(KeyHighlight *highlight, u32 mode, const KeyRect *rect, u32 kanaPage, u32 type) {
@@ -731,7 +731,7 @@ static void KeyHighlight_Set(KeyHighlight *highlight, u32 mode, const KeyRect *r
     GFL_BGSysLoadScr(2);
     GFL_BGSysLoadScr(1);
     if (mode != 0) {
-        sys_memset(highlight->phase, 0, sizeof(highlight->phase));
+        MI_CpuFill8(highlight->phase, 0, sizeof(highlight->phase));
         highlight->timer = 0;
         highlight->active = TRUE;
     }
@@ -829,7 +829,7 @@ static void NameBox_Init(NameBox *box, StrBuf *name, u8 maxLength, Font *font, P
     int offset;
     int i;
 
-    sys_memset(box, 0, sizeof(NameBox));
+    MI_CpuFill8(box, 0, sizeof(NameBox));
     box->font = font;
     box->maxLength = maxLength;
     box->queue = queue;
@@ -895,7 +895,7 @@ static void NameBox_Free(NameBox *box) {
     }
     GFL_StrBufFree(box->buf);
     BmpWin_Free(box->window);
-    sys_memset(box, 0, sizeof(NameBox));
+    MI_CpuFill8(box, 0, sizeof(NameBox));
 }
 
 static BOOL NameBox_Update(NameBox *box) {
@@ -1215,7 +1215,7 @@ static BOOL NameEntry_IsGameSyncIdChar(u16 c) {
 static void KeyLayout_Init(KeyLayout *layout, u32 type, u32 index, const NameinKeyboardSet *keyboards, HeapID heapId) {
     int i;
 
-    sys_memset(layout, 0, sizeof(KeyLayout));
+    MI_CpuFill8(layout, 0, sizeof(KeyLayout));
     layout->keyboard = NameinData_GetKeyboard(keyboards, index);
     switch (type) {
     case KEYBOARD_TYPE_KANA:
@@ -1245,7 +1245,7 @@ static void KeyLayout_SetKeyboard(KeyLayout *layout, u32 index, const NameinKeyb
 }
 
 static void KeyLayout_Clear(KeyLayout *layout) {
-    sys_memset(layout, 0, sizeof(KeyLayout));
+    MI_CpuFill8(layout, 0, sizeof(KeyLayout));
 }
 
 // Returns what is at the position, and the character if it is one
@@ -1992,7 +1992,7 @@ static void Keyboard_Init(Keyboard *kb, u32 type, Font *font, PrintQueue *queue,
     BmpWin *window;
     KeyRect rect;
 
-    sys_memset(kb, 0, sizeof(Keyboard));
+    MI_CpuFill8(kb, 0, sizeof(Keyboard));
     kb->pos.x = 0;
     kb->pos.y = 0;
     kb->font = font;
@@ -2039,7 +2039,7 @@ static void Keyboard_Free(Keyboard *kb) {
     KeyHighlight_Clear(&kb->highlight);
     GFL_HeapFree(kb->screenData[0]);
     GFL_HeapFree(kb->screenData[1]);
-    sys_memset(kb, 0, sizeof(Keyboard));
+    MI_CpuFill8(kb, 0, sizeof(Keyboard));
 }
 
 static void Keyboard_Update(Keyboard *kb, NameBox *box) {
@@ -2049,7 +2049,7 @@ static void Keyboard_Update(Keyboard *kb, NameBox *box) {
         KeyInput input;
         BOOL acted;
 
-        sys_memset(&input, 0, sizeof(KeyInput));
+        MI_CpuFill8(&input, 0, sizeof(KeyInput));
         acted = Keyboard_HandleTouch(kb, &input);
         if (!acted) {
             Keyboard_HandleKeys(kb, &input);
@@ -2064,7 +2064,7 @@ static void Keyboard_Update(Keyboard *kb, NameBox *box) {
         KeyInput input;
         BOOL acted;
 
-        sys_memset(&input, 0, sizeof(KeyInput));
+        MI_CpuFill8(&input, 0, sizeof(KeyInput));
         acted = Keyboard_HandleTouchSlide(kb, &input);
         if (!acted) {
             Keyboard_HandleKeysSlide(kb, &input);
@@ -2153,16 +2153,16 @@ static BOOL Keyboard_StartSwitch(Keyboard *kb, u32 type) {
         }
         kb->hasUpperLayer = hasUpperLayer;
         if (hasUpperLayer) {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR,
-                                GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                                    GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
-                                16, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR,
+                               GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                                   GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                               16, 16);
         } else {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                                    GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
-                                16, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                                   GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                               16, 16);
         }
         return TRUE;
     }
@@ -2587,7 +2587,7 @@ static void NameEntryMessage_Init(NameEntryMessage *message, Font *font, MsgData
                                   WordSet *wordSet, HeapID heapId) {
     BmpWin *window;
 
-    sys_memset(message, 0, sizeof(NameEntryMessage));
+    MI_CpuFill8(message, 0, sizeof(NameEntryMessage));
     message->fillColor = 15;
     message->font = font;
     message->wordSet = wordSet;
@@ -2608,7 +2608,7 @@ static void NameEntryMessage_Init(NameEntryMessage *message, Font *font, MsgData
 static void NameEntryMessage_Free(NameEntryMessage *message) {
     BmpWin_Free(message->window);
     GFL_StrBufFree(message->buf);
-    sys_memset(message, 0, sizeof(NameEntryMessage));
+    MI_CpuFill8(message, 0, sizeof(NameEntryMessage));
 }
 
 static void NameEntryMessage_Print(NameEntryMessage *message, u32 messageId) {
@@ -2663,7 +2663,7 @@ static BOOL NameEntryMessage_IsPrintDone(NameEntryMessage *message) {
 }
 
 static void NameEntryTalk_Init(NameEntryTalk *talk, HeapID heapId) {
-    sys_memset(talk, 0, sizeof(NameEntryTalk));
+    MI_CpuFill8(talk, 0, sizeof(NameEntryTalk));
     talk->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 1, 0);
 }
 
@@ -2672,7 +2672,7 @@ static void NameEntryTalk_Free(NameEntryTalk *talk) {
         func_020223cc(talk->stream);
     }
     GFL_TCBExMgrFree(talk->tcbManager);
-    sys_memset(talk, 0, sizeof(NameEntryTalk));
+    MI_CpuFill8(talk, 0, sizeof(NameEntryTalk));
 }
 
 // Prints the message that the name was given
@@ -2722,7 +2722,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     u32 messageId;
     u16 color;
 
-    sys_memset(icon, 0, sizeof(NameEntryIcon));
+    MI_CpuFill8(icon, 0, sizeof(NameEntryIcon));
     paletteStart = 0;
     switch (type) {
     case ICON_TYPE_PLAYER:
@@ -2792,7 +2792,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
     GFL_ArcToolFree(arc);
 
     icon->baseY = y;
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = x;
     setup.y = y;
     icon->actor = func_0204c040(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 0, heapId);
@@ -2834,7 +2834,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
         icon->labelBitmap = GFL_BitmapCreate(2, 2, 32, heapId);
         icon->labelPalette = func_0204bc48(arc, 5, 0, 224, heapId);
         GFL_ArcToolFree(arc);
-        sys_memset(&labelSetup, 0, sizeof(BmpOamActorSetup));
+        MI_CpuFill8(&labelSetup, 0, sizeof(BmpOamActorSetup));
         labelSetup.bitmap = icon->labelBitmap;
         labelSetup.x = 46;
         labelSetup.y = 20;
@@ -2871,7 +2871,7 @@ static void NameEntryIcon_Free(NameEntryIcon *icon) {
     func_0204b98c(icon->chars);
     func_0204be64(icon->cellAnims);
     func_0204c108(icon->actor);
-    sys_memset(icon, 0, sizeof(NameEntryIcon));
+    MI_CpuFill8(icon, 0, sizeof(NameEntryIcon));
 }
 
 static void NameEntryIcon_Update(NameEntryIcon *icon) {
@@ -3160,13 +3160,13 @@ static void NameEntry_UpperCaseName(StrBuf *name) {
 }
 
 static void NameEntryTask_Init(NameEntryTask *task, NameEntryWork *work, NameEntryTaskFunc func) {
-    sys_memset(task, 0, sizeof(NameEntryTask));
+    MI_CpuFill8(task, 0, sizeof(NameEntryTask));
     task->work = work;
     NameEntryTask_SetFunc(task, func);
 }
 
 static void NameEntryTask_Clear(NameEntryTask *task) {
-    sys_memset(task, 0, sizeof(NameEntryTask));
+    MI_CpuFill8(task, 0, sizeof(NameEntryTask));
 }
 
 static void NameEntryTask_Run(NameEntryTask *task) {
