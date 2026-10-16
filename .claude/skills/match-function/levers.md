@@ -73,6 +73,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   stores first, and read fields at each use. (matching.md: "registers still follow the source order")
 - A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
   declare it `unsigned long`, the SDK's `u32`. (matching.md: "`WDS_OnScan`")
+- An array entry's address recomputed after a call, where the original keeps it from before the call in a saved
+  register: declare the index `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
   "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
@@ -656,10 +658,11 @@ optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and 
 same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which showed it too and came within a
 byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is 0/1").
 
-An empty `if (a && b && c) {}` (three operands or more; two are removed early) splits the block where it stands
-and emits nothing. When a register or CSE difference looks like a missing block boundary, slide one through the
-statements: if one place matches, the original has a boundary there, such as a compiled-out debug print's `if`
-(`SortBySpeed`'s swap; matching.md: "three or more `&&` operands"). Document it, don't commit it.
+An empty `if (a && b && c) {}` (three operands or more; two are removed early) or a discarded ternary statement
+splits the block where it stands and emits nothing. When a register or CSE difference looks like a missing block
+boundary, slide one through the statements: a place that matches shows where CSE differs, not that the original has
+a statement there. `SortBySpeed` matched that way and then with `unsigned long j` and nothing added, so try the
+index types first (matching.md: "three or more `&&` operands"). Document it, don't commit it.
 
 Try one at a time with `try_variants.py`, which allows definitions before the function. If a pragma is all that
 matches, write that down in the nonmatching row; it's evidence, not a fix.
