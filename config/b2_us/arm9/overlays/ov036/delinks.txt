@@ -603,6 +603,7 @@ src/ov036/fldeff_d06denki.c:
     .data       start:0x021d558c end:0x021d55a0
 
 src/ov036/land_data_patch.c:
+    complete
     .text       start:0x021c2cbc end:0x021c2ddc
     .data       start:0x021d55a0 end:0x021d55b4
 
