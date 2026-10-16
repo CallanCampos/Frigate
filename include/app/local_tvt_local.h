@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
+#include "app/local_tvt/local_tvt_callselect.h"
 #include "app/local_tvt/local_tvt_chara.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_graphic.h"
@@ -26,7 +27,6 @@
 
 typedef struct LocalTvtScriptMode LocalTvtScriptMode;
 typedef struct LocalTvtCallMode LocalTvtCallMode;
-typedef struct LocalTvtCallSelect LocalTvtCallSelect;
 
 // local_tvt_scriptmode.c: plays a call's script
 
@@ -57,34 +57,6 @@ typedef struct {
 LocalTvtCallMode *LocalTvtCallMode_Create(const LocalTvtCallModeSetup *setup, HeapID heapId);
 void LocalTvtCallMode_Free(LocalTvtCallMode *mode);
 BOOL LocalTvtCallMode_Main(LocalTvtCallMode *mode);
-
-// local_tvt_callselect.c: the list of the persons to call on the lower screen
-
-#define LOCAL_TVT_SELECT_MAX 6
-
-// The results of the list
-enum {
-    LOCAL_TVT_SELECT_NONE,
-    LOCAL_TVT_SELECT_CALL,
-    LOCAL_TVT_SELECT_EXIT,
-};
-
-typedef struct {
-    RivalDataSave *rival;
-    LocalTvtMessage *message;
-    ClActUnit *unit;
-    MsgData *msgData;
-    // The messages of the names
-    u32 names[LOCAL_TVT_SELECT_MAX];
-    BOOL enabled[LOCAL_TVT_SELECT_MAX];
-    int count;
-} LocalTvtCallSelectSetup;
-
-LocalTvtCallSelect *LocalTvtCallSelect_Create(const LocalTvtCallSelectSetup *setup, HeapID heapId);
-void LocalTvtCallSelect_Free(LocalTvtCallSelect *select);
-void LocalTvtCallSelect_Main(LocalTvtCallSelect *select);
-u32 LocalTvtCallSelect_GetResult(LocalTvtCallSelect *select);
-int LocalTvtCallSelect_GetSelected(LocalTvtCallSelect *select);
 
 // local_tvt_person_*.c
 void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId);
