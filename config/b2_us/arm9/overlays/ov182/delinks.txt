@@ -144,6 +144,12 @@ lib/dwcutilui/src/dwc_util_gfx_resource.c:
     .rodata     start:0x021bfb54 end:0x021bfba4
     .bss        start:0x021c4030 end:0x021c4070
 
+lib/dwcutilui/src/dwc_util_button_sprites.c:
+    complete
+    .text       start:0x021ab7c8 end:0x021ab90c
+    .rodata     start:0x021bfba4 end:0x021bfbb0
+    .bss        start:0x021c4070 end:0x021c4074
+
 lib/dwcutilui/src/dwc_util_main.c:
     complete
     .text       start:0x021adbc0 end:0x021ae084

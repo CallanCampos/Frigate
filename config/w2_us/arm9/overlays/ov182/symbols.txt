@@ -1151,7 +1151,7 @@ sLanguageChars kind:data(any) addr:0x021bfba4
 sTextFlags kind:data(any) addr:0x021bfbac
 sStrPositions kind:data(any) addr:0x021bfbc8
 data_ov182_021bfb8a kind:data(any) addr:0x021bfbca
-data_ov182_021bfba4 kind:data(any) addr:0x021bfbe4
+sPairCells kind:data(any) addr:0x021bfbe4
 data_ov182_021bfbb0 kind:data(any) addr:0x021bfbf0
 data_ov182_021bfbb8 kind:data(any) addr:0x021bfbf8
 data_ov182_021bfbba kind:data(any) addr:0x021bfbfa
@@ -1613,7 +1613,7 @@ sEffect kind:bss addr:0x021c4064
 sUiObject kind:bss addr:0x021c4068
 sScreenActive kind:bss addr:0x021c406c
 sPath kind:bss addr:0x021c4070
-data_ov182_021c4070 kind:bss addr:0x021c40b0
+sButtonSprites kind:bss addr:0x021c40b0
 data_ov182_021c4074 kind:bss addr:0x021c40b4
 data_ov182_021c4078 kind:bss addr:0x021c40b8
 data_ov182_021c407c kind:bss addr:0x021c40bc

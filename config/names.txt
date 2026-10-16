@@ -11253,6 +11253,7 @@ overlays/ov182 0x021bfb54 sStrMsgBox
 overlays/ov182 0x021bfb64 sLanguageChars
 overlays/ov182 0x021bfb6c sTextFlags
 overlays/ov182 0x021bfb88 sStrPositions
+overlays/ov182 0x021bfba4 sPairCells
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11285,6 +11286,7 @@ overlays/ov182 0x021c4024 sEffect
 overlays/ov182 0x021c4028 sUiObject
 overlays/ov182 0x021c402c sScreenActive
 overlays/ov182 0x021c4030 sPath
+overlays/ov182 0x021c4070 sButtonSprites
 overlays/ov182 0x021c408c sMain
 overlays/ov182 0x021c40ac sMsgWork
 overlays/ov182 0x021c4180 gWork
