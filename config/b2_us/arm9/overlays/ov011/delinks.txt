@@ -149,3 +149,9 @@ lib/dwc/src/gt2/gt2Message.c:
 
 lib/dwc/src/gt2/gt2Socket.c:
     .text       start:0x0217e768 end:0x0217ed14
+
+lib/dwc/src/gt2/gt2Utility.c:
+    complete
+    .text       start:0x0217ed14 end:0x0217ee90
+    .data       start:0x021890e0 end:0x021890f4
+    .bss        start:0x02191bbc end:0x02191bec
