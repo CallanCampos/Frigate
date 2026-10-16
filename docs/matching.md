@@ -470,7 +470,15 @@ Same instructions, registers swapped.
   statement and three nodes more before the edge. So when the only difference is which uses of a constant are
   immediates and which are register copies, look for a statement before the first copy that the original wrote with
   one more (or one fewer) named step, and measure by padding rather than counting. This also explains "holding three
-  nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`).
+  nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`). The Battle Recorder's
+  `BrProfile_Init` (4 bytes off: a `1` copied from `r7` where the original has `movs r1, #1` at both uses) showed
+  three more things. There the budget counted from the start of the `if (species != 0)` block, not of the function:
+  removing statements before the `if` never moved the edge. Pointer and `u8`-to-`u32` conversions were free. And the
+  signedness of locals weighed: `species`, `form` and `gender`, each used twice in the block, matched as `int`
+  instead of `u32` (the getters return `u32` and the callees take `u32`, and the code is the same), about one node
+  each, with all three needed. To find a one-node change, first bring the function one node short of the edge (there
+  by turning two variable arguments into constants), then try each respelling on top of that: a change too small to
+  show from the starting source flips the immediates there.
 - A reload of a spilled parameter that trades places with a constant, at the same size, can be a free width
   conversion to a wider callee parameter: the GTS Negotiations screen's `GtsNegoDisp_DimPalettes` passed a `u16 vram`
   to `PaletteFade_BlendBuffer`'s `u32 buffer`, which emits nothing but moves the reload. The palette fade's five
