@@ -1836,13 +1836,14 @@ lib/dwc/src/bm/dwc_bm_check.c:
 lib/nitro/src/card/card_common.c:
     .text       start:0x0206ed94 end:0x0206f2e4
     .rodata     start:0x02094540 end:0x02094548
-    .bss        start:0x0214b3dc end:0x0214ba80
+    .bss        start:0x0214b3dc end:0x0214b980
 
 lib/nitro/src/card/card_request.c:
     .text       start:0x0206f2e4 end:0x0206f3e0
 
 lib/nitro/src/card/card_backup.c:
     .text       start:0x0206f3e0 end:0x0206f8b4
+    .bss        start:0x0214b980 end:0x0214ba80
 
 lib/nitro/src/card/card_rom.c:
     .text       start:0x0206f8b4 end:0x0206fed8
@@ -2104,11 +2105,11 @@ lib/nitro/src/snd/snd_interface.c:
 
 lib/nitro/src/snd/nitro_snd_main.c:
     .text       start:0x0207d670 end:0x0207d6b8
-    .bss        start:0x0214c690 end:0x0214c6ac
+    .bss        start:0x0214c690 end:0x0214c700
 
 lib/nitro/src/snd/snd_command.c:
     .text       start:0x0207d6b8 end:0x0207db34
-    .bss        start:0x0214c6ac end:0x0214e180
+    .bss        start:0x0214c700 end:0x0214e180
 
 lib/nitro/src/snd/snd_alarm.c:
     .text       start:0x0207db34 end:0x0207dbb8
