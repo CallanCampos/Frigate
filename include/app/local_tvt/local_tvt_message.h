@@ -46,11 +46,15 @@ void LocalTvtMessage_SetPlaceName(LocalTvtMessage *message, GameData *gameData, 
 void LocalTvtMessage_SetNumber(LocalTvtMessage *message, s32 number, u32 digits, u32 index);
 // The talk of a face: its window at the top or bottom, and the message printed a character at a time
 void LocalTvtMessage_OpenTalkWindow(LocalTvtMessage *message, u32 position);
+// With keyWait == TRUE, retain the completed stream until ending is allowed and A/B or touch is pressed.
 void LocalTvtMessage_StartTalk(LocalTvtMessage *message, MsgData *msgData, u32 messageId, u32 keyWait);
+// True when no talk stream exists, including before the first talk.
 BOOL LocalTvtMessage_IsTalkFinished(LocalTvtMessage *message);
+// Requires an existing talk stream. True for any state other than RUNNING, including retained DONE.
 BOOL LocalTvtMessage_IsTalkPaused(LocalTvtMessage *message);
+// True while an existing talk stream has reached the end of its text.
 BOOL LocalTvtMessage_IsTalkDone(LocalTvtMessage *message);
-// Lets the player close the last page of a talk with a key wait
+// Permits the current key-wait talk to end once its text is DONE and A/B or touch is pressed.
 void LocalTvtMessage_AllowTalkEnd(LocalTvtMessage *message);
 
 #endif // POKEBW2_APP_LOCAL_TVT_LOCAL_TVT_MESSAGE_H
