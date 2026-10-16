@@ -127,13 +127,17 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
 
 
 # Files of a library built with other flags than the rest of it, from file_flags in its library.toml: each flag
-# replaces the library's flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb")
+# replaces the library's flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb",
+# "-O2,p" replaces "-O4,p")
 FILE_FLAGS: dict[str, list[str]] = {}
 
 
 def flag_option(flag: str) -> str:
-    """Returns the option a compiler flag sets: its first word, with -thumb and -nothumb as one option."""
+    """Returns the option a compiler flag sets: its first word, with -thumb and -nothumb as one option, and every
+    optimization level (-O4,p, -O2,p) as one."""
     option = flag.split()[0]
+    if option.startswith("-O"):
+        return "-O"
     return "-thumb" if option == "-nothumb" else option
 
 

@@ -32,11 +32,11 @@ flags = [
 
 # Files registered from the untouched-code scouting; flags beyond the mode are not settled yet
 "rtc/rtc_api_ex.c" = ["-nothumb"]
-"camera/camera_api.c" = ["-nothumb"]
+"camera/camera_api.c" = ["-nothumb", "-ipa function"]
 "camera/camera.c" = ["-nothumb"]
-"nwm/nwm.c" = ["-nothumb"]
+"nwm/nwm.c" = ["-nothumb", "-ipa function"]
 "mic/mic_twl.c" = ["-nothumb"]
-"fatfs/fatfs_api.c" = ["-nothumb"]
+"fatfs/fatfs_api.c" = ["-nothumb", "-O2,p", "-ipa function"]
 "snd/sndex.c" = ["-nothumb"]
 "dsp/dsp_if.c" = ["-nothumb"]
 "dsp/dsp_process.c" = ["-nothumb"]

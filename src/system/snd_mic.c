@@ -6,7 +6,7 @@
 #include "nitro/mic.h"
 #include "nitro/os.h"
 #include "save/chatter.h"
-#include "twl/mic.h"
+#include "twl/sndex.h"
 
 // The microphone, which records a Chatot's cry. The name is the ROM's string.
 

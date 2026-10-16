@@ -8,7 +8,7 @@
 #include "nitro/mic.h"
 #include "nitro/os.h"
 #include "nnsys/snd.h"
-#include "twl/mic.h"
+#include "twl/sndex.h"
 
 // The Xtransceiver's microphone: the voice is recorded into a buffer, sent packed by ctvt_talk.c, and the other
 // side's voice played back on a wave channel

@@ -3,7 +3,9 @@
 
 #include "types.h"
 #include "nitro/os.h"
+#include "nitro/pm.h"
 #include "twl/mi.h"
+#include "twl/pm.h"
 
 // TwlSDK's camera library, in the DSi's LTD autoload. The game calls it through the SDK's inline functions, which
 // only call the library when the game runs on a DSi (OS_IsRunOnTwl, swan's hw_isDSi), so the check is inlined at
@@ -36,12 +38,13 @@ typedef enum {
 } CAMERAContext;
 
 typedef enum {
-    CAMERA_SIZE_DSI_VGA, // 640 x 480
-    CAMERA_SIZE_QVGA,    // 320 x 240
-    CAMERA_SIZE_QQVGA,   // 160 x 120
-    CAMERA_SIZE_CIF,     // 352 x 288
-    CAMERA_SIZE_QCIF,    // 176 x 144
-    CAMERA_SIZE_DS_LCD,  // 256 x 192
+    CAMERA_SIZE_DSI_VGA,  // 640 x 480
+    CAMERA_SIZE_QVGA,     // 320 x 240
+    CAMERA_SIZE_QQVGA,    // 160 x 120
+    CAMERA_SIZE_CIF,      // 352 x 288
+    CAMERA_SIZE_QCIF,     // 176 x 144
+    CAMERA_SIZE_DS_LCD,   // 256 x 192
+    CAMERA_SIZE_DS_LCDX4, // 512 x 384
 } CAMERASize;
 
 typedef enum {
@@ -49,11 +52,40 @@ typedef enum {
 } CAMERAEffect;
 
 typedef enum {
+    CAMERA_FLIP_NONE,
+    CAMERA_FLIP_HORIZONTAL,
+    CAMERA_FLIP_VERTICAL,
+    CAMERA_FLIP_REVERSE,
+} CAMERAFlip;
+
+// The color temperatures of the white balance's presets; AUTO is what the sensor sets by itself
+typedef enum {
+    CAMERA_WHITE_BALANCE_AUTO,
+    CAMERA_WHITE_BALANCE_3200K,
+    CAMERA_WHITE_BALANCE_4150K,
+    CAMERA_WHITE_BALANCE_5200K,
+    CAMERA_WHITE_BALANCE_6000K,
+    CAMERA_WHITE_BALANCE_7000K,
+} CAMERAWhiteBalance;
+
+typedef enum {
     CAMERA_OUTPUT_YUV,
     CAMERA_OUTPUT_RGB,
 } CAMERAOutput;
 
+// The camera's modes for a scene, by what camera_api.c sets the white balance, exposure and sharpness to for each (the
+// names are from the DSi's camera settings)
+typedef enum {
+    CAMERA_PHOTO_MODE_NORMAL,
+    CAMERA_PHOTO_MODE_PORTRAIT,
+    CAMERA_PHOTO_MODE_LANDSCAPE,
+    CAMERA_PHOTO_MODE_NIGHTVIEW,
+    CAMERA_PHOTO_MODE_LETTER,
+} CAMERAPhotoMode;
+
 typedef void (*CAMERAIntrCallback)(CAMERAResult result);
+// What the asynchronous I2C commands call when the ARM7 has answered
+typedef void (*CAMERACallback)(CAMERAResult result, void *arg);
 
 CAMERAResult func_02700938(void);                // CAMERA_InitCore
 void func_02700b34(void);                        // CAMERA_EndCore
@@ -76,11 +108,20 @@ void func_0270212c(void);                        // CAMERA_StopCaptureCore
 void func_02702158(BOOL enabled);                // CAMERA_SetTrimmingCore
 void func_0270218c(CAMERAOutput output);         // CAMERA_SetOutputFormatCore
 void func_027021e4(void);                        // CAMERA_ClearBufferCore
-void func_0270229c(u16 lines);                   // CAMERA_SetTransferLinesCore
-u16 func_027022f8(u16 width, u16 height);        // CAMERA_GetMaxLinesRoundCore
+void func_0270229c(int lines);                   // CAMERA_SetTransferLinesCore
+int func_027022f8(u16 width, u16 height);        // CAMERA_GetMaxLinesRoundCore
 u32 func_0270234c(u16 width);                    // CAMERA_GetBytesAtOnceCore
 u16 func_02702364(CAMERASize size);              // CAMERA_SizeToWidthCore
 u16 func_027023cc(CAMERASize size);              // CAMERA_SizeToHeightCore
+
+// camera.c's other functions on the camera interface's registers (SCFG_CLK and the control word at 0x04004202), which
+// camera_api.c calls while it starts the camera, stops it and handles its interrupt. They keep their default names
+// until the LTD autoload is analyzed
+void func_02702080(void);     // resets the interface and its camera clock
+BOOL func_027021cc(void);     // whether the interface reports a buffer error (bit 4 of its control)
+void func_02702208(BOOL on);  // sets or clears the interface's interrupt enable (bit 11 of its control)
+void func_0270223c(u32 bits); // replaces bits 8 and 9 of the interface's control
+void func_02702268(BOOL on);  // sets or clears bit 10 of the interface's control
 
 static inline CAMERAResult CAMERA_Init(void) {
     if (hw_isDSi() == TRUE) {
@@ -197,13 +238,20 @@ static inline void CAMERA_ClearBuffer(void) {
     }
 }
 
-static inline void CAMERA_SetTransferLines(u16 lines) {
+static inline BOOL CAMERA_IsBufferError(void) {
+    if (hw_isDSi() == TRUE) {
+        return func_027021cc();
+    }
+    return FALSE;
+}
+
+static inline void CAMERA_SetTransferLines(int lines) {
     if (hw_isDSi() == TRUE) {
         func_0270229c(lines);
     }
 }
 
-static inline u16 CAMERA_GetMaxLinesRound(u16 width, u16 height) {
+static inline int CAMERA_GetMaxLinesRound(u16 width, u16 height) {
     if (hw_isDSi() == TRUE) {
         return func_027022f8(width, height);
     }
@@ -237,5 +285,8 @@ static inline void CAMERA_DmaRecvAsync(u32 ndmaNo, void *dest, u32 unit, u32 len
                                        void *arg) {
     func_02768378(ndmaNo, dest, unit / 4, length, 0, callback, arg);
 }
+
+// What camera_api.c uses of the other libraries, whose headers do not have it yet. Each block moves to the header it
+// names with the chain that owns it.
 
 #endif // POKEBW2_TWL_CAMERA_H

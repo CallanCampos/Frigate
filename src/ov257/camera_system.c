@@ -393,7 +393,7 @@ BOOL CameraSystem_IsSoundDone(CameraSystem *sys) {
 
 static void CameraSystem_SetupCapture(CameraSystem *sys) {
     u16 width, height;
-    u16 lines;
+    int lines;
 
     if (sys->capturing == FALSE && CAMERA_IsBusy() == FALSE) {
         CAMERA_SetTrimming(FALSE);
