@@ -4,3 +4,6 @@
 lib/twl/src/scfg/scfg_proc_itcm.c:
     complete
     .text       start:0x01ff936c end:0x01ff939c
+
+lib/nitro/src/mi/mi_dma_itcm.c:
+    .text       start:0x01ff8bf0 end:0x01ff8c88
