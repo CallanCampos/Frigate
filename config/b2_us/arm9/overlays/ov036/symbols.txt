@@ -5529,7 +5529,7 @@ data_ov036_021d22b8 kind:data(any) addr:0x021d22b8
 FIELD_FLASH_FUNCTIONS kind:data(any) addr:0x021d22c0
 FIELD_EFFECT_SCRIPT_ENTRIES kind:data(any) addr:0x021d22d0
 data_ov036_021d22d2 kind:data(any) addr:0x021d22d2
-data_ov036_021d234c kind:data(any) addr:0x021d234c
+SLOPE_SLIP_TILES kind:data(any) addr:0x021d234c
 data_ov036_021d236c kind:data(any) addr:0x021d236c
 WATER_CURRENT_TILES kind:data(any) addr:0x021d237c
 data_ov036_021d2394 kind:data(any) addr:0x021d2394

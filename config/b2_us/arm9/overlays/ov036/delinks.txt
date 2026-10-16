@@ -583,6 +583,7 @@ src/ov036/pleasure_boat.c:
     .data       start:0x021d557c end:0x021d558c
 
 src/ov036/field_slope_slip.c:
+    complete
     .text       start:0x021c229c end:0x021c24b4
     .rodata     start:0x021d234c end:0x021d236c
 
