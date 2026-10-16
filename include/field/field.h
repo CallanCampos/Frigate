@@ -221,6 +221,8 @@ u32 func_ov036_021ba6a4(u8 index, void *list);
 u32 func_ov036_021ba6b0(u8 index, void *list);
 // Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
 void func_ov036_021ba6bc(u8 index, BOOL inUse, void *list);
+// Overlay 36's field_fade.c, not written yet: whether a grid position is in the rectangle of an entry of the list
+BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry);
 // The mapper's WFBC work
 void *func_ov036_0218adac(HeapID heapId);
 void func_ov036_0218add0(void *wfbc);

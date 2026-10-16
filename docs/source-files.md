@@ -540,7 +540,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | partial | string at `0x021d53d8` |
 | `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | complete | descriptive |
 | `field_fade.c` | `0x021b9494`–`0x021ba5d0` | 43 | partial | string at `0x021d53e8` |
-| `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | partial | string at `0x021d53f8` |
+| `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | complete | string at `0x021d53f8` |
 | `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | partial | string at `0x021d5404` |
 | `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | partial | string at `0x021d5420` |
 | `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | partial | string at `0x021d5430` |
