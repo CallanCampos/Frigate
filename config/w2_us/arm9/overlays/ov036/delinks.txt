@@ -369,12 +369,12 @@ src/ov036/fldmmdl_acmd.c:
 
 src/ov036/fldmmdl_blact.c:
     .text       start:0x021936c0 end:0x021946f4
-    .rodata     start:0x021ce3d4 end:0x021cf318
+    .rodata     start:0x021ce3d4 end:0x021cf398
     .data       start:0x021d4d90 end:0x021d4da0
 
 src/ov036/fldmmdl_g3dobj.c:
     .text       start:0x021946f4 end:0x021953b8
-    .rodata     start:0x021cf318 end:0x021cf3dc
+    .rodata     start:0x021cf398 end:0x021cf3dc
     .data       start:0x021d4da0 end:0x021d4db4
 
 src/ov036/fld_act_rail.c:

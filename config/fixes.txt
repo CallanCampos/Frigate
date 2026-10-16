@@ -1340,6 +1340,8 @@ overlays/ov036 0x021cac9c remove_reloc
 overlays/ov036 0x021cacf4 section_end src/ov036/ircbattlemenu.c:.rodata
 overlays/ov036 0x021cf2e4 section_end src/ov036/fldmmdl_blact.c:.rodata
 overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
+overlays/ov036 0x021cf364 section_end src/ov036/fldmmdl_blact.c:.rodata
+overlays/ov036 0x021cf364 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_end src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_start src/ov036/field_rail_loader.c:.rodata

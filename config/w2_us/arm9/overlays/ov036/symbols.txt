@@ -5104,7 +5104,7 @@ data_ov036_021ce324 kind:data(any) addr:0x021ce358
 data_ov036_021ce33d kind:data(any) addr:0x021ce37d ambiguous
 data_ov036_021ce34c kind:data(any) addr:0x021ce380
 data_ov036_021ce374 kind:data(any) addr:0x021ce3a8
-data_ov036_021ce3a0 kind:data(any) addr:0x021ce3d4
+BILLBOARD_SCALES kind:data(any) addr:0x021ce3d4
 MMDL_BILLBOARD_SIZES_INT kind:data(any) addr:0x021ce3e0
 data_ov036_021ce3b8 kind:data(any) addr:0x021ce3ec
 data_ov036_021ce3c1 kind:data(any) addr:0x021ce401 ambiguous
@@ -5136,7 +5136,7 @@ data_ov036_021cf02e_w2_us kind:data(any) addr:0x021cf02e
 data_ov036_021cf05c kind:data(any) addr:0x021cf090
 data_ov036_021cf108 kind:data(any) addr:0x021cf13c
 data_ov036_021cf1c8 kind:data(any) addr:0x021cf1fc
-data_ov036_021cf2d8 kind:data(any) addr:0x021cf30c
+BLACT_SCENE_SCALE kind:data(any) addr:0x021cf30c
 MMDL_TEXTURE_ATLAS_SIZE_BITS kind:data(any) addr:0x021cf318
 data_ov036_021cf364 kind:data(any) addr:0x021cf398
 data_ov036_021cf374 kind:data(any) addr:0x021cf3a8

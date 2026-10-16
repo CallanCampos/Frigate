@@ -156,14 +156,22 @@ void func_ov036_021963a4(FieldActor *actor, u16 a1, u16 a2);
 BOOL func_ov036_02196b10(FieldActor *actor, u16 time);
 // Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command
 BOOL func_ov036_0218ed68(FieldActor *actor);
-// Overlay 36's fldmmdl_blact.c, not written yet: the flag that the billboard actors' load callback sets, their
-// billboard system, and the change of an actor's model to another object code
+// Overlay 36's fldmmdl_blact.c: the freeing of the billboard actors' work, the flag that their load callback sets,
+// their billboard system, and the change of an actor's model to another object code
+void func_ov036_021937a4(MMSys *system);
 u8 func_ov036_0219381c(FieldActor *actor);
-BlActSys *FieldBlAct_GetBlActSys(void *fieldBlAct);
-void FldAct_SwapObjCode(FieldActor *actor, u16 objCode);
+BlActSys *FieldBlAct_GetBlActSys(FieldBlAct *blact);
+void FldAct_SwapObjCode(FieldActor *actor, u16 newObjCode);
 // The creation of an actor's billboard actor into *index, and its deletion
 BOOL func_ov036_02193a00(FieldActor *actor, u16 *index);
 void func_ov036_02193ac0(FieldActor *actor, u32 index);
+// The creation of a billboard actor of an object code at a position, into out[1] with the material's flags in out[0],
+// calling back once a material that has to be loaded first is there; its deletion; and the scale of an actor's
+// billboard
+BOOL func_ov036_02193b14(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
+                         void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
+void func_ov036_02193b7c(MMSys *system, u16 *out);
+void func_ov036_02193bd0(FieldActor *actor, u16 *scaleX, u16 *scaleY);
 // Overlay 36's field_rail_loader.c: sets a flag of the actor's rail billboard work
 void func_ov036_0219690c(FieldActor *actor, BOOL value);
 // The script call of an actor's script; the animation and frame of the billboard actors of object codes 0xd3 and 0xd5,
@@ -273,14 +281,9 @@ void func_ov036_02195c24(FieldActor *actor);
 void RailDataHandle_Reset(RailDataHandle *handle);
 u32 GetIndexOfObjID(u16 objCode);
 
-// Overlay 36's table that func_ov036_02194650 indexes, by a record's unk9
+// Overlay 36's table that func_ov036_02194650 indexes, by a record's unk9: the animations of the billboard actors
 typedef struct {
-    u16 unk0_0 : 14;
-    u16 unk0_14 : 2;
-} Ov036Unk021cf1c8Entry;
-
-typedef struct {
-    const Ov036Unk021cf1c8Entry *const *unk0;
+    const BlActAnimStep *const *unk0;
     u32 unk4;
 } Ov036Unk021cf1c8;
 

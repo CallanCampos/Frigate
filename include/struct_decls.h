@@ -298,6 +298,7 @@ typedef struct FieldAppCallParam FieldAppCallParam;
 typedef struct FieldAppCallWork FieldAppCallWork;
 typedef struct FieldAsyncProc FieldAsyncProc;
 typedef struct FieldAsyncProcManager FieldAsyncProcManager;
+typedef struct FieldBlAct FieldBlAct;
 typedef struct FieldCamera FieldCamera;
 typedef struct FieldChunk FieldChunk;
 typedef struct FieldChunkContext FieldChunkContext;
