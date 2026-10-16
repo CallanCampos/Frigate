@@ -513,6 +513,7 @@ src/ov036/height_ex.c:
     .data       start:0x021d5438 end:0x021d5444
 
 src/ov036/field_player_grid_event.c:
+    complete
     .text       start:0x021ba854 end:0x021bb5c8
     .rodata     start:0x021d17a0 end:0x021d17b8
     .data       start:0x021d5444 end:0x021d5460
