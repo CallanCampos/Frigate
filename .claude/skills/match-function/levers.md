@@ -194,6 +194,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
+- The `smull` and `smlal` of a sum of two 64-bit products in the other order: swap the products in the source, since
+  MWCC multiplies the right one first. (matching.md: "multiplies the right product first")
 - A `void *` parameter copied to a typed local takes the `const` itself, callback typedef included; through a
   wrapper whose body is a `static inline`, only the wrapper's parameter counts.
   (matching.md: "copied to a typed local needs the `const`"), (matching.md: "only the wrapper's own parameter counts")
@@ -360,6 +362,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "only keeps that shape when the loop runs over its own")
 - Two steps of constant arithmetic where MWCC makes one, or two registers where one cursor would do: a local for the
   first step, or a second local with a role of its own. (matching.md: "keeps the two steps only when")
+- Two `rsb`s of a double negation (`-h * -t`) that MWCC drops: the negated value in a local assigned first, or a
+  cast around it. (matching.md: "A double negation folds the same way")
 
 ## Branches and block layout
 

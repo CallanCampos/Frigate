@@ -1094,10 +1094,12 @@ lib/nnsys/src/g3d/si3d.c:
     .text       start:0x0206a740 end:0x0206ac54
 
 lib/nnsys/src/g3d/3dsmax.c:
+    complete
     .text       start:0x0206ac54 end:0x0206b298
     .data       start:0x0209b500 end:0x0209b520
 
 lib/nnsys/src/g3d/xsi.c:
+    complete
     .text       start:0x0206b298 end:0x0206b900
     .data       start:0x0209b520 end:0x0209b540
 

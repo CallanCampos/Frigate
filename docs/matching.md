@@ -574,6 +574,11 @@ Same code, other `sp` offsets or frame size.
   `smull`/`smlal` chain with different registers, and only the one expression merges the loads of neighbouring fields
   into an `ldm`. libfx's `VEC_Mag`, `VEC_Fx16Mag`, `VEC_Distance` and `VEC_Normalize` match only with `+=`; a rounding
   constant added in 32 bits to the last term (`sum += a->z * b->z + 0x800`) is what `VEC_Fx16DotProduct` needs.
+- A sum of two 64-bit products in one expression, `(fx64)a * b + (fx64)c * d`, multiplies the right product first
+  (`smull`) and accumulates the left one into it (`smlal`), so the source names the products in the reverse of the
+  asm's order. NitroSystem's `3dsmax.c` writes `(fx64)result->sinR * offsetS + (fx64)result->cosR * offsetT` in
+  `calcTexMtx3dsMaxRT_` for `smull` of `cosR` and `offsetT`, then `smlal` of `sinR` and `offsetS`; its `SR_` and
+  `SRT_` and `xsi.c`'s `RT_` and `SRT_` match the same way.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
@@ -1075,6 +1080,10 @@ Same instructions, scheduled in another order.
   (`dwc_ac_wepkey.c`) has the two steps in each range. In the same way, two locals that always hold the same value
   stay two registers, with the moves between them: `DWCAc_DecodeNdwcShapSsid` walks the permutation with a cursor
   for the place the byte came from and one for where it goes, and one cursor compiles 12 bytes shorter.
+- A double negation folds the same way: `-h * -t` compiles to `h * t`, and the two `rsb`s stay only when the negated
+  value goes through a local assigned first. NitroSystem's `xsi.c` writes `turnedT = -result->transT;` before the
+  stores in `calcTexMtxXsiT_` and then `-result->origHeight * turnedT`; a cast keeps them too, as its
+  `calcTexMtxXsiST_` does with `(fx64)(-result->transT) * result->scaleT`.
 
 ## An instruction too many or too few
 

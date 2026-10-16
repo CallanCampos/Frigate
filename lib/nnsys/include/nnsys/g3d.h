@@ -793,10 +793,11 @@ extern NNSG3dFuncBlendVis NNS_G3dFuncBlendVis;
 // by the rule or the mode (cgtool.c). A flush sends a joint's result to the geometry engine: its scale, rotation and
 // translation, as the result's flag leaves them. A scale function sets the scale parts of a joint's result from the
 // scale of the node, a vector of the scale and then one of its inverse, the node's command in the stream and its flags,
-// where bit 2 is a scale of one. A texture matrix function sends the texture matrix of a material's result
+// where bit 2 is a scale of one. A texture matrix function sends the texture matrix of a material's result; XSI's sets
+// the identity values into the result first, so the type of them all takes it without const
 typedef void (*NNSG3dFuncJointFlush)(const NNSG3dJntAnmResult *result);
 typedef void (*NNSG3dFuncJointScale)(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
-typedef void (*NNSG3dFuncTexMatrix)(const NNSG3dMatAnmResult *result);
+typedef void (*NNSG3dFuncTexMatrix)(NNSG3dMatAnmResult *result);
 
 // Standard (basic.c), Maya (maya.c) and Softimage (si3d.c) scaling rules
 void NNSi_G3dSendJointSRTBasic(const NNSG3dJntAnmResult *result);
@@ -806,10 +807,10 @@ void NNSi_G3dGetJointScaleBasic(NNSG3dJntAnmResult *result, const VecFx32 *scale
 void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 // Maya (maya.c), Softimage (si3d.c), 3ds Max (3dsmax.c) and XSI (xsi.c) texture matrix modes
-void NNSi_G3dSendTexSRTMaya(const NNSG3dMatAnmResult *result);
-void NNSi_G3dSendTexSRTSi3d(const NNSG3dMatAnmResult *result);
-void func_0206b124(const NNSG3dMatAnmResult *result);
-void func_0206b74c(const NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTMaya(NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTSi3d(NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRT3dsMax(NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTXsi(NNSG3dMatAnmResult *result);
 
 extern NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3];
 extern NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3];

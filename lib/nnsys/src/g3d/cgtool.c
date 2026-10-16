@@ -9,5 +9,5 @@ NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3] = { NNSi_G3dGetJointScaleBasic
                                                       NNSi_G3dGetJointScaleSi3d };
 NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3] = { NNSi_G3dSendJointSRTBasic, NNSi_G3dSendJointSRTMaya,
                                                       NNSi_G3dSendJointSRTSi3d };
-NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4] = { NNSi_G3dSendTexSRTMaya, NNSi_G3dSendTexSRTSi3d, func_0206b124,
-                                                    func_0206b74c };
+NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4] = { NNSi_G3dSendTexSRTMaya, NNSi_G3dSendTexSRTSi3d,
+                                                    NNSi_G3dSendTexSRT3dsMax, NNSi_G3dSendTexSRTXsi };

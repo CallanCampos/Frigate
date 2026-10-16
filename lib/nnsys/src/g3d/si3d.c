@@ -99,7 +99,7 @@ void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale,
 // rotation for, with the scale of the texture's size to its original size on the S and T of the matrix, and then the
 // geometry engine's matrix mode back to position and vector. With TEXMTX_SET it is loaded, and with TEXMTX_MULT it is
 // multiplied into the matrix that is there
-void NNSi_G3dSendTexSRTSi3d(const NNSG3dMatAnmResult *result) {
+void NNSi_G3dSendTexSRTSi3d(NNSG3dMatAnmResult *result) {
     struct {
         u32 op; // MTX_MODE, MTX_LOAD_4x3 or MTX_MULT_4x3, MTX_MODE
         u32 modeTexture;
