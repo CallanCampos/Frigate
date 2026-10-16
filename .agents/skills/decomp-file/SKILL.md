@@ -68,12 +68,13 @@ order you write them.
   `GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ITEM_NAMES, heapId)`.
   A message is its ID from the bank's header, `text/system/<bank>.h`, never its line number:
   `GFL_MsgDataLoadStrbufNew(msgData, YesNo_Text_Yes)`.
-- Duplicates: once the boundaries are known, run `ninja report` and
-  `.venv/bin/python tools/decomp/find_duplicates.py -o build/duplicates.tsv`, then
+- Duplicates: once the boundaries are known, run `ninja report`,
+  `.venv/bin/python tools/decomp/version_map.py b2_us w2_us -o build/version_map.tsv` (without it White 2 is not
+  scanned) and `.venv/bin/python tools/decomp/find_duplicates.py -o build/duplicates.tsv`, then
   `grep -E 'FUNC_A|FUNC_B' build/duplicates.tsv` for the file's functions. A row with a matched copy has C already:
-  read it before writing this one. Write the file as usual, and list each group the file shares (its `group` number
-  and the other copies) in the commit message and the PR, since how shared copies are organised is still being
-  settled in #315.
+  read it before writing this one. Write the file as usual, and list each copy the file shares (the other copies'
+  names and addresses; a row's `group` number changes from run to run) in the commit message and the PR, since how
+  shared copies are organised is still being settled in #315.
 
 ## 4. Write the C
 
