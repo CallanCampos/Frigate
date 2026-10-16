@@ -1345,6 +1345,8 @@ overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_start src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf768 section_end src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf76c add_section src/ov036/field_rail_loader.c:.rodata:0x250
+overlays/ov036 0x021cf7c8 section_end src/ov036/fld_act_rail.c:.rodata
+overlays/ov036 0x021cf7c8 section_start src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf9dc section_end src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf9dc section_start src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cf9ec section_end src/ov036/field_subscreen.c:.rodata
@@ -1546,6 +1548,8 @@ overlays/ov036 0x021d4684 add_section src/ov036/scrcmd_medal.c:.rodata:0x80
 overlays/ov036 0x021d4920 remove_reloc
 overlays/ov036 0x021d4948 remove_reloc
 overlays/ov036 0x021d4970 remove_reloc
+overlays/ov036 0x021d4de8 section_end src/ov036/fld_act_rail.c:.data
+overlays/ov036 0x021d4de8 section_start src/ov036/field_rail_loader.c:.data
 overlays/ov036 0x021d6f6c remove_symbol
 overlays/ov050 0x021e5e52 reloc_module overlay(36)
 overlays/ov050 0x021e5ed4 reloc_module overlay(36)
