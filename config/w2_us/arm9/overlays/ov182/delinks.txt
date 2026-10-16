@@ -87,3 +87,9 @@ lib/dwcutilui/src/dwc_util_heap.c:
     complete
     .text       start:0x021bc4a8 end:0x021bc584
     .bss        start:0x021c41e4 end:0x021c41e8
+
+lib/dwcutilui/src/dwc_util_fade.c:
+    complete
+    .text       start:0x021bbaac end:0x021bbc90
+    .rodata     start:0x021c05c4 end:0x021c05d0
+    .bss        start:0x021c41dc end:0x021c41e0

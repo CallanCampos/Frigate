@@ -11279,6 +11279,7 @@ overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
 overlays/ov182 0x021c4190 sScreens
 overlays/ov182 0x021c4194 sCells
+overlays/ov182 0x021c419c sFades
 overlays/ov182 0x021c41a4 sHeap
 overlays/ov184 0x0219f340 ErrorWindowScreen_Show
 overlays/ov185 0x0219ce80 PMSIData_Create
