@@ -3744,6 +3744,9 @@ ltd_autoload_0 0x02707f44 PhotoSign_FlushCache
 ltd_autoload_0 0x02707f60 PhotoSign_InvalidateCache
 ltd_autoload_0 0x02707fcc DSP_G711Image
 ltd_autoload_0 0x0272ecec DSP_GraphicsImage
+ltd_autoload_0 0x027674a8 CARDi_ReadSecureRom
+ltd_autoload_0 0x027674bc CARDi_ReadSecureRomWithDMA
+ltd_autoload_0 0x02767520 CARDi_InitTwlRom
 ltd_autoload_0 0x0276814c MI_NDmaFill
 ltd_autoload_0 0x02768180 MI_NDmaCopy
 ltd_autoload_0 0x027681b8 MI_NDmaFillAsync

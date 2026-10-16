@@ -83,3 +83,7 @@ lib/twl/src/dsp/dsp_graphics.c:
 
 lib/twl/src/syscall/syscall_twl_ltd.c:
     .ltdmain    start:0x027696e8 end:0x02769930
+
+lib/twl/src/card/card_rom_twl.c:
+    .ltdmain    start:0x027674a0 end:0x02767674
+    .bss        start:0x0276aee0 end:0x0276af74
