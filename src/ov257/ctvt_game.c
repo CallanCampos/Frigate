@@ -3110,7 +3110,7 @@ static BOOL CtvtGame_FindTouchedTarget(CtvtGame *game, u16 frame, int x, int y, 
         if (game->targets[i].active && game->targets[i].actor == 0 && game->targets[i].hitPending != TRUE) {
             width = sHitSizes[game->targets[i].depth - 1][0];
             height = sHitSizes[game->targets[i].depth - 1][1];
-            NNS_G3DProject(&game->targets[i].srt.translation, &screenX, &screenY);
+            NNS_G3dWorldPosToScrPos(&game->targets[i].srt.translation, &screenX, &screenY);
             dx = x - screenX;
             dy = (y - screenY) * ((f32)width / height);
             if (dx * dx + dy * dy <= width * height) {

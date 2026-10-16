@@ -226,7 +226,7 @@ void NNS_G3DRenderFuncLoadMatrix(NNSG3dRS *rs, u32 opt) {
             u32 param = rs->c[1];
 
             if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
-                NNS_G3DExecOp(G3OP_MTX_RESTORE, &param, 1);
+                NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &param, 1);
             }
         }
 
@@ -356,7 +356,7 @@ void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dRe
                 cmd[4] = 0x2b2a; // TEXIMAGE_PARAM, PLTT_BASE
                 cmd[5] = result->prmTexImage;
                 cmd[6] = result->prmTexPltt;
-                NNS_G3DExecOp(cmd[0], &cmd[1], 6);
+                NNS_G3dGeBufferOP_N(cmd[0], &cmd[1], 6);
 
                 if (result->flag & (NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SET | NNS_G3D_MATANM_RESULTFLAG_TEXMTX_MULT)) {
                     rs->funcTexMtx(result);
@@ -391,7 +391,7 @@ void NNS_G3DRenderFuncDrawMeshDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResShpD
 
     if (!RunCallBack(rs, NNS_G3D_SBC_SHP, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A)) {
         if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
-            NNS_G3DExecDisplayList((u8 *)shp + shp->ofsDL, shp->sizeDL);
+            NNS_G3dGeSendDL((u8 *)shp + shp->ofsDL, shp->sizeDL);
         }
     }
 
@@ -434,7 +434,7 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
             if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
                 u32 stackID = rs->c[4];
 
-                NNS_G3DExecOp(G3OP_MTX_RESTORE, &stackID, 1);
+                NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &stackID, 1);
             }
         }
         rs->c += size;
@@ -451,7 +451,7 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
             stackID = rs->c[5];
         }
         if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
-            NNS_G3DExecOp(G3OP_MTX_RESTORE, &stackID, 1);
+            NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &stackID, 1);
         }
     }
 
@@ -545,7 +545,7 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
         if (!skip && !(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
             u32 stackID = rs->c[4];
 
-            NNS_G3DExecOp(G3OP_MTX_STORE, &stackID, 1);
+            NNS_G3dGeBufferOP_N(G3OP_MTX_STORE, &stackID, 1);
         }
     }
     rs->c += size;
@@ -598,7 +598,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
             } else {
                 stackID = rs->c[3];
             }
-            NNS_G3DExecOp(G3OP_MTX_RESTORE, &stackID, 1);
+            NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &stackID, 1);
         }
     }
 
@@ -607,7 +607,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         MtxFx44 clip;
 
-        NNS_G3DWaitFIFO();
+        NNS_G3dGeFlushBuffer();
         reg_G3X_GXFIFO = 0x151110; // MTX_MODE, MTX_PUSH, MTX_IDENTITY
         reg_G3X_GXFIFO = 0;
         reg_G3X_GXFIFO = 0;
@@ -694,7 +694,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
             } else {
                 stackID = rs->c[3];
             }
-            NNS_G3DExecOp(G3OP_MTX_RESTORE, &stackID, 1);
+            NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &stackID, 1);
         }
     }
 
@@ -703,7 +703,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         MtxFx44 clip;
 
-        NNS_G3DWaitFIFO();
+        NNS_G3dGeFlushBuffer();
         reg_G3X_GXFIFO = 0x151110; // MTX_MODE, MTX_PUSH, MTX_IDENTITY
         reg_G3X_GXFIFO = 0;
         reg_G3X_GXFIFO = 0;
@@ -789,7 +789,7 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     u32 i;
 
     MI_CpuClearFast(&sum, sizeof(sum));
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     reg_G3_MTX_MODE = GX_MTXMODE_PROJECTION;
     reg_G3_MTX_STORE = 1;
     reg_G3_MTX_IDENTITY = 0;
@@ -876,7 +876,7 @@ void NNS_G3DRenderFuncExecFIFOQueue(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         const u8 *cmd = rs->c;
 
-        NNS_G3DExecDisplayList(cmd + NNS_G3D_GET_U32(cmd + 1), NNS_G3D_GET_U32(cmd + 5));
+        NNS_G3dGeSendDL(cmd + NNS_G3D_GET_U32(cmd + 1), NNS_G3D_GET_U32(cmd + 5));
     }
 
     RunCallBack(rs, NNS_G3D_SBC_CALLDL, &timing, NNS_G3D_SBC_CALLBACK_TIMING_C);
@@ -913,7 +913,7 @@ void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
             rs->pMatAnmResult->prmTexImage &= ~(3 << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT);
             rs->pMatAnmResult->prmTexImage |= GX_TEXGEN_NORMAL << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT;
             sEnvMapCmd[1] = rs->pMatAnmResult->prmTexImage;
-            NNS_G3DExecOp(sEnvMapCmd[0], &sEnvMapCmd[1], 1);
+            NNS_G3dGeBufferOP_N(sEnvMapCmd[0], &sEnvMapCmd[1], 1);
         }
         NNS_G3dGeMtxMode(GX_MTXMODE_TEXTURE);
 
@@ -953,7 +953,7 @@ void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
         skip = RunCallBack(rs, NNS_G3D_SBC_ENVMAP, &timing, NNS_G3D_SBC_CALLBACK_TIMING_C);
         if (!skip) {
             NNS_G3dGeMtxMode(GX_MTXMODE_POSITION_VECTOR);
-            NNS_G3DGetTransforms(NULL, &vec);
+            NNS_G3dGetCurrentMtx(NULL, &vec);
             NNS_G3dGeMtxMode(GX_MTXMODE_TEXTURE);
             if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
                 NNS_G3dGeMultMtx33(&NNS_G3dGlb.cameraRot);
@@ -984,7 +984,7 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
         u32 timing;
         u32 skip;
 
-        NNS_G3DGetTransforms(&pos, NULL);
+        NNS_G3dGetCurrentMtx(&pos, NULL);
         NNS_G3dGeStoreMtx(30);
 
         if ((rs->pMatAnmResult->prmTexImage & (3 << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT)) !=
@@ -992,7 +992,7 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
             rs->pMatAnmResult->prmTexImage &= ~(3 << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT);
             rs->pMatAnmResult->prmTexImage |= GX_TEXGEN_VERTEX << REG_G3_TEXIMAGE_PARAM_TGEN_SHIFT;
             sPrjMapCmd[1] = rs->pMatAnmResult->prmTexImage;
-            NNS_G3DExecOp(sPrjMapCmd[0], &sPrjMapCmd[1], 1);
+            NNS_G3dGeBufferOP_N(sPrjMapCmd[0], &sPrjMapCmd[1], 1);
         }
 
         timing = GetCallBackTiming(rs, NNS_G3D_SBC_PRJMAP);
@@ -1043,7 +1043,7 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
                 NNS_G3dGeMultMtx43(&pos);
             }
 
-            NNS_G3DWaitFIFO();
+            NNS_G3dGeFlushBuffer();
             reg_G3_MTX_MODE = GX_MTXMODE_PROJECTION;
             reg_G3_MTX_PUSH = 0;
             reg_G3_MTX_IDENTITY = 0;

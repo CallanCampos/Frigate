@@ -297,10 +297,10 @@ void GymMistralton_Update(Field *field) {
                 }
             }
         }
-        func_02068410(GFL_G3DMdlGetEngineModel(
-                          GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->system, SCENE, ACTOR_EFFECT_FIRST + 1 + i)))
-                          ->resMdl,
-                      work->alpha[i]);
+        NNS_G3dMdlSetMdlAlphaAll(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(FieldExpObj_GetActor(
+                                                              work->system, SCENE, ACTOR_EFFECT_FIRST + 1 + i)))
+                                     ->resMdl,
+                                 work->alpha[i]);
     }
     Mistralton_StepAnimations(work);
     Mistralton_StepFanPitch(&work->fanPitch, work->frames);

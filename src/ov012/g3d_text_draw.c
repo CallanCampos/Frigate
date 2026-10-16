@@ -67,7 +67,7 @@ BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, cons
     for (; i < 16; i++) {
         texResName.name[i] = 0;
     }
-    texEntry = NNS_G3DFind((NNSG3dResDict *)((u8 *)texData + dictOffset), &texResName);
+    texEntry = NNS_G3dGetResDataByName((NNSG3dResDict *)((u8 *)texData + dictOffset), &texResName);
     if (texEntry == NULL) {
         return FALSE;
     }
@@ -94,7 +94,7 @@ BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, cons
     for (; i < 16; i++) {
         plResName.name[i] = 0;
     }
-    plEntry = NNS_G3DFind((NNSG3dResDict *)((u8 *)texData + dictOffset), &plResName);
+    plEntry = NNS_G3dGetResDataByName((NNSG3dResDict *)((u8 *)texData + dictOffset), &plResName);
     if (plEntry == NULL) {
         return FALSE;
     }

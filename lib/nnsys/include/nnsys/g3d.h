@@ -9,8 +9,9 @@
 #include "nnsys/gfd.h"
 
 // NitroSystem's 3D graphics (NNS_G3d): its resource files, the render objects that draw a model, the animation
-// objects bound to them, and the global state of the geometry engine. Functions keep swan's names where it has them;
-// the NitroSystem name follows in a comment
+// objects bound to them, and the global state of the geometry engine. The functions of gecom.c, util.c, model.c and the
+// two res_struct_accessor files have NitroSystem's names, with swan's in a comment where it differs; the others keep
+// swan's names for now, with the NitroSystem name in a comment
 
 // A resource file and its blocks. The signatures are the files' first four characters
 #define NNS_G3D_SIGNATURE_BMD0 0x30444d42
@@ -43,6 +44,16 @@ typedef struct {
     u16 dummy_;
     u16 ofsEntry;
 } NNSG3dResDict;
+
+// A node of a dictionary's Patricia tree, which follows the dictionary's header: the bit of a name that the node tests,
+// the nodes that a 0 and a 1 at that bit lead to, and the entry that the node stands for. The first node is the root,
+// whose first child is the top of the tree, or 0 for an empty dictionary. A search follows the children for as long as
+// each node tests a lower bit than the one before it, and the node it stops at has the one entry that the name can be
+typedef struct {
+    u8 refBit;
+    u8 idxChild[2];
+    u8 idxEntry;
+} NNSG3dResDictTreeNode;
 
 typedef struct {
     u16 sizeUnit;
@@ -313,6 +324,12 @@ static inline NNSG3dResShpData *NNS_G3dGetShpDataByIdx(const NNSG3dResShp *shp, 
     return NULL;
 }
 
+// The animations block of a file: its animations by name, each at an offset from the block
+typedef struct {
+    NNSG3dResDataBlockHeader header;
+    NNSG3dResDict dict;
+} NNSG3dResAnmSet;
+
 // The start of every animation
 typedef struct {
     u8 category0;
@@ -359,6 +376,33 @@ typedef struct {
     u8 revision;
     u16 category1;
 } NNSG3dResAnmHeader;
+
+// A texture pattern animation (BTP0): the names of its textures and palettes, then a dictionary of the data for each
+// material it animates. A material's data says where its run of frame values is, in the animation, and how long it is:
+// the frame values give the texture and palette to show from a frame on (idPltt is 0xff for none). ratioDataFrame is
+// the number of frame values to a frame, in 1/4096ths, for finding the one at a frame without searching from the first
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u8 numTex;
+    u8 numPltt;
+    u16 ofsTexName;
+    u16 ofsPlttName;
+    NNSG3dResDict dict;
+} NNSG3dResTexPatAnm;
+
+typedef struct {
+    u16 numFV;
+    u16 flag;
+    fx16 ratioDataFrame;
+    u16 offset;
+} NNSG3dResTexPatAnmData;
+
+typedef struct {
+    u16 idxFrame;
+    u8 idTex;
+    u8 idPltt;
+} NNSG3dResTexPatAnmFV;
 
 // A joint animation. Each joint's tag, at ofsTag[joint], is a word of NNS_G3D_JNTANM_SRTINFO_* flags followed by the
 // data of each component that isn't constant
@@ -505,19 +549,22 @@ typedef struct {
     u32 hintVisAnmExist[2];
 } NNSG3dRenderObj;
 
-// The blocks of a file: NNS_G3dGetMdlSet, NNS_G3dGetTex and NNS_G3dGetAnmByIdx
-NNSG3dResMdlSet *NNS_G3DResGetMdlBlock(const NNSG3dResFileHeader *header);
-NNSG3dResTex *NNS_G3DResGetTexBlock(const NNSG3dResFileHeader *header);
+// The blocks of a file (res_struct_accessor.c), and the animations of an animation file by their index
+// (res_struct_accessor_anm.c)
+NNSG3dResMdlSet *NNS_G3dGetMdlSet(const NNSG3dResFileHeader *header); // swan's NNS_G3DResGetMdlBlock
+NNSG3dResTex *NNS_G3dGetTex(const NNSG3dResFileHeader *header);       // swan's NNS_G3DResGetTexBlock
+void *NNS_G3dGetAnmByIdx(const NNSG3dResFileHeader *header, u32 idx); // swan's NNS_G3DResGetAnm
+
 // The name of a dictionary entry, padded to sixteen characters with zeros
 typedef union {
     char name[16];
     u32 val[4];
 } NNSG3dResName;
 
-// NitroSDK's NNS_G3dGetResDataByName: the data of the dictionary's entry of the name, or NULL
-void *NNS_G3DFind(const NNSG3dResDict *dict, const NNSG3dResName *name);
-// NitroSDK's NNS_G3dGetResDictIdxByName: the index of the dictionary's entry of the name, or -1
-int NNS_G3DFindIndex(const NNSG3dResDict *dict, const NNSG3dResName *name);
+// The data of the dictionary's entry of the name, or NULL (swan's NNS_G3DFind)
+void *NNS_G3dGetResDataByName(const NNSG3dResDict *dict, const NNSG3dResName *name);
+// The index of the dictionary's entry of the name, or -1 (swan's NNS_G3DFindIndex)
+int NNS_G3dGetResDictIdxByName(const NNSG3dResDict *dict, const NNSG3dResName *name);
 
 static inline const NNSG3dResName *NNS_G3dGetResNameByIdx(const NNSG3dResDict *dict, u32 idx) {
     if (dict != NULL && idx < dict->numEntry) {
@@ -546,7 +593,13 @@ typedef struct {
     u16 offset;
     u16 flag;
 } NNSG3dResDictPlttData;
-void *NNS_G3DResGetAnm(const NNSG3dResFileHeader *header, u32 idx);
+
+// A texture pattern animation's names of a texture and of a palette, or NULL past the last, and the texture and palette
+// that its material shows at a frame, which the frame values of the material at idx say. The names are NitroSystem's as
+// recalled, not shown by the code
+const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx);
+const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx);
+const NNSG3dResTexPatAnmFV *NNSi_G3dGetTexPatAnmFV(const NNSG3dResTexPatAnm *anm, u32 idx, u32 frame);
 
 // Textures and palettes in VRAM: NNS_G3dTexGetRequiredSize, NNS_G3dTexSetTexKey, NNS_G3dTexLoad,
 // NNS_G3dPlttGetRequiredSize, NNS_G3dPlttSetPlttKey and NNS_G3dPlttLoad
@@ -649,102 +702,104 @@ extern NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3];
 extern NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3];
 extern NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4];
 
-// The buffer that geometry commands wait in, and sending one: NNS_G3dGeFlushBuffer and NNS_G3dGeBufferOP_N
+// The buffer that geometry commands wait in while a display list is on its way by DMA, and sending a command or a
+// display list (gecom.c). The names are NitroSystem's as recalled
 BOOL NNS_G3dGeIsBufferExist(void);
 void NNS_G3dGeSetBuffer(void *buffer);
 void *NNS_G3dGeReleaseBuffer(void);
-void NNS_G3DWaitFIFO(void);
-void NNS_G3DExecOp(u32 op, const u32 *args, u32 num);
-void NNS_G3DExecDisplayList(const void *list, u32 size);
-// NitroSystem's NNS_G3dGetCurrentMtx: gets the position matrix and the vector matrix that the geometry engine is at,
-// each unless its pointer is null
-void NNS_G3DGetTransforms(MtxFx43 *pos, MtxFx33 *nrm);
+void NNS_G3dGeFlushBuffer(void);                            // swan's NNS_G3DWaitFIFO
+void NNS_G3dGeBufferOP_N(u32 op, const u32 *args, u32 num); // swan's NNS_G3DExecOp
+void NNS_G3dGeSendDL(const void *list, u32 size);           // swan's NNS_G3DExecDisplayList
+// Whether NNS_G3dGeSendDL sends by the SDK's fast DMA rather than the one that waits for the FIFO
+extern u32 NNS_G3dFlagUseFastDma;
+// Gets the position matrix and the vector matrix that the geometry engine is at, each unless its pointer is null
+void NNS_G3dGetCurrentMtx(MtxFx43 *pos, MtxFx33 *nrm); // swan's NNS_G3DGetTransforms
 
 // NitroSystem's inline wrappers of the buffer, one per geometry command
 static inline void NNS_G3dGePushMtx(void) {
-    NNS_G3DExecOp(G3OP_MTX_PUSH, NULL, 0);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_PUSH, NULL, 0);
 }
 
 static inline void NNS_G3dGePopMtx(int num) {
     s32 param = num;
 
-    NNS_G3DExecOp(G3OP_MTX_POP, (const u32 *)&param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_POP, (const u32 *)&param, 1);
 }
 
 static inline void NNS_G3dGeMtxMode(int mode) {
     u32 param = mode;
 
-    NNS_G3DExecOp(G3OP_MTX_MODE, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MODE, &param, 1);
 }
 
 static inline void NNS_G3dGeStoreMtx(int idx) {
     u32 param = idx;
 
-    NNS_G3DExecOp(G3OP_MTX_STORE, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_STORE, &param, 1);
 }
 
 static inline void NNS_G3dGeRestoreMtx(int idx) {
     u32 param = idx;
 
-    NNS_G3DExecOp(G3OP_MTX_RESTORE, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &param, 1);
 }
 
 static inline void NNS_G3dGeIdentity(void) {
-    NNS_G3DExecOp(G3OP_MTX_IDENTITY, NULL, 0);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_IDENTITY, NULL, 0);
 }
 
 static inline void NNS_G3dGeLoadMtx44(const MtxFx44 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_LOAD_4x4, (const u32 *)mtx, 16);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_LOAD_4x4, (const u32 *)mtx, 16);
 }
 
 static inline void NNS_G3dGeLoadMtx43(const MtxFx43 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_LOAD_4x3, (const u32 *)mtx, 12);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_LOAD_4x3, (const u32 *)mtx, 12);
 }
 
 static inline void NNS_G3dGeMultMtx44(const MtxFx44 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_MULT_4x4, (const u32 *)mtx, 16);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MULT_4x4, (const u32 *)mtx, 16);
 }
 
 static inline void NNS_G3dGeMultMtx43(const MtxFx43 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_MULT_4x3, (const u32 *)mtx, 12);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MULT_4x3, (const u32 *)mtx, 12);
 }
 
 static inline void NNS_G3dGeMultMtx33(const MtxFx33 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_MULT_3x3, (const u32 *)mtx, 9);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MULT_3x3, (const u32 *)mtx, 9);
 }
 
 static inline void NNS_G3dGeScaleVec(const VecFx32 *scale) {
-    NNS_G3DExecOp(G3OP_MTX_SCALE, (const u32 *)scale, 3);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_SCALE, (const u32 *)scale, 3);
 }
 
 static inline void NNS_G3dGeTranslateVec(const VecFx32 *trans) {
-    NNS_G3DExecOp(G3OP_MTX_TRANS, (const u32 *)trans, 3);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_TRANS, (const u32 *)trans, 3);
 }
 
 static inline void NNS_G3dGeTexCoord(fx32 s, fx32 t) {
     u32 param = GX_ST(s, t);
 
-    NNS_G3DExecOp(G3OP_TEXCOORD, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_TEXCOORD, &param, 1);
 }
 
 static inline void NNS_G3dGePolygonAttr(int light, int polyMode, int cullMode, int polygonID, int alpha, int misc) {
     u32 param = GX_PACK_POLYGONATTR_PARAM(light, polyMode, cullMode, polygonID, alpha, misc);
 
-    NNS_G3DExecOp(G3OP_POLYGON_ATTR, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_POLYGON_ATTR, &param, 1);
 }
 
 static inline void NNS_G3dGeBegin(int primitive) {
     u32 param = primitive;
 
-    NNS_G3DExecOp(G3OP_BEGIN, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_BEGIN, &param, 1);
 }
 
 static inline void NNS_G3dGeEnd(void) {
-    NNS_G3DExecOp(G3OP_END, NULL, 0);
+    NNS_G3dGeBufferOP_N(G3OP_END, NULL, 0);
 }
 
 static inline void NNS_G3dGeBoxTest(const GXBoxTestParam *box) {
-    NNS_G3DExecOp(G3OP_BOX_TEST, (const u32 *)box, 3);
+    NNS_G3dGeBufferOP_N(G3OP_BOX_TEST, (const u32 *)box, 3);
 }
 
 // The global state of the geometry engine. The cmd words hold the geometry commands that send what follows them, so
@@ -813,8 +868,8 @@ typedef struct {
 
 extern NNSG3dGlb NNS_G3dGlb;
 
-// NNS_G3dInit, and NNS_G3dGlbInit
-void NNS_G3DInit(void);
+// NNS_G3dInit (util.c), and NNS_G3dGlbInit
+void NNS_G3dInit(void); // swan's NNS_G3DInit
 void NNS_G3DRenderStateInit(void);
 void NNS_G3dGlbSetBaseTrans(const VecFx32 *trans);
 void NNS_G3dGlbSetBaseScale(const VecFx32 *scale);
@@ -1019,16 +1074,27 @@ void NNS_G3DRenderFuncGlobalScale(NNSG3dRS *rs, u32 opt);
 void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt);
 void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt);
 
-// The alpha of a material of a model resource, from 0 to 31
-u32 NNS_G3DResMdlGetMatAlpha(const NNSG3dResMdl *mdl, u32 matId);
-void NNS_G3DResMdlSetMatAlpha(NNSG3dResMdl *mdl, u32 matId, u32 alpha);
-// The alpha of every material of a model resource, from 0 to 31 (NitroSystem's NNS_G3dMdlSetMdlAlphaAll)
-void func_02068410(NNSG3dResMdl *mdl, int alpha);
-// Turns fog on or off for every material of a model resource
+// Set the lights, polygon mode, culling, polygon ID and alpha of a material of a model resource, in the bits of its
+// polygon attribute (model.c). The lights are the mask of the four that shine on it, and the alpha is from 0 to 31. The
+// names are NitroSystem's as recalled; swan's are NNS_G3DResMdlSetMatLights, ShadingMode, FaceCulling, PolyID and Alpha
+void NNS_G3dMdlSetMdlLightEnableFlag(NNSG3dResMdl *mdl, u32 matID, u32 lights);
+void NNS_G3dMdlSetMdlPolygonMode(NNSG3dResMdl *mdl, u32 matID, u32 mode);
+void NNS_G3dMdlSetMdlCullMode(NNSG3dResMdl *mdl, u32 matID, u32 cull);
+void NNS_G3dMdlSetMdlPolygonID(NNSG3dResMdl *mdl, u32 matID, u32 polyID);
+void NNS_G3dMdlSetMdlAlpha(NNSG3dResMdl *mdl, u32 matId, u32 alpha);
+u32 NNS_G3dMdlGetMdlAlpha(const NNSG3dResMdl *mdl, u32 matId);
+// Turns fog on or off for a material of a model resource, or for every material
 void NNS_G3dMdlSetMdlFogEnableFlag(NNSG3dResMdl *mdl, int matID, BOOL enable);
+// Set the polygon ID or the alpha of every material of a model resource
+void NNS_G3dMdlSetMdlPolygonIDAll(NNSG3dResMdl *mdl, u32 polyID);
+void NNS_G3dMdlSetMdlAlphaAll(NNSG3dResMdl *mdl, int alpha);
 void NNS_G3dMdlSetMdlFogEnableFlagAll(NNSG3dResMdl *mdl, BOOL enable);
 
-// NitroSystem's NNS_G3dWorldPosToScrPos: where a point of the world is on the screen
-int NNS_G3DProject(const VecFx32 *world, int *x, int *y);
+// Where a point of the world is on the screen, and 0 if it is within the viewport, or -1 (util.c; swan's
+// NNS_G3DProject)
+int NNS_G3dWorldPosToScrPos(const VecFx32 *world, int *x, int *y);
+// The near and far ends of the line in the world that a screen position is on (the far end is left out for a null
+// pointer), and 0 if the position is within the viewport, or -1
+int NNS_G3dScrPosToWorldLine(int px, int py, VecFx32 *nearPos, VecFx32 *farPos);
 
 #endif // POKEBW2_NNSYS_G3D_H

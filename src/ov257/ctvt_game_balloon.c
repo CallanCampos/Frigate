@@ -272,7 +272,7 @@ void CtvtGameBalloon_Draw(CtvtGameBalloon *balloon) {
     }
     first = GFL_G3DMgrGetSceneFirstActorIdx(balloon->g3d, balloon->netId);
     actor = GFL_G3DMgrGetActor(balloon->g3d, first + balloon->stage);
-    func_02068410(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(actor))->resMdl, balloon->alpha);
+    NNS_G3dMdlSetMdlAlphaAll(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(actor))->resMdl, balloon->alpha);
     GFL_G3DSysDrawObj(actor, &balloon->srt);
 }
 
@@ -428,6 +428,6 @@ void CtvtGameShot_Draw(CtvtGameShot *shot) {
         index++;
     }
     actor = GFL_G3DMgrGetActor(shot->g3d, index);
-    func_02068410(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(actor))->resMdl, shot->alpha);
+    NNS_G3dMdlSetMdlAlphaAll(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(actor))->resMdl, shot->alpha);
     GFL_G3DSysDrawObj(actor, &shot->srt);
 }

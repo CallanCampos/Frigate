@@ -65,7 +65,7 @@ void NNS_G3DRenderStateInit(void) {
 void NNS_G3DFlushRenderState(void) {
     const u32 *glb = (const u32 *)&NNS_G3dGlb;
 
-    NNS_G3DExecOp(glb[0], glb + 1, 62);
+    NNS_G3dGeBufferOP_N(glb[0], glb + 1, 62);
     NNS_G3dGlb.flag &= ~NNS_G3D_GLB_FLAG_FLUSH_WVP;
     NNS_G3dGlb.flag &= ~NNS_G3D_GLB_FLAG_FLUSH_VP;
 }
@@ -73,10 +73,10 @@ void NNS_G3DFlushRenderState(void) {
 // Sends the projection matrix with the camera matrix applied to it, then the rest of the state from cmd1: the position
 // matrix starts as the identity, and gets the base transformation
 void NNS_G3DFlushViewProjection(void) {
-    NNS_G3DExecOp(0x1610, &NNS_G3dGlb.mtxmode_proj, 17); // MTX_MODE and MTX_LOAD_4x4
+    NNS_G3dGeBufferOP_N(0x1610, &NNS_G3dGlb.mtxmode_proj, 17); // MTX_MODE and MTX_LOAD_4x4
     NNS_G3dGeMultMtx43(&NNS_G3dGlb.cameraMtx);
     NNS_G3dGeMtxMode(GX_MTXMODE_POSITION_VECTOR);
-    NNS_G3DExecOp(G3OP_MTX_IDENTITY, &NNS_G3dGlb.cmd1, 32);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_IDENTITY, &NNS_G3dGlb.cmd1, 32);
     NNS_G3dGlb.flag &= ~NNS_G3D_GLB_FLAG_FLUSH_WVP;
     NNS_G3dGlb.flag |= NNS_G3D_GLB_FLAG_FLUSH_VP;
 }
@@ -88,15 +88,15 @@ void NNS_G3DFlushViewProjection(void) {
 void NNS_G3DFlushModelViewProjection(void) {
     MtxFx43 invBaseRot;
 
-    NNS_G3DExecOp(0x1610, &NNS_G3dGlb.mtxmode_proj, 17); // MTX_MODE and MTX_LOAD_4x4
+    NNS_G3dGeBufferOP_N(0x1610, &NNS_G3dGlb.mtxmode_proj, 17); // MTX_MODE and MTX_LOAD_4x4
     NNS_G3dGeMultMtx43(&NNS_G3dGlb.cameraMtx);
-    NNS_G3DExecOp(0x1b19, (const u32 *)&NNS_G3dGlb.prmBaseMtx, 15); // MTX_MULT_4x3 and MTX_SCALE
+    NNS_G3dGeBufferOP_N(0x1b19, (const u32 *)&NNS_G3dGlb.prmBaseMtx, 15); // MTX_MULT_4x3 and MTX_SCALE
     NNS_G3dGeMtxMode(GX_MTXMODE_POSITION_VECTOR);
     MAT3_Invert(&NNS_G3dGlb.prmBaseRot, &invBaseRot.rt.rot);
     NNS_G3dGeLoadMtx43(&invBaseRot);
-    NNS_G3DExecOp(NNS_G3dGlb.cmd1, (const u32 *)&NNS_G3dGlb.cmd1 + 1, 14);
+    NNS_G3dGeBufferOP_N(NNS_G3dGlb.cmd1, (const u32 *)&NNS_G3dGlb.cmd1 + 1, 14);
     NNS_G3dGeIdentity();
-    NNS_G3DExecOp(0x2a, &NNS_G3dGlb.prmTexImageParam, 1); // TEXIMAGE_PARAM
+    NNS_G3dGeBufferOP_N(0x2a, &NNS_G3dGlb.prmTexImageParam, 1); // TEXIMAGE_PARAM
     NNS_G3dGlb.flag |= NNS_G3D_GLB_FLAG_FLUSH_WVP;
     NNS_G3dGlb.flag &= ~NNS_G3D_GLB_FLAG_FLUSH_VP;
 }

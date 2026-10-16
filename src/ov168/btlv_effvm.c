@@ -2025,7 +2025,7 @@ static BOOL BtlvEffvm_CmdClactAdd(VM *vm, void *env) {
     BtlvMcss_GetDefaultPos(BtlvEffect_GetMcss(), &world, pos);
     world.x += offsetX;
     world.y += offsetY;
-    NNS_G3DProject(&world, &x, &y);
+    NNS_G3dWorldPosToScrPos(&world, &x, &y);
     wk->clactIndexes[index] = BtlvClact_AddActor(BtlvEffect_GetClact(), 94, fileId, x, y, scaleX, scaleY);
     return wk->ret;
 }
@@ -2506,7 +2506,7 @@ static BOOL BtlvEffvm_CmdBallAdd(VM *vm, void *env) {
     BtlvMcss_GetDefaultPos(BtlvEffect_GetMcss(), &world, pos);
     world.x += offsetX;
     world.y += offsetY;
-    NNS_G3DProject(&world, &x, &y);
+    NNS_G3dWorldPosToScrPos(&world, &x, &y);
     ball = PML_ItemGetMonsBallID(wk->param.itemNo);
     if (ball == 0 || ball > 25) {
         ball = 4;

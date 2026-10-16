@@ -1039,6 +1039,7 @@ lib/nnsys/src/g3d/sbc.c:
     .bss        start:0x02143cb0 end:0x021469b4
 
 lib/nnsys/src/g3d/gecom.c:
+    complete
     .text       start:0x02067b8c end:0x02067dd0
     .bss        start:0x021469b4 end:0x021469c0
 
@@ -1050,12 +1051,15 @@ lib/nnsys/src/g3d/mem.c:
     .text       start:0x020681b8 end:0x020681ec
 
 lib/nnsys/src/g3d/model.c:
+    complete
     .text       start:0x020681ec end:0x02068484
 
 lib/nnsys/src/g3d/res_struct_accessor.c:
+    complete
     .text       start:0x02068484 end:0x020686b8
 
 lib/nnsys/src/g3d/res_struct_accessor_anm.c:
+    complete
     .text       start:0x020686b8 end:0x02068790
 
 lib/nnsys/src/g3d/nsbca.c:

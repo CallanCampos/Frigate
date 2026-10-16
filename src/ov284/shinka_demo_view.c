@@ -777,7 +777,7 @@ static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view) {
     }
     GFL_G3DCameraFlush(manager->camera);
     GFL_G3DSysMtxViewFlush();
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
@@ -794,7 +794,7 @@ static void ShinkaDemoView_DrawPieces(ShinkaDemoView *view) {
     GFL_G3DSysMtxSetProjection(&projection);
     GFL_G3DSysMtxSetViewLookAt(&lookAt);
     GFL_G3DSysMtxViewFlush();
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
 }
 
 static void ShinkaDemoView_StartPieces(ShinkaDemoView *view) {

@@ -884,8 +884,8 @@ static void GymElecFade_Start(Fade *fade, GymElecObject *object, u32 frames) {
     fade->object = object;
     fade->frames = frames;
     mdl = GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(GymElecObject_GetActor(object)))->resMdl;
-    fade->alpha = NNS_G3DResMdlGetMatAlpha(mdl, 0);
-    NNS_G3DResMdlSetMatAlpha(mdl, 0, 0);
+    fade->alpha = NNS_G3dMdlGetMdlAlpha(mdl, 0);
+    NNS_G3dMdlSetMdlAlpha(mdl, 0, 0);
     fade->active = TRUE;
 }
 
@@ -896,7 +896,7 @@ static void GymElecFade_Update(Fade *fade) {
     if (fade->active) {
         alpha = fade->alpha * fade->frame / fade->frames;
         mdl = GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(GymElecObject_GetActor(fade->object)))->resMdl;
-        NNS_G3DResMdlSetMatAlpha(mdl, 0, alpha);
+        NNS_G3dMdlSetMdlAlpha(mdl, 0, alpha);
         if (fade->frame++ > fade->frames) {
             fade->active = FALSE;
         }

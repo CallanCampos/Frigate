@@ -332,7 +332,7 @@ BOOL NNS_G3dBindMdlTex(NNSG3dResMdl *mdl, const NNSG3dResTex *tex) {
 
     for (i = 0; i < texToMatDict->numEntry; i++) {
         const NNSG3dResName *name = NNS_G3dGetResNameByIdx(texToMatDict, i);
-        const NNSG3dResDictTexData *texData = tex != NULL ? NNS_G3DFind(&tex->dict, name) : NULL;
+        const NNSG3dResDictTexData *texData = tex != NULL ? NNS_G3dGetResDataByName(&tex->dict, name) : NULL;
 
         if (texData != NULL) {
             NNSG3dResDictTexToMatListData *list = NNS_G3dGetResDataByIdx(texToMatDict, i);
@@ -379,7 +379,7 @@ BOOL NNS_G3dBindMdlPltt(NNSG3dResMdl *mdl, const NNSG3dResTex *tex) {
         const NNSG3dResDictPlttData *plttData;
 
         if (tex != NULL && tex->plttInfo.ofsDict != 0) {
-            plttData = NNS_G3DFind((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), name);
+            plttData = NNS_G3dGetResDataByName((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), name);
         } else {
             plttData = NULL;
         }

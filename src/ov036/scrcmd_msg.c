@@ -281,7 +281,7 @@ static void ActorMsgWin_CalcAttachmentOffsetDynamic(const VecFx32 *pos, VecFx32 
     world.x += up.x;
     world.y += up.y;
     world.z += up.z;
-    NNS_G3DProject(&world, &x, &y);
+    NNS_G3dWorldPosToScrPos(&world, &x, &y);
     if ((u32)x / 8 < 10) {
         column = 0;
     } else if ((u32)x / 8 >= 10 && (u32)x / 8 <= 15) {

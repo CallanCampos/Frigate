@@ -217,13 +217,13 @@ static void func_ov036_021b4078(FieldEffectTask *task, void *work) {
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], offset);
     NNS_G3dGlbSetProjectionMtx(&mtx);
     NNS_G3DFlushRenderState();
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     MTX_Identity33_(&status.rotation);
     func_ov036_021a3ad4(task, &status.translation);
     GFL_G3DSysDrawObjBBoxCull(gyoeTask->params.gyoe->actors[gyoeTask->params.kind], &status);
     NNS_G3dGlbSetProjectionMtx(&saved);
     NNS_G3DFlushRenderState();
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
 }
 
 static void func_ov036_021b4164(u32 kind) {
