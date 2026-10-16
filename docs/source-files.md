@@ -574,7 +574,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | complete | string at `0x021d55a0` |
 | `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | partial | string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | partial | string at `0x021d55f8` |
-| `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | partial | string at `0x021d5620` |
+| `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
 | `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
 | `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | partial | string at `0x021d5648` |
 | `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | partial | string at `0x021d5654` |

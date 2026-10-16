@@ -618,6 +618,7 @@ src/ov036/party_select_list.c:
     .data       start:0x021d55d4 end:0x021d5620
 
 src/ov036/field_bbd_color.c:
+    complete
     .text       start:0x021c3c34 end:0x021c3d9c
     .rodata     start:0x021d2540 end:0x021d2560
     .data       start:0x021d5620 end:0x021d5634
