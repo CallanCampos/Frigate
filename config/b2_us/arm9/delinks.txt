@@ -2207,6 +2207,7 @@ lib/nitro/src/spi/pm.c:
     .bss        start:0x0214e240 end:0x0214e280
 
 lib/twl/src/scfg/scfg_proc.c:
+    complete
     .text       start:0x0207f6cc end:0x0207f7a4
     .bss        start:0x0214e280 end:0x0214e298
 
@@ -2263,6 +2264,7 @@ lib/nitro/src/ctrdg/ctrdg_proc.c:
     .text       start:0x020827d0 end:0x020827f8
 
 lib/twl/src/syscall/syscall_twl.c:
+    complete
     .text       start:0x020827f8 end:0x020828ac
 
 lib/msl/src/abort_exit_arm.c:

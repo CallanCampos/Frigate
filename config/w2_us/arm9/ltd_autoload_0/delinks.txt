@@ -21,13 +21,16 @@ lib/twl/src/photo_sign_util.c:
     .bss        start:0x0276ddc0 end:0x0276dde0
 
 lib/twl/src/rtc/rtc_api_ex.c:
+    complete
     .text       start:0x02700000 end:0x02700078
 
 lib/twl/src/camera/camera_api.c:
+    complete
     .text       start:0x02700078 end:0x02702080
     .bss        start:0x0276b104 end:0x0276c2e4
 
 lib/twl/src/camera/camera.c:
+    complete
     .text       start:0x02702080 end:0x02702434
 
 lib/twl/src/nwm/nwm.c:
@@ -35,9 +38,11 @@ lib/twl/src/nwm/nwm.c:
     .bss        start:0x0276c2e4 end:0x0276c520
 
 lib/twl/src/mic/mic_twl.c:
+    complete
     .text       start:0x02703c60 end:0x027040b4
 
 lib/twl/src/fatfs/fatfs_api.c:
+    complete
     .text       start:0x027040b4 end:0x02704364
     .bss        start:0x0276c520 end:0x0276c590
 
@@ -46,9 +51,11 @@ lib/twl/src/snd/sndex.c:
     .bss        start:0x0276c590 end:0x0276c5ec
 
 lib/twl/src/dsp/dsp_if.c:
+    complete
     .text       start:0x02704e90 end:0x027052b4
 
 lib/twl/src/dsp/dsp_process.c:
+    complete
     .text       start:0x027052b4 end:0x02705f64
     .data       start:0x0276ae98 end:0x0276aebc
     .bss        start:0x0276c5ec end:0x0276c618
@@ -63,11 +70,13 @@ lib/twl/src/dsp/dsp_pipe.c:
     .bss        start:0x0276c668 end:0x0276da80
 
 lib/twl/src/dsp/dsp_g711.c:
+    complete
     .text       start:0x0270723c end:0x02707310
     .data       start:0x0276aec0 end:0x0276aec8
     .bss        start:0x0276da80 end:0x0276dbdc
 
 lib/twl/src/dsp/dsp_graphics.c:
+    complete
     .text       start:0x02707310 end:0x02707628
     .data       start:0x0276aec8 end:0x0276aee0
     .bss        start:0x0276dbdc end:0x0276dd4c
