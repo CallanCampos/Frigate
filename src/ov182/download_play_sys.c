@@ -26,6 +26,9 @@ static void func_ov182_021bafc8(u16 unk, u16 peer, u8 *data);
 static void func_ov182_021bb0c0(void);
 static u16 func_ov182_021bb17c(void);
 
+// The work the parent's flow reads the helper's through, which the function that starts the flow stores
+DownloadPlaySysWork *gDownloadPlaySysWork;
+
 // Takes the work the overlay's screens file built and starts the flow out at the wireless bring-up, with the game
 // the children download. The state and the state before it are cleared; the two fields that say the parent is the
 // host and the session's own first word are set; the data sharing's own areas are cleared; then the game registry
@@ -35,7 +38,8 @@ void func_ov182_021ba768(DownloadPlaySysWork *loaderContext, const MBGameRegistr
     DownloadPlaySysWork *dat;
 
     DownloadPlay_SetWork((DownloadPlayWork *)loaderContext);
-    dat = (DownloadPlaySysWork *)gWork.work;
+    gDownloadPlaySysWork = (DownloadPlaySysWork *)loaderContext;
+    dat = gDownloadPlaySysWork;
     dat->state = DOWNLOAD_PLAY_SYS_STATE_STOP;
     dat->prevState = DOWNLOAD_PLAY_SYS_STATE_STOP;
     dat->unk_a92 = 1;
@@ -550,12 +554,14 @@ static void func_ov182_021bafc8(u16 unk, u16 peer, u8 *data) {
 // child, a frame that says the peer is the host is taken over
 static void func_ov182_021bb0c0(void) {
     DOWNLOAD_PLAY_SYS_WORK(dat);
+    u32 *changed;
     int i;
 
+    changed = dat->frameChanged;
     for (i = 0; i < DOWNLOAD_PLAY_SYS_FRAME_NO; i++) {
         u8 *frame;
 
-        if (!dat->frameChanged[i]) {
+        if (changed[i] == 0) {
             continue;
         }
 
@@ -587,7 +593,5 @@ static void func_ov182_021bb0c0(void) {
 
 // The code the peer's frame carries, which the flow reads to decide what to do next
 static u16 func_ov182_021bb17c(void) {
-    DOWNLOAD_PLAY_SYS_WORK(dat);
-
-    return dat->peerCode;
+    return gDownloadPlaySysWork->peerCode;
 }

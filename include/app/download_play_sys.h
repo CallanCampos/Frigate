@@ -107,8 +107,11 @@ typedef struct {
     u8 unk_ad1[0x33];
 } DownloadPlaySysWork;
 
-// The work the parent's flow reads the helper's through, which the function that starts the flow stores
-#define DOWNLOAD_PLAY_SYS_WORK(name) DownloadPlaySysWork *name = (DownloadPlaySysWork *)gWork.work
+// The parent's flow work, which the function that starts the flow stores here, the way the helper keeps its own
+extern DownloadPlaySysWork *gDownloadPlaySysWork;
+
+#define DOWNLOAD_PLAY_SYS_WORK(name) DownloadPlaySysWork *name = gDownloadPlaySysWork
+
 // What the overlay's screens file calls
 void func_ov182_021ba768(DownloadPlaySysWork *work, const MBGameRegistry *registry);
 BOOL func_ov182_021ba81c(void);
