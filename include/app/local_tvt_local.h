@@ -5,6 +5,7 @@
 // "local_tvt_*.c". Every name here is ours
 
 #include "types.h"
+#include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_chara.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_graphic.h"
@@ -24,7 +25,6 @@
 typedef struct LocalTvtBG LocalTvtBG;
 typedef struct LocalTvtScriptMode LocalTvtScriptMode;
 typedef struct LocalTvtCallMode LocalTvtCallMode;
-typedef struct LocalTvtCallData LocalTvtCallData;
 typedef struct LocalTvtCallSelect LocalTvtCallSelect;
 typedef struct LocalTvtPerson LocalTvtPerson;
 typedef struct LocalTvtSeq LocalTvtSeq;
@@ -88,35 +88,6 @@ void LocalTvtCallSelect_Free(LocalTvtCallSelect *select);
 void LocalTvtCallSelect_Main(LocalTvtCallSelect *select);
 u32 LocalTvtCallSelect_GetResult(LocalTvtCallSelect *select);
 int LocalTvtCallSelect_GetSelected(LocalTvtCallSelect *select);
-
-// local_tvt_calldata.c: the table of the calls and the save data of the calls made
-
-LocalTvtCallData *LocalTvtCallData_Create(GameSystem *gsys, GameData *gameData, HeapID heapId);
-void LocalTvtCallData_Free(LocalTvtCallData *data);
-// The background and the object of the face of a person the player calls, for the calls made so far
-u32 LocalTvtCallData_GetBackground(LocalTvtCallData *data, u16 person);
-u32 LocalTvtCallData_GetObject(LocalTvtCallData *data, u16 person);
-u32 LocalTvtCallData_GetBadgeCount(LocalTvtCallData *data);
-GameData *LocalTvtCallData_GetGameData(LocalTvtCallData *data);
-// The messages of the call with a person, for the calls made so far
-u16 LocalTvtCallData_GetGreetingMsg(LocalTvtCallData *data, u16 person);
-u16 LocalTvtCallData_GetChatMsg(LocalTvtCallData *data, u16 person);
-u16 LocalTvtCallData_GetByeMsg(LocalTvtCallData *data, u16 person);
-u16 LocalTvtCallData_GetExtraMsg(LocalTvtCallData *data, u16 person);
-BOOL LocalTvtCallData_CanCall(LocalTvtCallData *data, u16 person);
-BOOL LocalTvtCallData_IsListed(LocalTvtCallData *data, u16 person);
-// The background and the object of a face in a zone, by its battle background and weather
-u32 LocalTvtCallData_GetZoneBackground(LocalTvtCallData *data, u16 zoneId);
-u32 LocalTvtCallData_GetZoneObject(LocalTvtCallData *data, u16 zoneId);
-// The calls made with a person, which count up to a maximum
-u16 LocalTvtCallData_GetCallCount(LocalTvtCallData *data, u16 person);
-BOOL LocalTvtCallData_IsPlayerMale(LocalTvtCallData *data);
-void LocalTvtCallData_AddCall(LocalTvtCallData *data, u16 person, u32 max);
-void LocalTvtCallData_Set0200ff68(LocalTvtCallData *data, u32 value);
-void LocalTvtCallData_Set0200ff78(LocalTvtCallData *data);
-BOOL LocalTvtCallData_Get0200ff8c(LocalTvtCallData *data);
-void LocalTvtCallData_Reset0200ffcc(LocalTvtCallData *data);
-BOOL LocalTvtCallData_IsSecretUnknown(LocalTvtCallData *data);
 
 // local_tvt_person.c: the call with a person, who greets and then talks about the topic the player picks
 

@@ -411,6 +411,8 @@ typedef struct LinkFestival LinkFestival;
 typedef struct LiveBattleMatchPlayerData LiveBattleMatchPlayerData;
 typedef struct LocalTvtBGSetup LocalTvtBGSetup;
 typedef struct LocalTvtBackgroundFiles LocalTvtBackgroundFiles;
+typedef struct LocalTvtCallData LocalTvtCallData;
+typedef struct LocalTvtCallEntry LocalTvtCallEntry;
 typedef struct LocalTvtChara LocalTvtChara;
 typedef struct LocalTvtCharaSetup LocalTvtCharaSetup;
 typedef struct LocalTvtFace LocalTvtFace;

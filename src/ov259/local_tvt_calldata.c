@@ -1,3 +1,4 @@
+#include "app/local_tvt/local_tvt_calldata.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt_local.h"
@@ -27,7 +28,7 @@ enum {
     CALL_BACKGROUND_1,
 };
 
-typedef struct {
+struct LocalTvtCallEntry {
     u16 person;
     u16 callCount;
     u16 background;
@@ -38,7 +39,7 @@ typedef struct {
     u16 byeMsg;
     u16 extraMsg;
     u16 unk12;
-} LocalTvtCallEntry;
+};
 
 struct LocalTvtCallData {
     GameData *gameData;
