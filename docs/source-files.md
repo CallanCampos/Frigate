@@ -560,7 +560,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | partial | string at `0x021d557c` |
 | `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | complete | descriptive |
 | `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | complete | descriptive |
-| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | partial | string at `0x021d558c` |
+| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | string at `0x021d558c` |
 | `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | partial | string at `0x021d55a0` |
 | `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | partial | string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | partial | string at `0x021d55f8` |

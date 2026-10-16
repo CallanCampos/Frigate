@@ -593,6 +593,7 @@ src/ov036/field_water_current.c:
     .rodata     start:0x021d23a0 end:0x021d23c8
 
 src/ov036/fldeff_d06denki.c:
+    complete
     .text       start:0x021c27c0 end:0x021c2cf4
     .rodata     start:0x021d23c8 end:0x021d24dc
     .data       start:0x021d55cc end:0x021d55e0

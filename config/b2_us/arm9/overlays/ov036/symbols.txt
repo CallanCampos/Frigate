@@ -5532,7 +5532,7 @@ data_ov036_021d22d2 kind:data(any) addr:0x021d22d2
 SLOPE_SLIP_TILES kind:data(any) addr:0x021d234c
 WATER_CURRENT_FLOW_TILES kind:data(any) addr:0x021d236c
 WATER_CURRENT_TILES kind:data(any) addr:0x021d237c
-data_ov036_021d2394 kind:data(any) addr:0x021d2394
+MARK_TASK_VTABLE kind:data(any) addr:0x021d2394
 data_ov036_021d23a4 kind:data(any) addr:0x021d23a4
 data_ov036_021d23b8 kind:data(any) addr:0x021d23b8
 data_ov036_021d23cc kind:data(any) addr:0x021d23cc
