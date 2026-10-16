@@ -168,6 +168,11 @@ lib/dwcutilui/src/dwc_util_keyboard.c:
     .data       start:0x021c0988 end:0x021c0b6c
     .bss        start:0x021c407c end:0x021c4080
 
+lib/dwcutilui/src/dwc_util_menu.c:
+    .text       start:0x021acd80 end:0x021ada94
+    .rodata     start:0x021bfe7c end:0x021bff88
+    .bss        start:0x021c4080 end:0x021c4084
+
 lib/dwcutilui/src/dwc_util_main.c:
     complete
     .text       start:0x021adbc0 end:0x021ae084
