@@ -95,6 +95,11 @@ void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const NNSG3dJointScal
     }
 }
 
+// Sends a packet of num words to the geometry engine: the packed opcodes, then the arguments of their commands
+static inline void sendPacket_(const u32 *packet, u32 num) {
+    NNS_G3dGeBufferOP_N(packet[0], &packet[1], num - 1);
+}
+
 // Sends the texture matrix of a material's result: the scale and translation of the texture, which Softimage has no
 // rotation for, with the scale of the texture's size to its original size on the S and T of the matrix, and then the
 // geometry engine's matrix mode back to position and vector. With TEXMTX_SET it is loaded, and with TEXMTX_MULT it is
@@ -145,7 +150,6 @@ void NNSi_G3dSendTexSRTSi3d(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[1][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[1][1]) >> FX32_SHIFT);
         cmd.mtx.m[3][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[3][1]) >> FX32_SHIFT);
     }
-    // The arguments, the matrix modes and the matrix, are the words that follow the opcodes
-    NNS_G3dGeBufferOP_N(cmd.op, &cmd.modeTexture, sizeof(cmd) / sizeof(u32) - 1);
+    sendPacket_((const u32 *)&cmd, sizeof(cmd) / sizeof(u32));
 }
 #pragma thumb on

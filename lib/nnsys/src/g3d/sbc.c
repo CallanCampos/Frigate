@@ -606,6 +606,8 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
     skip = RunCallBack(rs, NNS_G3D_SBC_BB, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         MtxFx44 clip;
+        VecFx32 *trans = &sBBCmd.trans;
+        VecFx32 *scale = &sBBCmd.scale;
 
         NNS_G3dGeFlushBuffer();
         reg_G3X_GXFIFO = 0x151110; // MTX_MODE, MTX_PUSH, MTX_IDENTITY
@@ -626,12 +628,12 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
             MTX_Concat44(&clip, &cam, &clip);
         }
 
-        sBBCmd.trans.x = clip.m[3][0];
-        sBBCmd.trans.y = clip.m[3][1];
-        sBBCmd.trans.z = clip.m[3][2];
-        sBBCmd.scale.x = VEC_Mag((const VecFx32 *)clip.m[0]);
-        sBBCmd.scale.y = VEC_Mag((const VecFx32 *)clip.m[1]);
-        sBBCmd.scale.z = VEC_Mag((const VecFx32 *)clip.m[2]);
+        trans->x = clip.m[3][0];
+        trans->y = clip.m[3][1];
+        trans->z = clip.m[3][2];
+        scale->x = VEC_Mag((const VecFx32 *)clip.m[0]);
+        scale->y = VEC_Mag((const VecFx32 *)clip.m[1]);
+        scale->z = VEC_Mag((const VecFx32 *)clip.m[2]);
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
@@ -672,6 +674,9 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
     u32 size = 2;
     u32 timing;
     u32 skip;
+    VecFx32 *xAxis = &sBBYCmd.axis[0];
+    VecFx32 *yAxis;
+    VecFx32 *zAxis;
 
     if (rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) {
         if (opt == NNS_G3D_SBCFLG_010 || opt == NNS_G3D_SBCFLG_011) {
@@ -702,6 +707,8 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
     skip = RunCallBack(rs, NNS_G3D_SBC_BBY, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         MtxFx44 clip;
+        VecFx32 *trans = &sBBYCmd.trans;
+        VecFx32 *scale = &sBBYCmd.scale;
 
         NNS_G3dGeFlushBuffer();
         reg_G3X_GXFIFO = 0x151110; // MTX_MODE, MTX_PUSH, MTX_IDENTITY
@@ -722,24 +729,22 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
             MTX_Concat44(&clip, &cam, &clip);
         }
 
-        sBBYCmd.trans.x = clip.m[3][0];
-        sBBYCmd.trans.y = clip.m[3][1];
-        sBBYCmd.trans.z = clip.m[3][2];
-        sBBYCmd.scale.x = VEC_Mag((const VecFx32 *)clip.m[0]);
-        sBBYCmd.scale.y = VEC_Mag((const VecFx32 *)clip.m[1]);
-        sBBYCmd.scale.z = VEC_Mag((const VecFx32 *)clip.m[2]);
+        trans->x = clip.m[3][0];
+        trans->y = clip.m[3][1];
+        trans->z = clip.m[3][2];
+        scale->x = VEC_Mag((const VecFx32 *)clip.m[0]);
+        scale->y = VEC_Mag((const VecFx32 *)clip.m[1]);
+        scale->z = VEC_Mag((const VecFx32 *)clip.m[2]);
 
         // The y axis stays where the model has it, and the other two are made from it: x turns about z, z is across
         // them
-        sBBYCmd.axis[1].x = clip.m[1][0];
-        sBBYCmd.axis[1].y = clip.m[1][1];
-        sBBYCmd.axis[1].z = clip.m[1][2];
-        sBBYCmd.axis[0].x = sBBYCmd.axis[1].y;
-        sBBYCmd.axis[0].y = -sBBYCmd.axis[1].x;
-        sBBYCmd.axis[0].z = 0;
-        VEC_Normalize(&sBBYCmd.axis[0], &sBBYCmd.axis[0]);
-        VEC_Normalize(&sBBYCmd.axis[1], &sBBYCmd.axis[1]);
-        VEC_CrossProduct(&sBBYCmd.axis[0], &sBBYCmd.axis[1], &sBBYCmd.axis[2]);
+        yAxis = &xAxis[1];
+        zAxis = &xAxis[2];
+        VEC_Set(yAxis, clip.m[1][0], clip.m[1][1], clip.m[1][2]);
+        VEC_Set(xAxis, yAxis->y, -yAxis->x, 0);
+        VEC_Normalize(xAxis, xAxis);
+        VEC_Normalize(yAxis, yAxis);
+        VEC_CrossProduct(xAxis, yAxis, zAxis);
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3

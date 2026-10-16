@@ -91,43 +91,37 @@ int NNS_G3dScrPosToWorldLine(int px, int py, VecFx32 *nearPos, VecFx32 *farPos) 
     int x2;
     int y2;
     int height;
-    fx32 relX;
-    fx32 relY;
-    int result;
     fx32 ndcX;
     fx32 ndcY;
+    int result;
     const MtxFx44 *inv;
     fx32 wBase;
     fx32 wFar;
+    fx64 invW;
     fx32 x;
     fx32 y;
     fx32 z;
     fx32 farX;
     fx32 farY;
     fx32 farZ;
-    fx64 invW;
 
     NNS_G3DGetViewport(&x1, &y1, &x2, &y2);
     height = y2 - y1;
-    relX = FX_Div((px - x1) << FX32_SHIFT, (x2 - x1) << FX32_SHIFT);
-    relY = FX_Div((py + y1 - 191) << FX32_SHIFT, -height << FX32_SHIFT);
-    if (relX < 0 || relY < 0 || relX > FX32_ONE || relY > FX32_ONE) {
+    ndcX = FX_Div((px - x1) << FX32_SHIFT, (x2 - x1) << FX32_SHIFT);
+    ndcY = FX_Div((py + y1 - 191) << FX32_SHIFT, -height << FX32_SHIFT);
+    if (ndcX < 0 || ndcY < 0 || ndcX > FX32_ONE || ndcY > FX32_ONE) {
         result = -1;
     } else {
         result = 0;
     }
-    ndcX = (relX - FX32_HALF) * 2;
-    ndcY = (relY - FX32_HALF) * 2;
+    ndcX = (ndcX - FX32_HALF) * 2;
+    ndcY = (ndcY - FX32_HALF) * 2;
     inv = NNS_G3DGetInvViewProjectionMatrix();
-    wBase = (fx32)(((fx64)ndcX * inv->m[0][3] + (fx64)ndcY * inv->m[1][3]) >> FX32_SHIFT);
-    wBase += inv->m[3][3];
+    wBase = (fx32)(((fx64)ndcX * inv->m[0][3] + (fx64)ndcY * inv->m[1][3]) >> FX32_SHIFT) + inv->m[3][3];
     FX_InvAsync(wBase - inv->m[2][3]);
-    x = (fx32)(((fx64)ndcX * inv->m[0][0] + (fx64)ndcY * inv->m[1][0]) >> FX32_SHIFT);
-    x += inv->m[3][0];
-    y = (fx32)(((fx64)ndcX * inv->m[0][1] + (fx64)ndcY * inv->m[1][1]) >> FX32_SHIFT);
-    y += inv->m[3][1];
-    z = (fx32)(((fx64)ndcX * inv->m[0][2] + (fx64)ndcY * inv->m[1][2]) >> FX32_SHIFT);
-    z += inv->m[3][2];
+    x = (fx32)(((fx64)ndcX * inv->m[0][0] + (fx64)ndcY * inv->m[1][0]) >> FX32_SHIFT) + inv->m[3][0];
+    y = (fx32)(((fx64)ndcX * inv->m[0][1] + (fx64)ndcY * inv->m[1][1]) >> FX32_SHIFT) + inv->m[3][1];
+    z = (fx32)(((fx64)ndcX * inv->m[0][2] + (fx64)ndcY * inv->m[1][2]) >> FX32_SHIFT) + inv->m[3][2];
     if (farPos != NULL) {
         farX = x + inv->m[2][0];
         farY = y + inv->m[2][1];

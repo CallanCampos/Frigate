@@ -54,7 +54,6 @@ static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
                 u32 idxA;
                 u32 idxB;
                 u32 a;
-                u32 b;
                 u32 rb;
                 u32 g;
 
@@ -66,9 +65,8 @@ static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
                     idxB = idxA + 1;
                 }
                 a = data[idxA];
-                b = data[idxB];
-                rb = BLEND_3_1(a, b, COLOR_RB_MASK) >> 2;
-                g = BLEND_3_1(a, b, GX_RGB_G_MASK) >> 2;
+                rb = BLEND_3_1(a, data[idxB], COLOR_RB_MASK) >> 2;
+                g = BLEND_3_1(a, data[idxB], GX_RGB_G_MASK) >> 2;
                 return (rb & COLOR_RB_MASK) | (g & GX_RGB_G_MASK);
             }
             idx = frame >> 2;
@@ -117,6 +115,7 @@ static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
             if (frame & 1) {
                 u32 idxA;
                 u32 idxB;
+                u32 a;
 
                 if (frame & 2) {
                     idxB = frame >> 2;
@@ -125,7 +124,8 @@ static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
                     idxA = frame >> 2;
                     idxB = idxA + 1;
                 }
-                return (3 * data[idxA] + data[idxB]) >> 2;
+                a = data[idxA];
+                return (3 * a + data[idxB]) >> 2;
             }
             return (*(data + (frame >> 2)) + *(data + (frame >> 2) + 1)) >> 1;
         }

@@ -213,7 +213,8 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
                 }
                 p += 2;
             } else {
-                result->trans.x = *p++;
+                result->trans.x = *p;
+                p++;
             }
 
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_TY)) {
@@ -224,7 +225,8 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
                 }
                 p += 2;
             } else {
-                result->trans.y = *p++;
+                result->trans.y = *p;
+                p++;
             }
 
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_TZ)) {
@@ -235,7 +237,8 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
                 }
                 p += 2;
             } else {
-                result->trans.z = *p++;
+                result->trans.z = *p;
+                p++;
             }
         } else if (tag & NNS_G3D_JNTANM_SRTINFO_IDENTITY_T) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO;

@@ -164,6 +164,11 @@ static TexMtx3dsMaxFunc sTexMtx3dsMaxFuncs[8] = {
     calcTexMtx3dsMaxSR_,  calcTexMtx3dsMaxR_,  calcTexMtx3dsMaxS_,  calcTexMtx3dsMaxIdentity_,
 };
 
+// Sends a packet of num words to the geometry engine: the packed opcodes, then the arguments of their commands
+static inline void sendPacket_(const u32 *packet, u32 num) {
+    NNS_G3dGeBufferOP_N(packet[0], &packet[1], num - 1);
+}
+
 // Sends the texture matrix of a material's result: the matrix of the function that suits its flag, with the first row
 // and the S translation scaled by magW, the ratio of the texture's size to its original size, and the second row and
 // the T translation by magH, between a change of the geometry engine's matrix mode to texture and back to position and
@@ -200,7 +205,6 @@ void NNSi_G3dSendTexSRT3dsMax(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[1][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[1][1]) >> FX32_SHIFT);
         cmd.mtx.m[3][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[3][1]) >> FX32_SHIFT);
     }
-    // The arguments, the matrix modes and the matrix, are the words that follow the opcodes
-    NNS_G3dGeBufferOP_N(cmd.op, &cmd.modeTexture, sizeof(cmd) / sizeof(u32) - 1);
+    sendPacket_((const u32 *)&cmd, sizeof(cmd) / sizeof(u32));
 }
 #pragma thumb on

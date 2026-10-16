@@ -26,12 +26,13 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
     u32 last;
     fx32 a;
     fx32 b;
-    BOOL average = FALSE;
+    BOOL average;
 
     if (info & NNS_G3D_SRTANM_ELEM_CONST) {
         return offset;
     }
     data = (const u8 *)anm + offset;
+    average = FALSE;
     if (info & NNS_G3D_SRTANM_ELEM_STEP_MASK) {
         last = info & NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK;
         if (info & NNS_G3D_SRTANM_ELEM_STEP_2) {
@@ -70,7 +71,8 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
                         a = ((const fx32 *)data)[idxA];
                         b = ((const fx32 *)data)[idxB];
                     }
-                    return (3 * a + b) >> 2;
+                    a *= 3;
+                    return (a + b) >> 2;
                 } else {
                     frame >>= 2;
                     average = TRUE;
@@ -80,21 +82,21 @@ static fx32 getTexSrtData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset, 
             }
         }
     }
-    if (average) {
-        // The frame between two stored values is their average
+    if (!average) {
         if (info & NNS_G3D_SRTANM_ELEM_FX16) {
-            a = *((const fx16 *)data + frame);
-            b = *((const fx16 *)data + frame + 1);
-        } else {
-            a = *((const fx32 *)data + frame);
-            b = *((const fx32 *)data + frame + 1);
+            return ((const fx16 *)data)[frame];
         }
-        return (a + b) >> 1;
+        return ((const fx32 *)data)[frame];
     }
+    // The frame between two stored values is their average
     if (info & NNS_G3D_SRTANM_ELEM_FX16) {
-        return ((const fx16 *)data)[frame];
+        a = *((const fx16 *)data + frame);
+        b = *((const fx16 *)data + frame + 1);
+    } else {
+        a = *((const fx32 *)data + frame);
+        b = *((const fx32 *)data + frame + 1);
     }
-    return ((const fx32 *)data)[frame];
+    return (a + b) >> 1;
 }
 
 // The same for a rotation, the sine and the cosine as one word, the cosine in the high half. Each is blended by itself
@@ -102,12 +104,13 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
     const SinCos *data;
     const SinCos *a;
     u32 last;
-    BOOL average = FALSE;
+    BOOL average;
 
     if (info & NNS_G3D_SRTANM_ELEM_CONST) {
         return offset;
     }
     data = (const SinCos *)((const u8 *)anm + offset);
+    average = FALSE;
     if (info & NNS_G3D_SRTANM_ELEM_STEP_MASK) {
         last = info & NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK;
         if (info & NNS_G3D_SRTANM_ELEM_STEP_2) {
@@ -130,6 +133,8 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
                 } else if (frame & 1) {
                     u32 idxA;
                     u32 idxB;
+                    fx32 sinR;
+                    fx32 cosR;
 
                     if (frame & 2) {
                         idxB = frame >> 2;
@@ -138,8 +143,11 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
                         idxA = frame >> 2;
                         idxB = idxA + 1;
                     }
-                    a = data + idxA;
-                    return (u16)((3 * a->sinR + data[idxB].sinR) >> 2) | (((3 * a->cosR + data[idxB].cosR) >> 2) << 16);
+                    sinR = data[idxA].sinR;
+                    cosR = data[idxA].cosR;
+                    sinR = (3 * sinR + data[idxB].sinR) >> 2;
+                    cosR = (3 * cosR + data[idxB].cosR) >> 2;
+                    return (u16)sinR | (cosR << 16);
                 } else {
                     frame >>= 2;
                     average = TRUE;
@@ -149,11 +157,11 @@ static u32 getTexSrtRotData_(const NNSG3dResTexSrtAnm *anm, u32 info, u32 offset
             }
         }
     }
-    if (average) {
-        a = data + frame;
-        return (u16)((a->sinR + (a + 1)->sinR) >> 1) | (((a->cosR + (a + 1)->cosR) >> 1) << 16);
+    if (!average) {
+        return data[frame].word;
     }
-    return data[frame].word;
+    a = data + frame;
+    return (u16)((a->sinR + (a + 1)->sinR) >> 1) | (((a->cosR + (a + 1)->cosR) >> 1) << 16);
 }
 
 // Sets the texture matrix of a material in a result for the data at idx, at a frame: the scale, rotation and
