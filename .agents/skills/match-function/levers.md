@@ -343,6 +343,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
   recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
   (matching.md: "assigned just before the call")
+- A large offset derived from an earlier one (`subs r6, #0x80`) where the original builds it fresh (`movs; lsls`):
+  a join just before it, or a pointer local to the earlier member, initialized at its declaration at the top.
+  (matching.md: "rebuilt at each use in a scratch register")
 - Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
   them as two statements on the field. (matching.md: "Two constants applied to a field")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows

@@ -674,9 +674,17 @@ Same code, other `sp` offsets or frame size.
   and the fall-through of conditional branches, whatever pointer it is added to, and stops only at a join: a label
   reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
   `if`s, dead stores and one-pass loops are removed before that and don't stop it. Where the original builds an
-  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it: overlay 173's
-  `WifiP2PMatch_StateRecruitingFriendMenu` gets its voice-chat store in the common tail with the next state set in
-  both branches and stored once after them.
+  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it, or for a pointer local to the nearby
+  member that the derivation starts from.
+- A pointer local to a member at a large offset, initialized at its declaration at the top of the function, is
+  rebuilt at each use in a scratch register (`movs r1, #0x93; lsls r1, #2; adds r1, r5, r1`), and MWCC derives no
+  later offset from it. The same address written as `&wk->member` at each use, or a pointer assigned just before its
+  first use, is kept in a saved register and later stores are derived from it (`subs r6, #0x80`). Overlay 173's
+  `WifiP2PMatch_StateRecruitingFriendMenu` matches only with `WIFI_STATUS *targetStatus = &wk->targetStatus;` as its
+  first declaration, passed to `WifiP2PMatch_GetGameMode` and `WIFI_STATUS_GetVChatStatus`, as its siblings
+  `WifiP2PMatch_StateConnectFriendYesNo` and `WifiP2PMatch_StateFriendSelect` declare it: its `wk->seq` stores of
+  0xa2 and 0x76 are then built fresh and the second joins the common tail. No join is needed there. With the pointer
+  used at one call only, only the store after that call is fixed.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
