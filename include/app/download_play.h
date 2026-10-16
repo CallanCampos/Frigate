@@ -70,6 +70,17 @@ BOOL DownloadPlay_IsBootableAll(void);
 void DownloadPlay_StartRebootAll(void);
 void DownloadPlay_Cancel(void);
 u16 DownloadPlay_GetState(void);
+// The children's bitmaps DownloadPlay_GetChildBmp reads (DOWNLOAD_PLAY_BMP_*), in the order of DownloadPlayState's
+// bitmaps
+enum {
+    DOWNLOAD_PLAY_BMP_CONNECT,
+    DOWNLOAD_PLAY_BMP_REQUEST,
+    DOWNLOAD_PLAY_BMP_ENTRY,
+    DOWNLOAD_PLAY_BMP_DOWNLOAD,
+    DOWNLOAD_PLAY_BMP_BOOTABLE,
+    DOWNLOAD_PLAY_BMP_REBOOT,
+};
+
 u16 DownloadPlay_GetChildBmp(int bmpType);
 DownloadPlayChildInfo *DownloadPlay_GetChildInfo(u16 childAid);
 u16 DownloadPlay_GetPlayerNoByMac(const u8 *macAddress);
