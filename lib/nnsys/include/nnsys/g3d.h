@@ -585,12 +585,16 @@ typedef struct NNSG3dMatAnmResult {
 
 // A joint's flag says which of its parts are the identity: a scale of one, a zero rotation or translation. A blend
 // keeps only those that all its animations have. The rotation is three rows of a matrix, of which a blend adds up the
-// first two and makes the third
+// first two and makes the third. The scaling rules of Maya and Softimage models (maya.c and si3d.c) use the rest:
+// scaleEx0 and scaleEx1 are the scale of the parent and its inverse (Softimage), or scaleEx0 the inverse of the
+// parent's scale (Maya), where the joint is to cancel the scale of its parent, and EX0_ONE and EX1_ONE say that they
+// are one. MAYA_SSC_APPLY is Maya's segment scale compensate: the joint cancels the scale of its parent
 #define NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE 0x00000001
 #define NNS_G3D_JNTANM_RESULTFLAG_ROT_ZERO 0x00000002
 #define NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO 0x00000004
 #define NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE 0x00000008
 #define NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE 0x00000010
+#define NNS_G3D_JNTANM_RESULTFLAG_MAYA_SSC_APPLY 0x00000020
 
 typedef struct {
     u32 flag;
@@ -796,14 +800,14 @@ typedef void (*NNSG3dFuncTexMatrix)(const NNSG3dMatAnmResult *result);
 
 // Standard (basic.c), Maya (maya.c) and Softimage (si3d.c) scaling rules
 void NNSi_G3dSendJointSRTBasic(const NNSG3dJntAnmResult *result);
-void func_02069fbc(const NNSG3dJntAnmResult *result);
-void func_0206a714(const NNSG3dJntAnmResult *result);
+void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result);
+void NNSi_G3dSendJointSRTSi3d(const NNSG3dJntAnmResult *result);
 void NNSi_G3dGetJointScaleBasic(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
-void func_0206a044(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 // Maya (maya.c), Softimage (si3d.c), 3ds Max (3dsmax.c) and XSI (xsi.c) texture matrix modes
-void func_0206a5cc(const NNSG3dMatAnmResult *result);
-void func_0206aa5c(const NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTMaya(const NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTSi3d(const NNSG3dMatAnmResult *result);
 void func_0206b124(const NNSG3dMatAnmResult *result);
 void func_0206b74c(const NNSG3dMatAnmResult *result);
 
@@ -1080,6 +1084,12 @@ static inline void NNS_G3dGlbLookAt(const VecFx32 *camPos, const VecFx32 *camUp,
 #define NNS_G3D_SBC_ENVMAP 0x0c
 #define NNS_G3D_SBC_PRJMAP 0x0d
 #define NNS_G3D_SBC_COMMAND_NUM 32
+
+// The flags in the fourth byte of a NODEDESC command, after the node and its parent, that a Maya model's scaling rule
+// reads (maya.c): the joint cancels the scale of its parent, and a child of the joint does so, which makes the joint
+// keep its inverse scale for the children
+#define NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_APPLY 0x01
+#define NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_CHILD 0x02
 
 #define NNS_G3D_SBCFLG_000 0x00
 #define NNS_G3D_SBCFLG_001 0x20

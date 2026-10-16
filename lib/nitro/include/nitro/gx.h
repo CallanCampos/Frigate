@@ -550,6 +550,7 @@ typedef enum {
 } GXLightId;
 
 // Geometry commands, as NitroSystem buffers them
+#define G3OP_NOP 0x00
 #define G3OP_MTX_MODE 0x10
 #define G3OP_MTX_PUSH 0x11
 #define G3OP_MTX_POP 0x12
@@ -569,6 +570,9 @@ typedef enum {
 #define G3OP_BEGIN 0x40
 #define G3OP_END 0x41
 #define G3OP_BOX_TEST 0x70
+
+// Four commands packed into one word, the first in the low byte, for a buffer whose arguments follow
+#define GX_PACK_OP(op1, op2, op3, op4) ((u32)((op1) | ((op2) << 8) | ((op3) << 16) | ((op4) << 24)))
 
 typedef enum {
     GX_CULL_ALL,
