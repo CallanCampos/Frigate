@@ -9,6 +9,7 @@
 #include "app/local_tvt/local_tvt_person_chelen.h"
 #include "app/local_tvt/local_tvt_person_doctor.h"
 #include "app/local_tvt/local_tvt_person_mother.h"
+#include "app/local_tvt/local_tvt_person_rival.h"
 #include "app/local_tvt/local_tvt_person_support.h"
 #include "app/local_tvt/local_tvt_util.h"
 #include "app/local_tvt_local.h"

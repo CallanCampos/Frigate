@@ -16,6 +16,7 @@
 #include "app/local_tvt/local_tvt_person_chelen.h"
 #include "app/local_tvt/local_tvt_person_doctor.h"
 #include "app/local_tvt/local_tvt_person_mother.h"
+#include "app/local_tvt/local_tvt_person_rival.h"
 #include "app/local_tvt/local_tvt_person_support.h"
 #include "app/local_tvt/local_tvt_scriptmode.h"
 #include "app/local_tvt/local_tvt_util.h"
@@ -32,7 +33,6 @@
 #include "system/printsys.h"
 
 // local_tvt_person_*.c
-void LocalTvtRival_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId);
 void LocalTvtSecret_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, LocalTvtCallData *callData,
                           BOOL unk, HeapID heapId);
 // The face of the person, which depends on the player's gender

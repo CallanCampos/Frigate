@@ -1,21 +1,21 @@
+#include "app/local_tvt/local_tvt_person_rival.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_chara.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
-#include "app/local_tvt_local.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 
 // What the rival says in a call on the Xtransceiver, named after the ROM's "local_tvt_person_rival.c"
 
-typedef struct {
+struct LocalTvtRival {
     int step;
     u32 unk4;
     GameData *gameData;
     u16 heapId;
-} LocalTvtRival;
+};
 
 static LocalTvtRival *LocalTvtRival_Create(GameData *gameData, HeapID heapId);
 static void LocalTvtRival_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);

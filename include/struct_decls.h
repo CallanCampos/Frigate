@@ -452,6 +452,7 @@ typedef struct LocalTvtPokeSelectSetup LocalTvtPokeSelectSetup;
 typedef struct LocalTvtPrint LocalTvtPrint;
 typedef struct LocalTvtReturnBar LocalTvtReturnBar;
 typedef struct LocalTvtReturnIcon LocalTvtReturnIcon;
+typedef struct LocalTvtRival LocalTvtRival;
 typedef struct LocalTvtScriptCommand LocalTvtScriptCommand;
 typedef struct LocalTvtScriptCommandFuncs LocalTvtScriptCommandFuncs;
 typedef struct LocalTvtScriptHeader LocalTvtScriptHeader;
