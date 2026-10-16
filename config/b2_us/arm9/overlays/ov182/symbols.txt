@@ -1621,7 +1621,7 @@ data_ov182_021c4080 kind:bss addr:0x021c4080
 data_ov182_021c4084 kind:bss addr:0x021c4084
 data_ov182_021c4088 kind:bss addr:0x021c4088
 sMain kind:bss addr:0x021c408c
-data_ov182_021c40ac kind:bss addr:0x021c40ac
+sMsgWork kind:bss addr:0x021c40ac
 data_ov182_021c40b0 kind:bss addr:0x021c40b0
 data_ov182_021c40b4 kind:bss addr:0x021c40b4
 data_ov182_021c40b8 kind:bss addr:0x021c40b8
