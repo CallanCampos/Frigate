@@ -24,21 +24,21 @@ typedef struct OSiExContext {
 
 typedef void (*OSiExceptionHandler)(OSiExContext *context, void *arg);
 
-static asm void NativeExceptionHandler(void);
-static asm void AbortUndefExcHandler(void);
-static asm void exceptions_log_regs(void);
-static void exceptions_call_abort_undef_callback(void);
+static asm void OSi_ExceptionHandler(void);
+static asm void OSi_GetAndDisplayContext(void); // swan's AbortUndefExcHandler
+static asm void OSi_SetExContext(void);         // swan's exceptions_log_regs
+static void OSi_DisplayExContext(void);         // swan's exceptions_call_abort_undef_callback
 
-static OSiExceptionHandler OSi_ExceptionUserHandler;
+static OSiExceptionHandler OSi_ExceptionUserHandler; // swan's g_ExcUndefAbortCallback
 static u32 OSi_DebuggerHandler;
-static void *OSi_ExceptionUserArg;
+static void *OSi_ExceptionUserArg; // swan's g_ExcUndefAbortCallbackData
 // Nothing reads these 32 bytes, which lie between the variables above and the registers' buffer
 u8 data_0214c4dc[0x20];
-static OSiExContext OSi_ExContext;
+static OSiExContext OSi_ExContext; // swan's g_ExcRegDump
 
-// NitroSDK's OS_InitException, under swan's name: keeps the handler of a debugger in the vector, calling it before ours
+// NitroSDK's OS_InitException: keeps the handler of a debugger in the vector, calling it before ours
 // would run, and otherwise installs ours there and, on a DS, in the main memory's copy of the vector
-void exceptions_init(void) {
+void OS_InitException(void) {
     u32 *vector = (u32 *)HW_EXCP_VECTOR_BUF;
     u32 handler = *vector;
 
@@ -47,9 +47,9 @@ void exceptions_init(void) {
     }
     OSi_DebuggerHandler = handler;
     if (OSi_DebuggerHandler == 0) {
-        *vector = (u32)NativeExceptionHandler;
+        *vector = (u32)OSi_ExceptionHandler;
         if (!hw_isDSi()) {
-            *(u32 *)((u32)vector & HW_EXCP_VECTOR_MAIN_MASK) = (u32)NativeExceptionHandler;
+            *(u32 *)((u32)vector & HW_EXCP_VECTOR_MAIN_MASK) = (u32)OSi_ExceptionHandler;
         }
     }
     OSi_ExceptionUserHandler = NULL;
@@ -60,7 +60,7 @@ void exceptions_init(void) {
 // NitroSDK's OSi_ExceptionHandler, swan's NativeExceptionHandler: calls the debugger's handler first, if there is one,
 // moves to the stack at the end of ITCM and handles a data abort or an undefined instruction. Then it loops forever; the
 // code after the loop, which returns, is never reached
-static asm void NativeExceptionHandler(void) {
+static asm void OSi_ExceptionHandler(void) {
     ldr ip, =OSi_DebuggerHandler
     ldr ip, [ip, #0]
     cmp ip, #0
@@ -74,12 +74,12 @@ static asm void NativeExceptionHandler(void) {
     and r1, r1, #0x1f
     teq r1, #0x17
     bne @notAbort
-    bl AbortUndefExcHandler
+    bl OSi_GetAndDisplayContext
     b @done
 @notAbort:
     teq r1, #0x1b
     bne @done
-    bl AbortUndefExcHandler
+    bl OSi_GetAndDisplayContext
 @done:
     ldr ip, =OSi_DebuggerHandler
     ldr ip, [ip, #0]
@@ -96,10 +96,10 @@ static asm void NativeExceptionHandler(void) {
 
 // NitroSDK's OSi_GetAndDisplayContext (a guess): logs the registers and calls the game's handler, keeping r0 (the low
 // bit of the stack pointer) across the two calls
-static asm void AbortUndefExcHandler(void) {
+static asm void OSi_GetAndDisplayContext(void) {
     stmdb sp!, {r0, lr}
-    bl exceptions_log_regs
-    bl exceptions_call_abort_undef_callback
+    bl OSi_SetExContext
+    bl OSi_DisplayExContext
     ldmia sp!, {r0, lr}
     bx lr
 }
@@ -107,7 +107,7 @@ static asm void AbortUndefExcHandler(void) {
 // NitroSDK's OSi_SetExContext (a guess): gets the registers of the mode that took the exception into OSi_ExContext,
 // from the BIOS's frame at ip, r4 to r11 as they are and the mode's own sp and lr, which it reads by switching to the
 // mode with IRQs off
-static asm void exceptions_log_regs(void) {
+static asm void OSi_SetExContext(void) {
     ldr r1, =OSi_ExContext
     str r0, [r1, #0x6c]
     ldr r0, [ip, #0]
@@ -145,7 +145,7 @@ static asm void exceptions_log_regs(void) {
 // NitroSDK's OSi_DisplayExContext (a guess): calls the game's handler, if it set one, with the registers and its
 // argument, in system mode on the current stack and with the protection unit switched on for the call and off after
 // it. The assembly is the SDK's own, in a C function whose prologue and early return the compiler makes
-static void exceptions_call_abort_undef_callback(void) {
+static void OSi_DisplayExContext(void) {
     if (OSi_ExceptionUserHandler == NULL) {
         return;
     }
@@ -158,7 +158,7 @@ static void exceptions_call_abort_undef_callback(void) {
         mov r1, sp
         mov sp, r0
         stmdb sp!, {r1, r2}
-        bl cp15_mmu_enable
+        bl OS_EnableProtectionUnit
         ldr r0, =OSi_ExContext
         ldr r1, =OSi_ExceptionUserArg
         ldr r1, [r1, #0]
@@ -167,7 +167,7 @@ static void exceptions_call_abort_undef_callback(void) {
         ldr lr, =@return
         bx ip
     @return:
-        bl cp15_mmu_disable
+        bl OS_DisableProtectionUnit
         ldmia sp!, {r1, r2}
         mov sp, r1
         msr cpsr_fsxc, r2

@@ -21,7 +21,7 @@ FieldDispControl *FieldDispControl_Create(HeapID heapId) {
     FieldDispControl *control;
 
     control = GFL_HeapAllocate(heapId, sizeof(FieldDispControl), TRUE, "fld_vreq.c", 128);
-    sys_memset(control->bgEnabled, 0xff, sizeof(control->bgEnabled));
+    MI_CpuFill8(control->bgEnabled, 0xff, sizeof(control->bgEnabled));
     return control;
 }
 
@@ -53,11 +53,11 @@ void FieldDispControl_Update(FieldDispControl *control) {
     }
 
     if (control->brightnessRequest[0] != 0) {
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, control->brightnessValue[0]);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, control->brightnessValue[0]);
         control->brightnessRequest[0] = 0;
     }
     if (control->brightnessRequest[1] != 0) {
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, control->brightnessValue[1]);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, control->brightnessValue[1]);
         control->brightnessRequest[1] = 0;
     }
 }
@@ -108,25 +108,25 @@ void FieldDispControlProc_ResetBrightness(const u32 *params, u32 screen) {
 
 void FieldDispControlProc_SetAlpha(const u32 *params, u32 screen) {
     if (screen != 0) {
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, params[0], params[1], params[2], params[3]);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, params[0], params[1], params[2], params[3]);
     } else {
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, params[0], params[1], params[2], params[3]);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, params[0], params[1], params[2], params[3]);
     }
 }
 
 void FieldDispControlProc_SetBrightness(const u32 *params, u32 screen) {
     if (screen != 0) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, params[0], params[1]);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, params[0], params[1]);
     } else {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, params[0], params[1]);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, params[0], params[1]);
     }
 }
 
 void FieldDispControlProc_SetAll(const u32 *params, u32 screen) {
     if (screen != 0) {
-        gfxRegSetBlend(REG_BLDCNT_ADDR, params[0], params[1], params[2], params[3], params[4]);
+        G2x_SetBlendBrightnessExt_(REG_BLDCNT_ADDR, params[0], params[1], params[2], params[3], params[4]);
     } else {
-        gfxRegSetBlend(REG_DB_BLDCNT_ADDR, params[0], params[1], params[2], params[3], params[4]);
+        G2x_SetBlendBrightnessExt_(REG_DB_BLDCNT_ADDR, params[0], params[1], params[2], params[3], params[4]);
     }
 }
 
@@ -140,8 +140,8 @@ void FieldDispControlProc_AdjustAlpha(const u32 *params, u32 screen) {
 
 void FieldDispControlProc_AdjustBrightness(const u32 *params, u32 screen) {
     if (screen != 0) {
-        gfxRegAdjustBrightnessBlend(REG_BLDCNT_ADDR, params[0]);
+        G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, params[0]);
     } else {
-        gfxRegAdjustBrightnessBlend(REG_DB_BLDCNT_ADDR, params[0]);
+        G2x_ChangeBlendBrightness_(REG_DB_BLDCNT_ADDR, params[0]);
     }
 }

@@ -4,7 +4,7 @@
 
 // The volume in decibels, in tenths, of each linear volume from 0 (silence, -32768) to 127 (0). NitroSDK's
 // SNDi_DecibelTable, which swan names VOLUME_DB_TABLE
-const s16 VOLUME_DB_TABLE[128] = {
+const s16 SNDi_DecibelTable[128] = {
     -32768, -421, -361, -325, -300, -281, -265, -252, -240, -230, -221, -212, -205, -198, -192, -186, -180, -175, -170,
     -165,   -161, -156, -152, -148, -145, -141, -138, -134, -131, -128, -125, -122, -120, -117, -114, -112, -110, -107,
     -105,   -103, -100, -98,  -96,  -94,  -92,  -90,  -88,  -86,  -85,  -83,  -81,  -79,  -78,  -76,  -74,  -73,  -71,
@@ -53,7 +53,7 @@ static const u8 sVolumeTable[724] = {
 
 // NitroSDK's SND_CalcChannelVolume: the volume of a channel for a decibel value, in the low byte, and the data shift
 // that goes with it, in the high one. The quieter the sound, the further the channel shifts its samples down
-u16 func_0207dd2c(int dB) {
+u16 SND_CalcChannelVolume(int dB) {
     int volume;
     int shift;
 

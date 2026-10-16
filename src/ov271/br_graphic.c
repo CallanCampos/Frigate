@@ -112,7 +112,7 @@ BrGraphic *BrGraphic_Init(u32 type, u32 displayLayout, HeapID heapId) {
     BrGraphic *p_wk = GFL_HeapAllocate(heapId, sizeof(BrGraphic), FALSE, "br_graphic.c", 469);
     const BGSysVRAMConfig *cp_vram;
 
-    sys_memset(p_wk, 0, sizeof(BrGraphic));
+    MI_CpuFill8(p_wk, 0, sizeof(BrGraphic));
     switch (type) {
     case BR_GRAPHIC_TYPE_NORMAL:
         cp_vram = &sc_vram_bank;
@@ -149,7 +149,7 @@ void BrGraphic_Exit(BrGraphic *p_wk) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(p_wk, 0, sizeof(BrGraphic));
+    MI_CpuFill8(p_wk, 0, sizeof(BrGraphic));
     GFL_HeapFree(p_wk);
 }
 
@@ -172,7 +172,7 @@ static void BrGraphic_VBlankTask(TCB *tcb, void *p_wk_adrs) {
 static void BrGraphic_BG_Init(BrGraphicBG *p_wk, HeapID heapId) {
     u32 i;
 
-    sys_memset(p_wk, 0, sizeof(BrGraphicBG));
+    MI_CpuFill8(p_wk, 0, sizeof(BrGraphicBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sc_bgsys_header);
@@ -191,7 +191,7 @@ static void BrGraphic_BG_Exit(BrGraphicBG *p_wk) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(p_wk, 0, sizeof(BrGraphicBG));
+    MI_CpuFill8(p_wk, 0, sizeof(BrGraphicBG));
 }
 
 static void BrGraphic_BG_Main(BrGraphicBG *p_wk) {
@@ -202,7 +202,7 @@ static void BrGraphic_BG_VBlank(BrGraphicBG *p_wk) {
 }
 
 static void BrGraphic_OBJ_Init(BrGraphicOBJ *p_wk, const BGSysVRAMConfig *cp_vram, HeapID heapId) {
-    sys_memset(p_wk, 0, sizeof(BrGraphicOBJ));
+    MI_CpuFill8(p_wk, 0, sizeof(BrGraphicOBJ));
     ClActSys_Create(&sc_clsys_init, cp_vram, heapId);
     p_wk->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(p_wk->unit);
@@ -213,7 +213,7 @@ static void BrGraphic_OBJ_Init(BrGraphicOBJ *p_wk, const BGSysVRAMConfig *cp_vra
 static void BrGraphic_OBJ_Exit(BrGraphicOBJ *p_wk) {
     func_0204bf98(p_wk->unit);
     func_0204b758();
-    sys_memset(p_wk, 0, sizeof(BrGraphicOBJ));
+    MI_CpuFill8(p_wk, 0, sizeof(BrGraphicOBJ));
 }
 
 static void BrGraphic_OBJ_Main(BrGraphicOBJ *p_wk) {
@@ -237,7 +237,7 @@ void BrGraphic_StartMain3D(BrGraphic *p_wk, HeapID heapId) {
             GFL_BGSysReleaseBG(sc_bgcnt_data[i].frame);
         }
     }
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
 }
 
 void BrGraphic_EndMain3D(BrGraphic *p_wk, HeapID heapId) {
@@ -245,7 +245,7 @@ void BrGraphic_EndMain3D(BrGraphic *p_wk, HeapID heapId) {
 
     G2_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     for (i = 0; i < BR_GRAPHIC_BG_NUM; i++) {
         if (sc_bgcnt_data[i].frame < BGSYS_BG_SUB) {
             GFL_BGSysCreateBG(sc_bgcnt_data[i].frame, &sc_bgcnt_data[i].setup, sc_bgcnt_data[i].mode);

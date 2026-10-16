@@ -124,7 +124,7 @@ void PMSIVCategory_SetupGraphicDatas(PMSIVCategory *wk, ArcTool *arc) {
     GFL_BGSysMoveBG(1, BG_MOVE_SET_X, -4);
     GFL_BGSysMoveBG(1, BG_MOVE_SET_Y, 16);
     PMSIVCategory_SetupActor(wk);
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, -10);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, -10);
     G2_SetWnd0InsidePlane(GX_PLANEMASK_ALL, TRUE);
     G2_SetWndOutsidePlane(GX_PLANEMASK_ALL & ~GX_PLANEMASK_BG1, TRUE);
     G2_SetWnd0Position(0, 0, 255, 168);
@@ -340,7 +340,7 @@ BOOL PMSIVCategory_WaitFadeOut(PMSIVCategory *wk) {
 }
 
 void PMSIVCategory_StartFadeIn(PMSIVCategory *wk) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, 0x3f, 0, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, 0x3f, 0, 16);
     GFL_BGSysSetBGEnabled(1, TRUE);
     PMSIVTool_SetupBlendWork(&wk->blend, GX_BLEND_PLANEMASK_BG1, 0x3f, 0, PMSIV_BLEND_MAX, 12);
 }

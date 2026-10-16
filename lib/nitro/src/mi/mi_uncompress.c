@@ -5,7 +5,7 @@
 #include "nitro/mi.h"
 
 // clang-format off
-asm void sys_uncomp_lz1x(const void *src, void *dest) {
+asm void MI_UncompressLZ8(const void *src, void *dest) {
     stmdb sp!, {r4, r5, r6, r7, lr}
     // r2 counts the bytes left to write, from the header; r7 is set for the extended format
     ldr r5, [r0], #4

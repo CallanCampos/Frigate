@@ -3,12 +3,12 @@
 #include "mb_private.h"
 
 void MBCache_Clear(MBCache *cache) {
-    sys_memset(cache, 0, sizeof(MBCache));
+    MI_CpuFill8(cache, 0, sizeof(MBCache));
 }
 
 // Keeps a part of the program in the first free entry
 void MBCache_Add(MBCache *cache, u32 offset, u32 size, void *buf, u32 state) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     MBCacheEntry *entry = &cache->entries[0];
     MBCacheEntry *end = &cache->entries[MB_CACHE_ENTRY_COUNT];
 
@@ -25,13 +25,13 @@ void MBCache_Add(MBCache *cache, u32 offset, u32 size, void *buf, u32 state) {
         }
         entry++;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Copies a part of the program from the cache, if it is all there
 BOOL MBCache_Read(MBCache *cache, u32 offset, void *dst, u32 size) {
     BOOL found = FALSE;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     MBCacheEntry *entry;
 
     for (entry = &cache->entries[0]; entry < &cache->entries[MB_CACHE_ENTRY_COUNT]; entry++) {
@@ -39,13 +39,13 @@ BOOL MBCache_Read(MBCache *cache, u32 offset, void *dst, u32 size) {
             int relative = offset - entry->offset;
 
             if (relative >= 0 && relative + size <= entry->size) {
-                sys_memcpy((u8 *)entry->buf + relative, dst, size);
+                MI_CpuCopy8((u8 *)entry->buf + relative, dst, size);
                 cache->missCounter = 0;
                 found = TRUE;
                 break;
             }
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return found;
 }

@@ -20,12 +20,12 @@ BOOL canPlayerExchangePhotos(void) {
 }
 
 BOOL isWirelessEnabled(void) {
-    return func_0207c438();
+    return OS_IsAvailableWireless();
 }
 
 BOOL hasLicenseBeenAccepted(void) {
     if (isRunningOnDSi() == TRUE) {
-        return func_0207c45c();
+        return OS_IsAgreeEULA();
     }
     return TRUE;
 }

@@ -2,7 +2,7 @@
 // from the text "WDS!" that its RC4 key starts with; the ROM names none of it. A scan collects the wireless parents
 // whose beacons carry the game ID 0x857; the 0x70 bytes of game information of each one are decrypted with a key of
 // "WDS!" and four bytes of the beacon's BSSID, and kept when their CRC-16 is right. Its callers are the scan of
-// dwc_wdsscan.c and the connection of dwc_connectinet.c, which decrypts a beacon with func_02058d44 on its own.
+// dwc_wdsscan.c and the connection of dwc_connectinet.c, which decrypts a beacon with WDS_DecryptBeaconInfo on its own.
 //
 // The functions are still named after their addresses; the comment above each has the name we would give it.
 
@@ -42,18 +42,18 @@ typedef struct WDSWork {
     CRYPTORC4Context rc4;
 } WDSWork;
 
-static u8 func_02058840(u8 rssi);
-static void func_02058854(void *arg);
-static int func_02058c00(int index, WDSEntry *out);
-static BOOL func_02058e40(const u8 *text);
+static u8 WDS_RssiToSignal(u8 rssi);
+static void WDS_OnScan(void *arg);
+static int WDS_GetEntry(int index, WDSEntry *out);
+static BOOL WDS_IsPrintable(const u8 *text);
 
-static WDSWork *sWork;
+static WDSWork *sWdsWork;
 
 // The RC4 key's first four bytes, "WDS!" as a four-character constant (the ROM has it as "!SDW")
 static const u32 sKeyPrefix = 'WDS!';
 
-// WDS_RssiToSignal: turns the RSSI of a scan result into the signal strength that the entries keep
-static u8 func_02058840(u8 rssi) {
+// Turns the RSSI of a scan result into the signal strength that the entries keep
+static u8 WDS_RssiToSignal(u8 rssi) {
     int strength = rssi >> 2;
 
     if ((rssi & 2) == 0) {
@@ -62,14 +62,14 @@ static u8 func_02058840(u8 rssi) {
     return strength;
 }
 
-// WDS_OnScan: the callback of the scan. It takes in the beacons that are new and well-formed, then tells the caller
-static void func_02058854(void *arg) {
+// The callback of the scan. It takes in the beacons that are new and well-formed, then tells the caller
+static void WDS_OnScan(void *arg) {
     WMStartScanExCallback *result = arg;
     u32 i;
     u32 j;
     BOOL found;
 
-    cp15_invalidateDC(sWork->scanBuf, WDS_SCAN_BUF_SIZE);
+    DC_InvalidateRange(sWdsWork->scanBuf, WDS_SCAN_BUF_SIZE);
     if (result->errcode == WM_ERRCODE_SUCCESS && result->state == WM_STATECODE_PARENT_FOUND) {
         for (i = 0; i < result->bssDescCount; i++) {
             if (result->bssDesc[i]->gameInfo.userGameInfoLength + WDS_GAME_INFO_HEADER_SIZE != sizeof(WMGameInfo) ||
@@ -79,8 +79,8 @@ static void func_02058854(void *arg) {
             }
 
             found = FALSE;
-            for (j = 0; j < sWork->count; j++) {
-                if (sWork->tgids[j] == result->bssDesc[i]->gameInfo.tgid) {
+            for (j = 0; j < sWdsWork->count; j++) {
+                if (sWdsWork->tgids[j] == result->bssDesc[i]->gameInfo.tgid) {
                     found = TRUE;
                     break;
                 }
@@ -89,150 +89,143 @@ static void func_02058854(void *arg) {
                 continue;
             }
 
-            if (func_02058d44(&sWork->rc4, &sWork->crc, &sWork->crcTable, result->bssDesc[i],
-                              &sWork->infos[sWork->next])) {
-                sWork->signals[sWork->next] = func_02058840(result->bssDesc[i]->rssi);
-                sWork->tgids[sWork->next] = result->bssDesc[i]->gameInfo.tgid;
-                sWork->next = (sWork->next + 1) % WDS_MAX_ENTRIES;
-                sWork->count++;
-                if (sWork->count > WDS_MAX_ENTRIES) {
-                    sWork->count = WDS_MAX_ENTRIES;
+            if (WDS_DecryptBeaconInfo(&sWdsWork->rc4, &sWdsWork->crc, &sWdsWork->crcTable, result->bssDesc[i],
+                                      &sWdsWork->infos[sWdsWork->next])) {
+                sWdsWork->signals[sWdsWork->next] = WDS_RssiToSignal(result->bssDesc[i]->rssi);
+                sWdsWork->tgids[sWdsWork->next] = result->bssDesc[i]->gameInfo.tgid;
+                sWdsWork->next = (sWdsWork->next + 1) % WDS_MAX_ENTRIES;
+                sWdsWork->count++;
+                if (sWdsWork->count > WDS_MAX_ENTRIES) {
+                    sWdsWork->count = WDS_MAX_ENTRIES;
                 }
             }
         }
     }
 
-    sWork->state = WDS_STATE_SCANNED;
-    if (sWork->callback != NULL) {
-        sWork->callback(result);
+    sWdsWork->state = WDS_STATE_SCANNED;
+    if (sWdsWork->callback != NULL) {
+        sWdsWork->callback(result);
     }
 }
 
-// WDS_GetWorkSize
-u32 func_02058a40(void) {
+u32 WDS_GetWorkSize(void) {
     return (sizeof(WDSWork) + 31) & ~31;
 }
 
-// WDS_Initialize
-int func_02058a4c(void *work, WMCallbackFunc callback, u16 dmaNo) {
+int WDS_Initialize(void *work, WMCallbackFunc callback, u16 dmaNo) {
     int result;
 
     if (callback == NULL) {
         return -1;
     }
 
-    sWork = work;
-    sys_memset(sWork, 0, func_02058a40());
-    sWork->state = WDS_STATE_IDLE;
-    sWork->crc = 0;
-    MATHi_CRC16InitTableRev(&sWork->crcTable, 0xa001);
+    sWdsWork = work;
+    MI_CpuFill8(sWdsWork, 0, WDS_GetWorkSize());
+    sWdsWork->state = WDS_STATE_IDLE;
+    sWdsWork->crc = 0;
+    MATHi_CRC16InitTableRev(&sWdsWork->crcTable, 0xa001);
 
-    result = func_020813c4(sWork, callback, dmaNo);
+    result = WM_Initialize(sWdsWork, callback, dmaNo);
     if (result == WM_ERRCODE_OPERATING) {
         result = 0;
     }
     return result;
 }
 
-// WDS_End
-int func_02058ad0(WMCallbackFunc callback) {
+int WDS_End(WMCallbackFunc callback) {
     int result;
 
     if (callback == NULL) {
         return -1;
     }
 
-    sWork->state = WDS_STATE_ENDING;
-    sWork = NULL;
+    sWdsWork->state = WDS_STATE_ENDING;
+    sWdsWork = NULL;
 
-    result = func_02081448(callback);
+    result = WM_End(callback);
     if (result == WM_ERRCODE_OPERATING) {
         result = 0;
     }
     return result;
 }
 
-// WDS_StartScan
-int func_02058b10(WMCallbackFunc callback) {
+int WDS_StartScan(WMCallbackFunc callback) {
     int result;
 
     if (callback == NULL) {
         return -1;
     }
 
-    sWork->scanParam.scanBuf = (WMBssDesc *)sWork->scanBuf;
-    sWork->scanParam.scanBufSize = WDS_SCAN_BUF_SIZE;
-    sWork->scanParam.channelList = func_020810cc();
-    sWork->scanParam.maxChannelTime = func_020811a4();
-    sWork->scanParam.scanType = 1;
-    sys_memset(sWork->scanParam.bssid, 0xff, sizeof(sWork->scanParam.bssid));
-    sWork->callback = callback;
-    sWork->state = WDS_STATE_SCANNING;
+    sWdsWork->scanParam.scanBuf = (WMBssDesc *)sWdsWork->scanBuf;
+    sWdsWork->scanParam.scanBufSize = WDS_SCAN_BUF_SIZE;
+    sWdsWork->scanParam.channelList = WM_GetAllowedChannel();
+    sWdsWork->scanParam.maxChannelTime = WM_GetDispersionScanPeriod();
+    sWdsWork->scanParam.scanType = 1;
+    MI_CpuFill8(sWdsWork->scanParam.bssid, 0xff, sizeof(sWdsWork->scanParam.bssid));
+    sWdsWork->callback = callback;
+    sWdsWork->state = WDS_STATE_SCANNING;
 
-    result = func_020815c8(func_02058854, &sWork->scanParam);
+    result = WM_StartScanEx(WDS_OnScan, &sWdsWork->scanParam);
     if (result == WM_ERRCODE_OPERATING) {
         result = 0;
     }
     return result;
 }
 
-// WDS_EndScan
-int func_02058bc8(WMCallbackFunc callback) {
+int WDS_EndScan(WMCallbackFunc callback) {
     int result;
 
     if (callback == NULL) {
         return -1;
     }
 
-    sWork->state = WDS_STATE_SCANNED;
+    sWdsWork->state = WDS_STATE_SCANNED;
 
-    result = func_020816b4(callback);
+    result = WM_EndScan(callback);
     if (result == WM_ERRCODE_OPERATING) {
         result = 0;
     }
     return result;
 }
 
-// WDS_GetEntry: gives out the entry at an index of the ring, with its signal strength
-static int func_02058c00(int index, WDSEntry *out) {
-    if (sWork->state != WDS_STATE_SCANNED) {
+// Gives out the entry at an index of the ring, with its signal strength
+static int WDS_GetEntry(int index, WDSEntry *out) {
+    if (sWdsWork->state != WDS_STATE_SCANNED) {
         return -1;
     }
-    if (index < 0 || index >= sWork->count) {
+    if (index < 0 || index >= sWdsWork->count) {
         return -1;
     }
 
-    sys_memset(out, 0, sizeof(WDSEntry));
+    MI_CpuFill8(out, 0, sizeof(WDSEntry));
     out->valid = TRUE;
-    out->signal = sWork->signals[index];
-    sys_memcpy(&sWork->infos[index], &out->info, sizeof(WDSBeaconInfo));
+    out->signal = sWdsWork->signals[index];
+    MI_CpuCopy8(&sWdsWork->infos[index], &out->info, sizeof(WDSBeaconInfo));
     return 0;
 }
 
-// WDS_GetEntries
-int func_02058c9c(WDSEntry *entries) {
+int WDS_GetEntries(WDSEntry *entries) {
     int i;
 
-    if (sWork->state != WDS_STATE_SCANNED) {
+    if (sWdsWork->state != WDS_STATE_SCANNED) {
         return -1;
     }
 
-    sys_memset(entries, 0, WDS_MAX_ENTRIES * sizeof(WDSEntry));
+    MI_CpuFill8(entries, 0, WDS_MAX_ENTRIES * sizeof(WDSEntry));
     for (i = 0; i < WDS_MAX_ENTRIES; i++) {
         entries[i].valid = FALSE;
     }
 
-    for (i = 0; i < sWork->count; i++) {
-        if (func_02058c00(i, &entries[i]) == -1) {
+    for (i = 0; i < sWdsWork->count; i++) {
+        if (WDS_GetEntry(i, &entries[i]) == -1) {
             break;
         }
     }
     return 0;
 }
 
-// WDS_DecryptBeaconInfo
-BOOL func_02058d44(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *table, const WMBssDesc *desc,
-                   WDSBeaconInfo *out) {
+BOOL WDS_DecryptBeaconInfo(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *table, const WMBssDesc *desc,
+                           WDSBeaconInfo *out) {
     u8 key[8];
     u16 calculated;
 
@@ -240,9 +233,9 @@ BOOL func_02058d44(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *table, c
         return FALSE;
     }
 
-    sys_memcpy(desc->gameInfo.userGameInfo, out, sizeof(WDSBeaconInfo));
-    sys_memcpy(&sKeyPrefix, key, 4);
-    sys_memcpy(&desc->bssid[2], &key[4], 4);
+    MI_CpuCopy8(desc->gameInfo.userGameInfo, out, sizeof(WDSBeaconInfo));
+    MI_CpuCopy8(&sKeyPrefix, key, 4);
+    MI_CpuCopy8(&desc->bssid[2], &key[4], 4);
     CRYPTO_RC4Init(context, key, sizeof(key));
     CRYPTO_RC4Encrypt(context, out, sizeof(WDSBeaconInfo), out);
 
@@ -253,12 +246,12 @@ BOOL func_02058d44(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *table, c
         return TRUE;
     }
 
-    sys_memset(out, 0, sizeof(WDSBeaconInfo));
+    MI_CpuFill8(out, 0, sizeof(WDSBeaconInfo));
     return FALSE;
 }
 
-// WDS_IsPrintable: whether ten bytes are all printable ASCII
-static BOOL func_02058e40(const u8 *text) {
+// Whether ten bytes are all printable ASCII
+static BOOL WDS_IsPrintable(const u8 *text) {
     int i;
 
     for (i = 0; i < 10; i++) {
@@ -269,9 +262,8 @@ static BOOL func_02058e40(const u8 *text) {
     return TRUE;
 }
 
-// WDS_IsBeaconInfoValid
-BOOL func_02058e74(const WDSBeaconInfo *info) {
-    if ((info->flags & 2) && func_02058e40(info->unk_20) && info->unk_65 <= 3) {
+BOOL WDS_IsBeaconInfoValid(const WDSBeaconInfo *info) {
+    if ((info->flags & 2) && WDS_IsPrintable(info->unk_20) && info->unk_65 <= 3) {
         return TRUE;
     }
     return FALSE;

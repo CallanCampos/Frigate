@@ -295,7 +295,7 @@ void BtlvGauge_Update(BtlvGauge *gauge) {
 void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleMon *mon, u32 type, int index) {
     u32 status;
 
-    sys_memset16(0, &gauge->entries[index].mon, sizeof(BtlvGaugeMon));
+    MIi_CpuClear16(0, &gauge->entries[index].mon, sizeof(BtlvGaugeMon));
     gauge->entries[index].mon.hp = GetBattleMonStat(mon, BATTLEMON_HP);
     gauge->entries[index].mon.maxHp = GetBattleMonStat(mon, 14);
     gauge->entries[index].mon.hpAnim = GAUGE_ANIM_START;
@@ -342,7 +342,7 @@ void BtlvGauge_SetBattleMon(BtlvGauge *gauge, BtlMainModule *mainModule, BattleM
 void BtlvGauge_SetPartyPkm(BtlvGauge *gauge, PokeDexSave *pokedex, PartyPkm *pkm, u32 type, int index) {
     u16 species;
 
-    sys_memset16(0, &gauge->entries[index].mon, sizeof(BtlvGaugeMon));
+    MIi_CpuClear16(0, &gauge->entries[index].mon, sizeof(BtlvGaugeMon));
     gauge->entries[index].mon.hp = PokeParty_GetParam(pkm, PKM_PARAM_HP, NULL);
     gauge->entries[index].mon.maxHp = PokeParty_GetParam(pkm, PKM_PARAM_MAX_HP, NULL);
     gauge->entries[index].mon.hpAnim = GAUGE_ANIM_START;

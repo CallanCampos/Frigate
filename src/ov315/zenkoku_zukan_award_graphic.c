@@ -101,8 +101,8 @@ static void ZenkokuZukanAwardGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sZenkokuZukanAwardLights); i++) {
         GFL_G3DSysLightSet(i, &sZenkokuZukanAwardLights[i]);
@@ -114,7 +114,7 @@ ZenkokuZukanAwardGraphic *ZenkokuZukanAwardGraphic_Create(u32 layout, HeapID hea
     ZenkokuZukanAwardGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(ZenkokuZukanAwardGraphic), FALSE, "zenkoku_zukan_award_graphic.c", 460);
 
-    sys_memset(graphic, 0, sizeof(ZenkokuZukanAwardGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ZenkokuZukanAwardGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -143,7 +143,7 @@ void ZenkokuZukanAwardGraphic_Free(ZenkokuZukanAwardGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(ZenkokuZukanAwardGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ZenkokuZukanAwardGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -166,7 +166,7 @@ static void ZenkokuZukanAwardGraphic_VBlank(TCB *tcb, void *data) {
 static void ZenkokuZukanAwardBG_Init(ZenkokuZukanAwardBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(ZenkokuZukanAwardBG));
+    MI_CpuFill8(bg, 0, sizeof(ZenkokuZukanAwardBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sZenkokuZukanAwardLCDConfig);
@@ -186,7 +186,7 @@ static void ZenkokuZukanAwardBG_Free(ZenkokuZukanAwardBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(ZenkokuZukanAwardBG));
+    MI_CpuFill8(bg, 0, sizeof(ZenkokuZukanAwardBG));
 }
 
 static void ZenkokuZukanAwardBG_Update(ZenkokuZukanAwardBG *bg) {
@@ -198,7 +198,7 @@ static void ZenkokuZukanAwardBG_VBlank(ZenkokuZukanAwardBG *bg) {
 
 static void ZenkokuZukanAwardClAct_Init(ZenkokuZukanAwardClAct *clact, const BGSysVRAMConfig *vramConfig,
                                         HeapID heapId) {
-    sys_memset(clact, 0, sizeof(ZenkokuZukanAwardClAct));
+    MI_CpuFill8(clact, 0, sizeof(ZenkokuZukanAwardClAct));
     ClActSys_Create(&sZenkokuZukanAwardClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -209,7 +209,7 @@ static void ZenkokuZukanAwardClAct_Init(ZenkokuZukanAwardClAct *clact, const BGS
 static void ZenkokuZukanAwardClAct_Free(ZenkokuZukanAwardClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(ZenkokuZukanAwardClAct));
+    MI_CpuFill8(clact, 0, sizeof(ZenkokuZukanAwardClAct));
 }
 
 static void ZenkokuZukanAwardClAct_Update(ZenkokuZukanAwardClAct *clact) {

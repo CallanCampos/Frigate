@@ -46,10 +46,10 @@ static CtvtMic *sCtvtMic;
 CtvtMic *CtvtMic_Create(HeapID heapId) {
     CtvtMic *work = GFL_HeapAllocate(heapId, sizeof(CtvtMic), TRUE, "ctvt_mic.c", 87);
 
-    func_0207e75c();
-    func_0207ebb8();
-    func_0207efc4(PM_AMP_ON);
-    func_0207f008(80);
+    MIC_Init();
+    PM_Init();
+    PM_SetAmp(PM_AMP_ON);
+    PM_SetAmpGainLevel(80);
     if (hw_isDSi() == TRUE) {
         func_027047c0(0, sFilter);
     }
@@ -68,14 +68,14 @@ void CtvtMic_Delete(CtvtMic *work) {
     sCtvtMic = NULL;
     CtvtMic_StopRecording(work);
     CtvtMic_FreeChannel(work);
-    func_0207efc4(PM_AMP_OFF);
+    PM_SetAmp(PM_AMP_OFF);
     func_02042ed0(work->buffer);
     GFL_HeapFree(work);
 }
 
 void CtvtMic_Update(CtvtMic *work) {
     if (work->recording == TRUE) {
-        void *last = func_0207e8f8();
+        void *last = MIC_GetLastSamplingAddress();
 
         if (last == NULL) {
             work->recordedSize = 0;
@@ -110,7 +110,7 @@ BOOL CtvtMic_StartRecording(CtvtMic *work) {
     param.type = MIC_SAMPLING_TYPE_SIGNED_12BIT;
     param.size = CTVT_MIC_BUFFER_SIZE;
     param.buffer = work->buffer;
-    sys_memset32(0, param.buffer, param.size);
+    MIi_CpuClear32(0, param.buffer, param.size);
     if (param.size & 0x1f) {
         param.size &= ~0x1f;
     }
@@ -118,7 +118,7 @@ BOOL CtvtMic_StartRecording(CtvtMic *work) {
     param.loop = FALSE;
     param.rate = MIC_SAMPLING_RATE_8180;
     param.fullArg = work;
-    if (MIC_StartAutoSampling(&param) == MIC_RESULT_SUCCESS) {
+    if (MIC_StartLimitedSampling(&param) == MIC_RESULT_SUCCESS) {
         work->recording = TRUE;
         work->recordedSize = 0;
         return TRUE;
@@ -137,8 +137,8 @@ BOOL CtvtMic_StopRecording(CtvtMic *work) {
     if (work->recording == FALSE) {
         return TRUE;
     }
-    if (MIC_StopAutoSampling() == MIC_RESULT_SUCCESS) {
-        work->recordedSize = (u8 *)func_0207e8f8() - (u8 *)work->buffer + 4;
+    if (MIC_StopLimitedSampling() == MIC_RESULT_SUCCESS) {
+        work->recordedSize = (u8 *)MIC_GetLastSamplingAddress() - (u8 *)work->buffer + 4;
         if (work->recordedSize > CTVT_MIC_BUFFER_SIZE) {
             work->recordedSize = CTVT_MIC_BUFFER_SIZE;
         }
@@ -164,12 +164,12 @@ void *CtvtMic_GetBuffer(CtvtMic *work) {
 }
 
 u32 CtvtMic_Encode(CtvtMic *work, const s16 *src, u8 *dst, u32 size) {
-    sys_memset(dst, 0, size);
+    MI_CpuFill8(dst, 0, size);
     return Adpcm_Encode(src, size, dst);
 }
 
 u32 CtvtMic_Decode(CtvtMic *work, const s8 *src, s16 *dst, u32 size) {
-    sys_memset32(0, dst, size * 4);
+    MIi_CpuClear32(0, dst, size * 4);
     return Adpcm_Decode(src, size, dst);
 }
 

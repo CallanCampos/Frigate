@@ -36,7 +36,7 @@ GameEventReturnCode EventGameSync_Callback(GameEvent *event, u32 *state, void *d
         *state = 2;
         break;
     case 2:
-        sys_memset(&wk->accountInfo, 0, sizeof(wk->accountInfo));
+        MI_CpuFill8(&wk->accountInfo, 0, sizeof(wk->accountInfo));
         wk->hasAccountInfo = FALSE;
         GSYS_QueueProc(gsys, OVERLAY_GSYNC, &GSYNC_MENU_PROC_FUNCTIONS, wk);
         (*state)++;

@@ -1,8 +1,8 @@
 // NitroSDK's NVRAM library (the file name is a guess): the ARM9's access to the console's NVRAM, which is the flash of
 // the firmware. Reading, writing and verifying are calls that send the ARM7 their commands through the PXI FIFO and
 // finish in the function that gets its answers. The write sends a page at a time, and after each polls the flash's
-// status register on an alarm until the flash is done. The symbols keep their default names for now, and the comments
-// give the SDK's, which are known from how the code works but not from the ROM.
+// status register on an alarm until the flash is done. The names are the SDK's, which are known from how the code works
+// but not from the ROM.
 #include "nitro/nvram.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -125,24 +125,23 @@ static inline void NVRAMi_SetAlarm(u32 pxiResult) {
     OS_SetAlarm(&sNvramWork.alarm, OS_MilliSecondsToTicks(NVRAM_POLL_MSEC), func_02079994, (void *)pxiResult);
 }
 
-// NVRAM_Init
-void func_020791fc(void) {
+void NVRAM_Init(void) {
     u32 enabled;
 
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (sNvramInitState != NVRAM_INIT_NONE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return;
     }
     sNvramInitState = NVRAM_INIT_RUNNING;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     PXI_Init();
-    while (!func_0207ca48(PXI_FIFO_TAG_NVRAM, PXI_PROC_ARM7)) {
+    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_NVRAM, PXI_PROC_ARM7)) {
     }
-    func_0207c9fc(PXI_FIFO_TAG_NVRAM, func_02079944);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NVRAM, func_02079944);
     MI_CpuClearFast(&sNvramWork, sizeof(sNvramWork));
-    if (!clock_is_inited()) {
-        clock_init();
+    if (!OS_IsTickAvailable()) {
+        OS_InitTick();
     }
     if (!OS_IsAlarmAvailable()) {
         OS_InitAlarm();
@@ -152,30 +151,29 @@ void func_020791fc(void) {
     sNvramInitState = NVRAM_INIT_DONE;
 }
 
-// NVRAM_ReadDataBytesAsync
-NVRAMResult func_0207927c(u32 address, u32 size, void *buf, NVRAMCallback callback, void *arg) {
+NVRAMResult NVRAM_ReadDataBytesAsync(u32 address, u32 size, void *buf, NVRAMCallback callback, void *arg) {
     u32 enabled;
 
     if (!func_02079930()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (sNvramWork.command != NVRAM_COMMAND_NONE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_BUSY;
     }
     sNvramWork.command = NVRAM_COMMAND_READ;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     sNvramWork.callback = callback;
     sNvramWork.callbackArg = arg;
     sNvramWork.phase = 0;
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (func_02079a5c(address, size, buf) == TRUE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_SUCCESS;
     }
     sNvramWork.command = NVRAM_COMMAND_NONE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     OS_WakeupThread(&sNvramWork.queue);
     return NVRAM_RESULT_SEND_ERROR;
 }
@@ -205,8 +203,7 @@ static void func_020792f4(u32 data, BOOL err) {
     NVRAMi_EndCommand(result);
 }
 
-// NVRAM_ReadDataBytes
-NVRAMResult func_02079354(u32 address, u32 size, void *buf) {
+NVRAMResult NVRAM_ReadDataBytes(u32 address, u32 size, void *buf) {
     OSMessageQueue queue;
     NVRAMResult result;
     OSMessage message[1];
@@ -215,19 +212,19 @@ NVRAMResult func_02079354(u32 address, u32 size, void *buf) {
     if (OS_GetCurrentThread() == NULL) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
-    func_0207acc4(&queue, message, 1);
+    OS_InitMessageQueue(&queue, message, 1);
     while (TRUE) {
-        enabled = CPU_IRQDisable();
-        result = func_0207927c(address, size, buf, func_0207997c, &queue);
+        enabled = OS_DisableInterrupts();
+        result = NVRAM_ReadDataBytesAsync(address, size, buf, func_0207997c, &queue);
         if (result == NVRAM_RESULT_BUSY) {
-            scheduler_yield(&sNvramWork.queue);
+            OS_SleepThread(&sNvramWork.queue);
         } else if (result == NVRAM_RESULT_SEND_ERROR) {
-            func_0207aa04(1);
+            OS_Sleep(1);
         } else {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             break;
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
     if (result == NVRAM_RESULT_SUCCESS) {
         if (!OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK)) {
@@ -237,33 +234,32 @@ NVRAMResult func_02079354(u32 address, u32 size, void *buf) {
     return result;
 }
 
-// NVRAM_WriteDataBytesAsync
-NVRAMResult func_020793e0(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
+NVRAMResult NVRAM_WriteDataBytesAsync(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
     u32 enabled;
 
     if (!func_02079930()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (sNvramWork.command != NVRAM_COMMAND_NONE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_BUSY;
     }
     sNvramWork.command = NVRAM_COMMAND_WRITE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     sNvramWork.callback = callback;
     sNvramWork.callbackArg = arg;
     sNvramWork.address = address;
     sNvramWork.size = size;
     sNvramWork.buf = (u8 *)src;
     sNvramWork.phase = NVRAM_WRITE_ENABLE_SENT;
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (func_020799c8() == TRUE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_SUCCESS;
     }
     sNvramWork.command = NVRAM_COMMAND_NONE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     OS_WakeupThread(&sNvramWork.queue);
     return NVRAM_RESULT_SEND_ERROR;
 }
@@ -297,7 +293,7 @@ static void func_02079458(u32 data, BOOL err) {
             sNvramWork.address += chunk;
             sNvramWork.size -= chunk;
             sNvramWork.buf += chunk;
-            sNvramWork.pageTick = clock();
+            sNvramWork.pageTick = OS_GetTick();
             sNvramWork.phase = NVRAM_WRITE_POLL_WAIT;
             NVRAMi_SetAlarm(NVRAM_PXI_RESULT_SUCCESS);
             return;
@@ -384,22 +380,21 @@ static void func_02079458(u32 data, BOOL err) {
         NVRAMi_SetAlarm(NVRAM_PXI_RESULT_BUSY);
         return;
     case NVRAM_WRITE_POLL_WAIT:
-        cp15_invalidateDC(sNvramBuffer, NVRAM_BUFFER_SIZE);
+        DC_InvalidateRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
         if (func_02079a00(sNvramBuffer) == TRUE) {
             sNvramWork.phase = NVRAM_WRITE_STATUS_SENT;
             return;
         }
         sNvramWork.phase = NVRAM_WRITE_STATUS_SENT;
         sNvramBuffer[0] = NVRAM_STATUS_WRITE_IN_PROGRESS;
-        cp15_cleanDC(sNvramBuffer, NVRAM_BUFFER_SIZE);
+        DC_StoreRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
         NVRAMi_SetAlarm(NVRAM_PXI_RESULT_SUCCESS);
         return;
     }
     NVRAMi_EndCommand(result);
 }
 
-// NVRAM_WriteDataBytes
-NVRAMResult func_020796b4(u32 address, u32 size, const void *src) {
+NVRAMResult NVRAM_WriteDataBytes(u32 address, u32 size, const void *src) {
     OSMessageQueue queue;
     NVRAMResult result;
     OSMessage message[1];
@@ -408,19 +403,19 @@ NVRAMResult func_020796b4(u32 address, u32 size, const void *src) {
     if (OS_GetCurrentThread() == NULL) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
-    func_0207acc4(&queue, message, 1);
+    OS_InitMessageQueue(&queue, message, 1);
     while (TRUE) {
-        enabled = CPU_IRQDisable();
-        result = func_020793e0(address, size, src, func_0207997c, &queue);
+        enabled = OS_DisableInterrupts();
+        result = NVRAM_WriteDataBytesAsync(address, size, src, func_0207997c, &queue);
         if (result == NVRAM_RESULT_BUSY) {
-            scheduler_yield(&sNvramWork.queue);
+            OS_SleepThread(&sNvramWork.queue);
         } else if (result == NVRAM_RESULT_SEND_ERROR) {
-            func_0207aa04(1);
+            OS_Sleep(1);
         } else {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             break;
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
     if (result == NVRAM_RESULT_SUCCESS) {
         if (!OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK)) {
@@ -430,21 +425,20 @@ NVRAMResult func_020796b4(u32 address, u32 size, const void *src) {
     return result;
 }
 
-// NVRAM_VerifyDataBytesAsync
-NVRAMResult func_02079740(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
+NVRAMResult NVRAM_VerifyDataBytesAsync(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
     u32 enabled;
     u32 chunk;
 
     if (!func_02079930()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (sNvramWork.command != NVRAM_COMMAND_NONE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_BUSY;
     }
     sNvramWork.command = NVRAM_COMMAND_VERIFY;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     sNvramWork.callback = callback;
     sNvramWork.callbackArg = arg;
     sNvramWork.address = address;
@@ -452,17 +446,17 @@ NVRAMResult func_02079740(u32 address, u32 size, const void *src, NVRAMCallback 
     sNvramWork.buf = (u8 *)src;
     sNvramWork.phase = 0;
     chunk = NVRAM_BUFFER_SIZE;
-    cp15_invalidateDC(sNvramBuffer, NVRAM_BUFFER_SIZE);
-    enabled = CPU_IRQDisable();
+    DC_InvalidateRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
+    enabled = OS_DisableInterrupts();
     if (size <= NVRAM_BUFFER_SIZE) {
         chunk = size;
     }
     if (func_02079a5c(address, chunk, sNvramBuffer) == TRUE) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_SUCCESS;
     }
     sNvramWork.command = NVRAM_COMMAND_NONE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     OS_WakeupThread(&sNvramWork.queue);
     return NVRAM_RESULT_SEND_ERROR;
 }
@@ -487,7 +481,7 @@ static void func_020797d4(u32 data, BOOL err) {
             sNvramWork.size -= chunk;
             sNvramWork.buf += chunk;
             if (sNvramWork.size != 0) {
-                cp15_invalidateDC(sNvramBuffer, NVRAM_BUFFER_SIZE);
+                DC_InvalidateRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
                 next = NVRAM_BUFFER_SIZE;
                 if (sNvramWork.size <= NVRAM_BUFFER_SIZE) {
                     next = sNvramWork.size;
@@ -511,7 +505,7 @@ static void func_020797d4(u32 data, BOOL err) {
             result = NVRAM_RESULT_ILLEGAL_STATUS;
             break;
         case NVRAM_PXI_RESULT_BUSY:
-            cp15_invalidateDC(sNvramBuffer, NVRAM_BUFFER_SIZE);
+            DC_InvalidateRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
             if (func_02079a5c(sNvramWork.address, chunk, sNvramBuffer) == TRUE) {
                 return;
             }
@@ -522,8 +516,7 @@ static void func_020797d4(u32 data, BOOL err) {
     NVRAMi_EndCommand(result);
 }
 
-// NVRAM_VerifyDataBytes
-NVRAMResult func_020798a4(u32 address, u32 size, const void *src) {
+NVRAMResult NVRAM_VerifyDataBytes(u32 address, u32 size, const void *src) {
     OSMessageQueue queue;
     NVRAMResult result;
     OSMessage message[1];
@@ -532,19 +525,19 @@ NVRAMResult func_020798a4(u32 address, u32 size, const void *src) {
     if (OS_GetCurrentThread() == NULL) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
     }
-    func_0207acc4(&queue, message, 1);
+    OS_InitMessageQueue(&queue, message, 1);
     while (TRUE) {
-        enabled = CPU_IRQDisable();
-        result = func_02079740(address, size, src, func_0207997c, &queue);
+        enabled = OS_DisableInterrupts();
+        result = NVRAM_VerifyDataBytesAsync(address, size, src, func_0207997c, &queue);
         if (result == NVRAM_RESULT_BUSY) {
-            scheduler_yield(&sNvramWork.queue);
+            OS_SleepThread(&sNvramWork.queue);
         } else if (result == NVRAM_RESULT_SEND_ERROR) {
-            func_0207aa04(1);
+            OS_Sleep(1);
         } else {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             break;
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
     if (result == NVRAM_RESULT_SUCCESS) {
         if (!OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK)) {

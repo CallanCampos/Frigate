@@ -142,11 +142,11 @@ void PStaOam_Upload(PStaOamActor *actor) {
     u8 line;
     void (*upload)(const void *src, u32 offset, u32 size);
 
-    cp15_flushDC(pixels, GFL_BitmapCalcPixelDataSize(actor->bitmap));
+    DC_FlushRange(pixels, GFL_BitmapCalcPixelDataSize(actor->bitmap));
     if (actor->vramType == CLACT_VRAM_MAIN) {
-        upload = gfxUploadObjCharA;
+        upload = GX_LoadOBJ;
     } else {
-        upload = gfxUploadObjCharB;
+        upload = GXS_LoadOBJ;
     }
     tileCols = GFL_BitmapGetWidth(actor->bitmap) / 8;
     lastLines = GFL_BitmapGetHeight(actor->bitmap) / 8 % 4;

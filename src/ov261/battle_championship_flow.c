@@ -159,7 +159,7 @@ static BOOL BattleChampionshipFlow_Init(GameProc *proc, u32 *state, void *param,
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BATTLE_CHAMPIONSHIP_FLOW, 0x30200);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BattleChampionshipFlow), HEAPID_BATTLE_CHAMPIONSHIP_FLOW);
-    sys_memset(wk, 0, sizeof(BattleChampionshipFlow));
+    MI_CpuFill8(wk, 0, sizeof(BattleChampionshipFlow));
     wk->param = param;
     wk->heapId = HEAPID_BATTLE_CHAMPIONSHIP_FLOW;
     GFL_OvlLoad(OVERLAY_ID(139));
@@ -317,7 +317,7 @@ static void BattleChampionshipFlow_TaskMenu(WifiBattleMatchTask *task, u32 *seq,
 
     switch (*seq) {
     case 0:
-        sys_memset(&param, 0, sizeof(BattleChampionshipMenuParam));
+        MI_CpuFill8(&param, 0, sizeof(BattleChampionshipMenuParam));
         param.msgBox = wk->msgBox;
         param.font = wk->font;
         param.msgData = wk->msgData;
@@ -375,7 +375,7 @@ static void BattleChampionshipFlow_TaskLive(WifiBattleMatchTask *task, u32 *seq,
 
     switch (*seq) {
     case 0:
-        sys_memset(&param, 0, sizeof(LiveBattleMatchFlowParam));
+        MI_CpuFill8(&param, 0, sizeof(LiveBattleMatchFlowParam));
         param.msgBox = wk->msgBox;
         param.font = wk->font;
         param.printQueue = wk->printQueue;
@@ -442,7 +442,7 @@ static BattleChampionshipMenu *BattleChampionshipFlow_MenuCreate(const BattleCha
     BattleChampionshipMenu *menu =
         GFL_HeapAllocate(heapId, sizeof(BattleChampionshipMenu), FALSE, "battle_championship_flow.c", 185);
 
-    sys_memset(menu, 0, sizeof(BattleChampionshipMenu));
+    MI_CpuFill8(menu, 0, sizeof(BattleChampionshipMenu));
     menu->param = *param;
     menu->heapId = heapId;
     menu->wordSet = GFL_WordSetSystemCreateDefault(heapId);
@@ -615,7 +615,7 @@ static void BattleChampionshipFlow_MenuTaskWifiCard(WifiBattleMatchTask *task, u
 
     switch (*seq) {
     case 0:
-        sys_memset(&param, 0, sizeof(DigitalCardCheckParam));
+        MI_CpuFill8(&param, 0, sizeof(DigitalCardCheckParam));
         param.mode = DIGITAL_CARD_CHECK_WIFI;
         param.msgBox = menu->param.msgBox;
         param.font = menu->param.font;
@@ -646,7 +646,7 @@ static void BattleChampionshipFlow_MenuTaskLiveCard(WifiBattleMatchTask *task, u
 
     switch (*seq) {
     case 0:
-        sys_memset(&param, 0, sizeof(DigitalCardCheckParam));
+        MI_CpuFill8(&param, 0, sizeof(DigitalCardCheckParam));
         param.mode = DIGITAL_CARD_CHECK_LIVE;
         param.msgBox = menu->param.msgBox;
         param.font = menu->param.font;
@@ -909,7 +909,7 @@ static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u3
     TournamentEntry *entry;
     u8 x, y, width, height;
 
-    sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
+    MI_CpuFill8(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = menu->param.msgData;
     param.font = menu->param.font;
     param.printQueue = menu->param.printQueue;

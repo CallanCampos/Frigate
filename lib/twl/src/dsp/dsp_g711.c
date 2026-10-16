@@ -4,7 +4,8 @@
 // TwlSDK's DSP library, the G.711 component (guessed file name, after the SDK's dsp_g711.c): a DSP process, as a COFF
 // image in the LTD autoload's .rodata. The opener hands the image to the file system as a file of memory, the loader
 // starts the process under the name "g711" and the unloader quits it. ARM code in the DSi-only LTD autoload. The ROM
-// names none of it; the functions keep their default names, and the SDK's are in twl/dsp.h.
+// names none of it; the functions have the SDK's names where twl/dsp.h knows them, and keep their default names
+// otherwise.
 
 // The state of the component. Nothing in the game's code touches its first two words
 typedef struct DSPG711State {
@@ -18,18 +19,18 @@ static DSPProcessContext sG711Context;
 
 // Opens the component's image, as a file of memory, in file
 BOOL func_0270723c(FSFile *file) {
-    if (!fs_init_check()) {
-        fs_init(FS_DMA_NOT_USE);
+    if (!FS_IsAvailable()) {
+        FS_Init(FS_DMA_NOT_USE);
     }
-    finit(file);
-    return extfs_fopen(file, DSP_G711Image, DSP_COMPONENT_IMAGE_SIZE);
+    FS_InitFile(file);
+    return FS_CreateFileFromMemory(file, DSP_G711Image, DSP_COMPONENT_IMAGE_SIZE);
 }
 
 // Starts the process from the image in file, into the banks of WRAM B and C that slotB and slotC allow
 BOOL func_02707278(FSFile *file, int slotB, int slotC) {
     if (!sG711State.loaded) {
-        func_027058d8(&sG711Context, "g711");
-        if (func_02705c24(&sG711Context, file, slotB, slotC)) {
+        DSP_InitProcessContext(&sG711Context, "g711");
+        if (DSP_ExecuteProcess(&sG711Context, file, slotB, slotC)) {
             sG711State.loaded = TRUE;
         }
     }
@@ -38,7 +39,7 @@ BOOL func_02707278(FSFile *file, int slotB, int slotC) {
 
 void func_027072e0(void) {
     if (sG711State.loaded) {
-        func_02705e04(&sG711Context);
+        DSP_QuitProcess(&sG711Context);
         sG711State.loaded = FALSE;
     }
 }

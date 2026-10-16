@@ -232,7 +232,7 @@ void BeaconViewOam_Free(BeaconViewOam *oam) {
     BmpOam_ActorSetDrawEnable(oam->actor, FALSE);
     BmpOam_ActorDel(oam->actor);
     GFL_BitmapFree(oam->bitmap);
-    sys_memset(oam, 0, sizeof(BeaconViewOam));
+    MI_CpuFill8(oam, 0, sizeof(BeaconViewOam));
 }
 
 void BeaconViewWin_PrintEx(BeaconViewWin *win, const StrBuf *strbuf, s16 x, s16 y, u8 fill, u16 color, int *pending,
@@ -258,7 +258,7 @@ static void BeaconViewWin_StartFlushTask(BeaconViewWin *win, int *pending) {
     BeaconViewWinTask *data =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(win->tcbManager, BeaconViewWin_FlushTask, sizeof(BeaconViewWinTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewWinTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewWinTask));
     data->win = win;
     if (pending != NULL) {
         data->pending = pending;
@@ -305,7 +305,7 @@ static void BeaconViewOam_StartFlushTask(BeaconViewOam *oam, int *pending) {
     BeaconViewOamTask *data =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(oam->tcbManager, BeaconViewOam_FlushTask, sizeof(BeaconViewOamTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewOamTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewOamTask));
     data->oam = oam;
     if (pending != NULL) {
         data->pending = pending;
@@ -329,7 +329,7 @@ void BeaconView_StartBGSlide(TCBExManager *tcbManager, u8 bg, u8 back, int *pend
     BeaconViewBGSlideTask *data =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(tcbManager, BeaconView_BGSlideTask, sizeof(BeaconViewBGSlideTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewBGSlideTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewBGSlideTask));
     data->bg = bg;
     data->back = back;
     if (data->back == FALSE) {

@@ -7,10 +7,9 @@
 #include "twl/mi.h"
 #include "twl/pm.h"
 
-// TwlSDK's camera library, in the DSi's LTD autoload. The game calls it through the SDK's inline functions, which
-// only call the library when the game runs on a DSi (OS_IsRunOnTwl, swan's hw_isDSi), so the check is inlined at
-// every call. The library keeps its default names until the LTD autoload is analyzed; the comments give the SDK
-// functions they implement, from how the Xtransceiver uses them.
+// TwlSDK's camera library, in the DSi's LTD autoload. The game calls it through the SDK's inline functions, which only
+// call the library when the game runs on a DSi (OS_IsRunOnTwl, swan's hw_isDSi), so the check is inlined at every call.
+// The functions have the names of the SDK functions they implement, from how the Xtransceiver uses them.
 
 typedef enum {
     CAMERA_RESULT_SUCCESS = 0,
@@ -87,47 +86,44 @@ typedef void (*CAMERAIntrCallback)(CAMERAResult result);
 // What the asynchronous I2C commands call when the ARM7 has answered
 typedef void (*CAMERACallback)(CAMERAResult result, void *arg);
 
-CAMERAResult func_02700938(void);                // CAMERA_InitCore
-void func_02700b34(void);                        // CAMERA_EndCore
-CAMERAResult func_02700bd0(void);                // puts both cameras to standby, called before CAMERA_End
-CAMERAResult func_02700cb4(CAMERASelect camera); // CAMERA_I2CInitCore
-CAMERAResult func_02700db8(CAMERASelect camera); // CAMERA_I2CActivateCore
-// CAMERA_I2CSizeExCore
-CAMERAResult func_02700fe4(CAMERASelect camera, CAMERAContext context, CAMERASize size);
-// CAMERA_I2CEffectExCore
-CAMERAResult func_02701248(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect);
+CAMERAResult CAMERA_InitCore(void);
+void CAMERA_EndCore(void);
+CAMERAResult func_02700bd0(void); // puts both cameras to standby, called before CAMERA_End
+CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera);
+CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera);
+CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CAMERASize size);
+CAMERAResult CAMERA_I2CEffectExCore(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect);
 // CAMERA_I2CAutoExposureCore and CAMERA_I2CAutoWhiteBalanceCore, though which is which is a guess
-CAMERAResult func_027017dc(CAMERASelect camera, BOOL on);
-CAMERAResult func_02701908(CAMERASelect camera, BOOL on);
-void func_027000f8(CAMERAIntrCallback callback); // CAMERA_SetVsyncCallbackCore
-void func_02700108(CAMERAIntrCallback callback); // CAMERA_SetBufferErrorCallbackCore
-void func_02700118(CAMERAIntrCallback callback); // CAMERA_SetRebootCallbackCore
-BOOL func_027020f0(void);                        // CAMERA_IsBusyCore
-void func_02702108(void);                        // CAMERA_StartCaptureCore
-void func_0270212c(void);                        // CAMERA_StopCaptureCore
-void func_02702158(BOOL enabled);                // CAMERA_SetTrimmingCore
-void func_0270218c(CAMERAOutput output);         // CAMERA_SetOutputFormatCore
-void func_027021e4(void);                        // CAMERA_ClearBufferCore
-void func_0270229c(int lines);                   // CAMERA_SetTransferLinesCore
-int func_027022f8(u16 width, u16 height);        // CAMERA_GetMaxLinesRoundCore
-u32 func_0270234c(u16 width);                    // CAMERA_GetBytesAtOnceCore
-u16 func_02702364(CAMERASize size);              // CAMERA_SizeToWidthCore
-u16 func_027023cc(CAMERASize size);              // CAMERA_SizeToHeightCore
+CAMERAResult CAMERA_I2CAutoExposureCore(CAMERASelect camera, BOOL on);
+CAMERAResult CAMERA_I2CAutoWhiteBalanceCore(CAMERASelect camera, BOOL on);
+void CAMERA_SetVsyncCallbackCore(CAMERAIntrCallback callback);
+void CAMERA_SetBufferErrorCallbackCore(CAMERAIntrCallback callback);
+void CAMERA_SetRebootCallbackCore(CAMERAIntrCallback callback);
+BOOL CAMERA_IsBusyCore(void);
+void CAMERA_StartCaptureCore(void);
+void CAMERA_StopCaptureCore(void);
+void CAMERA_SetTrimmingCore(BOOL enabled);
+void CAMERA_SetOutputFormatCore(CAMERAOutput output);
+void CAMERA_ClearBufferCore(void);
+void CAMERA_SetTransferLinesCore(int lines);
+int CAMERA_GetMaxLinesRoundCore(u16 width, u16 height);
+u32 CAMERA_GetBytesAtOnceCore(u16 width);
+u16 CAMERA_SizeToWidthCore(CAMERASize size);
+u16 CAMERA_SizeToHeightCore(CAMERASize size);
 
 // camera.c's other functions on the camera interface's registers (SCFG_CLK and the control word at 0x04004202), which
-// camera_api.c calls while it starts the camera, stops it and handles its interrupt. They keep their default names
-// until the LTD autoload is analyzed
-void func_02702080(void);     // resets the interface and its camera clock
-BOOL func_027021cc(void);     // whether the interface reports a buffer error (bit 4 of its control)
-void func_02702208(BOOL on);  // sets or clears the interface's interrupt enable (bit 11 of its control)
-void func_0270223c(u32 bits); // replaces bits 8 and 9 of the interface's control
-void func_02702268(BOOL on);  // sets or clears bit 10 of the interface's control
+// camera_api.c calls while it starts the camera, stops it and handles its interrupt. Their names are descriptive
+void CAMERA_ResetCore(void);                 // resets the interface and its camera clock
+BOOL CAMERA_IsBufferErrorCore(void);         // whether the interface reports a buffer error (bit 4 of its control)
+void CAMERA_SetInterruptEnableCore(BOOL on); // sets or clears the interface's interrupt enable (bit 11 of its control)
+void func_0270223c(u32 bits);                // replaces bits 8 and 9 of the interface's control
+void func_02702268(BOOL on);                 // sets or clears bit 10 of the interface's control
 
 static inline CAMERAResult CAMERA_Init(void) {
     if (hw_isDSi() == TRUE) {
-        CAMERAResult result = func_02700938();
+        CAMERAResult result = CAMERA_InitCore();
         if (result == CAMERA_RESULT_SUCCESS) {
-            result = func_02700cb4(CAMERA_SELECT_BOTH);
+            result = CAMERA_I2CInitCore(CAMERA_SELECT_BOTH);
         }
         return result;
     }
@@ -136,7 +132,7 @@ static inline CAMERAResult CAMERA_Init(void) {
 
 static inline void CAMERA_End(void) {
     if (hw_isDSi() == TRUE) {
-        func_02700b34();
+        CAMERA_EndCore();
     }
 }
 
@@ -150,131 +146,131 @@ static inline CAMERAResult CAMERA_I2CStop(void) {
 
 static inline CAMERAResult CAMERA_I2CActivate(CAMERASelect camera) {
     if (hw_isDSi() == TRUE) {
-        return func_02700db8(camera);
+        return CAMERA_I2CActivateCore(camera);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CSizeEx(CAMERASelect camera, CAMERAContext context, CAMERASize size) {
     if (hw_isDSi() == TRUE) {
-        return func_02700fe4(camera, context, size);
+        return CAMERA_I2CSizeExCore(camera, context, size);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CEffectEx(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect) {
     if (hw_isDSi() == TRUE) {
-        return func_02701248(camera, context, effect);
+        return CAMERA_I2CEffectExCore(camera, context, effect);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CAutoExposure(CAMERASelect camera, BOOL on) {
     if (hw_isDSi() == TRUE) {
-        return func_027017dc(camera, on);
+        return CAMERA_I2CAutoExposureCore(camera, on);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CAutoWhiteBalance(CAMERASelect camera, BOOL on) {
     if (hw_isDSi() == TRUE) {
-        return func_02701908(camera, on);
+        return CAMERA_I2CAutoWhiteBalanceCore(camera, on);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline void CAMERA_SetVsyncCallback(CAMERAIntrCallback callback) {
     if (hw_isDSi() == TRUE) {
-        func_027000f8(callback);
+        CAMERA_SetVsyncCallbackCore(callback);
     }
 }
 
 static inline void CAMERA_SetBufferErrorCallback(CAMERAIntrCallback callback) {
     if (hw_isDSi() == TRUE) {
-        func_02700108(callback);
+        CAMERA_SetBufferErrorCallbackCore(callback);
     }
 }
 
 static inline void CAMERA_SetRebootCallback(CAMERAIntrCallback callback) {
     if (hw_isDSi() == TRUE) {
-        func_02700118(callback);
+        CAMERA_SetRebootCallbackCore(callback);
     }
 }
 
 static inline BOOL CAMERA_IsBusy(void) {
     if (hw_isDSi() == TRUE) {
-        return func_027020f0();
+        return CAMERA_IsBusyCore();
     }
     return FALSE;
 }
 
 static inline void CAMERA_StartCapture(void) {
     if (hw_isDSi() == TRUE) {
-        func_02702108();
+        CAMERA_StartCaptureCore();
     }
 }
 
 static inline void CAMERA_StopCapture(void) {
     if (hw_isDSi() == TRUE) {
-        func_0270212c();
+        CAMERA_StopCaptureCore();
     }
 }
 
 static inline void CAMERA_SetTrimming(BOOL enabled) {
     if (hw_isDSi() == TRUE) {
-        func_02702158(enabled);
+        CAMERA_SetTrimmingCore(enabled);
     }
 }
 
 static inline void CAMERA_SetOutputFormat(CAMERAOutput output) {
     if (hw_isDSi() == TRUE) {
-        func_0270218c(output);
+        CAMERA_SetOutputFormatCore(output);
     }
 }
 
 static inline void CAMERA_ClearBuffer(void) {
     if (hw_isDSi() == TRUE) {
-        func_027021e4();
+        CAMERA_ClearBufferCore();
     }
 }
 
 static inline BOOL CAMERA_IsBufferError(void) {
     if (hw_isDSi() == TRUE) {
-        return func_027021cc();
+        return CAMERA_IsBufferErrorCore();
     }
     return FALSE;
 }
 
 static inline void CAMERA_SetTransferLines(int lines) {
     if (hw_isDSi() == TRUE) {
-        func_0270229c(lines);
+        CAMERA_SetTransferLinesCore(lines);
     }
 }
 
 static inline int CAMERA_GetMaxLinesRound(u16 width, u16 height) {
     if (hw_isDSi() == TRUE) {
-        return func_027022f8(width, height);
+        return CAMERA_GetMaxLinesRoundCore(width, height);
     }
     return 0;
 }
 
 static inline u32 CAMERA_GetBytesAtOnce(u16 width) {
     if (hw_isDSi() == TRUE) {
-        return func_0270234c(width);
+        return CAMERA_GetBytesAtOnceCore(width);
     }
     return 0;
 }
 
 static inline u16 CAMERA_SizeToWidth(CAMERASize size) {
     if (hw_isDSi() == TRUE) {
-        return func_02702364(size);
+        return CAMERA_SizeToWidthCore(size);
     }
     return 0;
 }
 
 static inline u16 CAMERA_SizeToHeight(CAMERASize size) {
     if (hw_isDSi() == TRUE) {
-        return func_027023cc(size);
+        return CAMERA_SizeToHeightCore(size);
     }
     return 0;
 }

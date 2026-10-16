@@ -108,7 +108,7 @@ static const char *MBP_GetCallbackName(u32 status) {
 
 static inline void MBP_DisconnectChildFromBmp(u16 aid) {
     u16 aidMask = ~(1 << aid);
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     mbpState.connectChildBmp &= aidMask;
     mbpState.requestChildBmp &= aidMask;
@@ -116,7 +116,7 @@ static inline void MBP_DisconnectChildFromBmp(u16 aid) {
     mbpState.downloadChildBmp &= aidMask;
     mbpState.bootableChildBmp &= aidMask;
     mbpState.rebootChildBmp &= aidMask;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 static inline void MBP_DisconnectChild(u16 aid) {
@@ -128,10 +128,10 @@ void MBP_Init(HeapID heapId, u32 ggid, u32 tgid) {
     MBUserInfo myUser;
     OSOwnerInfoEx info;
 
-    func_0207c3bc(&info);
+    OS_GetOwnerInfoEx(&info);
     myUser.favoriteColor = info.favoriteColor;
     myUser.nameLength = info.nickNameLength;
-    sys_memcpy(info.nickName, myUser.name, info.nickNameLength * 2);
+    MI_CpuCopy8(info.nickName, myUser.name, info.nickNameLength * 2);
     sHeapId = heapId;
     // The parent is player 0
     myUser.playerNo = 0;
@@ -166,8 +166,8 @@ static BOOL MBP_RegistFile(const MBGameRegistry *gameInfo) {
         p_file = NULL;
     } else {
         p_file = &file;
-        finit(p_file);
-        if (!romfs_fopen(p_file, gameInfo->romFilePathp)) {
+        FS_InitFile(p_file);
+        if (!FS_OpenFile(p_file, gameInfo->romFilePathp)) {
             return ret;
         }
     }
@@ -187,7 +187,7 @@ static BOOL MBP_RegistFile(const MBGameRegistry *gameInfo) {
         }
     }
     if (p_file == &file) {
-        romfs_fclose(&file);
+        FS_CloseFile(&file);
     }
     return ret;
 }
@@ -204,11 +204,11 @@ static void MBP_KickChild(u16 childAid) {
         return;
     }
     {
-        u32 enabled = CPU_IRQDisable();
+        u32 enabled = OS_DisableInterrupts();
 
         mbpState.requestChildBmp &= ~(1 << childAid);
         mbpState.connectChildBmp &= ~(1 << childAid);
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
 }
 
@@ -218,11 +218,11 @@ static void MBP_StartDownload(u16 childAid) {
         return;
     }
     {
-        u32 enabled = CPU_IRQDisable();
+        u32 enabled = OS_DisableInterrupts();
 
         mbpState.entryChildBmp &= ~(1 << childAid);
         mbpState.downloadChildBmp |= 1 << childAid;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
 }
 
@@ -292,10 +292,10 @@ static void MBP_ParentStateCallback(u16 childAid, u32 status, void *arg) {
             break;
         }
         {
-            u32 enabled = CPU_IRQDisable();
+            u32 enabled = OS_DisableInterrupts();
 
             mbpState.connectChildBmp |= 1 << childAid;
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
         }
         childInfo[childAid - 1].macAddress[0] = p->macAddress[0];
         childInfo[childAid - 1].macAddress[1] = p->macAddress[1];
@@ -325,7 +325,7 @@ static void MBP_ParentStateCallback(u16 childAid, u32 status, void *arg) {
         MBP_AcceptChild(childAid);
         userInfo = MB_CommGetChildUser(childAid);
         if (userInfo != NULL) {
-            sys_memcpy(userInfo, &childInfo[childAid - 1].user, sizeof(MBUserInfo));
+            MI_CpuCopy8(userInfo, &childInfo[childAid - 1].user, sizeof(MBUserInfo));
         }
         break;
     }
@@ -396,14 +396,14 @@ u16 MBP_GetState(void) {
 static int MBP_GetChildState(u16 childAid) {
     MBPState tmpState;
     u16 bitmap = 1 << childAid;
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     if ((mbpState.connectChildBmp & bitmap) == 0) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return MBP_CHILDSTATE_NONE;
     }
-    sys_memcpy(&mbpState, &tmpState, sizeof(MBPState));
-    CPU_SetIRQMask(enabled);
+    MI_CpuCopy8(&mbpState, &tmpState, sizeof(MBPState));
+    OS_RestoreInterrupts(enabled);
     if (tmpState.requestChildBmp & bitmap) {
         return MBP_CHILDSTATE_REQUEST;
     }

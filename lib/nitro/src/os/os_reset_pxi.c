@@ -7,13 +7,12 @@
 // Whether the ARM7 said that a reset happened, and that the system is being terminated
 static u16 sResetFlags[2];
 
-// NitroSDK's OS_IsResetOccurred
-BOOL func_02079f04(void) {
+BOOL OS_IsResetOccurred(void) {
     return sResetFlags[0];
 }
 
 // The function that handles the words of the FIFO's OS tag
-void func_02079f10(u32 fifoTag, u32 data, BOOL err) {
+void OSi_CommonCallback(u32 fifoTag, u32 data, BOOL err) {
     u16 command = (data & OS_PXI_COMMAND_MASK) >> OS_PXI_COMMAND_SHIFT;
 
     if (command == OS_PXI_COMMAND_RESET) {
@@ -27,7 +26,7 @@ void func_02079f10(u32 fifoTag, u32 data, BOOL err) {
 }
 
 // Sends the ARM7 a command, until the FIFO takes it
-void func_02079f44(u32 command) {
+void OSi_SendToPxi(u32 command) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_OS, command << OS_PXI_COMMAND_SHIFT, FALSE) != 0) {
     }
 }

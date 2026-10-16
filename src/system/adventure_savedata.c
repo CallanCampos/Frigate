@@ -17,7 +17,7 @@ u32 getSizeofAdventureDataBlk(void) {
 }
 
 void initAdventureDataBlk(AdventureSave *adventure) {
-    sys_memset32_fast(0, adventure, sizeof(AdventureSave));
+    MIi_CpuClearFast(0, adventure, sizeof(AdventureSave));
     buildAdventureTimeBlk(&adventure->time);
 }
 
@@ -34,7 +34,7 @@ void setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay(AdventureSave *adventure) {
     OSOwnerInfo info;
 
     adventure->rtcOffset = OS_GetOwnerRtcOffset();
-    func_0207c33c(adventure->ownerMac);
+    OS_GetMacAddress(adventure->ownerMac);
     OS_GetOwnerInfo(&info);
     adventure->birthdayMonth = info.birthday.month;
     adventure->birthdayDay = info.birthday.day;
@@ -58,8 +58,8 @@ u8 getOSBirthdayDay(AdventureSave *adventure) {
 void buildAdventureTimeBlk(AdventureTime *time) {
     time->unk0 = 1;
     RTC_GetCachedDateTime(&time->date, &time->time);
-    time->day = func_0207d0b4(&time->date);
-    time->startSeconds = func_0207d12c(&time->date, &time->time);
+    time->day = RTC_ConvertDateToDay(&time->date);
+    time->startSeconds = RTC_ConvertDateTimeToSecond(&time->date, &time->time);
     time->seconds = 0;
     time->dayMinutes = 0;
 }
@@ -85,5 +85,5 @@ void dayCountdownTest(AdventureTime *time, u32 minutes) {
 void setNewDayForCountdown(AdventureTime *time) {
     time->dayMinutes = MINUTES_PER_DAY;
     RTC_GetCachedDateTime(&time->date, &time->time);
-    time->day = func_0207d0b4(&time->date);
+    time->day = RTC_ConvertDateToDay(&time->date);
 }

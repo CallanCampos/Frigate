@@ -7,7 +7,8 @@
 // TwlSDK's DSP library, the pipes (guessed file name, after the SDK's dsp_pipe.c): the access to the DSP's data memory
 // by bytes, the pipes that the ARM9 and the DSP's processes talk through, the interrupt that wakes the readers when the
 // DSP writes one, and the file server thread that opens, reads and writes files for the DSP. ARM code in the DSi-only
-// LTD autoload. The ROM names none of it; the functions keep their default names, and the SDK's are in twl/dsp.h.
+// LTD autoload. The ROM names none of it; the functions have the SDK's names where twl/dsp.h knows them, and keep their
+// default names otherwise.
 
 // What the DSP asks of the file server, as the first half word of a message on a port that has the file flag
 #define DSP_FILE_OPEN 0        // mode and a path (its length in half words, then the text): opens the file in the ROM
@@ -48,33 +49,33 @@ static OSThreadQueue sPipeQueue; // the threads that wait for a pipe to change
 // The callback and its user data of each port. The default for the first port is func_02706c2c
 static DSPPipeCallback sPipeCallbacks[DSP_PORT_COUNT];
 static void *sPipeUserData[DSP_PORT_COUNT];
-static DSPPipe sPipes[DSP_PORT_COUNT][2]; // for the callers that pass no pipe to func_02706d44
+static DSPPipe sPipes[DSP_PORT_COUNT][2]; // for the callers that pass no pipe to DSP_LoadPipe
 static DSPFileServer sFileServer;
 
 // The register interface of dsp_if.c, which the SDK's inline functions only call on a DSi
 static inline u16 DSPi_GetSemaphore(void) {
     if (hw_isDSi() == TRUE) {
-        return func_02705284();
+        return DSP_GetSemaphore();
     }
     return 0;
 }
 
 // The access to the DSP's memory, a half word of 16 bits at a time (its address is in half words)
 static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     if (hw_isDSi() == TRUE) {
         func_02705150(0, dst, wordAddress, count, 0);
     }
     reg_DSP_PCFG &= ~(DSP_PCFG_AUTO_INCREMENT | DSP_PCFG_READ_LENGTH_MASK);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static inline void DSPi_WriteWords(u16 wordAddress, const u16 *src, u16 count) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     if (hw_isDSi() == TRUE) {
         func_02705088(0, wordAddress, src, count, 0);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static inline u16 DSPi_ReadWord(u16 wordAddress) {
@@ -172,7 +173,7 @@ static void func_027067b4(void *arg) {
     DSPFileServer *server = arg;
 
     for (;;) {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
         int port;
         OSMessage message;
         DSPPipe readPipe;
@@ -188,69 +189,69 @@ static void func_027067b4(void *arg) {
             OS_ReceiveMessage(&server->queue, &message, OS_MESSAGE_BLOCK);
         }
         server->requests &= ~(1 << port);
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
 
         file = &server->files[port];
-        func_02706d44(&readPipe, port, 0);
-        func_02706d44(&writePipe, port, 1);
-        while (func_02706e90(&readPipe) >= 2) {
+        DSP_LoadPipe(&readPipe, port, 0);
+        DSP_LoadPipe(&writePipe, port, 1);
+        while (DSP_GetPipeReadableSize(&readPipe) >= 2) {
             u16 command;
-            func_02706ec0(&readPipe, &command, 2);
+            DSP_ReadPipe(&readPipe, &command, 2);
             switch (command) {
             case DSP_FILE_OPEN: {
                 u16 mode;
                 u16 length;
                 u16 result;
                 char path[DSP_FILE_PATH_SIZE];
-                func_02706ec0(&readPipe, &mode, 2);
-                func_02706ec0(&readPipe, &length, 2);
+                DSP_ReadPipe(&readPipe, &mode, 2);
+                DSP_ReadPipe(&readPipe, &length, 2);
                 length *= 2;
-                func_02706ec0(&readPipe, path, length);
+                DSP_ReadPipe(&readPipe, path, length);
                 path[length] = '\0';
-                romfs_fopen_core(file, path, mode);
+                FS_OpenFileEx(file, path, mode);
                 result = FS_IsFile(file) ? TRUE : FALSE;
-                func_02706fcc(&writePipe, &result, 2);
+                DSP_WritePipe(&writePipe, &result, 2);
                 break;
             }
             case DSP_FILE_OPEN_MEMORY: {
                 u32 address;
                 u32 length;
                 u16 result;
-                func_02706ec0(&readPipe, &address, 4);
-                func_02706ec0(&readPipe, &length, 4);
+                DSP_ReadPipe(&readPipe, &address, 4);
+                DSP_ReadPipe(&readPipe, &length, 4);
                 address = DSPi_SwapHalves(address);
                 length = DSPi_SwapHalves(length) * 2;
-                extfs_fopen(file, (void *)address, length);
+                FS_CreateFileFromMemory(file, (void *)address, length);
                 result = FS_IsFile(file) ? TRUE : FALSE;
-                func_02706fcc(&writePipe, &result, 2);
+                DSP_WritePipe(&writePipe, &result, 2);
                 break;
             }
             case DSP_FILE_CLOSE: {
                 u16 result = TRUE;
-                romfs_fclose(file);
-                func_02706fcc(&writePipe, &result, 2);
+                FS_CloseFile(file);
+                DSP_WritePipe(&writePipe, &result, 2);
                 break;
             }
             case DSP_FILE_SEEK: {
                 u32 offset;
                 u16 whence;
                 u32 position;
-                func_02706ec0(&readPipe, &offset, 4);
-                func_02706ec0(&readPipe, &whence, 2);
+                DSP_ReadPipe(&readPipe, &offset, 4);
+                DSP_ReadPipe(&readPipe, &whence, 2);
                 offset = DSPi_SwapHalves(offset);
-                romfs_fseek(file, offset, whence);
-                position = DSPi_SwapHalves(romfs_ftell(file));
-                func_02706fcc(&writePipe, &position, 4);
+                FS_SeekFile(file, offset, whence);
+                position = DSPi_SwapHalves(FS_GetFilePosition(file));
+                DSP_WritePipe(&writePipe, &position, 4);
                 break;
             }
             case DSP_FILE_READ: {
                 u16 length;
                 u16 words;
                 u8 buffer[DSP_FILE_CHUNK_SIZE];
-                func_02706ec0(&readPipe, &length, 2);
+                DSP_ReadPipe(&readPipe, &length, 2);
                 length *= 2;
                 {
-                    u32 left = romfs_fgetsize(file) - romfs_ftell(file);
+                    u32 left = FS_GetFileLength(file) - FS_GetFilePosition(file);
                     u32 size = length;
                     if (size > left) {
                         size = left;
@@ -258,11 +259,11 @@ static void func_027067b4(void *arg) {
                     length = size;
                 }
                 words = length >> 1;
-                func_02706fcc(&writePipe, &words, 2);
+                DSP_WritePipe(&writePipe, &words, 2);
                 while (length != 0) {
                     u16 chunk = (length > DSP_FILE_CHUNK_SIZE) ? DSP_FILE_CHUNK_SIZE : length;
-                    romfs_fread(file, buffer, chunk);
-                    func_02706fcc(&writePipe, buffer, chunk);
+                    FS_ReadFile(file, buffer, chunk);
+                    DSP_WritePipe(&writePipe, buffer, chunk);
                     length -= chunk;
                 }
                 break;
@@ -270,12 +271,12 @@ static void func_027067b4(void *arg) {
             case DSP_FILE_WRITE: {
                 u16 length;
                 u8 buffer[DSP_FILE_CHUNK_SIZE];
-                func_02706ec0(&readPipe, &length, 2);
+                DSP_ReadPipe(&readPipe, &length, 2);
                 length *= 2;
                 while (length != 0) {
                     u16 chunk = (length > DSP_FILE_CHUNK_SIZE) ? DSP_FILE_CHUNK_SIZE : length;
-                    func_02706ec0(&readPipe, buffer, chunk);
-                    func_02070e70(file, buffer, chunk);
+                    DSP_ReadPipe(&readPipe, buffer, chunk);
+                    FS_WriteFile(file, buffer, chunk);
                     length -= chunk;
                 }
                 break;
@@ -288,23 +289,23 @@ static void func_027067b4(void *arg) {
 // Asks the file server to look at the pipes of a port, and starts it if it is not running yet
 static void func_02706b60(int port) {
     DSPFileServer *server = &sFileServer;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (!server->started) {
         int i;
         for (i = 0; i < DSP_PORT_COUNT; i++) {
-            finit(&server->files[i]);
+            FS_InitFile(&server->files[i]);
         }
-        func_0207acc4(&server->queue, &server->message, 1);
+        OS_InitMessageQueue(&server->queue, &server->message, 1);
         server->requests = 0;
         server->started = TRUE;
-        scheduler_init_thread(&server->thread, func_027067b4, server, server->stack + DSP_FILE_STACK_SIZE,
-                              DSP_FILE_STACK_SIZE, DSP_FILE_THREAD_PRIORITY);
-        scheduler_start_thread(&server->thread);
+        OS_CreateThread(&server->thread, func_027067b4, server, server->stack + DSP_FILE_STACK_SIZE,
+                        DSP_FILE_STACK_SIZE, DSP_FILE_THREAD_PRIORITY);
+        OS_WakeupThreadDirect(&server->thread);
     }
     server->requests |= 1 << port;
     OS_SendMessage(&server->queue, (OSMessage)port, OS_MESSAGE_NOBLOCK);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // The callback of the first port: reads what the DSP wrote there, and drops it
@@ -317,26 +318,26 @@ static void func_02706c2c(void *userData, int port, int direction) {
     if (direction != 0) {
         return;
     }
-    func_02706d44(&pipe, port, direction);
-    length = func_02706e90(&pipe);
+    DSP_LoadPipe(&pipe, port, direction);
+    length = DSP_GetPipeReadableSize(&pipe);
     done = 0;
     if (length == 0) {
         return;
     }
     while (done < length) {
         u16 chunk = (length - done >= 0x80) ? 0x80 : length - done;
-        func_02706ec0(&pipe, buffer, chunk);
+        DSP_ReadPipe(&pipe, buffer, chunk);
         done += chunk;
     }
 }
 
 // Waits for the DSP to change a pipe, and gets its header again
 static void func_02706cb4(DSPPipe *pipe) {
-    scheduler_yield(&sPipeQueue);
+    OS_SleepThread(&sPipeQueue);
     func_02706dfc(pipe);
 }
 
-void func_02706cd4(void) {
+void DSP_InitPipe(void) {
     int i;
 
     sPipeBase = 0;
@@ -348,17 +349,17 @@ void func_02706cd4(void) {
     sPipeCallbacks[0] = func_02706c2c;
 }
 
-void func_02706d28(int port, DSPPipeCallback callback, void *userData) {
+void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData) {
     sPipeCallbacks[port] = callback;
     sPipeUserData[port] = userData;
 }
 
-DSPPipe *func_02706d44(DSPPipe *pipe, int port, int direction) {
-    u32 irq = CPU_IRQDisable();
+DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction) {
+    u32 irq = OS_DisableInterrupts();
     while (sPipeBase == 0) {
-        scheduler_yield(&sPipeQueue);
+        OS_SleepThread(&sPipeQueue);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     if (port >= 0 && port < DSP_PORT_COUNT && direction >= 0 && direction < 2) {
         u32 address = sPipeBase + port * sizeof(sPipes[0]) + direction * sizeof(DSPPipe);
         if (pipe == NULL) {
@@ -372,7 +373,7 @@ DSPPipe *func_02706d44(DSPPipe *pipe, int port, int direction) {
 
 // Gets the header of a pipe from the DSP again
 static void func_02706dfc(DSPPipe *pipe) {
-    func_02706d44(pipe, (pipe->id & 0xff) >> 1, pipe->id & 1);
+    DSP_LoadPipe(pipe, (pipe->id & 0xff) >> 1, pipe->id & 1);
 }
 
 // Tells the DSP that the ARM9 moved the pipe's read or write position
@@ -387,14 +388,14 @@ static void func_02706e18(DSPPipe *pipe) {
     DSPi_SendData(2, pipe->id & 0xff);
 }
 
-u16 func_02706e90(const DSPPipe *pipe) {
+u16 DSP_GetPipeReadableSize(const DSPPipe *pipe) {
     u16 writePos = pipe->writePos;
     u16 readPos = pipe->readPos;
     return (writePos - readPos + (((readPos ^ writePos) < 0x8000) ? 0 : pipe->length)) & ~0x8000;
 }
 
-void func_02706ec0(DSPPipe *pipe, void *dst, u16 length) {
-    u32 irq = CPU_IRQDisable();
+void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
+    u32 irq = OS_DisableInterrupts();
     BOOL moved = FALSE;
 
     func_02706dfc(pipe);
@@ -423,11 +424,11 @@ void func_02706ec0(DSPPipe *pipe, void *dst, u16 length) {
     if (moved) {
         func_02706e18(pipe);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
-void func_02706fcc(DSPPipe *pipe, const void *src, u16 length) {
-    u32 irq = CPU_IRQDisable();
+void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
+    u32 irq = OS_DisableInterrupts();
     BOOL moved = FALSE;
 
     func_02706dfc(pipe);
@@ -456,7 +457,7 @@ void func_02706fcc(DSPPipe *pipe, const void *src, u16 length) {
     if (moved) {
         func_02706e18(pipe);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // The DSP's interrupt: the first word the DSP sends on the third reply is the pipes' address, and each after it is a
@@ -464,7 +465,7 @@ void func_02706fcc(DSPPipe *pipe, const void *src, u16 length) {
 void func_027070dc(void *userData) {
     while (DSPi_GetSemaphore() & 0x8000 || DSPi_RecvDataIsReady(2)) {
         if (hw_isDSi() == TRUE) {
-            func_02705294(0x8000);
+            DSP_ClearSemaphore(0x8000);
         }
         while (DSPi_RecvDataIsReady(2)) {
             if (sPipeBase == 0) {
@@ -478,7 +479,7 @@ void func_027070dc(void *userData) {
                         sPipeCallbacks[port](sPipeUserData[port], port, direction);
                     } else {
                         DSPPipe pipe;
-                        func_02706d44(&pipe, port, direction);
+                        DSP_LoadPipe(&pipe, port, direction);
                         if (direction == 0 && (pipe.id & DSP_PIPE_FILE_FLAG)) {
                             func_02706b60(port);
                         }

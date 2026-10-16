@@ -75,16 +75,15 @@ static BOOL CTRDGi_IsExistedAtInit(void) {
     return *(vu16 *)HW_CTRDG_MODULE_INFO_BUF != 0xffff;
 }
 
-// CTRDGi_InitCommon
-void func_02082624(void) {
+void CTRDGi_InitCommon(void) {
     u32 zero = 0;
 
     CpuSet(&zero, &ctrdgWork.unk_04, SVC_CPUSET_FILL | SVC_CPUSET_32BIT | 1);
-    ctrdgWork.lockID = cart_key_create();
+    ctrdgWork.lockID = OS_GetLockID();
 }
 
-// CTRDG_IsExisting: reads the ROM's identifying values and compares them with what the start noted
-BOOL func_0208264c(void) {
+// Reads the ROM's identifying values and compares them with what the start noted
+BOOL CTRDG_IsExisting(void) {
     BOOL result = TRUE;
     CTRDGLockInfo lockInfo;
     CTRDGRomCycle cycle;
@@ -145,15 +144,15 @@ static void CTRDGi_RestoreAccessCycle(const CTRDGRomCycle *cycle) {
 // means that it was this processor's already, and nothing is locked
 static void CTRDGi_LockByProcessor(u16 lockID, CTRDGLockInfo *info) {
     while (TRUE) {
-        info->irq = CPU_IRQDisable();
-        info->hadBus = cart_mutex_get_status((const OSLockWord *)HW_CTRDG_LOCK_BUF) & 0x40;
+        info->irq = OS_DisableInterrupts();
+        info->hadBus = OS_ReadOwnerOfLockWord((const OSLockWord *)HW_CTRDG_LOCK_BUF) & 0x40;
         if (info->hadBus != 0) {
             return;
         }
-        if (func_0207a140(lockID) == 0) {
+        if (OS_TryLockCartridge(lockID) == 0) {
             return;
         }
-        CPU_SetIRQMask(info->irq);
+        OS_RestoreInterrupts(info->irq);
         WaitByLoop(1);
     }
 }
@@ -161,13 +160,12 @@ static void CTRDGi_LockByProcessor(u16 lockID, CTRDGLockInfo *info) {
 // Gives the bus back unless it was held before, and the interrupts as they were
 static void CTRDGi_UnlockByProcessor(u16 lockID, CTRDGLockInfo *info) {
     if (info->hadBus == 0) {
-        func_0207a138(lockID);
+        OS_UnLockCartridge(lockID);
     }
-    CPU_SetIRQMask(info->irq);
+    OS_RestoreInterrupts(info->irq);
 }
 
-// CTRDGi_SendtoPxi
-void func_020827a0(u32 data) {
+void CTRDGi_SendtoPxi(u32 data) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_CTRDG, data, FALSE) != 0) {
         WaitByLoop(1);
     }

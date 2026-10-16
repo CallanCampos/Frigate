@@ -62,7 +62,7 @@ static BOOL BattleLoseMessage_Init(GameProc *proc, u32 *state, void *param, void
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GAME_CLEAR_SAVE, 0x40000);
     msg = GFL_ProcInitSubsystem(proc, sizeof(BattleLoseMessage), HEAPID_GAME_CLEAR_SAVE);
-    sys_memset32(0, msg, sizeof(BattleLoseMessage));
+    MIi_CpuClear32(0, msg, sizeof(BattleLoseMessage));
     msg->heapId = HEAPID_GAME_CLEAR_SAVE;
     msg->returnNonLeague = loseData->returnNonLeague;
     msg->playerInfo = loseData->playerInfo;
@@ -76,9 +76,9 @@ static BOOL BattleLoseMessage_Main(GameProc *proc, u32 *state, void *param, void
 
     switch (*state) {
     case STATE_SETUP:
-        gfxSetLCDCBanks(GX_VRAM_LCDC_ALL);
-        sys_memset32_fast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
-        gfxDisableLCDCBanks();
+        GX_SetBankForLCDC(GX_VRAM_LCDC_ALL);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
+        GX_DisableBankForLCDC();
         BattleLoseMessage_InitBGs(msg->heapId);
         msg->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, msg->heapId);
         msg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_5, msg->heapId);

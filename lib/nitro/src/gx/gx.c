@@ -9,20 +9,20 @@
 // Whether the main engine's display is on, and the mode it shows when it is turned on again
 static u16 g_GfxEngineAEnabled = TRUE;
 u32 GXi_DmaId = GX_DEFAULT_DMAID;
-u16 g_GfxCartLock;
+u16 GXi_VRamLockId;
 static u16 g_GfxEngineAMode;
 
-void gfxInit(void) {
+void GX_Init(void) {
     reg_GX_POWCNT |= REG_GX_POWCNT_DSEL_MASK;
     GX_SetPower(GX_POWER_ALL);
     reg_GX_POWCNT |= REG_GX_POWCNT_LCD_MASK;
-    gfxInitVRAM();
-    while (g_GfxCartLock == 0) {
-        s32 lockId = cart_key_create();
+    GX_InitGXState();
+    while (GXi_VRamLockId == 0) {
+        s32 lockId = OS_GetLockID();
         if (lockId == OS_LOCK_ID_ERROR) {
             sys_exit();
         }
-        g_GfxCartLock = lockId;
+        GXi_VRamLockId = lockId;
     }
     reg_GX_DISPSTAT = 0;
     reg_GX_DISPCNT = 0;
@@ -34,14 +34,14 @@ void gfxInit(void) {
             reg_GX_MASTER_BRIGHT = 0;
             func_0276814c(GXi_DmaId - 4, &reg_GXS_DB_DISPCNT, 0, 0x70);
         } else {
-            dma_fill(GXi_DmaId, &reg_G2_BG0CNT, 0, 0x60, TRUE);
+            MIi_DmaFill32(GXi_DmaId, &reg_G2_BG0CNT, 0, 0x60, TRUE);
             reg_GX_MASTER_BRIGHT = 0;
-            dma_fill(GXi_DmaId, &reg_GXS_DB_DISPCNT, 0, 0x70, TRUE);
+            MIi_DmaFill32(GXi_DmaId, &reg_GXS_DB_DISPCNT, 0, 0x70, TRUE);
         }
     } else {
-        sys_memset32(0, &reg_G2_BG0CNT, 0x60);
+        MIi_CpuClear32(0, &reg_G2_BG0CNT, 0x60);
         reg_GX_MASTER_BRIGHT = 0;
-        sys_memset32(0, &reg_GXS_DB_DISPCNT, 0x70);
+        MIi_CpuClear32(0, &reg_GXS_DB_DISPCNT, 0x70);
     }
     reg_G2_BG2PA = 0x100;
     reg_G2_BG2PD = 0x100;
@@ -53,12 +53,12 @@ void gfxInit(void) {
     reg_G2S_DB_BG3PD = 0x100;
 }
 
-void gfxSetVCountIntrLine(int vcount) {
+void GX_SetVCountEqVal(int vcount) {
     reg_GX_DISPSTAT =
         (u16)((reg_GX_DISPSTAT & REG_GX_DISPSTAT_FLAGS_MASK) | ((vcount & 0xff) << 8) | ((vcount & 0x100) >> 1));
 }
 
-s32 gfxSetHBlankIRQEnabled(BOOL enable) {
+s32 GX_HBlankIntr(BOOL enable) {
     s32 prev = reg_GX_DISPSTAT & REG_GX_DISPSTAT_HBI_MASK;
     if (enable) {
         reg_GX_DISPSTAT |= REG_GX_DISPSTAT_HBI_MASK;
@@ -68,7 +68,7 @@ s32 gfxSetHBlankIRQEnabled(BOOL enable) {
     return prev;
 }
 
-s32 gfxSetVBlankIRQEnabled(BOOL enable) {
+s32 GX_VBlankIntr(BOOL enable) {
     s32 prev = reg_GX_DISPSTAT & REG_GX_DISPSTAT_VBI_MASK;
     if (enable) {
         reg_GX_DISPSTAT |= REG_GX_DISPSTAT_VBI_MASK;
@@ -78,11 +78,11 @@ s32 gfxSetVBlankIRQEnabled(BOOL enable) {
     return prev;
 }
 
-BOOL gfxEngineIsEnabledA(void) {
+BOOL GX_IsDispOn(void) {
     return g_GfxEngineAEnabled;
 }
 
-void gfxEngineDisableA(void) {
+void GX_DispOff(void) {
     u32 dispcnt = reg_GX_DISPCNT;
     g_GfxEngineAEnabled = FALSE;
     g_GfxEngineAMode = (dispcnt & REG_GX_DISPCNT_MODE_MASK) >> REG_GX_DISPCNT_MODE_SHIFT;
@@ -90,7 +90,7 @@ void gfxEngineDisableA(void) {
     func_0207f6b8();
 }
 
-void gfxEngineEnableA(void) {
+void GX_DispOn(void) {
     g_GfxEngineAEnabled = TRUE;
     if (g_GfxEngineAMode != 0) {
         reg_GX_DISPCNT = (reg_GX_DISPCNT & ~REG_GX_DISPCNT_MODE_MASK) | (g_GfxEngineAMode << REG_GX_DISPCNT_MODE_SHIFT);
@@ -99,7 +99,7 @@ void gfxEngineEnableA(void) {
     }
 }
 
-void gfxSetEngineModeA(int dispMode, int bgMode, int bg0As3D) {
+void GX_SetGraphicsMode(int dispMode, int bgMode, int bg0As3D) {
     u32 dispcnt = reg_GX_DISPCNT;
     g_GfxEngineAMode = dispMode;
     if (!g_GfxEngineAEnabled) {
@@ -112,11 +112,11 @@ void gfxSetEngineModeA(int dispMode, int bgMode, int bg0As3D) {
     }
 }
 
-void gfxSetBGModeB(int bgMode) {
+void GXS_SetGraphicsMode(int bgMode) {
     reg_GXS_DB_DISPCNT = (reg_GXS_DB_DISPCNT & ~REG_GXS_DB_DISPCNT_BGMODE_MASK) | bgMode;
 }
 
-void GFXRegSetMasterBrightness(u32 reg, s32 brightness) {
+void GXx_SetMasterBrightness_(u32 reg, s32 brightness) {
     if (brightness == 0) {
         *(vu16 *)reg = 0;
     } else if (brightness > 0) {
@@ -126,7 +126,7 @@ void GFXRegSetMasterBrightness(u32 reg, s32 brightness) {
     }
 }
 
-s32 gfxRegGetMasterBrightness(u32 reg) {
+s32 GXx_GetMasterBrightness_(u32 reg) {
     u16 mode = *(vu16 *)reg & REG_GX_MASTER_BRIGHT_MODE_MASK;
     if (mode == 0) {
         return 0;

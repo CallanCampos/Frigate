@@ -7,7 +7,7 @@
 // not have: the SHA-1 and HMAC-SHA-1 of the DSi's BIOS. The object has a half in ARM9 main, the wrappers below, and
 // another in the LTD autoload, the cores that they call (the BIOS calls themselves, and an HMAC built on them). A
 // wrapper ends the program if the console is not a DSi (OSi_IsRunOnTwl), and calls its core otherwise. The functions
-// keep their default names, swan's where it has one; the comments give the SDK's
+// have the SDK's names, and the cores in the LTD autoload keep their default names
 
 // The state of a SHA-1 computation, of which the BIOS keeps the first 0x60 bytes. The library's init core clears the
 // word after them, and the HMAC's context continues after it (the key at 0x64, its length at 0xa4)
@@ -17,14 +17,13 @@ typedef struct {
 } SVCSHA1Context;
 
 // syscall_twl.c, the half in ARM9 main
-// SVC_SHA1Init
-void dsiJump_27696E9(SVCSHA1Context *context);
-// SVC_SHA1Update: adds len bytes to the hash
-void func_02082820(SVCSHA1Context *context, const void *input, u32 len);
-// SVC_SHA1GetHash: writes the 20-byte digest of what the context has been given
-void func_02082850(SVCSHA1Context *context, void *digest);
-// SVC_CalcHMACSHA1: the 20-byte HMAC-SHA-1 of bin_len bytes under a key
-void func_0208287c(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len);
+void SVC_SHA1Init(SVCSHA1Context *context); // swan's dsiJump_27696E9
+// Adds len bytes to the hash
+void SVC_SHA1Update(SVCSHA1Context *context, const void *input, u32 len);
+// Writes the 20-byte digest of what the context has been given
+void SVC_SHA1GetHash(SVCSHA1Context *context, void *digest);
+// The 20-byte HMAC-SHA-1 of bin_len bytes under a key
+void SVC_CalcHMACSHA1(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len);
 
 // syscall_twl.c, the half in the LTD autoload, which nothing has written yet; the wrappers call these cores
 // The cores of SVC_SHA1Init, SVC_SHA1Update and SVC_SHA1GetHash: the first clears the word at 0x60 of the context, and

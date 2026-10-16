@@ -4,8 +4,8 @@
 // is not part of the source.
 #include "nitro/gx.h"
 
-void gfxInit3D(void) {
-    gfxResetFIFO();
+void G3X_Init(void) {
+    G3X_ClearFifo();
     G3_End();
     while (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
     }
@@ -19,46 +19,46 @@ void gfxInit3D(void) {
     G3X_AlphaTest(FALSE, 0);
     reg_G3X_GXSTAT |= REG_G3X_GXSTAT_SE_MASK;
     G3X_SetFifoIntrCond(GX_FIFOINTR_COND_EMPTY);
-    gfxResetMatrixStack();
+    G3X_InitMtxStack();
     reg_G3X_CLEAR_COLOR = 0;
     reg_G3X_CLEAR_DEPTH = 0x7fff;
     reg_G3X_CLRIMAGE_OFFSET = 0;
     reg_G3X_FOG_COLOR = 0;
     reg_G3X_FOG_OFFSET = 0;
     G2_SetBG0Priority(0);
-    gfxResetLUTs();
+    G3X_InitTable();
     G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_BACK, 0, 31, 0);
     G3_TexImageParam(GX_TEXFMT_NONE, GX_TEXGEN_NONE, GX_TEXSIZE_S8, GX_TEXSIZE_T8, GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE,
                      GX_TEXPLTTCOLOR0_USE, 0);
     G3_TexPlttBase(0, GX_TEXFMT_NONE);
 }
 
-void gfxReset3D(void) {
+void G3X_Reset(void) {
     while (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
     }
     reg_G3X_GXSTAT |= REG_G3X_GXSTAT_SE_MASK;
     reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_GO_MASK;
     reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_RO_MASK;
-    gfxResetMatrixStackKeepProjection();
+    G3X_ResetMtxStack();
     G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_BACK, 0, 31, 0);
     G3_TexImageParam(GX_TEXFMT_NONE, GX_TEXGEN_NONE, GX_TEXSIZE_S8, GX_TEXSIZE_T8, GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE,
                      GX_TEXPLTTCOLOR0_USE, 0);
     G3_TexPlttBase(0, GX_TEXFMT_NONE);
 }
 
-void gfxResetFIFO(void) {
-    gfxClearFIFO(&reg_G3X_GXFIFO);
+void G3X_ClearFifo(void) {
+    GXi_NopClearFifo128_(&reg_G3X_GXFIFO);
     while (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
     }
 }
 
-void gfxResetMatrixStack(void) {
+void G3X_InitMtxStack(void) {
     u32 posLevel;
     u32 projLevel;
     reg_G3X_GXSTAT |= REG_G3X_GXSTAT_SE_MASK;
-    while (gfxGetWorldMatrixStackLevel(&posLevel) != 0) {
+    while (G3X_GetMtxStackLevelPV(&posLevel) != 0) {
     }
-    while (gfxGetProjectionMatrixStackLevel(&projLevel) != 0) {
+    while (G3X_GetMtxStackLevelPJ(&projLevel) != 0) {
     }
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
@@ -72,13 +72,13 @@ void gfxResetMatrixStack(void) {
     G3_Identity();
 }
 
-void gfxResetMatrixStackKeepProjection(void) {
+void G3X_ResetMtxStack(void) {
     u32 posLevel;
     u32 projLevel;
     reg_G3X_GXSTAT |= REG_G3X_GXSTAT_SE_MASK;
-    while (gfxGetWorldMatrixStackLevel(&posLevel) != 0) {
+    while (G3X_GetMtxStackLevelPV(&posLevel) != 0) {
     }
-    while (gfxGetProjectionMatrixStackLevel(&projLevel) != 0) {
+    while (G3X_GetMtxStackLevelPJ(&projLevel) != 0) {
     }
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
@@ -91,7 +91,7 @@ void gfxResetMatrixStackKeepProjection(void) {
     G3_Identity();
 }
 
-void gfxSetFog(BOOL enabled, int alphaMode, int depthShift, int offset) {
+void G3X_SetFog(BOOL enabled, int alphaMode, int depthShift, int offset) {
     if (enabled) {
         reg_G3X_FOG_OFFSET = (u16)offset;
         reg_G3X_DISP3DCNT = (u16)((depthShift << REG_G3X_DISP3DCNT_FSHIFT_SHIFT) |
@@ -103,7 +103,7 @@ void gfxSetFog(BOOL enabled, int alphaMode, int depthShift, int offset) {
     }
 }
 
-int gfxGetClipMatrix(MtxFx44 *dest) {
+int G3X_GetClipMtx(MtxFx44 *dest) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
         return -1;
     }
@@ -111,7 +111,7 @@ int gfxGetClipMatrix(MtxFx44 *dest) {
     return 0;
 }
 
-int gfxGetNormalMatrix(MtxFx33 *dest) {
+int G3X_GetVectorMtx(MtxFx33 *dest) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
         return -1;
     }
@@ -119,15 +119,15 @@ int gfxGetNormalMatrix(MtxFx33 *dest) {
     return 0;
 }
 
-void gfxSetEdgeColorTable(const GXRgb *table) {
+void G3X_SetEdgeColorTable(const GXRgb *table) {
     MI_CpuCopy16(table, (void *)&reg_G3X_EDGE_COLOR, 16);
 }
 
-void gfxSetFogTable(const u32 *table) {
-    gfxUploadFogTable(table, (void *)&reg_G3X_FOG_TABLE);
+void G3X_SetFogTable(const u32 *table) {
+    MI_Copy32B(table, (void *)&reg_G3X_FOG_TABLE);
 }
 
-void gfxClearColor(GXRgb color, int alpha, int depth, int polygonId, BOOL fog) {
+void G3X_SetClearColor(GXRgb color, int alpha, int depth, int polygonId, BOOL fog) {
     u32 value = color | (alpha << REG_G3X_CLEAR_COLOR_ALPHA_SHIFT) | (polygonId << REG_G3X_CLEAR_COLOR_ID_SHIFT);
     if (fog) {
         value |= REG_G3X_CLEAR_COLOR_FOG_MASK;
@@ -136,26 +136,26 @@ void gfxClearColor(GXRgb color, int alpha, int depth, int polygonId, BOOL fog) {
     reg_G3X_CLEAR_DEPTH = (u16)depth;
 }
 
-void gfxResetLUTs(void) {
+void G3X_InitTable(void) {
     int i;
     if (GXi_DmaId != GX_DMA_NOT_USE) {
         if (GXi_DmaId > MI_DMA_MAX_NUM) {
             func_027681b8(GXi_DmaId - 4, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL);
             func_0276814c(GXi_DmaId - 4, (void *)&reg_G3X_FOG_TABLE, 0, 0x60);
         } else {
-            dma_fillEx(GXi_DmaId, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL, TRUE);
-            dma_fill(GXi_DmaId, (void *)&reg_G3X_FOG_TABLE, 0, 0x60, TRUE);
+            MIi_DmaFill32Async(GXi_DmaId, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL, TRUE);
+            MIi_DmaFill32(GXi_DmaId, (void *)&reg_G3X_FOG_TABLE, 0, 0x60, TRUE);
         }
     } else {
-        sys_memset32(0, (void *)&reg_G3X_EDGE_COLOR, 0x10);
-        sys_memset32(0, (void *)&reg_G3X_FOG_TABLE, 0x60);
+        MIi_CpuClear32(0, (void *)&reg_G3X_EDGE_COLOR, 0x10);
+        MIi_CpuClear32(0, (void *)&reg_G3X_FOG_TABLE, 0x60);
     }
     for (i = 0; i < 32; i++) {
         reg_G3X_SHININESS = 0;
     }
 }
 
-int gfxGetWorldMatrixStackLevel(u32 *level) {
+int G3X_GetMtxStackLevelPV(u32 *level) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_MB_MASK) {
         return -1;
     }
@@ -163,7 +163,7 @@ int gfxGetWorldMatrixStackLevel(u32 *level) {
     return 0;
 }
 
-int gfxGetProjectionMatrixStackLevel(u32 *level) {
+int G3X_GetMtxStackLevelPJ(u32 *level) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_MB_MASK) {
         return -1;
     }
@@ -171,11 +171,11 @@ int gfxGetProjectionMatrixStackLevel(u32 *level) {
     return 0;
 }
 
-void gfxSet1DotDepth(fx32 depth) {
+void G3X_SetDisp1DotDepth(fx32 depth) {
     reg_G3X_DISP_1DOT_DEPTH = (u16)((depth >> 9) & 0x7fff);
 }
 
-int gfxGetBoxTestResult(s32 *result) {
+int G3X_GetBoxTestResult(s32 *result) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_BT_MASK) {
         return -1;
     }
@@ -187,7 +187,7 @@ int gfxGetBoxTestResult(s32 *result) {
 // 32 stores of 4 words are not a loop
 // clang-format off
 #pragma thumb off
-asm void gfxClearFIFO(void *fifo) {
+asm void GXi_NopClearFifo128_(void *fifo) {
     mov r1, #0
     mov r2, #0
     mov r3, #0

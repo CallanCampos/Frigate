@@ -53,7 +53,7 @@ void POKE_NET_SSL_Setup(void) {
     if (sPOKE_NET_SSL_Connection != NULL) {
         return;
     }
-    sys_memset(&sPOKE_NET_SSL_DefaultConnection, 0, sizeof(POKE_NET_SSL_CONNECTION));
+    MI_CpuFill8(&sPOKE_NET_SSL_DefaultConnection, 0, sizeof(POKE_NET_SSL_CONNECTION));
     sPOKE_NET_SSL_DefaultConnection.ServerName = NULL;
     POKE_NET_SSL_SetConnection(&sPOKE_NET_SSL_DefaultConnection);
     POKE_NET_SSL_SetCaInfo(sPOKE_NET_SSL_CaInfoList, NELEMS(sPOKE_NET_SSL_CaInfoList));
@@ -82,12 +82,12 @@ void POKE_NET_SSL_SetCaInfo(POKE_NET_SSL_CA_INFO **caInfo, int count) {
 // Copies the whole template, retaining its pointer fields without duplicating their storage.
 // A non-NULL serverName replaces the copied name pointer with a separately allocated copy.
 void POKE_NET_SSL_StartConnection(const char *serverName, POKE_NET_SSL_CONNECTION *connection) {
-    sys_memcpy(sPOKE_NET_SSL_Connection, connection, sizeof(POKE_NET_SSL_CONNECTION));
+    MI_CpuCopy8(sPOKE_NET_SSL_Connection, connection, sizeof(POKE_NET_SSL_CONNECTION));
     if (serverName == NULL) {
         return;
     }
-    connection->ServerName = POKE_NET_AllocFunc(NNS_STD_StrLen(serverName) + 1);
-    func_0207f7a4(connection->ServerName, serverName);
+    connection->ServerName = POKE_NET_AllocFunc(STD_GetStringLength(serverName) + 1);
+    STD_CopyString(connection->ServerName, serverName);
 }
 
 void POKE_NET_SSL_EndConnection(POKE_NET_SSL_CONNECTION *connection) {

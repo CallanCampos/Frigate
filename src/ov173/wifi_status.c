@@ -40,17 +40,17 @@ BOOL WIFI_STATUS_IsVChatMac(const WIFI_STATUS *my, const WIFI_STATUS *friendStat
 
 void WIFI_STATUS_SetVChatMac(WIFI_STATUS *my, const WIFI_STATUS *friendStatus) {
     my->callCounter++;
-    sys_memcpy(friendStatus->myMac, my->vchatMac, WIFI_STATUS_MAC_SIZE);
+    MI_CpuCopy8(friendStatus->myMac, my->vchatMac, WIFI_STATUS_MAC_SIZE);
 }
 
 void WIFI_STATUS_ResetVChatMac(WIFI_STATUS *my) {
     u8 mac[WIFI_STATUS_MAC_SIZE] = { 0, 0, 0, 0, 0, 0 };
 
-    sys_memcpy(mac, my->vchatMac, WIFI_STATUS_MAC_SIZE);
+    MI_CpuCopy8(mac, my->vchatMac, WIFI_STATUS_MAC_SIZE);
 }
 
 void WIFI_STATUS_SetMyMac(WIFI_STATUS *my) {
-    func_0207c33c(my->myMac);
+    OS_GetMacAddress(my->myMac);
 }
 
 BOOL WIFI_STATUS_GetUseVChat(const WIFI_STATUS *status) {

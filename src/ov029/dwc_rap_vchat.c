@@ -60,14 +60,14 @@ static void StartStream(void);
 static DWCRapVChatWork *sVChatWork;
 
 static void InitHardware(void) {
-    func_0207e75c();
-    func_0207ebb8();
-    func_0207efc4(PM_AMP_ON);
-    func_0207eff4(3);
+    MIC_Init();
+    PM_Init();
+    PM_SetAmp(PM_AMP_ON);
+    PM_SetAmpGain(3);
     VCT_SetVad(TRUE);
     NNS_SndInit();
     NNS_SndStrmInit((NNSSndStrm *)sVChatWork->stream);
-    sys_memset32_fast(0, sVChatWork->silence, VCT_SAMPLE_BYTES);
+    MIi_CpuClearFast(0, sVChatWork->silence, VCT_SAMPLE_BYTES);
     sVChatWork->tickBudget = 0;
     VCT_SetEchoCancel(TRUE);
 }
@@ -82,22 +82,22 @@ static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, voi
 
     if (status == NNS_SND_STRM_CALLBACK_SETUP) {
         for (i = 0; i < numChannels; i++) {
-            sys_memset(buffer[i], 0, len);
+            MI_CpuFill8(buffer[i], 0, len);
         }
         return;
     }
     if (!isRunningOnDSi()) {
         if (sVChatWork->micRunning) {
-            func_0207e7a0(&sVChatWork->micParam, MicCallback, NULL);
+            MIC_StartAutoSamplingAsync(&sVChatWork->micParam, MicCallback, NULL);
             sVChatWork->micRunning = 0;
         }
     } else {
         if (sVChatWork->micRunning) {
-            func_0207e904(&sVChatWork->micParam, MicCallback, NULL);
+            MIC_StartLimitedSamplingAsync(&sVChatWork->micParam, MicCallback, NULL);
             sVChatWork->micRunning = 0;
         }
     }
-    if ((u8 *)func_0207e8f8() - samples < len) {
+    if ((u8 *)MIC_GetLastSamplingAddress() - samples < len) {
         samples += len;
     }
     if (PAD_DetectFold() || sVChatWork->muted != 0) {
@@ -218,7 +218,7 @@ void DWCRapVChat_Update(BOOL stalled) {
     u32 elapsed;
 
     sVChatWork->stalled = stalled;
-    now = clock();
+    now = OS_GetTick();
     elapsed = (u32)now - (u32)sVChatWork->lastTick;
     sVChatWork->tickBudget += elapsed * 0xfa00 / 0x82ea - 0x411a;
     if (sVChatWork->tickBudget < -10000) {
@@ -277,7 +277,7 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
 
     if (sVChatWork == NULL) {
         sVChatWork = DWCRapCommon_Alloc(heapId, sizeof(DWCRapVChatWork), 32);
-        sys_memset(sVChatWork, 0, sizeof(DWCRapVChatWork));
+        MI_CpuFill8(sVChatWork, 0, sizeof(DWCRapVChatWork));
         sVChatWork->packetMemory = DWCRapCommon_Alloc(heapId, 0x23c0 * count + 32, 32);
         sVChatWork->onEnd = NULL;
         InitHardware();
@@ -353,14 +353,14 @@ void DWCRapVChat_End(void) {
     if (sVChatWork != NULL) {
         onEnd = sVChatWork->onEnd;
         if (!isRunningOnDSi()) {
-            func_0207e8d4();
-        } else {
             MIC_StopAutoSampling();
+        } else {
+            MIC_StopLimitedSampling();
         }
         NNS_SndStrmStop((NNSSndStrm *)sVChatWork->stream);
         NNS_SndStrmFreeChannel((NNSSndStrm *)sVChatWork->stream);
         VCT_Shutdown();
-        func_0207efc4(PM_AMP_OFF);
+        PM_SetAmp(PM_AMP_OFF);
         DWCRapCommon_Free(0, sVChatWork->packetMemory, 0);
         DWCRapCommon_Free(0, sVChatWork, 0);
         sVChatWork = NULL;

@@ -14,7 +14,7 @@
 static void ShortcutSave_Condense(ShortcutSave *shortcutSave);
 
 void ShortcutSave_Init(ShortcutSave *shortcutSave) {
-    sys_memset(shortcutSave, SHORTCUT_NONE, sizeof(ShortcutSave));
+    MI_CpuFill8(shortcutSave, SHORTCUT_NONE, sizeof(ShortcutSave));
 }
 
 ShortcutSave *SaveControl_GetShortcutSave(SaveControl *save) {

@@ -184,7 +184,7 @@ static void MusShotPhoto_InitGraphics(MusShotPhoto *photo) {
                                         FX32_CONST(1000), 0, &MUS_SHOT_PHOTO_CAMERA_POS, &MUS_SHOT_PHOTO_CAMERA_UP,
                                         &MUS_SHOT_PHOTO_CAMERA_TARGET, photo->heapId);
     GFL_G3DCameraFlush(photo->camera);
-    gfxSetEdgeColorTable(MUS_SHOT_PHOTO_EDGE_COLORS);
+    G3X_SetEdgeColorTable(MUS_SHOT_PHOTO_EDGE_COLORS);
     G3X_EdgeMarking(FALSE);
     G3X_AntiAlias(TRUE);
     G3X_AlphaBlend(TRUE);
@@ -210,7 +210,7 @@ static void MusShotPhoto_InitGraphics(MusShotPhoto *photo) {
     GFL_BGSysLoadScr(2);
     GFL_BGSysLoadScr(3);
     GFL_ArcToolFree(arc);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG0, 0, 10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG0, 0, 10);
     GX_SetVisibleWnd(GX_WNDMASK_OW);
     G2_SetWndOBJInsidePlane(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, TRUE);
     G2_SetWndOutsidePlane(GX_PLANEMASK_ALL, TRUE);

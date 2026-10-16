@@ -34,8 +34,8 @@
 #define RWIN_MIN 0x10c0
 #define RWIN_MAX 0xffff
 
-// The AC's status (func_0205a2dc): 5 once it is connected, 0 or more while it works and a negative number for an error.
-// The errors from -10 up are its own failures
+// The AC's status (DWCAc_GetStatus): 5 once it is connected, 0 or more while it works and a negative number for an
+// error. The errors from -10 up are its own failures
 #define AC_STATUS_CONNECTED 5
 #define AC_STATUS_OWN_ERROR_MIN -10
 // The code of the fatal error that reports those failures, and a connection that cannot start
@@ -80,19 +80,20 @@ typedef struct DWCInet {
 
 static DWCInet sInet;
 
-static void func_0205ac88(int rwin);
-static void func_0205ad94(const char *ssid, const u8 *wepKey, int wepMode, u16 mtu, const char *spotInfo, int apType);
-static BOOL func_0205b224(void);
-static void func_0205b25c(const char *spotInfo, DWCApInfo *apInfo);
-static BOOL func_0205b3fc(const u8 *ssid, u16 ssidLength, DWCApInfo *apInfo);
-static u32 func_0205b49c(void);
-static BOOL func_0205b4a8(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo);
+static void DWCi_Inet_SetRecvWindow(int rwin);
+static void DWCi_Inet_ConnectToAp(const char *ssid, const u8 *wepKey, int wepMode, u16 mtu, const char *spotInfo,
+                                  int apType);
+static BOOL DWCi_Inet_IsLinkLost(void);
+static void DWCi_ApInfo_SetSpotInfo(const char *spotInfo, DWCApInfo *apInfo);
+static BOOL DWCi_ApInfo_FromNintendoSsid(const u8 *ssid, u16 ssidLength, DWCApInfo *apInfo);
+static u32 DWCi_ApInfo_GetWorkSize(void);
+static BOOL DWCi_ApInfo_FromWdsBeacon(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo);
 
-void func_0205ac24(DWCInetControl *control, u16 dmaNo, u16 powerMode, u16 sslPriority) {
+void DWC_InitInetEx(DWCInetControl *control, u16 dmaNo, u16 powerMode, u16 sslPriority) {
     if (sInet.control != NULL) {
         return;
     }
-    sys_memset(control, 0, sizeof(DWCInetControl));
+    MI_CpuFill8(control, 0, sizeof(DWCInetControl));
     control->dmaNo = dmaNo;
     control->powerMode = 1;
     control->state = DWC_CONNECTINET_STATE_IDLE;
@@ -104,7 +105,7 @@ void func_0205ac24(DWCInetControl *control, u16 dmaNo, u16 powerMode, u16 sslPri
     CPS_SslSetMaxPriority(sslPriority);
 }
 
-static void func_0205ac88(int rwin) {
+static void DWCi_Inet_SetRecvWindow(int rwin) {
     if (sInet.control == NULL) {
         return;
     }
@@ -116,69 +117,70 @@ static void func_0205ac88(int rwin) {
     }
 }
 
-void func_0205acd0(void) {
+void DWC_ConnectInetAsync(void) {
     DWCAcParam param;
 
     if (sInet.control != NULL) {
         if (sInet.control->state != DWC_CONNECTINET_STATE_IDLE) {
             return;
         }
-        sys_memset(&param, 0, sizeof(DWCAcParam));
+        MI_CpuFill8(&param, 0, sizeof(DWCAcParam));
         param.dmaNo = sInet.control->dmaNo;
         param.radioOn = sInet.control->powerMode;
         param.unk_0c = sInet.control->rwin;
-        param.alloc = func_020586e4;
-        param.free = func_02058728;
+        param.alloc = DWC_Alloc;
+        param.free = DWC_Free;
         param.ignoreEula = sInet.control->skipEulaCheck;
         sInet.control->state = DWC_CONNECTINET_STATE_OPERATING;
-        if (!func_02059f04(&param)) {
-            func_020584cc(DWC_ERROR_FATAL, AC_OWN_ERROR_CODE);
+        if (!DWCAc_Create(&param)) {
+            DWCi_SetError(DWC_ERROR_FATAL, AC_OWN_ERROR_CODE);
         }
     } else {
-        func_020584cc(DWC_ERROR_FATAL, AC_OWN_ERROR_CODE);
+        DWCi_SetError(DWC_ERROR_FATAL, AC_OWN_ERROR_CODE);
     }
 }
 
-static void func_0205ad94(const char *ssid, const u8 *wepKey, int wepMode, u16 mtu, const char *spotInfo, int apType) {
-    func_0205acd0();
+static void DWCi_Inet_ConnectToAp(const char *ssid, const u8 *wepKey, int wepMode, u16 mtu, const char *spotInfo,
+                                  int apType) {
+    DWC_ConnectInetAsync();
     if (sInet.control != NULL) {
         sInet.control->ended = TRUE;
     }
-    if (func_0205af98() == DWC_CONNECTINET_STATE_OPERATING) {
-        func_0205a420(ssid, wepKey, wepMode, mtu, spotInfo, apType);
+    if (DWC_GetInetStatus() == DWC_CONNECTINET_STATE_OPERATING) {
+        DWCAc_SetGivenAp(ssid, wepKey, wepMode, mtu, spotInfo, apType);
     }
 }
 
-BOOL func_0205ae04(void) {
+BOOL DWC_CheckInet(void) {
     if (sInet.control == NULL) {
         return FALSE;
     }
     if (sInet.control->result != 0) {
         sInet.control->state = DWC_CONNECTINET_STATE_OPERATED;
-        func_0205af98();
+        DWC_GetInetStatus();
         return sInet.control->ended != 0;
     }
     return FALSE;
 }
 
-void func_0205ae58(void) {
+void DWC_ProcessInet(void) {
     if (sInet.control == NULL) {
         return;
     }
     switch (sInet.control->scanStage) {
     case DWC_INET_SCAN_SCANNING:
         sInet.control->result = 0;
-        sInet.control->scanStage = func_0205bf04();
+        sInet.control->scanStage = DWCi_WdsScan_Process();
         return;
     case DWC_INET_SCAN_FOUND:
-        func_0205c1ec();
-        func_0205ad94(sInet.control->ap.ssid, sInet.control->ap.wepKey, sInet.control->ap.wepMode,
-                      sInet.control->ap.mtu, sInet.control->ap.spotInfo, AP_TYPE_WDS);
-        func_0205a590();
+        DWCi_WdsScan_Free();
+        DWCi_Inet_ConnectToAp(sInet.control->ap.ssid, sInet.control->ap.wepKey, sInet.control->ap.wepMode,
+                              sInet.control->ap.mtu, sInet.control->ap.spotInfo, AP_TYPE_WDS);
+        DWCAc_ClearPreferWpa();
         sInet.control->scanStage = DWC_INET_SCAN_NONE;
         return;
     case DWC_INET_SCAN_FAILED:
-        func_0205c1ec();
+        DWCi_WdsScan_Free();
         sInet.control->result = -1;
         sInet.control->ended = TRUE;
         return;
@@ -187,7 +189,7 @@ void func_0205ae58(void) {
         return;
     }
     if (sInet.control->state == DWC_CONNECTINET_STATE_OPERATING) {
-        sInet.control->result = func_0205a1f0();
+        sInet.control->result = DWCAc_Process();
     } else if (sInet.control->state == DWC_CONNECTINET_STATE_CONNECTED) {
         if (sInet.control->watch != 0) {
             if (WCM_GetState() != WCM_STATE_CONNECTED) {
@@ -198,7 +200,7 @@ void func_0205ae58(void) {
     }
 }
 
-int func_0205af98(void) {
+int DWC_GetInetStatus(void) {
     int status;
 
     if (sInet.control == NULL) {
@@ -210,8 +212,8 @@ int func_0205af98(void) {
     case DWC_INET_SCAN_FOUND:
         return DWC_CONNECTINET_STATE_OPERATING;
     case DWC_INET_SCAN_FAILED:
-        func_0205ae58();
-        func_020584cc(ERROR_AC, sInet.lastError);
+        DWC_ProcessInet();
+        DWCi_SetError(ERROR_AC, sInet.lastError);
         sInet.control->state = DWC_CONNECTINET_STATE_ERROR;
         sInet.control->scanStage = DWC_INET_SCAN_REPORTED;
         return DWC_CONNECTINET_STATE_ERROR;
@@ -223,7 +225,7 @@ int func_0205af98(void) {
     if (sInet.control->state == DWC_CONNECTINET_STATE_IDLE) {
         return sInet.control->state;
     }
-    status = func_0205a2dc();
+    status = DWCAc_GetStatus();
     if (status == AC_STATUS_CONNECTED) {
         sInet.control->state = DWC_CONNECTINET_STATE_CONNECTED;
         sInet.control->watch = 1;
@@ -233,14 +235,14 @@ int func_0205af98(void) {
     if (status < 0) {
         if (status >= AC_STATUS_OWN_ERROR_MIN) {
             sInet.control->ended = TRUE;
-            func_020584cc(DWC_ERROR_FATAL, AC_OWN_ERROR_CODE);
+            DWCi_SetError(DWC_ERROR_FATAL, AC_OWN_ERROR_CODE);
             sInet.control->state = DWC_CONNECTINET_STATE_FATAL_ERROR;
             return DWC_CONNECTINET_STATE_FATAL_ERROR;
         }
         // Two failures that end the connection without a retry
         if (status == -50599 || status == -50699) {
             sInet.control->ended = TRUE;
-            func_020584cc(ERROR_AC, status);
+            DWCi_SetError(ERROR_AC, status);
             sInet.control->state = DWC_CONNECTINET_STATE_ERROR;
             return DWC_CONNECTINET_STATE_ERROR;
         }
@@ -252,13 +254,13 @@ int func_0205af98(void) {
             int rwin = sInet.control->rwin;
 
             sInet.lastError = status;
-            func_0205b198();
-            func_0205ac24(control, dmaNo, 1, sslPriority);
+            DWC_CleanupInet();
+            DWC_InitInetEx(control, dmaNo, 1, sslPriority);
             sInet.control->skipEulaCheck = skipEulaCheck;
             if (rwin != 0) {
-                func_0205ac88(rwin);
+                DWCi_Inet_SetRecvWindow(rwin);
             }
-            func_0205be94(&sInet.control->ap, dmaNo);
+            DWCi_WdsScan_Start(&sInet.control->ap, dmaNo);
             sInet.control->scanStage = DWC_INET_SCAN_SCANNING;
             sInet.control->result = 0;
             return DWC_CONNECTINET_STATE_OPERATING;
@@ -266,14 +268,14 @@ int func_0205af98(void) {
         if (sInet.lastError < status) {
             status = sInet.lastError;
         }
-        func_020584cc(ERROR_AC, status);
+        DWCi_SetError(ERROR_AC, status);
         sInet.control->state = DWC_CONNECTINET_STATE_ERROR;
         return DWC_CONNECTINET_STATE_ERROR;
     }
     return DWC_CONNECTINET_STATE_OPERATING;
 }
 
-void func_0205b198(void) {
+void DWC_CleanupInet(void) {
     if (sInet.control == NULL) {
         return;
     }
@@ -281,122 +283,122 @@ void func_0205b198(void) {
         if (sInet.control->scanStage == DWC_INET_SCAN_SCANNING) {
             int scan;
 
-            func_0205c1d0();
+            DWCi_WdsScan_Stop();
             do {
-                scan = func_0205bf04();
+                scan = DWCi_WdsScan_Process();
             } while ((u32)(scan - 2) > 2);
-            func_0205c1ec();
+            DWCi_WdsScan_Free();
         }
         sInet.control = NULL;
         return;
     }
-    if (!func_0205a3e4()) {
+    if (!DWCAc_Destroy()) {
         do {
-            func_0207aa04(10);
-        } while (!func_0205a3e4());
+            OS_Sleep(10);
+        } while (!DWCAc_Destroy());
     }
     sInet.control = NULL;
 }
 
-static BOOL func_0205b224(void) {
+static BOOL DWCi_Inet_IsLinkLost(void) {
     if (sInet.control != NULL && sInet.control->state == DWC_CONNECTINET_STATE_DISCONNECTED) {
         return TRUE;
     }
     return FALSE;
 }
 
-int func_0205b250(void) {
+int DWC_GetLinkLevel(void) {
     return WCM_UpdateLinkQuality();
 }
 
-static void func_0205b25c(const char *spotInfo, DWCApInfo *apInfo) {
+static void DWCi_ApInfo_SetSpotInfo(const char *spotInfo, DWCApInfo *apInfo) {
     apInfo->area = (spotInfo[0] >= '0' && spotInfo[0] <= '9') ? spotInfo[0] - '0' : AP_AREA_UNKNOWN;
-    sys_memcpy(spotInfo + 1, apInfo->spotInfo, 9);
+    MI_CpuCopy8(spotInfo + 1, apInfo->spotInfo, 9);
 }
 
-BOOL func_0205b29c(DWCApInfo *apInfo) {
+BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     u16 ssidLength;
     char spotInfo[10];
     u32 irq;
     const u8 *bssid;
     const u8 *ssid;
 
-    sys_memset(apInfo, 0, sizeof(DWCApInfo));
+    MI_CpuFill8(apInfo, 0, sizeof(DWCApInfo));
     apInfo->area = AP_AREA_UNKNOWN;
-    if (func_0205af98() != DWC_CONNECTINET_STATE_CONNECTED) {
+    if (DWC_GetInetStatus() != DWC_CONNECTINET_STATE_CONNECTED) {
         return FALSE;
     }
-    apInfo->apType = func_0205a348();
+    apInfo->apType = DWCAc_GetApType();
     if (apInfo->apType == AP_TYPE_NONE || apInfo->apType > AP_TYPE_UNKNOWN) {
         apInfo->apType = AP_TYPE_UNKNOWN;
         return FALSE;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     bssid = WCM_GetApMacAddress();
-    cp15_invalidateDC(bssid, BSSID_SIZE);
+    DC_InvalidateRange(bssid, BSSID_SIZE);
     if (bssid == NULL) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
-    sys_memcpy(bssid, apInfo->bssid, BSSID_SIZE);
+    MI_CpuCopy8(bssid, apInfo->bssid, BSSID_SIZE);
     if (apInfo->apType == 0 || apInfo->apType == 1 || apInfo->apType == 2 ||
         (hw_isDSi() && (u32)(apInfo->apType - 10) <= 2)) {
         ssid = WCM_GetConnectedApSsid(&ssidLength);
-        cp15_invalidateDC(ssid, SSID_SIZE);
+        DC_InvalidateRange(ssid, SSID_SIZE);
         if (ssid == NULL) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return FALSE;
         }
-        sys_memcpy(ssid, apInfo->essid, ssidLength);
+        MI_CpuCopy8(ssid, apInfo->essid, ssidLength);
     }
-    CPU_SetIRQMask(irq);
-    if (!func_0205a378(spotInfo)) {
+    OS_RestoreInterrupts(irq);
+    if (!DWCAc_GetApSpotInfo(spotInfo)) {
         apInfo->area = AP_AREA_UNKNOWN;
     } else {
-        func_0205b25c(spotInfo, apInfo);
+        DWCi_ApInfo_SetSpotInfo(spotInfo, apInfo);
     }
-    apInfo->unk8 = func_0205a3d0();
+    apInfo->unk8 = DWCAc_GetKeyMode();
     return TRUE;
 }
 
-static BOOL func_0205b3fc(const u8 *ssid, u16 ssidLength, DWCApInfo *apInfo) {
+static BOOL DWCi_ApInfo_FromNintendoSsid(const u8 *ssid, u16 ssidLength, DWCApInfo *apInfo) {
     char spotInfo[10];
 
-    sys_memset(spotInfo, 0, sizeof(spotInfo));
+    MI_CpuFill8(spotInfo, 0, sizeof(spotInfo));
     if (ssid == NULL) {
         return FALSE;
     }
-    if (func_0205a54c(ssid, ssidLength)) {
+    if (DWCAc_IsShopSsid(ssid, ssidLength)) {
         if (apInfo == NULL) {
             return TRUE;
         }
-        if (func_0205cfe8(ssid, spotInfo)) {
+        if (DWCAc_GetNdwcShapSpotInfo(ssid, spotInfo)) {
             apInfo->apType = AP_TYPE_NINTENDO_WFC;
-            func_0205b25c(spotInfo, apInfo);
+            DWCi_ApInfo_SetSpotInfo(spotInfo, apInfo);
             return TRUE;
         }
     }
     return FALSE;
 }
 
-static u32 func_0205b49c(void) {
+static u32 DWCi_ApInfo_GetWorkSize(void) {
     return sizeof(DWCBssWork);
 }
 
-static BOOL func_0205b4a8(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo) {
+static BOOL DWCi_ApInfo_FromWdsBeacon(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo) {
     if (work == NULL || bss == NULL) {
         return FALSE;
     }
-    sys_memset(work, 0, sizeof(DWCBssWork));
+    MI_CpuFill8(work, 0, sizeof(DWCBssWork));
     if (bss->gameInfo.userGameInfoLength + WDS_GAME_INFO_HEADER_SIZE == WDS_GAME_INFO_SIZE &&
         bss->gameInfo.magicNumber == WDS_MAGIC_NUMBER && bss->gameInfo.ggid == WDS_GGID) {
         work->crc = 0;
         MATHi_CRC16InitTableRev(&work->crcTable, WDS_CRC_POLY);
-        if (func_02058d44(&work->rc4, &work->crc, &work->crcTable, bss, &work->record)) {
-            if (func_02058e74(&work->record)) {
+        if (WDS_DecryptBeaconInfo(&work->rc4, &work->crc, &work->crcTable, bss, &work->record)) {
+            if (WDS_IsBeaconInfoValid(&work->record)) {
                 if (apInfo != NULL) {
                     apInfo->apType = AP_TYPE_WDS;
-                    func_0205b25c((char *)work->record.unk_20, apInfo);
+                    DWCi_ApInfo_SetSpotInfo((char *)work->record.unk_20, apInfo);
                 }
                 return TRUE;
             }
@@ -405,33 +407,33 @@ static BOOL func_0205b4a8(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apI
     return FALSE;
 }
 
-u32 func_0205b588(void) {
-    return func_0205b49c();
+u32 DWCi_GetBssDescParseWorkSize(void) {
+    return DWCi_ApInfo_GetWorkSize();
 }
 
-BOOL func_0205b594(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo) {
+BOOL DWCi_BssDescToApInfo(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo) {
     if (work == NULL || bss == NULL || apInfo == NULL) {
         return FALSE;
     }
-    if (func_0205b3fc(bss->ssid, bss->ssidLength, apInfo)) {
+    if (DWCi_ApInfo_FromNintendoSsid(bss->ssid, bss->ssidLength, apInfo)) {
         return TRUE;
     }
-    return func_0205b4a8(work, bss, apInfo) != 0;
+    return DWCi_ApInfo_FromWdsBeacon(work, bss, apInfo) != 0;
 }
 
-BOOL func_0205b5ec(void) {
+BOOL DWC_UpdateConnection(void) {
     u32 apType;
 
-    func_0205ae58();
-    if (func_0205b224()) {
-        apType = func_0205a348();
+    DWC_ProcessInet();
+    if (DWCi_Inet_IsLinkLost()) {
+        apType = DWCAc_GetApType();
         if (apType == AP_TYPE_NONE || apType > AP_TYPE_UNKNOWN) {
             apType = AP_TYPE_UNKNOWN;
         }
         if (WCM_GetState() == WCM_STATE_ERROR) {
-            func_020584cc(DWC_ERROR_FATAL, LINK_LOST_FATAL_CODE - apType);
+            DWCi_SetError(DWC_ERROR_FATAL, LINK_LOST_FATAL_CODE - apType);
         } else {
-            func_020584cc(ERROR_LINK_LOST, LINK_LOST_CODE - apType);
+            DWCi_SetError(ERROR_LINK_LOST, LINK_LOST_CODE - apType);
         }
         return TRUE;
     }

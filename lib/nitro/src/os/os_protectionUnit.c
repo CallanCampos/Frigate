@@ -4,16 +4,16 @@
 
 // clang-format off
 
-// NitroSDK's OS_EnableProtectionUnit, under swan's name: sets bit 0 (the MPU enable) of the CP15 control register
-asm void cp15_mmu_enable(void) {
+// NitroSDK's OS_EnableProtectionUnit: sets bit 0 (the MPU enable) of the CP15 control register
+asm void OS_EnableProtectionUnit(void) {
     mrc p15, 0, r0, c1, c0, 0
     orr r0, r0, #1
     mcr p15, 0, r0, c1, c0, 0
     bx lr
 }
 
-// NitroSDK's OS_DisableProtectionUnit, under swan's name: clears that bit
-asm void cp15_mmu_disable(void) {
+// NitroSDK's OS_DisableProtectionUnit: clears that bit
+asm void OS_DisableProtectionUnit(void) {
     mrc p15, 0, r0, c1, c0, 0
     bic r0, r0, #1
     mcr p15, 0, r0, c1, c0, 0

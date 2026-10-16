@@ -121,15 +121,15 @@ static void func_ov136_021eedc0(void *texResource, const char *texName, const ch
 
     GFL_BitmapMakeLinear(bitmap, FALSE, heapId);
 
-    gfxBeginTextureUpload();
-    cp15_flushDC(character->rawData, 0x800);
-    gfxUploadTexture(character->rawData, texAddr, 0x800);
-    gfxEndTextureUpload();
+    GX_BeginLoadTex();
+    DC_FlushRange(character->rawData, 0x800);
+    GX_LoadTex(character->rawData, texAddr, 0x800);
+    GX_EndLoadTex();
 
-    gfxBeginPaletteUpload();
-    cp15_flushDC(palette->rawData, 0x20);
-    gfxUploadPalette(palette->rawData, plttAddr, 0x20);
-    gfxEndPaletteUpload();
+    GX_BeginLoadTexPltt();
+    DC_FlushRange(palette->rawData, 0x20);
+    GX_LoadTexPltt(palette->rawData, plttAddr, 0x20);
+    GX_EndLoadTexPltt();
 
     GFL_HeapFree(characterFile);
     GFL_HeapFree(paletteFile);
@@ -145,7 +145,7 @@ static u32 func_ov136_021eeea4(const NNSG3dResTex *tex, const NNSG3dResDictPlttD
 }
 
 static void func_ov136_021eeeb4(NNSG3dResName *resName, const char *name) {
-    int len = NNS_STD_StrLen(name);
+    int len = STD_GetStringLength(name);
     u8 i;
 
     for (i = 0; i < 4; i++) {

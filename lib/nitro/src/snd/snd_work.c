@@ -7,20 +7,20 @@
 SNDSharedWork *SNDi_SharedWork;
 
 // NitroSDK's SND_GetPlayerStatus: a bit for each player that is at work
-u32 func_0207dbb8(void) {
-    cp15_invalidateDC(&SNDi_SharedWork->playerStatus, sizeof(SNDi_SharedWork->playerStatus));
+u32 SND_GetPlayerStatus(void) {
+    DC_InvalidateRange(&SNDi_SharedWork->playerStatus, sizeof(SNDi_SharedWork->playerStatus));
     return SNDi_SharedWork->playerStatus;
 }
 
 // NitroSDK's SND_GetChannelStatus: a bit for each channel that is at work
-u32 func_0207dbd0(void) {
-    cp15_invalidateDC(&SNDi_SharedWork->channelStatus, sizeof(SNDi_SharedWork->channelStatus));
+u32 SND_GetChannelStatus(void) {
+    DC_InvalidateRange(&SNDi_SharedWork->channelStatus, sizeof(SNDi_SharedWork->channelStatus));
     return SNDi_SharedWork->channelStatus;
 }
 
 // NitroSDK's SND_GetPlayerTickCounter
 u32 SND_GetPlayerTickCounter(int playerNo) {
-    cp15_invalidateDC(&SNDi_SharedWork->player[playerNo].tickCounter, sizeof(u32));
+    DC_InvalidateRange(&SNDi_SharedWork->player[playerNo].tickCounter, sizeof(u32));
     return SNDi_SharedWork->player[playerNo].tickCounter;
 }
 
@@ -38,7 +38,7 @@ static inline const SNDDriverChannel *ToArm9(const SNDDriverInfo *driverInfo, co
 
 // NitroSDK's SND_ReadTrackInfo: reads a track of a player from a copy of the driver's state. FALSE when the numbers are
 // out of range or the player has no such track
-BOOL func_0207dc0c(const SNDDriverInfo *driverInfo, int playerNo, int trackNo, SNDTrackInfo *trackInfo) {
+BOOL SND_ReadTrackInfo(const SNDDriverInfo *driverInfo, int playerNo, int trackNo, SNDTrackInfo *trackInfo) {
     const SNDDriverTrack *track;
     const SNDDriverChannel *channel;
     u8 trackIndex;
@@ -75,13 +75,13 @@ BOOL func_0207dc0c(const SNDDriverInfo *driverInfo, int playerNo, int trackNo, S
 }
 
 // NitroSDK's SNDi_GetFinishedCommandTag: the number of packets that the ARM7 has dealt with
-u32 func_0207dcc4(void) {
-    cp15_invalidateDC(SNDi_SharedWork, sizeof(SNDi_SharedWork->finishedCommandTag));
+u32 SNDi_GetFinishedCommandTag(void) {
+    DC_InvalidateRange(SNDi_SharedWork, sizeof(SNDi_SharedWork->finishedCommandTag));
     return SNDi_SharedWork->finishedCommandTag;
 }
 
 // NitroSDK's SNDi_InitSharedWork: nothing plays, and no variable of a player has a value
-void func_0207dcdc(SNDSharedWork *work) {
+void SNDi_InitSharedWork(SNDSharedWork *work) {
     int i;
     int j;
 
@@ -98,5 +98,5 @@ void func_0207dcdc(SNDSharedWork *work) {
     for (i = 0; i < SND_PLAYER_VARIABLE_MAX; i++) {
         work->globalVariable[i] = SND_VARIABLE_UNSET;
     }
-    cp15_flushDC(work, sizeof(SNDSharedWork));
+    DC_FlushRange(work, sizeof(SNDSharedWork));
 }

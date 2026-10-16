@@ -189,7 +189,7 @@ BrBtnDataSys *BrBtnData_Init(const BrBtnDataSetup *cp_setup, HeapID heapId) {
     }
     size = sizeof(BrBtnDataSys) + sizeof(BrBtnData) * num;
     p_wk = GFL_HeapAllocate(heapId, size, FALSE, "br_btn_data.c", 1065);
-    sys_memset(p_wk, 0, size);
+    MI_CpuFill8(p_wk, 0, size);
     p_wk->setup = *cp_setup;
     BrBtnData_Load(p_wk);
     return p_wk;

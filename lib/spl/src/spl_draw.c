@@ -141,7 +141,7 @@ void SPLDraw_Billboard(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[3][1] = pos.y;
         mtx.m[3][2] = pos.z;
         G3_Identity();
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     } else {
         pos.x = particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
         pos.y = particle->position.y + particle->emitterPos.y - mgr->drawEmitter->resource->header->emitterBasePos.y;
@@ -165,7 +165,7 @@ void SPLDraw_Billboard(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     }
 
     // The particle's color, tinted by the emitter's
@@ -226,7 +226,7 @@ void SPLDraw_Child_Billboard(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[3][1] = pos.y;
         mtx.m[3][2] = pos.z;
         G3_Identity();
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     } else {
         pos.x = particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
         pos.y = particle->position.y + particle->emitterPos.y - mgr->drawEmitter->resource->header->emitterBasePos.y;
@@ -250,7 +250,7 @@ void SPLDraw_Child_Billboard(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,
@@ -338,7 +338,7 @@ void SPLDraw_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[2][2] = FX32_ONE;
         mtx.m[3][2] = pos.z;
         G3_Identity();
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     } else {
         pos.x = particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
         pos.y = particle->position.y + particle->emitterPos.y - mgr->drawEmitter->resource->header->emitterBasePos.y;
@@ -382,7 +382,7 @@ void SPLDraw_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,
@@ -469,7 +469,7 @@ void SPLDraw_Child_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[2][2] = FX32_ONE;
         mtx.m[3][2] = pos.z;
         G3_Identity();
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     } else {
         pos.x = particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
         pos.y = particle->position.y + particle->emitterPos.y - mgr->drawEmitter->resource->header->emitterBasePos.y;
@@ -513,7 +513,7 @@ void SPLDraw_Child_DirBillboard(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,
@@ -560,8 +560,8 @@ void SPLDraw_Polygon(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
         mtx.m[3][1] = particle->position.y + particle->emitterPos.y;
         mtx.m[3][2] = particle->position.z + particle->emitterPos.z;
-        gfxLoadMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_LoadMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     } else {
         mtx.m[3][0] =
             particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
@@ -573,8 +573,8 @@ void SPLDraw_Polygon(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,
@@ -622,8 +622,8 @@ void SPLDraw_Child_Polygon(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
         mtx.m[3][1] = particle->position.y + particle->emitterPos.y;
         mtx.m[3][2] = particle->position.z + particle->emitterPos.z;
-        gfxLoadMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_LoadMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     } else {
         mtx.m[3][0] =
             particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
@@ -635,8 +635,8 @@ void SPLDraw_Child_Polygon(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,
@@ -723,8 +723,8 @@ void SPLDraw_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
         mtx.m[3][1] = particle->position.y + particle->emitterPos.y;
         mtx.m[3][2] = particle->position.z + particle->emitterPos.z;
-        gfxLoadMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_LoadMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     } else {
         mtx.m[3][0] =
             particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
@@ -736,8 +736,8 @@ void SPLDraw_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,
@@ -824,8 +824,8 @@ void SPLDraw_Child_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
         mtx.m[3][0] = particle->position.x + particle->emitterPos.x;
         mtx.m[3][1] = particle->position.y + particle->emitterPos.y;
         mtx.m[3][2] = particle->position.z + particle->emitterPos.z;
-        gfxLoadMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_LoadMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     } else {
         mtx.m[3][0] =
             particle->position.x + particle->emitterPos.x - mgr->drawEmitter->resource->header->emitterBasePos.x;
@@ -837,8 +837,8 @@ void SPLDraw_Child_DirPolygon(SPLManager *mgr, SPLParticle *particle) {
         G3_Translate(mgr->drawEmitter->resource->header->emitterBasePos.x,
                      mgr->drawEmitter->resource->header->emitterBasePos.y,
                      mgr->drawEmitter->resource->header->emitterBasePos.z);
-        gfxMultMatrix4x3(mgr->viewMatrix);
-        gfxMultMatrix4x3(&mtx);
+        G3_MultMtx43(mgr->viewMatrix);
+        G3_MultMtx43(&mtx);
     }
 
     G3_Color(GX_RGB(((particle->color & 0x1f) * (mgr->drawEmitter->color & 0x1f)) >> 5,

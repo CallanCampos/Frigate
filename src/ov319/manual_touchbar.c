@@ -281,7 +281,7 @@ static void ManualTouchBar_CreateBar(ManualTouchBar *bar) {
         { MANUAL_TOUCHBAR_ICON_CLOSE, { 200, 168 } },
     };
 
-    sys_memset(&setup, 0, sizeof(TouchBarSetup));
+    MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
     setup.items = items;
     setup.count = NELEMS(items);
     setup.unit = ManualGraphic_GetClActUnit(bar->common->graphic);

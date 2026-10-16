@@ -167,7 +167,7 @@ static MysteryNetNdState sNdState;
 MysteryNet *MysteryNet_Create(SaveControl *save, HeapID heapId) {
     MysteryNet *net = GFL_HeapAllocate(heapId, sizeof(MysteryNet), FALSE, "mystery_net.c", 315);
 
-    sys_memset(net, 0, sizeof(MysteryNet));
+    MI_CpuFill8(net, 0, sizeof(MysteryNet));
     net->heapId = heapId;
     net->save = save;
     MysteryNetSeq_Init(&net->seq, net, MysteryNet_Idle);
@@ -272,7 +272,7 @@ u32 MysteryNet_GetBeaconFlags(MysteryNet *net) {
 
 u32 MysteryNet_GetRecvData(MysteryNet *net, void *buffer, u32 size) {
     if (net->result == MYSTERY_NET_RECV_OK) {
-        sys_memcpy(net->buffer, buffer, size);
+        MI_CpuCopy8(net->buffer, buffer, size);
         return MYSTERY_NET_RECV_OK;
     }
     return net->result;
@@ -322,7 +322,7 @@ static u32 MysteryNet_CheckErrorWifi(MysteryNet *net) {
                 return error;
             }
             func_020424e4();
-            func_02058490();
+            DWC_ClearError();
             func_02012154();
             func_02011de0();
             func_02012144();
@@ -430,7 +430,7 @@ static void MysteryNet_BeaconStart(MysteryNetSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        sys_memset(&init, 0, sizeof(DeliveryInit));
+        MI_CpuFill8(&init, 0, sizeof(DeliveryInit));
         init.code = 9;
         init.data[0].datasize = sizeof(MysteryGiftRecvData);
         init.data[0].pData = net->buffer;
@@ -493,7 +493,7 @@ static void MysteryNet_IrcStart(MysteryNetSeq *seq, int *state, void *work) {
 
     switch (*state) {
     case 0:
-        sys_memset(&init, 0, sizeof(DeliveryIrcInit));
+        MI_CpuFill8(&init, 0, sizeof(DeliveryIrcInit));
         init.code = 9;
         init.data[0].datasize = sizeof(MysteryGiftRecvData);
         init.data[0].pData = net->buffer;
@@ -566,7 +566,7 @@ static void MysteryNet_WifiDownload(MysteryNetSeq *seq, int *state, void *work) 
     switch (*state) {
     case 0:
         DWCRap_SetEventFunc(MysteryNet_OnDwcEvent, download);
-        sys_memset(download, 0, sizeof(MysteryNetDownload));
+        MI_CpuFill8(download, 0, sizeof(MysteryNetDownload));
         download->cancel = FALSE;
         download->cancelled = FALSE;
         download->selected = 0;
@@ -789,13 +789,13 @@ static void MysteryNetDownload_Cleanup(MysteryNetDownload *download, u32 error, 
 }
 
 static void MysteryNetSeq_Init(MysteryNetSeq *seq, void *work, MysteryNetSeqFunc func) {
-    sys_memset(seq, 0, sizeof(MysteryNetSeq));
+    MI_CpuFill8(seq, 0, sizeof(MysteryNetSeq));
     seq->work = work;
     MysteryNetSeq_SetNext(seq, func);
 }
 
 static void MysteryNetSeq_Exit(MysteryNetSeq *seq) {
-    sys_memset(seq, 0, sizeof(MysteryNetSeq));
+    MI_CpuFill8(seq, 0, sizeof(MysteryNetSeq));
 }
 
 static void MysteryNetSeq_Main(MysteryNetSeq *seq) {

@@ -195,7 +195,7 @@ static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
     work->bg3Control = G2_GetBG3ControlText();
     G2_SetBG3ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_256, GX_BG_SCRBASE(0x1000),
                          GX_BG_CHARBASE(0x04000));
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG3, GX_PLANEMASK_BG2, 0, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG3, GX_PLANEMASK_BG2, 0, 16);
 
     msgBGSys = Field_GetMsgBGSys(field);
     if (func_ov036_02187868(msgBGSys)) {
@@ -361,7 +361,7 @@ static BOOL FaceUp_UpdateFadeIn(FaceUpWork *work) {
 
     work->fadeCount++;
     alpha = work->fadeCount * 16 / FACEUP_FADE_FRAMES;
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG3, GX_PLANEMASK_BG2, alpha, 16 - alpha);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG3, GX_PLANEMASK_BG2, alpha, 16 - alpha);
     if (work->fadeCount >= FACEUP_FADE_FRAMES) {
         return TRUE;
     }

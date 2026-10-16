@@ -70,7 +70,7 @@ static BOOL LocalTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     sys->graphic = LocalTvtGraphic_Create(1, sys->heapId);
     sys->message = LocalTvtMessage_Create(sys->heapId);
     LocalTvtMessage_SetPlayerName(sys->message, sys->param->gameData);
-    sys_memset(&charaSetup, 0, sizeof(charaSetup));
+    MI_CpuFill8(&charaSetup, 0, sizeof(charaSetup));
     charaSetup.unit = LocalTvtGraphic_GetClActUnit(sys->graphic);
     charaSetup.playerInfo = GetGameDataPlayerInfo(tvtParam->gameData);
     charaSetup.rival = getHollow_RivalData(GameData_GetSaveControl(tvtParam->gameData));
@@ -147,7 +147,7 @@ static void LocalTvtSys_ExitScriptMode(LocalTvtSys *sys) {
 static void LocalTvtSys_InitCallMode(LocalTvtSys *sys) {
     LocalTvtCallModeSetup setup;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.gameData = sys->param->gameData;
     setup.chara = sys->chara;
     setup.message = sys->message;
@@ -160,7 +160,7 @@ static void LocalTvtSys_InitCallMode(LocalTvtSys *sys) {
 static void LocalTvtSys_InitCallSecretMode(LocalTvtSys *sys) {
     LocalTvtCallModeSetup setup;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.gameData = sys->param->gameData;
     setup.chara = sys->chara;
     setup.message = sys->message;

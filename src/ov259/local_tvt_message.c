@@ -114,8 +114,8 @@ LocalTvtMessage *LocalTvtMessage_Create(HeapID heapId) {
     message->queue = func_02021998(message->heapId);
     message->cursor = KeyCursor_CreateEx(15, TRUE, TRUE, message->heapId, sLocalTvtKeyCursor);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0,
-                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 4);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0,
+                       GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 4);
     return message;
 }
 

@@ -13,8 +13,8 @@ static void getOpponentMacAddress(LiveMatchData *data, u32 index, u8 *macAddress
 void func_0200f1c4(void *results) {
     LiveMatchData *data = results;
 
-    sys_memset(data, 0, sizeof(LiveMatchData));
-    func_0207c33c(data->macAddress);
+    MI_CpuFill8(data, 0, sizeof(LiveMatchData));
+    OS_GetMacAddress(data->macAddress);
 }
 
 u32 func_0200f1d8(void *results, u32 index) {
@@ -36,13 +36,13 @@ void func_0200f1e0(void *results, u32 index, int value) {
 }
 
 static void getOpponentMacAddress(LiveMatchData *data, u32 index, u8 *macAddress) {
-    sys_memcpy(data->opponents[index % LIVEMATCH_OPPONENT_MAX].macAddress, macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE);
+    MI_CpuCopy8(data->opponents[index % LIVEMATCH_OPPONENT_MAX].macAddress, macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE);
 }
 
 void func_0200f218(void *results, u32 index, const u8 *macAddress) {
     LiveMatchData *data = results;
 
-    sys_memcpy(macAddress, data->opponents[index % LIVEMATCH_OPPONENT_MAX].macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE);
+    MI_CpuCopy8(macAddress, data->opponents[index % LIVEMATCH_OPPONENT_MAX].macAddress, BATTLEMATCH_MAC_ADDRESS_SIZE);
 }
 
 void func_0200f238(void *results, u32 index, u32 field, u8 value) {

@@ -153,13 +153,13 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
     }
 
     if (latest == BLOCK_GIFTS_BACKUP) {
-        sys_memcpy(blocks[BLOCK_GIFTS_BACKUP], blocks[BLOCK_GIFTS], sizeof(SaveOutsideGiftsBlock));
+        MI_CpuCopy8(blocks[BLOCK_GIFTS_BACKUP], blocks[BLOCK_GIFTS], sizeof(SaveOutsideGiftsBlock));
     }
     GFL_HeapFree(blocks[BLOCK_GIFTS_BACKUP]);
     if (latest != -1) {
         work->giftsLoaded = TRUE;
     } else {
-        sys_memset(&work->gifts, 0, sizeof(SaveOutsideGiftsBlock));
+        MI_CpuFill8(&work->gifts, 0, sizeof(SaveOutsideGiftsBlock));
         mgEncryptData(&work->gifts.gifts, MG_DATA_OUTSIDE);
     }
     return work;
@@ -253,7 +253,7 @@ void SaveOutside_CopyGiftsToSave(SaveOutside *work, SaveControl *save) {
 void SaveOutside_Erase(HeapID heapId) {
     void *buf = GFL_HeapAllocate(heapId, SAVE_OUTSIDE_SIZE, FALSE, "save_outside.c", 431);
 
-    sys_memset32(0xffffffff, buf, SAVE_OUTSIDE_SIZE);
+    MIi_CpuClear32(0xffffffff, buf, SAVE_OUTSIDE_SIZE);
     func_0203bee8(GIFTS_ADDR, buf, SAVE_OUTSIDE_SIZE);
     GFL_HeapFree(buf);
 }
@@ -261,7 +261,7 @@ void SaveOutside_Erase(HeapID heapId) {
 void SaveOutside_EraseKeys(HeapID heapId) {
     void *buf = GFL_HeapAllocate(heapId, KEYS_SIZE, FALSE, "save_outside.c", 448);
 
-    sys_memset32(0xffffffff, buf, KEYS_SIZE);
+    MIi_CpuClear32(0xffffffff, buf, KEYS_SIZE);
     func_0203bee8(KEYS_ADDR, buf, KEYS_SIZE);
     GFL_HeapFree(buf);
 }

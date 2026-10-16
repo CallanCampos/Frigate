@@ -188,7 +188,7 @@ static BOOL WifiBattleMatchLink_CompetitionInit(GameProc *proc, u32 *state, void
     GFL_OvlLoad(OVERLAY_ID(189));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_LINK, 0x30000);
     link = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchLinkCompetition), HEAPID_WIFIBATTLEMATCH_LINK);
-    sys_memset(link, 0, sizeof(WifiBattleMatchLinkCompetition));
+    MI_CpuFill8(link, 0, sizeof(WifiBattleMatchLinkCompetition));
     link->param = linkParam;
     link->entry =
         TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(linkParam->param->gameData)), 0);
@@ -333,7 +333,7 @@ static void WifiBattleMatchLink_CompetitionTaskAccount(WifiBattleMatchTask *task
         *seq = 2;
         break;
     case 2:
-        sys_memset(param->account, 0, sizeof(WifiBattleMatchLinkAccount));
+        MI_CpuFill8(param->account, 0, sizeof(WifiBattleMatchLinkAccount));
         WifiBattleMatchNet_StartAccountRequest(link->net, HEAPID_WIFIBATTLEMATCH_LINK);
         *seq = 3;
         break;
@@ -423,7 +423,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
     case 1: {
         WifiBattleMatchLinkRequest request;
 
-        sys_memset(&request, 0, sizeof(request));
+        MI_CpuFill8(&request, 0, sizeof(request));
         request.unk1 = 0;
         request.unk0 = link->param->account->unk4;
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
@@ -483,7 +483,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
     case 7: {
         WifiBattleMatchLinkRequest request;
 
-        sys_memset(&request, 0, sizeof(request));
+        MI_CpuFill8(&request, 0, sizeof(request));
         request.unk1 = TournamentEntry_GetField(entry, 10);
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
         link->param->account->unk5 = TournamentEntry_GetField(entry, 10);
@@ -755,7 +755,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         break;
     case 38:
         if (*link->param->unk20 == 0) {
-            sys_memset(&param->unk34->body, 0, sizeof(param->unk34->body));
+            MI_CpuFill8(&param->unk34->body, 0, sizeof(param->unk34->body));
             WifiBattleMatchNet_StartWrite(link->net, 0, &link->param->unk34->body);
             *seq = 39;
         }
@@ -779,7 +779,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
     case 40: {
         WifiBattleMatchLinkRequest request;
 
-        sys_memset(&request, 0, sizeof(request));
+        MI_CpuFill8(&request, 0, sizeof(request));
         request.unk0 = 0;
         request.unk1 = 1;
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
@@ -816,7 +816,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         BattleBoxSave *battleBox = getBattleBox(save);
         void *previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
 
-        sys_memcpy(&link->serverEntry, link->entry, sizeof(link->serverEntry));
+        MI_CpuCopy8(&link->serverEntry, link->entry, sizeof(link->serverEntry));
         BattleBoxSave_ClearFlags(battleBox, 1);
         TournamentEntry_SetField(link->entry, 10, 1);
         RndMatchData_SetParam(param->record, 10, 0, 0);
@@ -1067,7 +1067,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
         break;
     case 17:
         WifiBattleMatchNet_StartPokemonCheck(link->net, param->player->partyData, TRUE);
-        sys_memset(&link->signature, 0, sizeof(link->signature));
+        MI_CpuFill8(&link->signature, 0, sizeof(link->signature));
         *seq = 18;
         break;
     case 18:
@@ -1153,7 +1153,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
     case 25: {
         WifiBattleMatchLinkRequest request;
 
-        sys_memset(&request, 0, sizeof(request));
+        MI_CpuFill8(&request, 0, sizeof(request));
         request.unk1 = 2;
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
         link->param->account->unk5 = 2;
@@ -1474,7 +1474,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 11:
         entry = link->entry;
-        sys_memset(&condition, 0, sizeof(condition));
+        MI_CpuFill8(&condition, 0, sizeof(condition));
         condition.rating = link->param->unk34->unk10;
         condition.disconnects = link->param->unk34->unk4;
         condition.cup = TournamentEntry_GetField(entry, 2);
@@ -1529,7 +1529,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 14:
         if (WifiBattleMatchNet_TakePlayerInfo(link->net, &received)) {
-            sys_memcpy(received, param->otherPlayer, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchLinkPlayer));
+            MI_CpuCopy8(received, param->otherPlayer, PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchLinkPlayer));
             otherPlayer = param->otherPlayer;
             fixCount = 0;
             noTerminator = TRUE;
@@ -2074,7 +2074,7 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         if (*link->param->unk20 != 0) {
             break;
         }
-        sys_memset(&reportBuf, 0, sizeof(reportBuf));
+        MI_CpuFill8(&reportBuf, 0, sizeof(reportBuf));
         reportBuf.report = *link->param->report;
         reportBuf.unk50 = *link->param->unk28;
         WifiBattleMatchNet_StartWrite(link->net, 3, &reportBuf);
@@ -2434,7 +2434,7 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         }
         valid = func_ov011_0215dda8(&date, &time);
         if (valid) {
-            func_0207d244(&date, &time, func_0207d12c(&date, &time));
+            RTC_ConvertSecondToDateTime(&date, &time, RTC_ConvertDateTimeToSecond(&date, &time));
         }
         startDate.year = TournamentEntry_GetField(entry, 4);
         startDate.month = TournamentEntry_GetField(entry, 5);
@@ -2444,9 +2444,9 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         endDate.month = TournamentEntry_GetField(entry, 8);
         endDate.day = TournamentEntry_GetField(entry, 9);
         endDate.week = RTC_WEEK_SUNDAY;
-        startDay = func_0207d0b4(&startDate);
-        endDay = func_0207d0b4(&endDate);
-        today = func_0207d0b4(&date);
+        startDay = RTC_ConvertDateToDay(&startDate);
+        endDay = RTC_ConvertDateToDay(&endDate);
+        today = RTC_ConvertDateToDay(&date);
         if (valid && today < startDay) {
             link->subTaskResult = 2;
             *seq = 2;
@@ -2523,7 +2523,7 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         WifiBattleMatchTask_SetReturnSeq(task, 11);
         break;
     case 11:
-        sys_memset(&request, 0, sizeof(request));
+        MI_CpuFill8(&request, 0, sizeof(request));
         request.unk1 = 3;
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
         link->param->account->unk5 = 3;
@@ -2660,7 +2660,7 @@ static void WifiBattleMatchLink_CompetitionTaskUnregister(WifiBattleMatchTask *t
         WifiBattleMatchTask_SetReturnSeq(task, 13);
         break;
     case 13:
-        sys_memset(&request, 0, sizeof(request));
+        MI_CpuFill8(&request, 0, sizeof(request));
         request.unk1 = 4;
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
         link->param->account->unk5 = 4;
@@ -2697,7 +2697,7 @@ static void WifiBattleMatchLink_CompetitionTaskSignTeam(WifiBattleMatchTask *tas
         *seq = 1;
         break;
     case 1:
-        sys_memset(&link->signature, 0, sizeof(link->signature));
+        MI_CpuFill8(&link->signature, 0, sizeof(link->signature));
         WifiBattleMatchNet_StartPokemonCheck(link->net, player->partyData, TRUE);
         *seq = 2;
         break;
@@ -2745,8 +2745,8 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
     previous =
         TournamentBlock_GetTeam(getTournamentBlockAddress(GameData_GetSaveControl(link->param->param->gameData)), 0);
-    sys_memset(&info, 0, sizeof(info));
-    sys_memcpy(func_0200b794(entry), &info, 0x92);
+    MI_CpuFill8(&info, 0, sizeof(info));
+    MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
     info.startDate = WifiBattleMatchLink_PackBytes(
         TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
     info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8),
@@ -2847,7 +2847,7 @@ static void WifiBattleMatchLink_CompetitionCreateMenu(WifiBattleMatchLinkCompeti
     if (link->menu != NULL) {
         return;
     }
-    sys_memset(&menuParam, 0, sizeof(menuParam));
+    MI_CpuFill8(&menuParam, 0, sizeof(menuParam));
     menuParam.msgData = link->msgData;
     menuParam.font = link->font;
     menuParam.printQueue = link->printQueue;
@@ -2937,11 +2937,11 @@ static void WifiBattleMatchLink_CompetitionFillBattleBoxParty(WifiBattleMatchLin
                                                               WifiBattleMatchLinkCompetition *link) {
     PokeParty *party;
 
-    sys_memset(player, 0, sizeof(WifiBattleMatchLinkPlayer));
+    MI_CpuFill8(player, 0, sizeof(WifiBattleMatchLinkPlayer));
     party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(link->param->param->gameData)),
                                        HEAPID_WIFIBATTLEMATCH_LINK);
     PokeParty_Init((PokeParty *)player->partyData);
-    sys_memcpy(party, player->partyData, PokeParty_GetSaveDataSize());
+    MI_CpuCopy8(party, player->partyData, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);
     player->unk44 = 100;
 }
@@ -2967,7 +2967,7 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer 
 
 static void WifiBattleMatchLink_CompetitionCopySignature(WifiBattleMatchLinkPlayer *player,
                                                          WifiBattleMatchNetCheck *signature) {
-    sys_memcpy(signature->signature, player->signature, sizeof(player->signature));
+    MI_CpuCopy8(signature->signature, player->signature, sizeof(player->signature));
 }
 
 static BOOL WifiBattleMatchLink_CompetitionCheckSignature(WifiBattleMatchLinkPlayer *player, PokeParty *party,

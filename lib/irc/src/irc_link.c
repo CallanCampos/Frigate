@@ -127,7 +127,7 @@ void IrcLink_Ping(void) {
         ping = IRC_CMD_PING ^ IRC_XOR;
         IrcSpi_Send(&ping, 1);
         IrcLink.state = IRC_STATE_PING_SENT;
-        IrcLink.tick = clock();
+        IrcLink.tick = OS_GetTick();
     }
 }
 
@@ -219,7 +219,7 @@ static BOOL IrcLink_CheckPingTimeout(void) {
     if (!IrcLink.linked && !IrcLink.pinging) {
         return FALSE;
     }
-    if (OS_TicksToMilliSeconds(clock() - IrcLink.tick) < IRC_PING_TIMEOUT) {
+    if (OS_TicksToMilliSeconds(OS_GetTick() - IrcLink.tick) < IRC_PING_TIMEOUT) {
         return FALSE;
     }
     IrcLink_Finish(1);
@@ -278,7 +278,7 @@ BOOL IrcLink_Poll(void) {
     if (!IrcLink_ValidateFrame(size)) {
         return FALSE;
     }
-    IrcLink.tick = clock();
+    IrcLink.tick = OS_GetTick();
     frame = &IrcFrame;
     raw = (u8 *)&IrcFrame;
     if (raw[0] < IRC_CMD_MIN) {

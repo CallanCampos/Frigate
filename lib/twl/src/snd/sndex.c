@@ -101,26 +101,26 @@ static void func_02704e04(void);
 
 // Sets the library up, once (SNDEX_Init, by its code)
 void func_02704364(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sSndex.state != SNDEX_STATE_UNINITIALIZED) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return;
     }
     sSndex.state = SNDEX_STATE_INITIALIZING;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_NONE);
     PXI_Init();
-    while (!func_0207ca48(PXI_FIFO_TAG_SNDEX, PXI_PROC_ARM7)) {
+    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_SNDEX, PXI_PROC_ARM7)) {
         WaitByLoop(10);
     }
-    func_0207c9fc(PXI_FIFO_TAG_SNDEX, func_027049b0);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SNDEX, func_027049b0);
 
     PM_SetExitCallbackInfo(&sSndex.exitInfo, func_02704d64, NULL);
     func_02769550(&sSndex.exitInfo, SNDEX_PM_PRIORITY);
     PM_SetSleepCallbackInfo(&sSndex.sleepInfo, func_02704d64, NULL);
-    func_0207f614(&sSndex.sleepInfo, SNDEX_PM_PRIORITY);
+    PM_InsertPreSleepCallback(&sSndex.sleepInfo, SNDEX_PM_PRIORITY);
     sSndex.state = SNDEX_STATE_IDLE;
 }
 
@@ -153,9 +153,9 @@ static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg) 
 // Waits until the answer to the last word is in and the library is idle again, sends the next word of the filter
 // request, and ends the request if the FIFO refuses it. The code is repeated for each word
 #define SNDEX_SEND_FILTER_WORD(cmd, word, cb, cbArg)                                                                   \
-    func_0207c160(SNDEX_SPIN_CYCLES);                                                                                  \
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);                                                                           \
     while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {                                                                  \
-        func_0207c160(SNDEX_SPIN_CYCLES);                                                                              \
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);                                                                       \
     }                                                                                                                  \
     func_02704d48((cb), (cbArg), NULL, (cmd));                                                                         \
     if (!func_02704be0(sSndex.command, (word))) {                                                                      \
@@ -171,7 +171,7 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         return SNDEX_RESULT_BUSY;
     }
     sSndex.filterBusy = TRUE;
-    if (!func_0207c210()) {
+    if (!OSi_IsCodecTwlMode()) {
         sSndex.filterBusy = FALSE;
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
@@ -204,7 +204,7 @@ SNDEXResult func_027047c0(int target, const u16 *coefficients) {
     if (OS_GetCurrentThread() == NULL) {
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
-    func_0207acc4(&queue, messages, 1);
+    OS_InitMessageQueue(&queue, messages, 1);
     result = func_027044f8(target, coefficients, func_02704b58, &queue);
     if (result == SNDEX_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
@@ -220,7 +220,7 @@ SNDEXResult func_02704858(void) {
     OSMessage messages[1];
     OSMessageQueue queue;
 
-    if (!func_0207c210()) {
+    if (!OSi_IsCodecTwlMode()) {
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
     if (OS_GetCurrentThread() == NULL) {
@@ -237,7 +237,7 @@ SNDEXResult func_02704858(void) {
         return SNDEX_RESULT_BUSY;
     }
 
-    func_0207acc4(&queue, messages, 1);
+    OS_InitMessageQueue(&queue, messages, 1);
     func_02704d48(func_02704b58, &queue, NULL, SNDEX_COMMAND_EXCLUSIVE_BEGIN);
     if (!func_02704b74(sSndex.command, 0)) {
         return SNDEX_RESULT_SEND_ERROR;
@@ -250,7 +250,7 @@ SNDEXResult func_02704858(void) {
 SNDEXResult func_02704940(SNDEXCallback callback, void *arg) {
     SNDEXResult result;
 
-    if (!func_0207c210() || sSndex.state != SNDEX_STATE_EXCLUSIVE) {
+    if (!OSi_IsCodecTwlMode() || sSndex.state != SNDEX_STATE_EXCLUSIVE) {
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
     result = SNDEX_RESULT_SEND_ERROR;
@@ -350,51 +350,51 @@ static void func_02704b58(SNDEXResult result, void *arg) {
 
 // Sends a word with a command and a value of one byte. FALSE, and the state back to idle, when the FIFO refuses it
 static BOOL func_02704b74(u32 command, u8 value) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SNDEX, ((command << 16) & 0xff0000) | (value & 0xff), FALSE) < 0) {
         sSndex.state = SNDEX_STATE_IDLE;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return TRUE;
 }
 
 // Sends a word with a command and a value of two bytes
 static BOOL func_02704be0(u32 command, u16 value) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SNDEX, ((command << 16) & 0xff0000) | (value & 0xffff), FALSE) < 0) {
         sSndex.state = SNDEX_STATE_IDLE;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     if (command == SNDEX_COMMAND_FILTER_END) {
         sSndex.filterEndSent = TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return TRUE;
 }
 
 // Starts a request if the library is idle, and puts it in the request state. It is not set up in the first two states,
 // and busy in the request and exclusive ones
 static SNDEXResult func_02704c5c(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     switch (sSndex.state) {
     case SNDEX_STATE_UNINITIALIZED:
     case SNDEX_STATE_INITIALIZING:
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return SNDEX_RESULT_NOT_INITIALIZED;
     case SNDEX_STATE_REQUEST:
     case SNDEX_STATE_EXCLUSIVE:
     case SNDEX_STATE_EXCLUSIVE_ENDING:
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return SNDEX_RESULT_BUSY;
     default:
         sSndex.state = SNDEX_STATE_REQUEST;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return SNDEX_RESULT_SUCCESS;
     }
 }
@@ -402,7 +402,7 @@ static SNDEXResult func_02704c5c(void) {
 // Ends the request in progress: clears it, goes back to idle (or to the exclusive state, after the request 0xfb) and
 // calls its callback with the result
 static void func_02704cc4(SNDEXResult result) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     u8 command = sSndex.command;
     SNDEXCallback callback = sSndex.callback;
     void *arg = sSndex.callbackArg;
@@ -417,7 +417,7 @@ static void func_02704cc4(SNDEXResult result) {
     } else {
         sSndex.state = SNDEX_STATE_IDLE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     if (callback != NULL) {
         callback(result, arg);
     }
@@ -442,8 +442,8 @@ static void func_02704d64(void *arg) {
 static void func_02704d74(void) {
     if (sSndex.filterEndSent) {
         do {
-            func_0207c160(SNDEX_SPIN_CYCLES);
-            func_0207cad4();
+            OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+            PXIi_HandlerRecvFifoNotEmpty();
         } while (sSndex.filterEndSent);
     }
 }
@@ -466,8 +466,8 @@ static void func_02704e04(void) {
             sSndex.volumeRetries++;
         }
         while (sSndex.volumePending) {
-            func_0207c160(SNDEX_SPIN_CYCLES);
-            func_0207cad4();
+            OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+            PXIi_HandlerRecvFifoNotEmpty();
         }
     }
 }

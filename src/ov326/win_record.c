@@ -374,7 +374,7 @@ static BOOL WinRecord_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_RECORD, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WinRecordWork), HEAPID_WBT_RECORD);
-    sys_memset(wk, 0, sizeof(WinRecordWork));
+    MI_CpuFill8(wk, 0, sizeof(WinRecordWork));
     wk->heapId = HEAPID_WBT_RECORD;
     wk->param = param;
     wk->graphic = WinRecordGraphic_Create(0, wk->heapId);
@@ -604,7 +604,7 @@ static void WinRecord_CreateActors(WinRecordWork *wk, u32 surface, const WinReco
     s16 x, y;
     BOOL visible, autoAnim;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     pltt = res->pltt;
     chars = res->chars;
     cells = res->cells;

@@ -49,7 +49,7 @@ static BOOL BrStart_ProcInit(GameProc *proc, u32 *state, void *param, void *work
     BrSeqFunc seqFunc;
 
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrStartWork), BrProcSys_GetHeapID(p->procSys));
-    sys_memset(wk, 0, sizeof(BrStartWork));
+    MI_CpuFill8(wk, 0, sizeof(BrStartWork));
     wk->param = p;
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
     wk->que = func_02021998(wk->heapId);

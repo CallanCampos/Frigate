@@ -124,10 +124,10 @@ BOOL PStatus_Init(PStatusWork *wk) {
     PStatus_CreateActors(wk);
     wk->vblankTcb = GFL_VBlankTCBAdd(PStatus_VBlank, wk, 8);
     wk->plttAnimPhase = 0;
-    sys_memcpy16((void *)(HW_OBJ_PLTT + 0x6c), wk->cursorPlttSrc, 12);
-    sys_memcpy16((void *)(HW_OBJ_PLTT + 0x160), wk->tabPlttSrc, sizeof(wk->tabPlttSrc));
-    sys_memcpy16((void *)(HW_OBJ_PLTT + 0x1a0), wk->buttonPltt, sizeof(wk->buttonPltt));
-    sys_memcpy16((void *)(HW_OBJ_PLTT + 0x1a0), wk->buttonPlttSrc, sizeof(wk->buttonPlttSrc));
+    MIi_CpuCopy16((void *)(HW_OBJ_PLTT + 0x6c), wk->cursorPlttSrc, 12);
+    MIi_CpuCopy16((void *)(HW_OBJ_PLTT + 0x160), wk->tabPlttSrc, sizeof(wk->tabPlttSrc));
+    MIi_CpuCopy16((void *)(HW_OBJ_PLTT + 0x1a0), wk->buttonPltt, sizeof(wk->buttonPltt));
+    MIi_CpuCopy16((void *)(HW_OBJ_PLTT + 0x1a0), wk->buttonPlttSrc, sizeof(wk->buttonPlttSrc));
     PStatus_LoadPokemon(wk);
     if (wk->param->mode == PSTATUS_MODE_FORGET_MOVE) {
         wk->page = PSTATUS_PAGE_FORGET;
@@ -320,9 +320,9 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
     PStatus_CreateBG(&sPStatusBG5Setup, 5, 0);
     PStatus_CreateBG(&sPStatusBG6Setup, 6, 0);
     PStatus_CreateBG(&sPStatusBG7Setup, 7, 0);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
-                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 13, 16);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 13, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
+                       GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 13, 16);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 13, 16);
     clactSetup = data_02093f08;
     clactSetup.charCount = 110;
     ClActSys_Create(&clactSetup, &sPStatusVRAMConfig, wk->heapId);
@@ -335,7 +335,7 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
                                      FX32_CONST(512), 0, &sPStatusCameraPos, &sPStatusCameraUp, &sPStatusCameraTarget,
                                      wk->heapId);
     GFL_G3DCameraFlush(wk->camera);
-    gfxSetEdgeColorTable(sPStatusEdgeColors);
+    G3X_SetEdgeColorTable(sPStatusEdgeColors);
     G3X_EdgeMarking(FALSE);
     GFL_G3DSysSetSwapBufferParams(0, 0);
     GFL_BGSysSet3DBGPriority(0);

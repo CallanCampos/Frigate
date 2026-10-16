@@ -127,8 +127,8 @@ static void ZknListBmp_LoadWindowBG(ZknListWork *wk, u32 window) {
     GFL_ArcToolFree(arc);
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {
-            sys_memcpy32(&chars[(screen[(posY + y) * 32 + posX + x] & 0x3ff) * 0x20], &pixels[(y * width + x) * 0x20],
-                         0x20);
+            MIi_CpuCopy32(&chars[(screen[(posY + y) * 32 + posX + x] & 0x3ff) * 0x20], &pixels[(y * width + x) * 0x20],
+                          0x20);
         }
     }
     GFL_HeapFree(charFile);

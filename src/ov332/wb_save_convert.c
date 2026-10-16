@@ -85,10 +85,10 @@ WBSaveData *WBSaveConvert_Create(void *save, HeapID heapId) {
 static void WBSaveConvert_ReadPlayer(void *save, WBSavePlayer *player) {
     PlayerInfo *info;
 
-    sys_memset(player, 0, sizeof(WBSavePlayer));
+    MI_CpuFill8(player, 0, sizeof(WBSavePlayer));
     info = (PlayerInfo *)((u8 *)WBSaveBlock_Get(save, WB_SAVE_BLOCK_PLAYER) + 4);
     player->id = info->id;
-    sys_memcpy(info->name, player->name, sizeof(player->name));
+    MI_CpuCopy8(info->name, player->name, sizeof(player->name));
     player->gender = info->gender;
     player->unk15 = info->version;
 }
@@ -99,7 +99,7 @@ static void WBSaveConvert_ReadMemories(void *save, WBSaveMemories *memories) {
     u8 *unk42;
     u32 i;
 
-    sys_memset(memories, 0, sizeof(WBSaveMemories));
+    MI_CpuFill8(memories, 0, sizeof(WBSaveMemories));
     eventWork = WBSaveBlock_Get(save, WB_SAVE_BLOCK_EVENT_WORK);
     for (i = 0; i < NELEMS(sEventFlagBits); i++) {
         const WBEventFlagBit *entry = &sEventFlagBits[i];
@@ -125,8 +125,8 @@ static void WBSaveConvert_ReadMemories(void *save, WBSaveMemories *memories) {
         memories->vars[sEventVars[i].index] = ((u16 *)eventWork)[sEventVars[i].var - WB_EVENT_WORK_VARS_START];
     }
     unk42 = WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK42);
-    sys_memcpy(unk42 + 0x258, memories->props, sizeof(memories->props));
+    MI_CpuCopy8(unk42 + 0x258, memories->props, sizeof(memories->props));
     memories->unk28 = *(u16 *)(unk42 + 0x256);
     memories->unk2A = *(u16 *)(unk42 + 0x252);
-    sys_memcpy(WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK66), memories->unk2C, sizeof(memories->unk2C));
+    MI_CpuCopy8(WBSaveBlock_Get(save, WB_SAVE_BLOCK_UNK66), memories->unk2C, sizeof(memories->unk2C));
 }

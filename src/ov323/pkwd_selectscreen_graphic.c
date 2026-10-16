@@ -106,7 +106,7 @@ PkwdSelectScreenGraphic *PkwdSelectScreenGraphic_Create(u32 layout, HeapID heapI
     PkwdSelectScreenGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(PkwdSelectScreenGraphic), FALSE, "pkwd_selectscreen_graphic.c", 319);
 
-    sys_memset(graphic, 0, sizeof(PkwdSelectScreenGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdSelectScreenGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -133,7 +133,7 @@ void PkwdSelectScreenGraphic_Free(PkwdSelectScreenGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(PkwdSelectScreenGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdSelectScreenGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -156,7 +156,7 @@ static void PkwdSelectScreenGraphic_VBlank(TCB *tcb, void *data) {
 static void PkwdSelectScreenBG_Init(PkwdSelectScreenBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(PkwdSelectScreenBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdSelectScreenBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPkwdSelectScreenLCDConfig);
@@ -176,7 +176,7 @@ static void PkwdSelectScreenBG_Free(PkwdSelectScreenBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(PkwdSelectScreenBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdSelectScreenBG));
 }
 
 static void PkwdSelectScreenBG_Update(PkwdSelectScreenBG *bg) {
@@ -187,7 +187,7 @@ static void PkwdSelectScreenBG_VBlank(PkwdSelectScreenBG *bg) {
 }
 
 static void PkwdSelectScreenClAct_Init(PkwdSelectScreenClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(PkwdSelectScreenClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdSelectScreenClAct));
     ClActSys_Create(&sPkwdSelectScreenClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -198,7 +198,7 @@ static void PkwdSelectScreenClAct_Init(PkwdSelectScreenClAct *clact, const BGSys
 static void PkwdSelectScreenClAct_Free(PkwdSelectScreenClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(PkwdSelectScreenClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdSelectScreenClAct));
 }
 
 static void PkwdSelectScreenClAct_Update(PkwdSelectScreenClAct *clact) {

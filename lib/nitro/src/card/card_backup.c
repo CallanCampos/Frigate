@@ -8,23 +8,23 @@
 // The page that the commands move a page of the backup through
 #define CARD_BACKUP_PAGE_SIZE 256
 
-static void func_0206f3e0(CARDiCommon *p);
-static void func_0206f538(CARDBackupType type);
-static void func_0206f7a4(CARDiCommon *p);
-static BOOL func_0206f7d4(u32 permit, MIDmaCallback callback, void *arg);
-static u32 func_0206f87c(void);
+static void CARDi_RequestStreamCommandCore(CARDiCommon *p);
+static void CARDi_IdentifyBackupCore(CARDBackupType type);
+static void CARDi_IdentifyBackupTask(CARDiCommon *p);
+static BOOL CARDi_BeginBackupCommand(u32 permit, MIDmaCallback callback, void *arg);
+static u32 CARD_GetBackupSectorSize(void);
 
 static u8 sCardBackupBuffer[CARD_BACKUP_PAGE_SIZE] ATTRIBUTE_ALIGN(32);
 
 // The task of every command that moves a number of bytes: runs it a page at a time
-static void func_0206f3e0(CARDiCommon *p) {
+static void CARDi_RequestStreamCommandCore(CARDiCommon *p) {
     int reqType = p->reqType;
     CARDRequestMode reqMode = p->reqMode;
     int reqRetry = p->reqRetry;
     u32 size = CARD_BACKUP_PAGE_SIZE;
     OSi_ReferSymbol(CARDi_BackupSignature);
     if (reqType == CARD_REQ_ERASE_SECTOR_BACKUP) {
-        size = func_0206f87c();
+        size = CARD_GetBackupSectorSize();
     } else if (reqType == CARD_REQ_ERASE_SUBSECTOR_BACKUP) {
         size = cardi_common.cmd->spec.subsectSize;
     }
@@ -41,15 +41,15 @@ static void func_0206f3e0(CARDiCommon *p) {
         }
         switch (reqMode) {
         case CARD_REQUEST_MODE_RECV:
-            cp15_invalidateDC(sCardBackupBuffer, len);
+            DC_InvalidateRange(sCardBackupBuffer, len);
             p->cmd->src = p->src;
             p->cmd->dst = (u32)sCardBackupBuffer;
             break;
         case CARD_REQUEST_MODE_SEND:
         case CARD_REQUEST_MODE_SEND_VERIFY:
-            sys_memcpy((void *)p->src, sCardBackupBuffer, len);
-            cp15_flushDC(sCardBackupBuffer, len);
-            cp15_drainWriteBuffer();
+            MI_CpuCopy8((void *)p->src, sCardBackupBuffer, len);
+            DC_FlushRange(sCardBackupBuffer, len);
+            DC_WaitWriteBufferEmpty();
             p->cmd->src = (u32)sCardBackupBuffer;
             p->cmd->dst = p->dst;
             break;
@@ -58,15 +58,15 @@ static void func_0206f3e0(CARDiCommon *p) {
             p->cmd->dst = p->dst;
             break;
         }
-        if (!func_0206f30c(p, reqType, reqRetry)) {
+        if (!CARDi_Request(p, reqType, reqRetry)) {
             break;
         }
         if (reqMode == CARD_REQUEST_MODE_SEND_VERIFY) {
-            if (!func_0206f30c(p, CARD_REQ_VERIFY_BACKUP, 1)) {
+            if (!CARDi_Request(p, CARD_REQ_VERIFY_BACKUP, 1)) {
                 break;
             }
         } else if (reqMode == CARD_REQUEST_MODE_RECV) {
-            sys_memcpy(sCardBackupBuffer, (void *)p->dst, len);
+            MI_CpuCopy8(sCardBackupBuffer, (void *)p->dst, len);
         }
         p->src += len;
         p->dst += len;
@@ -76,12 +76,12 @@ static void func_0206f3e0(CARDiCommon *p) {
 
 // Fills in the command block's description of the backup memory of this type: its sizes, its timings and the requests
 // it can execute. A type that isn't known is answered as unsupported
-static void func_0206f538(CARDBackupType type) {
+static void CARDi_IdentifyBackupCore(CARDBackupType type) {
     CARDiCommandArg *cmd = cardi_common.cmd;
     u32 size;
     u32 device;
     u32 vendor;
-    sys_memset(&cmd->spec, 0, sizeof(cmd->spec));
+    MI_CpuFill8(&cmd->spec, 0, sizeof(cmd->spec));
     cmd->type = type;
     // The requests that every kind can execute: 0 to 5 and 13
     cmd->spec.caps = 0x203f;
@@ -218,62 +218,62 @@ unsupported:
     cardi_common.cmd->result = CARD_RESULT_UNSUPPORTED;
 }
 
-static void func_0206f7a4(CARDiCommon *p) {
-    func_0206f30c(p, CARD_REQ_IDENTIFY, 1);
+static void CARDi_IdentifyBackupTask(CARDiCommon *p) {
+    CARDi_Request(p, CARD_REQ_IDENTIFY, 1);
     p->cmd->src = 0;
     p->cmd->dst = (u32)sCardBackupBuffer;
     p->cmd->len = 1;
-    func_0206f30c(p, CARD_REQ_READ_BACKUP, 1);
+    CARDi_Request(p, CARD_REQ_READ_BACKUP, 1);
 }
 
 // Begins a backup command: checks that the game may use the card in this way, then waits until the last command is
 // done
-static BOOL func_0206f7d4(u32 permit, MIDmaCallback callback, void *arg) {
+static BOOL CARDi_BeginBackupCommand(u32 permit, MIDmaCallback callback, void *arg) {
     OSi_ReferSymbol(CARDi_BackupSignature);
-    func_0206eeb0();
-    if ((func_0206f018() & permit) != permit) {
+    CARD_CheckEnabled();
+    if ((CARDi_GetAccessLevel() & permit) != permit) {
         sys_exit();
     }
-    return func_0206f1c0(&cardi_common, TRUE, callback, arg);
+    return CARDi_WaitForTask(&cardi_common, TRUE, callback, arg);
 }
 
-BOOL func_0206f80c(u32 src, u32 dest, u32 size, MIDmaCallback callback, void *arg, BOOL async, CARDRequest request,
-                   int retries, CARDRequestMode mode) {
-    func_0206f7d4(mode == CARD_REQUEST_MODE_RECV ? CARD_ACCESS_LEVEL_BACKUP_READ : CARD_ACCESS_LEVEL_BACKUP_WRITE,
-                  callback, arg);
+BOOL CARDi_RequestStreamCommand(u32 src, u32 dest, u32 size, MIDmaCallback callback, void *arg, BOOL async,
+                                CARDRequest request, int retries, CARDRequestMode mode) {
+    CARDi_BeginBackupCommand(
+        mode == CARD_REQUEST_MODE_RECV ? CARD_ACCESS_LEVEL_BACKUP_READ : CARD_ACCESS_LEVEL_BACKUP_WRITE, callback, arg);
     cardi_common.src = src;
     cardi_common.dst = dest;
     cardi_common.len = size;
     cardi_common.reqType = request;
     cardi_common.reqRetry = retries;
     cardi_common.reqMode = mode;
-    return func_0206f134(func_0206f3e0, async);
+    return CARDi_ExecuteOldTypeTask(CARDi_RequestStreamCommandCore, async);
 }
 
-BOOL func_0206f854(CARDBackupType type) {
+BOOL CARD_IdentifyBackup(CARDBackupType type) {
     if (type == 0) {
         sys_exit();
     }
-    func_0206f7d4(0, NULL, NULL);
-    func_0206f538(type);
-    return func_0206f134(func_0206f7a4, FALSE);
+    CARDi_BeginBackupCommand(0, NULL, NULL);
+    CARDi_IdentifyBackupCore(type);
+    return CARDi_ExecuteOldTypeTask(CARDi_IdentifyBackupTask, FALSE);
 }
 
 // The size of a sector of the backup memory
-static u32 func_0206f87c(void) {
+static u32 CARD_GetBackupSectorSize(void) {
     return cardi_common.cmd->spec.sectSize;
 }
 
-BOOL func_0206f888(void) {
-    return func_0206f07c();
+BOOL CARD_WaitBackupAsync(void) {
+    return CARDi_WaitAsync();
 }
 
-BOOL func_0206f890(void) {
-    return func_0206f090();
+BOOL CARD_TryWaitBackupAsync(void) {
+    return CARDi_TryWaitAsync();
 }
 
-void func_0206f898(void) {
-    u32 irq = CPU_IRQDisable();
+void CARD_CancelBackupAsync(void) {
+    u32 irq = OS_DisableInterrupts();
     cardi_common.flag |= CARD_STAT_CANCEL;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }

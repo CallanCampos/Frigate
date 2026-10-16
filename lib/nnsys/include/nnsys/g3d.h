@@ -856,7 +856,7 @@ static inline const MtxFx44 *NNS_G3dGlbGetProjectionMtx(void) {
 }
 
 static inline void NNS_G3dGlbSetProjectionMtx(const MtxFx44 *mtx) {
-    sys_memcpy32_fast(mtx, &NNS_G3dGlb.projMtx, sizeof(MtxFx44));
+    MIi_CpuCopyFast(mtx, &NNS_G3dGlb.projMtx, sizeof(MtxFx44));
     NNS_G3dGlb.flag &= ~(NNS_G3D_GLB_FLAG_INVPROJ_UPTODATE | NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE);
 }
 

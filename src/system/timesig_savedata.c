@@ -15,7 +15,7 @@ u32 func_02009184(void) {
 }
 
 void func_0200918c(TimeSigSave *timeSig) {
-    sys_memset(timeSig, 0, sizeof(TimeSigSave));
+    MI_CpuFill8(timeSig, 0, sizeof(TimeSigSave));
 }
 
 void *getTimeSigBlkAddress(SaveControl *save) {
@@ -82,7 +82,7 @@ void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 mon
     s64 seconds;
 
     RTC_GetCachedDateTime(&date, &time);
-    seconds = func_0207d12c(&date, &time);
+    seconds = RTC_ConvertDateTimeToSecond(&date, &time);
     timeSig->badgeDates[badgeId].year = year;
     timeSig->badgeDates[badgeId].month = month;
     timeSig->badgeDates[badgeId].day = day;

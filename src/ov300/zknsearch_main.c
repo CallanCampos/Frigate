@@ -403,9 +403,9 @@ void ZknSearchMain_StartFade(ZknSearchWork *wk, u8 start, u8 end) {
 
 void ZknSearchMain_SetBlend(BOOL enabled) {
     if (enabled == TRUE) {
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG2, 16, 6);
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
-                            6, 10);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, GX_BLEND_PLANEMASK_BG2, 16, 6);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
+                           6, 10);
     } else {
         G2S_BlendNone();
     }
@@ -519,7 +519,7 @@ void ZknSearchMain_LoadLoadingScreen(ZknSearchWork *wk) {
         GFL_HeapAllocate(HEAPID_ZUKAN_SEARCH, 32 * LOADING_HEIGHT * sizeof(u16), FALSE, "zknsearch_main.c", 944);
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
     file = GFL_G2DIOReadNSCRArc(arc, 93, FALSE, &screen, HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
-    sys_memcpy16(screen->rawData, wk->loadingScreen, 32 * LOADING_HEIGHT * sizeof(u16));
+    MIi_CpuCopy16(screen->rawData, wk->loadingScreen, 32 * LOADING_HEIGHT * sizeof(u16));
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
 }

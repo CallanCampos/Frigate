@@ -197,7 +197,7 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     int i;
 
     p_wk = GFL_ProcInitSubsystem(proc, sizeof(BrRecordWork), BrProcSys_GetHeapID(p_param->procSys));
-    sys_memset(p_wk, 0, sizeof(BrRecordWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrRecordWork));
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
     p_wk->isProfile = FALSE;
     p_wk->p_param = p_param;
@@ -534,7 +534,7 @@ static void BrRecord_SeqDownloadOutline(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_a
     case SEQ_DOWNLOAD_START: {
         BrNetRequestParam req;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         req.dataNumber = p_wk->p_param->videoNumber;
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_3, &req);
         p_wk->cnt = 0;
@@ -679,7 +679,7 @@ static void BrRecord_SeqDownloadPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs
     case SEQ_DOWNLOAD_START: {
         BrNetRequestParam req;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         req.dataNumber = func_0200c124(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_3, &req);
         p_wk->cnt = 0;
@@ -1149,7 +1149,7 @@ static void BrRecord_CreateIcons(BrRecordWork *p_wk, ClActUnit *unit, BattleRecH
 
             p_wk->iconChr[i] = func_0204b81c(handle, PokeParty_GetIconIndex(species[i], form[i], gender[i], FALSE),
                                              FALSE, CLACT_SURFACE_MAIN, heapId);
-            sys_memset(&setup, 0, sizeof(ClActorSetup));
+            MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
             setup.x = sBrRecordIconPos[layout][i].x + 8;
             setup.y = sBrRecordIconPos[layout][i].y - 12;
             setup.sequence = 1;
@@ -1240,7 +1240,7 @@ static void BrRecord_CreateButtons(BrRecordWork *p_wk, BrRecordProcParam *p_para
         ClActorSetup setup;
         BrResObjData obj;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = 24;
         setup.y = 168;
         setup.sequence = 0;
@@ -1256,7 +1256,7 @@ static void BrRecord_CreateButtons(BrRecordWork *p_wk, BrRecordProcParam *p_para
         ClActorSetup setup;
         BrResObjData obj;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = 80;
         setup.y = 168;
         setup.sequence = 0;

@@ -102,7 +102,7 @@ void EventData_Clear(EventData *data) {
     data->npcs = NULL;
     data->warps = NULL;
     data->triggers = NULL;
-    sys_memset(data->cache, 0, sizeof(data->cache));
+    MI_CpuFill8(data->cache, 0, sizeof(data->cache));
 }
 
 EncData *GetEncountData(EventData *data) {

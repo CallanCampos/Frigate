@@ -72,164 +72,164 @@ static BOOL IsQueueEmpty(const GfdVramTransferQueue *queue) {
 }
 
 static void DoTransfer3dTex(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginTextureUpload();
-    gfxUploadTexture(pSrc, dstAddr, szByte);
-    gfxEndTextureUpload();
+    GX_BeginLoadTex();
+    GX_LoadTex(pSrc, dstAddr, szByte);
+    GX_EndLoadTex();
 }
 
 static void DoTransfer3dTexPltt(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginPaletteUpload();
-    gfxUploadPalette(pSrc, dstAddr, szByte);
-    gfxEndPaletteUpload();
+    GX_BeginLoadTexPltt();
+    GX_LoadTexPltt(pSrc, dstAddr, szByte);
+    GX_EndLoadTexPltt();
 }
 
 static void DoTransfer3dClearImageColor(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginRearPlaneImageUpload();
-    gfxUploadRearPlaneImageA(pSrc, szByte);
-    gfxEndRearPlaneImageUpload();
+    GX_BeginLoadClearImage();
+    GX_LoadClearImageColor(pSrc, szByte);
+    GX_EndLoadClearImage();
 }
 
 static void DoTransfer3dClearImageDepth(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginRearPlaneImageUpload();
-    gfxUploadRearPlaneImageB(pSrc, szByte);
-    gfxEndRearPlaneImageUpload();
+    GX_BeginLoadClearImage();
+    GX_LoadClearImageDepth(pSrc, szByte);
+    GX_EndLoadClearImage();
 }
 
 static void DoTransfer2dBG0CharMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar0A(pSrc, dstAddr, szByte);
+    GX_LoadBG0Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG1CharMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar1A(pSrc, dstAddr, szByte);
+    GX_LoadBG1Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG2CharMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar2A(pSrc, dstAddr, szByte);
+    GX_LoadBG2Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG3CharMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar3A(pSrc, dstAddr, szByte);
+    GX_LoadBG3Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG0ScrMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen0A(pSrc, dstAddr, szByte);
+    GX_LoadBG0Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG1ScrMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen1A(pSrc, dstAddr, szByte);
+    GX_LoadBG1Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG2ScrMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen2A(pSrc, dstAddr, szByte);
+    GX_LoadBG2Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG3ScrMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen3A(pSrc, dstAddr, szByte);
+    GX_LoadBG3Scr(pSrc, dstAddr, szByte);
 }
 
 // A bitmap BG's image is where its screen would be
 static void DoTransfer2dBG2BmpMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen2A(pSrc, dstAddr, szByte);
+    GX_LoadBG2Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG3BmpMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen3A(pSrc, dstAddr, szByte);
+    GX_LoadBG3Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dObjPlttMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadStdPaletteObjA(pSrc, dstAddr, szByte);
+    GX_LoadOBJPltt(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBGPlttMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadStdPaletteBGA(pSrc, dstAddr, szByte);
+    GX_LoadBGPltt(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dObjExtPlttMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginObjExtPltAUpload();
-    gfxUploadExtPaletteObjA(pSrc, dstAddr, szByte);
-    gfxEndObjExtPltAUpload();
+    GX_BeginLoadOBJExtPltt();
+    GX_LoadOBJExtPltt(pSrc, dstAddr, szByte);
+    GX_EndLoadOBJExtPltt();
 }
 
 static void DoTransfer2dBGExtPlttMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginBGExtPltAUpload();
-    gfxUploadExtPaletteBGA(pSrc, dstAddr, szByte);
-    gfxEndBGExtPltAUpload();
+    GX_BeginLoadBGExtPltt();
+    GX_LoadBGExtPltt(pSrc, dstAddr, szByte);
+    GX_EndLoadBGExtPltt();
 }
 
 static void DoTransfer2dObjOamMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadOAMA(pSrc, dstAddr, szByte);
+    GX_LoadOAM(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dObjCharMain(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadObjCharA(pSrc, dstAddr, szByte);
+    GX_LoadOBJ(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG0CharSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar0B(pSrc, dstAddr, szByte);
+    GXS_LoadBG0Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG1CharSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar1B(pSrc, dstAddr, szByte);
+    GXS_LoadBG1Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG2CharSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar2B(pSrc, dstAddr, szByte);
+    GXS_LoadBG2Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG3CharSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGChar3B(pSrc, dstAddr, szByte);
+    GXS_LoadBG3Char(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG0ScrSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen0B(pSrc, dstAddr, szByte);
+    GXS_LoadBG0Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG1ScrSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen1B(pSrc, dstAddr, szByte);
+    GXS_LoadBG1Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG2ScrSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen2B(pSrc, dstAddr, szByte);
+    GXS_LoadBG2Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG3ScrSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen3B(pSrc, dstAddr, szByte);
+    GXS_LoadBG3Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG2BmpSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen2B(pSrc, dstAddr, szByte);
+    GXS_LoadBG2Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBG3BmpSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadBGScreen3B(pSrc, dstAddr, szByte);
+    GXS_LoadBG3Scr(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dObjPlttSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadStdPaletteObjB(pSrc, dstAddr, szByte);
+    GXS_LoadOBJPltt(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dBGPlttSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadStdPaletteBGB(pSrc, dstAddr, szByte);
+    GXS_LoadBGPltt(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dObjExtPlttSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginObjExtPltBUpload();
-    gfxUploadExtPaletteObjB(pSrc, dstAddr, szByte);
-    gfxEndObjExtPltBUpload();
+    GXS_BeginLoadOBJExtPltt();
+    GXS_LoadOBJExtPltt(pSrc, dstAddr, szByte);
+    GXS_EndLoadOBJExtPltt();
 }
 
 static void DoTransfer2dBGExtPlttSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxBeginBGExtPltBUpload();
-    gfxUploadExtPaletteBGB(pSrc, dstAddr, szByte);
-    gfxEndBGExtPltBUpload();
+    GXS_BeginLoadBGExtPltt();
+    GXS_LoadBGExtPltt(pSrc, dstAddr, szByte);
+    GXS_EndLoadBGExtPltt();
 }
 
 static void DoTransfer2dObjOamSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadOAMB(pSrc, dstAddr, szByte);
+    GXS_LoadOAM(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer2dObjCharSub(const void *pSrc, u32 dstAddr, u32 szByte) {
-    gfxUploadObjCharB(pSrc, dstAddr, szByte);
+    GXS_LoadOBJ(pSrc, dstAddr, szByte);
 }
 
 static void DoTransfer_(const NNSGfdVramTransferTask *task) {
@@ -274,7 +274,7 @@ static void DoTransfer_(const NNSGfdVramTransferTask *task) {
     };
     GfdTransferFunc fn = transFunc[task->type];
 
-    cp15_flushDC(task->pSrc, task->szByte);
+    DC_FlushRange(task->pSrc, task->szByte);
     fn(task->pSrc, task->dstAddr, task->szByte);
 }
 

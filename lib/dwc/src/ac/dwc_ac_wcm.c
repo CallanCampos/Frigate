@@ -11,45 +11,45 @@
 // A candidate's place that nothing has been put in is all zeroes
 #define IS_EMPTY(info) ((info).unk_00 + (info).id + (info).level + (info).tag + (info).seen == 0)
 
-static void func_02058eb0(const WMBssDesc *bss);
-static int func_0205914c(const WMBssDesc *bss, int count, const DWCAcTarget *targets);
-static int func_020591c8(const WMBssDesc *bss, DWCAcSearchWork *work);
-static int func_0205925c(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work);
-static void func_020593e4(u8 id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work);
-static void func_0205944c(int slot, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work);
-static void func_020594d4(int slot, DWCAcSearchWork *work);
+static void DWCAc_OnApFound(const WMBssDesc *bss);
+static int DWCAc_FindTarget(const WMBssDesc *bss, int count, const DWCAcTarget *targets);
+static int DWCAc_FindCandidate(const WMBssDesc *bss, DWCAcSearchWork *work);
+static int DWCAc_AddCandidate(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work);
+static void DWCAc_StoreNewCandidate(u8 id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work);
+static void DWCAc_RefreshCandidate(int slot, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work);
+static void DWCAc_SortCandidates(int slot, DWCAcSearchWork *work);
 
 // Takes in one access point that the wireless manager found: from the state the search is in, it matches the beacon
 // with a target (state 3, 5) or with a candidate that is kept (state 4), and adds or refreshes the candidate
-static void func_02058eb0(const WMBssDesc *bss) {
+static void DWCAc_OnApFound(const WMBssDesc *bss) {
     int id = -1;
     u8 tag;
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
-    DWCAcMain *control = func_0205a78c(DWC_AC_WORK_MAIN);
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
+    DWCAcMain *control = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
     control->unk_0b_0 = 1;
-    switch (func_0205a83c()) {
+    switch (DWCAc_GetState()) {
     case 3:
         tag = work->tag;
         if (bss->ssidLength == 0 || bss->ssid[0] == 0) {
-            func_0205c4e4(bss->channel);
+            DWCAc_NoteHiddenChannel(bss->channel);
         } else if (bss->ssidLength == 1 && bss->ssid[0] == ' ') {
-            func_0205c4e4(bss->channel);
-            id = func_0205914c(bss, work->targetCount, work->targets);
+            DWCAc_NoteHiddenChannel(bss->channel);
+            id = DWCAc_FindTarget(bss, work->targetCount, work->targets);
         } else {
-            id = func_0205914c(bss, work->targetCount, work->targets);
+            id = DWCAc_FindTarget(bss, work->targetCount, work->targets);
         }
         break;
     case 4:
         tag = work->candidates[work->current].channel - 1;
-        id = func_020591c8(bss, work);
+        id = DWCAc_FindCandidate(bss, work);
         if (id >= 0) {
             work->infos[work->current].seen = 1;
         }
         break;
     case 5:
         tag = work->tag;
-        id = func_0205914c(bss, 1, &work->targets[work->current]);
+        id = DWCAc_FindTarget(bss, 1, &work->targets[work->current]);
         if (id >= 0) {
             work->targets[work->current].found = 1;
         }
@@ -58,24 +58,24 @@ static void func_02058eb0(const WMBssDesc *bss) {
         return;
     }
     if (id >= 0) {
-        func_020594d4(func_0205925c(id, bss, tag, work), work);
+        DWCAc_SortCandidates(DWCAc_AddCandidate(id, bss, tag, work), work);
     }
 }
 
 // The id of the kind of access point that a beacon with a 32-byte SSID is, from the SSID and the kind the search wants
-int func_02059028(const WMBssDesc *bss) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+int DWCAc_GetSpecialApId(const WMBssDesc *bss) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     if (work->mode == 0 || work->mode == 4) {
         if (((bss->capaInfo >> 4) & 1) == 1) {
-            if (func_0205d074(bss->ssid) == TRUE) {
+            if (DWCAc_IsNwcUsbApSsid(bss->ssid) == TRUE) {
                 return DWC_AC_ID_NWCUSBAP;
             }
         }
     }
     if (work->mode == 0 || work->mode == 5) {
         if (((bss->capaInfo >> 4) & 1) == 1) {
-            if (func_0205cf80(bss->ssid) == TRUE) {
+            if (DWCAc_IsNdwcShapSsid(bss->ssid) == TRUE) {
                 return DWC_AC_ID_NDWCSHAP;
             }
         }
@@ -84,7 +84,7 @@ int func_02059028(const WMBssDesc *bss) {
 }
 
 // Whether the access point can be taken for a connection with WPA. A DS cannot tell, and takes it so
-BOOL func_020590cc(const WMBssDesc *bss) {
+BOOL DWCAc_CheckWpa(const WMBssDesc *bss) {
     if (hw_isDSi() && func_02703208((NWMBssDesc *)bss, 0x30) == NULL) {
         u8 oui[4] = { 0x00, 0x50, 0xf2, 0x01 };
 
@@ -97,12 +97,12 @@ BOOL func_020590cc(const WMBssDesc *bss) {
 
 // The id of the first of `count` targets whose SSID is the beacon's, or that of the kind of access point that the SSID
 // shows, or -1
-static int func_0205914c(const WMBssDesc *bss, int count, const DWCAcTarget *targets) {
+static int DWCAc_FindTarget(const WMBssDesc *bss, int count, const DWCAcTarget *targets) {
     int i;
     u16 length;
 
     if (bss->ssidLength == 0x20) {
-        int id = func_02059028(bss);
+        int id = DWCAc_GetSpecialApId(bss);
 
         if (id > 0) {
             return id;
@@ -123,13 +123,13 @@ static int func_0205914c(const WMBssDesc *bss, int count, const DWCAcTarget *tar
 }
 
 // The id of the candidate that has the beacon's SSID, or that of the kind of access point that the SSID shows, or -1
-static int func_020591c8(const WMBssDesc *bss, DWCAcSearchWork *work) {
+static int DWCAc_FindCandidate(const WMBssDesc *bss, DWCAcSearchWork *work) {
     int i;
     s16 count;
     u16 length;
 
     if (bss->ssidLength == 0x20) {
-        int id = func_02059028(bss);
+        int id = DWCAc_GetSpecialApId(bss);
 
         if (id > 0) {
             return id;
@@ -150,8 +150,8 @@ static int func_020591c8(const WMBssDesc *bss, DWCAcSearchWork *work) {
 }
 
 // Puts the beacon among the candidates, as a new one or in place of the one it matches, and gives its place: the last
-// one, a place past the end of the list that func_020594d4 then sorts it from
-static int func_0205925c(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
+// one, a place past the end of the list that DWCAc_SortCandidates then sorts it from
+static int DWCAc_AddCandidate(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
     int i;
     s16 count = work->candidateCount;
     int found = -1;
@@ -168,19 +168,19 @@ static int func_0205925c(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *
     }
 
     if (found == -1) {
-        func_020593e4(id, bss, tag, work);
+        DWCAc_StoreNewCandidate(id, bss, tag, work);
         if (work->candidateCount < DWC_AC_CANDIDATE_MAX) {
             work->candidateCount++;
         }
         found = DWC_AC_CANDIDATE_MAX;
     } else {
-        func_0205944c(found, bss, tag, work);
+        DWCAc_RefreshCandidate(found, bss, tag, work);
     }
     return found;
 }
 
 // Stores the beacon as a new candidate, in the place past the end of the list
-static void func_020593e4(u8 id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
+static void DWCAc_StoreNewCandidate(u8 id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
     DWCAcCandidate *info = &work->infos[DWC_AC_CANDIDATE_MAX];
     WMBssDesc *dest = &work->candidates[DWC_AC_CANDIDATE_MAX];
     u16 level = bss->rssi;
@@ -199,7 +199,7 @@ static void func_020593e4(u8 id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *
 }
 
 // Refreshes a candidate with a beacon of the same access point: its signal and the tag, if the signal is stronger
-static void func_0205944c(int slot, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
+static void DWCAc_RefreshCandidate(int slot, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
     DWCAcCandidate *info = &work->infos[slot];
     WMBssDesc *dest = &work->candidates[slot];
     u16 level = bss->rssi;
@@ -215,12 +215,12 @@ static void func_0205944c(int slot, const WMBssDesc *bss, u8 tag, DWCAcSearchWor
         info->level = level;
         info->tag = tag;
     }
-    sys_memcpy32(bss, dest, sizeof(WMBssDesc));
+    MIi_CpuCopy32(bss, dest, sizeof(WMBssDesc));
 }
 
 // Moves the candidate in a place toward the front for as long as it is better than the one before, and then clears the
 // place past the end of the list
-static void func_020594d4(int slot, DWCAcSearchWork *work) {
+static void DWCAc_SortCandidates(int slot, DWCAcSearchWork *work) {
     DWCAcCandidate *infos = work->infos;
     WMBssDesc *candidates = work->candidates;
     int prev;
@@ -228,9 +228,9 @@ static void func_020594d4(int slot, DWCAcSearchWork *work) {
     for (prev = slot - 1; prev >= 0; prev--) {
         BOOL swap = FALSE;
 
-        if (work->preferWpa == 1 && func_020590cc(&candidates[slot]) == TRUE) {
+        if (work->preferWpa == 1 && DWCAc_CheckWpa(&candidates[slot]) == TRUE) {
             if (infos[slot].level < infos[prev].level) {
-                if (func_020590cc(&candidates[prev]) == FALSE) {
+                if (DWCAc_CheckWpa(&candidates[prev]) == FALSE) {
                     swap = TRUE;
                 }
             } else {
@@ -245,7 +245,7 @@ static void func_020594d4(int slot, DWCAcSearchWork *work) {
             }
         } else if (infos[slot].level >= infos[prev].level) {
             if (work->preferWpa == 1) {
-                if (func_020590cc(&candidates[prev]) == FALSE) {
+                if (DWCAc_CheckWpa(&candidates[prev]) == FALSE) {
                     swap = TRUE;
                 }
             } else {
@@ -258,23 +258,23 @@ static void func_020594d4(int slot, DWCAcSearchWork *work) {
             DWCAcCandidate tmpInfo;
             WMBssDesc tmpBss;
 
-            sys_memcpy32(&infos[prev], &tmpInfo, sizeof(DWCAcCandidate));
-            sys_memcpy32(&infos[slot], &infos[prev], sizeof(DWCAcCandidate));
-            sys_memcpy32(&tmpInfo, &infos[slot], sizeof(DWCAcCandidate));
-            sys_memcpy32(&candidates[prev], &tmpBss, sizeof(WMBssDesc));
-            sys_memcpy32(&candidates[slot], &candidates[prev], sizeof(WMBssDesc));
-            sys_memcpy32(&tmpBss, &candidates[slot], sizeof(WMBssDesc));
+            MIi_CpuCopy32(&infos[prev], &tmpInfo, sizeof(DWCAcCandidate));
+            MIi_CpuCopy32(&infos[slot], &infos[prev], sizeof(DWCAcCandidate));
+            MIi_CpuCopy32(&tmpInfo, &infos[slot], sizeof(DWCAcCandidate));
+            MIi_CpuCopy32(&candidates[prev], &tmpBss, sizeof(WMBssDesc));
+            MIi_CpuCopy32(&candidates[slot], &candidates[prev], sizeof(WMBssDesc));
+            MIi_CpuCopy32(&tmpBss, &candidates[slot], sizeof(WMBssDesc));
             slot = prev;
         }
     }
-    sys_memset32(0, &infos[DWC_AC_CANDIDATE_MAX], sizeof(DWCAcCandidate));
-    sys_memset32(0, &candidates[DWC_AC_CANDIDATE_MAX], sizeof(WMBssDesc));
+    MIi_CpuClear32(0, &infos[DWC_AC_CANDIDATE_MAX], sizeof(DWCAcCandidate));
+    MIi_CpuClear32(0, &candidates[DWC_AC_CANDIDATE_MAX], sizeof(WMBssDesc));
 }
 
-// The wireless manager's notification callback of the search: an access point that was found goes to func_02058eb0,
+// The wireless manager's notification callback of the search: an access point that was found goes to DWCAc_OnApFound,
 // and the reason that a connection failed to the work
-void func_020596c0(WCMNotice *notice) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+void DWCAc_OnWcmNotify(WCMNotice *notice) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     if (notice->notify == WCM_NOTIFY_CONNECT) {
         if (notice->result == 0) {
@@ -297,6 +297,6 @@ void func_020596c0(WCMNotice *notice) {
             break;
         }
     } else if (notice->notify == WCM_NOTIFY_FOUND_AP) {
-        func_02058eb0((const WMBssDesc *)notice->parameter);
+        DWCAc_OnApFound((const WMBssDesc *)notice->parameter);
     }
 }

@@ -6,8 +6,7 @@
 #include "nitro/pm.h"
 #include "nitro/rtc.h"
 
-// NitroSDK's wireless manager. The functions keep their default names; the comments give the SDK functions they
-// appear to be
+// NitroSDK's wireless manager. The functions have the names of the SDK functions they appear to be
 
 // The signal strength, 0 (none) to 3
 typedef enum {
@@ -17,9 +16,9 @@ typedef enum {
     WM_LINK_LEVEL_3,
 } WMLinkLevel;
 
-WMLinkLevel func_020810fc(void); // WM_GetLinkLevel
+WMLinkLevel WM_GetLinkLevel(void);
 // The next TGID for a parent, counting up from the time (swan names its state tgid_bak)
-u16 func_020812b8(void);
+u16 WM_GetNextTgid(void);
 
 // What the parent's callback gets when a child connects or disconnects, with the child's SSID and the sizes that the
 // parent and the children may send
@@ -453,110 +452,103 @@ typedef struct {
 // WM_ERRCODE_*, WM_ERRCODE_SUCCESS being 0
 // WM_Init: starts the manager in the buffer, which must be WM_SYSTEM_BUF_SIZE bytes in main memory, 32-aligned, and
 // cleared by the DMA channel dmaNo (0 to 3)
-int func_02080758(void *wmSysBuf, u16 dmaNo);
-// WM_Finish: ends the manager, which must be in the READY state
-int func_02080908(void);
-// WMi_SetCallbackTable: sets the callback of an operation
-void func_02080950(u32 apiid, WMCallbackFunc callback);
+int WM_Init(void *wmSysBuf, u16 dmaNo);
+// Ends the manager, which must be in the READY state
+int WM_Finish(void);
+// Sets the callback of an operation
+void WMi_SetCallbackTable(u32 apiid, WMCallbackFunc callback);
 // WMi_SendCommand: puts a command in a buffer, with paramNum more arguments (words) as its parameters, and sends it to
 // the ARM7. WM_ERRCODE_OPERATING if sent, FIFO_ERROR if no buffer is free or the FIFO is full
 int WMi_SendCommand(u16 apiid, u16 paramNum, ...);
 // The same, with the command already made: size bytes at cmd
 int WMi_SendCommandDirect(const void *cmd, u32 size);
-// WMi_GetSystemWork: the ARM9 part of the buffer, NULL before WM_Init
-WMArm9Buf *func_02080a64(void);
-// WMi_CheckInitialized: WM_ERRCODE_ILLEGAL_STATE until WM_Init has been called
-int func_02080a70(void);
-// WMi_CheckIdle: WM_ERRCODE_ILLEGAL_STATE if the manager is in the READY or STOP state
-int func_02080a84(void);
-// WMi_CheckStateEx: SUCCESS if the manager is in one of the paramNum states that follow, else ILLEGAL_STATE
-int func_02080ab0(int paramNum, ...);
-// WMi_GetStatusAddress: the status that the ARM7 keeps, NULL before WM_Init
-void *func_02080dbc(void);
+// The ARM9 part of the buffer, NULL before WM_Init
+WMArm9Buf *WMi_GetSystemWork(void);
+// WM_ERRCODE_ILLEGAL_STATE until WM_Init has been called
+int WMi_CheckInitialized(void);
+// WM_ERRCODE_ILLEGAL_STATE if the manager is in the READY or STOP state
+int WMi_CheckIdle(void);
+// SUCCESS if the manager is in one of the paramNum states that follow, else ILLEGAL_STATE
+int WMi_CheckStateEx(int paramNum, ...);
+// The status that the ARM7 keeps, NULL before WM_Init
+void *WMi_GetStatusAddress(void);
 // WMi_GetMyAid and WMi_GetConnectedAidBitmap: this console's AID and the AIDs connected, as the last connection
 // event left them
-u16 func_02080dd8(void);
-u16 func_02080dfc(void);
-// WMi_RegisterSleepCallback: ends the program if the console goes to sleep, till WMi_DeleteSleepCallback
-void func_02080e24(void);
-void func_02080e48(void);
+u16 WMi_GetMyAid(void);
+u16 WMi_GetConnectedAidBitmap(void);
+// Ends the program if the console goes to sleep, till WMi_DeleteSleepCallback
+void WMi_RegisterSleepCallback(void);
+void WMi_DeleteSleepCallback(void);
 // Whether wireless is usable: on a DSi, when it is available and not disabled by force. TRUE on a DS
-BOOL func_02080e60(void);
+BOOL WMi_IsWirelessAvailable(void);
 // wm_common.c: WM_CheckInitialized, the same as WMi_CheckInitialized
-int func_020825e4(void);
+int WM_CheckInitialized(void);
 // NWM_CheckInitialized: ILLEGAL_STATE on a DS, and on a DSi what the DSi's code says about the wireless it is running
 // on
-int func_020825ec(void);
+int NWM_CheckInitialized(void);
 
 // wm_sync.c
-int func_02080e7c(WMCallbackFunc callback);                      // WM_SetIndCallback
-int func_02080eac(u16 port, WMCallbackFunc callback, void *arg); // WM_SetPortCallback
-// WM_ReadStatus: copies the status (0x7d0 bytes)
-int func_02080f40(WMStatus *statusBuf);
-int func_02080f74(void); // WM_GetMPSendBufferSize
-int func_02080fbc(void); // WM_GetMPReceiveBufferSize
-u16 func_020810cc(void); // WM_GetAllowedChannel
-u16 func_0208115c(void); // WM_GetDispersionBeaconPeriod
-u16 func_020811a4(void); // WM_GetDispersionScanPeriod
+int WM_SetIndCallback(WMCallbackFunc callback);
+int WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg);
+// Copies the status (0x7d0 bytes)
+int WM_ReadStatus(WMStatus *statusBuf);
+int WM_GetMPSendBufferSize(void);
+int WM_GetMPReceiveBufferSize(void);
+u16 WM_GetAllowedChannel(void);
+u16 WM_GetDispersionBeaconPeriod(void);
+u16 WM_GetDispersionScanPeriod(void);
 // wm_standard.c
-int func_020812fc(WMCallbackFunc callback);                         // WM_Enable
-int func_02081348(WMCallbackFunc callback);                         // WM_Disable
-int func_02081370(WMCallbackFunc callback);                         // WM_PowerOn
-int func_02081398(WMCallbackFunc callback);                         // WM_PowerOff
-int func_020813c4(void *wmBuf, WMCallbackFunc callback, u16 dmaNo); // WM_Initialize
+int WM_Enable(WMCallbackFunc callback);
+int WM_Disable(WMCallbackFunc callback);
+int WM_PowerOn(WMCallbackFunc callback);
+int WM_PowerOff(WMCallbackFunc callback);
+int WM_Initialize(void *wmBuf, WMCallbackFunc callback, u16 dmaNo);
 // Like WM_Initialize, with a fourth argument that changes the flags to the ARM7: bit 1 is set when it is 0
-int func_020813d0(void *wmBuf, WMCallbackFunc callback, u16 dmaNo, int extra);
-int func_02081424(WMCallbackFunc callback);                       // WM_Reset
-int func_02081448(WMCallbackFunc callback);                       // WM_End
-int func_02081474(WMCallbackFunc callback, WMParentParam *param); // WM_SetParentParameter
+int WM_InitializeForListening(void *wmBuf, WMCallbackFunc callback, u16 dmaNo, int extra);
+int WM_Reset(WMCallbackFunc callback);
+int WM_End(WMCallbackFunc callback);
+int WM_SetParentParameter(WMCallbackFunc callback, WMParentParam *param);
 // The data that a child sent in a round of the multi-point mode, or NULL
-const WMMpRecvData *func_02081040(const WMMpRecvBuf *recvBuf, u16 aid);
-// WM_GetOtherElements: the elements of a beacon that are not the game's, if it has no game information
-WMOtherElements func_020811ec(const WMBssDesc *bssDesc);
+const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid);
+// The elements of a beacon that are not the game's, if it has no game information
+WMOtherElements WM_GetOtherElements(const WMBssDesc *bssDesc);
 // The calls that start the parent: apiids 8 and 0x19, each with a flag. The first is WMi_StartParentEx
-int func_02081544(WMCallbackFunc callback, int enable);
-int func_0208252c(WMCallbackFunc callback, int enable);
-int func_02081594(WMCallbackFunc callback);                       // WM_StartParent
-int func_020815a0(WMCallbackFunc callback);                       // WM_EndParent
-int func_020815c8(WMCallbackFunc callback, WMScanExParam *param); // WM_StartScanEx
-int func_020816b4(WMCallbackFunc callback);                       // WM_EndScan
-// WM_StartMPEx: like WM_StartMP, with five more parameters
-int func_020818f8(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
-                  u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
-                  BOOL ignoreFatalError);
-// WM_StartConnectEx
-int func_020816dc(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave, u16 authMode);
-int func_02081774(WMCallbackFunc callback, u16 aid); // WM_Disconnect
-// WM_StartMP
-int func_0208195c(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq);
-// WM_SetMPDataToPortEx
-int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap, u16 port,
-                  u16 prio);
-int func_02081a68(WMCallbackFunc callback); // WM_EndMP
-// WM_StartDCF: starts the DCF mode of a child, with the buffer that it receives into
-int func_02081ab0(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize);
+int WMi_StartParentEx(WMCallbackFunc callback, int enable);
+int WM_SetBeaconIndication(WMCallbackFunc callback, int enable);
+int WM_StartParent(WMCallbackFunc callback);
+int WM_EndParent(WMCallbackFunc callback);
+int WM_StartScanEx(WMCallbackFunc callback, WMScanExParam *param);
+int WM_EndScan(WMCallbackFunc callback);
+// Like WM_StartMP, with five more parameters
+int WM_StartMPEx(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
+                 u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
+                 BOOL ignoreFatalError);
+int WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave, u16 authMode);
+int WM_Disconnect(WMCallbackFunc callback, u16 aid);
+int WM_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq);
+int WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap,
+                         u16 port, u16 prio);
+int WM_EndMP(WMCallbackFunc callback);
+// Starts the DCF mode of a child, with the buffer that it receives into
+int WM_StartDCF(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize);
 // WM_SetDCFData: queues a DCF transmission to the six-byte destination address; buffer remains borrowed until
 // completion
-int func_02081b18(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength);
-int func_02081b94(WMCallbackFunc callback); // WM_EndDCF
-// WM_StartDataSharing
-int func_02081bd8(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode);
-int func_02081dbc(WMDataSharingInfo *dsi);                                            // WM_EndDataSharing
-int func_02081df0(WMDataSharingInfo *dsi, const void *data, WMDataSet *dataSet);      // WM_StepDataSharing
-void *func_020823ac(const WMDataSharingInfo *dsi, const WMDataSet *dataSet, u16 aid); // WM_GetSharedDataAddress
+int WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength);
+int WM_EndDCF(WMCallbackFunc callback);
+int WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode);
+int WM_EndDataSharing(WMDataSharingInfo *dsi);
+int WM_StepDataSharing(WMDataSharingInfo *dsi, const void *data, WMDataSet *dataSet);
+void *WM_GetSharedDataAddress(const WMDataSharingInfo *dsi, const WMDataSet *dataSet, u16 aid);
 // wm_ks.c: the sharing of the keys of every console, two bytes each, in the double mode
-int func_02082408(WMDataSharingInfo *dsi, u16 port); // WM_StartKeySharing
-int func_0208241c(WMDataSharingInfo *dsi);           // WM_EndKeySharing
+int WM_StartKeySharing(WMDataSharingInfo *dsi, u16 port);
+int WM_EndKeySharing(WMDataSharingInfo *dsi);
 // wm_etc.c
-// WM_SetWEPKey: mode 0 (off) to 3, with a key of 0x50 bytes unless it is off
-int func_02082424(WMCallbackFunc callback, u16 wepMode, const void *wepKey);
-// WM_SetWEPKeyEx: like WM_SetWEPKey, with the number of the key to use
-int func_02082470(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey);
-// WM_SetGameInfo
-int func_020824bc(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr);
-// WM_SetLifeTime
-int func_02082560(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime);
-// WM_MeasureChannel
-int func_0208259c(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime);
+// Mode 0 (off) to 3, with a key of 0x50 bytes unless it is off
+int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey);
+// Like WM_SetWEPKey, with the number of the key to use
+int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey);
+int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr);
+int WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime);
+int WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime);
 
 #endif // POKEBW2_NITRO_WM_H

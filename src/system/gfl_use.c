@@ -33,7 +33,7 @@
 // The size of heap 9, which a DS takes from the main arena's OS heap and a DSi from heap 1
 #define EXTRA_HEAP_SIZE 0x3f00
 
-// The bits of the console type (func_0207ac24) that have a failed assert show its message
+// The bits of the console type (OS_GetConsoleType) that have a failed assert show its message
 #define CONSOLE_TYPE_DEBUG_MASK 0x81000000
 
 typedef struct {
@@ -106,13 +106,13 @@ static GFLUseWork *sWork;
 
 void GFLAppInit(void) {
     if (!hw_isDSi()) {
-        void *end = GetUserMemRegionEnd(OS_ARENA_MAIN);
-        void *start = GetUserMemRegionStart(OS_ARENA_MAIN);
+        void *end = OS_GetArenaHi(OS_ARENA_MAIN);
+        void *start = OS_GetArenaLo(OS_ARENA_MAIN);
 
-        start = mem_init_alloc_area(OS_ARENA_MAIN, start, end, 1);
-        SetUserMemRegionStart(OS_ARENA_MAIN, start);
-        sOSHeap = mem_bind_static_ram_alloc(OS_ARENA_MAIN);
-        sExtraHeapMemory = malloc_device(OS_ARENA_MAIN, sOSHeap, EXTRA_HEAP_SIZE);
+        start = OS_InitAlloc(OS_ARENA_MAIN, start, end, 1);
+        OS_SetArenaLo(OS_ARENA_MAIN, start);
+        sOSHeap = OS_CreateExtraHeap(OS_ARENA_MAIN);
+        sExtraHeapMemory = OS_AllocFromHeap(OS_ARENA_MAIN, sOSHeap, EXTRA_HEAP_SIZE);
     }
 
     if (hw_isDSi()) {
@@ -131,7 +131,7 @@ void GFLAppInit(void) {
     initTableArea(0);
     GFL_ArcSysInit(NARC_PATH_LIST, ARC_PATH_COUNT);
     GFL_HIDInit(0, 0);
-    if (func_0207ac24() & CONSOLE_TYPE_DEBUG_MASK) {
+    if (OS_GetConsoleType() & CONSOLE_TYPE_DEBUG_MASK) {
         GFL_DebugSetVerboseAssertHandlers();
     } else {
         GFL_DebugSetAssertHandlers(NULL, NULL, finishFunc);

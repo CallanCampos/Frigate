@@ -2,7 +2,7 @@
 // commands that it runs itself when its hook leaves them to it (the default commands, on the tables), the functions
 // of its interface that run them, and the functions that set such an archive up and load its tables into memory. The
 // file name is a guess from NitroSDK's own layout (fs_command.c and fs_rom.c); no string in the ROM names it. The
-// functions are under swan's names, with NitroSDK's in their comments.
+// functions have NitroSDK's names where they are known.
 
 #include "nitro/card.h"
 #include "nitro/fs.h"
@@ -34,7 +34,7 @@ typedef struct FSDirTableEntry {
 
 static FSResult fs_call_filecmd(FSFile *file, u32 command, BOOL blocking);
 static void *func_02071ff8(const FSArchive *arc, u32 offset);
-static BOOL func_02072000(const FSArchive *arc);
+static BOOL FS_IsArchiveTableLoaded(const FSArchive *arc);
 
 // Reads length bytes of the archive's tables at the reader's position, and moves the position on. The tables are read
 // through the archive's read function, or copied from memory once they were loaded into it
@@ -44,11 +44,11 @@ static FSResult func_0207130c(FSTableReader *reader, void *buffer, u32 length) {
     FSResult result;
 
     if (tables->loadedMemory != NULL) {
-        sys_memcpy((void *)reader->position, buffer, length);
+        MI_CpuCopy8((void *)reader->position, buffer, length);
         result = FS_RESULT_SUCCESS;
     } else {
         result = tables->readFunc(arc, buffer, reader->position, length);
-        result = func_02070130(arc->list, result);
+        result = FSi_WaitForArchiveCompletion(arc->list, result);
     }
     reader->position += length;
     return result;
@@ -172,7 +172,7 @@ static FSResult func_02071468(FSFile *file) {
     for (; *path != '\0'; path += (*path != '\0') ? 1 : 0) {
         char c;
 
-        length = func_02070bfc(path, 0);
+        length = FSi_IncrementSjisPositionToSlash(path, 0);
         wantDirectory = TRUE;
         if (path[length] == '\0' && isDirectory == FALSE) {
             wantDirectory = FALSE;
@@ -247,7 +247,7 @@ static FSResult func_020715d0(FSFile *file) {
     FSDirEntry entry;
     FSFile dir;
 
-    finit(&dir);
+    FS_InitFile(&dir);
     dir.arc = arc;
     if (FS_IsDir(file)) {
         dirId = file->body.dir.pos.dirId;
@@ -283,7 +283,7 @@ static FSResult func_020715d0(FSFile *file) {
         return FS_RESULT_NO_ENTRY;
     }
     child = dirId;
-    length = NNS_STD_StrLen(func_02070a24(arc)) + 2;
+    length = STD_GetStringLength(FS_GetArchiveName(arc)) + 2;
     func_02071340(&dir, dirId);
     if (fileId != FS_NO_ID) {
         length += entry.nameLength;
@@ -312,11 +312,11 @@ static FSResult func_020715d0(FSFile *file) {
         if (args->length >= pathLength) {
             int pos = 0;
 
-            name = func_02070a24(arc);
-            length = NNS_STD_StrLen(name);
-            sys_memcpy(name, buffer + pos, length);
+            name = FS_GetArchiveName(arc);
+            length = STD_GetStringLength(name);
+            MI_CpuCopy8(name, buffer + pos, length);
             pos += length;
-            sys_memcpy(":/", buffer + pos, 2);
+            MI_CpuCopy8(":/", buffer + pos, 2);
             func_02071340(&dir, dirId);
             if (fileId != FS_NO_ID) {
                 dir.arg.readDirectory.entry = &entry;
@@ -330,7 +330,7 @@ static FSResult func_020715d0(FSFile *file) {
                 }
                 // fileId has done its work, and holds the size of the name
                 fileId = entry.nameLength + 1;
-                sys_memcpy(entry.name, buffer + pathLength - fileId, fileId);
+                MI_CpuCopy8(entry.name, buffer + pathLength - fileId, fileId);
                 pathLength -= fileId;
             } else {
                 *(buffer + pathLength - 1) = '\0';
@@ -348,7 +348,7 @@ static FSResult func_020715d0(FSFile *file) {
                             if (entry.isDirectory && entry.id.dir.dirId == dirId) {
                                 // dirId is set again below, and holds the length of the name until then
                                 dirId = entry.nameLength;
-                                sys_memcpy(entry.name, buffer + pathLength - dirId, dirId);
+                                MI_CpuCopy8(entry.name, buffer + pathLength - dirId, dirId);
                                 pathLength -= dirId;
                                 break;
                             }
@@ -460,7 +460,7 @@ static FSResult fs_call_filecmd(FSFile *file, u32 command, BOOL blocking) {
         }
     }
     if (blocking) {
-        result = func_02070130(file, result);
+        result = FSi_WaitForArchiveCompletion(file, result);
     }
     return result;
 }
@@ -528,7 +528,7 @@ static FSResult func_020719c8(FSArchive *arc, FSFile *file, FSDirectoryEntryInfo
     if (result == FS_RESULT_SUCCESS) {
         info->shortnameLength = 0;
         info->longnameLength = entry.nameLength;
-        sys_memcpy(entry.name, info->longname, info->longnameLength);
+        MI_CpuCopy8(entry.name, info->longname, info->longnameLength);
         info->longname[info->longnameLength] = '\0';
         if (entry.isDirectory) {
             info->attributes = FS_ATTRIBUTE_IS_DIRECTORY;
@@ -551,7 +551,7 @@ static FSResult func_020719c8(FSArchive *arc, FSFile *file, FSDirectoryEntryInfo
                 reader.position = tables->fat + offset;
                 if (func_0207130c(&reader, &fat, sizeof(fat)) == FS_RESULT_SUCCESS) {
                     info->filesize = fat.bottom - fat.top;
-                    if (func_02072130(arc, fat.top)) {
+                    if (FSi_IsDsiOnlyRomOffset(arc, fat.top)) {
                         info->attributes |= FS_ATTRIBUTE_IS_PROTECTED;
                     }
                 }
@@ -574,7 +574,7 @@ static FSResult func_02071aac(FSArchive *arc, u32 baseDirId, const char *path, u
     FSEntryId id;
     FSResult result;
 
-    finit(&file);
+    FS_InitFile(&file);
     file.arg.findPath.start.dirId = baseDirId;
     file.arg.findPath.start.fileId = 0;
     file.arg.findPath.start.position = 0;
@@ -660,7 +660,7 @@ static FSResult func_02071b90(FSArchive *arc, FSFile *file) {
 static void func_02071bac(FSArchive *arc) {
     FSFile file;
 
-    finit(&file);
+    FS_InitFile(&file);
     file.arc = arc;
     fs_call_filecmd(&file, FS_COMMAND_ACTIVATE, FALSE);
 }
@@ -668,7 +668,7 @@ static void func_02071bac(FSArchive *arc) {
 static void func_02071bcc(FSArchive *arc) {
     FSFile file;
 
-    finit(&file);
+    FS_InitFile(&file);
     file.arc = arc;
     fs_call_filecmd(&file, FS_COMMAND_IDLE, FALSE);
 }
@@ -676,7 +676,7 @@ static void func_02071bcc(FSArchive *arc) {
 static void func_02071bec(FSArchive *arc) {
     FSFile file;
 
-    finit(&file);
+    FS_InitFile(&file);
     file.arc = arc;
     fs_call_filecmd(&file, FS_COMMAND_SUSPEND, FALSE);
 }
@@ -684,7 +684,7 @@ static void func_02071bec(FSArchive *arc) {
 static void func_02071c0c(FSArchive *arc) {
     FSFile file;
 
-    finit(&file);
+    FS_InitFile(&file);
     file.arc = arc;
     fs_call_filecmd(&file, FS_COMMAND_RESUME, FALSE);
 }
@@ -747,7 +747,7 @@ static FSResult func_02071ca0(FSArchive *arc, FSFile *file, u32 *position) {
 static void func_02071cb0(FSArchive *arc) {
     FSArchiveTables *tables = arc->userdata;
 
-    func_02072000(arc);
+    FS_IsArchiveTableLoaded(arc);
     tables->base = 0;
     tables->fat = 0;
     tables->fatSize = 0;
@@ -786,7 +786,7 @@ static FSResult func_02071d14(FSArchive *arc, u32 baseDirId, const char *path, F
     u32 id = 0;
     FSResult result = FS_RESULT_ERROR;
 
-    sys_memset(info, 0, sizeof(*info));
+    MI_CpuFill8(info, 0, sizeof(*info));
     if (func_02071aac(arc, baseDirId, path, &id, TRUE) == FS_RESULT_SUCCESS) {
         info->attributes = FS_ATTRIBUTE_IS_DIRECTORY;
         info->id = id;
@@ -808,7 +808,7 @@ static FSResult func_02071d14(FSArchive *arc, u32 baseDirId, const char *path, F
             reader.position = tables->fat + offset;
             if (func_0207130c(&reader, &fat, sizeof(fat)) == FS_RESULT_SUCCESS) {
                 info->filesize = fat.bottom - fat.top;
-                if (func_02072130(arc, fat.top)) {
+                if (FSi_IsDsiOnlyRomOffset(arc, fat.top)) {
                     info->attributes |= FS_ATTRIBUTE_IS_PROTECTED;
                 }
             }
@@ -821,7 +821,7 @@ static FSResult func_02071d14(FSArchive *arc, u32 baseDirId, const char *path, F
 
 // FS_COMMAND_GETARCHIVERESOURCE of the interface: the archive is the ROM, as big as the ROM header says
 static FSResult func_02071dc0(FSArchive *arc, FSArchiveResource *resource) {
-    const ROMHeader *header = func_0206eed8();
+    const ROMHeader *header = CARD_GetRomHeader();
 
     resource->unk_20[0] = 0;
     resource->unk_20[1] = 0;
@@ -863,19 +863,19 @@ static const FSArchiveInterface FS_VTABLE_BASE = {
 
 // The default functions to read and write an archive: it is in memory, at the base
 static FSResult func_02071df0(FSArchive *arc, void *buffer, u32 position, u32 length) {
-    sys_memcpy(func_02071ff8(arc, position), buffer, length);
+    MI_CpuCopy8(func_02071ff8(arc, position), buffer, length);
     return FS_RESULT_SUCCESS;
 }
 
 static FSResult func_02071e08(FSArchive *arc, const void *buffer, u32 position, u32 length) {
-    sys_memcpy(buffer, func_02071ff8(arc, position), length);
+    MI_CpuCopy8(buffer, func_02071ff8(arc, position), length);
     return FS_RESULT_SUCCESS;
 }
 
 // NitroSDK's FS_LoadArchive: gives an archive its tables, in the storage at the base or in memory, and the functions
 // to read and write it (the defaults for NULL), and mounts it
-BOOL fs_bind(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FSReadFunc readFunc,
-             FSWriteFunc writeFunc) {
+BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FSReadFunc readFunc,
+                    FSWriteFunc writeFunc) {
     FSArchiveTables *tables = &arc->tables;
 
     tables->base = base;
@@ -888,12 +888,12 @@ BOOL fs_bind(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSiz
     tables->readFunc = readFunc != NULL ? readFunc : func_02071df0;
     tables->writeFunc = writeFunc != NULL ? writeFunc : func_02071e08;
     tables->loadedMemory = NULL;
-    return func_02070a30(arc, tables, &FS_VTABLE_BASE);
+    return FS_MountArchive(arc, tables, &FS_VTABLE_BASE);
 }
 
 // NitroSDK's FS_UnloadArchive: unmounts the archive
-BOOL func_02071e6c(FSArchive *arc) {
-    return func_02070a5c(arc);
+BOOL FS_UnloadArchive(FSArchive *arc) {
+    return FS_UnmountArchive(arc);
 }
 
 // The length of a file whose archive has this interface, without sending a command to the archive. Returns whether
@@ -922,7 +922,7 @@ BOOL func_02071e9c(FSFile *file, u32 *position) {
 }
 
 // NitroSDK's FS_SetArchiveProc: sets the hook, and the commands that it is run for; neither goes without the other
-void func_02071ec4(FSArchive *arc, FSProc proc, u32 procMask) {
+void FS_SetArchiveProc(FSArchive *arc, FSProc proc, u32 procMask) {
     FSArchiveTables *tables = &arc->tables;
 
     if (procMask == 0) {
@@ -936,33 +936,33 @@ void func_02071ec4(FSArchive *arc, FSProc proc, u32 procMask) {
 
 // NitroSDK's FS_LoadArchiveTables: copies the tables into the memory (aligned up to 32 bytes) and keeps reading them
 // from there. Returns the size of memory they need, and loads them only if the memory has that much
-u32 func_02071edc(FSArchive *arc, void *memory, u32 memorySize) {
+u32 FS_LoadArchiveTables(FSArchive *arc, void *memory, u32 memorySize) {
     FSArchiveTables *tables;
     u32 size;
     u32 aligned;
     FSFile file;
 
-    if (memory != NULL && func_02072000(arc)) {
-        func_02071fa0(arc);
+    if (memory != NULL && FS_IsArchiveTableLoaded(arc)) {
+        FS_UnloadArchiveTables(arc);
     }
     tables = arc->userdata;
     size = (tables->fatSize + tables->fntSize + 0x3f) & ~0x1f;
     if (size <= memorySize) {
         aligned = ((u32)memory + 0x1f) & ~0x1f;
-        finit(&file);
-        if (fopen_raw(&file, arc, tables->fat, tables->fat + tables->fatSize, -1)) {
-            if (romfs_fread(&file, (void *)aligned, tables->fatSize) < 0) {
-                sys_memset((void *)aligned, 0, tables->fatSize);
+        FS_InitFile(&file);
+        if (FS_OpenFileDirect(&file, arc, tables->fat, tables->fat + tables->fatSize, -1)) {
+            if (FS_ReadFile(&file, (void *)aligned, tables->fatSize) < 0) {
+                MI_CpuFill8((void *)aligned, 0, tables->fatSize);
             }
-            romfs_fclose(&file);
+            FS_CloseFile(&file);
         }
         tables->fat = aligned;
         aligned += tables->fatSize;
-        if (fopen_raw(&file, arc, tables->fnt, tables->fnt + tables->fntSize, -1)) {
-            if (romfs_fread(&file, (void *)aligned, tables->fntSize) < 0) {
-                sys_memset((void *)aligned, 0, tables->fntSize);
+        if (FS_OpenFileDirect(&file, arc, tables->fnt, tables->fnt + tables->fntSize, -1)) {
+            if (FS_ReadFile(&file, (void *)aligned, tables->fntSize) < 0) {
+                MI_CpuFill8((void *)aligned, 0, tables->fntSize);
             }
-            romfs_fclose(&file);
+            FS_CloseFile(&file);
         }
         tables->fnt = aligned;
         tables->loadedMemory = memory;
@@ -972,14 +972,14 @@ u32 func_02071edc(FSArchive *arc, void *memory, u32 memorySize) {
 }
 
 // NitroSDK's FS_UnloadArchiveTables: reads the tables from the storage again, and returns the memory they were in
-void *func_02071fa0(FSArchive *arc) {
+void *FS_UnloadArchiveTables(FSArchive *arc) {
     void *memory = NULL;
 
     if (FS_IsArchiveMounted(arc)) {
         FSArchiveTables *tables = arc->userdata;
-        BOOL suspended = func_02070ad4(arc);
+        BOOL suspended = FS_SuspendArchive(arc);
 
-        if (func_02072000(arc)) {
+        if (FS_IsArchiveTableLoaded(arc)) {
             arc->flag &= ~FS_ARCHIVE_FLAG_TABLE_LOADED;
             memory = tables->loadedMemory;
             tables->fat = tables->fatBackup;
@@ -987,14 +987,13 @@ void *func_02071fa0(FSArchive *arc) {
             tables->loadedMemory = NULL;
         }
         if (suspended) {
-            func_02070b44(arc);
+            FS_ResumeArchive(arc);
         }
     }
     return memory;
 }
 
-// NitroSDK's FS_GetArchiveBase
-u32 func_02071ff0(const FSArchive *arc) {
+u32 FS_GetArchiveBase(const FSArchive *arc) {
     FSArchiveTables *tables = arc->userdata;
 
     return tables->base;
@@ -1007,11 +1006,10 @@ static void *func_02071ff8(const FSArchive *arc, u32 offset) {
     return (void *)(tables->base + offset);
 }
 
-// NitroSDK's FS_IsArchiveTableLoaded
-static BOOL func_02072000(const FSArchive *arc) {
+static BOOL FS_IsArchiveTableLoaded(const FSArchive *arc) {
     return (arc->flag & FS_ARCHIVE_FLAG_TABLE_LOADED) != 0;
 }
 
-u32 func_02072010(const FSFile *file) {
+u32 FS_GetFileImageTop(const FSFile *file) {
     return file->body.file.top;
 }

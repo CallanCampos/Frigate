@@ -180,7 +180,7 @@ static void PdcMain_InitGraphics(HeapID heapId) {
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
     G3X_AntiAlias(TRUE);
-    gfxSetFog(FALSE, 0, 0, 0);
+    G3X_SetFog(FALSE, 0, 0, 0);
     G2_SetBG0Priority(1);
     ClActSys_Create(&sClActSysSetup, &sVRAMConfig, heapId);
     GFL_BGSysSet3DBGPriority(1);
@@ -393,7 +393,7 @@ static u32 PdcMain_ProcLeave(PdcMain *work) {
 
 // Fades in from black, or from white if the screens were white
 static void PdcMain_FadeIn(u32 slowness) {
-    if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR) <= 0) {
+    if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) <= 0) {
         GFL_FadeSet(3, 16, 0, slowness);
     } else {
         GFL_FadeSet(12, 16, 0, slowness);

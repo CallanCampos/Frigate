@@ -44,9 +44,9 @@ int func_0205dbc0(void) {
     if (sSettingsOffset != -1) {
         return 0;
     }
-    func_020791fc();
+    NVRAM_Init();
     result = 0;
-    cp15_invalidateDC(sVersionBuffer, sizeof(sVersionBuffer));
+    DC_InvalidateRange(sVersionBuffer, sizeof(sVersionBuffer));
     // A header that can't be read ends it all: the second read is skipped
     do {
         if (func_0205dee8(NVRAM_ADDRESS_VERSION, sizeof(sVersionBuffer), sVersionBuffer) == 0) {
@@ -55,7 +55,7 @@ int func_0205dbc0(void) {
             result = -1;
             break;
         }
-        cp15_invalidateDC(sUserSettingsBuffer, sizeof(sUserSettingsBuffer));
+        DC_InvalidateRange(sUserSettingsBuffer, sizeof(sUserSettingsBuffer));
         if (func_0205dee8(NVRAM_ADDRESS_USER_SETTINGS, sizeof(sUserSettingsBuffer), sUserSettingsBuffer) == 0) {
             sSettingsOffset = sUserSettingsBuffer[0] * 8 - NVRAM_WIFI_SETTINGS_SIZE;
         } else {
@@ -93,7 +93,7 @@ int func_0205dca4(void *dst, u32 size, u32 page) {
     if (pageSize > size) {
         pageSize = size;
     }
-    cp15_invalidateDC(dst, pageSize);
+    DC_InvalidateRange(dst, pageSize);
     if (func_0205dee8(address, pageSize, dst) == 0) {
         return pageSize;
     }
@@ -118,7 +118,7 @@ int func_0205dd40(u32 page, const void *src, u32 size) {
         if (pageSize > size) {
             pageSize = size;
         }
-        cp15_cleanDC(src, pageSize);
+        DC_StoreRange(src, pageSize);
         result = -1;
         for (tries = 0; tries < NVRAM_WRITE_TRIES; tries++) {
             int verify;
@@ -176,12 +176,12 @@ static int func_0205dee8(u32 address, u16 size, void *buf) {
     int tries;
 
     for (tries = 0; tries < NVRAM_TRIES; tries++) {
-        result = func_02079354(address, size, buf);
+        result = NVRAM_ReadDataBytes(address, size, buf);
         if (result != NVRAM_RESULT_BUSY) {
             break;
         }
-        if (clock_is_inited() && OS_IsAlarmAvailable()) {
-            func_0207aa04(1);
+        if (OS_IsTickAvailable() && OS_IsAlarmAvailable()) {
+            OS_Sleep(1);
         }
     }
     return result;
@@ -192,12 +192,12 @@ static int func_0205df50(u32 address, u16 size, const void *src) {
     int tries;
 
     for (tries = 0; tries < NVRAM_TRIES; tries++) {
-        result = func_020796b4(address, size, src);
+        result = NVRAM_WriteDataBytes(address, size, src);
         if (result != NVRAM_RESULT_BUSY) {
             break;
         }
-        if (clock_is_inited() && OS_IsAlarmAvailable()) {
-            func_0207aa04(1);
+        if (OS_IsTickAvailable() && OS_IsAlarmAvailable()) {
+            OS_Sleep(1);
         }
     }
     return result;
@@ -208,12 +208,12 @@ static int func_0205dfb8(u32 address, u16 size, const void *src) {
     int tries;
 
     for (tries = 0; tries < NVRAM_TRIES; tries++) {
-        result = func_020798a4(address, size, src);
+        result = NVRAM_VerifyDataBytes(address, size, src);
         if (result != NVRAM_RESULT_BUSY) {
             break;
         }
-        if (clock_is_inited() && OS_IsAlarmAvailable()) {
-            func_0207aa04(1);
+        if (OS_IsTickAvailable() && OS_IsAlarmAvailable()) {
+            OS_Sleep(1);
         }
     }
     return result;

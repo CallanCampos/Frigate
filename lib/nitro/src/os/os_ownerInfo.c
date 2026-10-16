@@ -10,9 +10,8 @@ static const u16 OSi_FavoriteColorTable[16] = {
     0x1e80, 0x4769, 0x7ae6, 0x7960, 0x4800, 0x6811, 0x741a, 0x481f,
 };
 
-// NitroSDK's OS_GetMacAddress
-void func_0207c33c(u8 *macAddress) {
-    sys_memcpy(((NVRAMConfig *)HW_NVRAM_USER_INFO)->macAddress, macAddress, 6);
+void OS_GetMacAddress(u8 *macAddress) {
+    MI_CpuCopy8(((NVRAMConfig *)HW_NVRAM_USER_INFO)->macAddress, macAddress, 6);
 }
 
 // NitroSDK's OS_GetOwnerInfo
@@ -38,7 +37,6 @@ s64 OS_GetOwnerRtcOffset(void) {
     return config->rtcOffset;
 }
 
-// NitroSDK's OS_GetFavoriteColorTable
-const u16 *func_0207c3b4(void) {
+const u16 *OS_GetFavoriteColorTable(void) {
     return OSi_FavoriteColorTable;
 }

@@ -168,7 +168,7 @@ void InfinityDungeonGimmick_Setup(Field *field) {
     HeapID heapId = Field_GetHeapID(field);
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     InfinityDungeonGimmick *gimmick = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(InfinityDungeonGimmick));
-    sys_memset(gimmick, 0, sizeof(InfinityDungeonGimmick));
+    MI_CpuFill8(gimmick, 0, sizeof(InfinityDungeonGimmick));
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
     InfinityDungeonGimmick_Init(gimmick, field, keyData, func_02017220(gameData));
     gimmick->dungeon =
@@ -269,7 +269,7 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
 }
 
 static void InfinityDungeonGimmick_Init(InfinityDungeonGimmick *gimmick, Field *field, KeyDataSave *keyData, u16 a3) {
-    sys_memset(gimmick, 0, INIT_CLEAR_SIZE);
+    MI_CpuFill8(gimmick, 0, INIT_CLEAR_SIZE);
     gimmick->field = field;
     gimmick->zoneId = Field_GetPlayerStateZoneID(field);
     gimmick->expObjSystem = Field_GetExpObjSystem(gimmick->field);
@@ -590,7 +590,7 @@ static void InfinityDungeonGimmick_SetupDungeon(InfinityDungeon *dungeon, GameDa
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
     u16 version = func_02017220(gameData);
 
-    sys_memset(dungeon, 0, sizeof(InfinityDungeon));
+    MI_CpuFill8(dungeon, 0, sizeof(InfinityDungeon));
     if (version == 0) {
         dungeon->version = VERSION_BLACK2;
     } else {

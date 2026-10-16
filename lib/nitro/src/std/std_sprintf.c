@@ -1,8 +1,7 @@
 // TwlSDK's libstd, formatted text (std/common/src/std_sprintf.c): the printf family. They all end in one formatter,
 // which writes into a buffer of limited size and goes on counting when it is full. It knows the flags blank, plus,
 // minus and zero, a width and a precision (each a number or * from the arguments), h, hh, l and ll, and the
-// conversions c, s, d, i, u, o, x, X, p and %. The symbols keep their default names for now, and the comments give
-// the SDK's.
+// conversions c, s, d, i, u, o, x, X, p and %. The names are the SDK's.
 #include "nitro/std.h"
 
 // The flags of a conversion
@@ -28,12 +27,11 @@ typedef struct StringBuffer {
     char *start;
 } StringBuffer;
 
-static void func_02080070(StringBuffer *str, char c);
-static void func_02080088(StringBuffer *str, char c, int len);
-static void func_020800b8(StringBuffer *str, const char *src, int len);
+static void string_put_char(StringBuffer *str, char c);
+static void string_fill_char(StringBuffer *str, char c, int len);
+static void string_put_string(StringBuffer *str, const char *src, int len);
 
-// string_put_char
-static void func_02080070(StringBuffer *str, char c) {
+static void string_put_char(StringBuffer *str, char c) {
     if (str->len != 0) {
         *str->dst = c;
         str->len--;
@@ -41,8 +39,7 @@ static void func_02080070(StringBuffer *str, char c) {
     str->dst++;
 }
 
-// string_fill_char
-static void func_02080088(StringBuffer *str, char c, int len) {
+static void string_fill_char(StringBuffer *str, char c, int len) {
     if (len > 0) {
         u32 i;
         u32 n = str->len;
@@ -58,8 +55,7 @@ static void func_02080088(StringBuffer *str, char c, int len) {
     }
 }
 
-// string_put_string
-static void func_020800b8(StringBuffer *str, const char *src, int len) {
+static void string_put_string(StringBuffer *str, const char *src, int len) {
     if (len > 0) {
         u32 i;
         u32 n = str->len;
@@ -75,30 +71,27 @@ static void func_020800b8(StringBuffer *str, const char *src, int len) {
     }
 }
 
-// STD_TSPrintf
-int func_020800e8(char *dst, const char *fmt, ...) {
+int STD_TSPrintf(char *dst, const char *fmt, ...) {
     va_list args;
     int length;
 
     va_start(args, fmt);
-    length = OS_VSNPrintf(dst, 0x7fffffff, fmt, args);
+    length = STD_TVSNPrintf(dst, 0x7fffffff, fmt, args);
     va_end(args);
     return length;
 }
 
-// STD_TSNPrintf
-int OS_SNPrintf(char *dst, u32 len, const char *fmt, ...) {
+int STD_TSNPrintf(char *dst, u32 len, const char *fmt, ...) {
     va_list args;
     int length;
 
     va_start(args, fmt);
-    length = OS_VSNPrintf(dst, len, fmt, args);
+    length = STD_TVSNPrintf(dst, len, fmt, args);
     va_end(args);
     return length;
 }
 
-// STD_TVSNPrintf
-int OS_VSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
+int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
     char prefix[2];
     char digits[24];
     StringBuffer str;
@@ -119,14 +112,14 @@ int OS_VSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
         int zeros;
 
         if (STD_IS_LEAD_BYTE(*fmt)) {
-            func_02080070(&str, *fmt++);
+            string_put_char(&str, *fmt++);
             if (*fmt != '\0') {
-                func_02080070(&str, *fmt++);
+                string_put_char(&str, *fmt++);
             }
             continue;
         }
         if (*fmt != '%') {
-            func_02080070(&str, *fmt++);
+            string_put_char(&str, *fmt++);
             continue;
         }
 
@@ -238,11 +231,11 @@ int OS_VSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
                 int c = va_arg(args, int);
 
                 if (flags & STD_PRINTF_LEFT) {
-                    func_02080070(&str, c);
-                    func_02080088(&str, ' ', width - 1);
+                    string_put_char(&str, c);
+                    string_fill_char(&str, ' ', width - 1);
                 } else {
-                    func_02080088(&str, (flags & STD_PRINTF_ZERO) ? '0' : ' ', width - 1);
-                    func_02080070(&str, c);
+                    string_fill_char(&str, (flags & STD_PRINTF_ZERO) ? '0' : ' ', width - 1);
+                    string_put_char(&str, c);
                 }
                 fmt++;
                 continue;
@@ -263,24 +256,24 @@ int OS_VSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
             }
             width -= n;
             if (flags & STD_PRINTF_LEFT) {
-                func_020800b8(&str, s, n);
-                func_02080088(&str, ' ', width);
+                string_put_string(&str, s, n);
+                string_fill_char(&str, ' ', width);
             } else {
-                func_02080088(&str, (flags & STD_PRINTF_ZERO) ? '0' : ' ', width);
-                func_020800b8(&str, s, n);
+                string_fill_char(&str, (flags & STD_PRINTF_ZERO) ? '0' : ' ', width);
+                string_put_string(&str, s, n);
             }
             fmt++;
             continue;
         }
         case '%':
             if (percent + 1 == fmt) {
-                func_02080070(&str, *fmt++);
+                string_put_char(&str, *fmt++);
                 continue;
             }
         default:
         literal:
             // What is not a conversion is written as it is, up to the character that stopped it, which is read again
-            func_020800b8(&str, percent, fmt - percent);
+            string_put_string(&str, percent, fmt - percent);
             continue;
         case 'x':
         hex:
@@ -406,17 +399,17 @@ int OS_VSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
         width -= prefixLen + numDigits;
 
         if (!(flags & STD_PRINTF_LEFT)) {
-            func_02080088(&str, ' ', width);
+            string_fill_char(&str, ' ', width);
         }
         while (prefixLen > 0) {
-            func_02080070(&str, prefix[--prefixLen]);
+            string_put_char(&str, prefix[--prefixLen]);
         }
-        func_02080088(&str, '0', zeros);
+        string_fill_char(&str, '0', zeros);
         while (numDigits > 0) {
-            func_02080070(&str, digits[--numDigits]);
+            string_put_char(&str, digits[--numDigits]);
         }
         if (flags & STD_PRINTF_LEFT) {
-            func_02080088(&str, ' ', width);
+            string_fill_char(&str, ' ', width);
         }
         fmt++;
     }

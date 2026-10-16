@@ -123,7 +123,7 @@ BOOL GSyncDownload_SetAttr(GSyncDownload *dl, const char *attr1, int attr2) {
     char buf[20];
 
     dl->done = FALSE;
-    OS_SNPrintf(buf, sizeof(buf), "%d", attr2);
+    STD_TSNPrintf(buf, sizeof(buf), "%d", attr2);
     if (DWC_NdSetAttr(attr1, buf, "")) {
         result = TRUE;
     }

@@ -239,13 +239,13 @@ static GFLNetErrWork g_GflNetErr;
 
 void GFL_NetHeapInit(void) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_NET, NET_HEAP_SIZE);
-    sys_memset(&g_GflNetErr, 0, sizeof(GFLNetErrWork));
+    MI_CpuFill8(&g_GflNetErr, 0, sizeof(GFLNetErrWork));
 }
 
 void GFL_NetErrInit(u32 heapId) {
     GFLNetErrWork *work = &g_GflNetErr;
 
-    sys_memset(work, 0, sizeof(GFLNetErrWork));
+    MI_CpuFill8(work, 0, sizeof(GFLNetErrWork));
     work->charBuf = GFL_HeapAllocate(heapId, SAVED_CHAR_SIZE, FALSE, "net_err.c", 188);
     work->screenBuf = GFL_HeapAllocate(heapId, SAVED_SCREEN_SIZE, FALSE, "net_err.c", 189);
     work->plttBuf = GFL_HeapAllocate(heapId, SAVED_PLTT_SIZE, FALSE, "net_err.c", 190);
@@ -332,14 +332,14 @@ void func_02011d98(void) {
 void func_02011da4(void) {
     GFLNetErrWork *work = &g_GflNetErr;
 
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, work->brightness);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
 }
 
 static void func_02011dc8(void) {
     if (func_02042788() == TRUE) {
         func_020428e0();
-        irq_waitFor(TRUE, OS_IE_V_BLANK);
+        OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     }
 }
 
@@ -357,7 +357,7 @@ void func_02011de0(void) {
     }
     GFL_SndStop();
     GFL_NetErrDispInit(FALSE, FALSE);
-    gfxSetVBlankIRQEnabled(TRUE);
+    GX_VBlankIntr(TRUE);
     func_0203e84c();
     if (func_0203e8b0() == 1) {
         G2_SetWndOutsidePlane(GX_WND_PLANEMASK_BG1, FALSE);
@@ -382,7 +382,7 @@ void func_02011de0(void) {
     GFL_NetErrRestore(g_GflNetErr.keepDark == TRUE ? TRUE : FALSE);
     func_0203e860();
     if (func_0203e8b0() == 2) {
-        gfxSetBGModeB(subDispCnt.bgMode);
+        GXS_SetGraphicsMode(subDispCnt.bgMode);
         GXS_SetVisiblePlane(subDispCnt.visiblePlane);
         GXS_SetVisibleWnd(subDispCnt.visibleWnd);
         G2S_SetWndOutsidePlane(subOutside.planeMask, subOutside.effect);
@@ -487,7 +487,7 @@ BOOL func_02012154(void) {
             }
             func_02042918();
             GFL_NetErrGameUpdate();
-            irq_waitFor(TRUE, OS_IE_V_BLANK);
+            OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         } while (!func_020427a4());
     }
     return TRUE;
@@ -518,8 +518,8 @@ static BOOL GFL_NetErrShowCore(u32 fatal) {
             GFL_NetErrAbortCore();
         }
         if (wifi == TRUE) {
-            work->hBlankIrq = gfxSetHBlankIRQEnabled(FALSE);
-            work->vBlankIrq = gfxSetVBlankIRQEnabled(FALSE);
+            work->hBlankIrq = GX_HBlankIntr(FALSE);
+            work->vBlankIrq = GX_VBlankIntr(FALSE);
             GFL_NetErrDispMessage(fatal, FALSE);
         } else {
             GFL_NetErrDispInit(fatal, FALSE);
@@ -546,19 +546,19 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
     if (!GFL_NetErrIsReady()) {
         return;
     }
-    work->brightness = gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR);
-    work->subBrightness = gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    work->brightness = GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR);
+    work->subBrightness = GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     if (!disconnecting) {
-        work->hBlankIrq = gfxSetHBlankIRQEnabled(FALSE);
-        work->vBlankIrq = gfxSetVBlankIRQEnabled(FALSE);
+        work->hBlankIrq = GX_HBlankIntr(FALSE);
+        work->vBlankIrq = GX_VBlankIntr(FALSE);
     }
-    work->bgBanks = gfxAcquireBGBanksA();
-    work->subBgBanks = gfxAcquireBGBanksB();
-    gfxSetBGBanksA(GX_VRAM_BG_128_C);
+    work->bgBanks = GX_ResetBankForBG();
+    work->subBgBanks = GX_ResetBankForSubBG();
+    GX_SetBankForBG(GX_VRAM_BG_128_C);
     work->dispCnt = GX_GetDispCnt();
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     GX_SetVisiblePlane(GX_PLANEMASK_BG1);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     work->subVisibleWnd = GXS_GetVisibleWnd();
@@ -569,8 +569,8 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
     G2_BG1Mosaic(FALSE);
     G2_SetBG1Offset(0, 0);
     if (work->netType != NET_ERR_TYPE_ASSERT) {
-        MI_CpuCopy16(gfxGetCharAddrBG1A(), work->charBuf, SAVED_CHAR_SIZE);
-        MI_CpuCopy16(gfxGetScreenAddrBG1A(), work->screenBuf, SAVED_SCREEN_SIZE);
+        MI_CpuCopy16(G2_GetBG1CharPtr(), work->charBuf, SAVED_CHAR_SIZE);
+        MI_CpuCopy16(G2_GetBG1ScrPtr(), work->screenBuf, SAVED_SCREEN_SIZE);
         MI_CpuCopy16((void *)HW_BG_PLTT, work->plttBuf, SAVED_PLTT_SIZE);
     }
     work->blend = reg_G2_BLDCNT;
@@ -593,8 +593,8 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
         loadErrorBackground(ERROR_WINDOW_NET);
         GFL_NetErrDispMessage(fatal, disconnecting);
     }
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
 }
 
 // Puts back what the screens showed
@@ -606,34 +606,34 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     if (!GFL_NetErrIsReady()) {
         return;
     }
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     *(u16 *)HW_DB_BG_PLTT = work->subBackdrop;
     GFL_BGSysSetEnabledBGsB(work->subEnabledBGs);
     reg_G2_BLDCNT = work->blend;
     reg_G2S_DB_BLDCNT = work->subBlend;
-    MI_CpuCopy16(work->charBuf, gfxGetCharAddrBG1A(), SAVED_CHAR_SIZE);
-    MI_CpuCopy16(work->screenBuf, gfxGetScreenAddrBG1A(), SAVED_SCREEN_SIZE);
+    MI_CpuCopy16(work->charBuf, G2_GetBG1CharPtr(), SAVED_CHAR_SIZE);
+    MI_CpuCopy16(work->screenBuf, G2_GetBG1ScrPtr(), SAVED_SCREEN_SIZE);
     MI_CpuCopy16(work->plttBuf, (void *)HW_BG_PLTT, SAVED_PLTT_SIZE);
     G2_SetBG1Control(work->bg1Control.screenSize, work->bg1Control.colorMode, work->bg1Control.screenBase,
                      work->bg1Control.charBase, work->bg1Control.bgExtPltt);
     G2_BG1Mosaic(work->bg1Control.mosaic);
     func_02042eec(&x, &y);
     G2_SetBG1Offset(x, y);
-    gfxSetEngineModeA(work->dispCnt.dispMode, work->dispCnt.bgMode, work->dispCnt.bg0_2d3d);
+    GX_SetGraphicsMode(work->dispCnt.dispMode, work->dispCnt.bgMode, work->dispCnt.bg0_2d3d);
     GX_SetVisiblePlane(work->dispCnt.visiblePlane);
     GX_SetVisibleWnd(work->dispCnt.visibleWnd);
     GXS_SetVisibleWnd(work->subVisibleWnd);
-    gfxAcquireBGBanksB();
-    gfxAcquireBGBanksA();
-    gfxSetBGBanksA(work->bgBanks);
-    gfxSetBGBanksB(work->subBgBanks);
-    gfxSetHBlankIRQEnabled(work->hBlankIrq);
-    gfxSetVBlankIRQEnabled(work->vBlankIrq);
-    irq_waitFor(TRUE, OS_IE_V_BLANK);
+    GX_ResetBankForSubBG();
+    GX_ResetBankForBG();
+    GX_SetBankForBG(work->bgBanks);
+    GX_SetBankForSubBG(work->subBgBanks);
+    GX_HBlankIntr(work->hBlankIrq);
+    GX_VBlankIntr(work->vBlankIrq);
+    OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     if (!keepDark) {
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, work->brightness);
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
     }
 }
 
@@ -653,27 +653,27 @@ static void loadErrorBackground(int window) {
     NNSG2dPaletteCompressInfo *compressInfo;
     u32 arcId;
 
-    sys_memset32(0, gfxGetCharAddrBG1A(), SAVED_CHAR_SIZE);
+    MIi_CpuClear32(0, G2_GetBG1CharPtr(), SAVED_CHAR_SIZE);
 
     arcId = FATAL_ERROR_G2D_RESIDS[window].arcId;
     file = GFL_ArcSysReadHeapNewLZ(arcId, FATAL_ERROR_G2D_RESIDS[window].charId, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
-        cp15_flushDC(chars->rawData, chars->size);
-        MI_CpuCopy16(chars->rawData, gfxGetCharAddrBG1A(), chars->size);
+        DC_FlushRange(chars->rawData, chars->size);
+        MI_CpuCopy16(chars->rawData, G2_GetBG1CharPtr(), chars->size);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(arcId, FATAL_ERROR_G2D_RESIDS[window].screenId, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
-        cp15_flushDC(screen->rawData, screen->size);
-        MI_CpuCopy16(screen->rawData, gfxGetScreenAddrBG1A(), screen->size);
+        DC_FlushRange(screen->rawData, screen->size);
+        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->size);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(arcId, FATAL_ERROR_G2D_RESIDS[window].plttId, FALSE, HEAPID_USER);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
-        cp15_flushDC(palette->rawData, SAVED_PLTT_SIZE);
+        DC_FlushRange(palette->rawData, SAVED_PLTT_SIZE);
         MI_CpuCopy16(palette->rawData, (void *)HW_BG_PLTT, SAVED_PLTT_SIZE);
     }
     GFL_HeapFree(file);
@@ -723,7 +723,7 @@ static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting) {
     StrBuf *src;
     StrBuf *str;
 
-    screen = gfxGetScreenAddrBG1A();
+    screen = G2_GetBG1ScrPtr();
     tile = FIRST_TEXT_TILE;
     for (y = TEXT_TOP; y < TEXT_TOP + TEXT_HEIGHT; y++) {
         for (x = TEXT_LEFT; x < TEXT_LEFT + TEXT_WIDTH; x++) {
@@ -731,9 +731,9 @@ static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting) {
             tile++;
         }
     }
-    sys_memset16(TEXT_BACKGROUND * 0x1111, (u8 *)gfxGetCharAddrBG1A() + FIRST_TEXT_TILE * TILE_SIZE,
-                 TEXT_WIDTH * TEXT_HEIGHT * TILE_SIZE);
-    bitmap = GFL_BitmapWrapVRAM((u8 *)gfxGetCharAddrBG1A() + FIRST_TEXT_TILE * TILE_SIZE, TEXT_WIDTH, TEXT_HEIGHT,
+    MIi_CpuClear16(TEXT_BACKGROUND * 0x1111, (u8 *)G2_GetBG1CharPtr() + FIRST_TEXT_TILE * TILE_SIZE,
+                   TEXT_WIDTH * TEXT_HEIGHT * TILE_SIZE);
+    bitmap = GFL_BitmapWrapVRAM((u8 *)G2_GetBG1CharPtr() + FIRST_TEXT_TILE * TILE_SIZE, TEXT_WIDTH, TEXT_HEIGHT,
                                 TILE_SIZE, HEAPID_USER);
     wordSet = GFL_WordSetSystemCreateDefault(HEAPID_USER);
     font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_USER);

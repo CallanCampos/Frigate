@@ -97,7 +97,7 @@ static BOOL MonolithPowerInfo_Init(GameProc *proc, u32 *state, void *param, void
     switch (*state) {
     case 0:
         piw = GFL_ProcInitSubsystem(proc, sizeof(MonolithPowerInfoWork), HEAPID_MONOLITH);
-        sys_memset(piw, 0, sizeof(MonolithPowerInfoWork));
+        MI_CpuFill8(piw, 0, sizeof(MonolithPowerInfoWork));
         piw->shownPower = HIGH_LINK_POWER_NONE;
         MonolithPowerInfo_CreateBGs();
         MonolithPowerInfo_LoadGraphics(screen->work);

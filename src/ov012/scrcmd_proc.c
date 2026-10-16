@@ -251,7 +251,7 @@ BOOL func_ov012_02157814(VM *vm, FieldScriptEnv *env) {
     param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MonolithParam), TRUE, "scrcmd_proc.c", 444);
     saveBytes = param->powerFlags;
     highLink = getHighLinkBlockAddress(GameData_GetSaveControl(gameData));
-    sys_memset(saveBytes, 0, sizeof(param->powerFlags));
+    MI_CpuFill8(saveBytes, 0, sizeof(param->powerFlags));
     func_0200c6d8(highLink, saveBytes, 2);
     saveBytes[2] = 1;
     param->unk31 = 0;

@@ -19,7 +19,7 @@ void WF2DMAP_SCRContSysMain(WF2DMAP_SCROLL *scroll, const WF2DMAP_OBJWK *wk) {
 }
 
 void WF2DMAP_SCROLLSysDataInit(WF2DMAP_SCROLL *scroll) {
-    sys_memset(scroll, 0, sizeof(WF2DMAP_SCROLL));
+    MI_CpuFill8(scroll, 0, sizeof(WF2DMAP_SCROLL));
 }
 
 void WF2DMAP_SCROLLSysDataSet(WF2DMAP_SCROLL *scroll, s16 top, s16 left) {

@@ -33,7 +33,7 @@ static void MedalInfo_SetDate(MedalInfo *info, u8 year, u8 month, u8 day) {
 }
 
 void MedalBox_Init(MedalBox *box) {
-    sys_memset(box, 0, sizeof(MedalBox));
+    MI_CpuFill8(box, 0, sizeof(MedalBox));
     box->lastMedal = 0xff;
     func_02010ca0(MedalBox_GetHabitatList(box));
 }

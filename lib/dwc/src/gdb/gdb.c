@@ -145,7 +145,7 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     }
     if (!func_ov011_0215f9e0(&ticket)) {
         Gdb_Printf(282, "DWCi_GetLoginTicket failed.\n");
-        func_020584cc(8, Gdb_GetErrorCode(1, 4));
+        DWCi_SetError(8, Gdb_GetErrorCode(1, 4));
         return 4;
     }
     func_ov011_0216c77c();
@@ -255,7 +255,7 @@ void Gdb_Update(void) {
 }
 
 int Gdb_GetState(void) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return 4;
     }
     return sGdb.state;
@@ -379,15 +379,15 @@ static void Gdb_Printf(int line, const char *format, ...) {
     int length;
     va_list args;
 
-    length = func_0207a2c0(buffer, sizeof(buffer), "Gdb[%d]> ", line);
+    length = OS_SNPrintf(buffer, sizeof(buffer), "Gdb[%d]> ", line);
     va_start(args, format);
-    func_0207a2dc(buffer + length, sizeof(buffer) - length, format, args);
+    OS_VSNPrintf(buffer + length, sizeof(buffer) - length, format, args);
     va_end(args);
 }
 
 static BOOL Gdb_CheckReady(int *error) {
-    if (func_020584b0()) {
-        Gdb_Printf(1384, "in dwc error.[%d]\n", func_02058390(0));
+    if (DWCi_IsError()) {
+        Gdb_Printf(1384, "in dwc error.[%d]\n", DWC_GetLastError(0));
         if (error != NULL) {
             *error = 0x16;
         }
@@ -583,7 +583,7 @@ static int Gdb_SetStartupError(int sakeError) {
 
     if (error != 0) {
         Gdb_Printf(1755, "DWCGdbError[%d]\n", error);
-        func_020584cc(type, Gdb_GetErrorCode(1, error));
+        DWCi_SetError(type, Gdb_GetErrorCode(1, error));
     }
     return error;
 }
@@ -594,7 +594,7 @@ static int Gdb_SetRequestError(int operation, int sakeError) {
 
     if (error != 0) {
         Gdb_Printf(1772, "DWCGdbError[%d]\n", error);
-        func_020584cc(type, Gdb_GetErrorCode(operation, error));
+        DWCi_SetError(type, Gdb_GetErrorCode(operation, error));
     }
     return error;
 }
@@ -667,7 +667,7 @@ static int Gdb_SetResultError(int operation, int sakeResult) {
 
     if (error != 1) {
         Gdb_Printf(1883, "DWCGdbAsyncResult[%d]\n", error);
-        func_020584cc(type, Gdb_GetResultErrorCode(operation, error));
+        DWCi_SetError(type, Gdb_GetResultErrorCode(operation, error));
     }
     return error;
 }
@@ -692,28 +692,28 @@ static void Gdb_SetUrls(int server) {
 
     switch (server) {
     case 1:
-        func_0207a2c0(gSakeStorageUrl, 128,
-                      "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(gSakeStorageUrl, 128,
+                    "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
-        func_0207a2c0(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(uploadUrl);
-        func_0207a2c0(downloadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(downloadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     case 0:
     default:
-        func_0207a2c0(gSakeStorageUrl, 128,
-                      "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(gSakeStorageUrl, 128,
+                    "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
-        func_0207a2c0(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(uploadUrl);
-        func_0207a2c0(downloadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
-                      data_ov011_021917bc);
+        OS_SNPrintf(downloadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
+                    data_ov011_021917bc);
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     }

@@ -3,5 +3,5 @@
 #include "nitro/pxi.h"
 
 void PXI_Init(void) {
-    func_0207c954();
+    PXI_InitFifo();
 }

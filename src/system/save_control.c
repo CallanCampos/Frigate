@@ -27,7 +27,7 @@
 // GFLib's GFL_STD_MemCopy, an inline over the copy. SaveControl_Create reads the destination before the call that
 // gives the source only through it
 static inline void GFL_STD_MemCopy(const void *src, void *dest, u32 size) {
-    sys_memcpy(src, dest, size);
+    MI_CpuCopy8(src, dest, size);
 }
 
 static void func_020076d0(void);

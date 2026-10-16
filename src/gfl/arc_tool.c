@@ -54,8 +54,8 @@ static void GFL_ArcSysReadImpl(void *dest, u32 arcId, u32 fileId, u32 offset, u3
 
     GFL_ArcSysInitArcHandle(&file, arcId);
     size = ArchiveMoveImageTop(&file, fileId, offset, size);
-    romfs_fread(&file, dest, size);
-    romfs_fclose(&file);
+    FS_ReadFile(&file, dest, size);
+    FS_CloseFile(&file);
 }
 
 static void *GFL_ArcSysReadHeapNewImpl(u32 arcId, u32 fileId, HeapID heapId, u32 offset, u32 size) {
@@ -66,20 +66,20 @@ static void *GFL_ArcSysReadHeapNewImpl(u32 arcId, u32 fileId, HeapID heapId, u32
     GFL_ArcSysInitArcHandle(&file, arcId);
     dataSize = ArchiveMoveImageTop(&file, fileId, offset, size);
     data = GFL_HeapAllocate(heapId, dataSize, FALSE, "arc_tool.c", 187);
-    romfs_fread(&file, data, dataSize);
-    romfs_fclose(&file);
+    FS_ReadFile(&file, data, dataSize);
+    FS_CloseFile(&file);
     return data;
 }
 
 static void GFL_ArcSysInitArcHandle(FSFile *file, u32 arcId) {
-    finit(file);
+    FS_InitFile(file);
     if (!sArcSys.inMemory) {
-        romfs_fopen(file, ((const char **)sArcSys.table)[arcId]);
+        FS_OpenFile(file, ((const char **)sArcSys.table)[arcId]);
     } else {
         u32 size = ((const NarcFATBEntry *)sArcSys.table)[arcId].end;
 
         size -= ((const NarcFATBEntry *)sArcSys.table)[arcId].start;
-        extfs_fopen(file, (const void *)((const NarcFATBEntry *)sArcSys.table)[arcId].start, size);
+        FS_CreateFileFromMemory(file, (const void *)((const NarcFATBEntry *)sArcSys.table)[arcId].start, size);
     }
 }
 
@@ -92,20 +92,20 @@ static u32 ArchiveMoveImageTop(FSFile *file, u32 fileId, u32 offset, u32 size) {
     u32 fntbOffset;
     u32 fatbOffset;
 
-    romfs_fseek(file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(file, &value, 2);
+    FS_SeekFile(file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(file, &value, 2);
     fatbOffset = value;
-    romfs_fseek(file, fatbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(file, &fatb, 6);
+    FS_SeekFile(file, fatbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(file, &fatb, 6);
     GFL_ASSERT_MSG(fatb.fileCount > fileId, "ArchiveMoveImageTop fileCnt=%d, datID=%d", fatb.fileCount, fileId);
     fntbOffset = fatbOffset + fatb.size;
-    romfs_fseek(file, fntbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(file, &value, 4);
+    FS_SeekFile(file, fntbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(file, &value, 4);
     fimgOffset = fntbOffset + value;
-    romfs_fseek(file, fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry), FS_SEEK_SET);
-    romfs_fread(file, &entry, sizeof(NarcFATBEntry));
+    FS_SeekFile(file, fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry), FS_SEEK_SET);
+    FS_ReadFile(file, &entry, sizeof(NarcFATBEntry));
     fimgOffset += NARC_FIMG_DATA_OFFSET;
-    romfs_fseek(file, offset + (fimgOffset + entry.start), FS_SEEK_SET);
+    FS_SeekFile(file, offset + (fimgOffset + entry.start), FS_SEEK_SET);
     if (size == 0) {
         size = entry.end - entry.start;
     }
@@ -133,12 +133,12 @@ void *GFL_ArcSysReadHeapNewDirect(const char *path, u32 fileId, HeapID heapId) {
     u32 size;
     void *data;
 
-    finit(&file);
-    romfs_fopen(&file, path);
+    FS_InitFile(&file);
+    FS_OpenFile(&file, path);
     size = ArchiveMoveImageTop(&file, fileId, 0, 0);
     data = GFL_HeapAllocate(heapId, size, FALSE, "arc_tool.c", 386);
-    romfs_fread(&file, data, size);
-    romfs_fclose(&file);
+    FS_ReadFile(&file, data, size);
+    FS_CloseFile(&file);
     return data;
 }
 
@@ -148,11 +148,11 @@ u32 GFL_ArcSysGetDataMax(u32 arcId) {
     NarcFATBHeader fatb;
 
     GFL_ArcSysInitArcHandle(&file, arcId);
-    romfs_fseek(&file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(&file, &value, 2);
-    romfs_fseek(&file, value + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(&file, &fatb, 6);
-    romfs_fclose(&file);
+    FS_SeekFile(&file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(&file, &value, 2);
+    FS_SeekFile(&file, value + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(&file, &fatb, 6);
+    FS_CloseFile(&file);
     return fatb.fileCount;
 }
 
@@ -162,7 +162,7 @@ u32 GFL_ArcSysGetDataLength(u32 arcId, u32 fileId) {
 
     GFL_ArcSysInitArcHandle(&file, arcId);
     size = ArchiveMoveImageTop(&file, fileId, 0, 0);
-    romfs_fclose(&file);
+    FS_CloseFile(&file);
     return size;
 }
 
@@ -177,8 +177,8 @@ ArcTool *GFL_ArcSysCreateFileHandle(u32 arcId, HeapID heapId) {
 ArcTool *GFL_ArcSysCreateMemoryHandle(const void *data, u32 size, HeapID heapId) {
     ArcTool *handle = GFL_HeapAllocate(heapId, sizeof(ArcTool), FALSE, "arc_tool.c", 543);
 
-    finit(&handle->file);
-    extfs_fopen(&handle->file, data, size);
+    FS_InitFile(&handle->file);
+    FS_CreateFileFromMemory(&handle->file, data, size);
     GFL_ArcToolInit(handle);
     return handle;
 }
@@ -189,19 +189,19 @@ static void GFL_ArcToolInit(ArcTool *handle) {
     u32 fntbOffset;
 
     handle->fatbOffset = 0;
-    romfs_fseek(&handle->file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(&handle->file, &handle->fatbOffset, 2);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(&handle->file, &fatb, 6);
+    FS_SeekFile(&handle->file, NARC_HEADER_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(&handle->file, &handle->fatbOffset, 2);
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(&handle->file, &fatb, 6);
     handle->fileCount = fatb.fileCount;
     fntbOffset = handle->fatbOffset + fatb.size;
-    romfs_fseek(&handle->file, fntbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
-    romfs_fread(&handle->file, &fntbSize, 4);
+    FS_SeekFile(&handle->file, fntbOffset + NARC_BLOCK_SIZE_OFFSET, FS_SEEK_SET);
+    FS_ReadFile(&handle->file, &fntbSize, 4);
     handle->fimgOffset = fntbOffset + fntbSize;
 }
 
 void GFL_ArcToolFree(ArcTool *handle) {
-    romfs_fclose(&handle->file);
+    FS_CloseFile(&handle->file);
     GFL_HeapFree(handle);
 }
 
@@ -210,13 +210,13 @@ void *GFL_ArcToolReadHeapNew(ArcTool *handle, u32 fileId, HeapID heapId) {
     void *data;
 
     GFL_ASSERT_MSG(handle->fileCount > fileId, "DatCount=%d, DatID=%d", handle->fileCount, fileId);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
                 FS_SEEK_SET);
-    romfs_fread(&handle->file, &entry, sizeof(NarcFATBEntry));
-    romfs_fseek(&handle->file, handle->fimgOffset + NARC_FIMG_DATA_OFFSET + entry.start, FS_SEEK_SET);
+    FS_ReadFile(&handle->file, &entry, sizeof(NarcFATBEntry));
+    FS_SeekFile(&handle->file, handle->fimgOffset + NARC_FIMG_DATA_OFFSET + entry.start, FS_SEEK_SET);
     data = GFL_HeapAllocate(heapId, entry.end - entry.start, FALSE, "arc_tool.c", 619);
     if (data != NULL) {
-        romfs_fread(&handle->file, data, entry.end - entry.start);
+        FS_ReadFile(&handle->file, data, entry.end - entry.start);
     }
     return data;
 }
@@ -225,20 +225,20 @@ void GFL_ArcToolRead(ArcTool *handle, u32 fileId, void *dest) {
     NarcFATBEntry entry;
 
     GFL_ASSERT_MSG(handle->fileCount > fileId, "DatCount=%d, DatID=%d", handle->fileCount, fileId);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
                 FS_SEEK_SET);
-    romfs_fread(&handle->file, &entry, sizeof(NarcFATBEntry));
-    romfs_fseek(&handle->file, handle->fimgOffset + NARC_FIMG_DATA_OFFSET + entry.start, FS_SEEK_SET);
-    romfs_fread(&handle->file, dest, entry.end - entry.start);
+    FS_ReadFile(&handle->file, &entry, sizeof(NarcFATBEntry));
+    FS_SeekFile(&handle->file, handle->fimgOffset + NARC_FIMG_DATA_OFFSET + entry.start, FS_SEEK_SET);
+    FS_ReadFile(&handle->file, dest, entry.end - entry.start);
 }
 
 u32 GFL_ArcToolGetDataLength(ArcTool *handle, u32 fileId) {
     NarcFATBEntry entry;
 
     GFL_ASSERT_MSG(handle->fileCount > fileId, "DatCount=%d, DatID=%d", handle->fileCount, fileId);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
                 FS_SEEK_SET);
-    romfs_fread(&handle->file, &entry, sizeof(NarcFATBEntry));
+    FS_ReadFile(&handle->file, &entry, sizeof(NarcFATBEntry));
     return entry.end - entry.start;
 }
 
@@ -246,20 +246,20 @@ void GFL_ArcToolReadRange(ArcTool *handle, u32 fileId, u32 offset, u32 size, voi
     u32 start;
 
     GFL_ASSERT_MSG(handle->fileCount > fileId, "DatCount=%d, DatID=%d", handle->fileCount, fileId);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
                 FS_SEEK_SET);
-    romfs_fread(&handle->file, &start, 4);
-    romfs_fseek(&handle->file, offset + (handle->fimgOffset + NARC_FIMG_DATA_OFFSET + start), FS_SEEK_SET);
-    romfs_fread(&handle->file, dest, size);
+    FS_ReadFile(&handle->file, &start, 4);
+    FS_SeekFile(&handle->file, offset + (handle->fimgOffset + NARC_FIMG_DATA_OFFSET + start), FS_SEEK_SET);
+    FS_ReadFile(&handle->file, dest, size);
 }
 
 void GFL_ArcToolCopyDataOfs(ArcTool *handle, u32 fileId, u32 *offset) {
     u32 start;
 
     GFL_ASSERT_MSG(handle->fileCount > fileId, "DatCount=%d, DatID=%d", handle->fileCount, fileId);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
                 FS_SEEK_SET);
-    romfs_fread(&handle->file, &start, 4);
+    FS_ReadFile(&handle->file, &start, 4);
     *offset = handle->fimgOffset + NARC_FIMG_DATA_OFFSET + start;
 }
 
@@ -267,18 +267,18 @@ u32 GFL_ArcToolGetDataOfs(ArcTool *handle, u32 fileId) {
     u32 start;
 
     GFL_ASSERT_MSG(handle->fileCount > fileId, "DatCount=%d, DatID=%d", handle->fileCount, fileId);
-    romfs_fseek(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
+    FS_SeekFile(&handle->file, handle->fatbOffset + NARC_FATB_ENTRIES_OFFSET + fileId * sizeof(NarcFATBEntry),
                 FS_SEEK_SET);
-    romfs_fread(&handle->file, &start, 4);
+    FS_ReadFile(&handle->file, &start, 4);
     return handle->fimgOffset + NARC_FIMG_DATA_OFFSET + start;
 }
 
 void GFL_ArcToolReadRaw(ArcTool *handle, u32 size, void *dest) {
-    romfs_fread(&handle->file, dest, size);
+    FS_ReadFile(&handle->file, dest, size);
 }
 
 void GFL_ArcToolSeek(ArcTool *handle, u32 offset) {
-    romfs_fseek(&handle->file, offset, FS_SEEK_SET);
+    FS_SeekFile(&handle->file, offset, FS_SEEK_SET);
 }
 
 u32 GFL_ArcToolGetDataMax(ArcTool *handle) {

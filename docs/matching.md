@@ -247,8 +247,8 @@ Same instructions, registers swapped.
   bytes off with `int ownStartX = ownStart[0].x;` above it.
 - A variable assigned in a branch before that branch's call is live across the call and takes a callee-saved
   register in every branch; assigned after the call it sits in `r0` per branch and is copied at the join.
-  `fest_mission_sparkle_place.c`'s `FestSparklePlace_AddZone` has `index = 5;` before its `sys_memcpy`
-  (`movs r6, #5; blx sys_memcpy`), which also puts `index * 12` in `r7`.
+  `fest_mission_sparkle_place.c`'s `FestSparklePlace_AddZone` has `index = 5;` before its `MI_CpuCopy8`
+  (`movs r6, #5; blx MI_CpuCopy8`), which also puts `index * 12` in `r7`.
 - A struct copied as a loop of halfwords (`movs r1, #0xa; ldrh; strh; subs; bne`) is a 2-aligned type, with no member
   wider than 2 bytes. `ZoneBGEntity` holds its `s32` grid coordinates as `u16 grid[6]`, read through a cast, which is
   also why overlay 12's readers only matched through pointer locals; with it `FestSparklePlace_PickPlaces` and
@@ -363,12 +363,12 @@ Same instructions, registers swapped.
   `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
   constant locals, inline helpers and loops did not reproduce it.
 - A register argument or a loop counter that takes its 0 from another variable's stack slot
-  (`ldr r1, [sp, #0x20]` for `sys_memset`'s 0, and for `i = 0`) where the original has `movs r1, #0`: an earlier
+  (`ldr r1, [sp, #0x20]` for `MI_CpuFill8`'s 0, and for `i = 0`) where the original has `movs r1, #0`: an earlier
   statement nested a call in another call's arguments. `WbtDownloadNetBG_Load` wrote
   `GFL_G2DIOLoadNSCRSync(arc, 6, 4, 0, (u16)GFL_BGSysLoadArcNCGRDynamic(...), 0, FALSE, heapId);` three times; with
   the inner call's result in a local first (`chars = GFL_BGSysLoadArcNCGRDynamic(...);` then the call with
   `(u16)chars`) the zeros stored for the stack arguments still come from the hoisted `count = 0` slot, as in the
-  original, but the later `sys_memset(…, 0, …)` and `for (i = 0; …)` of the inlined code build their own. Where
+  original, but the later `MI_CpuFill8(…, 0, …)` and `for (i = 0; …)` of the inlined code build their own. Where
   `count` is declared or set, its type, and the shape of the inline changed nothing.
 - A store written in each branch of an `if` is the extra use that wins a register for a member-pointer local. The
   battle party list's `BPlistObj_LoadPokeIconRes` has `u32 *res = wk->charRes;` before its loop and writes
@@ -388,7 +388,7 @@ Same instructions, registers swapped.
   `s16 pal;` declared before its other locals and assigned after their initializers (4 bytes short before). In the
   same file `BChoiceMain_UpdateCursor` passes `(u32)index * 2` for x and `index * 2 + 1` for y, the mixed signedness
   of `PkwdRecordMonitor_UpdateListMarks`, and `BChoiceMain_CreateActors` declares
-  `int i` first but zeroes it in a plain `for` after the `sys_memset`: the stack slot follows the declaration, the
+  `int i` first but zeroes it in a plain `for` after the `MI_CpuFill8`: the stack slot follows the declaration, the
   store the statement.
 - A result variable that shares a saved register with another local across a call must not be assigned before that
   call: the compatibility check's `IrcCompatResult_GiveReward` sets `result` in an `if`/`else` on
@@ -411,7 +411,7 @@ Same instructions, registers swapped.
   across a call, but a read through a pointer to its row is loaded again: `Guru2MainSeq_Bonus` reads the clamp's
   first Berry through `const u32 *range = sBonusItems[count];`. The tell is a function that matches when the table is
   made non-`const` although it sits in `.rodata`.
-- A copy's size computed by a call and held in a local before the `sys_memcpy` or `sys_memset` is scheduled
+- A copy's size computed by a call and held in a local before the `MI_CpuCopy8` or `MI_CpuFill8` is scheduled
   differently from the call written as the size argument: the musical's `MusComm_SendAllPokes`,
   `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `func_ov211_021ef3e4` all matched with
   `u32 size = ...GetSize();` first. In `MusComm_Main`, `requesters[count] = i; count++;` in place of
@@ -517,7 +517,7 @@ Same code, other `sp` offsets or frame size.
   in a loop body took the highest slots, in their declaration order.
 - A loop counter that the original keeps in a stack slot in a small function may be assigned before a call: its value
   then lives across the call, so it can't stay in a scratch register. `ssp_jpegenc.c`'s `JpegEnc_SetupHuffmanTable`
-  matches only with `i = 0;` before its `sys_memset32_fast` call and the loop written `while (i < 16)` after it, with
+  matches only with `i = 0;` before its `MIi_CpuClearFast` call and the loop written `while (i < 16)` after it, with
   the table's terminator stored inside the outer loop.
 - A variable reused by several switch cases is split into one value per case (see Registers), and a split piece that is
   spilled takes the lowest slot whatever the declarations say. When the original has a case's spilled value among the
@@ -706,7 +706,7 @@ Same code, other `sp` offsets or frame size.
   ends with `*done = FALSE;`; the plain `wk->winDone[2] = FALSE;` rebuilds the constant and has no slot, 8 bytes shorter.
 - A halfword local whose address is passed, stored through the register that is then the argument
   (`add r0, sp, #4; add r0, #2; strh r6, [r0]`), is a one-element array with an initializer, `u16 black[1] = { 0 };`,
-  as `game_clear_save.c`'s `GameClearSave_Main` passes to `gfxUploadStdPaletteBGB`. A scalar `u16 black = 0;` with
+  as `game_clear_save.c`'s `GameClearSave_Main` passes to `GXS_LoadBGPltt`. A scalar `u16 black = 0;` with
   `&black` stores at base plus offset and computes the address a second time.
 - Two spill slots swapped between a doubled index local and a hoisted loop invariant: the local held the undoubled
   value and the doubling was in the uses. `PkwdBook_CreateTextActors` has `positionIdx = entries->positionIdx;` with
@@ -770,7 +770,7 @@ Same code, other `sp` offsets or frame size.
   likewise puts the load ahead of the next comparison, where a separate `current = low;` later does not.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
-  `readSize = romfs_fread(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
+  `readSize = FS_ReadFile(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
 - An argument of a call compared again unchanged after it is kept in a stack slot over the call; the original working
   it out again means its comparison was another expression. `snd_arc_loader.c`'s `LoadWaveArcTable` reads
   `sizeof(SNDWaveArc) + tableSize` bytes and matches only comparing `result != (int)sizeof(SNDWaveArc) + tableSize`,
@@ -897,8 +897,8 @@ Same instructions, scheduled in another order.
   like the read in the call, with the copy of `wk` sunk to the `bl`.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
   between, where a local of their type is computed where it is written: `g3d_text_draw.c`'s
-  `G3DTextDraw_StringToTexture` computes `size` before `gfxBeginTextureUpload()`, as the original does, only as a
-  `u32`, the type `cp15_flushDC` and `gfxUploadTexture` take, not as an `int`. The same function loads its heap ID,
+  `G3DTextDraw_StringToTexture` computes `size` before `GX_BeginLoadTex()`, as the original does, only as a
+  `u32`, the type `DC_FlushRange` and `GX_LoadTex` take, not as an `int`. The same function loads its heap ID,
   a stack parameter, after the second `TEX_DIM_LUT` read only with the table's `u16` sizes read into `u16` locals
   and divided at each call, `GFL_BitmapCreate(width / 8, height / 8, ...)`; `u32` locals holding the quotients load
   it first.
@@ -951,9 +951,9 @@ Same instructions, scheduled in another order.
   `BmpWin_GetBitmap(...)` in the same call, was passed to an inlined helper that makes the call, like
   `PrintWindow_Print`. A block-scoped local set from the field before the call does the same: bmp_menu.c's
   `BmpMenu_PrintOptions` loads the queue first because its loop body declares `PrintQueue *queue` and a `u8 y`.
-  save_error.c's `displayLightBlueErrorWindow` reads `chars->size` before calling `gfxGetCharAddrBG1A()` only
-  through NitroSDK's `MI_CpuCopy16` inline over `sys_memcpy16`. The same goes for a field read before a call that
-  could change it, such as a `sys_memset` of the struct that holds it: pdwacc_disp.c reads the heap ID before
+  save_error.c's `displayLightBlueErrorWindow` reads `chars->size` before calling `G2_GetBG1CharPtr()` only
+  through NitroSDK's `MI_CpuCopy16` inline over `MIi_CpuCopy16`. The same goes for a field read before a call that
+  could change it, such as a `MI_CpuFill8` of the struct that holds it: pdwacc_disp.c reads the heap ID before
   clearing its palette cycle only as the argument of a `static inline` helper that clears the cycle and then uses the
   heap ID.
 - Two stores through a pointer read from a struct, with one load of the pointer where ours loads it again after the
@@ -1497,14 +1497,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
   `s32 palette`, so the tail computes the offset again with `palette` in `r7` and `work` spilled (75 bytes off
   without it). `work->grayPalettes[(u32)palette]` in the tail shows the same thing.
-- A `sys_memset(p, 0, size)` whose size is computed before the zero is loaded was `GFL_STD_MemClear(p, size)`.
+- A `MI_CpuFill8(p, 0, size)` whose size is computed before the zero is loaded was `GFL_STD_MemClear(p, size)`.
   gflib's clear is an inline over the fill, so the size is an argument of the inline and is evaluated first.
   `WifiBattleMatchSys_AllocPlayers` has `adds r2, #0xd4` before `movs r1, #0` only with
 
-      static inline void MemClear(void *dest, u32 size) { sys_memset(dest, 0, size); }
+      static inline void MemClear(void *dest, u32 size) { MI_CpuFill8(dest, 0, size); }
       MemClear(sys->player, sizeof(WifiBattleMatchPlayer) + PokeParty_GetSaveDataSize());
 
-  written directly as `sys_memset(sys->player, 0, sizeof(...) + PokeParty_GetSaveDataSize())` the zero comes first.
+  written directly as `MI_CpuFill8(sys->player, 0, sizeof(...) + PokeParty_GetSaveDataSize())` the zero comes first.
   (Scheduling section; a candidate for a shared inline in `gfl/std.h`.)
 - In `if ((u8)f() != engine->criteria->color)` MWCC loads `engine->criteria` before the call and keeps it in a saved
   register. Where the original loads the pointer after the call, the call's result was in a local first: the Pokédex
@@ -1843,7 +1843,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
-  and lost its `end` local, which had been computed before `CPU_IRQDisable()` and pushed `found` to the stack.
+  and lost its `end` local, which had been computed before `OS_DisableInterrupts()` and pushed `found` to the stack.
 - MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
   stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.

@@ -32,12 +32,12 @@ void NNS_SndInit(void) {
     }
     initialized = TRUE;
 
-    func_0207d670();
+    SND_Init();
 
     PM_SetSleepCallbackInfo(&sPreSleepCallback, BeginSleep, NULL);
     PM_SetSleepCallbackInfo(&sPostSleepCallback, EndSleep, NULL);
-    func_0207f5e8(&sPreSleepCallback);
-    func_0207f600(&sPostSleepCallback);
+    PM_PrependPreSleepCallback(&sPreSleepCallback);
+    PM_AppendPostSleepCallback(&sPostSleepCallback);
 
     NNSi_SndInitResourceMgr();
     NNSi_SndCaptureInit();
@@ -48,55 +48,55 @@ void NNS_SndInit(void) {
 }
 
 void NNS_SndMain(void) {
-    while (func_0207d73c(SND_COMMAND_NOBLOCK)) {
+    while (SND_RecvCommandReply(SND_COMMAND_NOBLOCK)) {
     }
 
     NNSi_SndPlayerMain();
     NNSi_SndCaptureMain();
     NNSi_SndArcStrmMain();
 
-    func_0207d864(SND_COMMAND_NOBLOCK);
+    SND_FlushCommand(SND_COMMAND_NOBLOCK);
 }
 
 void NNS_SndSetMasterVolume(int volume) {
-    sndSetMasterVolume(volume);
+    SND_SetMasterVolume(volume);
 }
 
 void NNS_SndSetMonoFlag(BOOL flag) {
     if (flag) {
-        func_0207d5d0(SND_CHANNEL_PAN_CENTER);
+        SND_SetMasterPan(SND_CHANNEL_PAN_CENTER);
     } else {
-        func_0207d5e4();
+        SND_ResetMasterPan();
     }
 }
 
 BOOL NNS_SndUpdateDriverInfo(void) {
     if (!sDriverInfoFirstFlag) {
-        while (func_0207d73c(SND_COMMAND_NOBLOCK)) {
+        while (SND_RecvCommandReply(SND_COMMAND_NOBLOCK)) {
         }
-        if (!func_0207d9d0(sDriverInfoCommandTag)) {
+        if (!SND_IsFinishedCommandTag(sDriverInfoCommandTag)) {
             return FALSE;
         }
 
         if (sCurDriverInfo < 0) {
             sCurDriverInfo = 1;
         }
-        func_0207d5f8(&sDriverInfo[sCurDriverInfo]);
-        sDriverInfoCommandTag = sndGetSentPacketCount();
+        SND_ReadDriverInfo(&sDriverInfo[sCurDriverInfo]);
+        sDriverInfoCommandTag = SND_GetCurrentCommandTag();
 
         if (sCurDriverInfo == 0) {
             sCurDriverInfo = 1;
         } else {
             sCurDriverInfo = 0;
         }
-        cp15_invalidateDC(&sDriverInfo[sCurDriverInfo], sizeof(SNDDriverInfo));
+        DC_InvalidateRange(&sDriverInfo[sCurDriverInfo], sizeof(SNDDriverInfo));
 
-        func_0207d864(SND_COMMAND_NOBLOCK);
+        SND_FlushCommand(SND_COMMAND_NOBLOCK);
         return TRUE;
     }
 
-    func_0207d5f8(&sDriverInfo[0]);
-    sDriverInfoCommandTag = sndGetSentPacketCount();
+    SND_ReadDriverInfo(&sDriverInfo[0]);
+    sDriverInfoCommandTag = SND_GetCurrentCommandTag();
     sDriverInfoFirstFlag = FALSE;
     return FALSE;
 }
@@ -107,7 +107,7 @@ BOOL NNSi_SndReadDriverTrackInfo(int playerNo, int trackNo, SNDTrackInfo *trackI
     if (!driverInfo) {
         return FALSE;
     }
-    return func_0207dc0c(driverInfo, playerNo, trackNo, trackInfo);
+    return SND_ReadTrackInfo(driverInfo, playerNo, trackNo, trackInfo);
 }
 
 // Before sleep, the capture and every channel stop, and the commands are sent and waited for
@@ -115,11 +115,11 @@ static void BeginSleep(void *arg) {
     u32 tag;
 
     NNSi_SndCaptureBeginSleep();
-    func_0207d410(0, 0, 0, 0);
+    SND_StopTimer(0, 0, 0, 0);
 
-    tag = sndGetSentPacketCount();
-    func_0207d864(SND_COMMAND_BLOCK);
-    func_0207d96c(tag);
+    tag = SND_GetCurrentCommandTag();
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
 }
 
 static void EndSleep(void *arg) {

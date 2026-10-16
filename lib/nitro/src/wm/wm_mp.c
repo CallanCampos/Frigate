@@ -43,18 +43,18 @@ static int WMi_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, 
 static int WMi_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize,
                        const WmMpParam *mpParam) {
     WmStartMpCommand cmd;
-    WMStatus *status = func_02080a64()->status;
-    int result = func_02080ab0(2, WM_STATE_PARENT, WM_STATE_CHILD);
+    WMStatus *status = WMi_GetSystemWork()->status;
+    int result = WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_CHILD);
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    cp15_invalidateDC(&status->aid, 2);
-    cp15_invalidateDC(&status->childMpFlag, 2);
+    DC_InvalidateRange(&status->aid, 2);
+    DC_InvalidateRange(&status->childMpFlag, 2);
     if (status->aid != 0 && status->childMpFlag != 1) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
-    cp15_invalidateDC(&status->mpFlag, 4);
+    DC_InvalidateRange(&status->mpFlag, 4);
     if (status->mpFlag == TRUE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
@@ -64,25 +64,25 @@ static int WMi_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, 
     if (sendBufSize & 0x1f) {
         return WM_ERRCODE_INVALID_PARAM;
     }
-    cp15_invalidateDC(&status->mpSizeCheckOff, 2);
+    DC_InvalidateRange(&status->mpSizeCheckOff, 2);
     if (status->mpSizeCheckOff == 0) {
-        if (recvBufSize < func_02080fbc()) {
+        if (recvBufSize < WM_GetMPReceiveBufferSize()) {
             return WM_ERRCODE_INVALID_PARAM;
         }
-        if (sendBufSize < func_02080f74()) {
+        if (sendBufSize < WM_GetMPSendBufferSize()) {
             return WM_ERRCODE_INVALID_PARAM;
         }
     }
 
-    func_02080950(WM_APIID_START_MP, callback);
-    sys_memset32(0, &cmd, sizeof(cmd));
+    WMi_SetCallbackTable(WM_APIID_START_MP, callback);
+    MIi_CpuClear32(0, &cmd, sizeof(cmd));
     cmd.apiid = WM_APIID_START_MP;
     cmd.recvBufHalfwords = recvBufSize / 2;
     cmd.recvBuf = recvBuf;
     cmd.sendBuf = sendBuf;
     cmd.sendBufSize = sendBufSize;
-    sys_memset32(0, cmd.unk_14, sizeof(cmd.unk_14));
-    sys_memcpy32(mpParam, &cmd.param, sizeof(cmd.param));
+    MIi_CpuClear32(0, cmd.unk_14, sizeof(cmd.unk_14));
+    MIi_CpuCopy32(mpParam, &cmd.param, sizeof(cmd.param));
     result = WMi_SendCommandDirect(&cmd, sizeof(cmd));
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -92,12 +92,12 @@ static int WMi_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, 
 
 // WM_StartMPEx: the same frequency for the parent and the children, and the retries, the polling and the fatal errors
 // as the game wants them. A frequency that is fixed is also given to the ARM7 as such
-int func_020818f8(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
-                  u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
-                  BOOL ignoreFatalError) {
+int WM_StartMPEx(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
+                 u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
+                 BOOL ignoreFatalError) {
     WmMpParam param;
 
-    sys_memset32(0, &param, sizeof(param));
+    MIi_CpuClear32(0, &param, sizeof(param));
     param.mask = WM_MP_PARAM_MASK_ALL_BUT_FIXED;
     param.parentFreq = mpFreq;
     param.childFreq = mpFreq;
@@ -112,11 +112,10 @@ int func_020818f8(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void 
     return WMi_StartMP(callback, recvBuf, recvBufSize, sendBuf, sendBufSize, &param);
 }
 
-// WM_StartMP
-int func_0208195c(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq) {
+int WM_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq) {
     WmMpParam param;
 
-    sys_memset32(0, &param, sizeof(param));
+    MIi_CpuClear32(0, &param, sizeof(param));
     param.mask = WM_MP_PARAM_MASK_FREQ;
     param.parentFreq = mpFreq;
     param.childFreq = mpFreq;
@@ -125,20 +124,20 @@ int func_0208195c(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void 
 
 // WM_SetMPDataToPortEx: sends the data to the ports of the children in the bitmap in the next round; the callback and
 // its argument come back with the result
-int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap, u16 port,
-                  u16 prio) {
+int WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap,
+                         u16 port, u16 prio) {
     u16 childBitmap = 1;
-    WMStatus *status = func_02080a64()->status;
-    int result = func_02080ab0(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
+    WMStatus *status = WMi_GetSystemWork()->status;
+    int result = WMi_CheckStateEx(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    cp15_invalidateDC(&status->aid, 2);
+    DC_InvalidateRange(&status->aid, 2);
     if (status->aid == 0) {
-        cp15_invalidateDC(&status->childBitmap, 2);
+        DC_InvalidateRange(&status->childBitmap, 2);
         childBitmap = status->childBitmap;
-        cp15_invalidateDC(&status->unk_086, 2);
+        DC_InvalidateRange(&status->unk_086, 2);
     }
     if (sendData == NULL) {
         return WM_ERRCODE_INVALID_PARAM;
@@ -146,7 +145,7 @@ int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 
     if (childBitmap == 0) {
         return WM_ERRCODE_NO_CHILD;
     }
-    cp15_invalidateDC(&status->mpSendBuf, 2);
+    DC_InvalidateRange(&status->mpSendBuf, 2);
     if (sendData == status->mpSendBuf) {
         return WM_ERRCODE_INVALID_PARAM;
     }
@@ -156,7 +155,7 @@ int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 
     if (sendDataSize == 0) {
         return WM_ERRCODE_INVALID_PARAM;
     }
-    cp15_cleanDC(sendData, sendDataSize);
+    DC_StoreRange(sendData, sendDataSize);
     result = WMi_SendCommand(WM_APIID_SET_MP_DATA, 7, sendData, sendDataSize, destBitmap, port, prio, callback, arg);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -164,19 +163,18 @@ int func_02081998(WMCallbackFunc callback, void *arg, const void *sendData, u16 
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_EndMP
-int func_02081a68(WMCallbackFunc callback) {
-    WMArm9Buf *w9b = func_02080a64();
-    int result = func_02080ab0(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
+int WM_EndMP(WMCallbackFunc callback) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
+    int result = WMi_CheckStateEx(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    cp15_invalidateDC(&w9b->status->mpFlag, 4);
+    DC_InvalidateRange(&w9b->status->mpFlag, 4);
     if (w9b->status->mpFlag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
-    func_02080950(WM_APIID_END_MP, callback);
+    WMi_SetCallbackTable(WM_APIID_END_MP, callback);
     result = WMi_SendCommand(WM_APIID_END_MP, 0);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;

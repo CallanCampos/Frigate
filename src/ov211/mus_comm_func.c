@@ -312,7 +312,7 @@ void *func_ov211_021ef230(u32 *seq, void *param) {
         func_020425ec(&sMusCommInitData, MusComm_OnNetEnd, work);
     }
     func_02008b34(work->playerInfo, &work->beacon.playerInfo);
-    func_0207c33c(work->beacon.mac);
+    OS_GetMacAddress(work->beacon.mac);
     work->beacon.gameId = 0x3a0b;
     return work;
 }
@@ -424,9 +424,9 @@ void func_ov211_021ef3e4(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameC
         comm->players[i].data = GFL_HeapAllocate(comm->heapId, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), FALSE,
                                                  "mus_comm_func.c", 527);
         pokeSize = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
-        sys_memset(comm->players[i].poke, 0, pokeSize);
+        MI_CpuFill8(comm->players[i].poke, 0, pokeSize);
         dataSize = PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize();
-        sys_memset(comm->players[i].data, 0, dataSize);
+        MI_CpuFill8(comm->players[i].data, 0, dataSize);
         comm->players[i].musicalId = (u16 *)comm->players[i].data;
         comm->players[i].info = (PlayerInfo *)(comm->players[i].data + 4);
         comm->players[i].pkm = (BoxPkm *)(comm->players[i].data + 4 + PlayerInfo_GetSize());
@@ -886,9 +886,9 @@ static BOOL MusComm_SendPlayerData(MusCommWork *work) {
     work->playerData = data;
     info = (PlayerInfo *)(data + 4);
     pkm = (BoxPkm *)(data + 4 + PlayerInfo_GetSize());
-    sys_memcpy(&work->musicalId, data, 4);
-    sys_memcpy(work->info, info, PlayerInfo_GetSize());
-    sys_memcpy(work->pkm, pkm, PML_GetPkmRawSize());
+    MI_CpuCopy8(&work->musicalId, data, 4);
+    MI_CpuCopy8(work->info, info, PlayerInfo_GetSize());
+    MI_CpuCopy8(work->pkm, pkm, PML_GetPkmRawSize());
     return func_02042c18(func_02040440(), 0xff, MUS_COMM_CMD_PLAYER_DATA,
                          PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize(), work->playerData, 1, FALSE, TRUE);
 }
@@ -913,7 +913,7 @@ static BOOL MusComm_SendAllPlayerData(MusCommWork *work) {
     for (i = 0; i < MUS_COMM_PLAYER_MAX; i++) {
         u8 *dest = work->allPlayerData + i * (PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
 
-        sys_memcpy(work->players[i].data, dest, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
+        MI_CpuCopy8(work->players[i].data, dest, PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize());
     }
     return func_02042c18(func_02040414(0xff), 0xff, MUS_COMM_CMD_ALL_PLAYER_DATA,
                          (PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize()) * 4, work->allPlayerData, 1, FALSE, TRUE);
@@ -928,7 +928,7 @@ static void MusComm_RecvAllPlayerData(int netId, int size, const void *data, voi
         u32 dataSize = PlayerInfo_GetSize() + 4 + PML_GetPkmRawSize();
         BOOL valid;
 
-        sys_memcpy(src, comm->players[i].data, dataSize);
+        MI_CpuCopy8(src, comm->players[i].data, dataSize);
         valid = func_02008b5c(comm->players[i].info) == 0;
         comm->players[i].joined = valid;
         comm->players[i].hasInfo = valid;
@@ -956,8 +956,8 @@ static BOOL MusComm_SendPoke(MusCommWork *work, MusicalPoke *poke) {
     data =
         GFL_HeapAllocate(work->heapId, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke), FALSE, "mus_comm_func.c", 1470);
     work->pokeData = data;
-    sys_memcpy(poke, data, sizeof(MusicalPoke));
-    sys_memcpy(poke->pkm, data + sizeof(MusicalPoke), PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(poke, data, sizeof(MusicalPoke));
+    MI_CpuCopy8(poke->pkm, data + sizeof(MusicalPoke), PokeParty_GetPkmRawSize());
     return func_02042c18(func_02040440(), 0xff, MUS_COMM_CMD_POKE, PokeParty_GetPkmRawSize() + sizeof(MusicalPoke),
                          work->pokeData, 1, FALSE, TRUE);
 }
@@ -983,7 +983,7 @@ static BOOL MusComm_SendAllPokes(MusCommWork *work) {
         u8 *dest = work->allPokeData + i * (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
         u32 size = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
 
-        sys_memcpy(work->players[i].poke, dest, size);
+        MI_CpuCopy8(work->players[i].poke, dest, size);
     }
     return func_02042c18(func_02040414(0xff), 0xff, MUS_COMM_CMD_ALL_POKES,
                          (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke)) * 4, work->allPokeData, 1, FALSE, TRUE);
@@ -999,7 +999,7 @@ static void MusComm_RecvAllPokes(int netId, int size, const void *data, void *wo
             u8 *src = comm->allPokeData + i * (PokeParty_GetPkmRawSize() + sizeof(MusicalPoke));
             u32 pokeSize = PokeParty_GetPkmRawSize() + sizeof(MusicalPoke);
 
-            sys_memcpy(src, comm->players[i].poke, pokeSize);
+            MI_CpuCopy8(src, comm->players[i].poke, pokeSize);
             comm->players[i].poke->pkm = (PartyPkm *)(comm->players[i].poke + 1);
             comm->players[i].hasPoke = TRUE;
         } else {

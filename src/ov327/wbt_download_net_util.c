@@ -235,7 +235,7 @@ static WbtDownloadMessage *WbtDownloadMessage_Create(u16 bg, u16 x, u16 y, u16 w
     WbtDownloadMessage *p_wk =
         GFL_HeapAllocate(heapId, sizeof(WbtDownloadMessage), FALSE, "wbt_download_net_util.c", 94);
 
-    sys_memset(p_wk, 0, sizeof(WbtDownloadMessage));
+    MI_CpuFill8(p_wk, 0, sizeof(WbtDownloadMessage));
     p_wk->font = font;
     p_wk->queue = func_02021998(heapId);
     p_wk->state = WBT_DOWNLOAD_MSG_STATE_IDLE;
@@ -418,7 +418,7 @@ static WbtDownloadStack *WbtDownloadStack_Create(int capacity, void *userData, W
     u32 size = (capacity + 1) * sizeof(WbtDownloadStackEntry);
     WbtDownloadStack *stack = GFL_HeapAllocate(heapId, size, FALSE, "wbt_download_net_util.c", 1236);
 
-    sys_memset(stack, 0, size);
+    MI_CpuFill8(stack, 0, size);
     stack->userData = userData;
     stack->capacity = capacity;
     WbtDownloadStack_SetFunc(stack, func);
@@ -449,7 +449,7 @@ static BOOL WbtDownloadStack_IsEmpty(WbtDownloadStack *stack) {
 static void WbtDownloadStack_SetFunc(WbtDownloadStack *stack, WbtDownloadStackFunc func) {
     WbtDownloadStackEntry *entry = WbtDownloadStack_GetEntry(stack, stack->depth);
 
-    sys_memset(entry, 0, sizeof(WbtDownloadStackEntry));
+    MI_CpuFill8(entry, 0, sizeof(WbtDownloadStackEntry));
     entry->func = func;
 }
 
@@ -511,7 +511,7 @@ static BOOL WbtDownloadNet_Init(GameProc *proc, u32 *state, void *param, void *w
     GFL_OvlLoad(OVERLAY_ID(189));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_DOWNLOAD_NET, 0x50000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WbtDownloadNetWork), HEAPID_WBT_DOWNLOAD_NET);
-    sys_memset(wk, 0, sizeof(WbtDownloadNetWork));
+    MI_CpuFill8(wk, 0, sizeof(WbtDownloadNetWork));
     wk->param = param;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_WBT_DOWNLOAD_NET);
     wk->queue = func_02021998(HEAPID_WBT_DOWNLOAD_NET);
@@ -519,7 +519,7 @@ static BOOL WbtDownloadNet_Init(GameProc *proc, u32 *state, void *param, void *w
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_WBT_DOWNLOAD_NET);
     wk->graphic = WbtDownloadGraphic_Create(1, HEAPID_WBT_DOWNLOAD_NET);
     WbtDownloadNetBG_Create(&wk->bg, HEAPID_WBT_DOWNLOAD_NET);
-    sys_memset(&downloadParam, 0, sizeof(NetCommonDownloadParam));
+    MI_CpuFill8(&downloadParam, 0, sizeof(NetCommonDownloadParam));
     downloadParam.mode = 0;
     downloadParam.gameData = wk->param->gameData;
     downloadParam.dataSize = WBT_DOWNLOAD_BUFFER_SIZE;
@@ -651,7 +651,7 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
     case 0: {
         NetCommonDownloadFileListArgs args;
 
-        sys_memset(&args, 0, sizeof(NetCommonDownloadFileListArgs));
+        MI_CpuFill8(&args, 0, sizeof(NetCommonDownloadFileListArgs));
         args.fileCount = 1;
         args.attr1 = "WBT_E";
         // The ROM's strings for these are two bytes long, not one: they hold two NULs
@@ -669,7 +669,7 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
             void *data = NetCommonDownload_GetData(wk->download);
 
             if (NetCommonDownload_GetStatus(wk->download) == NET_COMMON_DOWNLOAD_STATUS_DONE) {
-                sys_memcpy(data, wk->param->buffer, WBT_DOWNLOAD_BUFFER_SIZE);
+                MI_CpuCopy8(data, wk->param->buffer, WBT_DOWNLOAD_BUFFER_SIZE);
             }
             (*state)++;
         }
@@ -735,7 +735,7 @@ static void WbtDownloadNet_DownloadStep(WbtDownloadStack *stack, u32 *state, voi
 }
 
 static void WbtDownloadNetBG_Create(WbtDownloadBG *bg, HeapID heapId) {
-    sys_memset(bg, 0, sizeof(WbtDownloadBG));
+    MI_CpuFill8(bg, 0, sizeof(WbtDownloadBG));
     WbtDownloadNetBG_Load(bg, heapId);
 }
 
@@ -753,10 +753,10 @@ static inline void WbtDownloadNetBG_InitCycle(WbtDownloadBG *bg, ArcTool *arc, u
     NNSG2dPaletteData *palette;
     void *file;
 
-    sys_memset(&bg->cycle, 0, sizeof(bg->cycle));
+    MI_CpuFill8(&bg->cycle, 0, sizeof(bg->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    sys_memcpy(palette->rawData, bg->cycle.palettes, sizeof(bg->cycle.palettes));
-    sys_memcpy(palette->rawData, bg->cycle.blended, sizeof(bg->cycle.palettes));
+    MI_CpuCopy8(palette->rawData, bg->cycle.palettes, sizeof(bg->cycle.palettes));
+    MI_CpuCopy8(palette->rawData, bg->cycle.blended, sizeof(bg->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps
@@ -788,10 +788,10 @@ static inline void WbtDownloadNetBG_InitCycle(WbtDownloadBG *bg, ArcTool *arc, u
             }
         }
     }
-    cp15_flushDC(bg->cycle.blended, sizeof(bg->cycle.blended));
+    DC_FlushRange(bg->cycle.blended, sizeof(bg->cycle.blended));
     bg->cycle.active = TRUE;
     bg->cycle.task = GFL_VBlankTCBAdd(WbtDownloadNetBG_CyclePalette, &bg->cycle, 20);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
     bg->cycle.scrollBg = 0;
 }
 
@@ -822,8 +822,8 @@ static void WbtDownloadNetBG_CyclePalette(TCB *task, void *work) {
     if (cycle->active) {
         cycle->skip ^= 1;
         if (!(cycle->skip & 1)) {
-            gfxUploadStdPaletteBGA(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
-            gfxUploadStdPaletteBGB(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GX_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GXS_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
             cycle->frame++;
             if (cycle->frame >= WBT_DOWNLOAD_PALETTE_COUNT * WBT_DOWNLOAD_BLEND_STEPS) {
                 cycle->frame = 0;

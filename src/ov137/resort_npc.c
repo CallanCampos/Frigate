@@ -110,7 +110,7 @@ static void func_ov137_021f1d7c(ResortNPC *npc) {
         FieldActor *actor = FindFieldActor(npc->setup.mmSys, i + RESORT_NPC_UID_FIRST);
         if (minRank <= rank && actor == NULL && npc->setup.zone == zone) {
             ZoneNPC zoneNpc;
-            sys_memset(&zoneNpc, 0, sizeof(ZoneNPC));
+            MI_CpuFill8(&zoneNpc, 0, sizeof(ZoneNPC));
             zoneNpc.uid = i + RESORT_NPC_UID_FIRST;
             zoneNpc.modelId = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_MODEL);
             zoneNpc.moveCode = ResortBinary_Get(npc->table, i, RESORT_NPC_COL_MOVE_CODE);

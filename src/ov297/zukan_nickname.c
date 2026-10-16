@@ -120,7 +120,7 @@ ZukanNickname *ZukanNickname_Create(HeapID heapId, PartyPkm *pkm, StrBuf *boxMes
     StrBuf *template;
     BOOL keyCursor;
 
-    sys_memset(nickname, 0, sizeof(ZukanNickname));
+    MI_CpuFill8(nickname, 0, sizeof(ZukanNickname));
     nickname->heapId = heapId;
     nickname->pkm = pkm;
     nickname->boxMessage = boxMessage;

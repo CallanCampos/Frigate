@@ -119,21 +119,21 @@ void MATH_MD5Update(MATHMD5Context *context, const void *data, u32 size) {
     room = MD5_BLOCK_SIZE - pos;
     if (room > size) {
         if (size != 0) {
-            sys_memcpy(src, &context->block.bytes[pos], size);
+            MI_CpuCopy8(src, &context->block.bytes[pos], size);
         }
         return;
     }
-    sys_memcpy(src, &context->block.bytes[pos], room);
+    MI_CpuCopy8(src, &context->block.bytes[pos], room);
     md5_transform(context);
     src += room;
     size -= room;
     for (blocks = size >> 6; blocks > 0; blocks--) {
-        sys_memcpy(src, context->block.bytes, MD5_BLOCK_SIZE);
+        MI_CpuCopy8(src, context->block.bytes, MD5_BLOCK_SIZE);
         src += MD5_BLOCK_SIZE;
         md5_transform(context);
     }
     if ((size & (MD5_BLOCK_SIZE - 1)) != 0) {
-        sys_memcpy(src, context->block.bytes, size & (MD5_BLOCK_SIZE - 1));
+        MI_CpuCopy8(src, context->block.bytes, size & (MD5_BLOCK_SIZE - 1));
     }
 }
 
@@ -146,17 +146,17 @@ void MATH_MD5GetHash(MATHMD5Context *context, void *digest) {
     pos = (u32)context->length & (MD5_BLOCK_SIZE - 1);
     room = MD5_BLOCK_SIZE - pos;
     if (room < 8) {
-        sys_memset(&context->block.bytes[pos], 0, room);
+        MI_CpuFill8(&context->block.bytes[pos], 0, room);
         md5_transform(context);
         pos = 0;
         room = MD5_BLOCK_SIZE;
     }
     if (room > 8) {
-        sys_memset(&context->block.bytes[pos], 0, room - 8);
+        MI_CpuFill8(&context->block.bytes[pos], 0, room - 8);
     }
     context->block.words[14] = (u32)bits;
     context->block.words[15] = (u32)(bits >> 32);
     md5_transform(context);
-    sys_memcpy(context, digest, MD5_DIGEST_SIZE);
-    sys_memset(context, 0, sizeof(MATHMD5Context));
+    MI_CpuCopy8(context, digest, MD5_DIGEST_SIZE);
+    MI_CpuFill8(context, 0, sizeof(MATHMD5Context));
 }

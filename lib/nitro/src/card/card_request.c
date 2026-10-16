@@ -10,28 +10,28 @@
 
 // CARDi_OnFifoRecv: called with each word the ARM7 sends. One with the error bit is the ARM7's acknowledgment of the
 // command, which wakes the thread that waits for it
-void func_0206f2e4(u32 fifoTag, u32 data, BOOL err) {
+void CARDi_OnFifoRecv(u32 fifoTag, u32 data, BOOL err) {
     if (fifoTag == PXI_FIFO_TAG_FS && err) {
         cardi_common.flag &= ~CARD_STAT_WAITFOR7ACK;
-        scheduler_start_thread(cardi_common.curThread);
+        OS_WakeupThreadDirect(cardi_common.curThread);
     }
 }
 
 // CARDi_Request: sends a command for the command block to the ARM7 and waits for its acknowledgment, sending it again
 // while the answer is a timeout, up to retry times. The first command also starts the ARM7 side. Returns whether the
 // block holds a success
-BOOL func_0206f30c(CARDiCommon *p, int reqType, int retry) {
+BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry) {
     if ((p->flag & CARD_STAT_INIT_CMD) == 0) {
         p->flag |= CARD_STAT_INIT_CMD;
-        if (!func_0207ca48(PXI_FIFO_TAG_FS, PXI_PROC_ARM7)) {
+        if (!PXI_IsCallbackReady(PXI_FIFO_TAG_FS, PXI_PROC_ARM7)) {
             do {
-                func_0207c160(CARD_ARM7_READY_SPIN);
-            } while (!func_0207ca48(PXI_FIFO_TAG_FS, PXI_PROC_ARM7));
+                OS_SpinWaitSysCycles(CARD_ARM7_READY_SPIN);
+            } while (!PXI_IsCallbackReady(PXI_FIFO_TAG_FS, PXI_PROC_ARM7));
         }
-        func_0206f30c(p, CARD_REQ_INIT, 1);
+        CARDi_Request(p, CARD_REQ_INIT, 1);
     }
-    cp15_flushDC(p->cmd, sizeof(CARDiCommandArg));
-    cp15_drainWriteBuffer();
+    DC_FlushRange(p->cmd, sizeof(CARDiCommandArg));
+    DC_WaitWriteBufferEmpty();
     p->curThread = OS_GetCurrentThread();
     do {
         p->flag |= CARD_STAT_WAITFOR7ACK;
@@ -43,13 +43,13 @@ BOOL func_0206f30c(CARDiCommon *p, int reqType, int retry) {
             }
         }
         {
-            u32 irq = CPU_IRQDisable();
+            u32 irq = OS_DisableInterrupts();
             while ((p->flag & CARD_STAT_WAITFOR7ACK) != 0) {
-                scheduler_yield(NULL);
+                OS_SleepThread(NULL);
             }
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
         }
-        cp15_invalidateDC(p->cmd, sizeof(CARDiCommandArg));
+        DC_InvalidateRange(p->cmd, sizeof(CARDiCommandArg));
     } while (p->cmd->result == CARD_RESULT_TIMEOUT && --retry > 0);
     return p->cmd->result == CARD_RESULT_SUCCESS;
 }

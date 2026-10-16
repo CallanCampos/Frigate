@@ -58,7 +58,7 @@ static void func_02040224(NetHandle *handle, int netId) {
     }
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         if (handle->negotiations[i] != NULL) {
-            sys_memset(handle->negotiations[i], 0, sizeof(NetNegotiation));
+            MI_CpuFill8(handle->negotiations[i], 0, sizeof(NetNegotiation));
         }
         negotiations[i] = handle->negotiations[i];
     }
@@ -66,7 +66,7 @@ static void func_02040224(NetHandle *handle, int netId) {
         GFL_HeapFree(handle->data);
         handle->data = NULL;
     }
-    sys_memset(handle, 0, sizeof(NetHandle));
+    MI_CpuFill8(handle, 0, sizeof(NetHandle));
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         handle->negotiations[i] = negotiations[i];
     }
@@ -79,7 +79,7 @@ static void func_02040298(NetHandle *handle, int netId) {
         handle->serverNegotiationsSent = func_02040a2c(handle->serverNegotiationsSent, netId, FALSE);
     }
     if (handle->negotiations[netId] != NULL) {
-        sys_memset(handle->negotiations[netId], 0, sizeof(NetNegotiation));
+        MI_CpuFill8(handle->negotiations[netId], 0, sizeof(NetNegotiation));
     }
 }
 
@@ -97,7 +97,7 @@ static NetHandle *func_020402c8(int netId) {
             }
         }
     }
-    sys_memset(handle, 0, sizeof(NetHandle));
+    MI_CpuFill8(handle, 0, sizeof(NetHandle));
     if (netId == GFL_NET_NETID_SERVER) {
         for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
             handle->negotiations[i] = GFL_HeapAllocate(ini->heapId, sizeof(NetNegotiation), TRUE, "net_handle.c", 199);
@@ -225,7 +225,7 @@ BOOL func_02040504(void) {
         if (handle->state == NET_HANDLE_STATE_SEND_NEGOTIATION) {
             u8 data[9];
 
-            func_0207c33c(data);
+            OS_GetMacAddress(data);
             data[6] = netId;
             data[7] = ini->gameCommandBase;
             data[8] = ini->unk6E;
@@ -394,9 +394,9 @@ void func_02040880(int netId, int size, u8 *data, void *work, NetHandle *handle)
 
         if (!negotiation->valid) {
             negotiation->valid = TRUE;
-            sys_memcpy(data, negotiation->mac, sizeof(negotiation->mac));
+            MI_CpuCopy8(data, negotiation->mac, sizeof(negotiation->mac));
             negotiation->netId = data[6];
-            func_0207c33c(negotiation->serverMac);
+            OS_GetMacAddress(negotiation->serverMac);
             if (data[8] != 0) {
                 if (data[6] != 0 && data[7] != ini->gameCommandBase && ini->unk6E == data[8]) {
                     negotiation->unkF = ini->unk6E;
@@ -456,7 +456,7 @@ void func_0204095c(int netId, int size, NetNegotiation *negotiation, void *work,
             func_0204092c(handle);
         }
     }
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     if (GFL_STD_MemCmp(negotiation->mac, mac, sizeof(mac)) == 0 && negotiation->netId != func_020401dc(handle)) {
         func_0204092c(handle);
     }
@@ -524,7 +524,7 @@ void func_02040ad0(int netID, int size, const void *data, void *work, NetHandle 
         }
         target->data = GFL_HeapAllocate(ini->heapId, size, TRUE, "net_handle.c", 984);
         target->dataSize = size;
-        sys_memcpy(data, target->data, size);
+        MI_CpuCopy8(data, target->data, size);
     }
 }
 

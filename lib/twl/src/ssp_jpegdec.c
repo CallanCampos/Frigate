@@ -255,7 +255,7 @@ static s32 func_ov257_021aafdc(u8 *data, u32 size, u32 option) {
     sStuffed = 0;
     sBitsLeft = 0;
     sBlocks[BLOCK_Y][0] = sBlocks[BLOCK_CB][0] = sBlocks[BLOCK_CR][0] = 0;
-    sys_memset32_fast(0, sHuffWork, HUFF_WORK_CLEAR_SIZE);
+    MIi_CpuClearFast(0, sHuffWork, HUFF_WORK_CLEAR_SIZE);
     sDataSize = size;
     if (size <= 2) {
         return 0;
@@ -327,7 +327,7 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
     sBlocks[BLOCK_Y][0] = sBlocks[BLOCK_CB][0] = sBlocks[BLOCK_CR][0] = 0;
     restartCount = 0;
     restartInterval = 0;
-    sys_memset32_fast(0, sHuffWork, HUFF_WORK_CLEAR_SIZE);
+    MIi_CpuClearFast(0, sHuffWork, HUFF_WORK_CLEAR_SIZE);
     sDataSize = size;
     if (size <= 2) {
         return 0;
@@ -1111,13 +1111,13 @@ BOOL SSP_StartJpegDecoder(u8 *data, u32 size, void *dst, s16 *width, s16 *height
         if (sigOffset + SSP_SIGNATURE_SIZE > size) {
             return FALSE;
         }
-        sys_memcpy(data + sigOffset, sig, SSP_SIGNATURE_SIZE);
-        sys_memset(data + sigOffset, 0, SSP_SIGNATURE_SIZE);
+        MI_CpuCopy8(data + sigOffset, sig, SSP_SIGNATURE_SIZE);
+        MI_CpuFill8(data + sigOffset, 0, SSP_SIGNATURE_SIZE);
         if (hw_isDSi()) {
             PhotoSign_Init();
         }
         signResult = PhotoSign_Verify(sig, data, size);
-        sys_memcpy(sig, data + sigOffset, SSP_SIGNATURE_SIZE);
+        MI_CpuCopy8(sig, data + sigOffset, SSP_SIGNATURE_SIZE);
         if (signResult != 1) {
             return FALSE;
         }

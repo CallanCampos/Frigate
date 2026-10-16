@@ -5,11 +5,10 @@
 #include "twl/pm.h"
 
 // TwlSDK's NWM, the DSi's wireless manager, ARM9 side, in the LTD autoload (nwm.c). It does for the DSi's own wireless
-// chip what NitroSDK's WM does for the DS's: the ARM9 sends the ARM7 commands through the PXI tag 0x16, in buffers
-// of a system area that the game hands to the library (func_02702434), and the ARM7 answers with events that run the
-// command's callback. The library keeps its default names until the LTD autoload is analyzed; the comments give the
-// SDK functions they implement, from what the code does. The game calls the functions through thumb veneers that the
-// linker made.
+// chip what NitroSDK's WM does for the DS's: the ARM9 sends the ARM7 commands through the PXI tag 0x16, in buffers of a
+// system area that the game hands to the library (NWM_Init), and the ARM7 answers with events that run the command's
+// callback. The functions have the names of the SDK functions they implement, from what the code does, where those are
+// known. The game calls the functions through thumb veneers that the linker made.
 
 typedef enum {
     NWM_RETCODE_SUCCESS = 0,
@@ -64,7 +63,7 @@ typedef struct NWMPmkParam {
 
 // NWM_Init: sets the library up with a 32-byte-aligned system area of the given size (whose beginning holds the work,
 // its buffers and its callbacks) and a DMA channel to clear it with, and takes the PXI tag
-NWMRetCode func_02702434(void *systemBuffer, u32 size, u32 dmaNo);
+NWMRetCode NWM_Init(void *systemBuffer, u32 size, u32 dmaNo);
 // SUCCESS if the library is initialized, else ILLEGAL_STATE
 NWMRetCode func_02702698(void);
 // The library's state, 0 when it is not initialized
@@ -73,18 +72,15 @@ u16 func_027028b0(void);
 u16 func_02702980(void);
 // A number from the console's MAC address and the VBlank count: 30 to 39 when the argument is 1, else 105 to 114
 u16 func_02702998(int type);
-// NWM_End
-NWMRetCode func_02702a98(void);
-// NWM_LoadDevice: also puts the callbacks that exit the application when the console sleeps and before it exits
-NWMRetCode func_02702b08(NWMCallback callback);
-// NWM_UnloadDevice
-NWMRetCode func_02702bfc(NWMCallback callback);
+NWMRetCode NWM_End(void);
+// Also puts the callbacks that exit the application when the console sleeps and before it exits
+NWMRetCode NWM_LoadDevice(NWMCallback callback);
+NWMRetCode NWM_UnloadDevice(NWMCallback callback);
 // The command 5, for a console with the wireless on (NWM_Open, by the states)
 NWMRetCode func_02702f38(NWMCallback callback);
 // The command 6 (NWM_Close, by the states)
 NWMRetCode func_02702fe8(NWMCallback callback);
-// NWM_StartScan
-NWMRetCode func_02703088(NWMCallback callback, const NWMScanParam *param);
+NWMRetCode NWM_StartScan(NWMCallback callback, const NWMScanParam *param);
 // The first information element of a scan result with the ID, or NULL
 u8 *func_02703208(NWMBssDesc *bssDesc, u32 id);
 // The first vendor-specific element (ID 0xdd) of a scan result that begins with the four bytes (the OUI and the
@@ -100,10 +96,10 @@ NWMRetCode func_027034c0(NWMCallback callback, u32 mode, u32 arg, const void *da
 NWMRetCode func_027035f4(NWMCallback callback, u32 arg);
 // NWM_SendFrame: sends the frame, whose first 12 bytes the library fills with the two MAC addresses. The callback runs
 // when the ARM7 is done with it
-NWMRetCode func_027036a0(NWMCallback callback, const u8 *destAddr, u8 *frame, u32 size);
+NWMRetCode NWM_SendFrame(NWMCallback callback, const u8 *destAddr, u8 *frame, u32 size);
 // NWM_SetReceivingFrameBuffer: gives the ARM7 a buffer (zeroed) to receive frames in, and the callback that the
 // events of the given index run
-NWMRetCode func_0270379c(NWMCallback receiveCallback, void *buffer, u32 size, u32 index);
+NWMRetCode NWM_SetReceivingFrameBuffer(NWMCallback receiveCallback, void *buffer, u32 size, u32 index);
 // The command 0xc, which takes the index of the callback of the received frames
 NWMRetCode func_02703854(NWMCallback callback, u32 index);
 // The command 0x12 (a pairwise master key, by the parameter)

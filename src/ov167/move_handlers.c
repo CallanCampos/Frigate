@@ -5013,7 +5013,7 @@ static void HandlerConversion2(BattleEventItem *item, BtlServerFlow *flow, u8 mo
                     if (DoesMonHaveType(mon, types[i])) {
                         length = count - 1 - i;
                         if (length > 0) {
-                            sys_memcpy(&types[i + 1], &types[i], length);
+                            MI_CpuCopy8(&types[i + 1], &types[i], length);
                         }
                         count--;
                     } else {

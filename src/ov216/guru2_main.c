@@ -886,7 +886,7 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GURU2, 0x80000);
     g2m = GFL_ProcInitSubsystem(proc, sizeof(Guru2MainWork), HEAPID_GURU2);
     i = 0;
-    sys_memset(g2m, 0, sizeof(Guru2MainWork));
+    MI_CpuFill8(g2m, 0, sizeof(Guru2MainWork));
     g2p->g2m = g2m;
     g2m->g2p = g2p;
     g2m->g2c = g2p->g2c;
@@ -1807,8 +1807,7 @@ static void Guru2Main_ShowBGs(Guru2MainWork *g2m) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     G2_SetBG0Priority(1);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 11,
-                        10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 11, 10);
 }
 
 static void Guru2Main_HideBGs(Guru2MainWork *g2m) {
@@ -1830,8 +1829,8 @@ static void Guru2Main_Setup3D(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(TRUE);
-    gfxSetEdgeColorTable(sEdgeColors);
-    gfxClearColor(GX_RGB(31, 31, 31), 0, 0x7fff, 63, FALSE);
+    G3X_SetEdgeColorTable(sEdgeColors);
+    G3X_SetClearColor(GX_RGB(31, 31, 31), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
 }
 
@@ -2290,7 +2289,7 @@ static void Guru2Disc_Turn(Guru2Disc *disc, fx32 angle) {
 // The model behind the disc
 static void Guru2Main_InitBG3D(Guru2MainWork *g2m) {
     g2m->bgScene = GFL_G3DMgrNewScene(g2m->g3dManager, &sBGScene);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 0, FALSE);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 0, FALSE);
 }
 
 static void Guru2Main_FreeBG3D(Guru2MainWork *g2m) {
@@ -2562,7 +2561,7 @@ static void Guru2Main_AddEgg(Guru2MainWork *g2m, int netId, int position, int in
     egg->landed = FALSE;
 
     task = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GURU2), sizeof(Guru2EggFallTask), FALSE, "guru2_main.c", 4878);
-    sys_memset(task, 0, sizeof(Guru2EggFallTask));
+    MI_CpuFill8(task, 0, sizeof(Guru2EggFallTask));
     task->g2m = g2m;
     task->egg = egg;
     GFL_TCBMgrAddTask(g2m->tcbManager, Guru2EggFallTask_Main, task, 0);
@@ -2651,7 +2650,7 @@ static void Guru2EggJumpTask_Update(Guru2MainWork *g2m, Guru2EggJumpTask *task) 
             } else {
                 egg->jumpY = 0;
                 Guru2Main_StartEggShake(g2m, egg);
-                sys_memset(task, 0, sizeof(Guru2EggJumpTask));
+                MI_CpuFill8(task, 0, sizeof(Guru2EggJumpTask));
             }
         }
         break;
@@ -2671,7 +2670,7 @@ static void Guru2EggJumpTask_Main(TCB *tcb, void *data) {
 }
 
 static void Guru2Main_InitEggJump(Guru2MainWork *g2m) {
-    sys_memset(g2m->jumpTasks, 0, sizeof(g2m->jumpTasks));
+    MI_CpuFill8(g2m->jumpTasks, 0, sizeof(g2m->jumpTasks));
     g2m->jumpTCB = GFL_TCBMgrAddTask(g2m->tcbManager, Guru2EggJumpTask_Main, g2m, 0x100);
 }
 
@@ -2732,7 +2731,7 @@ static void Guru2EggSpinTask_Update(Guru2EggSpinTask *task) {
             task->speed = (u32)task->speed >> 1;
             if (task->speed < FX32_CONST(4)) {
                 egg->rotation.y = 0;
-                sys_memset(task, 0, sizeof(Guru2EggSpinTask));
+                MI_CpuFill8(task, 0, sizeof(Guru2EggSpinTask));
             }
         }
         break;
@@ -2752,7 +2751,7 @@ static void Guru2EggSpinTask_Main(TCB *tcb, void *data) {
 }
 
 static void Guru2Main_InitEggSpin(Guru2MainWork *g2m) {
-    sys_memset(g2m->spinTasks, 0, sizeof(g2m->spinTasks));
+    MI_CpuFill8(g2m->spinTasks, 0, sizeof(g2m->spinTasks));
     g2m->spinTCB = GFL_TCBMgrAddTask(g2m->tcbManager, Guru2EggSpinTask_Main, g2m, 0x101);
 }
 
@@ -2807,7 +2806,7 @@ static void Guru2EggShakeTask_Update(Guru2EggShakeTask *task) {
             task->amplitude = (u32)task->amplitude >> 1;
             if (task->amplitude == 0) {
                 egg->rotation.z = 0;
-                sys_memset(task, 0, sizeof(Guru2EggShakeTask));
+                MI_CpuFill8(task, 0, sizeof(Guru2EggShakeTask));
             }
         }
         break;
@@ -2827,7 +2826,7 @@ static void Guru2EggShakeTask_Main(TCB *tcb, void *data) {
 }
 
 static void Guru2Main_InitEggShake(Guru2MainWork *g2m) {
-    sys_memset(g2m->shakeTasks, 0, sizeof(g2m->shakeTasks));
+    MI_CpuFill8(g2m->shakeTasks, 0, sizeof(g2m->shakeTasks));
     g2m->shakeTCB = GFL_TCBMgrAddTask(g2m->tcbManager, Guru2EggShakeTask_Main, g2m, 0x102);
 }
 
@@ -2916,7 +2915,7 @@ static void Guru2DiscBumpTask_Main(TCB *tcb, void *data) {
 }
 
 static void Guru2Main_InitDiscBump(Guru2MainWork *g2m) {
-    sys_memset(&g2m->bumpTask, 0, sizeof(Guru2DiscBumpTask));
+    MI_CpuFill8(&g2m->bumpTask, 0, sizeof(Guru2DiscBumpTask));
     g2m->bumpTCB = GFL_TCBMgrAddTask(g2m->tcbManager, Guru2DiscBumpTask_Main, g2m, 0xff);
 }
 
@@ -2973,7 +2972,7 @@ static void Guru2Main_StartCountdown(Guru2MainWork *g2m) {
     ClActorSetup setup;
 
     task = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_GURU2), sizeof(Guru2CountdownTask), FALSE, "guru2_main.c", 5638);
-    sys_memset(task, 0, sizeof(Guru2CountdownTask));
+    MI_CpuFill8(task, 0, sizeof(Guru2CountdownTask));
     setup.x = 128;
     setup.y = 100;
     setup.sequence = 0;
@@ -3029,7 +3028,7 @@ static void Guru2ButtonTask_Main(TCB *tcb, void *data) {
 }
 
 static void Guru2Main_InitButton(Guru2MainWork *g2m) {
-    sys_memset(&g2m->buttonTask, 0, sizeof(Guru2ButtonTask));
+    MI_CpuFill8(&g2m->buttonTask, 0, sizeof(Guru2ButtonTask));
     g2m->buttonTCB = GFL_TCBMgrAddTask(g2m->tcbManager, Guru2ButtonTask_Main, g2m, 0x103);
 }
 
@@ -3082,7 +3081,7 @@ static void Guru2BonusTask_Main(TCB *tcb, void *data) {
 }
 
 static void Guru2Main_InitBonus(Guru2MainWork *g2m) {
-    sys_memset(g2m->bonusTasks, 0, sizeof(g2m->bonusTasks));
+    MI_CpuFill8(g2m->bonusTasks, 0, sizeof(g2m->bonusTasks));
     g2m->bonusTCB = GFL_TCBMgrAddTask(g2m->tcbManager, Guru2BonusTask_Main, g2m, 0x104);
 }
 
@@ -3197,7 +3196,7 @@ void Guru2Main_OnGameData(Guru2MainWork *g2m, const void *data) {
 }
 
 static void *Guru2Main_InitSeqWork(Guru2MainWork *g2m, u32 size) {
-    sys_memset(g2m->seqWork, 0, sizeof(g2m->seqWork));
+    MI_CpuFill8(g2m->seqWork, 0, sizeof(g2m->seqWork));
     return g2m->seqWork;
 }
 

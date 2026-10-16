@@ -120,7 +120,7 @@ void WIFI_MCR_Init(WIFI_MATCHROOM *wk, u32 heapId, ArcTool *arc, u32 heroView, u
     u32 mapNo = 0;
     WIFI_MCR_MAPSIZE size;
 
-    sys_memset(wk, 0, sizeof(WIFI_MATCHROOM));
+    MI_CpuFill8(wk, 0, sizeof(WIFI_MATCHROOM));
 
     if (friendNum != 0) {
         mapNo = (friendNum - 1) / WIFI_MCR_BLOCK_FRIEND_NUM;
@@ -158,7 +158,7 @@ void WIFI_MCR_Dest(WIFI_MATCHROOM *wk) {
     WF2DMAP_MAPSysExit(wk->mapSys);
     WifiMcr_ClactExit(&wk->clact);
     WifiMcr_BgExit(wk->unk10);
-    sys_memset(wk, 0, sizeof(WIFI_MATCHROOM));
+    MI_CpuFill8(wk, 0, sizeof(WIFI_MATCHROOM));
 }
 
 BOOL WIFI_MCR_GetInitFlag(const WIFI_MATCHROOM *wk) {
@@ -333,7 +333,7 @@ void WIFI_MCR_DelPeopleReq(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj) {
 void WIFI_MCR_DelPeople(MCR_MOVEOBJ *obj) {
     WF2DMAP_OBJDrawWkDel(obj->draw);
     WF2DMAP_OBJWkDel(obj->obj);
-    sys_memset(obj, 0, sizeof(MCR_MOVEOBJ));
+    MI_CpuFill8(obj, 0, sizeof(MCR_MOVEOBJ));
 }
 
 u8 WIFI_MCR_GetFriendNo(const MCR_MOVEOBJ *obj) {
@@ -941,7 +941,7 @@ static void WifiMcr_NpcMoveInit(WIFI_MATCHROOM *wk, MCR_MOVEOBJ *obj, u32 moveId
 }
 
 static void WifiMcr_PcAnmInit(WIFI_MATCHROOM *wk, MCR_PCANM *anm, ArcTool *arc, u32 arcId) {
-    sys_memset(anm, 0, sizeof(MCR_PCANM));
+    MI_CpuFill8(anm, 0, sizeof(MCR_PCANM));
 
     anm->buffer = GFL_G2DIOReadNCLR(arcId, 9, &anm->palette, wk->heapId);
     anm->frame = 0;
@@ -951,7 +951,7 @@ static void WifiMcr_PcAnmInit(WIFI_MATCHROOM *wk, MCR_PCANM *anm, ArcTool *arc, 
 
 static void WifiMcr_PcAnmExit(WIFI_MATCHROOM *wk, MCR_PCANM *anm) {
     GFL_HeapFree(anm->buffer);
-    sys_memset(anm, 0, sizeof(MCR_PCANM));
+    MI_CpuFill8(anm, 0, sizeof(MCR_PCANM));
 }
 
 static void WifiMcr_PcAnmMain(WIFI_MATCHROOM *wk, MCR_PCANM *anm) {

@@ -373,7 +373,7 @@ static void WipeBright_Init(WipeScreen *screen, BOOL cover) {
     s32 start, end;
 
     screen->work = GFL_HeapAllocate(screen->heapId, sizeof(WipeBrightWork), FALSE, "wipe_sub.c", 2476);
-    sys_memset(screen->work, 0, sizeof(WipeBrightWork));
+    MI_CpuFill8(screen->work, 0, sizeof(WipeBrightWork));
     work = screen->work;
     if (cover == FALSE) {
         if (screen->color == WIPE_COLOR_WHITE) {
@@ -547,7 +547,7 @@ static void WipeScanWnd_CopyTask(TCB *tcb, void *data) {
     for (i = 0; i < scan->count; i++) {
         WipeScanBuf *buf = WipeScanWnd_GetBuf(scan, i);
 
-        sys_memcpy(&buf->next, &buf->lines, sizeof(WipeScanLines));
+        MI_CpuCopy8(&buf->next, &buf->lines, sizeof(WipeScanLines));
     }
     GFL_TCBRemove(tcb);
 }
@@ -586,7 +586,7 @@ static void WipeSub_SetWndVisible(WipeWnd *wnd, u32 visible, s32 screen, BOOL de
 }
 
 static void WipeLineWnd_Init(WipeLineWnd *lines, u32 screen, u32 count, u32 window0, u32 window1) {
-    sys_memset(lines, 0, sizeof(WipeLineWnd));
+    MI_CpuFill8(lines, 0, sizeof(WipeLineWnd));
     if (count == 1) {
         lines->buf[0].window = window0;
         lines->count = count;
@@ -616,7 +616,7 @@ static void WipeLineWnd_CopyTask(TCB *tcb, void *data) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        sys_memcpy(lines->buf[i].lines, lines->buf[i].prev, sizeof(lines->buf[i].lines));
+        MI_CpuCopy8(lines->buf[i].lines, lines->buf[i].prev, sizeof(lines->buf[i].lines));
     }
     GFL_TCBRemove(tcb);
 }
@@ -889,7 +889,7 @@ static void WipeCircleWork_Compute(WipeCircleWork *work) {
 
 static void WipeLine_Init(WipeScreen *screen, WipeLinePattern *pattern) {
     screen->work = GFL_HeapAllocate(screen->heapId, sizeof(WipeLineWork), FALSE, "wipe_sub.c", 4948);
-    sys_memset(screen->work, 0, sizeof(WipeLineWork));
+    MI_CpuFill8(screen->work, 0, sizeof(WipeLineWork));
     WipeLineWork_Init(screen->work, pattern, screen->division, screen->sync, screen->screen, screen->wnd,
                       screen->hblank, screen->heapId);
     screen->seq++;
@@ -924,11 +924,11 @@ static void WipeLineWork_Init(WipeLineWork *work, WipeLinePattern *pattern, s32 
                               WipeWnd *wnd, WipeHBlank *hblank, u32 heapId) {
     WipeLineWnd_Init(&work->lines, screen, 1, 0, 0);
     if (pattern->isOut == FALSE) {
-        sys_memset(work->lines.buf[0].prev, TRUE, sizeof(work->lines.buf[0].prev));
-        sys_memset(work->lines.buf[0].lines, TRUE, sizeof(work->lines.buf[0].lines));
+        MI_CpuFill8(work->lines.buf[0].prev, TRUE, sizeof(work->lines.buf[0].prev));
+        MI_CpuFill8(work->lines.buf[0].lines, TRUE, sizeof(work->lines.buf[0].lines));
     } else {
-        sys_memset(work->lines.buf[0].prev, FALSE, sizeof(work->lines.buf[0].prev));
-        sys_memset(work->lines.buf[0].lines, FALSE, sizeof(work->lines.buf[0].lines));
+        MI_CpuFill8(work->lines.buf[0].prev, FALSE, sizeof(work->lines.buf[0].prev));
+        MI_CpuFill8(work->lines.buf[0].lines, FALSE, sizeof(work->lines.buf[0].lines));
     }
     work->ranges = pattern->ranges;
     work->count = pattern->count;

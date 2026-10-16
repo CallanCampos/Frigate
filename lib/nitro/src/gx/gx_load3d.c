@@ -7,8 +7,8 @@
 // they are not part of the source.
 #include "nitro/gx.h"
 
-// Where the CPU sees the banks of the texture palettes, as a multiple of 4 KB, indexed by the banks / 16 (swan's name
-// is data_020987c0): the first of E, F and G that the palette is in. E and G together are not a valid choice
+// Where the CPU sees the banks of the texture palettes, as a multiple of 4 KB, indexed by the banks / 16: the first of
+// E, F and G that the palette is in. E and G together are not a valid choice
 static const u16 TEXPLTT_VRAM_BANK_ADDRS[8] = {
     0,                    // none
     HW_LCDC_VRAM_E >> 12, // E
@@ -62,14 +62,14 @@ static u32 sRearPlaneImageAddr;
 static u32 sTexBanks;
 static u32 sTexAddr2;
 
-void gfxBeginTextureUpload(void) {
-    sTexBanks = gfxAcquireTextureBanks();
+void GX_BeginLoadTex(void) {
+    sTexBanks = GX_ResetBankForTex();
     sTexAddr = TEX_VRAM_BANK_RANGES[sTexBanks].addr << 12;
     sTexAddr2 = TEX_VRAM_BANK_RANGES[sTexBanks].addr2 << 12;
     sTexSize = TEX_VRAM_BANK_RANGES[sTexBanks].size << 12;
 }
 
-void gfxUploadTexture(const void *src, u32 offset, u32 size) {
+void GX_LoadTex(const void *src, u32 offset, u32 size) {
     u32 addr2 = sTexAddr2;
     void *dest;
     if (addr2 == 0) {
@@ -91,33 +91,33 @@ void gfxUploadTexture(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, dest, size, NULL, NULL);
 }
 
-void gfxEndTextureUpload(void) {
+void GX_EndLoadTex(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetTextureBanks(sTexBanks);
+    GX_SetBankForTex(sTexBanks);
     sTexSize = 0;
     sTexAddr2 = 0;
     sTexAddr = 0;
     sTexBanks = 0;
 }
 
-void gfxBeginPaletteUpload(void) {
-    sPlttBanks = gfxAcquirePaletteBanks();
+void GX_BeginLoadTexPltt(void) {
+    sPlttBanks = GX_ResetBankForTexPltt();
     sPlttAddr = TEXPLTT_VRAM_BANK_ADDRS[sPlttBanks >> 4] << 12;
 }
 
-void gfxUploadPalette(const void *src, u32 offset, u32 size) {
+void GX_LoadTexPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)(sPlttAddr + offset), size, NULL, NULL);
 }
 
-void gfxEndPaletteUpload(void) {
+void GX_EndLoadTexPltt(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetPaletteBanks(sPlttBanks);
+    GX_SetBankForTexPltt(sPlttBanks);
     sPlttBanks = 0;
     sPlttAddr = 0;
 }
 
-void gfxBeginRearPlaneImageUpload(void) {
-    g_GfxVRAMUploadBanksRearPlaneImage = gfxAcquireRearPlaneImageBanks();
+void GX_BeginLoadClearImage(void) {
+    g_GfxVRAMUploadBanksRearPlaneImage = GX_ResetBankForClearImage();
     // The second image is in the highest bank given and the first 128 KB before it, so with a single bank the address
     // is of the bank before it
     switch (g_GfxVRAMUploadBanksRearPlaneImage) {
@@ -138,17 +138,17 @@ void gfxBeginRearPlaneImageUpload(void) {
     }
 }
 
-void gfxUploadRearPlaneImageA(const void *src, u32 size) {
+void GX_LoadClearImageColor(const void *src, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)sRearPlaneImageAddr, size, NULL, NULL);
 }
 
-void gfxUploadRearPlaneImageB(const void *src, u32 size) {
+void GX_LoadClearImageDepth(const void *src, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)(sRearPlaneImageAddr + 0x20000), size, NULL, NULL);
 }
 
-void gfxEndRearPlaneImageUpload(void) {
+void GX_EndLoadClearImage(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetRearPlaneImageBanks(g_GfxVRAMUploadBanksRearPlaneImage);
+    GX_SetBankForClearImage(g_GfxVRAMUploadBanksRearPlaneImage);
     g_GfxVRAMUploadBanksRearPlaneImage = 0;
     sRearPlaneImageAddr = 0;
 }

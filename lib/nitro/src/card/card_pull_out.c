@@ -21,7 +21,7 @@ void func_0206fed8(void) {
     PXI_Init();
     sCardPullOut.notificationCount = 0;
     sCardPullOut.pulledOut = FALSE;
-    func_0207c9fc(14, func_0206fefc);
+    PXI_SetFifoRecvCallback(14, func_0206fefc);
     sCardPullOut.callback = NULL;
 }
 
@@ -31,7 +31,7 @@ static void func_0206fefc(u32 tag, u32 data, BOOL err) {
         if (!sCardPullOut.pulledOut) {
             BOOL terminate = TRUE;
             sCardPullOut.pulledOut = TRUE;
-            func_0206f0f0(TRUE, FALSE);
+            CARDi_NotifyEvent(TRUE, FALSE);
             if (sCardPullOut.callback != NULL) {
                 terminate = sCardPullOut.callback();
             }
@@ -42,7 +42,7 @@ static void func_0206fefc(u32 tag, u32 data, BOOL err) {
     } else if (command == 2) {
         ++sCardPullOut.notificationCount;
         sCardPullOut.pulledOut = FALSE;
-        func_0206f0f0(2, 0);
+        CARDi_NotifyEvent(2, 0);
     } else {
         sys_exit();
     }
@@ -58,13 +58,13 @@ BOOL func_0206ff5c(void) {
 
 static void func_0206ff68(void) {
     if (PAD_DetectFold()) {
-        func_0207ef8c();
+        PM_ForceToPowerOff();
     }
     if (hw_isDSi()) {
         func_0206ffac();
     }
     func_0206fffc(1, 1);
-    dma_endAll();
+    MI_StopAllDma();
     if (hw_isDSi()) {
         func_0206ffbc();
     }
@@ -116,9 +116,9 @@ void func_0206ffcc(u32 cardId) {
     // slot
     volatile u32 bootCardId = *(vu32 *)0x02fffc00;
     if (cardId != bootCardId) {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
         func_0206fefc(14, 0x11, FALSE);
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
     }
 }
 

@@ -412,7 +412,7 @@ static BOOL UnionComm_AddBeacon(UnionSystem *unisys, UnionBeacon *beacon, const 
         UnionBeaconEntry *entry = &found[i];
 
         if (entry->beacon.valid == 1 && GFL_STD_MemCmp(mac, entry->mac, 6) == 0) {
-            sys_memcpy(beacon, entry, sizeof(UnionBeacon));
+            MI_CpuCopy8(beacon, entry, sizeof(UnionBeacon));
             if (found[i].status != 1) {
                 found[i].status = 2;
             }
@@ -427,8 +427,8 @@ static BOOL UnionComm_AddBeacon(UnionSystem *unisys, UnionBeacon *beacon, const 
         UnionBeaconEntry *entry = &found[i];
 
         if (entry->beacon.valid != 1) {
-            sys_memcpy(beacon, entry, sizeof(UnionBeacon));
-            sys_memcpy(mac, entry->mac, 6);
+            MI_CpuCopy8(beacon, entry, sizeof(UnionBeacon));
+            MI_CpuCopy8(mac, entry->mac, 6);
             found[i].index = i;
             found[i].status = 1;
             found[i].timeout = UNION_BEACON_TIMEOUT;
@@ -470,15 +470,15 @@ static void *UnionComm_GetBeacon(void *work) {
 static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     UnionSelf *self = &unisys->situ;
 
-    sys_memset(beacon, 0, sizeof(UnionBeacon));
+    MI_CpuFill8(beacon, 0, sizeof(UnionBeacon));
     if (self->mycomm.parent != NULL) {
         if (func_02042bc4() == TRUE) {
-            func_0207c33c(beacon->mac);
+            OS_GetMacAddress(beacon->mac);
         } else {
-            sys_memcpy(self->mycomm.parent->mac, beacon->mac, 6);
+            MI_CpuCopy8(self->mycomm.parent->mac, beacon->mac, 6);
         }
     } else if (self->mycomm.unk4 != NULL) {
-        sys_memcpy(self->mycomm.unk4->mac, beacon->mac, 6);
+        MI_CpuCopy8(self->mycomm.unk4->mac, beacon->mac, 6);
     }
     beacon->memberCount = func_02042a78();
     beacon->version = GAME_VERSION;
@@ -538,7 +538,7 @@ static void UnionComm_NetCallback2C(void *work) {
 }
 
 void UnionComm_ClearBeacons(UnionSystem *unisys) {
-    sys_memset(unisys->found, 0, sizeof(unisys->found));
+    MI_CpuFill8(unisys->found, 0, sizeof(unisys->found));
 }
 
 void UnionComm_FreeResources(UnionSystem *unisys) {
@@ -594,7 +594,7 @@ void UnionComm_SetSelf(UnionSystem *unisys, u32 which, u32 value) {
 static void UnionComm_InitSelf(UnionSystem *unisys) {
     UnionSelf *self = &unisys->situ;
 
-    sys_memset(self, 0, sizeof(UnionSelf));
+    MI_CpuFill8(self, 0, sizeof(UnionSelf));
     self->counter = GFL_RandomLC(0xffff);
     self->state = 1;
     self->step = 2;
@@ -610,10 +610,10 @@ void UnionGroup_ResetTargets(UnionGroup *group) {
 void UnionGroup_Init(UnionSystem *unisys, UnionGroup *group) {
     UnionMember *self;
 
-    sys_memset(group, 0, sizeof(UnionGroup));
+    MI_CpuFill8(group, 0, sizeof(UnionGroup));
     UnionGroup_ResetTargets(group);
     self = &group->members[0];
-    func_0207c33c(self->mac);
+    OS_GetMacAddress(self->mac);
     self->look = func_02008bf4(unisys->param->playerInfo);
     self->gender = getTrainerGender(unisys->param->playerInfo);
     self->used = TRUE;
@@ -635,7 +635,7 @@ int UnionGroup_AddMember(UnionGroup *group, const u8 *mac, u8 look, u8 gender) {
         UnionMember *member = &group->members[j];
 
         if (!member->used) {
-            sys_memcpy(mac, member->mac, 6);
+            MI_CpuCopy8(mac, member->mac, 6);
             member->look = look;
             member->gender = gender;
             member->used = TRUE;
@@ -656,7 +656,7 @@ void UnionGroup_RemoveMember(UnionGroup *group, const u8 *mac) {
         UnionMember *member = &group->members[i];
 
         if (member->used == 1 && GFL_STD_MemCmp(mac, member->mac, 6) == 0) {
-            sys_memset(member, 0, sizeof(UnionMember));
+            MI_CpuFill8(member, 0, sizeof(UnionMember));
             return;
         }
     }
@@ -669,9 +669,9 @@ void UnionGroup_RemoveBeaconMember(UnionGroup *group, const UnionBeaconEntry *en
 static void UnionComm_InitVisitors(UnionVisitorList *list) {
     int i;
 
-    sys_memset(list, 0, sizeof(UnionVisitorList));
+    MI_CpuFill8(list, 0, sizeof(UnionVisitorList));
     for (i = 0; i < UNION_VISITOR_MAX; i++) {
-        sys_memset(list->visitors[i].mac, 0xff, 6);
+        MI_CpuFill8(list->visitors[i].mac, 0xff, 6);
     }
     list->count = -1;
     list->viewEnd = -1;

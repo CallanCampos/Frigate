@@ -311,7 +311,7 @@ static void DrawSystem_PutPixel(DrawSystem *sys, u16 *screen, u16 x, u16 y, u16 
 }
 
 void DrawSystem_AddCommand(DrawSystem *sys, const DrawCommand *cmd) {
-    sys_memcpy(cmd, DrawSystem_GetCommand(sys, sys->writeIndex), sizeof(DrawCommand));
+    MI_CpuCopy8(cmd, DrawSystem_GetCommand(sys, sys->writeIndex), sizeof(DrawCommand));
     DrawSystem_NextIndex(sys, &sys->writeIndex);
 }
 
@@ -324,7 +324,7 @@ void DrawSystem_SetWriteIndex(DrawSystem *sys, u16 index) {
 }
 
 static u16 *DrawSystem_GetScreen(DrawSystem *sys) {
-    return gfxGetScreenAddrBG2A();
+    return G2_GetBG2ScrPtr();
 }
 
 static DrawCommand *DrawSystem_GetCommand(DrawSystem *sys, u16 index) {

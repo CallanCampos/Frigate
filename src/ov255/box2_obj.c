@@ -422,7 +422,7 @@ void func_ov255_021cf9c8(Box2SysWork *syswk, u32 tray) {
         } else {
             pkm = Box2Main_GetBoxPkm(syswk, tray, i);
             buf = func_ov255_021cf9a4(syswk->app, pkm, &chr);
-            sys_memcpy32(chr->rawData, syswk->app->pokeIconChar[i], 0x200);
+            MIi_CpuCopy32(chr->rawData, syswk->app->pokeIconChar[i], 0x200);
             GFL_HeapFree(buf);
             syswk->app->pokeIconPal[i] = func_ov255_021cfba0(syswk, pkm);
             syswk->app->pokeIconExist[i] = TRUE;
@@ -1405,7 +1405,7 @@ void func_ov255_021d1570(Box2SysWork *syswk, u32 tray) {
     NNSG2dCharacterData *chr;
     void *buf = GFL_G2DIOReadOBJNCGR(ARCID_BOX2, 71, TRUE, &chr, HEAPID_BOX2_APP);
 
-    sys_memcpy(chr->rawData, syswk->app->trayIconChar[tray], 0x400);
+    MI_CpuCopy8(chr->rawData, syswk->app->trayIconChar[tray], 0x400);
     GFL_HeapFree(buf);
     func_ov255_021d16a8(syswk, syswk->app->trayIconChar[tray], Box2Main_GetWallPaperNumber(syswk, tray), 8, 0x400);
     func_ov255_021d16cc(syswk, tray, syswk->app->trayIconChar[tray]);
@@ -1498,7 +1498,7 @@ static void func_ov255_021d16cc(Box2SysWork *syswk, u32 tray, u8 *chr) {
                 color += 16;
                 color = (color << 8) | color;
                 for (y = py; y < py + 2; y++) {
-                    sys_memset16(color, &chr[((y & 7) << 3) + ((((y >> 3) << 2) + (px >> 3)) << 6) + (px & 7)], 2);
+                    MIi_CpuClear16(color, &chr[((y & 7) << 3) + ((((y >> 3) << 2) + (px >> 3)) << 6) + (px & 7)], 2);
                 }
             }
             PML_PkmReEncrypt(pkm, encrypted);
@@ -1739,7 +1739,7 @@ void func_ov255_021d1db0(Box2AppWork *app, s32 mv) {
 }
 
 static void func_ov255_021d1e08(Box2SysWork *syswk) {
-    sys_memset(&syswk->app->rangeSelect, 0, sizeof(Box2RangeSelect));
+    MI_CpuFill8(&syswk->app->rangeSelect, 0, sizeof(Box2RangeSelect));
     syswk->app->rangeSelect.anmMax = 384;
 }
 

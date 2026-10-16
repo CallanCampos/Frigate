@@ -26,55 +26,55 @@ typedef struct OSArenaInfo {
 static struct {
     BOOL initialized;
     BOOL mainExArenaEnabled;
-} sArena;
+} sArena; // swan's g_IsUserMemMarkDone
 
-static void *GetUserMemRegionDefaultEnd(int arena);
-static void *GetUserMemRegionDefaultStart(int arena);
+static void *OS_GetInitArenaHi(int arena); // swan's GetUserMemRegionDefaultEnd
+static void *OS_GetInitArenaLo(int arena); // swan's GetUserMemRegionDefaultStart
 
 // NitroSDK's OS_InitArena: sets the limits of the arenas to the ones they start with, once
 void OS_InitArena(void) {
     if (!sArena.initialized) {
         sArena.initialized = TRUE;
-        SetUserMemRegionEnd(OS_ARENA_MAIN, GetUserMemRegionDefaultEnd(OS_ARENA_MAIN));
-        SetUserMemRegionStart(OS_ARENA_MAIN, GetUserMemRegionDefaultStart(OS_ARENA_MAIN));
-        SetUserMemRegionStart(OS_ARENA_MAINEX, NULL);
-        SetUserMemRegionEnd(OS_ARENA_MAINEX, NULL);
-        SetUserMemRegionEnd(OS_ARENA_ITCM, GetUserMemRegionDefaultEnd(OS_ARENA_ITCM));
-        SetUserMemRegionStart(OS_ARENA_ITCM, GetUserMemRegionDefaultStart(OS_ARENA_ITCM));
-        SetUserMemRegionEnd(OS_ARENA_DTCM, GetUserMemRegionDefaultEnd(OS_ARENA_DTCM));
-        SetUserMemRegionStart(OS_ARENA_DTCM, GetUserMemRegionDefaultStart(OS_ARENA_DTCM));
-        SetUserMemRegionEnd(OS_ARENA_SHARED, GetUserMemRegionDefaultEnd(OS_ARENA_SHARED));
-        SetUserMemRegionStart(OS_ARENA_SHARED, GetUserMemRegionDefaultStart(OS_ARENA_SHARED));
-        SetUserMemRegionEnd(OS_ARENA_WRAM_MAIN, GetUserMemRegionDefaultEnd(OS_ARENA_WRAM_MAIN));
-        SetUserMemRegionStart(OS_ARENA_WRAM_MAIN, GetUserMemRegionDefaultStart(OS_ARENA_WRAM_MAIN));
+        OS_SetArenaHi(OS_ARENA_MAIN, OS_GetInitArenaHi(OS_ARENA_MAIN));
+        OS_SetArenaLo(OS_ARENA_MAIN, OS_GetInitArenaLo(OS_ARENA_MAIN));
+        OS_SetArenaLo(OS_ARENA_MAINEX, NULL);
+        OS_SetArenaHi(OS_ARENA_MAINEX, NULL);
+        OS_SetArenaHi(OS_ARENA_ITCM, OS_GetInitArenaHi(OS_ARENA_ITCM));
+        OS_SetArenaLo(OS_ARENA_ITCM, OS_GetInitArenaLo(OS_ARENA_ITCM));
+        OS_SetArenaHi(OS_ARENA_DTCM, OS_GetInitArenaHi(OS_ARENA_DTCM));
+        OS_SetArenaLo(OS_ARENA_DTCM, OS_GetInitArenaLo(OS_ARENA_DTCM));
+        OS_SetArenaHi(OS_ARENA_SHARED, OS_GetInitArenaHi(OS_ARENA_SHARED));
+        OS_SetArenaLo(OS_ARENA_SHARED, OS_GetInitArenaLo(OS_ARENA_SHARED));
+        OS_SetArenaHi(OS_ARENA_WRAM_MAIN, OS_GetInitArenaHi(OS_ARENA_WRAM_MAIN));
+        OS_SetArenaLo(OS_ARENA_WRAM_MAIN, OS_GetInitArenaLo(OS_ARENA_WRAM_MAIN));
     }
 }
 
 // NitroSDK's OS_InitArenaEx: sets the limits of the extended main memory's arena and, on a DS, protects the main
 // memory (region 1 is its first 4 MB, region 2 the 4 KB at 0x027ff000). A DSi does the protecting in the LTD module
-void func_0207b23c(void) {
-    func_0207ac24();
-    SetUserMemRegionEnd(OS_ARENA_MAINEX, GetUserMemRegionDefaultEnd(OS_ARENA_MAINEX));
-    SetUserMemRegionStart(OS_ARENA_MAINEX, GetUserMemRegionDefaultStart(OS_ARENA_MAINEX));
+void OS_InitArenaEx(void) {
+    OS_GetConsoleType();
+    OS_SetArenaHi(OS_ARENA_MAINEX, OS_GetInitArenaHi(OS_ARENA_MAINEX));
+    OS_SetArenaLo(OS_ARENA_MAINEX, OS_GetInitArenaLo(OS_ARENA_MAINEX));
     if (!hw_isDSi()) {
-        SetMemoryProtectionRegion(1, 0x02000000, OS_PROTECTION_SIZE_4MB);
-        SetMemoryProtectionRegion(2, 0x027ff000, OS_PROTECTION_SIZE_4KB);
+        OS_SetProtectionRegion(1, 0x02000000, OS_PROTECTION_SIZE_4MB);
+        OS_SetProtectionRegion(2, 0x027ff000, OS_PROTECTION_SIZE_4KB);
     } else {
         func_027692ec();
     }
 }
 
-// NitroSDK's OS_GetArenaHi and OS_GetArenaLo, under swan's names
-void *GetUserMemRegionEnd(int arena) {
+// NitroSDK's OS_GetArenaHi and OS_GetArenaLo
+void *OS_GetArenaHi(int arena) {
     return OSi_GetArenaInfo()->hi[arena];
 }
 
-void *GetUserMemRegionStart(int arena) {
+void *OS_GetArenaLo(int arena) {
     return OSi_GetArenaInfo()->lo[arena];
 }
 
 // NitroSDK's OS_GetInitArenaHi: where each arena ends before the game moves it
-static void *GetUserMemRegionDefaultEnd(int arena) {
+static void *OS_GetInitArenaHi(int arena) {
     switch (arena) {
     case OS_ARENA_MAIN:
         if (hw_isDSi()) {
@@ -87,7 +87,7 @@ static void *GetUserMemRegionDefaultEnd(int arena) {
         if (!sArena.mainExArenaEnabled) {
             return NULL;
         }
-        consoleSize = func_0207ac24() & OS_CONSOLE_SIZE_MASK;
+        consoleSize = OS_GetConsoleType() & OS_CONSOLE_SIZE_MASK;
         if (hw_isDSi()) {
             if (consoleSize == OS_CONSOLE_SIZE_16MB) {
                 return NULL;
@@ -124,7 +124,7 @@ static void *GetUserMemRegionDefaultEnd(int arena) {
 }
 
 // NitroSDK's OS_GetInitArenaLo: where each arena begins before the game moves it
-static void *GetUserMemRegionDefaultStart(int arena) {
+static void *OS_GetInitArenaLo(int arena) {
     switch (arena) {
     case OS_ARENA_MAIN:
         if (hw_isDSi()) {
@@ -137,7 +137,7 @@ static void *GetUserMemRegionDefaultStart(int arena) {
         if (!sArena.mainExArenaEnabled) {
             return NULL;
         }
-        consoleSize = func_0207ac24() & OS_CONSOLE_SIZE_MASK;
+        consoleSize = OS_GetConsoleType() & OS_CONSOLE_SIZE_MASK;
         if (hw_isDSi()) {
             void *lo = NULL;
             if (consoleSize != OS_CONSOLE_SIZE_16MB) {
@@ -164,19 +164,19 @@ static void *GetUserMemRegionDefaultStart(int arena) {
     return NULL;
 }
 
-// NitroSDK's OS_SetArenaHi and OS_SetArenaLo, under swan's names
-void SetUserMemRegionEnd(int arena, void *end) {
+// NitroSDK's OS_SetArenaHi and OS_SetArenaLo
+void OS_SetArenaHi(int arena, void *end) {
     OSi_GetArenaInfo()->hi[arena] = end;
 }
 
-void SetUserMemRegionStart(int arena, void *start) {
+void OS_SetArenaLo(int arena, void *start) {
     OSi_GetArenaInfo()->lo[arena] = start;
 }
 
-// NitroSDK's OS_AllocFromArenaLo, under swan's name: takes memory from the start of the arena, NULL when there is not
+// NitroSDK's OS_AllocFromArenaLo: takes memory from the start of the arena, NULL when there is not
 // enough
-void *mem_alloc_direct(int arena, u32 size, u32 alignment) {
-    u32 start = (u32)GetUserMemRegionStart(arena);
+void *OS_AllocFromArenaLo(int arena, u32 size, u32 alignment) {
+    u32 start = (u32)OS_GetArenaLo(arena);
     u32 end;
 
     if (start == 0) {
@@ -185,9 +185,9 @@ void *mem_alloc_direct(int arena, u32 size, u32 alignment) {
     start = (start + alignment - 1) & ~(alignment - 1);
     end = start + size;
     end = (end + alignment - 1) & ~(alignment - 1);
-    if (end > (u32)GetUserMemRegionEnd(arena)) {
+    if (end > (u32)OS_GetArenaHi(arena)) {
         return NULL;
     }
-    SetUserMemRegionStart(arena, (void *)end);
+    OS_SetArenaLo(arena, (void *)end);
     return (void *)start;
 }

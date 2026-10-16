@@ -5,7 +5,7 @@
 
 // ARM code in a Thumb file: the SDK compiled this one under nitro/code32.h
 #pragma thumb off
-void gfxRegSetBGTransform(u32 addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
+void G2x_SetBGyAffine_(u32 addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
     vu32 *reg = (vu32 *)addr;
     fx32 a = mtx->_00;
     fx32 b = mtx->_01;
@@ -22,11 +22,11 @@ void gfxRegSetBGTransform(u32 addr, const MtxFx22 *mtx, int centerX, int centerY
 }
 #pragma thumb on
 
-void gfxRegSetAlphaBlend(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2) {
+void G2x_SetBlendAlpha_(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2) {
     *(vu32 *)reg = (u32)((plane1 | REG_G2_BLDCNT_EFFECT_ALPHA | (plane2 << 8)) | ((alpha1 | (alpha2 << 8)) << 16));
 }
 
-void gfxRegSetBrightnessBlend(u32 reg, u32 plane, s32 brightness) {
+void G2x_SetBlendBrightness_(u32 reg, u32 plane, s32 brightness) {
     if (brightness < 0) {
         *(vu16 *)reg = (u16)(plane | REG_G2_BLDCNT_EFFECT_DECREASE);
         *(vu16 *)(reg + 4) = (u16)-brightness;
@@ -36,7 +36,7 @@ void gfxRegSetBrightnessBlend(u32 reg, u32 plane, s32 brightness) {
     }
 }
 
-void gfxRegSetBlend(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness) {
+void G2x_SetBlendBrightnessExt_(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness) {
     *(vu16 *)(reg + 2) = (u16)(alpha1 | (alpha2 << 8));
     if (brightness < 0) {
         *(vu16 *)reg = (u16)(plane1 | REG_G2_BLDCNT_EFFECT_DECREASE | (plane2 << 8));
@@ -47,7 +47,7 @@ void gfxRegSetBlend(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32
     }
 }
 
-void gfxRegAdjustBrightnessBlend(u32 reg, s32 brightness) {
+void G2x_ChangeBlendBrightness_(u32 reg, s32 brightness) {
     u16 bldcnt = *(vu16 *)reg;
     if (brightness < 0) {
         if ((bldcnt & REG_G2_BLDCNT_EFFECT_MASK) == REG_G2_BLDCNT_EFFECT_INCREASE) {

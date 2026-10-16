@@ -434,7 +434,7 @@ static BOOL WbtListProc_Init(GameProc *proc, u32 *state, void *param, void *work
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WBT_LIST, 0x30000);
     list = GFL_ProcInitSubsystem(proc, sizeof(WbtList), HEAPID_WBT_LIST);
-    sys_memset(list, 0, sizeof(WbtList));
+    MI_CpuFill8(list, 0, sizeof(WbtList));
     list->heapId = HEAPID_WBT_LIST;
     list->setup = param;
     list->graphic = WbtListGraphic_Create(1, list->heapId);
@@ -857,7 +857,7 @@ static void WbtList_CreateActors(WbtList *work, u32 vramType, const WbtListActor
     ClActUnit *unit = WbtListGraphic_GetClActUnit(work->graphic);
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < ACTOR_COUNT; i++) {
         u32 position;
         s32 x;
@@ -917,7 +917,7 @@ static void WbtList_CreateNameActors(WbtList *work, u32 vramType, const WbtListN
         position = setups->position * 2;
         x = WbtList_GetPosition(work, position);
         y = WbtList_GetPosition(work, position + 1);
-        sys_memset(&setup, 0, sizeof(BmpOamActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(BmpOamActorSetup));
         setup.bitmap = work->nameBitmaps[i];
         setup.x = x;
         setup.y = y;
@@ -982,7 +982,7 @@ static void WbtList_SavePalettes(WbtList *work, s32 count, s32 start, s32 sub) {
     if (sub == 1) {
         src += 0x400 / sizeof(u16);
     }
-    sys_memcpy16(src + start * 16, work->palettes, count * 0x20);
+    MIi_CpuCopy16(src + start * 16, work->palettes, count * 0x20);
 }
 
 // Makes the gray version of one of the kept palettes

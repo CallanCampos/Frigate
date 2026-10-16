@@ -279,7 +279,7 @@ static void GtsNego_OnRecvRequest(int netId, int size, const void *data, void *w
     if (netId == func_02042a6c(func_02040440())) {
         return;
     }
-    sys_memcpy(data, &param->unk4[1], sizeof(GtsNegoUnk4));
+    MI_CpuCopy8(data, &param->unk4[1], sizeof(GtsNegoUnk4));
 }
 
 static void GtsNego_OnRecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -292,7 +292,7 @@ static void GtsNego_OnRecvPlayerInfo(int netId, int size, const void *data, void
     if (netId == func_02042a6c(func_02040440())) {
         return;
     }
-    sys_memcpy(data, param->playerInfo2, PlayerInfo_GetSize());
+    MI_CpuCopy8(data, param->playerInfo2, PlayerInfo_GetSize());
 }
 
 static void GtsNego_OnRecvPhrase(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -304,7 +304,7 @@ static void GtsNego_OnRecvPhrase(int netId, int size, const void *data, void *wo
     if (netId == func_02042a6c(func_02040440())) {
         return;
     }
-    sys_memcpy(data, &wk->recv, sizeof(GtsNegoGreeting));
+    MI_CpuCopy8(data, &wk->recv, sizeof(GtsNegoGreeting));
 }
 
 // The partner's Join Avenue person, who becomes a visitor of the avenue
@@ -576,7 +576,7 @@ static void GtsNego_StateStartNameCheck(GtsNegoWork *wk) {
     const u16 *chars;
     u32 i = 0;
 
-    sys_memset(&wk->nameCheck, 0, sizeof(GtsNegoNameCheck));
+    MI_CpuFill8(&wk->nameCheck, 0, sizeof(GtsNegoNameCheck));
     wk->nameCheck.unk24 = HEAPID_GTSNEGO;
     chars = GFL_StrBufGetStringPtr(name);
     for (; i < GFL_StrBufGetCharCount(name) + 1; i++) {
@@ -807,11 +807,11 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
         for (i = 0; i < GTSNEGO_KEY_COUNT; i++) {
             GtsNegoMatchKey *key = &wk->keys[i];
 
-            sys_memcpy(sGtsNegoKeyNames[i], key->key, 2);
+            MI_CpuCopy8(sGtsNegoKeyNames[i], key->key, 2);
             key->value = values[i];
             key->keyId = func_ov011_02160e10(key->keyId, key->key, &key->value);
         }
-        func_020800e8(wk->query, "ty=%d And db=%d", wk->mode, 1);
+        STD_TSPrintf(wk->query, "ty=%d And db=%d", wk->mode, 1);
         if (DWCRap_StartMatchQuery(wk->query, 2, GtsNego_EvalMatch, wk)) {
             func_0204204c();
             func_ov011_02151e40(0);
@@ -1524,7 +1524,7 @@ static BOOL GtsNegoProc_Init(GameProc *proc, u32 *state, void *param, void *work
     Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
     Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
     wk = GFL_ProcInitSubsystem(proc, sizeof(GtsNegoWork), HEAPID_GTSNEGO);
-    sys_memset(wk, 0, sizeof(GtsNegoWork));
+    MI_CpuFill8(wk, 0, sizeof(GtsNegoWork));
     wk->heapId = HEAPID_GTSNEGO;
     wk->param = negoParam;
     wk->disp = GtsNegoDisp_Create(wk->heapId, negoParam->gameData);

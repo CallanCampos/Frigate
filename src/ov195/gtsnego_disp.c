@@ -152,7 +152,7 @@ GtsNegoDisp *GtsNegoDisp_Create(HeapID heapId, GameData *gameData) {
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetDisplayLayout(1);
     GXS_DispOn();
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     ClActSys_Create(&sGtsNegoDispClActSetup, &sGtsNegoDispVRAMConfig, disp->heapId);
     disp->clUnit = func_0204bf1c(64, 0, disp->heapId);
@@ -415,12 +415,12 @@ static void GtsNegoDisp_DimPalettes(GtsNegoDisp *disp, u32 vram, int *starts, in
     for (i = 0; i < count; i++) {
         switch (vram) {
         case PALFADE_VRAM_SUB_OBJ:
-            cp15_flushDC(colors + starts[i] * 32, counts[i] * 32);
-            gfxUploadStdPaletteObjB(colors + starts[i] * 32, starts[i] * 32, counts[i] * 32);
+            DC_FlushRange(colors + starts[i] * 32, counts[i] * 32);
+            GXS_LoadOBJPltt(colors + starts[i] * 32, starts[i] * 32, counts[i] * 32);
             break;
         case PALFADE_VRAM_SUB_BG:
-            cp15_flushDC(colors + starts[i] * 32, counts[i] * 32);
-            gfxUploadStdPaletteBGB(colors + starts[i] * 32, starts[i] * 32, counts[i] * 32);
+            DC_FlushRange(colors + starts[i] * 32, counts[i] * 32);
+            GXS_LoadBGPltt(colors + starts[i] * 32, starts[i] * 32, counts[i] * 32);
             break;
         }
     }
@@ -456,8 +456,8 @@ static void GtsNegoDisp_DimPalettesVBlank(GtsNegoDisp *disp, u32 vram, int *star
 
 void GtsNegoDisp_SetDim(GtsNegoDisp *disp, BOOL dim, u32 type) {
     if (dim) {
-        sys_memcpy((void *)HW_DB_OBJ_PLTT, disp->objPalette, 0x200);
-        sys_memcpy((void *)HW_DB_BG_PLTT, disp->bgPalette, 0x200);
+        MI_CpuCopy8((void *)HW_DB_OBJ_PLTT, disp->objPalette, 0x200);
+        MI_CpuCopy8((void *)HW_DB_BG_PLTT, disp->bgPalette, 0x200);
         switch (type) {
         case GTSNEGO_DIM_SEARCH: {
             int starts[] = { 0 };
@@ -513,10 +513,10 @@ void GtsNegoDisp_SetDim(GtsNegoDisp *disp, BOOL dim, u32 type) {
         }
         }
     } else {
-        cp15_flushDC(disp->objPalette, 0x200);
-        gfxUploadStdPaletteObjB(disp->objPalette, 0, 0x200);
-        cp15_flushDC(disp->bgPalette, 0x200);
-        gfxUploadStdPaletteBGB(disp->bgPalette, 0, 0x200);
+        DC_FlushRange(disp->objPalette, 0x200);
+        GXS_LoadOBJPltt(disp->objPalette, 0, 0x200);
+        DC_FlushRange(disp->bgPalette, 0x200);
+        GXS_LoadBGPltt(disp->bgPalette, 0, 0x200);
     }
 }
 
@@ -565,8 +565,8 @@ static void GtsNegoDisp_LoadGraphics(GtsNegoDisp *disp) {
     }
     disp->res[GTSNEGO_RES_PLTT_AVATAR] = func_0204bbb8(arc, 0, CLACT_VRAM_SUB, 0, 0, 8, disp->heapId);
     GFL_ArcToolFree(arc);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2,
-                        GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 15, 9);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2,
+                       GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 15, 9);
 }
 
 void GtsNegoDisp_Dummy(GtsNegoDisp *disp, BOOL list) {
@@ -606,7 +606,7 @@ void GtsNegoDisp_CreateTouchBar(GtsNegoDisp *disp, u32 objPalette) {
     };
     TouchBarSetup setup;
 
-    sys_memset(&setup, 0, sizeof(TouchBarSetup));
+    MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
     setup.items = items;
     setup.count = NELEMS(items);
     setup.unit = disp->clUnit;

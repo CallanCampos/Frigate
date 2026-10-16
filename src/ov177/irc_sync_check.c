@@ -384,7 +384,7 @@ static BOOL IrcSyncCheck_Init(GameProc *proc, u32 *state, void *param, void *wor
 
     GFL_HeapCreateChild(HEAPID_USER, HEAP_ID, 0x25000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcSyncCheckWork), HEAP_ID);
-    sys_memset(wk, 0, sizeof(IrcSyncCheckWork));
+    MI_CpuFill8(wk, 0, sizeof(IrcSyncCheckWork));
     wk->param = syncParam;
     wk->param->unk11 = 0;
     IrcSyncNet_Init(&wk->net, wk->param->sys);
@@ -486,7 +486,7 @@ static BOOL IrcSyncCheck_Main(GameProc *proc, u32 *state, void *param, void *wor
 }
 
 static void IrcSyncCheckGraphic_Create(IrcSyncCheckGraphic *graphic, HeapID heapId) {
-    sys_memset(graphic, 0, sizeof(IrcSyncCheckGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IrcSyncCheckGraphic));
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
     GFL_BGSysSetVRAMBanks(&sIrcSyncCheckVRAMConfig);
     GFL_BGSysSetDisplayLayout(0);
@@ -561,7 +561,7 @@ static void IrcSyncCheckBG_Init(IrcSyncCheckBG *bg, HeapID heapId) {
     GFL_BGSysFillChar(5, 0, 1, 0);
     bg->frameChars = GFL_BGSysLoadArcNCGRDynamic(arc, 49, 5, 0, FALSE, heapId);
     GFL_ArcToolFree(arc);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 5, 12, 13, 8);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 5, 12, 13, 8);
 }
 
 static void IrcSyncCheckBG_Free(IrcSyncCheckBG *bg) {
@@ -586,7 +586,7 @@ static void IrcSyncCheckClAct_Init(IrcSyncCheckClAct *clact, const BGSysVRAMConf
     ClActorSetup setup;
     int i;
 
-    sys_memset(clact, 0, sizeof(IrcSyncCheckClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcSyncCheckClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -597,7 +597,7 @@ static void IrcSyncCheckClAct_Init(IrcSyncCheckClAct *clact, const BGSysVRAMConf
     clact->chars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
     clact->cellAnims = func_0204bde0(arc, 10, 9, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < CLACT_COUNT; i++) {
         clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
                                          CLACT_SURFACE_SUB, heapId);
@@ -621,7 +621,7 @@ static void IrcSyncCheckClAct_Free(IrcSyncCheckClAct *clact) {
     func_0204be64(clact->cellAnims);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(IrcSyncCheckClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcSyncCheckClAct));
 }
 
 static void IrcSyncCheckClAct_Update(IrcSyncCheckClAct *clact) {
@@ -688,8 +688,8 @@ static void IrcSyncCheck_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sIrcSyncCheckLights); i++) {
         GFL_G3DSysLightSet(i, &sIrcSyncCheckLights[i]);
@@ -703,7 +703,7 @@ static void IrcSyncCheckModel_Init(IrcSyncCheckModel *model, ArcTool *arc, const
     NNSG3dRenderObj *renderObj;
     int i;
 
-    sys_memset(model, 0, sizeof(IrcSyncCheckModel));
+    MI_CpuFill8(model, 0, sizeof(IrcSyncCheckModel));
     texture = NULL;
     model->resource = GFL_G3DSysReadArcToolResource(arc, fileIds[0]);
     if (GFL_G3DResCheckType(model->resource, G3D_RES_CHECK_TEX)) {
@@ -743,7 +743,7 @@ static void IrcSyncCheckModel_Free(IrcSyncCheckModel *model) {
         GFL_G3DResFree(model->animationResources[i]);
     }
     GFL_G3DResFree(model->resource);
-    sys_memset(model, 0, sizeof(IrcSyncCheckModel));
+    MI_CpuFill8(model, 0, sizeof(IrcSyncCheckModel));
 }
 
 static void IrcSyncCheckModel_Update(IrcSyncCheckModel *model) {
@@ -785,7 +785,7 @@ static int IrcSyncCheckModel_GetAnimation(IrcSyncCheckModel *model) {
 }
 
 static void IrcSyncCheckText_Init(IrcSyncCheckText *text, BOOL keepFont, HeapID heapId) {
-    sys_memset(text, 0, sizeof(IrcSyncCheckText));
+    MI_CpuFill8(text, 0, sizeof(IrcSyncCheckText));
     func_020232d0();
     if (!keepFont) {
         text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
@@ -800,7 +800,7 @@ static void IrcSyncCheckText_Free(IrcSyncCheckText *text) {
     GFL_MsgDataFree(text->msgData);
     func_02021a18(text->queue);
     GFL_FontFree(text->font);
-    sys_memset(text, 0, sizeof(IrcSyncCheckText));
+    MI_CpuFill8(text, 0, sizeof(IrcSyncCheckText));
 }
 
 static BOOL IrcSyncCheckText_Update(IrcSyncCheckText *text) {
@@ -825,7 +825,7 @@ static WordSet *IrcSyncCheckText_GetWordSet(IrcSyncCheckText *text) {
 
 static void IrcSyncCheckWindow_Init(IrcSyncCheckWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height, u8 palette,
                                     HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcSyncCheckWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcSyncCheckWindow));
     win->color = 15;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, TRUE);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -836,7 +836,7 @@ static void IrcSyncCheckWindow_Init(IrcSyncCheckWindow *win, u8 bg, u8 x, u8 y, 
 
 static void IrcSyncCheckWindow_InitWithColor(IrcSyncCheckWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height,
                                              u8 palette, u16 color, u8 fromEnd, HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcSyncCheckWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcSyncCheckWindow));
     win->color = color;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, fromEnd);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -848,7 +848,7 @@ static void IrcSyncCheckWindow_InitWithColor(IrcSyncCheckWindow *win, u8 bg, u8 
 static void IrcSyncCheckWindow_Free(IrcSyncCheckWindow *win) {
     GFL_StrBufFree(win->strbuf);
     BmpWin_Free(win->window);
-    sys_memset(win, 0, sizeof(IrcSyncCheckWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcSyncCheckWindow));
 }
 
 static BOOL IrcSyncCheckWindow_Flush(IrcSyncCheckWindow *win, IrcSyncCheckText *text) {
@@ -1237,14 +1237,14 @@ static void IrcSyncCheck_StepInterrupted(IrcSyncCheckWork *wk, u16 *state) {
 }
 
 static void IrcSyncNet_Init(IrcSyncNet *net, CompatibleIrcSys *sys) {
-    sys_memset(net, 0, sizeof(IrcSyncNet));
+    MI_CpuFill8(net, 0, sizeof(IrcSyncNet));
     net->sys = sys;
     CompatibleIrcSys_AddCommands(sys, NET_COMMAND_BASE, sIrcSyncCheckCommands, NELEMS(sIrcSyncCheckCommands), net);
 }
 
 static void IrcSyncNet_Free(IrcSyncNet *net) {
     CompatibleIrcSys_RemoveCommands(net->sys, NET_COMMAND_BASE);
-    sys_memset(net, 0, sizeof(IrcSyncNet));
+    MI_CpuFill8(net, 0, sizeof(IrcSyncNet));
 }
 
 // Sends the data, and returns TRUE once the other player's has also arrived
@@ -1297,7 +1297,7 @@ static void *IrcSyncNet_GetBuffer(int netId, void *work, int size) {
 static void IrcSyncCheckThumbs_Init(IrcSyncCheckThumbs *thumbs, IrcSyncCheckG3d *g3d, HeapID heapId) {
     int i;
 
-    sys_memset(thumbs, 0, sizeof(IrcSyncCheckThumbs));
+    MI_CpuFill8(thumbs, 0, sizeof(IrcSyncCheckThumbs));
     for (i = 0; i < THUMB_COUNT; i++) {
         thumbs->models[i] = IrcSyncCheckG3d_GetModel(g3d, i);
         IrcSyncCheckModel_SetAnimation(thumbs->models[i], 0);
@@ -1305,7 +1305,7 @@ static void IrcSyncCheckThumbs_Init(IrcSyncCheckThumbs *thumbs, IrcSyncCheckG3d 
 }
 
 static void IrcSyncCheckThumbs_Free(IrcSyncCheckThumbs *thumbs) {
-    sys_memset(thumbs, 0, sizeof(IrcSyncCheckThumbs));
+    MI_CpuFill8(thumbs, 0, sizeof(IrcSyncCheckThumbs));
 }
 
 // Draws the thumbs, with a sound when one has finished its animation
@@ -1514,7 +1514,7 @@ static void IrcSyncCheckSparkles_Init(IrcSyncCheckSparkles *sparkles, IrcSyncChe
                                       u32 palette, int firstActor, u32 value) {
     int i;
 
-    sys_memset(sparkles, 0, sizeof(IrcSyncCheckSparkles));
+    MI_CpuFill8(sparkles, 0, sizeof(IrcSyncCheckSparkles));
     sparkles->unk580 = unk580;
     sparkles->palette = palette;
     sparkles->timer = 0;
@@ -1526,18 +1526,18 @@ static void IrcSyncCheckSparkles_Init(IrcSyncCheckSparkles *sparkles, IrcSyncChe
 }
 
 static void IrcSyncCheckSparkles_Free(IrcSyncCheckSparkles *sparkles) {
-    sys_memset(sparkles, 0, sizeof(IrcSyncCheckSparkles));
+    MI_CpuFill8(sparkles, 0, sizeof(IrcSyncCheckSparkles));
 }
 
 static void IrcSyncCheckSparkle_Init(IrcSyncCheckSparkle *sparkle, ClActor *actor, u32 palette, u32 value) {
-    sys_memset(sparkle, 0, sizeof(IrcSyncCheckSparkle));
+    MI_CpuFill8(sparkle, 0, sizeof(IrcSyncCheckSparkle));
     sparkle->actor = actor;
     sparkle->value = value;
     func_0204c378(actor, (u8)palette, TRUE);
 }
 
 static void IrcSyncTrace_Clear(IrcSyncTrace *trace) {
-    sys_memset(trace, 0, sizeof(IrcSyncTrace));
+    MI_CpuFill8(trace, 0, sizeof(IrcSyncTrace));
 }
 
 // Takes a point of the trace every few frames while a thumb is held, and returns TRUE once it is done

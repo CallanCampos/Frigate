@@ -98,7 +98,7 @@ WifiLoginDisp *WifiLoginDisp_Create(HeapID heapId, u32 style, u32 unused) {
     G2_BlendNone();
     GFL_BGSysSetDisplayLayout(1);
     GXS_DispOn();
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     GFL_BGSysSetVRAMBanks(&sWifiLoginDispVRAMConfig);
     GFL_BGSysSetLCDConfig(&sWifiLoginDispLCDConfig);
@@ -509,10 +509,10 @@ static inline void WifiLoginDisp_InitCycle(WifiLoginDisp *disp, ArcTool *arc, He
     NNSG2dPaletteData *palette;
     void *file;
 
-    sys_memset(&disp->cycle, 0, sizeof(disp->cycle));
+    MI_CpuFill8(&disp->cycle, 0, sizeof(disp->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    sys_memcpy(palette->rawData, disp->cycle.palettes, sizeof(disp->cycle.palettes));
-    sys_memcpy(palette->rawData, disp->cycle.blended, sizeof(disp->cycle.palettes));
+    MI_CpuCopy8(palette->rawData, disp->cycle.palettes, sizeof(disp->cycle.palettes));
+    MI_CpuCopy8(palette->rawData, disp->cycle.blended, sizeof(disp->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps
@@ -544,10 +544,10 @@ static inline void WifiLoginDisp_InitCycle(WifiLoginDisp *disp, ArcTool *arc, He
             }
         }
     }
-    cp15_flushDC(disp->cycle.blended, sizeof(disp->cycle.blended));
+    DC_FlushRange(disp->cycle.blended, sizeof(disp->cycle.blended));
     disp->cycle.active = TRUE;
     disp->cycle.task = GFL_VBlankTCBAdd(WifiLoginDisp_CyclePalette, &disp->cycle, 20);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
     disp->cycle.scrollBg = 0;
 }
 
@@ -572,8 +572,8 @@ static void WifiLoginDisp_CyclePalette(TCB *task, void *work) {
     if (cycle->active) {
         cycle->skip ^= 1;
         if (!(cycle->skip & 1)) {
-            gfxUploadStdPaletteBGA(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
-            gfxUploadStdPaletteBGB(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GX_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GXS_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
             cycle->frame++;
             if (cycle->frame >= WIFILOGIN_PALETTE_COUNT * WIFILOGIN_BLEND_STEPS) {
                 cycle->frame = 0;
@@ -623,10 +623,9 @@ static void WifiLoginDisp_LoadGSyncGraphics(WifiLoginDisp *disp) {
     func_0204c520(disp->actors[1], TRUE);
     func_0204c124(disp->actors[1], TRUE);
 
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 6,
-                        16);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 6, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 6, 16);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 6, 16);
     disp->hblankTask = GFL_HBlankTCBAdd(WifiLoginDisp_HBlank, disp, 0);
     SinWaveTable_Make(disp->wave, WIFILOGIN_WAVE_COUNT, 0x5b0, 0x1800);
     disp->scrollX = 10;
@@ -700,13 +699,13 @@ void WifiLoginDisp_SetUnk9C4(WifiLoginDisp *disp) {
 void WifiLoginDisp_ResetBlend(WifiLoginDisp *disp) {
     switch (disp->style) {
     case WIFILOGIN_DISP_STYLE_GSYNC:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 6,
-                            16);
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
-                            GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 6, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1, 6,
+                           16);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
+                           GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 6, 16);
         break;
     case WIFILOGIN_DISP_STYLE_PDWACC:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
         break;
     }
 }

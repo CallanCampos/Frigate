@@ -45,7 +45,7 @@ static BOOL BrCodeInProc_Init(GameProc *proc, u32 *state, void *param, void *wor
     BrRes_GetFont(p->res);
     BrRes_GetMsgData(p->res);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrCodeInProcWork), BrProcSys_GetHeapID(p->procSys));
-    sys_memset(wk, 0, sizeof(BrCodeInProcWork));
+    MI_CpuFill8(wk, 0, sizeof(BrCodeInProcWork));
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
     BrRes_LoadBG(p->res, 29, wk->heapId);

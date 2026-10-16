@@ -146,7 +146,7 @@ void *func_ov012_02152990(const DeliveryInit *init) {
     DeliveryBeaconWork *pWork =
         GFL_HeapAllocate(init->heapId, sizeof(DeliveryBeaconWork), TRUE, "delivery_beacon.c", 295);
 
-    sys_memcpy(init, &pWork->aInit, sizeof(DeliveryInit));
+    MI_CpuCopy8(init, &pWork->aInit, sizeof(DeliveryInit));
     return pWork;
 }
 
@@ -205,7 +205,7 @@ static void func_ov012_02152a24(void *work) {
                         pWork->unk5E = beacon->unk5E;
                     }
                     func_ov030_021740d0(i);
-                    sys_memcpy(beacon, &pWork->beacons[0][index], sizeof(DeliveryBeaconData));
+                    MI_CpuCopy8(beacon, &pWork->beacons[0][index], sizeof(DeliveryBeaconData));
                     func_ov030_02173bc4();
                 }
             }
@@ -224,11 +224,11 @@ static void func_ov012_02152adc(DeliveryBeaconWork *pWork) {
         beacon = &pWork->beacons[0][i];
         decryptData(beacon->data, DELIVERY_BEACON_ONCE_NUM, beacon->seed);
         if (pWork->aInit.data[0].datasize > pos + DELIVERY_BEACON_ONCE_NUM) {
-            sys_memcpy(beacon->data, pWork->aInit.data[0].pData + i * DELIVERY_BEACON_ONCE_NUM,
-                       DELIVERY_BEACON_ONCE_NUM);
+            MI_CpuCopy8(beacon->data, pWork->aInit.data[0].pData + i * DELIVERY_BEACON_ONCE_NUM,
+                        DELIVERY_BEACON_ONCE_NUM);
         } else {
-            sys_memcpy(beacon->data, pWork->aInit.data[0].pData + i * DELIVERY_BEACON_ONCE_NUM,
-                       pWork->aInit.data[0].datasize - pos);
+            MI_CpuCopy8(beacon->data, pWork->aInit.data[0].pData + i * DELIVERY_BEACON_ONCE_NUM,
+                        pWork->aInit.data[0].datasize - pos);
         }
     }
 }

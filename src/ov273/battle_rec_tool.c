@@ -52,7 +52,7 @@ static void BattleRecTool_StorePkm(PartyPkm *pkm, BattleRecPkm *rec) {
     PkmBlockD *blockD;
     int i;
 
-    sys_memset(rec, 0, sizeof(BattleRecPkm));
+    MI_CpuFill8(rec, 0, sizeof(BattleRecPkm));
     if (!pkm->base.partyDecrypted) {
         PML_CryptoRun(&pkm->statusCond, sizeof(PartyPkm) - sizeof(BoxPkm), pkm->base.pid);
         PML_CryptoRun(&pkm->base.contentBuffer, sizeof(PkmBuffer), pkm->base.checksum);
@@ -133,7 +133,7 @@ void BattleRecTool_LoadPkm(BattleRecPkm *rec, PartyPkm *pkm) {
     PkmBlockD *blockD;
     int i;
 
-    sys_memset(pkm, 0, sizeof(PartyPkm));
+    MI_CpuFill8(pkm, 0, sizeof(PartyPkm));
     blockA = PML_PkmGetParamBlockCore(&pkm->base, rec->pid, 0);
     blockB = PML_PkmGetParamBlockCore(&pkm->base, rec->pid, 1);
     blockC = PML_PkmGetParamBlockCore(&pkm->base, rec->pid, 2);
@@ -257,7 +257,7 @@ void BattleRecTool_LoadSetup(BtlSetup *setup, u32 mode, HeapID heapId) {
 static void BattleRecTool_StoreParty(PokeParty *party, BattleRecParty *rec) {
     int i;
 
-    sys_memset(rec, 0, sizeof(BattleRecParty));
+    MI_CpuFill8(rec, 0, sizeof(BattleRecParty));
     if (PokeParty_GetPkmCount(party) != 0) {
         rec->capacity = PokeParty_GetCapacity(party);
         rec->count = PokeParty_GetPkmCount(party);
@@ -283,7 +283,7 @@ static void BattleRecTool_LoadParty(BattleRecParty *rec, PokeParty *party, HeapI
 static void BattleRecTool_StoreParties(const BtlSetup *setup, BattleRecBody *body) {
     u32 i;
 
-    sys_memset(body->parties, 0, sizeof(body->parties));
+    MI_CpuFill8(body->parties, 0, sizeof(body->parties));
     for (i = 0; i < 4; i++) {
         if (setup->party[i] != NULL) {
             BattleRecTool_StoreParty(setup->party[i], &body->parties[i]);
@@ -422,7 +422,7 @@ static BOOL BattleRecTool_StoreRecData(const BtlSetup *setup, BattleRecBody *bod
         size = setup->unkB4;
         if (size < sizeof(body->data)) {
             body->dataSize = size;
-            sys_memcpy(data, body->data, size);
+            MI_CpuCopy8(data, body->data, size);
             return TRUE;
         }
     }
@@ -431,7 +431,7 @@ static BOOL BattleRecTool_StoreRecData(const BtlSetup *setup, BattleRecBody *bod
 
 static BOOL BattleRecTool_LoadRecData(BtlSetup *setup, const BattleRecBody *body) {
     setup->unkB4 = body->dataSize;
-    sys_memcpy(body->data, setup->unkB0, setup->unkB4);
+    MI_CpuCopy8(body->data, setup->unkB0, setup->unkB4);
     return TRUE;
 }
 
@@ -465,7 +465,7 @@ static BOOL BattleRecTool_LoadSetupParams(BtlSetup *setup, const BattleRecSetup 
 }
 
 static void BattleRecTool_StorePokewoodParty(const BtlSetup *setup, PokewoodBlock *block) {
-    sys_memset(&block->party, 0, sizeof(BattleRecParty));
+    MI_CpuFill8(&block->party, 0, sizeof(BattleRecParty));
     if (setup->party[0] != NULL) {
         BattleRecTool_StorePokewoodPartyCore(setup->party[0], &block->party);
     }
@@ -485,7 +485,7 @@ static BOOL BattleRecTool_StorePokewoodRecData(const BtlSetup *setup, PokewoodBl
         size = setup->unkB4;
         if (size < sizeof(block->data)) {
             block->dataSize = size;
-            sys_memcpy(data, block->data, size);
+            MI_CpuCopy8(data, block->data, size);
             return TRUE;
         }
     }
@@ -494,14 +494,14 @@ static BOOL BattleRecTool_StorePokewoodRecData(const BtlSetup *setup, PokewoodBl
 
 static BOOL BattleRecTool_LoadPokewoodRecData(BtlSetup *setup, const PokewoodBlock *block) {
     setup->unkB4 = block->dataSize;
-    sys_memcpy(block->data, setup->unkB0, setup->unkB4);
+    MI_CpuCopy8(block->data, setup->unkB0, setup->unkB4);
     return TRUE;
 }
 
 static void BattleRecTool_StorePokewoodPartyCore(PokeParty *party, BattleRecParty *rec) {
     int i;
 
-    sys_memset(rec, 0, sizeof(BattleRecParty));
+    MI_CpuFill8(rec, 0, sizeof(BattleRecParty));
     if (PokeParty_GetPkmCount(party) != 0) {
         rec->capacity = BattleRecTool_Min(6, PokeParty_GetCapacity(party));
         rec->count = BattleRecTool_Min(PokeParty_GetPkmCount(party), rec->capacity);
@@ -527,13 +527,13 @@ static void BattleRecTool_LoadPokewoodPartyCore(BattleRecParty *rec, PokeParty *
 static void BattleRecTool_StorePokewoodInfo(const BtlSetup *setup, PokewoodBattleInfo *info) {
     info->unkDF = setup->unkDF;
     info->unk124 = setup->unk124;
-    sys_memcpy(setup->unk110, info->unk110, sizeof(info->unk110));
+    MI_CpuCopy8(setup->unk110, info->unk110, sizeof(info->unk110));
 }
 
 static void BattleRecTool_LoadPokewoodInfo(BtlSetup *setup, const PokewoodBattleInfo *info) {
     setup->unkDF = info->unkDF;
     setup->unk124 = info->unk124;
-    sys_memcpy(info->unk110, setup->unk110, sizeof(setup->unk110));
+    MI_CpuCopy8(info->unk110, setup->unk110, sizeof(setup->unk110));
 }
 
 static void BattleRecTool_StorePokewoodExtra(const BtlSetup *setup, PokewoodBlock *block) {

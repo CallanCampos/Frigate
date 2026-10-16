@@ -39,7 +39,7 @@ BOOL ProfWord_Check(ProfWordLists *lists, const u16 *name, HeapID heapId) {
     BOOL found;
     int i;
 
-    sys_memcpy(name, buf, sizeof(buf));
+    MI_CpuCopy8(name, buf, sizeof(buf));
     // Fold katakana to hiragana and every Latin letter to ASCII capitals
     for (i = 0; i < PROF_WORD_LEN; i++) {
         u16 c = buf[i];
@@ -108,7 +108,7 @@ BOOL ProfWord_HasManyDigits(const u16 *name, u32 len, HeapID unused) {
     int digits = 0;
     int i;
 
-    sys_memcpy(name, buf, len * sizeof(u16));
+    MI_CpuCopy8(name, buf, len * sizeof(u16));
     for (i = 0; i < PROF_WORD_LEN; i++) {
         if ((buf[i] >= '0' && buf[i] <= '9') || (buf[i] >= 0xff10 && buf[i] <= 0xff19)) {
             digits++;

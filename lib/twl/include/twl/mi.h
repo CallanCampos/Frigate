@@ -4,7 +4,7 @@
 #include "types.h"
 
 // TwlSDK's memory functions for the DSi's hardware: the shared WRAM B and C, which the DSP needs, and the new DMA
-// channels. They are in the LTD autoload and keep their default names until it is analyzed.
+// channels. They are in the LTD autoload.
 
 typedef enum {
     MI_WRAM_A,
@@ -28,7 +28,7 @@ void func_02768270(u32 ndmaNo);                  // MI_StopNDma
 void func_02768378(u32 ndmaNo, void *dest, u32 unitWords, u32 length, u32 unk, MINDmaCallback callback, void *arg);
 
 // The setup of the shared WRAM's manager and of the new DMA, which NitroSDK's MI_Init (mi_sharedWram.c's
-// func_02078000 and mi_init.c's func_020791d0) calls on a DSi
+// func_02078000 and mi_init.c's MI_Init) calls on a DSi
 void func_02768818(void);
 void func_02768138(void);
 // Stops the four new DMA channels, which OS_ResetSystem does on a DSi
@@ -38,9 +38,9 @@ void func_02768298(void);
 // done, which GX's loaders use for the DSi's channels; the linker reaches them through veneers
 void func_0276814c(u32 ndmaNo, void *dest, u32 data, u32 size);
 void func_027681b8(u32 ndmaNo, void *dest, u32 data, u32 size, MINDmaCallback callback, void *arg);
-void func_02768180(u32 ndmaNo, const void *src, void *dest, u32 size);
-void func_027681f4(u32 ndmaNo, const void *src, void *dest, u32 size, MINDmaCallback callback, void *arg);
-void func_0276824c(u32 ndmaNo);
+void MI_NDmaCopy(u32 ndmaNo, const void *src, void *dest, u32 size);
+void MI_NDmaCopyAsync(u32 ndmaNo, const void *src, void *dest, u32 size, MINDmaCallback callback, void *arg);
+void MI_WaitNDma(u32 ndmaNo);
 
 // The banks of the shared WRAM B and C go from one processor to another by their slots. One byte per bank of WRAM B:
 // its master, and the slot it has in the master's memory. WRAM C's follow

@@ -322,7 +322,7 @@ ZukanInfo *func_ov296_0219d768(HeapID heapId, u16 species, u16 form, u16 sex, u1
     u16 *colors;
     u16 formCount;
 
-    sys_memset(info, 0, sizeof(ZukanInfo));
+    MI_CpuFill8(info, 0, sizeof(ZukanInfo));
     info->heapId = heapId;
     info->species = species;
     info->form = form;
@@ -455,7 +455,7 @@ ZukanInfo *func_ov296_0219d768(HeapID heapId, u16 species, u16 form, u16 sex, u1
         G2_SetWnd0Position(0, 8, 100, info->windowEdge);
         G2_SetWnd0InsidePlane(0x1f, TRUE);
         G2_SetWndOutsidePlane(0x1f, FALSE);
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x10, -16);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x10, -16);
     }
 
     GFL_BGSysMoveBG(info->midBG, BG_MOVE_SET_Y, -info->scrollY);
@@ -524,7 +524,7 @@ void func_ov296_0219dc74(ZukanInfo *info) {
         G2_SetWnd0Position(0, 8, 100, info->windowEdge);
         if (info->windowEdge == 0x10) {
             GX_SetVisibleWnd(GX_WNDMASK_NONE);
-            gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x10, 0);
+            G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x10, 0);
             PokeVoice_Play(info->species, info->form, 0x40, 0, 0, 0, 0, NULL);
             info->state = ZUKAN_INFO_STATE_WAIT_READY;
         }
@@ -1152,7 +1152,7 @@ static void ZukanInfo_CreateSpriteActor(ZukanInfo *info, int x, u16 y, u32 slot)
         sub = TRUE;
     }
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = x;
     setup.y = y;
     info->sprites[slot] = func_0204c040(info->unit, info->chars[slot], info->palettes[slot], info->cellAnims[slot],

@@ -103,7 +103,7 @@ static BOOL BrMusicalLook_ProcInit(GameProc *proc, u32 *state, void *param, void
     GFL_OvlLoad(OVERLAY_ID(210));
 
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrMusicalLookWork), BrProcSys_GetHeapID(p->procSys));
-    sys_memset(wk, 0, sizeof(BrMusicalLookWork));
+    MI_CpuFill8(wk, 0, sizeof(BrMusicalLookWork));
     wk->param = p;
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
@@ -302,7 +302,7 @@ static void BrMusicalLook_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adr
     case SEQ_DOWNLOAD_START: {
         BrNetRequestParam req;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         req.species = wk->species;
         wk->cnt = 0;
         BrNet_StartRequest(wk->param->net, 1, &req);
@@ -699,7 +699,7 @@ static void BrMusicalLook_CreateButton(BrMusicalLookWork *wk, BrMusicalLookProcP
         msg = BrRes_GetMsgData(param->res);
         unit = BrGraphic_GetClunit(param->graphic);
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = 80;
         setup.y = 168;
         setup.sequence = 0;

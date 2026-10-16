@@ -103,7 +103,7 @@ static const NameinGraphicBGSetup sBGSetups[BG_COUNT] = {
 NameinGraphic *NameinGraphic_Create(u32 layout, HeapID heapId) {
     NameinGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(NameinGraphic), FALSE, "namein_graphic.c", 443);
 
-    sys_memset(graphic, 0, sizeof(NameinGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(NameinGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -130,7 +130,7 @@ void NameinGraphic_Delete(NameinGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(NameinGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(NameinGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -153,7 +153,7 @@ static void NameinGraphic_VBlank(TCB *tcb, void *data) {
 static void NameinGraphic_BGInit(NameinGraphicBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(NameinGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(NameinGraphicBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -172,7 +172,7 @@ static void NameinGraphic_BGExit(NameinGraphicBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(NameinGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(NameinGraphicBG));
 }
 
 static void NameinGraphic_BGMain(NameinGraphicBG *bg) {
@@ -183,7 +183,7 @@ static void NameinGraphic_BGVBlank(NameinGraphicBG *bg) {
 }
 
 static void NameinGraphic_ClActInit(NameinGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(NameinGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(NameinGraphicClAct));
     ClActSys_Create(&sClActSysSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -194,7 +194,7 @@ static void NameinGraphic_ClActInit(NameinGraphicClAct *clact, const BGSysVRAMCo
 static void NameinGraphic_ClActExit(NameinGraphicClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(NameinGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(NameinGraphicClAct));
 }
 
 static void NameinGraphic_ClActMain(NameinGraphicClAct *clact) {

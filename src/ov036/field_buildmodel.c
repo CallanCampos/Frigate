@@ -281,7 +281,7 @@ void FieldPropSystem_BuildResIDLUT(FieldPropSystem *system, u32 defaultResId) {
     s32 j;
     FieldPropResInfo *info;
 
-    sys_memset(system->resIdToIndex, 0x80, 0x200);
+    MI_CpuFill8(system->resIdToIndex, 0x80, 0x200);
     for (i = 0; i < system->resInfoCount; i++) {
         info = FieldPropSystem_GetResInfo(system, i);
         system->resIdToIndex[info->resId] = i;

@@ -13,12 +13,12 @@ static TextPrintParam sDebugPrint;
 void GFL_DebugPrintCreateSurface(void) {
     OS_DisableIrq();
     GX_SetVisiblePlane(0);
-    gfxAcquireBGBanksA();
-    gfxSetBGBanksA(GX_VRAM_BG_128_A);
+    GX_ResetBankForBG();
+    GX_SetBankForBG(GX_VRAM_BG_128_A);
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     G2_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GX_SetVisiblePlane(GX_PLANEMASK_BG0);
     GX_SetBGScrOffset(0);
@@ -60,7 +60,7 @@ void GFL_DebugPrintOutputMessage(const char *message) {
 
 // Shows the bitmap and stops the game
 void GFL_DebugPrintCommit(void) {
-    u16 *screen = gfxGetScreenAddrBG0A();
+    u16 *screen = G2_GetBG0ScrPtr();
     u32 tile = 0;
     int x;
     int y;
@@ -73,8 +73,8 @@ void GFL_DebugPrintCommit(void) {
         screen += 32;
     }
     pixels = GFL_BitmapGetPixelData(sDebugPrint.dest);
-    cp15_flushDC(pixels, 0x2000);
-    gfxUploadBGChar0A(pixels, 0, 0x2000);
+    DC_FlushRange(pixels, 0x2000);
+    GX_LoadBG0Char(pixels, 0, 0x2000);
     sys_exit();
 }
 

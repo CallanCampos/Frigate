@@ -37,14 +37,14 @@ void setupMic(HeapID heapId) {
     void *buffer;
 
     mic = GFL_HeapAllocate(heapId, sizeof(SndMic), FALSE, "snd_mic.c", 89);
-    sys_memset(mic, 0, sizeof(SndMic));
+    MI_CpuFill8(mic, 0, sizeof(SndMic));
     buffer = GFL_HeapAllocate(heapId, SND_MIC_BUFFER_SIZE, FALSE, "snd_mic.c", 95);
-    sys_memset(buffer, 0, SND_MIC_BUFFER_SIZE);
+    MI_CpuFill8(buffer, 0, SND_MIC_BUFFER_SIZE);
     mic->buffer = buffer;
-    func_0207efc4(PM_AMP_ON);
-    func_0207eff4(2);
+    PM_SetAmp(PM_AMP_ON);
+    PM_SetAmpGain(2);
     mic->enabled = TRUE;
-    func_0207e75c();
+    MIC_Init();
     if (hw_isDSi() == TRUE) {
         func_027047c0(0, sMicFilter);
     }
@@ -52,7 +52,7 @@ void setupMic(HeapID heapId) {
 }
 
 void ampOffFreeBlocks(void) {
-    func_0207efc4(PM_AMP_OFF);
+    PM_SetAmp(PM_AMP_OFF);
     GFL_HeapFree(sSndMic->buffer);
     GFL_HeapFree(sSndMic);
 }
@@ -70,7 +70,7 @@ BOOL func_02006e3c(void) {
 }
 
 static MICResult func_02006e54(MICAutoParam *param) {
-    MICResult result = MIC_StartAutoSampling(param);
+    MICResult result = MIC_StartLimitedSampling(param);
 
     sSndMic->sampling = TRUE;
     sSndMic->param = *param;

@@ -48,7 +48,7 @@ PMSIParam *PMSIParam_Create(u32 mode, u32 unused, const PMSData *sentence, BOOL 
         if (sentence == NULL) {
             PMSData_Init(&param->sentence, 0);
         } else {
-            sys_memcpy(sentence, &param->sentence, sizeof(PMSData));
+            MI_CpuCopy8(sentence, &param->sentence, sizeof(PMSData));
             param->hasStartSentence = TRUE;
         }
     } else {

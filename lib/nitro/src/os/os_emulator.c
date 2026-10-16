@@ -8,7 +8,7 @@
 #define reg_SCFG_A9ROM (*(vu8 *)0x04004000)
 
 // The console type that OS_GetConsoleType starts with on a DSi and on a DS, and the bits that the way the program was
-// booted adds to it (indexed by sys_get_boot_indicator)
+// booted adds to it (indexed by OS_GetBootType)
 #define OS_CONSOLE_TWL_BASE 0x01800004
 #define OS_CONSOLE_NITRO_BASE 0x80000001
 #define OS_CONSOLE_UNKNOWN 0xffffffff
@@ -33,7 +33,7 @@ static const u32 sBootTypeConsoleBits[5] = {
 };
 
 // NitroSDK's OS_GetConsoleType: the console type, worked out once
-u32 func_0207ac24(void) {
+u32 OS_GetConsoleType(void) {
     if (sConsole.consoleType == OS_CONSOLE_UNKNOWN) {
         if (hw_isDSi()) {
             sConsole.consoleType = OS_CONSOLE_TWL_BASE;
@@ -46,12 +46,11 @@ u32 func_0207ac24(void) {
 }
 
 static u32 func_0207ac60(void) {
-    return sBootTypeConsoleBits[sys_get_boot_indicator()];
+    return sBootTypeConsoleBits[OS_GetBootType()];
 }
 
-// NitroSDK's OS_IsRunOnEmulator
-BOOL func_0207ac74(void) {
-    if (func_0207ac24() & OS_CONSOLE_ENSATA) {
+BOOL OS_IsRunOnEmulator(void) {
+    if (OS_GetConsoleType() & OS_CONSOLE_ENSATA) {
         return TRUE;
     }
     return FALSE;

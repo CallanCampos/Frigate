@@ -23,7 +23,7 @@ GameEvent *EventWbtWifi_Create(GameSystem *gsys, void *args) {
     EventWbtWifi *wk = GameEvent_GetData(event);
     WbtDownloadParam *param;
 
-    sys_memset(wk, 0, sizeof(EventWbtWifi));
+    MI_CpuFill8(wk, 0, sizeof(EventWbtWifi));
     wk->gsys = gsys;
     wk->field = field;
     wk->param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(WbtDownloadParam), TRUE, "event_wbt_wifi.c", 105);

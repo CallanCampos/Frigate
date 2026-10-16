@@ -1,6 +1,6 @@
 // NitroSDK's file system (libfs): the archives, the queue of the commands that their files send, and the paths that
 // name a file in an archive ("rom:/dir/file"). The file name is a guess from NitroSDK's own layout (fs_archive.c); no
-// string in the ROM names it. The functions are under swan's names, with NitroSDK's in their comments.
+// string in the ROM names it. The functions have NitroSDK's names where they are known.
 
 #include "nitro/fs.h"
 #include "nitro/mi.h"
@@ -22,8 +22,8 @@ static char sArchiveNames[FS_ARCHIVE_NAME_SLOT_COUNT][FS_ARCHIVE_NAME_LEN_MAX + 
 // The path of the current directory inside the current archive
 static char sCurrentPath[FS_PATH_BUFFER_SIZE];
 
-static int func_02070c34(const char *path, int position);
-static int func_02070c50(char *path);
+static int FSi_DecrementSjisPositionToSlash(const char *path, int position);
+static int FSi_TrimSjisTrailingSlash(char *path);
 
 // The command of a file
 static inline FSCommandType FSi_GetCommand(const FSFile *file) {
@@ -52,7 +52,7 @@ static inline u32 FSi_IsArchiveSuspended(const FSArchive *arc) {
 #define FSi_EVENT_BIT(command) (1 << ((command) - FS_COMMAND_ACTIVATE))
 
 // NitroSDK's FSi_IsEventCommand: whether a command is an event
-static BOOL func_020700a8(u32 command) {
+static BOOL FSi_IsEventCommand(u32 command) {
     BOOL isEvent = FALSE;
     u32 index = command - FS_COMMAND_ACTIVATE;
 
@@ -71,10 +71,10 @@ static BOOL func_020700a8(u32 command) {
 
 // NitroSDK's FSi_EndCommand: ends a file's command with a result, taking the file out of its archive's queue and waking
 // the threads that wait for it
-static void func_020700c8(FSFile *file, FSResult result) {
+static void FSi_EndCommand(FSFile *file, FSResult result) {
     FSArchive *arc;
     FSCommandType command;
-    u32 interrupts = CPU_IRQDisable();
+    u32 interrupts = OS_DisableInterrupts();
 
     arc = file->arc;
     if (arc != NULL) {
@@ -91,28 +91,28 @@ static void func_020700c8(FSFile *file, FSResult result) {
         file->next = NULL;
     }
     command = FSi_GetCommand(file);
-    if (!func_020700a8(command) && arc != NULL) {
+    if (!FSi_IsEventCommand(command) && arc != NULL) {
         arc->command = command;
         arc->result = result;
     }
     file->error = result;
     file->stat &= ~FS_FILE_STATUS_PROGRESS_MASK;
     OS_WakeupThread(&file->queue);
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
 }
 
 // NitroSDK's FSi_WaitForArchiveCompletion: if a command went on apart from the thread (FS_RESULT_PROC_ASYNC), waits
 // until the archive ends it, and returns its result
-FSResult func_02070130(FSFile *file, FSResult result) {
+FSResult FSi_WaitForArchiveCompletion(FSFile *file, FSResult result) {
     if (result == FS_RESULT_PROC_ASYNC) {
-        u32 interrupts = CPU_IRQDisable();
+        u32 interrupts = OS_DisableInterrupts();
 
         if (!(file->stat & FS_FILE_STATUS_ENDED)) {
             do {
-                scheduler_yield(&file->queue);
+                OS_SleepThread(&file->queue);
             } while (!(file->stat & FS_FILE_STATUS_ENDED));
         }
-        CPU_SetIRQMask(interrupts);
+        OS_RestoreInterrupts(interrupts);
         file->stat &= ~FS_FILE_STATUS_ENDED;
         result = file->error;
     }
@@ -121,7 +121,7 @@ FSResult func_02070130(FSFile *file, FSResult result) {
 
 // NitroSDK's FSi_InvokeCommand: runs a file's command through its archive's interface. The events return at once; the
 // other commands end here, or wait for the archive to end them if a thread is blocked on the file
-static FSResult func_02070170(FSFile *file, u32 command) {
+static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
     FSArchive *arc = file->arc;
     const FSArchiveInterface *vtbl = arc->vtbl;
     FSResult result;
@@ -311,11 +311,11 @@ static FSResult func_02070170(FSFile *file, u32 command) {
             break;
         }
     }
-    if (!func_020700a8(command)) {
+    if (!FSi_IsEventCommand(command)) {
         if (file->stat & FS_FILE_STATUS_BLOCKING) {
-            result = func_02070130(file, result);
+            result = FSi_WaitForArchiveCompletion(file, result);
         } else if (result != FS_RESULT_PROC_ASYNC) {
-            func_020700c8(file, result);
+            FSi_EndCommand(file, result);
         }
     }
     return result;
@@ -323,14 +323,14 @@ static FSResult func_02070170(FSFile *file, u32 command) {
 
 // NitroSDK's FSi_NextCommand: ends the commands that were canceled, activates the archive if it is to start one, and
 // returns the file whose command the caller has to run. A blocked thread runs its own, so none is returned for it
-static FSFile *func_0207038c(FSArchive *arc, BOOL start) {
+static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
     FSFile *next = NULL;
     u32 interrupts;
     u32 activateInterrupts;
     u32 runInterrupts;
     BOOL activate;
 
-    interrupts = CPU_IRQDisable();
+    interrupts = OS_DisableInterrupts();
     if (arc->flag & FS_ARCHIVE_FLAG_CANCELING) {
         FSFile *file = arc->list;
 
@@ -339,7 +339,7 @@ static FSFile *func_0207038c(FSArchive *arc, BOOL start) {
             FSFile *following = file->next;
 
             if (FSi_IsFileCanceled(file)) {
-                func_020700c8(file, FS_RESULT_CANCELED);
+                FSi_EndCommand(file, FS_RESULT_CANCELED);
                 if (following == NULL) {
                     following = arc->list;
                 }
@@ -347,19 +347,19 @@ static FSFile *func_0207038c(FSArchive *arc, BOOL start) {
             file = following;
         }
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
 
-    activateInterrupts = CPU_IRQDisable();
+    activateInterrupts = OS_DisableInterrupts();
     if (!(arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) && !(arc->flag & FS_ARCHIVE_FLAG_SUSPENDED) && arc->list != NULL) {
         activate = start && !(arc->flag & FS_ARCHIVE_FLAG_ACTIVE);
         if (activate) {
             arc->flag |= FS_ARCHIVE_FLAG_ACTIVE;
         }
-        CPU_SetIRQMask(activateInterrupts);
+        OS_RestoreInterrupts(activateInterrupts);
         if (activate) {
-            func_02070170(arc->list, FS_COMMAND_ACTIVATE);
+            FSi_InvokeCommand(arc->list, FS_COMMAND_ACTIVATE);
         }
-        runInterrupts = CPU_IRQDisable();
+        runInterrupts = OS_DisableInterrupts();
         if (start || activate) {
             next = arc->list;
             next->stat |= FS_FILE_STATUS_RUNNING;
@@ -368,75 +368,75 @@ static FSFile *func_0207038c(FSArchive *arc, BOOL start) {
             OS_WakeupThread(&next->queue);
             next = NULL;
         }
-        CPU_SetIRQMask(runInterrupts);
+        OS_RestoreInterrupts(runInterrupts);
     } else {
         if (start) {
             if (arc->flag & FS_ARCHIVE_FLAG_ACTIVE) {
                 FSFile file;
 
-                finit(&file);
+                FS_InitFile(&file);
                 file.arc = arc;
                 arc->flag &= ~FS_ARCHIVE_FLAG_ACTIVE;
-                func_02070170(&file, FS_COMMAND_IDLE);
+                FSi_InvokeCommand(&file, FS_COMMAND_IDLE);
             }
             if (arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) {
                 arc->flag = (arc->flag & ~FS_ARCHIVE_FLAG_SUSPENDING) | FS_ARCHIVE_FLAG_SUSPENDED;
                 OS_WakeupThread(&arc->queue);
             }
         }
-        CPU_SetIRQMask(activateInterrupts);
+        OS_RestoreInterrupts(activateInterrupts);
     }
     return next;
 }
 
 // NitroSDK's FSi_ExecuteAsyncCommand: runs the commands of an archive from the one of a file, until one goes on apart
 // from the thread
-static void func_020704a0(FSFile *file) {
+static void FSi_ExecuteAsyncCommand(FSFile *file) {
     FSArchive *arc = file->arc;
 
     while (file != NULL) {
-        u32 interrupts = CPU_IRQDisable();
+        u32 interrupts = OS_DisableInterrupts();
 
         file->stat |= FS_FILE_STATUS_RUNNING;
         if (file->stat & FS_FILE_STATUS_BLOCKING) {
             OS_WakeupThread(&file->queue);
             file = NULL;
         }
-        CPU_SetIRQMask(interrupts);
+        OS_RestoreInterrupts(interrupts);
         if (file == NULL) {
             break;
         }
-        if (func_02070170(file, FSi_GetCommand(file)) == FS_RESULT_PROC_ASYNC) {
+        if (FSi_InvokeCommand(file, FSi_GetCommand(file)) == FS_RESULT_PROC_ASYNC) {
             break;
         }
-        file = func_0207038c(arc, TRUE);
+        file = FSi_NextCommand(arc, TRUE);
     }
 }
 
 // NitroSDK's FSi_ExecuteSyncCommand: waits for a file's turn, runs its command in the calling thread, and goes on with
 // the next ones
-static void func_020704f4(FSFile *file) {
-    u32 interrupts = CPU_IRQDisable();
+static void FSi_ExecuteSyncCommand(FSFile *file) {
+    u32 interrupts = OS_DisableInterrupts();
 
     while (!(file->stat & FS_FILE_STATUS_RUNNING) && (file->stat & FS_FILE_STATUS_BUSY)) {
-        scheduler_yield(&file->queue);
+        OS_SleepThread(&file->queue);
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
     if (file->stat & FS_FILE_STATUS_RUNNING) {
         FSArchive *arc = file->arc;
         FSFile *next;
 
-        func_020700c8(file, func_02070170(file, FSi_GetCommand(file)));
-        next = func_0207038c(arc, TRUE);
+        FSi_EndCommand(file, FSi_InvokeCommand(file, FSi_GetCommand(file)));
+        next = FSi_NextCommand(arc, TRUE);
         if (next != NULL) {
-            func_020704a0(next);
+            FSi_ExecuteAsyncCommand(next);
         }
     }
 }
 
 // NitroSDK's FSi_SendCommand: queues a command on a file's archive, and runs it when it is the next. With blocking set
 // it returns when the command has ended, TRUE if it succeeded
-BOOL fs_call_syscmd(FSFile *file, FSCommandType command, BOOL blocking) {
+BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
     BOOL result = FALSE;
     FSArchive *arc = file->arc;
     u32 interrupts;
@@ -462,9 +462,9 @@ BOOL fs_call_syscmd(FSFile *file, FSCommandType command, BOOL blocking) {
             *stat |= FS_FILE_STATUS_BLOCKING;
         }
     }
-    interrupts = CPU_IRQDisable();
+    interrupts = OS_DisableInterrupts();
     if (arc->flag & FS_ARCHIVE_FLAG_UNMOUNTING) {
-        func_020700c8(file, FS_RESULT_CANCELED);
+        FSi_EndCommand(file, FS_RESULT_CANCELED);
     } else {
         FSFile **link = &arc->list;
         FSFile *last = arc->list;
@@ -479,18 +479,18 @@ BOOL fs_call_syscmd(FSFile *file, FSCommandType command, BOOL blocking) {
     if (arc->list == file && !(arc->flag & FS_ARCHIVE_FLAG_ACTIVE)) {
         start = TRUE;
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
     if (file->error != FS_RESULT_CANCELED) {
-        next = func_0207038c(arc, start);
+        next = FSi_NextCommand(arc, start);
         if (blocking) {
-            func_020704f4(file);
+            FSi_ExecuteSyncCommand(file);
             result = TRUE;
             if (file->error != FS_RESULT_SUCCESS) {
                 result = FALSE;
             }
         } else {
             if (next != NULL) {
-                func_020704a0(next);
+                FSi_ExecuteAsyncCommand(next);
             }
             result = TRUE;
         }
@@ -499,49 +499,49 @@ BOOL fs_call_syscmd(FSFile *file, FSCommandType command, BOOL blocking) {
 }
 
 // NitroSDK's FS_FindArchive: finds the mounted archive of a name with the given number of characters
-FSArchive *func_0207062c(const char *name, int nameLength) {
+FSArchive *FS_FindArchive(const char *name, int nameLength) {
     FSArchive *arc;
-    u32 interrupts = CPU_IRQDisable();
+    u32 interrupts = OS_DisableInterrupts();
 
     for (arc = sArchives.list; arc != NULL; arc = arc->next) {
         if (FSi_IsArchiveMounted(arc)) {
-            const char *arcName = func_02070a24(arc);
+            const char *arcName = FS_GetArchiveName(arc);
 
-            if (func_0207f9c8(arcName, name, nameLength) == 0 && arcName[nameLength] == '\0') {
+            if (STD_CompareNString(arcName, name, nameLength) == 0 && arcName[nameLength] == '\0') {
                 break;
             }
         }
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
     return arc;
 }
 
 // NitroSDK's FS_ChangeDir: makes a path's archive and directory the current ones
-BOOL func_02070680(const char *path) {
+BOOL FS_ChangeDir(const char *path) {
     u32 baseDirId = 0;
     BOOL result = FALSE;
     char normalized[FS_PATH_BUFFER_SIZE];
-    FSArchive *arc = fs_normalize_path(path, &baseDirId, normalized);
+    FSArchive *arc = FSi_NormalizePath(path, &baseDirId, normalized);
 
     if (arc != NULL) {
         sArchives.current = arc;
         sArchives.directoryId = 0;
         sArchives.unk_0a = 0;
         sArchives.unk_0c = 0;
-        func_0207f7cc(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
+        STD_CopyLString(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
         if (arc->vtbl->findPath != NULL) {
             FSFile file;
             FSFindPathArgs args;
 
-            finit(&file);
+            FS_InitFile(&file);
             file.arc = arc;
             file.argument = &args;
             args.baseDirId = baseDirId;
             args.path = normalized;
             args.isDirectory = TRUE;
-            if (fs_call_syscmd(&file, FS_COMMAND_FINDPATH, TRUE)) {
+            if (FSi_SendCommand(&file, FS_COMMAND_FINDPATH, TRUE)) {
                 sArchives.directoryId = args.targetId;
-                func_0207f7cc(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
+                STD_CopyLString(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
             }
         }
         result = TRUE;
@@ -551,7 +551,7 @@ BOOL func_02070680(const char *path) {
 
 // Copies at most length characters of a string, no more than fit in a buffer with its NUL, and sets *overflow when
 // there were more. Returns the number of characters copied. NitroSDK's name is not known
-static int func_020706fc(char *dest, int destSize, const char *src, int length, BOOL *overflow) {
+static int FSi_CopyPathPart(char *dest, int destSize, const char *src, int length, BOOL *overflow) {
     int i;
     char c;
     int count = destSize - 1;
@@ -591,7 +591,7 @@ static inline BOOL FSi_IsSlash(u8 c) {
 // NitroSDK's FSi_NormalizePath: splits a path into its archive, the directory it starts in and the path inside the
 // archive, written without "." and ".." and a trailing slash. Returns the archive, or NULL when the archive is
 // unknown or the path does not fit in the buffer
-FSArchive *fs_normalize_path(const char *path, u32 *baseDirId, char *normalized) {
+FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized) {
     FSArchive *arc;
     BOOL overflow = FALSE;
     int length = 0;
@@ -621,13 +621,13 @@ FSArchive *fs_normalize_path(const char *path, u32 *baseDirId, char *normalized)
                 }
                 if (normalized != NULL && sArchives.directoryId == 0 && sCurrentPath[0] != '\0') {
                     length +=
-                        func_020706fc(normalized, FS_PATH_BUFFER_SIZE, sCurrentPath, FS_PATH_BUFFER_SIZE, &overflow);
-                    length += func_020706fc(normalized + length, FS_PATH_BUFFER_SIZE - length, "/", 1, &overflow);
+                        FSi_CopyPathPart(normalized, FS_PATH_BUFFER_SIZE, sCurrentPath, FS_PATH_BUFFER_SIZE, &overflow);
+                    length += FSi_CopyPathPart(normalized + length, FS_PATH_BUFFER_SIZE - length, "/", 1, &overflow);
                 }
                 break;
             }
             if (c == ':') {
-                arc = func_0207062c(path, i);
+                arc = FS_FindArchive(path, i);
                 path += i + 1;
                 if (FSi_IsSlash(path[0])) {
                     path++;
@@ -654,11 +654,11 @@ FSArchive *fs_normalize_path(const char *path, u32 *baseDirId, char *normalized)
                 if (length > 0) {
                     length--;
                 }
-                length = func_02070c34(normalized, length) + 1;
+                length = FSi_DecrementSjisPositionToSlash(normalized, length) + 1;
             } else {
-                length += func_020706fc(normalized + length, FS_PATH_BUFFER_SIZE - length, path, i, &overflow);
+                length += FSi_CopyPathPart(normalized + length, FS_PATH_BUFFER_SIZE - length, path, i, &overflow);
                 if (c != '\0') {
-                    length += func_020706fc(normalized + length, FS_PATH_BUFFER_SIZE - length, "/", 1, &overflow);
+                    length += FSi_CopyPathPart(normalized + length, FS_PATH_BUFFER_SIZE - length, "/", 1, &overflow);
                 }
             }
             if (c == '\0') {
@@ -668,7 +668,7 @@ FSArchive *fs_normalize_path(const char *path, u32 *baseDirId, char *normalized)
             i = 0;
         }
         normalized[length] = '\0';
-        func_02070c50(normalized);
+        FSi_TrimSjisTrailingSlash(normalized);
     }
     if (overflow) {
         arc = NULL;
@@ -677,18 +677,18 @@ FSArchive *fs_normalize_path(const char *path, u32 *baseDirId, char *normalized)
 }
 
 // NitroSDK's FS_InitArchive: clears an archive and its queue
-void fs_create(FSArchive *arc) {
-    sys_memset(arc, 0, sizeof(FSArchive));
+void FS_InitArchive(FSArchive *arc) {
+    MI_CpuFill8(arc, 0, sizeof(FSArchive));
     OS_InitThreadQueue(&arc->queue);
 }
 
 // NitroSDK's FS_RegisterArchiveName: registers an archive under a name of at most 15 characters, unless the name is in
 // use
-BOOL fs_open(FSArchive *arc, const char *name, u32 nameLength) {
+BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
     BOOL result = FALSE;
-    u32 interrupts = CPU_IRQDisable();
+    u32 interrupts = OS_DisableInterrupts();
 
-    if (func_0207062c(name, nameLength) == NULL) {
+    if (FS_FindArchive(name, nameLength) == NULL) {
         FSArchive **link = &sArchives.list;
         FSArchive *last = sArchives.list;
 
@@ -699,7 +699,7 @@ BOOL fs_open(FSArchive *arc, const char *name, u32 nameLength) {
         *link = arc;
         if (nameLength <= FS_ARCHIVE_SHORT_NAME_LEN_MAX) {
             arc->longName = NULL;
-            func_0207f7cc(arc->name, name, nameLength + 1);
+            STD_CopyLString(arc->name, name, nameLength + 1);
         } else if (nameLength <= FS_ARCHIVE_NAME_LEN_MAX) {
             int i;
 
@@ -707,7 +707,7 @@ BOOL fs_open(FSArchive *arc, const char *name, u32 nameLength) {
                 if (i >= FS_ARCHIVE_NAME_SLOT_COUNT) {
                     sys_exit();
                 } else if (sArchiveNames[i][0] == '\0') {
-                    func_0207f7cc(sArchiveNames[i], name, nameLength + 1);
+                    STD_CopyLString(sArchiveNames[i], name, nameLength + 1);
                     arc->longName = sArchiveNames[i];
                     break;
                 }
@@ -718,17 +718,17 @@ BOOL fs_open(FSArchive *arc, const char *name, u32 nameLength) {
         arc->flag |= FS_ARCHIVE_FLAG_REGISTERED;
         result = TRUE;
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
     return result;
 }
 
 // NitroSDK's FS_ReleaseArchiveName: takes an archive's name out of the list of archives (not the first)
-void func_020709b8(FSArchive *arc) {
+void FS_ReleaseArchiveName(FSArchive *arc) {
     if (arc == sArchives.list) {
         sys_exit();
     }
     if (arc->longName != NULL) {
-        u32 interrupts = CPU_IRQDisable();
+        u32 interrupts = OS_DisableInterrupts();
         FSArchive *current = sArchives.list;
         FSArchive **link = &sArchives.list;
 
@@ -749,12 +749,12 @@ void func_020709b8(FSArchive *arc) {
         if (sArchives.current == arc) {
             sArchives.current = NULL;
         }
-        CPU_SetIRQMask(interrupts);
+        OS_RestoreInterrupts(interrupts);
     }
 }
 
 // NitroSDK's FS_GetArchiveName: the name of an archive
-const char *func_02070a24(const FSArchive *arc) {
+const char *FS_GetArchiveName(const FSArchive *arc) {
     if (arc->name[FS_ARCHIVE_SHORT_NAME_LEN_MAX] != '\0') {
         return arc->longName;
     }
@@ -762,24 +762,24 @@ const char *func_02070a24(const FSArchive *arc) {
 }
 
 // NitroSDK's FS_MountArchive: sets an archive's interface and mounts it
-BOOL func_02070a30(FSArchive *arc, void *userdata, const FSArchiveInterface *vtbl) {
+BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *vtbl) {
     FSFile file;
 
     arc->userdata = userdata;
     arc->vtbl = vtbl;
-    finit(&file);
+    FS_InitFile(&file);
     file.arc = arc;
-    func_02070170(&file, FS_COMMAND_MOUNT);
+    FSi_InvokeCommand(&file, FS_COMMAND_MOUNT);
     arc->flag |= FS_ARCHIVE_FLAG_MOUNTED;
     return TRUE;
 }
 
 // NitroSDK's FS_UnmountArchive: cancels the commands of an archive, and runs FS_COMMAND_UNMOUNT
-BOOL func_02070a5c(FSArchive *arc) {
-    u32 interrupts = CPU_IRQDisable();
+BOOL FS_UnmountArchive(FSArchive *arc) {
+    u32 interrupts = OS_DisableInterrupts();
 
     if (FSi_IsArchiveMounted(arc)) {
-        BOOL suspended = func_02070ad4(arc);
+        BOOL suspended = FS_SuspendArchive(arc);
         FSFile *file = arc->list;
         FSFile unmountFile;
 
@@ -787,26 +787,26 @@ BOOL func_02070a5c(FSArchive *arc) {
         while (file != NULL) {
             FSFile *following = file->next;
 
-            func_020700c8(file, FS_RESULT_CANCELED);
+            FSi_EndCommand(file, FS_RESULT_CANCELED);
             file = following;
         }
         arc->list = NULL;
         if (suspended) {
-            func_02070b44(arc);
+            FS_ResumeArchive(arc);
         }
-        finit(&unmountFile);
+        FS_InitFile(&unmountFile);
         unmountFile.arc = arc;
-        func_02070170(&unmountFile, FS_COMMAND_UNMOUNT);
+        FSi_InvokeCommand(&unmountFile, FS_COMMAND_UNMOUNT);
         arc->flag &= ~(FS_ARCHIVE_FLAG_UNMOUNTING | FS_ARCHIVE_FLAG_CANCELING | FS_ARCHIVE_FLAG_MOUNTED);
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
     return TRUE;
 }
 
 // NitroSDK's FS_SuspendArchive: stops an archive from starting commands, waiting for the one it runs to end. Returns
 // FALSE if it was suspended already
-BOOL func_02070ad4(FSArchive *arc) {
-    u32 interrupts = CPU_IRQDisable();
+BOOL FS_SuspendArchive(FSArchive *arc) {
+    u32 interrupts = OS_DisableInterrupts();
     BOOL result = !FSi_IsArchiveSuspended(arc);
 
     if (result) {
@@ -816,59 +816,59 @@ BOOL func_02070ad4(FSArchive *arc) {
             u32 waitInterrupts;
 
             arc->flag |= FS_ARCHIVE_FLAG_SUSPENDING;
-            waitInterrupts = CPU_IRQDisable();
+            waitInterrupts = OS_DisableInterrupts();
             while (arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) {
-                scheduler_yield(&arc->queue);
+                OS_SleepThread(&arc->queue);
             }
-            CPU_SetIRQMask(waitInterrupts);
+            OS_RestoreInterrupts(waitInterrupts);
         }
     }
-    CPU_SetIRQMask(interrupts);
+    OS_RestoreInterrupts(interrupts);
     return result;
 }
 
 // NitroSDK's FS_ResumeArchive: lets a suspended archive start commands again. Returns TRUE if it was not suspended
-BOOL func_02070b44(FSArchive *arc) {
-    u32 interrupts = CPU_IRQDisable();
+BOOL FS_ResumeArchive(FSArchive *arc) {
+    u32 interrupts = OS_DisableInterrupts();
     BOOL result = !FSi_IsArchiveSuspended(arc);
     FSFile *file;
 
     if (!result) {
         arc->flag &= ~FS_ARCHIVE_FLAG_SUSPENDED;
     }
-    CPU_SetIRQMask(interrupts);
-    file = func_0207038c(arc, TRUE);
+    OS_RestoreInterrupts(interrupts);
+    file = FSi_NextCommand(arc, TRUE);
     if (file != NULL) {
-        func_020704a0(file);
+        FSi_ExecuteAsyncCommand(file);
     }
     return result;
 }
 
 // NitroSDK's FS_NotifyArchiveAsyncEnd: ends the command that an archive ran apart from the thread of the caller, with
 // its result
-void func_02070b88(FSArchive *arc, FSResult result) {
+void FS_NotifyArchiveAsyncEnd(FSArchive *arc, FSResult result) {
     FSFile *file = arc->list;
 
     if (file->stat & FS_FILE_STATUS_BLOCKING) {
-        u32 interrupts = CPU_IRQDisable();
+        u32 interrupts = OS_DisableInterrupts();
 
         file->stat |= FS_FILE_STATUS_ENDED;
         file->error = result;
         OS_WakeupThread(&file->queue);
-        CPU_SetIRQMask(interrupts);
+        OS_RestoreInterrupts(interrupts);
     } else {
         FSFile *next;
 
-        func_020700c8(file, result);
-        next = func_0207038c(arc, TRUE);
+        FSi_EndCommand(file, result);
+        next = FSi_NextCommand(arc, TRUE);
         if (next != NULL) {
-            func_020704a0(next);
+            FSi_ExecuteAsyncCommand(next);
         }
     }
 }
 
 // NitroSDK's FSi_DecrementSjisPosition: the start of the character before a position in a Shift_JIS string
-static int func_02070bd0(const char *path, int position) {
+static int FSi_DecrementSjisPosition(const char *path, int position) {
     int start = position - 1;
 
     while (start > 0 && FSi_IsSjisLead(path[start - 1])) {
@@ -878,7 +878,7 @@ static int func_02070bd0(const char *path, int position) {
 }
 
 // NitroSDK's FSi_IncrementSjisPositionToSlash: the position of the next slash or the end of a string, from a position
-int func_02070bfc(const char *path, int position) {
+int FSi_IncrementSjisPositionToSlash(const char *path, int position) {
     char c;
 
     while ((c = path[position]) != '\0' && (c & 0xff) != '/' && (c & 0xff) != '\\') {
@@ -888,17 +888,17 @@ int func_02070bfc(const char *path, int position) {
 }
 
 // NitroSDK's FSi_DecrementSjisPositionToSlash: the position of the last slash before a position, or -1
-static int func_02070c34(const char *path, int position) {
+static int FSi_DecrementSjisPositionToSlash(const char *path, int position) {
     do {
-        position = func_02070bd0(path, position);
+        position = FSi_DecrementSjisPosition(path, position);
     } while (position >= 0 && !FSi_IsSlash(path[position]));
     return position;
 }
 
 // NitroSDK's FSi_TrimSjisTrailingSlash: cuts a trailing slash off a path. Returns the new length
-static int func_02070c50(char *path) {
-    int length = NNS_STD_StrLen(path);
-    int position = func_02070bd0(path, length);
+static int FSi_TrimSjisTrailingSlash(char *path) {
+    int length = STD_GetStringLength(path);
+    int position = FSi_DecrementSjisPosition(path, length);
 
     if (position >= 0 && FSi_IsSlash(path[position])) {
         length = position;

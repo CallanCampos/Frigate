@@ -5,21 +5,21 @@
 
 // NitroSDK's SND_AssignWaveArc: makes the archive the one that slot index of the bank uses, and takes the slot out of
 // the list of the archive that it had
-void func_0207dd80(SNDBankData *bank, int index, SNDWaveArc *waveArc) {
+void SND_AssignWaveArc(SNDBankData *bank, int index, SNDWaveArc *waveArc) {
     SNDWaveArcLink *top;
 
-    func_0207d698();
+    SNDi_LockMutex();
     if (bank->waveArcLink[index].waveArc != NULL) {
         SNDWaveArcLink *prev;
 
         if (waveArc == bank->waveArcLink[index].waveArc) {
-            func_0207d6a8();
+            SNDi_UnlockMutex();
             return;
         }
         prev = bank->waveArcLink[index].waveArc->topLink;
         if (&bank->waveArcLink[index] == prev) {
             bank->waveArcLink[index].waveArc->topLink = bank->waveArcLink[index].next;
-            cp15_cleanDC(bank->waveArcLink[index].waveArc, sizeof(SNDWaveArc));
+            DC_StoreRange(bank->waveArcLink[index].waveArc, sizeof(SNDWaveArc));
         } else {
             while (prev != NULL) {
                 if (&bank->waveArcLink[index] == prev->next) {
@@ -28,23 +28,23 @@ void func_0207dd80(SNDBankData *bank, int index, SNDWaveArc *waveArc) {
                 prev = prev->next;
             }
             prev->next = bank->waveArcLink[index].next;
-            cp15_cleanDC(prev, sizeof(SNDWaveArcLink));
+            DC_StoreRange(prev, sizeof(SNDWaveArcLink));
         }
     }
     top = waveArc->topLink;
     waveArc->topLink = &bank->waveArcLink[index];
     bank->waveArcLink[index].next = top;
     bank->waveArcLink[index].waveArc = waveArc;
-    func_0207d6a8();
-    cp15_cleanDC(bank, sizeof(SNDBankData));
-    cp15_cleanDC(waveArc, sizeof(SNDWaveArc));
+    SNDi_UnlockMutex();
+    DC_StoreRange(bank, sizeof(SNDBankData));
+    DC_StoreRange(waveArc, sizeof(SNDWaveArc));
 }
 
 // NitroSDK's SND_DestroyBank: takes the bank's slots out of the lists of the wave archives that it uses
-void func_0207ddfc(SNDBankData *bank) {
+void SND_DestroyBank(SNDBankData *bank) {
     int i;
 
-    func_0207d698();
+    SNDi_LockMutex();
     for (i = 0; i < SND_BANK_WAVEARC_MAX; i++) {
         SNDWaveArc *waveArc = bank->waveArcLink[i].waveArc;
 
@@ -53,7 +53,7 @@ void func_0207ddfc(SNDBankData *bank) {
 
             if (&bank->waveArcLink[i] == prev) {
                 waveArc->topLink = bank->waveArcLink[i].next;
-                cp15_cleanDC(waveArc, sizeof(SNDWaveArc));
+                DC_StoreRange(waveArc, sizeof(SNDWaveArc));
             } else {
                 while (prev != NULL) {
                     if (&bank->waveArcLink[i] == prev->next) {
@@ -62,18 +62,18 @@ void func_0207ddfc(SNDBankData *bank) {
                     prev = prev->next;
                 }
                 prev->next = bank->waveArcLink[i].next;
-                cp15_cleanDC(prev, sizeof(SNDWaveArcLink));
+                DC_StoreRange(prev, sizeof(SNDWaveArcLink));
             }
         }
     }
-    func_0207d6a8();
+    SNDi_UnlockMutex();
 }
 
 // NitroSDK's SND_DestroyWaveArc: empties the slots of the banks that use the archive
-void func_0207de50(SNDWaveArc *waveArc) {
+void SND_DestroyWaveArc(SNDWaveArc *waveArc) {
     SNDWaveArcLink *link;
 
-    func_0207d698();
+    SNDi_LockMutex();
     link = waveArc->topLink;
     if (link != NULL) {
         do {
@@ -81,15 +81,15 @@ void func_0207de50(SNDWaveArc *waveArc) {
 
             link->waveArc = NULL;
             link->next = NULL;
-            cp15_cleanDC(link, sizeof(SNDWaveArcLink));
+            DC_StoreRange(link, sizeof(SNDWaveArcLink));
             link = next;
         } while (link != NULL);
     }
-    func_0207d6a8();
+    SNDi_UnlockMutex();
 }
 
 // NitroSDK's SND_GetFirstInstDataPos: the position of the first program
-SNDInstPos func_0207de7c(const SNDBankData *bank) {
+SNDInstPos SND_GetFirstInstDataPos(const SNDBankData *bank) {
     SNDInstPos pos;
 
     pos.prgNo = 0;
@@ -100,7 +100,7 @@ SNDInstPos func_0207de7c(const SNDBankData *bank) {
 // NitroSDK's SND_GetNextInstData: reads the instrument at pos and moves on. A drum set or a key split yields its
 // instruments one by one, the other programs one. FALSE when the bank has no more. The code jumps to the test of
 // the loops over the drum set and the key split, which return at the first pass
-BOOL func_0207de8c(const SNDBankData *bank, SNDInstData *inst, SNDInstPos *pos) {
+BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos *pos) {
     for (; pos->prgNo < bank->instCount; pos->prgNo++, pos->index = 0) {
         u32 offset = bank->instOffset[pos->prgNo];
 
@@ -148,25 +148,25 @@ BOOL func_0207de8c(const SNDBankData *bank, SNDInstData *inst, SNDInstPos *pos) 
 }
 
 // NitroSDK's SND_GetWaveDataCount: the number of waves in the archive
-u32 func_0207df80(const SNDWaveArc *waveArc) {
+u32 SND_GetWaveDataCount(const SNDWaveArc *waveArc) {
     return waveArc->waveCount;
 }
 
 // NitroSDK's SND_SetWaveDataAddress: the address that a wave of the archive is loaded at
-void func_0207df84(SNDWaveArc *waveArc, int index, const SNDWaveData *address) {
-    func_0207d698();
+void SND_SetWaveDataAddress(SNDWaveArc *waveArc, int index, const SNDWaveData *address) {
+    SNDi_LockMutex();
     waveArc->offsetTable[index] = (u32)address;
-    cp15_cleanDC(&waveArc->offsetTable[index], sizeof(u32));
-    func_0207d6a8();
+    DC_StoreRange(&waveArc->offsetTable[index], sizeof(u32));
+    SNDi_UnlockMutex();
 }
 
 // NitroSDK's SND_GetWaveDataAddress: the address of a wave of the archive. An offset in the table is from the archive,
 // an address (in main memory, so from 0x02000000 on) is itself, and 0 is a wave that isn't loaded
-const SNDWaveData *func_0207dfa4(const SNDWaveArc *waveArc, int index) {
+const SNDWaveData *SND_GetWaveDataAddress(const SNDWaveArc *waveArc, int index) {
     const SNDWaveData *wave;
     u32 offset;
 
-    func_0207d698();
+    SNDi_LockMutex();
     offset = waveArc->offsetTable[index];
     if (offset != 0) {
         wave = (const SNDWaveData *)offset;
@@ -176,6 +176,6 @@ const SNDWaveData *func_0207dfa4(const SNDWaveArc *waveArc, int index) {
     } else {
         wave = NULL;
     }
-    func_0207d6a8();
+    SNDi_UnlockMutex();
     return wave;
 }

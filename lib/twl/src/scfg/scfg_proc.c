@@ -31,26 +31,23 @@ typedef struct SCFGWork {
 
 static SCFGWork scfgWork;
 
-static void func_0207f710(u32 tag, u32 data, BOOL err);
+static void SCFGi_CommonCallback(u32 tag, u32 data, BOOL err);
 
-// SCFG_Init
-void func_0207f6cc(void) {
-    func_0207c9fc(PXI_FIFO_TAG_SCFG, func_0207f710);
+void SCFG_Init(void) {
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SCFG, SCFGi_CommonCallback);
     scfgWork.busy = FALSE;
 }
 
-// SCFG_SetCpuSpeed
-void func_0207f6e8(SCFGCpuSpeed speed) {
-    u32 irq = CPU_IRQDisable();
+void SCFG_SetCpuSpeed(SCFGCpuSpeed speed) {
+    u32 irq = OS_DisableInterrupts();
 
     if (speed != (reg_SCFG_CLK & SCFG_CLK_CPU_2X)) {
-        func_01ff936c(speed);
+        SCFGi_SwitchCpuSpeed(speed);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
-// SCFGi_CommonCallback
-static void func_0207f710(u32 tag, u32 data, BOOL err) {
+static void SCFGi_CommonCallback(u32 tag, u32 data, BOOL err) {
     u16 index = (data & SCFG_PXI_INDEX_MASK) >> SCFG_PXI_INDEX_SHIFT;
     u16 type = (data & SCFG_PXI_TYPE_MASK) >> SCFG_PXI_TYPE_SHIFT;
     u16 value = data & SCFG_PXI_DATA_MASK;

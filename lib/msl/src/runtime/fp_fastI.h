@@ -61,6 +61,6 @@ unsigned int __aeabi_uidivmod(unsigned int a, unsigned int b); // _u32_div_f
 
 // Others
 void func_0208e130(void); // dead code after _fadd
-void func_0208ecdc(void); // _fp_init
+void _fp_init(void);
 
 #endif // POKEBW2_MSL_RUNTIME_FP_FASTI_H

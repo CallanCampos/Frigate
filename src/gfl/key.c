@@ -65,7 +65,7 @@ static inline u16 PAD_Read(void) {
 KeypadManager *GFL_HIDCreateKeypadManager(HeapID heapId) {
     KeypadManager *keypad = GFL_HeapAllocate(heapId, sizeof(KeypadManager), FALSE, "key.c", 68);
 
-    sys_memset(keypad, 0, sizeof(KeypadManager));
+    MI_CpuFill8(keypad, 0, sizeof(KeypadManager));
     keypad->repeatWait = 8;
     keypad->repeatStart = 15;
     return keypad;

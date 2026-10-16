@@ -33,7 +33,7 @@ NameinKeyboardSet *NameinData_LoadKeyboards(HeapID heapId) {
     NameinKeyboardSet *set = GFL_HeapAllocate(heapId, sizeof(NameinKeyboardSet), FALSE, "namein_data.c", 147);
     int i;
 
-    sys_memset(set, 0, sizeof(NameinKeyboardSet));
+    MI_CpuFill8(set, 0, sizeof(NameinKeyboardSet));
     for (i = 0; i < NAMEIN_KEYBOARD_COUNT; i++) {
         set->keyboards[i] = NameinData_LoadKeyboard(i, heapId);
     }

@@ -272,7 +272,7 @@ void GameBeaconSys_SetGameData(GameData *gameData) {
 void GameBeaconSys_GetSendBeacon(GameBeacon *dest) {
     GameBeaconSystem *sys = GameBeaconSys;
 
-    sys_memcpy(&sys->mine.beacon, dest, sizeof(GameBeacon));
+    MI_CpuCopy8(&sys->mine.beacon, dest, sizeof(GameBeacon));
     GameBeacon_PrepareSend(dest, sys->b2w2Only);
 }
 
@@ -403,7 +403,7 @@ static void GameBeaconSys_AddLog(GameBeaconSystem *sys, const GameBeacon *beacon
         }
     }
     RTC_GetCachedTime(&time);
-    sys_memset(entry, 0, sizeof(GameBeaconLogEntry));
+    MI_CpuFill8(entry, 0, sizeof(GameBeaconLogEntry));
     entry->beacon = *beacon;
     entry->age = 0;
     entry->time.hour = time.hour;
@@ -741,7 +741,7 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     playTime = func_02017a40(gameData);
     beacon->playHours = func_02008cec(playTime);
     beacon->playMinutes = func_02008cf0(playTime);
-    sys_memcpy(func_0200ec38(func_0200ec2c(save)), beacon->surveyAnswers, sizeof(beacon->surveyAnswers));
+    MI_CpuCopy8(func_0200ec38(func_0200ec2c(save)), beacon->surveyAnswers, sizeof(beacon->surveyAnswers));
     CGearPhrases_Get(cgear, 0, &cgearRecord);
     GameBeacon_SetMyCGearRecord(&cgearRecord);
     terminator = GFL_StrBufGetTerminator();
@@ -890,7 +890,7 @@ static void GameBeacon_StoreTextN(const StrBuf *str, u16 *dest, u32 length) {
     u16 terminator = GFL_StrBufGetTerminator();
     u32 i;
 
-    sys_memset16(terminator, dest, length * 2);
+    MIi_CpuClear16(terminator, dest, length * 2);
     GFL_StrBufStoreString(str, buf, length + 1);
     for (i = 0; i < length; i++) {
         dest[i] = buf[i];
@@ -919,7 +919,7 @@ u8 GameBeaconSys_PopSurveyUpdated(void) {
 void GameBeaconSys_SetSurveyAnswers(const void *answers) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
-    sys_memcpy(answers, slot->beacon.surveyAnswers, sizeof(slot->beacon.surveyAnswers));
+    MI_CpuCopy8(answers, slot->beacon.surveyAnswers, sizeof(slot->beacon.surveyAnswers));
     slot->updated = TRUE;
 }
 

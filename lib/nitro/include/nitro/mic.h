@@ -5,9 +5,9 @@
 #include "nitro/pm.h"
 
 // NitroSDK's microphone (TwlSDK's libspi mic.c). Its amplifier is turned on by the power management of nitro/pm.h,
-// which this header includes. The functions keep their default names; the comments give the SDK functions they are,
-// from how the code works. The Limited functions hand over to the DSi's MICEX code on a DSi and otherwise call the
-// plain ones (swan named them after these)
+// which this header includes. The functions have the names of the SDK functions they are, from how the code works. The
+// Limited functions hand over to the DSi's MICEX code on a DSi and otherwise call the plain ones (swan named them after
+// these)
 
 typedef enum {
     MIC_RESULT_SUCCESS,
@@ -59,15 +59,15 @@ typedef struct {
     u16 *sampleDest;
 } MICWork;
 
-void func_0207e75c(void);                                                            // MIC_Init
-MICResult func_0207e7a0(const MICAutoParam *param, MICCallback callback, void *arg); // MIC_StartAutoSamplingAsync
-MICResult func_0207e870(const MICAutoParam *param);                                  // the synchronous start
-MICResult func_0207e894(MICCallback callback, void *arg);                            // MIC_StopAutoSamplingAsync
-MICResult func_0207e8d4(void);                                                       // the synchronous stop
-void *func_0207e8f8(void);                                                           // MIC_GetLastSamplingAddress
-MICResult func_0207e904(const MICAutoParam *param, MICCallback callback, void *arg); // MIC_StartLimitedSamplingAsync
-MICResult MIC_StartAutoSampling(const MICAutoParam *param);                          // MIC_StartLimitedSampling
-MICResult MIC_StopAutoSampling(void);                                                // MIC_StopLimitedSampling
-MICWork *func_0207eb1c(void);                                                        // MICi_GetSysWork
+void MIC_Init(void);
+MICResult MIC_StartAutoSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg);
+MICResult MIC_StartAutoSampling(const MICAutoParam *param); // the synchronous start
+MICResult MIC_StopAutoSamplingAsync(MICCallback callback, void *arg);
+MICResult MIC_StopAutoSampling(void); // the synchronous stop
+void *MIC_GetLastSamplingAddress(void);
+MICResult MIC_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg);
+MICResult MIC_StartLimitedSampling(const MICAutoParam *param); // swan's MIC_StartAutoSampling
+MICResult MIC_StopLimitedSampling(void);                       // swan's MIC_StopAutoSampling
+MICWork *MICi_GetSysWork(void);
 
 #endif // POKEBW2_NITRO_MIC_H

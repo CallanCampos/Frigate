@@ -4,15 +4,15 @@
 #include "secure_error.h"
 #include "types.h"
 
-static constraint_handler_t data_0214f1f0 = NULL;
+static constraint_handler_t __msl_constraint_handler = NULL;
 
-void nothing(const char *msg, void *ptr, int error) {
-    if (data_0214f1f0 != NULL) {
-        data_0214f1f0(msg, ptr, error);
+void __msl_runtime_constraint_violation_s(const char *msg, void *ptr, int error) {
+    if (__msl_constraint_handler != NULL) {
+        __msl_constraint_handler(msg, ptr, error);
     } else {
-        func_02085d98(msg, ptr, error);
+        ignore_handler_s(msg, ptr, error);
     }
 }
 
-void func_02085d98(const char *msg, void *ptr, int error) {
+void ignore_handler_s(const char *msg, void *ptr, int error) {
 }

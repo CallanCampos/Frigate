@@ -1,9 +1,9 @@
 // NitroSDK's microphone library (TwlSDK's libspi, spi/ARM9/src/mic.c): starts and stops the ARM7's automatic sampling
 // of the microphone into a buffer, through the PXI FIFO. The file name is the SDK's, and the split is certain: the
-// functions come in the SDK's order, and the .bss is its two statics. The symbols keep their default names for now, and
-// the comments give the SDK's. The Limited functions hand over to the DSi's MICEX code in the LTD autoload when the
-// console runs in its DSi mode, and otherwise call the plain ones (swan named them after these). The linker's veneers
-// to that code (func_0207e92c, func_0207e950 and func_0207e970) follow their callers in the ROM.
+// functions come in the SDK's order, and the .bss is its two statics. The names are the SDK's. The Limited functions
+// hand over to the DSi's MICEX code in the LTD autoload when the console runs in its DSi mode, and otherwise call the
+// plain ones (swan named them after these). The linker's veneers to that code (func_0207e92c, func_0207e950 and
+// func_0207e970) follow their callers in the ROM.
 #include "nitro/mic.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
@@ -50,14 +50,13 @@
 static u16 micInitialized;
 static MICWork micWork;
 
-static void func_0207e978(u32 tag, u32 data, BOOL err);
+static void MicCommonCallback(u32 tag, u32 data, BOOL err);
 static BOOL MicStartAutoSampling(void *buffer, u32 size, u32 rate, u8 type);
-static BOOL func_0207eadc(void);
-static void func_0207eaf8(MICResult result, void *arg);
-static void func_0207eb04(void);
+static BOOL MicStopAutoSampling(void);
+static void MicGetResultCallback(MICResult result, void *arg);
+static void MicWaitBusy(void);
 
-// MIC_Init
-void func_0207e75c(void) {
+void MIC_Init(void) {
     if (micInitialized) {
         return;
     }
@@ -65,14 +64,13 @@ void func_0207e75c(void) {
     micWork.busy = FALSE;
     micWork.callback = NULL;
     PXI_Init();
-    while (!func_0207ca48(PXI_FIFO_TAG_MIC, PXI_PROC_ARM7)) {
+    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_MIC, PXI_PROC_ARM7)) {
     }
     *(void **)HW_MIC_LAST_ADDRESS = NULL;
-    func_0207c9fc(PXI_FIFO_TAG_MIC, func_0207e978);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_MIC, MicCommonCallback);
 }
 
-// MIC_StartAutoSamplingAsync
-MICResult func_0207e7a0(const MICAutoParam *param, MICCallback callback, void *arg) {
+MICResult MIC_StartAutoSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
     u32 enabled;
     int type;
     u8 mode;
@@ -113,13 +111,13 @@ MICResult func_0207e7a0(const MICAutoParam *param, MICCallback callback, void *a
     }
     mode = param->loop ? (u8)(type | MIC_PXI_TYPE_LOOP) : (u8)type;
 
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (micWork.busy) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return MIC_RESULT_BUSY;
     }
     micWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
     micWork.callback = callback;
     micWork.callbackArg = arg;
@@ -133,28 +131,27 @@ MICResult func_0207e7a0(const MICAutoParam *param, MICCallback callback, void *a
 }
 
 // The synchronous start: waits for the answer
-MICResult func_0207e870(const MICAutoParam *param) {
-    micWork.result = func_0207e7a0(param, func_0207eaf8, NULL);
+MICResult MIC_StartAutoSampling(const MICAutoParam *param) {
+    micWork.result = MIC_StartAutoSamplingAsync(param, MicGetResultCallback, NULL);
     if (micWork.result == MIC_RESULT_SUCCESS) {
-        func_0207eb04();
+        MicWaitBusy();
     }
     return micWork.result;
 }
 
-// MIC_StopAutoSamplingAsync
-MICResult func_0207e894(MICCallback callback, void *arg) {
-    u32 enabled = CPU_IRQDisable();
+MICResult MIC_StopAutoSamplingAsync(MICCallback callback, void *arg) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (micWork.busy) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return MIC_RESULT_BUSY;
     }
     micWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
     micWork.callback = callback;
     micWork.callbackArg = arg;
-    if (func_0207eadc()) {
+    if (MicStopAutoSampling()) {
         return MIC_RESULT_SUCCESS;
     }
     micWork.busy = FALSE;
@@ -162,45 +159,41 @@ MICResult func_0207e894(MICCallback callback, void *arg) {
 }
 
 // The synchronous stop: waits for the answer
-MICResult func_0207e8d4(void) {
-    micWork.result = func_0207e894(func_0207eaf8, NULL);
+MICResult MIC_StopAutoSampling(void) {
+    micWork.result = MIC_StopAutoSamplingAsync(MicGetResultCallback, NULL);
     if (micWork.result == MIC_RESULT_SUCCESS) {
-        func_0207eb04();
+        MicWaitBusy();
     }
     return micWork.result;
 }
 
-// MIC_GetLastSamplingAddress
-void *func_0207e8f8(void) {
+void *MIC_GetLastSamplingAddress(void) {
     return *(void **)HW_MIC_LAST_ADDRESS;
 }
 
-// MIC_StartLimitedSamplingAsync
-MICResult func_0207e904(const MICAutoParam *param, MICCallback callback, void *arg) {
-    if (func_0207c210() == TRUE) {
-        return func_02703cdc(param, callback, arg);
+MICResult MIC_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
+    if (OSi_IsCodecTwlMode() == TRUE) {
+        return MICEX_StartLimitedSamplingAsync(param, callback, arg);
     }
-    return func_0207e7a0(param, callback, arg);
+    return MIC_StartAutoSamplingAsync(param, callback, arg);
 }
 
-// MIC_StartLimitedSampling
-MICResult MIC_StartAutoSampling(const MICAutoParam *param) {
-    if (func_0207c210() == TRUE) {
-        return func_02703c60(param);
+MICResult MIC_StartLimitedSampling(const MICAutoParam *param) {
+    if (OSi_IsCodecTwlMode() == TRUE) {
+        return MICEX_StartLimitedSampling(param);
     }
-    return func_0207e870(param);
+    return MIC_StartAutoSampling(param);
 }
 
-// MIC_StopLimitedSampling
-MICResult MIC_StopAutoSampling(void) {
-    if (func_0207c210() == TRUE) {
-        return func_02703e90();
+MICResult MIC_StopLimitedSampling(void) {
+    if (OSi_IsCodecTwlMode() == TRUE) {
+        return MICEX_StopLimitedSampling();
     }
-    return func_0207e8d4();
+    return MIC_StopAutoSampling();
 }
 
-// MicCommonCallback: gets the ARM7's words with the microphone's tag
-static void func_0207e978(u32 tag, u32 data, BOOL err) {
+// Gets the ARM7's words with the microphone's tag
+static void MicCommonCallback(u32 tag, u32 data, BOOL err) {
     MICCallback callback;
     MICResult result;
     u16 command;
@@ -291,23 +284,23 @@ static BOOL MicStartAutoSampling(void *buffer, u32 size, u32 rate, u8 type) {
     return TRUE;
 }
 
-// MicStopAutoSampling: sends the command that stops the sampling
-static BOOL func_0207eadc(void) {
+// Sends the command that stops the sampling
+static BOOL MicStopAutoSampling(void) {
     if (MIC_PXI_SEND(MIC_PXI_START | MIC_PXI_END | MIC_PXI_COMMAND(MIC_PXI_COMMAND_AUTO_OFF)) < 0) {
         return FALSE;
     }
     return TRUE;
 }
 
-// MicGetResultCallback: the callback of the synchronous calls
-static void func_0207eaf8(MICResult result, void *arg) {
+// The callback of the synchronous calls
+static void MicGetResultCallback(MICResult result, void *arg) {
     micWork.result = result;
 }
 
 #pragma thumb off
 // MicWaitBusy: the SDK wrote it in assembly, in ARM (it keeps the address in ip, which MWCC doesn't use for this)
 // clang-format off
-static asm void func_0207eb04(void) {
+static asm void MicWaitBusy(void) {
     ldr ip, =micWork
 @loop:
     ldr r0, [ip]
@@ -318,7 +311,6 @@ static asm void func_0207eb04(void) {
 // clang-format on
 #pragma thumb on
 
-// MICi_GetSysWork
-MICWork *func_0207eb1c(void) {
+MICWork *MICi_GetSysWork(void) {
     return &micWork;
 }

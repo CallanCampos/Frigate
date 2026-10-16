@@ -17,7 +17,7 @@ u32 PerapVoice_GetSize(void) {
 }
 
 void initChatotChatter(PerapVoice *chatter) {
-    sys_memset32(0, chatter, sizeof(PerapVoice));
+    MIi_CpuClear32(0, chatter, sizeof(PerapVoice));
     chatter->exists = FALSE;
 }
 
@@ -93,7 +93,7 @@ void PerapVoice_Encode(PerapVoice *chatter, const s8 *src) {
 }
 
 void moveChatter(PerapVoice *dest, const PerapVoice *src) {
-    sys_memcpy(src, dest, sizeof(PerapVoice));
+    MI_CpuCopy8(src, dest, sizeof(PerapVoice));
 }
 
 void checkChatotInParty(PerapVoice *chatter, PokeParty *party) {

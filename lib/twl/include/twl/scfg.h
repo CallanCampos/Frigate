@@ -26,12 +26,12 @@ typedef enum SCFGCpuSpeed {
 // a single 16-bit value in the low bits
 typedef void (*SCFGCallback)(u64 response, void *arg);
 
-// SCFG_Init: takes the PXI words of the SCFG service
-void func_0207f6cc(void);
-// SCFG_SetCpuSpeed: switches the ARM9 to the DS or the DSi clock, with the interrupts off
-void func_0207f6e8(SCFGCpuSpeed speed);
+// Takes the PXI words of the SCFG service
+void SCFG_Init(void);
+// Switches the ARM9 to the DS or the DSi clock, with the interrupts off
+void SCFG_SetCpuSpeed(SCFGCpuSpeed speed);
 
 // SCFGi_SwitchCpuSpeed, in ITCM (the last function of it): writes bit 0 of SCFG_CLK and waits for the clock to settle
-void func_01ff936c(SCFGCpuSpeed speed);
+void SCFGi_SwitchCpuSpeed(SCFGCpuSpeed speed);
 
 #endif // POKEBW2_TWL_SCFG_H

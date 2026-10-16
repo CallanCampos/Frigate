@@ -247,7 +247,7 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
 
 // Draws an OAM as a quad in the current 3D matrix, flipped by the renderer's flip
 static void DrawOamToSurface3D_(GXOamAttr *oam) {
-    gfxLoadMatrix4x3(&pCurrentInstance_->mtx3D);
+    G3_LoadMtx43(&pCurrentInstance_->mtx3D);
 
     if (pCurrentInstance_->flipFlag != NNS_G2D_RENDERERFLIP_NONE) {
         GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
@@ -295,7 +295,7 @@ static void DrawCellToSurface3D_(const NNSG2dRenderSurface *surface, const NNSG2
 }
 
 void NNS_G2dInitRndCore(NNSG2dRndCoreInstance *core) {
-    sys_memset16(0, core, sizeof(NNSG2dRndCoreInstance));
+    MIi_CpuClear16(0, core, sizeof(NNSG2dRndCoreInstance));
     core->pCurrentTargetSurface = NULL;
     core->affineOverwriteMode = NNS_G2D_RND_AFFINE_OVERWRITE_DOUBLE;
     core->pImageProxy = NULL;

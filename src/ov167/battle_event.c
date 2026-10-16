@@ -83,7 +83,7 @@ BattleEventItem *BattleEvent_AddItem(u32 factorType, u16 subId, u32 priority, u3
         } else {
             item->dependMonId = 0x1f;
         }
-        sys_memset(item->work, 0, sizeof(item->work));
+        MI_CpuFill8(item->work, 0, sizeof(item->work));
         if (data_ov167_021db194.first == NULL) {
             data_ov167_021db194.first = item;
         } else if (item->priority > data_ov167_021db194.first->priority) {
@@ -396,7 +396,7 @@ void func_ov167_021bcca4(BattleEventItem *item) {
 }
 
 void func_ov167_021bcccc(BattleEventItem *item) {
-    sys_memset(item, 0, sizeof(BattleEventItem));
+    MI_CpuFill8(item, 0, sizeof(BattleEventItem));
 }
 
 void func_ov167_021bccd8(void) {

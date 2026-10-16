@@ -1,7 +1,8 @@
 // TwlSDK's camera library (libcamera), the PXI and I2C API in the DSi's LTD autoload: the commands that the ARM9 sends
 // to the ARM7, which drives the cameras' I2C bus, and the interrupt, thread and PM callbacks that keep the cameras
 // running. ARM code. The ROM names none of it; the file's name is a guess, after the SDK's camera_api.h, whose Core
-// names twl/camera.h gives. The functions keep their default names.
+// names twl/camera.h gives. The functions have those names where they are known, and keep their default names
+// otherwise.
 //
 // Each command is a word of the camera's PXI tag, with a payload of three bytes per further word, and the ARM7
 // answers it in the same form. camera_api.c caches what the settings were set to (CAMERASettings) so that, when the
@@ -107,9 +108,9 @@ typedef struct {
 } CAMERAWork;
 
 // MWCC lays these out in reverse order of declaration: the flag first, then the word, then the work
-static CAMERAWork sWork;
+static CAMERAWork sCameraWork;
 static u32 sUnused; // Nothing reads it; the library's other code that used it was stripped
-static BOOL sInitialized;
+static BOOL sCameraInitialized;
 
 static void func_02701aa0(u32 tag, u32 data, BOOL err);
 static void func_02701fd8(CAMERAResult result, void *arg);
@@ -142,27 +143,27 @@ static void func_027001f0(void);
 static void func_02700078(void) {
     OS_SetIrqCheckFlag(OS_IE_CAMERA);
     if (CAMERA_IsBufferError()) {
-        if (sWork.bufferErrorCallback != NULL) {
-            sWork.bufferErrorCallback(CAMERA_RESULT_SUCCESS);
+        if (sCameraWork.bufferErrorCallback != NULL) {
+            sCameraWork.bufferErrorCallback(CAMERA_RESULT_SUCCESS);
         }
     } else {
-        sWork.vsyncTick = clock();
-        if (sWork.vsyncCallback != NULL) {
-            sWork.vsyncCallback(CAMERA_RESULT_SUCCESS);
+        sCameraWork.vsyncTick = OS_GetTick();
+        if (sCameraWork.vsyncCallback != NULL) {
+            sCameraWork.vsyncCallback(CAMERA_RESULT_SUCCESS);
         }
     }
 }
 
-void func_027000f8(CAMERAIntrCallback callback) {
-    sWork.vsyncCallback = callback;
+void CAMERA_SetVsyncCallbackCore(CAMERAIntrCallback callback) {
+    sCameraWork.vsyncCallback = callback;
 }
 
-void func_02700108(CAMERAIntrCallback callback) {
-    sWork.bufferErrorCallback = callback;
+void CAMERA_SetBufferErrorCallbackCore(CAMERAIntrCallback callback) {
+    sCameraWork.bufferErrorCallback = callback;
 }
 
-void func_02700118(CAMERAIntrCallback callback) {
-    sWork.rebootCallback = callback;
+void CAMERA_SetRebootCallbackCore(CAMERAIntrCallback callback) {
+    sCameraWork.rebootCallback = callback;
 }
 
 // What a camera's white balance, sharpness and exposure are for a photo mode (func_02700128, func_02700168 and
@@ -215,9 +216,9 @@ static int func_027001b8(CAMERAPhotoMode mode) {
 
 // The camera answered with a wrong state: count it and wake the thread
 static void func_027001f0(void) {
-    sWork.busy = TRUE;
-    sWork.errorCount++;
-    OS_SendMessage(&sWork.queue, 0, OS_MESSAGE_NOBLOCK);
+    sCameraWork.busy = TRUE;
+    sCameraWork.errorCount++;
+    OS_SendMessage(&sCameraWork.queue, 0, OS_MESSAGE_NOBLOCK);
 }
 
 // The callback of the commands that start the camera again: sends the next setting that is not the camera's default,
@@ -232,145 +233,157 @@ static void func_02700230(CAMERAResult result, void *arg) {
         func_02700c18(CAMERA_SELECT_BOTH, func_02700230, (void *)1);
         return;
     case 1:
-        if (sWork.settings[0].photoMode != CAMERA_PHOTO_MODE_PORTRAIT) {
-            func_027013a4(CAMERA_SELECT_IN, sWork.settings[0].photoMode, func_02700230, (void *)2);
+        if (sCameraWork.settings[0].photoMode != CAMERA_PHOTO_MODE_PORTRAIT) {
+            func_027013a4(CAMERA_SELECT_IN, sCameraWork.settings[0].photoMode, func_02700230, (void *)2);
             return;
         }
     case 2:
-        if (sWork.settings[1].photoMode != CAMERA_PHOTO_MODE_NORMAL) {
-            func_027013a4(CAMERA_SELECT_OUT, sWork.settings[1].photoMode, func_02700230, (void *)3);
+        if (sCameraWork.settings[1].photoMode != CAMERA_PHOTO_MODE_NORMAL) {
+            func_027013a4(CAMERA_SELECT_OUT, sCameraWork.settings[1].photoMode, func_02700230, (void *)3);
             return;
         }
     case 3:
-        if (sWork.settings[0].size[0] != CAMERA_SIZE_DS_LCD) {
-            func_02700eb8(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sWork.settings[0].size[0], func_02700230, (void *)4);
+        if (sCameraWork.settings[0].size[0] != CAMERA_SIZE_DS_LCD) {
+            func_02700eb8(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sCameraWork.settings[0].size[0], func_02700230,
+                          (void *)4);
             return;
         }
     case 4:
-        if (sWork.settings[0].size[1] != CAMERA_SIZE_DSI_VGA) {
-            func_02700eb8(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sWork.settings[0].size[1], func_02700230, (void *)5);
+        if (sCameraWork.settings[0].size[1] != CAMERA_SIZE_DSI_VGA) {
+            func_02700eb8(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sCameraWork.settings[0].size[1], func_02700230,
+                          (void *)5);
             return;
         }
     case 5:
-        if (sWork.settings[1].size[0] != CAMERA_SIZE_DS_LCD) {
-            func_02700eb8(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sWork.settings[1].size[0], func_02700230, (void *)6);
+        if (sCameraWork.settings[1].size[0] != CAMERA_SIZE_DS_LCD) {
+            func_02700eb8(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sCameraWork.settings[1].size[0], func_02700230,
+                          (void *)6);
             return;
         }
     case 6:
-        if (sWork.settings[1].size[1] != CAMERA_SIZE_DSI_VGA) {
-            func_02700eb8(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sWork.settings[1].size[1], func_02700230, (void *)7);
+        if (sCameraWork.settings[1].size[1] != CAMERA_SIZE_DSI_VGA) {
+            func_02700eb8(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sCameraWork.settings[1].size[1], func_02700230,
+                          (void *)7);
             return;
         }
     case 7:
-        if (sWork.settings[0].frameRate != 0) {
-            func_02701020(CAMERA_SELECT_IN, sWork.settings[0].frameRate, func_02700230, (void *)8);
+        if (sCameraWork.settings[0].frameRate != 0) {
+            func_02701020(CAMERA_SELECT_IN, sCameraWork.settings[0].frameRate, func_02700230, (void *)8);
             return;
         }
     case 8:
-        if (sWork.settings[1].frameRate != 0) {
-            func_02701020(CAMERA_SELECT_OUT, sWork.settings[1].frameRate, func_02700230, (void *)9);
+        if (sCameraWork.settings[1].frameRate != 0) {
+            func_02701020(CAMERA_SELECT_OUT, sCameraWork.settings[1].frameRate, func_02700230, (void *)9);
             return;
         }
     case 9:
-        if (sWork.settings[0].effect[0] != CAMERA_EFFECT_NONE) {
-            func_02701120(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sWork.settings[0].effect[0], func_02700230, (void *)10);
+        if (sCameraWork.settings[0].effect[0] != CAMERA_EFFECT_NONE) {
+            func_02701120(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sCameraWork.settings[0].effect[0], func_02700230,
+                          (void *)10);
             return;
         }
     case 10:
-        if (sWork.settings[0].effect[1] != CAMERA_EFFECT_NONE) {
-            func_02701120(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sWork.settings[0].effect[1], func_02700230, (void *)11);
+        if (sCameraWork.settings[0].effect[1] != CAMERA_EFFECT_NONE) {
+            func_02701120(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sCameraWork.settings[0].effect[1], func_02700230,
+                          (void *)11);
             return;
         }
     case 11:
-        if (sWork.settings[1].effect[0] != CAMERA_EFFECT_NONE) {
-            func_02701120(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sWork.settings[1].effect[0], func_02700230, (void *)12);
+        if (sCameraWork.settings[1].effect[0] != CAMERA_EFFECT_NONE) {
+            func_02701120(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sCameraWork.settings[1].effect[0], func_02700230,
+                          (void *)12);
             return;
         }
     case 12:
-        if (sWork.settings[1].effect[1] != CAMERA_EFFECT_NONE) {
-            func_02701120(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sWork.settings[1].effect[1], func_02700230, (void *)13);
+        if (sCameraWork.settings[1].effect[1] != CAMERA_EFFECT_NONE) {
+            func_02701120(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sCameraWork.settings[1].effect[1], func_02700230,
+                          (void *)13);
             return;
         }
     case 13:
-        if (sWork.settings[0].flip[0] != CAMERA_FLIP_VERTICAL) {
-            func_02701284(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sWork.settings[0].flip[0], func_02700230, (void *)14);
+        if (sCameraWork.settings[0].flip[0] != CAMERA_FLIP_VERTICAL) {
+            func_02701284(CAMERA_SELECT_IN, CAMERA_CONTEXT_A, sCameraWork.settings[0].flip[0], func_02700230,
+                          (void *)14);
             return;
         }
     case 14:
-        if (sWork.settings[0].flip[1] != CAMERA_FLIP_VERTICAL) {
-            func_02701284(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sWork.settings[0].flip[1], func_02700230, (void *)15);
+        if (sCameraWork.settings[0].flip[1] != CAMERA_FLIP_VERTICAL) {
+            func_02701284(CAMERA_SELECT_IN, CAMERA_CONTEXT_B, sCameraWork.settings[0].flip[1], func_02700230,
+                          (void *)15);
             return;
         }
     case 15:
-        if (sWork.settings[1].flip[0] != CAMERA_FLIP_NONE) {
-            func_02701284(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sWork.settings[1].flip[0], func_02700230, (void *)16);
+        if (sCameraWork.settings[1].flip[0] != CAMERA_FLIP_NONE) {
+            func_02701284(CAMERA_SELECT_OUT, CAMERA_CONTEXT_A, sCameraWork.settings[1].flip[0], func_02700230,
+                          (void *)16);
             return;
         }
     case 16:
-        if (sWork.settings[1].flip[1] != CAMERA_FLIP_NONE) {
-            func_02701284(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sWork.settings[1].flip[1], func_02700230, (void *)17);
+        if (sCameraWork.settings[1].flip[1] != CAMERA_FLIP_NONE) {
+            func_02701284(CAMERA_SELECT_OUT, CAMERA_CONTEXT_B, sCameraWork.settings[1].flip[1], func_02700230,
+                          (void *)17);
             return;
         }
     case 17:
-        if (sWork.settings[0].whiteBalance != func_02700128(sWork.settings[0].photoMode)) {
-            func_02701488(CAMERA_SELECT_IN, sWork.settings[0].whiteBalance, func_02700230, (void *)18);
+        if (sCameraWork.settings[0].whiteBalance != func_02700128(sCameraWork.settings[0].photoMode)) {
+            func_02701488(CAMERA_SELECT_IN, sCameraWork.settings[0].whiteBalance, func_02700230, (void *)18);
             return;
         }
     case 18:
-        if (sWork.settings[1].whiteBalance != func_02700128(sWork.settings[1].photoMode)) {
-            func_02701488(CAMERA_SELECT_OUT, sWork.settings[1].whiteBalance, func_02700230, (void *)19);
+        if (sCameraWork.settings[1].whiteBalance != func_02700128(sCameraWork.settings[1].photoMode)) {
+            func_02701488(CAMERA_SELECT_OUT, sCameraWork.settings[1].whiteBalance, func_02700230, (void *)19);
             return;
         }
     case 19: {
-        int exposure = sWork.settings[0].exposure;
-        if (exposure != func_027001b8(sWork.settings[0].photoMode)) {
+        int exposure = sCameraWork.settings[0].exposure;
+        if (exposure != func_027001b8(sCameraWork.settings[0].photoMode)) {
             func_02701570(CAMERA_SELECT_IN, exposure, func_02700230, (void *)20);
             return;
         }
     }
     case 20: {
-        int exposure = sWork.settings[1].exposure;
-        if (exposure != func_027001b8(sWork.settings[1].photoMode)) {
+        int exposure = sCameraWork.settings[1].exposure;
+        if (exposure != func_027001b8(sCameraWork.settings[1].photoMode)) {
             func_02701570(CAMERA_SELECT_OUT, exposure, func_02700230, (void *)21);
             return;
         }
     }
     case 21: {
-        int sharpness = sWork.settings[0].sharpness;
-        if (sharpness != func_02700168(sWork.settings[0].photoMode)) {
+        int sharpness = sCameraWork.settings[0].sharpness;
+        if (sharpness != func_02700168(sCameraWork.settings[0].photoMode)) {
             func_02701644(CAMERA_SELECT_IN, sharpness, func_02700230, (void *)22);
             return;
         }
     }
     case 22: {
-        int sharpness = sWork.settings[1].sharpness;
-        if (sharpness != func_02700168(sWork.settings[1].photoMode)) {
+        int sharpness = sCameraWork.settings[1].sharpness;
+        if (sharpness != func_02700168(sCameraWork.settings[1].photoMode)) {
             func_02701644(CAMERA_SELECT_OUT, sharpness, func_02700230, (void *)23);
             return;
         }
     }
     case 23:
-        if (sWork.settings[0].autoExposure != TRUE) {
-            func_02701718(CAMERA_SELECT_IN, sWork.settings[0].autoExposure, func_02700230, (void *)24);
+        if (sCameraWork.settings[0].autoExposure != TRUE) {
+            func_02701718(CAMERA_SELECT_IN, sCameraWork.settings[0].autoExposure, func_02700230, (void *)24);
             return;
         }
     case 24:
-        if (sWork.settings[1].autoExposure != TRUE) {
-            func_02701718(CAMERA_SELECT_OUT, sWork.settings[1].autoExposure, func_02700230, (void *)25);
+        if (sCameraWork.settings[1].autoExposure != TRUE) {
+            func_02701718(CAMERA_SELECT_OUT, sCameraWork.settings[1].autoExposure, func_02700230, (void *)25);
             return;
         }
     case 25:
-        if (sWork.settings[0].autoWhiteBalance != TRUE) {
-            func_02701814(CAMERA_SELECT_IN, sWork.settings[0].autoWhiteBalance, func_02700230, (void *)26);
+        if (sCameraWork.settings[0].autoWhiteBalance != TRUE) {
+            func_02701814(CAMERA_SELECT_IN, sCameraWork.settings[0].autoWhiteBalance, func_02700230, (void *)26);
             return;
         }
     case 26:
-        if (sWork.settings[1].autoWhiteBalance != TRUE) {
-            func_02701814(CAMERA_SELECT_OUT, sWork.settings[1].autoWhiteBalance, func_02700230, (void *)27);
+        if (sCameraWork.settings[1].autoWhiteBalance != TRUE) {
+            func_02701814(CAMERA_SELECT_OUT, sCameraWork.settings[1].autoWhiteBalance, func_02700230, (void *)27);
             return;
         }
     case 27: {
-        CAMERAContext context = sWork.settings[0].context;
+        CAMERAContext context = sCameraWork.settings[0].context;
         if (context != CAMERA_CONTEXT_A) {
             if (hw_isDSi() == TRUE) {
                 func_02700df0(CAMERA_SELECT_IN, context, func_02700230, (void *)28);
@@ -379,7 +392,7 @@ static void func_02700230(CAMERAResult result, void *arg) {
         }
     }
     case 28: {
-        CAMERAContext context = sWork.settings[1].context;
+        CAMERAContext context = sCameraWork.settings[1].context;
         if (context != CAMERA_CONTEXT_A) {
             if (hw_isDSi() == TRUE) {
                 func_02700df0(CAMERA_SELECT_OUT, context, func_02700230, (void *)29);
@@ -388,12 +401,12 @@ static void func_02700230(CAMERAResult result, void *arg) {
         }
     }
     case 29:
-        if (sWork.activeCamera != CAMERA_SELECT_NONE) {
-            func_02700cec(sWork.activeCamera, func_02700230, (void *)30);
+        if (sCameraWork.activeCamera != CAMERA_SELECT_NONE) {
+            func_02700cec(sCameraWork.activeCamera, func_02700230, (void *)30);
             return;
         }
     case 30:
-        if (sWork.activeCamera == CAMERA_SELECT_OUT && sWork.settings[1].unk_38 == 1) {
+        if (sCameraWork.activeCamera == CAMERA_SELECT_OUT && sCameraWork.settings[1].unk_38 == 1) {
             if (hw_isDSi() == TRUE) {
                 func_02701940(1, func_02700230, (void *)31);
             }
@@ -402,24 +415,24 @@ static void func_02700230(CAMERAResult result, void *arg) {
     default:
         break;
     }
-    sWork.errorCount = 0;
-    if (sWork.rebootCallback != NULL) {
-        sWork.rebootCallback(CAMERA_RESULT_SUCCESS);
+    sCameraWork.errorCount = 0;
+    if (sCameraWork.rebootCallback != NULL) {
+        sCameraWork.rebootCallback(CAMERA_RESULT_SUCCESS);
     }
 }
 
 // Checks that the camera may take a command: FATAL_ERROR, after it has stopped the active camera, once it failed more
 // than twice, ILLEGAL_STATUS while it is being started again
 static CAMERAResult func_027007c8(void) {
-    if (sWork.errorCount > 2) {
-        if (sWork.activeCamera != CAMERA_SELECT_NONE) {
-            sWork.stopClock = TRUE;
-            sWork.activeCamera = CAMERA_SELECT_NONE;
+    if (sCameraWork.errorCount > 2) {
+        if (sCameraWork.activeCamera != CAMERA_SELECT_NONE) {
+            sCameraWork.stopClock = TRUE;
+            sCameraWork.activeCamera = CAMERA_SELECT_NONE;
             func_027019b4(CAMERA_COMMAND_I2C_ACTIVATE, 1, 0);
         }
         return CAMERA_RESULT_FATAL_ERROR;
     }
-    if (sWork.errorCount != 0) {
+    if (sCameraWork.errorCount != 0) {
         return CAMERA_RESULT_ILLEGAL_STATUS;
     }
     return CAMERA_RESULT_SUCCESS;
@@ -432,145 +445,145 @@ static void func_02700824(void *arg) {
     OSMessage message;
     int elapsed;
 
-    CPU_IRQDisable();
+    OS_DisableInterrupts();
     for (;;) {
-        func_0207aa04(100);
-        if (!OS_ReceiveMessage(&sWork.queue, &message, OS_MESSAGE_NOBLOCK)) {
-            if (sWork.errorCount != 0) {
+        OS_Sleep(100);
+        if (!OS_ReceiveMessage(&sCameraWork.queue, &message, OS_MESSAGE_NOBLOCK)) {
+            if (sCameraWork.errorCount != 0) {
                 continue;
             }
-            if (sWork.activeCamera == CAMERA_SELECT_NONE) {
+            if (sCameraWork.activeCamera == CAMERA_SELECT_NONE) {
                 continue;
             }
-            if (sWork.busy) {
+            if (sCameraWork.busy) {
                 continue;
             }
-            if (++sWork.pollCount < 10) {
+            if (++sCameraWork.pollCount < 10) {
                 continue;
             }
-            sWork.pollCount = 0;
+            sCameraWork.pollCount = 0;
             // The ticks since the last frame as an int, which the comparison widens to an unsigned 64 bits
-            elapsed = clock() - sWork.vsyncTick;
+            elapsed = OS_GetTick() - sCameraWork.vsyncTick;
             if (elapsed < OS_MilliSecondsToTicks(1000)) {
                 continue;
             }
-            sWork.busy = TRUE;
-            sWork.errorCount++;
+            sCameraWork.busy = TRUE;
+            sCameraWork.errorCount++;
         }
         if (func_027007c8() == CAMERA_RESULT_FATAL_ERROR) {
-            sWork.busy = FALSE;
-            if (sWork.rebootCallback != NULL) {
-                sWork.rebootCallback(CAMERA_RESULT_FATAL_ERROR);
+            sCameraWork.busy = FALSE;
+            if (sCameraWork.rebootCallback != NULL) {
+                sCameraWork.rebootCallback(CAMERA_RESULT_FATAL_ERROR);
             }
             return;
         }
-        CPU_IRQEnable();
-        func_02702080();
-        CPU_IRQDisable();
-        sWork.busy = FALSE;
+        OS_EnableInterrupts();
+        CAMERA_ResetCore();
+        OS_DisableInterrupts();
+        sCameraWork.busy = FALSE;
         func_02700230(CAMERA_RESULT_SUCCESS, NULL);
     }
 }
 
-CAMERAResult func_02700938(void) {
-    if (sInitialized) {
+CAMERAResult CAMERA_InitCore(void) {
+    if (sCameraInitialized) {
         return CAMERA_RESULT_BUSY;
     }
-    sInitialized = TRUE;
-    sWork.vsyncCallback = NULL;
-    sWork.bufferErrorCallback = NULL;
-    sWork.rebootCallback = NULL;
-    sWork.busy = FALSE;
-    sWork.callback = NULL;
-    sWork.keepClock = FALSE;
-    sWork.stopClock = FALSE;
-    sWork.activeCamera = CAMERA_SELECT_NONE;
-    sWork.errorCount = 0;
-    sWork.pollCount = 0;
+    sCameraInitialized = TRUE;
+    sCameraWork.vsyncCallback = NULL;
+    sCameraWork.bufferErrorCallback = NULL;
+    sCameraWork.rebootCallback = NULL;
+    sCameraWork.busy = FALSE;
+    sCameraWork.callback = NULL;
+    sCameraWork.keepClock = FALSE;
+    sCameraWork.stopClock = FALSE;
+    sCameraWork.activeCamera = CAMERA_SELECT_NONE;
+    sCameraWork.errorCount = 0;
+    sCameraWork.pollCount = 0;
     PXI_Init();
-    if (!func_0207ca48(PXI_FIFO_TAG_CAMERA, 1)) {
+    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_CAMERA, 1)) {
         return CAMERA_RESULT_FATAL_ERROR;
     }
-    func_0207c9fc(PXI_FIFO_TAG_CAMERA, func_02701aa0);
-    func_02702080();
-    func_0270212c();
-    func_027021e4();
-    PM_SetSleepCallbackInfo(&sWork.sleepInfo, func_02702070, NULL);
-    func_0207f614(&sWork.sleepInfo, CAMERA_PM_CALLBACK_PRIORITY);
-    PM_SetExitCallbackInfo(&sWork.exitInfo, func_02702070, NULL);
-    func_02769550(&sWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CAMERA, func_02701aa0);
+    CAMERA_ResetCore();
+    CAMERA_StopCaptureCore();
+    CAMERA_ClearBufferCore();
+    PM_SetSleepCallbackInfo(&sCameraWork.sleepInfo, func_02702070, NULL);
+    PM_InsertPreSleepCallback(&sCameraWork.sleepInfo, CAMERA_PM_CALLBACK_PRIORITY);
+    PM_SetExitCallbackInfo(&sCameraWork.exitInfo, func_02702070, NULL);
+    func_02769550(&sCameraWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
     func_0270223c(0x200);
     func_02702268(TRUE);
-    func_02702208(TRUE);
-    CPU_SetIRQFunc(OS_IE_CAMERA, func_02700078);
-    CPU_EnableInterrupts(OS_IE_CAMERA);
-    sWork.settings[0].size[0] = CAMERA_SIZE_DS_LCD;
-    sWork.settings[0].size[1] = CAMERA_SIZE_DSI_VGA;
-    sWork.settings[0].effect[0] = CAMERA_EFFECT_NONE;
-    sWork.settings[0].effect[1] = CAMERA_EFFECT_NONE;
-    sWork.settings[0].flip[0] = CAMERA_FLIP_VERTICAL;
-    sWork.settings[0].flip[1] = CAMERA_FLIP_VERTICAL;
-    sWork.settings[0].photoMode = CAMERA_PHOTO_MODE_PORTRAIT;
-    sWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
-    sWork.settings[0].frameRate = 0;
-    sWork.settings[0].exposure = 0;
-    sWork.settings[0].sharpness = -2;
-    sWork.settings[0].autoExposure = TRUE;
-    sWork.settings[0].autoWhiteBalance = TRUE;
-    sWork.settings[0].context = CAMERA_CONTEXT_A;
-    sWork.settings[0].unk_38 = 0;
-    sWork.settings[1].size[0] = CAMERA_SIZE_DS_LCD;
-    sWork.settings[1].size[1] = CAMERA_SIZE_DSI_VGA;
-    sWork.settings[1].effect[0] = CAMERA_EFFECT_NONE;
-    sWork.settings[1].effect[1] = CAMERA_EFFECT_NONE;
-    sWork.settings[1].flip[0] = CAMERA_FLIP_NONE;
-    sWork.settings[1].flip[1] = CAMERA_FLIP_NONE;
-    sWork.settings[1].photoMode = CAMERA_PHOTO_MODE_NORMAL;
-    sWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
-    sWork.settings[1].frameRate = 0;
-    sWork.settings[1].exposure = 0;
-    sWork.settings[1].sharpness = 0;
-    sWork.settings[1].autoExposure = TRUE;
-    sWork.settings[1].autoWhiteBalance = TRUE;
-    sWork.settings[1].context = CAMERA_CONTEXT_A;
-    sWork.settings[1].unk_38 = 0;
-    func_0207acc4(&sWork.queue, sWork.messages, 1);
-    scheduler_init_thread(&sWork.thread, func_02700824, NULL, sWork.stack + CAMERA_STACK_SIZE / sizeof(u32),
-                          CAMERA_STACK_SIZE, CAMERA_THREAD_PRIORITY);
-    scheduler_start_thread(&sWork.thread);
+    CAMERA_SetInterruptEnableCore(TRUE);
+    OS_SetIrqFunction(OS_IE_CAMERA, func_02700078);
+    OS_EnableIrqMask(OS_IE_CAMERA);
+    sCameraWork.settings[0].size[0] = CAMERA_SIZE_DS_LCD;
+    sCameraWork.settings[0].size[1] = CAMERA_SIZE_DSI_VGA;
+    sCameraWork.settings[0].effect[0] = CAMERA_EFFECT_NONE;
+    sCameraWork.settings[0].effect[1] = CAMERA_EFFECT_NONE;
+    sCameraWork.settings[0].flip[0] = CAMERA_FLIP_VERTICAL;
+    sCameraWork.settings[0].flip[1] = CAMERA_FLIP_VERTICAL;
+    sCameraWork.settings[0].photoMode = CAMERA_PHOTO_MODE_PORTRAIT;
+    sCameraWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+    sCameraWork.settings[0].frameRate = 0;
+    sCameraWork.settings[0].exposure = 0;
+    sCameraWork.settings[0].sharpness = -2;
+    sCameraWork.settings[0].autoExposure = TRUE;
+    sCameraWork.settings[0].autoWhiteBalance = TRUE;
+    sCameraWork.settings[0].context = CAMERA_CONTEXT_A;
+    sCameraWork.settings[0].unk_38 = 0;
+    sCameraWork.settings[1].size[0] = CAMERA_SIZE_DS_LCD;
+    sCameraWork.settings[1].size[1] = CAMERA_SIZE_DSI_VGA;
+    sCameraWork.settings[1].effect[0] = CAMERA_EFFECT_NONE;
+    sCameraWork.settings[1].effect[1] = CAMERA_EFFECT_NONE;
+    sCameraWork.settings[1].flip[0] = CAMERA_FLIP_NONE;
+    sCameraWork.settings[1].flip[1] = CAMERA_FLIP_NONE;
+    sCameraWork.settings[1].photoMode = CAMERA_PHOTO_MODE_NORMAL;
+    sCameraWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+    sCameraWork.settings[1].frameRate = 0;
+    sCameraWork.settings[1].exposure = 0;
+    sCameraWork.settings[1].sharpness = 0;
+    sCameraWork.settings[1].autoExposure = TRUE;
+    sCameraWork.settings[1].autoWhiteBalance = TRUE;
+    sCameraWork.settings[1].context = CAMERA_CONTEXT_A;
+    sCameraWork.settings[1].unk_38 = 0;
+    OS_InitMessageQueue(&sCameraWork.queue, sCameraWork.messages, 1);
+    OS_CreateThread(&sCameraWork.thread, func_02700824, NULL, sCameraWork.stack + CAMERA_STACK_SIZE / sizeof(u32),
+                    CAMERA_STACK_SIZE, CAMERA_THREAD_PRIORITY);
+    OS_WakeupThreadDirect(&sCameraWork.thread);
     return CAMERA_RESULT_SUCCESS;
 }
 
-void func_02700b34(void) {
-    if (!sInitialized) {
+void CAMERA_EndCore(void) {
+    if (!sCameraInitialized) {
         return;
     }
-    sInitialized = FALSE;
-    func_0207f62c(&sWork.sleepInfo);
-    func_02769568(&sWork.exitInfo);
-    func_02700db8(CAMERA_SELECT_NONE);
-    func_02702080();
-    func_0270212c();
-    func_027021e4();
-    func_0207c9fc(PXI_FIFO_TAG_CAMERA, NULL);
+    sCameraInitialized = FALSE;
+    PM_DeletePreSleepCallback(&sCameraWork.sleepInfo);
+    func_02769568(&sCameraWork.exitInfo);
+    CAMERA_I2CActivateCore(CAMERA_SELECT_NONE);
+    CAMERA_ResetCore();
+    CAMERA_StopCaptureCore();
+    CAMERA_ClearBufferCore();
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CAMERA, NULL);
     func_0270223c(0);
     func_02702268(FALSE);
-    func_02702208(FALSE);
-    CPU_SetIRQFunc(OS_IE_CAMERA, NULL);
-    CPU_DisableInterrupts(OS_IE_CAMERA);
-    func_0207a768(&sWork.thread, NULL);
+    CAMERA_SetInterruptEnableCore(FALSE);
+    OS_SetIrqFunction(OS_IE_CAMERA, NULL);
+    OS_DisableIrqMask(OS_IE_CAMERA);
+    OS_KillThread(&sCameraWork.thread, NULL);
 }
 
 // Stops the capture, waits for the interface to finish, clears its buffer and deactivates the cameras
 CAMERAResult func_02700bd0(void) {
     int timeout = 0x1991b0;
 
-    func_0270212c();
-    while (timeout-- > 0 && func_027020f0()) {
-        func_0207c160(4);
+    CAMERA_StopCaptureCore();
+    while (timeout-- > 0 && CAMERA_IsBusyCore()) {
+        OS_SpinWaitSysCycles(4);
     }
-    func_027021e4();
-    return func_02700db8(CAMERA_SELECT_NONE);
+    CAMERA_ClearBufferCore();
+    return CAMERA_I2CActivateCore(CAMERA_SELECT_NONE);
 }
 
 // Starts the I2C of the cameras
@@ -585,31 +598,31 @@ static CAMERAResult func_02700c18(CAMERASelect camera, CAMERACallback callback, 
     if (camera != CAMERA_SELECT_IN && camera != CAMERA_SELECT_OUT && camera != CAMERA_SELECT_BOTH) {
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
     result = CAMERA_RESULT_SUCCESS;
-    sWork.callbackArg = arg;
-    sWork.stopClock = TRUE;
+    sCameraWork.callbackArg = arg;
+    sCameraWork.stopClock = TRUE;
     if (!func_027019b4(CAMERA_COMMAND_I2C_INIT, 1, camera)) {
         result = CAMERA_RESULT_SEND_ERROR;
     }
     return result;
 }
 
-CAMERAResult func_02700cb4(CAMERASelect camera) {
+CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera) {
     CAMERAResult result = func_02700c18(camera, func_02701fd8, NULL);
 
-    sWork.result = result;
+    sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
         func_02702028();
     }
-    return sWork.result;
+    return sCameraWork.result;
 }
 
 // Activates a camera, or none
@@ -623,36 +636,36 @@ static CAMERAResult func_02700cec(CAMERASelect camera, CAMERACallback callback, 
     if (camera != CAMERA_SELECT_NONE && camera != CAMERA_SELECT_IN && camera != CAMERA_SELECT_OUT) {
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     if (camera == CAMERA_SELECT_NONE) {
-        sWork.stopClock = TRUE;
+        sCameraWork.stopClock = TRUE;
     } else {
-        sWork.keepClock = TRUE;
+        sCameraWork.keepClock = TRUE;
     }
-    sWork.activeCamera = camera;
-    if (sWork.errorCount == 0) {
-        sWork.sentValue = 0;
+    sCameraWork.activeCamera = camera;
+    if (sCameraWork.errorCount == 0) {
+        sCameraWork.sentValue = 0;
     }
-    sWork.vsyncTick = clock();
+    sCameraWork.vsyncTick = OS_GetTick();
     return func_027019b4(CAMERA_COMMAND_I2C_ACTIVATE, 1, camera) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
 }
 
-CAMERAResult func_02700db8(CAMERASelect camera) {
+CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera) {
     CAMERAResult result = func_02700cec(camera, func_02701fd8, NULL);
 
-    sWork.result = result;
+    sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
         func_02702028();
     }
-    return sWork.result;
+    return sCameraWork.result;
 }
 
 // Chooses the context of a camera that it uses
@@ -670,19 +683,19 @@ static CAMERAResult func_02700df0(CAMERASelect camera, CAMERAContext context, CA
     if (context != CAMERA_CONTEXT_A && context != CAMERA_CONTEXT_B) {
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = context;
-    sWork.sentCamera = camera;
-    sWork.sentValue = context;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = context;
     if (!func_027019b4(CAMERA_COMMAND_I2C_CONTEXT_SWITCH, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -717,21 +730,21 @@ static CAMERAResult func_02700eb8(CAMERASelect camera, CAMERAContext context, CA
     default:
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = context;
     data[2] = size;
-    sWork.sentCamera = camera;
-    sWork.sentContext = context;
-    sWork.sentValue = size;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentContext = context;
+    sCameraWork.sentValue = size;
     if (!func_027019b4(CAMERA_COMMAND_I2C_SIZE, 3, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -739,14 +752,14 @@ static CAMERAResult func_02700eb8(CAMERASelect camera, CAMERAContext context, CA
     return CAMERA_RESULT_SUCCESS;
 }
 
-CAMERAResult func_02700fe4(CAMERASelect camera, CAMERAContext context, CAMERASize size) {
+CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CAMERASize size) {
     CAMERAResult result = func_02700eb8(camera, context, size, func_02701fd8, NULL);
 
-    sWork.result = result;
+    sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
         func_02702028();
     }
-    return sWork.result;
+    return sCameraWork.result;
 }
 
 static CAMERAResult func_02701020(CAMERASelect camera, int rate, CAMERACallback callback, void *arg) {
@@ -777,19 +790,19 @@ static CAMERAResult func_02701020(CAMERASelect camera, int rate, CAMERACallback 
     default:
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = rate;
-    sWork.sentCamera = camera;
-    sWork.sentValue = rate;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = rate;
     if (!func_027019b4(CAMERA_COMMAND_I2C_FRAME_RATE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -823,21 +836,21 @@ static CAMERAResult func_02701120(CAMERASelect camera, CAMERAContext context, CA
     default:
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = context;
     data[2] = effect;
-    sWork.sentCamera = camera;
-    sWork.sentContext = context;
-    sWork.sentValue = effect;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentContext = context;
+    sCameraWork.sentValue = effect;
     if (!func_027019b4(CAMERA_COMMAND_I2C_EFFECT, 3, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -845,14 +858,14 @@ static CAMERAResult func_02701120(CAMERASelect camera, CAMERAContext context, CA
     return CAMERA_RESULT_SUCCESS;
 }
 
-CAMERAResult func_02701248(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect) {
+CAMERAResult CAMERA_I2CEffectExCore(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect) {
     CAMERAResult result = func_02701120(camera, context, effect, func_02701fd8, NULL);
 
-    sWork.result = result;
+    sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
         func_02702028();
     }
-    return sWork.result;
+    return sCameraWork.result;
 }
 
 static CAMERAResult func_02701284(CAMERASelect camera, CAMERAContext context, CAMERAFlip flip, CAMERACallback callback,
@@ -879,21 +892,21 @@ static CAMERAResult func_02701284(CAMERASelect camera, CAMERAContext context, CA
     default:
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = context;
     data[2] = flip;
-    sWork.sentCamera = camera;
-    sWork.sentContext = context;
-    sWork.sentValue = flip;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentContext = context;
+    sCameraWork.sentValue = flip;
     if (!func_027019b4(CAMERA_COMMAND_I2C_FLIP, 3, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -922,19 +935,19 @@ static CAMERAResult func_027013a4(CAMERASelect camera, CAMERAPhotoMode mode, CAM
     default:
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = mode;
-    sWork.sentCamera = camera;
-    sWork.sentValue = mode;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = mode;
     if (!func_027019b4(CAMERA_COMMAND_I2C_PHOTO_MODE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -965,19 +978,19 @@ static CAMERAResult func_02701488(CAMERASelect camera, CAMERAWhiteBalance whiteB
     default:
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = whiteBalance;
-    sWork.sentCamera = camera;
-    sWork.sentValue = whiteBalance;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = whiteBalance;
     if (!func_027019b4(CAMERA_COMMAND_I2C_WHITE_BALANCE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -999,19 +1012,19 @@ static CAMERAResult func_02701570(CAMERASelect camera, int exposure, CAMERACallb
     if (exposure < -5 || exposure > 5) {
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = exposure;
-    sWork.sentCamera = camera;
-    sWork.sentValue = exposure;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = exposure;
     if (!func_027019b4(CAMERA_COMMAND_I2C_EXPOSURE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -1033,19 +1046,19 @@ static CAMERAResult func_02701644(CAMERASelect camera, int sharpness, CAMERACall
     if (sharpness < -3 || sharpness > 5) {
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = sharpness;
-    sWork.sentCamera = camera;
-    sWork.sentValue = sharpness;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = sharpness;
     if (!func_027019b4(CAMERA_COMMAND_I2C_SHARPNESS, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -1064,19 +1077,19 @@ static CAMERAResult func_02701718(CAMERASelect camera, BOOL on, CAMERACallback c
     if (camera != CAMERA_SELECT_IN && camera != CAMERA_SELECT_OUT && camera != CAMERA_SELECT_BOTH) {
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = on != FALSE;
-    sWork.sentCamera = camera;
-    sWork.sentValue = on;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = on;
     if (!func_027019b4(CAMERA_COMMAND_I2C_AUTO_EXPOSURE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -1084,14 +1097,14 @@ static CAMERAResult func_02701718(CAMERASelect camera, BOOL on, CAMERACallback c
     return CAMERA_RESULT_SUCCESS;
 }
 
-CAMERAResult func_027017dc(CAMERASelect camera, BOOL on) {
+CAMERAResult CAMERA_I2CAutoExposureCore(CAMERASelect camera, BOOL on) {
     CAMERAResult result = func_02701718(camera, on, func_02701fd8, NULL);
 
-    sWork.result = result;
+    sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
         func_02702028();
     }
-    return sWork.result;
+    return sCameraWork.result;
 }
 
 static CAMERAResult func_02701814(CAMERASelect camera, BOOL on, CAMERACallback callback, void *arg) {
@@ -1106,25 +1119,25 @@ static CAMERAResult func_02701814(CAMERASelect camera, BOOL on, CAMERACallback c
         return CAMERA_RESULT_ILLEGAL_PARAMETER;
     }
     // The white balance is automatic only while its setting is the first
-    if ((camera & CAMERA_SELECT_IN) && sWork.settings[0].whiteBalance != CAMERA_WHITE_BALANCE_AUTO) {
+    if ((camera & CAMERA_SELECT_IN) && sCameraWork.settings[0].whiteBalance != CAMERA_WHITE_BALANCE_AUTO) {
         return CAMERA_RESULT_INVALID_COMMAND;
     }
-    if ((camera & CAMERA_SELECT_OUT) && sWork.settings[1].whiteBalance != CAMERA_WHITE_BALANCE_AUTO) {
+    if ((camera & CAMERA_SELECT_OUT) && sCameraWork.settings[1].whiteBalance != CAMERA_WHITE_BALANCE_AUTO) {
         return CAMERA_RESULT_INVALID_COMMAND;
     }
-    enabled = CPU_IRQDisable();
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    enabled = OS_DisableInterrupts();
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return state == CAMERA_RESULT_ILLEGAL_STATUS ? CAMERA_RESULT_ILLEGAL_STATUS : CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
     data[0] = camera;
     data[1] = on != FALSE;
-    sWork.sentCamera = camera;
-    sWork.sentValue = on;
+    sCameraWork.sentCamera = camera;
+    sCameraWork.sentValue = on;
     if (!func_027019b4(CAMERA_COMMAND_I2C_AUTO_WHITE_BALANCE, 2, data[0])) {
         return CAMERA_RESULT_SEND_ERROR;
     }
@@ -1132,28 +1145,28 @@ static CAMERAResult func_02701814(CAMERASelect camera, BOOL on, CAMERACallback c
     return CAMERA_RESULT_SUCCESS;
 }
 
-CAMERAResult func_02701908(CAMERASelect camera, BOOL on) {
+CAMERAResult CAMERA_I2CAutoWhiteBalanceCore(CAMERASelect camera, BOOL on) {
     CAMERAResult result = func_02701814(camera, on, func_02701fd8, NULL);
 
-    sWork.result = result;
+    sCameraWork.result = result;
     if (result == CAMERA_RESULT_SUCCESS) {
         func_02702028();
     }
-    return sWork.result;
+    return sCameraWork.result;
 }
 
 static CAMERAResult func_02701940(int value, CAMERACallback callback, void *arg) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
-    if (sWork.busy) {
-        CPU_SetIRQMask(enabled);
+    if (sCameraWork.busy) {
+        OS_RestoreInterrupts(enabled);
         return CAMERA_RESULT_BUSY;
     }
-    sWork.busy = TRUE;
-    CPU_SetIRQMask(enabled);
-    sWork.callback = callback;
-    sWork.callbackArg = arg;
-    sWork.sentValue = value;
+    sCameraWork.busy = TRUE;
+    OS_RestoreInterrupts(enabled);
+    sCameraWork.callback = callback;
+    sCameraWork.callbackArg = arg;
+    sCameraWork.sentValue = value;
     return func_027019b4(CAMERA_COMMAND_UNK_40, 1, value) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
 }
 
@@ -1164,20 +1177,20 @@ static BOOL func_027019b4(u32 command, u32 length, u8 data) {
     u16 clk;
     int wasOn;
 
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     clk = reg_SCFG_CLK;
     reg_SCFG_CLK = clk | SCFG_CLK_CAMERA;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     wasOn = clk & SCFG_CLK_CAMERA;
     if (!wasOn) {
-        func_0207c160(0x14);
+        OS_SpinWaitSysCycles(0x14);
     }
-    sWork.clockWasOn = wasOn >> 8;
+    sCameraWork.clockWasOn = wasOn >> 8;
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_CAMERA, word, FALSE) < 0) {
-        if (!sWork.clockWasOn) {
-            enabled = CPU_IRQDisable();
+        if (!sCameraWork.clockWasOn) {
+            enabled = OS_DisableInterrupts();
             reg_SCFG_CLK = reg_SCFG_CLK & ~SCFG_CLK_CAMERA;
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
         }
         return FALSE;
     }
@@ -1196,9 +1209,9 @@ static void func_02701a60(const u8 *data) {
 // outer camera also sets context B of the inner camera and the other way round. The cached settings of the camera
 // that was not addressed are then wrong, and the thread sends them when it starts the cameras again.
 #ifdef BUGFIX
-#define SENT_CONTEXT_B(camera) ((sWork.sentCamera & (camera)) && (sWork.sentContext & CAMERA_CONTEXT_B))
+#define SENT_CONTEXT_B(camera) ((sCameraWork.sentCamera & (camera)) && (sCameraWork.sentContext & CAMERA_CONTEXT_B))
 #else
-#define SENT_CONTEXT_B(camera) (sWork.sentContext & CAMERA_CONTEXT_B)
+#define SENT_CONTEXT_B(camera) (sCameraWork.sentContext & CAMERA_CONTEXT_B)
 #endif
 
 // The camera interface's PXI callback: puts together an answer from its words and, with the whole answer, updates
@@ -1211,219 +1224,219 @@ static void func_02701aa0(u32 tag, u32 data, BOOL err) {
         return;
     }
     if (data & CAMERA_PXI_START) {
-        sWork.length = (data & 0xff0000) >> 16;
-        sWork.received = 0;
-        sWork.command = (data & 0x7f00) >> 8;
-        sWork.response = data & 0xff;
+        sCameraWork.length = (data & 0xff0000) >> 16;
+        sCameraWork.received = 0;
+        sCameraWork.command = (data & 0x7f00) >> 8;
+        sCameraWork.response = data & 0xff;
     } else {
-        if (sWork.buffer == NULL) {
+        if (sCameraWork.buffer == NULL) {
             func_02701fe8(CAMERA_RESULT_FATAL_ERROR);
             return;
         }
-        if (sWork.received < sWork.bufferSize) {
-            sWork.buffer[sWork.received++] = (data & 0xff0000) >> 16;
+        if (sCameraWork.received < sCameraWork.bufferSize) {
+            sCameraWork.buffer[sCameraWork.received++] = (data & 0xff0000) >> 16;
         }
-        if (sWork.received < sWork.bufferSize) {
-            sWork.buffer[sWork.received++] = (data & 0xff00) >> 8;
+        if (sCameraWork.received < sCameraWork.bufferSize) {
+            sCameraWork.buffer[sCameraWork.received++] = (data & 0xff00) >> 8;
         }
-        if (sWork.received < sWork.bufferSize) {
-            sWork.buffer[sWork.received++] = data;
+        if (sCameraWork.received < sCameraWork.bufferSize) {
+            sCameraWork.buffer[sCameraWork.received++] = data;
         }
     }
-    if (sWork.received < sWork.length - 1) {
+    if (sCameraWork.received < sCameraWork.length - 1) {
         return;
     }
-    if (sWork.stopClock || (!sWork.keepClock && !sWork.clockWasOn)) {
-        u32 enabled = CPU_IRQDisable();
+    if (sCameraWork.stopClock || (!sCameraWork.keepClock && !sCameraWork.clockWasOn)) {
+        u32 enabled = OS_DisableInterrupts();
 
         reg_SCFG_CLK = reg_SCFG_CLK & ~SCFG_CLK_CAMERA;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
-    sWork.keepClock = FALSE;
-    sWork.stopClock = FALSE;
+    sCameraWork.keepClock = FALSE;
+    sCameraWork.stopClock = FALSE;
     result = CAMERA_RESULT_SUCCESS;
-    switch (sWork.response) {
+    switch (sCameraWork.response) {
     case CAMERA_PXI_RESULT_SUCCESS:
-        switch (sWork.command) {
+        switch (sCameraWork.command) {
         case CAMERA_COMMAND_I2C_ACTIVATE:
-            sWork.settings[1].unk_38 = sWork.sentValue;
+            sCameraWork.settings[1].unk_38 = sCameraWork.sentValue;
             break;
         case CAMERA_COMMAND_I2C_CONTEXT_SWITCH:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].context = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].context = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].context = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].context = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_SIZE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                if (sWork.sentContext & CAMERA_CONTEXT_A) {
-                    sWork.settings[0].size[0] = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                if (sCameraWork.sentContext & CAMERA_CONTEXT_A) {
+                    sCameraWork.settings[0].size[0] = sCameraWork.sentValue;
                 }
             }
             if (SENT_CONTEXT_B(CAMERA_SELECT_IN)) {
-                sWork.settings[0].size[1] = sWork.sentValue;
+                sCameraWork.settings[0].size[1] = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                if (sWork.sentContext & CAMERA_CONTEXT_A) {
-                    sWork.settings[1].size[0] = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                if (sCameraWork.sentContext & CAMERA_CONTEXT_A) {
+                    sCameraWork.settings[1].size[0] = sCameraWork.sentValue;
                 }
             }
             if (SENT_CONTEXT_B(CAMERA_SELECT_OUT)) {
-                sWork.settings[1].size[1] = sWork.sentValue;
+                sCameraWork.settings[1].size[1] = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_FRAME_RATE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].frameRate = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].frameRate = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].frameRate = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].frameRate = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_EFFECT:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                if (sWork.sentContext & CAMERA_CONTEXT_A) {
-                    sWork.settings[0].effect[0] = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                if (sCameraWork.sentContext & CAMERA_CONTEXT_A) {
+                    sCameraWork.settings[0].effect[0] = sCameraWork.sentValue;
                 }
             }
             if (SENT_CONTEXT_B(CAMERA_SELECT_IN)) {
-                sWork.settings[0].effect[1] = sWork.sentValue;
+                sCameraWork.settings[0].effect[1] = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                if (sWork.sentContext & CAMERA_CONTEXT_A) {
-                    sWork.settings[1].effect[0] = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                if (sCameraWork.sentContext & CAMERA_CONTEXT_A) {
+                    sCameraWork.settings[1].effect[0] = sCameraWork.sentValue;
                 }
             }
             if (SENT_CONTEXT_B(CAMERA_SELECT_OUT)) {
-                sWork.settings[1].effect[1] = sWork.sentValue;
+                sCameraWork.settings[1].effect[1] = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_FLIP:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                if (sWork.sentContext & CAMERA_CONTEXT_A) {
-                    sWork.settings[0].flip[0] = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                if (sCameraWork.sentContext & CAMERA_CONTEXT_A) {
+                    sCameraWork.settings[0].flip[0] = sCameraWork.sentValue;
                 }
             }
             if (SENT_CONTEXT_B(CAMERA_SELECT_IN)) {
-                sWork.settings[0].flip[1] = sWork.sentValue;
+                sCameraWork.settings[0].flip[1] = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                if (sWork.sentContext & CAMERA_CONTEXT_A) {
-                    sWork.settings[1].flip[0] = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                if (sCameraWork.sentContext & CAMERA_CONTEXT_A) {
+                    sCameraWork.settings[1].flip[0] = sCameraWork.sentValue;
                 }
             }
             if (SENT_CONTEXT_B(CAMERA_SELECT_OUT)) {
-                sWork.settings[1].flip[1] = sWork.sentValue;
+                sCameraWork.settings[1].flip[1] = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_PHOTO_MODE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].photoMode = sWork.sentValue;
-                switch (sWork.settings[0].photoMode) {
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].photoMode = sCameraWork.sentValue;
+                switch (sCameraWork.settings[0].photoMode) {
                 case CAMERA_PHOTO_MODE_NORMAL:
-                    sWork.settings[0].sharpness = 0;
-                    sWork.settings[0].exposure = 0;
-                    sWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[0].sharpness = 0;
+                    sCameraWork.settings[0].exposure = 0;
+                    sCameraWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 case CAMERA_PHOTO_MODE_PORTRAIT:
-                    sWork.settings[0].sharpness = -2;
-                    sWork.settings[0].exposure = 0;
-                    sWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[0].sharpness = -2;
+                    sCameraWork.settings[0].exposure = 0;
+                    sCameraWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 case CAMERA_PHOTO_MODE_LANDSCAPE:
-                    sWork.settings[0].sharpness = 1;
-                    sWork.settings[0].exposure = 0;
-                    sWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_5200K;
+                    sCameraWork.settings[0].sharpness = 1;
+                    sCameraWork.settings[0].exposure = 0;
+                    sCameraWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_5200K;
                     break;
                 case CAMERA_PHOTO_MODE_NIGHTVIEW:
-                    sWork.settings[0].sharpness = -1;
-                    sWork.settings[0].exposure = 2;
-                    sWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[0].sharpness = -1;
+                    sCameraWork.settings[0].exposure = 2;
+                    sCameraWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 case CAMERA_PHOTO_MODE_LETTER:
-                    sWork.settings[0].sharpness = 2;
-                    sWork.settings[0].exposure = 2;
-                    sWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[0].sharpness = 2;
+                    sCameraWork.settings[0].exposure = 2;
+                    sCameraWork.settings[0].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 }
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].photoMode = sWork.sentValue;
-                switch (sWork.settings[1].photoMode) {
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].photoMode = sCameraWork.sentValue;
+                switch (sCameraWork.settings[1].photoMode) {
                 case CAMERA_PHOTO_MODE_NORMAL:
-                    sWork.settings[1].sharpness = 0;
-                    sWork.settings[1].exposure = 0;
-                    sWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[1].sharpness = 0;
+                    sCameraWork.settings[1].exposure = 0;
+                    sCameraWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 case CAMERA_PHOTO_MODE_PORTRAIT:
-                    sWork.settings[1].sharpness = -2;
-                    sWork.settings[1].exposure = 0;
-                    sWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[1].sharpness = -2;
+                    sCameraWork.settings[1].exposure = 0;
+                    sCameraWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 case CAMERA_PHOTO_MODE_LANDSCAPE:
-                    sWork.settings[1].sharpness = 1;
-                    sWork.settings[1].exposure = 0;
-                    sWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_5200K;
+                    sCameraWork.settings[1].sharpness = 1;
+                    sCameraWork.settings[1].exposure = 0;
+                    sCameraWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_5200K;
                     break;
                 case CAMERA_PHOTO_MODE_NIGHTVIEW:
-                    sWork.settings[1].sharpness = -1;
-                    sWork.settings[1].exposure = 2;
-                    sWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[1].sharpness = -1;
+                    sCameraWork.settings[1].exposure = 2;
+                    sCameraWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 case CAMERA_PHOTO_MODE_LETTER:
-                    sWork.settings[1].sharpness = 2;
-                    sWork.settings[1].exposure = 2;
-                    sWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
+                    sCameraWork.settings[1].sharpness = 2;
+                    sCameraWork.settings[1].exposure = 2;
+                    sCameraWork.settings[1].whiteBalance = CAMERA_WHITE_BALANCE_AUTO;
                     break;
                 }
             }
             break;
         case CAMERA_COMMAND_I2C_WHITE_BALANCE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].whiteBalance = sWork.sentValue;
-                sWork.settings[0].autoWhiteBalance = TRUE;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].whiteBalance = sCameraWork.sentValue;
+                sCameraWork.settings[0].autoWhiteBalance = TRUE;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].whiteBalance = sWork.sentValue;
-                sWork.settings[1].autoWhiteBalance = TRUE;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].whiteBalance = sCameraWork.sentValue;
+                sCameraWork.settings[1].autoWhiteBalance = TRUE;
             }
             break;
         case CAMERA_COMMAND_I2C_EXPOSURE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].exposure = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].exposure = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].exposure = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].exposure = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_SHARPNESS:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].sharpness = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].sharpness = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].sharpness = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].sharpness = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_AUTO_EXPOSURE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].autoExposure = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].autoExposure = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].autoExposure = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].autoExposure = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_I2C_AUTO_WHITE_BALANCE:
-            if (sWork.sentCamera & CAMERA_SELECT_IN) {
-                sWork.settings[0].autoWhiteBalance = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_IN) {
+                sCameraWork.settings[0].autoWhiteBalance = sCameraWork.sentValue;
             }
-            if (sWork.sentCamera & CAMERA_SELECT_OUT) {
-                sWork.settings[1].autoWhiteBalance = sWork.sentValue;
+            if (sCameraWork.sentCamera & CAMERA_SELECT_OUT) {
+                sCameraWork.settings[1].autoWhiteBalance = sCameraWork.sentValue;
             }
             break;
         case CAMERA_COMMAND_UNK_40:
-            sWork.settings[1].unk_38 = sWork.sentValue;
+            sCameraWork.settings[1].unk_38 = sCameraWork.sentValue;
             break;
         }
         break;
@@ -1448,36 +1461,36 @@ static void func_02701aa0(u32 tag, u32 data, BOOL err) {
 
 // The synchronous functions' callback
 static void func_02701fd8(CAMERAResult result, void *arg) {
-    sWork.result = result;
+    sCameraWork.result = result;
 }
 
 // Ends the command that is on its way: calls its callback with the result
 static void func_02701fe8(CAMERAResult result) {
     CAMERACallback callback;
 
-    if (sWork.busy) {
-        sWork.busy = FALSE;
+    if (sCameraWork.busy) {
+        sCameraWork.busy = FALSE;
     }
-    callback = sWork.callback;
+    callback = sCameraWork.callback;
     if (callback == NULL) {
         return;
     }
-    sWork.callback = NULL;
-    callback(result, sWork.callbackArg);
+    sCameraWork.callback = NULL;
+    callback(result, sCameraWork.callbackArg);
 }
 
 // Waits for the command to end, by reading the PXI FIFO itself when the interrupts are off
 static void func_02702028(void) {
-    CAMERAWork *work = &sWork;
+    CAMERAWork *work = &sCameraWork;
 
     while (work->busy) {
-        if (CPU_GetIRQMask() == 0x80 || reg_OS_IME == 0) {
-            func_0207cad4();
+        if (OS_GetCpsrIrq() == 0x80 || reg_OS_IME == 0) {
+            PXIi_HandlerRecvFifoNotEmpty();
         }
     }
 }
 
 // The PM callback, for the system sleeping and exiting: deactivates the cameras
 static void func_02702070(void *arg) {
-    func_02700db8(CAMERA_SELECT_NONE);
+    CAMERA_I2CActivateCore(CAMERA_SELECT_NONE);
 }

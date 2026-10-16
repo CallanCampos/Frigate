@@ -271,7 +271,7 @@ static BOOL MysteryProc_Init(GameProc *proc, u32 *state, void *param, void *work
     GFL_OvlLoad(OVERLAY_ID(189));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MYSTERY, 0xa0000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(MysteryWork), HEAPID_MYSTERY);
-    sys_memset(wk, 0, sizeof(MysteryWork));
+    MI_CpuFill8(wk, 0, sizeof(MysteryWork));
     wk->param = param;
     wk->gameData = GameData_Create(HEAPID_MYSTERY);
     wk->giftSave = mysteryGiftBlock(GameData_GetSaveControl(wk->gameData), 1, HEAPID_MYSTERY);
@@ -352,7 +352,7 @@ static BOOL MysteryProc_Main(GameProc *proc, u32 *state, void *param, void *work
 }
 
 static void MysteryBg_Init(MysteryBg *bg, HeapID heapId) {
-    sys_memset(bg, 0, sizeof(MysteryBg));
+    MI_CpuFill8(bg, 0, sizeof(MysteryBg));
     bg->heapId = heapId;
     MysteryBg_Load(bg, 0);
     GFL_BGSysSetBGEnabled(6, TRUE);
@@ -415,12 +415,12 @@ static void MysteryActors_Init(MysteryActors *actors, ClActUnit *unit, HeapID he
     actors->chars = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_BOTH, heapId);
     buffer = GFL_G2DIOReadNCLRArc(arc, 8, &palette, heapId);
     colors = palette->rawData;
-    sys_memcpy(colors, actors->fromColors, sizeof(actors->fromColors));
+    MI_CpuCopy8(colors, actors->fromColors, sizeof(actors->fromColors));
     colors += 16;
-    sys_memcpy(colors, actors->toColors, sizeof(actors->toColors));
+    MI_CpuCopy8(colors, actors->toColors, sizeof(actors->toColors));
     GFL_HeapFree(buffer);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     actors->actors[ACTOR_CURSOR] =
         func_0204c040(unit, actors->chars, actors->palette, actors->cellAnims, &setup, 0, heapId);
     func_0204c124(actors->actors[ACTOR_CURSOR], FALSE);
@@ -486,7 +486,7 @@ static void MysteryActors_ResetPalAnim(MysteryActors *actors) {
 }
 
 static void MysteryParticle_Init(MysteryParticle *particle, HeapID heapId) {
-    sys_memset(particle, 0, sizeof(MysteryParticle));
+    MI_CpuFill8(particle, 0, sizeof(MysteryParticle));
     particle->active = TRUE;
     particle->work = GFL_HeapAllocate(heapId, 0x4800, FALSE, "mystery.c", 1154);
     particle->sys = func_0204f968(particle->work, 0x4800, TRUE, heapId);
@@ -494,7 +494,7 @@ static void MysteryParticle_Init(MysteryParticle *particle, HeapID heapId) {
 
 static void MysteryParticle_Exit(MysteryParticle *particle) {
     GFL_HeapFree(particle->work);
-    sys_memset(particle, 0, sizeof(MysteryParticle));
+    MI_CpuFill8(particle, 0, sizeof(MysteryParticle));
 }
 
 static void MysteryParticle_Load(MysteryParticle *particle, u32 arcId, u32 fileId, HeapID heapId) {
@@ -1064,7 +1064,7 @@ static void MysterySeq_Received(MysterySeq *seq, u32 *state, void *work) {
         MysteryCardResSetup setup;
 
         GFL_BGSysSetBGEnabled(1, FALSE);
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.bg = 2;
         setup.textBg = 0;
         setup.bgPalette = 8;
@@ -1140,7 +1140,7 @@ static void MysterySeq_Album(MysterySeq *seq, u32 *state, void *work) {
         Mystery_DeleteList(wk);
         MysteryMsgWin_Delete(wk->msgWin);
         wk->msgWin = NULL;
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.mode = 0;
         setup.unit = MysteryGraphic_GetClactUnit(wk->graphic);
         setup.giftSave = wk->giftSave;
@@ -1177,7 +1177,7 @@ static void MysterySeq_Album(MysterySeq *seq, u32 *state, void *work) {
         wk->msgWin = MysteryMsgWin_Create(1, 15, wk->queue, wk->font, HEAPID_MYSTERY);
         MysteryMsgWin_DrawFrame(wk->msgWin, 10, 14);
         Mystery_CreateList(wk, LIST_TOP, HEAPID_MYSTERY);
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
         *state = 6;
         break;
     case 6:
@@ -1214,7 +1214,7 @@ static void MysterySeq_AlbumFull(MysterySeq *seq, u32 *state, void *work) {
         Mystery_DeleteList(wk);
         MysteryMsgWin_Delete(wk->msgWin);
         wk->msgWin = NULL;
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.mode = 1;
         setup.unit = MysteryGraphic_GetClactUnit(wk->graphic);
         setup.giftSave = wk->giftSave;
@@ -1250,7 +1250,7 @@ static void MysterySeq_AlbumFull(MysterySeq *seq, u32 *state, void *work) {
         MysteryActors_LoadPalette(&wk->actors, HEAPID_MYSTERY);
         wk->msgWin = MysteryMsgWin_Create(1, 15, wk->queue, wk->font, HEAPID_MYSTERY);
         MysteryMsgWin_DrawFrame(wk->msgWin, 10, 14);
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
         *state = 6;
         break;
     case 6:
@@ -1307,7 +1307,7 @@ static void MysterySeq_WifiLogin(MysterySeq *seq, u32 *state, void *work) {
         break;
     case 3:
         wk->loginParam = GFL_HeapAllocate(HEAPID_MYSTERY, sizeof(WifiLoginParam), FALSE, "mystery.c", 2666);
-        sys_memset(wk->loginParam, 0, sizeof(WifiLoginParam));
+        MI_CpuFill8(wk->loginParam, 0, sizeof(WifiLoginParam));
         wk->loginParam->gameData = wk->gameData;
         wk->loginParam->unk4 = 0;
         wk->loginParam->unk8 = 1;
@@ -1328,7 +1328,7 @@ static void MysterySeq_WifiLogin(MysterySeq *seq, u32 *state, void *work) {
         MysteryActors_Init(&wk->actors, MysteryGraphic_GetClactUnit(wk->graphic), HEAPID_MYSTERY);
         wk->msgWin = MysteryMsgWin_Create(1, 15, wk->queue, wk->font, HEAPID_MYSTERY);
         MysteryMsgWin_DrawFrame(wk->msgWin, 10, 14);
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
         func_02042ba8(TRUE, HEAPID_MYSTERY);
         GFL_SndBGMPlay(SEQ_BGM_WIFI_PRESENT, 0xffff);
         MysteryBgScroll_SetEnabled(&wk->scroll, TRUE);
@@ -1390,7 +1390,7 @@ static void Mystery_CreateYesNo(MysteryWork *wk, u32 unused, HeapID heapId) {
     MysteryYesNoSetup setup;
 
     if (wk->yesNo == NULL) {
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.msgData = wk->msgData;
         setup.font = wk->font;
         setup.queue = wk->queue;
@@ -1418,7 +1418,7 @@ static void Mystery_CreateList(MysteryWork *wk, u32 type, HeapID heapId) {
     int i;
 
     if (wk->list == NULL) {
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.font = wk->font;
         setup.queue = wk->queue;
         setup.cursor = MysteryActors_GetActor(&wk->actors, ACTOR_CURSOR);
@@ -1487,7 +1487,7 @@ static void Mystery_CreateList(MysteryWork *wk, u32 type, HeapID heapId) {
                 }
             }
         }
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 0x18, 15, 3);
         MysteryActors_ResetPalAnim(&wk->actors);
     }
 }
@@ -1532,7 +1532,7 @@ static void Mystery_CreateCardWin(MysteryWork *wk, HeapID heapId) {
         MysteryBg_Load(&wk->bg, 1);
         GFL_BGSysLoadScr(6);
         GFL_BGSysSetBGEnabled(6, TRUE);
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 4, 0x18, 15, 3);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 4, 0x18, 15, 3);
     }
 }
 
@@ -1560,7 +1560,7 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     s16 height;
     ClActorSetup setup;
 
-    sys_memset(effect, 0, sizeof(MysteryEffect));
+    MI_CpuFill8(effect, 0, sizeof(MysteryEffect));
     effect->scroll = scroll;
     effect->bg = bg;
     effect->heapId = heapId;
@@ -1574,8 +1574,8 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
     }
     buffer = GFL_G2DIOReadNCLR(ARCID_MYSTERY, 2, &palette, heapId);
     colors = palette->rawData;
-    sys_memcpy(colors, effect->baseColors, sizeof(effect->baseColors));
-    sys_memcpy(colors + palNo * 16, effect->kindColors, sizeof(effect->kindColors));
+    MI_CpuCopy8(colors, effect->baseColors, sizeof(effect->baseColors));
+    MI_CpuCopy8(colors + palNo * 16, effect->kindColors, sizeof(effect->kindColors));
     GFL_HeapFree(buffer);
     for (i = 0; i < STAR_COUNT; i++) {
         func_0204c378(MysteryActors_GetActor(actors, ACTOR_STARS + i), (u8)palNo, 0);
@@ -1614,11 +1614,11 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
         break;
     }
     if (recv->special) {
-        sys_memcpy((void *)(HW_OBJ_PLTT + 14 * 0x20), effect->objColors, sizeof(effect->objColors));
-        sys_memset16(0x7fff, (void *)(HW_OBJ_PLTT + 14 * 0x20), 0x20);
-        sys_memcpy((void *)(HW_OBJ_PLTT + 14 * 0x20), effect->whiteColors, sizeof(effect->whiteColors));
+        MI_CpuCopy8((void *)(HW_OBJ_PLTT + 14 * 0x20), effect->objColors, sizeof(effect->objColors));
+        MIi_CpuClear16(0x7fff, (void *)(HW_OBJ_PLTT + 14 * 0x20), 0x20);
+        MI_CpuCopy8((void *)(HW_OBJ_PLTT + 14 * 0x20), effect->whiteColors, sizeof(effect->whiteColors));
     }
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = effect->offsetX + 128;
     setup.y = -96;
     setup.bgPriority = 2;
@@ -1661,7 +1661,7 @@ static void MysteryEffect_Exit(MysteryEffect *effect) {
     func_0204bcd0(effect->palette);
     func_0204b98c(effect->chars);
     func_0204be64(effect->cellAnims);
-    sys_memset(effect, 0, sizeof(MysteryEffect));
+    MI_CpuFill8(effect, 0, sizeof(MysteryEffect));
 }
 
 static void MysteryEffect_Main(MysteryEffect *effect) {
@@ -1692,7 +1692,7 @@ static void MysteryEffect_Fall(MysteryEffect *effect) {
         effect->state = 1;
         break;
     case 1:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 8, 0, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 8, 0, 16);
         GFL_BGSysSetBGEnabled(2, TRUE);
         effect->frame = 0;
         effect->state = 2;
@@ -1754,7 +1754,7 @@ static void MysteryEffect_FallSpecial(MysteryEffect *effect) {
         effect->state = 1;
         break;
     case 1:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 8, 0, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 8, 0, 16);
         GFL_BGSysSetBGEnabled(2, TRUE);
         effect->frame = 0;
         effect->state = 2;
@@ -1775,7 +1775,7 @@ static void MysteryEffect_FallSpecial(MysteryEffect *effect) {
         if (effect->frame++ > 180) {
             effect->frame = 0;
             effect->state = 6;
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 1, 31, 0, 16);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 1, 31, 0, 16);
             MysteryParticle_Emit(&effect->particle, 0);
             MysteryParticle_Emit(&effect->particle, 1);
             MysteryParticle_Emit(&effect->particle, 2);
@@ -1867,7 +1867,7 @@ static void MysteryBgScroll_Init(MysteryBgScroll *scroll, MysteryActors *actors,
     int i;
     ClActorPos pos;
 
-    sys_memset(scroll, 0, sizeof(MysteryBgScroll));
+    MI_CpuFill8(scroll, 0, sizeof(MysteryBgScroll));
     scroll->speed = -FX32_CONST(0.2);
     scroll->actors = actors;
     scroll->startSpeed = -FX32_CONST(0.2);
@@ -1880,7 +1880,7 @@ static void MysteryBgScroll_Init(MysteryBgScroll *scroll, MysteryActors *actors,
 }
 
 static void MysteryBgScroll_Exit(MysteryBgScroll *scroll) {
-    sys_memset(scroll, 0, sizeof(MysteryBgScroll));
+    MI_CpuFill8(scroll, 0, sizeof(MysteryBgScroll));
 }
 
 static void MysteryBgScroll_Main(MysteryBgScroll *scroll) {
@@ -1972,10 +1972,10 @@ static void MysteryOamMsg_Init(MysteryOamMsg *msg, const MysteryActors *actors, 
                                MsgData *msgData, u32 msgId, Font *font, HeapID heapId) {
     ClActorSetup setup;
 
-    sys_memset(msg, 0, sizeof(MysteryOamMsg));
+    MI_CpuFill8(msg, 0, sizeof(MysteryOamMsg));
     msg->actors = actors;
     msg->bmpOam = BmpOam_Init(heapId, unit);
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 96;
     setup.y = 169;
     setup.priority = 0;
@@ -1992,7 +1992,7 @@ static void MysteryOamMsg_Exit(MysteryOamMsg *msg) {
     func_0204c124(MysteryActors_GetActor(msg->actors, ACTOR_HINT), FALSE);
     MysteryOamText_Delete(msg->text);
     BmpOam_Exit(msg->bmpOam);
-    sys_memset(msg, 0, sizeof(MysteryOamMsg));
+    MI_CpuFill8(msg, 0, sizeof(MysteryOamMsg));
 }
 
 static BOOL MysteryOamMsg_Update(MysteryOamMsg *msg) {

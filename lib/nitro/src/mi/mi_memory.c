@@ -1,13 +1,12 @@
 // NitroSDK's mi_memory.c: the CPU copies, fills and compare of the MI library. The SDK wrote them all in assembly
-// (MI_Zero36B, the last, in Thumb), so each is an MWCC asm function. The names are swan's; the SDK's are in the
-// comments.
+// (MI_Zero36B, the last, in Thumb), so each is an MWCC asm function. The names are the SDK's, and mi.h gives swan's.
 #include "nitro/mi.h"
 
 // clang-format off
 #pragma thumb off
 
-// MIi_CpuClear16: fills size bytes with a halfword at a time
-asm void sys_memset16(u16 value, void *dest, u32 size) {
+// Fills size bytes with a halfword at a time
+asm void MIi_CpuClear16(u16 value, void *dest, u32 size) {
     mov r3, #0
 @loop:
     cmp r3, r2
@@ -17,8 +16,8 @@ asm void sys_memset16(u16 value, void *dest, u32 size) {
     bx lr
 }
 
-// MIi_CpuCopy16: copies size bytes a halfword at a time
-asm void sys_memcpy16(const void *src, void *dest, u32 size) {
+// Copies size bytes a halfword at a time
+asm void MIi_CpuCopy16(const void *src, void *dest, u32 size) {
     mov r12, #0
 @loop:
     cmp r12, r2
@@ -29,8 +28,8 @@ asm void sys_memcpy16(const void *src, void *dest, u32 size) {
     bx lr
 }
 
-// MIi_CpuClear32: fills size bytes with a word at a time
-asm void sys_memset32(u32 value, void *dest, u32 size) {
+// Fills size bytes with a word at a time
+asm void MIi_CpuClear32(u32 value, void *dest, u32 size) {
     add r12, r1, r2
 @loop:
     cmp r1, r12
@@ -39,8 +38,8 @@ asm void sys_memset32(u32 value, void *dest, u32 size) {
     bx lr
 }
 
-// MIi_CpuCopy32: copies size bytes a word at a time
-asm void *sys_memcpy32(const void *src, void *dest, u32 size) {
+// Copies size bytes a word at a time
+asm void *MIi_CpuCopy32(const void *src, void *dest, u32 size) {
     add r12, r1, r2
 @loop:
     cmp r1, r12
@@ -50,8 +49,8 @@ asm void *sys_memcpy32(const void *src, void *dest, u32 size) {
     bx lr
 }
 
-// MIi_CpuSend32: sends size bytes, a word at a time, to one address, such as a FIFO port
-asm void sys_memcpy_volatile(const void *src, volatile void *dest, u32 size) {
+// Sends size bytes, a word at a time, to one address, such as a FIFO port
+asm void MIi_CpuSend32(const void *src, volatile void *dest, u32 size) {
     add r12, r0, r2
 @loop:
     cmp r0, r12
@@ -61,8 +60,8 @@ asm void sys_memcpy_volatile(const void *src, volatile void *dest, u32 size) {
     bx lr
 }
 
-// MIi_CpuClearFast: fills size bytes, a multiple of 4, with a word, 32 bytes at a time while it can
-asm void sys_memset32_fast(u32 value, void *dest, u32 size) {
+// Fills size bytes, a multiple of 4, with a word, 32 bytes at a time while it can
+asm void MIi_CpuClearFast(u32 value, void *dest, u32 size) {
     stmdb sp!, {r4, r5, r6, r7, r8, r9}
     add r9, r1, r2
     mov r12, r2, lsr #5
@@ -86,8 +85,8 @@ asm void sys_memset32_fast(u32 value, void *dest, u32 size) {
     bx lr
 }
 
-// MIi_CpuCopyFast: copies size bytes, a multiple of 4, 32 bytes at a time while it can
-asm void sys_memcpy32_fast(const void *src, void *dest, u32 size) {
+// Copies size bytes, a multiple of 4, 32 bytes at a time while it can
+asm void MIi_CpuCopyFast(const void *src, void *dest, u32 size) {
     stmdb sp!, {r4, r5, r6, r7, r8, r9, r10}
     add r10, r1, r2
     mov r12, r2, lsr #5
@@ -107,7 +106,7 @@ asm void sys_memcpy32_fast(const void *src, void *dest, u32 size) {
 }
 
 // MI_Copy32B (swan's gfxUploadFogTable): copies 32 bytes, as big as the fog table
-asm void gfxUploadFogTable(const void *src, void *dest) {
+asm void MI_Copy32B(const void *src, void *dest) {
     ldmia r0!, {r2, r3, r12}
     stmia r1!, {r2, r3, r12}
     ldmia r0!, {r2, r3, r12}
@@ -158,7 +157,7 @@ asm void MI_Copy64B(const void *src, void *dest) {
 
 // MI_CpuFill8: fills size bytes with a byte, writing halfwords and words only: the ARM9 can't write a byte to
 // VRAM, so an odd start or end is a halfword that keeps the byte next to it
-asm void sys_memset(void *dest, u32 value, u32 size) {
+asm void MI_CpuFill8(void *dest, u32 value, u32 size) {
     cmp r2, #0
     bxeq lr
     tst r0, #1
@@ -205,7 +204,7 @@ asm void sys_memset(void *dest, u32 value, u32 size) {
 
 // MI_CpuFill: fills size bytes with a byte. Up to 8 bytes are an unrolled run that a computed jump enters; more are
 // bytes up to a word boundary, then words, in blocks of 32 bytes where it can
-asm void sys_memset_fast(void *dest, u32 value, u32 size) {
+asm void MI_CpuFill(void *dest, u32 value, u32 size) {
     cmp r2, #0
     bxeq lr
     cmp r2, #8
@@ -270,9 +269,9 @@ asm void sys_memset_fast(void *dest, u32 value, u32 size) {
     bx lr
 }
 
-// MI_CpuCopy8: copies size bytes, writing halfwords and words only (see sys_memset), whatever the alignment of the two
+// MI_CpuCopy8: copies size bytes, writing halfwords and words only (see MI_CpuFill8), whatever the alignment of the two
 // sides
-asm void sys_memcpy(const void *src, void *dest, u32 size) {
+asm void MI_CpuCopy8(const void *src, void *dest, u32 size) {
     cmp r2, #0
     bxeq lr
     tst r1, #1
@@ -361,8 +360,8 @@ asm void sys_memcpy(const void *src, void *dest, u32 size) {
     bx lr
 }
 
-// MI_CpuComp8: compares size bytes, returning the difference of the first that differ, or 0
-asm int sys_memcmp(const void *a, const void *b, u32 size) {
+// Compares size bytes, returning the difference of the first that differ, or 0
+asm int MI_CpuComp8(const void *a, const void *b, u32 size) {
     add r12, r0, r2
     cmp r0, r12
     bhs @equal
@@ -382,7 +381,7 @@ asm int sys_memcmp(const void *a, const void *b, u32 size) {
 // MI_CpuCopy: copies size bytes forwards by words, whatever the alignment of the two sides. Up to 8 bytes are an
 // unrolled run that a computed jump enters. Otherwise the source is brought to a word with bytes, and the destination's
 // offset in its word chooses one of four loops: 32 bytes at a time, then 4, with the words shifted to fit
-asm void sys_memcpy_fast(const void *src, void *dest, u32 size) {
+asm void MI_CpuCopy(const void *src, void *dest, u32 size) {
     cmp r2, #8
     bgt @large
     rsb r3, r2, #8
@@ -589,11 +588,11 @@ asm void sys_memcpy_fast(const void *src, void *dest, u32 size) {
 
 // MI_CpuMove: copies size bytes, even when the ranges overlap. Where the destination is below the source it is
 // MI_CpuCopy; otherwise it copies backwards from the ends, in the same four ways
-asm void sys_memcpy_ex(const void *src, void *dest, u32 size) {
+asm void MI_CpuMove(const void *src, void *dest, u32 size) {
     cmp r2, #0
     subnes r3, r0, r1
     bxeq lr
-    bgt sys_memcpy_fast ; EXTERNAL
+    bgt MI_CpuCopy ; EXTERNAL
     add r1, r1, r2
     add r0, r0, r2
     cmp r2, #8
@@ -806,8 +805,8 @@ asm void sys_memcpy_ex(const void *src, void *dest, u32 size) {
 
 #pragma thumb on
 
-// MI_Zero36B: clears 36 bytes
-asm void func_02079084(void *dest) {
+// Clears 36 bytes
+asm void MI_Zero36B(void *dest) {
     mov r1, #0
     mov r2, #0
     mov r3, #0

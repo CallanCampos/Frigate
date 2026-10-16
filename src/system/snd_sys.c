@@ -167,7 +167,7 @@ BOOL func_02005cbc(void) {
     if (sThread == NULL) {
         return FALSE;
     }
-    if (scheduler_is_thread_ended(&g_GFLSndThread) == FALSE) {
+    if (OS_IsThreadTerminated(&g_GFLSndThread) == FALSE) {
         return TRUE;
     }
     return FALSE;
@@ -436,7 +436,7 @@ static void UpdateBGMChange(void) {
             StartLoadThread(sBGMChange.seq, SND_THREAD_LOAD_WAVE);
             sBGMChange.loadState = BGM_LOAD_WAVE;
         } else {
-            func_0207aa04(1);
+            OS_Sleep(1);
         }
         break;
     case BGM_LOAD_WAVE:
@@ -447,7 +447,7 @@ static void UpdateBGMChange(void) {
             NNS_SndPlayerSetVolume(handle, 0);
             sBGMChange.loadState = BGM_LOAD_IDLE;
         } else {
-            func_0207aa04(1);
+            OS_Sleep(1);
         }
         break;
     }
@@ -579,21 +579,21 @@ static void StartLoadThread(u32 seq, int kind) {
     StopLoadThread();
     switch (kind) {
     case SND_THREAD_LOAD_SEQ:
-        scheduler_init_thread(&g_GFLSndThread, GFL_SndThreadProc2, &sThreadSeq, sThreadStack + NELEMS(sThreadStack),
-                              SND_THREAD_STACK_SIZE, SND_THREAD_PRIORITY);
+        OS_CreateThread(&g_GFLSndThread, GFL_SndThreadProc2, &sThreadSeq, sThreadStack + NELEMS(sThreadStack),
+                        SND_THREAD_STACK_SIZE, SND_THREAD_PRIORITY);
         break;
     case SND_THREAD_LOAD_WAVE:
-        scheduler_init_thread(&g_GFLSndThread, GFL_SndThreadProc1, &sThreadSeq, sThreadStack + NELEMS(sThreadStack),
-                              SND_THREAD_STACK_SIZE, SND_THREAD_PRIORITY);
+        OS_CreateThread(&g_GFLSndThread, GFL_SndThreadProc1, &sThreadSeq, sThreadStack + NELEMS(sThreadStack),
+                        SND_THREAD_STACK_SIZE, SND_THREAD_PRIORITY);
         break;
     }
-    scheduler_start_thread(&g_GFLSndThread);
+    OS_WakeupThreadDirect(&g_GFLSndThread);
     sThread = &g_GFLSndThread;
 }
 
 static void StopLoadThread(void) {
-    if (sThread != NULL && scheduler_is_thread_ended(&g_GFLSndThread) == FALSE) {
-        func_0207a710(&g_GFLSndThread);
+    if (sThread != NULL && OS_IsThreadTerminated(&g_GFLSndThread) == FALSE) {
+        OS_DestroyThread(&g_GFLSndThread);
         sThread = NULL;
     }
 }
@@ -602,7 +602,7 @@ static BOOL IsLoadThreadDone(void) {
     if (sThread == NULL) {
         return TRUE;
     }
-    return scheduler_is_thread_ended(&g_GFLSndThread);
+    return OS_IsThreadTerminated(&g_GFLSndThread);
 }
 
 BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
@@ -623,7 +623,7 @@ BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
                 StartLoadThread(seq, SND_THREAD_LOAD_WAVE);
                 (*step)++;
             } else {
-                func_0207aa04(2);
+                OS_Sleep(2);
             }
             break;
         case 2:
@@ -634,7 +634,7 @@ BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
                 (*step)++;
                 return TRUE;
             }
-            func_0207aa04(2);
+            OS_Sleep(2);
             break;
         }
     }
@@ -673,7 +673,7 @@ BOOL func_02006528(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 src
     if (loaded == NULL) {
         return FALSE;
     }
-    func_0207df84(loaded, index, func_0207dfa4(srcWaveArc, srcIndex));
+    SND_SetWaveDataAddress(loaded, index, SND_GetWaveDataAddress(srcWaveArc, srcIndex));
     return TRUE;
 }
 

@@ -14,16 +14,15 @@
 
 static u16 OSi_IsInitReset;
 
-// NitroSDK's OS_InitReset
-void func_0207c248(void) {
+void OS_InitReset(void) {
     if (OSi_IsInitReset) {
         return;
     }
     OSi_IsInitReset = TRUE;
     PXI_Init();
-    while (!func_0207ca48(PXI_FIFO_TAG_OS, PXI_PROC_ARM7)) {
+    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_OS, PXI_PROC_ARM7)) {
     }
-    func_0207c9fc(PXI_FIFO_TAG_OS, func_02079f10);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_OS, OSi_CommonCallback);
 }
 
 // NitroSDK's OS_ResetSystem: the reset parameter goes to the shared memory for the next program. A Download Play
@@ -36,14 +35,14 @@ void sys_reset(u32 parameter) {
     if (hw_isDSi()) {
         func_02769578();
     }
-    func_0206eef0(cart_key_create());
-    CPU_SetInterrupts(OS_IE_FIFO_RECV);
-    CPU_AcknowledgeInterrupts(0xffffffff);
-    dma_endAll();
+    CARD_LockRom(OS_GetLockID());
+    OS_SetIrqMask(OS_IE_FIFO_RECV);
+    OS_ResetRequestIrqMask(0xffffffff);
+    MI_StopAllDma();
     if (hw_isDSi()) {
         func_02768298();
     }
     *(u32 *)HW_RESET_PARAMETER_BUF = parameter;
-    func_02079f44(OS_PXI_COMMAND_RESET);
+    OSi_SendToPxi(OS_PXI_COMMAND_RESET);
     func_01ff8fac();
 }

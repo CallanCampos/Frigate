@@ -15,7 +15,7 @@ static BOOL AppPrintsysCommon_IsHeld(u32 flags);
 static BOOL AppPrintsysCommon_IsReleased(u32 flags);
 
 void AppPrintsysCommon_Init(AppPrintsysCommon *work, u32 flags) {
-    sys_memset(work, 0, sizeof(AppPrintsysCommon));
+    MI_CpuFill8(work, 0, sizeof(AppPrintsysCommon));
     work->flags = flags;
 }
 

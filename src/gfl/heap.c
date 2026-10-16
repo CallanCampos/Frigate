@@ -35,8 +35,8 @@ static char sHeapDumpFile[0x14];
 void GFL_MemInit(const HeapDef *defs, u32 rootCount, u32 maxHeapIds, u32 reserveSize) {
     BOOL ok = GFL_HeapMgrInit(defs, rootCount, maxHeapIds, reserveSize);
 
-    GetUserMemRegionStart(OS_ARENA_MAIN);
-    GetUserMemRegionEnd(OS_ARENA_MAIN);
+    OS_GetArenaLo(OS_ARENA_MAIN);
+    OS_GetArenaHi(OS_ARENA_MAIN);
     if (!ok) {
         GFL_HeapGetLastResult();
         sys_exit();
@@ -100,7 +100,7 @@ void *GFL_HeapAllocate(HeapID heapId, u32 size, BOOL clear, const char *file, u1
         GFL_HeapSetBlockDebugInfo(ptr, file, line);
         GFL_HeapDebugTraceAlloc(heapId, ptr, size);
         if (clear) {
-            sys_memset32(0, ptr, size);
+            MIi_CpuClear32(0, ptr, size);
         }
     }
     return ptr;
@@ -269,12 +269,12 @@ static void GFL_HeapDumpProc(void *block, NNSFndHeapHandle heap, u32 param) {
     sHeapDumpState.size = NNS_FndGetSizeForMBlockExpHeap(block);
     sHeapDumpState.ptr = ptr;
     if (!GFL_HeapDebugCopyFileName(file, info->file)) {
-        sys_memcpy("SYSTEM ALLOC", file, 13);
+        MI_CpuCopy8("SYSTEM ALLOC", file, 13);
         line = 0;
     } else {
         line = info->line;
     }
-    sys_memcpy(file, sHeapDumpFile, GFL_STD_StrLen(file) + 1);
+    MI_CpuCopy8(file, sHeapDumpFile, GFL_STD_StrLen(file) + 1);
     sHeapDumpState.line = line;
     pad = 0x12 - GFL_STD_StrLen(file);
     for (i = 0; i < pad; i++) {

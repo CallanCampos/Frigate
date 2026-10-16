@@ -383,7 +383,7 @@ BOOL PokeList_Main(PokeListWork *wk) {
 
 // Blends the plates' palettes toward white while a plate flashes, and makes the cursor's plate glow
 static void PokeList_UpdateGlow(PokeListWork *wk) {
-    sys_memcpy16(wk->baseColors, wk->colors, sizeof(wk->colors));
+    MIi_CpuCopy16(wk->baseColors, wk->colors, sizeof(wk->colors));
     if (wk->flashTimer != 0) {
         u8 level;
         u8 i;
@@ -499,8 +499,8 @@ static void PokeList_InitGraphics(PokeListWork *wk) {
     PokeList_CreateBG(&sBG5Setup, 5, 0);
     PokeList_CreateBG(&sBG4Setup, 4, 0);
     PokeList_CreateBG0(wk);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 16, 10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 16, 10);
     GFL_BGSysMoveBG(2, BG_MOVE_SET_X, 128);
     GFL_BGSysMoveBG(1, BG_MOVE_SET_X, 128);
     clactSetup = data_02093f08;
@@ -511,12 +511,12 @@ static void PokeList_InitGraphics(PokeListWork *wk) {
 }
 
 void PokeList_CreateBG0(PokeListWork *wk) {
-    gfxSetEngineModeA(1, 0, 0);
+    GX_SetGraphicsMode(1, 0, 0);
     PokeList_CreateBG(&sBG0Setup, 0, 0);
 }
 
 void PokeList_Init3D(PokeListWork *wk) {
-    gfxSetEngineModeA(1, 0, 1);
+    GX_SetGraphicsMode(1, 0, 1);
     GFL_G3DSysCreate(FALSE, 1, FALSE, 1, 0, wk->heapId, NULL);
     G2_SetBG0Priority(0);
     G3X_EdgeMarking(TRUE);
@@ -525,8 +525,8 @@ void PokeList_Init3D(PokeListWork *wk) {
     wk->camera = GFL_G3DCameraCreate(2, 0, 0x50d7, 0, 0x6bca, FX32_ONE, FX32_CONST(128), 0, &sCameraPos, &sCameraUp,
                                      &sCameraTarget, wk->heapId);
     GFL_G3DCameraFlush(wk->camera);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
-                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
+                       GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 10);
     func_0204f918(wk->heapId);
 }
 
@@ -554,7 +554,7 @@ void PokeList_Exit3D(PokeListWork *wk) {
     GFL_G3DCameraFree(wk->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
 }
 
 static void PokeList_CreateBG(const BGSetup *setup, u8 bg, u8 mode) {
@@ -684,7 +684,7 @@ static void PokeList_LoadResources(PokeListWork *wk) {
     wk->clResources[CL_RES_CHAR(5)] = func_0204b81c(commonArc, func_0202d8b4(), FALSE, 0, wk->heapId);
     wk->clResources[CL_RES_CELL(5)] = func_0204bde0(commonArc, func_0202d8b8(2), func_0202d8bc(2), wk->heapId);
     GFL_ArcToolFree(commonArc);
-    sys_memcpy16((void *)(HW_BG_PLTT + 0xc0), wk->baseColors, sizeof(wk->baseColors));
+    MIi_CpuCopy16((void *)(HW_BG_PLTT + 0xc0), wk->baseColors, sizeof(wk->baseColors));
 }
 
 static void PokeList_FreeResources(PokeListWork *wk) {
@@ -2064,8 +2064,8 @@ static void PokeList_UpdateMenu(PokeListWork *wk) {
 static void func_ov165_0219ceec(PokeListWork *wk) {
     wk->state = 6;
     wk->subState = 0;
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ,
-                             8);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ,
+                            8);
     G2_SetWnd0Position(224, 168, 248, 192);
     G2_SetWnd0InsidePlane(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ,
                           FALSE);
@@ -2088,7 +2088,7 @@ static void func_ov165_0219cf70(PokeListWork *wk) {
         func_0204c124(wk->exitButton, TRUE);
     }
     if (wk->menuItem != 4 && wk->menuItem != 5) {
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
         wk->glowPaused = FALSE;
     }
     GFL_BGSysFillScrAsync(0, 0);

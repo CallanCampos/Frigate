@@ -21,7 +21,7 @@ BOOL EncData_Load(EncData *encData, ArcTool *arc, u16 zoneId, u8 season) {
     u32 fileId;
     u32 count;
 
-    sys_memset(encData, 0, sizeof(EncData));
+    MI_CpuFill8(encData, 0, sizeof(EncData));
     fileId = GetZoneEncID(zoneId);
     if (fileId == 0x1fff) {
         return FALSE;
@@ -124,7 +124,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
     s16 y;
     s16 z;
 
-    sys_memset(action, 0, sizeof(PlayerActionPossibilities));
+    MI_CpuFill8(action, 0, sizeof(PlayerActionPossibilities));
     action->zoneId = Field_GetPlayerStateZoneID(field);
     action->gsys = Field_GetGameSystem(field);
     action->field = field;

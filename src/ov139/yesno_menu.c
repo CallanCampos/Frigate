@@ -40,7 +40,7 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     u8 i;
     u8 j;
 
-    sys_memset(menu, 0, sizeof(TwoChoiceMenu));
+    MI_CpuFill8(menu, 0, sizeof(TwoChoiceMenu));
     menu->heapId = heapId;
     menu->unit = unit;
     menu->font = font;

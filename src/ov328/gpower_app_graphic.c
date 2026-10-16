@@ -103,7 +103,7 @@ static const GPowerAppBGSetup sGPowerAppBGSetups[BG_COUNT] = {
 GPowerAppGraphic *GPowerAppGraphic_Create(u32 layout, HeapID heapId) {
     GPowerAppGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(GPowerAppGraphic), FALSE, "gpower_app_graphic.c", 450);
 
-    sys_memset(graphic, 0, sizeof(GPowerAppGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(GPowerAppGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -130,7 +130,7 @@ void GPowerAppGraphic_Free(GPowerAppGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(GPowerAppGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(GPowerAppGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -159,7 +159,7 @@ static void GPowerAppGraphic_VBlank(TCB *tcb, void *data) {
 static void GPowerAppBG_Init(GPowerAppBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(GPowerAppBG));
+    MI_CpuFill8(bg, 0, sizeof(GPowerAppBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sGPowerAppLCDConfig);
@@ -178,7 +178,7 @@ static void GPowerAppBG_Free(GPowerAppBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(GPowerAppBG));
+    MI_CpuFill8(bg, 0, sizeof(GPowerAppBG));
 }
 
 static void GPowerAppBG_Update(GPowerAppBG *bg) {
@@ -189,7 +189,7 @@ static void GPowerAppBG_VBlank(GPowerAppBG *bg) {
 }
 
 static void GPowerAppClAct_Init(GPowerAppClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(GPowerAppClAct));
+    MI_CpuFill8(clact, 0, sizeof(GPowerAppClAct));
     ClActSys_Create(&sGPowerAppClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -200,7 +200,7 @@ static void GPowerAppClAct_Init(GPowerAppClAct *clact, const BGSysVRAMConfig *vr
 static void GPowerAppClAct_Free(GPowerAppClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(GPowerAppClAct));
+    MI_CpuFill8(clact, 0, sizeof(GPowerAppClAct));
 }
 
 static void GPowerAppClAct_Update(GPowerAppClAct *clact) {

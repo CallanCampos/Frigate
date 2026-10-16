@@ -208,14 +208,14 @@ static u16 getYearMonthDay(const RTCDate *date) {
 }
 
 static void JoinAvenue_UnpackDate(u16 packed, RTCDate *date) {
-    sys_memset(date, 0, sizeof(RTCDate));
+    MI_CpuFill8(date, 0, sizeof(RTCDate));
     date->year = (packed >> 9) & 0x7f;
     date->month = (packed >> 5) & 0xf;
     date->day = packed & 0x1f;
 }
 
 static void JoinAvenueShop_Init(JoinAvenueShop *shop) {
-    sys_memset(shop, 0, sizeof(JoinAvenueShop));
+    MI_CpuFill8(shop, 0, sizeof(JoinAvenueShop));
     shop->id = 0xffff;
 }
 
@@ -266,7 +266,7 @@ void func_02036448(JoinAvenueShop *shop, u32 bit, BOOL set) {
 }
 
 static void JoinAvenueProfile_SetFromPlayerInfo(JoinAvenueProfile *profile, PlayerInfo *playerInfo) {
-    sys_memcpy(GetPlayerName(playerInfo), profile->name, sizeof(profile->name));
+    MI_CpuCopy8(GetPlayerName(playerInfo), profile->name, sizeof(profile->name));
     profile->trainerId = getTrainerID(playerInfo);
     profile->country = UnityTowerVisitor_GetCountry(playerInfo);
     profile->region = UnityTowerVisitor_GetProvince(playerInfo);
@@ -280,10 +280,10 @@ static void JoinAvenueProfile_SetFromGameData(JoinAvenueProfile *profile, GameDa
     void *answers;
     PlayTime *playTime;
 
-    sys_memset(profile, 0, sizeof(JoinAvenueProfile));
+    MI_CpuFill8(profile, 0, sizeof(JoinAvenueProfile));
     JoinAvenueProfile_SetFromPlayerInfo(profile, GetGameDataPlayerInfo(gameData));
-    sys_memcpy(TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))),
-               profile->greeting, sizeof(profile->greeting));
+    MI_CpuCopy8(TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))),
+                profile->greeting, sizeof(profile->greeting));
     answers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(gameData)));
     profile->job = func_0200ec3c(answers, 26);
     profile->hobby = func_0200ec3c(answers, 25);
@@ -295,9 +295,9 @@ static void JoinAvenueProfile_SetFromGameData(JoinAvenueProfile *profile, GameDa
 static void JoinAvenueProfile_SetFromBeacon(JoinAvenueProfile *profile, const GameBeacon *beacon) {
     void *answers;
 
-    sys_memset(profile, 0, sizeof(JoinAvenueProfile));
-    sys_memcpy(beacon->name, profile->name, sizeof(profile->name));
-    sys_memcpy(beacon->greeting, profile->greeting, sizeof(profile->greeting));
+    MI_CpuFill8(profile, 0, sizeof(JoinAvenueProfile));
+    MI_CpuCopy8(beacon->name, profile->name, sizeof(profile->name));
+    MI_CpuCopy8(beacon->greeting, profile->greeting, sizeof(profile->greeting));
     profile->trainerId = beacon->trainerId;
     profile->gender = beacon->gender;
     profile->version = beacon->version;
@@ -347,7 +347,7 @@ static BOOL JoinAvenueProfile_IsEmpty(const JoinAvenueProfile *profile) {
 }
 
 static void JoinAvenueProfile_GetName(const JoinAvenueProfile *profile, u16 *dest) {
-    sys_memcpy(profile->name, dest, sizeof(profile->name));
+    MI_CpuCopy8(profile->name, dest, sizeof(profile->name));
     dest[NELEMS(profile->name)] = GFL_StrBufGetTerminator();
 }
 
@@ -375,7 +375,7 @@ static void JoinAvenueProfile_GetGreeting(const JoinAvenueProfile *profile, u16 
     StrBuf *str;
 
     if (profile->greeting[0] != GFL_StrBufGetTerminator()) {
-        sys_memcpy(profile->greeting, dest, sizeof(profile->greeting));
+        MI_CpuCopy8(profile->greeting, dest, sizeof(profile->greeting));
         dest[NELEMS(profile->greeting)] = GFL_StrBufGetTerminator();
     } else {
         msgData =
@@ -393,7 +393,7 @@ static void JoinAvenueShopChoice_SetFromGameData(JoinAvenueShopChoice *choice, G
     JoinAvenuePerson *player;
     PlayerInfo *playerInfo;
 
-    sys_memset(choice, 0, sizeof(JoinAvenueShopChoice));
+    MI_CpuFill8(choice, 0, sizeof(JoinAvenueShopChoice));
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     info = JoinAvenue_GetInfo(joinAvenue);
     player = func_02038a18(getAddressOfBeginningOfOccupants(joinAvenue));
@@ -433,12 +433,12 @@ static void JoinAvenueData_FillAdventure(JoinAvenueData *data, GameData *gameDat
     PokeParty *party;
     PartyPkm *pkm;
 
-    sys_memset(adventure, 0, sizeof(JoinAvenueAdventure));
+    MI_CpuFill8(adventure, 0, sizeof(JoinAvenueAdventure));
     time = getSaveAdventureTimeBlock(save);
-    func_0207d244(&date, &rtcTime, time->startSeconds);
+    RTC_ConvertSecondToDateTime(&date, &rtcTime, time->startSeconds);
     adventure->startDate = getYearMonthDay(&date);
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), EVENT_FLAG_HALL_OF_FAME)) {
-        func_0207d244(&date, &rtcTime, time->seconds);
+        RTC_ConvertSecondToDateTime(&date, &rtcTime, time->seconds);
         adventure->hallOfFameDate = getYearMonthDay(&date);
     }
 
@@ -521,7 +521,7 @@ static BOOL JoinAvenueData_CheckAdventure(JoinAvenueData *data) {
 static void JoinAvenueData_FillRecords1(JoinAvenueData *data, GameData *gameData) {
     ResortWork *work = func_02017b84(gameData);
 
-    sys_memset(data, 0, sizeof(JoinAvenueData));
+    MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
     data->records[0] = ResortWork_Get(work, 0);
     data->records[1] = ResortWork_Get(work, 1);
     data->records[2] = ResortWork_Get(work, 2);
@@ -542,7 +542,7 @@ static BOOL JoinAvenueData_CheckRecords1(JoinAvenueData *data) {
 static void JoinAvenueData_FillRecords2(JoinAvenueData *data, GameData *gameData) {
     ResortWork *work = func_02017b84(gameData);
 
-    sys_memset(data, 0, sizeof(JoinAvenueData));
+    MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
     data->records[0] = ResortWork_Get(work, 4);
     data->records[1] = ResortWork_Get(work, 5);
     data->records[2] = ResortWork_Get(work, 6);
@@ -565,7 +565,7 @@ static void JoinAvenueData_FillValues(JoinAvenueData *data, GameData *gameData) 
         func_02038a18(getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))));
     int i;
 
-    sys_memset(data, 0, sizeof(JoinAvenueData));
+    MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
     for (i = 0; i < 16; i++) {
         data->values[i] = joinAveTextHandler(player, JOIN_AVE_PARAM_VALUE + i, NULL);
     }
@@ -587,7 +587,7 @@ static void JoinAvenueData_FillRecent(JoinAvenueData *data, GameData *gameData) 
         func_02038a18(getAddressOfBeginningOfOccupants(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))));
     int i;
 
-    sys_memset(data, 0, sizeof(JoinAvenueData));
+    MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
     for (i = 0; i < JOIN_AVE_RECENT_COUNT; i++) {
         data->recent.ids[i] = joinAveTextHandler(player, JOIN_AVE_PARAM_RECENT_ID + i, NULL);
         data->recent.dates[i] = joinAveTextHandler(player, JOIN_AVE_PARAM_RECENT_DATE + i, NULL);
@@ -610,11 +610,11 @@ static BOOL JoinAvenueData_CheckRecent(JoinAvenueData *data) {
 }
 
 static void JoinAvenueData_FillMessage1(JoinAvenueData *data, GameData *gameData) {
-    sys_memset(data, 0, sizeof(JoinAvenueData));
-    sys_memcpy((void *)joinAveTextHandler(func_02038a18(getAddressOfBeginningOfOccupants(
-                                              SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData)))),
-                                          JOIN_AVE_PARAM_MESSAGE1_RAW, NULL),
-               data, sizeof(JoinAvenueMessage));
+    MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
+    MI_CpuCopy8((void *)joinAveTextHandler(func_02038a18(getAddressOfBeginningOfOccupants(
+                                               SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData)))),
+                                           JOIN_AVE_PARAM_MESSAGE1_RAW, NULL),
+                data, sizeof(JoinAvenueMessage));
 }
 
 static BOOL JoinAvenueData_CheckMessage1(JoinAvenueData *data) {
@@ -626,7 +626,7 @@ static void getSpecialJoinAveTextToBuf(const JoinAvenueMessage *message, u16 *de
     StrBuf *str;
 
     if (message->str[0] != GFL_StrBufGetTerminator()) {
-        sys_memcpy(message, dest, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8(message, dest, sizeof(JoinAvenueMessage));
         dest[NELEMS(message->str)] = GFL_StrBufGetTerminator();
     } else {
         msgData =
@@ -639,11 +639,11 @@ static void getSpecialJoinAveTextToBuf(const JoinAvenueMessage *message, u16 *de
 }
 
 static void JoinAvenueData_FillMessage2(JoinAvenueData *data, GameData *gameData) {
-    sys_memset(data, 0, sizeof(JoinAvenueData));
-    sys_memcpy((void *)joinAveTextHandler(func_02038a18(getAddressOfBeginningOfOccupants(
-                                              SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData)))),
-                                          JOIN_AVE_PARAM_MESSAGE2_RAW, NULL),
-               data, sizeof(JoinAvenueMessage));
+    MI_CpuFill8(data, 0, sizeof(JoinAvenueData));
+    MI_CpuCopy8((void *)joinAveTextHandler(func_02038a18(getAddressOfBeginningOfOccupants(
+                                               SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData)))),
+                                           JOIN_AVE_PARAM_MESSAGE2_RAW, NULL),
+                data, sizeof(JoinAvenueMessage));
 }
 
 static BOOL JoinAvenueData_CheckMessage2(JoinAvenueData *data) {
@@ -655,7 +655,7 @@ static void JoinAvenue_GetMessage2(const JoinAvenueMessage *message, u16 *dest, 
     StrBuf *str;
 
     if (message->str[0] != GFL_StrBufGetTerminator()) {
-        sys_memcpy(message, dest, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8(message, dest, sizeof(JoinAvenueMessage));
         dest[NELEMS(message->str)] = GFL_StrBufGetTerminator();
     } else {
         msgData =
@@ -693,7 +693,7 @@ void func_02036dc0(JoinAvenuePerson *person, GameData *gameData) {
 }
 
 void func_02036e14(JoinAvenuePerson *person) {
-    sys_memset(person, 0, sizeof(JoinAvenuePerson));
+    MI_CpuFill8(person, 0, sizeof(JoinAvenuePerson));
     person->data[5].message.str[0] = GFL_StrBufGetTerminator();
     person->data[6].message.str[0] = GFL_StrBufGetTerminator();
     person->profile.greeting[0] = GFL_StrBufGetTerminator();
@@ -793,7 +793,7 @@ static u32 JoinAvenuePerson_MergePerson(JoinAvenuePerson *person, const JoinAven
     person->choice = src->choice;
     for (srcData = src->data, data = person->data, i = 0; i < JOIN_AVE_DATA_COUNT; i++, srcData++, data++) {
         if (src->dataMask & (1 << i)) {
-            sys_memcpy(srcData, data, sizeof(JoinAvenueData));
+            MI_CpuCopy8(srcData, data, sizeof(JoinAvenueData));
             person->dataMask |= 1 << i;
         }
     }
@@ -1009,13 +1009,13 @@ u32 joinAveTextHandler(const JoinAvenuePerson *person, JoinAvenuePersonParam par
         return 0;
     case JOIN_AVE_PARAM_MESSAGE1_RAW:
         if (buffer != NULL) {
-            sys_memcpy(&person->data[5].message, buffer, sizeof(JoinAvenueMessage));
+            MI_CpuCopy8(&person->data[5].message, buffer, sizeof(JoinAvenueMessage));
             ((u16 *)buffer)[8] = GFL_StrBufGetTerminator();
         }
         return (u32)&person->data[5].message;
     case JOIN_AVE_PARAM_MESSAGE2_RAW:
         if (buffer != NULL) {
-            sys_memcpy(&person->data[6].message, buffer, sizeof(JoinAvenueMessage));
+            MI_CpuCopy8(&person->data[6].message, buffer, sizeof(JoinAvenueMessage));
             ((u16 *)buffer)[8] = GFL_StrBufGetTerminator();
         }
         return (u32)&person->data[6].message;
@@ -1062,10 +1062,10 @@ void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam p
         person->profile.language = value;
         break;
     case JOIN_AVE_PARAM_NAME:
-        sys_memcpy((void *)value, person->profile.name, sizeof(person->profile.name));
+        MI_CpuCopy8((void *)value, person->profile.name, sizeof(person->profile.name));
         break;
     case JOIN_AVE_PARAM_GREETING:
-        sys_memcpy((void *)value, person->profile.greeting, sizeof(person->profile.greeting));
+        MI_CpuCopy8((void *)value, person->profile.greeting, sizeof(person->profile.greeting));
         break;
     case JOIN_AVE_PARAM_SHOP_ID:
         person->choice.shopId = value;
@@ -1235,10 +1235,10 @@ void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam p
         person->data[4].recent.dates[param - JOIN_AVE_PARAM_RECENT_DATE] = value;
         break;
     case JOIN_AVE_PARAM_MESSAGE1:
-        sys_memcpy((void *)value, &person->data[5].message, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8((void *)value, &person->data[5].message, sizeof(JoinAvenueMessage));
         break;
     case JOIN_AVE_PARAM_MESSAGE2:
-        sys_memcpy((void *)value, &person->data[6].message, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8((void *)value, &person->data[6].message, sizeof(JoinAvenueMessage));
         break;
     }
 }
@@ -1261,7 +1261,7 @@ static BOOL JoinAvenuePerson_IsExpired(const JoinAvenuePerson *person, s64 now) 
     date.day = person->day;
     time.hour = person->hour;
     time.minute = person->minute;
-    arrived = func_0207d12c(&date, &time);
+    arrived = RTC_ConvertDateTimeToSecond(&date, &time);
     count = joinAveTextHandler(person, JOIN_AVE_PARAM_DATA_COUNT, NULL);
     if (person->choice.unk0) {
         if (now - arrived > JOIN_AVE_STAY_SHORT) {
@@ -1301,19 +1301,19 @@ void func_02037938(JoinAvenueVisitor *visitor, int index, GameData *gameData) {
 }
 
 void func_02037970(JoinAvenueVisitor *visitor, GameBeacon *beacon) {
-    sys_memcpy(&visitor->choice, &GameBeacon_GetAvenuePayload(beacon)->choice, sizeof(JoinAvenueShopChoice));
-    sys_memcpy(&visitor->data, &GameBeacon_GetAvenuePayload(beacon)->data, sizeof(JoinAvenueData));
+    MI_CpuCopy8(&visitor->choice, &GameBeacon_GetAvenuePayload(beacon)->choice, sizeof(JoinAvenueShopChoice));
+    MI_CpuCopy8(&visitor->data, &GameBeacon_GetAvenuePayload(beacon)->data, sizeof(JoinAvenueData));
     beacon->arg.value = visitor->dataIndex;
 }
 
 void func_02037998(JoinAvenueVisitor *visitor, const GameBeacon *beacon, u32 a2) {
-    sys_memset(visitor, 0, sizeof(JoinAvenueVisitor));
+    MI_CpuFill8(visitor, 0, sizeof(JoinAvenueVisitor));
     visitor->unk44 = a2;
     JoinAvenueProfile_SetFromBeacon(&visitor->profile, beacon);
     if (beacon->version == VERSION_WHITE2 || beacon->version == VERSION_BLACK2) {
         if (a2 == 8) {
-            sys_memcpy(&GameBeacon_GetAvenuePayload(beacon)->choice, &visitor->choice, sizeof(JoinAvenueShopChoice));
-            sys_memcpy(&GameBeacon_GetAvenuePayload(beacon)->data, &visitor->data, sizeof(JoinAvenueData));
+            MI_CpuCopy8(&GameBeacon_GetAvenuePayload(beacon)->choice, &visitor->choice, sizeof(JoinAvenueShopChoice));
+            MI_CpuCopy8(&GameBeacon_GetAvenuePayload(beacon)->data, &visitor->data, sizeof(JoinAvenueData));
             visitor->dataIndex = beacon->arg.value;
         } else {
             visitor->dataIndex = JOIN_AVE_DATA_COUNT;
@@ -1355,7 +1355,7 @@ void func_02037a68(JoinAvenueEntry *entry) {
 }
 
 void func_02037a70(JoinAvenueEntry *entry) {
-    sys_memset(entry, 0, sizeof(JoinAvenueEntry));
+    MI_CpuFill8(entry, 0, sizeof(JoinAvenueEntry));
     entry->message1.str[0] = GFL_StrBufGetTerminator();
     entry->message2.str[0] = GFL_StrBufGetTerminator();
     entry->profile.greeting[0] = GFL_StrBufGetTerminator();
@@ -1412,7 +1412,7 @@ u32 func_02037b38(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buf
     case JOIN_AVE_PARAM_TRAINER_TYPE:
         return entry->profile.trainerType;
     case JOIN_AVE_PARAM_NAME:
-        sys_memcpy(entry->profile.name, buffer, sizeof(entry->profile.name));
+        MI_CpuCopy8(entry->profile.name, buffer, sizeof(entry->profile.name));
         ((u16 *)buffer)[7] = GFL_StrBufGetTerminator();
         return 0;
     case JOIN_AVE_PARAM_UNK_20:
@@ -1481,16 +1481,16 @@ void func_02037c70(JoinAvenueEntry *entry, JoinAvenuePersonParam param, u32 valu
         entry->row = value;
         break;
     case JOIN_AVE_PARAM_NAME:
-        sys_memcpy((void *)value, entry->profile.name, sizeof(entry->profile.name));
+        MI_CpuCopy8((void *)value, entry->profile.name, sizeof(entry->profile.name));
         break;
     case JOIN_AVE_PARAM_MESSAGE1:
-        sys_memcpy((void *)value, &entry->message1, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8((void *)value, &entry->message1, sizeof(JoinAvenueMessage));
         break;
     case JOIN_AVE_PARAM_MESSAGE2:
-        sys_memcpy((void *)value, &entry->message2, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8((void *)value, &entry->message2, sizeof(JoinAvenueMessage));
         break;
     case JOIN_AVE_PARAM_GREETING:
-        sys_memcpy((void *)value, entry->profile.greeting, sizeof(entry->profile.greeting));
+        MI_CpuCopy8((void *)value, entry->profile.greeting, sizeof(entry->profile.greeting));
         break;
     case JOIN_AVE_PARAM_GENDER:
         entry->profile.gender = value;
@@ -1542,9 +1542,9 @@ static BOOL JoinAvenueEntry_Merge(JoinAvenueEntry *entry, const JoinAvenueEntry 
     if (entry->unk4E == 4) {
         u16 greeting[8];
 
-        sys_memcpy(entry->profile.greeting, greeting, sizeof(greeting));
+        MI_CpuCopy8(entry->profile.greeting, greeting, sizeof(greeting));
         entry->profile = src->profile;
-        sys_memcpy(greeting, entry->profile.greeting, sizeof(greeting));
+        MI_CpuCopy8(greeting, entry->profile.greeting, sizeof(greeting));
     } else {
         entry->profile = src->profile;
         entry->message1 = src->message1;
@@ -1568,7 +1568,7 @@ u32 func_02037e34(JoinAvenueEntry *entry, int count, u32 max) {
 void func_02037e4c(JoinAvenueEntryList *list, u32 count) {
     u32 i = 0;
 
-    sys_memset(list, 0, sizeof(JoinAvenueEntryList));
+    MI_CpuFill8(list, 0, sizeof(JoinAvenueEntryList));
     list->count = count;
     for (; i < list->count; i++) {
         func_02037a70(&list->entries[i]);
@@ -1684,7 +1684,7 @@ void JoinAvenuePersonList_Free(JoinAvenuePersonList *list) {
 void func_02037ffc(JoinAvenuePersonList *list, u32 count) {
     u32 i = 0;
 
-    sys_memset(list, 0, sizeof(JoinAvenuePersonList));
+    MI_CpuFill8(list, 0, sizeof(JoinAvenuePersonList));
     list->count = count;
     for (; i < list->count; i++) {
         func_02036e14(&list->people[i]);
@@ -1826,7 +1826,7 @@ static JoinAvenuePerson *JoinAvenuePersonList_FindExpired(JoinAvenuePersonList *
     u32 i;
 
     RTC_GetCachedDateTime(&date, &time);
-    now = func_0207d12c(&date, &time);
+    now = RTC_ConvertDateTimeToSecond(&date, &time);
     for (i = 0; i < list->count; i++) {
         if (!JoinAvenuePerson_IsEmpty(&list->people[i]) && JoinAvenuePerson_IsExpired(&list->people[i], now)) {
             return &list->people[i];
@@ -1880,7 +1880,7 @@ static void JoinAvenuePerson_AddVisitorData(JoinAvenuePerson *person, const Join
         JoinAvenueData *data = person->data;
 
         data += visitor->dataIndex;
-        sys_memcpy(&visitor->data, data, sizeof(JoinAvenueData));
+        MI_CpuCopy8(&visitor->data, data, sizeof(JoinAvenueData));
         person->dataMask |= 1 << visitor->dataIndex;
     }
 }
@@ -1907,7 +1907,7 @@ void func_020384cc(JoinAvenueRecord *record) {
 }
 
 void func_020384d4(JoinAvenueRecord *record) {
-    sys_memset(record, 0, sizeof(JoinAvenueRecord));
+    MI_CpuFill8(record, 0, sizeof(JoinAvenueRecord));
 }
 
 BOOL func_020384e0(JoinAvenueRecord *record) {
@@ -1929,9 +1929,9 @@ static BOOL JoinAvenueRecord_MatchesEntry(JoinAvenueRecord *record, const JoinAv
 static u32 JoinAvenueRecord_MergeVisitor(JoinAvenueRecord *record, const JoinAvenueVisitor *visitor) {
     record->profile = visitor->profile;
     if (visitor->dataIndex == 5) {
-        sys_memcpy(&visitor->data, &record->message1, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8(&visitor->data, &record->message1, sizeof(JoinAvenueMessage));
     } else if (visitor->dataIndex == 6) {
-        sys_memcpy(&visitor->data, &record->message2, sizeof(JoinAvenueMessage));
+        MI_CpuCopy8(&visitor->data, &record->message2, sizeof(JoinAvenueMessage));
     }
     return 1;
 }
@@ -2053,7 +2053,7 @@ u32 func_020387f4(JoinAvenueRecord *record, int count, u32 max) {
 void func_0203880c(JoinAvenueOccupants *occupants) {
     int i;
 
-    sys_memset(occupants, 0, sizeof(JoinAvenueOccupants));
+    MI_CpuFill8(occupants, 0, sizeof(JoinAvenueOccupants));
     for (i = 0; i < JOIN_AVE_OCCUPANT_COUNT; i++) {
         func_02036e14(&occupants->people[i]);
     }
@@ -2285,14 +2285,14 @@ void func_02038bc8(u32 id) {
 
     RTC_GetCachedDate(&today);
     todayPacked = getYearMonthDay(&today);
-    todayDays = func_0207d0b4(&today);
+    todayDays = RTC_ConvertDateToDay(&today);
 
     // Forget the activities dated after today
     for (i = 0; i < JOIN_AVE_RECENT_COUNT; i++) {
         u32 recentId = joinAveTextHandler(player, JOIN_AVE_PARAM_RECENT_ID + i, NULL);
 
         JoinAvenue_UnpackDate(joinAveTextHandler(player, JOIN_AVE_PARAM_RECENT_DATE + i, NULL), &date);
-        days = func_0207d0b4(&date);
+        days = RTC_ConvertDateToDay(&date);
         if (recentId == 0) {
             days = 0;
         }
@@ -2362,8 +2362,8 @@ void func_02038bc8(u32 id) {
 
             JoinAvenue_UnpackDate(packedA, &dateA);
             JoinAvenue_UnpackDate(packedB, &dateB);
-            days = func_0207d0b4(&dateA);
-            daysB = func_0207d0b4(&dateB);
+            days = RTC_ConvertDateToDay(&dateA);
+            daysB = RTC_ConvertDateToDay(&dateB);
             if (idA == 0) {
                 days = 0;
             }
@@ -2384,13 +2384,13 @@ void func_02038e54(JoinAvenueInfo *info) {
     MsgData *msgData;
     StrBuf *str;
 
-    sys_memset(info, 0, sizeof(JoinAvenueInfo));
+    MI_CpuFill8(info, 0, sizeof(JoinAvenueInfo));
     info->name[0] = GFL_StrBufGetTerminator();
     info->name2[0] = GFL_StrBufGetTerminator();
     info->seed = GFL_RandomLC(0);
     info->rank = 1;
     info->unkDC_1 = TRUE;
-    sys_memset32(0xffffffff, info->visitorIds, sizeof(info->visitorIds));
+    MIi_CpuClear32(0xffffffff, info->visitorIds, sizeof(info->visitorIds));
 
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, MSG_JOIN_AVENUE_NAMES, HEAPID_TAIL(HEAPID_SAVEDATA));
     str = GFL_MsgDataLoadStrbufNew(msgData, MSG_JOIN_AVENUE_DEFAULT_NAME);
@@ -2563,7 +2563,7 @@ void func_02039064(JoinAvenueInfo *info, u32 param, u32 value) {
 
 void func_020392d4(JoinAvenueInfo *info, BOOL fullDay) {
     if (!fullDay) {
-        sys_memset32(0xffffffff, info->visitorIds, sizeof(info->visitorIds));
+        MIi_CpuClear32(0xffffffff, info->visitorIds, sizeof(info->visitorIds));
         info->visitorIdIndex = 0;
         info->visitorIdCount = 0;
         info->seed = gfRand(info->seed);

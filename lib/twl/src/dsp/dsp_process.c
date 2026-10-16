@@ -6,7 +6,7 @@
 // TwlSDK's DSP library, the DSP's processes (guessed file name, after the SDK's dsp_process.c): a context for each COFF
 // image, which this file loads into the shared WRAM B and C and hands to the DSP, the interrupt that calls the
 // context's callbacks, and the list of the running processes. ARM code in the DSi-only LTD autoload. The ROM names none
-// of it; the functions keep their default names, and the SDK's are in twl/dsp.h.
+// of it; the functions have the SDK's names where twl/dsp.h knows them, and keep their default names otherwise.
 
 // The COFF image's file header and a section header
 typedef struct COFFHeader {
@@ -77,29 +77,29 @@ static inline void *DSPi_GetWramAddress(DSPProcessContext *context, MIWram wram,
 
 static DSPProcessContext *sProcessList;
 static BOOL sExitCallbackSet;
-static PMExitCallbackInfo sExitCallbackInfo;
-static PMSleepCallbackInfo sSleepCallbackInfo;
+static PMExitCallbackInfo sDspExitCallbackInfo;
+static PMSleepCallbackInfo sDspSleepCallbackInfo;
 static BOOL sSleepCallbackSet;
 
 // Tells the DSP's OS to quit, and waits for its answer
 static void func_027052b4(void) {
     sProcessList->events = 0;
     if (hw_isDSi() == TRUE) {
-        func_0270502c(2, 0x8000);
+        DSP_SendData(2, 0x8000);
     }
     if (hw_isDSi() == TRUE) {
-        func_0270505c(2);
+        DSP_RecvData(2);
     }
 }
 
 // Before the system exits: quits every process
 static void func_027052fc(void *arg) {
     for (;;) {
-        DSPProcessContext *context = func_02705ed0(NULL);
+        DSPProcessContext *context = DSP_FindProcess(NULL);
         if (context == NULL) {
             return;
         }
-        func_02705e04(context);
+        DSP_QuitProcess(context);
     }
 }
 
@@ -131,8 +131,8 @@ static void func_0270532c(void) {
 // Reads size bytes of the image from offset
 static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32 size) {
     BOOL ok = FALSE;
-    if (romfs_fseek(context->image, offset, FS_SEEK_SET)) {
-        ok = (size == romfs_fread(context->image, dst, size));
+    if (FS_SeekFile(context->image, offset, FS_SEEK_SET)) {
+        ok = (size == FS_ReadFile(context->image, dst, size));
     }
     return ok;
 }
@@ -182,13 +182,13 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
     if (section->flags & COFF_SECTION_PROGRAM) {
         u32 address = section->programAddress * 2;
         BOOL empty = (section->flags & COFF_SECTION_PROGRAM_EMPTY) != 0;
-        if (func_0207f874(name, "@c0")) {
+        if (STD_SearchString(name, "@c0")) {
             wrams[count] = MI_WRAM_B;
             addresses[count] = address;
             empties[count] = empty;
             count++;
         }
-        if (func_0207f874(name, "@c1")) {
+        if (STD_SearchString(name, "@c1")) {
             wrams[count] = MI_WRAM_B;
             addresses[count] = address + DSP_MEMORY_HALF_SIZE;
             empties[count] = empty;
@@ -198,13 +198,13 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
     if (section->flags & COFF_SECTION_DATA) {
         u32 address = section->dataAddress * 2;
         BOOL empty = (section->flags & COFF_SECTION_DATA_EMPTY) != 0;
-        if (func_0207f874(name, "@d0")) {
+        if (STD_SearchString(name, "@d0")) {
             wrams[count] = MI_WRAM_C;
             addresses[count] = address;
             empties[count] = empty;
             count++;
         }
-        if (func_0207f874(name, "@d1")) {
+        if (STD_SearchString(name, "@d1")) {
             wrams[count] = MI_WRAM_C;
             addresses[count] = address + DSP_MEMORY_HALF_SIZE;
             empties[count] = empty;
@@ -243,7 +243,7 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
                     result = FALSE;
                     break;
                 }
-                sys_memset32_fast(0, DSPi_GetWramAddress(context, wram, slot << 14), DSP_BANK_SIZE);
+                MIi_CpuClearFast(0, DSPi_GetWramAddress(context, wram, slot << 14), DSP_BANK_SIZE);
             }
             if (!empty) {
                 if (!func_027053d4(context, fileOffset, DSPi_GetWramAddress(context, wram, address / 2), chunk)) {
@@ -259,12 +259,12 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
     return result;
 }
 
-void func_027058d8(DSPProcessContext *context, const char *name) {
+void DSP_InitProcessContext(DSPProcessContext *context, const char *name) {
     int i;
-    sys_memset(context, 0, sizeof(*context));
+    MI_CpuFill8(context, 0, sizeof(*context));
     context->next = NULL;
     context->flags = 0;
-    func_0207f7a4(context->name, name != NULL ? name : "");
+    STD_CopyString(context->name, name != NULL ? name : "");
     context->image = NULL;
     context->usedSlotsB = 0;
     context->usedSlotsC = 0;
@@ -333,8 +333,8 @@ static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB,
     context->freeBanksB = banksB;
     context->freeBanksC = banksC;
     if (func_02705980(context, func_027054e4)) {
-        cp15_flushDC(func_027687a0(), 0x40000);
-        cp15_flushDC(func_027687bc(), 0x40000);
+        DC_FlushRange(func_027687a0(), 0x40000);
+        DC_FlushRange(func_027687bc(), 0x40000);
         if (func_02705a4c(context, MI_WRAM_B, 0, 0x20000, MI_WRAM_DSP)) {
             if (func_02705a4c(context, MI_WRAM_C, 0, 0x20000, MI_WRAM_DSP)) {
                 ok = TRUE;
@@ -344,8 +344,8 @@ static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB,
     return ok;
 }
 
-void func_02705b70(DSPProcessContext *context, int events, DSPCallback callback, void *userData) {
-    u32 irq = CPU_IRQDisable();
+void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callback, void *userData) {
+    u32 irq = OS_DisableInterrupts();
     int i;
     for (i = 0; i < DSP_EVENT_COUNT; i++) {
         if (events & (1 << i)) {
@@ -367,23 +367,23 @@ void func_02705b70(DSPProcessContext *context, int events, DSPCallback callback,
         reg_DSP_PMASK = pmask | mask;
         context->events &= ~events;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static void func_02705c20(void) {
 }
 
-BOOL func_02705c24(DSPProcessContext *context, FSFile *image, int banksB, int banksC) {
+BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, int banksC) {
     BOOL started = FALSE;
-    if (!fs_init_check()) {
-        fs_init(-1);
+    if (!FS_IsAvailable()) {
+        FS_Init(-1);
     }
-    func_02706cd4();
-    CPU_SetIRQFunc(OS_IE_DSP, func_0270532c);
-    func_02705b70(context, 0x48000, func_027070dc, NULL);
-    CPU_EnableInterrupts(OS_IE_DSP);
+    DSP_InitPipe();
+    OS_SetIrqFunction(OS_IE_DSP, func_0270532c);
+    DSP_SetCallback(context, 0x48000, func_027070dc, NULL);
+    OS_EnableIrqMask(OS_IE_DSP);
     if (func_02705acc(context, image, banksB, banksC)) {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
         DSPProcessContext **link = &sProcessList;
         u16 mask;
         while (*link != NULL && *link != context) {
@@ -392,25 +392,25 @@ BOOL func_02705c24(DSPProcessContext *context, FSFile *image, int banksB, int ba
         *link = context;
         context->image = NULL;
         if (!sExitCallbackSet) {
-            PM_SetExitCallbackInfo(&sExitCallbackInfo, func_027052fc, NULL);
-            func_02769550(&sExitCallbackInfo, DSP_PM_PRIORITY);
+            PM_SetExitCallbackInfo(&sDspExitCallbackInfo, func_027052fc, NULL);
+            func_02769550(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
             sExitCallbackSet = TRUE;
         }
         if (!sSleepCallbackSet) {
-            PM_SetSleepCallbackInfo(&sSleepCallbackInfo, func_02705320, NULL);
-            func_0207f614(&sSleepCallbackInfo, DSP_PM_PRIORITY);
+            PM_SetSleepCallbackInfo(&sDspSleepCallbackInfo, func_02705320, NULL);
+            PM_InsertPreSleepCallback(&sDspSleepCallbackInfo, DSP_PM_PRIORITY);
             sSleepCallbackSet = TRUE;
         }
         if (hw_isDSi() == TRUE) {
-            func_02704e90();
+            DSP_PowerOn();
         }
         mask = context->events >> 16;
         if (hw_isDSi() == TRUE) {
-            func_02704f4c(mask);
+            DSP_ResetOffEx(mask);
         }
         mask = ~context->events;
         if (hw_isDSi() == TRUE) {
-            func_027052a4(mask);
+            DSP_MaskSemaphore(mask);
         }
         func_02705c20();
         if (context->flags & DSP_PROCESS_USING_OS) {
@@ -419,32 +419,32 @@ BOOL func_02705c24(DSPProcessContext *context, FSFile *image, int banksB, int ba
                 // volatile: the ROM stores each reply in a stack variable and reads it back to compare it
                 volatile u16 reply;
                 do {
-                    reply = func_0270505c(port);
+                    reply = DSP_RecvData(port);
                 } while (reply != 1);
                 port++;
             } while (port < 3);
         }
         func_0270532c();
         started = TRUE;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
     }
     return started;
 }
 
-void func_02705e04(DSPProcessContext *context) {
+void DSP_QuitProcess(DSPProcessContext *context) {
     u32 irq;
     DSPProcessContext **link;
     DSPProcessContext *node;
     func_027052b4();
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     if (hw_isDSi() == TRUE) {
-        func_02704f1c();
+        DSP_ResetOn();
     }
     if (hw_isDSi() == TRUE) {
-        func_02704ee8();
+        DSP_PowerOff();
     }
-    CPU_DisableInterrupts(OS_IE_DSP);
-    CPU_SetIRQFunc(OS_IE_DSP, NULL);
+    OS_DisableIrqMask(OS_IE_DSP);
+    OS_SetIrqFunction(OS_IE_DSP, NULL);
     func_02768cf8(MI_WRAM_B, MI_WRAM_DSP);
     func_02768cf8(MI_WRAM_C, MI_WRAM_DSP);
     link = &sProcessList;
@@ -456,26 +456,26 @@ void func_02705e04(DSPProcessContext *context) {
         link = &node->next;
     }
     context->next = NULL;
-    CPU_SetIRQMask(irq);
-    func_0207f62c(&sSleepCallbackInfo);
+    OS_RestoreInterrupts(irq);
+    PM_DeletePreSleepCallback(&sDspSleepCallbackInfo);
     sSleepCallbackSet = FALSE;
 }
 
-DSPProcessContext *func_02705ed0(const char *name) {
+DSPProcessContext *DSP_FindProcess(const char *name) {
     DSPProcessContext *context;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     context = sProcessList;
     if (name != NULL) {
         while (context != NULL && STD_CompareString(context->name, name) != 0) {
             context = context->next;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return context;
 }
 
-void func_02705f28(DSPProcessContext *context, int port, const void *src, u32 length) {
+void DSP_WriteProcessPipe(DSPProcessContext *context, int port, const void *src, u32 length) {
     DSPPipe pipe;
-    func_02706d44(&pipe, port, 1);
-    func_02706fcc(&pipe, src, length);
+    DSP_LoadPipe(&pipe, port, 1);
+    DSP_WritePipe(&pipe, src, length);
 }

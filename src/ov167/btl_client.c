@@ -2845,7 +2845,7 @@ static void selItemWork_Quit(BtlClient *client) {
 }
 
 static void shooterWork_Init(BtlClient *client) {
-    sys_memset(client->shooterCost, 0, 3);
+    MI_CpuFill8(client->shooterCost, 0, 3);
 }
 
 static void shooterWork_SetCost(BtlClient *client, u8 index, u8 cost) {

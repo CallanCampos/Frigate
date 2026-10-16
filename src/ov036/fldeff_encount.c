@@ -249,7 +249,7 @@ FieldEffectTask *func_ov036_021a53f8(EncountSystem *system, FieldEffects *effect
     if (effect == NULL) {
         return NULL;
     }
-    sys_memset(&params, 0, sizeof(EncountTaskParams));
+    MI_CpuFill8(&params, 0, sizeof(EncountTaskParams));
     params.system = system;
     params.effect = effect;
     params.actorSys = Field_GetActorSystem(field);

@@ -406,7 +406,7 @@ static void *CryptAlloc(u32 size) {
     if (sAllocator.alloc != NULL) {
         return sAllocator.alloc(size);
     }
-    return malloc_device(0, -1, size);
+    return OS_AllocFromHeap(0, -1, size);
 }
 
 static void CryptFree(void *ptr) {
@@ -414,7 +414,7 @@ static void CryptFree(void *ptr) {
         sAllocator.free(ptr);
         return;
     }
-    free_device(0, -1, ptr);
+    OS_FreeToHeap(0, -1, ptr);
 }
 
 void Crypt_SetAllocator(CryptAllocFunc alloc, CryptFreeFunc free, u32 arg) {
@@ -514,7 +514,7 @@ static void CryptNormalize(BigNum *n) {
 }
 
 static void InitNum(BigNum *n) {
-    sys_memset(n, 0, sizeof(BigNum));
+    MI_CpuFill8(n, 0, sizeof(BigNum));
 }
 
 static BigNum *NewNum(void) {
@@ -543,7 +543,7 @@ static BigNumPool *NewPool(void) {
 }
 
 static void InitPool(BigNumPool *pool) {
-    sys_memset(pool, 0, sizeof(BigNumPool));
+    MI_CpuFill8(pool, 0, sizeof(BigNumPool));
     pool->used = 0;
     pool->flags = 0;
 }
@@ -572,7 +572,7 @@ static BigNum *CryptExpand(BigNum *n, int words) {
             return NULL;
         }
         if (n->digits != NULL) {
-            sys_memcpy(n->digits, digits, n->length * sizeof(u32));
+            MI_CpuCopy8(n->digits, digits, n->length * sizeof(u32));
             CryptFree(n->digits);
         }
         n->digits = digits;
@@ -588,7 +588,7 @@ static BigNum *CryptCopy(BigNum *dest, BigNum *src) {
     if (Reserve(dest, src->length) == NULL) {
         return NULL;
     }
-    sys_memcpy(src->digits, dest->digits, src->length * sizeof(u32));
+    MI_CpuCopy8(src->digits, dest->digits, src->length * sizeof(u32));
     dest->length = src->length;
     if (dest->length == 0 && dest->digits != NULL) {
         dest->digits[0] = 0;
@@ -599,7 +599,7 @@ static BigNum *CryptCopy(BigNum *dest, BigNum *src) {
 
 static void CryptClear(BigNum *n) {
     if (n->digits != NULL) {
-        sys_memset(n->digits, 0, n->capacity * sizeof(u32));
+        MI_CpuFill8(n->digits, 0, n->capacity * sizeof(u32));
     }
     n->length = 0;
     n->negative = 0;
@@ -747,7 +747,7 @@ static BOOL ShiftLeft(BigNum *dest, BigNum *src, int bits) {
             out[words + i] = word << shift;
         }
     }
-    sys_memset(out, 0, words * sizeof(u32));
+    MI_CpuFill8(out, 0, words * sizeof(u32));
     dest->length = src->length + words + 1;
     CryptNormalize(dest);
     return TRUE;
@@ -2158,7 +2158,7 @@ static BOOL ModExpMont(BigNum *dest, BigNum *base, BigNum *exponent, BigNum *mod
         }
     }
     ReadWindow(&cursor, &index, &squarings);
-    sys_memcpy(table[index >> 1], acc, n * sizeof(u32));
+    MI_CpuCopy8(table[index >> 1], acc, n * sizeof(u32));
     while (squarings != 0) {
         if (progress != NULL) {
             int stop = progress->func(progress, 0xff, counter);

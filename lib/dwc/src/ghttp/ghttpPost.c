@@ -682,16 +682,16 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
         state->position = 0;
         if (!connection->post->hasFiles && !connection->post->hasXml) {
             if (first) {
-                func_0207a290(buffer, "%s=", state->item->name);
+                OS_SPrintf(buffer, "%s=", state->item->name);
             } else {
-                func_0207a290(buffer, "&%s=", state->item->name);
+                OS_SPrintf(buffer, "&%s=", state->item->name);
             }
         } else {
             GHIPostItem *item = state->item;
 
             if (item->type == GHI_POST_STRING) {
-                func_0207a290(buffer, "%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n",
-                              first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name);
+                OS_SPrintf(buffer, "%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n",
+                           first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name);
             } else if (item->type == GHI_POST_XML) {
                 if (connection->post->mixed) {
                     int count;
@@ -781,11 +781,11 @@ static int ghiPostStateDoPosting(GHIPostItemState *state, GHIConnection *connect
                         }
                     }
                 } else {
-                    func_0207a290(buffer,
-                                  "%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: "
-                                  "%s\r\n\r\n",
-                                  first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name,
-                                  fileName, contentType);
+                    OS_SPrintf(buffer,
+                               "%sContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\nContent-Type: "
+                               "%s\r\n\r\n",
+                               first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name, fileName,
+                               contentType);
                 }
             }
         }

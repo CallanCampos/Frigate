@@ -10,8 +10,8 @@
 // The maker code of the ROM header that the system puts in the main memory (the TWL ROM header's, at 0x10)
 #define HW_TWL_MAKER_CODE 0x02ffe010
 // The state of the buffer: bit 0 is set while it is set up and can be sent, or has the block that was taken
-// (func_0207c574 sets bits 0 and 1). The flags of the block: bit 1 is set in a block that is left for the next program,
-// bit 0 as well, until the receiver takes the block and clears it
+// (OS_InitDeliverArg sets bits 0 and 1). The flags of the block: bit 1 is set in a block that is left for the next
+// program, bit 0 as well, until the receiver takes the block and clears it
 #define OSi_DELIVER_ARG_STATE_READY 0x1
 #define OSi_DELIVER_ARG_STATE_SET_UP 0x3
 #define OSi_DELIVER_ARG_FLAGS_DELIVERED 0x2
@@ -29,9 +29,9 @@ static struct {
 } OSi_deliverArg;
 
 // Sets the buffer up with an empty list of arguments, leaving reserved bytes of it for something else
-void func_0207c574(OSDeliverArgInfo *info, u32 reserved) {
+void OS_InitDeliverArg(OSDeliverArgInfo *info, u32 reserved) {
     OSi_deliverArg.info = info;
-    sys_memset(info, 0, sizeof(OSDeliverArgInfo));
+    MI_CpuFill8(info, 0, sizeof(OSDeliverArgInfo));
     OSi_deliverArg.state = OSi_DELIVER_ARG_STATE_SET_UP;
     OSi_deliverArg.info->argSpace = sizeof(info->args) - reserved;
     OSi_deliverArg.info->argCount = 0;
@@ -42,7 +42,7 @@ void func_0207c574(OSDeliverArgInfo *info, u32 reserved) {
 
 // Puts the buffer in the block for the next program, with this program's title and maker code, and clears it. Gives -1
 // when the buffer was not set up for it
-int func_0207c5b0(void) {
+int OS_EncodeDeliverArg(void) {
     OSDeliverArgInfo *info;
 
     if (!(OSi_deliverArg.state & OSi_DELIVER_ARG_STATE_READY)) {
@@ -55,15 +55,15 @@ int func_0207c5b0(void) {
     OSi_deliverArgTitleId = OSi_deliverArg.info->titleId;
     OSi_deliverArg.info->crc16 = 0;
     OSi_deliverArg.info->crc16 = GetCRC16(0xffff, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
-    sys_memcpy(OSi_deliverArg.info, (void *)HW_DELIVER_ARG_BUF, sizeof(OSDeliverArgInfo));
-    sys_memset(OSi_deliverArg.info, 0, sizeof(OSDeliverArgInfo));
+    MI_CpuCopy8(OSi_deliverArg.info, (void *)HW_DELIVER_ARG_BUF, sizeof(OSDeliverArgInfo));
+    MI_CpuFill8(OSi_deliverArg.info, 0, sizeof(OSDeliverArgInfo));
     OSi_deliverArg.state = 0;
     return 0;
 }
 
 // Takes the block that the last program left into the buffer, if there is one and its CRC16 is right. Gives -1 when
 // there is no block or no buffer
-int func_0207c624(void) {
+int OS_DecodeDeliverArg(void) {
     u16 crc;
 
     if (!func_0207c6bc()) {
@@ -72,12 +72,12 @@ int func_0207c624(void) {
     if (OSi_deliverArg.info == NULL) {
         return -1;
     }
-    sys_memcpy((void *)HW_DELIVER_ARG_BUF, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
+    MI_CpuCopy8((void *)HW_DELIVER_ARG_BUF, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
     crc = OSi_deliverArg.info->crc16;
     OSi_deliverArg.info->crc16 = 0;
     OSi_deliverArg.info->crc16 = GetCRC16(0xffff, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
     if (crc != OSi_deliverArg.info->crc16) {
-        sys_memset(OSi_deliverArg.info, 0, sizeof(OSDeliverArgInfo));
+        MI_CpuFill8(OSi_deliverArg.info, 0, sizeof(OSDeliverArgInfo));
         func_0207c698();
         return 0;
     }

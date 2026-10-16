@@ -24,12 +24,12 @@ BOOL NNS_SndArcInit(NNSSndArc *arc, const char *filePath, NNSSndHeapHandle heap,
     arc->symbol = NULL;
     arc->loadBlockSize = 0;
 
-    if (!fs_resolve_file(&arc->fileId, filePath)) {
+    if (!FS_ConvertPathToFileID(&arc->fileId, filePath)) {
         return FALSE;
     }
 
-    finit(&arc->file);
-    if (!romfs_fopen_id(&arc->file, arc->fileId)) {
+    FS_InitFile(&arc->file);
+    if (!FS_OpenFileFast(&arc->file, arc->fileId)) {
         return FALSE;
     }
     arc->file_open = TRUE;
@@ -46,10 +46,10 @@ BOOL NNS_SndArcInit(NNSSndArc *arc, const char *filePath, NNSSndHeapHandle heap,
 static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag) {
     s32 readSize;
 
-    if (!romfs_fseek(&arc->file, 0, FS_SEEK_SET)) {
+    if (!FS_SeekFile(&arc->file, 0, FS_SEEK_SET)) {
         return FALSE;
     }
-    readSize = romfs_fread(&arc->file, &arc->header, sizeof(arc->header));
+    readSize = FS_ReadFile(&arc->file, &arc->header, sizeof(arc->header));
     if (readSize != sizeof(arc->header)) {
         return FALSE;
     }
@@ -59,10 +59,10 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
         if (arc->info == NULL) {
             return FALSE;
         }
-        if (!romfs_fseek(&arc->file, arc->header.infoOffset, FS_SEEK_SET)) {
+        if (!FS_SeekFile(&arc->file, arc->header.infoOffset, FS_SEEK_SET)) {
             return FALSE;
         }
-        readSize = romfs_fread(&arc->file, arc->info, arc->header.infoSize);
+        readSize = FS_ReadFile(&arc->file, arc->info, arc->header.infoSize);
         if (readSize != arc->header.infoSize) {
             return FALSE;
         }
@@ -71,10 +71,10 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
         if (arc->fat == NULL) {
             return FALSE;
         }
-        if (!romfs_fseek(&arc->file, arc->header.fatOffset, FS_SEEK_SET)) {
+        if (!FS_SeekFile(&arc->file, arc->header.fatOffset, FS_SEEK_SET)) {
             return FALSE;
         }
-        readSize = romfs_fread(&arc->file, arc->fat, arc->header.fatSize);
+        readSize = FS_ReadFile(&arc->file, arc->fat, arc->header.fatSize);
         if (readSize != arc->header.fatSize) {
             return FALSE;
         }
@@ -84,10 +84,10 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
             if (arc->symbol == NULL) {
                 return FALSE;
             }
-            if (!romfs_fseek(&arc->file, arc->header.symbolDataOffset, FS_SEEK_SET)) {
+            if (!FS_SeekFile(&arc->file, arc->header.symbolDataOffset, FS_SEEK_SET)) {
                 return FALSE;
             }
-            readSize = romfs_fread(&arc->file, arc->symbol, arc->header.symbolDataSize);
+            readSize = FS_ReadFile(&arc->file, arc->symbol, arc->header.symbolDataSize);
             if (readSize != arc->header.symbolDataSize) {
                 return FALSE;
             }
@@ -100,7 +100,7 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
 void NNS_SndArcInitOnMemory(NNSSndArc *arc, void *data) {
     u32 i;
 
-    sys_memcpy32(data, arc, sizeof(arc->header));
+    MIi_CpuCopy32(data, arc, sizeof(arc->header));
 
     arc->info = GetAddress(data, arc->header.infoOffset);
     arc->fat = GetAddress(data, arc->header.fatOffset);
@@ -233,10 +233,10 @@ int NNS_SndArcReadFile(u32 fileId, void *buffer, int size, int offset) {
             break;
         }
 
-        if (!romfs_fseek(&arc->file, fileInfo->offset + offset, FS_SEEK_SET)) {
+        if (!FS_SeekFile(&arc->file, fileInfo->offset + offset, FS_SEEK_SET)) {
             return -1;
         }
-        result = romfs_fread(&arc->file, buffer, len);
+        result = FS_ReadFile(&arc->file, buffer, len);
         if (result < 0) {
             return result;
         }

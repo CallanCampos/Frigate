@@ -77,7 +77,7 @@ static BOOL SubwayMap_Init(GameProc *proc, u32 *state, void *param, void *work) 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_SUBWAY_MAP, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(SubwayMapWork), HEAPID_SUBWAY_MAP);
-    sys_memset(wk, 0, sizeof(SubwayMapWork));
+    MI_CpuFill8(wk, 0, sizeof(SubwayMapWork));
     wk->heapId = HEAPID_SUBWAY_MAP;
     wk->param = param;
     wk->graphic = SubwayMapGraphic_Create(1, wk->heapId);
@@ -91,7 +91,7 @@ static BOOL SubwayMap_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    gfxSetBGModeB(0);
+    GXS_SetGraphicsMode(0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sSubBGSetups); i++) {
         GFL_BGSysCreateBG(sSubBGSetups[i].bg, &sSubBGSetups[i].setup, sSubBGSetups[i].mode);

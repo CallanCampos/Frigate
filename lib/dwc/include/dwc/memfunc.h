@@ -13,19 +13,19 @@ typedef void *(*DWCAllocFunc)(u32 name, u32 size, int align);
 typedef void (*DWCFreeFunc)(u32 name, void *ptr, u32 size);
 
 // Gives the library its allocator and deallocator: DWCi_SetMemFunc
-void func_020586d0(DWCAllocFunc alloc, DWCFreeFunc free);
+void DWCi_SetMemFunc(DWCAllocFunc alloc, DWCFreeFunc free);
 // Allocates a block of size bytes, aligned to 32: DWC_Alloc
-void *func_020586e4(u32 name, u32 size);
+void *DWC_Alloc(u32 name, u32 size);
 // The same with an alignment: DWC_AllocEx. Returns NULL if the allocator has no memory
-void *func_020586f4(u32 name, u32 size, int align);
+void *DWC_AllocEx(u32 name, u32 size, int align);
 // Frees a block that DWC_Alloc or DWC_AllocEx gave, NULL included. The third argument, the block's size in the SDK, is
 // not used: DWC_Free
-void func_02058728(u32 name, void *ptr, u32 size);
+void DWC_Free(u32 name, void *ptr, u32 size);
 
 // The allocator that the library hands to GameSpy, which all use the name 9: malloc, realloc, free and memalign
-void *func_020587e4(u32 size);
-void *func_020587f8(void *ptr, u32 size);
-void func_02058814(void *ptr);
-void *func_0205882c(u32 align, u32 size);
+void *DWCi_GsAlloc(u32 size);
+void *DWCi_GsRealloc(void *ptr, u32 size);
+void DWCi_GsFree(void *ptr);
+void *DWCi_GsMemalign(u32 align, u32 size);
 
 #endif // POKEBW2_DWC_MEMFUNC_H

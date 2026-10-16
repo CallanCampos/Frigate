@@ -7,7 +7,8 @@
 #include "nitro/os.h"
 
 // Puts the banks of a mask in LCDC mode
-static void gfxSetLCDCBanksCore(u32 banks) {
+// swan's gfxSetLCDCBanksCore
+static void GX_VRAMCNT_SetLCDC_(u32 banks) {
     if (banks & GX_VRAM_A) {
         reg_GX_VRAMCNT_A = GX_VRAMCNT_LCDC;
     }
@@ -43,7 +44,7 @@ static void gfxSetLCDCBanksCore(u32 banks) {
 // texture palette, 4 BG extended palette, and 5 OBJ extended palette for F and G; H: 1 sub BG, 2 sub BG extended
 // palette; I: 1 sub BG, 2 sub OBJ, 3 sub OBJ extended palette) and with the offset, which is the bank's place among
 // the banks of its use. A case of several banks sets the last one and falls into the case of the others
-void gfxSetBGBanksA(GXVRamBG banks) {
+void GX_SetBankForBG(GXVRamBG banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.bg) & ~banks;
     gGXState.bg = banks;
     switch (banks) {
@@ -120,10 +121,10 @@ void gfxSetBGBanksA(GXVRamBG banks) {
         reg_GX_VRAMCNT_G = GX_VRAMCNT(1, 0);
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetObjBanksA(GXVRamOBJ banks) {
+void GX_SetBankForOBJ(GXVRamOBJ banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.obj) & ~banks;
     gGXState.obj = banks;
     switch (banks) {
@@ -161,10 +162,10 @@ void gfxSetObjBanksA(GXVRamOBJ banks) {
     case GX_VRAM_OBJ_NONE:
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetBGExtPltBanksA(GXVRamBGExtPltt banks) {
+void GX_SetBankForBGExtPltt(GXVRamBGExtPltt banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.bgExtPltt) & ~banks;
     gGXState.bgExtPltt = banks;
     switch (banks) {
@@ -187,10 +188,10 @@ void gfxSetBGExtPltBanksA(GXVRamBGExtPltt banks) {
         reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetObjExtPltBanksA(GXVRamOBJExtPltt banks) {
+void GX_SetBankForOBJExtPltt(GXVRamOBJExtPltt banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.objExtPltt) & ~banks;
     gGXState.objExtPltt = banks;
     switch (banks) {
@@ -206,10 +207,10 @@ void gfxSetObjExtPltBanksA(GXVRamOBJExtPltt banks) {
         reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetTextureBanks(GXVRamTex banks) {
+void GX_SetBankForTex(GXVRamTex banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.tex) & ~banks;
     gGXState.tex = banks;
     if (banks == GX_VRAM_TEX_NONE) {
@@ -272,10 +273,10 @@ void gfxSetTextureBanks(GXVRamTex banks) {
             break;
         }
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetPaletteBanks(GXVRamTexPltt banks) {
+void GX_SetBankForTexPltt(GXVRamTexPltt banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.texPltt) & ~banks;
     gGXState.texPltt = banks;
     switch (banks) {
@@ -300,10 +301,10 @@ void gfxSetPaletteBanks(GXVRamTexPltt banks) {
     case GX_VRAM_TEXPLTT_NONE:
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetRearPlaneImageBanks(GXVRamClearImage banks) {
+void GX_SetBankForClearImage(GXVRamClearImage banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.clrImg) & ~banks;
     gGXState.clrImg = banks;
     switch (banks) {
@@ -333,10 +334,10 @@ void gfxSetRearPlaneImageBanks(GXVRamClearImage banks) {
         reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_CLRIMG_MASK;
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetPlainARM7Banks(GXVRamARM7 banks) {
+void GX_SetBankForARM7(GXVRamARM7 banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.arm7) & ~banks;
     gGXState.arm7 = banks;
     switch (banks) {
@@ -353,15 +354,15 @@ void gfxSetPlainARM7Banks(GXVRamARM7 banks) {
     case GX_VRAM_ARM7_NONE:
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetLCDCBanks(u32 banks) {
+void GX_SetBankForLCDC(u32 banks) {
     gGXState.lcdc |= banks;
-    gfxSetLCDCBanksCore(banks);
+    GX_VRAMCNT_SetLCDC_(banks);
 }
 
-void gfxSetBGBanksB(GXVRamSubBG banks) {
+void GX_SetBankForSubBG(GXVRamSubBG banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.subBg) & ~banks;
     gGXState.subBg = banks;
     switch (banks) {
@@ -377,10 +378,10 @@ void gfxSetBGBanksB(GXVRamSubBG banks) {
     case GX_VRAM_SUB_BG_NONE:
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetObjBanksB(GXVRamSubOBJ banks) {
+void GX_SetBankForSubOBJ(GXVRamSubOBJ banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.subObj) & ~banks;
     gGXState.subObj = banks;
     switch (banks) {
@@ -393,10 +394,10 @@ void gfxSetObjBanksB(GXVRamSubOBJ banks) {
     case GX_VRAM_SUB_OBJ_NONE:
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetBGExtPltBanksB(GXVRamSubBGExtPltt banks) {
+void GX_SetBankForSubBGExtPltt(GXVRamSubBGExtPltt banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.subBgExtPltt) & ~banks;
     gGXState.subBgExtPltt = banks;
     switch (banks) {
@@ -408,10 +409,10 @@ void gfxSetBGExtPltBanksB(GXVRamSubBGExtPltt banks) {
         reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void gfxSetObjExtPltBanksB(GXVRamSubOBJExtPltt banks) {
+void GX_SetBankForSubOBJExtPltt(GXVRamSubOBJExtPltt banks) {
     gGXState.lcdc = (gGXState.lcdc | gGXState.subObjExtPltt) & ~banks;
     gGXState.subObjExtPltt = banks;
     switch (banks) {
@@ -423,68 +424,70 @@ void gfxSetObjExtPltBanksB(GXVRamSubOBJExtPltt banks) {
         reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
         break;
     }
-    gfxSetLCDCBanksCore(gGXState.lcdc);
+    GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
 // Takes the banks that a use has, which go to LCDC mode, and returns them
-static u32 gfxAcquireBanksForLCDC(u16 *banks) {
+// swan's gfxAcquireBanksForLCDC
+static u32 resetBankForX_(u16 *banks) {
     u32 acquired = *banks;
     *banks = 0;
     gGXState.lcdc |= acquired;
-    gfxSetLCDCBanksCore(acquired);
+    GX_VRAMCNT_SetLCDC_(acquired);
     return acquired;
 }
 
-u32 gfxAcquireBGBanksA(void) {
-    return gfxAcquireBanksForLCDC(&gGXState.bg);
+u32 GX_ResetBankForBG(void) {
+    return resetBankForX_(&gGXState.bg);
 }
 
-u32 gfxAcquireObjBanksA(void) {
-    return gfxAcquireBanksForLCDC(&gGXState.obj);
+u32 GX_ResetBankForOBJ(void) {
+    return resetBankForX_(&gGXState.obj);
 }
 
-GXVRamBGExtPltt gfxAcquireBGExtPltBanksA(void) {
+GXVRamBGExtPltt GX_ResetBankForBGExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
-    return (GXVRamBGExtPltt)gfxAcquireBanksForLCDC(&gGXState.bgExtPltt);
+    return (GXVRamBGExtPltt)resetBankForX_(&gGXState.bgExtPltt);
 }
 
-GXVRamOBJExtPltt gfxAcquireObjExtPltBanksA(void) {
+GXVRamOBJExtPltt GX_ResetBankForOBJExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
-    return (GXVRamOBJExtPltt)gfxAcquireBanksForLCDC(&gGXState.objExtPltt);
+    return (GXVRamOBJExtPltt)resetBankForX_(&gGXState.objExtPltt);
 }
 
-u32 gfxAcquireTextureBanks(void) {
-    return gfxAcquireBanksForLCDC(&gGXState.tex);
+u32 GX_ResetBankForTex(void) {
+    return resetBankForX_(&gGXState.tex);
 }
 
-GXVRamTexPltt gfxAcquirePaletteBanks(void) {
-    return (GXVRamTexPltt)gfxAcquireBanksForLCDC(&gGXState.texPltt);
+GXVRamTexPltt GX_ResetBankForTexPltt(void) {
+    return (GXVRamTexPltt)resetBankForX_(&gGXState.texPltt);
 }
 
-u32 gfxAcquireRearPlaneImageBanks(void) {
-    return gfxAcquireBanksForLCDC(&gGXState.clrImg);
+u32 GX_ResetBankForClearImage(void) {
+    return resetBankForX_(&gGXState.clrImg);
 }
 
-u32 gfxAcquireBGBanksB(void) {
-    return gfxAcquireBanksForLCDC(&gGXState.subBg);
+u32 GX_ResetBankForSubBG(void) {
+    return resetBankForX_(&gGXState.subBg);
 }
 
-u32 gfxAcquireObjBanksB(void) {
-    return gfxAcquireBanksForLCDC(&gGXState.subObj);
+u32 GX_ResetBankForSubOBJ(void) {
+    return resetBankForX_(&gGXState.subObj);
 }
 
-u32 gfxAcquireBGExtPltBanksB(void) {
+u32 GX_ResetBankForSubBGExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
-    return gfxAcquireBanksForLCDC(&gGXState.subBgExtPltt);
+    return resetBankForX_(&gGXState.subBgExtPltt);
 }
 
-u32 gfxAcquireObjExtPltBanksB(void) {
+u32 GX_ResetBankForSubOBJExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
-    return gfxAcquireBanksForLCDC(&gGXState.subObjExtPltt);
+    return resetBankForX_(&gGXState.subObjExtPltt);
 }
 
 // Turns off the banks that a use has, and unlocks them for the lock ID that GX_Init took
-static u32 gfxDisableQueuedBanks(u16 *banks) {
+// swan's gfxDisableQueuedBanks
+static u32 disableBankForX_(u16 *banks) {
     u32 disabled = *banks;
     *banks = 0;
     if (disabled & GX_VRAM_A) {
@@ -514,86 +517,86 @@ static u32 gfxDisableQueuedBanks(u16 *banks) {
     if (disabled & GX_VRAM_I) {
         reg_GX_VRAMCNT_I = 0;
     }
-    func_0207c51c(disabled, g_GfxCartLock);
+    OSi_UnlockVram(disabled, GXi_VRamLockId);
     return disabled;
 }
 
-void gfxDisableBGBanksA(void) {
-    gfxDisableQueuedBanks(&gGXState.bg);
+void GX_DisableBankForBG(void) {
+    disableBankForX_(&gGXState.bg);
 }
 
-void gfxDisableObjBanksA(void) {
-    gfxDisableQueuedBanks(&gGXState.obj);
+void GX_DisableBankForOBJ(void) {
+    disableBankForX_(&gGXState.obj);
 }
 
-void gfxDisableBGExtPltBanksA(void) {
+void GX_DisableBankForBGExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
-    gfxDisableQueuedBanks(&gGXState.bgExtPltt);
+    disableBankForX_(&gGXState.bgExtPltt);
 }
 
-void gfxDisableObjExtPltBanksA(void) {
+void GX_DisableBankForOBJExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
-    gfxDisableQueuedBanks(&gGXState.objExtPltt);
+    disableBankForX_(&gGXState.objExtPltt);
 }
 
-void gfxDisableTextureBanks(void) {
-    gfxDisableQueuedBanks(&gGXState.tex);
+void GX_DisableBankForTex(void) {
+    disableBankForX_(&gGXState.tex);
 }
 
-void gfxDisablePaletteBanks(void) {
-    gfxDisableQueuedBanks(&gGXState.texPltt);
+void GX_DisableBankForTexPltt(void) {
+    disableBankForX_(&gGXState.texPltt);
 }
 
-void gfxDisableRearPlaneImageBanks(void) {
-    gfxDisableQueuedBanks(&gGXState.clrImg);
+void GX_DisableBankForClearImage(void) {
+    disableBankForX_(&gGXState.clrImg);
 }
 
-void gfxDisablePlainARM7Banks(void) {
-    gfxDisableQueuedBanks(&gGXState.arm7);
+void GX_DisableBankForARM7(void) {
+    disableBankForX_(&gGXState.arm7);
 }
 
-void gfxDisableLCDCBanks(void) {
-    gfxDisableQueuedBanks(&gGXState.lcdc);
+void GX_DisableBankForLCDC(void) {
+    disableBankForX_(&gGXState.lcdc);
 }
 
-void gfxDisableBGBanksB(void) {
-    gfxDisableQueuedBanks(&gGXState.subBg);
+void GX_DisableBankForSubBG(void) {
+    disableBankForX_(&gGXState.subBg);
 }
 
-void gfxDisableObjBanksB(void) {
-    gfxDisableQueuedBanks(&gGXState.subObj);
+void GX_DisableBankForSubOBJ(void) {
+    disableBankForX_(&gGXState.subObj);
 }
 
-void gfxDisableBGExtPltBanksB(void) {
+void GX_DisableBankForSubBGExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
-    gfxDisableQueuedBanks(&gGXState.subBgExtPltt);
+    disableBankForX_(&gGXState.subBgExtPltt);
 }
 
-void gfxDisableObjExtPltBanksB(void) {
+void GX_DisableBankForSubOBJExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
-    gfxDisableQueuedBanks(&gGXState.subObjExtPltt);
+    disableBankForX_(&gGXState.subObjExtPltt);
 }
 
-u16 gfxGetObjBanksA(void) {
+u16 GX_GetBankForOBJ(void) {
     return gGXState.obj;
 }
 
-u32 gfxGetObjExtPltBanksA(void) {
+u32 GX_GetBankForOBJExtPltt(void) {
     return gGXState.objExtPltt;
 }
 
-u32 gfxGetTextureBanks(void) {
+u32 GX_GetBankForTex(void) {
     return gGXState.tex;
 }
 
-u32 gfxGetLCDCBanks(void) {
+u32 GX_GetBankForLCDC(void) {
     return gGXState.lcdc;
 }
 
-u16 gfxGetObjBanksB(void) {
+u16 GX_GetBankForSubOBJ(void) {
     return gGXState.subObj;
 }
 
-u32 gfxGetObjExtPltBanksB(void) {
+u32 GX_GetBankForSubOBJExtPltt(void) {
     return gGXState.subObjExtPltt;
 }

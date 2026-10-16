@@ -156,7 +156,7 @@ BOOL VCT_InitAudio(void) {
     VCTCodec codec;
     const u8 *frameSize;
 
-    sAudio.sequence = func_0207bb84();
+    sAudio.sequence = OS_GetTickLo();
     sVadEnabled = TRUE;
     sAudio.sessionCount = 0;
     sAudio.activeMask = 0;
@@ -218,7 +218,7 @@ BOOL VCT_AttachSession(VCTSession *session) {
     }
     if (sAudio.sessionCount == 1) {
         VCT_ResetCapture();
-        sAudio.sequence = func_0207bb84();
+        sAudio.sequence = OS_GetTickLo();
         sAudio.adpcmState.predictor = 0;
         sAudio.adpcmState.stepIndex = 0;
         sAudio.resync = TRUE;
@@ -277,13 +277,13 @@ BOOL VCT_SubmitSamples(void *samples, int size) {
     packet = (sSendQueue.writeIndex & 1) ? &sSendQueue.frames[0] : &sSendQueue.frames[1];
     packet->magic = VCT_PACKET_MAGIC;
     if (sAudio.codec >= VCT_CODEC_ADPCM2) {
-        sys_memcpy32_fast(samples, &packet->payload[4], size);
+        MIi_CpuCopyFast(samples, &packet->payload[4], size);
     } else {
-        sys_memcpy32_fast(samples, packet->payload, size);
+        MIi_CpuCopyFast(samples, packet->payload, size);
     }
     packet->type = VCT_TYPE_VOICE;
     packet->sequence = sAudio.sequence++;
-    packet->timestamp = (u32)(clock() / 64);
+    packet->timestamp = (u32)(OS_GetTick() / 64);
     sSendQueue.writeIndex++;
     return TRUE;
 }
@@ -298,7 +298,7 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
 
     count = GetQueueCount(slot);
     while (count != 0) {
-        now = clock();
+        now = OS_GetTick();
         packet = PeekQueue(slot);
 
         if (packet == NULL) {
@@ -309,7 +309,7 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
             more = FALSE;
             if (packet->silence == 0 && receiver->held != NULL) {
                 receiver->playedCount++;
-                sys_memcpy32_fast(receiver->held->data, dst, size);
+                MIi_CpuCopyFast(receiver->held->data, dst, size);
                 VCT_FreePacket(receiver->held);
                 receiver->held = NULL;
                 if (heardMask != NULL) {
@@ -344,7 +344,7 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
                 receiver->lastDelay = delay;
                 receiver->avgDelayCopy = smoothed;
                 receiver->avgDelay = smoothed;
-                sys_memcpy32_fast(packet->data, dst, size);
+                MIi_CpuCopyFast(packet->data, dst, size);
                 SetHeld(receiver, packet);
                 if (heardMask != NULL) {
                     *heardMask |= 1 << packet->aid;
@@ -390,11 +390,11 @@ BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask) {
                 }
             }
         } else {
-            sys_memset32_fast(0, dst, size);
+            MIi_CpuClearFast(0, dst, size);
         }
     } else {
         heard = FALSE;
-        sys_memset32_fast(0, dst, size);
+        MIi_CpuClearFast(0, dst, size);
     }
     if (sAudio.echoCancel) {
         VCT_SaveFarEnd(dst, size);
@@ -561,7 +561,7 @@ BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now) {
     }
     dataSize = size - 0xc;
     data = (u8 *)queued->samples + sizeof(queued->samples) - dataSize;
-    sys_memcpy(packet->payload, data, dataSize);
+    MI_CpuCopy8(packet->payload, data, dataSize);
     queued->slot = receiver->slot;
     queued->codec = codec;
     queued->data = data;
@@ -590,7 +590,7 @@ int VCT_DecodeReceived(void) {
     if (first == NULL) {
         return 0;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     slot = first->slot;
     count = GetActiveCount(slot);
     for (i = 0; i < count; i++) {
@@ -609,7 +609,7 @@ int VCT_DecodeReceived(void) {
             VCT_FreePacket(packet);
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return count;
 }
 
@@ -651,7 +651,7 @@ BOOL VCT_SendPending(void) {
 }
 
 static void ResetActiveList(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int i;
 
     sActiveList.tail = NULL;
@@ -659,12 +659,12 @@ static void ResetActiveList(void) {
     for (i = 0; i < VCT_SLOT_MAX; i++) {
         sActiveCounts[i] = 0;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Frees the packets in the order of arrival that belong to a slot
 static void FreeActiveOfSlot(int slot) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     VCTPacket *packet;
 
     for (packet = FindActiveBySlot(slot); packet != NULL; packet = FindActiveBySlot(slot)) {
@@ -672,11 +672,11 @@ static void FreeActiveOfSlot(int slot) {
         VCT_FreePacket(packet);
     }
     sActiveCounts[slot] = 0;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static void FreeAllActive(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     VCTPacket *packet = sActiveList.head;
     int i;
 
@@ -691,11 +691,11 @@ static void FreeAllActive(void) {
     for (i = 0; i < VCT_SLOT_MAX; i++) {
         sActiveCounts[i] = 0;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static int AppendActive(VCTPacket *packet) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sActiveList.head == NULL) {
         sActiveList.head = packet;
@@ -709,7 +709,7 @@ static int AppendActive(VCTPacket *packet) {
         sActiveList.tail = packet;
     }
     sActiveCounts[packet->slot]++;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return sActiveCounts[packet->slot];
 }
 
@@ -723,20 +723,20 @@ static int GetActiveCount(int slot) {
 
 static VCTPacket *FindActiveBySlot(int slot) {
     VCTPacket *packet = sActiveList.head;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     for (; packet != NULL; packet = packet->next) {
         if (packet->slot == slot) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return packet;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return NULL;
 }
 
 static int RemoveActive(VCTPacket *packet) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (packet->prev != NULL) {
         packet->prev->next = packet->next;
@@ -755,7 +755,7 @@ static int RemoveActive(VCTPacket *packet) {
         }
     }
     sActiveCounts[packet->slot]--;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return sActiveCounts[packet->slot];
 }
 
@@ -820,16 +820,16 @@ static void DecodePcm8(s8 *src, s16 *dst, u32 count) {
 }
 
 static void ClearSlotQueues(int slot) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     sQueueTails[slot] = NULL;
     sQueueHeads[slot] = NULL;
     sQueueCounts[slot] = 0;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static void FlushSlotQueue(int slot) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     VCTPacket *packet = sQueueHeads[slot];
 
     while (packet != NULL) {
@@ -844,11 +844,11 @@ static void FlushSlotQueue(int slot) {
     }
     sQueueTails[slot] = NULL;
     sQueueCounts[slot] = 0;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 static void FlushAllQueues(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
@@ -867,7 +867,7 @@ static void FlushAllQueues(void) {
         sQueueTails[slot] = NULL;
         sQueueCounts[slot] = 0;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Puts a packet in a slot's queue before the packets with higher sequence numbers
@@ -881,7 +881,7 @@ static int InsertSorted(VCTPacket *packet, u32 slot) {
     if (slot >= VCT_SLOT_MAX) {
         return -1;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     if (sQueueHeads[slot] == NULL) {
         sQueueHeads[slot] = packet;
         packet->prev = NULL;
@@ -909,23 +909,23 @@ static int InsertSorted(VCTPacket *packet, u32 slot) {
     }
 inserted:
     sQueueCounts[slot]++;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return sQueueCounts[slot];
 }
 
 static VCTPacket *PeekQueue(int slot) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sQueueHeads[slot] != NULL) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return sQueueHeads[slot];
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return NULL;
 }
 
 static int PopQueue(int slot) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sQueueHeads[slot] != NULL) {
         VCTPacket *next = sQueueHeads[slot]->next;
@@ -938,7 +938,7 @@ static int PopQueue(int slot) {
             sQueueTails[slot] = NULL;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return sQueueCounts[slot];
 }
 
@@ -947,7 +947,7 @@ static int GetQueueCount(int slot) {
 }
 
 static void InitReceiver(VCTReceiver *receiver, int slot, int aid) {
-    sys_memset(receiver, 0, 0x28);
+    MI_CpuFill8(receiver, 0, 0x28);
     receiver->playoutDelay = 0x134df;
     receiver->lastDelay = 0;
     receiver->avgDelayCopy = 0;
@@ -1093,7 +1093,7 @@ static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
     }
     playTime = (u64)tickDelta + receiver->firstArrival + receiver->playoutDelay;
     packet->playTime = playTime;
-    now = clock();
+    now = OS_GetTick();
     if (packet->playTime + 0x8b18 < now) {
         return FALSE;
     }

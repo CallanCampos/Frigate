@@ -9,8 +9,8 @@ void VM_Reset(VM *vm) {
     vm->state = VM_STATE_STOPPED;
     vm->native = NULL;
     vm->stackPos = 0;
-    sys_memset(vm->stack, 0, vm->param.stackSize * sizeof(u32));
-    sys_memset(vm->work, 0, vm->param.workSize * sizeof(u32));
+    MI_CpuFill8(vm->stack, 0, vm->param.stackSize * sizeof(u32));
+    MI_CpuFill8(vm->work, 0, vm->param.workSize * sizeof(u32));
     vm->verifier = NULL;
     vm->verifierArg = NULL;
 }
@@ -19,7 +19,7 @@ VM *VM_Create(HeapID heapId, const VMInitParam *param) {
     u32 size = sizeof(VM) + param->workSize * sizeof(u32) + param->stackSize * sizeof(u32);
     VM *vm = GFL_HeapAllocate(heapId, size, FALSE, "vm.c", 96);
 
-    sys_memset(vm, 0, size);
+    MI_CpuFill8(vm, 0, size);
     vm->param = *param;
     vm->work = (u32 *)(vm + 1);
     vm->stack = vm->work + param->workSize;

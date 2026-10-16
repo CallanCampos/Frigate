@@ -62,7 +62,7 @@ static BOOL Manual_Init(GameProc *proc, u32 *state, void *param, void *data) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MANUAL, 0x50000);
     work = GFL_ProcInitSubsystem(proc, sizeof(Manual), HEAPID_MANUAL);
-    sys_memset(work, 0, sizeof(Manual));
+    MI_CpuFill8(work, 0, sizeof(Manual));
     work->heapId = HEAPID_MANUAL;
     work->param = param;
     work->param->result = MANUAL_RESULT_RETURN;

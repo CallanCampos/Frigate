@@ -9,24 +9,24 @@
 #include "nitro/os.h"
 #include "nitrowifi/wcm.h"
 
-static u8 func_020598f4(DWCAcSearchWork *work);
-static u8 func_02059a00(DWCAcSearchWork *work);
-static u8 func_02059b64(DWCAcSearchWork *work);
-static u32 func_02059d08(const DWCAcSearchWork *work);
-static u32 func_02059d28(const DWCAcSearchWork *work);
-static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc);
+static u8 DWCAc_SettleKey(DWCAcSearchWork *work);
+static u8 DWCAc_ConnectCandidate(DWCAcSearchWork *work);
+static u8 DWCAc_FindCandidateTarget(DWCAcSearchWork *work);
+static u32 DWCAc_GetPowerOption(const DWCAcSearchWork *work);
+static u32 DWCAc_GetAuthOption(const DWCAcSearchWork *work);
+static BOOL DWCAc_MakeKey(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc);
 
 // Runs the state at hand if it is 7 or 8, and returns the state that follows
-u8 func_020598b4(void) {
-    u8 state = func_0205a83c();
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+u8 DWCAc_StepConnect(void) {
+    u8 state = DWCAc_GetState();
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     switch (state) {
     case 7:
-        state = func_020598f4(work);
+        state = DWCAc_SettleKey(work);
         break;
     case 8:
-        state = func_02059a00(work);
+        state = DWCAc_ConnectCandidate(work);
         break;
     }
     return state;
@@ -37,12 +37,12 @@ u8 func_020598b4(void) {
 // key and an open one does not, and a key makes the first try authenticate with the shared key. The candidate that does
 // not fit gets the result "wrong key" and the search goes on to the next (state 9). An NWCUSBAP whose SSID has a zero
 // at its tenth byte is passed over too, for a reason that the code does not show
-static u8 func_020598f4(DWCAcSearchWork *work) {
+static u8 DWCAc_SettleKey(DWCAcSearchWork *work) {
     WMBssDesc *bss = &work->candidates[work->selected];
 
-    work->kind = func_02059b64(work);
-    sys_memset(&work->keyDesc, 0, sizeof(work->keyDesc));
-    if (func_02059d48(work, work->kind, &work->keyDesc)) {
+    work->kind = DWCAc_FindCandidateTarget(work);
+    MI_CpuFill8(&work->keyDesc, 0, sizeof(work->keyDesc));
+    if (DWCAc_MakeKey(work, work->kind, &work->keyDesc)) {
         work->sharedKey = 1;
         if (!((bss->capaInfo >> 4) & 1)) {
             work->infos[work->selected].unk_00 = DWC_AC_RESULT_WRONG_KEY;
@@ -69,13 +69,13 @@ static u8 func_020598f4(DWCAcSearchWork *work) {
 // (failureReason): a refused authentication algorithm drops the shared key for an open authentication, a wrong key or a
 // full access point ends the candidate. When the connection is up it is state 10; when the wireless manager is in
 // trouble, the error is noted and the teardown, state 17, begins
-static u8 func_02059a00(DWCAcSearchWork *work) {
+static u8 DWCAc_ConnectCandidate(DWCAcSearchWork *work) {
     s32 state = WCM_GetState();
     WMBssDesc *bss = &work->candidates[work->selected];
     u32 option;
 
     if (state == 3) {
-        option = func_02059d08(work);
+        option = DWCAc_GetPowerOption(work);
         if (++work->attempts > 3) {
             work->attempts = 0;
             work->infos[work->selected].unk_00 = DWC_AC_RESULT_GAVE_UP;
@@ -96,16 +96,16 @@ static u8 func_02059a00(DWCAcSearchWork *work) {
                 work->sharedKey = 0;
             }
         }
-        WCM_ConnectAsync(bss, &work->keyDesc, option | func_02059d28(work));
+        WCM_ConnectAsync(bss, &work->keyDesc, option | DWCAc_GetAuthOption(work));
     } else if (state == 9) {
         work->attempts = 0;
-        work->connectedTime = clock();
+        work->connectedTime = OS_GetTick();
         return 10;
     } else if (state == 11) {
-        func_0205a85c(0);
+        DWCAc_SetError(0);
         return 17;
     } else if (state > 11) {
-        func_0205a85c(4);
+        DWCAc_SetError(4);
         return 17;
     }
     return 8;
@@ -114,23 +114,23 @@ static u8 func_02059a00(DWCAcSearchWork *work) {
 // Finds which target the candidate at hand is: an access point told by its SSID (NWCUSBAP, NDWCSHAP, FREESPOT), or the
 // first target with the same SSID. When several targets have it, the first is taken and the others are marked, and
 // the candidate is visited again for each of them. The id of the target, or 0
-static u8 func_02059b64(DWCAcSearchWork *work) {
+static u8 DWCAc_FindCandidateTarget(DWCAcSearchWork *work) {
     WMBssDesc *bss = &work->candidates[work->selected];
     int id = 0;
     int i;
     int matches = 0;
-    u8 count = func_0205b9ac();
+    u8 count = DWCAc_CountTargets();
 
     if (!work->sameSsid) {
         if (bss->ssidLength == 0x20) {
-            id = func_02059028(bss);
+            id = DWCAc_GetSpecialApId(bss);
             if (id > 0) {
                 matches++;
             } else {
                 id = 0;
             }
         } else if (bss->ssidLength == 8) {
-            id = func_0205b958(bss);
+            id = DWCAc_GetFreeSpotId(bss);
             if (id != 0) {
                 matches++;
             } else {
@@ -168,12 +168,12 @@ static u8 func_02059b64(DWCAcSearchWork *work) {
 
 // The authentication and power saving of the connection, as the option of WCM_ConnectAsync: with the radio always on,
 // or saving power
-static u32 func_02059d08(const DWCAcSearchWork *work) {
+static u32 DWCAc_GetPowerOption(const DWCAcSearchWork *work) {
     return work->radioOn == 1 ? WCM_OPTION_POWER_ACTIVE : WCM_OPTION_POWER_SAVE;
 }
 
 // and with a shared key, or open
-static u32 func_02059d28(const DWCAcSearchWork *work) {
+static u32 DWCAc_GetAuthOption(const DWCAcSearchWork *work) {
     return work->sharedKey == 1 ? WCM_OPTION_AUTH_SHARED : WCM_OPTION_AUTH_OPEN;
 }
 
@@ -182,7 +182,7 @@ static u32 func_02059d28(const DWCAcSearchWork *work) {
 // of 40 bits, 12 to 14 their WPA key with the mode 4 and 15 to 17 the other one with the mode 6, then NWCUSBAP and
 // NDWCSHAP, whose key comes from the SSID. FREESPOT has none. TRUE if there is a key (the mode is not 0). The cases of
 // a group fall through, one setting further on for each, to the one that the group starts with
-static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
+static BOOL DWCAc_MakeKey(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
     const DWCAcDsSetting *ds = work->dsSettings;
     const DWCAcDsiSetting *dsi = work->dsiSettings;
 
@@ -193,7 +193,7 @@ static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
         ds++;
     case 0:
         desc->mode = ds->wepMode;
-        sys_memcpy(ds->wepKey, desc->key, 16);
+        MI_CpuCopy8(ds->wepKey, desc->key, 16);
         break;
     case 5:
         ds++;
@@ -201,7 +201,7 @@ static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
         ds++;
     case 3:
         desc->mode = 1;
-        sys_memcpy(ds->wepKey40, desc->key, 5);
+        MI_CpuCopy8(ds->wepKey40, desc->key, 5);
         break;
     case 8:
         dsi++;
@@ -211,11 +211,11 @@ static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
         if (dsi->base.security == 0x10 || dsi->base.security == 0x12 || dsi->base.security == 0x13) {
             desc->mode = dsi->wcmMode;
             desc->length = 32;
-            sys_memcpy(dsi->wpaKey, desc->key, 32);
+            MI_CpuCopy8(dsi->wpaKey, desc->key, 32);
             desc->key[32] = 0;
         } else {
             desc->mode = dsi->base.wepMode;
-            sys_memcpy(dsi->base.wepKey, desc->key, 16);
+            MI_CpuCopy8(dsi->base.wepKey, desc->key, 16);
         }
         break;
     case 11:
@@ -224,7 +224,7 @@ static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
         dsi++;
     case 9:
         desc->mode = 1;
-        sys_memcpy(dsi->base.wepKey40, desc->key, 5);
+        MI_CpuCopy8(dsi->base.wepKey40, desc->key, 5);
         break;
     case 14:
         dsi++;
@@ -233,7 +233,7 @@ static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
     case 12:
         desc->mode = 4;
         desc->length = 32;
-        sys_memcpy(dsi->wpaKey, desc->key, 32);
+        MI_CpuCopy8(dsi->wpaKey, desc->key, 32);
         desc->key[32] = 0;
         break;
     case 17:
@@ -243,16 +243,16 @@ static BOOL func_02059d48(DWCAcSearchWork *work, u8 id, DWCAcKeyDesc *desc) {
     case 15:
         desc->mode = 6;
         desc->length = 32;
-        sys_memcpy(dsi->wpaKey2, desc->key, 32);
+        MI_CpuCopy8(dsi->wpaKey2, desc->key, 32);
         desc->key[32] = 0;
         break;
     case DWC_AC_ID_NWCUSBAP:
         desc->mode = 2;
-        func_0205d098(work->candidates[work->selected].ssid, desc->key);
+        DWCAc_MakeNwcUsbApKey(work->candidates[work->selected].ssid, desc->key);
         break;
     case DWC_AC_ID_NDWCSHAP:
         desc->mode = 2;
-        func_0205cfbc(work->candidates[work->selected].ssid, desc->key);
+        DWCAc_MakeNdwcShapKey(work->candidates[work->selected].ssid, desc->key);
         break;
     case DWC_AC_ID_FREESPOT:
         break;

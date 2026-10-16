@@ -311,7 +311,7 @@ u8 func_02013cf0(GameBeacon *beacon);
 // The sender's C-Gear record
 void GameBeacon_GetCGearRecord(const GameBeacon *beacon, PMSData *dest);
 u8 GameBeacon_GetSurveyRank(const GameBeacon *beacon);
-// The color of func_0207c3b4's table that the sender's favorite color is shown in
+// The color of OS_GetFavoriteColorTable's table that the sender's favorite color is shown in
 void func_02013d38(u16 *dest, const GameBeacon *beacon);
 u8 GameBeacon_GetFavoriteColor(const GameBeacon *beacon);
 u16 GameBeacon_GetTrainerId(const GameBeacon *beacon);

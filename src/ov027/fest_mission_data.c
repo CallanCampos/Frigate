@@ -60,7 +60,7 @@ void func_ov027_02170b98(ArcTool *arc, u8 index, u32 level, FestMission *mission
     FestMissionData data;
     FestMissionParams *params;
 
-    sys_memset(mission, 0, sizeof(FestMission));
+    MI_CpuFill8(mission, 0, sizeof(FestMission));
     func_ov027_02170b24(arc, index, &data);
     params = &data.params;
     mission->index = index;

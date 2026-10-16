@@ -85,7 +85,7 @@ static FatfsState sFatfs;
 static void func_027040b4(FatfsRequest *request) {
     u32 addr = (u32)request;
 
-    cp15_flushDC(request, FATFS_REQUEST_SIZE);
+    DC_FlushRange(request, FATFS_REQUEST_SIZE);
     addr >>= 5;
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_FATFS, addr, FALSE) < 0) {
     }
@@ -93,7 +93,7 @@ static void func_027040b4(FatfsRequest *request) {
 
 // The id of the running thread
 static OSThread *func_027040ec(void) {
-    if (CPU_GetMode() == FATFS_IRQ_MODE) {
+    if (OS_GetProcMode() == FATFS_IRQ_MODE) {
         return FATFS_IRQ_THREAD;
     }
     return OS_GetCurrentThread();
@@ -106,7 +106,7 @@ static inline FatfsRequest *TakeReservedRequest(void) {
     OSThread *current;
     u32 irq;
 
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     current = func_027040ec();
     for (candidate = sFatfs.reserved; candidate != NULL; candidate = candidate->nextReserved) {
         if (candidate->owner == current) {
@@ -116,7 +116,7 @@ static inline FatfsRequest *TakeReservedRequest(void) {
             break;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return request;
 }
 
@@ -135,7 +135,7 @@ static FatfsRequest *func_0270410c(u32 command) {
         request->kind = FATFS_KIND_SHARED;
     }
 
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     current = func_027040ec();
     for (thread = sFatfs.threads; thread != NULL; thread = thread->next) {
         if (thread->thread == current) {
@@ -143,7 +143,7 @@ static FatfsRequest *func_0270410c(u32 command) {
             break;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 
     request->command = command;
     request->result = FATFS_RESULT_UNANSWERED;
@@ -155,7 +155,7 @@ static FatfsRequest *func_0270410c(u32 command) {
 static FatfsRequest *func_027041e8(u32 command) {
     FatfsRequest *request;
 
-    if (CPU_GetMode() != FATFS_IRQ_MODE) {
+    if (OS_GetProcMode() != FATFS_IRQ_MODE) {
         return func_0270410c(command);
     }
     request = sFatfs.interruptRequest;
@@ -185,7 +185,7 @@ static void func_02704264(FatfsRequest *request) {
 
     while (waiting) {
         FatfsRequest *volatile *link;
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
 
         for (link = &sFatfs.done; *link != NULL; link = &(*link)->next) {
             if (*link == request) {
@@ -196,14 +196,14 @@ static void func_02704264(FatfsRequest *request) {
             }
         }
         if (waiting) {
-            if (CPU_GetMode() == FATFS_IRQ_MODE) {
-                func_0207cad4();
+            if (OS_GetProcMode() == FATFS_IRQ_MODE) {
+                PXIi_HandlerRecvFifoNotEmpty();
                 WaitByLoop(FATFS_IRQ_SPIN);
             } else {
-                scheduler_yield(&sFatfs.waitQueue);
+                OS_SleepThread(&sFatfs.waitQueue);
             }
         }
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
     }
 }
 

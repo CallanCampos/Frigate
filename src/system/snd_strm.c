@@ -22,7 +22,7 @@ static SndStream *sSndStream;
 
 void GFL_SndStreamInit(HeapID heapId) {
     sSndStream = GFL_HeapAllocate(heapId, sizeof(SndStream), FALSE, "snd_strm.c", 65);
-    sys_memset(sSndStream, 0, sizeof(SndStream));
+    MI_CpuFill8(sSndStream, 0, sizeof(SndStream));
     NNS_SndArcStrmInit(SND_STREAM_THREAD_PRIORITY, func_02005ce4());
     NNS_SndArcStrmInitHandle(&sSndStream->handle);
     NNS_SndArcStrmAllocChannel(SND_STREAM_PLAYER);

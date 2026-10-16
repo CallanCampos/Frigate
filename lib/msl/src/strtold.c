@@ -599,6 +599,6 @@ double strtod(const char *str, char **end) {
     return value;
 }
 
-double atod(const char *str) {
+double atof(const char *str) {
     return strtod(str, NULL);
 }

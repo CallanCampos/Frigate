@@ -5,7 +5,7 @@
 // part in the LTD autoload (the exit callbacks and the battery level), which this part reaches through the linker's
 // veneers (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers) and which reaches back to
 // the work of this part by the addresses of its first objects, so PMi_IsInit, PMi_WaitBusyMethod and PMi_AutoExitFlag
-// are not static. The symbols keep their default names for now, and the comments give the SDK's.
+// are not static. The names are the SDK's.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -140,49 +140,49 @@ static PMGenCallbackInfo *PMi_PreSleepList;
 u32 PMi_WaitBusyMethod = PM_WAIT_BUSY_IRQ_MODE;
 BOOL PMi_AutoExitFlag = TRUE;
 
-static void func_0207eb24(void);
-static void func_0207eb78(u32 result, void *arg);
-static void func_0207eb80(u32 result);
+static void PMi_WaitBusy(void);
+static void PMi_SyncCallback(u32 result, void *arg);
+static void PMi_CallCallbackAndUnlock(u32 result);
 static void func_0207eb9c(void);
-static void func_0207ec1c(u32 tag, u32 data, BOOL err);
-static u32 func_0207ecf4(const u32 *words, int length, u16 *result, PMCallback callback, void *arg);
-static void func_0207ed44(const u32 *words, int length);
-static u32 func_0207edb0(u16 trigger, u16 keyPattern);
-static u32 func_0207ee0c(u32 request, u32 data, u16 *result, PMCallback callback, void *arg);
+static void PMi_CommonCallback(u32 tag, u32 data, BOOL err);
+static u32 PMi_SendPxiData(const u32 *words, int length, u16 *result, PMCallback callback, void *arg);
+static void PMi_SendPxiDataSync(const u32 *words, int length);
+static u32 PMi_SendSleepStart(u16 trigger, u16 keyPattern);
+static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback callback, void *arg);
 static u32 func_0207ee5c(u32 power, PMCallback callback, void *arg);
 static u32 func_0207ee94(u32 power);
-static u32 func_0207ef28(PMCallback callback, void *arg);
+static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg);
 static u32 func_0207ef60(void);
 static u32 func_0207efd4(int amp);
 static void func_0207f0d8(u32 word);
-static void func_0207f0f0(void);
-static BOOL func_0207f390(BOOL on, u32 power, BOOL force, BOOL sync);
+static void PMi_StopDma(void);
+static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync);
 static BOOL func_0207f4f8(void);
 static void func_0207f64c(void);
 
 // PMi_WaitBusy: waits for the answer of the request that is being sent, reading the ARM7's words itself where the
 // interrupt that would run the callback can't. The lock is polled through its address, which the callback clears
-static void func_0207eb24(void) {
+static void PMi_WaitBusy(void) {
     BOOL *lock = &PMi_Work.lock;
 
     while (*lock) {
-        if (((PMi_WaitBusyMethod & PM_WAIT_BUSY_IRQ_MODE) && CPU_GetMode() == PM_PROC_MODE_IRQ) ||
-            ((PMi_WaitBusyMethod & PM_WAIT_BUSY_IRQ_MASKED) && CPU_GetIRQMask() == PM_CPSR_IRQ_DISABLE) ||
+        if (((PMi_WaitBusyMethod & PM_WAIT_BUSY_IRQ_MODE) && OS_GetProcMode() == PM_PROC_MODE_IRQ) ||
+            ((PMi_WaitBusyMethod & PM_WAIT_BUSY_IRQ_MASKED) && OS_GetCpsrIrq() == PM_CPSR_IRQ_DISABLE) ||
             ((PMi_WaitBusyMethod & PM_WAIT_BUSY_IME_OFF) && reg_OS_IME == 0)) {
-            func_0207cad4();
+            PXIi_HandlerRecvFifoNotEmpty();
         }
     }
 }
 
 // The callback of the synchronous calls: gives the result to the caller, which waits for it
-static void func_0207eb78(u32 result, void *arg) {
+static void PMi_SyncCallback(u32 result, void *arg) {
     if (arg != NULL) {
         *(u32 *)arg = result;
     }
 }
 
-// PMi_CallCallbackAndUnlock: ends the request, calling its callback once
-static void func_0207eb80(u32 result) {
+// Ends the request, calling its callback once
+static void PMi_CallCallbackAndUnlock(u32 result) {
     PMCallback callback = PMi_Work.callback;
     void *arg = PMi_Work.callbackArg;
 
@@ -201,8 +201,7 @@ static void func_0207eb9c(void) {
     }
 }
 
-// PM_Init
-void func_0207ebb8(void) {
+void PM_Init(void) {
     if (PMi_IsInit) {
         return;
     }
@@ -211,15 +210,15 @@ void func_0207ebb8(void) {
     PMi_Work.callback = NULL;
     *(vu32 *)HW_PM_EXIT_FLAG = 0;
     PXI_Init();
-    while (!func_0207ca48(PXI_FIFO_TAG_PM, PXI_PROC_ARM7)) {
+    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_PM, PXI_PROC_ARM7)) {
         WaitByLoop(100);
     }
-    func_0207c9fc(PXI_FIFO_TAG_PM, func_0207ec1c);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_PM, PMi_CommonCallback);
     PMi_ScreensOffCount = PMi_DisplayOffCount = OS_GetVBlankCount();
 }
 
-// PMi_CommonCallback: the ARM7's answers, and its notifications
-static void func_0207ec1c(u32 tag, u32 data, BOOL err) {
+// The ARM7's answers, and its notifications
+static void PMi_CommonCallback(u32 tag, u32 data, BOOL err) {
     u16 command, value;
     BOOL finish = TRUE;
 
@@ -227,8 +226,9 @@ static void func_0207ec1c(u32 tag, u32 data, BOOL err) {
     value = data & PM_PXI_DATA_MASK;
 
     if (err) {
-        func_0207eb80(command == PM_PXI_COMMAND_REQUEST || command == PM_PXI_COMMAND_SLEEP_START ? PM_RESULT_BUSY
-                                                                                                 : PM_RESULT_ERROR);
+        PMi_CallCallbackAndUnlock(command == PM_PXI_COMMAND_REQUEST || command == PM_PXI_COMMAND_SLEEP_START
+                                      ? PM_RESULT_BUSY
+                                      : PM_RESULT_ERROR);
         return;
     }
     switch (command) {
@@ -257,8 +257,8 @@ static void func_0207ec1c(u32 tag, u32 data, BOOL err) {
         case 3:
             break;
         case PM_PXI_NOTIFY_BATTERY_LOW:
-            if (data_0276b0f0.callback != NULL) {
-                data_0276b0f0.callback(data_0276b0f0.arg);
+            if (PMi_BatteryLowCallbackInfo.callback != NULL) {
+                PMi_BatteryLowCallbackInfo.callback(PMi_BatteryLowCallbackInfo.arg);
             }
             break;
         case PM_PXI_NOTIFY_EXIT_2:
@@ -270,17 +270,17 @@ static void func_0207ec1c(u32 tag, u32 data, BOOL err) {
         break;
     }
     if (finish) {
-        func_0207eb80(value);
+        PMi_CallCallbackAndUnlock(value);
     }
 }
 
-// PMi_SendPxiData: sends the words of a request, if the ARM7 is not on another. PM_RESULT_BUSY if it is
-static u32 func_0207ecf4(const u32 *words, int length, u16 *result, PMCallback callback, void *arg) {
-    u32 irq = CPU_IRQDisable();
+// Sends the words of a request, if the ARM7 is not on another. PM_RESULT_BUSY if it is
+static u32 PMi_SendPxiData(const u32 *words, int length, u16 *result, PMCallback callback, void *arg) {
+    u32 irq = OS_DisableInterrupts();
     int i;
 
     if (PMi_Work.lock) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return PM_RESULT_BUSY;
     }
     PMi_Work.lock = TRUE;
@@ -290,60 +290,60 @@ static u32 func_0207ecf4(const u32 *words, int length, u16 *result, PMCallback c
     for (i = 0; i < length; i++) {
         func_0207f0d8(words[i]);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return PM_RESULT_SUCCESS;
 }
 
-// PMi_SendPxiDataSync: sends the words, retrying until the ARM7 accepts them and answers with success
-static void func_0207ed44(const u32 *words, int length) {
+// Sends the words, retrying until the ARM7 accepts them and answers with success
+static void PMi_SendPxiDataSync(const u32 *words, int length) {
     // Set by the callback, from the interrupt
     vu32 result;
 
     for (;;) {
         result = PM_SYNC_PENDING;
-        while (func_0207ecf4(words, length, NULL, func_0207eb78, (void *)&result) != PM_RESULT_SUCCESS) {
-            func_0207c160(PM_RETRY_CYCLES);
+        while (PMi_SendPxiData(words, length, NULL, PMi_SyncCallback, (void *)&result) != PM_RESULT_SUCCESS) {
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         while (result == PM_SYNC_PENDING) {
-            func_0207c160(PM_RETRY_CYCLES);
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         if (result == PM_RESULT_SUCCESS) {
             break;
         }
-        func_0207c160(PM_RETRY_CYCLES);
+        OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
 }
 
-// PMi_SendSleepStart: has the ARM7 prepare, turns the screens off and sends the trigger and the key pattern
-static u32 func_0207edb0(u16 trigger, u16 keyPattern) {
+// Has the ARM7 prepare, turns the screens off and sends the trigger and the key pattern
+static u32 PMi_SendSleepStart(u16 trigger, u16 keyPattern) {
     u32 words[2];
 
     words[0] = PM_PXI_START | PM_PXI_END | PM_PXI_COMMAND(PM_PXI_COMMAND_SLEEP_PREPARE);
-    func_0207ed44(words, 1);
-    while (func_0207f390(FALSE, PM_LCD_POWER_OFF, FALSE, TRUE) != TRUE) {
+    PMi_SendPxiDataSync(words, 1);
+    while (PMi_SetLCDPower(FALSE, PM_LCD_POWER_OFF, FALSE, TRUE) != TRUE) {
     }
     words[0] = PM_PXI_START | PM_PXI_COMMAND(PM_PXI_COMMAND_SLEEP_START) | (trigger & PM_PXI_DATA_MASK);
     words[1] = PM_PXI_END | PM_PXI_INDEX(1) | (keyPattern & PM_PXI_DATA16_MASK);
-    func_0207ed44(words, 2);
+    PMi_SendPxiDataSync(words, 2);
     return PM_RESULT_SUCCESS;
 }
 
-// PMi_SendRequestAsync: sends a request with a halfword of data. The ARM7's data goes to *result
-static u32 func_0207ee0c(u32 request, u32 data, u16 *result, PMCallback callback, void *arg) {
+// Sends a request with a halfword of data. The ARM7's data goes to *result
+static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback callback, void *arg) {
     u32 words[2];
 
     words[0] = PM_PXI_START | PM_PXI_COMMAND(PM_PXI_COMMAND_REQUEST) | (request & PM_PXI_DATA_MASK);
     words[1] = PM_PXI_END | PM_PXI_INDEX(1) | (data & PM_PXI_DATA16_MASK);
-    return func_0207ecf4(words, 2, result, callback, arg);
+    return PMi_SendPxiData(words, 2, result, callback, arg);
 }
 
 // PMi_ReadRegister
 u32 PMi_ReadRegister(u8 request, u16 data, u16 *result) {
     u32 res;
-    u32 sent = func_0207ee0c(request, data, result, func_0207eb78, &res);
+    u32 sent = PMi_SendRequestAsync(request, data, result, PMi_SyncCallback, &res);
 
     if (sent == PM_RESULT_SUCCESS) {
-        func_0207eb24();
+        PMi_WaitBusy();
         return res;
     }
     return sent;
@@ -368,7 +368,7 @@ static u32 func_0207ee5c(u32 power, PMCallback callback, void *arg) {
         break;
     }
     if (request != 0) {
-        return func_0207ee0c(request, 0, NULL, callback, arg);
+        return PMi_SendRequestAsync(request, 0, NULL, callback, arg);
     }
     return PM_RESULT_ILLEGAL_PARAMETER;
 }
@@ -376,10 +376,10 @@ static u32 func_0207ee5c(u32 power, PMCallback callback, void *arg) {
 // The same, waiting for the answer
 static u32 func_0207ee94(u32 power) {
     u32 res;
-    u32 sent = func_0207ee5c(power, func_0207eb78, &res);
+    u32 sent = func_0207ee5c(power, PMi_SyncCallback, &res);
 
     if (sent == PM_RESULT_SUCCESS) {
-        func_0207eb24();
+        PMi_WaitBusy();
         return res;
     }
     return sent;
@@ -412,7 +412,7 @@ u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *a
         }
     }
     if (request != 0) {
-        return func_0207ee0c(request, 0, NULL, callback, arg);
+        return PMi_SendRequestAsync(request, 0, NULL, callback, arg);
     }
     return PM_RESULT_ILLEGAL_PARAMETER;
 }
@@ -420,48 +420,46 @@ u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *a
 // PM_SetBackLight
 u32 PM_SetBackLight(u32 target, u32 backlight) {
     u32 res;
-    u32 sent = PM_SetBackLightAsync(target, backlight, func_0207eb78, &res);
+    u32 sent = PM_SetBackLightAsync(target, backlight, PMi_SyncCallback, &res);
 
     if (sent == PM_RESULT_SUCCESS) {
-        func_0207eb24();
+        PMi_WaitBusy();
         return res;
     }
     return sent;
 }
 
-// PM_ForceToPowerOffAsync
-static u32 func_0207ef28(PMCallback callback, void *arg) {
+static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg) {
     PMi_ExitType = PM_EXIT_TYPE_FORCED;
     func_0207f64c();
     if (hw_isDSi()) {
-        func_0207f5d4(data_0276b0ec);
+        PMi_CallCallbackList(PMi_PostExitCallbackList);
     }
-    return func_0207ee0c(PM_REQ_POWER_OFF, 0, NULL, callback, arg);
+    return PMi_SendRequestAsync(PM_REQ_POWER_OFF, 0, NULL, callback, arg);
 }
 
 // Sends the power-off request and waits for it, polling for the answer in every state
 static u32 func_0207ef60(void) {
     u32 res;
-    u32 sent = func_0207ef28(func_0207eb78, &res);
+    u32 sent = PM_ForceToPowerOffAsync(PMi_SyncCallback, &res);
 
     if (sent == PM_RESULT_SUCCESS) {
         PMi_WaitBusyMethod = PM_WAIT_BUSY_IRQ_MASKED | PM_WAIT_BUSY_IME_OFF;
-        func_0207eb24();
+        PMi_WaitBusy();
         PMi_WaitBusyMethod = PM_WAIT_BUSY_IRQ_MODE;
         return res;
     }
     return sent;
 }
 
-// PM_ForceToPowerOff
-void func_0207ef8c(void) {
+void PM_ForceToPowerOff(void) {
     if (func_0207ef60() != PM_RESULT_SUCCESS) {
         do {
-            func_0207c160(PM_RETRY_CYCLES);
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         } while (func_0207ef60() != PM_RESULT_SUCCESS);
     }
-    CPU_IRQDisable();
-    dma_endAll();
+    OS_DisableInterrupts();
+    MI_StopAllDma();
     if (hw_isDSi()) {
         func_0206ffbc();
     }
@@ -470,8 +468,7 @@ void func_0207ef8c(void) {
     }
 }
 
-// PM_SetAmp
-u32 func_0207efc4(int amp) {
+u32 PM_SetAmp(int amp) {
     PMi_Amp = amp;
     return func_0207efd4(amp);
 }
@@ -484,13 +481,11 @@ static u32 func_0207efd4(int amp) {
     return PM_RESULT_SUCCESS;
 }
 
-// PM_SetAmpGain
-u32 func_0207eff4(int gain) {
+u32 PM_SetAmpGain(int gain) {
     return PMi_ReadRegister(PM_REQ_SET_AMP_GAIN, gain, NULL);
 }
 
-// PM_SetAmpGainLevel
-u32 func_0207f008(u8 level) {
+u32 PM_SetAmpGainLevel(u8 level) {
     return PMi_ReadRegister(PM_REQ_SET_AMP_GAIN_LEVEL, level, NULL);
 }
 
@@ -533,8 +528,7 @@ u32 PM_GetBackLight(u32 *top, u32 *bottom) {
     return result;
 }
 
-// PM_GetAmp
-u32 func_0207f0ac(int *amp) {
+u32 PM_GetAmp(int *amp) {
     u16 data;
     u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_AMP, &data);
 
@@ -554,7 +548,7 @@ static void func_0207f0d8(u32 word) {
 
 // PMi_StopDma: keeps the DMA channels from running over the sleep, by waiting for those that finish and stopping those
 // that don't, and the new DMA channels of the DSi
-static void func_0207f0f0(void) {
+static void PMi_StopDma(void) {
     u32 i;
 
     for (i = 0; i <= MI_DMA_MAX_NUM; i++) {
@@ -566,13 +560,13 @@ static void func_0207f0f0(void) {
             break;
         case MI_DMA_TIMING_DISP:
         case MI_DMA_TIMING_DISP_MMEM:
-            func_0207829c(i);
+            MI_WaitDma(i);
             break;
         default:
             if (!(MI_DMA_REGS[i].cnt & MI_DMA_CONTINUOUS_ON)) {
-                func_0207829c(i);
+                MI_WaitDma(i);
             } else {
-                dma_end(i);
+                MI_StopDma(i);
             }
             break;
         }
@@ -598,22 +592,22 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     u32 bottom;
     u32 startTrigger;
 
-    func_0207f5d4(PMi_PreSleepList);
+    PMi_CallCallbackList(PMi_PreSleepList);
     ime = OS_DisableIrq();
-    irq = CPU_IRQDisable();
-    interrupts = CPU_DisableInterrupts(~0);
-    CPU_SetInterrupts(PM_IE_FIFO_RECV | (clock_is_inited() ? PM_IE_TIMER0 : 0));
-    CPU_SetIRQMask(irq);
+    irq = OS_DisableInterrupts();
+    interrupts = OS_DisableIrqMask(~0);
+    OS_SetIrqMask(PM_IE_FIFO_RECV | (OS_IsTickAvailable() ? PM_IE_TIMER0 : 0));
+    OS_RestoreInterrupts(irq);
     OS_EnableIrq();
 
     // No card to pull out when the game was started by the Download Play or from the DSi's flash (boot types 2 and 3)
     if (trigger & PM_TRIGGER_CARD) {
-        if ((u16)(sys_get_boot_indicator() + 0xfffe) <= 1) {
+        if ((u16)(OS_GetBootType() + 0xfffe) <= 1) {
             trigger &= ~PM_TRIGGER_CARD;
         }
     }
     if (trigger & PM_TRIGGER_CARTRIDGE) {
-        if (hw_isDSi() || !func_0208264c()) {
+        if (hw_isDSi() || !CTRDG_IsExisting()) {
             trigger &= ~PM_TRIGGER_CARTRIDGE;
         }
     }
@@ -622,55 +616,55 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     dispcntSub = reg_GXS_DB_DISPCNT;
     screensOn = func_0207f4f8();
     while (PM_GetBackLight(&top, &bottom) != PM_RESULT_SUCCESS) {
-        func_0207c160(PM_RETRY_CYCLES);
+        OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
     while (PM_SetBackLight(PM_LCD_ALL, PM_BACKLIGHT_OFF) != PM_RESULT_SUCCESS) {
-        func_0207c160(PM_RETRY_CYCLES);
+        OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
     func_0207eb9c();
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_MODE_MASK;
     reg_GXS_DB_DISPCNT &= ~REG_GXS_DB_DISPCNT_MODE_MASK;
     func_0207eb9c();
     func_0207eb9c();
-    func_0207f0f0();
+    PMi_StopDma();
     PMi_WokeUp = FALSE;
     startTrigger = trigger | (top ? PM_TRIGGER_BACKLIGHT_TOP : 0) | (bottom ? PM_TRIGGER_BACKLIGHT_BOTTOM : 0);
-    CPU_SetInterrupts(PM_IE_FIFO_RECV);
-    func_0207edb0(startTrigger, logic | keyPattern);
+    OS_SetIrqMask(PM_IE_FIFO_RECV);
+    PMi_SendSleepStart(startTrigger, logic | keyPattern);
     while (!PMi_WokeUp) {
         cp15_halt();
     }
 
-    CPU_SetInterrupts(PM_IE_FIFO_RECV | (clock_is_inited() ? PM_IE_TIMER0 : 0));
+    OS_SetIrqMask(PM_IE_FIFO_RECV | (OS_IsTickAvailable() ? PM_IE_TIMER0 : 0));
     if ((trigger & PM_TRIGGER_CARD) && (reg_OS_IF & PM_IF_CARD_IREQ)) {
         cardPulledOut = TRUE;
     }
     if (!cardPulledOut) {
         if (screensOn == TRUE) {
-            while (func_0207f390(TRUE, PM_LCD_POWER_ON, TRUE, TRUE) != TRUE) {
+            while (PMi_SetLCDPower(TRUE, PM_LCD_POWER_ON, TRUE, TRUE) != TRUE) {
             }
         } else {
             while (func_0207ee94(PM_LCD_POWER_ON) != PM_RESULT_SUCCESS) {
-                func_0207c160(PM_RETRY_CYCLES);
+                OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
             }
         }
         reg_GX_DISPCNT = dispcnt;
         reg_GXS_DB_DISPCNT = dispcntSub;
     }
-    func_0207c160(PM_SCREENS_SETTLE_CYCLES);
+    OS_SpinWaitSysCycles(PM_SCREENS_SETTLE_CYCLES);
     OS_DisableIrq();
-    CPU_SetInterrupts(interrupts);
-    CPU_SetIRQMask(irq);
+    OS_SetIrqMask(interrupts);
+    OS_RestoreInterrupts(irq);
     OS_RestoreIrq(ime);
     if (cardPulledOut) {
-        func_0207ef8c();
+        PM_ForceToPowerOff();
     }
-    func_0207f5d4(PMi_PostSleepList);
+    PMi_CallCallbackList(PMi_PostSleepList);
 }
 
 // PMi_SetLCDPower: turns the screens' power on or off, with the waits between the changes that the hardware needs, and
 // tells the ARM7 about it with the power request if there is one. FALSE when the screens went off too recently to be on
-static BOOL func_0207f390(BOOL on, u32 power, BOOL force, BOOL sync) {
+static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync) {
     switch (on) {
     case TRUE:
         if (!force && OS_GetVBlankCount() - PMi_ScreensOffCount <= 7) {
@@ -679,22 +673,22 @@ static BOOL func_0207f390(BOOL on, u32 power, BOOL force, BOOL sync) {
         if (power != 0) {
             if (sync) {
                 while (func_0207ee94(power) != PM_RESULT_SUCCESS) {
-                    func_0207c160(PM_RETRY_CYCLES);
+                    OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
                 }
             } else {
                 while (func_0207ee5c(power, NULL, NULL) != PM_RESULT_SUCCESS) {
-                    func_0207c160(PM_RETRY_CYCLES);
+                    OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
                 }
             }
         }
         reg_GX_POWCNT |= REG_GX_POWCNT_LCD_MASK;
         while (func_0207efd4(PMi_Amp) != PM_RESULT_SUCCESS) {
-            func_0207c160(PM_RETRY_CYCLES);
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         break;
     case FALSE:
         while (func_0207efd4(PM_AMP_OFF) != PM_RESULT_SUCCESS) {
-            func_0207c160(PM_RETRY_CYCLES);
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         if (OS_GetVBlankCount() - PMi_DisplayOffCount <= 2) {
             func_0207eb9c();
@@ -705,11 +699,11 @@ static BOOL func_0207f390(BOOL on, u32 power, BOOL force, BOOL sync) {
         if (power != 0) {
             if (sync) {
                 while (func_0207ee94(power) != PM_RESULT_SUCCESS) {
-                    func_0207c160(PM_RETRY_CYCLES);
+                    OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
                 }
             } else {
                 while (func_0207ee5c(power, NULL, NULL) != PM_RESULT_SUCCESS) {
-                    func_0207c160(PM_RETRY_CYCLES);
+                    OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
                 }
             }
         }
@@ -722,11 +716,11 @@ static BOOL func_0207f390(BOOL on, u32 power, BOOL force, BOOL sync) {
 BOOL func_0207f4d4(BOOL on) {
     if (on != TRUE) {
         on = FALSE;
-        if (gfxEngineIsEnabledA()) {
-            gfxEngineDisableA();
+        if (GX_IsDispOn()) {
+            GX_DispOff();
         }
     }
-    return func_0207f390(on, 0, FALSE, TRUE);
+    return PMi_SetLCDPower(on, 0, FALSE, TRUE);
 }
 
 // Whether the screens' power is on
@@ -750,8 +744,7 @@ u32 func_0207f520(u32 *value) {
     return result;
 }
 
-// PMi_InsertList
-void func_0207f544(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType) {
+void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType) {
     PMGenCallbackInfo *cur;
     PMGenCallbackInfo *prev;
     u32 irq;
@@ -760,7 +753,7 @@ void func_0207f544(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priori
         return;
     }
     info->priority = priority;
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     prev = NULL;
     for (cur = *list; cur != NULL; prev = cur, cur = cur->next) {
         if (insertType == PM_INSERT_APPEND && cur->priority > priority) {
@@ -780,11 +773,10 @@ void func_0207f544(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priori
     } else {
         *list = info;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
-// PMi_DeleteList
-void func_0207f59c(PMGenCallbackInfo **list, PMGenCallbackInfo *info) {
+void PMi_DeleteList(PMGenCallbackInfo **list, PMGenCallbackInfo *info) {
     PMGenCallbackInfo *cur;
     PMGenCallbackInfo *prev;
     u32 irq;
@@ -792,7 +784,7 @@ void func_0207f59c(PMGenCallbackInfo **list, PMGenCallbackInfo *info) {
     if (list == NULL) {
         return;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     prev = cur = *list;
     for (; cur != NULL; prev = cur, cur = cur->next) {
         if (cur == info) {
@@ -804,39 +796,33 @@ void func_0207f59c(PMGenCallbackInfo **list, PMGenCallbackInfo *info) {
             break;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
-// PMi_CallCallbackList
-void func_0207f5d4(PMGenCallbackInfo *list) {
+void PMi_CallCallbackList(PMGenCallbackInfo *list) {
     for (; list != NULL; list = list->next) {
         list->callback(list->arg);
     }
 }
 
-// PM_PrependPreSleepCallback
-void func_0207f5e8(PMSleepCallbackInfo *info) {
-    func_0207f544(&PMi_PreSleepList, info, PM_CALLBACK_PRIORITY_MIN, PM_INSERT_PREPEND);
+void PM_PrependPreSleepCallback(PMSleepCallbackInfo *info) {
+    PMi_InsertList(&PMi_PreSleepList, info, PM_CALLBACK_PRIORITY_MIN, PM_INSERT_PREPEND);
 }
 
-// PM_AppendPostSleepCallback
-void func_0207f600(PMSleepCallbackInfo *info) {
-    func_0207f544(&PMi_PostSleepList, info, PM_CALLBACK_PRIORITY_MAX, PM_INSERT_APPEND);
+void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info) {
+    PMi_InsertList(&PMi_PostSleepList, info, PM_CALLBACK_PRIORITY_MAX, PM_INSERT_APPEND);
 }
 
-// PM_InsertPreSleepCallback
-void func_0207f614(PMSleepCallbackInfo *info, int priority) {
-    func_0207f544(&PMi_PreSleepList, info, priority, PM_INSERT_APPEND);
+void PM_InsertPreSleepCallback(PMSleepCallbackInfo *info, int priority) {
+    PMi_InsertList(&PMi_PreSleepList, info, priority, PM_INSERT_APPEND);
 }
 
-// PM_DeletePreSleepCallback
-void func_0207f62c(PMSleepCallbackInfo *info) {
-    func_0207f59c(&PMi_PreSleepList, info);
+void PM_DeletePreSleepCallback(PMSleepCallbackInfo *info) {
+    PMi_DeleteList(&PMi_PreSleepList, info);
 }
 
-// PM_DeletePostSleepCallback
-void func_0207f63c(PMSleepCallbackInfo *info) {
-    func_0207f59c(&PMi_PostSleepList, info);
+void PM_DeletePostSleepCallback(PMSleepCallbackInfo *info) {
+    PMi_DeleteList(&PMi_PostSleepList, info);
 }
 
 // Waits out the screens before the power-off: turns the backlights off and the screens on if they were off, in every
@@ -844,15 +830,15 @@ void func_0207f63c(PMSleepCallbackInfo *info) {
 static void func_0207f64c(void) {
     u32 method;
 
-    func_0207c160(PM_SCREENS_SETTLE_CYCLES);
+    OS_SpinWaitSysCycles(PM_SCREENS_SETTLE_CYCLES);
     method = PMi_WaitBusyMethod;
     PMi_WaitBusyMethod = PM_WAIT_BUSY_ALL;
     if (func_0207f4f8() != TRUE) {
         while (PM_SetBackLight(PM_LCD_ALL, PM_BACKLIGHT_OFF) != PM_RESULT_SUCCESS) {
-            func_0207c160(PM_RETRY_CYCLES);
+            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         while (!func_0207f4d4(TRUE)) {
-            func_0207c160(PM_SCREENS_RETRY_CYCLES);
+            OS_SpinWaitSysCycles(PM_SCREENS_RETRY_CYCLES);
         }
     }
     PMi_WaitBusyMethod = method;

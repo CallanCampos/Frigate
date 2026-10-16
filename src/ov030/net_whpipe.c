@@ -126,7 +126,7 @@ BOOL func_ov030_02173340(HeapID heapId, WHCallback callback, void *gameWork, BOO
     work->gameWork = gameWork;
     work->endKind = 0;
     work->unkCE4 = 0;
-    work->tgid = func_020812b8();
+    work->tgid = WM_GetNextTgid();
     return TRUE;
 }
 
@@ -187,7 +187,7 @@ static BOOL OnBeaconFound(const void *found) {
     for (i = 0; i < BEACON_MAX; i++) {
         if (work->beaconTimer[i] != 0 && GFL_STD_MemCmp(work->beacons[i].mac, beacon->mac, 6) == 0) {
             work->beaconTimer[i] = BEACON_LIFETIME;
-            sys_memcpy(beacon, &work->beacons[i], sizeof(NetWhpipeBeacon));
+            MI_CpuCopy8(beacon, &work->beacons[i], sizeof(NetWhpipeBeacon));
             return TRUE;
         }
     }
@@ -200,7 +200,7 @@ static BOOL OnBeaconFound(const void *found) {
         return FALSE;
     }
     work->beaconTimer[i] = BEACON_LIFETIME;
-    sys_memcpy(beacon, &work->beacons[i], sizeof(NetWhpipeBeacon));
+    MI_CpuCopy8(beacon, &work->beacons[i], sizeof(NetWhpipeBeacon));
     work->beaconListChanged = TRUE;
     return TRUE;
 }
@@ -212,7 +212,7 @@ void func_ov030_02173554(void) {
     for (i = 0; i < BEACON_MAX; i++) {
         work->beaconTimer[i] = 0;
     }
-    sys_memset(work->beacons, 0, sizeof(work->beacons));
+    MI_CpuFill8(work->beacons, 0, sizeof(work->beacons));
 }
 
 static void ResetFlags(NetWhpipeWork *work) {
@@ -348,7 +348,7 @@ void func_ov030_02173780(void) {
         info->gameId = init->unk4C.id.gameId;
         info->unk5 = 0;
         info->closed = work->entryClosed;
-        sys_memcpy(init->unk18(work->gameWork), info->data, size);
+        MI_CpuCopy8(init->unk18(work->gameWork), info->data, size);
         SetBeaconInfo(&work->info, sizeof(NetWhpipeBeaconInfo));
     }
 }
@@ -362,7 +362,7 @@ static void UpdateBeacon(void) {
         int size = init->unk1C(work->gameWork);
 
         GFL_ASSERT(size <= _BEACON_USER_SIZE_MAX);
-        sys_memcpy(init->unk18(work->gameWork), info->data, size);
+        MI_CpuCopy8(init->unk18(work->gameWork), info->data, size);
     }
     if (info->childCount != CountChildren()) {
         work->beaconCounter = 0;
@@ -627,7 +627,7 @@ static void StateStartParent(void *arg) {
             channel = work->channel;
         }
         if (init->unk66 != 0) {
-            work->tgid = func_020812b8();
+            work->tgid = WM_GetNextTgid();
         }
         func_ov030_02173780();
         WH_ParentConnect(modes[init->bMPMode], work->tgid, channel, init->maxConnectNum - 1);
@@ -662,7 +662,7 @@ static void SetBeaconInfo(NetWhpipeBeaconInfo *info, int size) {
 
     if (work != NULL && init != NULL) {
         info->crc = getCRC16(&info->gameId, size - 2);
-        cp15_flushDC(info, size);
+        DC_FlushRange(info, size);
         if (WH_GetSystemState() == WH_SYSSTATE_IDLE) {
             WH_SetUserGameInfo(info, size);
         } else {
@@ -695,9 +695,9 @@ BOOL func_ov030_02173e0c(BOOL unused, const u8 *mac, int index, void (*callback)
     }
     NetWhpipe_SetState(&sWork->base, StateStartChild);
     if (mac != NULL) {
-        sys_memcpy(mac, sWork->parentMac, 6);
+        MI_CpuCopy8(mac, sWork->parentMac, 6);
     } else {
-        sys_memcpy(sWork->beacons[index].mac, sWork->parentMac, 6);
+        MI_CpuCopy8(sWork->beacons[index].mac, sWork->parentMac, 6);
     }
     sWork->onConnect = callback;
     return TRUE;

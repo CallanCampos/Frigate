@@ -111,7 +111,7 @@ TouchpadManager *initTouchpad(HeapID heapId) {
     TPCalibrateParam calibrate;
     TouchpadManager *tp = GFL_HeapAllocate(heapId, sizeof(TouchpadManager), FALSE, "touchpanel.c", 131);
 
-    sys_memset(tp, 0, sizeof(TouchpadManager));
+    MI_CpuFill8(tp, 0, sizeof(TouchpadManager));
     tp->autoSampling = 0;
     tp->stopped = 0;
     TP_Init();
@@ -141,7 +141,7 @@ static void getTouchpadInput(SystemUI *ui) {
         return;
     }
     if (PAD_DetectFold()) {
-        sys_memset(tp, 0, sizeof(TouchpadManager));
+        MI_CpuFill8(tp, 0, sizeof(TouchpadManager));
         return;
     }
     if (tp->autoMode == 0) {

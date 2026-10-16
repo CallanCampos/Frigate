@@ -327,38 +327,38 @@ static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *t
     u32 size;
     u32 value;
 
-    sys_memset32_fast(0, &table->spec, sizeof(table->spec));
+    MIi_CpuClearFast(0, &table->spec, sizeof(table->spec));
     switch (type) {
     case 0:
-        sys_memcpy32_fast(sJpegEncDcLumSpec.bits, table->spec.bits, 16);
+        MIi_CpuCopyFast(sJpegEncDcLumSpec.bits, table->spec.bits, 16);
         break;
     case 1:
-        sys_memcpy32_fast(sJpegEncDcChromSpec.bits, table->spec.bits, 16);
+        MIi_CpuCopyFast(sJpegEncDcChromSpec.bits, table->spec.bits, 16);
         break;
     case 2:
-        sys_memcpy32_fast(sJpegEncAcLumSpec.bits, table->spec.bits, 16);
+        MIi_CpuCopyFast(sJpegEncAcLumSpec.bits, table->spec.bits, 16);
         break;
     case 3:
-        sys_memcpy32_fast(sJpegEncAcChromSpec.bits, table->spec.bits, 16);
+        MIi_CpuCopyFast(sJpegEncAcChromSpec.bits, table->spec.bits, 16);
         break;
     }
     switch (type) {
     case 0:
-        sys_memcpy32_fast(sJpegEncDcLumSpec.values, table->spec.values, sizeof(sJpegEncDcLumSpec.values));
+        MIi_CpuCopyFast(sJpegEncDcLumSpec.values, table->spec.values, sizeof(sJpegEncDcLumSpec.values));
         break;
     case 1:
-        sys_memcpy32_fast(sJpegEncDcChromSpec.values, table->spec.values, sizeof(sJpegEncDcChromSpec.values));
+        MIi_CpuCopyFast(sJpegEncDcChromSpec.values, table->spec.values, sizeof(sJpegEncDcChromSpec.values));
         break;
     case 2:
-        sys_memcpy_fast(sJpegEncAcLumSpec.values, table->spec.values, sizeof(sJpegEncAcLumSpec.values));
+        MI_CpuCopy(sJpegEncAcLumSpec.values, table->spec.values, sizeof(sJpegEncAcLumSpec.values));
         break;
     case 3:
-        sys_memcpy_fast(sJpegEncAcChromSpec.values, table->spec.values, sizeof(sJpegEncAcChromSpec.values));
+        MI_CpuCopy(sJpegEncAcChromSpec.values, table->spec.values, sizeof(sJpegEncAcChromSpec.values));
         break;
     }
 
     i = 0;
-    sys_memset32_fast(0, work->sizes, sizeof(work->sizes));
+    MIi_CpuClearFast(0, work->sizes, sizeof(work->sizes));
     p = 0;
     while (i < 16) {
         for (j = 0; j < table->spec.bits[i]; j++) {
@@ -369,7 +369,7 @@ static void JpegEnc_SetupHuffmanTable(JpegEncHuffWork *work, JpegEncHuffTable *t
         i++;
     }
 
-    sys_memset32_fast(0, work->codes, sizeof(work->codes));
+    MIi_CpuClearFast(0, work->codes, sizeof(work->codes));
     p = 0;
     size = work->sizes[0];
     while (work->sizes[p] != 0) {
@@ -749,14 +749,14 @@ static BOOL JpegEnc_Sign(u8 *data, u32 size) {
     if (offset + SSP_SIGNATURE_SIZE > limit) {
         return FALSE;
     }
-    sys_memset(&data[offset], 0, SSP_SIGNATURE_SIZE);
+    MI_CpuFill8(&data[offset], 0, SSP_SIGNATURE_SIZE);
     if (hw_isDSi()) {
         PhotoSign_Init();
     }
     if (PhotoSign_Sign(signature, data, size) != TRUE) {
         return FALSE;
     }
-    sys_memcpy(signature, &data[offset], SSP_SIGNATURE_SIZE);
+    MI_CpuCopy8(signature, &data[offset], SSP_SIGNATURE_SIZE);
     return TRUE;
 }
 
@@ -979,7 +979,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         if (sizeof(sJpegEncThumbnailHeader) >= sJpegEncLimit) {
             return 0;
         }
-        sys_memcpy(sJpegEncThumbnailHeader, dst, sizeof(sJpegEncThumbnailHeader));
+        MI_CpuCopy8(sJpegEncThumbnailHeader, dst, sizeof(sJpegEncThumbnailHeader));
         dst[7] = THUMBNAIL_HEIGHT >> 8;
         dst[8] = THUMBNAIL_HEIGHT & 0xff;
         dst[9] = THUMBNAIL_WIDTH >> 8;
@@ -991,7 +991,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         if (pos + sizeof(sJpegEncSofHeader) >= sJpegEncLimit) {
             return 0;
         }
-        sys_memcpy(sJpegEncSofHeader, &dst[pos], sizeof(sJpegEncSofHeader));
+        MI_CpuCopy8(sJpegEncSofHeader, &dst[pos], sizeof(sJpegEncSofHeader));
         *(dst + pos + 5) = height >> 8;
         *(dst + pos + 6) = height;
         *(dst + pos + 7) = width >> 8;

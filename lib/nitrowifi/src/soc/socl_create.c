@@ -62,15 +62,15 @@ static int SOCLi_CreateSocketCallBack(SOCLCommandPacket *packet) {
 
 static SOCLSocket *SOCLi_StartupSocket(const SOCLSocketParam *param) {
     u32 size = SOCLi_GetSizeSocket(param);
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     SOCLSocket *socket = (SOCLSocket *)SOCLiConfigPtr->alloc(size);
 
     if (socket != NULL) {
-        sys_memset(socket, 0, size);
+        MI_CpuFill8(socket, 0, size);
         SOCLi_InitSocket(socket, param);
         SOCLi_SocketRegister(socket);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return socket;
 }
 
@@ -143,10 +143,10 @@ static u8 *SOCLi_InitSocketBuffer(u8 *data, SOCLSocketBuffer *buffer, u32 size) 
 static u8 *SOCLi_InitCommandPipe(u8 *data, SOCLCommandPipe *pipe, const SOCLPipeParam *param) {
     u32 size = SOCLi_GetSizeCommandPipe(param);
 
-    func_0207acc4(&pipe->queue, (OSMessage *)data, param->queue_length);
+    OS_InitMessageQueue(&pipe->queue, (OSMessage *)data, param->queue_length);
     OS_InitMutex(&pipe->mutex);
-    scheduler_init_thread(&pipe->thread, (void (*)(void *))SOCLi_CommandPacketHandler, pipe, data + size,
-                          param->stack_size, param->priority);
-    scheduler_start_thread(&pipe->thread);
+    OS_CreateThread(&pipe->thread, (void (*)(void *))SOCLi_CommandPacketHandler, pipe, data + size, param->stack_size,
+                    param->priority);
+    OS_WakeupThreadDirect(&pipe->thread);
     return data + size;
 }

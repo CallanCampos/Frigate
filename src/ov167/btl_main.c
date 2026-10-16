@@ -105,7 +105,7 @@ BOOL func_ov167_021998c0(GameProc *proc, u32 *state, void *param, void *work) {
         GFL_HeapCreateChild(HEAPID_USER, 0x14, 0x8000);
         GFL_HeapCreateChild(HEAPID_USER, 0x13, 0xac500);
         mainModule = GFL_ProcInitSubsystem(proc, sizeof(BtlMainModule), HEAPID_BATTLE);
-        sys_memset32(0, mainModule, sizeof(BtlMainModule));
+        MIi_CpuClear32(0, mainModule, sizeof(BtlMainModule));
         func_ov167_021ce604(0x13);
         func_ov167_021ce10c();
         if (!GFL_SndIsVolumeControlCallbackSet()) {
@@ -258,10 +258,10 @@ BOOL func_ov167_02199cd4(GameProc *proc, u32 *state, void *param, void *work) {
         if (func_ov167_0219c988(mainModule)) {
             func_ov167_0219e378(mainModule);
         }
-        if (gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR)) {
+        if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR)) {
             mainModule->unk460 = -16;
-            GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
             *state += 2;
             break;
         }
@@ -270,13 +270,13 @@ BOOL func_ov167_02199cd4(GameProc *proc, u32 *state, void *param, void *work) {
     case 1:
         if (mainModule->unk460 > -16) {
             mainModule->unk460--;
-            brightness = gfxRegGetMasterBrightness(REG_MASTER_BRIGHT_ADDR);
+            brightness = GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR);
             if (brightness > mainModule->unk460) {
-                GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, mainModule->unk460);
+                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, mainModule->unk460);
             }
-            brightness = gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR);
+            brightness = GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR);
             if (brightness > mainModule->unk460) {
-                GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, mainModule->unk460);
+                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, mainModule->unk460);
             }
             break;
         }
@@ -1226,7 +1226,7 @@ BOOL func_ov167_0219b3a8(BtlMainModule *mainModule, s32 *state) {
                     chatter = func_ov167_021b9e48(i);
                     if (chatter != NULL) {
                         mainModule->unk3E0[i] = allocChatotChatterBlk(mainModule->heapId);
-                        sys_memcpy(chatter, mainModule->unk3E0[i], PerapVoice_GetSize());
+                        MI_CpuCopy8(chatter, mainModule->unk3E0[i], PerapVoice_GetSize());
                     }
                 }
                 func_ov167_0219dfd0(mainModule, i);
@@ -3096,7 +3096,7 @@ void func_ov167_0219d794(BtlTrainerData *trainer, const BtlSetupTrainer *src) {
         trainer->unk08 = src->trainerClass;
         trainer->name = GFL_StrBufClone(src->name, HEAPID_BATTLE);
         trainer->unk0C = src->aiFlags;
-        sys_memcpy(src->items, trainer->unk10, sizeof(trainer->unk10));
+        MI_CpuCopy8(src->items, trainer->unk10, sizeof(trainer->unk10));
         PMSData_Copy(&trainer->unk18, &src->unk18);
         PMSData_Copy(&trainer->unk20, &src->unk20);
     } else {
@@ -3121,7 +3121,7 @@ void func_ov167_0219d808(BtlTrainerData *trainer, const BtlCommTrainerData *src)
         trainer->name = GFL_StrBufCreate(0x20, HEAPID_BATTLE);
         GFL_StrBufCopyString(trainer->name, src->name, src->nameLength + 1);
         trainer->unk0C = src->aiFlags;
-        sys_memcpy(src->items, trainer->unk10, sizeof(trainer->unk10));
+        MI_CpuCopy8(src->items, trainer->unk10, sizeof(trainer->unk10));
         PMSData_Copy(&trainer->unk18, &src->unk18);
         PMSData_Copy(&trainer->unk20, &src->unk20);
     } else {
@@ -3517,7 +3517,7 @@ void func_ov167_0219dff8(BtlMainModule *mainModule) {
     if (func_ov167_0219c964(mainModule)) {
         data = func_ov167_021b18d4(mainModule->clients[mainModule->playerClientId], &size);
         if (data != NULL) {
-            sys_memcpy(data, mainModule->setup->unkB0, size);
+            MI_CpuCopy8(data, mainModule->setup->unkB0, size);
             mainModule->setup->unkB4 = size;
             mainModule->setup->rand = mainModule->rand;
         }

@@ -9,7 +9,7 @@
 // code. The library has no handler of its own to set, so reports go to the ignoring one.
 typedef void (*constraint_handler_t)(const char *msg, void *ptr, int error);
 
-void nothing(const char *msg, void *ptr, int error);
-void func_02085d98(const char *msg, void *ptr, int error);
+void __msl_runtime_constraint_violation_s(const char *msg, void *ptr, int error); // swan's nothing
+void ignore_handler_s(const char *msg, void *ptr, int error);
 
 #endif // POKEBW2_MSL_SECURE_ERROR_H

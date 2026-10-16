@@ -4,8 +4,8 @@
 #include "types.h"
 
 // NitroSDK's PXI, the FIFO between the ARM9 and the ARM7. Each word carries a tag, which picks the function that the
-// receiving side calls with it, and an error bit. func_0207ca48 (NitroSDK's PXI_IsCallbackReady) tells whether the
-// ARM7 is ready for a tag
+// receiving side calls with it, and an error bit. PXI_IsCallbackReady (NitroSDK's PXI_IsCallbackReady) tells whether
+// the ARM7 is ready for a tag
 
 // The FIFO's registers: the four bits each processor sets for the other, and the FIFO's control and ports
 #define reg_PXI_MAINP_INTF (*(vu16 *)0x04000180)
@@ -50,7 +50,7 @@
 #define PXI_FIFO_TAG_SCFG 23
 #define PXI_FIFO_TAG_SNDEX 24
 
-// The processors, for func_0207ca48
+// The processors, for PXI_IsCallbackReady
 #define PXI_PROC_ARM9 0
 #define PXI_PROC_ARM7 1
 
@@ -66,19 +66,19 @@ typedef union {
 
 typedef void (*PXIFifoCallback)(u32 fifoTag, u32 data, BOOL err);
 
-// Sets up the FIFO (NitroSDK's PXI_Init, which calls func_0207c954, NitroSDK's PXI_InitFifo)
+// Sets up the FIFO (NitroSDK's PXI_Init, which calls PXI_InitFifo, NitroSDK's PXI_InitFifo)
 void PXI_Init(void);
-void func_0207c954(void);
+void PXI_InitFifo(void);
 // Sets the function called with the words the ARM7 sends with the tag, and marks the tag ready for the ARM7 in the
 // shared memory; NULL clears both (PXI_SetFifoRecvCallback's code)
-void func_0207c9fc(u32 fifoTag, PXIFifoCallback callback);
+void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback);
 // Sends a word with the tag. Negative when the FIFO is full or in error
 int PXI_SendWordByFifo(u32 fifoTag, u32 data, BOOL err);
 // NitroSDK's PXIi_HandlerRecvFifoNotEmpty: the interrupt handler that calls the callbacks with the words received,
 // which the loops that wait with the interrupts off also call
-void func_0207cad4(void);
+void PXIi_HandlerRecvFifoNotEmpty(void);
 // NitroSDK's PXI_IsCallbackReady: whether the processor has a callback for the tag, by its bit in the shared memory
 // (OSSystemWork's pxiSignalParam, nitro/os.h)
-BOOL func_0207ca48(u32 fifoTag, u32 processor);
+BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor);
 
 #endif // POKEBW2_NITRO_PXI_H

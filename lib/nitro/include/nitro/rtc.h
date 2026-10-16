@@ -13,8 +13,8 @@ typedef enum {
     RTC_WEEK_SATURDAY,
 } RTCWeek;
 
-// The SDK types the date as unsigned long (the game's u32 is unsigned int): func_0207d0b4 folds the - 1 of its table
-// index into the table's address only for that type
+// The SDK types the date as unsigned long (the game's u32 is unsigned int): RTC_ConvertDateToDay folds the - 1 of its
+// table index into the table's address only for that type
 typedef struct {
     unsigned long year;
     unsigned long month;
@@ -76,41 +76,40 @@ typedef struct RTCWork {
 } RTCWork;
 
 // NitroSDK's RTC_Init: starts listening to the ARM7's RTC driver, once
-void func_0207cb88(void);
+void RTC_Init(void);
 // NitroSDK's RTC_GetDateAsync, RTC_GetDate, RTC_GetTimeAsync and RTC_GetTime: read the clock and fill the date or the
 // time. The asynchronous ones answer by calling the callback; the others wait for the answer. Each returns
 // RTC_RESULT_SUCCESS when it read the clock
-int func_0207cbc8(RTCDate *date, RTCCallback callback, void *arg);
-int func_0207cc10(RTCDate *date);
-int func_0207cc34(RTCTime *time, RTCCallback callback, void *arg);
-int func_0207cc80(RTCTime *time);
+int RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg);
+int RTC_GetDate(RTCDate *date);
+int RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg);
+int RTC_GetTime(RTCTime *time);
 // NitroSDK's RTC_GetDateTimeAsync and RTC_GetDateTime
-int func_0207cca4(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg);
-int func_0207ccf4(RTCDate *date, RTCTime *time);
+int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg);
+int RTC_GetDateTime(RTCDate *date, RTCTime *time);
 // The work of the command under way, for TwlSDK's RTC code in the LTD autoload
 RTCWork *func_0207cd18(void);
 
 // NitroSDK's RTCi_ReadRawDateTimeAsync, RTCi_ReadRawDateAsync and RTCi_ReadRawTimeAsync, which ask the ARM7 to put the
 // clock in the shared memory, and RTCi_WriteRawStatus2Async, which asks it to write the second status register of the
 // clock chip from the shared memory. They return TRUE when the command was sent
-BOOL func_0207d064(void);
-BOOL func_0207d070(void);
-BOOL func_0207d07c(void);
-BOOL func_0207d088(void);
+BOOL RTCi_ReadRawDateTimeAsync(void);
+BOOL RTCi_ReadRawDateAsync(void);
+BOOL RTCi_ReadRawTimeAsync(void);
+BOOL RTCi_WriteRawStatus2Async(void);
 
 // NitroSDK's RTC_ConvertDateToDay: the days since 2000-01-01, or -1 for a date that is not valid
-s32 func_0207d0b4(const RTCDate *date);
+s32 RTC_ConvertDateToDay(const RTCDate *date);
 // NitroSDK's RTCi_ConvertTimeToSecond: the seconds since midnight
-s32 func_0207d114(const RTCTime *time);
+s32 RTCi_ConvertTimeToSecond(const RTCTime *time);
 // NitroSDK's RTC_ConvertDateTimeToSecond: the seconds since 2000-01-01, or -1 for an invalid date or time
-s64 func_0207d12c(const RTCDate *date, const RTCTime *time);
+s64 RTC_ConvertDateTimeToSecond(const RTCDate *date, const RTCTime *time);
 // NitroSDK's RTCi_ConvertDayToDate and RTCi_ConvertSecondToTime: the date that a number of days since 2000-01-01 make,
 // and the time that a number of seconds since midnight make
-void func_0207d170(RTCDate *date, s32 day);
-void func_0207d204(RTCTime *time, s32 second);
+void RTCi_ConvertDayToDate(RTCDate *date, s32 day);
+void RTCi_ConvertSecondToTime(RTCTime *time, s32 second);
 // NitroSDK's RTC_ConvertSecondToDateTime: the date and time a number of seconds since 2000-01-01 make
-void func_0207d244(RTCDate *date, RTCTime *time, s64 seconds);
-// NitroSDK's RTC_GetDayOfWeek
-RTCWeek func_0207d2a0(const RTCDate *date);
+void RTC_ConvertSecondToDateTime(RTCDate *date, RTCTime *time, s64 seconds);
+RTCWeek RTC_GetDayOfWeek(const RTCDate *date);
 
 #endif // POKEBW2_NITRO_RTC_H

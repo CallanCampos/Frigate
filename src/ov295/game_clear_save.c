@@ -114,7 +114,7 @@ static BOOL GameClearSave_Init(GameProc *proc, u32 *state, void *param, void *wo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GAME_CLEAR_SAVE, 0x40000);
     save = GFL_ProcInitSubsystem(proc, sizeof(GameClearSave), HEAPID_GAME_CLEAR_SAVE);
-    sys_memset32(0, save, sizeof(GameClearSave));
+    MIi_CpuClear32(0, save, sizeof(GameClearSave));
     save->heapId = HEAPID_GAME_CLEAR_SAVE;
     save->msgBank = TEXT_BANK_0041;
     save->gameData = GSYS_GetGameData(gsys);
@@ -142,12 +142,12 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
         if (getGameVersion() == VERSION_BLACK2) {
             u16 black[1] = { 0 };
 
-            gfxUploadStdPaletteBGB(black, 0, 2);
+            GXS_LoadBGPltt(black, 0, 2);
             GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
         } else {
             u16 white[1] = { 0xffff };
 
-            gfxUploadStdPaletteBGB(white, 0, 2);
+            GXS_LoadBGPltt(white, 0, 2);
             GFL_FadeSet(FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE, 16, 0, 0);
         }
         (*state)++;
@@ -284,9 +284,9 @@ static BOOL GameClearSave_Exit(GameProc *proc, u32 *state, void *param, void *wo
 
 static void GameClearSave_Setup(GameClearSave *save, GameClearSaveParam *param) {
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_MAIN_SUB);
-    gfxSetLCDCBanks(GX_VRAM_LCDC_ALL);
-    sys_memset32_fast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
-    gfxDisableLCDCBanks();
+    GX_SetBankForLCDC(GX_VRAM_LCDC_ALL);
+    MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
+    GX_DisableBankForLCDC();
     GameClearSave_InitBGs(save->heapId);
     save->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, save->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x1a0, 0x20, save->heapId);
@@ -400,7 +400,7 @@ static void GameClearSave_RegisterTeam(GameClearSave *save) {
     SaveControl *saveControl;
     HallOfFameSave *hallOfFame;
 
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     party = GameData_GetParty(save->gameData);
     saveControl = GameData_GetSaveControl(save->gameData);
     func_020074ec(saveControl, HALL_OF_FAME_BLOCK, HEAPID_GAMEEVENT);

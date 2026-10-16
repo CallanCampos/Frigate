@@ -6,7 +6,7 @@
 // The SDK wrote these in assembly: stmia without write-back stores every word to the same address, the port, which
 // C has no way to ask for
 // clang-format off
-asm void gfxUploadMatrix4x3(const void *src, volatile void *dest) {
+asm void GX_SendFifo48B(const void *src, volatile void *dest) {
     ldmia r0!, {r2, r3, r12}
     stmia r1, {r2, r3, r12}
     ldmia r0!, {r2, r3, r12}
@@ -18,7 +18,7 @@ asm void gfxUploadMatrix4x3(const void *src, volatile void *dest) {
     bx lr
 }
 
-asm void gfxUploadMatrix4x4(const void *src, volatile void *dest) {
+asm void GX_SendFifo64B(const void *src, volatile void *dest) {
     stmdb sp!, {r4, r5, r6, r7, r8}
     ldmia r0!, {r2, r3, r4, r5, r6, r7, r8, r12}
     stmia r1, {r2, r3, r4, r5, r6, r7, r8, r12}

@@ -13,7 +13,7 @@
 // TwlSDK's OSi_WaitVCount0, which is assembly there: waits for the screen's line counter to be 0, with the interrupts
 // off (IME is stored from the register that holds its address, a value whose bit 0 is clear)
 #pragma thumb off
-static asm void func_0207b104(void) {
+static asm void OSi_WaitVCount0(void) {
     mov ip, #0x4000000
     ldr r1, [ip, #0x208]
     str ip, [ip, #0x208]
@@ -27,35 +27,35 @@ static asm void func_0207b104(void) {
 #pragma thumb on
 // clang-format on
 
-static void func_0207b12c(void);
+static void OSi_InitBody(void);
 
 // NitroSDK's OS_Init, which only starts the function that does the work
-void os_init(void) {
-    func_0207b12c();
+void OS_Init(void) {
+    OSi_InitBody();
 }
 
 // The work of OS_Init: starts the OS and the libraries that the SDK starts with it, in this order
-static void func_0207b12c(void) {
+static void OSi_InitBody(void) {
     PXI_Init();
     OS_InitArena();
-    func_02079fe4(); // OS_InitLock
-    func_0207b23c(); // OS_InitArenaEx
-    func_02079d10(); // OS_InitIrqTable
+    OS_InitLock();     // OS_InitLock
+    OS_InitArenaEx();  // OS_InitArenaEx
+    OS_InitIrqTable(); // OS_InitIrqTable
     OS_SetIrqStackChecker();
-    exceptions_init(); // OS_InitException
-    func_020791d0();   // MI_Init
+    OS_InitException(); // OS_InitException
+    MI_Init();          // MI_Init
     OS_InitVAlarm();
-    func_0207c4fc();         // OSi_InitVramExclusive
-    scheduler_init();        // OS_InitThread
-    func_0207c248();         // OS_InitReset
+    OSi_InitVramExclusive(); // OSi_InitVramExclusive
+    OS_InitThread();         // OS_InitThread
+    OS_InitReset();          // OS_InitReset
     func_0200548c();         // CTRDG_Init
-    cart_read_thread_init(); // CARD_Init
+    CARD_Init();             // CARD_Init
     func_02078000();         // TwlSDK's shared WRAM manager, on a DSi
     if (hw_isDSi() == TRUE) {
-        func_0207f6cc(); // SCFG: sets the PXI callback for its tag
+        SCFG_Init(); // SCFG: sets the PXI callback for its tag
     }
-    func_0207ebb8(); // PM_Init
-    func_0207b104(); // OSi_WaitVCount0
+    PM_Init();         // PM_Init
+    OSi_WaitVCount0(); // OSi_WaitVCount0
     if (hw_isDSi() == TRUE) {
         func_0207c888();
     }

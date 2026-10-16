@@ -18,7 +18,7 @@ u32 WorldTradeData_GetBlockSize(void) {
 }
 
 void WorldTradeData_Init(WorldTradeData *data) {
-    sys_memset32_fast(0, data, sizeof(WorldTradeData));
+    MIi_CpuClearFast(0, data, sizeof(WorldTradeData));
 }
 
 u16 func_0200b4a8(WorldTradeData *data) {
@@ -30,7 +30,7 @@ void func_0200b4b0(WorldTradeData *data, u16 flag) {
 }
 
 void WorldTradeData_GetPkm(WorldTradeData *data, PartyPkm *pkm) {
-    sys_memcpy(&data->pkm, pkm, PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(&data->pkm, pkm, PokeParty_GetPkmRawSize());
 }
 
 PartyPkm *func_0200b4d0(WorldTradeData *data) {
@@ -38,7 +38,7 @@ PartyPkm *func_0200b4d0(WorldTradeData *data) {
 }
 
 void WorldTradeData_SetPkm(WorldTradeData *data, PartyPkm *pkm, u32 box) {
-    sys_memcpy(pkm, &data->pkm, PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(pkm, &data->pkm, PokeParty_GetPkmRawSize());
 }
 
 void func_0200b4ec(WorldTradeData *data, u32 value) {

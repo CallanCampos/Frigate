@@ -40,7 +40,7 @@ GameEvent *EventWorldTrade_Create(GameSystem *gsys, Field *field, u32 unused) {
     }
 
     wk = GameEvent_GetData(event);
-    sys_memset(wk, 0, sizeof(EventWorldTrade));
+    MI_CpuFill8(wk, 0, sizeof(EventWorldTrade));
     wk->gsys = gsys;
     wk->field = field;
     wk->param.savedata = GameData_GetSaveControl(gameData);

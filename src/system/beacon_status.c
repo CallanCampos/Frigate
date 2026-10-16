@@ -47,7 +47,7 @@ BeaconStatus *BeaconStatus_Create(HeapID heapId, HeapID msgHeapId) {
 void BeaconStatus_Free(BeaconStatus *status) {
     GFL_StrBufFree(status->unkB90);
     GFL_StrBufFree(status->greeting);
-    sys_memset(status, 0, sizeof(BeaconStatus));
+    MI_CpuFill8(status, 0, sizeof(BeaconStatus));
     GFL_HeapFree(status);
 }
 

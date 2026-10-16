@@ -92,7 +92,7 @@ static inline const u16 *InfoWin_GetSignalColors(u8 on) {
 
 void InfoWin_Init(u8 bg, u8 palette, GameData *gameData, HeapID heapId) {
     sInfoWin = GFL_HeapAllocate(heapId, sizeof(InfoWin), FALSE, "infowin.c", 259);
-    sys_memset(sInfoWin, 0, sizeof(InfoWin));
+    MI_CpuFill8(sInfoWin, 0, sizeof(InfoWin));
     sInfoWin->bg = bg;
     sInfoWin->palette = palette;
     InfoWin_LoadGraphics(bg, palette, heapId);

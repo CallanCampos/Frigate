@@ -5,13 +5,12 @@
 #include "nitro/wm.h"
 #include "twl/nwm.h"
 
-// WM_CheckInitialized
-int func_020825e4(void) {
-    return func_02080a70();
+int WM_CheckInitialized(void) {
+    return WMi_CheckInitialized();
 }
 
-// NWM_CheckInitialized: on a DS there is no such library, which its return code calls an illegal state
-int func_020825ec(void) {
+// On a DS there is no such library, which its return code calls an illegal state
+int NWM_CheckInitialized(void) {
     if (hw_isDSi()) {
         return func_02702698();
     }

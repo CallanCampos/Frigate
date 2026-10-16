@@ -24,35 +24,36 @@ typedef struct DWCInit {
 
 static DWCInit sInit;
 
-static int func_02058520(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free);
-static void func_02058694(int started);
+static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free);
+static void DWCi_SetStarted(int started);
 
-int func_020584e4(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int), void (*free)(u32, void *, u32)) {
+int DWC_InitForProduction(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int),
+                          void (*free)(u32, void *, u32)) {
     OSi_ReferSymbol(DWCi_Signature);
-    return func_02058520(1, gameName, gameCode, alloc, free);
+    return DWCi_Init(1, gameName, gameCode, alloc, free);
 }
 
-static int func_02058520(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free) {
+static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free) {
     int checked;
     int result;
     BOOL created = FALSE;
     void *work;
 
-    func_020586d0(alloc, free);
-    clock_init();
+    DWCi_SetMemFunc(alloc, free);
+    OS_InitTick();
     OS_InitAlarm();
-    func_0207cb88();
+    RTC_Init();
 
-    work = func_020586e4(DWC_MEM_INIT, DWC_INIT_WORK_SIZE);
+    work = DWC_Alloc(DWC_MEM_INIT, DWC_INIT_WORK_SIZE);
     if (work == NULL) {
         return DWC_INIT_RESULT_OUT_OF_MEMORY;
     }
-    checked = func_02056f48(work);
-    if (func_02057580()) {
-        func_02057300(work);
+    checked = DWC_BM_Init(work);
+    if (DWCBm_HasNoWifiId()) {
+        DWCBm_MakeAndSaveWifiId(work);
         created = TRUE;
     }
-    func_02058728(DWC_MEM_INIT, work, 0);
+    DWC_Free(DWC_MEM_INIT, work, 0);
 
     if (checked < 0) {
         if (created) {
@@ -70,7 +71,7 @@ static int func_02058520(int server, const char *gameName, u32 gameCode, DWCAllo
 
     func_ov011_02169df8(server);
     sInit.gameCode = gameCode;
-    func_ov011_0216ddc8(func_020587e4, func_02058814, func_020587f8, func_0205882c);
+    func_ov011_0216ddc8(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
     if (gameName != NULL) {
         strcpy(data_ov011_021917bc, gameName);
     }
@@ -79,14 +80,14 @@ static int func_02058520(int server, const char *gameName, u32 gameCode, DWCAllo
     } else {
         strcpy(data_ov011_02188fe4, "gamestats.gs.nintendowifi.net");
     }
-    func_02058694(1);
+    DWCi_SetStarted(1);
     return result;
 }
 
-u32 func_02058684(void) {
+u32 DWCi_GetGameCode(void) {
     return sInit.gameCode;
 }
 
-static void func_02058694(int started) {
+static void DWCi_SetStarted(int started) {
     sInit.started = started;
 }

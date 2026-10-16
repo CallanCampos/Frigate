@@ -14,7 +14,7 @@ typedef struct {
 } RndMatchData;
 
 void RndMatchData_Init(void *results) {
-    sys_memset(results, 0, sizeof(RndMatchData));
+    MI_CpuFill8(results, 0, sizeof(RndMatchData));
 }
 
 u16 RndMatchData_GetParam(void *results, u32 index, u32 field) {

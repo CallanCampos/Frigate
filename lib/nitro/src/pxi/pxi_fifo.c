@@ -17,10 +17,9 @@ static inline u32 PXI_GetRemoteState(void) {
     return reg_PXI_MAINP_INTF & REG_PXI_MAINP_INTF_RECV_MASK;
 }
 
-// NitroSDK's PXI_InitFifo
-void func_0207c954(void) {
+void PXI_InitFifo(void) {
     OSSystemWork *work = OS_GetSystemWork();
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     if (!sFifoInitialized) {
         int i;
@@ -33,9 +32,9 @@ void func_0207c954(void) {
         }
 
         reg_PXI_FIFO_CNT = REG_PXI_FIFO_CNT_INIT;
-        CPU_AcknowledgeInterrupts(OS_IE_FIFO_RECV);
-        CPU_SetIRQFunc(OS_IE_FIFO_RECV, func_0207cad4);
-        CPU_EnableInterrupts(OS_IE_FIFO_RECV);
+        OS_ResetRequestIrqMask(OS_IE_FIFO_RECV);
+        OS_SetIrqFunction(OS_IE_FIFO_RECV, PXIi_HandlerRecvFifoNotEmpty);
+        OS_EnableIrqMask(OS_IE_FIFO_RECV);
 
         // Hand the ARM7's state back to it until it has said 0 for a few rounds
         round = 0;
@@ -58,13 +57,12 @@ void func_0207c954(void) {
             round++;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-// NitroSDK's PXI_SetFifoRecvCallback
-void func_0207c9fc(u32 fifoTag, PXIFifoCallback callback) {
+void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
     OSSystemWork *work = OS_GetSystemWork();
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     sFifoCallbacks[fifoTag] = callback;
     if (callback != NULL) {
@@ -72,11 +70,10 @@ void func_0207c9fc(u32 fifoTag, PXIFifoCallback callback) {
     } else {
         work->pxiSignalParam[MI_PROCESSOR_ARM9] &= ~(1 << fifoTag);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-// NitroSDK's PXI_IsCallbackReady
-BOOL func_0207ca48(u32 fifoTag, u32 processor) {
+BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor) {
     OSSystemWork *work = OS_GetSystemWork();
 
     return (work->pxiSignalParam[processor] & (1 << fifoTag)) != 0;
@@ -90,13 +87,13 @@ static inline int PXIi_SendRaw(u32 raw) {
         reg_PXI_FIFO_CNT |= REG_PXI_FIFO_CNT_ERR_ACK;
         return PXI_FIFO_FAIL_SEND_ERR;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_SEND_FULL_MASK) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return PXI_FIFO_FAIL_SEND_FULL;
     }
     reg_PXI_SEND_FIFO = raw;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return PXI_FIFO_SUCCESS;
 }
 
@@ -119,19 +116,19 @@ static inline int PXIi_ReceiveRaw(u32 *raw) {
         reg_PXI_FIFO_CNT |= REG_PXI_FIFO_CNT_ERR_ACK;
         return PXI_FIFO_FAIL_RECV_ERR;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_RECV_EMPTY_MASK) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return PXI_FIFO_FAIL_RECV_EMPTY;
     }
     *raw = reg_PXI_RECV_FIFO;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return PXI_FIFO_SUCCESS;
 }
 
 // NitroSDK's PXIi_HandlerRecvFifoNotEmpty: reads the words the ARM7 sent and calls the callback of each tag. A word
 // for a tag without a callback is sent back with the error bit set
-void func_0207cad4(void) {
+void PXIi_HandlerRecvFifoNotEmpty(void) {
     PXIFifoMessage message;
     int result;
 

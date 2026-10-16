@@ -178,15 +178,15 @@ void Wipe_SetCovered(u16 color) {
 }
 
 void Wipe_SetBackdropColor(u16 color) {
-    gfxUploadStdPaletteBGA(&color, 0, sizeof(color));
-    gfxUploadStdPaletteBGB(&color, 0, sizeof(color));
+    GX_LoadBGPltt(&color, 0, sizeof(color));
+    GXS_LoadBGPltt(&color, 0, sizeof(color));
 }
 
 void setBrightnessForEngine(int screen, int brightness) {
     if (screen == 0) {
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, brightness);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
     } else {
-        GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, brightness);
+        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, brightness);
     }
 }
 
@@ -427,9 +427,9 @@ static void WipeScreen_Finish(WipeScreen *screen) {
 }
 
 static void Wipe_Clear(WipeSys *sys) {
-    sys_memset(&sys->control, 0, sizeof(WipeControl));
-    sys_memset(&sys->main, 0, sizeof(WipeScreen));
-    sys_memset(&sys->sub, 0, sizeof(WipeScreen));
-    sys_memset(&sys->hblank, 0, sizeof(WipeHBlank));
-    sys_memset(&sys->wnd, 0, sizeof(WipeWnd));
+    MI_CpuFill8(&sys->control, 0, sizeof(WipeControl));
+    MI_CpuFill8(&sys->main, 0, sizeof(WipeScreen));
+    MI_CpuFill8(&sys->sub, 0, sizeof(WipeScreen));
+    MI_CpuFill8(&sys->hblank, 0, sizeof(WipeHBlank));
+    MI_CpuFill8(&sys->wnd, 0, sizeof(WipeWnd));
 }

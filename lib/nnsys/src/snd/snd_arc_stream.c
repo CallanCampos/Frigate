@@ -213,7 +213,7 @@ void NNS_SndArcStrmInit(u32 threadPrio, NNSSndHeapHandle heap) {
         NNSSndArcStrmPlayer *player = &sPlayers[i];
 
         player->flags.active = FALSE;
-        finit(&player->file);
+        FS_InitFile(&player->file);
         NNS_SndStrmInit(&player->stream);
         player->playerNo = i;
         player->numChannels = 0;
@@ -332,7 +332,7 @@ void NNS_SndArcStrmFreeChannel(int playerNo) {
 
 // A volume 0 to 127 in decibels, as NitroSDK's SND_CalcDecibel gives it
 static inline s16 CalcDecibel(int scale) {
-    return VOLUME_DB_TABLE[scale];
+    return SNDi_DecibelTable[scale];
 }
 
 void NNSi_SndArcStrmMain(void) {
@@ -557,17 +557,17 @@ static void FreeChannel(NNSSndArcStrmPlayer *player) {
 }
 
 static void CreateThread(StrmThread *thread, u32 prio) {
-    scheduler_init_thread(&thread->thread, ThreadProc, thread, thread->stack + STRM_THREAD_STACK_SIZE / sizeof(u64),
-                          STRM_THREAD_STACK_SIZE, prio);
+    OS_CreateThread(&thread->thread, ThreadProc, thread, thread->stack + STRM_THREAD_STACK_SIZE / sizeof(u64),
+                    STRM_THREAD_STACK_SIZE, prio);
     NNS_FndInitList(&thread->commandList, 0);
     OS_InitMutex(&thread->mutex);
     OS_InitThreadQueue(&thread->queue);
-    scheduler_start_thread(&thread->thread);
+    OS_WakeupThreadDirect(&thread->thread);
 }
 
 // Drops the commands of player from list
 static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     StrmCommand *command = NNS_FndGetNextListObject(list, NULL);
 
     while (command != NULL) {
@@ -579,37 +579,37 @@ static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player) {
         }
         command = next;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 static StrmCommand *PopCommand(NNSFndList *list) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     StrmCommand *command = NNS_FndGetNextListObject(list, NULL);
 
     if (command != NULL) {
         NNS_FndRemoveListObject(list, command);
         command->player->cmdCount--;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return command;
 }
 
 static StrmCommand *AllocCommand(void) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     StrmCommand *command = NNS_FndGetNextListObject(&sFreeCommandList, NULL);
 
     if (command != NULL) {
         NNS_FndRemoveListObject(&sFreeCommandList, command);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return command;
 }
 
 static void FreeCommand(StrmCommand *command) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     NNS_FndAppendListObject(&sFreeCommandList, command);
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // The sound heap frees a player's buffer
@@ -656,7 +656,7 @@ static void ArcStrmCallback(NNSSndStrmCallbackStatus status, int numChannels, vo
             }
         }
         for (i = 0; i < command->numChannels; i++) {
-            sys_memset(command->buffer[i], 0, command->len);
+            MI_CpuFill8(command->buffer[i], 0, command->len);
         }
         NNS_FndRemoveListObject(&sThread.commandList, command);
         player->cmdCount--;
@@ -795,7 +795,7 @@ static void ProcessCommand(StrmCommand *command) {
     while (len != 0) {
         if (player->flags.dataEnd) {
             for (ch = 0; ch < command->numChannels; ch++) {
-                sys_memset((u8 *)command->buffer[ch] + bufOffset, 0, len);
+                MI_CpuFill8((u8 *)command->buffer[ch] + bufOffset, 0, len);
             }
             break;
         }
@@ -910,9 +910,9 @@ static void ProcessCommand(StrmCommand *command) {
                     OS_UnlockMutex(&sDecodeMutex);
                 }
             } else if (player->flags.singleChannel) {
-                sys_memset(dest, 0, dataSize);
+                MI_CpuFill8(dest, 0, dataSize);
             } else {
-                sys_memcpy((u8 *)command->buffer[0] + bufOffset, dest, dataSize);
+                MI_CpuCopy8((u8 *)command->buffer[0] + bufOffset, dest, dataSize);
             }
         }
 
@@ -939,7 +939,7 @@ static void ProcessCommand(StrmCommand *command) {
                              player->strmCallbackArg);
     }
     for (ch = 0; ch < command->numChannels; ch++) {
-        cp15_flushDC(command->buffer[ch], command->len);
+        DC_FlushRange(command->buffer[ch], command->len);
     }
     if (command->status == NNS_SND_STRM_CALLBACK_SETUP) {
         player->prepared = TRUE;
@@ -967,9 +967,9 @@ static BOOL OpenRomFile(NNSSndArcStrmPlayer *player, u32 fileId) {
     if (NNS_SndArcReadFile(fileId, &player->header, sizeof(player->header), 0) != sizeof(player->header)) {
         return FALSE;
     }
-    if (!romfs_fopen_id(&player->file, NNSi_SndArcGetFileID())) {
+    if (!FS_OpenFileFast(&player->file, NNSi_SndArcGetFileID())) {
         path = NNSi_SndArcGetFilePath();
-        if (path != NULL && !romfs_fopen_core(&player->file, path, FS_FILEMODE_R)) {
+        if (path != NULL && !FS_OpenFileEx(&player->file, path, FS_FILEMODE_R)) {
             return FALSE;
         }
     }
@@ -978,12 +978,12 @@ static BOOL OpenRomFile(NNSSndArcStrmPlayer *player, u32 fileId) {
 }
 
 static void CloseRomFile(NNSSndArcStrmPlayer *player) {
-    romfs_fclose(&player->file);
+    FS_CloseFile(&player->file);
 }
 
 static int ReadRomFile(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset) {
-    romfs_fseek(&player->file, player->fileOffset + offset, FS_SEEK_SET);
-    return romfs_fread(&player->file, buffer, size);
+    FS_SeekFile(&player->file, player->fileOffset + offset, FS_SEEK_SET);
+    return FS_ReadFile(&player->file, buffer, size);
 }
 
 static void CancelRomFile(NNSSndArcStrmPlayer *player) {
@@ -992,7 +992,7 @@ static void CancelRomFile(NNSSndArcStrmPlayer *player) {
 
 static BOOL OpenMemFile(NNSSndArcStrmPlayer *player, u32 fileId) {
     player->fileAddress = NNS_SndArcGetFileAddress(fileId);
-    sys_memcpy(player->fileAddress, &player->header, sizeof(player->header));
+    MI_CpuCopy8(player->fileAddress, &player->header, sizeof(player->header));
     return TRUE;
 }
 
@@ -1000,7 +1000,7 @@ static void CloseMemFile(NNSSndArcStrmPlayer *player) {
 }
 
 static int ReadMemFile(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset) {
-    sys_memcpy(player->fileAddress + offset, buffer, size);
+    MI_CpuCopy8(player->fileAddress + offset, buffer, size);
     return size;
 }
 
@@ -1014,7 +1014,7 @@ static void ThreadProc(void *arg) {
     while (TRUE) {
         StrmCommand *command;
 
-        scheduler_yield(&thread->queue);
+        OS_SleepThread(&thread->queue);
         while (TRUE) {
             OS_LockMutex(&thread->mutex);
             command = PopCommand(&thread->commandList);

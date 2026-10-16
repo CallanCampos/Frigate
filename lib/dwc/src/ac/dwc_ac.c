@@ -1,5 +1,5 @@
 // DWC's auto-connect, its core (TWL-DWC 5.3, ac). The file name is descriptive: the file creates and destroys the
-// control block and the other blocks of memory that auto-connect keeps, and steps the state machine (func_0205a1f0)
+// control block and the other blocks of memory that auto-connect keeps, and steps the state machine (DWCAc_Process)
 // whose states the other ac files run: 1 starts the wireless manager, 2 to 6 the search, 7 and 8 the connection to the
 // candidate, 9 its end, 10 to 15 the sockets coming up and the connection kept, 16 the connection up, 17 the teardown
 // and 18 the failure. The next function, at 0205ac24, is the first of dwc_connectinet.c.
@@ -10,7 +10,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-// The pointers to the five blocks of memory, which func_0205a78c gives out by their flags
+// The pointers to the five blocks of memory, which DWCAc_GetBlock gives out by their flags
 typedef struct DWCAcBlocks {
     void *wcm;               // DWC_AC_WORK_WCM
     void *unk_04;            // DWC_AC_WORK_UNK_04
@@ -21,15 +21,15 @@ typedef struct DWCAcBlocks {
 
 static DWCAcBlocks sBlocks;
 
-static void func_0205a494(const u8 *ssid, const u8 *key, u32 wepMode);
-static void *func_0205a5b0(u32 flag, u32 size);
-static void func_0205a5f8(u32 flag, void *block, u32 size);
-static void func_0205a664(void);
-static void func_0205a7d4(u8 state);
-static void func_0205aaa0(void);
-static u8 func_0205aad4(void);
-static BOOL func_0205ab78(void);
-static BOOL func_0205abe8(void);
+static void DWCAc_FillDsSetting(const u8 *ssid, const u8 *key, u32 wepMode);
+static void *DWCAc_AllocBlock(u32 flag, u32 size);
+static void DWCAc_FreeBlock(u32 flag, void *block, u32 size);
+static void DWCAc_FreeAllBlocks(void);
+static void DWCAc_SetState(u8 state);
+static void DWCAc_FreeSearchBlocks(void);
+static u8 DWCAc_FindSimilarCandidate(void);
+static BOOL DWCAc_CheckEula(void);
+static BOOL DWCAc_CheckWirelessAllowed(void);
 
 // Whether a DSi setting's security byte says it uses WPA: any byte from 0x10 on that is not 0xff, which a setting not
 // in use has
@@ -37,7 +37,7 @@ static BOOL func_0205abe8(void);
 
 // Creates auto-connect: the control block and the four more blocks of memory, the settings that it works from (the DS's
 // and, on a DSi, the DSi's), and the wireless manager. FALSE if the wireless manager does not start
-BOOL func_02059f04(DWCAcParam *param) {
+BOOL DWCAc_Create(DWCAcParam *param) {
     DWCAcMain *main;
     DWCAcMemFuncs *funcs;
     DWCAcSearchWork *work;
@@ -51,10 +51,10 @@ BOOL func_02059f04(DWCAcParam *param) {
     main->state = 1;
     main->maxState = 1;
     main->allocated = DWC_AC_WORK_MAIN;
-    sBlocks.search = func_0205a5b0(DWC_AC_WORK_SEARCH, sizeof(DWCAcSearchWork));
-    sBlocks.wcm = func_0205a5b0(DWC_AC_WORK_WCM, 0x4800);
-    sBlocks.unk_04 = func_0205a5b0(DWC_AC_WORK_UNK_04, 0x58);
-    sBlocks.memFuncs = func_0205a5b0(DWC_AC_WORK_UNK_08, sizeof(DWCAcMemFuncs));
+    sBlocks.search = DWCAc_AllocBlock(DWC_AC_WORK_SEARCH, sizeof(DWCAcSearchWork));
+    sBlocks.wcm = DWCAc_AllocBlock(DWC_AC_WORK_WCM, 0x4800);
+    sBlocks.unk_04 = DWCAc_AllocBlock(DWC_AC_WORK_UNK_04, 0x58);
+    sBlocks.memFuncs = DWCAc_AllocBlock(DWC_AC_WORK_UNK_08, sizeof(DWCAcMemFuncs));
     MI_CpuClear32(sBlocks.search, sizeof(DWCAcSearchWork));
     MI_CpuClear32(sBlocks.wcm, 0x4800);
     MI_CpuClear32(sBlocks.unk_04, 0x58);
@@ -71,10 +71,10 @@ BOOL func_02059f04(DWCAcParam *param) {
     work->mode = param->mode;
     work->unk_14bc_4 = param->unk_0b_0;
     work->rssiPacked = param->rssiPacked;
-    func_02056a58(work);
+    DWCBm_ReadNtrSettings(work);
     if (hw_isDSi()) {
         work->preferWpa = 0;
-        func_02056a6c(work->dsiSettings);
+        DWCBm_ReadTwlSettings(work->dsiSettings);
         if (work->mode == 0) {
             if (SETTING_USES_WPA(work->dsiSettings[0]) || SETTING_USES_WPA(work->dsiSettings[1]) ||
                 SETTING_USES_WPA(work->dsiSettings[2])) {
@@ -109,64 +109,64 @@ BOOL func_02059f04(DWCAcParam *param) {
         result = WCM_Init(sBlocks.wcm, 0x4800);
     }
     if (result == 1 || result > 4) {
-        func_0205a664();
+        DWCAc_FreeAllBlocks();
         return FALSE;
     }
     return TRUE;
 }
 
 // Runs the state at hand once and moves to the one that follows. Returns 1 once the connection is up (state 16, or 2 if
-// func_0205aad4 finds another candidate like the one connected to), -1 when it has failed for good (state 18), else 0.
-// Once it is up or has failed, the search's blocks of memory are let go
-s32 func_0205a1f0(void) {
-    u8 state = func_0205a83c();
+// DWCAc_FindSimilarCandidate finds another candidate like the one connected to), -1 when it has failed for good (state
+// 18), else 0. Once it is up or has failed, the search's blocks of memory are let go
+s32 DWCAc_Process(void) {
+    u8 state = DWCAc_GetState();
     s32 result;
 
     if (state == 1) {
-        if (func_0205ab78()) {
-            if (func_0205abe8()) {
-                state = func_0205d568();
+        if (DWCAc_CheckEula()) {
+            if (DWCAc_CheckWirelessAllowed()) {
+                state = DWCAc_StepWcmStartup();
             } else {
-                func_0205a85c(8);
-                state = func_0205b65c();
+                DWCAc_SetError(8);
+                state = DWCAc_StepFailedTeardown();
             }
         } else {
-            func_0205a85c(7);
-            state = func_0205b65c();
+            DWCAc_SetError(7);
+            state = DWCAc_StepFailedTeardown();
         }
     } else if (state < 7) {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
 
-        state = func_0205c37c();
-        func_0205a7d4(state);
-        CPU_SetIRQMask(irq);
+        state = DWCAc_StepSearch();
+        DWCAc_SetState(state);
+        OS_RestoreInterrupts(irq);
     } else if (state < 9) {
-        state = func_020598b4();
+        state = DWCAc_StepConnect();
     } else if (state < 10) {
-        state = func_0205c2a4();
+        state = DWCAc_StepCandidateOver();
     } else if (state < 16) {
-        state = func_0205d5f4();
+        state = DWCAc_StepSockets();
     } else if (state == 17) {
-        state = func_0205b65c();
+        state = DWCAc_StepFailedTeardown();
     }
-    func_0205a7d4(state);
+    DWCAc_SetState(state);
     if (state == 16) {
-        result = func_0205aad4();
-        func_0205aaa0();
+        result = DWCAc_FindSimilarCandidate();
+        DWCAc_FreeSearchBlocks();
         return result;
     }
     if (state != 18) {
         return 0;
     }
-    func_0205aaa0();
+    DWCAc_FreeSearchBlocks();
     return -1;
 }
 
 // What the state is, in a few values for the caller: 0 before the search, 1 searching (states 2 to 6), 2 connecting (7
 // and 8), 3 the sockets coming up (10, 12 to 15), 4 for 9, 11 and 17, which go on to another candidate or to the
-// teardown, 5 connected (16); for a failure (18), the error code of dwc_ac_result.c's func_0205b680
-s32 func_0205a2dc(void) {
-    u8 state = func_0205a83c();
+// teardown, 5 connected (16); for a failure (18), the error code of dwc_ac_result.c's DWCAc_GetErrorCode
+s32 DWCAc_GetStatus(void) {
+    u8 state = DWCAc_GetState();
 
     if (state <= 1) {
         return 0;
@@ -192,13 +192,13 @@ s32 func_0205a2dc(void) {
     if (state == 17) {
         return 4;
     }
-    return func_0205b680();
+    return DWCAc_GetErrorCode();
 }
 
 // The type of the access point that the connection is with, 0xff while there is none
-u8 func_0205a348(void) {
+u8 DWCAc_GetApType(void) {
     u8 type = 0xff;
-    u8 state = func_0205a83c();
+    u8 state = DWCAc_GetState();
 
     if (state >= 10 && state <= 16) {
         type = sBlocks.main->type;
@@ -208,15 +208,15 @@ u8 func_0205a348(void) {
 
 // Copies the 10 bytes of spot information to spotInfo, if the connection is with an access point that has any (the type
 // 4 or 8). TRUE if it did
-BOOL func_0205a378(u8 *spotInfo) {
+BOOL DWCAc_GetApSpotInfo(u8 *spotInfo) {
     BOOL found = FALSE;
-    u8 state = func_0205a83c();
+    u8 state = DWCAc_GetState();
 
     if (state >= 10 && state <= 16) {
         DWCAcMain *main = sBlocks.main;
 
         if (main->type == 4 || main->type == 8) {
-            sys_memcpy(main->spotInfo, spotInfo, sizeof(main->spotInfo));
+            MI_CpuCopy8(main->spotInfo, spotInfo, sizeof(main->spotInfo));
             found = TRUE;
         }
     }
@@ -224,51 +224,51 @@ BOOL func_0205a378(u8 *spotInfo) {
 }
 
 // The key mode of the setting that the connection is made with
-u8 func_0205a3d0(void) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
+u8 DWCAc_GetKeyMode(void) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
     return main->keyMode;
 }
 
 // Takes auto-connect down. Once it has no state or is over (18), lets its memory go and returns TRUE; else steps the
 // teardown that the state at hand needs
-BOOL func_0205a3e4(void) {
-    u8 state = func_0205a83c();
+BOOL DWCAc_Destroy(void) {
+    u8 state = DWCAc_GetState();
 
     if (state == 0 || state == 18) {
-        func_0205a664();
+        DWCAc_FreeAllBlocks();
         return TRUE;
     }
-    func_0205975c(&state);
-    func_0205a7d4(state);
+    DWCAc_StepTeardown(&state);
+    DWCAc_SetState(state);
     return FALSE;
 }
 
 // Gives the connection to make by hand: the first setting of the DS is made from the SSID, the WEP key and its mode and
 // the fourth argument, and the search is made to try that and nothing else. The spot information, if any, and the type
 // that the access point is given are what the connection reports
-void func_0205a420(const u8 *ssid, const u8 *key, u32 wepMode, u16 unk_ea, const u8 *spotInfo, u32 type) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+void DWCAc_SetGivenAp(const u8 *ssid, const u8 *key, u32 wepMode, u16 unk_ea, const u8 *spotInfo, u32 type) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     if (spotInfo != NULL) {
-        sys_memcpy(spotInfo, main->spotInfo, sizeof(main->spotInfo));
+        MI_CpuCopy8(spotInfo, main->spotInfo, sizeof(main->spotInfo));
     } else {
-        sys_memset(main->spotInfo, 0, sizeof(main->spotInfo));
+        MI_CpuFill8(main->spotInfo, 0, sizeof(main->spotInfo));
     }
     main->givenType = type;
-    func_0205a494(ssid, key, wepMode);
+    DWCAc_FillDsSetting(ssid, key, wepMode);
     work->dsSettings[0].unk_ea = unk_ea;
 }
 
 // Clears the first setting of the DS and fills it with the SSID (a string of 32 bytes at most) and, unless the mode is
 // 0, a WEP key of the length that the mode says; makes the search look for that setting alone (mode 1)
-static void func_0205a494(const u8 *ssid, const u8 *key, u32 wepMode) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+static void DWCAc_FillDsSetting(const u8 *ssid, const u8 *key, u32 wepMode) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     int i;
 
     work->mode = 1;
-    sys_memset(work, 0, 0xf0);
+    MI_CpuFill8(work, 0, 0xf0);
     for (i = 0; i < 32; i++) {
         if (ssid[i] == 0) {
             break;
@@ -279,35 +279,35 @@ static void func_0205a494(const u8 *ssid, const u8 *key, u32 wepMode) {
         work->dsSettings[0].wepMode = 0;
         return;
     }
-    sys_memcpy(key, work->dsSettings[0].wepKey, wepMode == 1 ? 5 : wepMode == 2 ? 13 : 16);
+    MI_CpuCopy8(key, work->dsSettings[0].wepKey, wepMode == 1 ? 5 : wepMode == 2 ? 13 : 16);
     work->dsSettings[0].wepMode = wepMode;
 }
 
 // Whether the SSID of length bytes is that of an NDWCSHAP
-BOOL func_0205a54c(const u8 *ssid, u32 length) {
+BOOL DWCAc_IsShopSsid(const u8 *ssid, u32 length) {
     if (length != 32) {
         return FALSE;
     }
-    return func_0205cf80(ssid);
+    return DWCAc_IsNdwcShapSsid(ssid);
 }
 
 // Replaces the connection of the DS's setting `index` with the 0xf0 bytes of setting
-void func_0205a564(u32 index, const void *setting) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+void DWCAc_SetDsConnection(u32 index, const void *setting) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
-    sys_memcpy32(setting, &work->dsSettings[index], 0xf0);
+    MIi_CpuCopy32(setting, &work->dsSettings[index], 0xf0);
 }
 
 // Stops the search from preferring the access points with WPA
-void func_0205a590(void) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+void DWCAc_ClearPreferWpa(void) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     work->preferWpa = 0;
 }
 
 // Takes a block of memory of the flag, if it is not taken yet; NULL if it is
-static void *func_0205a5b0(u32 flag, u32 size) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
+static void *DWCAc_AllocBlock(u32 flag, u32 size) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
     if (main->allocated & flag) {
         return NULL;
@@ -317,8 +317,8 @@ static void *func_0205a5b0(u32 flag, u32 size) {
 }
 
 // Lets a block of memory go, if it is taken; the control block's pointer is cleared with its own block
-static void func_0205a5f8(u32 flag, void *block, u32 size) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
+static void DWCAc_FreeBlock(u32 flag, void *block, u32 size) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
     if (main == NULL) {
         return;
@@ -334,32 +334,32 @@ static void func_0205a5f8(u32 flag, void *block, u32 size) {
 }
 
 // Lets go of every block that is taken, the control block last
-static void func_0205a664(void) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
+static void DWCAc_FreeAllBlocks(void) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
     if (main == NULL) {
         return;
     }
     if (main->allocated & DWC_AC_WORK_SEARCH) {
-        void *block = func_0205a78c(DWC_AC_WORK_SEARCH);
+        void *block = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
         main->allocated &= ~DWC_AC_WORK_SEARCH;
         main->free(1, block, sizeof(DWCAcSearchWork));
     }
     if (main->allocated & DWC_AC_WORK_UNK_08) {
-        void *block = func_0205a78c(DWC_AC_WORK_UNK_08);
+        void *block = DWCAc_GetBlock(DWC_AC_WORK_UNK_08);
 
         main->allocated &= ~DWC_AC_WORK_UNK_08;
         main->free(1, block, sizeof(DWCAcMemFuncs));
     }
     if (main->allocated & DWC_AC_WORK_UNK_04) {
-        void *block = func_0205a78c(DWC_AC_WORK_UNK_04);
+        void *block = DWCAc_GetBlock(DWC_AC_WORK_UNK_04);
 
         main->allocated &= ~DWC_AC_WORK_UNK_04;
         main->free(1, block, 0x58);
     }
     if (main->allocated & DWC_AC_WORK_WCM) {
-        void *block = func_0205a78c(DWC_AC_WORK_WCM);
+        void *block = DWCAc_GetBlock(DWC_AC_WORK_WCM);
 
         main->allocated &= ~DWC_AC_WORK_WCM;
         main->free(1, block, 0x4800);
@@ -372,7 +372,7 @@ static void func_0205a664(void) {
 }
 
 // The block of memory that a flag names: the first of its bits that is set decides. NULL while it is not taken
-void *func_0205a78c(u32 flag) {
+void *DWCAc_GetBlock(u32 flag) {
     if (flag & DWC_AC_WORK_MAIN) {
         return sBlocks.main;
     }
@@ -393,9 +393,9 @@ void *func_0205a78c(u32 flag) {
 
 // Sets the state, and keeps track of the highest one: when a state past 7 is reached for the first time, notes the type
 // and the result of the candidate that the connection works on
-static void func_0205a7d4(u8 state) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+static void DWCAc_SetState(u8 state) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     main->state = state;
     if (state >= 16) {
@@ -404,68 +404,68 @@ static void func_0205a7d4(u8 state) {
     if (state > main->maxState) {
         main->maxState = state;
         if (state > 7) {
-            main->candidateType = func_0205aa40(work->kind);
+            main->candidateType = DWCAc_GetApTypeOfId(work->kind);
             main->candidateResult = work->infos[work->selected].unk_00;
         }
     }
 }
 
 // The state of the control block, 0 while there is none
-u8 func_0205a83c(void) {
+u8 DWCAc_GetState(void) {
     return sBlocks.main != NULL ? sBlocks.main->state : 0;
 }
 
 // Notes an error: the code, and the state it came in, from which the teardown goes on
-void func_0205a85c(s32 error) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
+void DWCAc_SetError(s32 error) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
     main->error = error;
-    main->failedState = func_0205a83c();
+    main->failedState = DWCAc_GetState();
 }
 
 // The error that was noted last
-s32 func_0205a880(void) {
+s32 DWCAc_GetError(void) {
     return sBlocks.main->error;
 }
 
-// Notes the type of the access point that the connection is with: the one that func_0205a420 was given, else that of
+// Notes the type of the access point that the connection is with: the one that DWCAc_SetGivenAp was given, else that of
 // the target id; and its spot information, which an NDWCSHAP's SSID holds (zeroes for any other)
-void func_0205a894(u8 id) {
+void DWCAc_NoteConnectedAp(u8 id) {
     u8 type = sBlocks.main->givenType;
     const u8 *ssid;
 
     if (type == 0) {
-        type = func_0205aa40(id);
+        type = DWCAc_GetApTypeOfId(id);
     }
     sBlocks.main->type = type;
     ssid = WCM_GetConnectedApSsid(NULL);
     if (ssid != NULL) {
-        cp15_invalidateDC((void *)ssid, 32);
-        if (func_0205cfe8(ssid, sBlocks.main->spotInfo)) {
+        DC_InvalidateRange((void *)ssid, 32);
+        if (DWCAc_GetNdwcShapSpotInfo(ssid, sBlocks.main->spotInfo)) {
             return;
         }
-        sys_memset(sBlocks.main->spotInfo, 0, sizeof(sBlocks.main->spotInfo));
+        MI_CpuFill8(sBlocks.main->spotInfo, 0, sizeof(sBlocks.main->spotInfo));
     } else {
-        sys_memset(sBlocks.main->spotInfo, 0, sizeof(sBlocks.main->spotInfo));
+        MI_CpuFill8(sBlocks.main->spotInfo, 0, sizeof(sBlocks.main->spotInfo));
     }
 }
 
 // Notes the key mode of the setting that the connection to the target id uses: the WCM mode of its WPA if it is one of
 // the DSi's three and uses WPA, else its WEP mode; the two kinds told by their SSIDs (NWCUSBAP, NDWCSHAP) have mode 2.
 // For the DSi's three it also copies some of the setting's details to the control block
-void func_0205a928(u8 id) {
-    DWCAcMain *main = func_0205a78c(DWC_AC_WORK_MAIN);
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
-    u8 type = func_0205aa40(id);
+void DWCAc_NoteKeyMode(u8 id) {
+    DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
+    u8 type = DWCAc_GetApTypeOfId(id);
 
     if (type >= 10 && type <= 12 && hw_isDSi()) {
         type -= 10;
         main->unk_24 = work->dsiSettings[type].unk_182;
         main->unk_25 = work->dsiSettings[type].unk_183;
         main->unk_26 = work->dsiSettings[type].unk_1e8;
-        sys_memcpy(work->dsiSettings[type].unk_184, main->unk_28, sizeof(main->unk_28));
-        sys_memcpy(work->dsiSettings[type].base.unk_00, main->unk_8c, sizeof(main->unk_8c));
-        sys_memcpy(work->dsiSettings[type].base.unk_20, main->unk_ac, sizeof(main->unk_ac));
+        MI_CpuCopy8(work->dsiSettings[type].unk_184, main->unk_28, sizeof(main->unk_28));
+        MI_CpuCopy8(work->dsiSettings[type].base.unk_00, main->unk_8c, sizeof(main->unk_8c));
+        MI_CpuCopy8(work->dsiSettings[type].base.unk_20, main->unk_ac, sizeof(main->unk_ac));
         if (work->dsiSettings[type].base.security == 0x10 || work->dsiSettings[type].base.security == 0x11 ||
             work->dsiSettings[type].base.security == 0x12 || work->dsiSettings[type].base.security == 0x13) {
             main->keyMode = work->dsiSettings[type].wcmMode;
@@ -481,7 +481,7 @@ void func_0205a928(u8 id) {
 
 // The type of the access point of a target id: 0 to 2 for the DS's three settings, which ids 0 to 5 are, 3 to 5 for
 // NWCUSBAP, NDWCSHAP and FREESPOT (ids 0x12 to 0x14), and 10 to 12 for the DSi's three, ids 6 to 17
-u8 func_0205aa40(u8 id) {
+u8 DWCAc_GetApTypeOfId(u8 id) {
     if (id >= 0x12) {
         return id - 0xf;
     }
@@ -504,9 +504,9 @@ u8 func_0205aa40(u8 id) {
 }
 
 // Lets go of the two blocks that only the search and the connection used
-static void func_0205aaa0(void) {
-    func_0205a5f8(DWC_AC_WORK_UNK_08, sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
-    func_0205a5f8(DWC_AC_WORK_SEARCH, sBlocks.search, sizeof(DWCAcSearchWork));
+static void DWCAc_FreeSearchBlocks(void) {
+    DWCAc_FreeBlock(DWC_AC_WORK_UNK_08, sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
+    DWCAc_FreeBlock(DWC_AC_WORK_SEARCH, sBlocks.search, sizeof(DWCAcSearchWork));
 }
 
 // 2 if another ordinary candidate (id below 0x12) looks like the one that was connected to, else 1; a special target
@@ -515,7 +515,7 @@ static void func_0205aaa0(void) {
 //
 // BUG: the comparison starts at the BSSID, whose six bytes and the SSID's length come first, where the SSIDs were
 // probably meant, to tell that another access point has the same name
-static u8 func_0205aad4(void) {
+static u8 DWCAc_FindSimilarCandidate(void) {
     u8 i;
     u8 count;
     DWCAcSearchWork *work = sBlocks.search;
@@ -547,10 +547,10 @@ static u8 func_0205aad4(void) {
 
 // On a DSi, whether the license agreement has been agreed to, in the version that the ROM asks for; always TRUE on a
 // DS, or when the work says to ignore it
-static BOOL func_0205ab78(void) {
+static BOOL DWCAc_CheckEula(void) {
     if (hw_isDSi()) {
         if (sBlocks.search->ignoreEula != 0 ||
-            (func_0207c45c() && func_0207c480() != 0 && func_0207c480() >= func_0207c49c())) {
+            (OS_IsAgreeEULA() && OS_GetAgreedEULAVersion() != 0 && OS_GetAgreedEULAVersion() >= func_0207c49c())) {
             return TRUE;
         }
         return FALSE;
@@ -560,9 +560,9 @@ static BOOL func_0205ab78(void) {
 
 // On a DSi, whether the system settings allow the wireless connection and the parental controls do not forbid it;
 // always TRUE on a DS
-static BOOL func_0205abe8(void) {
+static BOOL DWCAc_CheckWirelessAllowed(void) {
     if (hw_isDSi()) {
-        if (func_0207c438() == TRUE && func_0207c4d0() == 0) {
+        if (OS_IsAvailableWireless() == TRUE && func_0207c4d0() == 0) {
             return TRUE;
         }
         return FALSE;

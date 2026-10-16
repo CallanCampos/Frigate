@@ -2,7 +2,7 @@
 // reading a word at a time once the strings are aligned, and a scanf, which the file ends with (the scout merged the
 // SDK's std_sscanf.c into it, since libstd's archive has no such file; the name is the SDK's). The scanf is one
 // function of 0x5b0 bytes whose conversions are labelled blocks, reached by goto from the switch on the conversion
-// character. The symbols keep their default names for now, and the comments give the SDK's.
+// character. The names are the SDK's.
 #include "nitro/mi.h"
 #include "nitro/std.h"
 
@@ -28,11 +28,10 @@
 // Whether a byte begins a two-byte Shift-JIS character
 #define STD_IS_LEAD_BYTE(c) ((u32)(((u8)(c) ^ 0x20) - 0xa1) < 0x3c)
 
-static BOOL func_0207fa68(int c);
-static void func_0207fa88(u32 *bitset, u32 from, u32 to);
+static BOOL STDi_IsSpace(int c);
+static void STDi_FillBitset(u32 *bitset, u32 from, u32 to);
 
-// STD_CopyString
-char *func_0207f7a4(char *dst, const char *src) {
+char *STD_CopyString(char *dst, const char *src) {
     char *start = dst;
 
     while (*src != '\0') {
@@ -42,8 +41,7 @@ char *func_0207f7a4(char *dst, const char *src) {
     return start;
 }
 
-// STD_CopyLString
-int func_0207f7cc(char *dst, const char *src, int size) {
+int STD_CopyLString(char *dst, const char *src, int size) {
     u32 offset = (u32)dst & 3;
     const char *s = src;
     int i = 0;
@@ -83,13 +81,12 @@ terminate:
         dst[i] = '\0';
     }
     if (*s != '\0') {
-        i += NNS_STD_StrLen(s);
+        i += STD_GetStringLength(s);
     }
     return i;
 }
 
-// STD_SearchString
-char *func_0207f874(const char *str, const char *sub) {
+char *STD_SearchString(const char *str, const char *sub) {
     int i = 0;
 
     while (str[i] != '\0') {
@@ -107,8 +104,7 @@ char *func_0207f874(const char *str, const char *sub) {
     return NULL;
 }
 
-// STD_GetStringLength
-int NNS_STD_StrLen(const char *str) {
+int STD_GetStringLength(const char *str) {
     int len = 0;
     const u32 *p;
 
@@ -136,8 +132,7 @@ int NNS_STD_StrLen(const char *str) {
     return len;
 }
 
-// STD_GetStringNLength
-int func_0207f900(const char *str, int maxlen) {
+int STD_GetStringNLength(const char *str, int maxlen) {
     int len = 0;
     const u32 *p;
 
@@ -201,8 +196,7 @@ int STD_CompareString(const char *a, const char *b) {
     }
 }
 
-// STD_CompareNString
-int func_0207f9c8(const char *a, const char *b, int len) {
+int STD_CompareNString(const char *a, const char *b, int len) {
     u32 offset;
     int i;
 
@@ -247,7 +241,7 @@ int func_0207f9c8(const char *a, const char *b, int len) {
 // STD_TVSScanf: reads the text as the format says and returns how many values it stored, or -1 if the text ended before
 // the first conversion read anything. A conversion that fails ends the scan. The format character at the top of each
 // pass and the field width of a conversion share one variable, as they share a register in the original
-int func_0207fac0(const char *src, const char *fmt, va_list args) {
+int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
     // Declared in the order of the original's stack slots, the highest first, which ours differ from (see nonmatching)
     const char *textStart = src;
     BOOL matched = FALSE;
@@ -270,11 +264,11 @@ int func_0207fac0(const char *src, const char *fmt, va_list args) {
     char conv;
 
     while ((width = *fmt) != '\0') {
-        if (func_0207fa68(width)) {
-            while (func_0207fa68(*fmt)) {
+        if (STDi_IsSpace(width)) {
+            while (STDi_IsSpace(*fmt)) {
                 fmt++;
             }
-            while (func_0207fa68(*src)) {
+            while (STDi_IsSpace(*src)) {
                 src++;
             }
             continue;
@@ -388,7 +382,7 @@ int func_0207fac0(const char *src, const char *fmt, va_list args) {
 
         fmt++;
         c = *src;
-        while (func_0207fa68(c)) {
+        while (STDi_IsSpace(c)) {
             src++;
             c = *src;
         }
@@ -481,11 +475,11 @@ int func_0207fac0(const char *src, const char *fmt, va_list args) {
                 width = 0x7fffffff;
             }
             sc = *src;
-            while (func_0207fa68(sc)) {
+            while (STDi_IsSpace(sc)) {
                 src++;
                 sc = *src;
             }
-            while (sc != '\0' && !func_0207fa68(sc) && width > 0) {
+            while (sc != '\0' && !STDi_IsSpace(sc) && width > 0) {
                 if (dst != NULL) {
                     *dst++ = sc;
                 }
@@ -559,7 +553,7 @@ int func_0207fac0(const char *src, const char *fmt, va_list args) {
                     STD_SET_BIT(set, '-');
                     STD_SET_BIT(set, cur);
                 } else {
-                    func_0207fa88(set, prev, cur + 1);
+                    STDi_FillBitset(set, prev, cur + 1);
                 }
                 range = FALSE;
                 prev = 0;
@@ -599,24 +593,22 @@ finish:
     return count;
 }
 
-// STD_TSScanf
-int func_0207fa4c(const char *src, const char *fmt, ...) {
+int STD_TSScanf(const char *src, const char *fmt, ...) {
     va_list args;
     int count;
 
     va_start(args, fmt);
-    count = func_0207fac0(src, fmt, args);
+    count = STD_TVSScanf(src, fmt, args);
     va_end(args);
     return count;
 }
 
-// STDi_IsSpace
-static BOOL func_0207fa68(int c) {
+static BOOL STDi_IsSpace(int c) {
     return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
 }
 
-// STDi_FillBitset: sets the bits from to to - 1
-static void func_0207fa88(u32 *bitset, u32 from, u32 to) {
+// Sets the bits from to to - 1
+static void STDi_FillBitset(u32 *bitset, u32 from, u32 to) {
     if (from < to) {
         u32 mask;
         u32 lastMask = (1 << (to & 31)) - 1;

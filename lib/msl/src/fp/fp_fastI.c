@@ -3286,7 +3286,7 @@ asm double __aeabi_ddiv(double a, double b) {
 // _fp_init, which the startup code calls before the static initializers. There is no floating-point hardware
 // to set up, so it returns.
 // clang-format off
-asm void func_0208ecdc(void) {
+asm void _fp_init(void) {
     bx lr
 }
 

@@ -25,7 +25,7 @@ void MarineTubeBoardMsgWin_Init(MarineTubeBoardMsgWin *win, Font *font, MsgData 
                                 WordSet *wordSet, HeapID heapId) {
     BmpWin *window;
 
-    sys_memset(win, 0, sizeof(MarineTubeBoardMsgWin));
+    MI_CpuFill8(win, 0, sizeof(MarineTubeBoardMsgWin));
     win->color = BACKGROUND_COLOR;
     win->font = font;
     win->wordSet = wordSet;
@@ -46,11 +46,11 @@ void MarineTubeBoardMsgWin_Init(MarineTubeBoardMsgWin *win, Font *font, MsgData 
 void MarineTubeBoardMsgWin_Free(MarineTubeBoardMsgWin *win) {
     BmpWin_Free(win->window);
     GFL_StrBufFree(win->strBuf);
-    sys_memset(win, 0, sizeof(MarineTubeBoardMsgWin));
+    MI_CpuFill8(win, 0, sizeof(MarineTubeBoardMsgWin));
 }
 
 void MarineTubeBoardPrinter_Init(MarineTubeBoardPrinter *printer, HeapID heapId) {
-    sys_memset(printer, 0, sizeof(MarineTubeBoardPrinter));
+    MI_CpuFill8(printer, 0, sizeof(MarineTubeBoardPrinter));
     printer->tcbMgr = GFL_TCBExMgrCreate(heapId, heapId, 2, 0);
     printer->keyCursor = KeyCursor_Create(BACKGROUND_COLOR, TRUE, TRUE, heapId);
 }
@@ -61,7 +61,7 @@ void MarineTubeBoardPrinter_Free(MarineTubeBoardPrinter *printer) {
     }
     KeyCursor_Free(printer->keyCursor);
     GFL_TCBExMgrFree(printer->tcbMgr);
-    sys_memset(printer, 0, sizeof(MarineTubeBoardPrinter));
+    MI_CpuFill8(printer, 0, sizeof(MarineTubeBoardPrinter));
 }
 
 void MarineTubeBoardPrinter_Print(MarineTubeBoardPrinter *printer, MarineTubeBoardMsgWin *win, u32 messageId,

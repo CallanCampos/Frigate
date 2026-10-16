@@ -13,7 +13,7 @@
 #define RTC_COMMAND_EX_READ_TIME16 0x11
 #define RTC_COMMAND_EX_NOP 0x12
 
-int func_02700000(void) {
+int RTCi_ProcessExCommand(void) {
     RTCWork *work = func_0207cd18();
     int result = RTC_RESULT_SUCCESS;
 

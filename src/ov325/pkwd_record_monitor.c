@@ -610,7 +610,7 @@ static BOOL PkwdRecordMonitor_Init(GameProc *proc, u32 *state, void *param, void
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PKWD_RECORD_MONITOR, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PkwdRecordMonitorWork), HEAPID_PKWD_RECORD_MONITOR);
-    sys_memset(wk, 0, sizeof(PkwdRecordMonitorWork));
+    MI_CpuFill8(wk, 0, sizeof(PkwdRecordMonitorWork));
     wk->heapId = HEAPID_PKWD_RECORD_MONITOR;
     wk->param = param;
     wk->graphic = PkwdRecordMonitorGraphic_Create(1, wk->heapId);
@@ -917,7 +917,7 @@ static void PkwdRecordMonitor_CreateActors(PkwdRecordMonitorWork *wk, u32 surfac
     s16 y;
     BOOL flag;
 
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     paletteRes = group->paletteRes;
     cellRes = group->cellRes;
     count = group->count;
@@ -978,10 +978,10 @@ static void PkwdRecordMonitor_InitActors(PkwdRecordMonitorWork *wk) {
     func_0204c318(wk->marks[MARK_COVER + 0], 1);
     func_0204c318(wk->marks[MARK_COVER + 1], 1);
     func_0204c318(wk->marks[MARK_COVER + 2], 1);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        8, 8);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       8, 8);
 }
 
 static void PkwdRecordMonitor_FreeActors(PkwdRecordMonitorWork *wk) {

@@ -80,8 +80,8 @@ static int DDemoSeq_Init(DDemoWork *wk) {
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     DDemoMain_InitBg();
     DDemoMain_InitMsg(wk);
     DDemoMain_InitSound(wk);
@@ -93,8 +93,8 @@ static int DDemoSeq_Release(DDemoWork *wk) {
     DDemoMain_ExitSound(wk);
     DDemoMain_ExitMsg(wk);
     DDemoMain_ExitBg();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);

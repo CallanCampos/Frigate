@@ -9,15 +9,15 @@ static char sBase64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstu
 #define TO_LOWER(c) ((((c) >= 'A') & ((c) <= 'Z')) ? (c) + ('a' - 'A') : (c))
 
 void NHTTPi_memcpy(void *dest, const void *src, u32 size) {
-    sys_memcpy(src, dest, size);
+    MI_CpuCopy8(src, dest, size);
 }
 
 int NHTTPi_strlen(const char *s) {
-    return NNS_STD_StrLen(s);
+    return STD_GetStringLength(s);
 }
 
 int NHTTPi_strnlen(const char *s, int max) {
-    return func_0207f900(s, max);
+    return STD_GetStringNLength(s, max);
 }
 
 int NHTTPi_strcmp(const char *a, const char *b) {
@@ -25,7 +25,7 @@ int NHTTPi_strcmp(const char *a, const char *b) {
 }
 
 void NHTTPi_memclr(void *dest, u32 size) {
-    sys_memset(dest, 0, size);
+    MI_CpuFill8(dest, 0, size);
 }
 
 // Compares two strings up to a size without caring for the case; 0 if they are equal, else the size that was left

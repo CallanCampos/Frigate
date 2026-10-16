@@ -6,32 +6,32 @@
 // ARM code in this Thumb file.
 #include "nitro/gx.h"
 
-void *gfxGetScreenAddrBG0A(void) {
+void *G2_GetBG0ScrPtr(void) {
     return (void *)(((reg_G2_BG0CNT & REG_G2_BGCNT_SCREENBASE_MASK) >> REG_G2_BGCNT_SCREENBASE_SHIFT) * 0x800 +
                     (HW_BG_VRAM +
                      ((reg_GX_DISPCNT & REG_GX_DISPCNT_BGSCREENOFFSET_MASK) >> REG_GX_DISPCNT_BGSCREENOFFSET_SHIFT) *
                          0x10000));
 }
 
-void *gfxGetScreenAddrBG0B(void) {
+void *G2S_GetBG0ScrPtr(void) {
     return (void *)(HW_DB_BG_VRAM +
                     ((reg_G2S_DB_BG0CNT & REG_G2_BGCNT_SCREENBASE_MASK) >> REG_G2_BGCNT_SCREENBASE_SHIFT) * 0x800);
 }
 
-void *gfxGetScreenAddrBG1A(void) {
+void *G2_GetBG1ScrPtr(void) {
     return (void *)(((reg_G2_BG1CNT & REG_G2_BGCNT_SCREENBASE_MASK) >> REG_G2_BGCNT_SCREENBASE_SHIFT) * 0x800 +
                     (HW_BG_VRAM +
                      ((reg_GX_DISPCNT & REG_GX_DISPCNT_BGSCREENOFFSET_MASK) >> REG_GX_DISPCNT_BGSCREENOFFSET_SHIFT) *
                          0x10000));
 }
 
-void *gfxGetScreenAddrBG1B(void) {
+void *G2S_GetBG1ScrPtr(void) {
     return (void *)(HW_DB_BG_VRAM +
                     ((reg_G2S_DB_BG1CNT & REG_G2_BGCNT_SCREENBASE_MASK) >> REG_G2_BGCNT_SCREENBASE_SHIFT) * 0x800);
 }
 
 #pragma thumb off
-void *gfxGetScreenAddrBG2A(void) {
+void *G2_GetBG2ScrPtr(void) {
     int mode = reg_GX_DISPCNT & REG_GX_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2_BG2CNT;
     u32 offset = ((reg_GX_DISPCNT & REG_GX_DISPCNT_BGSCREENOFFSET_MASK) >> REG_GX_DISPCNT_BGSCREENOFFSET_SHIFT) << 16;
@@ -57,7 +57,7 @@ void *gfxGetScreenAddrBG2A(void) {
 }
 #pragma thumb on
 
-void *gfxGetScreenAddrBG2B(void) {
+void *G2S_GetBG2ScrPtr(void) {
     int mode = reg_GXS_DB_DISPCNT & REG_GXS_DB_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2S_DB_BG2CNT;
     u32 screenBase = (bgcnt & REG_G2_BGCNT_SCREENBASE_MASK) >> REG_G2_BGCNT_SCREENBASE_SHIFT;
@@ -82,7 +82,7 @@ void *gfxGetScreenAddrBG2B(void) {
 }
 
 #pragma thumb off
-void *gfxGetScreenAddrBG3A(void) {
+void *G2_GetBG3ScrPtr(void) {
     int mode = reg_GX_DISPCNT & REG_GX_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2_BG3CNT;
     u32 offset = ((reg_GX_DISPCNT & REG_GX_DISPCNT_BGSCREENOFFSET_MASK) >> REG_GX_DISPCNT_BGSCREENOFFSET_SHIFT) << 16;
@@ -108,7 +108,7 @@ void *gfxGetScreenAddrBG3A(void) {
 }
 #pragma thumb on
 
-void *gfxGetScreenAddrBG3B(void) {
+void *G2S_GetBG3ScrPtr(void) {
     int mode = reg_GXS_DB_DISPCNT & REG_GXS_DB_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2S_DB_BG3CNT;
     u32 screenBase = (bgcnt & REG_G2_BGCNT_SCREENBASE_MASK) >> REG_G2_BGCNT_SCREENBASE_SHIFT;
@@ -132,31 +132,31 @@ void *gfxGetScreenAddrBG3B(void) {
     }
 }
 
-void *gfxGetCharAddrBG0A(void) {
+void *G2_GetBG0CharPtr(void) {
     return (
         void *)(((reg_G2_BG0CNT & REG_G2_BGCNT_CHARBASE_MASK) >> REG_G2_BGCNT_CHARBASE_SHIFT) * 0x4000 +
                 (HW_BG_VRAM +
                  ((reg_GX_DISPCNT & REG_GX_DISPCNT_BGCHAROFFSET_MASK) >> REG_GX_DISPCNT_BGCHAROFFSET_SHIFT) * 0x10000));
 }
 
-void *gfxGetCharAddrBG0B(void) {
+void *G2S_GetBG0CharPtr(void) {
     return (void *)(HW_DB_BG_VRAM +
                     ((reg_G2S_DB_BG0CNT & REG_G2_BGCNT_CHARBASE_MASK) >> REG_G2_BGCNT_CHARBASE_SHIFT) * 0x4000);
 }
 
-void *gfxGetCharAddrBG1A(void) {
+void *G2_GetBG1CharPtr(void) {
     return (
         void *)(((reg_G2_BG1CNT & REG_G2_BGCNT_CHARBASE_MASK) >> REG_G2_BGCNT_CHARBASE_SHIFT) * 0x4000 +
                 (HW_BG_VRAM +
                  ((reg_GX_DISPCNT & REG_GX_DISPCNT_BGCHAROFFSET_MASK) >> REG_GX_DISPCNT_BGCHAROFFSET_SHIFT) * 0x10000));
 }
 
-void *gfxGetCharAddrBG1B(void) {
+void *G2S_GetBG1CharPtr(void) {
     return (void *)(HW_DB_BG_VRAM +
                     ((reg_G2S_DB_BG1CNT & REG_G2_BGCNT_CHARBASE_MASK) >> REG_G2_BGCNT_CHARBASE_SHIFT) * 0x4000);
 }
 
-void *gfxGetCharAddrBG2A(void) {
+void *G2_GetBG2CharPtr(void) {
     int mode = reg_GX_DISPCNT & REG_GX_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2_BG2CNT;
 
@@ -169,7 +169,7 @@ void *gfxGetCharAddrBG2A(void) {
     return NULL;
 }
 
-void *gfxGetCharAddrBG2B(void) {
+void *G2S_GetBG2CharPtr(void) {
     int mode = reg_GXS_DB_DISPCNT & REG_GXS_DB_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2S_DB_BG2CNT;
 
@@ -179,7 +179,7 @@ void *gfxGetCharAddrBG2B(void) {
     return NULL;
 }
 
-void *gfxGetCharAddrBG3A(void) {
+void *G2_GetBG3CharPtr(void) {
     int mode = reg_GX_DISPCNT & REG_GX_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2_BG3CNT;
 
@@ -192,7 +192,7 @@ void *gfxGetCharAddrBG3A(void) {
     return NULL;
 }
 
-void *gfxGetCharAddrBG3B(void) {
+void *G2S_GetBG3CharPtr(void) {
     int mode = reg_GXS_DB_DISPCNT & REG_GXS_DB_DISPCNT_BGMODE_MASK;
     u32 bgcnt = reg_G2S_DB_BG3CNT;
 

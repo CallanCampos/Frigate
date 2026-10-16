@@ -70,14 +70,14 @@ static u8 sMD5Padding[64] = {
 };
 
 // RFC 1321's Encode, which packs an array of 32-bit words into bytes, low byte first: on this little-endian target
-// that is a plain copy, through sys_memcpy (whose argument order is the opposite of this one's)
+// that is a plain copy, through MI_CpuCopy8 (whose argument order is the opposite of this one's)
 static void MD5Encode(u8 *output, const u32 *input, u32 len) {
-    sys_memcpy(input, output, len);
+    MI_CpuCopy8(input, output, len);
 }
 
 // RFC 1321's Decode, the opposite of MD5Encode: also a plain copy on this little-endian target
 static void MD5Decode(u32 *output, const u8 *input, u32 len) {
-    sys_memcpy(input, output, len);
+    MI_CpuCopy8(input, output, len);
 }
 
 static void MD5Transform(u32 state[4], const u8 block[64]) {
@@ -143,7 +143,7 @@ static void MD5Transform(u32 state[4], const u8 block[64]) {
 }
 
 void MD5Init(MD5Context *context) {
-    sys_memset(context, 0, sizeof(MD5Context));
+    MI_CpuFill8(context, 0, sizeof(MD5Context));
     context->state[0] = 0x67452301;
     context->state[1] = 0xefcdab89;
     context->state[2] = 0x98badcfe;
@@ -165,7 +165,7 @@ void MD5Update(MD5Context *context, const u8 *input, u32 inputLen) {
     partLen = 64 - index;
 
     if (inputLen >= partLen) {
-        sys_memcpy(input, &context->buffer[index], partLen);
+        MI_CpuCopy8(input, &context->buffer[index], partLen);
         index = 0;
         MD5Transform(context->state, context->buffer);
 
@@ -176,7 +176,7 @@ void MD5Update(MD5Context *context, const u8 *input, u32 inputLen) {
         i = 0;
     }
 
-    sys_memcpy(&input[i], &context->buffer[index], inputLen - i);
+    MI_CpuCopy8(&input[i], &context->buffer[index], inputLen - i);
 }
 
 void MD5Final(MD5Context *context, u8 digest[16]) {

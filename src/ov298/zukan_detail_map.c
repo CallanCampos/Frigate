@@ -436,7 +436,7 @@ static BOOL ZukanDetailMap_Init(ZukanDetailProcSys *sys, int *seq, void *param_,
 
     GFL_OvlLoad(OVERLAY_TOWNMAP);
     wk = ZukanDetailProcSys_AllocWork(sys, sizeof(ZukanDetailMapWork), param->heapId);
-    sys_memset(wk, 0, sizeof(ZukanDetailMapWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanDetailMapWork));
     wk->unit = ZukanDetailGraphic_GetClActUnit(ZukanDetailCommon_GetGraphic(common));
     wk->font = ZukanDetailCommon_GetFont(common);
     for (i = 0; i < 2; i++) {
@@ -520,7 +520,7 @@ static BOOL ZukanDetailMap_Main(ZukanDetailProcSys *sys, int *seq, void *param_,
         u8 bg;
 
         *seq = MAP_SEQ_FADE_IN_SUB;
-        gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BG0_AS_2D);
+        GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BG0_AS_2D);
         for (i = 0; i < NELEMS(sZukanDetailMapBGSetups); i++) {
             GFL_BGSysReleaseBG(sZukanDetailMapBGSetups[i].bg);
             GFL_BGSysCreateBG(sZukanDetailMapBGSetups[i].bg, &sZukanDetailMapBGSetups[i].setup,
@@ -652,7 +652,7 @@ static BOOL ZukanDetailMap_Main(ZukanDetailProcSys *sys, int *seq, void *param_,
         u32 i;
 
         ZukanDetailMap_FreeMapBG(param, wk, common);
-        gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
+        GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
         for (i = 0; i < NELEMS(sZukanDetailMapDefaultBGSetups); i++) {
             GFL_BGSysReleaseBG(sZukanDetailMapDefaultBGSetups[i].bg);
             GFL_BGSysCreateBG(sZukanDetailMapDefaultBGSetups[i].bg, &sZukanDetailMapDefaultBGSetups[i].setup,
@@ -901,7 +901,7 @@ static void ZukanDetailMap_CreateActors(ZukanDetailMapParam *param, ZukanDetailM
         ClActorPos pos;
         ClActorPos buttonPos;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         for (i = ACTOR_CURSOR; i < ACTOR_COUNT; i++) {
             wk->actors[i] = func_0204c040(wk->unit2, wk->mapChars, wk->mapPalette, wk->mapCellAnims, &setup,
                                           CLACT_SURFACE_MAIN, param->heapId);
@@ -953,7 +953,7 @@ static void ZukanDetailMap_CreateAreas(ZukanDetailMapParam *param, ZukanDetailMa
     ClActorSetup setup;
     u8 i;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
         setup.x = TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_X);
         setup.y = TownMapData_GetParam(wk->townmap, i, TOWNMAP_PARAM_AREA_Y);
@@ -2245,7 +2245,7 @@ static void ZukanDetailMap_UpdateKinds(ZukanDetailMapParam *param, ZukanDetailMa
 
 // Darkens the map when the Pokémon lives nowhere
 static void ZukanDetailMap_SetDimBlend(ZukanDetailMapWork *wk) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, ALL_PLANES, 12, 4);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, ALL_PLANES, 12, 4);
 }
 
 static void ZukanDetailMap_ResetBlend(ZukanDetailMapWork *wk) {
@@ -2272,13 +2272,13 @@ static void ZukanDetailMap_ClearHighlight(ZukanDetailMapWork *wk) {
 }
 
 static void ZukanDetailMap_UpdateGlow(ZukanDetailMapWork *wk) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, ALL_PLANES, wk->glowEv, 16 - wk->glowEv);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, ALL_PLANES, wk->glowEv, 16 - wk->glowEv);
     ZukanCommon_StepGlow(&wk->glowPhase, &wk->glowEv);
 }
 
 static void ZukanDetailMap_StartGlow(ZukanDetailMapWork *wk) {
     ZukanCommon_StartGlow(&wk->glowPhase, &wk->glowEv);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, ALL_PLANES, wk->glowEv, 16 - wk->glowEv);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, ALL_PLANES, wk->glowEv, 16 - wk->glowEv);
 }
 
 static void ZukanDetailMap_SetActorsOpaque(ZukanDetailMapParam *param, ZukanDetailMapWork *wk,
@@ -2322,7 +2322,7 @@ static void ZukanDetailMap_SetIconsOpaque(ZukanDetailMapParam *param, ZukanDetai
             func_0204c318(wk->icons[i], 0);
         }
     }
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, ALL_PLANES, 12, 4);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3, ALL_PLANES, 12, 4);
 }
 
 static void ZukanDetailMap_SetIconsBlended(ZukanDetailMapParam *param, ZukanDetailMapWork *wk,

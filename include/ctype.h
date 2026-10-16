@@ -19,7 +19,7 @@
 
 // The lower and the upper case of each character, and its classes
 extern const unsigned char __lower_map[0x80];
-extern const unsigned char __upper_map[0x80];
+extern const unsigned char __upper_map[0x80]; // swan's ascii_char
 extern const unsigned short __ctype_map[0x80];
 
 // The class functions test the table for the characters below 0x80 and give 0 for the others. They are written as

@@ -226,7 +226,7 @@ static BOOL NewGame_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->save = save;
     wk->newPlayerInfo = func_02008b0c(HEAPID_USER);
     wk->newConfig = func_0200898c(HEAPID_USER);
-    sys_memset(wk->rivalName, 0, sizeof(wk->rivalName));
+    MI_CpuFill8(wk->rivalName, 0, sizeof(wk->rivalName));
     wk->onlyCGearQuestion = FALSE;
     wk->config = wk->newConfig;
     wk->playerInfo = wk->newPlayerInfo;
@@ -560,8 +560,8 @@ static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void DebugGameStart_InitBG(DebugGameStartWork *wk) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetVRAMBanks(&sDebugVRAMConfig);

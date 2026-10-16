@@ -906,7 +906,7 @@ static BOOL CGearSw_IsScreenShown(CGearSw *work) {
     if (!GFL_WipeIsFinished()) {
         return FALSE;
     }
-    if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
         return FALSE;
     }
     if (!Field_GetSeasonBannerOverdrawFlag(GSYS_GetField(work->gsys))) {
@@ -982,14 +982,14 @@ static void CGearSw_LoadBG(CGearSw *work, int gender, int skin, BOOL palettes) {
         file = GFL_G2DIOReadNCLRArc(work->arc, 6, &palette, HEAPID_TAIL(work->heapId));
         colors = palette->rawData;
         for (i = 0; i < PANEL_COUNT + 1; i++) {
-            sys_memcpy(&colors[(i + gender * 6) * 16], work->panelColors[i], sizeof(work->panelColors[i]));
+            MI_CpuCopy8(&colors[(i + gender * 6) * 16], work->panelColors[i], sizeof(work->panelColors[i]));
         }
         GFL_HeapFree(file);
 
         file = GFL_G2DIOReadNCLRArc(work->arc, 7, &palette, HEAPID_TAIL(work->heapId));
         colors = palette->rawData;
         for (i = 0; i < PANEL_COUNT + 1; i++) {
-            sys_memcpy(&colors[(i + gender * 6) * 16], work->skinColors[i], sizeof(work->skinColors[i]));
+            MI_CpuCopy8(&colors[(i + gender * 6) * 16], work->skinColors[i], sizeof(work->skinColors[i]));
         }
         GFL_HeapFree(file);
     }
@@ -1015,7 +1015,7 @@ static void CGearSw_LoadObjRes(CGearSw *work, int gender) {
     work->objRes[4] = func_0204bde0(work->arc, 29, 30, work->heapId);
 
     file = GFL_G2DIOReadNCLRArc(work->arc, 13, &palette, work->heapId);
-    sys_memcpy16(&((u16 *)palette->rawData)[9 * 16], work->beaconColors, sizeof(work->beaconColors));
+    MIi_CpuCopy16(&((u16 *)palette->rawData)[9 * 16], work->beaconColors, sizeof(work->beaconColors));
     GFL_HeapFree(file);
 
     func_02042f2c(200, 10);
@@ -1136,8 +1136,8 @@ static void CGearSw_InitBG(CGearSw *work) {
 }
 
 static void CGearSw_SetSkinBlend(CGearSw *work) {
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1,
-                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 21, 10);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1,
+                       GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 21, 10);
 }
 
 // The markers and the buttons. Without the beacons only the Xtransceiver's marker can be touched
@@ -1156,7 +1156,7 @@ static int CGearSw_GetTouchedButton(CGearSw *work) {
         rect->left = pos.y;
         rect->right = 20;
     }
-    sys_memcpy(sCGearSwButtonRects, &rects[MARKER_COUNT], sizeof(sCGearSwButtonRects));
+    MI_CpuCopy8(sCGearSwButtonRects, &rects[MARKER_COUNT], sizeof(sCGearSwButtonRects));
     rects[MARKER_COUNT + NELEMS(sCGearSwButtonRects)].top = TOUCH_RECT_END;
     touched = func_0203da0c(rects);
     if (touched == TOUCH_RECT_NONE || (!work->beacons && touched != TOUCH_POWER)) {
@@ -1524,7 +1524,7 @@ static void CGearSw_AddPanelTask(CGearSw *work, u8 appear, u8 panel, u8 color, u
     CGearSwPanelTask *task =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbExMgr, CGearSw_PanelTask, sizeof(CGearSwPanelTask), 0));
 
-    sys_memset(task, 0, sizeof(CGearSwPanelTask));
+    MI_CpuFill8(task, 0, sizeof(CGearSwPanelTask));
     task->work = work;
     task->appear = appear;
     task->panel = panel;
@@ -1608,7 +1608,7 @@ static void CGearSw_StartNoticeGlow(CGearSw *work) {
     }
     task = GFL_TCBExMgrAddTask(work->tcbExMgr, CGearSw_NoticeTask, sizeof(CGearSwNoticeTask), 0);
     noticeTask = GFL_TCBExGetData(task);
-    sys_memset(noticeTask, 0, sizeof(CGearSwNoticeTask));
+    MI_CpuFill8(noticeTask, 0, sizeof(CGearSwNoticeTask));
     noticeTask->work = work;
     noticeTask->unk5 = 2;
     noticeTask->fraction = 0;
@@ -2203,7 +2203,7 @@ static void CGearSw_Exit(CGearSw *work) {
     GFL_ArcToolFree(work->arc);
     CGearSw_ExitGraphics(work);
     G2S_BlendNone();
-    sys_memset(work, 0, sizeof(CGearSw));
+    MI_CpuFill8(work, 0, sizeof(CGearSw));
 }
 
 CGearSw *CGearSw_Create(CGearSettings *settings, FieldSubscreen *subscreen, GameSystem *gsys, BOOL startup) {

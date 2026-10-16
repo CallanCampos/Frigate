@@ -103,7 +103,7 @@ static const char *DownloadPlay_GetCallbackName(u32 status) {
 // Takes a child out of every state's bitmap, with the interrupts off while the six words change
 static inline void DownloadPlay_DisconnectChildFromBmp(u16 childAid) {
     u16 aidMask = ~(1 << childAid);
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     sWork->state.connectChildBmp &= aidMask;
     sWork->state.requestChildBmp &= aidMask;
@@ -111,7 +111,7 @@ static inline void DownloadPlay_DisconnectChildFromBmp(u16 childAid) {
     sWork->state.downloadChildBmp &= aidMask;
     sWork->state.bootableChildBmp &= aidMask;
     sWork->state.rebootChildBmp &= aidMask;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 static inline void DownloadPlay_DisconnectChild(u16 childAid) {
@@ -132,7 +132,7 @@ void DownloadPlay_Init(u32 ggid, u32 tgid) {
 
     user.favoriteColor = 1;
     user.nameLength = settings->nickNameLength;
-    sys_memcpy(settings->nickName, user.name, MB_USER_NAME_LENGTH * 2);
+    MI_CpuCopy8(settings->nickName, user.name, MB_USER_NAME_LENGTH * 2);
     user.playerNo = 0;
     sWork->state = (const DownloadPlayState){ 0 };
     sWork->mbWorkp = sWork->mbWork;
@@ -164,8 +164,8 @@ static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo) {
         p_file = NULL;
     } else {
         p_file = &file;
-        finit(p_file);
-        if (!romfs_fopen(p_file, gameInfo->romFilePathp)) {
+        FS_InitFile(p_file);
+        if (!FS_OpenFile(p_file, gameInfo->romFilePathp)) {
             return ret;
         }
     }
@@ -179,7 +179,7 @@ static BOOL DownloadPlay_RegistFile(const MBGameRegistry *gameInfo) {
         }
     }
     if (p_file == &file) {
-        romfs_fclose(&file);
+        FS_CloseFile(&file);
     }
     return ret;
 }
@@ -196,11 +196,11 @@ static void DownloadPlay_KickChild(u16 childAid) {
         return;
     }
     {
-        u32 enabled = CPU_IRQDisable();
+        u32 enabled = OS_DisableInterrupts();
 
         sWork->state.requestChildBmp &= ~(1 << childAid);
         sWork->state.connectChildBmp &= ~(1 << childAid);
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
 }
 
@@ -210,11 +210,11 @@ static void DownloadPlay_StartDownload(u16 childAid) {
         return;
     }
     {
-        u32 enabled = CPU_IRQDisable();
+        u32 enabled = OS_DisableInterrupts();
 
         sWork->state.entryChildBmp &= ~(1 << childAid);
         sWork->state.downloadChildBmp |= 1 << childAid;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
 }
 
@@ -304,10 +304,10 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
         // through one base pointer; without either local the function no longer matches
         {
             u16 *bmp = &sWork->state.connectChildBmp;
-            u32 enabled = CPU_IRQDisable();
+            u32 enabled = OS_DisableInterrupts();
 
             *bmp |= 1 << childAid;
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
         }
         {
             u8 *macAddress = sWork->childInfo[childAid - 1].macAddress;
@@ -341,7 +341,7 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
         DownloadPlay_AcceptChild(childAid);
         userInfo = MB_CommGetChildUser(childAid);
         if (userInfo != NULL) {
-            sys_memcpy(userInfo, &sWork->childInfo[childAid - 1].user, sizeof(MBUserInfo));
+            MI_CpuCopy8(userInfo, &sWork->childInfo[childAid - 1].user, sizeof(MBUserInfo));
         }
         break;
     }
@@ -422,14 +422,14 @@ u16 DownloadPlay_GetChildBmp(int bmpType) {
 static int DownloadPlay_GetChildState(u16 childAid) {
     DownloadPlayState tmpState;
     u16 bitmap = 1 << childAid;
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     if ((sWork->state.connectChildBmp & bitmap) == 0) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return DOWNLOAD_PLAY_CHILD_NONE;
     }
-    sys_memcpy(&sWork->state, &tmpState, sizeof(DownloadPlayState));
-    CPU_SetIRQMask(enabled);
+    MI_CpuCopy8(&sWork->state, &tmpState, sizeof(DownloadPlayState));
+    OS_RestoreInterrupts(enabled);
     if (tmpState.requestChildBmp & bitmap) {
         return DOWNLOAD_PLAY_CHILD_REQUEST;
     }

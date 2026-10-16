@@ -102,7 +102,7 @@ static const WinRecordBGSetup sWinRecordBGSetups[] = {
 WinRecordGraphic *WinRecordGraphic_Create(u32 layout, HeapID heapId) {
     WinRecordGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(WinRecordGraphic), FALSE, "win_record_graphic.c", 450);
 
-    sys_memset(graphic, 0, sizeof(WinRecordGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WinRecordGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -129,7 +129,7 @@ void WinRecordGraphic_Delete(WinRecordGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(WinRecordGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WinRecordGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -158,7 +158,7 @@ static void WinRecordGraphic_VBlank(TCB *tcb, void *data) {
 static void WinRecordGraphic_BGInit(WinRecordBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(WinRecordBG));
+    MI_CpuFill8(bg, 0, sizeof(WinRecordBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sWinRecordLCDConfig);
@@ -177,7 +177,7 @@ static void WinRecordGraphic_BGExit(WinRecordBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(WinRecordBG));
+    MI_CpuFill8(bg, 0, sizeof(WinRecordBG));
 }
 
 static void WinRecordGraphic_BGMain(WinRecordBG *bg) {
@@ -188,7 +188,7 @@ static void WinRecordGraphic_BGVBlank(WinRecordBG *bg) {
 }
 
 static void WinRecordGraphic_ClActInit(WinRecordClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(WinRecordClAct));
+    MI_CpuFill8(clact, 0, sizeof(WinRecordClAct));
     ClActSys_Create(&sWinRecordClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -199,7 +199,7 @@ static void WinRecordGraphic_ClActInit(WinRecordClAct *clact, const BGSysVRAMCon
 static void WinRecordGraphic_ClActExit(WinRecordClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(WinRecordClAct));
+    MI_CpuFill8(clact, 0, sizeof(WinRecordClAct));
 }
 
 static void WinRecordGraphic_ClActMain(WinRecordClAct *clact) {

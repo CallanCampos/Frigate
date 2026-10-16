@@ -475,7 +475,7 @@ void GymElec_ReapplyProgress(Field *field) {
 }
 
 void GymElec_SetBrightness(Field *field, s32 brightness) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, brightness);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
 }
 
 static GymElecSave *GymElec_GetSave(Field *field) {
@@ -677,7 +677,7 @@ static GymElecFog *GymElecFog_Create(FieldFog *fieldFog, FieldCamera *camera, co
     fog->camera = camera;
     fog->stages = stages;
     fog->stageCount = stageCount;
-    sys_memcpy(sFogTable, fog->table, sizeof(fog->table));
+    MI_CpuCopy8(sFogTable, fog->table, sizeof(fog->table));
     FieldFog_SetAlphaMode(fog->fog, 0);
     FieldFog_SetDepthShift(fog->fog, 9);
     FieldFog_SetOffset(fog->fog, 0);
@@ -699,7 +699,7 @@ static void GymElecFog_Update(GymElecFog *fog) {
 
     if (fog->stageChanged) {
         fog->current = fog->stages[fog->stage];
-        sys_memcpy(sFogTable, fog->table, sizeof(fog->table));
+        MI_CpuCopy8(sFogTable, fog->table, sizeof(fog->table));
         FieldFog_SetTable(fog->fog, fog->table);
         fog->stageChanged = FALSE;
     }
@@ -800,7 +800,7 @@ static Follower *GymElecFollowers_Get(GymElecFollowers *followers, u32 index) {
 }
 
 static void GymElecFollower_Init(Follower *follower, GymElecObject *object) {
-    sys_memset(follower, 0, sizeof(Follower));
+    MI_CpuFill8(follower, 0, sizeof(Follower));
     follower->object = object;
 }
 
@@ -880,7 +880,7 @@ static void GymElecStageObjects_FadeIn(GymElecStageObjects *stageObjects, u32 in
 static void GymElecFade_Start(Fade *fade, GymElecObject *object, u32 frames) {
     NNSG3dResMdl *mdl;
 
-    sys_memset(fade, 0, sizeof(Fade));
+    MI_CpuFill8(fade, 0, sizeof(Fade));
     fade->object = object;
     fade->frames = frames;
     mdl = GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(GymElecObject_GetActor(object)))->resMdl;
@@ -1101,14 +1101,14 @@ static void GymElecEffects_Mode2(GymElecEffects *effects) {
 }
 
 static void GymElecBurst_Init(Burst *burst, GymElecObject *obj0, GymElecObject *obj1, GymElecObject *obj2) {
-    sys_memset(burst, 0, sizeof(Burst));
+    MI_CpuFill8(burst, 0, sizeof(Burst));
     burst->objects[0] = obj0;
     burst->objects[1] = obj1;
     burst->objects[2] = obj2;
 }
 
 static void GymElecBurst_Clear(Burst *burst) {
-    sys_memset(burst, 0, sizeof(Burst));
+    MI_CpuFill8(burst, 0, sizeof(Burst));
 }
 
 static void GymElecBurst_Update(Burst *burst, const VecFx32 *playerPos) {

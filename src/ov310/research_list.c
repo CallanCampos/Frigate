@@ -2297,8 +2297,8 @@ static void ResearchList_InitBG(ResearchList *wk) {
     GFL_BGSysSetBGEnabled(BG_MAIN_FRAME, TRUE);
     GFL_BGSysSetBGEnabled(BG_MAIN_LIST, TRUE);
     GFL_BGSysSetBGEnabled(BG_MAIN_TEXT, TRUE);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 16, 5);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG1, 16, 5);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 16, 5);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG1, 16, 5);
     BmpWin_InitAllocator(wk->heapId);
 }
 

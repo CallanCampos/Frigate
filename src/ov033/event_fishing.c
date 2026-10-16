@@ -78,7 +78,7 @@ GameEvent *EventFieldFishing_Create(Field *field, GameSystem *gsys) {
 
     event = GameEvent_Create(gsys, NULL, EventFieldFishing_Callback, sizeof(FishingEventWork));
     work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(FishingEventWork));
+    MI_CpuFill8(work, 0, sizeof(FishingEventWork));
     work->gsys = gsys;
     work->field = field;
     work->gameData = GSYS_GetGameData(gsys);

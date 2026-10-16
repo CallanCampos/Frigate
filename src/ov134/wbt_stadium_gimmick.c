@@ -566,7 +566,7 @@ static u32 WbtStadiumGimmick_GetPlttAddr(const NNSG3dResTex *tex, const NNSG3dRe
 }
 
 static void WbtStadiumGimmick_MakeResName(NNSG3dResName *resName, const char *name) {
-    int len = NNS_STD_StrLen(name);
+    int len = STD_GetStringLength(name);
     u8 i;
 
     for (i = 0; i < 4; i++) {
@@ -632,10 +632,10 @@ static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource,
     work->paletteFile = GFL_G2DIOReadNCLR(0x123, file * 2 + 1, &work->palette, heapId);
     src = work->character->rawData;
     pixels = GFL_BitmapGetPixelData(work->bitmap);
-    sys_memset32(0, pixels, 16 * 32);
+    MIi_CpuClear32(0, pixels, 16 * 32);
     for (y = 0; y < 4; y++) {
         for (x = 0; x < 4; x++) {
-            sys_memcpy32(src + (y * 32 + x + 28) * 32, pixels + (y * 4 + x) * 32, 32);
+            MIi_CpuCopy32(src + (y * 32 + x + 28) * 32, pixels + (y * 4 + x) * 32, 32);
         }
     }
     GFL_BitmapMakeLinear(work->bitmap, FALSE, heapId);

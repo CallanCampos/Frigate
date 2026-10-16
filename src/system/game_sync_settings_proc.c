@@ -47,7 +47,7 @@ static BOOL GameSyncSettings_Init(GameProc *proc, u32 *state, void *param, void 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GAMESYNC, 0x78000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(GameSyncSettingsWork), HEAPID_GAMESYNC);
-    sys_memset(wk, 0, sizeof(GameSyncSettingsWork));
+    MI_CpuFill8(wk, 0, sizeof(GameSyncSettingsWork));
     wk->heapId = HEAPID_GAMESYNC;
     wk->gameData = GameData_Create(HEAPID_GAMESYNC);
     if (func_020099f4(getDreamWorldStuffAddress(GameData_GetSaveControl(wk->gameData)))) {

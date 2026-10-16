@@ -357,7 +357,7 @@ void func_ov137_021eec80(Field *field) {
     bubblesEnabled = TRUE;
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
     list2 = GameData_GetJoinAvenuePersonListPtr(gameData);
-    sys_memset(&sysSetup, 0, sizeof(ResortSysSetup));
+    MI_CpuFill8(&sysSetup, 0, sizeof(ResortSysSetup));
     sysSetup.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     sysSetup.list = JoinAvenue_GetPersonList(joinAvenue);
     sysSetup.list2 = *list2;
@@ -372,7 +372,7 @@ void func_ov137_021eec80(Field *field) {
     work->people = func_ov137_021f042c(heapId, work->sys, mmSys, Field_GetPlayer(field), flag, unk2);
     func_ov137_021f0508(work->people, flag, unk2);
 
-    sys_memset(&npcSetup, 0, sizeof(ResortNPCSetup));
+    MI_CpuFill8(&npcSetup, 0, sizeof(ResortNPCSetup));
     npcSetup.mmSys = GameData_GetMMSys(gameData);
     npcSetup.unk4 = 16;
     npcSetup.info = ResortSys_GetInfo(work->sys);
@@ -710,7 +710,7 @@ static void func_ov137_021ef418(ResortWalker *walker, ResortPerson *person, void
 }
 
 static void func_ov137_021ef470(ResortWalker *walker) {
-    sys_memset(walker, 0, sizeof(ResortWalker));
+    MI_CpuFill8(walker, 0, sizeof(ResortWalker));
     walker->magic = 0x765f573;
 }
 
@@ -1046,14 +1046,14 @@ static void func_ov137_021efb4c(FieldActor *actor) {
 }
 
 static void func_ov137_021efb50(ResortWalkerGroup *group, u16 x, u16 dir, HeapID heapId) {
-    sys_memset(group, 0, sizeof(ResortWalkerGroup));
+    MI_CpuFill8(group, 0, sizeof(ResortWalkerGroup));
     group->x = x;
     group->dir = dir;
     group->timer = GFL_RandomMTRange(239) + 1;
 }
 
 static void func_ov137_021efb78(ResortWalkerGroup *group) {
-    sys_memset(group, 0, sizeof(ResortWalkerGroup));
+    MI_CpuFill8(group, 0, sizeof(ResortWalkerGroup));
 }
 
 static void func_ov137_021efb84(ResortWalkerGroup *group, FieldPlayer *player) {
@@ -1389,14 +1389,14 @@ static ResortPersonData *func_ov137_021f0164(ResortBubbles *bubbles) {
 }
 
 static void func_ov137_021f022c(ResortBubble *bubble, u16 index, HeapID heapId) {
-    sys_memset(bubble, 0, sizeof(ResortBubble));
+    MI_CpuFill8(bubble, 0, sizeof(ResortBubble));
     bubble->strbuf = GFL_StrBufCreate(33, heapId);
     bubble->index = index;
 }
 
 static void func_ov137_021f024c(ResortBubble *bubble) {
     GFL_StrBufFree(bubble->strbuf);
-    sys_memset(bubble, 0, sizeof(ResortBubble));
+    MI_CpuFill8(bubble, 0, sizeof(ResortBubble));
 }
 
 static void func_ov137_021f0264(ResortBubble *bubble, void *msgBGSys) {
@@ -1530,7 +1530,7 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
     ResortFieldPeople *people = GFL_HeapAllocate(heapId, sizeof(ResortFieldPeople), TRUE, "resort_field.c", 3601);
 
     people->sys = sys;
-    sys_memset(&watchSetup, 0, sizeof(ResortWatchSetup));
+    MI_CpuFill8(&watchSetup, 0, sizeof(ResortWatchSetup));
     watchSetup.list = ResortSys_GetList(sys);
     watchSetup.list2 = ResortSys_GetList2(sys);
     watchSetup.entries = ResortSys_GetEntries(sys);
@@ -1539,7 +1539,7 @@ static ResortFieldPeople *func_ov137_021f042c(HeapID heapId, ResortSys *sys, MMS
     watchSetup.interval = 0;
     people->watch = func_ov137_021eef7c(heapId, &watchSetup);
 
-    sys_memset(&peopleSetup, 0, sizeof(ResortPeopleSetup));
+    MI_CpuFill8(&peopleSetup, 0, sizeof(ResortPeopleSetup));
     peopleSetup.mmSys = mmSys;
     peopleSetup.slots = ResortSys_GetSlots(sys);
     peopleSetup.datas = ResortSys_GetDatas(sys);
@@ -1664,7 +1664,7 @@ static BOOL func_ov137_021f067c(void *context, void *person, u32 a2, u32 event) 
     case 2:
         if (func_ov137_021f1600(people->people, person) == NULL) {
             ResortPersonSource source;
-            sys_memset(&source, 0, sizeof(ResortPersonSource));
+            MI_CpuFill8(&source, 0, sizeof(ResortPersonSource));
             source.data = func_ov137_021f1b6c(ResortSys_GetDatas(people->sys), person);
             source.zone = 1;
             func_ov137_021ef250(people->walkers, func_ov137_021f14a8(people->people, &source));
@@ -1939,7 +1939,7 @@ void func_ov137_021f0d10(Field *field) {
     fill = FALSE;
     work = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(ResortFieldWork0));
     joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
-    sys_memset(&sysSetup, 0, sizeof(ResortSysSetup));
+    MI_CpuFill8(&sysSetup, 0, sizeof(ResortSysSetup));
     sysSetup.occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     sysSetup.list = JoinAvenue_GetPersonList(joinAvenue);
     sysSetup.list2 = NULL;
@@ -1950,7 +1950,7 @@ void func_ov137_021f0d10(Field *field) {
         fill = TRUE;
     }
 
-    sys_memset(&peopleSetup, 0, sizeof(ResortPeopleSetup));
+    MI_CpuFill8(&peopleSetup, 0, sizeof(ResortPeopleSetup));
     peopleSetup.mmSys = GameData_GetMMSys(gameData);
     peopleSetup.slots = ResortSys_GetSlots(work->sys);
     peopleSetup.datas = ResortSys_GetDatas(work->sys);
@@ -1963,7 +1963,7 @@ void func_ov137_021f0d10(Field *field) {
         func_ov137_021f1350(work->people);
     }
 
-    sys_memset(&npcSetup, 0, sizeof(ResortNPCSetup));
+    MI_CpuFill8(&npcSetup, 0, sizeof(ResortNPCSetup));
     npcSetup.mmSys = GameData_GetMMSys(gameData);
     npcSetup.unk4 = 16;
     npcSetup.info = ResortSys_GetInfo(work->sys);

@@ -103,7 +103,7 @@ WifiBattleMatchGraphic *WifiBattleMatchGraphic_Create(u32 layout, HeapID heapId)
     WifiBattleMatchGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchGraphic), FALSE, "wifibattlematch_graphic.c", 443);
 
-    sys_memset(graphic, 0, sizeof(WifiBattleMatchGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WifiBattleMatchGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -130,7 +130,7 @@ void WifiBattleMatchGraphic_Free(WifiBattleMatchGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(WifiBattleMatchGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WifiBattleMatchGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -153,7 +153,7 @@ static void WifiBattleMatchGraphic_VBlank(TCB *tcb, void *data) {
 static void WifiBattleMatchGraphic_BGInit(WifiBattleMatchGraphicBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(WifiBattleMatchGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(WifiBattleMatchGraphicBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -172,7 +172,7 @@ static void WifiBattleMatchGraphic_BGFree(WifiBattleMatchGraphicBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(WifiBattleMatchGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(WifiBattleMatchGraphicBG));
 }
 
 static void WifiBattleMatchGraphic_BGUpdate(WifiBattleMatchGraphicBG *bg) {
@@ -184,7 +184,7 @@ static void WifiBattleMatchGraphic_BGVBlank(WifiBattleMatchGraphicBG *bg) {
 
 static void WifiBattleMatchGraphic_ClActInit(WifiBattleMatchGraphicClAct *clact, const BGSysVRAMConfig *vramConfig,
                                              HeapID heapId) {
-    sys_memset(clact, 0, sizeof(WifiBattleMatchGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(WifiBattleMatchGraphicClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -195,7 +195,7 @@ static void WifiBattleMatchGraphic_ClActInit(WifiBattleMatchGraphicClAct *clact,
 static void WifiBattleMatchGraphic_ClActFree(WifiBattleMatchGraphicClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(WifiBattleMatchGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(WifiBattleMatchGraphicClAct));
 }
 
 static void WifiBattleMatchGraphic_ClActUpdate(WifiBattleMatchGraphicClAct *clact) {

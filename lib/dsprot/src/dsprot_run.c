@@ -31,7 +31,7 @@ asm void DSProt_Crash(void) {
 // clang-format on
 
 void DSProt_ClearMemory(void *dest, u32 size) {
-    sys_memset32(0, dest, size);
+    MIi_CpuClear32(0, dest, size);
 }
 
 // Hand-written, as every DSProt_Call* is: verifies the code from the address packed in its last word, then has

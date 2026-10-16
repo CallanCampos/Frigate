@@ -16,30 +16,29 @@
 
 // The ARM7 reads the pool and shares the work with the ARM9 through the cache, so each starts on a cache line. The
 // queue's state and the packets are in nitro_snd_main.c (see snd.h), before these
-static SNDCommand sCommands[SND_COMMAND_NUM] ATTRIBUTE_ALIGN(32);
+static SNDCommand sSndCommands[SND_COMMAND_NUM] ATTRIBUTE_ALIGN(32);
 static SNDSharedWork sSharedWork ATTRIBUTE_ALIGN(32);
 
-static int func_0207da0c(void);
-static int func_0207da30(void);
-static int func_0207da54(void);
-static void func_0207da6c(u32 fifoTag, u32 data, BOOL err);
-static void func_0207da84(void);
-static void func_0207dac0(void);
-static SNDCommand *func_0207dad8(void);
-static BOOL func_0207db08(void);
+static int SND_CountFreeCommand(void);
+static int SND_CountReadyCommand(void);
+static int SND_CountWaitingCommand(void);
+static void SNDi_PxiFifoCallback(u32 fifoTag, u32 data, BOOL err);
+static void SNDi_InitPxi(void);
+static void SNDi_WakeArm7(void);
+static SNDCommand *SNDi_PopFreeCommand(void);
+static BOOL SNDi_IsDriverAvailable(void);
 
-// NitroSDK's SND_CommandInit
-void func_0207d6b8(void) {
+void SND_CommandInit(void) {
     int i;
     SNDCommand *command;
 
-    func_0207da84();
-    SNDi_Queue.freeHead = sCommands;
+    SNDi_InitPxi();
+    SNDi_Queue.freeHead = sSndCommands;
     for (i = 0; i < SND_COMMAND_NUM - 1; i++) {
-        sCommands[i].next = &sCommands[i + 1];
+        sSndCommands[i].next = &sSndCommands[i + 1];
     }
-    sCommands[SND_COMMAND_NUM - 1].next = NULL;
-    SNDi_Queue.freeTail = &sCommands[SND_COMMAND_NUM - 1];
+    sSndCommands[SND_COMMAND_NUM - 1].next = NULL;
+    SNDi_Queue.freeTail = &sSndCommands[SND_COMMAND_NUM - 1];
     SNDi_Queue.readyHead = NULL;
     SNDi_Queue.readyTail = NULL;
     SNDi_Queue.sentCount = 0;
@@ -48,35 +47,35 @@ void func_0207d6b8(void) {
     SNDi_Queue.nextTag = 1;
     SNDi_Queue.receivedTag = 0;
     SNDi_SharedWork = &sSharedWork;
-    func_0207dcdc(SNDi_SharedWork);
+    SNDi_InitSharedWork(SNDi_SharedWork);
 
     // Tell the ARM7 where the shared work is
-    command = sndNewPacket(SND_COMMAND_BLOCK);
+    command = SND_AllocCommand(SND_COMMAND_BLOCK);
     if (command) {
         command->id = SND_COMMAND_SHARED_WORK;
         command->arg[0] = (u32)SNDi_SharedWork;
-        sndQueuePacket_(command);
-        func_0207d864(SND_COMMAND_BLOCK);
+        SND_PushCommand(command);
+        SND_FlushCommand(SND_COMMAND_BLOCK);
     }
 }
 
 // NitroSDK's SND_RecvCommandReply: takes back the next packet that the ARM7 is done with and returns its commands, or
 // returns NULL when there is none. With SND_COMMAND_BLOCK it waits for one
-SNDCommand *func_0207d73c(u32 flags) {
-    u32 enabled = CPU_IRQDisable();
+SNDCommand *SND_RecvCommandReply(u32 flags) {
+    u32 enabled = OS_DisableInterrupts();
     SNDCommand *command;
     SNDCommand *last;
 
     if (flags & SND_COMMAND_BLOCK) {
-        if (SNDi_Queue.receivedTag == func_0207dcc4()) {
+        if (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag()) {
             do {
-                CPU_SetIRQMask(enabled);
-                func_0207c160(SND_WAIT_CYCLES);
-                enabled = CPU_IRQDisable();
-            } while (SNDi_Queue.receivedTag == func_0207dcc4());
+                OS_RestoreInterrupts(enabled);
+                OS_SpinWaitSysCycles(SND_WAIT_CYCLES);
+                enabled = OS_DisableInterrupts();
+            } while (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag());
         }
-    } else if (SNDi_Queue.receivedTag == func_0207dcc4()) {
-        CPU_SetIRQMask(enabled);
+    } else if (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag()) {
+        OS_RestoreInterrupts(enabled);
         return NULL;
     }
 
@@ -97,19 +96,19 @@ SNDCommand *func_0207d73c(u32 flags) {
     SNDi_Queue.freeTail = last;
     SNDi_Queue.sentCount--;
     SNDi_Queue.receivedTag++;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return command;
 }
 
 // NitroSDK's SND_AllocCommand: takes a command from the pool. When the pool is empty it returns NULL, or with
 // SND_COMMAND_BLOCK it waits until the ARM7 returns some
-SNDCommand *sndNewPacket(u32 flags) {
+SNDCommand *SND_AllocCommand(u32 flags) {
     SNDCommand *command;
 
-    if (!func_0207db08()) {
+    if (!SNDi_IsDriverAvailable()) {
         return NULL;
     }
-    command = func_0207dad8();
+    command = SNDi_PopFreeCommand();
     if (command != NULL) {
         return command;
     }
@@ -117,29 +116,29 @@ SNDCommand *sndNewPacket(u32 flags) {
         return NULL;
     }
 
-    if (func_0207da54() > 0) {
+    if (SND_CountWaitingCommand() > 0) {
         // Packets are on their way: take back what is there
-        while (func_0207d73c(SND_COMMAND_NOBLOCK) != NULL) {
+        while (SND_RecvCommandReply(SND_COMMAND_NOBLOCK) != NULL) {
         }
-        command = func_0207dad8();
+        command = SNDi_PopFreeCommand();
         if (command != NULL) {
             return command;
         }
     } else {
         // Everything is waiting to be sent
-        func_0207d864(SND_COMMAND_BLOCK);
+        SND_FlushCommand(SND_COMMAND_BLOCK);
     }
-    func_0207dac0();
+    SNDi_WakeArm7();
     do {
-        func_0207d73c(SND_COMMAND_BLOCK);
-        command = func_0207dad8();
+        SND_RecvCommandReply(SND_COMMAND_BLOCK);
+        command = SNDi_PopFreeCommand();
     } while (command == NULL);
     return command;
 }
 
 // NitroSDK's SND_PushCommand: adds a command to the ready list
-void sndQueuePacket_(SNDCommand *command) {
-    u32 enabled = CPU_IRQDisable();
+void SND_PushCommand(SNDCommand *command) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (SNDi_Queue.readyTail == NULL) {
         SNDi_Queue.readyHead = command;
@@ -149,47 +148,47 @@ void sndQueuePacket_(SNDCommand *command) {
         SNDi_Queue.readyTail = command;
     }
     command->next = NULL;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's SND_FlushCommand: sends the ready commands as a packet. It returns FALSE when it could not, because no
 // packet could be sent without waiting and SND_COMMAND_BLOCK is not set. SND_COMMAND_IMMEDIATE wakes the ARM7 up
-BOOL func_0207d864(u32 flags) {
-    u32 enabled = CPU_IRQDisable();
+BOOL SND_FlushCommand(u32 flags) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (!SNDi_Queue.readyHead) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return TRUE;
     }
 
     if (SNDi_Queue.sentCount >= SND_PACKET_MAX) {
         if (!(flags & SND_COMMAND_BLOCK)) {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             return FALSE;
         }
         do {
-            func_0207d73c(SND_COMMAND_BLOCK);
+            SND_RecvCommandReply(SND_COMMAND_BLOCK);
         } while (SNDi_Queue.sentCount >= SND_PACKET_MAX);
         if (!SNDi_Queue.readyHead) {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             return TRUE;
         }
     }
 
-    cp15_flushDC(sCommands, sizeof(sCommands));
+    DC_FlushRange(sSndCommands, sizeof(sSndCommands));
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32)SNDi_Queue.readyHead, FALSE) < 0) {
         if (!(flags & SND_COMMAND_BLOCK)) {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             return FALSE;
         }
         while (SNDi_Queue.sentCount >= SND_PACKET_MAX ||
                PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32)SNDi_Queue.readyHead, FALSE) < 0) {
-            CPU_SetIRQMask(enabled);
-            func_0207d73c(SND_COMMAND_NOBLOCK);
-            enabled = CPU_IRQDisable();
-            cp15_flushDC(sCommands, sizeof(sCommands));
+            OS_RestoreInterrupts(enabled);
+            SND_RecvCommandReply(SND_COMMAND_NOBLOCK);
+            enabled = OS_DisableInterrupts();
+            DC_FlushRange(sSndCommands, sizeof(sSndCommands));
             if (!SNDi_Queue.readyHead) {
-                CPU_SetIRQMask(enabled);
+                OS_RestoreInterrupts(enabled);
                 return TRUE;
             }
         }
@@ -204,37 +203,37 @@ BOOL func_0207d864(u32 flags) {
     SNDi_Queue.readyTail = NULL;
     SNDi_Queue.sentCount++;
     SNDi_Queue.nextTag++;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
     if (flags & SND_COMMAND_IMMEDIATE) {
-        func_0207dac0();
+        SNDi_WakeArm7();
     }
     return TRUE;
 }
 
 // NitroSDK's SND_WaitForCommandProc: waits until the ARM7 is done with the packet that has the tag
-void func_0207d96c(u32 tag) {
-    if (func_0207d9d0(tag)) {
+void SND_WaitForCommandProc(u32 tag) {
+    if (SND_IsFinishedCommandTag(tag)) {
         return;
     }
-    while (func_0207d73c(SND_COMMAND_NOBLOCK) != NULL) {
+    while (SND_RecvCommandReply(SND_COMMAND_NOBLOCK) != NULL) {
     }
-    if (func_0207d9d0(tag)) {
+    if (SND_IsFinishedCommandTag(tag)) {
         return;
     }
-    func_0207dac0();
-    if (func_0207d9d0(tag)) {
+    SNDi_WakeArm7();
+    if (SND_IsFinishedCommandTag(tag)) {
         return;
     }
     do {
-        func_0207d73c(SND_COMMAND_BLOCK);
-    } while (!func_0207d9d0(tag));
+        SND_RecvCommandReply(SND_COMMAND_BLOCK);
+    } while (!SND_IsFinishedCommandTag(tag));
 }
 
 // swan's name for SND_GetCurrentCommandTag: the tag that SND_IsFinishedCommandTag tells for the commands pushed last,
 // which is the next packet's while commands wait to be flushed, and else the last packet taken back
-u32 sndGetSentPacketCount(void) {
-    u32 enabled = CPU_IRQDisable();
+u32 SND_GetCurrentCommandTag(void) {
+    u32 enabled = OS_DisableInterrupts();
     u32 tag;
 
     if (SNDi_Queue.readyHead == NULL) {
@@ -242,13 +241,13 @@ u32 sndGetSentPacketCount(void) {
     } else {
         tag = SNDi_Queue.nextTag;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return tag;
 }
 
 // NitroSDK's SND_IsFinishedCommandTag: whether the packet with the tag has come back. The tags wrap around
-BOOL func_0207d9d0(u32 tag) {
-    u32 enabled = CPU_IRQDisable();
+BOOL SND_IsFinishedCommandTag(u32 tag) {
+    u32 enabled = OS_DisableInterrupts();
     BOOL finished;
 
     if (tag > SNDi_Queue.receivedTag) {
@@ -264,95 +263,93 @@ BOOL func_0207d9d0(u32 tag) {
             finished = FALSE;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return finished;
 }
 
-// NitroSDK's SND_CountFreeCommand
-static int func_0207da0c(void) {
-    u32 enabled = CPU_IRQDisable();
+static int SND_CountFreeCommand(void) {
+    u32 enabled = OS_DisableInterrupts();
     int count = 0;
     SNDCommand *command;
 
     for (command = SNDi_Queue.freeHead; command != NULL; command = command->next) {
         count++;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return count;
 }
 
-// NitroSDK's SND_CountReadyCommand
-static int func_0207da30(void) {
-    u32 enabled = CPU_IRQDisable();
+static int SND_CountReadyCommand(void) {
+    u32 enabled = OS_DisableInterrupts();
     int count = 0;
     SNDCommand *command;
 
     for (command = SNDi_Queue.readyHead; command != NULL; command = command->next) {
         count++;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return count;
 }
 
 // NitroSDK's SND_CountWaitingCommand: the commands that are in neither the pool nor the ready list, so with the ARM7
-static int func_0207da54(void) {
-    return SND_COMMAND_NUM - func_0207da0c() - func_0207da30();
+static int SND_CountWaitingCommand(void) {
+    return SND_COMMAND_NUM - SND_CountFreeCommand() - SND_CountReadyCommand();
 }
 
 // The function that the PXI FIFO calls with the words that the ARM7 sends for the sound tag: the number of an alarm and
 // its ID, which are the alarm that went off. NitroSDK's SNDi_PxiFifoCallback (a guess)
-static void func_0207da6c(u32 fifoTag, u32 data, BOOL err) {
-    u32 enabled = CPU_IRQDisable();
+static void SNDi_PxiFifoCallback(u32 fifoTag, u32 data, BOOL err) {
+    u32 enabled = OS_DisableInterrupts();
 
-    func_0207db8c(data);
-    CPU_SetIRQMask(enabled);
+    SNDi_CallAlarmHandler(data);
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's SNDi_InitPxi: sets the FIFO's callback for the sound tag and waits until the ARM7 has set its own
-static void func_0207da84(void) {
-    func_0207c9fc(PXI_FIFO_TAG_SOUND, func_0207da6c);
-    if (func_0207db08()) {
-        while (!func_0207ca48(PXI_FIFO_TAG_SOUND, MI_PROCESSOR_ARM7)) {
-            func_0207c160(SND_WAIT_CYCLES);
+static void SNDi_InitPxi(void) {
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SOUND, SNDi_PxiFifoCallback);
+    if (SNDi_IsDriverAvailable()) {
+        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_SOUND, MI_PROCESSOR_ARM7)) {
+            OS_SpinWaitSysCycles(SND_WAIT_CYCLES);
         }
     }
 }
 
 // Sends the ARM7 an empty word, to make it look at the packets
-static void func_0207dac0(void) {
+static void SNDi_WakeArm7(void) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, 0, FALSE) < 0) {
     }
 }
 
 // Takes a command from the pool, or returns NULL when there is none
-static SNDCommand *func_0207dad8(void) {
-    u32 enabled = CPU_IRQDisable();
+static SNDCommand *SNDi_PopFreeCommand(void) {
+    u32 enabled = OS_DisableInterrupts();
     SNDCommand *command = SNDi_Queue.freeHead;
 
     if (command == NULL) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return NULL;
     }
     SNDi_Queue.freeHead = command->next;
     if (SNDi_Queue.freeHead == NULL) {
         SNDi_Queue.freeTail = NULL;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return command;
 }
 
 // Whether there is a sound driver to send commands to: always on a console, while on the Ensata emulator
 // (OS_IsRunOnEmulator) it asks a register of the emulator
-static BOOL func_0207db08(void) {
+static BOOL SNDi_IsDriverAvailable(void) {
     u32 enabled;
     u32 present;
 
-    if (!func_0207ac74()) {
+    if (!OS_IsRunOnEmulator()) {
         return TRUE;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     reg_SND_EMULATOR_DRIVER = SND_EMULATOR_QUERY;
     present = reg_SND_EMULATOR_DRIVER;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return present != 0;
 }

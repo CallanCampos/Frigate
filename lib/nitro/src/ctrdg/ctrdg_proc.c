@@ -6,12 +6,11 @@
 
 static void CTRDGi_DummyCallback(u32 fifoTag, u32 data, BOOL err);
 
-// CTRDG_DummyInit
-void func_020827d0(void) {
-    func_02082624();
-    func_0207c9fc(PXI_FIFO_TAG_CTRDG, NULL);
-    func_0207c9fc(PXI_FIFO_TAG_CTRDG, CTRDGi_DummyCallback);
-    func_020827a0(1);
+void CTRDG_DummyInit(void) {
+    CTRDGi_InitCommon();
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CTRDG, NULL);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CTRDG, CTRDGi_DummyCallback);
+    CTRDGi_SendtoPxi(1);
 }
 
 static void CTRDGi_DummyCallback(u32 fifoTag, u32 data, BOOL err) {

@@ -272,13 +272,13 @@ MysteryCardView *MysteryCardView_Create(const MysteryCardViewSetup *setup, HeapI
     const MysteryTextWinEntry *texts;
     u32 textCount;
 
-    sys_memset(view, 0, sizeof(MysteryCardView));
+    MI_CpuFill8(view, 0, sizeof(MysteryCardView));
     view->bgHalf = TRUE;
     view->setup = *setup;
     view->heapId = heapId;
-    sys_memset32(-1, view->iconChars, sizeof(view->iconChars));
-    sys_memset32(-1, view->iconPalettes, sizeof(view->iconPalettes));
-    sys_memset32(-1, view->iconCellAnims, sizeof(view->iconCellAnims));
+    MIi_CpuClear32(-1, view->iconChars, sizeof(view->iconChars));
+    MIi_CpuClear32(-1, view->iconPalettes, sizeof(view->iconPalettes));
+    MIi_CpuClear32(-1, view->iconCellAnims, sizeof(view->iconCellAnims));
     for (i = 0; i < func_0200aa64(view->setup.giftSave); i++) {
         if (func_0200a800(view->setup.giftSave, i)) {
             count++;
@@ -299,7 +299,7 @@ MysteryCardView *MysteryCardView_Create(const MysteryCardViewSetup *setup, HeapI
     }
     view->textWin = MysteryTextWin_Create(FALSE, texts, textCount, 1, 3, view->setup.queue, view->setup.msgData,
                                           view->setup.font, heapId);
-    sys_memset(&resSetup, 0, sizeof(MysteryCardResSetup));
+    MI_CpuFill8(&resSetup, 0, sizeof(MysteryCardResSetup));
     resSetup.bg = 6;
     resSetup.textBg = 4;
     resSetup.bgPalette = 14;
@@ -461,7 +461,7 @@ static void MysteryCardView_LoadGraphics(MysteryCardView *view, HeapID heapId) {
     MysteryPalFade_Init(&view->fades[0], arc, 0, 0, 1, heapId);
     MysteryPalFade_Init(&view->fades[1], arc, 0, 2, 3, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.x = 0;
     actorSetup.y = 24;
     actorSetup.bgPriority = 1;
@@ -622,7 +622,7 @@ static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL lef
     MysteryCardView_LoadIcon(view, card, win, heapId);
     dx = 0;
     dy = 0;
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.y = pos.iconY;
     actorSetup.bgPriority = 1;
     if (MysteryCard_GetKind(card) == 2) {
@@ -826,7 +826,7 @@ static void MysteryCard_Init(MysteryCard *card, const MysteryGift *gift, const M
     s16 x;
     s16 y;
 
-    sys_memset(card, 0, sizeof(MysteryCard));
+    MI_CpuFill8(card, 0, sizeof(MysteryCard));
     if (gift != NULL) {
         card->used = TRUE;
         card->gift = *gift;
@@ -851,7 +851,7 @@ static void MysteryCard_Init(MysteryCard *card, const MysteryGift *gift, const M
 static void MysteryCard_Exit(MysteryCard *card) {
     if (card->used) {
         GFL_BitmapFree(card->dateBitmap);
-        sys_memset(card, 0, sizeof(MysteryCard));
+        MI_CpuFill8(card, 0, sizeof(MysteryCard));
     }
 }
 
@@ -1197,7 +1197,7 @@ static void MysteryCardView_SeqMenu(MysterySeq *seq, u32 *state, void *work) {
         *state = 1;
         break;
     case 1:
-        sys_memset(&setup, 0, sizeof(MysteryYesNoSetup));
+        MI_CpuFill8(&setup, 0, sizeof(MysteryYesNoSetup));
         setup.msgData = view->setup.msgData;
         setup.font = view->setup.font;
         setup.queue = view->setup.queue;
@@ -1301,7 +1301,7 @@ static void MysteryCardView_SeqThrowAway(MysterySeq *seq, u32 *state, void *work
         break;
     case 1:
         if (MysteryMsgWin_IsDone(view->msgWin)) {
-            sys_memset(&setup, 0, sizeof(MysteryYesNoSetup));
+            MI_CpuFill8(&setup, 0, sizeof(MysteryYesNoSetup));
             setup.msgData = view->setup.msgData;
             setup.font = view->setup.font;
             setup.queue = view->setup.queue;
@@ -1350,7 +1350,7 @@ static void MysteryCardView_SeqThrowAway(MysterySeq *seq, u32 *state, void *work
         break;
     }
     case 4:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, view->fadeFrame * 16 / 30);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, view->fadeFrame * 16 / 30);
         if (view->fadeFrame++ > 30) {
             view->fadeFrame = 0;
             *state = 5;
@@ -1364,7 +1364,7 @@ static void MysteryCardView_SeqThrowAway(MysterySeq *seq, u32 *state, void *work
         *state = 6;
         break;
     case 6:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, 16 - view->fadeFrame * 16 / 30);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, 16 - view->fadeFrame * 16 / 30);
         if (view->fadeFrame++ > 30) {
             view->fadeFrame = 0;
             *state = 7;
@@ -1451,7 +1451,7 @@ static void MysteryCardView_SeqMove(MysterySeq *seq, u32 *state, void *work) {
         break;
     }
     case 2:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, view->fadeFrame * 16 / 30);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, view->fadeFrame * 16 / 30);
         if (view->fadeFrame++ > 30) {
             view->fadeFrame = 0;
             *state = 3;
@@ -1481,7 +1481,7 @@ static void MysteryCardView_SeqMove(MysterySeq *seq, u32 *state, void *work) {
         break;
     }
     case 4:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x1e, 16 - view->fadeFrame * 16 / 30);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1e, 16 - view->fadeFrame * 16 / 30);
         if (view->fadeFrame++ > 30) {
             view->fadeFrame = 0;
             *state = 5;
@@ -1533,7 +1533,7 @@ static void MysteryCardView_SeqExit(MysterySeq *seq, u32 *state, void *work) {
         break;
     case 3:
         if (MysteryMsgWin_IsDone(view->msgWin)) {
-            sys_memset(&setup, 0, sizeof(MysteryYesNoSetup));
+            MI_CpuFill8(&setup, 0, sizeof(MysteryYesNoSetup));
             setup.msgData = view->setup.msgData;
             setup.font = view->setup.font;
             setup.queue = view->setup.queue;
@@ -1650,11 +1650,11 @@ static void MysteryPalFade_Init(MysteryPalFade *fade, ArcTool *arc, u32 fileId, 
     void *buf;
     u8 *data;
 
-    sys_memset(fade, 0, sizeof(MysteryPalFade));
+    MI_CpuFill8(fade, 0, sizeof(MysteryPalFade));
     buf = GFL_G2DIOReadNCLRArc(arc, fileId, &pal, heapId);
     data = pal->rawData;
-    sys_memcpy(data + to * 32, fade->to, sizeof(fade->to));
-    sys_memcpy(data + from * 32, fade->from, sizeof(fade->from));
+    MI_CpuCopy8(data + to * 32, fade->to, sizeof(fade->to));
+    MI_CpuCopy8(data + from * 32, fade->from, sizeof(fade->from));
     GFL_HeapFree(buf);
 }
 
@@ -1699,7 +1699,7 @@ MysteryCardRes *MysteryCardRes_Create(const MysteryCardResSetup *setup, HeapID h
     res->cellAnims = func_0204bde0(arc, 33, 36, heapId);
     res->chars = func_0204b81c(arc, 12, FALSE, res->vramType, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&iconSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&iconSetup, 0, sizeof(ClActorSetup));
     iconSetup.x = 216;
     iconSetup.y = 22;
     res->icon = func_0204c040(setup->unit, res->chars, res->palette, res->cellAnims, &iconSetup, res->vramType, heapId);
@@ -1711,7 +1711,7 @@ MysteryCardRes *MysteryCardRes_Create(const MysteryCardResSetup *setup, HeapID h
     res->pokeCellAnims = PokeGra_LoadClActCellAnims(1, 0, 0, FALSE, 0, FALSE, 2, res->vramType, heapId);
     res->pokeChars = PokeGra_LoadClActChars(pokeArc, 1, 0, 0, FALSE, 0, FALSE, 0, res->vramType, heapId);
     GFL_ArcToolFree(pokeArc);
-    sys_memset(&pokeSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&pokeSetup, 0, sizeof(ClActorSetup));
     pokeSetup.x = 184;
     pokeSetup.y = 112;
     res->bgPriority = pokeSetup.bgPriority = setup->bg & 3;
@@ -1745,12 +1745,12 @@ MysteryAlbum *MysteryAlbum_CreateReceived(MysteryGift *gift, MysteryCardRes *res
     MysteryAlbum *album = GFL_HeapAllocate(heapId, sizeof(MysteryAlbum), FALSE, "mystery_album.c", 3542);
     MysteryCardViewSetup setup;
 
-    sys_memset(album, 0, sizeof(MysteryAlbum));
+    MI_CpuFill8(album, 0, sizeof(MysteryAlbum));
     album->heapId = heapId;
     album->gift = gift;
     album->res = res;
     album->gameData = gameData;
-    sys_memset(&setup, 0, sizeof(MysteryCardViewSetup));
+    MI_CpuFill8(&setup, 0, sizeof(MysteryCardViewSetup));
     setup.mode = 0;
     setup.unit = res->setup.unit;
     setup.giftSave = res->setup.giftSave;
@@ -1981,7 +1981,7 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
     } else {
         dst += HW_DB_OBJ_PLTT;
     }
-    sys_memcpy(pal->rawData, (void *)dst, 0x60);
+    MI_CpuCopy8(pal->rawData, (void *)dst, 0x60);
     GFL_HeapFree(buf);
     buf = GFL_G2DIOReadOBJNCGRArc(arc, MysteryCard_GetIconCharFile(&album->card), FALSE, &chars, album->heapId);
     func_0204bab8(res->chars, chars->rawData, 0x200, 0, res->vramType);
@@ -2004,8 +2004,8 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
 #else
         func_0204bd10(res->pokePalette, album->pal->rawData, 1);
 #endif
-        sys_memcpy(album->pal->rawData, res->fade.to, sizeof(res->fade.to));
-        sys_memset16(0, res->fade.from, sizeof(res->fade.from));
+        MI_CpuCopy8(album->pal->rawData, res->fade.to, sizeof(res->fade.to));
+        MIi_CpuClear16(0, res->fade.from, sizeof(res->fade.from));
         func_0204bab8(res->pokeChars, album->chars->rawData, 0x1200, 0, res->vramType);
         func_0204c2a0(res->poke, 0);
         func_0204c124(res->poke, TRUE);
@@ -2018,10 +2018,10 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
             pltt[i] = res->fade.from[i];
         }
         if (res->setup.bg < 4) {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, (1 << (u8)res->setup.bg) | (1 << (u8)res->setup.textBg), 2, 12);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, (1 << (u8)res->setup.bg) | (1 << (u8)res->setup.textBg), 2, 12);
         } else {
-            gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0,
-                                (1 << (u8)(res->setup.bg - 4)) | (1 << (u8)(res->setup.textBg - 4)), 2, 12);
+            G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0,
+                               (1 << (u8)(res->setup.bg - 4)) | (1 << (u8)(res->setup.textBg - 4)), 2, 12);
         }
     } else {
         func_0204c124(res->poke, FALSE);
@@ -2052,8 +2052,8 @@ static void MysteryAlbum_Close(MysteryAlbum *album) {
             setBlend = Mystery_SetBlendAlphaSub;
         }
         setBlend(2, 12);
-        sys_memset16(0, album->res->fade.from, sizeof(album->res->fade.from));
-        sys_memcpy16(album->res->fade.from, pltt, sizeof(album->res->fade.from));
+        MIi_CpuClear16(0, album->res->fade.from, sizeof(album->res->fade.from));
+        MIi_CpuCopy16(album->res->fade.from, pltt, sizeof(album->res->fade.from));
     }
 }
 
@@ -2109,7 +2109,7 @@ static void MysteryCardRes_Clear(MysteryCardRes *res) {
 }
 
 static void MysteryAlbumShake_Init(MysteryAlbumShake *shake, u16 rotation, s32 x, s32 y) {
-    sys_memset(shake, 0, sizeof(MysteryAlbumShake));
+    MI_CpuFill8(shake, 0, sizeof(MysteryAlbumShake));
     shake->fromRotation = rotation;
     shake->toRotation = rotation;
     shake->stepCount = 11;

@@ -373,7 +373,7 @@ void ghiDoSendingRequest(GHIConnection *connection) {
         }
 
         if (connection->post != NULL && !connection->postingState.finished) {
-            func_0207a290(length, "%d", connection->postingState.totalBytes);
+            OS_SPrintf(length, "%d", connection->postingState.totalBytes);
             ghiAppendHeaderToBuffer(buffer, "Content-Length", length);
             ghiAppendHeaderToBuffer(buffer, "Content-Type", ghiPostGetContentType(connection));
         }
@@ -468,7 +468,7 @@ static BOOL ghiParseStatus(GHIConnection *connection) {
     int textEnd;
     char c;
 
-    if (func_0207fa4c(connection->recvBuffer.data, "HTTP/%d.%d %d%n", &major, &minor, &code, &textEnd) != 3 ||
+    if (STD_TSScanf(connection->recvBuffer.data, "HTTP/%d.%d %d%n", &major, &minor, &code, &textEnd) != 3 ||
         major < 1 || code < 100 || code >= 600) {
         connection->completed = TRUE;
         connection->result = 7;
@@ -575,7 +575,7 @@ static BOOL ghiDeliverIncomingFileData(GHIConnection *connection, const char *da
 static int ghiGetChunkSize(GHIConnection *connection) {
     int size;
 
-    if (func_0207fa4c(connection->chunkHeader, "%x", &size) != 1) {
+    if (STD_TSScanf(connection->chunkHeader, "%x", &size) != 1) {
         return -1;
     }
     return size;
@@ -795,8 +795,8 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
                         connection->completed = TRUE;
                         connection->result = 1;
                     }
-                    func_0207a290(connection->redirectUrl, "http://%s:%d%s", connection->serverAddress,
-                                  connection->serverPort, location);
+                    OS_SPrintf(connection->redirectUrl, "http://%s:%d%s", connection->serverAddress,
+                               connection->serverPort, location);
                 } else {
                     connection->redirectUrl = func_ov011_0216e2c8(location);
                     if (connection->redirectUrl == NULL) {

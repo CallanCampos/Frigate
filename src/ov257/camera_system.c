@@ -130,7 +130,7 @@ CameraSystem *CameraSystem_Create(HeapID heapId) {
     }
 
     sys->frameCount = 0;
-    CPU_EnableInterrupts(OS_IE_NDMA1);
+    OS_EnableIrqMask(OS_IE_NDMA1);
     CAMERA_SetVsyncCallback(CameraSystem_OnVsync);
     CAMERA_SetBufferErrorCallback(CameraSystem_OnBufferError);
     CAMERA_SetRebootCallback(CameraSystem_OnReboot);
@@ -157,7 +157,7 @@ static void CameraSystem_OnSoftReset(void *work) {
     CameraSystem *sys = work;
 
     while (DSP_IsShutterSoundPlaying() == TRUE) {
-        func_0207aa04(10);
+        OS_Sleep(10);
     }
     DSP_UnloadG711();
     CameraSystem_Stop(sys);
@@ -250,7 +250,7 @@ static void CameraSystem_LoadSound(CameraSystem *sys, BOOL start) {
     sys->soundSize = GFL_ArcSysGetDataLength(ARC_CAMERA_SOUND, file);
     sys->soundData = allocConfigDSSoftwareFeature(sys->heapId, sys->soundSize, "camera_system.c", 359);
     GFL_ArcSysRead(sys->soundData, ARC_CAMERA_SOUND, file);
-    cp15_flushDC(sys->soundData, sys->soundSize);
+    DC_FlushRange(sys->soundData, sys->soundSize);
 }
 
 static void CameraSystem_FreeSound(CameraSystem *sys) {
@@ -265,7 +265,7 @@ static void CameraSystem_LoadShutterSound(CameraSystem *sys) {
     sys->soundSize = GFL_ArcSysGetDataLength(ARC_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
     sys->soundData = allocConfigDSSoftwareFeature(sys->heapId, sys->soundSize, "camera_system.c", 381);
     GFL_ArcSysRead(sys->soundData, ARC_CAMERA_SOUND, CAMERA_SOUND_SHUTTER);
-    cp15_flushDC(sys->soundData, sys->soundSize);
+    DC_FlushRange(sys->soundData, sys->soundSize);
 }
 
 static void CameraSystem_OnBufferError(CAMERAResult result) {

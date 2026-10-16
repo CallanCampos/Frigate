@@ -841,7 +841,7 @@ static void GymOpelucid_ShakeCamera(Field *field) {
     FieldCameraShakeSetup setup;
     FieldTask *task;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.amplitudeX = 1;
     setup.amplitudeY = 2;
     setup.period = 3;

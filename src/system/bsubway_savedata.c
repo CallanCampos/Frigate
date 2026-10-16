@@ -17,7 +17,7 @@ u32 BSubwayPlayData_GetSize(void) {
 }
 
 void BSubwayPlayData_Init(BSubwayPlayData *data) {
-    sys_memset(data, 0, sizeof(BSubwayPlayData));
+    MI_CpuFill8(data, 0, sizeof(BSubwayPlayData));
 }
 
 void BSubwayPlayData_SetSaveFlag(BSubwayPlayData *data, u32 value) {
@@ -41,15 +41,15 @@ u32 BSubwayPlayData_GetData(BSubwayPlayData *data, u32 id, void *buffer) {
     case BSUBWAY_PLAY_WIFI_DAMAGE:
         return data->wifiDamage;
     case BSUBWAY_PLAY_UNK8:
-        sys_memcpy(data->unk8, buffer, sizeof(data->unk8));
+        MI_CpuCopy8(data->unk8, buffer, sizeof(data->unk8));
         return 0;
     case BSUBWAY_PLAY_UNK28:
-        sys_memcpy(data->unk28, buffer, sizeof(data->unk28));
+        MI_CpuCopy8(data->unk28, buffer, sizeof(data->unk28));
         return 0;
     case BSUBWAY_PLAY_UNK0_0:
         return data->unk0_0;
     case BSUBWAY_PLAY_UNKC:
-        sys_memcpy(data->unkC, buffer, sizeof(data->unkC));
+        MI_CpuCopy8(data->unkC, buffer, sizeof(data->unkC));
         return 0;
     case BSUBWAY_PLAY_UNK0_6:
         return data->unk0_6;
@@ -79,16 +79,16 @@ void BSubwayPlayData_SetData(BSubwayPlayData *data, u32 id, const void *value) {
         data->wifiDamage = *(const u16 *)value;
         break;
     case BSUBWAY_PLAY_UNK8:
-        sys_memcpy(value, data->unk8, sizeof(data->unk8));
+        MI_CpuCopy8(value, data->unk8, sizeof(data->unk8));
         break;
     case BSUBWAY_PLAY_UNK28:
-        sys_memcpy(value, data->unk28, sizeof(data->unk28));
+        MI_CpuCopy8(value, data->unk28, sizeof(data->unk28));
         break;
     case BSUBWAY_PLAY_UNK0_0:
         data->unk0_0 = *(const u8 *)value;
         break;
     case BSUBWAY_PLAY_UNKC:
-        sys_memcpy(value, data->unkC, sizeof(data->unkC));
+        MI_CpuCopy8(value, data->unkC, sizeof(data->unkC));
         break;
     case BSUBWAY_PLAY_UNK0_6:
         data->unk0_6 = *(const u8 *)value;
@@ -138,7 +138,7 @@ u32 BSubwayScoreData_GetSize(void) {
 }
 
 void BSubwayScoreData_Init(BSubwayScoreData *score) {
-    sys_memset(score, 0, sizeof(BSubwayScoreData));
+    MI_CpuFill8(score, 0, sizeof(BSubwayScoreData));
     score->wifiRank = 1;
 }
 
@@ -282,17 +282,17 @@ u32 BSubwayScoreData_SetWifiLoseCount(BSubwayScoreData *score, u32 op) {
 
 void BSubwayScoreData_SetTeam(BSubwayScoreData *score, u32 flag, const void *team) {
     if (flag == 0) {
-        sys_memcpy(team, score->team0, sizeof(score->team0));
+        MI_CpuCopy8(team, score->team0, sizeof(score->team0));
     } else {
-        sys_memcpy(team, score->team1, sizeof(score->team1));
+        MI_CpuCopy8(team, score->team1, sizeof(score->team1));
     }
 }
 
 void BSubwayScoreData_GetTeam(BSubwayScoreData *score, u32 flag, void *team) {
     if (flag == 0) {
-        sys_memcpy(score->team0, team, sizeof(score->team0));
+        MI_CpuCopy8(score->team0, team, sizeof(score->team0));
     } else {
-        sys_memcpy(score->team1, team, sizeof(score->team1));
+        MI_CpuCopy8(score->team1, team, sizeof(score->team1));
     }
 }
 
@@ -329,7 +329,7 @@ u32 BSubwayWifiData_GetSize(void) {
 }
 
 void BSubwayWifiData_Init(BSubwayWifiData *data) {
-    sys_memset(data, 0, sizeof(BSubwayWifiData));
+    MI_CpuFill8(data, 0, sizeof(BSubwayWifiData));
 }
 
 void BSubwayWifiData_SetRoomFlag(BSubwayWifiData *data, u8 rank, u8 room, const RTCDate *date) {
@@ -352,8 +352,8 @@ void BSubwayWifiData_SetRoomFlag(BSubwayWifiData *data, u8 rank, u8 room, const 
 }
 
 static void BSubwayWifiData_ClearRoomFlags(BSubwayWifiData *data) {
-    sys_memset(data->roomFlags, 0, sizeof(data->roomFlags));
-    sys_memset(&data->date, 0, sizeof(data->date));
+    MI_CpuFill8(data->roomFlags, 0, sizeof(data->roomFlags));
+    MI_CpuFill8(&data->date, 0, sizeof(data->date));
 }
 
 // Whether a date is after another, by its year, its month or its day
@@ -407,7 +407,7 @@ u16 BSubwayWifiData_HasLeaders(BSubwayWifiData *data) {
 }
 
 void BSubwayWifiData_SetPlayers(BSubwayWifiData *data, const void *players, u8 rank, u8 room) {
-    sys_memcpy(players, data->players, sizeof(data->players));
+    MI_CpuCopy8(players, data->players, sizeof(data->players));
     data->playerRank = rank;
     data->playerRoom = room;
     data->hasPlayers = TRUE;
@@ -426,15 +426,15 @@ void BSubwayWifiData_GetTrainer(BSubwayWifiData *data, BSubwayTrainer *trainer, 
 
     trainer->unk00 = 0xffff;
     trainer->trainerId = player->trainerClass;
-    sys_memcpy(player->name, trainer->name, sizeof(player->name));
-    sys_memcpy(player->message, &trainer->message, sizeof(player->message));
-    sys_memcpy(player->winWords, trainer->winWords, sizeof(player->winWords));
-    sys_memcpy(player->loseWords, trainer->loseWords, sizeof(player->loseWords));
-    sys_memcpy(player->pokemon, trainer->pokemon, sizeof(player->pokemon));
+    MI_CpuCopy8(player->name, trainer->name, sizeof(player->name));
+    MI_CpuCopy8(player->message, &trainer->message, sizeof(player->message));
+    MI_CpuCopy8(player->winWords, trainer->winWords, sizeof(player->winWords));
+    MI_CpuCopy8(player->loseWords, trainer->loseWords, sizeof(player->loseWords));
+    MI_CpuCopy8(player->pokemon, trainer->pokemon, sizeof(player->pokemon));
 }
 
 void BSubwayWifiData_SetLeaders(BSubwayWifiData *data, const void *leaders, u8 rank, u8 room) {
-    sys_memcpy(leaders, data->leaders, sizeof(data->leaders));
+    MI_CpuCopy8(leaders, data->leaders, sizeof(data->leaders));
     data->leaderRank = rank;
     data->leaderRoom = room;
     data->hasLeaders = TRUE;
@@ -451,7 +451,7 @@ u16 BSubwayWifiData_GetLeaderRoom(BSubwayWifiData *data) {
 void *BSubwayWifiData_AllocLeaders(BSubwayWifiData *data, HeapID heapId) {
     BSubwayWifiLeader *leaders = GFL_HeapAllocate(heapId, sizeof(data->leaders), TRUE, "bsubway_savedata.c", 1288);
 
-    sys_memcpy(data->leaders, leaders, sizeof(data->leaders));
+    MI_CpuCopy8(data->leaders, leaders, sizeof(data->leaders));
     return leaders;
 }
 

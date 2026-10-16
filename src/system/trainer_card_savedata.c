@@ -14,7 +14,7 @@ u32 func_020093d0(void) {
 }
 
 void initTrainerCardInfoBlk(GameRecords *records) {
-    sys_memset32(0, records, sizeof(GameRecords));
+    MIi_CpuClear32(0, records, sizeof(GameRecords));
     records->seedHigh = OS_GetVBlankCount() | (OS_GetVBlankCount() << 8);
     EncryptRecordStorage(records, 1);
 }

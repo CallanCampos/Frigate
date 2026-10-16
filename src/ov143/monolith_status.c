@@ -95,7 +95,7 @@ static BOOL MonolithStatus_Init(GameProc *proc, u32 *state, void *param, void *w
     switch (*state) {
     case 0:
         sw = GFL_ProcInitSubsystem(proc, sizeof(MonolithStatusWork), HEAPID_MONOLITH);
-        sys_memset(sw, 0, sizeof(MonolithStatusWork));
+        MI_CpuFill8(sw, 0, sizeof(MonolithStatusWork));
         MonolithStatus_CreateBGs(sw);
         MonolithStatus_LoadScreen(screen, screen->work, sw);
         MonolithStatus_CreateWindows(screen->work, sw);

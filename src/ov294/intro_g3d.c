@@ -115,7 +115,7 @@ BOOL IntroG3d_Open(IntroG3d *g3d) {
 
     switch (g3d->state) {
     case 0:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 1, 9, 0, 0);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 1, 9, 0, 0);
         GFL_SndSEPlay(SEQ_SE_OPEN2);
         g3d->state++;
     case 1:

@@ -208,7 +208,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A u16 stack parameter left in its slot and reloaded with `ldrh`, one load shared by two calls: those callees take
   `u32`; check their prototypes against their asm. (matching.md: "reloaded with `ldrh`")
 - An argument loaded before a call among the arguments was passed to an inlined helper that makes the call.
-- A field read before a `sys_memset` (or another call) that could change it was the argument of an inlined helper.
+- A field read before a `MI_CpuFill8` (or another call) that could change it was the argument of an inlined helper.
   (matching.md: "a field read before a call that could change it")
   (matching.md: "inlined helper that makes the call")
 - One load of a struct's pointer field for two stores through it, where ours reloads: an inline helper taking the

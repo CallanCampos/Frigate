@@ -86,12 +86,12 @@ void WFCUserInfoWarning_Show(void) {
 }
 
 static void WFCUserInfoWarning_Init(u32 message) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
-    gfxAcquireBGBanksA();
-    gfxAcquireBGBanksB();
-    gfxSetBGBanksA(GX_VRAM_BG_128_C);
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_ResetBankForBG();
+    GX_ResetBankForSubBG();
+    GX_SetBankForBG(GX_VRAM_BG_128_C);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     GX_SetVisiblePlane(GX_PLANEMASK_BG1);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     G2_SetBG1Control(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x0000, GX_BG_CHARBASE_0x04000,
@@ -101,8 +101,8 @@ static void WFCUserInfoWarning_Init(u32 message) {
     G2_BlendNone();
     WFCUserInfoWarning_LoadWindow();
     WFCUserInfoWarning_PrintMessage(message);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
 }
 
 static void WFCUserInfoWarning_LoadWindow(void) {
@@ -112,26 +112,26 @@ static void WFCUserInfoWarning_LoadWindow(void) {
     NNSG2dPaletteData *palette;
     NNSG2dPaletteCompressInfo *compressInfo;
 
-    sys_memset32(0, gfxGetCharAddrBG1A(), 0x4000);
+    MIi_CpuClear32(0, G2_GetBG1CharPtr(), 0x4000);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_CHAR, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
-        cp15_flushDC(chars->rawData, chars->size);
-        MI_CpuCopy16(chars->rawData, gfxGetCharAddrBG1A(), chars->size);
+        DC_FlushRange(chars->rawData, chars->size);
+        MI_CpuCopy16(chars->rawData, G2_GetBG1CharPtr(), chars->size);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_SCRN, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
-        cp15_flushDC(screen->rawData, screen->size);
-        MI_CpuCopy16(screen->rawData, gfxGetScreenAddrBG1A(), screen->size);
+        DC_FlushRange(screen->rawData, screen->size);
+        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->size);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_PLTT, FALSE, HEAPID_USER);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
-        cp15_flushDC(palette->rawData, 0x20);
+        DC_FlushRange(palette->rawData, 0x20);
         MI_CpuCopy16(palette->rawData, (void *)HW_BG_PLTT, 0x20);
     }
     GFL_HeapFree(file);
@@ -148,7 +148,7 @@ static void WFCUserInfoWarning_PrintMessage(u32 message) {
     MsgData *msgData;
     StrBuf *str;
 
-    screen = gfxGetScreenAddrBG1A();
+    screen = G2_GetBG1ScrPtr();
     tile = FIRST_TEXT_TILE;
     for (y = TEXT_TOP; y < TEXT_TOP + TEXT_HEIGHT; y++) {
         for (x = TEXT_LEFT; x < TEXT_LEFT + TEXT_WIDTH; x++) {
@@ -156,9 +156,9 @@ static void WFCUserInfoWarning_PrintMessage(u32 message) {
             tile++;
         }
     }
-    sys_memset16(TEXT_BACKGROUND * 0x1111, (u8 *)gfxGetCharAddrBG1A() + FIRST_TEXT_TILE * TILE_SIZE,
-                 TEXT_WIDTH * TEXT_HEIGHT * TILE_SIZE);
-    bitmap = GFL_BitmapWrapVRAM((u8 *)gfxGetCharAddrBG1A() + FIRST_TEXT_TILE * TILE_SIZE, TEXT_WIDTH, TEXT_HEIGHT,
+    MIi_CpuClear16(TEXT_BACKGROUND * 0x1111, (u8 *)G2_GetBG1CharPtr() + FIRST_TEXT_TILE * TILE_SIZE,
+                   TEXT_WIDTH * TEXT_HEIGHT * TILE_SIZE);
+    bitmap = GFL_BitmapWrapVRAM((u8 *)G2_GetBG1CharPtr() + FIRST_TEXT_TILE * TILE_SIZE, TEXT_WIDTH, TEXT_HEIGHT,
                                 TILE_SIZE, HEAPID_USER);
     font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_USER);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, MSG_FILE_WIFI_ERROR, HEAPID_USER);
@@ -172,15 +172,15 @@ static void WFCUserInfoWarning_PrintMessage(u32 message) {
 
 // Clears the window and gives the banks back
 static void WFCUserInfoWarning_Exit(void) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetEnabledBGsB(0);
-    sys_memset16(0, gfxGetCharAddrBG1A(), 0x4000);
-    sys_memset16(0, gfxGetScreenAddrBG1A(), 0x800);
-    sys_memset16(GX_RGB(31, 31, 31), (void *)HW_BG_PLTT, 0x20);
+    MIi_CpuClear16(0, G2_GetBG1CharPtr(), 0x4000);
+    MIi_CpuClear16(0, G2_GetBG1ScrPtr(), 0x800);
+    MIi_CpuClear16(GX_RGB(31, 31, 31), (void *)HW_BG_PLTT, 0x20);
     GX_SetVisiblePlane(0);
-    gfxAcquireBGBanksB();
-    gfxAcquireBGBanksA();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GX_ResetBankForSubBG();
+    GX_ResetBankForBG();
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
 }

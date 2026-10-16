@@ -33,7 +33,7 @@ static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, const LocalTvtP
 static BOOL LocalTvtSupport_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 
 void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     funcs->work = LocalTvtSupport_Create(gameData, heapId);
     funcs->free = LocalTvtSupport_Free;
     funcs->greet = LocalTvtSupport_Greet;
@@ -143,7 +143,7 @@ static BOOL LocalTvtSupport_Happiness(LocalTvtPerson *person, const LocalTvtPers
         } else {
             LocalTvtPokeSelectSetup selectSetup;
 
-            sys_memset(&selectSetup, 0, sizeof(selectSetup));
+            MI_CpuFill8(&selectSetup, 0, sizeof(selectSetup));
             selectSetup.message = setup->message;
             selectSetup.unit = setup->unit;
             selectSetup.party = GameData_GetParty(support->gameData);
@@ -232,7 +232,7 @@ static BOOL LocalTvtSupport_EffortValues(LocalTvtPerson *person, const LocalTvtP
         } else {
             LocalTvtPokeSelectSetup selectSetup;
 
-            sys_memset(&selectSetup, 0, sizeof(selectSetup));
+            MI_CpuFill8(&selectSetup, 0, sizeof(selectSetup));
             selectSetup.message = setup->message;
             selectSetup.unit = setup->unit;
             selectSetup.party = GameData_GetParty(support->gameData);

@@ -96,7 +96,7 @@ void GFL_BitmapCopy(const GFLBitmap *src, GFLBitmap *dest) {
     if (destSize < size) {
         size = destSize;
     }
-    sys_memcpy32(src->pixels, dest->pixels, size);
+    MIi_CpuCopy32(src->pixels, dest->pixels, size);
 }
 
 GFLBitmap *GFL_G2DIOLoadBitmap(u32 arcId, u32 fileId, BOOL compressed, HeapID heapId) {
@@ -126,7 +126,7 @@ void GFL_BitmapConvFromCHAR(GFLBitmap *bitmap, NNSG2dCharacterData *chars, HeapI
         bitmap->tileSize = 0x40;
         break;
     }
-    sys_memcpy32(chars->rawData, bitmap->pixels, chars->size);
+    MIi_CpuCopy32(chars->rawData, bitmap->pixels, chars->size);
 }
 
 u8 GFL_BitmapGetBytesPerTile(GFLBitmap *bitmap) {
@@ -178,7 +178,7 @@ void GFL_BitmapFill(GFLBitmap *bitmap, u8 color) {
     if (bitmap->tileSize == 0x20) {
         color = ((color & 0xf) << 4) | (color & 0xf);
     }
-    sys_memset(bitmap->pixels, color, bitmap->width / 8 * (bitmap->height / 8) * bitmap->tileSize);
+    MI_CpuFill8(bitmap->pixels, color, bitmap->width / 8 * (bitmap->height / 8) * bitmap->tileSize);
 }
 
 // Clips a copy to the source and the destination, and returns whether any of it is left

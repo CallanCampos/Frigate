@@ -171,7 +171,7 @@ static int Enter_DpwTrInit(WorldTradeWork *wk) {
 
     func_02008be0(wk->param->mystatus, WifiList_GetMyGSID(wk->param->wifilist));
     pid = func_02008bdc(wk->param->mystatus);
-    DpwTr_Init(pid, func_02057ec4(userData), 0);
+    DpwTr_Init(pid, DWC_CreateFriendKey(userData), 0);
     return TRUE;
 }
 
@@ -323,7 +323,7 @@ static int Enter_WifiConnectionLogin(WorldTradeWork *wk) {
     WifiLoginParam *param;
 
     wk->subProcParam = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(WifiLoginParam), FALSE, "worldtrade_enter.c", 611);
-    sys_memset(wk->subProcParam, 0, sizeof(WifiLoginParam));
+    MI_CpuFill8(wk->subProcParam, 0, sizeof(WifiLoginParam));
     param = wk->subProcParam;
     param->gameData = GSYS_GetGameData(wk->param->gsys);
     param->unk4 = 0;
@@ -366,7 +366,7 @@ static int Enter_WifiConnectionLogout(WorldTradeWork *wk) {
     WifiLogoutParam *param;
 
     wk->subProcParam = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(WifiLogoutParam), FALSE, "worldtrade_enter.c", 689);
-    sys_memset(wk->subProcParam, 0, sizeof(WifiLogoutParam));
+    MI_CpuFill8(wk->subProcParam, 0, sizeof(WifiLogoutParam));
     param = wk->subProcParam;
     param->gameData = GSYS_GetGameData(wk->param->gsys);
     param->unk4 = 0;
@@ -552,7 +552,7 @@ static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
     case 3:
         DpwTr_End();
         func_ov011_0215fb78();
-        func_0205b198();
+        DWC_CleanupInet();
         wk->localSeq++;
         break;
     default:

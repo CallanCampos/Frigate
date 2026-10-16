@@ -92,7 +92,7 @@ BOOL func_ov012_021580c4(VM *vm, FieldScriptEnv *env) {
         online = kind != 0 ? TRUE : FALSE;
         event = GameEvent_Create(gsys, NULL, func_ov012_02158c8c, sizeof(MusicalCallEvent));
         data = GameEvent_GetData(event);
-        sys_memset(data, 0, sizeof(MusicalCallEvent));
+        MI_CpuFill8(data, 0, sizeof(MusicalCallEvent));
         data->event = func_ov012_02150cf8(gsys, gameData, arg, online, commWork);
         data->work = commWork;
         data->online = online;
@@ -130,7 +130,7 @@ BOOL func_ov012_021581e4(VM *vm, FieldScriptEnv *env) {
     poke = MusicalSystem_InitPokeFromPkm(PokeParty_GetPkm(GameData_GetParty(gameData), slot), HEAPID_GAMEEVENT);
     event = GameEvent_Create(gsys, NULL, func_ov012_02158d24, sizeof(MusicalDressUpEvent));
     data = GameEvent_GetData(event);
-    sys_memset(data, 0, sizeof(MusicalDressUpEvent));
+    MI_CpuFill8(data, 0, sizeof(MusicalDressUpEvent));
     data->param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MusicalDressUpParam), TRUE, "scrcmd_musical.c", 218);
     data->param->poke = poke;
     data->param->save = save;
@@ -515,7 +515,7 @@ BOOL func_ov012_0215887c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     MusicalOv020Args args;
 
-    sys_memset(&args, 0, sizeof(MusicalOv020Args));
+    MI_CpuFill8(&args, 0, sizeof(MusicalOv020Args));
     args.a0 = a0;
     args.a1 = a1;
     ScriptWork_CallEvent(

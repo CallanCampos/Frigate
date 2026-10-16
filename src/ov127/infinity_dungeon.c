@@ -441,15 +441,15 @@ static BOOL func_ov127_021f00a8(KeyDataSave *keyData, InfinityDungeon *dungeon) 
             for (i = 0; i < INFINITY_DUNGEON_ROOM_COUNT; i++) {
                 InfinityDungeonRoom *room = &dungeon->floors[floor].rooms[i];
 
-                sys_memset(room, 0, sizeof(InfinityDungeonRoom));
+                MI_CpuFill8(room, 0, sizeof(InfinityDungeonRoom));
                 room->kind = 4;
                 room->type = INFINITY_DUNGEON_ROOM_TYPE_NONE;
             }
         }
         if (dungeon->version == VERSION_BLACK2) {
-            sys_memcpy(black2Floors[mode], &dungeon->floors[0], sizeof(InfinityDungeonFloor));
+            MI_CpuCopy8(black2Floors[mode], &dungeon->floors[0], sizeof(InfinityDungeonFloor));
         } else {
-            sys_memcpy(white2Floors[mode], &dungeon->floors[0], sizeof(InfinityDungeonFloor));
+            MI_CpuCopy8(white2Floors[mode], &dungeon->floors[0], sizeof(InfinityDungeonFloor));
         }
     }
     return TRUE;
@@ -476,17 +476,17 @@ static void func_ov127_021f0190(KeyDataSave *keyData, InfinityDungeon *dungeon) 
         const u16 *black2Lists[2][2] = { { sBlack2Trainers0, sBlack2Specials0 },
                                          { sBlack2Trainers1, sBlack2Specials1 } };
 
-        sys_memset(dungeon->trainerIds, 0, sizeof(dungeon->trainerIds));
-        sys_memset(dungeon->specialTrainers, 0, sizeof(dungeon->specialTrainers));
+        MI_CpuFill8(dungeon->trainerIds, 0, sizeof(dungeon->trainerIds));
+        MI_CpuFill8(dungeon->specialTrainers, 0, sizeof(dungeon->specialTrainers));
         if (dungeon->version == VERSION_BLACK2) {
-            sys_memcpy(black2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
+            MI_CpuCopy8(black2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
             MI_CpuCopy16(black2Lists[mode][1], dungeon->specialTrainers, sizeof(dungeon->specialTrainers));
         } else {
-            sys_memcpy(white2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
+            MI_CpuCopy8(white2Lists[mode][0], dungeon->trainerIds, sizeof(dungeon->specialTrainers));
             MI_CpuCopy16(white2Lists[mode][1], dungeon->specialTrainers, sizeof(dungeon->specialTrainers));
         }
     }
-    sys_memset(dungeon->specialRoom, 0, sizeof(dungeon->specialRoom));
+    MI_CpuFill8(dungeon->specialRoom, 0, sizeof(dungeon->specialRoom));
     for (i = 0; i < INFINITY_DUNGEON_ROOM_COUNT; i++) {
         InfinityDungeonRoom *room = &dungeon->floors[0].rooms[i];
 

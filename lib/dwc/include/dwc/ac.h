@@ -11,11 +11,11 @@
 // brings the wireless manager, the socket layer and the connection up. The ROM names none of it, so the names of the
 // types and their fields are ours, taken from what the code does, and the calls are still named after their addresses.
 //
-// Auto-connect keeps five blocks of memory, which func_0205a78c gives out by the flag of each; a table of five
+// Auto-connect keeps five blocks of memory, which DWCAc_GetBlock gives out by the flag of each; a table of five
 // pointers in the BSS holds them, and a bit of the byte at offset 8 of the first block says which of them are
 // allocated. The first block is the control block, DWCAcMain; the one of 0x14d8 bytes is the search's work.
 
-// The flags func_0205a78c takes
+// The flags DWCAc_GetBlock takes
 #define DWC_AC_WORK_MAIN 0x01   // the control block: 0xcc bytes
 #define DWC_AC_WORK_WCM 0x02    // the wireless connection manager's work: 0x4800 bytes
 #define DWC_AC_WORK_UNK_04 0x04 // the SocConfig that SOC_Startup is given (dwc_ac_soc.c): 0x58 bytes
@@ -27,7 +27,7 @@
 typedef void *(*DWCAcAllocFunc)(u32 name, u32 size);
 typedef void (*DWCAcFreeFunc)(u32 name, void *ptr, u32 size);
 
-// What func_02059f04 is given, 0x14 bytes
+// What DWCAc_Create is given, 0x14 bytes
 typedef struct DWCAcParam {
     DWCAcAllocFunc alloc;
     DWCAcFreeFunc free;
@@ -52,20 +52,21 @@ typedef struct DWCAcMemFuncs {
 // The control block, 0xcc bytes. Only the bytes that the files seen so far touch are named
 typedef struct DWCAcMain {
     DWCAcAllocFunc alloc;
-    DWCAcFreeFunc free; // lets a block go: func_0205a664 calls it with 1, the block and its size
+    DWCAcFreeFunc free; // lets a block go: DWCAc_FreeAllBlocks calls it with 1, the block and its size
     u8 allocated;       // 0x08; a bit for each of the blocks by its flag
-    u8 state;           // 0x09; what func_0205a1f0 dispatches on
-    u8 failedState;  // 0x0a; the state that func_0205a85c found when it was told of an error; the teardown starts there
-    u8 unk_0b_0 : 4; // the search sets it to 1 whenever the wireless manager reports an access point
-    u8 unk_0b_4 : 4; // 1 when the connection test failed with CPS saying that the address is in use (dwc_ac_soc.c)
-    s32 error;       // 0x0c; what func_0205a85c was told
-    u32 unk_10;      // the result of the connection test of overlay 11 (func_ov011_0216b2cc), kept by dwc_ac_soc.c
+    u8 state;           // 0x09; what DWCAc_Process dispatches on
+    u8 failedState; // 0x0a; the state that DWCAc_SetError found when it was told of an error; the teardown starts there
+    u8 unk_0b_0 : 4;    // the search sets it to 1 whenever the wireless manager reports an access point
+    u8 unk_0b_4 : 4;    // 1 when the connection test failed with CPS saying that the address is in use (dwc_ac_soc.c)
+    s32 error;          // 0x0c; what DWCAc_SetError was told
+    u32 unk_10;         // the result of the connection test of overlay 11 (func_ov011_0216b2cc), kept by dwc_ac_soc.c
     u8 candidateResult; // 0x14; DWCAcCandidate.unk_00 of the candidate that the connection works on
-    u8 candidateType;   // 0x15; the type (func_0205aa40) of that candidate's target
-    u8 maxState;        // 0x16; the highest state that func_0205a7d4 was given, from 1
+    u8 candidateType;   // 0x15; the type (DWCAc_GetApTypeOfId) of that candidate's target
+    u8 maxState;        // 0x16; the highest state that DWCAc_SetState was given, from 1
     u8 type;            // 0x17; the type of the access point that the connection is with, 0xff for none
-    u8 spotInfo[10];    // 0x18; what an NDWCSHAP's SSID tells (func_0205cfe8), or the 10 bytes that func_0205a420 got
-    u8 givenType;       // 0x22; the type that func_0205a420 got: nonzero when the game gave the access point
+    u8 spotInfo[10];    // 0x18; what an NDWCSHAP's SSID tells (DWCAc_GetNdwcShapSpotInfo), or the 10 bytes that
+                        // DWCAc_SetGivenAp got
+    u8 givenType;       // 0x22; the type that DWCAc_SetGivenAp got: nonzero when the game gave the access point
     u8 keyMode; // 0x23; the key mode of the setting: the WCM mode of WPA, the WEP mode, or 2 for NWCUSBAP and NDWCSHAP
     u8 unk_24;  // 0x24; the connection's setting on a DSi: this byte, the next, the halfword and the 0x64 bytes
     u8 unk_25;  //   are the DSi setting's 0x182, 0x183, 0x1e8 and 0x184, and the last two blocks its first 0x40
@@ -89,8 +90,8 @@ typedef struct DWCAcTarget {
 #define DWC_AC_TARGET_MAX 21
 
 // The ids of the access points that are told by their SSIDs: one that starts with "NWCUSBAP", one that decodes to
-// "NDWCSHAP", one that starts with "FREESPOT" (dwc_ac_aplist.c's func_0205b958) and one that is "NINTENDOWFC". The ids
-// 0x13 to 0x16 are those of a kind that the candidates sort apart from the others; 0x15 is not known
+// "NDWCSHAP", one that starts with "FREESPOT" (dwc_ac_aplist.c's DWCAc_GetFreeSpotId) and one that is "NINTENDOWFC".
+// The ids 0x13 to 0x16 are those of a kind that the candidates sort apart from the others; 0x15 is not known
 #define DWC_AC_ID_NWCUSBAP 0x12
 #define DWC_AC_ID_NDWCSHAP 0x13
 #define DWC_AC_ID_FREESPOT 0x14
@@ -105,7 +106,7 @@ typedef struct DWCAcCandidate {
     u8 unk_00;   // the result of the connection to it: 0 while untried, else DWC_AC_RESULT_*
     u8 id;       // that of the target it matched
     u8 level;    // the signal's strength, the best that the beacons showed
-    u8 tag : 7;  // what func_0205925c was told when the best beacon came in: the round or the channel
+    u8 tag : 7;  // what DWCAc_AddCandidate was told when the best beacon came in: the round or the channel
     u8 seen : 1; // set when the beacon was seen again on its channel
 } DWCAcCandidate;
 
@@ -138,7 +139,7 @@ typedef struct DWCAcDsSetting {
     u8 unk_e6_2 : 6;
     u8 security; // 0xe7; on the DSi, 0x10, 0x12 and 0x13 are the settings that use WPA; 0xff is a setting not in use
     u8 unk_e8[2];
-    u16 unk_ea; // 0xea; the MTU (dwc_ac_soc.c), 0 for the default; func_0205a420 sets it from its fourth argument
+    u16 unk_ea; // 0xea; the MTU (dwc_ac_soc.c), 0 for the default; DWCAc_SetGivenAp sets it from its fourth argument
     u8 unk_ec[0x14];
 } DWCAcDsSetting;
 
@@ -179,10 +180,10 @@ typedef struct DWCAcSearchWork {
     u8 dmaNo;             // 0x14ba; the DMA channel that WCM_StartupAsync gets in WCMConfig.dmano (dwc_ac_soc.c)
     u8 radioOn : 2;       // 0x14bb; 1 to connect with the radio always on, else in the wireless manager's power saving
     u8 sharedKey : 2;     // 1 to authenticate with a shared key, else open; the connection drops it when that fails
-    u8 round : 4;         // how many times the search went on to its second round (dwc_ac_search.c's func_0205c6f4)
-    // 0x14bc; what the search looks for: 0 everything; 1 to 3 only the DS setting of that number (func_0205bb00), 0xb
-    // to 0xd only the DSi setting (0xb is the first); 4 NWCUSBAP, 5 NDWCSHAP, 6 FREESPOT and 8 NINTENDOWFC alone
-    // (func_0205b9e8, func_0205ba50, func_02059028)
+    u8 round : 4; // how many times the search went on to its second round (dwc_ac_search.c's DWCAc_StartSecondRound)
+    // 0x14bc; what the search looks for: 0 everything; 1 to 3 only the DS setting of that number (MakeSettingTargets),
+    // 0xb to 0xd only the DSi setting (0xb is the first); 4 NWCUSBAP, 5 NDWCSHAP, 6 FREESPOT and 8 NINTENDOWFC alone
+    // (MakeFirstTargets, MakeSecondTargets, DWCAc_GetSpecialApId)
     u8 mode : 4;
     u8 unk_14bc_4 : 1; // 1 to skip the connection test (dwc_ac_soc.c); DWCAcParam byte 0xb
     u8 rssiPacked : 1; // the beacon's signal is in the DSi's form, a quarter of what it is in the DS's, and 0x19 less
@@ -215,112 +216,112 @@ typedef struct DWCAcSearchWork {
 // dwc_ac.c
 // Creates auto-connect from the allocator and the settings of the param: the control block and the four more blocks,
 // the settings that it works from, and the wireless manager. FALSE if the wireless manager does not start
-BOOL func_02059f04(DWCAcParam *param);
-// Runs the state at hand once and moves to the next. 1 once the connection is up (2 if func_0205aad4 finds another
-// candidate like the one connected to), -1 when it has failed for good, else 0
-s32 func_0205a1f0(void);
+BOOL DWCAc_Create(DWCAcParam *param);
+// Runs the state at hand once and moves to the next. 1 once the connection is up (2 if DWCAc_FindSimilarCandidate finds
+// another candidate like the one connected to), -1 when it has failed for good, else 0
+s32 DWCAc_Process(void);
 // What the state is, in a few values: 0 before the search, 1 searching, 2 connecting, 3 the sockets coming up, 4 going
 // on to another candidate or to the teardown, 5 connected; for a failure, the error code of dwc_ac_result.c's
-// func_0205b680
-s32 func_0205a2dc(void);
+// DWCAc_GetErrorCode
+s32 DWCAc_GetStatus(void);
 // The type of the access point that the connection is with (DWCAcMain.type), 0xff while there is none
-u8 func_0205a348(void);
+u8 DWCAc_GetApType(void);
 // Copies the access point's 10 bytes of spot information, if the connection is with one that has them. TRUE if so
-BOOL func_0205a378(u8 *spotInfo);
+BOOL DWCAc_GetApSpotInfo(u8 *spotInfo);
 // The key mode of the setting that the connection is made with (DWCAcMain.keyMode)
-u8 func_0205a3d0(void);
+u8 DWCAc_GetKeyMode(void);
 // Takes auto-connect down, a step at a time. TRUE once it is down, with every block let go
-BOOL func_0205a3e4(void);
+BOOL DWCAc_Destroy(void);
 // Gives the connection to make by hand: an SSID, a WEP key with its mode (the length it has), a halfword for the first
 // setting's DWCAcDsSetting.unk_ea, the spot information if any, and the type that the access point is given
-void func_0205a420(const u8 *ssid, const u8 *key, u32 wepMode, u16 unk_ea, const u8 *spotInfo, u32 type);
+void DWCAc_SetGivenAp(const u8 *ssid, const u8 *key, u32 wepMode, u16 unk_ea, const u8 *spotInfo, u32 type);
 // Whether the SSID of the given length is that of an NDWCSHAP
-BOOL func_0205a54c(const u8 *ssid, u32 length);
+BOOL DWCAc_IsShopSsid(const u8 *ssid, u32 length);
 // Replaces the connection of the DS's setting `index` with the 0xf0 bytes of setting
-void func_0205a564(u32 index, const void *setting);
+void DWCAc_SetDsConnection(u32 index, const void *setting);
 // Stops the search from preferring the access points with WPA
-void func_0205a590(void);
+void DWCAc_ClearPreferWpa(void);
 // The block of memory that a flag of DWC_AC_WORK_* names, NULL while it is not allocated
-void *func_0205a78c(u32 flag);
+void *DWCAc_GetBlock(u32 flag);
 // The state of the control block, 0 while there is none
-u8 func_0205a83c(void);
+u8 DWCAc_GetState(void);
 // Notes an error, as the control block's error and, as its failed state, the state it is in
-void func_0205a85c(s32 error);
+void DWCAc_SetError(s32 error);
 // The error that was noted last
-s32 func_0205a880(void);
+s32 DWCAc_GetError(void);
 // Notes the type of the access point that the connection is with, and its spot information if it has some
-void func_0205a894(u8 id);
+void DWCAc_NoteConnectedAp(u8 id);
 // Notes the key mode of the setting that the target `id` is, and a copy of the DSi setting's details
-void func_0205a928(u8 id);
+void DWCAc_NoteKeyMode(u8 id);
 // The type of the access point of a target id: 0 to 2 the DS's settings, 3 to 5 NWCUSBAP, NDWCSHAP and FREESPOT, 10 to
 // 12 the DSi's
-u8 func_0205aa40(u8 id);
+u8 DWCAc_GetApTypeOfId(u8 id);
 
 // dwc_ac_connect.c
 // The handler of the states 7 and 8, which settle the key for the candidate and then connect to it: the state that
 // follows
-u8 func_020598b4(void);
+u8 DWCAc_StepConnect(void);
 
 // dwc_ac_search.c
 // Notes that a beacon with no SSID came in on the channel (its number, from 1), so that the search's third pass looks
 // on it
-void func_0205c4e4(u32 channel);
+void DWCAc_NoteHiddenChannel(u32 channel);
 // The handler of the states 2 to 6, the search: the state that follows
-u8 func_0205c37c(void);
+u8 DWCAc_StepSearch(void);
 // The handler of state 9, the end of the connection to a candidate: back to the search, or to the next target of the
 // candidate; the state that follows
-u8 func_0205c2a4(void);
+u8 DWCAc_StepCandidateOver(void);
 
 // dwc_ac_soc.c
 // The handler of state 1 (the wireless manager's start), and the one of the states 10 to 15 (the sockets coming up, the
 // connection kept): the state that follows
-u8 func_0205d568(void);
-u8 func_0205d5f4(void);
+u8 DWCAc_StepWcmStartup(void);
+u8 DWCAc_StepSockets(void);
 
 // dwc_ac_result.c
 // The teardown of the state 17, from the state the failure came in: 18 once it is over, else 17
-u8 func_0205b65c(void);
-// The error code that is told to the game, from the error that func_0205a85c noted
-s32 func_0205b680(void);
+u8 DWCAc_StepFailedTeardown(void);
+// The error code that is told to the game, from the error that DWCAc_SetError noted
+s32 DWCAc_GetErrorCode(void);
 
 // dwc_ac_aplist.c
 // Makes the list that a step of the search works from: step 0 the targets of the first search (the stored settings and
 // FREESPOT), step 1 the candidates still to visit, step 2 the targets of the second (the stored settings, NWCUSBAP and
 // NINTENDOWFC). FALSE if steps 1 and 2 leave nothing to look for
-BOOL func_0205b890(u32 step);
+BOOL DWCAc_MakeSearchList(u32 step);
 // The id of FREESPOT if the SSID of the beacon is that and the search takes it, else 0
-int func_0205b958(const WMBssDesc *bss);
+int DWCAc_GetFreeSpotId(const WMBssDesc *bss);
 // How many targets there are: the first with an SSID of no length ends them, at DWC_AC_TARGET_MAX at most
-u8 func_0205b9ac(void);
+u8 DWCAc_CountTargets(void);
 
 // dwc_ac_wepkey.c
 // Makes the 13-byte WEP key of an access point whose SSID starts with "NWCUSBAP", from the SSID alone
-void func_0205d098(const u8 *ssid, u8 *key);
+void DWCAc_MakeNwcUsbApKey(const u8 *ssid, u8 *key);
 // Makes the 13-byte WEP key of an access point whose SSID, decoded, starts with "NDWCSHAP", from the SSID alone
-void func_0205cfbc(const u8 *ssid, u8 *key);
+void DWCAc_MakeNdwcShapKey(const u8 *ssid, u8 *key);
 // Whether the SSID starts with "NWCUSBAP"
-BOOL func_0205d074(const u8 *ssid);
+BOOL DWCAc_IsNwcUsbApSsid(const u8 *ssid);
 // Whether the 32 characters of the SSID, decoded, start with "NDWCSHAP"
-BOOL func_0205cf80(const u8 *ssid);
+BOOL DWCAc_IsNdwcShapSsid(const u8 *ssid);
 // Decodes an NDWCSHAP's SSID into its 10 bytes of spot information; TRUE if it holds the 8 bytes "NDWCSHAP" and the 10
 // are printable
-BOOL func_0205cfe8(const u8 *ssid, u8 *spotInfo);
+BOOL DWCAc_GetNdwcShapSpotInfo(const u8 *ssid, u8 *spotInfo);
 
 // dwc_ac_wcm.c
 // The id of the kind of access point that an unmatched beacon with a 32-byte SSID is, from its SSID and the kind that
 // the search wants: DWC_AC_ID_NWCUSBAP or DWC_AC_ID_NDWCSHAP, or -1 for none
-int func_02059028(const WMBssDesc *bss);
+int DWCAc_GetSpecialApId(const WMBssDesc *bss);
 // Whether the access point can be taken for a connection with WPA: FALSE only on a DSi, for a beacon that has neither
 // the RSN element nor the WPA vendor element
-BOOL func_020590cc(const WMBssDesc *bss);
+BOOL DWCAc_CheckWpa(const WMBssDesc *bss);
 // The wireless manager's notification callback during the search. It takes in the access points that are found and
 // notes why a connection failed
-void func_020596c0(WCMNotice *notice);
+void DWCAc_OnWcmNotify(WCMNotice *notice);
 
 // dwc_ac_cleanup.c
 // Steps the teardown whose state is *state (DWCAcMain.failedState): the sockets down first, if the state is over 10,
 // and then the wireless manager to idle. TRUE when it is over, with *state 0, or has failed, with *state 0x12
-BOOL func_0205975c(u8 *state);
+BOOL DWCAc_StepTeardown(u8 *state);
 
 // What the wireless manager's notification carries after WCMNotice. WCM_Notify builds it so, and nitrowifi/wcm.h
 // names only the WCMNotice at its start

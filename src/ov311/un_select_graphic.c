@@ -124,8 +124,8 @@ static void UnSelectGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sUnSelectLights); i++) {
         GFL_G3DSysLightSet(i, &sUnSelectLights[i]);
@@ -136,7 +136,7 @@ static void UnSelectGraphic_G3DInit(void) {
 UnSelectGraphic *UnSelectGraphic_Create(u32 layout, HeapID heapId) {
     UnSelectGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(UnSelectGraphic), FALSE, "un_select_graphic.c", 436);
 
-    sys_memset(graphic, 0, sizeof(UnSelectGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(UnSelectGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -165,7 +165,7 @@ void UnSelectGraphic_Free(UnSelectGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(UnSelectGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(UnSelectGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -188,7 +188,7 @@ static void UnSelectGraphic_VBlank(TCB *tcb, void *data) {
 static void UnSelectBG_Init(UnSelectBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(UnSelectBG));
+    MI_CpuFill8(bg, 0, sizeof(UnSelectBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sUnSelectLCDConfig);
@@ -207,7 +207,7 @@ static void UnSelectBG_Free(UnSelectBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(UnSelectBG));
+    MI_CpuFill8(bg, 0, sizeof(UnSelectBG));
 }
 
 static void UnSelectBG_Update(UnSelectBG *bg) {
@@ -218,7 +218,7 @@ static void UnSelectBG_VBlank(UnSelectBG *bg) {
 }
 
 static void UnSelectClAct_Init(UnSelectClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(UnSelectClAct));
+    MI_CpuFill8(clact, 0, sizeof(UnSelectClAct));
     ClActSys_Create(&sUnSelectClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -229,7 +229,7 @@ static void UnSelectClAct_Init(UnSelectClAct *clact, const BGSysVRAMConfig *vram
 static void UnSelectClAct_Free(UnSelectClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(UnSelectClAct));
+    MI_CpuFill8(clact, 0, sizeof(UnSelectClAct));
 }
 
 static void UnSelectClAct_Update(UnSelectClAct *clact) {

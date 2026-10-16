@@ -376,9 +376,9 @@ LocalTvtMenu *LocalTvtMenu_Create(const LocalTvtMenuSetup *setup, HeapID heapId)
     GFL_BGSysLoadArcNCGRStatic(arc, 122, BG_SUB_WINDOW, 1, 0, FALSE, heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 121, &paletteData, heapId);
     colors = paletteData->rawData;
-    sys_memcpy(colors, menu->palette, sizeof(menu->palette));
+    MI_CpuCopy8(colors, menu->palette, sizeof(menu->palette));
     colors += 16;
-    sys_memcpy(colors, menu->paletteSelected, sizeof(menu->paletteSelected));
+    MI_CpuCopy8(colors, menu->paletteSelected, sizeof(menu->paletteSelected));
     GFL_BGSysUploadStdPalette(BG_SUB_WINDOW, menu->palette, sizeof(menu->palette), PALETTE_NORMAL * 0x20);
     GFL_BGSysUploadStdPalette(BG_SUB_WINDOW, menu->paletteSelected, sizeof(menu->paletteSelected),
                               PALETTE_SELECTED * 0x20);
@@ -398,7 +398,7 @@ LocalTvtMenu *LocalTvtMenu_Create(const LocalTvtMenuSetup *setup, HeapID heapId)
         BmpWin_Transfer(menu->windows[i]);
         BmpWin_DrawFrame(menu->windows[i], TRUE, 1, PALETTE_NORMAL);
     }
-    sys_memset(&inputSetup, 0, sizeof(inputSetup));
+    MI_CpuFill8(&inputSetup, 0, sizeof(inputSetup));
     inputSetup.work = menu;
     inputSetup.touch = LocalTvtMenu_Touch;
     inputSetup.key = LocalTvtMenu_Key;
@@ -601,9 +601,9 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
     arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT, heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 123, &paletteData, heapId);
     colors = paletteData->rawData;
-    sys_memcpy(&colors[0], select->palette, sizeof(select->palette));
-    sys_memcpy(&colors[16], select->paletteSelected, sizeof(select->paletteSelected));
-    sys_memcpy(&colors[32], select->paletteEgg, sizeof(select->paletteEgg));
+    MI_CpuCopy8(&colors[0], select->palette, sizeof(select->palette));
+    MI_CpuCopy8(&colors[16], select->paletteSelected, sizeof(select->paletteSelected));
+    MI_CpuCopy8(&colors[32], select->paletteEgg, sizeof(select->paletteEgg));
     GFL_BGSysUploadStdPalette(BG_SUB_PANEL, select->palette, sizeof(select->palette), PALETTE_NORMAL * 0x20);
     GFL_BGSysUploadStdPalette(BG_SUB_PANEL, select->paletteSelected, sizeof(select->paletteSelected),
                               PALETTE_SELECTED * 0x20);
@@ -620,7 +620,7 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
     GFL_ArcToolFree(arc);
     select->returnBar = LocalTvtReturnBar_Create(select->setup.unit, heapId);
     LocalTvtReturnBar_SetVisible(select->returnBar, FALSE);
-    sys_memset(&inputSetup, 0, sizeof(inputSetup));
+    MI_CpuFill8(&inputSetup, 0, sizeof(inputSetup));
     inputSetup.work = select;
     inputSetup.touch = LocalTvtPokeSelect_Touch;
     inputSetup.key = LocalTvtPokeSelect_Key;
@@ -635,7 +635,7 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
         u32 iconPalette = PokeIcon_GetPaletteOfPkm(func_0201d624(pkm));
         ClActorSetup actorSetup;
 
-        sys_memset(&actorSetup, 0, sizeof(actorSetup));
+        MI_CpuFill8(&actorSetup, 0, sizeof(actorSetup));
         actorSetup.sequence = 1;
         actorSetup.x = sLocalTvtPokeSelectRects[i].left + 24;
         actorSetup.y = sLocalTvtPokeSelectRects[i].top + 16;
@@ -773,10 +773,10 @@ void LocalTvtPokeSelect_Main(LocalTvtPokeSelect *select) {
 void LocalTvtPokeSelect_SetActive(LocalTvtPokeSelect *select, BOOL active) {
     select->active = active;
     if (active) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_ALL, 0);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_ALL, 0);
         G2S_SetWnd0Position(0, BAR_Y * 8, 255, 192);
         G2S_SetWnd1Position(1, BAR_Y * 8, 256, 192);
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG2, 13, 3);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG2, 13, 3);
     } else {
         if (func_02042788()) {
             G2S_SetWnd0Position(240, 0, 256, 16);
@@ -785,7 +785,7 @@ void LocalTvtPokeSelect_SetActive(LocalTvtPokeSelect *select, BOOL active) {
             G2S_SetWnd0Position(0, 0, 0, 0);
             G2S_SetWnd1Position(0, 0, 0, 0);
         }
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_ALL, 8);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_ALL, 8);
     }
 }
 
@@ -985,7 +985,7 @@ static void LocalTvtPokeSelect_VBlank(TCB *tcb, void *data) {
         GFL_BGSysSetBGEnabled(BG_SUB_PANEL, TRUE);
         GFL_BGSysSetBGEnabled(BG_SUB_BACK, TRUE);
         GFL_BGSysSetBGEnabled(BG_SUB_WINDOW, TRUE);
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG2, 13, 3);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG2, 13, 3);
         GXS_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
         G2S_SetWnd0Position(0, BAR_Y * 8, 255, 192);
         G2S_SetWnd1Position(1, BAR_Y * 8, 256, 192);
@@ -1024,13 +1024,13 @@ static void LocalTvtReturnIcon_Init(LocalTvtReturnIcon *icon, ClActUnit *unit, H
     ArcTool *arc;
     ClActorSetup setup;
 
-    sys_memset(icon, 0, sizeof(LocalTvtReturnIcon));
+    MI_CpuFill8(icon, 0, sizeof(LocalTvtReturnIcon));
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     icon->palette = func_0204bbb8(arc, func_0202d810(), 1, 11 * 0x20, 0, 3, heapId);
     icon->chars = func_0204b81c(arc, func_0202d814(), FALSE, 1, heapId);
     icon->cellAnims = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 224;
     setup.y = BAR_Y * 8;
     icon->actor = func_0204c040(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 1, heapId);
@@ -1043,7 +1043,7 @@ static void LocalTvtReturnIcon_Exit(LocalTvtReturnIcon *icon) {
     func_0204bcd0(icon->palette);
     func_0204b98c(icon->chars);
     func_0204be64(icon->cellAnims);
-    sys_memset(icon, 0, sizeof(LocalTvtReturnIcon));
+    MI_CpuFill8(icon, 0, sizeof(LocalTvtReturnIcon));
 }
 
 static ClActor *LocalTvtReturnIcon_GetActor(LocalTvtReturnIcon *icon) {

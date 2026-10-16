@@ -28,7 +28,7 @@ void TrainerGameInfo_Init(TrainerGameInfoSave *info) {
     MsgData *msgData;
     StrBuf *str;
 
-    sys_memset(info, 0, sizeof(TrainerGameInfoSave));
+    MI_CpuFill8(info, 0, sizeof(TrainerGameInfoSave));
     TrainerGameInfo_ClearKeyboardTypes(info);
     info->palParkHighScore = 0;
 
@@ -66,7 +66,7 @@ u8 func_0200c84c(TrainerGameInfoSave *info, u32 index) {
 }
 
 static void TrainerGameInfo_ClearKeyboardTypes(TrainerGameInfoSave *info) {
-    sys_memset(info->keyboardTypes, 0, TRAINER_GAME_INFO_KEYBOARD_COUNT);
+    MI_CpuFill8(info->keyboardTypes, 0, TRAINER_GAME_INFO_KEYBOARD_COUNT);
 }
 
 void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 a3, int a4) {

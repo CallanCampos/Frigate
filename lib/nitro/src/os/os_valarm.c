@@ -15,7 +15,7 @@ typedef struct OSiVAlarmQueue {
 static void OSi_InsertVAlarm(OSVAlarm *alarm);
 static void OSi_AppendVAlarm(OSVAlarm *alarm);
 static void OSi_DetachVAlarm(OSVAlarm *alarm);
-static void func_0207bf64(OSVAlarm *alarm);
+static void OSi_SetNextVAlarm(OSVAlarm *alarm);
 static void OSi_VAlarmHandler(void);
 static int OSi_CompareVCount(OSVAlarm *alarm, u32 frame, int vcount);
 static u32 OSi_GetVFrame(int vcount);
@@ -31,7 +31,7 @@ void OS_InitVAlarm(void) {
         OSi_UseVAlarm = TRUE;
         OSi_VAlarmQueue.head = NULL;
         OSi_VAlarmQueue.tail = NULL;
-        CPU_DisableInterrupts(OS_IE_V_COUNT);
+        OS_DisableIrqMask(OS_IE_V_COUNT);
         OSi_VFrameCount = 0;
         OSi_PrevVCount = 0;
     }
@@ -57,7 +57,7 @@ static void OSi_InsertVAlarm(OSVAlarm *alarm) {
             prev->next = alarm;
         } else {
             OSi_VAlarmQueue.head = alarm;
-            func_0207bf64(alarm);
+            OSi_SetNextVAlarm(alarm);
         }
         return;
     }
@@ -75,7 +75,7 @@ static void OSi_AppendVAlarm(OSVAlarm *alarm) {
         prev->next = alarm;
     } else {
         OSi_VAlarmQueue.head = alarm;
-        func_0207bf64(alarm);
+        OSi_SetNextVAlarm(alarm);
     }
 }
 
@@ -101,8 +101,7 @@ static void OSi_DetachVAlarm(OSVAlarm *alarm) {
     }
 }
 
-// NitroSDK's OS_CreateVAlarm
-void func_0207befc(OSVAlarm *alarm) {
+void OS_CreateVAlarm(OSVAlarm *alarm) {
     alarm->handler = NULL;
     alarm->tag = 0;
     alarm->unk_20 = 0;
@@ -111,7 +110,7 @@ void func_0207befc(OSVAlarm *alarm) {
 // NitroSDK's OS_SetVAlarm: calls the handler with the argument when the scan reaches the line (vcount), or at most
 // delay lines after it. If the scan has reached that line already in this frame, it waits for the next
 void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handler, void *arg) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     int current;
     u32 frame;
 
@@ -131,15 +130,15 @@ void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handle
     alarm->canceled = FALSE;
     alarm->handler = handler;
     OSi_InsertVAlarm(alarm);
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OSi_SetNextVAlarm: makes the first alarm of the queue the one that the V-count interrupt waits for
-static void func_0207bf64(OSVAlarm *alarm) {
-    CPU_SetIRQFunc(OS_IE_V_COUNT, OSi_VAlarmHandler);
-    gfxSetVCountIntrLine(alarm->vcount);
+static void OSi_SetNextVAlarm(OSVAlarm *alarm) {
+    OS_SetIrqFunction(OS_IE_V_COUNT, OSi_VAlarmHandler);
+    GX_SetVCountEqVal(alarm->vcount);
     reg_GX_DISPSTAT |= REG_GX_DISPSTAT_VCI_MASK;
-    CPU_EnableInterrupts(OS_IE_V_COUNT);
+    OS_EnableIrqMask(OS_IE_V_COUNT);
 }
 
 // NitroSDK's OSi_VAlarmHandler, the V-count interrupt's: runs the alarms that are due in turn, and puts back the
@@ -151,7 +150,7 @@ static void OSi_VAlarmHandler(void) {
     int vcount;
     u16 dispstat;
 
-    CPU_DisableInterrupts(OS_IE_V_COUNT);
+    OS_DisableIrqMask(OS_IE_V_COUNT);
     reg_GX_DISPSTAT &= ~REG_GX_DISPSTAT_VCI_MASK;
     OS_SetIrqCheckFlag(OS_IE_V_COUNT);
     // The line that the interrupt waited for: its low 8 bits are DISPSTAT's bits 8 to 15 and its ninth is bit 7
@@ -163,13 +162,13 @@ static void OSi_VAlarmHandler(void) {
         switch (OSi_CompareVCount(alarm, frame, vcount)) {
         case 0:
             // Not yet: wait for its line, unless the scan has reached it by now
-            func_0207bf64(alarm);
+            OSi_SetNextVAlarm(alarm);
             if (alarm->vcount != GX_GetVCount() || alarm->frame != frame) {
                 return;
             }
-            CPU_DisableInterrupts(OS_IE_V_COUNT);
+            OS_DisableIrqMask(OS_IE_V_COUNT);
             reg_GX_DISPSTAT &= ~REG_GX_DISPSTAT_VCI_MASK;
-            CPU_AcknowledgeInterrupts(OS_IE_V_COUNT);
+            OS_ResetRequestIrqMask(OS_IE_V_COUNT);
             // fall through
         case 1:
             handler = alarm->handler;
@@ -213,12 +212,12 @@ static int OSi_CompareVCount(OSVAlarm *alarm, u32 frame, int vcount) {
 
 // NitroSDK's OSi_GetVFrame: counts the frames, by a V-count lower than the last one; gives the count
 static u32 OSi_GetVFrame(int vcount) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     if (vcount < OSi_PrevVCount) {
         OSi_VFrameCount++;
     }
     OSi_PrevVCount = vcount;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return OSi_VFrameCount;
 }

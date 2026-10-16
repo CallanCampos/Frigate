@@ -9,7 +9,7 @@
 // where the code shows them. The access point information that the same file gives is in dwc/apinfo.h, and the WDS
 // scan, a file of its own, is in dwc/wdsscan.h.
 
-// What a connection is in (DWCInetControl.state), and what func_0205af98 reports. The names follow the SDK's
+// What a connection is in (DWCInetControl.state), and what DWC_GetInetStatus reports. The names follow the SDK's
 // DWC_CONNECTINET_STATE_* and its order from memory; the code confirms IDLE, OPERATING, CONNECTED, DISCONNECTED, ERROR
 // and FATAL_ERROR (the game's caller waits for CONNECTED), and OPERATED as the state the poll sets once the AC has a
 // result. DISCONNECTING is only ever reported, never kept
@@ -80,21 +80,21 @@ typedef struct DWCInetControl {
 
 // Starts a connection control, a DWCInetControl that the game gives: it takes the DMA channel for the AC and the
 // priority of SSL. The power mode is not used: the control always gets mode 1. DWC_InitInetEx.
-void func_0205ac24(DWCInetControl *control, u16 dmaNo, u16 powerMode, u16 sslPriority);
+void DWC_InitInetEx(DWCInetControl *control, u16 dmaNo, u16 powerMode, u16 sslPriority);
 // Starts connecting with the console's Wi-Fi settings: DWC_ConnectInetAsync
-void func_0205acd0(void);
+void DWC_ConnectInetAsync(void);
 // Whether the connection has ended, in which case it also settles the status: DWC_CheckInet
-BOOL func_0205ae04(void);
+BOOL DWC_CheckInet(void);
 // Takes the next step of the connection: DWC_ProcessInet
-void func_0205ae58(void);
+void DWC_ProcessInet(void);
 // The connection's state, one of the above: DWC_GetInetStatus
-int func_0205af98(void);
+int DWC_GetInetStatus(void);
 // Ends the connection and frees the control, waiting for the AC to finish: DWC_CleanupInet
-void func_0205b198(void);
+void DWC_CleanupInet(void);
 // How good the link is, from 0 to 3: DWC_GetLinkLevel
-int func_0205b250(void);
-// What the game calls every frame once it is connected: takes a step of the connection (func_0205ae58), and if the link
-// was lost sets the error for it and returns TRUE: DWC_UpdateConnection
-BOOL func_0205b5ec(void);
+int DWC_GetLinkLevel(void);
+// What the game calls every frame once it is connected: takes a step of the connection (DWC_ProcessInet), and if the
+// link was lost sets the error for it and returns TRUE: DWC_UpdateConnection
+BOOL DWC_UpdateConnection(void);
 
 #endif // POKEBW2_DWC_CONNECTINET_H

@@ -14,27 +14,27 @@ static const char sFreeSpotSsid[8] = "FREESPOT";
 static const char sNintendoWfcSsid[] = "NINTENDOWFC";
 static char sNwcUsbApSsid[] = "NWCUSBAP";
 
-static u8 func_0205b9e8(DWCAcSearchWork *work);
-static u8 func_0205ba50(DWCAcSearchWork *work);
-static u8 func_0205bb00(DWCAcSearchWork *work);
-static u8 func_0205bdc0(DWCAcSearchWork *work);
-static u8 func_0205be4c(DWCAcSearchWork *work);
+static u8 MakeFirstTargets(DWCAcSearchWork *work);
+static u8 MakeSecondTargets(DWCAcSearchWork *work);
+static u8 MakeSettingTargets(DWCAcSearchWork *work);
+static u8 CountCandidatesToVisit(DWCAcSearchWork *work);
+static u8 FirstUnseenCandidate(DWCAcSearchWork *work);
 
 // Makes the list that a step of the search works from. Step 0 is that of the first search: the targets of the stored
 // settings and FREESPOT. Step 1 counts the candidates that the search found and still has to visit, and has the first
 // of them to start with. Step 2 is the targets of the second search: the settings, NWCUSBAP and NINTENDOWFC. TRUE if
 // there is something to look for
-BOOL func_0205b890(u32 step) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+BOOL DWCAc_MakeSearchList(u32 step) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     switch (step) {
     case 0:
         MI_CpuClear32(work->targets, sizeof(work->targets));
-        work->targetCount = func_0205b9e8(work);
+        work->targetCount = MakeFirstTargets(work);
         break;
     case 1:
-        work->targetCount = func_0205bdc0(work);
-        work->current = func_0205be4c(work);
+        work->targetCount = CountCandidatesToVisit(work);
+        work->current = FirstUnseenCandidate(work);
         if (work->targetCount == 0) {
             return FALSE;
         }
@@ -42,7 +42,7 @@ BOOL func_0205b890(u32 step) {
     case 2:
         MI_CpuClear32(work->targets, sizeof(work->targets));
         work->current = 0;
-        work->targetCount = func_0205ba50(work);
+        work->targetCount = MakeSecondTargets(work);
         if (work->targetCount == 0) {
             return FALSE;
         }
@@ -54,8 +54,8 @@ BOOL func_0205b890(u32 step) {
 }
 
 // The id of FREESPOT if the SSID of the beacon starts with that and the search takes it, else 0
-int func_0205b958(const WMBssDesc *bss) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+int DWCAc_GetFreeSpotId(const WMBssDesc *bss) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     if (work->mode == 0 || work->mode == 6) {
         if (strncmp(bss->ssid, sFreeSpotSsid, sizeof(sFreeSpotSsid)) == 0) {
@@ -66,8 +66,8 @@ int func_0205b958(const WMBssDesc *bss) {
 }
 
 // How many targets there are: the first with an SSID of no length ends them
-u8 func_0205b9ac(void) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+u8 DWCAc_CountTargets(void) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u8 i;
 
     for (i = 0; i < DWC_AC_TARGET_MAX; i++) {
@@ -79,15 +79,15 @@ u8 func_0205b9ac(void) {
 }
 
 // The targets of the first search: those of the settings, and FREESPOT. Returns how many there are
-static u8 func_0205b9e8(DWCAcSearchWork *work) {
+static u8 MakeFirstTargets(DWCAcSearchWork *work) {
     u8 count;
     DWCAcTarget *target = work->targets;
 
-    count = func_0205bb00(work);
+    count = MakeSettingTargets(work);
     target += count;
 
     if (work->mode == 0 || work->mode == 6) {
-        sys_memcpy(sFreeSpotSsid, target->ssid, sizeof(sFreeSpotSsid));
+        MI_CpuCopy8(sFreeSpotSsid, target->ssid, sizeof(sFreeSpotSsid));
         target->ssidLength = sizeof(sFreeSpotSsid);
         target->id = DWC_AC_ID_FREESPOT;
         count++;
@@ -97,22 +97,22 @@ static u8 func_0205b9e8(DWCAcSearchWork *work) {
 
 // The targets of the second search: those of the settings, an NWCUSBAP's SSID and NINTENDOWFC. Returns how many there
 // are
-static u8 func_0205ba50(DWCAcSearchWork *work) {
+static u8 MakeSecondTargets(DWCAcSearchWork *work) {
     u8 count;
     DWCAcTarget *target = work->targets;
 
-    count = func_0205bb00(work);
+    count = MakeSettingTargets(work);
     target += count;
 
     if (work->mode == 0 || work->mode == 4) {
-        sys_memcpy(sNwcUsbApSsid, target->ssid, 8);
+        MI_CpuCopy8(sNwcUsbApSsid, target->ssid, 8);
         target->ssidLength = 8;
         target->id = DWC_AC_ID_NWCUSBAP;
         count++;
         target++;
     }
     if (work->mode == 0 || work->mode == 8) {
-        sys_memcpy(sNintendoWfcSsid, target->ssid, 11);
+        MI_CpuCopy8(sNintendoWfcSsid, target->ssid, 11);
         target->ssidLength = 11;
         target->id = DWC_AC_ID_NINTENDOWFC;
         count++;
@@ -143,7 +143,7 @@ static inline BOOL AddTarget(DWCAcTarget *target, const u8 *ssid, u8 id) {
 // SSID of a setting that is in use. Returns how many there are. The ids are those that the connection reads the keys
 // by (ids 0 to 2 the DS settings' first SSIDs, 3 to 5 their second, 6 to 8 the DSi settings' first SSIDs, 9 to 11 their
 // second, 12 to 14 and 15 to 17 their SSIDs for WPA)
-static u8 func_0205bb00(DWCAcSearchWork *work) {
+static u8 MakeSettingTargets(DWCAcSearchWork *work) {
     u8 count = 0;
     int i;
     const DWCAcDsSetting *ds = work->dsSettings;
@@ -198,7 +198,7 @@ static u8 func_0205bb00(DWCAcSearchWork *work) {
 
 // Counts the candidates that are still to be visited: those that no connection was tried on and whose tag is not the
 // channel they are on, which means that the search heard them from another channel. The others are marked as seen
-static u8 func_0205bdc0(DWCAcSearchWork *work) {
+static u8 CountCandidatesToVisit(DWCAcSearchWork *work) {
     u8 count = 0;
     int i;
 
@@ -214,7 +214,7 @@ static u8 func_0205bdc0(DWCAcSearchWork *work) {
 }
 
 // The first candidate that is not marked as seen, else the first of all
-static u8 func_0205be4c(DWCAcSearchWork *work) {
+static u8 FirstUnseenCandidate(DWCAcSearchWork *work) {
     u8 i;
     u8 first = 0;
     u8 count = work->candidateCount;

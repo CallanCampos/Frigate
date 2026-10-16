@@ -135,8 +135,8 @@ static void MysteryGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
         GFL_G3DSysLightSet(i, &sLights[i]);
@@ -147,7 +147,7 @@ static void MysteryGraphic_G3DInit(void) {
 MysteryGraphic *MysteryGraphic_Create(u32 layout, HeapID heapId) {
     MysteryGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(MysteryGraphic), FALSE, "mystery_graphic.c", 448);
 
-    sys_memset(graphic, 0, sizeof(MysteryGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(MysteryGraphic));
     graphic->heapId = heapId;
     G2_BlendNone();
     G2S_BlendNone();
@@ -175,7 +175,7 @@ void MysteryGraphic_Delete(MysteryGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(MysteryGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(MysteryGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -224,7 +224,7 @@ static void MysteryGraphic_VBlank(TCB *tcb, void *data) {
 static void MysteryGraphicBG_Init(MysteryGraphicBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(MysteryGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(MysteryGraphicBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -243,7 +243,7 @@ static void MysteryGraphicBG_Free(MysteryGraphicBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(MysteryGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(MysteryGraphicBG));
 }
 
 static void MysteryGraphicBG_Update(MysteryGraphicBG *bg) {
@@ -254,7 +254,7 @@ static void MysteryGraphicBG_VBlank(MysteryGraphicBG *bg) {
 }
 
 static void MysteryGraphicClAct_Init(MysteryGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(MysteryGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(MysteryGraphicClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     clact->renderer = func_0204be9c(sSurfaceSetups, NELEMS(sSurfaceSetups), heapId);
@@ -267,7 +267,7 @@ static void MysteryGraphicClAct_Free(MysteryGraphicClAct *clact) {
     func_0204becc(clact->renderer);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(MysteryGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(MysteryGraphicClAct));
 }
 
 static void MysteryGraphicClAct_Update(MysteryGraphicClAct *clact) {

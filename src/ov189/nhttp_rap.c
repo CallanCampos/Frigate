@@ -119,12 +119,12 @@ static BOOL NHttpRap_CreateRequest(u32 index, NHttpRap *rap) {
 }
 
 static void NHttpRap_BuildUrl(NHttpRap *rap, u32 index) {
-    sys_memset(rap->url, 0, 4);
+    MI_CpuFill8(rap->url, 0, 4);
     if (index == 4) {
-        OS_SNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[index].url, rap->login->token);
+        STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[index].url, rap->login->token);
     } else {
-        OS_SNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[index].url, rap->profileId, GAME_VERSION, GAME_LANGUAGE, 1,
-                    rap->login->token);
+        STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[index].url, rap->profileId, GAME_VERSION, GAME_LANGUAGE,
+                      1, rap->login->token);
     }
 }
 
@@ -149,9 +149,9 @@ BOOL NHttpRap_SendRequestWithId(u32 index, u32 id, NHttpRap *rap) {
         return FALSE;
     }
     if (index == 10) {
-        sys_memset(rap->url, 0, 4);
-        OS_SNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[10].url, id, GAME_VERSION, GAME_LANGUAGE, 1,
-                    rap->login->token);
+        MI_CpuFill8(rap->url, 0, 4);
+        STD_TSNPrintf(rap->url, NHTTP_RAP_URL_SIZE, sRequests[10].url, id, GAME_VERSION, GAME_LANGUAGE, 1,
+                      rap->login->token);
     } else {
         NHttpRap_BuildUrl(rap, index);
     }
@@ -261,14 +261,14 @@ static void NHttpRap_WriteHeader(NHttpRap *rap, int type) {
 void NHttpRap_BeginPost(NHttpRap *rap, HeapID heapId, u32 size, int type) {
     if (rap != NULL) {
         rap->data = allocConfigDSSoftwareFeature(heapId, size + 0x130, "nhttp_rap.c", 0x219);
-        sys_memset(rap->data, 0, size + 0x130);
+        MI_CpuFill8(rap->data, 0, size + 0x130);
         NHttpRap_WriteHeader(rap, type);
     }
 }
 
 void NHttpRap_AddPostData(NHttpRap *rap, const void *data, u32 size) {
     if (rap != NULL) {
-        sys_memcpy(data, rap->data + rap->size, size);
+        MI_CpuCopy8(data, rap->data + rap->size, size);
         rap->size += size;
     }
 }
@@ -284,8 +284,8 @@ BOOL NHttpRap_SendValidate(NHttpRap *rap) {
         GFL_ASSERT(0);
         return FALSE;
     }
-    sys_memset(rap->url, 0, 4);
-    func_0207f7a4(rap->url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].url);
+    MI_CpuFill8(rap->url, 0, 4);
+    STD_CopyString(rap->url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].url);
     request =
         NHTTPCreateConnection(sRequests[NHTTP_RAP_REQUEST_VALIDATE].url, sRequests[NHTTP_RAP_REQUEST_VALIDATE].method,
                               rap->answer, rap->answerSize, NHttpRap_RequestCallback, NULL);

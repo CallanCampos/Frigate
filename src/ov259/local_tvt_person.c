@@ -91,7 +91,7 @@ static void LocalTvtPerson_SeqMenu(LocalTvtSeq *seq, int *step, void *work) {
     case 3: {
         LocalTvtMenuSetup setup;
 
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.message = person->setup.message;
         setup.unit = person->setup.unit;
         setup.msgData = person->funcs.msgData;

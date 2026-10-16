@@ -7,6 +7,6 @@ extern void (*ARM9_CTOR_START[])(void);
 
 // Calls the program's static initializers (call_static_initializers.c), which NitroSDK's startup code runs right after
 // the runtime's own initialization. The runtime calls it __call_static_initializers.
-void boot_CallStaticInit(void);
+void __call_static_initializers(void); // swan's boot_CallStaticInit
 
 #endif // POKEBW2_MSL_RUNTIME_CALL_STATIC_INITIALIZERS_H

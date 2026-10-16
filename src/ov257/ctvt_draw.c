@@ -768,14 +768,14 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     }
     if (func_0203da48() == TRUE && draw->inputHandled == FALSE) {
         if (draw->tool == DRAW_TOOL_PICK) {
-            u16 *screen = (u16 *)gfxGetScreenAddrBG2A() + y * 256 + x;
+            u16 *screen = (u16 *)G2_GetBG2ScrPtr() + y * 256 + x;
             u16 *camera;
 
-            gfxGetScreenAddrBG3A();
+            G2_GetBG3ScrPtr();
             if (CommTvt_IsZoomed(sys) == TRUE) {
-                camera = (u16 *)gfxGetScreenAddrBG3A() + (y / 2) * 256 + x / 2;
+                camera = (u16 *)G2_GetBG3ScrPtr() + (y / 2) * 256 + x / 2;
             } else {
-                camera = (u16 *)gfxGetScreenAddrBG3A() + y * 256 + x;
+                camera = (u16 *)G2_GetBG3ScrPtr() + y * 256 + x;
             }
             if (*screen & CTVT_DRAW_OPAQUE) {
                 draw->color = *screen;

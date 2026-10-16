@@ -3,7 +3,8 @@
 // game.
 #include "nitro/gx.h"
 
-void gfxPerspective(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx) {
+void G3i_PerspectiveW_(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad,
+                       MtxFx44 *mtx) {
     MtxFx44 tmp;
     if (mtx == NULL) {
         mtx = &tmp;
@@ -11,11 +12,11 @@ void gfxPerspective(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx3
     MTX_PerspectiveW(fovySin, fovyCos, aspect, n, f, scaleW, mtx);
     if (isLoad) {
         G3_MtxMode(GX_MTXMODE_PROJECTION);
-        gfxLoadMatrix4x4(mtx);
+        G3_LoadMtx44(mtx);
     }
 }
 
-void gfxOrtho(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx) {
+void G3i_OrthoW_(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx) {
     MtxFx44 tmp;
     if (mtx == NULL) {
         mtx = &tmp;
@@ -23,11 +24,11 @@ void gfxOrtho(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, BOOL 
     MTX_OrthoW(t, b, l, r, n, f, scaleW, mtx);
     if (isLoad) {
         G3_MtxMode(GX_MTXMODE_PROJECTION);
-        gfxLoadMatrix4x4(mtx);
+        G3_LoadMtx44(mtx);
     }
 }
 
-void gfxLookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, BOOL isLoad, MtxFx43 *mtx) {
+void G3i_LookAt_(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, BOOL isLoad, MtxFx43 *mtx) {
     MtxFx43 tmp;
     if (mtx == NULL) {
         mtx = &tmp;
@@ -35,11 +36,11 @@ void gfxLookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *targe
     MTX_LookAt(camPos, camUp, target, mtx);
     if (isLoad) {
         G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
-        gfxLoadMatrix4x3(mtx);
+        G3_LoadMtx43(mtx);
     }
 }
 
-void gfxRotateX(fx32 sin, fx32 cos) {
+void G3_RotX(fx32 sin, fx32 cos) {
     reg_G3_MTX_MULT_3x3 = FX32_ONE;
     reg_G3_MTX_MULT_3x3 = 0;
     reg_G3_MTX_MULT_3x3 = 0;
@@ -51,7 +52,7 @@ void gfxRotateX(fx32 sin, fx32 cos) {
     reg_G3_MTX_MULT_3x3 = cos;
 }
 
-void gfxRotateY(fx32 sin, fx32 cos) {
+void G3_RotY(fx32 sin, fx32 cos) {
     reg_G3_MTX_MULT_3x3 = cos;
     reg_G3_MTX_MULT_3x3 = 0;
     reg_G3_MTX_MULT_3x3 = -sin;
@@ -63,7 +64,7 @@ void gfxRotateY(fx32 sin, fx32 cos) {
     reg_G3_MTX_MULT_3x3 = cos;
 }
 
-void gfxRotateZ(fx32 sin, fx32 cos) {
+void G3_RotZ(fx32 sin, fx32 cos) {
     reg_G3_MTX_MULT_3x3 = cos;
     reg_G3_MTX_MULT_3x3 = sin;
     reg_G3_MTX_MULT_3x3 = 0;

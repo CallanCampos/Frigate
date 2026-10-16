@@ -13,17 +13,17 @@ static BOOL sWriteDone = TRUE;
 static BOOL sLocked;
 
 BOOL identifyGameCardBackup(void) {
-    s32 lock_id = cart_key_create();
+    s32 lock_id = OS_GetLockID();
     CARDBackupType type;
 
     GFL_ASSERT(lock_id != OS_LOCK_ID_ERROR);
-    func_0206ef4c(lock_id);
+    CARD_LockBackup(lock_id);
     type = CARD_BACKUP_TYPE_FLASH_4MBITS_EX;
-    if (!func_0206f854(type)) {
+    if (!CARD_IdentifyBackup(type)) {
         type = 0;
     }
-    func_0206ef58(lock_id);
-    cart_key_release(lock_id);
+    CARD_UnlockBackup(lock_id);
+    OS_ReleaseLockID(lock_id);
     return type != 0 ? TRUE : FALSE;
 }
 
@@ -37,15 +37,15 @@ BOOL func_0203bfd4(u32 dest, const void *src, u32 size, BackupWriteErrorCallback
 }
 
 BOOL readFlashWaitSuccess(u32 src, void *dest, u32 size, BackupReadErrorCallback callback) {
-    s32 lock_id = cart_key_create();
+    s32 lock_id = OS_GetLockID();
     BOOL result;
 
     GFL_ASSERT(lock_id != OS_LOCK_ID_ERROR);
-    func_0206ef4c(lock_id);
+    CARD_LockBackup(lock_id);
     CARD_ReadBackupAsync(src, dest, size, NULL, NULL);
-    result = func_0206f888();
-    func_0206ef58(lock_id);
-    cart_key_release(lock_id);
+    result = CARD_WaitBackupAsync();
+    CARD_UnlockBackup(lock_id);
+    OS_ReleaseLockID(lock_id);
     if (!result && callback != NULL) {
         callback();
     }
@@ -58,10 +58,10 @@ static void setCardWrittenVerified(void *arg) {
 
 u16 func_0203c07c(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback) {
     u32 header;
-    s32 lock_id = cart_key_create();
+    s32 lock_id = OS_GetLockID();
 
     GFL_ASSERT(lock_id != OS_LOCK_ID_ERROR);
-    func_0206ef4c(lock_id);
+    CARD_LockBackup(lock_id);
     sLocked = TRUE;
     if (!CARD_ReadBackup(0, &header, sizeof(header))) {
         func_0203c1c0(lock_id, TRUE, callback);
@@ -73,10 +73,10 @@ u16 func_0203c07c(u32 dest, const void *src, u32 size, BackupWriteErrorCallback 
 
 BOOL finishBackupGetResult(u16 lockId, BOOL *result, BackupWriteErrorCallback callback) {
     if (sWriteDone == TRUE) {
-        func_0206ef58(lockId);
-        cart_key_release(lockId);
+        CARD_UnlockBackup(lockId);
+        OS_ReleaseLockID(lockId);
         sLocked = FALSE;
-        switch (func_0206eecc()) {
+        switch (CARD_GetResultCode()) {
         case CARD_RESULT_SUCCESS:
             *result = TRUE;
             break;
@@ -105,20 +105,20 @@ BOOL finishBackupGetResult(u16 lockId, BOOL *result, BackupWriteErrorCallback ca
 }
 
 void cancelCardProcess(u16 lockId) {
-    if (!func_0206f890()) {
-        func_0206f898();
-        func_0206f888();
+    if (!CARD_TryWaitBackupAsync()) {
+        CARD_CancelBackupAsync();
+        CARD_WaitBackupAsync();
     }
     if (sLocked == TRUE) {
-        func_0206ef58(lockId);
-        cart_key_release(lockId);
+        CARD_UnlockBackup(lockId);
+        OS_ReleaseLockID(lockId);
         sLocked = FALSE;
     }
 }
 
 static void func_0203c1c0(u16 lockId, BOOL noResponse, BackupWriteErrorCallback callback) {
-    func_0206ef58(lockId);
-    cart_key_release(lockId);
+    CARD_UnlockBackup(lockId);
+    OS_ReleaseLockID(lockId);
     sLocked = FALSE;
     if (callback != NULL) {
         callback(noResponse);

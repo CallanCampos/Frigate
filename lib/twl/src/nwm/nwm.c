@@ -1,8 +1,8 @@
 // TwlSDK's NWM, the DSi's wireless manager, ARM9 side: it keeps a system area for the commands that it sends the ARM7
 // over the PXI tag 0x16 and for the events that come back, checks that the commands suit the state that the ARM7
-// reports, and runs the callbacks. ARM code in the DSi-only LTD autoload. The ROM names none of it; the file's name
-// and those of the types and data are descriptive guesses, and the functions keep their default names (twl/nwm.h
-// gives the SDK functions they implement, from what they do).
+// reports, and runs the callbacks. ARM code in the DSi-only LTD autoload. The ROM names none of it; the file's name and
+// those of the types and data are descriptive guesses, and the functions have the names of the SDK functions they
+// implement where those are known, from what they do, and keep their default names otherwise.
 
 #include "types.h"
 #include "nitro/mi.h"
@@ -144,7 +144,7 @@ static NWMRetCode func_02703b24(const void *cmd, u32 size);
 static NWMCmdBuf *func_02703b98(void);
 static BOOL func_02703c28(void);
 
-// The data, declared in the reverse of their order in memory, which -ipa function lays them out in: sInitialized,
+// The data, declared in the reverse of their order in memory, which -ipa function lays them out in: sNwmInitialized,
 // sNwm (the system area and the two PM callbacks), sUnloaded (set when the exit callback's unload is done) and
 // sBlockBuf (the block that the command 8 copies for the ARM7)
 static u32 sBlockBuf[0x210 / 4];
@@ -154,7 +154,7 @@ static struct {
     PMExitCallbackInfo exitCallback;
     PMSleepCallbackInfo sleepCallback;
 } sNwm;
-static u8 sInitialized;
+static u8 sNwmInitialized;
 
 // Whether the ARM7 is running the command: it sets the command's byte in its status block while it does
 static inline BOOL NWMi_IsPending(u32 cmd) {
@@ -162,7 +162,7 @@ static inline BOOL NWMi_IsPending(u32 cmd) {
     BOOL pending;
 
     if (sys != NULL) {
-        cp15_invalidateDC(&sys->status->pending[cmd], 1);
+        DC_InvalidateRange(&sys->status->pending[cmd], 1);
         pending = sys->status->pending[cmd] == 1;
     } else {
         pending = FALSE;
@@ -170,7 +170,7 @@ static inline BOOL NWMi_IsPending(u32 cmd) {
     return pending;
 }
 
-NWMRetCode func_02702434(void *systemBuffer, u32 size, u32 dmaNo) {
+NWMRetCode NWM_Init(void *systemBuffer, u32 size, u32 dmaNo) {
     if (!func_027026b4()) {
         return NWM_RETCODE_UNAVAILABLE;
     }
@@ -181,64 +181,64 @@ static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
     u32 irq;
     int i;
 
-    irq = CPU_IRQDisable();
-    if (func_020825e4() == 0) {
-        CPU_SetIRQMask(irq);
+    irq = OS_DisableInterrupts();
+    if (WM_CheckInitialized() == 0) {
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_ILLEGAL_STATE;
     }
-    if (sInitialized) {
-        CPU_SetIRQMask(irq);
+    if (sNwmInitialized) {
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_ILLEGAL_STATE;
     }
     if (sys == NULL) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_INVALID_PARAM;
     }
     if (dmaNo > 3) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_INVALID_PARAM;
     }
     if (((u32)sys & 0x1f) != 0) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_INVALID_PARAM;
     }
     PXI_Init();
-    if (!func_0207ca48(PXI_FIFO_TAG_NWM, 1)) {
-        CPU_SetIRQMask(irq);
+    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_NWM, 1)) {
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_UNAVAILABLE;
     }
-    cp15_invalidateDC(sys, size);
-    dma_fill(dmaNo, sys, 0, size, TRUE);
+    DC_InvalidateRange(sys, size);
+    MIi_DmaFill32(dmaNo, sys, 0, size, TRUE);
     sNwm.sys = sys;
-    cp15_cleanDC(&sNwm.sys, 4);
+    DC_StoreRange(&sNwm.sys, 4);
     sNwm.sys->info = (NWMInfo *)(sNwm.sys + 1);
     sNwm.sys->status = (NWMStatus *)(sNwm.sys->info + 1);
     sNwm.sys->event = (NWMEvent *)(sNwm.sys->status + 1);
     func_027026ec();
     sNwm.sys->dmaNo = dmaNo;
-    func_0207acc4(&sNwm.sys->freeQueue, sNwm.sys->freeMsgs, NWM_CMD_BUF_COUNT);
+    OS_InitMessageQueue(&sNwm.sys->freeQueue, sNwm.sys->freeMsgs, NWM_CMD_BUF_COUNT);
     for (i = 0; i < NWM_CMD_BUF_COUNT; i++) {
         sNwm.sys->cmdBuf[i].cmd = NWM_CMD_BUF_FREE;
-        cp15_cleanDC(&sNwm.sys->cmdBuf[i], 2);
+        DC_StoreRange(&sNwm.sys->cmdBuf[i], 2);
         OS_SendMessage(&sNwm.sys->freeQueue, &sNwm.sys->cmdBuf[i], OS_MESSAGE_BLOCK);
     }
-    func_0207c9fc(PXI_FIFO_TAG_NWM, func_02702740);
-    sys_memset(sNwm.sys->unk_2120, 0, sizeof(sNwm.sys->unk_2120));
-    sInitialized = TRUE;
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, func_02702740);
+    MI_CpuFill8(sNwm.sys->unk_2120, 0, sizeof(sNwm.sys->unk_2120));
+    sNwmInitialized = TRUE;
     sNwm.sys->status->state = NWM_STATE_INITIALIZED;
-    cp15_cleanDC(sNwm.sys, sizeof(NWMSys));
-    cp15_cleanDC(&sInitialized, 1);
-    CPU_SetIRQMask(irq);
+    DC_StoreRange(sNwm.sys, sizeof(NWMSys));
+    DC_StoreRange(&sNwmInitialized, 1);
+    OS_RestoreInterrupts(irq);
     return NWM_RETCODE_SUCCESS;
 }
 
 NWMRetCode func_02702698(void) {
-    return sInitialized ? NWM_RETCODE_SUCCESS : NWM_RETCODE_ILLEGAL_STATE;
+    return sNwmInitialized ? NWM_RETCODE_SUCCESS : NWM_RETCODE_ILLEGAL_STATE;
 }
 
 // Whether the wireless is available and not turned off
 static BOOL func_027026b4(void) {
-    if (func_0207c438() == TRUE && !func_0207c4d0()) {
+    if (OS_IsAvailableWireless() == TRUE && !func_0207c4d0()) {
         return TRUE;
     }
     return FALSE;
@@ -256,10 +256,10 @@ static void func_027026ec(void) {
         return;
     }
     info = sNwm.sys->info;
-    cp15_invalidateDC(info, 1);
+    DC_InvalidateRange(info, 1);
     if (info->flags & NWM_INFO_PENDING) {
         info->flags &= ~NWM_INFO_PENDING;
-        cp15_cleanDC(info, 1);
+        DC_StoreRange(info, 1);
     }
 }
 
@@ -280,15 +280,15 @@ static void func_02702740(u32 tag, u32 data, BOOL err) {
     }
     // BUG: the event is read before its cache lines are invalidated, so the check can see the event that was there
 #ifdef BUGFIX
-    cp15_invalidateDC(event, sizeof(NWMEvent));
+    DC_InvalidateRange(event, sizeof(NWMEvent));
 #endif
     if (event->cmd >= NWM_CMD_COUNT) {
         return;
     }
-    cp15_invalidateDC(sys->event, sizeof(NWMEvent));
-    cp15_invalidateDC(sys->status, sizeof(NWMStatus));
+    DC_InvalidateRange(sys->event, sizeof(NWMEvent));
+    DC_InvalidateRange(sys->status, sizeof(NWMStatus));
     if (event != sys->event) {
-        cp15_invalidateDC(event, sizeof(NWMEvent));
+        DC_InvalidateRange(event, sizeof(NWMEvent));
     }
     if ((event->cmd == NWM_CMD_LOAD_DEVICE && event->result != 0) ||
         (event->cmd == NWM_CMD_UNLOAD_DEVICE && event->result == 0) || event->cmd == NWM_CMD_19) {
@@ -304,14 +304,14 @@ static void func_02702740(u32 tag, u32 data, BOOL err) {
         }
         callback = sys->callbacks[event->cmd];
         if (event->cmd == NWM_CMD_SCAN) {
-            cp15_invalidateDC(event->data, event->u0c.size);
+            DC_InvalidateRange(event->data, event->u0c.size);
         }
         if (callback != NULL) {
             callback(event);
         }
     }
-    sys_memset(event, 0, sizeof(NWMEvent));
-    cp15_cleanDC(event, sizeof(NWMEvent));
+    MI_CpuFill8(event, 0, sizeof(NWMEvent));
+    DC_StoreRange(event, sizeof(NWMEvent));
     if (sys != NULL) {
         func_027026ec();
     }
@@ -326,9 +326,9 @@ u16 func_027028b0(void) {
         status = sys->status;
         // BUG: the state is 0x24 bytes into the block, in another cache line than the one that is invalidated
 #ifdef BUGFIX
-        cp15_invalidateDC(&status->state, 2);
+        DC_InvalidateRange(&status->state, 2);
 #else
-        cp15_invalidateDC(status, 2);
+        DC_InvalidateRange(status, 2);
 #endif
         state = status->state;
     }
@@ -346,7 +346,7 @@ static NWMRetCode func_027028e4(u32 count, ...) {
     if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {
         return result;
     }
-    cp15_invalidateDC(&sys->status->state, 2);
+    DC_InvalidateRange(&sys->status->state, 2);
     state = sys->status->state;
     va_start(args, count);
     result = NWM_RETCODE_ILLEGAL_STATE;
@@ -368,7 +368,7 @@ u16 func_02702998(int type) {
     int i;
     int value;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0, sum = 0; i < 6; i++) {
         sum += mac[i];
     }
@@ -383,18 +383,18 @@ u16 func_02702998(int type) {
 // Puts the callback that exits the application before the console sleeps (the wireless would be on)
 static void func_02702a40(void) {
     PM_SetSleepCallbackInfo(&sNwm.sleepCallback, func_02702a8c, NULL);
-    func_0207f614(&sNwm.sleepCallback, NWM_PM_PRIORITY);
+    PM_InsertPreSleepCallback(&sNwm.sleepCallback, NWM_PM_PRIORITY);
 }
 
 static void func_02702a78(void) {
-    func_0207f62c(&sNwm.sleepCallback);
+    PM_DeletePreSleepCallback(&sNwm.sleepCallback);
 }
 
 static void func_02702a8c(void *arg) {
     sys_exit();
 }
 
-NWMRetCode func_02702a98(void) {
+NWMRetCode NWM_End(void) {
     u32 irq;
     NWMRetCode result;
 
@@ -402,17 +402,17 @@ NWMRetCode func_02702a98(void) {
     if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {
         return result;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     sNwm.sys->status->state = NWM_STATE_NONE;
     func_027026ec();
-    func_0207c9fc(PXI_FIFO_TAG_NWM, NULL);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, NULL);
     sNwm.sys = NULL;
-    sInitialized = FALSE;
-    CPU_SetIRQMask(irq);
+    sNwmInitialized = FALSE;
+    OS_RestoreInterrupts(irq);
     return NWM_RETCODE_SUCCESS;
 }
 
-NWMRetCode func_02702b08(NWMCallback callback) {
+NWMRetCode NWM_LoadDevice(NWMCallback callback) {
     NWMSys *sys = func_027026dc();
     NWMRetCode result;
     PMExitCallbackInfo *info;
@@ -437,7 +437,7 @@ NWMRetCode func_02702b08(NWMCallback callback) {
     return result;
 }
 
-NWMRetCode func_02702bfc(NWMCallback callback) {
+NWMRetCode NWM_UnloadDevice(NWMCallback callback) {
     NWMRetCode result;
 
     result = func_027028e4(1, NWM_STATE_LOADED);
@@ -494,11 +494,11 @@ static void func_02702d7c(void *arg) {
     if (sys == NULL) {
         return;
     }
-    func_0207c160(NWM_EXIT_SPIN_FIRST);
+    OS_SpinWaitSysCycles(NWM_EXIT_SPIN_FIRST);
     while ((NWMi_IsPending(NWM_CMD_LOAD_DEVICE) == TRUE && func_027028b0() == 1) || NWMi_IsPending(NWM_CMD_1) == TRUE ||
            NWMi_IsPending(NWM_CMD_19) == TRUE) {
-        func_0207c160(NWM_EXIT_SPIN_STEP);
-        func_0207cad4();
+        OS_SpinWaitSysCycles(NWM_EXIT_SPIN_STEP);
+        PXIi_HandlerRecvFifoNotEmpty();
     }
     if (func_027028e4(4, NWM_STATE_LOADED, NWM_STATE_READY, NWM_STATE_CONNECTED, NWM_STATE_5) != 0) {
         return;
@@ -506,8 +506,8 @@ static void func_02702d7c(void *arg) {
     sUnloaded = FALSE;
     func_02702ca0(func_02702d68);
     do {
-        func_0207c160(NWM_EXIT_SPIN_STEP);
-        func_0207cad4();
+        OS_SpinWaitSysCycles(NWM_EXIT_SPIN_STEP);
+        PXIi_HandlerRecvFifoNotEmpty();
         timeout -= NWM_EXIT_SPIN_STEP;
         if (timeout < 0) {
             return;
@@ -570,7 +570,7 @@ typedef struct NWMScanCmd {
     u8 bssid[6];
 } NWMScanCmd;
 
-NWMRetCode func_02703088(NWMCallback callback, const NWMScanParam *param) {
+NWMRetCode NWM_StartScan(NWMCallback callback, const NWMScanParam *param) {
     NWMScanCmd cmd;
     NWMRetCode result;
 
@@ -593,8 +593,8 @@ NWMRetCode func_02703088(NWMCallback callback, const NWMScanParam *param) {
     if (param->ssidMatchLength > 32) {
         return NWM_RETCODE_INVALID_PARAM;
     }
-    sys_memset(param->buffer, 0, (param->bufferSize + 3) & ~3);
-    cp15_cleanDC(param->buffer, (param->bufferSize + 3) & ~3);
+    MI_CpuFill8(param->buffer, 0, (param->bufferSize + 3) & ~3);
+    DC_StoreRange(param->buffer, (param->bufferSize + 3) & ~3);
     func_02703a34(NWM_CMD_SCAN, callback);
     cmd.cmd = NWM_CMD_SCAN;
     cmd.channelList = param->channelList;
@@ -604,8 +604,8 @@ NWMRetCode func_02703088(NWMCallback callback, const NWMScanParam *param) {
     cmd.scanType = param->scanType;
     cmd.ssidLength = param->ssidLength;
     cmd.ssidMatchLength = param->ssidMatchLength;
-    sys_memcpy(param->ssid, cmd.ssid, 32);
-    sys_memcpy(param->bssid, cmd.bssid, 6);
+    MI_CpuCopy8(param->ssid, cmd.ssid, 32);
+    MI_CpuCopy8(param->bssid, cmd.bssid, 6);
     result = func_02703b24(&cmd, sizeof(cmd));
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
@@ -631,7 +631,7 @@ u8 *func_02703250(NWMBssDesc *bssDesc, u32 id, const u8 *oui) {
         return NULL;
     }
     while (element + element[1] + 2 <= end) {
-        if (element[0] == id && sys_memcmp(element + 2, oui, 4) == 0) {
+        if (element[0] == id && MI_CpuComp8(element + 2, oui, 4) == 0) {
             return element;
         }
         element += element[1] + 2;
@@ -670,14 +670,14 @@ NWMRetCode func_027032e0(NWMCallback callback, u32 index, const NWMBlockParam *d
         return NWM_RETCODE_INVALID_PARAM;
     }
     // The block is cleaned for twice its length and copied for its length: one of them is not in bytes
-    cp15_cleanDC(data, data->length * 2);
+    DC_StoreRange(data, data->length * 2);
     func_02703a34(NWM_CMD_8, callback);
     cmd.cmd = NWM_CMD_8;
     cmd.index = index;
     cmd.data = sBlockBuf;
-    sys_memcpy(data, sBlockBuf, data->length);
-    cp15_cleanDC(cmd.data, 0x200);
-    cp15_cleanDC(&cmd, 8);
+    MI_CpuCopy8(data, sBlockBuf, data->length);
+    DC_StoreRange(cmd.data, 0x200);
+    DC_StoreRange(&cmd, 8);
     result = func_02703b24(&cmd, 8);
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
@@ -739,13 +739,13 @@ NWMRetCode func_027034c0(NWMCallback callback, u32 mode, u32 arg, const void *da
     default:
         return NWM_RETCODE_INVALID_PARAM;
     }
-    cp15_cleanDC(data, 0x50);
+    DC_StoreRange(data, 0x50);
     func_02703a34(NWM_CMD_CONNECT, callback);
     cmd.cmd = NWM_CMD_CONNECT;
     cmd.arg = arg;
     cmd.mode = mode;
     cmd.arg2 = arg2;
-    sys_memcpy(data, cmd.data, 0x50);
+    MI_CpuCopy8(data, cmd.data, 0x50);
     result = func_02703b24(&cmd, sizeof(cmd));
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
@@ -772,7 +772,7 @@ NWMRetCode func_027035f4(NWMCallback callback, u32 arg) {
     return result;
 }
 
-NWMRetCode func_027036a0(NWMCallback callback, const u8 *destAddr, u8 *frame, u32 size) {
+NWMRetCode NWM_SendFrame(NWMCallback callback, const u8 *destAddr, u8 *frame, u32 size) {
     NWMSys *sys = func_027026dc();
     NWMRetCode result;
     u32 irq;
@@ -781,20 +781,20 @@ NWMRetCode func_027036a0(NWMCallback callback, const u8 *destAddr, u8 *frame, u3
     if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {
         return result;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     if (size > 0x5f2) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return NWM_RETCODE_INVALID_PARAM;
     }
-    cp15_cleanDC(frame, size);
+    DC_StoreRange(frame, size);
     func_02703764(destAddr, sys->status->macAddr, frame, size);
-    cp15_cleanDC(frame, 14);
+    DC_StoreRange(frame, 14);
     result = func_02703a74(NWM_CMD_SEND_FRAME, 3, callback, frame, size);
     // Only the result 0 leaves without restoring the interrupts, and the command never gives it
     if (result == NWM_RETCODE_SUCCESS) {
         return NWM_RETCODE_OPERATING;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return result;
 }
 
@@ -803,11 +803,11 @@ static void func_02703764(const u8 *destAddr, const u8 *srcAddr, u8 *frame, u32 
     if (size < 14) {
         return;
     }
-    sys_memcpy(destAddr, frame, 6);
-    sys_memcpy(srcAddr, frame + 6, 6);
+    MI_CpuCopy8(destAddr, frame, 6);
+    MI_CpuCopy8(srcAddr, frame + 6, 6);
 }
 
-NWMRetCode func_0270379c(NWMCallback receiveCallback, void *buffer, u32 size, u32 index) {
+NWMRetCode NWM_SetReceivingFrameBuffer(NWMCallback receiveCallback, void *buffer, u32 size, u32 index) {
     NWMSys *sys = func_027026dc();
     NWMRetCode result;
 
@@ -815,8 +815,8 @@ NWMRetCode func_0270379c(NWMCallback receiveCallback, void *buffer, u32 size, u3
     if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {
         return result;
     }
-    dma_fill(sys->dmaNo, buffer, 0, size, TRUE);
-    cp15_cleanDC(buffer, size);
+    MIi_DmaFill32(sys->dmaNo, buffer, 0, size, TRUE);
+    DC_StoreRange(buffer, size);
     func_02703a34(NWM_CMD_SET_RECEIVE_BUFFER, func_027038bc);
     func_02703a54(index, receiveCallback);
     result = func_02703a74(NWM_CMD_SET_RECEIVE_BUFFER, 3, buffer, size, index);
@@ -859,7 +859,7 @@ static void func_027038bc(void *event) {
         ok = TRUE;
     }
     if (sys->indicate[ev->u04.index] != NULL) {
-        cp15_cleanDC(ev, 16);
+        DC_StoreRange(ev, 16);
         sys->indicate[ev->u04.index](ev);
     }
     if (ok) {
@@ -886,7 +886,7 @@ NWMRetCode func_02703960(NWMCallback callback, NWMPmkParam *param) {
     if (param == NULL) {
         return NWM_RETCODE_INVALID_PARAM;
     }
-    cp15_cleanDC(param, 0x22);
+    DC_StoreRange(param, 0x22);
     switch (param->type) {
     case 4:
     case 5:
@@ -899,7 +899,7 @@ NWMRetCode func_02703960(NWMCallback callback, NWMPmkParam *param) {
     func_02703a34(NWM_CMD_SET_PMK, callback);
     cmd.cmd = NWM_CMD_SET_PMK;
     cmd.type = param->type;
-    sys_memcpy(param->pmk, cmd.pmk, 32);
+    MI_CpuCopy8(param->pmk, cmd.pmk, 32);
     result = func_02703b24(&cmd, sizeof(cmd));
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
@@ -933,7 +933,7 @@ static NWMRetCode func_02703a74(u32 cmd, u16 count, ...) {
     for (i = 0; i < count; i++) {
         buf->args[i] = va_arg(args, u32);
     }
-    cp15_cleanDC(buf, sizeof(NWMCmdBuf));
+    DC_StoreRange(buf, sizeof(NWMCmdBuf));
     sent = PXI_SendWordByFifo(PXI_FIFO_TAG_NWM, (u32)buf, FALSE);
     OS_SendMessage(&sys->freeQueue, buf, OS_MESSAGE_BLOCK);
     result = NWM_RETCODE_SEND_ERROR;
@@ -954,8 +954,8 @@ static NWMRetCode func_02703b24(const void *cmd, u32 size) {
     if (buf == NULL) {
         return NWM_RETCODE_SEND_ERROR;
     }
-    sys_memcpy(cmd, buf, size);
-    cp15_cleanDC(buf, size);
+    MI_CpuCopy8(cmd, buf, size);
+    DC_StoreRange(buf, size);
     sent = PXI_SendWordByFifo(PXI_FIFO_TAG_NWM, (u32)buf, FALSE);
     OS_SendMessage(&sys->freeQueue, buf, OS_MESSAGE_BLOCK);
     result = NWM_RETCODE_SEND_ERROR;
@@ -974,8 +974,8 @@ static NWMCmdBuf *func_02703b98(void) {
         if (!OS_ReceiveMessage(&sys->freeQueue, (OSMessage *)&buf, OS_MESSAGE_NOBLOCK)) {
             return NULL;
         }
-        cp15_invalidateDC(sys, 0x2000);
-        cp15_invalidateDC(buf, 2);
+        DC_InvalidateRange(sys, 0x2000);
+        DC_InvalidateRange(buf, 2);
         if (!(buf->cmd & NWM_CMD_BUF_FREE)) {
             OS_SendMessage(&sys->freeQueue, buf, OS_MESSAGE_BLOCK);
             buf = NULL;

@@ -144,7 +144,7 @@ BOOL s00D4_TrainerCardGetBirthDate(VM *vm, FieldScriptEnv *env) {
 
     month = ScriptReadVar(vm, env);
     day = ScriptReadVar(vm, env);
-    func_0207c3bc(&info);
+    OS_GetOwnerInfoEx(&info);
     *month = info.birthday.month;
     *day = info.birthday.day;
     return FALSE;

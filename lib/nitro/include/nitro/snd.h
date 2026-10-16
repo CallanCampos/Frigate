@@ -69,7 +69,7 @@ extern SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
 #define SND_CHANNEL_MAX 16
 #define SND_ALARM_MAX 8
 
-// Channels: SND_SetChannelVolume, SND_SetChannelPan and SND_SetupChannelPcm, under swan's names
+// Channels: SND_SetChannelVolume, SND_SetChannelPan and SND_SetupChannelPcm
 #define SND_WAVE_FORMAT_PCM8 0
 #define SND_WAVE_FORMAT_PCM16 1
 
@@ -78,24 +78,25 @@ extern SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
 #define SND_CHANNEL_VOLUME_MAX 127
 #define SND_CHANNEL_PAN_CENTER 64
 
-void sndSetVolume(u32 chBitMask, int volume, int shift);
-void sndSetPan(u32 chBitMask, int pan);
-void sndQueuePacket_PlaySamples(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen,
-                                int volume, int shift, int timer, int pan);
+void SND_SetChannelVolume(u32 chBitMask, int volume, int shift); // swan's sndSetVolume
+void SND_SetChannelPan(u32 chBitMask, int pan);                  // swan's sndSetPan
+// swan's sndQueuePacket_PlaySamples
+void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen, int volume,
+                         int shift, int timer, int pan);
 
 // Timers and alarms: NitroSDK's SND_StartTimer, SND_StopTimer and SND_SetupAlarm, by their code
 typedef void (*SNDAlarmHandler)(void *arg);
 
-void func_0207d3f4(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
-void func_0207d410(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
-void func_0207d450(int alarmNo, u32 tick, u32 period, SNDAlarmHandler handler, void *arg);
+void SND_StartTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
+void SND_StopTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
+void SND_SetupAlarm(int alarmNo, u32 tick, u32 period, SNDAlarmHandler handler, void *arg);
 
 // The alarms' handlers, which snd_alarm.c keeps: NitroSDK's SND_AlarmInit, SNDi_IncAlarmId, SNDi_SetAlarmHandler, which
 // returns the alarm's new ID, and SNDi_CallAlarmHandler, which takes the number and the ID that the ARM7 sends
-void func_0207db34(void);
-void func_0207db58(int alarmNo);
-u8 func_0207db6c(int alarmNo, SNDAlarmHandler handler, void *arg);
-void func_0207db8c(int data);
+void SND_AlarmInit(void);
+void SNDi_IncAlarmId(int alarmNo);
+u8 SNDi_SetAlarmHandler(int alarmNo, SNDAlarmHandler handler, void *arg);
+void SNDi_CallAlarmHandler(int data);
 
 // Commands: NitroSDK's SND_FlushCommand and SND_WaitForCommandProc by their code, and SND_GetCurrentCommandTag under
 // swan's name
@@ -103,9 +104,9 @@ void func_0207db8c(int data);
 // Flush: wake the ARM7 up for the packet at once
 #define SND_COMMAND_IMMEDIATE 2
 
-BOOL func_0207d864(u32 flags);
-void func_0207d96c(u32 tag);
-u32 sndGetSentPacketCount(void);
+BOOL SND_FlushCommand(u32 flags);
+void SND_WaitForCommandProc(u32 tag);
+u32 SND_GetCurrentCommandTag(void); // swan's sndGetSentPacketCount
 
 // NitroSDK's SND_CalcChannelVolume: a volume in decibels as a channel volume in the low byte and a data shift in the
 // high one
@@ -114,7 +115,7 @@ u32 sndGetSentPacketCount(void);
 
 #define SND_DB_MIN (-723)
 
-u16 func_0207dd2c(int dB);
+u16 SND_CalcChannelVolume(int dB);
 
 // Sound data files: a sequence, a bank of instruments and a wave archive, each a binary file with one data block
 typedef struct SNDBinaryFileHeader {
@@ -218,17 +219,17 @@ typedef struct SNDInstPos {
 // NitroSDK's SND_InvalidateSeqData, SND_InvalidateBankData and SND_InvalidateWaveData, which stop what plays from the
 // range, then SND_AssignWaveArc, SND_DestroyBank, SND_DestroyWaveArc, SND_GetFirstInstDataPos, SND_GetNextInstData,
 // SND_GetWaveDataCount, SND_SetWaveDataAddress and SND_GetWaveDataAddress, by their code
-void func_0207d558(const void *start, const void *end);
-void func_0207d570(const void *start, const void *end);
-void func_0207d588(const void *start, const void *end);
-void func_0207dd80(SNDBankData *bank, int index, SNDWaveArc *waveArc);
-void func_0207ddfc(SNDBankData *bank);
-void func_0207de50(SNDWaveArc *waveArc);
-SNDInstPos func_0207de7c(const SNDBankData *bank);
-BOOL func_0207de8c(const SNDBankData *bank, SNDInstData *inst, SNDInstPos *pos);
-u32 func_0207df80(const SNDWaveArc *waveArc);
-void func_0207df84(SNDWaveArc *waveArc, int index, const SNDWaveData *address);
-const SNDWaveData *func_0207dfa4(const SNDWaveArc *waveArc, int index);
+void SND_InvalidateSeqData(const void *start, const void *end);
+void SND_InvalidateBankData(const void *start, const void *end);
+void SND_InvalidateWaveData(const void *start, const void *end);
+void SND_AssignWaveArc(SNDBankData *bank, int index, SNDWaveArc *waveArc);
+void SND_DestroyBank(SNDBankData *bank);
+void SND_DestroyWaveArc(SNDWaveArc *waveArc);
+SNDInstPos SND_GetFirstInstDataPos(const SNDBankData *bank);
+BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos *pos);
+u32 SND_GetWaveDataCount(const SNDWaveArc *waveArc);
+void SND_SetWaveDataAddress(SNDWaveArc *waveArc, int index, const SNDWaveData *address);
+const SNDWaveData *SND_GetWaveDataAddress(const SNDWaveArc *waveArc, int index);
 
 // The driver: NitroSDK's SND_Init, SNDi_LockMutex and SNDi_UnlockMutex, which guard the commands of a caller,
 // SND_CommandInit, SND_RecvCommandReply, which returns the commands of the next packet the ARM7 is done with or NULL,
@@ -236,24 +237,24 @@ const SNDWaveData *func_0207dfa4(const SNDWaveArc *waveArc, int index);
 // code
 #define SND_COMMAND_NOBLOCK 0
 
-void func_0207d670(void);
-void func_0207d698(void);
-void func_0207d6a8(void);
-void func_0207d6b8(void);
-SNDCommand *func_0207d73c(u32 flags);
-SNDCommand *sndNewPacket(u32 flags);
-void sndQueuePacket_(SNDCommand *command);
-BOOL func_0207d9d0(u32 tag);
+void SND_Init(void);
+void SNDi_LockMutex(void);
+void SNDi_UnlockMutex(void);
+void SND_CommandInit(void);
+SNDCommand *SND_RecvCommandReply(u32 flags);
+SNDCommand *SND_AllocCommand(u32 flags);   // swan's sndNewPacket
+void SND_PushCommand(SNDCommand *command); // swan's sndQueuePacket_
+BOOL SND_IsFinishedCommandTag(u32 tag);
 
 // Sequences on a player: NitroSDK's SND_StopSeq, SND_PrepareSeq, SND_StartPreparedSeq, SND_PauseSeq,
 // SND_SetPlayerTempoRatio, SND_SetPlayerVolume and SND_SetPlayerChannelPriority, by their code
-void func_0207d300(int playerNo);
-void func_0207d314(int playerNo, const void *seqBase, u32 seqOffset, const SNDBankData *bank);
-void func_0207d330(int playerNo);
-void func_0207d344(int playerNo, BOOL flag);
-void func_0207d35c(int playerNo, int ratio);
-void func_0207d36c(int playerNo, int volume);
-void func_0207d37c(int playerNo, int prio);
+void SND_StopSeq(int playerNo);
+void SND_PrepareSeq(int playerNo, const void *seqBase, u32 seqOffset, const SNDBankData *bank);
+void SND_StartPreparedSeq(int playerNo);
+void SND_PauseSeq(int playerNo, BOOL flag);
+void SND_SetPlayerTempoRatio(int playerNo, int ratio);
+void SND_SetPlayerVolume(int playerNo, int volume);
+void SND_SetPlayerChannelPriority(int playerNo, int prio);
 
 // The tracks of a player: NitroSDK's SND_SetTrackVolume, SND_SetTrackPitch, SND_SetTrackPan, SND_SetTrackModDepth and
 // SND_SetTrackModSpeed (the depth and speed of the track's LFO), then SND_SetTrackAllocatableChannel, SND_SetTrackMute
@@ -262,14 +263,14 @@ void func_0207d37c(int playerNo, int prio);
 #define SND_TRACK_MUTE_ON 3
 #define SND_TRACK_PAN_CENTER 64
 
-void func_0207d38c(int playerNo, u32 trackBitMask, int volume);
-void func_0207d39c(int playerNo, u32 trackBitMask, int pitch);
-void func_0207d3ac(int playerNo, u32 trackBitMask, int pan);
-void func_0207d3bc(int playerNo, u32 trackBitMask, int depth);
-void func_0207d3cc(int playerNo, u32 trackBitMask, int speed);
-void func_0207d3dc(int playerNo, u32 trackBitMask, u32 chBitFlag);
-void func_0207d474(int playerNo, u32 trackBitMask, BOOL flag);
-void func_0207d494(int playerNo, u32 trackBitMask, int muteType);
+void SND_SetTrackVolume(int playerNo, u32 trackBitMask, int volume);
+void SND_SetTrackPitch(int playerNo, u32 trackBitMask, int pitch);
+void SND_SetTrackPan(int playerNo, u32 trackBitMask, int pan);
+void SND_SetTrackModDepth(int playerNo, u32 trackBitMask, int depth);
+void SND_SetTrackModSpeed(int playerNo, u32 trackBitMask, int speed);
+void SND_SetTrackAllocatableChannel(int playerNo, u32 trackBitMask, u32 chBitFlag);
+void SND_SetTrackMute(int playerNo, u32 trackBitMask, BOOL flag);
+void SND_SetTrackMuteEx(int playerNo, u32 trackBitMask, int muteType);
 
 // NitroSDK's SND_LockChannel and SND_UnlockChannel, by their code; SND_SetChannelTimer and SND_SetMasterVolume under
 // swan's names; SND_SetOutputSelector, SND_SetMasterPan and SND_ResetMasterPan by their code
@@ -280,13 +281,13 @@ void func_0207d494(int playerNo, u32 trackBitMask, int muteType);
 // The channels' timer clock, half the system clock
 #define SND_TIMER_CLOCK 16756991
 
-void func_0207d4ac(u32 chBitMask, u32 flags);
-void func_0207d4c4(u32 chBitMask, u32 flags);
-void sndSetRate(u32 chBitMask, int timer);
-void sndSetMasterVolume(int volume);
-void func_0207d5b4(int left, int right, int channel1, int channel3);
-void func_0207d5d0(int pan);
-void func_0207d5e4(void);
+void SND_LockChannel(u32 chBitMask, u32 flags);
+void SND_UnlockChannel(u32 chBitMask, u32 flags);
+void SND_SetChannelTimer(u32 chBitMask, int timer); // swan's sndSetRate
+void SND_SetMasterVolume(int volume);               // swan's sndSetMasterVolume
+void SND_SetOutputSelector(int left, int right, int channel1, int channel3);
+void SND_SetMasterPan(int pan);
+void SND_ResetMasterPan(void);
 #define SND_MASTER_PAN_RESET (-1)
 
 // What the driver reports: NitroSDK's SND_ReadDriverInfo, which copies the driver's state to info,
@@ -368,16 +369,16 @@ typedef struct SNDTrackInfo {
     u8 channel[SND_CHANNEL_MAX];
 } SNDTrackInfo;
 
-void func_0207d5f8(SNDDriverInfo *info);
-u32 func_0207dbb8(void);
-u32 func_0207dbd0(void);
+void SND_ReadDriverInfo(SNDDriverInfo *info);
+u32 SND_GetPlayerStatus(void);
+u32 SND_GetChannelStatus(void);
 u32 SND_GetPlayerTickCounter(int playerNo);
-BOOL func_0207dc0c(const SNDDriverInfo *driverInfo, int playerNo, int trackNo, SNDTrackInfo *trackInfo);
-u32 func_0207dcc4(void);
-void func_0207dcdc(SNDSharedWork *work);
+BOOL SND_ReadTrackInfo(const SNDDriverInfo *driverInfo, int playerNo, int trackNo, SNDTrackInfo *trackInfo);
+u32 SNDi_GetFinishedCommandTag(void);
+void SNDi_InitSharedWork(SNDSharedWork *work);
 
 // The volume in decibels, as a player or track takes it, of each linear volume 0 to 127. NitroSDK's
-// SNDi_DecibelTable, under swan's name
-extern const s16 VOLUME_DB_TABLE[128];
+// SNDi_DecibelTable
+extern const s16 SNDi_DecibelTable[128]; // swan's VOLUME_DB_TABLE
 
 #endif // POKEBW2_NITRO_SND_H

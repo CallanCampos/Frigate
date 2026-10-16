@@ -681,7 +681,7 @@ u32 BagSave_GetBlockSize(void) {
 }
 
 void BagSave_Init(BagSave *bag) {
-    sys_memset(bag, 0, sizeof(BagSave));
+    MI_CpuFill8(bag, 0, sizeof(BagSave));
 }
 
 void BagSave_CopyPocket(BagSave *bag, BagItem *items, u32 pocket, BOOL load) {
@@ -694,7 +694,7 @@ void BagSave_CopyPocket(BagSave *bag, BagItem *items, u32 pocket, BOOL load) {
     if (load) {
         for (i = 0; i < max; i++) {
             if (!BagSave_IsItemInFreeSpace(bag, pocketItems[i].item)) {
-                sys_memcpy(&pocketItems[i], &items[i], sizeof(BagItem));
+                MI_CpuCopy8(&pocketItems[i], &items[i], sizeof(BagItem));
             } else {
                 BagSave_ClearItemEntry(&items[i]);
             }
@@ -702,7 +702,7 @@ void BagSave_CopyPocket(BagSave *bag, BagItem *items, u32 pocket, BOOL load) {
     } else {
         for (i = 0; i < max; i++) {
             if (items[i].item != ITEM_NONE && !BagSave_IsItemInFreeSpace(bag, items[i].item)) {
-                sys_memcpy(&items[i], &pocketItems[i], sizeof(BagItem));
+                MI_CpuCopy8(&items[i], &pocketItems[i], sizeof(BagItem));
             }
         }
     }
@@ -714,9 +714,9 @@ void BagSave_CopyPocketRaw(BagSave *bag, BagItem *items, u32 pocket, BOOL load) 
 
     BagSave_GetPocketPtr(bag, pocket, &pocketItems, &max);
     if (load) {
-        sys_memcpy(pocketItems, items, max * sizeof(BagItem));
+        MI_CpuCopy8(pocketItems, items, max * sizeof(BagItem));
     } else {
-        sys_memcpy(items, pocketItems, max * sizeof(BagItem));
+        MI_CpuCopy8(items, pocketItems, max * sizeof(BagItem));
     }
 }
 
@@ -1056,12 +1056,12 @@ static void BagSave_MoveLastToFirst(BagItem *items, u32 count) {
     if (count > 1) {
         for (i = count - 1; i >= 0; i--) {
             if (last.item == ITEM_NONE) {
-                sys_memcpy(&items[i], &last, sizeof(BagItem));
+                MI_CpuCopy8(&items[i], &last, sizeof(BagItem));
             } else {
-                sys_memcpy(&items[i], &items[i + 1], sizeof(BagItem));
+                MI_CpuCopy8(&items[i], &items[i + 1], sizeof(BagItem));
             }
         }
-        sys_memcpy(&last, &items[0], sizeof(BagItem));
+        MI_CpuCopy8(&last, &items[0], sizeof(BagItem));
     }
 }
 
@@ -1295,7 +1295,7 @@ void BagSave_GetOwnedItemFlags(BagSave *bag, u8 *inBag) {
     u16 pocket;
     u32 i;
 
-    sys_memset(inBag, 0, ITEM_LAST + 1);
+    MI_CpuFill8(inBag, 0, ITEM_LAST + 1);
     for (pocket = 0; pocket <= BAG_POCKET_KEY_ITEMS; pocket++) {
         BagSave_GetPocketPtr(bag, pocket, &items, &max);
         for (i = 0; i < max; i++) {

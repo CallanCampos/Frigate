@@ -5,27 +5,27 @@
 
 // TwlSDK's DSP library, the register interface (guessed file name, after the SDK's dsp_if.c): the DSP's power, its
 // reset and the ports of SCFG and of the DSP's own registers, through which the other DSP files talk to it. ARM code in
-// the DSi-only LTD autoload. The ROM names none of it; the functions keep their default names, and the SDK's are in
-// twl/dsp.h.
+// the DSi-only LTD autoload. The ROM names none of it; the functions have the SDK's names where twl/dsp.h knows them,
+// and keep their default names otherwise.
 
 static void func_02704f9c(void);
 static BOOL func_02704fe4(int index);
 
 // Powers the DSP: its clock, then its reset line, then the reset of its port
-void func_02704e90(void) {
+void DSP_PowerOn(void) {
     reg_SCFG_RST &= ~DSP_SCFG_RST_RELEASE;
     reg_SCFG_CLK = (u16)((reg_SCFG_CLK & (u16)~DSP_SCFG_CLK_ENABLE) | DSP_SCFG_CLK_ENABLE);
-    func_0207c160(2);
+    OS_SpinWaitSysCycles(2);
     reg_SCFG_RST = (u16)((reg_SCFG_RST & (u16)~DSP_SCFG_RST_RELEASE) | DSP_SCFG_RST_RELEASE);
-    func_02704f1c();
+    DSP_ResetOn();
 }
 
-void func_02704ee8(void) {
+void DSP_PowerOff(void) {
     reg_SCFG_RST &= ~DSP_SCFG_RST_RELEASE;
     reg_SCFG_CLK &= ~DSP_SCFG_CLK_ENABLE;
 }
 
-void func_02704f1c(void) {
+void DSP_ResetOn(void) {
     if (reg_DSP_PCFG & DSP_PCFG_RESET) {
         return;
     }
@@ -34,7 +34,7 @@ void func_02704f1c(void) {
     }
 }
 
-void func_02704f4c(u16 mask) {
+void DSP_ResetOffEx(u16 mask) {
     while (reg_DSP_PSTS & DSP_PSTS_RESETTING) {
     }
     func_02704f9c();
@@ -64,7 +64,7 @@ static BOOL func_02704fe4(int index) {
     return empty;
 }
 
-BOOL func_02705008(int index) {
+BOOL DSP_RecvDataIsReady(int index) {
     BOOL ready = TRUE;
     if (!(reg_DSP_PSTS & ((1 << index) << DSP_PSTS_REPLY_SHIFT))) {
         ready = FALSE;
@@ -72,20 +72,20 @@ BOOL func_02705008(int index) {
     return ready;
 }
 
-void func_0270502c(int index, u16 data) {
+void DSP_SendData(int index, u16 data) {
     while (!func_02704fe4(index)) {
     }
     reg_DSP_CMD(index) = data;
 }
 
-u16 func_0270505c(int index) {
-    while (!func_02705008(index)) {
+u16 DSP_RecvData(int index) {
+    while (!DSP_RecvDataIsReady(index)) {
     }
     return reg_DSP_REP(index);
 }
 
 void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u16 autoIncrement = (flags & DSP_WRITE_FIXED_ADDRESS) ? 0 : DSP_PCFG_AUTO_INCREMENT;
     reg_DSP_PADR = dspAddr;
     reg_DSP_PCFG = (reg_DSP_PCFG & ~(DSP_PCFG_MEMORY_MASK | DSP_PCFG_AUTO_INCREMENT)) | memory | autoIncrement;
@@ -102,11 +102,11 @@ void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags
             reg_DSP_PDATA = *src++;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u16 autoIncrement = (flags & DSP_READ_FIXED_ADDRESS) ? 0 : DSP_PCFG_AUTO_INCREMENT;
     u16 length;
 
@@ -144,17 +144,17 @@ void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags) {
         }
     }
     reg_DSP_PCFG &= ~DSP_PCFG_READ_START;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-u16 func_02705284(void) {
+u16 DSP_GetSemaphore(void) {
     return reg_DSP_SEM;
 }
 
-void func_02705294(u16 mask) {
+void DSP_ClearSemaphore(u16 mask) {
     reg_DSP_PCLEAR = mask;
 }
 
-void func_027052a4(u16 mask) {
+void DSP_MaskSemaphore(u16 mask) {
     reg_DSP_PMASK = mask;
 }

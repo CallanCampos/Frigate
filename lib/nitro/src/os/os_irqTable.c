@@ -12,73 +12,73 @@ static u16 OSi_IrqCallbackInfoIndex[OSi_IRQCALLBACK_NUM] = {
 };
 
 // NitroSDK's OSi_IrqCallbackInfo: the callback and argument of each, which OSi_IrqCallback clears when it runs it
-OSIrqCallbackInfo data_0214c178[OSi_IRQCALLBACK_NUM];
+OSIrqCallbackInfo OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NUM];
 
 // NitroSDK's OS_IrqDummy: the handler of the interrupts that nothing handles
-void func_02079c24(void) {
+void OS_IrqDummy(void) {
 }
 
 static void OSi_IrqCallback(int index) {
     u32 mask = 1 << OSi_IrqCallbackInfoIndex[index];
-    OSIrqCallback func = data_0214c178[index].func;
+    OSIrqCallback func = OSi_IrqCallbackInfo[index].func;
 
-    data_0214c178[index].func = NULL;
+    OSi_IrqCallbackInfo[index].func = NULL;
     if (func != NULL) {
-        func(data_0214c178[index].arg);
+        func(OSi_IrqCallbackInfo[index].arg);
     }
     OS_SetIrqCheckFlag(mask);
-    if (data_0214c178[index].enable == FALSE) {
-        CPU_DisableInterrupts(mask);
+    if (OSi_IrqCallbackInfo[index].enable == FALSE) {
+        OS_DisableIrqMask(mask);
     }
 }
 
 // NitroSDK's OSi_IrqDma0 to 3
-void func_02079c80(void) {
+void OSi_IrqDma0(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_DMA0);
 }
 
-void func_02079c8c(void) {
+void OSi_IrqDma1(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_DMA0 + 1);
 }
 
-void func_02079c98(void) {
+void OSi_IrqDma2(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_DMA0 + 2);
 }
 
-void func_02079ca4(void) {
+void OSi_IrqDma3(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_DMA0 + 3);
 }
 
 // NitroSDK's OSi_IrqTimer0 to 3
-void func_02079cb0(void) {
+void OSi_IrqTimer0(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_TIMER0);
 }
 
-void func_02079cbc(void) {
+void OSi_IrqTimer1(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_TIMER0 + 1);
 }
 
-void func_02079cc8(void) {
+void OSi_IrqTimer2(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_TIMER0 + 2);
 }
 
-void func_02079cd4(void) {
+void OSi_IrqTimer3(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_TIMER0 + 3);
 }
 
 // NitroSDK's OSi_IrqNDma0 to 3
-void func_02079ce0(void) {
+void OSi_IrqNDma0(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_NDMA0);
 }
 
-void func_02079cec(void) {
+void OSi_IrqNDma1(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_NDMA0 + 1);
 }
 
-void func_02079cf8(void) {
+void OSi_IrqNDma2(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_NDMA0 + 2);
 }
 
-void func_02079d04(void) {
+void OSi_IrqNDma3(void) {
     OSi_IrqCallback(OSi_IRQCALLBACK_NO_NDMA0 + 3);
 }

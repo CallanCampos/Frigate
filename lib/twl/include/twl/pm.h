@@ -5,8 +5,8 @@
 #include "nitro/pm.h"
 
 // TwlSDK's power management for the DSi, in the LTD autoload: the callbacks run when the console is about to exit the
-// application, as when the power button is pressed. The functions keep their default names until the LTD autoload is
-// analyzed; the comments give the SDK functions they implement, by their code
+// application, as when the power button is pressed. The functions keep their default names; the comments give the SDK
+// functions they implement, by their code
 
 typedef PMGenCallback PMExitCallback;
 typedef PMGenCallbackInfo PMExitCallbackInfo;
@@ -24,7 +24,7 @@ void func_027694dc(void);                     // PM_ReadyToExit
 // application exits, and func_02769568 takes it out
 void func_02769550(PMExitCallbackInfo *info, int priority);
 void func_02769568(PMExitCallbackInfo *info);
-// Reads a word (at 0x14) of main's bss (data_0214e240)
+// Reads a word (at 0x14) of main's bss (PMi_IsInit)
 BOOL func_02769520(void);
 
 // The part of TwlSDK's pm.c that main's pm.c calls on a DSi. The exit request starts TwlSDK's exit sequence
@@ -41,7 +41,7 @@ typedef struct {
     void *arg;
 } PMBatteryLowCallbackInfo;
 
-extern PMGenCallbackInfo *data_0276b0ec;       // PMi_PostExitCallbackList
-extern PMBatteryLowCallbackInfo data_0276b0f0; // PMi_BatteryLowCallbackInfo
+extern PMGenCallbackInfo *PMi_PostExitCallbackList;
+extern PMBatteryLowCallbackInfo PMi_BatteryLowCallbackInfo;
 
 #endif // POKEBW2_TWL_PM_H

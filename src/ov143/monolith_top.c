@@ -151,7 +151,7 @@ static BOOL MonolithTop_Init(GameProc *proc, u32 *state, void *param, void *work
 
     GSYS_GetGameData(screen->param->gsys);
     mtw = GFL_ProcInitSubsystem(proc, sizeof(MonolithTopWork), HEAPID_MONOLITH);
-    sys_memset(mtw, 0, sizeof(MonolithTopWork));
+    MI_CpuFill8(mtw, 0, sizeof(MonolithTopWork));
     MonolithTop_CreateBG();
     MonolithTop_CreateMessageWindow(mtw, screen->work);
     MonolithTop_InitCursor(screen, mtw);

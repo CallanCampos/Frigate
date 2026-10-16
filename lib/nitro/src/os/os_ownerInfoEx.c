@@ -26,7 +26,7 @@ typedef struct TWLSettings {
 #define TWL_SETTINGS (*(TWLSettings **)HW_TWL_SETTINGS_BUF_PTR)
 
 // TwlSDK's OS_GetOwnerInfoEx: the owner's settings, with the language and the country from the DSi's settings on a DSi
-void func_0207c3bc(OSOwnerInfoEx *info) {
+void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
     NVRAMConfig *config = (NVRAMConfig *)HW_NVRAM_USER_INFO;
 
     info->favoriteColor = config->owner.favoriteColor;
@@ -50,7 +50,7 @@ void func_0207c3bc(OSOwnerInfoEx *info) {
 }
 
 // TwlSDK's OS_IsAvailableWireless: TRUE on a DS
-BOOL func_0207c438(void) {
+BOOL OS_IsAvailableWireless(void) {
     if (hw_isDSi()) {
         return func_02769318();
     }
@@ -58,7 +58,7 @@ BOOL func_0207c438(void) {
 }
 
 // TwlSDK's OS_IsAgreeEULA: FALSE on a DS
-BOOL func_0207c45c(void) {
+BOOL OS_IsAgreeEULA(void) {
     if (hw_isDSi()) {
         return (TWL_SETTINGS->eulaFlags & 1) != 0;
     }
@@ -66,7 +66,7 @@ BOOL func_0207c45c(void) {
 }
 
 // TwlSDK's OS_GetAgreedEULAVersion: 0 on a DS
-u8 func_0207c480(void) {
+u8 OS_GetAgreedEULAVersion(void) {
     if (hw_isDSi()) {
         return TWL_SETTINGS->agreedEULAVersion;
     }

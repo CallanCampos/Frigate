@@ -4,8 +4,8 @@
 // TwlSDK's DSP library, the graphics component (guessed file name, after the SDK's dsp_graphics.c): the DSP process
 // that scales the camera's pictures, as a COFF image in the LTD autoload's .rodata. The ARM9 tells it what to scale
 // through the pipe of port 3 and the DSP answers on reply 1, which the ARM9 either waits for or has func_0270734c
-// handle from the DSP's interrupt. ARM code in the DSi-only LTD autoload. The ROM names none of it; the functions keep
-// their default names, and the SDK's are in twl/dsp.h.
+// handle from the DSP's interrupt. ARM code in the DSi-only LTD autoload. The ROM names none of it; the functions have
+// the SDK's names where twl/dsp.h knows them, and keep their default names otherwise.
 
 // What the DSP gets to scale one picture, as its pipe carries it
 typedef struct DSPScalingRequest {
@@ -40,11 +40,11 @@ static DSPProcessContext sGraphicsContext;
 
 // Opens the component's image, as a file of memory, in file
 BOOL func_02707310(FSFile *file) {
-    if (!fs_init_check()) {
-        fs_init(FS_DMA_NOT_USE);
+    if (!FS_IsAvailable()) {
+        FS_Init(FS_DMA_NOT_USE);
     }
-    finit(file);
-    return extfs_fopen(file, DSP_GraphicsImage, DSP_COMPONENT_IMAGE_SIZE);
+    FS_InitFile(file);
+    return FS_CreateFileFromMemory(file, DSP_GraphicsImage, DSP_COMPONENT_IMAGE_SIZE);
 }
 
 // The DSP's answer to an asynchronous scaling: whether it worked or not, the scaling is over, and only a success is
@@ -70,20 +70,20 @@ BOOL func_027073b8(FSFile *file, int slotB, int slotC) {
     if (!sGraphicsLoaded) {
         sGraphicsBusy = FALSE;
         sGraphicsAsync = FALSE;
-        func_027058d8(&sGraphicsContext, "graphics");
+        DSP_InitProcessContext(&sGraphicsContext, "graphics");
         sGraphicsContext.flags |= DSP_PROCESS_USING_OS;
-        func_02705b70(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), func_0270734c, NULL);
-        if (func_02705c24(&sGraphicsContext, file, slotB, slotC)) {
+        DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), func_0270734c, NULL);
+        if (DSP_ExecuteProcess(&sGraphicsContext, file, slotB, slotC)) {
             sGraphicsLoaded = TRUE;
         }
-        func_02706d44(&sGraphicsPipe, DSP_GRAPHICS_PIPE_PORT, 1);
+        DSP_LoadPipe(&sGraphicsPipe, DSP_GRAPHICS_PIPE_PORT, 1);
     }
     return sGraphicsLoaded;
 }
 
 void func_02707464(void) {
     if (sGraphicsLoaded) {
-        func_02705e04(&sGraphicsContext);
+        DSP_QuitProcess(&sGraphicsContext);
         sGraphicsLoaded = FALSE;
     }
 }
@@ -100,9 +100,9 @@ BOOL func_02707494(const void *src, void *dst, u16 imageWidth, u16 imageHeight, 
     sGraphicsCallback = callback;
     sGraphicsAsync = async;
     if (async) {
-        func_02705b70(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), func_0270734c, NULL);
+        DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), func_0270734c, NULL);
     } else {
-        func_02705b70(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), NULL, NULL);
+        DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), NULL, NULL);
     }
     DSPi_SendData(0, 1);
     request.src = src;
@@ -116,12 +116,12 @@ BOOL func_02707494(const void *src, void *dst, u16 imageWidth, u16 imageHeight, 
     request.y = y;
     request.width = width;
     request.height = height;
-    func_02706fcc(&sGraphicsPipe, &request, sizeof(request));
+    DSP_WritePipe(&sGraphicsPipe, &request, sizeof(request));
     if (sGraphicsAsync) {
         return TRUE;
     }
     while (!DSPi_RecvDataIsReady(DSP_GRAPHICS_REPLY)) {
-        func_0207aa04(1);
+        OS_Sleep(1);
     }
     sGraphicsResult = DSPi_RecvData(DSP_GRAPHICS_REPLY);
     sGraphicsBusy = FALSE;

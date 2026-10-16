@@ -5,32 +5,28 @@
 #include "nitro/os.h"
 #include "twl/syscall.h"
 
-// SVC_SHA1Init
-void dsiJump_27696E9(SVCSHA1Context *context) {
+void SVC_SHA1Init(SVCSHA1Context *context) {
     if (!func_0207acbc()) {
         sys_exit();
     }
     func_027696e8(context);
 }
 
-// SVC_SHA1Update
-void func_02082820(SVCSHA1Context *context, const void *input, u32 len) {
+void SVC_SHA1Update(SVCSHA1Context *context, const void *input, u32 len) {
     if (!func_0207acbc()) {
         sys_exit();
     }
     func_027696f4(context, input, len);
 }
 
-// SVC_SHA1GetHash
-void func_02082850(SVCSHA1Context *context, void *digest) {
+void SVC_SHA1GetHash(SVCSHA1Context *context, void *digest) {
     if (!func_0207acbc()) {
         sys_exit();
     }
     func_027696f8(context, digest);
 }
 
-// SVC_CalcHMACSHA1
-void func_0208287c(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len) {
+void SVC_CalcHMACSHA1(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len) {
     if (!func_0207acbc()) {
         sys_exit();
     }

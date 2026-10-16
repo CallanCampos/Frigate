@@ -212,7 +212,7 @@ static MsgFileHeader *GFL_MsgDataLoadHeader(ArcTool *arc, u32 offset, HeapID hea
     header = (MsgFileHeader *)buf;
     GFL_ArcToolReadRaw(arc, sizeof(MsgFileHeader), header);
     result = GFL_HeapAllocate(heapId, sizeof(MsgFileHeader) + header->langCount * sizeof(u32), FALSE, "msgdata.c", 499);
-    sys_memcpy(header, result, sizeof(MsgFileHeader));
+    MI_CpuCopy8(header, result, sizeof(MsgFileHeader));
     GFL_ArcToolReadRaw(arc, result->langCount * sizeof(u32), result->langOffsets);
     return result;
 }

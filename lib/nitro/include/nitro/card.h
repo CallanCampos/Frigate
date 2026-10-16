@@ -5,13 +5,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-// NitroSDK's access to the card's backup memory. The functions are unnamed: func_0206ef4c is CARD_LockBackup,
-// func_0206ef58 CARD_UnlockBackup, func_0206eecc CARD_GetResultCode, func_0206f80c CARDi_RequestStreamCommand,
-// func_0206f854 CARD_IdentifyBackup, func_0206f888 CARD_WaitBackupAsync, func_0206f890 CARD_TryWaitBackupAsync and
-// func_0206f898 CARD_CancelBackupAsync. The rest of the library's names, from the SDK: cart_read_thread_init is
-// CARD_Init, func_0206eea4 CARD_IsEnabled, func_0206eeb0 CARD_CheckEnabled, func_0206eec0 CARD_Enable, func_0206eed8
-// CARD_GetRomHeader, rom_get_header CARD_GetOwnRomHeader, func_0206eee8 CARD_GetOwnRomHeaderTWL, func_0206eef0
-// CARD_LockRom and func_0206ef38 CARD_UnlockRom
+// NitroSDK's access to the card's backup memory, and the rest of the card library that other files use
 
 typedef enum {
     CARD_RESULT_SUCCESS,
@@ -183,38 +177,36 @@ typedef struct CARDiCommon {
 
 extern CARDiCommon cardi_common;
 
-void func_0206ef4c(u16 lockId);
-void func_0206ef58(u16 lockId);
-CARDResult func_0206eecc(void);
-BOOL func_0206f80c(u32 src, u32 dest, u32 size, MIDmaCallback callback, void *arg, BOOL async, CARDRequest request,
-                   int retries, CARDRequestMode mode);
-BOOL func_0206f854(CARDBackupType type);
-BOOL func_0206f888(void);
+void CARD_LockBackup(u16 lockId);
+void CARD_UnlockBackup(u16 lockId);
+CARDResult CARD_GetResultCode(void);
+BOOL CARDi_RequestStreamCommand(u32 src, u32 dest, u32 size, MIDmaCallback callback, void *arg, BOOL async,
+                                CARDRequest request, int retries, CARDRequestMode mode);
+BOOL CARD_IdentifyBackup(CARDBackupType type);
+BOOL CARD_WaitBackupAsync(void);
 // Whether no access to the backup is in progress
-BOOL func_0206f890(void);
-void func_0206f898(void);
+BOOL CARD_TryWaitBackupAsync(void);
+void CARD_CancelBackupAsync(void);
 
 // What card_common.c gives the other files of the library
-void cart_read_thread_init(void);
-BOOL func_0206eea4(void);
-void func_0206eeb0(void);
-void func_0206eec0(BOOL enable);
-const ROMHeader *func_0206eed8(void);
-void func_0206eef0(u16 lockId);
-void func_0206ef38(u16 lockId);
-u32 func_0206f018(void);
-BOOL func_0206f07c(void);
-BOOL func_0206f090(void);
-BOOL func_0206f134(CARDiTask task, BOOL async);
-BOOL func_0206f1c0(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg);
-void func_0206f224(CARDiCommon *p);
-const CARDDmaInterface *func_0206f25c(u32 dma);
-void func_0206f298(void *addr, u32 len, u32 threshold);
-void func_0206f2ac(void *addr, u32 len, u32 threshold);
+void CARD_Init(void); // swan's cart_read_thread_init
+void CARD_CheckEnabled(void);
+const ROMHeader *CARD_GetRomHeader(void);
+void CARD_LockRom(u16 lockId);
+void CARD_UnlockRom(u16 lockId);
+u32 CARDi_GetAccessLevel(void);
+BOOL CARDi_WaitAsync(void);
+BOOL CARDi_TryWaitAsync(void);
+BOOL CARDi_ExecuteOldTypeTask(CARDiTask task, BOOL async);
+BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg);
+void CARDi_EndTask(CARDiCommon *p);
+const CARDDmaInterface *CARDi_GetDmaInterface(u32 dma);
+void CARDi_ICInvalidateSmart(void *addr, u32 len, u32 threshold);
+void CARDi_DCInvalidateSmart(void *addr, u32 len, u32 threshold);
 // Called with each word the ARM7 sends with the card's tag, and sends it its commands. CARDi_OnFifoRecv and
 // CARDi_Request
-void func_0206f2e4(u32 fifoTag, u32 data, BOOL err);
-BOOL func_0206f30c(CARDiCommon *p, int reqType, int retry);
+void CARDi_OnFifoRecv(u32 fifoTag, u32 data, BOOL err);
+BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry);
 
 // The middleware signature of the backup part of the library, "[SDK+NINTENDO:BACKUP]", which lies in the version
 // strings at the start of the program
@@ -222,7 +214,7 @@ extern const char CARDi_BackupSignature[];
 
 // What card_rom.c gives card_common.c: the object that holds the ROM's base address, and the setup of the ROM reads
 extern u32 cardi_rom_base;
-void func_0206fe54(void);
+void CARDi_InitRom(void);
 
 // A ROM read by DMA, which the card-data interrupt moves on a page at a time. The callback is called with the argument
 // once it is done. TwlSDK's part of the library, in the LTD autoload, makes one of its own
@@ -238,13 +230,13 @@ typedef struct CARDiRomDmaRead {
 
 // Reads len bytes of the ROM at the offset src into dst, with a DMA channel of the number dma if it can, and calls the
 // callback with the argument once done. Waits for the end unless async
-void func_0206fd24(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async);
+void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async);
 // NitroSDK's CARDi_ReadRomWithCPU and CARDi_ReadRomWithDMA, which TwlSDK's part of the library in the LTD autoload
 // calls. The first reads len bytes from src into dst and returns len; its first parameter is for the argument of a
 // callback that it has no use for
-u32 func_0206fab4(void *arg, void *dst, u32 src, u32 len);
-void func_0206fbf0(CARDiRomDmaRead *read);
-// The linker's veneer, a pair of functions, from func_0206fe54 to the DSi's setup of the ROM reads in the LTD autoload
+u32 CARDi_ReadRomWithCPU(void *arg, void *dst, u32 src, u32 len);
+void CARDi_ReadRomWithDMA(CARDiRomDmaRead *read);
+// The linker's veneer, a pair of functions, from CARDi_InitRom to the DSi's setup of the ROM reads in the LTD autoload
 void func_0206feb8(void);
 void func_0206febc(void);
 
@@ -252,7 +244,7 @@ void func_0206febc(void);
 typedef BOOL (*CARDPulledOutCallback)(void);
 
 void func_0206ff50(CARDPulledOutCallback callback); // CARD_SetPulledOutCallback
-void func_0206f0f0(u32 command, u32 value);
+void CARDi_NotifyEvent(u32 command, u32 value);
 void func_0206fed8(void);
 BOOL func_0206ff5c(void);
 void func_0206ffac(void);
@@ -262,17 +254,19 @@ void func_0206ffc0(void);
 void func_0206ffcc(u32 cardId);
 
 static inline BOOL CARD_ReadBackup(u32 src, void *dest, u32 size) {
-    return func_0206f80c(src, (u32)dest, size, NULL, NULL, FALSE, CARD_REQ_READ_BACKUP, 1, CARD_REQUEST_MODE_RECV);
+    return CARDi_RequestStreamCommand(src, (u32)dest, size, NULL, NULL, FALSE, CARD_REQ_READ_BACKUP, 1,
+                                      CARD_REQUEST_MODE_RECV);
 }
 
 static inline BOOL CARD_ReadBackupAsync(u32 src, void *dest, u32 size, MIDmaCallback callback, void *arg) {
-    return func_0206f80c(src, (u32)dest, size, callback, arg, TRUE, CARD_REQ_READ_BACKUP, 1, CARD_REQUEST_MODE_RECV);
+    return CARDi_RequestStreamCommand(src, (u32)dest, size, callback, arg, TRUE, CARD_REQ_READ_BACKUP, 1,
+                                      CARD_REQUEST_MODE_RECV);
 }
 
 static inline BOOL CARD_WriteAndVerifyBackupAsync(u32 dest, const void *src, u32 size, MIDmaCallback callback,
                                                   void *arg) {
-    return func_0206f80c((u32)src, dest, size, callback, arg, TRUE, CARD_REQ_WRITE_BACKUP, CARD_RETRY_COUNT_MAX,
-                         CARD_REQUEST_MODE_SEND_VERIFY);
+    return CARDi_RequestStreamCommand((u32)src, dest, size, callback, arg, TRUE, CARD_REQ_WRITE_BACKUP,
+                                      CARD_RETRY_COUNT_MAX, CARD_REQUEST_MODE_SEND_VERIFY);
 }
 
 #endif // POKEBW2_NITRO_CARD_H

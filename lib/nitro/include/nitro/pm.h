@@ -5,8 +5,8 @@
 
 // NitroSDK's power management (TwlSDK's libspi pm.c, whose ARM9 part is lib/nitro/src/spi/pm.c): the backlights, the
 // battery, the sound amplifier of the microphone, the sleep mode and the power-off. Each call sends the ARM7 a request
-// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions keep their default names; the
-// comments give the SDK's, by what the code does
+// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions have the SDK's names, by what
+// the code does
 
 #define PM_RESULT_SUCCESS 0
 // The ARM7 is still on a request
@@ -38,7 +38,7 @@ typedef void (*PMCallback)(u32 result, void *arg);
 #define PM_TRIGGER_CARTRIDGE 0x10
 
 // Turns the power management on, as the first call
-void func_0207ebb8(void); // PM_Init
+void PM_Init(void);
 
 // Sends the ARM7 a request with a number and a halfword, waits for the answer and returns its result. A request that
 // reads gives the ARM7's answer in *result. Swan calls it PMi_ReadRegister, after the register reads that it is
@@ -54,13 +54,13 @@ u32 PM_GetBattery(u32 *battery);
 u32 PM_GetBatteryLevel(u16 *level);
 
 // The sound amplifier of the microphone. The setting is kept and sent again when the screens come back on
-u32 func_0207efc4(int amp);  // PM_SetAmp
-u32 func_0207f0ac(int *amp); // PM_GetAmp
-u32 func_0207eff4(int gain); // PM_SetAmpGain
-u32 func_0207f008(u8 level); // PM_SetAmpGainLevel
+u32 PM_SetAmp(int amp);
+u32 PM_GetAmp(int *amp);
+u32 PM_SetAmpGain(int gain);
+u32 PM_SetAmpGainLevel(u8 level);
 
 // Turns the system off, and never returns
-void func_0207ef8c(void); // PM_ForceToPowerOff
+void PM_ForceToPowerOff(void);
 // Turns the screens' power on or off, and the upper engine off with it. TRUE when it is done, FALSE when the screens
 // went off too recently to be turned on
 BOOL func_0207f4d4(BOOL on);
@@ -97,15 +97,15 @@ static inline void PM_SetSleepCallbackInfo(PMSleepCallbackInfo *info, PMGenCallb
 #define PM_INSERT_PREPEND 1
 
 // PMi_InsertList, PMi_DeleteList and PMi_CallCallbackList, which TwlSDK's exit callbacks (the LTD autoload) use too
-void func_0207f544(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType);
-void func_0207f59c(PMGenCallbackInfo **list, PMGenCallbackInfo *info);
-void func_0207f5d4(PMGenCallbackInfo *list);
+void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType);
+void PMi_DeleteList(PMGenCallbackInfo **list, PMGenCallbackInfo *info);
+void PMi_CallCallbackList(PMGenCallbackInfo *list);
 
-void func_0207f5e8(PMSleepCallbackInfo *info);
-void func_0207f600(PMSleepCallbackInfo *info);
-// PM_InsertPreSleepCallback: the pre-sleep callback with its priority, after those of the same one
-void func_0207f614(PMSleepCallbackInfo *info, int priority);
-void func_0207f62c(PMSleepCallbackInfo *info);
-void func_0207f63c(PMSleepCallbackInfo *info);
+void PM_PrependPreSleepCallback(PMSleepCallbackInfo *info);
+void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info);
+// The pre-sleep callback with its priority, after those of the same one
+void PM_InsertPreSleepCallback(PMSleepCallbackInfo *info, int priority);
+void PM_DeletePreSleepCallback(PMSleepCallbackInfo *info);
+void PM_DeletePostSleepCallback(PMSleepCallbackInfo *info);
 
 #endif // POKEBW2_NITRO_PM_H

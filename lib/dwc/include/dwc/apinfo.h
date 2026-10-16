@@ -26,12 +26,13 @@ typedef struct DWCApInfo {
 
 // Gives the information of the access point the console is connected through, FALSE if it is not connected or the
 // access point is not one that DWC knows: DWC_GetApInfo
-BOOL func_0205b29c(DWCApInfo *apInfo);
+BOOL DWC_GetApInfo(DWCApInfo *apInfo);
 
-// The work that func_0205b594 parses a beacon with, which the caller allocates; its size is func_0205b588's
+// The work that DWCi_BssDescToApInfo parses a beacon with, which the caller allocates; its size is
+// DWCi_GetBssDescParseWorkSize's
 typedef struct DWCBssWork DWCBssWork;
-u32 func_0205b588(void);
+u32 DWCi_GetBssDescParseWorkSize(void);
 // Gives the information of the access point that a beacon is of, FALSE if it is not one that DWC knows
-BOOL func_0205b594(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo);
+BOOL DWCi_BssDescToApInfo(DWCBssWork *work, const WMBssDesc *bss, DWCApInfo *apInfo);
 
 #endif // POKEBW2_DWC_APINFO_H

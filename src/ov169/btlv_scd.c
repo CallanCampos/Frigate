@@ -962,7 +962,7 @@ static BOOL BtlvScd_RotationMain(s32 *seq, void *arg) {
 }
 
 static void BtlvScd_ClearTargetList(BtlvScdTargetList *list) {
-    sys_memset(list, 0, sizeof(*list));
+    MI_CpuFill8(list, 0, sizeof(*list));
 }
 
 static void BtlvScd_FillSelectTargets(BtlvScdTargetList *list, BtlMainModule *mainModule, u16 posFlags) {

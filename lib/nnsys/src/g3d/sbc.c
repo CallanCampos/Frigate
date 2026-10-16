@@ -497,7 +497,7 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
                     b = rot[1];
                     pivot = (node->flag & NNS_G3D_SRTFLAG_IDXPIVOT_MASK) >> NNS_G3D_SRTFLAG_IDXPIVOT_SHIFT;
 
-                    func_02079084(&result->rot);
+                    MI_Zero36B(&result->rot);
                     result->rotElem[pivot] = (node->flag & NNS_G3D_SRTFLAG_PIVOT_MINUS) ? -FX32_ONE : FX32_ONE;
                     result->rotElem[NNS_COMPACT_ROT_LUT[pivot][0]] = a;
                     result->rotElem[NNS_COMPACT_ROT_LUT[pivot][1]] = b;
@@ -607,7 +607,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
         reg_G3X_GXFIFO = 0x151110; // MTX_MODE, MTX_PUSH, MTX_IDENTITY
         reg_G3X_GXFIFO = 0;
         reg_G3X_GXFIFO = 0;
-        while (gfxGetClipMatrix(&clip) != 0) {
+        while (G3X_GetClipMtx(&clip) != 0) {
         }
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
@@ -628,18 +628,18 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
-            sys_memcpy_volatile(&sBBCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            sys_memcpy_volatile(NNS_G3DGetTempInvMVMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(&sBBCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
+            MIi_CpuSend32(NNS_G3DGetTempInvMVMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
-            sys_memcpy_volatile(sBBCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
+            MIi_CpuSend32(sBBCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
-            sys_memcpy_volatile(&sBBCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            sys_memcpy_volatile(NNS_G3DGetInvViewMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(&sBBCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
+            MIi_CpuSend32(NNS_G3DGetInvViewMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
-            sys_memcpy_volatile(sBBCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
+            MIi_CpuSend32(sBBCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else {
-            sys_memcpy_volatile(&sBBCmd, &reg_G3X_GXFIFO, sizeof(BillboardCmd));
+            MIi_CpuSend32(&sBBCmd, &reg_G3X_GXFIFO, sizeof(BillboardCmd));
         }
     }
 
@@ -700,7 +700,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
         reg_G3X_GXFIFO = 0x151110; // MTX_MODE, MTX_PUSH, MTX_IDENTITY
         reg_G3X_GXFIFO = 0;
         reg_G3X_GXFIFO = 0;
-        while (gfxGetClipMatrix(&clip) != 0) {
+        while (G3X_GetClipMtx(&clip) != 0) {
         }
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
@@ -736,18 +736,18 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
-            sys_memcpy_volatile(&sBBYCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            sys_memcpy_volatile(NNS_G3DGetTempInvMVMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(&sBBYCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
+            MIi_CpuSend32(NNS_G3DGetTempInvMVMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
-            sys_memcpy_volatile(sBBYCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
+            MIi_CpuSend32(sBBYCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
-            sys_memcpy_volatile(&sBBYCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            sys_memcpy_volatile(NNS_G3DGetInvViewMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(&sBBYCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
+            MIi_CpuSend32(NNS_G3DGetInvViewMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
-            sys_memcpy_volatile(sBBYCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
+            MIi_CpuSend32(sBBYCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else {
-            sys_memcpy_volatile(&sBBYCmd, &reg_G3X_GXFIFO, sizeof(BillboardCmd));
+            MIi_CpuSend32(&sBBYCmd, &reg_G3X_GXFIFO, sizeof(BillboardCmd));
         }
     }
 
@@ -796,7 +796,7 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
             rs->isEnvMtxCached[jointID >> 5] |= 1 << (jointID & 0x1f);
             reg_G3_MTX_RESTORE = p[0];
             reg_G3_MTX_MODE = 1;
-            gfxMultMatrix4x3(&evpMtx[jointID].invM);
+            G3_MultMtx43(&evpMtx[jointID].invM);
         }
 
         if (i != 0) {
@@ -812,10 +812,10 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         }
 
         if (!isCached) {
-            while (gfxGetClipMatrix(clip) != 0) {
+            while (G3X_GetClipMtx(clip) != 0) {
             }
             reg_G3_MTX_MODE = 2;
-            gfxMultMatrix3x3(&evpMtx[jointID].invN);
+            G3_MultMtx33(&evpMtx[jointID].invN);
         }
 
         weight = p[2] << 4;
@@ -834,7 +834,7 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         p += 3;
         nrm = &g_NNSG3DIBPMatrices[jointID].normal;
         if (!isCached) {
-            while (gfxGetNormalMatrix(&g_NNSG3DIBPMatrices[jointID].normal) != 0) {
+            while (G3X_GetVectorMtx(&g_NNSG3DIBPMatrices[jointID].normal) != 0) {
             }
         }
     }
@@ -848,9 +848,9 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     sum.invN.m[2][0] += MulFx(weight, nrm->m[2][0]);
     sum.invN.m[2][1] += MulFx(weight, nrm->m[2][1]);
     sum.invN.m[2][2] += MulFx(weight, nrm->m[2][2]);
-    gfxLoadMatrix4x3((const MtxFx43 *)&sum.invN);
+    G3_LoadMtx43((const MtxFx43 *)&sum.invN);
     reg_G3_MTX_MODE = 1;
-    gfxLoadMatrix4x3(&sum.invM);
+    G3_LoadMtx43(&sum.invM);
     reg_G3_MTX_MODE = 0;
     reg_G3_MTX_RESTORE = 1;
     reg_G3_MTX_MODE = 2;
@@ -1037,7 +1037,7 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
             reg_G3_MTX_MODE = 0;
             reg_G3_MTX_PUSH = 0;
             reg_G3_MTX_IDENTITY = 0;
-            while (gfxGetClipMatrix(&clip) != 0) {
+            while (G3X_GetClipMtx(&clip) != 0) {
             }
             reg_G3_MTX_POP = 1;
             reg_G3_MTX_MODE = 3;

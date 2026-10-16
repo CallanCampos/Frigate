@@ -71,7 +71,7 @@ static const UnionActorStep sUnionActorSteps[4] = {
 };
 
 void UnionOneself_ClearActors(UnionSystem *unisys) {
-    sys_memset(unisys->actors, 0, sizeof(unisys->actors));
+    MI_CpuFill8(unisys->actors, 0, sizeof(unisys->actors));
 }
 
 static BOOL UnionOneself_SetActorNextStep(UnionActorSlot *slot, u8 step) {
@@ -191,7 +191,7 @@ static void UnionOneself_FreeActorSlot(UnionSystem *unisys, UnionBeaconEntry *en
         UnionEff_RemoveMark(func_ov036_0218051c(field), actor);
     }
     DeleteActor(actor);
-    sys_memset(slot, 0, sizeof(UnionActorSlot));
+    MI_CpuFill8(slot, 0, sizeof(UnionActorSlot));
 }
 
 static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList, void *effWork,
@@ -203,7 +203,7 @@ static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *r
     if (entry->timeout == 0) {
         return;
     }
-    func_0207c33c(ownMac);
+    OS_GetMacAddress(ownMac);
     for (i = 0; i < UNION_MEMBER_MAX; i++) {
         if (entry->actor[i] == NULL && entry->beacon.members[i].used == 1 &&
             GFL_STD_MemCmp(ownMac, entry->beacon.members[i].mac, 6) != 0 &&
@@ -263,7 +263,7 @@ static BOOL UnionOneself_ShowFocus(UnionSystem *unisys, UnionBeaconEntry *entry)
                     }
                 }
             }
-            sys_memset(unisys->situ.mac78, 0, 6);
+            MI_CpuFill8(unisys->situ.mac78, 0, 6);
             return TRUE;
         }
     }
@@ -313,11 +313,11 @@ void UnionOneself_UpdateActors(UnionSystem *unisys, GameData *gameData, Field *f
                 }
             }
             if (emptyCount >= UNION_MEMBER_MAX && entry->timeout == 0) {
-                sys_memset(entry, 0, sizeof(UnionBeaconEntry));
+                MI_CpuFill8(entry, 0, sizeof(UnionBeaconEntry));
             }
         }
     }
-    sys_memset(unisys->situ.mac78, 0, 6);
+    MI_CpuFill8(unisys->situ.mac78, 0, 6);
 }
 
 static BOOL UnionOneself_RunActor(UnionSystem *unisys, UnionActorSlot *slot, Field *field) {

@@ -18,7 +18,7 @@
 #define OSi_SetMutexType(m, t) ((m)->count = ((m)->count & OS_MUTEX_COUNT_MASK) | (t))
 #define OSi_SetMutexCount(m, c) ((m)->count = ((m)->count & OS_MUTEX_TYPE_MASK) | ((c) & OS_MUTEX_COUNT_MASK))
 
-static void func_0207af58(OSMutex *mutex, u32 type);
+static void OSi_UnlockMutexCore(OSMutex *mutex, u32 type);
 static void OSi_EnqueueTail(OSThread *thread, OSMutex *mutex);
 static void OSi_DequeueItem(OSThread *thread, OSMutex *mutex);
 
@@ -32,7 +32,7 @@ void OS_InitMutex(OSMutex *mutex) {
 
 // NitroSDK's OS_LockMutex: waits until the mutex is free (or already the thread's), then holds it
 void OS_LockMutex(OSMutex *mutex) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     OSThread *current = OS_GetCurrentThread();
 
     for (;;) {
@@ -40,20 +40,20 @@ void OS_LockMutex(OSMutex *mutex) {
             break;
         }
         current->mutex = mutex;
-        scheduler_yield(&mutex->queue);
+        OS_SleepThread(&mutex->queue);
         current->mutex = NULL;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // NitroSDK's OS_UnlockMutex, which unlocks a mutex of type 1
 void OS_UnlockMutex(OSMutex *mutex) {
-    func_0207af58(mutex, OS_MUTEX_TYPE_1);
+    OSi_UnlockMutexCore(mutex, OS_MUTEX_TYPE_1);
 }
 
 // NitroSDK's OSi_UnlockAllMutex: unlocks every mutex that a thread has, whatever its count, and wakes the threads that
 // wait for it
-void func_0207aeb0(OSThread *thread) {
+void OSi_UnlockAllMutex(OSThread *thread) {
     OSMutex *mutex;
 
     while (thread->mutexQueue.head != NULL) {
@@ -68,7 +68,7 @@ void func_0207aeb0(OSThread *thread) {
 // TRUE when the thread has the mutex now, either by taking it when it is free or by locking
 // it again
 BOOL OS_TryLockMutex(OSMutex *mutex) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     OSThread *current = OS_GetCurrentThread();
     BOOL locked;
 
@@ -84,20 +84,20 @@ BOOL OS_TryLockMutex(OSMutex *mutex) {
     } else {
         locked = FALSE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return locked;
 }
 
 // TwlSDK's body of OS_UnlockMutex: lowers the count of the mutex, if it is of the type that is asked for (any type when
 // that is 0) and the thread may unlock it, and once the count is 0 gives the mutex up and wakes the threads that wait
-static void func_0207af58(OSMutex *mutex, u32 type) {
-    u32 irq = CPU_IRQDisable();
+static void OSi_UnlockMutexCore(OSMutex *mutex, u32 type) {
+    u32 irq = OS_DisableInterrupts();
     OSThread *current = OS_GetCurrentThread();
     BOOL free = FALSE;
     u32 mutexType;
 
     if (type != 0 && type != OSi_GetMutexType(mutex)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return;
     }
     mutexType = OSi_GetMutexType(mutex);
@@ -120,7 +120,7 @@ static void func_0207af58(OSMutex *mutex, u32 type) {
         }
         break;
     default:
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return;
     }
     if (free) {
@@ -129,7 +129,7 @@ static void func_0207af58(OSMutex *mutex, u32 type) {
         OSi_SetMutexType(mutex, 0);
         OS_WakeupThread(&mutex->queue);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // NitroSDK's OSi_EnqueueTail, for mutexes: puts a mutex at the end of the list of the mutexes that a thread has

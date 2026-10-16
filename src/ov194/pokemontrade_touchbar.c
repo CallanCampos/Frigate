@@ -20,7 +20,7 @@ void PokemonTrade_CreateTouchBar(PokemonTradeWork *wk) {
     };
     TouchBarSetup setup;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.items = items;
     setup.count = NELEMS(items);
     setup.unit = wk->clactUnit;

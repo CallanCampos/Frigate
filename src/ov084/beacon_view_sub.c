@@ -782,7 +782,7 @@ void BeaconView_AddLine(BeaconViewWork *work, const GameBeacon *beacon, u8 dataI
     }
     data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(work->tcbManager, BeaconView_AddLineTask, sizeof(BeaconViewAddLineTask), 0));
-    sys_memset(data, 0, sizeof(BeaconViewAddLineTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewAddLineTask));
     data->work = work;
     data->dir = dir;
     data->frames = frames;
@@ -865,7 +865,7 @@ static void BeaconViewPanel_StartMove(BeaconViewWork *work, BeaconViewPanel *pan
     BeaconViewMoveTask *data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(work->tcbManager, BeaconViewPanel_MoveTask, sizeof(BeaconViewMoveTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewMoveTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewMoveTask));
     data->dir = dir;
     if (data->dir == 0) {
         panel->line--;
@@ -926,7 +926,7 @@ void BeaconView_StartJump(BeaconViewWork *work, u8 top) {
     BeaconViewJumpTask *data =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbManager, BeaconView_JumpTask, sizeof(BeaconViewJumpTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewJumpTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewJumpTask));
     data->work = work;
     data->pending = &work->pending;
     data->top = top;
@@ -1023,7 +1023,7 @@ static void BeaconView_StartMessage(BeaconViewWork *work, const StrBuf *strbuf, 
     BeaconViewMessageTask *data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(work->tcbManager, BeaconView_MessageTask, sizeof(BeaconViewMessageTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewMessageTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewMessageTask));
     GFL_StrBufCopy(work->strMessage, strbuf);
     data->work = work;
     data->timer = 90;
@@ -1090,7 +1090,7 @@ void BeaconView_OfferPassPower(BeaconViewWork *work, u32 passPower, u8 record, i
     BeaconViewPassPowerTask *data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(work->tcbManager, BeaconView_PassPowerTask, sizeof(BeaconViewPassPowerTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewPassPowerTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewPassPowerTask));
     work->usePassPower = PASS_POWER_NONE;
     data->work = work;
     data->timer = 90;
@@ -1189,7 +1189,7 @@ void BeaconView_OfferMission(BeaconViewWork *work, const FestMissionConfig *conf
     BeaconViewMissionTask *data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(work->tcbManager, BeaconView_MissionTask, sizeof(BeaconViewMissionTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewMissionTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewMissionTask));
     ClearFesMissionCfg(&work->mission);
     work->missionRefusal = 0;
     data->work = work;
@@ -1320,7 +1320,7 @@ static void BeaconViewPanel_StartIcon(BeaconViewWork *work, BeaconViewPanel *pan
     TCBEx *task = GFL_TCBExMgrAddTask(work->tcbManager, BeaconViewPanel_IconTask, sizeof(BeaconViewIconTask), 0);
     BeaconViewIconTask *data = GFL_TCBExGetData(task);
 
-    sys_memset(data, 0, sizeof(BeaconViewIconTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewIconTask));
     data->work = work;
     data->panel = panel;
     data->timer = 90;
@@ -1367,7 +1367,7 @@ static void BeaconViewPanel_StartFlash(BeaconViewWork *work, BeaconViewPanel *pa
     BeaconViewFlashTask *data = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(work->tcbManager, BeaconViewPanel_FlashTask, sizeof(BeaconViewFlashTask), 0));
 
-    sys_memset(data, 0, sizeof(BeaconViewFlashTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewFlashTask));
     data->work = work;
     data->panel = panel;
     data->frames = 2;
@@ -1417,7 +1417,7 @@ static void BeaconViewPanel_StartPrintTask(BeaconViewWork *work, BeaconViewPanel
     TCBEx *task = GFL_TCBExMgrAddTask(work->tcbManager, BeaconViewPanel_PrintTask, sizeof(BeaconViewPrintTask), 0);
     BeaconViewPrintTask *data = GFL_TCBExGetData(task);
 
-    sys_memset(data, 0, sizeof(BeaconViewPrintTask));
+    MI_CpuFill8(data, 0, sizeof(BeaconViewPrintTask));
     data->work = work;
     data->panel = panel;
     data->oam = &panel->oam;

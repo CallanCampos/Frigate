@@ -4,7 +4,7 @@
 #include "call_static_initializers.h"
 #include "types.h"
 
-void boot_CallStaticInit(void) {
+void __call_static_initializers(void) {
     void (**ctor)(void);
 
     for (ctor = ARM9_CTOR_START; ctor != NULL && *ctor != NULL; ctor++) {

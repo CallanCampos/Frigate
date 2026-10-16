@@ -210,8 +210,8 @@ static void CPSi_SetNoIp(u32 reason) {
     CPSDnsIp[1] = 0;
     sDhcpServerIp = 0;
     if (hadIp) {
-        sys_memset(sArpCache, 0, sizeof(sArpCache));
-        for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+        MI_CpuFill8(sArpCache, 0, sizeof(sArpCache));
+        for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
             CPSSoc *soc = thread->specific[0];
 
             if (soc != NULL && soc->thread != NULL) {
@@ -220,7 +220,7 @@ static void CPSi_SetNoIp(u32 reason) {
                 }
                 if (soc->block_type != CPS_BLOCK_NONE) {
                     soc->block_type = CPS_BLOCK_NONE;
-                    scheduler_start_thread(soc->thread);
+                    OS_WakeupThreadDirect(soc->thread);
                 }
             }
         }
@@ -241,7 +241,7 @@ static void CPSi_Yield(void) {
     if (sYieldWait == 0) {
         OS_YieldThread();
     } else {
-        func_0207aa04(sYieldWait);
+        OS_Sleep(sYieldWait);
     }
 }
 
@@ -262,7 +262,7 @@ void CPS_Startup(CPSConfig *config) {
     if (config->random_seed) {
         seed = config->random_seed;
     } else {
-        seed = clock();
+        seed = OS_GetTick();
     }
     MATH_InitRand32(&CPSiRand, seed);
     if (config->alloc && config->free) {
@@ -297,27 +297,25 @@ void CPS_Startup(CPSConfig *config) {
     sLastPort = 1024 + MATH_Rand32(&CPSiRand, 5000 - 1024);
     WCM_GetMacAddress(sMyMac);
     sIpCollision = FALSE;
-    scheduler_init_thread(&sRecvThread, CPSi_RecvThread, NULL, sRecvStack + CPS_STACK_SIZE, CPS_STACK_SIZE,
-                          sThreadPriority);
-    scheduler_init_thread(&sScavengerThread, CPSi_ScavengerThread, NULL, sScavengerStack + CPS_STACK_SIZE,
-                          CPS_STACK_SIZE, sThreadPriority);
-    scheduler_start_thread(&sRecvThread);
-    scheduler_start_thread(&sScavengerThread);
+    OS_CreateThread(&sRecvThread, CPSi_RecvThread, NULL, sRecvStack + CPS_STACK_SIZE, CPS_STACK_SIZE, sThreadPriority);
+    OS_CreateThread(&sScavengerThread, CPSi_ScavengerThread, NULL, sScavengerStack + CPS_STACK_SIZE, CPS_STACK_SIZE,
+                    sThreadPriority);
+    OS_WakeupThreadDirect(&sRecvThread);
+    OS_WakeupThreadDirect(&sScavengerThread);
     OS_CreateAlarm(&sAckAlarm);
-    scheduler_init_thread(&sAckThread, CPSi_AckThread, NULL, sAckStack + CPS_STACK_SIZE, CPS_STACK_SIZE,
-                          sThreadPriority - 1);
+    OS_CreateThread(&sAckThread, CPSi_AckThread, NULL, sAckStack + CPS_STACK_SIZE, CPS_STACK_SIZE, sThreadPriority - 1);
 }
 
 // CPS_CalmDown
 BOOL CPS_CalmDown(void) {
-    u32 enabled = CPU_IRQDisable();
-    BOOL ended = scheduler_is_thread_ended(&sScavengerThread);
+    u32 enabled = OS_DisableInterrupts();
+    BOOL ended = OS_IsThreadTerminated(&sScavengerThread);
 
     if (!ended && !sCalmDown) {
         sCalmDown = TRUE;
-        scheduler_start_thread(&sScavengerThread);
+        OS_WakeupThreadDirect(&sScavengerThread);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return ended;
 }
 
@@ -332,13 +330,13 @@ void CPS_Cleanup(void) {
 
     CPS_CalmDown();
     OS_JoinThread(&sScavengerThread);
-    func_0207a710(&sRecvThread);
+    OS_DestroyThread(&sRecvThread);
     OS_CancelAlarm(&sAckAlarm);
-    enabled = CPU_IRQDisable();
-    if (!scheduler_is_thread_ended(&sAckThread)) {
-        scheduler_start_thread(&sAckThread);
+    enabled = OS_DisableInterrupts();
+    if (!OS_IsThreadTerminated(&sAckThread)) {
+        OS_WakeupThreadDirect(&sAckThread);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     OS_JoinThread(&sAckThread);
     sRecvWaiter = NULL;
     CPSi_SetNoIp(CPS_NOIP_REASON_NONE);
@@ -349,8 +347,8 @@ void CPS_Cleanup(void) {
 // CPS_SetThreadPriority
 void CPS_SetThreadPriority(u32 priority) {
     sThreadPriority = priority;
-    func_0207a998(&sRecvThread, priority);
-    func_0207a998(&sScavengerThread, priority);
+    OS_SetThreadPriority(&sRecvThread, priority);
+    OS_SetThreadPriority(&sScavengerThread, priority);
 }
 
 // CPSi_CalcSum: adds the 16-bit words of data to sum, in ones' complement
@@ -508,7 +506,7 @@ static BOOL CPSi_MacDiffers(u16 *a, u16 *b) {
 
 // CPSi_SendFrame: sends an Ethernet frame as an 802.11 one, with the SNAP header over its source address
 static void CPSi_SendFrame(u8 *frame, u32 len, u8 *data, u32 dataLen) {
-    sys_memcpy_fast(CPS_SNAP_HEADER, frame + 6, 6);
+    MI_CpuCopy(CPS_SNAP_HEADER, frame + 6, 6);
     sSendFailed = WCM_SendDCFDataEx(frame, frame + 6, len - 6, data, dataLen) < 0;
 }
 
@@ -555,11 +553,11 @@ static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data,
         sLanWrite = 0;
     }
     *(u16 *)(sLanBuf + sLanWrite) = size;
-    sys_memcpy_fast(dst, sLanBuf + sLanWrite + 2, 6);
-    sys_memcpy_fast(src, sLanBuf + sLanWrite + 8, 6);
-    sys_memcpy_fast(header + 6, sLanBuf + sLanWrite + 14, headerLen - 6);
+    MI_CpuCopy(dst, sLanBuf + sLanWrite + 2, 6);
+    MI_CpuCopy(src, sLanBuf + sLanWrite + 8, 6);
+    MI_CpuCopy(header + 6, sLanBuf + sLanWrite + 14, headerLen - 6);
     if (data != NULL && dataLen != 0) {
-        sys_memcpy_fast(data, sLanBuf + sLanWrite + 8 + headerLen, dataLen);
+        MI_CpuCopy(data, sLanBuf + sLanWrite + 8 + headerLen, dataLen);
     }
     sLanWrite = next;
 }
@@ -567,23 +565,23 @@ static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data,
 // CPSi_RecvCallback
 void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
     CPSi_PutFrame(src, dst, data, len, NULL, 0);
-    if (sRecvWaiter != NULL && !scheduler_is_thread_ended(sRecvWaiter)) {
-        scheduler_start_thread(sRecvWaiter);
+    if (sRecvWaiter != NULL && !OS_IsThreadTerminated(sRecvWaiter)) {
+        OS_WakeupThreadDirect(sRecvWaiter);
     }
 }
 
 // CPSi_GetFrame: waits for a frame in the LAN buffer
 static CPSEtherHeader *CPSi_GetFrame(u32 *len) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u8 *buf;
     u16 size;
 
     while (sLanRead == sLanWrite) {
         sRecvWaiter = OS_GetCurrentThread();
-        scheduler_yield(NULL);
+        OS_SleepThread(NULL);
         sRecvWaiter = NULL;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     buf = sLanBuf;
     do {
         if (sLanBufLen - sLanRead < 2) {
@@ -600,18 +598,18 @@ static CPSEtherHeader *CPSi_GetFrame(u32 *len) {
 
 // CPSi_ConsumeFrame
 static void CPSi_ConsumeFrame(void) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     sLanRead += *(u16 *)(sLanBuf + sLanRead);
     if (sLanRead >= sLanBufLen) {
         sLanRead = 0;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // CPSi_LookupMac: the MAC address of an address in the cache, or NULL
 static u8 *CPSi_LookupMac(CPSInAddr ip) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u8 *mac = NULL;
     u32 i;
 
@@ -630,7 +628,7 @@ static u8 *CPSi_LookupMac(CPSInAddr ip) {
             }
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return mac;
 }
 
@@ -638,15 +636,15 @@ static u8 *CPSi_LookupMac(CPSInAddr ip) {
 static void CPSi_SendArpRequest(CPSInAddr ip) {
     u8 frame[42];
 
-    sys_memset(frame, 0, 42);
-    sys_memset(frame, 0xff, 6);
-    sys_memcpy_fast(sMyMac, frame + 6, 6);
+    MI_CpuFill8(frame, 0, 42);
+    MI_CpuFill8(frame, 0xff, 6);
+    MI_CpuCopy(sMyMac, frame + 6, 6);
     *(u16 *)(frame + 12) = 0x608;
     frame[15] = 1;
     frame[16] = 8;
     *(u16 *)(frame + 18) = 0x406;
     frame[21] = 1;
-    sys_memcpy_fast(sMyMac, frame + 22, 6);
+    MI_CpuCopy(sMyMac, frame + 22, 6);
     CPS_PUT32(frame + 28, CPSMyIp);
     CPS_PUT32(frame + 38, ip);
     CPSi_SendFrame(frame, 42, NULL, 0);
@@ -664,7 +662,7 @@ static u8 *CPSi_ResolveMac(CPSInAddr ip) {
             if (CPSMyIp == 0) {
                 return NULL;
             }
-            func_0207aa04(100);
+            OS_Sleep(100);
             mac = CPSi_LookupMac(ip);
             if (mac != NULL) {
                 return mac;
@@ -686,7 +684,7 @@ static void CPSi_UpdateArp(u8 *mac, CPSInAddr ip, BOOL add) {
     for (i = 0; i < CPS_ARP_CACHE_SIZE; i++) {
         if (sArpCache[i].ip == ip) {
             sArpCache[i].time = now;
-            sys_memcpy_fast(mac, sArpCache[i].mac, 6);
+            MI_CpuCopy(mac, sArpCache[i].mac, 6);
             return;
         }
     }
@@ -705,7 +703,7 @@ static void CPSi_UpdateArp(u8 *mac, CPSInAddr ip, BOOL add) {
             }
         }
         sArpCache[victim].ip = ip;
-        sys_memcpy_fast(mac, sArpCache[victim].mac, 6);
+        MI_CpuCopy(mac, sArpCache[victim].mac, 6);
         sArpCache[victim].time = now;
     }
 }
@@ -727,7 +725,7 @@ static void CPSi_SendEther(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip
         if (mac == NULL) {
             return;
         }
-        sys_memcpy_fast(mac, buf - 14, 6);
+        MI_CpuCopy(mac, buf - 14, 6);
     } else {
         buf[-14] = 0x01;
         buf[-13] = 0x00;
@@ -736,7 +734,7 @@ static void CPSi_SendEther(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip
         buf[-10] = ip >> 8;
         buf[-9] = ip;
     }
-    sys_memcpy_fast(sMyMac, buf - 8, 6);
+    MI_CpuCopy(sMyMac, buf - 8, 6);
     CPSi_SendFrame(buf - 14, len + 14, data, dataLen);
 }
 
@@ -752,10 +750,10 @@ static void CPSi_SendIpPacket(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr
     if (ip == CPS_LOOPBACK_ADDR || ip == CPSMyIp || CPSi_IsMulticast(ip)) {
         u32 enabled;
 
-        sys_memcpy_fast(CPS_SNAP_HEADER, buf - 28, 8);
-        enabled = CPU_IRQDisable();
+        MI_CpuCopy(CPS_SNAP_HEADER, buf - 28, 8);
+        enabled = OS_DisableInterrupts();
         CPSi_PutFrame(sMyMac, sMyMac, buf - 28, len + 28, data, dataLen);
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
 }
 
@@ -854,7 +852,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
         u32 enabled;
 
         blocks = 0;
-        enabled = CPU_IRQDisable();
+        enabled = OS_DisableInterrupts();
         u32 mss;
         u32 max;
 
@@ -877,7 +875,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
             best = -1;
             blocks++;
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPS_PUT32(tcp + 20, 0x01010500 | (blocks * 8 + 2));
         headerLen = blocks * 8 + 24;
         mss = soc->remote_mss < sMyMss ? soc->remote_mss : sMyMss;
@@ -909,7 +907,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
     }
     if (flags & CPS_TCP_ACK) {
         soc->delayed_ack = 0;
-        soc->ack_time = clock();
+        soc->ack_time = OS_GetTick();
     }
     CPS_PUT16(tcp + 16, CPSi_FinishSum(CPSi_CalcSum(data, len, CPSi_CalcSum(tcp - 12, headerLen + 12, 0))));
     soc->seqno += len;
@@ -923,11 +921,11 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
 // CPSi_ReplyArp: turns a request into its reply and sends it back
 static void CPSi_ReplyArp(CPSArpPacket *arp) {
     arp->op = 0x200;
-    sys_memcpy_fast(arp->src_mac, arp->dst_mac, 10);
-    sys_memcpy_fast(sMyMac, arp->src_mac, 6);
+    MI_CpuCopy(arp->src_mac, arp->dst_mac, 10);
+    MI_CpuCopy(sMyMac, arp->src_mac, 6);
     CPS_PUT32(arp->src_ip, CPSMyIp);
-    sys_memcpy_fast(arp->dst_mac, (u8 *)arp - 14, 6);
-    sys_memcpy_fast(sMyMac, (u8 *)arp - 8, 6);
+    MI_CpuCopy(arp->dst_mac, (u8 *)arp - 14, 6);
+    MI_CpuCopy(sMyMac, (u8 *)arp - 8, 6);
     CPSi_SendFrame((u8 *)arp - 14, 42, NULL, 0);
 }
 
@@ -989,10 +987,10 @@ static void CPSi_ReceiveEchoRequest(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 le
 
 // CPSi_ReceiveEchoReply: gives the reply to the socket that pinged
 static void CPSi_ReceiveEchoReply(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     OSThread *thread;
 
-    for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+    for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = thread->specific[0];
 
         if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_PING && (u16)(u32)soc->thread == icmp->id &&
@@ -1003,15 +1001,15 @@ static void CPSi_ReceiveEchoReply(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
             } else {
                 soc->rcvbuf_len = len;
             }
-            sys_memcpy_fast(icmp + 1, soc->rcvbuf, soc->rcvbuf_len);
+            MI_CpuCopy(icmp + 1, soc->rcvbuf, soc->rcvbuf_len);
             if (soc->block_type == CPS_BLOCK_UDPREAD) {
                 soc->block_type = CPS_BLOCK_NONE;
-                scheduler_start_thread(soc->thread);
+                OS_WakeupThreadDirect(soc->thread);
             }
             break;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // CPSi_IsUnicast: whether both addresses are of single hosts
@@ -1049,7 +1047,7 @@ static CPSSoc *CPSi_FindListener(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     CPSSoc *soc;
     OSThread *thread;
 
-    for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+    for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         soc = thread->specific[0];
         if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_LISTEN &&
             soc->local_port == CPS_GET16(&tcp->dst_port) &&
@@ -1073,7 +1071,7 @@ static CPSSoc *CPSi_FindTcpSoc(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     CPSSoc *soc;
     OSThread *thread;
 
-    for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+    for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         soc = thread->specific[0];
         if (soc != NULL && soc->thread != NULL && CPSi_IsTcpOf(ip, tcp, soc)) {
             return soc;
@@ -1150,7 +1148,7 @@ static void CPSi_SendAck(CPSSoc *soc, int mode) {
         }
         if (mode != 1) {
             soc->delayed_ack++;
-            if (soc->delayed_ack < 2 && (u32)clock() - soc->ack_time < CPS_ACK_DELAY) {
+            if (soc->delayed_ack < 2 && (u32)OS_GetTick() - soc->ack_time < CPS_ACK_DELAY) {
                 CPSi_SendDelayedAcks();
                 return;
             }
@@ -1169,7 +1167,7 @@ static void CPSi_SendReset(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     CPSSoc *soc = &sReplySoc;
     u8 flags;
 
-    sys_memset(soc, 0, sizeof(CPSSoc));
+    MI_CpuFill8(soc, 0, sizeof(CPSSoc));
     soc->local_port = CPS_GET16(&tcp->dst_port);
     soc->remote_port = CPS_GET16(&tcp->src_port);
     soc->remote_ip = CPS_GET32(ip->src);
@@ -1257,7 +1255,7 @@ static void CPSi_ReceiveSynAck(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     soc->state = CPS_STT_ESTABLISHED;
     if (soc->block_type == CPS_BLOCK_TCPCON) {
         soc->block_type = CPS_BLOCK_NONE;
-        scheduler_start_thread(soc->thread);
+        OS_WakeupThreadDirect(soc->thread);
     }
 }
 
@@ -1345,7 +1343,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
         soc->remote_ackno = ack;
     }
     seq = CPS_GET32(tcp->seq);
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (soc->state == CPS_STT_ESTABLISHED && soc->ackno != seq) {
         if ((s32)(seq - soc->ackno) < 0) {
             // Partly old: take the rest
@@ -1367,7 +1365,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
 
                         retry:
                             if (soc->ooo[i].start == 0) {
-                                sys_memcpy_fast(CPS_TCP_DATA(tcp), soc->rcvbuf + offset, len);
+                                MI_CpuCopy(CPS_TCP_DATA(tcp), soc->rcvbuf + offset, len);
                                 soc->ooo[i].start = offset;
                                 soc->ooo[i].len = len;
                                 CPSi_MarkOoo(soc, i);
@@ -1376,7 +1374,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
                             }
                             runEnd = soc->ooo[i].start + soc->ooo[i].len;
                             if (offset < soc->ooo[i].start && soc->ooo[i].start <= end) {
-                                sys_memcpy_fast(CPS_TCP_DATA(tcp), soc->rcvbuf + offset, soc->ooo[i].start - offset);
+                                MI_CpuCopy(CPS_TCP_DATA(tcp), soc->rcvbuf + offset, soc->ooo[i].start - offset);
                                 soc->ooo[i].len += soc->ooo[i].start - offset;
                                 soc->ooo[i].start = offset;
                                 CPSi_MarkOoo(soc, i);
@@ -1386,7 +1384,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
                             if (offset <= runEnd && runEnd < end) {
                                 u32 more = end - runEnd;
 
-                                sys_memcpy_fast(CPS_TCP_DATA(tcp) + runEnd - offset, soc->rcvbuf + runEnd, more);
+                                MI_CpuCopy(CPS_TCP_DATA(tcp) + runEnd - offset, soc->rcvbuf + runEnd, more);
                                 soc->ooo[i].len += more;
                                 CPSi_MergeOoo(soc);
                                 CPSi_MarkOoo(soc, i);
@@ -1403,7 +1401,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
                     }
                 }
             }
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             CPSi_SendAck(soc, 2);
             return;
         }
@@ -1411,7 +1409,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     if (offset > len) {
         // BUG: Returns with the interrupts still disabled
 #ifdef BUGFIX
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
 #endif
         return;
     }
@@ -1420,17 +1418,17 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     switch (soc->state) {
     case CPS_STT_CLOSED:
     case CPS_STT_SYN_SENT:
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendReset(ip, tcp, len);
         break;
     case CPS_STT_SYN_RCVD:
         soc->state = CPS_STT_ESTABLISHED;
         if (soc->block_type == CPS_BLOCK_TCPCON) {
             soc->block_type = CPS_BLOCK_NONE;
-            scheduler_start_thread(soc->thread);
+            OS_WakeupThreadDirect(soc->thread);
         }
         if (len == 0) {
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             break;
         }
         // fallthrough
@@ -1449,36 +1447,36 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
         if (len != 0) {
             if (soc->ooo[0].start != 0 && soc->ooo[0].start <= rcvLen + len) {
                 if (!(flags & CPS_TCP_FIN)) {
-                    sys_memcpy_fast(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, soc->ooo[0].start - rcvLen);
+                    MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, soc->ooo[0].start - rcvLen);
                     len = soc->ooo[0].start + soc->ooo[0].len - soc->rcvbuf_len;
                 } else {
-                    sys_memcpy_fast(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, len);
+                    MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, len);
                 }
                 soc->ooo[0].start = 0;
                 CPSi_PackOoo(soc);
             } else {
-                sys_memcpy_fast(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, len);
+                MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, len);
             }
             soc->rcvbuf_len += len;
             soc->ackno += len;
             CPSi_MergeOoo(soc);
             if (soc->block_type == CPS_BLOCK_TCPREAD) {
                 soc->block_type = CPS_BLOCK_NONE;
-                scheduler_start_thread(soc->thread);
+                OS_WakeupThreadDirect(soc->thread);
             }
         }
         if (whole && (flags & CPS_TCP_FIN)) {
             soc->ackno++;
             soc->state = CPS_STT_LAST_ACK;
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             CPSi_SendFin(soc);
             if (len == 0 && soc->block_type == CPS_BLOCK_TCPREAD) {
                 soc->block_type = CPS_BLOCK_NONE;
-                scheduler_start_thread(soc->thread);
+                OS_WakeupThreadDirect(soc->thread);
             }
             break;
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         if (len != 0) {
             CPSi_SendAck(soc, 0);
         }
@@ -1488,16 +1486,16 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     case CPS_STT_FIN_WAIT2:
         if (flags & CPS_TCP_FIN) {
             soc->ackno += len + 1;
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             CPSi_SendAck(soc, 2);
             soc->state = CPS_STT_CLOSED;
             if (soc->block_type == CPS_BLOCK_TCPREAD) {
                 soc->block_type = CPS_BLOCK_NONE;
-                scheduler_start_thread(soc->thread);
+                OS_WakeupThreadDirect(soc->thread);
             }
         } else {
             soc->state = CPS_STT_FIN_WAIT2;
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             if (len != 0) {
                 soc->ackno += len;
                 CPSi_SendAck(soc, 2);
@@ -1507,14 +1505,14 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     case CPS_STT_LAST_ACK:
     case CPS_STT_CLOSING:
         soc->state = CPS_STT_CLOSED;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         if (soc->block_type == CPS_BLOCK_TCPREAD) {
             soc->block_type = CPS_BLOCK_NONE;
-            scheduler_start_thread(soc->thread);
+            OS_WakeupThreadDirect(soc->thread);
         }
         break;
     default:
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         if (flags & CPS_TCP_FIN) {
             soc->ackno++;
         }
@@ -1532,32 +1530,32 @@ static void CPSi_ReceiveFin(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
     if (soc == NULL) {
         return;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     switch (soc->state) {
     case CPS_STT_FIN_WAIT1:
         soc->ackno++;
         soc->state = CPS_STT_CLOSING;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendAck(soc, 2);
         break;
     case CPS_STT_FIN_WAIT2:
         soc->ackno++;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendAck(soc, 2);
         soc->state = CPS_STT_CLOSED;
         if (soc->block_type == CPS_BLOCK_TCPREAD) {
             soc->block_type = CPS_BLOCK_NONE;
-            scheduler_start_thread(soc->thread);
+            OS_WakeupThreadDirect(soc->thread);
         }
         break;
     case CPS_STT_ESTABLISHED:
         soc->ackno++;
         soc->state = CPS_STT_LAST_ACK;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendFin(soc);
         break;
     default:
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendReset(ip, tcp, len);
         break;
     }
@@ -1574,7 +1572,7 @@ static void CPSi_ReceiveRst(CPSIpHeader *ip, CPSTcpHeader *tcp) {
     soc->state = CPS_STT_CLOSED;
     if (soc->block_type == CPS_BLOCK_TCPCON || soc->block_type == CPS_BLOCK_TCPREAD) {
         soc->block_type = CPS_BLOCK_NONE;
-        scheduler_start_thread(soc->thread);
+        OS_WakeupThreadDirect(soc->thread);
     }
 }
 
@@ -1632,8 +1630,8 @@ static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len) {
     if (udp->sum != 0 && CPSi_BadPseudoSum(udp, len, ip, CPS_PROTO_UDP)) {
         return;
     }
-    enabled = CPU_IRQDisable();
-    for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+    enabled = OS_DisableInterrupts();
+    for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = thread->specific[0];
 
         if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_DATAGRAM &&
@@ -1652,10 +1650,10 @@ static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len) {
                 } else {
                     soc->rcvbuf_len = len;
                 }
-                sys_memcpy_fast(udp + 1, soc->rcvbuf, soc->rcvbuf_len);
+                MI_CpuCopy(udp + 1, soc->rcvbuf, soc->rcvbuf_len);
                 if (soc->block_type == CPS_BLOCK_UDPREAD) {
                     soc->block_type = CPS_BLOCK_NONE;
-                    scheduler_start_thread(soc->thread);
+                    OS_WakeupThreadDirect(soc->thread);
                 } else if (soc->udp_callback != NULL && soc->udp_callback(soc->rcvbuf, soc->rcvbuf_len, soc)) {
                     soc->rcvbuf_len = 0;
                 }
@@ -1663,7 +1661,7 @@ static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len) {
             break;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // CPSi_Reassemble: the whole packet once its fragments are all in, which allocated says to free, or NULL
@@ -1718,7 +1716,7 @@ static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated) {
         free->last = 0;
         free->time = CPS_NOW();
         free->data = free->buf + sizeof(CPSEtherHeader) + headerLen;
-        sys_memcpy_fast(ip, free->buf + sizeof(CPSEtherHeader), headerLen);
+        MI_CpuCopy(ip, free->buf + sizeof(CPSEtherHeader), headerLen);
     }
     if (reassembly->count == 8 || total > CPS_REASSEMBLY_SIZE) {
         reassembly->count = 0;
@@ -1733,7 +1731,7 @@ static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated) {
     reassembly->start[reassembly->count] = offset;
     reassembly->end[reassembly->count] = end;
     reassembly->count++;
-    sys_memcpy_fast((u8 *)ip + headerLen, reassembly->data + (offset << 3), len);
+    MI_CpuCopy((u8 *)ip + headerLen, reassembly->data + (offset << 3), len);
     last = reassembly->last;
     if (last == 0) {
         return NULL;
@@ -1840,7 +1838,7 @@ u16 CPSi_GetNewPort(void) {
         if (sLastPort < 1024 || sLastPort >= 5000) {
             sLastPort = 1024;
         }
-        for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+        for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
             CPSSoc *soc = thread->specific[0];
 
             if (soc != NULL && soc->thread != NULL && soc->local_port == sLastPort) {
@@ -1904,7 +1902,7 @@ void CPS_SocUse(void) {
         soc->thread = thread;
         soc->state = CPS_STT_CLOSED;
         soc->rcvbuf_len = 0;
-        sys_memset(soc->ooo, 0, sizeof(soc->ooo));
+        MI_CpuFill8(soc->ooo, 0, sizeof(soc->ooo));
         soc->outbuf_len = 0;
         soc->udp_callback = NULL;
         soc->sack_permitted = FALSE;
@@ -1946,12 +1944,12 @@ int CPSi_TcpConnect(CPSSoc *soc) {
         soc->state = CPS_STT_SYN_SENT;
         soc->when = CPS_NOW();
         CPSi_SendTcpControl(soc, CPS_TCP_SYN);
-        enabled = CPU_IRQDisable();
+        enabled = OS_DisableInterrupts();
         if (soc->state == CPS_STT_SYN_SENT && CPSMyIp != 0) {
             soc->block_type = CPS_BLOCK_TCPCON;
-            scheduler_yield(NULL);
+            OS_SleepThread(NULL);
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         if (soc->state == CPS_STT_ESTABLISHED) {
             return 0;
         }
@@ -1980,19 +1978,19 @@ static void CPSi_TcpShutdown(CPSSoc *soc) {
     u32 enabled;
 
     OS_YieldThread();
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     if (soc->state == CPS_STT_SYN_RCVD || soc->state == CPS_STT_ESTABLISHED) {
         soc->state = CPS_STT_FIN_WAIT1;
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendFin(soc);
         return;
     }
     if (soc->state != CPS_STT_CLOSED) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         CPSi_SendAck(soc, 2);
         return;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // CPS_TcpShutdown
@@ -2027,15 +2025,15 @@ void CPS_TcpClose(void) {
 
 // CPSi_UdpRead
 static u8 *CPSi_UdpRead(u32 *len, CPSSoc *soc) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u32 received = soc->rcvbuf_len;
 
     while (received == 0) {
         soc->block_type = CPS_BLOCK_UDPREAD;
-        scheduler_yield(NULL);
+        OS_SleepThread(NULL);
         received = soc->rcvbuf_len;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     *len = received;
     return soc->rcvbuf;
 }
@@ -2046,13 +2044,13 @@ u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc) {
         CPSi_SendAck(soc, 1);
     }
     if (soc->rcvbuf_len == 0 && soc->state == CPS_STT_ESTABLISHED) {
-        u32 enabled = CPU_IRQDisable();
+        u32 enabled = OS_DisableInterrupts();
 
         while (soc->rcvbuf_len == 0 && soc->state == CPS_STT_ESTABLISHED) {
             soc->block_type = CPS_BLOCK_TCPREAD;
-            scheduler_yield(NULL);
+            OS_SleepThread(NULL);
         }
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     } else {
         OS_YieldThread();
     }
@@ -2081,7 +2079,7 @@ u8 *CPS_SocRead(u32 *len) {
 
 // CPSi_TcpConsume: drops data from the front of the receive buffer, moving the runs after it along
 void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u32 received = soc->rcvbuf_len;
     BOOL wasFull = FALSE;
     u32 start;
@@ -2093,7 +2091,7 @@ void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
         soc->rcvbuf_len = 0;
     } else {
         soc->rcvbuf_len = received - len;
-        sys_memcpy_ex(soc->rcvbuf + len, soc->rcvbuf, received - len);
+        MI_CpuMove(soc->rcvbuf + len, soc->rcvbuf, received - len);
     }
     start = soc->ooo[0].start;
     if (start != 0) {
@@ -2107,17 +2105,17 @@ void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
             if (start > consumed) {
                 u8 *runs = soc->rcvbuf + start;
 
-                sys_memcpy_ex(runs, runs - consumed, soc->ooo[i - 1].start + soc->ooo[i - 1].len - start);
+                MI_CpuMove(runs, runs - consumed, soc->ooo[i - 1].start + soc->ooo[i - 1].len - start);
                 for (i = 0; i < 4 && soc->ooo[i].start != 0; i++) {
                     soc->ooo[i].start -= consumed;
                 }
             } else {
-                sys_memset(soc->ooo, 0, sizeof(soc->ooo));
+                MI_CpuFill8(soc->ooo, 0, sizeof(soc->ooo));
                 sys_exit();
             }
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     if (soc->state != CPS_STT_DATAGRAM && soc->state != CPS_STT_PING) {
         if (soc->rcvbuf_len == 0 || wasFull) {
             CPSi_SendAck(soc, 0);
@@ -2294,7 +2292,7 @@ u32 CPS_SocWrite(u8 *data, u32 len) {
             u32 sent = CPSi_SocWrite(soc->outbuf, pending, data, len);
 
             if (sent < soc->outbuf_len) {
-                sys_memcpy_ex(soc->outbuf + sent, soc->outbuf, soc->outbuf_len - sent);
+                MI_CpuMove(soc->outbuf + sent, soc->outbuf, soc->outbuf_len - sent);
                 soc->outbuf_len -= sent;
                 return 0;
             }
@@ -2342,14 +2340,14 @@ static BOOL CPSi_CheckCollision(void) {
     s32 start;
 
     CPSi_SendArpRequest(CPSMyIp);
-    func_0207aa04(100);
+    OS_Sleep(100);
     CPSi_SendArpRequest(CPSMyIp);
     start = CPS_NOW();
     while (sLinkIsOn() && CPS_NOW() - start < 23) {
         if (sIpCollision) {
             return FALSE;
         }
-        func_0207aa04(100);
+        OS_Sleep(100);
     }
     return TRUE;
 }
@@ -2379,7 +2377,7 @@ static void CPSi_ScavengerThread(void *arg) {
 
     sCalmDown = FALSE;
     state = DHCP_STATE_INIT;
-    sys_memset(&sDhcpSoc, 0, sizeof(CPSSoc));
+    MI_CpuFill8(&sDhcpSoc, 0, sizeof(CPSSoc));
     sDhcpSoc.rcvbuf_size = sizeof(sDhcpRcvBuf);
     sDhcpSoc.rcvbuf = sDhcpRcvBuf;
     sDhcpSoc.sndbuf_size = sizeof(sDhcpSndBuf);
@@ -2390,7 +2388,7 @@ static void CPSi_ScavengerThread(void *arg) {
     CPSNoIpReason = CPS_NOIP_REASON_LINKOFF;
     first = TRUE;
     for (;;) {
-        func_0207aa04(1000);
+        OS_Sleep(1000);
         if (sCalmDown) {
             break;
         }
@@ -2478,7 +2476,7 @@ static void CPSi_ScavengerThread(void *arg) {
             CPSi_SendArpRequest(CPSGatewayIp);
             arpTimer = 105;
         }
-        for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+        for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
             CPSSoc *soc = thread->specific[0];
 
             if (soc != NULL && soc->thread != NULL) {
@@ -2490,11 +2488,11 @@ static void CPSi_ScavengerThread(void *arg) {
                     if (soc->block_type == CPS_BLOCK_TCPCON) {
                         soc->state = CPS_STT_CLOSED;
                         soc->block_type = CPS_BLOCK_NONE;
-                        scheduler_start_thread(soc->thread);
+                        OS_WakeupThreadDirect(soc->thread);
                     }
                 } else if (soc->state != CPS_STT_ESTABLISHED && soc->block_type == CPS_BLOCK_TCPREAD) {
                     soc->block_type = CPS_BLOCK_NONE;
-                    scheduler_start_thread(soc->thread);
+                    OS_WakeupThreadDirect(soc->thread);
                 }
             }
         }
@@ -2520,11 +2518,11 @@ static void CPSi_ScavengerThread(void *arg) {
 // CPSi_SendDelayedAcks: sends the ACKs that waited long enough, and sets the alarm for the next one
 static void CPSi_SendDelayedAcks(void) {
     u32 wait = 0xffffffff;
-    u32 enabled = CPU_IRQDisable();
-    u32 now = clock();
+    u32 enabled = OS_DisableInterrupts();
+    u32 now = OS_GetTick();
     OSThread *thread;
 
-    for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+    for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = thread->specific[0];
 
         if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_ESTABLISHED && soc->delayed_ack != 0) {
@@ -2541,32 +2539,32 @@ static void CPSi_SendDelayedAcks(void) {
         OS_CancelAlarm(&sAckAlarm);
         OS_SetAlarm(&sAckAlarm, wait, CPSi_AckAlarm, NULL);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // CPSi_AckThread
 static void CPSi_AckThread(void *arg) {
-    while (!scheduler_is_thread_ended(&sScavengerThread)) {
+    while (!OS_IsThreadTerminated(&sScavengerThread)) {
         CPSi_SendDelayedAcks();
-        scheduler_yield(NULL);
+        OS_SleepThread(NULL);
     }
 }
 
 // CPSi_AckAlarm
 static void CPSi_AckAlarm(void *arg) {
-    scheduler_start_thread(&sAckThread);
+    OS_WakeupThreadDirect(&sAckThread);
 }
 
 // CPSi_DhcpMakeMessage: the BOOTP header and the options every message has, returning where the rest go
 static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type) {
     u8 *option;
 
-    sys_memset(buf, 0, 0xec);
+    MI_CpuFill8(buf, 0, 0xec);
     *(u16 *)buf = 0x101;
     buf[2] = 6;
     CPS_PUT32(buf + 4, sDhcpXid);
     CPS_PUT32(buf + 12, CPSMyIp);
-    sys_memcpy_fast(sMyMac, buf + 28, 6);
+    MI_CpuCopy(sMyMac, buf + 28, 6);
     *(u16 *)(buf + 0xec) = 0x8263;
     *(u16 *)(buf + 0xee) = 0x6353;
     *(u16 *)(buf + 0xf0) = 0x135;
@@ -2574,12 +2572,12 @@ static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type) {
     buf[0xf3] = 61;
     buf[0xf4] = 7;
     buf[0xf5] = 1;
-    sys_memcpy_fast(sMyMac, buf + 0xf6, 6);
+    MI_CpuCopy(sMyMac, buf + 0xf6, 6);
     option = buf + 0xfc;
     if (type != DHCP_RELEASE) {
         option[0] = 12;
         option[1] = 10;
-        sys_memcpy_fast("NintendoDS", option + 2, 10);
+        MI_CpuCopy("NintendoDS", option + 2, 10);
         option[12] = 55;
         option[13] = 3;
         option[14] = 1;
@@ -2595,7 +2593,7 @@ static u8 *CPSi_Pad(u32 value, u32 size, u8 *p, u32 used) {
     if (used < size) {
         u32 rest = size - used;
 
-        sys_memset(p, value, rest);
+        MI_CpuFill8(p, value, rest);
         p += rest;
     }
     return p;
@@ -2857,7 +2855,7 @@ static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resul
         u8 *reply;
 
         if (CPS_SocGetLength() == 0) {
-            func_0207aa04(10);
+            OS_Sleep(10);
             continue;
         }
         reply = CPS_SocRead(&len);
@@ -2883,7 +2881,7 @@ static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resul
                         } else if (dataLen > resultSize) {
                             answer = 2;
                         } else {
-                            sys_memcpy_fast(p + 10, result, dataLen);
+                            MI_CpuCopy(p + 10, result, dataLen);
                             answer = 1;
                         }
                         break;

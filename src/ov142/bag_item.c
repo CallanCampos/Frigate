@@ -93,7 +93,7 @@ void BagItemList_Init(BagItemList *list, BagSave *bag, u32 filter, HeapID heapId
     list->bag = bag;
     count = 0;
     list->heapId = heapId;
-    sys_memset(list->entries, 0, sizeof(list->entries));
+    MI_CpuFill8(list->entries, 0, sizeof(list->entries));
     for (i = 0; i <= ITEM_LAST; i++) {
         if (BagSave_IsItemInFreeSpace(list->bag, i)) {
             pocket = BagSave_GetExistingItemPocket(list->bag, i);

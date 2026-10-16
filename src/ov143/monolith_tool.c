@@ -219,7 +219,7 @@ void MonolithTool_InitPanels(MonolithScreenParam *param) {
     int i;
 
     for (i = 0; i < PANEL_CONTROL_MAX; i++) {
-        sys_memset(&param->panels[i], 0, sizeof(MonolithPanelControl));
+        MI_CpuFill8(&param->panels[i], 0, sizeof(MonolithPanelControl));
     }
 }
 
@@ -287,7 +287,7 @@ void MonolithTool_UpdatePanel(MonolithScreenParam *param, int req) {
 static void MonolithTool_SetPanelMode(MonolithScreenParam *param, u8 mode, int req) {
     MonolithPanelControl *panel = &param->panels[req];
 
-    sys_memset(panel, 0, sizeof(MonolithPanelControl));
+    MI_CpuFill8(panel, 0, sizeof(MonolithPanelControl));
     panel->mode = mode;
     PaletteFade_BlendBuffer(param->work->fade, req, MonolithTool_GetPanelColorPos(req),
                             MonolithTool_GetPanelColorCount(req), 0, 0);

@@ -79,7 +79,7 @@ static BOOL Demo3D_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_DEMO3D, 0x130000);
     demo = GFL_ProcInitSubsystem(proc, sizeof(Demo3DWork), HEAPID_DEMO3D);
-    sys_memset(demo, 0, sizeof(Demo3DWork));
+    MI_CpuFill8(demo, 0, sizeof(Demo3DWork));
     demo->heapId = HEAPID_DEMO3D;
     demo->param = demoParam;
     demo->graphic = Demo3DGraphic_Create(1, demoParam->demoId, demo->heapId);

@@ -256,7 +256,7 @@ static BOOL MicTest_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MICTEST, 0x70000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(MicTestWork), HEAPID_MICTEST);
-    sys_memset(wk, 0, sizeof(MicTestWork));
+    MI_CpuFill8(wk, 0, sizeof(MicTestWork));
     wk->heapId = HEAPID_MICTEST;
     MicTest_InitDisplay(HEAPID_MICTEST);
     MicTest_SetVRAM();
@@ -610,7 +610,7 @@ static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, v
     GCTX_HIDBlockSleep(8);
     bufferSize = 0x120;
     buffer = GFL_HeapAllocate(heapId, bufferSize, FALSE, "mictest.c", 1539);
-    sys_memset(buffer, 0, bufferSize);
+    MI_CpuFill8(buffer, 0, bufferSize);
     mic->buffer = buffer;
     mic->param.type = MIC_SAMPLING_TYPE_8BIT;
     mic->param.buffer = (void *)(((u32)buffer + 0x1f) & ~0x1f);
@@ -656,7 +656,7 @@ static void MicTestMic_Update(MicTestMic *mic) {
 
 static void MicTestMic_Start(MicTestMic *mic) {
     if (!mic->asleep) {
-        MIC_StartAutoSampling(&mic->param);
+        MIC_StartLimitedSampling(&mic->param);
         mic->sampling = TRUE;
     } else {
         mic->resume = TRUE;
@@ -664,7 +664,7 @@ static void MicTestMic_Start(MicTestMic *mic) {
 }
 
 static void MicTestMic_Stop(MicTestMic *mic) {
-    MIC_StopAutoSampling();
+    MIC_StopLimitedSampling();
     mic->sampling = FALSE;
 }
 

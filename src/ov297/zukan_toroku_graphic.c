@@ -84,7 +84,7 @@ ZukanTorokuGraphic *ZukanTorokuGraphic_Create(u32 layout, HeapID heapId) {
     ZukanTorokuGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(ZukanTorokuGraphic), FALSE, "zukan_toroku_graphic.c", 455);
 
-    sys_memset(graphic, 0, sizeof(ZukanTorokuGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ZukanTorokuGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -111,7 +111,7 @@ void ZukanTorokuGraphic_Free(ZukanTorokuGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(ZukanTorokuGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ZukanTorokuGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -140,7 +140,7 @@ static void ZukanTorokuGraphic_VBlank(TCB *tcb, void *data) {
 static void ZukanTorokuBG_Init(ZukanTorokuBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(ZukanTorokuBG));
+    MI_CpuFill8(bg, 0, sizeof(ZukanTorokuBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sZukanTorokuLCDConfig);
@@ -159,7 +159,7 @@ static void ZukanTorokuBG_Free(ZukanTorokuBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(ZukanTorokuBG));
+    MI_CpuFill8(bg, 0, sizeof(ZukanTorokuBG));
 }
 
 static void ZukanTorokuBG_Update(ZukanTorokuBG *bg) {
@@ -170,7 +170,7 @@ static void ZukanTorokuBG_VBlank(ZukanTorokuBG *bg) {
 }
 
 static void ZukanTorokuClAct_Init(ZukanTorokuClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(ZukanTorokuClAct));
+    MI_CpuFill8(clact, 0, sizeof(ZukanTorokuClAct));
     ClActSys_Create(&sZukanTorokuClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -181,7 +181,7 @@ static void ZukanTorokuClAct_Init(ZukanTorokuClAct *clact, const BGSysVRAMConfig
 static void ZukanTorokuClAct_Free(ZukanTorokuClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(ZukanTorokuClAct));
+    MI_CpuFill8(clact, 0, sizeof(ZukanTorokuClAct));
 }
 
 static void ZukanTorokuClAct_Update(ZukanTorokuClAct *clact) {

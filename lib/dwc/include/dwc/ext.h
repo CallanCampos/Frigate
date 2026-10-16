@@ -74,8 +74,8 @@ int func_ov011_021716ac(void *array, const void *element, int (*compare)(const v
 // first)
 void func_ov011_02171634(void *array, int index);
 
-// The formatted texts of NitroSDK's OS (OS_SPrintf, OS_SNPrintf and OS_VSNPrintf under their default names) are in
-// nitro/os.h, and the Wi-Fi library's one error in dwc/error.h
+// The formatted texts of NitroSDK's OS (OS_SPrintf, OS_SNPrintf and OS_VSNPrintf) are in nitro/os.h,
+// NitroSDK's STD's (STD_TSNPrintf) in nitro/std.h, and the Wi-Fi library's one error in dwc/error.h
 
 // Overlay 11: allocates, zeroed by the caller, and frees
 void *func_ov011_0216dddc(u32 size);

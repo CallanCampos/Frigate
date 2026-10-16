@@ -26,20 +26,20 @@ BOOL SOCL_IsNotClosing(int socket) {
     if (socket <= 0) {
         return FALSE;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     if (SOCL_SocketIsInTrash(s)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
     if (SOCL_SocketIsInvalid(s)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
     if (s->state & SOCLI_STATE_CLOSE_CALLED) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return FALSE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return TRUE;
 }
 
@@ -51,24 +51,24 @@ int SOCL_Close(int socket) {
     if (socket <= 0) {
         return SOCL_EINVAL;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     if (SOCL_SocketIsInTrash(s)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return SOCL_EINPROGRESS;
     }
     if (SOCL_SocketIsInvalid(s)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return 0;
     }
     if (!SOCLi_SocketIsCreated(s)) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return SOCL_ENETRESET;
     }
     if (s->state & SOCLI_STATE_CLOSE_CALLED) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return SOCL_EINPROGRESS;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     s->state |= SOCLI_STATE_CLOSING | SOCLI_STATE_CLOSE_CALLED;
     if (SOCLi_SocketIsTCP(s)) {
         SOCLi_SendCommandPacket(s->send_pipe, NULL);
@@ -95,10 +95,10 @@ static int SOCLi_CloseCallBack(SOCLCommandPacket *packet) {
     CPS_SocUnRegister();
     socket->state &= ~(SOCLI_STATE_BINDING | SOCLI_STATE_CONNECTED);
     SOCLi_SendCommandPacket(socket->flag == 2 ? socket->send_pipe : socket->recv_pipe, NULL);
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     SOCLi_SocketUnregister(socket);
     SOCLi_SocketRegisterTrash(socket);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     socket->state |= SOCLI_STATE_CLOSED;
     return 0;
 }
@@ -132,11 +132,11 @@ static void SOCLi_CleanupSocket(SOCLSocket *socket) {
     } else if (flag == 2) {
         SOCLi_FreeCommandPipe(socket->send_pipe);
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     SOCLi_SocketUnregister(socket);
     SOCLi_SocketUnregisterTrash(socket);
     SOCLiConfigPtr->free(socket);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Waits for the pipe's thread to end, and answers the commands that it never ran with an error
@@ -148,7 +148,7 @@ static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
         return;
     }
     OS_JoinThread(&pipe->thread);
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     OS_DisableScheduler();
     if (OS_ReceiveMessage(&pipe->queue, &message, OS_MESSAGE_NOBLOCK)) {
         do {
@@ -163,14 +163,14 @@ static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
     }
     OS_EnableScheduler();
     OS_RescheduleThread();
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 void SOCLi_TrashSocket(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     while (SOCLiSocketListTrash != NULL) {
         SOCLi_CleanupSocket(SOCLiSocketListTrash);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }

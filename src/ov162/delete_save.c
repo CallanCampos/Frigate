@@ -107,7 +107,7 @@ static WaitIcon *sWaitIcon;
 
 static BOOL DeleteSave_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_SAVEDATA_DELETE, 0x30000);
-    sys_memset(GFL_ProcInitSubsystem(proc, sizeof(DeleteSaveWork), HEAPID_SAVEDATA_DELETE), 0, sizeof(DeleteSaveWork));
+    MI_CpuFill8(GFL_ProcInitSubsystem(proc, sizeof(DeleteSaveWork), HEAPID_SAVEDATA_DELETE), 0, sizeof(DeleteSaveWork));
     return TRUE;
 }
 

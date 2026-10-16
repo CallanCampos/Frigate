@@ -106,7 +106,7 @@ static const PkwdBookBGSetup sPkwdBookBGSetups[BG_COUNT] = {
 PkwdBookGraphic *PkwdBookGraphic_Create(u32 layout, HeapID heapId) {
     PkwdBookGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(PkwdBookGraphic), FALSE, "pkwd_book_graphic.c", 454);
 
-    sys_memset(graphic, 0, sizeof(PkwdBookGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdBookGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -135,7 +135,7 @@ void PkwdBookGraphic_Free(PkwdBookGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(PkwdBookGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdBookGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -165,7 +165,7 @@ static void PkwdBookGraphic_VBlank(TCB *tcb, void *data) {
 static void PkwdBookBG_Init(PkwdBookBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(PkwdBookBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdBookBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPkwdBookLCDConfig);
@@ -184,7 +184,7 @@ static void PkwdBookBG_Free(PkwdBookBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(PkwdBookBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdBookBG));
 }
 
 static void PkwdBookBG_Update(PkwdBookBG *bg) {
@@ -195,7 +195,7 @@ static void PkwdBookBG_VBlank(PkwdBookBG *bg) {
 }
 
 static void PkwdBookClAct_Init(PkwdBookClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(PkwdBookClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdBookClAct));
     ClActSys_Create(&sPkwdBookClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -206,7 +206,7 @@ static void PkwdBookClAct_Init(PkwdBookClAct *clact, const BGSysVRAMConfig *vram
 static void PkwdBookClAct_Free(PkwdBookClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(PkwdBookClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdBookClAct));
 }
 
 static void PkwdBookClAct_Update(PkwdBookClAct *clact) {

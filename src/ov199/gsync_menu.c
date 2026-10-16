@@ -522,8 +522,8 @@ static void GSyncMenu_LoadGraphics(GSyncMenuWork *wk) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_SUB_BG, 0, 0, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, wk->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 1, &palette, wk->heapId);
-    sys_memcpy(palette->rawData, wk->palettes[0], sizeof(wk->palettes[0]));
-    sys_memcpy(palette->rawData, wk->palettes[1], sizeof(wk->palettes[1]));
+    MI_CpuCopy8(palette->rawData, wk->palettes[0], sizeof(wk->palettes[0]));
+    MI_CpuCopy8(palette->rawData, wk->palettes[1], sizeof(wk->palettes[1]));
     GSyncMenu_BrightenPalettes(wk->palettes[1], sBrightenAmounts, 7);
     GFL_HeapFree(file);
     wk->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, wk->heapId);
@@ -678,13 +678,13 @@ static void GSyncMenu_DimPalettes(GSyncMenuWork *wk, u16 buffer, int count) {
     PaletteFade_LoadFromVRAM(fade, buffer, 0, count * 32);
     PaletteFade_BlendBuffer(fade, buffer, 0, count * 16, 6, 0);
     faded = PaletteFade_GetFadedBuffer(fade, buffer);
-    cp15_flushDC(faded, count * 32);
+    DC_FlushRange(faded, count * 32);
     switch (buffer) {
     case PALFADE_BUFFER_SUB_OBJ:
-        gfxUploadStdPaletteObjB(faded, 0, count * 32);
+        GXS_LoadOBJPltt(faded, 0, count * 32);
         break;
     case PALFADE_BUFFER_SUB_BG:
-        gfxUploadStdPaletteBGB(faded, 0, count * 32);
+        GXS_LoadBGPltt(faded, 0, count * 32);
         break;
     }
     PaletteFade_FreeBuffer(fade, buffer);
@@ -694,13 +694,13 @@ static void GSyncMenu_DimPalettes(GSyncMenuWork *wk, u16 buffer, int count) {
 // Dims the sub screen behind a message, or restores it
 static void GSyncMenu_DimSubScreen(GSyncMenuWork *wk, BOOL dim) {
     if (dim) {
-        sys_memcpy((void *)HW_DB_OBJ_PLTT, wk->objPalettes, 0x200);
-        sys_memcpy((void *)HW_DB_BG_PLTT, wk->bgPalettes, 0x200);
+        MI_CpuCopy8((void *)HW_DB_OBJ_PLTT, wk->objPalettes, 0x200);
+        MI_CpuCopy8((void *)HW_DB_BG_PLTT, wk->bgPalettes, 0x200);
         GSyncMenu_DimPalettes(wk, PALFADE_BUFFER_SUB_OBJ, 14);
         GSyncMenu_DimPalettes(wk, PALFADE_BUFFER_SUB_BG, 9);
     } else {
-        gfxUploadStdPaletteObjB(wk->objPalettes, 0, 14 * 32);
-        gfxUploadStdPaletteBGB(wk->bgPalettes, 0, 9 * 32);
+        GXS_LoadOBJPltt(wk->objPalettes, 0, 14 * 32);
+        GXS_LoadBGPltt(wk->bgPalettes, 0, 9 * 32);
     }
 }
 
@@ -862,7 +862,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GSYNC_MENU, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(GSyncMenuWork), HEAPID_GSYNC_MENU);
-    sys_memset(wk, 0, sizeof(GSyncMenuWork));
+    MI_CpuFill8(wk, 0, sizeof(GSyncMenuWork));
     wk->heapId = HEAPID_GSYNC_MENU;
     wk->gameData = event->gameData;
     wk->gsys = event->gsys;
@@ -872,10 +872,10 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     } else {
         brightness = -16;
     }
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, brightness);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, brightness);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, brightness);
     GXS_DispOn();
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
     func_020232d0();
@@ -897,7 +897,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     wk->keyCursor = KeyCursor_Create(15, FALSE, TRUE, wk->heapId);
     wk->printQueue = func_02021998(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
     color = WIPE_COLOR_BLACK;
     if (event->fromWifiSettings) {
         color = WIPE_COLOR_WHITE;

@@ -21,15 +21,15 @@ typedef struct {
     u32 unk_3c;
 } CARDRomLockPoll;
 
-static void func_0206ed94(void *arg);
-static BOOL func_0206edcc(void *arg);
-static BOOL func_0206eea4(void);
-static void func_0206eec0(BOOL enable);
-static void func_0206ef74(u16 lockId, int target);
-static void func_0206efc8(u16 lockId, int target);
-static int func_0206f0a8(void);
-static void func_0206f0c0(void);
-static void cart_read_thread_proc(void *arg);
+static void CARDi_PollRomLock(void *arg);
+static BOOL CARDi_TryLockCard(void *arg);
+static BOOL CARD_IsEnabled(void);
+static void CARD_Enable(BOOL enable);
+static void CARDi_LockResource(u16 lockId, int target);
+static void CARDi_UnlockResource(u16 lockId, int target);
+static int CARDi_InitResourceLock(void);
+static void CARDi_InitCommand(void);
+static void CARDi_OldTypeTaskThread(void *arg); // swan's cart_read_thread_proc
 
 // The first node of the list of hooks has only its link in use. The statics lie in memory in reverse of the order here
 static CARDHookContext sCardHookRoot;
@@ -38,31 +38,31 @@ static CARDiCommandArg cardi_arg;
 static BOOL sCardEnabled;
 
 // The interface for the DS's DMA channels
-static const CARDDmaInterface sCardDmaInterface = { func_0207917c, dma_end };
+static const CARDDmaInterface sCardDmaInterface = { MIi_CardDmaCopy32, MI_StopDma };
 
 // Calls the condition each frame, at the first line of the vertical blank, until it holds
-static void func_0206ed94(void *arg) {
+static void CARDi_PollRomLock(void *arg) {
     CARDRomLockPoll *poll = arg;
     if (poll->condition(poll->arg)) {
-        func_0207c864(&poll->event, 1);
+        OS_SignalEvent(&poll->event, 1);
     } else {
-        OS_SetVAlarm(&poll->alarm, 192, 263, func_0206ed94, poll);
+        OS_SetVAlarm(&poll->alarm, 192, 263, CARDi_PollRomLock, poll);
     }
 }
 
 // Whether the card's lock was free, and is the caller's now
-static BOOL func_0206edcc(void *arg) {
-    return func_0207a1a8(*(u16 *)arg) == 0;
+static BOOL CARDi_TryLockCard(void *arg) {
+    return OS_TryLockCard(*(u16 *)arg) == 0;
 }
 
 // CARD_Init: sets up the library's work, starts the thread that runs the commands' tasks and, on a ROM boot, enables
 // the card
-void cart_read_thread_init(void) {
+void CARD_Init(void) {
     CARDiCommon *p = &cardi_common;
     if (p->flag == 0) {
         p->flag = CARD_STAT_INIT;
-        if (sys_get_boot_indicator() == OS_BOOTTYPE_ROM) {
-            sys_memcpy((void *)HW_ROM_HEADER_BUF, (void *)HW_CARD_ROM_HEADER, HW_CARD_ROM_HEADER_SIZE);
+        if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
+            MI_CpuCopy8((void *)HW_ROM_HEADER_BUF, (void *)HW_CARD_ROM_HEADER, HW_CARD_ROM_HEADER_SIZE);
         }
         p->src = 0;
         p->dst = 0;
@@ -73,103 +73,103 @@ void cart_read_thread_init(void) {
         p->icInvalidateThreshold = 0x400;
         cardi_rom_base = 0;
         p->priority = 4;
-        func_0206f0a8();
+        CARDi_InitResourceLock();
         p->callback = NULL;
         p->callbackArg = NULL;
         OS_InitThreadQueue(&p->busyQueue);
-        scheduler_init_thread(&p->thread, cart_read_thread_proc, NULL, p->stack + sizeof(p->stack), sizeof(p->stack),
-                              p->priority);
-        scheduler_start_thread(&p->thread);
-        func_0206f0c0();
-        func_0206fe54();
-        if (sys_get_boot_indicator() == OS_BOOTTYPE_ROM) {
-            func_0206eec0(TRUE);
+        OS_CreateThread(&p->thread, CARDi_OldTypeTaskThread, NULL, p->stack + sizeof(p->stack), sizeof(p->stack),
+                        p->priority);
+        OS_WakeupThreadDirect(&p->thread);
+        CARDi_InitCommand();
+        CARDi_InitRom();
+        if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
+            CARD_Enable(TRUE);
         }
         func_0206fed8();
     }
 }
 
-static BOOL func_0206eea4(void) {
+static BOOL CARD_IsEnabled(void) {
     return sCardEnabled;
 }
 
-void func_0206eeb0(void) {
-    if (!func_0206eea4()) {
+void CARD_CheckEnabled(void) {
+    if (!CARD_IsEnabled()) {
         sys_exit();
     }
 }
 
-static void func_0206eec0(BOOL enable) {
+static void CARD_Enable(BOOL enable) {
     sCardEnabled = enable;
 }
 
-CARDResult func_0206eecc(void) {
+CARDResult CARD_GetResultCode(void) {
     return cardi_common.cmd->result;
 }
 
-const ROMHeader *func_0206eed8(void) {
+const ROMHeader *CARD_GetRomHeader(void) {
     return (const ROMHeader *)HW_CARD_ROM_HEADER;
 }
 
-const ROMHeader *rom_get_header(void) {
+const ROMHeader *CARD_GetOwnRomHeader(void) {
     return (const ROMHeader *)HW_ROM_HEADER_BUF;
 }
 
-const void *func_0206eee8(void) {
+const void *CARD_GetOwnRomHeaderTWL(void) {
     return (const void *)HW_TWL_ROM_HEADER_BUF;
 }
 
 // Locks the card's ROM for a thread by the ID it got from the OS, polling for the card's lock each frame
-void func_0206eef0(u16 lockId) {
+void CARD_LockRom(u16 lockId) {
     CARDRomLockPoll poll;
-    func_0206ef74(lockId, CARD_TARGET_ROM);
-    func_0207c7f4(&poll.event);
-    func_0207befc(&poll.alarm);
-    poll.condition = func_0206edcc;
+    CARDi_LockResource(lockId, CARD_TARGET_ROM);
+    OS_InitEvent(&poll.event);
+    OS_CreateVAlarm(&poll.alarm);
+    poll.condition = CARDi_TryLockCard;
     poll.arg = &lockId;
-    func_0206ed94(&poll);
-    func_0207c800(&poll.event, 1, OS_EVENT_MODE_AND, 1);
+    CARDi_PollRomLock(&poll);
+    OS_WaitEventEx(&poll.event, 1, OS_EVENT_MODE_AND, 1);
 }
 
-void func_0206ef38(u16 lockId) {
-    func_0207a18c(lockId);
-    func_0206efc8(lockId, CARD_TARGET_ROM);
+void CARD_UnlockRom(u16 lockId) {
+    OS_UnlockCard(lockId);
+    CARDi_UnlockResource(lockId, CARD_TARGET_ROM);
 }
 
-void func_0206ef4c(u16 lockId) {
-    func_0206ef74(lockId, CARD_TARGET_BACKUP);
+void CARD_LockBackup(u16 lockId) {
+    CARDi_LockResource(lockId, CARD_TARGET_BACKUP);
 }
 
-void func_0206ef58(u16 lockId) {
-    if (!func_0206f890()) {
-        func_0206f888();
+void CARD_UnlockBackup(u16 lockId) {
+    if (!CARD_TryWaitBackupAsync()) {
+        CARD_WaitBackupAsync();
     }
-    func_0206efc8(lockId, CARD_TARGET_BACKUP);
+    CARDi_UnlockResource(lockId, CARD_TARGET_BACKUP);
 }
 
 // Takes the lock of the card's resources for an ID, waiting if another ID holds it. The same ID may take it again for
 // the same target. The loop's test is a 0/1 value, which keeps it from being rotated
-static void func_0206ef74(u16 lockId, int target) {
+static void CARDi_LockResource(u16 lockId, int target) {
     CARDiCommon *p = &cardi_common;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     if (p->lockOwner == lockId) {
         if (p->lockTarget != target) {
             sys_exit();
         }
     } else {
         while (p->lockOwner != OS_LOCK_ID_ERROR ? TRUE : FALSE) {
-            scheduler_yield(&p->lockQueue);
+            OS_SleepThread(&p->lockQueue);
         }
         p->lockOwner = lockId;
         p->lockTarget = target;
     }
     p->lockRef++;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
-static void func_0206efc8(u16 lockId, int target) {
+static void CARDi_UnlockResource(u16 lockId, int target) {
     CARDiCommon *p = &cardi_common;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     if (p->lockOwner != lockId || p->lockRef == 0) {
         sys_exit();
     } else {
@@ -182,18 +182,18 @@ static void func_0206efc8(u16 lockId, int target) {
             OS_WakeupThread(&p->lockQueue);
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // What the game may do with the card: everything on a ROM boot or a DS, and what the header of a DSi game allows
-u32 func_0206f018(void) {
+u32 CARDi_GetAccessLevel(void) {
     u32 level = 0;
-    if (sys_get_boot_indicator() == OS_BOOTTYPE_ROM) {
+    if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
         level = CARD_ACCESS_LEVEL_FULL;
     } else if (!hw_isDSi()) {
         level = CARD_ACCESS_LEVEL_FULL;
     } else {
-        const CARDTwlRomHeader *header = func_0206eee8();
+        const CARDTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
         BOOL granted = FALSE;
         if (header->accessControl.gameCardNtrMode) {
             level |= CARD_ACCESS_LEVEL_ROM;
@@ -213,17 +213,17 @@ u32 func_0206f018(void) {
     return level;
 }
 
-BOOL func_0206f07c(void) {
-    return func_0206f1c0(&cardi_common, FALSE, NULL, NULL);
+BOOL CARDi_WaitAsync(void) {
+    return CARDi_WaitForTask(&cardi_common, FALSE, NULL, NULL);
 }
 
-BOOL func_0206f090(void) {
+BOOL CARDi_TryWaitAsync(void) {
     return (cardi_common.flag & CARD_STAT_BUSY) == 0;
 }
 
 // Returns 0, which nothing reads: the original has the zero in r0 when it returns, where a void function puts the
 // address of the work in r0
-static int func_0206f0a8(void) {
+static int CARDi_InitResourceLock(void) {
     CARDiCommon *p = &cardi_common;
     p->lockOwner = OS_LOCK_ID_ERROR;
     p->lockRef = 0;
@@ -232,17 +232,17 @@ static int func_0206f0a8(void) {
     return 0;
 }
 
-static void func_0206f0c0(void) {
+static void CARDi_InitCommand(void) {
     cardi_common.cmd = &cardi_arg;
     MI_CpuClearFast(&cardi_arg, sizeof(CARDiCommandArg));
-    cp15_flushDC(&cardi_arg, sizeof(CARDiCommandArg));
-    func_0207c9fc(PXI_FIFO_TAG_FS, func_0206f2e4);
+    DC_FlushRange(&cardi_arg, sizeof(CARDiCommandArg));
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_FS, CARDi_OnFifoRecv);
 }
 
 // CARDi_NotifyEvent: calls each hook with the event. The walk keeps the link before the current hook and moves it on
 // only if the hook is still there, so a hook may remove itself
-void func_0206f0f0(u32 command, u32 value) {
-    u32 irq = CPU_IRQDisable();
+void CARDi_NotifyEvent(u32 command, u32 value) {
+    u32 irq = OS_DisableInterrupts();
     CARDHookContext *prev = &sCardHookRoot;
     CARDHookContext *hook = sCardHookRoot.next;
     for (; hook != NULL; hook = prev->next) {
@@ -253,20 +253,20 @@ void func_0206f0f0(u32 command, u32 value) {
             prev = prev->next;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Runs a task: on the thread if async, otherwise here and now. An async task is done when its callback is called
-BOOL func_0206f134(CARDiTask task, BOOL async) {
+BOOL CARDi_ExecuteOldTypeTask(CARDiTask task, BOOL async) {
     CARDiCommon *p = &cardi_common;
     if (async) {
-        func_0207a998(&p->thread, p->priority);
+        OS_SetThreadPriority(&p->thread, p->priority);
         p->task = task;
         p->flag |= CARD_STAT_TASK;
-        scheduler_start_thread(&p->thread);
+        OS_WakeupThreadDirect(&p->thread);
     } else {
         task(p);
-        func_0206f224(p);
+        CARDi_EndTask(p);
     }
     if (async) {
         return TRUE;
@@ -274,46 +274,46 @@ BOOL func_0206f134(CARDiTask task, BOOL async) {
     return p->cmd->result == CARD_RESULT_SUCCESS;
 }
 
-// CARDi_OldTypeTaskThread: sleeps until a task is set, then runs it
-static void cart_read_thread_proc(void *arg) {
+// Sleeps until a task is set, then runs it
+static void CARDi_OldTypeTaskThread(void *arg) {
     CARDiCommon *p = &cardi_common;
     while (TRUE) {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
         for (;;) {
             if ((p->flag & CARD_STAT_TASK) != 0) {
                 break;
             }
-            scheduler_yield(NULL);
+            OS_SleepThread(NULL);
         }
-        CPU_SetIRQMask(irq);
-        func_0206f134(p->task, FALSE);
+        OS_RestoreInterrupts(irq);
+        CARDi_ExecuteOldTypeTask(p->task, FALSE);
     }
 }
 
 // Waits until the last command is done. A command that starts takes over the thread, with the callback to call when
 // it ends. Returns whether the command block holds a success
-BOOL func_0206f1c0(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg) {
-    u32 irq = CPU_IRQDisable();
+BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg) {
+    u32 irq = OS_DisableInterrupts();
     while ((p->flag & CARD_STAT_BUSY) != 0) {
-        scheduler_yield(&p->busyQueue);
+        OS_SleepThread(&p->busyQueue);
     }
     if (start) {
         p->flag |= CARD_STAT_BUSY;
         p->callback = callback;
         p->callbackArg = arg;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return p->cmd->result == CARD_RESULT_SUCCESS;
 }
 
 // Ends a command: lets the next one start, then calls the callback of the one that ended
-void func_0206f224(CARDiCommon *p) {
+void CARDi_EndTask(CARDiCommon *p) {
     MIDmaCallback callback = p->callback;
     void *arg = p->callbackArg;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     p->flag &= ~(CARD_STAT_BUSY | CARD_STAT_TASK | CARD_STAT_CANCEL);
     OS_WakeupThread(&p->busyQueue);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     if (callback != NULL) {
         callback(arg);
     }
@@ -321,7 +321,7 @@ void func_0206f224(CARDiCommon *p) {
 
 // The interface of a DMA channel for ROM reads: bit 4 of the number picks the DSi's new DMA, which only a DSi has.
 // NULL for a channel that doesn't exist
-const CARDDmaInterface *func_0206f25c(u32 dma) {
+const CARDDmaInterface *CARDi_GetDmaInterface(u32 dma) {
     const CARDDmaInterface *interface = NULL;
     BOOL twl = (dma & 0x10) != 0;
     dma &= ~0x10;
@@ -338,28 +338,28 @@ const CARDDmaInterface *func_0206f25c(u32 dma) {
 }
 
 // Discards the instruction cache of a range, or all of it from the threshold on
-void func_0206f298(void *addr, u32 len, u32 threshold) {
+void CARDi_ICInvalidateSmart(void *addr, u32 len, u32 threshold) {
     if (len >= threshold) {
-        cp15_invalidateICAll();
+        IC_InvalidateAll();
     } else {
-        cp15_invalidateIC(addr, len);
+        IC_InvalidateRange(addr, len);
     }
 }
 
 // Discards the data cache of a range, or all of it from the threshold on. The lines at the ends of a range that they
 // share with other data are written back first
-void func_0206f2ac(void *addr, u32 len, u32 threshold) {
+void CARDi_DCInvalidateSmart(void *addr, u32 len, u32 threshold) {
     if (len >= threshold) {
-        cp15_invalidateDCAll();
+        DC_FlushAll();
     } else {
         u32 offset = (u32)addr & 0x1f;
         if (offset != 0) {
             addr = (u8 *)addr - offset;
-            cp15_cleanDC(addr, 0x20);
-            cp15_cleanDC((u8 *)addr + len, 0x20);
+            DC_StoreRange(addr, 0x20);
+            DC_StoreRange((u8 *)addr + len, 0x20);
             len += 0x20;
         }
-        cp15_invalidateDC(addr, len);
-        cp15_drainWriteBuffer();
+        DC_InvalidateRange(addr, len);
+        DC_WaitWriteBufferEmpty();
     }
 }

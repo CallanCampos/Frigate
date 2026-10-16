@@ -294,7 +294,7 @@ static GameEvent *StartPush(Field *field, FieldActor *stone, u16 dir) {
         event = GameEvent_Create(gsys, NULL, PushEvent, sizeof(PushData));
     }
     data = GameEvent_GetData(event);
-    sys_memset_fast(data, 0, sizeof(PushData));
+    MI_CpuFill(data, 0, sizeof(PushData));
     data->dir = dir;
     data->work = work;
     data->slotIndex = i;

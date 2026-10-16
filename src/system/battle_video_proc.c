@@ -64,7 +64,7 @@ static BOOL BattleVideo_Init(GameProc *proc, u32 *state, void *param, void *work
     G2S_BlendNone();
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BATTLE_VIDEO, 0x800);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BattleVideoWork), HEAPID_BATTLE_VIDEO);
-    sys_memset(wk, 0, sizeof(BattleVideoWork));
+    MI_CpuFill8(wk, 0, sizeof(BattleVideoWork));
     wk->param = param;
     wk->manager = CreateGameProcManager(HEAPID_BATTLE_VIDEO);
     return TRUE;
@@ -85,7 +85,7 @@ static BOOL BattleVideo_Main(GameProc *proc, u32 *state, void *param, void *work
         // Whether the Battle Recorder lost the connection, and so comes back here
         BOOL retry = wk->sub.recorder.result == 2;
 
-        sys_memset(&wk->sub.login, 0, sizeof(WifiLoginParam));
+        MI_CpuFill8(&wk->sub.login, 0, sizeof(WifiLoginParam));
         wk->sub.login.gameData = wk->param->gameData;
         wk->sub.login.unk4 = 0;
         wk->sub.login.unk8 = 1;
@@ -111,7 +111,7 @@ static BOOL BattleVideo_Main(GameProc *proc, u32 *state, void *param, void *work
         }
         break;
     case BATTLE_VIDEO_RECORDER:
-        sys_memset(&wk->sub.recorder, 0, sizeof(BattleRecorderParam));
+        MI_CpuFill8(&wk->sub.recorder, 0, sizeof(BattleRecorderParam));
         wk->sub.recorder.mode = wk->param->mode;
         wk->sub.recorder.gameData = wk->param->gameData;
         wk->sub.recorder.unk8 = (u32)wk->loginBuffer;
@@ -128,7 +128,7 @@ static BOOL BattleVideo_Main(GameProc *proc, u32 *state, void *param, void *work
         }
         break;
     case BATTLE_VIDEO_LOGOUT:
-        sys_memset(&wk->sub.logout, 0, sizeof(WifiLogoutParam));
+        MI_CpuFill8(&wk->sub.logout, 0, sizeof(WifiLogoutParam));
         wk->sub.logout.gameData = wk->param->gameData;
         wk->sub.logout.unk4 = 0;
         wk->sub.logout.unk8 = 1;
@@ -145,7 +145,7 @@ static BOOL BattleVideo_Main(GameProc *proc, u32 *state, void *param, void *work
         return TRUE;
     }
     if (wk->online == TRUE) {
-        func_0205b5ec();
+        DWC_UpdateConnection();
     }
     return FALSE;
 }

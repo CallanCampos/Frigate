@@ -234,7 +234,7 @@ static void Demo3DCmd_AddSeFade(Demo3DCmdSys *sys, u8 param, u16 se, s32 start, 
     Demo3DSeFade *work =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_SeFadeTask, sizeof(Demo3DSeFade), 0));
 
-    sys_memset(work, 0, sizeof(Demo3DSeFade));
+    MI_CpuFill8(work, 0, sizeof(Demo3DSeFade));
     work->sys = sys;
     work->param = param;
     work->start = start;
@@ -314,7 +314,7 @@ static void Demo3DCmd_AddBgmChange(Demo3DCmdSys *sys, u32 bgm, s32 fadeOutFrames
     Demo3DBgmChange *work =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_BgmChangeTask, sizeof(Demo3DBgmChange), 0));
 
-    sys_memset(work, 0, sizeof(Demo3DBgmChange));
+    MI_CpuFill8(work, 0, sizeof(Demo3DBgmChange));
     work->sys = sys;
     work->type = type;
     if (type == DEMO3D_BGM_CHANGE_PUSH) {
@@ -388,7 +388,7 @@ static void Demo3DCmd_AddBrightnessFade(Demo3DCmdSys *sys, u32 screens, u32 plan
     Demo3DBrightnessFade *work = GFL_TCBExGetData(
         GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_BrightnessFadeTask, sizeof(Demo3DBrightnessFade), 0));
 
-    sys_memset(work, 0, sizeof(Demo3DBrightnessFade));
+    MI_CpuFill8(work, 0, sizeof(Demo3DBrightnessFade));
     work->sys = sys;
     work->screens = screens;
     work->planes = planes;
@@ -439,7 +439,7 @@ static void Demo3DCmd_Flash(Demo3DCmdSys *sys, Demo3DEngine *engine, s32 *params
 static void Demo3DCmd_AddFlash(Demo3DCmdSys *sys, u8 screens, s8 start, s8 peak, s8 end, s32 inFrames, s32 outFrames) {
     Demo3DFlash *work = GFL_TCBExGetData(GFL_TCBExMgrAddTask(sys->tcbMgr, Demo3DCmd_FlashTask, sizeof(Demo3DFlash), 1));
 
-    sys_memset(work, 0, sizeof(Demo3DFlash));
+    MI_CpuFill8(work, 0, sizeof(Demo3DFlash));
     work->sys = sys;
     work->start = start;
     work->peak = peak;
@@ -557,7 +557,7 @@ static void Demo3DCmd_MessageTask(TCBEx *task, void *data) {
 
 static void Demo3DCmd_InitMessage(Demo3DCmdSys *sys, Demo3DMessage *work, u32 textBank, u32 message, s32 frames, u8 x,
                                   u8 y, u8 width, u8 height) {
-    sys_memset(work, 0, sizeof(Demo3DMessage));
+    MI_CpuFill8(work, 0, sizeof(Demo3DMessage));
     work->textBank = textBank;
     work->frames = frames;
     work->sys = sys;
@@ -577,7 +577,7 @@ static void Demo3DCmd_FreeMessage(Demo3DMessage *work) {
     BmpWin_ClearFrame(work->window, 1);
     BmpWin_Free(work->window);
     FreeCursorImageEndOfHeap(1, work->frameChars);
-    sys_memset(work, 0, sizeof(Demo3DMessage));
+    MI_CpuFill8(work, 0, sizeof(Demo3DMessage));
     GFL_BGSysSetBGPriority(1, 1);
     GFL_BGSysSetBGPriority(0, 0);
     GFL_BGSysSetBGEnabled(1, FALSE);
@@ -623,7 +623,7 @@ static void Demo3DCmd_TelopTask(TCBEx *task, void *data) {
         work->step = FX_Div(FX32_CONST(16), FX32_CONST(work->fadeInFrames));
         GFL_BGSysSetBGPriority(1, 0);
         GFL_BGSysSetBGPriority(0, 1);
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0, 0, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0, 0, 16);
         GFL_BGSysSetBGEnabled(1, TRUE);
         work->state++;
         break;
@@ -664,7 +664,7 @@ static void Demo3DCmd_TelopTask(TCBEx *task, void *data) {
 
 static void Demo3DCmd_InitTelop(Demo3DCmdSys *sys, Demo3DTelop *work, u32 paletteFile, u32 charFile, u32 screenFile,
                                 s32 frames, s32 fadeInFrames, s32 fadeOutFrames) {
-    sys_memset(work, 0, sizeof(Demo3DTelop));
+    MI_CpuFill8(work, 0, sizeof(Demo3DTelop));
     work->sys = sys;
     work->frames = frames;
     work->paletteFile = paletteFile;
@@ -676,7 +676,7 @@ static void Demo3DCmd_InitTelop(Demo3DCmdSys *sys, Demo3DTelop *work, u32 palett
 }
 
 static void Demo3DCmd_FreeTelop(Demo3DTelop *work) {
-    sys_memset(work, 0, sizeof(Demo3DTelop));
+    MI_CpuFill8(work, 0, sizeof(Demo3DTelop));
     GFL_BGSysSetBGEnabled(1, FALSE);
     GFL_BGSysSetBGPriority(0, 0);
     GFL_BGSysSetBGPriority(1, 1);

@@ -90,7 +90,7 @@ DWCBmReadResult func_0205e038(void *work, int unused) {
 int func_0205e094(void *work) {
     NtrWork *ntr = work;
 
-    sys_memset(work, 0, NTR_WORK_SIZE);
+    MI_CpuFill8(work, 0, NTR_WORK_SIZE);
     if (func_0205dbc0() != 0) {
         return DWC_BM_CHECK_READ_FAILED;
     }
@@ -105,7 +105,7 @@ int func_0205e094(void *work) {
 int func_0205e0f0(void *work) {
     TwlWork *twl = work;
 
-    sys_memset(work, 0, TWL_WORK_SIZE);
+    MI_CpuFill8(work, 0, TWL_WORK_SIZE);
     if (func_0205dbc0() != 0) {
         return DWC_BM_CHECK_READ_FAILED;
     }
@@ -130,7 +130,7 @@ static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
     u16 crc;
     int i;
 
-    sys_memset(valid, 0, sizeof(valid));
+    MI_CpuFill8(valid, 0, sizeof(valid));
     for (i = 0; i < CONNECTION_COUNT; i++) {
         crc = MATH_CalcCRC16(table, &pages[i], NTR_CRC_SIZE);
 
@@ -155,20 +155,20 @@ static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
         func_0205e540(pages, 0);
         if (valid[1]) {
             usedMask = pages[1].usedMask;
-            sys_memcpy(pages[1].wifiId, pages[0].wifiId, DWC_BM_PACKED_SIZE);
+            MI_CpuCopy8(pages[1].wifiId, pages[0].wifiId, DWC_BM_PACKED_SIZE);
         }
     }
     if (!valid[1]) {
         func_0205e540(pages, 1);
         if (valid[0]) {
-            sys_memcpy(pages[0].wifiId, pages[1].wifiId, DWC_BM_PACKED_SIZE);
+            MI_CpuCopy8(pages[0].wifiId, pages[1].wifiId, DWC_BM_PACKED_SIZE);
         }
     }
     if (!valid[2]) {
         func_0205e540(pages, 2);
     }
     if (!valid[3]) {
-        sys_memset16(0, &pages[3], sizeof(DWCBmNtrPage));
+        MIi_CpuClear16(0, &pages[3], sizeof(DWCBmNtrPage));
     }
 
     lost = FALSE;
@@ -209,7 +209,7 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
     BOOL lost;
     int i;
 
-    sys_memset(valid, 0, sizeof(valid));
+    MI_CpuFill8(valid, 0, sizeof(valid));
     for (i = 0; i < TWL_PAGE_COUNT; i++) {
         u16 ntrCrc = MATH_CalcCRC16(table, &pages[i].ntr, NTR_CRC_SIZE);
         u16 extraCrc = MATH_CalcCRC16(table, &pages[i].extra, TWL_EXTRA_CRC_SIZE);
@@ -269,12 +269,12 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
 
 // Empties a page, and marks its connection as not in use
 static void func_0205e540(DWCBmNtrPage *pages, int index) {
-    sys_memset16(0, &pages[index], sizeof(DWCBmNtrPage));
+    MIi_CpuClear16(0, &pages[index], sizeof(DWCBmNtrPage));
     pages[index].connection.status = DWC_BM_CONNECTION_UNUSED;
 }
 
 static void func_0205e56c(DWCBmTwlPage *pages, int index) {
-    sys_memset16(0, &pages[index], sizeof(DWCBmTwlPage));
+    MIi_CpuClear16(0, &pages[index], sizeof(DWCBmTwlPage));
     pages[index].ntr.connection.status = DWC_BM_CONNECTION_UNUSED;
 }
 
@@ -443,8 +443,8 @@ static BOOL func_0205e990(const u8 *address, const u8 *mask) {
     if (!func_0205ea10(address)) {
         return FALSE;
     }
-    sys_memcpy(address, &addressBits, 4);
-    sys_memcpy(mask, &maskBits, 4);
+    MI_CpuCopy8(address, &addressBits, 4);
+    MI_CpuCopy8(mask, &maskBits, 4);
     if ((addressBits | maskBits) == 0xFFFFFFFE) {
         return FALSE;
     }

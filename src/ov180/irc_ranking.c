@@ -390,7 +390,7 @@ static BOOL IrcRanking_Init(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_HeapCreateChild(HEAPID_USER, HEAP_ID, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcRankingWork), HEAP_ID);
-    sys_memset(wk, 0, sizeof(IrcRankingWork));
+    MI_CpuFill8(wk, 0, sizeof(IrcRankingWork));
     if (rankingParam->gsys != NULL) {
         wk->gameData = GSYS_GetGameData(rankingParam->gsys);
     } else {
@@ -412,7 +412,7 @@ static BOOL IrcRanking_Init(GameProc *proc, u32 *state, void *param, void *work)
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, HEAP_ID);
     wk->palette = func_0204bc48(arc, 5, CLACT_VRAM_MAIN, 0x1c0, HEAP_ID);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 8;
     setup.y = 41;
     setup.priority = 0;
@@ -474,13 +474,13 @@ static BOOL IrcRanking_Main(GameProc *proc, u32 *state, void *param, void *work)
 }
 
 static void IrcRankingStepMan_Init(IrcRankingStepMan *mgr, IrcRankingWork *wk, IrcRankingStepFunc step) {
-    sys_memset(mgr, 0, sizeof(IrcRankingStepMan));
+    MI_CpuFill8(mgr, 0, sizeof(IrcRankingStepMan));
     mgr->work = wk;
     IrcRankingStepMan_SetStep(mgr, step);
 }
 
 static void IrcRankingStepMan_Free(IrcRankingStepMan *mgr) {
-    sys_memset(mgr, 0, sizeof(IrcRankingStepMan));
+    MI_CpuFill8(mgr, 0, sizeof(IrcRankingStepMan));
 }
 
 static void IrcRankingStepMan_Run(IrcRankingStepMan *mgr) {
@@ -635,7 +635,7 @@ static void IrcRankingBG_Init(IrcRankingBG *bg, GameData *gameData, HeapID heapI
     StrBuf *format;
     int i;
 
-    sys_memset(bg, 0, sizeof(IrcRankingBG));
+    MI_CpuFill8(bg, 0, sizeof(IrcRankingBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sIrcRankingLCDConfig);
@@ -687,7 +687,7 @@ static void IrcRankingBG_Free(IrcRankingBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(IrcRankingBG));
+    MI_CpuFill8(bg, 0, sizeof(IrcRankingBG));
 }
 
 static void IrcRankingBG_VBlank(IrcRankingBG *bg) {
@@ -702,7 +702,7 @@ static u32 IrcRankingBG_GetChars(IrcRankingBG *bg, BOOL main) {
 }
 
 static void IrcRankingClAct_Init(IrcRankingClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(IrcRankingClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcRankingClAct));
     ClActSys_Create(&sIrcRankingClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -713,7 +713,7 @@ static void IrcRankingClAct_Init(IrcRankingClAct *clact, const BGSysVRAMConfig *
 static void IrcRankingClAct_Free(IrcRankingClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(IrcRankingClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcRankingClAct));
 }
 
 static void IrcRankingClAct_Update(IrcRankingClAct *clact) {
@@ -729,7 +729,7 @@ static ClActUnit *IrcRankingClAct_GetUnit(IrcRankingClAct *clact) {
 }
 
 static void IrcRankingGraphic_Create(IrcRankingGraphic *graphic, GameData *gameData, HeapID heapId) {
-    sys_memset(graphic, 0, sizeof(IrcRankingGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IrcRankingGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -749,7 +749,7 @@ static void IrcRankingGraphic_Free(IrcRankingGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     IrcRankingClAct_Free(&graphic->clact);
     IrcRankingBG_Free(&graphic->bg);
-    sys_memset(graphic, 0, sizeof(IrcRankingGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IrcRankingGraphic));
 }
 
 static void IrcRankingGraphic_Update(IrcRankingGraphic *graphic) {
@@ -776,7 +776,7 @@ static void IrcRankingList_Init(IrcRankingList *list, u8 bg1, u8 bg2, u8 bg5, u8
     ArcTool *arc;
     u32 i;
 
-    sys_memset(list, 0, sizeof(IrcRankingList));
+    MI_CpuFill8(list, 0, sizeof(IrcRankingList));
     list->bg = bg;
     list->bgs[0] = bg1;
     list->bgs[1] = bg2;
@@ -830,7 +830,7 @@ static void IrcRankingList_Free(IrcRankingList *list) {
     IrcRankingScreens_Free(&list->screens);
     GFL_WordSetSystemFree(list->wordSet);
     GFL_FontFree(list->font);
-    sys_memset(list, 0, sizeof(IrcRankingList));
+    MI_CpuFill8(list, 0, sizeof(IrcRankingList));
 }
 
 // Once the list has stopped on a row, redraws it for the rows that show, and plays a sound for a new one
@@ -1015,7 +1015,7 @@ static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry,
     u32 halfWidth;
     u32 palette;
 
-    sys_memset(row, 0, sizeof(IrcRankingRow));
+    MI_CpuFill8(row, 0, sizeof(IrcRankingRow));
     row->entry = entry;
     row->screens = screens;
     row->bitmap = GFL_BitmapCreate(32, 3, 32, heapId);
@@ -1050,7 +1050,7 @@ static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry,
     row->iconChars = func_0204b81c(arc, iconFile, FALSE, CLACT_VRAM_BOTH, heapId);
     row->iconCellAnims = func_0204bde0(arc, iconCells, iconAnims, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.sequence = 1;
     setup.bgPriority = 1;
     for (i = 0; i < 2; i++) {
@@ -1082,7 +1082,7 @@ static void IrcRankingRow_Free(IrcRankingRow *row) {
     func_0204b98c(row->iconChars);
     func_0204be64(row->iconCellAnims);
     GFL_BitmapFree(row->bitmap);
-    sys_memset(row, 0, sizeof(IrcRankingRow));
+    MI_CpuFill8(row, 0, sizeof(IrcRankingRow));
 }
 
 static void IrcRankingRow_Draw(IrcRankingRow *row, BmpWin *window, u8 bg, u16 tileY) {
@@ -1118,7 +1118,7 @@ static void IrcRankingScreens_Init(IrcRankingScreens *screens, IrcRankingBG *bg,
     int y;
     int x;
 
-    sys_memset(screens, 0, sizeof(IrcRankingScreens));
+    MI_CpuFill8(screens, 0, sizeof(IrcRankingScreens));
     mainChars = IrcRankingBG_GetChars(bg, TRUE);
     subChars = IrcRankingBG_GetChars(bg, FALSE);
     file = GFL_G2DIOReadNSCR(ARCID_IRC_RANKING, 5, FALSE, &screen, heapId);
@@ -1133,7 +1133,7 @@ static void IrcRankingScreens_Init(IrcRankingScreens *screens, IrcRankingBG *bg,
 }
 
 static void IrcRankingScreens_Free(IrcRankingScreens *screens) {
-    sys_memset(screens, 0, sizeof(IrcRankingScreens));
+    MI_CpuFill8(screens, 0, sizeof(IrcRankingScreens));
 }
 
 static void IrcRankingScreens_Load(const IrcRankingScreens *screens, u8 bg, u32 tileY, u8 palette) {
@@ -1158,7 +1158,7 @@ static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) 
     u8 self;
     u32 i;
 
-    sys_memset(ranking, 0, sizeof(u32) + count * sizeof(IrcRankingEntry));
+    MI_CpuFill8(ranking, 0, sizeof(u32) + count * sizeof(IrcRankingEntry));
     ranking->count = count;
     if (count != 0) {
         prevValue = 0x80;
@@ -1241,11 +1241,11 @@ static u32 IrcRankingData_GetCount(IrcRankingData *ranking) {
 }
 
 static void IrcRankingTouch_Init(IrcRankingTouch *touch, HeapID heapId) {
-    sys_memset(touch, 0, sizeof(IrcRankingTouch));
+    MI_CpuFill8(touch, 0, sizeof(IrcRankingTouch));
 }
 
 static void IrcRankingTouch_Free(IrcRankingTouch *touch) {
-    sys_memset(touch, 0, sizeof(IrcRankingTouch));
+    MI_CpuFill8(touch, 0, sizeof(IrcRankingTouch));
 }
 
 static void IrcRankingTouch_Update(IrcRankingTouch *touch) {
@@ -1338,11 +1338,11 @@ static u32 IrcRankingTouch_GetHeldKeys(IrcRankingTouch *touch, u32 *keyFrames) {
 }
 
 static void IrcRankingFling_Init(IrcRankingFling *fling) {
-    sys_memset(fling, 0, sizeof(IrcRankingFling));
+    MI_CpuFill8(fling, 0, sizeof(IrcRankingFling));
 }
 
 static void IrcRankingFling_Free(IrcRankingFling *fling) {
-    sys_memset(fling, 0, sizeof(IrcRankingFling));
+    MI_CpuFill8(fling, 0, sizeof(IrcRankingFling));
 }
 
 // Turns a fling that was started into its speed
@@ -1429,8 +1429,8 @@ static void IrcRanking_CopyTiles(GFLBitmap *src, GFLBitmap *dest, u32 srcX, u32 
     u8 *srcPixels = GFL_BitmapGetPixelData(src);
     u8 *destPixels = GFL_BitmapGetPixelData(dest);
 
-    sys_memcpy32(srcPixels + (srcX + width * srcY) * 32, destPixels + (destX + width * destY) * 32,
-                 width * height * 32);
+    MIi_CpuCopy32(srcPixels + (srcX + width * srcY) * 32, destPixels + (destX + width * destY) * 32,
+                  width * height * 32);
 }
 
 static IrcRankingLabel *IrcRankingLabel_Create(const ClActorSetup *setup, u8 width, u8 height, u32 palette,
@@ -1440,11 +1440,11 @@ static IrcRankingLabel *IrcRankingLabel_Create(const ClActorSetup *setup, u8 wid
     BmpOamActorSetup actorSetup;
 
     label = GFL_HeapAllocate(heapId, sizeof(IrcRankingLabel), FALSE, "irc_ranking.c", 3402);
-    sys_memset(label, 0, sizeof(IrcRankingLabel));
+    MI_CpuFill8(label, 0, sizeof(IrcRankingLabel));
     label->queue = queue;
     label->strbuf = GFL_StrBufCreate(128, heapId);
     label->bitmap = GFL_BitmapCreate(width, height, 32, heapId);
-    sys_memset(&actorSetup, 0, sizeof(BmpOamActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(BmpOamActorSetup));
     actorSetup.bitmap = label->bitmap;
     actorSetup.x = setup->x;
     actorSetup.y = setup->y;

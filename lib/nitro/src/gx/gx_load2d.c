@@ -23,122 +23,122 @@ static u32 sBGExtPlttOffsetA;
 static u32 sBGExtPlttDestA;
 static u32 sBGExtPlttBanksA;
 
-void gfxUploadStdPaletteBGA(const void *src, u32 offset, u32 size) {
+void GX_LoadBGPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy16(GXi_DmaId, src, (void *)(HW_BG_PLTT + offset), size);
 }
 
-void gfxUploadStdPaletteBGB(const void *src, u32 offset, u32 size) {
+void GXS_LoadBGPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy16(GXi_DmaId, src, (void *)(HW_DB_BG_PLTT + offset), size);
 }
 
-void gfxUploadStdPaletteObjA(const void *src, u32 offset, u32 size) {
+void GX_LoadOBJPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy16(GXi_DmaId, src, (void *)(HW_OBJ_PLTT + offset), size);
 }
 
-void gfxUploadStdPaletteObjB(const void *src, u32 offset, u32 size) {
+void GXS_LoadOBJPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy16(GXi_DmaId, src, (void *)(HW_DB_OBJ_PLTT + offset), size);
 }
 
-void gfxUploadOAMA(const void *src, u32 offset, u32 size) {
+void GX_LoadOAM(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32(GXi_DmaId, src, (void *)(HW_OAM + offset), size);
 }
 
-void gfxUploadOAMB(const void *src, u32 offset, u32 size) {
+void GXS_LoadOAM(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32(GXi_DmaId, src, (void *)(HW_DB_OAM + offset), size);
 }
 
-void gfxUploadObjCharA(const void *src, u32 offset, u32 size) {
+void GX_LoadOBJ(const void *src, u32 offset, u32 size) {
     u8 *chars = G2_GetOBJCharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadObjCharB(const void *src, u32 offset, u32 size) {
+void GXS_LoadOBJ(const void *src, u32 offset, u32 size) {
     u8 *chars = G2S_GetOBJCharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGScreen0A(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG0A();
+void GX_LoadBG0Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2_GetBG0ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen0B(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG0B();
+void GXS_LoadBG0Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2S_GetBG0ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen1A(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG1A();
+void GX_LoadBG1Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2_GetBG1ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen1B(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG1B();
+void GXS_LoadBG1Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2S_GetBG1ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen2A(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG2A();
+void GX_LoadBG2Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2_GetBG2ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen2B(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG2B();
+void GXS_LoadBG2Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2S_GetBG2ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen3A(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG3A();
+void GX_LoadBG3Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2_GetBG3ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGScreen3B(const void *src, u32 offset, u32 size) {
-    u8 *screen = gfxGetScreenAddrBG3B();
+void GXS_LoadBG3Scr(const void *src, u32 offset, u32 size) {
+    u8 *screen = G2S_GetBG3ScrPtr();
     GXi_DmaCopy16(GXi_DmaId, src, screen + offset, size);
 }
 
-void gfxUploadBGChar0A(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG0A();
+void GX_LoadBG0Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2_GetBG0CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar0B(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG0B();
+void GXS_LoadBG0Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2S_GetBG0CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar1A(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG1A();
+void GX_LoadBG1Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2_GetBG1CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar1B(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG1B();
+void GXS_LoadBG1Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2S_GetBG1CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar2A(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG2A();
+void GX_LoadBG2Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2_GetBG2CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar2B(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG2B();
+void GXS_LoadBG2Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2S_GetBG2CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar3A(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG3A();
+void GX_LoadBG3Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2_GetBG3CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxUploadBGChar3B(const void *src, u32 offset, u32 size) {
-    u8 *chars = gfxGetCharAddrBG3B();
+void GXS_LoadBG3Char(const void *src, u32 offset, u32 size) {
+    u8 *chars = G2S_GetBG3CharPtr();
     GXi_DmaCopy32(GXi_DmaId, src, chars + offset, size);
 }
 
-void gfxBeginBGExtPltAUpload(void) {
-    GXVRamBGExtPltt banks = gfxAcquireBGExtPltBanksA();
+void GX_BeginLoadBGExtPltt(void) {
+    GXVRamBGExtPltt banks = GX_ResetBankForBGExtPltt();
     sBGExtPlttBanksA = banks;
     switch (banks) {
     case GX_VRAM_BGEXTPLTT_NONE:
@@ -159,20 +159,20 @@ void gfxBeginBGExtPltAUpload(void) {
     }
 }
 
-void gfxUploadExtPaletteBGA(const void *src, u32 offset, u32 size) {
+void GX_LoadBGExtPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)(sBGExtPlttDestA + offset - sBGExtPlttOffsetA), size, NULL, NULL);
 }
 
-void gfxEndBGExtPltAUpload(void) {
+void GX_EndLoadBGExtPltt(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetBGExtPltBanksA(sBGExtPlttBanksA);
+    GX_SetBankForBGExtPltt(sBGExtPlttBanksA);
     sBGExtPlttBanksA = 0;
     sBGExtPlttDestA = 0;
     sBGExtPlttOffsetA = 0;
 }
 
-void gfxBeginObjExtPltAUpload(void) {
-    GXVRamOBJExtPltt banks = gfxAcquireObjExtPltBanksA();
+void GX_BeginLoadOBJExtPltt(void) {
+    GXVRamOBJExtPltt banks = GX_ResetBankForOBJExtPltt();
     sObjExtPlttBanksA = banks;
     switch (banks) {
     case GX_VRAM_OBJEXTPLTT_NONE:
@@ -186,41 +186,41 @@ void gfxBeginObjExtPltAUpload(void) {
     }
 }
 
-void gfxUploadExtPaletteObjA(const void *src, u32 offset, u32 size) {
+void GX_LoadOBJExtPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)(sObjExtPlttDestA + offset), size, NULL, NULL);
 }
 
-void gfxEndObjExtPltAUpload(void) {
+void GX_EndLoadOBJExtPltt(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetObjExtPltBanksA(sObjExtPlttBanksA);
+    GX_SetBankForOBJExtPltt(sObjExtPlttBanksA);
     sObjExtPlttBanksA = 0;
     sObjExtPlttDestA = 0;
 }
 
-void gfxBeginBGExtPltBUpload(void) {
-    g_GfxVRAMUploadBanksBGExtPltB = gfxAcquireBGExtPltBanksB();
+void GXS_BeginLoadBGExtPltt(void) {
+    g_GfxVRAMUploadBanksBGExtPltB = GX_ResetBankForSubBGExtPltt();
 }
 
-void gfxUploadExtPaletteBGB(const void *src, u32 offset, u32 size) {
+void GXS_LoadBGExtPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)(HW_LCDC_VRAM_H + offset), size, NULL, NULL);
 }
 
-void gfxEndBGExtPltBUpload(void) {
+void GXS_EndLoadBGExtPltt(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetBGExtPltBanksB(g_GfxVRAMUploadBanksBGExtPltB);
+    GX_SetBankForSubBGExtPltt(g_GfxVRAMUploadBanksBGExtPltB);
     g_GfxVRAMUploadBanksBGExtPltB = 0;
 }
 
-void gfxBeginObjExtPltBUpload(void) {
-    sObjExtPlttBanksB = gfxAcquireObjExtPltBanksB();
+void GXS_BeginLoadOBJExtPltt(void) {
+    sObjExtPlttBanksB = GX_ResetBankForSubOBJExtPltt();
 }
 
-void gfxUploadExtPaletteObjB(const void *src, u32 offset, u32 size) {
+void GXS_LoadOBJExtPltt(const void *src, u32 offset, u32 size) {
     GXi_DmaCopy32Async(GXi_DmaId, src, (void *)(HW_LCDC_VRAM_I + offset), size, NULL, NULL);
 }
 
-void gfxEndObjExtPltBUpload(void) {
+void GXS_EndLoadOBJExtPltt(void) {
     GXi_WaitDma(GXi_DmaId);
-    gfxSetObjExtPltBanksB(sObjExtPlttBanksB);
+    GX_SetBankForSubOBJExtPltt(sObjExtPlttBanksB);
     sObjExtPlttBanksB = 0;
 }

@@ -15,7 +15,7 @@ void UpdateScriptFieldWk(void *fieldWork, GameSystem *gsys) {
     void **ptr;
 
     field = GSYS_GetField(gsys);
-    sys_memset32(0, fieldWork, 8);
+    MIi_CpuClear32(0, fieldWork, 8);
     ptr = fieldWork;
     ptr[1] = field;
     if (field != NULL) {
@@ -191,7 +191,7 @@ void *ScriptWork_CreateVarCopy(ScriptWork *work) {
 
     copy = GFL_HeapAllocate(work->heapId, 0x7e, TRUE, "script_work.c", 0x21b);
     vars = ScriptWork_GetLocalWork(work, 0x8020);
-    sys_memcpy16(vars, copy, 0x7e);
+    MIi_CpuCopy16(vars, copy, 0x7e);
     return copy;
 }
 
@@ -199,7 +199,7 @@ void ScriptWork_RestoreVarCopy(ScriptWork *work, void *copy) {
     u16 *vars;
 
     vars = ScriptWork_GetLocalWork(work, 0x8020);
-    sys_memcpy16(copy, vars, 0x7e);
+    MIi_CpuCopy16(copy, vars, 0x7e);
     GFL_HeapFree(copy);
 }
 

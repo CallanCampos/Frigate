@@ -204,12 +204,12 @@ void DDemoMain_LoadBg(void) {
 
 // Blends the 3D of the first scene over the actors and the backdrop
 void DDemoMain_SetBlendAlpha(void) {
-    gfxRegSetAlphaBlend(
-        REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
-        GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 6, 10);
-    gfxRegSetAlphaBlend(
-        REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
-        GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 6, 10);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                       GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                       6, 10);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0,
+                       GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD,
+                       6, 10);
 }
 
 void DDemoMain_InitMsg(DDemoWork *wk) {
@@ -286,8 +286,8 @@ static void DDemoMain_Setup3D(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sDDemoLights); i++) {
         GFL_G3DSysLightSet(i, &sDDemoLights[i]);

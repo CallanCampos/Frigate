@@ -23,7 +23,7 @@ static void BrCodeIn_VBlank(TCB *tcb, void *data);
 BrCodeInWork *BrCodeIn_Init(const BrCodeInParam *param, HeapID heapId) {
     BrCodeInWork *wk = GFL_HeapAllocate(heapId, sizeof(BrCodeInWork), FALSE, "br_codein.c", 56);
 
-    sys_memset(wk, 0, sizeof(BrCodeInWork));
+    MI_CpuFill8(wk, 0, sizeof(BrCodeInWork));
     wk->param = *param;
     wk->heapId = heapId;
     wk->unit = param->unit;

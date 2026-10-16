@@ -871,7 +871,7 @@ static BOOL PkwdBook_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PKWD_BOOK, 0x38000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PkwdBookWork), HEAPID_PKWD_BOOK);
-    sys_memset(wk, 0, sizeof(PkwdBookWork));
+    MI_CpuFill8(wk, 0, sizeof(PkwdBookWork));
     wk->heapId = HEAPID_PKWD_BOOK;
     wk->param = param;
     wk->graphic = PkwdBookGraphic_Create(1, wk->heapId);
@@ -1012,10 +1012,10 @@ static void PkwdBook_InitScreen(PkwdBookWork *wk) {
     PkwdBook_SetArrows(wk, 0, wk->movieCount - 1, wk->selected);
     PkwdBook_ScrollBG(wk, PAGE_LIST);
     PkwdBook_ShowMovie(wk, FALSE);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0x3f, 8, 3);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, 8, 3);
     wk->blendAlpha1 = 3;
     wk->blendAlpha2 = 15;
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, 0x3a, wk->blendAlpha1, wk->blendAlpha2);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, 0x3a, wk->blendAlpha1, wk->blendAlpha2);
 }
 
 static void PkwdBook_Step(PkwdBookWork *wk) {
@@ -1298,7 +1298,7 @@ static void PkwdBook_CreateActors(PkwdBookWork *wk, u32 surface, const PkwdBookA
     s16 paletteSlot;
     s16 cellSlot;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     paletteSlot = group->paletteSlot;
     cellSlot = group->cellSlot;
     count = group->count;
@@ -1531,7 +1531,7 @@ static void PkwdBook_CreateTextActors(PkwdBookWork *wk, u32 surface, const PkwdB
         positionIdx = entries->positionIdx;
         x = PkwdBook_GetPosition(wk, positionIdx * 2);
         y = PkwdBook_GetPosition(wk, positionIdx * 2 + 1);
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.bitmap = wk->textBitmaps[i];
         setup.x = x;
         setup.y = y;

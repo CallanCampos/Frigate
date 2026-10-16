@@ -192,14 +192,14 @@ EventGtsNego *EventGtsNego_Init(GameEvent *event, GameSystem *gsys, Field *field
     wk->unk3B0 = unk3B0;
     wk->party = PokeParty_Create(HEAPID_GAMEEVENT);
     wk->trade.party = wk->party;
-    sys_memset(&wk->nego, 0, sizeof(GtsNegoParam));
+    MI_CpuFill8(&wk->nego, 0, sizeof(GtsNegoParam));
     wk->nego.gameData = GSYS_GetGameData(gsys);
     wk->nego.playerInfo = GFL_HeapAllocate(HEAPID_GAMEEVENT, PlayerInfo_GetSize(), TRUE, "event_gtsnego.c", 291);
     wk->nego.playerInfo2 = GFL_HeapAllocate(HEAPID_GAMEEVENT, PlayerInfo_GetSize(), TRUE, "event_gtsnego.c", 292);
     playerInfo = GetGameDataPlayerInfo(GSYS_GetGameData(gsys));
-    sys_memcpy(playerInfo, wk->nego.playerInfo, PlayerInfo_GetSize());
+    MI_CpuCopy8(playerInfo, wk->nego.playerInfo, PlayerInfo_GetSize());
 
-    sys_memset(&wk->login, 0, sizeof(WifiLoginParam));
+    MI_CpuFill8(&wk->login, 0, sizeof(WifiLoginParam));
     wk->login.gameData = GSYS_GetGameData(gsys);
     wk->login.unk4 = 0;
     wk->login.unk8 = 1;

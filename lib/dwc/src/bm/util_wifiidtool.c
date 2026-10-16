@@ -25,7 +25,7 @@ static inline u8 UnsubstituteNibble(u8 nibble) {
 
 // Makes a pending ID of 43 bits from the salt, the last three bytes of the MAC address, whether the first three are
 // not Nintendo's, and a type of 2 bits (always 0), and scrambles it
-static u64 func_02056fb4(u32 salt, u32 nic, u32 notNintendo, u32 type) {
+static u64 MakeScrambledId(u32 salt, u32 nic, u32 notNintendo, u32 type) {
     union {
         u64 value;
         u8 bytes[8];
@@ -41,7 +41,7 @@ static u64 func_02056fb4(u32 salt, u32 nic, u32 notNintendo, u32 type) {
     for (i = 0; i < 5; i++) {
         id.bytes[i] = (sNibbleSubstitution[(id.bytes[i] >> 4) & 0xF] << 4) | sNibbleSubstitution[id.bytes[i] & 0xF];
     }
-    sys_memcpy(id.bytes, copy, 8);
+    MI_CpuCopy8(id.bytes, copy, 8);
     for (i = 0; i < 5; i++) {
         id.bytes[sByteOrder[i]] = copy[i];
     }
@@ -60,7 +60,7 @@ static u64 func_02056fb4(u32 salt, u32 nic, u32 notNintendo, u32 type) {
     return id.value;
 }
 
-BOOL func_02057138(DWCBmWifiIdInfo *info) {
+BOOL DWCBm_MakePendingWifiId(DWCBmWifiIdInfo *info) {
     u8 mac[6];
     RTCDate date;
     RTCTime time;
@@ -70,27 +70,27 @@ BOOL func_02057138(DWCBmWifiIdInfo *info) {
     u32 oui;
     u32 nic;
 
-    func_02056a90(info);
-    func_0207cb88();
-    if (func_0207cc10(&date) != 0) {
+    DWCBm_GetWifiIdInfo(info);
+    RTC_Init();
+    if (RTC_GetDate(&date) != 0) {
         return FALSE;
     }
-    if (func_0207cc80(&time) != 0) {
+    if (RTC_GetTime(&time) != 0) {
         return FALSE;
     }
-    seconds = func_0207d12c(&date, &time);
+    seconds = RTC_ConvertDateTimeToSecond(&date, &time);
     if (seconds < 0) {
         return FALSE;
     }
-    if (clock_is_inited()) {
+    if (OS_IsTickAvailable()) {
         // BUG: adds the address of the tick function, not the tick count that its call would give
 #ifdef BUGFIX
-        seconds += clock();
+        seconds += OS_GetTick();
 #else
-        seconds += (u32)clock;
+        seconds += (u32)OS_GetTick;
 #endif
     }
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     oui = (mac[0] << 16) | (mac[1] << 8) | mac[2];
     notNintendo = oui != NINTENDO_OUI;
     nic = (mac[3] << 16) | (mac[4] << 8) | mac[5];
@@ -105,37 +105,37 @@ BOOL func_02057138(DWCBmWifiIdInfo *info) {
                 seed = seed * 0x5D588B65 + 0x269EC3;
             }
             info->salt = seed;
-            info->pendingId = func_02056fb4(info->salt, nic, notNintendo, 0);
+            info->pendingId = MakeScrambledId(info->salt, nic, notNintendo, 0);
         }
     } else {
         info->pendingId = 0;
         while (info->pendingId == 0) {
             info->salt++;
-            info->pendingId = func_02056fb4(info->salt, nic, notNintendo, 0);
+            info->pendingId = MakeScrambledId(info->salt, nic, notNintendo, 0);
         }
     }
     return TRUE;
 }
 
-BOOL func_02057300(void *work) {
+BOOL DWCBm_MakeAndSaveWifiId(void *work) {
     DWCBmWifiIdInfo info;
 
-    if (func_02057138(&info) == FALSE) {
+    if (DWCBm_MakePendingWifiId(&info) == FALSE) {
         return FALSE;
     }
-    return func_02056c34(&info, work) != 0;
+    return DWCBm_WriteWifiIdInfo(&info, work) != 0;
 }
 
-BOOL func_02057348(DWCBmWifiIdInfo *info, void *work) {
+BOOL DWCBm_ConfirmWifiId(DWCBmWifiIdInfo *info, void *work) {
     DWCBmWifiIdInfo stored;
 
-    func_02056a90(&stored);
+    DWCBm_GetWifiIdInfo(&stored);
     info->id = info->pendingId;
     info->pendingId = stored.pendingId;
-    return func_02056c34(info, work) != 0;
+    return DWCBm_WriteWifiIdInfo(info, work) != 0;
 }
 
-BOOL func_02057398(DWCBmWifiIdInfo *info) {
+BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info) {
     u8 mac[6] = { 0, 0, 0, 0, 0, 0 };
     RTCDate date;
     RTCTime time;
@@ -145,27 +145,27 @@ BOOL func_02057398(DWCBmWifiIdInfo *info) {
     u32 nic;
     u32 oui;
 
-    func_02056a90(info);
-    func_0207cb88();
-    if (func_0207cc10(&date) != 0) {
+    DWCBm_GetWifiIdInfo(info);
+    RTC_Init();
+    if (RTC_GetDate(&date) != 0) {
         return FALSE;
     }
-    if (func_0207cc80(&time) != 0) {
+    if (RTC_GetTime(&time) != 0) {
         return FALSE;
     }
-    seconds = func_0207d12c(&date, &time);
+    seconds = RTC_ConvertDateTimeToSecond(&date, &time);
     if (seconds < 0) {
         return FALSE;
     }
-    if (clock_is_inited()) {
+    if (OS_IsTickAvailable()) {
         // BUG: adds the address of the tick function, not the tick count that its call would give
 #ifdef BUGFIX
-        seconds += clock();
+        seconds += OS_GetTick();
 #else
-        seconds += (u32)clock;
+        seconds += (u32)OS_GetTick;
 #endif
     }
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     oui = (mac[0] << 16) | (mac[1] << 8) | mac[2];
     notNintendo = oui != NINTENDO_OUI;
     nic = (mac[3] << 16) | (mac[4] << 8) | mac[5];
@@ -178,15 +178,15 @@ BOOL func_02057398(DWCBmWifiIdInfo *info) {
             seed = seed * 0x5D588B65 + 0x269EC3;
         }
         info->salt = seed;
-        info->pendingId = func_02056fb4(info->salt, nic, notNintendo, 0);
+        info->pendingId = MakeScrambledId(info->salt, nic, notNintendo, 0);
     }
     return TRUE;
 }
 
-void func_0205752c(DWCBmWifiId *out) {
+void DWCBm_GetWifiId(DWCBmWifiId *out) {
     DWCBmWifiIdInfo info;
 
-    func_02056a90(&info);
+    DWCBm_GetWifiIdInfo(&info);
     out->id = info.id;
     out->pendingId = info.pendingId;
     if (info.id != 0) {
@@ -196,10 +196,10 @@ void func_0205752c(DWCBmWifiId *out) {
     }
 }
 
-BOOL func_02057580(void) {
+BOOL DWCBm_HasNoWifiId(void) {
     DWCBmWifiIdInfo info;
 
-    func_02056a90(&info);
+    DWCBm_GetWifiIdInfo(&info);
     if (info.pendingId == 0 && info.id == 0) {
         return TRUE;
     }

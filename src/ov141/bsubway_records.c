@@ -265,7 +265,7 @@ static BOOL BSubwayRecords_Init(GameProc *proc, u32 *state, void *param, void *w
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BSUBWAY_RECORDS, 0x20000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BSubwayRecordsWork), HEAPID_BSUBWAY_RECORDS);
-    sys_memset32_fast(0, wk, sizeof(BSubwayRecordsWork));
+    MIi_CpuClearFast(0, wk, sizeof(BSubwayRecordsWork));
     Wipe_SetScreenCovered(0, 0);
     Wipe_SetScreenCovered(1, 0);
     BSubwayRecords_InitData(wk, param);

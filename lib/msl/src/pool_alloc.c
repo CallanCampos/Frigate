@@ -7,13 +7,13 @@
 #define CURRENT_HEAP (-1)
 
 void *__sys_alloc(size_t size) {
-    return malloc_device(OS_ARENA_MAIN, CURRENT_HEAP, size);
+    return OS_AllocFromHeap(OS_ARENA_MAIN, CURRENT_HEAP, size);
 }
 
 void __sys_free(void *ptr) {
-    free_device(OS_ARENA_MAIN, CURRENT_HEAP, ptr);
+    OS_FreeToHeap(OS_ARENA_MAIN, CURRENT_HEAP, ptr);
 }
 
 size_t __sys_pointer_size(void *ptr) {
-    return func_0207b730(OS_ARENA_MAIN, ptr);
+    return OS_ReferentSize(OS_ARENA_MAIN, ptr);
 }

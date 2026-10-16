@@ -139,13 +139,13 @@ static inline void SetSignMode(BOOL sign) {
 #define WRITE_BYTE(value) (sExifEncWriteBuffer[sExifEncWritePos++] = (value))
 
 static void ExifEnc_SetDateTime(const char *dateTime) {
-    sys_memcpy_fast(dateTime, sExifEncDateTime, 19);
+    MI_CpuCopy(dateTime, sExifEncDateTime, 19);
     sExifEncDateTime[19] = '\0';
     sExifEncDateTimeSet = TRUE;
 }
 
 static BOOL ExifEnc_GetDateTime(RTCDate *date, RTCTime *time) {
-    if (func_0207ccf4(date, time) == 0) {
+    if (RTC_GetDateTime(date, time) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -157,8 +157,8 @@ static BOOL ExifEnc_SetCurrentDateTime(void) {
     char dateTime[20];
 
     if (ExifEnc_GetDateTime(&date, &time) == TRUE) {
-        func_020800e8(dateTime, "%04d:%02d:%02d %02d:%02d:%02d", date.year + 2000, date.month, date.day, time.hour,
-                      time.minute, time.second);
+        STD_TSPrintf(dateTime, "%04d:%02d:%02d %02d:%02d:%02d", date.year + 2000, date.month, date.day, time.hour,
+                     time.minute, time.second);
         ExifEnc_SetDateTime(dateTime);
         return TRUE;
     }
@@ -166,7 +166,7 @@ static BOOL ExifEnc_SetCurrentDateTime(void) {
 }
 
 static void ExifEnc_SetSoftware(const char *software) {
-    sExifEncSoftwareLength = func_0207f7cc(sExifEncSoftware, software, EXIF_VALUE_MAX) + 1;
+    sExifEncSoftwareLength = STD_CopyLString(sExifEncSoftware, software, EXIF_VALUE_MAX) + 1;
 }
 
 static u32 ExifEnc_GetValueSize(const ExifEntry *entry) {
@@ -454,7 +454,7 @@ static BOOL ExifEnc_WriteApp1(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbna
 
     WRITE_BYTE((s16)(set->size & 0xff00) >> 8);
     WRITE_BYTE(set->size);
-    for (i = 0; i < NNS_STD_StrLen(exif); i++) {
+    for (i = 0; i < STD_GetStringLength(exif); i++) {
         WRITE_BYTE(exif[i]);
     }
     WRITE_BYTE(0);
@@ -481,7 +481,7 @@ static BOOL ExifEnc_WriteApp1(ExifIfdSet *set, u8 noThumbnail, const u8 *thumbna
     }
     if (!noThumbnail) {
         ExifEnc_WriteIfd(set, &set->ifd[EXIF_IFD_1ST], TRUE);
-        sys_memcpy_fast(thumbnail, sExifEncWriteBuffer + sExifEncWritePos, thumbnailSize);
+        MI_CpuCopy(thumbnail, sExifEncWriteBuffer + sExifEncWritePos, thumbnailSize);
         sExifEncWritePos += thumbnailSize;
     }
     return TRUE;
@@ -519,7 +519,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, "Nintendo", entry->count);
+    STD_CopyLString(entry->asciiValue, "Nintendo", entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_0TH].count++;
     entry = &set->ifd[EXIF_IFD_0TH].entries[set->ifd[EXIF_IFD_0TH].count];
@@ -531,7 +531,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, "NintendoDS", entry->count);
+    STD_CopyLString(entry->asciiValue, "NintendoDS", entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_0TH].count++;
     entry = &set->ifd[EXIF_IFD_0TH].entries[set->ifd[EXIF_IFD_0TH].count];
@@ -577,7 +577,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
         entry->longValue = 0;
         entry->numerator = 0;
         entry->denominator = 0;
-        func_0207f7cc(entry->asciiValue, sExifEncSoftware, entry->count);
+        STD_CopyLString(entry->asciiValue, sExifEncSoftware, entry->count);
         entry->offset = 0;
         set->ifd[EXIF_IFD_0TH].count++;
     }
@@ -590,7 +590,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, sExifEncDateTime, entry->count);
+    STD_CopyLString(entry->asciiValue, sExifEncDateTime, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_0TH].count++;
     entry = &set->ifd[EXIF_IFD_0TH].entries[set->ifd[EXIF_IFD_0TH].count];
@@ -615,7 +615,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    sys_memcpy_fast("0220", entry->undefinedValue, entry->count);
+    MI_CpuCopy("0220", entry->undefinedValue, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_EXIF].count++;
     entry = &set->ifd[EXIF_IFD_EXIF].entries[set->ifd[EXIF_IFD_EXIF].count];
@@ -627,7 +627,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, sExifEncDateTime, entry->count);
+    STD_CopyLString(entry->asciiValue, sExifEncDateTime, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_EXIF].count++;
     entry = &set->ifd[EXIF_IFD_EXIF].entries[set->ifd[EXIF_IFD_EXIF].count];
@@ -639,7 +639,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, sExifEncDateTime, entry->count);
+    STD_CopyLString(entry->asciiValue, sExifEncDateTime, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_EXIF].count++;
     entry = &set->ifd[EXIF_IFD_EXIF].entries[set->ifd[EXIF_IFD_EXIF].count];
@@ -681,7 +681,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    sys_memcpy_fast("0100", entry->undefinedValue, entry->count);
+    MI_CpuCopy("0100", entry->undefinedValue, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_EXIF].count++;
     entry = &set->ifd[EXIF_IFD_EXIF].entries[set->ifd[EXIF_IFD_EXIF].count];
@@ -728,7 +728,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = sExifEncSignatureEntry.longValue;
     entry->numerator = sExifEncSignatureEntry.numerator;
     entry->denominator = sExifEncSignatureEntry.denominator;
-    func_0207f7cc(entry->asciiValue, sExifEncSignatureEntry.asciiValue, entry->count);
+    STD_CopyLString(entry->asciiValue, sExifEncSignatureEntry.asciiValue, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_MAKER_NOTE].count++;
     if (sExifEncMakerNoteData1Size != 0) {
@@ -768,7 +768,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, "R98", entry->count);
+    STD_CopyLString(entry->asciiValue, "R98", entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_INTEROP].count++;
     entry = &set->ifd[EXIF_IFD_INTEROP].entries[set->ifd[EXIF_IFD_INTEROP].count];
@@ -780,7 +780,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    sys_memcpy_fast("0100", entry->undefinedValue, entry->count);
+    MI_CpuCopy("0100", entry->undefinedValue, entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_INTEROP].count++;
     entry = &set->ifd[EXIF_IFD_INTEROP].entries[set->ifd[EXIF_IFD_INTEROP].count];
@@ -792,7 +792,7 @@ static BOOL ExifEnc_BuildIfds(s16 width, s16 height, BOOL thumbnail, const u8 *t
     entry->longValue = 0;
     entry->numerator = 0;
     entry->denominator = 0;
-    func_0207f7cc(entry->asciiValue, "JPEG Exif Ver 2.2", entry->count);
+    STD_CopyLString(entry->asciiValue, "JPEG Exif Ver 2.2", entry->count);
     entry->offset = 0;
     set->ifd[EXIF_IFD_INTEROP].count++;
 
@@ -968,20 +968,20 @@ u32 ExifEnc_WriteHeader(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32
     sExifEncSignatureEntry.longValue = 0;
     sExifEncSignatureEntry.numerator = 0;
     sExifEncSignatureEntry.denominator = 0;
-    sys_memset(sExifEncSignatureEntry.asciiValue, 0, sExifEncSignatureEntry.count);
+    MI_CpuFill8(sExifEncSignatureEntry.asciiValue, 0, sExifEncSignatureEntry.count);
 
     // The software is the game code, the low word of the DSi's title ID
     titleId = 0;
     if (hw_isDSi() == TRUE) {
         titleId = *(u32 *)HW_TWL_TITLE_ID;
     }
-    sys_memcpy(&titleId, software, 4);
+    MI_CpuCopy8(&titleId, software, 4);
     software[4] = '\0';
     ExifEnc_SetSoftware(software);
 
     if (!sExifEncDateTimeSet) {
         while (!ExifEnc_SetCurrentDateTime()) {
-            func_0207c160(5);
+            OS_SpinWaitSysCycles(5);
         }
     }
 

@@ -4,7 +4,7 @@
 
 GXState gGXState;
 
-void gfxInitVRAM(void) {
+void GX_InitGXState(void) {
     gGXState.lcdc = 0;
     gGXState.bg = 0;
     gGXState.obj = 0;

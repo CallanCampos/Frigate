@@ -11,13 +11,13 @@
 
 // Starts the scan, allocating its work: the result goes in settings, and dmaNo is the DMA channel of the wireless
 // manager. The return value is always TRUE, and the caller ignores it
-BOOL func_0205be94(DWCInetApSettings *settings, u16 dmaNo);
+BOOL DWCi_WdsScan_Start(DWCInetApSettings *settings, u16 dmaNo);
 // Takes a step of the scan: 1 while it runs, 2 once it found an access point (in the settings), 3 if it failed or was
 // never started
-int func_0205bf04(void);
+int DWCi_WdsScan_Process(void);
 // Asks the scan to stop: a scan that is waiting for its time to run out ends at the next step
-void func_0205c1d0(void);
+void DWCi_WdsScan_Stop(void);
 // Frees the scan's work
-void func_0205c1ec(void);
+void DWCi_WdsScan_Free(void);
 
 #endif // POKEBW2_DWC_WDSSCAN_H

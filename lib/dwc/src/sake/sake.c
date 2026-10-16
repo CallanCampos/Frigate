@@ -108,12 +108,12 @@ BOOL Sake_GetDownloadUrl(const Sake *sake, int fileId, char *url) {
         return FALSE;
     }
     if (sSakeDownloadUrl[0] != '\0') {
-        length = func_0207a2c0(url, 128, "%s?fileid=%d&gameid=%d&pid=%d", sSakeDownloadUrl, fileId, sake->gameId,
-                               sake->profileId);
+        length = OS_SNPrintf(url, 128, "%s?fileid=%d&gameid=%d&pid=%d", sSakeDownloadUrl, fileId, sake->gameId,
+                             sake->profileId);
     } else {
-        length = func_0207a2c0(url, 128,
-                               "http://%s.sake.gamespy.com/SakeFileServer/download.aspx?fileid=%d&gameid=%d&pid=%d",
-                               sake->gameName, fileId, sake->gameId, sake->profileId);
+        length =
+            OS_SNPrintf(url, 128, "http://%s.sake.gamespy.com/SakeFileServer/download.aspx?fileid=%d&gameid=%d&pid=%d",
+                        sake->gameName, fileId, sake->gameId, sake->profileId);
     }
     if (length < 0) {
         return FALSE;
@@ -136,10 +136,10 @@ BOOL Sake_GetUploadUrl(const Sake *sake, char *url) {
         return FALSE;
     }
     if (sSakeUploadUrl[0] != '\0') {
-        length = func_0207a2c0(url, 128, "%s?gameid=%d&pid=%d", sSakeUploadUrl, sake->gameId, sake->profileId);
+        length = OS_SNPrintf(url, 128, "%s?gameid=%d&pid=%d", sSakeUploadUrl, sake->gameId, sake->profileId);
     } else {
-        length = func_0207a2c0(url, 128, "http://%s.sake.gamespy.com/SakeFileServer/upload.aspx?gameid=%d&pid=%d",
-                               sake->gameName, sake->gameId, sake->profileId);
+        length = OS_SNPrintf(url, 128, "http://%s.sake.gamespy.com/SakeFileServer/upload.aspx?gameid=%d&pid=%d",
+                             sake->gameName, sake->gameId, sake->profileId);
     }
     if (length < 0) {
         return FALSE;

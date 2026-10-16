@@ -18,7 +18,7 @@ int SOCL_Cleanup(void) {
     }
     if (SOCL_CalmDown() == SOCL_EINPROGRESS) {
         do {
-            func_0207aa04(100);
+            OS_Sleep(100);
         } while (SOCL_CalmDown() == SOCL_EINPROGRESS);
     }
     result = SOCLi_CleanupCommandPacketQueue();
@@ -46,13 +46,13 @@ static int SOCL_CloseAll(void) {
     u32 irq;
 
     while (TRUE) {
-        irq = CPU_IRQDisable();
+        irq = OS_DisableInterrupts();
         for (socket = SOCLiSocketList; socket != NULL; socket = socket->next) {
             if (socket != SOCLiUDPSendSocket && !(socket->state & SOCLI_STATE_CLOSE_CALLED)) {
                 break;
             }
         }
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         if (socket == NULL) {
             break;
         }
@@ -104,7 +104,7 @@ CPSInAddr SOCL_Resolve(const char *name) {
     if (buf == NULL) {
         return 0;
     }
-    sys_memset(&soc, 0, sizeof(CPSSoc));
+    MI_CpuFill8(&soc, 0, sizeof(CPSSoc));
     soc.rcvbuf = buf;
     soc.rcvbuf_size = 0xb68;
     soc.sndbuf = buf + 0xb68;
@@ -120,7 +120,7 @@ CPSInAddr SOCL_Resolve(const char *name) {
 CPSInAddr SOCL_InetAtoH(const char *name) {
     CPSInAddr dns1, dns2;
     CPSInAddr ip;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     dns1 = CPSDnsIp[0];
     dns2 = CPSDnsIp[1];
@@ -129,7 +129,7 @@ CPSInAddr SOCL_InetAtoH(const char *name) {
     ip = CPS_Resolve(name);
     CPSDnsIp[0] = dns1;
     CPSDnsIp[1] = dns2;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return ip;
 }
 
@@ -154,8 +154,8 @@ CPSInAddr SOCL_GetHostID(void) {
 
     if (ip == 0) {
         if ((SOCLiDhcpState & (SOCLI_DHCP_REQUESTED | SOCLI_DHCP_DONE)) == SOCLI_DHCP_REQUESTED) {
-            if (CPU_GetMode() != 0x12) {
-                func_0207aa04(10);
+            if (OS_GetProcMode() != 0x12) {
+                OS_Sleep(10);
             }
         }
     } else if (SOCLiRequestedIP == 0) {

@@ -55,7 +55,7 @@ u32 getSizeofNpcData(void) {
 }
 
 void initNpcData(AreaNPCSave *npcData) {
-    sys_memset(npcData, 0, sizeof(AreaNPCSave));
+    MI_CpuFill8(npcData, 0, sizeof(AreaNPCSave));
     decryptNpcData(npcData);
 }
 
@@ -99,8 +99,8 @@ static void removeSlot(AreaNPCSave *npcData, u32 slot) {
     u32 end = sSlotRanges[getKindOfSlot(slot)].end;
 
     if (slot < end) {
-        sys_memcpy(&npcData->pokemon[slot + 1], &npcData->pokemon[slot],
-                   (end - (slot + 1)) * sizeof(EntreeForestPokemon));
+        MI_CpuCopy8(&npcData->pokemon[slot + 1], &npcData->pokemon[slot],
+                    (end - (slot + 1)) * sizeof(EntreeForestPokemon));
     }
     npcData->pokemon[end - 1].species = 0;
 }

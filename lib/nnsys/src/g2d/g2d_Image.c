@@ -41,15 +41,15 @@ static inline void SetOBJVRamModeChar_(NNSG2dVRamType type, GXOBJVRamModeChar mo
 static inline void LoadImage_(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type) {
     switch (type) {
     case NNS_G2D_VRAM_TYPE_3DMAIN:
-        gfxBeginTextureUpload();
-        gfxUploadTexture(data->rawData, baseAddr, data->size);
-        gfxEndTextureUpload();
+        GX_BeginLoadTex();
+        GX_LoadTex(data->rawData, baseAddr, data->size);
+        GX_EndLoadTex();
         break;
     case NNS_G2D_VRAM_TYPE_2DMAIN:
-        gfxUploadObjCharA(data->rawData, baseAddr, data->size);
+        GX_LoadOBJ(data->rawData, baseAddr, data->size);
         break;
     case NNS_G2D_VRAM_TYPE_2DSUB:
-        gfxUploadObjCharB(data->rawData, baseAddr, data->size);
+        GXS_LoadOBJ(data->rawData, baseAddr, data->size);
         break;
     }
 }
@@ -76,26 +76,26 @@ static inline void LoadPalette_(const NNSG2dPaletteData *data, const void *src, 
     switch (type) {
     case NNS_G2D_VRAM_TYPE_2DMAIN:
         if (data->extendedPalette) {
-            gfxBeginObjExtPltAUpload();
-            gfxUploadExtPaletteObjA(src, addr, size);
-            gfxEndObjExtPltAUpload();
+            GX_BeginLoadOBJExtPltt();
+            GX_LoadOBJExtPltt(src, addr, size);
+            GX_EndLoadOBJExtPltt();
         } else {
-            gfxUploadStdPaletteObjA(src, addr, size);
+            GX_LoadOBJPltt(src, addr, size);
         }
         break;
     case NNS_G2D_VRAM_TYPE_2DSUB:
         if (data->extendedPalette) {
-            gfxBeginObjExtPltBUpload();
-            gfxUploadExtPaletteObjB(src, addr, size);
-            gfxEndObjExtPltBUpload();
+            GXS_BeginLoadOBJExtPltt();
+            GXS_LoadOBJExtPltt(src, addr, size);
+            GXS_EndLoadOBJExtPltt();
         } else {
-            gfxUploadStdPaletteObjB(src, addr, size);
+            GXS_LoadOBJPltt(src, addr, size);
         }
         break;
     case NNS_G2D_VRAM_TYPE_3DMAIN:
-        gfxBeginPaletteUpload();
-        gfxUploadPalette(src, addr, size);
-        gfxEndPaletteUpload();
+        GX_BeginLoadTexPltt();
+        GX_LoadTexPltt(src, addr, size);
+        GX_EndLoadTexPltt();
         break;
     }
 }
@@ -143,7 +143,7 @@ BOOL NNS_G2dIsImagePaletteReadyToUse(const NNSG2dImagePaletteProxy *proxy, NNSG2
 void NNS_G2dLoadImage1DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type,
                                NNSG2dImageProxy *proxy) {
     SetOBJVRamModeChar_(type, (GXOBJVRamModeChar)data->mappingType);
-    cp15_flushDC(data->rawData, data->size);
+    DC_FlushRange(data->rawData, data->size);
     LoadImage_(data, baseAddr, type);
     SetImageProxy_(data, baseAddr, type, proxy);
 }
@@ -151,7 +151,7 @@ void NNS_G2dLoadImage1DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NN
 void NNS_G2dLoadImage2DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type,
                                NNSG2dImageProxy *proxy) {
     SetOBJVRamModeChar_(type, (GXOBJVRamModeChar)data->mappingType);
-    cp15_flushDC(data->rawData, data->size);
+    DC_FlushRange(data->rawData, data->size);
     LoadImage_(data, baseAddr, type);
     SetImageProxy_(data, baseAddr, type, proxy);
 }
@@ -159,7 +159,7 @@ void NNS_G2dLoadImage2DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NN
 // For an image whose characters are transferred to VRAM as its cells are shown: only flushes it and sets the mapping
 void NNS_G2dLoadImageVramTransfer(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type,
                                   NNSG2dImageProxy *proxy) {
-    cp15_flushDC(data->rawData, data->size);
+    DC_FlushRange(data->rawData, data->size);
     SetOBJVRamModeChar_(type, (GXOBJVRamModeChar)data->mappingType);
     SetImageProxy_(data, baseAddr, type, proxy);
 }
@@ -170,7 +170,7 @@ void NNS_G2dLoadPalette(const NNSG2dPaletteData *data, u32 addr, NNSG2dVRamType 
 
     size = data->size;
     src = data->rawData;
-    cp15_flushDC(src, size);
+    DC_FlushRange(src, size);
     LoadPalette_(data, src, addr, size, type);
     proxy->fmt = data->format;
     proxy->bExtendedPlt = data->extendedPalette;
@@ -193,7 +193,7 @@ void NNS_G2dLoadPaletteEx(const NNSG2dPaletteData *data, const NNSG2dPaletteComp
         src = data->rawData;
         srcOffset = size * i;
 
-        cp15_flushDC(src, data->size);
+        DC_FlushRange(src, data->size);
         LoadPalette_(data, src + srcOffset, addr + dstOffset, size, type);
     }
     proxy->fmt = data->format;

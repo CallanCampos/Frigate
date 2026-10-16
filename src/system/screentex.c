@@ -56,12 +56,12 @@ void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank) {
     resource = GFL_HeapAllocate(heapId, GFL_G3DResGetAllocSize(), FALSE, "screentex.c", 59);
     offset = 0;
     file = GFL_HeapAllocate(heapId, sizeof(CAPTURE_TEX_RESHEADER), FALSE, "screentex.c", 60);
-    sys_memcpy(CAPTURE_TEX_RESHEADER, file, sizeof(CAPTURE_TEX_RESHEADER));
+    MI_CpuCopy8(CAPTURE_TEX_RESHEADER, file, sizeof(CAPTURE_TEX_RESHEADER));
     GFL_G3DResBindData(resource, 2, file);
     tex = NNS_G3DResGetTexBlock(file);
     size = NNS_G3DResTexGetTexDataSize(tex);
     // The texture image slots are the texture banks in order, so the bank's image starts after the banks before it
-    texBanks = gfxGetTextureBanks();
+    texBanks = GX_GetBankForTex();
     switch (bank) {
     case SCREENTEX_BANK_D:
         // BUG: `|=` for `&`, which is always true, so every bank before the capture bank is counted, texture bank or
@@ -97,21 +97,21 @@ void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank) {
 }
 
 void GFL_G3DScreenTexCapture(u32 bank, u32 destBank) {
-    u32 texBanks = gfxGetTextureBanks();
+    u32 texBanks = GX_GetBankForTex();
 
-    gfxSetLCDCBanks(SCREEN_CAPTURE_BANK_INFO[bank].vramBank);
+    GX_SetBankForLCDC(SCREEN_CAPTURE_BANK_INFO[bank].vramBank);
     GX_SetCapture(GX_CAPTURE_SIZE_256x192, GX_CAPTURE_MODE_A, GX_CAPTURE_SRCA_2D3D, GX_CAPTURE_SRCB_VRAM_0x00000,
                   SCREEN_CAPTURE_BANK_INFO[bank].captureDest, 16, 0);
     OS_WaitVBlankIntr();
     OS_WaitVBlankIntr();
-    gfxDisableLCDCBanks();
-    gfxSetTextureBanks(texBanks);
+    GX_DisableBankForLCDC();
+    GX_SetBankForTex(texBanks);
     if (bank != destBank) {
-        texBanks = gfxAcquireTextureBanks();
-        sys_memcpy32_fast(SCREEN_CAPTURE_BANK_INFO[bank].lcdcAddr, SCREEN_CAPTURE_BANK_INFO[destBank].lcdcAddr,
-                          SCREENTEX_SIZE);
-        gfxDisableLCDCBanks();
-        gfxSetTextureBanks(texBanks);
+        texBanks = GX_ResetBankForTex();
+        MIi_CpuCopyFast(SCREEN_CAPTURE_BANK_INFO[bank].lcdcAddr, SCREEN_CAPTURE_BANK_INFO[destBank].lcdcAddr,
+                        SCREENTEX_SIZE);
+        GX_DisableBankForLCDC();
+        GX_SetBankForTex(texBanks);
     }
 }
 

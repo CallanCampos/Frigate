@@ -1360,74 +1360,75 @@ GX_DEFINE_BG_GET_CONTROL(G2S_GetBG3Control256x16Pltt, GXBg23Control256x16Pltt, r
 // clang-format on
 
 // Sets a BG's affine matrix, its center and its offset. NitroSDK's G2x_SetBGyAffine_
-void gfxRegSetBGTransform(u32 addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y);
+// swan's gfxRegSetBGTransform
+void G2x_SetBGyAffine_(u32 addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y);
 
 static inline void G2_SetBG2Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    gfxRegSetBGTransform((u32)&reg_G2_BG2PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((u32)&reg_G2_BG2PA, mtx, centerX, centerY, x, y);
 }
 
 static inline void G2_SetBG3Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    gfxRegSetBGTransform((u32)&reg_G2_BG3PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((u32)&reg_G2_BG3PA, mtx, centerX, centerY, x, y);
 }
 
 static inline void G2S_SetBG2Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    gfxRegSetBGTransform((u32)&reg_G2S_DB_BG2PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((u32)&reg_G2S_DB_BG2PA, mtx, centerX, centerY, x, y);
 }
 
 static inline void G2S_SetBG3Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    gfxRegSetBGTransform((u32)&reg_G2S_DB_BG3PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((u32)&reg_G2S_DB_BG3PA, mtx, centerX, centerY, x, y);
 }
 
 // NitroSDK's GX_SetGraphicsMode and GXS_SetGraphicsMode
 // NitroSDK's GX_BeginLoadTex, GX_LoadTex and GX_EndLoadTex, and the same for palettes. The destination is an offset
 // into the memory of the textures or the palettes (gx_load3d.c)
-void gfxBeginTextureUpload(void);
-void gfxUploadTexture(const void *src, u32 offset, u32 size);
-void gfxEndTextureUpload(void);
-void gfxBeginPaletteUpload(void);
-void gfxUploadPalette(const void *src, u32 offset, u32 size);
-void gfxEndPaletteUpload(void);
+void GX_BeginLoadTex(void);                                 // swan's gfxBeginTextureUpload
+void GX_LoadTex(const void *src, u32 offset, u32 size);     // swan's gfxUploadTexture
+void GX_EndLoadTex(void);                                   // swan's gfxEndTextureUpload
+void GX_BeginLoadTexPltt(void);                             // swan's gfxBeginPaletteUpload
+void GX_LoadTexPltt(const void *src, u32 offset, u32 size); // swan's gfxUploadPalette
+void GX_EndLoadTexPltt(void);                               // swan's gfxEndPaletteUpload
 // NitroSDK's GX_BeginLoadClearImage, GX_LoadClearImageColor, GX_LoadClearImageDepth and GX_EndLoadClearImage
-void gfxBeginRearPlaneImageUpload(void);
-void gfxUploadRearPlaneImageA(const void *src, u32 size);
-void gfxUploadRearPlaneImageB(const void *src, u32 size);
-void gfxEndRearPlaneImageUpload(void);
+void GX_BeginLoadClearImage(void);                      // swan's gfxBeginRearPlaneImageUpload
+void GX_LoadClearImageColor(const void *src, u32 size); // swan's gfxUploadRearPlaneImageA
+void GX_LoadClearImageDepth(const void *src, u32 size); // swan's gfxUploadRearPlaneImageB
+void GX_EndLoadClearImage(void);                        // swan's gfxEndRearPlaneImageUpload
 // NitroSDK's G3_LoadMtx43, G3_MultMtx43 and G3_MultMtx33
-void gfxLoadMatrix4x3(const MtxFx43 *mtx);
-void gfxMultMatrix4x3(const MtxFx43 *mtx);
-void gfxMultMatrix3x3(const MtxFx33 *mtx);
-void gfxSetEngineModeA(int dispMode, int bgMode, int bg0As3D);
-void gfxSetBGModeB(int bgMode);
+void G3_LoadMtx43(const MtxFx43 *mtx);                          // swan's gfxLoadMatrix4x3
+void G3_MultMtx43(const MtxFx43 *mtx);                          // swan's gfxMultMatrix4x3
+void G3_MultMtx33(const MtxFx33 *mtx);                          // swan's gfxMultMatrix3x3
+void GX_SetGraphicsMode(int dispMode, int bgMode, int bg0As3D); // swan's gfxSetEngineModeA
+void GXS_SetGraphicsMode(int bgMode);                           // swan's gfxSetBGModeB
 // NitroSDK's GX_HBlankIntr and GX_VBlankIntr, which return whether the interrupt was enabled
-s32 gfxSetHBlankIRQEnabled(BOOL enable);
-s32 gfxSetVBlankIRQEnabled(BOOL enable);
+s32 GX_HBlankIntr(BOOL enable); // swan's gfxSetHBlankIRQEnabled
+s32 GX_VBlankIntr(BOOL enable); // swan's gfxSetVBlankIRQEnabled
 
 // NitroSDK's loads to BG VRAM: GX_LoadBG0Scr to GXS_LoadBG3Scr, GX_LoadBG0Char to GXS_LoadBG3Char, and GX_LoadBGPltt
 // and GXS_LoadBGPltt
-void gfxUploadBGScreen0A(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen1A(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen2A(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen3A(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen0B(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen1B(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen2B(const void *src, u32 offset, u32 size);
-void gfxUploadBGScreen3B(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar0A(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar1A(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar2A(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar3A(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar0B(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar1B(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar2B(const void *src, u32 offset, u32 size);
-void gfxUploadBGChar3B(const void *src, u32 offset, u32 size);
-void gfxUploadStdPaletteBGA(const void *src, u32 offset, u32 size);
-void gfxUploadStdPaletteBGB(const void *src, u32 offset, u32 size);
+void GX_LoadBG0Scr(const void *src, u32 offset, u32 size);   // swan's gfxUploadBGScreen0A
+void GX_LoadBG1Scr(const void *src, u32 offset, u32 size);   // swan's gfxUploadBGScreen1A
+void GX_LoadBG2Scr(const void *src, u32 offset, u32 size);   // swan's gfxUploadBGScreen2A
+void GX_LoadBG3Scr(const void *src, u32 offset, u32 size);   // swan's gfxUploadBGScreen3A
+void GXS_LoadBG0Scr(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGScreen0B
+void GXS_LoadBG1Scr(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGScreen1B
+void GXS_LoadBG2Scr(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGScreen2B
+void GXS_LoadBG3Scr(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGScreen3B
+void GX_LoadBG0Char(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGChar0A
+void GX_LoadBG1Char(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGChar1A
+void GX_LoadBG2Char(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGChar2A
+void GX_LoadBG3Char(const void *src, u32 offset, u32 size);  // swan's gfxUploadBGChar3A
+void GXS_LoadBG0Char(const void *src, u32 offset, u32 size); // swan's gfxUploadBGChar0B
+void GXS_LoadBG1Char(const void *src, u32 offset, u32 size); // swan's gfxUploadBGChar1B
+void GXS_LoadBG2Char(const void *src, u32 offset, u32 size); // swan's gfxUploadBGChar2B
+void GXS_LoadBG3Char(const void *src, u32 offset, u32 size); // swan's gfxUploadBGChar3B
+void GX_LoadBGPltt(const void *src, u32 offset, u32 size);   // swan's gfxUploadStdPaletteBGA
+void GXS_LoadBGPltt(const void *src, u32 offset, u32 size);  // swan's gfxUploadStdPaletteBGB
 
 // NitroSDK's GX_LoadOBJPltt, GXS_LoadOBJPltt, GX_LoadOBJ and GXS_LoadOBJ
-void gfxUploadStdPaletteObjA(const void *src, u32 offset, u32 size);
-void gfxUploadStdPaletteObjB(const void *src, u32 offset, u32 size);
-void gfxUploadObjCharA(const void *src, u32 offset, u32 size);
-void gfxUploadObjCharB(const void *src, u32 offset, u32 size);
+void GX_LoadOBJPltt(const void *src, u32 offset, u32 size);  // swan's gfxUploadStdPaletteObjA
+void GXS_LoadOBJPltt(const void *src, u32 offset, u32 size); // swan's gfxUploadStdPaletteObjB
+void GX_LoadOBJ(const void *src, u32 offset, u32 size);      // swan's gfxUploadObjCharA
+void GXS_LoadOBJ(const void *src, u32 offset, u32 size);     // swan's gfxUploadObjCharB
 // The DMA channel that GX loads and fills with, or GX_DMA_NOT_USE for the CPU. swan calls it g_GfxDMANo
 extern u32 GXi_DmaId;
 
@@ -1439,108 +1440,107 @@ static inline void GXi_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size) {
         dmaNo = GX_DMA_NOT_USE;
     }
     if (dmaNo != GX_DMA_NOT_USE) {
-        dma_fill(dmaNo, dest, data, size, TRUE);
+        MIi_DmaFill32(dmaNo, dest, data, size, TRUE);
     } else {
-        sys_memset32(data, dest, size);
+        MIi_CpuClear32(data, dest, size);
     }
 }
 
 // NitroSDK's GX_LoadOAM and GXS_LoadOAM
-void gfxUploadOAMA(const void *src, u32 offset, u32 size);
-void gfxUploadOAMB(const void *src, u32 offset, u32 size);
+void GX_LoadOAM(const void *src, u32 offset, u32 size);  // swan's gfxUploadOAMA
+void GXS_LoadOAM(const void *src, u32 offset, u32 size); // swan's gfxUploadOAMB
 
 // NitroSDK's loads to extended palette VRAM: GX_BeginLoadBGExtPltt, GX_LoadBGExtPltt and GX_EndLoadBGExtPltt, and the
 // same for OBJ and for the sub engine
-void gfxBeginBGExtPltAUpload(void);
-void gfxUploadExtPaletteBGA(const void *src, u32 offset, u32 size);
-void gfxEndBGExtPltAUpload(void);
-void gfxBeginObjExtPltAUpload(void);
-void gfxUploadExtPaletteObjA(const void *src, u32 offset, u32 size);
-void gfxEndObjExtPltAUpload(void);
-void gfxBeginBGExtPltBUpload(void);
-void gfxUploadExtPaletteBGB(const void *src, u32 offset, u32 size);
-void gfxEndBGExtPltBUpload(void);
-void gfxBeginObjExtPltBUpload(void);
-void gfxUploadExtPaletteObjB(const void *src, u32 offset, u32 size);
-void gfxEndObjExtPltBUpload(void);
+void GX_BeginLoadBGExtPltt(void);                               // swan's gfxBeginBGExtPltAUpload
+void GX_LoadBGExtPltt(const void *src, u32 offset, u32 size);   // swan's gfxUploadExtPaletteBGA
+void GX_EndLoadBGExtPltt(void);                                 // swan's gfxEndBGExtPltAUpload
+void GX_BeginLoadOBJExtPltt(void);                              // swan's gfxBeginObjExtPltAUpload
+void GX_LoadOBJExtPltt(const void *src, u32 offset, u32 size);  // swan's gfxUploadExtPaletteObjA
+void GX_EndLoadOBJExtPltt(void);                                // swan's gfxEndObjExtPltAUpload
+void GXS_BeginLoadBGExtPltt(void);                              // swan's gfxBeginBGExtPltBUpload
+void GXS_LoadBGExtPltt(const void *src, u32 offset, u32 size);  // swan's gfxUploadExtPaletteBGB
+void GXS_EndLoadBGExtPltt(void);                                // swan's gfxEndBGExtPltBUpload
+void GXS_BeginLoadOBJExtPltt(void);                             // swan's gfxBeginObjExtPltBUpload
+void GXS_LoadOBJExtPltt(const void *src, u32 offset, u32 size); // swan's gfxUploadExtPaletteObjB
+void GXS_EndLoadOBJExtPltt(void);                               // swan's gfxEndObjExtPltBUpload
 
 // NitroSDK's GX_GetBankForOBJ and GX_GetBankForSubOBJ
-u16 gfxGetObjBanksA(void);
-u16 gfxGetObjBanksB(void);
+u16 GX_GetBankForOBJ(void);    // swan's gfxGetObjBanksA
+u16 GX_GetBankForSubOBJ(void); // swan's gfxGetObjBanksB
 
 // NitroSDK's G2_GetBG0ScrPtr to G2_GetBG3ScrPtr and G2S_GetBG0ScrPtr to G2S_GetBG3ScrPtr (gx_bgcnt.c)
-void *gfxGetScreenAddrBG0A(void);
-void *gfxGetScreenAddrBG1A(void);
-void *gfxGetScreenAddrBG2A(void);
-void *gfxGetScreenAddrBG3A(void);
-void *gfxGetScreenAddrBG0B(void);
-void *gfxGetScreenAddrBG1B(void);
-void *gfxGetScreenAddrBG2B(void);
-void *gfxGetScreenAddrBG3B(void);
+void *G2_GetBG0ScrPtr(void);  // swan's gfxGetScreenAddrBG0A
+void *G2_GetBG1ScrPtr(void);  // swan's gfxGetScreenAddrBG1A
+void *G2_GetBG2ScrPtr(void);  // swan's gfxGetScreenAddrBG2A
+void *G2_GetBG3ScrPtr(void);  // swan's gfxGetScreenAddrBG3A
+void *G2S_GetBG0ScrPtr(void); // swan's gfxGetScreenAddrBG0B
+void *G2S_GetBG1ScrPtr(void); // swan's gfxGetScreenAddrBG1B
+void *G2S_GetBG2ScrPtr(void); // swan's gfxGetScreenAddrBG2B
+void *G2S_GetBG3ScrPtr(void); // swan's gfxGetScreenAddrBG3B
 
 // NitroSDK's G2_GetBG0CharPtr to G2S_GetBG3CharPtr
-void *gfxGetCharAddrBG0A(void);
-void *gfxGetCharAddrBG1A(void);
-void *gfxGetCharAddrBG2A(void);
-void *gfxGetCharAddrBG3A(void);
-void *gfxGetCharAddrBG0B(void);
-void *gfxGetCharAddrBG1B(void);
-void *gfxGetCharAddrBG2B(void);
-void *gfxGetCharAddrBG3B(void);
+void *G2_GetBG0CharPtr(void);  // swan's gfxGetCharAddrBG0A
+void *G2_GetBG1CharPtr(void);  // swan's gfxGetCharAddrBG1A
+void *G2_GetBG2CharPtr(void);  // swan's gfxGetCharAddrBG2A
+void *G2_GetBG3CharPtr(void);  // swan's gfxGetCharAddrBG3A
+void *G2S_GetBG0CharPtr(void); // swan's gfxGetCharAddrBG0B
+void *G2S_GetBG1CharPtr(void); // swan's gfxGetCharAddrBG1B
+void *G2S_GetBG2CharPtr(void); // swan's gfxGetCharAddrBG2B
+void *G2S_GetBG3CharPtr(void); // swan's gfxGetCharAddrBG3B
 
-// NitroSDK libgx's gx_vramcnt.c, under swan's names: gfxSet<Use>Banks is NitroSDK's GX_SetBankFor<Use>,
-// gfxAcquire<Use>Banks its GX_ResetBankFor<Use>, gfxDisable<Use>Banks its GX_DisableBankFor<Use> and
-// gfxGet<Use>Banks its GX_GetBankFor<Use>. The uses are BG (the SDK's BG), Obj (OBJ), BGExtPlt (BGExtPltt), ObjExtPlt
-// (OBJExtPltt), Texture (Tex), Palette (TexPltt), RearPlaneImage (ClearImage), PlainARM7 (ARM7) and LCDC; the sub
-// engine's, with a B, are SubBG, SubOBJ, SubBGExtPltt and SubOBJExtPltt. Set takes the banks for a use, which the
-// enums above name, and puts the ones it had back to LCDC mode; Acquire (Reset) gives the banks of a use back to LCDC
-// mode and returns them; Disable turns them off and unlocks them for the lock ID that GX_Init took. The Acquire and
-// Disable of an extended palette also turn it off in DISPCNT
-void gfxSetLCDCBanks(u32 banks);
-void gfxSetBGBanksA(GXVRamBG banks);
-void gfxSetObjBanksA(GXVRamOBJ banks);
-void gfxSetBGExtPltBanksA(GXVRamBGExtPltt banks);
-void gfxSetObjExtPltBanksA(GXVRamOBJExtPltt banks);
-void gfxSetTextureBanks(GXVRamTex banks);
-void gfxSetPaletteBanks(GXVRamTexPltt banks);
-void gfxSetRearPlaneImageBanks(GXVRamClearImage banks);
-void gfxSetPlainARM7Banks(GXVRamARM7 banks);
-void gfxSetBGBanksB(GXVRamSubBG banks);
-void gfxSetObjBanksB(GXVRamSubOBJ banks);
-void gfxSetBGExtPltBanksB(GXVRamSubBGExtPltt banks);
-void gfxSetObjExtPltBanksB(GXVRamSubOBJExtPltt banks);
-u32 gfxAcquireBGBanksA(void);
-u32 gfxAcquireObjBanksA(void);
-GXVRamBGExtPltt gfxAcquireBGExtPltBanksA(void);
-GXVRamOBJExtPltt gfxAcquireObjExtPltBanksA(void);
+// NitroSDK libgx's gx_vramcnt.c: GX_SetBankFor<Use>, GX_ResetBankFor<Use>, GX_DisableBankFor<Use> and
+// GX_GetBankFor<Use>, which swan calls gfxSet<Use>Banks, gfxAcquire<Use>Banks, gfxDisable<Use>Banks and
+// gfxGet<Use>Banks. The uses are BG, OBJ (Obj), BGExtPltt (BGExtPlt), OBJExtPltt (ObjExtPlt), Tex (Texture), TexPltt
+// (Palette), ClearImage (RearPlaneImage), ARM7 (PlainARM7) and LCDC; the sub engine's, which swan gives a B, are SubBG,
+// SubOBJ, SubBGExtPltt and SubOBJExtPltt. Set takes the banks for a use, which the enums above name, and puts the ones
+// it had back to LCDC mode; Reset gives the banks of a use back to LCDC mode and returns them; Disable turns them off
+// and unlocks them for the lock ID that GX_Init took. The Reset and Disable of an extended palette also turn it off in
+// DISPCNT
+void GX_SetBankForLCDC(u32 banks);                          // swan's gfxSetLCDCBanks
+void GX_SetBankForBG(GXVRamBG banks);                       // swan's gfxSetBGBanksA
+void GX_SetBankForOBJ(GXVRamOBJ banks);                     // swan's gfxSetObjBanksA
+void GX_SetBankForBGExtPltt(GXVRamBGExtPltt banks);         // swan's gfxSetBGExtPltBanksA
+void GX_SetBankForOBJExtPltt(GXVRamOBJExtPltt banks);       // swan's gfxSetObjExtPltBanksA
+void GX_SetBankForTex(GXVRamTex banks);                     // swan's gfxSetTextureBanks
+void GX_SetBankForTexPltt(GXVRamTexPltt banks);             // swan's gfxSetPaletteBanks
+void GX_SetBankForClearImage(GXVRamClearImage banks);       // swan's gfxSetRearPlaneImageBanks
+void GX_SetBankForARM7(GXVRamARM7 banks);                   // swan's gfxSetPlainARM7Banks
+void GX_SetBankForSubBG(GXVRamSubBG banks);                 // swan's gfxSetBGBanksB
+void GX_SetBankForSubOBJ(GXVRamSubOBJ banks);               // swan's gfxSetObjBanksB
+void GX_SetBankForSubBGExtPltt(GXVRamSubBGExtPltt banks);   // swan's gfxSetBGExtPltBanksB
+void GX_SetBankForSubOBJExtPltt(GXVRamSubOBJExtPltt banks); // swan's gfxSetObjExtPltBanksB
+u32 GX_ResetBankForBG(void);                                // swan's gfxAcquireBGBanksA
+u32 GX_ResetBankForOBJ(void);                               // swan's gfxAcquireObjBanksA
+GXVRamBGExtPltt GX_ResetBankForBGExtPltt(void);             // swan's gfxAcquireBGExtPltBanksA
+GXVRamOBJExtPltt GX_ResetBankForOBJExtPltt(void);           // swan's gfxAcquireObjExtPltBanksA
 // Returns the banks the textures had
-u32 gfxAcquireTextureBanks(void);
-GXVRamTexPltt gfxAcquirePaletteBanks(void);
-u32 gfxAcquireRearPlaneImageBanks(void);
-u32 gfxAcquireBGBanksB(void);
-u32 gfxAcquireObjBanksB(void);
-u32 gfxAcquireBGExtPltBanksB(void);
-u32 gfxAcquireObjExtPltBanksB(void);
-void gfxDisableBGBanksA(void);
-void gfxDisableObjBanksA(void);
-void gfxDisableBGExtPltBanksA(void);
-void gfxDisableObjExtPltBanksA(void);
-void gfxDisableTextureBanks(void);
-void gfxDisablePaletteBanks(void);
-void gfxDisableRearPlaneImageBanks(void);
-void gfxDisablePlainARM7Banks(void);
-void gfxDisableLCDCBanks(void);
-void gfxDisableBGBanksB(void);
-void gfxDisableObjBanksB(void);
-void gfxDisableBGExtPltBanksB(void);
-void gfxDisableObjExtPltBanksB(void);
-u32 gfxGetLCDCBanks(void);
-u32 gfxGetTextureBanks(void);
-u32 gfxGetObjExtPltBanksA(void);
-u32 gfxGetObjExtPltBanksB(void);
+u32 GX_ResetBankForTex(void);               // swan's gfxAcquireTextureBanks
+GXVRamTexPltt GX_ResetBankForTexPltt(void); // swan's gfxAcquirePaletteBanks
+u32 GX_ResetBankForClearImage(void);        // swan's gfxAcquireRearPlaneImageBanks
+u32 GX_ResetBankForSubBG(void);             // swan's gfxAcquireBGBanksB
+u32 GX_ResetBankForSubOBJ(void);            // swan's gfxAcquireObjBanksB
+u32 GX_ResetBankForSubBGExtPltt(void);      // swan's gfxAcquireBGExtPltBanksB
+u32 GX_ResetBankForSubOBJExtPltt(void);     // swan's gfxAcquireObjExtPltBanksB
+void GX_DisableBankForBG(void);             // swan's gfxDisableBGBanksA
+void GX_DisableBankForOBJ(void);            // swan's gfxDisableObjBanksA
+void GX_DisableBankForBGExtPltt(void);      // swan's gfxDisableBGExtPltBanksA
+void GX_DisableBankForOBJExtPltt(void);     // swan's gfxDisableObjExtPltBanksA
+void GX_DisableBankForTex(void);            // swan's gfxDisableTextureBanks
+void GX_DisableBankForTexPltt(void);        // swan's gfxDisablePaletteBanks
+void GX_DisableBankForClearImage(void);     // swan's gfxDisableRearPlaneImageBanks
+void GX_DisableBankForARM7(void);           // swan's gfxDisablePlainARM7Banks
+void GX_DisableBankForLCDC(void);           // swan's gfxDisableLCDCBanks
+void GX_DisableBankForSubBG(void);          // swan's gfxDisableBGBanksB
+void GX_DisableBankForSubOBJ(void);         // swan's gfxDisableObjBanksB
+void GX_DisableBankForSubBGExtPltt(void);   // swan's gfxDisableBGExtPltBanksB
+void GX_DisableBankForSubOBJExtPltt(void);  // swan's gfxDisableObjExtPltBanksB
+u32 GX_GetBankForLCDC(void);                // swan's gfxGetLCDCBanks
+u32 GX_GetBankForTex(void);                 // swan's gfxGetTextureBanks
+u32 GX_GetBankForOBJExtPltt(void);          // swan's gfxGetObjExtPltBanksA
+u32 GX_GetBankForSubOBJExtPltt(void);       // swan's gfxGetObjExtPltBanksB
 
-// NitroSDK's GX_DispOn
-void gfxEngineEnableA(void);
+void GX_DispOn(void); // swan's gfxEngineEnableA
 
 #define GX_VRAM_LCDC_ALL 0x1ff
 
@@ -1589,7 +1589,7 @@ typedef struct GXState {
     u16 subObjExtPltt;
 } GXState;
 
-extern GXState gGXState;
+extern GXState gGXState; // swan's g_GfxVRAMLCDCBanks
 
 // VRAM as the CPU sees it with every bank given to it, and OAM
 #define HW_LCDC_VRAM 0x06800000
@@ -1659,31 +1659,33 @@ static inline void GXS_DispOn(void) {
     reg_GXS_DB_DISPCNT |= REG_GXS_DB_DISPCNT_MODE_MASK;
 }
 
-// NitroSDK's G3X_Reset, G3X_InitMtxStack and G3X_GetBoxTestResult, under swan's names. The box test result is 0 when
+// NitroSDK's G3X_Reset, G3X_InitMtxStack and G3X_GetBoxTestResult. The box test result is 0 when
 // the box is outside the view, and the function returns nonzero while the test is still running
-void gfxReset3D(void);
-// NitroSDK's G3X_Init, under swan's name
-void gfxInit3D(void);
-// NitroSDK's G3X_GetClipMtx and G3X_GetVectorMtx, under swan's names: copy the clip matrix (the position matrix with
+void G3X_Reset(void); // swan's gfxReset3D
+// NitroSDK's G3X_Init
+void G3X_Init(void); // swan's gfxInit3D
+// NitroSDK's G3X_GetClipMtx and G3X_GetVectorMtx: copy the clip matrix (the position matrix with
 // the projection matrix applied) or the vector matrix that the geometry engine last made into dest. Both return -1
 // without copying while the engine is busy, and 0 once they have
-int gfxGetClipMatrix(MtxFx44 *dest);
-int gfxGetNormalMatrix(MtxFx33 *dest);
+int G3X_GetClipMtx(MtxFx44 *dest);   // swan's gfxGetClipMatrix
+int G3X_GetVectorMtx(MtxFx33 *dest); // swan's gfxGetNormalMatrix
 // NitroSDK's G3i_LookAt_, which loads the camera matrix into the geometry engine when isLoad is set, G3_RotX, G3_RotY,
-// G3_RotZ and G3_MultTransMtx33, under swan's names
-void gfxLookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, BOOL isLoad, MtxFx43 *mtx);
+// G3_RotZ and G3_MultTransMtx33
+// swan's gfxLookAt
+void G3i_LookAt_(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, BOOL isLoad, MtxFx43 *mtx);
 // NitroSDK's G3i_PerspectiveW_, which loads the projection matrix into the geometry engine when isLoad is set
-void gfxPerspective(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx);
+// swan's gfxPerspective
+void G3i_PerspectiveW_(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx);
 // NitroSDK's G3i_OrthoW_, which loads the projection matrix into the geometry engine when isLoad is set
-void gfxOrtho(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx);
-void gfxRotateX(fx32 sin, fx32 cos);
-void gfxRotateY(fx32 sin, fx32 cos);
-void gfxRotateZ(fx32 sin, fx32 cos);
-// NitroSDK's G3_MultMtx44
-void gfxMultMatrix4x4(const MtxFx44 *mtx);
-void gfxMultTransRot4x3(const MtxFx33 *mtx, const VecFx32 *trans);
-void gfxResetMatrixStack(void);
-int gfxGetBoxTestResult(s32 *in);
+// swan's gfxOrtho
+void G3i_OrthoW_(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, BOOL isLoad, MtxFx44 *mtx);
+void G3_RotX(fx32 sin, fx32 cos);                                 // swan's gfxRotateX
+void G3_RotY(fx32 sin, fx32 cos);                                 // swan's gfxRotateY
+void G3_RotZ(fx32 sin, fx32 cos);                                 // swan's gfxRotateZ
+void G3_MultMtx44(const MtxFx44 *mtx);                            // swan's gfxMultMatrix4x4
+void G3_MultTransMtx33(const MtxFx33 *mtx, const VecFx32 *trans); // swan's gfxMultTransRot4x3
+void G3X_InitMtxStack(void);                                      // swan's gfxResetMatrixStack
+int G3X_GetBoxTestResult(s32 *in);                                // swan's gfxGetBoxTestResult
 
 // NitroSDK libgx's gx.c: the power and display registers it sets up, and its entry points
 #define reg_G2_BG2PD (*(vu16 *)0x04000026)
@@ -1729,19 +1731,19 @@ static inline void GX_SetPower(int power) {
 #define REG_GX_MASTER_BRIGHT_MODE_UP 0x4000
 #define REG_GX_MASTER_BRIGHT_MODE_DOWN 0x8000
 
-// NitroSDK's GX_Init, GX_SetVCountEqVal, GX_IsDispOn and GX_DispOff, under swan's names
-void gfxInit(void);
-void gfxSetVCountIntrLine(int vcount);
-BOOL gfxEngineIsEnabledA(void);
-void gfxEngineDisableA(void);
+// NitroSDK's GX_Init, GX_SetVCountEqVal, GX_IsDispOn and GX_DispOff
+void GX_Init(void);                 // swan's gfxInit
+void GX_SetVCountEqVal(int vcount); // swan's gfxSetVCountIntrLine
+BOOL GX_IsDispOn(void);             // swan's gfxEngineIsEnabledA
+void GX_DispOff(void);              // swan's gfxEngineDisableA
 // NitroSDK's G2x_SetMasterBrightness_ and G2x_GetMasterBrightness_, which take the address of the register: -16 to 16,
 // 0 for none
-void GFXRegSetMasterBrightness(u32 reg, s32 brightness);
-s32 gfxRegGetMasterBrightness(u32 reg);
+void GXx_SetMasterBrightness_(u32 reg, s32 brightness); // swan's GFXRegSetMasterBrightness
+s32 GXx_GetMasterBrightness_(u32 reg);                  // swan's gfxRegGetMasterBrightness
 // NitroSDK's GX_InitGXState (gx_state.c)
-void gfxInitVRAM(void);
+void GX_InitGXState(void); // swan's gfxInitVRAM
 // The lock ID that GX_Init takes for the VRAM banks. NitroSDK's GXi_VRamLockId, swan's g_GfxCartLock
-extern u16 g_GfxCartLock;
+extern u16 GXi_VRamLockId;
 
 // NitroSDK libgx's g2.c: the 2D engines' blending and brightness effect, set through the address of BLDCNT, which is
 // followed by BLDALPHA and, 4 bytes on, BLDY
@@ -1752,25 +1754,25 @@ extern u16 g_GfxCartLock;
 
 // NitroSDK's G2x_SetBlendAlpha_: alpha blending of the planes of plane1 over those of plane2. The sub screen's BLDCNT
 // is at REG_DB_BLDCNT_ADDR
-void gfxRegSetAlphaBlend(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2);
+void G2x_SetBlendAlpha_(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2); // swan's gfxRegSetAlphaBlend
 // NitroSDK's G2x_SetBlendBrightness_: brightens the planes by a positive brightness or darkens them by a negative one
-void gfxRegSetBrightnessBlend(u32 reg, u32 plane, s32 brightness);
+void G2x_SetBlendBrightness_(u32 reg, u32 plane, s32 brightness); // swan's gfxRegSetBrightnessBlend
 // NitroSDK's G2x_SetBlendBrightnessExt_: the brightness effect, with the alphas that BLDALPHA holds for the planes
 // that it is not applied to
-void gfxRegSetBlend(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness);
+// swan's gfxRegSetBlend
+void G2x_SetBlendBrightnessExt_(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness);
 // NitroSDK's G2x_ChangeBlendBrightness_: changes the brightness effect's level and keeps its planes, turning a
 // brightening into a darkening and back
-void gfxRegAdjustBrightnessBlend(u32 reg, s32 brightness);
+void G2x_ChangeBlendBrightness_(u32 reg, s32 brightness); // swan's gfxRegAdjustBrightnessBlend
 
 // NitroSDK libgx's g3imm.c and g3_util.c: matrix commands through the FIFO port, and rotations through the matrix
 // multiplication port
 #define reg_G3_MTX_MULT_3x3 (*(vu32 *)0x04000468)
 
-// NitroSDK's G3_LoadMtx44
-void gfxLoadMatrix4x4(const MtxFx44 *mtx);
+void G3_LoadMtx44(const MtxFx44 *mtx); // swan's gfxLoadMatrix4x4
 // NitroSDK's GX_SendFifo64B and GX_SendFifo48B, which copy 64 or 48 bytes to one address (gxasm.c)
-void gfxUploadMatrix4x4(const void *src, volatile void *dest);
-void gfxUploadMatrix4x3(const void *src, volatile void *dest);
+void GX_SendFifo64B(const void *src, volatile void *dest); // swan's gfxUploadMatrix4x4
+void GX_SendFifo48B(const void *src, volatile void *dest); // swan's gfxUploadMatrix4x3
 
 // NitroSDK libgx's g3x.c: the 3D engine's registers that it clears, polls and loads, and its entry points
 #define reg_G3X_GXSTAT (*(vu32 *)0x04000600)
@@ -1827,24 +1829,21 @@ static inline void G3X_SetFifoIntrCond(GXFifoIntrCond cond) {
 }
 
 // NitroSDK's GXi_NopClearFifo128_, which writes 128 zero words to the FIFO port
-void gfxClearFIFO(void *fifo);
-// NitroSDK's G3X_ClearFifo
-void gfxResetFIFO(void);
-// NitroSDK's G3X_ResetMtxStack: G3X_InitMtxStack (gfxResetMatrixStack) without the projection matrix's identity
-void gfxResetMatrixStackKeepProjection(void);
-// NitroSDK's G3X_SetFog
-void gfxSetFog(BOOL enabled, int alphaMode, int depthShift, int offset);
+void GXi_NopClearFifo128_(void *fifo); // swan's gfxClearFIFO
+void G3X_ClearFifo(void);              // swan's gfxResetFIFO
+// NitroSDK's G3X_ResetMtxStack: G3X_InitMtxStack without the projection matrix's identity
+void G3X_ResetMtxStack(void);                                             // swan's gfxResetMatrixStackKeepProjection
+void G3X_SetFog(BOOL enabled, int alphaMode, int depthShift, int offset); // swan's gfxSetFog
 // NitroSDK's G3X_SetEdgeColorTable, G3X_SetFogTable and G3X_SetClearColor
-void gfxSetEdgeColorTable(const GXRgb *table);
-void gfxSetFogTable(const u32 *table);
-void gfxClearColor(GXRgb color, int alpha, int depth, int polygonId, BOOL fog);
+void G3X_SetEdgeColorTable(const GXRgb *table);                                     // swan's gfxSetEdgeColorTable
+void G3X_SetFogTable(const u32 *table);                                             // swan's gfxSetFogTable
+void G3X_SetClearColor(GXRgb color, int alpha, int depth, int polygonId, BOOL fog); // swan's gfxClearColor
 // NitroSDK's G3X_InitTable: clears the edge color, fog and toon tables and the shininess table
-void gfxResetLUTs(void);
+void G3X_InitTable(void); // swan's gfxResetLUTs
 // NitroSDK's G3X_GetMtxStackLevelPV and G3X_GetMtxStackLevelPJ, which return -1 while the stacks are busy
-int gfxGetWorldMatrixStackLevel(u32 *level);
-int gfxGetProjectionMatrixStackLevel(u32 *level);
-// NitroSDK's G3X_SetDisp1DotDepth
-void gfxSet1DotDepth(fx32 depth);
+int G3X_GetMtxStackLevelPV(u32 *level); // swan's gfxGetWorldMatrixStackLevel
+int G3X_GetMtxStackLevelPJ(u32 *level); // swan's gfxGetProjectionMatrixStackLevel
+void G3X_SetDisp1DotDepth(fx32 depth);  // swan's gfxSet1DotDepth
 
 // The loaders' copies (gx_load2d.c, gx_load3d.c): by DMA on GX's channel, by NDMA when it is one of the DSi's (numbers
 // above 3), or with the CPU when it has none or the copy is small (up to 28 bytes by halfwords, 48 by words). NDMA
@@ -1853,12 +1852,12 @@ static inline void GXi_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 siz
     if (dmaNo != GX_DMA_NOT_USE && size > 28) {
         if (dmaNo > MI_DMA_MAX_NUM) {
             if ((((u32)src | (u32)dest | size) & 3) == 0) {
-                func_02768180(dmaNo - 4, src, dest, size);
+                MI_NDmaCopy(dmaNo - 4, src, dest, size);
             } else {
                 MI_CpuCopy16(src, dest, size);
             }
         } else {
-            func_020780e8(dmaNo, src, dest, size, TRUE);
+            MIi_DmaCopy16(dmaNo, src, dest, size, TRUE);
         }
     } else {
         MI_CpuCopy16(src, dest, size);
@@ -1868,12 +1867,12 @@ static inline void GXi_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 siz
 static inline void GXi_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size) {
     if (dmaNo != GX_DMA_NOT_USE && size > 48) {
         if (dmaNo > MI_DMA_MAX_NUM) {
-            func_02768180(dmaNo - 4, src, dest, size);
+            MI_NDmaCopy(dmaNo - 4, src, dest, size);
         } else {
-            dma_copy(dmaNo, src, dest, size, TRUE);
+            MIi_DmaCopy32(dmaNo, src, dest, size, TRUE);
         }
     } else {
-        sys_memcpy32(src, dest, size);
+        MIi_CpuCopy32(src, dest, size);
     }
 }
 
@@ -1882,12 +1881,12 @@ static inline void GXi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u3
                                       void *arg) {
     if (dmaNo != GX_DMA_NOT_USE) {
         if (dmaNo > MI_DMA_MAX_NUM) {
-            func_027681f4(dmaNo - 4, src, dest, size, callback, arg);
+            MI_NDmaCopyAsync(dmaNo - 4, src, dest, size, callback, arg);
         } else {
-            dma_copyEx(dmaNo, src, dest, size, callback, arg, TRUE);
+            MIi_DmaCopy32Async(dmaNo, src, dest, size, callback, arg, TRUE);
         }
     } else {
-        sys_memcpy32(src, dest, size);
+        MIi_CpuCopy32(src, dest, size);
     }
 }
 
@@ -1895,9 +1894,9 @@ static inline void GXi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u3
 static inline void GXi_WaitDma(u32 dmaNo) {
     if (dmaNo != GX_DMA_NOT_USE) {
         if (dmaNo > MI_DMA_MAX_NUM) {
-            func_0276824c(dmaNo - 4);
+            MI_WaitNDma(dmaNo - 4);
         } else {
-            func_0207829c(dmaNo);
+            MI_WaitDma(dmaNo);
         }
     }
 }

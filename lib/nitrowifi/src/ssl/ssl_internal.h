@@ -6,7 +6,7 @@
 // SSL's state and helpers, shared by its files
 
 // The C library's string functions the main module links, under their own names (ssl.c's certificate and session
-// matching and biginteger.c need them; sys_memcpy and sys_memset, with the reversed argument order, cover the rest).
+// matching and biginteger.c need them; MI_CpuCopy8 and MI_CpuFill8, with the reversed argument order, cover the rest).
 // They are not taken from <string.h>: MWCC builds strcmp and strlen in place when <string.h> declares them, where the
 // ROM calls them
 void *memmove(void *dest, const void *src, u32 size);

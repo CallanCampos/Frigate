@@ -586,7 +586,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         break;
     case 319:
         bsw->recvCount = 0;
-        sys_memset(bsw->recvBuf, 0, sizeof(bsw->recvBuf));
+        MI_CpuFill8(bsw->recvBuf, 0, sizeof(bsw->recvBuf));
         break;
     case 320:
         ScriptWork_CallEvent(work, func_ov012_02166118(bsw, gsys, param0, param1, 5));
@@ -739,7 +739,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 348:
-        sys_memset(&bsw->ov306Param, 0, sizeof(bsw->ov306Param));
+        MI_CpuFill8(&bsw->ov306Param, 0, sizeof(bsw->ov306Param));
         bsw->ov306Param.gameData = gameData;
         bsw->ov306Param.unk4 = 1;
         bsw->ov306Param.unk8 = 0;
@@ -879,7 +879,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = func_0203ffc4();
         break;
     case 408:
-        sys_memset(&bsw->ircMatchParam, 0, sizeof(bsw->ircMatchParam));
+        MI_CpuFill8(&bsw->ircMatchParam, 0, sizeof(bsw->ircMatchParam));
         bsw->ircMatchParam.gameData = gameData;
         bsw->ircMatchParam.result = IRCBATTLEMATCH_MODE_BSUBWAY;
         ScriptWork_CallEvent(work, EventFieldSubprocessTransition_CreateWithCallback(

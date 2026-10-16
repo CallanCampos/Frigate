@@ -323,13 +323,13 @@ PartyPkm *boxPkmRegenToPartyPkm(BoxPkm *pkm, HeapID heapId) {
 }
 
 void PokeParty_ClearPkm(PartyPkm *pkm) {
-    sys_memset32_fast(0, pkm, sizeof(PartyPkm));
+    MIi_CpuClearFast(0, pkm, sizeof(PartyPkm));
     PML_CryptoRun(&pkm->base.contentBuffer, sizeof(PkmBuffer), pkm->base.checksum);
     PML_CryptoRun(&pkm->statusCond, sizeof(PartyPkm) - sizeof(BoxPkm), pkm->base.pid);
 }
 
 void PML_PkmInit(BoxPkm *pkm) {
-    sys_memset32_fast(0, pkm, sizeof(BoxPkm));
+    MIi_CpuClearFast(0, pkm, sizeof(BoxPkm));
     PML_CryptoRun(&pkm->contentBuffer, sizeof(PkmBuffer), pkm->checksum);
 }
 

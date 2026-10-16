@@ -10,7 +10,7 @@
 // Sets a sound player's volume, 0 to 127. That it is NitroSystem's NNS_SndPlayerSetPlayerVolume is a guess from its
 // code
 void NNS_SndPlayerSetPlayerVolume(int playerNo, int volume);
-// Sets the master volume, 0 to 127, through sndSetMasterVolume; NitroSystem's NNS_SndSetMasterVolume by its code
+// Sets the master volume, 0 to 127, through SND_SetMasterVolume; NitroSystem's NNS_SndSetMasterVolume by its code
 void NNS_SndSetMasterVolume(int volume);
 
 // A handle to a sound player, which plays one sequence

@@ -177,7 +177,7 @@ static void func_ov012_02152c74(void *work) {
             pWork->result = 3;
         } else {
             pWork->result = 1;
-            sys_memcpy(pWork->buffer, pWork->aInit.data[0].pData, pWork->aInit.data[0].datasize);
+            MI_CpuCopy8(pWork->buffer, pWork->aInit.data[0].pData, pWork->aInit.data[0].datasize);
             if (getCRC16(pWork->aInit.data[0].pData, pWork->aInit.data[0].datasize) != pWork->crc) {
                 pWork->result = 2;
             }
@@ -339,7 +339,7 @@ static void func_ov012_0215307c(void *work) {
 void *func_ov012_0215309c(const DeliveryIrcInit *init) {
     DeliveryIrcWork *pWork = GFL_HeapAllocate(init->heapId, sizeof(DeliveryIrcWork), TRUE, "delivery_irc.c", 461);
 
-    sys_memcpy(init, &pWork->aInit, sizeof(DeliveryIrcInit));
+    MI_CpuCopy8(init, &pWork->aInit, sizeof(DeliveryIrcInit));
     return pWork;
 }
 

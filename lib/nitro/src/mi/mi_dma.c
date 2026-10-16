@@ -12,7 +12,7 @@
 #define MI_ADDR_AREA_IOREG 0x04000000
 #define MI_ADDR_AREA_CARTRIDGE 0x08000000
 
-void dma_fill(u32 dmaNo, void *dest, u32 data, u32 size, BOOL dmaEnable) {
+void MIi_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size, BOOL dmaEnable) {
     vu32 *dmaCntp;
 
     if (size == 0) {
@@ -32,13 +32,13 @@ void dma_fill(u32 dmaNo, void *dest, u32 data, u32 size, BOOL dmaEnable) {
     }
 }
 
-void dma_copy(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) {
+void MIi_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) {
     vu32 *dmaCntp;
 
     if (size == 0) {
         return;
     }
-    dma_check_source_valid(dmaNo, (u32)src, size, MI_DMA_SRC_INC);
+    MIi_CheckDma0SourceAddress(dmaNo, (u32)src, size, MI_DMA_SRC_INC);
     dmaCntp = &((vu32 *)REG_DMA0SAD_ADDR)[dmaNo * 3 + 2];
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
@@ -52,13 +52,13 @@ void dma_copy(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) 
     }
 }
 
-void func_020780e8(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) {
+void MIi_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEnable) {
     vu32 *dmaCntp;
 
     if (size == 0) {
         return;
     }
-    dma_check_source_valid(dmaNo, (u32)src, size, MI_DMA_SRC_INC);
+    MIi_CheckDma0SourceAddress(dmaNo, (u32)src, size, MI_DMA_SRC_INC);
     dmaCntp = &((vu32 *)REG_DMA0SAD_ADDR)[dmaNo * 3 + 2];
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
@@ -71,16 +71,16 @@ void func_020780e8(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEna
     }
 }
 
-void dma_fillEx(u32 dmaNo, void *dest, u32 data, u32 size, MIDmaCallback callback, void *arg, BOOL dmaEnable) {
+void MIi_DmaFill32Async(u32 dmaNo, void *dest, u32 data, u32 size, MIDmaCallback callback, void *arg, BOOL dmaEnable) {
     if (size == 0) {
         if (callback != NULL) {
             callback(arg);
         }
         return;
     }
-    func_0207829c(dmaNo);
+    MI_WaitDma(dmaNo);
     if (callback != NULL) {
-        irq_setDMACallback(dmaNo, callback, arg);
+        OSi_EnterDmaCallback(dmaNo, callback, arg);
         if (dmaEnable) {
             dma_beginSyncEx(dmaNo, data, (u32)dest,
                             MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
@@ -100,17 +100,18 @@ void dma_fillEx(u32 dmaNo, void *dest, u32 data, u32 size, MIDmaCallback callbac
     }
 }
 
-void dma_copyEx(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaCallback callback, void *arg, BOOL dmaEnable) {
-    dma_check_source_valid(dmaNo, (u32)src, size, MI_DMA_SRC_INC);
+void MIi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaCallback callback, void *arg,
+                        BOOL dmaEnable) {
+    MIi_CheckDma0SourceAddress(dmaNo, (u32)src, size, MI_DMA_SRC_INC);
     if (size == 0) {
         if (callback != NULL) {
             callback(arg);
         }
         return;
     }
-    func_0207829c(dmaNo);
+    MI_WaitDma(dmaNo);
     if (callback != NULL) {
-        irq_setDMACallback(dmaNo, callback, arg);
+        OSi_EnterDmaCallback(dmaNo, callback, arg);
         if (dmaEnable) {
             dma_beginSyncEx(dmaNo, (u32)src, (u32)dest,
                             MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | (size >> 2), 0);
@@ -127,8 +128,8 @@ void dma_copyEx(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaCallback 
     }
 }
 
-void func_0207829c(u32 dmaNo) {
-    u32 enabled = CPU_IRQDisable();
+void MI_WaitDma(u32 dmaNo) {
+    u32 enabled = OS_DisableInterrupts();
 
     while (*(vu32 *)(REG_DMA0SAD_ADDR + 8 + dmaNo * 12) & MI_DMA_ENABLE) {
     }
@@ -138,11 +139,11 @@ void func_0207829c(u32 dmaNo) {
         regs[1] = 0;
         regs[2] = MI_DMA0_DUMMY_CNT;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-void dma_end(u32 dmaNo) {
-    u32 enabled = CPU_IRQDisable();
+void MI_StopDma(u32 dmaNo) {
+    u32 enabled = OS_DisableInterrupts();
     vu32 *dmaCntp = (vu32 *)(REG_DMA0SAD_ADDR + 8 + dmaNo * 12);
 
     *dmaCntp &= ~(MI_DMA_TIMING_MASK | MI_DMA_CONTINUOUS_ON);
@@ -155,17 +156,17 @@ void dma_end(u32 dmaNo) {
         regs[1] = 0;
         regs[2] = MI_DMA0_DUMMY_CNT;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-void dma_endAll(void) {
-    dma_end(0);
-    dma_end(1);
-    dma_end(2);
-    dma_end(3);
+void MI_StopAllDma(void) {
+    MI_StopDma(0);
+    MI_StopDma(1);
+    MI_StopDma(2);
+    MI_StopDma(3);
 }
 
-void func_02078344(u32 dmaNo, u32 dmaType) {
+void MIi_CheckAnotherAutoDMA(u32 dmaNo, u32 dmaType) {
     int i;
 
     for (i = 0; i < MI_DMA_MAX_NUM; i++) {
@@ -197,7 +198,7 @@ void func_02078344(u32 dmaNo, u32 dmaType) {
     }
 }
 
-void dma_check_source_valid(u32 dmaNo, u32 src, u32 size, u32 dir) {
+void MIi_CheckDma0SourceAddress(u32 dmaNo, u32 src, u32 size, u32 dir) {
     if (dmaNo == 0) {
         u32 areaStart = src & MI_ADDR_AREA_MASK;
         u32 areaEnd = src;

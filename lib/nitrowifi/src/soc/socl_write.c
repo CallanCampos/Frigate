@@ -97,7 +97,7 @@ static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *w
     if (chunk > len) {
         chunk = len;
     }
-    irq = CPU_IRQDisable();
+    irq = OS_DisableInterrupts();
     while (1) {
         free = SOCLi_GetWriteBufferFreeSize(socket);
         if (free >= chunk) {
@@ -111,9 +111,9 @@ static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *w
             free = 0;
             break;
         }
-        scheduler_yield(&pipe->wait);
+        OS_SleepThread(&pipe->wait);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return free;
 }
 
@@ -160,9 +160,9 @@ static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, in
         packet->args.write.buf2 = data;
         packet->args.write.len2 = len - packet->args.write.len1;
         pos = packet->args.write.len2;
-        sys_memcpy_fast(buf + packet->args.write.len1, packet->args.write.buf2, pos);
+        MI_CpuCopy(buf + packet->args.write.len1, packet->args.write.buf2, pos);
     }
-    sys_memcpy_fast(buf, packet->args.write.buf1, packet->args.write.len1);
+    MI_CpuCopy(buf, packet->args.write.buf1, packet->args.write.len1);
     old_write_pos = pipe->write_pos;
     packet->args.write.write_end = pos;
     pipe->write_pos = packet->args.write.write_end;
@@ -243,7 +243,7 @@ static int SOCLi_WriteCallBack(SOCLCommandPacket *packet) {
 // The largest size that fits a whole number of the connection's segments, for TCP
 static int SOCLi_GetOptimumSendBufLen(int len) {
     CPSSoc *soc = (CPSSoc *)OS_GetCurrentThread()->specific[0];
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int unit;
     int mss;
     int win;
@@ -267,7 +267,7 @@ static int SOCLi_GetOptimumSendBufLen(int len) {
     } else {
         unit = SOCLiCPSConfig.mymss * 2;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     if (unit > 0) {
         count = len / unit;
         if (count > 0) {
@@ -290,12 +290,12 @@ static int SOCLi_MemCpy(u8 *dst, int len, SOCLCommandPacket *packet) {
         len2 = len - len1;
     }
     if (len1 > 0) {
-        sys_memcpy_fast(packet->args.write.buf1, dst, len1);
+        MI_CpuCopy(packet->args.write.buf1, dst, len1);
         packet->args.write.buf1 += len1;
         packet->args.write.len1 -= len1;
     }
     if (len2 > 0) {
-        sys_memcpy_fast(packet->args.write.buf2, dst + len1, len2);
+        MI_CpuCopy(packet->args.write.buf2, dst + len1, len2);
         packet->args.write.buf2 += len2;
         packet->args.write.len2 -= len2;
     }

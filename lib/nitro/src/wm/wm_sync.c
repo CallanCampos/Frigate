@@ -7,29 +7,27 @@
 #include "nitro/rtc.h"
 #include "nitro/wm.h"
 
-// WM_SetIndCallback
-int func_02080e7c(WMCallbackFunc callback) {
-    u32 irq = CPU_IRQDisable();
-    int result = func_02080a70();
+int WM_SetIndCallback(WMCallbackFunc callback) {
+    u32 irq = OS_DisableInterrupts();
+    int result = WMi_CheckInitialized();
 
     if (result != WM_ERRCODE_SUCCESS) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return result;
     }
-    func_02080a64()->indCallback = callback;
-    CPU_SetIRQMask(irq);
+    WMi_GetSystemWork()->indCallback = callback;
+    OS_RestoreInterrupts(irq);
     return WM_ERRCODE_SUCCESS;
 }
 
-// WM_SetPortCallback
-int func_02080eac(u16 port, WMCallbackFunc callback, void *arg) {
+int WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg) {
     WMPortRecvCallback cb;
     u32 irq;
     int result;
     WMArm9Buf *w9b;
 
     if (callback != NULL) {
-        sys_memset(&cb, 0, sizeof(cb));
+        MI_CpuFill8(&cb, 0, sizeof(cb));
         cb.apiid = WM_APIID_PORT_RECV;
         cb.errcode = WM_ERRCODE_SUCCESS;
         cb.state = WM_STATECODE_PORT_INIT;
@@ -40,32 +38,31 @@ int func_02080eac(u16 port, WMCallbackFunc callback, void *arg) {
         cb.seqNo = 0xffff;
         cb.arg = arg;
         cb.aid = 0;
-        func_0207c33c(cb.macAddress);
+        OS_GetMacAddress(cb.macAddress);
     }
 
-    irq = CPU_IRQDisable();
-    result = func_02080a70();
+    irq = OS_DisableInterrupts();
+    result = WMi_CheckInitialized();
     if (result != WM_ERRCODE_SUCCESS) {
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return result;
     }
 
-    w9b = func_02080a64();
+    w9b = WMi_GetSystemWork();
     w9b->portCallbackTable[port] = callback;
     w9b->portCallbackArgTable[port] = arg;
     if (callback != NULL) {
-        cb.connectedAidBitmap = func_02080dfc();
-        cb.myAid = func_02080dd8();
+        cb.connectedAidBitmap = WMi_GetConnectedAidBitmap();
+        cb.myAid = WMi_GetMyAid();
         callback(&cb);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return WM_ERRCODE_SUCCESS;
 }
 
-// WM_ReadStatus
-int func_02080f40(WMStatus *statusBuf) {
-    WMArm9Buf *w9b = func_02080a64();
-    int result = func_02080a70();
+int WM_ReadStatus(WMStatus *statusBuf) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
+    int result = WMi_CheckInitialized();
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -73,57 +70,55 @@ int func_02080f40(WMStatus *statusBuf) {
     if (statusBuf == NULL) {
         return WM_ERRCODE_INVALID_PARAM;
     }
-    cp15_invalidateDC(w9b->status, sizeof(WMStatus));
-    sys_memcpy32_fast(w9b->status, statusBuf, sizeof(WMStatus));
+    DC_InvalidateRange(w9b->status, sizeof(WMStatus));
+    MIi_CpuCopyFast(w9b->status, statusBuf, sizeof(WMStatus));
     return WM_ERRCODE_SUCCESS;
 }
 
-// WM_GetMPSendBufferSize
-int func_02080f74(void) {
-    WMArm9Buf *w9b = func_02080a64();
+int WM_GetMPSendBufferSize(void) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
 
-    if (func_02080ab0(2, WM_STATE_PARENT, WM_STATE_CHILD) != WM_ERRCODE_SUCCESS) {
+    if (WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_CHILD) != WM_ERRCODE_SUCCESS) {
         return 0;
     }
-    cp15_invalidateDC(&w9b->status->mpFlag, 4);
+    DC_InvalidateRange(&w9b->status->mpFlag, 4);
     if (w9b->status->mpFlag == TRUE) {
         return 0;
     }
-    cp15_invalidateDC(&w9b->status->mpSendSize, 4);
+    DC_InvalidateRange(&w9b->status->mpSendSize, 4);
     return (w9b->status->mpSendSize + 0x1f) & ~0x1f;
 }
 
-// WM_GetMPReceiveBufferSize
-int func_02080fbc(void) {
+int WM_GetMPReceiveBufferSize(void) {
     u32 size;
     BOOL isParent;
-    WMArm9Buf *w9b = func_02080a64();
+    WMArm9Buf *w9b = WMi_GetSystemWork();
 
-    if (func_02080ab0(2, WM_STATE_PARENT, WM_STATE_CHILD) != WM_ERRCODE_SUCCESS) {
+    if (WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_CHILD) != WM_ERRCODE_SUCCESS) {
         return 0;
     }
-    cp15_invalidateDC(&w9b->status->mpFlag, 4);
+    DC_InvalidateRange(&w9b->status->mpFlag, 4);
     if (w9b->status->mpFlag == TRUE) {
         return 0;
     }
-    cp15_invalidateDC(&w9b->status->aid, 2);
+    DC_InvalidateRange(&w9b->status->aid, 2);
     isParent = TRUE;
     if (w9b->status->aid != 0) {
         isParent = FALSE;
     }
-    cp15_invalidateDC(&w9b->status->mpRecvSize, 2);
+    DC_InvalidateRange(&w9b->status->mpRecvSize, 2);
     size = w9b->status->mpRecvSize;
     if (isParent == TRUE) {
-        cp15_invalidateDC(&w9b->status->maxEntry, 2);
+        DC_InvalidateRange(&w9b->status->maxEntry, 2);
         size += 0xc;
         return ((size * w9b->status->maxEntry + 0x29) & ~0x1f) * 2;
     }
     return ((size + 0x51) & ~0x1f) * 2;
 }
 
-// WM_ReadMPData: the data that the child with the AID sent in a round of the multi-point mode, or NULL if it sent none
-const WMMpRecvData *func_02081040(const WMMpRecvBuf *recvBuf, u16 aid) {
-    WMArm9Buf *w9b = func_02080a64();
+// The data that the child with the AID sent in a round of the multi-point mode, or NULL if it sent none
+const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
     // BUG: when the buffer has 15 entries and none is the child's, the loop writes datap[15], past the array and over a
     // saved register
 #ifdef BUGFIX
@@ -133,13 +128,13 @@ const WMMpRecvData *func_02081040(const WMMpRecvBuf *recvBuf, u16 aid) {
 #endif
     int i;
 
-    if (func_02080a70() != WM_ERRCODE_SUCCESS) {
+    if (WMi_CheckInitialized() != WM_ERRCODE_SUCCESS) {
         return NULL;
     }
     if (aid < 1 || aid > 15) {
         return NULL;
     }
-    cp15_invalidateDC(&w9b->status->childBitmap, 2);
+    DC_InvalidateRange(&w9b->status->childBitmap, 2);
     if (!(w9b->status->childBitmap & (1 << aid))) {
         return NULL;
     }
@@ -159,35 +154,34 @@ const WMMpRecvData *func_02081040(const WMMpRecvBuf *recvBuf, u16 aid) {
     return NULL;
 }
 
-// WM_GetAllowedChannel: the channels that the console may use, one bit each
-u16 func_020810cc(void) {
-    if (hw_isDSi() && !func_02080e60()) {
+// The channels that the console may use, one bit each
+u16 WM_GetAllowedChannel(void) {
+    if (hw_isDSi() && !WMi_IsWirelessAvailable()) {
         return 0;
     }
-    if (func_02080a70() != WM_ERRCODE_SUCCESS) {
+    if (WMi_CheckInitialized() != WM_ERRCODE_SUCCESS) {
         return 0x8000;
     }
     return *(u16 *)HW_WM_ALLOWED_CHANNEL_BUF;
 }
 
-// WM_GetLinkLevel
-WMLinkLevel func_020810fc(void) {
-    WMArm9Buf *w9b = func_02080a64();
+WMLinkLevel WM_GetLinkLevel(void) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
 
-    if (func_02080a70() != WM_ERRCODE_SUCCESS) {
+    if (WMi_CheckInitialized() != WM_ERRCODE_SUCCESS) {
         return WM_LINK_LEVEL_0;
     }
-    cp15_invalidateDC(w9b->status, 2);
+    DC_InvalidateRange(w9b->status, 2);
     switch (w9b->status->state) {
     case WM_STATE_MP_PARENT:
-        cp15_invalidateDC(&w9b->status->childBitmap, 2);
+        DC_InvalidateRange(&w9b->status->childBitmap, 2);
         if (w9b->status->childBitmap == 0) {
             return WM_LINK_LEVEL_0;
         }
         // fall through
     case WM_STATE_MP_CHILD:
     case WM_STATE_DCF_CHILD:
-        cp15_invalidateDC(&w9b->status->linkLevel, 2);
+        DC_InvalidateRange(&w9b->status->linkLevel, 2);
         return w9b->status->linkLevel;
     }
     return WM_LINK_LEVEL_0;
@@ -195,12 +189,12 @@ WMLinkLevel func_020810fc(void) {
 
 // WM_GetDispersionBeaconPeriod: the period of a parent's beacon in milliseconds, 200 to 219, from the console's
 // address and the time
-u16 func_0208115c(void) {
+u16 WM_GetDispersionBeaconPeriod(void) {
     u8 mac[6];
     u16 seed;
     int i;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0, seed = 0; i < 6; i++) {
         seed += mac[i];
     }
@@ -208,13 +202,13 @@ u16 func_0208115c(void) {
     return 200 + (u16)(seed * 7) % 20;
 }
 
-// WM_GetDispersionScanPeriod: how long to stay on a channel while scanning, 30 to 39 milliseconds
-u16 func_020811a4(void) {
+// How long to stay on a channel while scanning, 30 to 39 milliseconds
+u16 WM_GetDispersionScanPeriod(void) {
     u8 mac[6];
     u16 seed;
     int i;
 
-    func_0207c33c(mac);
+    OS_GetMacAddress(mac);
     for (i = 0, seed = 0; i < 6; i++) {
         seed += mac[i];
     }
@@ -222,8 +216,8 @@ u16 func_020811a4(void) {
     return 30 + (u16)(seed * 13) % 10;
 }
 
-// WM_GetOtherElements: the elements that follow the beacon's header, if there is no game information
-WMOtherElements func_020811ec(const WMBssDesc *bssDesc) {
+// The elements that follow the beacon's header, if there is no game information
+WMOtherElements WM_GetOtherElements(const WMBssDesc *bssDesc) {
     WMOtherElements elems;
     const u8 *p;
     int i;
@@ -263,14 +257,14 @@ WMOtherElements func_020811ec(const WMBssDesc *bssDesc) {
     return elems;
 }
 
-// WM_GetNextTgid: the TGID for a parent's next beacon, counting up from the minute and second at the first call
-u16 func_020812b8(void) {
+// The TGID for a parent's next beacon, counting up from the minute and second at the first call
+u16 WM_GetNextTgid(void) {
     static u32 tgid_bak = 0x10000;
     RTCTime time;
 
     if (tgid_bak == 0x10000) {
-        func_0207cb88();
-        if (func_0207cc80(&time) == 0) {
+        RTC_Init();
+        if (RTC_GetTime(&time) == 0) {
             tgid_bak = (u16)(time.second + (time.minute << 8));
         }
     }

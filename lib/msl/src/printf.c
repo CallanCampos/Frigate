@@ -1076,7 +1076,7 @@ static int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *
                 wchar_t *wcs_ptr = va_arg(arg, wchar_t *);
 
                 if (is_secure && wcs_ptr == NULL) {
-                    nothing(NULL, NULL, -1);
+                    __msl_runtime_constraint_violation_s(NULL, NULL, -1);
                     return -1;
                 }
                 if (wcs_ptr == NULL) {
@@ -1092,7 +1092,7 @@ static int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *
             }
 
             if (is_secure && buff_ptr == NULL) {
-                nothing(NULL, NULL, -1);
+                __msl_runtime_constraint_violation_s(NULL, NULL, -1);
                 return -1;
             }
             if (buff_ptr == NULL) {
@@ -1121,7 +1121,7 @@ static int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *
             buff_ptr = va_arg(arg, char *);
 
             if (is_secure) {
-                nothing(NULL, NULL, -1);
+                __msl_runtime_constraint_violation_s(NULL, NULL, -1);
                 return -1;
             }
             switch (format.argument_options) {

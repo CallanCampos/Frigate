@@ -371,7 +371,7 @@ static void FMissionAppDraw_AddActors(FMissionApp *work, u32 vramType, const FMi
     s16 cells;
     s16 type;
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     palette = group->palette;
     chars = group->chars;
     cells = group->cells;

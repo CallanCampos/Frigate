@@ -9,7 +9,7 @@
 static BOOL OSi_CodecModeChecked;
 static BOOL OSi_CodecIsTwlMode;
 
-BOOL func_0207c210(void) {
+BOOL OSi_IsCodecTwlMode(void) {
     if (!OSi_CodecModeChecked) {
         OSi_CodecIsTwlMode = hw_isDSi() == TRUE && (*(u8 *)OSi_CODEC_FLAGS & OSi_CODEC_FLAGS_TWL_MODE) == TRUE;
     }

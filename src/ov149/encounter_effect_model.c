@@ -133,12 +133,12 @@ GameEventReturnCode EncEffModel_EventCallback(GameEvent *event, u32 *state, void
         }
         break;
     case 3:
-        work->texBanks = gfxGetTextureBanks();
+        work->texBanks = GX_GetBankForTex();
         work->addedTexBank = FALSE;
         if (!(work->texBanks & GX_VRAM_D)) {
             work->addedTexBank = TRUE;
             work->texBanks |= GX_VRAM_D;
-            gfxSetTextureBanks(work->texBanks);
+            GX_SetBankForTex(work->texBanks);
         }
         work->modelRes = GFL_G3DSysReadArcSysResource(ARCID_ENCOUNT_EFFECT_MODEL, work->modelId);
         work->animRes = GFL_G3DSysReadArcSysResource(ARCID_ENCOUNT_EFFECT_MODEL, work->animId);
@@ -171,7 +171,7 @@ GameEventReturnCode EncEffModel_EventCallback(GameEvent *event, u32 *state, void
     case 5:
         if (work->addedTexBank == TRUE) {
             work->texBanks &= ~GX_VRAM_D;
-            gfxSetTextureBanks(work->texBanks);
+            GX_SetBankForTex(work->texBanks);
         }
         GFL_G3DActorFree(work->actor);
         GFL_G3DAnmFree(work->anim);

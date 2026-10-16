@@ -201,7 +201,7 @@ static void UnionOneself_CheckParentEntry(UnionSystem *unisys, UnionBeaconEntry 
 
     func_ov036_021b445c(unisys, entry, NULL, 0);
     if (situ->step == 0 && situ->nextStep == 0 && entry->beacon.unk0A == 5 && entry->timeout != 0) {
-        func_0207c33c(ownMac);
+        OS_GetMacAddress(ownMac);
         if (GFL_STD_MemCmp(entry, ownMac, 6) == 0 &&
             UnionOneself_SetNextStepIfRunning(unisys, UNION_STEP_ASKED) == TRUE) {
             UnionComm_SetSelf(unisys, 2, (u32)entry);
@@ -1541,7 +1541,7 @@ static BOOL UnionOneself_StepCardRun(UnionSystem *unisys, UnionSelf *situ, Field
             GFL_HeapAllocate(HEAPID_UNION, sizeof(TrainerCardData), TRUE, "union_oneself.c", 2596);
         func_ov012_02169770(unisys->alloc.my_card, unisys->param->gameData, TRUE, FALSE, HEAPID_UNION);
         func_ov012_02169508(unisys->alloc.my_card, unisys->param->gameData, HEAPID_UNION);
-        sys_memcpy(unisys->alloc.my_card, unisys->alloc.target_card, 0x678);
+        MI_CpuCopy8(unisys->alloc.my_card, unisys->alloc.target_card, 0x678);
         func_02040624(func_02040440(), 3, 0x14);
         UnionMsg_CreateAndPrint(unisys, field,
                                 UnionMsg_GetOriginMessage(unisys, situ->mycomm.target->beacon.country,

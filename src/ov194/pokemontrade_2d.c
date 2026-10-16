@@ -748,15 +748,16 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             if (async == TRUE && screenPos.x >= -16 && screenPos.x <= 272) {
                 if (!NNS_GfdRegisterNewVramTransferTask(35, proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
                                                         wk->iconCharData + slot * 0x200, 0x200)) {
-                    sys_memcpy(
+                    MI_CpuCopy8(
                         wk->iconCharData + slot * 0x200,
                         (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
                         0x200);
                 }
             } else {
-                sys_memcpy(wk->iconCharData + slot * 0x200,
-                           (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
-                           0x200);
+                MI_CpuCopy8(
+                    wk->iconCharData + slot * 0x200,
+                    (void *)((u32)G2S_GetOBJCharPtr() + ImageProxy_GetLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB)),
+                    0x200);
             }
             func_ov194_021c38d4(wk, column, i, pkm, isParty, index);
             func_0204c378(wk->icons[index][i], PokeIcon_GetPaletteOfPkm(pkm), CLACT_VRAM_SUB);
@@ -922,7 +923,7 @@ void func_ov194_021c3e9c(PokemonTradeWork *wk, int box) {
                 icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
             }
             file = GFL_G2DIOReadBGNCGRArc(arc, icon, FALSE, &chars, wk->heapId);
-            sys_memcpy(chars->rawData, wk->iconCharData + slot * 0x200, 0x200);
+            MI_CpuCopy8(chars->rawData, wk->iconCharData + slot * 0x200, 0x200);
             slot++;
             GFL_HeapFree(file);
         }
@@ -1136,8 +1137,8 @@ static void func_ov194_021c4324(void) {
     G3X_AntiAlias(TRUE);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(TRUE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(TRUE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
         GFL_G3DSysLightSet(i, &sLights[i]);
@@ -1833,8 +1834,8 @@ void func_ov194_021c54ec(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c5504(PokemonTradeWork *wk) {
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0,
-                        GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, 8, 8);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3,
+                       8, 8);
 }
 
 // Shows a stamp's button, under the lower screen's panels
@@ -2129,9 +2130,9 @@ void func_ov194_021c5c80(PokemonTradeWork *wk) {
         u32 dest = func_0204bb80(wk->negoPanelChars[i], TRUE);
         u8 *pixels = GFL_BitmapGetPixelData(wk->negoBitmaps[i]);
 
-        cp15_flushDC(pixels, GFL_BitmapCalcPixelDataSize(wk->negoBitmaps[i]));
+        DC_FlushRange(pixels, GFL_BitmapCalcPixelDataSize(wk->negoBitmaps[i]));
         for (j = 0; j < 8; j++) {
-            gfxUploadObjCharB(pixels + order[j] * 0x100, dest, 0x100);
+            GXS_LoadOBJ(pixels + order[j] * 0x100, dest, 0x100);
             dest += 0x100;
         }
     }
@@ -2225,19 +2226,19 @@ static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 palett
     colors = (u8 *)PaletteFade_GetFadedBuffer(fade, vram);
     for (i = 0; i < 16; i++) {
         if (paletteMask & (1 << i)) {
-            cp15_flushDC(colors + i * 32, 32);
+            DC_FlushRange(colors + i * 32, 32);
             switch (vram) {
             case PALFADE_VRAM_SUB_OBJ:
-                gfxUploadStdPaletteObjB(colors + i * 32, i * 32, 32);
+                GXS_LoadOBJPltt(colors + i * 32, i * 32, 32);
                 break;
             case PALFADE_VRAM_SUB_BG:
-                gfxUploadStdPaletteBGB(colors + i * 32, i * 32, 32);
+                GXS_LoadBGPltt(colors + i * 32, i * 32, 32);
                 break;
             case PALFADE_VRAM_MAIN_OBJ:
-                gfxUploadStdPaletteObjA(colors + i * 32, i * 32, 32);
+                GX_LoadOBJPltt(colors + i * 32, i * 32, 32);
                 break;
             case PALFADE_VRAM_MAIN_BG:
-                gfxUploadStdPaletteBGA(colors + i * 32, i * 32, 32);
+                GX_LoadBGPltt(colors + i * 32, i * 32, 32);
                 break;
             }
         }
@@ -2251,17 +2252,17 @@ static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 palett
 static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask) {
     if (dim) {
         if (vram == PALFADE_VRAM_SUB_OBJ) {
-            sys_memcpy((void *)HW_DB_OBJ_PLTT, wk->savedObjPalette, 0x200);
+            MI_CpuCopy8((void *)HW_DB_OBJ_PLTT, wk->savedObjPalette, 0x200);
         } else if (vram == PALFADE_VRAM_SUB_BG) {
-            sys_memcpy((void *)HW_DB_BG_PLTT, wk->savedBGPalette, 0x200);
+            MI_CpuCopy8((void *)HW_DB_BG_PLTT, wk->savedBGPalette, 0x200);
         }
         func_ov194_021c5e9c(wk, vram, paletteMask);
     } else if (vram == PALFADE_VRAM_SUB_OBJ) {
-        cp15_flushDC(wk->savedObjPalette, 0x200);
-        gfxUploadStdPaletteObjB(wk->savedObjPalette, 0, 0x200);
+        DC_FlushRange(wk->savedObjPalette, 0x200);
+        GXS_LoadOBJPltt(wk->savedObjPalette, 0, 0x200);
     } else if (vram == PALFADE_VRAM_SUB_BG) {
-        cp15_flushDC(wk->savedBGPalette, 0x200);
-        gfxUploadStdPaletteBGB(wk->savedBGPalette, 0, 0x200);
+        DC_FlushRange(wk->savedBGPalette, 0x200);
+        GXS_LoadBGPltt(wk->savedBGPalette, 0, 0x200);
     }
 }
 

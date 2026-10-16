@@ -51,7 +51,7 @@ void PokewoodSystem_Free(PokewoodSystem *sys) {
 }
 
 void func_ov062_021e61a0(PokewoodSystem *sys, const PokeListParam *param) {
-    sys_memcpy(param->picked, sys->castSlots, sizeof(sys->castSlots));
+    MI_CpuCopy8(param->picked, sys->castSlots, sizeof(sys->castSlots));
     sys->unkE = param->index;
     sys->unk10 = param->result;
     if (sys->unk10 != 0 || sys->unkE == 7 || sys->unkE == 8) {
@@ -81,7 +81,7 @@ void func_ov062_021e61e8(PokewoodSystem *sys, GameData *gameData, PokeListParam 
 void func_ov062_021e6254(PokewoodSystem *sys, GameData *gameData, PStatusParam *param) {
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
 
-    sys_memset32(0, param, sizeof(PStatusParam));
+    MIi_CpuClear32(0, param, sizeof(PStatusParam));
     param->party = GameData_GetParty(gameData);
     param->dataType = PSTATUS_DATA_PARTY;
     param->partyCount = PokeParty_GetPkmCount(param->party);
@@ -230,7 +230,7 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32
     u32 form;
     int i = 0;
 
-    sys_memset(&record, 0, sizeof(record));
+    MI_CpuFill8(&record, 0, sizeof(record));
     record.score = result->score;
     for (; i < PokeParty_GetPkmCount(party); i++) {
         pkm = PokeParty_GetPkm(party, i);

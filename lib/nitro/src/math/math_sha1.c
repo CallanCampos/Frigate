@@ -45,7 +45,7 @@ static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size) {
         if (chunk > size) {
             chunk = size;
         }
-        sys_memset(&context->block.bytes[context->blockPos], value, chunk);
+        MI_CpuFill8(&context->block.bytes[context->blockPos], value, chunk);
         size -= chunk;
         context->blockPos += chunk;
         if (context->blockPos >= SHA1_BLOCK_SIZE) {
@@ -95,7 +95,7 @@ void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size) {
         if (chunk > size) {
             chunk = size;
         }
-        sys_memcpy(src, &context->block.bytes[context->blockPos], chunk);
+        MI_CpuCopy8(src, &context->block.bytes[context->blockPos], chunk);
         src += chunk;
         size -= chunk;
         context->blockPos += chunk;
@@ -131,7 +131,7 @@ void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest) {
     context->state[2] = BSWAP32(context->state[2]);
     context->state[3] = BSWAP32(context->state[3]);
     context->state[4] = BSWAP32(context->state[4]);
-    sys_memcpy(context, digest, 20);
+    MI_CpuCopy8(context, digest, 20);
 }
 
 void MATH_CalcSHA1(u8 *digest, const void *data, u32 size) {

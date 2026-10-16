@@ -19,7 +19,7 @@ BOOL DWCUtilScreen_Start(void *param, int arg1, int arg2) {
         return FALSE;
     }
 
-    func_ov182_021ab67c(sBlankScreenPath, gfxUploadBGScreen0B);
+    func_ov182_021ab67c(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
     object = func_ov182_021bbdec(1, 0);
     work = func_ov182_021ae118(data_ov182_021c40b8, param, arg1, arg2);

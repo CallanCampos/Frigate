@@ -91,7 +91,7 @@ void BtlvTimer_Start(BtlvTimer *timer, s32 battleLimit, s32 commandLimit) {
     }
     timer->limits[0] = battleLimit;
     timer->limits[1] = commandLimit;
-    timer->startTicks[0] = timer->startTicks[1] = clock();
+    timer->startTicks[0] = timer->startTicks[1] = OS_GetTick();
     BtlvTimer_SetVisible(timer, 0, FALSE, FALSE);
     BtlvTimer_SetVisible(timer, 1, FALSE, FALSE);
     timer->task = GFL_TCBMgrAddTask(BtlvEffect_GetTCBManager(), BtlvTimer_Task, timer, 0);
@@ -121,7 +121,7 @@ static void BtlvTimer_DeleteActors(BtlvTimer *timer) {
 void BtlvTimer_SetVisible(BtlvTimer *timer, int which, BOOL visible, BOOL restart) {
     if (timer->actors[which][0] != NULL) {
         if (visible == TRUE && restart == TRUE) {
-            timer->startTicks[which] = clock();
+            timer->startTicks[which] = OS_GetTick();
             timer->seqBase[which] = 0;
             BtlvTimer_Draw(timer, which);
         }
@@ -130,7 +130,7 @@ void BtlvTimer_SetVisible(BtlvTimer *timer, int which, BOOL visible, BOOL restar
 }
 
 BOOL BtlvTimer_IsTimeUp(BtlvTimer *timer, int which) {
-    s32 left = timer->limits[which] - (s32)OS_TicksToSeconds(clock() - timer->startTicks[which]);
+    s32 left = timer->limits[which] - (s32)OS_TicksToSeconds(OS_GetTick() - timer->startTicks[which]);
 
     return left <= 0;
 }
@@ -145,7 +145,7 @@ enum {
 static void BtlvTimer_Draw(BtlvTimer *timer, int which) {
     const s32 warnTimes[2] = { 300, 15 };
     int label = which == 0 ? TIMER_SEQ_BATTLE_LABEL : TIMER_SEQ_COMMAND_LABEL;
-    s32 left = timer->limits[which] - (s32)OS_TicksToSeconds(clock() - timer->startTicks[which]);
+    s32 left = timer->limits[which] - (s32)OS_TicksToSeconds(OS_GetTick() - timer->startTicks[which]);
     int minutes, seconds, minuteTens, minuteOnes, secondTens, secondOnes;
 
     if (timer->actors[which][0] == NULL) {

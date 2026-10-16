@@ -96,7 +96,7 @@ BrSidebar *BrSidebar_Init(ClActUnit *unit, BrFade *fade, BrRes *res, HeapID heap
     int i;
 
     p_wk = GFL_HeapAllocate(heapId, sizeof(BrSidebar), FALSE, "br_sidebar.c", 306);
-    sys_memset(p_wk, 0, sizeof(BrSidebar));
+    MI_CpuFill8(p_wk, 0, sizeof(BrSidebar));
     BrRes_LoadOBJ(res, BR_RES_OBJ_SIDEBAR_M, heapId);
     BrRes_LoadOBJ(res, BR_RES_OBJ_SIDEBAR_S, heapId);
     for (i = 0; i < BR_SIDEBAR_MAX; i++) {
@@ -185,7 +185,7 @@ static void BrSidebarWork_Init(BrSidebarWork *p_wk, ClActUnit *unit, BrRes *res,
     BOOL ret;
     u32 objID;
 
-    sys_memset(p_wk, 0, sizeof(BrSidebarWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrSidebarWork));
     p_wk->data = *cp_data;
     objID = BR_RES_OBJ_SIDEBAR_M;
     if (cp_data->display) {
@@ -194,7 +194,7 @@ static void BrSidebarWork_Init(BrSidebarWork *p_wk, ClActUnit *unit, BrRes *res,
     ret = BrRes_GetObjData(res, objID, &obj);
     GFL_ASSERT(ret);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = cp_data->x;
     setup.y = cp_data->y;
     setup.bgPriority = 1;
@@ -211,7 +211,7 @@ static void BrSidebarWork_Init(BrSidebarWork *p_wk, ClActUnit *unit, BrRes *res,
 
 static void BrSidebarWork_Exit(BrSidebarWork *p_wk) {
     func_0204c108(p_wk->clwk);
-    sys_memset(p_wk, 0, sizeof(BrSidebarWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrSidebarWork));
 }
 
 static void BrSidebarWork_Main(BrSidebarWork *p_wk) {

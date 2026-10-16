@@ -17,26 +17,26 @@ static void MBTask_ThreadMain(void *arg) {
     MBTaskThread *thread = arg;
 
     while (TRUE) {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
         MBTask *task;
         void (*done)(MBTask *task);
         u32 priority;
         u32 next;
 
         while (thread->head == NULL) {
-            func_0207a998(&thread->thread, 0);
-            scheduler_yield(NULL);
+            OS_SetThreadPriority(&thread->thread, 0);
+            OS_SleepThread(NULL);
         }
         task = thread->head;
         thread->head = thread->head->next;
-        func_0207a998(&thread->thread, task->priority);
-        CPU_SetIRQMask(irq);
+        OS_SetThreadPriority(&thread->thread, task->priority);
+        OS_RestoreInterrupts(irq);
         if (task->func != NULL) {
             task->func(task);
         }
-        irq = CPU_IRQDisable();
+        irq = OS_DisableInterrupts();
         done = task->done;
-        priority = func_0207aa00(&thread->thread);
+        priority = OS_GetThreadPriority(&thread->thread);
         if (thread->head == NULL) {
             next = 0;
         } else if (priority < thread->head->priority) {
@@ -45,7 +45,7 @@ static void MBTask_ThreadMain(void *arg) {
             next = priority;
         }
         if (next != priority) {
-            func_0207a998(&thread->thread, next);
+            OS_SetThreadPriority(&thread->thread, next);
         }
         task->next = NULL;
         task->busy = 0;
@@ -55,14 +55,14 @@ static void MBTask_ThreadMain(void *arg) {
         if (task == &thread->exitTask) {
             break;
         }
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
     }
-    scheduler_thread_exit_proc();
+    OS_ExitThread();
 }
 
 // Starts the thread, with a block of memory for it and its stack
 void MBTask_StartThread(MBTaskThread *thread, u32 size) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sTaskThread == NULL) {
         u32 stackSize;
@@ -71,10 +71,10 @@ void MBTask_StartThread(MBTaskThread *thread, u32 size) {
         MBTask_Clear(&thread->exitTask);
         thread->head = NULL;
         stackSize = (size - sizeof(MBTaskThread) + sizeof(thread->stack)) & ~3;
-        scheduler_init_thread(&thread->thread, MBTask_ThreadMain, thread, thread->stack + stackSize, stackSize, 0);
-        scheduler_start_thread(&thread->thread);
+        OS_CreateThread(&thread->thread, MBTask_ThreadMain, thread, thread->stack + stackSize, stackSize, 0);
+        OS_WakeupThreadDirect(&thread->thread);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 BOOL MBTask_IsThreadStarted(void) {
@@ -85,7 +85,7 @@ BOOL MBTask_IsThreadStarted(void) {
 }
 
 void MBTask_Clear(MBTask *task) {
-    sys_memset(task, 0, sizeof(MBTask));
+    MI_CpuFill8(task, 0, sizeof(MBTask));
 }
 
 BOOL MBTask_IsBusy(const MBTask *task) {
@@ -103,7 +103,7 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
         return;
     }
     if (priority > MB_TASK_PRIORITY_MAX) {
-        u32 current = func_0207aa00(&thread->thread);
+        u32 current = OS_GetThreadPriority(&thread->thread);
 
         if (priority == MB_TASK_PRIORITY_HIGHER) {
             priority = current - 1;
@@ -122,7 +122,7 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
         }
     }
     {
-        u32 irq = CPU_IRQDisable();
+        u32 irq = OS_DisableInterrupts();
 
         task->busy = 1;
         task->priority = priority;
@@ -133,7 +133,7 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
                 sTaskThread = NULL;
             }
             thread->head = task;
-            scheduler_start_thread(&thread->thread);
+            OS_WakeupThreadDirect(&thread->thread);
         } else {
             MBTask *queued = thread->head;
 
@@ -156,16 +156,16 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
                 queued->next = task;
             }
         }
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
     }
 }
 
 // Ends the thread once its jobs are done, and then runs a function
 void MBTask_EndThread(void (*done)(MBTask *task)) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (MBTask_IsThreadStarted()) {
         MBTask_Add(&sTaskThread->exitTask, NULL, done, 0);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }

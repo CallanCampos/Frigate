@@ -12,4 +12,4 @@ func_01ff8ff8 kind:function(arm,size=0xcc) addr:0x01ff8ff8
 func_01ff90c4 kind:function(arm,size=0x14) addr:0x01ff90c4
 func_01ff90d8 kind:function(arm,size=0x1c0) addr:0x01ff90d8
 func_01ff9298 kind:function(arm,size=0xd4) addr:0x01ff9298
-func_01ff936c kind:function(arm,size=0x30) addr:0x01ff936c
+SCFGi_SwitchCpuSpeed kind:function(arm,size=0x30) addr:0x01ff936c

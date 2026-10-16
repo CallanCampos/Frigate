@@ -169,7 +169,7 @@ int WorldTrade_Box_Init(WorldTradeWork *wk, int seq) {
     Box_SetCellActor(wk);
     WorldTrade_SetPartnerExchangePos(wk);
 
-    if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) == 0) {
+    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == 0) {
         GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
     } else {
         GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
@@ -187,7 +187,7 @@ int WorldTrade_Box_Main(WorldTradeWork *wk, int seq) {
 }
 
 int WorldTrade_Box_End(WorldTradeWork *wk, int seq) {
-    if (gfxRegGetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
         WorldTrade_SetPartnerExchangePosIsReturns(wk);
     }
     Box_DelCellActor(wk);
@@ -324,7 +324,7 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
     ClActorSetup setup;
     int i;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = sCursorPos[wk->boxCursorPos].x;
     setup.y = sCursorPos[wk->boxCursorPos].y;
     wk->cursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
@@ -1031,7 +1031,7 @@ static void Box_TransPokeIconCharaPal(int species, int form, int sex, int egg, i
     void *file =
         Box_CharDataGetbyHandle(handle, PokeParty_GetIconIndex(species, form, sex, egg), &charData, HEAPID_WORLDTRADE);
 
-    sys_memcpy32_fast(charData->rawData, pbuf->chars, 0x200);
+    MIi_CpuCopyFast(charData->rawData, pbuf->chars, 0x200);
     pbuf->charOffset = (no * 16 + 28) * 32;
     pbuf->icon = icon;
     pbuf->palette = PokeIcon_GetPalette(species, form, sex, egg) + 5;
@@ -1048,8 +1048,8 @@ static void Box_PokemonIconDraw(WorldTradeWork *wk) {
 
     for (i = 0; i < BOX_POKE_NUM; i++, pbuf++) {
         if (pbuf->icon != NULL) {
-            cp15_flushDC(pbuf->chars, 0x200);
-            gfxUploadObjCharA(pbuf->chars, pbuf->charOffset, 0x200);
+            DC_FlushRange(pbuf->chars, 0x200);
+            GX_LoadOBJ(pbuf->chars, pbuf->charOffset, 0x200);
             func_0204c378(pbuf->icon, (u8)pbuf->palette, 1);
         }
     }

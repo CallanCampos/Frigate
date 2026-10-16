@@ -7,7 +7,7 @@
 // WAV file from memory through the audio component that the first DSP process runs, and tells whether it still plays.
 // The ARM9 talks to the component over pipe 2 of that process, in messages of four 32-bit words that the DSP reads as
 // two 16-bit halves each, the high half first. ARM code in the DSi-only LTD autoload. The ROM names none of it; the
-// functions keep their default names, and the SDK's are in twl/dsp.h.
+// functions have the SDK's names where twl/dsp.h knows them, and keep their default names otherwise.
 
 #define SHUTTER_PIPE_PORT 2
 
@@ -78,7 +78,7 @@ static inline void SendAudioCommand(DSPProcessContext *context, u32 command, u32
     message[1] = SwapHalves(address);
     message[2] = SwapHalves(words);
     message[3] = 0;
-    func_02705f28(context, SHUTTER_PIPE_PORT, message, sizeof(message));
+    DSP_WriteProcessPipe(context, SHUTTER_PIPE_PORT, message, sizeof(message));
 }
 
 static inline u32 ReadU32(const u8 *p) {
@@ -109,11 +109,11 @@ static void func_02705fac(void *userData, int port, int direction) {
     if (direction != 0) {
         return;
     }
-    func_02706d44(&pipe, port, direction);
-    if (func_02706e90(&pipe) < sizeof(message)) {
+    DSP_LoadPipe(&pipe, port, direction);
+    if (DSP_GetPipeReadableSize(&pipe) < sizeof(message)) {
         return;
     }
-    func_02706ec0(&pipe, message, sizeof(message));
+    DSP_ReadPipe(&pipe, message, sizeof(message));
     message[0] = SwapHalves(message[0]);
     message[1] = SwapHalves(message[1]);
     if ((message[0] & AUDIO_GROUP_MASK) == AUDIO_GROUP_PLAYBACK && (message[0] & AUDIO_KIND_MASK) == AUDIO_KIND_STOP) {
@@ -132,7 +132,7 @@ static void func_02705fac(void *userData, int port, int direction) {
 // Sends the play command for length bytes of 16-bit samples at src to the first process, unless something of a higher
 // priority plays
 static void func_027060b4(const void *src, u32 length, int mode, int priority) {
-    DSPProcessContext *context = func_02705ed0(NULL);
+    DSPProcessContext *context = DSP_FindProcess(NULL);
 
     if (context == NULL) {
         return;
@@ -141,13 +141,13 @@ static void func_027060b4(const void *src, u32 length, int mode, int priority) {
         return;
     }
     sPriority = priority;
-    func_02706d28(SHUTTER_PIPE_PORT, func_02705fac, NULL);
+    DSP_SetPipeCallback(SHUTTER_PIPE_PORT, func_02705fac, NULL);
     sShutter.playing = TRUE;
     SendAudioCommand(context, AUDIO_COMMAND_PLAY | mode, (u32)src, length / 2);
 }
 
-// DSP_PlayShutterSoundCore: plays the WAV file at src, if it fits the I2S's sample rate
-BOOL func_02706174(const void *src, u32 length) {
+// Plays the WAV file at src, if it fits the I2S's sample rate
+BOOL DSP_PlayShutterSoundCore(const void *src, u32 length) {
     const u8 *file = src;
     u32 dataSize;
     u32 sampleRate;
@@ -170,9 +170,9 @@ BOOL func_02706174(const void *src, u32 length) {
     if (length < dataSize + WAV_HEADER_SIZE) {
         return FALSE;
     }
-    func_0207c160(SHUTTER_REQUEST_DELAY_CYCLES);
+    OS_SpinWaitSysCycles(SHUTTER_REQUEST_DELAY_CYCLES);
     while (func_02704858() != SNDEX_RESULT_SUCCESS) {
-        func_0207aa04(1);
+        OS_Sleep(1);
     }
     func_027060b4(file + WAV_HEADER_SIZE, dataSize, AUDIO_PLAY_MODE_ONCE, AUDIO_PRIORITY_HIGHEST);
     sShutter.requestOn = TRUE;
@@ -180,15 +180,14 @@ BOOL func_02706174(const void *src, u32 length) {
 }
 
 // Stops the sound
-void func_027062c8(void) {
-    DSPProcessContext *context = func_02705ed0(NULL);
+void DSP_StopSoundCore(void) {
+    DSPProcessContext *context = DSP_FindProcess(NULL);
 
     if (context != NULL && sShutter.playing) {
         SendAudioCommand(context, AUDIO_COMMAND_STOP, 0, 0);
     }
 }
 
-// DSP_IsShutterSoundPlayingCore
-BOOL func_02706324(void) {
+BOOL DSP_IsShutterSoundPlayingCore(void) {
     return sShutter.playing | sShutter.requestOn;
 }

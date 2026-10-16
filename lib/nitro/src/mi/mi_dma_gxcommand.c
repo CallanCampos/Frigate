@@ -28,7 +28,7 @@ static void func_020784d0(void);
 static void func_02078550(void *arg);
 static void func_0207860c(void *arg);
 
-void func_02078428(u32 dmaNo, const void *src, u32 length, MIDmaCallback callback, void *arg) {
+void MI_SendGXCommandAsync(u32 dmaNo, const void *src, u32 length, MIDmaCallback callback, void *arg) {
     u32 enabled;
 
     if (length == 0) {
@@ -48,16 +48,16 @@ void func_02078428(u32 dmaNo, const void *src, u32 length, MIDmaCallback callbac
     sGXDmaState.length = length;
     sGXDmaState.callback = callback;
     sGXDmaState.arg = arg;
-    dma_check_source_valid(dmaNo, (u32)src, length, MI_DMA_SRC_INC);
-    func_0207829c(dmaNo);
-    enabled = CPU_IRQDisable();
+    MIi_CheckDma0SourceAddress(dmaNo, (u32)src, length, MI_DMA_SRC_INC);
+    MI_WaitDma(dmaNo);
+    enabled = OS_DisableInterrupts();
     sGXDmaState.fifoIrqCondition = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_FIFO_IRQ_MASK) >> REG_G3X_GXSTAT_FIFO_IRQ_SHIFT;
-    sGXDmaState.irqFunc = func_02079d88(OS_IE_GXFIFO);
+    sGXDmaState.irqFunc = OS_GetIrqFunction(OS_IE_GXFIFO);
     reg_G3X_GXSTAT = (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FIFO_IRQ_MASK) | (1 << REG_G3X_GXSTAT_FIFO_IRQ_SHIFT);
-    CPU_SetIRQFunc(OS_IE_GXFIFO, func_020784d0);
-    CPU_EnableInterrupts(OS_IE_GXFIFO);
+    OS_SetIrqFunction(OS_IE_GXFIFO, func_020784d0);
+    OS_EnableIrqMask(OS_IE_GXFIFO);
     func_020784d0();
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // The FIFO's interrupt: sends the next part, and the last with a DMA that ends in func_02078550
@@ -75,14 +75,14 @@ static void func_020784d0(void) {
     sGXDmaState.length -= part;
     sGXDmaState.src += part;
     if (sGXDmaState.length == 0) {
-        irq_setDMACallback(sGXDmaState.dmaNo, func_02078550, NULL);
+        OSi_EnterDmaCallback(sGXDmaState.dmaNo, func_02078550, NULL);
         dma_beginSyncEx(sGXDmaState.dmaNo, src, REG_GXFIFO_ADDR,
                         MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX | (part >> 2), 0);
-        CPU_AcknowledgeInterrupts(OS_IE_GXFIFO);
+        OS_ResetRequestIrqMask(OS_IE_GXFIFO);
     } else {
         dma_beginSyncEx(sGXDmaState.dmaNo, src, REG_GXFIFO_ADDR,
                         MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX | (part >> 2), 0);
-        CPU_AcknowledgeInterrupts(OS_IE_GXFIFO);
+        OS_ResetRequestIrqMask(OS_IE_GXFIFO);
     }
 }
 
@@ -91,10 +91,10 @@ static void func_02078550(void *arg) {
     MIDmaCallback callback;
     void *callbackArg;
 
-    CPU_DisableInterrupts(OS_IE_GXFIFO);
+    OS_DisableIrqMask(OS_IE_GXFIFO);
     reg_G3X_GXSTAT = (sGXDmaState.fifoIrqCondition << REG_G3X_GXSTAT_FIFO_IRQ_SHIFT) |
                      (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FIFO_IRQ_MASK);
-    CPU_SetIRQFunc(OS_IE_GXFIFO, sGXDmaState.irqFunc);
+    OS_SetIrqFunction(OS_IE_GXFIFO, sGXDmaState.irqFunc);
     sGXDmaState.isBusy = FALSE;
     callback = sGXDmaState.callback;
     callbackArg = sGXDmaState.arg;
@@ -103,7 +103,7 @@ static void func_02078550(void *arg) {
     }
 }
 
-void func_02078594(u32 dmaNo, const void *src, u32 length, MIDmaCallback callback, void *arg) {
+void MI_SendGXCommandAsyncFast(u32 dmaNo, const void *src, u32 length, MIDmaCallback callback, void *arg) {
     if (length == 0) {
         if (callback != NULL) {
             callback(arg);
@@ -116,10 +116,10 @@ void func_02078594(u32 dmaNo, const void *src, u32 length, MIDmaCallback callbac
     sGXDmaState.dmaNo = dmaNo;
     sGXDmaState.callback = callback;
     sGXDmaState.arg = arg;
-    func_02078344(dmaNo, MI_DMA_TIMING_GXFIFO);
-    dma_check_source_valid(dmaNo, (u32)src, length, MI_DMA_SRC_INC);
-    func_0207829c(dmaNo);
-    irq_setDMACallback(dmaNo, func_0207860c, NULL);
+    MIi_CheckAnotherAutoDMA(dmaNo, MI_DMA_TIMING_GXFIFO);
+    MIi_CheckDma0SourceAddress(dmaNo, (u32)src, length, MI_DMA_SRC_INC);
+    MI_WaitDma(dmaNo);
+    OSi_EnterDmaCallback(dmaNo, func_0207860c, NULL);
     dma_beginSyncEx(dmaNo, (u32)src, REG_GXFIFO_ADDR,
                     MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_TIMING_GXFIFO | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX |
                         (length >> 2),

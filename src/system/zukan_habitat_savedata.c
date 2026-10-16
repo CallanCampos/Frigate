@@ -10,7 +10,7 @@
 static u32 getSize(void);
 
 void func_02010ca0(void *data) {
-    sys_memset(data, 0, getSize());
+    MI_CpuFill8(data, 0, getSize());
 }
 
 static u32 getSize(void) {

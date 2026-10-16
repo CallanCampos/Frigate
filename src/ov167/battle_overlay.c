@@ -9,7 +9,7 @@ static BOOL sOverlayLoaded;
 
 // Loads overlay 219 when the game's flags ask for it
 void func_ov167_021ce10c(void) {
-    if (func_0207ac24() & 0x2000000) {
+    if (OS_GetConsoleType() & 0x2000000) {
         GFL_OvlLoad(OVERLAY_ID(219));
         sOverlayLoaded = TRUE;
     } else {

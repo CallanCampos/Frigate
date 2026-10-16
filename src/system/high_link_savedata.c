@@ -22,7 +22,7 @@ u32 getSizeofProbabilityTable(void) {
 void probability(HighLinkSave *save) {
     int i;
 
-    sys_memset(save, 0, sizeof(HighLinkSave));
+    MI_CpuFill8(save, 0, sizeof(HighLinkSave));
     setupProbabilityTable(&save->levels);
     for (i = 0; i < HIGH_LINK_POWER_MAX; i++) {
         save->powers[i] = HIGH_LINK_POWER_NONE;
@@ -30,7 +30,7 @@ void probability(HighLinkSave *save) {
 }
 
 void setupProbabilityTable(PassPowerLevel *levels) {
-    sys_memset(levels, 0, sizeof(PassPowerLevel));
+    MI_CpuFill8(levels, 0, sizeof(PassPowerLevel));
     probabilityLoop((SurveyProbabilityState *)levels);
 }
 

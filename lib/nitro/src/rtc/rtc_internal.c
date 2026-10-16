@@ -3,26 +3,26 @@
 #include "nitro/pxi.h"
 #include "nitro/rtc.h"
 
-static BOOL func_0207d094(u8 command);
+static BOOL RtcSendPxiCommand(u8 command);
 
-BOOL func_0207d064(void) {
-    return func_0207d094(RTC_PXI_COMMAND_READ_DATETIME);
+BOOL RTCi_ReadRawDateTimeAsync(void) {
+    return RtcSendPxiCommand(RTC_PXI_COMMAND_READ_DATETIME);
 }
 
-BOOL func_0207d070(void) {
-    return func_0207d094(RTC_PXI_COMMAND_READ_DATE);
+BOOL RTCi_ReadRawDateAsync(void) {
+    return RtcSendPxiCommand(RTC_PXI_COMMAND_READ_DATE);
 }
 
-BOOL func_0207d07c(void) {
-    return func_0207d094(RTC_PXI_COMMAND_READ_TIME);
+BOOL RTCi_ReadRawTimeAsync(void) {
+    return RtcSendPxiCommand(RTC_PXI_COMMAND_READ_TIME);
 }
 
-BOOL func_0207d088(void) {
-    return func_0207d094(RTC_PXI_COMMAND_WRITE_STATUS2);
+BOOL RTCi_WriteRawStatus2Async(void) {
+    return RtcSendPxiCommand(RTC_PXI_COMMAND_WRITE_STATUS2);
 }
 
 // NitroSDK's RtcSendPxiCommand: sends a command with the RTC's tag, and tells whether the FIFO took it
-static BOOL func_0207d094(u8 command) {
+static BOOL RtcSendPxiCommand(u8 command) {
     BOOL sent = FALSE;
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_RTC, ((u32)command << RTC_PXI_COMMAND_SHIFT) & RTC_PXI_COMMAND_MASK, FALSE) >=

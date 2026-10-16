@@ -123,7 +123,7 @@ static BOOL BrBvRank_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     int i;
 
     p_wk = GFL_ProcInitSubsystem(proc, sizeof(BrBvRankWork), BrProcSys_GetHeapID(p_param->procSys));
-    sys_memset(p_wk, 0, sizeof(BrBvRankWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvRankWork));
     p_wk->p_param = p_param;
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
@@ -232,7 +232,7 @@ static void BrBvRank_SeqCreate(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     BrRes_LoadOBJ(p_wk->p_param->res, 6, p_wk->heapId);
     p_wk->isResLoaded = TRUE;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 80;
     setup.y = 168;
     setup.sequence = 0;
@@ -379,7 +379,7 @@ static void BrBvRank_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         BrNetRequestParam req;
         int type;
 
-        sys_memset(&req, 0, sizeof(BrNetRequestParam));
+        MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
         switch (p_wk->p_param->mode) {
         case BR_BVRANK_MODE_LIST1:
             type = BR_NET_REQUEST_5;
@@ -398,7 +398,7 @@ static void BrBvRank_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             GFL_ASSERT(0);
             break;
         }
-        sys_memset(p_wk->p_param->p_outline, 0, sizeof(BrOutlineData));
+        MI_CpuFill8(p_wk->p_param->p_outline, 0, sizeof(BrOutlineData));
         p_wk->cnt = 0;
         BrNet_StartRequest(p_wk->p_param->net, type, &req);
         *p_seq = SEQ_DOWNLOAD_WAIT;
@@ -561,7 +561,7 @@ static void BrBvRankList_Init(BrBvRankList *p_wk, BrOutlineData *p_outline, BrRe
     font = BrRes_GetFont(res);
     msg = BrRes_GetMsgData(res);
 
-    sys_memset(p_wk, 0, sizeof(BrBvRankList));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvRankList));
     p_wk->p_outline = p_outline;
     p_wk->p_word = GFL_WordSetSystemCreateDefault(heapId);
     p_wk->ballMain = ballMain;
@@ -625,7 +625,7 @@ static void BrBvRankList_Exit(BrBvRankList *p_wk) {
     GFL_WordSetSystemFree(p_wk->p_word);
     BrList_Exit(p_wk->p_list);
     ListMenuCore_FreeOptionList(p_wk->p_list_data);
-    sys_memset(p_wk, 0, sizeof(BrBvRankList));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvRankList));
 }
 
 // Runs the list, and scrolls the icons when it has scrolled
@@ -665,7 +665,7 @@ static void BrBvRankList_CreateIcons(BrBvRankList *p_wk, ClActUnit *unit, HeapID
     p_wk->plt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x80, heapId);
     p_wk->cel = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
@@ -822,7 +822,7 @@ static void BrBvRank_GetPokeData(BrOutline *outline, BrBvRankPokeData *poke) {
     int idx = 0;
     int i;
 
-    sys_memset(poke, 0, sizeof(BrBvRankPokeData));
+    MI_CpuFill8(poke, 0, sizeof(BrBvRankPokeData));
     header = &outline->header;
     mode = func_0200c124(header, BATTLE_REC_HEADER_MODE, 0);
     switch (mode) {

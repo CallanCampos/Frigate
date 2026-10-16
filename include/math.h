@@ -19,7 +19,7 @@
 
 double copysign(double x, double y);
 double cos(double x);
-double fabs(double x);
+double fabs(double x); // swan's floatAbs
 double floor(double x);
 double frexp(double x, int *eptr);
 double ldexp(double x, int n);

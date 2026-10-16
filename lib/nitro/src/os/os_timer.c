@@ -6,6 +6,6 @@
 static u16 OSi_TimerReserved;
 
 // NitroSDK's OSi_SetTimerReserved: takes a timer for the OS
-void func_0207ba64(int timerNo) {
+void OSi_SetTimerReserved(int timerNo) {
     OSi_TimerReserved |= (u16)(1 << timerNo);
 }

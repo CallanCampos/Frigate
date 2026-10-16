@@ -511,7 +511,7 @@ BOOL TrAI_ChooseMove(VM *vm, TrAIContext *wk) {
                 wk->seq = TRAI_SEQ_LOAD_SCRIPT;
             }
             wk->status &= (u8)~TRAI_STATUS_SUSPENDED;
-            wk->startTick = clock();
+            wk->startTick = OS_GetTick();
             TrAI_RunScripts(vm, wk);
             if (wk->status & TRAI_STATUS_SUSPENDED) {
                 return TRUE;
@@ -593,7 +593,7 @@ BOOL TrAI_ChooseMoveAndTarget(VM *vm, TrAIContext *wk) {
                     wk->seq = TRAI_SEQ_LOAD_SCRIPT;
                 }
                 wk->status &= (u8)~TRAI_STATUS_SUSPENDED;
-                wk->startTick = clock();
+                wk->startTick = OS_GetTick();
                 TrAI_RunScripts(vm, wk);
                 if (wk->status & TRAI_STATUS_SUSPENDED) {
                     return TRUE;
@@ -688,7 +688,7 @@ void TrAI_RunScripts(VM *vm, TrAIContext *wk) {
                     wk->status &= (u8)~TRAI_STATUS_SUSPENDED;
                     TrAI_ReleaseScript(wk);
                     wk->script = NULL;
-                } else if (clock() - wk->startTick > TRAI_TIME_LIMIT) {
+                } else if (OS_GetTick() - wk->startTick > TRAI_TIME_LIMIT) {
                     wk->status |= TRAI_STATUS_SUSPENDED;
                     break;
                 }

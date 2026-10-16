@@ -1,11 +1,11 @@
 // DWC's auto-connect, the search for an access point (TWL-DWC 5.3, ac). The file name is a guess: its functions are the
-// handlers of the states that dwc_ac.c dispatches below 7 (func_0205c37c, the search) and of state 9 (func_0205c2a4,
-// the end of the connection to a candidate, which goes back to the search), and the scans they start. A round of the
-// search has up to three passes: state 3 listens on every other channel for any access point, state 4 asks for each
-// candidate found on its own channel, and state 5 asks for the SSID of each target on the channels where a beacon came
-// with no SSID. The first round listens on the channels with an even index (channels 1, 3, ...), the second, which
-// follows when the first finds nothing to connect to, on those with an odd one. State 6 is the end of the search. The
-// file ends where dwc_ac_wepkey.c begins.
+// handlers of the states that dwc_ac.c dispatches below 7 (DWCAc_StepSearch, the search) and of state 9
+// (DWCAc_StepCandidateOver, the end of the connection to a candidate, which goes back to the search), and the scans
+// they start. A round of the search has up to three passes: state 3 listens on every other channel for any access
+// point, state 4 asks for each candidate found on its own channel, and state 5 asks for the SSID of each target on the
+// channels where a beacon came with no SSID. The first round listens on the channels with an even index (channels 1, 3,
+// ...), the second, which follows when the first finds nothing to connect to, on those with an odd one. State 6 is the
+// end of the search. The file ends where dwc_ac_wepkey.c begins.
 
 #include "dwc/ac.h"
 #include "nitro/os.h"
@@ -27,18 +27,18 @@ static const u32 sChannelOptions[13] = {
 #define CANDIDATE_SCAN_OPTION(channel) ((u16)(((channel) - 1) | 0x300000))
 #endif
 
-static u8 func_0205cb08(DWCAcSearchWork *work, u8 state);
-static u8 func_0205cd08(DWCAcSearchWork *work);
-static void func_0205c520(u8 state);
-static u8 func_0205c688(DWCAcSearchWork *work);
-static u8 func_0205c6f4(DWCAcSearchWork *work);
-static u8 func_0205c748(DWCAcSearchWork *work);
-static u8 func_0205c814(DWCAcSearchWork *work);
-static u8 func_0205c9bc(DWCAcSearchWork *work);
-static u8 func_0205cbc4(DWCAcSearchWork *work, u8 state);
-static s8 func_0205cd90(BOOL second);
-static s8 func_0205ce34(s8 channel);
-static s8 func_0205cecc(void);
+static u8 DWCAc_EndPass(DWCAcSearchWork *work, u8 state);
+static u8 DWCAc_StartHiddenPass(DWCAcSearchWork *work);
+static void DWCAc_StartScan(u8 state);
+static u8 DWCAc_StartSearch(DWCAcSearchWork *work);
+static u8 DWCAc_StartSecondRound(DWCAcSearchWork *work);
+static u8 DWCAc_StepListenPass(DWCAcSearchWork *work);
+static u8 DWCAc_StepCandidatePass(DWCAcSearchWork *work);
+static u8 DWCAc_StepHiddenPass(DWCAcSearchWork *work);
+static u8 DWCAc_TryCandidate(DWCAcSearchWork *work, u8 state);
+static s8 DWCAc_FirstChannel(BOOL second);
+static s8 DWCAc_NextChannel(s8 channel);
+static s8 DWCAc_NextHiddenChannel(void);
 
 // Whether the wireless manager lets the channels of the mask be used
 static inline BOOL IsChannelAllowed(u16 mask) {
@@ -54,8 +54,8 @@ static inline BOOL IsChannelAllowed(u16 mask) {
 // (its state 3; 6 is a scan, 9 a connection) and then the search goes on from the state it was in, or the connection
 // goes to the next target of a candidate that several matched (state 7). The wireless manager's states 11 and 12 are
 // errors, and end everything. The state that follows
-u8 func_0205c2a4(void) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+u8 DWCAc_StepCandidateOver(void) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u8 state = 9;
 
     switch (WCM_GetState()) {
@@ -65,7 +65,7 @@ u8 func_0205c2a4(void) {
             work->infos[work->selected].unk_00 = 0;
             state = 7;
         } else if (state >= 3 && state <= 5) {
-            func_0205c520(state);
+            DWCAc_StartScan(state);
         }
         break;
     case 6:
@@ -76,11 +76,11 @@ u8 func_0205c2a4(void) {
         break;
     case 12:
         WCM_RestoreIdleAsync();
-        func_0205a85c(4);
+        DWCAc_SetError(4);
         state = 17;
         break;
     case 11:
-        func_0205a85c(0);
+        DWCAc_SetError(0);
         state = 17;
         break;
     }
@@ -90,11 +90,11 @@ u8 func_0205c2a4(void) {
 // The handler of the states 2 to 6, the search. In state 2, once the wireless manager is idle, it measures what the
 // channels allow, sets how long a scan stays on a channel and starts the first scan, which is state 3. After that, as
 // long as the wireless manager is idle or scanning, it connects to a candidate if one is good enough
-// (func_0205cbc4), and otherwise lets the scan of the state at hand run its course. An error of the wireless manager
-// ends everything. The state that follows
-u8 func_0205c37c(void) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
-    u8 state = func_0205a83c();
+// (DWCAc_TryCandidate), and otherwise lets the scan of the state at hand run its course. An error of the wireless
+// manager ends everything. The state that follows
+u8 DWCAc_StepSearch(void) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
+    u8 state = DWCAc_GetState();
     s32 wcmState = WCM_GetState();
 
     if (state == 2 && wcmState == 3) {
@@ -119,33 +119,33 @@ u8 func_0205c37c(void) {
             work->scanTime = 300;
             work->directedTime = 150;
         }
-        state = func_0205c688(work);
+        state = DWCAc_StartSearch(work);
     } else if (state == 6) {
-        state = func_0205cbc4(work, state);
+        state = DWCAc_TryCandidate(work, state);
     } else if (wcmState == 3 || wcmState == 6) {
-        state = func_0205cbc4(work, state);
+        state = DWCAc_TryCandidate(work, state);
         if (state != 7) {
             if (state == 3) {
-                state = func_0205c748(work);
+                state = DWCAc_StepListenPass(work);
             } else if (state == 4) {
-                state = func_0205c814(work);
+                state = DWCAc_StepCandidatePass(work);
             } else if (state == 5) {
-                state = func_0205c9bc(work);
+                state = DWCAc_StepHiddenPass(work);
             }
         }
     } else if (wcmState == 11) {
-        func_0205a85c(0);
+        DWCAc_SetError(0);
         return 17;
     } else if (wcmState > 11) {
-        func_0205a85c(4);
+        DWCAc_SetError(4);
         return 17;
     }
     return state;
 }
 
 // Notes that a beacon with no SSID came in on the channel (its number from 1), so that the third pass looks on it
-void func_0205c4e4(u32 channel) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+void DWCAc_NoteHiddenChannel(u32 channel) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     if (channel > work->channelMax) {
         channel = work->channelMax;
@@ -156,17 +156,17 @@ void func_0205c4e4(u32 channel) {
 // Starts the scan that a state of the search has on the channel it is at. State 3 listens for any access point, state
 // 4 asks the candidate at hand on its own channel (and drops it if the wireless manager does not allow the channel),
 // and state 5 asks for the SSID of the target at hand
-static void func_0205c520(u8 state) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+static void DWCAc_StartScan(u8 state) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
     switch (state) {
     case 3:
-        work->connectedTime = clock();
+        work->connectedTime = OS_GetTick();
         WCM_SearchAsync(WCMiAnyBssid, WCMiAnyEssid, sChannelOptions[work->tag] | 0x200000);
         break;
     case 4:
         if (IsChannelAllowed(1 << (work->candidates[work->current].channel - 1)) == TRUE) {
-            work->connectedTime = clock();
+            work->connectedTime = OS_GetTick();
             WCM_SearchAsync(work->candidates[work->current].bssid, work->candidates[work->current].ssid,
                             CANDIDATE_SCAN_OPTION(work->candidates[work->current].channel));
         } else {
@@ -174,40 +174,40 @@ static void func_0205c520(u8 state) {
         }
         break;
     case 5:
-        work->connectedTime = clock();
+        work->connectedTime = OS_GetTick();
         WCM_SearchAsync(WCMiAnyBssid, work->targets[work->current].ssid, sChannelOptions[work->tag] | 0x300000);
         break;
     }
 }
 
 // Starts the search, in state 2: the first channel to listen on, and the scan. State 3
-static u8 func_0205c688(DWCAcSearchWork *work) {
-    work->connectedTime = clock();
-    work->tag = func_0205cd90(FALSE);
-    work->connectedTime = clock();
+static u8 DWCAc_StartSearch(DWCAcSearchWork *work) {
+    work->connectedTime = OS_GetTick();
+    work->tag = DWCAc_FirstChannel(FALSE);
+    work->connectedTime = OS_GetTick();
     WCM_SearchAsync(WCMiAnyBssid, WCMiAnyEssid, sChannelOptions[work->tag] | 0x200000);
     return 3;
 }
 
 // Begins the second round of the search: the list of targets is made again, and the first channel to listen on is that
 // with the index 1. State 3
-static u8 func_0205c6f4(DWCAcSearchWork *work) {
+static u8 DWCAc_StartSecondRound(DWCAcSearchWork *work) {
     work->attempts = 0;
     work->round++;
-    func_0205b890(0);
-    work->tag = func_0205cd90(TRUE);
+    DWCAc_MakeSearchList(0);
+    work->tag = DWCAc_FirstChannel(TRUE);
     return 3;
 }
 
 // State 3: when the scan has had its time on the channel, goes on to the next channel of the pass, or to what follows
 // the pass when there are no more
-static u8 func_0205c748(DWCAcSearchWork *work) {
-    if (OS_TicksToMilliSeconds(clock() - work->connectedTime) >= work->scanTime) {
-        work->tag = func_0205ce34(work->tag);
+static u8 DWCAc_StepListenPass(DWCAcSearchWork *work) {
+    if (OS_TicksToMilliSeconds(OS_GetTick() - work->connectedTime) >= work->scanTime) {
+        work->tag = DWCAc_NextChannel(work->tag);
         if (work->tag == -1) {
-            return func_0205cb08(work, 3);
+            return DWCAc_EndPass(work, 3);
         }
-        work->connectedTime = clock();
+        work->connectedTime = OS_GetTick();
         WCM_SearchAsync(WCMiAnyBssid, WCMiAnyEssid, sChannelOptions[work->tag] | 0x200000);
     }
     return 3;
@@ -215,8 +215,8 @@ static u8 func_0205c748(DWCAcSearchWork *work) {
 
 // State 4: when the scan for the candidate at hand has had its time or has found it, goes on to the next candidate
 // that was not seen, or to what follows the pass when there are no more
-static u8 func_0205c814(DWCAcSearchWork *work) {
-    if (OS_TicksToMilliSeconds(clock() - work->connectedTime) >= work->directedTime ||
+static u8 DWCAc_StepCandidatePass(DWCAcSearchWork *work) {
+    if (OS_TicksToMilliSeconds(OS_GetTick() - work->connectedTime) >= work->directedTime ||
         work->infos[work->current].seen == 1) {
         work->infos[work->current].seen = 1;
         while (work->current < work->candidateCount) {
@@ -227,10 +227,10 @@ static u8 func_0205c814(DWCAcSearchWork *work) {
         }
         if (work->candidateCount <= work->current) {
             work->current = 0;
-            return func_0205cb08(work, 4);
+            return DWCAc_EndPass(work, 4);
         }
         if (IsChannelAllowed(1 << (work->candidates[work->current].channel - 1)) == TRUE) {
-            work->connectedTime = clock();
+            work->connectedTime = OS_GetTick();
             WCM_SearchAsync(work->candidates[work->current].bssid, work->candidates[work->current].ssid,
                             CANDIDATE_SCAN_OPTION(work->candidates[work->current].channel));
         } else {
@@ -242,21 +242,21 @@ static u8 func_0205c814(DWCAcSearchWork *work) {
 
 // State 5: when the scan for the target at hand has had its time or has found it, goes on to the next target, and
 // when they are all done to the next channel where a hidden SSID was seen, or to what follows the pass
-static u8 func_0205c9bc(DWCAcSearchWork *work) {
-    if (OS_TicksToMilliSeconds(clock() - work->connectedTime) >= work->directedTime ||
+static u8 DWCAc_StepHiddenPass(DWCAcSearchWork *work) {
+    if (OS_TicksToMilliSeconds(OS_GetTick() - work->connectedTime) >= work->directedTime ||
         work->targets[work->current].found == 1) {
         work->targets[work->current].found = 0;
         work->current++;
         if (work->targetCount <= work->current) {
             work->attempts++;
             work->current = 0;
-            work->tag = func_0205cecc();
+            work->tag = DWCAc_NextHiddenChannel();
         }
         if (work->tag < 0) {
             work->attempts = 0;
-            return func_0205cb08(work, 5);
+            return DWCAc_EndPass(work, 5);
         }
-        work->connectedTime = clock();
+        work->connectedTime = OS_GetTick();
         WCM_SearchAsync(WCMiAnyBssid, work->targets[work->current].ssid, sChannelOptions[work->tag] | 0x300000);
     }
     return 5;
@@ -266,33 +266,33 @@ static u8 func_0205c9bc(DWCAcSearchWork *work) {
 // found are asked on their own channels (state 4) if there are any, and after that or in its place the channels with
 // hidden SSIDs are looked into (state 5); when nothing is left the second round begins, or if it has been the search
 // ends (state 6)
-static u8 func_0205cb08(DWCAcSearchWork *work, u8 state) {
+static u8 DWCAc_EndPass(DWCAcSearchWork *work, u8 state) {
     switch (state) {
     case 3:
         if (work->candidateCount != 0 || work->hiddenMask != 0) {
-            if (func_0205b890(1) == TRUE) {
+            if (DWCAc_MakeSearchList(1) == TRUE) {
                 state = 4;
             } else {
-                state = func_0205cd08(work);
+                state = DWCAc_StartHiddenPass(work);
             }
         } else if (work->round >= 1) {
             state = 6;
         } else {
-            state = func_0205c6f4(work);
+            state = DWCAc_StartSecondRound(work);
         }
         break;
     case 4:
-        state = func_0205cd08(work);
+        state = DWCAc_StartHiddenPass(work);
         break;
     case 5:
         if (work->round >= 1) {
             state = 6;
         } else {
-            state = func_0205c6f4(work);
+            state = DWCAc_StartSecondRound(work);
         }
         break;
     }
-    func_0205c520(state);
+    DWCAc_StartScan(state);
     return state;
 }
 
@@ -301,7 +301,7 @@ static u8 func_0205cb08(DWCAcSearchWork *work, u8 state) {
 // settings prefer WPA, it can be taken for a connection with it. The scan is stopped, and the state is kept to go back
 // to (resumeState); the state that follows is 7. In state 6, the end of the search, any candidate that is left is taken
 // and there being none is an error: 5 when none was found, 6 when all were tried. The state that follows
-static u8 func_0205cbc4(DWCAcSearchWork *work, u8 state) {
+static u8 DWCAc_TryCandidate(DWCAcSearchWork *work, u8 state) {
     u8 i;
     u8 count;
 
@@ -317,9 +317,9 @@ static u8 func_0205cbc4(DWCAcSearchWork *work, u8 state) {
     if (state == 6) {
         if (count == i) {
             if (i == 0) {
-                func_0205a85c(5);
+                DWCAc_SetError(5);
             } else {
-                func_0205a85c(6);
+                DWCAc_SetError(6);
             }
             return 17;
         }
@@ -341,7 +341,7 @@ static u8 func_0205cbc4(DWCAcSearchWork *work, u8 state) {
             return state;
         }
         if (work->preferWpa == 1) {
-            if (!func_020590cc(&work->candidates[i])) {
+            if (!DWCAc_CheckWpa(&work->candidates[i])) {
                 return state;
             }
         }
@@ -356,27 +356,27 @@ static u8 func_0205cbc4(DWCAcSearchWork *work, u8 state) {
 }
 
 // What follows the pass of the candidates, or comes in place of it: the third pass, for the channels where a beacon
-// with no SSID came, if the list of targets for it has any (func_0205b890 with 2); else the second round, or the end if
-// it has been. The state that follows
-static u8 func_0205cd08(DWCAcSearchWork *work) {
-    if (work->hiddenMask != 0 && func_0205b890(2) == TRUE) {
-        work->tag = func_0205cecc();
+// with no SSID came, if the list of targets for it has any (DWCAc_MakeSearchList with 2); else the second round, or the
+// end if it has been. The state that follows
+static u8 DWCAc_StartHiddenPass(DWCAcSearchWork *work) {
+    if (work->hiddenMask != 0 && DWCAc_MakeSearchList(2) == TRUE) {
+        work->tag = DWCAc_NextHiddenChannel();
         if (work->tag >= 0) {
             return 5;
         }
         work->attempts = 0;
-        return func_0205cb08(work, 5);
+        return DWCAc_EndPass(work, 5);
     }
     if (work->round >= 1) {
         return 6;
     }
-    return func_0205c6f4(work);
+    return DWCAc_StartSecondRound(work);
 }
 
 // The index of the first channel of a round that the wireless manager allows: the channels with an even index (0, 2,
 // ...) for FALSE, those with an odd one for TRUE. If it allows none, the index the round starts at
-static s8 func_0205cd90(BOOL second) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+static s8 DWCAc_FirstChannel(BOOL second) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     int channel;
     u16 mask;
 
@@ -399,8 +399,8 @@ static s8 func_0205cd90(BOOL second) {
 }
 
 // The index of the channel of the round after the one given (two on) that the wireless manager allows, or -1
-static s8 func_0205ce34(s8 channel) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+static s8 DWCAc_NextChannel(s8 channel) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u16 mask;
 
     channel += 2;
@@ -418,8 +418,8 @@ static s8 func_0205ce34(s8 channel) {
 
 // The channel for the third pass: the one of the hidden ones that the pass is at (attempts counts how many it is
 // past) if the wireless manager allows it, else the next. -1 when there is none
-static s8 func_0205cecc(void) {
-    DWCAcSearchWork *work = func_0205a78c(DWC_AC_WORK_SEARCH);
+static s8 DWCAc_NextHiddenChannel(void) {
+    DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u16 hidden = work->hiddenMask;
     u8 i;
     u8 count;

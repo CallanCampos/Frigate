@@ -275,8 +275,8 @@ static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, voi
     }
     GFL_HeapCreateChild(parentHeapId, HEAPID_WIFIBATTLEMATCH, 0x8000);
     sys = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchSys), HEAPID_WIFIBATTLEMATCH);
-    sys_memset(sys, 0, sizeof(WifiBattleMatchSys));
-    sys_memcpy(matchParam, &sys->param, sizeof(WifiBattleMatchParam));
+    MI_CpuFill8(sys, 0, sizeof(WifiBattleMatchSys));
+    MI_CpuCopy8(matchParam, &sys->param, sizeof(WifiBattleMatchParam));
     sys->result = 0;
     if (sys->param.gameData == NULL) {
         sys->param.gameData = GameData_Create(HEAPID_USER);
@@ -306,12 +306,12 @@ static BOOL WifiBattleMatchSys_Init(GameProc *proc, u32 *state, void *param, voi
     switch (sys->param.unkC) {
     case 0:
         party = GameData_GetParty(sys->param.gameData);
-        sys_memcpy(party, player->partyData, PokeParty_GetSaveDataSize());
+        MI_CpuCopy8(party, player->partyData, PokeParty_GetSaveDataSize());
         break;
     case 1:
         party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(sys->param.gameData)),
                                            HEAPID_TAIL(HEAPID_WIFIBATTLEMATCH));
-        sys_memcpy(party, player->partyData, PokeParty_GetSaveDataSize());
+        MI_CpuCopy8(party, player->partyData, PokeParty_GetSaveDataSize());
         GFL_HeapFree(party);
         break;
     }
@@ -371,7 +371,7 @@ static void *WifiBattleMatchSys_CreateChampionshipParam(WifiBattleMatchChain *ch
     WifiBattleMatchChampionshipParam *param =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchChampionshipParam), FALSE, "wifibattlematch_sys.c", 591);
 
-    sys_memset(param, 0, sizeof(WifiBattleMatchChampionshipParam));
+    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchChampionshipParam));
     param->gameData = sys->param.gameData;
     param->player = sys->player;
     param->otherPlayer = sys->otherPlayer;
@@ -442,7 +442,7 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
     WifiBattleMatchNetParam *param =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchNetParam), FALSE, "wifibattlematch_sys.c", 704);
 
-    sys_memset(param, 0, sizeof(WifiBattleMatchNetParam));
+    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchNetParam));
     param->param = &sys->param;
     param->result = sys->result;
     param->mode = sys->mode - 2;
@@ -514,7 +514,7 @@ static void *WifiBattleMatchSys_CreateListParam(WifiBattleMatchChain *chain, Hea
     PokeParty_Init(sys->party);
     PokeParty_Init(sys->otherParty);
     param = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchListParam), FALSE, "wifibattlematch_sys.c", 815);
-    sys_memset(param, 0, sizeof(WifiBattleMatchListParam));
+    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchListParam));
     if (sys->mode - 2 <= 1) {
         switch (sys->param.unk4) {
         case 0:
@@ -611,12 +611,12 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
     tournament = getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData));
     param = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchBattleParam), FALSE, "wifibattlematch_sys.c", 992);
     fileId = 0x10;
-    sys_memset(param, 0, sizeof(WifiBattleMatchBattleParam));
+    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchBattleParam));
     param->gameData = sys->param.gameData;
     clearVSPlayer();
-    sys_memset(&sys->battleResult, 0, sizeof(WifiBattleMatchBattleResult));
+    MI_CpuFill8(&sys->battleResult, 0, sizeof(WifiBattleMatchBattleResult));
     param->players = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchPlayers), FALSE, "wifibattlematch_sys.c", 1003);
-    sys_memset(param->players, 0, sizeof(WifiBattleMatchPlayers));
+    MI_CpuFill8(param->players, 0, sizeof(WifiBattleMatchPlayers));
     param->players->records = GameData_GetRecords(sys->param.gameData);
     param->players->unk50 = 0;
     player = &param->players->base.players[0];
@@ -831,7 +831,7 @@ static void *WifiBattleMatchSys_CreateLoginParam(WifiBattleMatchChain *chain, He
     WifiLoginParam *param = GFL_HeapAllocate(heapId, sizeof(WifiLoginParam), FALSE, "wifibattlematch_sys.c", 1415);
     u32 serviceId;
 
-    sys_memset(param, 0, sizeof(WifiLoginParam));
+    MI_CpuFill8(param, 0, sizeof(WifiLoginParam));
     param->gameData = sys->param.gameData;
     param->unk4 = 0;
     param->unk8 = 1;
@@ -877,7 +877,7 @@ static void *WifiBattleMatchSys_CreateExchangeParam(WifiBattleMatchChain *chain,
     WifiBattleMatchExchangeParam *param =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchExchangeParam), FALSE, "wifibattlematch_sys.c", 1499);
 
-    sys_memset(param, 0, sizeof(WifiBattleMatchExchangeParam));
+    MI_CpuFill8(param, 0, sizeof(WifiBattleMatchExchangeParam));
     param->gameData = &sys->param.gameData;
     param->party = sys->party;
     param->otherParty = sys->otherParty;
@@ -932,7 +932,7 @@ static void *WifiBattleMatchSys_CreateResultParam(WifiBattleMatchChain *chain, H
     int param0D;
     Regulation *regulation = NULL;
 
-    sys_memset(param, 0, sizeof(Ov306Param));
+    MI_CpuFill8(param, 0, sizeof(Ov306Param));
     if (sys->mode == 3) {
         battleType = sys->param.unk4 + 0x17;
     } else if (sys->mode == 2) {
@@ -986,7 +986,7 @@ static BOOL WifiBattleMatchSys_FinishResult(WifiBattleMatchChain *chain, void *p
 static void *WifiBattleMatchSys_CreateLogoutParam(WifiBattleMatchChain *chain, HeapID heapId, WifiBattleMatchSys *sys) {
     WifiLogoutParam *param = GFL_HeapAllocate(heapId, sizeof(WifiLogoutParam), FALSE, "wifibattlematch_sys.c", 1713);
 
-    sys_memset(param, 0, sizeof(WifiLogoutParam));
+    MI_CpuFill8(param, 0, sizeof(WifiLogoutParam));
     param->gameData = sys->param.gameData;
     param->unk4 = 0;
     param->unk8 = 1;
@@ -1020,7 +1020,7 @@ static BOOL WifiBattleMatchSys_FinishLogout(WifiBattleMatchChain *chain, void *p
 static void *WifiBattleMatchSys_CreateReplayParam(WifiBattleMatchChain *chain, HeapID heapId, WifiBattleMatchSys *sys) {
     BtlSetup *setup = GFL_HeapAllocate(heapId, sizeof(BtlSetup), FALSE, "wifibattlematch_sys.c", 1779);
 
-    sys_memset(setup, 0, sizeof(BtlSetup));
+    MI_CpuFill8(setup, 0, sizeof(BtlSetup));
     GFL_OvlLoad(OVERLAY_ID(167));
     BtlSetup_Reset(setup);
     BtlSetup_InitForRecord(setup, sys->param.gameData, heapId);
@@ -1047,7 +1047,7 @@ static BOOL WifiBattleMatchSys_FinishReplay(WifiBattleMatchChain *chain, void *p
 }
 
 static inline void WifiBattleMatchSys_MemClear(void *dest, u32 size) {
-    sys_memset(dest, 0, size);
+    MI_CpuFill8(dest, 0, size);
 }
 
 static void WifiBattleMatchSys_AllocPlayers(WifiBattleMatchSys *sys, HeapID heapId) {
@@ -1074,7 +1074,7 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
     BOOL ret;
     int i;
 
-    sys_memset(report, 0, sizeof(WifiBattleMatchReport));
+    MI_CpuFill8(report, 0, sizeof(WifiBattleMatchReport));
     report->profileId = func_02008bdc(&otherPlayer->info);
     report->unk4 = otherPlayer->unk48;
     for (i = 0; i < PokeParty_GetPkmCount(otherParty); i++) {
@@ -1181,7 +1181,7 @@ static WifiBattleMatchChain *WifiBattleMatchSys_ChainCreate(const WifiBattleMatc
     WifiBattleMatchChain *chain =
         GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchChain), FALSE, "wifibattlematch_sys.c", 2117);
 
-    sys_memset(chain, 0, sizeof(WifiBattleMatchChain));
+    MI_CpuFill8(chain, 0, sizeof(WifiBattleMatchChain));
     chain->procManager = CreateGameProcManager(heapId);
     chain->sys = sys;
     chain->steps = steps;

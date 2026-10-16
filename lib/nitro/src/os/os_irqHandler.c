@@ -3,16 +3,16 @@
 // is ARM code (the library's default).
 #include "nitro/os.h"
 
-// NitroSDK's OS_WaitIrq, under swan's name: sleeps until one of the interrupts has happened, after forgetting the
+// NitroSDK's OS_WaitIrq: sleeps until one of the interrupts has happened, after forgetting the
 // interrupts that already did if clear is set
-void irq_waitFor(BOOL clear, u32 interrupts) {
-    u32 irq = CPU_IRQDisable();
+void OS_WaitIrq(BOOL clear, u32 interrupts) {
+    u32 irq = OS_DisableInterrupts();
 
     if (clear) {
         *(vu32 *)HW_INTR_CHECK_BUF &= ~interrupts;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     while (!(interrupts & *(vu32 *)HW_INTR_CHECK_BUF)) {
-        scheduler_yield(&data_02fe00a0);
+        OS_SleepThread(&OSi_IrqThreadQueue);
     }
 }

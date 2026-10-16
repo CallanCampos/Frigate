@@ -40,7 +40,7 @@ FestMissionConfig *allocateForFestMission(HeapID heapId) {
 }
 
 void ClearFesMissionCfg(FestMissionConfig *config) {
-    sys_memset(config, 0, sizeof(FestMissionConfig));
+    MI_CpuFill8(config, 0, sizeof(FestMissionConfig));
     config->info.count = 0x3fff;
     config->info.index = FEST_MISSION_NONE;
     config->unk24 = -1;

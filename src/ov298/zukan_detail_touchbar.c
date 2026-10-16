@@ -527,7 +527,7 @@ static void ZukanDetailTouchbar_CreateGeneral(ZukanDetailTouchbar *touchbar) {
     icons[GENERAL_INFO].key = 0;
     icons[GENERAL_INFO].se = SEQ_SE_SELECT3;
 
-    sys_memset(&param, 0, sizeof(ZkndTbarParam));
+    MI_CpuFill8(&param, 0, sizeof(ZkndTbarParam));
     param.icons = icons;
     param.iconCount = NELEMS(sZukanDetailTouchbarGeneralIcons);
     param.unit = touchbar->unit;
@@ -678,8 +678,8 @@ static void ZukanDetailTouchbar_InitGlow(ZukanDetailTouchbar *touchbar) {
     void *file = GFL_G2DIOReadNCLR(ARCID_ZUKAN_GRA, 3, &palette, touchbar->heapId);
     u16 *data = palette->rawData;
 
-    sys_memcpy(data + 16, touchbar->glowPalettes[0], 32);
-    sys_memcpy(data + 48, touchbar->glowPalettes[1], 32);
+    MI_CpuCopy8(data + 16, touchbar->glowPalettes[0], 32);
+    MI_CpuCopy8(data + 48, touchbar->glowPalettes[1], 32);
     GFL_HeapFree(file);
     touchbar->glowPhase = 0;
 }
@@ -845,7 +845,7 @@ static void ZukanDetailTouchbar_CreateMap(ZukanDetailTouchbar *touchbar) {
     icon->key = PAD_BUTTON_A;
     icon->se = SEQ_SE_DECIDE1;
 
-    sys_memset(&param, 0, sizeof(ZkndTbarParam));
+    MI_CpuFill8(&param, 0, sizeof(ZkndTbarParam));
     param.icons = icons;
     param.iconCount = NELEMS(sZukanDetailTouchbarMapIcons);
     param.unit = touchbar->unit;
@@ -903,7 +903,7 @@ static void ZukanDetailTouchbar_CreateForm(ZukanDetailTouchbar *touchbar) {
     icon->key = PAD_BUTTON_A;
     icon->se = SEQ_SE_DECIDE1;
 
-    sys_memset(&param, 0, sizeof(ZkndTbarParam));
+    MI_CpuFill8(&param, 0, sizeof(ZkndTbarParam));
     param.icons = icons;
     param.iconCount = NELEMS(sZukanDetailTouchbarFormIcons);
     param.unit = touchbar->unit;

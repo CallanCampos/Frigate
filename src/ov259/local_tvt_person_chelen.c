@@ -36,7 +36,7 @@ static BOOL LocalTvtChelen_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup
 static u16 LocalTvtChelen_GetTypesMsg(u16 type1, u16 type2);
 
 void LocalTvtChelen_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     funcs->work = LocalTvtChelen_Create(gameData, heapId);
     funcs->msgData = msgData;
     funcs->free = LocalTvtChelen_Free;
@@ -144,7 +144,7 @@ static BOOL LocalTvtChelen_Types(LocalTvtPerson *person, const LocalTvtPersonSet
         } else {
             LocalTvtPokeSelectSetup selectSetup;
 
-            sys_memset(&selectSetup, 0, sizeof(selectSetup));
+            MI_CpuFill8(&selectSetup, 0, sizeof(selectSetup));
             selectSetup.message = setup->message;
             selectSetup.unit = setup->unit;
             selectSetup.party = GameData_GetParty(chelen->gameData);
@@ -218,7 +218,7 @@ static BOOL LocalTvtChelen_Ability(LocalTvtPerson *person, const LocalTvtPersonS
         } else {
             LocalTvtPokeSelectSetup selectSetup;
 
-            sys_memset(&selectSetup, 0, sizeof(selectSetup));
+            MI_CpuFill8(&selectSetup, 0, sizeof(selectSetup));
             selectSetup.message = setup->message;
             selectSetup.unit = setup->unit;
             selectSetup.party = GameData_GetParty(chelen->gameData);

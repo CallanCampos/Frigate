@@ -5,15 +5,15 @@
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
-// WM_StartDCF: starts the mode with the buffer that the frames are received into
-int func_02081ab0(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize) {
-    WMArm9Buf *w9b = func_02080a64();
-    int result = func_02080ab0(1, WM_STATE_CHILD);
+// Starts the mode with the buffer that the frames are received into
+int WM_StartDCF(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
+    int result = WMi_CheckStateEx(1, WM_STATE_CHILD);
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    cp15_invalidateDC(&w9b->status->dcfFlag, 4);
+    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
     if (w9b->status->dcfFlag == TRUE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
@@ -23,8 +23,8 @@ int func_02081ab0(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize) {
     if (recvBuf == NULL) {
         return WM_ERRCODE_INVALID_PARAM;
     }
-    cp15_cleanDC(recvBuf, recvBufSize);
-    func_02080950(WM_APIID_START_DCF, callback);
+    DC_StoreRange(recvBuf, recvBufSize);
+    WMi_SetCallbackTable(WM_APIID_START_DCF, callback);
     result = WMi_SendCommand(WM_APIID_START_DCF, 2, recvBuf, recvBufSize);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -34,24 +34,24 @@ int func_02081ab0(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize) {
 
 // WM_SetDCFData: sends the frame in the buffer to the six-byte address. The mode must have been started and the frame
 // is 0x5e4 bytes at most
-int func_02081b18(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength) {
-    WMArm9Buf *w9b = func_02080a64();
-    int result = func_02080ab0(1, WM_STATE_DCF_CHILD);
+int WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
+    int result = WMi_CheckStateEx(1, WM_STATE_DCF_CHILD);
     u32 dstAddr[2];
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    cp15_invalidateDC(&w9b->status->dcfFlag, 4);
+    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
     if (w9b->status->dcfFlag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (byteLength > 0x5e4) {
         return WM_ERRCODE_INVALID_PARAM;
     }
-    cp15_cleanDC(buffer, byteLength);
-    func_02080950(WM_APIID_SET_DCF_DATA, callback);
-    sys_memcpy(dst, dstAddr, 6);
+    DC_StoreRange(buffer, byteLength);
+    WMi_SetCallbackTable(WM_APIID_SET_DCF_DATA, callback);
+    MI_CpuCopy8(dst, dstAddr, 6);
     result = WMi_SendCommand(WM_APIID_SET_DCF_DATA, 4, dstAddr[0], dstAddr[1], buffer, byteLength);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -59,19 +59,18 @@ int func_02081b18(WMCallbackFunc callback, const u8 *dst, const void *buffer, u1
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_EndDCF
-int func_02081b94(WMCallbackFunc callback) {
-    WMArm9Buf *w9b = func_02080a64();
-    int result = func_02080ab0(1, WM_STATE_DCF_CHILD);
+int WM_EndDCF(WMCallbackFunc callback) {
+    WMArm9Buf *w9b = WMi_GetSystemWork();
+    int result = WMi_CheckStateEx(1, WM_STATE_DCF_CHILD);
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    cp15_invalidateDC(&w9b->status->dcfFlag, 4);
+    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
     if (w9b->status->dcfFlag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
-    func_02080950(WM_APIID_END_DCF, callback);
+    WMi_SetCallbackTable(WM_APIID_END_DCF, callback);
     result = WMi_SendCommand(WM_APIID_END_DCF, 0);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;

@@ -159,7 +159,7 @@ static BOOL GameSystem_Init(GameProc *proc, u32 *state, void *param, void *work)
     GFL_OvlUnload(OVERLAY_DSPROT);
 
     gsys = GFL_ProcInitSubsystem(proc, size, HEAPID_GAMESYSTEM);
-    sys_memset(gsys, 0, size);
+    MI_CpuFill8(gsys, 0, size);
     g_GameSystem = gsys;
     SetupGameSystem(gsys, HEAPID_GAMESYSTEM, param);
     GSYS_SetNowEvent(gsys, CallCreateGameEntryPointEvent(gsys, param));
@@ -191,7 +191,7 @@ static BOOL GameSystem_End(GameProc *proc, u32 *state, void *param, void *work) 
 }
 
 GameSystemProcData *GameSystem_CreateProcData(GameEntryPoint entryPoint, u16 zoneId, VecFx32 *spawnPos, s16 unk12) {
-    sys_memset(&g_GameSysProcData, 0, sizeof(g_GameSysProcData));
+    MI_CpuFill8(&g_GameSysProcData, 0, sizeof(g_GameSysProcData));
     g_GameSysProcData.entryPoint = entryPoint;
     g_GameSysProcData.zoneId = zoneId;
     g_GameSysProcData.spawnPos = *spawnPos;

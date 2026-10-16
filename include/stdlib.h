@@ -26,7 +26,7 @@ size_t wcstombs(char *s, const wchar_t *pwcs, size_t n);
 // The floating-point conversions (strtold.c). strtod reads the number at the start of str, after its white space, and
 // sets *end to where it stopped unless end is NULL. atod is swan's name for atof, which is strtod without end.
 double strtod(const char *str, char **end);
-double atod(const char *str);
+double atof(const char *str);
 
 // The integer conversions (strtoul.c). They read the number at the start of str, after its white space and sign, in the
 // given base (0 reads the base off the prefix: 0x is 16, 0 is 8, else 10), and set *end to where they stopped unless

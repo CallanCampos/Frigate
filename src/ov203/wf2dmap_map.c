@@ -35,7 +35,7 @@ u16 WF2DMAP_MAPSysGridYGet(const WF2DMAP_MAPSYS *sys) {
 }
 
 void WF2DMAP_MAPSysDataSet(WF2DMAP_MAPSYS *sys, const WF2DMAP_MAP *buff) {
-    sys_memcpy(buff, sys->buff, sizeof(WF2DMAP_MAP) * (sys->gridX * sys->gridY));
+    MI_CpuCopy8(buff, sys->buff, sizeof(WF2DMAP_MAP) * (sys->gridX * sys->gridY));
 }
 
 WF2DMAP_MAP WF2DMAP_MAPSysDataGet(const WF2DMAP_MAPSYS *sys, u16 x, u16 y) {

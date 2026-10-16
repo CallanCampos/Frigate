@@ -71,36 +71,36 @@ typedef struct DWCBmWifiId {
 // dwc_backup.c. The pages of the settings are in the NVRAM from page 0 on for an NTR console, and from page 0x11 on for
 // a TWL console. A page buffer takes the pages one after the other.
 // Reads the first three pages of the NTR console's settings; TRUE when all could be read
-BOOL func_02056a58(void *buf);
+BOOL DWCBm_ReadNtrSettings(void *buf);
 // The same for the TWL console's
-BOOL func_02056a6c(void *buf);
+BOOL DWCBm_ReadTwlSettings(void *buf);
 // Unpacks the Wi-Fi ID that the settings were last read with
-void func_02056a90(DWCBmWifiIdInfo *info);
+void DWCBm_GetWifiIdInfo(DWCBmWifiIdInfo *info);
 // Packs an ID and writes it to each of the first two pages of the NTR console's settings, after the page's CRC16 is
 // made again. The work area is 0x400 bytes: a page to read and write, 0x100 bytes of scratch for the write, and the
 // 0x200 bytes of the CRC16 table
-BOOL func_02056c34(const DWCBmWifiIdInfo *info, void *work);
+BOOL DWCBm_WriteWifiIdInfo(const DWCBmWifiIdInfo *info, void *work);
 // Reads the four pages of the NTR console's settings
-BOOL func_02056ce8(void *buf);
+BOOL DWCBm_ReadAllNtrPages(void *buf);
 // Writes the pages of the NTR settings that the four flags select, from a page buffer. The scratch buffer of 0x100
 // bytes, 32-byte aligned, is for the write to use
-BOOL func_02056cfc(void *buf, const u32 flags[4], void *scratch);
+BOOL DWCBm_WriteNtrPages(void *buf, const u32 flags[4], void *scratch);
 // Keeps the packed Wi-Fi ID of a page, as the settings were last read
-void func_02056d58(const void *packed);
+void DWCBm_SetPackedWifiIdInfo(const void *packed);
 // The number of bits that the four bytes of a network mask have set
-u8 func_02056d70(const u8 *mask);
+u8 DWCBm_CountMaskBits(const u8 *mask);
 // The four bytes of the mask that has the given number of its high bits set
-void func_02056db4(u32 bits, u8 *mask);
-// Whether an address has bits that the mask leaves to the host, if it is a usable address (func_02056e48)
-BOOL func_02056de0(const u8 *address, const u8 *mask);
+void DWCBm_MakeMask(u32 bits, u8 *mask);
+// Whether an address has bits that the mask leaves to the host, if it is a usable address (DWCBm_IsUsableAddress)
+BOOL DWCBm_HasHostBits(const u8 *address, const u8 *mask);
 // Whether the first byte of an address is neither 0, 127 nor above 223
-BOOL func_02056e48(const u8 *address);
+BOOL DWCBm_IsUsableAddress(const u8 *address);
 // Returns TRUE without doing anything; the settings' writes end by it
 BOOL func_02056e74(void);
 // Packs an ID and returns the packed bytes, DWC_BM_PACKED_SIZE of them, which are kept
-const u8 *func_02056e7c(const DWCBmWifiIdInfo *info);
+const u8 *DWCBm_PackWifiIdInfo(const DWCBmWifiIdInfo *info);
 // The packed Wi-Fi ID that the settings were last read with
-const u8 *func_02056f3c(void);
+const u8 *DWCBm_GetPackedWifiIdInfo(void);
 
 // What the checks of dwc_bm_check.c return: 0 when the settings are whole, or were made whole again without losing a
 // connection, or a negative number for what failed or was lost. DWC_Init takes any of them as the settings being
@@ -123,22 +123,22 @@ DWCBmReadResult func_0205e038(void *work, int unused);
 // dwc_bm_init.c, DWC_BM_Init. The same checks for the console the game runs on, then the Wi-Fi ID that the settings
 // hold is kept. The work area is 0x1000 bytes. Returns the result of the checks, or -10001 when the four pages of the
 // NTR console's settings can't be read
-int func_02056f48(void *work);
+int DWC_BM_Init(void *work);
 
 // util_wifiidtool.c
 // Makes the pending ID for this console from its MAC address and the time, with a salt that is random the first time
 // and counts on from the one in the settings after that, and sets the number; FALSE when the clock can't be read
-BOOL func_02057138(DWCBmWifiIdInfo *info);
-// Makes the pending ID and writes the settings, with the work area of func_02056c34
-BOOL func_02057300(void *work);
-// Makes the pending ID the ID, and writes the settings, with the work area of func_02056c34
-BOOL func_02057348(DWCBmWifiIdInfo *info, void *work);
+BOOL DWCBm_MakePendingWifiId(DWCBmWifiIdInfo *info);
+// Makes the pending ID and writes the settings, with the work area of DWCBm_WriteWifiIdInfo
+BOOL DWCBm_MakeAndSaveWifiId(void *work);
+// Makes the pending ID the ID, and writes the settings, with the work area of DWCBm_WriteWifiIdInfo
+BOOL DWCBm_ConfirmWifiId(DWCBmWifiIdInfo *info, void *work);
 // Makes a new pending ID with another salt than the one in the settings, and sets the number; FALSE when the clock
 // can't be read
-BOOL func_02057398(DWCBmWifiIdInfo *info);
+BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info);
 // The Wi-Fi ID of the settings
-void func_0205752c(DWCBmWifiId *id);
+void DWCBm_GetWifiId(DWCBmWifiId *id);
 // Whether the settings hold neither an ID nor a pending one
-BOOL func_02057580(void);
+BOOL DWCBm_HasNoWifiId(void);
 
 #endif // POKEBW2_DWC_BM_H

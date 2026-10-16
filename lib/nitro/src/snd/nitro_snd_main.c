@@ -9,24 +9,21 @@
 SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
 SNDCommandQueue SNDi_Queue;
 static OSMutex sMutex;
-static BOOL sInitialized;
+static BOOL sSndInitialized;
 
-// NitroSDK's SND_Init
-void func_0207d670(void) {
-    if (!sInitialized) {
-        sInitialized = TRUE;
+void SND_Init(void) {
+    if (!sSndInitialized) {
+        sSndInitialized = TRUE;
         OS_InitMutex(&sMutex);
-        func_0207d6b8();
-        func_0207db34();
+        SND_CommandInit();
+        SND_AlarmInit();
     }
 }
 
-// NitroSDK's SNDi_LockMutex
-void func_0207d698(void) {
+void SNDi_LockMutex(void) {
     OS_LockMutex(&sMutex);
 }
 
-// NitroSDK's SNDi_UnlockMutex
-void func_0207d6a8(void) {
+void SNDi_UnlockMutex(void) {
     OS_UnlockMutex(&sMutex);
 }

@@ -156,7 +156,7 @@ BOOL MailSys_ProcInit(GameProc *proc, u32 *state, void *param, void *unused) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MAIL, 0x1000);
     work = GFL_ProcInitSubsystem(proc, sizeof(MailProcWork), HEAPID_MAIL);
-    sys_memset32_fast(0, work, sizeof(MailProcWork));
+    MIi_CpuClearFast(0, work, sizeof(MailProcWork));
     work->heapId = HEAPID_MAIL;
     work->edit = MailSys_CreateEdit(mailParam->mail, HEAPID_MAIL);
     if (mailParam->mode == MAIL_PARAM_MODE_WRITE) {
@@ -272,7 +272,7 @@ static MailEdit *MailSys_CreateEdit(MailData *mail, u32 heapId) {
     MailEdit *edit = GFL_HeapAllocate(heapId, sizeof(MailEdit), FALSE, "mailsys.c", 0x147);
     u16 i;
 
-    sys_memset32_fast(0, edit, sizeof(MailEdit));
+    MIi_CpuClearFast(0, edit, sizeof(MailEdit));
     edit->mode = 0;
     edit->trainerId = func_02009730(mail);
     edit->name = GFL_StrBufCreate(16, heapId);
@@ -325,7 +325,7 @@ static BOOL MailSys_EditInit(GameProc *proc, u32 *state, void *param, void *unus
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MAIL_SCREEN, 0x20000);
     work = GFL_ProcInitSubsystem(proc, sizeof(MailSysWork), HEAPID_MAIL_SCREEN);
-    sys_memset32_fast(0, work, sizeof(MailSysWork));
+    MIi_CpuClearFast(0, work, sizeof(MailSysWork));
     work->heapId = HEAPID_MAIL_SCREEN;
     work->edit = edit;
     work->phase = edit->mode;
@@ -381,7 +381,7 @@ static BOOL MailSys_Update(MailSysWork *work) {
             work->vblankTask = GFL_VBlankTCBAdd(MailSys_VBlank, work, 16);
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
             killBrightnessEitherEngine(0);
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 28, 4);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 28, 4);
             PaletteFade_StartFade(work->palFade, 5, 0xffff, -1, 16, 0, 0, GFL_VBlankGetTCBMgr());
             work->seq++;
         }

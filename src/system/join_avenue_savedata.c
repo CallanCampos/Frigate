@@ -65,7 +65,7 @@ u32 func_0200fffc(void) {
 }
 
 void func_02010004(JoinAvenueSave *joinAvenue) {
-    sys_memset(joinAvenue, 0, offsetof(JoinAvenueSave, unk13E0));
+    MI_CpuFill8(joinAvenue, 0, offsetof(JoinAvenueSave, unk13E0));
     func_02037ffc(JoinAvenue_GetPersonList(joinAvenue), JOIN_AVE_PERSON_COUNT);
     func_02037e4c(func_02010054(joinAvenue), JOIN_AVE_ENTRY_COUNT);
     func_0203880c(getAddressOfBeginningOfOccupants(joinAvenue));

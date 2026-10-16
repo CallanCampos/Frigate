@@ -11,7 +11,7 @@ u32 func_0200f164(void) {
 }
 
 void func_0200f16c(void *block) {
-    sys_memset(block, 0, func_0200f164());
+    MI_CpuFill8(block, 0, func_0200f164());
 }
 
 void *func_0200f180(void *block) {

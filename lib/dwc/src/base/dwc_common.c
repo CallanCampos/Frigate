@@ -8,7 +8,7 @@
 static const char *sBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-";
 
 // Encodes the bytes in groups of three, each as four characters
-int func_020580b8(const u8 *src, u32 srcLen, char *dst, u32 dstLen) {
+int DWC_Base64Encode(const u8 *src, u32 srcLen, char *dst, u32 dstLen) {
     u32 count;
     const u8 *end;
     char *out;
@@ -30,8 +30,8 @@ int func_020580b8(const u8 *src, u32 srcLen, char *dst, u32 dstLen) {
 
         count = bits / 6 + (bits % 6 != 0 ? 1 : 0);
         size = size < 3 ? size : 3;
-        sys_memset(group, 0, 3);
-        sys_memcpy(src, group, size);
+        MI_CpuFill8(group, 0, 3);
+        MI_CpuCopy8(src, group, size);
 
         out[0] = sBase64Chars[group[0] >> 2];
         out[1] = count >= 2 ? sBase64Chars[((group[0] << 4) & 0x3f) | (group[1] >> 4)] : '*';
@@ -44,7 +44,7 @@ int func_020580b8(const u8 *src, u32 srcLen, char *dst, u32 dstLen) {
 }
 
 // Decodes the text in groups of four characters, each as three bytes
-int func_02058234(const char *src, int srcLen, u8 *dst, u32 dstLen) {
+int DWC_Base64Decode(const char *src, int srcLen, u8 *dst, u32 dstLen) {
     int bits;
     int i;
     int outLen;

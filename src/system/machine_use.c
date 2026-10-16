@@ -31,7 +31,7 @@
 #define SCFG_EXT_COPY (*(vu32 *)0x02fffdf0)
 #define SCFG_EXT_VRAM 0x2000
 
-// The bits of the console type (func_0207ac24) that SystemInit checks
+// The bits of the console type (OS_GetConsoleType) that SystemInit checks
 #define CONSOLE_TYPE_DEV_MASK 0x3000000
 
 #define VRAM_TRANSFER_TASK_COUNT 48
@@ -47,24 +47,24 @@ void SystemInit(void) {
     void *table;
     int amp;
 
-    os_init();
-    clock_init();
+    OS_Init();
+    OS_InitTick();
     OS_InitAlarm();
-    func_0207cb88();
-    gfxInit();
+    RTC_Init();
+    GX_Init();
     FX_Init();
 
-    if (func_0207ac24() & CONSOLE_TYPE_DEV_MASK) {
-        func_0207f6e8(SCFG_CPU_SPEED_2X);
+    if (OS_GetConsoleType() & CONSOLE_TYPE_DEV_MASK) {
+        SCFG_SetCpuSpeed(SCFG_CPU_SPEED_2X);
         reg_SCFG_EXT &= ~SCFG_EXT_VRAM;
         SCFG_EXT_COPY &= ~SCFG_EXT_VRAM;
     }
 
     (void)OS_EnableIrq();
-    fs_init(1);
-    tableSize = func_02072358(NULL, 0);
-    table = mem_alloc_direct(OS_ARENA_MAIN, tableSize, 4);
-    func_02072358(table, tableSize);
+    FS_Init(1);
+    tableSize = FS_LoadTable(NULL, 0);
+    table = OS_AllocFromArenaLo(OS_ARENA_MAIN, tableSize, 4);
+    FS_LoadTable(table, tableSize);
 
     NNS_GfdInitVramTransferManager(sVramTransferTasks, VRAM_TRANSFER_TASK_COUNT);
 
@@ -74,9 +74,9 @@ void SystemInit(void) {
         func_0276952c(&sExitCallbackInfo);
     }
 
-    func_0207f0ac(&amp);
+    PM_GetAmp(&amp);
     if (amp == PM_AMP_ON) {
-        func_0207efc4(PM_AMP_OFF);
+        PM_SetAmp(PM_AMP_OFF);
     }
 }
 
@@ -92,7 +92,7 @@ void SystemUpdateVBlank(void) {
 }
 
 void func_0200548c(void) {
-    func_020827d0();
+    CTRDG_DummyInit();
 }
 
 // Called when the DSi is about to exit the game: keeps it from exiting until func_02005430 lets it

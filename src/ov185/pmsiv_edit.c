@@ -249,8 +249,8 @@ static void PMSIVEdit_SetupPalette(PMSIVEdit *wk, ArcTool *arc) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, 0, 0, 0x1c0, HEAPID_PMS_INPUT);
     GFL_G2DIOLoadArcNCLRDefault(arc, 4, 4, 0, 0xa0, HEAPID_PMS_INPUT);
     buf = GFL_G2DIOReadNCLRArc(arc, 6, &palette, HEAPID_PMS_INPUT);
-    sys_memcpy16(palette->rawData, wk->palette, sizeof(wk->palette));
-    cp15_flushDC(wk->palette, sizeof(wk->palette));
+    MIi_CpuCopy16(palette->rawData, wk->palette, sizeof(wk->palette));
+    DC_FlushRange(wk->palette, sizeof(wk->palette));
     GFL_HeapFree(buf);
 }
 
@@ -258,11 +258,11 @@ static void PMSIVEdit_UpdatePalette(PMSIVEdit *wk) {
     if (PMSInput_GetInputMode(wk->mwk) == PMSI_MODE_SENTENCE && PMSInput_GetSentenceType(wk->mwk) < 5) {
         u32 offset = (PMSInput_GetSentenceType(wk->mwk) + 1) * 16;
 
-        gfxUploadStdPaletteBGA(&wk->palette[offset], 0, 0x20);
-        gfxUploadStdPaletteBGB(&wk->palette[offset], 0, 0x20);
+        GX_LoadBGPltt(&wk->palette[offset], 0, 0x20);
+        GXS_LoadBGPltt(&wk->palette[offset], 0, 0x20);
     } else {
-        gfxUploadStdPaletteBGA(wk->palette, 0, 0x20);
-        gfxUploadStdPaletteBGB(wk->palette, 0, 0x20);
+        GX_LoadBGPltt(wk->palette, 0, 0x20);
+        GXS_LoadBGPltt(wk->palette, 0, 0x20);
     }
 }
 

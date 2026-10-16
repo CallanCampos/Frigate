@@ -322,7 +322,7 @@ static void SkyarrowBridge_LowerBGMVolume(GimmickWork *work, s32 target) {
 }
 
 static void PassingSE_Init(PassingSE *se) {
-    sys_memset32(0, se, sizeof(PassingSE));
+    MIi_CpuClear32(0, se, sizeof(PassingSE));
 }
 
 static void PassingSE_Update(PassingSE *se, FieldCamera *camera, FieldPlayer *player) {

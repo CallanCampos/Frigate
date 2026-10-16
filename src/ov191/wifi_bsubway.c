@@ -391,7 +391,7 @@ static BOOL WifiBSubway_ProcInit(GameProc *proc, u32 *state, void *paramPtr, voi
     GFL_OvlLoad(OVERLAY_ID(189));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFI_BSUBWAY, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiBSubwayWork), HEAPID_WIFI_BSUBWAY);
-    sys_memset(wk, 0, sizeof(WifiBSubwayWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiBSubwayWork));
     wk->param = param;
     param->result = WIFI_BSUBWAY_RESULT_ERROR;
     gameData = GSYS_GetGameData(wk->param->gsys);
@@ -573,7 +573,7 @@ static BOOL WifiBSubway_CanCheckError(WifiBSubwayWork *wk, int state) {
 }
 
 static void WifiBSubwayRoom_Init(WifiBSubwayRoom *room) {
-    sys_memset(room, 0, sizeof(WifiBSubwayRoom));
+    MI_CpuFill8(room, 0, sizeof(WifiBSubwayRoom));
 }
 
 // Asks the server how many trains a rank has
@@ -670,7 +670,7 @@ static void WifiBSubwayRoom_SaveLeaders(WifiBSubwayRoom *room, BSubwayWifiData *
 }
 
 static void WifiBSubwayUpload_Init(WifiBSubwayUpload *upload, HeapID heapId) {
-    sys_memset(upload, 0, sizeof(WifiBSubwayUpload));
+    MI_CpuFill8(upload, 0, sizeof(WifiBSubwayUpload));
     upload->playerInfo = func_02008b0c(heapId);
 }
 
@@ -689,7 +689,7 @@ static void WifiBSubwayUpload_CheckName(WifiBSubwayUpload *upload, GameData *gam
 
     func_02008b34(GetGameDataPlayerInfo(gameData), upload->playerInfo);
     name = copyTrainerNameToNewStrbuf(upload->playerInfo->name, heapId);
-    sys_memset(&upload->nameCheck, 0, sizeof(WifiBSubwayNameCheck));
+    MI_CpuFill8(&upload->nameCheck, 0, sizeof(WifiBSubwayNameCheck));
     upload->nameCheck.heapId = heapId;
     chars = GFL_StrBufGetStringPtr(name);
     for (i = 0; i < GFL_StrBufGetCharCount(name) + 1; i++) {
@@ -762,8 +762,8 @@ static void WifiBSubwayUpload_FillPlayer(Dpw_Bt_Player *player, GameData *gameDa
     void *cgear = getCGearDataBlkAddress(save);
     int i;
 
-    sys_memset(player, 0, sizeof(Dpw_Bt_Player));
-    sys_memcpy(GetPlayerName(playerInfo), player->name, sizeof(player->name));
+    MI_CpuFill8(player, 0, sizeof(Dpw_Bt_Player));
+    MI_CpuCopy8(GetPlayerName(playerInfo), player->name, sizeof(player->name));
     *(u32 *)player->playerId = getIDAsUInt(playerInfo);
     player->versionCode = game_version;
     player->langCode = region;
@@ -827,7 +827,7 @@ static u32 WifiBSubwayUpload_WaitCheckPokemon(WifiBSubwayUpload *upload, WifiBSu
         if (NHttpRap_GetCheckStatus(answer) == 0) {
             BOOL ok = TRUE;
 
-            sys_memcpy(NHttpRap_GetCheckSignature(answer, upload->pokemonCount), upload->sign, sizeof(upload->sign));
+            MI_CpuCopy8(NHttpRap_GetCheckSignature(answer, upload->pokemonCount), upload->sign, sizeof(upload->sign));
             for (i = 0; i < upload->pokemonCount; i++) {
                 if (NHttpRap_GetCheckResult(answer, i)) {
                     ok = FALSE;
@@ -898,7 +898,7 @@ static BOOL WifiBSubwayUpload_WaitSend(WifiBSubwayUpload *upload, WifiBSubwayErr
 }
 
 static void WifiBSubwayError_Init(WifiBSubwayError *error) {
-    sys_memset(error, 0, sizeof(WifiBSubwayError));
+    MI_CpuFill8(error, 0, sizeof(WifiBSubwayError));
 }
 
 // Starts the wait for a request of the server library
@@ -1491,7 +1491,7 @@ static void WifiBSubway_Connect(WifiBSubwayWork *wk) {
 
     func_02008be0(wk->playerInfo, WifiList_GetMyGSID(wk->wifiList));
     profileId = func_02008bdc(wk->playerInfo);
-    DpwBt_Init(profileId, func_02057ec4(userData), 0);
+    DpwBt_Init(profileId, DWC_CreateFriendKey(userData), 0);
     DpwBt_GetServerState();
     WifiBSubwayError_StartDpw(&wk->error);
     wk->dpwActive = TRUE;
@@ -1595,7 +1595,7 @@ static void WifiBSubwayView_Free(WifiBSubwayView *view) {
         BmpWin_Free(view->window);
         WifiBSubwayGraphic_Free(view->graphic);
         func_020232d8();
-        sys_memset(view, 0, sizeof(WifiBSubwayView));
+        MI_CpuFill8(view, 0, sizeof(WifiBSubwayView));
     }
 }
 
@@ -1612,10 +1612,10 @@ static inline void WifiBSubwayView_InitCycle(WifiBSubwayView *view, ArcTool *arc
     NNSG2dPaletteData *palette;
     void *file;
 
-    sys_memset(&view->cycle, 0, sizeof(view->cycle));
+    MI_CpuFill8(&view->cycle, 0, sizeof(view->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    sys_memcpy(palette->rawData, view->cycle.palettes, sizeof(view->cycle.palettes));
-    sys_memcpy(palette->rawData, view->cycle.blended, sizeof(view->cycle.palettes));
+    MI_CpuCopy8(palette->rawData, view->cycle.palettes, sizeof(view->cycle.palettes));
+    MI_CpuCopy8(palette->rawData, view->cycle.blended, sizeof(view->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps
@@ -1647,10 +1647,10 @@ static inline void WifiBSubwayView_InitCycle(WifiBSubwayView *view, ArcTool *arc
             }
         }
     }
-    cp15_flushDC(view->cycle.blended, sizeof(view->cycle.blended));
+    DC_FlushRange(view->cycle.blended, sizeof(view->cycle.blended));
     view->cycle.active = TRUE;
     view->cycle.task = GFL_VBlankTCBAdd(WifiBSubwayView_CyclePalette, &view->cycle, 20);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
     view->cycle.scrollBg = 0;
 }
 
@@ -1682,8 +1682,8 @@ static void WifiBSubwayView_CyclePalette(TCB *task, void *work) {
     if (cycle->active) {
         cycle->skip ^= 1;
         if (!(cycle->skip & 1)) {
-            gfxUploadStdPaletteBGA(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
-            gfxUploadStdPaletteBGB(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GX_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GXS_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
             cycle->frame++;
             if (cycle->frame >= PALETTE_COUNT * BLEND_STEPS) {
                 cycle->frame = 0;

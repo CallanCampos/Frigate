@@ -68,7 +68,7 @@ asm BOOL OS_SaveContext(OSContext *context) {
 // NitroSDK's OS_LoadContext: continues from a context. In the SVC mode it loads the registers of the thread's mode and
 // returns to the context's PC and CPSR with SUBS PC. Before that it waits for the divider (the busy bit of DIVCNT) to
 // finish, going by the flags that hw_isDSi leaves (its BEQ has no compare before it, as in the original)
-asm void func_0207abbc(OSContext *context) {
+asm void OS_LoadContext(OSContext *context) {
     stmdb sp!, {r0, lr}
     add r0, r0, #0x48
     ldr r1, =CPi_RestoreContext

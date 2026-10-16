@@ -122,8 +122,8 @@ static void PselGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(TRUE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sPselLights); i++) {
         GFL_G3DSysLightSet(i, &sPselLights[i]);
@@ -134,7 +134,7 @@ static void PselGraphic_G3DInit(void) {
 PselGraphic *PselGraphic_Create(u32 layout, HeapID heapId) {
     PselGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(PselGraphic), FALSE, "psel_graphic.c", 465);
 
-    sys_memset(graphic, 0, sizeof(PselGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PselGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -163,7 +163,7 @@ void PselGraphic_Free(PselGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(PselGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PselGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -198,7 +198,7 @@ static void PselGraphic_VBlank(TCB *tcb, void *data) {
 static void PselBG_Init(PselBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(PselBG));
+    MI_CpuFill8(bg, 0, sizeof(PselBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPselLCDConfig);
@@ -217,7 +217,7 @@ static void PselBG_Free(PselBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(PselBG));
+    MI_CpuFill8(bg, 0, sizeof(PselBG));
 }
 
 static void PselBG_Update(PselBG *bg) {
@@ -228,7 +228,7 @@ static void PselBG_VBlank(PselBG *bg) {
 }
 
 static void PselClAct_Init(PselClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(PselClAct));
+    MI_CpuFill8(clact, 0, sizeof(PselClAct));
     ClActSys_Create(&sPselClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -239,7 +239,7 @@ static void PselClAct_Init(PselClAct *clact, const BGSysVRAMConfig *vramConfig, 
 static void PselClAct_Free(PselClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(PselClAct));
+    MI_CpuFill8(clact, 0, sizeof(PselClAct));
 }
 
 static void PselClAct_Update(PselClAct *clact) {

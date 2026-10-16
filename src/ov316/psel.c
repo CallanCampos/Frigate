@@ -466,7 +466,7 @@ static BOOL PselProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 16, 0);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PSEL, 0x100000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PselWork), HEAPID_PSEL);
-    sys_memset(wk, 0, sizeof(PselWork));
+    MI_CpuFill8(wk, 0, sizeof(PselWork));
     wk->heapId = HEAPID_PSEL;
     wk->param = param;
     wk->fadeFreq = GFL_FadeGetUpdateFreq();
@@ -767,7 +767,7 @@ static void PselPoke_Load(PselWork *wk) {
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.x = sPselPokeMoves[i].pos[0][0];
         setup.y = sPselPokeMoves[i].pos[0][1];
         setup.sequence = 0;
@@ -789,7 +789,7 @@ static void PselPoke_Load(PselWork *wk) {
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
         ClActorSetupEx setup;
 
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.base.x = sPselPokeMoves[i].pos[0][0];
         setup.base.y = sPselPokeMoves[i].pos[0][1];
         setup.base.sequence = 0;
@@ -1081,7 +1081,7 @@ static void PselPoke_StartFadeIn(PselWork *wk) {
     }
     wk->fadeCount = 0;
     wk->fadeState = 1;
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0x3f, wk->fadeCount, 16 - wk->fadeCount);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, wk->fadeCount, 16 - wk->fadeCount);
 }
 
 static BOOL PselPoke_IsFadeInDone(PselWork *wk) {
@@ -1110,13 +1110,13 @@ static void PselPoke_UpdateFadeIn(PselWork *wk) {
                 }
                 wk->fadeState = 3;
             }
-            gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0x3f, wk->fadeCount, 16 - wk->fadeCount);
+            G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, wk->fadeCount, 16 - wk->fadeCount);
         } else {
             wk->fadeState = 3;
         }
         break;
     case 3:
-        gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, 0x3f, 8, 8);
+        G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, 0x3f, 8, 8);
         wk->fadeState = 0;
         break;
     }
@@ -1130,7 +1130,7 @@ static void PselCursor_Load(PselWork *wk) {
     wk->cursorChars = func_0204b81c(arc, PSEL_ARC_CURSOR_NCGR, FALSE, 0, wk->heapId);
     wk->cursorCellAnim = func_0204bde0(arc, PSEL_ARC_CURSOR_NCER, PSEL_ARC_CURSOR_NANR, wk->heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 42;
     setup.y = 29;
     setup.sequence = 0;
@@ -1530,10 +1530,10 @@ static void PselPokePal_Load(PselWork *wk) {
         void *dark;
 
         normal = GFL_G2DIOReadNCLRArc(arc, sPselPokeFiles[i].pltt, &palette, wk->heapId);
-        sys_memcpy(palette->rawData, wk->poke[i].palNormal, sizeof(wk->poke[i].palNormal));
+        MI_CpuCopy8(palette->rawData, wk->poke[i].palNormal, sizeof(wk->poke[i].palNormal));
         GFL_HeapFree(normal);
         dark = GFL_G2DIOReadNCLRArc(arc, sPselPokeFiles[i].plttDark, &palette, wk->heapId);
-        sys_memcpy(palette->rawData, wk->poke[i].palDark, sizeof(wk->poke[i].palDark));
+        MI_CpuCopy8(palette->rawData, wk->poke[i].palDark, sizeof(wk->poke[i].palDark));
         GFL_HeapFree(dark);
     }
     GFL_ArcToolFree(arc);
@@ -1543,7 +1543,7 @@ static void PselPokePal_Load(PselWork *wk) {
         wk->poke[i].palStep = 16;
     }
     for (i = 0; i < PSEL_POKE_COUNT; i++) {
-        sys_memcpy(wk->poke[i].palDark, wk->poke[i].palNow, sizeof(wk->poke[i].palNow));
+        MI_CpuCopy8(wk->poke[i].palDark, wk->poke[i].palNow, sizeof(wk->poke[i].palNow));
         NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_SUB, sPselPokePaletteSlots[i] * 0x20,
                                            wk->poke[i].palNow, sizeof(wk->poke[i].palNow));
     }
@@ -1611,14 +1611,14 @@ static void PselBGPal_Load(PselWork *wk) {
         NNSG2dPaletteData *palette;
         void *file = GFL_G2DIOReadNCLRArc(arc, sPselBGPaletteFiles[i], &palette, wk->heapId);
 
-        sys_memcpy(&((u16 *)palette->rawData)[0x80], wk->bgPal[i], sizeof(wk->bgPal[i]));
+        MI_CpuCopy8(&((u16 *)palette->rawData)[0x80], wk->bgPal[i], sizeof(wk->bgPal[i]));
         GFL_HeapFree(file);
     }
     GFL_ArcToolFree(arc);
     wk->bgPalActive = FALSE;
     wk->bgPalStep = 16;
     wk->bgPalTarget = 3;
-    sys_memcpy(wk->bgPal[3], wk->bgPalNow, sizeof(wk->bgPalNow));
+    MI_CpuCopy8(wk->bgPal[3], wk->bgPalNow, sizeof(wk->bgPalNow));
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0x100, wk->bgPalNow, sizeof(wk->bgPalNow));
 }
 
@@ -1694,7 +1694,7 @@ static void PselBGPal_SetTarget(PselWork *wk, u8 target) {
         wk->bgPalActive = TRUE;
         wk->bgPalStep = 0;
         wk->bgPalTarget = target;
-        sys_memcpy(wk->bgPalNow, wk->bgPalFrom, sizeof(wk->bgPalFrom));
+        MI_CpuCopy8(wk->bgPalNow, wk->bgPalFrom, sizeof(wk->bgPalFrom));
     }
 }
 
@@ -1735,8 +1735,8 @@ static s32 PselSeq_Load(PselWork *wk, s32 *step) {
     PselPal_Load(wk);
     wk->bgRequest |= PSEL_BG_REQ_MAIN_OFF;
     wk->bgRequest |= PSEL_BG_REQ_SUB_OFF;
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, 0x3f, 8, 8);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, 0x3f, 8, 8);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, 0x3f, 8, 8);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG2, 0x3f, 8, 8);
     wk->frame = 0;
     return PSEL_SEQ_FADE_IN;
 }

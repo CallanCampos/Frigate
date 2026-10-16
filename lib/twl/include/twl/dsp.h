@@ -7,13 +7,13 @@
 #include "twl/mi.h"
 #include "twl/pm.h"
 
-// TwlSDK's DSP library, in the DSi's LTD autoload, which plays the camera's shutter and video sounds through the
-// G.711 component. As with the camera, the SDK's inline functions only call it on a DSi, and its functions keep their
-// default names until the LTD autoload is analyzed.
+// TwlSDK's DSP library, in the DSi's LTD autoload, which plays the camera's shutter and video sounds through the G.711
+// component. As with the camera, the SDK's inline functions only call it on a DSi, and its functions have the SDK's
+// names, from what they do; some keep their default names.
 
-void func_027062c8(void);                               // stops the sound playing
-BOOL func_02706174(const void *src, u32 length);        // DSP_PlayShutterSoundCore
-BOOL func_02706324(void);                               // DSP_IsShutterSoundPlayingCore
+void DSP_StopSoundCore(void); // stops the sound playing
+BOOL DSP_PlayShutterSoundCore(const void *src, u32 length);
+BOOL DSP_IsShutterSoundPlayingCore(void);
 BOOL func_0270723c(FSFile *file);                       // DSP_OpenStaticComponentG711Core
 BOOL func_02707278(FSFile *file, int slotB, int slotC); // DSP_LoadG711Core
 void func_027072e0(void);                               // DSP_UnloadG711Core
@@ -26,13 +26,13 @@ extern const u8 DSP_GraphicsImage[];
 
 static inline void DSP_StopSound(void) {
     if (hw_isDSi()) {
-        func_027062c8();
+        DSP_StopSoundCore();
     }
 }
 
 static inline BOOL DSP_PlayShutterSound(const void *src, u32 length) {
     if (hw_isDSi()) {
-        return func_02706174(src, length);
+        return DSP_PlayShutterSoundCore(src, length);
     }
     return FALSE;
 }
@@ -40,7 +40,7 @@ static inline BOOL DSP_PlayShutterSound(const void *src, u32 length) {
 static inline BOOL DSP_IsShutterSoundPlaying(void) {
     BOOL playing = FALSE;
     if (hw_isDSi()) {
-        playing = func_02706324();
+        playing = DSP_IsShutterSoundPlayingCore();
     }
     return playing;
 }
@@ -132,30 +132,30 @@ static inline void DSP_UnloadGraphics(void) {
 #define DSP_PSTS_COMMAND_SHIFT 13  // command n was not taken yet, on bit n of three
 
 // dsp_if.c. TwlSDK's names are in the comments
-void func_02704e90(void);                // DSP_PowerOn: starts the DSP's clock and releases its reset line
-void func_02704ee8(void);                // DSP_PowerOff
-void func_02704f1c(void);                // DSP_ResetOn: puts the DSP in reset
-void func_02704f4c(u16 mask);            // DSP_ResetOffEx: takes it out, with the reply interrupts of mask
-BOOL func_02705008(int index);           // DSP_RecvDataIsReady: reply index has data
-void func_0270502c(int index, u16 data); // DSP_SendData: waits for command index to be free, then writes it
-u16 func_0270505c(int index);            // DSP_RecvData: waits for reply index and reads it
+void DSP_PowerOn(void); // starts the DSP's clock and releases its reset line
+void DSP_PowerOff(void);
+void DSP_ResetOn(void);                 // puts the DSP in reset
+void DSP_ResetOffEx(u16 mask);          // takes it out, with the reply interrupts of mask
+BOOL DSP_RecvDataIsReady(int index);    // reply index has data
+void DSP_SendData(int index, u16 data); // waits for command index to be free, then writes it
+u16 DSP_RecvData(int index);            // waits for reply index and reads it
 // The SDK's inline functions over the three, which only call them on a DSi
 static inline void DSPi_SendData(int index, u16 data) {
     if (hw_isDSi() == TRUE) {
-        func_0270502c(index, data);
+        DSP_SendData(index, data);
     }
 }
 
 static inline BOOL DSPi_RecvDataIsReady(int index) {
     if (hw_isDSi() == TRUE) {
-        return func_02705008(index);
+        return DSP_RecvDataIsReady(index);
     }
     return FALSE;
 }
 
 static inline u16 DSPi_RecvData(int index) {
     if (hw_isDSi() == TRUE) {
-        return func_0270505c(index);
+        return DSP_RecvData(index);
     }
     return 0;
 }
@@ -171,9 +171,9 @@ void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags
 #define DSP_READ_BURST_8 0x200
 #define DSP_READ_BURST_16 0x300
 void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags);
-u16 func_02705284(void);      // DSP_GetSemaphore
-void func_02705294(u16 mask); // DSP_ClearSemaphore
-void func_027052a4(u16 mask); // DSP_MaskSemaphore
+u16 DSP_GetSemaphore(void);
+void DSP_ClearSemaphore(u16 mask);
+void DSP_MaskSemaphore(u16 mask);
 
 // dsp_process.c: a process is a COFF image that the DSP runs. Its program goes to the shared WRAM B and its data to
 // WRAM C, in banks of 32 KB that the ARM9 gives it from the ones its context allows, and its events (the 16 bits of the
@@ -203,18 +203,16 @@ typedef struct DSPProcessContext {
     int group[DSP_EVENT_COUNT]; // the events set along with each one, which its callback takes together
 } DSPProcessContext;
 
-// DSP_InitProcessContext
-void func_027058d8(DSPProcessContext *context, const char *name);
-// DSP_SetCallback: calls callback for each of the events (NULL stops that)
-void func_02705b70(DSPProcessContext *context, int events, DSPCallback callback, void *userData);
-// DSP_ExecuteProcess: loads the image into the banks given by banksB and banksC, one bit each, and starts the DSP
-BOOL func_02705c24(DSPProcessContext *context, FSFile *image, int banksB, int banksC);
-// DSP_QuitProcess
-void func_02705e04(DSPProcessContext *context);
-// DSP_FindProcess: the running process of that name, or the first one if name is NULL
-DSPProcessContext *func_02705ed0(const char *name);
-// DSP_WriteProcessPipe: writes length bytes of src to the pipe of that port (the context is not used)
-void func_02705f28(DSPProcessContext *context, int port, const void *src, u32 length);
+void DSP_InitProcessContext(DSPProcessContext *context, const char *name);
+// Calls callback for each of the events (NULL stops that)
+void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callback, void *userData);
+// Loads the image into the banks given by banksB and banksC, one bit each, and starts the DSP
+BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, int banksC);
+void DSP_QuitProcess(DSPProcessContext *context);
+// The running process of that name, or the first one if name is NULL
+DSPProcessContext *DSP_FindProcess(const char *name);
+// Writes length bytes of src to the pipe of that port (the context is not used)
+void DSP_WriteProcessPipe(DSPProcessContext *context, int port, const void *src, u32 length);
 
 // dsp_pipe.c: the pipes between the ARM9 and the DSP, ring buffers in the DSP's memory that each have a header of five
 // half words, which the DSP shares. A port has two pipes, 0 for what the DSP writes and 1 for what the ARM9 writes,
@@ -232,23 +230,23 @@ typedef struct DSPPipe {
 // A flag of a pipe's id: the DSP writes to this port requests for the files (func_02706b60's thread answers them)
 #define DSP_PIPE_FILE_FLAG 0x100
 
-// What a pipe's events call: the user data of func_02706d28, the port and the direction
+// What a pipe's events call: the user data of DSP_SetPipeCallback, the port and the direction
 typedef void (*DSPPipeCallback)(void *userData, int port, int direction);
 
 // TwlSDK's names are in the comments. The ports are 0 to 7, and the first has a callback of its own at the start
-void func_02706cd4(void); // DSP_InitPipe: forgets the pipes' address and the callbacks, and drops what port 0 gets
-// DSP_SetPipeCallback: calls callback for the pipes' events of a port, with userData (NULL stops that)
-void func_02706d28(int port, DSPPipeCallback callback, void *userData);
+void DSP_InitPipe(void); // forgets the pipes' address and the callbacks, and drops what port 0 gets
+// Calls callback for the pipes' events of a port, with userData (NULL stops that)
+void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData);
 // DSP_LoadPipe: reads the header of the pipe of a port and direction from the DSP into pipe, or into a scratch copy if
 // pipe is NULL, and returns it. Waits until the DSP has sent the pipes' address. A port or direction out of range
 // leaves pipe alone
-DSPPipe *func_02706d44(DSPPipe *pipe, int port, int direction);
-// DSP_GetPipeReadableSize: how many bytes the pipe has to read, by the header that was loaded
-u16 func_02706e90(const DSPPipe *pipe);
-// DSP_ReadPipe: reads length bytes of the pipe into dst, waiting for the DSP when it is empty
-void func_02706ec0(DSPPipe *pipe, void *dst, u16 length);
-// DSP_WritePipe: writes length bytes of src to the pipe, waiting for the DSP when it is full
-void func_02706fcc(DSPPipe *pipe, const void *src, u16 length);
+DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction);
+// How many bytes the pipe has to read, by the header that was loaded
+u16 DSP_GetPipeReadableSize(const DSPPipe *pipe);
+// Reads length bytes of the pipe into dst, waiting for the DSP when it is empty
+void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length);
+// Writes length bytes of src to the pipe, waiting for the DSP when it is full
+void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length);
 // The callback of the DSP's events (DSPCallback): hands each change of a pipe to its port's callback, and to the file
 // server thread when the pipe has the file flag
 void func_027070dc(void *userData);

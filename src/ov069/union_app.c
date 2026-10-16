@@ -31,9 +31,9 @@ UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const P
     app->current = 0xff;
     app->currentPending = 0xff;
 
-    sys_memset(&member, 0, sizeof(UnionAppMember));
+    MI_CpuFill8(&member, 0, sizeof(UnionAppMember));
     member.info = *info;
-    func_0207c33c(member.mac);
+    OS_GetMacAddress(member.mac);
     UnionApp_SetMemberProfile(app, sys, func_02042a6c(func_02040440()), &member);
     UnionApp_CloseEntry(app);
     func_ov069_0217cf4c(app);
@@ -246,7 +246,7 @@ void UnionApp_RequestSendStatus(UnionApp *app, u8 netId) {
 }
 
 void UnionApp_ReceiveStatus(UnionApp *app, const UnionAppStatus *status) {
-    sys_memcpy(status, &app->status, sizeof(UnionAppStatus));
+    MI_CpuCopy8(status, &app->status, sizeof(UnionAppStatus));
 }
 
 void UnionApp_RequestSendProfile(UnionApp *app, u8 netId) {

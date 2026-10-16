@@ -106,7 +106,7 @@ static const PkwdCountBGSetup sPkwdCountBGSetups[BG_COUNT] = {
 PkwdCountGraphic *PkwdCountGraphic_Create(u32 layout, HeapID heapId) {
     PkwdCountGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(PkwdCountGraphic), FALSE, "pkwd_count_graphic.c", 454);
 
-    sys_memset(graphic, 0, sizeof(PkwdCountGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdCountGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -135,7 +135,7 @@ void PkwdCountGraphic_Free(PkwdCountGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(PkwdCountGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdCountGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -169,7 +169,7 @@ static void PkwdCountGraphic_VBlank(TCB *tcb, void *data) {
 static void PkwdCountBG_Init(PkwdCountBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(PkwdCountBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdCountBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPkwdCountLCDConfig);
@@ -188,7 +188,7 @@ static void PkwdCountBG_Free(PkwdCountBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(PkwdCountBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdCountBG));
 }
 
 static void PkwdCountBG_Update(PkwdCountBG *bg) {
@@ -199,7 +199,7 @@ static void PkwdCountBG_VBlank(PkwdCountBG *bg) {
 }
 
 static void PkwdCountClAct_Init(PkwdCountClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(PkwdCountClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdCountClAct));
     ClActSys_Create(&sPkwdCountClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -210,7 +210,7 @@ static void PkwdCountClAct_Init(PkwdCountClAct *clact, const BGSysVRAMConfig *vr
 static void PkwdCountClAct_Free(PkwdCountClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(PkwdCountClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdCountClAct));
 }
 
 static void PkwdCountClAct_Update(PkwdCountClAct *clact) {

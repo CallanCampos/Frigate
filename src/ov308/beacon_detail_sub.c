@@ -259,19 +259,19 @@ static void BeaconDetailSub_PlaySE(u32 se) {
 static void BeaconDetailSub_LoadPalette(const void *src, u32 dest, u16 offset, u32 count) {
     u32 destOffset = offset * 2;
 
-    cp15_flushDC(src, count * 2);
+    DC_FlushRange(src, count * 2);
     switch (dest) {
     case PALETTE_BG_MAIN:
-        gfxUploadStdPaletteBGA(src, destOffset, count * 2);
+        GX_LoadBGPltt(src, destOffset, count * 2);
         break;
     case PALETTE_BG_SUB:
-        gfxUploadStdPaletteBGB(src, destOffset, count * 2);
+        GXS_LoadBGPltt(src, destOffset, count * 2);
         break;
     case PALETTE_OBJ_MAIN:
-        gfxUploadStdPaletteObjA(src, destOffset, count * 2);
+        GX_LoadOBJPltt(src, destOffset, count * 2);
         break;
     case PALETTE_OBJ_SUB:
-        gfxUploadStdPaletteObjB(src, destOffset, count * 2);
+        GXS_LoadOBJPltt(src, destOffset, count * 2);
         break;
     }
 }
@@ -580,7 +580,7 @@ static void BeaconDetailSub_StartMapSlide(BeaconDetailWork *work, u8 out, int *t
     BeaconDetailMapSlideTask *slide =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbManager, BeaconDetailSub_MapSlideTask, sizeof(*slide), 0));
 
-    sys_memset(slide, 0, sizeof(*slide));
+    MI_CpuFill8(slide, 0, sizeof(*slide));
     slide->out = out;
     if (!slide->out) {
         slide->y = 0;
@@ -615,7 +615,7 @@ static void BeaconDetailSub_StartPopupTask(BeaconDetailWork *work, int *taskCoun
     BeaconDetailPopupTask *popup =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbManager, BeaconDetailSub_PopupTask, sizeof(*popup), 0));
 
-    sys_memset(popup, 0, sizeof(*popup));
+    MI_CpuFill8(popup, 0, sizeof(*popup));
     popup->work = work;
     popup->timer = POPUP_FRAMES;
     TouchBar_SetActive(work->touchBar, FALSE);
@@ -669,7 +669,7 @@ static void BeaconDetailSub_StartPanelSlide(BeaconDetailWork *work, u8 page, int
     BeaconDetailPanelSlideTask *slide =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbManager, BeaconDetailSub_PanelSlideTask, sizeof(*slide), 0));
 
-    sys_memset(slide, 0, sizeof(*slide));
+    MI_CpuFill8(slide, 0, sizeof(*slide));
     slide->panel = &work->panels[page];
     slide->page = page;
     slide->y = (PANEL_SLIDE_OUT - from) * -SCREEN_HEIGHT;
@@ -713,7 +713,7 @@ static void BeaconDetailSub_StartPageTask(BeaconDetailWork *work, u8 direction, 
     BeaconDetailPageTask *page =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbManager, BeaconDetailSub_PageTask, sizeof(*page), 0));
 
-    sys_memset(page, 0, sizeof(*page));
+    MI_CpuFill8(page, 0, sizeof(*page));
     page->direction = direction;
     if (direction == PAGE_NEXT) {
         page->index = work->index + 1;
@@ -786,7 +786,7 @@ static void BeaconDetailSub_StartFlushTask(BeaconDetailWork *work, BeaconDetailW
     BeaconDetailFlushTask *flush =
         GFL_TCBExGetData(GFL_TCBExMgrAddTask(work->tcbManager, BeaconDetailSub_FlushTask, sizeof(*flush), 0));
 
-    sys_memset(flush, 0, sizeof(*flush));
+    MI_CpuFill8(flush, 0, sizeof(*flush));
     flush->work = work;
     flush->window = window;
     if (taskCount != NULL) {

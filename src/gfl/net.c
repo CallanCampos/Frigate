@@ -59,7 +59,7 @@ void func_020425ec(const GFLNetInitData *pNetInit, void (*callback)(void *work),
     if (pNetInit->bNetType == 4) {
         pNetInit = func_02042f74(pNetInit, work);
     }
-    sys_memcpy(pNetInit, &pNet->aNetInit, sizeof(GFLNetInitData));
+    MI_CpuCopy8(pNetInit, &pNet->aNetInit, sizeof(GFLNetInitData));
     switch (pNetInit->bNetType) {
     case GFL_NET_TYPE_WIFI:
     case GFL_NET_TYPE_WIFI_LOBBY:
@@ -614,7 +614,7 @@ void func_02042eec(int *x, int *y) {
 }
 
 void func_02042efc(const GFLNetInitData *pNetInit) {
-    sys_memcpy(pNetInit, &func_02042e78()->aNetInit, sizeof(GFLNetInitData));
+    MI_CpuCopy8(pNetInit, &func_02042e78()->aNetInit, sizeof(GFLNetInitData));
 }
 
 void func_02042f10(void) {

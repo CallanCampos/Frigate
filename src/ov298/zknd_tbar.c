@@ -118,7 +118,7 @@ ZkndTbar *ZkndTbar_Create(ZkndTbarParam *param, HeapID heapId) {
     u32 palType;
     u32 i;
 
-    sys_memset(tbar, 0, size);
+    MI_CpuFill8(tbar, 0, size);
     tbar->itemCount = param->iconCount;
     tbar->seq = TBAR_SEQ_WAIT;
     tbar->active = TRUE;
@@ -286,7 +286,7 @@ static void ZkndTbarResource_Load(ZkndTbarResource *resource, u8 bg, u32 engine,
                                   u8 objPalette, BOOL noBG, HeapID heapId) {
     ArcTool *arc;
 
-    sys_memset(resource, 0, sizeof(ZkndTbarResource));
+    MI_CpuFill8(resource, 0, sizeof(ZkndTbarResource));
     resource->bg = bg;
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     if (!noBG) {
@@ -306,7 +306,7 @@ static void ZkndTbarResource_Free(ZkndTbarResource *resource) {
     func_0204b98c(resource->objRes[OBJRES_CHARS]);
     func_0204bcd0(resource->objRes[OBJRES_PALETTE]);
     GFL_BGSysFreeCharMemory(resource->bg, CHAR_POS(resource->bgChars), CHAR_SIZE(resource->bgChars));
-    sys_memset(resource, 0, sizeof(ZkndTbarResource));
+    MI_CpuFill8(resource, 0, sizeof(ZkndTbarResource));
 }
 
 static u32 ZkndTbarResource_Get(const ZkndTbarResource *resource, u32 index) {
@@ -344,11 +344,11 @@ static void ZkndTbarItem_Init(ZkndTbarItem *item, ClActUnit *unit, const ZkndTba
     u32 palette;
     u32 cellAnims;
 
-    sys_memset(item, 0, sizeof(ZkndTbarItem));
+    MI_CpuFill8(item, 0, sizeof(ZkndTbarItem));
     item->icon = *icon;
     item->active = TRUE;
     item->pushed = FALSE;
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.bgPriority = GFL_BGSysGetBGPriority(resource->bg);
     setup.x = icon->pos.x;
     setup.y = icon->pos.y;
@@ -384,7 +384,7 @@ static void ZkndTbarItem_Init(ZkndTbarItem *item, ClActUnit *unit, const ZkndTba
 
 static void ZkndTbarItem_Free(ZkndTbarItem *item) {
     func_0204c108(item->actor);
-    sys_memset(item, 0, sizeof(ZkndTbarItem));
+    MI_CpuFill8(item, 0, sizeof(ZkndTbarItem));
 }
 
 static BOOL ZkndTbarItem_CheckTouch(ZkndTbarItem *item) {

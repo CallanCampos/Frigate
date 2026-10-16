@@ -145,7 +145,7 @@ void func_020430bc(const u8 *mac) {
     *p++ = 0;
     for (i = 0; i < _COLLECTMAC_NUM; i++) {
         if (GFL_STD_MemCmp(empty, NetIwSys->collect.macs[i], 6) == 0) {
-            sys_memcpy(mac, NetIwSys->collect.macs[i], 6);
+            MI_CpuCopy8(mac, NetIwSys->collect.macs[i], 6);
             NetIwSys->collect.num = i;
             return;
         }
@@ -155,7 +155,7 @@ void func_020430bc(const u8 *mac) {
 
 void func_0204313c(u8 *mac, int index) {
     if (NetIwSys != NULL) {
-        sys_memcpy(NetIwSys->collect.macs[index], mac, 6);
+        MI_CpuCopy8(NetIwSys->collect.macs[index], mac, 6);
     } else {
         GFL_ASSERT(0);
     }
@@ -310,7 +310,7 @@ void func_020431cc(void) {
         int i;
 
         // Find the beacon of the machine that collected this machine's MAC address
-        func_0207c33c(mac);
+        OS_GetMacAddress(mac);
         for (;;) {
             NetIwCollectMac *collect = func_020428a8(index);
 
@@ -407,7 +407,7 @@ static void *func_02043720(void *work) {
     if (sys == NULL) {
         return NULL;
     }
-    sys_memcpy(sys->unk18(work), sys->unkB4, sizeof(sys->unkB4));
+    MI_CpuCopy8(sys->unk18(work), sys->unkB4, sizeof(sys->unkB4));
     return &sys->collect;
 }
 

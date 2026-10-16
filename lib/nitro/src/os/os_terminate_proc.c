@@ -23,23 +23,23 @@ void sys_exit(void) {
     }
     if (!OSi_terminate.isTerminating) {
         OSi_terminate.isTerminating = TRUE;
-        if (CPU_GetMode() != OS_PROCMODE_IRQ) {
+        if (OS_GetProcMode() != OS_PROCMODE_IRQ) {
             OS_EnableIrq();
-            CPU_IRQEnable();
+            OS_EnableInterrupts();
         }
         if (hw_isDSi()) {
             if (func_02704318()) {
                 func_02704328();
             }
         }
-        func_02079f44(OS_PXI_COMMAND_TERMINATE);
+        OSi_SendToPxi(OS_PXI_COMMAND_TERMINATE);
     }
     abort();
 }
 
 // The loop that OS_Terminate ends in: swan names it abort
 void abort(void) {
-    CPU_IRQDisable();
+    OS_DisableInterrupts();
     while (TRUE) {
         cp15_halt();
     }

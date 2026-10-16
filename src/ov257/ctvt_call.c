@@ -811,7 +811,7 @@ static void CtvtCall_Scan(CommTvtWork *sys, CtvtCall *call) {
                     u32 id = getIDAsUInt(beacon);
                     u8 selfMac[6];
 
-                    func_0207c33c(selfMac);
+                    OS_GetMacAddress(selfMac);
                     if (((CtvtCommBeacon *)beacon)->inviteOnly == FALSE ||
                         CtvtComm_IsInvited(beacon, selfMac) == TRUE) {
                         friend = CtvtCall_IsFriend(sys, call, name, id, gender);
@@ -883,11 +883,11 @@ static void CtvtCall_Scan(CommTvtWork *sys, CtvtCall *call) {
                     }
                     if (service == CTVT_CALL_SERVICE_CTVT) {
                         call->entries[slot].gameServiceId = CTVT_CALL_SERVICE_CTVT;
-                        sys_memcpy(beacon, call->entries[slot].beacon, sizeof(CtvtCommBeacon));
+                        MI_CpuCopy8(beacon, call->entries[slot].beacon, sizeof(CtvtCommBeacon));
                         call->entries[slot].romVersion = func_02008bfc(call->entries[slot].beacon);
                     } else {
                         call->entries[slot].gameServiceId = CTVT_CALL_SERVICE_FIELD;
-                        sys_memcpy(beacon, call->entries[slot].beacon, sizeof(CtvtCallFieldBeacon));
+                        MI_CpuCopy8(beacon, call->entries[slot].beacon, sizeof(CtvtCallFieldBeacon));
                         call->entries[slot].romVersion =
                             ((CtvtCallFieldBeacon *)call->entries[slot].beacon)->beacon.version;
                     }

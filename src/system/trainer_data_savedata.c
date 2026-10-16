@@ -14,7 +14,7 @@ u32 getSizeofTrainerData(void) {
 }
 
 void func_02008da4(TrainerDataSave *data) {
-    sys_memset32(0, data, sizeof(TrainerDataSave));
+    MIi_CpuClear32(0, data, sizeof(TrainerDataSave));
     func_020089c0(&data->config);
     func_02008b40(&data->playerInfo);
     func_02008c40(&data->playTime);

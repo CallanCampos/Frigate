@@ -4,15 +4,15 @@
 
 #include "dwc/ac.h"
 
-static int func_020597dc(void);
-static BOOL func_02059870(void);
+static int DWCAc_StepWcmTeardown(void);
+static BOOL DWCAc_StepSocTeardown(void);
 
-// Steps the teardown whose state is *state. Up to 10 is the wireless manager's, brought down to idle by func_020597dc;
-// from 0xb to 0x11 the sockets are brought down first, by func_02059870, and 0xe lets go of CPS before that. TRUE when
-// it is over (the state is then 0), or when it failed (the state is then 0x12)
-BOOL func_0205975c(u8 *state) {
+// Steps the teardown whose state is *state. Up to 10 is the wireless manager's, brought down to idle by
+// DWCAc_StepWcmTeardown; from 0xb to 0x11 the sockets are brought down first, by DWCAc_StepSocTeardown, and 0xe lets go
+// of CPS before that. TRUE when it is over (the state is then 0), or when it failed (the state is then 0x12)
+BOOL DWCAc_StepTeardown(u8 *state) {
     if (*state <= 10) {
-        int result = func_020597dc();
+        int result = DWCAc_StepWcmTeardown();
 
         if (result == 1) {
             *state = 0;
@@ -27,7 +27,7 @@ BOOL func_0205975c(u8 *state) {
         func_ov011_0216b1d4();
         *state = 12;
     } else if (*state < 18) {
-        if (func_02059870() == TRUE) {
+        if (DWCAc_StepSocTeardown() == TRUE) {
             *state = 10;
         }
     }
@@ -35,7 +35,7 @@ BOOL func_0205975c(u8 *state) {
 }
 
 // Asks the wireless manager for the next step down from the state it is in; 1 once it is down, -1 if it cannot be
-static int func_020597dc(void) {
+static int DWCAc_StepWcmTeardown(void) {
     switch (WCM_GetState()) {
     case 0:
         return 1;
@@ -55,14 +55,14 @@ static int func_020597dc(void) {
         WCM_RestoreIdleAsync();
         break;
     case 11:
-        func_0205a85c(0);
+        DWCAc_SetError(0);
         return -1;
     }
     return 0;
 }
 
 // Brings the sockets down: TRUE once SOCL has closed them and SOC is cleaned up (or was never started)
-static BOOL func_02059870(void) {
+static BOOL DWCAc_StepSocTeardown(void) {
     int result;
 
     if (SOCLiConfigPtr == NULL) {

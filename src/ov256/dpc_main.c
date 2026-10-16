@@ -245,8 +245,8 @@ BOOL DpcMain_IsPaletteFading(DendouPCWork *wk) {
 }
 
 void DpcMain_SetBlend(void) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, 16, 8);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, 16, 8);
 }
 
 void DpcMain_InitMsg(DendouPCWork *wk) {

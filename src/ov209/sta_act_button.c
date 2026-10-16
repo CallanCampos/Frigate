@@ -77,7 +77,7 @@ void StaActButton_UpdateSystem(StaActButton *sys) {
         };
         s32 hit = func_0203da0c(rects);
 
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x10, 0);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x10, 0);
         if (hit != TOUCH_RECT_NONE && sys->itemIds[hit] != 0xff && sys->used[hit] == FALSE) {
             ClActorPos pos;
 
@@ -86,7 +86,7 @@ void StaActButton_UpdateSystem(StaActButton *sys) {
             } else {
                 StaActing_UseItem(sys->stage, STA_ACT_BUTTON_EQUIP_RIGHT);
             }
-            gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x10, -8);
+            G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x10, -8);
             sys->used[hit] = TRUE;
             sys->active = FALSE;
             sys->pressed = TRUE;
@@ -198,9 +198,9 @@ static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId
     charAddr = func_0204bb80(sys->chars[0], TRUE);
     charAddr += index << 11;
 
-    cp15_flushDC((u8 *)tex + plttOfs, plttSize);
-    gfxUploadStdPaletteObjB((u8 *)tex + plttOfs, index << 5, plttSize);
-    cp15_flushDC(texData, texSize);
+    DC_FlushRange((u8 *)tex + plttOfs, plttSize);
+    GXS_LoadOBJPltt((u8 *)tex + plttOfs, index << 5, plttSize);
+    DC_FlushRange(texData, texSize);
     yStart = 0;
     switch (size) {
     case 0x22:
@@ -233,8 +233,8 @@ static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId
     for (row = 0; row < height; row++) {
         for (line = 0; line < 8; line++) {
             for (col = 0; col < width; col++) {
-                gfxUploadObjCharB(texData + (col * 4 + (row * 32 * width + line * width * 4)),
-                                  charAddr + (line * 4 + ((col + xStart) * 32 + (row + yStart) * 256)), 4);
+                GXS_LoadOBJ(texData + (col * 4 + (row * 32 * width + line * width * 4)),
+                            charAddr + (line * 4 + ((col + xStart) * 32 + (row + yStart) * 256)), 4);
             }
         }
     }

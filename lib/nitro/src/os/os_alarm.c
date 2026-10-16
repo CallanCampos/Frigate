@@ -7,10 +7,10 @@ typedef struct OSiAlarmQueue {
     OSAlarm *tail;
 } OSiAlarmQueue;
 
-static void func_0207bb90(OSAlarm *alarm);
-static void func_0207bc2c(OSAlarm *alarm, OSTick fire);
-static asm void func_0207bd90(void *arg);
-static void func_0207bda0(void);
+static void OSi_SetTimer(OSAlarm *alarm);
+static void InsertAlarm(OSAlarm *alarm, OSTick fire);
+static asm void OSi_AlarmHandlerEntry(void *arg);
+static void OSi_AlarmHandler(void);
 
 static u16 OSi_UseAlarm;
 static OSiAlarmQueue OSi_AlarmQueue;
@@ -18,14 +18,14 @@ static OSiAlarmQueue OSi_AlarmQueue;
 // NitroSDK's OSi_SetTimer: sets timer 1 to interrupt when the alarm fires, by starting it at the complement of the
 // ticks left so that it wraps then. An alarm more than a wrap of the timer away gets the whole wrap, and one that is
 // late already fires two ticks from now
-static void func_0207bb90(OSAlarm *alarm) {
-    OSTick tick = clock();
+static void OSi_SetTimer(OSAlarm *alarm) {
+    OSTick tick = OS_GetTick();
     s64 delta;
     u16 count;
 
     reg_OS_TM1CNT_H = 0;
     delta = alarm->fire - tick;
-    OSi_EnterTimerCallback(1, func_0207bd90, NULL);
+    OSi_EnterTimerCallback(1, OSi_AlarmHandlerEntry, NULL);
     if (delta < 0) {
         count = 0xfffe;
     } else if (delta < 0x10000) {
@@ -35,16 +35,16 @@ static void func_0207bb90(OSAlarm *alarm) {
     }
     reg_OS_TM1CNT_L = count;
     reg_OS_TM1CNT_H = REG_OS_TMCNT_H_E_MASK | REG_OS_TMCNT_H_I_MASK | OS_TIMER_PRESCALER_64;
-    CPU_EnableInterrupts(OS_IE_TIMER1);
+    OS_EnableIrqMask(OS_IE_TIMER1);
 }
 
 void OS_InitAlarm(void) {
     if (!OSi_UseAlarm) {
         OSi_UseAlarm = TRUE;
-        func_0207ba64(1);
+        OSi_SetTimerReserved(1);
         OSi_AlarmQueue.head = NULL;
         OSi_AlarmQueue.tail = NULL;
-        CPU_DisableInterrupts(OS_IE_TIMER1);
+        OS_DisableIrqMask(OS_IE_TIMER1);
     }
 }
 
@@ -59,12 +59,12 @@ void OS_CreateAlarm(OSAlarm *alarm) {
 
 // NitroSDK's InsertAlarm: puts the alarm in the queue, before the first that fires later, and sets the timer if it
 // is the first. A periodic alarm fires at its next period from its start, not at the tick given
-static void func_0207bc2c(OSAlarm *alarm, OSTick fire) {
+static void InsertAlarm(OSAlarm *alarm, OSTick fire) {
     OSAlarm *next;
     OSAlarm *prev;
 
     if (alarm->period != 0) {
-        OSTick tick = clock();
+        OSTick tick = OS_GetTick();
 
         fire = alarm->start;
         if (fire < tick) {
@@ -81,7 +81,7 @@ static void func_0207bc2c(OSAlarm *alarm, OSTick fire) {
                 alarm->prev->next = alarm;
             } else {
                 OSi_AlarmQueue.head = alarm;
-                func_0207bb90(alarm);
+                OSi_SetTimer(alarm);
             }
             return;
         }
@@ -94,7 +94,7 @@ static void func_0207bc2c(OSAlarm *alarm, OSTick fire) {
         prev->next = alarm;
     } else {
         OSi_AlarmQueue.head = OSi_AlarmQueue.tail = alarm;
-        func_0207bb90(alarm);
+        OSi_SetTimer(alarm);
     }
 }
 
@@ -105,20 +105,20 @@ void OS_SetAlarm(OSAlarm *alarm, OSTick tick, OSAlarmHandler handler, void *arg)
     if (alarm == NULL || alarm->handler != NULL) {
         sys_exit();
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     alarm->period = 0;
     alarm->handler = handler;
     alarm->arg = arg;
-    func_0207bc2c(alarm, tick + clock());
-    CPU_SetIRQMask(enabled);
+    InsertAlarm(alarm, tick + OS_GetTick());
+    OS_RestoreInterrupts(enabled);
 }
 
 void OS_CancelAlarm(OSAlarm *alarm) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     OSAlarm *next;
 
     if (alarm->handler == NULL) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return;
     }
     next = alarm->next;
@@ -132,21 +132,21 @@ void OS_CancelAlarm(OSAlarm *alarm) {
     } else {
         OSi_AlarmQueue.head = next;
         if (next != NULL) {
-            func_0207bb90(next);
+            OSi_SetTimer(next);
         }
     }
     alarm->handler = NULL;
     alarm->period = 0;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 #pragma thumb off
 // clang-format off
 // The handler of timer 1's interrupt, in ARM code that keeps the stack 8-byte aligned (the SDK's OSi_AlarmHandler
 // calls the Thumb function that does the work): assembly in the SDK, since a C function would not push r0 for that
-static asm void func_0207bd90(void *arg) {
+static asm void OSi_AlarmHandlerEntry(void *arg) {
     stmdb sp!, {r0, lr}
-    bl func_0207bda0
+    bl OSi_AlarmHandler
     ldmia sp!, {r0, lr}
     bx lr
 }
@@ -155,22 +155,22 @@ static asm void func_0207bd90(void *arg) {
 
 // Runs the first alarm of the queue if it is due (an alarm that is not due yet, if the timer interrupted at a wrap,
 // sets the timer again), then sets the timer for the next. A periodic alarm is put back in the queue
-static void func_0207bda0(void) {
+static void OSi_AlarmHandler(void) {
     OSAlarm *alarm;
     OSAlarm *next;
     OSAlarmHandler handler;
     OSTick tick;
 
     reg_OS_TM1CNT_H = 0;
-    CPU_DisableInterrupts(OS_IE_TIMER1);
+    OS_DisableIrqMask(OS_IE_TIMER1);
     OS_SetIrqCheckFlag(OS_IE_TIMER1);
-    tick = clock();
+    tick = OS_GetTick();
     alarm = OSi_AlarmQueue.head;
     if (alarm == NULL) {
         return;
     }
     if (tick < alarm->fire) {
-        func_0207bb90(alarm);
+        OSi_SetTimer(alarm);
         return;
     }
     next = alarm->next;
@@ -189,9 +189,9 @@ static void func_0207bda0(void) {
     }
     if (alarm->period != 0) {
         alarm->handler = handler;
-        func_0207bc2c(alarm, 0);
+        InsertAlarm(alarm, 0);
     }
     if (OSi_AlarmQueue.head != NULL) {
-        func_0207bb90(OSi_AlarmQueue.head);
+        OSi_SetTimer(OSi_AlarmQueue.head);
     }
 }

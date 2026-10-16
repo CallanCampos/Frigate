@@ -496,7 +496,7 @@ static BOOL ConfigPanel_Init(GameProc *proc, u32 *state, void *param, void *work
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_CONFIG_PANEL, 0x21000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ConfigPanelWork), HEAPID_CONFIG_PANEL);
-    sys_memset(wk, 0, sizeof(ConfigPanelWork));
+    MI_CpuFill8(wk, 0, sizeof(ConfigPanelWork));
     wk->param = param;
     wk->param->result = FALSE;
     ConfigPanelGraphic_Init(&wk->graphic, HEAPID_CONFIG_PANEL);
@@ -559,7 +559,7 @@ static BOOL ConfigPanel_Main(GameProc *proc, u32 *state, void *param, void *work
 }
 
 static void ConfigPanelGraphic_Init(ConfigPanelGraphic *graphic, HeapID heapId) {
-    sys_memset(graphic, 0, sizeof(ConfigPanelGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ConfigPanelGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -586,7 +586,7 @@ static void ConfigPanelGraphic_Exit(ConfigPanelGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(ConfigPanelGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ConfigPanelGraphic));
 }
 
 void ConfigPanelGraphic_Main(ConfigPanelGraphic *graphic) {
@@ -623,7 +623,7 @@ static void ConfigPanelBg_Init(ConfigPanelBg *bg, HeapID heapId) {
     NNSG2dPaletteData *palette;
     void *buf;
 
-    sys_memset(bg, 0, sizeof(ConfigPanelBg));
+    MI_CpuFill8(bg, 0, sizeof(ConfigPanelBg));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sConfigPanelLCDConfig);
@@ -654,7 +654,7 @@ static void ConfigPanelBg_Init(ConfigPanelBg *bg, HeapID heapId) {
     GFL_ArcToolFree(arc);
 
     buf = GFL_G2DIOReadNCLR(ARCID_CONFIG_PANEL, 1, &palette, heapId);
-    sys_memcpy((u16 *)palette->rawData + 7 * 16, bg->cursorPalette, sizeof(bg->cursorPalette));
+    MI_CpuCopy8((u16 *)palette->rawData + 7 * 16, bg->cursorPalette, sizeof(bg->cursorPalette));
     GFL_HeapFree(buf);
 
     bg->windows[WINDOW_MESSAGE] = BmpWin_CreateDynamic(BG_MESSAGE, 1, 19, 30, 4, 4, TRUE);
@@ -680,7 +680,7 @@ static void ConfigPanelBg_Exit(ConfigPanelBg *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(ConfigPanelBg));
+    MI_CpuFill8(bg, 0, sizeof(ConfigPanelBg));
 }
 
 // Pulses the cursor's color
@@ -729,7 +729,7 @@ static void ConfigPanelBg_PrintLabels(ConfigPanelBg *bg) {
 
     // The title's window starts as the bar's graphic of it
     chars = bg->titleChars->rawData;
-    sys_memcpy32(chars, GFL_BitmapGetPixelData(BmpWin_GetBitmap(bg->windows[WINDOW_TITLE])), 16 * 3 * 0x20);
+    MIi_CpuCopy32(chars, GFL_BitmapGetPixelData(BmpWin_GetBitmap(bg->windows[WINDOW_TITLE])), 16 * 3 * 0x20);
     str = GFL_MsgDataLoadStrbufNew(msgData, Title2_Text_Options);
     x = BmpWin_GetSizeX(bg->windows[WINDOW_TITLE]) * 4;
     x -= GFL_FontGetBlockWidth(str, font, 0) / 2;
@@ -778,7 +778,7 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
     ArcTool *arc;
     ClActorSetup setup;
 
-    sys_memset(obj, 0, sizeof(ConfigPanelObj));
+    MI_CpuFill8(obj, 0, sizeof(ConfigPanelObj));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
     obj->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(obj->unit);
@@ -793,7 +793,7 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
     obj->knobCellAnims = func_0204bde0(arc, 11, 10, heapId);
     GFL_ArcToolFree(arc);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.bgPriority = 2;
     setup.priority = 2;
     for (i = ACTOR_ITEM; i < ACTOR_ITEM + ITEM_COUNT; i++) {
@@ -803,7 +803,7 @@ static void ConfigPanelObj_Init(ConfigPanelObj *obj, const BGSysVRAMConfig *vram
         func_0204c520(obj->actors[i], FALSE);
     }
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 128;
     setup.y = 96;
     setup.bgPriority = 2;
@@ -831,7 +831,7 @@ static void ConfigPanelObj_Exit(ConfigPanelObj *obj) {
     func_0204be64(obj->knobCellAnims);
     func_0204bf98(obj->unit);
     func_0204b758();
-    sys_memset(obj, 0, sizeof(ConfigPanelObj));
+    MI_CpuFill8(obj, 0, sizeof(ConfigPanelObj));
 }
 
 // Animates the values' frames together
@@ -860,11 +860,11 @@ static ClActUnit *ConfigPanelObj_GetUnit(ConfigPanelObj *obj) {
 }
 
 static void ConfigPanelUi_Init(ConfigPanelUi *ui, HeapID heapId) {
-    sys_memset(ui, 0, sizeof(ConfigPanelUi));
+    MI_CpuFill8(ui, 0, sizeof(ConfigPanelUi));
 }
 
 static void ConfigPanelUi_Exit(ConfigPanelUi *ui) {
-    sys_memset(ui, 0, sizeof(ConfigPanelUi));
+    MI_CpuFill8(ui, 0, sizeof(ConfigPanelUi));
 }
 
 static void ConfigPanelUi_Main(ConfigPanelUi *ui) {
@@ -949,7 +949,7 @@ static void ConfigPanelUi_GetPoint(ConfigPanelUi *ui, u32 kind, ConfigPanelPoint
 
 static void ConfigPanelMsg_Init(ConfigPanelMsg *msg, BmpWin *window, Font *font, MsgData *msgData,
                                 TCBExManager *tcbManager, PrintQueue *queue, u16 heapId) {
-    sys_memset(msg, 0, sizeof(ConfigPanelMsg));
+    MI_CpuFill8(msg, 0, sizeof(ConfigPanelMsg));
     msg->clearColor = 4;
     msg->window = window;
     msg->heapId = heapId;
@@ -974,7 +974,7 @@ static void ConfigPanelMsg_Exit(ConfigPanelMsg *msg) {
         msg->stream = NULL;
     }
     GFL_StrBufFree(msg->strbuf);
-    sys_memset(msg, 0, sizeof(ConfigPanelMsg));
+    MI_CpuFill8(msg, 0, sizeof(ConfigPanelMsg));
 }
 
 static void ConfigPanelMsg_Print(ConfigPanelMsg *msg, u32 msgId, s32 wait, BOOL stream) {
@@ -1014,7 +1014,7 @@ static BOOL ConfigPanelMsg_IsDone(ConfigPanelMsg *msg) {
 
 static void ConfigPanelAppBar_Init(ConfigPanelAppBar *appBar, ClActUnit *unit, Font *font, PrintQueue *queue,
                                    MsgData *msgData, AppTaskMenuRes *res, GameData *gameData, u16 heapId) {
-    sys_memset(appBar, 0, sizeof(ConfigPanelAppBar));
+    MI_CpuFill8(appBar, 0, sizeof(ConfigPanelAppBar));
     appBar->button = BUTTON_NONE;
     appBar->font = font;
     appBar->res = res;
@@ -1029,7 +1029,7 @@ static void ConfigPanelAppBar_Init(ConfigPanelAppBar *appBar, ClActUnit *unit, F
         };
         TouchBarSetup setup;
 
-        sys_memset(&setup, 0, sizeof(TouchBarSetup));
+        MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
         setup.items = items;
         setup.count = 2;
         setup.unit = unit;
@@ -1055,7 +1055,7 @@ static void ConfigPanelAppBar_Exit(ConfigPanelAppBar *appBar) {
         GFL_StrBufFree(appBar->items[i].str);
         AppTaskMenuWin_Free(appBar->wins[i]);
     }
-    sys_memset(appBar, 0, sizeof(ConfigPanelAppBar));
+    MI_CpuFill8(appBar, 0, sizeof(ConfigPanelAppBar));
 }
 
 static void ConfigPanelAppBar_Main(ConfigPanelAppBar *appBar, ConfigPanelUi *ui, ConfigPanelScroll *scroll) {
@@ -1252,7 +1252,7 @@ static void ConfigPanelScroll_Init(ConfigPanelScroll *scroll, u16 textBg, u16 ro
                                    const ConfigPanelOptions *options, HeapID heapId) {
     int i;
 
-    sys_memset(scroll, 0, sizeof(ConfigPanelScroll));
+    MI_CpuFill8(scroll, 0, sizeof(ConfigPanelScroll));
     scroll->textBg = textBg;
     scroll->rowsBg = rowsBg;
     scroll->y = 16;
@@ -1273,7 +1273,7 @@ static void ConfigPanelScroll_Init(ConfigPanelScroll *scroll, u16 textBg, u16 ro
 }
 
 static void ConfigPanelScroll_Exit(ConfigPanelScroll *scroll) {
-    sys_memset(scroll, 0, sizeof(ConfigPanelScroll));
+    MI_CpuFill8(scroll, 0, sizeof(ConfigPanelScroll));
 }
 
 static void ConfigPanelScroll_Main(ConfigPanelScroll *scroll, ConfigPanelUi *ui, ConfigPanelMsg *msg,
@@ -1572,7 +1572,7 @@ static void ConfigPanelConfirm_Init(ConfigPanelConfirm *confirm, BmpWin *window,
                                     TCBExManager *tcbManager, AppTaskMenuRes *res, PrintQueue *queue, u16 heapId) {
     int i;
 
-    sys_memset(confirm, 0, sizeof(ConfigPanelConfirm));
+    MI_CpuFill8(confirm, 0, sizeof(ConfigPanelConfirm));
     confirm->result = CONFIRM_NONE;
     confirm->res = res;
     ConfigPanelMsg_Init(&confirm->msg, window, font, msgData, tcbManager, queue, heapId);
@@ -1598,7 +1598,7 @@ static void ConfigPanelConfirm_Exit(ConfigPanelConfirm *confirm) {
         GFL_StrBufFree(confirm->items[i].str);
     }
     ConfigPanelMsg_Exit(&confirm->msg);
-    sys_memset(confirm, 0, sizeof(ConfigPanelConfirm));
+    MI_CpuFill8(confirm, 0, sizeof(ConfigPanelConfirm));
 }
 
 static void ConfigPanelConfirm_Main(ConfigPanelConfirm *confirm) {
@@ -1625,7 +1625,7 @@ static void ConfigPanelConfirm_Main(ConfigPanelConfirm *confirm) {
 
 // Asks whether to make the changes
 static void ConfigPanelConfirm_Start(ConfigPanelConfirm *confirm, s32 wait) {
-    gfxRegSetBrightnessBlend(
+    G2x_SetBlendBrightness_(
         REG_BLDCNT_ADDR,
         GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
     GFL_BGSysSetBGEnabled(BG_CONFIRM, TRUE);
@@ -1640,7 +1640,7 @@ static u32 ConfigPanelConfirm_GetResult(ConfigPanelConfirm *confirm) {
 static void ConfigPanelConfirm_PrintScriptMsg(ConfigPanelConfirm *confirm, u32 msgId, s32 wait) {
     MsgData *msgData;
 
-    gfxRegSetBrightnessBlend(
+    G2x_SetBlendBrightness_(
         REG_BLDCNT_ADDR,
         GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
     GFL_BGSysSetBGEnabled(BG_CONFIRM, TRUE);
@@ -1651,7 +1651,7 @@ static void ConfigPanelConfirm_PrintScriptMsg(ConfigPanelConfirm *confirm, u32 m
 }
 
 static void ConfigPanelConfirm_PrintMsg(ConfigPanelConfirm *confirm, u32 msgId, s32 wait) {
-    gfxRegSetBrightnessBlend(
+    G2x_SetBlendBrightness_(
         REG_BLDCNT_ADDR,
         GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
     GFL_BGSysSetBGEnabled(BG_CONFIRM, TRUE);
@@ -1668,7 +1668,7 @@ static BOOL ConfigPanelConfirm_IsMsgDone(ConfigPanelConfirm *confirm) {
 }
 
 static void ConfigPanelOptions_Init(ConfigPanelOptions *options, Config *config) {
-    sys_memset(options, 0, sizeof(ConfigPanelOptions));
+    MI_CpuFill8(options, 0, sizeof(ConfigPanelOptions));
     options->changed = ITEM_COUNT;
     options->config = config;
     options->values[OPTION_TEXT_SPEED] = func_02008a14(config);
@@ -1679,7 +1679,7 @@ static void ConfigPanelOptions_Init(ConfigPanelOptions *options, Config *config)
 }
 
 static void ConfigPanelOptions_Exit(ConfigPanelOptions *options) {
-    sys_memset(options, 0, sizeof(ConfigPanelOptions));
+    MI_CpuFill8(options, 0, sizeof(ConfigPanelOptions));
 }
 
 // Writes the options to the save's
@@ -1749,13 +1749,13 @@ static BOOL ConfigPanelOptions_Equals(const ConfigPanelOptions *a, const ConfigP
 }
 
 static void ConfigPanelSeq_Init(ConfigPanelSeq *seq, void *data, ConfigPanelSeqFunc func) {
-    sys_memset(seq, 0, sizeof(ConfigPanelSeq));
+    MI_CpuFill8(seq, 0, sizeof(ConfigPanelSeq));
     seq->data = data;
     ConfigPanelSeq_SetNext(seq, func);
 }
 
 static void ConfigPanelSeq_Exit(ConfigPanelSeq *seq) {
-    sys_memset(seq, 0, sizeof(ConfigPanelSeq));
+    MI_CpuFill8(seq, 0, sizeof(ConfigPanelSeq));
 }
 
 static void ConfigPanelSeq_Main(ConfigPanelSeq *seq) {

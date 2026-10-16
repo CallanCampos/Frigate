@@ -19,9 +19,8 @@ typedef struct {
 // 32 bytes, so the buffer's size is WM_SIZE_USER_GAMEINFO (0x70) rounded up
 static u8 tmpUserGameInfoBuf[0x80] ATTRIBUTE_ALIGN(32);
 
-// WM_SetWEPKey
-int func_02082424(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
-    int result = func_02080a84();
+int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
+    int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -33,9 +32,9 @@ int func_02082424(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
         if (wepKey == NULL) {
             return WM_ERRCODE_INVALID_PARAM;
         }
-        cp15_cleanDC(wepKey, 0x50);
+        DC_StoreRange(wepKey, 0x50);
     }
-    func_02080950(WM_APIID_SET_WEP_KEY, callback);
+    WMi_SetCallbackTable(WM_APIID_SET_WEP_KEY, callback);
     result = WMi_SendCommand(WM_APIID_SET_WEP_KEY, 2, wepMode, wepKey);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -43,9 +42,8 @@ int func_02082424(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_SetWEPKeyEx
-int func_02082470(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey) {
-    int result = func_02080a84();
+int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey) {
+    int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -57,9 +55,9 @@ int func_02082470(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void
         if (wepKey == NULL) {
             return WM_ERRCODE_INVALID_PARAM;
         }
-        cp15_cleanDC(wepKey, 0x50);
+        DC_StoreRange(wepKey, 0x50);
     }
-    func_02080950(WM_APIID_SET_WEP_KEY_EX, callback);
+    WMi_SetCallbackTable(WM_APIID_SET_WEP_KEY_EX, callback);
     result = WMi_SendCommand(WM_APIID_SET_WEP_KEY_EX, 3, wepMode, wepKey, wepKeyId);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -67,9 +65,9 @@ int func_02082470(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_SetGameInfo: the information is at most WM_SIZE_USER_GAMEINFO bytes
-int func_020824bc(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr) {
-    int result = func_02080ab0(2, WM_STATE_PARENT, WM_STATE_MP_PARENT);
+// The information is at most WM_SIZE_USER_GAMEINFO bytes
+int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr) {
+    int result = WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_MP_PARENT);
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -81,8 +79,8 @@ int func_020824bc(WMCallbackFunc callback, const void *userGameInfo, u16 gameInf
         return WM_ERRCODE_INVALID_PARAM;
     }
     MI_CpuCopy16(userGameInfo, tmpUserGameInfoBuf, gameInfoSize);
-    cp15_cleanDC(tmpUserGameInfoBuf, gameInfoSize);
-    func_02080950(WM_APIID_SET_GAME_INFO, callback);
+    DC_StoreRange(tmpUserGameInfoBuf, gameInfoSize);
+    WMi_SetCallbackTable(WM_APIID_SET_GAME_INFO, callback);
     result = WMi_SendCommand(WM_APIID_SET_GAME_INFO, 5, tmpUserGameInfoBuf, gameInfoSize, ggid, tgid, attr);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -90,9 +88,9 @@ int func_020824bc(WMCallbackFunc callback, const void *userGameInfo, u16 gameInf
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_SetBeaconIndication: enable is 0 or 1
-int func_0208252c(WMCallbackFunc callback, int enable) {
-    int result = func_02080a84();
+// Enable is 0 or 1
+int WM_SetBeaconIndication(WMCallbackFunc callback, int enable) {
+    int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -100,7 +98,7 @@ int func_0208252c(WMCallbackFunc callback, int enable) {
     if (enable != 0 && enable != 1) {
         return WM_ERRCODE_INVALID_PARAM;
     }
-    func_02080950(WM_APIID_SET_BEACON_IND, callback);
+    WMi_SetCallbackTable(WM_APIID_SET_BEACON_IND, callback);
     result = WMi_SendCommand(WM_APIID_SET_BEACON_IND, 1, enable);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -108,14 +106,13 @@ int func_0208252c(WMCallbackFunc callback, int enable) {
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_SetLifeTime
-int func_02082560(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime) {
-    int result = func_02080a84();
+int WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime) {
+    int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    func_02080950(WM_APIID_SET_LIFE_TIME, callback);
+    WMi_SetCallbackTable(WM_APIID_SET_LIFE_TIME, callback);
     result = WMi_SendCommand(WM_APIID_SET_LIFE_TIME, 4, tableNumber, camLifeTime, frameLifeTime, mpLifeTime);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
@@ -123,17 +120,16 @@ int func_02082560(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16
     return WM_ERRCODE_OPERATING;
 }
 
-// WM_MeasureChannel
-int func_0208259c(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime) {
+int WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime) {
     int result;
     WmMeasureChannelCommand cmd;
 
-    func_02080a64();
-    result = func_02080ab0(1, WM_STATE_IDLE);
+    WMi_GetSystemWork();
+    result = WMi_CheckStateEx(1, WM_STATE_IDLE);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    func_02080950(WM_APIID_MEASURE_CHANNEL, callback);
+    WMi_SetCallbackTable(WM_APIID_MEASURE_CHANNEL, callback);
     cmd.apiid = WM_APIID_MEASURE_CHANNEL;
     cmd.ccaMode = ccaMode;
     cmd.edThreshold = edThreshold;

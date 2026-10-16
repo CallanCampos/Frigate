@@ -327,7 +327,7 @@ static BOOL StartMenu_Init(GameProc *proc, u32 *state, void *param, void *work) 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_STARTMENU, 0x80000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(StartMenuWork), HEAPID_STARTMENU);
-    sys_memset(wk, 0, sizeof(StartMenuWork));
+    MI_CpuFill8(wk, 0, sizeof(StartMenuWork));
     wk->save = SaveControl_GetInstance();
     wk->playerInfo = SaveControl_GetPlayerInfo(wk->save);
     wk->gameInfo = getTrainerGameInfoAddress(wk->save);
@@ -384,7 +384,7 @@ static BOOL StartMenu_Exit(GameProc *proc, u32 *state, void *param, void *work) 
         break;
     case ITEM_BATTLE_COMPETITION:
         battleMatchParam = GFL_HeapAllocate(HEAPID_USER, sizeof(WifiBattleMatchParam), FALSE, "startmenu.c", 583);
-        sys_memset(battleMatchParam, 0, sizeof(WifiBattleMatchParam));
+        MI_CpuFill8(battleMatchParam, 0, sizeof(WifiBattleMatchParam));
         battleMatchParam->unk8 = 0;
         battleMatchParam->unk10 = 1;
         GCTX_ProcMgrReplaceProc(OVERLAY_ID(290), &WIFIBATTLEMATCH_PROC_FUNCTIONS, battleMatchParam);
@@ -1345,8 +1345,8 @@ static void StartMenu_FreeTextScreens(StartMenuWork *wk) {
 }
 
 static void StartMenu_SetBlend(void) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 16, 3);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG2, 16, 3);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG3, 16, 3);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG2, 16, 3);
 }
 
 // Lists the items that the menu has: continue with a saved game, then the items that are always there, then the ones
@@ -1389,7 +1389,7 @@ static void StartMenu_LoadItemScreens(StartMenuWork *wk) {
         size = ITEM_WIDTH * sizeof(u16) * sItemLayouts[i].rows;
         wk->itemScreens[i] = GFL_HeapAllocate(HEAPID_STARTMENU, size, FALSE, "startmenu.c", 2240);
         file = GFL_G2DIOReadNSCRArc(arc, sItemLayouts[i].screenFile, TRUE, &screen, HEAPID_STARTMENU);
-        sys_memcpy16(screen->rawData, wk->itemScreens[i], size);
+        MIi_CpuCopy16(screen->rawData, wk->itemScreens[i], size);
         GFL_HeapFree(file);
     }
     GFL_ArcToolFree(arc);

@@ -104,7 +104,7 @@ static const TownMapBGSetup sTownMapBGSetups[TOWNMAP_BG_COUNT] = {
 TownMapGraphic *TownMapGraphic_Create(HeapID heapId) {
     TownMapGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(TownMapGraphic), FALSE, "townmap_grh.c", 236);
 
-    sys_memset(graphic, 0, sizeof(TownMapGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(TownMapGraphic));
     TownMapGraphic_InitDisplay();
     TownMapBG_Init(&graphic->bg, heapId);
     TownMapClAct_Init(&graphic->clact, &sTownMapVRAMConfig, heapId);
@@ -165,7 +165,7 @@ static void TownMapBG_Init(TownMapBG *bg, HeapID heapId) {
     int i;
     ArcTool *arc;
 
-    sys_memset(bg, 0, sizeof(TownMapBG));
+    MI_CpuFill8(bg, 0, sizeof(TownMapBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sTownMapLCDConfig);
@@ -202,7 +202,7 @@ static void TownMapBG_Free(TownMapBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(TownMapBG));
+    MI_CpuFill8(bg, 0, sizeof(TownMapBG));
 }
 
 static void TownMapBG_VBlank(TownMapBG *bg) {
@@ -213,7 +213,7 @@ static void TownMapClAct_Init(TownMapClAct *clact, const BGSysVRAMConfig *vramCo
     int i;
     ArcTool *arc;
 
-    sys_memset(clact, 0, sizeof(TownMapClAct));
+    MI_CpuFill8(clact, 0, sizeof(TownMapClAct));
     {
         ClActSysSetup setup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 
@@ -231,7 +231,7 @@ static void TownMapClAct_Init(TownMapClAct *clact, const BGSysVRAMConfig *vramCo
     {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         for (i = 0; i < TOWNMAP_ACTOR_COUNT; i++) {
             clact->actors[i] =
                 func_0204c040(clact->units[TOWNMAP_UNIT_MAIN], clact->res[TOWNMAP_RES_CHARS],
@@ -262,7 +262,7 @@ static void TownMapClAct_Free(TownMapClAct *clact) {
         func_0204bf98(clact->units[TOWNMAP_UNIT_MAIN]);
     }
     func_0204b758();
-    sys_memset(clact, 0, sizeof(TownMapClAct));
+    MI_CpuFill8(clact, 0, sizeof(TownMapClAct));
 }
 
 static void TownMapClAct_Update(TownMapClAct *clact) {

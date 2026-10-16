@@ -85,8 +85,8 @@ static u32 DpcSeq_Init(DendouPCWork *wk) {
     G2S_BlendNone();
     // The main engine drives the touch screen
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_SUB_MAIN);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
 
     DpcMain_LoadTeams(wk);
     DpcMain_InitVram();
@@ -113,8 +113,8 @@ static u32 DpcSeq_Release(DendouPCWork *wk) {
     DpcMain_ExitBg();
     DpcMain_FreeTeams(wk);
 
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);

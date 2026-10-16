@@ -115,7 +115,7 @@ static BOOL KeySystem_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_KEY_SYSTEM, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(KeySystemWork), HEAPID_KEY_SYSTEM);
-    sys_memset(wk, 0, sizeof(KeySystemWork));
+    MI_CpuFill8(wk, 0, sizeof(KeySystemWork));
     wk->param = param;
     if (param == NULL) {
         wk->param = GFL_HeapAllocate(HEAPID_KEY_SYSTEM, sizeof(UnovaLinkParam), TRUE, "key_system_main.c", 152);
@@ -381,11 +381,11 @@ static void KeySystemBG_Load(KeySystemBG *bg, HeapID heapId) {
 
     file = GFL_G2DIOReadNCLRArc(arc, 0, &palette, heapId);
     colors = palette->rawData;
-    sys_memcpy(&colors[0], bg->palettes[0], sizeof(bg->palettes[0]));
-    sys_memcpy(&colors[16], bg->palettes[1], sizeof(bg->palettes[1]));
-    sys_memcpy(&colors[32], bg->palettes[2], sizeof(bg->palettes[2]));
-    sys_memcpy(&colors[48], bg->palettes[3], sizeof(bg->palettes[3]));
-    sys_memcpy(&colors[64], bg->palettes[4], sizeof(bg->palettes[4]));
+    MI_CpuCopy8(&colors[0], bg->palettes[0], sizeof(bg->palettes[0]));
+    MI_CpuCopy8(&colors[16], bg->palettes[1], sizeof(bg->palettes[1]));
+    MI_CpuCopy8(&colors[32], bg->palettes[2], sizeof(bg->palettes[2]));
+    MI_CpuCopy8(&colors[48], bg->palettes[3], sizeof(bg->palettes[3]));
+    MI_CpuCopy8(&colors[64], bg->palettes[4], sizeof(bg->palettes[4]));
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
 
@@ -486,7 +486,7 @@ void KeySystemBG_LoadScreen(KeySystemBG *bg, u8 bgId, u32 screen) {
 }
 
 static void KeySystemClAct_Init(KeySystemClAct *clact, KeySystemGraphic *graphic, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(KeySystemClAct));
+    MI_CpuFill8(clact, 0, sizeof(KeySystemClAct));
     clact->unit = KeySystemGraphic_GetClActUnit(graphic);
 }
 
@@ -672,7 +672,7 @@ ClActUnit *KeySystemClAct_GetUnit(KeySystemClAct *clact) {
 }
 
 static void KeySystemTags_Init(KeySystemTag *tags, HeapID heapId) {
-    sys_memset(tags, 0, sizeof(KeySystemTag) * KEY_SYSTEM_TAG_COUNT);
+    MI_CpuFill8(tags, 0, sizeof(KeySystemTag) * KEY_SYSTEM_TAG_COUNT);
 }
 
 void KeySystemTags_Set(KeySystemTag *tags, const char *tag, u32 value) {
@@ -680,7 +680,7 @@ void KeySystemTags_Set(KeySystemTag *tags, const char *tag, u32 value) {
 
     for (i = 0; i < KEY_SYSTEM_TAG_COUNT; i++) {
         if (tags[i].tag[0] == '\0') {
-            sys_memcpy(tag, tags[i].tag, sizeof(tags[i].tag));
+            MI_CpuCopy8(tag, tags[i].tag, sizeof(tags[i].tag));
             tags[i].value = value;
             return;
         }
@@ -692,7 +692,7 @@ void KeySystemTags_Remove(KeySystemTag *tags, const char *tag) {
 
     for (i = 0; i < KEY_SYSTEM_TAG_COUNT; i++) {
         if (_STD_CompareNString(tags[i].tag, tag) == 0) {
-            sys_memset(tags[i].tag, 0, sizeof(tags[i].tag));
+            MI_CpuFill8(tags[i].tag, 0, sizeof(tags[i].tag));
             tags[i].value = 0;
             return;
         }
@@ -725,7 +725,7 @@ static void KeySystemTags_Clear(KeySystemTag *tags) {
     int i;
 
     for (i = 0; i < KEY_SYSTEM_TAG_COUNT; i++) {
-        sys_memset(tags[i].tag, 0, sizeof(tags[i].tag));
+        MI_CpuFill8(tags[i].tag, 0, sizeof(tags[i].tag));
         tags[i].value = 0;
     }
 }
@@ -862,7 +862,7 @@ void KeySystem_FreeInfoWin(KeySystemWork *wk) {
 void KeySystem_CreateYesNoMenu(KeySystemWork *wk, HeapID heapId) {
     KeySystemMenuSetup setup;
 
-    sys_memset(&setup, 0, sizeof(KeySystemMenuSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemMenuSetup));
     setup.msgData = wk->msgData;
     setup.font = wk->font;
     setup.printQueue = wk->printQueue;
@@ -1044,7 +1044,7 @@ static void KeySystemTopScene_Init(void *work, HeapID heapId) {
     if (wk->titleWin == NULL) {
         KeySystem_CreateDefaultTitleWin(wk, heapId);
     }
-    sys_memset(&setup, 0, sizeof(KeySystemListSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemListSetup));
     setup.bg = 1;
     setup.unk04 = 14;
     setup.frameChar = 10;

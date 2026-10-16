@@ -2,7 +2,7 @@
 
 // DWC's error (TWL-DWC 5.3's dwc_error.c, a guessed name; the ROM names none of it, and the file is ARM code in ARM9
 // main like the rest of the library's base): the one error that the library keeps, with its code and the type that
-// says what to do about it. The numbers of the errors are the callers', who set them with func_020584cc.
+// says what to do about it. The numbers of the errors are the callers', who set them with DWCi_SetError.
 
 // The last error and its code
 typedef struct DWCErrorInfo {
@@ -12,14 +12,14 @@ typedef struct DWCErrorInfo {
 
 static DWCErrorInfo sErrorInfo;
 
-int func_02058390(int *code) {
+int DWC_GetLastError(int *code) {
     if (code != NULL) {
         *code = sErrorInfo.code;
     }
     return sErrorInfo.error;
 }
 
-int func_020583b0(int *code, int *type) {
+int DWC_GetLastErrorEx(int *code, int *type) {
     if (code != NULL) {
         *code = sErrorInfo.code;
     }
@@ -75,18 +75,18 @@ int func_020583b0(int *code, int *type) {
     return sErrorInfo.error;
 }
 
-void func_02058490(void) {
+void DWC_ClearError(void) {
     if (sErrorInfo.error != DWC_ERROR_FATAL) {
         sErrorInfo.error = DWC_ERROR_NONE;
         sErrorInfo.code = 0;
     }
 }
 
-BOOL func_020584b0(void) {
+BOOL DWCi_IsError(void) {
     return sErrorInfo.error != DWC_ERROR_NONE;
 }
 
-void func_020584cc(int error, int code) {
+void DWCi_SetError(int error, int code) {
     if (sErrorInfo.error != DWC_ERROR_FATAL) {
         sErrorInfo.error = error;
         sErrorInfo.code = code;

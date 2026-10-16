@@ -20,7 +20,7 @@ u32 getSizeofHollow_RivalData(void) {
 }
 
 void clearHollowRivalData(RivalDataSave *data) {
-    sys_memset(data, 0, sizeof(RivalDataSave));
+    MI_CpuFill8(data, 0, sizeof(RivalDataSave));
 }
 
 RivalDataSave *getHollow_RivalData(SaveControl *save) {
@@ -35,7 +35,7 @@ void Misc_AddMetTrainer(RivalDataSave *rivalData, u32 id) {
         if (id == rivalData->metTrainers[i]) {
             int after = rivalData->metTrainerCount - 1 - i;
             if (after > 0) {
-                sys_memcpy(&rivalData->metTrainers[i + 1], &rivalData->metTrainers[i], after * sizeof(u32));
+                MI_CpuCopy8(&rivalData->metTrainers[i + 1], &rivalData->metTrainers[i], after * sizeof(u32));
                 rivalData->metTrainers[rivalData->metTrainerCount - 1] = id;
             }
             return;
@@ -45,7 +45,7 @@ void Misc_AddMetTrainer(RivalDataSave *rivalData, u32 id) {
         rivalData->metTrainers[rivalData->metTrainerCount] = id;
         rivalData->metTrainerCount++;
     } else {
-        sys_memcpy(&rivalData->metTrainers[1], &rivalData->metTrainers[0], (MISC_MET_TRAINER_MAX - 1) * sizeof(u32));
+        MI_CpuCopy8(&rivalData->metTrainers[1], &rivalData->metTrainers[0], (MISC_MET_TRAINER_MAX - 1) * sizeof(u32));
         rivalData->metTrainers[MISC_MET_TRAINER_MAX - 1] = id;
         rivalData->metTrainerCount = MISC_MET_TRAINER_MAX;
     }

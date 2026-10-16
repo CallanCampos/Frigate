@@ -392,7 +392,7 @@ static BOOL MonolithMission_Init(GameProc *proc, u32 *state, void *param, void *
     switch (*state) {
     case 0:
         mfw = GFL_ProcInitSubsystem(proc, sizeof(MonolithMissionWork), HEAPID_MONOLITH);
-        sys_memset(mfw, 0, sizeof(MonolithMissionWork));
+        MI_CpuFill8(mfw, 0, sizeof(MonolithMissionWork));
         mfw->scroll = 8 << 8;
         mfw->selected = MONOLITH_MISSION_NONE;
         mfw->prevCursor = MONOLITH_MISSION_NONE;

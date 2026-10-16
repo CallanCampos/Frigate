@@ -55,9 +55,9 @@ void func_ov012_02162f44(GameData *gameData) {
 
 static BOOL calcPokerusDecay(AdventureTime *adventureTime, const RTCDate *date, const RTCTime *time, s32 *days,
                              s32 *minutes) {
-    s64 last = func_0207d12c(&adventureTime->date, &adventureTime->time);
-    s64 now = func_0207d12c(date, time);
-    s32 day = func_0207d0b4(date);
+    s64 last = RTC_ConvertDateTimeToSecond(&adventureTime->date, &adventureTime->time);
+    s64 now = RTC_ConvertDateTimeToSecond(date, time);
+    s32 day = RTC_ConvertDateToDay(date);
     s32 passed;
 
     *days = 0;

@@ -62,7 +62,7 @@ Guru2CommWork *Guru2Comm_Create(Guru2ProcWork *g2p, u32 heapId) {
     Guru2CommWork *g2c;
 
     g2c = GFL_HeapAllocate(heapId, sizeof(Guru2CommWork), FALSE, "guru2_comm.c", 0x98);
-    sys_memset(g2c, 0, sizeof(Guru2CommWork));
+    MI_CpuFill8(g2c, 0, sizeof(Guru2CommWork));
     g2c->g2p = g2p;
     g2c->blockRecvBuffer =
         GFL_HeapAllocate(heapId, GURU2_COMM_BLOCK_SIZE * GURU2_MEMBER_MAX, FALSE, "guru2_comm.c", 0x9f);
@@ -87,7 +87,7 @@ static BOOL Guru2Comm_SendData(Guru2CommWork *g2c, u32 command, const void *data
     NetHandle *handle = func_02040440();
     Guru2CommSendBuffer *send = &g2c->send;
 
-    sys_memcpy(data, send->data, size);
+    MI_CpuCopy8(data, send->data, size);
     return func_02042be8(handle, (u16)command, size + 4, send->data);
 }
 
@@ -99,7 +99,7 @@ static void Guru2Comm_RecvBlock(int netId, int size, const void *data, void *wor
     Guru2CommWork *g2c = work;
 
     g2c->blockBits |= 1 << netId;
-    sys_memcpy(data, Guru2Comm_GetBlock(g2c, netId), GURU2_COMM_BLOCK_SIZE);
+    MI_CpuCopy8(data, Guru2Comm_GetBlock(g2c, netId), GURU2_COMM_BLOCK_SIZE);
 }
 
 static void Guru2Comm_RecvStart(int netId, int size, const void *data, void *work, NetHandle *handle) {

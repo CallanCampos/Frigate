@@ -587,7 +587,7 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
     u32 files[4] = { 9, 12, 15, 18 };
 
     for (i = 0; i < 3; i++) {
-        sys_memset(&game->members[i], 0, sizeof(CtvtGameMember));
+        MI_CpuFill8(&game->members[i], 0, sizeof(CtvtGameMember));
     }
     for (netId = 0; netId < 4; netId++) {
         if (selfNetId == netId) {
@@ -1227,7 +1227,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         break;
     case CTVT_GAME_PLAY_WAIT_FADE_IN:
         if (GFL_WipeIsFinished() == TRUE) {
-            gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 1, -8);
+            G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 1, -8);
             game->playing = TRUE;
             switch (CtvtGame_GetType(game)) {
             case CTVT_GAME_TYPE_TARGETS:
@@ -1320,7 +1320,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         }
         break;
     case CTVT_GAME_PLAY_ASK_REPLAY:
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 27, -8);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 27, -8);
         LoadSysMsgBox(2, 1, 14, 0, game->heapId);
         CtvtGame_PrintMessage(sys, game, 61);
         game->menuRes = AppTaskMenuRes_Create(2, 12, CommTvt_GetFont(sys), CommTvt_GetPrintQueue(sys), game->heapId);
@@ -1627,7 +1627,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
         func_0204c124(game->introActors[i], TRUE);
         func_0204c520(game->introActors[i], TRUE);
     }
-    sys_memset(&setupEx, 0, sizeof(ClActorSetupEx));
+    MI_CpuFill8(&setupEx, 0, sizeof(ClActorSetupEx));
     setupEx.base.x = 60;
     setupEx.base.y = 50;
     setupEx.base.sequence = 13;
@@ -1818,8 +1818,8 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     BmpWin_FlushMap(game->infoWindow);
     BmpWin_DrawFrame(game->infoWindow, 1, 1, 14);
     game->infoPending = TRUE;
-    sys_memset(game->pumps, 0, sizeof(game->pumps));
-    sys_memset(game->stages, 0, sizeof(game->stages));
+    MI_CpuFill8(game->pumps, 0, sizeof(game->pumps));
+    MI_CpuFill8(game->stages, 0, sizeof(game->stages));
     game->wobbleCooldown = 0;
     game->leftPuff = 0;
     game->rightPuff = 0;
@@ -2216,7 +2216,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     game->tryAgainSign = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
                                        CLACT_SURFACE_MAIN, heapId);
     func_0204c124(game->tryAgainSign, FALSE);
-    sys_memset(&setupEx, 0, sizeof(ClActorSetupEx));
+    MI_CpuFill8(&setupEx, 0, sizeof(ClActorSetupEx));
     setupEx.base.x = 128;
     setupEx.base.y = 96;
     setupEx.base.sequence = 15;
@@ -2672,7 +2672,7 @@ static void CtvtGame_DrawTargets3D(CtvtGame *game) {
         }
         GFL_TCBMgrUpdate(game->tcbManager);
         CtvtGame_SeparateTargets(game);
-        gfxClearColor(GX_RGB(18, 29, 31), 0, GX_RGB(31, 31, 31), 63, FALSE);
+        G3X_SetClearColor(GX_RGB(18, 29, 31), 0, GX_RGB(31, 31, 31), 63, FALSE);
         GFL_G3DSysReqSwapBuffers();
     }
 }
@@ -2717,7 +2717,7 @@ static void CtvtGame_InitBGs(CtvtGame *game, HeapID heapId) {
     CtvtGame_InitBG(&sCtvtGameBG5Setup, 5, 0);
     CtvtGame_InitBG(&sCtvtGameBG6Setup, 6, 0);
     CtvtGame_InitBG(&sCtvtGameBG7Setup, 7, 0);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 1, 0x3f, 0, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 1, 0x3f, 0, 16);
     GFL_BGSysSetBGPriority(0, 2);
     GFL_BGSysSetBGPriority(2, 0);
     GFL_BGSysSetBGPriority(1, 3);
@@ -2759,11 +2759,11 @@ static void CtvtGame_InitBG(const BGSetup *setup, u8 bg, u8 mode) {
 static void CtvtGame_Init3D(CtvtGame *game, HeapID heapId) {
     GFL_G3DSysCreate(FALSE, 1, FALSE, 1, 0, heapId, NULL);
     GFL_G3DSysSetSwapBufferParams(0, 0);
-    gfxClearColor(GX_RGB(31, 31, 31), 0, GX_RGB(31, 31, 31), 63, FALSE);
+    G3X_SetClearColor(GX_RGB(31, 31, 31), 0, GX_RGB(31, 31, 31), 63, FALSE);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
     G3X_AntiAlias(TRUE);
-    gfxSetFog(FALSE, 0, 0, 0);
+    G3X_SetFog(FALSE, 0, 0, 0);
     {
         VecFx32 up = { 0, FX32_ONE, 0 };
 

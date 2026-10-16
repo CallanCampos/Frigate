@@ -336,13 +336,13 @@ void MCSSSys_Draw(MCSSSystem *system) {
         mcss = system->mcss[i];
         imageProxy = &mcss->imageProxy;
         if (ortho == FALSE) {
-            gfxLookAt(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
+            G3i_LookAt_(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
         } else {
             VecFx32 camPos = { 0, 0, 0 };
             VecFx32 camUp = { 0, FX32_ONE, 0 };
             VecFx32 camTarget = { 0, 0, -FX32_ONE };
 
-            gfxLookAt(&camPos, &camUp, &camTarget, TRUE, NULL);
+            G3i_LookAt_(&camPos, &camUp, &camTarget, TRUE, NULL);
         }
         mcAnim = &mcss->mcAnim;
         cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimArray;
@@ -374,12 +374,12 @@ void MCSSSys_Draw(MCSSSystem *system) {
         }
         G3_Translate(pos.x, pos.y, pos.z);
         if (ortho == FALSE) {
-            gfxMultMatrix4x4(&billboard);
+            G3_MultMtx44(&billboard);
         }
         rot = mcSrt.rotZ + (mcss->rotation.z >> FX32_SHIFT);
         G3_Translate(x, y, 0);
         flip = 0;
-        gfxRotateZ(-FX_SinIdx(rot), FX_CosIdx(rot));
+        G3_RotZ(-FX_SinIdx(rot), FX_CosIdx(rot));
         G3_Scale(FX_Mul(FX_Mul(mcSrt.sx, mcss->scale.x), mcss->scaleOffset.x),
                  FX_Mul(FX_Mul(mcSrt.sy, mcss->scale.y), mcss->scaleOffset.y), FX32_ONE);
         if (mcss->scale.x < 0) {
@@ -388,14 +388,14 @@ void MCSSSys_Draw(MCSSSystem *system) {
         G3_StoreMtx(29);
 
         // The shadow's matrix
-        gfxLookAt(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
+        G3i_LookAt_(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
         G3_Translate(mcss->pos.x + mcss->posOffset.x + mcss->shadowOffset.x, mcss->pos.y + mcss->shadowOffset.y,
                      mcss->pos.z + mcss->posOffset.z + mcss->shadowOffset.z);
-        gfxRotateX(FX_SinIdx(mcss->shadowRotX), FX_CosIdx(mcss->shadowRotX));
+        G3_RotX(FX_SinIdx(mcss->shadowRotX), FX_CosIdx(mcss->shadowRotX));
         G3_Translate(FX_Mul(FX_Mul(mcSrt.px << 8, system->offsetScale), mcss->shadowScale.x),
                      FX_Mul(FX_Mul(-mcSrt.py << 8, system->offsetScale), mcss->shadowScale.y), 0);
-        gfxRotateZ(-FX_SinIdx(mcss->shadowRotZ), FX_CosIdx(mcss->shadowRotZ));
-        gfxRotateZ(-FX_SinIdx(rot), FX_CosIdx(rot));
+        G3_RotZ(-FX_SinIdx(mcss->shadowRotZ), FX_CosIdx(mcss->shadowRotZ));
+        G3_RotZ(-FX_SinIdx(rot), FX_CosIdx(rot));
         G3_Scale(FX_Mul(FX_Mul(FX_Mul(mcSrt.sx, mcss->shadowScale.x), mcss->unk110.x), mcss->scaleOffset.x),
                  FX_Mul(FX_Mul(FX_Mul(mcSrt.sy, mcss->shadowScale.y), mcss->unk110.y), mcss->scaleOffset.y), FX32_ONE);
         G3_StoreMtx(30);
@@ -470,8 +470,8 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
         }
     }
     if (ortho) {
-        gfxOrtho(FX32_CONST(96), FX32_CONST(-96), FX32_CONST(-128), FX32_CONST(128), FX32_ONE,
-                 FX32_ONE * (system->orthoNear ? 512 : 1024), FX32_ONE, TRUE, NULL);
+        G3i_OrthoW_(FX32_CONST(96), FX32_CONST(-96), FX32_CONST(-128), FX32_CONST(128), FX32_ONE,
+                    FX32_ONE * (system->orthoNear ? 512 : 1024), FX32_ONE, TRUE, NULL);
         G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     }
     G3_RestoreMtx(29);
@@ -484,7 +484,7 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
         -(cellSrt->py + mcss->mcAnim.pMultiCellDataBank->pMultiCellDataArray[mcSrt->index].pHierDataArray[node].pos.y)
         << 8;
     G3_Translate(nodeX, nodeY, *z);
-    gfxRotateZ(-FX_SinIdx(cellSrt->rotZ), FX_CosIdx(cellSrt->rotZ));
+    G3_RotZ(-FX_SinIdx(cellSrt->rotZ), FX_CosIdx(cellSrt->rotZ));
     if (flip == 0) {
         G3_Scale(cellSrt->sx, cellSrt->sy, FX32_ONE);
         G3_Translate(x, y, 0);
@@ -515,7 +515,7 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
         G3_TexPlttBase(shadowPltt->vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_3DMAIN], shadowPltt->fmt);
         G3_PolygonAttr(GX_LIGHTMASK_NONE, GX_POLYGONMODE_MODULATE, GX_CULL_NONE, 1, shadowAlpha, 0);
         G3_Translate(nodeX, nodeY, 0);
-        gfxRotateZ(-FX_SinIdx(cellSrt->rotZ), FX_CosIdx(cellSrt->rotZ));
+        G3_RotZ(-FX_SinIdx(cellSrt->rotZ), FX_CosIdx(cellSrt->rotZ));
         G3_Scale(cellSrt->sx, cellSrt->sy, FX32_ONE);
         G3_Translate(x, y, 0);
         G3_Scale(width, height, FX32_ONE);

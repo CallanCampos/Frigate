@@ -499,7 +499,7 @@ static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *w
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BOX_SEARCH, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BoxSearchWork), HEAPID_BOX_SEARCH);
-    sys_memset(wk, 0, sizeof(BoxSearchWork));
+    MI_CpuFill8(wk, 0, sizeof(BoxSearchWork));
     wk->param = searchParam;
     wk->heapId = HEAPID_BOX_SEARCH;
     wk->pokedex = GameData_GetPokedex(searchParam->syswk->param->gameData);
@@ -610,7 +610,7 @@ static TouchBar *func_ov255_021d3e9c(BoxSearchWork *wk, ClActUnit *unit, HeapID 
     TouchBarSetup setup;
     TouchBarItem item = { 1, { 232, 168 } };
 
-    sys_memset(&setup, 0, sizeof(TouchBarSetup));
+    MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
     setup.items = &item;
     setup.count = 1;
     setup.unit = unit;
@@ -2066,7 +2066,7 @@ static void func_ov255_021d6150(BoxSearchWork *wk) {
     u16 *species;
     u32 group;
 
-    sys_memset(wk->caughtCounts, 0, sizeof(wk->caughtCounts));
+    MI_CpuFill8(wk->caughtCounts, 0, sizeof(wk->caughtCounts));
     species = func_ov255_021d68d8(wk->heapId, &len);
     for (letter = 0; letter < 26; letter++) {
         for (group = 0; group < data_ov255_021d8f30[letter]; group++) {

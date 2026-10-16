@@ -9,9 +9,9 @@ void OS_GetLowEntropyData(u32 buffer[8]) {
     OSSystemWork *work = (OSSystemWork *)HW_MAIN_MEM_SHARED_WORK;
     NVRAMConfig *config = (NVRAMConfig *)work->nvramUserInfo;
 
-    buffer[0] = (GX_GetVCount() << 16) | func_0207bb84();
-    buffer[1] = (u32)g_SystemClockBaseCounter ^ (*(u16 *)&config->macAddress[4] << 16);
-    buffer[2] = *(u32 *)&config->macAddress[0] ^ (g_SystemClockBaseCounter >> 32) ^ work->vblankCount;
+    buffer[0] = (GX_GetVCount() << 16) | OS_GetTickLo();
+    buffer[1] = (u32)OSi_TickCounter ^ (*(u16 *)&config->macAddress[4] << 16);
+    buffer[2] = *(u32 *)&config->macAddress[0] ^ (OSi_TickCounter >> 32) ^ work->vblankCount;
     buffer[2] ^= reg_G3X_GXSTAT;
     buffer[3] = work->realTimeClock[0];
     buffer[4] = work->realTimeClock[1];

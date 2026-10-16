@@ -47,7 +47,7 @@ static inline u16 CPS_SWAP16(u16 x) {
 #define CPS_IP_MTU 1480
 
 // The stack's clock, in units of 65536 ticks (about 0.125 s)
-#define CPS_NOW() ((s32)(clock() >> 16))
+#define CPS_NOW() ((s32)(OS_GetTick() >> 16))
 // How long an ACK may wait for more data to go with it
 #define CPS_ACK_DELAY OS_MilliSecondsToTicks(200)
 

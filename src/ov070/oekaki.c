@@ -209,7 +209,7 @@ static BOOL Oekaki_Init(GameProc *proc, u32 *state, void *param, void *work) {
         GFL_BGSysDisableAllB();
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_OEKAKI, 0x50000);
         wk = GFL_ProcInitSubsystem(proc, sizeof(OekakiWork), HEAPID_OEKAKI);
-        sys_memset(wk, 0, sizeof(OekakiWork));
+        MI_CpuFill8(wk, 0, sizeof(OekakiWork));
         GFL_BGSysCreate(HEAPID_OEKAKI);
         wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_OEKAKI);
         wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_MAPCHANGE, HEAPID_OEKAKI);
@@ -528,8 +528,8 @@ static void Oekaki_FreeWork(OekakiWork *wk) {
 }
 
 static void Oekaki_FreeBG(void) {
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysReleaseBG(5);
     GFL_BGSysReleaseBG(4);
     GFL_BGSysReleaseBG(2);
@@ -868,8 +868,8 @@ static int Oekaki_SeqNewcomer(OekakiWork *wk, int seq) {
     Oekaki_SetNextSeq(wk, OEKAKI_SEQ_NEWCOMER_WAIT);
     Oekaki_CloseMenu(wk);
     GFL_SndSEPlay(SEQ_SE_DECIDE1);
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3,
-                             -6);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3,
+                            -6);
     Oekaki_DrawOthers(wk);
     return seq;
 }
@@ -950,7 +950,7 @@ static int Oekaki_SeqEndSelect(OekakiWork *wk, int seq) {
 static int Oekaki_SeqEndRequest(OekakiWork *wk, int seq) {
     OekakiSignal signal;
 
-    sys_memset(&signal, 0, sizeof(signal));
+    MI_CpuFill8(&signal, 0, sizeof(signal));
     signal.type = OEKAKI_SIGNAL_LEAVE_REQUEST;
     signal.netId = func_0203ffc4();
     if (func_02042be8(func_02040440(), OEKAKI_NET_CMD_SIGNAL, sizeof(signal), &signal)) {
@@ -981,7 +981,7 @@ static int Oekaki_SeqEndOk(OekakiWork *wk, int seq) {
 static int Oekaki_SeqEndLeave(OekakiWork *wk, int seq) {
     OekakiSignal signal;
 
-    sys_memset(&signal, 0, sizeof(signal));
+    MI_CpuFill8(&signal, 0, sizeof(signal));
     signal.type = OEKAKI_SIGNAL_LEAVE;
     signal.netId = func_0203ffc4();
     if (func_02042be8(func_02040440(), OEKAKI_NET_CMD_SIGNAL, sizeof(signal), &signal)) {
@@ -1472,7 +1472,7 @@ static void Oekaki_UpdatePalette(u16 *angle) {
         *angle = 0;
     }
     color = GX_RGB(29, func_02044360(*angle) * 10 / FX16_ONE + 15, 0);
-    gfxUploadStdPaletteObjA(&color, 12 * sizeof(u16), sizeof(u16));
+    GX_LoadOBJPltt(&color, 12 * sizeof(u16), sizeof(u16));
 }
 
 static int Oekaki_CountMembers(OekakiWork *wk) {

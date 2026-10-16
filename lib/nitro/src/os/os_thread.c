@@ -6,21 +6,21 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-static u32 func_0207a2e4(void);
-static void scheduler_thread_list_append(OSThreadQueue *queue, OSThread *thread);
+static u32 OSi_GetUnusedThreadId(void);
+static void OSi_InsertLinkToQueue(OSThreadQueue *queue, OSThread *thread); // swan's scheduler_thread_list_append
 static OSThread *OSi_RemoveLinkFromQueue(OSThreadQueue *queue);
 static OSThread *OSi_RemoveSpecifiedLinkFromQueue(OSThreadQueue *queue, OSThread *thread);
-static void func_0207a3d0(OSThread *thread);
-static void func_0207a408(OSThread *thread);
-static void scheduler_switch_thread(void);
-static void scheduler_exit_thread(OSThread *thread, void *arg);
-static void scheduler_release_thread(void *arg);
+static void OSi_InsertThreadToList(OSThread *thread);
+static void OSi_RemoveThreadFromList(OSThread *thread);
+static void OSi_RescheduleThread(void);                               // swan's scheduler_switch_thread
+static void OSi_ExitThread_ArgSpecified(OSThread *thread, void *arg); // swan's scheduler_exit_thread
+static void OSi_ExitThread_Destroy(void *arg);                        // swan's scheduler_release_thread
 static void scheduler_release_thread_core(void);
-static void func_0207a780(OSThread *thread, void *arg, u32 priority);
+static void OSi_KillThreadWithPriority(OSThread *thread, void *arg, u32 priority);
 static void func_0207a7f0(OSThread *thread);
-static OSThread *func_0207a900(void);
-static void func_0207aa74(void *arg);
-static void func_0207aaa8(void *arg);
+static OSThread *OSi_SelectThread(void);
+static void OSi_SleepAlarmCallback(void *arg);
+static void OSi_IdleThreadProc(void *arg);
 
 // Where the running thread is: the thread info's current. Some of the code reads it through here
 static OSThread **sCurrentThreadPtr;
@@ -29,7 +29,7 @@ static OSSwitchThreadCallback sSwitchHook;
 // How many times the scheduler has been locked (NitroSDK's OS_DisableScheduler), which stops it from switching
 static u32 sSchedulerLockCount;
 // Whether OS_InitThread has run (NitroSDK's OS_IsThreadAvailable), which other code reads
-BOOL data_0214c21c;
+BOOL OSi_ThreadInitialized;
 // A word that code the link removed used, the stack that a thread that ends runs the end on when it is not zero, and
 // the last ID that was given to a thread
 static struct {
@@ -37,19 +37,17 @@ static struct {
     u32 exitStack;
     u32 idCount;
 } sThreadState;
-// NitroSDK's OSi_ThreadInfo
-OSThreadInfo g_IsThreadSwitchRequested;
-static OSThread OSi_IdleThread;
-static OSThread OSi_LauncherThread;
+OSThreadInfo OSi_ThreadInfo;
+static OSThread OSi_IdleThread;     // swan's g_IdleThread
+static OSThread OSi_LauncherThread; // swan's g_MainThread
 static u8 OSi_IdleThreadStack[0xc8];
 
-// NitroSDK's OSi_GetUnusedThreadId
-static u32 func_0207a2e4(void) {
+static u32 OSi_GetUnusedThreadId(void) {
     return ++sThreadState.idCount;
 }
 
 // NitroSDK's OSi_InsertLinkToQueue: puts a thread in the queue after the ones of the same or a more urgent priority
-static void scheduler_thread_list_append(OSThreadQueue *queue, OSThread *thread) {
+static void OSi_InsertLinkToQueue(OSThreadQueue *queue, OSThread *thread) {
     OSThread *next = queue->head;
     OSThread *prev;
 
@@ -147,10 +145,10 @@ OSMutex *OSi_RemoveMutexLinkFromQueue(OSMutexQueue *queue) {
 }
 
 // NitroSDK's OSi_InsertThreadToList: puts a thread in the list of all of them, before the ones that are less urgent
-static void func_0207a3d0(OSThread *thread) {
+static void OSi_InsertThreadToList(OSThread *thread) {
     OSThread *next;
     OSThread *prev = NULL;
-    OSThread *head = g_IsThreadSwitchRequested.list;
+    OSThread *head = OSi_ThreadInfo.list;
 
     next = head;
     while (next != NULL && next->priority < thread->priority) {
@@ -160,17 +158,16 @@ static void func_0207a3d0(OSThread *thread) {
 
     if (prev == NULL) {
         thread->next = head;
-        g_IsThreadSwitchRequested.list = thread;
+        OSi_ThreadInfo.list = thread;
     } else {
         thread->next = prev->next;
         prev->next = thread;
     }
 }
 
-// NitroSDK's OSi_RemoveThreadFromList
-static void func_0207a408(OSThread *thread) {
+static void OSi_RemoveThreadFromList(OSThread *thread) {
     OSThread *prev = NULL;
-    OSThread *next = g_IsThreadSwitchRequested.list;
+    OSThread *next = OSi_ThreadInfo.list;
 
     while (next != NULL && next != thread) {
         prev = next;
@@ -178,7 +175,7 @@ static void func_0207a408(OSThread *thread) {
     }
 
     if (prev == NULL) {
-        g_IsThreadSwitchRequested.list = thread->next;
+        OSi_ThreadInfo.list = thread->next;
     } else {
         prev->next = thread->next;
     }
@@ -186,7 +183,7 @@ static void func_0207a408(OSThread *thread) {
 
 // NitroSDK's OSi_RescheduleThread: switches to the first thread that is ready, unless the scheduler is locked or an
 // interrupt is being handled, when it only notes that a switch is wanted
-static void scheduler_switch_thread(void) {
+static void OSi_RescheduleThread(void) {
     OSThread *current;
     OSThread *next;
 
@@ -196,15 +193,15 @@ static void scheduler_switch_thread(void) {
 
     // The flag and the callback are reached through a pointer to the thread info and the rest of it by name, which is
     // how the original has two literals for it
-    OSThreadInfo *info = &g_IsThreadSwitchRequested;
+    OSThreadInfo *info = &OSi_ThreadInfo;
 
-    if (g_IsThreadSwitchRequested.irqDepth != 0 || CPU_GetMode() == 0x12) {
+    if (OSi_ThreadInfo.irqDepth != 0 || OS_GetProcMode() == 0x12) {
         info->isNeedRescheduling = TRUE;
         return;
     }
 
     current = *sCurrentThreadPtr;
-    next = func_0207a900();
+    next = OSi_SelectThread();
     if (current == next || next == NULL) {
         return;
     }
@@ -220,27 +217,27 @@ static void scheduler_switch_thread(void) {
     if (info->switchCallback != NULL) {
         info->switchCallback(current, next);
     }
-    g_IsThreadSwitchRequested.current = next;
-    func_0207abbc(&next->context);
+    OSi_ThreadInfo.current = next;
+    OS_LoadContext(&next->context);
 }
 
 // NitroSDK's OS_InitThread: makes the running thread the launcher thread, with the system stack, and creates the idle
 // thread
-void scheduler_init(void) {
+void OS_InitThread(void) {
     u32 stackTop;
 
-    if (data_0214c21c) {
+    if (OSi_ThreadInitialized) {
         return;
     }
-    data_0214c21c = TRUE;
-    sCurrentThreadPtr = &g_IsThreadSwitchRequested.current;
+    OSi_ThreadInitialized = TRUE;
+    sCurrentThreadPtr = &OSi_ThreadInfo.current;
 
     OSi_LauncherThread.priority = OS_THREAD_LAUNCHER_PRIORITY;
     OSi_LauncherThread.id = 0;
     OSi_LauncherThread.state = OS_THREAD_STATE_READY;
     OSi_LauncherThread.next = NULL;
     OSi_LauncherThread.profiler = NULL;
-    g_IsThreadSwitchRequested.current = g_IsThreadSwitchRequested.list = &OSi_LauncherThread;
+    OSi_ThreadInfo.current = OSi_ThreadInfo.list = &OSi_LauncherThread;
 
     if (HW_SYS_STACK_SIZE <= 0) {
         stackTop = HW_DTCM_SYSRV_END - HW_SYS_STACK_SIZE;
@@ -254,33 +251,32 @@ void scheduler_init(void) {
     *(u32 *)OSi_LauncherThread.stackTop = OS_STACK_END_MAGIC;
     OS_InitThreadQueue(&OSi_LauncherThread.joinQueue);
 
-    g_IsThreadSwitchRequested.isNeedRescheduling = FALSE;
-    g_IsThreadSwitchRequested.irqDepth = 0;
-    *(OSThreadInfo **)HW_THREADINFO_MAIN = &g_IsThreadSwitchRequested;
-    func_0207aa8c(NULL);
+    OSi_ThreadInfo.isNeedRescheduling = FALSE;
+    OSi_ThreadInfo.irqDepth = 0;
+    *(OSThreadInfo **)HW_THREADINFO_MAIN = &OSi_ThreadInfo;
+    OS_SetSwitchThreadCallback(NULL);
 
-    scheduler_init_thread(&OSi_IdleThread, func_0207aaa8, NULL, OSi_IdleThreadStack + sizeof(OSi_IdleThreadStack),
-                          sizeof(OSi_IdleThreadStack), OS_THREAD_PRIORITY_MAX);
+    OS_CreateThread(&OSi_IdleThread, OSi_IdleThreadProc, NULL, OSi_IdleThreadStack + sizeof(OSi_IdleThreadStack),
+                    sizeof(OSi_IdleThreadStack), OS_THREAD_PRIORITY_MAX);
     OSi_IdleThread.priority = OS_THREAD_PRIORITY_MAX + 1;
     OSi_IdleThread.state = OS_THREAD_STATE_READY;
 }
 
-// NitroSDK's OS_IsThreadAvailable
-BOOL func_0207a57c(void) {
-    return data_0214c21c;
+BOOL OS_IsThreadAvailable(void) {
+    return OSi_ThreadInitialized;
 }
 
 // NitroSDK's OS_CreateThread: sets up a thread, which stays asleep until it is started. The stack is where it begins,
 // and the end of the function makes the thread exit
-void scheduler_init_thread(OSThread *thread, void (*func)(void *), void *arg, void *stack, u32 stackSize, u32 prio) {
-    u32 enabled = CPU_IRQDisable();
+void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *stack, u32 stackSize, u32 prio) {
+    u32 enabled = OS_DisableInterrupts();
     u32 stackTop;
 
-    thread->id = func_0207a2e4();
+    thread->id = OSi_GetUnusedThreadId();
     thread->state = OS_THREAD_STATE_WAITING;
     thread->priority = prio;
     thread->profiler = NULL;
-    func_0207a3d0(thread);
+    OSi_InsertThreadToList(thread);
 
     thread->stackBottom = (u32)stack;
     stackTop = (u32)stack - stackSize;
@@ -292,50 +288,50 @@ void scheduler_init_thread(OSThread *thread, void (*func)(void *), void *arg, vo
 
     OS_InitContext(&thread->context, (u32)func, (u32)stack - 8);
     thread->context.r[0] = (u32)arg;
-    thread->context.lr = (u32)scheduler_thread_exit_proc;
+    thread->context.lr = (u32)OS_ExitThread;
     MI_CpuClear32((void *)(stackTop + 4), stackSize - 12);
 
     thread->mutex = NULL;
     thread->mutexQueue.head = NULL;
     thread->mutexQueue.tail = NULL;
-    func_0207aafc(thread, NULL);
+    OS_SetThreadDestructor(thread, NULL);
     thread->queue = NULL;
     thread->link.prev = NULL;
     thread->link.next = NULL;
     MI_CpuClear32(thread->specific, sizeof(thread->specific));
     thread->alarmForSleep = NULL;
 
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OSi_ExitThread: what a thread returns to when its function ends
-void scheduler_thread_exit_proc(void) {
-    CPU_IRQDisable();
-    scheduler_exit_thread(g_IsThreadSwitchRequested.current, NULL);
+void OS_ExitThread(void) {
+    OS_DisableInterrupts();
+    OSi_ExitThread_ArgSpecified(OSi_ThreadInfo.current, NULL);
 }
 
 // NitroSDK's OSi_ExitThread_ArgSpecified: makes a thread continue with the end of it, on the exit stack if there is one
-static void scheduler_exit_thread(OSThread *thread, void *arg) {
+static void OSi_ExitThread_ArgSpecified(OSThread *thread, void *arg) {
     if (sThreadState.exitStack != 0) {
-        OS_InitContext(&thread->context, (u32)scheduler_release_thread, sThreadState.exitStack);
+        OS_InitContext(&thread->context, (u32)OSi_ExitThread_Destroy, sThreadState.exitStack);
         thread->context.cpsr |= 0x80;
         thread->state = OS_THREAD_STATE_READY;
         thread->context.r[0] = (u32)arg;
-        func_0207abbc(&thread->context);
+        OS_LoadContext(&thread->context);
     } else {
-        scheduler_release_thread(arg);
+        OSi_ExitThread_Destroy(arg);
     }
 }
 
 // NitroSDK's OSi_ExitThread_Destroy: the end of a thread, which calls its destructor first
-static void scheduler_release_thread(void *arg) {
+static void OSi_ExitThread_Destroy(void *arg) {
     OSThread *thread = *sCurrentThreadPtr;
     OSThreadDestructor destructor = thread->destructor;
 
     if (destructor != NULL) {
         thread->destructor = NULL;
         destructor(arg);
-        CPU_IRQDisable();
+        OS_DisableInterrupts();
     }
     scheduler_release_thread_core();
 }
@@ -344,11 +340,11 @@ static void scheduler_release_thread_core(void) {
     OSThread *thread = *sCurrentThreadPtr;
 
     OS_DisableScheduler();
-    func_0207aeb0(thread);
+    OSi_UnlockAllMutex(thread);
     if (thread->queue != NULL) {
         OSi_RemoveSpecifiedLinkFromQueue(thread->queue, thread);
     }
-    func_0207a408(thread);
+    OSi_RemoveThreadFromList(thread);
     thread->state = OS_THREAD_STATE_TERMINATED;
     OS_WakeupThread(&thread->joinQueue);
     OS_EnableScheduler();
@@ -357,38 +353,38 @@ static void scheduler_release_thread_core(void) {
 }
 
 // NitroSDK's OS_DestroyThread: ends a thread, waking the ones that wait for it
-void func_0207a710(OSThread *thread) {
-    u32 enabled = CPU_IRQDisable();
+void OS_DestroyThread(OSThread *thread) {
+    u32 enabled = OS_DisableInterrupts();
 
-    if (g_IsThreadSwitchRequested.current == thread) {
+    if (OSi_ThreadInfo.current == thread) {
         scheduler_release_thread_core();
     }
     OS_DisableScheduler();
-    func_0207aeb0(thread);
+    OSi_UnlockAllMutex(thread);
     func_0207a7f0(thread);
     if (thread->queue != NULL) {
         OSi_RemoveSpecifiedLinkFromQueue(thread->queue, thread);
     }
-    func_0207a408(thread);
+    OSi_RemoveThreadFromList(thread);
     thread->state = OS_THREAD_STATE_TERMINATED;
     OS_WakeupThread(&thread->joinQueue);
     OS_EnableScheduler();
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     OS_RescheduleThread();
 }
 
 // NitroSDK's OS_KillThread: makes a thread end, with a value for its destructor
-void func_0207a768(OSThread *thread, void *arg) {
-    func_0207a780(thread, arg, func_0207aa00(thread));
+void OS_KillThread(OSThread *thread, void *arg) {
+    OSi_KillThreadWithPriority(thread, arg, OS_GetThreadPriority(thread));
 }
 
 // NitroSDK's OSi_KillThreadWithPriority: makes the end of a thread run next, at the priority
-static void func_0207a780(OSThread *thread, void *arg, u32 priority) {
-    u32 enabled = CPU_IRQDisable();
+static void OSi_KillThreadWithPriority(OSThread *thread, void *arg, u32 priority) {
+    u32 enabled = OS_DisableInterrupts();
     u32 stack;
 
-    if (thread == g_IsThreadSwitchRequested.current) {
-        scheduler_exit_thread(thread, arg);
+    if (thread == OSi_ThreadInfo.current) {
+        OSi_ExitThread_ArgSpecified(thread, arg);
     }
     func_0207a7f0(thread);
 
@@ -396,16 +392,16 @@ static void func_0207a780(OSThread *thread, void *arg, u32 priority) {
     if (stack == 0) {
         stack = thread->stackBottom - 8;
     }
-    OS_InitContext(&thread->context, (u32)scheduler_release_thread, stack);
+    OS_InitContext(&thread->context, (u32)OSi_ExitThread_Destroy, stack);
     thread->context.cpsr |= 0x80;
     thread->context.r[0] = (u32)arg;
     thread->state = OS_THREAD_STATE_READY;
 
     OS_DisableScheduler();
-    func_0207a998(thread, priority);
+    OS_SetThreadPriority(thread, priority);
     OS_EnableScheduler();
-    scheduler_switch_thread();
-    CPU_SetIRQMask(enabled);
+    OSi_RescheduleThread();
+    OS_RestoreInterrupts(enabled);
 }
 
 // Cancels the alarm that a thread sleeps with, if it has one
@@ -417,16 +413,15 @@ static void func_0207a7f0(OSThread *thread) {
 
 // Waits for a thread to end
 void OS_JoinThread(OSThread *thread) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     while (thread->state != OS_THREAD_STATE_TERMINATED) {
-        scheduler_yield(&thread->joinQueue);
+        OS_SleepThread(&thread->joinQueue);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-// NitroSDK's OS_IsThreadTerminated
-BOOL scheduler_is_thread_ended(const OSThread *thread) {
+BOOL OS_IsThreadTerminated(const OSThread *thread) {
     if (thread->state == OS_THREAD_STATE_TERMINATED) {
         return TRUE;
     }
@@ -434,37 +429,37 @@ BOOL scheduler_is_thread_ended(const OSThread *thread) {
 }
 
 // TwlSDK's OS_SleepThreadDirect: puts a thread to sleep in a queue
-void scheduler_join_thread(OSThread *thread, OSThreadQueue *queue) {
-    u32 enabled = CPU_IRQDisable();
+void OS_SleepThreadDirect(OSThread *thread, OSThreadQueue *queue) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (thread->state == OS_THREAD_STATE_READY) {
         if (queue != NULL) {
             thread->queue = queue;
-            scheduler_thread_list_append(queue, thread);
+            OSi_InsertLinkToQueue(queue, thread);
         }
         thread->state = OS_THREAD_STATE_WAITING;
-        scheduler_switch_thread();
+        OSi_RescheduleThread();
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OS_SleepThread: puts the running thread to sleep in a queue
-void scheduler_yield(OSThreadQueue *queue) {
-    u32 enabled = CPU_IRQDisable();
+void OS_SleepThread(OSThreadQueue *queue) {
+    u32 enabled = OS_DisableInterrupts();
     OSThread *current = *sCurrentThreadPtr;
 
     if (queue != NULL) {
         current->queue = queue;
-        scheduler_thread_list_append(queue, current);
+        OSi_InsertLinkToQueue(queue, current);
     }
     current->state = OS_THREAD_STATE_WAITING;
-    scheduler_switch_thread();
-    CPU_SetIRQMask(enabled);
+    OSi_RescheduleThread();
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OS_WakeupThread: makes all the threads in a queue ready
 void OS_WakeupThread(OSThreadQueue *queue) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     if (queue->head != NULL) {
         while (queue->head != NULL) {
@@ -476,23 +471,23 @@ void OS_WakeupThread(OSThreadQueue *queue) {
             thread->link.prev = thread->link.next;
         }
         OS_InitThreadQueue(queue);
-        scheduler_switch_thread();
+        OSi_RescheduleThread();
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OS_WakeupThreadDirect: makes a thread ready
-void scheduler_start_thread(OSThread *thread) {
-    u32 enabled = CPU_IRQDisable();
+void OS_WakeupThreadDirect(OSThread *thread) {
+    u32 enabled = OS_DisableInterrupts();
 
     thread->state = OS_THREAD_STATE_READY;
-    scheduler_switch_thread();
-    CPU_SetIRQMask(enabled);
+    OSi_RescheduleThread();
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OSi_SelectThread: the first thread of the list that is ready
-static OSThread *func_0207a900(void) {
-    OSThread *thread = g_IsThreadSwitchRequested.list;
+static OSThread *OSi_SelectThread(void) {
+    OSThread *thread = OSi_ThreadInfo.list;
 
     while (thread != NULL && thread->state != OS_THREAD_STATE_READY) {
         thread = thread->next;
@@ -501,10 +496,10 @@ static OSThread *func_0207a900(void) {
 }
 
 void OS_RescheduleThread(void) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
-    scheduler_switch_thread();
-    CPU_SetIRQMask(enabled);
+    OSi_RescheduleThread();
+    OS_RestoreInterrupts(enabled);
 }
 
 // Moves the running thread behind the other threads of its priority
@@ -518,12 +513,12 @@ void OS_YieldThread(void) {
     u32 enabled;
 
     beforeCurrent = NULL;
-    current = g_IsThreadSwitchRequested.current;
+    current = OSi_ThreadInfo.current;
     lastSame = NULL;
     sameCount = 0;
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
 
-    thread = g_IsThreadSwitchRequested.list;
+    thread = OSi_ThreadInfo.list;
     prev = NULL;
     while (thread != NULL) {
         if (thread == current) {
@@ -538,95 +533,92 @@ void OS_YieldThread(void) {
     }
 
     if (sameCount <= 1 || lastSame == current) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return;
     }
 
     if (beforeCurrent == NULL) {
-        g_IsThreadSwitchRequested.list = current->next;
+        OSi_ThreadInfo.list = current->next;
     } else {
         beforeCurrent->next = current->next;
     }
     current->next = lastSame->next;
     lastSame->next = current;
-    scheduler_switch_thread();
-    CPU_SetIRQMask(enabled);
+    OSi_RescheduleThread();
+    OS_RestoreInterrupts(enabled);
 }
 
 // NitroSDK's OS_SetThreadPriority: gives false for a thread that is not in the list and for the idle thread
-BOOL func_0207a998(OSThread *thread, u32 priority) {
-    OSThread *found = g_IsThreadSwitchRequested.list;
+BOOL OS_SetThreadPriority(OSThread *thread, u32 priority) {
+    OSThread *found = OSi_ThreadInfo.list;
     OSThread *prev = NULL;
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
 
     while (found != NULL && found != thread) {
         prev = found;
         found = found->next;
     }
     if (found == NULL || found == &OSi_IdleThread) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return FALSE;
     }
 
     if (found->priority != priority) {
         if (prev == NULL) {
-            g_IsThreadSwitchRequested.list = thread->next;
+            OSi_ThreadInfo.list = thread->next;
         } else {
             prev->next = thread->next;
         }
         thread->priority = priority;
-        func_0207a3d0(thread);
-        scheduler_switch_thread();
+        OSi_InsertThreadToList(thread);
+        OSi_RescheduleThread();
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return TRUE;
 }
 
-// NitroSDK's OS_GetThreadPriority
-u32 func_0207aa00(const OSThread *thread) {
+u32 OS_GetThreadPriority(const OSThread *thread) {
     return thread->priority;
 }
 
 // NitroSDK's OS_Sleep: sleeps for some milliseconds, with an alarm that wakes the thread and clears the pointer to it
 // that it is given, which the loop looks at
-void func_0207aa04(u32 msec) {
+void OS_Sleep(u32 msec) {
     OSAlarm alarm;
     OSThread *thread;
     u32 enabled;
 
     OS_CreateAlarm(&alarm);
     thread = *sCurrentThreadPtr;
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     thread->alarmForSleep = &alarm;
-    OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(msec), func_0207aa74, &thread);
+    OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(msec), OSi_SleepAlarmCallback, &thread);
     while (thread != NULL) {
-        scheduler_yield(NULL);
+        OS_SleepThread(NULL);
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // The alarm's handler: wakes the thread that sleeps, whose pointer it clears to say so
-static void func_0207aa74(void *arg) {
+static void OSi_SleepAlarmCallback(void *arg) {
     OSThread *thread = *(OSThread **)arg;
 
     *(OSThread **)arg = NULL;
     thread->alarmForSleep = NULL;
-    scheduler_start_thread(thread);
+    OS_WakeupThreadDirect(thread);
 }
 
-// NitroSDK's OS_SetSwitchThreadCallback
-OSSwitchThreadCallback func_0207aa8c(OSSwitchThreadCallback callback) {
-    u32 enabled = CPU_IRQDisable();
-    OSSwitchThreadCallback previous = g_IsThreadSwitchRequested.switchCallback;
+OSSwitchThreadCallback OS_SetSwitchThreadCallback(OSSwitchThreadCallback callback) {
+    u32 enabled = OS_DisableInterrupts();
+    OSSwitchThreadCallback previous = OSi_ThreadInfo.switchCallback;
 
-    g_IsThreadSwitchRequested.switchCallback = callback;
-    CPU_SetIRQMask(enabled);
+    OSi_ThreadInfo.switchCallback = callback;
+    OS_RestoreInterrupts(enabled);
     return previous;
 }
 
-// NitroSDK's OSi_IdleThreadProc
-static void func_0207aaa8(void *arg) {
-    CPU_IRQEnable();
+static void OSi_IdleThreadProc(void *arg) {
+    OS_EnableInterrupts();
     while (TRUE) {
         cp15_halt();
     }
@@ -634,7 +626,7 @@ static void func_0207aaa8(void *arg) {
 
 // Gives the count it had
 u32 OS_DisableScheduler(void) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u32 old;
     u32 count = sSchedulerLockCount;
 
@@ -647,12 +639,12 @@ u32 OS_DisableScheduler(void) {
         sSchedulerLockCount = count + 1;
         old = count;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return old;
 }
 
 u32 OS_EnableScheduler(void) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     u32 old = 0;
     u32 count = sSchedulerLockCount;
 
@@ -660,11 +652,10 @@ u32 OS_EnableScheduler(void) {
         sSchedulerLockCount = count - 1;
         old = count;
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     return old;
 }
 
-// NitroSDK's OS_SetThreadDestructor
-void func_0207aafc(OSThread *thread, OSThreadDestructor destructor) {
+void OS_SetThreadDestructor(OSThread *thread, OSThreadDestructor destructor) {
     thread->destructor = destructor;
 }

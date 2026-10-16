@@ -54,7 +54,7 @@ static void SOCLi_StartupCPS(void) {
     s32 mtu;
     s32 rwin;
 
-    sys_memset(cps, 0, sizeof(CPSConfig));
+    MI_CpuFill8(cps, 0, sizeof(CPSConfig));
     cps->alloc = config->alloc;
     cps->free = config->free;
     cps->link_is_on = SOCL_LinkIsOn;

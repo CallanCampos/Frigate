@@ -33,7 +33,7 @@ void NHTTPi_WaitConnection(NHttpConnection *connection) {
 
     if (connection->running != 0) {
         do {
-            scheduler_yield(&info->waiters);
+            OS_SleepThread(&info->waiters);
         } while (connection->running != 0);
     }
 }

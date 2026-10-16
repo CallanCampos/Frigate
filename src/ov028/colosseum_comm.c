@@ -87,7 +87,7 @@ static void Colosseum_RecvMember(int netId, int size, const void *data, void *wo
     UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL) {
-        sys_memcpy(data, &colosseum->members[netId], size);
+        MI_CpuCopy8(data, &colosseum->members[netId], size);
     }
 }
 
@@ -106,7 +106,7 @@ static void Colosseum_RecvCard(int netId, int size, const void *data, void *work
 
     if (netId != func_02042a6c(func_02040440()) && colosseum != NULL && colosseum->commPlayer != NULL &&
         colosseum->cardCheck[netId] != NULL) {
-        sys_memcpy(data, colosseum->card[netId], size);
+        MI_CpuCopy8(data, colosseum->card[netId], size);
         colosseum->cardReady[netId] = TRUE;
     }
 }
@@ -167,7 +167,7 @@ static void Colosseum_RecvParty(int netId, int size, const void *data, void *wor
     UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL && colosseum->party[netId] != NULL) {
-        sys_memcpy(data, colosseum->party[netId], size);
+        MI_CpuCopy8(data, colosseum->party[netId], size);
         colosseum->partyReady[netId] = TRUE;
     }
 }
@@ -184,7 +184,7 @@ static void Colosseum_RecvResult(int netId, int size, const void *data, void *wo
     UnionColosseum *colosseum = unisys->colosseum_sys;
 
     if (colosseum != NULL) {
-        sys_memcpy(data, colosseum->unk16C, size);
+        MI_CpuCopy8(data, colosseum->unk16C, size);
         colosseum->unk170 = TRUE;
     }
 }

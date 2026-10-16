@@ -85,13 +85,12 @@ static struct {
     RTCWork work;
 } sRtc;
 
-static void func_0207cd20(u32 tag, u32 data, BOOL err);
-static u32 func_0207cff8(u32 bcd);
-static void func_0207d040(int result, void *arg);
-static void func_0207d04c(void);
+static void RtcCommonCallback(u32 tag, u32 data, BOOL err);
+static u32 RtcBCD2HEX(u32 bcd);
+static void RtcGetResultCallback(int result, void *arg);
+static void RtcWaitBusy(void);
 
-// NitroSDK's RTC_Init
-void func_0207cb88(void) {
+void RTC_Init(void) {
     if (!sRtc.initialized) {
         sRtc.initialized = TRUE;
         sRtc.work.lock = FALSE;
@@ -101,86 +100,81 @@ void func_0207cb88(void) {
         sRtc.work.data[1] = NULL;
 
         PXI_Init();
-        while (!func_0207ca48(PXI_FIFO_TAG_RTC, MI_PROCESSOR_ARM7)) {
+        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_RTC, MI_PROCESSOR_ARM7)) {
         }
-        func_0207c9fc(PXI_FIFO_TAG_RTC, func_0207cd20);
+        PXI_SetFifoRecvCallback(PXI_FIFO_TAG_RTC, RtcCommonCallback);
     }
 }
 
-// NitroSDK's RTC_GetDateAsync
-int func_0207cbc8(RTCDate *date, RTCCallback callback, void *arg) {
-    u32 enabled = CPU_IRQDisable();
+int RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (sRtc.work.lock) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return RTC_RESULT_BUSY;
     }
     sRtc.work.lock = TRUE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
     sRtc.work.command = RTC_SEQ_DATE_GET;
     sRtc.work.busy = 0;
     sRtc.work.data[0] = date;
     sRtc.work.callback = callback;
     sRtc.work.callbackArg = arg;
-    if (func_0207d070()) {
+    if (RTCi_ReadRawDateAsync()) {
         return RTC_RESULT_SUCCESS;
     }
     sRtc.work.lock = FALSE;
     return RTC_RESULT_SEND_ERROR;
 }
 
-// NitroSDK's RTC_GetDate
-int func_0207cc10(RTCDate *date) {
-    sRtc.work.commonResult = func_0207cbc8(date, func_0207d040, NULL);
+int RTC_GetDate(RTCDate *date) {
+    sRtc.work.commonResult = RTC_GetDateAsync(date, RtcGetResultCallback, NULL);
     if (sRtc.work.commonResult == RTC_RESULT_SUCCESS) {
-        func_0207d04c();
+        RtcWaitBusy();
     }
     return sRtc.work.commonResult;
 }
 
-// NitroSDK's RTC_GetTimeAsync
-int func_0207cc34(RTCTime *time, RTCCallback callback, void *arg) {
-    u32 enabled = CPU_IRQDisable();
+int RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (sRtc.work.lock) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return RTC_RESULT_BUSY;
     }
     sRtc.work.lock = TRUE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
     sRtc.work.command = RTC_SEQ_TIME_GET;
     sRtc.work.busy = 0;
     sRtc.work.data[0] = time;
     sRtc.work.callback = callback;
     sRtc.work.callbackArg = arg;
-    if (func_0207d07c()) {
+    if (RTCi_ReadRawTimeAsync()) {
         return RTC_RESULT_SUCCESS;
     }
     sRtc.work.lock = FALSE;
     return RTC_RESULT_SEND_ERROR;
 }
 
-// NitroSDK's RTC_GetTime
-int func_0207cc80(RTCTime *time) {
-    sRtc.work.commonResult = func_0207cc34(time, func_0207d040, NULL);
+int RTC_GetTime(RTCTime *time) {
+    sRtc.work.commonResult = RTC_GetTimeAsync(time, RtcGetResultCallback, NULL);
     if (sRtc.work.commonResult == RTC_RESULT_SUCCESS) {
-        func_0207d04c();
+        RtcWaitBusy();
     }
     return sRtc.work.commonResult;
 }
 
-// NitroSDK's RTC_GetDateTimeAsync
-int func_0207cca4(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg) {
-    u32 enabled = CPU_IRQDisable();
+int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg) {
+    u32 enabled = OS_DisableInterrupts();
 
     if (sRtc.work.lock) {
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
         return RTC_RESULT_BUSY;
     }
     sRtc.work.lock = TRUE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
     sRtc.work.command = RTC_SEQ_DATETIME_GET;
     sRtc.work.busy = 0;
@@ -188,18 +182,17 @@ int func_0207cca4(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg)
     sRtc.work.data[1] = time;
     sRtc.work.callback = callback;
     sRtc.work.callbackArg = arg;
-    if (func_0207d064()) {
+    if (RTCi_ReadRawDateTimeAsync()) {
         return RTC_RESULT_SUCCESS;
     }
     sRtc.work.lock = FALSE;
     return RTC_RESULT_SEND_ERROR;
 }
 
-// NitroSDK's RTC_GetDateTime
-int func_0207ccf4(RTCDate *date, RTCTime *time) {
-    sRtc.work.commonResult = func_0207cca4(date, time, func_0207d040, NULL);
+int RTC_GetDateTime(RTCDate *date, RTCTime *time) {
+    sRtc.work.commonResult = RTC_GetDateTimeAsync(date, time, RtcGetResultCallback, NULL);
     if (sRtc.work.commonResult == RTC_RESULT_SUCCESS) {
-        func_0207d04c();
+        RtcWaitBusy();
     }
     return sRtc.work.commonResult;
 }
@@ -210,7 +203,7 @@ RTCWork *func_0207cd18(void) {
 
 // NitroSDK's RtcCommonCallback: the answer of the ARM7 to a command. The low byte has its result, and the bits 8 to 14
 // the command it answers. The alarm interrupt is not an answer
-static void func_0207cd20(u32 tag, u32 data, BOOL err) {
+static void RtcCommonCallback(u32 tag, u32 data, BOOL err) {
     RTCResult result;
     u8 command;
     u8 pxiResult;
@@ -247,32 +240,32 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
         case RTC_SEQ_DATE_GET: {
             RTCDate *date = sRtc.work.data[0];
 
-            date->year = func_0207cff8(RTC_RAW_DATE.year);
-            date->month = func_0207cff8(RTC_RAW_DATE.month);
-            date->day = func_0207cff8(RTC_RAW_DATE.day);
-            date->week = func_0207d2a0(date);
+            date->year = RtcBCD2HEX(RTC_RAW_DATE.year);
+            date->month = RtcBCD2HEX(RTC_RAW_DATE.month);
+            date->day = RtcBCD2HEX(RTC_RAW_DATE.day);
+            date->week = RTC_GetDayOfWeek(date);
             break;
         }
         case RTC_SEQ_TIME_GET: {
             RTCTime *time = sRtc.work.data[0];
 
-            time->hour = func_0207cff8(RTC_RAW_TIME.hour);
-            time->minute = func_0207cff8(RTC_RAW_TIME.minute);
-            time->second = func_0207cff8(RTC_RAW_TIME.second);
+            time->hour = RtcBCD2HEX(RTC_RAW_TIME.hour);
+            time->minute = RtcBCD2HEX(RTC_RAW_TIME.minute);
+            time->second = RtcBCD2HEX(RTC_RAW_TIME.second);
             break;
         }
         case RTC_SEQ_DATETIME_GET: {
             RTCDate *date = sRtc.work.data[0];
             RTCTime *time;
 
-            date->year = func_0207cff8(RTC_RAW_DATE.year);
-            date->month = func_0207cff8(RTC_RAW_DATE.month);
-            date->day = func_0207cff8(RTC_RAW_DATE.day);
-            date->week = func_0207d2a0(date);
+            date->year = RtcBCD2HEX(RTC_RAW_DATE.year);
+            date->month = RtcBCD2HEX(RTC_RAW_DATE.month);
+            date->day = RtcBCD2HEX(RTC_RAW_DATE.day);
+            date->week = RTC_GetDayOfWeek(date);
             time = sRtc.work.data[1];
-            time->hour = func_0207cff8(RTC_RAW_TIME.hour);
-            time->minute = func_0207cff8(RTC_RAW_TIME.minute);
-            time->second = func_0207cff8(RTC_RAW_TIME.second);
+            time->hour = RtcBCD2HEX(RTC_RAW_TIME.hour);
+            time->minute = RtcBCD2HEX(RTC_RAW_TIME.minute);
+            time->second = RtcBCD2HEX(RTC_RAW_TIME.second);
             break;
         }
         // The sequences of the commands that set the clock, which only wait for the answer, and those that the library
@@ -310,8 +303,8 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
             u32 *alarm = sRtc.work.data[0];
 
             alarm[0] = RTC_RAW_ALARM.week;
-            alarm[1] = func_0207cff8(RTC_RAW_ALARM.hour);
-            alarm[2] = func_0207cff8(RTC_RAW_ALARM.minute);
+            alarm[1] = RtcBCD2HEX(RTC_RAW_ALARM.hour);
+            alarm[2] = RtcBCD2HEX(RTC_RAW_ALARM.minute);
             alarm[3] = 0;
             if (RTC_RAW_ALARM.weekAvailable) {
                 alarm[3] += RTC_ALARM_MASK_WEEK;
@@ -333,7 +326,7 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
                     if (RTC_RAW_STATUS2.int1Mode != RTC_INT1_MODE_ALARM) {
                         sRtc.work.busy++;
                         RTC_RAW_STATUS2.int1Mode = RTC_INT1_MODE_ALARM;
-                        if (!func_0207d088()) {
+                        if (!RTCi_WriteRawStatus2Async()) {
                             sRtc.work.busy = 0;
                             result = RTC_RESULT_SEND_ERROR;
                         }
@@ -342,7 +335,7 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
                     if (RTC_RAW_STATUS2.int1Mode != 0) {
                         sRtc.work.busy++;
                         RTC_RAW_STATUS2.int1Mode = 0;
-                        if (!func_0207d088()) {
+                        if (!RTCi_WriteRawStatus2Async()) {
                             sRtc.work.busy = 0;
                             result = RTC_RESULT_SEND_ERROR;
                         }
@@ -358,7 +351,7 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
                     if (!RTC_RAW_STATUS2.int2Alarm) {
                         sRtc.work.busy++;
                         RTC_RAW_STATUS2.int2Alarm = TRUE;
-                        if (!func_0207d088()) {
+                        if (!RTCi_WriteRawStatus2Async()) {
                             sRtc.work.busy = 0;
                             result = RTC_RESULT_SEND_ERROR;
                         }
@@ -367,7 +360,7 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
                     if (RTC_RAW_STATUS2.int2Alarm) {
                         sRtc.work.busy++;
                         RTC_RAW_STATUS2.int2Alarm = FALSE;
-                        if (!func_0207d088()) {
+                        if (!RTCi_WriteRawStatus2Async()) {
                             sRtc.work.busy = 0;
                             result = RTC_RESULT_SEND_ERROR;
                         }
@@ -379,7 +372,7 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
             break;
         default:
             if (hw_isDSi() == TRUE) {
-                result = func_02700000();
+                result = RTCi_ProcessExCommand();
             } else {
                 result = RTC_RESULT_INVALID_COMMAND;
                 sRtc.work.busy = 0;
@@ -420,7 +413,7 @@ static void func_0207cd20(u32 tag, u32 data, BOOL err) {
 }
 
 // NitroSDK's RtcBCD2HEX: the number that the digits of a BCD number make, or 0 when a nibble is not a digit
-static u32 func_0207cff8(u32 bcd) {
+static u32 RtcBCD2HEX(u32 bcd) {
     u32 result = 0;
     u32 place;
     int i;
@@ -438,13 +431,13 @@ static u32 func_0207cff8(u32 bcd) {
 }
 
 // NitroSDK's RtcGetResultCallback: the callback of the functions that wait for their answer
-static void func_0207d040(int result, void *arg) {
+static void RtcGetResultCallback(int result, void *arg) {
     sRtc.work.commonResult = result;
 }
 
 // NitroSDK's RtcWaitBusy: waits until the answer of the command under way came. ARM code
 #pragma thumb off
-static void func_0207d04c(void) {
+static void RtcWaitBusy(void) {
     vu32 *lock = &sRtc.work.lock;
 
     while (*lock == TRUE) {

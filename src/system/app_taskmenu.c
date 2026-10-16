@@ -111,7 +111,7 @@ AppTaskMenu *AppTaskMenu_Create(AppTaskMenuInit *init, AppTaskMenuRes *res) {
         GFL_HeapAllocate(menu->init.heapId, menu->init.itemCount * sizeof(BmpWin *), FALSE, "app_taskmenu.c", 168);
     menu->items = GFL_HeapAllocate(menu->init.heapId, menu->init.itemCount * sizeof(AppTaskMenuItem), FALSE,
                                    "app_taskmenu.c", 169);
-    sys_memcpy16(menu->init.items, menu->items, menu->init.itemCount * sizeof(AppTaskMenuItem));
+    MIi_CpuCopy16(menu->init.items, menu->items, menu->init.itemCount * sizeof(AppTaskMenuItem));
     menu->isDecided = FALSE;
     menu->isLocked = FALSE;
     menu->cursorPos = 0;
@@ -421,7 +421,7 @@ AppTaskMenuRes *AppTaskMenuRes_Create(u8 bg, u8 palette, Font *font, PrintQueue 
     AppTaskMenuRes *res = GFL_HeapAllocate(heapId, sizeof(AppTaskMenuRes), FALSE, "app_taskmenu.c", 716);
     u32 palType = PALTYPE_MAIN_BG;
 
-    sys_memset(res, 0, sizeof(AppTaskMenuRes));
+    MI_CpuFill8(res, 0, sizeof(AppTaskMenuRes));
     res->bg = bg;
     res->palette = palette;
     res->font = font;
@@ -465,7 +465,7 @@ static AppTaskMenuWin *AppTaskMenuWin_CreateCore(AppTaskMenuRes *res, const AppT
     u8 textX = 2;
     AppTaskMenuWin *win = GFL_HeapAllocate(heapId, sizeof(AppTaskMenuWin), FALSE, "app_taskmenu.c", 829);
 
-    sys_memset(win, 0, sizeof(AppTaskMenuWin));
+    MI_CpuFill8(win, 0, sizeof(AppTaskMenuWin));
     win->res = res;
     win->isUpdatingText = TRUE;
     win->flashSpeed = fastFlash + 1;
@@ -604,7 +604,7 @@ static void AppTaskMenu_DrawFrame(BmpWin *window, AppTaskMenuRes *res, u32 type)
             } else {
                 tile = (u8 *)res->character->rawData + FRAME_TILE_CENTER * FRAME_TILE_SIZE;
             }
-            sys_memcpy32(tile, pixels + offset, FRAME_TILE_SIZE);
+            MIi_CpuCopy32(tile, pixels + offset, FRAME_TILE_SIZE);
         }
     }
 }

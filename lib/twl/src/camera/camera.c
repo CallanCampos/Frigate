@@ -1,7 +1,8 @@
 // TwlSDK's camera library (libcamera), the camera interface's registers, in the DSi's LTD autoload: resetting the
 // interface and its clock, starting and stopping a capture, and the interface's control bits (the transfer size, the
 // trimming, the output format, the interrupt). ARM code. The ROM names none of it; the file's name is a guess, after
-// the SDK's camera.h, whose Core names twl/camera.h gives. The functions keep their default names.
+// the SDK's camera.h, whose Core names twl/camera.h gives. The functions have those names where they are known, and
+// keep their default names otherwise.
 //
 // The interface has two registers in the I/O space after SCFG_CLK: 0x04004200, which the reset writes, and 0x04004202,
 // the control word. The functions that change the control word do so with the interrupts off.
@@ -32,39 +33,35 @@ static u32 func_027022e0(void);
 
 // Resets the interface: the interface's clock on, its first register cleared, the camera's clock on for the reset, and
 // then off again, with the SDK's delays in between
-void func_02702080(void) {
+void CAMERA_ResetCore(void) {
     reg_SCFG_CLK |= SCFG_CLK_CAMERA_INTERFACE;
     reg_CAMERA_MCNT = 0;
-    func_0207c160(0x1e);
+    OS_SpinWaitSysCycles(0x1e);
     reg_SCFG_CLK |= SCFG_CLK_CAMERA;
-    func_0207c160(0x1e);
+    OS_SpinWaitSysCycles(0x1e);
     reg_CAMERA_MCNT = CAMERA_MCNT_RESET;
-    func_0207c160(0x2008);
+    OS_SpinWaitSysCycles(0x2008);
     reg_SCFG_CLK &= ~SCFG_CLK_CAMERA;
 }
 
-// CAMERA_IsBusyCore
-BOOL func_027020f0(void) {
+BOOL CAMERA_IsBusyCore(void) {
     return (reg_CAMERA_CNT & CAMERA_CNT_CAPTURE) >> 15;
 }
 
-// CAMERA_StartCaptureCore
-void func_02702108(void) {
-    u32 enabled = CPU_IRQDisable();
+void CAMERA_StartCaptureCore(void) {
+    u32 enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT |= CAMERA_CNT_CAPTURE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-// CAMERA_StopCaptureCore
-void func_0270212c(void) {
-    u32 enabled = CPU_IRQDisable();
+void CAMERA_StopCaptureCore(void) {
+    u32 enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT &= ~CAMERA_CNT_CAPTURE;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
-// CAMERA_SetTrimmingCore
-void func_02702158(BOOL enabled) {
-    u32 irq = CPU_IRQDisable();
+void CAMERA_SetTrimmingCore(BOOL enabled) {
+    u32 irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     if (enabled) {
         cnt |= CAMERA_CNT_TRIMMING;
@@ -72,12 +69,11 @@ void func_02702158(BOOL enabled) {
         cnt &= ~CAMERA_CNT_TRIMMING;
     }
     reg_CAMERA_CNT = cnt;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
-// CAMERA_SetOutputFormatCore
-void func_0270218c(CAMERAOutput output) {
-    u32 irq = CPU_IRQDisable();
+void CAMERA_SetOutputFormatCore(CAMERAOutput output) {
+    u32 irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     switch (output) {
     case CAMERA_OUTPUT_YUV:
@@ -87,24 +83,23 @@ void func_0270218c(CAMERAOutput output) {
         reg_CAMERA_CNT = cnt | CAMERA_CNT_FORMAT_RGB;
         break;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Whether the interface reports a buffer error (CAMERA_IsBufferErrorCore, perhaps)
-BOOL func_027021cc(void) {
+BOOL CAMERA_IsBufferErrorCore(void) {
     return (reg_CAMERA_CNT & CAMERA_CNT_BUFFER_ERROR) >> 4;
 }
 
-// CAMERA_ClearBufferCore
-void func_027021e4(void) {
-    u32 enabled = CPU_IRQDisable();
+void CAMERA_ClearBufferCore(void) {
+    u32 enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT |= CAMERA_CNT_CLEAR_BUFFER;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // Sets or clears the interface's interrupt enable (CAMERA_SetInterruptCore, perhaps)
-void func_02702208(BOOL on) {
-    u32 irq = CPU_IRQDisable();
+void CAMERA_SetInterruptEnableCore(BOOL on) {
+    u32 irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     if (on) {
         cnt |= CAMERA_CNT_INTR_ENABLE;
@@ -112,19 +107,19 @@ void func_02702208(BOOL on) {
         cnt &= ~CAMERA_CNT_INTR_ENABLE;
     }
     reg_CAMERA_CNT = cnt;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // Replaces the two-bit field of bits 8 and 9 of the control word
 void func_0270223c(u32 bits) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT = (reg_CAMERA_CNT & ~CAMERA_CNT_UNK_MASK) | bits;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // Sets or clears bit 10 of the control word
 void func_02702268(BOOL on) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     if (on) {
         cnt |= CAMERA_CNT_UNK_BIT10;
@@ -132,18 +127,18 @@ void func_02702268(BOOL on) {
         cnt &= ~CAMERA_CNT_UNK_BIT10;
     }
     reg_CAMERA_CNT = cnt;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // CAMERA_SetTransferLinesCore, which takes 1 to 16 lines and ignores any other
-void func_0270229c(int lines) {
+void CAMERA_SetTransferLinesCore(int lines) {
     u32 enabled;
     if (lines < 1 || lines > 16) {
         return;
     }
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT = (reg_CAMERA_CNT & ~CAMERA_CNT_LINES_MASK) | (u16)(lines - 1);
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // The number of lines per transfer that the control word holds
@@ -151,8 +146,8 @@ static u32 func_027022e0(void) {
     return (reg_CAMERA_CNT & CAMERA_CNT_LINES_MASK) + 1;
 }
 
-// CAMERA_GetMaxLinesRoundCore: the most lines, up to 16, with at most 1024 pixels in all, that divide the height
-int func_027022f8(u16 width, u16 height) {
+// The most lines, up to 16, with at most 1024 pixels in all, that divide the height
+int CAMERA_GetMaxLinesRoundCore(u16 width, u16 height) {
     int lines = 0x400 / width;
     if (lines > 16) {
         lines = 16;
@@ -166,13 +161,12 @@ int func_027022f8(u16 width, u16 height) {
     return 1;
 }
 
-// CAMERA_GetBytesAtOnceCore: the bytes of one transfer, two per pixel of a line
-u32 func_0270234c(u16 width) {
+// The bytes of one transfer, two per pixel of a line
+u32 CAMERA_GetBytesAtOnceCore(u16 width) {
     return width * 2 * func_027022e0();
 }
 
-// CAMERA_SizeToWidthCore
-u16 func_02702364(CAMERASize size) {
+u16 CAMERA_SizeToWidthCore(CAMERASize size) {
     switch (size) {
     case CAMERA_SIZE_DSI_VGA:
         return 640;
@@ -193,8 +187,7 @@ u16 func_02702364(CAMERASize size) {
     }
 }
 
-// CAMERA_SizeToHeightCore
-u16 func_027023cc(CAMERASize size) {
+u16 CAMERA_SizeToHeightCore(CAMERASize size) {
     switch (size) {
     case CAMERA_SIZE_DSI_VGA:
         return 480;

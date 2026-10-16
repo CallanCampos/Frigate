@@ -167,7 +167,7 @@ void PMSIVWordWin_RedrawWords(PMSIVWordWin *wk, u32 top) {
 
 void PMSIVWordWin_StartFadeIn(PMSIVWordWin *wk) {
     PMSIView_SetLowerScreen(wk->vwk, TRUE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, 0x3f, 0, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, 0x3f, 0, 16);
     GFL_BGSysSetBGEnabled(2, TRUE);
     G2_SetWnd1InsidePlane(GX_PLANEMASK_ALL, TRUE);
     wk->savedOutside = G2_GetWndOutsidePlane();

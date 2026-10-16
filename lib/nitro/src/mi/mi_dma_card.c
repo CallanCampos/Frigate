@@ -9,11 +9,11 @@
 
 // NitroSDK's MIi_CardDmaCopy32. The size is not the transfer's count, which is 1; it only goes to the check of the
 // source
-void func_0207917c(u32 dmaNo, const void *src, void *dest, u32 size) {
+void MIi_CardDmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size) {
     vu32 *dmaCntp;
 
-    func_02078344(dmaNo, (u32)-1);
-    dma_check_source_valid(dmaNo, (u32)src, size, MI_DMA_SRC_FIX);
+    MIi_CheckAnotherAutoDMA(dmaNo, (u32)-1);
+    MIi_CheckDma0SourceAddress(dmaNo, (u32)src, size, MI_DMA_SRC_FIX);
     if (size != 0) {
         dmaCntp = &((vu32 *)REG_DMA0SAD_ADDR)[dmaNo * 3 + 2];
         while (*dmaCntp & MI_DMA_ENABLE) {

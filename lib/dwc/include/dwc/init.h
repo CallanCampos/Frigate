@@ -23,8 +23,9 @@ extern const char DWCi_Signature[];
 
 // Starts the library for the retail servers with the game's name and code, and the allocator and deallocator it uses,
 // and returns one of the results above: DWC_InitForProduction
-int func_020584e4(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int), void (*free)(u32, void *, u32));
+int DWC_InitForProduction(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int),
+                          void (*free)(u32, void *, u32));
 // The game code that the library was started with
-u32 func_02058684(void);
+u32 DWCi_GetGameCode(void);
 
 #endif // POKEBW2_DWC_INIT_H

@@ -144,7 +144,7 @@ static GameEventReturnCode func_ov012_02165eb8(GameEvent *event, u32 *state, voi
         break;
     case 4:
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, data->field, 0, 0, 1, 0, 0));
-        sys_memcpy(data->partyParam.picked, data->picked, sizeof(data->partyParam.picked));
+        MI_CpuCopy8(data->partyParam.picked, data->picked, sizeof(data->partyParam.picked));
         *data->choice = data->partyParam.index;
         *data->result = data->partyParam.result;
         GFL_HeapFree(data->partyParam.regulation);
@@ -160,7 +160,7 @@ static inline void InitSummaryParam(BSubwayPokeSelectData *data, PokeParty *part
     PStatusParam *param = &data->summaryParam;
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
 
-    sys_memset(param, 0, sizeof(PStatusParam));
+    MI_CpuFill8(param, 0, sizeof(PStatusParam));
     param->party = party;
     param->dataType = PSTATUS_DATA_PARTY;
     param->partyCount = PokeParty_GetPkmCount(party);

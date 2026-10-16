@@ -50,7 +50,7 @@ BOOL MedalInfo_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(medalParam->parentHeapId, HEAPID_MEDAL_INFO, 0x21000);
     medalWork = GFL_ProcInitSubsystem(proc, sizeof(MedalInfoWork), HEAPID_MEDAL_INFO);
-    sys_memset(medalWork, 0, sizeof(MedalInfoWork));
+    MI_CpuFill8(medalWork, 0, sizeof(MedalInfoWork));
     medalWork->entry.name = medalParam->name;
     medalWork->entry.medal = medalParam->medal;
     medalWork->entry.count = medalParam->medalCount;
@@ -97,7 +97,7 @@ static BOOL MedalInfoBeacon_LogInit(GameProc *proc, u32 *state, void *param, voi
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MEDAL_INFO, 0x31000);
     logWork = GFL_ProcInitSubsystem(proc, sizeof(MedalInfoBeaconWork), HEAPID_MEDAL_INFO);
-    sys_memset(logWork, 0, sizeof(MedalInfoBeaconWork));
+    MI_CpuFill8(logWork, 0, sizeof(MedalInfoBeaconWork));
     logWork->param = param;
     MedalInfoBeacon_LoadBeacons(logWork);
     logWork->viewerParam.heapId = HEAPID_MEDAL_INFO;

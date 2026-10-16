@@ -30,7 +30,7 @@ static BOOL LocalTvtMother_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup
 
 void LocalTvtMother_Setup(LocalTvtPersonFuncs *funcs, LocalTvtMessage *message, MsgData *msgData, GameData *gameData,
                           HeapID heapId) {
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     funcs->work = LocalTvtMother_Create(gameData, heapId);
     funcs->free = LocalTvtMother_Free;
     funcs->greet = LocalTvtMother_Greet;
