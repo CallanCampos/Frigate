@@ -1,5 +1,11 @@
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_callmode.h"
+#include "app/local_tvt/local_tvt_chara.h"
+#include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_graphic.h"
+#include "app/local_tvt/local_tvt_message.h"
+#include "app/local_tvt/local_tvt_scriptmode.h"
+#include "app/local_tvt/local_tvt_util.h"
 #include "app/xtransceiver.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
@@ -12,8 +18,6 @@
 
 // The proc of the Xtransceiver's calls with the game's characters, named after the ROM's "local_tvt_sys.c": it makes
 // the parts every mode shares and runs the mode the parameters ask for
-
-typedef struct LocalTvtSys LocalTvtSys;
 
 struct LocalTvtSys {
     u16 heapId;
@@ -75,7 +79,7 @@ static BOOL LocalTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     charaSetup.playerInfo = GetGameDataPlayerInfo(tvtParam->gameData);
     charaSetup.rival = getHollow_RivalData(GameData_GetSaveControl(tvtParam->gameData));
     charaSetup.message = sys->message;
-    charaSetup.time = LocalTvtUtil_GetTime(tvtParam->gameData);
+    charaSetup.timeOfDay = LocalTvtUtil_GetTime(tvtParam->gameData);
     sys->chara = LocalTvtChara_Create(&charaSetup, sys->heapId);
     sys->bg = LocalTvtBG_Create(tvtParam->gameData, sys->heapId, sys->param->unk04);
     sys->initMode(sys);

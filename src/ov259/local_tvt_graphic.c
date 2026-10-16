@@ -1,5 +1,6 @@
+#include "app/local_tvt/local_tvt_graphic.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_common.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -15,13 +16,13 @@
 
 #define BG_COUNT 8
 
-typedef struct {
+struct LocalTvtGraphicBG {
     u32 unk0;
-} LocalTvtGraphicBG;
+};
 
-typedef struct {
+struct LocalTvtGraphicClAct {
     ClActUnit *unit;
-} LocalTvtGraphicClAct;
+};
 
 struct LocalTvtGraphic {
     LocalTvtGraphicBG bg;
@@ -30,12 +31,12 @@ struct LocalTvtGraphic {
     TCB *vblankTask;
 };
 
-typedef struct {
+struct LocalTvtBGSetup {
     u32 bg;
     BGSetup setup;
     u32 mode;
     u32 enabled;
-} LocalTvtBGSetup;
+};
 
 static void LocalTvtGraphic_VBlank(TCB *tcb, void *data);
 static void LocalTvtGraphicBG_Init(LocalTvtGraphicBG *bg, HeapID heapId);

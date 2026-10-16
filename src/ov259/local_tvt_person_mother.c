@@ -1,5 +1,10 @@
+#include "app/local_tvt/local_tvt_person_mother.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_calldata.h"
+#include "app/local_tvt/local_tvt_chara.h"
+#include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_message.h"
+#include "app/local_tvt/local_tvt_person.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "field/player_state.h"
@@ -12,14 +17,14 @@
 // What the player's mother says in a call on the Xtransceiver, named after the ROM's "local_tvt_person_mother.c":
 // she tells about the place the player is at
 
-typedef struct {
+struct LocalTvtMother {
     int step;
     u32 unk4;
     GameData *gameData;
     // The bank of what she says about each place, by the message of the place's name
     MsgData *placeMsgData;
     u16 heapId;
-} LocalTvtMother;
+};
 
 static LocalTvtMother *LocalTvtMother_Create(GameData *gameData, HeapID heapId);
 static void LocalTvtMother_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);

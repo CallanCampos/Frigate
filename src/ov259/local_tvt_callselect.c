@@ -1,5 +1,8 @@
+#include "app/local_tvt/local_tvt_callselect.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_message.h"
+#include "app/local_tvt/local_tvt_util.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -51,7 +54,7 @@ enum {
 };
 
 // A person of the list
-typedef struct {
+struct LocalTvtCallItem {
     BOOL selected;
     BOOL cursor;
     // Dark while another person is selected
@@ -62,9 +65,9 @@ typedef struct {
     u32 unk18;
     BmpWin *window;
     int index;
-} LocalTvtCallItem;
+};
 
-typedef struct {
+struct LocalTvtCallScrollBar {
     // Only a list longer than the screen has it
     BOOL enabled;
     BOOL held;
@@ -74,10 +77,10 @@ typedef struct {
     ClActor *actor;
     int pos;
     int target;
-} LocalTvtCallScrollBar;
+};
 
 // The bottom of the screen: a message while nobody is selected, then the button that makes the call
-typedef struct {
+struct LocalTvtCallButton {
     BmpWin *window;
     AppTaskMenuWin *button;
     AppTaskMenuRes *res;
@@ -87,9 +90,9 @@ typedef struct {
     u16 heapId;
     BOOL shown;
     BOOL active;
-} LocalTvtCallButton;
+};
 
-typedef struct {
+struct LocalTvtCallList {
     u16 scroll;
     u16 count;
     // The button's when it is the count
@@ -100,7 +103,7 @@ typedef struct {
     LocalTvtCallButton button;
     // The next key moves the cursor to the button
     BOOL cursorToButton;
-} LocalTvtCallList;
+};
 
 struct LocalTvtCallSelect {
     u32 palette;

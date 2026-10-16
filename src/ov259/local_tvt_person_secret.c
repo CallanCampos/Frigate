@@ -1,5 +1,10 @@
+#include "app/local_tvt/local_tvt_person_secret.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_calldata.h"
+#include "app/local_tvt/local_tvt_chara.h"
+#include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_message.h"
+#include "app/local_tvt/local_tvt_person.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "constants/types.h"
@@ -38,7 +43,7 @@ enum {
     SECRET_CALL_4,
 };
 
-typedef struct {
+struct LocalTvtSecret {
     int step;
     int talkStep;
     BOOL chatted;
@@ -48,9 +53,9 @@ typedef struct {
     BOOL unk18;
     u16 heapId;
     u8 *surveyAnswers;
-} LocalTvtSecret;
+};
 
-typedef struct {
+struct LocalTvtSecretStage {
     int callCountMin;
     int callCountMax;
     u32 callType;
@@ -58,7 +63,7 @@ typedef struct {
     u32 unk10;
     u32 unk14;
     u32 ringCount;
-} LocalTvtSecretStage;
+};
 
 static LocalTvtSecret *LocalTvtSecret_Create(GameData *gameData, BOOL unk, HeapID heapId);
 static void LocalTvtSecret_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);

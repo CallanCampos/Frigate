@@ -1,5 +1,6 @@
+#include "app/local_tvt/local_tvt_message.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_common.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -41,10 +42,10 @@
 
 #define TALK_PALETTE 12
 
-typedef struct {
+struct LocalTvtPrint {
     BmpWin *window;
     u8 pending;
-} LocalTvtPrint;
+};
 
 struct LocalTvtMessage {
     TCBExManager *tcbManager;

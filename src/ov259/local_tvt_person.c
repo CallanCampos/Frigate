@@ -1,5 +1,8 @@
+#include "app/local_tvt/local_tvt_person.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_chara.h"
+#include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_util.h"
 #include "gfl/heap.h"
 #include "gfl/std.h"
 
