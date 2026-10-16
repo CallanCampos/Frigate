@@ -4,6 +4,8 @@
 #include "nitro/os.h"
 #include "nitro/pm.h"
 #include "nitro/pxi.h"
+#include "twl/mi.h"
+#include "twl/os.h"
 
 typedef struct {
     u32 notificationCount;
@@ -60,56 +62,17 @@ static void func_0206ff68(void) {
     if (PAD_DetectFold()) {
         PM_ForceToPowerOff();
     }
+    // The calls into the LTD autoload go through veneers, which the linker adds after this function
     if (hw_isDSi()) {
-        func_0206ffac();
+        func_02769578();
     }
     func_0206fffc(1, 1);
     MI_StopAllDma();
     if (hw_isDSi()) {
-        func_0206ffbc();
+        func_02768298();
     }
     sys_exit();
 }
-
-// The NOP is the ROM's alignment halfword before the following ARM entry point.
-// clang-format off
-asm void func_0206ffac(void) {
-    bx pc
-    nop
-}
-
-// clang-format on
-
-#pragma thumb off
-// clang-format off
-asm void func_0206ffb0(void) {
-    ldr ip, [pc, #0]
-    bx ip
-    dcd 0x02769579
-}
-
-// clang-format on
-#pragma thumb on
-
-// As above, the NOP fills the remaining halfword before ARM code.
-// clang-format off
-asm void func_0206ffbc(void) {
-    bx pc
-    nop
-}
-
-// clang-format on
-
-#pragma thumb off
-// clang-format off
-asm void func_0206ffc0(void) {
-    ldr ip, [pc, #0]
-    bx ip
-    dcd 0x02768299
-}
-
-// clang-format on
-#pragma thumb on
 
 void func_0206ffcc(u32 cardId) {
     // volatile: the boot card ID in the shared header is written by the ARM7, and the original reads it into a stack

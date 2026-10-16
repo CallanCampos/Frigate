@@ -5,6 +5,7 @@
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "twl/card.h"
 
 // The card's registers are in nitro/hw.h
 
@@ -356,27 +357,11 @@ void CARDi_InitRom(void) {
             OS_ReleaseLockID(lockId);
         }
     }
+    // The call into the LTD autoload goes through a veneer, which the linker adds after this function
     if (hw_isDSi()) {
-        func_0206feb8();
+        func_02767520();
     }
 }
-
-// The linker's veneer from here to the DSi's part of the library in the LTD autoload, out of the Thumb call's range.
-// The NOP fills the halfword before the ARM entry point
-// clang-format off
-asm void func_0206feb8(void) {
-    bx pc
-    nop
-}
-
-#pragma thumb off
-asm void func_0206febc(void) {
-    ldr ip, [pc, #0]
-    bx ip
-    dcd 0x02767521
-}
-#pragma thumb on
-// clang-format on
 
 // Waits for the last task of the library, which is the one just started
 static void CARDi_WaitRomTask(void) {

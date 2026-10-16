@@ -13,6 +13,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
+#include "twl/mi.h"
 #include "twl/pm.h"
 
 // A request is one or two PXI words with the tag of the power management. The first has PM_PXI_START and the command
@@ -461,7 +462,7 @@ void PM_ForceToPowerOff(void) {
     OS_DisableInterrupts();
     MI_StopAllDma();
     if (hw_isDSi()) {
-        func_0206ffbc();
+        func_02768298();
     }
     for (;;) {
         cp15_halt();

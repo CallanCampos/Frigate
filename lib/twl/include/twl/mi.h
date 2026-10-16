@@ -31,7 +31,7 @@ void func_02768378(u32 ndmaNo, void *dest, u32 unitWords, u32 length, u32 unk, M
 // func_02078000 and mi_init.c's MI_Init) calls on a DSi
 void func_02768818(void);
 void func_02768138(void);
-// Stops the four new DMA channels, which OS_ResetSystem does on a DSi
+// Stops the four new DMA channels, which OS_ResetSystem, the card's pull-out and PM_ForceToPowerOff do on a DSi
 void func_02768298(void);
 
 // The NDMA fills, the first with a callback and its argument, the copies, the same, and the wait for a channel to be

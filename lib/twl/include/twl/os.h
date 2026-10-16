@@ -11,7 +11,7 @@
 // the shared memory
 BOOL func_02769318(void);
 BOOL func_02769334(void);
-// The DSi's cleanup before OS_ResetSystem resets
+// The DSi's cleanup before OS_ResetSystem resets, which the card's pull-out does too
 void func_02769578(void);
 // TwlSDK's body of OSi_EnterNDmaCallback
 void func_027692b8(u32 ndmaNo, OSIrqCallback callback, void *arg);

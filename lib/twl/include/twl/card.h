@@ -7,5 +7,7 @@
 // TwlSDK's part of the card library in the LTD autoload: the interface of the DSi's new DMA channels, which CARD reads
 // the ROM with on a DSi
 extern const CARDDmaInterface CARDi_NdmaInterface;
+// TwlSDK's part of CARDi_InitRom for a DSi, in the LTD autoload
+void func_02767520(void);
 
 #endif // POKEBW2_TWL_CARD_H

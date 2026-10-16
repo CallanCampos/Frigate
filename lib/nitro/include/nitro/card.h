@@ -236,9 +236,6 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
 // callback that it has no use for
 u32 CARDi_ReadRomWithCPU(void *arg, void *dst, u32 src, u32 len);
 void CARDi_ReadRomWithDMA(CARDiRomDmaRead *read);
-// The linker's veneer, a pair of functions, from CARDi_InitRom to the DSi's setup of the ROM reads in the LTD autoload
-void func_0206feb8(void);
-void func_0206febc(void);
 
 // Called when the card is pulled out; returns whether to stop the system
 typedef BOOL (*CARDPulledOutCallback)(void);
@@ -247,10 +244,6 @@ void func_0206ff50(CARDPulledOutCallback callback); // CARD_SetPulledOutCallback
 void CARDi_NotifyEvent(u32 command, u32 value);
 void func_0206fed8(void);
 BOOL func_0206ff5c(void);
-void func_0206ffac(void);
-void func_0206ffb0(void);
-void func_0206ffbc(void);
-void func_0206ffc0(void);
 void func_0206ffcc(u32 cardId);
 
 static inline BOOL CARD_ReadBackup(u32 src, void *dest, u32 size) {
