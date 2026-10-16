@@ -2415,6 +2415,7 @@ lib/msl/src/string.c:
     .text       start:0x02085dc8 end:0x020861d8
 
 lib/msl/src/strtold.c:
+    complete
     .text       start:0x020861d8 end:0x02087188
     .rodata     start:0x02098e8c end:0x02098ea0
 
@@ -2440,6 +2441,7 @@ lib/msl/src/math_sun.c:
     .text       start:0x02088fdc end:0x02089008
 
 lib/msl/src/math/e_pow.c:
+    complete
     .text       start:0x02089008 end:0x0208a190
     .rodata     start:0x02098ea0 end:0x02098ed0
 

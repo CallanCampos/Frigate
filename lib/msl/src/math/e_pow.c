@@ -46,7 +46,7 @@ static const double ivln2_l = 1.92596299112661746887e-08;
 double __ieee754_pow(double x, double y) {
     double z, ax, z_h, z_l, p_h, p_l;
     double y1, t1, t2, r, s, t, u, v, w;
-    double ss, s2, s_h, s_l, t_h, t_l;
+    double s2, s_h, s_l, t_h, t_l;
     int i, j, k, yisint, n, xpos;
     int hx, hy, ix, iy;
     unsigned lx, ly;
@@ -151,6 +151,7 @@ double __ieee754_pow(double x, double y) {
     }
 
 #ifdef BUGFIX
+    // The sign of the result, for the returns of a huge y (set again after the branches)
     s = one;
     if ((xpos | (yisint - 1)) == 0) {
         s = -one;
@@ -223,11 +224,11 @@ double __ieee754_pow(double x, double y) {
         }
         __HI(ax) = ix;
 
-        // ss = s_h + s_l is (x - 1) / (x + 1) or (x - 1.5) / (x + 1.5)
+        // s = s_h + s_l is (x - 1) / (x + 1) or (x - 1.5) / (x + 1.5)
         u = ax - bp[k];
         v = one / (ax + bp[k]);
-        ss = u * v;
-        s_h = ss;
+        s = u * v;
+        s_h = s;
         __LO(s_h) = 0;
         // t_h is ax + bp[k], high part
         t_h = zero;
@@ -236,17 +237,17 @@ double __ieee754_pow(double x, double y) {
         s_l = v * ((u - s_h * t_h) - s_h * t_l);
 
         // log(ax)
-        s2 = ss * ss;
+        s2 = s * s;
         r = s2 * s2 * (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
-        r += s_l * (s_h + ss);
+        r += s_l * (s_h + s);
         s2 = s_h * s_h;
         t_h = 3.0 + s2 + r;
         __LO(t_h) = 0;
         t_l = r - ((t_h - 3.0) - s2);
-        // u + v is ss * (1 + ...)
+        // u + v is s * (1 + ...)
         u = s_h * t_h;
-        v = s_l * t_h + t_l * ss;
-        // p_h + p_l is 2 / (3 * ln(2)) * (ss + ...)
+        v = s_l * t_h + t_l * s;
+        // p_h + p_l is 2 / (3 * ln(2)) * (s + ...)
         p_h = u + v;
         __LO(p_h) = 0;
         p_l = v - (p_h - u);
@@ -259,13 +260,12 @@ double __ieee754_pow(double x, double y) {
         t2 = z_l - (((t1 - t) - dp_h[k]) - z_h);
     }
 
-#ifndef BUGFIX
-    // The sign of the result is -1 for a negative number to an odd power
+    // The sign of the result is -1 for a negative number to an odd power. It is set after the branches, since the
+    // else branch holds (x - 1) / (x + 1) in s
     s = one;
     if ((xpos | (yisint - 1)) == 0) {
         s = -one;
     }
-#endif
 
     // y * log2(x) = (y1 + y2) * (t1 + t2), as p_h + p_l
     y1 = y;
