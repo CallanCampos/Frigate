@@ -26,7 +26,7 @@ void PXI_InitFifo(void) {
         int round;
 
         sFifoInitialized = TRUE;
-        work->pxiSignalParam[MI_PROCESSOR_ARM9] = 0;
+        work->pxiHandleChecker[MI_PROCESSOR_ARM9] = 0;
         for (i = 0; i < PXI_MAX_FIFO_TAG; i++) {
             sFifoCallbacks[i] = NULL;
         }
@@ -66,9 +66,9 @@ void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
 
     sFifoCallbacks[fifoTag] = callback;
     if (callback != NULL) {
-        work->pxiSignalParam[MI_PROCESSOR_ARM9] |= 1 << fifoTag;
+        work->pxiHandleChecker[MI_PROCESSOR_ARM9] |= 1 << fifoTag;
     } else {
-        work->pxiSignalParam[MI_PROCESSOR_ARM9] &= ~(1 << fifoTag);
+        work->pxiHandleChecker[MI_PROCESSOR_ARM9] &= ~(1 << fifoTag);
     }
     OS_RestoreInterrupts(enabled);
 }
@@ -76,7 +76,7 @@ void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
 BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor) {
     OSSystemWork *work = OS_GetSystemWork();
 
-    return (work->pxiSignalParam[processor] & (1 << fifoTag)) != 0;
+    return (work->pxiHandleChecker[processor] & (1 << fifoTag)) != 0;
 }
 
 // Puts a word in the send FIFO, unless the FIFO is in error (the error is acknowledged) or full

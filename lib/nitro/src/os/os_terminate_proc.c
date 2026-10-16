@@ -13,8 +13,8 @@ static struct {
     BOOL isTerminating;
 } OSi_terminate;
 
-// NitroSDK's OS_Terminate, under swan's name sys_exit
-void sys_exit(void) {
+// NitroSDK's OS_Terminate (swan's sys_exit)
+void OS_Terminate(void) {
     if (OSi_terminate.callback != NULL) {
         OSTerminateCallback callback = OSi_terminate.callback;
 
@@ -27,28 +27,28 @@ void sys_exit(void) {
             OS_EnableIrq();
             OS_EnableInterrupts();
         }
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             if (func_02704318()) {
                 func_02704328();
             }
         }
         OSi_SendToPxi(OS_PXI_COMMAND_TERMINATE);
     }
-    abort();
+    OSi_TerminateCore();
 }
 
-// The loop that OS_Terminate ends in: swan names it abort
-void abort(void) {
+// The loop that OS_Terminate ends in. The name is a guess at TwlSDK's; swan's is abort
+void OSi_TerminateCore(void) {
     OS_DisableInterrupts();
     while (TRUE) {
-        cp15_halt();
+        OS_Halt();
     }
 }
 
 #pragma thumb off
 // clang-format off
-// NitroSDK's OS_Halt, under swan's name cp15_halt: stops the CPU until an interrupt. It is assembly in the SDK
-asm void cp15_halt(void) {
+// NitroSDK's OS_Halt (swan's cp15_halt): stops the CPU until an interrupt. It is assembly in the SDK
+asm void OS_Halt(void) {
     mov r0, #0
     mcr p15, 0, r0, c7, c0, 4
     bx lr

@@ -1423,7 +1423,7 @@ static void CGearSw_AddActors(CGearSw *work) {
                              sActorData[i].priority, sActorData[i].res);
     }
     func_0204c520(work->actors[ACTOR_CLOCK], FALSE);
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         CGearSw_SetActorAnim(work->actors[ACTOR_BATTERY], 4);
     }
     func_0204c5c8(work->actors[ACTOR_TOUCH], TRUE);
@@ -1996,7 +1996,7 @@ static void CGearSw_UpdateClock(CGearSw *work) {
         func_0204c504(actor, frame);
     }
     actor = work->actors[ACTOR_BATTERY];
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         frame = CGearSw_GetBatteryFrame();
         if (frame != func_0204c510(actor)) {
             func_0204c504(actor, frame);

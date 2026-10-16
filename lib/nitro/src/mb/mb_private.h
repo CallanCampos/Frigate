@@ -2,6 +2,7 @@
 #define POKEBW2_NITRO_MB_PRIVATE_H
 
 #include "types.h"
+#include "nitro/card.h"
 #include "nitro/fs.h"
 #include "nitro/mb.h"
 #include "nitro/mi.h"

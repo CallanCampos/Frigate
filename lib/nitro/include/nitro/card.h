@@ -7,6 +7,51 @@
 
 // NitroSDK's access to the card's backup memory, and the rest of the card library that other files use
 
+// Where a ROM header's program is loaded in RAM, and its size. NitroSDK's multiboot library reads the pair through a
+// pointer to it
+typedef struct ROMHeaderLoad {
+    u32 ramAddr;
+    u32 size;
+} ROMHeaderLoad;
+
+// A range of the ROM image: where it starts, and how long it is
+typedef struct ROMHeaderRegion {
+    u32 offset;
+    u32 size;
+} ROMHeaderRegion;
+
+// The ROM header of the running program, which the card puts at the end of main memory. Only the fields that
+// NitroSDK's multiboot library and file system read are named
+typedef struct ROMHeader {
+    u8 unk_00[0x12];
+    u8 unitCode;
+    u8 unk_13;
+    u8 deviceSize; // the card's capacity: 128 KB shifted left by it
+    u8 unk_15[0xb];
+    u32 arm9RomOffset;
+    u32 arm9Entry;
+    ROMHeaderLoad arm9;
+    u32 arm7RomOffset;
+    u32 arm7Entry;
+    ROMHeaderLoad arm7;
+    ROMHeaderRegion fnt;         // the file name table
+    ROMHeaderRegion fat;         // the file allocation table
+    ROMHeaderRegion arm9Overlay; // the table of the ARM9's overlay headers
+    ROMHeaderRegion arm7Overlay; // and the ARM7's
+    u32 normalCommandControl;    // what the card's control register (MCCNT1) gets for the normal commands
+    u8 unk_64[0x1c];
+    u32 romSize;
+    u8 unk_84[0xe];
+    u16 twlRegionStart; // where the part of the ROM that only the DSi mode reads starts, in units of 0x80000 bytes
+    u8 unk_94[0xcc];
+} ROMHeader;
+
+// The ROM header in main memory (card_common.c), the TWL header that the DSi's system puts there, and the copy of 0x88
+// bytes that the card read after the ROM header (card_rom.c)
+const ROMHeader *CARD_GetOwnRomHeader(void); // swan's rom_get_header
+const void *CARD_GetOwnRomHeaderTWL(void);
+const void *CARDi_GetRomAuthCode(void);
+
 typedef enum {
     CARD_RESULT_SUCCESS,
     CARD_RESULT_FAILURE,
@@ -77,7 +122,7 @@ typedef int CARDBackupType;
 #define CARD_TARGET_ROM 1
 #define CARD_TARGET_BACKUP 2
 
-// What the backup memory is: its sizes and timings, which CARDi_IdentifyBackupCore2 fills in from its type. The times
+// What the backup memory is: its sizes and timings, which CARDi_IdentifyBackupCore fills in from its type. The times
 // are in milliseconds
 typedef struct CARDBackupSpec {
     u32 totalSize;
@@ -240,11 +285,15 @@ void CARDi_ReadRomWithDMA(CARDiRomDmaRead *read);
 // Called when the card is pulled out; returns whether to stop the system
 typedef BOOL (*CARDPulledOutCallback)(void);
 
-void func_0206ff50(CARDPulledOutCallback callback); // CARD_SetPulledOutCallback
+void CARD_SetPulledOutCallback(CARDPulledOutCallback callback);
+// The events that CARDi_NotifyEvent gives the hooks: the card was pulled out, or the slot was reset after one was put
+// back. Named for what card_pull_out.c sends them on
+#define CARD_EVENT_PULLED_OUT 1
+#define CARD_EVENT_SLOT_RESET 2
 void CARDi_NotifyEvent(u32 command, u32 value);
-void func_0206fed8(void);
-BOOL func_0206ff5c(void);
-void func_0206ffcc(u32 cardId);
+void CARD_InitPulledOutCallback(void);
+BOOL CARD_IsPulledOut(void);
+void CARDi_CheckPulledOutCore(u32 cardId);
 
 static inline BOOL CARD_ReadBackup(u32 src, void *dest, u32 size) {
     return CARDi_RequestStreamCommand(src, (u32)dest, size, NULL, NULL, FALSE, CARD_REQ_READ_BACKUP, 1,

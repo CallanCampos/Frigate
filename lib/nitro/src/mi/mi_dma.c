@@ -1,5 +1,5 @@
 // NitroSDK's mi_dma.c: DMA fills and copies, synchronous and with a completion callback, and the checks on them. The
-// SDK writes the registers in ITCM (dma_beginSyncEx).
+// SDK writes the registers in ITCM (MIi_DmaSetParameters).
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
@@ -22,11 +22,11 @@ void MIi_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size, BOOL dmaEnable) {
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
     if (dmaEnable) {
-        dma_beginSyncEx(dmaNo, data, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
-                        MI_DMA_SET_WAIT | MI_DMA_SET_FILL32);
+        MIi_DmaSetParameters(dmaNo, data, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
+                             MI_DMA_SET_WAIT | MI_DMA_SET_FILL32);
     } else {
-        dma_beginSyncEx(dmaNo, data, (u32)dest, MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
-                        MI_DMA_SET_WAIT | MI_DMA_SET_NO_DMA0_FIX | MI_DMA_SET_FILL32);
+        MIi_DmaSetParameters(dmaNo, data, (u32)dest, MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
+                             MI_DMA_SET_WAIT | MI_DMA_SET_NO_DMA0_FIX | MI_DMA_SET_FILL32);
     }
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
@@ -43,10 +43,11 @@ void MIi_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEna
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
     if (dmaEnable) {
-        dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | (size >> 2), MI_DMA_SET_WAIT);
+        MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | (size >> 2),
+                             MI_DMA_SET_WAIT);
     } else {
-        dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_32BIT_BUF | (size >> 2),
-                        MI_DMA_SET_WAIT | MI_DMA_SET_NO_DMA0_FIX);
+        MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_32BIT_BUF | (size >> 2),
+                             MI_DMA_SET_WAIT | MI_DMA_SET_NO_DMA0_FIX);
     }
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
@@ -63,9 +64,9 @@ void MIi_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size, BOOL dmaEna
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
     if (dmaEnable) {
-        dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_ENABLE | (size >> 1), MI_DMA_SET_WAIT);
+        MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_ENABLE | (size >> 1), MI_DMA_SET_WAIT);
     } else {
-        dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, size >> 1, MI_DMA_SET_WAIT | MI_DMA_SET_NO_DMA0_FIX);
+        MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, size >> 1, MI_DMA_SET_WAIT | MI_DMA_SET_NO_DMA0_FIX);
     }
     while (*dmaCntp & MI_DMA_ENABLE) {
     }
@@ -82,20 +83,21 @@ void MIi_DmaFill32Async(u32 dmaNo, void *dest, u32 data, u32 size, MIDmaCallback
     if (callback != NULL) {
         OSi_EnterDmaCallback(dmaNo, callback, arg);
         if (dmaEnable) {
-            dma_beginSyncEx(dmaNo, data, (u32)dest,
-                            MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
-                            MI_DMA_SET_FILL32);
+            MIi_DmaSetParameters(dmaNo, data, (u32)dest,
+                                 MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
+                                 MI_DMA_SET_FILL32);
         } else {
-            dma_beginSyncEx(dmaNo, data, (u32)dest, MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
-                            MI_DMA_SET_NO_DMA0_FIX | MI_DMA_SET_FILL32);
+            MIi_DmaSetParameters(dmaNo, data, (u32)dest,
+                                 MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
+                                 MI_DMA_SET_NO_DMA0_FIX | MI_DMA_SET_FILL32);
         }
     } else {
         if (dmaEnable) {
-            dma_beginSyncEx(dmaNo, data, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
-                            MI_DMA_SET_FILL32);
+            MIi_DmaSetParameters(dmaNo, data, (u32)dest,
+                                 MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2), MI_DMA_SET_FILL32);
         } else {
-            dma_beginSyncEx(dmaNo, data, (u32)dest, MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
-                            MI_DMA_SET_NO_DMA0_FIX | MI_DMA_SET_FILL32);
+            MIi_DmaSetParameters(dmaNo, data, (u32)dest, MI_DMA_32BIT_BUF | MI_DMA_SRC_FIX | (size >> 2),
+                                 MI_DMA_SET_NO_DMA0_FIX | MI_DMA_SET_FILL32);
         }
     }
 }
@@ -113,17 +115,17 @@ void MIi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaC
     if (callback != NULL) {
         OSi_EnterDmaCallback(dmaNo, callback, arg);
         if (dmaEnable) {
-            dma_beginSyncEx(dmaNo, (u32)src, (u32)dest,
-                            MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | (size >> 2), 0);
+            MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest,
+                                 MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | (size >> 2), 0);
         } else {
-            dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | (size >> 2),
-                            MI_DMA_SET_NO_DMA0_FIX);
+            MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | (size >> 2),
+                                 MI_DMA_SET_NO_DMA0_FIX);
         }
     } else {
         if (dmaEnable) {
-            dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | (size >> 2), 0);
+            MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_ENABLE | MI_DMA_32BIT_BUF | (size >> 2), 0);
         } else {
-            dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_32BIT_BUF | (size >> 2), MI_DMA_SET_NO_DMA0_FIX);
+            MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_32BIT_BUF | (size >> 2), MI_DMA_SET_NO_DMA0_FIX);
         }
     }
 }
@@ -193,7 +195,7 @@ void MIi_CheckAnotherAutoDMA(u32 dmaNo, u32 dmaType) {
         if (type == MI_DMA_TIMING_DISP || type == MI_DMA_TIMING_DISP_MMEM || type == MI_DMA_TIMING_CARD ||
             type == MI_DMA_TIMING_CARTRIDGE || type == MI_DMA_TIMING_GXFIFO || type == MI_DMA_TIMING_V_BLANK ||
             type == MI_DMA_TIMING_H_BLANK) {
-            sys_exit();
+            OS_Terminate();
         }
     }
 }
@@ -214,7 +216,7 @@ void MIi_CheckDma0SourceAddress(u32 dmaNo, u32 src, u32 size, u32 dir) {
         areaEnd &= MI_ADDR_AREA_MASK;
         if (areaStart == MI_ADDR_AREA_IOREG || areaStart >= MI_ADDR_AREA_CARTRIDGE || areaEnd == MI_ADDR_AREA_IOREG ||
             areaEnd >= MI_ADDR_AREA_CARTRIDGE) {
-            sys_exit();
+            OS_Terminate();
         }
     }
 }

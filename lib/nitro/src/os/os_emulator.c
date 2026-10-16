@@ -35,7 +35,7 @@ static const u32 sBootTypeConsoleBits[5] = {
 // NitroSDK's OS_GetConsoleType: the console type, worked out once
 u32 OS_GetConsoleType(void) {
     if (sConsole.consoleType == OS_CONSOLE_UNKNOWN) {
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             sConsole.consoleType = OS_CONSOLE_TWL_BASE;
         } else {
             sConsole.consoleType = OS_CONSOLE_NITRO_BASE;
@@ -56,8 +56,8 @@ BOOL OS_IsRunOnEmulator(void) {
     return FALSE;
 }
 
-// TwlSDK's OS_IsRunOnTwl, under swan's name hw_isDSi: worked out once
-BOOL hw_isDSi(void) {
+// TwlSDK's OS_IsRunOnTwl (swan's hw_isDSi): worked out once
+BOOL OS_IsRunOnTwl(void) {
     if (!sTwl.isTwlChecked) {
         sTwl.isTwl = (reg_SCFG_A9ROM & 3) == 1;
         sTwl.isTwlChecked = TRUE;
@@ -66,5 +66,5 @@ BOOL hw_isDSi(void) {
 }
 
 BOOL func_0207acbc(void) {
-    return hw_isDSi();
+    return OS_IsRunOnTwl();
 }

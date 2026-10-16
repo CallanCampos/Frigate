@@ -112,7 +112,7 @@ static void DWCi_Inet_SetRecvWindow(int rwin) {
     if (rwin < RWIN_MIN || rwin > RWIN_MAX) {
         return;
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         sInet.control->rwin = rwin;
     }
 }
@@ -342,7 +342,7 @@ BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     }
     MI_CpuCopy8(bssid, apInfo->bssid, BSSID_SIZE);
     if (apInfo->apType == 0 || apInfo->apType == 1 || apInfo->apType == 2 ||
-        (hw_isDSi() && (u32)(apInfo->apType - 10) <= 2)) {
+        (OS_IsRunOnTwl() && (u32)(apInfo->apType - 10) <= 2)) {
         ssid = WCM_GetConnectedApSsid(&ssidLength);
         DC_InvalidateRange(ssid, SSID_SIZE);
         if (ssid == NULL) {

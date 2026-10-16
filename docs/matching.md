@@ -359,7 +359,7 @@ Same instructions, registers swapped.
 - An `if`/`else` that stores a constant to the same field of a static struct in each arm, on a condition that is a
   call, loads the struct's address once before the call into the first saved register, ahead of the parameter's copy,
   and the stores after it reuse it. The Wi-Fi login's `WifiLogin_StateStartNet` starts with
-  `if (hw_isDSi()) { sNetInit.wifiHeapSize = 0x79000; } else { sNetInit.wifiHeapSize = 0x5e400; }` and then fills
+  `if (OS_IsRunOnTwl()) { sNetInit.wifiHeapSize = 0x79000; } else { sNetInit.wifiHeapSize = 0x5e400; }` and then fills
   `sNetInit.` directly. A ternary store loads the address late into a scratch register, and a
   `GFLNetInitData *init = &sNetInit;` local swaps `r4` and `r5`.
 - Constants hoisted into saved registers across a run of `f(g(x, N), FALSE)` calls (`movs r1, #0; movs r4, #0` at the
@@ -2117,6 +2117,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `memset` of a `VCTSession`), `dwc_auth.c`, `ghttpEncryption.c` and `poke_net.c`, declares the C library's string
   functions in its own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does
   TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops.
+- In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
+  and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
+  out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
 
 ## Data and sections
 

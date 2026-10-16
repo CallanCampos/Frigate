@@ -1043,7 +1043,7 @@ BOOL SSP_StartJpegDecoder(u8 *data, u32 size, void *dst, s16 *width, s16 *height
     u32 decodeOption;
     u32 result;
 
-    if (data_ov257_021b6240 == TRUE && hw_isDSi() == TRUE) {
+    if (data_ov257_021b6240 == TRUE && OS_IsRunOnTwl() == TRUE) {
         u8 sig[SSP_SIGNATURE_SIZE];
         u32 pos, count, i;
         u16 tag;
@@ -1113,7 +1113,7 @@ BOOL SSP_StartJpegDecoder(u8 *data, u32 size, void *dst, s16 *width, s16 *height
         }
         MI_CpuCopy8(data + sigOffset, sig, SSP_SIGNATURE_SIZE);
         MI_CpuFill8(data + sigOffset, 0, SSP_SIGNATURE_SIZE);
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             PhotoSign_Init();
         }
         signResult = PhotoSign_Verify(sig, data, size);

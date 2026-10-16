@@ -1,6 +1,7 @@
 #include "types.h"
 #include "nitro/math.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "twl/dsp.h"
 
 // TwlSDK's DSP library, the DSP's processes (guessed file name, after the SDK's dsp_process.c): a context for each COFF
@@ -84,10 +85,10 @@ static BOOL sSleepCallbackSet;
 // Tells the DSP's OS to quit, and waits for its answer
 static void func_027052b4(void) {
     sProcessList->events = 0;
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         DSP_SendData(2, 0x8000);
     }
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         DSP_RecvData(2);
     }
 }
@@ -105,7 +106,7 @@ static void func_027052fc(void *arg) {
 
 // Before the system sleeps: ends the game
 static void func_02705320(void *arg) {
-    sys_exit();
+    OS_Terminate();
 }
 
 // The DSP's interrupt: calls the callback of each event that the first process has a callback for, until none is left
@@ -141,8 +142,8 @@ static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32
 static BOOL func_0270541c(DSPProcessContext *context, MIWram wram, int slot, MIWramProc proc) {
     int bank = (wram == MI_WRAM_B) ? context->bankB[slot] : context->bankC[slot];
     BOOL given = FALSE;
-    if (!func_0276919c(wram, bank) || func_02768d90(wram, bank, 1, func_02768770(wram, bank)) > 0) {
-        if (func_02768c04(wram, bank, 1, proc) != 0) {
+    if (!func_0276919c(wram, bank) || MI_FreeWramSlot(wram, bank, 1, func_02768770(wram, bank)) > 0) {
+        if (MI_AllocWramSlot(wram, bank, 1, proc) != 0) {
             vu8 *master = (wram == MI_WRAM_B) ? reg_MBK_B : reg_MBK_C;
             if (proc == MI_WRAM_ARM9) {
                 master[bank] = (master[bank] & ~0x1c) | (bank << 2);
@@ -393,7 +394,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
         context->image = NULL;
         if (!sExitCallbackSet) {
             PM_SetExitCallbackInfo(&sDspExitCallbackInfo, func_027052fc, NULL);
-            func_02769550(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
+            PM_InsertPreExitCallback(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
             sExitCallbackSet = TRUE;
         }
         if (!sSleepCallbackSet) {
@@ -401,15 +402,15 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
             PM_InsertPreSleepCallback(&sDspSleepCallbackInfo, DSP_PM_PRIORITY);
             sSleepCallbackSet = TRUE;
         }
-        if (hw_isDSi() == TRUE) {
+        if (OS_IsRunOnTwl() == TRUE) {
             DSP_PowerOn();
         }
         mask = context->events >> 16;
-        if (hw_isDSi() == TRUE) {
+        if (OS_IsRunOnTwl() == TRUE) {
             DSP_ResetOffEx(mask);
         }
         mask = ~context->events;
-        if (hw_isDSi() == TRUE) {
+        if (OS_IsRunOnTwl() == TRUE) {
             DSP_MaskSemaphore(mask);
         }
         func_02705c20();
@@ -437,16 +438,16 @@ void DSP_QuitProcess(DSPProcessContext *context) {
     DSPProcessContext *node;
     func_027052b4();
     irq = OS_DisableInterrupts();
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         DSP_ResetOn();
     }
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         DSP_PowerOff();
     }
     OS_DisableIrqMask(OS_IE_DSP);
     OS_SetIrqFunction(OS_IE_DSP, NULL);
-    func_02768cf8(MI_WRAM_B, MI_WRAM_DSP);
-    func_02768cf8(MI_WRAM_C, MI_WRAM_DSP);
+    MI_FreeWram(MI_WRAM_B, MI_WRAM_DSP);
+    MI_FreeWram(MI_WRAM_C, MI_WRAM_DSP);
     link = &sProcessList;
     for (node = *link; node != NULL; node = node->next) {
         if (node == context) {

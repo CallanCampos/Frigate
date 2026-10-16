@@ -29,7 +29,7 @@ typedef struct DSPScalingRequest {
 static void func_0270734c(void *arg);
 
 // The component's state. The two flags are volatile because func_0270734c clears them in the DSP's interrupt while
-// func_02707494 may be looking at them
+// DSPi_ScalingCore may be looking at them
 static DSPPipe sGraphicsPipe;
 static u16 sGraphicsResult;
 static volatile BOOL sGraphicsAsync;
@@ -40,7 +40,7 @@ static BOOL sGraphicsLoaded;
 static DSPProcessContext sGraphicsContext;
 
 // Opens the component's image, as a file of memory, in file
-BOOL func_02707310(FSFile *file) {
+BOOL DSP_OpenStaticComponentGraphicsCore(FSFile *file) {
     if (!FS_IsAvailable()) {
         FS_Init(FS_DMA_NOT_USE);
     }
@@ -67,7 +67,7 @@ static void func_0270734c(void *arg) {
 }
 
 // Starts the process from the image in file, into the banks of WRAM B and C that slotB and slotC allow
-BOOL func_027073b8(FSFile *file, int slotB, int slotC) {
+BOOL DSP_LoadGraphicsCore(FSFile *file, int slotB, int slotC) {
     if (!sGraphicsLoaded) {
         sGraphicsBusy = FALSE;
         sGraphicsAsync = FALSE;
@@ -82,7 +82,7 @@ BOOL func_027073b8(FSFile *file, int slotB, int slotC) {
     return sGraphicsLoaded;
 }
 
-void func_02707464(void) {
+void DSP_UnloadGraphicsCore(void) {
     if (sGraphicsLoaded) {
         DSP_QuitProcess(&sGraphicsContext);
         sGraphicsLoaded = FALSE;
@@ -91,8 +91,8 @@ void func_02707464(void) {
 
 // Scales the area at (x, y) of a width by height image from src to dst. If async, returns TRUE at once and calls
 // callback when the DSP is done; if not, waits for the DSP and returns whether it scaled the image
-BOOL func_02707494(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry, u16 mode, u16 x, u16 y,
-                   u16 width, u16 height, void (*callback)(void), BOOL async) {
+BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry, u16 mode, u16 x,
+                      u16 y, u16 width, u16 height, void (*callback)(void), BOOL async) {
     DSPScalingRequest request;
     if (sGraphicsBusy) {
         return FALSE;

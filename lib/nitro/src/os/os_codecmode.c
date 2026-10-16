@@ -11,7 +11,7 @@ static BOOL OSi_CodecIsTwlMode;
 
 BOOL OSi_IsCodecTwlMode(void) {
     if (!OSi_CodecModeChecked) {
-        OSi_CodecIsTwlMode = hw_isDSi() == TRUE && (*(u8 *)OSi_CODEC_FLAGS & OSi_CODEC_FLAGS_TWL_MODE) == TRUE;
+        OSi_CodecIsTwlMode = OS_IsRunOnTwl() == TRUE && (*(u8 *)OSi_CODEC_FLAGS & OSi_CODEC_FLAGS_TWL_MODE) == TRUE;
     }
     OSi_CodecModeChecked = TRUE;
     return OSi_CodecIsTwlMode;

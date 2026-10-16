@@ -121,18 +121,18 @@ void GX_BeginLoadClearImage(void) {
     // The second image is in the highest bank given and the first 128 KB before it, so with a single bank the address
     // is of the bank before it
     switch (g_GfxVRAMUploadBanksRearPlaneImage) {
-    case GX_VRAM_B:
-    case GX_VRAM_A | GX_VRAM_B:
+    case GX_VRAM_CLEARIMAGE_128_B:
+    case GX_VRAM_CLEARIMAGE_256_AB:
         sRearPlaneImageAddr = HW_LCDC_VRAM_A;
         break;
-    case GX_VRAM_D:
-    case GX_VRAM_C | GX_VRAM_D:
+    case GX_VRAM_CLEARIMAGE_128_D:
+    case GX_VRAM_CLEARIMAGE_256_CD:
         sRearPlaneImageAddr = HW_LCDC_VRAM_C;
         break;
-    case GX_VRAM_A:
+    case GX_VRAM_CLEARIMAGE_128_A:
         sRearPlaneImageAddr = HW_LCDC_VRAM_A - 0x20000;
         break;
-    case GX_VRAM_C:
+    case GX_VRAM_CLEARIMAGE_128_C:
         sRearPlaneImageAddr = HW_LCDC_VRAM_B;
         break;
     }

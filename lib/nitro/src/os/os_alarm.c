@@ -8,9 +8,9 @@ typedef struct OSiAlarmQueue {
 } OSiAlarmQueue;
 
 static void OSi_SetTimer(OSAlarm *alarm);
-static void InsertAlarm(OSAlarm *alarm, OSTick fire);
-static asm void OSi_AlarmHandlerEntry(void *arg);
-static void OSi_AlarmHandler(void);
+static void OSi_InsertAlarm(OSAlarm *alarm, OSTick fire);
+static asm void OSi_AlarmHandler(void *arg);
+static void OSi_ArrangeTimer(void);
 
 static u16 OSi_UseAlarm;
 static OSiAlarmQueue OSi_AlarmQueue;
@@ -25,7 +25,7 @@ static void OSi_SetTimer(OSAlarm *alarm) {
 
     reg_OS_TM1CNT_H = 0;
     delta = alarm->fire - tick;
-    OSi_EnterTimerCallback(1, OSi_AlarmHandlerEntry, NULL);
+    OSi_EnterTimerCallback(1, OSi_AlarmHandler, NULL);
     if (delta < 0) {
         count = 0xfffe;
     } else if (delta < 0x10000) {
@@ -57,9 +57,9 @@ void OS_CreateAlarm(OSAlarm *alarm) {
     alarm->tag = 0;
 }
 
-// NitroSDK's InsertAlarm: puts the alarm in the queue, before the first that fires later, and sets the timer if it
+// NitroSDK's OSi_InsertAlarm: puts the alarm in the queue, before the first that fires later, and sets the timer if it
 // is the first. A periodic alarm fires at its next period from its start, not at the tick given
-static void InsertAlarm(OSAlarm *alarm, OSTick fire) {
+static void OSi_InsertAlarm(OSAlarm *alarm, OSTick fire) {
     OSAlarm *next;
     OSAlarm *prev;
 
@@ -103,13 +103,13 @@ void OS_SetAlarm(OSAlarm *alarm, OSTick tick, OSAlarmHandler handler, void *arg)
     u32 enabled;
 
     if (alarm == NULL || alarm->handler != NULL) {
-        sys_exit();
+        OS_Terminate();
     }
     enabled = OS_DisableInterrupts();
     alarm->period = 0;
     alarm->handler = handler;
     alarm->arg = arg;
-    InsertAlarm(alarm, tick + OS_GetTick());
+    OSi_InsertAlarm(alarm, tick + OS_GetTick());
     OS_RestoreInterrupts(enabled);
 }
 
@@ -142,20 +142,21 @@ void OS_CancelAlarm(OSAlarm *alarm) {
 
 #pragma thumb off
 // clang-format off
-// The handler of timer 1's interrupt, in ARM code that keeps the stack 8-byte aligned (the SDK's OSi_AlarmHandler
-// calls the Thumb function that does the work): assembly in the SDK, since a C function would not push r0 for that
-static asm void OSi_AlarmHandlerEntry(void *arg) {
+// NitroSDK's OSi_AlarmHandler, the handler of timer 1's interrupt: ARM code that keeps the stack 8-byte aligned around
+// the call of OSi_ArrangeTimer, which does the work. Assembly in the SDK, since a C function would not push r0 for that
+static asm void OSi_AlarmHandler(void *arg) {
     stmdb sp!, {r0, lr}
-    bl OSi_AlarmHandler
+    bl OSi_ArrangeTimer
     ldmia sp!, {r0, lr}
     bx lr
 }
 // clang-format on
 #pragma thumb on
 
-// Runs the first alarm of the queue if it is due (an alarm that is not due yet, if the timer interrupted at a wrap,
-// sets the timer again), then sets the timer for the next. A periodic alarm is put back in the queue
-static void OSi_AlarmHandler(void) {
+// NitroSDK's OSi_ArrangeTimer: runs the first alarm of the queue if it is due (an alarm that is not due yet, if the
+// timer interrupted at a wrap, sets the timer again), then sets the timer for the next. A periodic alarm is put back in
+// the queue
+static void OSi_ArrangeTimer(void) {
     OSAlarm *alarm;
     OSAlarm *next;
     OSAlarmHandler handler;
@@ -189,7 +190,7 @@ static void OSi_AlarmHandler(void) {
     }
     if (alarm->period != 0) {
         alarm->handler = handler;
-        InsertAlarm(alarm, 0);
+        OSi_InsertAlarm(alarm, 0);
     }
     if (OSi_AlarmQueue.head != NULL) {
         OSi_SetTimer(OSi_AlarmQueue.head);

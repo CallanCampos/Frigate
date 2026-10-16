@@ -313,7 +313,7 @@ static void InfoWin_VBlankTask(TCB *tcb, void *data) {
         u8 dsiBatteryLevels[6] = { 0, 0, 1, 1, 2, 3 };
         u16 battery[4];
 
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             level = dsiBatteryLevels[sInfoWin->batteryLevel];
         } else if (sInfoWin->batteryLevel == 5) {
             level = 5;

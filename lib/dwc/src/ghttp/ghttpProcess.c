@@ -1,4 +1,5 @@
 #include "ghttp_internal.h"
+#include "nitro/std.h"
 
 // ghttpProcess: what each state of a connection does, from reading its URL to the end of the file it receives
 

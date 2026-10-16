@@ -750,7 +750,7 @@ static BOOL JpegEnc_Sign(u8 *data, u32 size) {
         return FALSE;
     }
     MI_CpuFill8(&data[offset], 0, SSP_SIGNATURE_SIZE);
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         PhotoSign_Init();
     }
     if (PhotoSign_Sign(signature, data, size) != TRUE) {
@@ -1113,7 +1113,7 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         }
         return pos;
     }
-    if (ExifEnc_SignMode == TRUE && hw_isDSi() == TRUE) {
+    if (ExifEnc_SignMode == TRUE && OS_IsRunOnTwl() == TRUE) {
         if (JpegEnc_Sign(dst, pos)) {
             return pos;
         }

@@ -63,12 +63,13 @@ u32 PM_SetAmpGainLevel(u8 level);
 void PM_ForceToPowerOff(void);
 // Turns the screens' power on or off, and the upper engine off with it. TRUE when it is done, FALSE when the screens
 // went off too recently to be turned on
-BOOL func_0207f4d4(BOOL on);
+BOOL PM_SetLCDPower(BOOL on);
 // Two more settings of the ARM7 (the request 0x12, and the read of the register 8)
 u32 func_0207f50c(u32 value);
 u32 func_0207f520(u32 *value);
-// Records the vertical blank count at which the display went off, which the screens' power waits two frames from
-void func_0207f6b8(void);
+// NitroSDK's PMi_SetDispOffCount (the name is recalled, not shown): records the vertical blank count at which the
+// display went off, which the screens' power waits two frames from
+void PMi_SetDispOffCount(void);
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern);
 
 // Callbacks run before the system sleeps and after it wakes, in lists ordered by priority: the TwlSDK's

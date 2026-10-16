@@ -9,13 +9,9 @@
 
 // The card's registers are in nitro/hw.h
 
-// The words of a command go to the card in the other byte order
-#define MI_SWAP32(x) ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >> 8) | (((x) & 0x0000ff00) << 8) | ((x) << 24))
-
-// The control word of the ROM header (HW_CARD_ROM_HEADER) for the card's normal commands, 0x60 bytes in
-#define CARD_ROM_HEADER_NORMAL_CONTROL (*(u32 *)(HW_CARD_ROM_HEADER + 0x60))
-// The ID of the card that the system read at boot, of which one bit says that the card has the refresh command
-#define HW_CARD_ROM_ID (*(u32 *)0x02fffc00)
+// The control word of the ROM header for the card's normal commands
+#define CARD_ROM_HEADER_NORMAL_CONTROL (((const ROMHeader *)HW_CARD_ROM_HEADER)->normalCommandControl)
+// The bit of the boot card's ID that says that the card has the refresh command
 #define CARD_ROM_ID_HAS_REFRESH 0x20000000
 
 // The commands to the card, which MCCMD0 takes as the first byte: reading a page, the ID, the status and the refresh.
@@ -34,11 +30,6 @@
 
 // A ROM page, the unit that the card reads in
 #define CARD_ROM_PAGE_SIZE 0x200
-
-// The memory that DMA can't reach: the instruction TCM, which ends where main memory starts, and the data TCM
-#define HW_ITCM_IMAGE 0x01ff8000
-#define HW_MAIN_MEM 0x02000000
-#define HW_DTCM_SIZE 0x4000
 
 // What reads the ROM, as CARDi_ReadRomWithCPU does: len bytes from the offset src into dst. The first parameter is for
 // the argument of a callback, which a reader by DMA gives the read
@@ -86,15 +77,15 @@ static void CARDi_SetRomOp(u32 cmd, u32 offset) {
     while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_START_MASK) != 0) {
     }
     reg_MI_MCCNT0 = (reg_MI_MCCNT0 & ~REG_MI_MCCNT0_SEL_MASK) | REG_MI_MCCNT0_E_MASK | REG_MI_MCCNT0_I_MASK;
-    reg_MI_MCCMD0 = MI_SWAP32(hi);
-    reg_MI_MCCMD1 = MI_SWAP32(lo);
+    reg_MI_MCCMD0 = MI_SwapEndian32(hi);
+    reg_MI_MCCMD1 = MI_SwapEndian32(lo);
 }
 
 // Whether the card works in the DSi's mode: the game is on a DSi and was not booted from the ROM, and its header wants
 // the card powered on and not in the DS's mode
 static BOOL CARDi_IsTwlRomMode(void) {
     const CARDTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
-    if (hw_isDSi() && OS_GetBootType() != OS_BOOTTYPE_ROM && header->accessControl.gameCardPowerOn &&
+    if (OS_IsRunOnTwl() && OS_GetBootType() != OS_BOOTTYPE_ROM && header->accessControl.gameCardPowerOn &&
         !header->accessControl.gameCardNtrMode) {
         return TRUE;
     }
@@ -129,7 +120,7 @@ static u32 CARDi_ReadRomIDCore(void) {
 
 // Reads the card's status. A card whose ID says that it has no refresh is always done
 static u32 CARDi_ReadRomStatus(void) {
-    if ((HW_CARD_ROM_ID & CARD_ROM_ID_HAS_REFRESH) == 0) {
+    if ((OS_GetSystemWork()->bootCardId & CARD_ROM_ID_HAS_REFRESH) == 0) {
         return CARD_ROM_STATUS_REFRESHED;
     }
     CARDi_SetRomOp(CARD_ROM_CMD_READ_STATUS, 0);
@@ -208,7 +199,7 @@ u32 CARDi_ReadRomWithCPU(void *arg, void *dst, u32 src, u32 len) {
         dst = (u8 *)dst + size;
         src += size;
     }
-    func_0206ffcc(CARDi_ReadRomIDCore());
+    CARDi_CheckPulledOutCore(CARDi_ReadRomIDCore());
     sCachedPage = cachedPage;
     return total;
 }
@@ -228,7 +219,7 @@ static void CARDi_OnRomDmaInterrupt(void) {
         OS_DisableIrqMask(OS_IE_CARD_DATA);
         OS_ResetRequestIrqMask(OS_IE_CARD_DATA);
         sRomDmaActive = NULL;
-        func_0206ffcc(CARDi_ReadRomIDCore());
+        CARDi_CheckPulledOutCore(CARDi_ReadRomIDCore());
         if (read->callback != NULL) {
             read->callback(read->arg);
         }
@@ -249,7 +240,7 @@ void CARDi_ReadRomWithDMA(CARDiRomDmaRead *read) {
 
 // The callback of a read by DMA: ends the command
 static void CARDi_OnReadRomDmaDone(void *arg) {
-    func_0206ffcc(CARDi_ReadRomIDCore());
+    CARDi_CheckPulledOutCore(CARDi_ReadRomIDCore());
     CARDi_RefreshRom(CARD_ROM_STATUS_NEED_REFRESH);
     cardi_common.cmd->result = CARD_RESULT_SUCCESS;
     CARDi_EndTask(&cardi_common);
@@ -290,7 +281,7 @@ static BOOL CARDi_CanReadRomWithDMA(u32 dma, u32 dst, u32 src, u32 len) {
 // The task that reads with the reader on the thread
 static void CARDi_ReadRomTask(CARDiCommon *p) {
     sRomReader(NULL, (void *)p->dst, p->src, p->len);
-    func_0206ffcc(CARDi_ReadRomIDCore());
+    CARDi_CheckPulledOutCore(CARDi_ReadRomIDCore());
     CARDi_RefreshRom(CARD_ROM_STATUS_NEED_REFRESH);
     cardi_common.cmd->result = CARD_RESULT_SUCCESS;
 }
@@ -302,7 +293,7 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
     u32 dmaNo;
     CARD_CheckEnabled();
     if ((CARDi_GetAccessLevel() & CARD_ACCESS_LEVEL_ROM) == 0) {
-        sys_exit();
+        OS_Terminate();
     }
     CARDi_WaitForTask(p, TRUE, callback, arg);
     p->dmaInterface = CARDi_GetDmaInterface(dma);
@@ -358,7 +349,7 @@ void CARDi_InitRom(void) {
         }
     }
     // The call into the LTD autoload goes through a veneer, which the linker adds after this function
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02767520();
     }
 }

@@ -5,7 +5,7 @@
 // part in the LTD autoload (the exit callbacks and the battery level), which this part reaches through the linker's
 // veneers (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers) and which reaches back to
 // the work of this part by the addresses of its first objects, so PMi_IsInit, PMi_WaitBusyMethod and PMi_AutoExitFlag
-// are not static. The names are the SDK's.
+// are not static. The named functions have the SDK's names; the statics still named by address are not known.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -13,6 +13,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
+#include "nitro/svc.h"
 #include "twl/mi.h"
 #include "twl/pm.h"
 
@@ -154,11 +155,11 @@ static u32 func_0207ee5c(u32 power, PMCallback callback, void *arg);
 static u32 func_0207ee94(u32 power);
 static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg);
 static u32 func_0207ef60(void);
-static u32 func_0207efd4(int amp);
+static u32 PMi_SetAmp(int amp);
 static void func_0207f0d8(u32 word);
 static void PMi_StopDma(void);
 static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync);
-static BOOL func_0207f4f8(void);
+static BOOL PM_GetLCDPower(void);
 static void func_0207f64c(void);
 
 // PMi_WaitBusy: waits for the answer of the request that is being sent, reading the ARM7's words itself where the
@@ -212,7 +213,7 @@ void PM_Init(void) {
     *(vu32 *)HW_PM_EXIT_FLAG = 0;
     PXI_Init();
     while (!PXI_IsCallbackReady(PXI_FIFO_TAG_PM, PXI_PROC_ARM7)) {
-        WaitByLoop(100);
+        SVC_WaitByLoop(100);
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_PM, PMi_CommonCallback);
     PMi_ScreensOffCount = PMi_DisplayOffCount = OS_GetVBlankCount();
@@ -338,7 +339,7 @@ static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback c
     return PMi_SendPxiData(words, 2, result, callback, arg);
 }
 
-// PMi_ReadRegister
+// NitroSDK's PMi_ReadRegister
 u32 PMi_ReadRegister(u8 request, u16 data, u16 *result) {
     u32 res;
     u32 sent = PMi_SendRequestAsync(request, data, result, PMi_SyncCallback, &res);
@@ -418,7 +419,7 @@ u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *a
     return PM_RESULT_ILLEGAL_PARAMETER;
 }
 
-// PM_SetBackLight
+// NitroSDK's PM_SetBackLight
 u32 PM_SetBackLight(u32 target, u32 backlight) {
     u32 res;
     u32 sent = PM_SetBackLightAsync(target, backlight, PMi_SyncCallback, &res);
@@ -433,7 +434,7 @@ u32 PM_SetBackLight(u32 target, u32 backlight) {
 static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg) {
     PMi_ExitType = PM_EXIT_TYPE_FORCED;
     func_0207f64c();
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         PMi_CallCallbackList(PMi_PostExitCallbackList);
     }
     return PMi_SendRequestAsync(PM_REQ_POWER_OFF, 0, NULL, callback, arg);
@@ -461,22 +462,22 @@ void PM_ForceToPowerOff(void) {
     }
     OS_DisableInterrupts();
     MI_StopAllDma();
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02768298();
     }
     for (;;) {
-        cp15_halt();
+        OS_Halt();
     }
 }
 
 u32 PM_SetAmp(int amp) {
     PMi_Amp = amp;
-    return func_0207efd4(amp);
+    return PMi_SetAmp(amp);
 }
 
-// PMi_SetAmp: sets the amplifier, if the screens are on
-static u32 func_0207efd4(int amp) {
-    if (func_0207f4f8()) {
+// NitroSDK's PMi_SetAmp: sets the amplifier, if the screens are on
+static u32 PMi_SetAmp(int amp) {
+    if (PM_GetLCDPower()) {
         return PMi_ReadRegister(PM_REQ_SET_AMP, amp, NULL);
     }
     return PM_RESULT_SUCCESS;
@@ -507,13 +508,13 @@ u32 PM_GetBattery(u32 *battery) {
 
 // PM_GetBatteryLevel
 u32 PM_GetBatteryLevel(u16 *level) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         return func_027693dc(level);
     }
     return PM_RESULT_ERROR;
 }
 
-// PM_GetBackLight
+// NitroSDK's PM_GetBackLight
 u32 PM_GetBackLight(u32 *top, u32 *bottom) {
     u16 data;
     u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BACKLIGHT, &data);
@@ -571,7 +572,7 @@ static void PMi_StopDma(void) {
             }
             break;
         }
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             func_02769410(i);
         }
     }
@@ -608,14 +609,14 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
         }
     }
     if (trigger & PM_TRIGGER_CARTRIDGE) {
-        if (hw_isDSi() || !CTRDG_IsExisting()) {
+        if (OS_IsRunOnTwl() || !CTRDG_IsExisting()) {
             trigger &= ~PM_TRIGGER_CARTRIDGE;
         }
     }
 
     dispcnt = reg_GX_DISPCNT;
     dispcntSub = reg_GXS_DB_DISPCNT;
-    screensOn = func_0207f4f8();
+    screensOn = PM_GetLCDPower();
     while (PM_GetBackLight(&top, &bottom) != PM_RESULT_SUCCESS) {
         OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
@@ -633,7 +634,7 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     OS_SetIrqMask(PM_IE_FIFO_RECV);
     PMi_SendSleepStart(startTrigger, logic | keyPattern);
     while (!PMi_WokeUp) {
-        cp15_halt();
+        OS_Halt();
     }
 
     OS_SetIrqMask(PM_IE_FIFO_RECV | (OS_IsTickAvailable() ? PM_IE_TIMER0 : 0));
@@ -683,12 +684,12 @@ static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync) {
             }
         }
         reg_GX_POWCNT |= REG_GX_POWCNT_LCD_MASK;
-        while (func_0207efd4(PMi_Amp) != PM_RESULT_SUCCESS) {
+        while (PMi_SetAmp(PMi_Amp) != PM_RESULT_SUCCESS) {
             OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         break;
     case FALSE:
-        while (func_0207efd4(PM_AMP_OFF) != PM_RESULT_SUCCESS) {
+        while (PMi_SetAmp(PM_AMP_OFF) != PM_RESULT_SUCCESS) {
             OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
         if (OS_GetVBlankCount() - PMi_DisplayOffCount <= 2) {
@@ -713,8 +714,8 @@ static BOOL PMi_SetLCDPower(BOOL on, u32 power, BOOL force, BOOL sync) {
     return TRUE;
 }
 
-// PM_SetLCDPower
-BOOL func_0207f4d4(BOOL on) {
+// NitroSDK's PM_SetLCDPower
+BOOL PM_SetLCDPower(BOOL on) {
     if (on != TRUE) {
         on = FALSE;
         if (GX_IsDispOn()) {
@@ -724,8 +725,8 @@ BOOL func_0207f4d4(BOOL on) {
     return PMi_SetLCDPower(on, 0, FALSE, TRUE);
 }
 
-// Whether the screens' power is on
-static BOOL func_0207f4f8(void) {
+// NitroSDK's PM_GetLCDPower: whether the screens' power is on
+static BOOL PM_GetLCDPower(void) {
     return (reg_GX_POWCNT & REG_GX_POWCNT_LCD_MASK) != 0;
 }
 
@@ -834,18 +835,19 @@ static void func_0207f64c(void) {
     OS_SpinWaitSysCycles(PM_SCREENS_SETTLE_CYCLES);
     method = PMi_WaitBusyMethod;
     PMi_WaitBusyMethod = PM_WAIT_BUSY_ALL;
-    if (func_0207f4f8() != TRUE) {
+    if (PM_GetLCDPower() != TRUE) {
         while (PM_SetBackLight(PM_LCD_ALL, PM_BACKLIGHT_OFF) != PM_RESULT_SUCCESS) {
             OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
         }
-        while (!func_0207f4d4(TRUE)) {
+        while (!PM_SetLCDPower(TRUE)) {
             OS_SpinWaitSysCycles(PM_SCREENS_RETRY_CYCLES);
         }
     }
     PMi_WaitBusyMethod = method;
 }
 
-// Records the vertical blank count at which the display went off
-void func_0207f6b8(void) {
+// NitroSDK's PMi_SetDispOffCount (the name is recalled): records the vertical blank count at which the display went
+// off
+void PMi_SetDispOffCount(void) {
     PMi_DisplayOffCount = OS_GetVBlankCount();
 }

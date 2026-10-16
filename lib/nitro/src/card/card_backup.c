@@ -232,7 +232,7 @@ static BOOL CARDi_BeginBackupCommand(u32 permit, MIDmaCallback callback, void *a
     OSi_ReferSymbol(CARDi_BackupSignature);
     CARD_CheckEnabled();
     if ((CARDi_GetAccessLevel() & permit) != permit) {
-        sys_exit();
+        OS_Terminate();
     }
     return CARDi_WaitForTask(&cardi_common, TRUE, callback, arg);
 }
@@ -252,7 +252,7 @@ BOOL CARDi_RequestStreamCommand(u32 src, u32 dest, u32 size, MIDmaCallback callb
 
 BOOL CARD_IdentifyBackup(CARDBackupType type) {
     if (type == 0) {
-        sys_exit();
+        OS_Terminate();
     }
     CARDi_BeginBackupCommand(0, NULL, NULL);
     CARDi_IdentifyBackupCore(type);

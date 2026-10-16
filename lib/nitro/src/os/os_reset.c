@@ -27,22 +27,22 @@ void OS_InitReset(void) {
 
 // NitroSDK's OS_ResetSystem: the reset parameter goes to the shared memory for the next program. A Download Play
 // child, or a DSi program that runs from the NAND, can't reset to a cartridge, so it terminates
-void sys_reset(u32 parameter) {
+void OS_ResetSystem(u32 parameter) {
     if (*(u16 *)HW_BOOT_CHECK_INFO_BUF == OS_BOOTTYPE_DOWNLOAD_MB ||
-        (hw_isDSi() == TRUE && (*(u32 *)HW_TWL_TITLE_ID_HI & TWL_TITLE_ID_HI_NAND_APP))) {
-        sys_exit();
+        (OS_IsRunOnTwl() == TRUE && (*(u32 *)HW_TWL_TITLE_ID_HI & TWL_TITLE_ID_HI_NAND_APP))) {
+        OS_Terminate();
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02769578();
     }
     CARD_LockRom(OS_GetLockID());
     OS_SetIrqMask(OS_IE_FIFO_RECV);
     OS_ResetRequestIrqMask(0xffffffff);
     MI_StopAllDma();
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02768298();
     }
     *(u32 *)HW_RESET_PARAMETER_BUF = parameter;
     OSi_SendToPxi(OS_PXI_COMMAND_RESET);
-    func_01ff8fac();
+    OSi_DoResetSystem();
 }

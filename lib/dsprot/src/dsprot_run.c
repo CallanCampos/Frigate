@@ -9,8 +9,8 @@
 
 static const u32 sEncryptedKey[6] = { 0x08a27510, 0xe47ab3c3, 0x5a289302, 0xeaa6cac8, 0xe00d75d5, 0xe2d2fe00 };
 
-// Hand-written: clears 0x100 bytes of the stack, then jumps to sys_exit with the return address cleared, so that the
-// game stops without a trace of where it came from
+// Hand-written: clears 0x100 bytes of the stack, then jumps to OS_Terminate with the return address cleared, so that
+// the game stops without a trace of where it came from
 // clang-format off
 asm void DSProt_Crash(void) {
     mov r10, pc
@@ -22,7 +22,7 @@ asm void DSProt_Crash(void) {
     sub r9, r9, #0x2200
     mov r1, #0x100
     blx r9
-    ldr lr, =sys_exit + 0x2200
+    ldr lr, =OS_Terminate + 0x2200
     mov r0, r10
     mov r1, #0x1000
     sub lr, lr, #0x2200

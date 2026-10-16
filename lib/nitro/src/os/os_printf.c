@@ -1,5 +1,6 @@
 // NitroSDK OS: the formatted text functions of the OS (os_printf.c), which call libstd's text formatter.
 #include "nitro/os.h"
+#include "nitro/std.h"
 
 int OS_SPrintf(char *dest, const char *format, ...) {
     va_list args;

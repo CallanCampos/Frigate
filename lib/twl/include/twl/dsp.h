@@ -14,9 +14,9 @@
 void DSP_StopSoundCore(void); // stops the sound playing
 BOOL DSP_PlayShutterSoundCore(const void *src, u32 length);
 BOOL DSP_IsShutterSoundPlayingCore(void);
-BOOL func_0270723c(FSFile *file);                       // DSP_OpenStaticComponentG711Core
-BOOL func_02707278(FSFile *file, int slotB, int slotC); // DSP_LoadG711Core
-void func_027072e0(void);                               // DSP_UnloadG711Core
+BOOL DSP_OpenStaticComponentG711Core(FSFile *file);
+BOOL DSP_LoadG711Core(FSFile *file, int slotB, int slotC);
+void DSP_UnloadG711Core(void);
 
 // The COFF images of the G.711 and the graphics component, in the LTD autoload's .rodata after its code, which no
 // source file owns yet. The openers hand them to the file system as memory files with this size, more than they are
@@ -25,13 +25,13 @@ extern const u8 DSP_G711Image[];
 extern const u8 DSP_GraphicsImage[];
 
 static inline void DSP_StopSound(void) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         DSP_StopSoundCore();
     }
 }
 
 static inline BOOL DSP_PlayShutterSound(const void *src, u32 length) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         return DSP_PlayShutterSoundCore(src, length);
     }
     return FALSE;
@@ -39,59 +39,59 @@ static inline BOOL DSP_PlayShutterSound(const void *src, u32 length) {
 
 static inline BOOL DSP_IsShutterSoundPlaying(void) {
     BOOL playing = FALSE;
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         playing = DSP_IsShutterSoundPlayingCore();
     }
     return playing;
 }
 
 static inline BOOL DSP_OpenStaticComponentG711(FSFile *file) {
-    if (hw_isDSi()) {
-        return func_0270723c(file);
+    if (OS_IsRunOnTwl()) {
+        return DSP_OpenStaticComponentG711Core(file);
     }
     return FALSE;
 }
 
 static inline BOOL DSP_LoadG711(FSFile *file, int slotB, int slotC) {
-    if (hw_isDSi()) {
-        return func_02707278(file, slotB, slotC);
+    if (OS_IsRunOnTwl()) {
+        return DSP_LoadG711Core(file, slotB, slotC);
     }
     return FALSE;
 }
 
 static inline void DSP_UnloadG711(void) {
-    if (hw_isDSi()) {
-        func_027072e0();
+    if (OS_IsRunOnTwl()) {
+        DSP_UnloadG711Core();
     }
 }
 
 // The graphics component, which the minigames' camera uses to scale its pictures
-BOOL func_02707310(FSFile *file);                       // DSP_OpenStaticComponentGraphicsCore
-BOOL func_027073b8(FSFile *file, int slotB, int slotC); // DSP_LoadGraphicsCore
-void func_02707464(void);                               // DSP_UnloadGraphicsCore
+BOOL DSP_OpenStaticComponentGraphicsCore(FSFile *file);
+BOOL DSP_LoadGraphicsCore(FSFile *file, int slotB, int slotC);
+void DSP_UnloadGraphicsCore(void);
 // DSPi_ScalingCore: scales the area at (x, y) of a width by height image by rx and ry. If async, returns TRUE at once
 // and calls callback when the DSP is done; if not, waits for the DSP and returns whether it scaled the image. Returns
 // FALSE when a scaling is in progress
-BOOL func_02707494(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry, u16 mode, u16 x, u16 y,
-                   u16 width, u16 height, void (*callback)(void), BOOL async);
+BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry, u16 mode, u16 x,
+                      u16 y, u16 width, u16 height, void (*callback)(void), BOOL async);
 
 static inline BOOL DSP_OpenStaticComponentGraphics(FSFile *file) {
-    if (hw_isDSi()) {
-        return func_02707310(file);
+    if (OS_IsRunOnTwl()) {
+        return DSP_OpenStaticComponentGraphicsCore(file);
     }
     return FALSE;
 }
 
 static inline BOOL DSP_LoadGraphics(FSFile *file, int slotB, int slotC) {
-    if (hw_isDSi() == TRUE) {
-        return func_027073b8(file, slotB, slotC);
+    if (OS_IsRunOnTwl() == TRUE) {
+        return DSP_LoadGraphicsCore(file, slotB, slotC);
     }
     return FALSE;
 }
 
 static inline void DSP_UnloadGraphics(void) {
-    if (hw_isDSi()) {
-        func_02707464();
+    if (OS_IsRunOnTwl()) {
+        DSP_UnloadGraphicsCore();
     }
 }
 
@@ -141,20 +141,20 @@ void DSP_SendData(int index, u16 data); // waits for command index to be free, t
 u16 DSP_RecvData(int index);            // waits for reply index and reads it
 // The SDK's inline functions over the three, which only call them on a DSi
 static inline void DSPi_SendData(int index, u16 data) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         DSP_SendData(index, data);
     }
 }
 
 static inline BOOL DSPi_RecvDataIsReady(int index) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return DSP_RecvDataIsReady(index);
     }
     return FALSE;
 }
 
 static inline u16 DSPi_RecvData(int index) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return DSP_RecvData(index);
     }
     return 0;

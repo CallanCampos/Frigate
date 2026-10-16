@@ -13,7 +13,7 @@ int DWC_BM_Init(void *work) {
     int result;
 
     MI_CpuFill8(work, 0, 0x1000);
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         result = func_0205e0f0(work);
     } else {
         result = func_0205e094(work);

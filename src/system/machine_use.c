@@ -71,7 +71,7 @@ void SystemInit(void) {
     if (isRunningOnDSi()) {
         sExitRequested = FALSE;
         PM_SetExitCallbackInfo(&sExitCallbackInfo, OnExitRequest, NULL);
-        func_0276952c(&sExitCallbackInfo);
+        PM_AppendPreExitCallback(&sExitCallbackInfo);
     }
 
     PM_GetAmp(&amp);
@@ -81,9 +81,9 @@ void SystemInit(void) {
 }
 
 void func_02005430(void) {
-    if (sExitRequested && !GCTX_HIDIsSoftResetBlocked(2) && !func_02769594()) {
+    if (sExitRequested && !GCTX_HIDIsSoftResetBlocked(2) && !PM_GetAutoExit()) {
         MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
-        func_027694dc();
+        PM_ReadyToExit();
     }
 }
 
@@ -91,12 +91,12 @@ void SystemUpdateVBlank(void) {
     NNS_GfdDoVramTransfer();
 }
 
-void func_0200548c(void) {
+void CTRDG_Init(void) {
     CTRDG_DummyInit();
 }
 
 // Called when the DSi is about to exit the game: keeps it from exiting until func_02005430 lets it
 static void OnExitRequest(void *arg) {
-    func_02769588(FALSE);
+    PM_SetAutoExit(FALSE);
     sExitRequested = TRUE;
 }

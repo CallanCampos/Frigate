@@ -6,6 +6,7 @@
 
 #include "nitro/fs.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 
 static FSArchive sMemoryArchive; // swan's g_ExtFileSystem
 static BOOL sMemoryArchiveReady;
@@ -56,7 +57,7 @@ static void FSi_InitMemoryArchive(void) {
         FS_InitArchive(&sMemoryArchive);
         FS_SetArchiveProc(&sMemoryArchive, FSi_MemoryArchiveProc, 0xffffffff);
         if (!FS_LoadArchive(&sMemoryArchive, 0, 0, 0, 0, 0, NULL, NULL)) {
-            sys_exit();
+            OS_Terminate();
         }
         sMemoryArchiveReady = TRUE;
     }

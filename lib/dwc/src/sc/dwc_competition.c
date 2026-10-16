@@ -2,6 +2,7 @@
 #include "dwc/dwc.h"
 #include "dwc/ext.h"
 #include "dwc/soap.h"
+#include "nitro/std.h"
 
 // GameSpy's competition service, as the Wi-Fi library of overlay 260 talks to it: a client with the three requests, and
 // the report that the game builds. The report's numbers are big-endian, as the service reads them; its first 0x44 bytes

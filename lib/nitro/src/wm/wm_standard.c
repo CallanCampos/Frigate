@@ -167,7 +167,7 @@ int WM_SetParentParameter(WMCallbackFunc callback, WMParentParam *param) {
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    if (hw_isDSi() && !WMi_IsWirelessAvailable()) {
+    if (OS_IsRunOnTwl() && !WMi_IsWirelessAvailable()) {
         return WM_ERRCODE_WM_DISABLE;
     }
     if (param == NULL) {
@@ -224,7 +224,7 @@ int WMi_StartParentEx(WMCallbackFunc callback, int enable) {
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    if (hw_isDSi() && !WMi_IsWirelessAvailable()) {
+    if (OS_IsRunOnTwl() && !WMi_IsWirelessAvailable()) {
         return WM_ERRCODE_WM_DISABLE;
     }
     w9b = WMi_GetSystemWork();
@@ -264,7 +264,7 @@ int WM_StartScanEx(WMCallbackFunc callback, WMScanExParam *param) {
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    if (hw_isDSi() && !WMi_IsWirelessAvailable()) {
+    if (OS_IsRunOnTwl() && !WMi_IsWirelessAvailable()) {
         return WM_ERRCODE_WM_DISABLE;
     }
     if (param == NULL) {
@@ -327,7 +327,7 @@ int WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    if (hw_isDSi() && !WMi_IsWirelessAvailable()) {
+    if (OS_IsRunOnTwl() && !WMi_IsWirelessAvailable()) {
         return WM_ERRCODE_WM_DISABLE;
     }
     if (bssDesc == NULL) {

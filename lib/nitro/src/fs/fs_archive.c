@@ -5,6 +5,7 @@
 #include "nitro/fs.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 
 // Where the archives are registered, and the archive and directory that a relative path starts in
 static struct {
@@ -225,25 +226,25 @@ static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
         case FS_COMMAND_UNMOUNT:
             vtbl->unmount(arc);
             return FS_RESULT_SUCCESS;
-        case FS_COMMAND_19:
-            result = vtbl->command19(arc, file->argument);
+        case FS_COMMAND_GETARCHIVECAPS:
+            result = vtbl->getArchiveCaps(arc, file->argument);
             break;
-        case FS_COMMAND_20: {
+        case FS_COMMAND_CREATEFILE: {
             u32 *args = file->argument;
 
-            result = vtbl->command20(arc, args[0], args[1], args[2]);
-            break;
-        }
-        case FS_COMMAND_21: {
-            u32 *args = file->argument;
-
-            result = vtbl->command21(arc, args[0], args[1]);
+            result = vtbl->createFile(arc, args[0], args[1], args[2]);
             break;
         }
-        case FS_COMMAND_22: {
+        case FS_COMMAND_DELETEFILE: {
             u32 *args = file->argument;
 
-            result = vtbl->command22(arc, args[0], args[1], args[2], args[3]);
+            result = vtbl->deleteFile(arc, args[0], args[1]);
+            break;
+        }
+        case FS_COMMAND_RENAMEFILE: {
+            u32 *args = file->argument;
+
+            result = vtbl->renameFile(arc, args[0], args[1], args[2], args[3]);
             break;
         }
         case FS_COMMAND_GETPATHINFO: {
@@ -252,28 +253,28 @@ static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
             result = vtbl->getPathInfo(arc, args->baseDirId, args->path, args->info);
             break;
         }
-        case FS_COMMAND_24: {
+        case FS_COMMAND_SETPATHINFO: {
             u32 *args = file->argument;
 
-            result = vtbl->command24(arc, args[0], args[1], args[2]);
+            result = vtbl->setPathInfo(arc, args[0], args[1], args[2]);
             break;
         }
-        case FS_COMMAND_25: {
+        case FS_COMMAND_CREATEDIRECTORY: {
             u32 *args = file->argument;
 
-            result = vtbl->command25(arc, args[0], args[1], args[2]);
+            result = vtbl->createDirectory(arc, args[0], args[1], args[2]);
             break;
         }
-        case FS_COMMAND_26: {
+        case FS_COMMAND_DELETEDIRECTORY: {
             u32 *args = file->argument;
 
-            result = vtbl->command26(arc, args[0], args[1]);
+            result = vtbl->deleteDirectory(arc, args[0], args[1]);
             break;
         }
-        case FS_COMMAND_27: {
+        case FS_COMMAND_RENAMEDIRECTORY: {
             u32 *args = file->argument;
 
-            result = vtbl->command27(arc, args[0], args[1], args[2], args[3]);
+            result = vtbl->renameDirectory(arc, args[0], args[1], args[2], args[3]);
             break;
         }
         case FS_COMMAND_GETARCHIVERESOURCE: {
@@ -282,13 +283,13 @@ static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
             result = vtbl->getArchiveResource(arc, args->resource);
             break;
         }
-        case FS_COMMAND_30:
-            result = vtbl->command30(arc, file);
+        case FS_COMMAND_FLUSHFILE:
+            result = vtbl->flushFile(arc, file);
             break;
-        case FS_COMMAND_31: {
+        case FS_COMMAND_SETFILELENGTH: {
             u32 *args = file->argument;
 
-            result = vtbl->command31(arc, file, args[0]);
+            result = vtbl->setFileLength(arc, file, args[0]);
             break;
         }
         case FS_COMMAND_OPENDIRECTORY: {
@@ -300,10 +301,10 @@ static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
         case FS_COMMAND_CLOSEDIRECTORY:
             result = vtbl->closeDirectory(arc, file);
             break;
-        case FS_COMMAND_34: {
+        case FS_COMMAND_SETSEEKCACHE: {
             u32 *args = file->argument;
 
-            result = vtbl->command34(arc, file, args[0], args[1]);
+            result = vtbl->setSeekCache(arc, file, args[0], args[1]);
             break;
         }
         default:
@@ -445,7 +446,7 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
 
     // A file takes one command at a time
     if (FSi_IsFileBusy(file)) {
-        sys_exit();
+        OS_Terminate();
     }
     if (arc == NULL) {
         file->error = FS_RESULT_INVALID_PARAMETER;
@@ -516,8 +517,8 @@ FSArchive *FS_FindArchive(const char *name, int nameLength) {
     return arc;
 }
 
-// NitroSDK's FS_ChangeDir: makes a path's archive and directory the current ones
-BOOL FS_ChangeDir(const char *path) {
+// TwlSDK's FS_SetCurrentDirectory: makes a path's archive and directory the current ones
+BOOL FS_SetCurrentDirectory(const char *path) {
     u32 baseDirId = 0;
     BOOL result = FALSE;
     char normalized[FS_PATH_BUFFER_SIZE];
@@ -690,7 +691,7 @@ BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
 
             for (i = 0;; i++) {
                 if (i >= FS_ARCHIVE_NAME_SLOT_COUNT) {
-                    sys_exit();
+                    OS_Terminate();
                 } else if (sArchiveNames[i][0] == '\0') {
                     STD_CopyLString(sArchiveNames[i], name, nameLength + 1);
                     arc->longName = sArchiveNames[i];
@@ -698,7 +699,7 @@ BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
                 }
             }
         } else {
-            sys_exit();
+            OS_Terminate();
         }
         arc->flag |= FS_ARCHIVE_FLAG_REGISTERED;
         result = TRUE;
@@ -710,7 +711,7 @@ BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
 // NitroSDK's FS_ReleaseArchiveName: takes an archive's name out of the list of archives (not the first)
 void FS_ReleaseArchiveName(FSArchive *arc) {
     if (arc == sArchives.list) {
-        sys_exit();
+        OS_Terminate();
     }
     if (arc->longName != NULL) {
         u32 interrupts = OS_DisableInterrupts();

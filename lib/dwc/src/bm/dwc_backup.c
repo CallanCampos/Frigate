@@ -92,7 +92,7 @@ BOOL DWCBm_WriteWifiIdInfo(const DWCBmWifiIdInfo *info, void *work) {
     for (index = 0; index < 2; index++) {
         // The page can't be read back before it is written: the game stops
         if (!ReadNtrPages(&buf->page, index, 1)) {
-            sys_exit();
+            OS_Terminate();
             return FALSE;
         }
         MI_CpuCopy8(sWifiId.packed, buf->page.wifiId, DWC_BM_PACKED_SIZE);

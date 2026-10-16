@@ -5,8 +5,8 @@
 #include "nitro/pm.h"
 
 // TwlSDK's power management for the DSi, in the LTD autoload: the callbacks run when the console is about to exit the
-// application, as when the power button is pressed. The functions keep their default names; the comments give the SDK
-// functions they implement, by their code
+// application, as when the power button is pressed. The functions have the names of the SDK functions they implement,
+// from their code; the ones still named by address are not known
 
 typedef PMGenCallback PMExitCallback;
 typedef PMGenCallbackInfo PMExitCallbackInfo;
@@ -16,14 +16,14 @@ static inline void PM_SetExitCallbackInfo(PMExitCallbackInfo *info, PMExitCallba
     info->arg = arg;
 }
 
-void func_0276952c(PMExitCallbackInfo *info); // PM_AppendPreExitCallback
-void func_02769588(BOOL enabled);             // PM_SetAutoExit
-BOOL func_02769594(void);                     // PM_GetAutoExit
-void func_027694dc(void);                     // PM_ReadyToExit
-// Like func_0276952c, but with the callback's priority: inserts it into the list of the callbacks that run before the
-// application exits, and func_02769568 takes it out
-void func_02769550(PMExitCallbackInfo *info, int priority);
-void func_02769568(PMExitCallbackInfo *info);
+void PM_AppendPreExitCallback(PMExitCallbackInfo *info);
+void PM_SetAutoExit(BOOL enabled);
+BOOL PM_GetAutoExit(void);
+void PM_ReadyToExit(void);
+// Like PM_AppendPreExitCallback, but with the callback's priority: inserts it into the list of the callbacks that run
+// before the application exits, and PM_DeletePreExitCallback takes it out
+void PM_InsertPreExitCallback(PMExitCallbackInfo *info, int priority);
+void PM_DeletePreExitCallback(PMExitCallbackInfo *info);
 // Reads a word (at 0x14) of main's bss (PMi_IsInit)
 BOOL func_02769520(void);
 

@@ -315,7 +315,7 @@ static BOOL MysteryProc_Exit(GameProc *proc, u32 *state, void *param, void *work
     GameData_Free(wk->gameData);
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(HEAPID_MYSTERY);
-    sys_reset(0);
+    OS_ResetSystem(0);
     GFL_OvlUnload(OVERLAY_ID(189));
     func_02005d8c();
     return TRUE;

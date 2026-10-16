@@ -5,10 +5,13 @@
 #include "nitro/pxi.h"
 
 // Whether the ARM7 said that a reset happened, and that the system is being terminated
-static u16 sResetFlags[2];
+static struct {
+    u16 resetOccurred;
+    u16 terminating;
+} sResetFlags;
 
 BOOL OS_IsResetOccurred(void) {
-    return sResetFlags[0];
+    return sResetFlags.resetOccurred;
 }
 
 // The function that handles the words of the FIFO's OS tag
@@ -16,12 +19,12 @@ void OSi_CommonCallback(u32 fifoTag, u32 data, BOOL err) {
     u16 command = (data & OS_PXI_COMMAND_MASK) >> OS_PXI_COMMAND_SHIFT;
 
     if (command == OS_PXI_COMMAND_RESET) {
-        sResetFlags[0] = TRUE;
+        sResetFlags.resetOccurred = TRUE;
     } else if (command == OS_PXI_COMMAND_TERMINATE) {
-        sResetFlags[1] = TRUE;
-        sys_exit();
+        sResetFlags.terminating = TRUE;
+        OS_Terminate();
     } else {
-        sys_exit();
+        OS_Terminate();
     }
 }
 

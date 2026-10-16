@@ -234,7 +234,7 @@ static void DeleteSave_Delete(DeleteSaveWork *wk, u32 *state) {
             freeIntermediateSaveExtraBlksAfterLoad(save, i);
         }
         GFL_VBlankResetCallback();
-        sys_reset(0);
+        OS_ResetSystem(0);
     }
 }
 

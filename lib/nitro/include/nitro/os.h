@@ -4,7 +4,6 @@
 #include "types.h"
 #include "nitro/cp.h"
 #include "nitro/hw.h"
-#include "nitro/std.h"
 #include <stdarg.h>
 
 // The tick count of the system timer (NitroSDK's OS_GetTick), which swan names clock, and its low 16 bits
@@ -26,14 +25,15 @@ void OSi_SetTimerReserved(int timerNo);
 #define OS_MilliSecondsToTicks(msec) ((u64)(((OS_SYSTEM_CLOCK / 1000) * (u64)(msec)) / 64))
 // Does nothing but be called with a library's signature ("[SDK+...]"), keeping the signature in the link
 void OSi_ReferSymbol(const char *signature);
-// Restarts the game, which swan names sys_reset (NitroSDK's OS_ResetSystem). The parameter is left in the shared memory
-// for the next program. A program that runs from the NAND of a DSi terminates instead
-void sys_reset(u32 parameter);
-// Stops the game after a fatal error, calling the registered handler first (NitroSDK's OS_Terminate)
-void sys_exit(void);
+// NitroSDK's OS_ResetSystem (swan's sys_reset): restarts the game. The parameter is left in the shared memory for the
+// next program. A program that runs from the NAND of a DSi terminates instead
+void OS_ResetSystem(u32 parameter);
+// NitroSDK's OS_Terminate (swan's sys_exit): stops the game after a fatal error, calling the registered handler first
+void OS_Terminate(void);
 void OS_InitReset(void);
-// The loop that sys_exit ends in, which disables the interrupts and halts the CPU for good. The name is swan's
-void abort(void);
+// The loop that OS_Terminate ends in, which disables the interrupts and halts the CPU for good. The name is a guess at
+// TwlSDK's; swan's is abort
+void OSi_TerminateCore(void);
 
 // The boot type that the card's boot code leaves in the shared memory (NitroSDK's OS_GetBootType): 1 when the game
 // booted from the ROM of a cartridge, 2 when it was downloaded as a DS Download Play child
@@ -48,11 +48,10 @@ void abort(void);
 #define OS_PXI_COMMAND_SHIFT 8
 #define OS_PXI_COMMAND_RESET 0x10
 #define OS_PXI_COMMAND_TERMINATE 0x20
-// The ITCM function that OS_ResetSystem ends in (NitroSDK's OSi_DoResetSystem)
-void func_01ff8fac(void);
-void WaitByLoop(u32 cycles);
-// Stops the CPU until an interrupt, which swan names cp15_halt. NitroSDK's OS_Halt
-void cp15_halt(void);
+// NitroSDK's OSi_DoResetSystem, in ITCM: the function that OS_ResetSystem ends in
+void OSi_DoResetSystem(void);
+// NitroSDK's OS_Halt (swan's cp15_halt): stops the CPU until an interrupt
+void OS_Halt(void);
 // Writes a range of the data cache back to memory, before DMA reads it. NitroSDK's DC_FlushRange
 void DC_FlushRange(const void *addr, u32 size); // swan's cp15_flushDC
 // Discards a range of the data cache, after DMA writes it. NitroSDK's DC_InvalidateRange
@@ -103,14 +102,15 @@ extern u8 SDK_SYS_STACKSIZE[];
 // NitroSDK's OSSystemWork, the system area at the end of main memory that the two processors share. Only the words
 // that the code reads are laid out
 typedef struct OSSystemWork {
-    u8 unk_000[0x3c];
+    u32 bootCardId; // the ID of the card that the system read at boot
+    u8 unk_004[0x38];
     u32 vblankCount;
     u8 unk_040[0x40];
     u8 nvramUserInfo[0x80];
     u8 unk_100[0xe8];
     u32 realTimeClock[2];
     u8 unk_1f0[0x198];
-    u32 pxiSignalParam[2]; // one for each processor, with a bit for each PXI tag that it has a callback for
+    u32 pxiHandleChecker[2]; // one for each processor, with a bit for each PXI tag that it has a callback for
     u32 micLastAddress;
     u16 micSampling;
     u16 unk_396;
@@ -189,7 +189,7 @@ void OS_SetArenaHi(int arena, void *end);                            // swan's S
 void *OS_AllocFromArenaLo(int arena, u32 size, u32 alignment);       // swan's mem_alloc_direct
 void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps); // swan's mem_init_alloc_area
 int OS_CreateHeap(int arena, void *start, void *end);                // swan's mem_bind_range
-void *OS_AllocFromHeap(int arena, int heap, s32 size);               // swan's malloc_device
+void *OS_AllocFromHeap(int arena, int heap, u32 size);               // swan's malloc_device
 void OS_FreeToHeap(int arena, int heap, void *ptr);                  // swan's free_device
 // NitroSDK's OS_InitArena, which sets the limits of the arenas, and OS_InitArenaEx, which on a DSi also protects the
 // main memory that a DS does not have
@@ -270,8 +270,9 @@ u32 OS_RestoreInterrupts(u32 mask); // swan's CPU_SetIRQMask
 // The same for both IRQ and FIQ (NitroSDK's OS_DisableInterrupts_IrqAndFiq and OS_RestoreInterrupts_IrqAndFiq)
 u32 OS_DisableInterrupts_IrqAndFiq(void);     // swan's CPU_IRQFIQDisable
 u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask); // swan's CPU_SetIRQFIQMask
-// IRQ dispatcher; WCM also uses its address as a special mutex-owner marker.
-void CPU_IRQInvoke(void);
+// NitroSDK's OS_IrqHandler (swan's CPU_IRQInvoke), in ITCM: the IRQ dispatcher. WCM also uses its address as a special
+// mutex-owner marker
+void OS_IrqHandler(void);
 // NitroSDK's OS_GetCpsrIrq: the CPSR's IRQ-disable bit, 0x80 while IRQs are off
 u32 OS_GetCpsrIrq(void); // swan's CPU_GetIRQMask
 // NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler
@@ -282,6 +283,8 @@ u32 OS_GetProcMode(void); // swan's CPU_GetMode
 u32 OS_EnableIrqMask(u32 mask); // swan's CPU_EnableInterrupts
 // NitroSDK's OS_Sleep: waits for some milliseconds, letting other threads run
 void OS_Sleep(u32 msec);
+// MSL's exit, which gfl/heap.c calls. Not from <stdlib.h>: MWCC takes the exit that a header named stdlib.h declares
+// for a function that doesn't return, and drops the code after GFL_HeapDumpOnFailure's first call of it
 void exit(int status);
 
 // Fills 32 bytes with values that differ from run to run
@@ -289,51 +292,6 @@ void OS_GetLowEntropyData(u32 buffer[8]);
 // TwlSDK's OS_SpinWaitSysCycles: busy-waits for some cycles of the system clock
 void OS_SpinWaitSysCycles(u32 cycles);
 
-// Where a ROM header's program is loaded in RAM, and its size. NitroSDK's multiboot library reads the pair through a
-// pointer to it
-typedef struct ROMHeaderLoad {
-    u32 ramAddr;
-    u32 size;
-} ROMHeaderLoad;
-
-// A range of the ROM image: where it starts, and how long it is
-typedef struct ROMHeaderRegion {
-    u32 offset;
-    u32 size;
-} ROMHeaderRegion;
-
-// The ROM header of the running program, which the card puts at the end of main memory. Only the fields that
-// NitroSDK's multiboot library and file system read are named
-typedef struct ROMHeader {
-    u8 unk_00[0x12];
-    u8 unitCode;
-    u8 unk_13;
-    u8 deviceSize; // the card's capacity: 128 KB shifted left by it
-    u8 unk_15[0xb];
-    u32 arm9RomOffset;
-    u32 arm9Entry;
-    ROMHeaderLoad arm9;
-    u32 arm7RomOffset;
-    u32 arm7Entry;
-    ROMHeaderLoad arm7;
-    ROMHeaderRegion fnt;         // the file name table
-    ROMHeaderRegion fat;         // the file allocation table
-    ROMHeaderRegion arm9Overlay; // the table of the ARM9's overlay headers
-    ROMHeaderRegion arm7Overlay; // and the ARM7's
-    u32 unk_60;
-    u8 unk_64[0x1c];
-    u32 romSize;
-    u8 unk_84[0xe];
-    u16 twlRegionStart; // where the part of the ROM that only the DSi mode reads starts, in units of 0x80000 bytes
-    u8 unk_94[0xcc];
-} ROMHeader;
-
-// Gives the ROM header in main memory
-const ROMHeader *CARD_GetOwnRomHeader(void); // swan's rom_get_header
-// The TWL header that the DSi's system puts in main memory
-const void *CARD_GetOwnRomHeaderTWL(void);
-// A saved copy of 0x88 bytes that the card read after the ROM header
-const void *CARDi_GetRomAuthCode(void);
 // An empty function that the program's autoload step calls
 void AutoloadCallback(void);
 // Reads the console's MAC address (NitroSDK's OS_GetMacAddress)
@@ -344,15 +302,15 @@ const u16 *OS_GetFavoriteColorTable(void);
 // NitroSDK's OS_GetBootType: 1 when the game booted from the ROM
 u32 OS_GetBootType(void); // swan's sys_get_boot_indicator
 // NitroSDK's OS_GetConsoleType and OS_IsRunOnEmulator (the console type has the emulator's bit set), and a function
-// that calls hw_isDSi
+// that calls OS_IsRunOnTwl
 #define OS_CONSOLE_ENSATA 0x10000000
 u32 OS_GetConsoleType(void);
 BOOL OS_IsRunOnEmulator(void);
 BOOL func_0207acbc(void);
 
-// NitroSDK's OS_WaitIrq, and OS_IsRunOnTwl under swan's name
+// NitroSDK's OS_WaitIrq, and TwlSDK's OS_IsRunOnTwl
 void OS_WaitIrq(BOOL clear, u32 interrupts); // swan's irq_waitFor
-BOOL hw_isDSi(void);
+BOOL OS_IsRunOnTwl(void);                    // swan's hw_isDSi
 // TwlSDK's OSi_IsCodecTwlMode: whether the game runs with the DSi's codec in TWL mode (on a DSi, with the TWL ROM
 // header's codec flag set)
 BOOL OSi_IsCodecTwlMode(void);
@@ -365,15 +323,15 @@ typedef struct {
 } TWLParentalControl;
 
 // The DSi's parental controls, NULL on a DS
-TWLParentalControl *func_0207c4b4(void);
+TWLParentalControl *OS_GetParentalControlInfoPtr(void);
 // TwlSDK's OS_IsAvailableWireless, TRUE on a DS, and OS_IsAgreeEULA, FALSE on a DS
 BOOL OS_IsAvailableWireless(void);
 BOOL OS_IsAgreeEULA(void);
 // TwlSDK's OS_GetAgreedEULAVersion (0 on a DS), then a byte of the TWL ROM header (0 on a DS) and, by its role,
 // TwlSDK's OS_IsForceDisableWireless (FALSE on a DS)
 u8 OS_GetAgreedEULAVersion(void);
-u8 func_0207c49c(void);
-BOOL func_0207c4d0(void);
+u8 OS_GetROMHeaderEULAVersion(void);
+BOOL OS_IsForceDisableWireless(void);
 // NitroSDK's OS_WaitVBlankIntr
 void OS_WaitVBlankIntr(void);
 
@@ -671,8 +629,8 @@ OSIrqFunction OS_GetIrqFunction(u32 interrupts);
 void OSi_EnterDmaCallback(u32 dmaNo, OSIrqCallback callback, void *arg); // swan's irq_setDMACallback
 void OSi_EnterNDmaCallback(u32 ndmaNo, OSIrqCallback callback, void *arg);
 void OSi_EnterTimerCallback(int timerNo, OSIrqCallback callback, void *arg);
-// NitroSDK's OS_SetIrqMask, OS_EnableIrqMask (declared above), OS_DisableIrqMask and OS_ResetRequestIrqMask, under
-// swan's names: change IE or acknowledge bits of IF, returning the previous IE or IF
+// NitroSDK's OS_SetIrqMask, OS_EnableIrqMask (declared above), OS_DisableIrqMask and OS_ResetRequestIrqMask: change IE
+// or acknowledge bits of IF, returning the previous IE or IF
 u32 OS_SetIrqMask(u32 mask);          // swan's CPU_SetInterrupts
 u32 OS_DisableIrqMask(u32 mask);      // swan's CPU_DisableInterrupts
 u32 OS_ResetRequestIrqMask(u32 mask); // swan's CPU_AcknowledgeInterrupts
@@ -725,8 +683,8 @@ typedef struct OSDeliverArgInfo {
 void OS_InitDeliverArg(OSDeliverArgInfo *info, u32 reserved);
 int OS_EncodeDeliverArg(void);
 int OS_DecodeDeliverArg(void);
-void func_0207c698(void);
-u64 func_0207c6a4(void);
+void OS_FinalizeDeliverArg(void);
+u64 OS_GetTitleIdFromDeliverArg(void);
 
 // Alarms: OS_SetAlarm's fires once after the ticks and calls the function with the argument
 typedef u64 OSTick;

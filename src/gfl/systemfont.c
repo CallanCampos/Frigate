@@ -43,7 +43,7 @@ void GFL_SystemFontInit(const char *path) {
                 FS_ReadFile(&file, (void *)sSystemFont->data, size);
                 FS_CloseFile(&file);
             } else {
-                sys_exit();
+                OS_Terminate();
             }
             sSystemFont->builtIn = FALSE;
         } else {

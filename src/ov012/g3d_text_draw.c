@@ -6,6 +6,7 @@
 #include "gfl/graphics.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "nnsys/g3d.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"

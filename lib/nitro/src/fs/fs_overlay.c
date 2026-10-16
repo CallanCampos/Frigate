@@ -3,6 +3,7 @@
 // static initializers and destructors. The file name is a guess from NitroSDK's own layout (fs_overlay.c); no string
 // in the ROM names it. The functions have NitroSDK's names where they are known.
 
+#include "nitro/card.h"
 #include "nitro/fs.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
@@ -97,7 +98,7 @@ BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id) {
     if (target != MI_PROCESSOR_ARM9) {
         table = &sArm7Overlays;
     }
-    if (id < FS_OVERLAY_COUNT || hw_isDSi()) {
+    if (id < FS_OVERLAY_COUNT || OS_IsRunOnTwl()) {
         if (table->address != NULL) {
             if (offset < table->size) {
                 FSFile file;
@@ -178,7 +179,7 @@ static BOOL FSi_CompareDigest(const FSOverlayDigest *expected, const void *data,
 
     MI_CpuFill8(digest, 0, sizeof(digest));
     MI_CpuCopy8(sDigestKey.data, key, sDigestKey.size);
-    if (!masked && hw_isDSi()) {
+    if (!masked && OS_IsRunOnTwl()) {
         SVC_CalcHMACSHA1(digest, data, size, key, sDigestKey.size);
     } else {
         u32 previous = 0;
@@ -207,7 +208,7 @@ void FS_StartOverlay(const FSOverlayInfo *info) {
     void (**initializersEnd)(void);
 
     if ((u32)info->ramAddress >= (u32)LTD_AUTOLOAD_0_TEXT_START &&
-        (u32)info->ramAddress < (u32)LTD_AUTOLOAD_0_BSS_END && hw_isDSi() && !sLtdOverlayLoaded) {
+        (u32)info->ramAddress < (u32)LTD_AUTOLOAD_0_BSS_END && OS_IsRunOnTwl() && !sLtdOverlayLoaded) {
         sLtdOverlayLoaded = TRUE;
     }
     if (OS_GetBootType() != OS_BOOTTYPE_ROM) {
@@ -222,12 +223,12 @@ void FS_StartOverlay(const FSOverlayInfo *info) {
         }
         if (!verified) {
             MI_CpuFill8(info->ramAddress, 0, size);
-            sys_exit();
+            OS_Terminate();
             return;
         }
     }
     if (info->flag & FS_OVERLAY_FLAG_COMPRESS) {
-        sys_uncomp_blz(info->ramAddress + size);
+        MIi_UncompressBackward(info->ramAddress + size);
     }
     DC_FlushRange(info->ramAddress, info->ramSize);
     initializer = info->sinitStart;

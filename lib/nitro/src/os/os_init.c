@@ -34,29 +34,29 @@ void OS_Init(void) {
     OSi_InitBody();
 }
 
-// The work of OS_Init: starts the OS and the libraries that the SDK starts with it, in this order
+// The work of OS_Init (the name is ours): starts the OS and the libraries that the SDK starts with it, in this order
 static void OSi_InitBody(void) {
     PXI_Init();
     OS_InitArena();
-    OS_InitLock();     // OS_InitLock
-    OS_InitArenaEx();  // OS_InitArenaEx
-    OS_InitIrqTable(); // OS_InitIrqTable
+    OS_InitLock();
+    OS_InitArenaEx();
+    OS_InitIrqTable();
     OS_SetIrqStackChecker();
-    OS_InitException(); // OS_InitException
-    MI_Init();          // MI_Init
+    OS_InitException();
+    MI_Init();
     OS_InitVAlarm();
-    OSi_InitVramExclusive(); // OSi_InitVramExclusive
-    OS_InitThread();         // OS_InitThread
-    OS_InitReset();          // OS_InitReset
-    func_0200548c();         // CTRDG_Init
-    CARD_Init();             // CARD_Init
-    func_02078000();         // TwlSDK's shared WRAM manager, on a DSi
-    if (hw_isDSi() == TRUE) {
+    OSi_InitVramExclusive();
+    OS_InitThread();
+    OS_InitReset();
+    CTRDG_Init(); // the game's, which replaces the SDK's weak CTRDG_Init
+    CARD_Init();
+    func_02078000(); // TwlSDK's shared WRAM manager, on a DSi
+    if (OS_IsRunOnTwl() == TRUE) {
         SCFG_Init(); // SCFG: sets the PXI callback for its tag
     }
-    PM_Init();         // PM_Init
-    OSi_WaitVCount0(); // OSi_WaitVCount0
-    if (hw_isDSi() == TRUE) {
+    PM_Init();
+    OSi_WaitVCount0();
+    if (OS_IsRunOnTwl() == TRUE) {
         func_0207c888();
     }
 }

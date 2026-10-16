@@ -833,12 +833,12 @@ static void MBParent_SetupGameInfo(MBParentWork *wk) {
         GFL_BGSysSetBGEnabled(5, TRUE);
         GFL_BGSysSetBGEnabled(4, TRUE);
     }
-    func_0206ff50(MBParent_CardPulledOut);
+    CARD_SetPulledOutCallback(MBParent_CardPulledOut);
 }
 
 static void MBParent_FreeGameInfo(MBParentWork *wk) {
     GFL_OvlUnload(OVERLAY_ID(30));
-    func_0206ff50(NULL);
+    CARD_SetPulledOutCallback(NULL);
     GFL_HeapFree(wk->gameName);
     GFL_HeapFree(wk->gameIntro);
     if (wk->startMenu == FALSE) {

@@ -190,7 +190,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
         *retWk = func_ov050_021e6f90(field);
         break;
     case 1:
-        sys_reset(0);
+        OS_ResetSystem(0);
         break;
     case 2:
         BSubwayPlayData_Init(playData);

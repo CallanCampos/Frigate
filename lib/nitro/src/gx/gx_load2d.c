@@ -6,15 +6,11 @@
 // wait in TwlSDK's LTD module sit after their first callers; they are not part of the source.
 #include "nitro/gx.h"
 
-// NitroSDK's inline for the sub screen's OBJ VRAM, which gx.h doesn't have yet (ov194's pokemontrade_2d.c has its own)
-static inline void *G2S_GetOBJCharPtr(void) {
-    return (void *)HW_DB_OBJ_VRAM;
-}
-
 // The extended palette being loaded. The banks are what a Begin took from the engine (0 when it took none) and the End
 // gives back; dest is the address of the first of them in the CPU's view, and offset where in the extended palette that
 // bank starts, which is not 0 when only bank G holds the BGs' palette: it starts at its third slot. The first of the
-// seven words is swan's g_GfxVRAMUploadBanksBGExtPltB
+// seven words is swan's g_GfxVRAMUploadBanksBGExtPltB. MWCC lays the words out in a fixed permutation of their order
+// here, which is why sObjExtPlttBanksB, the last in .bss, is declared first
 static u32 sObjExtPlttBanksB;
 static u32 g_GfxVRAMUploadBanksBGExtPltB;
 static u32 sObjExtPlttDestA;

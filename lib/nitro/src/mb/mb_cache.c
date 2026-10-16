@@ -14,7 +14,7 @@ void MBCache_Add(MBCache *cache, u32 offset, u32 size, void *buf, u32 state) {
 
     while (TRUE) {
         if (entry >= end) {
-            sys_exit();
+            OS_Terminate();
         }
         if (entry->state == MB_CACHE_ENTRY_EMPTY) {
             entry->offset = offset;

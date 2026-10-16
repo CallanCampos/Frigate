@@ -1,11 +1,19 @@
-// Card removal notification and shutdown. The source file name follows NitroSDK's CARD_pullOut.c.
+// NitroSDK's card removal notification and shutdown. The source file name follows NitroSDK's CARD_pullOut.c, and the
+// names are the SDK's.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pm.h"
 #include "nitro/pxi.h"
+#include "nitro/svc.h"
 #include "twl/mi.h"
 #include "twl/os.h"
+
+// The commands of the card's PXI tag: the ARM7 sends PULLED_OUT and RESET_SLOT, and the ARM9 sends TERMINATE
+#define CARD_PXI_COMMAND_MASK 0x3f
+#define CARD_PXI_COMMAND_TERMINATE 0x01
+#define CARD_PXI_COMMAND_RESET_SLOT 0x02
+#define CARD_PXI_COMMAND_PULLED_OUT 0x11
 
 typedef struct {
     u32 notificationCount;
@@ -15,78 +23,77 @@ typedef struct {
 
 static CARDPullOutState sCardPullOut;
 
-static void func_0206fefc(u32 tag, u32 data, BOOL err);
-static void func_0206ff68(void);
-static void func_0206fffc(u32 data, u32 wait);
+static void CARDi_PulledOutCallback(u32 tag, u32 data, BOOL err);
+static void CARD_TerminateForPulledOut(void);
+static void CARDi_SendtoPxi(u32 data, u32 wait);
 
-void func_0206fed8(void) {
+void CARD_InitPulledOutCallback(void) {
     PXI_Init();
     sCardPullOut.notificationCount = 0;
     sCardPullOut.pulledOut = FALSE;
-    PXI_SetFifoRecvCallback(14, func_0206fefc);
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CARD, CARDi_PulledOutCallback);
     sCardPullOut.callback = NULL;
 }
 
-static void func_0206fefc(u32 tag, u32 data, BOOL err) {
-    u32 command = data & 0x3f;
-    if (command == 0x11) {
+static void CARDi_PulledOutCallback(u32 tag, u32 data, BOOL err) {
+    u32 command = data & CARD_PXI_COMMAND_MASK;
+    if (command == CARD_PXI_COMMAND_PULLED_OUT) {
         if (!sCardPullOut.pulledOut) {
             BOOL terminate = TRUE;
             sCardPullOut.pulledOut = TRUE;
-            CARDi_NotifyEvent(TRUE, FALSE);
+            CARDi_NotifyEvent(CARD_EVENT_PULLED_OUT, 0);
             if (sCardPullOut.callback != NULL) {
                 terminate = sCardPullOut.callback();
             }
             if (terminate) {
-                func_0206ff68();
+                CARD_TerminateForPulledOut();
             }
         }
-    } else if (command == 2) {
+    } else if (command == CARD_PXI_COMMAND_RESET_SLOT) {
         ++sCardPullOut.notificationCount;
         sCardPullOut.pulledOut = FALSE;
-        CARDi_NotifyEvent(2, 0);
+        CARDi_NotifyEvent(CARD_EVENT_SLOT_RESET, 0);
     } else {
-        sys_exit();
+        OS_Terminate();
     }
 }
 
-void func_0206ff50(CARDPulledOutCallback callback) {
+void CARD_SetPulledOutCallback(CARDPulledOutCallback callback) {
     sCardPullOut.callback = callback;
 }
 
-BOOL func_0206ff5c(void) {
+BOOL CARD_IsPulledOut(void) {
     return sCardPullOut.pulledOut;
 }
 
-static void func_0206ff68(void) {
+static void CARD_TerminateForPulledOut(void) {
     if (PAD_DetectFold()) {
         PM_ForceToPowerOff();
     }
     // The calls into the LTD autoload go through veneers, which the linker adds after this function
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02769578();
     }
-    func_0206fffc(1, 1);
+    CARDi_SendtoPxi(CARD_PXI_COMMAND_TERMINATE, 1);
     MI_StopAllDma();
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02768298();
     }
-    sys_exit();
+    OS_Terminate();
 }
 
-void func_0206ffcc(u32 cardId) {
-    // volatile: the boot card ID in the shared header is written by the ARM7, and the original reads it into a stack
-    // slot
-    volatile u32 bootCardId = *(vu32 *)0x02fffc00;
+void CARDi_CheckPulledOutCore(u32 cardId) {
+    // volatile: the boot card ID in the shared work is written by the ARM7, and the original reads it into a stack slot
+    volatile u32 bootCardId = OS_GetSystemWork()->bootCardId;
     if (cardId != bootCardId) {
         u32 irq = OS_DisableInterrupts();
-        func_0206fefc(14, 0x11, FALSE);
+        CARDi_PulledOutCallback(PXI_FIFO_TAG_CARD, CARD_PXI_COMMAND_PULLED_OUT, FALSE);
         OS_RestoreInterrupts(irq);
     }
 }
 
-static void func_0206fffc(u32 data, u32 wait) {
-    while (PXI_SendWordByFifo(14, data, FALSE) != 0) {
-        WaitByLoop(wait);
+static void CARDi_SendtoPxi(u32 data, u32 wait) {
+    while (PXI_SendWordByFifo(PXI_FIFO_TAG_CARD, data, FALSE) != 0) {
+        SVC_WaitByLoop(wait);
     }
 }

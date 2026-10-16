@@ -50,8 +50,8 @@ CtvtMic *CtvtMic_Create(HeapID heapId) {
     PM_Init();
     PM_SetAmp(PM_AMP_ON);
     PM_SetAmpGainLevel(80);
-    if (hw_isDSi() == TRUE) {
-        func_027047c0(0, sFilter);
+    if (OS_IsRunOnTwl() == TRUE) {
+        SNDEX_SetIirFilter(0, sFilter);
     }
     CtvtMic_AllocChannel(work, heapId);
     work->buffer = allocConfigDSSoftwareFeature(heapId, CTVT_MIC_BUFFER_SIZE, "ctvt_mic.c", 134);

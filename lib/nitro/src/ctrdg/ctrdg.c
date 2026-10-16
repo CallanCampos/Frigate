@@ -78,7 +78,7 @@ static BOOL CTRDGi_IsExistedAtInit(void) {
 void CTRDGi_InitCommon(void) {
     u32 zero = 0;
 
-    CpuSet(&zero, &ctrdgWork.unk_04, SVC_CPUSET_FILL | SVC_CPUSET_32BIT | 1);
+    SVC_CpuSet(&zero, &ctrdgWork.unk_04, SVC_CPUSET_FILL | SVC_CPUSET_32BIT | 1);
     ctrdgWork.lockID = OS_GetLockID();
 }
 
@@ -153,7 +153,7 @@ static void CTRDGi_LockByProcessor(u16 lockID, CTRDGLockInfo *info) {
             return;
         }
         OS_RestoreInterrupts(info->irq);
-        WaitByLoop(1);
+        SVC_WaitByLoop(1);
     }
 }
 
@@ -167,6 +167,6 @@ static void CTRDGi_UnlockByProcessor(u16 lockID, CTRDGLockInfo *info) {
 
 void CTRDGi_SendtoPxi(u32 data) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_CTRDG, data, FALSE) != 0) {
-        WaitByLoop(1);
+        SVC_WaitByLoop(1);
     }
 }

@@ -183,7 +183,7 @@ static void TPi_TpCallback(u32 tag, u32 data, BOOL err) {
         }
         return;
     default:
-        sys_exit();
+        OS_Terminate();
         return;
     }
 }

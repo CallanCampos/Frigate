@@ -6,7 +6,7 @@
 // The DSi's settings, with what a DS answers in their place. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except isRunningOnDSi and isWirelessEnabled
 
-// Whether the game runs on a DSi, through hw_isDSi
+// Whether the game runs on a DSi, through OS_IsRunOnTwl
 BOOL isRunningOnDSi(void);
 // TRUE when the DSi's parental controls restrict exchanging photos, despite swan's name
 BOOL canPlayerExchangePhotos(void);

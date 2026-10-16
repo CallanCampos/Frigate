@@ -2111,7 +2111,7 @@ void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
                 }
             } else {
                 MI_CpuFill8(soc->ooo, 0, sizeof(soc->ooo));
-                sys_exit();
+                OS_Terminate();
             }
         }
     }

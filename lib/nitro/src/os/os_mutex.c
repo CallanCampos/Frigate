@@ -4,12 +4,12 @@
 // word that holds the lock count.
 #include "nitro/os.h"
 
-// The word at OSMutex.count: the lock count in the low 24 bits and the type in the top 8. What a type means is known
-// from how the unlock treats it: a mutex of type 1 (the only one that is made here) and one of type 3 are unlocked by
-// the thread that has it, one of type 2 by any thread
-#define OS_MUTEX_TYPE_1 0x10000000
-#define OS_MUTEX_TYPE_2 0x20000000
-#define OS_MUTEX_TYPE_3 0x30000000
+// The word at OSMutex.count: the lock count in the low 24 bits and the type in the top 8. The types are TwlSDK's
+// standard, read and write mutexes: a standard one (the only one that is made here) and a write one are unlocked by the
+// thread that has it, a read one by any thread
+#define OS_MUTEX_TYPE_STD 0x10000000
+#define OS_MUTEX_TYPE_R 0x20000000
+#define OS_MUTEX_TYPE_W 0x30000000
 #define OS_MUTEX_TYPE_MASK 0xff000000
 #define OS_MUTEX_COUNT_MASK 0x00ffffff
 
@@ -48,7 +48,7 @@ void OS_LockMutex(OSMutex *mutex) {
 
 // NitroSDK's OS_UnlockMutex, which unlocks a mutex of type 1
 void OS_UnlockMutex(OSMutex *mutex) {
-    OSi_UnlockMutexCore(mutex, OS_MUTEX_TYPE_1);
+    OSi_UnlockMutexCore(mutex, OS_MUTEX_TYPE_STD);
 }
 
 // NitroSDK's OSi_UnlockAllMutex: unlocks every mutex that a thread has, whatever its count, and wakes the threads that
@@ -73,7 +73,7 @@ BOOL OS_TryLockMutex(OSMutex *mutex) {
     BOOL locked;
 
     if (mutex->thread == NULL) {
-        OSi_SetMutexType(mutex, OS_MUTEX_TYPE_1);
+        OSi_SetMutexType(mutex, OS_MUTEX_TYPE_STD);
         OSi_SetMutexCount(mutex, mutex->count + 1);
         mutex->thread = current;
         OSi_EnqueueTail(current, mutex);
@@ -102,8 +102,8 @@ static void OSi_UnlockMutexCore(OSMutex *mutex, u32 type) {
     }
     mutexType = OSi_GetMutexType(mutex);
     switch (mutexType) {
-    case OS_MUTEX_TYPE_1:
-    case OS_MUTEX_TYPE_3:
+    case OS_MUTEX_TYPE_STD:
+    case OS_MUTEX_TYPE_W:
         if (mutex->thread == current) {
             mutex->count--;
             mutex->count = mutexType | (mutex->count & OS_MUTEX_COUNT_MASK);
@@ -112,7 +112,7 @@ static void OSi_UnlockMutexCore(OSMutex *mutex, u32 type) {
             }
         }
         break;
-    case OS_MUTEX_TYPE_2:
+    case OS_MUTEX_TYPE_R:
         mutex->count--;
         mutex->count = mutexType | (mutex->count & OS_MUTEX_COUNT_MASK);
         if (OSi_GetMutexCount(mutex) == 0) {

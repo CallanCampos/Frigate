@@ -972,7 +972,7 @@ u32 ExifEnc_WriteHeader(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32
 
     // The software is the game code, the low word of the DSi's title ID
     titleId = 0;
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         titleId = *(u32 *)HW_TWL_TITLE_ID;
     }
     MI_CpuCopy8(&titleId, software, 4);
@@ -988,11 +988,11 @@ u32 ExifEnc_WriteHeader(u8 *dst, u32 width, u32 height, const u8 *thumbnail, u32
     sExifEncWritePos = 0;
     if (thumbnailSize == 0) {
         if (ExifEnc_BuildIfds(width, height, FALSE, thumbnail, thumbnailSize) != TRUE) {
-            sys_exit();
+            OS_Terminate();
         }
     } else {
         if (ExifEnc_BuildIfds(width, height, TRUE, thumbnail, thumbnailSize) != TRUE) {
-            sys_exit();
+            OS_Terminate();
         }
     }
 

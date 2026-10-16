@@ -108,7 +108,7 @@ static OSAllocCell *DLInsert(OSAllocCell *list, OSAllocCell *cell) {
 
 // NitroSDK's OS_AllocFromHeap: gives memory of the size, aligned to 0x20, from the heap (the
 // arena's current one when negative); NULL when the arena has no heaps or no cell is big enough
-void *OS_AllocFromHeap(int arena, int heap, s32 size) {
+void *OS_AllocFromHeap(int arena, int heap, u32 size) {
     OSHeapInfo *info;
     OSHeap *hp;
     OSAllocCell *cell;
@@ -127,7 +127,7 @@ void *OS_AllocFromHeap(int arena, int heap, s32 size) {
     hp = &info->heaps[heap];
     size = OS_ROUND_UP_32(size + OS_ALLOC_HEADER_SIZE);
     for (cell = hp->free; cell != NULL; cell = cell->next) {
-        if (size <= cell->size) {
+        if ((s32)size <= cell->size) {
             break;
         }
     }
@@ -189,11 +189,10 @@ void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
     info->heaps = (OSHeap *)((u8 *)info + sizeof(OSHeapInfo));
     info->numHeaps = maxHeaps;
     for (i = 0; i < info->numHeaps; i++) {
-        OSHeap *heaps = info->heaps;
+        OSHeap *hp = &info->heaps[i];
 
-        heaps[i].size = -1;
-        heaps[i].allocated = NULL;
-        heaps[i].free = NULL;
+        hp->size = -1;
+        hp->free = hp->allocated = NULL;
     }
     info->current = -1;
     info->arenaStart = (void *)OS_ROUND_UP_32((u32)info->heaps + heapsSize);
@@ -243,7 +242,7 @@ int OS_CreateExtraHeap(int arena) {
     u32 irq = OS_DisableInterrupts();
 
     info = sHeapInfo[arena];
-    if (!hw_isDSi() && sExtraHeap.heap < 0) {
+    if (!OS_IsRunOnTwl() && sExtraHeap.heap < 0) {
         for (heap = 0; heap < info->numHeaps; heap++) {
             hp = &info->heaps[heap];
             if (hp->size < 0) {
@@ -267,6 +266,8 @@ int OS_CreateExtraHeap(int arena) {
 
 // The usable size of an allocated block, which MSL's __sys_pointer_size asks for
 u32 OS_ReferentSize(int arena, void *ptr) {
-    OS_RestoreInterrupts(OS_DisableInterrupts());
+    u32 irq = OS_DisableInterrupts();
+
+    OS_RestoreInterrupts(irq);
     return ((OSAllocCell *)((u8 *)ptr - OS_ALLOC_HEADER_SIZE))->size - OS_ALLOC_HEADER_SIZE;
 }

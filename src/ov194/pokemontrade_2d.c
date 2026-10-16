@@ -687,11 +687,6 @@ static void func_ov194_021c38d4(PokemonTradeWork *wk, int column, int row, BoxPk
     func_ov194_021c38bc(wk, wk->icons[index][row], grey);
 }
 
-// NitroSDK's inline for the sub screen's OBJ VRAM
-static inline void *G2S_GetOBJCharPtr(void) {
-    return (void *)HW_DB_OBJ_VRAM;
-}
-
 // Where an image's characters are in a screen's OBJ VRAM, as NNS_G2dGetImageLocation(), inlined
 static inline u32 ImageProxy_GetLocation(const NNSG2dImageProxy *proxy, int type) {
     return proxy->vramLocation.baseAddrOfVram[type];

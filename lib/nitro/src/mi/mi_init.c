@@ -6,7 +6,7 @@
 // MI_Init. The call into the LTD autoload goes through a veneer, which the linker adds after this function
 void MI_Init(void) {
     MI_SetWramBank(MI_WRAM_ARM7_ALL);
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02768138();
     }
     MI_StopDma(0);

@@ -4,8 +4,8 @@
 #include "types.h"
 
 // The part of DWC (TWL-DWC 5.3, ARM9 main) that keeps the console's Wi-Fi settings and its Wi-Fi ID in the NVRAM: the
-// bm/ files of lib/dwc. The ROM names none of it, so the names of the types and their fields are ours, taken from what
-// the code does, and the calls are still named after their addresses.
+// bm/ files of lib/dwc. The ROM names none of it, so the names of the types, their fields and the DWCBm_ functions are
+// ours, taken from what the code does (DWC_BM_Init is the SDK's).
 //
 // The Wi-Fi ID is two 43-bit numbers, a confirmed one and a pending one made on this console, and two more fields that
 // the pending one is made from. The NVRAM keeps all of it bit-packed in 14 bytes, at offset 0xf0 of each page of the
@@ -103,8 +103,8 @@ const u8 *DWCBm_PackWifiIdInfo(const DWCBmWifiIdInfo *info);
 const u8 *DWCBm_GetPackedWifiIdInfo(void);
 
 // What the checks of dwc_bm_check.c return: 0 when the settings are whole, or were made whole again without losing a
-// connection, or a negative number for what failed or was lost. DWC_Init takes any of them as the settings being
-// destroyed
+// connection, or a negative number for what failed or was lost. DWC_InitForProduction takes any of them as the settings
+// being destroyed
 typedef enum DWCBmCheckResult {
     DWC_BM_CHECK_WRITE_FAILED = -10000,    // the repaired settings couldn't be written
     DWC_BM_CHECK_READ_FAILED = -10001,     // the NVRAM couldn't be read

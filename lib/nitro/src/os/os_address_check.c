@@ -5,7 +5,7 @@
 // Whether an address is in the extended main memory: 0x0d000000 to 0x0e000000 on a DSi (the 16 MB that its 32 MB main
 // memory has beyond the DS's), 0x02400000 to 0x02800000 otherwise. Only the WM library's setup calls it
 BOOL OSi_IsAddressInMainMemoryEx(u32 addr) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         return addr >= 0x0d000000 && addr < 0x0e000000;
     }
     return addr >= 0x02400000 && addr < 0x02800000;

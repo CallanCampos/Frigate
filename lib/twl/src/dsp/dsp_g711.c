@@ -18,7 +18,7 @@ static DSPG711State sG711State;
 static DSPProcessContext sG711Context;
 
 // Opens the component's image, as a file of memory, in file
-BOOL func_0270723c(FSFile *file) {
+BOOL DSP_OpenStaticComponentG711Core(FSFile *file) {
     if (!FS_IsAvailable()) {
         FS_Init(FS_DMA_NOT_USE);
     }
@@ -27,7 +27,7 @@ BOOL func_0270723c(FSFile *file) {
 }
 
 // Starts the process from the image in file, into the banks of WRAM B and C that slotB and slotC allow
-BOOL func_02707278(FSFile *file, int slotB, int slotC) {
+BOOL DSP_LoadG711Core(FSFile *file, int slotB, int slotC) {
     if (!sG711State.loaded) {
         DSP_InitProcessContext(&sG711Context, "g711");
         if (DSP_ExecuteProcess(&sG711Context, file, slotB, slotC)) {
@@ -37,7 +37,7 @@ BOOL func_02707278(FSFile *file, int slotB, int slotC) {
     return sG711State.loaded;
 }
 
-void func_027072e0(void) {
+void DSP_UnloadG711Core(void) {
     if (sG711State.loaded) {
         DSP_QuitProcess(&sG711Context);
         sG711State.loaded = FALSE;

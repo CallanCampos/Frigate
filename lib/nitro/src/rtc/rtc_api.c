@@ -194,7 +194,7 @@ int RTC_GetDateTime(RTCDate *date, RTCTime *time) {
     return rtcWork.commonResult;
 }
 
-RTCWork *func_0207cd18(void) {
+RTCWork *RTCi_GetSysWork(void) {
     return &rtcWork;
 }
 
@@ -368,7 +368,7 @@ static void RtcCommonCallback(u32 tag, u32 data, BOOL err) {
             }
             break;
         default:
-            if (hw_isDSi() == TRUE) {
+            if (OS_IsRunOnTwl() == TRUE) {
                 result = RTCi_ProcessExCommand();
             } else {
                 result = RTC_RESULT_INVALID_COMMAND;

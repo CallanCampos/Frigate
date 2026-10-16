@@ -24,9 +24,9 @@ typedef struct MIiGXDmaState {
 
 static MIiGXDmaState sGXDmaState;
 
-static void func_020784d0(void);
-static void func_02078550(void *arg);
-static void func_0207860c(void *arg);
+static void MIi_FIFOCallback(void);
+static void MIi_DMACallback(void *arg);
+static void MIi_DMAFastCallback(void *arg);
 
 void MI_SendGXCommandAsync(u32 dmaNo, const void *src, u32 length, MIDmaCallback callback, void *arg) {
     u32 enabled;
@@ -54,14 +54,14 @@ void MI_SendGXCommandAsync(u32 dmaNo, const void *src, u32 length, MIDmaCallback
     sGXDmaState.fifoIrqCondition = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_FIFO_IRQ_MASK) >> REG_G3X_GXSTAT_FIFO_IRQ_SHIFT;
     sGXDmaState.irqFunc = OS_GetIrqFunction(OS_IE_GXFIFO);
     reg_G3X_GXSTAT = (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FIFO_IRQ_MASK) | (1 << REG_G3X_GXSTAT_FIFO_IRQ_SHIFT);
-    OS_SetIrqFunction(OS_IE_GXFIFO, func_020784d0);
+    OS_SetIrqFunction(OS_IE_GXFIFO, MIi_FIFOCallback);
     OS_EnableIrqMask(OS_IE_GXFIFO);
-    func_020784d0();
+    MIi_FIFOCallback();
     OS_RestoreInterrupts(enabled);
 }
 
-// The FIFO's interrupt: sends the next part, and the last with a DMA that ends in func_02078550
-static void func_020784d0(void) {
+// The FIFO's interrupt: sends the next part, and the last with a DMA that ends in MIi_DMACallback
+static void MIi_FIFOCallback(void) {
     u32 src;
     u32 part = sGXDmaState.length;
 
@@ -75,19 +75,19 @@ static void func_020784d0(void) {
     sGXDmaState.length -= part;
     sGXDmaState.src += part;
     if (sGXDmaState.length == 0) {
-        OSi_EnterDmaCallback(sGXDmaState.dmaNo, func_02078550, NULL);
-        dma_beginSyncEx(sGXDmaState.dmaNo, src, REG_GXFIFO_ADDR,
-                        MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX | (part >> 2), 0);
+        OSi_EnterDmaCallback(sGXDmaState.dmaNo, MIi_DMACallback, NULL);
+        MIi_DmaSetParameters(sGXDmaState.dmaNo, src, REG_GXFIFO_ADDR,
+                             MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX | (part >> 2), 0);
         OS_ResetRequestIrqMask(OS_IE_GXFIFO);
     } else {
-        dma_beginSyncEx(sGXDmaState.dmaNo, src, REG_GXFIFO_ADDR,
-                        MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX | (part >> 2), 0);
+        MIi_DmaSetParameters(sGXDmaState.dmaNo, src, REG_GXFIFO_ADDR,
+                             MI_DMA_ENABLE | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX | (part >> 2), 0);
         OS_ResetRequestIrqMask(OS_IE_GXFIFO);
     }
 }
 
 // The end of the last part: restores what the FIFO interrupted for, and calls back
-static void func_02078550(void *arg) {
+static void MIi_DMACallback(void *arg) {
     MIDmaCallback callback;
     void *callbackArg;
 
@@ -119,15 +119,15 @@ void MI_SendGXCommandAsyncFast(u32 dmaNo, const void *src, u32 length, MIDmaCall
     MIi_CheckAnotherAutoDMA(dmaNo, MI_DMA_TIMING_GXFIFO);
     MIi_CheckDma0SourceAddress(dmaNo, (u32)src, length, MI_DMA_SRC_INC);
     MI_WaitDma(dmaNo);
-    OSi_EnterDmaCallback(dmaNo, func_0207860c, NULL);
-    dma_beginSyncEx(dmaNo, (u32)src, REG_GXFIFO_ADDR,
-                    MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_TIMING_GXFIFO | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX |
-                        (length >> 2),
-                    0);
+    OSi_EnterDmaCallback(dmaNo, MIi_DMAFastCallback, NULL);
+    MIi_DmaSetParameters(dmaNo, (u32)src, REG_GXFIFO_ADDR,
+                         MI_DMA_ENABLE | MI_DMA_IF_ENABLE | MI_DMA_TIMING_GXFIFO | MI_DMA_32BIT_BUF | MI_DMA_DEST_FIX |
+                             (length >> 2),
+                         0);
 }
 
 // The end of the DMA: calls back
-static void func_0207860c(void *arg) {
+static void MIi_DMAFastCallback(void *arg) {
     void *callbackArg;
     MIDmaCallback callback;
 

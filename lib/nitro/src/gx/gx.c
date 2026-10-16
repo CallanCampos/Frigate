@@ -6,7 +6,7 @@
 #include "nitro/os.h"
 #include "nitro/pm.h"
 
-// Whether the main engine's display is on, and the mode it shows when it is turned on again
+// Whether the main engine's display is on, and the mode it shows when it is turned on again (swan's names)
 static u16 g_GfxEngineAEnabled = TRUE;
 u32 GXi_DmaId = GX_DEFAULT_DMAID;
 u16 GXi_VRamLockId;
@@ -20,7 +20,7 @@ void GX_Init(void) {
     while (GXi_VRamLockId == 0) {
         s32 lockId = OS_GetLockID();
         if (lockId == OS_LOCK_ID_ERROR) {
-            sys_exit();
+            OS_Terminate();
         }
         GXi_VRamLockId = lockId;
     }
@@ -30,18 +30,18 @@ void GX_Init(void) {
     // kind of channel is tested once for both fills
     if (GXi_DmaId != GX_DMA_NOT_USE) {
         if (GXi_DmaId > MI_DMA_MAX_NUM) {
-            func_0276814c(GXi_DmaId - 4, &reg_G2_BG0CNT, 0, 0x60);
+            MI_NDmaFill(GXi_DmaId - 4, (void *)&reg_G2_BG0CNT, 0, 0x60);
             reg_GX_MASTER_BRIGHT = 0;
-            func_0276814c(GXi_DmaId - 4, &reg_GXS_DB_DISPCNT, 0, 0x70);
+            MI_NDmaFill(GXi_DmaId - 4, (void *)&reg_GXS_DB_DISPCNT, 0, 0x70);
         } else {
-            MIi_DmaFill32(GXi_DmaId, &reg_G2_BG0CNT, 0, 0x60, TRUE);
+            MIi_DmaFill32(GXi_DmaId, (void *)&reg_G2_BG0CNT, 0, 0x60, TRUE);
             reg_GX_MASTER_BRIGHT = 0;
-            MIi_DmaFill32(GXi_DmaId, &reg_GXS_DB_DISPCNT, 0, 0x70, TRUE);
+            MIi_DmaFill32(GXi_DmaId, (void *)&reg_GXS_DB_DISPCNT, 0, 0x70, TRUE);
         }
     } else {
-        MIi_CpuClear32(0, &reg_G2_BG0CNT, 0x60);
+        MI_CpuClear32((void *)&reg_G2_BG0CNT, 0x60);
         reg_GX_MASTER_BRIGHT = 0;
-        MIi_CpuClear32(0, &reg_GXS_DB_DISPCNT, 0x70);
+        MI_CpuClear32((void *)&reg_GXS_DB_DISPCNT, 0x70);
     }
     reg_G2_BG2PA = 0x100;
     reg_G2_BG2PD = 0x100;
@@ -87,7 +87,7 @@ void GX_DispOff(void) {
     g_GfxEngineAEnabled = FALSE;
     g_GfxEngineAMode = (dispcnt & REG_GX_DISPCNT_MODE_MASK) >> REG_GX_DISPCNT_MODE_SHIFT;
     reg_GX_DISPCNT = dispcnt & ~REG_GX_DISPCNT_MODE_MASK;
-    func_0207f6b8();
+    PMi_SetDispOffCount();
 }
 
 void GX_DispOn(void) {

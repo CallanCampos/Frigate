@@ -308,7 +308,7 @@ static void MBWm_ParentCallback(void *arg) {
             sWmWork->commCallback(MB_WM_EVENT_IND_3, arg);
             return;
         case 0x16:
-            sys_exit();
+            OS_Terminate();
             return;
         case 0x14:
         case 0x15:
@@ -580,7 +580,7 @@ static void MBWm_ChildCallback(void *arg) {
     case MB_WM_API_INDICATION:
         switch (((WMIndCallback *)arg)->state) {
         case 0x16:
-            sys_exit();
+            OS_Terminate();
             return;
         case 0x17:
             return;
@@ -809,7 +809,7 @@ void MB_End(void) {
     u32 irq = OS_DisableInterrupts();
 
     if (gMBCommWork->started == 0) {
-        sys_exit();
+        OS_Terminate();
     }
     MBWm_End();
     OS_RestoreInterrupts(irq);

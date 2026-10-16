@@ -228,7 +228,7 @@ NVRAMResult NVRAM_ReadDataBytes(u32 address, u32 size, void *buf) {
     }
     if (result == NVRAM_RESULT_SUCCESS) {
         if (!OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK)) {
-            sys_exit();
+            OS_Terminate();
         }
     }
     return result;
@@ -419,7 +419,7 @@ NVRAMResult NVRAM_WriteDataBytes(u32 address, u32 size, const void *src) {
     }
     if (result == NVRAM_RESULT_SUCCESS) {
         if (!OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK)) {
-            sys_exit();
+            OS_Terminate();
         }
     }
     return result;
@@ -541,7 +541,7 @@ NVRAMResult NVRAM_VerifyDataBytes(u32 address, u32 size, const void *src) {
     }
     if (result == NVRAM_RESULT_SUCCESS) {
         if (!OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK)) {
-            sys_exit();
+            OS_Terminate();
         }
     }
     return result;
@@ -573,7 +573,7 @@ static void func_02079944(u32 tag, u32 data, BOOL err) {
 // The callback of the synchronous calls, which sends the result to the queue that they wait on
 static void func_0207997c(NVRAMResult result, void *arg) {
     if (!OS_SendMessage((OSMessageQueue *)arg, (OSMessage)result, OS_MESSAGE_NOBLOCK)) {
-        sys_exit();
+        OS_Terminate();
     }
 }
 

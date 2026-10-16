@@ -53,10 +53,11 @@ void OS_InitArena(void) {
 // NitroSDK's OS_InitArenaEx: sets the limits of the extended main memory's arena and, on a DS, protects the main
 // memory (region 1 is its first 4 MB, region 2 the 4 KB at 0x027ff000). A DSi does the protecting in the LTD module
 void OS_InitArenaEx(void) {
+    // The SDK reads the console type here and drops it; the read fills OS_GetConsoleType's cache
     OS_GetConsoleType();
     OS_SetArenaHi(OS_ARENA_MAINEX, OS_GetInitArenaHi(OS_ARENA_MAINEX));
     OS_SetArenaLo(OS_ARENA_MAINEX, OS_GetInitArenaLo(OS_ARENA_MAINEX));
-    if (!hw_isDSi()) {
+    if (!OS_IsRunOnTwl()) {
         OS_SetProtectionRegion(1, 0x02000000, OS_PROTECTION_SIZE_4MB);
         OS_SetProtectionRegion(2, 0x027ff000, OS_PROTECTION_SIZE_4KB);
     } else {
@@ -77,7 +78,7 @@ void *OS_GetArenaLo(int arena) {
 static void *OS_GetInitArenaHi(int arena) {
     switch (arena) {
     case OS_ARENA_MAIN:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             return (void *)0x02f80000;
         }
         return (void *)0x023e0000;
@@ -88,7 +89,7 @@ static void *OS_GetInitArenaHi(int arena) {
             return NULL;
         }
         consoleSize = OS_GetConsoleType() & OS_CONSOLE_SIZE_MASK;
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             if (consoleSize == OS_CONSOLE_SIZE_16MB) {
                 return NULL;
             }
@@ -127,7 +128,7 @@ static void *OS_GetInitArenaHi(int arena) {
 static void *OS_GetInitArenaLo(int arena) {
     switch (arena) {
     case OS_ARENA_MAIN:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             return LTD_AUTOLOAD_0_BSS_END;
         }
         return OV290_BSS_END;
@@ -138,18 +139,16 @@ static void *OS_GetInitArenaLo(int arena) {
             return NULL;
         }
         consoleSize = OS_GetConsoleType() & OS_CONSOLE_SIZE_MASK;
-        if (hw_isDSi()) {
-            void *lo = NULL;
-            if (consoleSize != OS_CONSOLE_SIZE_16MB) {
-                lo = (void *)SDK_MAINEX_ARENA_LO;
+        if (OS_IsRunOnTwl()) {
+            if (consoleSize == OS_CONSOLE_SIZE_16MB) {
+                return NULL;
             }
-            return lo;
+            return (void *)SDK_MAINEX_ARENA_LO;
         } else {
-            void *lo = NULL;
-            if (consoleSize != OS_CONSOLE_SIZE_4MB) {
-                lo = (void *)0x02400060;
+            if (consoleSize == OS_CONSOLE_SIZE_4MB) {
+                return NULL;
             }
-            return lo;
+            return (void *)0x02400060;
         }
     }
     case OS_ARENA_ITCM:

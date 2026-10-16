@@ -280,7 +280,7 @@ static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
     if (mode == 1) {
         *size = WCM_WORK_SIZE;
     } else if (mode == 2) {
-        if (!hw_isDSi()) {
+        if (!OS_IsRunOnTwl()) {
             return FALSE;
         }
         *size = 0x4800;
@@ -325,7 +325,7 @@ s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
         result = WCM_StartupStep1();
         break;
     case 2:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             result = func_02769930();
         } else {
             result = 7;
@@ -369,7 +369,7 @@ s32 WCM_CleanupAsync(void) {
         result = WCM_StartupStep2();
         break;
     case 2:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             result = func_02769a30();
         } else {
             result = 7;
@@ -406,7 +406,7 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
         result = WCM_StartSearchStep(bssid, essid, option);
         break;
     case 2:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             result = func_02769aa4(bssid, essid, option);
         } else {
             result = 7;
@@ -511,7 +511,7 @@ s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
         result = WCM_StartConnectStep();
         break;
     case 2:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             result = func_02769b80();
         } else {
             result = 7;
@@ -559,7 +559,7 @@ s32 WCM_DisconnectAsync(void) {
             result = WCM_StartDisconnectStep();
             break;
         case 2:
-            if (hw_isDSi()) {
+            if (OS_IsRunOnTwl()) {
                 result = func_02769c70();
             } else {
                 result = 7;
@@ -615,7 +615,7 @@ s32 WCM_RestoreIdleAsync(void) {
             result = WCM_RestoreIdleStep();
             break;
         case 2:
-            if (hw_isDSi()) {
+            if (OS_IsRunOnTwl()) {
                 result = func_02769ce8();
             } else {
                 result = 7;
@@ -700,7 +700,7 @@ s32 WCM_GetChannelMask(void) {
     case 1:
         return WCM_GetDsAllowedChannelSpanMask();
     case 2:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             return func_02769e54();
         }
         break;
@@ -820,7 +820,7 @@ static void WCM_TimeoutAlarmHandler(void) {
 }
 
 static s32 WCM_GetDefaultWirelessMode(void) {
-    return hw_isDSi() ? 2 : 1;
+    return OS_IsRunOnTwl() ? 2 : 1;
 }
 
 void WCM_ClearApListBuffer(void) {
@@ -892,7 +892,7 @@ void WCM_OnBeaconReceived(const WMBssDesc *bss, u16 scanLinkLevel) {
     if (work == NULL || work->apListLocked != 0) {
         return;
     }
-    if (hw_isDSi() && work->wirelessMode == 2 && WCM_FindVendorIE(bss) != NULL) {
+    if (OS_IsRunOnTwl() && work->wirelessMode == 2 && WCM_FindVendorIE(bss) != NULL) {
         return;
     }
     if (work->wirelessMode == 1 && bss->gameInfoLength != 0) {
@@ -1082,7 +1082,7 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     if (bss == NULL) {
         return NULL;
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         if (work->wirelessMode == 2 && bss->otherElementCount != 0) {
             WCMVendorIE *ie = WCM_GetInformationElement(bss, 0xdd, buf);
             if (ie != NULL && ie->magicNumber == 1) {
@@ -1193,7 +1193,7 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
         WCM_SendFrame(dst, work, (u16)sentLen, NULL);
         break;
     case 2:
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             func_02769dc4(dst, work, (u16)sentLen, NULL);
         }
         break;
@@ -1207,7 +1207,7 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
 
 void WCM_ReleaseIrqOwnedMutex(OSMutex *mutex) {
     // The IRQ-handler address is an owner marker, not an OSThread object; this path releases no ownership-list link.
-    if (mutex->thread == (OSThread *)CPU_IRQInvoke) {
+    if (mutex->thread == (OSThread *)OS_IrqHandler) {
         mutex->count--;
         if (mutex->count == 0) {
             mutex->thread = NULL;

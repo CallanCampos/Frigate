@@ -3375,7 +3375,7 @@ static void WifiP2PMatch_OnFriendCode(int code, int param, void *work) {
 
 // Starts the network with the Wi-Fi heap of the machine, or only gives it the init data again
 static void WifiP2PMatch_NetInit(WIFIP2PMATCH_WORK *wk, BOOL init) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         sWifiP2PMatchNetInit.wifiHeapSize = 0x79000;
     } else {
         sWifiP2PMatchNetInit.wifiHeapSize = 0x5e400;

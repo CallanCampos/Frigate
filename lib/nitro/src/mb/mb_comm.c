@@ -421,7 +421,7 @@ static void MBComm_LoadCacheBlock(MBTask *task) {
     if (archive == NULL) {
         archive = cache->archive;
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         if (archive == FS_FindArchive("rom", 3)) {
             const MBTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
             u32 firstEnd = header->ntrRegionOffset + header->ntrRegionSize;
@@ -505,7 +505,7 @@ static int MBComm_SendBlock(void) {
                     }
                 }
                 if (oldest == NULL) {
-                    sys_exit();
+                    OS_Terminate();
                 }
                 cache->missCounter = 2;
                 oldest->state = MB_CACHE_ENTRY_LOADING;

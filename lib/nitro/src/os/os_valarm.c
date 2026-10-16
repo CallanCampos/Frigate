@@ -115,7 +115,7 @@ void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handle
     u32 frame;
 
     if (alarm == NULL || alarm->handler != NULL) {
-        sys_exit();
+        OS_Terminate();
     }
     current = GX_GetVCount();
     frame = OSi_GetVFrame(current);

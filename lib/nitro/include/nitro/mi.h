@@ -60,7 +60,7 @@ typedef struct MIDmaRegs {
 #define MI_DMA_DEST_DEC 0x00200000
 #define MI_DMA_DEST_FIX 0x00400000
 
-// What dma_beginSyncEx does besides writing the three registers (swan's name for NitroSDK's MIi_DmaSetParams, in ITCM):
+// What MIi_DmaSetParameters does besides writing the three registers (TwlSDK's name, in ITCM; swan's dma_beginSyncEx):
 // - NO_INTR: leaves interrupts as they are, where it would disable them while it writes
 // - WAIT: reads DMA0's source register back twice, so that the CPU has waited for a transfer that it started, and
 //   unless NO_DMA0_FIX, gives DMA0 a dummy transfer of one word afterwards
@@ -75,7 +75,7 @@ typedef struct MIDmaRegs {
 typedef void (*MIDmaCallback)(void *arg);
 
 // Writes a channel's source, destination and control. In ITCM
-void dma_beginSyncEx(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags);
+void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags);
 
 // NitroSDK's MIi_DmaFill32, which fills size bytes with a word by DMA, starting it at once if dmaEnable. swan calls it
 // dma_fill
@@ -190,6 +190,10 @@ static inline void MI_SetMainMemoryPriority(MIProcessor proc) {
     reg_MI_EXMEMCNT = (u16)((reg_MI_EXMEMCNT & ~REG_MI_EXMEMCNT_EP_MASK) | (proc << REG_MI_EXMEMCNT_EP_SHIFT));
 }
 
+// NitroSDK's MI_SwapEndian32: the word with its bytes in the other order, as the card's commands go
+#define MI_SwapEndian32(x)                                                                                             \
+    ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >> 8) | (((x) & 0x0000ff00) << 8) | ((x) << 24))
+
 // NitroSDK's MI_SwapWord, in assembly: stores the word at the address and returns the one that was there. os.h still
 // declares it too
 u32 MI_SwapWord(u32 data, vu32 *destp); // swan's memswap
@@ -197,9 +201,9 @@ u32 MI_SwapWord(u32 data, vu32 *destp); // swan's memswap
 // Decompresses LZ77 data, which starts with a word holding its decompressed size in its upper 24 bits.
 void MI_UncompressLZ8(const void *src, void *dest); // swan's sys_uncomp_lz1x
 // Expands an image that was compressed backward in place, given the address of its end: NitroSDK's
-// MIi_UncompressBackward, swan's sys_uncomp_blz, which the startup code has and the overlays' loading (fs_overlay.c)
+// MIi_UncompressBackward (swan's sys_uncomp_blz), which the startup code has and the overlays' loading (fs_overlay.c)
 // uses
-void sys_uncomp_blz(void *end);
+void MIi_UncompressBackward(void *end);
 
 static inline u32 MI_GetUncompressedSize(const void *src) {
     return *(u32 *)src >> 8;

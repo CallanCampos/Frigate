@@ -1,5 +1,6 @@
 #include "nhttp_internal.h"
 #include "nitro/mi.h"
+#include "nitro/std.h"
 
 // NHTTP_stdlib: the library's C library, over NitroSDK's, and its text conversions
 

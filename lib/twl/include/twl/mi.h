@@ -4,7 +4,8 @@
 #include "types.h"
 
 // TwlSDK's memory functions for the DSi's hardware: the shared WRAM B and C, which the DSP needs, and the new DMA
-// channels. They are in the LTD autoload.
+// channels. They are in the LTD autoload. The functions have TwlSDK's names where the code shows them; the ones still
+// named by address are not known.
 
 typedef enum {
     MI_WRAM_A,
@@ -20,10 +21,10 @@ typedef enum {
 
 typedef void (*MINDmaCallback)(void *arg);
 
-int func_02768cf8(MIWram wram, MIWramProc proc); // MI_FreeWram
-int func_02769080(MIWram wram, MIWramProc proc); // MI_CancelWram
-BOOL func_02768234(u32 ndmaNo);                  // MI_IsNDmaBusy
-void func_02768270(u32 ndmaNo);                  // MI_StopNDma
+int MI_FreeWram(MIWram wram, MIWramProc proc);
+int MI_CancelWram(MIWram wram, MIWramProc proc);
+BOOL MI_IsNDmaBusy(u32 ndmaNo);
+void MI_StopNDma(u32 ndmaNo);
 // Receives a camera frame by NDMA, CAMERA_DmaRecvAsync's body
 void func_02768378(u32 ndmaNo, void *dest, u32 unitWords, u32 length, u32 unk, MINDmaCallback callback, void *arg);
 
@@ -34,10 +35,10 @@ void func_02768138(void);
 // Stops the four new DMA channels, which OS_ResetSystem, the card's pull-out and PM_ForceToPowerOff do on a DSi
 void func_02768298(void);
 
-// The NDMA fills, the first with a callback and its argument, the copies, the same, and the wait for a channel to be
-// done, which GX's loaders use for the DSi's channels; the linker reaches them through veneers
-void func_0276814c(u32 ndmaNo, void *dest, u32 data, u32 size);
-void func_027681b8(u32 ndmaNo, void *dest, u32 data, u32 size, MINDmaCallback callback, void *arg);
+// The NDMA fills and copies, each without a callback and then with one and its argument, and the wait for a channel to
+// be done, which GX's loaders use for the DSi's channels; the linker reaches them through veneers
+void MI_NDmaFill(u32 ndmaNo, void *dest, u32 data, u32 size);
+void MI_NDmaFillAsync(u32 ndmaNo, void *dest, u32 data, u32 size, MINDmaCallback callback, void *arg);
 void MI_NDmaCopy(u32 ndmaNo, const void *src, void *dest, u32 size);
 void MI_NDmaCopyAsync(u32 ndmaNo, const void *src, void *dest, u32 size, MINDmaCallback callback, void *arg);
 void MI_WaitNDma(u32 ndmaNo);
@@ -50,10 +51,10 @@ void MI_WaitNDma(u32 ndmaNo);
 BOOL func_0276919c(MIWram wram, int bank);
 // The processor that the hardware gives the bank to
 MIWramProc func_02768770(MIWram wram, int bank);
-// MI_AllocWramSlot: gives count free banks from bank to proc
-int func_02768c04(MIWram wram, int bank, int count, MIWramProc proc);
-// MI_FreeWramSlot: takes the banks back from proc
-int func_02768d90(MIWram wram, int bank, int count, MIWramProc proc);
+// Gives count free banks from bank to proc
+int MI_AllocWramSlot(MIWram wram, int bank, int count, MIWramProc proc);
+// Takes the banks back from proc
+int MI_FreeWramSlot(MIWram wram, int bank, int count, MIWramProc proc);
 // Where WRAM B is in the ARM9's memory, WRAM C, and either of them
 void *func_027687a0(void);
 void *func_027687bc(void);

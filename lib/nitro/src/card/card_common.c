@@ -7,9 +7,6 @@
 #include "nitro/pxi.h"
 #include "twl/card.h"
 
-// The size of the ROM header that CARD copies (nitro/hw.h has the addresses)
-#define HW_CARD_ROM_HEADER_SIZE 0x160
-
 // What CARD_LockRom waits with: an event, signaled once the card is locked, and the vertical-blank alarm that polls for
 // it
 typedef struct {
@@ -85,7 +82,7 @@ void CARD_Init(void) {
         if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
             CARD_Enable(TRUE);
         }
-        func_0206fed8();
+        CARD_InitPulledOutCallback();
     }
 }
 
@@ -95,7 +92,7 @@ static BOOL CARD_IsEnabled(void) {
 
 void CARD_CheckEnabled(void) {
     if (!CARD_IsEnabled()) {
-        sys_exit();
+        OS_Terminate();
     }
 }
 
@@ -154,7 +151,7 @@ static void CARDi_LockResource(u16 lockId, int target) {
     u32 irq = OS_DisableInterrupts();
     if (p->lockOwner == lockId) {
         if (p->lockTarget != target) {
-            sys_exit();
+            OS_Terminate();
         }
     } else {
         while (p->lockOwner != OS_LOCK_ID_ERROR ? TRUE : FALSE) {
@@ -171,10 +168,10 @@ static void CARDi_UnlockResource(u16 lockId, int target) {
     CARDiCommon *p = &cardi_common;
     u32 irq = OS_DisableInterrupts();
     if (p->lockOwner != lockId || p->lockRef == 0) {
-        sys_exit();
+        OS_Terminate();
     } else {
         if (p->lockTarget != target) {
-            sys_exit();
+            OS_Terminate();
         }
         if (--p->lockRef == 0) {
             p->lockOwner = OS_LOCK_ID_ERROR;
@@ -190,7 +187,7 @@ u32 CARDi_GetAccessLevel(void) {
     u32 level = 0;
     if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
         level = CARD_ACCESS_LEVEL_FULL;
-    } else if (!hw_isDSi()) {
+    } else if (!OS_IsRunOnTwl()) {
         level = CARD_ACCESS_LEVEL_FULL;
     } else {
         const CARDTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
@@ -328,8 +325,8 @@ const CARDDmaInterface *CARDi_GetDmaInterface(u32 dma) {
     if (dma <= 3) {
         if (!twl) {
             interface = &sCardDmaInterface;
-        } else if (!hw_isDSi()) {
-            sys_exit();
+        } else if (!OS_IsRunOnTwl()) {
+            OS_Terminate();
         } else {
             interface = &CARDi_NdmaInterface;
         }

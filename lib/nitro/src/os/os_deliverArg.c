@@ -36,7 +36,7 @@ void OS_InitDeliverArg(OSDeliverArgInfo *info, u32 reserved) {
     OSi_deliverArg.info->argSpace = sizeof(info->args) - reserved;
     OSi_deliverArg.info->argCount = 0;
     OSi_deliverArg.args = OSi_deliverArg.info->args;
-    OSi_deliverArg.info->args[0] = 0;
+    OSi_deliverArg.args[0] = 0;
     OSi_deliverArg.args[1] = 0;
 }
 
@@ -54,7 +54,7 @@ int OS_EncodeDeliverArg(void) {
     info->flags = OSi_DELIVER_ARG_FLAGS_DELIVERED | OSi_DELIVER_ARG_FLAGS_PENDING;
     OSi_deliverArgTitleId = OSi_deliverArg.info->titleId;
     OSi_deliverArg.info->crc16 = 0;
-    OSi_deliverArg.info->crc16 = GetCRC16(0xffff, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
+    OSi_deliverArg.info->crc16 = SVC_GetCRC16(0xffff, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
     MI_CpuCopy8(OSi_deliverArg.info, (void *)HW_DELIVER_ARG_BUF, sizeof(OSDeliverArgInfo));
     MI_CpuFill8(OSi_deliverArg.info, 0, sizeof(OSDeliverArgInfo));
     OSi_deliverArg.state = 0;
@@ -75,10 +75,10 @@ int OS_DecodeDeliverArg(void) {
     MI_CpuCopy8((void *)HW_DELIVER_ARG_BUF, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
     crc = OSi_deliverArg.info->crc16;
     OSi_deliverArg.info->crc16 = 0;
-    OSi_deliverArg.info->crc16 = GetCRC16(0xffff, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
+    OSi_deliverArg.info->crc16 = SVC_GetCRC16(0xffff, OSi_deliverArg.info, sizeof(OSDeliverArgInfo));
     if (crc != OSi_deliverArg.info->crc16) {
         MI_CpuFill8(OSi_deliverArg.info, 0, sizeof(OSDeliverArgInfo));
-        func_0207c698();
+        OS_FinalizeDeliverArg();
         return 0;
     }
     OSi_deliverArg.info->flags &= ~OSi_DELIVER_ARG_FLAGS_PENDING;
@@ -87,12 +87,12 @@ int OS_DecodeDeliverArg(void) {
 }
 
 // Forgets the buffer, so that nothing is sent or read
-void func_0207c698(void) {
+void OS_FinalizeDeliverArg(void) {
     OSi_deliverArg.state = 0;
 }
 
 // The title ID of the program that sent the block, or 0 when it was not taken
-u64 func_0207c6a4(void) {
+u64 OS_GetTitleIdFromDeliverArg(void) {
     if (OSi_deliverArg.state & OSi_DELIVER_ARG_STATE_READY) {
         return OSi_deliverArg.info->titleId;
     }

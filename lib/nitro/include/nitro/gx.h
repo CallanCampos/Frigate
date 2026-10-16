@@ -275,7 +275,7 @@ static inline void G2_SetOBJColorMode(GXOamAttr *oam, int color) {
 #define GX_BLEND_PLANEMASK_BD 0x20
 
 #define GX_DISPMODE_GRAPHICS 1
-// Show VRAM A to D instead of the main engine's output; the display capture can write to D
+// Show VRAM A to D instead of the main engine's output (any of them can hold a display capture)
 #define GX_DISPMODE_VRAM_A 2
 #define GX_DISPMODE_VRAM_B 6
 #define GX_DISPMODE_VRAM_C 10
@@ -749,9 +749,13 @@ static inline void GX_SetDispSelect(int select) {
     reg_GX_POWCNT = (u16)((reg_GX_POWCNT & ~REG_GX_POWCNT_DSEL_MASK) | (select << REG_GX_POWCNT_DSEL_SHIFT));
 }
 
-// The main screen's OBJ characters
+// The main screen's OBJ characters, and the sub screen's
 static inline void *G2_GetOBJCharPtr(void) {
     return (void *)HW_OBJ_VRAM;
+}
+
+static inline void *G2S_GetOBJCharPtr(void) {
+    return (void *)HW_DB_OBJ_VRAM;
 }
 
 static inline int GX_GetDispSelect(void) {
@@ -1560,10 +1564,10 @@ void GX_DispOn(void); // swan's gfxEngineEnableA
 #define reg_GX_VRAMCNT_HI (*(vu16 *)0x04000248)
 #define REG_GX_VRAMCNT_MST_SHIFT 0
 #define REG_GX_VRAMCNT_OFS_SHIFT 3
-#define REG_GX_VRAMCNT_E_MASK 0x80
-#define GX_VRAMCNT(mst, ofs) ((u8)(REG_GX_VRAMCNT_E_MASK | ((ofs) << REG_GX_VRAMCNT_OFS_SHIFT) | (mst)))
+#define REG_GX_VRAMCNT_ENABLE_MASK 0x80
+#define GX_VRAMCNT(mst, ofs) ((u8)(REG_GX_VRAMCNT_ENABLE_MASK | ((ofs) << REG_GX_VRAMCNT_OFS_SHIFT) | (mst)))
 // The bank in LCDC mode: the CPU sees it at its HW_LCDC_VRAM address
-#define GX_VRAMCNT_LCDC REG_GX_VRAMCNT_E_MASK
+#define GX_VRAMCNT_LCDC REG_GX_VRAMCNT_ENABLE_MASK
 
 // The bits of DISPCNT and DISP3DCNT that the banks of the extended palettes and of the textures turn on
 #define REG_GX_DISPCNT_BGEXTPLTT_MASK 0x40000000
@@ -1609,8 +1613,7 @@ extern GXState gGXState; // swan's g_GfxVRAMLCDCBanks
 #define HW_DB_BG_VRAM 0x06200000
 #define HW_DB_BG_VRAM_SIZE 0x20000
 #define HW_OBJ_VRAM_SIZE 0x40000
-// The sub engine's OBJ characters
-#define HW_DB_OBJ_VRAM 0x06600000
+// The sub engine's OBJ characters (HW_DB_OBJ_VRAM is in nitro/hw.h)
 #define HW_DB_OBJ_VRAM_SIZE 0x20000
 #define HW_OAM 0x07000000
 #define HW_DB_OAM 0x07000400
@@ -1685,7 +1688,7 @@ void G3_RotZ(fx32 sin, fx32 cos);                                 // swan's gfxR
 void G3_MultMtx44(const MtxFx44 *mtx);                            // swan's gfxMultMatrix4x4
 void G3_MultTransMtx33(const MtxFx33 *mtx, const VecFx32 *trans); // swan's gfxMultTransRot4x3
 void G3X_InitMtxStack(void);                                      // swan's gfxResetMatrixStack
-int G3X_GetBoxTestResult(s32 *in);                                // swan's gfxGetBoxTestResult
+int G3X_GetBoxTestResult(s32 *result);                            // swan's gfxGetBoxTestResult
 
 // NitroSDK libgx's gx.c: the power and display registers it sets up, and its entry points
 #define reg_G2_BG2PD (*(vu16 *)0x04000026)
@@ -1736,7 +1739,7 @@ void GX_Init(void);                 // swan's gfxInit
 void GX_SetVCountEqVal(int vcount); // swan's gfxSetVCountIntrLine
 BOOL GX_IsDispOn(void);             // swan's gfxEngineIsEnabledA
 void GX_DispOff(void);              // swan's gfxEngineDisableA
-// NitroSDK's G2x_SetMasterBrightness_ and G2x_GetMasterBrightness_, which take the address of the register: -16 to 16,
+// NitroSDK's GXx_SetMasterBrightness_ and GXx_GetMasterBrightness_, which take the address of the register: -16 to 16,
 // 0 for none
 void GXx_SetMasterBrightness_(u32 reg, s32 brightness); // swan's GFXRegSetMasterBrightness
 s32 GXx_GetMasterBrightness_(u32 reg);                  // swan's gfxRegGetMasterBrightness

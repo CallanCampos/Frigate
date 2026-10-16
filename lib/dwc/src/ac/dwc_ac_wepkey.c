@@ -4,7 +4,7 @@
 // Base64 text of 24 bytes, masked and shuffled, that start with "NDWCSHAP" and hold the 10 bytes of its spot
 // information, and its key is the MD5 of the 24.
 //
-// The functions are still named after their addresses; the comment above each has the name we would give it.
+// The DWCAc_ names are ours, taken from what the code does.
 
 #include "dwc/ac.h"
 #include "dwc/ext.h"
@@ -45,7 +45,7 @@ void DWCAc_MakeNdwcShapKey(const u8 *ssid, u8 *key) {
     DWCAc_HashNdwcShapKey(buf, key);
 }
 
-// DWCAc_GetNdwcShapSpotInfo: decodes an NDWCSHAP's SSID into its 10 bytes of spot information; TRUE if it holds the 8
+// Decodes an NDWCSHAP's SSID into its 10 bytes of spot information; TRUE if it holds the 8
 // bytes "NDWCSHAP" and the 10 are printable
 BOOL DWCAc_GetNdwcShapSpotInfo(const u8 *ssid, u8 *spotInfo) {
     u8 buf[0x18];
@@ -74,7 +74,7 @@ void DWCAc_MakeNwcUsbApKey(const u8 *ssid, u8 *key) {
     DWCAc_ScrambleNwcUsbApKey(ssid + 12, key);
 }
 
-// DWCAc_DecodeNdwcShapSsid: turns the 32 characters of an NDWCSHAP's SSID into the 24 bytes that they stand for:
+// Turns the 32 characters of an NDWCSHAP's SSID into the 24 bytes that they stand for:
 // decodes the Base64, masks the bytes, puts them in their places (each cycle of the permutation in `order` is walked
 // once, the places that are done being marked with 0xff) and masks them again
 static void DWCAc_DecodeNdwcShapSsid(const u8 *ssid, u8 *out) {
@@ -121,7 +121,7 @@ static void DWCAc_HashNdwcShapKey(const u8 *in, u8 *key) {
     MI_CpuCopy8(digest + 3, key, 13);
 }
 
-// DWCAc_ScrambleNwcUsbApKey: the key of an NWCUSBAP, the 13 bytes of a 104-bit WEP key, from the 20 bytes of its SSID
+// The key of an NWCUSBAP, the 13 bytes of a 104-bit WEP key, from the 20 bytes of its SSID
 // that follow "NWCUSBAP" and 4 more: they are folded to 13, masked, put in their places, masked again, their half
 // bytes are mapped and the bytes are mixed
 static void DWCAc_ScrambleNwcUsbApKey(const u8 *in, u8 *key) {
@@ -156,7 +156,7 @@ static void DWCAc_ScrambleNwcUsbApKey(const u8 *in, u8 *key) {
     }
 }
 
-// DWCAc_Base64Value: the value of a Base64 character ('=' is 0), or -1 if it is none. The offset into a range is kept
+// The value of a Base64 character ('=' is 0), or -1 if it is none. The offset into a range is kept
 // in a local, as MWCC folds `c - 'a' + 26` into one subtract where the original has two steps
 static int DWCAc_Base64Value(u32 c) {
     int v;
@@ -184,7 +184,7 @@ static int DWCAc_Base64Value(u32 c) {
     return -1;
 }
 
-// DWCAc_DecodeBase64: decodes Base64 text of `length` characters into `capacity` bytes at most, a partial group of
+// Decodes Base64 text of `length` characters into `capacity` bytes at most, a partial group of
 // characters last. Returns the number of bytes it makes, or -1 if the destination is too small
 static int DWCAc_DecodeBase64(const u8 *src, u8 *dest, u32 length, u32 capacity) {
     int size = length * 3 / 4;

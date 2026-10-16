@@ -78,7 +78,7 @@ static void SCFGi_CommonCallback(u32 tag, u32 data, BOOL err) {
         scfgWork.busy = FALSE;
         break;
     default:
-        sys_exit();
+        OS_Terminate();
         break;
     }
 }

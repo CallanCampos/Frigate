@@ -292,7 +292,7 @@ static void WifiLogin_StateWaitMessageThenSave(WifiLoginWork *work) {
 
 // Starts the network library for the Wi-Fi connection
 static void WifiLogin_StateStartNet(WifiLoginWork *work) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         sNetInit.wifiHeapSize = 0x79000;
     } else {
         sNetInit.wifiHeapSize = 0x5e400;

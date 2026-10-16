@@ -121,7 +121,7 @@ BOOL MB_ReadSegment(FSFile *file, void *buf, u32 len) {
             }
             pos = FS_GetFilePosition(file);
             MI_CpuCopy8((const void *)MB_ROM_HEADER_BUF, buf, 0x160);
-            header->unk_60 |= 0x406000;
+            header->normalCommandControl |= 0x406000;
         }
 
         if (remaining >= 0x88) {
@@ -349,7 +349,7 @@ static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegm
             segment->recvAddr = load->ramAddr;
             segment->isArm7 = FALSE;
         } else {
-            sys_exit();
+            OS_Terminate();
         }
         break;
     }
@@ -377,7 +377,7 @@ static void MBFile_SetupSegment(const ROMHeader *header, const u32 *kind, MBSegm
             invalid = TRUE;
         }
         if (invalid == TRUE) {
-            sys_exit();
+            OS_Terminate();
         }
         segment->size = load->size;
         segment->ramAddr = load->ramAddr;

@@ -2,6 +2,7 @@
 // and the pool of lock IDs. The first functions are Thumb, the pool's two are ARM.
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "nitro/svc.h"
 
 // The bits of EXMEMCNT that give the cartridge and the card to the ARM7, and the DSi's card slot status (the card's
 // control register is in nitro/hw.h)
@@ -34,7 +35,7 @@ void OSi_SyncWithOtherProc(int c, vu8 *p) {
         do {
             p[0] = 0x80 | (i & 0xf);
             while (p[0] != p[1] && p[2] == 0) {
-                WaitByLoop(0x400);
+                SVC_WaitByLoop(0x400);
             }
             i++;
         } while (p[2] == 0);
@@ -47,13 +48,13 @@ void OSi_SyncWithOtherProc(int c, vu8 *p) {
                 p[1] = p[0];
                 sum += p[1];
             } else {
-                WaitByLoop(0x400);
+                SVC_WaitByLoop(0x400);
             }
         }
         p[3] = 0;
         p[2] = 1;
         while (p[3] == 0) {
-            WaitByLoop(0x400);
+            SVC_WaitByLoop(0x400);
         }
     }
 }
@@ -77,7 +78,7 @@ static s32 OSi_DoLockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void), B
     s32 lastLockFlag;
 
     while ((lastLockFlag = OSi_DoTryLockByWord(lockID, lockp, ctrl, disableFiq)) > 0) {
-        WaitByLoop(0x400);
+        SVC_WaitByLoop(0x400);
     }
     return lastLockFlag;
 }
@@ -186,7 +187,7 @@ s32 OS_TryLockCard(u16 lockID) {
 // of the card's control), and OSi_FreeCardBus
 static void OSi_AllocateCardBus(void) {
     if (((reg_SCFG_MC & 0xc) >> 2) == 2) {
-        reg_MI_MCCNT1 |= 0x20000000;
+        reg_MI_MCCNT1 |= REG_MI_MCCNT1_RESB_MASK;
     }
     reg_MI_EXMEMCNT = (u16)(reg_MI_EXMEMCNT & ~EXMEMCNT_CARD_ARM7);
 }

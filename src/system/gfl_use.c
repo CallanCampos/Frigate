@@ -105,7 +105,7 @@ static void *sExtraHeapMemory;
 static GFLUseWork *sWork;
 
 void GFLAppInit(void) {
-    if (!hw_isDSi()) {
+    if (!OS_IsRunOnTwl()) {
         void *end = OS_GetArenaHi(OS_ARENA_MAIN);
         void *start = OS_GetArenaLo(OS_ARENA_MAIN);
 
@@ -115,14 +115,14 @@ void GFLAppInit(void) {
         sExtraHeapMemory = OS_AllocFromHeap(OS_ARENA_MAIN, sOSHeap, EXTRA_HEAP_SIZE);
     }
 
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         GFL_MemInit(HEAP_SETUP_TWL, 2, 193, 0);
     } else {
         GFL_MemInit(HEAP_SETUP_NTR, 2, 193, 0);
     }
     GFL_HeapDTCMInit(0x2000);
     GFL_HeapCreateChild(1, 7, 0x27000);
-    if (!hw_isDSi()) {
+    if (!OS_IsRunOnTwl()) {
         GFL_HeapCreateRoot(sExtraHeapMemory, EXTRA_HEAP_SIZE, 9);
     } else {
         GFL_HeapCreateChild(1, 9, EXTRA_HEAP_SIZE);

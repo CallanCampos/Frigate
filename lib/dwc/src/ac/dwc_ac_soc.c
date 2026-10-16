@@ -4,7 +4,7 @@
 // the connection) or down again. The configuration that SOC_Startup gets is made from the setting that the connection
 // is with, and from the memory functions of auto-connect.
 //
-// The functions are still named after their addresses; the comment above each has the name we would give it.
+// The DWCAc_ names are ours, taken from what the code does.
 
 #include "dwc/ac.h"
 #include "nitro/mi.h"
@@ -32,7 +32,7 @@ static const SocConfig sSocConfigInit = {
     0x01000000, NULL, NULL, TRUE, 0, 0, 0, 0, 0, 0x1000, 0x1000, 0, 0, { 0, 0, 0, 0, 0, (u32)sSocHostName, 4, 0, 0 },
 };
 
-// DWCAc_StepWcmStartup: state 1, starts the wireless manager with the notification callback of dwc_ac_wcm.c, after
+// State 1, starts the wireless manager with the notification callback of dwc_ac_wcm.c, after
 // listing the targets of the first search. Returns the state that follows: 2, the search; 0x11, the teardown, if the
 // wireless manager will not start; and 1, to wait, while it is not in its first state
 u8 DWCAc_StepWcmStartup(void) {
@@ -58,7 +58,7 @@ u8 DWCAc_StepWcmStartup(void) {
     return 2;
 }
 
-// DWCAc_StepSockets: the states 10 to 15. While the wireless manager holds the connection (its state 9), each does its
+// The states 10 to 15. While the wireless manager holds the connection (its state 9), each does its
 // part: 10 starts SOC, 11 takes it down, 12 waits for the address, 13 starts the connection test, 14 waits for it and
 // 15 notes the connection. Once the connection is gone, 11 and 15 still go on as they are, 14 lets the test go first,
 // and every state marks the candidate as lost and goes to 11, to take SOC down. Returns the state that follows
@@ -109,7 +109,7 @@ u8 DWCAc_StepSockets(void) {
     return state;
 }
 
-// DWCAc_StartSoc: state 10, starts SOC from the configuration that DWCAc_MakeSocConfig makes, with the wait of SOCL's
+// State 10, starts SOC from the configuration that DWCAc_MakeSocConfig makes, with the wait of SOCL's
 // yields at 4. 12 to wait for the address, or 0x11, the teardown, if SOC will not start
 static u8 DWCAc_StartSoc(DWCAcSearchWork *work) {
     DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
@@ -124,7 +124,7 @@ static u8 DWCAc_StartSoc(DWCAcSearchWork *work) {
     return 0x11;
 }
 
-// DWCAc_WaitHostId: state 12, waits for the address. When it has come, gives SOC the DNS servers of the setting, and
+// State 12, waits for the address. When it has come, gives SOC the DNS servers of the setting, and
 // goes on to the connection test (13), or skips it (15) if the game asked for that or the setting on a DSi uses a
 // proxy. If the address has not come in 10 seconds the candidate is given up, and SOC goes down (11)
 static u8 DWCAc_WaitHostId(DWCAcSearchWork *work) {
@@ -137,7 +137,7 @@ static u8 DWCAc_WaitHostId(DWCAcSearchWork *work) {
         }
         type = DWCAc_GetApTypeOfId(work->kind);
         if (type >= 10 && type <= 12) {
-            if (hw_isDSi() && work->dsiSettings[(u8)(type - 10)].unk_182 != 0) {
+            if (OS_IsRunOnTwl() && work->dsiSettings[(u8)(type - 10)].unk_182 != 0) {
                 return 15;
             }
         }
@@ -150,7 +150,7 @@ static u8 DWCAc_WaitHostId(DWCAcSearchWork *work) {
     return 11;
 }
 
-// DWCAc_StartConnectionTest: state 13, starts the connection test of overlay 11 with the memory functions. 14 to wait
+// State 13, starts the connection test of overlay 11 with the memory functions. 14 to wait
 // for it, or 0x11, the teardown, if it will not start
 static u8 DWCAc_StartConnectionTest(void) {
     if (func_ov011_0216b14c(DWCAc_GetBlock(DWC_AC_WORK_UNK_08)) == 0) {
@@ -160,7 +160,7 @@ static u8 DWCAc_StartConnectionTest(void) {
     return 0x11;
 }
 
-// DWCAc_WaitConnectionTest: state 14, waits for the connection test. Once it is over, takes its result for the error
+// State 14, waits for the connection test. Once it is over, takes its result for the error
 // if the candidate is of the type that the game was told of, and lets the test go. 15 if it went well; else the
 // candidate is given up, with a note if CPS found its address already in use, and SOC goes down (11)
 static u8 DWCAc_WaitConnectionTest(DWCAcSearchWork *work) {
@@ -188,7 +188,7 @@ static u8 DWCAc_WaitConnectionTest(DWCAcSearchWork *work) {
     }
 }
 
-// DWCAc_NoteConnected: state 15, notes the type of the access point and the key mode of the setting that the
+// State 15, notes the type of the access point and the key mode of the setting that the
 // connection is with. 16, the connection is up
 static u8 DWCAc_NoteConnected(DWCAcSearchWork *work) {
     DWCAc_NoteConnectedAp(work->kind);
@@ -196,7 +196,7 @@ static u8 DWCAc_NoteConnected(DWCAcSearchWork *work) {
     return 16;
 }
 
-// DWCAc_StopSoc: state 11, takes the sockets down: SOCL first, then SOC. 9, the end of the candidate, once they are
+// State 11, takes the sockets down: SOCL first, then SOC. 9, the end of the candidate, once they are
 // down, else 11
 static u8 DWCAc_StopSoc(void) {
     int result;
@@ -211,7 +211,7 @@ static u8 DWCAc_StopSoc(void) {
     return 11;
 }
 
-// DWCAc_MakeSocConfig: makes the configuration for SOC_Startup from the setting that the connection is with: the
+// Makes the configuration for SOC_Startup from the setting that the connection is with: the
 // allocators of auto-connect; the address, the mask, the gateway and the DNS servers if the setting has an address of
 // its own, else DHCP; the MTU, which a DSi takes from the setting within 576 to 1500 (1400 if it has none); and on a
 // DSi the receive window of the search's work, unless the MTU is the smallest. The allocators have the type of DWC's
@@ -247,7 +247,7 @@ static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfi
         config->dns1 = 0;
         config->dns2 = 0;
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         if (setting->unk_ea == 0) {
             config->mtu = 0x578;
         } else if (setting->unk_ea > 0x5dc) {
@@ -260,7 +260,7 @@ static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfi
     } else {
         config->mtu = 0x240;
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         if (setting->unk_ea == 0x240) {
             config->rwin = 0;
         } else {
@@ -271,7 +271,7 @@ static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfi
     }
 }
 
-// DWCAc_ReadAddress: an IPv4 address of four bytes in a setting (the first byte is the highest) as SOC_Startup wants
+// An IPv4 address of four bytes in a setting (the first byte is the highest) as SOC_Startup wants
 // it, with its bytes in the other order
 static u32 DWCAc_ReadAddress(const u8 *address) {
     u32 value = 0;
@@ -283,7 +283,7 @@ static u32 DWCAc_ReadAddress(const u8 *address) {
     return ((value >> 24) & 0xff) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | ((value << 24) & 0xff000000);
 }
 
-// DWCAc_MakeNetmask: the netmask with that many of its high bits set, as SOC_Startup wants it, with its bytes in the
+// The netmask with that many of its high bits set, as SOC_Startup wants it, with its bytes in the
 // other order
 static u32 DWCAc_MakeNetmask(u8 bits) {
     u32 mask = 0xffffffff;
@@ -295,7 +295,7 @@ static u32 DWCAc_MakeNetmask(u8 bits) {
     return ((mask >> 24) & 0xff) | ((mask >> 8) & 0xff00) | ((mask << 8) & 0xff0000) | ((mask << 24) & 0xff000000);
 }
 
-// DWCAc_SetResolver: gives SOC the DNS servers of the setting that the connection is with, when the address comes from
+// Gives SOC the DNS servers of the setting that the connection is with, when the address comes from
 // DHCP but the setting has DNS servers of its own (those of a setting with an address of its own are in the
 // configuration already)
 static void DWCAc_SetResolver(DWCAcSearchWork *work) {

@@ -137,7 +137,7 @@ void DownloadPlay_Init(u32 ggid, u32 tgid) {
     sWork->state = (const DownloadPlayState){ 0 };
     sWork->mbWorkp = sWork->mbWork;
     if (MB_Init(sWork->mbWorkp, &user, ggid, tgid, DOWNLOAD_PLAY_DMA_NO) != MB_SUCCESS) {
-        sys_exit();
+        OS_Terminate();
     }
     MB_SetParentCommParam(MB_COMM_PARENT_SEND_MIN, DOWNLOAD_PLAY_CHILD_MAX);
     MB_CommSetParentStateCallback(DownloadPlay_ParentStateCallback);
@@ -151,7 +151,7 @@ void DownloadPlay_Start(const MBGameRegistry *gameInfo, u16 channel) {
         return;
     }
     if (!DownloadPlay_RegistFile(gameInfo)) {
-        sys_exit();
+        OS_Terminate();
     }
 }
 
@@ -397,7 +397,7 @@ static void DownloadPlay_ParentStateCallback(u16 childAid, u32 status, void *arg
         break;
     }
     default:
-        sys_exit();
+        OS_Terminate();
     }
 }
 

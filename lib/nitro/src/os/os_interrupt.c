@@ -122,10 +122,8 @@ u32 OS_ResetRequestIrqMask(u32 mask) {
     return prev;
 }
 
-// Puts the magic numbers that the exception handler checks at the top and at the end of the IRQ stack. The original
-// subtracts the stack's size from the address in code, 8 bytes more than this constant, which looks like a symbol that
-// the linker defines (SDK_IRQ_STACKSIZE)
+// Puts the magic numbers that the exception handler checks at the top and at the end of the IRQ stack
 void OS_SetIrqStackChecker(void) {
-    *(u32 *)(HW_IRQ_STACK - 4) = 0xfddb597d;
-    *(u32 *)HW_IRQ_STACK_END = 0x7bf9dd5b;
+    *(u32 *)(HW_IRQ_STACK - 4) = OS_STACK_BEGIN_MAGIC;
+    *(u32 *)HW_IRQ_STACK_END = OS_STACK_END_MAGIC;
 }

@@ -156,7 +156,7 @@ const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid) {
 
 // The channels that the console may use, one bit each
 u16 WM_GetAllowedChannel(void) {
-    if (hw_isDSi() && !WMi_IsWirelessAvailable()) {
+    if (OS_IsRunOnTwl() && !WMi_IsWirelessAvailable()) {
         return 0;
     }
     if (WMi_CheckInitialized() != WM_ERRCODE_SUCCESS) {

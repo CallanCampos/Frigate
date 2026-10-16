@@ -9,7 +9,7 @@
 // A beacon scanner of DWC (TWL-DWC 5.3, ARM9 main; wds.c), on NitroSDK's wireless manager. It scans for the wireless
 // parents whose beacons carry the game ID 0x857 and a block of 0x70 bytes of game information, encrypted with RC4
 // under a key made from the text "WDS!" and four bytes of the beacon's BSSID, and checked with a CRC-16. The ROM names
-// none of it; the names are ours, taken from what the code does. The calls are still named after their addresses.
+// none of it; the names, the WDS_ functions' included, are ours, taken from what the code does.
 //
 // The caller gives a work area of WDS_GetWorkSize() bytes to WDS_Initialize (WM_Initialize), starts a scan with
 // WDS_StartScan, and when the scan's callback comes reads the beacons it found with WDS_GetEntries. WDS_EndScan stops

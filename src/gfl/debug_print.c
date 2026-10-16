@@ -75,7 +75,7 @@ void GFL_DebugPrintCommit(void) {
     pixels = GFL_BitmapGetPixelData(sDebugPrint.dest);
     DC_FlushRange(pixels, 0x2000);
     GX_LoadBG0Char(pixels, 0, 0x2000);
-    sys_exit();
+    OS_Terminate();
 }
 
 void GFL_DebugSetVerboseAssertHandlers(void) {

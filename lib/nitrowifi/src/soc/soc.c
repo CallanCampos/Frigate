@@ -1,6 +1,7 @@
 #include "nitrowifi/soc.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "socl_internal.h"
 
 // soc.c: the BSD-style SOC_ calls over SOCL, which NitroWiFi's SOC_ API is (pokediamond's soc.o: the same calls under

@@ -332,7 +332,7 @@ static BOOL WifiBattleMatchSys_Exit(GameProc *proc, u32 *state, void *param, voi
         GameData_Free(sys->param.gameData);
     }
     if (sys->param.unk8 != 1) {
-        sys_reset(0);
+        OS_ResetSystem(0);
     }
     if (sys->param.unk10 != 0) {
         GFL_HeapFree(param);

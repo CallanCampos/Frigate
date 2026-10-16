@@ -8,6 +8,7 @@
 #include "types.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
+#include "nitro/svc.h"
 #include "twl/fatfs.h"
 
 // The part of a request that the ARM7 sees, which the ARM9 flushes from its cache before it sends the address
@@ -199,7 +200,7 @@ static void func_02704264(FatfsRequest *request) {
         if (waiting) {
             if (OS_GetProcMode() == FATFS_IRQ_MODE) {
                 PXIi_HandlerRecvFifoNotEmpty();
-                WaitByLoop(FATFS_IRQ_SPIN);
+                SVC_WaitByLoop(FATFS_IRQ_SPIN);
             } else {
                 OS_SleepThread(&sFatfs.waitQueue);
             }

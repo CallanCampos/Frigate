@@ -38,6 +38,6 @@ void CTRDG_DummyInit(void);
 
 // CTRDG_Init, which OS_Init calls: a weak function of the SDK, which the game replaces (system/machine_use.c) with one
 // that calls CTRDG_DummyInit and leaves the slot unused
-void func_0200548c(void);
+void CTRDG_Init(void);
 
 #endif // POKEBW2_NITRO_CTRDG_H

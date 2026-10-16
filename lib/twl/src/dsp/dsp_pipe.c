@@ -54,7 +54,7 @@ static DSPFileServer sFileServer;
 
 // The register interface of dsp_if.c, which the SDK's inline functions only call on a DSi
 static inline u16 DSPi_GetSemaphore(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return DSP_GetSemaphore();
     }
     return 0;
@@ -63,7 +63,7 @@ static inline u16 DSPi_GetSemaphore(void) {
 // The access to the DSP's memory, a half word of 16 bits at a time (its address is in half words)
 static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
     u32 irq = OS_DisableInterrupts();
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         func_02705150(0, dst, wordAddress, count, 0);
     }
     reg_DSP_PCFG &= ~(DSP_PCFG_AUTO_INCREMENT | DSP_PCFG_READ_LENGTH_MASK);
@@ -72,7 +72,7 @@ static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
 
 static inline void DSPi_WriteWords(u16 wordAddress, const u16 *src, u16 count) {
     u32 irq = OS_DisableInterrupts();
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         func_02705088(0, wordAddress, src, count, 0);
     }
     OS_RestoreInterrupts(irq);
@@ -464,7 +464,7 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
 // port and a direction that changed, which goes to the port's callback, or to the file server if it has the file flag
 void func_027070dc(void *userData) {
     while (DSPi_GetSemaphore() & 0x8000 || DSPi_RecvDataIsReady(2)) {
-        if (hw_isDSi() == TRUE) {
+        if (OS_IsRunOnTwl() == TRUE) {
             DSP_ClearSemaphore(0x8000);
         }
         while (DSPi_RecvDataIsReady(2)) {

@@ -3,13 +3,14 @@
 // word of the same command and a code; a request's callback, or the thread that waits on a message queue, gets the
 // result. Only the code that the game keeps is here: the setup, the request that sets the microphone's filter and the
 // two that begin and end the exclusive state, with what they share. The ROM names none of it; the file name and those
-// of the types and data are descriptive guesses, and the functions keep their default names (twl/sndex.h says what
-// the public ones do).
+// of the types and data are descriptive guesses, and the functions have the SDK's names where the code shows them and
+// keep their default names otherwise (twl/sndex.h says what the public ones do).
 
 #include "types.h"
 #include "nitro/os.h"
 #include "nitro/pm.h"
 #include "nitro/pxi.h"
+#include "nitro/svc.h"
 #include "twl/pm.h"
 #include "twl/sndex.h"
 
@@ -99,8 +100,8 @@ static void func_02704d74(void);
 static void func_02704db0(SNDEXResult result, void *arg);
 static void func_02704e04(void);
 
-// Sets the library up, once (SNDEX_Init, by its code)
-void func_02704364(void) {
+// TwlSDK's SNDEX_Init, by its code: sets the library up, once
+void SNDEX_Init(void) {
     u32 irq = OS_DisableInterrupts();
 
     if (sSndex.state != SNDEX_STATE_UNINITIALIZED) {
@@ -113,12 +114,12 @@ void func_02704364(void) {
     func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_NONE);
     PXI_Init();
     while (!PXI_IsCallbackReady(PXI_FIFO_TAG_SNDEX, PXI_PROC_ARM7)) {
-        WaitByLoop(10);
+        SVC_WaitByLoop(10);
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SNDEX, func_027049b0);
 
     PM_SetExitCallbackInfo(&sSndex.exitInfo, func_02704d64, NULL);
-    func_02769550(&sSndex.exitInfo, SNDEX_PM_PRIORITY);
+    PM_InsertPreExitCallback(&sSndex.exitInfo, SNDEX_PM_PRIORITY);
     PM_SetSleepCallbackInfo(&sSndex.sleepInfo, func_02704d64, NULL);
     PM_InsertPreSleepCallback(&sSndex.sleepInfo, SNDEX_PM_PRIORITY);
     sSndex.state = SNDEX_STATE_IDLE;
@@ -144,7 +145,7 @@ static SNDEXResult func_02704448(int volume, SNDEXCallback callback, void *arg, 
 }
 
 static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg) {
-    if (!hw_isDSi()) {
+    if (!OS_IsRunOnTwl()) {
         return SNDEX_RESULT_ILLEGAL_STATE;
     }
     return func_02704448(volume, callback, arg, FALSE);
@@ -196,7 +197,7 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
 }
 
 // Sets the microphone's filter and waits for the answer
-SNDEXResult func_027047c0(int target, const u16 *coefficients) {
+SNDEXResult SNDEX_SetIirFilter(int target, const u16 *coefficients) {
     SNDEXResult result;
     OSMessage messages[1];
     OSMessageQueue queue;

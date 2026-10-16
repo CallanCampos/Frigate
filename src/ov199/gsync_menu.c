@@ -387,7 +387,7 @@ static void GSyncMenu_OnButtonAnimEnd(u32 param, fx32 frame) {
             BmpWin_Free(wk->msgWin);
             wk->msgWin = NULL;
         }
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             // A DSi's own settings can't be opened from here
             GFL_MsgDataLoadStrbuf(wk->dsiMsgData, WifiError_Text_PleaseConfigureConnectionSettings, wk->strBuf);
             GSyncMenu_PrintMessage(wk, 10, FALSE);

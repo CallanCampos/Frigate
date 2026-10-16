@@ -53,7 +53,7 @@ static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
     u32 irq = OS_DisableInterrupts();
     int i;
 
-    if (hw_isDSi() && NWM_CheckInitialized() != 3) {
+    if (OS_IsRunOnTwl() && NWM_CheckInitialized() != 3) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_ILLEGAL_STATE;
     }
@@ -65,7 +65,7 @@ static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_INVALID_PARAM;
     }
-    if (OSi_IsAddressInVideoMemory((u32)wmSysBuf) || (hw_isDSi() && OSi_IsAddressInMainMemoryEx((u32)wmSysBuf))) {
+    if (OSi_IsAddressInVideoMemory((u32)wmSysBuf) || (OS_IsRunOnTwl() && OSi_IsAddressInMainMemoryEx((u32)wmSysBuf))) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_INVALID_PARAM;
     }
@@ -263,7 +263,7 @@ static void WmReceiveFifo(u32 tag, u32 data, BOOL err) {
     if (cb->apiid >= WM_APIID_ASYNC_KIND_MAX) {
         if (cb->apiid == WM_APIID_INDICATION) {
             if (cb->errcode == WM_ERRCODE_FATAL) {
-                sys_exit();
+                OS_Terminate();
             }
             if (w9b->indCallback != NULL) {
                 w9b->indCallback(cb);
@@ -457,12 +457,12 @@ void WMi_DeleteSleepCallback(void) {
 
 // The game ends if the console goes to sleep while the manager is on
 static void WmSleepCallback(void *arg) {
-    sys_exit();
+    OS_Terminate();
 }
 
 // Whether wireless is usable
 BOOL WMi_IsWirelessAvailable(void) {
-    if (OS_IsAvailableWireless() == TRUE && !func_0207c4d0()) {
+    if (OS_IsAvailableWireless() == TRUE && !OS_IsForceDisableWireless()) {
         return TRUE;
     }
     return FALSE;

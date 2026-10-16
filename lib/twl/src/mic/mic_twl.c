@@ -32,7 +32,7 @@
 
 #define MIC_ALIGN_MASK 0x1f
 
-static MICResult func_02703f04(MICCallback callback, void *arg);
+static MICResult MICEX_StopLimitedSamplingAsync(MICCallback callback, void *arg);
 static void func_02703f60(MICResult result, void *arg);
 static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type);
 static BOOL func_02704088(void);
@@ -136,15 +136,15 @@ MICResult MICEX_StopLimitedSampling(void) {
         return MIC_RESULT_ILLEGAL_STATUS;
     }
     OS_InitMessageQueue(&queue, messages, 1);
-    result = func_02703f04(func_02703f60, &queue);
+    result = MICEX_StopLimitedSamplingAsync(func_02703f60, &queue);
     if (result == MIC_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
     }
     return result;
 }
 
-// MICEX_StopLimitedSamplingAsync
-static MICResult func_02703f04(MICCallback callback, void *arg) {
+// TwlSDK's MICEX_StopLimitedSamplingAsync: sends the stop, and the callback gets the answer
+static MICResult MICEX_StopLimitedSamplingAsync(MICCallback callback, void *arg) {
     MICWork *work = MICi_GetSysWork();
     u32 enabled = OS_DisableInterrupts();
 

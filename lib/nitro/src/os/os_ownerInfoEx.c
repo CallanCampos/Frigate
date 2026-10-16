@@ -1,6 +1,6 @@
 // TwlSDK OS: the DSi's settings (os_ownerInfoEx.c, a guessed name). On a DSi the system leaves its own settings in the
 // shared main memory, and these functions give out what is in them, on top of the owner's settings that the DS has;
-// each checks OS_IsRunOnTwl (hw_isDSi) first. The calls to the LTD autoload's functions go through linker veneers.
+// each checks OS_IsRunOnTwl (OS_IsRunOnTwl) first. The calls to the LTD autoload's functions go through linker veneers.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "twl/os.h"
@@ -38,7 +38,7 @@ void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
     MI_CpuCopy16(config->owner.comment, info->comment, OS_OWNERINFO_COMMENT_MAX * sizeof(u16));
     info->nickName[OS_OWNERINFO_NICKNAME_MAX] = 0;
     info->comment[OS_OWNERINFO_COMMENT_MAX] = 0;
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         TWLSettings *settings = TWL_SETTINGS;
 
         info->country = settings->country;
@@ -51,7 +51,7 @@ void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
 
 // TwlSDK's OS_IsAvailableWireless: TRUE on a DS
 BOOL OS_IsAvailableWireless(void) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         return func_02769318();
     }
     return TRUE;
@@ -59,7 +59,7 @@ BOOL OS_IsAvailableWireless(void) {
 
 // TwlSDK's OS_IsAgreeEULA: FALSE on a DS
 BOOL OS_IsAgreeEULA(void) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         return (TWL_SETTINGS->eulaFlags & 1) != 0;
     }
     return FALSE;
@@ -67,31 +67,31 @@ BOOL OS_IsAgreeEULA(void) {
 
 // TwlSDK's OS_GetAgreedEULAVersion: 0 on a DS
 u8 OS_GetAgreedEULAVersion(void) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         return TWL_SETTINGS->agreedEULAVersion;
     }
     return 0;
 }
 
 // A byte of the TWL ROM header (what TwlSDK's function is, is not known), 0 on a DS
-u8 func_0207c49c(void) {
-    if (hw_isDSi()) {
+u8 OS_GetROMHeaderEULAVersion(void) {
+    if (OS_IsRunOnTwl()) {
         return *(u8 *)HW_TWL_ROM_HEADER_BYTE_20E;
     }
     return 0;
 }
 
 // The DSi's parental controls, NULL on a DS
-TWLParentalControl *func_0207c4b4(void) {
-    if (hw_isDSi()) {
+TWLParentalControl *OS_GetParentalControlInfoPtr(void) {
+    if (OS_IsRunOnTwl()) {
         return &TWL_SETTINGS->parentalControl;
     }
     return NULL;
 }
 
-// Probably TwlSDK's OS_IsForceDisableWireless: FALSE on a DS
-BOOL func_0207c4d0(void) {
-    if (hw_isDSi()) {
+// TwlSDK's OS_IsForceDisableWireless (the name is recalled, not shown): FALSE on a DS
+BOOL OS_IsForceDisableWireless(void) {
+    if (OS_IsRunOnTwl()) {
         return func_02769334();
     }
     return FALSE;

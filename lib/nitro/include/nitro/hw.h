@@ -65,16 +65,23 @@
 #define HW_OBJ_PLTT 0x05000200
 #define HW_DB_BG_PLTT 0x05000400
 #define HW_DB_OBJ_PLTT 0x05000600
-// The main screen's OBJ VRAM
+// The main screen's OBJ VRAM, and the sub screen's
 #define HW_OBJ_VRAM 0x06400000
+#define HW_DB_OBJ_VRAM 0x06600000
 #define REG_MASTER_BRIGHT_ADDR 0x0400006c
 #define REG_DB_MASTER_BRIGHT_ADDR 0x0400106c
+
+// The instruction TCM's image, which ends where main memory starts, and the size of the data TCM
+#define HW_ITCM_IMAGE 0x01ff8000
+#define HW_MAIN_MEM 0x02000000
+#define HW_DTCM_SIZE 0x4000
 
 // VBlank counter in shared memory, from the DSi mirror of main memory
 #define HW_VBLANK_COUNT_BUF 0x02fffc3c
 // The ROM header that the card's boot leaves at the end of main memory, the copy of it that the system keeps, and the
 // header of a DSi game, which the system leaves in the memory the processors share
 #define HW_CARD_ROM_HEADER 0x02fffa80
+#define HW_CARD_ROM_HEADER_SIZE 0x160
 #define HW_ROM_HEADER_BUF 0x02fffe00
 #define HW_TWL_ROM_HEADER_BUF 0x02ffe000
 // The low word of the DSi's title ID, its game code, in the system area

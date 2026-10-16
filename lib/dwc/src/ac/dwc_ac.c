@@ -72,7 +72,7 @@ BOOL DWCAc_Create(DWCAcParam *param) {
     work->unk_14bc_4 = param->unk_0b_0;
     work->rssiPacked = param->rssiPacked;
     DWCBm_ReadNtrSettings(work);
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         work->preferWpa = 0;
         DWCBm_ReadTwlSettings(work->dsiSettings);
         if (work->mode == 0) {
@@ -99,7 +99,7 @@ BOOL DWCAc_Create(DWCAcParam *param) {
             }
         }
     }
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         if (work->rssiPacked == 1) {
             result = WCM_Init(sBlocks.wcm, 0x4800);
         } else {
@@ -458,7 +458,7 @@ void DWCAc_NoteKeyMode(u8 id) {
     DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u8 type = DWCAc_GetApTypeOfId(id);
 
-    if (type >= 10 && type <= 12 && hw_isDSi()) {
+    if (type >= 10 && type <= 12 && OS_IsRunOnTwl()) {
         type -= 10;
         main->unk_24 = work->dsiSettings[type].unk_182;
         main->unk_25 = work->dsiSettings[type].unk_183;
@@ -548,9 +548,9 @@ static u8 DWCAc_FindSimilarCandidate(void) {
 // On a DSi, whether the license agreement has been agreed to, in the version that the ROM asks for; always TRUE on a
 // DS, or when the work says to ignore it
 static BOOL DWCAc_CheckEula(void) {
-    if (hw_isDSi()) {
-        if (sBlocks.search->ignoreEula != 0 ||
-            (OS_IsAgreeEULA() && OS_GetAgreedEULAVersion() != 0 && OS_GetAgreedEULAVersion() >= func_0207c49c())) {
+    if (OS_IsRunOnTwl()) {
+        if (sBlocks.search->ignoreEula != 0 || (OS_IsAgreeEULA() && OS_GetAgreedEULAVersion() != 0 &&
+                                                OS_GetAgreedEULAVersion() >= OS_GetROMHeaderEULAVersion())) {
             return TRUE;
         }
         return FALSE;
@@ -561,8 +561,8 @@ static BOOL DWCAc_CheckEula(void) {
 // On a DSi, whether the system settings allow the wireless connection and the parental controls do not forbid it;
 // always TRUE on a DS
 static BOOL DWCAc_CheckWirelessAllowed(void) {
-    if (hw_isDSi()) {
-        if (OS_IsAvailableWireless() == TRUE && func_0207c4d0() == 0) {
+    if (OS_IsRunOnTwl()) {
+        if (OS_IsAvailableWireless() == TRUE && OS_IsForceDisableWireless() == 0) {
             return TRUE;
         }
         return FALSE;

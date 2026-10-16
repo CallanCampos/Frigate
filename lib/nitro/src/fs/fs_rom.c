@@ -7,6 +7,7 @@
 #include "nitro/card.h"
 #include "nitro/fs.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 
 // What the ROM header holds for a table that is not there, besides 0
 #define FS_ROM_NO_TABLE 0xffffffff
@@ -25,7 +26,7 @@ static u32 sCardLockId;
 BOOL FSi_IsDsiOnlyRomOffset(const FSArchive *arc, u32 position) {
     BOOL locked = FALSE;
 
-    if (STD_CompareString(FS_GetArchiveName(arc), "rom") == 0 && !hw_isDSi() &&
+    if (STD_CompareString(FS_GetArchiveName(arc), "rom") == 0 && !OS_IsRunOnTwl() &&
         position >= CARD_GetOwnRomHeader()->twlRegionStart << 19) {
         locked = TRUE;
     }
@@ -34,7 +35,7 @@ BOOL FSi_IsDsiOnlyRomOffset(const FSArchive *arc, u32 position) {
 
 // The card read ended: the archive's command ends with it, with an error if the card was pulled out
 static void FSi_RomReadEnd(void *arg) {
-    FS_NotifyArchiveAsyncEnd(arg, func_0206ff5c() ? FS_RESULT_ERROR : FS_RESULT_SUCCESS);
+    FS_NotifyArchiveAsyncEnd(arg, CARD_IsPulledOut() ? FS_RESULT_ERROR : FS_RESULT_SUCCESS);
 }
 
 // The ROM archive's read function: reads from the card, apart from the caller's thread
@@ -83,9 +84,10 @@ static FSResult FSi_EmptyWrite(FSArchive *arc, const void *buffer, u32 position,
     return FS_RESULT_UNSUPPORTED;
 }
 
-// What FSi_InitRomArchive calls for a game that did not boot from the ROM, in place of the ROM header's tables: it does
-// nothing, and what it returns is not used
-static BOOL func_02072234(FSArchive *arc) {
+// TwlSDK's FSi_OverrideRomArchive, the default of a weak hook that a program overrides to supply its own ROM archive:
+// FSi_InitRomArchive calls it for a game that did not boot from the ROM, in place of the ROM header's tables. The
+// default does nothing, and what it returns is not used
+static BOOL FSi_OverrideRomArchive(FSArchive *arc) {
     return FALSE;
 }
 
@@ -106,13 +108,13 @@ void FSi_InitRomArchive(u32 dma) {
             FS_LoadArchive(&sRomFileSystem, 0, fat->offset, fat->size, fnt->offset, fnt->size, FSi_ReadRom, NULL);
         }
     } else {
-        func_02072234(&sRomFileSystem);
+        FSi_OverrideRomArchive(&sRomFileSystem);
     }
     if (!FS_IsArchiveMounted(&sRomFileSystem)) {
         FS_SetArchiveProc(&sRomFileSystem, FSi_EmptyArchiveProc, 0xffffffff);
         FS_LoadArchive(&sRomFileSystem, 0, 0, 0, 0, 0, FSi_EmptyRead, FSi_EmptyWrite);
     }
-    FS_ChangeDir("rom:");
+    FS_SetCurrentDirectory("rom:");
 }
 
 // NitroSDK's FS_SetDefaultDMA: the DMA channel that the ROM archive reads with, or FS_DMA_NOT_USE. Returns the one

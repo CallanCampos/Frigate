@@ -388,7 +388,7 @@ static void func_02700230(CAMERAResult result, void *arg) {
     case 27: {
         CAMERAContext context = sCameraWork.settings[0].context;
         if (context != CAMERA_CONTEXT_A) {
-            if (hw_isDSi() == TRUE) {
+            if (OS_IsRunOnTwl() == TRUE) {
                 func_02700df0(CAMERA_SELECT_IN, context, func_02700230, (void *)28);
             }
             return;
@@ -397,7 +397,7 @@ static void func_02700230(CAMERAResult result, void *arg) {
     case 28: {
         CAMERAContext context = sCameraWork.settings[1].context;
         if (context != CAMERA_CONTEXT_A) {
-            if (hw_isDSi() == TRUE) {
+            if (OS_IsRunOnTwl() == TRUE) {
                 func_02700df0(CAMERA_SELECT_OUT, context, func_02700230, (void *)29);
             }
             return;
@@ -410,7 +410,7 @@ static void func_02700230(CAMERAResult result, void *arg) {
         }
     case 30:
         if (sCameraWork.activeCamera == CAMERA_SELECT_OUT && sCameraWork.settings[1].unk_38 == 1) {
-            if (hw_isDSi() == TRUE) {
+            if (OS_IsRunOnTwl() == TRUE) {
                 func_02701940(1, func_02700230, (void *)31);
             }
             return;
@@ -514,7 +514,7 @@ CAMERAResult CAMERA_InitCore(void) {
     PM_SetSleepCallbackInfo(&sCameraWork.sleepInfo, func_02702070, NULL);
     PM_InsertPreSleepCallback(&sCameraWork.sleepInfo, CAMERA_PM_CALLBACK_PRIORITY);
     PM_SetExitCallbackInfo(&sCameraWork.exitInfo, func_02702070, NULL);
-    func_02769550(&sCameraWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
+    PM_InsertPreExitCallback(&sCameraWork.exitInfo, CAMERA_PM_CALLBACK_PRIORITY);
     func_0270223c(0x200);
     func_02702268(TRUE);
     CAMERA_SetInterruptEnableCore(TRUE);
@@ -563,7 +563,7 @@ void CAMERA_EndCore(void) {
     }
     sCameraInitialized = FALSE;
     PM_DeletePreSleepCallback(&sCameraWork.sleepInfo);
-    func_02769568(&sCameraWork.exitInfo);
+    PM_DeletePreExitCallback(&sCameraWork.exitInfo);
     CAMERA_I2CActivateCore(CAMERA_SELECT_NONE);
     CAMERA_ResetCore();
     CAMERA_StopCaptureCore();

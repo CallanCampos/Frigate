@@ -11,6 +11,6 @@ void SystemInit(void);
 void func_02005430(void);
 // Does the VRAM transfers queued during the frame
 void SystemUpdateVBlank(void);
-// func_0200548c, the game's CTRDG_Init, is in nitro/ctrdg.h
+// CTRDG_Init, the game's CTRDG_Init, is in nitro/ctrdg.h
 
 #endif // POKEBW2_SYSTEM_MACHINE_USE_H

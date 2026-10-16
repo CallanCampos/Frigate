@@ -11,6 +11,7 @@
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "nnsys/g3d.h"
 #include "nnsys/gfd.h"
 #include "save/pokewood.h"

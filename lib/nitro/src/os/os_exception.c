@@ -48,7 +48,7 @@ void OS_InitException(void) {
     OSi_DebuggerHandler = handler;
     if (OSi_DebuggerHandler == 0) {
         *vector = (u32)OSi_ExceptionHandler;
-        if (!hw_isDSi()) {
+        if (!OS_IsRunOnTwl()) {
             *(u32 *)((u32)vector & HW_EXCP_VECTOR_MAIN_MASK) = (u32)OSi_ExceptionHandler;
         }
     }

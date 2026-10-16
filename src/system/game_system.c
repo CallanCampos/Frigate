@@ -186,7 +186,7 @@ static BOOL GameSystem_End(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_HeapDelete(HEAPID_GAMESYSTEM);
     GFL_HeapDelete(HEAPID_GAMEEVENT);
     GFL_HeapDelete(HEAPID_TRIAL_HOUSE);
-    sys_reset(0);
+    OS_ResetSystem(0);
     return TRUE;
 }
 

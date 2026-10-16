@@ -1,6 +1,6 @@
-// MSL C's abort_exit_arm.c (the name is a guess from the ARM platform group of MSL_C_NITRO_Ai_LE.a; BW1's map names
-// abort_exit_arm.): atexit, which takes the lock of the atexit table around the runtime's __register_atexit. exit
-// itself lies before this file in the ROM.
+// MSL C's abort_exit_arm.c (the name is a guess from the ARM platform group of MSL_C_NITRO_Ai_LE.a): atexit, which
+// takes the lock of the atexit table around the runtime's __register_atexit. exit itself lies before this file in the
+// ROM.
 #include "critical_regions.h"
 #include "runtime/register_atexit.h"
 #include <stdlib.h>

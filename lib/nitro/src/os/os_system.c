@@ -1,6 +1,7 @@
 // NitroSDK OS: the processor's interrupt state and waiting (os_system.c, a guessed name). The functions that change
 // the CPSR are assembly in the SDK, in ARM code; the others are Thumb.
 #include "nitro/os.h"
+#include "nitro/svc.h"
 #include "twl/scfg.h"
 
 static asm void OSi_SpinWaitCpuCycles(u32 cycles);
@@ -83,12 +84,7 @@ static asm void OSi_SpinWaitCpuCycles(u32 cycles) {
 // TwlSDK's OS_SpinWaitSysCycles: waits for some cycles of the system clock. The ARM9 runs at twice its rate, or at four
 // times with the speed bit of SCFG_CLK set (the DSi's 134 MHz), and 16 of its cycles are the cost of the call
 void OS_SpinWaitSysCycles(u32 cycles) {
-    u32 shift = 1;
-
-    if ((reg_SCFG_CLK & SCFG_CLK_CPU_2X) == 1) {
-        shift = 2;
-    }
-    cycles <<= shift;
+    cycles <<= ((reg_SCFG_CLK & SCFG_CLK_CPU_2X) == 1) ? 2 : 1;
     if (cycles > 16) {
         OSi_SpinWaitCpuCycles(cycles - 16);
     }
@@ -104,7 +100,7 @@ void OS_WaitInterrupt(BOOL clear, u32 interrupts) {
         *(vu32 *)HW_INTR_CHECK_BUF &= ~interrupts;
     }
     while (!(*(vu32 *)HW_INTR_CHECK_BUF & interrupts)) {
-        cp15_halt();
+        OS_Halt();
         OS_EnableInterrupts();
         OS_DisableInterrupts();
     }
@@ -115,7 +111,7 @@ void OS_WaitInterrupt(BOOL clear, u32 interrupts) {
 
 // NitroSDK's OS_WaitVBlankIntr
 void OS_WaitVBlankIntr(void) {
-    WaitByLoop(1);
+    SVC_WaitByLoop(1);
     OS_WaitIrq(TRUE, OS_IE_V_BLANK);
 }
 

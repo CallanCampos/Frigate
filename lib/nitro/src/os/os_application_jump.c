@@ -17,7 +17,7 @@ void func_0207c888(void) {
 
     OS_InitDeliverArg(&info, 0);
     if (OS_DecodeDeliverArg() == 0) {
-        data_0276b0dc = func_0207c6a4();
+        data_0276b0dc = OS_GetTitleIdFromDeliverArg();
     }
     if ((data_0276b0dc != 0 && func_0276934c(data_0276b0dc, -1) == 0) || TITLE_ID_FIRST_CHAR(data_0276b0dc) == '0' ||
         TITLE_ID_FIRST_CHAR(data_0276b0dc) == '1' || TITLE_ID_FIRST_CHAR(data_0276b0dc) == '2' ||
@@ -26,6 +26,6 @@ void func_0207c888(void) {
         OS_InitDeliverArg(&info, 0);
         OS_EncodeDeliverArg();
     } else {
-        func_0207c698();
+        OS_FinalizeDeliverArg();
     }
 }

@@ -76,10 +76,10 @@ NWMRetCode NWM_End(void);
 // Also puts the callbacks that exit the application when the console sleeps and before it exits
 NWMRetCode NWM_LoadDevice(NWMCallback callback);
 NWMRetCode NWM_UnloadDevice(NWMCallback callback);
-// The command 5, for a console with the wireless on (NWM_Open, by the states)
-NWMRetCode func_02702f38(NWMCallback callback);
-// The command 6 (NWM_Close, by the states)
-NWMRetCode func_02702fe8(NWMCallback callback);
+// The command 5, for a console with the wireless on (the name is a guess from the states)
+NWMRetCode NWM_Open(NWMCallback callback);
+// The command 6 (the name is a guess from the states)
+NWMRetCode NWM_Close(NWMCallback callback);
 NWMRetCode NWM_StartScan(NWMCallback callback, const NWMScanParam *param);
 // The first information element of a scan result with the ID, or NULL
 u8 *func_02703208(NWMBssDesc *bssDesc, u32 id);
@@ -88,10 +88,10 @@ u8 *func_02703208(NWMBssDesc *bssDesc, u32 id);
 u8 *func_02703250(NWMBssDesc *bssDesc, u32 id, const u8 *oui);
 // The command 8, with a block for the ARM7 and an index below 3
 NWMRetCode func_027032e0(NWMCallback callback, u32 index, const NWMBlockParam *block);
-// The command 9, in the connected state (NWM_Disconnect, by the state)
-NWMRetCode func_02703424(NWMCallback callback);
-// The command 0xd (NWM_Connect, by the state): the mode is 0 to 3, and the 0x50 bytes of data go along
-NWMRetCode func_027034c0(NWMCallback callback, u32 mode, u32 arg, const void *data, u16 arg2);
+// The command 9, in the connected state (the name is a guess from the state)
+NWMRetCode NWM_Disconnect(NWMCallback callback);
+// The command 0xd (the name is a guess from the state): the mode is 0 to 3, and the 0x50 bytes of data go along
+NWMRetCode NWM_Connect(NWMCallback callback, u32 mode, u32 arg, const void *data, u16 arg2);
 // The command 0xe
 NWMRetCode func_027035f4(NWMCallback callback, u32 arg);
 // NWM_SendFrame: sends the frame, whose first 12 bytes the library fills with the two MAC addresses. The callback runs

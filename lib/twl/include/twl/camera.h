@@ -120,7 +120,7 @@ void func_0270223c(u32 bits);                // replaces bits 8 and 9 of the int
 void func_02702268(BOOL on);                 // sets or clears bit 10 of the interface's control
 
 static inline CAMERAResult CAMERA_Init(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERAResult result = CAMERA_InitCore();
         if (result == CAMERA_RESULT_SUCCESS) {
             result = CAMERA_I2CInitCore(CAMERA_SELECT_BOTH);
@@ -131,145 +131,145 @@ static inline CAMERAResult CAMERA_Init(void) {
 }
 
 static inline void CAMERA_End(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_EndCore();
     }
 }
 
 // Not an SDK name: what the SDK calls the function is unknown
 static inline CAMERAResult CAMERA_I2CStop(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return func_02700bd0();
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CActivate(CAMERASelect camera) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_I2CActivateCore(camera);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CSizeEx(CAMERASelect camera, CAMERAContext context, CAMERASize size) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_I2CSizeExCore(camera, context, size);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CEffectEx(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_I2CEffectExCore(camera, context, effect);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CAutoExposure(CAMERASelect camera, BOOL on) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_I2CAutoExposureCore(camera, on);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline CAMERAResult CAMERA_I2CAutoWhiteBalance(CAMERASelect camera, BOOL on) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_I2CAutoWhiteBalanceCore(camera, on);
     }
     return CAMERA_RESULT_FATAL_ERROR;
 }
 
 static inline void CAMERA_SetVsyncCallback(CAMERAIntrCallback callback) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_SetVsyncCallbackCore(callback);
     }
 }
 
 static inline void CAMERA_SetBufferErrorCallback(CAMERAIntrCallback callback) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_SetBufferErrorCallbackCore(callback);
     }
 }
 
 static inline void CAMERA_SetRebootCallback(CAMERAIntrCallback callback) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_SetRebootCallbackCore(callback);
     }
 }
 
 static inline BOOL CAMERA_IsBusy(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_IsBusyCore();
     }
     return FALSE;
 }
 
 static inline void CAMERA_StartCapture(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_StartCaptureCore();
     }
 }
 
 static inline void CAMERA_StopCapture(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_StopCaptureCore();
     }
 }
 
 static inline void CAMERA_SetTrimming(BOOL enabled) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_SetTrimmingCore(enabled);
     }
 }
 
 static inline void CAMERA_SetOutputFormat(CAMERAOutput output) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_SetOutputFormatCore(output);
     }
 }
 
 static inline void CAMERA_ClearBuffer(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_ClearBufferCore();
     }
 }
 
 static inline BOOL CAMERA_IsBufferError(void) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_IsBufferErrorCore();
     }
     return FALSE;
 }
 
 static inline void CAMERA_SetTransferLines(int lines) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         CAMERA_SetTransferLinesCore(lines);
     }
 }
 
 static inline int CAMERA_GetMaxLinesRound(u16 width, u16 height) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_GetMaxLinesRoundCore(width, height);
     }
     return 0;
 }
 
 static inline u32 CAMERA_GetBytesAtOnce(u16 width) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_GetBytesAtOnceCore(width);
     }
     return 0;
 }
 
 static inline u16 CAMERA_SizeToWidth(CAMERASize size) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_SizeToWidthCore(size);
     }
     return 0;
 }
 
 static inline u16 CAMERA_SizeToHeight(CAMERASize size) {
-    if (hw_isDSi() == TRUE) {
+    if (OS_IsRunOnTwl() == TRUE) {
         return CAMERA_SizeToHeightCore(size);
     }
     return 0;

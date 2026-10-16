@@ -39,7 +39,7 @@ void GFL_MemInit(const HeapDef *defs, u32 rootCount, u32 maxHeapIds, u32 reserve
     OS_GetArenaHi(OS_ARENA_MAIN);
     if (!ok) {
         GFL_HeapGetLastResult();
-        sys_exit();
+        OS_Terminate();
     }
 }
 
@@ -58,19 +58,19 @@ void GFL_HeapCreateRoot(void *memory, u32 size, HeapID heapId) {
 static void GFL_HeapHandleAllocResult(u16 result, HeapID parentHeapId, HeapID heapId) {
     switch (result) {
     case HEAP_RESULT_1:
-        sys_exit();
+        OS_Terminate();
         break;
     case HEAP_RESULT_2:
-        sys_exit();
+        OS_Terminate();
         break;
     case HEAP_RESULT_3:
-        sys_exit();
+        OS_Terminate();
         break;
     case HEAP_RESULT_4:
-        sys_exit();
+        OS_Terminate();
         break;
     case HEAP_RESULT_5:
-        sys_exit();
+        OS_Terminate();
         break;
     }
 }
@@ -80,10 +80,10 @@ void GFL_HeapDelete(HeapID heapId) {
     if (!GFL_HeapDeleteCore(heapId)) {
         switch (GFL_HeapGetLastResult()) {
         case HEAP_RESULT_1:
-            sys_exit();
+            OS_Terminate();
             break;
         case HEAP_RESULT_2:
-            sys_exit();
+            OS_Terminate();
             break;
         }
     }
@@ -95,7 +95,7 @@ void *GFL_HeapAllocate(HeapID heapId, u32 size, BOOL clear, const char *file, u1
     if (ptr == NULL) {
         GFL_HeapGetLastResult();
         GFL_HeapDumpAllocFailure(heapId, size, file, line);
-        sys_exit();
+        OS_Terminate();
     } else {
         GFL_HeapSetBlockDebugInfo(ptr, file, line);
         GFL_HeapDebugTraceAlloc(heapId, ptr, size);
@@ -113,7 +113,7 @@ void GFL_HeapFree(void *ptr) {
 
 void GFL_HeapCreateAllocator(NNSFndAllocator *allocator, HeapID heapId, int alignment) {
     if (!GFL_HeapCreateAllocatorCore(allocator, heapId, alignment)) {
-        sys_exit();
+        OS_Terminate();
     }
 }
 
@@ -121,13 +121,13 @@ void GFL_HeapResize(void *ptr, u32 size) {
     if (!GFL_HeapResizeCore(ptr, size)) {
         switch (GFL_HeapGetLastResult()) {
         case HEAP_RESULT_1:
-            sys_exit();
+            OS_Terminate();
             break;
         case HEAP_RESULT_2:
-            sys_exit();
+            OS_Terminate();
             break;
         case HEAP_RESULT_3:
-            sys_exit();
+            OS_Terminate();
             break;
         case HEAP_RESULT_4:
             break;
@@ -141,7 +141,7 @@ u32 GFL_HeapGetFreeSize(HeapID heapId) {
     u32 size = GFL_HeapGetFreeSizeCore(heapId);
 
     if (size == 0) {
-        sys_exit();
+        OS_Terminate();
     }
     return size;
 }
@@ -156,7 +156,7 @@ BOOL GFL_HeapStatusValidate(HeapID heapId) {
         case HEAP_RESULT_2:
             break;
         case HEAP_RESULT_3:
-            sys_exit();
+            OS_Terminate();
             break;
         }
     }
@@ -296,7 +296,7 @@ void GFL_HeapDumpOnFailure(HeapID heapId) {
 
 void GFL_HeapDTCMInit(u32 size) {
     if (!GFL_HeapDTCMInitCore(size)) {
-        sys_exit();
+        OS_Terminate();
     }
 }
 

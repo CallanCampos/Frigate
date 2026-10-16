@@ -49,7 +49,7 @@ BOOL DWCAc_MakeSearchList(u32 step) {
         break;
     }
     // A test of the console whose body is not in this build, most likely a debug print for the DSi
-    hw_isDSi();
+    OS_IsRunOnTwl();
     return TRUE;
 }
 
@@ -167,7 +167,7 @@ static u8 MakeSettingTargets(DWCAcSearchWork *work) {
         }
     }
 
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         for (i = 0; i < 3; i++, dsi++) {
             if (work->mode == 0 || work->mode == i + 0xb) {
                 if (dsi->base.security != 0xff) {

@@ -14,7 +14,7 @@
 #define RTC_COMMAND_EX_NOP 0x12
 
 int RTCi_ProcessExCommand(void) {
-    RTCWork *work = func_0207cd18();
+    RTCWork *work = RTCi_GetSysWork();
     int result = RTC_RESULT_SUCCESS;
 
     switch (work->command) {

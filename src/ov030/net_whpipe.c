@@ -340,7 +340,7 @@ void func_ov030_02173780(void) {
         }
         size = init->unk1C(work->gameWork);
         if (size > _BEACON_USER_SIZE_MAX) {
-            sys_exit();
+            OS_Terminate();
             return;
         }
         info = &work->info;

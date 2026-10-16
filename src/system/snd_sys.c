@@ -98,8 +98,8 @@ void GFL_SndInit(void) {
     sSndHeap = NNS_SndHeapCreate(g_GFLSndHeap, sizeof(g_GFLSndHeap));
     NNS_SndArcInit(&sSndArc, "swan_sound_data.sdat", sSndHeap, FALSE);
     GFL_SndInitCore(TRUE);
-    if (hw_isDSi() == TRUE) {
-        func_02704364();
+    if (OS_IsRunOnTwl() == TRUE) {
+        SNDEX_Init();
     }
 }
 

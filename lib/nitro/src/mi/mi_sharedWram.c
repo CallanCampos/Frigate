@@ -5,7 +5,7 @@
 #include "twl/mi.h"
 
 void func_02078000(void) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         func_02768818();
     }
 }

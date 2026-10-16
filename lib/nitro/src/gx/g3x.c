@@ -140,15 +140,15 @@ void G3X_InitTable(void) {
     int i;
     if (GXi_DmaId != GX_DMA_NOT_USE) {
         if (GXi_DmaId > MI_DMA_MAX_NUM) {
-            func_027681b8(GXi_DmaId - 4, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL);
-            func_0276814c(GXi_DmaId - 4, (void *)&reg_G3X_FOG_TABLE, 0, 0x60);
+            MI_NDmaFillAsync(GXi_DmaId - 4, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL);
+            MI_NDmaFill(GXi_DmaId - 4, (void *)&reg_G3X_FOG_TABLE, 0, 0x60);
         } else {
             MIi_DmaFill32Async(GXi_DmaId, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL, TRUE);
             MIi_DmaFill32(GXi_DmaId, (void *)&reg_G3X_FOG_TABLE, 0, 0x60, TRUE);
         }
     } else {
-        MIi_CpuClear32(0, (void *)&reg_G3X_EDGE_COLOR, 0x10);
-        MIi_CpuClear32(0, (void *)&reg_G3X_FOG_TABLE, 0x60);
+        MI_CpuClear32((void *)&reg_G3X_EDGE_COLOR, 0x10);
+        MI_CpuClear32((void *)&reg_G3X_FOG_TABLE, 0x60);
     }
     for (i = 0; i < 32; i++) {
         reg_G3X_SHININESS = 0;

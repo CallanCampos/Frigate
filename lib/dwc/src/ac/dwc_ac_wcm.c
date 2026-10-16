@@ -85,7 +85,7 @@ int DWCAc_GetSpecialApId(const WMBssDesc *bss) {
 
 // Whether the access point can be taken for a connection with WPA. A DS cannot tell, and takes it so
 BOOL DWCAc_CheckWpa(const WMBssDesc *bss) {
-    if (hw_isDSi() && func_02703208((NWMBssDesc *)bss, 0x30) == NULL) {
+    if (OS_IsRunOnTwl() && func_02703208((NWMBssDesc *)bss, 0x30) == NULL) {
         u8 oui[4] = { 0x00, 0x50, 0xf2, 0x01 };
 
         if (func_02703250((NWMBssDesc *)bss, 0xdd, oui) == NULL) {

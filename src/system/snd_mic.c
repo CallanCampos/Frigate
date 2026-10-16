@@ -45,8 +45,8 @@ void setupMic(HeapID heapId) {
     PM_SetAmpGain(2);
     mic->enabled = TRUE;
     MIC_Init();
-    if (hw_isDSi() == TRUE) {
-        func_027047c0(0, sMicFilter);
+    if (OS_IsRunOnTwl() == TRUE) {
+        SNDEX_SetIirFilter(0, sMicFilter);
     }
     sSndMic = mic;
 }

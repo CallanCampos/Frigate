@@ -9,7 +9,7 @@
 
 // DWC's auto-connect (TWL-DWC 5.3, ARM9 main; the ac/ files of lib/dwc), which finds an access point to join and
 // brings the wireless manager, the socket layer and the connection up. The ROM names none of it, so the names of the
-// types and their fields are ours, taken from what the code does, and the calls are still named after their addresses.
+// types, their fields and the DWCAc_ functions are ours, taken from what the code does.
 //
 // Auto-connect keeps five blocks of memory, which DWCAc_GetBlock gives out by the flag of each; a table of five
 // pointers in the BSS holds them, and a bit of the byte at offset 8 of the first block says which of them are

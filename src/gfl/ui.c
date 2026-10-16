@@ -211,7 +211,7 @@ KeypadManager *GFL_HIDGetKeypadManager(SystemUI *ui) {
 
 SystemUI *GCTX_HIDGetInstance(void) {
     if (sSystemUI == NULL) {
-        sys_exit();
+        OS_Terminate();
     }
     return sSystemUI;
 }
@@ -248,7 +248,7 @@ static void battery(void) {
     u32 battery;
 
     if (OS_GetVBlankCount() % 600 == 1) {
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             if (PM_GetBatteryLevel(&level) == PM_RESULT_SUCCESS) {
                 sSystemUI->batteryLevel = level;
             }
@@ -343,7 +343,7 @@ void GFL_HIDDoSoftReset(u32 parameter) {
     for (;;) {
         if (func_02042ab8() && CARD_TryWaitBackupAsync()) {
             setBacklightBothScreens(ui->backlight);
-            sys_reset(parameter);
+            OS_ResetSystem(parameter);
         }
         OS_WaitIrq(TRUE, OS_IE_V_BLANK);
         func_020428e0();

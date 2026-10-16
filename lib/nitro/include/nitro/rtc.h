@@ -63,7 +63,7 @@ typedef void (*RTCCallback)(int result, void *arg);
 typedef void (*RTCAlarmCallback)(void);
 
 // The work of the command under way (NitroSDK's RTCWork, which main's rtc_api.c keeps after a flag that says the
-// library is set up; TwlSDK's code in the LTD autoload gets it from func_0207cd18)
+// library is set up; TwlSDK's code in the LTD autoload gets it from RTCi_GetSysWork)
 typedef struct RTCWork {
     vu32 lock;                      // 0x00: set from the start of a command to the end of its answer
     RTCCallback callback;           // 0x04: called with the result when the command is done
@@ -88,7 +88,7 @@ int RTC_GetTime(RTCTime *time);
 int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg);
 int RTC_GetDateTime(RTCDate *date, RTCTime *time);
 // The work of the command under way, for TwlSDK's RTC code in the LTD autoload
-RTCWork *func_0207cd18(void);
+RTCWork *RTCi_GetSysWork(void);
 
 // NitroSDK's RTCi_ReadRawDateTimeAsync, RTCi_ReadRawDateAsync and RTCi_ReadRawTimeAsync, which ask the ARM7 to put the
 // clock in the shared memory, and RTCi_WriteRawStatus2Async, which asks it to write the second status register of the

@@ -4,7 +4,7 @@
 // "WDS!" and four bytes of the beacon's BSSID, and kept when their CRC-16 is right. Its callers are the scan of
 // dwc_wdsscan.c and the connection of dwc_connectinet.c, which decrypts a beacon with WDS_DecryptBeaconInfo on its own.
 //
-// The functions are still named after their addresses; the comment above each has the name we would give it.
+// The WDS_ names are ours, taken from what the code does.
 
 #include "dwc/wds.h"
 #include "nitro/math.h"

@@ -6,6 +6,7 @@
 #include "dwc/ext.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "poke_net_internal.h"
 
 static int POKE_NET_SSL_AuthCallback(int result, POKE_NET_SSL_CONNECTION *connection, int level);

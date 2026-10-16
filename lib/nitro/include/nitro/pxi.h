@@ -44,6 +44,7 @@
 #define PXI_FIFO_TAG_FS 11
 #define PXI_FIFO_TAG_OS 12
 #define PXI_FIFO_TAG_CTRDG 13
+#define PXI_FIFO_TAG_CARD 14
 #define PXI_FIFO_TAG_FATFS 20
 #define PXI_FIFO_TAG_CAMERA 21
 #define PXI_FIFO_TAG_NWM 22
@@ -78,7 +79,7 @@ int PXI_SendWordByFifo(u32 fifoTag, u32 data, BOOL err);
 // which the loops that wait with the interrupts off also call
 void PXIi_HandlerRecvFifoNotEmpty(void);
 // NitroSDK's PXI_IsCallbackReady: whether the processor has a callback for the tag, by its bit in the shared memory
-// (OSSystemWork's pxiSignalParam, nitro/os.h)
+// (OSSystemWork's pxiHandleChecker, nitro/os.h)
 BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor);
 
 #endif // POKEBW2_NITRO_PXI_H

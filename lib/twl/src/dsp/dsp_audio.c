@@ -88,10 +88,10 @@ static inline u32 ReadU32(const u8 *p) {
 // The answer to the ARM7's request that ends the shutter sound
 static void func_02705f64(SNDEXResult result, void *arg) {
     if (result == SNDEX_RESULT_BUSY) {
-        sys_exit();
+        OS_Terminate();
     }
     if (result != SNDEX_RESULT_SUCCESS) {
-        sys_exit();
+        OS_Terminate();
     }
     sShutter.requestOn = FALSE;
 }

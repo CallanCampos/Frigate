@@ -149,7 +149,7 @@ static BOOL KeySystem_ProcExit(GameProc *proc, u32 *state, void *param, void *wo
         FreeZoneDataSystem();
         GameData_Free(wk->param->gameData);
         GFL_HeapFree(wk->param);
-        sys_reset(0);
+        OS_ResetSystem(0);
     }
     if (wk->wbSave != NULL) {
         GFL_HeapFree(wk->wbSave);

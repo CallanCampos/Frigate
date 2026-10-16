@@ -238,7 +238,7 @@ NWMRetCode func_02702698(void) {
 
 // Whether the wireless is available and not turned off
 static BOOL func_027026b4(void) {
-    if (OS_IsAvailableWireless() == TRUE && !func_0207c4d0()) {
+    if (OS_IsAvailableWireless() == TRUE && !OS_IsForceDisableWireless()) {
         return TRUE;
     }
     return FALSE;
@@ -300,7 +300,7 @@ static void func_02702740(u32 tag, u32 data, BOOL err) {
     if (event->cmd != NWM_CMD_SEND_FRAME) {
         if (event->cmd == NWM_CMD_UNLOAD_DEVICE || event->cmd == NWM_CMD_19 ||
             (event->cmd == NWM_CMD_LOAD_DEVICE && event->result != 0)) {
-            func_02769568(&sNwm.exitCallback);
+            PM_DeletePreExitCallback(&sNwm.exitCallback);
         }
         callback = sys->callbacks[event->cmd];
         if (event->cmd == NWM_CMD_SCAN) {
@@ -391,7 +391,7 @@ static void func_02702a78(void) {
 }
 
 static void func_02702a8c(void *arg) {
-    sys_exit();
+    OS_Terminate();
 }
 
 NWMRetCode NWM_End(void) {
@@ -429,7 +429,7 @@ NWMRetCode NWM_LoadDevice(NWMCallback callback) {
     func_02702a40();
     info = &sNwm.exitCallback;
     PM_SetExitCallbackInfo(info, func_02702d7c, NULL);
-    func_02769550(info, NWM_PM_PRIORITY);
+    PM_InsertPreExitCallback(info, NWM_PM_PRIORITY);
     result = func_02703a74(NWM_CMD_LOAD_DEVICE, 4, sys->info, sys->status, sys->event, 0);
     if (result == NWM_RETCODE_SUCCESS || result == NWM_RETCODE_OPERATING) {
         result = NWM_RETCODE_OPERATING;
@@ -515,7 +515,7 @@ static void func_02702d7c(void *arg) {
     } while (!sUnloaded);
 }
 
-NWMRetCode func_02702f38(NWMCallback callback) {
+NWMRetCode NWM_Open(NWMCallback callback) {
     NWMRetCode result;
 
     if (!func_027026b4()) {
@@ -537,7 +537,7 @@ NWMRetCode func_02702f38(NWMCallback callback) {
     return result;
 }
 
-NWMRetCode func_02702fe8(NWMCallback callback) {
+NWMRetCode NWM_Close(NWMCallback callback) {
     NWMRetCode result;
 
     result = func_027028e4(1, NWM_STATE_READY);
@@ -685,7 +685,7 @@ NWMRetCode func_027032e0(NWMCallback callback, u32 index, const NWMBlockParam *d
     return result;
 }
 
-NWMRetCode func_02703424(NWMCallback callback) {
+NWMRetCode NWM_Disconnect(NWMCallback callback) {
     NWMRetCode result;
 
     result = func_027028e4(1, NWM_STATE_CONNECTED);
@@ -712,7 +712,7 @@ typedef struct NWMConnectCmd {
     u8 data[0x50];
 } NWMConnectCmd;
 
-NWMRetCode func_027034c0(NWMCallback callback, u32 mode, u32 arg, const void *data, u16 arg2) {
+NWMRetCode NWM_Connect(NWMCallback callback, u32 mode, u32 arg, const void *data, u16 arg2) {
     NWMConnectCmd cmd;
     NWMRetCode result;
 
@@ -988,5 +988,5 @@ static NWMCmdBuf *func_02703b98(void) {
 static BOOL func_02703c28(void) {
     u8 *settings = *(u8 **)NWM_SETTINGS_PTR;
 
-    return GetCRC16(0xffff, settings + 0x1e4, 12) == *(u32 *)(settings + 0x1e0) >> 16;
+    return SVC_GetCRC16(0xffff, settings + 0x1e4, 12) == *(u32 *)(settings + 0x1e0) >> 16;
 }

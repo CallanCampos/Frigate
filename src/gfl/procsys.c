@@ -160,7 +160,7 @@ static u32 GFL_ProcMgrUpdateCore(GameProcManager *manager) {
 // Freeing the manager while a process runs halts the system
 static void GFL_ProcMgrFree(GameProcManager *manager) {
     if (manager->proc != NULL) {
-        cp15_halt();
+        OS_Halt();
     }
     GFL_HeapFree(manager);
 }

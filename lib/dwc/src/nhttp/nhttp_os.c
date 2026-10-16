@@ -49,7 +49,7 @@ void NHTTPi_CheckCurrentThread(NHttpThreadInfo *info, BOOL outside) {
 
     if (current != NULL) {
         if ((!outside && current != thread) || (outside && current == thread)) {
-            sys_exit();
+            OS_Terminate();
         }
     }
 }

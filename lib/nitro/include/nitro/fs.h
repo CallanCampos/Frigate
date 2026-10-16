@@ -5,8 +5,8 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-// NitroSDK's file system: FS_InitFile, FS_OpenFile, FS_GetLength, FS_ReadFile, FS_CloseFile,
-// FS_SeekFile, and FS_CreateFileFromMemory, which opens a file over memory
+// NitroSDK's file system (TwlSDK's libfs): the files, the archives and their command queue, the ROM archive and the
+// overlays
 
 // What a command of the file system returns. A command that an archive runs apart from the caller's thread returns
 // FS_RESULT_PROC_ASYNC and ends later, through FS_NotifyArchiveAsyncEnd
@@ -34,7 +34,8 @@ typedef enum FSResult {
 // position). 9 to 12, 17, 18 and FS_COMMAND_INVALID are the events, which run at once and return nothing. The
 // commands from 19 on act on paths and on the archive; no function of the game sends them. The ROM archive has
 // functions for 19, 23 (the information of a path), 28 (the archive's resources) and 32 and 33 (opening and closing a
-// directory by path); the others are left as the words an interface function receives
+// directory by path). The names are TwlSDK's, which the other commands' arguments fit; 29's is not known, and the
+// arguments of the commands that the ROM archive lacks are left as the words an interface function receives
 typedef enum FSCommandType {
     FS_COMMAND_READFILE = 0,
     FS_COMMAND_WRITEFILE = 1,
@@ -55,22 +56,22 @@ typedef enum FSCommandType {
     FS_COMMAND_GETFILEPOSITION = 16,
     FS_COMMAND_MOUNT = 17,
     FS_COMMAND_UNMOUNT = 18,
-    FS_COMMAND_19 = 19,
-    FS_COMMAND_20 = 20,
-    FS_COMMAND_21 = 21,
-    FS_COMMAND_22 = 22,
+    FS_COMMAND_GETARCHIVECAPS = 19,
+    FS_COMMAND_CREATEFILE = 20,
+    FS_COMMAND_DELETEFILE = 21,
+    FS_COMMAND_RENAMEFILE = 22,
     FS_COMMAND_GETPATHINFO = 23,
-    FS_COMMAND_24 = 24,
-    FS_COMMAND_25 = 25,
-    FS_COMMAND_26 = 26,
-    FS_COMMAND_27 = 27,
+    FS_COMMAND_SETPATHINFO = 24,
+    FS_COMMAND_CREATEDIRECTORY = 25,
+    FS_COMMAND_DELETEDIRECTORY = 26,
+    FS_COMMAND_RENAMEDIRECTORY = 27,
     FS_COMMAND_GETARCHIVERESOURCE = 28,
     FS_COMMAND_29 = 29,
-    FS_COMMAND_30 = 30,
-    FS_COMMAND_31 = 31,
+    FS_COMMAND_FLUSHFILE = 30,
+    FS_COMMAND_SETFILELENGTH = 31,
     FS_COMMAND_OPENDIRECTORY = 32,
     FS_COMMAND_CLOSEDIRECTORY = 33,
-    FS_COMMAND_34 = 34,
+    FS_COMMAND_SETSEEKCACHE = 34,
     // What a file that has no command holds
     FS_COMMAND_INVALID = 35,
 } FSCommandType;
@@ -187,22 +188,22 @@ typedef union FSArchiveInterface {
         FSResult (*getFilePosition)(FSArchive *arc, FSFile *file, u32 *position);
         void (*mount)(FSArchive *arc);
         void (*unmount)(FSArchive *arc);
-        FSResult (*command19)(FSArchive *arc, u32 *arg0);
-        FSResult (*command20)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2);
-        FSResult (*command21)(FSArchive *arc, u32 arg0, u32 arg1);
-        FSResult (*command22)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2, u32 arg3);
+        FSResult (*getArchiveCaps)(FSArchive *arc, u32 *arg0);
+        FSResult (*createFile)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2);
+        FSResult (*deleteFile)(FSArchive *arc, u32 arg0, u32 arg1);
+        FSResult (*renameFile)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2, u32 arg3);
         FSResult (*getPathInfo)(FSArchive *arc, u32 baseDirId, const char *path, FSPathInfo *info);
-        FSResult (*command24)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2);
-        FSResult (*command25)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2);
-        FSResult (*command26)(FSArchive *arc, u32 arg0, u32 arg1);
-        FSResult (*command27)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2, u32 arg3);
+        FSResult (*setPathInfo)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2);
+        FSResult (*createDirectory)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2);
+        FSResult (*deleteDirectory)(FSArchive *arc, u32 arg0, u32 arg1);
+        FSResult (*renameDirectory)(FSArchive *arc, u32 arg0, u32 arg1, u32 arg2, u32 arg3);
         FSResult (*getArchiveResource)(FSArchive *arc, FSArchiveResource *resource);
         void *command29;
-        FSResult (*command30)(FSArchive *arc, FSFile *file);
-        FSResult (*command31)(FSArchive *arc, FSFile *file, u32 arg0);
+        FSResult (*flushFile)(FSArchive *arc, FSFile *file);
+        FSResult (*setFileLength)(FSArchive *arc, FSFile *file, u32 arg0);
         FSResult (*openDirectory)(FSArchive *arc, FSFile *file, u32 baseDirId, const char *path, u32 arg2);
         FSResult (*closeDirectory)(FSArchive *arc, FSFile *file);
-        FSResult (*command34)(FSArchive *arc, FSFile *file, u32 arg0, u32 arg1);
+        FSResult (*setSeekCache)(FSArchive *arc, FSFile *file, u32 arg0, u32 arg1);
     };
     void *command[FS_COMMAND_MAX];
 } FSArchiveInterface;
@@ -462,8 +463,8 @@ BOOL FS_CreateFileFromMemory(FSFile *file, const void *data, u32 size); // swan'
 u32 FS_GetFilePosition(FSFile *file); // swan's romfs_ftell
 // The ROM archive's shortcuts for the length and the position of a file: they set *value and return TRUE when the
 // file's archive has the ROM interface, and return FALSE (and leave the command to be sent) otherwise
-BOOL func_02071e74(FSFile *file, u32 *length);
-BOOL func_02071e9c(FSFile *file, u32 *position);
+BOOL FSi_GetFileLengthIfProc(FSFile *file, u32 *length);
+BOOL FSi_GetFilePositionIfProc(FSFile *file, u32 *position);
 // Opens a file that is a range of an archive's data, from start to end
 BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, int fileId); // swan's fopen_raw
 // The archive of a name of the given length, or NULL. NitroSDK's FS_FindArchive
@@ -566,11 +567,11 @@ u32 FS_GetArchiveBase(const FSArchive *arc);
 // (fs_rom.c)
 BOOL FSi_IsDsiOnlyRomOffset(const FSArchive *arc, u32 position);
 
-// The archives and the command queue, in swan's names. NitroSDK's FS_RegisterArchiveName (the longest name is 15
+// The archives and the command queue: NitroSDK's FS_RegisterArchiveName (the longest name is 15
 // characters), FS_ReleaseArchiveName, FS_InitArchive, FS_SuspendArchive, FS_ResumeArchive, FSi_SendCommand (with
-// blocking set, it returns after the command ended), FS_NotifyArchiveAsyncEnd, FS_ChangeDir, FSi_NormalizePath
-// (which returns the archive a path is in, with the number of the directory it starts at and the path inside the
-// archive), FS_GetArchiveName and FSi_IncrementSjisPositionToSlash
+// blocking set, it returns after the command ended), FS_NotifyArchiveAsyncEnd, FS_SetCurrentDirectory,
+// FSi_NormalizePath (which returns the archive a path is in, with the number of the directory it starts at and the path
+// inside the archive), FS_GetArchiveName and FSi_IncrementSjisPositionToSlash
 #define FS_ARCHIVE_SHORT_NAME_LEN_MAX 3 // the longest name that the archive holds in place
 #define FS_ARCHIVE_NAME_LEN_MAX 15
 #define FS_PATH_BUFFER_SIZE 0x104
@@ -590,10 +591,10 @@ void FS_NotifyArchiveAsyncEnd(FSArchive *arc, FSResult result);
 FSResult FSi_WaitForArchiveCompletion(FSFile *file, FSResult result);
 BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking);         // swan's fs_call_syscmd
 FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized); // swan's fs_normalize_path
-BOOL FS_ChangeDir(const char *path);
+BOOL FS_SetCurrentDirectory(const char *path);
 int FSi_IncrementSjisPositionToSlash(const char *path, int position);
-BOOL func_02070eb4(const char *path);
-// Opens a file that is a range of the ROM, from start, for size bytes
+BOOL FS_ChangeDir(const char *path);
+// Opens a file that is a range of the ROM, from start, for size bytes. The name is swan's
 BOOL romfs_fopen_raw(FSFile *file, u32 start, u32 size);
 
 // The ROM archive (fs_rom.c) and the file system as a whole (fs_api.c): NitroSDK's FSi_InitRomArchive, which makes the

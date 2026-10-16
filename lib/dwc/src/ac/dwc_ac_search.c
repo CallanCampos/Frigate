@@ -107,7 +107,7 @@ u8 DWCAc_StepSearch(void) {
             }
         }
         work->channelMax = 13 - i;
-        if (hw_isDSi()) {
+        if (OS_IsRunOnTwl()) {
             if (work->rssiPacked == 1) {
                 work->scanTime = 300;
                 work->directedTime = 150;

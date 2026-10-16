@@ -18,6 +18,6 @@ void MIi_CardDmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size) {
         dmaCntp = &((vu32 *)REG_DMA0SAD_ADDR)[dmaNo * 3 + 2];
         while (*dmaCntp & MI_DMA_ENABLE) {
         }
-        dma_beginSyncEx(dmaNo, (u32)src, (u32)dest, MI_DMA_CARD_CNT, 0);
+        MIi_DmaSetParameters(dmaNo, (u32)src, (u32)dest, MI_DMA_CARD_CNT, 0);
     }
 }

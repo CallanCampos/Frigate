@@ -118,7 +118,7 @@ BOOL FS_CloseFile(FSFile *file) {
 u32 FS_GetFileLength(FSFile *file) {
     u32 length = 0;
 
-    if (!func_02071e74(file, &length)) {
+    if (!FSi_GetFileLengthIfProc(file, &length)) {
         FSGetFileValueArgs args;
 
         file->argument = &args;
@@ -133,7 +133,7 @@ u32 FS_GetFileLength(FSFile *file) {
 u32 FS_GetFilePosition(FSFile *file) {
     u32 position = 0;
 
-    if (!func_02071e9c(file, &position)) {
+    if (!FSi_GetFilePositionIfProc(file, &position)) {
         FSGetFileValueArgs args;
 
         file->argument = &args;
@@ -190,8 +190,8 @@ u32 FS_GetLength(FSFile *file) {
     return FS_GetFileLength(file);
 }
 
-// Makes a path's archive and directory the current ones: a thunk to NitroSDK's FS_ChangeDir, under a
-// name that is not known
-BOOL func_02070eb4(const char *path) {
-    return FS_ChangeDir(path);
+// NitroSDK's FS_ChangeDir, which TwlSDK keeps as a wrapper of FS_SetCurrentDirectory: makes a path's archive and
+// directory the current ones
+BOOL FS_ChangeDir(const char *path) {
+    return FS_SetCurrentDirectory(path);
 }
