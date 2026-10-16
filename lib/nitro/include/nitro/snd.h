@@ -298,19 +298,20 @@ void SND_ResetMasterPan(void);
 // The work that the driver and the ARM9 share. The driver writes it, and the functions below read it
 #define SND_VARIABLE_UNSET (-1)
 
+// The ARM7's sound driver writes this memory while the ARM9 reads it, so the fields are volatile, as in NitroSDK
 typedef struct SNDSharedPlayer {
-    s16 variable[SND_PLAYER_VARIABLE_MAX];
-    u32 tickCounter;
+    vs16 variable[SND_PLAYER_VARIABLE_MAX];
+    vu32 tickCounter;
 } SNDSharedPlayer;
 
 typedef struct SNDSharedWork {
-    u32 finishedCommandTag;
-    u32 playerStatus;
-    u16 channelStatus;
-    u16 captureStatus;
-    u32 padding_0c[5];
+    vu32 finishedCommandTag;
+    vu32 playerStatus;
+    vu16 channelStatus;
+    vu16 captureStatus;
+    vu32 padding_0c[5];
     SNDSharedPlayer player[SND_PLAYER_MAX];
-    s16 globalVariable[SND_PLAYER_VARIABLE_MAX];
+    vs16 globalVariable[SND_PLAYER_VARIABLE_MAX];
 } SNDSharedWork;
 
 extern SNDSharedWork *SNDi_SharedWork;

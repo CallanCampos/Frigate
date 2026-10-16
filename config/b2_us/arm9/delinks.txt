@@ -1894,6 +1894,7 @@ lib/nitro/src/fs/fs_overlay.c:
     .bss        start:0x0214bf60 end:0x0214bf80
 
 lib/nitro/src/fs/fs_command_default.c:
+    complete
     .text       start:0x0207130c end:0x02072014
     .rodata     start:0x02094588 end:0x020946bc
     .data       start:0x0209b510 end:0x0209b514
@@ -2003,6 +2004,7 @@ lib/nitro/src/mi/mi_init.c:
     .text       start:0x020791d0 end:0x020791fc
 
 lib/nitro/src/nvram/nvram.c:
+    complete
     .text       start:0x020791fc end:0x02079bb0
     .bss        start:0x0214c0e0 end:0x0214c178
 
@@ -2209,6 +2211,7 @@ lib/nitro/src/snd/snd_alarm.c:
     .bss        start:0x0214e180 end:0x0214e1e0
 
 lib/nitro/src/snd/snd_work.c:
+    complete
     .text       start:0x0207dbb8 end:0x0207dd2c
     .bss        start:0x0214e1e0 end:0x0214e1e4
 
@@ -2246,6 +2249,7 @@ lib/nitro/src/std/std_string.c:
     .text       start:0x0207f7a4 end:0x02080070
 
 lib/nitro/src/std/std_sprintf.c:
+    complete
     .text       start:0x02080070 end:0x02080758
 
 lib/nitro/src/wm/wm_system.c:
@@ -2259,6 +2263,7 @@ lib/nitro/src/wm/wm_sync.c:
     .data       start:0x0209b794 end:0x0209b798
 
 lib/nitro/src/wm/wm_standard.c:
+    complete
     .text       start:0x020812fc end:0x020817fc
 
 lib/nitro/src/wm/wm_mp.c:

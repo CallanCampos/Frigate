@@ -715,8 +715,8 @@ const char *FS_GetArchiveName(const FSArchive *arc) {
     return arc->name;
 }
 
-// NitroSDK's FS_MountArchive: sets an archive's interface and mounts it
-BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *vtbl) {
+// NitroSDK's FS_MountArchive: sets an archive's interface and mounts it. reserved is unused
+BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *vtbl, u32 reserved) {
     FSFile file;
 
     arc->userdata = userdata;
