@@ -5565,10 +5565,10 @@ data_ov036_021d294c kind:data(any) addr:0x021d294c
 data_ov036_021d2988 kind:data(any) addr:0x021d2988
 data_ov036_021d2994 kind:data(any) addr:0x021d2994
 data_ov036_021d29a0 kind:data(any) addr:0x021d29a0
-data_ov036_021d29b4 kind:data(any) addr:0x021d29b4
-data_ov036_021d29b8 kind:data(any) addr:0x021d29b8
-data_ov036_021d29c0 kind:data(any) addr:0x021d29c0
-data_ov036_021d29cc kind:data(any) addr:0x021d29cc
+BUBBLE_MDL_INDEX kind:data(any) addr:0x021d29b4
+BUBBLE_ANM_INDICES kind:data(any) addr:0x021d29b8
+BUBBLE_FILE_IDS kind:data(any) addr:0x021d29c0
+BUBBLE_TASK_VTABLE kind:data(any) addr:0x021d29cc
 data_ov036_021d29e0 kind:data(any) addr:0x021d29e0
 data_ov036_021d29e8 kind:data(any) addr:0x021d29e8
 data_ov036_021d29f4 kind:data(any) addr:0x021d29f4
@@ -5741,7 +5741,7 @@ data_ov036_021d5634 kind:data(any) addr:0x021d5634
 data_ov036_021d5648 kind:data(any) addr:0x021d5648
 data_ov036_021d5654 kind:data(any) addr:0x021d5654
 data_ov036_021d5664 kind:data(any) addr:0x021d5664
-data_ov036_021d5674 kind:data(any) addr:0x021d5674
+sBubbleMatrix kind:data(any) addr:0x021d5674
 data_ov036_021d56b0 kind:data(any) addr:0x021d56b0
 data_ov036_021d56c0 kind:data(any) addr:0x021d56c0
 FIELD_DISP_CONTROL_PROCS kind:data(any) addr:0x021d56d4

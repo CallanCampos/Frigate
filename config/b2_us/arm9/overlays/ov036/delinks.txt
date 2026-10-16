@@ -638,6 +638,7 @@ src/ov036/fldeff_hide.c:
     .data       start:0x021d5664 end:0x021d5674
 
 src/ov036/fldeff_bubble.c:
+    complete
     .text       start:0x021c6934 end:0x021c6cc8
     .rodata     start:0x021d29b4 end:0x021d29e0
     .data       start:0x021d5674 end:0x021d56c0
