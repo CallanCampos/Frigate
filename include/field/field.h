@@ -314,6 +314,7 @@ BOOL func_ov036_021878bc(void *msgBGSys);
 // Releases the BG of the field's message BG and returns TRUE, or returns FALSE if it has none
 BOOL func_ov036_02187868(void *msgBGSys);
 void func_ov036_021879c0(void *msgBGSys);
+void func_ov036_0218a5a0(void *msgBGSys);
 // The state of a message window of the field's message BG. fld_faceup.c moves the mouth from state 0 to state 2,
 // which looks like printing and finished
 u32 func_ov036_02188cbc(void *window);

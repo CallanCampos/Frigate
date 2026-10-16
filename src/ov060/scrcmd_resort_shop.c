@@ -1911,7 +1911,7 @@ static void func_ov060_021e85b0(ResortShopWork *wk, u8 mode, u8 subMode) {
 }
 
 static u8 func_ov060_021e8708(u32 index) {
-    return data_ov036_021cf1c8[index].unk0[1]->unk0_0;
+    return data_ov036_021cf1c8[index].unk0[1]->face;
 }
 
 static void func_ov060_021e8720(ArcTool *handle, u16 objCode, u8 *texture, u16 *fileId) {

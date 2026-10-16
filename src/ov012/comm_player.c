@@ -177,11 +177,11 @@ BOOL func_ov012_021616b0(CommPlayerSys *cps, CommPlayerStatus *status) {
     return FALSE;
 }
 
-u32 func_ov012_021617e8(CommPlayerSys *cps, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5) {
+BOOL func_ov012_021617e8(CommPlayerSys *cps, s16 x, s16 y, s16 z, u32 *netId, u32 *index) {
     if (cps->act_ctrl == NULL) {
-        return 0;
+        return FALSE;
     }
-    return FldCommActSys_FindActor(cps->act_ctrl, a1, a2, a3, a4, a5);
+    return FldCommActSys_FindActor(cps->act_ctrl, x, y, z, netId, index);
 }
 
 static void func_ov012_02161808(GameSystem *gsys, CommPlayerSys *cps) {

@@ -56,8 +56,8 @@ void *EncEff_GetWorkArea(EncEff *effect);
 void *EncEff_GetEventData(EncEff *effect);
 void *Field_Get3DCi(Field *field);
 void EncEff_CallRenderFunc(EncEff *effect);
-GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, void *g3DCi, u8 partySlot);
-GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, void *g3DCi, u32 param);
+GameEvent *EventFieldEffect_CreatePokeSprite(GameSystem *gsys, Fld3DCi *ci, u8 partySlot);
+GameEvent *EventFieldEffect_CreateAlderFly(GameSystem *gsys, Fld3DCi *ci, u32 actorId);
 // The event of an effect: init makes the effect's event, and render draws it
 GameEvent *EncEffCapture_CreateFlashEvent(GameSystem *gsys, const VecFx32 *pos, GameEvent *(*init)(GameSystem *gsys),
                                           void (*render)(EncEffGrid *grid));

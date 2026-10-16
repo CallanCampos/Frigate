@@ -674,9 +674,17 @@ Same code, other `sp` offsets or frame size.
   and the fall-through of conditional branches, whatever pointer it is added to, and stops only at a join: a label
   reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
   `if`s, dead stores and one-pass loops are removed before that and don't stop it. Where the original builds an
-  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it: overlay 173's
-  `WifiP2PMatch_StateRecruitingFriendMenu` gets its voice-chat store in the common tail with the next state set in
-  both branches and stored once after them.
+  offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it, or for a pointer local to the nearby
+  member that the derivation starts from.
+- A pointer local to a member at a large offset, initialized at its declaration at the top of the function, is
+  rebuilt at each use in a scratch register (`movs r1, #0x93; lsls r1, #2; adds r1, r5, r1`), and MWCC derives no
+  later offset from it. The same address written as `&wk->member` at each use, or a pointer assigned just before its
+  first use, is kept in a saved register and later stores are derived from it (`subs r6, #0x80`). Overlay 173's
+  `WifiP2PMatch_StateRecruitingFriendMenu` matches only with `WIFI_STATUS *targetStatus = &wk->targetStatus;` as its
+  first declaration, passed to `WifiP2PMatch_GetGameMode` and `WIFI_STATUS_GetVChatStatus`, as its siblings
+  `WifiP2PMatch_StateConnectFriendYesNo` and `WifiP2PMatch_StateFriendSelect` declare it: its `wk->seq` stores of
+  0xa2 and 0x76 are then built fresh and the second joins the common tail. No join is needed there. With the pointer
+  used at one call only, only the store after that call is fixed.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
@@ -2071,6 +2079,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A value the inner loop computes from the outer loop's counter alone, like `turn = row / 3`, is hoisted into the
   preheader too, so it can be written inside the inner loop. `row % 3` used in both conditions of an `if`/`else if`
   is computed once, later than a `rowInTurn` variable set with `turn` would be.
+- An outer loop body that starts with a `volatile` store and splits the inner loop's hoisted row address around it
+  (`y * 33` before the store, `* 6 + ripple` after it, and the inner counter set last) kept another of the outer
+  counter's invariants in a local assigned after the store. The ripple's `EncEffRipple_Draw`
+  (`encounter_effect_ripple.c`) matches with its strip's texture coordinate as `fx32 t;`, set by
+  `t = y * 8 * FX32_ONE;` right after `G3_Begin(GX_BEGIN_QUAD_STRIP)`, and the vertices indexed in the inner loop,
+  `ripple->vertices[y * 33 + x]`. With `y * 8 * FX32_ONE` written in the inner loop's `G3_TexCoord` calls, every
+  spelling of the row put its whole address before the store or after it; `t` assigned before `G3_Begin` is 18 bytes
+  off, and a row pointer 3 to 50.
 - A loop that walks a pointer parameter (`for (; options->text != END; options++)`) reuses the test's load in the
   body. When the original loads the field again at the top of the body, the loop walks a local cursor set from the
   parameter instead (`for (option = options; option->text != END; option++)`), as bmp_menuwork.c's

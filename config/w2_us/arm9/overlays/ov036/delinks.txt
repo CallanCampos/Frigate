@@ -369,12 +369,12 @@ src/ov036/fldmmdl_acmd.c:
 
 src/ov036/fldmmdl_blact.c:
     .text       start:0x021936c0 end:0x021946f4
-    .rodata     start:0x021ce3d4 end:0x021cf318
+    .rodata     start:0x021ce3d4 end:0x021cf398
     .data       start:0x021d4d90 end:0x021d4da0
 
 src/ov036/fldmmdl_g3dobj.c:
     .text       start:0x021946f4 end:0x021953b8
-    .rodata     start:0x021cf318 end:0x021cf3dc
+    .rodata     start:0x021cf398 end:0x021cf3dc
     .data       start:0x021d4da0 end:0x021d4db4
 
 src/ov036/fld_act_rail.c:
@@ -393,6 +393,7 @@ src/ov036/field_fog.c:
     .data       start:0x021d4e3c end:0x021d4e48
 
 src/ov036/field_zonefog.c:
+    complete
     .text       start:0x02197750 end:0x02197860
     .data       start:0x021d4e48 end:0x021d4e58
 
@@ -420,6 +421,7 @@ src/ov036/weather_task.c:
     .data       start:0x021d4ea0 end:0x021d4eb0
 
 src/ov036/fieldmap_ctrl_grid.c:
+    complete
     .text       start:0x0219a3f4 end:0x0219a4bc
     .rodata     start:0x021cfc30 end:0x021cfc44
     .data       start:0x021d4eb0 end:0x021d4ec8
@@ -435,6 +437,7 @@ src/ov036/field_player_nogrid.c:
     .data       start:0x021d4f00 end:0x021d4f3c
 
 src/ov036/fieldmap_ctrl_nogrid_work.c:
+    complete
     .text       start:0x0219e368 end:0x0219e470
     .rodata     start:0x021cfe28 end:0x021cfe50
     .data       start:0x021d4f3c end:0x021d4f58
@@ -519,6 +522,7 @@ src/ov036/field_player_grid_event.c:
     .data       start:0x021d5444 end:0x021d5460
 
 src/ov036/fld_particle.c:
+    complete
     .text       start:0x021bb5c8 end:0x021bb6b4
     .rodata     start:0x021d17b8 end:0x021d1cb4
     .data       start:0x021d5460 end:0x021d5470
@@ -599,6 +603,7 @@ src/ov036/fldeff_d06denki.c:
     .data       start:0x021d55cc end:0x021d55e0
 
 src/ov036/land_data_patch.c:
+    complete
     .text       start:0x021c2cf4 end:0x021c2e14
     .data       start:0x021d55e0 end:0x021d55f4
 
@@ -613,6 +618,7 @@ src/ov036/party_select_list.c:
     .data       start:0x021d5614 end:0x021d5660
 
 src/ov036/field_bbd_color.c:
+    complete
     .text       start:0x021c3c6c end:0x021c3dd4
     .rodata     start:0x021d2574 end:0x021d2594
     .data       start:0x021d5660 end:0x021d5674

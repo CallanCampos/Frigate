@@ -11,15 +11,6 @@
 #include "nitro/fx.h"
 #include "nitro/mi.h"
 
-// The functions that run an action command: what to do on the first frame, each frame and at the end
-typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
-
-typedef struct {
-    ActorAcmdFunc start;
-    ActorAcmdFunc update;
-    ActorAcmdFunc end;
-} ActorAcmdFuncs;
-
 // The place an actor holds on the rail, with the rail unit that follows it, at the start of the actor's work for its
 // move code
 typedef struct {
@@ -55,18 +46,6 @@ typedef struct {
     s8 side;
     u8 front;
 } ActorRailPatrolWork;
-
-// The work of a jump along the rail
-typedef struct {
-    s32 speed;
-    s32 progress;
-    u16 step;
-    u16 phase;
-    s8 dir;
-    s8 timer;
-    s8 pad;
-    s8 height;
-} ActorRailJumpWork;
 
 static BOOL func_ov036_02195378(FieldActor *actor);
 static BOOL func_ov036_02195480(FieldActor *actor);
@@ -328,7 +307,7 @@ void func_ov036_02195624(FieldActor *actor) {
     func_ov036_02195d6c(rail, actor);
 }
 
-void func_ov036_02195640(FieldActor *actor, u32 dir, u32 speed) {
+void func_ov036_02195640(FieldActor *actor, u16 dir, u32 speed) {
     ActorRailWork *rail = RAIL_WORK(actor);
     u32 railDir = func_ov036_02195c2c(dir);
 
@@ -489,7 +468,7 @@ BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position) {
     return func_ov036_021b0814(rail->unit, ConvDirToRailDir(dir), position, NULL);
 }
 
-void func_ov036_021959bc(FieldActor *actor, u32 dir) {
+void func_ov036_021959bc(FieldActor *actor, u16 dir) {
     FieldRailSystem *railSystem =
         FieldNoGridMapper_GetRailSystem(FldActSys_GetNoGridMapper(GetActorMModelSystem(actor)));
     RailPosition rail;

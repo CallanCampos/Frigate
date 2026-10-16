@@ -2267,7 +2267,7 @@ static BOOL UnionOneself_StepIdleColosseumRun(UnionSystem *unisys, UnionSelf *si
             s16 x, y, z;
 
             FieldPlayer_GetGPosInFront(player, &x, &y, &z);
-            if (func_ov012_021617e8(clsys->commPlayer, x, y, z, (u32)&out, (u32)&dir) == TRUE) {
+            if (func_ov012_021617e8(clsys->commPlayer, x, y, z, &out, &dir) == TRUE) {
                 clsys->unk17C[0] = out;
                 UnionOneself_SetNextStep(unisys, UNION_STEP_COLOSSEUM_CARD);
                 UnionOneself_SetUpdateDisabled(unisys, field, TRUE);
