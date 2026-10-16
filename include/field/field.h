@@ -10,7 +10,7 @@
 #include "struct_decls.h"
 #include "system/bmp_menulist.h"
 
-void BeginContinuePlaceNameDisp(PlaceName *placeName, u16 zoneId);
+void BeginContinuePlaceNameDisp(PlaceName *placeName, s32 zoneId);
 void BeginForcePlaceNameDisp(PlaceName *placeName, s32 zoneId);
 void EncEff_StartEvent(EncEff *encEff, GameEvent *event, u32 effect);
 void FieldG2D_Prepare3DSurface(Field *field);

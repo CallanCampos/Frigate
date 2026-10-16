@@ -5405,8 +5405,8 @@ data_ov036_021d10d8 kind:data(any) addr:0x021d10d8
 data_ov036_021d10e4 kind:data(any) addr:0x021d10e4
 data_ov036_021d10f0 kind:data(any) addr:0x021d10f0
 data_ov036_021d10fc kind:data(any) addr:0x021d10fc
-data_ov036_021d1110 kind:data(any) addr:0x021d1110
-data_ov036_021d1120 kind:data(any) addr:0x021d1120
+sPlaceNameSurfaceSetup kind:data(any) addr:0x021d1110
+sPlaceNameBGSetup kind:data(any) addr:0x021d1120
 data_ov036_021d1140 kind:data(any) addr:0x021d1140
 data_ov036_021d1150 kind:data(any) addr:0x021d1150
 data_ov036_021d1170 kind:data(any) addr:0x021d1170

@@ -508,6 +508,7 @@ typedef struct PassPowerParam PassPowerParam;
 typedef struct Percentage Percentage;
 typedef struct PCSubprocessEventData PCSubprocessEventData;
 typedef struct PlaceName PlaceName;
+typedef struct PlaceNameLetter PlaceNameLetter;
 typedef struct PlayerActionPerms PlayerActionPerms;
 typedef struct PlayerActionPossibilities PlayerActionPossibilities;
 typedef struct PlayerInfo PlayerInfo;

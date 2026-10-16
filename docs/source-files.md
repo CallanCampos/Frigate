@@ -531,7 +531,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | partial | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
 | `fldeff_reflect.c` | `0x021b496c`–`0x021b4eb4` | 15 | partial | string at `0x021d5338` |
-| `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | partial | string at `0x021d534c` |
+| `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | complete | string at `0x021d534c` |
 | `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | partial | string at `0x021d5360` |
 | `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | partial | string at `0x021d5378` |
 | `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | partial | string at `0x021d53b0` |

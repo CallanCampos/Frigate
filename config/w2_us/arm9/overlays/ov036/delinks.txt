@@ -462,6 +462,7 @@ src/ov036/fldeff_reflect.c:
     .data       start:0x021d5378 end:0x021d538c
 
 src/ov036/field_place_name.c:
+    complete
     .text       start:0x021b4eec end:0x021b5bb4
     .rodata     start:0x021d1144 end:0x021d1174
     .data       start:0x021d538c end:0x021d53a0
