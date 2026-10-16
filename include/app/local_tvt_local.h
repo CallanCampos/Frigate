@@ -12,6 +12,7 @@
 #include "app/local_tvt/local_tvt_graphic.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
+#include "app/local_tvt/local_tvt_scriptmode.h"
 #include "app/local_tvt/local_tvt_util.h"
 #include "app/xtransceiver.h"
 #include "gfl/clact.h"
@@ -25,15 +26,7 @@
 #include "system/gf_font.h"
 #include "system/printsys.h"
 
-typedef struct LocalTvtScriptMode LocalTvtScriptMode;
 typedef struct LocalTvtCallMode LocalTvtCallMode;
-
-// local_tvt_scriptmode.c: plays a call's script
-
-LocalTvtScriptMode *LocalTvtScriptMode_Create(HeapID heapId, GameSystem *gsys, GameData *gameData, u16 scriptId,
-                                              LocalTvtChara *chara);
-void LocalTvtScriptMode_Free(LocalTvtScriptMode *mode);
-BOOL LocalTvtScriptMode_Main(LocalTvtScriptMode *mode);
 
 // local_tvt_callmode.c: the calls the player makes
 
