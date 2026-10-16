@@ -2,6 +2,7 @@
 #include "app/livebattlematch_flow.h"
 #include "gfl/net.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "save/records.h"
 
 // The results of the live competition, which the record block (records.h) starts with: the console's MAC address,

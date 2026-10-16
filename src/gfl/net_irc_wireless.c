@@ -7,6 +7,7 @@
 #include "gfl/net_system.h"
 #include "gfl/std.h"
 #include "gfl/ui.h"
+#include "nitro/os.h"
 
 // How many MAC addresses are collected over infrared
 #define _COLLECTMAC_NUM 4

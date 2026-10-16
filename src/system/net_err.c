@@ -89,7 +89,6 @@ enum {
 // The first of the types of GFLNetErrorInfo that have a message of their own
 #define NET_ERR_INFO_TYPE_FIRST 0x3ee
 
-#define reg_PAD_KEYINPUT (*(vu16 *)0x04000130)
 // The buttons and keys that PAD_Read reports, X and Y among them
 #define PAD_ALL_MASK 0x2fff
 

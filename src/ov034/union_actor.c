@@ -14,6 +14,7 @@
 #include "field/union_oneself.h"
 #include "gfl/net.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

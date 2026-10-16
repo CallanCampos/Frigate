@@ -5,6 +5,7 @@
 #include "gfl/net_irc_wireless.h"
 #include "gfl/net_system.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 
 // The timing numbers the server relays
 typedef struct {

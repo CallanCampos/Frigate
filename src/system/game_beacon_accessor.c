@@ -10,6 +10,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "nitro/mi.h"
+#include "nitro/os.h"
 #include "save/high_link.h"
 #include "save/survey_savedata.h"
 #include "system/game_beacon.h"

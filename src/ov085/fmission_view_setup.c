@@ -34,6 +34,7 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
+#include "nitro/os.h"
 #include "nnsys/g2d.h"
 #include "save/high_link.h"
 #include "save/player_info.h"

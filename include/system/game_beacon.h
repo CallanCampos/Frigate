@@ -344,7 +344,4 @@ u8 func_020140cc(int type);
 // Sets the words of the beacon's message: the sender's name as word 0 and what the type's format shows from word 1
 void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, HeapID heapId);
 
-// In another file of ARM9 main: a table of colors, by favorite color
-const u16 *func_0207c3b4(void);
-
 #endif // POKEBW2_SYSTEM_GAME_BEACON_H

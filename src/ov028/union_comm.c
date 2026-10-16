@@ -14,6 +14,7 @@
 #include "gfl/net_whpipe.h"
 #include "gfl/random.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "save/wifi_list.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

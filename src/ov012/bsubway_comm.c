@@ -9,6 +9,7 @@
 #include "gfl/net_handle.h"
 #include "gfl/net_system.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "save/player_info.h"
 #include "system/game_data.h"

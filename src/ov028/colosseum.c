@@ -13,6 +13,7 @@
 #include "gfl/net_handle.h"
 #include "gfl/overlay.h"
 #include "gfl/std.h"
+#include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "system/game_data.h"
 #include "system/game_system.h"

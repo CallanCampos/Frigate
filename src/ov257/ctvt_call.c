@@ -21,6 +21,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "gfl/touchpanel.h"
+#include "nitro/os.h"
 #include "save/player_info.h"
 #include "save/wifi_list.h"
 #include "system/app_taskmenu.h"

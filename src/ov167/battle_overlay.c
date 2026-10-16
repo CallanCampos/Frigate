@@ -1,6 +1,7 @@
 #include "types.h"
 #include "battle/battle_overlay.h"
 #include "gfl/overlay.h"
+#include "nitro/os.h"
 #include "system/dsi.h"
 
 // Whether overlay 219 was loaded

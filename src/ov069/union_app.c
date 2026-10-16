@@ -7,6 +7,7 @@
 #include "gfl/net_handle.h"
 #include "gfl/std.h"
 #include "nitro/math.h"
+#include "nitro/os.h"
 #include "save/player_info.h"
 
 static void UnionApp_CheckJoinedLeft(UnionApp *app);

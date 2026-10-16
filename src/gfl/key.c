@@ -5,7 +5,6 @@
 #include "gfl/ui.h"
 #include "nitro/os.h"
 
-#define reg_PAD_KEYINPUT (*(vu16 *)0x04000130)
 // The buttons and keys that PAD_Read reports, X and Y among them
 #define PAD_ALL_MASK 0x2fff
 

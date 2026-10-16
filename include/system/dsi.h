@@ -16,7 +16,5 @@ BOOL isWirelessEnabled(void);
 BOOL hasLicenseBeenAccepted(void);
 // The birthday in the DS's owner settings
 void getBirthdayMonthDay(u8 *month, u8 *day);
-// Flags next to the DSi checks; bit 25 has the battle load overlay 219
-u32 func_0207ac24(void);
 
 #endif // POKEBW2_SYSTEM_DSI_H

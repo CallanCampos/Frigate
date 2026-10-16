@@ -22,8 +22,4 @@ void GFL_VBlankUpdate(void);
 void GFL_SndMute(void *work);
 void GFL_SndSetMaxVol(void *work);
 
-// Declarations that belong to headers gfl_use.c does not own, to be moved there:
-// nitro/os.h. NitroSDK's OS_CreateHeap for the whole arena, which only works on a DS
-int mem_bind_static_ram_alloc(int arena);
-
 #endif // POKEBW2_SYSTEM_GFL_USE_H

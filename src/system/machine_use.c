@@ -1,16 +1,21 @@
 #include "types.h"
 #include "gfl/ui.h"
+#include "nitro/ctrdg.h"
+#include "nitro/fs.h"
 #include "nitro/fx.h"
+#include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
 #include "nitro/mic.h"
 #include "nitro/os.h"
+#include "nitro/pm.h"
 #include "nitro/rtc.h"
 #include "nnsys/gfd.h"
 #include "system/dsi.h"
 #include "system/machine_use.h"
 #include "system/main.h"
 #include "twl/pm.h"
+#include "twl/scfg.h"
 
 // The game's setup of the console and the SDK, with what the main loop does for them each frame. The file name is a
 // guess after gfl_use.c, which follows it, as the ROM does not embed it; its statics have a base of their own, so it
@@ -50,7 +55,7 @@ void SystemInit(void) {
     FX_Init();
 
     if (func_0207ac24() & CONSOLE_TYPE_DEV_MASK) {
-        func_0207f6e8(1);
+        func_0207f6e8(SCFG_CPU_SPEED_2X);
         reg_SCFG_EXT &= ~SCFG_EXT_VRAM;
         SCFG_EXT_COPY &= ~SCFG_EXT_VRAM;
     }

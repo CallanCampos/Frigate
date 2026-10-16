@@ -20,7 +20,4 @@ BOOL FMissionView_IsPrinting(FMissionView *view);
 // The event of the screen that a button asked for, or NULL
 GameEvent *FMissionView_CheckEvent(FMissionView *view, BOOL enabled);
 
-// NitroSDK's DC_InvalidateAll, which nitro/os.h doesn't declare yet
-void cp15_invalidateDCAll(void);
-
 #endif // POKEBW2_FIELD_FMISSION_VIEW_H
