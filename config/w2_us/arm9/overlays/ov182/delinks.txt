@@ -156,6 +156,12 @@ lib/dwcutilui/src/dwc_util_bg_overlay.c:
     .data       start:0x021c0794 end:0x021c09c8
     .bss        start:0x021c40b4 end:0x021c40b8
 
+lib/dwcutilui/src/dwc_util_link_icon.c:
+    complete
+    .text       start:0x021aba3c end:0x021abb50
+    .rodata     start:0x021bfbf0 end:0x021bfbf8
+    .bss        start:0x021c40b8 end:0x021c40bc
+
 lib/dwcutilui/src/dwc_util_main.c:
     complete
     .text       start:0x021adc00 end:0x021ae0c4

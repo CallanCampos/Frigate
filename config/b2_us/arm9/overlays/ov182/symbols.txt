@@ -1152,7 +1152,7 @@ sTextFlags kind:data(any) addr:0x021bfb6c
 sStrPositions kind:data(any) addr:0x021bfb88
 data_ov182_021bfb8a kind:data(any) addr:0x021bfb8a
 sPairCells kind:data(any) addr:0x021bfba4
-data_ov182_021bfbb0 kind:data(any) addr:0x021bfbb0
+sLevelCells kind:data(any) addr:0x021bfbb0
 data_ov182_021bfbb8 kind:data(any) addr:0x021bfbb8
 data_ov182_021bfbba kind:data(any) addr:0x021bfbba
 data_ov182_021bfbbc kind:data(any) addr:0x021bfbbc
@@ -1615,7 +1615,7 @@ sScreenActive kind:bss addr:0x021c402c
 sPath kind:bss addr:0x021c4030
 sButtonSprites kind:bss addr:0x021c4070
 sOverlayScreen kind:bss addr:0x021c4074
-data_ov182_021c4078 kind:bss addr:0x021c4078
+sLinkIcon kind:bss addr:0x021c4078
 data_ov182_021c407c kind:bss addr:0x021c407c
 data_ov182_021c4080 kind:bss addr:0x021c4080
 data_ov182_021c4084 kind:bss addr:0x021c4084
