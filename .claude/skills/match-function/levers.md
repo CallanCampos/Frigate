@@ -198,7 +198,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "keeps the offset live as a third temporary")
 - A struct local's members in the lowest slots, every declared slot moved up: MWCC split it, since its address
   did not survive into the optimizer; an initializer, a real call with `&s`, a copy through memory or a pointer
-  live across blocks keeps it whole. (matching.md: "split into one variable per member")
+  live across blocks keeps it whole. An accessed enum-typed member keeps it whole at no cost, with direct
+  `[sp, #off]` accesses. (matching.md: "split into one variable per member")
 - Values in the lowest slots, below an inline's parameter copies, in assignment order, that no scalar spelling,
   inline getter or declaration order moves there (one of them set in one branch only): make them the members of
   one struct local, which MWCC splits. (matching.md: "The split members are slotted with the temporaries")
