@@ -479,7 +479,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_act_rail.c` | `0x02195378`–`0x02196238` | 74 | partial | descriptive |
 | `field_rail_loader.c` | `0x02196238`–`0x02197534` | 62 | partial | string at `0x021d4de8` |
 | `field_fog.c` | `0x02197534`–`0x02197710` | 22 | complete | string at `0x021d4dfc` |
-| `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | partial | string at `0x021d4e08` |
+| `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | complete | string at `0x021d4e08` |
 | `field_light.c` | `0x02197820`–`0x02198198` | 31 | partial | string at `0x021d4e18` |
 | `field_subscreen.c` | `0x02198198`–`0x02198bc0` | 72 | partial | string at `0x021d4e28` |
 | `field_3dbg.c` | `0x02198bc0`–`0x02199004` | 20 | partial | string at `0x021d4e3c` |

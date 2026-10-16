@@ -309,6 +309,7 @@ typedef struct FieldExpObjSystem FieldExpObjSystem;
 typedef struct FieldFlash FieldFlash;
 typedef struct FieldFlashG3D FieldFlashG3D;
 typedef struct FieldFog FieldFog;
+typedef struct FieldFogCtrl FieldFogCtrl;
 typedef struct FieldG3DMapper FieldG3DMapper;
 typedef struct FieldG3DMapperConfig FieldG3DMapperConfig;
 typedef struct FieldG3DObjSystem FieldG3DObjSystem;

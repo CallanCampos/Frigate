@@ -393,6 +393,7 @@ src/ov036/field_fog.c:
     .data       start:0x021d4e3c end:0x021d4e48
 
 src/ov036/field_zonefog.c:
+    complete
     .text       start:0x02197750 end:0x02197860
     .data       start:0x021d4e48 end:0x021d4e58
 
