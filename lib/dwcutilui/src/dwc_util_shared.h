@@ -7,6 +7,7 @@
 #include "dwc_util_heap.h"
 #include "dwc_util_oam.h"
 #include "dwc_util_text.h"
+#include "dwc_util_touch.h"
 #include "nitro/gx.h"
 #include "struct_decls.h"
 
@@ -26,7 +27,6 @@ void func_ov182_021bcc9c(GXOamAttr *oam);
 // callback is handed the task and the argument it was created with.
 typedef void (*DWCUtilTaskCallback)(DWCUtilTask *task, void *arg);
 
-BOOL func_ov182_021bc888(const void *rect);
 DWCUtilTask *func_ov182_021bd200(int list, DWCUtilTaskCallback callback, void *arg, u8 priority);
 void func_ov182_021bd264(DWCUtilTask *task, DWCUtilTaskCallback callback);
 void func_ov182_021bd268(int list, DWCUtilTask *task);

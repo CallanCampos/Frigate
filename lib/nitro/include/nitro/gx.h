@@ -1691,6 +1691,10 @@ static inline void GXS_DispOn(void) {
     reg_GXS_DB_DISPCNT |= REG_GXS_DB_DISPCNT_MODE_MASK;
 }
 
+static inline void GXS_DispOff(void) {
+    reg_GXS_DB_DISPCNT &= ~REG_GXS_DB_DISPCNT_MODE_MASK;
+}
+
 // NitroSDK's G3X_Reset, G3X_InitMtxStack and G3X_GetBoxTestResult. The box test result is 0 when
 // the box is outside the view, and the function returns nonzero while the test is still running
 void G3X_Reset(void); // swan's gfxReset3D

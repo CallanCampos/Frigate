@@ -1674,9 +1674,9 @@ sCells kind:bss addr:0x021c4194
 sFades kind:bss addr:0x021c419c
 sTextWork kind:bss addr:0x021c41a0
 sHeap kind:bss addr:0x021c41a4
-data_ov182_021c41a8 kind:bss addr:0x021c41a8
+sTouch kind:bss addr:0x021c41a8
 data_ov182_021c41ac kind:bss addr:0x021c41ac
-data_ov182_021c41b0 kind:bss addr:0x021c41b0
+sKeyRepeats kind:bss addr:0x021c41b0
 data_ov182_021c41c0 kind:bss addr:0x021c41c0
 data_ov182_021c41c8 kind:bss addr:0x021c41c8
 data_ov182_021c41cc kind:bss addr:0x021c41cc

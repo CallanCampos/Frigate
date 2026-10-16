@@ -11286,6 +11286,8 @@ overlays/ov182 0x021c4194 sCells
 overlays/ov182 0x021c419c sFades
 overlays/ov182 0x021c41a0 sTextWork
 overlays/ov182 0x021c41a4 sHeap
+overlays/ov182 0x021c41a8 sTouch
+overlays/ov182 0x021c41b0 sKeyRepeats
 overlays/ov184 0x0219f340 ErrorWindowScreen_Show
 overlays/ov185 0x0219ce80 PMSIData_Create
 overlays/ov185 0x0219ced4 PMSIData_Delete
