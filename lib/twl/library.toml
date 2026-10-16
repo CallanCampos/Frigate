@@ -27,6 +27,7 @@ flags = [
 
 # The photo signature code in the LTD autoload is ARM code
 [file_flags]
+"scfg/scfg_proc_itcm.c" = ["-nothumb"]
 "photo_sign_client.c" = ["-nothumb"]
 "photo_sign.c" = ["-nothumb"]
 "photo_sign_util.c" = ["-nothumb"]
