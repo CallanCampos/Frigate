@@ -1510,7 +1510,7 @@ data_ov182_021c1820 kind:data(any) addr:0x021c1820
 data_ov182_021c1840 kind:data(any) addr:0x021c1840
 data_ov182_021c1864 kind:data(any) addr:0x021c1864
 data_ov182_021c1888 kind:data(any) addr:0x021c1888
-data_ov182_021c18ac kind:data(any) addr:0x021c18ac
+stateNames kind:data(any) addr:0x021c18ac
 data_ov182_021c18d4 kind:data(any) addr:0x021c18d4
 data_ov182_021c18dc kind:data(any) addr:0x021c18dc
 data_ov182_021c18e0 kind:data(any) addr:0x021c18e0

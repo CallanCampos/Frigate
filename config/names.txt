@@ -11148,6 +11148,7 @@ overlays/ov182 0x021c05d4 sNet
 overlays/ov182 0x021c05dc sSocConfig
 overlays/ov182 0x021c0648 sRates
 overlays/ov182 0x021c0740 sBlankScreenPath
+overlays/ov182 0x021c18ac stateNames
 overlays/ov182 0x021c1b60 sAoss
 overlays/ov182 0x021c1ba0 sSession
 overlays/ov182 0x021c1e20 sCrcTable
