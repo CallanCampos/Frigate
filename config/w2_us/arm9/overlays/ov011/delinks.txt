@@ -130,3 +130,7 @@ lib/dwc/src/gamespy/md5c.c:
 lib/dwc/src/gt2/gt2Buffer.c:
     complete
     .text       start:0x0217c984 end:0x0217ca34
+
+lib/dwc/src/gt2/gt2Callback.c:
+    complete
+    .text       start:0x0217ca34 end:0x0217ce40
