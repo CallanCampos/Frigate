@@ -10,6 +10,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Zeros loaded from a stack slot at each use and a constant hoisted into a saved register, where ours uses `movs`:
   move a later loop into a `static inline` that counts with its own parameter, passed that constant.
   (matching.md: "A constant held in a stack slot")
+- A constant copied from a saved register (`adds r1, r7, #0`) at uses where the original writes the immediate, or the
+  reverse: the hoisted-constant budget. Give a statement before the first copy one more (or one fewer) named step, or
+  declare locals `int` instead of `u32` (one node each); test one node short of the edge.
+  (matching.md: "within a budget")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
 - An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
