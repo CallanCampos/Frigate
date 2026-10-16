@@ -152,8 +152,11 @@ static BOOL func_ov182_021b9d28(void) {
 // What the parent start calls with each change of who is connected
 static void func_ov182_021b9d68(void *arg) {
     WMStartParentCallback *cb = arg;
-    u16 aid = cb->aid;
-    u16 bit = 1 << aid;
+    u16 aid;
+    u16 bit;
+
+    aid = cb->aid;
+    bit = 1 << aid;
 
     if (cb->errcode != WM_ERRCODE_SUCCESS) {
         func_ov182_021b9c34(cb->errcode);
@@ -166,7 +169,7 @@ static void func_ov182_021b9d68(void *arg) {
             gWork.logPrint(0x08000000, data_ov182_021c18e0, aid);
         }
         if (gWork.work->sScanFilter != NULL && !gWork.work->sScanFilter(cb)) {
-            int result = WM_Disconnect(NULL, cb->aid);
+            int result = WM_Disconnect(NULL, aid);
 
             if (result != WM_ERRCODE_OPERATING) {
                 func_ov182_021b9c34(result);
@@ -507,11 +510,10 @@ static u16 func_ov182_021ba238(u16 channel) {
     return func_ov182_021ba33c(func_ov182_021ba2a8, channel);
 }
 
-// What the measure of a channel calls: keeps the least busy channel, and goes on to the next one
+// What the measure of a channel calls: logs how busy it was, keeps the least busy channel, and goes on to the next one
 static void func_ov182_021ba2a8(void *arg) {
     WMMeasureChannelCallback *cb = arg;
     u16 channel;
-    u16 busy;
     u16 next;
 
     if (cb->errcode != WM_ERRCODE_SUCCESS) {
@@ -519,23 +521,20 @@ static void func_ov182_021ba2a8(void *arg) {
         func_ov182_021b9be4(WIH_STATE_ERROR);
         return;
     }
-    channel = cb->channel;
-    busy = cb->ccaBusyRatio;
-    if (cb->unk_0c != NULL) {
-        cb->unk_0c(channel, busy);
+    if (gWork.logPrint != NULL) {
+        gWork.logPrint(0x08000000, data_ov182_021c19e0, cb->channel, cb->ccaBusyRatio);
     }
-    if (gWork.work->minBusy > busy) {
-        gWork.work->minBusy = busy;
+    channel = cb->channel;
+    if (gWork.work->minBusy > cb->ccaBusyRatio) {
+        gWork.work->minBusy = cb->ccaBusyRatio;
         gWork.work->bestBitmap = 1 << (channel - 1);
-    } else if (gWork.work->minBusy == busy) {
+    } else if (gWork.work->minBusy == cb->ccaBusyRatio) {
         gWork.work->bestBitmap |= 1 << (channel - 1);
     }
     next = func_ov182_021ba238(channel + 1);
-    if (next == 0x18 && gWork.work->sysState != WIH_STATE_ERROR) {
+    if (next == 0x18) {
         func_ov182_021b9be4(WIH_STATE_MEASURECHANNEL);
-        return;
-    }
-    if (next != WM_ERRCODE_OPERATING) {
+    } else if (next != WM_ERRCODE_OPERATING) {
         func_ov182_021b9be4(WIH_STATE_ERROR);
     }
 }
