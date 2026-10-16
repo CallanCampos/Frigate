@@ -2,6 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
 
 #include "types.h"
+#include "dwc_util_display.h"
 #include "dwc_util_heap.h"
 #include "nitro/gx.h"
 
@@ -31,7 +32,6 @@ GXOamAttr *func_ov182_021bb6ec(void *object, int index);
 void func_ov182_021bb7e0(void *object, int index, int x, int y);
 void func_ov182_021bb878(void *object, int index, int value);
 void func_ov182_021bb8bc(void *object, int index, int *x, int *y);
-void func_ov182_021bc1c0(const void *position, const void *size, void *rect);
 BOOL func_ov182_021bc888(const void *rect);
 void func_ov182_021bd264(void *task, void (*callback)(void *task));
 void func_ov182_021bd268(int priority, void *task);

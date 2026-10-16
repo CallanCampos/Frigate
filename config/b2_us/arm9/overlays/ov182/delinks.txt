@@ -63,6 +63,10 @@ src/ov182/download_play_sys.c:
     complete
     .text       start:0x021ba768 end:0x021bb18c
     .bss        start:0x021c4188 end:0x021c418c
+lib/dwcutilui/src/dwc_util_display.c:
+    complete
+    .text       start:0x021bc1a8 end:0x021bc468
+
 lib/dwcutilui/src/dwc_util_heap.c:
     complete
     .text       start:0x021bc468 end:0x021bc544

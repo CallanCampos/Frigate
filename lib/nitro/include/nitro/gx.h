@@ -1644,6 +1644,14 @@ static inline void GXS_SetVisiblePlane(int plane) {
         (u32)((reg_GXS_DB_DISPCNT & ~REG_GX_DISPCNT_DISPLAY_MASK) | (plane << REG_GX_DISPCNT_DISPLAY_SHIFT));
 }
 
+static inline int GX_GetVisiblePlane(void) {
+    return (int)((reg_GX_DISPCNT & REG_GX_DISPCNT_DISPLAY_MASK) >> REG_GX_DISPCNT_DISPLAY_SHIFT);
+}
+
+static inline int GXS_GetVisiblePlane(void) {
+    return (int)((reg_GXS_DB_DISPCNT & REG_GX_DISPCNT_DISPLAY_MASK) >> REG_GX_DISPCNT_DISPLAY_SHIFT);
+}
+
 static inline void GX_SetOBJVRamModeChar(GXOBJVRamModeChar mode) {
     reg_GX_DISPCNT = (u32)((reg_GX_DISPCNT & ~(REG_GX_DISPCNT_EXOBJ_CH_MASK | REG_GX_DISPCNT_OBJMAP_CH_MASK)) | mode);
 }
