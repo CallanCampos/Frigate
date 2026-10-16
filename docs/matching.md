@@ -741,8 +741,12 @@ Same code, other `sp` offsets or frame size.
   or one used in the same block, `s[1]`, union or nested members and a copy between locals all leave it split. An
   initializer (stored through a base register), a real call taking `&s`, a copy to or from memory whose address is
   taken, an inline's by-value parameter or return (each emits the copy), or a pointer local live across blocks (each
-  access an `add rN, sp, #off`) keeps it whole. The original's `best` in `dowsing.c`'s `Dowsing_Update` is whole,
-  with direct `[sp, #0x48]` stores and no initializer, and none of these gives that at no cost (see its row).
+  access an `add rN, sp, #off`) keeps it whole. So does an accessed member of an enum type, at no cost: the struct
+  keeps its slot and each member is read and written directly at `[sp, #off]`. `dowsing.c`'s `DowsingHit` has an
+  enum `type`, and `Dowsing_Update`'s `best`, declared with no initializer and set first by `best.type = HIT_NONE`,
+  is whole at `sp+0x48` with a lone `str r4, [sp, #0x48]`, as in the original. With a `u32`, `int` or `u8` type,
+  with a `void *`, incomplete-struct or function pointer beside it, or with an enum member that is never accessed,
+  the struct is split.
   The split members are slotted with the temporaries, below the parameter copies of inlined calls, by first
   assignment, and a member set in one branch only is split as well. Overlay 143's `MonolithMissionInfo_DrawRecords`
   has `best` and `count` in its lowest slots, below the four inlined `PrintWindow_PrintNoColor` calls' `queue`

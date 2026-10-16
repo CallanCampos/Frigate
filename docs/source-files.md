@@ -892,7 +892,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `dowsing.c` | `0x021ea860`–`0x021eb6ac` | 22 | partial | string at `0x021eb760` |
+| `dowsing.c` | `0x021ea860`–`0x021eb6ac` | 22 | complete | string at `0x021eb760` |
 
 ### Overlay 87
 
