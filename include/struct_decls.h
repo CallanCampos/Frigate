@@ -350,6 +350,7 @@ typedef struct FieldTaskManager FieldTaskManager;
 typedef struct FieldTradeInput FieldTradeInput;
 typedef struct FieldTradeOfferData FieldTradeOfferData;
 typedef struct FishingEventWork FishingEventWork;
+typedef struct Fld3DCi Fld3DCi;
 typedef struct FlyEventWork FlyEventWork;
 typedef struct G3DTextDrawResource G3DTextDrawResource;
 typedef struct GameCommSys GameCommSys;

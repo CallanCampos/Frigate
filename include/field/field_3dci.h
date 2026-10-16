@@ -108,8 +108,9 @@ extern const Fld3DCiSoundKey data_ov036_021d1bd4[7];
 extern const Fld3DCiSoundKey data_ov036_021d1c0c[7];
 extern const Fld3DCiFadeKey data_ov036_021d1c44[5];
 
-void Fld3DCi_Draw(void *ci);
-void *Fld3DCi_Create(HeapID heapId, void *particleSystem);
-void Fld3DCi_Free(void *ci);
+// fld3d_ci.c: the field effects
+Fld3DCi *Fld3DCi_Create(HeapID heapId, FieldParticle *particleSystem);
+void Fld3DCi_Free(Fld3DCi *ci);
+void Fld3DCi_Draw(Fld3DCi *ci);
 
 #endif // POKEBW2_FIELD_FIELD_3DCI_H
