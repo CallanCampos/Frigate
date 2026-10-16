@@ -26,6 +26,12 @@ lib/dwcutil/src/dwc_aoss_ap.c:
     .data       start:0x021c0648 end:0x021c0678
     .bss        start:0x021c2940 end:0x021c2aa0
 
+lib/dwcutil/src/dwcutil_ac.c:
+    .text       start:0x021a7858 end:0x021ab040
+    .rodata     start:0x021bd2e8 end:0x021bfb18
+    .data       start:0x021c0678 end:0x021c0740
+    .bss        start:0x021c2af0 end:0x021c4024
+
 lib/dwcutilui/src/dwc_util_screen.c:
     complete
     .text       start:0x021ab588 end:0x021ab63c
@@ -48,8 +54,7 @@ src/ov182/download_play.c:
     .data       start:0x021c1484 end:0x021c1770
     .bss        start:0x021c417c end:0x021c4180
 
-lib/dwcutil/src/dwc_ac.c:
-    .text       start:0x021a7858 end:0x021ab040
-    .rodata     start:0x021bd2e8 end:0x021bfb18
-    .data       start:0x021c0678 end:0x021c0740
-    .bss        start:0x021c2af0 end:0x021c4024
+src/ov182/download_play_wih.c:
+    .text       start:0x021b9bbc end:0x021ba768
+    .data       start:0x021c1770 end:0x021c1ad8
+    .bss        start:0x021c4180 end:0x021c4188
