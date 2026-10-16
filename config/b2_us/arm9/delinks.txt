@@ -2283,83 +2283,108 @@ lib/twl/src/syscall/syscall_twl.c:
     .text       start:0x020827f8 end:0x020828ac
 
 lib/msl/src/abort_exit_arm.c:
+    complete
     .text       start:0x020828c8 end:0x02082994
 
 lib/msl/src/critical_regions_nitro.c:
+    complete
     .bss        start:0x0214edcc end:0x0214eeec
 
 lib/msl/src/math_arm.c:
+    complete
     .text       start:0x02082994 end:0x020829ac
 
 lib/msl/src/pool_alloc.c:
+    complete
     .text       start:0x020829ac end:0x020829f0
 
 lib/msl/src/alloc.c:
+    complete
     .text       start:0x020829f0 end:0x02082abc
 
 lib/msl/src/ansi_files.c:
+    complete
     .text       start:0x02082abc end:0x02082ba8
     .data       start:0x0209b798 end:0x0209b87c
     .bss        start:0x0214eeec end:0x0214f1ec
 
 lib/msl/src/arith.c:
+    complete
     .text       start:0x02082ba8 end:0x02082bb4
 
 lib/msl/src/buffer_io.c:
+    complete
     .text       start:0x02082bb4 end:0x02082cf4
 
 lib/msl/src/ctype.c:
+    complete
     .rodata     start:0x02098c60 end:0x02098e60
 
 lib/msl/src/direct_io.c:
+    complete
     .text       start:0x02082cf4 end:0x02083108
 
 lib/msl/src/errno.c:
+    complete
     .bss        start:0x0214f1ec end:0x0214f1f0
 
 lib/msl/src/file_io.c:
+    complete
     .text       start:0x02083108 end:0x020832dc
 
 lib/msl/src/file_pos.c:
+    complete
     .text       start:0x020832dc end:0x02083764
 
 lib/msl/src/float.c:
+    complete
     .data       start:0x0209b87c end:0x0209b88c
 
 lib/msl/src/locale.c:
+    complete
     .data       start:0x0209b88c end:0x0209baa8
 
 lib/msl/src/math_api.c:
+    complete
     .text       start:0x02083764 end:0x02083884
 
 lib/msl/src/mbstring.c:
+    complete
     .text       start:0x02083884 end:0x02083964
 
 lib/msl/src/msl_mem.c:
+    complete
     .text       start:0x02083964 end:0x02083a50
 
 lib/msl/src/mem_funcs.c:
+    complete
     .text       start:0x02083a50 end:0x02083afc
 
 lib/msl/src/printf.c:
+    complete
     .text       start:0x02083afc end:0x02085b7c
     .data       start:0x0209baa8 end:0x0209bae0
 
 lib/msl/src/qsort.c:
+    complete
     .text       start:0x02085b7c end:0x02085cb4
 
 lib/msl/src/rand.c:
+    complete
     .text       start:0x02085cb4 end:0x02085cf8
     .data       start:0x0209bae0 end:0x0209bae4
 
 lib/msl/src/scanf.c:
+    complete
     .text       start:0x02085cf8 end:0x02085d70
 
 lib/msl/src/secure_error.c:
+    complete
     .text       start:0x02085d70 end:0x02085d9c
     .bss        start:0x0214f1f0 end:0x0214f1f4
 
 lib/msl/src/string.c:
+    complete
     .text       start:0x02085d9c end:0x020861ac
 
 lib/msl/src/strtold.c:
@@ -2367,19 +2392,24 @@ lib/msl/src/strtold.c:
     .rodata     start:0x02098e60 end:0x02098e74
 
 lib/msl/src/strtoul.c:
+    complete
     .text       start:0x0208715c end:0x02087b28
 
 lib/msl/src/wchar_io.c:
+    complete
     .text       start:0x02087b28 end:0x02087b98
 
 lib/msl/src/wstring.c:
+    complete
     .text       start:0x02087b98 end:0x02087bd4
 
 lib/msl/src/ansi_fp.c:
+    complete
     .text       start:0x02087bd4 end:0x02088fb0
     .data       start:0x0209bae4 end:0x0209bc20
 
 lib/msl/src/math_sun.c:
+    complete
     .text       start:0x02088fb0 end:0x02088fdc
 
 lib/msl/src/math/e_pow.c:
@@ -2387,62 +2417,80 @@ lib/msl/src/math/e_pow.c:
     .rodata     start:0x02098e74 end:0x02098ea4
 
 lib/msl/src/math/e_rem_pio2.c:
+    complete
     .text       start:0x0208a164 end:0x0208a844
     .rodata     start:0x02098ea4 end:0x0209902c
 
 lib/msl/src/math/k_cos.c:
+    complete
     .text       start:0x0208a844 end:0x0208ab5c
 
 lib/msl/src/math/k_rem_pio2.c:
+    complete
     .text       start:0x0208ab5c end:0x0208b70c
     .rodata     start:0x0209902c end:0x0209907c
 
 lib/msl/src/math/k_sin.c:
+    complete
     .text       start:0x0208b70c end:0x0208b988
 
 lib/msl/src/math/s_copysign.c:
+    complete
     .text       start:0x0208b988 end:0x0208b9b0
 
 lib/msl/src/math/s_cos.c:
+    complete
     .text       start:0x0208b9b0 end:0x0208bb24
 
 lib/msl/src/math/s_fabs.c:
+    complete
     .text       start:0x0208bb24 end:0x0208bb44
 
 lib/msl/src/math/s_floor.c:
+    complete
     .text       start:0x0208bb44 end:0x0208bd08
 
 lib/msl/src/math/s_frexp.c:
+    complete
     .text       start:0x0208bd08 end:0x0208bdc8
 
 lib/msl/src/math/s_ldexp.c:
+    complete
     .text       start:0x0208bdc8 end:0x0208c028
 
 lib/msl/src/math/s_sin.c:
+    complete
     .text       start:0x0208c028 end:0x0208c1a0
 
 lib/msl/src/math/w_pow.c:
+    complete
     .text       start:0x0208c1a0 end:0x0208c1ac
 
 lib/msl/src/extras_string.c:
+    complete
     .text       start:0x0208c1ac end:0x0208c224
 
 lib/msl/src/fp/fp_fastI.c:
     .text       start:0x0208c224 end:0x0208ece0
 
 lib/msl/src/runtime/register_atexit.c:
+    complete
     .text       start:0x0208ece0 end:0x0208ed2c
     .bss        start:0x0214f1f4 end:0x0214f4f8
 
 lib/msl/src/runtime/trk_stubs.c:
+    complete
     .text       start:0x0208ed2c end:0x0208ed3c
 
 lib/msl/src/runtime/console_io.c:
+    complete
     .text       start:0x0208ed3c end:0x0208edd8
 
 lib/msl/src/runtime/call_static_initializers.c:
+    complete
     .text       start:0x0208edd8 end:0x0208ee08
 
 lib/msl/src/runtime/global_destructor_chain.c:
+    complete
     .text       start:0x0208ee08 end:0x0208ee28
     .bss        start:0x0214f4f8 end:0x0214f500
