@@ -30,7 +30,9 @@ flags = [
 "photo_sign.c" = ["-nothumb"]
 "photo_sign_util.c" = ["-nothumb"]
 
-# Files registered from the untouched-code scouting; flags beyond the mode are not settled yet
+# The LTD autoload's TwlSDK libraries are ARM code. camera_api.c and nwm.c load each static through a literal of its
+# own, as -ipa function does (-ipa file reaches them all from one base, and drops camera_api.c's unreferenced word);
+# fatfs_api.c is -O2,p, since -O4,p and -O3,p rotate its loops and fold its reloads
 "rtc/rtc_api_ex.c" = ["-nothumb"]
 "camera/camera_api.c" = ["-nothumb", "-ipa function"]
 "camera/camera.c" = ["-nothumb"]

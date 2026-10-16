@@ -40,7 +40,8 @@ flags = [
 # So does the file of DWC that wraps the GameSpy HTTP client (overlay 189)
 "ghttp/dwc_ghttp.c" = ["-ipa file"]
 
-# Files registered from the untouched-code scouting; flags beyond the mode are not settled yet
+# ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
+# base, as -ipa file does
 "bm/dwc_backup.c" = ["-nothumb"]
 "bm/dwc_bm_init.c" = ["-nothumb"]
 "bm/util_wifiidtool.c" = ["-nothumb"]
