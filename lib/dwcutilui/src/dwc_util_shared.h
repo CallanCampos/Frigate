@@ -31,6 +31,8 @@ DWCUtilTask *func_ov182_021bd200(int list, DWCUtilTaskCallback callback, void *a
 void func_ov182_021bd264(DWCUtilTask *task, DWCUtilTaskCallback callback);
 void func_ov182_021bd268(int list, DWCUtilTask *task);
 void func_ov182_021bd280(int list, DWCUtilTask *task);
+// Runs the list's tasks: list 1 is the VBlank's
+void func_ov182_021bd19c(int list);
 
 // The list and the OAM buffer under the OAM allocator and the cells, in the same later files
 void *func_ov182_021bcb3c(void);
