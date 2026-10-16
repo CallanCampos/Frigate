@@ -2478,6 +2478,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   of equal length that each end in a `TOUCH_RECT_END` entry, with other tables pointing into the rows. Once the sizes
   are right, any order of the objects of one size can be reached; keep the natural order elsewhere and let
   `rodata_order.py` solve for the same-size groups.
+- One initialized array retains entries that no code indexes, where MWCC drops separate unreferenced statics. If
+  live `.data` objects have gaps filled by unused records, indexing a shared array preserves the ROM's offsets:
+  `wipe_sub.c`'s seven `WipeLinePattern` entries put its four used patterns at 0, 0x10, 0x20 and 0x28, matching all
+  four line-wipe functions in both versions without pointer casts.
 - The linker starts each `.rodata` section on a 4-byte boundary, whatever the section's own alignment, so a 6-byte
   `u16` table followed by a `u8` initializer leaves 2 bytes of padding between them, as at the start of
   `btl_server_flow.c`'s `.rodata`. `scrcmd_ochiba.c`'s 150-byte and 342-byte tables, both 2-aligned, end where only

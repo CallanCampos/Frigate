@@ -572,6 +572,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
+  only some of them, preserving the original element offsets; `wipe_sub.c`'s line patterns match at 0, 0x10, 0x20
+  and 0x28 this way. (matching.md: "One initialized array retains entries")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
