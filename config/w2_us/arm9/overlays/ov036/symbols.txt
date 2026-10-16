@@ -5531,7 +5531,7 @@ data_ov036_021d22a8 kind:data(any) addr:0x021d22dc
 data_ov036_021d22b0 kind:data(any) addr:0x021d22e4
 data_ov036_021d22b8 kind:data(any) addr:0x021d22ec
 FIELD_FLASH_FUNCTIONS kind:data(any) addr:0x021d22f4
-data_ov036_021d22d0 kind:data(any) addr:0x021d2304
+FIELD_EFFECT_SCRIPT_ENTRIES kind:data(any) addr:0x021d2304
 data_ov036_021d22d2 kind:data(any) addr:0x021d2306
 data_ov036_021d234c kind:data(any) addr:0x021d2380
 data_ov036_021d236c kind:data(any) addr:0x021d23a0

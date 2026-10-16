@@ -1022,6 +1022,12 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt);
 // The alpha of a material of a model resource, from 0 to 31
 u32 NNS_G3DResMdlGetMatAlpha(const NNSG3dResMdl *mdl, u32 matId);
 void NNS_G3DResMdlSetMatAlpha(NNSG3dResMdl *mdl, u32 matId, u32 alpha);
+// A material's lights, polygon ID, faces to cull and polygon mode (NitroSystem's NNS_G3dMdlSetMdlLightEnableFlag,
+// NNS_G3dMdlSetMdlPolygonID, NNS_G3dMdlSetMdlCullMode and NNS_G3dMdlSetMdlPolygonMode)
+void NNS_G3DResMdlSetMatLights(NNSG3dResMdl *mdl, u32 matId, u32 lights);
+void NNS_G3DResMdlSetMatPolyID(NNSG3dResMdl *mdl, u32 matId, u32 polyId);
+void NNS_G3DResMdlSetMatFaceCulling(NNSG3dResMdl *mdl, u32 matId, u32 culling);
+void NNS_G3DResMdlSetMatShadingMode(NNSG3dResMdl *mdl, u32 matId, u32 mode);
 // The alpha of every material of a model resource, from 0 to 31 (NitroSystem's NNS_G3dMdlSetMdlAlphaAll)
 void func_02068410(NNSG3dResMdl *mdl, int alpha);
 // Turns fog on or off for every material of a model resource

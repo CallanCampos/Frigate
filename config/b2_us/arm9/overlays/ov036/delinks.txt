@@ -573,6 +573,7 @@ src/ov036/fieldskill_mapeff.c:
     .data       start:0x021d5554 end:0x021d5568
 
 src/ov036/fld_wipe_3dobj.c:
+    complete
     .text       start:0x021c1e30 end:0x021c2080
     .rodata     start:0x021d22d0 end:0x021d234c
     .data       start:0x021d5568 end:0x021d557c
