@@ -1,7 +1,7 @@
+#include "app/local_tvt/local_tvt_chara.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_message.h"
-#include "app/local_tvt_local.h"
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "gfl/arc.h"
@@ -118,28 +118,28 @@ struct LocalTvtChara {
 
 // The files of a person: the palette and the characters, which the second frame follows, and the cell actor
 // resources of the eyes and mouth
-typedef struct {
+struct LocalTvtPersonFiles {
     u8 palette;
     u8 chars;
     u8 obj;
-} LocalTvtPersonFiles;
+};
 
-typedef struct {
+struct LocalTvtBackgroundFiles {
     u16 palette;
     u16 chars;
-} LocalTvtBackgroundFiles;
+};
 
-typedef struct {
+struct LocalTvtObjectFiles {
     u8 palette;
     u8 chars;
     u8 cells;
     u8 anims;
-} LocalTvtObjectFiles;
+};
 
-typedef struct {
+struct LocalTvtNamePos {
     u8 x;
     u8 y;
-} LocalTvtNamePos;
+};
 
 static void LocalTvtFace_TalkCore(LocalTvtFace *face, MsgData *msgData, u16 messageId, u32 keyWait);
 static LocalTvtFace *LocalTvtFace_Create(LocalTvtChara *chara, const LocalTvtFaceSetup *setup, u32 index,
