@@ -5278,6 +5278,8 @@ overlays/ov036 0x021cf970 RAIL_OBJ_ANIMS
 overlays/ov036 0x021cfca4 PLAYER_NPC_TEMPLATE
 overlays/ov036 0x021cfcf8 TILE_CLASS_SFX_LAY0
 overlays/ov036 0x021cfd30 TILE_CLASS_SFX_LAY1
+overlays/ov036 0x021cfdcc SPIN_FACE_DIRS
+overlays/ov036 0x021cfdd4 SLIDE_FUNCS
 overlays/ov036 0x021d0924 sConfirmDialogSetup
 overlays/ov036 0x021d0948 sWindowShards
 overlays/ov036 0x021d0954 sWindowTitle
@@ -5310,6 +5312,7 @@ overlays/ov036 0x021d29e0 SAVE_ANIME_PALETTE_OFFSETS
 overlays/ov036 0x021d29e8 SAVE_ANIME_UP
 overlays/ov036 0x021d29f4 SAVE_ANIME_STEPS
 overlays/ov036 0x021d4d74 sJumpHeights
+overlays/ov036 0x021d4ec0 sPlayerTemplate
 overlays/ov036 0x021d5178 sMartWindows
 overlays/ov036 0x021d5194 sBPShopWindows
 overlays/ov036 0x021d51b0 sMoveTutorWindows
