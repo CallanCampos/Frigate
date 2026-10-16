@@ -16,9 +16,6 @@
 #define STD_PRINTF_CHAR 0x0100
 #define STD_PRINTF_UNSIGNED 0x1000
 
-// Whether a byte begins a two-byte Shift-JIS character
-#define STD_IS_LEAD_BYTE(c) ((u32)(((u8)(c) ^ 0x20) - 0xa1) < 0x3c)
-
 // Where the text goes: how many bytes are left, where the next one is written and where the text begins. The
 // writing goes on when no bytes are left, so that dst tells the length
 typedef struct StringBuffer {
@@ -111,7 +108,7 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
         int numDigits;
         int zeros;
 
-        if (STD_IS_LEAD_BYTE(*fmt)) {
+        if (STD_IsSjisLeadByte(*fmt)) {
             string_put_char(&str, *fmt++);
             if (*fmt != '\0') {
                 string_put_char(&str, *fmt++);

@@ -569,21 +569,6 @@ static int FSi_CopyPathPart(char *dest, int destSize, const char *src, int lengt
     return i;
 }
 
-// Whether a byte starts a two-byte Shift_JIS character
-static inline BOOL FSi_IsSjisLead(u8 c) {
-    return (u32)((c ^ 0x20) - 0xa1) < 0x3c;
-}
-
-// Whether the bytes at a string's start are a two-byte Shift_JIS character
-static inline BOOL FSi_IsSjisCharacter(const char *s) {
-    BOOL result = FALSE;
-
-    if (FSi_IsSjisLead(s[0]) && s[1] != 0x7f && (u8)(s[1] - 0x40) <= 0xbc) {
-        result = TRUE;
-    }
-    return result;
-}
-
 static inline BOOL FSi_IsSlash(u8 c) {
     return c == '/' || c == '\\';
 }
@@ -611,7 +596,7 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
             *baseDirId = 0;
         }
     } else {
-        for (i = 0;; i = i + 1 + FSi_IsSjisLead(path[i])) {
+        for (i = 0;; i = i + 1 + STD_IsSjisLeadByte(path[i])) {
             u8 c = path[i];
 
             if (c == '\0' || FSi_IsSlash(c)) {
@@ -645,7 +630,7 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
             char c = path[i];
 
             if (c != '\0' && !FSi_IsSlash(c)) {
-                i += FSi_IsSjisCharacter(path + i) ? 2 : 1;
+                i += STD_IsSjisCharacter(path + i) ? 2 : 1;
                 continue;
             }
             if (i == 0 || (i == 1 && path[0] == '.')) {
@@ -871,7 +856,7 @@ void FS_NotifyArchiveAsyncEnd(FSArchive *arc, FSResult result) {
 static int FSi_DecrementSjisPosition(const char *path, int position) {
     int start = position - 1;
 
-    while (start > 0 && FSi_IsSjisLead(path[start - 1])) {
+    while (start > 0 && STD_IsSjisLeadByte(path[start - 1])) {
         start--;
     }
     return (position - 1) - (((position - 1) - start) & 1);
@@ -882,7 +867,7 @@ int FSi_IncrementSjisPositionToSlash(const char *path, int position) {
     char c;
 
     while ((c = path[position]) != '\0' && (c & 0xff) != '/' && (c & 0xff) != '\\') {
-        position = position + 1 + FSi_IsSjisLead(c);
+        position = position + 1 + STD_IsSjisLeadByte(c);
     }
     return position;
 }

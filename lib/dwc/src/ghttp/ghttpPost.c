@@ -570,7 +570,7 @@ static int ghiPostFileDiskStateDoPosting(GHIPostItemState *state, GHIConnection 
     int result;
 
     do {
-        count = __fread(buffer, 1, sizeof(buffer), state->file);
+        count = fread(buffer, 1, sizeof(buffer), state->file);
         if (count <= 0) {
             connection->completed = TRUE;
             connection->result = 14;

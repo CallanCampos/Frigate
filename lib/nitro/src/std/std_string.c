@@ -1,8 +1,8 @@
 // TwlSDK's libstd, string functions (std/common/src/std_string.c): copy, search, length and compare, the last three
-// reading a word at a time once the strings are aligned, and a scanf, which the file ends with (the scout merged the
-// SDK's std_sscanf.c into it, since libstd's archive has no such file; the name is the SDK's). The scanf is one
-// function of 0x5b0 bytes whose conversions are labelled blocks, reached by goto from the switch on the conversion
-// character. The names are the SDK's.
+// reading a word at a time once the strings are aligned, and a scanf, which the file ends with: libstd's archive has
+// no scanf object of its own, so the scanf is taken to be part of this file. The scanf is one function of 0x5b0 bytes
+// whose conversions are labelled blocks, reached by goto from the switch on the conversion character. The names are
+// the SDK's.
 #include "nitro/mi.h"
 #include "nitro/std.h"
 
@@ -24,9 +24,6 @@
 
 // Sets the bit of a character in a set of 256 bits
 #define STD_SET_BIT(set, c) ((set)[(u32)(c) >> 5] |= 1 << ((u32)(c) & 31))
-
-// Whether a byte begins a two-byte Shift-JIS character
-#define STD_IS_LEAD_BYTE(c) ((u32)(((u8)(c) ^ 0x20) - 0xa1) < 0x3c)
 
 static BOOL STDi_IsSpace(int c);
 static void STDi_FillBitset(u32 *bitset, u32 from, u32 to);
@@ -238,9 +235,41 @@ int STD_CompareNString(const char *a, const char *b, int len) {
     return 0;
 }
 
+int STD_TSScanf(const char *src, const char *fmt, ...) {
+    va_list args;
+    int count;
+
+    va_start(args, fmt);
+    count = STD_TVSScanf(src, fmt, args);
+    va_end(args);
+    return count;
+}
+
+static BOOL STDi_IsSpace(int c) {
+    return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+}
+
+// Sets the bits from to to - 1
+static void STDi_FillBitset(u32 *bitset, u32 from, u32 to) {
+    if (from < to) {
+        u32 mask;
+        u32 lastMask = (1 << (to & 31)) - 1;
+
+        do {
+            u32 word = from >> 5;
+            mask = ~0u << (from & 31);
+
+            from = (word + 1) << 5;
+            if (from > to) {
+                mask &= lastMask;
+            }
+            bitset[word] |= mask;
+        } while (from < to);
+    }
+}
+
 // STD_TVSScanf: reads the text as the format says and returns how many values it stored, or -1 if the text ended before
-// the first conversion read anything. A conversion that fails ends the scan. The format character at the top of each
-// pass and the field width of a conversion share one variable, as they share a register in the original
+// the first conversion read anything. A conversion that fails ends the scan
 int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
     // Declared in the order of the original's stack slots, the highest first, which ours differ from (see nonmatching)
     const char *textStart = src;
@@ -257,14 +286,15 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
     int c;
     int count = 0;
     int width;
+    int fmtChar;
     char *dst;
     u8 prev;
     u32 set[8];
     char ch;
     char conv;
 
-    while ((width = *fmt) != '\0') {
-        if (STDi_IsSpace(width)) {
+    while ((fmtChar = *fmt) != '\0') {
+        if (STDi_IsSpace(fmtChar)) {
             while (STDi_IsSpace(*fmt)) {
                 fmt++;
             }
@@ -273,11 +303,11 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             }
             continue;
         }
-        if (width != '%') {
-            if (width != *src) {
+        if (fmtChar != '%') {
+            if (fmtChar != *src) {
                 break;
             }
-            if (STD_IS_LEAD_BYTE(width)) {
+            if (STD_IsSjisLeadByte(fmtChar)) {
                 src++;
                 // BUG: compares the second byte of the text with the first byte of the format character, and moves
                 // on in the format by one byte only
@@ -287,7 +317,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
                     break;
                 }
 #else
-                if (width != *src) {
+                if (fmtChar != *src) {
                     break;
                 }
 #endif
@@ -297,7 +327,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             continue;
         }
         if (fmt[1] == '%') {
-            if (width != *src) {
+            if (fmtChar != *src) {
                 break;
             }
             fmt += 2;
@@ -591,37 +621,4 @@ finish:
         count = -1;
     }
     return count;
-}
-
-int STD_TSScanf(const char *src, const char *fmt, ...) {
-    va_list args;
-    int count;
-
-    va_start(args, fmt);
-    count = STD_TVSScanf(src, fmt, args);
-    va_end(args);
-    return count;
-}
-
-static BOOL STDi_IsSpace(int c) {
-    return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
-}
-
-// Sets the bits from to to - 1
-static void STDi_FillBitset(u32 *bitset, u32 from, u32 to) {
-    if (from < to) {
-        u32 mask;
-        u32 lastMask = (1 << (to & 31)) - 1;
-
-        do {
-            u32 word = from >> 5;
-            mask = ~0u << (from & 31);
-
-            from = (word + 1) << 5;
-            if (from > to) {
-                mask &= lastMask;
-            }
-            bitset[word] |= mask;
-        } while (from < to);
-    }
 }

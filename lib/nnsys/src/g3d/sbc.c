@@ -23,8 +23,8 @@ static const u8 NNS_COMPACT_ROT_LUT[9][4] = {
 
 // The functions that draw a shape or a material of the item tag in its data, with room for three more of each; and the
 // function of each command, of which the model's byte code has fourteen
-NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4] = { NNS_G3DRenderFuncDrawMeshDefault };
 NNSG3dFuncSbcMat NNS_G3D_MATERIAL_APPLY_FUNCS[4] = { NNS_G3DRenderFuncApplyMaterialDefault };
+NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4] = { NNS_G3DRenderFuncDrawMeshDefault };
 NNSG3dFuncSbc NNS_G3D_RENDER_FUNC[NNS_G3D_SBC_COMMAND_NUM] = {
     NNS_G3DRenderFuncNop,
     NNS_G3DRenderFuncReturn,
@@ -50,7 +50,9 @@ typedef struct {
 } IbpMatrix;
 
 // The results of the materials that a model's nodes share, which a node reuses once one has made it. The scaling rules
-// set and read the scale of each joint
+// set and read the scale of each joint. In the ROM the renderer's pointer and the three arrays are one block of .bss
+// (NitroSystem's render state on the global), which these four objects don't give: see the file's rows in
+// docs/nonmatching-functions.md
 NNSG3dMatAnmResult g_NNSMaterials[NNS_G3D_SIZE_MAT_MAX];
 NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
 IbpMatrix g_NNSG3DIBPMatrices[NNS_G3D_SIZE_JNT_MAX];
@@ -224,7 +226,7 @@ void NNS_G3DRenderFuncLoadMatrix(NNSG3dRS *rs, u32 opt) {
             u32 param = rs->c[1];
 
             if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
-                NNS_G3DExecOp(0x14, &param, 1); // MTX_RESTORE
+                NNS_G3DExecOp(G3OP_MTX_RESTORE, &param, 1);
             }
         }
 
@@ -622,9 +624,12 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
             MTX_Concat44(&clip, &cam, &clip);
         }
 
-        VEC_Set(&sBBCmd.trans, clip.m[3][0], clip.m[3][1], clip.m[3][2]);
-        VEC_Set(&sBBCmd.scale, VEC_Mag((const VecFx32 *)clip.m[0]), VEC_Mag((const VecFx32 *)clip.m[1]),
-                VEC_Mag((const VecFx32 *)clip.m[2]));
+        sBBCmd.trans.x = clip.m[3][0];
+        sBBCmd.trans.y = clip.m[3][1];
+        sBBCmd.trans.z = clip.m[3][2];
+        sBBCmd.scale.x = VEC_Mag((const VecFx32 *)clip.m[0]);
+        sBBCmd.scale.y = VEC_Mag((const VecFx32 *)clip.m[1]);
+        sBBCmd.scale.z = VEC_Mag((const VecFx32 *)clip.m[2]);
 
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
@@ -781,13 +786,12 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
 
     MI_CpuClearFast(&sum, sizeof(sum));
     NNS_G3DWaitFIFO();
-    i = 0;
-    reg_G3_MTX_MODE = 0;
+    reg_G3_MTX_MODE = GX_MTXMODE_PROJECTION;
     reg_G3_MTX_STORE = 1;
     reg_G3_MTX_IDENTITY = 0;
-    reg_G3_MTX_MODE = 2;
+    reg_G3_MTX_MODE = GX_MTXMODE_POSITION_VECTOR;
 
-    for (; i < numMtx; i++) {
+    for (i = 0; i < numMtx; i++) {
         u32 jointID = p[1];
         u32 isCached = rs->isEnvMtxCached[jointID >> 5] & (1 << (jointID & 0x1f));
         MtxFx44 *clip = &g_NNSG3DIBPMatrices[jointID].clip;
@@ -795,7 +799,7 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         if (!isCached) {
             rs->isEnvMtxCached[jointID >> 5] |= 1 << (jointID & 0x1f);
             reg_G3_MTX_RESTORE = p[0];
-            reg_G3_MTX_MODE = 1;
+            reg_G3_MTX_MODE = GX_MTXMODE_POSITION;
             G3_MultMtx43(&evpMtx[jointID].invM);
         }
 
@@ -814,7 +818,7 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         if (!isCached) {
             while (G3X_GetClipMtx(clip) != 0) {
             }
-            reg_G3_MTX_MODE = 2;
+            reg_G3_MTX_MODE = GX_MTXMODE_POSITION_VECTOR;
             G3_MultMtx33(&evpMtx[jointID].invN);
         }
 
@@ -848,12 +852,14 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     sum.invN.m[2][0] += MulFx(weight, nrm->m[2][0]);
     sum.invN.m[2][1] += MulFx(weight, nrm->m[2][1]);
     sum.invN.m[2][2] += MulFx(weight, nrm->m[2][2]);
+    // Loads the normal matrix as a 4x3 one, so the load reads three words past sum. Only the position matrix takes that
+    // translation, and the next load replaces it
     G3_LoadMtx43((const MtxFx43 *)&sum.invN);
-    reg_G3_MTX_MODE = 1;
+    reg_G3_MTX_MODE = GX_MTXMODE_POSITION;
     G3_LoadMtx43(&sum.invM);
-    reg_G3_MTX_MODE = 0;
+    reg_G3_MTX_MODE = GX_MTXMODE_PROJECTION;
     reg_G3_MTX_RESTORE = 1;
-    reg_G3_MTX_MODE = 2;
+    reg_G3_MTX_MODE = GX_MTXMODE_POSITION_VECTOR;
     reg_G3_MTX_STORE = rs->c[1];
     rs->c += 3 * (rs->c[2] + 1);
 }
@@ -1034,13 +1040,13 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
             }
 
             NNS_G3DWaitFIFO();
-            reg_G3_MTX_MODE = 0;
+            reg_G3_MTX_MODE = GX_MTXMODE_PROJECTION;
             reg_G3_MTX_PUSH = 0;
             reg_G3_MTX_IDENTITY = 0;
             while (G3X_GetClipMtx(&clip) != 0) {
             }
             reg_G3_MTX_POP = 1;
-            reg_G3_MTX_MODE = 3;
+            reg_G3_MTX_MODE = GX_MTXMODE_TEXTURE;
             NNS_G3dGeLoadMtx44(&clip);
             NNS_G3dGeTexCoord(clip.m[3][0] >> 4, clip.m[3][1] >> 4);
         }

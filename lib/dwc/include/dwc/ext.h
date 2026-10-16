@@ -33,8 +33,7 @@ u32 strcspn(const char *s, const char *set);
 u32 strlen(const char *s);
 char *strchr(const char *s, int c);
 char *strstr(const char *s, const char *find);
-// The rest is in the C headers above (MSL's), but for the block read under fread, which they keep to the library
-u32 __fread(void *buffer, u32 size, u32 count, void *file);
+// The rest is in the C headers above (MSL's)
 
 // What overlay 189's HTTP code (the NHTTP client and the GameSpy HTTP code) calls in the main module and overlay 11.
 // NitroSDK's thread library, which it also calls, is in nitro/os.h

@@ -136,6 +136,9 @@ static CAMERAResult func_02701814(CAMERASelect camera, BOOL on, CAMERACallback c
 static CAMERAResult func_02701940(int value, CAMERACallback callback, void *arg);
 static BOOL func_027019b4(u32 command, u32 length, u8 data);
 static void func_02701a60(const u8 *data);
+// The bytes of a command after the first go out three at a time, so a command's buffer has room for the two bytes
+// that the last three can reach past its size
+#define CAMERA_COMMAND_BUFFER_SIZE(size) ((size) + 2)
 static void func_02701fe8(CAMERAResult result);
 static void func_027001f0(void);
 
@@ -589,7 +592,6 @@ CAMERAResult func_02700bd0(void) {
 // Starts the I2C of the cameras
 static CAMERAResult func_02700c18(CAMERASelect camera, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    CAMERAResult result;
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -606,13 +608,9 @@ static CAMERAResult func_02700c18(CAMERASelect camera, CAMERACallback callback, 
     sCameraWork.busy = TRUE;
     OS_RestoreInterrupts(enabled);
     sCameraWork.callback = callback;
-    result = CAMERA_RESULT_SUCCESS;
     sCameraWork.callbackArg = arg;
     sCameraWork.stopClock = TRUE;
-    if (!func_027019b4(CAMERA_COMMAND_I2C_INIT, 1, camera)) {
-        result = CAMERA_RESULT_SEND_ERROR;
-    }
-    return result;
+    return func_027019b4(CAMERA_COMMAND_I2C_INIT, 1, camera) ? CAMERA_RESULT_SUCCESS : CAMERA_RESULT_SEND_ERROR;
 }
 
 CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera) {
@@ -671,7 +669,7 @@ CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera) {
 // Chooses the context of a camera that it uses
 static CAMERAResult func_02700df0(CAMERASelect camera, CAMERAContext context, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -706,7 +704,7 @@ static CAMERAResult func_02700df0(CAMERASelect camera, CAMERAContext context, CA
 static CAMERAResult func_02700eb8(CAMERASelect camera, CAMERAContext context, CAMERASize size, CAMERACallback callback,
                                   void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[5]; // The three bytes and the one that func_02701a60 reads after them; a frame of 8 bytes in the ROM
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -764,7 +762,7 @@ CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CA
 
 static CAMERAResult func_02701020(CAMERASelect camera, int rate, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -813,7 +811,7 @@ static CAMERAResult func_02701020(CAMERASelect camera, int rate, CAMERACallback 
 static CAMERAResult func_02701120(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect,
                                   CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[5]; // The three bytes and the one that func_02701a60 reads after them; a frame of 8 bytes in the ROM
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -871,7 +869,7 @@ CAMERAResult CAMERA_I2CEffectExCore(CAMERASelect camera, CAMERAContext context, 
 static CAMERAResult func_02701284(CAMERASelect camera, CAMERAContext context, CAMERAFlip flip, CAMERACallback callback,
                                   void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[5]; // The three bytes and the one that func_02701a60 reads after them; a frame of 8 bytes in the ROM
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -916,7 +914,7 @@ static CAMERAResult func_02701284(CAMERASelect camera, CAMERAContext context, CA
 
 static CAMERAResult func_027013a4(CAMERASelect camera, CAMERAPhotoMode mode, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -958,7 +956,7 @@ static CAMERAResult func_027013a4(CAMERASelect camera, CAMERAPhotoMode mode, CAM
 static CAMERAResult func_02701488(CAMERASelect camera, CAMERAWhiteBalance whiteBalance, CAMERACallback callback,
                                   void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -1000,7 +998,7 @@ static CAMERAResult func_02701488(CAMERASelect camera, CAMERAWhiteBalance whiteB
 
 static CAMERAResult func_02701570(CAMERASelect camera, int exposure, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -1034,7 +1032,7 @@ static CAMERAResult func_02701570(CAMERASelect camera, int exposure, CAMERACallb
 
 static CAMERAResult func_02701644(CAMERASelect camera, int sharpness, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -1068,7 +1066,7 @@ static CAMERAResult func_02701644(CAMERASelect camera, int sharpness, CAMERACall
 
 static CAMERAResult func_02701718(CAMERASelect camera, BOOL on, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
@@ -1109,7 +1107,7 @@ CAMERAResult CAMERA_I2CAutoExposureCore(CAMERASelect camera, BOOL on) {
 
 static CAMERAResult func_02701814(CAMERASelect camera, BOOL on, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u8 data[2];
+    u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
     u32 enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {

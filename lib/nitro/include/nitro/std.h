@@ -7,6 +7,19 @@
 // NitroSDK's STD, the standard string functions of the SDK (TwlSDK's libstd). Their names are the SDK's; swan named the
 // length one NNS_STD_StrLen
 
+// TwlSDK's STD_IsSjisLeadByte: whether a byte begins a two-byte Shift_JIS character. STD_IsSjisTrailByte: whether a
+// byte can be the second byte of one. STD_IsSjisCharacter: whether a string starts with one
+#define STD_IsSjisLeadByte(c) ((u32)(((u8)(c) ^ 0x20) - 0xa1) < 0x3c)
+#define STD_IsSjisTrailByte(c) ((c) != 0x7f && (u8)((c) - 0x40) <= 0xbc)
+static inline BOOL STD_IsSjisCharacter(const char *s) {
+    BOOL result = FALSE;
+
+    if (STD_IsSjisLeadByte(s[0]) && STD_IsSjisTrailByte(s[1])) {
+        result = TRUE;
+    }
+    return result;
+}
+
 // Copies the string and its terminator, returning dst
 char *STD_CopyString(char *dst, const char *src);
 // Copies at most size - 1 characters and a terminator, returning the length of src
