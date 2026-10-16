@@ -1745,10 +1745,12 @@ lib/nitro/src/math/sha1_block.c:
     .text       start:0x02077cd4 end:0x02078000
 
 lib/dwc/src/bm/dwc_backup.c:
+    complete
     .text       start:0x02056a58 end:0x02056f48
     .bss        start:0x02141958 end:0x0214196c
 
 lib/dwc/src/bm/dwc_bm_init.c:
+    complete
     .text       start:0x02056f48 end:0x02056fb4
 
 lib/dwc/src/bm/util_wifiidtool.c:
@@ -1760,10 +1762,12 @@ lib/dwc/src/base/dwc_account.c:
     .data       start:0x0209b05c end:0x0209b090
 
 lib/dwc/src/base/dwc_common.c:
+    complete
     .text       start:0x020580b8 end:0x02058390
     .data       start:0x0209b090 end:0x0209b0d8
 
 lib/dwc/src/base/dwc_error.c:
+    complete
     .text       start:0x02058390 end:0x020584e4
     .bss        start:0x0214196c end:0x02141974
 
@@ -1786,9 +1790,11 @@ lib/dwc/src/ac/dwc_ac_wcm.c:
     .rodata     start:0x020940dc end:0x020940e0
 
 lib/dwc/src/ac/dwc_ac_cleanup.c:
+    complete
     .text       start:0x0205975c end:0x020598b4
 
 lib/dwc/src/ac/dwc_ac_connect.c:
+    complete
     .text       start:0x020598b4 end:0x02059f04
 
 lib/dwc/src/ac/dwc_ac.c:
@@ -1796,41 +1802,50 @@ lib/dwc/src/ac/dwc_ac.c:
     .bss        start:0x02141988 end:0x0214199c
 
 lib/dwc/src/base/dwc_connectinet.c:
+    complete
     .text       start:0x0205ac24 end:0x0205b65c
     .bss        start:0x0214199c end:0x021419a4
 
 lib/dwc/src/ac/dwc_ac_result.c:
+    complete
     .text       start:0x0205b65c end:0x0205b890
 
 lib/dwc/src/ac/dwc_ac_aplist.c:
+    complete
     .text       start:0x0205b890 end:0x0205be94
     .rodata     start:0x020940e0 end:0x020940f4
     .data       start:0x0209b10c end:0x0209b118
 
 lib/dwc/src/base/dwc_wdsscan.c:
+    complete
     .text       start:0x0205be94 end:0x0205c2a4
     .bss        start:0x021419a4 end:0x021419c0
 
 lib/dwc/src/ac/dwc_ac_search.c:
+    complete
     .text       start:0x0205c2a4 end:0x0205cf80
     .rodata     start:0x020940f4 end:0x02094128
 
 lib/dwc/src/ac/dwc_ac_wepkey.c:
+    complete
     .text       start:0x0205cf80 end:0x0205d568
     .rodata     start:0x02094128 end:0x02094160
     .data       start:0x0209b118 end:0x0209b198
 
 lib/dwc/src/ac/dwc_ac_soc.c:
+    complete
     .text       start:0x0205d568 end:0x0205dbc0
     .rodata     start:0x02094160 end:0x020941b8
     .data       start:0x0209b198 end:0x0209b1a4
 
 lib/dwc/src/bm/dwc_nvram.c:
+    complete
     .text       start:0x0205dbc0 end:0x0205e020
     .data       start:0x0209b1a4 end:0x0209b1a8
     .bss        start:0x021419c0 end:0x02141a20
 
 lib/dwc/src/bm/dwc_bm_check.c:
+    complete
     .text       start:0x0205e020 end:0x0205ea3c
 
 lib/nitro/src/card/card_common.c:
