@@ -379,13 +379,13 @@ src/ov036/fldmmdl_g3dobj.c:
 
 src/ov036/fld_act_rail.c:
     .text       start:0x021953b8 end:0x02196278
-    .rodata     start:0x021cf3dc end:0x021cf79c
-    .data       start:0x021d4db4 end:0x021d4dd8
+    .rodata     start:0x021cf3dc end:0x021cf7fc
+    .data       start:0x021d4db4 end:0x021d4e28
 
 src/ov036/field_rail_loader.c:
     .text       start:0x02196278 end:0x02197574
-    .rodata     start:0x021cf79c end:0x021cfa10
-    .data       start:0x021d4dd8 end:0x021d4e3c
+    .rodata     start:0x021cf7fc end:0x021cfa10
+    .data       start:0x021d4e28 end:0x021d4e3c
 
 src/ov036/field_fog.c:
     complete
