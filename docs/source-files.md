@@ -490,7 +490,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_player_core.c` | `0x0219ad4c`–`0x0219b7a8` | 65 | partial | string at `0x021d4e98` |
 | `field_player_grid.c` | `0x0219b7a8`–`0x0219cea0` | 99 | complete | string at `0x021d4eac` |
 | `field_player_nogrid.c` | `0x0219cea0`–`0x0219e328` | 91 | partial | string at `0x021d4ee4` |
-| `fieldmap_ctrl_nogrid_work.c` | `0x0219e328`–`0x0219e430` | 7 | partial | string at `0x021d4efc` |
+| `fieldmap_ctrl_nogrid_work.c` | `0x0219e328`–`0x0219e430` | 7 | complete | string at `0x021d4efc` |
 | `fieldmap_ctrl_hybrid.c` | `0x0219e430`–`0x0219e9d0` | 13 | complete | string at `0x021d4f44` |
 | `field_ground_anime.c` | `0x0219e9d0`–`0x0219f178` | 32 | partial | string at `0x021d4f5c` |
 | `event_entrance_effect.c` | `0x0219f178`–`0x0219fa10` | 25 | complete | descriptive |

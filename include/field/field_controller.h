@@ -17,7 +17,7 @@ struct FieldmapCtrlVTable {
 };
 
 // The three kinds of controller, which fieldmap.c's table of map kinds lists: fieldmap_ctrl_grid.c's, and
-// fieldmap_ctrl_nogrid_work.c's for the rail and the hybrid maps, which is not written yet
+// fieldmap_ctrl_nogrid_work.c's for the rail and the hybrid maps
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_GRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_HYBRID;
