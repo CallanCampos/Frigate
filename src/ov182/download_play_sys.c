@@ -349,12 +349,13 @@ static void func_ov182_021bacbc(void) {
         break;
 
     case DOWNLOAD_PLAY_STATE_ENTRY:
-        for (i = 2; i < 5; i++) {
+        i = 2;
+        do {
             if (DownloadPlay_GetChildBmp(i) != 0) {
                 dat->state = DOWNLOAD_PLAY_SYS_STATE_WAIT_CHILDREN;
                 return;
             }
-        }
+        } while (++i < 5);
         if (dat->state != DOWNLOAD_PLAY_SYS_STATE_WAIT_CHILDREN || DownloadPlay_GetChildBmp(i) != 0) {
             return;
         }
