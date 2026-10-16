@@ -32,8 +32,9 @@ static void OSi_DisplayExContext(void);         // swan's exceptions_call_abort_
 static OSiExceptionHandler OSi_ExceptionUserHandler; // swan's g_ExcUndefAbortCallback
 static u32 OSi_DebuggerHandler;
 static void *OSi_ExceptionUserArg; // swan's g_ExcUndefAbortCallbackData
-// Nothing reads these 32 bytes, which lie between the variables above and the registers' buffer
-u8 data_0214c4dc[0x20];
+// Nothing reads these 32 bytes, which lie between the variables above and the registers' buffer. They are global
+// because MWCC drops a static that nothing reads; the name is ours
+u8 OSi_UnusedExceptionWork[0x20];
 static OSiExContext OSi_ExContext; // swan's g_ExcRegDump
 
 // NitroSDK's OS_InitException: keeps the handler of a debugger in the vector, calling it before ours

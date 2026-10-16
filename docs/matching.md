@@ -1070,6 +1070,11 @@ Same instructions, scheduled in another order.
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
   `r7` and which a stack slot.
+- MWCC folds a subtraction and an addition of constants into one (`c - 'a' + 26` is one `sub`), and keeps the two
+  steps only when the first result goes through a local: `v = c - 'a'; return v + 26;`. DWC's `DWCAc_Base64Value`
+  (`dwc_ac_wepkey.c`) has the two steps in each range. In the same way, two locals that always hold the same value
+  stay two registers, with the moves between them: `DWCAc_DecodeNdwcShapSsid` walks the permutation with a cursor
+  for the place the byte came from and one for where it goes, and one cursor compiles 12 bytes shorter.
 
 ## An instruction too many or too few
 
@@ -1127,8 +1132,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loads the callee's address into `r3`, which the fourth argument holds. When the original saves a register and
   calls where the C tail-calls, the callee takes one argument more: `sta_acting.c`'s `StaActing_PlayWave` matched
   once `func_02006528` took the fourth argument its code reads, which the caller passes on from its own `r3`.
-  The register is always `r3` in Thumb: a tail jump through another, `ldr r1, =f; bx r1` as in `os_spinLock.c`'s
-  `OS_UnLockCartridge` and `OS_UnLockCard`, is no compiler output under any flags tried. ARM code tail-calls with
+  The register is always `r3` in Thumb: a tail jump through another, `ldr r1, =f; bx r1`, is no compiler output under
+  any flags tried, so it is the SDK's assembly, an `asm` function (in `lib/` only), as `os_spinLock.c`'s
+  `OS_UnLockCartridge` and `OS_UnLockCard` are in NitroSDK. ARM code tail-calls with
   `ldr ip, =f; bx ip`, and only from a function that needs no frame, as TWL-DWC's wrappers and `w_pow.c`'s `pow` do.
 
 - `p->stack[p->num - 1]` with the array a direct member of `*p` subtracts 1 and loads from the array's offset
@@ -2116,7 +2122,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `include/string.h` (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s
   `memset` of a `VCTSession`), `dwc_auth.c`, `ghttpEncryption.c` and `poke_net.c`, declares the C library's string
   functions in its own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does
-  TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops.
+  TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops. `strcmp` and
+  `strlen` stay calls either way, but the code around them changes: with `<string.h>`, NitroWiFi's
+  `SSLi_FindNamedParam` (`ssl.c`) keeps `name` in r7 where the ROM spills it to `[sp]`, so `ssl_internal.h` declares
+  them itself.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.

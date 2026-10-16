@@ -2014,6 +2014,7 @@ lib/nitro/src/os/os_reset_pxi.c:
     .bss        start:0x0214c208 end:0x0214c20c
 
 lib/nitro/src/os/os_spinLock.c:
+    complete
     .text       start:0x02079f5c end:0x0207a290
     .bss        start:0x0214c20c end:0x0214c210
 

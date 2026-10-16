@@ -3498,6 +3498,7 @@
 . 0x0214c4d0 OSi_DebuggerHandler
 . 0x0214c4d4 OSi_ExceptionUserArg
 . 0x0214c4d8 OSi_ExceptionUserHandler
+. 0x0214c4dc OSi_UnusedExceptionWork
 . 0x0214c4fc OSi_ExContext
 . 0x0214c56c OSi_TimerReserved
 . 0x0214c570 OSi_UseTick

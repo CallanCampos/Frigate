@@ -149,9 +149,13 @@ s32 OS_UnlockCartridge(u16 lockID) {
     return OSi_DoUnlockByWord(lockID, (OSLockWord *)HW_CTRDG_LOCK_BUF, OSi_FreeCartridgeBus, TRUE);
 }
 
-s32 OS_UnLockCartridge(u16 lockID) {
-    return OS_UnlockCartridge(lockID);
-}
+// clang-format off
+// NitroSDK's OS_UnLockCartridge, the old spelling of OS_UnlockCartridge, kept for the code that still calls it: the SDK
+// writes it in assembly, a jump to OS_UnlockCartridge
+asm s32 OS_UnLockCartridge(u16 lockID) {
+    ldr r1, =OS_UnlockCartridge
+    bx r1
+} // clang-format on
 
 // NitroSDK's OS_TryLockCartridge, which takes the cartridge for the ARM9
 s32 OS_TryLockCartridge(u16 lockID) {
@@ -175,9 +179,12 @@ s32 OS_UnlockCard(u16 lockID) {
     return OS_UnlockByWord(lockID, (OSLockWord *)HW_CARD_LOCK_BUF, OSi_FreeCardBus);
 }
 
-s32 OS_UnLockCard(u16 lockID) {
-    return OS_UnlockCard(lockID);
-}
+// clang-format off
+// NitroSDK's OS_UnLockCard, the old spelling of OS_UnlockCard: in assembly in the SDK, a jump to OS_UnlockCard
+asm s32 OS_UnLockCard(u16 lockID) {
+    ldr r1, =OS_UnlockCard
+    bx r1
+} // clang-format on
 
 s32 OS_TryLockCard(u16 lockID) {
     return OS_TryLockByWord(lockID, (OSLockWord *)HW_CARD_LOCK_BUF, OSi_AllocateCardBus);

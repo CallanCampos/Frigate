@@ -552,7 +552,9 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
 }
 
 // The geometry commands that a billboard sends: the pop of the matrix pushed to read the clip matrix, the matrix mode,
-// the load of the billboard matrix and the scale after it. A billboard command makes the matrix from the clip matrix
+// the load of the billboard matrix and the scale after it. A billboard command makes the matrix from the clip matrix.
+// swan names the parts of the first one NNS_BILLBOARD_START_PARAMS (popNum), g_NNSBillboardMatrix (axis and trans)
+// and g_NNSBillboardScale, and of the second g_NNSBillboardMatrix2 and g_NNSBillboardScale2
 typedef struct {
     u32 cmd;
     u32 popNum;
@@ -781,6 +783,8 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     const u8 *p = rs->c + 3;
     fx64 weight = 0;
     const MtxFx33 *nrm;
+    // The weighted sums of the clip and the normal matrices, in the inverse bind pose's type only for its layout (one
+    // object of 0x54 bytes, which one clear zeroes): invM and invN are sums here, not inverses
     NNSG3dResEvpMtx sum;
     u32 i;
 

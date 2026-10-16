@@ -1,6 +1,7 @@
 // NitroSDK OS: restarting the game (os_reset.c). OS_InitReset registers the callback for the OS tag of the PXI FIFO,
 // and OS_ResetSystem shuts down what the ARM9 started and has the ARM7 reset the console, through code in the ITCM
-// that is probably part of this file too (OSi_DoResetSystem, not yet registered). ARM code.
+// that is probably part of this file too (OSi_DoResetSystem, not yet registered). ARM code. The file is complete for
+// ARM9 main only: the ITCM part is still to be added.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

@@ -31,9 +31,6 @@
 #define SCFG_EXT_COPY (*(vu32 *)0x02fffdf0)
 #define SCFG_EXT_VRAM 0x2000
 
-// The bits of the console type (OS_GetConsoleType) that SystemInit checks
-#define CONSOLE_TYPE_DEV_MASK 0x3000000
-
 #define VRAM_TRANSFER_TASK_COUNT 48
 
 static void OnExitRequest(void *arg);
@@ -54,7 +51,7 @@ void SystemInit(void) {
     GX_Init();
     FX_Init();
 
-    if (OS_GetConsoleType() & CONSOLE_TYPE_DEV_MASK) {
+    if (OS_GetConsoleType() & OS_CONSOLE_DEV_MASK) {
         SCFG_SetCpuSpeed(SCFG_CPU_SPEED_2X);
         reg_SCFG_EXT &= ~SCFG_EXT_VRAM;
         SCFG_EXT_COPY &= ~SCFG_EXT_VRAM;

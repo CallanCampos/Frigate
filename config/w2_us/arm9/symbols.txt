@@ -9263,7 +9263,7 @@ sHeapInfo kind:bss addr:0x0214c4ec
 OSi_DebuggerHandler kind:bss addr:0x0214c510
 OSi_ExceptionUserArg kind:bss addr:0x0214c514
 OSi_ExceptionUserHandler kind:bss addr:0x0214c518
-data_0214c4dc kind:bss addr:0x0214c51c
+OSi_UnusedExceptionWork kind:bss addr:0x0214c51c
 OSi_ExContext kind:bss addr:0x0214c53c
 OSi_TimerReserved kind:bss addr:0x0214c5ac
 OSi_UseTick kind:bss addr:0x0214c5b0

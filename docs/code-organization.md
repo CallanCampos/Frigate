@@ -24,7 +24,7 @@ every section.
   (microphone, power and touch panel), STD and wireless libraries, its fixed-point math and libmath, and libcrypto's
   RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
   (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
-  microphone, NWM, FATFS and the sound and RTC extensions, beside the game's photo signature code, and the new DMA and
+  microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and the new DMA and
   WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader, linked
   into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
   (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
@@ -43,7 +43,10 @@ every section.
   listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
   (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names
   (see [Names](#names)). The C library's headers are MSL's, in `include/` (`string.h`, `stdio.h`, `math.h` and the
-  others, and `NMWException.h` for the runtime), and `lib/msl/src/` keeps MSL's private ones. A library without sources
+  others, and `NMWException.h` for the runtime), and `lib/msl/src/` keeps MSL's private ones. A library whose ROM calls
+  the string functions that MWCC builds in place from `<string.h>` declares them in its own header instead (`dwc/ext.h`,
+  `ssl_internal.h`; `docs/matching.md`, "a header named `string.h`"), the one exception to declaring a function once.
+  A library without sources
   needs no `library.toml`; its first source file adds one with the compiler it was built with. A library's public
   headers keep its name as their directory, as in `lib/nitro/include/nitro/os.h`, so code includes `"nitro/os.h"`.
   Every file is compiled with `include/` and every `lib/*/include/` on its search path.

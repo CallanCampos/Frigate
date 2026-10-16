@@ -272,8 +272,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "Two fields of one element of a static table")
 - A saved register, `bl` and return where the C tail-calls (`ldr r3, =f; bx r3`): the call passes a fourth register
   argument. (matching.md: "four arguments in registers")
-- A Thumb tail jump through a register other than `r3` (`ldr r1, =f; bx r1`) is not compiler output; ARM code
-  tail-calls through `ip`, and only without a frame. (matching.md: "always `r3` in Thumb")
+- A Thumb tail jump through a register other than `r3` (`ldr r1, =f; bx r1`) is not compiler output, so it is the
+  SDK's assembly: an `asm` function (`lib/` only). ARM code tail-calls through `ip`, and only without a frame.
+  (matching.md: "always `r3` in Thumb")
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
@@ -357,6 +358,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `bl memcpy` where the original keeps a hand `ldrb`/`strb` loop: declare `const u8 *`/`u8 *` locals and loop over
   those, not over the function's own raw `const void *`/`const char *` parameter directly.
   (matching.md: "only keeps that shape when the loop runs over its own")
+- Two steps of constant arithmetic where MWCC makes one, or two registers where one cursor would do: a local for the
+  first step, or a second local with a role of its own. (matching.md: "keeps the two steps only when")
 
 ## Branches and block layout
 
