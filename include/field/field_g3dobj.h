@@ -25,7 +25,7 @@ typedef struct {
 
 u16 FieldG3DObjSystem_AddResGroup(FieldG3DObjSystem *sys, FieldG3DObjResRequest *req, BOOL preloadTextures);
 void FieldG3DObjSystem_FreeResGroup(FieldG3DObjSystem *sys, u16 resGroupIdx);
-u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u32 resGroupIdx, u16 modelIdxInRes, VecFx32 *pos);
+u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u16 resGroupIdx, u16 modelIdxInRes, const VecFx32 *pos);
 void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *sys, u16 objIdx);
 SRTMatrix *FieldG3DObjSystem_GetObjTransform(FieldG3DObjSystem *sys, u16 objIdx);
 // Hide the object, or not
@@ -40,10 +40,10 @@ void FieldG3DObjResRequest_Clear(FieldG3DObjResRequest *req);
 void FieldG3DObjResRequest_SetModel(FieldG3DObjResRequest *req, ArcTool *arc, u16 datId);
 void FieldG3DObjResRequest_SetAnmArc(FieldG3DObjResRequest *req, ArcTool *arc);
 void FieldG3DObjResRequest_AddAnm(FieldG3DObjResRequest *req, u16 datId);
-void *FieldG3DObjSystem_Create(HeapID heapId, u32 a1, u32 a2);
-void FieldG3DObjSystem_Free(void *system);
-void FieldG3DObjSystem_SetupResources(void *system);
-void FieldG3DObjSystem_Draw(void *system);
-void FieldG3DObjSystem_SetColorPostFX(void *system, void *postFx);
+FieldG3DObjSystem *FieldG3DObjSystem_Create(HeapID heapId, u16 resGroupCount, u16 objCount);
+void FieldG3DObjSystem_Free(FieldG3DObjSystem *sys);
+void FieldG3DObjSystem_SetupResources(FieldG3DObjSystem *sys);
+void FieldG3DObjSystem_Draw(FieldG3DObjSystem *sys);
+void FieldG3DObjSystem_SetColorPostFX(FieldG3DObjSystem *sys, void *postFx);
 
 #endif // POKEBW2_FIELD_FIELD_G3DOBJ_H
