@@ -97,6 +97,9 @@ int func_ov011_02160f98(int index, const char *key, int defaultValue);
 void func_ov011_02169df8(int server);
 void func_ov011_0216ddc8(void *(*alloc)(u32 size), void (*free)(void *ptr), void *(*realloc)(void *ptr, u32 size),
                          void *(*memalign)(u32 align, u32 size));
+// A text with the library's service name, which the server URLs are made from; the start copies the game's name
+// into it
+extern char data_ov011_021917bc[];
 // The host name of the game stats server, 64 bytes, which the start sets
 extern char data_ov011_02188fe4[];
 

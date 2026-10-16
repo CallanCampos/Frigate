@@ -1,4 +1,5 @@
 #include "dwc/competition.h"
+#include "dwc/dwc.h"
 #include "dwc/ext.h"
 #include "dwc/soap.h"
 

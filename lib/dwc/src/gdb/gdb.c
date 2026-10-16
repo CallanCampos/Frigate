@@ -1,4 +1,5 @@
 #include "dwc/gdb.h"
+#include "dwc/dwc.h"
 #include "dwc/ext.h"
 #include <stdarg.h>
 

@@ -1,10 +1,12 @@
 #include "dwc/bm.h"
 #include "dwc/dwc.h"
-#include "dwc/ext.h"
 #include "dwc/init.h"
 #include "dwc/memfunc.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
+// MSL's <string.h>, not dwc/ext.h's declarations: MWCC builds a strcpy of a string literal in place only when
+// <string.h> declares it, as the ROM's copies of the host names are
+#include <string.h>
 
 // DWC's start (TWL-DWC 5.3's dwc_init.c, a guessed name; the ROM names none of it, and the file is ARM code in ARM9
 // main like the rest of the library's base): starts the timer, the alarms and the clock, makes the Wi-Fi ID if the

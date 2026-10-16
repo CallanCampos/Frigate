@@ -87,8 +87,6 @@ void func_ov011_0216c998(void);
 void func_ov011_0216c77c(void);
 // Gets the token and the challenge that the player logs in to the authentication service with
 void func_ov011_0215f9b4(const char **authToken, const char **challenge);
-// A text with the library's service name, which the server URLs are made from
-extern char data_ov011_021917bc[];
 extern char data_ov011_0219069c[];
 // The secret key of the game
 extern char data_ov011_021918bc[];
