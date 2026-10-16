@@ -388,6 +388,7 @@ src/ov036/field_rail_loader.c:
     .data       start:0x021d4dd8 end:0x021d4e3c
 
 src/ov036/field_fog.c:
+    complete
     .text       start:0x02197574 end:0x02197750
     .data       start:0x021d4e3c end:0x021d4e48
 
