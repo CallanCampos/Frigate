@@ -497,6 +497,7 @@ src/ov036/fld_exp_obj.c:
     .data       start:0x021d53d8 end:0x021d53e8
 
 src/ov036/field_transition.c:
+    complete
     .text       start:0x021b86d4 end:0x021b9494
     .rodata     start:0x021d1634 end:0x021d1754
 

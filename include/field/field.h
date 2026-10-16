@@ -306,6 +306,9 @@ void func_ov036_021878d0(void *msgBGSys);
 void func_ov036_0218796c(void *msgBGSys);
 void func_ov036_02187760(void *msgBGSys);
 void func_ov036_0218776c(void *msgBGSys);
+// Runs a step of the message BG's BG setup, and whether its VBlank task has finished
+void func_ov036_0218779c(void *msgBGSys, u32 step);
+BOOL func_ov036_021878bc(void *msgBGSys);
 // Releases the BG of the field's message BG and returns TRUE, or returns FALSE if it has none
 BOOL func_ov036_02187868(void *msgBGSys);
 void func_ov036_021879c0(void *msgBGSys);
