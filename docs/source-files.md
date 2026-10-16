@@ -485,7 +485,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_3dbg.c` | `0x02198bc0`–`0x02199004` | 20 | partial | string at `0x021d4e3c` |
 | `weather.c` | `0x02199004`–`0x021993e0` | 16 | partial | string at `0x021d4e54` |
 | `weather_task.c` | `0x021993e0`–`0x0219a3b4` | 91 | partial | string at `0x021d4e60` |
-| `fieldmap_ctrl_grid.c` | `0x0219a3b4`–`0x0219a47c` | 5 | partial | string at `0x021d4e70` |
+| `fieldmap_ctrl_grid.c` | `0x0219a3b4`–`0x0219a47c` | 5 | complete | string at `0x021d4e70` |
 | `field_player.c` | `0x0219a47c`–`0x0219ad4c` | 68 | complete | string at `0x021d4e88` |
 | `field_player_core.c` | `0x0219ad4c`–`0x0219b7a8` | 65 | partial | string at `0x021d4e98` |
 | `field_player_grid.c` | `0x0219b7a8`–`0x0219cea0` | 99 | complete | string at `0x021d4eac` |
