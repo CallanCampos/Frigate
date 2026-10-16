@@ -1,4 +1,4 @@
-#include "dwc_aoss.h"
+#include "dwcutil/dwc_aoss.h"
 #include "dwc/ext.h"
 #include "dwc_aoss_ap.h"
 #include "dwc_wcm.h"
