@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt_local.h"
 #include "app/xtransceiver.h"
 #include "field/zone.h"
@@ -12,8 +13,6 @@
 
 // The proc of the Xtransceiver's calls with the game's characters, named after the ROM's "local_tvt_sys.c": it makes
 // the parts every mode shares and runs the mode the parameters ask for
-
-typedef struct LocalTvtSys LocalTvtSys;
 
 struct LocalTvtSys {
     u16 heapId;

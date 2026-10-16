@@ -20,14 +20,14 @@ enum {
 };
 
 // The Xtransceiver's parameters
-typedef struct {
+struct LocalTvtParam {
     u32 mode;
     u32 unk04;
     // The script of LOCAL_TVT_MODE_SCRIPT
     u16 scriptId;
     GameData *gameData;
     GameSystem *gsys;
-} LocalTvtParam;
+};
 
 extern const GameProcFunctions XTRANSCEIVER_PROC_FUNCTIONS;
 

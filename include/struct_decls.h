@@ -409,6 +409,8 @@ typedef struct JoinAvenueVisitor JoinAvenueVisitor;
 typedef struct KeyInfoSave KeyInfoSave;
 typedef struct LinkFestival LinkFestival;
 typedef struct LiveBattleMatchPlayerData LiveBattleMatchPlayerData;
+typedef struct LocalTvtParam LocalTvtParam;
+typedef struct LocalTvtSys LocalTvtSys;
 typedef struct MMSys MMSys;
 typedef struct MailboxProcessData MailboxProcessData;
 typedef struct MapMatrix MapMatrix;

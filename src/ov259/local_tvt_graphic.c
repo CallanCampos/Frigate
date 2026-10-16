@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt_local.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmpwin.h"

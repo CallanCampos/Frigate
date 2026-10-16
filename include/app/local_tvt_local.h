@@ -5,6 +5,7 @@
 // "local_tvt_*.c". Every name here is ours
 
 #include "types.h"
+#include "app/local_tvt/local_tvt_common.h"
 #include "app/xtransceiver.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -16,36 +17,6 @@
 #include "struct_decls.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
-
-#define HEAPID_LOCAL_TVT 85
-
-// The archive of the faces, backgrounds and objects of the calls
-#define ARC_LOCAL_TVT 132
-// The communication Xtransceiver's archive, which has the frame, the cursors and the lower screen
-#define ARC_LOCAL_TVT_COMMON 170
-
-// At most this many faces are on the upper screen
-#define LOCAL_TVT_FACES 4
-
-// The persons of a call. The player is LOCAL_TVT_PERSON_PLAYER_FEMALE when female
-#define LOCAL_TVT_PERSON_PLAYER 0
-#define LOCAL_TVT_PERSON_RIVAL 1
-#define LOCAL_TVT_PERSON_PLAYER_FEMALE 13
-#define LOCAL_TVT_PERSON_COUNT 14
-#define LOCAL_TVT_PERSON_NONE 0xff
-
-// A face has no object beside it
-#define LOCAL_TVT_OBJECT_NONE 3
-// The name of a face is the person's own
-#define LOCAL_TVT_NAME_DEFAULT 0xff
-
-// The part of the day, which picks the backgrounds of the faces
-enum {
-    LOCAL_TVT_TIME_DAY,
-    LOCAL_TVT_TIME_EVENING,
-    LOCAL_TVT_TIME_NIGHT,
-    LOCAL_TVT_TIME_COUNT,
-};
 
 typedef struct LocalTvtGraphic LocalTvtGraphic;
 typedef struct LocalTvtMessage LocalTvtMessage;
@@ -60,17 +31,6 @@ typedef struct LocalTvtPerson LocalTvtPerson;
 typedef struct LocalTvtSeq LocalTvtSeq;
 typedef struct LocalTvtMenu LocalTvtMenu;
 typedef struct LocalTvtPokeSelect LocalTvtPokeSelect;
-
-// The persons the player can call, which the save data of the calls counts
-enum {
-    LOCAL_TVT_CALL_DOCTOR,
-    LOCAL_TVT_CALL_RIVAL,
-    LOCAL_TVT_CALL_CHELEN,
-    LOCAL_TVT_CALL_SUPPORT,
-    LOCAL_TVT_CALL_MOTHER,
-    LOCAL_TVT_CALL_SECRET,
-    LOCAL_TVT_CALL_COUNT,
-};
 
 // local_tvt_chara.c: the faces of the upper screen
 
