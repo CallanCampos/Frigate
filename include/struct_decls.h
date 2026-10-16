@@ -300,6 +300,7 @@ typedef struct FieldAsyncProc FieldAsyncProc;
 typedef struct FieldAsyncProcManager FieldAsyncProcManager;
 typedef struct FieldBlAct FieldBlAct;
 typedef struct FieldCamera FieldCamera;
+typedef struct FieldCameraDelay FieldCameraDelay;
 typedef struct FieldChunk FieldChunk;
 typedef struct FieldChunkContext FieldChunkContext;
 typedef struct FieldChunkPropHolder FieldChunkPropHolder;
