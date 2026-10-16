@@ -2,6 +2,7 @@
 // the door's animations and sounds, the entrance camera, and the transitions. The name is descriptive; the ROM has no
 // string for this file
 #include "types.h"
+#include "field/entrance_camera.h"
 #include "field/event_action_call.h"
 #include "field/event_entrance_effect.h"
 #include "field/event_mapchange.h"
