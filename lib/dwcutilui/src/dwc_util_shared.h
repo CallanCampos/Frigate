@@ -5,6 +5,7 @@
 #include "dwc_util_cell.h"
 #include "dwc_util_display.h"
 #include "dwc_util_heap.h"
+#include "dwc_util_list.h"
 #include "dwc_util_oam.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
@@ -34,13 +35,7 @@ void func_ov182_021bd280(int list, DWCUtilTask *task);
 // Runs the list's tasks: list 1 is the VBlank's
 void func_ov182_021bd19c(int list);
 
-// The list and the OAM buffer under the OAM allocator and the cells, in the same later files
-void *func_ov182_021bcb3c(void);
-void func_ov182_021bcb58(void *list);
-void func_ov182_021bcb6c(void *node);
-void func_ov182_021bcb90(void *position, void *node);
-void func_ov182_021bcbb0(void *list, void *node);
-void func_ov182_021bcbbc(void *list, void *node);
+// The OAM buffer under the OAM allocator and the cells, in the same later files
 GXOamAttr *func_ov182_021bcc80(int screen);
 GXOamAttr *func_ov182_021bccd8(int screen, int index);
 
