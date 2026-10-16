@@ -2,13 +2,12 @@
 #define POKEBW2_FIELD_FIELD_SKILL_MAP_EFF_H
 
 #include "types.h"
+#include "field/field_flash.h"
 #include "gfl/heap.h"
 #include "struct_decls.h"
 
 void *Field_GetSkillMapEff(Field *field);
 void *FieldSkillMapEff_GetFlash(void *skillMapEff);
-void func_ov036_021c1c68(void *flash, u16 value);
-u16 func_ov036_021c1c6c(void *flash);
 void *FieldSkillMapEff_Create(u32 flashPerms, HeapID heapId);
 void FieldSkillMapEff_Free(void *effect);
 void FieldSkillMapEff_Update(void *effect);

@@ -562,6 +562,7 @@ src/ov036/field_task_manager.c:
     .data       start:0x021d556c end:0x021d5584
 
 src/ov036/field_flash.c:
+    complete
     .text       start:0x021c1bfc end:0x021c1dc0
     .rodata     start:0x021d22f4 end:0x021d2304
     .data       start:0x021d5584 end:0x021d5594
