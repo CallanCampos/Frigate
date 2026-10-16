@@ -7759,9 +7759,11 @@ _dgr kind:label(arm) addr:0x0208ce84
 __aeabi_dcmple kind:function(arm,size=0xa4) addr:0x0208cf1c
 _dleq kind:label(arm) addr:0x0208cf1c
 __aeabi_dcmplt kind:function(arm,size=0x9c) addr:0x0208cfc0
+_dls kind:label(arm) addr:0x0208cfc0
 __aeabi_dcmpeq kind:function(arm,size=0x8c) addr:0x0208d05c
 _deq kind:label(arm) addr:0x0208d05c
 doubleIsNotEqual kind:function(arm,size=0x8c) addr:0x0208d0e8
+_dneq kind:label(arm) addr:0x0208d0e8
 _fgeq kind:function(arm,size=0x5c) addr:0x0208d174
 _fgr kind:function(arm,size=0x5c) addr:0x0208d1d0
 _fleq kind:function(arm,size=0x68) addr:0x0208d22c
@@ -7772,6 +7774,7 @@ __aeabi_i2f kind:function(arm,size=0x48) addr:0x0208d374
 _fflt kind:label(arm) addr:0x0208d374
 _ffltu kind:function(arm,size=0x48) addr:0x0208d3bc
 mod64Signed kind:function(arm,size=0x10) addr:0x0208d404
+_ll_mod kind:label(arm) addr:0x0208d404
 _ll_sdiv kind:function(arm,size=0x10) addr:0x0208d414
 ll_div_body kind:function(arm,size=0x64) addr:0x0208d424
 ll_udiv_core kind:function(arm,size=0x13c) addr:0x0208d488
