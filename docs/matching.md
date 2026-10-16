@@ -745,8 +745,8 @@ Same code, other `sp` offsets or frame size.
 - A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
   returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
   register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key
-  position updates, `func_ov182_021acff0` and its neighbours, and its OAM position setter, `func_ov182_021bb7e0`;
-  they match only when `attr01` is read through `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
+  position updates, `func_ov182_021acff0` and its neighbours; they match only when `attr01` is read through
+  `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
   which returns a one-word struct, as in `(u8)ReadAttr01(sMenu->keyOams[0]).attr01 - 12`. Reading `oam->attr01`
   directly leaves no slot.
 

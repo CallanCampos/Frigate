@@ -4,6 +4,7 @@
 #include "types.h"
 #include "dwc_util_display.h"
 #include "dwc_util_heap.h"
+#include "dwc_util_oam.h"
 #include "nitro/gx.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
@@ -27,13 +28,17 @@ void func_ov182_021bb914(int screen, int resource, GXOamAttr *oam);
 // The utility's object and task helpers, in the same later files. A task's
 // callback is handed the task it was created for.
 void *func_ov182_021bb97c(int screen, int resource, int arg);
-void func_ov182_021bb690(void *object);
-GXOamAttr *func_ov182_021bb6ec(void *object, int index);
-void func_ov182_021bb7e0(void *object, int index, int x, int y);
-void func_ov182_021bb878(void *object, int index, int value);
-void func_ov182_021bb8bc(void *object, int index, int *x, int *y);
 BOOL func_ov182_021bc888(const void *rect);
 void func_ov182_021bd264(void *task, void (*callback)(void *task));
 void func_ov182_021bd268(int priority, void *task);
+
+// The list and the OAM buffer under the OAM allocator and the cells, in the same later files
+void *func_ov182_021bcb3c(void);
+void func_ov182_021bcb58(void *list);
+void func_ov182_021bcb6c(void *node);
+void func_ov182_021bcb90(void *position, void *node);
+void func_ov182_021bcbb0(void *list, void *node);
+void func_ov182_021bcbbc(void *list, void *node);
+GXOamAttr *func_ov182_021bccd8(int screen, int index);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
