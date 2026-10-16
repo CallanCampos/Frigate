@@ -1,14 +1,70 @@
+#include "dwc/vct_session.h"
+#include "gfl/std.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+#include "vct_adpcm.h"
+#include "vct_audio_internal.h"
+#include "vct_dsp_internal.h"
 #include "vct_internal.h"
 
 // The sound going out and coming in. A frame of the microphone is filtered, coded and sent to every machine that
 // listens; the packets of the other machines wait in a queue each, and are decoded, mixed and played once their time
 // comes.
 
+// How the samples of a frame are coded
+typedef enum VCTCodec {
+    VCT_CODEC_PCM8,
+    VCT_CODEC_MULAW,
+    VCT_CODEC_ADPCM2,
+    VCT_CODEC_ADPCM3,
+    VCT_CODEC_ADPCM4,
+    VCT_CODEC_MAX,
+} VCTCodec;
+
+// What one machine's voice has gone through on the way to being played
+struct VCTReceiver {
+    u32 avgDelay;
+    u32 playoutDelay;
+    int queuedCount;
+    int skewDifference;
+    u32 lastSequenceSeen;
+    int lostCount;
+    int unk18;
+    int lateCount;
+    int playedCount;
+    int codec;
+    u32 lastDelay;
+    u32 avgDelayCopy;
+    u32 syncSequence;
+    int slot;
+    int aid;
+    VCTPacket *held;
+    int unk40;
+    u64 firstArrival;
+    u32 firstTimestamp;
+    int unk50;
+    u32 lastSequence;
+    u32 lastPlayedSequence;
+    int needsReset;
+    u32 wrap;
+    u32 expectedSequence;
+    u16 sequence16;
+    u8 pad6a[2];
+    u32 warmup;
+    int unk70;
+    int skewAverage;
+    int skewFirst;
+    int jitterAverage;
+    int lastSkew;
+    int burstCount;
+    int delayFloor;
+    u32 delayCeiling;
+    u32 belowCount;
+};
+
 // What the library keeps of the stream going out
-typedef struct VCTAudio {
+struct VCTAudio {
     u16 sequence;
     // The machines that are heard, one bit for each ID
     u32 activeMask;
@@ -23,10 +79,10 @@ typedef struct VCTAudio {
     int sessionCount;
     u32 frameBytes;
     int voiceLevel;
-} VCTAudio;
+};
 
 // The two frames going out: one is filled while the other is sent
-typedef struct VCTSendQueue {
+struct VCTSendQueue {
     VCTVoicePacket frames[2];
     u32 readIndex;
     u32 writeIndex;
@@ -34,12 +90,12 @@ typedef struct VCTSendQueue {
     u32 pendingMask;
     u32 scheduleColumn;
     int scheduleRow;
-} VCTSendQueue;
+};
 
-typedef struct VCTList {
+struct VCTList {
     VCTPacket *head;
     VCTPacket *tail;
-} VCTList;
+};
 
 static void ResetActiveList(void);
 static void FreeActiveOfSlot(int slot);
@@ -227,7 +283,7 @@ BOOL VCT_SubmitSamples(void *samples, int size) {
     }
     packet->type = VCT_TYPE_VOICE;
     packet->sequence = sAudio.sequence++;
-    packet->timestamp = (u32)((s64)clock() / 64);
+    packet->timestamp = (u32)(clock() / 64);
     sSendQueue.writeIndex++;
     return TRUE;
 }
