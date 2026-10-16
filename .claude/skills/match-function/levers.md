@@ -433,6 +433,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- A combined `&&` camera check moves a copied parameter, where the original has two false branches with the same
+  call: nest the checks and write that call in both false arms. (matching.md: "tests `cameraEnabled` first")
 - A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
   register is an operand of the `cmp`; declare and compute that flag first. (matching.md: "A 0/1 comparison flag")
 - Returns of `-1` and `0` folded into one computed result (`rsbs`, `mvns`) where the original keeps two returns: the

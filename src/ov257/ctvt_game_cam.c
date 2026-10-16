@@ -827,9 +827,9 @@ static void CtvtGameCam_SeqEnd(CtvtGameCamSeq *seq, int *state, CtvtGameCamTask 
 static void CtvtGameCam_SeqStart(CtvtGameCamSeq *seq, int *state, CtvtGameCamTask *task) {
     switch (*state) {
     case 0: {
+        u8 netId;
         u8 selfNetId = func_02042a6c(func_02040440());
         BOOL ready = TRUE;
-        u8 netId;
 
         if (!func_02043b10()) {
             ready = FALSE;
@@ -860,8 +860,12 @@ static void CtvtGameCam_SeqStart(CtvtGameCamSeq *seq, int *state, CtvtGameCamTas
         *state = 4;
         break;
     case 4:
-        if (task->cam->cameraEnabled && CommTvt_IsCameraEnabled() == TRUE) {
-            CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqCameraIntro);
+        if (task->cam->cameraEnabled) {
+            if (CommTvt_IsCameraEnabled() == TRUE) {
+                CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqCameraIntro);
+            } else {
+                CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqRouletteIntro);
+            }
         } else {
             CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqRouletteIntro);
         }

@@ -1728,6 +1728,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- `ctvt_game_cam.c`'s `CtvtGameCam_SeqStart` tests `cameraEnabled` first, then calls
+  `CommTvt_IsCameraEnabled` in its true arm. Both the inner and outer false arms call
+  `CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqRouletteIntro)`. MWCC shares that call's tail but keeps the outer false
+  branch's copy of `seq`, as in the ROM; one combined `&&` test moves the copy. Declaring `netId` before `selfNetId`
+  also puts the loop counter in `r4` rather than `r5`.
 - `BOOL x = a && b && c && ...` used as a value compiles to one flag per `&&` level, all zeroed up front, outermost
   first, and set by nested tests, the first covering two compares. Flags like that in the asm are such a chain, not
   separate variables: multiboot's `MBWm_ChildCallback` (`mb_wm.c`) has its beacon and BSSID checks as two of them.
