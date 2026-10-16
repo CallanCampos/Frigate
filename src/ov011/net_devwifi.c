@@ -3,6 +3,8 @@
 
 #include "gfl/net_devwifi.h"
 #include "types.h"
+#include "dwc/connectinet.h"
+#include "dwc/error.h"
 #include "gfl/dwc_rap.h"
 #include "gfl/dwc_rapcommon.h"
 #include "gfl/heap.h"

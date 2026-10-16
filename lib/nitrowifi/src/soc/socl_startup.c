@@ -15,7 +15,7 @@ static BOOL SOCL_LinkIsOn(void);
 SOCLConfig *SOCLiConfigPtr = NULL;
 u32 SOCLiDefaultLanBufferSize = 0x4000;
 
-static u32 SOCLiYieldWait;
+u32 SOCLiYieldWait;
 CPSInAddr SOCLiRequestedIP;
 u32 SOCLiDhcpState;
 SOCLSocket *SOCLiUDPSendSocket;

@@ -2,27 +2,20 @@
 #define POKEBW2_DWC_GAMESTATS_INTERNAL_H
 
 #include "types.h"
+#include "dwc/error.h"
+#include "dwc/memfunc.h"
 #include "nitro/math.h"
+#include "nitro/os.h"
+#include <stdlib.h>
 
 // What gamestats.c calls outside itself, none of it with a name in the ROM
 
-// The main module's: the Wi-Fi library's allocator and error
-void *func_020586e4(int type, u32 size);
-void func_02058728(int type, void *ptr, int unused);
-void func_02058814(void *ptr);
-BOOL func_020584b0(void);
-void func_020584cc(int type, int code);
-// The Wi-Fi library's error, as its type and its group
-int func_020583b0(int *type, int *group);
-// Formats a text like snprintf, and into a bigger buffer without a size
-int func_0207a2c0(char *dest, u32 size, const char *format, ...);
-int func_0207a290(char *dest, const char *format, ...);
-
-// The C library
+// The main module's Wi-Fi library (its allocator and its error), NitroSDK's formatted texts and the C library are in
+// the headers above, but for the C library's string functions: MWCC builds them in place (memcpy of a size it knows,
+// strlen) when <string.h> declares them, where the ROM calls them
 u32 strlen(const char *s);
 char *strncpy(char *dest, const char *src, u32 size);
 int strncmp(const char *a, const char *b, u32 size);
-unsigned long strtoul(const char *text, char **end, int base);
 void *memcpy(void *dest, const void *src, u32 size);
 
 // Overlay 11's base64 encoder: encodes size bytes of src into dest, with the alphabet 1 or 2

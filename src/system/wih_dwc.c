@@ -1,5 +1,7 @@
 #include "types.h"
 #include "app/comm_tvt_field.h"
+#include "dwc/apinfo.h"
+#include "dwc/bm.h"
 #include "gfl/net.h"
 #include "gfl/net_whpipe.h"
 #include "gfl/overlay.h"

@@ -61,5 +61,5 @@ flags = [
 "ac/dwc_ac_search.c" = ["-nothumb"]
 "ac/dwc_ac_wepkey.c" = ["-nothumb"]
 "ac/dwc_ac_soc.c" = ["-nothumb"]
-"bm/dwc_nvram.c" = ["-nothumb"]
+"bm/dwc_nvram.c" = ["-nothumb", "-ipa file"]
 "bm/dwc_bm_check.c" = ["-nothumb"]

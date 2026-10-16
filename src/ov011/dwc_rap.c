@@ -57,7 +57,7 @@ typedef struct {
     DWCFriendData *friendList;
     void *unk104;
     void *userData;
-    u8 inetControl[0x68];
+    DWCInetControl inetControl;
     void *recvBuf[2];
     // Errors that came up in the library, until they are given to the game
     int pendingCode[DWCRAP_FRIEND_MAX];

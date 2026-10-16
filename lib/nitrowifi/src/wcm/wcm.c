@@ -6,6 +6,7 @@
 #include "nitro/wm.h"
 #include "nitrowifi/wcm_dsi.h"
 #include "nitrowifi/wcm_internal.h"
+#include "twl/nwm.h"
 #include <stddef.h>
 
 // NitroWiFi's WCM (overlay 11), over NitroSDK's WM. dsd splits this range into 93 pieces; eight Thumb/ARM pairs among
@@ -1103,7 +1104,7 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
 }
 
 static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out) {
-    return func_02703250(frame, tag, out);
+    return func_02703250((NWMBssDesc *)frame, tag, out);
 }
 
 static void WCM_InitOnce(void) {

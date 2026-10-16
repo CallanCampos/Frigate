@@ -2,6 +2,7 @@
 #include "app/battle_recorder.h"
 #include "app/battle_video.h"
 #include "app/wifi_login.h"
+#include "dwc/connectinet.h"
 #include "gfl/gx_layers.h"
 #include "gfl/heap.h"
 #include "gfl/net.h"

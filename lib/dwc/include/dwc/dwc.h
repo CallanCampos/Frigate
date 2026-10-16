@@ -2,35 +2,16 @@
 #define POKEBW2_DWC_DWC_H
 
 #include "types.h"
+#include "dwc/account.h"
+#include "dwc/connectinet.h"
+#include "dwc/error.h"
+#include "dwc/init.h"
 #include "gfl/heap.h"
 #include "nitro/rtc.h"
 
 // Nintendo's Wi-Fi Connection library (NitroDWC), in main and overlay 11. The ROM names none of it; what these
-// functions do is read off their callers. The account functions carry the SDK's names, chosen from what they do
-
-// The player's account and a friend's, as the save keeps them: DWCAccUserData and DWCAccFriendData of the SDK
-typedef struct DWCUserData {
-    u8 data[0x40];
-} DWCUserData;
-
-typedef struct DWCFriendData {
-    u8 data[0xc];
-} DWCFriendData;
-
-BOOL DWC_IsValidFriendData(const DWCFriendData *friendData);
-BOOL DWC_CheckHasProfile(const DWCUserData *userData);
-BOOL DWC_CheckValidConsole(const DWCUserData *userData);
-s32 DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendData);
-void DWC_CreateExchangeToken(const DWCUserData *userData, DWCFriendData *token);
-// The friend key of the player's user data
-u64 func_02057ec4(const DWCUserData *userData);
-// Whether a friend key is valid for the player's user data, and the friend data of a friend key
-BOOL func_020578cc(const DWCUserData *userData, u64 friendKey);
-void func_02057ef8(DWCFriendData *token, u64 friendKey);
-// Whether two friends' data name the same friend
-BOOL func_02057fd4(const DWCFriendData *friendData, const DWCFriendData *other);
-// Clears the error, unless it is 9
-void func_02058490(void);
+// functions do is read off their callers. The account and friend data are in dwc/account.h, the error in dwc/error.h
+// and the start in dwc/init.h
 
 // Starts connecting to the access point; one of the calls that end the connection after a server error; and the
 // connection's state
@@ -51,30 +32,11 @@ BOOL func_ov011_0216bea4(const u16 **words, int count, const char *reserved, int
                          int *badWordCount, int region);
 int func_ov011_0216bed4(void);
 
-// Starts the library with the game's name and code, and the allocator and deallocator it uses
-int func_020584e4(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int), void (*free)(u32, void *, u32));
-// Whether the user data is valid; clears it; and creates it
-BOOL func_02057c90(void *userData);
-void func_02057c74(void *userData);
-void func_02057de8(void *userData);
-
 // Asked how well another machine fits a random match, and the function's work
 typedef int (*DWCEvalFunc)(int index, void *work);
 
 // Not in dwc_rap.c, past it in the overlay
 int func_ov011_02160344(void);
-
-// Main's: the inet part and the user data and friend data parts
-void func_0205ac24(void *inetControl, int dmaNo, int powerMode, int sslPriority);
-void func_0205acd0(void);
-BOOL func_0205ae04(void);
-int func_0205af98(void);
-void func_0205ae58(void);
-BOOL func_02057dc4(void *userData);
-void func_02057de8(void *userData);
-BOOL func_020576a4(const DWCFriendData *friendData);
-// The last error: its code and type, returning the kind of the error or 0 if there is none
-int func_020583b0(int *code, int *type);
 
 // Overlay 11's: starting, logging in and the friend list
 void func_ov011_0215fa0c(void *userData, int productId, const char *gameName, const char *secretKey, int a4,
@@ -128,5 +90,14 @@ void func_ov011_02168c00(DWCTimeoutFunc func, int a1);
 // a candidate's key
 u8 func_ov011_02160e10(u8 keyId, const char *key, const int *valueSrc);
 int func_ov011_02160f98(int index, const char *key, int defaultValue);
+
+// Overlay 11's, which the library's start in main (dwc_init.c) calls: chooses the servers that the library talks to
+// by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives), and gives
+// GameSpy its memory functions (malloc, free, realloc and memalign)
+void func_ov011_02169df8(int server);
+void func_ov011_0216ddc8(void *(*alloc)(u32 size), void (*free)(void *ptr), void *(*realloc)(void *ptr, u32 size),
+                         void *(*memalign)(u32 align, u32 size));
+// The host name of the game stats server, 64 bytes, which the start sets
+extern char data_ov011_02188fe4[];
 
 #endif // POKEBW2_DWC_DWC_H

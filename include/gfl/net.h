@@ -173,8 +173,6 @@ typedef struct {
 } GFLNetErrorInfo;
 
 void func_020410dc(void);
-// NitroSDK's OS_GetMacAddress
-void func_0207c33c(u8 *mac);
 // Command handlers of the other parts of the library
 void func_02040d78(int netId, int sender, int command, int size, void *data, NetHandle *handle);
 BOOL func_02040dc0(int command);
@@ -316,11 +314,5 @@ BOOL func_02042f24(void);
 void func_02042f2c(int x, int y);
 void func_02042f40(void);
 void func_02042f50(BOOL a0);
-
-// ARM functions past SPL that no source file owns yet, from the network code: the first updates the connection, the
-// second is a veneer to overlay 11's link level
-BOOL func_0205b5ec(void);
-int func_0205b250(void);
-void func_0205b198(void);
 
 #endif // POKEBW2_GFL_NET_H

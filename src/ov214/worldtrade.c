@@ -3,6 +3,7 @@
 #include "constants/arc.h"
 #include "constants/text_banks.h"
 #include "dpw/dpw_tr.h"
+#include "dwc/connectinet.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"

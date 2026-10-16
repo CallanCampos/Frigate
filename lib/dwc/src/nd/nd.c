@@ -163,7 +163,7 @@ static int FormatDecimal64(char *dest, u64 value, int minDigits);
 static int FormatHex(char *dest, u32 value, int digits);
 
 static char sNdLogDataParam[0x59];
-static NdApInfo sNdApInfo;
+static DWCApInfo sNdApInfo;
 static char sNdUserAgent[0x21];
 static char sNdPasswordParam[25];
 static OSMutex sNdAttrMutex;
@@ -783,16 +783,16 @@ static BOOL MakeApInfoParam(char *dest) {
     char info[13] = "00:0000000-00";
 
     if (func_0205b29c(&sNdApInfo)) {
-        if (sNdApInfo.type >= 0 && sNdApInfo.type < 10) {
-            info[1] = '0' + sNdApInfo.type;
-        } else if (sNdApInfo.type >= 10 && sNdApInfo.type < 100) {
-            FormatInt(info, sNdApInfo.type);
+        if (sNdApInfo.apType >= 0 && sNdApInfo.apType < 10) {
+            info[1] = '0' + sNdApInfo.apType;
+        } else if (sNdApInfo.apType >= 10 && sNdApInfo.apType < 100) {
+            FormatInt(info, sNdApInfo.apType);
         }
-        if (sNdApInfo.type == 4 || sNdApInfo.type == 8) {
-            if (sNdApInfo.unk4 >= 0 && sNdApInfo.unk4 < 10) {
-                info[3] = '0' + sNdApInfo.unk4;
+        if (sNdApInfo.apType == 4 || sNdApInfo.apType == 8) {
+            if (sNdApInfo.area >= 0 && sNdApInfo.area < 10) {
+                info[3] = '0' + sNdApInfo.area;
             }
-            MemCopy(info + 4, sNdApInfo.spot, 9);
+            MemCopy(info + 4, sNdApInfo.spotInfo, 9);
         }
         Base64Encode(dest, info, 13);
         return TRUE;
@@ -802,7 +802,7 @@ static BOOL MakeApInfoParam(char *dest) {
 
 // Writes the console's identifier and the game's code in base64, for the requests
 static BOOL MakeUserIdParams(char *gameCode, char *userId) {
-    NdConsoleIds ids;
+    DWCBmWifiIdInfo ids;
     char digits[13];
 
     MemZero(&ids, sizeof(ids));

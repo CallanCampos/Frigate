@@ -2,8 +2,14 @@
 #define POKEBW2_DPW_INTERNAL_H
 
 #include "types.h"
+#include "dwc/connectinet.h"
+#include "dwc/error.h"
 
 // What the sources of the dpw library call outside themselves, none of it with a name in the ROM
+
+// The C library's memcpy, not taken from <string.h>: MWCC builds memcpy and the other string functions in place, for a
+// size it knows, when <string.h> declares them, where the ROM calls them
+void *memcpy(void *dest, const void *src, u32 size);
 
 // The key of the game statistics client: the game's secret, four numbers of its scrambling, and its name
 #define DPW_GAMESTATS_KEY "HZEdGCzcGGLvguqUEKQN0001d93500002dd5000000082db842b2syachi2ds"
@@ -13,13 +19,5 @@ typedef struct DpwFriendKey {
     u32 low;
     u32 high;
 } DpwFriendKey;
-
-// The C library
-void *memcpy(void *dest, const void *src, u32 size);
-
-// The Wi-Fi library's error: its type and group, and the other calls that look at and clear it
-int func_020583b0(int *type, int *group);
-int func_0205b5ec(void);
-void func_02058490(void);
 
 #endif // POKEBW2_DPW_INTERNAL_H

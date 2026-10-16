@@ -66,6 +66,14 @@ s32 WCM_RestoreIdleAsync(void);
 s32 WCM_GetState(void);
 // Updates the selected option fields and ORs the entire normalized incoming word, returning the previous word.
 s32 WCM_SetSearchOption(u32 option);
+// The options of WCM_ConnectAsync that pick the power saving and the authentication (descriptive names). Each is a
+// pair of bits: the upper one says that the option is given, the lower one is its value (WCM_SetSearchOption sets or
+// clears 0x10000 and 0x40000 by it), and the connection reads them back as "!= 0x30000" for power saving and
+// "== 0xc0000" for a shared key
+#define WCM_OPTION_POWER_SAVE 0x20000
+#define WCM_OPTION_POWER_ACTIVE 0x30000
+#define WCM_OPTION_AUTH_OPEN 0x80000
+#define WCM_OPTION_AUTH_SHARED 0xc0000
 // DS mode fills gaps between the lowest and highest hardware-allowed channel bits; DSi uses its backend mask.
 // Returns zero outside states 3 through 10.
 s32 WCM_GetChannelMask(void);
