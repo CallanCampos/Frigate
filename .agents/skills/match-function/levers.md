@@ -520,6 +520,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
   (matching.md: "inner loop computes"), (matching.md: "preheader")
+- A hoisted row address split around a `volatile` store at the top of the outer loop's body (`G3_Begin`): another
+  invariant of the outer counter, such as a texture coordinate, in a local assigned after the store.
+  (matching.md: "splits the inner loop's hoisted row address")
 - Enum counters keep their guard (see above).
 - A field loaded again at the top of a loop's body, after the test loaded it: walk a local cursor, not the pointer
   parameter. (matching.md: "local cursor")
