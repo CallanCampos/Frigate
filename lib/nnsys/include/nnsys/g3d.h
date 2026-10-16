@@ -377,6 +377,84 @@ typedef struct {
     u16 category1;
 } NNSG3dResAnmHeader;
 
+// A material color animation (BMA0): a dictionary of the data of each material it animates. A material's data has a
+// word for each value it animates, its diffuse, ambient, specular and emission colors and its polygon alpha, which
+// says how the values at the frames are kept (nsbma.c). With CONST the word's low half is the value itself. Otherwise
+// it is the offset of an array of them from the animation, with a value for every frame, or with a step of two or
+// four for every second or fourth, and the frames between are made from the stored ones up to LAST_INTERP, the last
+// frame that is. A color is a GXRgb (RGB555) and the alpha a byte
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u16 dummy_;
+    NNSG3dResDict dict;
+} NNSG3dResMatCAnm;
+
+typedef struct {
+    u32 diffuse;
+    u32 ambient;
+    u32 specular;
+    u32 emission;
+    u32 polygonAlpha;
+} NNSG3dResMatCAnmData;
+
+#define NNS_G3D_MATCANM_ELEM_CONST 0x20000000
+#define NNS_G3D_MATCANM_ELEM_STEP_1 0x00000000
+#define NNS_G3D_MATCANM_ELEM_STEP_2 0x40000000
+#define NNS_G3D_MATCANM_ELEM_STEP_4 0x80000000
+#define NNS_G3D_MATCANM_ELEM_STEP_MASK 0xc0000000
+#define NNS_G3D_MATCANM_ELEM_LAST_INTERP_MASK 0x1fff0000
+#define NNS_G3D_MATCANM_ELEM_LAST_INTERP_SHIFT 16
+#define NNS_G3D_MATCANM_ELEM_OFFSET_MASK 0x0000ffff
+
+// A texture SRT animation (BTA0): a dictionary of the data of each material it animates. A material's data says how
+// the values of the parts of its texture matrix are kept (nsbta.c): the scale in S and T, the rotation, and the
+// translation in S and T, each by an info word and a second word. As for the colors of a BMA0, the info says whether
+// the values are constant, or have a step of two or four with the last frame that is interpolated, here in its low
+// half, and FX16 says that they are fx16 rather than fx32. The second word is the value itself if CONST is set, or the
+// offset of the values from the animation. A rotation is its sine and cosine, two fx16 that make a word, with the
+// cosine in the high half
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u16 dummy_;
+    NNSG3dResDict dict;
+} NNSG3dResTexSrtAnm;
+
+typedef struct {
+    u32 info;
+    u32 offset;
+} NNSG3dResTexSrtAnmElem;
+
+typedef struct {
+    NNSG3dResTexSrtAnmElem scaleS;
+    NNSG3dResTexSrtAnmElem scaleT;
+    NNSG3dResTexSrtAnmElem rot;
+    NNSG3dResTexSrtAnmElem transS;
+    NNSG3dResTexSrtAnmElem transT;
+} NNSG3dResTexSrtAnmData;
+
+#define NNS_G3D_SRTANM_ELEM_CONST 0x20000000
+#define NNS_G3D_SRTANM_ELEM_FX16 0x10000000
+#define NNS_G3D_SRTANM_ELEM_STEP_1 0x00000000
+#define NNS_G3D_SRTANM_ELEM_STEP_2 0x40000000
+#define NNS_G3D_SRTANM_ELEM_STEP_4 0x80000000
+#define NNS_G3D_SRTANM_ELEM_STEP_MASK 0xc0000000
+#define NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK 0x0000ffff
+
+// A rotation of zero as the word of its sine and cosine: a sine of zero and a cosine of one
+#define NNS_G3D_SRTANM_ROT_ZERO ((u32)FX16_ONE << 16)
+
+// A visibility animation (BVA0): a bit for each node at each frame, the bits of a frame being those of numNode nodes
+// after the bits of the frame before, and a set bit meaning the node shows
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u16 numNode;
+    u32 dummy_;
+    u32 visData[1];
+} NNSG3dResVisAnm;
+
 // A texture pattern animation (BTP0): the names of its textures and palettes, then a dictionary of the data for each
 // material it animates. A material's data says where its run of frame values is, in the animation, and how long it is:
 // the frame values give the texture and palette to show from a frame on (idPltt is 0xff for none). ratioDataFrame is
@@ -681,15 +759,15 @@ extern NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[];
 // The functions that fill in an animation object of each kind, which its init function (NitroSystem's
 // NNS_G3dAnmObjInitNsBma, NsBtp, NsBta, NsBva and NsBca, in nsbma.c, nsbtp.c, nsbta.c, nsbva.c and nsbca.c) copies
 // from these variables to funcAnm (anm.c). The NNS_G3dFuncAnm names are a guess from the files
-void func_020698d4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3DAnimationInit_TP(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
-void func_02069ee4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationInit_VA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
-void func_02069968(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-void func_02069cf8(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-void func_02069ea0(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-void func_02069f18(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_MA(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_TA(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_TP(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_VA(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
 void NNS_G3DAnimationApply_CA(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
 extern void *NNS_G3dFuncAnmVisNsBva;
 extern void *NNS_G3dFuncAnmJntNsBca;
@@ -717,10 +795,10 @@ typedef void (*NNSG3dFuncJointScale)(NNSG3dJntAnmResult *result, const VecFx32 *
 typedef void (*NNSG3dFuncTexMatrix)(const NNSG3dMatAnmResult *result);
 
 // Standard (basic.c), Maya (maya.c) and Softimage (si3d.c) scaling rules
-void func_02069f40(const NNSG3dJntAnmResult *result);
+void NNSi_G3dSendJointSRTBasic(const NNSG3dJntAnmResult *result);
 void func_02069fbc(const NNSG3dJntAnmResult *result);
 void func_0206a714(const NNSG3dJntAnmResult *result);
-void func_02069f94(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+void NNSi_G3dGetJointScaleBasic(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 void func_0206a044(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
 // Maya (maya.c), Softimage (si3d.c), 3ds Max (3dsmax.c) and XSI (xsi.c) texture matrix modes
