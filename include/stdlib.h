@@ -4,7 +4,6 @@
 // The C library's stdlib.h, from CodeWarrior's MSL, which the main module links
 
 #include <stddef.h>
-#include <wchar.h>
 
 // What rand returns at most: it keeps 15 bits of its generator
 #define RAND_MAX 0x7FFF

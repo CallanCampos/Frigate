@@ -1,6 +1,7 @@
 // MSL C's math/s_frexp.c, Sun's fdlibm frexp: splits x into a fraction in [0.5, 1) with the sign of x and a power of
 // two, stored in *eptr, so that x = fraction * 2**exponent. Zero, infinities and NaNs come back as they are with an
 // exponent of 0; a subnormal x is first scaled by 2**54 (and the exponent corrected by -54).
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

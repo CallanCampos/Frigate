@@ -6,11 +6,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-// MSL's wide character for the ARM platform is 16 bits
-#ifndef __wchar_t_defined
-#define __wchar_t_defined
-typedef unsigned short wchar_t;
-#endif
+// wchar_t is in stddef.h
 
 // The length of a wide string without its terminator, and a copy of it with the terminator (wstring.c)
 size_t wcslen(const wchar_t *s);

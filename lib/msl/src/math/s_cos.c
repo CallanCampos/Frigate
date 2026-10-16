@@ -1,6 +1,7 @@
 // MSL C's math/s_cos.c, Sun's fdlibm cos: the cosine of x. A x within pi / 4 goes straight to __kernel_cos; an
 // infinity or a NaN gives a NaN (x - x); any other x is reduced by __ieee754_rem_pio2 to y[0] + y[1] in [-pi / 4,
 // pi / 4] and a quadrant n, and the cosine is one of cos(y), -sin(y), -cos(y) and sin(y) by n % 4.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

@@ -164,6 +164,8 @@ static inline void OS_SetIrqCheckFlag(u32 interrupts) {
 // sets up six of them: the main memory, the extended main memory (OS_InitArenaEx), the ITCM and DTCM, the shared
 // memory and the shared WRAM
 #define OS_ARENA_MAIN 0
+// The arena's current heap, as a heap handle
+#define OS_CURRENT_HEAP_HANDLE (-1)
 #define OS_ARENA_MAINEX 2
 #define OS_ARENA_ITCM 3
 #define OS_ARENA_DTCM 4
@@ -306,6 +308,8 @@ u32 OS_GetBootType(void); // swan's sys_get_boot_indicator
 // NitroSDK's OS_GetConsoleType and OS_IsRunOnEmulator (the console type has the emulator's bit set), and a function
 // that calls OS_IsRunOnTwl
 #define OS_CONSOLE_ENSATA 0x10000000
+// The bits of a development console's hardware, 0 on a retail one (NitroSDK's OS_CONSOLE_DEV_MASK)
+#define OS_CONSOLE_DEV_MASK 0x03000000
 u32 OS_GetConsoleType(void);
 BOOL OS_IsRunOnEmulator(void);
 BOOL func_0207acbc(void);

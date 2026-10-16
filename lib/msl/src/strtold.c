@@ -162,7 +162,13 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
             }
             if (i == 3 || i == 4) {
                 if (i == 4) {
+                    // BUG: j also counts the ')' before the terminator is written, so a payload of 31 characters or
+                    // more writes it past nan_arg
+#ifdef BUGFIX
+                    while (j < (int)sizeof(nan_arg) - 2 && (isdigit(c) || isalpha(c) || c == '.')) {
+#else
                     while (j < 32 && (isdigit(c) || isalpha(c) || c == '.')) {
+#endif
                         nan_arg[j] = c;
                         j++;
                         count++;

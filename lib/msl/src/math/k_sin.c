@@ -1,6 +1,7 @@
 // MSL C's math/k_sin.c, Sun's fdlibm __kernel_sin: the sine of x for |x| up to pi / 4, where y is the tail of x (the
 // argument is x + y, as __ieee754_rem_pio2 splits it) and iy says whether there is one: with iy == 0 the tail is
 // ignored. It is the polynomial of the series in x * x, times x * x * x, added to x. cos and sin call it.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

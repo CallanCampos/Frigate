@@ -2,6 +2,7 @@
 // and the result of exp(y * log(x)) taken in extra precision: log2(x) is found as a head and a tail (n + the table's
 // dp_h and dp_l + the polynomial of the series in (x - 1) / (x + 1)), multiplied by y, and 2 raised to that is
 // found by the polynomial of exp.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include <errno.h>
 #include <math.h>

@@ -7,14 +7,6 @@
 #include <float.h>
 #include <math.h>
 
-// BUG: __str2dec compares the first digit that it cuts off, a character, with 5 instead of '5', so every cut-off
-// remainder is over half and rounds up
-#ifdef BUGFIX
-#define HALF_DIGIT '5'
-#else
-#define HALF_DIGIT 5
-#endif
-
 // The powers of ten that __dec2num scales its running value by, for up to eight digits at a time
 static double pow_10[8] = { 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8 };
 
@@ -186,10 +178,19 @@ void __str2dec(decimal *d, const char *s, short exp) {
     if (*s == '\0') {
         return;
     }
-    if (*s < HALF_DIGIT) {
+    // BUG: the first digit that is cut off, a character, is compared with 5 instead of '5', so every cut-off remainder
+    // is over half and rounds up
+#ifdef BUGFIX
+    if (*s < '5') {
         return;
     }
-    if (*s <= HALF_DIGIT) {
+    if (*s <= '5') {
+#else
+    if (*s < 5) {
+        return;
+    }
+    if (*s <= 5) {
+#endif
         const char *t;
 
         for (t = s + 1; *t != '\0'; t++) {

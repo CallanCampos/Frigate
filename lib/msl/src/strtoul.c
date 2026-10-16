@@ -4,7 +4,7 @@
 // and atoll are strtol and strtoll in base 10. The ROM's order differs from the library's other builds, which put
 // __strtoull next to __strtoul.
 #include "types.h"
-#include "strtold.h"
+#include "scanf.h"
 #include "strtoul.h"
 #include <ctype.h>
 #include <errno.h>
@@ -131,8 +131,6 @@ unsigned long __strtoul(int base, int max_width, int (*ReadProc)(void *, int, in
                 *overflow = 1;
             }
             value += c;
-            // Set after the arithmetic, which the old state does not live across: __strtoull's temporaries use its
-            // register
             scan_state = SCAN_DIGITS;
             count++;
             c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
@@ -295,8 +293,6 @@ unsigned long long __strtoull(int base, int max_width, int (*ReadProc)(void *, i
                 *overflow = 1;
             }
             value += c;
-            // Set after the arithmetic, which the old state does not live across: __strtoull's temporaries use its
-            // register
             scan_state = SCAN_DIGITS;
             count++;
             c = (*ReadProc)(ReadProcArg, 0, MSL_GET);

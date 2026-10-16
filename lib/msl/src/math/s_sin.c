@@ -1,6 +1,7 @@
 // MSL C's math/s_sin.c, Sun's fdlibm sin: the sine of x. A x within pi / 4 goes straight to __kernel_sin (with no
 // tail); an infinity or a NaN gives a NaN (x - x); any other x is reduced by __ieee754_rem_pio2 to y[0] + y[1] in
 // [-pi / 4, pi / 4] and a quadrant n, and the sine is one of sin(y), cos(y), -sin(y) and -cos(y) by n % 4.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

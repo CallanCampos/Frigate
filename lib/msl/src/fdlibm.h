@@ -1,6 +1,16 @@
 #ifndef MSL_FDLIBM_H
 #define MSL_FDLIBM_H
 
+// The math files (math/*.c) are the fdlibm sources that MSL bundles, written again from the ROM. fdlibm's notice,
+// which its terms ask to keep with them:
+//
+// Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+//
+// Developed at SunPro, a Sun Microsystems, Inc. business.
+// Permission to use, copy, modify, and distribute this
+// software is freely granted, provided that this notice
+// is preserved.
+
 // Private to MSL's math functions: the access to the halves of a double that the fdlibm sources use. The target is
 // little-endian, so the high word is the second one.
 

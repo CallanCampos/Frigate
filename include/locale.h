@@ -6,10 +6,10 @@
 // characters into bytes and back
 
 #include <stddef.h>
-#include <wchar.h>
 
 // The strings of the time functions: AM and PM, and the formats of the date with the time, of the 12-hour time, of the
-// date and of the time, in strftime's conversions; and the names of the days and months, each as short name|full name
+// date and of the time, in strftime's conversions; the names of the days and months, each as short name|full name;
+// and the time zone
 typedef struct _Loc_time_cmpt {
     char *am_pm;
     char *date_time_format;
@@ -18,14 +18,14 @@ typedef struct _Loc_time_cmpt {
     char *time_format;
     char *day_names;
     char *month_names;
-    char *era;
+    char *time_zone;
 } _Loc_time_cmpt;
 
-// The collation of the characters from first_char on, by their weights
+// The collation of the characters from first_char on, by their weights: MSL's size of the table and its accents
 typedef struct _Loc_coll_cmpt {
     int first_char;
-    int unk_4;
-    int unk_8;
+    int char_coll_tab_size;
+    int char_spec_accents;
     const unsigned short *char_weights;
 } _Loc_coll_cmpt;
 

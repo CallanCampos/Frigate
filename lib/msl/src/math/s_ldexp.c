@@ -2,6 +2,7 @@
 // (x comes back as it is). It moves the exponent of x by n, with the steps for a subnormal x (scaled by 2**54 first),
 // for an overflow (huge, with the sign of x; also for a large n after the exponent underflows), for an underflow (tiny,
 // with the sign) and for a subnormal result (the exponent moved to 54 above and the value scaled by 2**-54).
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

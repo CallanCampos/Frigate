@@ -2,6 +2,7 @@
 // (the argument is x + y, as __ieee754_rem_pio2 splits it). It is 1 - x * x / 2 plus the polynomial of the series in
 // x * x. For |x| from 0.3 on, a part of x * x / 2 (qx, about |x| / 4 with its low word cleared) is taken off 1 on its
 // own and off x * x / 2 too, so that the bits of the small terms are not lost in the subtraction from 1.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

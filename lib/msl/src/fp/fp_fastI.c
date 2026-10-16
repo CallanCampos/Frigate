@@ -11,7 +11,7 @@
 // An MWCC asm function has one entry, but the runtime enters some routines in the middle and lets others fall into the
 // next. The routines are split at those entries, in the ROM's order: a routine that ends without a return falls into
 // the function after it, and the parts that nothing outside the file reaches are static.
-#include "../runtime/fp_fastI.h"
+#include "fp_fastI.h"
 #include <errno.h>
 #include <math.h>
 

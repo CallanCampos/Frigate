@@ -27,8 +27,9 @@ static long _ftell(FILE *file) {
     return position;
 }
 
-// The region of a stream: the console streams have one each, all the other files share one
-static inline int __stream_region(FILE *file) {
+// The region of a stream: the console streams have one each, all the other files share one. The helper's name is ours;
+// MSL writes the test in ftell and fseek
+static inline int stream_region(FILE *file) {
     if (file == stdin) {
         return stdin_access;
     }
@@ -43,7 +44,7 @@ static inline int __stream_region(FILE *file) {
 
 long ftell(FILE *file) {
     long retval;
-    int region = __stream_region(file);
+    int region = stream_region(file);
 
     __begin_critical_region(region);
     retval = _ftell(file);
@@ -99,7 +100,7 @@ static int _fseek(FILE *file, unsigned long position, int whence) {
 
 int fseek(FILE *file, long offset, int whence) {
     int retval;
-    int region = __stream_region(file);
+    int region = stream_region(file);
 
     __begin_critical_region(region);
     retval = _fseek(file, offset, whence);

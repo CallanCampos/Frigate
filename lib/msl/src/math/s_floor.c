@@ -3,6 +3,7 @@
 // word are cleared (one is added first for a negative x that has any), and the low word is cleared; up to 2**52 it is
 // the low word's fraction bits that go, with a carry into the high word for a negative x; from there on x is already
 // an integer, or an infinity or a NaN (x + x). The addition of huge is only there to raise the inexact flag.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

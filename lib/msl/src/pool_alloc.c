@@ -3,15 +3,12 @@
 #include "pool_alloc.h"
 #include "nitro/os.h"
 
-// NitroSDK's OS_CURRENT_HEAP_HANDLE: the heap that the arena uses for allocations
-#define CURRENT_HEAP (-1)
-
 void *__sys_alloc(size_t size) {
-    return OS_AllocFromHeap(OS_ARENA_MAIN, CURRENT_HEAP, size);
+    return OS_AllocFromHeap(OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE, size);
 }
 
 void __sys_free(void *ptr) {
-    OS_FreeToHeap(OS_ARENA_MAIN, CURRENT_HEAP, ptr);
+    OS_FreeToHeap(OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE, ptr);
 }
 
 size_t __sys_pointer_size(void *ptr) {

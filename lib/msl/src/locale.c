@@ -1,5 +1,5 @@
-// MSL C's locale.c: the C locale, the only one that the library has. A data-only object, built with -ipa file: the
-// size sort of its data and the separate sections of _current_locale and of the table are that option's.
+// MSL C's locale.c: the C locale, the only one that the library has. A data-only object, built with -ipa file, which
+// gives _current_locale and the table sections of their own (lib/msl/library.toml).
 #include <locale.h>
 
 // The weights of the characters from 0x20 to 0x7F

@@ -8,15 +8,13 @@
 #include "ansi_fp.h"
 #include "secure_error.h"
 #include <ctype.h>
+#include <limits.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-
-// The smallest long long (the library's limits.h has it, which the ROM's code does not need otherwise)
-#define LLONG_MIN (-0x7FFFFFFFFFFFFFFFLL - 1)
 
 // The longest text that a number may take in __pformatter's buffer
 #define MAX_FIELD_WIDTH 509

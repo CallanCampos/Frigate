@@ -6,6 +6,7 @@
 // fraction gives the remainder after a multiplication by pi / 2, held in as many doubles as prec says: 0 for a 24-bit
 // result, 1 or 2 for a double (y[0] + y[1]), 3 for a triple (y[0] + y[1] + y[2]). If the fraction cancels, the loop
 // starts over with more pieces of 2 / pi.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 

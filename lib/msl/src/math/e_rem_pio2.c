@@ -4,6 +4,7 @@
 // multiplication by 2 / pi and subtracts n * pi / 2 held in up to three pieces (pio2_1 to pio2_3, with their tails)
 // until enough bits are left; a larger x is split into 24-bit pieces for __kernel_rem_pio2, which divides it using
 // the bits of 2 / pi.
+// fdlibm's notice is in ../fdlibm.h.
 #include "../fdlibm.h"
 #include "math.h"
 
