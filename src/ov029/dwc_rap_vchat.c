@@ -47,7 +47,7 @@ typedef struct DWCRapVChatWork {
 } DWCRapVChatWork;
 
 static void InitHardware(void);
-static void MicCallback(void);
+static void MicCallback(MICResult result, void *arg);
 static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
                            NNSSndStrmFormat format, void *arg);
 static BOOL RequestVoice(u8 aid);
@@ -72,7 +72,7 @@ static void InitHardware(void) {
     VCT_SetEchoCancel(TRUE);
 }
 
-static void MicCallback(void) {
+static void MicCallback(MICResult result, void *arg) {
 }
 
 static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
@@ -88,12 +88,12 @@ static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, voi
     }
     if (!isRunningOnDSi()) {
         if (sVChatWork->micRunning) {
-            func_0207e7a0(&sVChatWork->micParam, MicCallback, 0);
+            func_0207e7a0(&sVChatWork->micParam, MicCallback, NULL);
             sVChatWork->micRunning = 0;
         }
     } else {
         if (sVChatWork->micRunning) {
-            func_0207e904(&sVChatWork->micParam, MicCallback, 0);
+            func_0207e904(&sVChatWork->micParam, MicCallback, NULL);
             sVChatWork->micRunning = 0;
         }
     }

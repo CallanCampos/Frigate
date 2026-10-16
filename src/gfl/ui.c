@@ -310,7 +310,7 @@ static void sleepSetup(void) {
         if (!IsSleepBlocked(ui)) {
             func_0203db7c();
             CallSleepCallback(ui);
-            PM_GoSleepMode(PM_TRIGGER_COVER_OPEN | PM_TRIGGER_CARTRIDGE, 0, 0);
+            PM_GoSleepMode(PM_TRIGGER_COVER_OPEN | PM_TRIGGER_CARD, 0, 0);
             CallInputCallback(ui);
             CallLidOpenCallback(ui);
             CallWakeCallback(ui);

@@ -3,25 +3,72 @@
 
 #include "types.h"
 
-// NitroSDK's power management: PM_GetBackLight, PM_SetBackLight, PM_GetBattery, the DSi's PM_GetBatteryLevel and
-// PM_GoSleepMode. They return PM_RESULT_SUCCESS, or another result when the ARM7 is busy
+// NitroSDK's power management (TwlSDK's libspi pm.c, whose ARM9 part is lib/nitro/src/spi/pm.c): the backlights, the
+// battery, the sound amplifier of the microphone, the sleep mode and the power-off. Each call sends the ARM7 a request
+// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions keep their default names; the
+// comments give the SDK's, by what the code does
 
 #define PM_RESULT_SUCCESS 0
+// The ARM7 is still on a request
+#define PM_RESULT_BUSY 1
+#define PM_RESULT_ERROR 2
+// A parameter has no request
+#define PM_RESULT_ILLEGAL_PARAMETER 0xffff
 
+// Called with the result when the ARM7 has answered
+typedef void (*PMCallback)(u32 result, void *arg);
+
+#define PM_LCD_TOP 0
+#define PM_LCD_BOTTOM 1
 #define PM_LCD_ALL 2
+
 #define PM_BACKLIGHT_OFF 0
+#define PM_BACKLIGHT_ON 1
 
 #define PM_BATTERY_HIGH 0
+#define PM_BATTERY_LOW 1
 
-// What wakes the system: opening the lid, or the Game Pak being pulled
+#define PM_AMP_OFF 0
+#define PM_AMP_ON 1
+
+// What wakes the system from the sleep mode: opening the lid, or the card in the DS slot being pulled out. The
+// cartridge of the GBA slot works only on a DS
 #define PM_TRIGGER_COVER_OPEN 0x04
-#define PM_TRIGGER_CARTRIDGE 0x08
+#define PM_TRIGGER_CARD 0x08
+#define PM_TRIGGER_CARTRIDGE 0x10
 
-u32 PM_GetBackLight(u32 *top, u32 *bottom);
+// Turns the power management on, as the first call
+void func_0207ebb8(void); // PM_Init
+
+// Sends the ARM7 a request with a number and a halfword, waits for the answer and returns its result. A request that
+// reads gives the ARM7's answer in *result. Swan calls it PMi_ReadRegister, after the register reads that it is
+// mostly used for
+u32 PMi_ReadRegister(u8 request, u16 data, u16 *result);
+
+// PM_SetBackLight sends the request and waits for the answer, PM_SetBackLightAsync calls back
+u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *arg);
 u32 PM_SetBackLight(u32 target, u32 backlight);
+u32 PM_GetBackLight(u32 *top, u32 *bottom);
 u32 PM_GetBattery(u32 *battery);
+// The battery level of the DSi, 2 (PM_RESULT_ERROR) on a DS
 u32 PM_GetBatteryLevel(u16 *level);
-void func_0207ef8c(void);
+
+// The sound amplifier of the microphone. The setting is kept and sent again when the screens come back on
+u32 func_0207efc4(int amp);  // PM_SetAmp
+u32 func_0207f0ac(int *amp); // PM_GetAmp
+u32 func_0207eff4(int gain); // PM_SetAmpGain
+u32 func_0207f008(u8 level); // PM_SetAmpGainLevel
+
+// Turns the system off, and never returns
+void func_0207ef8c(void); // PM_ForceToPowerOff
+// Turns the screens' power on or off, and the upper engine off with it. TRUE when it is done, FALSE when the screens
+// went off too recently to be turned on
+BOOL func_0207f4d4(BOOL on);
+// Two more settings of the ARM7 (the request 0x12, and the read of the register 8)
+u32 func_0207f50c(u32 value);
+u32 func_0207f520(u32 *value);
+// Records the vertical blank count at which the display went off, which the screens' power waits two frames from
+void func_0207f6b8(void);
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern);
 
 // Callbacks run before the system sleeps and after it wakes, in lists ordered by priority: the TwlSDK's
@@ -43,8 +90,21 @@ static inline void PM_SetSleepCallbackInfo(PMSleepCallbackInfo *info, PMGenCallb
     info->arg = arg;
 }
 
+// The priorities of the callbacks that go first and last, and where a new one goes among those of its own priority
+#define PM_CALLBACK_PRIORITY_MIN (-255)
+#define PM_CALLBACK_PRIORITY_MAX 255
+#define PM_INSERT_APPEND 0
+#define PM_INSERT_PREPEND 1
+
+// PMi_InsertList, PMi_DeleteList and PMi_CallCallbackList, which TwlSDK's exit callbacks (the LTD autoload) use too
+void func_0207f544(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType);
+void func_0207f59c(PMGenCallbackInfo **list, PMGenCallbackInfo *info);
+void func_0207f5d4(PMGenCallbackInfo *list);
+
 void func_0207f5e8(PMSleepCallbackInfo *info);
 void func_0207f600(PMSleepCallbackInfo *info);
+// PM_InsertPreSleepCallback: the pre-sleep callback with its priority, after those of the same one
+void func_0207f614(PMSleepCallbackInfo *info, int priority);
 void func_0207f62c(PMSleepCallbackInfo *info);
 void func_0207f63c(PMSleepCallbackInfo *info);
 

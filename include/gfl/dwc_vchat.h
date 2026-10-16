@@ -23,11 +23,4 @@ BOOL DWCRapVChat_AddHeard(u32 netIds, int myNetId);
 BOOL DWCRapVChat_RemoveHeard(int myNetId);
 void DWCRapVChat_SetMuted(BOOL muted);
 
-// Microphone and power calls the file makes, not yet named: starting the microphone's sampling for the DS and for the
-// DSi, stopping it for the DS, and setting the amplifier's gain
-void func_0207e7a0(MICAutoParam *param, void (*callback)(void), int arg);
-void func_0207e904(MICAutoParam *param, void (*callback)(void), int arg);
-void func_0207e8d4(void);
-void func_0207eff4(int gain);
-
 #endif // POKEBW2_GFL_DWC_VCHAT_H
