@@ -9,10 +9,10 @@
 #include "twl/scfg.h"
 
 // clang-format off
+#pragma thumb off
 
 // TwlSDK's OSi_WaitVCount0, which is assembly there: waits for the screen's line counter to be 0, with the interrupts
 // off (IME is stored from the register that holds its address, a value whose bit 0 is clear)
-#pragma thumb off
 static asm void OSi_WaitVCount0(void) {
     mov ip, #0x4000000
     ldr r1, [ip, #0x208]

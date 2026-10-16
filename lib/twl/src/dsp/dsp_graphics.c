@@ -34,6 +34,7 @@ static DSPPipe sGraphicsPipe;
 static u16 sGraphicsResult;
 static volatile BOOL sGraphicsAsync;
 static void (*sGraphicsCallback)(void);
+// Cleared by func_0270734c in the DSP's interrupt
 static volatile BOOL sGraphicsBusy;
 static BOOL sGraphicsLoaded;
 static DSPProcessContext sGraphicsContext;

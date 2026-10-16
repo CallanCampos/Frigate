@@ -43,10 +43,10 @@ static void OSi_CountUpTick(void) {
 }
 
 // NitroSDK's OS_GetTick. The wrap's interrupt may be pending with the timer already past 0, in
-// which case the counter is one behind. The timer and the counter are read into volatile locals, as the original's
-// code does, which keeps the order of the reads
+// which case the counter is one behind
 u64 OS_GetTick(void) {
     u32 enabled = OS_DisableInterrupts();
+    // The SDK reads the timer and the counter into volatile locals, which keeps the order of the reads
     vu16 countL = reg_OS_TM0CNT_L;
     volatile u64 countH = OSi_TickCounter & 0x0000ffffffffffffULL;
 

@@ -184,6 +184,7 @@ static void func_02704264(FatfsRequest *request) {
     BOOL waiting = TRUE;
 
     while (waiting) {
+        // The PXI callback adds to the list of done requests from its interrupt
         FatfsRequest *volatile *link;
         u32 irq = OS_DisableInterrupts();
 

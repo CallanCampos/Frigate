@@ -39,83 +39,100 @@ static void OS_SetProtectionRegionParam(int regionNo, u32 param) {
 }
 
 // clang-format off
-// Assembly in the SDK: the setters and getters of coprocessor 15's registers c6,c0 to c6,c7, the regions'
-// registers
+// The setters and getters of coprocessor 15's registers c6,c0 to c6,c7, the regions' registers. Each is assembly in
+// the SDK, since only an instruction can name a coprocessor register
+
+// Assembly in the SDK: writes region 0's register, c6,c0
 static asm void OSi_SetPRParam0(u32 param) {
     mcr p15, 0, r0, c6, c0, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 1's register, c6,c1
 static asm void OSi_SetPRParam1(u32 param) {
     mcr p15, 0, r0, c6, c1, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 2's register, c6,c2
 static asm void OSi_SetPRParam2(u32 param) {
     mcr p15, 0, r0, c6, c2, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 3's register, c6,c3
 static asm void OSi_SetPRParam3(u32 param) {
     mcr p15, 0, r0, c6, c3, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 4's register, c6,c4
 static asm void OSi_SetPRParam4(u32 param) {
     mcr p15, 0, r0, c6, c4, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 5's register, c6,c5
 static asm void OSi_SetPRParam5(u32 param) {
     mcr p15, 0, r0, c6, c5, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 6's register, c6,c6
 static asm void OSi_SetPRParam6(u32 param) {
     mcr p15, 0, r0, c6, c6, 0
     bx lr
 }
 
+// Assembly in the SDK: writes region 7's register, c6,c7
 static asm void OSi_SetPRParam7(u32 param) {
     mcr p15, 0, r0, c6, c7, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 0's register, c6,c0
 static asm u32 OSi_GetPRParam0(void) {
     mrc p15, 0, r0, c6, c0, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 1's register, c6,c1
 static asm u32 OSi_GetPRParam1(void) {
     mrc p15, 0, r0, c6, c1, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 2's register, c6,c2
 static asm u32 OSi_GetPRParam2(void) {
     mrc p15, 0, r0, c6, c2, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 3's register, c6,c3
 static asm u32 OSi_GetPRParam3(void) {
     mrc p15, 0, r0, c6, c3, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 4's register, c6,c4
 static asm u32 OSi_GetPRParam4(void) {
     mrc p15, 0, r0, c6, c4, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 5's register, c6,c5
 static asm u32 OSi_GetPRParam5(void) {
     mrc p15, 0, r0, c6, c5, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 6's register, c6,c6
 static asm u32 OSi_GetPRParam6(void) {
     mrc p15, 0, r0, c6, c6, 0
     bx lr
 }
 
+// Assembly in the SDK: reads region 7's register, c6,c7
 static asm u32 OSi_GetPRParam7(void) {
     mrc p15, 0, r0, c6, c7, 0
     bx lr

@@ -657,8 +657,8 @@ void *NNS_G3dGeReleaseBuffer(void);
 void NNS_G3DWaitFIFO(void);
 void NNS_G3DExecOp(u32 op, const u32 *args, u32 num);
 void NNS_G3DExecDisplayList(const void *list, u32 size);
-// NitroSystem's NNS_G3dGetCurrentMtx: gets the position matrix and the vector matrix that the geometry engine is at, each
-// unless its pointer is null
+// NitroSystem's NNS_G3dGetCurrentMtx: gets the position matrix and the vector matrix that the geometry engine is at,
+// each unless its pointer is null
 void NNS_G3DGetTransforms(MtxFx43 *pos, MtxFx33 *nrm);
 
 // NitroSystem's inline wrappers of the buffer, one per geometry command
@@ -930,8 +930,8 @@ static inline void NNS_G3dGlbLookAt(const VecFx32 *camPos, const VecFx32 *camUp,
 #define NNS_G3D_SBC_CALLBACK_TIMING_C 3
 
 // The flag of the render state. NODE_VISIBLE is whether the current node is shown, MAT_TRANSPARENT whether the current
-// material is fully transparent, and the CURRENT_*_VALID flags whether the node, material and joint have been set. RETURN ends
-// the stream, SKIP is set by a callback, and the OPT_* flags are the render object's options
+// material is fully transparent, and the CURRENT_*_VALID flags whether the node, material and joint have been set.
+// RETURN ends the stream, SKIP is set by a callback, and the OPT_* flags are the render object's options
 #define NNS_G3D_RSFLAG_NODE_VISIBLE 0x00000001
 #define NNS_G3D_RSFLAG_MAT_TRANSPARENT 0x00000002
 #define NNS_G3D_RSFLAG_CURRENT_NODE_VALID 0x00000004

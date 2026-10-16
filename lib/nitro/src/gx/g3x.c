@@ -183,10 +183,10 @@ int G3X_GetBoxTestResult(s32 *result) {
     return 0;
 }
 
-// The SDK wrote this in assembly: 128 words of 0 stored to the FIFO port, which push out whatever it still holds. The
-// 32 stores of 4 words are not a loop
 // clang-format off
 #pragma thumb off
+// The SDK wrote this in assembly: 128 words of 0 stored to the FIFO port, which push out whatever it still holds. The
+// 32 stores of 4 words are not a loop
 asm void GXi_NopClearFifo128_(void *fifo) {
     mov r1, #0
     mov r2, #0

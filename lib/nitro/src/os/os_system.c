@@ -8,8 +8,8 @@ static u16 *sys_get_boot_indicator_ptr(void);
 
 #pragma thumb off
 // clang-format off
-// NitroSDK's OS_EnableInterrupts, OS_DisableInterrupts and OS_RestoreInterrupts. Each gives the
-// IRQ bit that the CPSR had
+// NitroSDK's OS_EnableInterrupts, assembly in the SDK like every function here that reads or changes the CPSR: clears
+// the IRQ bit and gives the one the CPSR had
 asm u32 OS_EnableInterrupts(void) {
     mrs r0, cpsr
     bic r1, r0, #0x80
@@ -18,6 +18,7 @@ asm u32 OS_EnableInterrupts(void) {
     bx lr
 }
 
+// NitroSDK's OS_DisableInterrupts, assembly in the SDK: sets the IRQ bit and gives the one the CPSR had
 asm u32 OS_DisableInterrupts(void) {
     mrs r0, cpsr
     orr r1, r0, #0x80
@@ -26,6 +27,7 @@ asm u32 OS_DisableInterrupts(void) {
     bx lr
 }
 
+// NitroSDK's OS_RestoreInterrupts, assembly in the SDK: sets the IRQ bit to mask and gives the one the CPSR had
 asm u32 OS_RestoreInterrupts(u32 mask) {
     mrs r1, cpsr
     bic r2, r1, #0x80
@@ -35,7 +37,7 @@ asm u32 OS_RestoreInterrupts(u32 mask) {
     bx lr
 }
 
-// NitroSDK's OS_DisableInterrupts_IrqAndFiq and OS_RestoreInterrupts_IrqAndFiq: the same for both the IRQ and FIQ bits
+// NitroSDK's OS_DisableInterrupts_IrqAndFiq, assembly in the SDK: OS_DisableInterrupts for both the IRQ and FIQ bits
 asm u32 OS_DisableInterrupts_IrqAndFiq(void) {
     mrs r0, cpsr
     orr r1, r0, #0xc0
@@ -44,6 +46,7 @@ asm u32 OS_DisableInterrupts_IrqAndFiq(void) {
     bx lr
 }
 
+// NitroSDK's OS_RestoreInterrupts_IrqAndFiq, assembly in the SDK: OS_RestoreInterrupts for both bits
 asm u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask) {
     mrs r1, cpsr
     bic r2, r1, #0xc0
@@ -53,20 +56,21 @@ asm u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask) {
     bx lr
 }
 
-// NitroSDK's OS_GetCpsrIrq and OS_GetProcMode
+// NitroSDK's OS_GetCpsrIrq, assembly in the SDK: the IRQ bit of the CPSR
 asm u32 OS_GetCpsrIrq(void) {
     mrs r0, cpsr
     and r0, r0, #0x80
     bx lr
 }
 
+// NitroSDK's OS_GetProcMode, assembly in the SDK: the processor's mode, from the CPSR
 asm u32 OS_GetProcMode(void) {
     mrs r0, cpsr
     and r0, r0, #0x1f
     bx lr
 }
 
-// NitroSDK's OSi_SpinWaitCpuCycles: a loop of four CPU cycles per turn
+// NitroSDK's OSi_SpinWaitCpuCycles, assembly in the SDK: a loop of four CPU cycles per turn
 static asm void OSi_SpinWaitCpuCycles(u32 cycles) {
 @loop:
     subs r0, r0, #4
