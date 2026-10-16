@@ -117,3 +117,8 @@ lib/dwcutilui/src/dwc_util_oam_buf.c:
     complete
     .text       start:0x021bcbc8 end:0x021bccec
     .bss        start:0x021c41c8 end:0x021c41cc
+
+lib/dwcutilui/src/dwc_util_vram_alloc.c:
+    complete
+    .text       start:0x021bccec end:0x021bcef8
+    .bss        start:0x021c41cc end:0x021c41d0

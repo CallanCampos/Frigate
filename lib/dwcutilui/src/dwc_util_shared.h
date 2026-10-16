@@ -10,6 +10,7 @@
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
+#include "dwc_util_vram_alloc.h"
 #include "nitro/gx.h"
 #include "struct_decls.h"
 
@@ -33,9 +34,5 @@ void func_ov182_021bd268(int list, DWCUtilTask *task);
 void func_ov182_021bd280(int list, DWCUtilTask *task);
 // Runs the list's tasks: list 1 is the VBlank's
 void func_ov182_021bd19c(int list);
-
-// The OBJ characters under the text canvases, in the same later files
-void *func_ov182_021bcdbc(int screen, int size, s16 fromFront, u32 *charName);
-void func_ov182_021bcec4(void *block);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
