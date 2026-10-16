@@ -136,7 +136,7 @@ u32 DSProt_CheckFlashcart(void) {
     lockId = (u16)cart_key_create();
     func_0206eef0(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (((u8 *)func_0206eed8())[0x14] + 17)), 0);
+        DSProt_ReadCardRaw(page, address + (1 << (func_0206eed8()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32((u8 *)page, 0x200);
         func_0206fd24(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32((u8 *)page, 0x200);

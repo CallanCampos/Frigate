@@ -18,7 +18,6 @@ static const u8 SHA1_PADDING[12] = { 0x80 };
 
 static void sha1_block_masked(MATHSHA1Context *context);
 static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size);
-static u32 sha1_set_masked(u32 masked);
 static void hmac_generic(void *out, const void *data, u32 dataSize, const void *key, u32 keySize,
                          const MATHHashInfo *info);
 
@@ -61,7 +60,7 @@ static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size) {
 }
 
 // Chooses whether the block function clears words 6 and 14, returning the choice before
-static u32 sha1_set_masked(u32 masked) {
+u32 sha1_set_masked(u32 masked) {
     u32 old = sSHA1Masked;
 
     sSHA1Masked = masked;
