@@ -1,8 +1,9 @@
-# TwlSDK's DSi libraries, built apart from the game. So far the SSP JPEG encoder and decoder and their EXIF writer and
-# reader, linked into overlay 257 (the Xtransceiver). They take the game's compiler and flags: Thumb code at -O4,p
-# (-O4,s and -O2 differ), where dsi/1.1 to dsi/1.3p1 compile them alike and dsi/1.6 does not; -ipa file, without which
-# the files' statics are no longer addressed from one base; and -inline on,noauto, since -inline auto inlines small
-# static functions that the ROM keeps.
+# TwlSDK's DSi libraries, built apart from the game: SCFG and the DSi system calls in ARM9 main, the camera, DSP,
+# microphone, NWM, FATFS and sound and RTC extensions in the LTD autoload (ARM, file_flags below), and the SSP JPEG
+# encoder and decoder and their EXIF writer and reader, linked into overlay 257 (the Xtransceiver). The SSP files take
+# the game's compiler and flags: Thumb code at -O4,p (-O4,s and -O2 differ), where dsi/1.1 to dsi/1.3p1 compile them
+# alike and dsi/1.6 does not; -ipa file, without which the files' statics are no longer addressed from one base; and
+# -inline on,noauto, since -inline auto inlines small static functions that the ROM keeps.
 compiler = "dsi/1.1p1"
 flags = [
     "-O4,p",               # Optimize for speed

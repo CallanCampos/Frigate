@@ -20,24 +20,33 @@ every section.
   headers, `lib/<name>/src/` for the sources and private headers (`lib/spl/src/spl_internal.h`), and
   `lib/<name>/library.toml` for the library's compiler and flags, which `configure.py` and the probe read: `lib/spl/`
   (Nintendo's SPL particle library), `lib/dsprot/` (Nintendo's DS Protect, in overlays 165 and 337), `lib/nitro/`
-  (NitroSDK), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound) and `lib/twl/` (TwlSDK's DSi libraries in the LTD
-  autoload: the camera, the DSP and the new DMA and WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and
-  decoder with their EXIF writer and reader, linked into overlay 257 and built as Thumb with the game's compiler,
-  `-ipa file` and `-inline on,noauto`), `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under
-  DWC in overlay 11, Thumb with the game's compiler), `lib/dwcutil/` (the DWC utility, the Wi-Fi Connection settings
-  in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's screens and selectable objects, built with
-  the game's compiler and flags; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files,
-  built with the game's compiler and flags but `-O2,p`; the name is ours).
-  NitroSDK's first source is libcrypto's RC4 (`lib/nitro/src/crypto/rc4.c`, ARM, `dsi/1.1p1`), which the game links
-  last among its own code in ARM9 main. NitroSystem's sources (`lib/nnsys/src/fnd`, `gfd`, ...) are Thumb built with
-  CodeWarrior 2.0. A file built with other flags than the rest of its library is listed under `file_flags` in the
-  `library.toml`, each flag replacing the library's flag of the same option (NitroSystem's sound capture takes
-  `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names (see [Names](#names)). `include/stddef.h` and
-  `include/stdlib.h` declare the few C library names the code needs (`size_t`, `offsetof`, `abs`), which the MSL C
-  library linked into main defines. A library without sources needs no `library.toml`; its first source file adds
-  one with the compiler it was built with. A library's public headers keep its name as their directory, as in
-  `lib/nitro/include/nitro/os.h`, so code includes `"nitro/os.h"`. Every file is compiled with `include/` and every
-  `lib/*/include/` on its search path.
+  (NitroSDK: in ARM9 main its card, cartridge, file system, graphics, memory, NVRAM, OS, PXI, RTC, sound, SPI
+  (microphone, power and touch panel), STD and wireless libraries, its fixed-point math and libmath, and libcrypto's
+  RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
+  (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
+  microphone, NWM, FATFS and the sound and RTC extensions, beside the game's photo signature code, and the new DMA and
+  WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader, linked
+  into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
+  (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
+  code; the rest in overlays 11, 29, 189 and 260, mostly Thumb), `lib/msl/` (Metrowerks' MSL C library for NITRO, the
+  C library, fdlibm math and runtime that ARM9 main links after NitroSDK, ARM code built with `dsi/1.2`),
+  `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under DWC in overlay 11, Thumb with the game's
+  compiler), `lib/dpw/` (the Global Trade Station's and the Battle Subway's Wi-Fi library in overlay 189, ARM),
+  `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
+  Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's screens and
+  selectable objects, built with the game's compiler and flags; the name is ours) and `lib/irc/` (the infrared link,
+  overlay 31's last two files, built with the game's compiler and flags but `-O2,p`; the name is ours).
+  NitroSDK, TwlSDK and DWC are built with the game's compiler, `dsi/1.1p1`: NitroSDK as ARM code by default, with most
+  of its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the
+  LTD autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
+  `gfd`, ...) are Thumb built with CodeWarrior 2.0. A file built with other flags than the rest of its library is
+  listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
+  (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names
+  (see [Names](#names)). The C library's headers are MSL's, in `include/` (`string.h`, `stdio.h`, `math.h` and the
+  others, and `NMWException.h` for the runtime), and `lib/msl/src/` keeps MSL's private ones. A library without sources
+  needs no `library.toml`; its first source file adds one with the compiler it was built with. A library's public
+  headers keep its name as their directory, as in `lib/nitro/include/nitro/os.h`, so code includes `"nitro/os.h"`.
+  Every file is compiled with `include/` and every `lib/*/include/` on its search path.
 - `tools/decomp/source_files.py OVERLAY` finds the boundaries: it lists the embedded file names, the functions that
   refer to them, and how well each boundary between two functions keeps every section's data references in file
   order and the calls inside one file.
@@ -52,8 +61,9 @@ every section.
   and items, are generated from `data/constants/` (see [Constant lists](data.md#constant-lists)). The libraries'
   headers are in `lib/`, as `lib/nitro/include/nitro/`, `lib/nnsys/include/nnsys/`, `lib/spl/include/spl/`,
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
-  `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC),
-  `lib/dpw/include/dpw/` (the Global Trade Station's server library) and `lib/irc/include/irc/` (the infrared link).
+  `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),
+  `lib/dpw/include/dpw/` (the Global Trade Station's server library), `lib/poke_net/include/poke_net/` (the Global
+  Data Server client) and `lib/irc/include/irc/` (the infrared link).
   A header is named after the original file that owns its declarations, or after swan's header for it, such as
   `field/field_3dci.h`.
 - Put functions, data and callback tables used across source files or overlays in the owning file's header. Declare

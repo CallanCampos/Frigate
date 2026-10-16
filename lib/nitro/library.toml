@@ -1,5 +1,7 @@
-# Nintendo's NitroSDK. Its headers are in include/nitro; the only source so far is libcrypto's RC4 (src/crypto), which
-# the game links last among its own code in ARM9 main. It was built apart from the game, as ARM code.
+# Nintendo's NitroSDK, built apart from the game with the game's compiler. Its headers are in include/nitro. In ARM9
+# main: the card, cartridge, file system, graphics, memory, NVRAM, OS, PXI, RTC, sound, SPI, STD and wireless libraries,
+# libfx and libmath, which are Thumb (file_flags below), and the divider's context save (cp) and libcrypto's RC4, which
+# the game links last among its own code, ARM code like the default here; in overlay 181, the multiboot library (Thumb).
 compiler = "dsi/1.1p1"
 flags = [
     "-O4,p",               # Optimize for speed
