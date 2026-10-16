@@ -5182,6 +5182,7 @@ overlays/ov036 0x021d1120 sPlaceNameBGSetup
 overlays/ov036 0x021d176c WATERFALL_UP_HANDLERS
 overlays/ov036 0x021d22d0 FIELD_EFFECT_SCRIPT_ENTRIES
 overlays/ov036 0x021d234c SLOPE_SLIP_TILES
+overlays/ov036 0x021d236c WATER_CURRENT_FLOW_TILES
 overlays/ov036 0x021d5178 sMartWindows
 overlays/ov036 0x021d5194 sBPShopWindows
 overlays/ov036 0x021d51b0 sMoveTutorWindows

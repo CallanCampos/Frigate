@@ -588,6 +588,7 @@ src/ov036/field_slope_slip.c:
     .rodata     start:0x021d2380 end:0x021d23a0
 
 src/ov036/field_water_current.c:
+    complete
     .text       start:0x021c24ec end:0x021c27c0
     .rodata     start:0x021d23a0 end:0x021d23c8
 
