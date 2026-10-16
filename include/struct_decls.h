@@ -436,6 +436,7 @@ typedef struct LocalTvtKeyTouchSetup LocalTvtKeyTouchSetup;
 typedef struct LocalTvtMenu LocalTvtMenu;
 typedef struct LocalTvtMenuSetup LocalTvtMenuSetup;
 typedef struct LocalTvtMessage LocalTvtMessage;
+typedef struct LocalTvtMother LocalTvtMother;
 typedef struct LocalTvtNamePos LocalTvtNamePos;
 typedef struct LocalTvtObjectFiles LocalTvtObjectFiles;
 typedef struct LocalTvtParam LocalTvtParam;
