@@ -477,12 +477,16 @@ typedef enum {
 typedef enum {
     GX_BG_SCRBASE_0x0000 = 0,
     GX_BG_SCRBASE_0x6000 = 12,
+    GX_BG_SCRBASE_0x6800 = 13,
+    GX_BG_SCRBASE_0x7000 = 14,
+    GX_BG_SCRBASE_0x7800 = 15,
     GX_BG_SCRBASE_0xf800 = 31,
 } GXBGScrBase;
 
 typedef enum {
     GX_BG_CHARBASE_0x00000 = 0,
     GX_BG_CHARBASE_0x04000 = 1,
+    GX_BG_CHARBASE_0x08000 = 2,
     GX_BG_CHARBASE_0x10000 = 4,
     GX_BG_CHARBASE_0x3c000 = 15,
 } GXBGCharBase;

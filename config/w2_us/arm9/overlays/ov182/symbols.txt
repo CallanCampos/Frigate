@@ -1365,7 +1365,7 @@ data_ov182_021c0a40 kind:data(any) addr:0x021c0a80
 data_ov182_021c0aa4 kind:data(any) addr:0x021c0ae4
 data_ov182_021c0b02_w2_us kind:data(any) addr:0x021c0b02 ambiguous
 data_ov182_021c0b08 kind:data(any) addr:0x021c0b48
-data_ov182_021c0b6c kind:data(any) addr:0x021c0bac
+sNasUrl kind:data(any) addr:0x021c0bac
 data_ov182_021c0b8c kind:data(any) addr:0x021c0bcc
 data_ov182_021c0ba0 kind:data(any) addr:0x021c0be0
 data_ov182_021c0bb8 kind:data(any) addr:0x021c0bf8
@@ -1620,7 +1620,7 @@ data_ov182_021c407c kind:bss addr:0x021c40bc
 data_ov182_021c4080 kind:bss addr:0x021c40c0
 data_ov182_021c4084 kind:bss addr:0x021c40c4
 data_ov182_021c4088 kind:bss addr:0x021c40c8
-data_ov182_021c408c kind:bss addr:0x021c40cc
+sMain kind:bss addr:0x021c40cc
 data_ov182_021c40ac kind:bss addr:0x021c40ec
 data_ov182_021c40b0 kind:bss addr:0x021c40f0
 data_ov182_021c40b4 kind:bss addr:0x021c40f4

@@ -20,8 +20,13 @@ void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32
 void *func_ov182_021ae118(void *work, void *param, int arg1, int arg2);
 // The text flags of the utility's language
 u32 func_ov182_021ab7b4(void);
-// The utility's language
-u8 func_ov182_021ae018(void);
+
+// The utility's sound: its start and its end, around the main loop
+void func_ov182_021b8050(void);
+void func_ov182_021b80d4(void);
+
+// The update function of the utility's first screen
+void func_ov182_021ae574(void);
 
 extern void *data_ov182_021c40b8;
 
