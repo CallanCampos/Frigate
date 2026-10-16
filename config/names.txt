@@ -11252,6 +11252,7 @@ overlays/ov182 0x021bfb46 sPosIndex
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
+overlays/ov182 0x021c05a4 sTaskCounts
 overlays/ov182 0x021c05d0 sRecordType
 overlays/ov182 0x021c05d4 sNet
 overlays/ov182 0x021c05dc sSocConfig
@@ -11292,6 +11293,7 @@ overlays/ov182 0x021c41c0 sIrq
 overlays/ov182 0x021c41c8 sOamBuf
 overlays/ov182 0x021c41cc sVramScreens
 overlays/ov182 0x021c41d0 sBanks
+overlays/ov182 0x021c4204 sTaskLists
 overlays/ov184 0x0219f340 ErrorWindowScreen_Show
 overlays/ov185 0x0219ce80 PMSIData_Create
 overlays/ov185 0x0219ced4 PMSIData_Delete

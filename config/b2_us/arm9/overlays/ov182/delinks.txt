@@ -131,3 +131,9 @@ lib/dwcutilui/src/dwc_util_bank.c:
     complete
     .text       start:0x021bcf38 end:0x021bd0d4
     .bss        start:0x021c41d0 end:0x021c4204
+
+lib/dwcutilui/src/dwc_util_task.c:
+    complete
+    .text       start:0x021bd0d4 end:0x021bd2cc
+    .rodata     start:0x021c05a4 end:0x021c05a8
+    .bss        start:0x021c4204 end:0x021c4220

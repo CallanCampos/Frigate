@@ -1315,7 +1315,7 @@ sBgCharNames kind:data(any) addr:0x021c0590
 sBgSizes kind:data(any) addr:0x021c0594
 data_ov182_021c0596 kind:data(any) addr:0x021c0596
 data_ov182_021c059c kind:data(any) addr:0x021c059c
-data_ov182_021c05a4 kind:data(any) addr:0x021c05a4
+sTaskCounts kind:data(any) addr:0x021c05a4
 data_ov182_021c05c0 kind:data(any) addr:0x021c05c0
 sRecordType kind:data(any) addr:0x021c05d0
 sNet kind:data(any) addr:0x021c05d4
@@ -1681,4 +1681,4 @@ sIrq kind:bss addr:0x021c41c0
 sOamBuf kind:bss addr:0x021c41c8
 sVramScreens kind:bss addr:0x021c41cc
 sBanks kind:bss addr:0x021c41d0
-data_ov182_021c4204 kind:bss addr:0x021c4204
+sTaskLists kind:bss addr:0x021c4204
