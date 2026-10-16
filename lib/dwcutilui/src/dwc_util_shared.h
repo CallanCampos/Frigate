@@ -2,6 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
 
 #include "types.h"
+#include "dwc_util_heap.h"
 #include "nitro/gx.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
@@ -16,12 +17,10 @@ void func_ov182_021bbf7c(int kind);
 
 extern void *data_ov182_021c40b8;
 
-void *func_ov182_021bc4d8(int size, int align);
 GXOamAttr *func_ov182_021bb960(int screen, int resource);
 void *func_ov182_021bd200(int priority, void (*callback)(void *task), int arg, int period);
 void func_ov182_021bd280(int priority, void *task);
 void func_ov182_021bcc9c(GXOamAttr *oam);
-void func_ov182_021bc4f0(void *work);
 void func_ov182_021bb914(int screen, int resource, GXOamAttr *oam);
 
 // The utility's object and task helpers, in the same later files. A task's
