@@ -116,3 +116,7 @@ lib/dwc/src/gt2/gt2.c:
 lib/dwc/src/gamespy/darray.c:
     complete
     .text       start:0x021714cc end:0x02171818
+
+lib/dwc/src/gamespy/hashtable.c:
+    complete
+    .text       start:0x02171818 end:0x021719fc
