@@ -5255,7 +5255,7 @@ data_ov036_021cfc84 kind:data(any) addr:0x021cfc84
 data_ov036_021cfc8c kind:data(any) addr:0x021cfc8c
 PLAYER_EXSTATE_CHANGE_VTABLE_CYCLING kind:data(any) addr:0x021cfc94
 data_ov036_021cfc9c kind:data(any) addr:0x021cfc9c
-data_ov036_021cfca4 kind:data(any) addr:0x021cfca4
+PLAYER_NPC_TEMPLATE kind:data(any) addr:0x021cfca4
 PLAYER_EXSTATE_CHANGE_VTABLES kind:data(any) addr:0x021cfcc8
 FIELD_PLAYER_GRID_CONST_MOVE_FUNCS kind:data(any) addr:0x021cfcf0
 TILE_CLASS_SFX_LAY0 kind:data(any) addr:0x021cfcf8
