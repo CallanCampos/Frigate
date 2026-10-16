@@ -1839,18 +1839,22 @@ lib/nitro/src/card/card_common.c:
     .bss        start:0x0214b41c end:0x0214b9c0
 
 lib/nitro/src/card/card_request.c:
+    complete
     .text       start:0x0206f310 end:0x0206f40c
 
 lib/nitro/src/card/card_backup.c:
+    complete
     .text       start:0x0206f40c end:0x0206f8e0
     .bss        start:0x0214b9c0 end:0x0214bac0
 
 lib/nitro/src/card/card_rom.c:
+    complete
     .text       start:0x0206f8e0 end:0x0206ff04
     .data       start:0x0209b540 end:0x0209b548
     .bss        start:0x0214bac0 end:0x0214bd80
 
 lib/nitro/src/fs/fs_archive.c:
+    complete
     .text       start:0x020700d4 end:0x02070ca8
     .data       start:0x0209b548 end:0x0209b54c
     .bss        start:0x0214bd8c end:0x0214bfa0
@@ -1859,6 +1863,7 @@ lib/nitro/src/fs/fs_file.c:
     .text       start:0x02070ca8 end:0x02070ee8
 
 lib/nitro/src/fs/fs_overlay.c:
+    complete
     .text       start:0x02070ee8 end:0x02071338
     .rodata     start:0x02094574 end:0x020945b4
     .data       start:0x0209b54c end:0x0209b550
@@ -1875,15 +1880,18 @@ lib/nitro/src/fs/fs_memfile.c:
     .bss        start:0x0214bfc0 end:0x0214c020
 
 lib/nitro/src/fs/fs_rom.c:
+    complete
     .text       start:0x0207215c end:0x020723bc
     .data       start:0x0209b558 end:0x0209b564
     .bss        start:0x0214c020 end:0x0214c084
 
 lib/nitro/src/fs/fs_api.c:
+    complete
     .text       start:0x020723bc end:0x020723e4
     .bss        start:0x0214c084 end:0x0214c08c
 
 lib/nitro/src/gx/gx.c:
+    complete
     .text       start:0x02074744 end:0x020749f8
     .data       start:0x0209b564 end:0x0209b56c
     .bss        start:0x0214c08c end:0x0214c090
@@ -1892,43 +1900,55 @@ lib/nitro/src/gx/g2.c:
     .text       start:0x020749f8 end:0x02074b40
 
 lib/nitro/src/gx/g3_util.c:
+    complete
     .text       start:0x02074b40 end:0x02074c40
 
 lib/nitro/src/gx/g3imm.c:
+    complete
     .text       start:0x02074c40 end:0x02074cc8
 
 lib/nitro/src/gx/g3x.c:
+    complete
     .text       start:0x02074cc8 end:0x0207512c
 
 lib/nitro/src/gx/gx_bgcnt.c:
+    complete
     .text       start:0x0207512c end:0x020754e4
 
 lib/nitro/src/gx/gx_load2d.c:
+    complete
     .text       start:0x020754e4 end:0x02076164
     .bss        start:0x0214c090 end:0x0214c0ac
 
 lib/nitro/src/gx/gx_load3d.c:
+    complete
     .text       start:0x02076164 end:0x020764e8
     .rodata     start:0x020987ec end:0x0209885c
     .bss        start:0x0214c0ac end:0x0214c0cc
 
 lib/nitro/src/gx/gx_vramcnt.c:
+    complete
     .text       start:0x020764e8 end:0x02076f60
 
 lib/nitro/src/gx/gxasm.c:
+    complete
     .text       start:0x02076f60 end:0x02076fa0
 
 lib/nitro/src/gx/gx_state.c:
+    complete
     .text       start:0x02076fa0 end:0x02076fd4
     .bss        start:0x0214c0cc end:0x0214c0e8
 
 lib/nitro/src/mi/mi_sharedWram.c:
+    complete
     .text       start:0x0207802c end:0x0207804c
 
 lib/nitro/src/mi/mi_wram.c:
+    complete
     .text       start:0x0207804c end:0x02078058
 
 lib/nitro/src/mi/mi_dma.c:
+    complete
     .text       start:0x02078058 end:0x02078454
 
 lib/nitro/src/mi/mi_dma_gxcommand.c:
@@ -1936,18 +1956,23 @@ lib/nitro/src/mi/mi_dma_gxcommand.c:
     .bss        start:0x0214c0ec end:0x0214c120
 
 lib/nitro/src/mi/mi_memory.c:
+    complete
     .text       start:0x02078650 end:0x020790c0
 
 lib/nitro/src/mi/mi_swap.c:
+    complete
     .text       start:0x020790c0 end:0x020790c8
 
 lib/nitro/src/mi/mi_uncompress.c:
+    complete
     .text       start:0x020790c8 end:0x020791a8
 
 lib/nitro/src/mi/mi_dma_card.c:
+    complete
     .text       start:0x020791a8 end:0x020791fc
 
 lib/nitro/src/mi/mi_init.c:
+    complete
     .text       start:0x020791fc end:0x02079228
 
 lib/nitro/src/nvram/nvram.c:
@@ -1955,9 +1980,11 @@ lib/nitro/src/nvram/nvram.c:
     .bss        start:0x0214c120 end:0x0214c1b8
 
 lib/nitro/src/os/os_irqHandler.c:
+    complete
     .text       start:0x02079bdc end:0x02079c50
 
 lib/nitro/src/os/os_irqTable.c:
+    complete
     .text       start:0x02079c50 end:0x02079d3c
     .data       start:0x0209b734 end:0x0209b74c
     .bss        start:0x0214c1b8 end:0x0214c248
@@ -1966,6 +1993,7 @@ lib/nitro/src/os/os_interrupt.c:
     .text       start:0x02079d3c end:0x02079f30
 
 lib/nitro/src/os/os_reset_pxi.c:
+    complete
     .text       start:0x02079f30 end:0x02079f88
     .bss        start:0x0214c248 end:0x0214c24c
 
@@ -1974,6 +2002,7 @@ lib/nitro/src/os/os_spinLock.c:
     .bss        start:0x0214c24c end:0x0214c250
 
 lib/nitro/src/os/os_printf.c:
+    complete
     .text       start:0x0207a2bc end:0x0207a310
 
 lib/nitro/src/os/os_thread.c:
@@ -1981,24 +2010,30 @@ lib/nitro/src/os/os_thread.c:
     .bss        start:0x0214c250 end:0x0214c4c4
 
 lib/nitro/src/os/os_context.c:
+    complete
     .text       start:0x0207ab30 end:0x0207ac50
 
 lib/nitro/src/os/os_emulator.c:
+    complete
     .text       start:0x0207ac50 end:0x0207acf0
     .rodata     start:0x02098884 end:0x02098898
     .data       start:0x0209b74c end:0x0209b754
     .bss        start:0x0214c4c4 end:0x0214c4e4
 
 lib/nitro/src/os/os_message.c:
+    complete
     .text       start:0x0207acf0 end:0x0207ae78
 
 lib/nitro/src/os/os_mutex.c:
+    complete
     .text       start:0x0207ae78 end:0x0207b06c
 
 lib/nitro/src/os/os_cache.c:
+    complete
     .text       start:0x0207b06c end:0x0207b130
 
 lib/nitro/src/os/os_init.c:
+    complete
     .text       start:0x0207b130 end:0x0207b1b8
 
 lib/nitro/src/os/os_arena.c:
@@ -2006,66 +2041,83 @@ lib/nitro/src/os/os_arena.c:
     .bss        start:0x0214c4e4 end:0x0214c4ec
 
 lib/nitro/src/os/os_alloc.c:
+    complete
     .text       start:0x0207b494 end:0x0207b770
     .data       start:0x0209b754 end:0x0209b75c
     .bss        start:0x0214c4ec end:0x0214c510
 
 lib/nitro/src/os/os_address_check.c:
+    complete
     .text       start:0x0207b770 end:0x0207b7c8
 
 lib/nitro/src/os/os_tcm.c:
+    complete
     .text       start:0x0207b7c8 end:0x0207b7dc
 
 lib/nitro/src/os/os_protectionUnit.c:
+    complete
     .text       start:0x0207b7dc end:0x0207b7fc
 
 lib/nitro/src/os/os_protectionRegion.c:
+    complete
     .text       start:0x0207b7fc end:0x0207b8c0
     .data       start:0x0209b75c end:0x0209b79c
 
 lib/nitro/src/os/os_exception.c:
+    complete
     .text       start:0x0207b8c0 end:0x0207ba90
     .bss        start:0x0214c510 end:0x0214c5ac
 
 lib/nitro/src/os/os_timer.c:
+    complete
     .text       start:0x0207ba90 end:0x0207baa8
     .bss        start:0x0214c5ac end:0x0214c5b0
 
 lib/nitro/src/os/os_tick.c:
+    complete
     .text       start:0x0207baa8 end:0x0207bbbc
     .bss        start:0x0214c5b0 end:0x0214c5c0
 
 lib/nitro/src/os/os_alarm.c:
+    complete
     .text       start:0x0207bbbc end:0x0207be6c
     .bss        start:0x0214c5c0 end:0x0214c5cc
 
 lib/nitro/src/os/os_valarm.c:
+    complete
     .text       start:0x0207be6c end:0x0207c0fc
     .bss        start:0x0214c5cc end:0x0214c5e0
 
 lib/nitro/src/os/os_system.c:
+    complete
     .text       start:0x0207c0fc end:0x0207c23c
 
 lib/nitro/src/os/os_codecmode.c:
+    complete
     .text       start:0x0207c23c end:0x0207c274
     .bss        start:0x0214c5e0 end:0x0214c5e8
 
 lib/nitro/src/os/os_reset.c:
+    complete
     .text       start:0x0207c274 end:0x0207c368
     .bss        start:0x0214c5e8 end:0x0214c5ec
 
 lib/nitro/src/os/os_ownerInfo.c:
+    complete
     .text       start:0x0207c368 end:0x0207c3e8
     .rodata     start:0x02098898 end:0x020988b8
 
 lib/nitro/src/os/os_ownerInfoEx.c:
+    complete
     .text       start:0x0207c3e8 end:0x0207c520
 
 lib/nitro/src/os/os_vramExclusive.c:
+    complete
     .text       start:0x0207c520 end:0x0207c5a0
     .bss        start:0x0214c5ec end:0x0214c604
 
 lib/nitro/src/os/os_deliverArg.c:
+    complete
     .text       start:0x0207c5a0 end:0x0207c6fc
     .bss        start:0x0214c604 end:0x0214c618
 
@@ -2073,19 +2125,24 @@ lib/nitro/src/os/os_entropy.c:
     .text       start:0x0207c6fc end:0x0207c7a0
 
 lib/nitro/src/os/os_terminate_proc.c:
+    complete
     .text       start:0x0207c7a0 end:0x0207c820
     .bss        start:0x0214c618 end:0x0214c624
 
 lib/nitro/src/os/os_event.c:
+    complete
     .text       start:0x0207c820 end:0x0207c8b4
 
 lib/nitro/src/os/os_application_jump.c:
+    complete
     .text       start:0x0207c8b4 end:0x0207c978
 
 lib/nitro/src/pxi/pxi_init.c:
+    complete
     .text       start:0x0207c978 end:0x0207c980
 
 lib/nitro/src/pxi/pxi_fifo.c:
+    complete
     .text       start:0x0207c980 end:0x0207cbb4
     .bss        start:0x0214c624 end:0x0214c6a8
 
@@ -2094,24 +2151,30 @@ lib/nitro/src/rtc/rtc_api.c:
     .bss        start:0x0214c6a8 end:0x0214c6d0
 
 lib/nitro/src/rtc/rtc_internal.c:
+    complete
     .text       start:0x0207d090 end:0x0207d0e0
 
 lib/nitro/src/rtc/rtc_convert.c:
+    complete
     .text       start:0x0207d0e0 end:0x0207d32c
     .data       start:0x0209b79c end:0x0209b7cc
 
 lib/nitro/src/snd/snd_interface.c:
+    complete
     .text       start:0x0207d32c end:0x0207d69c
 
 lib/nitro/src/snd/nitro_snd_main.c:
+    complete
     .text       start:0x0207d69c end:0x0207d6e4
     .bss        start:0x0214c6d0 end:0x0214c740
 
 lib/nitro/src/snd/snd_command.c:
+    complete
     .text       start:0x0207d6e4 end:0x0207db60
     .bss        start:0x0214c740 end:0x0214e1c0
 
 lib/nitro/src/snd/snd_alarm.c:
+    complete
     .text       start:0x0207db60 end:0x0207dbe4
     .bss        start:0x0214e1c0 end:0x0214e220
 
@@ -2120,13 +2183,16 @@ lib/nitro/src/snd/snd_work.c:
     .bss        start:0x0214e220 end:0x0214e224
 
 lib/nitro/src/snd/snd_util.c:
+    complete
     .text       start:0x0207dd58 end:0x0207ddac
     .rodata     start:0x020988b8 end:0x02098c8c
 
 lib/nitro/src/snd/snd_bank.c:
+    complete
     .text       start:0x0207ddac end:0x0207dffc
 
 lib/nitro/src/spi/tp.c:
+    complete
     .text       start:0x0207dffc end:0x0207e788
     .bss        start:0x0214e224 end:0x0214e260
 
@@ -2135,6 +2201,7 @@ lib/nitro/src/spi/mic.c:
     .bss        start:0x0214e260 end:0x0214e280
 
 lib/nitro/src/spi/pm.c:
+    complete
     .text       start:0x0207eb50 end:0x0207f6f8
     .data       start:0x0209b7cc end:0x0209b7d4
     .bss        start:0x0214e280 end:0x0214e2c0
@@ -2150,6 +2217,7 @@ lib/nitro/src/std/std_sprintf.c:
     .text       start:0x0208009c end:0x02080784
 
 lib/nitro/src/wm/wm_system.c:
+    complete
     .text       start:0x02080784 end:0x02080ea8
     .bss        start:0x0214e2d8 end:0x0214ed80
 
@@ -2161,29 +2229,37 @@ lib/nitro/src/wm/wm_standard.c:
     .text       start:0x02081328 end:0x02081828
 
 lib/nitro/src/wm/wm_mp.c:
+    complete
     .text       start:0x02081828 end:0x02081adc
 
 lib/nitro/src/wm/wm_dcf.c:
+    complete
     .text       start:0x02081adc end:0x02081c04
 
 lib/nitro/src/wm/wm_ds.c:
+    complete
     .text       start:0x02081c04 end:0x02082434
 
 lib/nitro/src/wm/wm_ks.c:
+    complete
     .text       start:0x02082434 end:0x02082450
 
 lib/nitro/src/wm/wm_etc.c:
+    complete
     .text       start:0x02082450 end:0x02082610
     .bss        start:0x0214ed80 end:0x0214ee00
 
 lib/nitro/src/wm/wm_common.c:
+    complete
     .text       start:0x02082610 end:0x02082634
 
 lib/nitro/src/ctrdg/ctrdg.c:
+    complete
     .text       start:0x02082634 end:0x020827fc
     .bss        start:0x0214ee00 end:0x0214ee08
 
 lib/nitro/src/ctrdg/ctrdg_proc.c:
+    complete
     .text       start:0x020827fc end:0x02082824
 
 lib/twl/src/syscall/syscall_twl.c:
