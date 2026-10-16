@@ -1504,7 +1504,7 @@ void BtlvEffect_UpdateTexPaletteFade(BtlvTexPaletteFade *fade) {
         if (fade->wait == 0) {
             fade->wait = fade->waitFrames;
             for (i = 0; i < fade->count; i++) {
-                tex = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(fade->resources[i]));
+                tex = NNS_G3dGetTex(GFL_G3DResGetResData(fade->resources[i]));
                 size = tex->plttInfo.sizePltt << 3;
                 addr = NNS_GfdGetPlttKeyAddr(tex->plttInfo.vramKey);
                 BlendColors((u16 *)((u8 *)tex + tex->plttInfo.ofsPlttData), fade->palettes[i], size / sizeof(u16),

@@ -150,7 +150,7 @@ const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid) {
             return datap[i];
         }
         i++;
-        datap[i] = (const WMMpRecvData *)((const u8 *)datap[i - 1] + recvBuf->entrySize);
+        datap[i] = (const WMMpRecvData *)((u32)datap[i - 1] + recvBuf->entrySize);
     } while (i < recvBuf->count);
     return NULL;
 }

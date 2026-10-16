@@ -82,20 +82,14 @@ static void *DWC_Realloc(u32 name, void *ptr, u32 oldSize, u32 newSize) {
 
 static void *DWC_ReallocEx(u32 name, void *ptr, u32 oldSize, u32 newSize, int align) {
     void *newPtr = DWC_AllocEx(name, newSize, align);
-    u32 blockSize;
-    u32 copySize;
 
     if (newPtr == NULL) {
         return NULL;
     }
     if (ptr != NULL) {
-        blockSize = DWCi_GetMemSize(ptr);
-        copySize = newSize;
-        if (blockSize <= copySize) {
-            copySize = blockSize;
-        }
-        MI_CpuCopy8(ptr, newPtr, copySize);
-        DWC_Free(name, ptr, blockSize);
+        oldSize = DWCi_GetMemSize(ptr);
+        MI_CpuCopy8(ptr, newPtr, oldSize <= newSize ? oldSize : newSize);
+        DWC_Free(name, ptr, oldSize);
     }
     return newPtr;
 }

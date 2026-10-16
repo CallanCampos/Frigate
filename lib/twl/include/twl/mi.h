@@ -42,6 +42,10 @@ void MI_NDmaFillAsync(u32 ndmaNo, void *dest, u32 data, u32 size, MINDmaCallback
 void MI_NDmaCopy(u32 ndmaNo, const void *src, void *dest, u32 size);
 void MI_NDmaCopyAsync(u32 ndmaNo, const void *src, void *dest, u32 size, MINDmaCallback callback, void *arg);
 void MI_WaitNDma(u32 ndmaNo);
+// NitroSDK's MI_SendGXCommandAsync and MI_SendGXCommandAsyncFast for the new DMA channels, which NitroSystem G3D's
+// NNS_G3dGeSendDL uses for GX's channels above 3. The names are TwlSDK's as recalled, not shown by the code
+void MI_SendNDmaGXCommandAsync(u32 ndmaNo, const void *src, u32 length, MINDmaCallback callback, void *arg);
+void MI_SendNDmaGXCommandAsyncFast(u32 ndmaNo, const void *src, u32 length, MINDmaCallback callback, void *arg);
 
 // The banks of the shared WRAM B and C go from one processor to another by their slots. One byte per bank of WRAM B:
 // its master, and the slot it has in the master's memory. WRAM C's follow

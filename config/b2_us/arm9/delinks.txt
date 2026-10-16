@@ -1039,10 +1039,12 @@ lib/nnsys/src/g3d/sbc.c:
     .bss        start:0x02143c70 end:0x02146974
 
 lib/nnsys/src/g3d/gecom.c:
+    complete
     .text       start:0x02067b60 end:0x02067da4
     .bss        start:0x02146974 end:0x02146980
 
 lib/nnsys/src/g3d/util.c:
+    complete
     .text       start:0x02067da4 end:0x0206818c
 
 lib/nnsys/src/g3d/mem.c:
@@ -1050,12 +1052,15 @@ lib/nnsys/src/g3d/mem.c:
     .text       start:0x0206818c end:0x020681c0
 
 lib/nnsys/src/g3d/model.c:
+    complete
     .text       start:0x020681c0 end:0x02068458
 
 lib/nnsys/src/g3d/res_struct_accessor.c:
+    complete
     .text       start:0x02068458 end:0x0206868c
 
 lib/nnsys/src/g3d/res_struct_accessor_anm.c:
+    complete
     .text       start:0x0206868c end:0x02068764
 
 lib/nnsys/src/g3d/nsbca.c:
@@ -1063,18 +1068,22 @@ lib/nnsys/src/g3d/nsbca.c:
     .rodata     start:0x02094458 end:0x0209447c
 
 lib/nnsys/src/g3d/nsbma.c:
+    complete
     .text       start:0x0206970c end:0x02069a18
 
 lib/nnsys/src/g3d/nsbta.c:
     .text       start:0x02069a18 end:0x02069d28
 
 lib/nnsys/src/g3d/nsbtp.c:
+    complete
     .text       start:0x02069d28 end:0x02069ee4
 
 lib/nnsys/src/g3d/nsbva.c:
+    complete
     .text       start:0x02069ee4 end:0x02069f40
 
 lib/nnsys/src/g3d/basic.c:
+    complete
     .text       start:0x02069f40 end:0x02069fbc
 
 lib/nnsys/src/g3d/maya.c:
@@ -1082,13 +1091,16 @@ lib/nnsys/src/g3d/maya.c:
     .data       start:0x0209b4a0 end:0x0209b4c0
 
 lib/nnsys/src/g3d/si3d.c:
+    complete
     .text       start:0x0206a714 end:0x0206ac28
 
 lib/nnsys/src/g3d/3dsmax.c:
+    complete
     .text       start:0x0206ac28 end:0x0206b26c
     .data       start:0x0209b4c0 end:0x0209b4e0
 
 lib/nnsys/src/g3d/xsi.c:
+    complete
     .text       start:0x0206b26c end:0x0206b8d4
     .data       start:0x0209b4e0 end:0x0209b500
 
@@ -1778,10 +1790,12 @@ lib/dwc/src/base/dwc_init.c:
     .bss        start:0x02141974 end:0x0214197c
 
 lib/dwc/src/base/dwc_memfunc.c:
+    complete
     .text       start:0x020586a4 end:0x02058840
     .bss        start:0x0214197c end:0x02141984
 
 lib/dwc/src/wds/wds.c:
+    complete
     .text       start:0x02058840 end:0x02058eb0
     .rodata     start:0x020940d8 end:0x020940dc
     .bss        start:0x02141984 end:0x02141988
@@ -1799,6 +1813,7 @@ lib/dwc/src/ac/dwc_ac_connect.c:
     .text       start:0x020598b4 end:0x02059f04
 
 lib/dwc/src/ac/dwc_ac.c:
+    complete
     .text       start:0x02059f04 end:0x0205ac24
     .bss        start:0x02141988 end:0x0214199c
 
@@ -1876,6 +1891,7 @@ lib/nitro/src/fs/fs_archive.c:
     .bss        start:0x0214bd4c end:0x0214bf60
 
 lib/nitro/src/fs/fs_file.c:
+    complete
     .text       start:0x02070c7c end:0x02070ebc
 
 lib/nitro/src/fs/fs_overlay.c:
@@ -1886,11 +1902,13 @@ lib/nitro/src/fs/fs_overlay.c:
     .bss        start:0x0214bf60 end:0x0214bf80
 
 lib/nitro/src/fs/fs_command_default.c:
+    complete
     .text       start:0x0207130c end:0x02072014
     .rodata     start:0x02094588 end:0x020946bc
     .data       start:0x0209b510 end:0x0209b514
 
 lib/nitro/src/fs/fs_memfile.c:
+    complete
     .text       start:0x02072014 end:0x02072130
     .data       start:0x0209b514 end:0x0209b518
     .bss        start:0x0214bf80 end:0x0214bfe0
@@ -1913,6 +1931,7 @@ lib/nitro/src/gx/gx.c:
     .bss        start:0x0214c04c end:0x0214c050
 
 lib/nitro/src/gx/g2.c:
+    complete
     .text       start:0x020749cc end:0x02074b14
 
 lib/nitro/src/gx/g3_util.c:
@@ -1968,6 +1987,7 @@ lib/nitro/src/mi/mi_dma.c:
     .text       start:0x0207802c end:0x02078428
 
 lib/nitro/src/mi/mi_dma_gxcommand.c:
+    complete
     .text       start:0x02078428 end:0x02078624
     .bss        start:0x0214c0ac end:0x0214c0e0
 
@@ -1992,6 +2012,7 @@ lib/nitro/src/mi/mi_init.c:
     .text       start:0x020791d0 end:0x020791fc
 
 lib/nitro/src/nvram/nvram.c:
+    complete
     .text       start:0x020791fc end:0x02079bb0
     .bss        start:0x0214c0e0 end:0x0214c178
 
@@ -2139,6 +2160,7 @@ lib/nitro/src/os/os_deliverArg.c:
     .bss        start:0x0214c5c4 end:0x0214c5d8
 
 lib/nitro/src/os/os_entropy.c:
+    complete
     .text       start:0x0207c6d0 end:0x0207c774
 
 lib/nitro/src/os/os_terminate_proc.c:
@@ -2197,6 +2219,7 @@ lib/nitro/src/snd/snd_alarm.c:
     .bss        start:0x0214e180 end:0x0214e1e0
 
 lib/nitro/src/snd/snd_work.c:
+    complete
     .text       start:0x0207dbb8 end:0x0207dd2c
     .bss        start:0x0214e1e0 end:0x0214e1e4
 
@@ -2234,6 +2257,7 @@ lib/nitro/src/std/std_string.c:
     .text       start:0x0207f7a4 end:0x02080070
 
 lib/nitro/src/std/std_sprintf.c:
+    complete
     .text       start:0x02080070 end:0x02080758
 
 lib/nitro/src/wm/wm_system.c:
@@ -2242,10 +2266,12 @@ lib/nitro/src/wm/wm_system.c:
     .bss        start:0x0214e298 end:0x0214ed40
 
 lib/nitro/src/wm/wm_sync.c:
+    complete
     .text       start:0x02080e7c end:0x020812fc
     .data       start:0x0209b794 end:0x0209b798
 
 lib/nitro/src/wm/wm_standard.c:
+    complete
     .text       start:0x020812fc end:0x020817fc
 
 lib/nitro/src/wm/wm_mp.c:
@@ -2392,6 +2418,7 @@ lib/msl/src/string.c:
     .text       start:0x02085d9c end:0x020861ac
 
 lib/msl/src/strtold.c:
+    complete
     .text       start:0x020861ac end:0x0208715c
     .rodata     start:0x02098e60 end:0x02098e74
 
@@ -2417,6 +2444,7 @@ lib/msl/src/math_sun.c:
     .text       start:0x02088fb0 end:0x02088fdc
 
 lib/msl/src/math/e_pow.c:
+    complete
     .text       start:0x02088fdc end:0x0208a164
     .rodata     start:0x02098e74 end:0x02098ea4
 

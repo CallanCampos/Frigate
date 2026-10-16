@@ -66,13 +66,14 @@ static OSAlarm sStopAlarm;
 // The priority of what plays; the lower number wins
 static int sPriority = AUDIO_PRIORITY_IDLE;
 
-// Sends a command to the first process's audio component, which takes it as four words
+// Sends a command to the first process's audio component, which takes it as four words. The caller gives the words in
+// the DSP's order, their halves swapped
 static inline void SendAudioCommand(DSPProcessContext *context, u32 command, u32 address, u32 words) {
     u32 message[4];
 
-    message[0] = DSPi_SwapHalves(command);
-    message[1] = DSPi_SwapHalves(address);
-    message[2] = DSPi_SwapHalves(words);
+    message[0] = command;
+    message[1] = address;
+    message[2] = words;
     message[3] = 0;
     DSP_WriteProcessPipe(context, SHUTTER_PIPE_PORT, message, sizeof(message));
 }
@@ -139,7 +140,8 @@ static void func_027060b4(const void *src, u32 length, int mode, int priority) {
     sPriority = priority;
     DSP_SetPipeCallback(SHUTTER_PIPE_PORT, func_02705fac, NULL);
     sShutter.playing = TRUE;
-    SendAudioCommand(context, AUDIO_COMMAND_PLAY | mode, (u32)src, length / 2);
+    SendAudioCommand(context, DSPi_SwapHalves(AUDIO_COMMAND_PLAY | mode), DSPi_SwapHalves((u32)src),
+                     DSPi_SwapHalves(length / 2));
 }
 
 // Plays the WAV file at src, if it fits the I2S's sample rate
@@ -180,7 +182,7 @@ void DSP_StopSoundCore(void) {
     DSPProcessContext *context = DSP_FindProcess(NULL);
 
     if (context != NULL && sShutter.playing) {
-        SendAudioCommand(context, AUDIO_COMMAND_STOP, 0, 0);
+        SendAudioCommand(context, DSPi_SwapHalves(AUDIO_COMMAND_STOP), 0, 0);
     }
 }
 

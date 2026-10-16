@@ -63,6 +63,9 @@ enum {
 // The states that leave a hexadecimal number
 #define HEX_NUMBER_STATES (HEX_LEADING_ZEROS | HEX_INT_DIGITS | HEX_FRACTION_DIGITS | HEX_EXP_ZEROS | HEX_EXP_DIGITS)
 
+// Reads the next character of the text and counts it
+#define fetch() (count++, (*ReadProc)(ReadProcArg, 0, MSL_GET))
+
 // Reads at most max_width characters of the number at the start of the text, after its white space. *chars_scanned is
 // how many of them were the number (0 when there was none) and the character after it is given back. *overflow is set
 // when the value is out of the range of a double: the result is then infinity, or 0 for a negative exponent, and a
@@ -81,9 +84,10 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
     int dec_exp = 0;
     int sign_detected = 0;
     unsigned char *cp;
-    int hex_exp = 0;
+    unsigned long hex_exp = 0;
     int hex_exp_negative = 0;
     unsigned int int_digits = 0;
+    unsigned int max_digits; // the digits that a hexadecimal number keeps, set when one starts
     int nibble;
     unsigned char mant[8]; // the digits of a hexadecimal number, two to a byte from the top
     int failed;
@@ -92,8 +96,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
     double result;
 
     *overflow = 0;
-    count++;
-    c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+    c = fetch();
 
     while (count <= max_width && c != EOF && !(scan_state & (SCAN_FINISHED | SCAN_FAILED))) {
         switch (scan_state) {
@@ -107,18 +110,15 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
             case '-':
                 negative = 1;
             case '+':
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 sign_detected = 1;
                 break;
             case 'I':
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 scan_state = SCAN_INFINITY;
                 break;
             case 'N':
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 scan_state = SCAN_NAN;
                 break;
             default:
@@ -133,8 +133,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
 
             while (i < 8 && inf_string[i] == toupper(c)) {
                 i++;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
             }
             if (i == 3 || i == 8) {
                 if (negative) {
@@ -157,8 +156,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
 
             while (i < 4 && nan_string[i] == toupper(c)) {
                 i++;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
             }
             if (i == 3 || i == 4) {
                 if (i == 4) {
@@ -171,8 +169,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
 #endif
                         nan_arg[j] = c;
                         j++;
-                        count++;
-                        c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                        c = fetch();
                     }
                     if (c != ')') {
                         scan_state = SCAN_FAILED;
@@ -196,8 +193,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
         case SCAN_CHECK_ZERO:
             if (c == '.') {
                 scan_state = SCAN_FRACTION_START;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
             }
             if (!isdigit(c)) {
@@ -205,8 +201,8 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 break;
             }
             if (c == '0') {
-                count++;
-                if (toupper(c = (*ReadProc)(ReadProcArg, 0, MSL_GET)) == 'X') {
+                c = fetch();
+                if (toupper(c) == 'X') {
                     scan_state = SCAN_HEX;
                     hex_state = HEX_START;
                 } else {
@@ -222,8 +218,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 scan_state = SCAN_INT_DIGITS;
                 break;
             }
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_INT_DIGITS:
@@ -233,13 +228,15 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     break;
                 }
                 scan_state = SCAN_FRACTION_DIGITS;
-            } else if (d.sig.length < MAX_SIG_DIG) {
+                c = fetch();
+                break;
+            }
+            if (d.sig.length < MAX_SIG_DIG) {
                 d.sig.text[d.sig.length++] = c;
             } else {
                 dec_exp++;
             }
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_FRACTION_START:
@@ -261,8 +258,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 }
                 dec_exp--;
             }
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_SIG_END:
@@ -271,17 +267,14 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 break;
             }
             scan_state = SCAN_EXP_SIGN;
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_EXP_SIGN:
             if (c == '+') {
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
             } else if (c == '-') {
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 exp_negative = 1;
             }
             scan_state = SCAN_EXP_START;
@@ -297,8 +290,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 break;
             }
             scan_state = SCAN_EXP_ZEROS;
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_EXP_ZEROS:
@@ -306,8 +298,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 scan_state = SCAN_EXP_DIGITS;
                 break;
             }
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_EXP_DIGITS:
@@ -319,8 +310,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
             if (exp > MAX_EXP) {
                 *overflow = 1;
             }
-            count++;
-            c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+            c = fetch();
             break;
 
         case SCAN_HEX:
@@ -329,10 +319,10 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                 cp = mant;
                 int_digits = 0;
                 memset(cp, 0, 8);
+                max_digits = MAX_HEX_DIG;
                 nibble = 0;
                 hex_state = HEX_LEADING_ZEROS;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
 
             case HEX_LEADING_ZEROS:
@@ -340,8 +330,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     hex_state = HEX_INT_DIGITS;
                     break;
                 }
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
 
             case HEX_INT_DIGITS:
@@ -351,7 +340,10 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                         break;
                     }
                     hex_state = HEX_FRACTION_DIGITS;
-                } else if (int_digits < MAX_HEX_DIG) {
+                    c = fetch();
+                    break;
+                }
+                if (int_digits < max_digits) {
                     unsigned char byte;
                     unsigned char digit;
 
@@ -359,16 +351,16 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     byte = cp[nibble / 2];
                     c = toupper(c);
                     digit = c >= 'A' ? c - 'A' + 10 : c - '0';
-                    if (nibble % 2 == 0) {
-                        byte |= digit << 4;
-                    } else {
+                    if (nibble % 2 != 0) {
                         byte |= digit;
+                    } else {
+                        byte |= digit << 4;
                     }
-                    cp[nibble / 2] = byte;
-                    nibble++;
+                    cp[nibble++ / 2] = byte;
+                    c = fetch();
+                } else {
+                    c = fetch();
                 }
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
                 break;
 
             case HEX_FRACTION_DIGITS:
@@ -381,7 +373,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
 #ifdef BUGFIX
                 if (nibble < MAX_HEX_DIG) {
 #else
-                if (int_digits < MAX_HEX_DIG) {
+                if (int_digits < max_digits) {
 #endif
                     unsigned char byte;
                     unsigned char digit;
@@ -389,16 +381,16 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     byte = cp[nibble / 2];
                     c = toupper(c);
                     digit = c >= 'A' ? c - 'A' + 10 : c - '0';
-                    if (nibble % 2 == 0) {
-                        byte |= digit << 4;
-                    } else {
+                    if (nibble % 2 != 0) {
                         byte |= digit;
+                    } else {
+                        byte |= digit << 4;
                     }
-                    cp[nibble / 2] = byte;
-                    nibble++;
+                    cp[nibble++ / 2] = byte;
+                    c = fetch();
+                } else {
+                    c = fetch();
                 }
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
                 break;
 
             case HEX_EXP_CHAR:
@@ -407,8 +399,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     break;
                 }
                 hex_state = HEX_EXP_SIGN;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
 
             case HEX_EXP_SIGN:
@@ -419,8 +410,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     count--;
                 }
                 hex_state = HEX_EXP_START;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
 
             case HEX_EXP_START:
@@ -433,8 +423,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     break;
                 }
                 hex_state = HEX_EXP_ZEROS;
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
 
             case HEX_EXP_ZEROS:
@@ -442,8 +431,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
                     hex_state = HEX_EXP_DIGITS;
                     break;
                 }
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
 
             case HEX_EXP_DIGITS:
@@ -461,8 +449,7 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
 #endif
                     *overflow = 1;
                 }
-                count++;
-                c = (*ReadProc)(ReadProcArg, 0, MSL_GET);
+                c = fetch();
                 break;
             }
             break;
@@ -524,14 +511,13 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
         return result;
     } else {
         double hex_value;
-        unsigned char *dbl = (unsigned char *)&hex_value;
         int shift;
         int carry;
         unsigned i;
         unsigned j;
         unsigned k;
-        unsigned bin_exp;
         int n;
+        unsigned char *dbl = (unsigned char *)&hex_value;
 
         if (hex_exp_negative) {
             hex_exp = -hex_exp;
@@ -564,13 +550,15 @@ double __strtold(int max_width, int (*ReadProc)(void *, int, int), void *ReadPro
             dbl[k / 8] |= byte >> (k % 8);
             dbl[(k + 8) / 8] |= byte << (8 - k % 8);
         }
-        bin_exp = exp + 0x3FF + hex_exp;
-        if (bin_exp & ~0x7FF) {
+        hex_exp += exp + 0x3FF;
+        if (hex_exp & ~0x7FF) {
             *overflow = 1;
             return 0.0;
         }
-        dbl[0] |= (bin_exp >> 4) & 0x7F;
-        dbl[1] |= bin_exp << 4;
+        // The 11 bits of the exponent follow the sign: shifted to the top of the word, their high 7 go down to the
+        // first byte and their low 4 to the top of the second
+        dbl[0] |= (hex_exp << 21) >> 25;
+        dbl[1] |= (hex_exp << 21) >> 17;
         if (negative) {
             dbl[0] |= 0x80;
         }

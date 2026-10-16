@@ -6,12 +6,12 @@
 
 // NitroSDK's OS_GetLowEntropyData
 void OS_GetLowEntropyData(u32 buffer[8]) {
-    OSSystemWork *work = (OSSystemWork *)HW_MAIN_MEM_SHARED_WORK;
-    NVRAMConfig *config = (NVRAMConfig *)work->nvramUserInfo;
+    const OSSystemWork *work = OS_GetSystemWork();
+    const u8 *macAddress = ((const NVRAMConfig *)work->nvramUserInfo)->macAddress;
 
     buffer[0] = (GX_GetVCount() << 16) | OS_GetTickLo();
-    buffer[1] = (u32)OSi_TickCounter ^ (*(u16 *)&config->macAddress[4] << 16);
-    buffer[2] = *(u32 *)&config->macAddress[0] ^ (OSi_TickCounter >> 32) ^ work->vblankCount;
+    buffer[1] = (*(const u16 *)&macAddress[4] << 16) ^ (u32)OSi_TickCounter;
+    buffer[2] = (OSi_TickCounter >> 32) ^ *(const u32 *)macAddress ^ work->vblankCount;
     buffer[2] ^= reg_G3X_GXSTAT;
     buffer[3] = work->realTimeClock[0];
     buffer[4] = work->realTimeClock[1];

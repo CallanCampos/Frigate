@@ -171,7 +171,7 @@ BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info) {
     info->pendingId = 0;
     while (info->pendingId == 0) {
         seed = seed * 0x5D588B65 + 0x269EC3;
-        while (seed == 0 || (u16)seed == info->salt) {
+        while (seed == 0 || info->salt == (u16)seed) {
             seed = seed * 0x5D588B65 + 0x269EC3;
         }
         info->salt = seed;

@@ -298,6 +298,12 @@
 . 0x02067b54 reloc_addend 0xbc
 . 0x02067f98 reloc_addend 0x8
 . 0x02067f9c reloc_addend 0x4c
+. 0x020689a4 reloc_addend 1
+. 0x020689a8 reloc_addend 2
+. 0x020689ac reloc_addend 3
+. 0x02069700 reloc_addend 1
+. 0x02069704 reloc_addend 2
+. 0x02069708 reloc_addend 3
 . 0x0206a124 reloc_addend 0xc
 . 0x0206a128 reloc_addend 0x10
 . 0x0206a12c reloc_addend 0x14
@@ -535,6 +541,9 @@
 . 0x02094435 remove_symbol
 . 0x02094436 remove_symbol
 . 0x02094437 remove_symbol
+. 0x02094459 remove_symbol
+. 0x0209445a remove_symbol
+. 0x0209445b remove_symbol
 . 0x020947fc remove_symbol
 . 0x0209497c remove_symbol
 . 0x02094a3c remove_symbol

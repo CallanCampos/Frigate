@@ -550,6 +550,7 @@ typedef enum {
 } GXLightId;
 
 // Geometry commands, as NitroSystem buffers them
+#define G3OP_NOP 0x00
 #define G3OP_MTX_MODE 0x10
 #define G3OP_MTX_PUSH 0x11
 #define G3OP_MTX_POP 0x12
@@ -569,6 +570,9 @@ typedef enum {
 #define G3OP_BEGIN 0x40
 #define G3OP_END 0x41
 #define G3OP_BOX_TEST 0x70
+
+// Four commands packed into one word, the first in the low byte, for a buffer whose arguments follow
+#define GX_PACK_OP(op1, op2, op3, op4) ((u32)((op1) | ((op2) << 8) | ((op3) << 16) | ((op4) << 24)))
 
 typedef enum {
     GX_CULL_ALL,
@@ -638,10 +642,15 @@ typedef enum {
 } GXTexPlttColor0;
 
 #define REG_G3_POLYGON_ATTR_LE_SHIFT 0
+#define REG_G3_POLYGON_ATTR_LE_MASK 0x0000000f
 #define REG_G3_POLYGON_ATTR_PM_SHIFT 4
+#define REG_G3_POLYGON_ATTR_PM_MASK 0x00000030
 #define REG_G3_POLYGON_ATTR_BK_SHIFT 6
+#define REG_G3_POLYGON_ATTR_BK_MASK 0x000000c0
 #define REG_G3_POLYGON_ATTR_ALPHA_SHIFT 16
+#define REG_G3_POLYGON_ATTR_ALPHA_MASK 0x001f0000
 #define REG_G3_POLYGON_ATTR_ID_SHIFT 24
+#define REG_G3_POLYGON_ATTR_ID_MASK 0x3f000000
 
 #define REG_G3_TEXIMAGE_PARAM_RS_SHIFT 16
 #define REG_G3_TEXIMAGE_PARAM_FS_SHIFT 18

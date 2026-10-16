@@ -258,7 +258,7 @@ int WM_EndParent(WMCallbackFunc callback) {
 }
 
 // Scans the channels of the list for parents. The scan type is 0 to 3, 2 and 3 matching the SSID
-int WM_StartScanEx(WMCallbackFunc callback, WMScanExParam *param) {
+int WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param) {
     WmStartScanExCommand cmd;
     int result = WMi_CheckStateEx(3, WM_STATE_IDLE, WM_STATE_CLASS1, WM_STATE_SCAN);
 

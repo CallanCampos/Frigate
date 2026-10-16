@@ -5,6 +5,9 @@
 // 3dsmax.c and xsi.c. The file's name is a guess from the tables. The two tables of three come out in the reverse of
 // their declaration order
 
-NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3] = { func_02069f94, func_0206a044, NNSi_G3dGetJointScaleSi3d };
-NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3] = { func_02069f40, func_02069fbc, func_0206a714 };
-NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4] = { func_0206a5cc, func_0206aa5c, func_0206b124, func_0206b74c };
+NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3] = { NNSi_G3dGetJointScaleBasic, NNSi_G3dGetJointScaleMaya,
+                                                      NNSi_G3dGetJointScaleSi3d };
+NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3] = { NNSi_G3dSendJointSRTBasic, NNSi_G3dSendJointSRTMaya,
+                                                      NNSi_G3dSendJointSRTSi3d };
+NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4] = { NNSi_G3dSendTexSRTMaya, NNSi_G3dSendTexSRTSi3d,
+                                                    NNSi_G3dSendTexSRT3dsMax, NNSi_G3dSendTexSRTXsi };

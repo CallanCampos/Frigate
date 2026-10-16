@@ -522,7 +522,7 @@ int WMi_StartParentEx(WMCallbackFunc callback, int enable);
 int WM_SetBeaconIndication(WMCallbackFunc callback, int enable);
 int WM_StartParent(WMCallbackFunc callback);
 int WM_EndParent(WMCallbackFunc callback);
-int WM_StartScanEx(WMCallbackFunc callback, WMScanExParam *param);
+int WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param);
 int WM_EndScan(WMCallbackFunc callback);
 // Like WM_StartMP, with five more parameters
 int WM_StartMPEx(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,

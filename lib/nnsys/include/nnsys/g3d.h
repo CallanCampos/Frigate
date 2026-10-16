@@ -9,8 +9,13 @@
 #include "nnsys/gfd.h"
 
 // NitroSystem's 3D graphics (NNS_G3d): its resource files, the render objects that draw a model, the animation
-// objects bound to them, and the global state of the geometry engine. Functions keep swan's names where it has them;
-// the NitroSystem name follows in a comment
+// objects bound to them, and the global state of the geometry engine. The functions of gecom.c, util.c, model.c and the
+// two res_struct_accessor files have NitroSystem's names as recalled, with swan's in a comment where it differs.
+// Elsewhere swan's names are kept (the NNS_G3D ones, such as kernel.c's and sbc.c's), with the NitroSystem name in a
+// comment where known, and the functions that swan leaves unnamed take NitroSystem's names as recalled: kernel.c's
+// binding functions, anm.c's NNSi_G3dAnmBlend ones, and the joint and texture matrix functions of basic.c, maya.c,
+// si3d.c, 3dsmax.c and xsi.c. The exception is the animation formats' init and calc functions, which follow swan's
+// NNS_G3DAnimationInit_TA (see there). The names that are not swan's are ours, in config/names.txt
 
 // A resource file and its blocks. The signatures are the files' first four characters
 #define NNS_G3D_SIGNATURE_BMD0 0x30444d42
@@ -35,13 +40,26 @@ typedef struct {
     u32 size;
 } NNSG3dResDataBlockHeader;
 
-// A dictionary: a Patricia tree of names, then each entry's data of sizeUnit bytes
+// A node of a dictionary's Patricia tree, which follows the dictionary's header (below): the bit of a name that the
+// node tests, the nodes that a 0 and a 1 at that bit lead to, and the entry that the node stands for. The first node is
+// the root, whose first child is the top of the tree, or 0 for an empty dictionary. A search follows the children for
+// as long as each node tests a lower bit than the one before it, and the node it stops at has the one entry that the
+// name can be
+typedef struct {
+    u8 refBit;
+    u8 idxChild[2];
+    u8 idxEntry;
+} NNSG3dResDictTreeNode;
+
+// A dictionary: a Patricia tree of names, then each entry's data of sizeUnit bytes. The tree's nodes follow the header,
+// as many as there are entries and the root, so every block that holds a dictionary ends with it
 typedef struct {
     u8 revision;
     u8 numEntry;
     u16 sizeDictBlk;
     u16 dummy_;
     u16 ofsEntry;
+    NNSG3dResDictTreeNode node[1];
 } NNSG3dResDict;
 
 typedef struct {
@@ -313,6 +331,12 @@ static inline NNSG3dResShpData *NNS_G3dGetShpDataByIdx(const NNSG3dResShp *shp, 
     return NULL;
 }
 
+// The animations block of a file: its animations by name, each at an offset from the block
+typedef struct {
+    NNSG3dResDataBlockHeader header;
+    NNSG3dResDict dict;
+} NNSG3dResAnmSet;
+
 // The start of every animation
 typedef struct {
     u8 category0;
@@ -360,8 +384,116 @@ typedef struct {
     u16 category1;
 } NNSG3dResAnmHeader;
 
-// A joint animation. Each joint's tag, at ofsTag[joint], is a word of NNS_G3D_JNTANM_SRTINFO_* flags followed by the
-// data of each component that isn't constant
+// A material color animation (BMA0): a dictionary of the data of each material it animates. A material's data has a
+// word for each value it animates, its diffuse, ambient, specular and emission colors and its polygon alpha, which
+// says how the values at the frames are kept (nsbma.c). With CONST the word's low half is the value itself. Otherwise
+// it is the offset of an array of them from the animation, with a value for every frame, or with a step of two or
+// four for every second or fourth, and the frames between are made from the stored ones up to LAST_INTERP, the last
+// frame that is. A color is a GXRgb (RGB555) and the alpha a byte
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u16 dummy_;
+    NNSG3dResDict dict;
+} NNSG3dResMatCAnm;
+
+typedef struct {
+    u32 diffuse;
+    u32 ambient;
+    u32 specular;
+    u32 emission;
+    u32 polygonAlpha;
+} NNSG3dResMatCAnmData;
+
+#define NNS_G3D_MATCANM_ELEM_CONST 0x20000000
+#define NNS_G3D_MATCANM_ELEM_STEP_1 0x00000000
+#define NNS_G3D_MATCANM_ELEM_STEP_2 0x40000000
+#define NNS_G3D_MATCANM_ELEM_STEP_4 0x80000000
+#define NNS_G3D_MATCANM_ELEM_STEP_MASK 0xc0000000
+#define NNS_G3D_MATCANM_ELEM_LAST_INTERP_MASK 0x1fff0000
+#define NNS_G3D_MATCANM_ELEM_LAST_INTERP_SHIFT 16
+#define NNS_G3D_MATCANM_ELEM_OFFSET_MASK 0x0000ffff
+
+// A texture SRT animation (BTA0): a dictionary of the data of each material it animates. A material's data says how
+// the values of the parts of its texture matrix are kept (nsbta.c): the scale in S and T, the rotation, and the
+// translation in S and T, each by an info word and a second word. As for the colors of a BMA0, the info says whether
+// the values are constant, or have a step of two or four with the last frame that is interpolated, here in its low
+// half, and FX16 says that they are fx16 rather than fx32. The second word is the value itself if CONST is set, or the
+// offset of the values from the animation. A rotation is its sine and cosine, two fx16 that make a word, with the
+// cosine in the high half
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u16 dummy_;
+    NNSG3dResDict dict;
+} NNSG3dResTexSrtAnm;
+
+typedef struct {
+    u32 info;
+    u32 offset;
+} NNSG3dResTexSrtAnmElem;
+
+typedef struct {
+    NNSG3dResTexSrtAnmElem scaleS;
+    NNSG3dResTexSrtAnmElem scaleT;
+    NNSG3dResTexSrtAnmElem rot;
+    NNSG3dResTexSrtAnmElem transS;
+    NNSG3dResTexSrtAnmElem transT;
+} NNSG3dResTexSrtAnmData;
+
+#define NNS_G3D_SRTANM_ELEM_CONST 0x20000000
+#define NNS_G3D_SRTANM_ELEM_FX16 0x10000000
+#define NNS_G3D_SRTANM_ELEM_STEP_1 0x00000000
+#define NNS_G3D_SRTANM_ELEM_STEP_2 0x40000000
+#define NNS_G3D_SRTANM_ELEM_STEP_4 0x80000000
+#define NNS_G3D_SRTANM_ELEM_STEP_MASK 0xc0000000
+#define NNS_G3D_SRTANM_ELEM_LAST_INTERP_MASK 0x0000ffff
+
+// A rotation of zero as the word of its sine and cosine: a sine of zero and a cosine of one
+#define NNS_G3D_SRTANM_ROT_ZERO ((u32)FX16_ONE << 16)
+
+// A visibility animation (BVA0): a bit for each node at each frame, the bits of a frame being those of numNode nodes
+// after the bits of the frame before, and a set bit meaning the node shows
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u16 numNode;
+    u32 dummy_;
+    u32 visData[1];
+} NNSG3dResVisAnm;
+
+// A texture pattern animation (BTP0): the names of its textures and palettes, then a dictionary of the data for each
+// material it animates. A material's data says where its run of frame values is, in the animation, and how long it is:
+// the frame values give the texture and palette to show from a frame on (idPltt is 0xff for none). ratioDataFrame is
+// the number of frame values to a frame, in 1/4096ths, for finding the one at a frame without searching from the first
+typedef struct {
+    NNSG3dResAnmHeader header;
+    u16 numFrame;
+    u8 numTex;
+    u8 numPltt;
+    u16 ofsTexName;
+    u16 ofsPlttName;
+    NNSG3dResDict dict;
+} NNSG3dResTexPatAnm;
+
+typedef struct {
+    u16 numFV;
+    u16 flag;
+    fx16 ratioDataFrame;
+    u16 offset;
+} NNSG3dResTexPatAnmData;
+
+typedef struct {
+    u16 idxFrame;
+    u8 idTex;
+    u8 idPltt;
+} NNSG3dResTexPatAnmFV;
+
+// A joint animation. Each joint's tag, at ofsTag[joint], is a word of NNS_G3D_JNTANM_SRTINFO_* flags followed by what
+// the flags say the animation has of the joint's translation, rotation and scale: for a component that is neither the
+// identity nor the node's own, either its value if it is constant, or a NNSG3dJntAnmTInfo that says where its values
+// are. The constant of a rotation is an index of the rotation tables (ofsRot3 and ofsRot5, offsets from the animation),
+// and that of a scale component is the scale and its inverse
 typedef struct {
     NNSG3dResAnmHeader anmHeader;
     u16 numFrame;
@@ -372,14 +504,32 @@ typedef struct {
     u16 ofsTag[1];
 } NNSG3dResJntAnm;
 
+// The flag of a joint animation: INTERPOLATION blends the values of a frame with a fraction with those of the next
+// frame, and END_TO_START does so for the last frame too, with the first
+#define NNS_G3D_JNTANM_OPTION_INTERPOLATION 0x00000001
+#define NNS_G3D_JNTANM_OPTION_END_TO_START_INTERPOLATION 0x00000002
+
 #define NNS_G3D_JNTANM_SRTINFO_IDENTITY 0x00000001
 #define NNS_G3D_JNTANM_SRTINFO_IDENTITY_T 0x00000002
 #define NNS_G3D_JNTANM_SRTINFO_BASE_T 0x00000004
 #define NNS_G3D_JNTANM_SRTINFO_CONST_TX 0x00000008
 #define NNS_G3D_JNTANM_SRTINFO_CONST_TY 0x00000010
 #define NNS_G3D_JNTANM_SRTINFO_CONST_TZ 0x00000020
+#define NNS_G3D_JNTANM_SRTINFO_IDENTITY_R 0x00000040
+#define NNS_G3D_JNTANM_SRTINFO_BASE_R 0x00000080
+#define NNS_G3D_JNTANM_SRTINFO_CONST_R 0x00000100
+#define NNS_G3D_JNTANM_SRTINFO_IDENTITY_S 0x00000200
+#define NNS_G3D_JNTANM_SRTINFO_BASE_S 0x00000400
+#define NNS_G3D_JNTANM_SRTINFO_CONST_SX 0x00000800
+#define NNS_G3D_JNTANM_SRTINFO_CONST_SY 0x00001000
+#define NNS_G3D_JNTANM_SRTINFO_CONST_SZ 0x00002000
+#define NNS_G3D_JNTANM_SRTINFO_NODE_MASK 0xff000000
+#define NNS_G3D_JNTANM_SRTINFO_NODE_SHIFT 24
 
-// The first word of a translation component's data; the second is the offset of its values from the animation
+// Where the values of a component are, and how they are kept: TINFO_* flags and the offset of the values from the
+// animation. The values are for every frame, or with a step of two or four for every second or fourth, and the frames
+// between are made from the stored ones up to LAST_INTERP, the last frame that is. A translation or scale component is
+// kept in fx16 (FX16ARR) or in fx32, a rotation as the indices (u16) of rotations
 #define NNS_G3D_JNTANM_TINFO_STEP_1 0x00000000
 #define NNS_G3D_JNTANM_TINFO_STEP_2 0x40000000
 #define NNS_G3D_JNTANM_TINFO_STEP_4 0x80000000
@@ -387,6 +537,16 @@ typedef struct {
 #define NNS_G3D_JNTANM_TINFO_FX16ARR 0x20000000
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK 0x1fff0000
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT 16
+
+typedef struct {
+    u32 info;
+    u32 offset;
+} NNSG3dJntAnmTInfo;
+
+// A rotation index is that of a rotation of three values (ROT3, a pivot and two numbers) or of five, in the table
+// that ofsRot3 or ofsRot5 gives
+#define NNS_G3D_JNTANM_RINFO_IS_ROT3 0x00008000
+#define NNS_G3D_JNTANM_RINFO_IDX_MASK 0x00007fff
 
 // The second category of an animation resource's header, which tells the kind of animation within what it animates
 #define NNS_G3D_ANM_CATEGORY1_MA 'MA'
@@ -432,12 +592,16 @@ typedef struct NNSG3dMatAnmResult {
 
 // A joint's flag says which of its parts are the identity: a scale of one, a zero rotation or translation. A blend
 // keeps only those that all its animations have. The rotation is three rows of a matrix, of which a blend adds up the
-// first two and makes the third
+// first two and makes the third. The scaling rules of Maya and Softimage models (maya.c and si3d.c) use the rest:
+// scaleEx0 and scaleEx1 are the scale of the parent and its inverse (Softimage), or scaleEx0 the inverse of the
+// parent's scale (Maya), where the joint is to cancel the scale of its parent, and EX0_ONE and EX1_ONE say that they
+// are one. MAYA_SSC_APPLY is Maya's segment scale compensate: the joint cancels the scale of its parent
 #define NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE 0x00000001
 #define NNS_G3D_JNTANM_RESULTFLAG_ROT_ZERO 0x00000002
 #define NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO 0x00000004
 #define NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE 0x00000008
 #define NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE 0x00000010
+#define NNS_G3D_JNTANM_RESULTFLAG_MAYA_SSC_APPLY 0x00000020
 
 typedef struct {
     u32 flag;
@@ -505,19 +669,22 @@ typedef struct {
     u32 hintVisAnmExist[2];
 } NNSG3dRenderObj;
 
-// The blocks of a file: NNS_G3dGetMdlSet, NNS_G3dGetTex and NNS_G3dGetAnmByIdx
-NNSG3dResMdlSet *NNS_G3DResGetMdlBlock(const NNSG3dResFileHeader *header);
-NNSG3dResTex *NNS_G3DResGetTexBlock(const NNSG3dResFileHeader *header);
+// The blocks of a file (res_struct_accessor.c), and the animations of an animation file by their index
+// (res_struct_accessor_anm.c)
+NNSG3dResMdlSet *NNS_G3dGetMdlSet(const NNSG3dResFileHeader *header); // swan's NNS_G3DResGetMdlBlock
+NNSG3dResTex *NNS_G3dGetTex(const NNSG3dResFileHeader *header);       // swan's NNS_G3DResGetTexBlock
+void *NNS_G3dGetAnmByIdx(const NNSG3dResFileHeader *header, u32 idx); // swan's NNS_G3DResGetAnm
+
 // The name of a dictionary entry, padded to sixteen characters with zeros
 typedef union {
     char name[16];
     u32 val[4];
 } NNSG3dResName;
 
-// NitroSDK's NNS_G3dGetResDataByName: the data of the dictionary's entry of the name, or NULL
-void *NNS_G3DFind(const NNSG3dResDict *dict, const NNSG3dResName *name);
-// NitroSDK's NNS_G3dGetResDictIdxByName: the index of the dictionary's entry of the name, or -1
-int NNS_G3DFindIndex(const NNSG3dResDict *dict, const NNSG3dResName *name);
+// The data of the dictionary's entry of the name, or NULL (swan's NNS_G3DFind)
+void *NNS_G3dGetResDataByName(const NNSG3dResDict *dict, const NNSG3dResName *name);
+// The index of the dictionary's entry of the name, or -1 (swan's NNS_G3DFindIndex)
+int NNS_G3dGetResDictIdxByName(const NNSG3dResDict *dict, const NNSG3dResName *name);
 
 static inline const NNSG3dResName *NNS_G3dGetResNameByIdx(const NNSG3dResDict *dict, u32 idx) {
     if (dict != NULL && idx < dict->numEntry) {
@@ -546,7 +713,13 @@ typedef struct {
     u16 offset;
     u16 flag;
 } NNSG3dResDictPlttData;
-void *NNS_G3DResGetAnm(const NNSG3dResFileHeader *header, u32 idx);
+
+// A texture pattern animation's names of a texture and of a palette, or NULL past the last, and the texture and palette
+// that its material shows at a frame, which the frame values of the material at idx say. The names are NitroSystem's as
+// recalled, not shown by the code
+const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx);
+const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx);
+const NNSG3dResTexPatAnmFV *NNSi_G3dGetTexPatAnmFV(const NNSG3dResTexPatAnm *anm, u32 idx, u32 frame);
 
 // Textures and palettes in VRAM: NNS_G3dTexGetRequiredSize, NNS_G3dTexSetTexKey, NNS_G3dTexLoad,
 // NNS_G3dPlttGetRequiredSize, NNS_G3dPlttSetPlttKey and NNS_G3dPlttLoad
@@ -594,24 +767,26 @@ typedef struct {
 // in use (anm.c)
 extern u32 NNS_G3D_ANIMATION_INIT_HEADER_COUNT;
 extern NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[];
-// The functions that fill in an animation object of each kind, which its init function (NitroSystem's
-// NNS_G3dAnmObjInitNsBma, NsBtp, NsBta, NsBva and NsBca, in nsbma.c, nsbtp.c, nsbta.c, nsbva.c and nsbca.c) copies
-// from these variables to funcAnm (anm.c). The NNS_G3dFuncAnm names are a guess from the files
-void func_020698d4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+// The function that fills in an animation object of each kind, and the function the object holds, which its init
+// function copies to funcAnm from the variables after them (nsbma.c, nsbtp.c, nsbta.c, nsbva.c, nsbca.c and anm.c).
+// NNS_G3DAnimationInit_TA, NNS_G3DAnimationInit_TP and NNS_G3DAnimationApply_CA are swan's names; the other seven are
+// ours, after them. NitroSystem's, as recalled, are NNSi_G3dAnmObjInitNsBma and NNSi_G3dAnmCalcNsBma, and so on for
+// Btp, Bta, Bva and Bca. The NNS_G3dFuncAnm names of the variables are a guess from the files
+void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3DAnimationInit_TP(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
-void func_02069ee4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
-void func_02068764(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
-void func_02069968(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-void func_02069cf8(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-void func_02069ea0(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-void func_02069f18(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationInit_VA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationApply_MA(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_TA(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_TP(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
+void NNS_G3DAnimationApply_VA(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
 void NNS_G3DAnimationApply_CA(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
-extern void *NNS_G3dFuncAnmVisNsBva;
-extern void *NNS_G3dFuncAnmJntNsBca;
-extern void *NNS_G3dFuncAnmMatNsBtp;
-extern void *NNS_G3dFuncAnmMatNsBta;
-extern void *NNS_G3dFuncAnmMatNsBma;
+extern NNSG3dFuncAnmVis NNS_G3dFuncAnmVisNsBva;
+extern NNSG3dFuncAnmJnt NNS_G3dFuncAnmJntNsBca;
+extern NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBta;
+extern NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBtp;
+extern NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBma;
 
 // The functions that combine the animations of a render object, for its materials, joints and visibility (NitroSystem's
 // NNSi_G3dAnmBlendMat, NNSi_G3dAnmBlendJnt and NNSi_G3dAnmBlendVis). The variables after them are what
@@ -623,128 +798,139 @@ extern NNSG3dFuncBlendMat NNS_G3dFuncBlendMat;
 extern NNSG3dFuncBlendJnt NNS_G3dFuncBlendJnt;
 extern NNSG3dFuncBlendVis NNS_G3dFuncBlendVis;
 
+// A scale and its inverse: a node's, as a scale function reads them, and each joint's of the model being drawn, which
+// the scaling rules (maya.c and si3d.c) keep for the joints below it in g_NNSG3DJointScales
+typedef struct {
+    VecFx32 scale;
+    VecFx32 invScale;
+} NNSG3dJointScale;
+
 // The functions that a model's scaling rule and texture matrix mode choose between when it is drawn, in tables indexed
 // by the rule or the mode (cgtool.c). A flush sends a joint's result to the geometry engine: its scale, rotation and
 // translation, as the result's flag leaves them. A scale function sets the scale parts of a joint's result from the
-// scale of the node, a vector of the scale and then one of its inverse, the node's command in the stream and its flags,
-// where bit 2 is a scale of one. A texture matrix function sends the texture matrix of a material's result
+// scale of the node, its scale and inverse scale (an NNSG3dJointScale), the node's command in the stream and its flags,
+// where bit 2 is a scale of one. A texture matrix function sends the texture matrix of a material's result; XSI's sets
+// the identity values into the result first, so the type of them all takes it without const
 typedef void (*NNSG3dFuncJointFlush)(const NNSG3dJntAnmResult *result);
-typedef void (*NNSG3dFuncJointScale)(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
-typedef void (*NNSG3dFuncTexMatrix)(const NNSG3dMatAnmResult *result);
+typedef void (*NNSG3dFuncJointScale)(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd,
+                                     u32 srtFlag);
+typedef void (*NNSG3dFuncTexMatrix)(NNSG3dMatAnmResult *result);
 
 // Standard (basic.c), Maya (maya.c) and Softimage (si3d.c) scaling rules
-void func_02069f40(const NNSG3dJntAnmResult *result);
-void func_02069fbc(const NNSG3dJntAnmResult *result);
-void func_0206a714(const NNSG3dJntAnmResult *result);
-void func_02069f94(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
-void func_0206a044(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
-void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag);
+void NNSi_G3dSendJointSRTBasic(const NNSG3dJntAnmResult *result);
+void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result);
+void NNSi_G3dSendJointSRTSi3d(const NNSG3dJntAnmResult *result);
+void NNSi_G3dGetJointScaleBasic(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag);
+void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag);
+void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag);
 // Maya (maya.c), Softimage (si3d.c), 3ds Max (3dsmax.c) and XSI (xsi.c) texture matrix modes
-void func_0206a5cc(const NNSG3dMatAnmResult *result);
-void func_0206aa5c(const NNSG3dMatAnmResult *result);
-void func_0206b124(const NNSG3dMatAnmResult *result);
-void func_0206b74c(const NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTMaya(NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTSi3d(NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRT3dsMax(NNSG3dMatAnmResult *result);
+void NNSi_G3dSendTexSRTXsi(NNSG3dMatAnmResult *result);
 
 extern NNSG3dFuncJointFlush NNS_G3D_JOINT_FLUSH_FUNCS[3];
 extern NNSG3dFuncJointScale NNS_G3D_JOINT_SCALE_FUNCS[3];
 extern NNSG3dFuncTexMatrix NNS_G3D_TEX_MATRIX_FUNCS[4];
 
-// The buffer that geometry commands wait in, and sending one: NNS_G3dGeFlushBuffer and NNS_G3dGeBufferOP_N
+// The buffer that geometry commands wait in while a display list is on its way by DMA, and sending a command or a
+// display list (gecom.c). The names are NitroSystem's as recalled
 BOOL NNS_G3dGeIsBufferExist(void);
 void NNS_G3dGeSetBuffer(void *buffer);
 void *NNS_G3dGeReleaseBuffer(void);
-void NNS_G3DWaitFIFO(void);
-void NNS_G3DExecOp(u32 op, const u32 *args, u32 num);
-void NNS_G3DExecDisplayList(const void *list, u32 size);
-// NitroSystem's NNS_G3dGetCurrentMtx: gets the position matrix and the vector matrix that the geometry engine is at,
-// each unless its pointer is null
-void NNS_G3DGetTransforms(MtxFx43 *pos, MtxFx33 *nrm);
+void NNS_G3dGeFlushBuffer(void);                            // swan's NNS_G3DWaitFIFO
+void NNS_G3dGeBufferOP_N(u32 op, const u32 *args, u32 num); // swan's NNS_G3DExecOp
+void NNS_G3dGeSendDL(const void *list, u32 size);           // swan's NNS_G3DExecDisplayList
+// Whether NNS_G3dGeSendDL sends by the SDK's fast DMA rather than the one that waits for the FIFO
+extern u32 NNS_G3dFlagUseFastDma;
+// Gets the position matrix and the vector matrix that the geometry engine is at, each unless its pointer is null
+void NNS_G3dGetCurrentMtx(MtxFx43 *pos, MtxFx33 *nrm); // swan's NNS_G3DGetTransforms
 
 // NitroSystem's inline wrappers of the buffer, one per geometry command
 static inline void NNS_G3dGePushMtx(void) {
-    NNS_G3DExecOp(G3OP_MTX_PUSH, NULL, 0);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_PUSH, NULL, 0);
 }
 
 static inline void NNS_G3dGePopMtx(int num) {
     s32 param = num;
 
-    NNS_G3DExecOp(G3OP_MTX_POP, (const u32 *)&param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_POP, (const u32 *)&param, 1);
 }
 
 static inline void NNS_G3dGeMtxMode(int mode) {
     u32 param = mode;
 
-    NNS_G3DExecOp(G3OP_MTX_MODE, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MODE, &param, 1);
 }
 
 static inline void NNS_G3dGeStoreMtx(int idx) {
     u32 param = idx;
 
-    NNS_G3DExecOp(G3OP_MTX_STORE, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_STORE, &param, 1);
 }
 
 static inline void NNS_G3dGeRestoreMtx(int idx) {
     u32 param = idx;
 
-    NNS_G3DExecOp(G3OP_MTX_RESTORE, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_RESTORE, &param, 1);
 }
 
 static inline void NNS_G3dGeIdentity(void) {
-    NNS_G3DExecOp(G3OP_MTX_IDENTITY, NULL, 0);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_IDENTITY, NULL, 0);
 }
 
 static inline void NNS_G3dGeLoadMtx44(const MtxFx44 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_LOAD_4x4, (const u32 *)mtx, 16);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_LOAD_4x4, (const u32 *)mtx, 16);
 }
 
 static inline void NNS_G3dGeLoadMtx43(const MtxFx43 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_LOAD_4x3, (const u32 *)mtx, 12);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_LOAD_4x3, (const u32 *)mtx, 12);
 }
 
 static inline void NNS_G3dGeMultMtx44(const MtxFx44 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_MULT_4x4, (const u32 *)mtx, 16);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MULT_4x4, (const u32 *)mtx, 16);
 }
 
 static inline void NNS_G3dGeMultMtx43(const MtxFx43 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_MULT_4x3, (const u32 *)mtx, 12);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MULT_4x3, (const u32 *)mtx, 12);
 }
 
 static inline void NNS_G3dGeMultMtx33(const MtxFx33 *mtx) {
-    NNS_G3DExecOp(G3OP_MTX_MULT_3x3, (const u32 *)mtx, 9);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_MULT_3x3, (const u32 *)mtx, 9);
 }
 
 static inline void NNS_G3dGeScaleVec(const VecFx32 *scale) {
-    NNS_G3DExecOp(G3OP_MTX_SCALE, (const u32 *)scale, 3);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_SCALE, (const u32 *)scale, 3);
 }
 
 static inline void NNS_G3dGeTranslateVec(const VecFx32 *trans) {
-    NNS_G3DExecOp(G3OP_MTX_TRANS, (const u32 *)trans, 3);
+    NNS_G3dGeBufferOP_N(G3OP_MTX_TRANS, (const u32 *)trans, 3);
 }
 
 static inline void NNS_G3dGeTexCoord(fx32 s, fx32 t) {
     u32 param = GX_ST(s, t);
 
-    NNS_G3DExecOp(G3OP_TEXCOORD, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_TEXCOORD, &param, 1);
 }
 
 static inline void NNS_G3dGePolygonAttr(int light, int polyMode, int cullMode, int polygonID, int alpha, int misc) {
     u32 param = GX_PACK_POLYGONATTR_PARAM(light, polyMode, cullMode, polygonID, alpha, misc);
 
-    NNS_G3DExecOp(G3OP_POLYGON_ATTR, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_POLYGON_ATTR, &param, 1);
 }
 
 static inline void NNS_G3dGeBegin(int primitive) {
     u32 param = primitive;
 
-    NNS_G3DExecOp(G3OP_BEGIN, &param, 1);
+    NNS_G3dGeBufferOP_N(G3OP_BEGIN, &param, 1);
 }
 
 static inline void NNS_G3dGeEnd(void) {
-    NNS_G3DExecOp(G3OP_END, NULL, 0);
+    NNS_G3dGeBufferOP_N(G3OP_END, NULL, 0);
 }
 
 static inline void NNS_G3dGeBoxTest(const GXBoxTestParam *box) {
-    NNS_G3DExecOp(G3OP_BOX_TEST, (const u32 *)box, 3);
+    NNS_G3dGeBufferOP_N(G3OP_BOX_TEST, (const u32 *)box, 3);
 }
 
 // The global state of the geometry engine. The cmd words hold the geometry commands that send what follows them, so
@@ -813,8 +999,8 @@ typedef struct {
 
 extern NNSG3dGlb NNS_G3dGlb;
 
-// NNS_G3dInit, and NNS_G3dGlbInit
-void NNS_G3DInit(void);
+// NNS_G3dInit (util.c), and NNS_G3dGlbInit
+void NNS_G3dInit(void); // swan's NNS_G3DInit
 void NNS_G3DRenderStateInit(void);
 void NNS_G3dGlbSetBaseTrans(const VecFx32 *trans);
 void NNS_G3dGlbSetBaseScale(const VecFx32 *scale);
@@ -917,6 +1103,12 @@ static inline void NNS_G3dGlbLookAt(const VecFx32 *camPos, const VecFx32 *camUp,
 #define NNS_G3D_SBC_PRJMAP 0x0d
 #define NNS_G3D_SBC_COMMAND_NUM 32
 
+// The flags in the fourth byte of a NODEDESC command, after the node and its parent, that a Maya model's scaling rule
+// reads (maya.c): the joint cancels the scale of its parent, and a child of the joint does so, which makes the joint
+// keep its inverse scale for the children
+#define NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_APPLY 0x01
+#define NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_CHILD 0x02
+
 #define NNS_G3D_SBCFLG_000 0x00
 #define NNS_G3D_SBCFLG_001 0x20
 #define NNS_G3D_SBCFLG_010 0x40
@@ -991,13 +1183,7 @@ extern NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4];
 // The state of the model being drawn, while there is one: a draw within a callback shares it
 extern NNSG3dRS *g_NNSG3DModelRenderer;
 
-// The scale of each joint of the model being drawn and its inverse, which the scaling rules (maya.c and si3d.c) keep
-// for the joints below it
-typedef struct {
-    VecFx32 scale;
-    VecFx32 invScale;
-} NNSG3dJointScale;
-
+// The scale and inverse scale of each joint of the model being drawn, relative to the root, for the joints below it
 extern NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
 
 // The commands (NitroSystem's NNSi_G3dFuncSbcNop, Ret, Node, Mtx, Mat, MatDefault, Shp, ShpDefault, NodeDesc, BB, BBY,
@@ -1019,22 +1205,27 @@ void NNS_G3DRenderFuncGlobalScale(NNSG3dRS *rs, u32 opt);
 void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt);
 void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt);
 
-// The alpha of a material of a model resource, from 0 to 31
-u32 NNS_G3DResMdlGetMatAlpha(const NNSG3dResMdl *mdl, u32 matId);
-void NNS_G3DResMdlSetMatAlpha(NNSG3dResMdl *mdl, u32 matId, u32 alpha);
-// A material's lights, polygon ID, faces to cull and polygon mode (NitroSystem's NNS_G3dMdlSetMdlLightEnableFlag,
-// NNS_G3dMdlSetMdlPolygonID, NNS_G3dMdlSetMdlCullMode and NNS_G3dMdlSetMdlPolygonMode)
-void NNS_G3DResMdlSetMatLights(NNSG3dResMdl *mdl, u32 matId, u32 lights);
-void NNS_G3DResMdlSetMatPolyID(NNSG3dResMdl *mdl, u32 matId, u32 polyId);
-void NNS_G3DResMdlSetMatFaceCulling(NNSG3dResMdl *mdl, u32 matId, u32 culling);
-void NNS_G3DResMdlSetMatShadingMode(NNSG3dResMdl *mdl, u32 matId, u32 mode);
-// The alpha of every material of a model resource, from 0 to 31 (NitroSystem's NNS_G3dMdlSetMdlAlphaAll)
-void func_02068410(NNSG3dResMdl *mdl, int alpha);
-// Turns fog on or off for every material of a model resource
-void NNS_G3dMdlSetMdlFogEnableFlag(NNSG3dResMdl *mdl, int matID, BOOL enable);
+// Set the lights, polygon mode, culling, polygon ID and alpha of a material of a model resource, in the bits of its
+// polygon attribute (model.c). The lights are the mask of the four that shine on it, and the alpha is from 0 to 31. The
+// names are NitroSystem's as recalled; swan's are NNS_G3DResMdlSetMatLights, ShadingMode, FaceCulling, PolyID and Alpha
+void NNS_G3dMdlSetMdlLightEnableFlag(NNSG3dResMdl *mdl, u32 matID, u32 lights);
+void NNS_G3dMdlSetMdlPolygonMode(NNSG3dResMdl *mdl, u32 matID, u32 mode);
+void NNS_G3dMdlSetMdlCullMode(NNSG3dResMdl *mdl, u32 matID, u32 cull);
+void NNS_G3dMdlSetMdlPolygonID(NNSG3dResMdl *mdl, u32 matID, u32 polyID);
+void NNS_G3dMdlSetMdlAlpha(NNSG3dResMdl *mdl, u32 matID, u32 alpha);
+u32 NNS_G3dMdlGetMdlAlpha(const NNSG3dResMdl *mdl, u32 matID);
+// Turns fog on or off for a material of a model resource, or for every material
+void NNS_G3dMdlSetMdlFogEnableFlag(NNSG3dResMdl *mdl, u32 matID, BOOL enable);
+// Set the polygon ID or the alpha of every material of a model resource
+void NNS_G3dMdlSetMdlPolygonIDAll(NNSG3dResMdl *mdl, u32 polyID);
+void NNS_G3dMdlSetMdlAlphaAll(NNSG3dResMdl *mdl, u32 alpha);
 void NNS_G3dMdlSetMdlFogEnableFlagAll(NNSG3dResMdl *mdl, BOOL enable);
 
-// NitroSystem's NNS_G3dWorldPosToScrPos: where a point of the world is on the screen
-int NNS_G3DProject(const VecFx32 *world, int *x, int *y);
+// Where a point of the world is on the screen, and 0 if it is within the viewport, or -1 (util.c; swan's
+// NNS_G3DProject)
+int NNS_G3dWorldPosToScrPos(const VecFx32 *world, int *x, int *y);
+// The near and far ends of the line in the world that a screen position is on (the far end is left out for a null
+// pointer), and 0 if the position is within the viewport, or -1
+int NNS_G3dScrPosToWorldLine(int px, int py, VecFx32 *nearPos, VecFx32 *farPos);
 
 #endif // POKEBW2_NNSYS_G3D_H

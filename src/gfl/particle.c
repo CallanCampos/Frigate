@@ -354,14 +354,14 @@ void func_0204ff54(ParticleSystem *system) {
         }
         GFL_G3DCameraFlush(system->camera);
         GFL_G3DSysMtxViewFlush();
-        NNS_G3DWaitFIFO();
+        NNS_G3dGeFlushBuffer();
     }
     SPLManager_Draw(system->manager, &NNS_G3dGlb.cameraMtx);
     if (system->camera != NULL) {
         GFL_G3DSysMtxSetProjection(&projection);
         GFL_G3DSysMtxSetViewLookAt(&lookAt);
         GFL_G3DSysMtxViewFlush();
-        NNS_G3DWaitFIFO();
+        NNS_G3dGeFlushBuffer();
     }
 }
 

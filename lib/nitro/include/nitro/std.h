@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include <stdarg.h>
+#include <stddef.h>
 
 // NitroSDK's STD, the standard string functions of the SDK (TwlSDK's libstd). Their names are the SDK's; swan named the
 // length one NNS_STD_StrLen
@@ -42,9 +43,9 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args);
 // Writes a formatted text to dst, with no limit on its length, and returns the length
 int STD_TSPrintf(char *dst, const char *fmt, ...);
 // STD_TSNPrintf (swan's name is OS_SNPrintf): the same, at most len - 1 characters and a NUL
-int STD_TSNPrintf(char *dst, u32 len, const char *fmt, ...);
+int STD_TSNPrintf(char *dst, size_t len, const char *fmt, ...);
 // STD_TVSNPrintf (swan's name is OS_VSNPrintf): the same with the arguments in a list. Returns the length the text
 // would have without the limit
-int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args);
+int STD_TVSNPrintf(char *dst, size_t len, const char *fmt, va_list args);
 
 #endif // POKEBW2_NITRO_STD_H

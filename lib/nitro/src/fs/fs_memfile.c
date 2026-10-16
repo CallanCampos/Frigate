@@ -14,6 +14,8 @@ static BOOL sMemoryArchiveReady;
 // The hook of the memory archive: a directory read lists the archives, and the commands that look for a path or a
 // number are not supported. The directory's position is the archive it reads next
 static FSResult FSi_MemoryArchiveProc(FSFile *file, FSCommandType command) {
+    FSResult result;
+
     switch (command) {
     case FS_COMMAND_READDIR: {
         FSArchive *arc = (FSArchive *)file->body.dir.pos.position;
@@ -23,29 +25,34 @@ static FSResult FSi_MemoryArchiveProc(FSFile *file, FSCommandType command) {
         if (arc == NULL) {
             entry->nameLength = 0;
             entry->isDirectory = FALSE;
-            return FS_RESULT_FAILURE;
+            result = FS_RESULT_FAILURE;
+        } else {
+            name = FS_GetArchiveName(arc);
+            entry->nameLength = STD_GetStringLength(name) + 1;
+            entry->isDirectory = TRUE;
+            if (!file->arg.readDirectory.skipName) {
+                STD_TSPrintf(entry->name, "%s:", name);
+                entry->id.dir.arc = file->arc;
+                entry->id.dir.dirId = 0;
+                entry->id.dir.fileId = 0;
+                entry->id.dir.position = 0;
+            }
+            result = FS_RESULT_SUCCESS;
+            file->body.dir.pos.position = (u32)arc->next;
         }
-        name = FS_GetArchiveName(arc);
-        entry->nameLength = STD_GetStringLength(name) + 1;
-        entry->isDirectory = TRUE;
-        if (!file->arg.readDirectory.skipName) {
-            STD_TSPrintf(entry->name, "%s:", name);
-            entry->id.dir.arc = file->arc;
-            entry->id.dir.dirId = 0;
-            entry->id.dir.fileId = 0;
-            entry->id.dir.position = 0;
-        }
-        file->body.dir.pos.position = (u32)arc->next;
-        return FS_RESULT_SUCCESS;
+        break;
     }
     case FS_COMMAND_SEEKDIR:
     case FS_COMMAND_FINDPATH:
     case FS_COMMAND_GETPATH:
     case FS_COMMAND_OPENFILEFAST:
-        return FS_RESULT_UNSUPPORTED;
+        result = FS_RESULT_UNSUPPORTED;
+        break;
     default:
-        return FS_RESULT_PROC_DEFAULT;
+        result = FS_RESULT_PROC_DEFAULT;
+        break;
     }
+    return result;
 }
 
 // Makes the memory archive once: its hook set for every command, and nothing of the tables. The program ends if it
