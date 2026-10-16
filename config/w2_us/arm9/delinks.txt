@@ -1883,6 +1883,7 @@ lib/nitro/src/fs/fs_archive.c:
     .bss        start:0x0214bd8c end:0x0214bfa0
 
 lib/nitro/src/fs/fs_file.c:
+    complete
     .text       start:0x02070ca8 end:0x02070ee8
 
 lib/nitro/src/fs/fs_overlay.c:
@@ -1898,6 +1899,7 @@ lib/nitro/src/fs/fs_command_default.c:
     .data       start:0x0209b550 end:0x0209b554
 
 lib/nitro/src/fs/fs_memfile.c:
+    complete
     .text       start:0x02072040 end:0x0207215c
     .data       start:0x0209b554 end:0x0209b558
     .bss        start:0x0214bfc0 end:0x0214c020
@@ -1920,6 +1922,7 @@ lib/nitro/src/gx/gx.c:
     .bss        start:0x0214c08c end:0x0214c090
 
 lib/nitro/src/gx/g2.c:
+    complete
     .text       start:0x020749f8 end:0x02074b40
 
 lib/nitro/src/gx/g3_util.c:
@@ -1975,6 +1978,7 @@ lib/nitro/src/mi/mi_dma.c:
     .text       start:0x02078058 end:0x02078454
 
 lib/nitro/src/mi/mi_dma_gxcommand.c:
+    complete
     .text       start:0x02078454 end:0x02078650
     .bss        start:0x0214c0ec end:0x0214c120
 
@@ -2146,6 +2150,7 @@ lib/nitro/src/os/os_deliverArg.c:
     .bss        start:0x0214c604 end:0x0214c618
 
 lib/nitro/src/os/os_entropy.c:
+    complete
     .text       start:0x0207c6fc end:0x0207c7a0
 
 lib/nitro/src/os/os_terminate_proc.c:
@@ -2249,6 +2254,7 @@ lib/nitro/src/wm/wm_system.c:
     .bss        start:0x0214e2d8 end:0x0214ed80
 
 lib/nitro/src/wm/wm_sync.c:
+    complete
     .text       start:0x02080ea8 end:0x02081328
     .data       start:0x0209b7d4 end:0x0209b7d8
 

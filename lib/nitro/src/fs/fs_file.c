@@ -154,28 +154,34 @@ BOOL FS_SeekFile(FSFile *file, s32 offset, int whence) {
 // invalid
 s32 FS_ReadFile(FSFile *file, void *dest, s32 size) {
     FSReadFileArgs args;
-    s32 result = -1;
 
     file->argument = &args;
     args.buffer = dest;
     args.length = size;
-    if (FSi_SendCommand(file, FS_COMMAND_READFILE, TRUE) || FS_GetResultCode(file) != FS_RESULT_INVALID_PARAMETER) {
-        result = args.length;
+    if (FSi_SendCommand(file, FS_COMMAND_READFILE, TRUE)) {
+        size = args.length;
+    } else if (FS_GetResultCode(file) == FS_RESULT_INVALID_PARAMETER) {
+        size = -1;
+    } else {
+        size = args.length;
     }
-    return result;
+    return size;
 }
 
 s32 FS_WriteFile(FSFile *file, const void *src, s32 size) {
     FSWriteFileArgs args;
-    s32 result = -1;
 
     file->argument = &args;
     args.buffer = src;
     args.length = size;
-    if (FSi_SendCommand(file, FS_COMMAND_WRITEFILE, TRUE) || FS_GetResultCode(file) != FS_RESULT_INVALID_PARAMETER) {
-        result = args.length;
+    if (FSi_SendCommand(file, FS_COMMAND_WRITEFILE, TRUE)) {
+        size = args.length;
+    } else if (FS_GetResultCode(file) == FS_RESULT_INVALID_PARAMETER) {
+        size = -1;
+    } else {
+        size = args.length;
     }
-    return result;
+    return size;
 }
 
 BOOL FS_OpenFile(FSFile *file, const char *path) {

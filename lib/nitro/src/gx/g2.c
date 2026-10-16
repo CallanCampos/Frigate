@@ -7,16 +7,15 @@
 #pragma thumb off
 void G2x_SetBGyAffine_(u32 addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
     vu32 *reg = (vu32 *)addr;
-    fx32 a = mtx->_00;
-    fx32 b = mtx->_01;
-    fx32 c = mtx->_10;
-    fx32 d = mtx->_11;
-    int ddy = y - centerY;
-    int ddx = x - centerX;
-    s32 dx = (a * ddx + b * ddy) + (centerX << FX32_SHIFT);
-    s32 dy = (c * ddx + d * ddy) + (centerY << FX32_SHIFT);
-    reg[0] = (u16)(s16)(a >> 4) | ((u16)(s16)(b >> 4) << 16);
-    reg[1] = (u16)(s16)(c >> 4) | ((u16)(s16)(d >> 4) << 16);
+    fx32 dx, dy;
+    s32 x2, y2;
+
+    reg[0] = (u16)(fx16)(mtx->_00 >> 4) | ((u16)(fx16)(mtx->_01 >> 4) << 16);
+    reg[1] = (u16)(fx16)(mtx->_10 >> 4) | ((u16)(fx16)(mtx->_11 >> 4) << 16);
+    x2 = x - centerX;
+    y2 = y - centerY;
+    dx = mtx->_00 * x2 + mtx->_01 * y2 + (centerX << FX32_SHIFT);
+    dy = mtx->_10 * x2 + mtx->_11 * y2 + (centerY << FX32_SHIFT);
     reg[2] = dx >> 4;
     reg[3] = dy >> 4;
 }
