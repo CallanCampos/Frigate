@@ -37,9 +37,9 @@ DownloadPlaySysWork *gDownloadPlaySysWork;
 void func_ov182_021ba768(DownloadPlaySysWork *loaderContext, const MBGameRegistry *registry) {
     DownloadPlaySysWork *dat;
 
-    DownloadPlay_SetWork((DownloadPlayWork *)loaderContext);
-    gDownloadPlaySysWork = (DownloadPlaySysWork *)loaderContext;
-    dat = gDownloadPlaySysWork;
+    gDownloadPlaySysWork = loaderContext;
+    DownloadPlay_SetWork((DownloadPlayWork *)gDownloadPlaySysWork);
+    dat = loaderContext;
     dat->state = DOWNLOAD_PLAY_SYS_STATE_STOP;
     dat->prevState = DOWNLOAD_PLAY_SYS_STATE_STOP;
     dat->unk_a92 = 1;
@@ -57,7 +57,7 @@ void func_ov182_021ba768(DownloadPlaySysWork *loaderContext, const MBGameRegistr
     OS_GetTick();
     DWCBm_ReadAllNtrPages(&dat->unk_a98);
     OS_GetTick();
-    dat->unk_aa8 = (void *)func_ov182_021b7e6c();
+    dat->chanParam[0] = (u16 *)func_ov182_021b7e6c();
 }
 
 // Maps the state the flow is in to the state it should end in, and says whether the flow may move. The states that
@@ -112,7 +112,7 @@ static void func_ov182_021ba8bc(void) {
     func_ov182_021ba180(dat->registry.ggid);
     dat->state = DOWNLOAD_PLAY_SYS_STATE_START_WIRELESS;
     dat->ids.ids.tgid = WM_GetNextTgid();
-    MI_CpuCopy8(dat->unk_aa8, dat->dataShareFrame, 0x40);
+    MI_CpuCopy8(dat->chanParam[0], dat->dataShareFrame, 0x40);
     dat->host = 0;
     dat->msgCounter = 0;
     dat->ids.ids.tgid++;
@@ -349,13 +349,11 @@ static void func_ov182_021bacbc(void) {
         break;
 
     case DOWNLOAD_PLAY_STATE_ENTRY:
-        i = 2;
-        while (i < 5) {
+        for (i = 2; i < 5; i++) {
             if (DownloadPlay_GetChildBmp(i) != 0) {
                 dat->state = DOWNLOAD_PLAY_SYS_STATE_WAIT_CHILDREN;
                 return;
             }
-            i++;
         }
         if (dat->state != DOWNLOAD_PLAY_SYS_STATE_WAIT_CHILDREN || DownloadPlay_GetChildBmp(i) != 0) {
             return;
@@ -415,7 +413,8 @@ static void func_ov182_021badf8(void) {
 
     switch (func_ov182_021ba19c()) {
     case WIH_STATE_IDLE:
-        func_ov182_021ba4f8(WIH_CONNECTMODE_DS_PARENT, dat->ids.ids.tgid + 1, dat->ids.ids.channel);
+        func_ov182_021ba4f8(WIH_CONNECTMODE_DS_PARENT, dat->ids.ids.tgid + 1,
+                           dat->chanParam[dat->ids.ids.channel]);
         return;
 
     case WIH_STATE_CONNECTED:

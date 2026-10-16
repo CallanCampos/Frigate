@@ -79,10 +79,12 @@ typedef struct {
     u16 peerCode;
     u32 msgCounter;
     u32 frameChanged[DOWNLOAD_PLAY_SYS_FRAME_NO];
-    u8 unk_148[0x504];
+    u8 unk_148[0x4fc];
     // What the parent's session runs under
     DownloadPlaySysIds ids;
-    u8 unk_650[0x440];
+    u8 unk_64c[0x3fc];
+    // The parent parameter of each channel, which the measurement filled
+    u8 unk_64c_1[0x460];
     // The state the flow is in (DOWNLOAD_PLAY_SYS_STATE_*), the state it was in, and what the caller passed
     u8 state;
     u8 prevState;
@@ -94,12 +96,11 @@ typedef struct {
     u32 timer;
     // The players the scan found, by player number less one
     u16 playerNo[2];
-    // The address the helper's 0x40 bytes of game data are found at, the parent's own address, and the address of
-    // this work, which the parent hands its callbacks
-    void *unk_aa8;
-    void *unk_aac;
+    // The parent parameter of each channel, which the parent connects with
+    u16 *chanParam[0x10];
+    // The frame the parent fills, the address of this work, and what the scan calls with each child
+    u8 unk_aa8[8];
     void *unk_ab0;
-    // What the scan calls with each child that connects
     WHScanFilter scanFilter;
     // The game the children download, as the parent was handed it, and how many players it allows
     MBGameRegistry registry;
