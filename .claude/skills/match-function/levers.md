@@ -199,6 +199,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A struct local's members in the lowest slots, every declared slot moved up: MWCC split it, since its address
   did not survive into the optimizer; an initializer, a real call with `&s`, a copy through memory or a pointer
   live across blocks keeps it whole. (matching.md: "split into one variable per member")
+- Values in the lowest slots, below an inline's parameter copies, in assignment order, that no scalar spelling,
+  inline getter or declaration order moves there (one of them set in one branch only): make them the members of
+  one struct local, which MWCC splits. (matching.md: "The split members are slotted with the temporaries")
 - A register parameter stored at entry and loaded back from its slot, where ours copies it out of the register:
   the parameter is narrower than `int` (for a static helper, the type its public caller passes); loop with a
   separate `int` counter. (matching.md: "A register parameter stored at entry and read back from its slot")
