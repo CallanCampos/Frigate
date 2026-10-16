@@ -74,7 +74,9 @@ u16 DownloadPlay_GetChildBmp(int bmpType);
 DownloadPlayChildInfo *DownloadPlay_GetChildInfo(u16 childAid);
 u16 DownloadPlay_GetPlayerNoByMac(const u8 *macAddress);
 
-// The overlay's next file's, which this file hands the work's tail to
+// The overlay's next file's (src/ov182/download_play_wih.c), which this file hands the work's tail to: it takes that
+// work, and it measures how busy each channel is
 void func_ov182_021b9bbc(void *loaderContext);
+BOOL func_ov182_021ba1a8(void);
 
 #endif // POKEBW2_APP_DOWNLOAD_PLAY_H

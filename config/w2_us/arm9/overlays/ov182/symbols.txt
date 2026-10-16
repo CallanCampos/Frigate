@@ -1666,7 +1666,7 @@ data_ov182_021c4170 kind:bss addr:0x021c41b0
 data_ov182_021c4174 kind:bss addr:0x021c41b4
 data_ov182_021c4178 kind:bss addr:0x021c41b8
 data_ov182_021c417c kind:bss addr:0x021c41bc
-data_ov182_021c4180 kind:bss addr:0x021c41c0
+gWork kind:bss addr:0x021c41c0
 data_ov182_021c4188 kind:bss addr:0x021c41c8
 data_ov182_021c418c kind:bss addr:0x021c41cc
 data_ov182_021c4190 kind:bss addr:0x021c41d0
