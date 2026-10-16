@@ -79,7 +79,7 @@ static BOOL LocalTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     charaSetup.playerInfo = GetGameDataPlayerInfo(tvtParam->gameData);
     charaSetup.rival = getHollow_RivalData(GameData_GetSaveControl(tvtParam->gameData));
     charaSetup.message = sys->message;
-    charaSetup.time = LocalTvtUtil_GetTime(tvtParam->gameData);
+    charaSetup.timeOfDay = LocalTvtUtil_GetTime(tvtParam->gameData);
     sys->chara = LocalTvtChara_Create(&charaSetup, sys->heapId);
     sys->bg = LocalTvtBG_Create(tvtParam->gameData, sys->heapId, sys->param->unk04);
     sys->initMode(sys);

@@ -470,7 +470,8 @@ static void LocalTvtFace_Update(LocalTvtFace *face) {
     case FACE_STATE_READ_BACKGROUND:
         face->step = 0;
         LocalTvtFace_ReadChars(face, face->chara->arc,
-                               sLocalTvtBackgroundFiles[face->background][face->chara->setup.time].chars, face->heapId);
+                               sLocalTvtBackgroundFiles[face->background][face->chara->setup.timeOfDay].chars,
+                               face->heapId);
         face->state = FACE_STATE_COPY_BACKGROUND;
         break;
     case FACE_STATE_COPY_BACKGROUND:
@@ -547,8 +548,8 @@ static void LocalTvtFace_LoadPalettes(LocalTvtFace *face, LocalTvtChara *chara, 
 
     GFL_G2DIOLoadArcNCLR(chara->arc, sLocalTvtPersonFiles[face->person].palette, 2, 0, face->index * 0x200 + 0x4000,
                          0x200, heapId);
-    GFL_G2DIOLoadArcNCLR(chara->arc, sLocalTvtBackgroundFiles[face->background][face->chara->setup.time].palette, 2, 0,
-                         face->index * 0x200 + 0x6000, 0x200, heapId);
+    GFL_G2DIOLoadArcNCLR(chara->arc, sLocalTvtBackgroundFiles[face->background][face->chara->setup.timeOfDay].palette,
+                         2, 0, face->index * 0x200 + 0x6000, 0x200, heapId);
     GFL_BGSysSetScrPaletteNo(2, (face->index % 2) * 16, (face->index / 2) * height, 16, height, face->index);
     GFL_BGSysSetScrPaletteNo(3, (face->index % 2) * 16, (face->index / 2) * height, 16, height, face->index);
     GFL_BGSysQueueScrLoad(3);
@@ -570,7 +571,7 @@ static void LocalTvtFace_LoadGraphics(LocalTvtFace *face, LocalTvtChara *chara, 
     LocalTvtFace_ReadChars(face, chara->arc, sLocalTvtPersonFiles[face->person].chars, heapId);
     LocalTvtFace_CopyChars(face, srcOffset, size * face->index + PERSON_CHAR_OFFSET, size);
     GFL_HeapFree(face->charFile);
-    LocalTvtFace_ReadChars(face, chara->arc, sLocalTvtBackgroundFiles[face->background][chara->setup.time].chars,
+    LocalTvtFace_ReadChars(face, chara->arc, sLocalTvtBackgroundFiles[face->background][chara->setup.timeOfDay].chars,
                            heapId);
     LocalTvtFace_CopyChars(face, srcOffset, size * face->index + BACKGROUND_CHAR_OFFSET, size);
     GFL_HeapFree(face->charFile);

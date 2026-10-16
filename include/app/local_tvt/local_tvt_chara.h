@@ -23,7 +23,8 @@ struct LocalTvtCharaSetup {
     PlayerInfo *playerInfo;
     RivalDataSave *rival;
     LocalTvtMessage *message;
-    u32 time;
+    // LOCAL_TVT_TIME_*
+    u32 timeOfDay;
 };
 
 LocalTvtChara *LocalTvtChara_Create(const LocalTvtCharaSetup *setup, HeapID heapId);
