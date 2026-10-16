@@ -80,3 +80,6 @@ lib/twl/src/dsp/dsp_graphics.c:
     .text       start:0x02707310 end:0x02707628
     .data       start:0x0276aec8 end:0x0276aee0
     .bss        start:0x0276dbdc end:0x0276dd4c
+
+lib/twl/src/syscall/syscall_twl_ltd.c:
+    .ltdmain    start:0x027696e8 end:0x02769930
