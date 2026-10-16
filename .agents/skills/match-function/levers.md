@@ -53,6 +53,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A pointer local to an element")
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate differently, as do `count = 1; arr[0] = x;` and the
   reverse. (matching.md: "arr[count++]")
+- A pointer stepped by `*p++` that lands in a callee-saved register above the others (MSL, `dsi/1.2`): write the
+  step as its own statement, `*q = *p; p++;`. (matching.md: "post-increment or post-decrement")
+- A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
+  `cmp rX, #0`: test the pointer as `if (p)`, not against `NULL`. (matching.md: "A pointer compared with `NULL`")
 - A sum used as an index goes to the register of one of its terms unless it has its own variable.
   (matching.md: "array index that is a sum")
 - The operands of `*` are loaded in source order. A product assigned to its own variable gets a new register.
@@ -179,6 +183,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
+- `lsr` then `orr ..., lsl` where the original shifts left first (a halfword swap): swap the operands of the `|`.
+  (matching.md: "An OR of two shifts of one value")
 - An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
   SDK (an `int` where ours has an enum). (matching.md: "An inline's enum-typed parameter")
 - A stack argument stored after the next argument's setup starts, where the original stores it first, around a
@@ -208,7 +214,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A u16 stack parameter left in its slot and reloaded with `ldrh`, one load shared by two calls: those callees take
   `u32`; check their prototypes against their asm. (matching.md: "reloaded with `ldrh`")
 - An argument loaded before a call among the arguments was passed to an inlined helper that makes the call.
-- A field read before a `sys_memset` (or another call) that could change it was the argument of an inlined helper.
+- A field read before a `MI_CpuFill8` (or another call) that could change it was the argument of an inlined helper.
   (matching.md: "a field read before a call that could change it")
   (matching.md: "inlined helper that makes the call")
 - One load of a struct's pointer field for two stores through it, where ours reloads: an inline helper taking the
@@ -266,6 +272,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "Two fields of one element of a static table")
 - A saved register, `bl` and return where the C tail-calls (`ldr r3, =f; bx r3`): the call passes a fourth register
   argument. (matching.md: "four arguments in registers")
+- A Thumb tail jump through a register other than `r3` (`ldr r1, =f; bx r1`) is not compiler output; ARM code
+  tail-calls through `ip`, and only without a frame. (matching.md: "always `r3` in Thumb")
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
@@ -286,6 +294,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A narrowing again after a clamp is `MATH_CLAMP`, a conditional expression. (matching.md: "narrowed again after it is clamped")
 - A local reloaded from its stack slot before each use can be a `u8` flag, not `volatile`.
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
+- ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
+  `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
   a sum that adds a counter known to be 0, has an enum counter. (matching.md: "enum type")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
@@ -478,6 +488,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   off")
 - `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. A bare inlined `clz` in ARM library code is
   `nitro/math.h`'s `MATH_CountLeadingZeros`. (matching.md: "no count-leading-zeros intrinsic")
+- Loops left unrotated, an element's address added at each access and a value loaded twice around a `clz`: the
+  SDK's inline `asm` block does it, which a call can't. (matching.md: "The inline's `asm` block")
+- A `memcpy`/`memset` of a constant size inlined where the ROM calls it: `<string.h>` declares it; declare it in the
+  library's own header instead. (matching.md: "a header named `string.h`")
+- Two-bytes-a-pass copy loops (`ldrb [r3, #1]; ldrb [r3], #2`) where ours calls `strcpy` with a literal: take
+  `strcpy` from `<string.h>`. (matching.md: "`strcpy` of a string literal")
 
 ## Data and sections
 
@@ -518,6 +534,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "same small table")
 - Two literals for the same object in one function: it is a `static` of the function's file; an `extern` shares
   one. (matching.md: "gets two literals")
+- Two objects reached from one literal without `-ipa file`: they are one struct. (matching.md: "reached from one
+  literal, at")
+- A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
+  symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
+- A gap in `.bss` before a 32-aligned object: the previous file ends there. (matching.md: "makes its file's whole
+  `.bss` section 32-aligned")
 
 ## Function order and presence
 
@@ -525,6 +547,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, toggling `#pragma thumb off/on` around the ARM part.
   (matching.md: "A Thumb `bx pc` trampoline")
 
+- SDK assembly in an `asm` function: pre-UAL spellings, `@name:` labels, `dcd`, `ldr rX, =value`, and one `asm`
+  function per entry point, falling into the next; no `entry`, so a second name comes from the configs or the linker.
+  (matching.md: "MWCC's ARM assembler")
+- A prologue, early return or static addressing around SDK assembly: an `asm {}` block in a C function.
+  (matching.md: "An `asm {}` block inside a C function")
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.

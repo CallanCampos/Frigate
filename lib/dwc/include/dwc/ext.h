@@ -20,7 +20,8 @@
 // does, read off the callers
 
 // The C library's string functions that the main module links, not taken from <string.h>: MWCC builds them in place
-// (memset and memcpy of a size it knows, strcmp and strlen) when <string.h> declares them, where the ROM calls them
+// (memset and memcpy of a size it knows, strcpy of a literal, strcmp and strlen) when <string.h> declares them,
+// where the ROM calls them
 void *memset(void *dest, int value, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
 void *memmove(void *dest, const void *src, u32 size);

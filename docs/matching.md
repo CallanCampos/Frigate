@@ -156,6 +156,11 @@ Same instructions, registers swapped.
   buffers in the same order.
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate registers differently, as do `count = 1; arr[0] = x;` and
   the reverse order.
+- In MSL's compiler (`dsi/1.2`, ARM), a pointer dereferenced with a post-increment or post-decrement (`*p++`, `*p--`,
+  `*q++ = v`) is colored after every other local, whatever its uses, and falls to the first callee-saved register left;
+  `*++p` and `*--p` don't do it. Writing the step as a statement of its own puts the pointer back in the normal order:
+  `ansi_fp.c`'s `__timesdec` (`result->sig.text[n] = *p; p++;` and `xp++; yp--;`) and `__minus_dec` (`*rtext = *k;
+  rtext++; k++;`) match only so.
 - `a[i + c]` adds `c` to `i` first, while `(a + i)[c]` folds `c * 4` into the base offset. When the original folds a
   constant index offset outside a loop, the array it indexes probably starts at `a + c` in the source.
 - An array index that is a sum, `a[i * 2 + x]`, is split into `(a + x) + i * 2`. When the original adds first and
@@ -833,6 +838,9 @@ Same instructions, scheduled in another order.
 - `x + (p << 12)` and `x + p * 0x1000` put the operands of `adds` in opposite orders: the phrase select's
   `PMSSelect_BGDrawPlate` sets a screen entry's palette with `(entries[i] & 0xfff) + (palette + 2) * 0x1000`, which
   gives `adds r5, r5, r2`, where `<< 12` gave `adds r5, r2, r5`.
+- An OR of two shifts of one value computes its right operand first and folds the left one's shift into the `orr`: `(x
+  << 16) | (x >> 16)` is `lsr r1, r0, #16; orr r0, r1, r0, lsl #16`, so the ROM's `lsl` first is `(x >> 16) | (x <<
+  16)`, as the DSP's `dsp_audio.c` and `dsp_pipe.c` swap the halves of a word.
 - Loads through a pointer are not moved above stores unless the pointee is `const`. A load that the original
   schedules early, such as an argument loaded before the stack arguments are stored, points to a `const` parameter.
   The reverse also shows: a store the original keeps after loads through a pointer, which ours hoists above them, means
@@ -1119,6 +1127,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loads the callee's address into `r3`, which the fourth argument holds. When the original saves a register and
   calls where the C tail-calls, the callee takes one argument more: `sta_acting.c`'s `StaActing_PlayWave` matched
   once `func_02006528` took the fourth argument its code reads, which the caller passes on from its own `r3`.
+  The register is always `r3` in Thumb: a tail jump through another, `ldr r1, =f; bx r1` as in `os_spinLock.c`'s
+  `OS_UnLockCartridge` and `OS_UnLockCard`, is no compiler output under any flags tried. ARM code tail-calls with
+  `ldr ip, =f; bx ip`, and only from a function that needs no frame, as TWL-DWC's wrappers and `w_pow.c`'s `pow` do.
 
 - `p->stack[p->num - 1]` with the array a direct member of `*p` subtracts 1 and loads from the array's offset
   (`subs; lsls; ldr [r0, #0x4c]`), while the same index into an array inside a nested struct folds the `- 1` into the
@@ -1218,6 +1229,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - An `if` whose condition is an assignment with `|=`, `if (texBanks |= GX_VRAM_C)`, keeps the `orr` and tests its
   result, which `|` would fold away: `screentex.c`'s bank switch, where the test is always true.
 - Masks written with `~` clear bits with `bic`. The game's `and` with a constant such as `0xef` is `x &= (u8)~FLAG`.
+  In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
+  so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
+  its register setters both ways, as the ROM has them. In Thumb both are an `ands` with a pool word.
 - MWCC doesn't propagate constants into a variable of an enum type. A loop that still checks its bound before the
   first pass, as `for (p = 80; p <= 83; p++)` does in the Join Avenue's commands, or a sum that still adds a counter
   known to be 0, as the Battle Subway's loop over its music switches does, has an enum counter. Nor does it move an
@@ -1332,6 +1346,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Two locals initialized to 0 in their declarations share one zero register, so a later `offset += 4` compiles as
   `adds r5, r4, #4` from the counter's zero: `iss_switch_set.c`'s `ISSSwitchSet_LoadArcDataCore` declares `int i = 0;
   u32 offset = 0;`, where `offset = 4` shares the `movs #4` of another argument instead.
+- A pointer compared with `NULL`, which is `((void *)0)`, can share a zero that the function keeps in a register for its
+  stores, `cmp r0, r5`, where `if (p)` and `if (!p)` compare with `#0`; keeping that zero alive moves other registers
+  too. `snd_command.c`'s `SND_CommandInit` stores eight zeros before its calls and matches only with `if (command)`;
+  `wm_system.c`'s `WmInit` and `nvram.c`'s callbacks need the same.
 - A value moved into an argument register just before a call, and used for nothing else, is an argument the prototype
   is missing. `GFL_SEPlayKeepVol` takes the sound's player as well as the sound. The value can be narrowed for it:
   `CtvtComm_RecvPacket` narrows `packet->value` into r1 (`lsls`/`lsrs #24`) but compares the unnarrowed value with
@@ -2088,12 +2106,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC has no count-leading-zeros intrinsic: `__clz`, `__CLZ` and `__builtin_clz` all compile to a real call to an
   external symbol, never the `clz` instruction. A bare `clz` in ARM library code is the SDK's `MATH_CountLeadingZeros`,
   which `nitro/math.h` inlines as the instruction in ARM code (MWCC defines `__thumb` only for Thumb) and as a call to
-  `MATH_CountLeadingZerosFunc` in Thumb code: `vct_audio.c`'s `VCT_SendPending` uses it.
+  `MATH_CountLeadingZerosFunc` in Thumb code: `vct_audio.c`'s `VCT_SendPending` uses it. The inline's `asm` block
+  also changes how the rest of the function compiles: in `dsp_process.c`'s `func_0270532c` and `func_027054e4` the
+  loops keep their `b` to the test instead of being rotated, an element's address is added again at each access, and
+  `~*p & (*p - 1)` loads `*p` twice, as in the ROM, where a call in its place rotates the loops and shares the adds.
 - MWCC builds `memcpy` and `memset` of a size it knows in place, without the call, when a header named `string.h`
-  declares them; the same prototypes from any other header leave a call. `include/string.h` (MSL's) does it, so code
-  whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s `memset` of a `VCTSession`), `dwc_auth.c`,
-  `ghttpEncryption.c` and `poke_net.c`, declares the C library's string functions in its own header (`dwc/ext.h`)
-  and doesn't include `<string.h>`. MSL's own files include it.
+  declares them, and `strcpy` of a string literal as a loop that copies two bytes a pass (`ldrb [r3, #1]; ldrb [r3],
+  #2; subs; strb; strb; bne`, and the last byte); the same prototypes from any other header leave a call.
+  `include/string.h` (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s
+  `memset` of a `VCTSession`), `dwc_auth.c`, `ghttpEncryption.c` and `poke_net.c`, declares the C library's string
+  functions in its own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does
+  TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops.
 
 ## Data and sections
 
@@ -2115,6 +2138,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   built with `-ipa function` (`file_flags` in `lib/nnsys/library.toml`), while the other sound files are reached from
   one base and need `-ipa file`. A struct that looks like another file's extern, or a gap in `.bss` that seems to need
   a stand-in function, is the first thing to try this on.
+- Without `-ipa file`, two objects reached from one literal, at `[r0]` and `[r0, #4]`, are one struct: `rtc_api.c` keeps
+  its flag and its work as `static struct { u16 initialized; RTCWork work; } sRtc;`, and TWL-DWC's `dwc_init.c` its game
+  code and started flag in one `DWCInit`. As two statics they get two literals.
+- A constant that the ROM loads from the literal pool, with no relocation in `relocs.txt`, where MWCC would fold it or
+  build it with `mov` and `lsl`, is a linker symbol: NitroSDK takes its stack sizes, the extended arena's start and the
+  overlay count from the linker script. Declared `extern u8 SYM[]` and cast where it is used, `(u32)SDK_IRQ_STACKSIZE`,
+  it is a pool load that stays out of the folding, as `os_interrupt.c`'s `OS_SetIrqStackChecker` (`HW_DTCM + 0x3f80 -
+  size`), `os_arena.c` (`SDK_MAINEX_ARENA_LO`, 0x0d000000) and `fs_overlay.c` (`__OVERLAY_COUNT`) need. dsd's linker
+  script defines `__OVERLAY_COUNT` but not NitroSDK's own symbols, so a file that reads those links only once the build
+  defines them.
 - A file-scope static that a function both passes by address and reads or writes directly gets two literals with
   the same address: the access goes through one (`ldr r0, =obj; strh r1, [r0, #0xe]`) and the pointer passed on
   through the other, where an `extern` object's address is loaded once and kept in a register, 4 bytes shorter. Two
@@ -2299,6 +2332,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ROM, the aligned buffer is larger than its use: the LTD's `photo_sign.c` sizes its random buffer, which the ARM7
   writes, to a whole 32-byte cache line though each fill uses 16. Aligning the next file's object instead gave the
   right size but changed how its code addresses it.
+- One `ATTRIBUTE_ALIGN(32)` object makes its file's whole `.bss` section 32-aligned, and the linker starts the section
+  on a 32-byte boundary, so a gap in the ROM's `.bss` before a 32-aligned object can be the end of the previous file:
+  NitroSDK's `snd_command.c` starts at `0x0214c700` with its 32-aligned command array, and the queue before the gap is
+  `nitro_snd_main.c`'s global `SNDi_Queue`. The alignment can change code as well: the loop that links that array's free
+  list keeps its `b` to the test only with the array aligned.
 - Sections start 4-aligned at link time (`ALIGNALL(4)` in the LCF), whatever their own alignment: pms_data.c's
   12-entry `u16` initializer after 0x16 bytes of shared `.rodata` sits at +0x18, not +0x16.
 - The same small table in the `.rodata` of several files of one overlay, each file with its own copy of the same
@@ -2421,6 +2459,22 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `bx pc` to reproduce the alignment halfword. The probe reports these Thumb functions as two bytes long in the ROM,
   excluding that padding; the full module check includes it. A C function pointer call makes each ARM part eight
   bytes too large.
+
+- MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
+  `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands
+  (`mov r1, r1, lsl #1`; there is no `lsl` mnemonic). Labels are `@name:`, local to the function; `dcd` emits a word;
+  `ldr rX, =value` builds the function's literal pool in first-use order, and `=symbol` gives a relocation. A branch to
+  another function's name is a relocation, so a routine that other code enters in the middle is split into one `asm`
+  function per entry, in the ROM's order, each falling into the next (an `asm` function gets no epilogue), as MSL's
+  `fp_fastI.c` is. In a Thumb file, an ARM `asm` function goes between `#pragma thumb off` and `#pragma thumb on`.
+
+- An `asm` function has one name: the assembler doesn't take `entry` (`unknown assembler instruction mnemonic`, in
+  `dsi/1.1p1` and `dsi/1.2`), so a routine that the ROM reaches under two names, as MSL's runtime routines with swan's
+  `__aeabi_*` names and MWCC's `_dadd`, gets its second name from the configs or the linker, never from the C.
+
+- An `asm {}` block inside a C function keeps the compiler's prologue, epilogue and addressing around it, which an `asm`
+  function can't give: `os_exception.c`'s `OSi_DisplayExContext` tests the handler and returns early in C, then switches
+  modes and calls it in the SDK's assembly.
 
 - An index into a flat array of actors that the source names by ranges is written with the range's enum base even
   when that base is 0: `b_plist_obj.c`'s `BPlistObj_ShowList` matches only as `actors[BPLIST_ACTOR_ITEM + slot]`, since
