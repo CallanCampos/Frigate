@@ -457,6 +457,8 @@ typedef struct LocalTvtScriptCommand LocalTvtScriptCommand;
 typedef struct LocalTvtScriptCommandFuncs LocalTvtScriptCommandFuncs;
 typedef struct LocalTvtScriptHeader LocalTvtScriptHeader;
 typedef struct LocalTvtScriptMode LocalTvtScriptMode;
+typedef struct LocalTvtSecret LocalTvtSecret;
+typedef struct LocalTvtSecretStage LocalTvtSecretStage;
 typedef struct LocalTvtSeq LocalTvtSeq;
 typedef struct LocalTvtSupport LocalTvtSupport;
 typedef struct LocalTvtSys LocalTvtSys;

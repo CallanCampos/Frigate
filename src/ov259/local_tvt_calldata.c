@@ -1,7 +1,7 @@
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_common.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_person_secret.h"
 #include "constants/zones.h"
 #include "field/player_state.h"
 #include "field/zone.h"

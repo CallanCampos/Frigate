@@ -3,7 +3,7 @@
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_chara.h"
 #include "app/local_tvt/local_tvt_common.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_person_secret.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
