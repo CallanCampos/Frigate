@@ -275,6 +275,11 @@ Same instructions, registers swapped.
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
   and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
   loop without the `NULL` test, matches with plain indexing.
+- `ctvt_game_cam.c`'s `CtvtGameCamExchange_Update` matches when each received picture is accessed as
+  `exchange->received[slot]`, keeping `exchange` in `r6` and forming its member offset after adding `slot`. An element
+  pointer grows the frame from 0x10 to 0x1c and computes a separate address. Declaring `finished` before `slot`, then
+  assigning its zero after `slot` is initialized, copies the saved zero into the loop counter instead of reloading the
+  stack slot. The two timing calls also need the picture number narrowed to `u8` after adding 32.
 - A loop-invariant field read through a `const` pointer parameter, which the original keeps in `ip`, `r7` or a stack
   slot across the loop, can be a load MWCC hoisted itself. Written as a local before the loop it keeps the same
   copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:

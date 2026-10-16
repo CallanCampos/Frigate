@@ -39,6 +39,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   Declaring every local first and assigning them below moves both registers and slots (matching.md: "declared first")
 - A pointer needs an earlier slot but a later store: declare it without an initializer and assign it after other
   pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
+- An element pointer grows the frame and replaces the original's struct-base-plus-index field access: index the
+  member at each use; declare a saved flag before a zeroed index and assign the flag afterward if the loop counter
+  must copy that index's zero. (matching.md: "each received picture is accessed")
 - A `u16` local and `local ± 1` sharing a register can push a parameter out of r0: a wider local keeps them apart.
   (matching.md: "wider local")
 - A ternary store computes the address once, an `if`/`else` store in each branch, and at the end of a function a

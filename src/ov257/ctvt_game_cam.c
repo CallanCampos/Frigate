@@ -697,23 +697,25 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
     }
     switch (exchange->state) {
     case 0: {
-        u8 finished = 0;
+        u8 finished;
         u8 slot = 0;
-        u8 selfNetId = func_02042a6c(func_02040440());
+        u8 selfNetId;
         u8 netId;
+
+        finished = 0;
+        selfNetId = func_02042a6c(func_02040440());
 
         if (!canPlayerExchangePhotos()) {
             for (netId = 0; netId < 4; netId++) {
                 if (exchange->receiving & (1 << netId)) {
-                    u8 *received = &exchange->received[slot];
-
-                    if (exchange->picture != *received) {
+                    if (exchange->picture != exchange->received[slot]) {
                         finished |= (u8)(1 << netId);
                     } else if (func_02043b24(netId) == TRUE) {
                         func_02043a1c(netId);
-                        (*received)++;
-                        if (*received < 3) {
-                            func_020439a4(0x2000, netId, exchange->heapId, members[slot].pictures[*received]);
+                        exchange->received[slot]++;
+                        if (exchange->received[slot] < 3) {
+                            func_020439a4(0x2000, netId, exchange->heapId,
+                                          members[slot].pictures[exchange->received[slot]]);
                         }
                     }
                 }
@@ -731,13 +733,13 @@ static void CtvtGameCamExchange_Update(CtvtGameCamExchange *exchange, CtvtGameMe
     }
     case 1:
         if (exchange->waiting == FALSE) {
-            func_02040624(func_02040440(), exchange->picture + 32, 32);
+            func_02040624(func_02040440(), (u8)(exchange->picture + 32), 32);
             exchange->state = 2;
             return;
         }
         break;
     case 2:
-        if (func_02040664(func_02040440(), exchange->picture + 32, 32) == TRUE) {
+        if (func_02040664(func_02040440(), (u8)(exchange->picture + 32), 32) == TRUE) {
             exchange->state = 0;
             exchange->waiting = TRUE;
             exchange->picture++;
@@ -1117,9 +1119,10 @@ static void CtvtGameCam_SeqRoulette(CtvtGameCamSeq *seq, int *state, CtvtGameCam
         break;
     case 3:
         if (task->roulette.timer % 6 == 0) {
+            u8 actorIndex = task->roulette.cursor + 3;
+
             task->roulette.blink ^= 1;
-            func_0204c378(CtvtGameCamActors_GetActor(&task->clact, task->roulette.cursor + 3), task->roulette.blink,
-                          TRUE);
+            func_0204c378(CtvtGameCamActors_GetActor(&task->clact, actorIndex), task->roulette.blink, TRUE);
         }
         task->roulette.timer++;
         if (task->roulette.timer > 80) {
