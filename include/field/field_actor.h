@@ -154,6 +154,15 @@ void func_ov036_0219634c(FieldActor *actor, u16 *a1, u16 *a2);
 void func_ov036_021963a4(FieldActor *actor, u16 a1, u16 a2);
 // Sets the frame of the model's animation for a time. FALSE if the actor has no model
 BOOL func_ov036_02196b10(FieldActor *actor, u16 time);
+// Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command
+BOOL func_ov036_0218ed68(FieldActor *actor);
+// Overlay 36's fldmmdl_blact.c, not written yet: the flag that the billboard actors' load callback sets, their
+// billboard system, and the change of an actor's model to another object code
+u8 func_ov036_0219381c(FieldActor *actor);
+BlActSys *FieldBlAct_GetBlActSys(void *fieldBlAct);
+void FldAct_SwapObjCode(FieldActor *actor, u16 objCode);
+// Overlay 36's field_rail_loader.c, not written yet: sets a flag of the actor's rail billboard work
+void func_ov036_0219690c(FieldActor *actor, BOOL value);
 // The unit vector of a direction along the actor's rail
 void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest);
 void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest);

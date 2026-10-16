@@ -108,7 +108,7 @@ void CtvtGameTarget_Draw(CtvtGameTarget *target) {
         }
         first = GFL_G3DMgrGetSceneFirstActorIdx(target->g3d, target->scene);
         actor = GFL_G3DMgrGetActor(target->g3d, first + target->actor);
-        func_02068410(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(actor))->resMdl, target->alpha);
+        NNS_G3dMdlSetMdlAlphaAll(GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(actor))->resMdl, target->alpha);
         GFL_G3DSysDrawObj(actor, &target->srt);
     }
 }

@@ -594,8 +594,9 @@ BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength); /
 void FS_ReleaseArchiveName(FSArchive *arc);
 // The name of the archive, in place or in the pool
 const char *FS_GetArchiveName(const FSArchive *arc);
-// Gives an archive its interface and the data its functions use, and mounts it: runs FS_COMMAND_MOUNT
-BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *vtbl);
+// Gives an archive its interface and the data its functions use, and mounts it: runs FS_COMMAND_MOUNT. reserved,
+// TwlSDK's, is unused; FS_LoadArchive passes 0
+BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *vtbl, u32 reserved);
 // Unmounts it: cancels its commands, runs FS_COMMAND_UNMOUNT and takes it out of FS_FindArchive's reach
 BOOL FS_UnmountArchive(FSArchive *arc);
 BOOL FS_SuspendArchive(FSArchive *arc);

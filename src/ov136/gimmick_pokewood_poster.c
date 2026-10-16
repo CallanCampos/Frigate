@@ -110,7 +110,7 @@ static void func_ov136_021eedc0(void *texResource, const char *texName, const ch
     static const u8 sTilePixels = 8;
     NNSGfdTexKey texKey = GFL_G3DResGetTexVRAMHandle(texResource);
     NNSGfdPlttKey plttKey = GFL_G3DResGetPltVRAMHandle(texResource);
-    NNSG3dResTex *tex = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(texResource));
+    NNSG3dResTex *tex = NNS_G3dGetTex(GFL_G3DResGetResData(texResource));
     u32 texAddr = func_ov136_021eeee8(tex, texName);
     u32 plttAddr = func_ov136_021eef20(tex, plttName);
     NNSG2dCharacterData *character = NULL;
@@ -163,7 +163,7 @@ static u32 func_ov136_021eeee8(const NNSG3dResTex *tex, const char *name) {
 
     func_ov136_021eeeb4(&resName, name);
     if (tex != NULL) {
-        texData = NNS_G3DFind(&tex->dict, &resName);
+        texData = NNS_G3dGetResDataByName(&tex->dict, &resName);
     } else {
         texData = NULL;
     }
@@ -179,7 +179,7 @@ static u32 func_ov136_021eef20(const NNSG3dResTex *tex, const char *name) {
 
     func_ov136_021eeeb4(&resName, name);
     if (tex != NULL && tex->plttInfo.ofsDict != 0) {
-        plttData = NNS_G3DFind((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), &resName);
+        plttData = NNS_G3dGetResDataByName((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), &resName);
     } else {
         plttData = NULL;
     }

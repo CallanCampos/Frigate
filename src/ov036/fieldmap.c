@@ -926,7 +926,7 @@ void *FieldG2D_GetDispControl(Field *field) {
 
 void Field_FreeGraphicsSystems(Field *field) {
     GFL_BGSysSetDisplayLayout(1);
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     GFL_G3DSysFree();
     GFL_BGSysFree();
 }
@@ -1394,7 +1394,7 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset);
     NNS_G3dGlbSetProjectionMtx(&mtx);
     NNS_G3DFlushRenderState();
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     FieldEffects_Draw(field->fieldEffects);
     FieldG3DObjSystem_Draw(field->g3DObjSystem);
     BlActSys_Draw(field->actorBlAct, field->g3dCamera, field->g3dLights);
@@ -1406,7 +1406,7 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset / 2);
     NNS_G3dGlbSetProjectionMtx(&mtx);
     NNS_G3DFlushRenderState();
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     BlActSys_Draw(field->effectBlAct, field->g3dCamera, field->g3dLights);
     NNS_G3dGlbSetProjectionMtx(&saved);
     NNS_G3DFlushRenderState();

@@ -134,7 +134,7 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
     field->status.scale.z = FX32_ONE;
     MTX_Identity33_(&field->status.rotation);
 
-    palSize = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
+    palSize = NNS_G3dGetTex(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
     field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0xea);
     field->palFade.palettes = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0xeb);
     field->palFade.resources[0] = field->res;
@@ -216,7 +216,7 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
     field->status.scale.z = FX32_ONE;
     MTX_Identity33_(&field->status.rotation);
 
-    palSize = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
+    palSize = NNS_G3dGetTex(GFL_G3DResGetResData(field->res))->plttInfo.sizePltt << 3;
     field->palFade.resources = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0x1f4);
     field->palFade.palettes = GFL_HeapAllocate(field->heapId, sizeof(void *), FALSE, "btlv_field.c", 0x1f5);
     field->palFade.resources[0] = field->res;

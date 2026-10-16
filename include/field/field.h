@@ -10,7 +10,7 @@
 #include "struct_decls.h"
 #include "system/bmp_menulist.h"
 
-void BeginContinuePlaceNameDisp(PlaceName *placeName, u16 zoneId);
+void BeginContinuePlaceNameDisp(PlaceName *placeName, s32 zoneId);
 void BeginForcePlaceNameDisp(PlaceName *placeName, s32 zoneId);
 void EncEff_StartEvent(EncEff *encEff, GameEvent *event, u32 effect);
 void FieldG2D_Prepare3DSurface(Field *field);
@@ -221,6 +221,8 @@ u32 func_ov036_021ba6a4(u8 index, void *list);
 u32 func_ov036_021ba6b0(u8 index, void *list);
 // Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
 void func_ov036_021ba6bc(u8 index, BOOL inUse, void *list);
+// Overlay 36's field_fade.c, not written yet: whether a grid position is in the rectangle of an entry of the list
+BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry);
 // The mapper's WFBC work
 void *func_ov036_0218adac(HeapID heapId);
 void func_ov036_0218add0(void *wfbc);
@@ -306,6 +308,9 @@ void func_ov036_021878d0(void *msgBGSys);
 void func_ov036_0218796c(void *msgBGSys);
 void func_ov036_02187760(void *msgBGSys);
 void func_ov036_0218776c(void *msgBGSys);
+// Runs a step of the message BG's BG setup, and whether its VBlank task has finished
+void func_ov036_0218779c(void *msgBGSys, u32 step);
+BOOL func_ov036_021878bc(void *msgBGSys);
 // Releases the BG of the field's message BG and returns TRUE, or returns FALSE if it has none
 BOOL func_ov036_02187868(void *msgBGSys);
 void func_ov036_021879c0(void *msgBGSys);

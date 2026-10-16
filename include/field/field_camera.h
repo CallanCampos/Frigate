@@ -77,6 +77,10 @@ void FieldCameraAnimationController_SetAnimation(FieldCameraAnimationController 
                                                  const FieldCameraAnimation *animation);
 void FieldCameraAnimationController_PrepareCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_StartAnimation(FieldCameraAnimationController *controller);
+// Overlay 36's field_camera_anime.c, not written yet: releases the camera the animation is bound to, and puts the
+// camera at the animation's start
+void FieldCameraAnimationController_FinishCamera(FieldCameraAnimationController *controller);
+void FieldCameraAnimationController_CommitSrcCoords(FieldCameraAnimationController *controller);
 GameEvent *EventEvCameraShake_Create(GameSystem *gsys, const FieldEvCameraShake *shake);
 void FieldCamera_CalcTransform(FieldCamera *camera, u16 heldKeys);
 G3DCamera *FieldCamera_GetG3DCamera(FieldCamera *camera);

@@ -10,6 +10,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Zeros loaded from a stack slot at each use and a constant hoisted into a saved register, where ours uses `movs`:
   move a later loop into a `static inline` that counts with its own parameter, passed that constant.
   (matching.md: "A constant held in a stack slot")
+- A constant copied from a saved register (`adds r1, r7, #0`) at uses where the original writes the immediate, or the
+  reverse: the hoisted-constant budget. Give a statement before the first copy one more (or one fewer) named step, or
+  declare locals `int` instead of `u32` (one node each); test one node short of the edge.
+  (matching.md: "within a budget")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
 - An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
@@ -37,7 +41,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
 - A `u16` local and `local ± 1` sharing a register can push a parameter out of r0: a wider local keeps them apart.
   (matching.md: "wider local")
-- A ternary store computes the address once, an `if`/`else` store in each branch. (matching.md: "ternary store")
+- A ternary store computes the address once, an `if`/`else` store in each branch, and at the end of a function a
+  copy of the epilogue in each. (matching.md: "ternary store")
 - `p + (a + 4)` and `p + a + 4` differ. (matching.md: "Parenthesized offsets")
 - A sum folded into the load's offset (`ldrb r2, [r3, #9]` from `base + pos`) where ours adds `pos + 1` first:
   `*(data + pos + 1)` instead of `data[pos + 1]`; this also folds `- 1` in `BrProcSys_Pop`.
@@ -53,8 +58,20 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A pointer local to an element")
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate differently, as do `count = 1; arr[0] = x;` and the
   reverse. (matching.md: "arr[count++]")
-- A pointer stepped by `*p++` that lands in a callee-saved register above the others (MSL, `dsi/1.2`): write the
-  step as its own statement, `*q = *p; p++;`. (matching.md: "post-increment or post-decrement")
+- A pointer stepped by `*p++` that lands in a callee-saved register above the others (MSL's `dsi/1.2`, NitroSystem's 2.0
+  Thumb), or whose spill takes a temporary's slot (`dsi/1.1p1`): write the step as its own statement, `*q = *p; p++;`,
+  for every `*p++` on it. (matching.md: "post-increment or post-decrement")
+- A register swap between a new local and a value derived from the parameters: store the value in a parameter the
+  function never reads, or in a variable an earlier branch used (fdlibm 5.2's `s`). (matching.md: "a variable the
+  function already has")
+- A narrow local colored after every declared one, whatever its declaration's place, when it is only used widened:
+  declare it `int`. (matching.md: "only ever used widened")
+- Registers of a scheduled function swapped although every order of the computation was tried: write the `volatile`
+  stores first, and read fields at each use. (matching.md: "registers still follow the source order")
+- A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
+  declare it `unsigned long`, the SDK's `u32`. (matching.md: "`WDS_OnScan`")
+- Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
+  "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
   `cmp rX, #0`: test the pointer as `if (p)`, not against `NULL`. (matching.md: "A pointer compared with `NULL`")
 - A sum used as an index goes to the register of one of its terms unless it has its own variable.
@@ -146,10 +163,15 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "reused by several switch cases")
 - Values at the bottom of the frame in assignment order, with one among the declared slots: one variable reused by
   several blocks. (matching.md: "assigned anew in several `if` blocks")
+- A local's slot taken by a loop-invariant temporary above the spilled parameters: declare the local with the type the
+  loop compares or combines it at (`u32 include`). (matching.md: "loop-invariant converted copy")
 - A spilled value in the lowest slot that should be among the declared ones: split a chained assignment `a = b = x`.
   (matching.md: "chained assignment")
-- Block-scoped locals sit above function-scope ones. A block-scoped `{0, 0, 0}` initializer and a non-`const`
-  parameter fixed `particle.c`.
+- Block-scoped locals sat above function-scope ones in `particle.c`, where a block-scoped `{0, 0, 0}` initializer and a
+  non-`const` parameter fixed it; NitroSDK's Thumb files without `-ipa file` and NitroSystem put them below.
+  (matching.md: "a block local sits below")
+- A padding slot stored twice before a call, one field read through a register and one through the slot: a pointer local
+  to a field of a field. (matching.md: "A padding slot stored twice")
 - A NULL check written on a field gives different slots from the same check on a local loaded first.
   (matching.md: "NULL check written on a field")
 - Reusing one `next` variable for two loops gives late spill slots. A counter multiplied later
@@ -194,6 +216,31 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
+- A NitroSDK parameter struct read late: check the SDK's prototype for a `const` our header lost (`WM_StartScanEx`).
+  (matching.md: "lost the SDK's `const`")
+- A parameter's copy and a stored constant in the other order at entry, all else equal: the stored-to fields are
+  `volatile`, as for memory another processor shares. (matching.md: "Stores to `volatile` fields")
+- A store order that no sweep reaches, with one value a call's result: hold the result in a local and sweep again.
+  (matching.md: "When one stored value is a call's result")
+- A byte offset added to a pointer, with the offset loaded first and on the left of the `adds`: integer arithmetic on
+  the address, `(T *)((u32)p + n)`. (matching.md: "With two loads and no local")
+- `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
+  two branch-assigned locals. (matching.md: "A weighted sum")
+- Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
+  rather than a fresh local. (matching.md: "a fresh local's computation down to its first use")
+- All three values loaded before the stores of a vector: NitroSDK's `VEC_Set`. (matching.md: "`VEC_Set(v, x, y, z)`")
+- `*p` loaded again at the top of a loop's body: walk a local copy of the parameter. (matching.md: "walks a parameter
+  pointer")
+- An address into another processor's table scheduled differently: index it through a pointer to the table's type.
+  (matching.md: "another processor holds")
+- A constant return value built between a load and its store: `result = CONST;` before that store, `break`, and one
+  `return result;`. (matching.md: "A constant return value built between")
+- A member of a file static stored through a literal of its own address (2.0/sp2p2): a pointer local to the member.
+  (matching.md: "goes through the section's anchor")
+- An inline's argument evaluated in the original's order only through the SDK's own inline, enum parameter and all
+  (`G3X_SetFifoIntrCond`). (matching.md: "It goes the other way as well")
+- The `smull` and `smlal` of a sum of two 64-bit products in the other order: swap the products in the source, since
+  MWCC multiplies the right one first. (matching.md: "multiplies the right product first")
 - A `void *` parameter copied to a typed local takes the `const` itself, callback typedef included; through a
   wrapper whose body is a `static inline`, only the wrapper's parameter counts.
   (matching.md: "copied to a typed local needs the `const`"), (matching.md: "only the wrapper's own parameter counts")
@@ -262,6 +309,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A static table's address loaded into a saved register at entry after a parameter's spill, where the original
   loads it first: drop the pointer local aliasing the table and index the table at each use.
   (matching.md: "A static table's address that MWCC gathers")
+- Constant stores in descending order: one chained assignment written from the first element to the last.
+  (matching.md: "A longer chain also stores from the right")
+- Calls packed into one word with a kept bit, the bit tested before the calls and spilled: the calls into locals,
+  then the packing. (matching.md: "packed into one word")
 
 ## An instruction too many or too few
 
@@ -360,6 +411,22 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "only keeps that shape when the loop runs over its own")
 - Two steps of constant arithmetic where MWCC makes one, or two registers where one cursor would do: a local for the
   first step, or a second local with a role of its own. (matching.md: "keeps the two steps only when")
+- Two `rsb`s of a double negation (`-h * -t`) that MWCC drops: the negated value in a local assigned first, or a
+  cast around it. (matching.md: "A double negation folds the same way")
+- `rsb #0; add #c` for `c - (a + b)` where ours has one `rsb #c`: a conversion between the negation and the add, as
+  NitroSDK's `long` `FX32_ONE` gives. (matching.md: "A negated sum folds")
+- `add rN, sp, #0; add rN, rN, #4` for a stack struct's field: pass the struct as words to an inline that indexes them.
+  (matching.md: "passed as a packet of words")
+- `mov r0, #imm; cmp rX, r0` where the immediate fits: the limit is a variable set to the constant. (matching.md: "is a
+  limit held in a variable")
+- A constant built in a free argument register before a call and shared with a store: the callee takes one more
+  argument. (matching.md: "shares with an earlier store of the same constant")
+- An address computed differently for a `size_t` index: the SDK's prototype takes `size_t`, which is `unsigned long`.
+  (matching.md: "`size_t` is `unsigned long` as well")
+- A loop hoisted differently around `strncmp` or `strcmp`: `<string.h>` against another header's prototypes.
+  (matching.md: "`<string.h>`'s `strncmp`")
+- A dot product's translation added after the shift, 8 bytes larger in one expression: `+=` in a statement of its
+  own; a sum of two products can need the one expression instead. (matching.md: "adds each translation")
 
 ## Branches and block layout
 
@@ -513,7 +580,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but
   given the `.data` tables with the `.rodata` objects it predicts the `.rodata` order. (matching.md: "The list that is
   heapsorted")
-- `.bss` statics are ordered by size, then in an order that isn't the declaration order; try permutations.
+- `.bss` statics in another order: MWCC 2.0 lays them out in the reverse of their definitions without `-ipa file`, and
+  with it in their order with the first one moved to the end. (matching.md: "with the first one moved to the end")
 - A table that only one function reads can be a `static const` inside it, which moves it in the heapsort's list.
   (matching.md: "declared inside the one function")
 - A `.rodata` template copied to a local, then patched with computed fields, in a section of its own: a local
@@ -537,6 +605,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "same small table")
 - Two literals for the same object in one function: it is a `static` of the function's file; an `extern` shares
   one. (matching.md: "gets two literals")
+- Two literals for one static in a library file without `-ipa file`: add the flag. Read at offset 0 after the file's
+  other statics: the static opens another file's `.bss`. (matching.md: "take MWCC knowing the static's definition")
 - Two statics reached from one literal: `-ipa file` in `file_flags`, with the SDK's separate statics. (matching.md:
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker

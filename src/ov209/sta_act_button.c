@@ -190,7 +190,7 @@ static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId
     u8 *texData;
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_MUSICAL_ITEM, itemId, FALSE, sys->heapId);
-    tex = NNS_G3DResGetTexBlock(file);
+    tex = NNS_G3dGetTex(file);
     texData = (u8 *)tex + tex->texInfo.ofsTex;
     plttOfs = tex->plttInfo.ofsPlttData;
     texSize = tex->texInfo.sizeTex << 3;

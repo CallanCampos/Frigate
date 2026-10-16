@@ -276,11 +276,10 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
     u32 flags;
     int digits;
     char *dstStart;
-    BOOL include;
+    u32 include;
     BOOL range;
     char *setDst;
     int radix;
-    int sc;
     int c;
     int count = 0;
     int width;
@@ -499,6 +498,8 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             dstStart = dst;
         }
         if (conv == 's') {
+            int sc;
+
             if (width == 0) {
                 width = 0x7fffffff;
             }
@@ -603,7 +604,8 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
                 break;
             }
             if (setDst != NULL) {
-                *setDst++ = ch;
+                *setDst = ch;
+                setDst++;
             }
             src++;
             ch = *src;

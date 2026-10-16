@@ -772,9 +772,9 @@ BrProfile *BrProfile_Init(GdsProfile *cp_profile, BrRes *res, ClActUnit *unit, P
 
     {
         BOOL egg = GdsProfile_IsEgg(cp_profile);
-        u32 species = GdsProfile_GetSpecies(cp_profile);
-        u32 form = GdsProfile_GetForm(cp_profile);
-        u32 gender = GdsProfile_GetGender(cp_profile);
+        int species = GdsProfile_GetSpecies(cp_profile);
+        int form = GdsProfile_GetForm(cp_profile);
+        int gender = GdsProfile_GetGender(cp_profile);
 
         if (species != 0) {
             ArcTool *handle = GFL_ArcSysCreateFileHandle(7, HEAPID_TAIL(heapId));

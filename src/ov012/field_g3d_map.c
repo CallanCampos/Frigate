@@ -422,10 +422,10 @@ void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, void *resource, void *texture
     void *mdlFile = GFL_G3DResGetResData(resource);
     void *texFile = GFL_G3DResGetResData(texture);
     NNSG3dResTex *tex = NULL;
-    NNSG3dResMdl *mdl = FieldChunk_GetFirstMdl(NNS_G3DResGetMdlBlock(mdlFile));
+    NNSG3dResMdl *mdl = FieldChunk_GetFirstMdl(NNS_G3dGetMdlSet(mdlFile));
 
     if (texFile != NULL) {
-        tex = NNS_G3DResGetTexBlock(texFile);
+        tex = NNS_G3dGetTex(texFile);
     }
     if (tex != NULL) {
         NNS_G3dBindMdlTex(mdl, tex);
@@ -468,7 +468,7 @@ s32 FieldChunk_CheckBBox(const GXBoxTestParam *box) {
     NNS_G3dGeBegin(GX_BEGIN_TRIANGLES);
     NNS_G3dGeEnd();
     NNS_G3dGeBoxTest(box);
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     while (G3X_GetBoxTestResult(&in) != 0) {
     }
     return in;

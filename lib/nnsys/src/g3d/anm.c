@@ -13,21 +13,21 @@ NNSG3dFuncBlendMat NNS_G3dFuncBlendMat = NNSi_G3dAnmBlendMat;
 NNSG3dFuncBlendJnt NNS_G3dFuncBlendJnt = NNSi_G3dAnmBlendJnt;
 NNSG3dFuncBlendVis NNS_G3dFuncBlendVis = NNSi_G3dAnmBlendVis;
 
-void *NNS_G3dFuncAnmMatNsBma = (void *)func_02069968;
-void *NNS_G3dFuncAnmMatNsBta = (void *)func_02069ea0;
-void *NNS_G3dFuncAnmMatNsBtp = (void *)func_02069cf8;
-void *NNS_G3dFuncAnmJntNsBca = (void *)NNS_G3DAnimationApply_CA;
-void *NNS_G3dFuncAnmVisNsBva = (void *)func_02069f18;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBma = NNS_G3DAnimationApply_MA;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBtp = NNS_G3DAnimationApply_TP;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBta = NNS_G3DAnimationApply_TA;
+NNSG3dFuncAnmJnt NNS_G3dFuncAnmJntNsBca = NNS_G3DAnimationApply_CA;
+NNSG3dFuncAnmVis NNS_G3dFuncAnmVisNsBva = NNS_G3DAnimationApply_VA;
 
 u32 NNS_G3D_ANIMATION_INIT_HEADER_COUNT = 5;
 
 // The kinds of animation resource that NNS_G3DAnimationCreate knows, with room for five more
 NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[10] = {
-    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_MA }, func_020698d4 },
+    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_MA }, NNS_G3DAnimationInit_MA },
     { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TP }, NNS_G3DAnimationInit_TP },
     { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TA }, NNS_G3DAnimationInit_TA },
-    { { NNS_G3D_DATABLK_VIS_ANM, 0, NNS_G3D_ANM_CATEGORY1_VA }, func_02069ee4 },
-    { { NNS_G3D_DATABLK_JNT_ANM, 0, NNS_G3D_ANM_CATEGORY1_CA }, func_02068764 },
+    { { NNS_G3D_DATABLK_VIS_ANM, 0, NNS_G3D_ANM_CATEGORY1_VA }, NNS_G3DAnimationInit_VA },
+    { { NNS_G3D_DATABLK_JNT_ANM, 0, NNS_G3D_ANM_CATEGORY1_CA }, NNS_G3DAnimationInit_CA },
 };
 
 // Calls the animation function of every animation object that has data for the material, in the order of the list, so

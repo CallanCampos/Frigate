@@ -270,11 +270,12 @@ BOOL OS_IsThreadAvailable(void) {
 // and the end of the function makes the thread exit
 void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *stack, u32 stackSize, u32 prio) {
     u32 enabled = OS_DisableInterrupts();
+    u32 id = OSi_GetUnusedThreadId();
     u32 stackTop;
 
-    thread->id = OSi_GetUnusedThreadId();
-    thread->state = OS_THREAD_STATE_WAITING;
     thread->priority = prio;
+    thread->state = OS_THREAD_STATE_WAITING;
+    thread->id = id;
     thread->profiler = NULL;
     OSi_InsertThreadToList(thread);
 

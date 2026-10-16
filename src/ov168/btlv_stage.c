@@ -153,7 +153,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
         stage->actors[1] = GFL_G3DActorCreate(stage->mdls[1], NULL, 0);
     }
 
-    size = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(stage->models[0]))->plttInfo.sizePltt << 3;
+    size = NNS_G3dGetTex(GFL_G3DResGetResData(stage->models[0]))->plttInfo.sizePltt << 3;
     stage->fade.resources = GFL_HeapAllocate(stage->heapId, sizeof(void *), TRUE, "btlv_stage.c", 0x120);
     stage->fade.palettes = GFL_HeapAllocate(stage->heapId, sizeof(void *), TRUE, "btlv_stage.c", 0x121);
     stage->fade.resources[0] = stage->models[0];

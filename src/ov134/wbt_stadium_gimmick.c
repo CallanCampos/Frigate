@@ -583,7 +583,7 @@ static u32 WbtStadiumGimmick_FindTexAddr(const NNSG3dResTex *tex, const char *na
 
     WbtStadiumGimmick_MakeResName(&resName, name);
     if (tex != NULL) {
-        texData = NNS_G3DFind(&tex->dict, &resName);
+        texData = NNS_G3dGetResDataByName(&tex->dict, &resName);
     } else {
         texData = NULL;
     }
@@ -599,7 +599,7 @@ static u32 WbtStadiumGimmick_FindPlttAddr(const NNSG3dResTex *tex, const char *n
 
     WbtStadiumGimmick_MakeResName(&resName, name);
     if (tex != NULL && tex->plttInfo.ofsDict != 0) {
-        plttData = NNS_G3DFind((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), &resName);
+        plttData = NNS_G3dGetResDataByName((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), &resName);
     } else {
         plttData = NULL;
     }
@@ -623,7 +623,7 @@ static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource,
 
     GFL_G3DResGetTexVRAMHandle(texResource);
     GFL_G3DResGetPltVRAMHandle(texResource);
-    tex = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(texResource));
+    tex = NNS_G3dGetTex(GFL_G3DResGetResData(texResource));
     texAddr = WbtStadiumGimmick_FindTexAddr(tex, texName);
     plttAddr = WbtStadiumGimmick_FindPlttAddr(tex, plttName);
     work->character = NULL;

@@ -519,12 +519,15 @@ static void DWCAc_FreeSearchBlocks(void) {
 // or the six bytes of the BSSIDs (memcmp); the callers only test the result for 0, so the code doesn't say which
 static u8 DWCAc_FindSimilarCandidate(void) {
     u8 i;
-    u8 count;
+    int selected;
     DWCAcSearchWork *work = sBlocks.search;
-    s16 selected = work->selected;
-    u8 kind = work->kind;
-    const char *name = (const char *)work->candidates[selected].bssid;
+    u8 count;
+    u8 kind;
+    const char *name;
 
+    selected = work->selected;
+    kind = work->kind;
+    name = (const char *)work->candidates[selected].bssid;
     if (kind >= 0x12) {
         return 1;
     }

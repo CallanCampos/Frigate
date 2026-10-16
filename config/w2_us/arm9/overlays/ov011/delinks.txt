@@ -112,3 +112,17 @@ lib/dwc/src/gt2/gt2.c:
     .text       start:0x0216eee8 end:0x0216fc38
     .data       start:0x0218703c end:0x021874e0
     .bss        start:0x02190968 end:0x021909a4
+
+lib/dwc/src/gamespy/darray.c:
+    complete
+    .text       start:0x0217150c end:0x02171858
+
+lib/dwc/src/gamespy/hashtable.c:
+    complete
+    .text       start:0x02171858 end:0x02171a3c
+
+lib/dwc/src/gamespy/md5c.c:
+    complete
+    .text       start:0x02171a3c end:0x0217245c
+    .rodata     start:0x021850d4 end:0x021850e8
+    .data       start:0x02187794 end:0x021877d4

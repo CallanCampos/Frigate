@@ -18,7 +18,7 @@ typedef struct MIiGXDmaState {
     MIDmaCallback callback;
     void *arg;
     // What the FIFO interrupted for, and the function of its interrupt, until the transfer is over
-    u32 fifoIrqCondition;
+    GXFifoIntrCond fifoIrqCondition;
     OSIrqFunction irqFunc;
 } MIiGXDmaState;
 
@@ -51,9 +51,10 @@ void MI_SendGXCommandAsync(u32 dmaNo, const void *src, u32 length, MIDmaCallback
     MIi_CheckDma0SourceAddress(dmaNo, (u32)src, length, MI_DMA_SRC_INC);
     MI_WaitDma(dmaNo);
     enabled = OS_DisableInterrupts();
-    sGXDmaState.fifoIrqCondition = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_FIFO_IRQ_MASK) >> REG_G3X_GXSTAT_FIFO_IRQ_SHIFT;
+    sGXDmaState.fifoIrqCondition =
+        (GXFifoIntrCond)((reg_G3X_GXSTAT & REG_G3X_GXSTAT_FIFO_IRQ_MASK) >> REG_G3X_GXSTAT_FIFO_IRQ_SHIFT);
     sGXDmaState.irqFunc = OS_GetIrqFunction(OS_IE_GXFIFO);
-    reg_G3X_GXSTAT = (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FIFO_IRQ_MASK) | (1 << REG_G3X_GXSTAT_FIFO_IRQ_SHIFT);
+    G3X_SetFifoIntrCond(GX_FIFOINTR_COND_UNDERHALF);
     OS_SetIrqFunction(OS_IE_GXFIFO, MIi_FIFOCallback);
     OS_EnableIrqMask(OS_IE_GXFIFO);
     MIi_FIFOCallback();
@@ -92,8 +93,7 @@ static void MIi_DMACallback(void *arg) {
     void *callbackArg;
 
     OS_DisableIrqMask(OS_IE_GXFIFO);
-    reg_G3X_GXSTAT = (sGXDmaState.fifoIrqCondition << REG_G3X_GXSTAT_FIFO_IRQ_SHIFT) |
-                     (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FIFO_IRQ_MASK);
+    G3X_SetFifoIntrCond(sGXDmaState.fifoIrqCondition);
     OS_SetIrqFunction(OS_IE_GXFIFO, sGXDmaState.irqFunc);
     sGXDmaState.isBusy = FALSE;
     callback = sGXDmaState.callback;

@@ -65,7 +65,8 @@ static u8 WDS_RssiToSignal(u8 rssi) {
 // The callback of the scan. It takes in the beacons that are new and well-formed, then tells the caller
 static void WDS_OnScan(void *arg) {
     WMStartScanExCallback *result = arg;
-    u32 i;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long i;
     u32 j;
     BOOL found;
 

@@ -721,7 +721,7 @@ static void IrcSyncCheckModel_Init(IrcSyncCheckModel *model, ArcTool *arc, const
         for (i = 0; i < 2; i++) {
             GFL_G3DActorBindAnm(model->actor, i);
         }
-        func_020683ec(renderObj->resMdl, polygonId);
+        NNS_G3dMdlSetMdlPolygonIDAll(renderObj->resMdl, polygonId);
     }
     MTX_Identity33_(&model->transform.rotation);
     model->transform.scale.x = FX32_ONE;
@@ -1339,7 +1339,7 @@ static void IrcSyncCheckThumbs_Place(IrcSyncCheckThumbs *thumbs, int index, int 
 
     switch (index) {
     case 0:
-        func_02067fa0(x, y, &nearPos, &farPos);
+        NNS_G3dScrPosToWorldLine(x, y, &nearPos, &farPos);
         VEC_Subtract(&farPos, &nearPos, &direction);
         VEC_Normalize(&direction, &direction);
         VEC_MultAdd(FX32_CONST(64), &direction, &nearPos, &nearPos);
@@ -1348,8 +1348,8 @@ static void IrcSyncCheckThumbs_Place(IrcSyncCheckThumbs *thumbs, int index, int 
         thumbs->lastY = y;
         break;
     case 1:
-        func_02067fa0(thumbs->lastX + (x - thumbs->lastX) * 2, thumbs->lastY + (y - thumbs->lastY) * 2, &nearPos,
-                      &farPos);
+        NNS_G3dScrPosToWorldLine(thumbs->lastX + (x - thumbs->lastX) * 2, thumbs->lastY + (y - thumbs->lastY) * 2,
+                                 &nearPos, &farPos);
         VEC_Subtract(&farPos, &nearPos, &direction);
         VEC_Normalize(&direction, &direction);
         VEC_MultAdd(FX32_CONST(64), &direction, &nearPos, &nearPos);

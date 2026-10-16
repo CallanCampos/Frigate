@@ -742,5 +742,5 @@ static void CircleGraph_ToScreenPos(const VecFx16 *pos, int *x, int *y) {
     world.x = FX_F32_TO_FX32(FX_FX16_TO_F32(pos->x));
     world.y = FX_F32_TO_FX32(FX_FX16_TO_F32(pos->y));
     world.z = FX_F32_TO_FX32(FX_FX16_TO_F32(pos->z));
-    NNS_G3DProject(&world, x, y);
+    NNS_G3dWorldPosToScrPos(&world, x, y);
 }

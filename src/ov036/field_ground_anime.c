@@ -171,7 +171,7 @@ static void FieldTerrainAnimator_LoadSRT(FieldTerrainSRTAnimator *animator, u16 
     u32 i;
 
     animator->nsbtaData = GFL_ArcSysReadHeapNewLZ(arcId, fileId, FALSE, heapId);
-    resAnm = NNS_G3DResGetAnm(animator->nsbtaData, 0);
+    resAnm = NNS_G3dGetAnmByIdx(animator->nsbtaData, 0);
     animator->chunkStates = GFL_HeapAllocate(heapId, sizeof(FieldTerrainSRTAnimatorChunkState) * chunkCapacity, TRUE,
                                              "field_ground_anime.c", 406);
     animator->chunkStateCount = chunkCapacity;
@@ -227,7 +227,7 @@ static void FieldTerrainSRTAnimatorChunkState_Free(FieldTerrainSRTAnimatorChunkS
 
 static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, void *model,
                                                        void *textures, NNSG3dRenderObj *renderObj) {
-    NNSG3dResMdlSet *mdlSet = NNS_G3DResGetMdlBlock(GFL_G3DResGetResData(model));
+    NNSG3dResMdlSet *mdlSet = NNS_G3dGetMdlSet(GFL_G3DResGetResData(model));
     NNSG3dResMdl *mdl;
     NNSG3dResTex *tex;
 
@@ -392,7 +392,7 @@ static int FieldTerrainTexPatAnimation_MatchTextureVRAMAddress(void *worldTextur
     int index;
 
     name = tex != NULL ? NNS_G3dGetResNameByIdx(&tex->dict, textureIndex) : NULL;
-    index = worldTex != NULL ? NNS_G3DFindIndex(&worldTex->dict, name) : -1;
+    index = worldTex != NULL ? NNS_G3dGetResDictIdxByName(&worldTex->dict, name) : -1;
     if (index < 0) {
         return -1;
     }

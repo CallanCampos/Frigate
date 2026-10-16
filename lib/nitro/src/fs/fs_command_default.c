@@ -240,8 +240,9 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
     u32 length;
     char *buffer;
     u32 pathLength;
-    u32 dirId;
+    // The order of these declarations sets the locals' registers
     u32 fileId;
+    u32 dirId;
     u32 child;
     FSDirEntry entry;
     FSFile dir;
@@ -890,7 +891,7 @@ BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32
     tables->readFunc = readFunc != NULL ? readFunc : FSi_ReadMemCallback;
     tables->writeFunc = writeFunc != NULL ? writeFunc : FSi_WriteMemCallback;
     tables->loadedMemory = NULL;
-    return FS_MountArchive(arc, tables, &FS_VTABLE_BASE);
+    return FS_MountArchive(arc, tables, &FS_VTABLE_BASE, 0);
 }
 
 // NitroSDK's FS_UnloadArchive: unmounts the archive

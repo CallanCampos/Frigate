@@ -62,7 +62,7 @@ void NsbtxToClwk_LoadTextureEx(ClActor *actor, u32 arcId, u32 fileId, u8 texture
     u32 size = width * height * 32;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(arcId, heapId);
     void *file = GFL_ArcToolReadHeapNew(arc, fileId, heapId);
-    NNSG3dResTex *tex = NNS_G3DResGetTexBlock(file);
+    NNSG3dResTex *tex = NNS_G3dGetTex(file);
     u8 *bitmap;
     u32 texOffset;
     u8 *chars;

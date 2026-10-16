@@ -174,6 +174,8 @@ void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId);
 void FieldEffect_BTrain_Free(FieldEffects *effects, void *data);
 void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c670c(FieldEffects *effects, void *data);
+// The bubbles that rise from an actor in the water
+void func_ov036_021c6934(FieldActor *actor, FieldEffects *effects);
 void *func_ov036_021c696c(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c6990(FieldEffects *effects, void *data);
 void *func_ov036_021be988(FieldEffects *effects, HeapID heapId);

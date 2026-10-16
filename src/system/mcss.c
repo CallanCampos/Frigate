@@ -313,7 +313,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
     u8 flip;
     BOOL ortho;
 
-    NNS_G3DWaitFIFO();
+    NNS_G3dGeFlushBuffer();
     G3_PushMtx();
     G3_MtxMode(GX_MTXMODE_PROJECTION);
     G3_StoreMtx(0);

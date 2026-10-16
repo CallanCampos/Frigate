@@ -78,7 +78,7 @@ int STD_TSPrintf(char *dst, const char *fmt, ...) {
     return length;
 }
 
-int STD_TSNPrintf(char *dst, u32 len, const char *fmt, ...) {
+int STD_TSNPrintf(char *dst, size_t len, const char *fmt, ...) {
     va_list args;
     int length;
 
@@ -88,45 +88,45 @@ int STD_TSNPrintf(char *dst, u32 len, const char *fmt, ...) {
     return length;
 }
 
-int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
-    char prefix[2];
+int STD_TVSNPrintf(char *dst, size_t len, const char *fmt, va_list args) {
     char digits[24];
+    int numDigits;
+    char prefix[2];
+    int prefixLen;
     StringBuffer str;
+    const char *s = fmt;
 
     str.len = len;
-    str.dst = dst;
-    str.start = dst;
-    while (*fmt != '\0') {
+    str.dst = str.start = dst;
+    while (*s != '\0') {
         int flags = 0;
         int width;
         int prec;
         int radix;
-        int hexBase;
         const char *percent;
+        int hexBase;
         u64 value;
-        int prefixLen;
-        int numDigits;
         int zeros;
 
-        if (STD_IsSjisLeadByte(*fmt)) {
-            string_put_char(&str, *fmt++);
-            if (*fmt != '\0') {
-                string_put_char(&str, *fmt++);
+        if (STD_IsSjisLeadByte(*s)) {
+            string_put_char(&str, *s++);
+            if (*s != '\0') {
+                string_put_char(&str, *s++);
             }
             continue;
         }
-        if (*fmt != '%') {
-            string_put_char(&str, *fmt++);
+        if (*s != '%') {
+            string_put_char(&str, *s++);
             continue;
         }
 
-        percent = fmt;
+        percent = s;
         width = 0;
         prec = -1;
         radix = 10;
         hexBase = 'a' - 10;
         for (;;) {
-            switch (*++fmt) {
+            switch (*++s) {
             case '+':
                 // BUG: the plus flag only counts after a blank flag ("% +d"). In "%+d" it ends the flags, and the
                 // conversion that follows is the +, which is none, so the text is printed as it is
@@ -134,7 +134,7 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
                 flags |= STD_PRINTF_PLUS;
                 continue;
 #else
-                if (fmt[-1] == ' ') {
+                if (s[-1] == ' ') {
                     flags |= STD_PRINTF_PLUS;
                     continue;
                 }
@@ -153,51 +153,51 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
             break;
         }
 
-        if (*fmt == '*') {
-            fmt++;
+        if (*s == '*') {
+            s++;
             width = va_arg(args, int);
             if (width < 0) {
                 width = -width;
                 flags |= STD_PRINTF_LEFT;
             }
         } else {
-            while (*fmt >= '0' && *fmt <= '9') {
-                width = width * 10 + *fmt++ - '0';
+            while (*s >= '0' && *s <= '9') {
+                width = width * 10 + *s++ - '0';
             }
         }
 
-        if (*fmt == '.') {
-            fmt++;
+        if (*s == '.') {
+            s++;
             prec = 0;
-            if (*fmt == '*') {
-                fmt++;
+            if (*s == '*') {
+                s++;
                 prec = va_arg(args, int);
                 if (prec < 0) {
                     prec = -1;
                 }
             } else {
-                while (*fmt >= '0' && *fmt <= '9') {
-                    prec = prec * 10 + *fmt++ - '0';
+                while (*s >= '0' && *s <= '9') {
+                    prec = prec * 10 + *s++ - '0';
                 }
             }
         }
 
-        switch (*fmt) {
+        switch (*s) {
         case 'h':
-            fmt++;
-            if (*fmt != 'h') {
+            s++;
+            if (*s != 'h') {
                 flags |= STD_PRINTF_SHORT;
             } else {
-                fmt++;
+                s++;
                 flags |= STD_PRINTF_CHAR;
             }
             break;
         case 'l':
-            fmt++;
-            if (*fmt != 'l') {
+            s++;
+            if (*s != 'l') {
                 flags |= STD_PRINTF_LONG;
             } else {
-                fmt++;
+                s++;
                 flags |= STD_PRINTF_LONG_LONG;
             }
             break;
@@ -205,7 +205,7 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
 
         // The numbers go on below the switch. A character, a string, a % and a conversion that does not exist are
         // written here, and their code goes on with the next character
-        switch (*fmt) {
+        switch (*s) {
         case 'd':
         case 'i':
             break;
@@ -234,43 +234,43 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
                     string_fill_char(&str, (flags & STD_PRINTF_ZERO) ? '0' : ' ', width - 1);
                     string_put_char(&str, c);
                 }
-                fmt++;
+                s++;
                 continue;
             }
             goto literal;
         case 's': {
-            const char *s = va_arg(args, const char *);
+            const char *string = va_arg(args, const char *);
             int n = 0;
 
             if (prec < 0) {
-                while (s[n] != '\0') {
+                while (string[n] != '\0') {
                     n++;
                 }
             } else {
-                while (n < prec && s[n] != '\0') {
+                while (n < prec && string[n] != '\0') {
                     n++;
                 }
             }
             width -= n;
             if (flags & STD_PRINTF_LEFT) {
-                string_put_string(&str, s, n);
+                string_put_string(&str, string, n);
                 string_fill_char(&str, ' ', width);
             } else {
                 string_fill_char(&str, (flags & STD_PRINTF_ZERO) ? '0' : ' ', width);
-                string_put_string(&str, s, n);
+                string_put_string(&str, string, n);
             }
-            fmt++;
+            s++;
             continue;
         }
         case '%':
-            if (percent + 1 == fmt) {
-                string_put_char(&str, *fmt++);
+            if (percent + 1 == s) {
+                string_put_char(&str, *s++);
                 continue;
             }
         default:
         literal:
             // What is not a conversion is written as it is, up to the character that stopped it, which is read again
-            string_put_string(&str, percent, fmt - percent);
+            string_put_string(&str, percent, s - percent);
             continue;
         case 'x':
         hex:
@@ -324,7 +324,8 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
             } else {
                 value = va_arg(args, s32);
             }
-            if (value & 0x8000000000000000ULL) {
+            // The sign bit, the top of the high word
+            if ((value >> 32) & 0x80000000) {
                 value = ~value + 1;
                 prefix[0] = '-';
                 prefixLen = 1;
@@ -344,8 +345,10 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
         switch (radix) {
         case 8:
             while (value != 0) {
-                digits[numDigits++] = (value & 7) + '0';
+                int d = value & 7;
+
                 value >>= 3;
+                digits[numDigits++] = d + '0';
             }
             break;
         case 10:
@@ -354,16 +357,18 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
 
                 while (v != 0) {
                     u32 q = v / 10;
+                    int d = v - q * 10;
 
-                    digits[numDigits++] = v - q * 10 + '0';
                     v = q;
+                    digits[numDigits++] = d + '0';
                 }
             } else {
                 while (value != 0) {
                     u64 q = value / 10;
+                    int d = value - q * 10;
 
-                    digits[numDigits++] = value - q * 10 + '0';
                     value = q;
+                    digits[numDigits++] = d + '0';
                 }
             }
             break;
@@ -371,8 +376,8 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
             while (value != 0) {
                 int d = value & 15;
 
-                digits[numDigits++] = d < 10 ? d + '0' : d + hexBase;
                 value >>= 4;
+                digits[numDigits++] = d < 10 ? d + '0' : d + hexBase;
             }
             break;
         }
@@ -408,7 +413,7 @@ int STD_TVSNPrintf(char *dst, u32 len, const char *fmt, va_list args) {
         if (flags & STD_PRINTF_LEFT) {
             string_fill_char(&str, ' ', width);
         }
-        fmt++;
+        s++;
     }
 
     if (str.len != 0) {

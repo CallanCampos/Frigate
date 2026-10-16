@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-556 of 1688 functions are in source files.
+595 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -120,6 +120,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
 | `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
+| `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
+| `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
+| `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
 
 ### Overlay 12
 
@@ -468,7 +471,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | partial | string at `0x021d4d60` |
 | `fld_act_rail.c` | `0x02195378`–`0x02196238` | 74 | partial | descriptive |
 | `field_rail_loader.c` | `0x02196238`–`0x02197534` | 62 | partial | string at `0x021d4de8` |
-| `field_fog.c` | `0x02197534`–`0x02197710` | 22 | partial | string at `0x021d4dfc` |
+| `field_fog.c` | `0x02197534`–`0x02197710` | 22 | complete | string at `0x021d4dfc` |
 | `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | partial | string at `0x021d4e08` |
 | `field_light.c` | `0x02197820`–`0x02198198` | 31 | partial | string at `0x021d4e18` |
 | `field_subscreen.c` | `0x02198198`–`0x02198bc0` | 72 | partial | string at `0x021d4e28` |
@@ -531,17 +534,17 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | partial | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
 | `fldeff_reflect.c` | `0x021b496c`–`0x021b4eb4` | 15 | partial | string at `0x021d5338` |
-| `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | partial | string at `0x021d534c` |
+| `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | complete | string at `0x021d534c` |
 | `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | partial | string at `0x021d5360` |
 | `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | partial | string at `0x021d5378` |
 | `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | partial | string at `0x021d53b0` |
-| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | partial | string at `0x021d53c4` |
+| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | complete | string at `0x021d53c4` |
 | `field_gimmick.c` | `0x021b7f7c`–`0x021b804c` | 4 | partial | descriptive |
 | `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | partial | string at `0x021d53d8` |
-| `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | partial | descriptive |
+| `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | complete | descriptive |
 | `field_fade.c` | `0x021b9494`–`0x021ba5d0` | 43 | partial | string at `0x021d53e8` |
-| `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | partial | string at `0x021d53f8` |
-| `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | partial | string at `0x021d5404` |
+| `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | complete | string at `0x021d53f8` |
+| `field_player_grid_event.c` | `0x021ba81c`–`0x021bb590` | 23 | complete | string at `0x021d5404` |
 | `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | partial | string at `0x021d5420` |
 | `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | partial | string at `0x021d5430` |
 | `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | partial | string at `0x021d54a4` |
@@ -550,17 +553,17 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
-| `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | partial | string at `0x021d54f0` |
+| `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | complete | string at `0x021d54f0` |
 | `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | partial | string at `0x021d5500` |
 | `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | partial | string at `0x021d551c` |
 | `field_task_manager.c` | `0x021c0914`–`0x021c1bc4` | 52 | partial | string at `0x021d552c` |
-| `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | partial | string at `0x021d5544` |
-| `fieldskill_mapeff.c` | `0x021c1d88`–`0x021c1e30` | 9 | partial | string at `0x021d5554` |
-| `fld_wipe_3dobj.c` | `0x021c1e30`–`0x021c2080` | 7 | partial | string at `0x021d5568` |
+| `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | complete | string at `0x021d5544` |
+| `fieldskill_mapeff.c` | `0x021c1d88`–`0x021c1e30` | 9 | complete | string at `0x021d5554` |
+| `fld_wipe_3dobj.c` | `0x021c1e30`–`0x021c2080` | 7 | complete | string at `0x021d5568` |
 | `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | partial | string at `0x021d557c` |
-| `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | partial | descriptive |
-| `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | partial | descriptive |
-| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | partial | string at `0x021d558c` |
+| `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | complete | descriptive |
+| `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | complete | descriptive |
+| `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | string at `0x021d558c` |
 | `land_data_patch.c` | `0x021c2cbc`–`0x021c2ddc` | 6 | partial | string at `0x021d55a0` |
 | `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | partial | string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | partial | string at `0x021d55f8` |
@@ -569,8 +572,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | partial | string at `0x021d5648` |
 | `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | partial | string at `0x021d5654` |
 | `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | partial | string at `0x021d5664` |
-| `fldeff_bubble.c` | `0x021c6934`–`0x021c6cc8` | 15 | partial | string at `0x021d56b0` |
-| `field_saveanime.c` | `0x021c6cc8`–`0x021c7028` | 12 | partial | string at `0x021d56c0` |
+| `fldeff_bubble.c` | `0x021c6934`–`0x021c6cc8` | 15 | complete | string at `0x021d56b0` |
+| `field_saveanime.c` | `0x021c6cc8`–`0x021c7028` | 12 | complete | string at `0x021d56c0` |
 | `field_map_chunk_height.c` | `0x021c7028`–`0x021c71d4` | 1 | complete | descriptive |
 | `scrcmd_field.c` | `0x021c71d4`–`0x021c7b38` | 25 | partial | descriptive |
 | `scrcmd_medal.c` | `0x021c7b38`–`0x021c7fd8` | 13 | partial | descriptive |

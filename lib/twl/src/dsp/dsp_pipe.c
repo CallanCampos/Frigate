@@ -31,7 +31,8 @@ typedef struct DSPFileServer {
     OSThread thread;
     OSMessage message;
     OSMessageQueue queue;
-    u32 requests; // the ports that have a request, a bit each
+    // the ports that have a request, a bit each: the DSP's interrupt sets them (func_02706b60) as the thread reads them
+    volatile u32 requests;
     FSFile files[DSP_PORT_COUNT];
     u8 stack[DSP_FILE_STACK_SIZE];
 } DSPFileServer;
@@ -215,8 +216,9 @@ static void func_027067b4(void *arg) {
                 break;
             }
             case DSP_FILE_CLOSE: {
-                u16 result = TRUE;
+                u16 result;
                 FS_CloseFile(file);
+                result = TRUE;
                 DSP_WritePipe(&writePipe, &result, 2);
                 break;
             }
@@ -349,9 +351,10 @@ DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction) {
     }
     OS_RestoreInterrupts(irq);
     if (port >= 0 && port < DSP_PORT_COUNT && direction >= 0 && direction < 2) {
-        u32 address = sPipeBase + port * sizeof(sPipes[0]) + direction * sizeof(DSPPipe);
+        // the DSP keeps the headers at sPipeBase in its memory, in a table laid out like sPipes
+        DSPPipe(*headers)[2] = (DSPPipe(*)[2])sPipeBase;
+        u32 address = (u32)&headers[port][direction];
         if (pipe == NULL) {
-            // the scratch headers are in the same order as the DSP's
             pipe = &sPipes[port][direction];
         }
         func_0270633c(address, (u8 *)pipe, sizeof(DSPPipe));

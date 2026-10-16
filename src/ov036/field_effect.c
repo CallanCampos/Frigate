@@ -418,7 +418,7 @@ void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, void *resource) {
     NNSG3dResTex *tex;
 
     if (effects->luminanceTable != NULL) {
-        tex = NNS_G3DResGetTexBlock(GFL_G3DResGetResData(resource));
+        tex = NNS_G3dGetTex(GFL_G3DResGetResData(resource));
         ColorFilter_ApplyLUT((u16 *)((u8 *)tex + tex->plttInfo.ofsPlttData),
                              (tex->plttInfo.sizePltt << 3) / sizeof(u16), effects->luminanceTable);
     }
