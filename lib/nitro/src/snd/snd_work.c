@@ -1,0 +1,102 @@
+// NitroSDK's SND (snd_work.c, a guess from the SDK's file names): the work that the ARM7's sound driver shares with the
+// ARM9, and the functions that read what the driver reports in it. The driver writes it, so each read first discards
+// the data cache's copy of the word.
+#include "nitro/os.h"
+#include "nitro/snd.h"
+
+SNDSharedWork *SNDi_SharedWork;
+
+// NitroSDK's SND_GetPlayerStatus: a bit for each player that is at work
+u32 func_0207dbb8(void) {
+    cp15_invalidateDC(&SNDi_SharedWork->playerStatus, sizeof(SNDi_SharedWork->playerStatus));
+    return SNDi_SharedWork->playerStatus;
+}
+
+// NitroSDK's SND_GetChannelStatus: a bit for each channel that is at work
+u32 func_0207dbd0(void) {
+    cp15_invalidateDC(&SNDi_SharedWork->channelStatus, sizeof(SNDi_SharedWork->channelStatus));
+    return SNDi_SharedWork->channelStatus;
+}
+
+// NitroSDK's SND_GetPlayerTickCounter
+u32 SND_GetPlayerTickCounter(int playerNo) {
+    cp15_invalidateDC(&SNDi_SharedWork->player[playerNo].tickCounter, sizeof(u32));
+    return SNDi_SharedWork->player[playerNo].tickCounter;
+}
+
+// The links of the driver's channels are ARM7 addresses. This turns the one that is stored at link into the address of
+// the channel in the copy of the state, or NULL for the end of the list
+static inline const SNDDriverChannel *ToArm9(const SNDDriverInfo *driverInfo, const SNDDriverChannel *const *link) {
+    u32 base = driverInfo->arm7Address;
+    const SNDDriverChannel *channel = *link;
+
+    if (channel == NULL) {
+        return NULL;
+    }
+    return (const SNDDriverChannel *)((const u8 *)driverInfo + ((u32)channel - base));
+}
+
+// NitroSDK's SND_ReadTrackInfo: reads a track of a player from a copy of the driver's state. FALSE when the numbers are
+// out of range or the player has no such track
+BOOL func_0207dc0c(const SNDDriverInfo *driverInfo, int playerNo, int trackNo, SNDTrackInfo *trackInfo) {
+    const SNDDriverTrack *track;
+    const SNDDriverChannel *channel;
+    u8 trackIndex;
+
+    if (playerNo < 0 || playerNo > SND_PLAYER_MAX - 1) {
+        return FALSE;
+    }
+    if (trackNo < 0 || trackNo > SND_PLAYER_TRACK_MAX - 1) {
+        return FALSE;
+    }
+    trackIndex = driverInfo->player[playerNo].trackIndex[trackNo];
+    if (trackIndex == SND_TRACK_INDEX_NONE) {
+        return FALSE;
+    }
+
+    track = &driverInfo->track[trackIndex];
+    trackInfo->prgNo = track->prgNo;
+    trackInfo->volume = track->volume;
+    trackInfo->volume2 = track->volume2;
+    trackInfo->pitchBend = track->pitchBend;
+    trackInfo->bendRange = track->bendRange;
+    trackInfo->pan = track->pan + SND_TRACK_PAN_CENTER;
+    trackInfo->transpose = track->transpose;
+
+    // The channels that the track plays are a list of ARM7 addresses
+    channel = ToArm9(driverInfo, &track->channel);
+    trackInfo->chCount = 0;
+    while (channel != NULL) {
+        trackInfo->channel[trackInfo->chCount] = channel->myNo;
+        trackInfo->chCount++;
+        channel = ToArm9(driverInfo, &channel->next);
+    }
+    return TRUE;
+}
+
+// NitroSDK's SNDi_GetFinishedCommandTag: the number of packets that the ARM7 has dealt with
+u32 func_0207dcc4(void) {
+    cp15_invalidateDC(SNDi_SharedWork, sizeof(SNDi_SharedWork->finishedCommandTag));
+    return SNDi_SharedWork->finishedCommandTag;
+}
+
+// NitroSDK's SNDi_InitSharedWork: nothing plays, and no variable of a player has a value
+void func_0207dcdc(SNDSharedWork *work) {
+    int i;
+    int j;
+
+    work->playerStatus = 0;
+    work->channelStatus = 0;
+    work->captureStatus = 0;
+    work->finishedCommandTag = 0;
+    for (i = 0; i < SND_PLAYER_MAX; i++) {
+        work->player[i].tickCounter = 0;
+        for (j = 0; j < SND_PLAYER_VARIABLE_MAX; j++) {
+            work->player[i].variable[j] = SND_VARIABLE_UNSET;
+        }
+    }
+    for (i = 0; i < SND_PLAYER_VARIABLE_MAX; i++) {
+        work->globalVariable[i] = SND_VARIABLE_UNSET;
+    }
+    cp15_flushDC(work, sizeof(SNDSharedWork));
+}

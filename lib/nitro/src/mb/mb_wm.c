@@ -2,6 +2,8 @@
 // for the manager's replies, the scan that the child side of the library starts, and the sending of frames (libmb).
 // The names are descriptive, except swan's MB_*
 #include "mb_private.h"
+#include "nitro/os.h"
+#include "nitro/pxi.h"
 
 // What the wireless manager is set up with: how long a connection may be silent, for the manager's four lifetimes
 // (table, cam, frame and mp), whether to start in power-save, and the parent's name (a wide string)
