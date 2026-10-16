@@ -26,7 +26,7 @@ static u8 sMac[PHOTO_SIGN_MAC_SIZE];
 
 // The MAC's callback: wakes the signing thread with the result
 static void PhotoSign_SignalEvent(u32 result, void *arg) {
-    func_0207c864(arg, result);
+    OS_SignalEvent(arg, result);
 }
 
 // Seeds the ARM7's random numbers once with the digest of the console's entropy, then overwrites the entropy and the
@@ -37,7 +37,7 @@ static void PhotoSign_InitRandom(void) {
     u32 digest[MATH_SHA1_DIGEST_SIZE / sizeof(u32)];
     u32 i;
 
-    clock_init();
+    OS_InitTick();
     sRandomRemaining = 0;
     sRandomInitialized = TRUE;
     MATH_InitRand32(&rand, ((u64)(u32)&rand << 32) | (u32)&rand);
@@ -66,7 +66,7 @@ static int PhotoSign_GetRandom(u8 *dst, u32 size) {
             count = size;
         }
         sRandomRemaining -= count;
-        sys_memcpy(sRandomBuffer + sRandomRemaining, dst, count);
+        MI_CpuCopy8(sRandomBuffer + sRandomRemaining, dst, count);
         size -= count;
         dst += count;
     }
@@ -75,7 +75,7 @@ static int PhotoSign_GetRandom(u8 *dst, u32 size) {
         if (result != PHOTO_SIGN_RESULT_SUCCESS) {
             return result;
         }
-        sys_memcpy(sRandomBuffer, dst, PHOTO_SIGN_RANDOM_BLOCK_SIZE);
+        MI_CpuCopy8(sRandomBuffer, dst, PHOTO_SIGN_RANDOM_BLOCK_SIZE);
         dst += PHOTO_SIGN_RANDOM_BLOCK_SIZE;
         size -= PHOTO_SIGN_RANDOM_BLOCK_SIZE;
     }
@@ -85,7 +85,7 @@ static int PhotoSign_GetRandom(u8 *dst, u32 size) {
             return result;
         }
         sRandomRemaining = PHOTO_SIGN_RANDOM_BLOCK_SIZE - size;
-        sys_memcpy(sRandomBuffer + sRandomRemaining, dst, size);
+        MI_CpuCopy8(sRandomBuffer + sRandomRemaining, dst, size);
     }
     return PHOTO_SIGN_RESULT_SUCCESS;
 }
@@ -98,7 +98,7 @@ int PhotoSign_Sign(u8 *sig, const u8 *data, u32 size) {
     if (!sRandomInitialized) {
         PhotoSign_InitRandom();
     }
-    func_0207c7f4(&event);
+    OS_InitEvent(&event);
     result = PhotoSign_GetRandom(sig, PHOTO_SIGN_NONCE_SIZE);
     if (result != PHOTO_SIGN_RESULT_SUCCESS) {
         // BUG: The lock stays taken, so other threads wait for it forever
@@ -113,9 +113,9 @@ int PhotoSign_Sign(u8 *sig, const u8 *data, u32 size) {
         }
         result = PhotoSign_StartMac(sig, data, size, sMac, PhotoSign_SignalEvent, &event);
         if (result == PHOTO_SIGN_RESULT_SUCCESS) {
-            result = func_0207c800(&event, 0xffffffff, OS_EVENT_MODE_OR, 0xffffffff);
+            result = OS_WaitEventEx(&event, 0xffffffff, OS_EVENT_MODE_OR, 0xffffffff);
             if (result == PHOTO_SIGN_RESULT_SUCCESS) {
-                sys_memcpy(sMac, sig + PHOTO_SIGN_NONCE_SIZE, PHOTO_SIGN_MAC_SIZE);
+                MI_CpuCopy8(sMac, sig + PHOTO_SIGN_NONCE_SIZE, PHOTO_SIGN_MAC_SIZE);
             }
         }
     } while (result == PHOTO_SIGN_RESULT_BUSY);
@@ -134,16 +134,16 @@ int PhotoSign_Verify(const u8 *sig, const u8 *data, u32 size) {
     if (!sRandomInitialized) {
         PhotoSign_InitRandom();
     }
-    func_0207c7f4(&event);
+    OS_InitEvent(&event);
     do {
         if (!sRandomUnk04) {
             PhotoSign_SendHeader(PHOTO_SIGN_FIFO_TAG, PHOTO_SIGN_COMMAND_UNK_8, 1);
         }
         result = PhotoSign_StartMac(sig, data, size, sMac, PhotoSign_SignalEvent, &event);
         if (result == PHOTO_SIGN_RESULT_SUCCESS) {
-            result = func_0207c800(&event, 0xffffffff, OS_EVENT_MODE_OR, 0xffffffff);
+            result = OS_WaitEventEx(&event, 0xffffffff, OS_EVENT_MODE_OR, 0xffffffff);
             if (result == PHOTO_SIGN_RESULT_SUCCESS &&
-                sys_memcmp(sMac, sig + PHOTO_SIGN_NONCE_SIZE, PHOTO_SIGN_MAC_SIZE) != 0) {
+                MI_CpuComp8(sMac, sig + PHOTO_SIGN_NONCE_SIZE, PHOTO_SIGN_MAC_SIZE) != 0) {
                 result = PHOTO_SIGN_RESULT_MISMATCH;
             }
         }

@@ -84,7 +84,7 @@ static const ManualBGSetup sManualBGSetups[BG_COUNT] = {
 ManualGraphic *ManualGraphic_Create(u32 layout, HeapID heapId) {
     ManualGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(ManualGraphic), FALSE, "manual_graphic.c", 454);
 
-    sys_memset(graphic, 0, sizeof(ManualGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ManualGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -111,7 +111,7 @@ void ManualGraphic_Free(ManualGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(ManualGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(ManualGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -134,7 +134,7 @@ static void ManualGraphic_VBlank(TCB *tcb, void *data) {
 static void ManualBG_Init(ManualBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(ManualBG));
+    MI_CpuFill8(bg, 0, sizeof(ManualBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sManualLCDConfig);
@@ -153,7 +153,7 @@ static void ManualBG_Free(ManualBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(ManualBG));
+    MI_CpuFill8(bg, 0, sizeof(ManualBG));
 }
 
 static void ManualBG_Update(ManualBG *bg) {
@@ -164,7 +164,7 @@ static void ManualBG_VBlank(ManualBG *bg) {
 }
 
 static void ManualClAct_Init(ManualClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(ManualClAct));
+    MI_CpuFill8(clact, 0, sizeof(ManualClAct));
     ClActSys_Create(&sManualClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -175,7 +175,7 @@ static void ManualClAct_Init(ManualClAct *clact, const BGSysVRAMConfig *vramConf
 static void ManualClAct_Free(ManualClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(ManualClAct));
+    MI_CpuFill8(clact, 0, sizeof(ManualClAct));
 }
 
 static void ManualClAct_Update(ManualClAct *clact) {

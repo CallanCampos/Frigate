@@ -38,7 +38,7 @@ BOOL VCT_Init(VCTConfig *config) {
     if ((int)config->buffer % 32 != 0) {
         return FALSE;
     }
-    sys_memset(&gVCTSettings, 0, sizeof(gVCTSettings));
+    MI_CpuFill8(&gVCTSettings, 0, sizeof(gVCTSettings));
     gVCTSettings.callback = config->callback;
     gVCTSettings.userData = config->userData;
     gVCTSettings.mode = config->mode;
@@ -118,7 +118,7 @@ static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result)
     }
     result->event = 0;
     result->session = NULL;
-    now = clock();
+    now = OS_GetTick();
     type = packet->type;
     if ((type & 0xf0) == VCT_TYPE_VOICE) {
         sLibrary.receivedCount++;

@@ -342,7 +342,7 @@ DowsingWork *Dowsing_Create(HeapID heapId, HeapID subscreenHeapId, FieldSubscree
     eventWork = GameData_GetEventWork(gameData);
     GameData_GetSaveControl(gameData);
     work->search = DowsingSearch_Create(work->heapId, eventWork);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0x10, 0x18, 1, 7);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0x10, 0x18, 1, 7);
     func_02042ba8(FALSE, work->heapId);
     return work;
 }

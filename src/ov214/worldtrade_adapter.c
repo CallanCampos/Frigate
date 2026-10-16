@@ -55,7 +55,7 @@ PartyPkm *WorldTrade_AllocPartyPkm(HeapID heapId) {
 }
 
 void WorldTrade_CopyPartyPkm(PartyPkm *src, PartyPkm *dest) {
-    sys_memcpy(src, dest, PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(src, dest, PokeParty_GetPkmRawSize());
 }
 
 void WorldTrade_ClearWindow(BmpWin *win, int mode) {
@@ -97,7 +97,7 @@ int WorldTrade_GetStrWidth(WorldTradePrint *print, u8 font, StrBuf *str, int spa
 void WorldTrade_PrintInit(WorldTradePrint *print, TrainerDataSave *config) {
     int i;
 
-    sys_memset(print, 0, sizeof(WorldTradePrint));
+    MI_CpuFill8(print, 0, sizeof(WorldTradePrint));
     print->tcbManager = GFL_TCBExMgrCreate(HEAPID_WORLDTRADE, HEAPID_WORLDTRADE, 32, 32);
     print->config = config;
     print->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_WORLDTRADE);
@@ -106,7 +106,7 @@ void WorldTrade_PrintInit(WorldTradePrint *print, TrainerDataSave *config) {
     for (i = 0; i < PRINT_ENTRY_COUNT; i++) {
         WorldTradePrintEntry *entry = &print->entries[i];
 
-        sys_memset(&entry->printWin, 0, sizeof(PrintWindow));
+        MI_CpuFill8(&entry->printWin, 0, sizeof(PrintWindow));
         entry->active = FALSE;
     }
 }
@@ -116,7 +116,7 @@ void WorldTrade_PrintExit(WorldTradePrint *print) {
     func_02021a18(print->printQueue);
     GFL_FontFree(print->font);
     GFL_TCBExMgrFree(print->tcbManager);
-    sys_memset(print, 0, sizeof(WorldTradePrint));
+    MI_CpuFill8(print, 0, sizeof(WorldTradePrint));
 }
 
 void WorldTrade_PrintMain(WorldTradePrint *print) {
@@ -222,7 +222,7 @@ WorldTradeNumFont *WorldTrade_NumFontCreate(u32 unused0, u32 unused1, u32 unused
     WorldTradeNumFont *numFont =
         GFL_HeapAllocate(heapId, sizeof(WorldTradeNumFont), FALSE, "worldtrade_adapter.c", 477);
 
-    sys_memset(numFont, 0, sizeof(WorldTradeNumFont));
+    MI_CpuFill8(numFont, 0, sizeof(WorldTradeNumFont));
     numFont->heapId = heapId;
     numFont->font = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, heapId);
     numFont->printQueue = func_02021998(heapId);

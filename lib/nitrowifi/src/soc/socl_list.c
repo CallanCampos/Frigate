@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
@@ -18,7 +18,7 @@ SOCLSocket *SOCLiSocketList;
 SOCLSocket *SOCLiSocketListTrash;
 
 void SOCLi_ResetSocketCount(void) {
-    sys_memset(SOCLiSocketCount, 0, sizeof(SOCLiSocketCount));
+    MI_CpuFill8(SOCLiSocketCount, 0, sizeof(SOCLiSocketCount));
 }
 
 // Whether ip can be a remote address for a host with this net mask and address: not the network or broadcast address
@@ -118,29 +118,29 @@ void SOCLi_SocketUnregister(SOCLSocket *socket) {
 }
 
 static void SOCLi_SocketUnregisterList(SOCLSocket **list, SOCLSocket *socket) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     SOCLSocket **link = SOCLi_SocketGetNextPtr(list, socket);
 
     if (link != NULL) {
         *link = socket->next;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 // The pointer that points to the socket (the list's head or a socket's next), NULL when it is not in the list
 static SOCLSocket **SOCLi_SocketGetNextPtr(SOCLSocket **list, SOCLSocket *socket) {
     SOCLSocket **link = list;
     SOCLSocket *s;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     for (s = *link; s != NULL; s = *link) {
         if (s == socket) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return link;
         }
         link = &s->next;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return NULL;
 }
 

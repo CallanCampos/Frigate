@@ -257,7 +257,7 @@ static void PaletteAnime_Hold(PaletteAnime *anime) {
 }
 
 static void PaletteAnime_RestoreCore(PaletteAnime *anime) {
-    sys_memcpy(anime->backup, anime->dst, anime->count * sizeof(u16));
+    MI_CpuCopy8(anime->backup, anime->dst, anime->count * sizeof(u16));
 }
 
 static BOOL PaletteAnime_IsActiveCore(PaletteAnime *anime) {
@@ -278,7 +278,7 @@ static void PaletteAnime_Free(PaletteAnime *anime) {
 static void PaletteAnime_InitWork(PaletteAnime *anime) {
     HeapID heapId = anime->heapId;
 
-    sys_memset(anime, 0, sizeof(PaletteAnime));
+    MI_CpuFill8(anime, 0, sizeof(PaletteAnime));
     anime->heapId = heapId;
 }
 

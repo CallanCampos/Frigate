@@ -6,6 +6,7 @@
 #include "gfl/graphics.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
+#include "nitro/std.h"
 #include "nnsys/g3d.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
@@ -60,7 +61,7 @@ BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, cons
     res.unk4 = texData->texInfo.vramKey;
     res.unk8 = texData->plttInfo.vramKey;
     dictOffset = texData->texInfo.ofsDict;
-    for (i = 0; i < NNS_STD_StrLen(texName); i++) {
+    for (i = 0; i < STD_GetStringLength(texName); i++) {
         texResName.name[i] = texName[i];
     }
     for (; i < 16; i++) {
@@ -87,7 +88,7 @@ BOOL G3DTextDraw_CreateResource(void *texture, const char *texName, u32 a2, cons
         }
     }
     dictOffset = texData->plttInfo.ofsDict;
-    for (i = 0; i < NNS_STD_StrLen(plName); i++) {
+    for (i = 0; i < STD_GetStringLength(plName); i++) {
         plResName.name[i] = plName[i];
     }
     for (; i < 16; i++) {
@@ -174,10 +175,10 @@ static void G3DTextDraw_StringToTexture(G3DTextDrawWork *work, const StrBuf *tex
     texOffset = work->resource.unkC;
     texKey = (work->resource.unk4 & 0xffff) << 3;
     size = width / 8 * height / 8 * 32;
-    gfxBeginTextureUpload();
-    cp15_flushDC(pixels, size);
-    gfxUploadTexture(pixels, texOffset + texKey, size);
-    gfxEndTextureUpload();
+    GX_BeginLoadTex();
+    DC_FlushRange(pixels, size);
+    GX_LoadTex(pixels, texOffset + texKey, size);
+    GX_EndLoadTex();
     GFL_BitmapFree(tiled);
     GFL_BitmapFree(linear);
 }
@@ -188,8 +189,8 @@ static void G3DTextDraw_ConvertPalette(G3DTextDrawWork *work, const void *palett
 
     plttKey = (work->resource.unk8 & 0xffff) << 3;
 
-    gfxBeginPaletteUpload();
-    cp15_flushDC(palette, 0x20);
-    gfxUploadPalette(palette, plttOffset + plttKey, 0x20);
-    gfxEndPaletteUpload();
+    GX_BeginLoadTexPltt();
+    DC_FlushRange(palette, 0x20);
+    GX_LoadTexPltt(palette, plttOffset + plttKey, 0x20);
+    GX_EndLoadTexPltt();
 }

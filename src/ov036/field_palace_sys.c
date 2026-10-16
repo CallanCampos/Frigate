@@ -103,7 +103,7 @@ void FieldPalaceSys_LoadLuminanceTable(FieldPalaceSys *sys, u32 fileId, u16 zone
         i = 0;
     }
     sys->luminanceTable = GFL_HeapAllocate(heapId, sizeof(entries[i].table), FALSE, "field_palace_sys.c", 212);
-    sys_memcpy(entries[i].table, sys->luminanceTable, sizeof(entries[i].table));
+    MI_CpuCopy8(entries[i].table, sys->luminanceTable, sizeof(entries[i].table));
     GFL_HeapFree(entries);
     GFL_ArcToolFree(arc);
 }

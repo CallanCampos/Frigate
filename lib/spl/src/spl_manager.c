@@ -1,7 +1,7 @@
 #include "types.h"
-#include "gfl/std.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
+#include "nitro/mi.h"
 #include "nnsys/gfd.h"
 #include "spl/spl.h"
 #include "spl_internal.h"
@@ -25,7 +25,7 @@ SPLManager *SPLManager_New(SPLAllocFunc alloc, u16 maxEmitters, u16 maxParticles
     SPLParticle *particles;
     int i;
 
-    sys_memset(mgr, 0, sizeof(SPLManager));
+    MI_CpuFill8(mgr, 0, sizeof(SPLManager));
     mgr->maxEmitters = maxEmitters;
     mgr->maxParticles = maxParticles;
     mgr->minPolygonID = minPolyID;
@@ -45,13 +45,13 @@ SPLManager *SPLManager_New(SPLAllocFunc alloc, u16 maxEmitters, u16 maxParticles
     mgr->frame = 0;
 
     emitters = alloc(maxEmitters * sizeof(SPLEmitter));
-    sys_memset(emitters, 0, maxEmitters * sizeof(SPLEmitter));
+    MI_CpuFill8(emitters, 0, maxEmitters * sizeof(SPLEmitter));
     for (i = 0; i < maxEmitters; i++) {
         SPLList_PushFront((SPLList *)&mgr->inactiveEmitters, (SPLNode *)&emitters[i]);
     }
 
     particles = alloc(maxParticles * sizeof(SPLParticle));
-    sys_memset(particles, 0, maxParticles * sizeof(SPLParticle));
+    MI_CpuFill8(particles, 0, maxParticles * sizeof(SPLParticle));
     for (i = 0; i < maxParticles; i++) {
         SPLList_PushFront(&mgr->unusedParticles, (SPLNode *)&particles[i]);
     }
@@ -72,7 +72,7 @@ void SPLManager_LoadResources(SPLManager *mgr, const void *data) {
     mgr->resourceCount = file->resourceCount;
     mgr->textureCount = file->textureCount;
     mgr->resources = mgr->alloc(mgr->resourceCount * sizeof(SPLResource));
-    sys_memset(mgr->resources, 0, mgr->resourceCount * sizeof(SPLResource));
+    MI_CpuFill8(mgr->resources, 0, mgr->resourceCount * sizeof(SPLResource));
 
     for (i = 0; i < mgr->resourceCount; i++) {
         SPLResource *resource;
@@ -163,7 +163,7 @@ void SPLManager_LoadResources(SPLManager *mgr, const void *data) {
     }
 
     mgr->textures = mgr->alloc(mgr->textureCount * sizeof(SPLTexture));
-    sys_memset(mgr->textures, 0, mgr->textureCount * sizeof(SPLTexture));
+    MI_CpuFill8(mgr->textures, 0, mgr->textureCount * sizeof(SPLTexture));
     for (i = 0; i < mgr->textureCount; i++) {
         SPLTexture *entry = &mgr->textures[i];
         const SPLTextureResource *texture = (const SPLTextureResource *)((u8 *)data + offset);
@@ -179,7 +179,7 @@ void SPLManager_LoadResources(SPLManager *mgr, const void *data) {
 BOOL SPLManager_UploadTexturesEx(SPLManager *mgr, SPLTexVRAMAllocFunc vramAlloc) {
     int i;
 
-    gfxBeginTextureUpload();
+    GX_BeginLoadTex();
     for (i = 0; i < mgr->textureCount; i++) {
         SPLTexture *texture = &mgr->textures[i];
         const SPLTextureResource *data = texture->data;
@@ -189,18 +189,18 @@ BOOL SPLManager_UploadTexturesEx(SPLManager *mgr, SPLTexVRAMAllocFunc vramAlloc)
         } else {
             u32 addr = vramAlloc(data->textureSize, data->param.format == GX_TEXFMT_COMP4x4 ? TRUE : FALSE);
 
-            gfxUploadTexture((u8 *)texture->data + sizeof(SPLTextureResource), addr, data->textureSize);
+            GX_LoadTex((u8 *)texture->data + sizeof(SPLTextureResource), addr, data->textureSize);
             texture->texAddr = addr;
         }
     }
-    gfxEndTextureUpload();
+    GX_EndLoadTex();
     return TRUE;
 }
 
 BOOL SPLManager_UploadPalettesEx(SPLManager *mgr, SPLPalVRAMAllocFunc vramAlloc) {
     int i;
 
-    gfxBeginPaletteUpload();
+    GX_BeginLoadTexPltt();
     for (i = 0; i < mgr->textureCount; i++) {
         SPLTexture *texture = &mgr->textures[i];
         const SPLTextureResource *data = texture->data;
@@ -208,11 +208,11 @@ BOOL SPLManager_UploadPalettesEx(SPLManager *mgr, SPLPalVRAMAllocFunc vramAlloc)
 
         if (data->paletteSize != 0) {
             addr = vramAlloc(data->paletteSize, data->param.format == GX_TEXFMT_PLTT4 ? TRUE : FALSE);
-            gfxUploadPalette((u8 *)texture->data + data->paletteOffset, addr, data->paletteSize);
+            GX_LoadTexPltt((u8 *)texture->data + data->paletteOffset, addr, data->paletteSize);
         }
         texture->palAddr = addr;
     }
-    gfxEndPaletteUpload();
+    GX_EndLoadTexPltt();
     return TRUE;
 }
 

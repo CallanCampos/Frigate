@@ -1,6 +1,6 @@
 #include "dwc_wcm.h"
 #include "dwc/wcm.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 
 // The wrapper that DWC's settings put around the wireless connection manager (WCM, see wcm.h): one operation runs at a
@@ -251,7 +251,7 @@ int DWC_Wcm_GetApList(void *dest, int max) {
             if (i >= max) {
                 break;
             }
-            sys_memcpy32(WCM_PointApList(i), out, 0xc0);
+            MIi_CpuCopy32(WCM_PointApList(i), out, 0xc0);
             out += 0xc0;
         }
     }
@@ -260,7 +260,7 @@ int DWC_Wcm_GetApList(void *dest, int max) {
 }
 
 BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 option) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int i;
 
     sWcm.searchOption = option;
@@ -270,7 +270,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         }
         sWcm.bssid = sBssid;
     } else {
-        sys_memset(sBssid, 0xff, 6);
+        MI_CpuFill8(sBssid, 0xff, 6);
         sWcm.bssid = WCMiAnyBssid;
     }
     if (essid != NULL && essidLength > 0 && essidLength <= 0x20) {
@@ -282,96 +282,96 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         }
         sWcm.essid = sEssid;
     } else {
-        sys_memset(sEssid, 0xff, 0x20);
+        MI_CpuFill8(sEssid, 0xff, 0x20);
         sWcm.essid = WCMiAnyEssid;
     }
     if (sWcm.state == STATE_IDLE) {
         if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) == WCM_RESULT_ACCEPT) {
             sWcm.state = STATE_SEARCH_STARTING;
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return TRUE;
         }
     } else if (WcmAbort() == TRUE) {
         sWcm.state = STATE_SEARCH_STARTING;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }
 
 BOOL DWC_Wcm_EndSearch(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sWcm.state == STATE_SEARCHING && WCM_SearchAsync(NULL, NULL, 0) == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_STOPPING;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }
 
 BOOL DWC_Wcm_Disconnect(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sWcm.state == STATE_CONNECTED && WCM_DisconnectAsync() == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_STOPPING;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }
 
 BOOL DWC_Wcm_Cleanup(void) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (sWcm.state == STATE_IDLE) {
         if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return FALSE;
         }
         sWcm.state = STATE_CLEANING_UP;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
     if (WcmAbort() == TRUE) {
         sWcm.state = STATE_CLEANING_UP;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }
 
 BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     sWcm.connectOption = option;
     if (wepDesc != NULL) {
-        sys_memcpy(wepDesc, sWcm.wepDesc, 0x50);
+        MI_CpuCopy8(wepDesc, sWcm.wepDesc, 0x50);
     } else {
-        sys_memset(sWcm.wepDesc, 0, 0x50);
+        MI_CpuFill8(sWcm.wepDesc, 0, 0x50);
     }
-    sys_memcpy32(bssDesc, sWcm.bssDesc, 0xc0);
+    MIi_CpuCopy32(bssDesc, sWcm.bssDesc, 0xc0);
     if (WcmAbort() == TRUE) {
         sWcm.state = STATE_CONNECTING;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
     if (sWcm.state == STATE_IDLE &&
         WCM_ConnectAsync(sWcm.bssDesc, sWcm.wepDesc, sWcm.connectOption) == WCM_RESULT_ACCEPT) {
         sWcm.state = STATE_CONNECTING;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }
 
 BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     u8 *buf = work;
 
     sWcm.wepDesc = buf;
@@ -385,20 +385,20 @@ BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size) {
     sWcm.callback = callback;
     if (sWcm.state == STATE_OFF) {
         if (WCM_Init(sWcm.wcmWork, WCM_WORK_SIZE) != 0) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return FALSE;
         }
         sWcm.state = STATE_INITIALIZED;
     }
     if (sWcm.state == STATE_INITIALIZED) {
         if (WCM_StartupAsync(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
             return FALSE;
         }
         sWcm.state = STATE_STOPPING;
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return FALSE;
 }

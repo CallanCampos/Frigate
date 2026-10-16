@@ -287,7 +287,7 @@ Regulation *func_ov055_021e5f78(WbtSystem *sys) {
         WbtDownloadedTournament *downloaded = &sys->download.tournament;
         int i;
 
-        sys_memset(&sys->regulation, 0, sizeof(sys->regulation));
+        MI_CpuFill8(&sys->regulation, 0, sizeof(sys->regulation));
         sys->regulation.unk2 = downloaded->unk0;
         sys->regulation.unk3 = downloaded->unk1;
         sys->regulation.unk4 = downloaded->unk2;

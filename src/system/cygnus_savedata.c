@@ -18,7 +18,7 @@ u32 getDreamRadarSaveSize(void) {
 }
 
 void initDreamRadarSave(DreamRadarSave *save) {
-    sys_memset(save, 0, getDreamRadarSaveSize());
+    MI_CpuFill8(save, 0, getDreamRadarSaveSize());
 }
 
 u32 GetDreamRadarFlag(DreamRadarSave *save, u32 flag) {

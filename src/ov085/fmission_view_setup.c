@@ -34,6 +34,7 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
+#include "nitro/os.h"
 #include "nnsys/g2d.h"
 #include "save/high_link.h"
 #include "save/player_info.h"
@@ -440,7 +441,7 @@ static void FMissionViewSetup_InitBG(FMissionView *view, ArcTool *arc) {
     GFL_BGSysCreateBG(5, &sFMissionViewBGSetups[1], BGMODE_TEXT);
     GFL_BGSysCreateBG(6, &sFMissionViewBGSetups[2], BGMODE_TEXT);
     GFL_BGSysCreateBG(7, &sFMissionViewBGSetups[3], BGMODE_TEXT);
-    sys_memset32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
+    MIi_CpuClear32(0, (void *)HW_DB_BG_VRAM, HW_DB_BG_VRAM_SIZE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     G2S_BlendNone();
     PaletteFade_LoadArcNCLR(view->fade, arc, 4, view->tmpHeapId, PALFADE_BUFFER_SUB_BG, 0x1a0, 0);
@@ -449,7 +450,7 @@ static void FMissionViewSetup_InitBG(FMissionView *view, ArcTool *arc) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, 6, 5, 0, 0x800, TRUE, view->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, 6, 0, 0x800, TRUE, view->tmpHeapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 8, 7, 0, 0x800, TRUE, view->tmpHeapId);
-    gfxRegSetAlphaBlend(
+    G2x_SetBlendAlpha_(
         REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2,
         GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 13, 3);
     GFL_BGSysSetBGEnabled(4, TRUE);
@@ -505,7 +506,7 @@ static void FMissionViewSetup_LoadResources(FMissionView *view, ArcTool *arc) {
         view->iconChars[i].file = GFL_ArcToolReadHeapNew(iconArc, i + 49, view->heapId);
         NNS_G2dGetUnpackedCharacterData(view->iconChars[i].file, &view->iconChars[i].data);
     }
-    cp15_invalidateDCAll();
+    DC_FlushAll();
     GFL_ArcToolFree(iconArc);
 }
 
@@ -584,7 +585,7 @@ static void FMissionViewSetup_LoadRes(FMissionView *view, FMissionViewRes *res, 
                                       ArcTool *arc, BOOL compressed) {
     int i;
 
-    sys_memset(res, 0, sizeof(FMissionViewRes));
+    MI_CpuFill8(res, 0, sizeof(FMissionViewRes));
     for (i = 0; i < FMISSION_VIEW_RES_TYPE_COUNT; i++) {
         res->lists[i].count = setup[i].count;
         if (res->lists[i].count != 0) {
@@ -690,7 +691,7 @@ static void FMissionViewSetup_InitLine(FMissionView *view, BeaconViewOam *line, 
 static void FMissionViewSetup_InitPanel(FMissionView *view, u8 index) {
     FMissionViewPanel *panel = &view->panels[index];
 
-    sys_memset(panel, 0, sizeof(FMissionViewPanel));
+    MI_CpuFill8(panel, 0, sizeof(FMissionViewPanel));
     panel->index = index;
     panel->logIndex = FMISSION_VIEW_PANEL_NONE;
     panel->slot = 0;
@@ -738,5 +739,5 @@ static void FMissionViewSetup_FreePanel(FMissionView *view, u8 index) {
     func_0204c108(panel->markActor);
     func_0204c124(panel->frame, FALSE);
     func_0204c108(panel->frame);
-    sys_memset(panel, 0, sizeof(FMissionViewPanel));
+    MI_CpuFill8(panel, 0, sizeof(FMissionViewPanel));
 }

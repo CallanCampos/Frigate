@@ -79,7 +79,7 @@ GameEvent *InfDungeonRetire_CreateEvent(GameSystem *gsys, Field *field, u32 scre
     GameEvent *event = GameEvent_Create(gsys, NULL, InfDungeonRetire_EventMain, sizeof(RetireEvent));
     RetireEvent *retire = GameEvent_GetData(event);
 
-    sys_memset(retire, 0, sizeof(RetireEvent));
+    MI_CpuFill8(retire, 0, sizeof(RetireEvent));
     retire->field = field;
     retire->screenId = screenId;
     retire->result = result;

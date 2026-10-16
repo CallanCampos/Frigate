@@ -12,36 +12,36 @@ static struct {
 } sEnabledPlanes;
 
 void GFL_BGSysInitVRAM(u32 banks) {
-    gfxSetLCDCBanks(GX_VRAM_LCDC_ALL & (banks ^ 0xffff));
-    sys_memset32_fast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
-    gfxDisableLCDCBanks();
-    sys_memset32_fast(0xc0, (void *)HW_OAM, HW_OAM_SIZE);
-    sys_memset32_fast(0, (void *)HW_BG_PLTT, HW_PLTT_SIZE);
-    sys_memset32_fast(0xc0, (void *)HW_DB_OAM, HW_OAM_SIZE);
-    sys_memset32_fast(0, (void *)HW_DB_BG_PLTT, HW_PLTT_SIZE);
+    GX_SetBankForLCDC(GX_VRAM_LCDC_ALL & (banks ^ 0xffff));
+    MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
+    GX_DisableBankForLCDC();
+    MIi_CpuClearFast(0xc0, (void *)HW_OAM, HW_OAM_SIZE);
+    MIi_CpuClearFast(0, (void *)HW_BG_PLTT, HW_PLTT_SIZE);
+    MIi_CpuClearFast(0xc0, (void *)HW_DB_OAM, HW_OAM_SIZE);
+    MIi_CpuClearFast(0, (void *)HW_DB_BG_PLTT, HW_PLTT_SIZE);
 }
 
 void GFL_BGSysSetVRAMBanks(const BGSysVRAMConfig *config) {
-    gfxAcquireBGBanksA();
-    gfxAcquireBGExtPltBanksA();
-    gfxAcquireBGBanksB();
-    gfxAcquireBGExtPltBanksB();
-    gfxAcquireObjBanksA();
-    gfxAcquireObjExtPltBanksA();
-    gfxAcquireObjBanksB();
-    gfxAcquireObjExtPltBanksB();
-    gfxAcquireTextureBanks();
-    gfxAcquirePaletteBanks();
-    gfxSetBGBanksA(config->bgMain);
-    gfxSetBGExtPltBanksA(config->bgExtPaletteMain);
-    gfxSetBGBanksB(config->bgSub);
-    gfxSetBGExtPltBanksB(config->bgExtPaletteSub);
-    gfxSetObjBanksA(config->objMain);
-    gfxSetObjExtPltBanksA(config->objExtPaletteMain);
-    gfxSetObjBanksB(config->objSub);
-    gfxSetObjExtPltBanksB(config->objExtPaletteSub);
-    gfxSetTextureBanks(config->texture);
-    gfxSetPaletteBanks(config->texturePalette);
+    GX_ResetBankForBG();
+    GX_ResetBankForBGExtPltt();
+    GX_ResetBankForSubBG();
+    GX_ResetBankForSubBGExtPltt();
+    GX_ResetBankForOBJ();
+    GX_ResetBankForOBJExtPltt();
+    GX_ResetBankForSubOBJ();
+    GX_ResetBankForSubOBJExtPltt();
+    GX_ResetBankForTex();
+    GX_ResetBankForTexPltt();
+    GX_SetBankForBG(config->bgMain);
+    GX_SetBankForBGExtPltt(config->bgExtPaletteMain);
+    GX_SetBankForSubBG(config->bgSub);
+    GX_SetBankForSubBGExtPltt(config->bgExtPaletteSub);
+    GX_SetBankForOBJ(config->objMain);
+    GX_SetBankForOBJExtPltt(config->objExtPaletteMain);
+    GX_SetBankForSubOBJ(config->objSub);
+    GX_SetBankForSubOBJExtPltt(config->objExtPaletteSub);
+    GX_SetBankForTex(config->texture);
+    GX_SetBankForTexPltt(config->texturePalette);
     GX_SetOBJVRamModeChar(config->objMappingMain);
     GXS_SetOBJVRamModeChar(config->objMappingSub);
 }
@@ -111,7 +111,7 @@ void GFL_BGSysSetEnabledBGsB(u32 enabled) {
 }
 
 void GFL_BGSysEnableEngines(void) {
-    gfxEngineEnableA();
+    GX_DispOn();
     GXS_DispOn();
 }
 

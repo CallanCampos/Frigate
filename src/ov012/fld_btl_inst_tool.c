@@ -302,7 +302,7 @@ u32 func_ov012_02162490(BSubwayPokemon *pkm, u32 arcId, u16 file, u32 id, u32 pi
     u32 ability;
     MsgData *msgData;
 
-    sys_memset(pkm, 0, sizeof(BSubwayPokemon));
+    MI_CpuFill8(pkm, 0, sizeof(BSubwayPokemon));
     func_ov012_021627b0(arcId, &data, file);
     pkm->species = data.species;
     pkm->form = data.form;
@@ -464,7 +464,7 @@ void *func_ov012_021628c0(BSubwayTrainer *trainer, u32 arcId, u16 trainerId, u16
     u16 *trainerData;
     StrBuf *name;
 
-    sys_memset(trainer, 0, sizeof(BSubwayTrainer));
+    MI_CpuFill8(trainer, 0, sizeof(BSubwayTrainer));
     trainerData = func_ov012_021627c0(arcId, trainerId, heapId);
     trainer->unk00 = trainerId + 1;
     trainer->message.type = 0xffff;

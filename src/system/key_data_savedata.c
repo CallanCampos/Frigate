@@ -15,13 +15,13 @@ u32 func_02010230(void) {
 }
 
 void func_02010234(KeyDataSave *keyData) {
-    sys_memset(keyData, 0, sizeof(KeyDataSave));
+    MI_CpuFill8(keyData, 0, sizeof(KeyDataSave));
     func_02010474(func_020103f0(keyData));
 }
 
 // Clears the run, but not its seed, its money or the areas reached
 void func_0201024c(KeyDataSave *keyData) {
-    sys_memset(keyData->trainerFlags, 0, sizeof(keyData->trainerFlags));
+    MI_CpuFill8(keyData->trainerFlags, 0, sizeof(keyData->trainerFlags));
     keyData->flags = 0;
     keyData->unk1C = 0;
     keyData->floor = 0;

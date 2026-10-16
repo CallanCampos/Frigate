@@ -24,7 +24,7 @@ static BOOL ZukanList_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN_LIST, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZknListWork), HEAPID_ZUKAN_LIST);
-    sys_memset(wk, 0, sizeof(ZknListWork));
+    MI_CpuFill8(wk, 0, sizeof(ZknListWork));
     wk->param = param;
     return TRUE;
 }

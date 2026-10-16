@@ -253,8 +253,8 @@ void MailBox_LoadBGGraphics(MailBoxWork *work) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 39, PALTYPE_MAIN_BG, 0, 0, HEAPID_MAILBOX_VIEW);
     file = GFL_G2DIOReadBGNCGRArc(arc, 38, TRUE, &character, HEAPID_MAILBOX_VIEW);
     chars = character->rawData;
-    sys_memcpy32_fast(chars + 0x100, work->view->tileA, 0x20);
-    sys_memcpy32_fast(chars + 0x100, work->view->tileB, 0x20);
+    MIi_CpuCopyFast(chars + 0x100, work->view->tileA, 0x20);
+    MIi_CpuCopyFast(chars + 0x100, work->view->tileB, 0x20);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
 }
@@ -278,7 +278,7 @@ void MailBox_CreateFrames(MailBoxWork *work) {
     BGWinFrame_LoadScreen(work->view->frames, 0, ARCID_MAILBOX, 40, TRUE);
     screen = BGWinFrame_GetScreen(work->view->frames, 0);
     for (i = 1; i <= MAILBOX_FRAME_SELECTED; i++) {
-        sys_memcpy(screen, BGWinFrame_GetScreen(work->view->frames, i), 14 * 4 * sizeof(u16));
+        MI_CpuCopy8(screen, BGWinFrame_GetScreen(work->view->frames, i), 14 * 4 * sizeof(u16));
     }
     for (i = 0; i < MAILBOX_PAGE_SIZE; i++) {
         BGWinFrame_Put(work->view->frames, i, (i % 2) * 16 + 1, (i / 2) * 4);

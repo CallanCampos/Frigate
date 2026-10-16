@@ -114,7 +114,7 @@ void EncEffGrid_ClearAndDraw(EncEff *effect) {
     void *eventData = EncEff_GetEventData(effect);
     EncEffGrid *grid = EncEff_GetWorkArea(effect);
 
-    gfxClearColor(grid->unk3078, 31, 0x7fff, 0, FALSE);
+    G3X_SetClearColor(grid->unk3078, 31, 0x7fff, 0, FALSE);
     EncEffCapture_Draw(eventData);
 }
 
@@ -153,9 +153,9 @@ void EncEffGrid_Draw(EncEffGrid *grid) {
             G3_Translate(trans.x, trans.y, trans.z);
             G3_Scale(scale.x, scale.y, scale.z);
             MTX_RotY33_(&rot, FX_SinIdx(cell->offset), FX_CosIdx(cell->offset));
-            gfxMultMatrix3x3(&rot);
+            G3_MultMtx33(&rot);
             MTX_RotZ33_(&rot, FX_SinIdx(cell->unk20), FX_CosIdx(cell->unk20));
-            gfxMultMatrix3x3(&rot);
+            G3_MultMtx33(&rot);
             G3_Begin(GX_BEGIN_QUADS);
             G3_Normal(0, 0, FX16_ONE);
             G3_TexCoord(s, t);

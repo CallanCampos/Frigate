@@ -23,7 +23,7 @@ typedef struct {
 
 // A stage of file 2 of archive 151, 0x42 bytes
 typedef struct {
-    GXRgb edgeColor; // gfxSetEdgeColorTable reads the table from here
+    GXRgb edgeColor; // G3X_SetEdgeColorTable reads the table from here
     // The resources of archive 11 by row (0 the models, 1-3 the animations), then by variant and ground, two to a
     // variant; 0xffff for none
     u16 resources[4][8];
@@ -175,7 +175,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
         stage->srt[1].translation.z = FX32_CONST(-15);
     }
 
-    gfxSetEdgeColorTable(&data[stageId].edgeColor);
+    G3X_SetEdgeColorTable(&data[stageId].edgeColor);
     GFL_HeapFree(data);
     return stage;
 }

@@ -16,6 +16,7 @@
 #include "gfl/touchpanel.h"
 #include "gfl/ui.h"
 #include "nitro/fx.h"
+#include "nitro/os.h"
 #include "nitro/rtc.h"
 #include "pml/poke_party.h"
 #include "save/box.h"
@@ -139,13 +140,13 @@ BOOL s00D2_RTCGetSeason(VM *vm, FieldScriptEnv *env) {
 BOOL s00D4_TrainerCardGetBirthDate(VM *vm, FieldScriptEnv *env) {
     u16 *month;
     u16 *day;
-    u8 date[0x58];
+    OSOwnerInfoEx info;
 
     month = ScriptReadVar(vm, env);
     day = ScriptReadVar(vm, env);
-    func_0207c3bc(date);
-    *month = date[2];
-    *day = date[3];
+    OS_GetOwnerInfoEx(&info);
+    *month = info.birthday.month;
+    *day = info.birthday.day;
     return FALSE;
 }
 

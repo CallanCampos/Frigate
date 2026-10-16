@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/snd.h"
 #include "snd_internal.h"
@@ -190,7 +190,7 @@ NNSiSndArcLoadResult NNSi_SndArcLoadBank(int bankNo, u32 loadFlag, NNSSndHeapHan
             }
         }
         if (bank != NULL && waveArc != NULL) {
-            func_0207dd80(bank, i, waveArc);
+            SND_AssignWaveArc(bank, i, waveArc);
         }
     }
     if (pData != NULL) {
@@ -242,7 +242,7 @@ static void *LoadFile(u32 fileId, NNSSndHeapDisposeCallback callback, u32 data1,
     if (NNS_SndArcReadFile(fileId, buffer, size, 0) != size) {
         return NULL;
     }
-    cp15_cleanDC(buffer, size);
+    DC_StoreRange(buffer, size);
     return buffer;
 }
 
@@ -319,9 +319,9 @@ static void *LoadWaveArcTable(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) 
         if (result != (int)sizeof(SNDWaveArc) + tableSize) {
             return NULL;
         }
-        sys_memcpy(waveArc->offsetTable, &waveArc->offsetTable[waveArc->waveCount], tableSize);
-        sys_memset(waveArc->offsetTable, 0, tableSize);
-        cp15_cleanDC(waveArc, size);
+        MI_CpuCopy8(waveArc->offsetTable, &waveArc->offsetTable[waveArc->waveCount], tableSize);
+        MI_CpuFill8(waveArc->offsetTable, 0, tableSize);
+        DC_StoreRange(waveArc, size);
         if (bSetAddr) {
             NNS_SndArcSetFileAddress(fileId, waveArc);
         }
@@ -335,44 +335,44 @@ static void ClearFileAddress(void *mem, NNSSndArc *arc, u32 fileId) {
     NNSSndArc *current;
 
     if (arc != NULL) {
-        enabled = CPU_IRQDisable();
+        enabled = OS_DisableInterrupts();
         current = NNS_SndArcSetCurrent(arc);
         if (mem == NNS_SndArcGetFileAddress(fileId)) {
             NNS_SndArcSetFileAddress(fileId, NULL);
         }
         NNS_SndArcSetCurrent(current);
-        CPU_SetIRQMask(enabled);
+        OS_RestoreInterrupts(enabled);
     }
 }
 
 static void SeqDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
     ClearFileAddress(mem, (NNSSndArc *)data1, data2);
-    func_0207d558(mem, (u8 *)mem + size);
+    SND_InvalidateSeqData(mem, (u8 *)mem + size);
 }
 
 static void BankDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
     ClearFileAddress(mem, (NNSSndArc *)data1, data2);
-    func_0207d570(mem, (u8 *)mem + size);
-    func_0207ddfc(mem);
+    SND_InvalidateBankData(mem, (u8 *)mem + size);
+    SND_DestroyBank(mem);
 }
 
 static void WaveArcDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
     ClearFileAddress(mem, (NNSSndArc *)data1, data2);
-    func_0207d588(mem, (u8 *)mem + size);
-    func_0207de50(mem);
+    SND_InvalidateWaveData(mem, (u8 *)mem + size);
+    SND_DestroyWaveArc(mem);
 }
 
 static void WaveArcTableDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
     ClearFileAddress(mem, (NNSSndArc *)data1, data2);
-    func_0207de50(mem);
+    SND_DestroyWaveArc(mem);
 }
 
 // data1 is the wave archive, data2 the wave's index
 static void SingleWaveDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
-    if (mem == func_0207dfa4((SNDWaveArc *)data1, (int)data2)) {
-        func_0207df84((SNDWaveArc *)data1, (int)data2, NULL);
+    if (mem == SND_GetWaveDataAddress((SNDWaveArc *)data1, (int)data2)) {
+        SND_SetWaveDataAddress((SNDWaveArc *)data1, (int)data2, NULL);
     }
-    func_0207d588(mem, (u8 *)mem + size);
+    SND_InvalidateWaveData(mem, (u8 *)mem + size);
 }
 
 // The offset of the wave after the one at fileOffset, where that wave ends
@@ -386,12 +386,12 @@ static BOOL LoadSingleWave(SNDWaveArc *waveArc, int index, u32 fileId, NNSSndHea
     u32 size;
     void *wave;
 
-    if (func_0207dfa4(waveArc, index) != NULL) {
+    if (SND_GetWaveDataAddress(waveArc, index) != NULL) {
         return TRUE;
     }
     // The wave runs to the next one's offset, the last to the end of the file. The table's second half keeps the
     // waves' offsets in the file, since the first half is overwritten with the loaded waves
-    waveCount = func_0207df80(waveArc);
+    waveCount = SND_GetWaveDataCount(waveArc);
     offset = waveArc->offsetTable[waveArc->waveCount + index];
     if (index < waveCount - 1) {
         size = GetNextWaveOffset(&waveArc->offsetTable[waveArc->waveCount + index]) - offset;
@@ -408,8 +408,8 @@ static BOOL LoadSingleWave(SNDWaveArc *waveArc, int index, u32 fileId, NNSSndHea
     if (NNS_SndArcReadFile(fileId, wave, size, offset) != size) {
         return FALSE;
     }
-    cp15_cleanDC(wave, size);
-    func_0207df84(waveArc, index, wave);
+    DC_StoreRange(wave, size);
+    SND_SetWaveDataAddress(waveArc, index, wave);
     return TRUE;
 }
 
@@ -417,13 +417,13 @@ static BOOL LoadSingleWave(SNDWaveArc *waveArc, int index, u32 fileId, NNSSndHea
 // place among the bank's
 static BOOL LoadWavesOfBank(SNDWaveArc *waveArc, const SNDBankData *bank, int index, u32 fileId,
                             NNSSndHeapHandle heap) {
-    SNDInstPos pos = func_0207de7c(bank);
+    SNDInstPos pos = SND_GetFirstInstDataPos(bank);
     SNDInstData inst;
 
     if (bank == NULL) {
         return FALSE;
     }
-    while (func_0207de8c(bank, &inst, &pos)) {
+    while (SND_GetNextInstData(bank, &inst, &pos)) {
         if (inst.type == SND_INST_PCM && index == inst.param.wave[1]) {
             if (!LoadSingleWave(waveArc, inst.param.wave[0], fileId, heap)) {
                 return FALSE;

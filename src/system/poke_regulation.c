@@ -188,7 +188,7 @@ u32 PokeRegulation_CheckPartyCanEnter(Regulation *regulation, PokeParty *party) 
     int i, j;
     u32 result;
 
-    sys_memset(items, 0, sizeof(items));
+    MI_CpuFill8(items, 0, sizeof(items));
     for (i = 0; i < count; i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 

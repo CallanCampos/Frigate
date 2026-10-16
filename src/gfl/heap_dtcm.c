@@ -22,12 +22,12 @@ BOOL GFL_HeapDTCMInitCore(u32 size) {
     if (size > DTCM_HEAP_MAX_SIZE) {
         return FALSE;
     }
-    start = GetUserMemRegionStart(OS_ARENA_DTCM);
-    SetUserMemRegionEnd(OS_ARENA_DTCM, (void *)(HW_DTCM + 0x3000));
+    start = OS_GetArenaLo(OS_ARENA_DTCM);
+    OS_SetArenaHi(OS_ARENA_DTCM, (void *)(HW_DTCM + 0x3000));
     result = TRUE;
-    lo = mem_init_alloc_area(OS_ARENA_DTCM, start, (u8 *)start + size, 1);
-    SetUserMemRegionStart(OS_ARENA_DTCM, lo);
-    sDTCMHeap.handle = mem_bind_range(OS_ARENA_DTCM, lo, (u8 *)start + size);
+    lo = OS_InitAlloc(OS_ARENA_DTCM, start, (u8 *)start + size, 1);
+    OS_SetArenaLo(OS_ARENA_DTCM, lo);
+    sDTCMHeap.handle = OS_CreateHeap(OS_ARENA_DTCM, lo, (u8 *)start + size);
     if (sDTCMHeap.handle == OS_HEAP_INVALID) {
         result = FALSE;
     }
@@ -35,10 +35,10 @@ BOOL GFL_HeapDTCMInitCore(u32 size) {
 }
 
 void *GFL_HeapDTCMAllocateCore(u32 size) {
-    return malloc_device(OS_ARENA_DTCM, sDTCMHeap.handle, size);
+    return OS_AllocFromHeap(OS_ARENA_DTCM, sDTCMHeap.handle, size);
 }
 
 BOOL freeBlkFromDTCM(void *ptr) {
-    free_device(OS_ARENA_DTCM, sDTCMHeap.handle, ptr);
+    OS_FreeToHeap(OS_ARENA_DTCM, sDTCMHeap.handle, ptr);
     return TRUE;
 }

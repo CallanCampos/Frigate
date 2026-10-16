@@ -287,7 +287,7 @@ BOOL Guru2Receipt_Init(GameProc *proc, u32 *state, void *param, void *work) {
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_GURU2, 0x80000);
         arc = GFL_ArcSysCreateFileHandle(GURU2_RECEIPT_ARCID, HEAPID_GURU2);
         wk = GFL_ProcInitSubsystem(proc, sizeof(Guru2ReceiptWork), HEAPID_GURU2);
-        sys_memset(wk, 0, sizeof(Guru2ReceiptWork));
+        MI_CpuFill8(wk, 0, sizeof(Guru2ReceiptWork));
         g2p->g2r = wk;
         wk->g2p = g2p;
         wk->g2c = g2p->g2c;
@@ -440,7 +440,7 @@ static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
             if (sPalAnimSteps[anim->index].palette == 0xff) {
                 anim->index = 0;
             }
-            gfxUploadStdPaletteObjA((u8 *)anim->palette->rawData + sPalAnimSteps[anim->index].palette * 0x20, 0, 0x20);
+            GX_LoadOBJPltt((u8 *)anim->palette->rawData + sPalAnimSteps[anim->index].palette * 0x20, 0, 0x20);
         } else {
             wk->palAnim.counter++;
         }
@@ -901,7 +901,7 @@ static int Guru2ReceiptSeq_CancelYesNo(Guru2ReceiptWork *wk, int procSeq) {
             } else {
                 Guru2CommSignal signal;
 
-                sys_memset(&signal, 0, sizeof(signal));
+                MI_CpuFill8(&signal, 0, sizeof(signal));
                 signal.type = GURU2_SIGNAL_LEAVE_REQUEST;
                 signal.netId = func_0203ffc4();
                 if (Guru2Comm_Send(wk->g2c, GURU2_NET_CMD_SIGNAL, &signal, sizeof(signal))) {
@@ -937,7 +937,7 @@ static int Guru2ReceiptSeq_CancelOk(Guru2ReceiptWork *wk, int procSeq) {
     if (wk->signalTimer > 30) {
         Guru2CommSignal signal;
 
-        sys_memset(&signal, 0, sizeof(signal));
+        MI_CpuFill8(&signal, 0, sizeof(signal));
         signal.type = GURU2_SIGNAL_LEAVE;
         signal.netId = func_0203ffc4();
         Guru2Comm_Send(wk->g2c, GURU2_NET_CMD_SIGNAL, &signal, sizeof(signal));
@@ -1444,7 +1444,7 @@ static void Guru2Receipt_SetActorLook(Guru2ReceiptWork *wk, NNSG2dPaletteData *p
     NNSG2dCharacterData *character;
     void *file;
 
-    gfxUploadStdPaletteObjA((u8 *)palette->rawData + sLookPalettes[look] * 0x20, id * 0x20, 0x20);
+    GX_LoadOBJPltt((u8 *)palette->rawData + sLookPalettes[look] * 0x20, id * 0x20, 0x20);
     file = GFL_G2DIOReadOBJNCGR(GURU2_RECEIPT_TRAINER_ARCID, look + 1, FALSE, &character, HEAPID_GURU2);
     func_0204ba40(wk->resources[GURU2_RECEIPT_RES_CHAR + id], character);
     GFL_HeapFree(file);

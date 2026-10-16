@@ -389,7 +389,7 @@ static void Deposit_BmpWinDelete(WorldTradeWork *wk) {
 static void Deposit_SetCellActor(WorldTradeWork *wk) {
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 160;
     setup.y = 32;
     wk->subCursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
@@ -427,7 +427,7 @@ static void Deposit_DelCellActor(WorldTradeWork *wk) {
 static void Deposit_InitWork(WorldTradeWork *wk) {
     wk->talkString = GFL_StrBufCreate(180, HEAPID_WORLDTRADE);
     wk->dw = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(WorldTradeDepositWork), FALSE, "worldtrade_deposit.c", 692);
-    sys_memset32_fast(0, wk->dw, sizeof(WorldTradeDepositWork));
+    MIi_CpuClearFast(0, wk->dw, sizeof(WorldTradeDepositWork));
     wk->dw->nameSortTable = WorldTrade_ZukanSortDataGet(HEAPID_WORLDTRADE, 0, &wk->dw->nameSortNum);
     wk->dw->sinouTable = WorldTrade_SinouZukanDataGet(HEAPID_WORLDTRADE);
     WorldTrade_SelectListPosInit(&wk->selectListPos);
@@ -915,7 +915,7 @@ u8 *WorldTrade_SinouZukanDataGet(int heapId) {
     u16 *data;
     u32 num;
 
-    sys_memset32_fast(0, table, MONSNO_TABLE_SIZE);
+    MIi_CpuClearFast(0, table, MONSNO_TABLE_SIZE);
     data = GFL_ArcSysReadHeapNewLZGetLen(97, 4, FALSE, heapId, &size);
     num = size / 2;
     for (; i < num; i++) {
@@ -935,7 +935,7 @@ void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
         if (species == SPECIES_SHAYMIN || species == SPECIES_KYUREM) {
             PokeParty_ChangeForme((PartyPkm *)wk->depositPkm, 0);
         }
-        sys_memcpy32_fast(wk->depositPkm, dtd, PokeParty_GetPkmRawSize());
+        MIi_CpuCopyFast(wk->depositPkm, dtd, PokeParty_GetPkmRawSize());
     } else {
         u32 species = PML_PkmGetParam(wk->depositPkm, PKM_PARAM_SPECIES, NULL);
 

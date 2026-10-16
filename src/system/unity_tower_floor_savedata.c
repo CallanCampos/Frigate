@@ -14,13 +14,13 @@ u32 UnityTowerSave_GetBlockSize(void) {
 }
 
 void UnityTowerSave_Init(UnityTowerFloor *save) {
-    sys_memset(save, 0, UNITY_TOWER_FLOOR_BLOCK_SIZE);
+    MI_CpuFill8(save, 0, UNITY_TOWER_FLOOR_BLOCK_SIZE);
 }
 
 void UnityTowerSave_Store(const UnityTowerFloor *floor, SaveControl *save) {
-    sys_memcpy32(floor, SaveControl_GetBlockPtr(save, SAVE_BLOCK_UNITY_TOWER_FLOOR), UNITY_TOWER_FLOOR_BLOCK_SIZE);
+    MIi_CpuCopy32(floor, SaveControl_GetBlockPtr(save, SAVE_BLOCK_UNITY_TOWER_FLOOR), UNITY_TOWER_FLOOR_BLOCK_SIZE);
 }
 
 void UnityTowerSave_Load(SaveControl *save, UnityTowerFloor *floor) {
-    sys_memcpy32(SaveControl_GetBlockPtr(save, SAVE_BLOCK_UNITY_TOWER_FLOOR), floor, UNITY_TOWER_FLOOR_BLOCK_SIZE);
+    MIi_CpuCopy32(SaveControl_GetBlockPtr(save, SAVE_BLOCK_UNITY_TOWER_FLOOR), floor, UNITY_TOWER_FLOOR_BLOCK_SIZE);
 }

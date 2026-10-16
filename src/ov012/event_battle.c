@@ -642,7 +642,7 @@ static void EventBattleCall_SyncGameDataOnReturn(EventBattleCallWork *work, Game
 }
 
 static void EventBattleCall_Setup(EventBattleCallWork *work, GameSystem *gsys, BtlSetup *setup) {
-    sys_memset32(0, work, sizeof(EventBattleCallWork));
+    MIi_CpuClear32(0, work, sizeof(EventBattleCallWork));
     work->gsys = gsys;
     work->gameData = GSYS_GetGameData(gsys);
     work->setup = setup;

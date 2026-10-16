@@ -350,7 +350,7 @@ static void ISSSwitchMuteStateChangeRequest_Set(ISSSwitchMuteStateChangeRequest 
 }
 
 static void ISSSwitchMuteStateChangeRequest_Reset(ISSSwitchMuteStateChangeRequest *request) {
-    sys_memset(request, 0, sizeof(ISSSwitchMuteStateChangeRequest));
+    MI_CpuFill8(request, 0, sizeof(ISSSwitchMuteStateChangeRequest));
 }
 
 static void ISSSwitchSys_ProcessMuteStateChangeRequest(ISSSwitchMuteStateChangeRequest *request,
@@ -396,7 +396,7 @@ static void ISSSwitchMasterVolumeChangeRequest_Set(ISSSwitchMasterVolumeChangeRe
 }
 
 static void ISSSwitchMasterVolumeChangeRequest_Reset(ISSSwitchMasterVolumeChangeRequest *request) {
-    sys_memset(request, 0, sizeof(ISSSwitchMasterVolumeChangeRequest));
+    MI_CpuFill8(request, 0, sizeof(ISSSwitchMasterVolumeChangeRequest));
 }
 
 static void ISSSwitchSys_ProcessMasterVolumeChangeRequest(ISSSwitchMasterVolumeChangeRequest *request,

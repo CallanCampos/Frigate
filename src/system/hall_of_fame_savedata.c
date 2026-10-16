@@ -18,11 +18,11 @@ u32 HallOfFameTeam_GetSize(void) {
 }
 
 void HallOfFameSave_Init(HallOfFameSave *save) {
-    sys_memset(save, 0, sizeof(HallOfFameSave));
+    MI_CpuFill8(save, 0, sizeof(HallOfFameSave));
 }
 
 void HallOfFameTeam_Init(HallOfFameTeam *team) {
-    sys_memset(team, 0, sizeof(HallOfFameTeam));
+    MI_CpuFill8(team, 0, sizeof(HallOfFameTeam));
 }
 
 // Copies the party's Pokémon into the team, skipping the eggs
@@ -37,7 +37,7 @@ static void HallOfFameTeam_Set(HallOfFameTeam *team, PokeParty *party, const RTC
 
     count = PokeParty_GetPkmCount(party);
     strbuf = GFL_StrBufCreate(HALL_OF_FAME_NICKNAME_LENGTH, heapId);
-    sys_memset(team->pokemon, 0, sizeof(team->pokemon));
+    MI_CpuFill8(team->pokemon, 0, sizeof(team->pokemon));
     for (i = 0, slot = 0; i < count; i++) {
         pkm = PokeParty_GetPkm(party, i);
         wasEncrypted = PokeParty_DecryptPkm(pkm);

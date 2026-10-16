@@ -60,9 +60,9 @@ void clearTrainerBattleFlag(EventWork *eventWork, u16 trainerId) {
 void resetRebattleTrainers(EventWork *eventWork) {
     int i;
 
-    clock();
+    OS_GetTick();
     for (i = 0; i < REBATTLE_TRAINER_COUNT; i++) {
         EventWork_FlagReset(eventWork, sRebattleTrainers[i] + 0x5f0);
     }
-    clock();
+    OS_GetTick();
 }

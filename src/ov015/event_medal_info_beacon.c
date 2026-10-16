@@ -39,7 +39,7 @@ GameEventReturnCode func_ov015_0216e660(GameEvent *event, u32 *state, void *data
         GameEvent_ChainNext(event, EventBGMPlayPushEx_Create(gsys, 0x483, 6, 0));
         (*state)++;
     case 3:
-        sys_memset(&work->param, 0, sizeof(work->param));
+        MI_CpuFill8(&work->param, 0, sizeof(work->param));
         work->param.gsys = work->gsys;
         work->param.gameData = work->gameData;
         work->param.beaconIndex = work->subscreen;

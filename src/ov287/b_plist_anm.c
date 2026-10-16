@@ -149,7 +149,7 @@ static void BPlistAnm_MakeButtonScrn(BPlistWork *work, u16 *buf, u8 button, u8 s
     src = BPlistAnm_GetButtonScrn(work, button, state, mode);
     width = data_ov287_021fadac[button].width;
     size = width * data_ov287_021fadac[button].height;
-    sys_memcpy(src, buf, size * 2);
+    MI_CpuCopy8(src, buf, size * 2);
 
     switch (button) {
     case 0:

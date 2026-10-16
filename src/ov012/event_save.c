@@ -16,7 +16,7 @@ GameEvent *EventSave_Create(GameSystem *gsys, Field *field, u16 heapId, void *ms
     EventSaveWork *work = GameEvent_GetData(event);
     GameData *gameData;
 
-    sys_memset(work, 0, sizeof(EventSaveWork));
+    MI_CpuFill8(work, 0, sizeof(EventSaveWork));
     work->msgBgSys = msgBgSys;
     work->heapId = heapId;
     work->gameSystem = gsys;

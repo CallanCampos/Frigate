@@ -226,7 +226,7 @@ static void MyPoke_BgGraphicSet(WorldTradeWork *wk) {
 static void MyPoke_SetCellActor(WorldTradeWork *wk) {
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 208;
     setup.y = 58;
     wk->pokemonAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
@@ -538,8 +538,8 @@ void WorldTrade_TransPokeGraphic(PartyPkm *pkm) {
     u32 arcId;
     u32 palette;
 
-    cp15_flushDC(charData->rawData, 0x1200);
-    gfxUploadObjCharA(charData->rawData, 0x3f80, 0x1200);
+    DC_FlushRange(charData->rawData, 0x1200);
+    GX_LoadOBJ(charData->rawData, 0x3f80, 0x1200);
     GFL_HeapFree(buf);
 
     arcId = GetPokemonGraphicsARCID();

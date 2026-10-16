@@ -52,10 +52,10 @@ void func_0204f864(void) {
 }
 
 static void func_0204f8c8(int ch) {
-    u32 mode = CPU_IRQDisable();
+    u32 mode = OS_DisableInterrupts();
     DMAVBlankChannel *channel = &sDMAChannels[ch];
 
     reg_DMA_CNT(ch) = (channel->irq << 30) | (channel->is32bit << 26) | (channel->srcCtrl << 23) |
                       (channel->dstCtrl << 21) | channel->count;
-    CPU_SetIRQMask(mode);
+    OS_RestoreInterrupts(mode);
 }

@@ -21,11 +21,11 @@ PlayerInfo *func_02008b0c(u32 heapId) {
 }
 
 void func_02008b34(const PlayerInfo *src, PlayerInfo *dest) {
-    sys_memcpy(src, dest, sizeof(PlayerInfo));
+    MI_CpuCopy8(src, dest, sizeof(PlayerInfo));
 }
 
 void func_02008b40(PlayerInfo *info) {
-    sys_memset(info, 0, sizeof(PlayerInfo));
+    MI_CpuFill8(info, 0, sizeof(PlayerInfo));
     info->region = 2;
     func_02008c00(info, GAME_VERSION);
 }

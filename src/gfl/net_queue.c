@@ -88,7 +88,7 @@ static BOOL func_0203e22c(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBu
         if (entry->data == NULL) {
             func_0203e038(ring, buffer->ptr, buffer->size, buffer->size);
         } else {
-            sys_memcpy(entry->data, buffer->ptr, buffer->size);
+            MI_CpuCopy8(entry->data, buffer->ptr, buffer->size);
             entry->data += buffer->size;
         }
         entry->size -= buffer->size;
@@ -99,7 +99,7 @@ static BOOL func_0203e22c(NetQueueEntry *entry, NetSendBuffer *buffer, NetRingBu
     if (entry->data == NULL) {
         func_0203e038(ring, buffer->ptr, entry->size, entry->size);
     } else {
-        sys_memcpy(entry->data, buffer->ptr, entry->size);
+        MI_CpuCopy8(entry->data, buffer->ptr, entry->size);
     }
     buffer->ptr += entry->size;
     buffer->size -= entry->size;
@@ -188,20 +188,20 @@ BOOL func_0203e3bc(NetQueue *queue, NetSendBuffer *buffer) {
             queue->current = entry;
             return FALSE;
         }
-        sys_memset(entry, 0, sizeof(NetQueueEntry));
+        MI_CpuFill8(entry, 0, sizeof(NetQueueEntry));
     }
     return TRUE;
 }
 
 void func_0203e418(NetQueue *queue, int count, NetRingBuff *ring, HeapID heapId) {
-    sys_memset(queue, 0, sizeof(NetQueue));
+    MI_CpuFill8(queue, 0, sizeof(NetQueue));
     queue->entries = GFL_HeapAllocate(heapId, count * sizeof(NetQueueEntry), TRUE, "net_queue.c", 371);
     queue->count = count;
     queue->ring = ring;
 }
 
 void func_0203e44c(NetQueue *queue) {
-    sys_memset(queue->entries, 0, sizeof(NetQueueEntry) * queue->count);
+    MI_CpuFill8(queue->entries, 0, sizeof(NetQueueEntry) * queue->count);
     queue->list.head = NULL;
     queue->list.tail = NULL;
     queue->list2.head = NULL;

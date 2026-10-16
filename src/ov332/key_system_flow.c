@@ -275,7 +275,7 @@ static void KeySystemFlow_SeqExchange(KeySystemSeq *seq, int *state, void *work)
     case 8: {
         KeySystemNetCallback callback;
 
-        sys_memset(&callback, 0, sizeof(KeySystemNetCallback));
+        MI_CpuFill8(&callback, 0, sizeof(KeySystemNetCallback));
         callback.arg = wk;
         callback.func = KeySystemFlow_OnNetError;
         wk->choice = 0;
@@ -1088,7 +1088,7 @@ void KeySystemFlow_MenuSceneInit(void *work, HeapID heapId) {
     u32 i;
 
     KeySystemMsgWin_PrintMsg(wk->titleWin, wk->msgData, 1, KEY_SYSTEM_MSG_PRINT);
-    sys_memset(&setup, 0, sizeof(KeySystemListSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemListSetup));
     setup.bg = 1;
     setup.unk04 = 14;
     setup.frameChar = 10;
@@ -1149,8 +1149,8 @@ void KeySystemFlow_ConnectSceneInit(void *work, HeapID heapId) {
     KeySystemClAct_Create(&wk->clact, 1, heapId);
     KeySystemClAct_Create(&wk->clact, 2, heapId);
     KeySystemClAct_Create(&wk->clact, 3, heapId);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_OBJ, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, 16,
-                        6);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_OBJ, GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, 16,
+                       6);
     GX_SetVisibleWnd(GX_WNDMASK_W0);
     G2_SetWnd0Position(224, 0, 0, 32);
     G2_SetWnd0InsidePlane(GX_PLANEMASK_ALL, FALSE);
@@ -1191,7 +1191,7 @@ void KeySystemFlow_SettingsSceneInit(void *work, HeapID heapId) {
     KeySystemListSetup setup;
     u32 i;
 
-    sys_memset(&setup, 0, sizeof(KeySystemListSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemListSetup));
     setup.bg = 1;
     setup.unk04 = 14;
     setup.frameChar = 10;

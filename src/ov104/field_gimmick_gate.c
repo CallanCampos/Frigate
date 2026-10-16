@@ -306,7 +306,7 @@ GimmickGateWork *func_ov104_021eee34(Field *field) {
     heapId = Field_GetHeapID(field);
     system = Field_GetExpObjSystem(field);
     work = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(GimmickGateWork));
-    sys_memset(work, 0, sizeof(GimmickGateWork));
+    MI_CpuFill8(work, 0, sizeof(GimmickGateWork));
     work->heapId = heapId;
     work->field = field;
     work->gameSystem = Field_GetGameSystem(field);
@@ -622,7 +622,7 @@ void func_ov104_021ef3c0(GimmickGateWork *work) {
     RTCDate date;
 
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     WordSetNumber(wordSet, 2, date.year, 2, 2, 1);
     loadMonthToStrbuf(wordSet, 0, date.month);
     WordSetNumber(wordSet, 1, date.day, 2, 0, 1);
@@ -735,7 +735,7 @@ void func_ov104_021ef658(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     switch (date.week) {
     case 0:
         arg.messageId = work->zoneData->messageIds[9];
@@ -772,7 +772,7 @@ void func_ov104_021ef6dc(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     switch (date.week) {
     case 0:
         arg.messageId = work->zoneData->messageIds[10];
@@ -809,7 +809,7 @@ void func_ov104_021ef760(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     switch (date.week) {
     case 0:
         arg.messageId = work->zoneData->messageIds[11];
@@ -846,7 +846,7 @@ void func_ov104_021ef7e4(GimmickGateWork *work) {
     ElboardMessageArg arg;
     RTCDate date;
 
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     switch (date.week) {
     case 0:
         arg.messageId = work->zoneData->messageIds[18];

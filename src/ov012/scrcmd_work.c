@@ -221,7 +221,7 @@ void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 
     ScriptSubwork *subwork = env->subwork;
     ScriptListMenu *menu = &subwork->listMenu;
 
-    sys_memset(menu, 0, sizeof(ScriptListMenu));
+    MI_CpuFill8(menu, 0, sizeof(ScriptListMenu));
     subwork->listMenu.x = x;
     menu->y = y;
     menu->cursor = cursor;
@@ -230,7 +230,7 @@ void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 
     menu->result = result;
     menu->wordSet = wordSet;
     menu->msgData = msgData;
-    sys_memset32(0, menu->descriptions, sizeof(menu->descriptions));
+    MIi_CpuClear32(0, menu->descriptions, sizeof(menu->descriptions));
     if (menu->msgData == NULL) {
         menu->ownsMsgData = TRUE;
         menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_0410, env->heapId);

@@ -183,23 +183,23 @@ static void func_0203ea5c(void) {
     int sendSize = func_0203e8e8();
     int dataSize = func_02042de8();
 
-    sys_memset(sNetSys->recvData, 0, sNetSys->recvSize * machineMax);
+    MI_CpuFill8(sNetSys->recvData, 0, sNetSys->recvSize * machineMax);
     for (i = 0; i < machineMax; i++) {
         func_0203dfc0(&sNetSys->recvRings[i], sNetSys->recvData + i * sNetSys->recvSize, sNetSys->recvSize);
         sNetSys->recvSeq[i] = 0;
     }
-    sys_memset(sNetSys->mpRingData, 0, (u32)sendSize * 2);
+    MI_CpuFill8(sNetSys->mpRingData, 0, (u32)sendSize * 2);
     func_0203dfc0(&sNetSys->mpRing, sNetSys->mpRingData, sendSize * 2);
     for (i = 0; i < sendSize; i++) {
         sNetSys->mpSendData[i] = 0;
     }
-    sys_memset(sNetSys->sendRingData, 0, (u32)dataSize * 15);
+    MI_CpuFill8(sNetSys->sendRingData, 0, (u32)dataSize * 15);
     func_0203dfc0(&sNetSys->sendRing, sNetSys->sendRingData, dataSize * 15);
     sNetSys->sendData[0] = 0xff;
     for (i = 1; i < dataSize; i++) {
         sNetSys->sendData[i] = 0;
     }
-    sys_memset(sNetSys->serverRingData, 0, sNetSys->recvSize * 3);
+    MI_CpuFill8(sNetSys->serverRingData, 0, sNetSys->recvSize * 3);
     func_0203dfc0(&sNetSys->serverRing, sNetSys->serverRingData, sNetSys->recvSize * 3);
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
         func_0203e8d4(&sNetSys->recvStates[i]);
@@ -797,7 +797,7 @@ static BOOL func_0203fa28(u8 *packet, NetQueue *queue, int size, u8 seq) {
     int len;
     int crc;
 
-    sys_memset(packet, 0, size);
+    MI_CpuFill8(packet, 0, size);
     packet[PACKET_FLAGS] = queue->pending == FALSE ? PACKET_FLAG_FIRST : PACKET_FLAG_CONTINUED;
     queue->pending = FALSE;
     packet[PACKET_CONNECT_BITS] = sys->pDevTable->getConnectBits();
@@ -948,7 +948,7 @@ static void func_0203fc34(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *
                 copied = read;
             }
             if (dest != NULL) {
-                sys_memcpy(temp, dest, copied);
+                MI_CpuCopy8(temp, dest, copied);
             }
         }
         state->pos += copied;

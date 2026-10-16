@@ -73,7 +73,7 @@ static BOOL WifiLogoutProc_Init(GameProc *proc, u32 *state, void *param, void *w
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFILOGOUT, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiLogoutWork), HEAPID_WIFILOGOUT);
-    sys_memset(wk, 0, sizeof(WifiLogoutWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiLogoutWork));
     wk->param = logoutParam;
     wk->heapId = HEAPID_WIFILOGOUT;
     if (logoutParam->unk10 == 0) {

@@ -200,7 +200,7 @@ static inline BOOL BtlvCore_RunSubProc(BtlvCore *core) {
 void func_ov167_021ce604(HeapID heapId) {
     func_ov167_021ce678(heapId);
     GFL_OvlLoad(OVERLAY_ID(168));
-    gfxSetLCDCBanks(0x80);
+    GX_SetBankForLCDC(0x80);
     GFL_OvlLoad(OVERLAY_ID(169));
     if (!func_02042b20()) {
         GFL_OvlLoad(OVERLAY_TR_AI);
@@ -235,12 +235,12 @@ void func_ov167_021ce678(HeapID heapId) {
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
     G3X_AntiAlias(TRUE);
-    gfxSetFog(FALSE, 0, 0, 0);
+    G3X_SetFog(FALSE, 0, 0, 0);
     G2_SetBG0Priority(1);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        0x1f, 3);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
+                           GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       0x1f, 3);
     ClActSys_Create(&data_ov167_021da8e4, &data_ov167_021da900, heapId);
 }
 

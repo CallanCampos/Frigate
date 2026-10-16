@@ -121,7 +121,7 @@ GameEvent *func_ov021_0216e80c(GameSystem *gsys, void *args) {
 
 void func_ov021_0216e848(FestivalEventParam *param, GameSystem *gsys, GameData *gameData, u32 mode) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    sys_memset(param, 0, sizeof(*param));
+    MI_CpuFill8(param, 0, sizeof(*param));
     param->gsys = gsys;
     param->gameData = gameData;
     param->mode = mode;

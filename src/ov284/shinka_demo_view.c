@@ -912,29 +912,29 @@ static SpritePieces *ShinkaDemoPieces_Create(u32 species, u32 form, u32 sex, BOO
     pieces->paletteFile = GFL_G2DIOReadNCLR(GetPokemonGraphicsARCID(), paletteNo, &pieces->palette, heapId);
     src = pieces->character->rawData;
     pixels = GFL_BitmapGetPixelData(pieces->bitmap);
-    sys_memset32(0, pixels, 16 * 16 * 32);
+    MIi_CpuClear32(0, pixels, 16 * 16 * 32);
     // The sprite's characters come in cells of 64 by 64, 32 by 64, 64 by 32 and 32 by 32 pixels
     for (y = 0; y < 8; y++) {
         for (x = 0; x < 8; x++) {
-            sys_memcpy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
+            MIi_CpuCopy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
             character++;
         }
     }
     for (y = 0; y < 8; y++) {
         for (x = 8; x < 12; x++) {
-            sys_memcpy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
+            MIi_CpuCopy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
             character++;
         }
     }
     for (y = 8; y < 12; y++) {
         for (x = 0; x < 8; x++) {
-            sys_memcpy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
+            MIi_CpuCopy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
             character++;
         }
     }
     for (y = 8; y < 12; y++) {
         for (x = 8; x < 12; x++) {
-            sys_memcpy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
+            MIi_CpuCopy32(src + character * 32, pixels + (2 * 16 + 2) * 32 + (x + y * 16) * 32, 32);
             character++;
         }
     }

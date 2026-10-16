@@ -366,7 +366,7 @@ static void DataConvert_SeqWireless(KeySystemSeq *seq, int *state, void *work) {
         if (KeySystemMsgWin_IsDone(wk->msgWin)) {
             KeySystemMenuSetup setup;
 
-            sys_memset(&setup, 0, sizeof(KeySystemMenuSetup));
+            MI_CpuFill8(&setup, 0, sizeof(KeySystemMenuSetup));
             setup.msgData = wk->msgData;
             setup.font = wk->font;
             setup.printQueue = wk->printQueue;
@@ -647,7 +647,7 @@ static void DataConvert_SeqWifi(KeySystemSeq *seq, int *state, void *work) {
         if (KeySystemMsgWin_IsDone(wk->msgWin)) {
             KeySystemMenuSetup setup;
 
-            sys_memset(&setup, 0, sizeof(KeySystemMenuSetup));
+            MI_CpuFill8(&setup, 0, sizeof(KeySystemMenuSetup));
             setup.msgData = wk->msgData;
             setup.font = wk->font;
             setup.printQueue = wk->printQueue;
@@ -1180,7 +1180,7 @@ static void DataConvert_MenuSceneInit(void *work, HeapID heapId) {
     int i;
 
     KeySystemMsgWin_PrintMsg(wk->titleWin, wk->msgData, 76, KEY_SYSTEM_MSG_PRINT);
-    sys_memset(&setup, 0, sizeof(KeySystemListSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemListSetup));
     setup.bg = 1;
     setup.unk04 = 14;
     setup.frameChar = 10;
@@ -1331,7 +1331,7 @@ static void DataConvert_MemoryListSceneInit(void *work, HeapID heapId) {
     int i;
 
     KeySystemMsgWin_PrintMsg(wk->titleWin, wk->msgData, 139, KEY_SYSTEM_MSG_PRINT);
-    sys_memset(&setup, 0, sizeof(KeySystemScrollListSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemScrollListSetup));
     setup.msgData = wk->msgData;
     setup.font = wk->font;
     setup.arrowUp = KeySystemClAct_Create(&wk->clact, 22, heapId);

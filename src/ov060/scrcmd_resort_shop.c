@@ -1855,9 +1855,9 @@ static void func_ov060_021e841c(ResortShopWork *wk, u8 mode, u8 subMode) {
                 func_02038680(b, 0, a0);
                 func_02038680(b, 1, a1);
                 func_02038680(b, 31, a31);
-                sys_memcpy(a, record, sizeof(record));
-                sys_memcpy(b, a, sizeof(record));
-                sys_memcpy(record, b, sizeof(record));
+                MI_CpuCopy8(a, record, sizeof(record));
+                MI_CpuCopy8(b, a, sizeof(record));
+                MI_CpuCopy8(record, b, sizeof(record));
                 tmp = wk->order[i];
                 wk->order[i] = wk->order[wk->entries[i].id];
                 wk->order[wk->entries[i].id] = tmp;
@@ -1896,9 +1896,9 @@ static void func_ov060_021e85b0(ResortShopWork *wk, u8 mode, u8 subMode) {
                 JoinAvenuePerson_SetParam(a, 1, b1);
                 JoinAvenuePerson_SetParam(b, 0, a0);
                 JoinAvenuePerson_SetParam(b, 1, a1);
-                sys_memcpy(a, person, sizeof(person));
-                sys_memcpy(b, a, sizeof(person));
-                sys_memcpy(person, b, sizeof(person));
+                MI_CpuCopy8(a, person, sizeof(person));
+                MI_CpuCopy8(b, a, sizeof(person));
+                MI_CpuCopy8(person, b, sizeof(person));
                 tmp = wk->order[i];
                 wk->order[i] = wk->order[j];
                 wk->order[j] = tmp;

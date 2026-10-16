@@ -15,6 +15,7 @@
 #include "gfl/std.h"
 #include "gfl/str.h"
 #include "gfl/ui.h"
+#include "nitro/os.h"
 #include "pml/poke_party.h"
 #include "save/box.h"
 #include "save/player_info.h"
@@ -106,7 +107,7 @@ LiveBattleMatchFlow *LiveBattleMatchFlow_Create(const LiveBattleMatchFlowParam *
     LiveBattleMatchFlow *wk =
         GFL_HeapAllocate(heapId, sizeof(LiveBattleMatchFlow), FALSE, "livebattlematch_flow.c", 270);
 
-    sys_memset(wk, 0, sizeof(LiveBattleMatchFlow));
+    MI_CpuFill8(wk, 0, sizeof(LiveBattleMatchFlow));
     wk->param = *param;
     wk->heapId = heapId;
     wk->hasVideo = func_0200bb80();
@@ -912,8 +913,8 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 14:
         if (LiveBattleMatchIrc_TakePlayerData(wk->irc, &received)) {
-            sys_memcpy(received, wk->param.partnerData,
-                       PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE);
+            MI_CpuCopy8(received, wk->param.partnerData,
+                        PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE);
             *seq = 15;
         }
         break;
@@ -1271,7 +1272,7 @@ static void LiveBattleMatchFlow_MenuStart(LiveBattleMatchFlow *wk, u32 kind) {
     u8 y;
     u8 width;
 
-    sys_memset(&param, 0, sizeof(WifiBattleMatchMenuParam));
+    MI_CpuFill8(&param, 0, sizeof(WifiBattleMatchMenuParam));
     param.msgData = wk->msgMain;
     param.font = wk->param.font;
     param.printQueue = wk->param.printQueue;
@@ -1374,13 +1375,13 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
         WifiBattleMatchLiveCardInfo card;
 
-        sys_memset(&card, 0, sizeof(WifiBattleMatchLiveCardInfo));
+        MI_CpuFill8(&card, 0, sizeof(WifiBattleMatchLiveCardInfo));
         card.unkA0 = func_0200f1d8(wk->record, 1);
         card.unkA2 = func_0200f1d8(wk->record, 2);
         card.unkA4 = func_0200f1d8(wk->record, 0);
         card.unkA6 = Regulation_GetParam(regulation, 0x16);
         card.look = func_02008bf4(info);
-        sys_memcpy(func_0200b794(wk->entry), card.data, sizeof(card.data));
+        MI_CpuCopy8(func_0200b794(wk->entry), card.data, sizeof(card.data));
         card.startDate =
             LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, 4), TournamentEntry_GetField(wk->entry, 5),
                                          TournamentEntry_GetField(wk->entry, 6));
@@ -1471,7 +1472,7 @@ static void LiveBattleMatchFlow_LoadTeam(LiveBattleMatchFlow *wk, PokeParty *des
     PokeParty *party =
         convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(wk->param.gameData)), wk->heapId);
 
-    sys_memcpy(party, dest, PokeParty_GetSaveDataSize());
+    MI_CpuCopy8(party, dest, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);
 }
 
@@ -1481,11 +1482,11 @@ static void LiveBattleMatchFlow_FillPlayerData(LiveBattleMatchPlayerData *data, 
     PokeParty *party;
 
     data->unk44 = 100;
-    sys_memcpy(GetGameDataPlayerInfo(gameData), data, PlayerInfo_GetSize());
-    func_0207c33c(data->mac);
+    MI_CpuCopy8(GetGameDataPlayerInfo(gameData), data, PlayerInfo_GetSize());
+    OS_GetMacAddress(data->mac);
     CGearPhrases_Get(CGearPhrases_GetBlock(GameData_GetSaveControl(gameData)), 0, &data->sentence);
     party = convertBoxedPokeSetToParty(getBattleBox(GameData_GetSaveControl(gameData)), HEAPID_LIVEBATTLEMATCH_TEAM);
-    sys_memcpy(party, (u8 *)data + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, PokeParty_GetSaveDataSize());
+    MI_CpuCopy8(party, (u8 *)data + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, PokeParty_GetSaveDataSize());
     GFL_HeapFree(party);
     data->record1 = func_0200f1d8(wk->record, 1);
     data->record2 = func_0200f1d8(wk->record, 2);

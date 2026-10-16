@@ -78,7 +78,7 @@ void PlayerActionPerms_Create(PlayerActionPerms *perms, GameSystem *gsys, Field 
     PlayerState *state = GameData_GetPlayerState(gameData);
     int i;
 
-    sys_memset(perms, 0, sizeof(PlayerActionPerms));
+    MI_CpuFill8(perms, 0, sizeof(PlayerActionPerms));
     for (i = 0; i < 12; i++) {
         PlayerActionPerms_SetActionBlocked(perms, i, CheckFieldActionBlocked(i, gsys, field));
     }

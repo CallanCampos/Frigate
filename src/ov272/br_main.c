@@ -87,7 +87,7 @@ static BOOL BrMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BATTLE_RECORDER_SYS, 0x12000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrMainWork), HEAPID_BATTLE_RECORDER_SYS);
-    sys_memset(wk, 0, sizeof(BrMainWork));
+    MI_CpuFill8(wk, 0, sizeof(BrMainWork));
     wk->param = param;
     func_0200bb24(HEAPID_BATTLE_RECORDER_SYS);
     BrMainProcSys_Init(&wk->procSys, sBrMainProcTable, wk, HEAPID_BATTLE_RECORDER_SYS);
@@ -132,7 +132,7 @@ static BOOL BrMain_ProcMain(GameProc *proc, u32 *state, void *param, void *work)
 }
 
 static void BrMainProcSys_Init(BrMainProcSys *p_wk, const BrMainProcData *tbl, void *work, HeapID heapId) {
-    sys_memset(p_wk, 0, sizeof(BrMainProcSys));
+    MI_CpuFill8(p_wk, 0, sizeof(BrMainProcSys));
     p_wk->procMgr = CreateGameProcManager(heapId);
     p_wk->work = work;
     p_wk->tbl = tbl;
@@ -181,7 +181,7 @@ static BOOL BrMainProcSys_Main(BrMainProcSys *p_wk) {
 static void BrMainProcSys_Exit(BrMainProcSys *p_wk) {
     GFL_ASSERT(p_wk->p_proc_param == NULL);
     FreeGameProcManager(p_wk->procMgr);
-    sys_memset(p_wk, 0, sizeof(BrMainProcSys));
+    MI_CpuFill8(p_wk, 0, sizeof(BrMainProcSys));
 }
 
 static void BrMainProcSys_SetNext(BrMainProcSys *p_wk, u32 procID) {
@@ -192,7 +192,7 @@ static void *BrMain_CoreCreateParam(HeapID heapId, void *work, u32 preID) {
     BrMainWork *wk = work;
     BrCoreParam *param = GFL_HeapAllocate(heapId, sizeof(BrCoreParam), FALSE, "br_main.c", 487);
 
-    sys_memset(param, 0, sizeof(BrCoreParam));
+    MI_CpuFill8(param, 0, sizeof(BrCoreParam));
     param->mainParam = wk->param;
     param->data = &wk->data;
     if (preID == BR_MAIN_PROCID_BATTLE) {

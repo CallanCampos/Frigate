@@ -1,5 +1,5 @@
 #include "dwc/wcm.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
@@ -15,7 +15,7 @@ static BOOL SOCL_LinkIsOn(void);
 SOCLConfig *SOCLiConfigPtr = NULL;
 u32 SOCLiDefaultLanBufferSize = 0x4000;
 
-static u32 SOCLiYieldWait;
+u32 SOCLiYieldWait;
 CPSInAddr SOCLiRequestedIP;
 u32 SOCLiDhcpState;
 SOCLSocket *SOCLiUDPSendSocket;
@@ -54,7 +54,7 @@ static void SOCLi_StartupCPS(void) {
     s32 mtu;
     s32 rwin;
 
-    sys_memset(cps, 0, sizeof(CPSConfig));
+    MI_CpuFill8(cps, 0, sizeof(CPSConfig));
     cps->alloc = config->alloc;
     cps->free = config->free;
     cps->link_is_on = SOCL_LinkIsOn;

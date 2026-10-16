@@ -314,7 +314,7 @@ WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void
     WifiBattleMatchNet *p_wk;
 
     p_wk = GFL_HeapAllocate(heapId, sizeof(WifiBattleMatchNet), FALSE, "wifibattlematch_net.c", 700);
-    sys_memset(p_wk, 0, sizeof(WifiBattleMatchNet));
+    MI_CpuFill8(p_wk, 0, sizeof(WifiBattleMatchNet));
     p_wk->wifiList = GameData_GetWifiList(gameData);
     p_wk->unk0 = func_02009f7c(p_wk->wifiList);
     p_wk->profileId = func_02008bdc(GetGameDataPlayerInfo(gameData));
@@ -324,7 +324,7 @@ WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void
     p_wk->unk1a0 = 0x573;
     p_wk->record =
         GFL_HeapAllocate(heapId, sizeof(GdbField) * WBM_GDB_FIELD_TABLE_MAX, FALSE, "wifibattlematch_net.c", 716);
-    sys_memset(p_wk->record, 0, sizeof(GdbField) * WBM_GDB_FIELD_TABLE_MAX);
+    MI_CpuFill8(p_wk->record, 0, sizeof(GdbField) * WBM_GDB_FIELD_TABLE_MAX);
     if (!func_02042788()) {
         GFL_ASSERT(0);
     }
@@ -508,11 +508,11 @@ void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u
     WifiBattleMatchNet_SetMatchKey(p_wk, 4, keys->cup);
     WifiBattleMatchNet_SetMatchKey(p_wk, 6, keys->matches);
     WifiBattleMatchNet_SetMatchKey(p_wk, 7, WBM_MATCH_VERSION);
-    func_020800e8(p_wk->matchQuery, "mod=%d And rul=%d And deb=%d", modValue, a3, 1);
+    STD_TSPrintf(p_wk->matchQuery, "mod=%d And rul=%d And deb=%d", modValue, a3, 1);
     p_wk->matchState = 0;
     p_wk->timer = 0;
     p_wk->matchTimer = 0;
-    sys_memset(&p_wk->flagInfoReceived, 0, 7 * sizeof(u32));
+    MI_CpuFill8(&p_wk->flagInfoReceived, 0, 7 * sizeof(u32));
     switch (mode) {
     case 0:
         p_wk->evalFunc = WifiBattleMatchNet_Eval;
@@ -718,7 +718,7 @@ static void WifiBattleMatchNet_GetLoginDate(u8 *dest) {
     if (!func_ov011_0215dda8(&date, &time)) {
         GFL_NetErrAbort();
     }
-    sys_memset(dest, 0, 6);
+    MI_CpuFill8(dest, 0, 6);
     dest[0] = date.year;
     dest[1] = date.month;
     dest[2] = date.day;
@@ -732,7 +732,7 @@ static void WifiBattleMatchNet_SetMatchKey(WifiBattleMatchNet *p_wk, u32 index, 
 
     p_wk->matchKeys[index].value = value;
     key = &p_wk->matchKeys[index];
-    sys_memcpy(sMatchKeyNames[index], key->name, 3);
+    MI_CpuCopy8(sMatchKeyNames[index], key->name, 3);
     key->name[3] = '\0';
     key->keyId = func_ov011_02160e10(key->keyId, key->name, &key->value);
 }
@@ -838,13 +838,13 @@ void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind
 static inline void WifiBattleMatchNet_CopySessionId(u8 *dest) {
     const char *src = Sc_GetSessionId();
 
-    sys_memcpy(src, dest, 0x28);
+    MI_CpuCopy8(src, dest, 0x28);
 }
 
 static inline void WifiBattleMatchNet_CopyConnectionId(u8 *dest) {
     const char *src = Sc_GetConnectionId();
 
-    sys_memcpy(src, dest, 0x28);
+    MI_CpuCopy8(src, dest, 0x28);
 }
 
 u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out) {
@@ -1140,7 +1140,7 @@ static void WifiBattleMatchNet_OnRequestDoneWithData(int error, void *work) {
     WifiBattleMatchNetInfo *mine = &p_wk->p_data->mine;
 
     if (error == 0) {
-        sys_memcpy(Sc_GetConnectionId(), mine->unk30, 0x28);
+        MI_CpuCopy8(Sc_GetConnectionId(), mine->unk30, 0x28);
     } else {
         p_wk->errorCode = error;
     }
@@ -1493,7 +1493,7 @@ static void WifiBattleMatchNet_OnInfoReceived(int netId, int size, const void *d
     WifiBattleMatchNet *p_wk = work;
 
     if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
-        sys_memcpy(data, &p_wk->p_data->theirs, 0x68);
+        MI_CpuCopy8(data, &p_wk->p_data->theirs, 0x68);
         p_wk->flagInfoReceived = 1;
     }
 }
@@ -1503,7 +1503,7 @@ static void WifiBattleMatchNet_OnPlayerInfoReceived(int netId, int size, const v
     WifiBattleMatchNet *p_wk = work;
     PlayerInfo *info = func_02017378(p_wk->gameData, netId);
 
-    sys_memcpy(data, info, PlayerInfo_GetSize());
+    MI_CpuCopy8(data, info, PlayerInfo_GetSize());
     if (handle == func_02040440() && netId != func_02042a6c(func_02040440())) {
         p_wk->flagPlayerInfoReceived = 1;
     }
@@ -1840,7 +1840,7 @@ static void WifiBattleMatchNet_ReadWifiCup(int recordNum, GdbField **records, vo
             } else if (!_STD_CompareNString(field->name, "WIFICUP_POKEMON_PARTY")) {
                 GdbBinaryData *bin = &field->value.binaryData;
 
-                sys_memcpy(bin->data, stats->party, bin->size);
+                MI_CpuCopy8(bin->data, stats->party, bin->size);
             }
         }
     }
@@ -1870,7 +1870,7 @@ static void WifiBattleMatchNet_ReadWifiCupParty(int recordNum, GdbField **record
             GdbField *field = &records[i][j];
 
             if (_STD_CompareNString(field->name, "WIFICUP_POKEMON_PARTY") == 0) {
-                sys_memcpy(field->value.binaryData.data, work, field->value.binaryData.size);
+                MI_CpuCopy8(field->value.binaryData.data, work, field->value.binaryData.size);
             }
         }
     }
@@ -1885,7 +1885,7 @@ static void WifiBattleMatchNet_ReadLastLogin(int recordNum, GdbField **records, 
             GdbField *field = &records[i][j];
 
             if (_STD_CompareNString(field->name, "LAST_LOGIN_DATETIME") == 0) {
-                sys_memcpy(field->value.binaryData.data, work, field->value.binaryData.size);
+                MI_CpuCopy8(field->value.binaryData.data, work, field->value.binaryData.size);
             }
         }
     }
@@ -2157,7 +2157,7 @@ BOOL WifiBattleMatchNet_TakeParty(WifiBattleMatchNet *p_wk, PokeParty *party) {
 
     if (flag != 0) {
         p_wk->flagPartyReceived = 0;
-        sys_memcpy(p_wk->recvBuffer, party, PokeParty_GetSaveDataSize());
+        MI_CpuCopy8(p_wk->recvBuffer, party, PokeParty_GetSaveDataSize());
     }
     return flag;
 }
@@ -2173,7 +2173,7 @@ BOOL WifiBattleMatchNet_TakeValue4(WifiBattleMatchNet *p_wk, void *out) {
 
     if (flag != 0) {
         p_wk->flag148 = 0;
-        sys_memcpy(p_wk->recvBuffer, out, 4);
+        MI_CpuCopy8(p_wk->recvBuffer, out, 4);
     }
     return flag;
 }
@@ -2195,9 +2195,9 @@ BOOL WifiBattleMatchNet_TakeReportValue(WifiBattleMatchNet *p_wk, u32 *out) {
 void WifiBattleMatchNet_InitDownload(WifiBattleMatchNet *p_wk, s32 profileId) {
     p_wk->state = 0;
     p_wk->downloading = 0;
-    sys_memset(p_wk->downloadAttr, 0, 10);
-    sys_memset(&p_wk->downloadFile, 0, sizeof(DWCNdFileInfo));
-    func_020800e8(p_wk->downloadAttr, "%d", profileId);
+    MI_CpuFill8(p_wk->downloadAttr, 0, 10);
+    MI_CpuFill8(&p_wk->downloadFile, 0, sizeof(DWCNdFileInfo));
+    STD_TSPrintf(p_wk->downloadAttr, "%d", profileId);
 }
 
 u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
@@ -2382,7 +2382,7 @@ static u32 WifiBattleMatchNet_GetHttpResultMessage(u32 result) {
 }
 
 void WifiBattleMatchNet_GetDownload(WifiBattleMatchNet *p_wk, void *dest) {
-    sys_memcpy(p_wk->downloadBuffer, dest, sizeof(p_wk->downloadBuffer));
+    MI_CpuCopy8(p_wk->downloadBuffer, dest, sizeof(p_wk->downloadBuffer));
 }
 
 static void WifiBattleMatchNet_StartDownloadWait(WifiBattleMatchNet *p_wk, u32 nextState) {
@@ -2496,7 +2496,7 @@ u32 WifiBattleMatchNet_AccountRequestMain(WifiBattleMatchNet *p_wk) {
         break;
     }
     case 4:
-        sys_memset(&p_wk->httpValues, 0, sizeof(p_wk->httpValues));
+        MI_CpuFill8(&p_wk->httpValues, 0, sizeof(p_wk->httpValues));
         if (p_wk->p_nhttp != NULL) {
             NHttpRap_EndRequest(p_wk->p_nhttp);
             NHttpRap_Destroy(p_wk->p_nhttp);
@@ -2609,7 +2609,7 @@ void WifiBattleMatchNet_StartNameCheck(WifiBattleMatchNet *p_wk, PlayerInfo *inf
 
     p_wk->namePlayerInfo = info;
     name = copyTrainerNameToNewStrbuf(info->name, p_wk->msgHeapId);
-    sys_memset(&p_wk->nameCheck, 0, sizeof(p_wk->nameCheck));
+    MI_CpuFill8(&p_wk->nameCheck, 0, sizeof(p_wk->nameCheck));
     p_wk->nameCheck.unk24 = unk24;
     chars = GFL_StrBufGetStringPtr(name);
     for (i = 0; i < GFL_StrBufGetCharCount(name) + 1; i++) {
@@ -2765,7 +2765,7 @@ u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatc
             out->result[i] = NHttpRap_GetCheckResult(answer, i);
         }
         if (out->status == 0) {
-            sys_memcpy(NHttpRap_GetCheckSignature(answer, p_wk->unk178), out->signature, 0x80);
+            MI_CpuCopy8(NHttpRap_GetCheckSignature(answer, p_wk->unk178), out->signature, 0x80);
         }
         NHttpRap_FreePostData(p_wk->p_nhttp);
         if (p_wk->p_nhttp != NULL) {
@@ -2948,7 +2948,7 @@ static u32 WifiBattleMatchNet_GetTimeoutResult(u32 code) {
 }
 
 static void WifiBattleMatchNet_ClearError(WifiBattleMatchNetError *error) {
-    sys_memset(error, 0, sizeof(WifiBattleMatchNetError));
+    MI_CpuFill8(error, 0, sizeof(WifiBattleMatchNetError));
 }
 
 void WifiBattleMatchNet_ShowIcon(WifiBattleMatchNet *p_wk, int a1) {

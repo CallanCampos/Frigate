@@ -18,7 +18,6 @@ static const u8 SHA1_PADDING[12] = { 0x80 };
 
 static void sha1_block_masked(MATHSHA1Context *context);
 static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size);
-static u32 sha1_set_masked(u32 masked);
 static void hmac_generic(void *out, const void *data, u32 dataSize, const void *key, u32 keySize,
                          const MATHHashInfo *info);
 
@@ -46,7 +45,7 @@ static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size) {
         if (chunk > size) {
             chunk = size;
         }
-        sys_memset(&context->block.bytes[context->blockPos], value, chunk);
+        MI_CpuFill8(&context->block.bytes[context->blockPos], value, chunk);
         size -= chunk;
         context->blockPos += chunk;
         if (context->blockPos >= SHA1_BLOCK_SIZE) {
@@ -61,7 +60,7 @@ static void sha1_zero_fill(MATHSHA1Context *context, u32 value, u32 size) {
 }
 
 // Chooses whether the block function clears words 6 and 14, returning the choice before
-static u32 sha1_set_masked(u32 masked) {
+u32 sha1_set_masked(u32 masked) {
     u32 old = sSHA1Masked;
 
     sSHA1Masked = masked;
@@ -96,7 +95,7 @@ void MATH_SHA1Update(MATHSHA1Context *context, const void *data, u32 size) {
         if (chunk > size) {
             chunk = size;
         }
-        sys_memcpy(src, &context->block.bytes[context->blockPos], chunk);
+        MI_CpuCopy8(src, &context->block.bytes[context->blockPos], chunk);
         src += chunk;
         size -= chunk;
         context->blockPos += chunk;
@@ -132,7 +131,7 @@ void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest) {
     context->state[2] = BSWAP32(context->state[2]);
     context->state[3] = BSWAP32(context->state[3]);
     context->state[4] = BSWAP32(context->state[4]);
-    sys_memcpy(context, digest, 20);
+    MI_CpuCopy8(context, digest, 20);
 }
 
 void MATH_CalcSHA1(u8 *digest, const void *data, u32 size) {

@@ -102,7 +102,7 @@ static const WbtListBGSetup sWbtListBGSetups[BG_COUNT] = {
 WbtListGraphic *WbtListGraphic_Create(u32 layout, HeapID heapId) {
     WbtListGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(WbtListGraphic), FALSE, "wbt_list_graphic.c", 455);
 
-    sys_memset(graphic, 0, sizeof(WbtListGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WbtListGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -129,7 +129,7 @@ void WbtListGraphic_Free(WbtListGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(WbtListGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WbtListGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -158,7 +158,7 @@ static void WbtListGraphic_VBlank(TCB *tcb, void *data) {
 static void WbtListBG_Init(WbtListBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(WbtListBG));
+    MI_CpuFill8(bg, 0, sizeof(WbtListBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sWbtListLCDConfig);
@@ -177,7 +177,7 @@ static void WbtListBG_Free(WbtListBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(WbtListBG));
+    MI_CpuFill8(bg, 0, sizeof(WbtListBG));
 }
 
 static void WbtListBG_Update(WbtListBG *bg) {
@@ -188,7 +188,7 @@ static void WbtListBG_VBlank(WbtListBG *bg) {
 }
 
 static void WbtListClAct_Init(WbtListClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(WbtListClAct));
+    MI_CpuFill8(clact, 0, sizeof(WbtListClAct));
     ClActSys_Create(&sWbtListClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -199,7 +199,7 @@ static void WbtListClAct_Init(WbtListClAct *clact, const BGSysVRAMConfig *vramCo
 static void WbtListClAct_Free(WbtListClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(WbtListClAct));
+    MI_CpuFill8(clact, 0, sizeof(WbtListClAct));
 }
 
 static void WbtListClAct_Update(WbtListClAct *clact) {

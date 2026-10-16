@@ -33,11 +33,11 @@ WifiList *populateWifiList(u32 heapId) {
 }
 
 void copyWifilist(const WifiList *src, WifiList *dest) {
-    sys_memcpy(src, dest, sizeof(WifiList));
+    MI_CpuCopy8(src, dest, sizeof(WifiList));
 }
 
 void initWifi(WifiList *wifiList) {
-    sys_memset(wifiList, 0, sizeof(WifiList));
+    MI_CpuFill8(wifiList, 0, sizeof(WifiList));
     GFL_OvlUnload(OVERLAY_ID(12));
     GFL_OvlUnload(OVERLAY_ID(27));
     GFL_OvlLoad(OVERLAY_ID(29));
@@ -172,18 +172,18 @@ void func_0200a190(WifiList *wifiList, u32 index) {
         return;
     }
     for (i = index; i < last; i++) {
-        sys_memcpy(&wifiList->friends[i + 1], &wifiList->friends[i], sizeof(WifiListFriend));
-        sys_memcpy(&wifiList->friendData[i + 1], &wifiList->friendData[i], sizeof(DWCFriendData));
+        MI_CpuCopy8(&wifiList->friends[i + 1], &wifiList->friends[i], sizeof(WifiListFriend));
+        MI_CpuCopy8(&wifiList->friendData[i + 1], &wifiList->friendData[i], sizeof(DWCFriendData));
     }
-    sys_memset(&wifiList->friends[last], 0, sizeof(WifiListFriend));
-    sys_memset(&wifiList->friendData[last], 0, sizeof(DWCFriendData));
+    MI_CpuFill8(&wifiList->friends[last], 0, sizeof(WifiListFriend));
+    MI_CpuFill8(&wifiList->friendData[last], 0, sizeof(DWCFriendData));
 }
 
 static void moveFriend(WifiList *wifiList, u32 dest, u32 src) {
-    sys_memcpy(&wifiList->friends[src], &wifiList->friends[dest], sizeof(WifiListFriend));
-    sys_memcpy(&wifiList->friendData[src], &wifiList->friendData[dest], sizeof(DWCFriendData));
-    sys_memset(&wifiList->friends[src], 0, sizeof(WifiListFriend));
-    sys_memset(&wifiList->friendData[src], 0, sizeof(DWCFriendData));
+    MI_CpuCopy8(&wifiList->friends[src], &wifiList->friends[dest], sizeof(WifiListFriend));
+    MI_CpuCopy8(&wifiList->friendData[src], &wifiList->friendData[dest], sizeof(DWCFriendData));
+    MI_CpuFill8(&wifiList->friends[src], 0, sizeof(WifiListFriend));
+    MI_CpuFill8(&wifiList->friendData[src], 0, sizeof(DWCFriendData));
 }
 
 void func_0200a258(WifiList *wifiList) {
@@ -248,7 +248,7 @@ void func_0200a340(WifiList *wifiList, s32 srcIndex, s32 destIndex) {
     if (wifiList->friends[destIndex].draws > WIFI_LIST_RECORD_MAX) {
         wifiList->friends[destIndex].draws = WIFI_LIST_RECORD_MAX;
     }
-    sys_memset(&wifiList->friends[srcIndex], 0, sizeof(WifiListFriend));
+    MI_CpuFill8(&wifiList->friends[srcIndex], 0, sizeof(WifiListFriend));
 }
 
 void func_0200a3c4(const DWCUserData *userData, DWCFriendData *token) {
@@ -314,7 +314,7 @@ u32 func_0200a4b8(void) {
 }
 
 void func_0200a4c0(PalPadFriendList *list) {
-    sys_memset(list, 0, func_0200a4b8());
+    MI_CpuFill8(list, 0, func_0200a4b8());
 }
 
 s32 func_0200a4d4(PalPadFriendList *list, u32 id) {
@@ -341,8 +341,8 @@ void func_0200a504(PalPadFriendList *list, PlayerInfo *info) {
         func_02008bf8(&list->players[index], func_02008bf4(info));
         return;
     }
-    sys_memcpy_ex(list, &list->players[1], (PAL_PAD_PLAYER_MAX - 1) * size);
-    sys_memcpy(info, list, size);
+    MI_CpuMove(list, &list->players[1], (PAL_PAD_PLAYER_MAX - 1) * size);
+    MI_CpuCopy8(info, list, size);
 }
 
 u32 func_0200a55c(PalPadFriendList *list, u32 index) {

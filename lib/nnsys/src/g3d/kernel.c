@@ -213,12 +213,12 @@ void NNS_G3DResTexUploadTex(NNSG3dResTex *tex, BOOL exec_begin_end) {
     u32 size4x4;
 
     if (exec_begin_end) {
-        gfxBeginTextureUpload();
+        GX_BeginLoadTex();
     }
 
     size = tex->texInfo.sizeTex << 3;
     if (size != 0) {
-        gfxUploadTexture((u8 *)tex + tex->texInfo.ofsTex, NNS_GfdGetTexKeyAddr(tex->texInfo.vramKey), size);
+        GX_LoadTex((u8 *)tex + tex->texInfo.ofsTex, NNS_GfdGetTexKeyAddr(tex->texInfo.vramKey), size);
         tex->texInfo.flag |= NNS_G3D_RESTEX_LOADED;
     }
 
@@ -227,14 +227,14 @@ void NNS_G3DResTexUploadTex(NNSG3dResTex *tex, BOOL exec_begin_end) {
         u32 addr = NNS_GfdGetTexKeyAddr(tex->tex4x4Info.vramKey);
         u32 ofsTexPlttIdx = tex->tex4x4Info.ofsTexPlttIdx;
 
-        gfxUploadTexture((u8 *)tex + tex->tex4x4Info.ofsTex, addr, size4x4);
-        gfxUploadTexture((u8 *)tex + ofsTexPlttIdx, 0x20000 + ((addr & 0x1ffff) >> 1) + ((addr & 0x40000) >> 2),
-                         size4x4 >> 1);
+        GX_LoadTex((u8 *)tex + tex->tex4x4Info.ofsTex, addr, size4x4);
+        GX_LoadTex((u8 *)tex + ofsTexPlttIdx, 0x20000 + ((addr & 0x1ffff) >> 1) + ((addr & 0x40000) >> 2),
+                   size4x4 >> 1);
         tex->tex4x4Info.flag |= NNS_G3D_RESTEX_LOADED;
     }
 
     if (exec_begin_end) {
-        gfxEndTextureUpload();
+        GX_EndLoadTex();
     }
 }
 
@@ -264,15 +264,15 @@ void NNS_G3DResTexSetPltGfdKey(NNSG3dResTex *tex, NNSGfdPlttKey plttKey) {
 
 void NNS_G3DResTexUploadPlt(NNSG3dResTex *tex, BOOL exec_begin_end) {
     if (exec_begin_end) {
-        gfxBeginPaletteUpload();
+        GX_BeginLoadTexPltt();
     }
 
-    gfxUploadPalette((u8 *)tex + tex->plttInfo.ofsPlttData, NNS_GfdGetPlttKeyAddr(tex->plttInfo.vramKey),
-                     tex->plttInfo.sizePltt << 3);
+    GX_LoadTexPltt((u8 *)tex + tex->plttInfo.ofsPlttData, NNS_GfdGetPlttKeyAddr(tex->plttInfo.vramKey),
+                   tex->plttInfo.sizePltt << 3);
     tex->plttInfo.flag |= NNS_G3D_RESPLTT_LOADED;
 
     if (exec_begin_end) {
-        gfxEndPaletteUpload();
+        GX_EndLoadTexPltt();
     }
 }
 

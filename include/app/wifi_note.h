@@ -30,7 +30,4 @@ typedef struct {
 
 extern const GameProcFunctions WIFI_NOTE_PROC_FUNCTIONS;
 
-// The friend key of a friend's data, 0 if it holds none (DWC, not declared in dwc/dwc.h)
-u64 func_02057e3c(const DWCFriendData *friendData);
-
 #endif // POKEBW2_APP_WIFI_NOTE_H

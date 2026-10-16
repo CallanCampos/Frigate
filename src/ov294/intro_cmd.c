@@ -306,7 +306,7 @@ static BOOL IntroCmd_LoadGraphics(IntroCmd *cmd, IntroCmdWork *work, s32 *args) 
     if (args[0] == TRUE) {
         GFL_BGSysLoadArcNCGRStatic(arc, 5, 2, 0, 0, FALSE, heapId);
         file = GFL_G2DIOReadNSCRArc(arc, 7, FALSE, &screen, heapId);
-        sys_memcpy16(screen->rawData, cmd->bandScreen, sizeof(cmd->bandScreen));
+        MIi_CpuCopy16(screen->rawData, cmd->bandScreen, sizeof(cmd->bandScreen));
         GFL_HeapFree(file);
     }
     GFL_ArcToolFree(arc);
@@ -639,7 +639,7 @@ static BOOL IntroCmd_PokemonAppear(IntroCmd *cmd, IntroCmdWork *work, s32 *args)
 }
 
 static BOOL IntroCmd_Particles(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 1, 9, 0, 0);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 1, 9, 0, 0);
     IntroParticle_SetPos(cmd->particle, args[0], args[1], 0);
     return TRUE;
 }
@@ -825,7 +825,7 @@ static BOOL IntroCmd_ObjFadeIn(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
 
     switch (work->state) {
     case 0:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, 12, 0, 16);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 12, 0, 16);
         func_0204c318(cmd->obj, GX_OAM_MODE_XLU);
         func_0204c124(cmd->obj, TRUE);
         work->state++;
@@ -851,7 +851,7 @@ static BOOL IntroCmd_ObjFadeOut(IntroCmd *cmd, IntroCmdWork *work, s32 *args) {
 
     switch (work->state) {
     case 0:
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 0, 12, 16, 0);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 12, 16, 0);
         for (i = 0; i < 3; i++) {
             func_0204c318(cmd->obj, GX_OAM_MODE_XLU);
         }

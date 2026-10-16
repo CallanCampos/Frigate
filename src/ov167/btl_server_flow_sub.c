@@ -501,7 +501,7 @@ void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, 
         baseExp = baseExp * 15 / 10;
     }
     for (i = 0; i < 6; i++) {
-        sys_memset(&entries[i], 0, sizeof(BtlFlowExpEntry));
+        MI_CpuFill8(&entries[i], 0, sizeof(BtlFlowExpEntry));
     }
     // An Exp. Share takes half the experience, split among the mons that hold one
     for (i = 0; i < numMons; i++) {

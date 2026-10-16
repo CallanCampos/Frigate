@@ -6,7 +6,7 @@
 // The DSi's settings, with what a DS answers in their place. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except isRunningOnDSi and isWirelessEnabled
 
-// Whether the game runs on a DSi, through hw_isDSi
+// Whether the game runs on a DSi, through OS_IsRunOnTwl
 BOOL isRunningOnDSi(void);
 // TRUE when the DSi's parental controls restrict exchanging photos, despite swan's name
 BOOL canPlayerExchangePhotos(void);
@@ -16,7 +16,5 @@ BOOL isWirelessEnabled(void);
 BOOL hasLicenseBeenAccepted(void);
 // The birthday in the DS's owner settings
 void getBirthdayMonthDay(u8 *month, u8 *day);
-// Flags next to the DSi checks; bit 25 has the battle load overlay 219
-u32 func_0207ac24(void);
 
 #endif // POKEBW2_SYSTEM_DSI_H

@@ -220,7 +220,7 @@ static void ZukanAreaList_HBlankTask(TCB *tcb, void *data) {
 static ZukanAreaListWork *ZukanAreaList_CreateWork(GameProc *proc, ZukanHabitatSummaryParam *param) {
     ZukanAreaListWork *wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanAreaListWork), HEAPID_ZUKAN_AREA_LIST);
 
-    sys_memset(wk, 0, sizeof(ZukanAreaListWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanAreaListWork));
     wk->param = param;
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0362, HEAPID_ZUKAN_AREA_LIST);
     wk->habitatSave = func_02010cb8(GameData_GetSaveControl(param->gameData));
@@ -282,8 +282,8 @@ static void ZukanAreaList_StateFadeIn(ZukanAreaListWork *wk) {
         break;
     case 1:
         if (!ZukanAreaListView_IsFading(&wk->view)) {
-            GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
             ZukanAreaListView_StartFade(&wk->view, 16, 0);
             wk->step++;
         }
@@ -318,8 +318,8 @@ static void ZukanAreaList_StateFadeOut(ZukanAreaListWork *wk) {
     case 1:
         if (!ZukanAreaListView_IsFading(&wk->view)) {
             if (wk->touchbarOffset >= SLIDE_DISTANCE) {
-                GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-                GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
                 ZukanAreaList_SetState(wk, STATE_END, STATE_PARAM_NORMAL);
             } else {
                 ZukanAreaListView_Slide(&wk->view, SLIDE_SPEED, TRUE);

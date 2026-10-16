@@ -35,7 +35,7 @@ static BOOL PStatus_ProcInit(GameProc *proc, u32 *state, void *data, void *work)
     case 0:
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_P_STATUS, 0x50000);
         wk = GFL_ProcInitSubsystem(proc, sizeof(PStatusWork), HEAPID_P_STATUS);
-        sys_memset(wk, 0, sizeof(PStatusWork));
+        MI_CpuFill8(wk, 0, sizeof(PStatusWork));
         wk->heapId = HEAPID_P_STATUS;
         if (param == NULL) {
             param = GFL_HeapAllocate(HEAPID_USER, sizeof(PStatusParam), FALSE, "p_status.c", 77);

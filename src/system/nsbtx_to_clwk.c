@@ -45,7 +45,7 @@ static void NsbtxToClwk_CopyTile(const u8 *src, u8 *dest, int *srcOffset, int *d
     int i;
 
     for (i = 0; i < 8; i++) {
-        sys_memcpy(src + *srcOffset, dest + *destOffset, size);
+        MI_CpuCopy8(src + *srcOffset, dest + *destOffset, size);
         *srcOffset += stride;
         *destOffset += size;
     }
@@ -76,19 +76,19 @@ void NsbtxToClwk_LoadTextureEx(ClActor *actor, u32 arcId, u32 fileId, u8 texture
     GFL_HeapFree(chars);
 
     colors = (u8 *)tex + tex->plttInfo.ofsPlttData;
-    cp15_flushDC(colors, 32);
+    DC_FlushRange(colors, 32);
     func_0204c3d0(actor, &proxy);
 
     if (vramType == CLACT_VRAM_MAIN || vramType == CLACT_VRAM_BOTH) {
         if (fade == NULL) {
-            gfxUploadStdPaletteObjA(colors, NNS_G2dGetImagePaletteLocation(&proxy, NNS_G2D_VRAM_TYPE_2DMAIN), 32);
+            GX_LoadOBJPltt(colors, NNS_G2dGetImagePaletteLocation(&proxy, NNS_G2D_VRAM_TYPE_2DMAIN), 32);
         } else {
             PaletteFade_LoadData(fade, colors, PALFADE_BUFFER_MAIN_OBJ, palette * 16, 32);
         }
     }
     if (vramType == CLACT_VRAM_SUB || vramType == CLACT_VRAM_BOTH) {
         if (fade == NULL) {
-            gfxUploadStdPaletteObjB(colors, NNS_G2dGetImagePaletteLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB), 32);
+            GXS_LoadOBJPltt(colors, NNS_G2dGetImagePaletteLocation(&proxy, NNS_G2D_VRAM_TYPE_2DSUB), 32);
         } else {
             PaletteFade_LoadData(fade, colors, PALFADE_BUFFER_SUB_OBJ, palette * 16, 32);
         }

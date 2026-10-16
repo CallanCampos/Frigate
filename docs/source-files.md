@@ -1,8 +1,9 @@
 # Source files
 
-Each source file is one of the game's original files, as [Code organization](code-organization.md) describes. This lists the
-files of every overlay that has some, with the evidence for their names. `tools/decomp/source_files.py --markdown`
-prints the tables below from the configs and the ROM:
+Each source file is one of the game's original files, as [Code organization](code-organization.md) describes. This lists
+the files of every overlay that has some, with the evidence for their names; ARM9 main's and the autoloads' files, the
+game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlSDK, DWC and MSL), are in their
+`delinks.txt` only. `tools/decomp/source_files.py --markdown` prints the tables below from the configs and the ROM:
 
 - **Boundaries.** The linker placed one object per original file, so a file's `.text`, `.rodata`, `.data` and `.bss`
   are each one range, in the same order in every section. `tools/decomp/source_files.py OVERLAY` lists the file names
@@ -90,7 +91,7 @@ prints the tables below from the configs and the ROM:
 
 ### Overlay 11
 
-230 of 1688 functions are in source files.
+556 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -98,6 +99,27 @@ prints the tables below from the configs and the ROM:
 | `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | partial | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
 | `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
+| `socl_startup.c` | `0x02155e34`–`0x02156000` | 6 | partial | descriptive |
+| `socl_command.c` | `0x02156000`–`0x02156200` | 13 | partial | descriptive |
+| `socl_create.c` | `0x02156200`–`0x021564cc` | 8 | complete | descriptive |
+| `socl_bind.c` | `0x021564cc`–`0x021566d8` | 4 | partial | descriptive |
+| `socl_read.c` | `0x021566d8`–`0x02156d8c` | 13 | partial | descriptive |
+| `socl_write.c` | `0x02156d8c`–`0x0215724c` | 8 | partial | descriptive |
+| `socl_shutdown.c` | `0x0215724c`–`0x021572f4` | 2 | partial | descriptive |
+| `socl_close.c` | `0x021572f4`–`0x02157620` | 7 | complete | descriptive |
+| `socl_cleanup.c` | `0x02157620`–`0x02157894` | 8 | complete | descriptive |
+| `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | partial | descriptive |
+| `socl_misc.c` | `0x02157978`–`0x02157980` | 1 | complete | descriptive |
+| `socl_list.c` | `0x02157980`–`0x02157bd0` | 13 | partial | descriptive |
+| `soc.c` | `0x02157bd0`–`0x02158174` | 23 | partial | descriptive |
+| `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
+| `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
+| `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | partial | descriptive |
+| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | partial | descriptive |
+| `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
+| `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
+| `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
 
 ### Overlay 12
 
@@ -1550,7 +1572,7 @@ prints the tables below from the configs and the ROM:
 | `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | partial | string at `0x021f41c8` |
 | `btlv_gauge.c` | `0x021ef794`–`0x021f1c84` | 58 | complete | string at `0x021f41d8` |
 | `btlv_b_gauge.c` | `0x021f1c84`–`0x021f2174` | 7 | complete | string at `0x021f41e8` |
-| `btlv_timer.c` | `0x021f2174`–`0x021f26b8` | 8 | partial | string at `0x021f41f8` |
+| `btlv_timer.c` | `0x021f2174`–`0x021f26b8` | 8 | complete | string at `0x021f41f8` |
 | `btlv_bg.c` | `0x021f26b8`–`0x021f2cdc` | 15 | complete | string at `0x021f4208` |
 | `btlv_finger_cursor.c` | `0x021f2cdc`–`0x021f2f54` | 7 | complete | string at `0x021f4214` |
 
@@ -1680,16 +1702,16 @@ prints the tables below from the configs and the ROM:
 | `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | partial | string at `0x021a46b8` |
 | `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | partial | string at `0x021a46c8` |
 | `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | partial | descriptive |
-| `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | partial | descriptive |
+| `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | complete | descriptive |
 | `mb_gameinfo.c` | `0x021a2040`–`0x021a2638` | 14 | partial | descriptive |
 | `mb_wm.c` | `0x021a2638`–`0x021a3b28` | 28 | partial | descriptive |
-| `mb_cache.c` | `0x021a3b28`–`0x021a3bd4` | 3 | partial | descriptive |
+| `mb_cache.c` | `0x021a3b28`–`0x021a3bd4` | 3 | complete | descriptive |
 | `mb_task.c` | `0x021a3bd4`–`0x021a3e44` | 7 | complete | descriptive |
 | `mb_frame.c` | `0x021a3e44`–`0x021a4040` | 7 | complete | descriptive |
 
 ### Overlay 182
 
-118 of 1113 functions are in source files.
+137 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1700,6 +1722,7 @@ prints the tables below from the configs and the ROM:
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
+| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
 
 ### Overlay 184
 
@@ -1759,31 +1782,31 @@ prints the tables below from the configs and the ROM:
 | `dpw_profile.c` | `0x0219d504`–`0x0219d550` | 1 | complete | descriptive |
 | `nhttp_os.c` | `0x0219d550`–`0x0219d60c` | 8 | partial | descriptive |
 | `nhttp_socket.c` | `0x0219d60c`–`0x0219d954` | 14 | partial | descriptive |
-| `nhttp_stdlib.c` | `0x0219d954`–`0x0219dd94` | 16 | partial | descriptive |
+| `nhttp_stdlib.c` | `0x0219d954`–`0x0219dd94` | 16 | complete | descriptive |
 | `nhttp_bgnend.c` | `0x0219dd94`–`0x0219df00` | 9 | partial | descriptive |
 | `nhttp_control.c` | `0x0219df00`–`0x0219e0d8` | 6 | partial | descriptive |
-| `nhttp_list.c` | `0x0219e0d8`–`0x0219e1f8` | 6 | partial | descriptive |
-| `nhttp_recvbuf.c` | `0x0219e1f8`–`0x0219e538` | 9 | partial | descriptive |
+| `nhttp_list.c` | `0x0219e0d8`–`0x0219e1f8` | 6 | complete | descriptive |
+| `nhttp_recvbuf.c` | `0x0219e1f8`–`0x0219e538` | 9 | complete | descriptive |
 | `nhttp_request.c` | `0x0219e538`–`0x0219ea14` | 8 | partial | descriptive |
-| `nhttp_response.c` | `0x0219ea14`–`0x0219ec24` | 4 | partial | descriptive |
-| `nhttp_thread.c` | `0x0219ec24`–`0x021a076c` | 30 | partial | descriptive |
+| `nhttp_response.c` | `0x0219ea14`–`0x0219ec24` | 4 | complete | descriptive |
+| `nhttp_thread.c` | `0x0219ec24`–`0x021a076c` | 30 | complete | descriptive |
 | `d_nhttp.c` | `0x021a076c`–`0x021a0a38` | 15 | partial | descriptive |
 | `d_nhttp_common.c` | `0x021a0a38`–`0x021a0e1c` | 35 | partial | descriptive |
 | `d_nhttp_private.c` | `0x021a0e1c`–`0x021a1160` | 11 | partial | descriptive |
-| `dwc_ghttp.c` | `0x021a1160`–`0x021a154c` | 15 | partial | descriptive |
-| `ghttpBuffer.c` | `0x021a154c`–`0x021a1980` | 11 | partial | descriptive |
+| `dwc_ghttp.c` | `0x021a1160`–`0x021a154c` | 15 | complete | descriptive |
+| `ghttpBuffer.c` | `0x021a154c`–`0x021a1980` | 11 | complete | descriptive |
 | `ghttpCallbacks.c` | `0x021a1980`–`0x021a1a44` | 3 | partial | descriptive |
 | `ghttpCommon.c` | `0x021a1a44`–`0x021a1e0c` | 8 | partial | descriptive |
 | `ghttpConnection.c` | `0x021a1e0c`–`0x021a23d8` | 10 | partial | descriptive |
 | `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | partial | descriptive |
 | `ghttpMain.c` | `0x021a2c50`–`0x021a3074` | 16 | partial | descriptive |
 | `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | partial | descriptive |
-| `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | partial | descriptive |
+| `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | complete | descriptive |
 | `nd.c` | `0x021a54b4`–`0x021a6c84` | 61 | partial | descriptive |
-| `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | partial | descriptive |
-| `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | partial | descriptive |
+| `dpw_tr.c` | `0x021a6c84`–`0x021a8010` | 19 | complete | descriptive |
+| `dpw_battle_tower.c` | `0x021a8010`–`0x021a893c` | 12 | complete | descriptive |
 | `gamestats.c` | `0x021a893c`–`0x021a90f0` | 16 | partial | descriptive |
-| `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | partial | descriptive |
+| `crypt.c` | `0x021a90f0`–`0x021ac838` | 67 | complete | descriptive |
 
 ### Overlay 190
 
@@ -2838,4 +2861,3 @@ prints the tables below from the configs and the ROM:
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | partial | descriptive |
-

@@ -12,7 +12,7 @@
 void PokeListParam_Setup(PokeListParam *param, GameData *gameData, u32 mode, PokeParty *party) {
     SaveControl *save = GameData_GetSaveControl(gameData);
 
-    sys_memset32(0, param, sizeof(PokeListParam));
+    MIi_CpuClear32(0, param, sizeof(PokeListParam));
     param->mode = mode;
     param->party = party;
     param->bag = GameData_GetBag(gameData);

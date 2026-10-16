@@ -2095,7 +2095,7 @@ void ResortSys_AddEntryOrRecord(ResortSys *sys, PlayerInfo *playerInfo, u32 mode
         }
         record = func_020384a4(HEAPID_TAIL(heapId));
         ResortRecord_Setup(sys, record, type, shopKind, func_ov137_021f184c(slots, 2), heapId);
-        sys_memcpy(record, func_020388c0(occupants), sizeof(JoinAvenueRecord));
+        MI_CpuCopy8(record, func_020388c0(occupants), sizeof(JoinAvenueRecord));
         func_ov137_021f1748(slots);
         func_020384cc(record);
         break;

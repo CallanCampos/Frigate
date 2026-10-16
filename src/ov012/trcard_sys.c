@@ -137,7 +137,7 @@ static BOOL func_ov012_021691c0(GameProc *proc, u32 *state, void *param, void *w
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TRAINER_CARD, 0x29000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TrainerCardSysWork), HEAPID_TRAINER_CARD);
-    sys_memset(wk, 0, sizeof(TrainerCardSysWork));
+    MI_CpuFill8(wk, 0, sizeof(TrainerCardSysWork));
     wk->heapId = HEAPID_TRAINER_CARD;
     wk->param = GFL_HeapAllocate(wk->heapId, sizeof(TrainerCardParam), TRUE, "trcard_sys.c", 178);
     *wk->param = *cardParam;
@@ -154,7 +154,7 @@ static BOOL func_ov012_02169274(GameProc *proc, u32 *state, void *param, void *w
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TRAINER_CARD, 0x29000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(TrainerCardSysWork), HEAPID_TRAINER_CARD);
-    sys_memset(wk, 0, sizeof(TrainerCardSysWork));
+    MI_CpuFill8(wk, 0, sizeof(TrainerCardSysWork));
     wk->heapId = HEAPID_TRAINER_CARD;
     wk->param = param;
     return TRUE;
@@ -429,7 +429,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     u8 bit;
 
     if (!func_02008b5c(playerInfo)) {
-        sys_memcpy16(GetPlayerName(playerInfo), data->name, sizeof(data->name));
+        MIi_CpuCopy16(GetPlayerName(playerInfo), data->name, sizeof(data->name));
     } else {
         data->name[0] = 'N';
         data->name[1] = 'o';
@@ -470,7 +470,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     data->unk48 = func_020091e8(timeSig);
     data->unk04_4 = func_02009204(timeSig);
     CGearPhrases_Get(cgear, 0, &data->greeting);
-    func_0207d244(&date, &time, adventureTime->startSeconds);
+    RTC_ConvertSecondToDateTime(&date, &time, adventureTime->startSeconds);
     data->startYear = date.year;
     data->startMonth = date.month;
     data->startDay = date.day;
@@ -481,7 +481,7 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
         data->clearHour = 0;
         data->clearMinute = 0;
     } else {
-        func_0207d244(&date, &time, adventureTime->seconds);
+        RTC_ConvertSecondToDateTime(&date, &time, adventureTime->seconds);
         data->clearYear = date.year;
         data->clearMonth = date.month;
         data->clearDay = date.day;
@@ -523,14 +523,14 @@ void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnaps
     }
     data->seenCount = countSeenDexPokes(pokedex, heapId);
     data->unk04_3 = func_020091ac(timeSig);
-    sys_memcpy(func_020091a8(timeSig), data->unk74, sizeof(data->unk74));
+    MI_CpuCopy8(func_020091a8(timeSig), data->unk74, sizeof(data->unk74));
     data->canEdit = canEdit;
 }
 
 void *func_ov012_02169b04(GameData *gameData, HeapID heapId, BOOL canEdit) {
     TrainerCardParam *param = GFL_HeapAllocate(heapId, sizeof(TrainerCardParam), TRUE, "trcard_sys.c", 975);
 
-    sys_memset(param, 0, sizeof(TrainerCardParam));
+    MI_CpuFill8(param, 0, sizeof(TrainerCardParam));
     param->shownData = NULL;
     param->gameData = gameData;
     param->next = 0;

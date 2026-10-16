@@ -87,8 +87,8 @@ void TradeMcssMove_Start(TradeMcssMove *move, int duration, const VecFx32 *end) 
     MCSS_GetPosition(move->mcss, &start);
     move->frame = 0;
     move->duration = duration;
-    sys_memcpy(end, &move->end, sizeof(VecFx32));
-    sys_memcpy(&start, &move->start, sizeof(VecFx32));
+    MI_CpuCopy8(end, &move->end, sizeof(VecFx32));
+    MI_CpuCopy8(&start, &move->start, sizeof(VecFx32));
 }
 
 TradeMcssMove *TradeMcssMove_Create(MCSS *mcss, int duration, const VecFx32 *end, HeapID heapId) {

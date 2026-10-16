@@ -168,8 +168,8 @@ static BOOL NewSection(NNSSndHeap *heap) {
 
 // Waits for the sound driver to have run every command sent, so that nothing plays from the memory freed
 static void WaitSoundDriver(void) {
-    u32 tag = sndGetSentPacketCount();
+    u32 tag = SND_GetCurrentCommandTag();
 
-    func_0207d864(SND_COMMAND_BLOCK);
-    func_0207d96c(tag);
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
 }

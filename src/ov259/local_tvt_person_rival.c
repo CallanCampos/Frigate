@@ -25,7 +25,7 @@ static BOOL LocalTvtRival_Extra(LocalTvtPerson *person, const LocalTvtPersonSetu
 static BOOL LocalTvtRival_Bye(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
 
 void LocalTvtRival_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId) {
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     funcs->work = LocalTvtRival_Create(gameData, heapId);
     funcs->msgData = msgData;
     funcs->free = LocalTvtRival_Free;

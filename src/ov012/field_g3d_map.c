@@ -469,7 +469,7 @@ s32 FieldChunk_CheckBBox(const GXBoxTestParam *box) {
     NNS_G3dGeEnd();
     NNS_G3dGeBoxTest(box);
     NNS_G3DWaitFIFO();
-    while (gfxGetBoxTestResult(&in) != 0) {
+    while (G3X_GetBoxTestResult(&in) != 0) {
     }
     return in;
 }

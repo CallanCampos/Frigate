@@ -101,7 +101,7 @@ static int sLiveBattleMatchIrcIsLinked = TRUE;
 LiveBattleMatchIrc *LiveBattleMatchIrc_Create(GameData *gameData, HeapID heapId) {
     LiveBattleMatchIrc *irc = GFL_HeapAllocate(heapId, sizeof(LiveBattleMatchIrc), FALSE, "livebattlematch_irc.c", 142);
 
-    sys_memset(irc, 0, sizeof(LiveBattleMatchIrc));
+    MI_CpuFill8(irc, 0, sizeof(LiveBattleMatchIrc));
     irc->heapId = heapId;
     if (func_02042788()) {
         func_02040c20(LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA, sLiveBattleMatchIrcCommands,
@@ -262,7 +262,7 @@ BOOL LiveBattleMatchIrc_TakeParty(LiveBattleMatchIrc *irc, PokeParty *party) {
 
     if (arrived) {
         irc->partyArrived = FALSE;
-        sys_memcpy(irc->buffer, party, PokeParty_GetSaveDataSize());
+        MI_CpuCopy8(irc->buffer, party, PokeParty_GetSaveDataSize());
     }
     return arrived;
 }
@@ -279,7 +279,7 @@ BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag) {
 
     if (arrived) {
         irc->readyArrived = FALSE;
-        sys_memcpy(irc->buffer, flag, sizeof(u32));
+        MI_CpuCopy8(irc->buffer, flag, sizeof(u32));
     }
     return arrived;
 }
@@ -287,7 +287,7 @@ BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag) {
 void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, void *buffer) {
     DeliveryIrcInit init;
 
-    sys_memset(&init, 0, sizeof(DeliveryIrcInit));
+    MI_CpuFill8(&init, 0, sizeof(DeliveryIrcInit));
     init.code = LIVEBATTLEMATCH_IRC_DELIVERY_CODE;
     init.data[0].datasize = LIVEBATTLEMATCH_IRC_DELIVERY_SIZE;
     init.data[0].pData = buffer;

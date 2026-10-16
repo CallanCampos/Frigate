@@ -3,6 +3,8 @@
 
 #include "gfl/net_devwifi.h"
 #include "types.h"
+#include "dwc/connectinet.h"
+#include "dwc/error.h"
 #include "gfl/dwc_rap.h"
 #include "gfl/dwc_rapcommon.h"
 #include "gfl/heap.h"
@@ -186,14 +188,14 @@ static int NetDevWifi_GetNetId(void) {
 }
 
 static int NetDevWifi_GetSignalLevel(void) {
-    return 3 - func_0205b250();
+    return 3 - DWC_GetLinkLevel();
 }
 
 static BOOL NetDevWifi_IsError(void) {
     int code;
     int type;
     GFLNetErrorInfo *info;
-    int result = func_020583b0(&code, &type);
+    int result = DWC_GetLastErrorEx(&code, &type);
 
     if (result != 0) {
         func_020424ac(code, type, result, 0);

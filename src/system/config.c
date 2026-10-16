@@ -21,12 +21,12 @@ Config *func_0200898c(u32 heapId) {
 }
 
 void initConfig(const Config *config, Config *dest) {
-    sys_memcpy(config, dest, sizeof(Config));
+    MI_CpuCopy8(config, dest, sizeof(Config));
 }
 
 // The original clears each option after the memset
 void func_020089c0(Config *config) {
-    sys_memset(config, 0, sizeof(Config));
+    MI_CpuFill8(config, 0, sizeof(Config));
     config->textSpeed = 1;
     config->soundFlags = 0;
     config->unk6 = 0;

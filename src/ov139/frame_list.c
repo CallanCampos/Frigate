@@ -156,7 +156,7 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
         }
         list->touchRects = GFL_HeapAllocate(list->heapId, (n + 1) * sizeof(TouchRect), FALSE, "frame_list.c", 323);
         for (i = 0; i < n + 1; i++) {
-            sys_memcpy32(&list->setup.touch[i], &list->touchRects[i], sizeof(TouchRect));
+            MIi_CpuCopy32(&list->setup.touch[i], &list->touchRects[i], sizeof(TouchRect));
         }
     }
     return list;
@@ -195,7 +195,7 @@ void FrameList_LoadScreen(FrameList *list, ArcTool *arc, u32 fileId, BOOL compre
     NNSG2dScreenData *screen;
     void *data = GFL_G2DIOReadNSCRArc(arc, fileId, compressed, &screen, list->heapId);
 
-    sys_memcpy16(screen->rawData, list->screens[index], list->setup.layout.width * list->setup.layout.rowHeight * 2);
+    MIi_CpuCopy16(screen->rawData, list->screens[index], list->setup.layout.width * list->setup.layout.rowHeight * 2);
     GFL_HeapFree(data);
 }
 
@@ -1197,7 +1197,7 @@ static void DrawItemFrame(FrameList *list, int item, int row) {
         for (i = 0; i < width; i++) {
             u16 entry = screen[x + (j + y) * screenWidth + i];
 
-            sys_memcpy32(tiles + (entry & 0x3ff) * 32, pixels + (i + j * width) * 32, 32);
+            MIi_CpuCopy32(tiles + (entry & 0x3ff) * 32, pixels + (i + j * width) * 32, 32);
         }
     }
 }

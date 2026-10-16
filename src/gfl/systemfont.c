@@ -35,15 +35,15 @@ void GFL_SystemFontInit(const char *path) {
         if (path != NULL) {
             FSFile file;
 
-            finit(&file);
-            if (romfs_fopen(&file, path) == TRUE) {
-                u32 size = GetFileSize(&file);
+            FS_InitFile(&file);
+            if (FS_OpenFile(&file, path) == TRUE) {
+                u32 size = FS_GetLength(&file);
 
                 sSystemFont->data = GFL_HeapAllocate(HEAPID_SYSTEM, size, FALSE, "systemfont.c", 77);
-                romfs_fread(&file, (void *)sSystemFont->data, size);
-                romfs_fclose(&file);
+                FS_ReadFile(&file, (void *)sSystemFont->data, size);
+                FS_CloseFile(&file);
             } else {
-                sys_exit();
+                OS_Terminate();
             }
             sSystemFont->builtIn = FALSE;
         } else {

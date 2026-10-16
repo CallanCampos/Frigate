@@ -129,7 +129,7 @@ LocalTvtScriptMode *LocalTvtScriptMode_Create(HeapID heapId, GameSystem *gsys, G
     mode->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0384 + scriptId, mode->heapId);
     gender = getTrainerGender(GetGameDataPlayerInfo(gameData));
     callData = LocalTvtCallData_Create(gsys, gameData, heapId);
-    sys_memset(setups, 0, sizeof(setups));
+    MI_CpuFill8(setups, 0, sizeof(setups));
     for (i = 0; i < LOCAL_TVT_FACES; i++) {
         u16 zoneId = mode->header->zones[i];
         u32 person;
@@ -219,8 +219,8 @@ BOOL LocalTvtScriptMode_Main(LocalTvtScriptMode *mode) {
 }
 
 static void LocalTvtScriptMode_InitGraphic(LocalTvtScriptMode *mode) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0,
-                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 4);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0,
+                       GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 4);
 }
 
 static void LocalTvtScriptMode_ExitGraphic(LocalTvtScriptMode *mode) {

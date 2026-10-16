@@ -132,8 +132,8 @@ void ZukanAreaListView_Init(ZukanAreaListView *view, GameData *gameData) {
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_SUB_MAIN);
     ZukanAreaListView_InitVRAM();
     ZukanAreaListView_InitBG();
@@ -166,8 +166,8 @@ void ZukanAreaListView_Exit(ZukanAreaListView *view) {
     ZukanAreaListView_ExitPaletteFade(view);
     G2_BlendNone();
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
@@ -688,7 +688,7 @@ static void ZukanAreaListView_ExitBlink(ZukanAreaListView *view) {
 }
 
 static void ZukanAreaListView_InitBlend(void) {
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG3, 6, 10);
 }
 
 u32 ZukanAreaListView_IsFading(ZukanAreaListView *view) {

@@ -117,6 +117,9 @@ void MATH_SHA1GetHash(MATHSHA1Context *context, void *digest);
 void MATH_CalcSHA1(u8 *digest, const void *data, u32 size);
 // HMAC-SHA1 of dataSize bytes under a key; the 20-byte digest is written to digest
 void MATH_CalcHMACSHA1(void *digest, const void *data, u32 dataSize, const void *key, u32 keySize);
+// Chooses whether SHA-1 clears words 6 and 14 of each block, and returns the choice before. The overlays' digest check
+// (fs_overlay.c) clears them
+u32 sha1_set_masked(u32 masked);
 
 // math_crc.c. Swan: MATH_CRC16CCITTInitTable (MATHi_CRC16InitTable)
 void MATHi_CRC8InitTable(MATHCRC8Table *table, u8 poly);

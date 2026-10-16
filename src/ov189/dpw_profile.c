@@ -8,7 +8,7 @@
 #include "system/str_tool.h"
 
 void DpwProfile_Fill(Dpw_Common_Profile *profile, PlayerInfo *playerInfo) {
-    sys_memset(profile, 0, sizeof(Dpw_Common_Profile));
+    MI_CpuFill8(profile, 0, sizeof(Dpw_Common_Profile));
     profile->version = GAME_VERSION;
     profile->language = GAME_LANGUAGE;
     profile->country = UnityTowerVisitor_GetCountry(playerInfo);

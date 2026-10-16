@@ -10,7 +10,7 @@ void func_0200fe80(void *data) {
     WbtSave *wbt = data;
     int i;
 
-    sys_memset(wbt, 0, sizeof(WbtSave));
+    MI_CpuFill8(wbt, 0, sizeof(WbtSave));
     for (i = 0; i < WBT_SLOT_COUNT; i++) {
         wbt->slots[i] = WBT_SLOT_NONE;
     }

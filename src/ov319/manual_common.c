@@ -86,8 +86,8 @@ void ManualCommon_LoadImage(ManualCommon *common, u16 image) {
         } else {
             buffer = GFL_ArcToolReadHeapNewLZGetLen(common->imageArc, common->image, TRUE, common->heapId, &size);
         }
-        cp15_flushDC(buffer, size);
-        gfxUploadBGScreen2A(buffer, 0, IMAGE_SIZE);
+        DC_FlushRange(buffer, size);
+        GX_LoadBG2Scr(buffer, 0, IMAGE_SIZE);
         GFL_HeapFree(buffer);
     }
 }

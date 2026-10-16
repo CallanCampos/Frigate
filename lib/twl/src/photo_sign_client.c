@@ -71,11 +71,11 @@ void PhotoSign_Init(void) {
     if (sInitialized) {
         return;
     }
-    func_0207acc4(&sQueue, sMessages, NELEMS(sMessages));
+    OS_InitMessageQueue(&sQueue, sMessages, NELEMS(sMessages));
     PhotoSign_InitLock();
     PXI_Init();
-    func_0207c9fc(PHOTO_SIGN_FIFO_TAG, PhotoSign_FifoCallback);
-    while (!func_0207ca48(PHOTO_SIGN_FIFO_TAG, MI_PROCESSOR_ARM7)) {
+    PXI_SetFifoRecvCallback(PHOTO_SIGN_FIFO_TAG, PhotoSign_FifoCallback);
+    while (!PXI_IsCallbackReady(PHOTO_SIGN_FIFO_TAG, PXI_PROC_ARM7)) {
     }
     sInitialized = TRUE;
 }
@@ -115,7 +115,7 @@ int PhotoSign_StartMac(const u8 *nonce, const void *data, u32 size, u8 *mac, Pho
     }
     sCallback = callback;
     sCallbackArg = arg;
-    sys_memcpy(nonce, param.nonce, PHOTO_SIGN_NONCE_SIZE);
+    MI_CpuCopy8(nonce, param.nonce, PHOTO_SIGN_NONCE_SIZE);
     param.data = data;
     param.dataSize = size;
     param.payloadSize = 0;

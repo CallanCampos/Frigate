@@ -1,4 +1,3 @@
-#include "gfl/std.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "vct_dsp_internal.h"
@@ -81,25 +80,25 @@ void VCT_ClearPacketPool(void) {
 
 VCTPacket *VCT_AllocPacket(void) {
     VCTPacket *packet = NULL;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     VCTPacket *head = sPacketPool.freeList;
 
     if (head != NULL) {
         packet = head;
         sPacketPool.freeList = head->nextFree;
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return packet;
 }
 
 void VCT_FreePacket(VCTPacket *packet) {
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     packet->nextFree = sPacketPool.freeList;
     sPacketPool.freeList = packet;
     packet->prev = NULL;
     packet->next = NULL;
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
 }
 
 void VCT_ResetCapture(void) {
@@ -117,7 +116,7 @@ void VCT_ResetCapture(void) {
 
 void VCT_GetCaptureLevels(s32 *out) {
     if (out != NULL) {
-        sys_memcpy(&sCapture, out, sizeof(VCTCapture));
+        MI_CpuCopy8(&sCapture, out, sizeof(VCTCapture));
     }
 }
 
@@ -248,7 +247,7 @@ void VCT_InitEcho(void) {
 
 // Keeps the frame that was played, to know what the microphone heard of it
 void VCT_SaveFarEnd(s16 *samples, int bytes) {
-    sys_memcpy32_fast(samples, sFarEnd, bytes);
+    MIi_CpuCopyFast(samples, sFarEnd, bytes);
 }
 
 // Runs the speaker's frame through a filter of the echo's way back, and turns the microphone down by more the louder

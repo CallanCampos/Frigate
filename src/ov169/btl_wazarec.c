@@ -6,7 +6,7 @@
 void BtlWazaRec_Init(BtlWazaRec *rec) {
     u32 i;
 
-    sys_memset(rec, 0, sizeof(BtlWazaRec));
+    MI_CpuFill8(rec, 0, sizeof(BtlWazaRec));
     rec->head = 0;
     for (i = 0; i < BTL_WAZAREC_MAX; i++) {
         rec->records[i].move = MOVE_NONE;

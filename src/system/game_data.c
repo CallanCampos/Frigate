@@ -197,7 +197,7 @@ GameData *GameData_Create(HeapID heapId) {
     }
     size = PlayerInfo_GetSize();
     playerInfo = GetGameDataPlayerInfo(gameData);
-    sys_memcpy(SaveControl_GetPlayerInfo(gameData->saveControl), playerInfo, size);
+    MI_CpuCopy8(SaveControl_GetPlayerInfo(gameData->saveControl), playerInfo, size);
 
     gameData->eventData = EventData_Create(heapId);
     EventData_Reset(gameData->eventData);
@@ -957,7 +957,7 @@ void func_02017a78(GameData *gameData) {
     BOOL different;
     int k;
 
-    sys_memset(gameData->picks, 0, sizeof(gameData->picks));
+    MI_CpuFill8(gameData->picks, 0, sizeof(gameData->picks));
     do {
         for (i = 0; i < GAME_DATA_PICK_MAX; i++) {
             gameData->picks[i] = sPickValues[GFL_RandomLC(NELEMS(sPickValues))];

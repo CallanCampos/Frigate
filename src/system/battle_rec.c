@@ -60,7 +60,7 @@ u32 getSizeOfVSPlayer(void) {
 }
 
 void clearVSPlayerBlk(BattleRecVideo *video) {
-    sys_memset32(0, video, sizeof(BattleRecVideo));
+    MIi_CpuClear32(0, video, sizeof(BattleRecVideo));
 }
 
 BOOL func_0200bb80(void) {
@@ -241,7 +241,7 @@ static void func_0200bf48(SaveControl *save, BattleRecHeader *header, BattleRecB
     s32 pkmCount;
     u16 mode;
 
-    sys_memset(header, 0, sizeof(BattleRecHeader));
+    MI_CpuFill8(header, 0, sizeof(BattleRecHeader));
     mode = sBattleRecModes[modeIndex];
     func_0200bef4(mode, &clientCount, &pkmCount);
     for (client = 0; client < clientCount; client++) {
@@ -331,9 +331,9 @@ BattleRecHeader *func_0200c0cc(BattleRecVideo *video) {
 
 void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
                    SaveControl *save) {
-    sys_memcpy(header, &data_02140f64->header, sizeof(BattleRecHeader));
-    sys_memcpy(body, &data_02140f64->body, sizeof(BattleRecBody));
-    sys_memcpy(profile, data_02140f64->profile, sizeof(data_02140f64->profile));
+    MI_CpuCopy8(header, &data_02140f64->header, sizeof(BattleRecHeader));
+    MI_CpuCopy8(body, &data_02140f64->body, sizeof(BattleRecBody));
+    MI_CpuCopy8(profile, data_02140f64->profile, sizeof(data_02140f64->profile));
     __decryptData(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 

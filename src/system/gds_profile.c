@@ -39,7 +39,7 @@ static u8 getValidLanguage(GdsProfile *profile);
 GdsProfile *GdsProfile_Create(u32 heapId) {
     GdsProfile *profile = GFL_HeapAllocate(heapId, sizeof(GdsProfile), FALSE, "gds_profile.c", 80);
 
-    sys_memset(profile, 0, sizeof(GdsProfile));
+    MI_CpuFill8(profile, 0, sizeof(GdsProfile));
     return profile;
 }
 
@@ -62,7 +62,7 @@ void GdsProfile_SetFromGameData(GdsProfile *profile, GameData *gameData) {
 
     OS_GetOwnerInfo(&ownerInfo);
     GetFavePokemonData(gameInfo, &species, &form, &egg, &gender);
-    sys_memset(profile, 0, sizeof(GdsProfile));
+    MI_CpuFill8(profile, 0, sizeof(GdsProfile));
     wcharsncpy(GetPlayerName(playerInfo), profile->name, GDS_PROFILE_NAME_LENGTH);
     profile->trainerId = getIDAsUInt(playerInfo);
     profile->sex = getTrainerGender(playerInfo);

@@ -81,7 +81,7 @@ static BOOL WifiBattleMatchList_Init(GameProc *proc, u32 *state, void *param, vo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_SUBPROC, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchListWork), HEAPID_WIFIBATTLEMATCH_SUBPROC);
-    sys_memset(wk, 0, sizeof(WifiBattleMatchListWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiBattleMatchListWork));
     wk->param = *list;
     wk->heapId = HEAPID_WIFIBATTLEMATCH_SUBPROC;
     wk->procManager = CreateGameProcManager(wk->heapId);
@@ -293,7 +293,7 @@ static BOOL WifiBattleMatchExchange_Init(GameProc *proc, u32 *state, void *param
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_WIFIBATTLEMATCH_SUBPROC, 0x10000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WifiBattleMatchExchangeWork), HEAPID_WIFIBATTLEMATCH_SUBPROC);
-    sys_memset(wk, 0, sizeof(WifiBattleMatchExchangeWork));
+    MI_CpuFill8(wk, 0, sizeof(WifiBattleMatchExchangeWork));
     exchange->result = 0;
     switch (exchange->mode) {
     case WIFIBATTLEMATCH_EXCHANGE_WIFI:

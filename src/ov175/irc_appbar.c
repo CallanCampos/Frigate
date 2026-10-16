@@ -61,7 +61,7 @@ IrcAppBar *IrcAppBar_Create(u32 unused0, ClActUnit *unit, u8 bg, u8 palette, u8 
     u32 vramType;
     u32 surface;
 
-    sys_memset(bar, 0, sizeof(IrcAppBar));
+    MI_CpuFill8(bar, 0, sizeof(IrcAppBar));
     bar->bg = bg;
     bar->result = -1;
     bar->unk48 = -1;
@@ -80,7 +80,7 @@ IrcAppBar *IrcAppBar_Create(u32 unused0, ClActUnit *unit, u8 bg, u8 palette, u8 
     bar->res = AppTaskMenuRes_Create(bg, palette, font, queue, heapId);
     IrcAppBar_CreateActor(bar, unit, unused0, isSub, GFL_BGSysGetBGPriority(bg), heapId);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_4, heapId);
-    sys_memset(&item, 0, sizeof(AppTaskMenuItem));
+    MI_CpuFill8(&item, 0, sizeof(AppTaskMenuItem));
     item.color = 0x39e3;
     item.str = GFL_MsgDataLoadStrbufNew(msgData, BtlMain4_Text_Cancel);
     item.type = APP_TASKMENU_ITEM_RETURN;
@@ -165,7 +165,7 @@ void IrcAppBar_SetLabel(IrcAppBar *bar, int label) {
 
         AppTaskMenuWin_Free(bar->win);
         msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_4, bar->heapId);
-        sys_memset(&item, 0, sizeof(AppTaskMenuItem));
+        MI_CpuFill8(&item, 0, sizeof(AppTaskMenuItem));
         item.color = 0x39e3;
         item.str = GFL_MsgDataLoadStrbufNew(msgData, BtlMain4_Text_Cancel + label);
         item.type = APP_TASKMENU_ITEM_RETURN;
@@ -198,7 +198,7 @@ static void IrcAppBar_CreateActor(IrcAppBar *bar, ClActUnit *unit, u32 unused2, 
                                   HeapID heapId) {
     ClActorSetup setup;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 0;

@@ -348,7 +348,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
         RTCDate date;
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_DATE);
-        func_0207cc10(&date);
+        RTC_GetDate(&date);
         WordSetNumber(wordSet, 0, date.year, 2, NUM_PAD_ZERO, TRUE);
         WordSetNumber(wordSet, 1, date.month, 2, NUM_PAD_NONE, TRUE);
         WordSetNumber(wordSet, 2, date.day, 2, NUM_PAD_NONE, TRUE);
@@ -362,7 +362,7 @@ static void Report_PrintWindows(ReportScreen *wk) {
         RTCTime time;
 
         fmt = GFL_MsgDataLoadStrbufNew(msgData, REPORT_WINDOW_TIME);
-        func_0207cc80(&time);
+        RTC_GetTime(&time);
         WordSetNumber(wordSet, 0, time.hour, 2, NUM_PAD_NONE, TRUE);
         WordSetNumber(wordSet, 1, time.minute, 2, NUM_PAD_ZERO, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, strbuf, fmt);

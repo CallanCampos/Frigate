@@ -5,23 +5,15 @@
 #include "gfl/heap.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
+#include "nitro/std.h"
 
-void sys_memcpy(const void *src, void *dest, u32 size);
-void sys_memcpy32_fast(const void *src, void *dest, u32 size);
-void sys_memcpy_fast(const void *src, void *dest, u32 size);
-// Copies size bytes even when the ranges overlap
-void sys_memcpy_ex(const void *src, void *dest, u32 size);
-void sys_memset(void *dest, u32 value, u32 size);
-void sys_memset_fast(void *dest, u32 value, u32 size);
-void sys_memset32_fast(u32 value, void *dest, u32 size);
-void *sys_memcpy32(const void *src, void *dest, u32 size);
+// NitroSDK's memory functions are in nitro/mi.h, and its string functions in nitro/std.h
+
 // Game Freak's standard library (gf_standard.c): its tables are allocated once, from a heap
 void initTableArea(HeapID heapId);
 // Compares size bytes, returning the difference of the first that differ
 s32 GFL_STD_MemCmp(const void *a, const void *b, u32 size);
 u32 GFL_STD_StrLen(const char *str);
-// Copies the string with its terminator, returning dest
-char *func_0207f7a4(char *dest, const char *src);
 // Compares two strings with STD_CompareString, whatever swan's name says
 int _STD_CompareNString(const char *a, const char *b);
 // Seeds the Mersenne Twister of GFL_RandomMT

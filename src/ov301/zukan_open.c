@@ -107,7 +107,7 @@ static BOOL ZukanOpen_Init(GameProc *proc, u32 *state, void *param, void *work) 
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN_OPEN, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanOpenWork), HEAPID_ZUKAN_OPEN);
-    sys_memset(wk, 0, sizeof(ZukanOpenWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanOpenWork));
     wk->param = param;
     return TRUE;
 }
@@ -320,15 +320,15 @@ static void ZukanOpen_LoadSkin(ZukanOpenWork *work) {
             GFL_BGSysLoadChar(BG_COVER_BACK, characters, SKIN_CHAR_SIZE, 0);
             GFL_BGSysUploadStdPalette(BG_COVER_BACK, palette, SKIN_PALETTE_SIZE, 0);
             GFL_BGSysUploadStdPalette(BG_COVER_SUB, palette, SKIN_PALETTE_SIZE, 0);
-            cp15_flushDC(palette, SKIN_PALETTE_SIZE);
-            gfxBeginBGExtPltAUpload();
-            gfxUploadExtPaletteBGA(palette, 0x4000, SKIN_PALETTE_SIZE);
-            gfxUploadExtPaletteBGA(palette, 0x6000, SKIN_PALETTE_SIZE);
-            gfxEndBGExtPltAUpload();
-            gfxBeginBGExtPltBUpload();
-            gfxUploadExtPaletteBGB(palette, 0x4000, SKIN_PALETTE_SIZE);
-            gfxUploadExtPaletteBGB(palette, 0x6000, SKIN_PALETTE_SIZE);
-            gfxEndBGExtPltBUpload();
+            DC_FlushRange(palette, SKIN_PALETTE_SIZE);
+            GX_BeginLoadBGExtPltt();
+            GX_LoadBGExtPltt(palette, 0x4000, SKIN_PALETTE_SIZE);
+            GX_LoadBGExtPltt(palette, 0x6000, SKIN_PALETTE_SIZE);
+            GX_EndLoadBGExtPltt();
+            GXS_BeginLoadBGExtPltt();
+            GXS_LoadBGExtPltt(palette, 0x4000, SKIN_PALETTE_SIZE);
+            GXS_LoadBGExtPltt(palette, 0x6000, SKIN_PALETTE_SIZE);
+            GXS_EndLoadBGExtPltt();
         }
     }
     freeIntermediateSaveExtraBlksAfterLoad(save, SKIN_BLOCK);

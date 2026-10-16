@@ -20,7 +20,7 @@ u32 func_0200ec00(void) {
 }
 
 void func_0200ec08(SurveySave *survey) {
-    sys_memset(survey, 0, sizeof(SurveySave));
+    MI_CpuFill8(survey, 0, sizeof(SurveySave));
     survey->questions[0] = 0;
     survey->questions[1] = 8;
     survey->questions[2] = 29;

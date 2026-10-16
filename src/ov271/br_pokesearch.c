@@ -120,7 +120,7 @@ BrPokeSearch *BrPokeSearch_Init(PokeDexSave *pokedex, BrRes *res, ClActUnit *uni
     int i;
 
     p_wk = GFL_HeapAllocate(heapId, sizeof(BrPokeSearch), FALSE, "br_pokesearch.c", 298);
-    sys_memset(p_wk, 0, sizeof(BrPokeSearch));
+    MI_CpuFill8(p_wk, 0, sizeof(BrPokeSearch));
 
     p_wk->heap_id = heapId;
     p_wk->pokedex = pokedex;
@@ -292,7 +292,7 @@ static void BrPokeSearch_InitBtn(BrPokeSearch *p_wk) {
     BrResObjData obj;
     BOOL ret;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 80;
     setup.y = 168;
     setup.sequence = 0;
@@ -424,7 +424,7 @@ static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, u32 letter, const 
     }
 
     buff = GFL_HeapAllocate(heapId, count * sizeof(u16), FALSE, "br_pokesearch.c", 984);
-    sys_memset(buff, 0, count * sizeof(u16));
+    MI_CpuFill8(buff, 0, count * sizeof(u16));
 
     {
         u32 n = 0;

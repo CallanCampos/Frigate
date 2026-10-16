@@ -936,11 +936,11 @@ void FieldG3D_InitCallback(void) {
     G3X_AntiAlias(TRUE);
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
-    gfxSetFog(FALSE, 0, 5, 0xe00);
+    G3X_SetFog(FALSE, 0, 5, 0xe00);
     G3X_SetFogColor(GX_RGB(31, 31, 31), 0);
-    gfxSetFogTable(FIELD_DEFAULT_FOG_TABLE);
-    gfxClearColor(GX_RGB(0, 0, 0), 31, 0x7fff, 0, FALSE);
-    gfxSetEdgeColorTable(FIELD_DEFAULT_EDGE_COLOR_TABLE);
+    G3X_SetFogTable(FIELD_DEFAULT_FOG_TABLE);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 31, 0x7fff, 0, FALSE);
+    G3X_SetEdgeColorTable(FIELD_DEFAULT_EDGE_COLOR_TABLE);
     G3X_EdgeMarking(FALSE);
     G3_ViewPort(0, 0, 255, 191);
     GFL_G3DSysSetSwapBufferParams(GX_SORTMODE_MANUAL, GX_BUFFERMODE_Z);
@@ -1055,7 +1055,7 @@ void Field_LoadEdgeColorTable(AreaData *area, u16 zoneId) {
     }
     GFL_ArcSysRead(g_FieldEdgeColorTable, 0xf, tableId);
     g_FieldEdgeColorTable[7] = 0x4210;
-    gfxSetEdgeColorTable(g_FieldEdgeColorTable);
+    G3X_SetEdgeColorTable(g_FieldEdgeColorTable);
 }
 
 void Field_LoadActorMatColorPreset(Field *field) {
@@ -1418,13 +1418,13 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
 }
 
 void FieldRenderPhase2_FieldEffect(Field *field) {
-    gfxClearColor(0, 0, 0x7fff, 0, FALSE);
+    G3X_SetClearColor(0, 0, 0x7fff, 0, FALSE);
     func_ov036_021bb674();
     Fld3DCi_Draw(field->g3dCi);
 }
 
 void FieldRenderPhase2_EncountEffect(Field *field) {
-    gfxClearColor(0x4210, 31, 0x7fff, 0, FALSE);
+    G3X_SetClearColor(0x4210, 31, 0x7fff, 0, FALSE);
     EncEff_CallRenderFunc(field->encEff);
 }
 

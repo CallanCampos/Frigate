@@ -123,7 +123,7 @@ void FieldAsyncProc_End(FieldAsyncProc *proc) {
         if (proc->overlayId != OVERLAY_NONE) {
             GFL_OvlUnload(proc->overlayId);
         }
-        sys_memset(proc, 0, sizeof(FieldAsyncProc));
+        MI_CpuFill8(proc, 0, sizeof(FieldAsyncProc));
     }
 }
 

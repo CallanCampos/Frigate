@@ -390,7 +390,7 @@ GameEvent *func_ov027_02170860(GameSystem *gsys) {
 void func_ov027_02170884(SurveyTextWork *work, GameSystem *gsys) {
     Field *field;
     field = GSYS_GetField(gsys);
-    sys_memset(work, 0, 0x20);
+    MI_CpuFill8(work, 0, 0x20);
     work->heapId = Field_GetHeapID(field);
     work->gameSystem = gsys;
     work->gameData = GSYS_GetGameData(gsys);

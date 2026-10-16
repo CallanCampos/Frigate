@@ -228,7 +228,7 @@ u32 ZukanCommon_LoadHabitatSpecies(PokeDexSave *pokedex, void *habitat, u16 **ou
     if (areaFile < 0) {
         areaFile = 0;
     }
-    sys_memset(&file, 0, sizeof(ZukanHabitatFile));
+    MI_CpuFill8(&file, 0, sizeof(ZukanHabitatFile));
     GFL_ArcToolRead(arc, areaFile, &file);
     list = ZukanCommon_CreateSpeciesList(&file, pokedex, type, season, &total, heapId);
     for (i = 0; i < file.count; i++) {
@@ -258,7 +258,7 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
         param->count = 1;
     }
     if (param->count != 0) {
-        sys_memset(param->areas, 0, sizeof(param->areas));
+        MI_CpuFill8(param->areas, 0, sizeof(param->areas));
         index = 0;
         for (habitatIndex = 0; habitatIndex < ZUKAN_HABITAT_COUNT; habitatIndex++) {
             const ZukanHabitatTableEntry *entry = &sZukanHabitats[habitatIndex];
@@ -272,7 +272,7 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
             if (flag == TRUE) {
                 ZukanHabitatFile file;
 
-                sys_memset(&file, 0, sizeof(ZukanHabitatFile));
+                MI_CpuFill8(&file, 0, sizeof(ZukanHabitatFile));
                 GFL_ArcToolRead(arc, entry->file, &file);
                 if (ZukanCommon_IsAreaShown(&file, &conditions)) {
                     int j;
@@ -281,7 +281,7 @@ void ZukanCommon_BuildHabitatList(void *habitat, ZukanHabitatListParam *param, B
                     ZukanHabitatArea *area;
 
                     area = &param->areas[index];
-                    sys_memset(area, 0, 4);
+                    MI_CpuFill8(area, 0, 4);
                     area->complete = 1;
                     area->zone = entry->zone;
                     area->unk8 = file.unk6;
@@ -343,14 +343,14 @@ void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *pa
         const ZukanHabitatTableEntry *entry = &sZukanHabitats[i];
 
         if (EventWork_FlagGet(eventWork, entry->flag) == 1) {
-            sys_memset(&countFile, 0, sizeof(ZukanHabitatFile));
+            MI_CpuFill8(&countFile, 0, sizeof(ZukanHabitatFile));
             GFL_ArcToolRead(arc, entry->file, &countFile);
             if (ZukanCommon_IsAreaShown(&countFile, &conditions)) {
                 param->count++;
             }
         }
     }
-    sys_memset(param->areas, 0, sizeof(param->areas));
+    MI_CpuFill8(param->areas, 0, sizeof(param->areas));
     index = 0;
     for (habitatIndex = 0; habitatIndex < ZUKAN_HABITAT_COUNT; habitatIndex++) {
         const ZukanHabitatTableEntry *entry = &sZukanHabitats[habitatIndex];
@@ -358,7 +358,7 @@ void ZukanCommon_BuildHabitatSummary(void *habitat, ZukanHabitatSummaryParam *pa
         if (EventWork_FlagGet(eventWork, entry->flag) == 1) {
             u8 j = 0;
 
-            sys_memset(&file, 0, sizeof(ZukanHabitatFile));
+            MI_CpuFill8(&file, 0, sizeof(ZukanHabitatFile));
             GFL_ArcToolRead(arc, entry->file, &file);
             if (ZukanCommon_IsAreaShown(&file, &conditions)) {
                 ZukanHabitatSummary *area = &param->areas[index];
@@ -417,7 +417,7 @@ static void ZukanCommon_GetHabitatStates(u32 *states, const ZukanHabitatFile *fi
     states[1] = 2;
     states[2] = 2;
     for (i = 0; i < file->count; i++) {
-        sys_memset(present, 0, 3);
+        MI_CpuFill8(present, 0, 3);
         for (j = 0; j < 3; j++) {
             for (k = 0; k < ZUKAN_SEASON_COUNT; k++) {
                 present[j] |= file->entries[i].present[k][j];
@@ -486,7 +486,7 @@ static u32 ZukanCommon_CountAreas(EventWork *eventWork, ArcTool *arc, const Zuka
         const ZukanHabitatTableEntry *entry = &sZukanHabitats[i];
 
         if (EventWork_FlagGet(eventWork, entry->flag) == 1) {
-            sys_memset(&file, 0, sizeof(ZukanHabitatFile));
+            MI_CpuFill8(&file, 0, sizeof(ZukanHabitatFile));
             GFL_ArcToolRead(arc, entry->file, &file);
             if (ZukanCommon_IsAreaShown(&file, conditions)) {
                 count++;

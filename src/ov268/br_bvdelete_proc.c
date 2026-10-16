@@ -83,7 +83,7 @@ static BOOL BrBvDelete_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     GFL_ASSERT(p_param->mode < BR_BVDELETE_MODE_MAX);
 
     p_wk = GFL_ProcInitSubsystem(proc, sizeof(BrBvDeleteWork), BrProcSys_GetHeapID(p_param->procSys));
-    sys_memset(p_wk, 0, sizeof(BrBvDeleteWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvDeleteWork));
     p_wk->p_param = p_param;
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 

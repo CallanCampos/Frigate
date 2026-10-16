@@ -74,16 +74,16 @@ static BOOL MBGameInfo_LoadIconFile(const char *path, MBGameInfoRecord *record, 
     if (path == NULL) {
         return FALSE;
     }
-    finit(&file);
-    if (!romfs_fopen_core(&file, path, FS_FILEMODE_R)) {
+    FS_InitFile(&file);
+    if (!FS_OpenFileEx(&file, path, FS_FILEMODE_R)) {
         return FALSE;
     }
-    if (size != GetFileSize(&file)) {
-        romfs_fclose(&file);
+    if (size != FS_GetLength(&file)) {
+        FS_CloseFile(&file);
         return FALSE;
     }
-    romfs_fread(&file, dst, size);
-    romfs_fclose(&file);
+    FS_ReadFile(&file, dst, size);
+    FS_CloseFile(&file);
     return TRUE;
 }
 
@@ -180,7 +180,7 @@ static int MBGameInfo_PickRecord(void) {
         u32 ggid = MBWm_GetGgid();
         u16 tgid = MBWm_GetTgid();
 
-        func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, MB_BEACON_ATTR_NO_GAME);
+        WM_SetGameInfo(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, MB_BEACON_ATTR_NO_GAME);
         return 0;
     }
     if (sSender.current == NULL || (record = sSender.current->next) == NULL) {
@@ -212,7 +212,7 @@ static void MBGameInfo_StartFragments(void) {
 // Puts the beacon out. 1 is the wireless manager's entry attribute: children may connect. Through a u32 parameter the
 // original ORs the caller's flag and this one apart, where `attr | MB_BEACON_ATTR_MULTIBOOT | 1` folds them
 static inline void MBGameInfo_SetBeacon(u32 ggid, u16 tgid, u32 attr) {
-    func_020824bc(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | 1);
+    WM_SetGameInfo(NULL, &sBeacon, sizeof(MBBeacon), ggid, tgid, attr | 1);
 }
 
 // Sends the next piece of the record

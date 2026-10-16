@@ -21,7 +21,7 @@ enum {
 UIScene *UIScene_Create(HeapID heapId, const UISceneStep *steps, u8 flag, u16 first, void *param) {
     UIScene *scene = GFL_HeapAllocate(heapId, sizeof(UIScene), FALSE, "ui_scene.c", 78);
 
-    sys_memset(scene, 0, sizeof(UIScene));
+    MI_CpuFill8(scene, 0, sizeof(UIScene));
     scene->steps = steps;
     scene->flag = flag;
     scene->param = param;

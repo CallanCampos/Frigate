@@ -412,7 +412,7 @@ static BOOL GeonetProc_Init(GameProc *proc, u32 *state, void *param, void *procW
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GEONET, 0x80000);
     work = GFL_ProcInitSubsystem(proc, sizeof(GeonetWork), HEAPID_GEONET);
-    sys_memset(work, 0, sizeof(GeonetWork));
+    MI_CpuFill8(work, 0, sizeof(GeonetWork));
     work->heapId = HEAPID_GEONET;
     work->gameData = param;
     work->save = GameData_GetSaveControl(param);
@@ -819,13 +819,13 @@ static void Geonet_SetVRAMBanks(void) {
         GX_VRAM_NONE, GX_VRAM_A | GX_VRAM_B, GX_VRAM_E, 0x10,         0x10,
     };
 
-    gfxSetLCDCBanks(GX_VRAM_LCDC_ALL);
-    sys_memset32_fast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
-    gfxDisableLCDCBanks();
-    sys_memset32_fast(0xc0, (void *)HW_OAM, HW_OAM_SIZE);
-    sys_memset32_fast(0, (void *)HW_BG_PLTT, HW_PLTT_SIZE);
-    sys_memset32_fast(0xc0, (void *)HW_DB_OAM, HW_OAM_SIZE);
-    sys_memset32_fast(0, (void *)HW_DB_BG_PLTT, HW_PLTT_SIZE);
+    GX_SetBankForLCDC(GX_VRAM_LCDC_ALL);
+    MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
+    GX_DisableBankForLCDC();
+    MIi_CpuClearFast(0xc0, (void *)HW_OAM, HW_OAM_SIZE);
+    MIi_CpuClearFast(0, (void *)HW_BG_PLTT, HW_PLTT_SIZE);
+    MIi_CpuClearFast(0xc0, (void *)HW_DB_OAM, HW_OAM_SIZE);
+    MIi_CpuClearFast(0, (void *)HW_DB_BG_PLTT, HW_PLTT_SIZE);
     GFL_BGSysSetVRAMBanks(&config);
 }
 

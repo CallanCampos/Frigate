@@ -94,7 +94,7 @@ void BGWinFrame_InitFrame(BGWinFrame *frames, u32 index, u32 bg, u32 width, u32 
 void BGWinFrame_SetScreen(BGWinFrame *frames, u32 index, u16 *screen) {
     BGWinFrameEntry *frame = &frames->entries[index];
 
-    sys_memcpy16(screen, frame->screen, frame->width * frame->height * sizeof(u16));
+    MIi_CpuCopy16(screen, frame->screen, frame->width * frame->height * sizeof(u16));
 }
 
 void BGWinFrame_LoadScreen(BGWinFrame *frames, u32 index, u32 arcId, u32 fileId, BOOL compressed) {

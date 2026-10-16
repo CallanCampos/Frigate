@@ -166,7 +166,7 @@ static BOOL VsMultiList_Init(GameProc *proc, u32 *state, void *param, void *work
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_VS_MULTI_LIST, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(VsMultiListWork), HEAPID_VS_MULTI_LIST);
-    sys_memset(wk, 0, sizeof(VsMultiListWork));
+    MI_CpuFill8(wk, 0, sizeof(VsMultiListWork));
     wk->param = param;
     return TRUE;
 }
@@ -726,7 +726,7 @@ static void VsMultiList_CreateFrames(VsMultiListWork *wk) {
     screen = GFL_BGSysIsScrHeapExists(1);
     buffer = GFL_HeapAllocate(BG_HEAP, 0xc0, FALSE, "vs_multi_list.c", 1552);
     for (i = 0; i < POKEMON_COUNT; i++) {
-        sys_memcpy16(screen + i * 0x20, buffer + i * 0x10, 0x20);
+        MIi_CpuCopy16(screen + i * 0x20, buffer + i * 0x10, 0x20);
     }
     for (i = 0; i < POKEMON_COUNT; i++) {
         if (wk->pkm[i] != NULL) {
@@ -734,7 +734,7 @@ static void VsMultiList_CreateFrames(VsMultiListWork *wk) {
         }
     }
     for (i = 0; i < POKEMON_COUNT; i++) {
-        sys_memcpy16(screen + (i + 18) * 0x20, buffer + i * 0x10, 0x20);
+        MIi_CpuCopy16(screen + (i + 18) * 0x20, buffer + i * 0x10, 0x20);
     }
     for (i = 0; i < POKEMON_COUNT; i++) {
         if (wk->pkm[i] == NULL) {

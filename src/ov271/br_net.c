@@ -78,10 +78,10 @@ BrNet *BrNet_Init(GameData *gameData, u32 a1, HeapID heapId) {
 
     GFL_OvlLoad(OVERLAY_ID(201));
     net = GFL_HeapAllocate(heapId, sizeof(BrNet), FALSE, "br_net.c", 151);
-    sys_memset(net, 0, sizeof(BrNet));
+    MI_CpuFill8(net, 0, sizeof(BrNet));
     net->gameData = gameData;
 
-    sys_memset(&init, 0, sizeof(GdsRapInit));
+    MI_CpuFill8(&init, 0, sizeof(GdsRapInit));
     init.gameData = gameData;
     init.profileId = func_02008bdc(GetGameDataPlayerInfo(gameData));
     init.loginBuffer = (void *)a1;
@@ -128,7 +128,7 @@ void BrNet_StartRequest(BrNet *net, int type, const BrNetRequestParam *param) {
     if (param != NULL) {
         net->param = *param;
     }
-    sys_memset(&net->uploadMusicalShotEnd, 0, 0x24);
+    MI_CpuFill8(&net->uploadMusicalShotEnd, 0, 0x24);
 
     switch (type) {
     case BR_NET_REQUEST_UPLOAD_MUSICAL_SHOT:
@@ -464,7 +464,7 @@ static void BrNet_OnUnk5d8End(void *work, const GdsRapResult *result) {
 static BrNetSeq *BrNetSeq_Init(BrNet *net, BrNetSeqFunc func, HeapID heapId) {
     BrNetSeq *p_wk = GFL_HeapAllocate(heapId, sizeof(BrNetSeq), FALSE, "br_net.c", 1103);
 
-    sys_memset(p_wk, 0, sizeof(BrNetSeq));
+    MI_CpuFill8(p_wk, 0, sizeof(BrNetSeq));
     p_wk->net = net;
     BrNetSeq_SetNext(p_wk, func);
     return p_wk;

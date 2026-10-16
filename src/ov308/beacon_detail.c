@@ -110,7 +110,7 @@ static BOOL BeaconDetail_Init(GameProc *proc, u32 *state, void *param, void *dat
     GFL_OvlLoad(OVERLAY_TOWNMAP);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BEACON_DETAIL, 0x30000);
     work = GFL_ProcInitSubsystem(proc, sizeof(BeaconDetailWork), HEAPID_BEACON_DETAIL);
-    sys_memset(work, 0, sizeof(BeaconDetailWork));
+    MI_CpuFill8(work, 0, sizeof(BeaconDetailWork));
     work->param = param;
     work->heapId = HEAPID_BEACON_DETAIL;
     work->tailHeapId = HEAPID_TAIL(HEAPID_BEACON_DETAIL);
@@ -350,9 +350,9 @@ static void BeaconDetail_LoadBGs(BeaconDetailWork *work, HeapID heapId) {
     NNS_G2dGetUnpackedPaletteData(work->versionPalette.file, &work->versionPalette.data);
     work->versionPalette.raw = work->versionPalette.data->rawData;
     GFL_ArcToolFree(townMapArc);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1,
-                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 11, 5);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, GX_PLANEMASK_ALL, 13, 3);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG1,
+                       GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 11, 5);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1, GX_PLANEMASK_ALL, 13, 3);
 }
 
 static void BeaconDetail_FreeBGs(BeaconDetailWork *work) {
@@ -364,7 +364,7 @@ static void BeaconDetail_FreeBGs(BeaconDetailWork *work) {
 static TouchBar *BeaconDetail_CreateTouchBar(ClActUnit *unit, HeapID heapId) {
     TouchBarSetup setup;
 
-    sys_memset(&setup, 0, sizeof(TouchBarSetup));
+    MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
     setup.items = (TouchBarItem *)sBeaconDetailTouchBarItems;
     setup.count = NELEMS(sBeaconDetailTouchBarItems);
     setup.unit = unit;
@@ -385,7 +385,7 @@ static void BeaconDetail_UpdateTouchBar(TouchBar *touchBar) {
 
 static void BeaconDetail_LoadObjRes(BeaconDetailWork *work, BeaconDetailObjRes *res,
                                     const BeaconDetailObjResFiles *files, ArcTool *arc) {
-    sys_memset(res, 0, sizeof(BeaconDetailObjRes));
+    MI_CpuFill8(res, 0, sizeof(BeaconDetailObjRes));
     res->palette = func_0204bbb8(arc, files->paletteFile, files->vramType, files->paletteOffset * 0x20, 0,
                                  files->paletteCount, work->heapId);
     res->chars = func_0204b81c(arc, files->charFile, FALSE, files->vramType, work->heapId);

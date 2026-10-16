@@ -15,7 +15,7 @@ NameEntryParam *setupNameEntry(HeapID heapId, u32 mode, u32 a2, u32 a3, u32 maxL
                                TrainerGameInfoSave *gameInfo) {
     NameEntryParam *param = GFL_HeapAllocate(heapId, sizeof(NameEntryParam), FALSE, "namein_setup.c", 55);
 
-    sys_memset(param, 0, sizeof(NameEntryParam));
+    MI_CpuFill8(param, 0, sizeof(NameEntryParam));
     param->mode = mode;
     param->maxLength = maxLength;
     param->gender = a2;
@@ -37,7 +37,7 @@ NameEntryParam *setupPokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLengt
     NameEntryParam *param = GFL_HeapAllocate(heapId, sizeof(NameEntryParam), FALSE, "namein_setup.c", 95);
     u32 form;
 
-    sys_memset(param, 0, sizeof(NameEntryParam));
+    MI_CpuFill8(param, 0, sizeof(NameEntryParam));
     param->mode = NAME_ENTRY_POKEMON;
     param->maxLength = maxLength;
     param->pkm = pkm;

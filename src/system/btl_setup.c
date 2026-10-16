@@ -54,7 +54,7 @@ void BtlSetup_Free(BtlSetup *setup) {
 }
 
 void BtlSetup_Reset(BtlSetup *setup) {
-    sys_memset(setup, 0, sizeof(BtlSetup));
+    MI_CpuFill8(setup, 0, sizeof(BtlSetup));
     BtlFieldEnv_Init(&setup->fieldSituation.env);
 }
 
@@ -75,7 +75,7 @@ void BtlSetup_FreeContents(BtlSetup *setup) {
     if (setup->unkB0 != NULL) {
         GFL_HeapFree(setup->unkB0);
     }
-    sys_memset(setup, 0, sizeof(BtlSetup));
+    MI_CpuFill8(setup, 0, sizeof(BtlSetup));
 }
 
 void BtlSetup_SetParty(BtlSetup *setup, PokeParty *party, u32 a2) {
@@ -237,7 +237,7 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     card = getTrainerCardData_wrapper(save);
     setup->config = &getTrainerDataBlkAddress(save)->config;
     setup->unk98 = getBadgeCount(card);
-    sys_memcpy(status, &setup->fieldSituation.env, sizeof(BtlFieldEnv));
+    MI_CpuCopy8(status, &setup->fieldSituation.env, sizeof(BtlFieldEnv));
     setup->fieldSituation.bgm = SEQ_BGM_VS_NORAPOKE;
     setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
     setup->unkA8 = 1;
@@ -423,7 +423,7 @@ void BtlSetup_InitForRecord(BtlSetup *setup, GameData *gameData, HeapID heapId) 
     u32 i;
     TrainerDataSave *trainerData;
 
-    sys_memset(setup, 0, sizeof(BtlSetup));
+    MI_CpuFill8(setup, 0, sizeof(BtlSetup));
     for (i = 0; i < 4; i++) {
         setup->party[i] = PokeParty_Create(heapId);
         setup->unk34[i] = func_02008b0c(heapId);

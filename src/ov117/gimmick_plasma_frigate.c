@@ -391,7 +391,7 @@ static void GimmickPlasmaFrigate_InitPanels(PlasmaFrigateWork *work) {
 #endif
     int i;
 
-    sys_memcpy(startingOn, panelOn, sizeof(panelOn));
+    MI_CpuCopy8(startingOn, panelOn, sizeof(panelOn));
     for (i = 0; i < PANEL_COUNT; i++) {
         if (panelOn[i] == 0) {
             work->panelOn[i] = FALSE;

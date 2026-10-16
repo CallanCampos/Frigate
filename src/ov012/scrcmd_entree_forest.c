@@ -229,7 +229,7 @@ static GameEvent *EventEntreeForestBattleCall_Create(GameSystem *gsys, Field *fi
         GameEvent_Create(gsys, NULL, EventEntreeForestBattleCall_Callback, sizeof(EntreeForestBattleData));
     EntreeForestBattleData *data = GameEvent_GetData(event);
 
-    sys_memset(data, 0, sizeof(EntreeForestBattleData));
+    MI_CpuFill8(data, 0, sizeof(EntreeForestBattleData));
     data->field = field;
     data->result = result;
     data->heapId = heapId;
@@ -366,7 +366,7 @@ GameEvent *EventEntreeForestWarp_Create(GameSystem *gsys, u32 mode, const VecFx3
     GSYS_GetGameData(gsys);
     event = GameEvent_Create(gsys, NULL, EventEntreeForestWarp_Callback, sizeof(EntreeForestWarpData));
     data = GameEvent_GetData(event);
-    sys_memset(data, 0, sizeof(EntreeForestWarpData));
+    MI_CpuFill8(data, 0, sizeof(EntreeForestWarpData));
     data->pos = *position;
     data->dir = arg3;
     data->result = NULL;

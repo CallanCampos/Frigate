@@ -113,7 +113,7 @@ void LocalTvtSecret_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData
     u32 callType;
     BOOL male;
 
-    sys_memset(funcs, 0, sizeof(LocalTvtPersonFuncs));
+    MI_CpuFill8(funcs, 0, sizeof(LocalTvtPersonFuncs));
     funcs->work = LocalTvtSecret_Create(gameData, unk, heapId);
     funcs->free = LocalTvtSecret_Free;
     callType = LocalTvtSecret_GetStageCallType(

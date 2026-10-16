@@ -51,7 +51,7 @@ static NNSSndPlayer sPlayer[NNS_SND_PLAYER_NUM];
 
 // A volume 0 to 127 in decibels, as NitroSDK's SND_CalcDecibel gives it
 static inline int CalcDecibel(int scale) {
-    return VOLUME_DB_TABLE[scale];
+    return SNDi_DecibelTable[scale];
 }
 
 static inline BOOL NNS_SndHandleIsValid(const NNSSndHandle *handle) {
@@ -155,63 +155,63 @@ void NNS_SndPlayerSetChannelPriority(NNSSndHandle *handle, int prio) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d37c(handle->player->playerNo, prio);
+    SND_SetPlayerChannelPriority(handle->player->playerNo, prio);
 }
 
 void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u32 trackBitMask, BOOL flag) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d474(handle->player->playerNo, trackBitMask, flag);
+    SND_SetTrackMute(handle->player->playerNo, trackBitMask, flag);
 }
 
 void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u32 trackBitMask, int muteType) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d494(handle->player->playerNo, trackBitMask, muteType);
+    SND_SetTrackMuteEx(handle->player->playerNo, trackBitMask, muteType);
 }
 
 void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u32 trackBitMask, int volume) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d38c(handle->player->playerNo, trackBitMask, CalcDecibel(volume));
+    SND_SetTrackVolume(handle->player->playerNo, trackBitMask, CalcDecibel(volume));
 }
 
 void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u32 trackBitMask, int pitch) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d39c(handle->player->playerNo, trackBitMask, pitch);
+    SND_SetTrackPitch(handle->player->playerNo, trackBitMask, pitch);
 }
 
 void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u32 trackBitMask, int pan) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d3ac(handle->player->playerNo, trackBitMask, pan);
+    SND_SetTrackPan(handle->player->playerNo, trackBitMask, pan);
 }
 
 void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u32 trackBitMask, int depth) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d3bc(handle->player->playerNo, trackBitMask, depth);
+    SND_SetTrackModDepth(handle->player->playerNo, trackBitMask, depth);
 }
 
 void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u32 trackBitMask, int speed) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d3cc(handle->player->playerNo, trackBitMask, speed);
+    SND_SetTrackModSpeed(handle->player->playerNo, trackBitMask, speed);
 }
 
 void NNS_SndPlayerSetTempoRatio(NNSSndHandle *handle, int ratio) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    func_0207d35c(handle->player->playerNo, ratio);
+    SND_SetPlayerTempoRatio(handle->player->playerNo, ratio);
 }
 
 void NNSi_SndPlayerSetSeqNo(NNSSndHandle *handle, int seqNo) {
@@ -279,13 +279,13 @@ void NNSi_SndPlayerInit(void) {
 void NNSi_SndPlayerMain(void) {
     NNSSndSeqPlayer *seqPlayer;
     NNSSndSeqPlayer *next;
-    u32 playerStatus = func_0207dbb8();
+    u32 playerStatus = SND_GetPlayerStatus();
     int volume;
 
     for (seqPlayer = NNS_FndGetNextListObject(&sPrioList, NULL); seqPlayer != NULL; seqPlayer = next) {
         next = NNS_FndGetNextListObject(&sPrioList, seqPlayer);
 
-        if (!seqPlayer->startFlag && func_0207d9d0(seqPlayer->commandTag)) {
+        if (!seqPlayer->startFlag && SND_IsFinishedCommandTag(seqPlayer->commandTag)) {
             seqPlayer->startFlag = TRUE;
         }
         if (seqPlayer->startFlag && !(playerStatus & (1 << seqPlayer->playerNo))) {
@@ -303,7 +303,7 @@ void NNSi_SndPlayerMain(void) {
             volume = 0x7fff;
         }
         if (volume != seqPlayer->volume) {
-            func_0207d36c(seqPlayer->playerNo, volume);
+            SND_SetPlayerVolume(seqPlayer->playerNo, volume);
             seqPlayer->volume = volume;
         }
 
@@ -312,7 +312,7 @@ void NNSi_SndPlayerMain(void) {
         }
 
         if (seqPlayer->prepareFlag) {
-            func_0207d330(seqPlayer->playerNo);
+            SND_StartPreparedSeq(seqPlayer->playerNo);
             seqPlayer->prepareFlag = FALSE;
         }
     }
@@ -356,13 +356,13 @@ void NNSi_SndPlayerFreeSeqPlayer(NNSSndSeqPlayer *seqPlayer) {
 void NNSi_SndPlayerStartSeq(NNSSndSeqPlayer *seqPlayer, const void *seqBase, u32 seqOffset, const SNDBankData *bank) {
     NNSSndPlayer *player = seqPlayer->player;
 
-    func_0207d314(seqPlayer->playerNo, seqBase, seqOffset, bank);
+    SND_PrepareSeq(seqPlayer->playerNo, seqBase, seqOffset, bank);
     if (player->allocChBitFlag) {
-        func_0207d3dc(seqPlayer->playerNo, SND_TRACK_MASK_ALL, player->allocChBitFlag);
+        SND_SetTrackAllocatableChannel(seqPlayer->playerNo, SND_TRACK_MASK_ALL, player->allocChBitFlag);
     }
     InitPlayer(seqPlayer);
 
-    seqPlayer->commandTag = sndGetSentPacketCount();
+    seqPlayer->commandTag = SND_GetCurrentCommandTag();
     seqPlayer->prepareFlag = TRUE;
     seqPlayer->status = NNS_SND_SEQ_PLAYER_STATUS_PLAY;
 }
@@ -388,7 +388,7 @@ static void PauseSeq(NNSSndSeqPlayer *seqPlayer, BOOL flag) {
         return;
     }
     if (flag != seqPlayer->pauseFlag) {
-        func_0207d344(seqPlayer->playerNo, flag);
+        SND_PauseSeq(seqPlayer->playerNo, flag);
         seqPlayer->pauseFlag = flag;
     }
 }
@@ -447,9 +447,9 @@ static void InsertPrioList(NNSSndSeqPlayer *seqPlayer) {
 
 static void ForceStopSeq(NNSSndSeqPlayer *seqPlayer) {
     if (seqPlayer->status == NNS_SND_SEQ_PLAYER_STATUS_FADEOUT) {
-        func_0207d36c(seqPlayer->playerNo, SND_VOLUME_DB_MIN);
+        SND_SetPlayerVolume(seqPlayer->playerNo, SND_VOLUME_DB_MIN);
     }
-    func_0207d300(seqPlayer->playerNo);
+    SND_StopSeq(seqPlayer->playerNo);
     ShutdownPlayer(seqPlayer);
 }
 

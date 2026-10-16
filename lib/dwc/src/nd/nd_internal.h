@@ -2,44 +2,21 @@
 #define POKEBW2_DWC_ND_INTERNAL_H
 
 #include "types.h"
+#include "dwc/apinfo.h"
+#include "dwc/bm.h"
+#include "dwc/common.h"
+#include "dwc/error.h"
+#include "dwc/memfunc.h"
 #include "dwc/nhttp.h"
 #include "nitro/os.h"
 
-// What nd.c calls outside itself, none of it with a name in the ROM: the Wi-Fi library's allocator and error in the
-// main module, the C library, and the HTTP client's calls in the front half of overlay 189 (the sources before nd.c),
-// whose header will take the last group
+// What nd.c calls outside itself, none of it with a name in the ROM: the Wi-Fi library in the main module (its
+// allocator, whose type is 10 for everything here, the one error that it keeps, the access point's information and
+// the console's Wi-Fi ID), the C library, and the HTTP client's calls in the front half of overlay 189 (the sources
+// before nd.c), whose header will take the last group
 
-// The main module's: the Wi-Fi library's allocator (the type is 10 for everything here), and the one error that the
-// library keeps
-void *func_020586f4(int type, u32 size, int align);
-void func_02058728(int type, void *ptr, int unused);
-BOOL func_020584b0(void);
-void func_020584cc(int type, int code);
-int func_02058390(int *code);
-// Formats a text like snprintf
-int func_0207a2c0(char *dest, u32 size, const char *format, ...);
-// Encodes a text of srcLen bytes into dest, which holds size bytes; the length, or -1
-int func_020580b8(const char *src, int srcLen, char *dest, int size);
-// Waits for a thread to end: NitroSDK's OS_JoinThread
-void OS_JoinThread(OSThread *thread);
-
-// What the access point's information is, as the Wi-Fi library fills it
-typedef struct NdApInfo {
-    int type;
-    int unk4;
-    u8 unk8[4];
-    char spot[9];
-    u8 unk15[0x2b];
-} NdApInfo;
-BOOL func_0205b29c(NdApInfo *info);
-// The identifiers of the console, as the Wi-Fi library fills them in
-typedef struct NdConsoleIds {
-    u64 id;
-    u8 unk8[12];
-} NdConsoleIds;
-void func_02056a90(NdConsoleIds *ids);
-
-// The C library
+// The C library's string functions, not taken from <string.h>: MWCC builds them in place (strlen, memcpy of a size it
+// knows) when <string.h> declares them, where the ROM calls them
 u32 strlen(const char *s);
 char *strncpy(char *dest, const char *src, u32 size);
 int strncmp(const char *a, const char *b, u32 size);

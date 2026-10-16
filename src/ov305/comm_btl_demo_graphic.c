@@ -127,8 +127,8 @@ static void CommBtlDemoGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sCommBtlDemoLights); i++) {
         GFL_G3DSysLightSet(i, &sCommBtlDemoLights[i]);
@@ -140,7 +140,7 @@ CommBtlDemoGraphic *CommBtlDemoGraphic_Create(u32 layout, HeapID heapId) {
     CommBtlDemoGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(CommBtlDemoGraphic), FALSE, "comm_btl_demo_graphic.c", 436);
 
-    sys_memset(graphic, 0, sizeof(CommBtlDemoGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(CommBtlDemoGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -169,7 +169,7 @@ void CommBtlDemoGraphic_Free(CommBtlDemoGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(CommBtlDemoGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(CommBtlDemoGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -200,7 +200,7 @@ static void CommBtlDemoGraphic_VBlank(TCB *tcb, void *data) {
 static void CommBtlDemoBG_Init(CommBtlDemoBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(CommBtlDemoBG));
+    MI_CpuFill8(bg, 0, sizeof(CommBtlDemoBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sCommBtlDemoLCDConfig);
@@ -219,7 +219,7 @@ static void CommBtlDemoBG_Free(CommBtlDemoBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(CommBtlDemoBG));
+    MI_CpuFill8(bg, 0, sizeof(CommBtlDemoBG));
 }
 
 static void CommBtlDemoBG_Update(CommBtlDemoBG *bg) {
@@ -230,7 +230,7 @@ static void CommBtlDemoBG_VBlank(CommBtlDemoBG *bg) {
 }
 
 static void CommBtlDemoClAct_Init(CommBtlDemoClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(CommBtlDemoClAct));
+    MI_CpuFill8(clact, 0, sizeof(CommBtlDemoClAct));
     ClActSys_Create(&sCommBtlDemoClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -241,7 +241,7 @@ static void CommBtlDemoClAct_Init(CommBtlDemoClAct *clact, const BGSysVRAMConfig
 static void CommBtlDemoClAct_Free(CommBtlDemoClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(CommBtlDemoClAct));
+    MI_CpuFill8(clact, 0, sizeof(CommBtlDemoClAct));
 }
 
 static void CommBtlDemoClAct_Update(CommBtlDemoClAct *clact) {

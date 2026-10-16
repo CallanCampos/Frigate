@@ -44,7 +44,7 @@ static BOOL ZukanDetail_Init(GameProc *proc, u32 *state, void *param_, void *wor
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN_DETAIL, 0x90000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZukanDetailWork), HEAPID_ZUKAN_DETAIL);
-    sys_memset(wk, 0, sizeof(ZukanDetailWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanDetailWork));
     wk->heapId = HEAPID_ZUKAN_DETAIL;
     param->result = ZUKAN_DETAIL_RESULT_CLOSE;
 

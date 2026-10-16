@@ -1394,7 +1394,7 @@ static void WifiP2PMatch_CreateTouchBar(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
     TouchBarSetup setup;
 
     if (wk->touchBar == NULL) {
-        sys_memset(&setup, 0, sizeof(setup));
+        MI_CpuFill8(&setup, 0, sizeof(setup));
         setup.items = items;
         setup.count = NELEMS(items);
         setup.unit = wk->clActUnit;
@@ -3375,7 +3375,7 @@ static void WifiP2PMatch_OnFriendCode(int code, int param, void *work) {
 
 // Starts the network with the Wi-Fi heap of the machine, or only gives it the init data again
 static void WifiP2PMatch_NetInit(WIFIP2PMATCH_WORK *wk, BOOL init) {
-    if (hw_isDSi()) {
+    if (OS_IsRunOnTwl()) {
         sWifiP2PMatchNetInit.wifiHeapSize = 0x79000;
     } else {
         sWifiP2PMatchNetInit.wifiHeapSize = 0x5e400;
@@ -3759,7 +3759,7 @@ static void WifiP2PMatch_RoomExit(WIFIP2PMATCH_WORK *wk) {
         wk->moveObj[i] = NULL;
         WifiP2PMatch_ViewClearFriendState(wk, i + 1);
     }
-    sys_memset(wk->matchStatus, 0, sizeof(wk->matchStatus));
+    MI_CpuFill8(wk->matchStatus, 0, sizeof(wk->matchStatus));
 }
 
 // The person of the room who is a friend, or NULL
@@ -4122,11 +4122,11 @@ static int WifiP2PMatch_StateConnectStart(WIFIP2PMATCH_WORK *wk, int seq) {
             ListMenuCore_FreeOptionList(wk->subMenuOptions);
             wk->subMenuOptions = NULL;
         }
-        sys_memset(wk->index2No, 0, sizeof(wk->index2No));
-        sys_memset(wk->index2NoBackup, 0, sizeof(wk->index2NoBackup));
-        sys_memset(wk->matchStatus, 0, sizeof(wk->matchStatus));
-        sys_memset(wk->matchGameMode, 0, sizeof(wk->matchGameMode));
-        sys_memset(wk->matchVChat, 0, sizeof(wk->matchVChat));
+        MI_CpuFill8(wk->index2No, 0, sizeof(wk->index2No));
+        MI_CpuFill8(wk->index2NoBackup, 0, sizeof(wk->index2NoBackup));
+        MI_CpuFill8(wk->matchStatus, 0, sizeof(wk->matchStatus));
+        MI_CpuFill8(wk->matchGameMode, 0, sizeof(wk->matchGameMode));
+        MI_CpuFill8(wk->matchVChat, 0, sizeof(wk->matchVChat));
         WifiP2PMatch_DrawTitle(wk);
         WifiP2PMatch_NetInit(wk, FALSE);
         func_020423e0();
@@ -4308,7 +4308,7 @@ static void WifiP2PMatch_StartRoom(WIFIP2PMATCH_WORK *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_WIFIP2PMATCH, WIFIP2PMATCH_HEAP);
     WifiP2PMatch_ResetVChat(wk);
     WifiP2PMatch_FreeRecruitMenu(wk);
-    sys_memset(wk->index2NoBackup, 0, sizeof(wk->index2NoBackup));
+    MI_CpuFill8(wk->index2NoBackup, 0, sizeof(wk->index2NoBackup));
     if (wk->subMenuOptions != NULL) {
         BmpWin_Free(wk->subWin);
         BmpMenuList_Free(wk->subList, NULL, NULL);
@@ -4431,7 +4431,7 @@ static int WifiP2PMatch_UpdateFriendsInRoom(WIFIP2PMATCH_WORK *wk) {
                 }
             }
         }
-        sys_memcpy(wk->index2No, wk->index2NoBackup, sizeof(wk->index2No));
+        MI_CpuCopy8(wk->index2No, wk->index2NoBackup, sizeof(wk->index2No));
         if (in || out) {
             WifiP2PMatch_ViewRequestRedrawAll(wk);
         }
@@ -4653,7 +4653,7 @@ static int WifiP2PMatch_StateRoom(WIFIP2PMATCH_WORK *wk, int seq) {
             u32 friendNo = WIFI_MCR_PlayerSelect(&wk->room);
 
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            sys_memcpy(WifiP2PMatch_GetFriendStatusData(friendNo - 1), &wk->targetStatus, sizeof(WIFI_STATUS));
+            MI_CpuCopy8(WifiP2PMatch_GetFriendStatusData(friendNo - 1), &wk->targetStatus, sizeof(WIFI_STATUS));
             wk->seq = WIFIP2PMATCH_SEQ_FRIEND_SELECT;
             WifiP2PMatch_ViewCloseDetailIfOpen(wk, WIFIP2PMATCH_HEAP);
             wk->unk135A = 1;
@@ -4748,7 +4748,7 @@ static int WifiP2PMatch_StateRoomMessage(WIFIP2PMATCH_WORK *wk, int seq) {
             u32 friendNo = WIFI_MCR_PlayerSelect(&wk->room);
 
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            sys_memcpy(WifiP2PMatch_GetFriendStatusData(friendNo - 1), &wk->targetStatus, sizeof(WIFI_STATUS));
+            MI_CpuCopy8(WifiP2PMatch_GetFriendStatusData(friendNo - 1), &wk->targetStatus, sizeof(WIFI_STATUS));
             wk->seq = WIFIP2PMATCH_SEQ_FRIEND_SELECT;
             WifiP2PMatch_ViewCloseDetailIfOpen(wk, WIFIP2PMATCH_HEAP);
             wk->unk135A = 1;
@@ -5922,7 +5922,7 @@ static int WifiP2PMatch_StateNegotiationWait(WIFIP2PMATCH_WORK *wk, int seq) {
         }
         if (wk->timer == 0) {
             if (func_0204044c(func_02040440())) {
-                sys_memset(wk->connectGameMode, 0, sizeof(wk->connectGameMode));
+                MI_CpuFill8(wk->connectGameMode, 0, sizeof(wk->connectGameMode));
                 func_02040624(func_02040440(), 0xe, 10);
                 wk->unk244 = 0;
                 WifiP2PMatch_PrintMessage(wk, Bank0416_Text_CommunicatingPleaseStandBy_2, FALSE);
@@ -6389,7 +6389,7 @@ static const TouchRect sWifiP2PMatchViewButtonRects[WIFIP2PMATCH_VIEW_FRIEND_NUM
 
 // Creates the friends' page of the lower screen
 static void WifiP2PMatch_ViewInit(WIFIP2PMATCH_WORK *wk, ArcTool *arc, u32 heapId) {
-    sys_memset(&wk->view, 0, sizeof(WIFIP2PMATCH_VIEW));
+    MI_CpuFill8(&wk->view, 0, sizeof(WIFIP2PMATCH_VIEW));
     GFL_BGSysSetBGEnabledB(7, TRUE);
     GFL_BGSysSetBGEnabledB(8, FALSE);
     wk->view.buttonMan = GFL_BMN_Create(sWifiP2PMatchViewButtonRects, WifiP2PMatch_ViewButtonCallback, wk, heapId);
@@ -6831,7 +6831,7 @@ static BOOL WifiP2PMatch_ProcInit(GameProc *proc, u32 *state, void *param, void 
 
     GFL_HeapCreateChild(1, WIFIP2PMATCH_HEAP | 0x8000, 0xa4000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(WIFIP2PMATCH_WORK), WIFIP2PMATCH_HEAP);
-    sys_memset(wk, 0, sizeof(WIFIP2PMATCH_WORK));
+    MI_CpuFill8(wk, 0, sizeof(WIFIP2PMATCH_WORK));
     func_02042dac(wk);
     wk->myStatus = parent->buffer;
     wk->save = parent->save;

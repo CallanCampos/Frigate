@@ -244,7 +244,7 @@ static void func_ov194_021bedfc(PokemonTradeWork *wk) {
 // GFLib's GFL_STD_MemCopy, an inline over the copy: the box's copy reads its destination before the call that gives
 // the source
 static inline void GFL_STD_MemCopy(const void *src, void *dest, u32 size) {
-    sys_memcpy(src, dest, size);
+    MI_CpuCopy8(src, dest, size);
 }
 
 // The copies of the mail and of the records are inlined, and not `static`: each has a file name string of its own
@@ -267,36 +267,36 @@ static void *func_ov194_021bef14(GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     void *copy = GFL_HeapAllocate(heapId, func_02009b5c(), FALSE, "pokemontrade_save.c", 431);
     u32 size = func_02009b5c();
-    sys_memcpy(getUnityTower_SurveySaveBlkAddrress(save), copy, size);
+    MI_CpuCopy8(getUnityTower_SurveySaveBlkAddrress(save), copy, size);
     return copy;
 }
 
 static void func_ov194_021bef58(GameData *gameData, void *copy) {
-    sys_memcpy(copy, getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), func_02009b5c());
+    MI_CpuCopy8(copy, getUnityTower_SurveySaveBlkAddrress(GameData_GetSaveControl(gameData)), func_02009b5c());
     GFL_HeapFree(copy);
 }
 
 static void *func_ov194_021bef7c(GameData *gameData, HeapID heapId) {
     void *copy = GFL_HeapAllocate(heapId, getSizeofPokedexData(), FALSE, "pokemontrade_save.c", 460);
     u32 size = getSizeofPokedexData();
-    sys_memcpy(GameData_GetPokedex(gameData), copy, size);
+    MI_CpuCopy8(GameData_GetPokedex(gameData), copy, size);
     return copy;
 }
 
 static void func_ov194_021befbc(GameData *gameData, void *copy) {
-    sys_memcpy(copy, GameData_GetPokedex(gameData), getSizeofPokedexData());
+    MI_CpuCopy8(copy, GameData_GetPokedex(gameData), getSizeofPokedexData());
     GFL_HeapFree(copy);
 }
 
 static void *func_ov194_021befdc(GameData *gameData, HeapID heapId) {
     void *copy = GFL_HeapAllocate(heapId, func_0200a4b8(), FALSE, "pokemontrade_save.c", 489);
     u32 size = func_0200a4b8();
-    sys_memcpy(func_02017980(gameData), copy, size);
+    MI_CpuCopy8(func_02017980(gameData), copy, size);
     return copy;
 }
 
 static void func_ov194_021bf01c(GameData *gameData, void *copy) {
-    sys_memcpy(copy, func_02017980(gameData), func_0200a4b8());
+    MI_CpuCopy8(copy, func_02017980(gameData), func_0200a4b8());
     GFL_HeapFree(copy);
 }
 
@@ -324,7 +324,7 @@ static void func_ov194_021bf03c(void *work) {
     if (wk->backup.box != NULL) {
         GFL_HeapFree(wk->backup.box);
     }
-    sys_memset(&wk->backup, 0, sizeof(wk->backup));
+    MI_CpuFill8(&wk->backup, 0, sizeof(wk->backup));
     wk->unk11F7 = 0;
 }
 
@@ -337,12 +337,12 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
         // The save is fetched and left unused, as if the block once came from it
         GameData_GetSaveControl(gameData);
         block = func_02009790(gameData);
-        sys_memcpy(copy, block, func_020097a0());
+        MI_CpuCopy8(copy, block, func_020097a0());
         GFL_HeapFree(copy);
     }
     if ((copy = wk->backup.records) != NULL) {
         GameRecords *records = GameData_GetRecords(wk->gameData);
-        sys_memcpy(copy, records, func_020093d0());
+        MI_CpuCopy8(copy, records, func_020093d0());
         GFL_HeapFree(copy);
     }
     if (wk->backup.survey != NULL) {
@@ -362,13 +362,13 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
     }
     if (wk->backup.box != NULL) {
         u32 size = getSizeofBox();
-        sys_memcpy(wk->backup.box, BoxSaveAccessor_GetBox(wk->boxes, wk->param->box), size);
+        MI_CpuCopy8(wk->backup.box, BoxSaveAccessor_GetBox(wk->boxes, wk->param->box), size);
         GFL_HeapFree(wk->backup.box);
     }
     if (wk->backup.chatot) {
         setChatotPresent(getChatterDataAddress(wk->gameData));
     }
-    sys_memset(&wk->backup, 0, sizeof(wk->backup));
+    MI_CpuFill8(&wk->backup, 0, sizeof(wk->backup));
 }
 
 // Forgets the Chatot's cry if the only Chatot of the party is traded away

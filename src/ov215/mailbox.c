@@ -20,7 +20,7 @@ static BOOL MailBox_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MAILBOX_PROC, 0x10000);
     mailbox = GFL_ProcInitSubsystem(proc, sizeof(MailBoxWork), HEAPID_MAILBOX_PROC);
-    sys_memset32_fast(0, mailbox, sizeof(MailBoxWork));
+    MIi_CpuClearFast(0, mailbox, sizeof(MailBoxWork));
     mailbox->param = data;
     mailbox->mails = func_02009790(data->gameData);
     mailbox->nextState = MAILBOX_STATE_WIPE_IN;

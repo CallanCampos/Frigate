@@ -77,7 +77,7 @@ void FieldChunkAccessor_GC_GetTerrain(MapTerrainSamplerOutput *out, const void *
     const GCChunkFile *file = container;
     MapTerrainSamplerOutput terrain;
 
-    sys_memset(&terrain, 0, sizeof(terrain));
+    MI_CpuFill8(&terrain, 0, sizeof(terrain));
     FieldChunkAccessor_GetTerrainCore(&terrain, 0, (u8 *)file + file->terrainOffsets[0], pos, size, baseY);
     FieldChunkAccessor_GetTerrainCore(&terrain, 1, (u8 *)file + file->terrainOffsets[1], pos, size, baseY);
     *out = terrain;
@@ -89,7 +89,7 @@ void FieldChunkAccessor_GC_GetTerrainBaseLayer(MapTerrainSamplerOutput *out, con
     const GCChunkFile *file = container;
     MapTerrainSamplerOutput terrain;
 
-    sys_memset(&terrain, 0, sizeof(terrain));
+    MI_CpuFill8(&terrain, 0, sizeof(terrain));
     FieldChunkAccessor_GetTerrainCore(&terrain, 0, (u8 *)file + file->terrainOffsets[0], pos, size, baseY);
     *out = terrain;
     out->layerCount = 1;

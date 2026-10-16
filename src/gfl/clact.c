@@ -339,8 +339,8 @@ static const u16 sSurfaceTypes[2] = { NNS_G2D_SURFACETYPE_MAIN2D, NNS_G2D_SURFAC
 // Unused
 const u16 data_02093e44[2] = { NNS_G2D_VRAM_TYPE_2DMAIN, NNS_G2D_VRAM_TYPE_2DSUB };
 static void (*const sTransferFuncs[2])(const void *src, u32 offset, u32 size) = {
-    gfxUploadObjCharA,
-    gfxUploadObjCharB,
+    GX_LoadOBJ,
+    GXS_LoadOBJ,
 };
 // Global, as only functions that are never compiled read them
 const NNSG2dUserExAnimSequenceAttr *(*const gClActAnimGetSeqAttrFuncs[3])(ClActAnim *anim, u32 sequence) = {
@@ -487,7 +487,7 @@ void ClActSys_Create(const ClActSysSetup *setup, const BGSysVRAMConfig *vramConf
     int i = 0;
 
     g_ClActSys = GFL_HeapAllocate(heapId, sizeof(ClActSys), FALSE, "clact.c", 671);
-    sys_memset(g_ClActSys, 0, sizeof(ClActSys));
+    MI_CpuFill8(g_ClActSys, 0, sizeof(ClActSys));
     resSetup.charCount = setup->charCount;
     resSetup.plttCount = setup->plttCount;
     resSetup.cellAnimCount = setup->cellAnimCount;
@@ -604,14 +604,14 @@ void func_0204ba40(u32 chars, NNSG2dCharacterData *character) {
     if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
         u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
 
-        cp15_flushDC(character->rawData, character->size);
-        gfxUploadObjCharA(character->rawData, addr, character->size);
+        DC_FlushRange(character->rawData, character->size);
+        GX_LoadOBJ(character->rawData, addr, character->size);
     }
     if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DSUB)) {
         u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DSUB);
 
-        cp15_flushDC(character->rawData, character->size);
-        gfxUploadObjCharB(character->rawData, addr, character->size);
+        DC_FlushRange(character->rawData, character->size);
+        GXS_LoadOBJ(character->rawData, addr, character->size);
     }
 }
 
@@ -620,16 +620,16 @@ void func_0204bab8(u32 chars, void *src, u32 size, u32 offset, u32 vramType) {
         if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
             u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
 
-            cp15_flushDC(src, size);
-            gfxUploadObjCharA(src, addr + offset, size);
+            DC_FlushRange(src, size);
+            GX_LoadOBJ(src, addr + offset, size);
         }
     }
     if (vramType == CLACT_VRAM_SUB || vramType == CLACT_VRAM_BOTH) {
         if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DSUB)) {
             u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DSUB);
 
-            cp15_flushDC(src, size);
-            gfxUploadObjCharB(src, addr + offset, size);
+            DC_FlushRange(src, size);
+            GXS_LoadOBJ(src, addr + offset, size);
         }
     }
 }
@@ -693,14 +693,14 @@ void func_0204bd10(u32 palette, NNSG2dPaletteData *data, u32 count) {
     if (NNS_G2dIsImagePaletteReadyToUse(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
         u32 addr = NNS_G2dGetImagePaletteLocation(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
 
-        cp15_flushDC(data->rawData, size);
-        gfxUploadStdPaletteObjA(data->rawData, addr, size);
+        DC_FlushRange(data->rawData, size);
+        GX_LoadOBJPltt(data->rawData, addr, size);
     }
     if (NNS_G2dIsImagePaletteReadyToUse(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DSUB)) {
         u32 addr = NNS_G2dGetImagePaletteLocation(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DSUB);
 
-        cp15_flushDC(data->rawData, size);
-        gfxUploadStdPaletteObjB(data->rawData, addr, size);
+        DC_FlushRange(data->rawData, size);
+        GXS_LoadOBJPltt(data->rawData, addr, size);
     }
 }
 
@@ -782,7 +782,7 @@ ClActUnit *func_0204bf1c(u16 count, u8 priority, HeapID heapId) {
     int i = 0;
 
     unit = GFL_HeapAllocate(heapId, sizeof(ClActUnit), FALSE, "clact.c", 1795);
-    sys_memset(unit, 0, sizeof(ClActUnit));
+    MI_CpuFill8(unit, 0, sizeof(ClActUnit));
     unit->actors = GFL_HeapAllocate(heapId, count * sizeof(ClActor), FALSE, "clact.c", 1799);
     unit->count = count;
     unit->priority = priority;
@@ -1380,7 +1380,7 @@ static void func_0204c93c(NNSG2dRenderSurface *surface, u32 screen) {
 static BOOL func_0204c94c(ClActOamMan *man, const GXOamAttr *oam, u16 affineIdx, u16 palette, u32 mode) {
     GXOamAttr attr;
 
-    sys_memcpy(oam, &attr, sizeof(GXOamAttr));
+    MI_CpuCopy8(oam, &attr, sizeof(GXOamAttr));
     if (mode == 0) {
         attr.cParam += palette;
     } else if (mode == 1) {
@@ -1579,7 +1579,7 @@ static void func_0204ce18(ClActTransfer *transfer, u32 count, HeapID heapId) {
 
     transfer->tasks = GFL_HeapAllocate(heapId, count * sizeof(ClActTransferTask), FALSE, "clact.c", 5044);
     for (; i < transfer->count; i++) {
-        sys_memset(&transfer->tasks[i], 0, sizeof(ClActTransferTask));
+        MI_CpuFill8(&transfer->tasks[i], 0, sizeof(ClActTransferTask));
     }
 }
 
@@ -1594,7 +1594,7 @@ static void func_0204ce6c(ClActTransfer *transfer) {
     for (i = 0; i < transfer->count; i++) {
         if (transfer->tasks[i].src != NULL) {
             func_0204cf14(&transfer->tasks[i]);
-            sys_memset(&transfer->tasks[i], 0, sizeof(ClActTransferTask));
+            MI_CpuFill8(&transfer->tasks[i], 0, sizeof(ClActTransferTask));
         }
     }
 }
@@ -1633,7 +1633,7 @@ static void func_0204cf08(ClActTransferTask *task, u32 screen, u32 dst, void *sr
 }
 
 static void func_0204cf14(ClActTransferTask *task) {
-    cp15_flushDC(task->src, task->size);
+    DC_FlushRange(task->src, task->size);
     sTransferFuncs[task->screen](task->src, task->dst, task->size);
 }
 
@@ -1715,7 +1715,7 @@ static ClActor *func_0204d020(ClActor *tail, u8 priority) {
 }
 
 static void func_0204d040(ClActor *actor) {
-    sys_memset(actor, 0, sizeof(ClActor));
+    MI_CpuFill8(actor, 0, sizeof(ClActor));
     actor->unk54 = FX32_ONE;
     NNS_G2dInitImageProxy(&actor->imgProxy);
     NNS_G2dInitImagePaletteProxy(&actor->pltProxy);
@@ -1802,7 +1802,7 @@ static void func_0204d1cc(ClActAnim *anim, const ClActResSetup *res, HeapID heap
 
 static void func_0204d1f4(ClActAnim *anim) {
     sAnimFreeFuncs[anim->type](anim);
-    sys_memset(anim, 0, sizeof(ClActAnim));
+    MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
 static u32 func_0204d214(const ClActResSetup *res) {
@@ -1850,17 +1850,17 @@ static void func_0204d2a8(ClActAnim *anim, const ClActResSetup *res, HeapID heap
 }
 
 static void func_0204d30c(ClActAnim *anim) {
-    sys_memset(anim, 0, sizeof(ClActAnim));
+    MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
 static void func_0204d318(ClActAnim *anim) {
     NNS_G2dFreeCellTransferStateHandle(anim->transferHandle);
-    sys_memset(anim, 0, sizeof(ClActAnim));
+    MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
 static void func_0204d330(ClActAnim *anim) {
     GFL_HeapFree(anim->mcWork);
-    sys_memset(anim, 0, sizeof(ClActAnim));
+    MI_CpuFill8(anim, 0, sizeof(ClActAnim));
 }
 
 static void func_0204d348(ClActAnim *anim, u16 sequence) {
@@ -2120,7 +2120,7 @@ static void *func_0204d7b0(ArcTool *arc, u32 fileId, BOOL compressed, HeapID hea
         void *file = GFL_ArcToolReadHeapNew(arc, fileId, HEAPID_TAIL(heapId));
 
         data = GFL_HeapAllocate(heapId, *(u32 *)file >> 8, FALSE, "clact.c", 7335);
-        sys_uncomp_lz1x(file, data);
+        MI_UncompressLZ8(file, data);
         GFL_HeapFree(file);
     } else {
         data = GFL_ArcToolReadHeapNew(arc, fileId, HEAPID_TAIL(heapId));
@@ -2241,23 +2241,23 @@ static void func_0204d9f4(ClActResMan *man, u32 idx, void *file, u32 vramType, u
             pltt->size = limit - offset;
         }
         if (func_0204d798(vramType, CLACT_VRAM_MAIN)) {
-            banks = gfxGetObjExtPltBanksA();
+            banks = GX_GetBankForOBJExtPltt();
             if (extended) {
-                gfxSetLCDCBanks(banks);
+                GX_SetBankForLCDC(banks);
             }
             NNS_G2dLoadPalette(pltt, offset, NNS_G2D_VRAM_TYPE_2DMAIN, &res->proxy);
             if (extended) {
-                gfxSetObjExtPltBanksA(banks);
+                GX_SetBankForOBJExtPltt(banks);
             }
         }
         if (func_0204d798(vramType, CLACT_VRAM_SUB)) {
-            banks = gfxGetObjExtPltBanksB();
+            banks = GX_GetBankForSubOBJExtPltt();
             if (extended) {
-                gfxSetLCDCBanks(banks);
+                GX_SetBankForLCDC(banks);
             }
             NNS_G2dLoadPalette(pltt, offset, NNS_G2D_VRAM_TYPE_2DSUB, &res->proxy);
             if (extended) {
-                gfxSetObjExtPltBanksB(banks);
+                GX_SetBankForSubOBJExtPltt(banks);
             }
         }
         man->pltts[idx].free = FALSE;
@@ -2281,25 +2281,25 @@ static void func_0204db2c(ClActResMan *man, u32 idx, void *file, u32 vramType, u
     if (NNS_G2dGetUnpackedPaletteData(file, &pltt)) {
         NNS_G2dInitImagePaletteProxy(&res->proxy);
         if (func_0204d798(vramType, CLACT_VRAM_MAIN)) {
-            u32 banks = gfxGetObjExtPltBanksA();
+            u32 banks = GX_GetBankForOBJExtPltt();
 
             if (extended) {
-                gfxSetLCDCBanks(banks);
+                GX_SetBankForLCDC(banks);
             }
             NNS_G2dLoadPaletteEx(pltt, cmpInfo, offset, NNS_G2D_VRAM_TYPE_2DMAIN, &res->proxy);
             if (extended) {
-                gfxSetObjExtPltBanksA(banks);
+                GX_SetBankForOBJExtPltt(banks);
             }
         }
         if (func_0204d798(vramType, CLACT_VRAM_SUB)) {
-            u32 banks = gfxGetObjExtPltBanksB();
+            u32 banks = GX_GetBankForSubOBJExtPltt();
 
             if (extended) {
-                gfxSetLCDCBanks(banks);
+                GX_SetBankForLCDC(banks);
             }
             NNS_G2dLoadPaletteEx(pltt, cmpInfo, offset, NNS_G2D_VRAM_TYPE_2DSUB, &res->proxy);
             if (extended) {
-                gfxSetObjExtPltBanksB(banks);
+                GX_SetBankForSubOBJExtPltt(banks);
             }
         }
         man->pltts[idx].free = FALSE;

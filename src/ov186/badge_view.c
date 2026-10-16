@@ -342,7 +342,7 @@ static BOOL BadgeView_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_OvlLoad(OVERLAY_ID(147));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TRAINER_CARD_SCREEN, 0x28000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(BadgeViewWork), HEAPID_TRAINER_CARD_SCREEN);
-    sys_memset32_fast(0, wk, sizeof(BadgeViewWork));
+    MIi_CpuClearFast(0, wk, sizeof(BadgeViewWork));
     BadgeView_InitWork(wk, param);
     BadgeView_InitVRAM();
     BadgeView_InitBG(wk);
@@ -427,7 +427,7 @@ static void BadgeView_InitWork(BadgeViewWork *wk, TrainerCardParam *param) {
     wk->expandBuf = GFL_StrBufCreate(104, HEAPID_TRAINER_CARD_SCREEN);
     wk->wordSet = GFL_WordSetSystemCreate(8, 64, HEAPID_TRAINER_CARD_SCREEN);
     wk->buffer = GFL_HeapAllocate(HEAPID_TRAINER_CARD_SCREEN, 0x600, FALSE, "badge_view.c", 770);
-    sys_memset(wk->buffer, 0, 0x600);
+    MI_CpuFill8(wk->buffer, 0, 0x600);
     wk->vblankTask = GFL_VBlankTCBAdd(BadgeView_VBlank, wk, 0);
     wk->badgeCount = BADGE_COUNT;
     wk->unk1C4 = -1;
@@ -557,8 +557,8 @@ static void BadgeView_LoadBG(BadgeViewWork *wk) {
     wk->palRes = GFL_G2DIOReadNCLRArc(arc, 0, &wk->palData, HEAPID_TRAINER_CARD_SCREEN);
     file = GFL_G2DIOReadNCLR(ARCID_TRAINER_CARD_GRA, 7, &palette, HEAPID_TRAINER_CARD_SCREEN);
     colors = palette->rawData;
-    sys_memcpy(colors, wk->palette[0], 0x20);
-    sys_memcpy(colors + 16, wk->palette[1], 0x20);
+    MI_CpuCopy8(colors, wk->palette[0], 0x20);
+    MI_CpuCopy8(colors + 16, wk->palette[1], 0x20);
     GFL_HeapFree(file);
 }
 
@@ -1181,7 +1181,7 @@ static void BadgeView_SavePolish(BadgeViewWork *wk) {
     int i;
 
     RTC_GetCachedDateTime(&date, &time);
-    seconds = func_0207d12c(&date, &time);
+    seconds = RTC_ConvertDateTimeToSecond(&date, &time);
     saveSecondsTime(wk->timeSig, seconds, seconds >> 32);
     for (i = 0; i < BADGE_COUNT; i++) {
         func_020092b8(wk->timeSig, i, wk->polish[i]);
@@ -1199,9 +1199,9 @@ static void BadgeView_LoadPolish(BadgeViewWork *wk) {
     s64 decay;
     int i;
 
-    func_0207d244(&savedDate, &savedTime, saved);
+    RTC_ConvertSecondToDateTime(&savedDate, &savedTime, saved);
     RTC_GetCachedDateTime(&nowDate, &nowTime);
-    hours = (func_0207d12c(&nowDate, &nowTime) - saved) / 3600;
+    hours = (RTC_ConvertDateTimeToSecond(&nowDate, &nowTime) - saved) / 3600;
     if (hours < 0) {
         hours = 0;
     }

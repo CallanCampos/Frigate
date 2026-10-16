@@ -254,9 +254,9 @@ static void ItemMenu_SetItemText(ItemMenuWork *work, u32 index, u32 item, BOOL p
 static void ItemMenu_SwapItems(ItemMenuWork *work, s32 a, s32 b) {
     BagItem temp;
 
-    sys_memcpy(&work->items[a], &temp, sizeof(BagItem));
-    sys_memcpy(&work->items[b], &work->items[a], sizeof(BagItem));
-    sys_memcpy(&temp, &work->items[b], sizeof(BagItem));
+    MI_CpuCopy8(&work->items[a], &temp, sizeof(BagItem));
+    MI_CpuCopy8(&work->items[b], &work->items[a], sizeof(BagItem));
+    MI_CpuCopy8(&temp, &work->items[b], sizeof(BagItem));
 }
 
 static void ItemMenu_MoveItem(ItemMenuWork *work, s32 from, s32 to) {
@@ -1032,7 +1032,7 @@ static void ItemMenu_StateList(ItemMenuWork *work) {
         if (ItemMenu_GetItemCount(work) <= 1) {
             return;
         }
-        sys_memset(work->items, 0, sizeof(work->items));
+        MI_CpuFill8(work->items, 0, sizeof(work->items));
         BagSave_CopyPocket(work->bag, work->items, work->pocket, TRUE);
         func_0204c488(work->listCursor, 2);
         ItemMenuDisp_SetMoveButtons(work, FALSE);
@@ -2156,7 +2156,7 @@ static BOOL ItemMenuProc_Init(GameProc *proc, u32 *state, void *param, void *dat
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BAG, 0x34000);
     work = GFL_ProcInitSubsystem(proc, sizeof(ItemMenuWork), HEAPID_BAG);
-    sys_memset(work, 0, sizeof(ItemMenuWork));
+    MI_CpuFill8(work, 0, sizeof(ItemMenuWork));
     GCTX_HIDGetRepeat(&work->savedRepeatWait, &work->savedRepeatStart);
     work->heapId = HEAPID_BAG;
     work->buttonsActive = TRUE;

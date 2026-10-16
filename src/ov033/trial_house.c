@@ -339,7 +339,7 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
         record->isDouble = FALSE;
     }
     record->points = points;
-    sys_memset(record->pokemon, 0, sizeof(record->pokemon));
+    MI_CpuFill8(record->pokemon, 0, sizeof(record->pokemon));
     for (i = 0; i < (s32)work->capacity; i++) {
         pokemon = &record->pokemon[i];
         pkm = PokeParty_GetPkm(work->party, i);
@@ -351,8 +351,8 @@ void TrialHouseCalcPointScore(GameSystem *gsys, TrialHouseWork *work, u16 *rankO
         extraSaveControl = GameData_GetSaveControl(GSYS_GetGameData(gsys));
         buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x277);
         if (func_02007560(extraSaveControl, 5, 0x8004, buffer, 0x800) == 1) {
-            sys_memcpy((u8 *)getAddressOfExtraSaveBlk(extraSaveControl, 5, 0) + 0x5a0, thSave->unk38,
-                       sizeof(thSave->unk38));
+            MI_CpuCopy8((u8 *)getAddressOfExtraSaveBlk(extraSaveControl, 5, 0) + 0x5a0, thSave->unk38,
+                        sizeof(thSave->unk38));
         }
         GFL_HeapFree(buffer);
         freeIntermediateSaveExtraBlksAfterLoad2(extraSaveControl, 5);
@@ -436,7 +436,7 @@ GameEventReturnCode func_ov033_0217b3ac(GameEvent *event, u32 *state, void *arg)
         if (data->mode == 1) {
             BattleExamination_SetUsed(extraSave);
         } else {
-            sys_memset(extraSave, 0, BattleExamination_GetSize());
+            MI_CpuFill8(extraSave, 0, BattleExamination_GetSize());
         }
         func_020178c4(gameData, 5);
         (*state)++;

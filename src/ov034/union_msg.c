@@ -723,7 +723,7 @@ void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ru
 
     if (kind == 1) {
         rows = GFL_HeapAllocate(UNION_HEAPID, sizeof(UnionMenuRow) * 6, TRUE, "union_msg.c", 0x647);
-        sys_memcpy(sMenu_03f4, rows, sizeof(UnionMenuRow) * 6);
+        MI_CpuCopy8(sMenu_03f4, rows, sizeof(UnionMenuRow) * 6);
         rows[0].msg = Bank0399_Text_BattleFormatSingleBattle + ruleSel[0];
         rows[1].msg = Bank0399_Text_BattleRulesNoRestrictions + ruleSel[1];
         rows[2].msg = Bank0399_Text_WonderLauncher_2 + ruleSel[2];
@@ -731,7 +731,7 @@ void UnionMsg_CreateRuleMenu(UnionSystem *unisys, Field *field, int kind, u8 *ru
         GFL_HeapFree(rows);
     } else if (kind == 5) {
         rows = GFL_HeapAllocate(UNION_HEAPID, sizeof(UnionMenuRow) * 5, TRUE, "union_msg.c", 0x657);
-        sys_memcpy(sMenu_039c, rows, sizeof(UnionMenuRow) * 5);
+        MI_CpuCopy8(sMenu_039c, rows, sizeof(UnionMenuRow) * 5);
         rows[0].msg = Bank0399_Text_BattleRulesNoRestrictions + ruleSel[1];
         rows[1].msg = Bank0399_Text_WonderLauncher_2 + ruleSel[2];
         UnionMsg_CreateMenu(unisys, field, rows, count, &request);

@@ -97,9 +97,9 @@ static u32 CDemo_StateScript(CDemoWork *work) {
 static u32 CDemo_StateMovie(CDemoWork *work) {
     const CDemoMovie *movie = &CDEMO_MOVIES[work->param->demo];
     if (work->lastTick == 0) {
-        work->lastTick = clock();
+        work->lastTick = OS_GetTick();
     } else {
-        u64 now = clock();
+        u64 now = OS_GetTick();
         work->elapsedFrameTime += OS_TicksToMicroSeconds(now - work->lastTick);
         work->lastTick = now;
         if (work->elapsedFrameTime < 0x1046b)
@@ -138,10 +138,10 @@ static u32 CDemo_StateMovie(CDemoWork *work) {
 }
 static void CDemo_LoadMovieFrame(ArcTool *arc, u32 fileId, u32 offset, u32 size, u32 buffer) {
     void *data = GFL_ArcToolReadHeapNewLZ(arc, fileId, TRUE, HEAPID_TAIL(HEAPID_CDEMO));
-    cp15_flushDC(data, size);
+    DC_FlushRange(data, size);
     if (buffer == 0)
-        gfxUploadBGScreen2A(data, offset, size);
+        GX_LoadBG2Scr(data, offset, size);
     else
-        gfxUploadBGScreen3A(data, offset, size);
+        GX_LoadBG3Scr(data, offset, size);
     GFL_HeapFree(data);
 }

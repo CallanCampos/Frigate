@@ -1726,7 +1726,7 @@ BOOL func_ov059_021e7a28(VM *vm, FieldScriptEnv *env) {
     zoneId = Field_GetPlayerStateZoneID(field);
     index = ScriptReadAny(vm, env);
     var = ScriptReadVar(vm, env);
-    sys_memset(&key, 0, sizeof(key));
+    MI_CpuFill8(&key, 0, sizeof(key));
     switch (index) {
     case 0:
     case 1:

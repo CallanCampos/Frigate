@@ -21,7 +21,7 @@ MsgSearch *MsgSearch_Create(MsgData **files, u32 count, HeapID heapId) {
     MsgSearch *search = GFL_HeapAllocate(heapId, size, FALSE, "msgsearch.c", 64);
     u32 i;
 
-    sys_memset(search, 0, size);
+    MI_CpuFill8(search, 0, size);
     search->count = count;
     for (i = 0; i < count; i++) {
         search->files[i] = files[i];
@@ -43,7 +43,7 @@ u32 MsgSearch_Find(MsgSearch *search, u32 file, u32 unused, StrBuf *prefix, MsgS
     MsgData *msgData;
     u32 length = GFL_StrBufGetCharCount(prefix);
 
-    sys_memset32(0xffffffff, results, max * sizeof(MsgSearchResult));
+    MIi_CpuClear32(0xffffffff, results, max * sizeof(MsgSearchResult));
     if (length != 0) {
         lineCount = GFL_MsgDataGetLineCount(search->files[file]);
         msgData = search->files[file];

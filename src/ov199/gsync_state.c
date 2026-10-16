@@ -512,7 +512,7 @@ static void GSync_ReceivePokemon(GSyncWork *wk) {
         PartyPkm *pkm = GFL_HeapAllocate(wk->heapId, PokeParty_GetPkmRawSize(), TRUE, "gsync_state.c", 597);
         u32 size = PokeParty_GetPkmRawSize();
 
-        sys_memcpy(func_02009998(dreamWorld), pkm, size);
+        MI_CpuCopy8(func_02009998(dreamWorld), pkm, size);
         if (wk->levels != 0) {
             int level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
 
@@ -668,7 +668,7 @@ static void GSync_StateCGearDownloaded(GSyncWork *wk) {
     skin = GFL_HeapAllocate(wk->heapId, 0x2800, FALSE, "gsync_state.c", 871);
     wk->cgearSkin = skin;
     func_02007560(save, 4, wk->heapId, skin, 0x2800);
-    sys_memcpy(buffer, skin, GSYNC_CGEAR_SKIN_SIZE);
+    MI_CpuCopy8(buffer, skin, GSYNC_CGEAR_SKIN_SIZE);
     func_020098d4(func_02009918(save), crc);
     func_020178c4(wk->gameData, 4);
     GSync_ChangeState(wk, GSync_StateWaitCGearSave, 882);
@@ -704,7 +704,7 @@ static void GSync_StateZukanDownloaded(GSyncWork *wk) {
     wk->busy = TRUE;
     wk->zukanSkin = GFL_HeapAllocate(wk->heapId, 0x6800, FALSE, "gsync_state.c", 922);
     func_02007560(save, 7, wk->heapId, wk->zukanSkin, 0x6800);
-    sys_memcpy(buffer, wk->zukanSkin, GSYNC_ZUKAN_SKIN_SIZE);
+    MI_CpuCopy8(buffer, wk->zukanSkin, GSYNC_ZUKAN_SKIN_SIZE);
     func_0200f194(wk->zukanSkin, TRUE);
     func_020178c4(wk->gameData, 7);
     GSync_ChangeState(wk, GSync_StateWaitZukanSave, 928);
@@ -1074,7 +1074,7 @@ static void GSync_StateWaitResult(GSyncWork *wk) {
             GSyncResult *result = &response->body.result;
 
             wk->result = GFL_HeapAllocate(wk->heapId, sizeof(GSyncResult), TRUE, "gsync_state.c", 1438);
-            sys_memcpy(result, wk->result, sizeof(GSyncResult));
+            MI_CpuCopy8(result, wk->result, sizeof(GSyncResult));
             GSync_ReadResult(wk, dreamWorld, result, response);
         }
         return;
@@ -1376,7 +1376,7 @@ static void GSync_StateWaitAccount(GSyncWork *wk) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
 
-            sys_memcpy(&response->body.accountInfo, &wk->param->accountInfo, sizeof(GSyncAccountInfo));
+            MI_CpuCopy8(&response->body.accountInfo, &wk->param->accountInfo, sizeof(GSyncAccountInfo));
             wk->param->hasAccountInfo = TRUE;
             GSync_HandleAccount(wk, response->body.accountInfo.status, response);
         }
@@ -1418,8 +1418,8 @@ static void GSync_StateWaitSpeciesFlags(GSyncWork *wk) {
             u32 status = response->status;
 
             if (status == 0 || status == 8) {
-                sys_memcpy(response->body.sendableSpecies, wk->param->sendableSpecies,
-                           sizeof(wk->param->sendableSpecies));
+                MI_CpuCopy8(response->body.sendableSpecies, wk->param->sendableSpecies,
+                            sizeof(wk->param->sendableSpecies));
                 wk->param->gsyncResult = GSYNC_RESULT_SELECT_POKEMON;
                 GSync_ChangeState(wk, GSync_StateFadeOut, 2162);
             } else {
@@ -1695,7 +1695,7 @@ static void GSync_RestoreDreamWorld(GSyncWork *wk) {
     DreamWorldSave *dreamWorld = getDreamWorldStuffAddress(wk->save);
 
     if (wk->dreamWorldCopy != NULL) {
-        sys_memcpy(wk->dreamWorldCopy, dreamWorld, func_02009930());
+        MI_CpuCopy8(wk->dreamWorldCopy, dreamWorld, func_02009930());
         GFL_HeapFree(wk->dreamWorldCopy);
         wk->dreamWorldCopy = NULL;
     }
@@ -1720,7 +1720,7 @@ static void GSync_PersonToPlayerInfo(GSyncResultPerson *person, PlayerInfo *info
     int offset = 0;
     u16 style;
 
-    sys_memset(info, 0, 0x20);
+    MI_CpuFill8(info, 0, 0x20);
     copyTrainerName(info, person->name);
     func_02008be0(info, person->profileId);
     func_02008c14(info, person->country, person->region);
@@ -1764,7 +1764,7 @@ static BOOL GSync_ProcInit(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_OvlLoad(OVERLAY_ID(189));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_GSYNC, 0x88000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(GSyncWork), HEAPID_GSYNC);
-    sys_memset(wk, 0, sizeof(GSyncWork));
+    MI_CpuFill8(wk, 0, sizeof(GSyncWork));
     wk->heapId = HEAPID_GSYNC;
     GFL_ASSERT(pParent);
     if (pParent != NULL) {

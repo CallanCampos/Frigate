@@ -46,7 +46,7 @@ static const MemoryLinkCondition sMemoryConditions[MEMORY_LINK_MEMORY_COUNT] = {
 // clang-format on
 
 void zero476Bytes(MemoryLinkSave *link) {
-    sys_memset(link, 0, sizeof(MemoryLinkSave));
+    MI_CpuFill8(link, 0, sizeof(MemoryLinkSave));
 }
 
 BOOL func_020108dc(MemoryLinkSave *link, const MemoryLinkData *data, SaveControl *save) {
@@ -144,7 +144,7 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
                 if (apply) {
                     dest->unk28 = src->unk28;
                     dest->unk2A = src->unk2A;
-                    sys_memcpy(src->props, dest->props, sizeof(src->props));
+                    MI_CpuCopy8(src->props, dest->props, sizeof(src->props));
                 }
             }
         }
@@ -152,7 +152,7 @@ static u32 mergeData(MemoryLinkSave *link, const MemoryLinkData *data, SaveContr
     if (src->flags[0] & 1) {
         if (GFL_STD_MemCmp(src->unk2C, dest->unk2C, sizeof(src->unk2C)) != 0) {
             if (apply) {
-                sys_memcpy(src->unk2C, dest->unk2C, sizeof(src->unk2C));
+                MI_CpuCopy8(src->unk2C, dest->unk2C, sizeof(src->unk2C));
             }
             changed[MEMORY_LINK_PART_UNK2C] = TRUE;
         }
@@ -181,19 +181,20 @@ u32 func_02010b0c(MemoryLinkSave *link, u32 kind, void *dest) {
     case MEMORY_LINK_KIND_UNK2C_0 + 3:
     case MEMORY_LINK_KIND_UNK2C_0 + 4:
     case MEMORY_LINK_KIND_UNK2C_5:
-        sys_memcpy(link->memories.unk2C[(u16)(kind - MEMORY_LINK_KIND_UNK2C_0)], dest, sizeof(link->memories.unk2C[0]));
+        MI_CpuCopy8(link->memories.unk2C[(u16)(kind - MEMORY_LINK_KIND_UNK2C_0)], dest,
+                    sizeof(link->memories.unk2C[0]));
         return 0;
     case MEMORY_LINK_KIND_PLAYER_0:
     case MEMORY_LINK_KIND_PLAYER_0 + 1:
     case MEMORY_LINK_KIND_PLAYER_2:
         if (dest != NULL) {
-            sys_memcpy(&link->players[kind - MEMORY_LINK_KIND_PLAYER_0], dest, sizeof(MemoryLinkPlayer));
+            MI_CpuCopy8(&link->players[kind - MEMORY_LINK_KIND_PLAYER_0], dest, sizeof(MemoryLinkPlayer));
         }
         // Not the player's address but the first one's, whichever was asked for
         return (u32)link;
     case MEMORY_LINK_KIND_PROPS:
         if (dest != NULL) {
-            sys_memcpy(link->memories.props, dest, sizeof(link->memories.props));
+            MI_CpuCopy8(link->memories.props, dest, sizeof(link->memories.props));
         }
         return (u32)link->memories.props;
     }

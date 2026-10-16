@@ -286,7 +286,7 @@ static u32 GFL_FontGetCharIndex(const Font *font, u16 c) {
 }
 
 static void GFL_FontGetGlyphCached(const Font *font, u32 index, void *dest, GlyphInfo *info) {
-    sys_memcpy(font->glyphs + index * font->glyphInfo.cellSize, font->cell, font->glyphInfo.cellSize);
+    MI_CpuCopy8(font->glyphs + index * font->glyphInfo.cellSize, font->cell, font->glyphInfo.cellSize);
     GFL_FontGlyphCopy(font, font->cell, font->lastBits, dest, info);
 }
 

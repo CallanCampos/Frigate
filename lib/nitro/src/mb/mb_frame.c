@@ -27,7 +27,7 @@ void MBFrame_SetPayloadSize(int size) {
 
 void MBFrame_SetBuffer(MBFrameBuffer *buf) {
     sMBFrame.buf = buf;
-    sys_memset(buf, 0, sizeof(MBFrameBuffer));
+    MI_CpuFill8(buf, 0, sizeof(MBFrameBuffer));
 }
 
 // Forgets the pieces of a child's request
@@ -35,7 +35,7 @@ void MBFrame_ClearChild(u16 aid) {
     if (sMBFrame.buf != NULL) {
         int index = aid - 1;
 
-        sys_memset(sMBFrame.buf->slot[index], 0, MB_FRAME_SLOT_SIZE);
+        MI_CpuFill8(sMBFrame.buf->slot[index], 0, MB_FRAME_SLOT_SIZE);
         sMBFrame.buf->received[index] = 0;
     }
 }
@@ -79,7 +79,7 @@ const void *MBFrame_Decode(const u8 *src, MBChildFrame *out, u16 aid) {
         if (out->fragment > sMBFrame.fragmentCount) {
             return NULL;
         }
-        sys_memcpy(src + 2, out->pieceData, sMBFrame.payloadSize);
+        MI_CpuCopy8(src + 2, out->pieceData, sMBFrame.payloadSize);
         next = MBFrame_Store(out, aid);
         break;
     case MB_FRAME_DOWNLOAD_REQUEST:
@@ -91,7 +91,7 @@ const void *MBFrame_Decode(const u8 *src, MBChildFrame *out, u16 aid) {
         next = src + 3;
         out->value = src[1];
         out->value |= (src[2] << 8) & 0xff00;
-        sys_memcpy(next, out->data, sMBFrame.payloadSize);
+        MI_CpuCopy8(next, out->data, sMBFrame.payloadSize);
         next += sMBFrame.payloadSize;
         break;
     default:
@@ -111,7 +111,7 @@ static const void *MBFrame_Store(const MBChildFrame *frame, u16 aid) {
     if (fragment > sMBFrame.fragmentCount) {
         return NULL;
     }
-    sys_memcpy(frame->pieceData, &sMBFrame.buf->slot[aid - 1][fragment * sMBFrame.payloadSize], sMBFrame.payloadSize);
+    MI_CpuCopy8(frame->pieceData, &sMBFrame.buf->slot[aid - 1][fragment * sMBFrame.payloadSize], sMBFrame.payloadSize);
     sMBFrame.buf->received[aid - 1] |= 1 << fragment;
     if (MBFrame_IsComplete(aid)) {
         return sMBFrame.buf->slot[aid - 1];

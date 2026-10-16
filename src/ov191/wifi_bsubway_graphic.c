@@ -93,7 +93,7 @@ WifiBSubwayGraphic *WifiBSubwayGraphic_Create(u32 layout, HeapID heapId) {
     WifiBSubwayGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(WifiBSubwayGraphic), FALSE, "wifi_bsubway_graphic.c", 444);
 
-    sys_memset(graphic, 0, sizeof(WifiBSubwayGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WifiBSubwayGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -118,7 +118,7 @@ void WifiBSubwayGraphic_Free(WifiBSubwayGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(WifiBSubwayGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WifiBSubwayGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -131,7 +131,7 @@ static void WifiBSubwayGraphic_VBlank(TCB *tcb, void *data) {
 static void WifiBSubwayBG_Init(WifiBSubwayBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(WifiBSubwayBG));
+    MI_CpuFill8(bg, 0, sizeof(WifiBSubwayBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sWifiBSubwayLCDConfig);
@@ -150,7 +150,7 @@ static void WifiBSubwayBG_Free(WifiBSubwayBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(WifiBSubwayBG));
+    MI_CpuFill8(bg, 0, sizeof(WifiBSubwayBG));
 }
 
 static void WifiBSubwayBG_VBlank(WifiBSubwayBG *bg) {

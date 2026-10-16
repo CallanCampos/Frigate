@@ -23,7 +23,7 @@ static BOOL Box2Proc_Init(GameProc *proc, u32 *state, void *param, void *work) {
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_BOX2, 0x10000);
     syswk = GFL_ProcInitSubsystem(proc, sizeof(Box2SysWork), HEAPID_BOX2);
-    sys_memset(syswk, 0, sizeof(Box2SysWork));
+    MI_CpuFill8(syswk, 0, sizeof(Box2SysWork));
     syswk->param = param;
     syswk->tray = BoxSaveAccessor_GetLastOpenedBox(((Box2Param *)param)->boxes);
     syswk->trayMax = BoxSaveAccessor_GetAvailableBoxCount(syswk->param->boxes);

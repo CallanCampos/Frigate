@@ -20,7 +20,7 @@ BagProcessData *BagParam_Create(GameData *gameData, const PlayerActionPerms *per
     param->bag = GameData_GetBag(gameData);
     param->freeSpaceFilter = func_020088e8(param->cursor);
     if (perms != NULL) {
-        sys_memcpy(perms, &param->perms, sizeof(PlayerActionPerms));
+        MI_CpuCopy8(perms, &param->perms, sizeof(PlayerActionPerms));
     }
     param->mode = mode;
     param->isCycling = FieldPlayerState_GetExState(GameData_GetPlayerState(gameData)) == FLD_PLAYER_EXSTATE_CYCLING;

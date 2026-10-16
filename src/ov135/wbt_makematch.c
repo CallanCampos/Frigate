@@ -236,8 +236,8 @@ static BOOL WbtMakeMatch_IsEligible(const WbtMatchParam *param, WbtTrainer *trai
 static void WbtMakeMatch_InitStatus(WbtMakeMatch *m, void *record) {
     int i;
 
-    sys_memset(m->status, WBT_STATUS_UNUSED, m->param->trainerCount);
-    sys_memset(m->encountered, 1, m->param->trainerCount);
+    MI_CpuFill8(m->status, WBT_STATUS_UNUSED, m->param->trainerCount);
+    MI_CpuFill8(m->encountered, 1, m->param->trainerCount);
     for (i = 0; i < m->param->trainerCount; i++) {
         if (WbtMakeMatch_IsEligible(m->param, &m->param->trainers[i]) == TRUE) {
             m->status[i] = WBT_STATUS_CANDIDATE;
@@ -266,7 +266,7 @@ static void WbtMakeMatch_PickDownloaded(const WbtUnk18A *slots, WbtMakeMatch *m,
         order[n - 1] = order[j];
         order[j] = tmp;
     }
-    sys_memset(result, 0, 8 * sizeof(WbtBracketEntry));
+    MI_CpuFill8(result, 0, 8 * sizeof(WbtBracketEntry));
     result[i++].value = 0xff00;
     for (; i < 8; i++) {
         int slot = i - 1;
@@ -298,7 +298,7 @@ static void WbtMakeMatch_PickTournament1(WbtMakeMatch *m, WbtBracketEntry *resul
     int i;
     int count;
 
-    sys_memset(result, 0, 8 * sizeof(WbtBracketEntry));
+    MI_CpuFill8(result, 0, 8 * sizeof(WbtBracketEntry));
     count = 0;
     result[count++].value = 0xff00;
     for (i = 0; i < m->param->trainerCount; i++) {
@@ -466,8 +466,8 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     int next;
 
     MATH_InitRand32(&rand, seed);
-    sys_memset(others, 0, sizeof(others));
-    sys_memset(places, 0, sizeof(places));
+    MI_CpuFill8(others, 0, sizeof(others));
+    MI_CpuFill8(places, 0, sizeof(places));
     for (i = 0; i < 8; i++) {
         others[i] = &entrants[i];
     }
@@ -508,7 +508,7 @@ static void WbtMakeMatch_PlaceEntrants(WbtEntrant *entrants, u64 seed, HeapID he
     for (i = 0; i < 8; i++) {
         copy[i] = *places[i];
     }
-    sys_memcpy32(copy, entrants, 8 * sizeof(WbtEntrant));
+    MIi_CpuCopy32(copy, entrants, 8 * sizeof(WbtEntrant));
     GFL_HeapFree(copy);
 }
 
@@ -639,7 +639,7 @@ void WbtMakeMatch_Make(WbtSystem *sys, GameData *gameData) {
     WbtBracketEntry result[8];
     WbtMatchParam param;
 
-    sys_memset(&param, 0, sizeof(WbtMatchParam));
+    MI_CpuFill8(&param, 0, sizeof(WbtMatchParam));
     param.heapId = sys->heapId;
     param.tournament = sys->tournament;
     param.type = sys->type;
@@ -699,7 +699,7 @@ u32 WbtMakeMatch_CountDownloads(WbtSystem *sys, GameData *gameData) {
 }
 
 static void WbtMakeMatch_ClearDownload(WbtSystem *sys) {
-    sys_memset32(0, &sys->download, 0x1214);
+    MIi_CpuClear32(0, &sys->download, 0x1214);
     sys->downloadValid = FALSE;
 }
 
@@ -724,17 +724,17 @@ void WbtMakeMatch_LoadDownload(WbtSystem *sys, GameData *gameData) {
         valid = func_02010428(data);
     }
     if (valid) {
-        sys_memcpy32(data, &sys->download, 0x1214);
+        MIi_CpuCopy32(data, &sys->download, 0x1214);
         sys->style = func_ov055_021e64e8(sys->download.tournament.unkA7);
     } else {
-        sys_memset32(0, &sys->download, 0x1214);
+        MIi_CpuClear32(0, &sys->download, 0x1214);
     }
     freeIntermediateSaveExtraBlksAfterLoad(save, block);
     sys->downloadValid = valid;
 }
 
 void WbtMakeMatch_ReadPick(WbtSystem *sys, PokeListParam *param) {
-    sys_memcpy(param->picked, sys->castSlots, sizeof(sys->castSlots));
+    MI_CpuCopy8(param->picked, sys->castSlots, sizeof(sys->castSlots));
     sys->listIndex = param->index;
     sys->listResult = param->result;
     if (sys->listResult != 0 || sys->listIndex == 7 || sys->listIndex == 8) {
@@ -790,7 +790,7 @@ void WbtMakeMatch_SetupPStatus(WbtSystem *sys, GameData *gameData, PStatusParam 
     PokeDexSave *pokedex = GameData_GetPokedex(gameData);
     PokeParty *party;
 
-    sys_memset32(0, param, sizeof(PStatusParam));
+    MIi_CpuClear32(0, param, sizeof(PStatusParam));
     party = WbtMakeMatch_GetParty(sys, gameData);
     param->party = party;
     param->dataType = PSTATUS_DATA_PARTY;

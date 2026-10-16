@@ -104,7 +104,7 @@ void GFL_WordSetSystemFree(WordSet *wordSet) {
 }
 
 static void GFL_WordSetClearBufFlags(WordSetAttr *attr) {
-    sys_memset(attr, 0, sizeof(WordSetAttr));
+    MI_CpuFill8(attr, 0, sizeof(WordSetAttr));
     attr->unk4 = FALSE;
 }
 

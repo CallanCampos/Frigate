@@ -18,14 +18,14 @@ int SOCL_GetStatus(SOCLSocket *socket) {
             status |= SOCL_STATUS_ERROR;
         }
         if (socket->flag == 1 || (socket->state & SOCLI_STATE_CONNECTED)) {
-            irq = CPU_IRQDisable();
+            irq = OS_DisableInterrupts();
             if (SOCLi_GetReadBufferOccpiedSize(socket) > 0) {
                 status |= SOCL_STATUS_READABLE;
             }
             if (SOCLi_GetWriteBufferFreeSize(socket) > 0) {
                 status |= SOCL_STATUS_WRITABLE;
             }
-            CPU_SetIRQMask(irq);
+            OS_RestoreInterrupts(irq);
         }
         if (SOCLi_SocketIsTCP(socket)) {
             if ((socket->state & SOCLI_STATE_CONNECTED) && socket->cps_state != CPS_STT_ESTABLISHED &&

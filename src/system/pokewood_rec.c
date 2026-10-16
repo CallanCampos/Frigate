@@ -27,7 +27,7 @@ static const u32 sSlotExtraBlocks[POKEWOOD_DOWNLOAD_SLOT_COUNT] = {
 static PokewoodBlock *sBlock;
 
 void clearPokewoodBlock(PokewoodBlock *block) {
-    sys_memset(block, 0, sizeof(PokewoodBlock));
+    MI_CpuFill8(block, 0, sizeof(PokewoodBlock));
 }
 
 u32 getSizeOfPokewoodBlock(void) {
@@ -44,18 +44,18 @@ void freeAndClearPokewoodBlk(void) {
 }
 
 void savePokewoodBlk(void *dest) {
-    sys_memcpy32(sBlock, dest, sizeof(PokewoodBlock));
+    MIi_CpuCopy32(sBlock, dest, sizeof(PokewoodBlock));
 }
 
 void setPokewoodBlk(const void *src) {
-    sys_memcpy32(src, sBlock, sizeof(PokewoodBlock));
+    MIi_CpuCopy32(src, sBlock, sizeof(PokewoodBlock));
 }
 
 u32 func_02010644(SaveControl *save, HeapID heapId, u32 slot) {
     u32 block = getSlotExtraBlock(slot);
     u32 result;
 
-    sys_memset(sBlock, 0, POKEWOOD_EXTRA_BLOCK_SIZE);
+    MI_CpuFill8(sBlock, 0, POKEWOOD_EXTRA_BLOCK_SIZE);
     result = func_02007560(save, block, heapId, sBlock, POKEWOOD_EXTRA_BLOCK_SIZE);
     freeIntermediateSaveExtraBlksAfterLoad(save, block);
     if (result == 0) {
@@ -71,7 +71,7 @@ u32 func_02010644(SaveControl *save, HeapID heapId, u32 slot) {
 }
 
 u32 loadPokewoodAndCheck(SaveControl *save, HeapID heapId, u32 slot) {
-    sys_memset(sBlock, 0, POKEWOOD_EXTRA_BLOCK_SIZE);
+    MI_CpuFill8(sBlock, 0, POKEWOOD_EXTRA_BLOCK_SIZE);
     GFL_ArcSysRead(sBlock, ARCID_POKEWOOD_MOVIE, POKEWOOD_DEFAULT_MOVIE_FILE);
     if (sBlock->crc == getCRC16(sBlock, POKEWOOD_BLOCK_CRC_SIZE)) {
         return 1;

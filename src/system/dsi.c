@@ -6,12 +6,12 @@
 // from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except isRunningOnDSi and isWirelessEnabled
 
 BOOL isRunningOnDSi(void) {
-    return hw_isDSi();
+    return OS_IsRunOnTwl();
 }
 
 BOOL canPlayerExchangePhotos(void) {
     if (isRunningOnDSi()) {
-        if (func_0207c4b4()->unk0_0 && func_0207c4b4()->unk0_5) {
+        if (OS_GetParentalControlInfoPtr()->unk0_0 && OS_GetParentalControlInfoPtr()->unk0_5) {
             return TRUE;
         }
         return FALSE;
@@ -20,12 +20,12 @@ BOOL canPlayerExchangePhotos(void) {
 }
 
 BOOL isWirelessEnabled(void) {
-    return func_0207c438();
+    return OS_IsAvailableWireless();
 }
 
 BOOL hasLicenseBeenAccepted(void) {
     if (isRunningOnDSi() == TRUE) {
-        return func_0207c45c();
+        return OS_IsAgreeEULA();
     }
     return TRUE;
 }

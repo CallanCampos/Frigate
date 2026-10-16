@@ -4,7 +4,7 @@
 #include "system/game_event.h"
 
 void FieldScriptSubEvent_ResetAll(void) {
-    sys_memset32(0, &g_ActiveFieldScriptSubEvents, sizeof(g_ActiveFieldScriptSubEvents));
+    MIi_CpuClear32(0, &g_ActiveFieldScriptSubEvents, sizeof(g_ActiveFieldScriptSubEvents));
 }
 
 void FieldScriptSubEvent_Register(int id) {

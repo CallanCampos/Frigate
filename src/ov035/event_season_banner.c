@@ -296,24 +296,24 @@ void EventSeasonBanner_UpdateRenderFX(EventSeasonBanner *wk, u32 state) {
 
 void EventSeasonBanner_UpdateRenderFXFieldOpen(const EventSeasonBanner *wk, u32 state) {
     if (state == SEASON_BANNER_STATE_FADE_IN) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 8, (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
     } else if (state == SEASON_BANNER_STATE_FADE_OUT) {
         if (wk->season == wk->endSeason) {
             s32 alpha = (s32)((f32)wk->timer / (f32)wk->duration * 16.0f);
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 8, 0x11, 16 - alpha, alpha);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR,
-                                      (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 8, 0x11, 16 - alpha, alpha);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR,
+                                     (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
         } else {
-            gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 8, (s32)(0.0f - (f32)wk->timer / (f32)wk->duration * 16.0f));
+            G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, (s32)(0.0f - (f32)wk->timer / (f32)wk->duration * 16.0f));
         }
     }
 }
 
 void EventSeasonBanner_UpdateRenderFXStandalone(EventSeasonBanner *wk, u32 state) {
     if (state == SEASON_BANNER_STATE_FADE_IN) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 8, (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
     } else if (state == SEASON_BANNER_STATE_FADE_OUT) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 8, (s32)(0.0f - (f32)wk->timer / (f32)wk->duration * 16.0f));
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, (s32)(0.0f - (f32)wk->timer / (f32)wk->duration * 16.0f));
     }
 }
 
@@ -362,8 +362,8 @@ void EventSeasonBanner_ProcessState(EventSeasonBanner *wk, u32 *state, u32 newSt
     case SEASON_BANNER_STATE_FADE_IN:
         GFL_BGSysSetBGEnabled(SEASON_BANNER_BG, TRUE);
         GFL_BGSysSetBGEnabled(0, FALSE);
-        GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 8, -16);
+        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, -16);
         wk->duration = EventSeasonBanner_GetFadeInTime(wk);
         break;
     case SEASON_BANNER_STATE_STAY:

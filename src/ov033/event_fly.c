@@ -34,7 +34,7 @@ GameEvent *func_ov033_02178908(GameSystem *gsys, Field *field, u32 zoneId) {
 
     event = GameEvent_Create(gsys, NULL, EventFly_Callback, sizeof(FlyEventWork));
     work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(FlyEventWork));
+    MI_CpuFill8(work, 0, sizeof(FlyEventWork));
     work->gsys = gsys;
     work->zoneId = zoneId;
     if (getTrainerGender(GetGameDataPlayerInfo(GSYS_GetGameData(gsys))) == 0) {

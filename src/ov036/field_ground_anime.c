@@ -241,7 +241,7 @@ static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorCh
     } else {
         tex = NULL;
     }
-    sys_memset(state->anmObj, 0, 0x80);
+    MI_CpuFill8(state->anmObj, 0, 0x80);
     NNS_G3DAnimationCreate(state->anmObj, state->resAnm, mdl, tex);
     NNS_G3DAnimationBind(renderObj, state->anmObj);
     state->used = TRUE;

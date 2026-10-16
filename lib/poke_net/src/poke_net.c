@@ -51,7 +51,7 @@ static u8 sPOKE_NET_ThreadStack[POKE_NET_THREAD_STACK_SIZE];
 
 // The seconds since the system timer started, of which a tick is 64 cycles of the system clock
 #define POKE_NET_TicksToSeconds(tick) ((tick) / (OS_SYSTEM_CLOCK / 64))
-#define POKE_NET_GetTime() POKE_NET_TicksToSeconds(clock())
+#define POKE_NET_GetTime() POKE_NET_TicksToSeconds(OS_GetTick())
 
 void POKE_NET_Release(void) {
     POKE_NET_Clear();
@@ -308,14 +308,14 @@ int POKE_NET_GetLastErrorCode(void) {
 }
 
 void *POKE_NET_AllocFunc(s32 size) {
-    return func_020586e4(0, size);
+    return DWC_Alloc(0, size);
 }
 
 void POKE_NET_FreeFunc(void *ptr) {
     if (ptr == NULL) {
         return;
     }
-    func_02058728(0, ptr, 0);
+    DWC_Free(0, ptr, 0);
 }
 
 void POKE_NET_LockMutex(void) {
@@ -336,8 +336,8 @@ BOOL POKE_NET_ReleaseMutex(void) {
 }
 
 BOOL POKE_NET_ExInitialize(void) {
-    if (!clock_is_inited()) {
-        clock_init();
+    if (!OS_IsTickAvailable()) {
+        OS_InitTick();
     }
     gPOKE_NET_Control.ThreadPriority = POKE_NET_THREAD_PRIORITY;
     return TRUE;
@@ -351,10 +351,10 @@ void POKE_NET_ThreadEntry(void *arg) {
 }
 
 BOOL POKE_NET_CreateThread(void) {
-    scheduler_init_thread(&gPOKE_NET_Control.Thread, POKE_NET_ThreadEntry, NULL,
-                          sPOKE_NET_ThreadStack + POKE_NET_THREAD_STACK_SIZE, POKE_NET_THREAD_STACK_SIZE,
-                          gPOKE_NET_Control.ThreadPriority);
-    scheduler_start_thread(&gPOKE_NET_Control.Thread);
+    OS_CreateThread(&gPOKE_NET_Control.Thread, POKE_NET_ThreadEntry, NULL,
+                    sPOKE_NET_ThreadStack + POKE_NET_THREAD_STACK_SIZE, POKE_NET_THREAD_STACK_SIZE,
+                    gPOKE_NET_Control.ThreadPriority);
+    OS_WakeupThreadDirect(&gPOKE_NET_Control.Thread);
     return TRUE;
 }
 
@@ -548,22 +548,22 @@ BOOL POKE_NET_Receiving(void) {
     s32 offset = 0;
     s32 size = -1;
     s32 start;
-    u64 startTick = clock();
+    u64 startTick = OS_GetTick();
 
-    scheduler_init_thread(&gPOKE_NET_Control.RecvThread, POKE_NET_RecvThreadEntry, NULL,
-                          sPOKE_NET_RecvThreadStack + POKE_NET_THREAD_STACK_SIZE, POKE_NET_THREAD_STACK_SIZE,
-                          gPOKE_NET_Control.ThreadPriority);
+    OS_CreateThread(&gPOKE_NET_Control.RecvThread, POKE_NET_RecvThreadEntry, NULL,
+                    sPOKE_NET_RecvThreadStack + POKE_NET_THREAD_STACK_SIZE, POKE_NET_THREAD_STACK_SIZE,
+                    gPOKE_NET_Control.ThreadPriority);
     gPOKE_NET_Control.RecvResult = POKE_NET_SOC_EWOULDBLOCK;
     gPOKE_NET_Control.RecvOffset = 0;
     gPOKE_NET_Control.RecvDone = FALSE;
-    scheduler_start_thread(&gPOKE_NET_Control.RecvThread);
+    OS_WakeupThreadDirect(&gPOKE_NET_Control.RecvThread);
     start = POKE_NET_TicksToSeconds(startTick);
 
     for (;;) {
         if (gPOKE_NET_Control.RecvTimeOut != 0) {
             if ((s32)(POKE_NET_GetTime() - start) >= gPOKE_NET_Control.RecvTimeOut) {
                 gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_RECVTIMEOUT;
-                func_0207a710(&gPOKE_NET_Control.RecvThread);
+                OS_DestroyThread(&gPOKE_NET_Control.RecvThread);
                 return FALSE;
             }
         }
@@ -573,7 +573,7 @@ BOOL POKE_NET_Receiving(void) {
         if (gPOKE_NET_Control.RecvResult != POKE_NET_SOC_EWOULDBLOCK) {
             if (gPOKE_NET_Control.RecvResult <= 0) {
                 gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_RECVRESPONSE;
-                func_0207a710(&gPOKE_NET_Control.RecvThread);
+                OS_DestroyThread(&gPOKE_NET_Control.RecvThread);
                 return FALSE;
             }
             offset += gPOKE_NET_Control.RecvResult;
@@ -591,19 +591,19 @@ BOOL POKE_NET_Receiving(void) {
         if (gPOKE_NET_Control.AbortFlag == TRUE) {
             gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_ABORTED;
             POKE_NET_UnlockMutex();
-            func_0207a710(&gPOKE_NET_Control.RecvThread);
+            OS_DestroyThread(&gPOKE_NET_Control.RecvThread);
             return FALSE;
         }
         POKE_NET_UnlockMutex();
         gPOKE_NET_Control.RecvDone = FALSE;
         POKE_NET_Sleep(1);
     }
-    func_0207a710(&gPOKE_NET_Control.RecvThread);
+    OS_DestroyThread(&gPOKE_NET_Control.RecvThread);
     return TRUE;
 }
 
 void POKE_NET_Sleep(s32 msec) {
-    func_0207aa04(msec);
+    OS_Sleep(msec);
 }
 
 // Fetches the token of the Nintendo Wi-Fi Connection's service locator, once, into the request that waits to be sent
@@ -630,7 +630,7 @@ BOOL POKE_NET_GetSvlToken(void) {
             gPOKE_NET_Control.HasSvlToken = TRUE;
             return TRUE;
         } else if (state == DWC_SVL_STATE_ERROR) {
-            func_020583b0(&code, &type);
+            DWC_GetLastErrorEx(&code, &type);
             gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_GETSVL;
             return FALSE;
         } else if (state == DWC_SVL_STATE_CANCELED) {

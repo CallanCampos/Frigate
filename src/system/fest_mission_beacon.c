@@ -74,10 +74,10 @@ static const u8 FestMission_LogCategories[LOG_KIND_MAX] = {
 void FestMissionLogEntry_Clear(FestMissionLogEntry *entry) {
     u16 terminator;
 
-    sys_memset(entry, 0, sizeof(FestMissionLogEntry));
+    MI_CpuFill8(entry, 0, sizeof(FestMissionLogEntry));
     terminator = GFL_StrBufGetTerminator();
-    sys_memset16(terminator, entry->name, sizeof(entry->name));
-    sys_memset16(terminator, entry->text, sizeof(entry->text));
+    MIi_CpuClear16(terminator, entry->name, sizeof(entry->name));
+    MIi_CpuClear16(terminator, entry->text, sizeof(entry->text));
 }
 
 void func_02015018(const FestMissionLogEntry *entry, StrBuf *dest) {
@@ -98,7 +98,7 @@ void FestMissionLog_Clear(FestMissionLog *log) {
 // Adds an entry, over the oldest when the log is full, and returns where it went
 static int FestMissionLog_Add(FestMissionLog *log, const FestMissionLogEntry *entry) {
     if (log->count == FEST_MISSION_LOG_MAX) {
-        sys_memcpy16(&log->entries[1], &log->entries[0], sizeof(FestMissionLogEntry) * (FEST_MISSION_LOG_MAX - 1));
+        MIi_CpuCopy16(&log->entries[1], &log->entries[0], sizeof(FestMissionLogEntry) * (FEST_MISSION_LOG_MAX - 1));
         log->entries[FEST_MISSION_LOG_MAX - 1] = *entry;
     } else {
         log->entries[log->count++] = *entry;
@@ -132,9 +132,9 @@ void FestMissionLog_AddPlayer(FestMissionLog *log, GameData *gameData, u8 joined
 }
 
 void FestMissionPassPower_Clear(FestMissionPassPower *passPower) {
-    sys_memset(passPower, 0, sizeof(FestMissionPassPower));
+    MI_CpuFill8(passPower, 0, sizeof(FestMissionPassPower));
     passPower->passPower = GAME_BEACON_PASS_POWER_NONE;
-    sys_memset16(GFL_StrBufGetTerminator(), passPower->name, sizeof(passPower->name));
+    MIi_CpuClear16(GFL_StrBufGetTerminator(), passPower->name, sizeof(passPower->name));
 }
 
 void func_02015198(FestMissionPassPowers *passPowers) {
@@ -169,7 +169,7 @@ BOOL FestMissionPassPowers_AddBeacon(FestMissionPassPowers *passPowers, const Ga
             return FALSE;
         }
     }
-    sys_memcpy16(beacon->name, passPower.name, sizeof(beacon->name));
+    MIi_CpuCopy16(beacon->name, passPower.name, sizeof(beacon->name));
     passPower.passPower = id;
     passPowers->others[passPowers->count++] = passPower;
     return TRUE;
@@ -179,14 +179,14 @@ u16 func_02015248(FestMissionPassPower *passPower, const FestMissionLogEntry *en
     FestMissionPassPower_Clear(passPower);
     passPower->passPower = entry->value;
     passPower->received = FALSE;
-    sys_memcpy16(entry->name, passPower->name, 14);
+    MIi_CpuCopy16(entry->name, passPower->name, 14);
     return passPower->passPower;
 }
 
 static void FestMissionOffer_Clear(FestMissionOffer *offer) {
-    sys_memset(offer, 0, sizeof(FestMissionOffer));
+    MI_CpuFill8(offer, 0, sizeof(FestMissionOffer));
     ClearFesMissionCfg(&offer->config);
-    sys_memset16(GFL_StrBufGetTerminator(), offer->name, sizeof(offer->name));
+    MIi_CpuClear16(GFL_StrBufGetTerminator(), offer->name, sizeof(offer->name));
 }
 
 void FestMissionOffers_AddBeacon(LinkFestival *festival, const GameBeacon *beacon) {
@@ -204,7 +204,7 @@ void FestMissionOffers_AddBeacon(LinkFestival *festival, const GameBeacon *beaco
     FestMissionOffer_Clear(&offer);
     FestMissionConfig_FromBeacon(&offer.config, beacon);
     FetchFestMissionCfgGimmickID(festival, ((const FestMissionInfo *)&beacon->payload)->index, &offer.config.header);
-    sys_memcpy16(beacon->name, offer.name, sizeof(beacon->name));
+    MIi_CpuCopy16(beacon->name, offer.name, sizeof(beacon->name));
     UpdateFesMissionConfigSecondsTime(&offer.config);
     if (index == FEST_MISSION_OFFER_NEW) {
         offers->entries[offers->count++] = offer;
@@ -223,7 +223,7 @@ void FestMissionOffers_DropExpired(LinkFestival *festival) {
         if (!FestMissionConfig_HasTimeLeft(&offers->entries[i].config)) {
             last = offers->count - 1;
             if (i < last) {
-                sys_memcpy32(&offers->entries[i + 1], &offers->entries[i], sizeof(FestMissionOffer) * (last - i));
+                MIi_CpuCopy32(&offers->entries[i + 1], &offers->entries[i], sizeof(FestMissionOffer) * (last - i));
                 if (last > 0) {
                     i--;
                 }
@@ -246,7 +246,7 @@ void FestMissionOffers_Remove(LinkFestival *festival, FestMissionConfig *config)
         if (FestMissionConfig_IsSame(&offers->entries[i].config, config)) {
             last = offers->count - 1;
             if (i < last) {
-                sys_memcpy32(&offers->entries[i + 1], &offers->entries[i], sizeof(FestMissionOffer) * (last - i));
+                MIi_CpuCopy32(&offers->entries[i + 1], &offers->entries[i], sizeof(FestMissionOffer) * (last - i));
                 if (last > 0) {
                     i--;
                 }
@@ -412,7 +412,7 @@ static BOOL func_020156f8(LinkFestival *festival, FestMissionLogEntry *entry, co
     FestMissionLogEntry_Clear(entry);
     switch (kind) {
     case LOG_KIND_TEXT:
-        sys_memcpy16(beacon->payload.mission.text, entry->text, sizeof(beacon->payload.mission.text));
+        MIi_CpuCopy16(beacon->payload.mission.text, entry->text, sizeof(beacon->payload.mission.text));
         entry->value = beacon->arg.mission.unk;
         break;
     case LOG_KIND_MEET:
@@ -432,7 +432,7 @@ static BOOL func_020156f8(LinkFestival *festival, FestMissionLogEntry *entry, co
     entry->gender = beacon->gender;
     entry->look = beacon->trainerView;
     entry->score = score;
-    sys_memcpy16(beacon->name, entry->name, sizeof(beacon->name));
+    MIi_CpuCopy16(beacon->name, entry->name, sizeof(beacon->name));
     return TRUE;
 }
 

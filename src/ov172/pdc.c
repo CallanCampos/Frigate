@@ -92,7 +92,7 @@ static BOOL Pdc_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_OvlLoad(OVERLAY_ID(168));
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PDC, 0xc0000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PdcProcWork), HEAPID_PDC);
-    sys_memset32_fast(0, wk, sizeof(PdcProcWork));
+    MIi_CpuClearFast(0, wk, sizeof(PdcProcWork));
     wk->heapId = HEAPID_PDC;
     wk->main = PdcMain_Create(pdc, wk->heapId);
     wk->pdc = pdc;

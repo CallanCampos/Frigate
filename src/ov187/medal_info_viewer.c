@@ -225,7 +225,7 @@ MedalInfoViewer *MedalInfoViewer_Create(MedalInfoViewerParam *param) {
 
     viewer = GFL_HeapAllocate(heapId, sizeof(MedalInfoViewer), FALSE, "medal_info_viewer.c", 148);
 
-    sys_memset(viewer, 0, sizeof(MedalInfoViewer));
+    MI_CpuFill8(viewer, 0, sizeof(MedalInfoViewer));
     viewer->heapId = heapId;
     MedalInfoViewer_Init(viewer, param);
     MedalInfoViewer_GraphicInit(viewer);
@@ -551,7 +551,7 @@ static void MedalInfoViewer_BGInit(MedalInfoViewer *viewer) {
     int i;
 
     GFL_BGSysCreate(heapId);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0, 16, 5);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG0, 16, 5);
     GFL_BGSysSetLCDConfig(&sMedalInfoLCDConfig);
     for (i = 0; i < MEDAL_INFO_BG_COUNT; i++) {
         GFL_BGSysCreateBG(sMedalInfoBGSetups[i].bg, &sMedalInfoBGSetups[i].setup, sMedalInfoBGSetups[i].mode);
@@ -614,7 +614,7 @@ static void MedalInfoViewer_BGExit(MedalInfoViewer *viewer) {
         GFL_BGSysClearBG(sMedalInfoBGSetups[i].bg);
         GFL_BGSysReleaseBG(sMedalInfoBGSetups[i].bg);
     }
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0, 31, 0);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0, 31, 0);
     GFL_BGSysFree();
 }
 
@@ -763,7 +763,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
         GFL_ArcToolFree(arcs[i]);
     }
 
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     medalArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_MEDAL_DATA, heapId);
     if (viewer->hasMedal == TRUE) {
         GFL_ArcToolRead(medalArc, viewer->entry->medal, &data);
@@ -785,7 +785,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
         func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_MEDAL], FALSE);
     }
 
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.bgPriority = 0;
     actorSetup.priority = 0;
     actorSetup.x = 232;
@@ -795,7 +795,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
                       &actorSetup, CLACT_SURFACE_MAIN, heapId);
     func_0204c488(viewer->actors[MEDAL_INFO_ACTOR_BACK], MEDAL_INFO_SEQ_BACK);
 
-    sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.bgPriority = 0;
     actorSetup.priority = 0;
     actorSetup.x = 200;
@@ -812,7 +812,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
     }
 
     if (viewer->param->mode == MEDAL_INFO_VIEWER_MODE_LIST) {
-        sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 0;
         actorSetup.priority = 0;
         actorSetup.x = 168;
@@ -827,7 +827,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
         }
         func_0204c124(viewer->actors[MEDAL_INFO_ACTOR_PREV], TRUE);
 
-        sys_memset(&actorSetup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 0;
         actorSetup.priority = 0;
         actorSetup.x = 200;

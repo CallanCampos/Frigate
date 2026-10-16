@@ -101,7 +101,7 @@ void FMissionLogFApp_EndMission(LinkFestival *festival, FMissionAppResult *resul
     MedalBox *medalBox = SaveControl_GetMedalBox(save);
     int players;
 
-    sys_memset(result, 0, sizeof(FMissionAppResult));
+    MI_CpuFill8(result, 0, sizeof(FMissionAppResult));
     LinkFestival_SetState(festival, 4);
     result->cleared = func_020148a8(festival, &result->total);
     if (!festival->info->unk0_30) {

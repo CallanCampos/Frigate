@@ -24,7 +24,7 @@ static BOOL CDemo_Init(GameProc *proc, u32 *state, void *param, void *unused) {
     CDemoWork *work;
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_CDEMO, 0x80000);
     work = GFL_ProcInitSubsystem(proc, sizeof(CDemoWork), HEAPID_CDEMO);
-    sys_memset(work, 0, sizeof(CDemoWork));
+    MI_CpuFill8(work, 0, sizeof(CDemoWork));
     work->param = param;
     work->initialized = FALSE;
     return TRUE;
@@ -43,15 +43,15 @@ void CDemo_ConfigureVRAM(void) {
 void CDemo_InitGraphics(CDemoWork *work) {
     MtxFx22 matrix;
     void *screen;
-    gfxSetEngineModeA(GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BG0_AS_2D);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BG0_AS_2D);
     G2_SetBG2ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x00000);
     G2_SetBG3ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, (GXBGBmpScrBase)(0x20000 / 0x4000));
     MAT2_SetScaleRot(&matrix, 0, FX32_ONE, FX32_ONE, 0);
     G2_SetBG2Affine(&matrix, 0, 0, 0, 0);
     G2_SetBG3Affine(&matrix, 0, 0, 0, 0);
     screen = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_CDEMO), 0x18000, TRUE, "cdemo_main.c", 90);
-    gfxUploadBGScreen2A(screen, 0, 0x18000);
-    gfxUploadBGScreen3A(screen, 0, 0x18000);
+    GX_LoadBG2Scr(screen, 0, 0x18000);
+    GX_LoadBG3Scr(screen, 0, 0x18000);
     GFL_HeapFree(screen);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_OBJ, FALSE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3, TRUE);
@@ -96,6 +96,6 @@ void CDemo_LoadPalette(CDemoWork *work, u32 index, u32 fileId) {
     void *file = GFL_G2DIOReadNCLRArc(work->arc, fileId, &palette, HEAPID_TAIL(HEAPID_CDEMO));
     CDemoPalette *buffer = &work->palettes[index];
     buffer->size = palette->size;
-    sys_memcpy32(palette->rawData, buffer->data, buffer->size);
+    MIi_CpuCopy32(palette->rawData, buffer->data, buffer->size);
     GFL_HeapFree(file);
 }

@@ -84,7 +84,7 @@ BOOL GdsRap_Init(GdsRapWork *gdsrap, const GdsRapInit *init) {
     BOOL ret;
 
     GFL_OvlLoad(OVERLAY_ID(189));
-    sys_memset(gdsrap, 0, sizeof(GdsRapWork));
+    MI_CpuFill8(gdsrap, 0, sizeof(GdsRapWork));
     gdsrap->heapId = init->heapId;
     gdsrap->gameData = init->gameData;
     gdsrap->loginBuffer = init->loginBuffer;
@@ -95,7 +95,7 @@ BOOL GdsRap_Init(GdsRapWork *gdsrap, const GdsRapInit *init) {
 
     gdsrap->response = GFL_HeapAllocate(init->heapId, POKE_NET_GDS_GetResponseMaxSize(POKE_NET_GDS_REQCODE_ADMIN),
                                         FALSE, "gds_rap.c", 132);
-    sys_memset(gdsrap->response, 0, POKE_NET_GDS_GetResponseMaxSize(POKE_NET_GDS_REQCODE_ADMIN));
+    MI_CpuFill8(gdsrap->response, 0, POKE_NET_GDS_GetResponseMaxSize(POKE_NET_GDS_REQCODE_ADMIN));
 
     gdsrap->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, init->heapId);
     gdsrap->wordSet = GFL_WordSetSystemCreateDefault(init->heapId);
@@ -171,7 +171,7 @@ BOOL GdsRap_SendBattleVideoUpload(GdsRapWork *gdsrap, GdsProfile *profile) {
     gdsrap->checkCount = 0;
 
     gdsrap->send.video = video;
-    sys_memcpy(profile, getVSPlayerAllocation(), sizeof(GdsProfile));
+    MI_CpuCopy8(profile, getVSPlayerAllocation(), sizeof(GdsProfile));
     gdsrap->sendWait = GDS_RAP_SEND_WAIT;
     gdsrap->sendReq = POKE_NET_GDS_REQCODE_BATTLEDATA_REGIST;
     return TRUE;
@@ -183,7 +183,7 @@ BOOL GdsRap_SendBattleVideoSearch(GdsRapWork *gdsrap, u16 species, u32 search_mo
     }
     GFL_ASSERT(search_mode_no < NELEMS(BattleModeBitTbl));
 
-    sys_memset(&gdsrap->send.condition, 0, sizeof(POKE_NET_GDS_BATTLEDATA_SEARCHCONDITION));
+    MI_CpuFill8(&gdsrap->send.condition, 0, sizeof(POKE_NET_GDS_BATTLEDATA_SEARCHCONDITION));
     gdsrap->send.condition.MonsNo = species;
     gdsrap->send.condition.BattleMode = BattleModeBitTbl[search_mode_no].mode;
     gdsrap->send.condition.BattleModeMask = BattleModeBitTbl[search_mode_no].mask;
@@ -282,7 +282,7 @@ BOOL GdsRap_Main(GdsRapWork *gdsrap) {
                     gdsrap->sub.callback(gdsrap->callbacks.work, &gdsrap->result);
                     gdsrap->sub.callback = NULL;
                 }
-                sys_memset(&gdsrap->sub, 0, sizeof(GdsRapSubProc));
+                MI_CpuFill8(&gdsrap->sub, 0, sizeof(GdsRapSubProc));
                 gdsrap->recv_wait_req = POKE_NET_GDS_REQCODE_LAST;
             }
         }
@@ -365,8 +365,8 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
                 if (NHttpRap_GetCheckStatus(answer) == 0) {
                     // The Pokémon passed: the upload carries the check's signature
                     gdsrap->checkFailed = FALSE;
-                    sys_memcpy(NHttpRap_GetCheckSignature(answer, gdsrap->pkmCount), gdsrap->signature,
-                               GDS_RAP_SIGNATURE_SIZE);
+                    MI_CpuCopy8(NHttpRap_GetCheckSignature(answer, gdsrap->pkmCount), gdsrap->signature,
+                                GDS_RAP_SIGNATURE_SIZE);
                     for (i = 0; i < gdsrap->pkmCount; i++) {
                         gdsrap->checkResult = NHttpRap_GetCheckResult(answer, i);
                     }
@@ -582,7 +582,7 @@ static BOOL GdsRap_GetVideoPokemonPos(GdsRapWork *gdsrap, int index, s32 *client
 }
 
 static void GdsRap_CopyNickname(const u16 *src, u16 *dest, int length) {
-    sys_memcpy(src, dest, length * sizeof(u16));
+    MI_CpuCopy8(src, dest, length * sizeof(u16));
 }
 
 // Takes the library's answer: whether the server's result is a success, the callback of the request, and what is
@@ -644,7 +644,7 @@ BOOL GdsRap_GetResult(GdsRapWork *gdsrap, GdsRapResult **result) {
 }
 
 void GdsRap_ClearResult(GdsRapWork *gdsrap) {
-    sys_memset(&gdsrap->result, 0, sizeof(GdsRapResult));
+    MI_CpuFill8(&gdsrap->result, 0, sizeof(GdsRapResult));
 }
 
 BOOL GdsRap_IsIdle(GdsRapWork *gdsrap) {

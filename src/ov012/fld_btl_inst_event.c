@@ -70,7 +70,7 @@ GameEvent *func_ov012_02161c88(GameSystem *gsys, u32 a1, u32 mode, u32 regulatio
     summaryParam = &work->summaryParam;
     gameData = GSYS_GetGameData(gsys);
     pokedex = GameData_GetPokedex(gameData);
-    sys_memset(summaryParam, 0, sizeof(PStatusParam));
+    MI_CpuFill8(summaryParam, 0, sizeof(PStatusParam));
     summaryParam->party = party;
     summaryParam->dataType = PSTATUS_DATA_PARTY;
     summaryParam->partyCount = PokeParty_GetPkmCount(party);
@@ -105,7 +105,7 @@ static GameEventReturnCode func_ov012_02161d54(GameEvent *event, u32 *state, voi
         break;
     case 4:
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(gsys, work->field, 0, 0, 1, 0, 0));
-        sys_memcpy(work->partyParam.picked, work->picked, sizeof(work->partyParam.picked));
+        MI_CpuCopy8(work->partyParam.picked, work->picked, sizeof(work->partyParam.picked));
         *work->choice = work->partyParam.index;
         *work->result = work->partyParam.result;
         if (*work->choice != 7 && *work->choice != 8 && work->entered != NULL) {

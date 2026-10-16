@@ -35,7 +35,7 @@ BOOL NNSi_G2dGetUnpackedFont(void *pNftrFile, NNSG2dFontInformation **ppFont) {
     if (!IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x102) &&
         !IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x101)) {
         if (!IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x100)) {
-            sys_exit();
+            OS_Terminate();
         }
         bOldVer = TRUE;
     }

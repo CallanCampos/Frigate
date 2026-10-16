@@ -88,7 +88,7 @@ static GameEventReturnCode EncEffRipple_EventCallback(GameEvent *event, u32 *sta
 void EncEffRipple_ClearAndDraw(EncEff *effect) {
     void *eventData = EncEff_GetEventData(effect);
 
-    gfxClearColor(GX_RGB(16, 16, 16), 31, 0x7fff, 0, FALSE);
+    G3X_SetClearColor(GX_RGB(16, 16, 16), 31, 0x7fff, 0, FALSE);
     EncEffCapture_Draw(eventData);
 }
 

@@ -26,8 +26,8 @@ static void RTCCache_ReadDone(int result, void *arg);
 static void RTCCache_Read(RTCCache *cache);
 
 void func_02044170(void) {
-    func_0207cb88();
-    sys_memset(&sRTCCache, 0, sizeof(RTCCache));
+    RTC_Init();
+    MI_CpuFill8(&sRTCCache, 0, sizeof(RTCCache));
     sRTCCache.valid = FALSE;
     sRTCCache.busy = FALSE;
     sRTCCache.frames = 0;
@@ -56,7 +56,7 @@ static void RTCCache_ReadDone(int result, void *arg) {
 
 static void RTCCache_Read(RTCCache *cache) {
     cache->busy = TRUE;
-    cache->result = func_0207cca4(&cache->readDate, &cache->readTime, RTCCache_ReadDone, cache);
+    cache->result = RTC_GetDateTimeAsync(&cache->readDate, &cache->readTime, RTCCache_ReadDone, cache);
 }
 
 void RTC_GetCachedDateTime(RTCDate *date, RTCTime *time) {
@@ -79,7 +79,7 @@ int RTC_ConvertDaySecondsCached(void) {
 }
 
 s64 RTC_ConvertSecondsCached(void) {
-    return func_0207d12c(&sRTCCache.date, &sRTCCache.time);
+    return RTC_ConvertDateTimeToSecond(&sRTCCache.date, &sRTCCache.time);
 }
 
 int func_02044298(const RTCDate *date) {
@@ -99,7 +99,7 @@ int func_02044298(const RTCDate *date) {
     firstDay = *date;
     firstDay.month = 1;
     firstDay.day = 1;
-    func_0207d0b4(&firstDay);
-    func_0207d0b4(date);
+    RTC_ConvertDateToDay(&firstDay);
+    RTC_ConvertDateToDay(date);
     return days;
 }

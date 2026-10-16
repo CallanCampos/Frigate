@@ -12,7 +12,7 @@ MailParam *MailTool_CreateWriteParam(GameData *gameData, u32 a1, u8 partySlot, u
     void *mailBox = func_02009790(gameData);
     MailParam *param = GFL_HeapAllocate(HEAPID_TAIL((HeapID)heapId), sizeof(MailParam), FALSE, "mailtool.c", 67);
 
-    sys_memset32_fast(0, param, sizeof(MailParam));
+    MIi_CpuClearFast(0, param, sizeof(MailParam));
     param->design = mailId;
     param->partySlot = partySlot;
     param->mailBox = mailBox;
@@ -29,7 +29,7 @@ MailParam *MailTool_CreateWriteParam(GameData *gameData, u32 a1, u8 partySlot, u
 MailParam *MailTool_CreatePokemonViewParam(GameData *gameData, PartyPkm *pkm, u32 heapId) {
     MailParam *param = GFL_HeapAllocate(HEAPID_TAIL((HeapID)heapId), sizeof(MailParam), FALSE, "mailtool.c", 151);
 
-    sys_memset32_fast(0, param, sizeof(MailParam));
+    MIi_CpuClearFast(0, param, sizeof(MailParam));
     param->mode = MAIL_PARAM_MODE_VIEW;
     param->save = GameData_GetSaveControl(gameData);
     param->mail = CreateMailData(heapId);
@@ -40,7 +40,7 @@ MailParam *MailTool_CreatePokemonViewParam(GameData *gameData, PartyPkm *pkm, u3
 MailParam *MailTool_CreateItemViewParam(GameData *gameData, u32 mailId, u32 heapId) {
     MailParam *param = GFL_HeapAllocate(HEAPID_TAIL((HeapID)heapId), sizeof(MailParam), FALSE, "mailtool.c", 185);
 
-    sys_memset32_fast(0, param, sizeof(MailParam));
+    MIi_CpuClearFast(0, param, sizeof(MailParam));
     param->mode = MAIL_PARAM_MODE_VIEW;
     param->save = GameData_GetSaveControl(gameData);
     param->mail = CreateMailData(heapId);

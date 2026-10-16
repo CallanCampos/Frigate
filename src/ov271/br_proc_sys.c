@@ -51,7 +51,7 @@ BrProcSys *BrProcSys_Init(u16 procID, const BrProcData *tbl, u16 tbl_max, void *
     u32 i = 0;
 
     p_wk = GFL_HeapAllocate(heapId, sizeof(BrProcSys), FALSE, "br_proc_sys.c", 119);
-    sys_memset(p_wk, 0, sizeof(BrProcSys));
+    MI_CpuFill8(p_wk, 0, sizeof(BrProcSys));
     p_wk->heapId = heapId;
     p_wk->tbl_max = tbl_max;
     p_wk->work = work;
@@ -66,7 +66,7 @@ BrProcSys *BrProcSys_Init(u16 procID, const BrProcData *tbl, u16 tbl_max, void *
         for (i = 0; i < p_wk->recovery->stack_num; i++) {
             BrProcSys_Push(p_wk, p_wk->recovery->stack[i]);
         }
-        sys_memset(p_wk->recovery, 0, sizeof(BrProcSysRecovery));
+        MI_CpuFill8(p_wk->recovery, 0, sizeof(BrProcSysRecovery));
         p_wk->isRecovery = TRUE;
     } else {
         BrProcSys_Push(p_wk, procID);
@@ -96,7 +96,7 @@ void BrProcSys_Main(BrProcSys *p_wk) {
         GFL_ASSERT(p_now->is_use);
         GFL_ASSERT(p_now->cp_data->before_func);
         p_now->param = GFL_HeapAllocate(p_wk->heapId, p_now->cp_data->paramSize, FALSE, "br_proc_sys.c", 210);
-        sys_memset(p_now->param, 0, p_now->cp_data->paramSize);
+        MI_CpuFill8(p_now->param, 0, p_now->cp_data->paramSize);
         preID = BR_PROCID_RECOVERY;
         if (!p_wk->isRecovery) {
             preID = p_prev->procID;
@@ -174,7 +174,7 @@ void BrProcSys_Push(BrProcSys *p_wk, u16 procID) {
 }
 
 void BrProcSys_Interrupt(BrProcSys *p_wk) {
-    sys_memcpy(p_wk->stack, p_wk->recovery->stack, sizeof(p_wk->stack));
+    MI_CpuCopy8(p_wk->stack, p_wk->recovery->stack, sizeof(p_wk->stack));
     p_wk->recovery->stack_num = p_wk->stack_num;
     BrProcSys_Abort(p_wk);
 }
@@ -186,7 +186,7 @@ void BrProcSys_Abort(BrProcSys *p_wk) {
 }
 
 static void BrProcSys_SetStack(BrProcStack *p_stack, u32 procID, const BrProcData *cp_data) {
-    sys_memset(p_stack, 0, sizeof(BrProcStack));
+    MI_CpuFill8(p_stack, 0, sizeof(BrProcStack));
     p_stack->is_use = TRUE;
     p_stack->param = NULL;
     p_stack->procID = procID;
@@ -194,6 +194,6 @@ static void BrProcSys_SetStack(BrProcStack *p_stack, u32 procID, const BrProcDat
 }
 
 static void BrProcSys_ClearStack(BrProcStack *p_stack) {
-    sys_memset(p_stack, 0, sizeof(BrProcStack));
+    MI_CpuFill8(p_stack, 0, sizeof(BrProcStack));
     p_stack->procID = BR_PROCID_NONE;
 }

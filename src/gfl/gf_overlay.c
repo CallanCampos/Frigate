@@ -44,7 +44,7 @@ void GFL_OvlManagerInit(HeapID heapId, u32 mainCount, u32 itcmCount, u32 dtcmCou
     u32 size = (mainCount + itcmCount + dtcmCount) * sizeof(OvlEntry) + sizeof(OvlManager);
 
     sOvlManager = GFL_HeapAllocate(heapId, size, FALSE, "gf_overlay.c", 108);
-    sys_memset32(0, sOvlManager, size);
+    MIi_CpuClear32(0, sOvlManager, size);
     sOvlManager->mainCount = mainCount;
     sOvlManager->itcmCount = itcmCount;
     sOvlManager->dtcmCount = dtcmCount;
@@ -54,7 +54,7 @@ void GFL_OvlManagerInit(HeapID heapId, u32 mainCount, u32 itcmCount, u32 dtcmCou
 }
 
 static void GFL_OvlEntryUnload(OvlEntry *entry) {
-    sys_unload_overlay(MI_PROCESSOR_ARM9, entry->id);
+    FS_UnloadOverlay(MI_PROCESSOR_ARM9, entry->id);
     entry->loaded = FALSE;
 }
 
@@ -111,11 +111,11 @@ BOOL GFL_OvlLoad(u32 overlayId) {
     }
     // Tightly coupled memory can't be written by DMA
     if (region == OVL_REGION_ITCM || region == OVL_REGION_DTCM) {
-        dma = fs_set_dma_id(FS_DMA_NOT_USE);
+        dma = FS_SetDefaultDMA(FS_DMA_NOT_USE);
     }
-    loaded = sys_load_overlay(MI_PROCESSOR_ARM9, overlayId);
+    loaded = FS_LoadOverlay(MI_PROCESSOR_ARM9, overlayId);
     if (region == OVL_REGION_ITCM || region == OVL_REGION_DTCM) {
-        fs_set_dma_id(dma);
+        FS_SetDefaultDMA(dma);
     }
     result = FALSE;
     if (loaded) {
@@ -182,7 +182,7 @@ static u32 GFL_OvlGetMemoryRegion(u32 id) {
     FSOverlayInfo info;
     u32 address;
 
-    sys_read_overlay_header(&info, MI_PROCESSOR_ARM9, id);
+    FS_LoadOverlayInfo(&info, MI_PROCESSOR_ARM9, id);
     address = (u32)info.ramAddress;
     if (address <= HW_ITCM_END && address >= HW_ITCM) {
         return OVL_REGION_ITCM;
@@ -196,7 +196,7 @@ static u32 GFL_OvlGetMemoryRegion(u32 id) {
 static BOOL GFL_OvlGetMemoryRange(u32 id, u32 *start, u32 *end) {
     FSOverlayInfo info;
 
-    if (!sys_read_overlay_header(&info, MI_PROCESSOR_ARM9, id)) {
+    if (!FS_LoadOverlayInfo(&info, MI_PROCESSOR_ARM9, id)) {
         return FALSE;
     }
     *start = (u32)info.ramAddress;

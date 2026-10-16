@@ -9,8 +9,8 @@ MapMatrix *InitMapMatrix(HeapID heapId) {
     MapMatrix *matrix = GFL_HeapAllocate(heapId, sizeof(MapMatrix), TRUE, "map_matrix.c", 0x4c);
 
     matrix->heapId = heapId;
-    sys_memset32((u32)-1, matrix->chunkIds, sizeof(matrix->chunkIds));
-    sys_memset32(0xffff, matrix->zoneIds, sizeof(matrix->zoneIds));
+    MIi_CpuClear32((u32)-1, matrix->chunkIds, sizeof(matrix->chunkIds));
+    MIi_CpuClear32(0xffff, matrix->zoneIds, sizeof(matrix->zoneIds));
     return matrix;
 }
 
@@ -111,7 +111,7 @@ void ProcessMapMatrix(MapMatrix *matrix, const MapMatrixFileHeader *data, u32 ma
     matrix->chunkIdCount = width * height;
     matrix->format = data->format;
     chunkIds = data->chunkIds;
-    sys_memcpy32(chunkIds, matrix->chunkIds, matrix->chunkIdCount * sizeof(u32));
+    MIi_CpuCopy32(chunkIds, matrix->chunkIds, matrix->chunkIdCount * sizeof(u32));
     zoneIds = matrix->zoneIds;
     if (matrix->format == 1) {
         zones = &chunkIds[matrix->chunkIdCount];
@@ -120,7 +120,7 @@ void ProcessMapMatrix(MapMatrix *matrix, const MapMatrixFileHeader *data, u32 ma
             zoneIds[i] = GetVersionedMapChangeZoneNum2(zoneIds[i]);
         }
     } else {
-        sys_memset16(zoneId, zoneIds, sizeof(matrix->zoneIds));
+        MIi_CpuClear16(zoneId, zoneIds, sizeof(matrix->zoneIds));
     }
 }
 

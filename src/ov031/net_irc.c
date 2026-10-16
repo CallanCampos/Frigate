@@ -76,16 +76,16 @@ static void NetIrc_SendPacket(const u8 *data, u8 size, u8 cmd, u8 turn) {
     NetIrcSys.packet.cmd = cmd;
     NetIrcSys.packet.turn = turn;
     if (data != NULL) {
-        sys_memcpy(data, NetIrcSys.packet.data, _IRC_SEND_SIZE);
+        MI_CpuCopy8(data, NetIrcSys.packet.data, _IRC_SEND_SIZE);
     }
     NetIrcSys.packet.crc = getCRC16(&NetIrcSys.packet.cmd, size + 0xc);
     IrcLink_Send((u8 *)&NetIrcSys.packet, size + 0xe, cmd);
 }
 
 void NetIrc_Init(u32 timeout, u8 gameCode) {
-    sys_memset(&NetIrcSys, 0, sizeof(NetIrcSys));
+    MI_CpuFill8(&NetIrcSys, 0, sizeof(NetIrcSys));
     NetIrcSys.timeout = timeout;
-    NetIrcSys.tgid = func_020812b8();
+    NetIrcSys.tgid = WM_GetNextTgid();
     IrcLink_Reset(3);
     IrcLink_SetRecvCallback(NetIrc_OnFrame);
     NetIrcSys.packet.senderId = GFL_RandomLC(0);

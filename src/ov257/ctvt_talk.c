@@ -224,7 +224,7 @@ CtvtTalk *CtvtTalk_Create(CommTvtWork *sys, HeapID heapId) {
     talk->voicePacket = talk->voiceAlloc;
     talk->voiceData = (u8 *)talk->voiceAlloc + 8;
     talk->speed = CTVT_TALK_SPEED_DEFAULT;
-    sys_memcpy16((void *)(HW_DB_BG_PLTT + 0x20), talk->normalPalette, sizeof(talk->normalPalette));
+    MIi_CpuCopy16((void *)(HW_DB_BG_PLTT + 0x20), talk->normalPalette, sizeof(talk->normalPalette));
     for (i = 0; i < 16; i++) {
         talk->flashPalette[i] = 0x7fff;
     }
@@ -254,7 +254,7 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, 17, 6, 0, 0, FALSE, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 12, 5, 0, 0x5000, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 15, 5, 0, 0, FALSE, heapId);
-    gfxRegSetAlphaBlend((u32)&reg_G2S_DB_BLDCNT, 2, 0x14, 5, 15);
+    G2x_SetBlendAlpha_((u32)&reg_G2S_DB_BLDCNT, 2, 0x14, 5, 15);
     GFL_BGSysLoadScr(6);
     GFL_BGSysLoadScr(5);
 
@@ -1404,7 +1404,7 @@ static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk) {
     talk->readyMask = 0;
     talk->newMembers = 0;
     GFL_BGSysSetBGEnabled(5, FALSE);
-    gfxRegSetBrightnessBlend((u32)&reg_G2S_DB_BLDCNT, 0x1c, -8);
+    G2x_SetBlendBrightness_((u32)&reg_G2S_DB_BLDCNT, 0x1c, -8);
     G2S_SetWnd0Position(240, 0, 0, 16);
     G2S_SetWnd0InsidePlane(0x10, FALSE);
     G2S_SetWndOutsidePlane(0x1d, TRUE);
@@ -1432,7 +1432,7 @@ static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk) {
         talk->gameMenu = NULL;
     }
     GFL_BGSysSetBGEnabled(5, TRUE);
-    gfxRegSetAlphaBlend((u32)&reg_G2S_DB_BLDCNT, 2, 0x14, 5, 15);
+    G2x_SetBlendAlpha_((u32)&reg_G2S_DB_BLDCNT, 2, 0x14, 5, 15);
     GXS_SetVisibleWnd(0);
     CtvtComm_ScanAll(sys, CommTvt_GetComm(sys));
 }

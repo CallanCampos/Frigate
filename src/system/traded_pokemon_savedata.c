@@ -20,7 +20,7 @@ u32 TradedPokemonSave_GetSize(void) {
 }
 
 void TradedPokemonSave_Init(TradedPokemonSave *block) {
-    sys_memset(block, 0, sizeof(TradedPokemonSave));
+    MI_CpuFill8(block, 0, sizeof(TradedPokemonSave));
 }
 
 BOOL TradedPokemonSave_IsTraded(TradedPokemonSave *block, u32 index) {

@@ -245,9 +245,9 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
     G3_Identity();
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     if (sys->ortho == FALSE) {
-        gfxLookAt(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
+        G3i_LookAt_(&NNS_G3dGlb.camPos, &NNS_G3dGlb.camUp, &NNS_G3dGlb.camTarget, TRUE, NULL);
     } else {
-        gfxLookAt(&MUSICAL_MCSS_ORTHO_POS, &MUSICAL_MCSS_ORTHO_UP, &MUSICAL_MCSS_ORTHO_TARGET, TRUE, NULL);
+        G3i_LookAt_(&MUSICAL_MCSS_ORTHO_POS, &MUSICAL_MCSS_ORTHO_UP, &MUSICAL_MCSS_ORTHO_TARGET, TRUE, NULL);
     }
     MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
@@ -305,13 +305,13 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
         }
         G3_Translate(pos.x, pos.y, pos.z);
         if (sys->ortho == FALSE) {
-            gfxMultMatrix4x4(&billboard);
+            G3_MultMtx44(&billboard);
         }
         G3_Translate(x, y, 0);
         {
             u16 rot = (flip & 1) ? 0x10000 - mcSrt.rotZ : mcSrt.rotZ;
 
-            gfxRotateZ(-FX_SinIdx(rot), FX_CosIdx(rot));
+            G3_RotZ(-FX_SinIdx(rot), FX_CosIdx(rot));
         }
         G3_Scale(FX_Mul(mcSrt.sx, mcss->scale.x), FX_Mul(mcSrt.sy, mcss->scale.y), FX32_ONE);
         MTX_RotZ33_(&centerRotation, -FX_SinIdx(mcss->rotation), FX_CosIdx(mcss->rotation));
@@ -407,8 +407,8 @@ static void MusicalMcss_DrawQuad(MusicalMcss *mcss, fx32 x, fx32 y, fx32 width, 
     fx32 nodeY;
 
     if (ortho) {
-        gfxOrtho(FX32_CONST(96), FX32_CONST(-95), FX32_CONST(-127), FX32_CONST(128), FX32_ONE, FX32_CONST(1000),
-                 FX32_ONE, TRUE, NULL);
+        G3i_OrthoW_(FX32_CONST(96), FX32_CONST(-95), FX32_CONST(-127), FX32_CONST(128), FX32_ONE, FX32_CONST(1000),
+                    FX32_ONE, TRUE, NULL);
         G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     }
     G3_RestoreMtx(29);
@@ -425,9 +425,9 @@ static void MusicalMcss_DrawQuad(MusicalMcss *mcss, fx32 x, fx32 y, fx32 width, 
     } else if (flip & 1) {
         rot = 0x10000 - mcss->rotation;
     }
-    gfxRotateZ(-FX_SinIdx(rot), FX_CosIdx(rot));
+    G3_RotZ(-FX_SinIdx(rot), FX_CosIdx(rot));
     G3_Translate(nodeX, nodeY, *z);
-    gfxRotateZ(-FX_SinIdx(cellSrt->rotZ), FX_CosIdx(cellSrt->rotZ));
+    G3_RotZ(-FX_SinIdx(cellSrt->rotZ), FX_CosIdx(cellSrt->rotZ));
     if (flip == 0) {
         G3_Scale(cellSrt->sx, cellSrt->sy, FX32_ONE);
         G3_Translate(x, y, 0);

@@ -19,7 +19,7 @@ static BOOL DendouPCProc_Init(GameProc *proc, u32 *state, void *param, void *wor
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_DENDOU_PC, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(DendouPCWork), HEAPID_DENDOU_PC);
-    sys_memset(wk, 0, sizeof(DendouPCWork));
+    MI_CpuFill8(wk, 0, sizeof(DendouPCWork));
     wk->param = param;
     return TRUE;
 }

@@ -86,10 +86,10 @@ static BOOL func_ov066_021e5910(VM *vm, FieldScriptEnv *env) {
     GFL_BGSysSetEnabledBGsA(enabledA);
     GFL_BGSysSetEnabledBGsB(enabledB);
     FieldG2D_Prepare3DSurface(field);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-    gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, 0x3d, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x3f, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x3d, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x3f, -16);
     return FALSE;
 }
 

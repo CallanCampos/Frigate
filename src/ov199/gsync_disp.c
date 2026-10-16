@@ -164,7 +164,7 @@ GSyncDisp *GSyncDisp_Create(HeapID heapId) {
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetDisplayLayout(1);
     GXS_DispOn();
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     ClActSys_Create(&data_02093f24, &sGSyncDispVRAMConfig, disp->heapId);
     disp->clUnit = func_0204bf1c(40, 0, disp->heapId);
@@ -392,8 +392,8 @@ static void GSyncDisp_VBlank(TCB *task, void *work) {
     if (timer % 10 == 1) {
         u8 *palette = disp->bgPalette->rawData;
 
-        gfxUploadStdPaletteBGA(palette + (timer / 10 + 2) * 0x20, 2 * 0x20, 0x20);
-        gfxUploadStdPaletteBGB(palette + (timer / 10 + 2) * 0x20, 2 * 0x20, 0x20);
+        GX_LoadBGPltt(palette + (timer / 10 + 2) * 0x20, 2 * 0x20, 0x20);
+        GXS_LoadBGPltt(palette + (timer / 10 + 2) * 0x20, 2 * 0x20, 0x20);
     }
     if (disp->paletteTimer >= 80) {
         disp->paletteTimer = 0;
@@ -565,20 +565,20 @@ static void GSyncDisp_HBlank(TCB *task, void *work) {
     if (GX_IsHBlank()) {
         G2_SetBG3Offset(disp->waveTable[line], 0);
         if (disp->progressLine >= 192) {
-            gfxUploadStdPaletteBGA(sGaugeColors, 10 * 0x20 + 2, 2);
+            GX_LoadBGPltt(sGaugeColors, 10 * 0x20 + 2, 2);
         } else if (disp->progressLine == 0) {
-            gfxUploadStdPaletteBGA(&sGaugeColors[9], 10 * 0x20 + 2, 2);
+            GX_LoadBGPltt(&sGaugeColors[9], 10 * 0x20 + 2, 2);
         } else if (vcount > 200) {
-            gfxUploadStdPaletteBGA(sGaugeColors, 10 * 0x20 + 2, 2);
+            GX_LoadBGPltt(sGaugeColors, 10 * 0x20 + 2, 2);
         } else if (disp->progressLine > vcount) {
-            gfxUploadStdPaletteBGA(sGaugeColors, 10 * 0x20 + 2, 2);
+            GX_LoadBGPltt(sGaugeColors, 10 * 0x20 + 2, 2);
         } else {
             int diff = vcount - disp->progressLine;
 
             if (diff < NELEMS(sGaugeColors) && diff >= 0) {
-                gfxUploadStdPaletteBGA(&sGaugeColors[diff], 10 * 0x20 + 2, 2);
+                GX_LoadBGPltt(&sGaugeColors[diff], 10 * 0x20 + 2, 2);
             } else {
-                gfxUploadStdPaletteBGA(&sGaugeColors[9], 10 * 0x20 + 2, 2);
+                GX_LoadBGPltt(&sGaugeColors[9], 10 * 0x20 + 2, 2);
             }
         }
     }
@@ -624,10 +624,10 @@ static void GSyncDisp_UpdateFade(GSyncDisp *disp) {
             // The fade ends, with the clamped alpha's 0
             disp->fadeStep = alpha;
         } else {
-            gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
-                                GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                                    GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                                alpha, 8);
+            G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG3,
+                               GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                                   GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                               alpha, 8);
         }
     }
 }
@@ -821,11 +821,11 @@ void GSyncDisp_LoadFloatGraphics(GSyncDisp *disp) {
         if (item != ITEM_NONE) {
             file = GFL_ArcToolReadHeapNew(itemArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), disp->heapId);
             NNS_G2dGetUnpackedPaletteData(file, &palette);
-            sys_memcpy(palette->rawData, disp->floatGraphics[i].palette, sizeof(disp->floatGraphics[i].palette));
+            MI_CpuCopy8(palette->rawData, disp->floatGraphics[i].palette, sizeof(disp->floatGraphics[i].palette));
             GFL_HeapFree(file);
             file = GFL_ArcToolReadHeapNew(itemArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), disp->heapId);
             NNS_G2dGetUnpackedBGCharacterData(file, &chars);
-            sys_memcpy(chars->rawData, disp->floatGraphics[i].chars, sizeof(disp->floatGraphics[i].chars));
+            MI_CpuCopy8(chars->rawData, disp->floatGraphics[i].chars, sizeof(disp->floatGraphics[i].chars));
             GFL_HeapFree(file);
         }
     }
@@ -844,7 +844,7 @@ void GSyncDisp_LoadFloatGraphics(GSyncDisp *disp) {
 
             file = GFL_ArcToolReadHeapNew(iconArc, icon, disp->heapId);
             NNS_G2dGetUnpackedBGCharacterData(file, &chars);
-            sys_memcpy(chars->rawData, disp->floatGraphics[index].chars, sizeof(disp->floatGraphics[index].chars));
+            MI_CpuCopy8(chars->rawData, disp->floatGraphics[index].chars, sizeof(disp->floatGraphics[index].chars));
             GFL_HeapFree(file);
             disp->floatGraphics[index].paletteNum = paletteNum;
         }
@@ -856,9 +856,9 @@ static void GSyncDisp_UploadPokemonFloat(GSyncDisp *disp, int index, ClActor *ac
     NNSG2dImageProxy proxy;
 
     func_0204c40c(actor, &proxy);
-    sys_memcpy(disp->floatGraphics[index].chars,
-               (void *)(HW_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
-               sizeof(disp->floatGraphics[index].chars));
+    MI_CpuCopy8(disp->floatGraphics[index].chars,
+                (void *)(HW_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
+                sizeof(disp->floatGraphics[index].chars));
     func_0204c378(actor, (u8)disp->floatGraphics[index].paletteNum, 1);
 }
 
@@ -866,11 +866,11 @@ static void GSyncDisp_UploadItemFloat(GSyncDisp *disp, int index, ClActor *actor
     NNSG2dImageProxy proxy;
 
     func_0204c40c(actor, &proxy);
-    sys_memcpy(disp->floatGraphics[index].chars,
-               (void *)(HW_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
-               sizeof(disp->floatGraphics[index].chars));
-    cp15_flushDC(disp->floatGraphics[index].palette, sizeof(disp->floatGraphics[index].palette));
-    gfxUploadStdPaletteObjA(disp->floatGraphics[index].palette, 8 * 0x20, sizeof(disp->floatGraphics[index].palette));
+    MI_CpuCopy8(disp->floatGraphics[index].chars,
+                (void *)(HW_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
+                sizeof(disp->floatGraphics[index].chars));
+    DC_FlushRange(disp->floatGraphics[index].palette, sizeof(disp->floatGraphics[index].palette));
+    GX_LoadOBJPltt(disp->floatGraphics[index].palette, 8 * 0x20, sizeof(disp->floatGraphics[index].palette));
 }
 
 // The actor the floating Pokémon are drawn with, by turns

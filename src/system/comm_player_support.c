@@ -28,7 +28,7 @@ void CommPlayerSupport_Free(CommPlayerSupport *support) {
 }
 
 void CommPlayerSupport_Init(CommPlayerSupport *support) {
-    sys_memset(support, 0, sizeof(CommPlayerSupport));
+    MI_CpuFill8(support, 0, sizeof(CommPlayerSupport));
     support->type = COMM_PLAYER_SUPPORT_NONE;
     support->usedType = COMM_PLAYER_SUPPORT_NONE;
     support->lastType = COMM_PLAYER_SUPPORT_NONE;

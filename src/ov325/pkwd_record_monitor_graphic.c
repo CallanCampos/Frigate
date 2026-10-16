@@ -107,7 +107,7 @@ PkwdRecordMonitorGraphic *PkwdRecordMonitorGraphic_Create(u32 layout, HeapID hea
     PkwdRecordMonitorGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(PkwdRecordMonitorGraphic), FALSE, "pkwd_record_monitor_graphic.c", 447);
 
-    sys_memset(graphic, 0, sizeof(PkwdRecordMonitorGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdRecordMonitorGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -134,7 +134,7 @@ void PkwdRecordMonitorGraphic_Free(PkwdRecordMonitorGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(PkwdRecordMonitorGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(PkwdRecordMonitorGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -163,7 +163,7 @@ static void PkwdRecordMonitorGraphic_VBlank(TCB *tcb, void *data) {
 static void PkwdRecordMonitorBG_Init(PkwdRecordMonitorBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(PkwdRecordMonitorBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdRecordMonitorBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sPkwdRecordMonitorLCDConfig);
@@ -183,7 +183,7 @@ static void PkwdRecordMonitorBG_Free(PkwdRecordMonitorBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(PkwdRecordMonitorBG));
+    MI_CpuFill8(bg, 0, sizeof(PkwdRecordMonitorBG));
 }
 
 static void PkwdRecordMonitorBG_Update(PkwdRecordMonitorBG *bg) {
@@ -195,7 +195,7 @@ static void PkwdRecordMonitorBG_VBlank(PkwdRecordMonitorBG *bg) {
 
 static void PkwdRecordMonitorClAct_Init(PkwdRecordMonitorClAct *clact, const BGSysVRAMConfig *vramConfig,
                                         HeapID heapId) {
-    sys_memset(clact, 0, sizeof(PkwdRecordMonitorClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdRecordMonitorClAct));
     ClActSys_Create(&sPkwdRecordMonitorClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -206,7 +206,7 @@ static void PkwdRecordMonitorClAct_Init(PkwdRecordMonitorClAct *clact, const BGS
 static void PkwdRecordMonitorClAct_Free(PkwdRecordMonitorClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(PkwdRecordMonitorClAct));
+    MI_CpuFill8(clact, 0, sizeof(PkwdRecordMonitorClAct));
 }
 
 static void PkwdRecordMonitorClAct_Update(PkwdRecordMonitorClAct *clact) {

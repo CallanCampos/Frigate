@@ -1,5 +1,5 @@
 #include "types.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "ssp_private.h"
 
 // The EXIF reader of TwlSDK's JPEG decoder (ssp_jpegdec.c): it walks the TIFF structure of a JPEG's APP1 segment for
@@ -139,7 +139,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
             if (value + 0x20 >= size) {
                 return EXIF_RESULT_ERROR;
             }
-            sys_memcpy_fast(&data[value + TIFF_HEADER_OFFSET], sDateTime, sizeof(sDateTime));
+            MI_CpuCopy(&data[value + TIFF_HEADER_OFFSET], sDateTime, sizeof(sDateTime));
         }
         if (tag == EXIF_TAG_SOFTWARE) {
             if (valueCount > EXIF_SOFTWARE_LENGTH_MAX) {
@@ -149,7 +149,7 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
             if (value + valueCount >= size) {
                 return EXIF_RESULT_ERROR;
             }
-            sys_memcpy_fast(data + value, sSoftware, valueCount);
+            MI_CpuCopy(data + value, sSoftware, valueCount);
             sSoftwareLength = valueCount;
         }
         count--;

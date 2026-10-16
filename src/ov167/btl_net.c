@@ -397,7 +397,7 @@ static void func_ov167_021b9efc(int netId, int size, const void *data, void *wor
         sWork->parties[packet->clientId] =
             GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), packet->size, TRUE, "btl_net.c", 642);
     }
-    sys_memcpy(packet->data, sWork->parties[packet->clientId], packet->size);
+    MI_CpuCopy8(packet->data, sWork->parties[packet->clientId], packet->size);
     GFL_HeapFree(sWork->tempBuffer);
     sWork->tempBuffer = NULL;
 }
@@ -522,8 +522,8 @@ void func_ov167_021ba204(void) {
 static BtlCommTrainerData *func_ov167_021ba20c(const BtlSetupTrainer *trainer, HeapID heapId) {
     BtlCommTrainerData *data = GFL_HeapAllocate(heapId, sizeof(BtlCommTrainerData), TRUE, "btl_net.c", 841);
 
-    sys_memcpy(trainer, data, sizeof(BtlSetupTrainer));
-    sys_memset16(GFL_StrBufGetTerminator(), data->name, sizeof(data->name));
+    MI_CpuCopy8(trainer, data, sizeof(BtlSetupTrainer));
+    MIi_CpuClear16(GFL_StrBufGetTerminator(), data->name, sizeof(data->name));
     if (trainer->name != NULL) {
         data->nameLength = GFL_StrBufGetCharCount(trainer->name);
         wcharsncpy(GFL_StrBufGetStringPtr(trainer->name), data->name, NELEMS(data->name));
@@ -705,7 +705,7 @@ void func_ov167_021ba564(void *data, PokeParty *party, u8 clientId) {
     BtlNetPartyPacket *packet = data;
 
     packet->clientId = clientId;
-    sys_memcpy(party, packet->data, packet->size);
+    MI_CpuCopy8(party, packet->data, packet->size);
 }
 
 // The link battle's commands, from 0x100

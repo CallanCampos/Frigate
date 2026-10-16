@@ -289,10 +289,10 @@ static void PdcMsgFade_Init(PdcMsgFade *fade, BmpWin *win) {
     fade->state = PDC_MSG_FADE_SHOWN;
     fade->evA = 31 << 12;
     fade->evB = 7 << 12;
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        31, 7);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
+                           GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       31, 7);
 }
 
 // Fades the window out
@@ -356,9 +356,9 @@ static BOOL PdcMsgFade_Update(PdcMsgFade *fade) {
         }
         break;
     }
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
-                            GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        (u8)(fade->evA >> 12), (u8)(fade->evB >> 12));
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |
+                           GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       (u8)(fade->evA >> 12), (u8)(fade->evB >> 12));
     return FALSE;
 }

@@ -84,14 +84,14 @@ GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code) {
         event = GameEvent_Create(gsys, NULL, EventShortcutChoicePopup_Callback, sizeof(ShortcutMenuWork));
     }
     work = GameEvent_GetData(event);
-    sys_memset(work, 0, sizeof(ShortcutMenuWork));
+    MI_CpuFill8(work, 0, sizeof(ShortcutMenuWork));
     work->gameSystem = gsys;
     work->event = event;
     work->field = field;
     work->code = code;
     work->done = 0;
     work->input = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(FieldAppCallInput), FALSE, "event_shortcut_menu.c", 0xcb);
-    sys_memset(work->input, 0, sizeof(FieldAppCallInput));
+    MI_CpuFill8(work->input, 0, sizeof(FieldAppCallInput));
     work->input->gameSystem = work->gameSystem;
     work->input->field = work->field;
     work->input->parent = event;

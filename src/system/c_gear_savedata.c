@@ -17,7 +17,7 @@ u32 func_02009854(void) {
 }
 
 void func_02009858(CGearSave *cgear) {
-    sys_memset(cgear, 0, func_02009854());
+    MI_CpuFill8(cgear, 0, func_02009854());
     CGearPhrases_Init(cgear->phrases);
     func_02009890(&cgear->settings);
     ShortcutSave_Init(&cgear->shortcuts);
@@ -31,7 +31,7 @@ u32 func_0200988c(void) {
 void func_02009890(CGearSettings *settings) {
     s32 i;
 
-    sys_memset(settings, 0, func_0200988c());
+    MI_CpuFill8(settings, 0, func_0200988c());
     for (i = 0; i < CGEAR_PANEL_MAX; i++) {
         settings->panels[i] = 0;
     }

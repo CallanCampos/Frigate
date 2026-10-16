@@ -184,7 +184,7 @@ void KeySystemNet_Request(KeySystemNet *net, u32 request, const void *params) {
     KeySystemNet_CanRequest(net, request);
     if (params != NULL) {
         // BUG: The parameters are smaller than the union, so this reads past them on the caller's stack
-        sys_memcpy(params, &net->request, sizeof(KeySystemNetRequest));
+        MI_CpuCopy8(params, &net->request, sizeof(KeySystemNetRequest));
     }
     switch (request) {
     case KEY_SYSTEM_NET_REQUEST_CONNECT:
@@ -260,7 +260,7 @@ u32 KeySystemNet_GetState(KeySystemNet *net) {
 BOOL KeySystemNet_GetReceived(KeySystemNet *net, void *dest, u32 size) {
     if (net->hasReceived) {
         if (dest != NULL) {
-            sys_memcpy(net->received, dest, size);
+            MI_CpuCopy8(net->received, dest, size);
         }
         return TRUE;
     }
@@ -331,7 +331,7 @@ void KeySystemNet_Reset(KeySystemNet *net) {
         func_02012154();
         func_02012144();
         func_020424e4();
-        func_02058490();
+        DWC_ClearError();
         KeySystemSeq_Set(net->seq, KeySystemNet_SeqIdle);
         break;
     }
@@ -811,7 +811,7 @@ static void KeySystemNet_Receive(int netId, int size, const void *data, void *wo
 
     if (handle == func_02040440() && netId != func_0203ffc4() && size < NET_BUFFER_SIZE) {
         net->hasReceived = TRUE;
-        sys_memcpy(data, net->received, size);
+        MI_CpuCopy8(data, net->received, size);
     }
 }
 

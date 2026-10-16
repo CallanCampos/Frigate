@@ -2,7 +2,9 @@
 #define POKEBW2_POKE_NET_INTERNAL_H
 
 #include "types.h"
+#include "dwc/error.h"
 #include "dwc/ext.h"
+#include "dwc/memfunc.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "poke_net/poke_net_gds.h"
@@ -95,11 +97,6 @@ void POKE_NET_SSL_EndConnection(POKE_NET_SSL_CONNECTION *connection);
 // The C library's memcpy as the compiler builds it in: a copy of a constant size is done in place
 #define POKE_NET_Memcpy __memcpy
 
-// The Wi-Fi library's allocator, and its last error (its code and type)
-void *func_020586e4(int heap, u32 size);
-void func_02058728(int heap, void *ptr, int unused);
-int func_020583b0(int *code, int *type);
-
 // The socket library of overlay 11: resolving a host's name to an address in host order (0 if it fails), and an
 // address as text
 u32 CPS_Resolve(const char *host);
@@ -118,8 +115,5 @@ enum {
 };
 BOOL func_ov011_0215de44(const char *svc, void *result);
 int func_ov011_0215dea8(void);
-
-// NitroSDK's STD_CopyString
-char *func_0207f7a4(char *dest, const char *src);
 
 #endif // POKEBW2_POKE_NET_INTERNAL_H

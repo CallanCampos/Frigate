@@ -103,7 +103,7 @@ GameEvent *EventFieldAppCall_Create(FieldAppCallInput *input, u16 code) {
         GameEvent_Create(input->gameSystem, input->parent, EventFieldAppCall_Callback, sizeof(FieldAppCallWork));
     FieldAppCallWork *work = GameEvent_GetData(event);
 
-    sys_memset(work, 0, sizeof(FieldAppCallWork));
+    MI_CpuFill8(work, 0, sizeof(FieldAppCallWork));
     work->code = code;
     work->input = input;
     work->result = FIELD_APP_RESULT_NEXT;
@@ -262,7 +262,7 @@ void func_ov012_0215b754(FieldAppCallWork *work) {
 
 void func_ov012_0215b76c(FieldAppCallParam *param, FieldAppCallInput *input, FieldAppCallPredicate canRetry,
                          FieldAppCallPredicate callback1, FieldAppCallPredicate callback2, void *arg) {
-    sys_memset(param, 0, sizeof(FieldAppCallParam));
+    MI_CpuFill8(param, 0, sizeof(FieldAppCallParam));
     param->canRetry = canRetry;
     param->callback1 = callback1;
     param->callback2 = callback2;
@@ -477,7 +477,7 @@ void *func_ov012_0215bad4(FieldAppCallWork *work, s32 appParam, s32 prevAppId, c
     ZukanParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ZukanParam), FALSE, "event_field_proclink.c", 1295);
     FieldSound *sound;
 
-    sys_memset(param, 0, sizeof(ZukanParam));
+    MI_CpuFill8(param, 0, sizeof(ZukanParam));
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
     param->pokedex = GameData_GetPokedex(param->gameData);
     param->playerInfo = GetGameDataPlayerInfo(param->gameData);

@@ -28,7 +28,7 @@ FieldFollowWk *InitFieldFollowWk(HeapID heapId) {
 }
 
 void FreeFieldFollowWk(FieldFollowWk *wk) {
-    sys_memset(wk, 0, sizeof(FieldFollowWk));
+    MI_CpuFill8(wk, 0, sizeof(FieldFollowWk));
     GFL_HeapFree(wk);
 }
 

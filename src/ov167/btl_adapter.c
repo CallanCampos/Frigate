@@ -93,7 +93,7 @@ void func_ov167_021d4aec(BtlAdapter *adapter, u32 cmd, const void *data, u32 siz
     adapter->cmd = cmd;
     adapter->sendCmd.cmd = cmd;
     adapter->sendCmd.size = size;
-    sys_memcpy(data, adapter->sendCmd.data, size);
+    MI_CpuCopy8(data, adapter->sendCmd.data, size);
     adapter->returnData = NULL;
     adapter->returnSize = 0;
     adapter->returned = 0;

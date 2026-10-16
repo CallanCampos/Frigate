@@ -20,7 +20,7 @@ int SOCLi_StartupCommandPacketQueue(u32 max) {
     if (packets == NULL) {
         return -1;
     }
-    func_0207acc4(&SOCLiCommandPacketQueue, (OSMessage *)packets, max);
+    OS_InitMessageQueue(&SOCLiCommandPacketQueue, (OSMessage *)packets, max);
     packet = (u8 *)packets + packets_offset;
     while ((s32)max > 0) {
         SOCLi_FreeCommandPacket((SOCLCommandPacket *)packet);
@@ -97,7 +97,7 @@ static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *pac
     OSMessageQueue queue;
 
     if (packet->flag_block == 1) {
-        func_0207acc4(&queue, message, 1);
+        OS_InitMessageQueue(&queue, message, 1);
         packet->reply_queue = &queue;
         SOCLi_SendCommandPacket(pipe, packet);
         OS_ReceiveMessage(&queue, &result, OS_MESSAGE_BLOCK);
@@ -132,7 +132,7 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue) {
             return;
         }
         result = packet->handler(packet);
-        irq = CPU_IRQDisable();
+        irq = OS_DisableInterrupts();
         OS_DisableScheduler();
         OS_ReceiveMessage(queue, NULL, OS_MESSAGE_NOBLOCK);
         if (packet->socket != NULL) {
@@ -143,6 +143,6 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue) {
         }
         SOCLi_FreeCommandPacket(packet);
         OS_EnableScheduler();
-        CPU_SetIRQMask(irq);
+        OS_RestoreInterrupts(irq);
     }
 }

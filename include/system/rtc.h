@@ -5,9 +5,6 @@
 #include "nitro/rtc.h"
 
 // The clock as GFL caches it is in gfl/rtc_cache.h
-void func_0207cc10(RTCDate *date);
-// NitroSDK's RTC_GetTime, which returns 0 on success
-int func_0207cc80(RTCTime *time);
 
 // The periods of a day
 enum {

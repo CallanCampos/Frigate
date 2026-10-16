@@ -2,11 +2,15 @@
 #define POKEBW2_DWC_EXT_H
 
 #include "types.h"
+#include "dwc/error.h"
 #include "dwc/sake.h"
 #include "dwc/soap.h"
 #include "nitro/os.h"
 #include "system/rtc.h"
+#include <ctype.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 // For CPS's address (CPSMyIp), which is set once the library has started
 #include "nitrowifi/cps.h"
 #include "nitrowifi/soc.h"
@@ -15,7 +19,9 @@
 // module and in overlays 11 and 189. The ROM names none of it, so these are the addresses with a word on what each
 // does, read off the callers
 
-// The C library's string functions that the main module links
+// The C library's string functions that the main module links, not taken from <string.h>: MWCC builds them in place
+// (memset and memcpy of a size it knows, strcpy of a literal, strcmp and strlen) when <string.h> declares them,
+// where the ROM calls them
 void *memset(void *dest, int value, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
 void *memmove(void *dest, const void *src, u32 size);
@@ -23,27 +29,15 @@ int memcmp(const void *a, const void *b, u32 size);
 char *strcpy(char *dest, const char *src);
 int strcmp(const char *a, const char *b);
 int strncmp(const char *a, const char *b, u32 size);
-// What swan names strcspn: it counts the characters before the first one that is in the set
 u32 strcspn(const char *s, const char *set);
 u32 strlen(const char *s);
 char *strchr(const char *s, int c);
 char *strstr(const char *s, const char *find);
-long atol(const char *s);
-// The classification of the characters below 0x80, as bits (0x100 for white space), which swan names __ctype_map
-extern u16 __ctype_map[];
-// The C library's stream functions, on a file that the stdio of the main module opened
-int fseek(void *file, long offset, int whence);
-long ftell(void *file);
-void rewind(void *file);
-int fclose(void *file);
-u32 __fread(void *buffer, u32 size, u32 count, void *file);
+// The rest is in the C headers above (MSL's)
 
 // What overlay 189's HTTP code (the NHTTP client and the GameSpy HTTP code) calls in the main module and overlay 11.
 // NitroSDK's thread library, which it also calls, is in nitro/os.h
-// NitroSDK's STD_GetStringLength with a limit: the length of the string, or the limit if it is longer
-int func_0207f900(const char *s, int max);
-// Seeds the random number generator of the secure connections with some bytes
-void CPS_SslAddRandomSeed(const void *data, u32 size);
+// NitroSDK's STD functions are in nitro/std.h, and CPS's in nitrowifi/cps.h
 
 // GameSpy's common code in overlay 11, used by the HTTP code: realloc and free (the ones beside the allocator above),
 // the clock in milliseconds and a sleep, and the sockets (the numbers that the socket functions return are -1 for an
@@ -80,20 +74,8 @@ int func_ov011_021716ac(void *array, const void *element, int (*compare)(const v
 // first)
 void func_ov011_02171634(void *array, int index);
 
-// Writes at most size bytes of a formatted text to dest, returning the length it would have, or a negative number
-int func_0207a2c0(char *dest, u32 size, const char *format, ...);
-// The same with the arguments in a list
-int func_0207a2dc(char *dest, u32 size, const char *format, va_list args);
-// Reads values out of a text, like sscanf
-int func_0207fa4c(const char *text, const char *format, ...);
-// Writes a formatted text to dest (sprintf)
-int func_0207a290(char *dest, const char *format, ...);
-
-// The Wi-Fi library's one error: sets it to a type and a code, unless it is already a type 9 error (the main module)
-void func_020584cc(int type, int code);
-// Whether there is an error, and (the second, with an error type to give) its code
-BOOL func_020584b0(void);
-int func_02058390(int *type);
+// The formatted texts of NitroSDK's OS (OS_SPrintf, OS_SNPrintf and OS_VSNPrintf) are in nitro/os.h,
+// NitroSDK's STD's (STD_TSNPrintf) in nitro/std.h, and the Wi-Fi library's one error in dwc/error.h
 
 // Overlay 11: allocates, zeroed by the caller, and frees
 void *func_ov011_0216dddc(u32 size);
@@ -105,10 +87,6 @@ void func_ov011_0216c998(void);
 void func_ov011_0216c77c(void);
 // Gets the token and the challenge that the player logs in to the authentication service with
 void func_ov011_0215f9b4(const char **authToken, const char **challenge);
-// Waits for some milliseconds (the main module)
-void func_0207aa04(u32 milliseconds);
-// A text with the library's service name, which the server URLs are made from
-extern char data_ov011_021917bc[];
 extern char data_ov011_0219069c[];
 // The secret key of the game
 extern char data_ov011_021918bc[];

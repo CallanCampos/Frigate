@@ -292,7 +292,7 @@ static BOOL PokeVoice_LoadWaveArc(PokeVoiceEntry *entry, u32 waveArc) {
     }
     arc = entry->buffer;
     wave = (PokeVoiceWaveData *)((u8 *)arc + arc->offsetTable[0]);
-    func_0207df80(arc);
+    SND_GetWaveDataCount(arc);
     size = arc->fileHeader.fileSize - arc->offsetTable[0];
     size -= sizeof(PokeVoiceWaveData);
     entry->samples = wave + 1;
@@ -360,7 +360,7 @@ u32 PokeVoice_Play(u32 species, u32 form, u32 pan, u32 chorus, u32 chorusVolume,
 
     // Waits until the sound thread has loaded the next BGM
     while (func_02005cbc() == TRUE) {
-        func_0207aa04(2);
+        OS_Sleep(2);
     }
     handle = PokeVoice_Load(species, form, pan, chorus, chorusVolume, chorusSpeed, reverse, chatterInfo);
     PokeVoice_StartPlayback(handle);

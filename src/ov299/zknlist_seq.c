@@ -86,8 +86,8 @@ static int ZknListSeq_Init(ZknListWork *wk) {
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     GFL_BGSysSetDisplayLayout(0);
     ZknListMain_InitPaletteFade(wk);
     ZknListMain_InitVRAM();
@@ -126,8 +126,8 @@ static int ZknListSeq_Exit(ZknListWork *wk) {
     ZknListMain_ExitMsg(wk);
     ZknListMain_ExitBG();
     ZknListMain_ExitPaletteFade(wk);
-    GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);
@@ -157,8 +157,8 @@ static int ZknListSeq_Start(ZknListWork *wk) {
         break;
     case 1:
         if (PaletteFade_GetActiveMask(wk->paletteFade) == 0) {
-            GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 0);
-            GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 0);
+            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
             ZknListMain_StartFade(wk, 16, 0);
             ZknListMain_StartFrameMove(wk, -8);
             wk->initSeq++;

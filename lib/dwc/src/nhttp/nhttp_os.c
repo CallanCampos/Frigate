@@ -15,11 +15,11 @@ void NHTTPi_LockMutex(OSMutex *mutex) {
 // Starts the thread, making its message queue the first time
 BOOL NHTTPi_createCommThread(NHttpThreadInfo *info, int priority, void *stack) {
     if (!NHTTPi_IsCreateCommThreadMessageQueue(info)) {
-        func_0207acc4(&info->queue, info->messages, 3);
+        OS_InitMessageQueue(&info->queue, info->messages, 3);
         NHTTPi_IsCreateCommThreadMessageQueueOn(info);
     }
-    scheduler_init_thread(&info->thread, NHTTPi_CommThreadProc, NULL, (u8 *)stack + 0x2000, 0x2000, priority);
-    scheduler_start_thread(&info->thread);
+    OS_CreateThread(&info->thread, NHTTPi_CommThreadProc, NULL, (u8 *)stack + 0x2000, 0x2000, priority);
+    OS_WakeupThreadDirect(&info->thread);
     return TRUE;
 }
 
@@ -45,11 +45,11 @@ void NHTTPi_kickCommThread(OSMessageQueue *queue) {
 // it is TRUE
 void NHTTPi_CheckCurrentThread(NHttpThreadInfo *info, BOOL outside) {
     OSThread *thread = &info->thread;
-    OSThread *current = g_IsThreadSwitchRequested.current;
+    OSThread *current = OSi_ThreadInfo.current;
 
     if (current != NULL) {
         if ((!outside && current != thread) || (outside && current == thread)) {
-            sys_exit();
+            OS_Terminate();
         }
     }
 }

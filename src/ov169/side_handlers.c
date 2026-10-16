@@ -84,7 +84,7 @@ static const SideEffectEventAddEntry sSideEffectEventAddTable[NUM_SIDE_EFFECTS] 
 };
 
 void SideEffectsInit(void) {
-    sys_memset(sSideEffects, 0, sizeof(sSideEffects));
+    MI_CpuFill8(sSideEffects, 0, sizeof(sSideEffects));
 }
 
 BattleEventItem *SideEffectEventAdd(u8 side, u32 effect, BattleCondition cont) {

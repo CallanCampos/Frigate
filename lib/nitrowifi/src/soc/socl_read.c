@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
@@ -37,7 +37,7 @@ int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSIn
     if ((flags & SOCLI_READ_NOBLOCK) || socket->flag_block == 0) {
         block = 0;
     } else {
-        if (CPU_GetMode() == 0x12) {
+        if (OS_GetProcMode() == OS_PROCMODE_IRQ) {
             return SOCL_EINVAL;
         }
         block = 1;
@@ -108,7 +108,7 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
     CPSInAddr sender_ip;
     int result;
     u8 *data;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     data = SOCLi_ReadCPSBuffer(socket, &avail, &local_port, &sender_port, &sender_ip);
     if (data != NULL) {
@@ -122,7 +122,7 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
             if (SOCLi_SocketIsTCP(socket)) {
                 result = len;
             }
-            sys_memcpy_fast(data, buf, len);
+            MI_CpuCopy(data, buf, len);
             if (SOCLi_GetRecvPipe(socket)->peek == 0) {
                 SOCLi_GetRecvPipe(socket)->cps_read_len += result;
             }
@@ -144,7 +144,7 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
             socket->local_port = local_port;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return result;
 }
 
@@ -207,7 +207,7 @@ static int SOCLi_ReadCallBack(SOCLCommandPacket *packet) {
                 data = NULL;
                 break;
             }
-            func_0207aa04(10);
+            OS_Sleep(10);
             continue;
         }
         break;
@@ -222,7 +222,7 @@ static int SOCLi_ReadCallBack(SOCLCommandPacket *packet) {
         if (len > cps_len) {
             len = cps_len;
         }
-        sys_memcpy_fast(data, buf, len);
+        MI_CpuCopy(data, buf, len);
         CPS_SocConsume(len);
         return len;
     }
@@ -277,7 +277,7 @@ static int SOCLi_ReadNoWaitCallBack(SOCLCommandPacket *packet) {
     if (len > cps_len) {
         len = cps_len;
     }
-    sys_memcpy_fast(data, buf, len);
+    MI_CpuCopy(data, buf, len);
     CPS_SocConsume(len);
     return len;
 }
@@ -302,14 +302,14 @@ static int SOCLi_ConsumeCallBack(SOCLCommandPacket *packet) {
 
 static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket) {
     SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int consume_len = pipe->cps_read_len;
 
     if (consume_len != 0) {
         pipe->cps_read_len = 0;
         CPS_SocConsume(consume_len);
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return consume_len;
 }
 
@@ -317,7 +317,7 @@ static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
                                int block) {
     SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
     SOCLUdpPacket *packet;
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
     int result;
 
     packet = pipe->udp_head;
@@ -329,7 +329,7 @@ static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
                 result = SOCL_EAGAIN;
                 break;
             }
-            scheduler_yield(&pipe->udp_wait);
+            OS_SleepThread(&pipe->udp_wait);
             if (SOCL_SocketIsInvalid(socket) || !SOCLi_SocketIsCreated(socket)) {
                 result = SOCL_ENOTCONN;
                 break;
@@ -344,7 +344,7 @@ static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
         if (len > packet->len) {
             len = packet->len;
         }
-        sys_memcpy_fast(packet->data, buf, len);
+        MI_CpuCopy(packet->data, buf, len);
         if (remote_port != NULL) {
             *remote_port = packet->port;
         }
@@ -361,7 +361,7 @@ static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
             pipe->udp_queued -= result;
         }
     }
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return result;
 }
 
@@ -369,7 +369,7 @@ BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc) {
     SOCLSocket *socket = (SOCLSocket *)soc;
     SOCLUdpPacket *packet;
     SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
-    u32 irq = CPU_IRQDisable();
+    u32 irq = OS_DisableInterrupts();
 
     if (pipe->udp_queued_max >= pipe->udp_queued + len) {
         packet = SOCLiConfigPtr->alloc(len + sizeof(SOCLUdpPacket));
@@ -379,7 +379,7 @@ BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc) {
             packet->len = len;
             packet->port = soc->remote_port;
             packet->ip = soc->remote_ip;
-            sys_memcpy_fast(data, packet->data, len);
+            MI_CpuCopy(data, packet->data, len);
             if (pipe->udp_tail != NULL) {
                 pipe->udp_tail->next = packet;
             }
@@ -399,6 +399,6 @@ BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc) {
     soc->remote_port = soc->remote_port_bound;
     soc->remote_ip = soc->remote_ip_bound;
     OS_WakeupThread(&pipe->udp_wait);
-    CPU_SetIRQMask(irq);
+    OS_RestoreInterrupts(irq);
     return TRUE;
 }

@@ -186,7 +186,7 @@ static u32 MailBox_StateInit(MailBoxWork *work) {
     GFL_BGSysSetDisplayLayout(0);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MAILBOX_VIEW, 0x60000);
     work->view = GFL_HeapAllocate(HEAPID_MAILBOX_VIEW, sizeof(MailBoxView), FALSE, "mb_seq.c", 268);
-    sys_memset32_fast(0, work->view, sizeof(MailBoxView));
+    MIi_CpuClearFast(0, work->view, sizeof(MailBoxView));
     MailBox_LoadMails(work);
     MailBox_SetVRAMBanks();
     MailBox_InitBGs(work);
@@ -609,7 +609,7 @@ static void MailBox_SetDimmed(MailBoxView *view, BOOL dimmed) {
         MailBox_SetActorBlend(view, 1, TRUE);
         MailBox_SetActorBlend(view, 3, TRUE);
         MailBox_SetActorBlend(view, 7, TRUE);
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 8, 4, 12);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 8, 4, 12);
     } else {
         MailBox_SetActorBlend(view, 0, FALSE);
         MailBox_SetActorBlend(view, 1, FALSE);
@@ -624,7 +624,7 @@ static void MailBox_SetDimmedForReading(MailBoxView *view) {
     MailBox_SetActorBlend(view, 1, TRUE);
     MailBox_SetActorBlend(view, 3, FALSE);
     MailBox_SetActorBlend(view, 7, FALSE);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, 4, 8, 4, 12);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 4, 8, 4, 12);
 }
 
 static void MailBox_ShowMail(MailBoxWork *work) {

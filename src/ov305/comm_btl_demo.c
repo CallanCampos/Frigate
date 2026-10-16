@@ -400,7 +400,7 @@ static BOOL CommBtlDemoProc_Init(GameProc *proc, u32 *state, void *param, void *
     GFL_OvlLoad(OVERLAY_APP_UI);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_COMM_BTL_DEMO, 0x80000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(CommBtlDemoWork), HEAPID_COMM_BTL_DEMO);
-    sys_memset(wk, 0, sizeof(CommBtlDemoWork));
+    MI_CpuFill8(wk, 0, sizeof(CommBtlDemoWork));
     wk->heapId = HEAPID_COMM_BTL_DEMO;
     wk->param = prm;
     wk->type = prm->battle.unk44;
@@ -1313,7 +1313,7 @@ static ClActor *CommBtlDemoObj_CreateCount(CommBtlDemoObj *obj, u32 side, u8 cou
 }
 
 static void CommBtlDemoG3D_Init(CommBtlDemoG3D *g3d, CommBtlDemoGraphic *graphic, HeapID heapId) {
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0, 0x1f, 0, 0);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG0, 0x1f, 0, 0);
     g3d->graphic = graphic;
     g3d->heapId = heapId;
     g3d->manager = GFL_G3DMgrCreate(16, 20, heapId);

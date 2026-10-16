@@ -15,7 +15,7 @@ int WorldTrade_Status_Init(WorldTradeWork *wk, int seq) {
 
     WorldTrade_ExitGraphics(wk);
     wk->subProcParam = GFL_HeapAllocate(HEAPID_WORLDTRADE, sizeof(PStatusParam), FALSE, "worldtrade_status.c", 76);
-    sys_memset(wk->subProcParam, 0, sizeof(PStatusParam));
+    MI_CpuFill8(wk->subProcParam, 0, sizeof(PStatusParam));
     status = wk->subProcParam;
     status->trainerData = wk->param->config;
     status->gameData = GSYS_GetGameData(wk->param->gsys);

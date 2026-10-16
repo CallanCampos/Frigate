@@ -116,7 +116,7 @@ const KeySystemSceneFuncs sChamberSceneFuncs = {
 void KeySystemKeyState_Init(KeySystemKeyState *keys, KeyInfoSave *keyInfo) {
     int i;
 
-    sys_memset(keys, 0, sizeof(KeySystemKeyState));
+    MI_CpuFill8(keys, 0, sizeof(KeySystemKeyState));
     keys->version = GAME_VERSION;
     for (i = 0; i < KEY_SYSTEM_KEY_COUNT; i++) {
         keys->unlocked[i] = func_020104c4(keyInfo, i);
@@ -187,10 +187,10 @@ void KeySystemKeyState_Receive(KeySystemKeyState *keys, KeySystemKeyState *partn
 void KeySystemSaveInfo_Init(KeySystemSaveInfo *info, GameData *gameData) {
     SaveControl *save = GameData_GetSaveControl(gameData);
 
-    sys_memset(info, 0, sizeof(KeySystemSaveInfo));
+    MI_CpuFill8(info, 0, sizeof(KeySystemSaveInfo));
     info->hasSave = SaveControl_IsDataAlreadyPresent(save);
     if (info->hasSave) {
-        sys_memcpy(GetGameDataPlayerInfo(gameData), &info->player, sizeof(PlayerInfo));
+        MI_CpuCopy8(GetGameDataPlayerInfo(gameData), &info->player, sizeof(PlayerInfo));
     }
 }
 
@@ -200,7 +200,7 @@ void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemC
     ClActorPos pos;
     int i;
 
-    sys_memset(keySelect, 0, sizeof(KeySystemKeySelect));
+    MI_CpuFill8(keySelect, 0, sizeof(KeySystemKeySelect));
     keySelect->clact = clact;
     keySelect->keyInfo = keyInfo;
     keySelect->list = list;
@@ -222,7 +222,7 @@ void KeySystemKeySelect_Init(KeySystemKeySelect *keySelect, u32 mode, KeySystemC
     }
     // The cursor at the setting
     func_0204c124(KeySystemClAct_Create(clact, 7, heapId), FALSE);
-    sys_memset(&setup, 0, sizeof(KeySystemListSetup));
+    MI_CpuFill8(&setup, 0, sizeof(KeySystemListSetup));
     setup.bg = 1;
     setup.unk04 = 14;
     setup.frameChar = 10;
@@ -544,7 +544,7 @@ BOOL KeySystemFlow_FormatKeyMsg(KeySystemWork *wk, int key, BOOL receive) {
 
 void KeySystemKeyAnim_Init(KeySystemKeyAnim *anim, KeySystemClAct *clact, KeySystemMsgWin *msgWin, Font *font,
                            HeapID heapId) {
-    sys_memset(anim, 0, sizeof(KeySystemKeyAnim));
+    MI_CpuFill8(anim, 0, sizeof(KeySystemKeyAnim));
     anim->clact = clact;
     anim->msgWin = msgWin;
     anim->font = font;

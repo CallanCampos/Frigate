@@ -134,8 +134,8 @@ static void KeySystemGraphic_G3DInit(void) {
     G3X_AlphaTest(FALSE, 0);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    gfxSetFog(FALSE, 0, 0, 0);
-    gfxClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
+    G3X_SetFog(FALSE, 0, 0, 0);
+    G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
         GFL_G3DSysLightSet(i, &sLights[i]);
@@ -146,7 +146,7 @@ static void KeySystemGraphic_G3DInit(void) {
 KeySystemGraphic *KeySystemGraphic_Create(u32 layout, HeapID heapId) {
     KeySystemGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(KeySystemGraphic), FALSE, "key_system_graphic.c", 468);
 
-    sys_memset(graphic, 0, sizeof(KeySystemGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(KeySystemGraphic));
     graphic->heapId = heapId;
     G2_BlendNone();
     G2S_BlendNone();
@@ -174,7 +174,7 @@ void KeySystemGraphic_Free(KeySystemGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(KeySystemGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(KeySystemGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -222,7 +222,7 @@ static void KeySystemGraphic_VBlank(TCB *tcb, void *data) {
 static void KeySystemGraphicBG_Init(KeySystemGraphicBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(KeySystemGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(KeySystemGraphicBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sLCDConfig);
@@ -241,7 +241,7 @@ static void KeySystemGraphicBG_Free(KeySystemGraphicBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(KeySystemGraphicBG));
+    MI_CpuFill8(bg, 0, sizeof(KeySystemGraphicBG));
 }
 
 static void KeySystemGraphicBG_Update(KeySystemGraphicBG *bg) {
@@ -252,7 +252,7 @@ static void KeySystemGraphicBG_VBlank(KeySystemGraphicBG *bg) {
 }
 
 static void KeySystemGraphicClAct_Init(KeySystemGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(KeySystemGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(KeySystemGraphicClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(32, 0, heapId);
     clact->renderer = func_0204be9c(sSurfaceSetups, NELEMS(sSurfaceSetups), heapId);
@@ -266,7 +266,7 @@ static void KeySystemGraphicClAct_Free(KeySystemGraphicClAct *clact) {
     func_0204becc(clact->renderer);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(KeySystemGraphicClAct));
+    MI_CpuFill8(clact, 0, sizeof(KeySystemGraphicClAct));
 }
 
 static void KeySystemGraphicClAct_Update(KeySystemGraphicClAct *clact) {
@@ -282,7 +282,7 @@ static ClActUnit *KeySystemGraphicClAct_GetUnit(KeySystemGraphicClAct *clact) {
 }
 
 static void KeySystemG3dSys_Init(KeySystemG3dSys *g3d, HeapID heapId) {
-    sys_memset(g3d, 0, sizeof(KeySystemG3dSys));
+    MI_CpuFill8(g3d, 0, sizeof(KeySystemG3dSys));
     GFL_G3DSysCreate(FALSE, 1, 0, 1, 0, heapId, KeySystemGraphic_G3DInit);
     g3d->camera =
         GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, FX32_CONST(24), -FX32_CONST(24), -FX32_CONST(32), FX32_CONST(32),
@@ -295,7 +295,7 @@ static void KeySystemG3dSys_Free(KeySystemG3dSys *g3d) {
     func_0204fb4c();
     GFL_G3DCameraFree(g3d->camera);
     GFL_G3DSysFree();
-    sys_memset(g3d, 0, sizeof(KeySystemG3dSys));
+    MI_CpuFill8(g3d, 0, sizeof(KeySystemG3dSys));
 }
 
 static void KeySystemG3dSys_Begin(KeySystemG3dSys *g3d) {

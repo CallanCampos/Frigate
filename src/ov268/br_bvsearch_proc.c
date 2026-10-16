@@ -188,7 +188,7 @@ static BOOL BrBvSearch_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     int i;
 
     p_wk = GFL_ProcInitSubsystem(proc, sizeof(BrBvSearchWork), BrProcSys_GetHeapID(p_param->procSys));
-    sys_memset(p_wk, 0, sizeof(BrBvSearchWork));
+    MI_CpuFill8(p_wk, 0, sizeof(BrBvSearchWork));
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
     p_wk->que = func_02021998(p_wk->heapId);
@@ -347,7 +347,7 @@ static BOOL BrBvSearch_MenuInit(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
     msg = BrRes_GetMsgData(p_param->res);
     BrRes_LoadBG(p_param->res, 0x1a, p_wk->heapId);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     BrRes_GetObjData(p_param->res, 6, &obj);
     for (i = 0; i < BR_BVSEARCH_BTN_MAX; i++) {
         setup.x = sBrBvSearchMenuBtns[i].x;
@@ -526,7 +526,7 @@ static BOOL BrBvSearch_ModeInit(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
     param.unit = p_param->unit;
     p_wk->p_list = BrList_Init(&param, p_wk->heapId);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     BrRes_GetObjData(p_param->res, 6, &obj);
     for (i = 0; i < 1; i++) {
         setup.x = sBrBvSearchModeBtns[i].x;
@@ -671,7 +671,7 @@ static BOOL BrBvSearch_AreaInit(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
     param.unit = p_param->unit;
     p_wk->p_list = BrList_Init(&param, p_wk->heapId);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     BrRes_GetObjData(p_param->res, 6, &obj);
     for (i = 0; i < 1; i++) {
         setup.x = sBrBvSearchAreaBtns[i].x;

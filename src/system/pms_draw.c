@@ -95,7 +95,7 @@ PMSDraw *PMSDraw_Create(ClActUnit *unit, u32 vramType, PrintQueue *queue, Font *
     int i;
     PMSDraw *draw = GFL_HeapAllocate(heapId, sizeof(PMSDraw), TRUE, "pms_draw.c", 130);
 
-    sys_memset(draw, 0, sizeof(PMSDraw));
+    MI_CpuFill8(draw, 0, sizeof(PMSDraw));
     draw->heapId = heapId;
     draw->queue = queue;
     draw->font = font;
@@ -103,7 +103,7 @@ PMSDraw *PMSDraw_Create(ClActUnit *unit, u32 vramType, PrintQueue *queue, Font *
     draw->backColor = 15;
     draw->followScroll = FALSE;
     draw->slots = GFL_HeapAllocate(heapId, count * sizeof(PMSDrawSlot), TRUE, "pms_draw.c", 141);
-    sys_memset(draw->slots, 0, count * sizeof(PMSDrawSlot));
+    MI_CpuFill8(draw->slots, 0, count * sizeof(PMSDrawSlot));
     draw->res.unit = unit;
     draw->res.vramType = vramType;
     draw->color = PRINT_COLOR(1, 2, 0);

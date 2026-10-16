@@ -32,14 +32,14 @@ const GameProcFunctions DWC_UTILITY_PROC_FUNCTIONS = {
 
 // Runs the settings with interrupts off, which a DSi skips
 static void DwcRapUtil_StartUtility(HeapID heapId) {
-    u32 mask = CPU_IRQDisable();
+    u32 mask = OS_DisableInterrupts();
     void *work = GFL_HeapAllocate(heapId, DWC_UTILITY_WORK_SIZE, TRUE, "dwc_raputil.c", 61);
 
-    if (!hw_isDSi()) {
+    if (!OS_IsRunOnTwl()) {
         DWC_StartUtility(work, DWC_LANGUAGE_ENGLISH, DWC_UTILITY_TOP_MENU_FOR_USA);
     }
     GFL_HeapFree(work);
-    CPU_SetIRQMask(mask);
+    OS_RestoreInterrupts(mask);
     OS_EnableIrq();
 }
 
@@ -57,7 +57,7 @@ static BOOL DwcRapUtil_ProcMain(GameProc *proc, u32 *state, void *param, void *w
 
 // Restarts the game, for the start menu
 static BOOL DwcRapUtil_ResetProcExit(GameProc *proc, u32 *state, void *param, void *work) {
-    sys_reset(0);
+    OS_ResetSystem(0);
     return TRUE;
 }
 

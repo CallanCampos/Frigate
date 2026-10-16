@@ -382,7 +382,7 @@ static void BScenarioMain_Step(BScenarioWork *work) {
 
 static void BScenarioMain_Init(BScenarioWork *work) {
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, work->param->heapId);
     work->printQueue = func_020219a8(0x800, work->param->heapId);
@@ -406,7 +406,7 @@ static void BScenarioMain_Init(BScenarioWork *work) {
     if (!func_0203d554()) {
         work->flags |= BSCENARIO_FLAG_KEYS;
     }
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0, 0x3f, 8, 3);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0, 0x3f, 8, 3);
 }
 
 static void BScenarioMain_StartWipe(BScenarioWork *work) {

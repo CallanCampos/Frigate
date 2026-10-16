@@ -1,7 +1,7 @@
 #include "nitro/mi.h"
+#include "nitro/rtc.h"
 #include "nitrowifi/cps.h"
 #include "ssl_internal.h"
-#include "system/rtc.h"
 
 // NitroWiFi's SSL layer (SSLv3-like: RC4 with MD5 or SHA1 MACs, RSA key exchange), in overlay 11. No swan name for the
 // object or any of its functions; named for their role, after pokediamond's SSL_ssl.o lists the same ones (structure
@@ -12,7 +12,7 @@
 typedef struct SSLSessionCacheEntry {
     u8 session_id[0x20];
     u8 secret[0x30];
-    s32 time; // clock() >> 16 when the entry was last used
+    s32 time; // OS_GetTick() >> 16 when the entry was last used
     CPSInAddr ip;
     u16 port;
     u8 valid;
@@ -236,7 +236,7 @@ static void SSLi_FillReadBuffer(CPSSoc *soc);
 
 // Looks the ctx's session id up in the cache; restores its secret and marks the connection resumed on a hit
 static void SSLi_RestoreSessionById(SSLContext *ctx) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     int i;
 
     ctx->resumed = FALSE;
@@ -244,38 +244,38 @@ static void SSLi_RestoreSessionById(SSLContext *ctx) {
         SSLSessionCacheEntry *entry = &sSessionCache[i];
         if (entry->valid && entry->ip == 0 && entry->port == 0 &&
             memcmp(entry, ctx->key_storage.fields.session_id, 0x20) == 0) {
-            sys_memcpy(entry->secret, ctx->secret, 0x30);
+            MI_CpuCopy8(entry->secret, ctx->secret, 0x30);
             ctx->resumed = TRUE;
             break;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // Looks a cached session up by its peer, offering its session ID and secret for the next ClientHello.
 static void SSLi_FindSessionByPeer(SSLContext *ctx, CPSInAddr ip, u16 port) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     int i;
 
     ctx->resumed = FALSE;
     for (i = 0; i < 4; i++) {
         SSLSessionCacheEntry *entry = &sSessionCache[i];
         if (entry->valid && entry->ip == ip && entry->port == port) {
-            sys_memcpy(entry->session_id, ctx->key_storage.fields.session_id, 0x20);
-            sys_memcpy(entry->secret, ctx->secret, 0x30);
-            entry->time = (u32)(clock() >> 16);
+            MI_CpuCopy8(entry->session_id, ctx->key_storage.fields.session_id, 0x20);
+            MI_CpuCopy8(entry->secret, ctx->secret, 0x30);
+            entry->time = (u32)(OS_GetTick() >> 16);
             ctx->resumed = TRUE;
             break;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // Stores the connection's current session (id and secret) in the cache, reusing a peer hit, an invalid entry, or the
 // oldest entry
 static void SSLi_SaveSession(SSLContext *ctx, CPSInAddr ip, u16 port) {
-    u32 enabled = CPU_IRQDisable();
-    u32 now = (u32)(clock() >> 16);
+    u32 enabled = OS_DisableInterrupts();
+    u32 now = (u32)(OS_GetTick() >> 16);
     SSLSessionCacheEntry *target = &sSessionCache[0];
     u32 bestAge = 0;
     int i;
@@ -300,18 +300,18 @@ static void SSLi_SaveSession(SSLContext *ctx, CPSInAddr ip, u16 port) {
         }
     }
 
-    sys_memcpy(ctx->key_storage.fields.session_id, target->session_id, 0x20);
-    sys_memcpy(ctx->secret, target->secret, 0x30);
+    MI_CpuCopy8(ctx->key_storage.fields.session_id, target->session_id, 0x20);
+    MI_CpuCopy8(ctx->secret, target->secret, 0x30);
     target->time = now;
     target->valid = TRUE;
     target->ip = ip;
     target->port = port;
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // Marks the cache entry that offered this session id as no longer valid, once the handshake using it has failed
 static void SSLi_InvalidateSession(SSLContext *ctx) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -321,7 +321,7 @@ static void SSLi_InvalidateSession(SSLContext *ctx) {
             break;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 }
 
 // A Unix-ish timestamp for the first 4 bytes of a client random
@@ -329,9 +329,9 @@ static u32 SSLi_GetUnixTime(void) {
     RTCDate date;
     RTCTime time;
 
-    func_0207cc10(&date);
-    func_0207cc80(&time);
-    return (u32)func_0207d12c(&date, &time) + 0x386d4380;
+    RTC_GetDate(&date);
+    RTC_GetTime(&time);
+    return (u32)RTC_ConvertDateTimeToSecond(&date, &time) + 0x386d4380;
 }
 
 // CPS_SslGetMaxPriority's role: the priority CPS_SslSetMaxPriority last gave, or -1
@@ -352,15 +352,15 @@ static u32 SSLi_ApplyConfiguredPriority(void) {
     }
     {
         OSThread *thread = OS_GetCurrentThread();
-        u32 old = func_0207aa00(thread);
-        func_0207a998(thread, sConfig.max_priority);
+        u32 old = OS_GetThreadPriority(thread);
+        OS_SetThreadPriority(thread, sConfig.max_priority);
         return old;
     }
 }
 
 static void SSLi_RestorePriority(u32 priority) {
     if (priority < 0x20) {
-        func_0207a998(OS_GetCurrentThread(), priority);
+        OS_SetThreadPriority(OS_GetCurrentThread(), priority);
     }
 }
 
@@ -473,7 +473,7 @@ static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, in
                 }
                 if (index == 0) {
                     if (mode == 0 && len <= 0x100) {
-                        sys_memcpy(value, ctx->certificate_key.modulus, len);
+                        MI_CpuCopy8(value, ctx->certificate_key.modulus, len);
                         ctx->certificate_key.modulus_len = len;
                     } else if (mode == 2) {
                         ctx->chain_key.modulus_len = len;
@@ -481,7 +481,7 @@ static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, in
                     }
                 } else {
                     if (mode == 0 && len <= 8) {
-                        sys_memcpy(value, ctx->certificate_key.exponent, len);
+                        MI_CpuCopy8(value, ctx->certificate_key.exponent, len);
                         ctx->certificate_key.exponent_len = len;
                     } else if (mode == 2) {
                         ctx->chain_key.exponent_len = len;
@@ -538,7 +538,7 @@ static int SSLi_ParseAsn1Field(SSLContext *ctx, const u8 **cursor, int depth, in
             if (ctx->certificate_phase.parsing_subject) {
                 SSLi_AppendCertificateNameValue(ctx->subject, (const char *)value, len);
                 if (ctx->attribute_oid == 5 && len <= 0x4f) {
-                    sys_memcpy(value, ctx->common_name, len);
+                    MI_CpuCopy8(value, ctx->common_name, len);
                     ctx->common_name[len] = 0;
                 }
             } else {
@@ -728,7 +728,7 @@ static void SSLi_ParseCertificateChain(SSLContext *ctx, const u8 *body) {
     RTCDate date;
     body += 3;
     ctx->public_key_algorithm = -1;
-    func_0207cc10(&date);
+    RTC_GetDate(&date);
     ctx->current_date = ((date.year + 2000) << 16) + (date.month << 8) + date.day;
     ctx->subject[0] = 0;
     ctx->certificate_key.exponent_len = 0;
@@ -785,7 +785,7 @@ static void SSLi_ParseServerHello(SSLContext *ctx, u8 *msg) {
     BOOL resumed;
     u8 *cipher;
 
-    sys_memcpy(msg + 2, ctx->server_random, 0x20);
+    MI_CpuCopy8(msg + 2, ctx->server_random, 0x20);
     sidLen = msg[0x22];
     wasResumed = ctx->resumed;
     msg += 0x23;
@@ -797,7 +797,7 @@ static void SSLi_ParseServerHello(SSLContext *ctx, u8 *msg) {
         if (sidLen == 0) {
             resumed = FALSE;
         } else {
-            sys_memcpy(msg, ctx->key_storage.fields.session_id, 0x20);
+            MI_CpuCopy8(msg, ctx->key_storage.fields.session_id, 0x20);
             resumed = TRUE;
         }
         ctx->resumed = resumed;
@@ -865,10 +865,10 @@ static void SSLi_ParseSsl2ClientHello(SSLContext *ctx, u8 *msg) {
     ctx->resumed = FALSE;
     offset = cipherLen + 8 + sessionLen;
     if (challengeLen >= 0x20) {
-        sys_memcpy(msg + offset, ctx->client_random, 0x20);
+        MI_CpuCopy8(msg + offset, ctx->client_random, 0x20);
     } else {
-        sys_memset(ctx->client_random, 0, 0x20 - challengeLen);
-        sys_memcpy(msg + offset, ctx->client_random + 0x20 - challengeLen, challengeLen);
+        MI_CpuFill8(ctx->client_random, 0, 0x20 - challengeLen);
+        MI_CpuCopy8(msg + offset, ctx->client_random + 0x20 - challengeLen, challengeLen);
     }
     ctx->state = SSLI_STATE_CLIENT_HELLO_PARSED;
 }
@@ -883,14 +883,14 @@ static void SSLi_ParseClientHello(SSLContext *ctx, u8 *msg) {
     if (!SSLi_IsSsl3Version(msg[0], msg[1])) {
         return;
     }
-    sys_memcpy(msg + 2, ctx->client_random, 0x20);
+    MI_CpuCopy8(msg + 2, ctx->client_random, 0x20);
 
     sidLen = msg[0x22];
     msg += 0x23;
     if (sidLen != 0x20) {
         ctx->resumed = FALSE;
     } else {
-        sys_memcpy(msg, ctx->key_storage.fields.session_id, 0x20);
+        MI_CpuCopy8(msg, ctx->key_storage.fields.session_id, 0x20);
         SSLi_RestoreSessionById(ctx);
     }
 
@@ -984,7 +984,7 @@ static void SSLi_GenerateMasterSecret(SSLContext *ctx) {
     SSLi_HashKeyMaterialBlock(block, sLabelA, ctx);
     SSLi_HashKeyMaterialBlock(block + 0x10, sLabelBB, ctx);
     SSLi_HashKeyMaterialBlock(block + 0x20, sLabelCCC, ctx);
-    sys_memcpy(block, ctx->secret, 0x30);
+    MI_CpuCopy8(block, ctx->secret, 0x30);
 }
 
 // Generates SSLv3 key material in embedded storage after session-cache use is finished.
@@ -1056,13 +1056,13 @@ static void SSLi_ComputeFinishedMd5(SSLContext *ctx, u8 *out, int sender) {
     // The caller restores the transcript after this destructive computation.
     MD5Update(&ctx->handshake_md5, label, 4);
     MD5Update(&ctx->handshake_md5, ctx->secret, 0x30);
-    sys_memset(pad, 0x36, 0x30);
+    MI_CpuFill8(pad, 0x36, 0x30);
     MD5Update(&ctx->handshake_md5, pad, 0x30);
     MD5Final(&ctx->handshake_md5, out);
 
     MD5Init(&ctx->handshake_md5);
     MD5Update(&ctx->handshake_md5, ctx->secret, 0x30);
-    sys_memset(pad, 0x5c, 0x30);
+    MI_CpuFill8(pad, 0x5c, 0x30);
     MD5Update(&ctx->handshake_md5, pad, 0x30);
     MD5Update(&ctx->handshake_md5, out, 0x10);
     MD5Final(&ctx->handshake_md5, out);
@@ -1075,13 +1075,13 @@ static void SSLi_ComputeFinishedSha1(SSLContext *ctx, u8 *out, int sender) {
 
     SHA1Update(&ctx->handshake_sha1, label, 4);
     SHA1Update(&ctx->handshake_sha1, ctx->secret, 0x30);
-    sys_memset(pad, 0x36, 0x28);
+    MI_CpuFill8(pad, 0x36, 0x28);
     SHA1Update(&ctx->handshake_sha1, pad, 0x28);
     SHA1Final(&ctx->handshake_sha1, out);
 
     SHA1Init(&ctx->handshake_sha1);
     SHA1Update(&ctx->handshake_sha1, ctx->secret, 0x30);
-    sys_memset(pad, 0x5c, 0x28);
+    MI_CpuFill8(pad, 0x5c, 0x28);
     SHA1Update(&ctx->handshake_sha1, pad, 0x28);
     SHA1Update(&ctx->handshake_sha1, out, 0x14);
     SHA1Final(&ctx->handshake_sha1, out);
@@ -1145,7 +1145,7 @@ static u32 SSLi_CheckRecordMac(SSLContext *ctx, u8 *hdr) {
 
         MD5Init(&ctx->handshake_md5_snapshot);
         MD5Update(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
-        sys_memset(pad, 0x36, 0x30);
+        MI_CpuFill8(pad, 0x36, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, pad, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, ctx->read_seq_num, 8);
         MD5Update(&ctx->handshake_md5_snapshot, hdr, 1);
@@ -1154,7 +1154,7 @@ static u32 SSLi_CheckRecordMac(SSLContext *ctx, u8 *hdr) {
 
         MD5Init(&ctx->handshake_md5_snapshot);
         MD5Update(&ctx->handshake_md5_snapshot, ctx->read_mac_secret, 0x10);
-        sys_memset(pad, 0x5c, 0x30);
+        MI_CpuFill8(pad, 0x5c, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, pad, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, mac, 0x10);
         MD5Final(&ctx->handshake_md5_snapshot, mac);
@@ -1166,7 +1166,7 @@ static u32 SSLi_CheckRecordMac(SSLContext *ctx, u8 *hdr) {
 
         SHA1Init(&ctx->handshake_sha1_snapshot);
         SHA1Update(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
-        sys_memset(pad, 0x36, 0x28);
+        MI_CpuFill8(pad, 0x36, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, pad, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, ctx->read_seq_num, 8);
         SHA1Update(&ctx->handshake_sha1_snapshot, hdr, 1);
@@ -1175,7 +1175,7 @@ static u32 SSLi_CheckRecordMac(SSLContext *ctx, u8 *hdr) {
 
         SHA1Init(&ctx->handshake_sha1_snapshot);
         SHA1Update(&ctx->handshake_sha1_snapshot, ctx->read_mac_secret, 0x14);
-        sys_memset(pad, 0x5c, 0x28);
+        MI_CpuFill8(pad, 0x5c, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, pad, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, mac, 0x14);
         SHA1Final(&ctx->handshake_sha1_snapshot, mac);
@@ -1200,7 +1200,7 @@ static u32 SSLi_ComputeMac(SSLContext *ctx, u8 *hdr) {
     if (ctx->cipher_suite == 4) {
         MD5Init(&ctx->handshake_md5_snapshot);
         MD5Update(&ctx->handshake_md5_snapshot, ctx->key_storage.fields.write_mac_secret, 0x10);
-        sys_memset(pad, 0x36, 0x30);
+        MI_CpuFill8(pad, 0x36, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, pad, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, ctx->write_seq_num, 8);
         MD5Update(&ctx->handshake_md5_snapshot, hdr, 1);
@@ -1209,7 +1209,7 @@ static u32 SSLi_ComputeMac(SSLContext *ctx, u8 *hdr) {
 
         MD5Init(&ctx->handshake_md5_snapshot);
         MD5Update(&ctx->handshake_md5_snapshot, ctx->key_storage.fields.write_mac_secret, 0x10);
-        sys_memset(pad, 0x5c, 0x30);
+        MI_CpuFill8(pad, 0x5c, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, pad, 0x30);
         MD5Update(&ctx->handshake_md5_snapshot, content + len, 0x10);
         MD5Final(&ctx->handshake_md5_snapshot, content + len);
@@ -1217,7 +1217,7 @@ static u32 SSLi_ComputeMac(SSLContext *ctx, u8 *hdr) {
     } else if (ctx->cipher_suite == 5) {
         SHA1Init(&ctx->handshake_sha1_snapshot);
         SHA1Update(&ctx->handshake_sha1_snapshot, ctx->key_storage.fields.write_mac_secret, 0x14);
-        sys_memset(pad, 0x36, 0x28);
+        MI_CpuFill8(pad, 0x36, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, pad, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, ctx->write_seq_num, 8);
         SHA1Update(&ctx->handshake_sha1_snapshot, hdr, 1);
@@ -1226,7 +1226,7 @@ static u32 SSLi_ComputeMac(SSLContext *ctx, u8 *hdr) {
 
         SHA1Init(&ctx->handshake_sha1_snapshot);
         SHA1Update(&ctx->handshake_sha1_snapshot, ctx->key_storage.fields.write_mac_secret, 0x14);
-        sys_memset(pad, 0x5c, 0x28);
+        MI_CpuFill8(pad, 0x5c, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, pad, 0x28);
         SHA1Update(&ctx->handshake_sha1_snapshot, content + len, 0x14);
         SHA1Final(&ctx->handshake_sha1_snapshot, content + len);
@@ -1253,7 +1253,7 @@ static int SSLi_ReadExact(u8 *dest, u32 len, CPSSoc *soc) {
         if (avail > len) {
             avail = len;
         }
-        sys_memcpy(data, dest, avail);
+        MI_CpuCopy8(data, dest, avail);
         CPSi_TcpConsume(avail, soc);
         dest += avail;
         len -= avail;
@@ -1293,7 +1293,7 @@ static void SSLi_ProcessRecord(SSLContext *ctx, u8 *record) {
     switch (type) {
     case 0x14:
         if (ctx->read_mac_secret != NULL) {
-            sys_memset(ctx->read_seq_num, 0, 8);
+            MI_CpuFill8(ctx->read_seq_num, 0, 8);
             ctx->state = SSLI_STATE_EXPECT_FINISHED;
         } else {
             ctx->state = SSLI_STATE_ERROR;
@@ -1480,7 +1480,7 @@ static void SSLi_GetRandomBytes(u8 *dest, int len) {
             u32 enabled;
 
             SHA1Init(&sha1);
-            enabled = CPU_IRQDisable();
+            enabled = OS_DisableInterrupts();
             SHA1Update(&sha1, sPool, 0x14);
             SHA1FinalNoLength(&sha1, digest);
 
@@ -1490,7 +1490,7 @@ static void SSLi_GetRandomBytes(u8 *dest, int len) {
                 sPool[i] = (u8)sum;
                 carry = sum >> 8;
             }
-            CPU_SetIRQMask(enabled);
+            OS_RestoreInterrupts(enabled);
             pos = 0;
         }
         if (digest[pos] != 0) {
@@ -1507,11 +1507,11 @@ void CPS_SslAddRandomSeed(const void *seed, u32 len) {
     u32 enabled;
 
     SHA1Init(&sha1);
-    enabled = CPU_IRQDisable();
+    enabled = OS_DisableInterrupts();
     SHA1Update(&sha1, sPool, 0x14);
     SHA1Update(&sha1, seed, len);
     SHA1Final(&sha1, sPool);
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
     sPoolSeeded = TRUE;
 }
 
@@ -1531,7 +1531,7 @@ static void SSLi_SendChangeCipherSpecAndFinished(CPSSoc *soc) {
     packet[3] = 0;
     packet[4] = 1;
     packet[5] = 1;
-    sys_memset(ctx->write_seq_num, 0, 8);
+    MI_CpuFill8(ctx->write_seq_num, 0, 8);
     packet[6] = 0x16;
     packet[7] = 3;
     packet[8] = 0;
@@ -1541,12 +1541,12 @@ static void SSLi_SendChangeCipherSpecAndFinished(CPSSoc *soc) {
     packet[12] = 0;
     packet[13] = 0;
     packet[14] = 0x24;
-    sys_memcpy(&ctx->handshake_md5, &ctx->handshake_md5_snapshot, sizeof(ctx->handshake_md5));
+    MI_CpuCopy8(&ctx->handshake_md5, &ctx->handshake_md5_snapshot, sizeof(ctx->handshake_md5));
     SSLi_ComputeFinishedMd5(ctx, packet + 15, 0);
-    sys_memcpy(&ctx->handshake_md5_snapshot, &ctx->handshake_md5, sizeof(ctx->handshake_md5));
-    sys_memcpy(&ctx->handshake_sha1, &ctx->handshake_sha1_snapshot, sizeof(ctx->handshake_sha1));
+    MI_CpuCopy8(&ctx->handshake_md5_snapshot, &ctx->handshake_md5, sizeof(ctx->handshake_md5));
+    MI_CpuCopy8(&ctx->handshake_sha1, &ctx->handshake_sha1_snapshot, sizeof(ctx->handshake_sha1));
     SSLi_ComputeFinishedSha1(ctx, packet + 31, 0);
-    sys_memcpy(&ctx->handshake_sha1_snapshot, &ctx->handshake_sha1, sizeof(ctx->handshake_sha1));
+    MI_CpuCopy8(&ctx->handshake_sha1_snapshot, &ctx->handshake_sha1, sizeof(ctx->handshake_sha1));
     SSLi_UpdateHandshakeHash(ctx, packet + 11, 0x28);
     len = SSLi_ComputeMac(ctx, packet + 6);
     CPSi_TcpWrite(packet, len + 6, NULL, 0, soc);
@@ -1574,11 +1574,11 @@ static void SSLi_SendClientHello(CPSSoc *soc) {
     ctx->client_random[2] = time >> 8;
     ctx->client_random[3] = time;
     SSLi_GetRandomBytes(ctx->client_random + 4, 0x1c);
-    sys_memcpy(ctx->client_random, p + 2, 0x20);
+    MI_CpuCopy8(ctx->client_random, p + 2, 0x20);
     SSLi_FindSessionByPeer(ctx, soc->remote_ip, soc->remote_port);
     if (ctx->resumed) {
         p[0x22] = 0x20;
-        sys_memcpy(ctx->key_storage.fields.session_id, p + 0x23, 0x20);
+        MI_CpuCopy8(ctx->key_storage.fields.session_id, p + 0x23, 0x20);
         p += 0x43;
     } else {
         p[0x22] = 0;
@@ -1633,7 +1633,7 @@ static void SSLi_SendClientKeyExchange(CPSSoc *soc) {
     padded[1] = 2;
     SSLi_GetRandomBytes(padded + 2, len - 0x33);
     padded[len - 0x31] = 0;
-    sys_memcpy(ctx->secret, padded + len - 0x30, 0x30);
+    MI_CpuCopy8(ctx->secret, padded + len - 0x30, 0x30);
     digits = CPSiAlloc(n * 8);
     if (digits == NULL) {
         CPSiFree(padded);
@@ -1825,7 +1825,7 @@ static void SSLi_FillReadBuffer(CPSSoc *soc) {
     } else {
         complete = FALSE;
     }
-    sys_memcpy(data, ctx->read_buf + ctx->read_buf_pos, len);
+    MI_CpuCopy8(data, ctx->read_buf + ctx->read_buf_pos, len);
     CPSi_TcpConsume(len, soc);
     if (complete) {
         SSLi_ProcessRecord(ctx, ctx->read_buf);
@@ -1873,10 +1873,10 @@ u32 CPS_SslWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
         if (len < (u32)chunk)
             first = len;
         second = chunk - first;
-        sys_memcpy(data, buf + 5, first);
+        MI_CpuCopy8(data, buf + 5, first);
         data += first;
         len -= first;
-        sys_memcpy(data2, buf + 5 + first, second);
+        MI_CpuCopy8(data2, buf + 5 + first, second);
         data2 += second;
         buf[0] = 0x17;
         buf[1] = 3;
@@ -1944,7 +1944,7 @@ void CPS_SetSsl(BOOL enable) {
 // have sat unused too long, and wakes any thread that has been blocked reading an SSL socket for too long, so its
 // own timeout logic can run
 void CPS_SslTick(s32 now) {
-    u32 enabled = CPU_IRQDisable();
+    u32 enabled = OS_DisableInterrupts();
     int i;
     OSThread *thread;
 
@@ -1954,21 +1954,21 @@ void CPS_SslTick(s32 now) {
             entry->valid = FALSE;
         }
     }
-    CPU_SetIRQMask(enabled);
+    OS_RestoreInterrupts(enabled);
 
-    for (thread = g_IsThreadSwitchRequested.list; thread != NULL; thread = thread->next) {
+    for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = (CPSSoc *)thread->specific[0];
         if (soc != NULL && soc->thread != NULL && soc->ssl != 0 && soc->state == CPS_STT_ESTABLISHED &&
             ((SSLContext *)soc->con)->state < SSLI_STATE_APPLICATION_DATA && now - soc->when > 0xef &&
             soc->block_type == CPS_BLOCK_TCPREAD) {
             soc->state = 0;
             soc->block_type = CPS_BLOCK_NONE;
-            scheduler_start_thread(soc->thread);
+            OS_WakeupThreadDirect(soc->thread);
         }
     }
 }
 
 // CPS_SslInit's role: clears the session cache, once at CPS_Startup
 void CPS_SslInit(void) {
-    sys_memset(sSessionCache, 0, sizeof(sSessionCache));
+    MI_CpuFill8(sSessionCache, 0, sizeof(sSessionCache));
 }

@@ -37,7 +37,7 @@ void *NHttpRapEvilCheck_AllocArray(u32 size, u32 count, HeapID heapId) {
     u32 total = count * size;
     void *ptr = GFL_HeapAllocate(heapId, total, FALSE, "nhttp_rap_evilcheck.c", 0xb9);
 
-    sys_memset(ptr, 0, total);
+    MI_CpuFill8(ptr, 0, total);
     return ptr;
 }
 
@@ -46,7 +46,7 @@ void NHttpRapEvilCheck_FreeArray(void *ptr) {
 }
 
 void NHttpRapEvilCheck_SetElement(void *array, const void *element, u32 size, u32 index) {
-    sys_memcpy(element, (u8 *)array + size * index, size);
+    MI_CpuCopy8(element, (u8 *)array + size * index, size);
 }
 
 static void *NHttpRapEvilCheck_Alloc(u32 size) {

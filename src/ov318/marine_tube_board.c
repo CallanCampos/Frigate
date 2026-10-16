@@ -69,7 +69,7 @@ static BOOL MarineTubeBoard_Init(GameProc *proc, u32 *state, void *param, void *
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_MARINE_TUBE_BOARD, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(MarineTubeBoardWork), HEAPID_MARINE_TUBE_BOARD);
-    sys_memset(wk, 0, sizeof(MarineTubeBoardWork));
+    MI_CpuFill8(wk, 0, sizeof(MarineTubeBoardWork));
     wk->heapId = HEAPID_MARINE_TUBE_BOARD;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
     wk->printQueue = func_02021998(wk->heapId);

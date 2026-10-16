@@ -411,8 +411,8 @@ void Box2Main_ExitPaletteFade(Box2SysWork *syswk) {
 
 void Box2Main_SetBlendAlpha(BOOL enabled) {
     if (enabled == TRUE) {
-        gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_NONE,
-                            GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 6, 10);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_NONE,
+                           GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_BD, 6, 10);
     } else {
         G2_BlendNone();
     }
@@ -1523,7 +1523,7 @@ static BOOL PokeIconMoveDataMake(Box2SysWork *syswk, u32 getPos, u32 putPos) {
     u32 start;
 
     work->mode = 0;
-    sys_memset(work->data, 0, sizeof(work->data));
+    MI_CpuFill8(work->data, 0, sizeof(work->data));
     work->setPos = putPos;
 
     if (putPos == BOX2_GET_NONE) {
@@ -1898,7 +1898,7 @@ static void PokeIconPartyOutDataMake(Box2SysWork *syswk, u32 getPos, u32 putPos)
     u32 index;
 
     work->mode = 0;
-    sys_memset(work->data, 0, sizeof(work->data));
+    MI_CpuFill8(work->data, 0, sizeof(work->data));
     if (putPos == BOX2_GET_NONE || Box2Main_PartyOutCheck(syswk, getPos, putPos) == FALSE) {
         work->getPos = BOX2_GET_NONE;
         work->putPos = BOX2_GET_NONE;
@@ -1952,7 +1952,7 @@ static void PokeIconPartyInDataMake(Box2SysWork *syswk, u32 getPos, u32 putPos) 
     u32 count;
 
     work->mode = 0;
-    sys_memset(work->data, 0, sizeof(work->data));
+    MI_CpuFill8(work->data, 0, sizeof(work->data));
     count = PokeParty_GetPkmCount(syswk->param->party);
     if (putPos == BOX2_GET_NONE || count == 6) {
         work->getPos = BOX2_GET_NONE;
@@ -1996,7 +1996,7 @@ static void PokeIconFreeDataMake(Box2SysWork *syswk, u32 pos) {
     u32 i;
 
     work->mode = 0;
-    sys_memset(work->data, 0, sizeof(work->data));
+    MI_CpuFill8(work->data, 0, sizeof(work->data));
     for (i = 0; i < 6; i++) {
         work->data[i].iconPos = i + BOX2_PARTY_POS;
         work->data[i].mvPos = i + BOX2_PARTY_POS;
@@ -4927,7 +4927,7 @@ BOOL Box2Main_VFuncRangeMoveTouch(Box2SysWork *syswk) {
 }
 
 void Box2Main_ClearRangeFlags(Box2SysWork *syswk) {
-    sys_memset(syswk->app->rangeFlags, 0, sizeof(syswk->app->rangeFlags));
+    MI_CpuFill8(syswk->app->rangeFlags, 0, sizeof(syswk->app->rangeFlags));
 }
 
 // Marks which positions of the picked range hold a Pokémon
@@ -5049,7 +5049,7 @@ static void PokeDataRangeMoveBox(Box2SysWork *syswk, u32 getPos, u32 putPos) {
     int x, y;
     int i;
 
-    sys_memset(pkms, 0, sizeof(pkms));
+    MI_CpuFill8(pkms, 0, sizeof(pkms));
     for (y = 0; y < syswk->app->rangeHeight; y++) {
         for (x = 0; x < syswk->app->rangeWidth; x++) {
             i = x + y * 6;

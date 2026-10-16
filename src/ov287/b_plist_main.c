@@ -208,7 +208,7 @@ static void BPlistMain_Task(TCB *tcb, void *data) {
 
 static int BPlistMain_StateInit(BPlistWork *work) {
     G2S_BlendNone();
-    GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbExMgr = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     if (work->param->unk1F == 4) {
         work->page = 6;
@@ -1070,8 +1070,8 @@ static void BPlistMain_LoadGraphics(BPlistWork *work) {
     PaletteFade_LoadNCLR(work->paletteFade, 99, 19, work->param->heapId, PALFADE_BUFFER_SUB_BG, 0x1e0, 0);
 #endif
     GFL_ArcToolFree(arc);
-    sys_memcpy(PaletteFade_GetUnfadedBuffer(work->paletteFade, PALFADE_BUFFER_SUB_BG) + 0xc0, work->savedPalette,
-               sizeof(work->savedPalette));
+    MI_CpuCopy8(PaletteFade_GetUnfadedBuffer(work->paletteFade, PALFADE_BUFFER_SUB_BG) + 0xc0, work->savedPalette,
+                sizeof(work->savedPalette));
     LoadSysMsgBox(4, 1, 14, 0, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, PALFADE_VRAM_SUB_BG, 0xe0, 0x20);
     PaletteFade_LoadNCLR(work->paletteFade, ARCID_FONT, 5, work->param->heapId, PALFADE_BUFFER_SUB_BG, 0x20, 0xd0);
@@ -1680,7 +1680,7 @@ static void BPlistMain_CopyPlateScrn(u16 *buf, u8 bg, u8 pos) {
 
     BPlistMain_GetPlatePos(&x, &y, pos);
     for (i = 0; i < 6; i++) {
-        sys_memcpy16(&scrn[(y + i) * 32 + x], &buf[i * 16], 16 * sizeof(u16));
+        MIi_CpuCopy16(&scrn[(y + i) * 32 + x], &buf[i * 16], 16 * sizeof(u16));
     }
 }
 

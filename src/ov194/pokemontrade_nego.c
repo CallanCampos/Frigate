@@ -207,7 +207,7 @@ void func_ov194_021bbf5c(PokemonTradeWork *wk) {
             wk->negoSlot[side][i] = -1;
             wk->negoBox[side][i] = -1;
             if (wk->negoPkm[side][i] != NULL) {
-                sys_memset(wk->negoPkm[side][i], 0, PokeParty_GetPkmRawSize());
+                MI_CpuFill8(wk->negoPkm[side][i], 0, PokeParty_GetPkmRawSize());
             }
         }
     }
@@ -289,7 +289,7 @@ void func_ov194_021bc124(PokemonTradeWork *wk, int index, PartyPkm *pkm) {
         wk->negoPkm[1][index] =
             GFL_HeapAllocate(wk->heapId, PokeParty_GetPkmRawSize(), TRUE, "pokemontrade_nego.c", 293);
     }
-    sys_memcpy(pkm, wk->negoPkm[1][index], PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(pkm, wk->negoPkm[1][index], PokeParty_GetPkmRawSize());
 }
 
 // The free place among a side's offers for a Pokémon, or -1 if it is offered already
@@ -323,7 +323,7 @@ static int func_ov194_021bc1cc(PokemonTradeWork *wk, int side, int slot, int box
                 wk->negoPkm[side][i] =
                     GFL_HeapAllocate(wk->heapId, PokeParty_GetPkmRawSize(), TRUE, "pokemontrade_nego.c", 335);
             }
-            sys_memcpy(pkm, wk->negoPkm[side][i], PokeParty_GetPkmRawSize());
+            MI_CpuCopy8(pkm, wk->negoPkm[side][i], PokeParty_GetPkmRawSize());
             func_ov194_021be6c0(wk, side, pkm);
             return i;
         }
@@ -763,7 +763,7 @@ static void func_ov194_021bced4(PokemonTradeWork *wk) {
         pkm = wk->negoPkm[0][0];
         func_ov194_021b81c8(wk, 1, pkm);
         size = PokeParty_GetPkmRawSize();
-        sys_memcpy(pkm, PokemonTrade_GetPkm(wk, 1), size);
+        MI_CpuCopy8(pkm, PokemonTrade_GetPkm(wk, 1), size);
         PokemonTrade_SetState(wk, func_ov194_021bcd1c);
     } else {
         PokemonTrade_SetState(wk, func_ov194_021bce98);
@@ -984,7 +984,7 @@ static BOOL func_ov194_021bd4fc(PokemonTradeWork *wk, int index) {
                     PokemonTrade_SetState(wk, func_ov194_021bc87c);
                 } else {
                     func_ov194_021b81c8(wk, side, pkm);
-                    sys_memcpy(pkm, wk->recvPkm[2], PokeParty_GetPkmRawSize());
+                    MI_CpuCopy8(pkm, wk->recvPkm[2], PokeParty_GetPkmRawSize());
                     func_ov194_021b7cc0(wk, 0, value);
                     PokemonTrade_SetState(wk, func_ov194_021bd4b4);
                 }
@@ -1129,7 +1129,7 @@ static void func_ov194_021bd948(PokemonTradeWork *wk) {
 
 // Shows the upper screen's window over the other player's side
 static void func_ov194_021bd97c(PokemonTradeWork *wk) {
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, 0x1b, -8);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x1b, -8);
     G2S_SetWnd0InsidePlane(0x1f, TRUE);
     G2S_SetWnd0Position(128, 0, 255, 169);
     G2S_SetWndOutsidePlane(0x1f, FALSE);
@@ -1702,7 +1702,7 @@ static BOOL func_ov194_021be790(PokemonTradeWork *wk, PartyPkm *pkm, int command
     if (wk->unk11FB_0) {
         return FALSE;
     }
-    sys_memcpy(pkm, wk->recvPkm[2], PokeParty_GetPkmRawSize());
+    MI_CpuCopy8(pkm, wk->recvPkm[2], PokeParty_GetPkmRawSize());
     if (!func_02042c18(handle, 0xff, command, PokeParty_GetPkmRawSize(), wk->recvPkm[2], 0, FALSE, TRUE)) {
         return FALSE;
     }

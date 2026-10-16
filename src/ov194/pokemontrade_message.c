@@ -567,8 +567,8 @@ void func_ov194_021c0b6c(PokemonTradeWork *wk, PartyPkm *pkm) {
         GFL_BGSysSetEnabledBGsA(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
         GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 |
                                 GX_PLANEMASK_OBJ);
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR,
-                                 GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR,
+                                GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
         wk->unk11F9 = 1;
         GFL_VBlankTCBAdd(func_ov194_021c189c, wk, 0);
     }
@@ -797,8 +797,8 @@ void func_ov194_021c1484(PokemonTradeWork *wk) {
 
 // Dims the upper screen, but for its windows
 void func_ov194_021c14b0(PokemonTradeWork *wk) {
-    gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR,
-                             GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
+    G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR,
+                            GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, -8);
     G2S_SetWnd0InsidePlane(GX_PLANEMASK_ALL, TRUE);
     G2S_SetWnd0Position(0, 0, 255, 192);
     G2S_SetWnd1InsidePlane(GX_PLANEMASK_ALL, TRUE);

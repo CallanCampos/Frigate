@@ -33,10 +33,10 @@ u32 func_0200a5f0(void) {
 void func_0200a5f8(MysteryGiftSaveData *data) {
     MysteryGiftSave save;
 
-    sys_memset(&save, 0, sizeof(MysteryGiftSave));
+    MI_CpuFill8(&save, 0, sizeof(MysteryGiftSave));
     save.kind = MG_DATA_SAVE;
     save.data = data;
-    sys_memset(data, 0, sizeof(MysteryGiftSaveData));
+    MI_CpuFill8(data, 0, sizeof(MysteryGiftSaveData));
     encrypt(&save);
 }
 
@@ -80,7 +80,7 @@ static void removeCard(MysteryGiftSave *save, u32 slot) {
     for (; slot < max - 1; slot++) {
         *getCard(save, slot) = *getCard(save, slot + 1);
     }
-    sys_memset(getCard(save, slot), 0, sizeof(MysteryGift));
+    MI_CpuFill8(getCard(save, slot), 0, sizeof(MysteryGift));
 }
 
 static MysteryGift *getUsedCard(MysteryGiftSave *save, u32 slot) {
@@ -100,7 +100,7 @@ BOOL func_0200a71c(MysteryGiftSave *save, u32 slot, MysteryGift *gift) {
     decrypt(save);
     card = getUsedCard(save, slot);
     if (card != NULL) {
-        sys_memcpy(card, gift, sizeof(MysteryGift));
+        MI_CpuCopy8(card, gift, sizeof(MysteryGift));
         found = TRUE;
     }
     encrypt(save);
@@ -117,7 +117,7 @@ BOOL func_0200a750(MysteryGiftSave *save, const MysteryGift *gift) {
         for (i = 0; i < max; i++) {
             MysteryGift *card = getCard(save, i);
             if (!func_0200a628(card->kind)) {
-                sys_memcpy(gift, card, sizeof(MysteryGift));
+                MI_CpuCopy8(gift, card, sizeof(MysteryGift));
                 saved = TRUE;
                 break;
             }
@@ -238,9 +238,9 @@ void func_0200a970(MysteryGiftSave *save, u32 slot1, u32 slot2) {
     if (isSlotUsed(save, slot1) && isSlotUsed(save, slot2)) {
         MysteryGift *card1 = getUsedCard(save, slot1);
         MysteryGift *card2 = getUsedCard(save, slot2);
-        sys_memcpy(card1, &temp, sizeof(MysteryGift));
-        sys_memcpy(card2, card1, sizeof(MysteryGift));
-        sys_memcpy(&temp, card2, sizeof(MysteryGift));
+        MI_CpuCopy8(card1, &temp, sizeof(MysteryGift));
+        MI_CpuCopy8(card2, card1, sizeof(MysteryGift));
+        MI_CpuCopy8(&temp, card2, sizeof(MysteryGift));
     }
     encrypt(save);
 }
@@ -265,7 +265,7 @@ u32 func_0200a9f4(MysteryGiftSave *save, GameData *gameData) {
 
 MysteryGiftSave *mysteryGiftBlock(SaveControl *save, u32 mode, HeapID heapId) {
     MysteryGiftSave *giftSave = GFL_HeapAllocate(heapId, sizeof(MysteryGiftSave), FALSE, "mystery_data.c", 608);
-    sys_memset(giftSave, 0, sizeof(MysteryGiftSave));
+    MI_CpuFill8(giftSave, 0, sizeof(MysteryGiftSave));
     func_0200aa74(giftSave, save, mode, heapId);
     return giftSave;
 }
@@ -286,7 +286,7 @@ u32 func_0200aa6c(MysteryGiftSave *save) {
 void func_0200aa74(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapID heapId) {
     BOOL useSave;
 
-    sys_memset(giftSave, 0, sizeof(MysteryGiftSave));
+    MI_CpuFill8(giftSave, 0, sizeof(MysteryGiftSave));
     switch (mode) {
     case 0:
         useSave = TRUE;
@@ -307,7 +307,7 @@ void func_0200aa74(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapI
         giftSave->data = SaveOutside_GetGifts(giftSave->outside);
         giftSave->kind = MG_DATA_OUTSIDE;
         if (!SaveOutside_IsGiftsLoaded(giftSave->outside)) {
-            sys_memset(giftSave->data, 0, sizeof(SaveOutsideGifts));
+            MI_CpuFill8(giftSave->data, 0, sizeof(SaveOutsideGifts));
             encrypt(giftSave);
         }
     }
@@ -322,7 +322,7 @@ void func_0200aaec(MysteryGiftSave *save) {
     case MG_DATA_SAVE:
         break;
     }
-    sys_memset(save, 0, sizeof(MysteryGiftSave));
+    MI_CpuFill8(save, 0, sizeof(MysteryGiftSave));
 }
 
 static u32 getKind(MysteryGiftSave *save) {

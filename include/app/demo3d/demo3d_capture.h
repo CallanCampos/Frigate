@@ -34,13 +34,4 @@ Demo3DCapture *Demo3DCapture_Create(TCBExManager *manager, const Demo3DCapturePa
 // Ends the capture and goes back to a display mode
 void Demo3DCapture_End(Demo3DCapture *capture, int dispMode, int bgMode, int bg0As3D);
 
-// The display modes that show VRAM A to C, as GX_DISPMODE_VRAM_D shows VRAM D. These belong in nitro/gx.h
-#define GX_DISPMODE_VRAM_A 2
-#define GX_DISPMODE_VRAM_B 6
-#define GX_DISPMODE_VRAM_C 10
-
-// NitroSDK's GX_GetBankForLCDC and G3X_SetDisp1DotDepth. These belong in gfl/graphics.h
-u32 gfxGetLCDCBanks(void);
-void gfxSet1DotDepth(fx32 depth);
-
 #endif // POKEBW2_APP_DEMO3D_DEMO3D_CAPTURE_H

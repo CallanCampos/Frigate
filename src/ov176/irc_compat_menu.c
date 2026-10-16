@@ -321,7 +321,7 @@ static BOOL IrcCompatMenu_Init(GameProc *proc, u32 *state, void *param, void *wo
 
     GFL_HeapCreateChild(HEAPID_USER, HEAP_ID, 0x40000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(IrcCompatMenuWork), HEAP_ID);
-    sys_memset(wk, 0, sizeof(IrcCompatMenuWork));
+    MI_CpuFill8(wk, 0, sizeof(IrcCompatMenuWork));
     wk->param = menuParam;
     IrcCompatMenuText_Init(&wk->text, HEAP_ID);
     IrcCompatMenuGraphic_Create(&wk->graphic, HEAP_ID);
@@ -430,7 +430,7 @@ static BOOL IrcCompatMenu_Main(GameProc *proc, u32 *state, void *param, void *wo
 }
 
 static void IrcCompatMenuGraphic_Create(IrcCompatMenuGraphic *graphic, HeapID heapId) {
-    sys_memset(graphic, 0, sizeof(IrcCompatMenuGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(IrcCompatMenuGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -517,7 +517,7 @@ static void IrcCompatMenuClAct_Init(IrcCompatMenuClAct *clact, const BGSysVRAMCo
     ClActorSetup setup;
     int i;
 
-    sys_memset(clact, 0, sizeof(IrcCompatMenuClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcCompatMenuClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -528,7 +528,7 @@ static void IrcCompatMenuClAct_Init(IrcCompatMenuClAct *clact, const BGSysVRAMCo
     clact->chars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
     clact->cellAnims = func_0204bde0(arc, 10, 9, heapId);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < HEART_COUNT; i++) {
         clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
                                          CLACT_SURFACE_SUB, heapId);
@@ -559,7 +559,7 @@ static void IrcCompatMenuClAct_Free(IrcCompatMenuClAct *clact) {
     func_0204be64(clact->cellAnims);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(IrcCompatMenuClAct));
+    MI_CpuFill8(clact, 0, sizeof(IrcCompatMenuClAct));
 }
 
 static void IrcCompatMenuClAct_Update(IrcCompatMenuClAct *clact) {
@@ -579,7 +579,7 @@ static ClActUnit *IrcCompatMenuClAct_GetUnit(IrcCompatMenuClAct *clact) {
 }
 
 static void IrcCompatMenuText_Init(IrcCompatMenuText *text, HeapID heapId) {
-    sys_memset(text, 0, sizeof(IrcCompatMenuText));
+    MI_CpuFill8(text, 0, sizeof(IrcCompatMenuText));
     func_020232d0();
     text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     text->queue = func_02021998(heapId);
@@ -594,7 +594,7 @@ static void IrcCompatMenuText_Free(IrcCompatMenuText *text) {
     GFL_MsgDataFree(text->msgData);
     func_02021a18(text->queue);
     GFL_FontFree(text->font);
-    sys_memset(text, 0, sizeof(IrcCompatMenuText));
+    MI_CpuFill8(text, 0, sizeof(IrcCompatMenuText));
 }
 
 static BOOL IrcCompatMenuText_Update(IrcCompatMenuText *text) {
@@ -615,7 +615,7 @@ static MsgData *IrcCompatMenuText_GetMsgData(IrcCompatMenuText *text) {
 
 static void IrcCompatMenuWindow_Init(IrcCompatMenuWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height, u8 palette,
                                      HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcCompatMenuWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcCompatMenuWindow));
     win->color = 15;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, TRUE);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -626,7 +626,7 @@ static void IrcCompatMenuWindow_Init(IrcCompatMenuWindow *win, u8 bg, u8 x, u8 y
 
 static void IrcCompatMenuWindow_InitWithColor(IrcCompatMenuWindow *win, u8 bg, u8 x, u8 y, u8 width, u8 height,
                                               u8 palette, u16 color, u8 fromEnd, HeapID heapId) {
-    sys_memset(win, 0, sizeof(IrcCompatMenuWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcCompatMenuWindow));
     win->color = color;
     win->window = BmpWin_CreateDynamic(bg, x, y, width, height, palette, fromEnd);
     win->strbuf = GFL_StrBufCreate(255, heapId);
@@ -638,7 +638,7 @@ static void IrcCompatMenuWindow_InitWithColor(IrcCompatMenuWindow *win, u8 bg, u
 static void IrcCompatMenuWindow_Free(IrcCompatMenuWindow *win) {
     GFL_StrBufFree(win->strbuf);
     BmpWin_Free(win->window);
-    sys_memset(win, 0, sizeof(IrcCompatMenuWindow));
+    MI_CpuFill8(win, 0, sizeof(IrcCompatMenuWindow));
 }
 
 static BOOL IrcCompatMenuWindow_Flush(IrcCompatMenuWindow *win, IrcCompatMenuText *text) {
@@ -813,7 +813,7 @@ static void IrcCompatMenu_StepMenu(IrcCompatMenuWork *wk, u16 *state) {
     case 0:
         wk->choice = 2;
         wk->choiceSent = FALSE;
-        wk->startTime = OS_TicksToMilliSeconds((u32)clock());
+        wk->startTime = OS_TicksToMilliSeconds((u32)OS_GetTick());
         *state = 1;
         break;
     case 1:
@@ -832,7 +832,7 @@ static void IrcCompatMenu_StepMenu(IrcCompatMenuWork *wk, u16 *state) {
                 break;
             }
         }
-        wk->choiceTime = OS_TicksToMilliSeconds((u32)clock()) - wk->startTime;
+        wk->choiceTime = OS_TicksToMilliSeconds((u32)OS_GetTick()) - wk->startTime;
         if (IrcAppBar_IsPressed(wk->button)) {
             IrcCompatMenuButtons_SetEnabled(&wk->buttons, FALSE);
         }
@@ -934,7 +934,7 @@ static void IrcCompatMenuButtons_Init(IrcCompatMenuButtons *buttons, u8 bg, cons
                                       u16 count, IrcCompatMenuText *text, HeapID heapId) {
     int i;
 
-    sys_memset(buttons, 0, sizeof(IrcCompatMenuButtons));
+    MI_CpuFill8(buttons, 0, sizeof(IrcCompatMenuButtons));
     buttons->count = count;
     buttons->defs = defs;
     buttons->bg = bg;
@@ -980,7 +980,7 @@ static void IrcCompatMenuButtons_Free(IrcCompatMenuButtons *buttons) {
         BmpWin_Free(buttons->windows[i]);
     }
     GFL_BMN_Delete(buttons->manager);
-    sys_memset(buttons, 0, sizeof(IrcCompatMenuButtons));
+    MI_CpuFill8(buttons, 0, sizeof(IrcCompatMenuButtons));
 }
 
 static inline u8 IrcCompatMenuButtons_GetBG(const IrcCompatMenuButtons *buttons, u32 index) {
@@ -1092,13 +1092,13 @@ static void IrcCompatMenuButtons_Callback(u32 button, u32 event, void *work) {
 }
 
 static void IrcCompatMenuScroll_Init(IrcCompatMenuScroll *scroll, HeapID heapId) {
-    sys_memset(scroll, 0, sizeof(IrcCompatMenuScroll));
+    MI_CpuFill8(scroll, 0, sizeof(IrcCompatMenuScroll));
     GFL_BGSysMoveBGReq(4, BG_MOVE_SET_Y, SCROLL_DISTANCE);
     GFL_BGSysMoveBGReq(7, BG_MOVE_SET_Y, SCROLL_DISTANCE);
 }
 
 static void IrcCompatMenuScroll_Free(IrcCompatMenuScroll *scroll) {
-    sys_memset(scroll, 0, sizeof(IrcCompatMenuScroll));
+    MI_CpuFill8(scroll, 0, sizeof(IrcCompatMenuScroll));
 }
 
 static void IrcCompatMenuScroll_Update(IrcCompatMenuScroll *scroll) {
@@ -1120,7 +1120,7 @@ static void IrcCompatMenuHeart_Init(IrcCompatMenuHeart *heart, ClActor *actor, B
     ClActorPos pos;
     u16 sequence;
 
-    sys_memset(heart, 0, sizeof(IrcCompatMenuHeart));
+    MI_CpuFill8(heart, 0, sizeof(IrcCompatMenuHeart));
     heart->actor = actor;
     if (isSpecial) {
         sequence = 13;
@@ -1137,7 +1137,7 @@ static void IrcCompatMenuHeart_Init(IrcCompatMenuHeart *heart, ClActor *actor, B
 }
 
 static void IrcCompatMenuHeart_Free(IrcCompatMenuHeart *heart) {
-    sys_memset(heart, 0, sizeof(IrcCompatMenuHeart));
+    MI_CpuFill8(heart, 0, sizeof(IrcCompatMenuHeart));
 }
 
 static void IrcCompatMenuHeart_Update(IrcCompatMenuHeart *heart) {
@@ -1170,7 +1170,7 @@ static void IrcCompatMenuHearts_Init(IrcCompatMenuHearts *hearts, IrcCompatMenuG
                                      HeapID heapId) {
     int i;
 
-    sys_memset(hearts, 0, sizeof(IrcCompatMenuHearts));
+    MI_CpuFill8(hearts, 0, sizeof(IrcCompatMenuHearts));
     if (log == NULL) {
         hearts->count = HEART_COUNT;
     } else {
@@ -1195,7 +1195,7 @@ static void IrcCompatMenuHearts_Free(IrcCompatMenuHearts *hearts) {
     for (i = 0; i < hearts->count; i++) {
         IrcCompatMenuHeart_Free(&hearts->hearts[i]);
     }
-    sys_memset(hearts, 0, sizeof(IrcCompatMenuHearts));
+    MI_CpuFill8(hearts, 0, sizeof(IrcCompatMenuHearts));
 }
 
 // Sets one more heart going every 30 frames

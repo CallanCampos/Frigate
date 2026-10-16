@@ -43,7 +43,7 @@ BOOL FMissionLogFV_PopEntry(FestMissionLog *log, FestMissionLogEntry *dest) {
         return FALSE;
     }
     *dest = log->entries[0];
-    sys_memcpy(&log->entries[1], &log->entries[0], sizeof(FestMissionLogEntry) * (FEST_MISSION_LOG_MAX - 1));
+    MI_CpuCopy8(&log->entries[1], &log->entries[0], sizeof(FestMissionLogEntry) * (FEST_MISSION_LOG_MAX - 1));
     FestMissionLogEntry_Clear(&log->entries[FEST_MISSION_LOG_MAX - 1]);
     log->count--;
     return TRUE;
@@ -98,7 +98,7 @@ u16 FMissionLogFV_GetPassPower(FestMissionPassPowers *passPowers, StrBuf *name, 
 void FMissionLogFV_RemovePassPower(FestMissionPassPowers *passPowers, BOOL received) {
     if (received) {
         if (passPowers->count != 0) {
-            sys_memcpy(&passPowers->others[1], &passPowers->others[0], sizeof(FestMissionPassPower));
+            MI_CpuCopy8(&passPowers->others[1], &passPowers->others[0], sizeof(FestMissionPassPower));
             FestMissionPassPower_Clear(&passPowers->others[1]);
             passPowers->count--;
         }

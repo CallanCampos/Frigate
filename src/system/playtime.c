@@ -55,7 +55,7 @@ void updateGameTime(PlayTime *time, u32 addSeconds) {
 }
 
 void func_02008cdc(PlayTime *dest, const PlayTime *src) {
-    sys_memcpy(src, dest, sizeof(PlayTime));
+    MI_CpuCopy8(src, dest, sizeof(PlayTime));
 }
 
 u16 func_02008cec(PlayTime *time) {
@@ -74,8 +74,8 @@ void func_02008cf8(PlayTime *time) {
     RTCDate date;
     RTCTime now;
 
-    func_0207cc10(&date);
-    func_0207cc80(&now);
+    RTC_GetDate(&date);
+    RTC_GetTime(&now);
     time->year = date.year;
     time->month = date.month;
     time->day = date.day;

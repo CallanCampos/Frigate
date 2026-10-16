@@ -484,7 +484,7 @@ static void BScenarioGraphic_CreateActors(BScenarioWork *work, u32 surface, cons
     ClActorSetup setup;
     ClActor **actors;
 
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     s16 palette = resources[0];
     s16 cells = resources[2];
     s16 count = resources[3];

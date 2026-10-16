@@ -243,7 +243,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
     case 7:
         return GAMEEVENT_DONE;
     case 8:
-        sys_memset(&wk->login, 0, sizeof(WifiLoginParam));
+        MI_CpuFill8(&wk->login, 0, sizeof(WifiLoginParam));
         *state = 9;
         wk->login.unk14 = 0;
         break;

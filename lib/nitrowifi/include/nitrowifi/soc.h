@@ -184,6 +184,12 @@ void SOCLi_TrashSocket(void);
 // Successful initial startup retains config for later callbacks and cleanup. Keep it alive until cleanup succeeds;
 // an already active layer ignores the new pointer. SOC_Startup instead supplies its own static SOCLConfig.
 int SOCL_Startup(SOCLConfig *config);
+// The config SOCL_Startup was given, NULL while SOCL is down
+extern SOCLConfig *SOCLiConfigPtr;
+// The wait between CPS's yields, which DWC's AC sets to 4 before SOC_Startup
+extern u32 SOCLiYieldWait;
+// Asks the sockets to close; SOCL_EINPROGRESS (nonzero) while it has not finished
+int SOCL_CalmDown(void);
 // Reads param synchronously without retaining its pointer. Owned buffer/pipe storage is in the socket allocation;
 // a UDP receive socket instead borrows its shared send pipe.
 // The final command result is ignored, so a returned allocation handle alone does not prove CREATED/registration.

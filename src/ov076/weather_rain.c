@@ -1008,13 +1008,13 @@ static void Gust_PlayRumble(WeatherTask *task, GustWork *work, u32 arg) {
 }
 
 static void Lightning_Init(Lightning *lightning, int kind) {
-    sys_memset(lightning, 0, sizeof(Lightning));
+    MI_CpuFill8(lightning, 0, sizeof(Lightning));
     lightning->timer = GFL_RandomLC(3);
     lightning->kind = kind;
 }
 
 static void Lightning_Exit(Lightning *lightning) {
-    sys_memset(lightning, 0, sizeof(Lightning));
+    MI_CpuFill8(lightning, 0, sizeof(Lightning));
 }
 
 static void Lightning_Update(Lightning *lightning, WeatherTask *task) {

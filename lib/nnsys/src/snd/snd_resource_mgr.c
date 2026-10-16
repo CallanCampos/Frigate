@@ -18,7 +18,7 @@ BOOL NNS_SndLockChannel(u32 chBitMask) {
     if (chBitMask & sLockChannel) {
         return FALSE;
     }
-    func_0207d4ac(chBitMask, 0);
+    SND_LockChannel(chBitMask, 0);
     sLockChannel |= chBitMask;
     return TRUE;
 }
@@ -27,7 +27,7 @@ void NNS_SndUnlockChannel(u32 chBitMask) {
     if (chBitMask == 0) {
         return;
     }
-    func_0207d4c4(chBitMask, 0);
+    SND_UnlockChannel(chBitMask, 0);
     sLockChannel &= ~chBitMask;
 }
 

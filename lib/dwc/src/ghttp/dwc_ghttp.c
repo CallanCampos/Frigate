@@ -79,7 +79,7 @@ BOOL DWC_ShutdownGHTTP(void) {
 }
 
 BOOL DWC_ProcessGHTTP(void) {
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return FALSE;
     }
     ghttpThink();
@@ -107,7 +107,7 @@ static BOOL DWCi_GHTTPCompleted(int request, int result, char *buffer, int lengt
     }
     if (result != 0 || freeBuffer == TRUE) {
         if (entry != NULL && entry->buffer != NULL) {
-            func_02058728(DWC_GHTTP_HEAP, entry->buffer, 0);
+            DWC_Free(DWC_GHTTP_HEAP, entry->buffer, 0);
         } else {
             freeBuffer = TRUE;
         }
@@ -140,7 +140,7 @@ int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost
     DWCGHTTPEntry *entry;
     int request;
 
-    if (func_020584b0()) {
+    if (DWCi_IsError()) {
         return -1;
     }
     entryParam.param = param;
@@ -156,7 +156,7 @@ int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost
     }
 
     if (bufferSize > 0) {
-        buffer = func_020586e4(DWC_GHTTP_HEAP, bufferSize);
+        buffer = DWC_Alloc(DWC_GHTTP_HEAP, bufferSize);
         if (buffer == NULL) {
             request = -5;
             DWCi_HandleGHTTPError(request);
@@ -173,7 +173,7 @@ int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost
         DWCi_HandleGHTTPError(request);
         completed(NULL, 0, request, param);
         if (entry->buffer != NULL) {
-            func_02058728(DWC_GHTTP_HEAP, entry->buffer, 0);
+            DWC_Free(DWC_GHTTP_HEAP, entry->buffer, 0);
         }
         DWCi_RemoveDWCGHTTPParamEntry(entry);
     }
@@ -189,7 +189,7 @@ void DWC_CancelGHTTPRequest(int request) {
     entry = DWCi_FindGHTTPEntry(request);
     if (entry != NULL) {
         if (entry->buffer != NULL) {
-            func_02058728(DWC_GHTTP_HEAP, entry->buffer, 0);
+            DWC_Free(DWC_GHTTP_HEAP, entry->buffer, 0);
         }
         DWCi_RemoveDWCGHTTPParamEntry(entry);
     }
@@ -267,13 +267,13 @@ int DWCi_HandleGHTTPError(int error) {
     default:
         break;
     }
-    func_020584cc(type, code);
+    DWCi_SetError(type, code);
     return error;
 }
 
 // Adds a request to the list
 static DWCGHTTPEntry *DWCi_NewGHTTPEntry(const DWCGHTTPParam *param) {
-    DWCGHTTPEntry *entry = func_020586e4(DWC_GHTTP_HEAP, sizeof(DWCGHTTPEntry));
+    DWCGHTTPEntry *entry = DWC_Alloc(DWC_GHTTP_HEAP, sizeof(DWCGHTTPEntry));
 
     if (entry == NULL) {
         return NULL;
@@ -301,7 +301,7 @@ static void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPEntry *entry) {
     if (previous == entry) {
         DWCGHTTPEntry *next = previous->next;
 
-        func_02058728(DWC_GHTTP_HEAP, previous, 0);
+        DWC_Free(DWC_GHTTP_HEAP, previous, 0);
         sGHTTPEntries = next;
         return;
     }
@@ -314,7 +314,7 @@ static void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPEntry *entry) {
                 DWCGHTTPEntry *next = previous->next;
 
                 previous->next = next->next;
-                func_02058728(DWC_GHTTP_HEAP, next, 0);
+                DWC_Free(DWC_GHTTP_HEAP, next, 0);
                 return;
             }
             current = current->next;
@@ -340,9 +340,9 @@ static void DWCi_FreeAllGHTTPEntries(void) {
 
             entry = entry->next;
             if (current->buffer != NULL) {
-                func_02058728(DWC_GHTTP_HEAP, current->buffer, 0);
+                DWC_Free(DWC_GHTTP_HEAP, current->buffer, 0);
             }
-            func_02058728(DWC_GHTTP_HEAP, current, 0);
+            DWC_Free(DWC_GHTTP_HEAP, current, 0);
         } while (entry != NULL);
     }
     sGHTTPEntries = NULL;

@@ -288,7 +288,7 @@ static BOOL ZukanDetailVoice_Init(ZukanDetailProcSys *sys, int *seq, void *param
     ZukanDetailVoiceWork *wk = ZukanDetailProcSys_AllocWork(sys, sizeof(ZukanDetailVoiceWork), param->heapId);
     u8 i;
 
-    sys_memset(wk, 0, sizeof(ZukanDetailVoiceWork));
+    MI_CpuFill8(wk, 0, sizeof(ZukanDetailVoiceWork));
     wk->unit = ZukanDetailGraphic_GetClActUnit(ZukanDetailCommon_GetGraphic(common));
     wk->font = ZukanDetailCommon_GetFont(common);
     wk->printQueue = ZukanDetailCommon_GetPrintQueue(common);
@@ -619,7 +619,7 @@ static void ZukanDetailVoice_CreateActors(ZukanDetailVoiceParam *param, ZukanDet
     GFL_ArcToolFree(arc);
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = sZukanDetailVoiceActors[i].x;
         setup.y = sZukanDetailVoiceActors[i].y;
         setup.sequence = sZukanDetailVoiceActors[i].anim;
@@ -700,7 +700,7 @@ static void ZukanDetailVoice_CreatePokemon(ZukanDetailVoiceParam *param, ZukanDe
                                    param->heapId, 3, 32, index * 16, 0);
     GFL_ArcToolFree(arc);
 
-    sys_memset(&setup, 0, sizeof(ClActorSetupEx));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetupEx));
     setup.base.x = 128;
     setup.base.y = 128;
     setup.base.sequence = 0;
@@ -861,7 +861,7 @@ static void ZukanDetailVoice_ClearTime(ZukanDetailVoiceParam *param, ZukanDetail
 static void ZukanDetailVoice_UpdateTime(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                         ZukanDetailCommon *common) {
     if (wk->playing) {
-        u64 now = clock();
+        u64 now = OS_GetTick();
         u64 elapsed;
         u64 time;
 
@@ -950,7 +950,7 @@ static void ZukanDetailVoice_CheckInput(ZukanDetailVoiceParam *param, ZukanDetai
         func_0200d3c8(pokedex, species, &sex, &rare, &form, param->heapId);
         wk->voice = PokeVoice_Play(species, form, 64, 0, 0, 0, 0, NULL);
         wk->time = 0;
-        wk->startTime = clock();
+        wk->startTime = OS_GetTick();
         wk->playing = TRUE;
         ZukanDetailVoice_DrawWave(param, wk, common, species, form);
         ZukanDetailVoice_StartStretch(param, wk, common);
@@ -1159,14 +1159,14 @@ static void ZukanDetailVoice_SetActorsOpaque(ZukanDetailVoiceParam *param, Zukan
     for (i = 0; i < ACTOR_ICON; i++) {
         func_0204c318(wk->actors[i], 0);
     }
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        16, 8);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, 0,
-                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
-                            GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
-                        12, 4);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       16, 8);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, 0,
+                       GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
+                           GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD,
+                       12, 4);
 }
 
 static void ZukanDetailVoice_SetActorsBlended(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,

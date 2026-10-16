@@ -150,8 +150,8 @@ BOOL NNSi_G3dAnmBlendJnt(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj,
                 // BUG: the rows to fall back on are saved only from the first animation object of the list, so if that
                 // one has no data for the node, they are never set
                 if (i == 0) {
-                    sys_memcpy32(&tmp.rotRow[0], &firstRow0, sizeof(VecFx32));
-                    sys_memcpy32(&tmp.rotRow[2], &firstRow2, sizeof(VecFx32));
+                    MIi_CpuCopy32(&tmp.rotRow[0], &firstRow0, sizeof(VecFx32));
+                    MIi_CpuCopy32(&tmp.rotRow[2], &firstRow2, sizeof(VecFx32));
                 }
 
                 if (sum == FX32_ONE) {
@@ -196,12 +196,12 @@ BOOL NNSi_G3dAnmBlendJnt(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj,
 
     VEC_CrossProduct(&result->rotRow[0], &result->rotRow[1], &result->rotRow[2]);
     if (result->rot.m[0][0] == 0 && result->rot.m[0][1] == 0 && result->rot.m[0][2] == 0) {
-        sys_memcpy32(&firstRow0, &result->rotRow[0], sizeof(VecFx32));
+        MIi_CpuCopy32(&firstRow0, &result->rotRow[0], sizeof(VecFx32));
     } else {
         VEC_Normalize(&result->rotRow[0], &result->rotRow[0]);
     }
     if (result->rot.m[2][0] == 0 && result->rot.m[2][1] == 0 && result->rot.m[2][2] == 0) {
-        sys_memcpy32(&firstRow2, &result->rotRow[2], sizeof(VecFx32));
+        MIi_CpuCopy32(&firstRow2, &result->rotRow[2], sizeof(VecFx32));
     } else {
         VEC_Normalize(&result->rotRow[2], &result->rotRow[2]);
     }

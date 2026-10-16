@@ -247,7 +247,7 @@ BmpMenu *ShopUI_CreateConfirmDialog(const ConfirmDialogSetup *setup, u16 frameCh
     ListMenuCore_AppendMsgOption(options, msgData, MSG_YESNO_NO, BMPMENU_CANCEL, heapId);
     GFL_MsgDataFree(msgData);
 
-    sys_memset(&header, 0, sizeof(header));
+    MI_CpuFill8(&header, 0, sizeof(header));
     header.options = options;
     window = BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, 7, 4, setup->palette, TRUE);
     header.xCount = 1;

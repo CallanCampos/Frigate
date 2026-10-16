@@ -44,7 +44,7 @@ static const u32 PASSPOWER_HOLLOW_CHANCES[PASS_POWER_GROTTO_LEVELS] = { 10, 20, 
 static PassPowerState g_PassPowerState;
 
 void PassPower_Init(void) {
-    sys_memset(&g_PassPowerState, 0, sizeof(PassPowerState));
+    MI_CpuFill8(&g_PassPowerState, 0, sizeof(PassPowerState));
     PassPower_DeactivateAllEffects();
 }
 

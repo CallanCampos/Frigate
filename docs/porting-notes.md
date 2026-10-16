@@ -25,7 +25,7 @@ are in [`wcm_internal.h`](../lib/nitrowifi/include/nitrowifi/wcm_internal.h).
 ## Hardware and synchronization
 
 `WCM_SetState` masks IRQs around state/alarm transitions and rearms the alarm for requested state 9.
-`WCM_ReleaseIrqOwnedMutex` recognizes the address of `CPU_IRQInvoke` as an owner marker, decrements the recursion
+`WCM_ReleaseIrqOwnedMutex` recognizes the address of `OS_IrqHandler` as an owner marker, decrements the recursion
 count, and wakes the queue when ownership clears. That marker cannot be treated as an ordinary thread object.
 The mapping of these operations to host synchronization and timers is unresolved.
 

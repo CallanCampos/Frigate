@@ -1,7 +1,6 @@
 #include "dwc_aoss_ap.h"
 #include "dwc/ext.h"
 #include "dwc_wcm.h"
-#include "gfl/std.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
@@ -50,9 +49,9 @@ static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
     int count;
 
     ap->ssidLength = bss->ssidLength;
-    sys_memcpy16(bss->ssid, ap->ssid, 0x20);
+    MIi_CpuCopy16(bss->ssid, ap->ssid, 0x20);
     ap->channel = bss->channel;
-    sys_memcpy16(bss->bssid, ap->bssid, 6);
+    MIi_CpuCopy16(bss->bssid, ap->bssid, 6);
     count = 0;
     for (i = 0; i < 12; i++) {
         if (bss->rateSetSupport & sRates[i].mask) {
@@ -77,7 +76,7 @@ static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
 static void Wifi_MakeBss(const WifiConnectParam *param, WMBssDesc *bss) {
     MI_CpuClear16(bss->ssid, 0x20);
     bss->ssidLength = param->ssidLength;
-    sys_memcpy(param->ssid, bss->ssid, bss->ssidLength);
+    MI_CpuCopy8(param->ssid, bss->ssid, bss->ssidLength);
 }
 
 static void Wifi_ReportConnect(WifiConnectResult *result, const WMBssDesc *bss, int success) {
@@ -98,14 +97,14 @@ int DWC_Aoss_Init(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
     OSMessage message;
     u32 mask;
 
-    func_0207acc4(&sAossApQueue, sAossApMessages, 4);
+    OS_InitMessageQueue(&sAossApQueue, sAossApMessages, 4);
     if (alloc == NULL || free == NULL) {
         return -1;
     }
-    mask = CPU_IRQDisable();
+    mask = OS_DisableInterrupts();
     gAossAp.alloc = alloc;
     gAossApFree = free;
-    CPU_SetIRQMask(mask);
+    OS_RestoreInterrupts(mask);
     gAossAp.block = gAossAp.alloc(0x5890);
     if (gAossAp.block == NULL) {
         return -1;
@@ -189,10 +188,10 @@ int DWC_Aoss_Shutdown(void) {
             break;
         }
     } while (ok);
-    mask = CPU_IRQDisable();
+    mask = OS_DisableInterrupts();
     gAossAp.alloc = NULL;
     gAossApFree = NULL;
-    CPU_SetIRQMask(mask);
+    OS_RestoreInterrupts(mask);
     return result;
 }
 
@@ -338,7 +337,7 @@ static // Connects to the access point; 0 if it did
         option = 3 << 18;
     }
     option |= 3 << 16;
-    sys_memset(&sWep, 0, sizeof(sWep));
+    MI_CpuFill8(&sWep, 0, sizeof(sWep));
     switch (param->keyLength) {
     case 5:
         sWep.mode = 1;
@@ -353,7 +352,7 @@ static // Connects to the access point; 0 if it did
         return -1;
     }
     sWep.keyId = connected;
-    sys_memcpy(param->key, sWep.key[connected], param->keyLength);
+    MI_CpuCopy8(param->key, sWep.key[connected], param->keyLength);
     WCM_ClearApListBuffer();
     if (DWC_Wcm_Search(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
         OS_CreateAlarm(&alarm);
@@ -436,7 +435,7 @@ static // Connects to the access point; 0 if it did
 }
 
 void AossAp_Sleep(u32 milliseconds) {
-    func_0207aa04(milliseconds);
+    OS_Sleep(milliseconds);
 }
 
 int AossAp_NotifyModeChange(int mode) {

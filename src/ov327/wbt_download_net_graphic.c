@@ -109,7 +109,7 @@ WbtDownloadGraphic *WbtDownloadGraphic_Create(u32 layout, HeapID heapId) {
     WbtDownloadGraphic *graphic =
         GFL_HeapAllocate(heapId, sizeof(WbtDownloadGraphic), FALSE, "wbt_download_net_graphic.c", 477);
 
-    sys_memset(graphic, 0, sizeof(WbtDownloadGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WbtDownloadGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -136,7 +136,7 @@ void WbtDownloadGraphic_Free(WbtDownloadGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(WbtDownloadGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(WbtDownloadGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -155,7 +155,7 @@ static void WbtDownloadGraphic_VBlank(TCB *tcb, void *data) {
 static void WbtDownloadBG_Init(WbtDownloadBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(WbtDownloadBG));
+    MI_CpuFill8(bg, 0, sizeof(WbtDownloadBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sWbtDownloadLCDConfig);
@@ -174,7 +174,7 @@ static void WbtDownloadBG_Free(WbtDownloadBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(WbtDownloadBG));
+    MI_CpuFill8(bg, 0, sizeof(WbtDownloadBG));
 }
 
 static void WbtDownloadBG_Update(WbtDownloadBG *bg) {
@@ -185,7 +185,7 @@ static void WbtDownloadBG_VBlank(WbtDownloadBG *bg) {
 }
 
 static void WbtDownloadClAct_Init(WbtDownloadClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(WbtDownloadClAct));
+    MI_CpuFill8(clact, 0, sizeof(WbtDownloadClAct));
     ClActSys_Create(&sWbtDownloadClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(32, 0, heapId);
     clact->renderer = func_0204be9c(sWbtDownloadSurfaceSetups, NELEMS(sWbtDownloadSurfaceSetups), heapId);
@@ -199,7 +199,7 @@ static void WbtDownloadClAct_Free(WbtDownloadClAct *clact) {
     func_0204becc(clact->renderer);
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(WbtDownloadClAct));
+    MI_CpuFill8(clact, 0, sizeof(WbtDownloadClAct));
 }
 
 static void WbtDownloadClAct_Update(WbtDownloadClAct *clact) {

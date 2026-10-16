@@ -152,7 +152,7 @@ static BOOL ZenkokuZukanAward_Init(GameProc *proc, u32 *state, void *param, void
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_AWARD, 0x30000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZenkokuZukanAwardWork), HEAPID_AWARD);
-    sys_memset(wk, 0, sizeof(ZenkokuZukanAwardWork));
+    MI_CpuFill8(wk, 0, sizeof(ZenkokuZukanAwardWork));
     wk->heapId = HEAPID_AWARD;
     wk->param = param;
     wk->graphic = ZenkokuZukanAwardGraphic_Create(1, wk->heapId);
@@ -170,7 +170,7 @@ static BOOL ZenkokuZukanAward_Init(GameProc *proc, u32 *state, void *param, void
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_DispOn();
     GFL_BGSysDisableAllB();
-    gfxSetBGModeB(0);
+    GXS_SetGraphicsMode(0);
     GFL_BGSysDisableBGsB();
     for (i = 0; i < NELEMS(sZenkokuZukanAwardSubBGSetups); i++) {
         GFL_BGSysCreateBG(sZenkokuZukanAwardSubBGSetups[i].bg, &sZenkokuZukanAwardSubBGSetups[i].setup,

@@ -48,7 +48,7 @@ void func_ov167_021d45f0(BtlRecorder *recorder, const void *data, u32 size) {
     if (!recorder->overflow) {
         u32 end = recorder->size + (size - 1);
         if (end <= recorder->capacity) {
-            sys_memcpy((const u8 *)data + 1, &recorder->data[recorder->size], size - 1);
+            MI_CpuCopy8((const u8 *)data + 1, &recorder->data[recorder->size], size - 1);
             recorder->size = end;
         } else {
             recorder->overflow = TRUE;
@@ -132,7 +132,7 @@ BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, 
                 if (id != clientId) {
                     *pos += n * sizeof(BattleAction);
                 } else {
-                    sys_memcpy(&reader->data[*pos], reader->actions[clientId], n * sizeof(BattleAction));
+                    MI_CpuCopy8(&reader->data[*pos], reader->actions[clientId], n * sizeof(BattleAction));
                     result = reader->actions[clientId];
                     *pos += n * sizeof(BattleAction);
                     *count = n;
@@ -205,7 +205,7 @@ BOOL func_ov167_021d4880(BtlRecReader *reader, u8 clientId) {
 }
 
 void func_ov167_021d48a0(BtlRecTool *tool, BOOL chapter) {
-    sys_memset(tool, 0, sizeof(BtlRecTool));
+    MI_CpuFill8(tool, 0, sizeof(BtlRecTool));
     tool->chapter = chapter;
 }
 
@@ -228,7 +228,7 @@ void func_ov167_021d48e0(BtlRecTool *tool, u8 clientId, const void *actions, u8 
             tool->clientFlags |= (1 << clientId);
             tool->numClients++;
             tool->data[tool->size] = (clientId << 5) | count;
-            sys_memcpy(actions, &tool->data[tool->size + 1], bytes);
+            MI_CpuCopy8(actions, &tool->data[tool->size + 1], bytes);
             tool->size = end;
         } else {
             tool->overflow = TRUE;
@@ -254,7 +254,7 @@ void *func_ov167_021d4990(BtlRecTool *tool, u32 *size) {
 }
 
 void func_ov167_021d49a0(BtlRecTool *tool, const void *data, u32 size) {
-    sys_memcpy(data, tool->data, size);
+    MI_CpuCopy8(data, tool->data, size);
     tool->size = size;
     tool->clientFlags = 0;
     tool->numClients = 0;
@@ -274,7 +274,7 @@ BOOL func_ov167_021d49d0(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, vo
         *count = byte & 0x1f;
         bytes = *count * sizeof(BattleAction);
         (*pos)++;
-        sys_memcpy(&tool->data[*pos], actions, bytes);
+        MI_CpuCopy8(&tool->data[*pos], actions, bytes);
         *pos += bytes;
         return TRUE;
     }

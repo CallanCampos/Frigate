@@ -528,8 +528,8 @@ static void CommTvtField_InitGraphics(CommTvtFieldWork *wk) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_SUB_BG, 0, 0, wk->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 1, &palette, wk->heapId);
-    sys_memcpy(palette->rawData, wk->palettes, sizeof(wk->palettes));
-    sys_memcpy(palette->rawData, wk->adjustedPalettes, sizeof(wk->palettes));
+    MI_CpuCopy8(palette->rawData, wk->palettes, sizeof(wk->palettes));
+    MI_CpuCopy8(palette->rawData, wk->adjustedPalettes, sizeof(wk->palettes));
     CommTvtField_AddPaletteOffsets(wk->adjustedPalettes, sPaletteOffsets, PALETTE_COUNT);
     GFL_HeapFree(file);
     wk->backgroundChars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, wk->heapId);
@@ -797,7 +797,7 @@ static void CommTvtField_SetAnswerMode(CommTvtFieldWork *wk, int index) {
     func_02042e84();
     mac = func_020428c8(index);
     wk->param->commParam.unk4 = 2;
-    sys_memcpy(mac, wk->param->commParam.parentMac, 6);
+    MI_CpuCopy8(mac, wk->param->commParam.parentMac, 6);
 }
 
 static void CommTvtField_SetCallMode(CommTvtFieldWork *wk) {
@@ -805,7 +805,7 @@ static void CommTvtField_SetCallMode(CommTvtFieldWork *wk) {
 
     func_02042e84();
     wk->param->commParam.unk4 = 1;
-    sys_memcpy(mac, wk->param->commParam.parentMac, 6);
+    MI_CpuCopy8(mac, wk->param->commParam.parentMac, 6);
 }
 
 static void CommTvtField_UpdateCalls(CommTvtFieldWork *wk) {
@@ -866,7 +866,7 @@ static void CommTvtField_OnBeacon(void *arg, const void *beacon, int gameCommand
         }
         for (j = 0; j < CALLER_COUNT; j++) {
             if (wk->callers[j].timer == 0) {
-                sys_memcpy((const u8 *)beacon + 4, wk->callers[j].mac, 6);
+                MI_CpuCopy8((const u8 *)beacon + 4, wk->callers[j].mac, 6);
                 wk->callers[j].timer = CALLER_FRAMES;
                 wk->callers[j].count = childCount;
                 return;
@@ -915,13 +915,13 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_COMM_TVT_FIELD, 0x18000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(CommTvtFieldWork), HEAPID_COMM_TVT_FIELD);
-    sys_memset(wk, 0, sizeof(CommTvtFieldWork));
+    MI_CpuFill8(wk, 0, sizeof(CommTvtFieldWork));
     wk->heapId = HEAPID_COMM_TVT_FIELD;
     wk->gameData = fieldParam->gameData;
     wk->gsys = fieldParam->gsys;
     GFL_BGSysSetDisplayLayout(1);
     GXS_DispOn();
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
     func_020232d0();
@@ -942,7 +942,7 @@ static BOOL CommTvtFieldApp_Init(GameProc *proc, u32 *state, void *param, void *
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 1, 0);
     wk->queue = func_02021998(wk->heapId);
     wk->taskMenuRes = AppTaskMenuRes_Create(5, 13, wk->font, wk->queue, wk->heapId);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
     GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_ALL);
     CommTvtField_SetFuncLine(wk, CommTvtField_InitUI, 1739);

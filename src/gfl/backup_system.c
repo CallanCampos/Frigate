@@ -125,7 +125,7 @@ static BackupSystem *svsys;
 void mainBackupSystemInit(u32 heapId, BackupReadErrorCallback readErrorCallback,
                           BackupWriteErrorCallback writeErrorCallback) {
     svsys = GFL_HeapAllocate(heapId, sizeof(BackupSystem), FALSE, "backup_system.c", 223);
-    sys_memset32(0, svsys, sizeof(BackupSystem));
+    MIi_CpuClear32(0, svsys, sizeof(BackupSystem));
     MATHi_CRC16InitTable(&svsys->crcTable, 0x1021);
     svsys->readErrorCallback = readErrorCallback;
     svsys->writeErrorCallback = writeErrorCallback;
@@ -220,7 +220,7 @@ BOOL func_0203adb4(SaveData *sv, u32 heapId) {
     if (sv->mainOffset != sv->backupOffset) {
         func_0203bd0c(sv, SAVE_COPY_BACKUP);
     }
-    sys_memset32(0xffffffff, buffer, 0x1000);
+    MIi_CpuClear32(0xffffffff, buffer, 0x1000);
     for (i = 0; i < sv->savearea_size; i += 0x1000) {
         func_0203bfd4(i + sv->mainOffset, buffer, 0x1000, svsys->writeErrorCallback);
     }
@@ -479,16 +479,16 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
         readFlashWaitSuccess(func_0203b0b4(sv, SAVE_COPY_BACKUP), backupData, sv->saveSize, svsys->readErrorCallback);
     if (mainRead == FALSE && backupRead == FALSE) {
         func_0203be8c(sv, BLOCK_STATUS_WRITE_MAIN);
-        sys_memset32(0, mainData, sv->saveSize);
+        MIi_CpuClear32(0, mainData, sv->saveSize);
         GFL_HeapFree(backupData);
         return SAVE_LOAD_RESULT_NONE;
     }
     if (mainRead == TRUE && backupRead == FALSE) {
         func_0203be8c(sv, BLOCK_STATUS_WRITE_BACKUP);
-        sys_memcpy16(mainData, backupData, sv->saveSize);
+        MIi_CpuCopy16(mainData, backupData, sv->saveSize);
     } else if (mainRead == FALSE && backupRead == TRUE) {
         func_0203be8c(sv, BLOCK_STATUS_WRITE_MAIN);
-        sys_memcpy16(backupData, mainData, sv->saveSize);
+        MIi_CpuCopy16(backupData, mainData, sv->saveSize);
     }
     func_0203b148(&mainCheck, sv, mainData, 0);
     func_0203b148(&backupCheck, sv, backupData, 1);
@@ -505,14 +505,14 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
             func_0203bdbc(sv, getSaveSize(sv->table), BLOCK_STATUS_WRITE_BACKUP);
             func_0203bdbc(sv, getSaveSize(sv->table) + 1, BLOCK_STATUS_WRITE_BACKUP);
             offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
-            sys_memcpy16(mainData + offset, backupData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
+            MIi_CpuCopy16(mainData + offset, backupData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
         }
     } else if (backupCheck.result == 0) {
         if (mainCheck.result != 0) {
             func_0203bdbc(sv, getSaveSize(sv->table), BLOCK_STATUS_WRITE_MAIN);
             func_0203bdbc(sv, getSaveSize(sv->table) + 1, BLOCK_STATUS_WRITE_MAIN);
             offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
-            sys_memcpy16(backupData + offset, mainData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
+            MIi_CpuCopy16(backupData + offset, mainData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
         }
     } else {
         if (mainCheck.result == 1 || backupCheck.result == 1) {
@@ -601,12 +601,12 @@ static u32 func_0203b170(SaveData *sv, u32 heapId, BOOL checkCount, u32 count) {
         return SAVE_LOAD_RESULT_BROKEN;
     }
     offset = sv->saveSize - SAVE_FOOTER_SIZE - sv->crcsSize;
-    sys_memcpy16(datas[copyIndex] + offset, mainData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
+    MIi_CpuCopy16(datas[copyIndex] + offset, mainData + offset, sv->crcsSize + SAVE_FOOTER_SIZE);
     for (i = 0; i < getSaveSize(sv->table); i++) {
         if (func_0203bda0(sv, i) == BLOCK_STATUS_WRITE_MAIN) {
             offset = getStartOffsetOfSaveBlockDataInSave(sv->table, i);
             size = getSizeOfSaveBlockData(sv->table, i);
-            sys_memcpy16(backupData + offset, mainData + offset, size + sizeof(BlockFooter));
+            MIi_CpuCopy16(backupData + offset, mainData + offset, size + sizeof(BlockFooter));
         }
     }
     func_0203b144(sv, counts[copyIndex]);
@@ -632,7 +632,7 @@ static u32 func_0203b598(SaveData *sv, BOOL checkCount, u32 count) {
     data = sv->data;
     if (!readFlashWaitSuccess(func_0203b0b4(sv, SAVE_COPY_MAIN), data, sv->saveSize, svsys->readErrorCallback)) {
         func_0203be8c(sv, BLOCK_STATUS_WRITE_MAIN);
-        sys_memset32(0, data, sv->saveSize);
+        MIi_CpuClear32(0, data, sv->saveSize);
         return SAVE_LOAD_RESULT_NONE;
     }
     func_0203b148(&check, sv, data, 0);
@@ -977,7 +977,7 @@ static void func_0203bcec(SaveData *sv) {
 static void func_0203bd0c(SaveData *sv, u32 copy) {
     u8 footer[SAVE_FOOTER_SIZE];
 
-    sys_memset(footer, 0xff, SAVE_FOOTER_SIZE);
+    MI_CpuFill8(footer, 0xff, SAVE_FOOTER_SIZE);
     func_0203bfd4(sv->saveSize + func_0203b0b4(sv, copy) - SAVE_FOOTER_SIZE, footer, SAVE_FOOTER_SIZE,
                   svsys->writeErrorCallback);
 }
@@ -1040,7 +1040,7 @@ static void func_0203bdf0(SaveData *sv) {
 }
 
 static void func_0203be74(SaveData *sv) {
-    sys_memset32(0, sv->blockStatus, sv->blockStatusSize);
+    MIi_CpuClear32(0, sv->blockStatus, sv->blockStatusSize);
 }
 
 static void func_0203be8c(SaveData *sv, u32 status) {
@@ -1049,7 +1049,7 @@ static void func_0203be8c(SaveData *sv, u32 status) {
     u32 shift;
     u32 i;
 
-    sys_memset32(0, sv->blockStatus, sv->blockStatusSize);
+    MIi_CpuClear32(0, sv->blockStatus, sv->blockStatusSize);
     count = getSaveSize(sv->table) + 2;
     shift = 0;
     for (i = 0; i < count; i++) {

@@ -102,7 +102,7 @@ static const TDownloadBGSetup sTDownloadBGSetups[] = {
 TDownloadGraphic *TDownloadGraphic_Create(u32 layout, HeapID heapId) {
     TDownloadGraphic *graphic = GFL_HeapAllocate(heapId, sizeof(TDownloadGraphic), FALSE, "t_download_graphic.c", 450);
 
-    sys_memset(graphic, 0, sizeof(TDownloadGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(TDownloadGraphic));
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -129,7 +129,7 @@ void TDownloadGraphic_Delete(TDownloadGraphic *graphic) {
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    sys_memset(graphic, 0, sizeof(TDownloadGraphic));
+    MI_CpuFill8(graphic, 0, sizeof(TDownloadGraphic));
     GFL_HeapFree(graphic);
 }
 
@@ -158,7 +158,7 @@ static void TDownloadGraphic_VBlank(TCB *tcb, void *data) {
 static void TDownloadGraphic_BGInit(TDownloadBG *bg, HeapID heapId) {
     u32 i;
 
-    sys_memset(bg, 0, sizeof(TDownloadBG));
+    MI_CpuFill8(bg, 0, sizeof(TDownloadBG));
     GFL_BGSysCreate(heapId);
     BmpWin_InitAllocator(heapId);
     GFL_BGSysSetLCDConfig(&sTDownloadLCDConfig);
@@ -177,7 +177,7 @@ static void TDownloadGraphic_BGExit(TDownloadBG *bg) {
     }
     BmpWin_FreeAllocator();
     GFL_BGSysFree();
-    sys_memset(bg, 0, sizeof(TDownloadBG));
+    MI_CpuFill8(bg, 0, sizeof(TDownloadBG));
 }
 
 static void TDownloadGraphic_BGMain(TDownloadBG *bg) {
@@ -188,7 +188,7 @@ static void TDownloadGraphic_BGVBlank(TDownloadBG *bg) {
 }
 
 static void TDownloadGraphic_ClActInit(TDownloadClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
-    sys_memset(clact, 0, sizeof(TDownloadClAct));
+    MI_CpuFill8(clact, 0, sizeof(TDownloadClAct));
     ClActSys_Create(&sTDownloadClActSetup, vramConfig, heapId);
     clact->unit = func_0204bf1c(128, 0, heapId);
     func_0204c028(clact->unit);
@@ -199,7 +199,7 @@ static void TDownloadGraphic_ClActInit(TDownloadClAct *clact, const BGSysVRAMCon
 static void TDownloadGraphic_ClActExit(TDownloadClAct *clact) {
     func_0204bf98(clact->unit);
     func_0204b758();
-    sys_memset(clact, 0, sizeof(TDownloadClAct));
+    MI_CpuFill8(clact, 0, sizeof(TDownloadClAct));
 }
 
 static void TDownloadGraphic_ClActMain(TDownloadClAct *clact) {

@@ -11,8 +11,8 @@ static void Sake_PostMessage(SakeRequest *request) {
     GsHttpRequest *http;
 
     if (gSakeStorageUrl[0] == '\0') {
-        func_0207a2c0(gSakeStorageUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                      request->sake->gameName);
+        OS_SNPrintf(gSakeStorageUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+                    request->sake->gameName);
     }
     http = func_ov011_0216ea4c(gSakeStorageUrl, request->type->soapAction, request->writer, Sake_OnResponse, request);
     if (http != NULL) {

@@ -138,7 +138,7 @@ BOOL NetCommonDownload_Request(NetCommonDownload *download, u32 command, const v
     if (allowed) {
         switch (command) {
         case NET_COMMON_DOWNLOAD_FILE_LIST:
-            sys_memcpy(args, &download->args, sizeof(NetCommonDownloadFileListArgs));
+            MI_CpuCopy8(args, &download->args, sizeof(NetCommonDownloadFileListArgs));
             download->handler = NetCommonDownload_DownloadFileList;
             break;
         case NET_COMMON_DOWNLOAD_COMMAND_1:
@@ -147,7 +147,7 @@ BOOL NetCommonDownload_Request(NetCommonDownload *download, u32 command, const v
             download->session.cancelled = TRUE;
             break;
         case NET_COMMON_DOWNLOAD_BEACON:
-            sys_memcpy(args, &download->args, sizeof(NetCommonDownloadBeaconArgs));
+            MI_CpuCopy8(args, &download->args, sizeof(NetCommonDownloadBeaconArgs));
             download->handler = NetCommonDownload_ReceiveBeacons;
             break;
         case NET_COMMON_DOWNLOAD_STOP_BEACON:
@@ -519,7 +519,7 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
 
     switch (*state) {
     case 0:
-        sys_memset(&init, 0, sizeof(DeliveryInit));
+        MI_CpuFill8(&init, 0, sizeof(DeliveryInit));
         init.code = args->code;
         init.data[0].datasize = args->dataSize;
         init.data[0].pData = download->data;
@@ -595,16 +595,16 @@ static u32 NetCommonDownload_OnDwcEvent(void *work, int a1, int event, int a3) {
 
 static void NetCommonDownload_AllocFileList(NetCommonDownloadSession *session,
                                             const NetCommonDownloadFileListArgs *args, HeapID heapId) {
-    sys_memset(session, 0, sizeof(NetCommonDownloadSession));
+    MI_CpuFill8(session, 0, sizeof(NetCommonDownloadSession));
     session->files =
         GFL_HeapAllocate(heapId, sizeof(DWCNdFileInfo) * args->fileCount, TRUE, "net_common_download.c", 1106);
 }
 
 static void NetCommonDownload_AllocFile(NetCommonDownloadSession *session, const NetCommonDownloadFileArgs *args,
                                         HeapID heapId) {
-    sys_memset(session, 0, sizeof(NetCommonDownloadSession));
+    MI_CpuFill8(session, 0, sizeof(NetCommonDownloadSession));
     session->files = GFL_HeapAllocate(heapId, sizeof(DWCNdFileInfo), TRUE, "net_common_download.c", 1120);
-    sys_memcpy(args->name, session->files, GFL_STD_StrLen(args->name));
+    MI_CpuCopy8(args->name, session->files, GFL_STD_StrLen(args->name));
     session->files->size = args->size;
 }
 
@@ -612,7 +612,7 @@ static void NetCommonDownload_FreeSession(NetCommonDownloadSession *session) {
     if (session->files != NULL) {
         GFL_HeapFree(session->files);
     }
-    sys_memset(session, 0, sizeof(NetCommonDownloadSession));
+    MI_CpuFill8(session, 0, sizeof(NetCommonDownloadSession));
 }
 
 static void NetCommonDownload_Wait(NetCommonDownloadSession *session, u32 *state, u32 nextState) {

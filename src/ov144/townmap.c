@@ -369,7 +369,7 @@ static BOOL TownMap_ProcInit(GameProc *proc, u32 *state, void *paramPtr, void *w
     all = TRUE;
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_TOWNMAP, 0x60000);
     work = GFL_ProcInitSubsystem(proc, sizeof(TownMapWork), HEAPID_TOWNMAP);
-    sys_memset(work, 0, sizeof(TownMapWork));
+    MI_CpuFill8(work, 0, sizeof(TownMapWork));
     work->param = param;
     if (work->param->mode != TOWNMAP_MODE_FLY_ALL) {
         all = FALSE;
@@ -471,13 +471,13 @@ static BOOL TownMap_ProcMain(GameProc *proc, u32 *state, void *paramPtr, void *w
 }
 
 static void TownMapSeq_Init(TownMapSeq *seq, void *work, TownMapSeqFunc func) {
-    sys_memset(seq, 0, sizeof(TownMapSeq));
+    MI_CpuFill8(seq, 0, sizeof(TownMapSeq));
     seq->work = work;
     TownMapSeq_SetNext(seq, func);
 }
 
 static void TownMapSeq_Free(TownMapSeq *seq) {
-    sys_memset(seq, 0, sizeof(TownMapSeq));
+    MI_CpuFill8(seq, 0, sizeof(TownMapSeq));
 }
 
 static void TownMapSeq_Main(TownMapSeq *seq) {
@@ -700,7 +700,7 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
                                GameData *gameData, HeapID heapId) {
     ArcTool *arc;
 
-    sys_memset(appBar, 0, sizeof(TownMapAppBar));
+    MI_CpuFill8(appBar, 0, sizeof(TownMapAppBar));
     appBar->gameData = gameData;
     arc = GFL_ArcSysCreateFileHandle(ARCID_TOWNMAP_GRA, heapId);
     appBar->pltt = func_0204bbb8(arc, 2, CLACT_VRAM_MAIN, 0, 0, 4, heapId);
@@ -710,7 +710,7 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
     {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = 168;
         setup.y = 168;
         setup.sequence = TOWNMAP_ANIM_ZOOM_IN;
@@ -726,7 +726,7 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
             { TOWNMAP_ICON_CLOSE, { 200, 168 } },
         };
 
-        sys_memset(&setup, 0, sizeof(TouchBarSetup));
+        MI_CpuFill8(&setup, 0, sizeof(TouchBarSetup));
         setup.items = items;
         setup.count = NELEMS(items);
         setup.unit = unit;
@@ -745,7 +745,7 @@ static void TownMapAppBar_Free(TownMapAppBar *appBar) {
     func_0204be64(appBar->cellAnims);
     func_0204b98c(appBar->chars);
     func_0204bcd0(appBar->pltt);
-    sys_memset(appBar, 0, sizeof(TownMapAppBar));
+    MI_CpuFill8(appBar, 0, sizeof(TownMapAppBar));
 }
 
 static void TownMapAppBar_Main(TownMapAppBar *appBar, TownMapMap *map) {
@@ -808,7 +808,7 @@ static BOOL TownMapAppBar_IsTouching(TownMapAppBar *appBar) {
 }
 
 static void TownMapCursor_Init(TownMapCursor *cursor, ClActor *actor, ClActor *ring, HeapID heapId) {
-    sys_memset(cursor, 0, sizeof(TownMapCursor));
+    MI_CpuFill8(cursor, 0, sizeof(TownMapCursor));
     cursor->pos.x = TOWNMAP_CURSOR_X;
     cursor->pos.y = TOWNMAP_CURSOR_Y;
     cursor->cursor = actor;
@@ -831,7 +831,7 @@ static void TownMapCursor_Init(TownMapCursor *cursor, ClActor *actor, ClActor *r
 }
 
 static void TownMapCursor_Free(TownMapCursor *cursor) {
-    sys_memset(cursor, 0, sizeof(TownMapCursor));
+    MI_CpuFill8(cursor, 0, sizeof(TownMapCursor));
 }
 
 static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
@@ -997,11 +997,11 @@ static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZone
     u32 pltt;
     TownMapPlace *place;
 
-    sys_memset(places, 0, sizeof(TownMapPlaces));
+    MI_CpuFill8(places, 0, sizeof(TownMapPlaces));
     places->count = TOWNMAP_PLACE_COUNT - 1;
     places->gameData = gameData;
     places->places = GFL_HeapAllocate(heapId, places->count * sizeof(TownMapPlace), FALSE, "townmap.c", 2261);
-    sys_memset(places->places, 0, places->count * sizeof(TownMapPlace));
+    MI_CpuFill8(places->places, 0, places->count * sizeof(TownMapPlace));
     TownMapGraphic_GetRes(graphic, &chars, &cellAnims, &pltt);
     for (i = 0; i < TOWNMAP_PLACE_COUNT; i++) {
         u32 offset = 0;
@@ -1047,7 +1047,7 @@ static void TownMapPlaces_Free(TownMapPlaces *places) {
         TownMapPlace_Free(&places->places[i]);
     }
     GFL_HeapFree(places->places);
-    sys_memset(places, 0, sizeof(TownMapPlaces));
+    MI_CpuFill8(places, 0, sizeof(TownMapPlaces));
 }
 
 static void TownMapPlaces_Main(TownMapPlaces *places) {
@@ -1201,7 +1201,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
     int i;
     u16 flag;
 
-    sys_memset(place, 0, sizeof(TownMapPlace));
+    MI_CpuFill8(place, 0, sizeof(TownMapPlace));
     place->scale = FX32_ONE;
     place->data = data;
     place->index = index;
@@ -1266,7 +1266,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
     if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) != 1) {
         ClActorSetup setup;
 
-        sys_memset(&setup, 0, sizeof(ClActorSetup));
+        MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = TownMapPlace_GetParam(place, TOWNMAP_PARAM_X);
         setup.y = TownMapPlace_GetParam(place, TOWNMAP_PARAM_Y);
         place->actor = func_0204c040(unit, chars, pltt, cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
@@ -1281,7 +1281,7 @@ static void TownMapPlace_Free(TownMapPlace *place) {
     if (place->actor != NULL) {
         func_0204c108(place->actor);
     }
-    sys_memset(place, 0, sizeof(TownMapPlace));
+    MI_CpuFill8(place, 0, sizeof(TownMapPlace));
 }
 
 static void TownMapPlace_SetVisible(TownMapPlace *place, BOOL visible) {
@@ -1439,9 +1439,9 @@ static void TownMapPlayer_Init(TownMapPlayer *player, TownMapPlace *place, ClAct
                                u32 pltt, HeapID heapId) {
     ClActorSetup setup;
 
-    sys_memset(player, 0, sizeof(TownMapPlayer));
+    MI_CpuFill8(player, 0, sizeof(TownMapPlayer));
     player->place = place;
-    sys_memset(&setup, 0, sizeof(ClActorSetup));
+    MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     if (place != NULL) {
         setup.x = TownMapPlace_GetParam(place, TOWNMAP_PARAM_X);
         setup.y = TownMapPlace_GetParam(place, TOWNMAP_PARAM_Y);
@@ -1458,7 +1458,7 @@ static void TownMapPlayer_Init(TownMapPlayer *player, TownMapPlace *place, ClAct
 
 static void TownMapPlayer_Free(TownMapPlayer *player) {
     func_0204c108(player->actor);
-    sys_memset(player, 0, sizeof(TownMapPlayer));
+    MI_CpuFill8(player, 0, sizeof(TownMapPlayer));
 }
 
 static void TownMapPlayer_UpdatePos(TownMapPlayer *player, const TownMapPoint *scroll) {
@@ -1472,7 +1472,7 @@ static void TownMapPlayer_UpdatePos(TownMapPlayer *player, const TownMapPoint *s
 }
 
 static void TownMapMap_Init(TownMapMap *map, u8 bgBack, u8 bgFront, HeapID heapId) {
-    sys_memset(map, 0, sizeof(TownMapMap));
+    MI_CpuFill8(map, 0, sizeof(TownMapMap));
     map->bgBack = bgBack;
     map->bgFront = bgFront;
     map->scale = FX32_ONE;
@@ -1483,7 +1483,7 @@ static void TownMapMap_Init(TownMapMap *map, u8 bgBack, u8 bgFront, HeapID heapI
 }
 
 static void TownMapMap_Free(TownMapMap *map) {
-    sys_memset(map, 0, sizeof(TownMapMap));
+    MI_CpuFill8(map, 0, sizeof(TownMapMap));
 }
 
 static inline void TownMapMap_SetLimits(TownMapMap *map, s16 top, s16 left, s16 right, s16 bottom) {
@@ -1583,7 +1583,7 @@ static void TownMapMap_AddPos(TownMapMap *map, const TownMapPoint *move) {
 
 static void TownMapInfo_Init(TownMapInfo *info, u8 bg, Font *font, MsgData *placeNames, MsgData *msgData,
                              GameData *gameData, HeapID heapId) {
-    sys_memset(info, 0, sizeof(TownMapInfo));
+    MI_CpuFill8(info, 0, sizeof(TownMapInfo));
     info->font = font;
     info->msgData = msgData;
     info->placeNames = placeNames;
@@ -1597,7 +1597,7 @@ static void TownMapInfo_Free(TownMapInfo *info) {
     GFL_StrBufFree(info->strbuf);
     BmpWin_Free(info->window);
     GFL_WordSetSystemFree(info->wordSet);
-    sys_memset(info, 0, sizeof(TownMapInfo));
+    MI_CpuFill8(info, 0, sizeof(TownMapInfo));
 }
 
 // Draws a place's name, description and landmarks on the upper screen; for Join Avenue, its name, rank and numbers
@@ -1739,7 +1739,7 @@ static void TownMapInfo_Clear(TownMapInfo *info) {
 
 static void TownMapMsgWin_Init(TownMapMsgWin *msgWin, u8 bg, Font *font, MsgData *msgData, u8 x, u8 y, u8 width,
                                u8 height, HeapID heapId) {
-    sys_memset(msgWin, 0, sizeof(TownMapMsgWin));
+    MI_CpuFill8(msgWin, 0, sizeof(TownMapMsgWin));
     msgWin->font = font;
     msgWin->msgData = msgData;
     msgWin->window = BmpWin_CreateDynamic(bg, x, y, width, height, 14, 0);
@@ -1749,7 +1749,7 @@ static void TownMapMsgWin_Init(TownMapMsgWin *msgWin, u8 bg, Font *font, MsgData
 static void TownMapMsgWin_Free(TownMapMsgWin *msgWin) {
     GFL_StrBufFree(msgWin->strbuf);
     BmpWin_Free(msgWin->window);
-    sys_memset(msgWin, 0, sizeof(TownMapMsgWin));
+    MI_CpuFill8(msgWin, 0, sizeof(TownMapMsgWin));
 }
 
 static void TownMapMsgWin_Print(TownMapMsgWin *msgWin, u32 messageId, u16 x, u16 y) {
@@ -1778,7 +1778,7 @@ static void TownMapPlaceName_Init(TownMapPlaceName *placeName, u8 bg, Font *font
                                   GameData *gameData, HeapID heapId) {
     ClActorPos pos;
 
-    sys_memset(placeName, 0, sizeof(TownMapPlaceName));
+    MI_CpuFill8(placeName, 0, sizeof(TownMapPlaceName));
     placeName->plate = plate;
     placeName->gameData = gameData;
     TownMapMsgWin_Init(&placeName->msgWin, bg, font, placeNames, 0, 0, 24, 3, heapId);
@@ -1795,7 +1795,7 @@ static void TownMapPlaceName_Init(TownMapPlaceName *placeName, u8 bg, Font *font
 
 static void TownMapPlaceName_Free(TownMapPlaceName *placeName) {
     TownMapMsgWin_Free(&placeName->msgWin);
-    sys_memset(placeName, 0, sizeof(TownMapPlaceName));
+    MI_CpuFill8(placeName, 0, sizeof(TownMapPlaceName));
 }
 
 static void TownMapPlaceName_Main(TownMapPlaceName *placeName) {
@@ -1841,11 +1841,11 @@ static void TownMapPlaceName_SetVisible(TownMapPlaceName *placeName, BOOL visibl
 }
 
 static void TownMapTouch_Init(TownMapTouch *touch, HeapID heapId) {
-    sys_memset(touch, 0, sizeof(TownMapTouch));
+    MI_CpuFill8(touch, 0, sizeof(TownMapTouch));
 }
 
 static void TownMapTouch_Free(TownMapTouch *touch) {
-    sys_memset(touch, 0, sizeof(TownMapTouch));
+    MI_CpuFill8(touch, 0, sizeof(TownMapTouch));
 }
 
 // Follows a touch on the map: how far it moved since it started, or since the last drag was taken

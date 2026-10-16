@@ -2616,7 +2616,7 @@ static void ResearchGraph_DeleteGraphs(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_ClearData(ResearchGraph *wk) {
-    sys_memset(&wk->data, 0, sizeof(ResearchData));
+    MI_CpuFill8(&wk->data, 0, sizeof(ResearchData));
 }
 
 // Reads the survey's questions and the counts of their answers from the save, adding today's to those of before
@@ -2751,15 +2751,15 @@ static void ResearchGraph_DeletePercentages(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_Init3D(void) {
-    gfxInit3D();
-    gfxResetMatrixStack();
+    G3X_Init();
+    G3X_InitMtxStack();
     G3_MtxMode(GX_MTXMODE_PROJECTION);
     G3_Identity();
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     G3_Identity();
     G3X_AntiAlias(TRUE);
     G3X_EdgeMarking(TRUE);
-    gfxSetEdgeColorTable(sGraphEdgeColors);
+    G3X_SetEdgeColorTable(sGraphEdgeColors);
 }
 
 static void ResearchGraph_InitBG(ResearchGraph *wk) {
@@ -2777,8 +2777,8 @@ static void ResearchGraph_InitBG(ResearchGraph *wk) {
     GFL_BGSysSetBGEnabled(RESEARCH_BG_MAIN_FRAME, TRUE);
     GFL_BGSysSetBGEnabled(BG_MAIN_GRAPH, TRUE);
     GFL_BGSysSetBGEnabled(BG_MAIN_TEXT, TRUE);
-    gfxRegSetAlphaBlend(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 7, 15);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG1, 16, 5);
+    G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_PLANEMASK_BG1, GX_PLANEMASK_BG0, 7, 15);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2, GX_PLANEMASK_BG1, 16, 5);
     BmpWin_InitAllocator(wk->heapId);
 }
 

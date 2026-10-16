@@ -55,9 +55,9 @@ static void BrightnessData_Step(BrightnessData *data) {
         done = TRUE;
     }
     if (data->screen & BRIGHTNESS_MAIN_SCREEN) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, data->planes, data->brightness);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, data->planes, data->brightness);
     } else if (data->screen & BRIGHTNESS_SUB_SCREEN) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, data->planes, data->brightness);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, data->planes, data->brightness);
     }
     if (done == TRUE) {
         data->active = FALSE;
@@ -89,32 +89,32 @@ void BrightnessController_StartTransition(u8 steps, s16 targetBrightness, s16 st
         return;
     }
     if (screens & BRIGHTNESS_MAIN_SCREEN) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, planes, startBrightness);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, planes, startBrightness);
         BrightnessData_Init(&sMainBrightness, steps, targetBrightness, startBrightness, planes, BRIGHTNESS_MAIN_SCREEN);
     }
     if (screens & BRIGHTNESS_SUB_SCREEN) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, planes, startBrightness);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, planes, startBrightness);
         BrightnessData_Init(&sSubBrightness, steps, targetBrightness, startBrightness, planes, BRIGHTNESS_SUB_SCREEN);
     }
 }
 
 void BrightnessController_SetScreenBrightness(s16 brightness, u32 planes, u32 screens) {
     if (screens & BRIGHTNESS_MAIN_SCREEN) {
-        gfxRegSetBrightnessBlend(REG_BLDCNT_ADDR, planes, brightness);
+        G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, planes, brightness);
     }
     if (screens & BRIGHTNESS_SUB_SCREEN) {
-        gfxRegSetBrightnessBlend(REG_DB_BLDCNT_ADDR, planes, brightness);
+        G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, planes, brightness);
     }
     BrightnessController_Reset(screens);
 }
 
 void BrightnessController_Reset(u32 screens) {
     if (screens & BRIGHTNESS_MAIN_SCREEN) {
-        sys_memset(&sMainBrightness, 0, sizeof(BrightnessData));
+        MI_CpuFill8(&sMainBrightness, 0, sizeof(BrightnessData));
         sMainBrightness.active = FALSE;
     }
     if (screens & BRIGHTNESS_SUB_SCREEN) {
-        sys_memset(&sSubBrightness, 0, sizeof(BrightnessData));
+        MI_CpuFill8(&sSubBrightness, 0, sizeof(BrightnessData));
         sSubBrightness.active = FALSE;
     }
 }

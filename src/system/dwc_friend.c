@@ -25,7 +25,7 @@ static void setFriendInfo(WifiList *wifiList, PlayerInfo *info, u32 index, u32 h
 static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId, int mode);
 
 static int compareFriendData(DWCFriendData *friendData, DWCUserData *userData, DWCFriendData *other) {
-    if (func_02057fd4(friendData, other)) {
+    if (DWC_IsEqualFriendData(friendData, other)) {
         return FRIEND_CHECK_SAME;
     }
     if (DWC_GetGsProfileId(userData, friendData) > 0 &&
@@ -46,7 +46,7 @@ static int findFriendData(DWCFriendData *friendData, int *index) {
         return FRIEND_CHECK_INVALID;
     }
     for (i = 0; i < count; i++) {
-        if (func_02057fd4(friendData, &friends[i])) {
+        if (DWC_IsEqualFriendData(friendData, &friends[i])) {
             *index = i;
             return FRIEND_CHECK_SAME;
         }
@@ -69,10 +69,10 @@ int func_02011980(WifiList *wifiList, u64 friendKey, int *index) {
     int count = func_0200a150(wifiList);
     DWCFriendData token;
 
-    if (!func_020578cc(userData, friendKey)) {
+    if (!DWC_CheckFriendKey(userData, friendKey)) {
         return FRIEND_CHECK_INVALID;
     }
-    func_02057ef8(&token, friendKey);
+    DWC_CreateFriendKeyToken(&token, friendKey);
     if (DWC_GetGsProfileId(userData, &token) <= 0) {
         return FRIEND_CHECK_INVALID;
     }
@@ -98,7 +98,7 @@ BOOL func_02011a28(DWCFriendData *friendData) {
     result = findFriendData(friendData, &index);
     if (result != FRIEND_CHECK_SAME) {
         if (result == FRIEND_CHECK_SAME_PROFILE) {
-            sys_memcpy(friendData, &friends[index], sizeof(DWCFriendData));
+            MI_CpuCopy8(friendData, &friends[index], sizeof(DWCFriendData));
         } else if (result == FRIEND_CHECK_NEW) {
             isNew = TRUE;
         }
@@ -124,7 +124,7 @@ static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendDa
     DWCFriendData *dest = func_0200a0e4(wifiList, index);
 
     if (mode != FRIEND_ADD_VIEW) {
-        sys_memcpy(friendData, dest, sizeof(DWCFriendData));
+        MI_CpuCopy8(friendData, dest, sizeof(DWCFriendData));
     }
     if (mode == FRIEND_ADD_NEW) {
         setFriendInfo(wifiList, info, index, heapId, TRUE);

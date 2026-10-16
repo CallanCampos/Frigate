@@ -308,7 +308,7 @@ static BOOL PdwAcc_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
 
     GFL_OvlLoad(OVERLAY_ID(189));
     wk = GFL_ProcInitSubsystem(proc, sizeof(PdwAccWork), pdwParam->heapId);
-    sys_memset(wk, 0, sizeof(PdwAccWork));
+    MI_CpuFill8(wk, 0, sizeof(PdwAccWork));
     wk->heapId = pdwParam->heapId;
     wk->save = GameData_GetSaveControl(pdwParam->gameData);
     wk->gameData = pdwParam->gameData;

@@ -300,7 +300,7 @@ void EventGameClear_GiveMonotypeMedals(GameClearWork *work) {
     count = PokeParty_GetPkmCount(party);
     eligible = 0;
     u16 medalIds[17] = { 236, 242, 245, 243, 244, 248, 247, 249, 252, 237, 238, 240, 239, 246, 241, 250, 251 };
-    sys_memset(typeCounts, 0, sizeof(typeCounts));
+    MI_CpuFill8(typeCounts, 0, sizeof(typeCounts));
     for (i = 0; i < count; i++) {
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
         u32 type1;

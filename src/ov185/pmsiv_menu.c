@@ -528,7 +528,7 @@ static void PMSIVMenu_SetupReturnButton(PMSIVMenu *wk) {
     wk->returnChars = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
     wk->returnCellAnims = func_0204bde0(arc, func_0202d818(1), func_0202d81c(1), HEAPID_PMS_INPUT);
     GFL_ArcToolFree(arc);
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 232;
     setup.y = 168;
     setup.sequence = 1;
@@ -569,10 +569,10 @@ static void PMSIVMenu_SetupColors(PMSIVMenu *wk) {
     void *buf = GFL_G2DIOReadNCLR(ARCID_PMSI, 7, &palette, HEAPID_PMS_INPUT);
     u16 *colors = palette->rawData;
 
-    sys_memcpy(&colors[75], wk->pulseFrom, sizeof(wk->pulseFrom));
-    sys_memcpy(&colors[59], wk->pulseTo, sizeof(wk->pulseTo));
+    MI_CpuCopy8(&colors[75], wk->pulseFrom, sizeof(wk->pulseFrom));
+    MI_CpuCopy8(&colors[59], wk->pulseTo, sizeof(wk->pulseTo));
     GFL_HeapFree(buf);
-    sys_memcpy(wk->pulseFrom, wk->pulse, sizeof(wk->pulse));
+    MI_CpuCopy8(wk->pulseFrom, wk->pulse, sizeof(wk->pulse));
     wk->pulseAngle = 0;
 }
 
@@ -607,7 +607,7 @@ static void PMSIVMenu_UpdateColors(PMSIVMenu *wk) {
 
 static void PMSIVMenu_StartTypeButtonPulse(PMSIVMenu *wk, u32 button) {
     func_0204c378(wk->typeButtons[button], 2, 1);
-    sys_memcpy(wk->pulseFrom, wk->pulse, sizeof(wk->pulse));
+    MI_CpuCopy8(wk->pulseFrom, wk->pulse, sizeof(wk->pulse));
     wk->pulseAngle = 0;
 }
 

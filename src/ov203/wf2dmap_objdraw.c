@@ -121,7 +121,7 @@ WF2DMAP_OBJDRAWWK *WF2DMAP_OBJDrawWkNew(WF2DMAP_OBJDRAWSYS *sys, const WF2DMAP_O
 
 void WF2DMAP_OBJDrawWkDel(WF2DMAP_OBJDRAWWK *wk) {
     WF_2DC_WkDel(wk->drawWk);
-    sys_memset(wk, 0, sizeof(WF2DMAP_OBJDRAWWK));
+    MI_CpuFill8(wk, 0, sizeof(WF2DMAP_OBJDRAWWK));
 }
 
 void WF2DMAP_OBJDrawSysUpdata(WF2DMAP_OBJDRAWSYS *sys) {

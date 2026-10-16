@@ -201,9 +201,9 @@ void ZukanDetailBlend_InitPlanes(ZukanDetailBlend *blend) {
 
 static void ZukanDetailBlend_Apply(u32 screen, ZukanDetailBlend *blend) {
     if (screen == 0) {
-        gfxRegSetBlend(REG_BLDCNT_ADDR, blend->plane1, blend->plane2, blend->ev, 0, blend->ev - 16);
+        G2x_SetBlendBrightnessExt_(REG_BLDCNT_ADDR, blend->plane1, blend->plane2, blend->ev, 0, blend->ev - 16);
     } else {
-        gfxRegSetBlend(REG_DB_BLDCNT_ADDR, blend->plane1, blend->plane2, blend->ev, 0, blend->ev - 16);
+        G2x_SetBlendBrightnessExt_(REG_DB_BLDCNT_ADDR, blend->plane1, blend->plane2, blend->ev, 0, blend->ev - 16);
     }
 }
 

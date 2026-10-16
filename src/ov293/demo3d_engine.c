@@ -233,17 +233,17 @@ static void Demo3DEngine_Setup3D(Demo3DEngine *engine, Demo3DParam *param, const
     G3X_AlphaBlend(setup->alphaBlend);
     G3X_EdgeMarking(setup->edgeMarking);
     if (setup->edgeMarking) {
-        gfxSetEdgeColorTable(setup->edgeColors);
+        G3X_SetEdgeColorTable(setup->edgeColors);
     }
-    gfxSetFog(setup->fog, setup->fogAlphaMode, setup->fogShift, setup->fogOffset);
+    G3X_SetFog(setup->fog, setup->fogAlphaMode, setup->fogShift, setup->fogOffset);
     if (setup->fog) {
         G3X_SetFogColor(setup->fogColor, setup->fogAlpha);
         for (i = 0; i < NELEMS(fogTable); i++) {
             fogTable[i] = setup->fogTable[i];
         }
-        gfxSetFogTable(fogTable);
+        G3X_SetFogTable(fogTable);
     }
-    gfxClearColor(setup->clearColor, setup->clearAlpha, setup->clearDepth, setup->clearPolygonId, setup->fog);
-    gfxSet1DotDepth(setup->polygon1DotDepth);
+    G3X_SetClearColor(setup->clearColor, setup->clearAlpha, setup->clearDepth, setup->clearPolygonId, setup->fog);
+    G3X_SetDisp1DotDepth(setup->polygon1DotDepth);
     GFL_G3DSysSetSwapBufferParams(setup->sortMode, setup->bufferMode);
 }

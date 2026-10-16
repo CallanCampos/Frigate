@@ -215,8 +215,8 @@ static BOOL sCtvtGameCamDspBusy;
 
 // TwlSDK's DSP_Scaling, which scales a whole image
 static inline BOOL DSP_Scaling(const void *src, void *dst, u16 width, u16 height, f32 rx, f32 ry, int mode) {
-    if (hw_isDSi() && !sCtvtGameCamDspBusy) {
-        return func_02707494(src, dst, width, height, rx, ry, mode, 0, 0, width, height, NULL, FALSE);
+    if (OS_IsRunOnTwl() && !sCtvtGameCamDspBusy) {
+        return DSPi_ScalingCore(src, dst, width, height, rx, ry, mode, 0, 0, width, height, NULL, FALSE);
     }
     return FALSE;
 }
@@ -346,9 +346,9 @@ static void CtvtGameCam_LoadBG(HeapID heapId) {
     GFL_BGSysFillChar(1, 0, 1, 0);
     LoadSysMsgBox(1, 1, 14, 0, heapId);
     G2S_SetBG3ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x00000);
-    sys_memset(gfxGetScreenAddrBG3B(), 0, 256 * 192 * 2);
+    MI_CpuFill8(G2S_GetBG3ScrPtr(), 0, 256 * 192 * 2);
     G2_SetBG3ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x14000);
-    sys_memset(gfxGetScreenAddrBG3A(), 0, 256 * 192 * 2);
+    MI_CpuFill8(G2_GetBG3ScrPtr(), 0, 256 * 192 * 2);
 }
 
 static void CtvtGameCam_FreeBG(void) {
@@ -364,7 +364,7 @@ static void CtvtGameCamActors_Init(CtvtGameCamActors *clact, ClActUnit *unit, He
     clact->resources[2] = func_0204bde0(arc, 7, 8, heapId);
     GFL_ArcToolFree(arc);
 
-    sys_memset(&setup, 0, sizeof(setup));
+    MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.sequence = 0;
     setup.x = 128;
     setup.y = 96;
@@ -433,7 +433,7 @@ static void CtvtGameCamMsgWin_Init(CtvtGameCamMsgWin *win, Font *font, MsgData *
                                    WordSet *wordSet, HeapID heapId) {
     BmpWin *window;
 
-    sys_memset(win, 0, sizeof(CtvtGameCamMsgWin));
+    MI_CpuFill8(win, 0, sizeof(CtvtGameCamMsgWin));
     win->color = 15;
     win->font = font;
     win->wordSet = wordSet;
@@ -453,7 +453,7 @@ static void CtvtGameCamMsgWin_Free(CtvtGameCamMsgWin *win) {
     BmpWin_Free(win->window);
     GFL_StrBufFree(win->expanded);
     GFL_StrBufFree(win->strbuf);
-    sys_memset(win, 0, sizeof(CtvtGameCamMsgWin));
+    MI_CpuFill8(win, 0, sizeof(CtvtGameCamMsgWin));
 }
 
 static BOOL CtvtGameCamMsgWin_Update(CtvtGameCamMsgWin *win) {
@@ -472,7 +472,7 @@ static BOOL CtvtGameCamMsgWin_Update(CtvtGameCamMsgWin *win) {
 }
 
 static void CtvtGameCamMsg_Init(CtvtGameCamMsg *msg, HeapID heapId) {
-    sys_memset(msg, 0, sizeof(CtvtGameCamMsg));
+    MI_CpuFill8(msg, 0, sizeof(CtvtGameCamMsg));
     msg->tcbManager = GFL_TCBExMgrCreate(heapId, heapId, 2, 0);
 }
 
@@ -481,7 +481,7 @@ static void CtvtGameCamMsg_Free(CtvtGameCamMsg *msg) {
         func_020223cc(msg->stream);
     }
     GFL_TCBExMgrFree(msg->tcbManager);
-    sys_memset(msg, 0, sizeof(CtvtGameCamMsg));
+    MI_CpuFill8(msg, 0, sizeof(CtvtGameCamMsg));
 }
 
 static void CtvtGameCamMsg_Print(CtvtGameCamMsg *msg, CtvtGameCamMsgWin *win, CtvtGameCamSeqFunc next, u32 msgId,
@@ -526,9 +526,9 @@ static void CtvtGameCamMsg_PrintNumber(CtvtGameCamMsg *msg, CtvtGameCamMsgWin *w
 static void CtvtGameCam_LoadMainPicture(u16 x, u16 y, u16 width, u16 height, const u16 *src) {
     u8 i;
 
-    cp15_flushDC(src, width * height * 2);
+    DC_FlushRange(src, width * height * 2);
     for (i = 0; i < height; i++) {
-        gfxUploadBGScreen3A(&src[width * i], (i + y) * 512 + x * 2, width * 2);
+        GX_LoadBG3Scr(&src[width * i], (i + y) * 512 + x * 2, width * 2);
     }
 }
 
@@ -554,10 +554,10 @@ static void CtvtGameCamCamera_TakePicture(CtvtGameCamCamera *camera, void *dest,
     CameraSystem_ExitDsp(camera->cameraSystem);
     DSP_OpenStaticComponentGraphics(&file);
     if (!DSP_LoadGraphics(&file, 0xff, 0xff)) {
-        sys_exit();
+        OS_Terminate();
     }
     for (i = 0; i < 128; i++) {
-        sys_memcpy32((u16 *)camera->frame + (i + 32) * 256 + 64, crop + i * 128, 128 * 2);
+        MIi_CpuCopy32((u16 *)camera->frame + (i + 32) * 256 + 64, crop + i * 128, 128 * 2);
     }
     scale = 0.5009f;
     DSP_Scaling(crop, dest, 128, 128, scale, scale, 2);
@@ -623,9 +623,9 @@ static void CtvtGameCamRoulette_Update(CtvtGameCamRoulette *roulette, CtvtGameCa
 static void CtvtGameCam_LoadSubPicture(u16 x, u16 y, u16 width, u16 height, const u16 *src) {
     u8 i;
 
-    cp15_flushDC(src, width * height * 2);
+    DC_FlushRange(src, width * height * 2);
     for (i = 0; i < height; i++) {
-        gfxUploadBGScreen3B(&src[width * i], (i + y) * 512 + x * 2, width * 2);
+        GXS_LoadBG3Scr(&src[width * i], (i + y) * 512 + x * 2, width * 2);
     }
 }
 
@@ -642,7 +642,7 @@ static BOOL CtvtGameCamRoulette_IsMoving(CtvtGameCamRoulette *roulette) {
 static void CtvtGameCamExchange_Init(CtvtGameCamExchange *exchange, BOOL cameraEnabled, HeapID heapId) {
     u8 i;
 
-    sys_memset(exchange, 0, sizeof(CtvtGameCamExchange));
+    MI_CpuFill8(exchange, 0, sizeof(CtvtGameCamExchange));
     exchange->heapId = heapId;
     if (cameraEnabled == TRUE) {
         exchange->buffer = GFL_HeapAllocate(heapId, 0x2000, TRUE, "ctvt_game_cam.c", 1561);
@@ -777,7 +777,7 @@ static BOOL CtvtGameCamExchange_IsDone(CtvtGameCamExchange *exchange) {
 }
 
 static void CtvtGameCamExchange_CopyBuffer(CtvtGameCamExchange *exchange, void *dest) {
-    sys_memcpy32(exchange->buffer, dest, 0x2000);
+    MIi_CpuCopy32(exchange->buffer, dest, 0x2000);
 }
 
 // Whether someone left the call
@@ -789,13 +789,13 @@ static BOOL CtvtGameCamExchange_IsSomeoneGone(CtvtGameCamExchange *exchange) {
 }
 
 static void CtvtGameCamSeq_Init(CtvtGameCamSeq *seq, CtvtGameCamTask *task, CtvtGameCamSeqFunc func) {
-    sys_memset(seq, 0, sizeof(CtvtGameCamSeq));
+    MI_CpuFill8(seq, 0, sizeof(CtvtGameCamSeq));
     seq->task = task;
     CtvtGameCamSeq_Set(seq, func);
 }
 
 static void CtvtGameCamSeq_Free(CtvtGameCamSeq *seq) {
-    sys_memset(seq, 0, sizeof(CtvtGameCamSeq));
+    MI_CpuFill8(seq, 0, sizeof(CtvtGameCamSeq));
 }
 
 static void CtvtGameCamSeq_Update(CtvtGameCamSeq *seq) {
@@ -1020,7 +1020,7 @@ static void CtvtGameCam_OnFrame(void *frame, void *work) {
     CtvtGameCamCamera *camera = work;
 
     if (camera->frameReady != TRUE) {
-        sys_memcpy32(frame, camera->frame, 256 * 192 * 2);
+        MIi_CpuCopy32(frame, camera->frame, 256 * 192 * 2);
         camera->frameReady = TRUE;
     }
 }
@@ -1157,8 +1157,8 @@ static void CtvtGameCam_VBlank(TCB *tcb, void *work) {
     CtvtGameCamTask *task = work;
 
     if (task->camera.frameReady == TRUE && task->camera.frame != NULL) {
-        cp15_flushDC(task->camera.frame, 256 * 192 * 2);
-        gfxUploadBGScreen3B(task->camera.frame, 0, 256 * 192 * 2);
+        DC_FlushRange(task->camera.frame, 256 * 192 * 2);
+        GXS_LoadBG3Scr(task->camera.frame, 0, 256 * 192 * 2);
         task->camera.frameReady = FALSE;
     }
     func_0204b7c8();

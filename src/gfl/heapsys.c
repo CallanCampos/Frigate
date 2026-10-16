@@ -76,9 +76,9 @@ BOOL GFL_HeapMgrInit(const HeapDef *defs, u16 rootCount, u16 maxHeapIds, u32 res
         while (reserveSize % 4 != 0) {
             reserveSize++;
         }
-        mem_alloc_direct(OS_ARENA_MAIN, reserveSize, 4);
+        OS_AllocFromArenaLo(OS_ARENA_MAIN, reserveSize, 4);
     }
-    sHeapMgr.heaps = mem_alloc_direct(OS_ARENA_MAIN, heapCount * sizeof(HeapEntry), 4);
+    sHeapMgr.heaps = OS_AllocFromArenaLo(OS_ARENA_MAIN, heapCount * sizeof(HeapEntry), 4);
     for (i = 0; i < heapCount; i++) {
         sHeapMgr.heaps[i].handle = NULL;
         sHeapMgr.heaps[i].parent = NULL;
@@ -86,7 +86,7 @@ BOOL GFL_HeapMgrInit(const HeapDef *defs, u16 rootCount, u16 maxHeapIds, u32 res
         sHeapMgr.heaps[i].allocations = 0;
         sHeapMgr.heaps[i].external = FALSE;
     }
-    sHeapMgr.indices = mem_alloc_direct(OS_ARENA_MAIN, maxHeapIds, 4);
+    sHeapMgr.indices = OS_AllocFromArenaLo(OS_ARENA_MAIN, maxHeapIds, 4);
     for (i = 0; i < maxHeapIds; i++) {
         sHeapMgr.indices[i] = HEAP_INDEX_NONE;
     }
@@ -95,7 +95,7 @@ BOOL GFL_HeapMgrInit(const HeapDef *defs, u16 rootCount, u16 maxHeapIds, u32 res
     sHeapMgr.heapCount = heapCount;
     sHeapMgr.lastResult = HEAP_RESULT_OK;
     for (i = 0; i < rootCount; i++) {
-        void *memory = mem_alloc_direct(OS_ARENA_MAIN, defs[i].size, 4);
+        void *memory = OS_AllocFromArenaLo(OS_ARENA_MAIN, defs[i].size, 4);
 
         if (memory != NULL) {
             sHeapMgr.heaps[i].handle = NNS_FndCreateExpHeapEx(memory, defs[i].size, 0);
@@ -214,7 +214,7 @@ void *GFL_HeapAllocateCore(HeapID heapId, u32 size) {
     } else if ((heap = GFL_HeapGetBase(heapId)) == NULL) {
         sHeapMgr.lastResult = HEAP_RESULT_2;
     } else {
-        interrupts = CPU_IRQDisable();
+        interrupts = OS_DisableInterrupts();
         size += sizeof(HeapBlockHeader);
         block = NNS_FndAllocFromExpHeapEx(heap, size, alignment);
         if (block == NULL) {
@@ -226,7 +226,7 @@ void *GFL_HeapAllocateCore(HeapID heapId, u32 size) {
             block++;
             sHeapMgr.lastResult = HEAP_RESULT_OK;
         }
-        CPU_SetIRQMask(interrupts);
+        OS_RestoreInterrupts(interrupts);
         return block;
     }
     return NULL;
@@ -247,11 +247,11 @@ BOOL GFL_HeapFreeCore(void *ptr) {
     } else if (GFL_HeapGetAllocationCountCore(heapId) == 0) {
         sHeapMgr.lastResult = HEAP_RESULT_4;
     } else {
-        interrupts = CPU_IRQDisable();
+        interrupts = OS_DisableInterrupts();
         sHeapMgr.heaps[sHeapMgr.indices[heapId]].allocations--;
         block->magic = HEAP_BLOCK_MAGIC - 1;
         NNS_FndFreeToExpHeap(heap, block);
-        CPU_SetIRQMask(interrupts);
+        OS_RestoreInterrupts(interrupts);
         sHeapMgr.lastResult = HEAP_RESULT_OK;
         return TRUE;
     }

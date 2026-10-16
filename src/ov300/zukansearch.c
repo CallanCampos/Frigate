@@ -24,7 +24,7 @@ static BOOL ZukanSearch_ProcInit(GameProc *proc, u32 *state, void *param, void *
 
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_ZUKAN_SEARCH, 0x60000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(ZknSearchWork), HEAPID_ZUKAN_SEARCH);
-    sys_memset(wk, 0, sizeof(ZknSearchWork));
+    MI_CpuFill8(wk, 0, sizeof(ZknSearchWork));
     wk->param = param;
     return TRUE;
 }

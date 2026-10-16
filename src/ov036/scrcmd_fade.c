@@ -214,8 +214,8 @@ static GameEventReturnCode func_ov036_021ab580(GameEvent *event, u32 *state, voi
             break;
         case FIELD_FADE_IN:
             if (fade->white == TRUE) {
-                GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, -16);
-                GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, -16);
+                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
+                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
                 resetLCD = TRUE;
             }
             *state = 2;
@@ -225,8 +225,8 @@ static GameEventReturnCode func_ov036_021ab580(GameEvent *event, u32 *state, voi
             break;
         case FIELD_FADE_OUT:
             if (fade->white == TRUE) {
-                GFXRegSetMasterBrightness(REG_MASTER_BRIGHT_ADDR, 16);
-                GFXRegSetMasterBrightness(REG_DB_MASTER_BRIGHT_ADDR, 16);
+                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
+                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
                 resetLCD = TRUE;
             }
             *state = 4;

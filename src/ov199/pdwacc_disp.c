@@ -81,7 +81,7 @@ PdwAccDisp *PdwAccDisp_Create(HeapID heapId) {
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetDisplayLayout(1);
     GXS_DispOn();
-    gfxEngineEnableA();
+    GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     ClActSys_Create(&data_02093f24, &sPdwAccVRAMConfig, disp->heapId);
     disp->clUnit = func_0204bf1c(40, 0, disp->heapId);
@@ -330,10 +330,10 @@ static inline void PdwAccDisp_InitCycle(PdwAccPaletteCycle *cycle, ArcTool *arc,
     NNSG2dPaletteData *palette;
     void *file;
 
-    sys_memset(cycle, 0, sizeof(*cycle));
+    MI_CpuFill8(cycle, 0, sizeof(*cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    sys_memcpy(palette->rawData, cycle->palettes, sizeof(cycle->palettes));
-    sys_memcpy(palette->rawData, cycle->blended, sizeof(cycle->palettes));
+    MI_CpuCopy8(palette->rawData, cycle->palettes, sizeof(cycle->palettes));
+    MI_CpuCopy8(palette->rawData, cycle->blended, sizeof(cycle->palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps
@@ -365,10 +365,10 @@ static inline void PdwAccDisp_InitCycle(PdwAccPaletteCycle *cycle, ArcTool *arc,
             }
         }
     }
-    cp15_flushDC(cycle->blended, sizeof(cycle->blended));
+    DC_FlushRange(cycle->blended, sizeof(cycle->blended));
     cycle->active = TRUE;
     cycle->task = GFL_VBlankTCBAdd(PdwAccDisp_CyclePalette, cycle, 20);
-    gfxRegSetAlphaBlend(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
+    G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0, GX_BLEND_PLANEMASK_BG3, 8, 16);
     cycle->scrollBg = 0;
 }
 
@@ -393,8 +393,8 @@ static void PdwAccDisp_CyclePalette(TCB *task, void *work) {
     if (cycle->active) {
         cycle->skip ^= 1;
         if (!(cycle->skip & 1)) {
-            gfxUploadStdPaletteBGA(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
-            gfxUploadStdPaletteBGB(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GX_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
+            GXS_LoadBGPltt(&cycle->blended[cycle->frame][4], 0x20 + 4 * 2, 7 * 2);
             cycle->frame++;
             if (cycle->frame >= PDWACC_PALETTE_COUNT * PDWACC_BLEND_STEPS) {
                 cycle->frame = 0;

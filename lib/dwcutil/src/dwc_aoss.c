@@ -2,7 +2,6 @@
 #include "dwc/ext.h"
 #include "dwc_aoss_ap.h"
 #include "dwc_wcm.h"
-#include "gfl/std.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
@@ -1844,11 +1843,11 @@ static int Mem_Compare(const u8 *a, const u8 *b, int size) {
 }
 
 static void Mem_Copy(void *dest, const void *src, u32 size) {
-    sys_memcpy(src, dest, size);
+    MI_CpuCopy8(src, dest, size);
 }
 
 static void Mem_Fill(void *dest, int value, u32 size) {
-    sys_memset(dest, (u8)value, size);
+    MI_CpuFill8(dest, (u8)value, size);
 }
 
 static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength) {
@@ -1920,7 +1919,7 @@ static u16 Aoss_Rand(void) {
         u32 seed = 0;
 
         Mem_Fill(&time, 0, sizeof(time));
-        if (func_0207cc80(&time) == 0) {
+        if (RTC_GetTime(&time) == 0) {
             seed += time.hour << 10;
             seed += time.minute << 3;
             seed += time.second;
