@@ -137,6 +137,13 @@ lib/dwcutilui/src/dwc_util_task.c:
     .text       start:0x021bd0d4 end:0x021bd2cc
     .rodata     start:0x021c05a4 end:0x021c05a8
     .bss        start:0x021c4204 end:0x021c4220
+
+lib/dwcutilui/src/dwc_util_gfx_resource.c:
+    complete
+    .text       start:0x021ab63c end:0x021ab7c8
+    .rodata     start:0x021bfb54 end:0x021bfba4
+    .bss        start:0x021c4030 end:0x021c4070
+
 lib/dwcutilui/src/dwc_util_main.c:
     complete
     .text       start:0x021adbc0 end:0x021ae084

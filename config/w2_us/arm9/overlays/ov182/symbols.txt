@@ -1146,10 +1146,10 @@ sPositions kind:data(any) addr:0x021bfb70
 data_ov182_021bfb32 kind:data(any) addr:0x021bfb72
 sUiResources kind:data(any) addr:0x021bfb78
 sPosIndex kind:data(any) addr:0x021bfb86
-data_ov182_021bfb54 kind:data(any) addr:0x021bfb94
-data_ov182_021bfb64 kind:data(any) addr:0x021bfba4
-data_ov182_021bfb6c kind:data(any) addr:0x021bfbac
-data_ov182_021bfb88 kind:data(any) addr:0x021bfbc8
+sStrMsgBox kind:data(any) addr:0x021bfb94
+sLanguageChars kind:data(any) addr:0x021bfba4
+sTextFlags kind:data(any) addr:0x021bfbac
+sStrPositions kind:data(any) addr:0x021bfbc8
 data_ov182_021bfb8a kind:data(any) addr:0x021bfbca
 data_ov182_021bfba4 kind:data(any) addr:0x021bfbe4
 data_ov182_021bfbb0 kind:data(any) addr:0x021bfbf0
@@ -1612,7 +1612,7 @@ data_ov182_021c3824 kind:bss addr:0x021c3864
 sEffect kind:bss addr:0x021c4064
 sUiObject kind:bss addr:0x021c4068
 sScreenActive kind:bss addr:0x021c406c
-data_ov182_021c4030 kind:bss addr:0x021c4070
+sPath kind:bss addr:0x021c4070
 data_ov182_021c4070 kind:bss addr:0x021c40b0
 data_ov182_021c4074 kind:bss addr:0x021c40b4
 data_ov182_021c4078 kind:bss addr:0x021c40b8

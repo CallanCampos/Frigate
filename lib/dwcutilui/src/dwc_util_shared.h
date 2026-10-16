@@ -16,9 +16,10 @@
 #include "struct_decls.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
-void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32));
-// The text flags of the utility's language
-u32 func_ov182_021ab7b4(void);
+
+// The rows of buttons of the two layouts
+void func_ov182_021b8154(int variant);
+void func_ov182_021b84c0(int variant);
 
 // The utility's message file, which a later file opens
 extern DWCUtilMsg *data_ov182_021c40b8;
