@@ -522,6 +522,7 @@ src/ov036/field_player_grid_event.c:
     .data       start:0x021d5404 end:0x021d5420
 
 src/ov036/fld_particle.c:
+    complete
     .text       start:0x021bb590 end:0x021bb67c
     .rodata     start:0x021d1784 end:0x021d1c80
     .data       start:0x021d5420 end:0x021d5430

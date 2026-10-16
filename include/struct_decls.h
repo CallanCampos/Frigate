@@ -318,6 +318,7 @@ typedef struct FieldLensFlare FieldLensFlare;
 typedef struct FieldLight FieldLight;
 typedef struct FieldmapCtrlVTable FieldmapCtrlVTable;
 typedef struct FieldMenuWork FieldMenuWork;
+typedef struct FieldParticle FieldParticle;
 typedef struct FieldPlayer FieldPlayer;
 typedef struct FieldPlayerCore FieldPlayerCore;
 typedef struct FieldPlayerGrid FieldPlayerGrid;
