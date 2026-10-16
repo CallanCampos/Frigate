@@ -138,3 +138,7 @@ lib/dwc/src/gt2/gt2Callback.c:
 lib/dwc/src/gt2/gt2Connection.c:
     complete
     .text       start:0x0217ce40 end:0x0217d184
+
+lib/dwc/src/gt2/gt2Main.c:
+    complete
+    .text       start:0x0217d184 end:0x0217d3ec
