@@ -550,7 +550,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
-| `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | partial | string at `0x021d54f0` |
+| `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | complete | string at `0x021d54f0` |
 | `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | partial | string at `0x021d5500` |
 | `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | partial | string at `0x021d551c` |
 | `field_task_manager.c` | `0x021c0914`–`0x021c1bc4` | 52 | partial | string at `0x021d552c` |
