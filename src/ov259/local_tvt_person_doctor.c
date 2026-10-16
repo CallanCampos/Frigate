@@ -1,3 +1,4 @@
+#include "app/local_tvt/local_tvt_person_doctor.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_chara.h"
@@ -5,7 +6,6 @@
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
 #include "app/local_tvt/local_tvt_util.h"
-#include "app/local_tvt_local.h"
 #include "constants/arc.h"
 #include "constants/flags.h"
 #include "constants/items.h"
@@ -35,7 +35,7 @@
 #define EVOLUTION_LEVEL_ITEM 20
 #define EVOLUTION_LEVEL_MOVE 21
 
-typedef struct {
+struct LocalTvtDoctor {
     int step;
     u32 timer;
     LocalTvtPokeSelect *select;
@@ -50,13 +50,13 @@ typedef struct {
     u16 pokedexJingle;
     // Whether the Pokédex has earned an award the player hasn't collected
     BOOL award;
-} LocalTvtDoctor;
+};
 
 // The message for a species, item or move
-typedef struct {
+struct LocalTvtEvolutionMsg {
     u16 key;
     u16 messageId;
-} LocalTvtEvolutionMsg;
+};
 
 static LocalTvtDoctor *LocalTvtDoctor_Create(GameData *gameData, HeapID heapId);
 static void LocalTvtDoctor_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
