@@ -27,7 +27,7 @@ NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[10] = {
     { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TP }, NNS_G3DAnimationInit_TP },
     { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TA }, NNS_G3DAnimationInit_TA },
     { { NNS_G3D_DATABLK_VIS_ANM, 0, NNS_G3D_ANM_CATEGORY1_VA }, func_02069ee4 },
-    { { NNS_G3D_DATABLK_JNT_ANM, 0, NNS_G3D_ANM_CATEGORY1_CA }, func_02068764 },
+    { { NNS_G3D_DATABLK_JNT_ANM, 0, NNS_G3D_ANM_CATEGORY1_CA }, NNS_G3DAnimationInit_CA },
 };
 
 // Calls the animation function of every animation object that has data for the material, in the order of the list, so

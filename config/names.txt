@@ -1915,6 +1915,18 @@
 . 0x020686e0 NNS_G3dGetTexPatAnmPlttNameByIdx
 . 0x020686f8 NNSi_G3dGetTexPatAnmFV
 . 0x02068744 GetTexPatAnmData
+. 0x02068764 NNS_G3DAnimationInit_CA
+. 0x020687d4 setBaseTrans_
+. 0x02068834 setBaseScale_
+. 0x02068898 setBaseRot_
+. 0x020689b0 getJntSRTAnmResult_
+. 0x02068c60 getTransData_
+. 0x02068d50 getTransDataInterp_
+. 0x02068e68 getScaleData_
+. 0x02068fb0 getScaleDataInterp_
+. 0x020690dc getRotData_
+. 0x02069390 getRotDataInterp_
+. 0x02069600 getRotMtx_
 . 0x02069dc0 SetTexParamaters_
 . 0x0206a840 NNSi_G3dGetJointScaleSi3d
 . 0x0206b8d4 NNS_SndInit
@@ -3276,6 +3288,7 @@
 . 0x02094304 texSizeSTbl_
 . 0x02094334 texSizeTTbl_
 . 0x0209436c mtxIdentity_
+. 0x02094458 NNS_COMPACT_ROT_LUT_CA
 . 0x0209447c sAdpcmIndexTable
 . 0x0209448c sAdpcmStepTable
 . 0x02094540 sCardDmaInterface

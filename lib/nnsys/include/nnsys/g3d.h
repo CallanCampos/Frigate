@@ -404,8 +404,11 @@ typedef struct {
     u8 idPltt;
 } NNSG3dResTexPatAnmFV;
 
-// A joint animation. Each joint's tag, at ofsTag[joint], is a word of NNS_G3D_JNTANM_SRTINFO_* flags followed by the
-// data of each component that isn't constant
+// A joint animation. Each joint's tag, at ofsTag[joint], is a word of NNS_G3D_JNTANM_SRTINFO_* flags followed by what
+// the flags say the animation has of the joint's translation, rotation and scale: for a component that is neither the
+// identity nor the node's own, either its value if it is constant, or a NNSG3dJntAnmTInfo that says where its values
+// are. The constant of a rotation is an index of the rotation tables (ofsRot3 and ofsRot5, offsets from the animation),
+// and that of a scale component is the scale and its inverse
 typedef struct {
     NNSG3dResAnmHeader anmHeader;
     u16 numFrame;
@@ -416,14 +419,32 @@ typedef struct {
     u16 ofsTag[1];
 } NNSG3dResJntAnm;
 
+// The flag of a joint animation: INTERPOLATION blends the values of a frame with a fraction with those of the next
+// frame, and END_TO_START does so for the last frame too, with the first
+#define NNS_G3D_JNTANM_OPTION_INTERPOLATION 0x00000001
+#define NNS_G3D_JNTANM_OPTION_END_TO_START_INTERPOLATION 0x00000002
+
 #define NNS_G3D_JNTANM_SRTINFO_IDENTITY 0x00000001
 #define NNS_G3D_JNTANM_SRTINFO_IDENTITY_T 0x00000002
 #define NNS_G3D_JNTANM_SRTINFO_BASE_T 0x00000004
 #define NNS_G3D_JNTANM_SRTINFO_CONST_TX 0x00000008
 #define NNS_G3D_JNTANM_SRTINFO_CONST_TY 0x00000010
 #define NNS_G3D_JNTANM_SRTINFO_CONST_TZ 0x00000020
+#define NNS_G3D_JNTANM_SRTINFO_IDENTITY_R 0x00000040
+#define NNS_G3D_JNTANM_SRTINFO_BASE_R 0x00000080
+#define NNS_G3D_JNTANM_SRTINFO_CONST_R 0x00000100
+#define NNS_G3D_JNTANM_SRTINFO_IDENTITY_S 0x00000200
+#define NNS_G3D_JNTANM_SRTINFO_BASE_S 0x00000400
+#define NNS_G3D_JNTANM_SRTINFO_CONST_SX 0x00000800
+#define NNS_G3D_JNTANM_SRTINFO_CONST_SY 0x00001000
+#define NNS_G3D_JNTANM_SRTINFO_CONST_SZ 0x00002000
+#define NNS_G3D_JNTANM_SRTINFO_NODE_MASK 0xff000000
+#define NNS_G3D_JNTANM_SRTINFO_NODE_SHIFT 24
 
-// The first word of a translation component's data; the second is the offset of its values from the animation
+// Where the values of a component are, and how they are kept: TINFO_* flags and the offset of the values from the
+// animation. The values are for every frame, or with a step of two or four for every second or fourth, and the frames
+// between are made from the stored ones up to LAST_INTERP, the last frame that is. A translation or scale component is
+// kept in fx16 (FX16ARR) or in fx32, a rotation as the indices (u16) of rotations
 #define NNS_G3D_JNTANM_TINFO_STEP_1 0x00000000
 #define NNS_G3D_JNTANM_TINFO_STEP_2 0x40000000
 #define NNS_G3D_JNTANM_TINFO_STEP_4 0x80000000
@@ -431,6 +452,16 @@ typedef struct {
 #define NNS_G3D_JNTANM_TINFO_FX16ARR 0x20000000
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK 0x1fff0000
 #define NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT 16
+
+typedef struct {
+    u32 info;
+    u32 offset;
+} NNSG3dJntAnmTInfo;
+
+// A rotation index is that of a rotation of three values (ROT3, a pivot and two numbers) or of five, in the table
+// that ofsRot3 or ofsRot5 gives
+#define NNS_G3D_JNTANM_RINFO_IS_ROT3 0x00008000
+#define NNS_G3D_JNTANM_RINFO_IDX_MASK 0x00007fff
 
 // The second category of an animation resource's header, which tells the kind of animation within what it animates
 #define NNS_G3D_ANM_CATEGORY1_MA 'MA'
@@ -654,7 +685,7 @@ void func_020698d4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *md
 void NNS_G3DAnimationInit_TP(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void func_02069ee4(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
-void func_02068764(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
+void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl);
 void func_02069968(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
 void func_02069cf8(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
 void func_02069ea0(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx);
