@@ -37,8 +37,14 @@ extern DWCUtilMsg *data_ov182_021c40b8;
 // The utility's sound: its start and its end, around the main loop
 void func_ov182_021b8050(void);
 void func_ov182_021b80d4(void);
+// Starts the sound effect, from the utility's sound archive
+void func_ov182_021b80f4(int seq);
 
 // The update function of the utility's first screen
 void func_ov182_021ae574(void);
+
+// The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
+// dwc_util_task.c's that no file claims yet
+extern const u16 data_ov182_021c059c[4];
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
