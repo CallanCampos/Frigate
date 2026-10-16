@@ -5138,7 +5138,7 @@ data_ov036_021cf108 kind:data(any) addr:0x021cf108
 data_ov036_021cf1c8 kind:data(any) addr:0x021cf1c8
 BLACT_SCENE_SCALE kind:data(any) addr:0x021cf2d8
 MMDL_TEXTURE_ATLAS_SIZE_BITS kind:data(any) addr:0x021cf2e4
-data_ov036_021cf364 kind:data(any) addr:0x021cf364
+FACE_DIRS_BY_ANGLE kind:data(any) addr:0x021cf364
 data_ov036_021cf374 kind:data(any) addr:0x021cf374
 data_ov036_021cf37c kind:data(any) addr:0x021cf37c
 data_ov036_021cf384 kind:data(any) addr:0x021cf384

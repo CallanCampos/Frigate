@@ -474,6 +474,15 @@ in both versions.
   `_drsb`, `_frsb`, `_frdiv` and `_drdiv` have no symbols, since dsd refuses a function that starts with the `eor` that
   swaps their operands, so the probe lists them as unknown.
 
+- `src/ov036/fldmmdl_g3dobj.c` (overlay 36) matches every function in both versions, but linked complete it fails the
+  module check: its registered `.rodata` holds `FACE_DIRS_BY_ANGLE` (16 bytes, at `0x021cf364`) before the five 8-byte
+  and one 12-byte action command tables at `0x021cf374`–`0x021cf3a8`, and MWCC sorts a file's data by size, so in one
+  file the tables come first. The tables are the first of the rail actors' action command tables, which go on in
+  `fld_act_rail.c` from `0x021cf3a8`, so they are evidently `fld_act_rail.c`'s, whose `.rodata` would start at
+  `0x021cf374`. That boundary moves down from `0x021cf3a8`, and `config_fixes.py apply` would undo it: `fixes.txt`
+  keeps the `0x021cf3a8` `section_end`/`section_start` lines and replays the fixes in address order. The file stays
+  incomplete until the boundary can be recorded.
+
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file

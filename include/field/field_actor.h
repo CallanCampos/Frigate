@@ -183,8 +183,29 @@ BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step);
 BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step);
 BOOL func_ov036_02197238(FieldActor *actor);
 void func_ov036_02197288(FieldActor *actor);
-// Overlay 36's fldmmdl_g3dobj.c, not written yet: the start, update and end functions of the action commands that
-// the rail actors' tables in fld_act_rail.c name, and the jump along the rail that their start functions begin
+// The functions that run an action command: what to do on the first frame, each frame and at the end
+typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
+
+typedef struct {
+    ActorAcmdFunc start;
+    ActorAcmdFunc update;
+    ActorAcmdFunc end;
+} ActorAcmdFuncs;
+
+// The work of a jump along the rail, which fldmmdl_g3dobj.c's func_ov036_02195354 starts and fld_act_rail.c updates
+typedef struct {
+    s32 speed;
+    s32 progress;
+    u16 step;
+    u16 phase;
+    s8 dir;
+    s8 timer;
+    s8 unkE;
+    s8 height;
+} ActorRailJumpWork;
+
+// Overlay 36's fldmmdl_g3dobj.c: the start, update and end functions of the action commands that the rail actors'
+// tables in fld_act_rail.c name, and the jump along the rail that their start functions begin
 BOOL func_ov036_02194ee8(FieldActor *actor);
 BOOL func_ov036_02194f94(FieldActor *actor);
 BOOL func_ov036_02194fe8(FieldActor *actor);
@@ -228,12 +249,15 @@ BOOL func_ov036_0219528c(FieldActor *actor);
 BOOL func_ov036_0219529c(FieldActor *actor);
 BOOL func_ov036_021952ac(FieldActor *actor);
 BOOL func_ov036_021952cc(FieldActor *actor);
-void func_ov036_02195354(FieldActor *actor, u16 dir, u32 a, u32 b, u16 s0, s16 s1, u16 s2);
-// Also fldmmdl_g3dobj.c's: the actors' 3D object system, the creation and deletion of an actor's 3D object, and the
-// direction an actor on the rails faces for a camera angle
+void func_ov036_02195354(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
+// Also fldmmdl_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion of
+// an actor's 3D object, the tile under a rail position, and the direction an actor on the rails faces for a camera
+// angle
+void func_ov036_021946f4(MMSys *system);
 FieldG3DObjSystem *FldAct_GetG3DObjSystem(FieldActor *actor);
 u16 func_ov036_021948a0(FieldActor *actor);
 void func_ov036_021948ec(FieldActor *actor, u16 objIdx);
+u32 func_ov036_02194990(FieldActor *actor, const RailPosition *pos);
 u8 func_ov036_021949a4(FieldActor *actor, int angle);
 // The unit vector of a direction along the actor's rail
 void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest);
@@ -247,11 +271,11 @@ BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position);
 // than exclude, and the change of the actor's grid position to the one a step ahead
 void func_ov036_02195604(FieldActor *actor, RailPosition *position);
 void func_ov036_02195624(FieldActor *actor);
-void func_ov036_02195640(FieldActor *actor, u32 dir, u32 speed);
+void func_ov036_02195640(FieldActor *actor, u16 dir, u32 speed);
 u32 func_ov036_021956e8(FieldActor *actor, u16 dir);
 u32 func_ov036_021956f4(FieldActor *actor, u16 dir, u32 *tile);
 FieldActor *func_ov036_0219584c(MMSys *system, const RailPosition *position, BOOL checkInit, FieldActor *exclude);
-void func_ov036_021959bc(FieldActor *actor, u32 dir);
+void func_ov036_021959bc(FieldActor *actor, u16 dir);
 // The move codes of the rail actors: their init, update and delete functions
 void func_ov036_02195b1c(FieldActor *actor);
 void func_ov036_02195b28(FieldActor *actor);

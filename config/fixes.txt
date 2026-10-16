@@ -1265,6 +1265,14 @@ overlays/ov036 0x02183a18 reloc_addend 4
 overlays/ov036 0x02183ca8 reloc_addend 8
 overlays/ov036 0x021841e8 reloc_addend 2
 overlays/ov036 0x02184440 reloc_module overlay(12)
+overlays/ov036 0x02194b68 reloc_module overlay(12)
+overlays/ov036 0x02194bc8 reloc_module overlay(12)
+overlays/ov036 0x02194c34 reloc_module overlay(12)
+overlays/ov036 0x02194c88 reloc_module overlay(12)
+overlays/ov036 0x02194cdc reloc_module overlay(12)
+overlays/ov036 0x02194f1a reloc_module overlay(12)
+overlays/ov036 0x0219515c reloc_module overlay(12)
+overlays/ov036 0x02195308 reloc_module overlay(12)
 overlays/ov036 0x02198618 reloc_module overlay(79)
 overlays/ov036 0x021986aa reloc_module overlay(80)
 overlays/ov036 0x021986d4 reloc_module overlay(80)
