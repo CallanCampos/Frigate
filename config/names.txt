@@ -11285,6 +11285,7 @@ overlays/ov182 0x021bfeb6 sLabels
 overlays/ov182 0x021bfed0 sKeyPositions
 overlays/ov182 0x021bfef8 sKeypadCursorPositions
 overlays/ov182 0x021bff30 sKeypadNavigation
+overlays/ov182 0x021bff88 sClientName
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11326,6 +11327,7 @@ overlays/ov182 0x021c4074 sOverlayScreen
 overlays/ov182 0x021c4078 sLinkIcon
 overlays/ov182 0x021c407c sKeyboard
 overlays/ov182 0x021c4080 sMenu
+overlays/ov182 0x021c4084 sAossSession
 overlays/ov182 0x021c408c sMain
 overlays/ov182 0x021c40ac sMsgWork
 overlays/ov182 0x021c4180 gWork

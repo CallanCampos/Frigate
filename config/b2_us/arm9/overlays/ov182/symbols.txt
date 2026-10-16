@@ -1195,7 +1195,7 @@ data_ov182_021bff68 kind:data(any) addr:0x021bff68
 data_ov182_021bff70 kind:data(any) addr:0x021bff70
 data_ov182_021bff78 kind:data(any) addr:0x021bff78
 data_ov182_021bff80 kind:data(any) addr:0x021bff80
-data_ov182_021bff88 kind:data(any) addr:0x021bff88
+sClientName kind:data(any) addr:0x021bff88
 data_ov182_021bff94 kind:data(any) addr:0x021bff94
 data_ov182_021bff98 kind:data(any) addr:0x021bff98
 data_ov182_021bffa8 kind:data(any) addr:0x021bffa8
@@ -1618,7 +1618,7 @@ sOverlayScreen kind:bss addr:0x021c4074
 sLinkIcon kind:bss addr:0x021c4078
 sKeyboard kind:bss addr:0x021c407c
 sMenu kind:bss addr:0x021c4080
-data_ov182_021c4084 kind:bss addr:0x021c4084
+sAossSession kind:bss addr:0x021c4084
 data_ov182_021c4088 kind:bss addr:0x021c4088
 sMain kind:bss addr:0x021c408c
 sMsgWork kind:bss addr:0x021c40ac
