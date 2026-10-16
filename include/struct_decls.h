@@ -335,6 +335,7 @@ typedef struct FieldPropSystem FieldPropSystem;
 typedef struct FieldScriptEnv FieldScriptEnv;
 typedef struct FieldScriptEnvArgs FieldScriptEnvArgs;
 typedef struct FieldScriptSupervisor FieldScriptSupervisor;
+typedef struct FieldSkillMapEff FieldSkillMapEff;
 typedef struct FieldSound FieldSound;
 typedef struct FieldStatus FieldStatus;
 typedef struct FieldSubscreen FieldSubscreen;
