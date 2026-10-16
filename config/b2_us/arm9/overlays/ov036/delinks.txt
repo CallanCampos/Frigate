@@ -369,12 +369,12 @@ src/ov036/fldmmdl_acmd.c:
 
 src/ov036/fldmmdl_blact.c:
     .text       start:0x02193680 end:0x021946b4
-    .rodata     start:0x021ce3a0 end:0x021cf2e4
+    .rodata     start:0x021ce3a0 end:0x021cf364
     .data       start:0x021d4d50 end:0x021d4d60
 
 src/ov036/fldmmdl_g3dobj.c:
     .text       start:0x021946b4 end:0x02195378
-    .rodata     start:0x021cf2e4 end:0x021cf3a8
+    .rodata     start:0x021cf364 end:0x021cf3a8
     .data       start:0x021d4d60 end:0x021d4d74
 
 src/ov036/fld_act_rail.c:
@@ -420,6 +420,7 @@ src/ov036/weather_task.c:
     .data       start:0x021d4e60 end:0x021d4e70
 
 src/ov036/fieldmap_ctrl_grid.c:
+    complete
     .text       start:0x0219a3b4 end:0x0219a47c
     .rodata     start:0x021cfbfc end:0x021cfc10
     .data       start:0x021d4e70 end:0x021d4e88
@@ -435,6 +436,7 @@ src/ov036/field_player_nogrid.c:
     .data       start:0x021d4ec0 end:0x021d4efc
 
 src/ov036/fieldmap_ctrl_nogrid_work.c:
+    complete
     .text       start:0x0219e328 end:0x0219e430
     .rodata     start:0x021cfdf4 end:0x021cfe1c
     .data       start:0x021d4efc end:0x021d4f18

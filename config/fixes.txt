@@ -1265,6 +1265,14 @@ overlays/ov036 0x02183a18 reloc_addend 4
 overlays/ov036 0x02183ca8 reloc_addend 8
 overlays/ov036 0x021841e8 reloc_addend 2
 overlays/ov036 0x02184440 reloc_module overlay(12)
+overlays/ov036 0x02194b68 reloc_module overlay(12)
+overlays/ov036 0x02194bc8 reloc_module overlay(12)
+overlays/ov036 0x02194c34 reloc_module overlay(12)
+overlays/ov036 0x02194c88 reloc_module overlay(12)
+overlays/ov036 0x02194cdc reloc_module overlay(12)
+overlays/ov036 0x02194f1a reloc_module overlay(12)
+overlays/ov036 0x0219515c reloc_module overlay(12)
+overlays/ov036 0x02195308 reloc_module overlay(12)
 overlays/ov036 0x02198618 reloc_module overlay(79)
 overlays/ov036 0x021986aa reloc_module overlay(80)
 overlays/ov036 0x021986d4 reloc_module overlay(80)
@@ -1340,6 +1348,8 @@ overlays/ov036 0x021cac9c remove_reloc
 overlays/ov036 0x021cacf4 section_end src/ov036/ircbattlemenu.c:.rodata
 overlays/ov036 0x021cf2e4 section_end src/ov036/fldmmdl_blact.c:.rodata
 overlays/ov036 0x021cf2e4 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
+overlays/ov036 0x021cf364 section_end src/ov036/fldmmdl_blact.c:.rodata
+overlays/ov036 0x021cf364 section_start src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_end src/ov036/fldmmdl_g3dobj.c:.rodata
 overlays/ov036 0x021cf3a8 section_start src/ov036/fld_act_rail.c:.rodata
 overlays/ov036 0x021cf768 section_start src/ov036/field_rail_loader.c:.rodata

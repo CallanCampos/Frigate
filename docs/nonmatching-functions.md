@@ -135,11 +135,18 @@ in both versions.
 | `src/ov036/scrcmd_misc.c` | `s01C2_ElevatorChangeMap` | `0x021afe90` / `0x021afed0` | 24 bytes, scheduling only: the original loads the floor's y, z, zone and x before the shifts and stores, ours each field's load, shift and store in turn. `VEC_Set` (26 bytes) and field orders tried. |
 | `src/ov036/scrcmd_misc.c` | `s01FB_ItemCollectorCheckGroup`, `s0236_WordSetLoadItemCollectorPrice`, `s0237_ItemCollectorSell` | `0x021aff94`, `0x021b0044`, `0x021b00f4` / `+0x40` | 20, 17 and 11 bytes, registers only: the original keeps the prices in `r4` and the index in `r5`, ours the reverse, where `s01FC_ItemCollectorGetPrice`, written the same way, matches. Declaration orders, `int`/`u16` counters and where the counter is set tried. |
 | `src/ov036/scrcmd_shop.c` | `func_ov036_021ad8e8` | `0x021ad8e8` / `0x021ad928` | 2 bytes short, registers only: the original keeps the message ID in `r7` and the price in `r6`, spills the item and reads the stack-passed amount from the stack at both uses; ours puts the item, then the amount, in `r6` and spills the message ID. Tried 24 combinations of `u32`/`int`/`u16` message ID, `u16`/`int` item, `u32`/`int` price and both orders of `amount * price`, and `s16` amount, `u32` item and `u16` price on their own. |
+| `src/ov036/field_comm_actor.c` | `FldCommActSys_Create` | `0x0218ae38` / `0x0218ae78` | Same size, 4 bytes of scheduling: the original loads the entry size 0xc for the second allocation's multiply before storing `count`, ours after. Tried `count * sizeof`, `sys->count` as the factor, a `u16` cast, the size in a block local and the system assigned on its own line. |
+| `src/ov036/fldmmdl_blact.c` | `BlActSys_LoadSingleUseTexMaterial` | `0x02193680` / `0x021936c0` | 4 bytes larger (0x84 against 0x80): the original keeps `sys`, `resource`, `sizeIdx` and `atlasIdx` in other registers, computes the size entry's address before the VRAM handles and passes the new material to `func_0204f31c` without narrowing it, where ours narrows it to the `u16` of `gfl/blact.h`'s prototype. Open. |
+| `src/ov036/fldmmdl_blact.c` | `FieldBlAct_IsAsyncLoadPending` | `0x02193ee0` / `0x02193f20` | 8 bytes short (0x70 against 0x78): the original reloads each count from the loader on every pass of its loop, ours keeps it in a register; the registers differ with it (r3/r4 against r4/r5). Open. |
+| `src/ov036/fldmmdl_blact.c` | `FldBlAct_ReqAsyncLoad` | `0x02193f58` / `0x02193f98` | 4 bytes short (0x40 against 0x44): the original copies `blact` and the arguments to other registers before the loop, ours loads the loader through `r0`. Open. |
+| `src/ov036/fldmmdl_blact.c` | `FldBlAct_CheckAsyncLoading`, `func_ov036_02194144` | `0x021940f0` / `0x02194130`; `0x02194144` / `0x02194184` | Same size, 19 bytes each, registers only: the original loads the loader into `r0` and swaps the counter's and the pointer's registers, and loads the second count before the second array. Open. |
+| `src/ov036/fldmmdl_blact.c` | `FldAct_InitBlActNewMat` | `0x021941a0` / `0x021941e0` | 4 bytes larger (0xb8 against 0xb4): ours keeps `&info` in r4 and stores the 1 of `info[0]` through a recomputed address, the original recomputes `sp + 0x10` at each use and keeps the 1 in r1. Open. |
 | `src/ov036/fld_act_rail.c` | `func_ov036_02195378` | `0x02195378` / `0x021953b8` | Same size, 28 bytes, scheduling of the jump's height lookup `sJumpHeights[work->height][stage]`: the original loads and shifts the phase between the loads of the table pointer, ours after them. Open. |
 | `src/ov036/fld_act_rail.c` | `func_ov036_02195c5c` | `0x02195c5c` / `0x02195c9c` | 2 bytes short (0x3e against 0x40): the original branches over the clear of the position with a `beq` and a `b`, ours with one `bne`; the empty `if (set) {} else` arm is the closest form found. Open. |
 | `src/ov036/field_rail_loader.c` | `func_ov036_02196680` | `0x02196680` / `0x021966c0` | Same size, 6 bytes: the original stores the direction before it builds the 0 of the step, ours builds the 0 first. Open. |
 | `src/ov036/field_rail_loader.c` | `func_ov036_02196b10` | `0x02196b10` / `0x02196b50` | Same size, 31 bytes, registers only: `time` and the work swap `r4` and `r5`. Open. |
 | `src/ov036/field_rail_loader.c` | `func_ov036_021972e0` | `0x021972e0` / `0x02197320` | Same size, 139 bytes: the original stores the state one instruction later and leaves the case of a pending stop with `bne` and `b` where ours has one `beq`, which shifts the rest. Open. |
+| `src/ov036/field_player_nogrid.c` | `func_ov036_0219d044` | `0x0219d044` / `0x0219d084` | 4 bytes larger (0x10 against 0xc): `field_player_nogrid.h` declares the direction `u32`, which `field_player.c`'s `func_ov036_0219ad30` needs, so ours narrows it for `GetActorRailPosForDir`; the original's parameter is a `u16`, passed on as it is. A `u16` here changes `func_ov036_0219ad30`, and a `u16` there `event_entrance_effect.c`'s `func_ov036_0219f83c`, whose direction comes from `FieldPlayer_GetFaceDir` as a `u32`. |
 | `src/ov036/field_rail.c` | `func_ov036_021b0774` | `0x021b0774` / `0x021b07ac` | Same size, 8 bytes: in the copy of `railPos` the original computes the field's address (`adds r0, #0x62`) one instruction earlier. Open. |
 | `src/ov036/field_rail.c` | `func_ov036_021b0a04` | `0x021b0a04` / `0x021b0a3c` | 6 bytes short (0x82 against 0x88): the original keeps `front` on the stack and reloads it for `front + 16`, with `side` in `r6`; ours keeps `front + 16` in `r4`. Open. |
 | `src/ov036/field_rail.c` | `func_ov036_021b0c04` | `0x021b0c04` / `0x021b0c3c` | Same size, 12 bytes: the original loads the tile width (`ldr r7, [r6, #0x34]`) before the line's address, ours after it. Open. |
@@ -466,6 +473,15 @@ in both versions.
   `src/ov036/field_goout_effect_data.c` and `src/ov033/unity_visitor.c` call), or until the linker gives them both.
   `_drsb`, `_frsb`, `_frdiv` and `_drdiv` have no symbols, since dsd refuses a function that starts with the `eor` that
   swaps their operands, so the probe lists them as unknown.
+
+- `src/ov036/fldmmdl_g3dobj.c` (overlay 36) matches every function in both versions, but linked complete it fails the
+  module check: its registered `.rodata` holds `FACE_DIRS_BY_ANGLE` (16 bytes, at `0x021cf364`) before the five 8-byte
+  and one 12-byte action command tables at `0x021cf374`–`0x021cf3a8`, and MWCC sorts a file's data by size, so in one
+  file the tables come first. The tables are the first of the rail actors' action command tables, which go on in
+  `fld_act_rail.c` from `0x021cf3a8`, so they are evidently `fld_act_rail.c`'s, whose `.rodata` would start at
+  `0x021cf374`. That boundary moves down from `0x021cf3a8`, and `config_fixes.py apply` would undo it: `fixes.txt`
+  keeps the `0x021cf3a8` `section_end`/`section_start` lines and replays the fixes in address order. The file stays
+  incomplete until the boundary can be recorded.
 
 ## Keeping this list current
 
