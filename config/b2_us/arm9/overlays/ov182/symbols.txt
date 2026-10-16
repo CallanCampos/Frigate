@@ -1369,7 +1369,7 @@ sNasUrl kind:data(any) addr:0x021c0b6c
 data_ov182_021c0b8c kind:data(any) addr:0x021c0b8c
 data_ov182_021c0ba0 kind:data(any) addr:0x021c0ba0
 data_ov182_021c0bb8 kind:data(any) addr:0x021c0bb8
-data_ov182_021c0bd0 kind:data(any) addr:0x021c0bd0
+sGame kind:data(any) addr:0x021c0bd0
 data_ov182_021c0bec kind:data(any) addr:0x021c0bec
 data_ov182_021c0bfc kind:data(any) addr:0x021c0bfc
 data_ov182_021c0c0c kind:data(any) addr:0x021c0c0c
@@ -1622,7 +1622,7 @@ sAossSession kind:bss addr:0x021c4084
 data_ov182_021c4088 kind:bss addr:0x021c4088
 sMain kind:bss addr:0x021c408c
 sMsgWork kind:bss addr:0x021c40ac
-data_ov182_021c40b0 kind:bss addr:0x021c40b0
+sMove kind:bss addr:0x021c40b0
 data_ov182_021c40b4 kind:bss addr:0x021c40b4
 data_ov182_021c40b8 kind:bss addr:0x021c40b8
 data_ov182_021c40bc kind:bss addr:0x021c40bc
