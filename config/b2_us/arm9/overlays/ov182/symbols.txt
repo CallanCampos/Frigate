@@ -1667,7 +1667,7 @@ data_ov182_021c4174 kind:bss addr:0x021c4174
 data_ov182_021c4178 kind:bss addr:0x021c4178
 data_ov182_021c417c kind:bss addr:0x021c417c
 gWork kind:bss addr:0x021c4180
-data_ov182_021c4188 kind:bss addr:0x021c4188
+sDownloadPlaySysWork kind:bss addr:0x021c4188
 data_ov182_021c418c kind:bss addr:0x021c418c
 data_ov182_021c4190 kind:bss addr:0x021c4190
 data_ov182_021c4194 kind:bss addr:0x021c4194

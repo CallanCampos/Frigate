@@ -58,3 +58,8 @@ src/ov182/download_play_wih.c:
     .text       start:0x021b9bfc end:0x021ba7a8
     .data       start:0x021c17b0 end:0x021c1b18
     .bss        start:0x021c41c0 end:0x021c41c8
+
+src/ov182/download_play_sys.c:
+    complete
+    .text       start:0x021ba7a8 end:0x021bb1cc
+    .bss        start:0x021c41c8 end:0x021c41cc

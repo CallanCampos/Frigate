@@ -2319,6 +2319,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
   NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics
   with `-ipa file` in `file_flags`; `dwc_init.c`'s are declared in the reverse of their `.bss` order.
+- A field offset that ours loads from the literal pool where the ROM builds it with `movs`/`lsls`, in every function
+  that touches the struct, is a wrong offset, not a code generation choice: read our pool word. An offset that is an
+  8-bit value shifted (0xa90 = 0xa9 << 4) is built with `movs`/`lsls`, and one that isn't (0xea8) goes to the pool, so
+  a layout off by 0x418 showed as one extra instruction in six small functions of `download_play_sys.c`. Rebuilding
+  the struct from the asm's offsets matched 18 of the file's 20 functions at once.
 - A constant that the ROM loads from the literal pool, with no relocation in `relocs.txt`, where MWCC would fold it or
   build it with `mov` and `lsl`, is a linker symbol: NitroSDK takes its stack sizes, the extended arena's start and the
   overlay count from the linker script. Declared `extern u8 SYM[]` and cast where it is used, `(u32)SDK_IRQ_STACKSIZE`,
