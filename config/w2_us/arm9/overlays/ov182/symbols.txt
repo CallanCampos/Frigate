@@ -1623,7 +1623,7 @@ data_ov182_021c4088 kind:bss addr:0x021c40c8
 sMain kind:bss addr:0x021c40cc
 sMsgWork kind:bss addr:0x021c40ec
 sMove kind:bss addr:0x021c40f0
-data_ov182_021c40b4 kind:bss addr:0x021c40f4
+sStatus kind:bss addr:0x021c40f4
 data_ov182_021c40b8 kind:bss addr:0x021c40f8
 data_ov182_021c40bc kind:bss addr:0x021c40fc
 data_ov182_021c40c4 kind:bss addr:0x021c4104

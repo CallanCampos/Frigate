@@ -195,3 +195,7 @@ lib/dwcutilui/src/dwc_util_move.c:
     .data       start:0x021c0b8c end:0x021c0bec
     .bss        start:0x021c40b0 end:0x021c40b4
 
+lib/dwcutilui/src/dwc_util_connection.c:
+    complete
+    .text       start:0x021ae3d8 end:0x021ae4f4
+    .bss        start:0x021c40b4 end:0x021c40b8

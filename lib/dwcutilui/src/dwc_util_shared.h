@@ -14,6 +14,7 @@
 #include "dwc_util_touch.h"
 #include "dwc_util_vram_alloc.h"
 #include "dwcutil/dwc_aoss.h"
+#include "dwcutil/dwcutil_ac.h"
 #include "nitro/gx.h"
 #include "struct_decls.h"
 
@@ -29,6 +30,8 @@ struct DWCUtilSettingsEdit {
 DWCUtilSettingsEdit *func_ov182_021b781c(void);
 // Takes the WEP keys that the AOSS setup got into the connection being edited
 void func_ov182_021b7d80(const AossResult *result);
+// Takes the SSID and the WEP mode of the access point that the connection test connected to
+void func_ov182_021b7c60(const DWCUtilAcResult *result);
 
 // The rows of buttons of the two layouts
 void func_ov182_021b8154(int variant);
