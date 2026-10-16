@@ -7,6 +7,7 @@
 #include "dwc_util_heap.h"
 #include "dwc_util_list.h"
 #include "dwc_util_oam.h"
+#include "dwc_util_oam_buf.h"
 #include "dwc_util_text.h"
 #include "dwc_util_touch.h"
 #include "nitro/gx.h"
@@ -22,8 +23,6 @@ u8 func_ov182_021ae018(void);
 
 extern void *data_ov182_021c40b8;
 
-void func_ov182_021bcc9c(GXOamAttr *oam);
-
 // The utility's object and task helpers, in the same later files. A task's
 // callback is handed the task and the argument it was created with.
 typedef void (*DWCUtilTaskCallback)(DWCUtilTask *task, void *arg);
@@ -34,10 +33,6 @@ void func_ov182_021bd268(int list, DWCUtilTask *task);
 void func_ov182_021bd280(int list, DWCUtilTask *task);
 // Runs the list's tasks: list 1 is the VBlank's
 void func_ov182_021bd19c(int list);
-
-// The OAM buffer under the OAM allocator and the cells, in the same later files
-GXOamAttr *func_ov182_021bcc80(int screen);
-GXOamAttr *func_ov182_021bccd8(int screen, int index);
 
 // The OBJ characters under the text canvases, in the same later files
 void *func_ov182_021bcdbc(int screen, int size, s16 fromFront, u32 *charName);

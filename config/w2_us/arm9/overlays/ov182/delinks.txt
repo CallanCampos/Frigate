@@ -112,3 +112,8 @@ lib/dwcutilui/src/dwc_util_irq.c:
 lib/dwcutilui/src/dwc_util_list.c:
     complete
     .text       start:0x021bcb7c end:0x021bcc08
+
+lib/dwcutilui/src/dwc_util_oam_buf.c:
+    complete
+    .text       start:0x021bcc08 end:0x021bcd2c
+    .bss        start:0x021c4208 end:0x021c420c
