@@ -128,7 +128,7 @@ static void func_ov036_021c6dc8(FieldSaveAnime *anime) {
     pos.x += FX_Mul(vertical.x, -FX32_CONST(28));
     pos.y += FX_Mul(vertical.y, -FX32_CONST(28));
     pos.z += FX_Mul(vertical.z, -FX32_CONST(28));
-    NNS_G3DProject(&pos, &x, &y);
+    NNS_G3dWorldPosToScrPos(&pos, &x, &y);
     x -= 16;
     y -= 24;
     anime->offsetX = x % 8;
