@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt_local.h"
 #include "constants/arc.h"
 #include "constants/flags.h"
