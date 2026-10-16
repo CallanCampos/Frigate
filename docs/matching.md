@@ -684,7 +684,8 @@ Same code, other `sp` offsets or frame size.
   `FX_Mul(x, x) + FX_Mul(z, z)` written out; through the file's `SquaredLengthXZ` inline they are temporaries.
   Only when the assignment dominates every use, though: overlay 143's `MonolithMissionInfo_DrawRecords` gets `best`
   slotted as a temporary through a pass-through inline getter, but `count`, assigned in one branch of an `if`/`else`,
-  keeps its declared slot whatever its type.
+  keeps its declared slot whatever its type. The two are the members of a struct local there, which MWCC splits
+  (below, "split into one variable per member").
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
@@ -742,6 +743,13 @@ Same code, other `sp` offsets or frame size.
   taken, an inline's by-value parameter or return (each emits the copy), or a pointer local live across blocks (each
   access an `add rN, sp, #off`) keeps it whole. The original's `best` in `dowsing.c`'s `Dowsing_Update` is whole,
   with direct `[sp, #0x48]` stores and no initializer, and none of these gives that at no cost (see its row).
+  The split members are slotted with the temporaries, below the parameter copies of inlined calls, by first
+  assignment, and a member set in one branch only is split as well. Overlay 143's `MonolithMissionInfo_DrawRecords`
+  has `best` and `count` in its lowest slots, below the four inlined `PrintWindow_PrintNoColor` calls' `queue`
+  copies; no scalar spelling, inline getter or declaration order moved `count`, set only in an `else`, there, and
+  `MonolithMissionInfoRecord record;` with `record.best` and `record.count` matches, in either member order and with
+  `u16`, `u32` or `int` members (a `u16 values[2]` matches too). Values in the lowest slots that no scalar spelling
+  moves there may be one struct local.
 - A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
   returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
   register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key

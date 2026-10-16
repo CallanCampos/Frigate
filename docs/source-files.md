@@ -1359,7 +1359,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `monolith_power_select.c` | `0x0219bb80`–`0x0219d360` | 53 | complete | descriptive |
 | `monolith_power_info.c` | `0x0219d360`–`0x0219d8f8` | 12 | complete | descriptive |
 | `monolith_mission_select.c` | `0x0219d8f8`–`0x0219f64c` | 69 | complete | descriptive |
-| `monolith_mission_info.c` | `0x0219f64c`–`0x0219fe70` | 18 | partial | descriptive |
+| `monolith_mission_info.c` | `0x0219f64c`–`0x0219fe70` | 18 | complete | descriptive |
 
 ### Overlay 144
 
