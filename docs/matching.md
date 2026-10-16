@@ -668,6 +668,13 @@ Same code, other `sp` offsets or frame size.
   taken, an inline's by-value parameter or return (each emits the copy), or a pointer local live across blocks (each
   access an `add rN, sp, #off`) keeps it whole. The original's `best` in `dowsing.c`'s `Dowsing_Update` is whole,
   with direct `[sp, #0x48]` stores and no initializer, and none of these gives that at no cost (see its row).
+- A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
+  returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
+  register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key
+  position updates, `func_ov182_021acff0` and its neighbours, and its OAM position setter, `func_ov182_021bb7e0`;
+  they match only when `attr01` is read through `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
+  which returns a one-word struct, as in `(u8)ReadAttr01(sMenu->keyOams[0]).attr01 - 12`. Reading `oam->attr01`
+  directly leaves no slot.
 
 - A function that declares every local first and assigns them below gets other registers and stack slots than one
   that initializes them in their declarations (palanm.c's `MaskPalettes` sets `mask = 0` after the count for its
@@ -2270,6 +2277,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   laid out earlier than any surviving reference to it points to code the original linker dead-stripped. A file name
   ahead of a table in `.data` is a file-scope array: `script_command.c` declares `static char sFile[] =
   "script_command.c";` and passes `sFile` to its allocations, as `event_research_radar.c` does.
+- The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
+  while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
+  call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
+  the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
+  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, while
+  `dwc_util_main_menu.c`'s message paths, packed one after another, stay arrays.
 - A global that no code refers to can be declared anywhere in the file, after functions too, and where it sits in
   the heapsort's list moves the local initializers around it: `mus_shot_photo.c` declares `MUS_SHOT_PHOTO_UNUSED`
   just before its last function, which gives the original's `.rodata` with no code change.
