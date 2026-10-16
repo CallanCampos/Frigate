@@ -343,6 +343,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
   recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
   (matching.md: "assigned just before the call")
+- A constant built at entry in a pushed register and copied for a later float literal (`adds r1, r6, #0`), where
+  ours builds it at the use (`movs r1, #0`): a float local initialized with that constant at its declaration, even
+  a dead initializer. (matching.md: "A float local initialized with a constant")
+- A stack parameter loaded again for one comparison (`add r0, sp, #N; ldrh r0, [r0]; cmp`) while its other uses
+  share one load: declare the local compared with it `long`, the SDK's `s32`. (matching.md:
+  "`CalcWarpTransferAddend`")
 - A large offset derived from an earlier one (`subs r6, #0x80`) where the original builds it fresh (`movs; lsls`):
   a join just before it, or a pointer local to the earlier member, initialized at its declaration at the top.
   (matching.md: "rebuilt at each use in a scratch register")
@@ -587,6 +593,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   and 0x28 this way. (matching.md: "One initialized array retains entries")
 - String literals in another order: MWCC lays them out in the order they first appear in the source; a `""` the
   game has before the file's name needs an earlier use. (matching.md: "String literals")
+- A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
+  section of its own, and a static called from code the optimizer removes is still emitted with its literals.
+  (matching.md: "Each literal that code creates")
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
