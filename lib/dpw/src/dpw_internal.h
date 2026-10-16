@@ -4,12 +4,9 @@
 #include "types.h"
 #include "dwc/connectinet.h"
 #include "dwc/error.h"
+#include <string.h>
 
 // What the sources of the dpw library call outside themselves, none of it with a name in the ROM
-
-// The C library's memcpy, not taken from <string.h>: MWCC builds memcpy and the other string functions in place, for a
-// size it knows, when <string.h> declares them, where the ROM calls them
-void *memcpy(void *dest, const void *src, u32 size);
 
 // The key of the game statistics client: the game's secret, four numbers of its scrambling, and its name
 #define DPW_GAMESTATS_KEY "HZEdGCzcGGLvguqUEKQN0001d93500002dd5000000082db842b2syachi2ds"

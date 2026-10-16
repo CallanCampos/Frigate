@@ -24,7 +24,7 @@
 // The work area of the NTR check is 0x700 bytes, and the TWL check's 0x1000: the pages, and the table that makes their
 // CRC16
 #define NTR_WORK_SIZE 0x700
-#define TWL_WORK_SIZE 0x1000
+#define TWL_WORK_SIZE DWC_BM_WORK_SIZE
 
 typedef struct NtrWork {
     DWCBmNtrPage pages[NTR_PAGE_COUNT];
@@ -168,7 +168,7 @@ static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
         func_0205e540(pages, 2);
     }
     if (!valid[3]) {
-        MIi_CpuClear16(0, &pages[3], sizeof(DWCBmNtrPage));
+        MI_CpuClear16(&pages[3], sizeof(DWCBmNtrPage));
     }
 
     lost = FALSE;
@@ -269,12 +269,12 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
 
 // Empties a page, and marks its connection as not in use
 static void func_0205e540(DWCBmNtrPage *pages, int index) {
-    MIi_CpuClear16(0, &pages[index], sizeof(DWCBmNtrPage));
+    MI_CpuClear16(&pages[index], sizeof(DWCBmNtrPage));
     pages[index].connection.status = DWC_BM_CONNECTION_UNUSED;
 }
 
 static void func_0205e56c(DWCBmTwlPage *pages, int index) {
-    MIi_CpuClear16(0, &pages[index], sizeof(DWCBmTwlPage));
+    MI_CpuClear16(&pages[index], sizeof(DWCBmTwlPage));
     pages[index].ntr.connection.status = DWC_BM_CONNECTION_UNUSED;
 }
 

@@ -87,8 +87,8 @@ static void DWCAc_DecodeNdwcShapSsid(const u8 *ssid, u8 *out) {
         out[i] = out[i] ^ sSsidMaskFirst[i];
     }
     for (i = 0; i < 0x18; i++) {
-        // Two cursors that always hold the same index: the original marks the place it came from with one and puts the
-        // byte it carries where the other says. A single cursor compiles 12 bytes shorter
+        // Two cursors that always hold the same index: one marks the place the byte came from, and the byte goes where
+        // the other says (docs/matching.md, "keeps the two steps only when")
         u8 slot = i;
         u8 from = i;
         u8 next;
@@ -156,8 +156,8 @@ static void DWCAc_ScrambleNwcUsbApKey(const u8 *in, u8 *key) {
     }
 }
 
-// The value of a Base64 character ('=' is 0), or -1 if it is none. The offset into a range is kept
-// in a local, as MWCC folds `c - 'a' + 26` into one subtract where the original has two steps
+// The value of a Base64 character ('=' is 0), or -1 if it is none. The offset into a range is kept in a local, which
+// keeps the original's two steps (docs/matching.md, "keeps the two steps only when")
 static int DWCAc_Base64Value(u32 c) {
     int v;
 

@@ -1,16 +1,15 @@
-#include "dwc/account.h"
-#include "dwc/bm.h"
-#include "dwc/dwc.h"
-#include "dwc/ext.h"
-#include "gfl/std.h"
-#include "nitro/math.h"
-#include "nitro/os.h"
-
 // DWC's account (TWL-DWC 5.3's dwc_account.c, a guessed name; the ROM names none of it, and the file is ARM code in
 // ARM9 main like the rest of the library's base): the user data that the save keeps and the 12-byte friend data, whose
 // layout is in dwc/account.h. A friend is a login ID, a friend key or a profile ID; a login ID is a 43-bit user ID and
 // a random 32-bit player ID, a friend key is the profile ID and a 7-bit checksum made from it and the game code, and
 // the login name that the server is given is both IDs and the game code as text.
+
+#include "dwc/account.h"
+#include "dwc/bm.h"
+#include "dwc/dwc.h"
+#include "nitro/math.h"
+#include "nitro/mi.h"
+#include "nitro/os.h"
 
 // The friend data's header: the high bits of the user ID in the low 11, and the flags in the 21 above them
 #define USER_ID_HIGH_MASK 0x7ff
@@ -27,6 +26,19 @@
 static BOOL DWCi_Acc_IsFriendKeyOf(u64 friendKey, u32 gameCode, int useMd5);
 static BOOL DWCi_Acc_IsDirty(const DWCUserData *userData);
 static void DWCi_Acc_ClearDirty(DWCUserData *userData);
+static BOOL DWCi_Acc_SetBitField(u32 *word, u32 value, u32 shift, u32 mask);
+static u32 DWCi_Acc_GetPlayerId(const DWCFriendData *loginId);
+static u64 DWCi_Acc_GetFriendKey(const DWCFriendData *friendData);
+static u32 DWCi_Acc_GetProfileId(const DWCFriendData *friendData);
+static void DWCi_Acc_SetFriendKey(DWCFriendData *friendData, u64 friendKey);
+static void DWCi_Acc_SetProfileId(DWCFriendData *friendData, s32 profileId);
+static u32 DWCi_Acc_GetFlags(const DWCFriendData *friendData);
+static int DWCi_Acc_GetType(const DWCFriendData *friendData);
+static void DWCi_Acc_SetFlags(DWCFriendData *friendData, u32 flags);
+static void DWCi_Acc_SetType(DWCFriendData *friendData, int type);
+static u64 DWCi_Acc_MakeFriendKey(u32 profileId, u32 gameCode, BOOL useMd5);
+static u32 DWCi_Acc_GetProfileIdFromFriendKey(u64 friendKey, u32 gameCode);
+static void DWCi_Acc_CreateUserData(DWCUserData *userData, u32 gameCode);
 
 // Puts a value in the bits that a mask selects after a shift; FALSE if it has bits outside the mask
 static BOOL DWCi_Acc_SetBitField(u32 *word, u32 value, u32 shift, u32 mask) {

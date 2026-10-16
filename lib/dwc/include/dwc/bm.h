@@ -123,6 +123,8 @@ DWCBmReadResult func_0205e038(void *work, int unused);
 // dwc_bm_init.c, DWC_BM_Init. The same checks for the console the game runs on, then the Wi-Fi ID that the settings
 // hold is kept. The work area is 0x1000 bytes. Returns the result of the checks, or -10001 when the four pages of the
 // NTR console's settings can't be read
+// The size of the work area that DWC_BM_Init is given and clears
+#define DWC_BM_WORK_SIZE 0x1000
 int DWC_BM_Init(void *work);
 
 // util_wifiidtool.c

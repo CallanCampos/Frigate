@@ -1,7 +1,7 @@
 #include "nitro/mi.h"
+#include "nitro/rtc.h"
 #include "nitrowifi/cps.h"
 #include "ssl_internal.h"
-#include "system/rtc.h"
 
 // NitroWiFi's SSL layer (SSLv3-like: RC4 with MD5 or SHA1 MACs, RSA key exchange), in overlay 11. No swan name for the
 // object or any of its functions; named for their role, after pokediamond's SSL_ssl.o lists the same ones (structure

@@ -231,7 +231,7 @@ static u32 DWCRap_UpdateLogin(void) {
         // fall through
     case DWCRAP_STATE_INET:
         if (DWC_CheckInet()) {
-            if (DWC_GetInetStatus() == 4) {
+            if (DWC_GetInetStatus() == DWC_CONNECTINET_STATE_CONNECTED) {
                 DWCRap_SetState(DWCRAP_STATE_LOGIN_WAIT);
             } else {
                 DWCRap_SetState(DWCRAP_STATE_ERROR);

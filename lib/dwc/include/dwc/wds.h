@@ -18,15 +18,15 @@
 // What a beacon says, once it is decrypted: 0x70 bytes. WDS_IsBeaconInfoValid checks three of them, and the last two
 // are the CRC-16 of the rest (a beacon that carries 0 there is taken as it is)
 typedef struct WDSBeaconInfo {
-    u8 unk_00[0x20];
-    u8 unk_20[10]; // ten printable characters; the connection code reads the first as a digit
+    u8 ssid[0x20];
+    u8 spotInfo[10]; // ten printable characters; the connection code reads the first as a digit
     u8 unk_2a[0x1a];
-    u8 unk_44[0x20];
+    u8 wepKey[0x20];
     u8 unk_64;
-    u8 unk_65; // at most 3
-    u8 flags;  // bit 1 must be set
+    u8 wepMode; // at most 3
+    u8 flags;   // bit 1 must be set
     u8 unk_67[5];
-    u16 unk_6c;
+    u16 mtu;
     u16 crc;
 } WDSBeaconInfo;
 

@@ -101,7 +101,7 @@ u8 DWCAc_StepSockets(void) {
             func_ov011_0216b1d4();
             // fall through to the loss of the candidate
         default:
-            work->infos[work->selected].unk_00 = DWC_AC_RESULT_LOST;
+            work->infos[work->selected].result = DWC_AC_RESULT_LOST;
             state = 11;
             break;
         }
@@ -113,7 +113,7 @@ u8 DWCAc_StepSockets(void) {
 // yields at 4. 12 to wait for the address, or 0x11, the teardown, if SOC will not start
 static u8 DWCAc_StartSoc(DWCAcSearchWork *work) {
     DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
-    SocConfig *config = DWCAc_GetBlock(DWC_AC_WORK_UNK_04);
+    SocConfig *config = DWCAc_GetBlock(DWC_AC_WORK_SOC_CONFIG);
 
     DWCAc_MakeSocConfig(main, work, config);
     SOCLiYieldWait = 4;
@@ -132,7 +132,7 @@ static u8 DWCAc_WaitHostId(DWCAcSearchWork *work) {
 
     if (SOC_GetHostID() != 0) {
         DWCAc_SetResolver(work);
-        if (work->unk_14bc_4 == 1) {
+        if (work->skipConnectionTest == 1) {
             return 15;
         }
         type = DWCAc_GetApTypeOfId(work->kind);
@@ -146,14 +146,14 @@ static u8 DWCAc_WaitHostId(DWCAcSearchWork *work) {
     if (OS_TicksToSeconds(OS_GetTick() - work->connectedTime) < 10) {
         return 12;
     }
-    work->infos[work->selected].unk_00 = DWC_AC_RESULT_GAVE_UP;
+    work->infos[work->selected].result = DWC_AC_RESULT_GAVE_UP;
     return 11;
 }
 
 // State 13, starts the connection test of overlay 11 with the memory functions. 14 to wait
 // for it, or 0x11, the teardown, if it will not start
 static u8 DWCAc_StartConnectionTest(void) {
-    if (func_ov011_0216b14c(DWCAc_GetBlock(DWC_AC_WORK_UNK_08)) == 0) {
+    if (func_ov011_0216b14c(DWCAc_GetBlock(DWC_AC_WORK_MEMFUNCS)) == 0) {
         return 14;
     }
     DWCAc_SetError(3);
@@ -169,15 +169,15 @@ static u8 DWCAc_WaitConnectionTest(DWCAcSearchWork *work) {
 
     if (status != 0) {
         if (main->candidateType == DWCAc_GetApTypeOfId(work->kind)) {
-            main->unk_10 = func_ov011_0216b2cc();
+            main->testResult = func_ov011_0216b2cc();
         }
         func_ov011_0216b1d4();
         if (status != 11) {
-            work->infos[work->selected].unk_00 = DWC_AC_RESULT_GAVE_UP;
+            work->infos[work->selected].result = DWC_AC_RESULT_GAVE_UP;
             if (CPSNoIpReason == CPS_NOIP_REASON_COLLISION) {
-                main->unk_0b_4 = 1;
+                main->addressInUse = 1;
             } else {
-                main->unk_0b_4 = 0;
+                main->addressInUse = 0;
             }
             return 11;
         } else {
@@ -264,7 +264,7 @@ static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfi
         if (setting->unk_ea == 0x240) {
             config->rwin = 0;
         } else {
-            config->rwin = work->unk_14c8;
+            config->rwin = work->rwin;
         }
     } else {
         config->rwin = 0;

@@ -14,14 +14,11 @@
 static const u8 sByteOrder[8] = { 1, 2, 0, 4, 3, 5, 6, 7 };
 // What each nibble of those bytes is replaced by; the inverse, which the descrambling of an ID would use, is the table
 // below. The ROM keeps it between the other two, but no code that is left reads it: MWCC drops a table that is static
-// and read by nothing, so it is a global, and the inline function stands for the code that the link dropped, which
-// emits nothing
+// and read by nothing, so it is a global
 const u8 WifiIdTool_InverseNibbleSubstitution[16] = { 7, 2, 5, 10, 11, 0, 13, 15, 12, 1, 6, 8, 4, 9, 3, 14 };
 static const u8 sNibbleSubstitution[16] = { 5, 9, 1, 14, 12, 2, 10, 0, 11, 13, 3, 4, 8, 6, 15, 7 };
 
-static inline u8 UnsubstituteNibble(u8 nibble) {
-    return WifiIdTool_InverseNibbleSubstitution[nibble];
-}
+static u64 MakeScrambledId(u32 salt, u32 nic, u32 notNintendo, u32 type);
 
 // Makes a pending ID of 43 bits from the salt, the last three bytes of the MAC address, whether the first three are
 // not Nintendo's, and a type of 2 bits (always 0), and scrambles it

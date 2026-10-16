@@ -1,5 +1,4 @@
 #include "nitrowifi/wcm.h"
-#include "gfl/std.h"
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -160,7 +159,7 @@ static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid);
 static WCMApEntry *WCM_FindApEntryById(s32 id);
 static void WCM_TouchApEntry(WCMApEntry *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
-static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out);
+static void *WCM_GetInformationElement(const void *frame, u32 tag, const u8 *oui);
 static void WCM_InitOnce(void);
 static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
                                  s32 dataLen);
@@ -764,21 +763,17 @@ void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line) {
 
 void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2) {
     WCMWork *work = sWcmAnchor.work;
-    struct {
-        WCMNotice notice;
-        void *param1;
-        s32 param2;
-    } buf;
+    WCMNotice notice;
 
     if (work->notify == NULL) {
         return;
     }
-    buf.notice.notify = notify;
-    buf.notice.result = result;
-    buf.notice.parameter = parameter;
-    buf.param1 = param1;
-    buf.param2 = param2;
-    work->notify(&buf.notice);
+    notice.notify = notify;
+    notice.result = result;
+    notice.parameter[0].n = parameter;
+    notice.parameter[1].p = param1;
+    notice.parameter[2].n = param2;
+    work->notify(&notice);
 }
 
 void WCM_SetState(s32 newState) {
@@ -1096,8 +1091,8 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     return NULL;
 }
 
-static void *WCM_GetInformationElement(const void *frame, u32 tag, void *out) {
-    return func_02703250((NWMBssDesc *)frame, tag, out);
+static void *WCM_GetInformationElement(const void *frame, u32 tag, const u8 *oui) {
+    return func_02703250((NWMBssDesc *)frame, tag, oui);
 }
 
 static void WCM_InitOnce(void) {

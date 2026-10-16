@@ -406,7 +406,7 @@ static void *CryptAlloc(u32 size) {
     if (sAllocator.alloc != NULL) {
         return sAllocator.alloc(size);
     }
-    return OS_AllocFromHeap(0, -1, size);
+    return OS_AllocFromHeap(OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE, size);
 }
 
 static void CryptFree(void *ptr) {
@@ -414,7 +414,7 @@ static void CryptFree(void *ptr) {
         sAllocator.free(ptr);
         return;
     }
-    OS_FreeToHeap(0, -1, ptr);
+    OS_FreeToHeap(OS_ARENA_MAIN, OS_CURRENT_HEAP_HANDLE, ptr);
 }
 
 void Crypt_SetAllocator(CryptAllocFunc alloc, CryptFreeFunc free, u32 arg) {

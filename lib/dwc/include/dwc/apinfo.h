@@ -5,8 +5,9 @@
 #include "nitro/wm.h"
 
 // The access point information of DWC (TWL-DWC 5.3's dwc_connectinet.c, in ARM9 main): what kind of access point the
-// console is connected through, and what kind a beacon is. The ROM names none of it; the SDK's names are in the
-// comments, where the code shows them.
+// console is connected through, and what kind a beacon is. The ROM names none of it: DWC_GetApInfo and DWCApInfo are
+// the SDK's names, and DWCi_GetBssDescParseWorkSize and DWCi_BssDescToApInfo are ours, from what they do. They are a
+// header of their own, apart from dwc/connectinet.h, to keep nitro/wm.h out of that header's includers.
 
 // A DWCApInfo of the SDK. Its size is 0x40
 typedef struct DWCApInfo {
@@ -16,8 +17,8 @@ typedef struct DWCApInfo {
     int apType;
     // The digit of the area in a Nintendo access point's information, 0xff if there is none
     int area;
-    // A byte of the connection's information
-    int unk8;
+    // The key mode of the setting that the connection is made with (DWCAc_GetKeyMode)
+    int keyMode;
     // The nine characters of the spot's name (the SDK's spotinfo)
     char spotInfo[10];
     u8 essid[33];

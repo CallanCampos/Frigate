@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "snd_internal.h"
 
 // NitroSystem's sound archive (NNS_SndArc): opening one, as a file of the ROM or wholly in memory, and finding the

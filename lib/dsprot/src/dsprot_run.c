@@ -1,6 +1,6 @@
 #include "dsprot/dsprot.h"
 #include "dsprot/dsprot_internal.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 
 // DS Protect's entry point in overlay 165. DSProt_CallRunChecks runs the four checks of the other objects and calls

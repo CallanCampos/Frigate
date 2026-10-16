@@ -4,8 +4,10 @@
 #include "types.h"
 
 // The player's account in DWC (TWL-DWC 5.3's dwc_account.c, in ARM9 main): the user data that the save keeps, and the
-// 12-byte friend data that names a friend, or the player, in one of three ways. The ROM names none of it; the calls
-// that are the SDK's carry its names where the code shows them, the rest are descriptive.
+// 12-byte friend data that names a friend, or the player, in one of three ways. The ROM names none of it. The DWC_
+// functions are the SDK's public API, by what they do; the DWCi_Acc_ ones (and the DWCi_ statics of dwc_account.c)
+// are ours, in the SDK's style. DWC_FRIEND_FLAG_4 and _5, and the DWCi_Acc_ functions of flags 4 and 5, are
+// placeholders until the overlay 11 code that uses them (0x0215e572, 0x0215ead6) shows what they mean.
 
 // A DWCAccFriendData of the SDK. Its first word holds the high 11 bits of a 43-bit user ID in its low bits and 21 bits
 // of flags above them; the bottom two flag bits are the kind of ID that the other two words hold

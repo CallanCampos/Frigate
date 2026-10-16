@@ -9,7 +9,7 @@
 #include "nitro/os.h"
 
 // A candidate's place that nothing has been put in is all zeroes
-#define IS_EMPTY(info) ((info).unk_00 + (info).id + (info).level + (info).tag + (info).seen == 0)
+#define IS_EMPTY(info) ((info).result + (info).id + (info).level + (info).tag + (info).seen == 0)
 
 static void DWCAc_OnApFound(const WMBssDesc *bss);
 static int DWCAc_FindTarget(const WMBssDesc *bss, int count, const DWCAcTarget *targets);
@@ -27,7 +27,7 @@ static void DWCAc_OnApFound(const WMBssDesc *bss) {
     DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     DWCAcMain *control = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
 
-    control->unk_0b_0 = 1;
+    control->apSeen = 1;
     switch (DWCAc_GetState()) {
     case 3:
         tag = work->tag;
@@ -267,8 +267,8 @@ static void DWCAc_SortCandidates(int slot, DWCAcSearchWork *work) {
             slot = prev;
         }
     }
-    MIi_CpuClear32(0, &infos[DWC_AC_CANDIDATE_MAX], sizeof(DWCAcCandidate));
-    MIi_CpuClear32(0, &candidates[DWC_AC_CANDIDATE_MAX], sizeof(WMBssDesc));
+    MI_CpuClear32(&infos[DWC_AC_CANDIDATE_MAX], sizeof(DWCAcCandidate));
+    MI_CpuClear32(&candidates[DWC_AC_CANDIDATE_MAX], sizeof(WMBssDesc));
 }
 
 // The wireless manager's notification callback of the search: an access point that was found goes to DWCAc_OnApFound,
@@ -282,7 +282,7 @@ void DWCAc_OnWcmNotify(WCMNotice *notice) {
         }
         // The status code of the failed attempt, as the access point gave it: 13 is an authentication algorithm that it
         // does not support, 15 a challenge that failed, 17 that it cannot take another station
-        switch (((DWCAcWcmNotice *)notice)->detail) {
+        switch (notice->parameter[1].n) {
         case 13:
             work->failureReason = 1;
             break;
@@ -297,6 +297,6 @@ void DWCAc_OnWcmNotify(WCMNotice *notice) {
             break;
         }
     } else if (notice->notify == WCM_NOTIFY_FOUND_AP) {
-        DWCAc_OnApFound((const WMBssDesc *)notice->parameter);
+        DWCAc_OnApFound(notice->parameter[0].p);
     }
 }

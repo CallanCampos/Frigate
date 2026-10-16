@@ -7,8 +7,6 @@
 
 // The magic number of a block's header, 'DWCM'
 #define DWC_MEM_MAGIC 0x4457434d
-// The name that GameSpy's blocks are asked for with
-#define DWC_MEM_GAMESPY 9
 // The alignment of a block that has none given
 #define DWC_MEM_ALIGN 32
 
@@ -27,6 +25,10 @@ typedef struct DWCMemFuncs {
 static DWCMemFuncs sMemFuncs;
 
 static void *DWC_ReallocEx(u32 name, void *ptr, u32 oldSize, u32 newSize, int align);
+static DWCMemHeader *DWCi_GetMemHeader(void *ptr);
+static void *DWCi_InitMemHeader(DWCMemHeader *header, u32 size);
+static u32 DWCi_GetMemSize(void *ptr);
+static void *DWC_Realloc(u32 name, void *ptr, u32 oldSize, u32 newSize);
 
 // The header of a block
 static DWCMemHeader *DWCi_GetMemHeader(void *ptr) {
@@ -99,17 +101,17 @@ static void *DWC_ReallocEx(u32 name, void *ptr, u32 oldSize, u32 newSize, int al
 }
 
 void *DWCi_GsAlloc(u32 size) {
-    return DWC_Alloc(DWC_MEM_GAMESPY, size);
+    return DWC_Alloc(DWC_ALLOCTYPE_GS, size);
 }
 
 void *DWCi_GsRealloc(void *ptr, u32 size) {
-    return DWC_Realloc(DWC_MEM_GAMESPY, ptr, size, size);
+    return DWC_Realloc(DWC_ALLOCTYPE_GS, ptr, size, size);
 }
 
 void DWCi_GsFree(void *ptr) {
-    DWC_Free(DWC_MEM_GAMESPY, ptr, 0);
+    DWC_Free(DWC_ALLOCTYPE_GS, ptr, 0);
 }
 
 void *DWCi_GsMemalign(u32 align, u32 size) {
-    return DWC_AllocEx(DWC_MEM_GAMESPY, size, align);
+    return DWC_AllocEx(DWC_ALLOCTYPE_GS, size, align);
 }

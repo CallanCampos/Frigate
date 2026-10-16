@@ -12,8 +12,8 @@
 // Starts the scan, allocating its work: the result goes in settings, and dmaNo is the DMA channel of the wireless
 // manager. The return value is always TRUE, and the caller ignores it
 BOOL DWCi_WdsScan_Start(DWCInetApSettings *settings, u16 dmaNo);
-// Takes a step of the scan: 1 while it runs, 2 once it found an access point (in the settings), 3 if it failed or was
-// never started
+// Takes a step of the scan: DWC_INET_SCAN_SCANNING while it runs, DWC_INET_SCAN_FOUND once it found an access point
+// (in the settings), DWC_INET_SCAN_FAILED if it failed or was never started
 int DWCi_WdsScan_Process(void);
 // Asks the scan to stop: a scan that is waiting for its time to run out ends at the next step
 void DWCi_WdsScan_Stop(void);

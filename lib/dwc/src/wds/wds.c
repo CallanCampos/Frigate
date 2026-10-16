@@ -263,7 +263,7 @@ static BOOL WDS_IsPrintable(const u8 *text) {
 }
 
 BOOL WDS_IsBeaconInfoValid(const WDSBeaconInfo *info) {
-    if ((info->flags & 2) && WDS_IsPrintable(info->unk_20) && info->unk_65 <= 3) {
+    if ((info->flags & 2) && WDS_IsPrintable(info->spotInfo) && info->wepMode <= 3) {
         return TRUE;
     }
     return FALSE;

@@ -45,17 +45,17 @@ static u8 DWCAc_SettleKey(DWCAcSearchWork *work) {
     if (DWCAc_MakeKey(work, work->kind, &work->keyDesc)) {
         work->sharedKey = 1;
         if (!((bss->capaInfo >> 4) & 1)) {
-            work->infos[work->selected].unk_00 = DWC_AC_RESULT_WRONG_KEY;
+            work->infos[work->selected].result = DWC_AC_RESULT_WRONG_KEY;
             return 9;
         }
         if (work->kind == DWC_AC_ID_NWCUSBAP && bss->ssid[9] == 0) {
-            work->infos[work->selected].unk_00 = DWC_AC_RESULT_WRONG_KEY;
+            work->infos[work->selected].result = DWC_AC_RESULT_WRONG_KEY;
             return 9;
         }
     } else {
         work->sharedKey = 0;
         if (((bss->capaInfo >> 4) & 1) == 1) {
-            work->infos[work->selected].unk_00 = DWC_AC_RESULT_WRONG_KEY;
+            work->infos[work->selected].result = DWC_AC_RESULT_WRONG_KEY;
             return 9;
         }
     }
@@ -78,7 +78,7 @@ static u8 DWCAc_ConnectCandidate(DWCAcSearchWork *work) {
         option = DWCAc_GetPowerOption(work);
         if (++work->attempts > 3) {
             work->attempts = 0;
-            work->infos[work->selected].unk_00 = DWC_AC_RESULT_GAVE_UP;
+            work->infos[work->selected].result = DWC_AC_RESULT_GAVE_UP;
             return 9;
         }
         if (work->attempts != 1) {
@@ -86,11 +86,11 @@ static u8 DWCAc_ConnectCandidate(DWCAcSearchWork *work) {
                 work->sharedKey = 0;
             } else if (work->failureReason == 2) {
                 work->attempts = 0;
-                work->infos[work->selected].unk_00 = DWC_AC_RESULT_WRONG_KEY;
+                work->infos[work->selected].result = DWC_AC_RESULT_WRONG_KEY;
                 return 9;
             } else if (work->failureReason == 3) {
                 work->attempts = 0;
-                work->infos[work->selected].unk_00 = DWC_AC_RESULT_FULL;
+                work->infos[work->selected].result = DWC_AC_RESULT_FULL;
                 return 9;
             } else if (work->attempts == 3) {
                 work->sharedKey = 0;

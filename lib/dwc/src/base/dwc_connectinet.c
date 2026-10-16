@@ -41,11 +41,9 @@
 // The code of the fatal error that reports those failures, and a connection that cannot start
 #define AC_OWN_ERROR_CODE -50199
 
-// The numbers of the errors that the connection sets: the failure of the AC (DWC_ERROR_AC_ANY in the SDK's order, from
-// memory), and the loss of the link while WCM is not in its state for errors; the fatal error is DWC_ERROR_FATAL. The
-// loss of the link subtracts the kind of the access point from its code
-#define ERROR_AC 5
-#define ERROR_LINK_LOST 8
+// The codes of the errors that the connection sets with DWC_ERROR_AC_ANY and DWC_ERROR_DISCONNECTED (the loss of the
+// link while WCM is not in its state for errors); the fatal error is DWC_ERROR_FATAL. The loss of the link subtracts
+// the kind of the access point from its code
 #define LINK_LOST_CODE -54000
 #define LINK_LOST_FATAL_CODE -54900
 
@@ -127,7 +125,7 @@ void DWC_ConnectInetAsync(void) {
         MI_CpuFill8(&param, 0, sizeof(DWCAcParam));
         param.dmaNo = sInet.control->dmaNo;
         param.radioOn = sInet.control->powerMode;
-        param.unk_0c = sInet.control->rwin;
+        param.rwin = sInet.control->rwin;
         param.alloc = DWC_Alloc;
         param.free = DWC_Free;
         param.ignoreEula = sInet.control->skipEulaCheck;
@@ -213,7 +211,7 @@ int DWC_GetInetStatus(void) {
         return DWC_CONNECTINET_STATE_OPERATING;
     case DWC_INET_SCAN_FAILED:
         DWC_ProcessInet();
-        DWCi_SetError(ERROR_AC, sInet.lastError);
+        DWCi_SetError(DWC_ERROR_AC_ANY, sInet.lastError);
         sInet.control->state = DWC_CONNECTINET_STATE_ERROR;
         sInet.control->scanStage = DWC_INET_SCAN_REPORTED;
         return DWC_CONNECTINET_STATE_ERROR;
@@ -242,7 +240,7 @@ int DWC_GetInetStatus(void) {
         // Two failures that end the connection without a retry
         if (status == -50599 || status == -50699) {
             sInet.control->ended = TRUE;
-            DWCi_SetError(ERROR_AC, status);
+            DWCi_SetError(DWC_ERROR_AC_ANY, status);
             sInet.control->state = DWC_CONNECTINET_STATE_ERROR;
             return DWC_CONNECTINET_STATE_ERROR;
         }
@@ -268,7 +266,7 @@ int DWC_GetInetStatus(void) {
         if (sInet.lastError < status) {
             status = sInet.lastError;
         }
-        DWCi_SetError(ERROR_AC, status);
+        DWCi_SetError(DWC_ERROR_AC_ANY, status);
         sInet.control->state = DWC_CONNECTINET_STATE_ERROR;
         return DWC_CONNECTINET_STATE_ERROR;
     }
@@ -286,7 +284,7 @@ void DWC_CleanupInet(void) {
             DWCi_WdsScan_Stop();
             do {
                 scan = DWCi_WdsScan_Process();
-            } while ((u32)(scan - 2) > 2);
+            } while (!(scan == DWC_INET_SCAN_FOUND || scan == DWC_INET_SCAN_FAILED || scan == DWC_INET_SCAN_REPORTED));
             DWCi_WdsScan_Free();
         }
         sInet.control = NULL;
@@ -342,7 +340,7 @@ BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     }
     MI_CpuCopy8(bssid, apInfo->bssid, BSSID_SIZE);
     if (apInfo->apType == 0 || apInfo->apType == 1 || apInfo->apType == 2 ||
-        (OS_IsRunOnTwl() && (u32)(apInfo->apType - 10) <= 2)) {
+        (OS_IsRunOnTwl() && (apInfo->apType == 10 || apInfo->apType == 11 || apInfo->apType == 12))) {
         ssid = WCM_GetConnectedApSsid(&ssidLength);
         DC_InvalidateRange(ssid, SSID_SIZE);
         if (ssid == NULL) {
@@ -357,7 +355,7 @@ BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     } else {
         DWCi_ApInfo_SetSpotInfo(spotInfo, apInfo);
     }
-    apInfo->unk8 = DWCAc_GetKeyMode();
+    apInfo->keyMode = DWCAc_GetKeyMode();
     return TRUE;
 }
 
@@ -398,7 +396,7 @@ static BOOL DWCi_ApInfo_FromWdsBeacon(DWCBssWork *work, const WMBssDesc *bss, DW
             if (WDS_IsBeaconInfoValid(&work->record)) {
                 if (apInfo != NULL) {
                     apInfo->apType = AP_TYPE_WDS;
-                    DWCi_ApInfo_SetSpotInfo((char *)work->record.unk_20, apInfo);
+                    DWCi_ApInfo_SetSpotInfo((char *)work->record.spotInfo, apInfo);
                 }
                 return TRUE;
             }
@@ -433,7 +431,7 @@ BOOL DWC_UpdateConnection(void) {
         if (WCM_GetState() == WCM_STATE_ERROR) {
             DWCi_SetError(DWC_ERROR_FATAL, LINK_LOST_FATAL_CODE - apType);
         } else {
-            DWCi_SetError(ERROR_LINK_LOST, LINK_LOST_CODE - apType);
+            DWCi_SetError(DWC_ERROR_DISCONNECTED, LINK_LOST_CODE - apType);
         }
         return TRUE;
     }

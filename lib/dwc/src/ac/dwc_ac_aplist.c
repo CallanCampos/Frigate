@@ -203,7 +203,7 @@ static u8 CountCandidatesToVisit(DWCAcSearchWork *work) {
     int i;
 
     for (i = 0; i < work->candidateCount; i++) {
-        if (work->infos[i].unk_00 == 0 && work->candidates[i].channel - 1 != work->infos[i].tag) {
+        if (work->infos[i].result == 0 && work->candidates[i].channel - 1 != work->infos[i].tag) {
             work->infos[i].seen = 0;
             count++;
         } else {

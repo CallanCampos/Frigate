@@ -62,7 +62,7 @@ u8 DWCAc_StepCandidateOver(void) {
     case 3:
         state = work->resumeState;
         if (work->sameSsid == 1) {
-            work->infos[work->selected].unk_00 = 0;
+            work->infos[work->selected].result = 0;
             state = 7;
         } else if (state >= 3 && state <= 5) {
             DWCAc_StartScan(state);
@@ -310,7 +310,7 @@ static u8 DWCAc_TryCandidate(DWCAcSearchWork *work, u8 state) {
     }
     count = work->candidateCount;
     for (i = 0; i < count; i++) {
-        if (work->infos[i].unk_00 == 0) {
+        if (work->infos[i].result == 0) {
             break;
         }
     }

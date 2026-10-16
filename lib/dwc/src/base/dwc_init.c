@@ -12,11 +12,6 @@
 // main like the rest of the library's base): starts the timer, the alarms and the clock, makes the Wi-Fi ID if the
 // console has none, and gives GameSpy its memory functions and the host name of the stats server.
 
-// The name that the work area of the Wi-Fi settings is asked for with
-#define DWC_MEM_INIT 2
-// The size of that work area
-#define DWC_INIT_WORK_SIZE 0x1000
-
 // 1 once the library has started, and the game code that it was started with. With -ipa file, MWCC places them in
 // .bss in the other order, which is the ROM's
 static int sStarted;
@@ -42,7 +37,7 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
     OS_InitAlarm();
     RTC_Init();
 
-    work = DWC_Alloc(DWC_MEM_INIT, DWC_INIT_WORK_SIZE);
+    work = DWC_Alloc(DWC_ALLOCTYPE_BM, DWC_BM_WORK_SIZE);
     if (work == NULL) {
         return DWC_INIT_RESULT_OUT_OF_MEMORY;
     }
@@ -51,7 +46,7 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
         DWCBm_MakeAndSaveWifiId(work);
         created = TRUE;
     }
-    DWC_Free(DWC_MEM_INIT, work, 0);
+    DWC_Free(DWC_ALLOCTYPE_BM, work, 0);
 
     if (checked < 0) {
         if (created) {

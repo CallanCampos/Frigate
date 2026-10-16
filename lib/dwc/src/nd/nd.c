@@ -720,7 +720,7 @@ static void SetWifiError(int error, int serverError) {
     case DWC_ND_ERROR_CANCELED:
         break;
     case DWC_ND_ERROR_ALLOC:
-        DWCi_SetError(9, -31001);
+        DWCi_SetError(DWC_ERROR_FATAL, -31001);
         break;
     case DWC_ND_ERROR_HTTP:
         DWCi_SetError(14, -31020);
@@ -735,13 +735,13 @@ static void SetWifiError(int error, int serverError) {
         DWCi_SetError(13, -31040);
         break;
     case ND_ERROR_FATAL:
-        DWCi_SetError(9, -31009);
+        DWCi_SetError(DWC_ERROR_FATAL, -31009);
         break;
     case DWC_ND_ERROR_BUSY:
         DWCi_SetError(13, -31010);
         break;
     default:
-        DWCi_SetError(9, -31009);
+        DWCi_SetError(DWC_ERROR_FATAL, -31009);
         break;
     }
 }

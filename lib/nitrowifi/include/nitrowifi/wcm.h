@@ -9,11 +9,18 @@
 // ROM names none of it: established SDK names are kept where identified; descriptive reconstruction names are
 // noted below.
 
-// What a WCM notification reports: the kind of the operation that ended, and its result
+// A word of a WCM notification, which carries a number or a pointer
+typedef union {
+    s32 n;
+    void *p;
+} WCMNoticeParameter;
+
+// What a WCM notification reports: the kind of the operation that ended, its result and three words about it (for a
+// found access point, the first is its WMBssDesc; for a connection, the second is why it failed)
 typedef struct {
     s16 notify;
     s16 result;
-    s32 parameter;
+    WCMNoticeParameter parameter[3];
 } WCMNotice;
 
 // notify

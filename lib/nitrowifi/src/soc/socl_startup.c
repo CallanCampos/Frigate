@@ -1,5 +1,5 @@
 #include "dwc/wcm.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"

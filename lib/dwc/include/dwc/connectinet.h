@@ -5,9 +5,9 @@
 
 // Connecting to the internet (TWL-DWC 5.3's dwc_connectinet.c, in ARM9 main): the library starts the auto connect of
 // the DS and DSi (AC) with the console's Wi-Fi settings, and when that fails it looks for a Nintendo Zone access point
-// with the WDS scan and connects to the one it finds. The ROM names none of it; the SDK's names are in the comments,
-// where the code shows them. The access point information that the same file gives is in dwc/apinfo.h, and the WDS
-// scan, a file of its own, is in dwc/wdsscan.h.
+// with the WDS scan and connects to the one it finds. The ROM names none of it: the DWC_ functions have the SDK's
+// names, by what they do, and the others are ours. The access point information that the same file gives is in
+// dwc/apinfo.h, and the WDS scan, a file of its own, is in dwc/wdsscan.h.
 
 // What a connection is in (DWCInetControl.state), and what DWC_GetInetStatus reports. The names follow the SDK's
 // DWC_CONNECTINET_STATE_* and its order from memory; the code confirms IDLE, OPERATING, CONNECTED, DISCONNECTED, ERROR

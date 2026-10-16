@@ -36,12 +36,7 @@ BOOL DWCBm_ReadNtrSettings(void *buf) {
 }
 
 BOOL DWCBm_ReadTwlSettings(void *buf) {
-    BOOL result = FALSE;
-
-    if (ReadTwlPages(buf, 0, 3)) {
-        result = TRUE;
-    }
-    return result;
+    return ReadTwlPages(buf, 0, 3) != FALSE;
 }
 
 void DWCBm_GetWifiIdInfo(DWCBmWifiIdInfo *info) {

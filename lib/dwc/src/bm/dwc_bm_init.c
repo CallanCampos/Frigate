@@ -12,15 +12,15 @@
 int DWC_BM_Init(void *work) {
     int result;
 
-    MI_CpuFill8(work, 0, 0x1000);
+    MI_CpuFill8(work, 0, DWC_BM_WORK_SIZE);
     if (OS_IsRunOnTwl()) {
         result = func_0205e0f0(work);
     } else {
         result = func_0205e094(work);
     }
-    MI_CpuFill8(work, 0, 0x1000);
+    MI_CpuFill8(work, 0, DWC_BM_WORK_SIZE);
     if (!DWCBm_ReadAllNtrPages(work)) {
-        return -10001;
+        return DWC_BM_CHECK_READ_FAILED;
     }
     DWCBm_SetPackedWifiIdInfo(((DWCBmNtrPage *)work)->wifiId);
     return result;

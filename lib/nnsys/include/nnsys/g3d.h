@@ -2,7 +2,6 @@
 #define POKEBW2_NNSYS_G3D_H
 
 #include "types.h"
-#include "gfl/std.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
 #include "nitro/mi.h"

@@ -13,14 +13,6 @@
 // How long the scan listens, in milliseconds
 #define SCAN_TIME 3000
 
-// The name of the scan's allocations (see dwc/memfunc.h)
-#define MEM_NAME_WDS_SCAN 1
-
-// What DWCi_WdsScan_Process returns
-#define SCAN_RUNNING 1
-#define SCAN_FOUND 2
-#define SCAN_FAILED 3
-
 // Where the scan is. The ones that wait for a callback are named for what is in progress
 enum {
     // Nothing started: start the wireless manager
@@ -74,8 +66,8 @@ static void DWCi_WdsScan_OnEnded(void *arg);
 static void DWCi_WdsScan_OnFailed(void *arg);
 
 BOOL DWCi_WdsScan_Start(DWCInetApSettings *settings, u16 dmaNo) {
-    sWdsScan.wds = DWC_Alloc(MEM_NAME_WDS_SCAN, WDS_GetWorkSize());
-    sWdsScan.data = DWC_Alloc(MEM_NAME_WDS_SCAN, sizeof(WdsScanData));
+    sWdsScan.wds = DWC_Alloc(DWC_ALLOCTYPE_AC, WDS_GetWorkSize());
+    sWdsScan.data = DWC_Alloc(DWC_ALLOCTYPE_AC, sizeof(WdsScanData));
     MI_CpuFill8(sWdsScan.data, 0, sizeof(WdsScanData));
     sWdsScan.data->settings = settings;
     sWdsScan.data->dmaNo = dmaNo;
@@ -89,9 +81,9 @@ int DWCi_WdsScan_Process(void) {
     int result;
 
     if (sWdsScan.wds == NULL || sWdsScan.data == NULL) {
-        return SCAN_FAILED;
+        return DWC_INET_SCAN_FAILED;
     }
-    result = SCAN_RUNNING;
+    result = DWC_INET_SCAN_SCANNING;
     switch (sWdsScan.state) {
     case SCAN_STATE_START:
         sWdsScan.state = SCAN_STATE_STARTING;
@@ -150,18 +142,17 @@ int DWCi_WdsScan_Process(void) {
             sWdsScan.state = SCAN_STATE_FAILED;
             break;
         }
-        // The wireless manager is down: the strongest access point becomes the settings to connect with. Its beacon
-        // gives them in the fields wds.h has not named yet: unk_00 is the SSID, unk_44 the WEP key, unk_65 the WEP
-        // mode, unk_6c the MTU and unk_20 the spot information
-        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.unk_00, sWdsScan.data->settings->ssid,
+        // The wireless manager is down: the strongest access point becomes the settings to connect with, from what its
+        // beacon gives
+        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.ssid, sWdsScan.data->settings->ssid,
                     sizeof(sWdsScan.data->settings->ssid));
-        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.unk_44, sWdsScan.data->settings->wepKey,
+        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.wepKey, sWdsScan.data->settings->wepKey,
                     sizeof(sWdsScan.data->settings->wepKey));
-        sWdsScan.data->settings->wepMode = sWdsScan.data->entries[sWdsScan.data->best].info.unk_65;
-        sWdsScan.data->settings->mtu = sWdsScan.data->entries[sWdsScan.data->best].info.unk_6c;
-        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.unk_20, sWdsScan.data->settings->spotInfo,
+        sWdsScan.data->settings->wepMode = sWdsScan.data->entries[sWdsScan.data->best].info.wepMode;
+        sWdsScan.data->settings->mtu = sWdsScan.data->entries[sWdsScan.data->best].info.mtu;
+        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.spotInfo, sWdsScan.data->settings->spotInfo,
                     sizeof(sWdsScan.data->settings->spotInfo));
-        result = SCAN_FOUND;
+        result = DWC_INET_SCAN_FOUND;
         break;
     case SCAN_STATE_FAIL:
         sWdsScan.state = SCAN_STATE_ENDING;
@@ -170,7 +161,7 @@ int DWCi_WdsScan_Process(void) {
         }
         break;
     case SCAN_STATE_FAILED:
-        result = SCAN_FAILED;
+        result = DWC_INET_SCAN_FAILED;
         break;
     }
     return result;
@@ -184,11 +175,11 @@ void DWCi_WdsScan_Stop(void) {
 
 void DWCi_WdsScan_Free(void) {
     if (sWdsScan.wds != NULL) {
-        DWC_Free(MEM_NAME_WDS_SCAN, sWdsScan.wds, 0);
+        DWC_Free(DWC_ALLOCTYPE_AC, sWdsScan.wds, 0);
         sWdsScan.wds = NULL;
     }
     if (sWdsScan.data != NULL) {
-        DWC_Free(MEM_NAME_WDS_SCAN, sWdsScan.data, 0);
+        DWC_Free(DWC_ALLOCTYPE_AC, sWdsScan.data, 0);
         sWdsScan.data = NULL;
     }
 }

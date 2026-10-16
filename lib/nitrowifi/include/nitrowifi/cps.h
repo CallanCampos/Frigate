@@ -204,8 +204,4 @@ void CPS_SslInit(void);
 // Turns the SSL layer on, or off, for the caller's socket
 void CPS_SetSsl(BOOL enable);
 
-// Overlay 11's code after CPS, whose file is not written yet: ends CPS's threads, then lets go of its memory
-void func_ov011_0216b24c(void);
-void func_ov011_0216b1d4(void);
-
 #endif // POKEBW2_NITROWIFI_CPS_H

@@ -16,11 +16,11 @@
 // allocated. The first block is the control block, DWCAcMain; the one of 0x14d8 bytes is the search's work.
 
 // The flags DWCAc_GetBlock takes
-#define DWC_AC_WORK_MAIN 0x01   // the control block: 0xcc bytes
-#define DWC_AC_WORK_WCM 0x02    // the wireless connection manager's work: 0x4800 bytes
-#define DWC_AC_WORK_UNK_04 0x04 // the SocConfig that SOC_Startup is given (dwc_ac_soc.c): 0x58 bytes
-#define DWC_AC_WORK_UNK_08 0x08 // the memory functions again, DWCAcMemFuncs: 0xc bytes
-#define DWC_AC_WORK_SEARCH 0x10 // the search's work: 0x14d8 bytes
+#define DWC_AC_WORK_MAIN 0x01       // the control block: 0xcc bytes
+#define DWC_AC_WORK_WCM 0x02        // the wireless connection manager's work: 0x4800 bytes
+#define DWC_AC_WORK_SOC_CONFIG 0x04 // the SocConfig that SOC_Startup is given (dwc_ac_soc.c): 0x58 bytes
+#define DWC_AC_WORK_MEMFUNCS 0x08   // the memory functions again, DWCAcMemFuncs: 0xc bytes
+#define DWC_AC_WORK_SEARCH 0x10     // the search's work: 0x14d8 bytes
 
 // The allocator and the deallocator that auto-connect is given, the same that DWC gives to the library. The name is
 // always 1 here
@@ -31,18 +31,18 @@ typedef void (*DWCAcFreeFunc)(u32 name, void *ptr, u32 size);
 typedef struct DWCAcParam {
     DWCAcAllocFunc alloc;
     DWCAcFreeFunc free;
-    u8 dmaNo;          // goes to DWCAcSearchWork.dmaNo
-    u8 radioOn;        // 0x09; DWCAcSearchWork.radioOn
-    u8 mode;           // 0x0a; DWCAcSearchWork.mode
-    u8 unk_0b_0 : 4;   // 0x0b; DWCAcSearchWork.unk_14bc_4, which is 1 to skip the connection test
-    u8 rssiPacked : 4; // DWCAcSearchWork.rssiPacked
-    s32 unk_0c;        // DWCAcSearchWork.unk_14c8, the receive window of SOC on a DSi
-    u8 ignoreEula;     // 0x10; DWCAcSearchWork.ignoreEula
+    u8 dmaNo;                  // goes to DWCAcSearchWork.dmaNo
+    u8 radioOn;                // 0x09; DWCAcSearchWork.radioOn
+    u8 mode;                   // 0x0a; DWCAcSearchWork.mode
+    u8 skipConnectionTest : 4; // 0x0b; DWCAcSearchWork.skipConnectionTest
+    u8 rssiPacked : 4;         // DWCAcSearchWork.rssiPacked
+    s32 rwin;                  // DWCAcSearchWork.rwin, the receive window of SOC on a DSi
+    u8 ignoreEula;             // 0x10; DWCAcSearchWork.ignoreEula
     u8 unk_11[3];
 } DWCAcParam;
 
-// The block of the flag DWC_AC_WORK_UNK_08, 0xc bytes: the allocator and the deallocator again, which the socket layer
-// is started with
+// The block of the flag DWC_AC_WORK_MEMFUNCS, 0xc bytes: the allocator and the deallocator again, which the socket
+// layer is started with
 typedef struct DWCAcMemFuncs {
     DWCAcAllocFunc alloc;
     DWCAcFreeFunc free;
@@ -56,17 +56,17 @@ typedef struct DWCAcMain {
     u8 allocated;       // 0x08; a bit for each of the blocks by its flag
     u8 state;           // 0x09; what DWCAc_Process dispatches on
     u8 failedState; // 0x0a; the state that DWCAc_SetError found when it was told of an error; the teardown starts there
-    u8 unk_0b_0 : 4;    // the search sets it to 1 whenever the wireless manager reports an access point
-    u8 unk_0b_4 : 4;    // 1 when the connection test failed with CPS saying that the address is in use (dwc_ac_soc.c)
-    s32 error;          // 0x0c; what DWCAc_SetError was told
-    u32 unk_10;         // the result of the connection test of overlay 11 (func_ov011_0216b2cc), kept by dwc_ac_soc.c
-    u8 candidateResult; // 0x14; DWCAcCandidate.unk_00 of the candidate that the connection works on
-    u8 candidateType;   // 0x15; the type (DWCAc_GetApTypeOfId) of that candidate's target
-    u8 maxState;        // 0x16; the highest state that DWCAc_SetState was given, from 1
-    u8 type;            // 0x17; the type of the access point that the connection is with, 0xff for none
-    u8 spotInfo[10];    // 0x18; what an NDWCSHAP's SSID tells (DWCAc_GetNdwcShapSpotInfo), or the 10 bytes that
-                        // DWCAc_SetGivenAp got
-    u8 givenType;       // 0x22; the type that DWCAc_SetGivenAp got: nonzero when the game gave the access point
+    u8 apSeen : 4;  // the search sets it to 1 whenever the wireless manager reports an access point
+    u8 addressInUse : 4; // 1 when the connection test failed with CPS saying that the address is in use (dwc_ac_soc.c)
+    s32 error;           // 0x0c; what DWCAc_SetError was told
+    u32 testResult;      // the result of the connection test of overlay 11 (func_ov011_0216b2cc), kept by dwc_ac_soc.c
+    u8 candidateResult;  // 0x14; DWCAcCandidate.result of the candidate that the connection works on
+    u8 candidateType;    // 0x15; the type (DWCAc_GetApTypeOfId) of that candidate's target
+    u8 maxState;         // 0x16; the highest state that DWCAc_SetState was given, from 1
+    u8 type;             // 0x17; the type of the access point that the connection is with, 0xff for none
+    u8 spotInfo[10];     // 0x18; what an NDWCSHAP's SSID tells (DWCAc_GetNdwcShapSpotInfo), or the 10 bytes that
+                         // DWCAc_SetGivenAp got
+    u8 givenType;        // 0x22; the type that DWCAc_SetGivenAp got: nonzero when the game gave the access point
     u8 keyMode; // 0x23; the key mode of the setting: the WCM mode of WPA, the WEP mode, or 2 for NWCUSBAP and NDWCSHAP
     u8 unk_24;  // 0x24; the connection's setting on a DSi: this byte, the next, the halfword and the 0x64 bytes
     u8 unk_25;  //   are the DSi setting's 0x182, 0x183, 0x1e8 and 0x184, and the last two blocks its first 0x40
@@ -103,14 +103,14 @@ typedef struct DWCAcTarget {
 // What the search keeps of the access point that it found for a target, next to the description of its beacon
 // (DWCAcSearchWork.candidates). The best of them come first
 typedef struct DWCAcCandidate {
-    u8 unk_00;   // the result of the connection to it: 0 while untried, else DWC_AC_RESULT_*
+    u8 result;   // the result of the connection to it: 0 while untried, else DWC_AC_RESULT_*
     u8 id;       // that of the target it matched
     u8 level;    // the signal's strength, the best that the beacons showed
     u8 tag : 7;  // what DWCAc_AddCandidate was told when the best beacon came in: the round or the channel
     u8 seen : 1; // set when the beacon was seen again on its channel
 } DWCAcCandidate;
 
-// What DWCAcCandidate.unk_00 says once the connection to an access point is over, or when it cannot be tried
+// What DWCAcCandidate.result says once the connection to an access point is over, or when it cannot be tried
 #define DWC_AC_RESULT_GAVE_UP 1   // every attempt failed, or the sockets did not come up in time
 #define DWC_AC_RESULT_LOST 2      // the connection to the access point was lost after it had come up
 #define DWC_AC_RESULT_WRONG_KEY 3 // the key at hand does not fit the access point, or the access point refused it
@@ -185,7 +185,7 @@ typedef struct DWCAcSearchWork {
     // 0xb to 0xd only the DSi setting (0xb is the first); 4 NWCUSBAP, 5 NDWCSHAP, 6 FREESPOT and 8 NINTENDOWFC alone
     // (MakeFirstTargets, MakeSecondTargets, DWCAc_GetSpecialApId)
     u8 mode : 4;
-    u8 unk_14bc_4 : 1; // 1 to skip the connection test (dwc_ac_soc.c); DWCAcParam byte 0xb
+    u8 skipConnectionTest : 1; // 1 to skip the connection test (dwc_ac_soc.c); from DWCAcParam
     u8 rssiPacked : 1; // the beacon's signal is in the DSi's form, a quarter of what it is in the DS's, and 0x19 less
     u8 sameSsid : 1;   // the access point matched more than one target, which are tried on its next visits
     u8 preferWpa : 1;  // the candidates with WPA come before those without
@@ -203,7 +203,7 @@ typedef struct DWCAcSearchWork {
     u8 attempts;       // 0x14c5; how many times the connection to the candidate has been tried; in the search's third
                        // state, how many of the channels in hiddenMask it is past
     u16 hiddenMask;    // 0x14c6; a bit for each channel (by its index) where a beacon came with no SSID
-    s32 unk_14c8;      // 0x14c8; the receive window that SOC is started with on a DSi (dwc_ac_soc.c), from DWCAcParam
+    s32 rwin;          // 0x14c8; the receive window that SOC is started with on a DSi (dwc_ac_soc.c), from DWCAcParam
     u8 ignoreEula;     // 0x14cc; nonzero lets the connection go on without the DSi's license agreement
     u8 unk_14cd;
     u16 channelMax; // 0x14ce; the highest channel that the wireless manager allows, as a number from 1
@@ -323,20 +323,15 @@ void DWCAc_OnWcmNotify(WCMNotice *notice);
 // and then the wireless manager to idle. TRUE when it is over, with *state 0, or has failed, with *state 0x12
 BOOL DWCAc_StepTeardown(u8 *state);
 
-// What the wireless manager's notification carries after WCMNotice. WCM_Notify builds it so, and nitrowifi/wcm.h
-// names only the WCMNotice at its start
-typedef struct DWCAcWcmNotice {
-    WCMNotice notice;
-    s32 detail; // for a connection, why it failed
-    s32 line;
-} DWCAcWcmNotice;
-
-// Overlay 11's connection test, whose file is not written yet, which the states 13 and 14 of dwc_ac_soc.c run, by the
-// 52xxx errors it leads to in dwc_ac_result.c. The first starts it from the memory functions (copied) and answers 0
-// once it is going, 4 if it has no memory; the second answers 0 while it is not over, else its state (11 if it went
-// well); the third its result. They are here, and not in dwc/dwc.h with overlay 11's other functions, for the
-// DWCAcMemFuncs that the first takes
+// Overlay 11's connection test and its teardown (0x0216b14c to 0x0216b2cc, one file that is not written yet), which
+// the states 13 and 14 of dwc_ac_soc.c run, by the 52xxx errors it leads to in dwc_ac_result.c. The first starts the
+// test from the memory functions (copied) and answers 0 once it is going, 4 if it has no memory;
+// func_ov011_0216b24c ends CPS's threads and func_ov011_0216b1d4 then lets go of its memory; func_ov011_0216b2a4
+// answers 0 while the test is not over, else its state (11 if it went well), and func_ov011_0216b2cc its result. They
+// are here, and not in dwc/dwc.h with overlay 11's other functions, for the DWCAcMemFuncs that the first takes
 int func_ov011_0216b14c(const DWCAcMemFuncs *funcs);
+void func_ov011_0216b1d4(void);
+void func_ov011_0216b24c(void);
 u32 func_ov011_0216b2a4(void);
 u32 func_ov011_0216b2cc(void);
 

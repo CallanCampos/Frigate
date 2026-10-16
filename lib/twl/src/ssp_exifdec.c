@@ -1,5 +1,5 @@
 #include "types.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "ssp_private.h"
 
 // The EXIF reader of TwlSDK's JPEG decoder (ssp_jpegdec.c): it walks the TIFF structure of a JPEG's APP1 segment for

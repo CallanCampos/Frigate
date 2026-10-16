@@ -1,8 +1,9 @@
 #include "ssp_exifenc.h"
 #include "types.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
+#include "nitro/std.h"
 
 // The EXIF writer of TwlSDK's JPEG encoder: the SOI and APP1 segment that start a photo, with its 0th IFD, Exif IFD,
 // MakerNote IFD (which holds what the DSi signs), Interoperability IFD and the 1st IFD of its thumbnail. The file name

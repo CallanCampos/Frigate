@@ -7,11 +7,24 @@
 // code that the server or the part that failed gave with it. The ROM names none of it; the calls that are the SDK's
 // carry its names in the comments, where the code shows them.
 
-// The error that none has set. A non-zero error is a number that the part that failed gives, 1 to 22 so far; the
-// parts of DWC pass it as a bare number (13 for the download of files, 6, 8, 9 and 20 for the stats and score parts)
+// The error that none has set, and the numbers that the part that failed gives: the SDK's DWCError, in its order
+// (recalled from the SDK, which the types that DWC_GetLastErrorEx gives them fit). The numbers from 14 to 22 are left
+// bare
 #define DWC_ERROR_NONE 0
+#define DWC_ERROR_DS_MEMORY_ANY 1
+#define DWC_ERROR_AUTH_ANY 2
+#define DWC_ERROR_AUTH_OUT_OF_SERVICE 3
+#define DWC_ERROR_AUTH_STOP_SERVICE 4
+#define DWC_ERROR_AC_ANY 5
+#define DWC_ERROR_NETWORK 6
+#define DWC_ERROR_GHTTP_ANY 7
+#define DWC_ERROR_DISCONNECTED 8
 // The one error that stays: nothing replaces it, and clearing leaves it
 #define DWC_ERROR_FATAL 9
+#define DWC_ERROR_FRIENDS_SHORTAGE 10
+#define DWC_ERROR_NOT_FRIEND_SERVER 11
+#define DWC_ERROR_SERVER_FULL 12
+#define DWC_ERROR_ND_ANY 13
 
 // What a caller does about an error, which DWC_GetLastErrorEx gives from the error: the SDK's DWCErrorType, in its
 // order. The callers (DWCRap_HandleError) confirm 1 (they clear it and go on), 3 (they end the friends match), 5 (they

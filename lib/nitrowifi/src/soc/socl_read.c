@@ -1,4 +1,4 @@
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
@@ -37,7 +37,7 @@ int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSIn
     if ((flags & SOCLI_READ_NOBLOCK) || socket->flag_block == 0) {
         block = 0;
     } else {
-        if (OS_GetProcMode() == 0x12) {
+        if (OS_GetProcMode() == OS_PROCMODE_IRQ) {
             return SOCL_EINVAL;
         }
         block = 1;

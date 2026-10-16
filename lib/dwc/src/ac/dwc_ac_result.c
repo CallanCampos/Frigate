@@ -68,7 +68,7 @@ static s32 ErrorToCodeFour(void) {
 // The error 5, which the search gives when it ends without a connection: the code is another if it saw an access point
 // at all
 static s32 ErrorToCodeSearchEnded(const DWCAcMain *main) {
-    if (main->unk_0b_0 == 0) {
+    if (main->apSeen == 0) {
         return -50099;
     }
     return -51099;
@@ -94,10 +94,10 @@ static s32 ErrorToCodeConnection(const DWCAcMain *main) {
     } else if (maxState < 13) {
         code = -52000 - type;
     } else {
-        code = main->unk_10;
+        code = main->testResult;
         if (code == 0) {
             code = -50000 - type;
-        } else if (main->unk_0b_4 == 1) {
+        } else if (main->addressInUse == 1) {
             code = -52700 - type;
         } else if (code == -1) {
             code = -52100 - type;

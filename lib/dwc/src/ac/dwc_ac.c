@@ -13,8 +13,8 @@
 // The pointers to the five blocks of memory, which DWCAc_GetBlock gives out by their flags
 typedef struct DWCAcBlocks {
     void *wcm;               // DWC_AC_WORK_WCM
-    void *unk_04;            // DWC_AC_WORK_UNK_04
-    DWCAcMemFuncs *memFuncs; // DWC_AC_WORK_UNK_08
+    void *socConfig;         // DWC_AC_WORK_SOC_CONFIG
+    DWCAcMemFuncs *memFuncs; // DWC_AC_WORK_MEMFUNCS
     DWCAcMain *main;         // DWC_AC_WORK_MAIN
     DWCAcSearchWork *search; // DWC_AC_WORK_SEARCH
 } DWCAcBlocks;
@@ -53,23 +53,23 @@ BOOL DWCAc_Create(DWCAcParam *param) {
     main->allocated = DWC_AC_WORK_MAIN;
     sBlocks.search = DWCAc_AllocBlock(DWC_AC_WORK_SEARCH, sizeof(DWCAcSearchWork));
     sBlocks.wcm = DWCAc_AllocBlock(DWC_AC_WORK_WCM, 0x4800);
-    sBlocks.unk_04 = DWCAc_AllocBlock(DWC_AC_WORK_UNK_04, 0x58);
-    sBlocks.memFuncs = DWCAc_AllocBlock(DWC_AC_WORK_UNK_08, sizeof(DWCAcMemFuncs));
+    sBlocks.socConfig = DWCAc_AllocBlock(DWC_AC_WORK_SOC_CONFIG, 0x58);
+    sBlocks.memFuncs = DWCAc_AllocBlock(DWC_AC_WORK_MEMFUNCS, sizeof(DWCAcMemFuncs));
     MI_CpuClear32(sBlocks.search, sizeof(DWCAcSearchWork));
     MI_CpuClear32(sBlocks.wcm, 0x4800);
-    MI_CpuClear32(sBlocks.unk_04, 0x58);
+    MI_CpuClear32(sBlocks.socConfig, 0x58);
     MI_CpuClear32(sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
     work = sBlocks.search;
     work->dmaNo = param->dmaNo;
     work->radioOn = param->radioOn;
-    work->unk_14c8 = param->unk_0c;
+    work->rwin = param->rwin;
     work->ignoreEula = param->ignoreEula;
     funcs = sBlocks.memFuncs;
     funcs->alloc = param->alloc;
     funcs->free = param->free;
     funcs->unk_08 = NULL;
     work->mode = param->mode;
-    work->unk_14bc_4 = param->unk_0b_0;
+    work->skipConnectionTest = param->skipConnectionTest;
     work->rssiPacked = param->rssiPacked;
     DWCBm_ReadNtrSettings(work);
     if (OS_IsRunOnTwl()) {
@@ -346,16 +346,16 @@ static void DWCAc_FreeAllBlocks(void) {
         main->allocated &= ~DWC_AC_WORK_SEARCH;
         main->free(1, block, sizeof(DWCAcSearchWork));
     }
-    if (main->allocated & DWC_AC_WORK_UNK_08) {
-        void *block = DWCAc_GetBlock(DWC_AC_WORK_UNK_08);
+    if (main->allocated & DWC_AC_WORK_MEMFUNCS) {
+        void *block = DWCAc_GetBlock(DWC_AC_WORK_MEMFUNCS);
 
-        main->allocated &= ~DWC_AC_WORK_UNK_08;
+        main->allocated &= ~DWC_AC_WORK_MEMFUNCS;
         main->free(1, block, sizeof(DWCAcMemFuncs));
     }
-    if (main->allocated & DWC_AC_WORK_UNK_04) {
-        void *block = DWCAc_GetBlock(DWC_AC_WORK_UNK_04);
+    if (main->allocated & DWC_AC_WORK_SOC_CONFIG) {
+        void *block = DWCAc_GetBlock(DWC_AC_WORK_SOC_CONFIG);
 
-        main->allocated &= ~DWC_AC_WORK_UNK_04;
+        main->allocated &= ~DWC_AC_WORK_SOC_CONFIG;
         main->free(1, block, 0x58);
     }
     if (main->allocated & DWC_AC_WORK_WCM) {
@@ -379,10 +379,10 @@ void *DWCAc_GetBlock(u32 flag) {
     if (flag & DWC_AC_WORK_WCM) {
         return sBlocks.wcm;
     }
-    if (flag & DWC_AC_WORK_UNK_04) {
-        return sBlocks.unk_04;
+    if (flag & DWC_AC_WORK_SOC_CONFIG) {
+        return sBlocks.socConfig;
     }
-    if (flag & DWC_AC_WORK_UNK_08) {
+    if (flag & DWC_AC_WORK_MEMFUNCS) {
         return sBlocks.memFuncs;
     }
     if (flag & DWC_AC_WORK_SEARCH) {
@@ -405,7 +405,7 @@ static void DWCAc_SetState(u8 state) {
         main->maxState = state;
         if (state > 7) {
             main->candidateType = DWCAc_GetApTypeOfId(work->kind);
-            main->candidateResult = work->infos[work->selected].unk_00;
+            main->candidateResult = work->infos[work->selected].result;
         }
     }
 }
@@ -505,7 +505,7 @@ u8 DWCAc_GetApTypeOfId(u8 id) {
 
 // Lets go of the two blocks that only the search and the connection used
 static void DWCAc_FreeSearchBlocks(void) {
-    DWCAc_FreeBlock(DWC_AC_WORK_UNK_08, sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
+    DWCAc_FreeBlock(DWC_AC_WORK_MEMFUNCS, sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
     DWCAc_FreeBlock(DWC_AC_WORK_SEARCH, sBlocks.search, sizeof(DWCAcSearchWork));
 }
 
@@ -513,19 +513,17 @@ static void DWCAc_FreeSearchBlocks(void) {
 // (id 0x12 on) always gives 1. The candidates are compared as far as the other one's SSID is long, starting at the
 // BSSID
 //
-// BUG: the comparison starts at the BSSID, whose six bytes and the SSID's length come first, where the SSIDs were
-// probably meant, to tell that another access point has the same name
+// style-ok: bug no BUGFIX, since the callers don't show which comparison was meant
+// BUG: strncmp compares the BSSIDs for the length of the SSID, and stops at a zero byte of a BSSID, so the access
+// points whose OUIs start with 0 come out equal. Either the SSIDs were meant (another access point with the same name)
+// or the six bytes of the BSSIDs (memcmp); the callers only test the result for 0, so the code doesn't say which
 static u8 DWCAc_FindSimilarCandidate(void) {
     u8 i;
     u8 count;
     DWCAcSearchWork *work = sBlocks.search;
     s16 selected = work->selected;
     u8 kind = work->kind;
-#ifdef BUGFIX
-    const char *name = (const char *)work->candidates[selected].ssid;
-#else
     const char *name = (const char *)work->candidates[selected].bssid;
-#endif
 
     if (kind >= 0x12) {
         return 1;
@@ -533,11 +531,7 @@ static u8 DWCAc_FindSimilarCandidate(void) {
     count = work->candidateCount;
     for (i = 0; i < count; i++) {
         if (i != selected && work->infos[i].id < 0x12) {
-#ifdef BUGFIX
-            if (strncmp(name, (const char *)work->candidates[i].ssid, work->candidates[i].ssidLength) == 0) {
-#else
             if (strncmp(name, (const char *)work->candidates[i].bssid, work->candidates[i].ssidLength) == 0) {
-#endif
                 return 2;
             }
         }

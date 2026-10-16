@@ -1,5 +1,5 @@
 #include "dwc/wcm.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitrowifi/soc.h"
 #include "socl_internal.h"
@@ -154,7 +154,7 @@ CPSInAddr SOCL_GetHostID(void) {
 
     if (ip == 0) {
         if ((SOCLiDhcpState & (SOCLI_DHCP_REQUESTED | SOCLI_DHCP_DONE)) == SOCLI_DHCP_REQUESTED) {
-            if (OS_GetProcMode() != 0x12) {
+            if (OS_GetProcMode() != OS_PROCMODE_IRQ) {
                 OS_Sleep(10);
             }
         }

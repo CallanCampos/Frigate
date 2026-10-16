@@ -1,8 +1,8 @@
 #include "nitrowifi/cps.h"
 #include "cps_internal.h"
 #include "dwc/wcm.h"
-#include "gfl/std.h"
 #include "nitro/math.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 
 // NitroWiFi's CPS, the TCP/IP stack under the socket layer (SOCL) in overlay 11: ARP, IP with its fragments, ICMP's
