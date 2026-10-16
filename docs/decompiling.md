@@ -44,6 +44,18 @@ adds each variant's count of differing aligned lines, to tell apart variants of 
 `tools/decomp/locals.py src/... FUNC` prints the register or stack slot of each parameter and local of a function,
 from the debug info of its built object, which shows which variable to move when registers or stack slots differ.
 
+`tools/decomp/find_duplicates.py` lists the functions the build put in more than one place, which the DS build does
+with helpers copied into overlays and libraries linked twice, so writing one copy's C matches its duplicates. It
+fingerprints every function of size >= `--min-size` (0x10 by default) by its masked bytes, groups the identical ones,
+and labels each group by its relocation targets: `identical`, `same via duplicates` (the targets are themselves one
+duplicate group) or `same shape` (same bytes, targets elsewhere, so not proven the same code). Its TSV lists free
+matches first - a group with one matched copy, whose C proves the others - then unmatched groups by copies x size. For
+each unmatched copy it says whether the function is `global` (referenced from outside its file, so it is emitted as
+soon as it is written), `static` (it needs the in-file callers the row lists, up to a global function), `static?`
+(every reference is inside a range the delinks have not covered yet, so its boundary has to be found first, as in the
+`decomp-file` skill) or `unreferenced`. Near-duplicates are not reported, and a pointer dsd did not record is not
+seen.
+
 `tools/decomp/rodata_order.py` predicts how MWCC lays out a file's static data and searches small reorderings; when
 no structured order reaches the ROM's layout, `tools/decomp/rodata_solver.py` anneals the sequence of sizes by
 declaration slot until the layout-forced declaration order defines every table before its users, and prints the
