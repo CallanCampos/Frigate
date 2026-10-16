@@ -1,9 +1,10 @@
 #include "nnsys/g3d.h"
 
-// NitroSystem's G3D texture pattern animation (NSBTP, the "BTP0" files): the function that fills in an animation
-// object for one, the function the object holds, which changes a material's texture and palette at a frame, and the
-// two that set them in a material's result. The file is named after NitroSystem's nsbtp.c. The two global functions
-// are the ones that anm.c's tables hold; the others are static because only this file calls them
+// NitroSystem's G3D texture pattern animation (NSBTP, the "BTP0" files): the function that fills in an animation object
+// for one, the function the object holds, which changes a material's texture and palette at a frame, and the two that
+// set them in a material's result. The file is named after NitroSystem's nsbtp.c. The two global functions are the ones
+// that anm.c's tables hold; the others are static because only this file calls them. Their names are NitroSystem's as
+// recalled, misspelling included, not shown by the code, and ours in config/names.txt
 
 static void SetTexParamaters_(const NNSG3dResTex *tex, const NNSG3dResName *texName, NNSG3dMatAnmResult *result);
 static void SetPlttParamaters_(const NNSG3dResTex *tex, const NNSG3dResName *plttName, NNSG3dMatAnmResult *result);
@@ -12,16 +13,15 @@ static void SetPlttParamaters_(const NNSG3dResTex *tex, const NNSG3dResName *plt
 // texture coordinate generation mode
 #define TEXIMAGE_PARAM_KEEP_MASK 0xc00f0000
 
-// Fills in an animation object for a texture pattern animation (NitroSystem's NNS_G3dAnmObjInitNsBtp). It applies the
-// animation with the variable that swan names NNS_G3dFuncAnmMatNsBta, which seems swapped with NNS_G3dFuncAnmMatNsBtp
-// (see nsbta.c). It maps each material of the model to the data of the animation's material of the same name, which is
-// flagged as existing and holds the data's index
+// Fills in an animation object for a texture pattern animation (NitroSystem's NNSi_G3dAnmObjInitNsBtp, as recalled).
+// It applies the animation with NNS_G3dFuncAnmMatNsBtp, and maps each material of the model to the data of the
+// animation's material of the same name, which is flagged as existing and holds the data's index
 void NNS_G3DAnimationInit_TP(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResTexPatAnm *patAnm = anm;
     const NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     u32 i;
 
-    anmObj->funcAnm = NNS_G3dFuncAnmMatNsBta;
+    anmObj->funcAnm = (void *)NNS_G3dFuncAnmMatNsBtp;
     anmObj->numMapData = mdl->info.numMat;
     anmObj->resAnm = anm;
     MI_CpuClear16(anmObj->mapData, anmObj->numMapData * sizeof(u16));
@@ -36,9 +36,12 @@ void NNS_G3DAnimationInit_TP(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3d
 }
 
 // Sets the texture of a material's result to the one of the name: its parameters, with its place in VRAM added, while
-// the result keeps the material's repeat, flip and texture coordinate generation. The texture's size becomes the
-// result's original size, so the magnification that follows, which compares the texture's size with the original
-// size as the binding of a texture to a material does in kernel.c, always comes out as one
+// the result keeps the material's repeat, flip and texture coordinate generation. The texture's size is stored as the
+// result's original size before the magnification compares the two, so the magnification always comes out as one.
+// kernel.c's binding instead compares the texture with the material's own original size. The texture matrix then works
+// in the new texture's size here, which agrees with kernel.c's for the translation, and for the rest of the matrix
+// when the pattern's textures have the material's size. A texture of another size is the only case where the two
+// differ, and nothing shows whether NitroSystem supports it, so this is not marked as a bug
 static void SetTexParamaters_(const NNSG3dResTex *tex, const NNSG3dResName *texName, NNSG3dMatAnmResult *result) {
     const NNSG3dResDictTexData *texData = tex != NULL ? NNS_G3dGetResDataByName(&tex->dict, texName) : NULL;
     u32 vramOffset;

@@ -37,7 +37,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
 - A `u16` local and `local ± 1` sharing a register can push a parameter out of r0: a wider local keeps them apart.
   (matching.md: "wider local")
-- A ternary store computes the address once, an `if`/`else` store in each branch. (matching.md: "ternary store")
+- A ternary store computes the address once, an `if`/`else` store in each branch, and at the end of a function a
+  copy of the epilogue in each. (matching.md: "ternary store")
 - `p + (a + 4)` and `p + a + 4` differ. (matching.md: "Parenthesized offsets")
 - A sum folded into the load's offset (`ldrb r2, [r3, #9]` from `base + pos`) where ours adds `pos + 1` first:
   `*(data + pos + 1)` instead of `data[pos + 1]`; this also folds `- 1` in `BrProcSys_Pop`.
@@ -264,6 +265,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A static table's address loaded into a saved register at entry after a parameter's spill, where the original
   loads it first: drop the pointer local aliasing the table and index the table at each use.
   (matching.md: "A static table's address that MWCC gathers")
+- Constant stores in descending order: one chained assignment written from the first element to the last.
+  (matching.md: "A longer chain also stores from the right")
+- Calls packed into one word with a kept bit, the bit tested before the calls and spilled: the calls into locals,
+  then the packing. (matching.md: "packed into one word")
 
 ## An instruction too many or too few
 
@@ -364,6 +369,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   first step, or a second local with a role of its own. (matching.md: "keeps the two steps only when")
 - Two `rsb`s of a double negation (`-h * -t`) that MWCC drops: the negated value in a local assigned first, or a
   cast around it. (matching.md: "A double negation folds the same way")
+- `rsb #0; add #c` for `c - (a + b)` where ours has one `rsb #c`: a local assigned `-(a + b)` folds too, so no
+  natural spelling is known. (matching.md: "A negated sum folds")
+- A dot product's translation added after the shift, 8 bytes larger in one expression: `+=` in a statement of its
+  own. (matching.md: "adds each translation")
 
 ## Branches and block layout
 
@@ -517,7 +526,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but
   given the `.data` tables with the `.rodata` objects it predicts the `.rodata` order. (matching.md: "The list that is
   heapsorted")
-- `.bss` statics are ordered by size, then in an order that isn't the declaration order; try permutations.
+- `.bss` statics in another order: MWCC 2.0 lays them out in the reverse of their definitions without `-ipa file`, and
+  with it in their order with the first one moved to the end. (matching.md: "with the first one moved to the end")
 - A table that only one function reads can be a `static const` inside it, which moves it in the heapsort's list.
   (matching.md: "declared inside the one function")
 - A `.rodata` template copied to a local, then patched with computed fields, in a section of its own: a local

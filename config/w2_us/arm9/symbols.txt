@@ -8784,8 +8784,8 @@ zOffsetStep_ kind:data(any) addr:0x0209b2c0
 NNS_G3D_ANIMATION_INIT_HEADER_COUNT kind:data(any) addr:0x0209b2c4
 NNS_G3dFuncAnmVisNsBva kind:data(any) addr:0x0209b2c8
 NNS_G3dFuncAnmJntNsBca kind:data(any) addr:0x0209b2cc
-NNS_G3dFuncAnmMatNsBtp kind:data(any) addr:0x0209b2d0
-NNS_G3dFuncAnmMatNsBta kind:data(any) addr:0x0209b2d4
+NNS_G3dFuncAnmMatNsBta kind:data(any) addr:0x0209b2d0
+NNS_G3dFuncAnmMatNsBtp kind:data(any) addr:0x0209b2d4
 NNS_G3dFuncAnmMatNsBma kind:data(any) addr:0x0209b2d8
 NNS_G3dFuncBlendVis kind:data(any) addr:0x0209b2dc
 NNS_G3dFuncBlendJnt kind:data(any) addr:0x0209b2e0

@@ -28,7 +28,7 @@ void *NNS_G3dGetResDataByName(const NNSG3dResDict *dict, const NNSG3dResName *na
             }
         }
     } else {
-        const NNSG3dResDictTreeNode *tree = (const NNSG3dResDictTreeNode *)(dict + 1);
+        const NNSG3dResDictTreeNode *tree = dict->node;
 
         if (tree->idxChild[0] != 0) {
             const NNSG3dResDictTreeNode *prev = tree;
@@ -72,7 +72,7 @@ int NNS_G3dGetResDictIdxByName(const NNSG3dResDict *dict, const NNSG3dResName *n
             }
         }
     } else {
-        const NNSG3dResDictTreeNode *tree = (const NNSG3dResDictTreeNode *)(dict + 1);
+        const NNSG3dResDictTreeNode *tree = dict->node;
 
         if (tree->idxChild[0] != 0) {
             const NNSG3dResDictTreeNode *prev = tree;

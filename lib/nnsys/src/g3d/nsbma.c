@@ -3,7 +3,8 @@
 // NitroSystem's G3D material color animation (NSBMA, the "BMA0" files): the function that fills in an animation object
 // for one, the function the object holds, which sets a material's colors and alpha at a frame, and the readers of the
 // animation's values. The file is named after NitroSystem's nsbma.c. The two global functions are the ones that anm.c's
-// tables hold; the readers are static because only this file calls them
+// tables hold; the readers are static because only this file calls them. Their names are guesses in NitroSystem's
+// style, ours in config/names.txt
 
 // The red and blue bits of a color. They are far enough apart to be summed together, while the green bits are summed
 // on their own, so that no sum carries into the next channel
@@ -11,7 +12,7 @@
 
 // Three parts of one color and one of the other, in the bits of a mask: the sum comes out shifted two bits down by the
 // caller
-#define BLEND_3_1(a, b, mask) (((a) & (mask)) + ((a) & (mask)) + ((a) & (mask)) + ((b) & (mask)))
+#define BLEND_3_1(a, b, mask) (3 * ((a) & (mask)) + ((b) & (mask)))
 
 static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame);
 static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame);
@@ -64,8 +65,8 @@ static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
                     idxA = frame >> 2;
                     idxB = idxA + 1;
                 }
-                a = *(data + idxA);
-                b = *(data + idxB);
+                a = data[idxA];
+                b = data[idxB];
                 rb = BLEND_3_1(a, b, COLOR_RB_MASK) >> 2;
                 g = BLEND_3_1(a, b, GX_RGB_G_MASK) >> 2;
                 return (rb & COLOR_RB_MASK) | (g & GX_RGB_G_MASK);
@@ -114,17 +115,17 @@ static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
                 return (data + (last >> 2))[rem];
             }
             if (frame & 1) {
-                // The nearer stored value is at idxA and the other at frame
                 u32 idxA;
+                u32 idxB;
 
                 if (frame & 2) {
-                    frame >>= 2;
-                    idxA = frame + 1;
+                    idxB = frame >> 2;
+                    idxA = idxB + 1;
                 } else {
                     idxA = frame >> 2;
-                    frame = idxA + 1;
+                    idxB = idxA + 1;
                 }
-                return (data[idxA] + data[idxA] + data[idxA] + data[frame]) >> 2;
+                return (3 * data[idxA] + data[idxB]) >> 2;
             }
             return (*(data + (frame >> 2)) + *(data + (frame >> 2) + 1)) >> 1;
         }
@@ -132,15 +133,15 @@ static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
     }
 }
 
-// Fills in an animation object for a material color animation (NitroSystem's NNS_G3dAnmObjInitNsBma). It applies the
-// animation with NNS_G3dFuncAnmMatNsBma, and maps each material of the model to the data of the animation's material
-// of the same name, which is flagged as existing and holds the data's index
+// Fills in an animation object for a material color animation (NitroSystem's NNSi_G3dAnmObjInitNsBma, as recalled). It
+// applies the animation with NNS_G3dFuncAnmMatNsBma, and maps each material of the model to the data of the animation's
+// material of the same name, which is flagged as existing and holds the data's index
 void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResMatCAnm *matAnm = anm;
     const NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     u32 i;
 
-    anmObj->funcAnm = NNS_G3dFuncAnmMatNsBma;
+    anmObj->funcAnm = (void *)NNS_G3dFuncAnmMatNsBma;
     anmObj->numMapData = mdl->info.numMat;
     MI_CpuClear16(anmObj->mapData, anmObj->numMapData * sizeof(u16));
     for (i = 0; i < matAnm->dict.numEntry; i++) {

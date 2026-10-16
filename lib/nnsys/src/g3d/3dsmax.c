@@ -200,7 +200,7 @@ void NNSi_G3dSendTexSRT3dsMax(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[1][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[1][1]) >> FX32_SHIFT);
         cmd.mtx.m[3][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[3][1]) >> FX32_SHIFT);
     }
-    // The arguments (the matrix modes and the matrix) follow the opcodes
-    NNS_G3dGeBufferOP_N(cmd.op, (u32 *)&cmd + 1, 18);
+    // The arguments, the matrix modes and the matrix, are the words that follow the opcodes
+    NNS_G3dGeBufferOP_N(cmd.op, &cmd.modeTexture, sizeof(cmd) / sizeof(u32) - 1);
 }
 #pragma thumb on

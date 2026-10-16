@@ -194,7 +194,9 @@ Same instructions, registers swapped.
   shop's arrow is placed with `row = ...; y = row * rowHeight; pos.y = y + 22;`.
 - Two stores of the same constant share a register when chained, and not when written as two initializers.
   `second = first = TRUE;` stores `first` first. `nearXZ = FALSE; nearY = FALSE;` in that order loads the zero twice,
-  while the other order shares it.
+  while the other order shares it. A longer chain also stores from the right: NitroSystem G3D's `maya.c` zeroes nine
+  elements of a texture matrix in `NNSi_G3dSendTexSRTMaya` with one chain written from `m[0][2]` to `m[3][2]`, which
+  stores the elements from the last to the first, the original's descending order.
 - A pointer local to an element of a struct, like `dst = &shot->pokes[i]`, takes a callee-saved register of its own
   and can push the struct's pointer to the stack along with a constant MWCC keeps for it. The musical's photo
   (`musical_event.c`'s `func_ov012_02151384`) only matches with `shot->pokes[pos].field` written at each use.
@@ -574,9 +576,12 @@ Same code, other `sp` offsets or frame size.
   `smull`/`smlal` chain with different registers, and only the one expression merges the loads of neighbouring fields
   into an `ldm`. libfx's `VEC_Mag`, `VEC_Fx16Mag`, `VEC_Distance` and `VEC_Normalize` match only with `+=`; a rounding
   constant added in 32 bits to the last term (`sum += a->z * b->z + 0x800`) is what `VEC_Fx16DotProduct` needs.
+  G3D's `util.c` adds each translation in a statement of its own after the dot product's shift in
+  `NNS_G3dWorldPosToScrPos` (`w = (fx32)((...) >> FX32_SHIFT); w += proj->m[3][3];`); in the same expression the
+  function is 8 bytes larger.
 - A sum of two 64-bit products in one expression, `(fx64)a * b + (fx64)c * d`, multiplies the right product first
   (`smull`) and accumulates the left one into it (`smlal`), so the source names the products in the reverse of the
-  asm's order. NitroSystem's `3dsmax.c` writes `(fx64)result->sinR * offsetS + (fx64)result->cosR * offsetT` in
+  asm's order. G3D's `3dsmax.c` writes `(fx64)result->sinR * offsetS + (fx64)result->cosR * offsetT` in
   `calcTexMtx3dsMaxRT_` for `smull` of `cosR` and `offsetT`, then `smlal` of `sinR` and `offsetS`; its `SR_` and
   `SRT_` and `xsi.c`'s `RT_` and `SRT_` match the same way.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
@@ -1081,9 +1086,20 @@ Same instructions, scheduled in another order.
   stay two registers, with the moves between them: `DWCAc_DecodeNdwcShapSsid` walks the permutation with a cursor
   for the place the byte came from and one for where it goes, and one cursor compiles 12 bytes shorter.
 - A double negation folds the same way: `-h * -t` compiles to `h * t`, and the two `rsb`s stay only when the negated
-  value goes through a local assigned first. NitroSystem's `xsi.c` writes `turnedT = -result->transT;` before the
-  stores in `calcTexMtxXsiT_` and then `-result->origHeight * turnedT`; a cast keeps them too, as its
-  `calcTexMtxXsiST_` does with `(fx64)(-result->transT) * result->scaleT`.
+  value goes through a local assigned first. G3D's `xsi.c` gives `calcTexMtxXsiT_` the turned translations of
+  `calcTexMtxXsiRT_` with a zero rotation, `turnedS = result->transS; turnedT = -result->transT;`, before the stores
+  and then writes `-result->origHeight * turnedT`; a cast keeps them too, as its `calcTexMtxXsiST_` does with
+  `(fx64)(-result->transT) * result->scaleT`.
+- A negated sum folds into a constant added after it even through a local: `FX32_ONE - (a + b)`, `-(a + b) + FX32_ONE`
+  and `sum = -(a + b);` then `sum + FX32_ONE` all compile to one `rsb r0, r0, #0x1000`, where G3D's `maya.c` has
+  `rsb r0, r0, #0; add r0, r0, #0x1000` in `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`. Only the negation in a statement
+  of its own (`sum = a + b; sum = -sum;`) keeps the two, which no one would write, so both functions stay 4 bytes
+  short.
+- Calls whose results are packed into one word with a bit kept from the old word are not kept in order with the bit:
+  G3D's `nsbma.c` builds a material's two color words in `NNS_G3DAnimationApply_MA`, and with
+  `GX_PACK_DIFFAMB_PARAM(getColorData_(...), getColorData_(...), result->prmMatColor0 & 0x8000)` in one expression
+  MWCC tests the kept bit before the calls and spills it (12 bytes larger). It matches with two calls into locals, the
+  store of the first word, and then the other two calls.
 
 ## An instruction too many or too few
 
@@ -1408,7 +1424,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u16`, for the flag to take the freed pointer register `r7`; set in two statements it outranks the temporaries and
   takes the lowest free scratch register.
 - A ternary store `*p = c ? a : b` computes the address once and stores after the branches; an `if`/`else` with a
-  store in each branch computes the address in each, as `Bitmap_Scroll16` does.
+  store in each branch computes the address in each, as `Bitmap_Scroll16` does. At the end of a function each branch
+  also gets a copy of the epilogue: G3D's `nsbtp.c` sets the texture's magnification in `SetTexParamaters_` with
+  `result->magW = width != result->origWidth ? FX_Div(...) : FX32_ONE;`, and with an `if`/`else` it is 4 bytes short.
 - Parenthesized offsets change the code: `pixels + (dst + 4)` adds the offsets and indexes once, `pixels + dst + 4`
   adds to the pointer twice (`Bitmap_Scroll256`).
 - The operand order of a product decides which value is loaded first: `(row + 1) * rowHeight * 2` and
@@ -2184,12 +2202,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   file scope or inside its one function, and each static at the top, before its first function or inside it. Its
   `.rodata` and `.bss` are the original's with four tables inside their functions, `sXItems` and `sCureItems` at
   file scope before theirs, and `sSelectSeq` declared before the first function that uses it.
-- MWCC 2.0 lays a file's `.bss` statics out in the reverse of their definition order, without the size sort: the
-  DWC utility's `dwc_wcm.c` (overlay 182) matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and
-  `sEssid[0x20]` defined in that order, but the module check failed until they were defined as `sEssid`, `sBssid`,
-  `sWcm`, the ROM's order backwards. The symptom is literal pool addresses off by another static's size:
-  DPW's `dpw_tr.c` (overlay 189) differed in 61 bytes, each `sDpwTrWork` address 4 bytes off, until `sDpwTrWork`
-  was defined before the 4-byte `sDpwTrServerType`.
+- MWCC 2.0 lays a file's `.bss` statics out without the size sort, in an order of their definitions that depends on
+  `-ipa`. Without `-ipa file` it is the reverse of their definition order: the DWC utility's `dwc_wcm.c` (overlay 182)
+  matched every function with `sWcm` (0x28 bytes), `sBssid[6]` and `sEssid[0x20]` defined in that order, but the
+  module check failed until they were defined as `sEssid`, `sBssid`, `sWcm`, the ROM's order backwards. The symptom is
+  literal pool addresses off by another static's size: DPW's `dpw_tr.c` (overlay 189) differed in 61 bytes, each
+  `sDpwTrWork` address 4 bytes off, until `sDpwTrWork` was defined before the 4-byte `sDpwTrServerType`. With
+  `-ipa file` it is the definition order with the first one moved to the end, which is the reverse only for two
+  objects: NitroSystem G3D's `gecom.c` defines `NNS_G3dFlagUseFastDma`, `sGeBuffer` and `sDmaBusy`, which the ROM has
+  as `sGeBuffer`, `sDmaBusy`, `NNS_G3dFlagUseFastDma`, and three or four words compiled alone with the library's flags
+  come out the same way.
 - MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
   first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
   count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of

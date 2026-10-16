@@ -85,13 +85,15 @@ static void calcTexMtxXsiST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 
 // The same for a zero rotation and a scale of one
 static void calcTexMtxXsiT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
-    fx32 turnedT; // the turned T translation of calcTexMtxXsiRT_: with a zero rotation, the T translation negated
+    // The turned translations of calcTexMtxXsiRT_, with a zero rotation: S as it is and T negated
+    fx32 turnedS, turnedT;
 
     mtx->m[0][0] = FX32_ONE;
     mtx->m[1][1] = FX32_ONE;
     mtx->m[0][1] = 0;
+    turnedS = result->transS;
     turnedT = -result->transT;
-    mtx->m[3][0] = (result->origWidth * -result->transS) << 4;
+    mtx->m[3][0] = (result->origWidth * -turnedS) << 4;
     mtx->m[3][1] = (-result->origHeight * turnedT) << 4;
     mtx->m[1][0] = 0;
 }
@@ -205,7 +207,7 @@ void NNSi_G3dSendTexSRTXsi(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[1][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[1][1]) >> FX32_SHIFT);
         cmd.mtx.m[3][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[3][1]) >> FX32_SHIFT);
     }
-    // The arguments (the matrix modes and the matrix) follow the opcodes
-    NNS_G3dGeBufferOP_N(cmd.op, (u32 *)&cmd + 1, 18);
+    // The arguments, the matrix modes and the matrix, are the words that follow the opcodes
+    NNS_G3dGeBufferOP_N(cmd.op, &cmd.modeTexture, sizeof(cmd) / sizeof(u32) - 1);
 }
 #pragma thumb on

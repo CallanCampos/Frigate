@@ -4,13 +4,13 @@
 // one, and the function the object holds, which tells whether a node shows at a frame. The file is named after
 // NitroSystem's nsbva.c. Both functions are the ones that anm.c's tables hold
 
-// Fills in an animation object for a visibility animation (NitroSystem's NNS_G3dAnmObjInitNsBva). It applies the
-// animation with NNS_G3dFuncAnmVisNsBva, and maps each node of the model to the data at its index, which is flagged as
-// existing
+// Fills in an animation object for a visibility animation (NitroSystem's NNSi_G3dAnmObjInitNsBva, as recalled). It
+// applies the animation with NNS_G3dFuncAnmVisNsBva, and maps each node of the model to the data at its index, which is
+// flagged as existing
 void NNS_G3DAnimationInit_VA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
     u32 i;
 
-    anmObj->funcAnm = NNS_G3dFuncAnmVisNsBva;
+    anmObj->funcAnm = (void *)NNS_G3dFuncAnmVisNsBva;
     anmObj->numMapData = mdl->info.numNode;
     anmObj->resAnm = anm;
     for (i = 0; i < anmObj->numMapData; i++) {

@@ -55,7 +55,7 @@ void NNSi_G3dSendJointSRTSi3d(const NNSG3dJntAnmResult *result) {
 // says so. Every joint keeps its scale and inverse scale, relative to the root, in g_NNSG3DJointScales, and whether
 // that scale is one in the render state. The joint's scaleEx0 and scaleEx1 are the scale and inverse scale of its
 // parent, or flags say that they are one, as they are when the parent's scale is
-void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag) {
+void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag) {
     u32 node = cmd[1];
     u32 parent = cmd[2];
 
@@ -69,9 +69,9 @@ void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale,
             MIi_CpuCopy32(&g_NNSG3DJointScales[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
         }
     } else {
-        result->scale.x = scale[0].x;
-        result->scale.y = scale[0].y;
-        result->scale.z = scale[0].z;
+        result->scale.x = scale->scale.x;
+        result->scale.y = scale->scale.y;
+        result->scale.z = scale->scale.z;
         if (g_NNSG3DModelRenderer->isScaleOne[parent >> 5] & (1 << (parent & 0x1f))) {
             MIi_CpuCopy32(scale, &g_NNSG3DJointScales[node], sizeof(NNSG3dJointScale));
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
@@ -79,17 +79,17 @@ void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const VecFx32 *scale,
         } else {
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
             g_NNSG3DJointScales[node].scale.x =
-                (fx32)(((fx64)scale[0].x * g_NNSG3DJointScales[parent].scale.x) >> FX32_SHIFT);
+                (fx32)(((fx64)scale->scale.x * g_NNSG3DJointScales[parent].scale.x) >> FX32_SHIFT);
             g_NNSG3DJointScales[node].scale.y =
-                (fx32)(((fx64)scale[0].y * g_NNSG3DJointScales[parent].scale.y) >> FX32_SHIFT);
+                (fx32)(((fx64)scale->scale.y * g_NNSG3DJointScales[parent].scale.y) >> FX32_SHIFT);
             g_NNSG3DJointScales[node].scale.z =
-                (fx32)(((fx64)scale[0].z * g_NNSG3DJointScales[parent].scale.z) >> FX32_SHIFT);
+                (fx32)(((fx64)scale->scale.z * g_NNSG3DJointScales[parent].scale.z) >> FX32_SHIFT);
             g_NNSG3DJointScales[node].invScale.x =
-                (fx32)(((fx64)scale[1].x * g_NNSG3DJointScales[parent].invScale.x) >> FX32_SHIFT);
+                (fx32)(((fx64)scale->invScale.x * g_NNSG3DJointScales[parent].invScale.x) >> FX32_SHIFT);
             g_NNSG3DJointScales[node].invScale.y =
-                (fx32)(((fx64)scale[1].y * g_NNSG3DJointScales[parent].invScale.y) >> FX32_SHIFT);
+                (fx32)(((fx64)scale->invScale.y * g_NNSG3DJointScales[parent].invScale.y) >> FX32_SHIFT);
             g_NNSG3DJointScales[node].invScale.z =
-                (fx32)(((fx64)scale[1].z * g_NNSG3DJointScales[parent].invScale.z) >> FX32_SHIFT);
+                (fx32)(((fx64)scale->invScale.z * g_NNSG3DJointScales[parent].invScale.z) >> FX32_SHIFT);
             MIi_CpuCopy32(&g_NNSG3DJointScales[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
         }
     }
@@ -145,7 +145,7 @@ void NNSi_G3dSendTexSRTSi3d(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[1][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[1][1]) >> FX32_SHIFT);
         cmd.mtx.m[3][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[3][1]) >> FX32_SHIFT);
     }
-    // The arguments (the matrix modes and the matrix) follow the opcodes
-    NNS_G3dGeBufferOP_N(cmd.op, (u32 *)&cmd + 1, 1 + 12 + 1);
+    // The arguments, the matrix modes and the matrix, are the words that follow the opcodes
+    NNS_G3dGeBufferOP_N(cmd.op, &cmd.modeTexture, sizeof(cmd) / sizeof(u32) - 1);
 }
 #pragma thumb on

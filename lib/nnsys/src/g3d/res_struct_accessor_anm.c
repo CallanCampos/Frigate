@@ -22,14 +22,18 @@ void *NNS_G3dGetAnmByIdx(const NNSG3dResFileHeader *header, u32 idx) {
 // The name of a texture of the animation, or of a palette
 const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx) {
     if (anm != NULL && idx < anm->numTex) {
-        return (const NNSG3dResName *)((const u8 *)anm + anm->ofsTexName) + idx;
+        const NNSG3dResName *names = (const NNSG3dResName *)((const u8 *)anm + anm->ofsTexName);
+
+        return &names[idx];
     }
     return NULL;
 }
 
 const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx) {
     if (anm != NULL && idx < anm->numPltt) {
-        return (const NNSG3dResName *)((const u8 *)anm + anm->ofsPlttName) + idx;
+        const NNSG3dResName *names = (const NNSG3dResName *)((const u8 *)anm + anm->ofsPlttName);
+
+        return &names[idx];
     }
     return NULL;
 }

@@ -13,11 +13,11 @@ NNSG3dFuncBlendMat NNS_G3dFuncBlendMat = NNSi_G3dAnmBlendMat;
 NNSG3dFuncBlendJnt NNS_G3dFuncBlendJnt = NNSi_G3dAnmBlendJnt;
 NNSG3dFuncBlendVis NNS_G3dFuncBlendVis = NNSi_G3dAnmBlendVis;
 
-void *NNS_G3dFuncAnmMatNsBma = (void *)NNS_G3DAnimationApply_MA;
-void *NNS_G3dFuncAnmMatNsBta = (void *)NNS_G3DAnimationApply_TP;
-void *NNS_G3dFuncAnmMatNsBtp = (void *)NNS_G3DAnimationApply_TA;
-void *NNS_G3dFuncAnmJntNsBca = (void *)NNS_G3DAnimationApply_CA;
-void *NNS_G3dFuncAnmVisNsBva = (void *)NNS_G3DAnimationApply_VA;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBma = NNS_G3DAnimationApply_MA;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBtp = NNS_G3DAnimationApply_TP;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBta = NNS_G3DAnimationApply_TA;
+NNSG3dFuncAnmJnt NNS_G3dFuncAnmJntNsBca = NNS_G3DAnimationApply_CA;
+NNSG3dFuncAnmVis NNS_G3dFuncAnmVisNsBva = NNS_G3DAnimationApply_VA;
 
 u32 NNS_G3D_ANIMATION_INIT_HEADER_COUNT = 5;
 

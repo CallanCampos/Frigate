@@ -1067,7 +1067,6 @@ lib/nnsys/src/g3d/nsbca.c:
     .rodata     start:0x02094458 end:0x0209447c
 
 lib/nnsys/src/g3d/nsbma.c:
-    complete
     .text       start:0x0206970c end:0x02069a18
 
 lib/nnsys/src/g3d/nsbta.c:
@@ -1090,16 +1089,13 @@ lib/nnsys/src/g3d/maya.c:
     .data       start:0x0209b4a0 end:0x0209b4c0
 
 lib/nnsys/src/g3d/si3d.c:
-    complete
     .text       start:0x0206a714 end:0x0206ac28
 
 lib/nnsys/src/g3d/3dsmax.c:
-    complete
     .text       start:0x0206ac28 end:0x0206b26c
     .data       start:0x0209b4c0 end:0x0209b4e0
 
 lib/nnsys/src/g3d/xsi.c:
-    complete
     .text       start:0x0206b26c end:0x0206b8d4
     .data       start:0x0209b4e0 end:0x0209b500
 

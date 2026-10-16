@@ -5,9 +5,8 @@
 // material's texture matrix. They are the ones that cgtool.c's tables hold. The file is named after NitroSystem's
 // maya.c. A Maya joint can cancel the scale of its parent (segment scale compensate): the parent keeps its inverse
 // scale for the joint, and the joint scales by it after its translation. A texture matrix is made by one of eight
-// functions, by which of the scale, rotation and translation the material's result has. In the functions that negate
-// a sum, the sum is negated in a step of its own, which keeps the original's `rsb` and `add` apart. The three global
-// names are NitroSystem's as recalled, parallel to basic.c's; the statics' names are ours
+// functions, by which of the scale, rotation and translation the material's result has. The three global names are
+// NitroSystem's as recalled, parallel to basic.c's; the statics' names are ours
 
 // A function that makes the elements of a material's texture matrix that its scale, rotation and translation set: the
 // matrix (of which the caller sets the others) and the result
@@ -58,7 +57,7 @@ void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result) {
 // says so. A joint whose children cancel its scale (the NODEDESC command's flag) keeps its inverse scale in
 // g_NNSG3DJointScales and whether its scale is one in the render state. A joint that cancels its parent's scale takes
 // the parent's inverse scale as its scaleEx0, or flags it as one if the parent's scale is
-void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const VecFx32 *scale, const u8 *cmd, u32 srtFlag) {
+void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag) {
     u32 flags = cmd[3];
 
     if (srtFlag & NNS_G3D_SRTFLAG_SCALE_ONE) {
@@ -69,16 +68,16 @@ void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const VecFx32 *scale,
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] |= 1 << (node & 0x1f);
         }
     } else {
-        result->scale.x = scale[0].x;
-        result->scale.y = scale[0].y;
-        result->scale.z = scale[0].z;
+        result->scale.x = scale->scale.x;
+        result->scale.y = scale->scale.y;
+        result->scale.z = scale->scale.z;
         if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_CHILD) {
             u32 node = cmd[1];
 
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
-            g_NNSG3DJointScales[node].invScale.x = scale[1].x;
-            g_NNSG3DJointScales[node].invScale.y = scale[1].y;
-            g_NNSG3DJointScales[node].invScale.z = scale[1].z;
+            g_NNSG3DJointScales[node].invScale.x = scale->invScale.x;
+            g_NNSG3DJointScales[node].invScale.y = scale->invScale.y;
+            g_NNSG3DJointScales[node].invScale.z = scale->invScale.z;
         }
     }
     if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_APPLY) {
@@ -125,16 +124,14 @@ static void calcTexMtxMayaSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 static void calcTexMtxMayaRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
-    fx32 sum;
 
     FX_DivAsync(height, width);
     mtx->m[0][0] = result->cosR;
     mtx->m[1][1] = result->cosR;
     mtx->m[0][1] = (-result->sinR * FX_GetDivResult()) >> FX32_SHIFT;
     FX_DivAsync(width, height);
-    sum = result->sinR + result->cosR;
-    sum = -sum;
-    mtx->m[3][0] = ((result->origWidth * (sum + FX32_ONE)) << 3) - ((result->transS * result->origWidth) << 4);
+    mtx->m[3][0] = ((result->origWidth * (FX32_ONE - (result->sinR + result->cosR))) << 3) -
+                   ((result->transS * result->origWidth) << 4);
     mtx->m[3][1] = ((result->origHeight * (result->sinR - result->cosR + FX32_ONE)) << 3) +
                    ((result->transT * result->origHeight) << 4);
     mtx->m[1][0] = (result->sinR * FX_GetDivResult()) >> FX32_SHIFT;
@@ -186,7 +183,6 @@ static void calcTexMtxMayaSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 
 // The same for a zero translation and a scale of one
 static void calcTexMtxMayaR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
-    fx32 sum;
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
 
@@ -195,9 +191,7 @@ static void calcTexMtxMayaR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[1][1] = result->cosR;
     mtx->m[0][1] = (-result->sinR * FX_GetDivResult()) >> FX32_SHIFT;
     FX_DivAsync(width, height);
-    sum = result->sinR + result->cosR;
-    sum = -sum;
-    mtx->m[3][0] = (result->origWidth * (sum + FX32_ONE)) << 3;
+    mtx->m[3][0] = (result->origWidth * (FX32_ONE - (result->sinR + result->cosR))) << 3;
     mtx->m[3][1] = (result->origHeight * (result->sinR - result->cosR + FX32_ONE)) << 3;
     mtx->m[1][0] = (result->sinR * FX_GetDivResult()) >> FX32_SHIFT;
 }
@@ -265,7 +259,7 @@ void NNSi_G3dSendTexSRTMaya(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[1][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[1][1]) >> FX32_SHIFT);
         cmd.mtx.m[3][1] = (fx32)(((fx64)result->magH * cmd.mtx.m[3][1]) >> FX32_SHIFT);
     }
-    // The arguments (the matrix modes and the matrix) follow the opcodes
-    NNS_G3dGeBufferOP_N(cmd.op, (u32 *)&cmd + 1, 18);
+    // The arguments, the matrix modes and the matrix, are the words that follow the opcodes
+    NNS_G3dGeBufferOP_N(cmd.op, &cmd.modeTexture, sizeof(cmd) / sizeof(u32) - 1);
 }
 #pragma thumb on

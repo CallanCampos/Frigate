@@ -51,16 +51,18 @@ int NNS_G3dWorldPosToScrPos(const VecFx32 *world, int *x, int *y) {
     int y1;
     int x2;
     int y2;
+    int width;
+    int height;
 
     MTX_MultVec43(world, &NNS_G3dGlb.cameraMtx, &view);
-    w = (fx32)(((fx64)view.z * proj->m[2][3] + ((fx64)view.x * proj->m[0][3] + (fx64)view.y * proj->m[1][3])) >>
+    w = (fx32)(((fx64)view.x * proj->m[0][3] + (fx64)view.y * proj->m[1][3] + (fx64)view.z * proj->m[2][3]) >>
                FX32_SHIFT);
     w += proj->m[3][3];
     FX_InvAsync(w);
-    clipX = (fx32)(((fx64)view.z * proj->m[2][0] + ((fx64)view.x * proj->m[0][0] + (fx64)view.y * proj->m[1][0])) >>
+    clipX = (fx32)(((fx64)view.x * proj->m[0][0] + (fx64)view.y * proj->m[1][0] + (fx64)view.z * proj->m[2][0]) >>
                    FX32_SHIFT);
     clipX += proj->m[3][0];
-    clipY = (fx32)(((fx64)view.z * proj->m[2][1] + ((fx64)view.x * proj->m[0][1] + (fx64)view.y * proj->m[1][1])) >>
+    clipY = (fx32)(((fx64)view.x * proj->m[0][1] + (fx64)view.y * proj->m[1][1] + (fx64)view.z * proj->m[2][1]) >>
                    FX32_SHIFT);
     clipY += proj->m[3][1];
     invW = FX_GetDivResultFx64c();
@@ -73,13 +75,10 @@ int NNS_G3dWorldPosToScrPos(const VecFx32 *world, int *x, int *y) {
     }
     // The viewport's y counts up from the bottom of the screen, whose last line is 191
     NNS_G3DGetViewport(&x1, &y1, &x2, &y2);
-    {
-        int width = x2 - x1;
-        int height = y2 - y1;
-
-        *x = x1 + ((fracX * width + FX32_HALF) >> FX32_SHIFT);
-        *y = 191 - y1 - ((fracY * height + FX32_HALF) >> FX32_SHIFT);
-    }
+    width = x2 - x1;
+    height = y2 - y1;
+    *x = x1 + ((fracX * width + FX32_HALF) >> FX32_SHIFT);
+    *y = 191 - y1 - ((fracY * height + FX32_HALF) >> FX32_SHIFT);
     return result;
 }
 

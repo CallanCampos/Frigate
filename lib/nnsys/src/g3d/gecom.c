@@ -5,19 +5,22 @@
 // NitroSystem's G3D geometry command buffer: every geometry command that G3D sends goes through NNS_G3dGeBufferOP_N,
 // and a display list through NNS_G3dGeSendDL. A large display list goes to the FIFO by DMA when GX has a channel, and
 // the commands that follow it wait in the buffer, if there is one, until the DMA is done. The file is named after
-// NitroSystem's own gecom.c. WaitDma and OnDmaDone are static because only this file calls them
+// NitroSystem's own gecom.c. WaitDma and OnDmaDone are static because only this file refers to them
 
 #define GEBUFFER_ARRAY_SIZE 192
 
 // The commands that wait for the DMA: the number of words, then the words as the FIFO takes them (each command, then
-// its parameters)
+// its parameters). GeBuffer and GEBUFFER_ARRAY_SIZE are our names
 typedef struct {
     u32 idx;
     u32 data[GEBUFFER_ARRAY_SIZE];
 } GeBuffer;
 
 static void WaitDma(void);
+static void OnDmaDone(void *arg);
 
+// With -ipa file, MWCC lays these out in the order they are declared but with the first one last: sGeBuffer, sDmaBusy,
+// then NNS_G3dFlagUseFastDma
 u32 NNS_G3dFlagUseFastDma;
 static GeBuffer *sGeBuffer;
 // Whether a display list is on its way by DMA; the DMA's callback (OnDmaDone) clears it from the interrupt
@@ -61,54 +64,50 @@ static void WaitDma(void) {
     }
 }
 
+// The DMA's callback, run from its interrupt: arg is sDmaBusy, which WaitDma spins on
 static void OnDmaDone(void *arg) {
-    *(BOOL *)arg = FALSE;
+    *(volatile BOOL *)arg = FALSE;
 }
 
-// Send the display list by DMA on GX's channel: the SDK's DMA on a DS, and on a DSi also the NDMA for the channels
-// above 3 (GX's channel minus 4), where the SDK's functions get GX_DMA_NOT_USE. The fast one is the SDK's variant that
-// doesn't wait for the FIFO to be half empty
+// GX's DMA channel as the SDK's DMA functions take it, GX_DMA_NOT_USE for the DSi's NDMA channels above 3, and as the
+// NDMA functions take it, the channel minus 4, or GX_DMA_NOT_USE for the SDK's own
+static inline u32 ToDmaNo(u32 id) {
+    return id > MI_DMA_MAX_NUM ? GX_DMA_NOT_USE : id;
+}
+
+static inline u32 ToNDmaNo(u32 id) {
+    return id > MI_DMA_MAX_NUM ? id - 4 : GX_DMA_NOT_USE;
+}
+
+// Send the display list by DMA on GX's channel: the SDK's DMA on a DS, and on a DSi the NDMA for the channels above 3.
+// The fast one is the SDK's variant that doesn't wait for the FIFO to be half empty
 static inline void SendDisplayListFast(const u32 *dl, u32 size) {
     if (OS_IsRunOnTwl()) {
-        u32 dmaNo = GXi_DmaId;
-        u32 sdkDmaNo = dmaNo > MI_DMA_MAX_NUM ? GX_DMA_NOT_USE : dmaNo;
+        u32 id = GXi_DmaId;
+        u32 dmaNo = ToDmaNo(id);
 
-        if (sdkDmaNo == GX_DMA_NOT_USE) {
-            u32 ndmaNo = GX_DMA_NOT_USE;
-
-            if (dmaNo > MI_DMA_MAX_NUM) {
-                ndmaNo = dmaNo - 4;
-            }
-            MI_SendNDmaGXCommandAsyncFast(ndmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+        if (dmaNo == GX_DMA_NOT_USE) {
+            MI_SendNDmaGXCommandAsyncFast(ToNDmaNo(id), dl, size, OnDmaDone, (void *)&sDmaBusy);
         } else {
-            MI_SendGXCommandAsyncFast(sdkDmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+            MI_SendGXCommandAsyncFast(dmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
         }
     } else {
-        u32 sdkDmaNo = GXi_DmaId > MI_DMA_MAX_NUM ? GX_DMA_NOT_USE : GXi_DmaId;
-
-        MI_SendGXCommandAsyncFast(sdkDmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+        MI_SendGXCommandAsyncFast(ToDmaNo(GXi_DmaId), dl, size, OnDmaDone, (void *)&sDmaBusy);
     }
 }
 
 static inline void SendDisplayList(const u32 *dl, u32 size) {
     if (OS_IsRunOnTwl()) {
-        u32 dmaNo = GXi_DmaId;
-        u32 sdkDmaNo = dmaNo > MI_DMA_MAX_NUM ? GX_DMA_NOT_USE : dmaNo;
+        u32 id = GXi_DmaId;
+        u32 dmaNo = ToDmaNo(id);
 
-        if (sdkDmaNo == GX_DMA_NOT_USE) {
-            u32 ndmaNo = GX_DMA_NOT_USE;
-
-            if (dmaNo > MI_DMA_MAX_NUM) {
-                ndmaNo = dmaNo - 4;
-            }
-            MI_SendNDmaGXCommandAsync(ndmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+        if (dmaNo == GX_DMA_NOT_USE) {
+            MI_SendNDmaGXCommandAsync(ToNDmaNo(id), dl, size, OnDmaDone, (void *)&sDmaBusy);
         } else {
-            MI_SendGXCommandAsync(sdkDmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+            MI_SendGXCommandAsync(dmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
         }
     } else {
-        u32 sdkDmaNo = GXi_DmaId > MI_DMA_MAX_NUM ? GX_DMA_NOT_USE : GXi_DmaId;
-
-        MI_SendGXCommandAsync(sdkDmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+        MI_SendGXCommandAsync(ToDmaNo(GXi_DmaId), dl, size, OnDmaDone, (void *)&sDmaBusy);
     }
 }
 

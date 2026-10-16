@@ -527,7 +527,7 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
                     data += 8 * sizeof(fx16);
                 }
 
-                rs->funcJntScale(result, (const VecFx32 *)data, rs->c, node->flag);
+                rs->funcJntScale(result, (const NNSG3dJointScale *)data, rs->c, node->flag);
             }
         }
         rs->pJntAnmResult = result;
