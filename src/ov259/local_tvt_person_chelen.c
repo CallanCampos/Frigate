@@ -1,3 +1,4 @@
+#include "app/local_tvt/local_tvt_person_chelen.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_chara.h"
@@ -5,7 +6,6 @@
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
 #include "app/local_tvt/local_tvt_util.h"
-#include "app/local_tvt_local.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/text_banks.h"
@@ -21,7 +21,7 @@
 // The types a Pokémon can have; a pair of types is counted with the smaller type first
 #define TYPE_COUNT 17
 
-typedef struct {
+struct LocalTvtChelen {
     int step;
     u32 timer;
     LocalTvtPokeSelect *select;
@@ -30,7 +30,7 @@ typedef struct {
     // The banks with a message for each pair of types and for each Ability
     MsgData *typeMsgData;
     MsgData *abilityMsgData;
-} LocalTvtChelen;
+};
 
 static LocalTvtChelen *LocalTvtChelen_Create(GameData *gameData, HeapID heapId);
 static void LocalTvtChelen_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);

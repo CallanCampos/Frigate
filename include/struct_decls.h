@@ -426,6 +426,7 @@ typedef struct LocalTvtCallSelectSetup LocalTvtCallSelectSetup;
 typedef struct LocalTvtCalling LocalTvtCalling;
 typedef struct LocalTvtChara LocalTvtChara;
 typedef struct LocalTvtCharaSetup LocalTvtCharaSetup;
+typedef struct LocalTvtChelen LocalTvtChelen;
 typedef struct LocalTvtDoctor LocalTvtDoctor;
 typedef struct LocalTvtEvolutionMsg LocalTvtEvolutionMsg;
 typedef struct LocalTvtFace LocalTvtFace;
