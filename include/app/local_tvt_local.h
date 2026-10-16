@@ -7,6 +7,7 @@
 #include "types.h"
 #include "app/local_tvt/local_tvt_chara.h"
 #include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_graphic.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/xtransceiver.h"
 #include "gfl/clact.h"
@@ -20,7 +21,6 @@
 #include "system/gf_font.h"
 #include "system/printsys.h"
 
-typedef struct LocalTvtGraphic LocalTvtGraphic;
 typedef struct LocalTvtBG LocalTvtBG;
 typedef struct LocalTvtScriptMode LocalTvtScriptMode;
 typedef struct LocalTvtCallMode LocalTvtCallMode;
@@ -30,13 +30,6 @@ typedef struct LocalTvtPerson LocalTvtPerson;
 typedef struct LocalTvtSeq LocalTvtSeq;
 typedef struct LocalTvtMenu LocalTvtMenu;
 typedef struct LocalTvtPokeSelect LocalTvtPokeSelect;
-
-// local_tvt_graphic.c
-
-LocalTvtGraphic *LocalTvtGraphic_Create(u32 layout, HeapID heapId);
-void LocalTvtGraphic_Free(LocalTvtGraphic *graphic);
-void LocalTvtGraphic_Update(LocalTvtGraphic *graphic);
-ClActUnit *LocalTvtGraphic_GetClActUnit(LocalTvtGraphic *graphic);
 
 // local_tvt_scriptmode.c: plays a call's script
 
