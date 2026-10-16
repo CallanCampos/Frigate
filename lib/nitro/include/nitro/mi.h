@@ -48,6 +48,10 @@ static inline void MI_CpuClear32(void *dest, u32 size) {
     sys_memset32(0, dest, size);
 }
 
+// Copies size bytes, a multiple of 4, a word at a time to one address, such as the geometry engine's FIFO: NitroSDK's
+// MIi_CpuSendBuffer32 under swan's name
+void sys_memcpy_volatile(const void *src, volatile void *dest, u32 size);
+
 // Fills size bytes, a multiple of 4, 32 bytes at a time where it can: NitroSDK's MIi_CpuClearFast and its inline
 // MI_CpuFillFast
 void sys_memset32_fast(u32 value, void *dest, u32 size);
@@ -62,6 +66,8 @@ static inline void MI_CpuClearFast(void *dest, u32 size) {
 
 // Copies 36 bytes, a 3x3 matrix
 void MI_Copy36B(const void *src, void *dest);
+// Clears 36 bytes, a 3x3 matrix: NitroSDK's MI_Zero36B
+void func_02079084(void *dest);
 // Swan's MAT43_Copy
 void MI_Copy48B(const void *src, void *dest);
 // Copies 64 bytes, a 4x4 matrix. Swan's MAT4_Copy

@@ -1643,6 +1643,7 @@
 . 0x02065c9c blendScale_
 . 0x02065d0c NNSi_G3dAnmBlendJnt
 . 0x020660f8 NNSi_G3dAnmBlendVis
+. 0x020662bc updateHintVec_
 . 0x02067b60 NNS_G3dGeIsBufferExist
 . 0x02067b74 NNS_G3dGeSetBuffer
 . 0x02067b88 NNS_G3dGeReleaseBuffer
@@ -2216,6 +2217,10 @@
 . 0x0209b29c NNS_G3dFuncBlendVis
 . 0x0209b2a0 NNS_G3dFuncBlendJnt
 . 0x0209b2a4 NNS_G3dFuncBlendMat
+. 0x0209b320 sPrjMapCmd
+. 0x0209b340 NNS_G3D_SHAPE_DRAW_FUNCS
+. 0x0209b390 sBBCmd
+. 0x0209b3d8 sBBYCmd
 . 0x0209b528 GXi_DmaId
 . 0x0209b52c MD5_PADDING
 . 0x0209b530 MD5_MSG_INDEX

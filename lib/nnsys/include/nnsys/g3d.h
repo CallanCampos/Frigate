@@ -128,6 +128,12 @@ typedef struct {
     fx32 boxInvPosScale;
 } NNSG3dResMdlInfo;
 
+// The nodes of a model: a dictionary of them, then each one's data. A node's data starts with its flag, followed by the
+// parts of its transformation that the flag doesn't say are the identity
+typedef struct {
+    NNSG3dResDict dict;
+} NNSG3dResNodeInfo;
+
 typedef struct NNSG3dResMdl {
     u32 size;
     u32 ofsSbc;
@@ -135,6 +141,7 @@ typedef struct NNSG3dResMdl {
     u32 ofsShp;
     u32 ofsEvpMtx;
     NNSG3dResMdlInfo info;
+    NNSG3dResNodeInfo nodeInfo;
 } NNSG3dResMdl;
 
 typedef struct {
@@ -154,6 +161,49 @@ static inline NNSG3dResMdl *NNS_G3dGetMdlByIdx(const NNSG3dResMdlSet *mdlSet, u3
 static inline NNSG3dResMdlInfo *NNS_G3dGetMdlInfo(const NNSG3dResMdl *mdl) {
     return (NNSG3dResMdlInfo *)&mdl->info;
 }
+
+static inline NNSG3dResNodeInfo *NNS_G3dGetNodeInfo(const NNSG3dResMdl *mdl) {
+    if (mdl != NULL) {
+        return (NNSG3dResNodeInfo *)&mdl->nodeInfo;
+    }
+    return NULL;
+}
+
+// A node's data: its flag, then the first element of its rotation. The translation follows, unless the flag has
+// TRANS_ZERO, then the rest of the rotation unless it has ROT_ZERO: eight more elements, or with PIVOT_EXIST two, the
+// pivot's index being in the flag, and last the data of the scale (NNSG3dFuncJointScale). The rotation elements are
+// fx16 and the translation fx32
+#define NNS_G3D_SRTFLAG_TRANS_ZERO 0x0001
+#define NNS_G3D_SRTFLAG_ROT_ZERO 0x0002
+#define NNS_G3D_SRTFLAG_SCALE_ONE 0x0004
+#define NNS_G3D_SRTFLAG_PIVOT_EXIST 0x0008
+#define NNS_G3D_SRTFLAG_IDXPIVOT_MASK 0x00f0
+#define NNS_G3D_SRTFLAG_IDXPIVOT_SHIFT 4
+#define NNS_G3D_SRTFLAG_PIVOT_MINUS 0x0100
+#define NNS_G3D_SRTFLAG_SIGN_REVC 0x0200
+#define NNS_G3D_SRTFLAG_SIGN_REVD 0x0400
+
+typedef struct {
+    u16 flag;
+    fx16 _00;
+} NNSG3dResNodeData;
+
+static inline const NNSG3dResNodeData *NNS_G3dGetNodeDataByIdx(const NNSG3dResNodeInfo *nodeInfo, u32 idx) {
+    if (nodeInfo != NULL) {
+        const u32 *ofs = NNS_G3dGetResDataByIdx(&nodeInfo->dict, idx);
+
+        if (ofs != NULL) {
+            return (const NNSG3dResNodeData *)((u8 *)nodeInfo + *ofs);
+        }
+    }
+    return NULL;
+}
+
+// What a model's envelope holds for a joint: the matrix that undoes the joint's bind pose, and for the normals
+typedef struct {
+    MtxFx43 invM;
+    MtxFx33 invN;
+} NNSG3dResEvpMtx;
 
 // A model's material block: which materials each texture and each palette is for, then the materials by name
 typedef struct {
@@ -182,6 +232,26 @@ typedef struct {
     fx32 magH;
 } NNSG3dResMatData;
 
+// The flag of a material. After the structure come the parts of its texture matrix that TEXMTX_USE says it has, leaving
+// out the scale if SCALEONE is set, the rotation if ROTZERO is and the translation if TRANSZERO is; an effect matrix
+// follows them. DIFFUSE, AMBIENT and VTXCOLOR say which parts of diffAmb the material sets, and SPECULAR, EMISSION and
+// SHININESS those of specEmi, each as a group of three bits that index the color masks
+#define NNS_G3D_MATFLAG_TEXMTX_USE 0x0001
+#define NNS_G3D_MATFLAG_TEXMTX_SCALEONE 0x0002
+#define NNS_G3D_MATFLAG_TEXMTX_ROTZERO 0x0004
+#define NNS_G3D_MATFLAG_TEXMTX_TRANSZERO 0x0008
+#define NNS_G3D_MATFLAG_WIREFRAME 0x0020
+#define NNS_G3D_MATFLAG_DIFFUSE 0x0040
+#define NNS_G3D_MATFLAG_AMBIENT 0x0080
+#define NNS_G3D_MATFLAG_VTXCOLOR 0x0100
+#define NNS_G3D_MATFLAG_SPECULAR 0x0200
+#define NNS_G3D_MATFLAG_EMISSION 0x0400
+#define NNS_G3D_MATFLAG_SHININESS 0x0800
+#define NNS_G3D_MATFLAG_EFFECTMTX 0x2000
+#define NNS_G3D_MATFLAG_DIFFAMB_SHIFT 6
+#define NNS_G3D_MATFLAG_SPECEMI_SHIFT 9
+#define NNS_G3D_MATFLAG_COLOR_INDEX_MASK 7
+
 // An entry of a texture-to-material or palette-to-material dictionary: numIdx material numbers, one byte each, at
 // offset from the material block. flag has NNS_G3D_MATLIST_BOUND once the texture or palette is bound to them
 typedef struct {
@@ -207,6 +277,38 @@ static inline NNSG3dResMatData *NNS_G3dGetMatDataByIdx(const NNSG3dResMat *mat, 
 
         if (ofs != NULL) {
             return (NNSG3dResMatData *)((u8 *)mat + *ofs);
+        }
+    }
+    return NULL;
+}
+
+// A model's shape block: a dictionary of the shapes by name, each one's data a tag for how it is drawn, then the
+// display list that draws it and its size
+typedef struct {
+    NNSG3dResDict dict;
+} NNSG3dResShp;
+
+typedef struct {
+    u16 itemTag;
+    u16 size;
+    u32 flag;
+    u32 ofsDL;
+    u32 sizeDL;
+} NNSG3dResShpData;
+
+static inline NNSG3dResShp *NNS_G3dGetShp(const NNSG3dResMdl *mdl) {
+    if (mdl != NULL && mdl->ofsShp != 0) {
+        return (NNSG3dResShp *)((u8 *)mdl + mdl->ofsShp);
+    }
+    return NULL;
+}
+
+static inline NNSG3dResShpData *NNS_G3dGetShpDataByIdx(const NNSG3dResShp *shp, u32 idx) {
+    if (shp != NULL) {
+        const u32 *ofs = NNS_G3dGetResDataByIdx(&shp->dict, idx);
+
+        if (ofs != NULL) {
+            return (NNSG3dResShpData *)((u8 *)shp + *ofs);
         }
     }
     return NULL;
@@ -296,9 +398,38 @@ typedef struct {
 
 // What an animation computes for one material, joint or node. The function in an animation object's funcAnm fills one
 // in from the data at the index of the animation's own data that mapData gives, and a blend combines the results of all
-// the animation objects of a list. The material's, shared by the material, texture SRT and texture pattern animations,
-// has no layout yet
-typedef struct NNSG3dMatAnmResult NNSG3dMatAnmResult;
+// the animation objects of a list. The material's is shared by the material, texture SRT and texture pattern
+// animations
+
+// A material's result is what the geometry engine gets for it: the colors, polygon attribute, texture and palette, and
+// the texture matrix's scale, rotation as a sine and cosine, and translation. Its flag says which of the matrix's parts
+// were set: when a part is the identity, the flag says so and leaves its values alone. The texture matrix is made when
+// TEXMTX_SET or TEXMTX_MULT is set, and the original size and magnification of the texture are the material's
+#define NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SCALEONE 0x00000001
+#define NNS_G3D_MATANM_RESULTFLAG_TEXMTX_ROTZERO 0x00000002
+#define NNS_G3D_MATANM_RESULTFLAG_TEXMTX_TRANSZERO 0x00000004
+#define NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SET 0x00000008
+#define NNS_G3D_MATANM_RESULTFLAG_TEXMTX_MULT 0x00000010
+#define NNS_G3D_MATANM_RESULTFLAG_WIREFRAME 0x00000020
+
+typedef struct NNSG3dMatAnmResult {
+    u32 flag;
+    u32 prmMatColor0;
+    u32 prmMatColor1;
+    u32 prmPolygonAttr;
+    u32 prmTexImage;
+    u32 prmTexPltt;
+    fx32 scaleS;
+    fx32 scaleT;
+    fx16 sinR;
+    fx16 cosR;
+    fx32 transS;
+    fx32 transT;
+    u16 origWidth;
+    u16 origHeight;
+    fx32 magW;
+    fx32 magH;
+} NNSG3dMatAnmResult;
 
 // A joint's flag says which of its parts are the identity: a scale of one, a zero rotation or translation. A blend
 // keeps only those that all its animations have. The rotation is three rows of a matrix, of which a blend adds up the
@@ -317,6 +448,7 @@ typedef struct {
     union {
         MtxFx33 rot;
         VecFx32 rotRow[3];
+        fx32 rotElem[9];
     };
     VecFx32 trans;
 } NNSG3dJntAnmResult;
@@ -335,11 +467,22 @@ typedef BOOL (*NNSG3dFuncBlendMat)(NNSG3dMatAnmResult *result, const NNSG3dAnmOb
 typedef BOOL (*NNSG3dFuncBlendJnt)(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 nodeID);
 typedef BOOL (*NNSG3dFuncBlendVis)(NNSG3dVisAnmResult *result, const NNSG3dAnmObj *anmObj, u32 nodeID);
 
-// Set in the flag of a render object when its animations changed, so that its hints are out of date
+// The flag of a render object. HINT_OBSOLETE is set when its animations changed, so that its hints are out of date. The
+// others set the options of the same name in the render state that draws it (NNS_G3D_RSFLAG_OPT_*)
+#define NNS_G3D_RENDEROBJ_FLAG_RECORD 0x00000001
+#define NNS_G3D_RENDEROBJ_FLAG_NOGECMD 0x00000002
+#define NNS_G3D_RENDEROBJ_FLAG_SKIP_SBCDRAW 0x00000004
+#define NNS_G3D_RENDEROBJ_FLAG_SKIP_SBCMTXCALC 0x00000008
 #define NNS_G3D_RENDEROBJ_FLAG_HINT_OBSOLETE 0x00000010
 
+// The render state that draws a model (below). A callback gets it when the command of cbCmd runs, at the time cbTiming
+// says, and cbInitFunc gets it before the first command
+typedef struct NNSG3dRS NNSG3dRS;
+typedef void (*NNSG3dSbcCallBackFunc)(NNSG3dRS *rs);
+
 // What draws a model, 0x54 bytes. The animations bound to it are in three lists by what they animate, and hint*Exist
-// has a bit for each material or node that one of them has data for
+// has a bit for each material or node that one of them has data for. ptrUserSbc replaces the model's own commands.
+// recJntAnm and recMatAnm are where the results of the joints and materials are recorded, one for each
 typedef struct {
     u32 flag;
     NNSG3dResMdl *resMdl;
@@ -349,15 +492,15 @@ typedef struct {
     NNSG3dFuncBlendJnt funcBlendJnt;
     NNSG3dAnmObj *anmVis;
     NNSG3dFuncBlendVis funcBlendVis;
-    void *cbFunc;
+    NNSG3dSbcCallBackFunc cbFunc;
     u8 cbCmd;
     u8 cbTiming;
     u16 dummy_;
-    void *cbInitFunc;
+    NNSG3dSbcCallBackFunc cbInitFunc;
     void *ptrUser;
     u8 *ptrUserSbc;
-    void *recJntAnm;
-    void *recMatAnm;
+    NNSG3dJntAnmResult *recJntAnm;
+    NNSG3dMatAnmResult *recMatAnm;
     u32 hintMatAnmExist[2];
     u32 hintJntAnmExist[2];
     u32 hintVisAnmExist[2];
@@ -513,6 +656,10 @@ void NNS_G3dGeSetBuffer(void *buffer);
 void *NNS_G3dGeReleaseBuffer(void);
 void NNS_G3DWaitFIFO(void);
 void NNS_G3DExecOp(u32 op, const u32 *args, u32 num);
+void NNS_G3DExecDisplayList(const void *list, u32 size);
+// NitroSystem's NNS_G3dGetCurrentMtx: gets the position matrix and the vector matrix that the geometry engine is at, each
+// unless its pointer is null
+void NNS_G3DGetTransforms(MtxFx43 *pos, MtxFx33 *nrm);
 
 // NitroSystem's inline wrappers of the buffer, one per geometry command
 static inline void NNS_G3dGePushMtx(void) {
@@ -528,20 +675,43 @@ static inline void NNS_G3dGePopMtx(int num) {
 static inline void NNS_G3dGeMtxMode(int mode) {
     u32 param = mode;
 
-    // MTX_MODE, 0x10 (gx.h has no name for it yet)
-    NNS_G3DExecOp(0x10, &param, 1);
+    NNS_G3DExecOp(G3OP_MTX_MODE, &param, 1);
+}
+
+static inline void NNS_G3dGeStoreMtx(int idx) {
+    u32 param = idx;
+
+    NNS_G3DExecOp(G3OP_MTX_STORE, &param, 1);
+}
+
+static inline void NNS_G3dGeRestoreMtx(int idx) {
+    u32 param = idx;
+
+    NNS_G3DExecOp(G3OP_MTX_RESTORE, &param, 1);
 }
 
 static inline void NNS_G3dGeIdentity(void) {
     NNS_G3DExecOp(G3OP_MTX_IDENTITY, NULL, 0);
 }
 
+static inline void NNS_G3dGeLoadMtx44(const MtxFx44 *mtx) {
+    NNS_G3DExecOp(G3OP_MTX_LOAD_4x4, (const u32 *)mtx, 16);
+}
+
 static inline void NNS_G3dGeLoadMtx43(const MtxFx43 *mtx) {
     NNS_G3DExecOp(G3OP_MTX_LOAD_4x3, (const u32 *)mtx, 12);
 }
 
+static inline void NNS_G3dGeMultMtx44(const MtxFx44 *mtx) {
+    NNS_G3DExecOp(G3OP_MTX_MULT_4x4, (const u32 *)mtx, 16);
+}
+
 static inline void NNS_G3dGeMultMtx43(const MtxFx43 *mtx) {
     NNS_G3DExecOp(G3OP_MTX_MULT_4x3, (const u32 *)mtx, 12);
+}
+
+static inline void NNS_G3dGeMultMtx33(const MtxFx33 *mtx) {
+    NNS_G3DExecOp(G3OP_MTX_MULT_3x3, (const u32 *)mtx, 9);
 }
 
 static inline void NNS_G3dGeScaleVec(const VecFx32 *scale) {
@@ -550,6 +720,12 @@ static inline void NNS_G3dGeScaleVec(const VecFx32 *scale) {
 
 static inline void NNS_G3dGeTranslateVec(const VecFx32 *trans) {
     NNS_G3DExecOp(G3OP_MTX_TRANS, (const u32 *)trans, 3);
+}
+
+static inline void NNS_G3dGeTexCoord(fx32 s, fx32 t) {
+    u32 param = GX_ST(s, t);
+
+    NNS_G3DExecOp(G3OP_TEXCOORD, &param, 1);
 }
 
 static inline void NNS_G3dGePolygonAttr(int light, int polyMode, int cullMode, int polygonID, int alpha, int misc) {
@@ -579,7 +755,14 @@ typedef struct {
     u32 mtxmode_proj;
     MtxFx44 projMtx;
     u32 mtxmode_posvec;
-    MtxFx43 cameraMtx;
+    // The camera matrix, which is also its rotation followed by its translation
+    union {
+        MtxFx43 cameraMtx;
+        struct {
+            MtxFx33 cameraRot;
+            VecFx32 cameraTrans;
+        };
+    };
     u32 cmd1;
     u32 lightVec[4];
     u32 cmd2;
@@ -712,6 +895,130 @@ static inline void NNS_G3dGlbLookAt(const VecFx32 *camPos, const VecFx32 *camUp,
     NNS_G3dGlb.flag &= ~(NNS_G3D_GLB_FLAG_INVCAMERA_UPTODATE | NNS_G3D_GLB_FLAG_INVBASECAMERA_UPTODATE |
                          NNS_G3D_GLB_FLAG_INVCAMERAPROJ_UPTODATE | NNS_G3D_GLB_FLAG_BASECAMERA_UPTODATE);
 }
+
+// The render state of a model being drawn, and the commands that draw it. A model's byte code is a stream of commands
+// (NNS_G3D_SBC_*), each a byte with the command in its low five bits and an option (NNS_G3D_SBCFLG_*) in its high
+// three, followed by the command's arguments. NNS_G3D_RENDER_FUNC has the function of each command, which gets the
+// render state and the option. The state is what the commands share: where they are in the stream, what has been set
+// for the node and material being drawn, the callbacks of the render object, and the results that the animations give
+// for the material, joint and visibility
+#define NNS_G3D_SBC_NOP 0x00
+#define NNS_G3D_SBC_RET 0x01
+#define NNS_G3D_SBC_NODE 0x02
+#define NNS_G3D_SBC_MTX 0x03
+#define NNS_G3D_SBC_MAT 0x04
+#define NNS_G3D_SBC_SHP 0x05
+#define NNS_G3D_SBC_NODEDESC 0x06
+#define NNS_G3D_SBC_BB 0x07
+#define NNS_G3D_SBC_BBY 0x08
+#define NNS_G3D_SBC_NODEMIX 0x09
+#define NNS_G3D_SBC_CALLDL 0x0a
+#define NNS_G3D_SBC_POSSCALE 0x0b
+#define NNS_G3D_SBC_ENVMAP 0x0c
+#define NNS_G3D_SBC_PRJMAP 0x0d
+#define NNS_G3D_SBC_COMMAND_NUM 32
+
+#define NNS_G3D_SBCFLG_000 0x00
+#define NNS_G3D_SBCFLG_001 0x20
+#define NNS_G3D_SBCFLG_010 0x40
+#define NNS_G3D_SBCFLG_011 0x60
+
+// When a render object's callback runs for a command: before it (A), after its first part (B) or after all of it (C). A
+// callback can set SKIP to leave out the part that follows it
+#define NNS_G3D_SBC_CALLBACK_TIMING_A 1
+#define NNS_G3D_SBC_CALLBACK_TIMING_B 2
+#define NNS_G3D_SBC_CALLBACK_TIMING_C 3
+
+// The flag of the render state. NODE_VISIBLE is whether the current node is shown, MAT_TRANSPARENT whether the current
+// material is fully transparent, and the CURRENT_*_VALID flags whether the node, material and joint have been set. RETURN ends
+// the stream, SKIP is set by a callback, and the OPT_* flags are the render object's options
+#define NNS_G3D_RSFLAG_NODE_VISIBLE 0x00000001
+#define NNS_G3D_RSFLAG_MAT_TRANSPARENT 0x00000002
+#define NNS_G3D_RSFLAG_CURRENT_NODE_VALID 0x00000004
+#define NNS_G3D_RSFLAG_CURRENT_MAT_VALID 0x00000008
+#define NNS_G3D_RSFLAG_CURRENT_NODEDESC_VALID 0x00000010
+#define NNS_G3D_RSFLAG_RETURN 0x00000020
+#define NNS_G3D_RSFLAG_SKIP 0x00000040
+#define NNS_G3D_RSFLAG_OPT_RECORD 0x00000080
+#define NNS_G3D_RSFLAG_OPT_NOGECMD 0x00000100
+#define NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW 0x00000200
+#define NNS_G3D_RSFLAG_OPT_SKIP_SBCMTXCALC 0x00000400
+
+// The most materials and joints that a model can have
+#define NNS_G3D_SIZE_MAT_MAX 64
+#define NNS_G3D_SIZE_JNT_MAX 64
+
+// 0x188 bytes. isMatCached has a bit for each material whose result is made, isScaleOne one for each joint whose scale
+// is one, and isEnvMtxCached one for each joint whose matrices for the envelope are made
+struct NNSG3dRS {
+    u8 *c;
+    NNSG3dRenderObj *pRenderObj;
+    u32 flag;
+    NNSG3dSbcCallBackFunc cbVecFunc[NNS_G3D_SBC_COMMAND_NUM];
+    u8 cbVecTiming[NNS_G3D_SBC_COMMAND_NUM];
+    u8 currentNode;
+    u8 currentMat;
+    u8 currentNodeDesc;
+    u8 dummy_;
+    NNSG3dMatAnmResult *pMatAnmResult;
+    NNSG3dJntAnmResult *pJntAnmResult;
+    NNSG3dVisAnmResult *pVisAnmResult;
+    u32 isMatCached[NNS_G3D_SIZE_MAT_MAX / 32];
+    u32 isScaleOne[NNS_G3D_SIZE_JNT_MAX / 32];
+    u32 isEnvMtxCached[NNS_G3D_SIZE_JNT_MAX / 32];
+    const NNSG3dResNodeInfo *pResNodeInfo;
+    const NNSG3dResMat *pResMat;
+    const NNSG3dResShp *pResShp;
+    fx32 posScale;
+    fx32 invPosScale;
+    NNSG3dFuncJointScale funcJntScale;
+    NNSG3dFuncJointFlush funcJntMtx;
+    NNSG3dFuncTexMatrix funcTexMtx;
+    NNSG3dMatAnmResult matAnmResult;
+    NNSG3dJntAnmResult jntAnmResult;
+    NNSG3dVisAnmResult visAnmResult;
+};
+
+// A command's function, and the functions that draw a material or a shape of the item tag in its data: its render
+// state, option, data and index
+typedef void (*NNSG3dFuncSbc)(NNSG3dRS *rs, u32 opt);
+typedef void (*NNSG3dFuncSbcMat)(NNSG3dRS *rs, u32 opt, const NNSG3dResMatData *mat, u32 matID);
+typedef void (*NNSG3dFuncSbcShp)(NNSG3dRS *rs, u32 opt, const NNSG3dResShpData *shp, u32 shpID);
+
+extern NNSG3dFuncSbc NNS_G3D_RENDER_FUNC[NNS_G3D_SBC_COMMAND_NUM];
+extern NNSG3dFuncSbcMat NNS_G3D_MATERIAL_APPLY_FUNCS[4];
+extern NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4];
+
+// The state of the model being drawn, while there is one: a draw within a callback shares it
+extern NNSG3dRS *g_NNSG3DModelRenderer;
+
+// The scale of each joint of the model being drawn and its inverse, which the scaling rules (maya.c and si3d.c) keep
+// for the joints below it
+typedef struct {
+    VecFx32 scale;
+    VecFx32 invScale;
+} NNSG3dJointScale;
+
+extern NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
+
+// The commands (NitroSystem's NNSi_G3dFuncSbcNop, Ret, Node, Mtx, Mat, MatDefault, Shp, ShpDefault, NodeDesc, BB, BBY,
+// NodeMix, CallDL, PosScale, EnvMap and PrjMap)
+void NNS_G3DRenderFuncNop(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncReturn(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncSetVisGroup(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncLoadMatrix(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResMatData *mat, u32 matID);
+void NNS_G3DRenderFuncApplyMaterial(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncDrawMeshDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResShpData *shp, u32 shpID);
+void NNS_G3DRenderFuncDrawMesh(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncExecFIFOQueue(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncGlobalScale(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt);
+void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt);
 
 // The alpha of a material of a model resource, from 0 to 31
 u32 NNS_G3DResMdlGetMatAlpha(const NNSG3dResMdl *mdl, u32 matId);
