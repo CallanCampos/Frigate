@@ -5388,8 +5388,8 @@ data_ov036_021d0f6c kind:data(any) addr:0x021d0f6c
 data_ov036_021d0f76 kind:data(any) addr:0x021d0f76
 data_ov036_021d0f80 kind:data(any) addr:0x021d0f80
 data_ov036_021d0f98 kind:data(any) addr:0x021d0f98
-data_ov036_021d0fa4 kind:data(any) addr:0x021d0fa4
-data_ov036_021d0fc8 kind:data(any) addr:0x021d0fc8
+DEFAULT_RAIL_CAMERA kind:data(any) addr:0x021d0fa4
+DEFAULT_RAIL_CURVE kind:data(any) addr:0x021d0fc8
 data_ov036_021d0fdb kind:data(any) addr:0x021d0fdb
 data_ov036_021d0fec kind:data(any) addr:0x021d0fec
 data_ov036_021d0ff8 kind:data(any) addr:0x021d0ff8
@@ -5679,7 +5679,7 @@ data_ov036_021d51dc kind:data(any) addr:0x021d51dc
 data_ov036_021d51f0 kind:data(any) addr:0x021d51f0
 data_ov036_021d5204 kind:data(any) addr:0x021d5204
 data_ov036_021d5218 kind:data(any) addr:0x021d5218
-data_ov036_021d5230 kind:data(any) addr:0x021d5230
+sPendingSteps kind:data(any) addr:0x021d5230
 data_ov036_021d5238 kind:data(any) addr:0x021d5238
 data_ov036_021d5248 kind:data(any) addr:0x021d5248
 data_ov036_021d524c kind:data(any) addr:0x021d524c

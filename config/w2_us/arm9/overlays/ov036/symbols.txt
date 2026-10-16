@@ -5392,9 +5392,9 @@ data_ov036_021d0f6c kind:data(any) addr:0x021d0fa0
 data_ov036_021d0f76 kind:data(any) addr:0x021d0faa
 data_ov036_021d0f80 kind:data(any) addr:0x021d0fb4
 data_ov036_021d0f98 kind:data(any) addr:0x021d0fcc
-data_ov036_021d0fa4 kind:data(any) addr:0x021d0fd8
+DEFAULT_RAIL_CAMERA kind:data(any) addr:0x021d0fd8
 data_ov036_021d0fdb_w2_us kind:data(any) addr:0x021d0fdb
-data_ov036_021d0fc8 kind:data(any) addr:0x021d0ffc
+DEFAULT_RAIL_CURVE kind:data(any) addr:0x021d0ffc
 data_ov036_021d0fec kind:data(any) addr:0x021d1020
 data_ov036_021d0ff8 kind:data(any) addr:0x021d102c
 data_ov036_021d1004 kind:data(any) addr:0x021d1038
@@ -5683,7 +5683,7 @@ data_ov036_021d51dc kind:data(any) addr:0x021d521c
 data_ov036_021d51f0 kind:data(any) addr:0x021d5230
 data_ov036_021d5204 kind:data(any) addr:0x021d5244
 data_ov036_021d5218 kind:data(any) addr:0x021d5258
-data_ov036_021d5230 kind:data(any) addr:0x021d5270
+sPendingSteps kind:data(any) addr:0x021d5270
 data_ov036_021d5238 kind:data(any) addr:0x021d5278
 data_ov036_021d5248 kind:data(any) addr:0x021d5288
 data_ov036_021d524c kind:data(any) addr:0x021d528c
