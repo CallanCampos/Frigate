@@ -4,9 +4,12 @@
 // vendor element.
 
 #include "dwc/ac.h"
-#include "dwc/ext.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
+
+// MSL's <string.h>, not dwc/ext.h's declarations: with it MWCC hoists the loads around DWCAc_AddCandidate's strncmp
+// out of its loop, as the ROM does
+#include <string.h>
 
 // A candidate's place that nothing has been put in is all zeroes
 #define IS_EMPTY(info) ((info).result + (info).id + (info).level + (info).tag + (info).seen == 0)
@@ -149,19 +152,22 @@ static int DWCAc_FindCandidate(const WMBssDesc *bss, DWCAcSearchWork *work) {
     return -1;
 }
 
+// Whether two BSSIDs are the same
+static inline BOOL DWCAc_IsSameBssid(const u8 *a, const u8 *b) {
+    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3] && a[4] == b[4] && a[5] == b[5];
+}
+
 // Puts the beacon among the candidates, as a new one or in place of the one it matches, and gives its place: the last
 // one, a place past the end of the list that DWCAc_SortCandidates then sorts it from
 static int DWCAc_AddCandidate(int id, const WMBssDesc *bss, u8 tag, DWCAcSearchWork *work) {
+    const WMBssDesc *candidates = work->candidates;
     int i;
     s16 count = work->candidateCount;
     int found = -1;
 
     for (i = 0; i < count; i++) {
-        const u8 *bssid = work->candidates[i].bssid;
-
-        if (bss->bssid[0] == bssid[0] && bss->bssid[1] == bssid[1] && bss->bssid[2] == bssid[2] &&
-            bss->bssid[3] == bssid[3] && bss->bssid[4] == bssid[4] && bss->bssid[5] == bssid[5] &&
-            strncmp(bss->ssid, work->candidates[i].ssid, bss->ssidLength) == 0) {
+        if (DWCAc_IsSameBssid(bss->bssid, candidates[i].bssid) &&
+            strncmp(bss->ssid, candidates[i].ssid, bss->ssidLength) == 0) {
             found = i;
             break;
         }

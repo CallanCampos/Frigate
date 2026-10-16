@@ -1790,10 +1790,12 @@ lib/dwc/src/base/dwc_init.c:
     .bss        start:0x021419b4 end:0x021419bc
 
 lib/dwc/src/base/dwc_memfunc.c:
+    complete
     .text       start:0x020586d0 end:0x0205886c
     .bss        start:0x021419bc end:0x021419c4
 
 lib/dwc/src/wds/wds.c:
+    complete
     .text       start:0x0205886c end:0x02058edc
     .rodata     start:0x02094104 end:0x02094108
     .bss        start:0x021419c4 end:0x021419c8
@@ -1811,6 +1813,7 @@ lib/dwc/src/ac/dwc_ac_connect.c:
     .text       start:0x020598e0 end:0x02059f30
 
 lib/dwc/src/ac/dwc_ac.c:
+    complete
     .text       start:0x02059f30 end:0x0205ac50
     .bss        start:0x021419c8 end:0x021419dc
 
