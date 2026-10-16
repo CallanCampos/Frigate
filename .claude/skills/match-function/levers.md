@@ -534,8 +534,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "same small table")
 - Two literals for the same object in one function: it is a `static` of the function's file; an `extern` shares
   one. (matching.md: "gets two literals")
-- Two objects reached from one literal without `-ipa file`: they are one struct. (matching.md: "reached from one
-  literal, at")
+- Two statics reached from one literal: `-ipa file` in `file_flags`, with the SDK's separate statics. (matching.md:
+  "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
   symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
 - A gap in `.bss` before a 32-aligned object: the previous file ends there. (matching.md: "makes its file's whole
@@ -543,9 +543,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Function order and presence
 
-- A Thumb to ARM `bx pc` trampoline: define a Thumb `asm void` with `bx pc; nop` and a separate ARM `asm void` with
-  `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, toggling `#pragma thumb off/on` around the ARM part.
-  (matching.md: "A Thumb `bx pc` trampoline")
+- A Thumb `bx pc; nop` and ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS` after a caller: the linker's veneer; call the
+  far target from C. (matching.md: "is the linker's long-branch veneer")
 
 - SDK assembly in an `asm` function: pre-UAL spellings, `@name:` labels, `dcd`, `ldr rX, =value`, and one `asm`
   function per entry point, falling into the next; no `entry`, so a second name comes from the configs or the linker.

@@ -3328,7 +3328,7 @@
 . 0x02141954 gSPLRandomState
 . 0x02141958 sWifiId
 . 0x0214196c sErrorInfo
-. 0x02141974 sInit
+. 0x02141974 sGameCode
 . 0x0214197c sMemFuncs
 . 0x02141984 sWdsWork
 . 0x02141988 sBlocks
@@ -3436,7 +3436,7 @@
 . 0x0214c5d8 OSi_terminate
 . 0x0214c5e4 sFifoInitialized
 . 0x0214c5e8 sFifoCallbacks
-. 0x0214c668 sRtc
+. 0x0214c668 rtcInitialized
 . 0x0214c690 sSndInitialized
 . 0x0214c694 sMutex
 . 0x0214c6ac SNDi_Queue

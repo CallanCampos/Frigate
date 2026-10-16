@@ -613,6 +613,7 @@
 . 0x02141962 remove_symbol
 . 0x02141966 remove_symbol
 . 0x02141968 remove_symbol
+. 0x02141978 add_data sStarted
 . 0x02141a58 remove_symbol
 . 0x02141a5c remove_symbol
 . 0x02141a74 remove_symbol
@@ -695,6 +696,7 @@
 . 0x0214c3bc add_data OSi_IdleThreadStack
 . 0x0214c4dc add_data data_0214c4dc
 . 0x0214c66c remove_symbol
+. 0x0214c66c add_data rtcWork
 . 0x0214c700 section_end lib/nitro/src/snd/nitro_snd_main.c:.bss
 . 0x0214c700 section_start lib/nitro/src/snd/snd_command.c:.bss
 . 0x0214e100 remove_symbol

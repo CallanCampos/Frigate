@@ -9103,7 +9103,8 @@ sParticle kind:bss addr:0x02141950
 gSPLRandomState kind:bss addr:0x02141954
 sWifiId kind:bss addr:0x02141958
 sErrorInfo kind:bss addr:0x0214196c
-sInit kind:bss addr:0x02141974
+sGameCode kind:bss addr:0x02141974
+sStarted kind:bss addr:0x02141978
 sMemFuncs kind:bss addr:0x0214197c
 sWdsWork kind:bss addr:0x02141984
 sBlocks kind:bss addr:0x02141988
@@ -9259,7 +9260,8 @@ OSi_deliverArgTitleId kind:bss addr:0x0214c5d0
 OSi_terminate kind:bss addr:0x0214c5d8
 sFifoInitialized kind:bss addr:0x0214c5e4
 sFifoCallbacks kind:bss addr:0x0214c5e8
-sRtc kind:bss addr:0x0214c668
+rtcInitialized kind:bss addr:0x0214c668
+rtcWork kind:bss addr:0x0214c66c
 sSndInitialized kind:bss addr:0x0214c690
 sMutex kind:bss addr:0x0214c694
 SNDi_Queue kind:bss addr:0x0214c6ac

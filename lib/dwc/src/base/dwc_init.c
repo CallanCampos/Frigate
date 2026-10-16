@@ -17,14 +17,10 @@
 // The size of that work area
 #define DWC_INIT_WORK_SIZE 0x1000
 
-typedef struct DWCInit {
-    // The game code that the library was started with
-    u32 gameCode;
-    // 1 once it has started
-    int started;
-} DWCInit;
-
-static DWCInit sInit;
+// 1 once the library has started, and the game code that it was started with. With -ipa file, MWCC places them in
+// .bss in the other order, which is the ROM's
+static int sStarted;
+static u32 sGameCode;
 
 static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free);
 static void DWCi_SetStarted(int started);
@@ -72,7 +68,7 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
     }
 
     func_ov011_02169df8(server);
-    sInit.gameCode = gameCode;
+    sGameCode = gameCode;
     func_ov011_0216ddc8(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
     if (gameName != NULL) {
         strcpy(data_ov011_021917bc, gameName);
@@ -87,9 +83,9 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
 }
 
 u32 DWCi_GetGameCode(void) {
-    return sInit.gameCode;
+    return sGameCode;
 }
 
 static void DWCi_SetStarted(int started) {
-    sInit.started = started;
+    sStarted = started;
 }

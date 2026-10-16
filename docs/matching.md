@@ -2138,9 +2138,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   built with `-ipa function` (`file_flags` in `lib/nnsys/library.toml`), while the other sound files are reached from
   one base and need `-ipa file`. A struct that looks like another file's extern, or a gap in `.bss` that seems to need
   a stand-in function, is the first thing to try this on.
-- Without `-ipa file`, two objects reached from one literal, at `[r0]` and `[r0, #4]`, are one struct: `rtc_api.c` keeps
-  its flag and its work as `static struct { u16 initialized; RTCWork work; } sRtc;`, and TWL-DWC's `dwc_init.c` its game
-  code and started flag in one `DWCInit`. As two statics they get two literals.
+- Two statics reached from one literal, at `[r0]` and `[r0, #4]`, ask for `-ipa file` before anything else: without it
+  each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
+  NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics
+  with `-ipa file` in `file_flags`; `dwc_init.c`'s are declared in the reverse of their `.bss` order.
 - A constant that the ROM loads from the literal pool, with no relocation in `relocs.txt`, where MWCC would fold it or
   build it with `mov` and `lsl`, is a linker symbol: NitroSDK takes its stack sizes, the extended arena's start and the
   overlay count from the linker script. Declared `extern u8 SYM[]` and cast where it is used, `(u32)SDK_IRQ_STACKSIZE`,
@@ -2454,11 +2455,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## When nothing moves it
 
-- A Thumb `bx pc` trampoline followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS` needs separate functions with
-  `#pragma thumb off` around the ARM function. `card_pull_out.c`'s two DSi jump stubs also need a Thumb `nop` after
-  `bx pc` to reproduce the alignment halfword. The probe reports these Thumb functions as two bytes long in the ROM,
-  excluding that padding; the full module check includes it. A C function pointer call makes each ARM part eight
-  bytes too large.
+- A Thumb `bx pc; nop` followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, right after a function that calls it,
+  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from
+  C and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
+  `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
+  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does.
 
 - MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
   `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands

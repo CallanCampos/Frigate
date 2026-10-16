@@ -2163,6 +2163,7 @@ lib/nitro/src/pxi/pxi_fifo.c:
     .bss        start:0x0214c5e4 end:0x0214c668
 
 lib/nitro/src/rtc/rtc_api.c:
+    complete
     .text       start:0x0207cb88 end:0x0207d064
     .bss        start:0x0214c668 end:0x0214c690
 
