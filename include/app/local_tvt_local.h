@@ -10,6 +10,7 @@
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_graphic.h"
 #include "app/local_tvt/local_tvt_message.h"
+#include "app/local_tvt/local_tvt_person.h"
 #include "app/xtransceiver.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -26,7 +27,6 @@ typedef struct LocalTvtBG LocalTvtBG;
 typedef struct LocalTvtScriptMode LocalTvtScriptMode;
 typedef struct LocalTvtCallMode LocalTvtCallMode;
 typedef struct LocalTvtCallSelect LocalTvtCallSelect;
-typedef struct LocalTvtPerson LocalTvtPerson;
 typedef struct LocalTvtSeq LocalTvtSeq;
 typedef struct LocalTvtMenu LocalTvtMenu;
 typedef struct LocalTvtPokeSelect LocalTvtPokeSelect;
@@ -88,42 +88,6 @@ void LocalTvtCallSelect_Free(LocalTvtCallSelect *select);
 void LocalTvtCallSelect_Main(LocalTvtCallSelect *select);
 u32 LocalTvtCallSelect_GetResult(LocalTvtCallSelect *select);
 int LocalTvtCallSelect_GetSelected(LocalTvtCallSelect *select);
-
-// local_tvt_person.c: the call with a person, who greets and then talks about the topic the player picks
-
-#define LOCAL_TVT_TOPIC_MAX 4
-
-typedef struct {
-    LocalTvtMessage *message;
-    LocalTvtChara *chara;
-    ClActUnit *unit;
-    LocalTvtCallData *callData;
-} LocalTvtPersonSetup;
-
-// A step of a call, which returns TRUE once it is over. The work starts with the step's own counter
-typedef BOOL (*LocalTvtPersonFunc)(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
-
-// What each local_tvt_person_*.c gives of its person
-typedef struct {
-    void *work;
-    LocalTvtPersonFunc greet;
-    LocalTvtPersonFunc topics[LOCAL_TVT_TOPIC_MAX];
-    void (*free)(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);
-    // The messages of the topics in the menu
-    u32 topicNames[LOCAL_TVT_TOPIC_MAX];
-    u32 topicCount;
-    // The person's question before the menu
-    u32 menuMsg;
-    MsgData *msgData;
-} LocalTvtPersonFuncs;
-
-LocalTvtPerson *LocalTvtPerson_Create(const LocalTvtPersonFuncs *funcs, const LocalTvtPersonSetup *setup,
-                                      HeapID heapId);
-void LocalTvtPerson_Free(LocalTvtPerson *person);
-void LocalTvtPerson_Main(LocalTvtPerson *person);
-BOOL LocalTvtPerson_IsEnd(LocalTvtPerson *person);
-// Ends the call; the topic that says goodbye calls it
-void LocalTvtPerson_End(LocalTvtPerson *person);
 
 // local_tvt_person_*.c
 void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId);
