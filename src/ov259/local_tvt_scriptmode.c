@@ -1,5 +1,9 @@
+#include "app/local_tvt/local_tvt_scriptmode.h"
 #include "types.h"
-#include "app/local_tvt_local.h"
+#include "app/local_tvt/local_tvt_calldata.h"
+#include "app/local_tvt/local_tvt_chara.h"
+#include "app/local_tvt/local_tvt_common.h"
+#include "app/local_tvt/local_tvt_person_secret.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
@@ -49,16 +53,16 @@ enum {
 #define SCRIPT_PERSON_8 8
 #define SCRIPT_PERSON_9 9
 
-typedef struct {
+struct LocalTvtScriptHeader {
     u8 persons[LOCAL_TVT_FACES];
     u16 zones[LOCAL_TVT_FACES];
-} LocalTvtScriptHeader;
+};
 
-typedef struct {
+struct LocalTvtScriptCommand {
     u8 command;
     u8 face;
     u16 param;
-} LocalTvtScriptCommand;
+};
 
 struct LocalTvtScriptMode {
     u16 heapId;
@@ -79,10 +83,10 @@ struct LocalTvtScriptMode {
     u16 wait;
 };
 
-typedef struct {
+struct LocalTvtScriptCommandFuncs {
     void (*init)(LocalTvtScriptMode *mode);
     BOOL (*main)(LocalTvtScriptMode *mode);
-} LocalTvtScriptCommandFuncs;
+};
 
 static void LocalTvtScriptMode_InitGraphic(LocalTvtScriptMode *mode);
 static void LocalTvtScriptMode_ExitGraphic(LocalTvtScriptMode *mode);
