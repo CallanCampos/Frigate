@@ -2076,6 +2076,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A value the inner loop computes from the outer loop's counter alone, like `turn = row / 3`, is hoisted into the
   preheader too, so it can be written inside the inner loop. `row % 3` used in both conditions of an `if`/`else if`
   is computed once, later than a `rowInTurn` variable set with `turn` would be.
+- An outer loop body that starts with a `volatile` store and splits the inner loop's hoisted row address around it
+  (`y * 33` before the store, `* 6 + ripple` after it, and the inner counter set last) kept another of the outer
+  counter's invariants in a local assigned after the store. The ripple's `EncEffRipple_Draw`
+  (`encounter_effect_ripple.c`) matches with its strip's texture coordinate as `fx32 t;`, set by
+  `t = y * 8 * FX32_ONE;` right after `G3_Begin(GX_BEGIN_QUAD_STRIP)`, and the vertices indexed in the inner loop,
+  `ripple->vertices[y * 33 + x]`. With `y * 8 * FX32_ONE` written in the inner loop's `G3_TexCoord` calls, every
+  spelling of the row put its whole address before the store or after it; `t` assigned before `G3_Begin` is 18 bytes
+  off, and a row pointer 3 to 50.
 - A loop that walks a pointer parameter (`for (; options->text != END; options++)`) reuses the test's load in the
   body. When the original loads the field again at the top of the body, the loop walks a local cursor set from the
   parameter instead (`for (option = options; option->text != END; option++)`), as bmp_menuwork.c's
