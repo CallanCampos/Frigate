@@ -256,6 +256,7 @@ typedef struct EffectEncountState EffectEncountState;
 typedef struct EncountSystem EncountSystem;
 typedef struct EncounterCutinWork EncounterCutinWork;
 typedef struct EntralinkWarpReturnWork EntralinkWarpReturnWork;
+typedef struct EntranceCamera EntranceCamera;
 typedef struct Event3DDemoWork Event3DDemoWork;
 typedef struct EventActionCallWork EventActionCallWork;
 typedef struct EventActorAnmProcWaitWork EventActorAnmProcWaitWork;

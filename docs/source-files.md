@@ -535,7 +535,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | partial | string at `0x021d5360` |
 | `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | partial | string at `0x021d5378` |
 | `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | partial | string at `0x021d53b0` |
-| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | partial | string at `0x021d53c4` |
+| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | complete | string at `0x021d53c4` |
 | `field_gimmick.c` | `0x021b7f7c`–`0x021b804c` | 4 | partial | descriptive |
 | `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | partial | string at `0x021d53d8` |
 | `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | partial | descriptive |
