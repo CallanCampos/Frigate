@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
+#include "app/local_tvt/local_tvt_callmode.h"
 #include "app/local_tvt/local_tvt_callselect.h"
 #include "app/local_tvt/local_tvt_chara.h"
 #include "app/local_tvt/local_tvt_common.h"
@@ -25,31 +26,6 @@
 #include "struct_decls.h"
 #include "system/gf_font.h"
 #include "system/printsys.h"
-
-typedef struct LocalTvtCallMode LocalTvtCallMode;
-
-// local_tvt_callmode.c: the calls the player makes
-
-// Whether the player picks the person, or the call is with LOCAL_TVT_CALL_SECRET at once
-enum {
-    LOCAL_TVT_CALL_MODE_SELECT,
-    LOCAL_TVT_CALL_MODE_SECRET,
-    LOCAL_TVT_CALL_MODE_2,
-};
-
-typedef struct {
-    GameSystem *gsys;
-    GameData *gameData;
-    LocalTvtChara *chara;
-    LocalTvtMessage *message;
-    ClActUnit *unit;
-    // LOCAL_TVT_CALL_MODE_*
-    u32 mode;
-} LocalTvtCallModeSetup;
-
-LocalTvtCallMode *LocalTvtCallMode_Create(const LocalTvtCallModeSetup *setup, HeapID heapId);
-void LocalTvtCallMode_Free(LocalTvtCallMode *mode);
-BOOL LocalTvtCallMode_Main(LocalTvtCallMode *mode);
 
 // local_tvt_person_*.c
 void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId);

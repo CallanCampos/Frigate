@@ -1,3 +1,4 @@
+#include "app/local_tvt/local_tvt_callmode.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_callselect.h"
@@ -29,7 +30,7 @@
 // persons, the ringing, and the call with the person picked
 
 // The window that shows the Xtransceiver is ringing
-typedef struct {
+struct LocalTvtCalling {
     BmpWin *window;
     WaitIcon *icon;
     LocalTvtMessage *message;
@@ -37,7 +38,7 @@ typedef struct {
     u16 ringCount;
     u16 finished;
     u16 timer;
-} LocalTvtCalling;
+};
 
 struct LocalTvtCallMode {
     u16 heapId;
@@ -54,10 +55,10 @@ struct LocalTvtCallMode {
     u32 ringCount;
 };
 
-typedef struct {
+struct LocalTvtCallPerson {
     u16 person;
     u16 nameMsg;
-} LocalTvtCallPerson;
+};
 
 static void LocalTvtCallMode_SetMode(LocalTvtCallMode *mode, u32 callMode);
 static void LocalTvtCallMode_GetSelectSetup(LocalTvtCallMode *mode, LocalTvtCallSelectSetup *setup);
