@@ -5,6 +5,7 @@
 #include "nitro/mi.h"
 #include "nitro/mic.h"
 #include "nitro/os.h"
+#include "nitro/pm.h"
 #include "nitro/pxi.h"
 #include "twl/scfg.h"
 

@@ -53,7 +53,7 @@ static FSResult FSi_MemoryArchiveProc(FSFile *file, FSCommandType command) {
 static void FSi_InitMemoryArchive(void) {
     u32 interrupts = OS_DisableInterrupts();
 
-    if (!sMemoryArchiveReady || !FS_IsArchiveMounted(&sMemoryArchive)) {
+    if (!sMemoryArchiveReady || !FS_IsArchiveLoaded(&sMemoryArchive)) {
         FS_InitArchive(&sMemoryArchive);
         FS_SetArchiveProc(&sMemoryArchive, FSi_MemoryArchiveProc, 0xffffffff);
         if (!FS_LoadArchive(&sMemoryArchive, 0, 0, 0, 0, 0, NULL, NULL)) {

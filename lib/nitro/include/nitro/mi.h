@@ -117,12 +117,11 @@ typedef enum {
 } MIProcessor;
 
 // Copy or fill size bytes a halfword or a word at a time: NitroSDK's MIi_CpuCopy16, MIi_CpuClear16, MIi_CpuClear32 and
-// MIi_CpuCopy32. The last returns nothing in the SDK; gfl/std.h still declares it to return a pointer, and has to
-// change along with this
-void MIi_CpuCopy16(const void *src, void *dest, u32 size);  // swan's sys_memcpy16
-void MIi_CpuClear16(u16 value, void *dest, u32 size);       // swan's sys_memset16
-void MIi_CpuClear32(u32 value, void *dest, u32 size);       // swan's sys_memset32
-void *MIi_CpuCopy32(const void *src, void *dest, u32 size); // swan's sys_memcpy32
+// MIi_CpuCopy32
+void MIi_CpuCopy16(const void *src, void *dest, u32 size); // swan's sys_memcpy16
+void MIi_CpuClear16(u16 value, void *dest, u32 size);      // swan's sys_memset16
+void MIi_CpuClear32(u32 value, void *dest, u32 size);      // swan's sys_memset32
+void MIi_CpuCopy32(const void *src, void *dest, u32 size); // swan's sys_memcpy32
 // Copy or fill size bytes in units of bytes: NitroSDK's MI_CpuCopy8 and MI_CpuFill8, MI_CpuComp8,
 // which returns the difference of the first bytes that differ, or 0, MI_CpuCopy, which copies by words whatever the
 // alignment, MI_CpuMove, which also handles ranges that overlap, and MI_CpuFill, which fills by words
@@ -194,8 +193,7 @@ static inline void MI_SetMainMemoryPriority(MIProcessor proc) {
 #define MI_SwapEndian32(x)                                                                                             \
     ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >> 8) | (((x) & 0x0000ff00) << 8) | ((x) << 24))
 
-// NitroSDK's MI_SwapWord, in assembly: stores the word at the address and returns the one that was there. os.h still
-// declares it too
+// NitroSDK's MI_SwapWord, in assembly: stores the word at the address and returns the one that was there
 u32 MI_SwapWord(u32 data, vu32 *destp); // swan's memswap
 
 // Decompresses LZ77 data, which starts with a word holding its decompressed size in its upper 24 bits.

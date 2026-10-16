@@ -12,20 +12,20 @@ static void func_02704f9c(void);
 static BOOL func_02704fe4(int index);
 
 // Powers the DSP: its clock, then its reset line, then the reset of its port
-void DSP_PowerOn(void) {
-    reg_SCFG_RST &= ~DSP_SCFG_RST_RELEASE;
-    reg_SCFG_CLK = (u16)((reg_SCFG_CLK & (u16)~DSP_SCFG_CLK_ENABLE) | DSP_SCFG_CLK_ENABLE);
+void DSP_PowerOnCore(void) {
+    reg_SCFG_RST &= ~SCFG_RST_DSP;
+    reg_SCFG_CLK = (u16)((reg_SCFG_CLK & (u16)~SCFG_CLK_DSP) | SCFG_CLK_DSP);
     OS_SpinWaitSysCycles(2);
-    reg_SCFG_RST = (u16)((reg_SCFG_RST & (u16)~DSP_SCFG_RST_RELEASE) | DSP_SCFG_RST_RELEASE);
-    DSP_ResetOn();
+    reg_SCFG_RST = (u16)((reg_SCFG_RST & (u16)~SCFG_RST_DSP) | SCFG_RST_DSP);
+    DSP_ResetOnCore();
 }
 
-void DSP_PowerOff(void) {
-    reg_SCFG_RST &= ~DSP_SCFG_RST_RELEASE;
-    reg_SCFG_CLK &= ~DSP_SCFG_CLK_ENABLE;
+void DSP_PowerOffCore(void) {
+    reg_SCFG_RST &= ~SCFG_RST_DSP;
+    reg_SCFG_CLK &= ~SCFG_CLK_DSP;
 }
 
-void DSP_ResetOn(void) {
+void DSP_ResetOnCore(void) {
     if (reg_DSP_PCFG & DSP_PCFG_RESET) {
         return;
     }
@@ -34,7 +34,7 @@ void DSP_ResetOn(void) {
     }
 }
 
-void DSP_ResetOffEx(u16 mask) {
+void DSP_ResetOffExCore(u16 mask) {
     while (reg_DSP_PSTS & DSP_PSTS_RESETTING) {
     }
     func_02704f9c();
@@ -64,7 +64,7 @@ static BOOL func_02704fe4(int index) {
     return empty;
 }
 
-BOOL DSP_RecvDataIsReady(int index) {
+BOOL DSP_RecvDataIsReadyCore(int index) {
     BOOL ready = TRUE;
     if (!(reg_DSP_PSTS & ((1 << index) << DSP_PSTS_REPLY_SHIFT))) {
         ready = FALSE;
@@ -72,14 +72,14 @@ BOOL DSP_RecvDataIsReady(int index) {
     return ready;
 }
 
-void DSP_SendData(int index, u16 data) {
+void DSP_SendDataCore(int index, u16 data) {
     while (!func_02704fe4(index)) {
     }
     reg_DSP_CMD(index) = data;
 }
 
-u16 DSP_RecvData(int index) {
-    while (!DSP_RecvDataIsReady(index)) {
+u16 DSP_RecvDataCore(int index) {
+    while (!DSP_RecvDataIsReadyCore(index)) {
     }
     return reg_DSP_REP(index);
 }
@@ -147,14 +147,14 @@ void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags) {
     OS_RestoreInterrupts(enabled);
 }
 
-u16 DSP_GetSemaphore(void) {
+u16 DSP_GetSemaphoreCore(void) {
     return reg_DSP_SEM;
 }
 
-void DSP_ClearSemaphore(u16 mask) {
+void DSP_ClearSemaphoreCore(u16 mask) {
     reg_DSP_PCLEAR = mask;
 }
 
-void DSP_MaskSemaphore(u16 mask) {
+void DSP_MaskSemaphoreCore(u16 mask) {
     reg_DSP_PMASK = mask;
 }

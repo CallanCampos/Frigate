@@ -5,7 +5,7 @@
 
 // NitroSDK's NVRAM library: the ARM9's access to the console's NVRAM (the flash of the firmware, which keeps the Wi-Fi
 // settings), through the PXI FIFO and the ARM7. The functions have the names of the SDK functions they are, from how
-// the code works, and the names are guesses where the SDK's are not known
+// the code works
 
 // The result of a call, as the callback gets it and the synchronous functions return it. The names are by where each
 // is produced: ILLEGAL_STATUS also when the library is not initialized, WRITE_ERROR when the flash's status register

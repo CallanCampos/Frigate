@@ -105,13 +105,11 @@ int STD_GetStringLength(const char *str) {
     int len = 0;
     const u32 *p;
 
-    if ((u32)str & 3) {
-        do {
-            if (str[len] == '\0') {
-                return len;
-            }
-            len++;
-        } while (((u32)(str + len)) & 3);
+    while ((u32)(str + len) & 3) {
+        if (str[len] == '\0') {
+            return len;
+        }
+        len++;
     }
     p = (const u32 *)(str + len);
     for (;;) {
@@ -161,8 +159,8 @@ int STD_CompareString(const char *a, const char *b) {
     int i = 0;
 
     if (!(offset ^ ((u32)b & 3))) {
-        if (offset != 0 && offset < 4) {
-            do {
+        if (offset != 0) {
+            while (i + offset < 4) {
                 u8 ca = a[i];
                 u8 cb = b[i];
 
@@ -170,7 +168,7 @@ int STD_CompareString(const char *a, const char *b) {
                     return ca - cb;
                 }
                 i++;
-            } while (i + offset < 4);
+            }
         }
         for (;;) {
             u32 wa = *(const u32 *)(a + i);

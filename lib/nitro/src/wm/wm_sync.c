@@ -1,7 +1,8 @@
 // The wireless manager's functions that give their answer at once (libwm, TwlSDK's wm/ARM9/src/wm_sync.c, by its place
 // in the library: the file name is a guess): setting the callbacks of indications and ports, reading the status and
 // the data of the multi-point mode, the sizes of its buffers, the channels and the link level, the dispersion of the
-// beacon and the scan, the elements of a beacon and the next TGID. The names are descriptive
+// beacon and the scan, the elements of a beacon and the next TGID. The public functions have the SDK's names, from what
+// they do; the static ones' names are ours
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"

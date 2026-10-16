@@ -136,12 +136,11 @@ static SNDEXResult func_02704448(int volume, SNDEXCallback callback, void *arg, 
     if (result != SNDEX_RESULT_SUCCESS) {
         return result;
     }
-    result = SNDEX_RESULT_SUCCESS;
     func_02704d48(callback, arg, NULL, SNDEX_COMMAND_84);
     if (!func_02704b74(sSndex.command, (u8)((volume & 0x1f) | (byLevel << 6)))) {
-        result = SNDEX_RESULT_SEND_ERROR;
+        return SNDEX_RESULT_SEND_ERROR;
     }
-    return result;
+    return SNDEX_RESULT_SUCCESS;
 }
 
 static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg) {
@@ -150,19 +149,6 @@ static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg) 
     }
     return func_02704448(volume, callback, arg, FALSE);
 }
-
-// Waits until the answer to the last word is in and the library is idle again, sends the next word of the filter
-// request, and ends the request if the FIFO refuses it. The code is repeated for each word
-#define SNDEX_SEND_FILTER_WORD(cmd, word, cb, cbArg)                                                                   \
-    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);                                                                           \
-    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {                                                                  \
-        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);                                                                       \
-    }                                                                                                                  \
-    func_02704d48((cb), (cbArg), NULL, (cmd));                                                                         \
-    if (!func_02704be0(sSndex.command, (word))) {                                                                      \
-        sSndex.filterBusy = FALSE;                                                                                     \
-        return SNDEX_RESULT_SEND_ERROR;                                                                                \
-    }
 
 // Sends the words of the filter request, one after the other, and gives the last the callback
 static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallback callback, void *arg) {
@@ -187,12 +173,61 @@ static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallb
         sSndex.filterBusy = FALSE;
         return SNDEX_RESULT_SEND_ERROR;
     }
-    SNDEX_SEND_FILTER_WORD(SNDEX_COMMAND_FILTER_COEFFICIENT_0, coefficients[0], NULL, NULL)
-    SNDEX_SEND_FILTER_WORD(SNDEX_COMMAND_FILTER_COEFFICIENT_1, coefficients[1], NULL, NULL)
-    SNDEX_SEND_FILTER_WORD(SNDEX_COMMAND_FILTER_COEFFICIENT_2, coefficients[2], NULL, NULL)
-    SNDEX_SEND_FILTER_WORD(SNDEX_COMMAND_FILTER_COEFFICIENT_3, coefficients[3], NULL, NULL)
-    SNDEX_SEND_FILTER_WORD(SNDEX_COMMAND_FILTER_COEFFICIENT_4, coefficients[4], NULL, NULL)
-    SNDEX_SEND_FILTER_WORD(SNDEX_COMMAND_FILTER_END, 0, callback, arg)
+    // Each word waits until the answer to the last one is in and the library is idle again
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    }
+    func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_0);
+    if (!func_02704be0(sSndex.command, coefficients[0])) {
+        sSndex.filterBusy = FALSE;
+        return SNDEX_RESULT_SEND_ERROR;
+    }
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    }
+    func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_1);
+    if (!func_02704be0(sSndex.command, coefficients[1])) {
+        sSndex.filterBusy = FALSE;
+        return SNDEX_RESULT_SEND_ERROR;
+    }
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    }
+    func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_2);
+    if (!func_02704be0(sSndex.command, coefficients[2])) {
+        sSndex.filterBusy = FALSE;
+        return SNDEX_RESULT_SEND_ERROR;
+    }
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    }
+    func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_3);
+    if (!func_02704be0(sSndex.command, coefficients[3])) {
+        sSndex.filterBusy = FALSE;
+        return SNDEX_RESULT_SEND_ERROR;
+    }
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    }
+    func_02704d48(NULL, NULL, NULL, SNDEX_COMMAND_FILTER_COEFFICIENT_4);
+    if (!func_02704be0(sSndex.command, coefficients[4])) {
+        sSndex.filterBusy = FALSE;
+        return SNDEX_RESULT_SEND_ERROR;
+    }
+    OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    while (func_02704c5c() != SNDEX_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+    }
+    func_02704d48(callback, arg, NULL, SNDEX_COMMAND_FILTER_END);
+    if (!func_02704be0(sSndex.command, 0)) {
+        sSndex.filterBusy = FALSE;
+        return SNDEX_RESULT_SEND_ERROR;
+    }
     return SNDEX_RESULT_SUCCESS;
 }
 
@@ -434,24 +469,20 @@ static void func_02704d48(SNDEXCallback callback, void *arg, void *result, u8 co
 
 // The callback that runs before the console sleeps or exits
 static void func_02704d64(void *arg) {
-#pragma unused(arg)
     func_02704d74();
     func_02704e04();
 }
 
 // Waits until the last word of the filter request has been answered
 static void func_02704d74(void) {
-    if (sSndex.filterEndSent) {
-        do {
-            OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
-            PXIi_HandlerRecvFifoNotEmpty();
-        } while (sSndex.filterEndSent);
+    while (sSndex.filterEndSent) {
+        OS_SpinWaitSysCycles(SNDEX_SPIN_CYCLES);
+        PXIi_HandlerRecvFifoNotEmpty();
     }
 }
 
 // The callback of the volume request: sends it again if it failed, up to five times, and ends the wait otherwise
 static void func_02704db0(SNDEXResult result, void *arg) {
-#pragma unused(arg)
     if (result != SNDEX_RESULT_SUCCESS && sSndex.volumeCallbackRetries < 5) {
         func_027044c0(sSndex.volume, func_02704db0, NULL);
         sSndex.volumeCallbackRetries++;

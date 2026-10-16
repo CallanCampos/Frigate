@@ -10,12 +10,12 @@
 // bit 1 runs the DSP, bit 2 the camera's interface and bit 8 the camera
 #define reg_SCFG_CLK (*(vu16 *)0x04004004)
 #define SCFG_CLK_CPU_2X 0x0001
-#define DSP_SCFG_CLK_ENABLE 0x0002
+#define SCFG_CLK_DSP 0x0002
 #define SCFG_CLK_CAMERA_INTERFACE 0x0004
 #define SCFG_CLK_CAMERA 0x0100
 // SCFG_RST: bit 0 takes the DSP out of its reset, which it is held in while the bit is low
 #define reg_SCFG_RST (*(vu16 *)0x04004006)
-#define DSP_SCFG_RST_RELEASE 0x0001
+#define SCFG_RST_DSP 0x0001
 
 typedef enum SCFGCpuSpeed {
     SCFG_CPU_SPEED_1X = 0,

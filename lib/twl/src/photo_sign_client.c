@@ -75,7 +75,7 @@ void PhotoSign_Init(void) {
     PhotoSign_InitLock();
     PXI_Init();
     PXI_SetFifoRecvCallback(PHOTO_SIGN_FIFO_TAG, PhotoSign_FifoCallback);
-    while (!PXI_IsCallbackReady(PHOTO_SIGN_FIFO_TAG, MI_PROCESSOR_ARM7)) {
+    while (!PXI_IsCallbackReady(PHOTO_SIGN_FIFO_TAG, PXI_PROC_ARM7)) {
     }
     sInitialized = TRUE;
 }

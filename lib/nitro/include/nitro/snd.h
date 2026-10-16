@@ -31,7 +31,8 @@ typedef struct SNDCommandQueue {
     u32 nextTag;   // the tag of the packet that the ready commands will make
 } SNDCommandQueue;
 
-// They are in the .bss of nitro_snd_main.c: the 32-aligned pool and shared work of snd_command.c start after them
+// They are in the .bss of nitro_snd_main.c: the 32-aligned pool and shared work of snd_command.c start after them. The
+// names SNDCommandQueue, SNDi_Queue and SNDi_Sent are ours, for what NitroSDK keeps as statics of snd_command.c
 extern SNDCommandQueue SNDi_Queue;
 extern SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
 
@@ -98,8 +99,8 @@ void SNDi_IncAlarmId(int alarmNo);
 u8 SNDi_SetAlarmHandler(int alarmNo, SNDAlarmHandler handler, void *arg);
 void SNDi_CallAlarmHandler(int data);
 
-// Commands: NitroSDK's SND_FlushCommand and SND_WaitForCommandProc by their code, and SND_GetCurrentCommandTag under
-// swan's name
+// Commands: NitroSDK's SND_FlushCommand and SND_WaitForCommandProc by their code, and SND_GetCurrentCommandTag (swan's
+// name noted)
 #define SND_COMMAND_BLOCK 1
 // Flush: wake the ARM7 up for the packet at once
 #define SND_COMMAND_IMMEDIATE 2
@@ -272,8 +273,8 @@ void SND_SetTrackAllocatableChannel(int playerNo, u32 trackBitMask, u32 chBitFla
 void SND_SetTrackMute(int playerNo, u32 trackBitMask, BOOL flag);
 void SND_SetTrackMuteEx(int playerNo, u32 trackBitMask, int muteType);
 
-// NitroSDK's SND_LockChannel and SND_UnlockChannel, by their code; SND_SetChannelTimer and SND_SetMasterVolume under
-// swan's names; SND_SetOutputSelector, SND_SetMasterPan and SND_ResetMasterPan by their code
+// NitroSDK's SND_LockChannel and SND_UnlockChannel, by their code; SND_SetChannelTimer and SND_SetMasterVolume (swan's
+// names noted); SND_SetOutputSelector, SND_SetMasterPan and SND_ResetMasterPan by their code
 #define SND_CHANNEL_TIMER_MIN 0x10
 #define SND_CHANNEL_TIMER_MAX 0xffff
 #define SND_CHANNEL_LOOP_1SHOT 2

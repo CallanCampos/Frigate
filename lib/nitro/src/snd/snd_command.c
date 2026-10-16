@@ -67,12 +67,10 @@ SNDCommand *SND_RecvCommandReply(u32 flags) {
     SNDCommand *last;
 
     if (flags & SND_COMMAND_BLOCK) {
-        if (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag()) {
-            do {
-                OS_RestoreInterrupts(enabled);
-                OS_SpinWaitSysCycles(SND_WAIT_CYCLES);
-                enabled = OS_DisableInterrupts();
-            } while (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag());
+        while (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag()) {
+            OS_RestoreInterrupts(enabled);
+            OS_SpinWaitSysCycles(SND_WAIT_CYCLES);
+            enabled = OS_DisableInterrupts();
         }
     } else if (SNDi_Queue.receivedTag == SNDi_GetFinishedCommandTag()) {
         OS_RestoreInterrupts(enabled);
@@ -222,15 +220,12 @@ void SND_WaitForCommandProc(u32 tag) {
         return;
     }
     SNDi_WakeArm7();
-    if (SND_IsFinishedCommandTag(tag)) {
-        return;
-    }
-    do {
+    while (!SND_IsFinishedCommandTag(tag)) {
         SND_RecvCommandReply(SND_COMMAND_BLOCK);
-    } while (!SND_IsFinishedCommandTag(tag));
+    }
 }
 
-// swan's name for SND_GetCurrentCommandTag: the tag that SND_IsFinishedCommandTag tells for the commands pushed last,
+// NitroSDK's SND_GetCurrentCommandTag: the tag that SND_IsFinishedCommandTag tells for the commands pushed last,
 // which is the next packet's while commands wait to be flushed, and else the last packet taken back
 u32 SND_GetCurrentCommandTag(void) {
     u32 enabled = OS_DisableInterrupts();
@@ -309,7 +304,7 @@ static void SNDi_PxiFifoCallback(u32 fifoTag, u32 data, BOOL err) {
 static void SNDi_InitPxi(void) {
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SOUND, SNDi_PxiFifoCallback);
     if (SNDi_IsDriverAvailable()) {
-        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_SOUND, MI_PROCESSOR_ARM7)) {
+        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_SOUND, PXI_PROC_ARM7)) {
             OS_SpinWaitSysCycles(SND_WAIT_CYCLES);
         }
     }

@@ -85,12 +85,8 @@ static BOOL sSleepCallbackSet;
 // Tells the DSP's OS to quit, and waits for its answer
 static void func_027052b4(void) {
     sProcessList->events = 0;
-    if (OS_IsRunOnTwl() == TRUE) {
-        DSP_SendData(2, 0x8000);
-    }
-    if (OS_IsRunOnTwl() == TRUE) {
-        DSP_RecvData(2);
-    }
+    DSP_SendData(2, 0x8000);
+    DSP_RecvData(2);
 }
 
 // Before the system exits: quits every process
@@ -158,7 +154,6 @@ static BOOL func_0270541c(DSPProcessContext *context, MIWram wram, int slot, MIW
 
 // Loads one section of the image into the banks of its slots, taking a bank for each slot that has none yet
 static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, const COFFSection *section) {
-    int mask;
     int empty;
     const char *name = section->name.chars;
     BOOL result = TRUE;
@@ -182,33 +177,33 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
     }
     if (section->flags & COFF_SECTION_PROGRAM) {
         u32 address = section->programAddress * 2;
-        BOOL empty = (section->flags & COFF_SECTION_PROGRAM_EMPTY) != 0;
+        BOOL sectionEmpty = (section->flags & COFF_SECTION_PROGRAM_EMPTY) != 0;
         if (STD_SearchString(name, "@c0")) {
             wrams[count] = MI_WRAM_B;
             addresses[count] = address;
-            empties[count] = empty;
+            empties[count] = sectionEmpty;
             count++;
         }
         if (STD_SearchString(name, "@c1")) {
             wrams[count] = MI_WRAM_B;
             addresses[count] = address + DSP_MEMORY_HALF_SIZE;
-            empties[count] = empty;
+            empties[count] = sectionEmpty;
             count++;
         }
     }
     if (section->flags & COFF_SECTION_DATA) {
         u32 address = section->dataAddress * 2;
-        BOOL empty = (section->flags & COFF_SECTION_DATA_EMPTY) != 0;
+        BOOL sectionEmpty = (section->flags & COFF_SECTION_DATA_EMPTY) != 0;
         if (STD_SearchString(name, "@d0")) {
             wrams[count] = MI_WRAM_C;
             addresses[count] = address;
-            empties[count] = empty;
+            empties[count] = sectionEmpty;
             count++;
         }
         if (STD_SearchString(name, "@d1")) {
             wrams[count] = MI_WRAM_C;
             addresses[count] = address + DSP_MEMORY_HALF_SIZE;
-            empties[count] = empty;
+            empties[count] = sectionEmpty;
             count++;
         }
     }
@@ -219,9 +214,8 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
         u32 fileOffset = section->dataOffset;
         empty = empties[i];
         while (size > 0) {
-            int chunk;
-            mask = -DSP_BANK_SIZE;
-            chunk = ((address + DSP_BANK_SIZE) & mask) - address;
+            int chunk = ((address + DSP_BANK_SIZE) & ~(DSP_BANK_SIZE - 1)) - address;
+
             if (size <= chunk) {
                 chunk = size;
             }
@@ -348,6 +342,11 @@ static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB,
 void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callback, void *userData) {
     u32 irq = OS_DisableInterrupts();
     int i;
+    int replies;
+    u16 mask;
+    u16 pcfg;
+    u16 pmask;
+
     for (i = 0; i < DSP_EVENT_COUNT; i++) {
         if (events & (1 << i)) {
             context->callback[i] = callback;
@@ -355,10 +354,10 @@ void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callbac
             context->group[i] = events;
         }
     }
-    int replies = ((events >> DSP_EVENT_REPLY_SHIFT) & 7) << DSP_PCFG_REPLY_IRQ_SHIFT;
-    u16 mask = events;
-    u16 pcfg = reg_DSP_PCFG;
-    u16 pmask = reg_DSP_PMASK;
+    replies = ((events >> DSP_EVENT_REPLY_SHIFT) & 7) << DSP_PCFG_REPLY_IRQ_SHIFT;
+    mask = events;
+    pcfg = reg_DSP_PCFG;
+    pmask = reg_DSP_PMASK;
     if (callback != NULL) {
         reg_DSP_PCFG = pcfg | replies;
         reg_DSP_PMASK = pmask & ~mask;
@@ -386,7 +385,6 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
     if (func_02705acc(context, image, banksB, banksC)) {
         u32 irq = OS_DisableInterrupts();
         DSPProcessContext **link = &sProcessList;
-        u16 mask;
         while (*link != NULL && *link != context) {
             link = &(*link)->next;
         }
@@ -402,28 +400,21 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
             PM_InsertPreSleepCallback(&sDspSleepCallbackInfo, DSP_PM_PRIORITY);
             sSleepCallbackSet = TRUE;
         }
-        if (OS_IsRunOnTwl() == TRUE) {
-            DSP_PowerOn();
-        }
-        mask = context->events >> 16;
-        if (OS_IsRunOnTwl() == TRUE) {
-            DSP_ResetOffEx(mask);
-        }
-        mask = ~context->events;
-        if (OS_IsRunOnTwl() == TRUE) {
-            DSP_MaskSemaphore(mask);
-        }
+        DSP_PowerOn();
+        DSP_ResetOffEx(context->events >> 16);
+        DSP_MaskSemaphore(~context->events);
         func_02705c20();
         if (context->flags & DSP_PROCESS_USING_OS) {
-            u16 port = 0;
-            do {
-                // volatile: the ROM stores each reply in a stack variable and reads it back to compare it
+            u16 port;
+
+            for (port = 0; port < 3; port++) {
+                // The SDK's own volatile local for the reply; nothing else writes it
                 volatile u16 reply;
+
                 do {
-                    reply = DSP_RecvData(port);
+                    reply = DSP_RecvDataCore(port);
                 } while (reply != 1);
-                port++;
-            } while (port < 3);
+            }
         }
         func_0270532c();
         started = TRUE;
@@ -438,12 +429,8 @@ void DSP_QuitProcess(DSPProcessContext *context) {
     DSPProcessContext *node;
     func_027052b4();
     irq = OS_DisableInterrupts();
-    if (OS_IsRunOnTwl() == TRUE) {
-        DSP_ResetOn();
-    }
-    if (OS_IsRunOnTwl() == TRUE) {
-        DSP_PowerOff();
-    }
+    DSP_ResetOn();
+    DSP_PowerOff();
     OS_DisableIrqMask(OS_IE_DSP);
     OS_SetIrqFunction(OS_IE_DSP, NULL);
     MI_FreeWram(MI_WRAM_B, MI_WRAM_DSP);

@@ -112,7 +112,8 @@ u16 CAMERA_SizeToWidthCore(CAMERASize size);
 u16 CAMERA_SizeToHeightCore(CAMERASize size);
 
 // camera.c's other functions on the camera interface's registers (SCFG_CLK and the control word at 0x04004202), which
-// camera_api.c calls while it starts the camera, stops it and handles its interrupt. Their names are descriptive
+// camera_api.c calls while it starts the camera, stops it and handles its interrupt. The three named ones have guesses
+// in the SDK's style, not its names
 void CAMERA_ResetCore(void);                 // resets the interface and its camera clock
 BOOL CAMERA_IsBufferErrorCore(void);         // whether the interface reports a buffer error (bit 4 of its control)
 void CAMERA_SetInterruptEnableCore(BOOL on); // sets or clears the interface's interrupt enable (bit 11 of its control)
@@ -281,8 +282,5 @@ static inline void CAMERA_DmaRecvAsync(u32 ndmaNo, void *dest, u32 unit, u32 len
                                        void *arg) {
     func_02768378(ndmaNo, dest, unit / 4, length, 0, callback, arg);
 }
-
-// What camera_api.c uses of the other libraries, whose headers do not have it yet. Each block moves to the header it
-// names with the chain that owns it.
 
 #endif // POKEBW2_TWL_CAMERA_H

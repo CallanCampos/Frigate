@@ -8,24 +8,6 @@
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 
-// In the system area at the end of main memory (OSSystemWork), the console's user settings, which the ARM7 copies at
-// boot, and the last sample of the touch panel, which it writes
-#define HW_USER_SETTINGS 0x02fffc80
-#define HW_TOUCHPANEL_BUF ((const u16 *)0x02ffffaa)
-
-// The touch screen's calibration in the user settings: the raw values of two points, and where they are on the screen
-typedef struct UserSettings {
-    u8 unused0[0x58];
-    u16 touchRawX1;
-    u16 touchRawY1;
-    u8 touchScreenX1;
-    u8 touchScreenY1;
-    u16 touchRawX2;
-    u16 touchRawY2;
-    u8 touchScreenX2;
-    u8 touchScreenY2;
-} UserSettings;
-
 // A sample as the ARM7 writes it, in the two halfwords of the shared memory
 typedef union TPRawData {
     u16 half[2];
@@ -109,8 +91,8 @@ static void TPi_TpCallback(u32 tag, u32 data, BOOL err);
 static inline void ReadSample(TPData *sample) {
     TPRawData raw;
 
-    raw.half[0] = HW_TOUCHPANEL_BUF[0];
-    raw.half[1] = HW_TOUCHPANEL_BUF[1];
+    raw.half[0] = OS_GetSystemWork()->touchPanelX;
+    raw.half[1] = OS_GetSystemWork()->touchPanelY;
     sample->x = raw.sample.x;
     sample->y = raw.sample.y;
     sample->touch = (u8)raw.sample.touch;
@@ -202,22 +184,22 @@ void TP_Init(void) {
     tpState.calibrated = FALSE;
     tpState.busy = 0;
     tpState.error = 0;
-    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_TOUCHPANEL, MI_PROCESSOR_ARM7)) {
+    while (!PXI_IsCallbackReady(PXI_FIFO_TAG_TOUCHPANEL, PXI_PROC_ARM7)) {
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_TOUCHPANEL, TPi_TpCallback);
 }
 
 // TP_GetUserInfo: the calibration in the user settings, or zeros when they hold none or an invalid one
 BOOL TP_GetUserInfo(TPCalibrateParam *calibrate) {
-    const UserSettings *settings = (const UserSettings *)HW_USER_SETTINGS;
-    u16 rawX1 = settings->touchRawX1;
-    u16 rawY1 = settings->touchRawY1;
-    u8 screenX1 = settings->touchScreenX1;
-    u8 screenY1 = settings->touchScreenY1;
-    u16 rawX2 = settings->touchRawX2;
-    u16 rawY2 = settings->touchRawY2;
-    u8 screenX2 = settings->touchScreenX2;
-    u8 screenY2 = settings->touchScreenY2;
+    const NVRAMConfig *settings = (const NVRAMConfig *)HW_NVRAM_USER_INFO;
+    u16 rawX1 = settings->touch.rawX1;
+    u16 rawY1 = settings->touch.rawY1;
+    u8 screenX1 = settings->touch.screenX1;
+    u8 screenY1 = settings->touch.screenY1;
+    u16 rawX2 = settings->touch.rawX2;
+    u16 rawY2 = settings->touch.rawY2;
+    u8 screenX2 = settings->touch.screenX2;
+    u8 screenY2 = settings->touch.screenY2;
 
     if ((rawX1 == 0 && rawX2 == 0 && rawY1 == 0 && rawY2 == 0) ||
         TP_CalcCalibrateParam(calibrate, rawX1, rawY1, screenX1, screenY1, rawX2, rawY2, screenX2, screenY2) != 0) {

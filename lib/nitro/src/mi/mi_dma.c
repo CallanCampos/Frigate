@@ -133,30 +133,31 @@ void MIi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaC
 void MI_WaitDma(u32 dmaNo) {
     u32 enabled = OS_DisableInterrupts();
 
-    while (*(vu32 *)(REG_DMA0SAD_ADDR + 8 + dmaNo * 12) & MI_DMA_ENABLE) {
+    while (MI_DMA_REGS[dmaNo].cnt & MI_DMA_ENABLE) {
     }
     if (dmaNo == 0) {
-        vu32 *regs = (vu32 *)(REG_DMA0SAD_ADDR + dmaNo * 12);
-        regs[0] = 0;
-        regs[1] = 0;
-        regs[2] = MI_DMA0_DUMMY_CNT;
+        MIDmaRegs *regs = &MI_DMA_REGS[dmaNo];
+        regs->src = 0;
+        regs->dest = 0;
+        regs->cnt = MI_DMA0_DUMMY_CNT;
     }
     OS_RestoreInterrupts(enabled);
 }
 
 void MI_StopDma(u32 dmaNo) {
     u32 enabled = OS_DisableInterrupts();
-    vu32 *dmaCntp = (vu32 *)(REG_DMA0SAD_ADDR + 8 + dmaNo * 12);
+    vu32 *dmaCntp = &MI_DMA_REGS[dmaNo].cnt;
 
     *dmaCntp &= ~(MI_DMA_TIMING_MASK | MI_DMA_CONTINUOUS_ON);
     *dmaCntp &= ~MI_DMA_ENABLE;
+    // The ARM9 waits two cycles for the channel to stop
     (void)*dmaCntp;
     (void)*dmaCntp;
     if (dmaNo == 0) {
-        vu32 *regs = (vu32 *)(REG_DMA0SAD_ADDR + dmaNo * 12);
-        regs[0] = 0;
-        regs[1] = 0;
-        regs[2] = MI_DMA0_DUMMY_CNT;
+        MIDmaRegs *regs = &MI_DMA_REGS[dmaNo];
+        regs->src = 0;
+        regs->dest = 0;
+        regs->cnt = MI_DMA0_DUMMY_CNT;
     }
     OS_RestoreInterrupts(enabled);
 }
@@ -171,7 +172,12 @@ void MI_StopAllDma(void) {
 void MIi_CheckAnotherAutoDMA(u32 dmaNo, u32 dmaType) {
     int i;
 
+    // BUG: MI_DMA_MAX_NUM is the highest channel's number, so channel 3 is never checked
+#ifdef BUGFIX
+    for (i = 0; i <= MI_DMA_MAX_NUM; i++) {
+#else
     for (i = 0; i < MI_DMA_MAX_NUM; i++) {
+#endif
         u32 cnt;
         u32 type;
 

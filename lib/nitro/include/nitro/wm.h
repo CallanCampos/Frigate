@@ -2,9 +2,6 @@
 #define POKEBW2_NITRO_WM_H
 
 #include "types.h"
-#include "nitro/os.h"
-#include "nitro/pm.h"
-#include "nitro/rtc.h"
 
 // NitroSDK's wireless manager. The functions have the names of the SDK functions they appear to be
 
@@ -262,7 +259,8 @@ typedef struct {
     u16 unk_06;
 } WMIndCallback;
 
-// The callback of the child's connection: the parent's answer and the child's AID
+// The callback of the child's connection: the parent's answer, the child's AID, why it was disconnected, the wireless
+// status code of a failed connection, the parent's address and the sizes of the parent's and the child's data
 typedef struct {
     u16 apiid;
     u16 errcode;
@@ -270,6 +268,11 @@ typedef struct {
     u16 wlResult;
     u16 state;
     u16 aid;
+    u16 reason;
+    u16 wlStatus;
+    u8 macAddress[6];
+    u16 parentSize;
+    u16 childSize;
 } WMStartConnectCallback;
 
 // The callback of the measure of a channel: how busy it was

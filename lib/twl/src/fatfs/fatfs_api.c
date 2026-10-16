@@ -84,10 +84,10 @@ static FatfsState sFatfs;
 
 // Sends the ARM7 the request: its address in units of 32 bytes, the size of a cache line
 static void func_027040b4(FatfsRequest *request) {
-    u32 addr = (u32)request;
+    u32 addr;
 
     DC_FlushRange(request, FATFS_REQUEST_SIZE);
-    addr >>= 5;
+    addr = (u32)request >> 5;
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_FATFS, addr, FALSE) < 0) {
     }
 }

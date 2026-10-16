@@ -97,7 +97,7 @@ void RTC_Init(void) {
         rtcWork.data[1] = NULL;
 
         PXI_Init();
-        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_RTC, MI_PROCESSOR_ARM7)) {
+        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_RTC, PXI_PROC_ARM7)) {
         }
         PXI_SetFifoRecvCallback(PXI_FIFO_TAG_RTC, RtcCommonCallback);
     }

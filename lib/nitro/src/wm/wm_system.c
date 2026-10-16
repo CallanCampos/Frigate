@@ -1,12 +1,14 @@
 // The core of the wireless manager (libwm, TwlSDK's wm/ARM9/src/wm_system.c, by its place in the library: the file name
 // is a guess). It sets the manager up in a buffer of the game's, keeps the queue of buffers for the commands to the
 // ARM7, sends a command and receives every callback and indication that the ARM7 sends back, and checks the manager's
-// state for the functions of the other files. The names are descriptive, except swan's WMi_*
+// state for the functions of the other files. The public functions have the SDK's names, from
+// what they do, swan's for the WMi_ ones, and the static ones' names are ours
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pm.h"
 #include "nitro/pxi.h"
 #include "nitro/wm.h"
+#include "twl/nwm.h"
 #include <stdarg.h>
 
 // The buffers for commands and callbacks, and the queue that hands them out: a free buffer is in it
@@ -22,16 +24,6 @@ static struct {
     WMArm9Buf *wm9buf;
     PMSleepCallbackInfo sleepCallbackInfo;
 } sWm;
-
-// What WmReceiveFifo reads of the callback of a child's connection past the fields of WMStartConnectCallback
-typedef struct {
-    WMStartConnectCallback base;
-    u16 unk_0c; // Given to the ports as the reason
-    u16 unk_0e;
-    u8 macAddress[6];
-    u16 parentSize;
-    u16 childSize;
-} WmStartConnectCallbackView;
 
 static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size);
 static void *WmGetCommandBuffer4Arm7(void);
@@ -53,7 +45,7 @@ static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
     u32 irq = OS_DisableInterrupts();
     int i;
 
-    if (OS_IsRunOnTwl() && NWM_CheckInitialized() != 3) {
+    if (OS_IsRunOnTwl() && NWM_CheckInitialized() != NWM_RETCODE_ILLEGAL_STATE) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_ILLEGAL_STATE;
     }
@@ -79,7 +71,7 @@ static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
     }
 
     PXI_Init();
-    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_WM, 1)) {
+    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_WM, PXI_PROC_ARM7)) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_WM_DISABLE;
     }
@@ -339,14 +331,14 @@ static void WmReceiveFifo(u32 tag, u32 data, BOOL err) {
                 parentSize = parentCb->parentSize;
                 childSize = parentCb->childSize;
             } else if (cb->apiid == WM_APIID_START_CONNECT) {
-                WmStartConnectCallbackView *connectCb = (WmStartConnectCallbackView *)cb;
+                WMStartConnectCallback *connectCb = (WMStartConnectCallback *)cb;
 
-                state = connectCb->base.state;
+                state = connectCb->state;
                 aid = 0;
                 macAddress = connectCb->macAddress;
                 ssid = NULL;
-                myAid = connectCb->base.aid;
-                reason = connectCb->unk_0c;
+                myAid = connectCb->aid;
+                reason = connectCb->reason;
                 parentSize = connectCb->parentSize;
                 childSize = connectCb->childSize;
             }

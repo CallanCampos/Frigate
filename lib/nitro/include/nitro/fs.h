@@ -429,25 +429,36 @@ static inline FSResult FS_GetResultCode(const FSFile *file) {
     return file->error;
 }
 
-// NitroSDK's FS_IsBusy: whether the file has a command that did not end. It returns u32 and not BOOL, with which MWCC
-// keeps the 0 or 1 as a value to compare, as the ROM's code does, and not folded into the branch
-static inline u32 FS_IsBusy(const FSFile *file) {
-    return (file->stat & FS_FILE_STATUS_BUSY) != 0;
+// The SDK's tests of a file's and an archive's state. Other threads and the end of an asynchronous command change
+// the stat and the flag, so the SDK reads them through volatile pointers
+// NitroSDK's FS_IsBusy: whether the file has a command that did not end
+static inline BOOL FS_IsBusy(volatile const FSFile *file) {
+    return (file->stat & FS_FILE_STATUS_BUSY) ? TRUE : FALSE;
 }
 
-// NitroSDK's FS_IsDir: whether the file is an open directory. Like FS_IsBusy, it returns u32
-static inline u32 FS_IsDir(const FSFile *file) {
-    return (file->stat & FS_FILE_STATUS_IS_DIR) != 0;
+// NitroSDK's FS_IsCanceling: whether the file's command is being canceled
+static inline BOOL FS_IsCanceling(volatile const FSFile *file) {
+    return (file->stat & FS_FILE_STATUS_CANCEL) ? TRUE : FALSE;
+}
+
+// NitroSDK's FS_IsDir: whether the file is an open directory
+static inline BOOL FS_IsDir(volatile const FSFile *file) {
+    return (file->stat & FS_FILE_STATUS_IS_DIR) ? TRUE : FALSE;
 }
 
 // NitroSDK's FS_IsFile: whether the file is open, as FS_IsDir says it of a directory
-static inline BOOL FS_IsFile(const FSFile *file) {
-    return (file->stat & FS_FILE_STATUS_IS_FILE) != 0;
+static inline BOOL FS_IsFile(volatile const FSFile *file) {
+    return (file->stat & FS_FILE_STATUS_IS_FILE) ? TRUE : FALSE;
 }
 
 // NitroSDK's FS_IsArchiveLoaded: whether the archive is mounted
-static inline u32 FS_IsArchiveMounted(const FSArchive *arc) {
-    return (arc->flag & FS_ARCHIVE_FLAG_MOUNTED) != 0;
+static inline BOOL FS_IsArchiveLoaded(volatile const FSArchive *arc) {
+    return (arc->flag & FS_ARCHIVE_FLAG_MOUNTED) ? TRUE : FALSE;
+}
+
+// NitroSDK's FS_IsArchiveSuspended: whether the archive is suspended
+static inline BOOL FS_IsArchiveSuspended(volatile const FSArchive *arc) {
+    return (arc->flag & FS_ARCHIVE_FLAG_SUSPENDED) ? TRUE : FALSE;
 }
 
 void FS_InitFile(FSFile *file);                      // swan's finit
@@ -574,6 +585,8 @@ BOOL FSi_IsDsiOnlyRomOffset(const FSArchive *arc, u32 position);
 // inside the archive), FS_GetArchiveName and FSi_IncrementSjisPositionToSlash
 #define FS_ARCHIVE_SHORT_NAME_LEN_MAX 3 // the longest name that the archive holds in place
 #define FS_ARCHIVE_NAME_LEN_MAX 15
+// TwlSDK's FS_ARCHIVE_FULLPATH_MAX: the longest full path, an archive's name, ':', '/' and an entry's long name
+#define FS_ARCHIVE_FULLPATH_MAX (FS_ARCHIVE_NAME_LEN_MAX + 1 + 1 + FS_ENTRY_LONGNAME_MAX)
 #define FS_PATH_BUFFER_SIZE 0x104
 
 void FS_InitArchive(FSArchive *arc);                                           // swan's fs_create

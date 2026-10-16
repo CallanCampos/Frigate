@@ -175,10 +175,7 @@ static FSResult FSi_FindPathDefault(FSFile *file) {
         char c;
 
         length = FSi_IncrementSjisPositionToSlash(path, 0);
-        wantDirectory = TRUE;
-        if (path[length] == '\0' && isDirectory == FALSE) {
-            wantDirectory = FALSE;
-        }
+        wantDirectory = path[length] != '\0' || isDirectory;
         if (length == 0) {
             return FS_RESULT_INVALID_PARAMETER;
         }
@@ -330,10 +327,12 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
                         }
                     } while (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
                 }
-                // fileId has done its work, and holds the size of the name
-                fileId = entry.nameLength + 1;
-                MI_CpuCopy8(entry.name, buffer + pathLength - fileId, fileId);
-                pathLength -= fileId;
+                {
+                    u32 nameLength = entry.nameLength + 1;
+
+                    MI_CpuCopy8(entry.name, buffer + pathLength - nameLength, nameLength);
+                    pathLength -= nameLength;
+                }
             } else {
                 *(buffer + pathLength - 1) = '\0';
                 pathLength--;
@@ -348,10 +347,10 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
                     if (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
                         do {
                             if (entry.isDirectory && entry.id.dir.dirId == dirId) {
-                                // dirId is set again below, and holds the length of the name until then
-                                dirId = entry.nameLength;
-                                MI_CpuCopy8(entry.name, buffer + pathLength - dirId, dirId);
-                                pathLength -= dirId;
+                                u32 nameLength = entry.nameLength;
+
+                                MI_CpuCopy8(entry.name, buffer + pathLength - nameLength, nameLength);
+                                pathLength -= nameLength;
                                 break;
                             }
                         } while (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
@@ -902,26 +901,13 @@ BOOL FS_UnloadArchive(FSArchive *arc) {
 // The length of a file whose archive has this interface, without sending a command to the archive. Returns whether
 // it could
 BOOL FSi_GetFileLengthIfProc(FSFile *file, u32 *length) {
-    BOOL handled = FALSE;
-
-    if (file->arc->vtbl == &FS_VTABLE_BASE) {
-        if (FSi_ROMFAT_GetFileLength(file->arc, file, length) == FS_RESULT_SUCCESS) {
-            handled = TRUE;
-        }
-    }
-    return handled;
+    return file->arc->vtbl == &FS_VTABLE_BASE && FSi_ROMFAT_GetFileLength(file->arc, file, length) == FS_RESULT_SUCCESS;
 }
 
 // and the position in it
 BOOL FSi_GetFilePositionIfProc(FSFile *file, u32 *position) {
-    BOOL handled = FALSE;
-
-    if (file->arc->vtbl == &FS_VTABLE_BASE) {
-        if (FSi_ROMFAT_GetFilePosition(file->arc, file, position) == FS_RESULT_SUCCESS) {
-            handled = TRUE;
-        }
-    }
-    return handled;
+    return file->arc->vtbl == &FS_VTABLE_BASE &&
+           FSi_ROMFAT_GetFilePosition(file->arc, file, position) == FS_RESULT_SUCCESS;
 }
 
 // NitroSDK's FS_SetArchiveProc: sets the hook, and the commands that it is run for; neither goes without the other
@@ -978,7 +964,7 @@ u32 FS_LoadArchiveTables(FSArchive *arc, void *memory, u32 memorySize) {
 void *FS_UnloadArchiveTables(FSArchive *arc) {
     void *memory = NULL;
 
-    if (FS_IsArchiveMounted(arc)) {
+    if (FS_IsArchiveLoaded(arc)) {
         FSArchiveTables *tables = arc->userdata;
         BOOL suspended = FS_SuspendArchive(arc);
 

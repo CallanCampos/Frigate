@@ -101,15 +101,8 @@
 #define PM_SCREENS_SETTLE_CYCLES 0x360000
 #define PM_SCREENS_RETRY_CYCLES 5
 
-// The interrupts that the sleep leaves on: the PXI FIFO's, and the timer of the clock when it runs. The card's pull-out
-// interrupt request wakes the system
-#define PM_IE_FIFO_RECV 0x40000
-#define PM_IE_TIMER0 (1 << OS_IE_TIMER0_SHIFT)
-#define PM_IF_CARD_IREQ 0x100000
-
-// The card's control register, whose bit 31 stays set while a transfer runs
-#define PM_MCCNT1 (*(vu32 *)0x040001a4)
-#define PM_MCCNT1_BUSY 0x80000000
+// The sleep leaves on the PXI FIFO's interrupt, and the timer of the clock when it runs. The card's pull-out interrupt
+// request (OS_IE_CARD_IREQ) wakes the system. The card's control register keeps its start bit set while a transfer runs
 
 typedef struct {
     // The request being answered, with its callback, and where the answer's data goes
@@ -455,10 +448,8 @@ static u32 func_0207ef60(void) {
 }
 
 void PM_ForceToPowerOff(void) {
-    if (func_0207ef60() != PM_RESULT_SUCCESS) {
-        do {
-            OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
-        } while (func_0207ef60() != PM_RESULT_SUCCESS);
+    while (func_0207ef60() != PM_RESULT_SUCCESS) {
+        OS_SpinWaitSysCycles(PM_RETRY_CYCLES);
     }
     OS_DisableInterrupts();
     MI_StopAllDma();
@@ -557,7 +548,7 @@ static void PMi_StopDma(void) {
         PMi_PreDmaCnt[i] = MI_DMA_REGS[i].cnt;
         switch (MI_DMA_REGS[i].cnt & MI_DMA_TIMING_MASK) {
         case MI_DMA_TIMING_CARD:
-            while (PM_MCCNT1 & PM_MCCNT1_BUSY) {
+            while (reg_MI_MCCNT1 & REG_MI_MCCNT1_START_MASK) {
             }
             break;
         case MI_DMA_TIMING_DISP:
@@ -598,13 +589,14 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     ime = OS_DisableIrq();
     irq = OS_DisableInterrupts();
     interrupts = OS_DisableIrqMask(~0);
-    OS_SetIrqMask(PM_IE_FIFO_RECV | (OS_IsTickAvailable() ? PM_IE_TIMER0 : 0));
+    OS_SetIrqMask(OS_IE_FIFO_RECV | (OS_IsTickAvailable() ? OS_IE_TIMER0 : 0));
     OS_RestoreInterrupts(irq);
     OS_EnableIrq();
 
-    // No card to pull out when the game was started by the Download Play or from the DSi's flash (boot types 2 and 3)
+    // No card to pull out when the game was started by the Download Play or from the DSi's flash. The test of the two
+    // boot types is a range check in 16 bits, which adds the u16 of -OS_BOOTTYPE_DOWNLOAD_MB (0xfffe)
     if (trigger & PM_TRIGGER_CARD) {
-        if ((u16)(OS_GetBootType() + 0xfffe) <= 1) {
+        if ((u16)(OS_GetBootType() + (u16)-OS_BOOTTYPE_DOWNLOAD_MB) <= OS_BOOTTYPE_NAND - OS_BOOTTYPE_DOWNLOAD_MB) {
             trigger &= ~PM_TRIGGER_CARD;
         }
     }
@@ -631,14 +623,14 @@ void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     PMi_StopDma();
     PMi_WokeUp = FALSE;
     startTrigger = trigger | (top ? PM_TRIGGER_BACKLIGHT_TOP : 0) | (bottom ? PM_TRIGGER_BACKLIGHT_BOTTOM : 0);
-    OS_SetIrqMask(PM_IE_FIFO_RECV);
+    OS_SetIrqMask(OS_IE_FIFO_RECV);
     PMi_SendSleepStart(startTrigger, logic | keyPattern);
     while (!PMi_WokeUp) {
         OS_Halt();
     }
 
-    OS_SetIrqMask(PM_IE_FIFO_RECV | (OS_IsTickAvailable() ? PM_IE_TIMER0 : 0));
-    if ((trigger & PM_TRIGGER_CARD) && (reg_OS_IF & PM_IF_CARD_IREQ)) {
+    OS_SetIrqMask(OS_IE_FIFO_RECV | (OS_IsTickAvailable() ? OS_IE_TIMER0 : 0));
+    if ((trigger & PM_TRIGGER_CARD) && (reg_OS_IF & OS_IE_CARD_IREQ)) {
         cardPulledOut = TRUE;
     }
     if (!cardPulledOut) {

@@ -5,10 +5,6 @@
 #include "nitro/fs.h"
 #include "nitro/os.h"
 
-// The buffer that a path is normalized into, in the functions that look a file up and that open one. Their frames have
-// 0x14 bytes after it that nothing touches, so it is declared that much larger than the normalizer's limit
-#define FS_FILE_PATH_BUFFER_SIZE (FS_PATH_BUFFER_SIZE + 0x14)
-
 void FS_InitFile(FSFile *file) {
     file->arc = NULL;
     file->prop = NULL;
@@ -35,7 +31,7 @@ void FS_CancelFile(FSFile *file) {
 BOOL FS_ConvertPathToFileID(FSFileID *fileId, const char *path) {
     BOOL result = FALSE;
     u32 baseDirId = 0;
-    char normalized[FS_FILE_PATH_BUFFER_SIZE];
+    char normalized[FS_ARCHIVE_FULLPATH_MAX + 1];
     FSArchive *arc = FSi_NormalizePath(path, &baseDirId, normalized);
 
     if (arc != NULL) {
@@ -90,7 +86,7 @@ BOOL FS_OpenFileFast(FSFile *file, FSFileID fileId) {
 BOOL FS_OpenFileEx(FSFile *file, const char *path, u32 mode) {
     BOOL result = FALSE;
     u32 baseDirId = 0;
-    char normalized[FS_FILE_PATH_BUFFER_SIZE];
+    char normalized[FS_ARCHIVE_FULLPATH_MAX + 1];
     FSArchive *arc = FSi_NormalizePath(path, &baseDirId, normalized);
 
     if (arc != NULL) {

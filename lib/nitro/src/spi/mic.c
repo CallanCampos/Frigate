@@ -9,10 +9,6 @@
 #include "nitro/pxi.h"
 #include "twl/mic.h"
 
-// In the shared memory, the ARM7 writes the address of the last sample it stored, and the value of a single sample
-#define HW_MIC_LAST_ADDRESS 0x02ffff90
-#define HW_MIC_SAMPLING_DATA 0x02ffff94
-
 // A command is a series of words with the microphone's tag: the first has MIC_PXI_START and the command in bits 8 to
 // 14, the last has MIC_PXI_END, and each of the others carries its index in bits 16 to 22 and 16 bits of data
 #define MIC_PXI_START 0x02000000
@@ -66,7 +62,7 @@ void MIC_Init(void) {
     PXI_Init();
     while (!PXI_IsCallbackReady(PXI_FIFO_TAG_MIC, PXI_PROC_ARM7)) {
     }
-    *(void **)HW_MIC_LAST_ADDRESS = NULL;
+    OS_GetSystemWork()->micLastAddress = 0;
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_MIC, MicCommonCallback);
 }
 
@@ -168,7 +164,7 @@ MICResult MIC_StopAutoSampling(void) {
 }
 
 void *MIC_GetLastSamplingAddress(void) {
-    return *(void **)HW_MIC_LAST_ADDRESS;
+    return (void *)OS_GetSystemWork()->micLastAddress;
 }
 
 MICResult MIC_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
@@ -241,7 +237,7 @@ static void MicCommonCallback(u32 tag, u32 data, BOOL err) {
     }
     if (command == MIC_PXI_COMMAND_SAMPLING_ONCE) {
         if (micWork.sampleDest) {
-            *micWork.sampleDest = *(u16 *)HW_MIC_SAMPLING_DATA;
+            *micWork.sampleDest = OS_GetSystemWork()->micSampling;
         }
     }
 

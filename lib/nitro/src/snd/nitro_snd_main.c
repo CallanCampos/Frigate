@@ -1,5 +1,6 @@
-// NitroSDK's SND (nitro_snd_main.c, a guess from the SDK's file names): sets up the sound driver interface and holds
-// the mutex that its callers lock around their commands.
+// NitroSDK's SND (the SDK's file is snd_main.c; the nitro_ prefix keeps the name apart from NitroSystem's snd_main.c
+// for dsd, which needs file names that are unique in a module): sets up the sound driver interface and holds the mutex
+// that its callers lock around their commands.
 #include "nitro/os.h"
 #include "nitro/snd.h"
 

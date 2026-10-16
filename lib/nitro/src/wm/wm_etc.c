@@ -1,7 +1,8 @@
 // The rest of the wireless manager's calls (libwm, TwlSDK's wm/ARM9/src/wm_etc.c, by its place in the library: the
 // file name is a guess): the WEP key, the game's information in the beacon, the beacon indication, the life times of
 // the connections and the measure of a channel. Each checks the state and the arguments, registers the callback and
-// sends the command to the ARM7. The names are descriptive
+// sends the command to the ARM7. The public functions have the SDK's names, from what
+// they do; the static ones' names are ours
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
@@ -124,6 +125,7 @@ int WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16
     int result;
     WmMeasureChannelCommand cmd;
 
+    // The SDK fetches the system work here and doesn't use it
     WMi_GetSystemWork();
     result = WMi_CheckStateEx(1, WM_STATE_IDLE);
     if (result != WM_ERRCODE_SUCCESS) {

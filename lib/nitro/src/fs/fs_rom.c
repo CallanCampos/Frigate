@@ -110,7 +110,7 @@ void FSi_InitRomArchive(u32 dma) {
     } else {
         FSi_OverrideRomArchive(&sRomFileSystem);
     }
-    if (!FS_IsArchiveMounted(&sRomFileSystem)) {
+    if (!FS_IsArchiveLoaded(&sRomFileSystem)) {
         FS_SetArchiveProc(&sRomFileSystem, FSi_EmptyArchiveProc, 0xffffffff);
         FS_LoadArchive(&sRomFileSystem, 0, 0, 0, 0, 0, FSi_EmptyRead, FSi_EmptyWrite);
     }

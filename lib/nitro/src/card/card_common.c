@@ -14,8 +14,8 @@ typedef struct {
     OSVAlarm alarm;
     BOOL (*condition)(void *arg);
     void *arg;
-    // Not read or written, but CARD_LockRom's frame has the room for it
-    u32 unk_3c;
+    // Only for the layout, not data: nothing reads or writes it, but CARD_LockRom's frame has the room for it
+    u32 unused;
 } CARDRomLockPoll;
 
 static void CARDi_PollRomLock(void *arg);
@@ -218,8 +218,8 @@ BOOL CARDi_TryWaitAsync(void) {
     return (cardi_common.flag & CARD_STAT_BUSY) == 0;
 }
 
-// Returns 0, which nothing reads: the original has the zero in r0 when it returns, where a void function puts the
-// address of the work in r0
+// The int return is only for the registers, not an API: nothing reads the 0, but the original has it in r0 when it
+// returns, where a void function leaves the address of the work
 static int CARDi_InitResourceLock(void) {
     CARDiCommon *p = &cardi_common;
     p->lockOwner = OS_LOCK_ID_ERROR;

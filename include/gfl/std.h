@@ -7,8 +7,7 @@
 #include "nitro/mi.h"
 #include "nitro/std.h"
 
-// The memory functions of NitroSDK under swan's sys_mem* names are in nitro/mi.h, and its string functions in
-// nitro/std.h
+// NitroSDK's memory functions are in nitro/mi.h, and its string functions in nitro/std.h
 
 // Game Freak's standard library (gf_standard.c): its tables are allocated once, from a heap
 void initTableArea(HeapID heapId);

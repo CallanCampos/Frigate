@@ -75,15 +75,13 @@ void SND_DestroyWaveArc(SNDWaveArc *waveArc) {
 
     SNDi_LockMutex();
     link = waveArc->topLink;
-    if (link != NULL) {
-        do {
-            SNDWaveArcLink *next = link->next;
+    while (link != NULL) {
+        SNDWaveArcLink *next = link->next;
 
-            link->waveArc = NULL;
-            link->next = NULL;
-            DC_StoreRange(link, sizeof(SNDWaveArcLink));
-            link = next;
-        } while (link != NULL);
+        link->waveArc = NULL;
+        link->next = NULL;
+        DC_StoreRange(link, sizeof(SNDWaveArcLink));
+        link = next;
     }
     SNDi_UnlockMutex();
 }

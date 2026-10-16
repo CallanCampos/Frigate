@@ -1,13 +1,14 @@
 // The cartridge library's common part (libctrdg, TwlSDK's ctrdg/common/src/ctrdg.c by its place in the library: the
 // file name is a guess): taking the bus of slot 2 for the ARM9, saying whether the cartridge is still the one that was
-// there at the start, and the word to the ARM7. The names are descriptive
+// there at the start, and the word to the ARM7. The public functions have the SDK's names, from what
+// they do; the static ones' names are ours
 #include "nitro/ctrdg.h"
+#include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 #include "nitro/svc.h"
 
-// The wait states of slot 2 are in the bits of the memory control register
-#define REG_MI_EXMEMCNT (*(vu16 *)0x04000204)
+// The wait states of slot 2 are in the bits of the memory control register (reg_MI_EXMEMCNT)
 #define MI_EXMEMCNT_ROM_1ST_MASK 0x000c
 #define MI_EXMEMCNT_ROM_1ST_SHIFT 2
 #define MI_EXMEMCNT_ROM_2ND_MASK 0x0010
@@ -111,19 +112,19 @@ BOOL CTRDG_IsExisting(void) {
 
 // The wait states of the ROM, in the register: the first access and the second
 static inline CTRDGRomCycle1st CTRDGi_GetRomCycle1st(void) {
-    return (REG_MI_EXMEMCNT & MI_EXMEMCNT_ROM_1ST_MASK) >> MI_EXMEMCNT_ROM_1ST_SHIFT;
+    return (reg_MI_EXMEMCNT & MI_EXMEMCNT_ROM_1ST_MASK) >> MI_EXMEMCNT_ROM_1ST_SHIFT;
 }
 
 static inline CTRDGRomCycle2nd CTRDGi_GetRomCycle2nd(void) {
-    return (REG_MI_EXMEMCNT & MI_EXMEMCNT_ROM_2ND_MASK) >> MI_EXMEMCNT_ROM_2ND_SHIFT;
+    return (reg_MI_EXMEMCNT & MI_EXMEMCNT_ROM_2ND_MASK) >> MI_EXMEMCNT_ROM_2ND_SHIFT;
 }
 
 static inline void CTRDGi_SetRomCycle1st(CTRDGRomCycle1st cycle) {
-    REG_MI_EXMEMCNT = (REG_MI_EXMEMCNT & ~MI_EXMEMCNT_ROM_1ST_MASK) | (cycle << MI_EXMEMCNT_ROM_1ST_SHIFT);
+    reg_MI_EXMEMCNT = (reg_MI_EXMEMCNT & ~MI_EXMEMCNT_ROM_1ST_MASK) | (cycle << MI_EXMEMCNT_ROM_1ST_SHIFT);
 }
 
 static inline void CTRDGi_SetRomCycle2nd(CTRDGRomCycle2nd cycle) {
-    REG_MI_EXMEMCNT = (REG_MI_EXMEMCNT & ~MI_EXMEMCNT_ROM_2ND_MASK) | (cycle << MI_EXMEMCNT_ROM_2ND_SHIFT);
+    reg_MI_EXMEMCNT = (reg_MI_EXMEMCNT & ~MI_EXMEMCNT_ROM_2ND_MASK) | (cycle << MI_EXMEMCNT_ROM_2ND_SHIFT);
 }
 
 // Saves the wait states of the ROM and sets the slowest ones

@@ -10,10 +10,7 @@
 // Where the archives are registered, and the archive and directory that a relative path starts in
 static struct {
     FSArchive *list;
-    FSArchive *current;
-    u16 directoryId;
-    u16 unk_0a;
-    u32 unk_0c;
+    FSDirPos current;
 } sArchives;
 
 // The names of more than 3 characters, one slot each. A slot is free when it starts with a NUL
@@ -29,24 +26,6 @@ static int FSi_TrimSjisTrailingSlash(char *path);
 // The command of a file
 static inline FSCommandType FSi_GetCommand(const FSFile *file) {
     return (FSCommandType)(u8)(file->stat >> FS_FILE_STATUS_COMMAND_SHIFT);
-}
-
-// The tests of the state of a file and of an archive. They return u32 and not BOOL, with which MWCC keeps the 0 or 1 as
-// a value to compare, as the ROM's code does, and not folded into the branch
-static inline u32 FSi_IsFileCanceled(const FSFile *file) {
-    return (file->stat & FS_FILE_STATUS_CANCEL) != 0;
-}
-
-static inline u32 FSi_IsFileBusy(const FSFile *file) {
-    return (file->stat & FS_FILE_STATUS_BUSY) != 0;
-}
-
-static inline u32 FSi_IsArchiveMounted(const FSArchive *arc) {
-    return (arc->flag & FS_ARCHIVE_FLAG_MOUNTED) != 0;
-}
-
-static inline u32 FSi_IsArchiveSuspended(const FSArchive *arc) {
-    return (arc->flag & FS_ARCHIVE_FLAG_SUSPENDED) != 0;
 }
 
 // The bit of a command in the mask of the events, counted from the first of them
@@ -108,10 +87,8 @@ FSResult FSi_WaitForArchiveCompletion(FSFile *file, FSResult result) {
     if (result == FS_RESULT_PROC_ASYNC) {
         u32 interrupts = OS_DisableInterrupts();
 
-        if (!(file->stat & FS_FILE_STATUS_ENDED)) {
-            do {
-                OS_SleepThread(&file->queue);
-            } while (!(file->stat & FS_FILE_STATUS_ENDED));
+        while (!(file->stat & FS_FILE_STATUS_ENDED)) {
+            OS_SleepThread(&file->queue);
         }
         OS_RestoreInterrupts(interrupts);
         file->stat &= ~FS_FILE_STATUS_ENDED;
@@ -339,7 +316,7 @@ static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
         while (file != NULL) {
             FSFile *following = file->next;
 
-            if (FSi_IsFileCanceled(file)) {
+            if (FS_IsCanceling(file)) {
                 FSi_EndCommand(file, FS_RESULT_CANCELED);
                 if (following == NULL) {
                     following = arc->list;
@@ -445,7 +422,7 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
     FSFile *next;
 
     // A file takes one command at a time
-    if (FSi_IsFileBusy(file)) {
+    if (FS_IsBusy(file)) {
         OS_Terminate();
     }
     if (arc == NULL) {
@@ -453,15 +430,12 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
         return FALSE;
     }
     file->error = FS_RESULT_BUSY;
-    {
-        u32 *stat = &file->stat;
-
-        *stat = (*stat & ~(0xff << FS_FILE_STATUS_COMMAND_SHIFT)) | (command << FS_FILE_STATUS_COMMAND_SHIFT) |
-                FS_FILE_STATUS_BUSY;
-        file->next = NULL;
-        if (blocking) {
-            *stat |= FS_FILE_STATUS_BLOCKING;
-        }
+    file->stat &= ~(0xff << FS_FILE_STATUS_COMMAND_SHIFT);
+    file->stat |= command << FS_FILE_STATUS_COMMAND_SHIFT;
+    file->stat |= FS_FILE_STATUS_BUSY;
+    file->next = NULL;
+    if (blocking) {
+        file->stat |= FS_FILE_STATUS_BLOCKING;
     }
     interrupts = OS_DisableInterrupts();
     if (arc->flag & FS_ARCHIVE_FLAG_UNMOUNTING) {
@@ -476,19 +450,13 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
         }
         *link = file;
     }
-    start = FALSE;
-    if (arc->list == file && !(arc->flag & FS_ARCHIVE_FLAG_ACTIVE)) {
-        start = TRUE;
-    }
+    start = arc->list == file && !(arc->flag & FS_ARCHIVE_FLAG_ACTIVE);
     OS_RestoreInterrupts(interrupts);
     if (file->error != FS_RESULT_CANCELED) {
         next = FSi_NextCommand(arc, start);
         if (blocking) {
             FSi_ExecuteSyncCommand(file);
-            result = TRUE;
-            if (file->error != FS_RESULT_SUCCESS) {
-                result = FALSE;
-            }
+            result = file->error == FS_RESULT_SUCCESS;
         } else {
             if (next != NULL) {
                 FSi_ExecuteAsyncCommand(next);
@@ -505,7 +473,7 @@ FSArchive *FS_FindArchive(const char *name, int nameLength) {
     u32 interrupts = OS_DisableInterrupts();
 
     for (arc = sArchives.list; arc != NULL; arc = arc->next) {
-        if (FSi_IsArchiveMounted(arc)) {
+        if (FS_IsArchiveLoaded(arc)) {
             const char *arcName = FS_GetArchiveName(arc);
 
             if (STD_CompareNString(arcName, name, nameLength) == 0 && arcName[nameLength] == '\0') {
@@ -525,10 +493,10 @@ BOOL FS_SetCurrentDirectory(const char *path) {
     FSArchive *arc = FSi_NormalizePath(path, &baseDirId, normalized);
 
     if (arc != NULL) {
-        sArchives.current = arc;
-        sArchives.directoryId = 0;
-        sArchives.unk_0a = 0;
-        sArchives.unk_0c = 0;
+        sArchives.current.arc = arc;
+        sArchives.current.dirId = 0;
+        sArchives.current.fileId = 0;
+        sArchives.current.position = 0;
         STD_CopyLString(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
         if (arc->vtbl->findPath != NULL) {
             FSFile file;
@@ -541,7 +509,7 @@ BOOL FS_SetCurrentDirectory(const char *path) {
             args.path = normalized;
             args.isDirectory = TRUE;
             if (FSi_SendCommand(&file, FS_COMMAND_FINDPATH, TRUE)) {
-                sArchives.directoryId = args.targetId;
+                sArchives.current.dirId = args.targetId;
                 STD_CopyLString(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
             }
         }
@@ -583,16 +551,16 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
     int length = 0;
     int i;
 
-    if (sArchives.current == NULL) {
-        sArchives.current = sArchives.list;
-        sArchives.directoryId = 0;
-        sArchives.unk_0c = 0;
-        sArchives.unk_0a = 0;
+    if (sArchives.current.arc == NULL) {
+        sArchives.current.arc = sArchives.list;
+        sArchives.current.dirId = 0;
+        sArchives.current.position = 0;
+        sArchives.current.fileId = 0;
         sCurrentPath[0] = '\0';
     }
     if (FSi_IsSlash(path[0])) {
         path++;
-        arc = sArchives.current;
+        arc = sArchives.current.arc;
         if (baseDirId != NULL) {
             *baseDirId = 0;
         }
@@ -601,11 +569,11 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
             u8 c = path[i];
 
             if (c == '\0' || FSi_IsSlash(c)) {
-                arc = sArchives.current;
+                arc = sArchives.current.arc;
                 if (baseDirId != NULL) {
-                    *baseDirId = sArchives.directoryId;
+                    *baseDirId = sArchives.current.dirId;
                 }
-                if (normalized != NULL && sArchives.directoryId == 0 && sCurrentPath[0] != '\0') {
+                if (normalized != NULL && sArchives.current.dirId == 0 && sCurrentPath[0] != '\0') {
                     length +=
                         FSi_CopyPathPart(normalized, FS_PATH_BUFFER_SIZE, sCurrentPath, FS_PATH_BUFFER_SIZE, &overflow);
                     length += FSi_CopyPathPart(normalized + length, FS_PATH_BUFFER_SIZE - length, "/", 1, &overflow);
@@ -732,8 +700,8 @@ void FS_ReleaseArchiveName(FSArchive *arc) {
         arc->longName = NULL;
         arc->next = NULL;
         arc->flag &= ~FS_ARCHIVE_FLAG_REGISTERED;
-        if (sArchives.current == arc) {
-            sArchives.current = NULL;
+        if (sArchives.current.arc == arc) {
+            sArchives.current.arc = NULL;
         }
         OS_RestoreInterrupts(interrupts);
     }
@@ -764,7 +732,7 @@ BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *v
 BOOL FS_UnmountArchive(FSArchive *arc) {
     u32 interrupts = OS_DisableInterrupts();
 
-    if (FSi_IsArchiveMounted(arc)) {
+    if (FS_IsArchiveLoaded(arc)) {
         BOOL suspended = FS_SuspendArchive(arc);
         FSFile *file = arc->list;
         FSFile unmountFile;
@@ -793,7 +761,7 @@ BOOL FS_UnmountArchive(FSArchive *arc) {
 // FALSE if it was suspended already
 BOOL FS_SuspendArchive(FSArchive *arc) {
     u32 interrupts = OS_DisableInterrupts();
-    BOOL result = !FSi_IsArchiveSuspended(arc);
+    BOOL result = !FS_IsArchiveSuspended(arc);
 
     if (result) {
         if (!(arc->flag & FS_ARCHIVE_FLAG_ACTIVE)) {
@@ -816,7 +784,7 @@ BOOL FS_SuspendArchive(FSArchive *arc) {
 // NitroSDK's FS_ResumeArchive: lets a suspended archive start commands again. Returns TRUE if it was not suspended
 BOOL FS_ResumeArchive(FSArchive *arc) {
     u32 interrupts = OS_DisableInterrupts();
-    BOOL result = !FSi_IsArchiveSuspended(arc);
+    BOOL result = !FS_IsArchiveSuspended(arc);
     FSFile *file;
 
     if (!result) {

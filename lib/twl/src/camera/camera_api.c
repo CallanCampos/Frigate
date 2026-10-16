@@ -504,7 +504,7 @@ CAMERAResult CAMERA_InitCore(void) {
     sCameraWork.errorCount = 0;
     sCameraWork.pollCount = 0;
     PXI_Init();
-    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_CAMERA, 1)) {
+    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_CAMERA, PXI_PROC_ARM7)) {
         return CAMERA_RESULT_FATAL_ERROR;
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_CAMERA, func_02701aa0);

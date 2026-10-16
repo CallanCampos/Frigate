@@ -2214,6 +2214,7 @@ lib/nitro/src/spi/tp.c:
     .bss        start:0x0214e224 end:0x0214e260
 
 lib/nitro/src/spi/mic.c:
+    complete
     .text       start:0x0207e788 end:0x0207eb50
     .bss        start:0x0214e260 end:0x0214e280
 

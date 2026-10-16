@@ -86,7 +86,7 @@ void CAMERA_SetOutputFormatCore(CAMERAOutput output) {
     OS_RestoreInterrupts(irq);
 }
 
-// Whether the interface reports a buffer error (CAMERA_IsBufferErrorCore, perhaps)
+// Whether the interface reports a buffer error
 BOOL CAMERA_IsBufferErrorCore(void) {
     return (reg_CAMERA_CNT & CAMERA_CNT_BUFFER_ERROR) >> 4;
 }
@@ -97,7 +97,7 @@ void CAMERA_ClearBufferCore(void) {
     OS_RestoreInterrupts(enabled);
 }
 
-// Sets or clears the interface's interrupt enable (CAMERA_SetInterruptCore, perhaps)
+// Sets or clears the interface's interrupt enable
 void CAMERA_SetInterruptEnableCore(BOOL on) {
     u32 irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;

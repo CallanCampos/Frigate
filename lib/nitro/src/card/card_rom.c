@@ -137,12 +137,10 @@ static u32 CARDi_ReadRomStatus(void) {
 static void CARDi_RefreshRom(u32 mask) {
     if ((CARDi_ReadRomStatus() & mask) != 0) {
         CARDi_SendRomRefresh();
-        if ((CARDi_ReadRomStatus() & CARD_ROM_STATUS_REFRESHED) == 0) {
-            do {
-                if (OSi_ThreadInitialized != 0 && OS_IsAlarmAvailable()) {
-                    OS_Sleep(1);
-                }
-            } while ((CARDi_ReadRomStatus() & CARD_ROM_STATUS_REFRESHED) == 0);
+        while ((CARDi_ReadRomStatus() & CARD_ROM_STATUS_REFRESHED) == 0) {
+            if (OSi_ThreadInitialized != 0 && OS_IsAlarmAvailable()) {
+                OS_Sleep(1);
+            }
         }
     }
 }
@@ -246,34 +244,48 @@ static void CARDi_OnReadRomDmaDone(void *arg) {
     CARDi_EndTask(&cardi_common);
 }
 
-// Whether a read can use DMA: the channel has to exist, and the destination to start at a cache line of 32 bytes and
-// to be outside both TCMs, while the source and the length are whole pages
+// Whether a range is outside the instruction TCM, whose image ends where main memory starts
+static inline BOOL CARDi_IsOutsideItcm(u32 dst, u32 len) {
+    BOOL result = TRUE;
+    if (dst + len > HW_ITCM_IMAGE && dst < HW_MAIN_MEM) {
+        result = FALSE;
+    }
+    return result;
+}
+
+// Whether a range is outside the data TCM
+static inline BOOL CARDi_IsOutsideDtcm(u32 dst, u32 len) {
+    BOOL result = TRUE;
+    if (dst + len > OS_GetDTCMAddress() && dst < OS_GetDTCMAddress() + HW_DTCM_SIZE) {
+        result = FALSE;
+    }
+    return result;
+}
+
+// Whether a DMA channel of the DS can write a range: it starts a cache line of 32 bytes and is outside the ITCM
+static inline BOOL CARDi_IsDmaWritable(u32 dma, u32 dst, u32 len) {
+    BOOL result = FALSE;
+    if (dma <= 3 && len != 0 && (dst & 0x1f) == 0 && CARDi_IsOutsideItcm(dst, len)) {
+        result = TRUE;
+    }
+    return result;
+}
+
+// The same, outside the DTCM too
+static inline BOOL CARDi_IsDmaReachable(u32 dma, u32 dst, u32 len) {
+    BOOL result = FALSE;
+    if (CARDi_IsDmaWritable(dma, dst, len) && CARDi_IsOutsideDtcm(dst, len)) {
+        result = TRUE;
+    }
+    return result;
+}
+
+// Whether a read can use DMA: the channel and the destination have to suit it, while the source and the length are
+// whole pages
 static BOOL CARDi_CanReadRomWithDMA(u32 dma, u32 dst, u32 src, u32 len) {
     BOOL result = FALSE;
-    BOOL reachable = FALSE;
-    BOOL outsideItcm = FALSE;
-    if (dma <= 3 && len != 0 && (dst & 0x1f) == 0) {
-        BOOL outside = TRUE;
-        if (dst + len > HW_ITCM_IMAGE && dst < HW_MAIN_MEM) {
-            outside = FALSE;
-        }
-        if (outside) {
-            outsideItcm = TRUE;
-        }
-    }
-    if (outsideItcm) {
-        BOOL outside = TRUE;
-        if (dst + len > OS_GetDTCMAddress() && dst < OS_GetDTCMAddress() + HW_DTCM_SIZE) {
-            outside = FALSE;
-        }
-        if (outside) {
-            reachable = TRUE;
-        }
-    }
-    if (reachable) {
-        if (((src | len) & (CARD_ROM_PAGE_SIZE - 1)) == 0) {
-            result = TRUE;
-        }
+    if (CARDi_IsDmaReachable(dma, dst, len) && ((src | len) & (CARD_ROM_PAGE_SIZE - 1)) == 0) {
+        result = TRUE;
     }
     return result;
 }

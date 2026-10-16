@@ -2,12 +2,10 @@
 #define POKEBW2_NITRO_MIC_H
 
 #include "types.h"
-#include "nitro/pm.h"
 
-// NitroSDK's microphone (TwlSDK's libspi mic.c). Its amplifier is turned on by the power management of nitro/pm.h,
-// which this header includes. The functions have the names of the SDK functions they are, from how the code works. The
-// Limited functions hand over to the DSi's MICEX code on a DSi and otherwise call the plain ones (swan named them after
-// these)
+// NitroSDK's microphone (TwlSDK's libspi mic.c). Its amplifier is turned on by the power management of nitro/pm.h. The
+// functions have the names of the SDK functions they are, from how the code works. The Limited functions hand over to
+// the DSi's MICEX code on a DSi and otherwise call the plain ones (swan named them after these)
 
 typedef enum {
     MIC_RESULT_SUCCESS,

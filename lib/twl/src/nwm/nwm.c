@@ -203,7 +203,7 @@ static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
         return NWM_RETCODE_INVALID_PARAM;
     }
     PXI_Init();
-    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_NWM, 1)) {
+    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_NWM, PXI_PROC_ARM7)) {
         OS_RestoreInterrupts(irq);
         return NWM_RETCODE_UNAVAILABLE;
     }
@@ -244,6 +244,8 @@ static BOOL func_027026b4(void) {
     return FALSE;
 }
 
+// The library's system area. The commands' bare calls of it, whose result they drop, are left from the SDK's fetches of
+// the work for assertions that its release build compiles out
 static NWMSys *func_027026dc(void) {
     return sNwm.sys;
 }

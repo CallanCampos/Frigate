@@ -131,34 +131,60 @@ static inline void DSP_UnloadGraphics(void) {
 #define DSP_PSTS_REPLY_SHIFT 10    // reply n has data, on bit n of three
 #define DSP_PSTS_COMMAND_SHIFT 13  // command n was not taken yet, on bit n of three
 
-// dsp_if.c. TwlSDK's names are in the comments
-void DSP_PowerOn(void); // starts the DSP's clock and releases its reset line
-void DSP_PowerOff(void);
-void DSP_ResetOn(void);                 // puts the DSP in reset
-void DSP_ResetOffEx(u16 mask);          // takes it out, with the reply interrupts of mask
-BOOL DSP_RecvDataIsReady(int index);    // reply index has data
-void DSP_SendData(int index, u16 data); // waits for command index to be free, then writes it
-u16 DSP_RecvData(int index);            // waits for reply index and reads it
-// The SDK's inline functions over the three, which only call them on a DSi
-static inline void DSPi_SendData(int index, u16 data) {
+// dsp_if.c, TwlSDK's names: the Core functions work the DSP's registers, and the SDK's inline functions over them only
+// call them on a DSi
+void DSP_PowerOnCore(void); // starts the DSP's clock and releases its reset line
+void DSP_PowerOffCore(void);
+void DSP_ResetOnCore(void);                 // puts the DSP in reset
+void DSP_ResetOffExCore(u16 mask);          // takes it out, with the reply interrupts of mask
+BOOL DSP_RecvDataIsReadyCore(int index);    // reply index has data
+void DSP_SendDataCore(int index, u16 data); // waits for command index to be free, then writes it
+u16 DSP_RecvDataCore(int index);            // waits for reply index and reads it
+
+static inline void DSP_PowerOn(void) {
     if (OS_IsRunOnTwl() == TRUE) {
-        DSP_SendData(index, data);
+        DSP_PowerOnCore();
     }
 }
 
-static inline BOOL DSPi_RecvDataIsReady(int index) {
+static inline void DSP_PowerOff(void) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return DSP_RecvDataIsReady(index);
+        DSP_PowerOffCore();
+    }
+}
+
+static inline void DSP_ResetOn(void) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        DSP_ResetOnCore();
+    }
+}
+
+static inline void DSP_ResetOffEx(u16 mask) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        DSP_ResetOffExCore(mask);
+    }
+}
+
+static inline void DSP_SendData(int index, u16 data) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        DSP_SendDataCore(index, data);
+    }
+}
+
+static inline BOOL DSP_RecvDataIsReady(int index) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        return DSP_RecvDataIsReadyCore(index);
     }
     return FALSE;
 }
 
-static inline u16 DSPi_RecvData(int index) {
+static inline u16 DSP_RecvData(int index) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return DSP_RecvData(index);
+        return DSP_RecvDataCore(index);
     }
     return 0;
 }
+
 // Writes count words at the DSP's address dspAddr, memory being the memory's PCFG bits
 #define DSP_WRITE_FIXED_SOURCE 0x1  // writes the first word count times
 #define DSP_WRITE_FIXED_ADDRESS 0x2 // does not move the DSP's address
@@ -171,13 +197,33 @@ void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags
 #define DSP_READ_BURST_8 0x200
 #define DSP_READ_BURST_16 0x300
 void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags);
-u16 DSP_GetSemaphore(void);
-void DSP_ClearSemaphore(u16 mask);
-void DSP_MaskSemaphore(u16 mask);
+u16 DSP_GetSemaphoreCore(void);
+void DSP_ClearSemaphoreCore(u16 mask);
+void DSP_MaskSemaphoreCore(u16 mask);
+
+static inline u16 DSP_GetSemaphore(void) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        return DSP_GetSemaphoreCore();
+    }
+    return 0;
+}
+
+static inline void DSP_ClearSemaphore(u16 mask) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        DSP_ClearSemaphoreCore(mask);
+    }
+}
+
+static inline void DSP_MaskSemaphore(u16 mask) {
+    if (OS_IsRunOnTwl() == TRUE) {
+        DSP_MaskSemaphoreCore(mask);
+    }
+}
 
 // dsp_process.c: a process is a COFF image that the DSP runs. Its program goes to the shared WRAM B and its data to
 // WRAM C, in banks of 32 KB that the ARM9 gives it from the ones its context allows, and its events (the 16 bits of the
-// semaphore from the DSP and its 3 replies) call the callbacks of its context. The SDK's names are in the comments.
+// semaphore from the DSP and its 3 replies) call the callbacks of its context. The named functions have TwlSDK's names;
+// the ones named by address are not known.
 #define DSP_EVENT_COUNT 19
 #define DSP_EVENT_REPLY_SHIFT 16 // reply n is event 16 + n
 
@@ -233,7 +279,7 @@ typedef struct DSPPipe {
 // What a pipe's events call: the user data of DSP_SetPipeCallback, the port and the direction
 typedef void (*DSPPipeCallback)(void *userData, int port, int direction);
 
-// TwlSDK's names are in the comments. The ports are 0 to 7, and the first has a callback of its own at the start
+// The named functions have TwlSDK's names. The ports are 0 to 7, and the first has a callback of its own at the start
 void DSP_InitPipe(void); // forgets the pipes' address and the callbacks, and drops what port 0 gets
 // Calls callback for the pipes' events of a port, with userData (NULL stops that)
 void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData);

@@ -39,7 +39,7 @@ asm void MIi_CpuClear32(u32 value, void *dest, u32 size) {
 }
 
 // Copies size bytes a word at a time
-asm void *MIi_CpuCopy32(const void *src, void *dest, u32 size) {
+asm void MIi_CpuCopy32(const void *src, void *dest, u32 size) {
     add r12, r1, r2
 @loop:
     cmp r1, r12

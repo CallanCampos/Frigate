@@ -1,4 +1,5 @@
 #include "types.h"
+#include "dsp_private.h"
 #include "nitro/os.h"
 #include "twl/dsp.h"
 #include "twl/sndex.h"
@@ -65,18 +66,13 @@ static OSAlarm sStopAlarm;
 // The priority of what plays; the lower number wins
 static int sPriority = AUDIO_PRIORITY_IDLE;
 
-// A 32-bit word of a message, which the DSP reads as two 16-bit halves, the high one first
-static inline u32 SwapHalves(u32 x) {
-    return (x >> 16) | (x << 16);
-}
-
 // Sends a command to the first process's audio component, which takes it as four words
 static inline void SendAudioCommand(DSPProcessContext *context, u32 command, u32 address, u32 words) {
     u32 message[4];
 
-    message[0] = SwapHalves(command);
-    message[1] = SwapHalves(address);
-    message[2] = SwapHalves(words);
+    message[0] = DSPi_SwapHalves(command);
+    message[1] = DSPi_SwapHalves(address);
+    message[2] = DSPi_SwapHalves(words);
     message[3] = 0;
     DSP_WriteProcessPipe(context, SHUTTER_PIPE_PORT, message, sizeof(message));
 }
@@ -114,8 +110,8 @@ static void func_02705fac(void *userData, int port, int direction) {
         return;
     }
     DSP_ReadPipe(&pipe, message, sizeof(message));
-    message[0] = SwapHalves(message[0]);
-    message[1] = SwapHalves(message[1]);
+    message[0] = DSPi_SwapHalves(message[0]);
+    message[1] = DSPi_SwapHalves(message[1]);
     if ((message[0] & AUDIO_GROUP_MASK) == AUDIO_GROUP_PLAYBACK && (message[0] & AUDIO_KIND_MASK) == AUDIO_KIND_STOP) {
         OS_CreateAlarm(&sStopAlarm);
         OS_SetAlarm(&sStopAlarm, OS_MilliSecondsToTicks(SHUTTER_STOP_DELAY), func_02705f98, NULL);

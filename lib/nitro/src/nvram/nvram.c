@@ -1,8 +1,8 @@
 // NitroSDK's NVRAM library (the file name is a guess): the ARM9's access to the console's NVRAM, which is the flash of
 // the firmware. Reading, writing and verifying are calls that send the ARM7 their commands through the PXI FIFO and
 // finish in the function that gets its answers. The write sends a page at a time, and after each polls the flash's
-// status register on an alarm until the flash is done. The names are the SDK's, which are known from how the code works
-// but not from the ROM.
+// status register on an alarm until the flash is done. The public functions have the SDK's names, known from how the
+// code works but not from the ROM; the statics are named by their addresses, and the static inlines' names are ours.
 #include "nitro/nvram.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

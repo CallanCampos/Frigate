@@ -40,6 +40,7 @@ void OSi_TerminateCore(void);
 #define HW_BOOT_CHECK_INFO_BUF 0x02fffc40
 #define OS_BOOTTYPE_ROM 1
 #define OS_BOOTTYPE_DOWNLOAD_MB 2
+#define OS_BOOTTYPE_NAND 3 // TwlSDK's: started from the DSi's flash
 // The word that OS_ResetSystem leaves for the next program
 #define HW_RESET_PARAMETER_BUF 0x02fffc20
 // The commands that the ARM7 and the ARM9 send each other with the OS's tag of the PXI FIFO (PXI_FIFO_TAG_OS), in the
@@ -135,6 +136,7 @@ typedef struct OSSystemWork {
 // The FIFO to the other processor has a word to receive
 #define OS_IE_FIFO_RECV 0x40000
 #define OS_IE_CARD_DATA 0x80000
+#define OS_IE_CARD_IREQ 0x100000
 // The geometry engine's command FIFO
 #define OS_IE_GXFIFO 0x200000
 // The DSi's DSP and camera
@@ -376,8 +378,7 @@ typedef struct {
 } OSOwnerInfoEx;
 
 // The user settings that the ARM7 reads from the firmware into the shared memory (NitroSDK's NVRAMConfig), with the
-// console's MAC address after them. Of the settings, the version, the alarm and the touch screen calibration are not
-// named
+// console's MAC address after them. Of the settings, the version and the alarm are not named
 #define HW_NVRAM_USER_INFO 0x02fffc80
 
 typedef struct NVRAMOwnerInfo {
@@ -393,10 +394,23 @@ typedef struct NVRAMOwnerInfo {
     u8 unk_4f;
 } NVRAMOwnerInfo;
 
+// The touch screen's calibration: the raw values of two points, and where they are on the screen
+typedef struct NVRAMTouchCalibration {
+    u16 rawX1;
+    u16 rawY1;
+    u8 screenX1;
+    u8 screenY1;
+    u16 rawX2;
+    u16 rawY2;
+    u8 screenX2;
+    u8 screenY2;
+} NVRAMTouchCalibration;
+
 typedef struct NVRAMConfig {
     u16 unk_00;
     NVRAMOwnerInfo owner;
-    u8 unk_52[0x12];
+    u8 unk_52[6]; // the alarm
+    NVRAMTouchCalibration touch;
     u16 language : 3;
     u16 unk_64_3 : 13;
     u16 unk_66;

@@ -66,14 +66,7 @@ typedef struct WCMReceiveRecord {
     u8 payload[]; // 0x2c
 } WCMReceiveRecord;
 
-// Private views of the callback bytes WCM reads; these names do not establish complete SDK callback layouts.
-// The existing SDK connection prefix ends before the failure reason supplied to this WCM consumer.
-typedef struct WCMConnectStatusView {
-    WMStartConnectCallback base;
-    u16 unk_0c;
-    u16 reason; // 0x0e, retained only when errcode is 1
-} WCMConnectStatusView;
-
+// A private view of the callback bytes WCM reads; these names do not establish a complete SDK callback layout
 typedef struct WCMDcfCallbackView {
     WMCallback base;
     u16 state; // 0x04, start or receive event
@@ -1728,13 +1721,13 @@ static void WCM_ConnectStep5(void *ind) {
 }
 
 static void WCM_OnConnectStatus(void *ind) {
-    const WCMConnectStatusView *callback = ind;
+    const WMStartConnectCallback *callback = ind;
     WCMWork *work = WCM_GetWork();
     int result;
 
-    switch (callback->base.errcode) {
+    switch (callback->errcode) {
     case 0:
-        switch (callback->base.state) {
+        switch (callback->state) {
         case 8:
         case 9:
             switch (work->state) {
@@ -1759,11 +1752,11 @@ static void WCM_OnConnectStatus(void *ind) {
                 WCM_RequestReset();
                 break;
             }
-            if (callback->base.aid < 1 || callback->base.aid > 0x7d7) {
+            if (callback->aid < 1 || callback->aid > 0x7d7) {
                 WCM_RequestReset();
                 break;
             }
-            work->associationId = callback->base.aid;
+            work->associationId = callback->aid;
             result =
                 WM_StartDCF((WMCallbackFunc)WCM_OnDcfReceive, work->ioBuffer.receive, sizeof(work->ioBuffer.receive));
             if (result == 2) {
@@ -1782,12 +1775,12 @@ static void WCM_OnConnectStatus(void *ind) {
             break;
         default:
             WCM_SetState(0xb);
-            WCM_NotifyResult(7, &work->connectBss, callback->base.state, 0x447);
+            WCM_NotifyResult(7, &work->connectBss, callback->state, 0x447);
             break;
         }
         break;
     case 1:
-        work->connectionFailureReason = callback->reason;
+        work->connectionFailureReason = callback->wlStatus;
     case 6:
     case 11:
     case 12:

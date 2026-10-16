@@ -12,6 +12,7 @@
 #include "gfl/std.h"
 #include "nitro/mic.h"
 #include "nitro/os.h"
+#include "nitro/pm.h"
 #include "nnsys/snd.h"
 #include "system/dsi.h"
 

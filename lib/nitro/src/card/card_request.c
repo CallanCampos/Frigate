@@ -23,10 +23,8 @@ void CARDi_OnFifoRecv(u32 fifoTag, u32 data, BOOL err) {
 BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry) {
     if ((p->flag & CARD_STAT_INIT_CMD) == 0) {
         p->flag |= CARD_STAT_INIT_CMD;
-        if (!PXI_IsCallbackReady(PXI_FIFO_TAG_FS, PXI_PROC_ARM7)) {
-            do {
-                OS_SpinWaitSysCycles(CARD_ARM7_READY_SPIN);
-            } while (!PXI_IsCallbackReady(PXI_FIFO_TAG_FS, PXI_PROC_ARM7));
+        while (!PXI_IsCallbackReady(PXI_FIFO_TAG_FS, PXI_PROC_ARM7)) {
+            OS_SpinWaitSysCycles(CARD_ARM7_READY_SPIN);
         }
         CARDi_Request(p, CARD_REQ_INIT, 1);
     }

@@ -108,22 +108,22 @@ void SND_UnlockChannel(u32 chBitMask, u32 flags) {
     sndQueuePacket(SND_COMMAND_UNLOCK_CHANNEL, chBitMask, flags, 0, 0);
 }
 
-// swan's name for SND_SetChannelTimer
+// NitroSDK's SND_SetChannelTimer
 void SND_SetChannelTimer(u32 chBitMask, int timer) {
     sndQueuePacket(SND_COMMAND_CHANNEL_TIMER, chBitMask, timer, 0, 0);
 }
 
-// swan's name for SND_SetChannelVolume
+// NitroSDK's SND_SetChannelVolume
 void SND_SetChannelVolume(u32 chBitMask, int volume, int shift) {
     sndQueuePacket(SND_COMMAND_CHANNEL_VOLUME, chBitMask, volume, shift, 0);
 }
 
-// swan's name for SND_SetChannelPan
+// NitroSDK's SND_SetChannelPan
 void SND_SetChannelPan(u32 chBitMask, int pan) {
     sndQueuePacket(SND_COMMAND_CHANNEL_PAN, chBitMask, pan, 0, 0);
 }
 
-// swan's name for SND_SetupChannelPcm. The arguments share the words of the command: the channel and the timer, the
+// NitroSDK's SND_SetupChannelPcm. The arguments share the words of the command: the channel and the timer, the
 // address, the length of the loop with the volume and the data shift, and the start of the loop with the pan, the
 // format and the loop mode
 void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen, int volume,
@@ -144,7 +144,7 @@ void SND_InvalidateWaveData(const void *start, const void *end) {
     sndQueuePacket(SND_COMMAND_INVALIDATE_WAVE, (u32)start, (u32)end, 0, 0);
 }
 
-// swan's name for SND_SetMasterVolume
+// NitroSDK's SND_SetMasterVolume
 void SND_SetMasterVolume(int volume) {
     sndQueuePacket(SND_COMMAND_MASTER_VOLUME, volume, 0, 0, 0);
 }

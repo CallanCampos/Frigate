@@ -1,4 +1,5 @@
 #include "types.h"
+#include "dsp_private.h"
 #include "nitro/fs.h"
 #include "nitro/math.h"
 #include "nitro/os.h"
@@ -52,14 +53,6 @@ static void *sPipeUserData[DSP_PORT_COUNT];
 static DSPPipe sPipes[DSP_PORT_COUNT][2]; // for the callers that pass no pipe to DSP_LoadPipe
 static DSPFileServer sFileServer;
 
-// The register interface of dsp_if.c, which the SDK's inline functions only call on a DSi
-static inline u16 DSPi_GetSemaphore(void) {
-    if (OS_IsRunOnTwl() == TRUE) {
-        return DSP_GetSemaphore();
-    }
-    return 0;
-}
-
 // The access to the DSP's memory, a half word of 16 bits at a time (its address is in half words)
 static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
     u32 irq = OS_DisableInterrupts();
@@ -86,11 +79,6 @@ static inline u16 DSPi_ReadWord(u16 wordAddress) {
 
 static inline void DSPi_WriteWord(u16 wordAddress, u16 word) {
     DSPi_WriteWords(wordAddress, &word, 1);
-}
-
-// Swaps the halves of a word: the DSP's 32-bit values are two 16-bit halves, the high one first
-static inline u32 DSPi_SwapHalves(u32 value) {
-    return (value >> 16) | (value << 16);
 }
 
 // Reads length bytes at a byte address in the DSP's memory
@@ -364,7 +352,7 @@ DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction) {
         u32 address = sPipeBase + port * sizeof(sPipes[0]) + direction * sizeof(DSPPipe);
         if (pipe == NULL) {
             // the scratch headers are in the same order as the DSP's
-            pipe = (DSPPipe *)((u8 *)sPipes + port * sizeof(sPipes[0]) + direction * sizeof(DSPPipe));
+            pipe = &sPipes[port][direction];
         }
         func_0270633c(address, (u8 *)pipe, sizeof(DSPPipe));
     }
@@ -385,7 +373,7 @@ static void func_02706e18(DSPPipe *pipe) {
     } else {
         func_02706694(address + 6, (u8 *)&pipe->writePos, 2);
     }
-    DSPi_SendData(2, pipe->id & 0xff);
+    DSP_SendData(2, pipe->id & 0xff);
 }
 
 u16 DSP_GetPipeReadableSize(const DSPPipe *pipe) {
@@ -463,15 +451,13 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
 // The DSP's interrupt: the first word the DSP sends on the third reply is the pipes' address, and each after it is a
 // port and a direction that changed, which goes to the port's callback, or to the file server if it has the file flag
 void func_027070dc(void *userData) {
-    while (DSPi_GetSemaphore() & 0x8000 || DSPi_RecvDataIsReady(2)) {
-        if (OS_IsRunOnTwl() == TRUE) {
-            DSP_ClearSemaphore(0x8000);
-        }
-        while (DSPi_RecvDataIsReady(2)) {
+    while (DSP_GetSemaphore() & 0x8000 || DSP_RecvDataIsReady(2)) {
+        DSP_ClearSemaphore(0x8000);
+        while (DSP_RecvDataIsReady(2)) {
             if (sPipeBase == 0) {
-                sPipeBase = DSPi_RecvData(2) << 1;
+                sPipeBase = DSP_RecvData(2) << 1;
             } else {
-                int message = DSPi_RecvData(2);
+                int message = DSP_RecvData(2);
                 int port = message >> 1;
                 int direction = message & 1;
                 if (port >= 0 && port < DSP_PORT_COUNT) {

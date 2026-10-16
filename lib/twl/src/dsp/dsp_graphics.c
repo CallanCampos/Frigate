@@ -52,7 +52,7 @@ BOOL DSP_OpenStaticComponentGraphicsCore(FSFile *file) {
 // called back
 static void func_0270734c(void *arg) {
     if (sGraphicsAsync) {
-        sGraphicsResult = DSPi_RecvData(DSP_GRAPHICS_REPLY);
+        sGraphicsResult = DSP_RecvData(DSP_GRAPHICS_REPLY);
         if (sGraphicsResult == DSP_GRAPHICS_RESULT_OK) {
             sGraphicsBusy = FALSE;
             sGraphicsAsync = FALSE;
@@ -105,7 +105,7 @@ BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeigh
     } else {
         DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), NULL, NULL);
     }
-    DSPi_SendData(0, 1);
+    DSP_SendData(0, 1);
     request.src = src;
     request.dst = dst;
     request.mode = mode;
@@ -121,10 +121,10 @@ BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeigh
     if (sGraphicsAsync) {
         return TRUE;
     }
-    while (!DSPi_RecvDataIsReady(DSP_GRAPHICS_REPLY)) {
+    while (!DSP_RecvDataIsReady(DSP_GRAPHICS_REPLY)) {
         OS_Sleep(1);
     }
-    sGraphicsResult = DSPi_RecvData(DSP_GRAPHICS_REPLY);
+    sGraphicsResult = DSP_RecvData(DSP_GRAPHICS_REPLY);
     sGraphicsBusy = FALSE;
     if (sGraphicsResult == DSP_GRAPHICS_RESULT_OK) {
         return TRUE;
