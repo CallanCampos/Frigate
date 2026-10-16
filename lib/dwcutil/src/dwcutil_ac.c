@@ -1,9 +1,9 @@
-#include "dwc_ac.h"
+#include "dwcutil_ac.h"
 #include "dwc/wcm.h"
-#include "gfl/std.h"
+#include "nitro/mi.h"
 
-// The access-point connection of DWC's settings (see dwc_ac.h): the second copy of the WCM wrapper, and the code that
-// drives it.
+// The access-point connection of DWC's settings (see dwcutil_ac.h): the second copy of the WCM wrapper, and the code
+// that drives it. The name says the utility's copy, because ARM9 main has a dwc_ac.c of its own (lib/dwc/src/ac)
 
 int func_ov182_021a7bcc(void *dest, int max) {
     u8 *out = dest;
@@ -17,7 +17,7 @@ int func_ov182_021a7bcc(void *dest, int max) {
             if (i >= max) {
                 break;
             }
-            sys_memcpy32(WCM_PointApList(i), out, 0xc0);
+            MIi_CpuCopy32(WCM_PointApList(i), out, 0xc0);
             out += 0xc0;
         }
     }
