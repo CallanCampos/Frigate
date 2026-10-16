@@ -1,3 +1,4 @@
+#include "app/local_tvt/local_tvt_person_support.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_calldata.h"
 #include "app/local_tvt/local_tvt_chara.h"
@@ -5,7 +6,6 @@
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
 #include "app/local_tvt/local_tvt_util.h"
-#include "app/local_tvt_local.h"
 #include "constants/flags.h"
 #include "constants/pokemon.h"
 #include "gfl/heap.h"
@@ -22,13 +22,13 @@
 #define EV_TOTAL_MAX 510
 #define EV_STAT_MAX 252
 
-typedef struct {
+struct LocalTvtSupport {
     int step;
     u32 timer;
     LocalTvtPokeSelect *select;
     GameData *gameData;
     u16 heapId;
-} LocalTvtSupport;
+};
 
 static LocalTvtSupport *LocalTvtSupport_Create(GameData *gameData, HeapID heapId);
 static void LocalTvtSupport_Free(LocalTvtPerson *person, const LocalTvtPersonSetup *setup, void *work);

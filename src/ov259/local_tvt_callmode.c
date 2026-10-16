@@ -6,6 +6,7 @@
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
+#include "app/local_tvt/local_tvt_person_support.h"
 #include "app/local_tvt/local_tvt_util.h"
 #include "app/local_tvt_local.h"
 #include "constants/sound.h"

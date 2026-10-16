@@ -13,6 +13,7 @@
 #include "app/local_tvt/local_tvt_graphic.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
+#include "app/local_tvt/local_tvt_person_support.h"
 #include "app/local_tvt/local_tvt_scriptmode.h"
 #include "app/local_tvt/local_tvt_util.h"
 #include "app/xtransceiver.h"
@@ -28,7 +29,6 @@
 #include "system/printsys.h"
 
 // local_tvt_person_*.c
-void LocalTvtSupport_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId);
 void LocalTvtMother_Setup(LocalTvtPersonFuncs *funcs, LocalTvtMessage *message, MsgData *msgData, GameData *gameData,
                           HeapID heapId);
 void LocalTvtDoctor_Setup(LocalTvtPersonFuncs *funcs, MsgData *msgData, GameData *gameData, HeapID heapId);
