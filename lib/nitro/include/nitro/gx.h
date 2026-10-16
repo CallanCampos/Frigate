@@ -39,6 +39,7 @@ typedef u16 GXRgb;
 #define reg_G2_BLDALPHA (*(vu16 *)0x04000052)
 #define reg_G3X_DISP3DCNT (*(vu16 *)0x04000060)
 #define reg_GX_DISPCAPCNT (*(vu32 *)0x04000064)
+#define reg_G3X_GXFIFO (*(vu32 *)0x04000400)
 #define reg_G3_MTX_MODE (*(vu32 *)0x04000440)
 #define reg_G3_MTX_PUSH (*(vu32 *)0x04000444)
 #define reg_G3_MTX_POP (*(vu32 *)0x04000448)
@@ -462,14 +463,22 @@ typedef enum {
 } GXLightId;
 
 // Geometry commands, as NitroSystem buffers them
+#define G3OP_MTX_MODE 0x10
 #define G3OP_MTX_PUSH 0x11
 #define G3OP_MTX_POP 0x12
+#define G3OP_MTX_STORE 0x13
+#define G3OP_MTX_RESTORE 0x14
 #define G3OP_MTX_IDENTITY 0x15
+#define G3OP_MTX_LOAD_4x4 0x16
 #define G3OP_MTX_LOAD_4x3 0x17
+#define G3OP_MTX_MULT_4x4 0x18
 #define G3OP_MTX_MULT_4x3 0x19
+#define G3OP_MTX_MULT_3x3 0x1a
 #define G3OP_MTX_SCALE 0x1b
 #define G3OP_MTX_TRANS 0x1c
+#define G3OP_TEXCOORD 0x22
 #define G3OP_POLYGON_ATTR 0x29
+#define G3OP_TEXIMAGE_PARAM 0x2a
 #define G3OP_BEGIN 0x40
 #define G3OP_END 0x41
 #define G3OP_BOX_TEST 0x70
@@ -1292,9 +1301,10 @@ void gfxBeginRearPlaneImageUpload(void);
 void gfxUploadRearPlaneImageA(const void *src, u32 size);
 void gfxUploadRearPlaneImageB(const void *src, u32 size);
 void gfxEndRearPlaneImageUpload(void);
-// NitroSDK's G3_LoadMtx43 and G3_MultMtx43
+// NitroSDK's G3_LoadMtx43, G3_MultMtx43 and G3_MultMtx33
 void gfxLoadMatrix4x3(const MtxFx43 *mtx);
 void gfxMultMatrix4x3(const MtxFx43 *mtx);
+void gfxMultMatrix3x3(const MtxFx33 *mtx);
 void gfxSetEngineModeA(int dispMode, int bgMode, int bg0As3D);
 void gfxSetBGModeB(int bgMode);
 // NitroSDK's GX_HBlankIntr and GX_VBlankIntr, which return whether the interrupt was enabled
@@ -1494,6 +1504,11 @@ static inline void GXS_DispOn(void) {
 void gfxReset3D(void);
 // NitroSDK's G3X_Init, under swan's name
 void gfxInit3D(void);
+// NitroSDK's G3X_GetClipMtx and G3X_GetVectorMtx, under swan's names: copy the clip matrix (the position matrix with the
+// projection matrix applied) or the vector matrix that the geometry engine last made into dest. Both return -1 without
+// copying while the engine is busy, and 0 once they have
+int gfxGetClipMatrix(MtxFx44 *dest);
+int gfxGetNormalMatrix(MtxFx33 *dest);
 // NitroSDK's G3i_LookAt_, which loads the camera matrix into the geometry engine when isLoad is set, G3_RotX, G3_RotY,
 // G3_RotZ and G3_MultTransMtx33, under swan's names
 void gfxLookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, BOOL isLoad, MtxFx43 *mtx);

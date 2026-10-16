@@ -169,6 +169,42 @@ static inline NNSG3dResNodeInfo *NNS_G3dGetNodeInfo(const NNSG3dResMdl *mdl) {
     return NULL;
 }
 
+// A node's data: its flag, then the first element of its rotation. The translation follows, unless the flag has
+// TRANS_ZERO, then the rest of the rotation unless it has ROT_ZERO: eight more elements, or with PIVOT_EXIST two, the
+// pivot's index being in the flag, and last the data of the scale (NNSG3dFuncJointScale). The rotation elements are
+// fx16 and the translation fx32
+#define NNS_G3D_SRTFLAG_TRANS_ZERO 0x0001
+#define NNS_G3D_SRTFLAG_ROT_ZERO 0x0002
+#define NNS_G3D_SRTFLAG_SCALE_ONE 0x0004
+#define NNS_G3D_SRTFLAG_PIVOT_EXIST 0x0008
+#define NNS_G3D_SRTFLAG_IDXPIVOT_MASK 0x00f0
+#define NNS_G3D_SRTFLAG_IDXPIVOT_SHIFT 4
+#define NNS_G3D_SRTFLAG_PIVOT_MINUS 0x0100
+#define NNS_G3D_SRTFLAG_SIGN_REVC 0x0200
+#define NNS_G3D_SRTFLAG_SIGN_REVD 0x0400
+
+typedef struct {
+    u16 flag;
+    fx16 _00;
+} NNSG3dResNodeData;
+
+static inline const NNSG3dResNodeData *NNS_G3dGetNodeDataByIdx(const NNSG3dResNodeInfo *nodeInfo, u32 idx) {
+    if (nodeInfo != NULL) {
+        const u32 *ofs = NNS_G3dGetResDataByIdx(&nodeInfo->dict, idx);
+
+        if (ofs != NULL) {
+            return (const NNSG3dResNodeData *)((u8 *)nodeInfo + *ofs);
+        }
+    }
+    return NULL;
+}
+
+// What a model's envelope holds for a joint: the matrix that undoes the joint's bind pose, and for the normals
+typedef struct {
+    MtxFx43 invM;
+    MtxFx33 invN;
+} NNSG3dResEvpMtx;
+
 // A model's material block: which materials each texture and each palette is for, then the materials by name
 typedef struct {
     u16 ofsDictTexToMatList;
@@ -412,6 +448,7 @@ typedef struct {
     union {
         MtxFx33 rot;
         VecFx32 rotRow[3];
+        fx32 rotElem[9];
     };
     VecFx32 trans;
 } NNSG3dJntAnmResult;
@@ -620,6 +657,9 @@ void *NNS_G3dGeReleaseBuffer(void);
 void NNS_G3DWaitFIFO(void);
 void NNS_G3DExecOp(u32 op, const u32 *args, u32 num);
 void NNS_G3DExecDisplayList(const void *list, u32 size);
+// NitroSystem's NNS_G3dGetCurrentMtx: gets the position matrix and the vector matrix that the geometry engine is at, each
+// unless its pointer is null
+void NNS_G3DGetTransforms(MtxFx43 *pos, MtxFx33 *nrm);
 
 // NitroSystem's inline wrappers of the buffer, one per geometry command
 static inline void NNS_G3dGePushMtx(void) {
@@ -635,20 +675,43 @@ static inline void NNS_G3dGePopMtx(int num) {
 static inline void NNS_G3dGeMtxMode(int mode) {
     u32 param = mode;
 
-    // MTX_MODE, 0x10 (gx.h has no name for it yet)
-    NNS_G3DExecOp(0x10, &param, 1);
+    NNS_G3DExecOp(G3OP_MTX_MODE, &param, 1);
+}
+
+static inline void NNS_G3dGeStoreMtx(int idx) {
+    u32 param = idx;
+
+    NNS_G3DExecOp(G3OP_MTX_STORE, &param, 1);
+}
+
+static inline void NNS_G3dGeRestoreMtx(int idx) {
+    u32 param = idx;
+
+    NNS_G3DExecOp(G3OP_MTX_RESTORE, &param, 1);
 }
 
 static inline void NNS_G3dGeIdentity(void) {
     NNS_G3DExecOp(G3OP_MTX_IDENTITY, NULL, 0);
 }
 
+static inline void NNS_G3dGeLoadMtx44(const MtxFx44 *mtx) {
+    NNS_G3DExecOp(G3OP_MTX_LOAD_4x4, (const u32 *)mtx, 16);
+}
+
 static inline void NNS_G3dGeLoadMtx43(const MtxFx43 *mtx) {
     NNS_G3DExecOp(G3OP_MTX_LOAD_4x3, (const u32 *)mtx, 12);
 }
 
+static inline void NNS_G3dGeMultMtx44(const MtxFx44 *mtx) {
+    NNS_G3DExecOp(G3OP_MTX_MULT_4x4, (const u32 *)mtx, 16);
+}
+
 static inline void NNS_G3dGeMultMtx43(const MtxFx43 *mtx) {
     NNS_G3DExecOp(G3OP_MTX_MULT_4x3, (const u32 *)mtx, 12);
+}
+
+static inline void NNS_G3dGeMultMtx33(const MtxFx33 *mtx) {
+    NNS_G3DExecOp(G3OP_MTX_MULT_3x3, (const u32 *)mtx, 9);
 }
 
 static inline void NNS_G3dGeScaleVec(const VecFx32 *scale) {
@@ -657,6 +720,12 @@ static inline void NNS_G3dGeScaleVec(const VecFx32 *scale) {
 
 static inline void NNS_G3dGeTranslateVec(const VecFx32 *trans) {
     NNS_G3DExecOp(G3OP_MTX_TRANS, (const u32 *)trans, 3);
+}
+
+static inline void NNS_G3dGeTexCoord(fx32 s, fx32 t) {
+    u32 param = GX_ST(s, t);
+
+    NNS_G3DExecOp(G3OP_TEXCOORD, &param, 1);
 }
 
 static inline void NNS_G3dGePolygonAttr(int light, int polyMode, int cullMode, int polygonID, int alpha, int misc) {
@@ -686,7 +755,14 @@ typedef struct {
     u32 mtxmode_proj;
     MtxFx44 projMtx;
     u32 mtxmode_posvec;
-    MtxFx43 cameraMtx;
+    // The camera matrix, which is also its rotation followed by its translation
+    union {
+        MtxFx43 cameraMtx;
+        struct {
+            MtxFx33 cameraRot;
+            VecFx32 cameraTrans;
+        };
+    };
     u32 cmd1;
     u32 lightVec[4];
     u32 cmd2;
@@ -854,12 +930,13 @@ static inline void NNS_G3dGlbLookAt(const VecFx32 *camPos, const VecFx32 *camUp,
 #define NNS_G3D_SBC_CALLBACK_TIMING_C 3
 
 // The flag of the render state. NODE_VISIBLE is whether the current node is shown, MAT_TRANSPARENT whether the current
-// material is fully transparent, and the CURRENT_*_VALID flags whether the node and material have been set. RETURN ends
+// material is fully transparent, and the CURRENT_*_VALID flags whether the node, material and joint have been set. RETURN ends
 // the stream, SKIP is set by a callback, and the OPT_* flags are the render object's options
 #define NNS_G3D_RSFLAG_NODE_VISIBLE 0x00000001
 #define NNS_G3D_RSFLAG_MAT_TRANSPARENT 0x00000002
 #define NNS_G3D_RSFLAG_CURRENT_NODE_VALID 0x00000004
 #define NNS_G3D_RSFLAG_CURRENT_MAT_VALID 0x00000008
+#define NNS_G3D_RSFLAG_CURRENT_NODEDESC_VALID 0x00000010
 #define NNS_G3D_RSFLAG_RETURN 0x00000020
 #define NNS_G3D_RSFLAG_SKIP 0x00000040
 #define NNS_G3D_RSFLAG_OPT_RECORD 0x00000080
