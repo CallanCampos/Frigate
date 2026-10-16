@@ -3,6 +3,7 @@
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_graphic.h"
 #include "app/local_tvt/local_tvt_message.h"
+#include "app/local_tvt/local_tvt_util.h"
 #include "app/local_tvt_local.h"
 #include "app/xtransceiver.h"
 #include "field/zone.h"

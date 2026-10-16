@@ -1,8 +1,8 @@
+#include "app/local_tvt/local_tvt_util.h"
 #include "types.h"
 #include "app/local_tvt/local_tvt_common.h"
 #include "app/local_tvt/local_tvt_message.h"
 #include "app/local_tvt/local_tvt_person.h"
-#include "app/local_tvt_local.h"
 #include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -76,12 +76,12 @@
 #define PARTY_COLUMNS 2
 
 // The return button of the touch bar
-typedef struct {
+struct LocalTvtReturnIcon {
     ClActor *actor;
     u32 palette;
     u32 chars;
     u32 cellAnims;
-} LocalTvtReturnIcon;
+};
 
 struct LocalTvtBG {
     TCB *vblankTask;
