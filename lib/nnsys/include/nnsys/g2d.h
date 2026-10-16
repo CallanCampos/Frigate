@@ -1025,6 +1025,15 @@ typedef struct {
     int vSpace;
 } NNSG2dTextCanvas;
 
+// NitroSystem's NNS_G2dTextCanvasInit
+static inline void NNS_G2dTextCanvasInit(NNSG2dTextCanvas *pTxn, const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont,
+                                         int hSpace, int vSpace) {
+    pTxn->pCanvas = pCC;
+    pTxn->pFont = pFont;
+    pTxn->hSpace = hSpace;
+    pTxn->vSpace = vSpace;
+}
+
 typedef struct {
     s8 x;
     s8 y;

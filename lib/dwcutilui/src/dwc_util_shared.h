@@ -6,18 +6,17 @@
 #include "dwc_util_display.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_oam.h"
+#include "dwc_util_text.h"
 #include "nitro/gx.h"
 #include "struct_decls.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32));
-void *func_ov182_021bbdec(int kind, int flags);
 void *func_ov182_021ae118(void *work, void *param, int arg1, int arg2);
-void *func_ov182_021ab7b4(void);
-void func_ov182_021bc0a4(void *object, int kind, int flags, int priority, int size, int count, void *resource,
-                         void *work);
-void func_ov182_021bc184(void *object);
-void func_ov182_021bbf7c(int kind);
+// The text flags of the utility's language
+u32 func_ov182_021ab7b4(void);
+// The utility's language
+u8 func_ov182_021ae018(void);
 
 extern void *data_ov182_021c40b8;
 
@@ -42,5 +41,9 @@ void func_ov182_021bcbb0(void *list, void *node);
 void func_ov182_021bcbbc(void *list, void *node);
 GXOamAttr *func_ov182_021bcc80(int screen);
 GXOamAttr *func_ov182_021bccd8(int screen, int index);
+
+// The OBJ characters under the text canvases, in the same later files
+void *func_ov182_021bcdbc(int screen, int size, s16 fromFront, u32 *charName);
+void func_ov182_021bcec4(void *block);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H

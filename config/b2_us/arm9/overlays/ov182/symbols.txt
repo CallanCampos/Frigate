@@ -1311,8 +1311,8 @@ sArchiveName kind:data(any) addr:0x021c0580
 data_ov182_021c0584 kind:data(any) addr:0x021c0584
 data_ov182_021c0588 kind:data(any) addr:0x021c0588
 data_ov182_021c058c kind:data(any) addr:0x021c058c
-data_ov182_021c0590 kind:data(any) addr:0x021c0590
-data_ov182_021c0594 kind:data(any) addr:0x021c0594
+sBgCharNames kind:data(any) addr:0x021c0590
+sBgSizes kind:data(any) addr:0x021c0594
 data_ov182_021c0596 kind:data(any) addr:0x021c0596
 data_ov182_021c059c kind:data(any) addr:0x021c059c
 data_ov182_021c05a4 kind:data(any) addr:0x021c05a4
@@ -1531,8 +1531,8 @@ data_ov182_021c1ad8 kind:data(any) addr:0x021c1ad8
 data_ov182_021c1af0 kind:data(any) addr:0x021c1af0
 data_ov182_021c1af8 kind:data(any) addr:0x021c1af8
 data_ov182_021c1b00 kind:data(any) addr:0x021c1b00
-data_ov182_021c1b04 kind:data(any) addr:0x021c1b04
-data_ov182_021c1b0c kind:data(any) addr:0x021c1b0c
+sKcFontPaths kind:data(any) addr:0x021c1b04
+sFontPaths kind:data(any) addr:0x021c1b0c
 data_ov182_021c1b14 kind:data(any) addr:0x021c1b14
 data_ov182_021c1b24 kind:data(any) addr:0x021c1b24
 data_ov182_021c1b34 kind:data(any) addr:0x021c1b34
@@ -1672,7 +1672,7 @@ sResource kind:bss addr:0x021c418c
 sScreens kind:bss addr:0x021c4190
 sCells kind:bss addr:0x021c4194
 sFades kind:bss addr:0x021c419c
-data_ov182_021c41a0 kind:bss addr:0x021c41a0
+sTextWork kind:bss addr:0x021c41a0
 sHeap kind:bss addr:0x021c41a4
 data_ov182_021c41a8 kind:bss addr:0x021c41a8
 data_ov182_021c41ac kind:bss addr:0x021c41ac
