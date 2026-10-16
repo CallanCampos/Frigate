@@ -7,6 +7,7 @@
 #include "dwc_util_heap.h"
 #include "dwc_util_oam.h"
 #include "nitro/gx.h"
+#include "struct_decls.h"
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 void func_ov182_021ab67c(const char *path, void (*upload)(const void *, u32, u32));
@@ -20,15 +21,17 @@ void func_ov182_021bbf7c(int kind);
 
 extern void *data_ov182_021c40b8;
 
-void *func_ov182_021bd200(int priority, void (*callback)(void *task), int arg, int period);
-void func_ov182_021bd280(int priority, void *task);
 void func_ov182_021bcc9c(GXOamAttr *oam);
 
 // The utility's object and task helpers, in the same later files. A task's
-// callback is handed the task it was created for.
+// callback is handed the task and the argument it was created with.
+typedef void (*DWCUtilTaskCallback)(DWCUtilTask *task, void *arg);
+
 BOOL func_ov182_021bc888(const void *rect);
-void func_ov182_021bd264(void *task, void (*callback)(void *task));
-void func_ov182_021bd268(int priority, void *task);
+DWCUtilTask *func_ov182_021bd200(int list, DWCUtilTaskCallback callback, void *arg, u8 priority);
+void func_ov182_021bd264(DWCUtilTask *task, DWCUtilTaskCallback callback);
+void func_ov182_021bd268(int list, DWCUtilTask *task);
+void func_ov182_021bd280(int list, DWCUtilTask *task);
 
 // The list and the OAM buffer under the OAM allocator and the cells, in the same later files
 void *func_ov182_021bcb3c(void);
