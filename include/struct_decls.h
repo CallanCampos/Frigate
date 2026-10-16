@@ -290,6 +290,7 @@ typedef struct FestMissionConfig FestMissionConfig;
 typedef struct FestMissionEventArgs FestMissionEventArgs;
 typedef struct FestMissionEntry FestMissionEntry;
 typedef struct Field Field;
+typedef struct Field3DBg Field3DBg;
 typedef struct FieldAcmdTCB FieldAcmdTCB;
 typedef struct FieldActor FieldActor;
 typedef struct FieldActorAnmProc FieldActorAnmProc;
