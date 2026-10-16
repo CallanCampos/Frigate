@@ -126,3 +126,8 @@ lib/dwcutilui/src/dwc_util_vram_alloc.c:
 lib/dwcutilui/src/dwc_util_string.c:
     complete
     .text       start:0x021bcef8 end:0x021bcf38
+
+lib/dwcutilui/src/dwc_util_bank.c:
+    complete
+    .text       start:0x021bcf38 end:0x021bd0d4
+    .bss        start:0x021c41d0 end:0x021c4204
