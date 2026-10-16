@@ -74,6 +74,11 @@ lib/dwcutilui/src/dwc_util_oam.c:
     .text       start:0x021bb4c0 end:0x021bb91c
     .bss        start:0x021c41d0 end:0x021c41d4
 
+lib/dwcutilui/src/dwc_util_cell.c:
+    complete
+    .text       start:0x021bb91c end:0x021bbaac
+    .bss        start:0x021c41d4 end:0x021c41dc
+
 lib/dwcutilui/src/dwc_util_display.c:
     complete
     .text       start:0x021bc1e8 end:0x021bc4a8

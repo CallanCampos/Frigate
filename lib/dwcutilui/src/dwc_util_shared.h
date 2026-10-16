@@ -2,6 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H
 
 #include "types.h"
+#include "dwc_util_cell.h"
 #include "dwc_util_display.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_oam.h"
@@ -19,15 +20,12 @@ void func_ov182_021bbf7c(int kind);
 
 extern void *data_ov182_021c40b8;
 
-GXOamAttr *func_ov182_021bb960(int screen, int resource);
 void *func_ov182_021bd200(int priority, void (*callback)(void *task), int arg, int period);
 void func_ov182_021bd280(int priority, void *task);
 void func_ov182_021bcc9c(GXOamAttr *oam);
-void func_ov182_021bb914(int screen, int resource, GXOamAttr *oam);
 
 // The utility's object and task helpers, in the same later files. A task's
 // callback is handed the task it was created for.
-void *func_ov182_021bb97c(int screen, int resource, int arg);
 BOOL func_ov182_021bc888(const void *rect);
 void func_ov182_021bd264(void *task, void (*callback)(void *task));
 void func_ov182_021bd268(int priority, void *task);
@@ -39,6 +37,7 @@ void func_ov182_021bcb6c(void *node);
 void func_ov182_021bcb90(void *position, void *node);
 void func_ov182_021bcbb0(void *list, void *node);
 void func_ov182_021bcbbc(void *list, void *node);
+GXOamAttr *func_ov182_021bcc80(int screen);
 GXOamAttr *func_ov182_021bccd8(int screen, int index);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H

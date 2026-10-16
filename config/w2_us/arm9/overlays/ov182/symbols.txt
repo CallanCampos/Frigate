@@ -1670,7 +1670,7 @@ gWork kind:bss addr:0x021c41c0
 sDownloadPlaySysWork kind:bss addr:0x021c41c8
 sResource kind:bss addr:0x021c41cc
 sScreens kind:bss addr:0x021c41d0
-data_ov182_021c4194 kind:bss addr:0x021c41d4
+sCells kind:bss addr:0x021c41d4
 data_ov182_021c419c kind:bss addr:0x021c41dc
 data_ov182_021c41a0 kind:bss addr:0x021c41e0
 sHeap kind:bss addr:0x021c41e4
