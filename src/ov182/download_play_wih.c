@@ -673,8 +673,7 @@ BOOL func_ov182_021ba4f8(u16 mode, u16 tgid, u16 channel) {
     gWork.work->sParentParam.multiBootFlag = 0;
     gWork.work->sParentParam.entryFlag = 1;
     gWork.work->sParentParam.KS_Flag = mode == WIH_CONNECTMODE_KS_PARENT;
-    if (mode == WIH_CONNECTMODE_MP_PARENT || mode == WIH_CONNECTMODE_KS_PARENT ||
-        mode == WIH_CONNECTMODE_DS_PARENT) {
+    if (mode == WIH_CONNECTMODE_MP_PARENT || mode == WIH_CONNECTMODE_KS_PARENT || mode == WIH_CONNECTMODE_DS_PARENT) {
         return func_ov182_021b9c48();
     }
     if (gWork.logPrint != NULL) {
