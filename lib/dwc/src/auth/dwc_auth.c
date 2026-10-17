@@ -62,7 +62,7 @@ static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *us
     AuthCertificate *certificate = &result.certificate;
     HashContext context;
 
-    // Redundant before the memset, but the ROM has this store
+    // As in GameSpy's login callbacks, the certificate is marked invalid before the whole result is cleared
     certificate->valid = FALSE;
     memset(&result, 0, sizeof(result));
     if (status == 0) {
