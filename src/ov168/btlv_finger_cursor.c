@@ -28,7 +28,7 @@ struct BtlvFingerCursor {
     u16 heapId;      // 0x2c
 };
 
-static void BtlvFingerCursor_AnimCallback(u32 param, fx32 frame);
+static void BtlvFingerCursor_AnimCallback(uptr param, fx32 frame);
 static void BtlvFingerCursor_Task(TCB *tcb, void *data);
 
 static const ClActorSetupEx data_ov168_021f3ef4 = { { 0, 0, 0, 0, 0 }, { 0, 0 }, FX32_ONE, FX32_ONE, 0, 2 };
@@ -90,7 +90,7 @@ BOOL BtlvFingerCursor_Start(BtlvFingerCursor *cursor, s32 x, s32 y, u32 wait, s3
     cursor->seq = 0;
     cursor->tapFrame = tapFrame;
     cursor->touched = FALSE;
-    callback.param = (u32)cursor;
+    callback.param = (uptr)cursor;
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.frame = 0;
     callback.func = BtlvFingerCursor_AnimCallback;
@@ -110,7 +110,7 @@ BOOL BtlvFingerCursor_IsTouched(BtlvFingerCursor *cursor) {
 }
 
 // The actor's animation callback, at the end of each animation and on the tap's frame
-static void BtlvFingerCursor_AnimCallback(u32 param, fx32 frame) {
+static void BtlvFingerCursor_AnimCallback(uptr param, fx32 frame) {
     BtlvFingerCursor *cursor = (BtlvFingerCursor *)param;
 
     switch (cursor->seq) {
@@ -120,7 +120,7 @@ static void BtlvFingerCursor_AnimCallback(u32 param, fx32 frame) {
 
             func_0204c488(cursor->actor, 1);
             cursor->seq++;
-            callback.param = (u32)cursor;
+            callback.param = (uptr)cursor;
             callback.type = CLACT_CALLBACK_FRAME;
             callback.frame = cursor->tapFrame;
             callback.func = BtlvFingerCursor_AnimCallback;
@@ -132,7 +132,7 @@ static void BtlvFingerCursor_AnimCallback(u32 param, fx32 frame) {
 
         cursor->touched = TRUE;
         cursor->seq++;
-        callback.param = (u32)cursor;
+        callback.param = (uptr)cursor;
         callback.type = CLACT_CALLBACK_EVERY_FRAME;
         callback.frame = 0;
         callback.func = BtlvFingerCursor_AnimCallback;

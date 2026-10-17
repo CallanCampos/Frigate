@@ -24,7 +24,8 @@ _Noreturn void port_trap_function(const PortTrapSymbol *symbol, void *caller);
 // instead of reading zeros. Called once at startup, before the game runs
 void port_trap_protect_data(void);
 
-// The tables gen_stubs.py writes: every data placeholder, in address order, and the range they occupy
+// The tables gen_stubs.py writes: every data placeholder, in the DS's address order, and the paddings defined around
+// them, which the linker may not keep around them (trap.c works out the range they occupy)
 extern const PortTrapSymbol port_trap_data_symbols[];
 extern const size_t port_trap_data_count;
 extern unsigned char *const port_trap_data_begin;

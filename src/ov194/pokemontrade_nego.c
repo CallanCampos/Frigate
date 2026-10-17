@@ -1279,11 +1279,11 @@ static void func_ov194_021bdcc4(PokemonTradeWork *wk) {
                             MailData *mail = CreateMailData(wk->heapId);
                             PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
                             func_02009738(mail, GFL_StrBufGetStringPtr(name));
-                            PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
+                            PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (uptr)mail);
                             GFL_HeapFree(mail);
                         }
                         setNicknameToNick(pkm);
-                        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GFL_StrBufGetStringPtr(name));
+                        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (uptr)GFL_StrBufGetStringPtr(name));
                         GFL_StrBufFree(name);
                     }
                     count++;

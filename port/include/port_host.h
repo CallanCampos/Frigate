@@ -48,6 +48,12 @@ void *port_hw_vecmtx_result(void);
 // (port/hal/gfl/heap_policy.c). The arguments are u32, u32 and BOOL
 unsigned int port_heap_size(unsigned int index, unsigned int size, int root);
 
+// The work a particle system's SPL manager allocates from on a host (src/gfl/particle.c), in place of the caller's
+// buffer, which is sized for the DS's structs (port/hal/gfl/particle_work.c). The size is u32, the system's ID 0 to 15
+unsigned int port_particle_work_size(unsigned int size);
+void *port_particle_work(unsigned int id, unsigned int size);
+void port_particle_work_free(unsigned int id);
+
 // The 32-bit handles that sound data keeps in place of a host pointer where the DS keeps an ARM9 address in a 32-bit
 // field of a file (port/hal/snd7/snd_handle.h): NitroSystem's file table (lib/nnsys/src/snd/snd_internal.h) and the
 // links of wave archives and banks (lib/nitro/include/nitro/snd.h). 0 is NULL both ways

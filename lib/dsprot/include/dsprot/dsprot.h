@@ -15,6 +15,25 @@ typedef void *(*DSProtCallback)(void *arg0, void *arg1);
 extern u32 data_ov337_02182440;
 extern DSProtCallback data_ov337_02182444[2];
 
+#ifdef PLATFORM_PC
+// The host's DSPROT_CHECKED_CALL and DSPROT_CHECKED_RUN. A host's function is its own machine code, never DS Protect's
+// ARM code, so a checksum of it never matches and the game would take a pirated copy's path: random numbers drawn
+// twice more every frame, a heap leak per map change, a crash leaving the party list. The port plays a genuine
+// cartridge (port/hal/stubs/dsprot.c), whose code always matches, so these skip the checksum and call func as the
+// DS's versions below do when it matches
+#define DSPROT_CHECKED_CALL(func, nop, tamper, arg0, arg1)                                                             \
+    {                                                                                                                  \
+        u32 index = *(u32 *)HW_VBLANK_COUNT_BUF & 1;                                                                   \
+        data_ov337_02182440 = index;                                                                                   \
+        data_ov337_02182444[index] = nop;                                                                              \
+        data_ov337_02182444[index ^ 1] = tamper;                                                                       \
+        func(arg0, arg1);                                                                                              \
+    }
+#define DSPROT_CHECKED_RUN(ret, func, tamper, callback, arg0, arg1)                                                    \
+    {                                                                                                                  \
+        ret = func(callback, arg0, arg1);                                                                              \
+    }
+#else
 // Calls a DS Protect function after verifying its code. If the checksum does not match, `tamper` is called instead.
 // `nop` and `tamper` are put in a table in a random order, picked with the VBlank counter.
 #define DSPROT_CHECKED_CALL(func, nop, tamper, arg0, arg1)                                                             \
@@ -57,6 +76,7 @@ extern DSProtCallback data_ov337_02182444[2];
             ret = tamper(NULL, NULL);                                                                                  \
         }                                                                                                              \
     }
+#endif
 
 void *DSProt_CallRunChecks1(void *arg0, void *arg1);
 void *DSProt_CallRunChecks2(void *arg0, void *arg1);

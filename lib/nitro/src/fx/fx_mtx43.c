@@ -160,6 +160,14 @@ void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab) {
     if (ab == b) {
         ab = &tmp;
     }
+#ifdef PLATFORM_PC
+    // The ROM loads each row of a before it stores that row of the product, so a product into a is right on the DS
+    // (SPL's drawing makes some). This C reads a's row again after storing some of it, so on a host that product is
+    // made in tmp too
+    if (ab == a) {
+        ab = &tmp;
+    }
+#endif
     ab->m[0][0] =
         (fx32)(((fx64)a->m[0][0] * b->m[0][0] + (fx64)a->m[0][1] * b->m[1][0] + (fx64)a->m[0][2] * b->m[2][0]) >>
                FX32_SHIFT);
@@ -202,6 +210,17 @@ void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab) {
 }
 
 void MTX_MultVec43(const VecFx32 *vec, const MtxFx43 *mtx, VecFx32 *dest) {
+#ifdef PLATFORM_PC
+    // The ROM loads the whole vector before it stores any of the result, so a vector transformed in place is right on
+    // the DS (SPL's drawing and battle effects transform some). This C reads vec->x again after storing dest->x, so on
+    // a host such a vector is read from a copy
+    VecFx32 copy;
+
+    if (vec == dest) {
+        copy = *vec;
+        vec = &copy;
+    }
+#endif
     dest->x = (fx32)(((fx64)vec->x * mtx->m[0][0] + (fx64)vec->y * mtx->m[1][0] + (fx64)vec->z * mtx->m[2][0]) >>
                      FX32_SHIFT) +
               mtx->m[3][0];

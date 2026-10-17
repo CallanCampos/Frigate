@@ -21,4 +21,8 @@ void port_present_frame(void);
 // Needs no window
 int port_present_screenshot(const char *path);
 
+// The SHA-1 of a screen's RGB bytes (0 top, 1 bottom), 8 bits a channel row by row, as 40 hex digits: what the
+// oracle's frames.tsv gives for a screen showing the same pixels (port/tools/oracle/README.md)
+void port_present_screen_hash(int screen, char hex[41]);
+
 #endif // PORT_APP_PRESENT_H

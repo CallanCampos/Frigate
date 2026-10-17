@@ -263,9 +263,11 @@ in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's logo, stays 2
 
 What the port needs to compare itself frame by frame:
 
-- **Its own run directory**: a `frames.tsv` row at each frame hook with the logic counter (the value
-  `GFL_VBlankUpdate` keeps in `sVBlankCount`) and the game frame, and PNGs at the frames of a list, so that one run
-  gives every frame instead of `oracle.py port`'s run per frame.
+- **Its own run directory** (partly done): `--screen-hashes DIR/frames.tsv` writes a row at each frame hook with the
+  logic counter (the value `GFL_VBlankUpdate` keeps in `sVBlankCount`) and both screens' hashes, `-` in the other
+  columns, so that `compare.py align` and `port/tests/replay/check_screens.py` work from one run. Still to come: the
+  game frame, the 3D and blank columns, and PNGs at the frames of a list instead of `oracle.py port`'s run per
+  frame (`--screenshot-every` writes them under other names).
 - **Replays** (done: `port/app/replay.c`, GFL's frame count read through `port/hal/gfl/gfl_use_host.c`): `--input FILE`
   read with `pbwinput.c` and one `PbwGameClock` for the run (`pbw_game_clock_init`).
   Before the game starts, apply `pbw_input_state(&input, 1)`. At the frame hook of each frame, read GFL's frame count

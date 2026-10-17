@@ -435,7 +435,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
                     PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
                     func_020097e0(block, 0, mailSlot, mail);
                     ResetMailData(mail);
-                    PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
+                    PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (uptr)mail);
                     PokeParty_SetParam(pkm, PKM_PARAM_ITEM, 0);
                     GFL_HeapFree(mail);
                 }

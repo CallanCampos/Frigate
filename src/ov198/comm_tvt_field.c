@@ -612,7 +612,7 @@ static void CommTvtField_StartPress(CommTvtFieldWork *wk) {
     int index = wk->selected;
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = (NNSG2dAnmCallBackPtr)CommTvtField_QueueStartExit;
     if (index == 3) {
         index = 0;

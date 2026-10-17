@@ -126,7 +126,7 @@ static void GtsNegoDisp_CreateListFooter(GtsNegoDisp *disp);
 static void GtsNegoDisp_CreateListActors(GtsNegoDisp *disp, BOOL scrollable);
 static int GtsNegoDisp_GetKnobY(GtsNegoDisp *disp, int pos, int count);
 static int GtsNegoDisp_GetKnobPos(GtsNegoDisp *disp, int y, int count);
-static void GtsNegoDisp_OnSearchAnimEnd(u32 param, fx32 frame);
+static void GtsNegoDisp_OnSearchAnimEnd(uptr param, fx32 frame);
 static void GtsNegoDisp_CreateSearchActors(GtsNegoDisp *disp);
 static void GtsNegoDisp_FreeSearchActors(GtsNegoDisp *disp);
 static void GtsNegoDisp_UpdateTopScroll(GtsNegoDisp *disp);
@@ -1164,7 +1164,7 @@ int GtsNegoDisp_DragKnob(GtsNegoDisp *disp, int y, int count) {
 }
 
 // The search's trainer cycles through the looks, a sequence each
-static void GtsNegoDisp_OnSearchAnimEnd(u32 param, fx32 frame) {
+static void GtsNegoDisp_OnSearchAnimEnd(uptr param, fx32 frame) {
     GtsNegoDisp *disp = (GtsNegoDisp *)param;
     u16 sequence = func_0204c4a0(disp->searchActors[1]) + 1;
 
@@ -1196,7 +1196,7 @@ static void GtsNegoDisp_CreateSearchActors(GtsNegoDisp *disp) {
     func_0204c520(disp->searchActors[1], TRUE);
     func_0204c124(disp->searchActors[1], TRUE);
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)disp;
+    callback.param = (uptr)disp;
     callback.func = GtsNegoDisp_OnSearchAnimEnd;
     func_0204c5b0(disp->searchActors[1], &callback);
     GFL_BGSysSetEnabledBGsA(GX_PLANEMASK_ALL);

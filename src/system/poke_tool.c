@@ -255,8 +255,8 @@ static void PokeParty_PkmEncrypt(PartyPkm *pkm);
 static void PML_PkmEncryptForce(BoxPkm *pkm);
 static u32 PokeParty_GetParamCore(PartyPkm *pkm, PkmField field, void *buffer);
 static u32 PML_PkmGetParamCore(BoxPkm *pkm, u32 field, void *buffer);
-static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, u32 value);
-static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value);
+static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, uptr value);
+static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, uptr value);
 static void writePkmBattleData(PartyPkm *pkm, int param, int value);
 static void PML_PkmAddParam(BoxPkm *pkm, int param, int value);
 static void addClampedU8(u8 *field, int value, int max);
@@ -316,7 +316,7 @@ PartyPkm *boxPkmRegenToPartyPkm(BoxPkm *pkm, HeapID heapId) {
     PokeParty_SetParam(partyPkm, PKM_PARAM_HP, 0);
     PokeParty_SetParam(partyPkm, PKM_PARAM_MAX_HP, 0);
     mail = CreateMailData(HEAPID_TAIL(heapId));
-    PokeParty_SetParam(partyPkm, PKM_PARAM_MAIL, (u32)mail);
+    PokeParty_SetParam(partyPkm, PKM_PARAM_MAIL, (uptr)mail);
     GFL_HeapFree(mail);
     PokeParty_RecalcStats(partyPkm);
     return partyPkm;
@@ -347,7 +347,7 @@ void PokeParty_CreatePkm(PartyPkm *pkm, u16 species, u16 level, u64 trainerId, s
     PML_CryptoRun(&pkm->statusCond, sizeof(PartyPkm) - sizeof(BoxPkm), pkm->base.pid);
     PokeParty_SetParam(pkm, PKM_PARAM_LEVEL, level);
     mail = CreateMailData(HEAPID_TAIL(HEAPID_SYSTEM));
-    PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
+    PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (uptr)mail);
     GFL_HeapFree(mail);
     PokeParty_RecalcStats(pkm);
 }
@@ -386,7 +386,7 @@ static void PML_CreatePkm(BoxPkm *pkm, u16 species, u16 level, u64 trainerId, u3
     PML_PkmSetParam(pkm, PKM_PARAM_REGION, region);
     PML_PkmSetParam(pkm, PKM_PARAM_SPECIES, species);
     GFL_MsgDataLoadRawStr(g_PMLSpeciesNamesResident, species, g_PMLPkmStringTemp, NELEMS(g_PMLPkmStringTemp));
-    PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)g_PMLPkmStringTemp);
+    PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (uptr)g_PMLPkmStringTemp);
     PML_PkmSetParam(pkm, PKM_PARAM_EXP, PML_UtilGetPkmLvExp(species, 0, level));
     PML_PkmSetParam(pkm, PKM_PARAM_HAPPINESS, PML_PersonalGetParam(personal, PERSONAL_FRIENDSHIP));
     PML_PkmSetParam(pkm, PKM_PARAM_MET_LEVEL, level);
@@ -442,7 +442,7 @@ static void setNameChangedPkm(BoxPkm *pkm, u16 species) {
         UpdateGenderOnMonsChange(pkm, species, oldSpecies);
         if (!isNicknamed) {
             GFL_MsgDataLoadRawStr(g_PMLSpeciesNamesResident, species, g_PMLPkmStringTemp, NELEMS(g_PMLPkmStringTemp));
-            PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)g_PMLPkmStringTemp);
+            PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (uptr)g_PMLPkmStringTemp);
         }
     }
     PML_PkmReEncrypt(pkm, wasEncrypted);
@@ -539,7 +539,7 @@ static void fillDataForHatchedEgg(BoxPkm *pkm, PlayerInfo *playerInfo, u32 place
     PML_PkmSetParam(pkm, PKM_PARAM_IS_EGG, FALSE);
     PML_PkmSetParam(pkm, PKM_PARAM_HAPPINESS, HATCHED_FRIENDSHIP);
     GFL_MsgDataLoadRawStr(g_PMLSpeciesNamesResident, species, g_PMLPkmStringTemp, NELEMS(g_PMLPkmStringTemp));
-    PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)g_PMLPkmStringTemp);
+    PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (uptr)g_PMLPkmStringTemp);
     PML_UtilSetupMetData(pkm, MET_DATA_HATCHED, playerInfo, placeName, heapId);
     PML_PkmReEncrypt(pkm, wasEncrypted);
 }
@@ -654,14 +654,14 @@ u32 PokeParty_GetParam(const PartyPkm *pkm, PkmField param, void *buffer) {
     return value;
 }
 
-void PokeParty_SetParam(PartyPkm *pkm, PkmField param, u32 value) {
+void PokeParty_SetParam(PartyPkm *pkm, PkmField param, uptr value) {
     if (PokeParty_PkmDecryptCheck(pkm) == TRUE) {
         PokeParty_SetParamCore(pkm, param, value);
     }
     PokeParty_PkmEncrypt(pkm);
 }
 
-void PML_PkmSetParam(BoxPkm *pkm, u32 param, u32 value) {
+void PML_PkmSetParam(BoxPkm *pkm, u32 param, uptr value) {
     if (PML_PkmDecryptCheck(pkm) == TRUE) {
         PML_PkmSetParamCore(pkm, param, value);
     }
@@ -1896,7 +1896,7 @@ static u32 PML_PkmGetParamCore(BoxPkm *pkm, u32 field, void *buffer) {
     return result;
 }
 
-static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, u32 value) {
+static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, uptr value) {
     switch (field) {
     case PKM_PARAM_STATUS:
         pkm->statusCond = value;
@@ -1940,7 +1940,7 @@ static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, u32 value) {
 }
 
 // Writes a field of a decrypted Pokémon. An effort value is cut down to what the total and the stat allow
-static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
+static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, uptr value) {
     u64 bit;
     PkmBlockA *blockA = PML_PkmGetParamBlockCore(pkm, pkm->pid, 0);
     PkmBlockB *blockB = PML_PkmGetParamBlockCore(pkm, pkm->pid, 1);
@@ -2513,7 +2513,7 @@ void setNicknameToNick(PartyPkm *pkm) {
 static void setNameToNick(BoxPkm *pkm) {
     GFL_MsgDataLoadRawStr(g_PMLSpeciesNamesResident, PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL), g_PMLPkmStringTemp,
                           NELEMS(g_PMLPkmStringTemp));
-    PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)g_PMLPkmStringTemp);
+    PML_PkmSetParam(pkm, PKM_PARAM_NICKNAME_RAW, (uptr)g_PMLPkmStringTemp);
 }
 
 static void PML_GrowTblRead(u32 growthRate, u32 *dest) {

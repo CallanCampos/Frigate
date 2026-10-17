@@ -109,7 +109,7 @@ typedef struct {
     u16 type;
     // For CLACT_CALLBACK_FRAME
     u16 frame;
-    u32 param;
+    uptr param;
     NNSG2dAnmCallBackPtr func;
 } ClActorCallback;
 

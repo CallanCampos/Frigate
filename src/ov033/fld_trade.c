@@ -85,7 +85,7 @@ void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm,
     EventFieldTrade_DebugLogPkm(pkm);
 
     name = FieldTradeInput_LoadName(heapId, offer->nicknameMessageId);
-    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
+    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (uptr)name);
     GFL_StrBufFree(name);
 
     if (offer->ivs[0] != 0xff) {
@@ -121,7 +121,7 @@ void EventFieldTrade_CreatePkm(GameData *gameData, HeapID heapId, PartyPkm *pkm,
     PokeParty_SetParam(pkm, PKM_PARAM_ITEM, offer->heldItem);
 
     name = FieldTradeInput_LoadName(heapId, offer->nameMessageId);
-    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (u32)name);
+    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (uptr)name);
     GFL_StrBufFree(name);
     PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, offer->trainerGender);
     PokeParty_SetParam(pkm, PKM_PARAM_REGION, offer->region);

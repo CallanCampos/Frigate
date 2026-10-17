@@ -85,7 +85,7 @@ static void func_ov194_021c604c(TradeCurve *curve, VecFx32 *start, VecFx32 *cont
 static BOOL func_ov194_021c60a0(TradeCurve *curve);
 static void func_ov194_021c4324(void);
 static void func_ov194_021c58b4(PokemonTradeWork *wk);
-static void func_ov194_021c5dcc(u32 param, fx32 frame);
+static void func_ov194_021c5dcc(uptr param, fx32 frame);
 static void func_ov194_021c5e9c(const PokemonTradeWork *wk, u32 vram, u32 paletteMask);
 static void func_ov194_021c5f64(PokemonTradeWork *wk, BOOL dim, u16 vram, u32 paletteMask);
 
@@ -2164,7 +2164,7 @@ void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
     GFL_BGSysQueueScrLoad(1);
 }
 
-static void func_ov194_021c5dcc(u32 param, fx32 frame) {
+static void func_ov194_021c5dcc(uptr param, fx32 frame) {
     PokemonTradeWork *wk = (PokemonTradeWork *)param;
 
     wk->boxCursorDone = TRUE;
@@ -2187,7 +2187,7 @@ void func_ov194_021c5dd8(PokemonTradeWork *wk, u8 x, u8 y) {
     func_0204c520(wk->boxCursor, TRUE);
     wk->boxCursorDone = FALSE;
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = func_ov194_021c5dcc;
     func_0204c5b0(wk->boxCursor, &callback);
 }

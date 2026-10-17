@@ -203,7 +203,7 @@ void NNS_G2dBindAnimCtrl(NNSG2dAnimController *animCtrl, const NNSG2dAnimSequenc
     NNS_G2dResetAnimCtrlState(animCtrl);
 }
 
-void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, u32 type, u32 param,
+void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, u32 type, uptr param,
                                        NNSG2dAnmCallBackPtr pFunc) {
     animCtrl->callbackFunctor.pFunc = pFunc;
     animCtrl->callbackFunctor.param = param;
@@ -211,8 +211,8 @@ void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, u32 type,
     animCtrl->callbackFunctor.frameIdx = 0;
 }
 
-void NNS_G2dSetAnimCtrlCallBackFunctorAtAnimFrame(NNSG2dAnimController *animCtrl, u32 param, NNSG2dAnmCallBackPtr pFunc,
-                                                  u16 frameIdx) {
+void NNS_G2dSetAnimCtrlCallBackFunctorAtAnimFrame(NNSG2dAnimController *animCtrl, uptr param,
+                                                  NNSG2dAnmCallBackPtr pFunc, u16 frameIdx) {
     animCtrl->callbackFunctor.type = NNS_G2D_ANMCALLBACKTYPE_SPEC_FRM;
     animCtrl->callbackFunctor.pFunc = pFunc;
     animCtrl->callbackFunctor.param = param;

@@ -885,7 +885,7 @@ BOOL s010F_PokePartyAddEgg(VM *vm, FieldScriptEnv *env) {
     pkm = PokeParty_NewTempPkm(species, 1, (u64)-1, heapId);
     PokeParty_SetParam(pkm, PKM_PARAM_FORM, form);
     name = copyTrainerNameToNewStrbuf((const u16 *)GetGameDataPlayerInfo(gameData), heapId);
-    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (u32)name);
+    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (uptr)name);
     GFL_StrBufFree(name);
     personal = PML_PersonalLoad(PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL),
                                 PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL), heapId);
@@ -894,7 +894,7 @@ BOOL s010F_PokePartyAddEgg(VM *vm, FieldScriptEnv *env) {
     PokeParty_SetParam(pkm, PKM_PARAM_HAPPINESS, cycles);
     PokeParty_SetParam(pkm, PKM_PARAM_IS_EGG, 1);
     name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
-    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
+    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (uptr)name);
     GFL_StrBufFree(name);
     PokeParty_RecalcStats(pkm);
     PokeParty_SetupMetData(pkm, 5, playerInfo, 0xea63, heapId);

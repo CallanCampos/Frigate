@@ -123,7 +123,7 @@ typedef struct {
     TCB *vblankTask;
     // DDEMO_SCENE_*
     u32 scene;
-    u32 seHandle;
+    uptr seHandle;
     G3DManager *g3dMgr;
     u32 unk14;
     MCSSSystem *mcssSys;

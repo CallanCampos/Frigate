@@ -163,10 +163,10 @@ static void BtlvMcss_MoveTaskEnd_Level(TCB *tcb);
 static void BtlvMcss_IdleTask(TCB *tcb, void *data);
 static void BtlvMcss_RotationTask(TCB *tcb, void *data);
 static void BtlvMcss_RotationTaskEnd(TCB *tcb);
-static void BtlvMcss_OnAnimationEnd(u32 index, fx32 frame);
+static void BtlvMcss_OnAnimationEnd(uptr index, fx32 frame);
 static BOOL BtlvMcss_IdleNodeCallback(u32 param, const NNSG2dMultiCellHierarchyData *node,
                                       NNSG2dCellAnimation *cellAnim, u16 nodeIdx);
-static void BtlvMcss_OnSetAnimationEnd(u32 index, fx32 frame);
+static void BtlvMcss_OnSetAnimationEnd(uptr index, fx32 frame);
 static void BtlvMcss_GetDefaultPosImpl(BtlvMcss *work, VecFx32 *out, int pos);
 static fx32 BtlvMcss_GetDefaultScaleImpl(BtlvMcss *work, int pos, BOOL flat);
 static int BtlvMcss_GetIndex(BtlvMcss *work, int pos);
@@ -2050,7 +2050,7 @@ static void BtlvMcss_RotationTaskEnd(TCB *tcb) {
     task->work->rotating = FALSE;
 }
 
-static void BtlvMcss_OnAnimationEnd(u32 index, fx32 frame) {
+static void BtlvMcss_OnAnimationEnd(uptr index, fx32 frame) {
     BtlvMcss *work = BtlvEffect_GetMcss();
     BtlvMcssIdle *idle;
     u32 count;
@@ -2121,7 +2121,7 @@ static BOOL BtlvMcss_IdleNodeCallback(u32 param, const NNSG2dMultiCellHierarchyD
     return TRUE;
 }
 
-static void BtlvMcss_OnSetAnimationEnd(u32 index, fx32 frame) {
+static void BtlvMcss_OnSetAnimationEnd(uptr index, fx32 frame) {
     BtlvMcss *work = BtlvEffect_GetMcss();
 
     work->entries[index].animSet = FALSE;

@@ -36,6 +36,29 @@ _Noreturn void port_trap_function(const PortTrapSymbol *symbol, void *caller) {
     _Exit(PORT_TRAP_EXIT_STATUS);
 }
 
+// The placeholders' range: from the first byte of any of them to the last. gen_stubs.py defines them between two
+// page-sized paddings, but ld64 doesn't keep a section's zero-fill objects in the order they are defined (it puts the
+// page-aligned paddings after every placeholder), so the paddings alone don't bracket them. The section is
+// page-aligned and holds nothing else, so the range starts a page, and a padding ends it whichever way the linker
+// orders them
+static const unsigned char *sDataBegin;
+static const unsigned char *sDataEnd;
+
+static void find_data_range(void) {
+    sDataBegin = port_trap_data_begin;
+    sDataEnd = port_trap_data_end;
+    for (size_t i = 0; i < port_trap_data_count; i++) {
+        const unsigned char *start = port_trap_data_addresses[i];
+        size_t size = port_trap_data_symbols[i].size;
+        if (start < sDataBegin) {
+            sDataBegin = start;
+        }
+        if (start + size > sDataEnd) {
+            sDataEnd = start + size;
+        }
+    }
+}
+
 // The placeholder containing an address, or NULL
 static const PortTrapSymbol *find_data_symbol(const unsigned char *address, size_t *offset) {
     for (size_t i = 0; i < port_trap_data_count; i++) {
@@ -52,7 +75,7 @@ static const PortTrapSymbol *find_data_symbol(const unsigned char *address, size
 static void on_fault(int signal, siginfo_t *info, void *context) {
     (void)context;
     const unsigned char *address = info->si_addr;
-    if (address >= port_trap_data_begin && address < port_trap_data_end) {
+    if (address >= sDataBegin && address < sDataEnd) {
         size_t offset = 0;
         const PortTrapSymbol *symbol = find_data_symbol(address, &offset);
         if (symbol != NULL) {
@@ -66,7 +89,7 @@ static void on_fault(int signal, siginfo_t *info, void *context) {
         fflush(stderr);
         _Exit(PORT_TRAP_EXIT_STATUS);
     }
-    if (!(address >= port_trap_data_begin && address < port_trap_data_end)) {
+    if (!(address >= sDataBegin && address < sDataEnd)) {
         // Any other fault is a crash: say where, then let the default action end the program as it would have
         fprintf(stderr, "\nport: crash: signal %d at address %p\n", signal, info->si_addr);
         print_backtrace();
@@ -81,8 +104,9 @@ static void on_fault(int signal, siginfo_t *info, void *context) {
 
 void port_trap_protect_data(void) {
     long page = sysconf(_SC_PAGESIZE);
-    uintptr_t begin = ((uintptr_t)port_trap_data_begin + (uintptr_t)page - 1) & ~((uintptr_t)page - 1);
-    uintptr_t end = (uintptr_t)port_trap_data_end & ~((uintptr_t)page - 1);
+    find_data_range();
+    uintptr_t begin = ((uintptr_t)sDataBegin + (uintptr_t)page - 1) & ~((uintptr_t)page - 1);
+    uintptr_t end = (uintptr_t)sDataEnd & ~((uintptr_t)page - 1);
     if (end > begin && mprotect((void *)begin, end - begin, PROT_NONE) != 0) {
         perror("port: mprotect of the data placeholders");
     }

@@ -9,20 +9,20 @@ void VM_Reset(VM *vm) {
     vm->state = VM_STATE_STOPPED;
     vm->native = NULL;
     vm->stackPos = 0;
-    MI_CpuFill8(vm->stack, 0, vm->param.stackSize * sizeof(u32));
+    MI_CpuFill8(vm->stack, 0, vm->param.stackSize * sizeof(uptr));
     MI_CpuFill8(vm->work, 0, vm->param.workSize * sizeof(u32));
     vm->verifier = NULL;
     vm->verifierArg = NULL;
 }
 
 VM *VM_Create(HeapID heapId, const VMInitParam *param) {
-    u32 size = sizeof(VM) + param->workSize * sizeof(u32) + param->stackSize * sizeof(u32);
+    u32 size = sizeof(VM) + param->workSize * sizeof(u32) + param->stackSize * sizeof(uptr);
     VM *vm = GFL_HeapAllocate(heapId, size, FALSE, "vm.c", 96);
 
     MI_CpuFill8(vm, 0, size);
     vm->param = *param;
     vm->work = (u32 *)(vm + 1);
-    vm->stack = vm->work + param->workSize;
+    vm->stack = (uptr *)(vm->work + param->workSize);
     return vm;
 }
 
@@ -130,14 +130,14 @@ u32 VM_Read32(VM *vm) {
     return value;
 }
 
-void VM_StackPush(VM *vm, u32 value) {
+void VM_StackPush(VM *vm, uptr value) {
     if (vm->stackPos + 1 < vm->param.stackSize) {
         vm->stack[vm->stackPos] = value;
         vm->stackPos++;
     }
 }
 
-u32 VM_StackPop(VM *vm) {
+uptr VM_StackPop(VM *vm) {
     if (vm->stackPos == 0) {
         return 0;
     }
@@ -149,7 +149,7 @@ void VM_Jump(VM *vm, const u8 *pc) {
 }
 
 void VM_Call(VM *vm, const u8 *pc) {
-    VM_StackPush(vm, (u32)vm->pc);
+    VM_StackPush(vm, (uptr)vm->pc);
     vm->pc = pc;
 }
 

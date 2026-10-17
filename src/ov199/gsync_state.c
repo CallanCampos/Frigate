@@ -199,7 +199,7 @@ static void GSync_StateWaitDownloadsShown(GSyncWork *wk);
 static void GSync_StateShowDownloads(GSyncWork *wk);
 static void GSync_StateWaitLevelUp(GSyncWork *wk);
 static void GSync_StateWaitReceived(GSyncWork *wk);
-static void GSync_OnPokemonAnimEnd(u32 param, fx32 frame);
+static void GSync_OnPokemonAnimEnd(uptr param, fx32 frame);
 static void GSync_ReceivePokemon(GSyncWork *wk);
 static void GSync_StateWaitReceiveSave(GSyncWork *wk);
 static void GSync_StateWaitFinishDownload(GSyncWork *wk);
@@ -492,7 +492,7 @@ static void GSync_StateWaitReceived(GSyncWork *wk) {
     }
 }
 
-static void GSync_OnPokemonAnimEnd(u32 param, fx32 frame) {
+static void GSync_OnPokemonAnimEnd(uptr param, fx32 frame) {
     GSyncWork *wk = (GSyncWork *)param;
 
     GSyncDisp_SetActorSequence(wk->disp, 0, 0);
@@ -552,7 +552,7 @@ static void GSync_StateWaitReceiveSave(GSyncWork *wk) {
         GSyncDisp_SetActorSequence(wk->disp, 0, 1);
         GSyncDisp_DeleteActor(wk->disp, 13);
         callback.type = CLACT_CALLBACK_LAST_FRAME;
-        callback.param = (u32)wk;
+        callback.param = (uptr)wk;
         callback.func = GSync_OnPokemonAnimEnd;
         GSyncDisp_SetActorCallback(wk->disp, 0, &callback);
         GSyncDisp_StartFade(wk->disp, FALSE);

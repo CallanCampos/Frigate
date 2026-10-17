@@ -97,8 +97,8 @@ void func_02005a24(void);
 BOOL func_02005a5c(void);
 BOOL func_02005aa8(void);
 // Loads sound sequences ahead of time, and frees them
-u32 func_02005af4(const u32 *seqs, u32 count);
-void func_02005b60(u32 handle);
+uptr func_02005af4(const u32 *seqs, u32 count);
+void func_02005b60(uptr handle);
 
 // A stream of music, which the title screen plays
 void GFL_SndStreamInit(HeapID heapId);

@@ -1631,13 +1631,13 @@ static void Upload_ReplaceBadName(PartyPkm *pkm, HeapID heapId) {
 
     GFL_MsgDataFree(msgData);
     setNicknameToNick(pkm);
-    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GFL_StrBufGetStringPtr(name));
+    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (uptr)GFL_StrBufGetStringPtr(name));
     if (PML_ItemIsMail(PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL))) {
         MailData *mail = CreateMailData(HEAPID_TAIL(heapId));
 
         PokeParty_GetParam(pkm, PKM_PARAM_MAIL, mail);
         func_02009738(mail, GFL_StrBufGetStringPtr(name));
-        PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)mail);
+        PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (uptr)mail);
         GFL_HeapFree(mail);
     }
     GFL_StrBufFree(name);

@@ -206,6 +206,14 @@ void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab) {
     if (ab == b) {
         ab = &tmp;
     }
+#ifdef PLATFORM_PC
+    // The ROM loads each row of a before it stores that row of the product, so a product into a is right on the DS
+    // (MAT3_RotationEulerZYX makes one). This C reads a's row again after storing some of it, so on a host that product
+    // is made in tmp too
+    if (ab == a) {
+        ab = &tmp;
+    }
+#endif
     ab->m[0][0] =
         (fx32)(((fx64)a->m[0][0] * b->m[0][0] + (fx64)a->m[0][1] * b->m[1][0] + (fx64)a->m[0][2] * b->m[2][0]) >>
                FX32_SHIFT);

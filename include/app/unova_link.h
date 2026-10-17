@@ -282,7 +282,7 @@ struct KeySystemWork {
     CygnusData *cygnusData;
     CygnusIcons *cygnusIcons;
     // The handle of the sounds that Unova Link loads ahead
-    u32 preloadedSeqs;
+    uptr preloadedSeqs;
     // The last choice of a list or menu, or the result of an exchange
     u32 choice;
     u32 timer;

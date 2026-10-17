@@ -330,7 +330,7 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
                 func_ov012_02165afc(wk->nameEntryParam, name);
                 PokeParty_GetParam(demoParam->pkm, PKM_PARAM_NICKNAME, oldName);
-                PokeParty_SetParam(demoParam->pkm, PKM_PARAM_NICKNAME, (u32)name);
+                PokeParty_SetParam(demoParam->pkm, PKM_PARAM_NICKNAME, (uptr)name);
                 if (func_ov012_02165b10(wk->nameEntryParam, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(demoParam->gameData), 30);
                 }

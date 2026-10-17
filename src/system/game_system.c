@@ -123,10 +123,16 @@ static BOOL GameSystem_Init(GameProc *proc, u32 *state, void *param, void *work)
         u32 checksum;
         const u32 *code = (const u32 *)DSProt_CallRunChecks2;
 
+#ifdef PLATFORM_PC
+        // A host's code is its own machine code, never DS Protect's ARM code, so the port skips its checksum
+        // and takes a genuine cartridge's path (lib/dsprot/include/dsprot/dsprot.h)
+        checksum = DSPROT_CHECKSUM;
+#else
         for (shift = 0x25, checksum = 0; shift != 0; shift--) {
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
+#endif
         if (checksum == DSPROT_CHECKSUM) {
             DSProt_CallRunChecks2(&seed, &flag);
         } else {
@@ -146,10 +152,16 @@ static BOOL GameSystem_Init(GameProc *proc, u32 *state, void *param, void *work)
         u32 checksum;
         const u32 *code = (const u32 *)DSProt_CallRunChecks1;
 
+#ifdef PLATFORM_PC
+        // A host's code is its own machine code, never DS Protect's ARM code, so the port skips its checksum
+        // and takes a genuine cartridge's path (lib/dsprot/include/dsprot/dsprot.h)
+        checksum = DSPROT_CHECKSUM;
+#else
         for (shift = 0x25, checksum = 0; shift != 0; shift--) {
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
+#endif
         if (checksum == DSPROT_CHECKSUM) {
             DSProt_CallRunChecks1(&seed, &size);
         } else {

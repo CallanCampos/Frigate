@@ -1060,7 +1060,7 @@ static PartyPkm *CygnusData_CreatePokemon(const CygnusData *data, u32 index, Hea
             PokeParty_SetHiddenAbil(pkm, species, form);
         }
         PML_PersonalFree(personal);
-        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GetPlayerName(GetGameDataPlayerInfo(data->gameData)));
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (uptr)GetPlayerName(GetGameDataPlayerInfo(data->gameData)));
         PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, getTrainerGender(GetGameDataPlayerInfo(data->gameData)));
         PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, 25);
         PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, game_version);

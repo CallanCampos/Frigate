@@ -37,7 +37,7 @@ static void DDemoMain_VBlank1st(TCB *tcb, void *data);
 static void DDemoMain_VBlank2nd(TCB *tcb, void *data);
 static void DDemoMain_Setup3D(void);
 static void DDemoMain_SetParticleCamera(DDemoWork *wk, ParticleSystem *ptc, BOOL sub);
-static void DDemoMain_McssCallBack(u32 param, fx32 frame);
+static void DDemoMain_McssCallBack(uptr param, fx32 frame);
 
 // The first scene's banks, with 3D on both screens, and the second's
 static const BGSysVRAMConfig sDDemoVramConfig1st = {
@@ -446,7 +446,7 @@ void DDemoMain_MoveMcss(DDemoWork *wk, s32 move) {
     MCSS_SetPosition(wk->mcss, &pos);
 }
 
-static void DDemoMain_McssCallBack(u32 param, fx32 frame) {
+static void DDemoMain_McssCallBack(uptr param, fx32 frame) {
     DDemoWork *wk = (DDemoWork *)param;
 
     MCSS_PauseAnimation(wk->mcss);
@@ -456,5 +456,5 @@ static void DDemoMain_McssCallBack(u32 param, fx32 frame) {
 // Has the Pokémon's animation stop at its end, which sets mcssAnmEnd
 void DDemoMain_SetMcssCallBack(DDemoWork *wk) {
     wk->mcssAnmEnd = FALSE;
-    MCSS_SetAnimationEndCallback(wk->mcss, (u32)wk, DDemoMain_McssCallBack, 0);
+    MCSS_SetAnimationEndCallback(wk->mcss, (uptr)wk, DDemoMain_McssCallBack, 0);
 }

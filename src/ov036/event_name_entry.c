@@ -105,7 +105,7 @@ static GameEventReturnCode PokeNameEntry_Callback(GameEvent *event, u32 *state, 
     }
     if (work->nameEntry->unk1C != 1) {
         if (GFL_StrBufCmp(work->nameEntry->name, work->name) == 0) {
-            PokeParty_SetParam(work->pkm, PKM_PARAM_NICKNAME, (u32)work->nameEntry->name);
+            PokeParty_SetParam(work->pkm, PKM_PARAM_NICKNAME, (uptr)work->nameEntry->name);
         } else {
             work->nameEntry->unk1C = 1;
         }

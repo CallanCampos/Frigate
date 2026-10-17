@@ -5,14 +5,19 @@
 // and this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the
 // DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
-//              [--save-dir PATH] [--fixed-time TIME] [--watchdog SECONDS] [--main-arena-size BYTES]
-//              [--vram-backend NAME]
+//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--screenshot-every N] [--screen-hashes PATH]
+//              [--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] [--fixed-time TIME]
+//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
 //   --screenshot PATH   writes both screens as a PNG (top above bottom) when the run ends: after the last frame of
 //                       --frames N, or when the window is closed
+//   --screenshot-every N also writes them every N frames, for a playtest: to PATH with the frame number before its
+//                       extension (shot.png gives shot-004800.png)
+//   --screen-hashes PATH writes every frame's screens as the SHA-1 of their RGB bytes, in the oracle's frames.tsv
+//                       format (port/tools/oracle/README.md), so that a replay can be checked against the oracle's
+//                       screens (port/tests/replay/check_screens.py) and compare.py can align the two runs
 //   --audio-dump PATH   writes the sound as it is made to a WAV file, with or without --headless
 //   --input FILE        plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h);
 //                       its time line (or the format's default) sets the clock unless --fixed-time is given
@@ -40,6 +45,7 @@
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
+#include "hal/gfl/gfl_frame.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_app.h"
@@ -76,8 +82,10 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless", "help",       "frames",   "screenshot",      "audio-dump",   "input",           "rom",
-    "save-dir", "fixed-time", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child",
+    "headless",         "help",       "frames",          "screenshot",   "screenshot-every",
+    "screen-hashes",    "audio-dump", "input",           "rom",          "save-dir",
+    "fixed-time",       "watchdog",   "main-arena-size", "vram-backend", "heap-scale-root",
+    "heap-scale-child",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -89,6 +97,8 @@ static unsigned sWatchdogSeconds;
 static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
+static unsigned long sScreenshotEvery;
+static FILE *sScreenHashes;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -100,8 +110,9 @@ static const PortHwG3Readbacks sG3Readbacks = {
 
 static void Usage(void) {
     fprintf(stderr,
-            "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH] "
-            "[--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
+            "usage: %s [--headless] [--frames N] [--screenshot PATH] [--screenshot-every N] [--screen-hashes PATH] "
+            "[--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] "
+            "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
             "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
@@ -226,6 +237,32 @@ static void Pace(void) {
     }
 }
 
+// --screenshot-every's shot of this frame: the path with -FRAME before its extension
+static void WritePeriodicScreenshot(void) {
+    const char *dot = strrchr(sScreenshotPath, '.');
+    const char *slash = strrchr(sScreenshotPath, '/');
+    size_t stem =
+        dot != NULL && (slash == NULL || dot > slash) ? (size_t)(dot - sScreenshotPath) : strlen(sScreenshotPath);
+    char path[4096];
+
+    if (snprintf(path, sizeof(path), "%.*s-%06lu%s", (int)stem, sScreenshotPath, sFrames, sScreenshotPath + stem) <
+        (int)sizeof(path)) {
+        port_present_screenshot(path);
+    }
+}
+
+// --screen-hashes's row for this frame: the frame, GFL's frame count (the oracle's counter, read at the same point of
+// the frame), the screens' hashes, and "-" for the columns the port doesn't write yet
+static void WriteScreenHashes(void) {
+    char top[41];
+    char bottom[41];
+
+    port_present_screen_hash(0, top);
+    port_present_screen_hash(1, bottom);
+    fprintf(sScreenHashes, "%lu\t-\t%u\t-\t-\t-\t-\t%s\t%s\t-\t-\n", sFrames, (unsigned)port_gfl_frame_count(), top,
+            bottom);
+}
+
 static void WriteScreenshot(void) {
     if (sScreenshotPath != NULL && !sScreenshotWritten) {
         sScreenshotWritten = 1;
@@ -249,6 +286,12 @@ static void AppFrame(void) {
     if (port_app_present != NULL) {
         port_app_present();
     }
+    if (sScreenshotEvery != 0 && sFrames % sScreenshotEvery == 0) {
+        WritePeriodicScreenshot();
+    }
+    if (sScreenHashes != NULL) {
+        WriteScreenHashes();
+    }
     if (sFrameLimit != 0 && sFrames >= sFrameLimit) {
         WriteScreenshot();
         port_os_stop();
@@ -261,10 +304,12 @@ static void AppFrame(void) {
 
 int main(int argc, char **argv) {
     long long frames;
+    long long screenshotEvery;
     long long watchdog;
     long long arenaSize;
     const char *audioDump;
     const char *inputPath;
+    const char *screenHashes;
     PortOsResult result;
     int status = 0;
 
@@ -277,9 +322,10 @@ int main(int argc, char **argv) {
     }
     sHeadless = port_app_option("headless") != NULL;
     frames = CountOption("frames", 0, 0);
+    screenshotEvery = CountOption("screenshot-every", 0, 0);
     watchdog = CountOption("watchdog", 0, sHeadless ? DEFAULT_HEADLESS_WATCHDOG : 0);
     arenaSize = CountOption("main-arena-size", 1, 0);
-    if (frames < 0 || watchdog < 0 || arenaSize < 0) {
+    if (frames < 0 || screenshotEvery < 0 || watchdog < 0 || arenaSize < 0) {
         Usage();
         return EXIT_BAD_OPTIONS;
     }
@@ -290,6 +336,25 @@ int main(int argc, char **argv) {
         fprintf(stderr, "port: --screenshot needs a path\n");
         Usage();
         return EXIT_BAD_OPTIONS;
+    }
+    sScreenshotEvery = (unsigned long)screenshotEvery;
+    if (sScreenshotEvery != 0 && sScreenshotPath == NULL) {
+        fprintf(stderr, "port: --screenshot-every needs --screenshot's path\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    screenHashes = port_app_option("screen-hashes");
+    if (screenHashes != NULL) {
+        sScreenHashes = *screenHashes != '\0' ? fopen(screenHashes, "w") : NULL;
+        if (sScreenHashes == NULL) {
+            fprintf(stderr, "port: --screen-hashes: can't write \"%s\"\n", screenHashes);
+            return EXIT_BAD_OPTIONS;
+        }
+        // A line at a time, so that a run a trap ends keeps every frame it showed
+        setvbuf(sScreenHashes, NULL, _IOLBF, 0);
+        fprintf(sScreenHashes,
+                "#pbwframes 2\nframe\tvblank\tcounter\tgame_frame\tkeyread\ttop_3d\tbottom_3d\ttop\tbottom\t"
+                "top_blank\tbottom_blank\n");
     }
     audioDump = port_app_option("audio-dump");
     if (audioDump != NULL && *audioDump == '\0') {
@@ -377,6 +442,9 @@ int main(int argc, char **argv) {
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
     port_replay_close();
+    if (sScreenHashes != NULL) {
+        fclose(sScreenHashes);
+    }
     if (sWindowOpen) {
         port_present_close();
     }

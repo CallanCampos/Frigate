@@ -273,7 +273,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                 oldName = GFL_StrBufCreate(32, wk->heapId);
                 func_ov012_02165afc(wk->nameEntry, wk->name);
                 PokeParty_GetParam(wk->pkm, PKM_PARAM_NICKNAME, oldName);
-                PokeParty_SetParam(wk->pkm, PKM_PARAM_NICKNAME, (u32)wk->name);
+                PokeParty_SetParam(wk->pkm, PKM_PARAM_NICKNAME, (uptr)wk->name);
                 if (func_ov012_02165b10(wk->nameEntry, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(prm->gameData), 0x1e);
                 }

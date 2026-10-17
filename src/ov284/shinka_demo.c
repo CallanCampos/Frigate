@@ -1348,11 +1348,11 @@ static void ShinkaDemo_MakeShedinja(ShinkaDemoParam *param, ShinkaDemoWork *wk) 
         }
         name =
             GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, PokeParty_GetParam(shedinja, PKM_PARAM_SPECIES, NULL));
-        PokeParty_SetParam(shedinja, PKM_PARAM_NICKNAME, (u32)name);
+        PokeParty_SetParam(shedinja, PKM_PARAM_NICKNAME, (uptr)name);
         GFL_StrBufFree(name);
         PokeParty_SetParam(shedinja, PKM_PARAM_STATUS, 0);
         mail = CreateMailData(wk->heapId);
-        PokeParty_SetParam(shedinja, PKM_PARAM_MAIL, (u32)mail);
+        PokeParty_SetParam(shedinja, PKM_PARAM_MAIL, (uptr)mail);
         GFL_HeapFree(mail);
         PokeParty_SetParam(shedinja, 0x9f, 0);
         PokeParty_SetParam(shedinja, PKM_PARAM_POKESTAR_FAME, 0);

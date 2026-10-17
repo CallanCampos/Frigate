@@ -403,7 +403,7 @@ static void genSubwayBtlInstitutePoke(const BSubwayPokemon *src, PartyPkm *pkm, 
     }
     nickname[i - 1] = terminator;
     GFL_StrBufLoadString(strbuf, nickname);
-    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)strbuf);
+    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (uptr)strbuf);
     GFL_StrBufFree(strbuf);
     PokeParty_SetParam(pkm, PKM_PARAM_REGION, src->region);
     PokeParty_SetParam(pkm, PKM_PARAM_LEVEL, PokeParty_GetLevel(pkm));
