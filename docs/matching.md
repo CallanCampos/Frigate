@@ -684,7 +684,11 @@ Same code, other `sp` offsets or frame size.
   first declaration, passed to `WifiP2PMatch_GetGameMode` and `WIFI_STATUS_GetVChatStatus`, as its siblings
   `WifiP2PMatch_StateConnectFriendYesNo` and `WifiP2PMatch_StateFriendSelect` declare it: its `wk->seq` stores of
   0xa2 and 0x76 are then built fresh and the second joins the common tail. No join is needed there. With the pointer
-  used at one call only, only the store after that call is fixed.
+  used at one call only, only the store after that call is fixed. A pointer to a member of a struct local is rebuilt
+  the same way, from `sp`: `dwc_auth.c`'s `Auth_OnResponse` declares `AuthCertificate *certificate =
+  &result.certificate;` and compiles each access as the ROM's `add r1, sp, #0x64; str r0, [r1]` (and `adds r1, #0x78`
+  for a field inside it), where `result.certificate` written out stores at `[sp, #0x64]` and keeps the address in a
+  saved register, which the ROM gives the hash context.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
   slotted by its declaration. Spill slots that look grouped by kind across branches can be this: overlay 284's
@@ -2327,13 +2331,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declares them, and `strcpy` of a string literal as a loop that copies two bytes a pass (`ldrb [r3, #1]; ldrb [r3],
   #2; subs; strb; strb; bne`, and the last byte); the same prototypes from any other header leave a call.
   `include/string.h` (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s
-  `memset` of a `VCTSession`), `dwc_auth.c`, `ghttpEncryption.c` and `poke_net.c`, declares the C library's string
-  functions in its own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does
-  TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops. `strcmp` and
-  `strlen` stay calls either way, but the code around them changes: with `<string.h>`, NitroWiFi's
-  `SSLi_FindNamedParam` (`ssl.c`) keeps `name` in r7 where the ROM spills it to `[sp]`, so `ssl_internal.h` declares
-  them itself. DWC's `DWCAc_AddCandidate` (`dwc_ac_wcm.c`) comes closer with `<string.h>`'s `strncmp`, which lets MWCC
-  hoist the loads through its `const` parameter and the loop's bases out of the loop that calls it.
+  `memset` of a `VCTSession`), `ghttpEncryption.c` and `poke_net.c`, declares the C library's string functions in its
+  own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does TWL-DWC's
+  `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops. `strcmp` and `strlen` stay
+  calls either way, but the code around them changes: with `<string.h>`, NitroWiFi's `SSLi_FindNamedParam` (`ssl.c`)
+  keeps `name` in r7 where the ROM spills it to `[sp]`, so `ssl_internal.h` declares them itself. DWC's
+  `DWCAc_AddCandidate` (`dwc_ac_wcm.c`) comes closer with `<string.h>`'s `strncmp`, which lets MWCC hoist the loads
+  through its `const` parameter and the loop's bases out of the loop that calls it. MWCC goes by the first
+  declaration it sees: `<string.h>` included after `dwc/ext.h`'s prototypes still leaves a call. `dwc_auth.c`
+  includes it first (`dwc/ext.h` takes its `size_t`), and its `Auth_OnResponse` then clears the 0x5a4-byte result in
+  place, as the ROM does, while its `memcpy` of a 0x104-byte `BigNum` stays a call, also as in the ROM: a call to
+  `memcpy` in the ROM doesn't rule `<string.h>` out.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
@@ -2348,7 +2356,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - An object of 64 bytes or more gets a section of its own only under `-ipa file`; without it every size stays in the
   shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
-  apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`.
+  apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`, and
+  `dwc_auth.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With
@@ -2605,7 +2614,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   not in it), and a tentative `.bss` definition counts at the end of the file. With that, `rodata_order.py`'s model
   predicts `pkwd_briefing.c` (117 objects), `c_gear_sw.c` and `comm_btl_demo.c` exactly; without it no declaration
   order of their tables gives the ROM's layout. A lone table ahead of the sorted run still means another file in
-  front (`oekaki_comm.c`).
+  front (`oekaki_comm.c`). A global initialized to zero (`int x = 0;`) goes to `.bss` too but counts where it is
+  defined: one before `wifibattlematch_net_fields.c`'s tables moves their strings as a `const` scalar there does.
 - A `const` on a pointer parameter lets MWCC hoist loads through it above later byte stores: the hit tests of
   `beacon_view.c` match only with a non-const `BeaconViewTouch *`, and the accessors of
   `fmission_log_accessor_fv.c` only with non-const entries.
@@ -2621,7 +2631,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   bytes or more has one of its own) with the unused public functions that read it. `pdwacc_disp.c`, a cut-down copy
   of `gsync_disp.c`, gets the ROM's BG setup order only with a referenced table between its VRAM and LCD configs,
   where `gsync_disp.c` has `sActorPositions`. Look at the sibling file a copy was made from for the missing object.
-  Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`.
+  Nothing the compiler drops itself is listed, so this can't be reproduced under `-nodead`. A zero-size global,
+  `const char *x[] = {};` (GCC's empty initializer), is listed where it is defined and emits nothing, so it tests a
+  place for such an object without adding bytes; it is placeholder data and stays out of the source. One before
+  `wifibattlematch_net_fields.c`'s tables gives the ROM's `.data` exactly. When a run of equal-size objects that stay
+  together comes out in an order no arrangement gives, enumerate the arrangements by how many listed objects are
+  smaller and larger than the run: `wifibattlematch_net.c`'s six 15-byte `RECORD_DATA` strings, just before their
+  table, need at least two objects more than the file has, one of them larger.
 - A small table that the ROM has after a 64-byte-or-larger table of the same file, where the size sort can only put
   it before, belongs to the next file. Overlay 290's 12-byte battle proc table sits after the 0x90-byte step table:
   no layout of one file gives that (`rodata_order.py`: G:12! S:144 B:12 is always B G S or G B S). Its three
@@ -2631,7 +2647,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `mbp.c` above): each literal joins the list just before its table, with size `strlen + 1`, and literals created in
   code are not in the list and come last. The model predicted 12 of 12 random declaration orders of
   `field_gimmick_gate.c`, whose `gelboard_N` strings were in the wrong order in `.data` until `sBoardNames` was
-  declared directly before `sBoardPlNames`.
+  declared directly before `sBoardPlNames`. A static table that nothing reads is dropped and a literal only it has is
+  not listed, but one that a later table repeats is listed where the dropped table stood: an unused
+  `static const char *s[] = { "recordid" };` ahead of `wifibattlematch_net_fields.c`'s tables moves that string.
 - A second `""` in what was taken for one file's `.data` is a file boundary: MWCC pools equal string literals within
   a translation unit, so each run of functions that shares one `""` is a file of its own. Overlay 28's `union_main.c`
   and `colosseum.c` were five files (`union_main.c`, `union_receive.c`, `union_subproc.c`, `colosseum_comm.c`,

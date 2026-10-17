@@ -354,6 +354,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A large offset derived from an earlier one (`subs r6, #0x80`) where the original builds it fresh (`movs; lsls`):
   a join just before it, or a pointer local to the earlier member, initialized at its declaration at the top.
   (matching.md: "rebuilt at each use in a scratch register")
+- A struct local's member addressed afresh at each access (`add r1, sp, #0x64; str r0, [r1]`) where ours uses
+  `[sp, #0x64]` and a saved register: a pointer local to the member, set at its declaration. (matching.md: "A pointer
+  to a member of a struct local")
 - Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
   them as two statements on the field. (matching.md: "Two constants applied to a field")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
@@ -585,6 +588,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   SDK's inline `asm` block does it, which a call can't. (matching.md: "The inline's `asm` block")
 - A `memcpy`/`memset` of a constant size inlined where the ROM calls it: `<string.h>` declares it; declare it in the
   library's own header instead. (matching.md: "a header named `string.h`")
+- The reverse, a `memset` built in place (an `stmia` loop) in a file whose library header declares the string
+  functions: include `<string.h>` before that header, since MWCC goes by the first declaration. (matching.md: "goes by
+  the first declaration")
 - Two-bytes-a-pass copy loops (`ldrb [r3, #1]; ldrb [r3], #2`) where ours calls `strcpy` with a literal: take
   `strcpy` from `<string.h>`. (matching.md: "`strcpy` of a string literal")
 
@@ -605,10 +611,14 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - On NitroSystem's `2.0/sp2p2`, initialized globals are ordered by size, smallest first, and objects of one size in the
   reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
-  statics, which join at the end in reverse order. Each kind (rodata, data, bss) gets its own shared section.
-  Unreferenced statics are dropped. `rodata_order.py` doesn't model the per-kind sections or the `.bss` rule yet, but
-  given the `.data` tables with the `.rodata` objects it predicts the `.rodata` order. (matching.md: "The list that is
-  heapsorted")
+  statics, which join at the end in reverse order; a global initialized to 0 joins where it is defined. Each kind
+  (rodata, data, bss) gets its own shared section. Unreferenced statics are dropped, but a literal of a dropped table
+  that a later table repeats is listed where the dropped one stood. `rodata_order.py` doesn't model the per-kind
+  sections or the `.bss` rule yet, but given the `.data` tables with the `.rodata` objects it predicts the `.rodata`
+  order. (matching.md: "The list that is heapsorted")
+- Equal-size objects that no order of the file's own objects puts in the ROM's order, where one more object would:
+  an object the original link dead-stripped. A zero-size global (`const char *x[] = {};`) tests a place for it
+  without adding bytes; diagnosis only, never source. (matching.md: "A zero-size global")
 - `.bss` statics in another order: MWCC 2.0 lays them out in the reverse of their definitions without `-ipa file`, and
   with it in their order with the first one moved to the end. (matching.md: "with the first one moved to the end")
 - A table that only one function reads can be a `static const` inside it, which moves it in the heapsort's list.

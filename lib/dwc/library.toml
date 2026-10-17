@@ -39,6 +39,9 @@ flags = [
 "nhttp/nhttp_thread.c" = ["-ipa file"]
 # So does the file of DWC that wraps the GameSpy HTTP client (overlay 189)
 "ghttp/dwc_ghttp.c" = ["-ipa file"]
+# The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
+# exponent, which only -ipa file gives
+"auth/dwc_auth.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does
