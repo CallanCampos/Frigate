@@ -31,6 +31,10 @@ typedef struct {
     u16 magic;
     HeapDebugInfo debug;
     u8 unk18[4];
+#ifdef PLATFORM_PC
+    // 32 bytes in all, so that the allocation after it keeps the 8-byte alignment a host's pointers need
+    u8 hostPadding[4];
+#endif
 } HeapBlockHeader;
 
 NNSFndHeapHandle GFL_HeapGetBase(HeapID heapId);

@@ -13,9 +13,21 @@
 //   - NNS_FndUnitHeapFree: one unit
 // Memory the game reuses without one of these (a static or stack buffer, or the OS arena) is seen when a file there is
 // loaded again: the loaders check a registered tree against the file's bytes before returning it.
+//
+// The heaps' alignment is wrapped too. The DS needs 4 bytes for everything the game keeps in a heap, a host 8 for its
+// pointers, so expanded and frame heaps start on 8 bytes, every block is aligned to at least 8 (towards the same end
+// for a negative alignment), and an expanded heap's blocks are a multiple of 8 long, which keeps the block heads FND
+// writes between them aligned as well. GFL's own head before each allocation is 32 bytes on a host for the same reason
+// (include/gfl/heapsys.h).
 #include "hal/nnsys/reloc.h"
 #include "nnsys/fnd.h"
 
+#define HOST_HEAP_ALIGN 8
+
+NNSFndHeapHandle port_sdk_NNS_FndCreateExpHeapEx(void *startAddress, u32 size, u16 optFlag);
+void *port_sdk_NNS_FndAllocFromExpHeapEx(NNSFndHeapHandle heap, u32 size, int alignment);
+NNSFndHeapHandle port_sdk_NNS_FndCreateFrmHeapEx(void *startAddress, u32 size, u16 optFlag);
+void *port_sdk_NNS_FndAllocFromFrmHeapEx(NNSFndHeapHandle heap, u32 size, int alignment);
 void port_sdk_NNS_FndDestroyExpHeap(NNSFndHeapHandle heap);
 u32 port_sdk_NNS_FndResizeForMBlockExpHeap(NNSFndHeapHandle heap, void *memBlock, u32 size);
 void port_sdk_NNS_FndFreeToExpHeap(NNSFndHeapHandle heap, void *memBlock);
@@ -40,6 +52,45 @@ static void ReleaseBetween(const void *from, const void *to) {
     }
 }
 
+static int HostAlignment(int alignment) {
+    if (alignment < 0) {
+        return alignment > -HOST_HEAP_ALIGN ? -HOST_HEAP_ALIGN : alignment;
+    }
+    return alignment < HOST_HEAP_ALIGN ? HOST_HEAP_ALIGN : alignment;
+}
+
+// A block's size, which FND itself rounds to 4; 0 is 1, as for FND
+static u32 HostBlockSize(u32 size) {
+    return ((size == 0 ? 1 : size) + HOST_HEAP_ALIGN - 1) & ~(u32)(HOST_HEAP_ALIGN - 1);
+}
+
+// The start of a heap's memory moved up to the host's alignment, and its size less what that skipped; a size too small
+// to reach it is 0, which FND refuses
+static void *HostHeapStart(void *startAddress, u32 *size) {
+    uptr skipped = (HOST_HEAP_ALIGN - (uptr)startAddress % HOST_HEAP_ALIGN) % HOST_HEAP_ALIGN;
+
+    *size = *size > skipped ? *size - (u32)skipped : 0;
+    return (u8 *)startAddress + skipped;
+}
+
+NNSFndHeapHandle NNS_FndCreateExpHeapEx(void *startAddress, u32 size, u16 optFlag) {
+    startAddress = HostHeapStart(startAddress, &size);
+    return port_sdk_NNS_FndCreateExpHeapEx(startAddress, size, optFlag);
+}
+
+void *NNS_FndAllocFromExpHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
+    return port_sdk_NNS_FndAllocFromExpHeapEx(heap, HostBlockSize(size), HostAlignment(alignment));
+}
+
+NNSFndHeapHandle NNS_FndCreateFrmHeapEx(void *startAddress, u32 size, u16 optFlag) {
+    startAddress = HostHeapStart(startAddress, &size);
+    return port_sdk_NNS_FndCreateFrmHeapEx(startAddress, size, optFlag);
+}
+
+void *NNS_FndAllocFromFrmHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
+    return port_sdk_NNS_FndAllocFromFrmHeapEx(heap, size, HostAlignment(alignment));
+}
+
 // Destroying a heap frees all of it: from its common head, where its memory starts, to its end
 void NNS_FndDestroyExpHeap(NNSFndHeapHandle heap) {
     void *end = heap->heapEnd;
@@ -50,7 +101,7 @@ void NNS_FndDestroyExpHeap(NNSFndHeapHandle heap) {
 
 u32 NNS_FndResizeForMBlockExpHeap(NNSFndHeapHandle heap, void *memBlock, u32 size) {
     u32 oldSize = NNS_FndGetSizeForMBlockExpHeap(memBlock);
-    u32 newSize = port_sdk_NNS_FndResizeForMBlockExpHeap(heap, memBlock, size);
+    u32 newSize = port_sdk_NNS_FndResizeForMBlockExpHeap(heap, memBlock, HostBlockSize(size));
 
     // 0 when it couldn't grow; a block that grows frees nothing
     if (newSize != 0 && newSize < oldSize) {

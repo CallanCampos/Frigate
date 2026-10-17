@@ -5,9 +5,7 @@
 #   cmake -S port -B build/port-os-asan -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 #         "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer" \
 #         -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined
-# Not Debug: at -O0 the game doesn't link yet, since C99 inline functions of the decomp with no external definition
-# (pokemontrade_save.c's) are only satisfied when the optimizer inlines them. mco_impl.c always builds without ASan
-# (fiber.c makes the switch annotations itself).
+# mco_impl.c always builds without ASan (fiber.c makes the switch annotations itself).
 
 include(FetchContent)
 # minicoro, pinned to a commit (public domain or MIT-0, one header); the spike's

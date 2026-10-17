@@ -3,7 +3,8 @@
 #
 #   - lib/nnsys/src/fnd: every function that gives heap memory back (freeing a block, shrinking one, freeing a frame
 #     heap's ends or back to a state, freeing a unit, destroying a heap). port/hal/nnsys/fnd_hooks.c gives the original
-#     names wrappers that call the SDK's and then release the relocated trees in what it freed (port/hal/nnsys/reloc.h)
+#     names wrappers that call the SDK's and then release the relocated trees in what it freed (port/hal/nnsys/reloc.h).
+#     Also the expanded and frame heaps' creation and allocation, which the wrappers align for 64-bit structs
 #   - lib/nnsys/src/g2d: every function that relocates a loaded file in place, and the public ones around them.
 #     port/hal/nnsys/g2d_load.c replaces them with loaders that build host structs; the renamed originals stay unused.
 #     The files' other functions (NNS_G2dFindBinaryBlock, NNS_G2dGetCellDataByIdx and the like) stay the decomp's
@@ -11,8 +12,10 @@
 # A name the file no longer defines fails the link (a wrapper calls port_sdk_<name>, or two definitions meet); a new
 # function of one of these files that frees memory or relocates a file needs a line here and a host version.
 
-set(port_nnsys_renamed_expheap NNS_FndDestroyExpHeap NNS_FndResizeForMBlockExpHeap NNS_FndFreeToExpHeap)
-set(port_nnsys_renamed_frameheap NNS_FndDestroyFrmHeap NNS_FndFreeToFrmHeap NNS_FndFreeByStateToFrmHeap)
+set(port_nnsys_renamed_expheap NNS_FndCreateExpHeapEx NNS_FndAllocFromExpHeapEx
+    NNS_FndDestroyExpHeap NNS_FndResizeForMBlockExpHeap NNS_FndFreeToExpHeap)
+set(port_nnsys_renamed_frameheap NNS_FndCreateFrmHeapEx NNS_FndAllocFromFrmHeapEx
+    NNS_FndDestroyFrmHeap NNS_FndFreeToFrmHeap NNS_FndFreeByStateToFrmHeap)
 set(port_nnsys_renamed_unitheap NNS_FndUnitHeapFree)
 set(port_nnsys_renamed_g2d_ncg
     NNS_G2dGetUnpackedCharacterData NNS_G2dUnpackNCG NNS_G2dGetUnpackedBGCharacterData NNS_G2dUnpackBGNCG)
