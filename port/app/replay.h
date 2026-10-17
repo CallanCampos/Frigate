@@ -17,12 +17,18 @@ int port_replay_active(void);
 const char *port_replay_time(void);
 // The file's "version" line, "b2_us" or "w2_us", or NULL when it has none
 const char *port_replay_version(void);
+// What the file's frames count, "game" or "video", or NULL without a file
+const char *port_replay_frames(void);
 
 // Gives the game frame 1's state, which holds from power-on; before the game starts
 void port_replay_start(void);
-// At each VBlank, before the interrupt is taken (a frame hook): gives the game the state of the frame whose pass reads
-// the keys next. videoFrame is the VBlank's number since the game's main() started, from 1
+// At each VBlank, before the interrupt is taken (a frame hook), with or without a file: moves the game clock on and,
+// with a file, gives the game the state of the frame whose pass reads the keys next. videoFrame is the VBlank's number
+// since the game's main() started, from 1
 void port_replay_vblank(uint32_t videoFrame);
+// The game frame whose input the game reads after the last VBlank given to port_replay_vblank (1 before the first):
+// frames.tsv's game_frame, as pbw-oracle counts it
+uint32_t port_replay_game_frame(void);
 
 void port_replay_close(void);
 

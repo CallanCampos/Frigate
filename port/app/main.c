@@ -6,8 +6,8 @@
 // DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
 //   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
-//              [--save-dir PATH] [--fixed-time TIME] [--watchdog SECONDS] [--main-arena-size BYTES]
-//              [--vram-backend NAME]
+//              [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--watchdog SECONDS]
+//              [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
@@ -19,6 +19,11 @@
 //   --rom PATH          the player's ROM (port/hal/rom)
 //   --save-dir PATH     where saves go (port/hal/card)
 //   --fixed-time TIME   the clock's time at boot, "YYYY-MM-DD HH:MM:SS", moving with the virtual clock (port/hal/rtc)
+//   --run-dir DIR       writes a run directory for the melonDS oracle's compare.py (port/app/run_dir.h): frames.tsv
+//                       with a row at every frame (the video frame, NitroSDK's VBlank count, GFL's frame count, the
+//                       game frame and each screen's hash), and run.txt
+//   --run-screens LIST  the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or
+//                       none, comma-separated, as pbw-oracle's --screens (none by default)
 //   --watchdog SECONDS  stops with a report and status 73 when a frame takes longer than that in host time: the game
 //                       hangs in a loop that never reaches the platform layer (30 by default with --headless; 0 is
 //                       off, the default with a window)
@@ -37,9 +42,11 @@
 
 #include "app/present.h"
 #include "app/replay.h"
+#include "app/run_dir.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
+#include "hal/gfl/gfl_frame.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_app.h"
@@ -76,8 +83,22 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless", "help",       "frames",   "screenshot",      "audio-dump",   "input",           "rom",
-    "save-dir", "fixed-time", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child",
+    "headless",
+    "help",
+    "frames",
+    "screenshot",
+    "audio-dump",
+    "input",
+    "rom",
+    "save-dir",
+    "fixed-time",
+    "run-dir",
+    "run-screens",
+    "watchdog",
+    "main-arena-size",
+    "vram-backend",
+    "heap-scale-root",
+    "heap-scale-child",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -89,6 +110,7 @@ static unsigned sWatchdogSeconds;
 static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
+static int sRunDirFailed;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -101,8 +123,9 @@ static const PortHwG3Readbacks sG3Readbacks = {
 static void Usage(void) {
     fprintf(stderr,
             "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH] "
-            "[--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
-            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
+            "[--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
+            "[--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend shm|mach-entry|mach-remap|copy] "
+            "[--heap-scale-root N] [--heap-scale-child N]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
 
@@ -235,6 +258,38 @@ static void WriteScreenshot(void) {
     }
 }
 
+// The run directory's row of this frame, with its PNG file if --run-screens has it. NitroSDK's VBlank count is the
+// OS core's count of VBlanks, which the port's ARM7 side keeps in the shared memory at the VBlank itself
+static void RunDirFrame(void) {
+    PortRunDirFrame frame;
+
+    frame.frame = (uint32_t)sFrames;
+    frame.vblank = port_os_frame();
+    frame.counter = port_gfl_frame_count();
+    frame.gameFrame = port_replay_game_frame();
+    if (!port_run_dir_frame(&frame, port_screens_pixels(PORT_SCREEN_TOP), port_screens_pixels(PORT_SCREEN_BOTTOM))) {
+        sRunDirFailed = 1;
+        port_os_stop();
+    }
+}
+
+// Opens --run-dir with what run.txt says of the run: the clock's time is --fixed-time's, else the input file's (or the
+// format's default), else the host's
+static int OpenRunDir(const char *dir, const char *inputPath) {
+    const char *program = strrchr(sArgv[0], '/');
+    const char *rom = port_app_option("rom");
+    const char *time = port_app_option("fixed-time");
+    PortRunDirInfo info;
+
+    info.program = program != NULL ? program + 1 : sArgv[0];
+    info.rom = rom != NULL ? rom : port_rom_default_path();
+    info.time = time != NULL ? time : inputPath != NULL ? port_replay_time() : "host";
+    info.input = inputPath;
+    info.inputFrames = port_replay_frames();
+    info.frames = (uint32_t)sFrameLimit;
+    return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
+}
+
 // The program's frame hook, at each VBlank on the dispatcher's stack: the scanline hook has drawn the frame's 192
 // lines by now. The input taken here is what the game's VBlank work and next frame read
 static void AppFrame(void) {
@@ -242,9 +297,10 @@ static void AppFrame(void) {
     if (sWindowOpen) {
         port_present_poll();
     }
-    // A replay's input replaces what the window took
-    if (port_replay_active()) {
-        port_replay_vblank((uint32_t)sFrames);
+    // The game clock, and a replay's input in place of what the window took
+    port_replay_vblank((uint32_t)sFrames);
+    if (port_run_dir_active()) {
+        RunDirFrame();
     }
     if (port_app_present != NULL) {
         port_app_present();
@@ -265,6 +321,7 @@ int main(int argc, char **argv) {
     long long arenaSize;
     const char *audioDump;
     const char *inputPath;
+    const char *runDir;
     PortOsResult result;
     int status = 0;
 
@@ -313,6 +370,15 @@ int main(int argc, char **argv) {
                     port_replay_time());
             return EXIT_BAD_OPTIONS;
         }
+    }
+    runDir = port_app_option("run-dir");
+    if ((runDir != NULL && *runDir == '\0') || (runDir == NULL && port_app_option("run-screens") != NULL)) {
+        fprintf(stderr, "port: --run-dir needs a directory, and --run-screens needs --run-dir\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    if (runDir != NULL && !OpenRunDir(runDir, inputPath)) {
+        return EXIT_BAD_OPTIONS;
     }
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
@@ -376,6 +442,10 @@ int main(int argc, char **argv) {
     // The device and the dump's WAV header; a run that stops the process itself (a trap, OS_Terminate) never gets here,
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
+    if (sRunDirFailed) {
+        status = 1;
+    }
+    port_run_dir_close(status);
     port_replay_close();
     if (sWindowOpen) {
         port_present_close();
