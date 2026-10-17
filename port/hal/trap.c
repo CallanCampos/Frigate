@@ -1,7 +1,5 @@
 // Reports the game reaching DS code or data that has no C yet. Function stubs call port_trap_function; data
 // placeholders sit on pages with no access, and the fault handler names the placeholder that was touched.
-// dladdr and Dl_info on glibc
-#define _GNU_SOURCE
 #include "hal/trap.h"
 #include <dlfcn.h>
 #include <execinfo.h>

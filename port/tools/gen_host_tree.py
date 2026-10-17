@@ -14,7 +14,7 @@ It writes:
     the divider's results, VCOUNT, ...) go through the accessor that HW_REGISTER_POLICY names. Nothing else in a
     header changes, and the variants are made again from upstream's headers at every configure (ADR 0004);
   - sources.txt: every C file of src/ and lib/ that the host build compiles, one path per line, relative to the
-    repository: all of them except the files port/hal/replaced.txt lists.
+    repository: all of them except the files port/hal/replaced.txt and the modules' port/hal/*/replaced.txt list.
 
 Files are rewritten only when their contents change, so that CMake rebuilds only what depends on a change.
 """
@@ -152,16 +152,19 @@ def mirror_include(out: Path):
 
 
 def read_replaced() -> list[tuple[str, str]]:
-    """Returns the patterns of port/hal/replaced.txt with their reasons: a pattern, then " # " and the reason."""
+    """Returns the patterns of port/hal/replaced.txt and of each module's port/hal/<module>/replaced.txt, with their
+    reasons: a pattern, then " # " and the reason."""
     patterns = []
-    for number, line in enumerate((ROOT / "port" / "hal" / "replaced.txt").read_text().splitlines(), 1):
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        pattern, _, reason = line.partition(" # ")
-        if not reason:
-            sys.exit(f"port/hal/replaced.txt:{number}: a pattern needs a reason after ' # '")
-        patterns.append((pattern.strip(), reason.strip()))
+    hal = ROOT / "port" / "hal"
+    for path in [hal / "replaced.txt", *sorted(hal.glob("*/replaced.txt"))]:
+        for number, line in enumerate(path.read_text().splitlines(), 1):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            pattern, _, reason = line.partition(" # ")
+            if not reason:
+                sys.exit(f"{path.relative_to(ROOT)}:{number}: a pattern needs a reason after ' # '")
+            patterns.append((pattern.strip(), reason.strip()))
     return patterns
 
 

@@ -64,24 +64,32 @@ if(NOT SDL3_FOUND)
     FetchContent_MakeAvailable(SDL3)
 endif()
 
-# The decomp's C, compiled with MWCC's language model: signed char, int-sized enums, 16-bit wchar_t, wrapping signed
-# arithmetic, no strict aliasing (the code puns types), no float contraction, and zeroed locals, since uninitialized
-# reads gave deterministic values on the DS (PLAN.md §4.4)
-add_library(pokebw2_game OBJECT ${game_sources})
-target_compile_definitions(pokebw2_game PRIVATE PLATFORM_PC ${PORT_VERSION_DEFINE})
+# What every file that includes the decomp's headers needs, the decomp's own C and the platform layer alike: MWCC's
+# language model (signed char, int-sized enums, 16-bit wchar_t, wrapping signed arithmetic, no strict aliasing since
+# the code puns types, no float contraction, and zeroed locals, since uninitialized reads gave deterministic values on
+# the DS; PLAN.md §4.4), the version, and the include path with the host variants of the headers that name DS
+# addresses first (ADR 0004). The decomp's headers are system headers here, so their warnings stay out of port code
+add_library(port_decomp_env INTERFACE)
+target_compile_definitions(port_decomp_env INTERFACE PLATFORM_PC ${PORT_VERSION_DEFINE})
 file(GLOB library_includes LIST_DIRECTORIES true "${REPO_ROOT}/lib/*/include")
-# The host variants of the headers that name DS addresses come first (ADR 0004)
-target_include_directories(pokebw2_game PRIVATE
+target_include_directories(port_decomp_env SYSTEM INTERFACE
     "${PORT_GEN}/hwinclude" "${PORT_GEN}/include" ${library_includes} "${REPO_ROOT}/build/include/generated")
-target_compile_options(pokebw2_game PRIVATE
-    -std=gnu99 -fsigned-char -fshort-wchar -fwrapv -fno-strict-aliasing -ffp-contract=off
-    -ftrivial-auto-var-init=zero -fno-common
+target_compile_options(port_decomp_env INTERFACE
+    -fsigned-char -fshort-wchar -fwrapv -fno-strict-aliasing -ffp-contract=off -ftrivial-auto-var-init=zero
+    -fno-common
     "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/include/port_host.h"
     # The decomp declares C library functions itself (DWC's ext.h), which the macOS headers' fortify macros rename
     -D_FORTIFY_SOURCE=0
-    # Errors that are never a porting artefact
+    # Errors that are never a porting artefact. MWCC accepts dropping const or volatile through a pointer, and the
+    # decomp does it where the original did, so that part of the group stays a warning
     -Werror=implicit-function-declaration -Werror=int-conversion -Werror=incompatible-pointer-types
-    # MWCC accepts dropping const through a pointer, and the decomp does it where the original did
+    -Wno-error=incompatible-pointer-types-discards-qualifiers)
+
+add_library(pokebw2_game OBJECT ${game_sources})
+target_link_libraries(pokebw2_game PRIVATE port_decomp_env)
+target_compile_options(pokebw2_game PRIVATE
+    -std=gnu99
+    # See port_decomp_env: the decomp drops const and volatile where the original did
     -Wno-incompatible-pointer-types-discards-qualifiers
     # The 64-bit warnings are counted by port/tools/compile-probe; here they only make noise
     -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-void-pointer-to-int-cast
@@ -89,14 +97,17 @@ target_compile_options(pokebw2_game PRIVATE
 # The game's main() becomes NitroMain(), which the platform layer calls on the game's thread
 set_source_files_properties("${REPO_ROOT}/src/system/main.c" PROPERTIES COMPILE_DEFINITIONS "main=NitroMain")
 
-# The platform layer
-add_library(port_hal OBJECT
-    hal/hw/hw.c
-    hal/os/memory_map.c
-    hal/stubs/unresolved.c
-    hal/trap.c)
+# The platform layer: every C file under hal/, one directory per SDK module it replaces, compiled against the
+# decomp's headers. A module lists the decomp files it replaces in its own replaced.txt
+file(GLOB_RECURSE port_hal_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/*.c")
+file(GLOB port_hal_replaced CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/*/replaced.txt")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${port_hal_replaced})
+add_library(port_hal OBJECT ${port_hal_sources})
+target_link_libraries(port_hal PRIVATE port_decomp_env)
 target_include_directories(port_hal PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
-target_compile_options(port_hal PRIVATE -std=c11 -Wall -Wextra)
+target_compile_options(port_hal PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
+# dladdr and Dl_info on glibc; port_host.h, force-included first, already pulls in system headers
+target_compile_definitions(port_hal PRIVATE _GNU_SOURCE)
 
 # Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py)
 add_custom_command(
