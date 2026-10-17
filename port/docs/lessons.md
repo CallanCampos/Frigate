@@ -10,7 +10,7 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   their own input are right on the DS and wrong on a host, and every test with separate pointers passed. When a
   library function writes through one pointer and reads through another of the same type, give the asm oracle cases
   with the pointers equal (`port/tests/asm_oracle/test_fx_decomp.py`), and grep the game for in-place calls.
-- **A replay survives without proving anything** until it checks what the screens show. `--screen-hashes` writes
+- **A replay survives without proving anything** until it checks what the screens show. `--run-dir` writes
   every frame's screens in the oracle's `frames.tsv` format, so the goldens are the oracle's own hashes and a test
   needs no images (`port/tests/replay/check_screens.py`).
 - **Press in video frames through the boot, and give presses room.** The DS drops frames in the logo movie and at

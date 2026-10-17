@@ -3,7 +3,7 @@
 
     check_screens.py SCREENS -- PROGRAM ARGUMENT...
 
-runs PROGRAM with its arguments and --screen-hashes, which writes every frame's screens as the SHA-1 of their RGB
+runs PROGRAM with its arguments and --run-dir, whose frames.tsv gives every frame's screens as the SHA-1 of their RGB
 bytes, then reads SCREENS, a table of the screens the run must show: each row gives a range of the port's frames and
 the two hashes of a screen that one of those frames must show. The hashes are pbw-oracle's, from playing the same input
 file on the player's ROM (port/tools/oracle/README.md), so a row passes only when the port draws that screen as the DS
@@ -49,7 +49,7 @@ def main(argv):
     rows = read_screens(argv[1])
     command = argv[3:]
     with tempfile.TemporaryDirectory(prefix="check_screens-") as run:
-        status = subprocess.call(command + ["--screen-hashes", os.path.join(run, "frames.tsv")])
+        status = subprocess.call(command + ["--run-dir", run])
         if status == NO_ROM:
             return NO_ROM
         if status != 0:

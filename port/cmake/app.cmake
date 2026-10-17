@@ -1,6 +1,7 @@
-# The program's own files besides main.c (port/app): the window, presentation, input, screenshots and the screens'
-# hashes, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The screens
-# they show are drawn by port/gfx/screens.c, which the port_gfx target builds.
+# The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the run directory
+# for the oracle's comparisons with the symbol lookup its memory dumps use, and input replays with the oracle's input
+# file reader (port/tools/oracle/pbwinput.c, plain C11). The screens they show are drawn by port/gfx/screens.c, which
+# the port_gfx target builds.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
@@ -50,7 +51,7 @@ set_tests_properties(replay_start_menu PROPERTIES FIXTURES_REQUIRED replay_start
 if(PORT_VERSION STREQUAL "b2_us")
     # A replay from power-on through the start menu's NEW GAME and the intro (overlay 294) into the opening's 3D flight
     # over Aspertia City (port/tests/replay/new_game.pbwinput), up to just before the field's first script, whose tables
-    # have no C yet: a test of level T3. check_screens.py runs it with --screen-hashes and checks that it shows, each
+    # have no C yet: a test of level T3. check_screens.py runs it with --run-dir and checks that it shows, each
     # within a range of frames, nine screens from the start menu to the opening's season banner exactly as the DS does,
     # by the oracle's hashes of them (port/tests/replay/new_game.screens.tsv), and that it runs all its frames. The
     # intro takes the start menu's first item, NEW GAME, only without a save, so the replay's save directory is emptied

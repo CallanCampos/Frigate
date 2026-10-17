@@ -4,6 +4,7 @@
 enable_testing()
 add_executable(port_integrate_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/test_integrate.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c"
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_integrate_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_integrate_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")

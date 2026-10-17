@@ -5,6 +5,7 @@
 //
 //   port_integrate_tests NAME | all
 #include "app/present.h"
+#include "app/run_dir.h"
 #include "gfx/screens.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
@@ -261,15 +262,15 @@ static void TestScreens(void) {
     RunTwoFrames();
     Check(ScreenIs(PORT_SCREEN_BOTTOM, WHITE_SHOWN), "engine B's screen is white while the engine is off");
     Check(ScreenIs(PORT_SCREEN_TOP, RED_SHOWN), "engine A's is unaffected");
-    // The screens' hashes, as --screen-hashes writes them: a white screen's is the oracle's at power-on
+    // The screens' hashes, as --run-dir writes them in frames.tsv: a white screen's is the oracle's at power-on
     // (port/tests/oracle/boot_b2_us.tsv, frame 1), and a red one's, bytes fb 00 00 for each pixel, is Python's
     // hashlib's, which shows the channels' order
     {
         char hash[41];
 
-        port_present_screen_hash(PORT_SCREEN_BOTTOM, hash);
+        port_run_dir_screen_hash(port_screens_pixels(PORT_SCREEN_BOTTOM), hash);
         Check(strcmp(hash, "76449f41286e8a2a18554c535b750bf6a958f4c9") == 0, "a white screen's hash is the oracle's");
-        port_present_screen_hash(PORT_SCREEN_TOP, hash);
+        port_run_dir_screen_hash(port_screens_pixels(PORT_SCREEN_TOP), hash);
         Check(strcmp(hash, "a26dc35c554a9abdd211fc48eab366a9e2f0af58") == 0, "a red screen's hash is its RGB bytes'");
     }
 
