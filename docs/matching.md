@@ -2049,7 +2049,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   base (`(work + 0x38)[first * 4]`), shares one spilled `first * 4` among all the uses and drops `first`. It matches
   at 0x120, where `int` gave 0x128 and `unsigned long` 0x11c. DWC's `WDS_OnScan` (`wds.c`) swaps its beacon counter with
   the compiler's temporaries (the hoisted TGID, the stack-passed `&infos[next]`, the reloaded work pointer) unless the
-  counter is `unsigned long i`. `eventdata_system.c`'s `CalcWarpTransferAddend` needs `long index`: compared with a
+  counter is `unsigned long i`. `btl_monset.c`'s `SortBySpeed` recomputes its inner entry's address (`set + j * 2`,
+  the base of both its `damage` and `speed` arrays) after the comparison's `BattleRandom` call unless `j` is
+  `unsigned long`; with it, global CSE keeps that address from the comparison in a saved register across the call
+  and into the swap (`#pragma opt_common_subs off` makes both spellings the same size).
+  `eventdata_system.c`'s `CalcWarpTransferAddend` needs `long index`: compared with a
   `long`, its `u16` stack parameter `span` is loaded again from its slot for the clamp (`add r0, sp, #0x10; ldrh r0,
   [r0]; cmp r5, r0`), while `span - width` and `span - 1` share one load; with `s32 index` the comparison uses that
   load's register too (`cmp r5, r2`) and the function is 4 bytes short.
@@ -2228,12 +2232,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
                                                             _pDLWork->error = result;
 - An empty `if` whose condition has three or more `&&` operands is not removed with the other empty statements: its
   branches become blocks and go only later, so it splits the code around it for CSE and register allocation and
-  emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first. `btl_monset.c`'s
-  `SortBySpeed` keeps `set + j * 2` from its speed comparison across `BattleRandom` into the swap, in a saved
-  register, only with `if (i && j && set) {}` between the swap's `damage[i]` and `speed[i]` stores, and nowhere
-  else; a real `if (set == NULL) { return; }` there gives the same registers plus its own 4 bytes. That points at
-  code the release build dropped, such as a debug print under a condition, so it is a probe for where the original
-  has a block boundary, not code to commit.
+  emits nothing. Two operands, `(void)(a && b && c)` and `if (TRUE)` are removed first; a discarded ternary
+  statement (`i ? j : set;`) splits the block like the `if`. A match with one shows that a boundary there changes
+  CSE the way the original's code does, not that the original has a statement there: `btl_monset.c`'s `SortBySpeed`
+  matched only with `if (i && j && set) {}` between the swap's `damage[i]` and `speed[i]` stores, which looked like
+  a debug print compiled out of the release build, and then matched with no extra statement once its inner counter
+  was the SDK's `unsigned long j` ("`SortBySpeed` recomputes"). It is a probe, never code to commit.
 - In a compare tree, a `blt default` lower bound marks a dense group, not a pivot: nearby cases compile to
   `cmp max; bgt` above a chain `cmp min; blt default; beq; cmp next; beq`, and the group counts as one unit when the
   tree is split. At 53-bit x87 precision, two cases form a group up to a distance of 4; three cases within a span
