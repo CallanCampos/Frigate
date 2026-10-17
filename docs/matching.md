@@ -87,6 +87,13 @@ tools that show the differences.
   the stores of the packed matrix written first, the matrix read through `mtx->_00` and the others at each use rather
   than in locals, and `x2` and `y2` assigned after those stores, in that order. When registers are swapped and no order
   of the computation helps, try writing the `volatile` stores before the arithmetic they don't depend on.
+- Registers are colored in the order the source defines the values, before the scheduler reorders the code, so
+  `compiler_probe.py --opt=-O1` shows the coloring in source order (`#pragma scheduling off` changes nothing). Read
+  the original's registers as a definition order: `btlv_effvm.c`'s `BtlvEffvm_InitEmitter` keeps from.x, to.x, from.y
+  and to.y of motion type 4's swap in r2, r1, r3 and r7, spills from.z and holds to.z in ip, the order of saving and
+  swapping each axis in turn (`x = from.x; from.x = to.x;`, then y and z), with the three sums after. Every save
+  first, then every move, is 29 to 35 bytes off. The sums match only as `to.x = x + from.x` (`adds rD, rFrom, rTo`):
+  `to.x += x` and `x + to.x` put the operands the other way round, though from.x and to.x hold the same value there.
 - A parameter the original copies to a saved register at entry and changes there in place is walked by the source
   itself, not copied to a local: `arrow.c`'s `Arrow_SetPathCore` steps `startX -= PIECE_SIZE` rather than an
   `x = startX - PIECE_SIZE`. A parameter copied to another register at entry (`mov r3, r1`), with a value derived
@@ -369,6 +376,11 @@ Same instructions, registers swapped.
   `y * 512` first, or `(x + y * 256) * 2`, it doesn't match. A constant term goes on the right whatever the order:
   `0x800 + (u32)p` gives the same `adds` as `(u32)p + 0x800` in `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` and
   `CtvtTalk_Main`.
+  A constant counts as a local only when it is held in a pointer local and cast at its use. `btlv_input.c`'s
+  `BtlvInput_CreateStruggleActor` adds the hoisted OBJ VRAM base first (`adds r2, r7, r2`) with
+  `void *vram = G2S_GetOBJCharPtr();` and `(void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy...baseAddrOfVram[...])`,
+  as `btlv_gauge.c`'s `BtlvGauge_DrawBar` writes it. The base written in place (`HW_DB_OBJ_VRAM`, or `HW_OBJ_VRAM` in
+  the gauge), a `u32 vram` local and the inline called in place put the constant second in both functions.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -1191,6 +1203,14 @@ Same instructions, scheduled in another order.
   only with the table indexed at each use; `const s16 *messages = sFMissionAppDrawMessages;` gives the same registers
   with the load after the spill. A branch that loads the address again from the pool, as one does there, hints that
   no local held it.
+- A local array's element is never loaded again after a call, even once the array's address has been passed to
+  another function, so an element loaded both before and after a call (`ldr r1, [r6, r7]` around
+  `bl BtlvEffect_GetGauge`) was read through a pointer. `btlv_effvm.c`'s `BtlvEffvm_CmdGauge` matches with
+  `pos = &positions[i];` set in its loop and read twice; MWCC then gathers `&positions` into `r6` at entry, ahead of
+  the parameter spill, as with the static table above. A function-scope `int *pos = positions;` gives the reload too,
+  but is set after the spill and takes over the array's other uses, such as a call argument the original builds
+  afresh with `add r2, sp, #0x10`. The same function needs `offset.x = mode == 2 ? 128 : -16;`: as an `if`/`else`,
+  the two stores keep `&offset` in a saved register and spill `i * 4`.
 - A struct assignment loads every field before it stores any, through a pointer that is not `const` too. Two
   fields copied with both loads first, `ldr r2, [r0, #0x10]; ldr r1, [r0, #0x14]; str r2, [r0]`, are one struct
   copied: `KeySystemTween_Update` ends with `tween->pos = tween->end;` for an `{ s32 x, y; }` position.
@@ -1392,6 +1412,12 @@ Same instructions, scheduled in another order.
   the use, keeps `lsls #1` and `lsls #0x10; lsrs #0x10` apart. A `u16` local or parameter and `& 0xffff` fold too.
   Multiboot's `MBGameInfo_Build` (`mb_gameinfo.c`) matched with `nameSize = MBGameInfo_CountChars(name) *
   sizeof(u16);` and `(u16)nameSize` in the copy.
+- An `ands` with 0xffff kept before a `strh`, its mask built at run time (`movs r5, #0xff; lsls; orrs`) and shared
+  by two stores, is one packed-byte expression in two inline calls: MWCC holds the expression's constants in
+  registers across both before it folds them, where a lone store folds the mask away. `btlv_effvm.c`'s
+  `BtlvEffvm_WindowTask` writes its window bounds with `G2_SetWnd0Position` and `G2_SetWnd1Position`, which match
+  only in NitroSDK's own form, `((y1 << 8) & 0xff00) | (y2 & 0xff)`; with `(u8)y2` the mask folds, and no direct
+  store to `reg_G2_WIN0V` keeps it. When an SDK inline won't give the original's code, compare it with the SDK's text.
 - Two loops in a row that share one counter can swap the second loop's counter with another local; a counter of its
   own, declared before that local, fixes it where no declaration order with the shared one does
   (`MBGameInfo_SendMembers`, `mb_gameinfo.c`).
@@ -1871,7 +1897,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   address into the argument: the pointer was set to the table and then advanced, a local with two assignments that is
   not moved to its use. `PkwdBook_LoadPoster` matches with `const PkwdBookLoad *screen = sPkwdBookPosterScreens;` at
   the top and `screen += graphicIdx;` before each call. An inline helper taking `&table[i]`, entry pointers at any
-  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".)
+  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".) A row of a buffer
+  shows it too: `btlv_input.c`'s `BtlvInput_LoadTypePalette` loads the buffer and computes the row before it stores
+  the size argument, and keeps the size, shared with the `mul`, in `r0`. It matches with `src = work->typePalBuf;
+  src += palette * 0x80;` before each `PaletteFade_LoadData`, and only with a non-`const` `work`: with `const`, the
+  first call's store moved above the buffer's load (the reverse case under "Loads through a pointer are not moved").
 - A shifted index that the original computes again after a loop, where ours reuses the loop's, is the same index in
   another type: MWCC shares `palette << 5` only between uses of one type. The World Tournament list's
   `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
@@ -1992,10 +2022,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
   `BOOL shown1 = view->page == slot / 4;` and `shown2` likewise: declared first, `shown1` takes the `r1` that
   holds `slot / 4` and gets the branches, as in the original.
-- A `cond ? 0 : 1` whose 0 the original takes from an existing register while 1 comes from a register it keeps 1 in
-  throughout inverts the branch polarity under every ternary spelling; `btlv_effvm.c`'s
-  `BtlvEffvm_GetDefenderPositions` needs the default-then-override form through a local,
-  `side = 0; if (!(wk->attacker & 1)) { side = 1; }`.
+- A `cond ? 0 : 1` whose 0 the original takes from an existing register and whose 1 from a register it keeps 1 in
+  throughout (`bne; adds r4, r5`, where `int` arms give `beq; adds r5, r4`) also has enum constants for both arms:
+  `btlv_effvm.c`'s `BtlvEffvm_GetDefenderPositions` stores
+  `(wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY` into its `int` array. One enum arm,
+  a cast of the whole ternary, or the condition inverted stays 5 bytes off.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
   on, where `if (!f()) { return FALSE; } n++;` puts it before.
@@ -2132,6 +2163,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the original puts an `if`'s then-block after the else path, write the condition negated with the bodies
   swapped: brightness.c's `BrightnessData_Step` matches with the long advance body first and `done = TRUE` in the
   `else`, for both its tests.
+- A negated test and its expansion by De Morgan's laws compile to different branch targets: `btlv_effvm.c`'s
+  `BtlvEffvm_InitEmitter` branches to the body when `angle` is below 0x2000 (`blo`) and on to the 0xe000 test when it
+  is at most 0x6000 (`bls`) only as `angle < 0x2000 || (angle > 0x6000 && angle < 0xa000) || angle > 0xe000`;
+  `!((angle >= 0x2000 && angle <= 0x6000) || (angle >= 0xa000 && angle <= 0xe000))` is 2 bytes off.
 - A test of a value against a few nearby constants returned as `return x == a || x == b || x == c;` compiles to a bit
   test, `sub; cmp #range; bhi; mov #1; lsl; tst #mask`, while the same test as an `if`, or as a `switch` that returns or
   sets a flag, compiles to compares. `itemmenu.c`'s `ItemMenu_IsRepel` returns the expression for its three repels.
