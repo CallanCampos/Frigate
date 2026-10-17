@@ -1,7 +1,14 @@
+// The sub events that a script starts, such as a message window or a sound, and the event that finishes them when the
+// script ends (a descriptive name). Function and data names from swan (https://github.com/ds-pokemon-hacking/swan,
+// GPL-3.0)
+
 #include "types.h"
 #include "field/field_script.h"
 #include "gfl/std.h"
 #include "system/game_event.h"
+
+// A bit for each of the script's sub events that is running, by the IDs of FieldScriptSubEvent_Register
+static u32 g_ActiveFieldScriptSubEvents;
 
 void FieldScriptSubEvent_ResetAll(void) {
     MIi_CpuClear32(0, &g_ActiveFieldScriptSubEvents, sizeof(g_ActiveFieldScriptSubEvents));
