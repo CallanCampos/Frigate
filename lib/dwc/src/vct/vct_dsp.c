@@ -38,7 +38,6 @@ struct VCTEcho {
 };
 
 static VCTCapture sCapture = { 0, 0, 15, 0x3fc };
-static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
 
 static s16 sEchoHistory[0x800];
 static s16 sFarEnd[VCT_FRAME_SAMPLES];
@@ -229,6 +228,8 @@ u32 VCT_FilterFrame(s16 *samples, int bytes) {
     }
     return REG_DIV_RESULT_LO;
 }
+
+static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
 
 void VCT_InitEcho(void) {
     const s16 *coeffs = sInitialCoefficients;
