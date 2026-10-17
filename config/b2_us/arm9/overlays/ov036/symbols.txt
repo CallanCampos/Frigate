@@ -5517,8 +5517,8 @@ data_ov036_021d2134 kind:data(any) addr:0x021d2134
 data_ov036_021d214c kind:data(any) addr:0x021d214c
 data_ov036_021d2164 kind:data(any) addr:0x021d2164
 data_ov036_021d217c kind:data(any) addr:0x021d217c
-data_ov036_021d220c kind:data(any) addr:0x021d220c
-data_ov036_021d2220 kind:data(any) addr:0x021d2220
+RIPPLE_TASK_VTABLE kind:data(any) addr:0x021d220c
+RIPPLE_ANIM_SPREAD kind:data(any) addr:0x021d2220
 data_ov036_021d2234 kind:data(any) addr:0x021d2234
 data_ov036_021d2248 kind:data(any) addr:0x021d2248
 data_ov036_021d2254 kind:data(any) addr:0x021d2254
@@ -5715,7 +5715,7 @@ data_ov036_021d5478 kind:data(any) addr:0x021d5478
 data_ov036_021d5488 kind:data(any) addr:0x021d5488
 data_ov036_021d5494 kind:data(any) addr:0x021d5494
 data_ov036_021d54a4 kind:data(any) addr:0x021d54a4
-data_ov036_021d54b0 kind:data(any) addr:0x021d54b0
+RIPPLE_ANIMS kind:data(any) addr:0x021d54b0
 data_ov036_021d54b4 kind:data(any) addr:0x021d54b4
 data_ov036_021d54c4 kind:data(any) addr:0x021d54c4
 data_ov036_021d54d4 kind:data(any) addr:0x021d54d4

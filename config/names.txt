@@ -5310,6 +5310,8 @@ overlays/ov036 0x021d1120 sPlaceNameBGSetup
 overlays/ov036 0x021d1170 PLACE_NAME_LETTER_POSITIONS
 overlays/ov036 0x021d121c PLACE_NAME_LETTER_OPS
 overlays/ov036 0x021d176c WATERFALL_UP_HANDLERS
+overlays/ov036 0x021d220c RIPPLE_TASK_VTABLE
+overlays/ov036 0x021d2220 RIPPLE_ANIM_SPREAD
 overlays/ov036 0x021d22d0 FIELD_EFFECT_SCRIPT_ENTRIES
 overlays/ov036 0x021d234c SLOPE_SLIP_TILES
 overlays/ov036 0x021d236c WATER_CURRENT_FLOW_TILES
@@ -5328,6 +5330,7 @@ overlays/ov036 0x021d5178 sMartWindows
 overlays/ov036 0x021d5194 sBPShopWindows
 overlays/ov036 0x021d51b0 sMoveTutorWindows
 overlays/ov036 0x021d5230 sPendingSteps
+overlays/ov036 0x021d54b0 RIPPLE_ANIMS
 overlays/ov036 0x021d5674 sBubbleMatrix
 overlays/ov036 0x021d57a0 g_FieldHeapMemory
 overlays/ov036 0x021e57bc g_ScrEventActorFlags

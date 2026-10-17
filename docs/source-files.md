@@ -555,7 +555,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | complete | string at `0x021d5420` |
 | `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | partial | string at `0x021d5430` |
 | `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | partial | string at `0x021d54a4` |
-| `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | partial | string at `0x021d54b4` |
+| `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | complete | string at `0x021d54b4` |
 | `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | partial | string at `0x021d54c4` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |

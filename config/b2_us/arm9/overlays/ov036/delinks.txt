@@ -538,6 +538,7 @@ src/ov036/sodateya.c:
     .data       start:0x021d54a4 end:0x021d54b0
 
 src/ov036/fldeff_ripple.c:
+    complete
     .text       start:0x021be790 end:0x021be988
     .rodata     start:0x021d220c end:0x021d2234
     .data       start:0x021d54b0 end:0x021d54c4
