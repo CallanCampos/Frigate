@@ -1,8 +1,9 @@
 // The native port's entry point: reads the options, opens the window, prepares the platform layer and runs the game's
 // main() (renamed NitroMain by the build) on the OS core (port/hal/os). Everything runs on this one thread: the game
 // and its SDK threads on fibers, and the platform's own work on the dispatcher's stack: the scanline hook, which draws
-// each line of both screens (port/gfx/screens.c), and this file's frame hook at each VBlank, which takes the player's
-// input, presents the frame (port/app/present.c) and paces to the DS's 59.8261 frames a second.
+// each line of both screens (port/gfx/screens.c), and at each VBlank the geometry engine's swap (port/gfx/ge/ge_hal.h)
+// and this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the
+// DS's 59.8261 frames a second.
 //
 //   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--rom PATH] [--save-dir PATH] [--fixed-time TIME]
 //              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
@@ -31,6 +32,7 @@
 #define _DEFAULT_SOURCE
 
 #include "app/present.h"
+#include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
@@ -94,6 +96,10 @@ static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
 static Uint64 sPacedFrames;
+// The geometry engine's readback registers, for the I/O registers' accessors (port/hal/hw/hw.h)
+static const PortHwG3Readbacks sG3Readbacks = {
+    port_g3d_gxstat, port_g3d_ram_count, port_g3d_vtxram_count, port_g3d_clipmtx_result, port_g3d_vecmtx_result,
+};
 
 static void Usage(void) {
     fprintf(stderr,
@@ -298,6 +304,11 @@ int main(int argc, char **argv) {
     // Nothing pressed, the lid open and the pen up, as the game's first reads must see; then the screens' line drawing
     port_input_set(0, 0);
     port_screens_attach();
+    // The geometry engine at power-on, now that the I/O registers exist, its readback registers, and its swap at each
+    // VBlank
+    port_g3d_reset();
+    port_hw_attach_g3_readbacks(&sG3Readbacks);
+    port_os_add_frame_hook(port_g3d_vblank);
 
     port_os_add_frame_hook(AppFrame);
     StartWatchdog();

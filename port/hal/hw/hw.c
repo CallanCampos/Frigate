@@ -163,12 +163,14 @@ void *port_hw_sqrt_result(void) {
     return &sSqrtResult;
 }
 
-// The geometry command ports and GXFIFO: each write is logged for the geometry engine (phase 2). The log grows as
-// needed; a frame of the game's 3D sends some tens of thousands of words
+// The geometry command ports and GXFIFO: each write is logged for the geometry engine (port/gfx/ge). The log grows
+// as needed; a frame of the game's 3D sends some tens of thousands of words. Taking the log swaps it with the one taken
+// before, so that the engine's runs at every readback allocate nothing
 static PortG3Write *sG3Log;
 static size_t sG3Count;
 static size_t sG3Capacity;
 static PortG3Write *sG3Taken;
+static size_t sG3TakenCapacity;
 
 static void *log_g3_write(uint32_t port) {
     if (sG3Count == sG3Capacity) {
@@ -208,39 +210,46 @@ int port_hw_g3_send(volatile void *dest, const void *src, uint32_t count, uint32
 }
 
 const PortG3Write *port_hw_g3_take(size_t *count) {
-    free(sG3Taken);
-    sG3Taken = sG3Log;
+    PortG3Write *log = sG3Log;
+    size_t capacity = sG3Capacity;
+
+    sG3Log = sG3Taken;
+    sG3Capacity = sG3TakenCapacity;
+    sG3Taken = log;
+    sG3TakenCapacity = capacity;
     *count = sG3Count;
-    sG3Log = NULL;
     sG3Count = 0;
-    sG3Capacity = 0;
     return sG3Taken;
 }
 
-// The geometry engine's status and readbacks. Until the engine exists (phase 2) it is always idle with empty buffers,
-// and the matrices it reports are zero
+// The geometry engine's status and readbacks: the attached engine's, or an idle engine's
+static const PortHwG3Readbacks *sG3Readbacks;
 static uint32_t sGxStat;
 static uint16_t sRamCount;
 static uint16_t sVtxRamCount;
 static uint32_t sClipMtx[16];
 static uint32_t sVecMtx[9];
 
+void port_hw_attach_g3_readbacks(const PortHwG3Readbacks *readbacks) {
+    sG3Readbacks = readbacks;
+}
+
 void *port_hw_gxstat(void) {
-    return &sGxStat;
+    return sG3Readbacks != NULL ? sG3Readbacks->gxstat() : &sGxStat;
 }
 
 void *port_hw_ram_count(void) {
-    return &sRamCount;
+    return sG3Readbacks != NULL ? sG3Readbacks->ram_count() : &sRamCount;
 }
 
 void *port_hw_vtxram_count(void) {
-    return &sVtxRamCount;
+    return sG3Readbacks != NULL ? sG3Readbacks->vtxram_count() : &sVtxRamCount;
 }
 
 void *port_hw_clipmtx_result(void) {
-    return sClipMtx;
+    return sG3Readbacks != NULL ? sG3Readbacks->clipmtx_result() : sClipMtx;
 }
 
 void *port_hw_vecmtx_result(void) {
-    return sVecMtx;
+    return sG3Readbacks != NULL ? sG3Readbacks->vecmtx_result() : sVecMtx;
 }

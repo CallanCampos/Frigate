@@ -1,5 +1,6 @@
 // The DS's two screens as the port draws them (port/gfx/screens.h)
 #include "gfx/screens.h"
+#include "gfx/ge/ge_hal.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/gx_display.h"
 #include "hal/gx/vram.h"
@@ -13,8 +14,8 @@
 #define COLOR_WHITE 0xffffffffu
 
 static uint32_t sScreens[2][PORT_SCREEN_HEIGHT * PORT_SCREEN_WIDTH];
-// Each engine's source, kept so that the 3D layer's line (bg0_3d_line, which port_vram_fill_source leaves alone)
-// stays NULL until the 3D renderer exists: BG0 in 3D mode then shows as transparent
+// Each engine's source, kept from line to line: port_vram_fill_source leaves the 3D layer's line (bg0_3d_line) alone,
+// which this file sets for engine A from the 3D renderer
 static PortDs2dSource sSources[2];
 
 static void Fill(uint32_t *line, uint32_t color) {
@@ -30,6 +31,12 @@ void port_screens_draw_line(int line) {
         return;
     }
     port_gx_display(&display);
+    // The 3D picture, drawn whole before line 0 from the list and registers of the last VBlank (port/gfx/ge/ge_hal.h);
+    // engine A shows its lines as BG0
+    if (line == 0) {
+        port_g3d_render_frame();
+    }
+    sSources[0].bg0_3d_line = port_g3d_line(line);
     for (int engine = 0; engine < 2; engine++) {
         int screen = engine == display.topEngine ? PORT_SCREEN_TOP : PORT_SCREEN_BOTTOM;
         uint32_t *out = &sScreens[screen][line * PORT_SCREEN_WIDTH];

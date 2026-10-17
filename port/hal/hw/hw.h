@@ -36,4 +36,17 @@ const PortG3Write *port_hw_g3_take(size_t *count);
 // otherwise it logs nothing and returns 0, and dest is memory, for the caller to store to
 int port_hw_g3_send(volatile void *dest, const void *src, uint32_t count, uint32_t step);
 
+// The geometry engine's readback registers (GXSTAT, RAM_COUNT, VTXRAM_COUNT, CLIPMTX_RESULT, VECMTX_RESULT): each
+// gives the memory one access to the register uses. The program attaches the engine's (port/gfx/ge/ge_hal.h); until
+// then, as in the platform layer's own tests, the engine reads as idle, with empty buffers and zero matrices
+typedef struct PortHwG3Readbacks {
+    void *(*gxstat)(void);
+    void *(*ram_count)(void);
+    void *(*vtxram_count)(void);
+    void *(*clipmtx_result)(void);
+    void *(*vecmtx_result)(void);
+} PortHwG3Readbacks;
+
+void port_hw_attach_g3_readbacks(const PortHwG3Readbacks *readbacks);
+
 #endif // PORT_HAL_HW_H
