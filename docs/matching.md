@@ -2077,6 +2077,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   at the end of both arms of an `if` is merged the same way: `p_sta_sub.c`'s `PStaSub_AnimSwipeX` stores the bounce
   and calls `PStaSub_SetBounce` in each arm, and the `else` passes the zero left from the vector's initializer; one
   call after the `if` drops the `b`.
+- Two calls to one function at different depths, one ending an arm of an inner `if`/`else` and one in the outer
+  `else`, are cross-jumped at the `bl` alone, even when their argument moves are in different orders: the inner arm
+  ends in `b` to the outer copy's `bl`. Neither the callee's spelling, the tests' polarity nor nesting the tests
+  keeps them apart. The original's separate `bl; b exit` in libVCT's `VCT_ReadSamples` (`vct_audio.c`) came back
+  only with a statement ending the outer then-arm that emits nothing but keeps its block, `heard = received;` between
+  two flags that share a register, which only shapes code there (its row).
 - A load that both arms of an `if`/`else` begin with is hoisted above the branch, between the test and the `beq`.
   When the original loads it first in each arm, after the branch, one arm began with another statement that the
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
@@ -2400,6 +2406,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
   `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
   `i < 8`, and an inline with `return kind < N;`, are both rotated.
+- What keeps the `b` is control flow in the condition that only the optimizer removes: a `?:`, an inline returning
+  `TRUE`/`FALSE`, or `&&` with an operand the front end can't fold, such as `i < 4 && !found` with a local flag. `&& 1`,
+  `MIN` of constants, a `static const` or enum bound and every counter type are rotated. In ARM code the 0/1 test still
+  compiles to a plain `cmp; blt` at the bottom, so the leading `b` is the only sign of it: libVCT's `VCT_InitAudio`
+  (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE` (its row).
+  As a diagnostic only, `__attribute__((aligned(4)))` on any object a function reads keeps the `b` there too, and
+  changes the function's other optimizations.
+- A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
+  `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a
+  `packet = head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `FlushAllQueues` (`vct_audio.c`)
+  matches as `while (sQueueHeads[slot] != NULL) { VCTPacket *packet = sQueueHeads[slot]; ... }` at the top of its slot
+  loop, where `packet` loaded before the `while` and again at the end of its body gave the rotated loop.
+- A search loop whose normal exit sets the counter's register to the bound before testing it (`mov r5, #8` falling
+  into `cmp r5, #8`) is an inline that returns the counter from inside the loop and its `size` argument after it. A
+  loop with `break` written in place leaves the counter as it is. The inline also walks its table with a
+  post-incremented pointer (`ldr r8, [fp], #4`) from `value <= *table++`. libVCT's `EncodeMulaw` (`vct_audio.c`) reaches
+  its size only with G.711's `search(val, table, size)` as a `static inline` (its row).
 
 ## Switches
 

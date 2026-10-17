@@ -758,6 +758,19 @@ static int RemoveActive(VCTPacket *packet) {
     return sActiveCounts[packet->slot];
 }
 
+// Finds the segment of a mu-law magnitude, as search() does in the public-domain G.711 code whose table and constants
+// these are
+static inline int SearchSegment(int value, const int *table, int size) {
+    int i;
+
+    for (i = 0; i < size; i++) {
+        if (value <= *table++) {
+            return i;
+        }
+    }
+    return size;
+}
+
 // Codes samples as 8-bit mu-law
 static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
     u32 i;
@@ -766,7 +779,6 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
         int segment;
         int sign;
         int sample = src[i] >> 2;
-        const int *end = sSegmentEnds;
 
         if (sample < 0) {
             sign = 0x7f;
@@ -777,15 +789,12 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
         if (sample > 0x1fdf) {
             sample = 0x1fdf;
         }
-        for (segment = 0; segment < 8; segment++) {
-            if (sample + 0x21 <= *end++) {
-                break;
-            }
-        }
+        sample += 0x21;
+        segment = SearchSegment(sample, sSegmentEnds, 8);
         if (segment >= 8) {
             dst[i] = sign ^ 0x7f;
         } else {
-            dst[i] = ((segment << 4) | (((sample + 0x21) >> (segment + 1)) & 0xf)) ^ sign;
+            dst[i] = ((segment << 4) | ((sample >> (segment + 1)) & 0xf)) ^ sign;
         }
     }
 }
@@ -851,9 +860,8 @@ static void FlushAllQueues(void) {
     int slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
-        VCTPacket *packet = sQueueHeads[slot];
-
-        while (packet != NULL) {
+        while (sQueueHeads[slot] != NULL) {
+            VCTPacket *packet = sQueueHeads[slot];
             VCTPacket *next = packet->next;
 
             sQueueHeads[slot] = next;
@@ -861,7 +869,6 @@ static void FlushAllQueues(void) {
                 next->prev = NULL;
             }
             VCT_FreePacket(packet);
-            packet = sQueueHeads[slot];
         }
         sQueueTails[slot] = NULL;
         sQueueCounts[slot] = 0;
