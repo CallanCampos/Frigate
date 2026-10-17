@@ -173,7 +173,9 @@ Same instructions, registers swapped.
   block around the loop; at function scope it copies `damage`. Stores of 0 just before a loop use the zero of the
   variable the loop's initializer sets first: `btl_net.c`'s `func_ov167_021b9950` clears `serverCmdReceived` and
   `unkE` with `i`'s zero, and keeps its own for `count` in `r5`, only as `for (i = 0, count = 0; i < 4; i++)`; with
-  `count = 0;` before `for (i = 0; ...)` the stores take `count`'s.
+  `count = 0;` before `for (i = 0; ...)` the stores take `count`'s. `btl_server_flow.c`'s `func_ov167_021a00a4`
+  likewise stores `clientId`'s zero before building `count`'s in `r7` only as
+  `for (clientId = 0, count = 0; clientId < 4; clientId++)`.
 - Moving code into a `static inline` helper can swap two registers when the instructions stay the same. In the same
   function, a loop counter and a copy of 0 traded `r1` and `r2` in its two closing loops until the loops and the
   stores after them became `ClearRecvBuffers()`, the setup counterpart of `func_ov167_021ba26c`, which frees those
@@ -731,7 +733,12 @@ Same code, other `sp` offsets or frame size.
   `func_ov167_0219a004` and passed on to four calls, after the calls' stack argument stores and after the store of
   the new client to `mainModule->clients[clientId]`, only with the callee returning `u8` into a `u8` local, the type
   of the `bagMode` field it ends in. A `u8` local from a `BOOL` return adds a narrowing after the call, and a `u8`
-  return into a `u32` local changes nothing.
+  return into a `u32` local changes nothing. The same goes for a returned flag: `btl_server_flow.c`'s
+  `func_ov167_0219f588` sets `result = FALSE;` between the command queue's two zero stores, and as a `u8` MWCC
+  loads that zero back from the flag's slot for the second store, where the original stores one register three
+  times. It matches as a `BOOL` local returned as `BOOL`, and its caller `func_ov167_0219e608` then matches only
+  with `func_ov167_0219f000`, which it passes the result to, taking a `BOOL` too, since a `u8` parameter there
+  narrows the argument.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
@@ -754,7 +761,11 @@ Same code, other `sp` offsets or frame size.
   all the candidates at once, misses it. A local read from a field can need the field's type even with the same
   instructions and slots: `u8 gender = poke->gender;` in `Mystery_CreateGiftPokemon` moves the species reload and
   the `poke->form` load among `PML_GenPID`'s stack argument stores, which matched `mystery_gift_pokemon.c`'s
-  `func_ov012_02153160`.
+  `func_ov012_02153160`. A spilled flag's constant store moves the same way: `btl_server_flow.c`'s
+  `func_ov167_021a1940` fills the delay slot after its `action->bits.target` load with the copy
+  `actualMove = move` (`adds r7, r6, #0`), as the original does, only with `u8 usedMove`, like its other flags;
+  with `BOOL usedMove` the flag's `FALSE` store (`str r1, [sp, #0x28]`) takes the slot and the copy sinks to just
+  before the next call.
 - A hardware address that the original builds with shifts and keeps on the stack, where ours loads it from the
   literal pool, comes from an SDK inline that returns it: the ribbon page's `PStaRibbon_CreateActors` builds
   `0x19 << 22` and `2 << 16` apart, and matches as `(u8 *)G2_GetOBJCharPtr() + 0x20000` but not as
@@ -897,6 +908,11 @@ Same code, other `sp` offsets or frame size.
   statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
   (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
   `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
+- An `|` chain is combined in the order written, so the order of the original's `orr`s gives the order of the
+  terms: `btl_server_flow.c`'s `ActionOrder_MakeKey` packs the action order's key from its highest field down,
+  `((unk22 & 7) << 22) | ((unk16 & 0x3f) << 16) | ((unk13 & 7) << 13) | (speed & 0x1fff)`, which both its callers,
+  `func_ov167_0219fb3c` and `func_ov167_021a00a4`, need; written from the speed up, they combine the low fields
+  first.
 - Stores through a walking pointer written `*p-- = a; *p-- = b;` compile at the same size as `p[0] = a; p[-1] = b;
   p -= 2;` but allocate and schedule differently: DWC's `EncodeWindows` (`crypt.c`) only gets the original's
   registers (a hoisted constant in fp) and order in the post-decrement form. A chained `current = low = *next++;`
@@ -1020,13 +1036,12 @@ Same instructions, scheduled in another order.
   `const void *prevParam`, while `const PokeListParam *partyParam = prevParam;` alone did nothing. Through a wrapper
   whose whole body is a `static inline`, only the wrapper's own parameter counts: `func_ov012_02153160` matched with
   `const MysteryGift *gift`, though `Mystery_CreateGiftPokemon`, which it returns, already took one. Since `const`
-  shows in the code, a caller and its callee can disagree, and then the call casts: `btl_server_flow.c`'s
-  `func_ov167_021a6c34` matches only with a `const` param and `func_ov167_021a6914`, which it passes it to, only
-  without, so it passes `(BtlFlowMoveParam *)param`. Before casting, check that dropping `const` along the caller's
-  chain doesn't match as well: `battle_rec_tool.c`'s party loaders took a non-`const` record with no change. A NitroSDK
-  function that takes a pointer to a parameter struct may have lost the SDK's `const` in our header: `WM_StartScanEx`
-  (`wm_standard.c`) loads `param->channelList` above its command's first store only with `const WMScanExParam *param`,
-  NitroSDK's prototype.
+  shows in the code, check it along a caller's chain before deciding that a caller and its callee disagree:
+  `btl_server_flow.c`'s `func_ov167_021a6c34` and `func_ov167_021a6914`, which it passes its param to, both match
+  only with a `const` param, and `battle_rec_tool.c`'s party loaders took a non-`const` record with no change. A
+  NitroSDK function that takes a pointer to a parameter struct may have lost the SDK's `const` in our header:
+  `WM_StartScanEx` (`wm_standard.c`) loads `param->channelList` above its command's first store only with
+  `const WMScanExParam *param`, NitroSDK's prototype.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1459,16 +1474,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   known to be 0, as the Battle Subway's loop over its music switches does, has an enum counter. Nor does it move an
   enum local's value into its one use: `btl_rec.c`'s `func_ov167_021d4674` computes a chunk's type from its header
   byte before the chapter bit, as written, only with `BtlRecChunkType type`; an `int type` used once is computed in
-  the `if` that tests it, after the chapter bit. A constant loaded once into a callee-saved register (`movs r5, #6`)
-  and copied to each use (`adds r0, r5, #0`) is such a local too, where an integer local gives a `movs #6` at each
-  use: `move_handlers.c`'s `HandlerChatter` holds its confusion status in a `BattleConditionID`. When the values are
-  `#define`s that asm includes share, as `CONDITION_*` are, a count-only enum in a C header gives the type. A constant
-  kept so for calls and then reduced at run time before a field store (`subs r6, #0x20; str r6, [r5, #8]`) has another
-  spelling, the field assigned and then updated in place: `mictest.c`'s `MicTestMic_Init` writes
-  `mic->param.size = bufferSize; mic->param.size -= 0x20;`, and MWCC passes the stored `0x120` on to the update
-  without folding the subtraction, so it keeps the constant in `r6` like a variable. `= bufferSize - 0x20` folds to
-  `0x100`, and an enum local reduced at run time gave the same instructions with the constant in `r4`, ahead of the
-  parameters.
+  the `if` that tests it, after the chapter bit. `btl_server_flow.c`'s `func_ov167_021a6914` tests its stat
+  against 0 and 10 with one load and loads it again into `r3` for `func_ov167_021a6ab8`, as the original does,
+  only with the stat an enum, `MoveStatChangeStat`, in the local, in `ServerEvent_GetMoveStatChangeValue`'s
+  out-parameter and in `func_ov167_021a6ab8`'s parameter; a `u32` local, or the enum local passed to a `u32`
+  parameter, reuses the tests' register for the call, and casts change nothing. A constant loaded once into a
+  callee-saved register (`movs r5, #6`) and copied to each use (`adds r0, r5, #0`) is such a local too, where an integer
+  local gives a `movs #6` at each use: `move_handlers.c`'s `HandlerChatter` holds its confusion status in a
+  `BattleConditionID`. When the values are `#define`s that asm includes share, as `CONDITION_*` are, a count-only enum
+  in a C header gives the type. A constant kept so for calls and then reduced at run time before a field store
+  (`subs r6, #0x20; str r6, [r5, #8]`) has another spelling, the field assigned and then updated in place: `mictest.c`'s
+  `MicTestMic_Init` writes `mic->param.size = bufferSize; mic->param.size -= 0x20;`, and MWCC passes the stored `0x120`
+  on to the update without folding the subtraction, so it keeps the constant in `r6` like a variable.
+  `= bufferSize - 0x20` folds to `0x100`, and an enum local reduced at run time gave the same instructions with the
+  constant in `r4`, ahead of the parameters.
   A constant narrowed at a call (`movs r3, #0x11` then `lsls`/`asrs` to `s16`) is an enum local too, and where it
   is assigned decides where it is built: set at the top, before the first call, and live across calls while every
   saved register is taken, it is rebuilt at its one use inside the argument setup. `zukan_detail_form.c`'s
@@ -1554,6 +1573,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   scale siblings keep the remainder both in `r2` after `__aeabi_uidivmod` and in `r3` for `* 12`, as the original
   does, only with `const G3DCurve *curve`, `frame %= curve->frameCount` and `curve->translations[frame].x` (`.y`,
   `.z`) written out; a `values` local or a separate index keeps one of the two copies.
+  An array element passed whole to a `static inline` taking a `const` pointer is formed again at that use from the
+  scaled index: `btl_server_flow.c`'s `ActionOrder_GetMove(&order[i])` adds `order` again to `i * 16`, kept in a
+  saved register, just before it loads the entry's action at `#4`, as `func_ov167_0219fb3c`,
+  `func_ov167_021a00a4`, `func_ov167_0219fffc` and `ServerEvent_InterruptSwitch` do. Written as
+  `BattleAction_GetMove(&order[i].action)`, through the header's own `const BattleAction *`, the read shares the
+  entry's address with the body's other uses of `order[i]`, and none of the four match.
 - Reads of a `const` table at a constant index are folded into immediates, but reads in a loop over the table are not,
   even when the loop runs once and is unrolled. An `ldm` from a table straight into argument registers is two fields
   read in such a loop, as the egg and evolution demos' particles load the resource of each of their one unit. Reads

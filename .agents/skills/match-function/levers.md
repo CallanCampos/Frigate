@@ -294,6 +294,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A local of another type than the callee parameters")
 - A spilled reload above another spill's store, where the original stores first: the spilled locals are `u8`
   or `u16`; sweep the widths of several together. (matching.md: "can mean narrow locals")
+- A spilled flag's constant store in a load's delay slot, where the original puts a register copy there: the flag
+  is a `u8`. (matching.md: "A spilled flag's constant store")
+- The `orr`s of a packed value combined in another order: write the `|` chain's terms in the order the original
+  combines them. (matching.md: "An `|` chain is combined")
 - A spilled parameter reloaded on the other side of a call's stack argument stores: sweep the caller's and the
   callee's parameter widths together. (matching.md: "Spilled parameters follow the same rule")
 - Loads moved among a call's stack argument stores with the same instructions and slots: give a local read
@@ -382,6 +386,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A sum truncated to `s16` before a comparison was stored in an `s16` local. (matching.md: "truncates to `s16`")
 - A narrowing again after a clamp is `MATH_CLAMP`, a conditional expression. (matching.md: "narrowed again after it is clamped")
 - A local reloaded from its stack slot before each use can be a `u8` flag, not `volatile`.
+- The reverse: a zero loaded back from a spilled `u8` flag's slot for a later zero store, where the original stores
+  one register again, is a `BOOL` flag, with the return and the caller's parameter it ends in.
+  (matching.md: "The same goes for a returned flag")
+- A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
+  an enum. (matching.md: "tests its stat")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
@@ -409,6 +418,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An element's address formed twice in two shapes, or a field loaded again after an inline read it: the callee or
   the inline takes a `const` pointer, even in another file. (matching.md: "The callee can be in another file"),
   (matching.md: "A field loaded in an inline that takes a `const` pointer")
+- An array element's address formed again from a saved `i * size` just before a field load, where ours keeps the
+  element's address across the body: read the field through a `static inline` taking a `const T *` to the element.
+  (matching.md: "An array element passed whole")
 - `const` table reads at a constant index are folded into immediates; reads in a loop, even an unrolled one, are not.
   An `ldm` into argument registers is a loop over a table. Reads through a pointer to the entry aren't folded either.
   (matching.md: "Reads of a `const` table")
