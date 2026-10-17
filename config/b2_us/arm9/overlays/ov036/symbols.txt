@@ -5401,10 +5401,10 @@ data_ov036_021d1078 kind:data(any) addr:0x021d1078
 data_ov036_021d1080 kind:data(any) addr:0x021d1080
 data_ov036_021d1090 kind:data(any) addr:0x021d1090
 data_ov036_021d10a4 kind:data(any) addr:0x021d10a4
-data_ov036_021d10d8 kind:data(any) addr:0x021d10d8
-data_ov036_021d10e4 kind:data(any) addr:0x021d10e4
-data_ov036_021d10f0 kind:data(any) addr:0x021d10f0
-data_ov036_021d10fc kind:data(any) addr:0x021d10fc
+REFLECT_BILLBOARD_OFFSET_Z kind:data(any) addr:0x021d10d8
+REFLECT_BILLBOARD_OFFSET_Y kind:data(any) addr:0x021d10e4
+REFLECT_TYPE_OFFSET_Y kind:data(any) addr:0x021d10f0
+REFLECT_TASK_VTABLE kind:data(any) addr:0x021d10fc
 sPlaceNameSurfaceSetup kind:data(any) addr:0x021d1110
 sPlaceNameBGSetup kind:data(any) addr:0x021d1120
 data_ov036_021d1140 kind:data(any) addr:0x021d1140
