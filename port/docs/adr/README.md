@@ -1,0 +1,77 @@
+# Architecture decision records
+
+An ADR records one decision about the port that isn't obvious from the code: what was decided, why, what else was
+considered, and what follows from it. [PLAN.md](../PLAN.md) says what the port will be; ADRs say why each part is the
+way it is, and they keep the reasoning when the plan's text moves on. The rules for sessions are in
+[port/CLAUDE.md](../../CLAUDE.md).
+
+## When to write one
+
+- A choice between real alternatives that a later session could undo without knowing why: a library, a data layout,
+  a boundary between the HAL and game code, a test method.
+- The end of a spike (phase 0 has three: overlay sections on Mach-O, VRAM page aliasing, fiber scheduling).
+- A change to a decision in PLAN.md §3: a new ADR that supersedes the old one, and the table in PLAN.md §3 updated in
+  the same commit.
+
+A bug fix, a refactor or anything one comment explains needs no ADR.
+
+## Numbering and files
+
+- Files are `NNNN-short-title.md`: four digits, then the title in lowercase words joined by hyphens.
+- Numbers are given in the order ADRs are written, starting at 0001, and never reused. The decisions below that are
+  waiting for an ADR take the next free number when someone writes them.
+- An accepted ADR isn't rewritten. Only its status line changes, to "superseded by NNNN" when a later ADR replaces
+  it. Typos and broken links may be fixed.
+- Each ADR gets a row in the index below in the same commit.
+
+## Template
+
+```markdown
+# NNNN: Title
+
+- **Status:** proposed | accepted | rejected | superseded by NNNN
+- **Date:** YYYY-MM-DD
+- **Plan:** the PLAN.md section or decision (D1–D10) it settles
+- **Upstream:** the `fuddlesworth/pokebw2` commit it was decided against
+
+## Context
+
+What forces the decision: the problem, the constraints, the measurements (with links to research reports, spikes or
+STATUS.md entries).
+
+## Decision
+
+What we do, stated so a session can follow it.
+
+## Alternatives
+
+Each option considered and why it lost.
+
+## Consequences
+
+What becomes easier, what becomes harder, what must be watched, and what would make us revisit this.
+```
+
+## Index
+
+| ADR | Decision | Plan | Status |
+| --- | --- | --- | --- |
+| [0001](0001-repository-and-upstream-sync.md) | Repository and upstream sync | D1, §4.1 | accepted |
+
+## Decisions waiting for an ADR
+
+[PLAN.md §3](../PLAN.md#3-decisions) states these decisions and their status, with the evidence in
+[RESEARCH.md](../RESEARCH.md); the titles below only name them, so that this index doesn't drift when the plan's text
+changes. Each deserves an ADR when the work it governs starts, or sooner if someone questions it.
+
+| Plan | Decision | Write by |
+| --- | --- | --- |
+| D2 | Our own platform layer, not libntr | phase 0 |
+| D3 | Hybrid platform boundary | phase 0 |
+| D4 | Languages, compiler and libraries | phase 0 |
+| D5 | 64-bit native build | phase 0 |
+| D6 | One executable for both versions | phase 5 |
+| D7 | DS-compatible saves with a sidecar file | phase 1 |
+| D8 | Host sound driver from the ARM7's asm | phase 2 |
+| D9 | Mods as a first-class design | phase 0 (hook macros), phase 6 (the rest) |
+| D10 | Upstream relations | when the user OKs the proposal |

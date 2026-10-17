@@ -1,0 +1,162 @@
+# Port rules
+
+This repository, `CallanCampos/pokebw2-native`, is the decomp `fuddlesworth/pokebw2` with its full history, merged
+continuously, plus a native port in `port/`. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the port stands
+is [docs/STATUS.md](docs/STATUS.md). The root `CLAUDE.md` is upstream's and applies here as this file says; for port
+work, this file wins where the two differ.
+
+## Where to work
+
+- **Port work happens in the port clone**, `~/dev/decomp/pokebw2-native`, and its `.claude/worktrees/*`. Its remotes:
+  `origin` is `CallanCampos/pokebw2-native` (the port), `upstream` is `fuddlesworth/pokebw2` (fetch only).
+- **Decomp work happens in the decomp checkout**, `~/dev/decomp/pokebw2` (`origin` is upstream, `fork` is
+  `CallanCampos/pokebw2`), under the root rules. Decomp PRs go from its `fork` remote, never from this repository.
+  Decomp changes reach the port only by sync. A session in the wrong checkout for its task stops and says so.
+- **This file loads at startup only through `CLAUDE.local.md`.** Claude Code loads a subdirectory's `CLAUDE.md` once
+  a session reads a file there, and a worktree doesn't see the clone root's untracked files. So the clone root and
+  every worktree have a `CLAUDE.local.md` containing `@port/CLAUDE.md`, kept out of git by `.git/info/exclude`, and the
+  clone's auto memory says to read this file first. [README.md](README.md#preparing-a-checkout) has the steps. A
+  session that finds its worktree without `CLAUDE.local.md` creates it.
+- **gh targets the port.** gh prefers a remote named `upstream` to `origin` and can't ask which one in a Claude
+  session, so each clone runs `gh repo set-default CallanCampos/pokebw2-native` (kept in `.git/config`, which
+  worktrees share). Every gh command that writes still names its repository: `-R CallanCampos/pokebw2-native` for the
+  port, and `-R fuddlesworth/pokebw2` only to read or for a post the user approved.
+- **Port work is for Claude Code.** Upstream's `AGENTS.md`, `.agents/` and `.codex/` give Codex the decomp's rules
+  and never mention the port, so Codex sessions don't do port work.
+- **Port files live in `port/`**, plus files upstream doesn't have: `.github/workflows/port-*.yml` and
+  `.github/README.md`. Never edit an upstream file for the port's own setup (root `CLAUDE.md`, `AGENTS.md`,
+  `README.md`, `CONTRIBUTING.md`, `.gitignore`, `.claude/`, `.agents/`, `.codex/`, upstream's `.github/` templates and
+  workflows, `docs/`, `tools/`, `config/`, `configure.py`): every sync would conflict.
+- **Only upstream's `build.yml` is off here**, because it needs the ROM deploy key
+  (`gh workflow disable build.yml -R CallanCampos/pokebw2-native`). Disabling or enabling any other workflow needs the
+  user's OK. Never disable `compile.yml` or `standards.yml` to make CI pass: fix the change instead.
+- **Upstream's issue and pull request templates** show here unchanged. A port pull request ignores the template's
+  decomp checklist and says which test levels ran instead.
+
+## How the root rules apply here
+
+- **Both ROMs stay byte for byte.** Every commit ends with `python3 configure.py && ninja` and both SHA1s, even one
+  that touches only `port/`: it proves the last sync and every change outside `port/` left the DS build alone (T0).
+- **The code rules apply to any edit in `src/`, `lib/` or `include/`**: natural C, names, `docs/code-standards.md`,
+  clang-format 23.1.1. `post_edit.py` and CI's Standards workflow check those paths; they don't look at `port/`.
+- **Publish every commit** means: `git fetch origin && git merge origin/main` (the port's own `main`, which other port
+  sessions and the hourly sync push to), the ROM build with both SHA1s, the host build and the pre-push tests that
+  exist, then `git push origin HEAD:main`. A rejected push is fetched, merged, rebuilt and pushed again.
+- **Never here:** overlay claims, matching, new decomp source files, config changes (`add_source_file.py`,
+  `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`), and edits to `docs/nonmatching-functions.md` or
+  `docs/matching.md`. The `decomp-file`, `match-function`, `finish-file` and `record-lesson` skills and the root
+  "Learn" rule belong to the decomp checkout. **Keep going** means the next task of the loop.
+- **`fix-build`** helps diagnose a ROM build failure here, but the fix is always to the port's own change (rework or
+  revert it), never a config, `delinks.txt`, symbol or rename change. A failure that upstream's `main` shows on its
+  own is a blocker to report (see below), not to fix here.
+
+## Staying in sync ([docs/SYNC.md](docs/SYNC.md))
+
+- **`main` also moves every hour.** The `port-sync` Action (`.github/workflows/port-sync.yml`) merges upstream's
+  `main` when the merge is clean and every C file still compiles for both versions. CI has no ROMs, so those merges
+  are not SHA1-checked: the T0 run after a session's `git merge origin/main` is what verifies them. A conflict, a
+  compile failure, a change to upstream's workflows or a rewrite of its history leaves `main` alone and opens an
+  `upstream-sync` issue.
+- **Each session starts with `port/tools/sync_upstream.sh`.** It merges upstream on top of what the Action merged,
+  builds both ROMs and checks both SHA1s, builds and tests the host side once `port/CMakeLists.txt` exists, and pushes
+  only when all of that passes. Upstream lands 150–250 commits a day, so sync before each task and at least daily.
+- **When the script stops**, SYNC.md says what to do. Exit 3 is a merge conflict: resolve it (a file with a row in
+  [game-changes.md](docs/game-changes.md) takes upstream's version with the port's change reapplied) and run the
+  script again. Exit 4 means upstream rewrote its history: stop and ask the user before `--allow-rewrite`. An
+  upstream `main` that fails `ninja` on its own is never fixed here: record it as a blocker in STATUS.md, offer an
+  upstream report (the user's OK), and ask the user how to go on meanwhile.
+- After a sync that changes upstream's workflows, check with `gh workflow list --all -R CallanCampos/pokebw2-native`
+  that `build.yml` is still off. Why the repository works this way is
+  [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md).
+
+## The iteration loop (PLAN.md §8)
+
+1. **Sync** with `port/tools/sync_upstream.sh`, as above, then regenerate source lists and stubs.
+2. **Pick** the earliest unmet exit criterion of the current phase (STATUS.md names it) that the decomp allows.
+3. **Build it in small commits**, each passing the pre-push tests. Large subsystems (renderer, sound driver,
+   scheduler) go to subagents in their own worktrees, one writer per set of files.
+4. **Verify** with the replay and oracle tests, and run the app and look at screenshots for anything visual.
+5. **Record**, in the same commit as the work: a [STATUS.md](docs/STATUS.md) entry after each session sync and each
+   finished task (the Action's merges get none), an [ADR](docs/adr/README.md) for each non-obvious choice, a row in
+   [game-changes.md](docs/game-changes.md) for every change outside `port/`, and lessons in `port/docs/lessons.md`
+   (created with the first one), never in `docs/matching.md` or the skills.
+6. **Publish** to `origin` as above.
+
+## Changes outside port/ (PLAN.md §4.1, §4.8)
+
+Game code stays the decomp's. Only three kinds of change are allowed outside `port/`:
+
+1. **Matching-neutral portability fixes**, such as `uptr` for a value that carries an address. Each is also offered
+   upstream, with the user's OK.
+2. **Hook macros** (`PORT_EVENT`, `PORT_SHOULD`) that compile to nothing, or to the bare expression, in the ROM build.
+3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. `include/platform.h` is the only place
+   that decides between MWCC and a host.
+
+All three need the same proof that MWCC's output didn't change. The ROM build proves a complete file. An incomplete
+file still links the original object, so the ROM build proves nothing about its C: show with
+`compiler_probe.py --mismatches` in both versions that no function got worse, and for a header change do it for every
+incomplete file that includes the header. [game-changes.md](docs/game-changes.md) has the steps.
+
+Each gets a row in game-changes.md in the same commit. Never copy a decomp file into `port/` to change it; source
+lists are generated from `config/`, never kept by hand. `BUGFIX` stays off, so gameplay matches the reference, but
+memory-safety bugs (out-of-bounds writes, use after free) are fixed under `PLATFORM_PC`, each with a comment, because
+64-bit layouts move what they hit. No new `long`; structs on disk, on the wire or in the save stay pointer-free and
+get host `_Static_assert`s.
+
+## Code that isn't C yet
+
+- **Trap stubs show it**: a function with no C stops the game with its name, address and caller. Never run,
+  interpret, recompile or translate the ROM's ARM code, and never write a stand-in in `port/` to get past a missing
+  game function. The HAL's SDK replacements and the ARM7 sound driver are port code by design (PLAN.md §4.5, §4.7).
+- **Writing the missing C is decomp work.** For an overlay, read its `[Decomp] Overlay NNN` issue and comments
+  (`gh issue view N -R fuddlesworth/pokebw2 --comments`). If someone holds a claim, the task waits: record the
+  blocker in STATUS.md and pick another. Code with no overlay issue (the ITCM, ARM9 main, LTD) has no claim yet, and
+  opening an issue for it is a public post that needs the user's OK. The four ITCM ClAct renderers that phase 2 needs
+  are such code.
+- **A port session never writes in the decomp checkout.** It offers the task to the user, who starts a decomp session
+  there; that session works under the root rules (claim, C from the asm, both SHA1s, fork PR).
+
+## What native means (PLAN.md §1)
+
+- All code runs as host machine code compiled from the decomp's C. There is no CPU emulator.
+- The ROM is a data source the player supplies. Nothing from it is committed: no ROMs, extracted files, VRAM or memory
+  dumps, or captured frames. The golden images and captured display state that PLAN.md §4.3 and §6 (T2) call for are
+  committed only as hashes, or built locally from the player's dump.
+- melonDS is a test oracle (`port/tools/oracle/`) only, never linked into or shipped with the port.
+- libntr, the Platinum port and other ports are references for patterns, never code to copy.
+
+## Testing (PLAN.md §6)
+
+| Level | What | When |
+| --- | --- | --- |
+| T0 | ROM build, both SHA1s | before every push |
+| T1 | Host build; the 64-bit warning count not above STATUS.md's last entry | before every push |
+| T2, T6 | Unit tests; save round trips and ROM dump verification | before every push |
+| T3 | Replay tests: frame hashes and state checkpoints | short ones before every push, long ones nightly |
+| T4 | Oracle comparison with melonDS | nightly, and to close a milestone |
+| T5 | Replays under ASan and UBSan | nightly |
+| T7 | Scripted playtests with screenshots against the milestone checklist | at each milestone |
+
+A level that doesn't exist yet is marked "not yet" in the STATUS.md entry, never skipped silently. A phase closes
+only when its exit criteria pass on macOS.
+
+## Environment and context
+
+- Python is `.venv/bin/python`. `configure.py` needs Homebrew LLVM first on `PATH`
+  (`PATH=/opt/homebrew/opt/llvm/bin:$PATH`). A full `ninja` takes about 5 minutes and 2.2 GB; exit code 139 is an
+  intermittent wibo crash, so run it once more.
+- A new clone or worktree is prepared with `port/tools/bootstrap_checkout.sh`, which links `orig/`, `.venv` and the
+  tools from the decomp checkout, and the Claude Code steps in [README.md](README.md#preparing-a-checkout).
+- Long jobs (`ninja`, the sync, the progress tracker, the compile probe, replays) run with `run_in_background` or
+  Monitor, never `sleep`. Never print a whole `.s` file, research report or log; use `grep -n` and `tail`.
+- Write only in your own worktree. If a hook refuses a write, stop and report it; never route around it with the
+  shell. `guard.py` refuses Write and Edit to any path with an `orig/`, `extract/`, `build/` or `.venv/` component and
+  to any `*.sha1` file, so port sources avoid those names. The host build goes in `build/port` (ignored), as
+  `sync_upstream.sh` does.
+- Stage files by name, never with `git add -A` or `git add .`, and never use a bare `git stash`.
+
+## Public posts and upstream
+
+- Anything public on `fuddlesworth/pokebw2` (issues, comments, overlay claims, PRs, the portability proposals of
+  PLAN.md §9) needs the user's OK each time. Read-only `gh` is fine. Never push to `upstream`; never force-push.
+- Unlinked C that the port shows behaving differently from the ROM is a decomp bug: offer an upstream report.

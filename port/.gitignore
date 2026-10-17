@@ -1,0 +1,7 @@
+# Outputs of the measurement scripts (they write next to themselves by default)
+/tools/progress/out/
+/tools/compile-probe/*
+!/tools/compile-probe/run_all.sh
+!/tools/compile-probe/README.md
+!/tools/compile-probe/scripts/
+!/tools/compile-probe/shim/
