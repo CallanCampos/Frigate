@@ -226,12 +226,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
   SDK (an `int` where ours has an enum). (matching.md: "An inline's enum-typed parameter")
 - A stack argument stored after the next argument's setup starts, where the original stores it first, around a
-  spilled local: sweep the local's width together with its callee's return type and `value` local.
-  (matching.md: "A spilled local's width for the rule below")
+  spilled local, or the local's reload placed above stores the original makes first: sweep the local's width
+  together with its callee's return type and `value` local. (matching.md: "A spilled local's width for the rule
+  below")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
+- A narrow parameter stored to its stack slot at entry, where the original stores it just before a call after
+  loading through another pointer parameter: make that parameter `const`. (matching.md: "spill to its stack slot at
+  entry")
 - A NitroSDK parameter struct read late: check the SDK's prototype for a `const` our header lost (`WM_StartScanEx`).
   (matching.md: "lost the SDK's `const`")
 - A parameter's copy and a stored constant in the other order at entry, all else equal: the stored-to fields are

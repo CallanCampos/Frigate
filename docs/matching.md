@@ -727,7 +727,11 @@ Same code, other `sp` offsets or frame size.
   original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
   `s16`). An `s16` local from an `s32` return, or any other pairing, swaps the two. The callee's other callers
   bound the width: `WbtList_UpdateMessage`'s `u16 message = WbtList_GetMatchValue(...)` keeps its narrowing
-  only with a signed or wider return.
+  only with a signed or wider return. `btl_main.c`'s `func_ov167_0219b610` reloads its spilled bag mode, from
+  `func_ov167_0219a004` and passed on to four calls, after the calls' stack argument stores and after the store of
+  the new client to `mainModule->clients[clientId]`, only with the callee returning `u8` into a `u8` local, the type
+  of the `bagMode` field it ends in. A `u8` local from a `BOOL` return adds a narrowing after the call, and a `u8`
+  return into a `u32` local changes nothing.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
@@ -1001,6 +1005,10 @@ Same instructions, scheduled in another order.
   16)`, as the DSP's `dsp_audio.c` and `dsp_pipe.c` swap the halves of a word.
 - Loads through a pointer are not moved above stores unless the pointee is `const`. A load that the original
   schedules early, such as an argument loaded before the stack arguments are stored, points to a `const` parameter.
+  A narrow parameter's spill to its stack slot at entry counts as a store: `btl_main.c`'s `func_ov167_0219d188`
+  loads `pokeCon->mainModule` first and stores its `u8 pos` to `[sp]` just before its first call only with `const
+  BtlPokeCon *pokeCon`, like the file's `GetPokeParamConst`. Ours stored `pos` at entry, and its width and the
+  callee's did not move it.
   The reverse also shows: a store the original keeps after loads through a pointer, which ours hoists above them, means
   the parameter isn't `const`. Multiboot's `MBFile_LocateBlock` (`mb_segment.c`) matched once its `file` lost the
   `const`, and a non-`const` local cast from it did nothing.
