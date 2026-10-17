@@ -55,7 +55,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 104,
+            "model": "OBJ_CODE_104",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -74,7 +74,7 @@
         },
         {
             "id": 1,
-            "model": 105,
+            "model": "OBJ_CODE_105",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -93,7 +93,7 @@
         },
         {
             "id": 2,
-            "model": 305,
+            "model": "OBJ_CODE_305",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -112,7 +112,7 @@
         },
         {
             "id": 3,
-            "model": 376,
+            "model": "OBJ_CODE_376",
             "movement": 38,
             "type": 0,
             "flag": 0,

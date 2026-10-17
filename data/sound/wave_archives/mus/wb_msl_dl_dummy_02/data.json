@@ -1,0 +1,121 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {
+            "loop_start": 6880
+        },
+        {
+            "loop_start": 2136
+        },
+        {
+            "loop_start": 2208
+        },
+        {
+            "loop_start": 1840
+        },
+        {
+            "loop_start": 18568
+        },
+        {
+            "loop_start": 11824
+        },
+        {
+            "loop_start": 9816
+        },
+        {
+            "loop_start": 9696
+        },
+        {
+            "loop_start": 1224
+        },
+        {
+            "loop_start": 1152
+        },
+        {
+            "loop_start": 1232
+        },
+        {
+            "loop_start": 216
+        },
+        {
+            "loop_start": 216
+        },
+        {
+            "loop_start": 216
+        },
+        {
+            "loop_start": 216
+        },
+        {
+            "loop_start": 1536
+        },
+        {
+            "loop_start": 1608
+        },
+        {
+            "loop_start": 1776
+        },
+        {
+            "loop_start": 13744
+        },
+        {
+            "loop_start": 13712
+        },
+        {
+            "loop_start": 13800
+        },
+        {
+            "loop_start": 14000
+        },
+        {},
+        {
+            "loop_start": 8696
+        },
+        {
+            "loop_start": 7928
+        },
+        {
+            "loop_start": 6296
+        },
+        {
+            "loop_start": 6432
+        },
+        {},
+        {
+            "loop_start": 2224
+        },
+        {
+            "loop_start": 1728
+        },
+        {
+            "loop_start": 2544
+        },
+        {
+            "loop_start": 1936
+        },
+        {
+            "loop_start": 2272
+        },
+        {
+            "loop_start": 2304
+        },
+        {
+            "loop_start": 9296
+        },
+        {
+            "loop_start": 9864
+        },
+        {
+            "loop_start": 9928
+        },
+        {
+            "loop_start": 1664
+        },
+        {
+            "loop_start": 1896
+        },
+        {
+            "loop_start": 2096
+        }
+    ]
+}

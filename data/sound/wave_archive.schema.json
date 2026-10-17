@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A sound wave archive: data/sound/wave_archives/<category>/<name>/data.json",
+    "description": "A wave archive's waves, 000.wav and on beside it, which tools/data/sound_data.py packs in the order of data/constants/sound_wave_archives.txt (tools/data/swar.py writes the archive). A WAV is 8-bit or 16-bit PCM, or IMA ADPCM as the game's own are; a wave archive with file uses another's.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "file": { "type": "string", "x-constant": "WAVE_", "description": "The wave archive whose waves this one uses" },
+        "waves": {
+            "type": "array",
+            "description": "What each wave's WAV doesn't say, in the order of the WAV files: an empty object for a wave that plays once",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "properties": {
+                    "loop_start": {
+                        "type": "integer", "minimum": 0,
+                        "description": "For a wave that loops, the sample its loop starts at; it loops to its end. A multiple of 8 for IMA ADPCM, 4 for 8-bit and 2 for 16-bit PCM"
+                    },
+                    "timer": {
+                        "type": "integer", "minimum": 0, "maximum": 65535,
+                        "description": "The wave's playback timer, where it isn't its rate's (16756991 divided by the rate)"
+                    }
+                }
+            }
+        }
+    }
+}

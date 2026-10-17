@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 295,
+            "model": "OBJ_CODE_295",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fb",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 372,
+            "model": "OBJ_CODE_372",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 297,
+            "model": "OBJ_CODE_297",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d0",
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 224,
+            "model": "OBJ_CODE_224",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d1",
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 55,
+            "model": "OBJ_CODE_DANCER",
             "movement": 12,
             "type": 1,
             "flag": 0,

@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 52,
+            "model": "OBJ_CODE_CLERK_M_67",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 47,
+            "model": "OBJ_CODE_BATTLE_GIRL",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 0,
             "type": 0,
             "flag": 0,

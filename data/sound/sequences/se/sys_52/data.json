@@ -1,0 +1,9 @@
+{
+    "$schema": "../../../sequence.schema.json",
+    "file": "SEQ_SE_SYS_43",
+    "bank": "BANK_SE_WB_SYS_52",
+    "volume": 122,
+    "channel_priority": 104,
+    "player_priority": 64,
+    "player": "PLAYER_SE_SYS"
+}

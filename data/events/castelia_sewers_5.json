@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 74,
+            "model": "OBJ_CODE_SCIENTIST_F_46",
             "movement": 0,
             "type": 0,
             "flag": 0,

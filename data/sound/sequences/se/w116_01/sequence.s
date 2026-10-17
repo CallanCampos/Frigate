@@ -1,0 +1,85 @@
+track_00:
+    alloc_tracks 0x0003
+    open_track 1, track_01
+    note_wait 0
+    tempo 300
+    program 0
+    volume 127
+    bend_range 12
+    sweep_pitch 0
+    sweep_pitch 0
+    pan 64
+    mod_depth 0
+    expression 127
+    note C4, 127, 143
+    rest 50
+    pitch_bend 2
+    rest 8
+    pitch_bend 6
+    rest 7
+    pitch_bend 10
+    rest 7
+    pitch_bend 16
+    rest 7
+    pitch_bend 22
+    rest 7
+    pitch_bend 28
+    rest 8
+    pitch_bend 36
+    rest 7
+    pitch_bend 44
+    rest 7
+    pitch_bend 56
+    rest 8
+    pitch_bend 69
+    rest 7
+    pitch_bend 85
+    rest 7
+    pitch_bend 105
+    rest 8
+    pitch_bend 127
+    rest 28
+    pitch_bend 0
+    end
+track_01:
+    note_wait 0
+    rest 72
+    program 0
+    volume 127
+    bend_range 12
+    sweep_pitch 0
+    sweep_pitch 0
+    pan 64
+    mod_depth 0
+    expression 127
+    note C4, 40, 143
+    rest 50
+    pitch_bend 2
+    rest 8
+    pitch_bend 6
+    rest 7
+    pitch_bend 10
+    rest 7
+    pitch_bend 16
+    rest 7
+    pitch_bend 22
+    rest 7
+    pitch_bend 28
+    rest 8
+    pitch_bend 36
+    rest 7
+    pitch_bend 44
+    rest 7
+    pitch_bend 56
+    rest 8
+    pitch_bend 69
+    rest 7
+    pitch_bend 85
+    rest 7
+    pitch_bend 105
+    rest 8
+    pitch_bend 127
+    rest 28
+    pitch_bend 0
+    end
+    .byte 0xff

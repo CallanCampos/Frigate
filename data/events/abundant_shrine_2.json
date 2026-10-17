@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 69,
+            "model": "OBJ_CODE_JANITOR",
             "movement": 3,
             "type": 0,
             "flag": 0,

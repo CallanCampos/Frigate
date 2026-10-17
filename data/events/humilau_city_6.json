@@ -45,7 +45,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 321,
+            "model": "OBJ_CODE_321",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -64,7 +64,7 @@
         },
         {
             "id": 1,
-            "model": 45,
+            "model": "OBJ_CODE_SOCIALITE",
             "movement": 0,
             "type": 0,
             "flag": 0,

@@ -45,7 +45,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 183,
+            "model": "OBJ_CODE_PSYCHIC_M",
             "movement": 0,
             "type": 0,
             "flag": 0,

@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x056e",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 23,
+            "model": "OBJ_CODE_NURSERY_AIDE",
             "movement": 14,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 307,
+            "model": "OBJ_CODE_307",
             "movement": 3,
             "type": 0,
             "flag": 0,

@@ -465,7 +465,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -484,7 +484,7 @@
         },
         {
             "id": 1,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -503,7 +503,7 @@
         },
         {
             "id": 2,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 13,
             "type": 0,
             "flag": 0,
@@ -522,7 +522,7 @@
         },
         {
             "id": 3,
-            "model": 306,
+            "model": "OBJ_CODE_306",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -541,7 +541,7 @@
         },
         {
             "id": 4,
-            "model": 18,
+            "model": "OBJ_CODE_18",
             "movement": 12,
             "type": 0,
             "flag": 0,
@@ -560,7 +560,7 @@
         },
         {
             "id": 5,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -579,7 +579,7 @@
         },
         {
             "id": 6,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 13,
             "type": 0,
             "flag": 0,
@@ -598,7 +598,7 @@
         },
         {
             "id": 7,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 13,
             "type": 0,
             "flag": 0,
@@ -617,7 +617,7 @@
         },
         {
             "id": 8,
-            "model": 18,
+            "model": "OBJ_CODE_18",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -636,7 +636,7 @@
         },
         {
             "id": 9,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -655,7 +655,7 @@
         },
         {
             "id": 10,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -674,7 +674,7 @@
         },
         {
             "id": 11,
-            "model": 54,
+            "model": "OBJ_CODE_HARLEQUIN_233",
             "movement": 11,
             "type": 0,
             "flag": 0,
@@ -693,7 +693,7 @@
         },
         {
             "id": 12,
-            "model": 26,
+            "model": "OBJ_CODE_POKEFAN_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -712,7 +712,7 @@
         },
         {
             "id": 13,
-            "model": 8,
+            "model": "OBJ_CODE_8",
             "movement": 38,
             "type": 0,
             "flag": 0,
@@ -731,7 +731,7 @@
         },
         {
             "id": 14,
-            "model": 62,
+            "model": "OBJ_CODE_BIKER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -750,7 +750,7 @@
         },
         {
             "id": 15,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -769,7 +769,7 @@
         },
         {
             "id": 16,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -788,7 +788,7 @@
         },
         {
             "id": 17,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 0,
             "type": 1,
             "flag": 0,
@@ -807,7 +807,7 @@
         },
         {
             "id": 18,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -826,7 +826,7 @@
         },
         {
             "id": 19,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -845,7 +845,7 @@
         },
         {
             "id": 20,
-            "model": 65,
+            "model": "OBJ_CODE_65",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -864,7 +864,7 @@
         },
         {
             "id": 21,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -883,7 +883,7 @@
         },
         {
             "id": 22,
-            "model": 44,
+            "model": "OBJ_CODE_GENTLEMAN",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -902,7 +902,7 @@
         },
         {
             "id": 23,
-            "model": 53,
+            "model": "OBJ_CODE_CLERK_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -921,7 +921,7 @@
         },
         {
             "id": 24,
-            "model": 256,
+            "model": "OBJ_CODE_256",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -940,7 +940,7 @@
         },
         {
             "id": 25,
-            "model": 48,
+            "model": "OBJ_CODE_BACKPACKER_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -959,7 +959,7 @@
         },
         {
             "id": 26,
-            "model": 345,
+            "model": "OBJ_CODE_345",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -978,7 +978,7 @@
         },
         {
             "id": 27,
-            "model": 91,
+            "model": "OBJ_CODE_91",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e3",
@@ -997,7 +997,7 @@
         },
         {
             "id": 28,
-            "model": 8202,
+            "model": "OBJ_CODE_MODEL_10",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e2",
@@ -1016,7 +1016,7 @@
         },
         {
             "id": 29,
-            "model": 18,
+            "model": "OBJ_CODE_18",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b3",
@@ -1035,7 +1035,7 @@
         },
         {
             "id": 30,
-            "model": 23,
+            "model": "OBJ_CODE_NURSERY_AIDE",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b3",
@@ -1054,7 +1054,7 @@
         },
         {
             "id": 31,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b3",
@@ -1073,7 +1073,7 @@
         },
         {
             "id": 32,
-            "model": 154,
+            "model": "OBJ_CODE_PRESCHOOLER_F",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b4",
@@ -1092,7 +1092,7 @@
         },
         {
             "id": 33,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b4",
@@ -1111,7 +1111,7 @@
         },
         {
             "id": 34,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b4",
@@ -1130,7 +1130,7 @@
         },
         {
             "id": 35,
-            "model": 8,
+            "model": "OBJ_CODE_8",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b5",
@@ -1149,7 +1149,7 @@
         },
         {
             "id": 36,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b6",
@@ -1168,7 +1168,7 @@
         },
         {
             "id": 37,
-            "model": 30,
+            "model": "OBJ_CODE_ACE_TRAINER_M",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02b6",

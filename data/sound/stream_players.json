@@ -1,0 +1,6 @@
+{
+    "$schema": "players.schema.json",
+    "PLAYER_STRM": {
+        "channels": [ 0, 6 ]
+    }
+}

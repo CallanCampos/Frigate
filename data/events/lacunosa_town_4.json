@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 3,
             "type": 0,
             "flag": 0,

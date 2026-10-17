@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0267",
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x026d",
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x026d",
@@ -252,7 +252,7 @@
         },
         {
             "id": 3,
-            "model": 228,
+            "model": "OBJ_CODE_228",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fd",
@@ -271,7 +271,7 @@
         },
         {
             "id": 4,
-            "model": 105,
+            "model": "OBJ_CODE_105",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02bb",
@@ -290,7 +290,7 @@
         },
         {
             "id": 5,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04af",
@@ -309,7 +309,7 @@
         },
         {
             "id": 6,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04b0",
@@ -328,7 +328,7 @@
         },
         {
             "id": 7,
-            "model": 34,
+            "model": "OBJ_CODE_PKMN_BREEDER_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -347,7 +347,7 @@
         },
         {
             "id": 8,
-            "model": 316,
+            "model": "OBJ_CODE_316",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x026d",
@@ -366,7 +366,7 @@
         },
         {
             "id": 9,
-            "model": 37,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -385,7 +385,7 @@
         },
         {
             "id": 10,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -404,7 +404,7 @@
         },
         {
             "id": 11,
-            "model": 12,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -423,7 +423,7 @@
         },
         {
             "id": 12,
-            "model": 71,
+            "model": "OBJ_CODE_PILOT",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -442,7 +442,7 @@
         },
         {
             "id": 13,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -461,7 +461,7 @@
         },
         {
             "id": 14,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 7,
             "type": 0,
             "flag": 0,
@@ -480,7 +480,7 @@
         },
         {
             "id": 15,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -499,7 +499,7 @@
         },
         {
             "id": 16,
-            "model": 49,
+            "model": "OBJ_CODE_BACKPACKER_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -518,7 +518,7 @@
         },
         {
             "id": 17,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 3,
             "type": 0,
             "flag": 0,

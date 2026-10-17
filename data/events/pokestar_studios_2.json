@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 162,
+            "model": "OBJ_CODE_WORK_00",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0392",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 163,
+            "model": "OBJ_CODE_WORK_01",
             "movement": 17,
             "type": 0,
             "flag": "EVENT_FLAG_0x0392",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 91,
+            "model": "OBJ_CODE_91",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x03c3",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0393",
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 26,
+            "model": "OBJ_CODE_POKEFAN_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0393",
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 25,
+            "model": "OBJ_CODE_25",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0393",
@@ -137,7 +137,7 @@
         },
         {
             "id": 7,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -156,7 +156,7 @@
         },
         {
             "id": 8,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -175,7 +175,7 @@
         },
         {
             "id": 9,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 0,
             "type": 0,
             "flag": 0,

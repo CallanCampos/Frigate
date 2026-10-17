@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 305,
+            "model": "OBJ_CODE_305",
             "movement": 3,
             "type": 0,
             "flag": 0,

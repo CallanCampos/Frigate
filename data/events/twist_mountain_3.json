@@ -75,7 +75,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x053d",
@@ -94,7 +94,7 @@
         },
         {
             "id": 1,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 42,
             "type": 1,
             "flag": 0,
@@ -113,7 +113,7 @@
         },
         {
             "id": 2,
-            "model": 33,
+            "model": "OBJ_CODE_VETERAN_F",
             "movement": 16,
             "type": 1,
             "flag": 0,
@@ -132,7 +132,7 @@
         },
         {
             "id": 3,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 15,
             "type": 1,
             "flag": 0,

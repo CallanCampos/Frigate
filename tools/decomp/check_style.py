@@ -102,7 +102,8 @@ def check_c(path, lines):
             add("extern", "extern in a .c file: declare it in the owner's header")
         if is_c and not line.startswith((" ", "\t")):
             mp = PROTO.match(line)
-            if mp:
+            # A global defined with an alignment (`T x ATTRIBUTE_ALIGN(32);`) is not a prototype
+            if mp and mp.group(1) != "ATTRIBUTE_ALIGN":
                 protos.append((i, mp.group(1)))
         if re.search(r"\bvolatile\b", code) and not macro_line and not re.search(r"\(\s*\*\s*\(\s*volatile", code) \
                 and not re.match(r"\s*typedef\b", code):

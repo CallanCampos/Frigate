@@ -285,7 +285,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x050b",
@@ -304,7 +304,7 @@
         },
         {
             "id": 1,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d1",
@@ -323,7 +323,7 @@
         },
         {
             "id": 2,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d0",

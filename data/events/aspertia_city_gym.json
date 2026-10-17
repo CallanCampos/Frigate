@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 223,
+            "model": "OBJ_CODE_223",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e8",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 187,
+            "model": "OBJ_CODE_187",
             "movement": 0,
             "type": 0,
             "flag": 0,

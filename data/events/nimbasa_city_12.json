@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 30,
+            "model": "OBJ_CODE_ACE_TRAINER_M",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 26,
+            "model": "OBJ_CODE_POKEFAN_F",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 45,
+            "model": "OBJ_CODE_SOCIALITE",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 313,
+            "model": "OBJ_CODE_313",
             "movement": 14,
             "type": 0,
             "flag": 0,

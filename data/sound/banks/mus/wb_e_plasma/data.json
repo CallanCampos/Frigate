@@ -1,0 +1,606 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_WB_E_PLASMA", null, null, null ],
+    "instruments": [
+        {
+            "program": 30,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+            "wave": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 87,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+            "wave": 7,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 93,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+            "wave": 15,
+            "base_key": "E3",
+            "attack": 127,
+            "decay": 30,
+            "sustain": 1,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "B1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 0,
+                    "base_key": "Cs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 5,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 5,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 6,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 86
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 120
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 4,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 9,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 118,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 1,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 1,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 2,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 8,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 0,
+                    "release": 115,
+                    "pan": 110
+                }
+            ]
+        },
+        {
+            "program": 28,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 10,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 11,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 92,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 14,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Fs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 15,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 16,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_E_PLASMA",
+                    "wave": 13,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

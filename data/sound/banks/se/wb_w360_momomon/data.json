@@ -1,0 +1,39 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_W360_MOMOMON", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 80,
+            "decay": 50,
+            "sustain": 0,
+            "release": 125,
+            "pan": 64
+        },
+        {
+            "program": 1,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 110,
+            "decay": 127,
+            "sustain": 60,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 2,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_W360_MOMOMON",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 90,
+            "decay": 99,
+            "sustain": 99,
+            "release": 115,
+            "pan": 64
+        }
+    ]
+}

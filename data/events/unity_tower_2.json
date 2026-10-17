@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 76,
+            "model": "OBJ_CODE_76",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 76,
+            "model": "OBJ_CODE_76",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 75,
+            "model": "OBJ_CODE_75",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 48,
+            "model": "OBJ_CODE_BACKPACKER_M",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 72,
+            "model": "OBJ_CODE_POLICEMAN",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 8,
+            "model": "OBJ_CODE_8",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 55,
+            "model": "OBJ_CODE_DANCER",
             "movement": 3,
             "type": 0,
             "flag": 0,

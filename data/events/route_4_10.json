@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 72,
+            "model": "OBJ_CODE_POLICEMAN",
             "movement": 3,
             "type": 0,
             "flag": 0,

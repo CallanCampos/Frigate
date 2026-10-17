@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 3,
             "type": 0,
             "flag": 0,

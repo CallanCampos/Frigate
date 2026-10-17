@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 16,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 12,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 97,
+            "model": "OBJ_CODE_97",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 304,
+            "model": "OBJ_CODE_304",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e4",

@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 97,
+            "model": "OBJ_CODE_97",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02db",
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": 360,
+            "model": "OBJ_CODE_360",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02da",
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -252,7 +252,7 @@
         },
         {
             "id": 3,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -271,7 +271,7 @@
         },
         {
             "id": 4,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -290,7 +290,7 @@
         },
         {
             "id": 5,
-            "model": 14,
+            "model": "OBJ_CODE_14",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -309,7 +309,7 @@
         },
         {
             "id": 6,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -328,7 +328,7 @@
         },
         {
             "id": 7,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0457",
@@ -347,7 +347,7 @@
         },
         {
             "id": 8,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 3,
             "type": 0,
             "flag": 0,

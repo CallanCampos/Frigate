@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 8197,
+            "model": "OBJ_CODE_MODEL_5",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": 8197,
+            "model": "OBJ_CODE_MODEL_5",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": 8197,
+            "model": "OBJ_CODE_MODEL_5",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -252,7 +252,7 @@
         },
         {
             "id": 3,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -271,7 +271,7 @@
         },
         {
             "id": 4,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 8,
             "type": 1,
             "flag": 0,
@@ -290,7 +290,7 @@
         },
         {
             "id": 5,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x049b",
@@ -309,7 +309,7 @@
         },
         {
             "id": 6,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x049c",
@@ -328,7 +328,7 @@
         },
         {
             "id": 7,
-            "model": 32,
+            "model": "OBJ_CODE_VETERAN_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0284",

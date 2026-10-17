@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 0,
             "type": 0,
             "flag": 0,

@@ -1,6 +1,7 @@
 // The actors of the other players in a field communication. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/field_actor.h"
 #include "field/field_comm_actor.h"
 #include "gfl/heap.h"
@@ -168,7 +169,7 @@ void func_ov036_0218b060(FieldActor *actor) {
         if (link->entry->unk6 != 0) {
             u16 objCode = FldAct_GetObjCode(actor);
 
-            if (objCode == 0xe7 || objCode == 0xf0) {
+            if (objCode == OBJ_CODE_HERO || objCode == OBJ_CODE_HEROINE) {
                 s32 dx;
                 s32 dz;
                 s32 dist = 0;

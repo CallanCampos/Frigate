@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 34,
+            "model": "OBJ_CODE_PKMN_BREEDER_M",
             "movement": 16,
             "type": 0,
             "flag": "EVENT_FLAG_0x0312",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 130,
+            "model": "OBJ_CODE_130",
             "movement": 17,
             "type": 0,
             "flag": "EVENT_FLAG_0x0312",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 12,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x0312",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0312",

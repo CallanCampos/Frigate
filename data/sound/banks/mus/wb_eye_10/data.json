@@ -1,0 +1,301 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_WB_EYE_10", null, null, null ],
+    "instruments": [
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "Gs1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 6,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 6,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 6,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 3,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 3,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 3,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 3,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 4,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 4,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 4,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 0,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 17,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 1,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 2,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 29,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 7,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 8,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 40,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 10,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_EYE_10",
+                    "wave": 9,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

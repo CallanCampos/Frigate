@@ -35,7 +35,8 @@ which documents the format and can write them again.
 | `a/0/1/6`, `a/0/1/8`, `a/0/1/9`, `a/0/2/0`, `a/1/2/4` | `data/pokemon/` (JSON) | Species data, level-up moves, evolutions, baby species, egg moves | `tools/data/species_data.py` |
 | `a/0/1/7` | `data/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
 | `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `data/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
-| `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
+| `a/1/9/1` | `data/pokemon/<species>/data.json` (`cry_volume`) | The Pokémon cries' playback volumes | `tools/data/pokemon_cries.py` |
+| `swan_sound_data.sdat` | `data/sound/`, `data/pokemon/<species>/cry.wav` | The sound archive: sequences, banks, wave archives, players, groups, streams and the Pokémon cries | `tools/data/sound_data.py` |
 | `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
 | `a/0/2/5` | `data/items/<item>/` (PNG, palette), `data/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
@@ -50,6 +51,7 @@ which documents the format and can write them again.
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
 | `a/0/1/3` | `data/areas/<area>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
+| `a/0/4/7`, `a/0/4/8` | `data/field_actors/<code>/` (JSON, PNG, palette, Nitro model) | The field actors' models: their table and graphics | `tools/data/field_actor_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
 | `a/2/1/2`, `a/2/1/1` | `data/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
@@ -325,10 +327,124 @@ it has one. `egg/` holds the egg's sprites and icon, which every egg shows, and 
 `cry_volume` in each species' `data.json` is the game's 0–127 playback volume; the egg, the bad egg and the
 Pokéstar Studios species have cries and volumes of their own too (`pm_voice.c`). Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
 volume.
-The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
-`.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
-`.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs them automatically.
-An unchanged source set reproduces all seven original graphics and sound archives byte for byte.
+A cry's wave archive must fit the game's 0x5c30-byte buffer. The sound archive takes the cries from `cry.wav` (see
+[Sound](#sound)). Extract the graphics again with `.venv/bin/python tools/data/pokemon_graphics.py extract
+data/pokemon` and the cries with `.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs
+them automatically. An unchanged source set reproduces the original graphics archives, the volumes and the cries byte
+for byte.
+
+## Sound
+
+The sound archive, `swan_sound_data.sdat`, the same in both versions, is built from `data/sound/` by
+`tools/data/sound_data.py`. Its entries are the constants of its lists in `data/constants/`, each in its list's order:
+the sequences of `sound.txt` (`SEQ_BGM_*` music, `SEQ_SE_*` sound effects, `SEQ_ME_*` jingles), the banks of
+instruments of `sound_banks.txt`, the wave archives of samples of `sound_wave_archives.txt`, and the players, groups,
+stream players and streams of `sound_players.txt`, `sound_groups.txt`, `sound_stream_players.txt` and
+`sound_streams.txt`, whose names are the archive's own symbols. A sequence, bank, wave archive or stream is a
+directory named after its constant, in its kind's directory and its category's, the word after the kind's prefix:
+`SEQ_BGM_T_01` is `data/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `data/sound/banks/se/sw_jump/`, and
+`BANK_PV001` `data/sound/banks/pv/pv001/`. A sequence has its `sequence.s` (see [Sequences](#sequences)), a bank its
+instruments in its `data.json` (see [Banks](#banks)), a wave archive its waves as WAV files (see
+[Wave archives](#wave-archives)), and a stream its file, `stream.strm`, Nitro's own format for now. A sequence, bank
+and stream has `data.json`, its record of the archive,
+which the schemas in `data/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
+archives, a stream's volume, priority and player. Some entries share a file: 86 sequences play another's, such as the
+placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
+`"file"`, naming the one whose file it uses. `players.json`, `stream_players.json` and
+`groups.json` hold the small kinds' records by their constants. The Pokémon cries' wave archives, the 690 after the
+empty first slot of `sound_wave_archives.txt`, are each species' `cry.wav` (see
+[Pokémon graphics and cries](#pokémon-graphics-and-cries)).
+
+To add a sequence, bank, wave archive or stream, add its constant to its list and its directory, as a copy of one to
+start from; `rename_constant.py` moves the directory when a constant is renamed. The packer lays the archive out as
+the game's, the files of the sequences, banks, wave archives and streams, each kind in its list's order, so the
+sources pack it byte for byte. `.venv/bin/python tools/data/sound_data.py dump extract/b2_us/files data/sound`
+writes them again.
+
+### Sequences
+
+A sequence's `sequence.s` is its commands as text, one a line, in the order of the sequence's data, with labels where
+its tracks start and where jumps and calls go; `tools/data/sseq.py` assembles it into the game's sequence byte for
+byte. Track 0 starts the sequence, allocates the tracks with `alloc_tracks` and starts the others with `open_track`:
+
+```
+track_00:
+    alloc_tracks 0x0c5f
+    open_track 1, track_01
+    ...
+    tempo 87
+    program 47
+    volume 104
+    rest 576
+label_0045:
+    note A5, 120, 113
+    rest 6
+    pitch_bend -5
+    ...
+    jump label_0045
+```
+
+`note KEY, VELOCITY, LENGTH` plays a key, named `C`, `Cs`, `D`, ... `B` and an octave, middle C (60) being `C4` and a
+negative octave `m1`, for a length in ticks, and `rest TICKS` waits. `program` picks an instrument of the sequence's
+bank; `tempo`, `volume`, `expression`, `pan`, `transpose`, `pitch_bend`, `bend_range`, `priority`, `note_wait`, `tie`,
+`portamento`, `portamento_key`, `portamento_time`, `mod_depth`, `mod_speed`, `mod_type`, `mod_range`, `mod_delay`,
+`sweep_pitch`, `attack`, `decay`, `sustain`, `release` and `master_volume` set what their names say; `jump`, `call`,
+`return`, `loop_start`, `loop_end` and `end` steer the track. The variable commands are `set_var`, `add_var`,
+`sub_var`, `mul_var`, `div_var`, `shift_var`, `random_var` and the comparisons `cmp_eq`, `cmp_ge`, `cmp_gt`, `cmp_le`,
+`cmp_lt` and `cmp_ne`; a command after `if` only runs when the last comparison held, after `random` its last argument
+is a random number between the two given, and after `from_var` it is the variable given. `.byte` keeps data that no
+track reaches. `sseq.py`'s commands table has every command with its byte and arguments.
+
+To add a song or a sound, add its `SEQ_` constant to the end of `sound.txt` and its directory, with a `data.json`
+naming its bank, volume, priorities and player, as a copy of a sequence like it, and its `sequence.s`, written by hand
+or converted from a MIDI file:
+
+```
+.venv/bin/python tools/data/midi_to_sequence.py SONG.mid data/sound/sequences/bgm/my_song/sequence.s
+```
+
+Each MIDI channel with notes becomes a track at the game's 48 ticks a quarter note, and the tempo, program changes,
+volume, pan, expression, modulation depth and pitch bend come along; markers named `loopStart` and `loopEnd` loop the
+song. A program is an instrument of the sequence's bank, not a General MIDI one, so set the MIDI file's programs to the
+bank's instruments.
+
+### Banks
+
+A bank's `data.json` has its four wave archives and its instruments, in the order of their data, each with the
+program number that a sequence's `program` picks it by:
+
+```json
+{
+    "program": 85,
+    "type": "wave",
+    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+    "wave": 110,
+    "base_key": "Cs2",
+    "attack": 127,
+    "decay": 125,
+    "sustain": 120,
+    "release": 120,
+    "pan": 64
+}
+```
+
+A `wave` instrument plays a wave of one of the bank's wave archives, a `psg` one a square wave of a `duty` from 0 to 7
+and a `noise` one noise, each at its own pitch on its `base_key`, with its envelope (`attack`, `decay`, `sustain`,
+`release`) and `pan`. A `drums` set has an instrument for each key from its `first_key` in its `keys`, and a `split` an
+instrument for each region of keys in its `regions`, each up to its `up_to`. Programs that share an instrument list
+their numbers, an `unused` entry keeps data that no program uses as hex, and `programs` gives a bank more programs than
+its last instrument's. `tools/data/sbnk.py` writes the bank from them byte for byte.
+
+### Wave archives
+
+A wave archive is a directory of its waves, the samples that banks' instruments play, `000.wav` and on, in the order
+that instruments number them, and a `data.json` with what a WAV doesn't say: for each wave, an empty object if it plays
+once, or the sample its loop starts at, `"loop_start"`, if it loops to its end, and its `"timer"` where that isn't its
+rate's. The game's waves are IMA ADPCM, and their WAV files keep them so, as IMA ADPCM WAVs that audio editors and
+ffmpeg open, so they pack back byte for byte; a wave larger than a WAV block is in several blocks, each starting with
+the decoder's state there. An edited wave can be saved as 8-bit or 16-bit PCM, which the game plays too, mono at a
+rate from 4000 to 65535; a loop starts on a multiple of 8 samples in IMA ADPCM, 4 in 8-bit and 2 in 16-bit PCM. To add a
+wave, add its WAV after the last and its entry to `waves`, and an instrument that plays it.
 
 ## Moves
 
@@ -797,6 +913,38 @@ show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 ```
 
 `data/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
+
+## Field actors
+
+The field's actors are the people, Pokémon and objects that zones and scripts put on the map. Each one's model is an
+object code, a constant of `data/constants/obj_codes.txt`, which the zones' events give their NPCs as `"model":
+"OBJ_CODE_YOUNGSTER"`, and each object code is a directory of `data/field_actors/`: `hero/` for `OBJ_CODE_HERO`,
+`pokemon/bulbasaur/` for the walking Pokémon's `OBJ_CODE_POKEMON_BULBASAUR`, and `models/0/` for the 3D models'
+`OBJ_CODE_MODEL_0`. Its `data.json` is its record of the model table (`a/0/4/7`, `FieldActorConfig` in
+`include/field/field_actor.h`, with swan's names), which `field_actor.schema.json` documents: whether it is a sprite,
+a 3D model or nothing to draw, its shadow, footprints, reflections, sizes, sex, collision and drawing offset. Its
+graphics go in the graphics archive (`a/0/4/8`):
+
+- a sprite has `sprite.png`, its frames side by side, each a square 32 or 64 pixels wide, as the hero's 24 frames of
+  facing and walking, and `sprite.pal`, its 16 colors in JASC format, 0 transparent. The palette file sets
+  the colors; a PNG's own palette only puts back the indices that an image editor reordered on saving.
+- a 3D model has `model.nsbmd`, a Nitro model, unless its `data.json`'s `"model"` names the object code whose model it
+  shows.
+
+People and objects are named after the trainer class that most of the trainers the zones' events give them have
+(`OBJ_CODE_BIKER`, `OBJ_CODE_ROUGHNECK` and `OBJ_CODE_HARLEQUIN_233` also show other classes'), or where the code
+shows what they are (`OBJ_CODE_HERO`, `OBJ_CODE_STRENGTH_ROCK`, `OBJ_CODE_WORK_00` and on, which stand for the
+code in a work value), and are numbered otherwise, as `OBJ_CODE_80`: name them with `rename_constant.py` as they are
+identified, which moves their directories. Walking Pokémon are named after the species, sex and form that the walking
+Pokémon's table (`a/2/0/8`) gives them. The table has the codes in the list's order; the graphics archive has the 3D
+models and then the sprites, each in the order of the codes that show them, and the packer writes each code's place
+in it into the table. To add an actor, add its constant to the list, with a value of its own, and its directory, as a
+copy of one to start from. Two places in the code still load sprites by their place in the graphics archive, the
+Funfest Missions' player icons (`sFMissionViewPlayerModels`) and an entrant's default sprite in `wbt_setup.c`, so adding a 3D model moves the sprites those name. Only a 3D model has a `model.nsbmd` or a
+`"model"`, and the code it names must have a `model.nsbmd` of its own.
+`tools/data/field_actor_data.py` writes the sprites' texture sets as the game's are, so the sources pack both archives
+byte for byte; `.venv/bin/python tools/data/field_actor_data.py dump extract/b2_us/files data/field_actors` writes
+them again.
 
 ## Zone events
 

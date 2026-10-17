@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 37,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 14,
             "type": 0,
             "flag": 0,
