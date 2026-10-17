@@ -15,10 +15,10 @@ lib/dwc/src/vct/vct_adpcm.c:
     .rodata     start:0x021971a8 end:0x02197278
 
 lib/dwc/src/vct/vct_audio.c:
-    .text       start:0x02193cb0 end:0x021956d4
+    .text       start:0x02193cb0 end:0x02194aa4
     .rodata     start:0x02197278 end:0x02197298
-    .data       start:0x021973dc end:0x02197400
-    .bss        start:0x02197444 end:0x02198390
+    .data       start:0x021973dc end:0x021973e0
+    .bss        start:0x02197444 end:0x02198358
 
 lib/dwc/src/vct/vct_session.c:
     .text       start:0x021956d4 end:0x02196680
@@ -35,3 +35,8 @@ lib/dwc/src/vct/vct.c:
     complete
     .text       start:0x02196eb4 end:0x021971a8
     .bss        start:0x0219988c end:0x021998c0
+
+lib/dwc/src/vct/vct_buffer.c:
+    .text       start:0x02194aa4 end:0x021956d4
+    .data       start:0x021973e0 end:0x02197400
+    .bss        start:0x02198358 end:0x02198390

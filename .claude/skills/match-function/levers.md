@@ -683,7 +683,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `TRUE`/`FALSE` inline or `&& !found`. In ARM the bottom test is still a plain `cmp; blt`.
   (matching.md: "has a test whose value is 0/1"), (matching.md: "What keeps the `b`")
 - The same `b` in every function that reads one object, where the file's other loops are rotated: the object has an
-  explicit alignment, as a 32-aligned address in the ROM shows. (matching.md: "An explicit alignment")
+  explicit alignment, as a 32-aligned address in the ROM shows; another file's object takes it on its `extern`
+  declaration. (matching.md: "An explicit alignment")
 - The same in an outer loop around an inner one: begin its body with the inner loop,
   `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
 - `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
@@ -806,8 +807,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
   symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
-- A gap in `.bss` before a 32-aligned object: the previous file ends there. (matching.md: "makes its file's whole
-  `.bss` section 32-aligned")
+- A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
+  gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
+  32-aligned")
 
 ## Function order and presence
 
