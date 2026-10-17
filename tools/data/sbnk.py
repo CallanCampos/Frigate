@@ -12,8 +12,11 @@ first_key, and a "split" an instrument for each region of keys up to its up_to. 
 program uses, as hex.
 """
 import struct
+import sys
+from pathlib import Path
 
-from sseq import key_name, parse_key
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.data.sseq import key_name, parse_key  # noqa: E402
 
 DATA = 0x3C
 TYPES = {1: "wave", 2: "psg", 3: "noise", 16: "drums", 17: "split"}
@@ -43,13 +46,29 @@ def simple_json(kind: str, data: bytes, archives: list) -> dict:
     return result
 
 
+# The fields of each simple instrument, besides its type
+FIELDS = {"wave": ("wave_archive", "wave"), "psg": ("duty",), "noise": ()}
+ENVELOPE = ("base_key", "attack", "decay", "sustain", "release", "pan")
+
+
 def simple_bytes(instrument: dict, archives: list) -> tuple[int, bytes]:
-    kind = instrument["type"]
+    kind = instrument.get("type")
+    if kind not in FIELDS:
+        raise BankError(f"an instrument's type must be wave, psg or noise, not {kind}")
+    missing = [field for field in FIELDS[kind] + ENVELOPE if field not in instrument]
+    if missing:
+        raise BankError(f"a {kind} instrument needs {', '.join(missing)}")
+    if not 0 <= parse_key(str(instrument["base_key"])) <= 127:
+        raise BankError(f"base_key {instrument['base_key']} is outside 0 to 127")
+    if any(not 0 <= instrument[field] <= 255 for field in ENVELOPE[1:]):
+        raise BankError("an instrument's envelope and pan are from 0 to 255")
     code = {name: number for number, name in TYPES.items()}[kind]
     if kind == "wave":
         if instrument["wave_archive"] not in archives:
             raise BankError(f"{instrument['wave_archive']} isn't one of the bank's wave archives")
         first, second = instrument["wave"], archives.index(instrument["wave_archive"])
+        if not 0 <= first <= 0xFFFF:
+            raise BankError(f"wave {first} is outside 0 to 65535")
     else:
         first, second = instrument.get("duty", 0), 0
     return code, SIMPLE.pack(first, second, parse_key(str(instrument["base_key"])), instrument["attack"],
@@ -147,6 +166,8 @@ def write(instruments: list, archives: list) -> bytes:
             code, data = simple_bytes(entry, archives)
         elif kind == "drums":
             first = parse_key(str(entry["first_key"]))
+            if not entry["keys"] or first + len(entry["keys"]) - 1 > 127:
+                raise BankError("a drum set has keys from its first_key up to 127 at most")
             code, data = 16, bytes([first, first + len(entry["keys"]) - 1])
             for key in entry["keys"]:
                 sub, sub_data = simple_bytes(key, archives)

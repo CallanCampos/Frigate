@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "A sound sequence: data/sound/sequences/<category>/<name>/data.json",
-    "description": "A sequence's info record in the sound archive (swan_sound_data.sdat), which tools/data/sound_data.py packs in the order of data/constants/sound.txt. Its file is sequence.sseq beside it, unless file names the sequence whose file it plays.",
+    "description": "A sequence's info record in the sound archive (swan_sound_data.sdat), which tools/data/sound_data.py packs in the order of data/constants/sound.txt. Its file is sequence.s beside it, its commands as text (tools/data/sseq.py), unless file names the sequence whose file it plays.",
     "type": "object",
     "additionalProperties": false,
     "required": [ "bank", "volume", "channel_priority", "player_priority", "player" ],

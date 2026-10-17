@@ -345,21 +345,25 @@ directory named after its constant, in its kind's directory and its category's, 
 `SEQ_BGM_T_01` is `data/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `data/sound/banks/se/sw_jump/`, and
 `BANK_PV001` `data/sound/banks/pv/pv001/`. A sequence has its `sequence.s` (see [Sequences](#sequences)), a bank its
 instruments in its `data.json` (see [Banks](#banks)), a wave archive its waves as WAV files (see
-[Wave archives](#wave-archives)), and a stream its file, `stream.strm`, Nitro's own format for now. A sequence, bank
-and stream has `data.json`, its record of the archive,
+[Wave archives](#wave-archives)), and a stream its audio, `stream.wav`, such as the title screen's music
+(`streams/title/title/`), 8-bit or 16-bit PCM, mono or stereo, with its loop start in samples in its `data.json` if
+it loops. A sequence, bank and stream has `data.json`, its record of the archive,
 which the schemas in `data/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
-archives, a stream's volume, priority and player. Some entries share a file: 86 sequences play another's, such as the
+archives, a stream's volume, priority, player, loop and its timer where that isn't its rate's. Some entries share a file: 86 sequences play another's, such as the
 placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
 `"file"`, naming the one whose file it uses. `players.json`, `stream_players.json` and
 `groups.json` hold the small kinds' records by their constants. The Pokémon cries' wave archives, the 690 after the
 empty first slot of `sound_wave_archives.txt`, are each species' `cry.wav` (see
 [Pokémon graphics and cries](#pokémon-graphics-and-cries)).
 
-To add a sequence, bank, wave archive or stream, add its constant to its list and its directory, as a copy of one to
-start from; `rename_constant.py` moves the directory when a constant is renamed. The packer lays the archive out as
-the game's, the files of the sequences, banks, wave archives and streams, each kind in its list's order, so the
-sources pack it byte for byte. `.venv/bin/python tools/data/sound_data.py dump extract/b2_us/files data/sound`
-writes them again.
+To add a sequence, bank, wave archive or stream, add its constant to the end of its list, after its last constant
+(nothing in the decompiled code reads the sequences' `SEQ_SE_END` and the like as limits), and its directory, as
+a copy of one to start from; a new player, group or stream player needs its constant and its entry in
+`players.json`, `groups.json` or `stream_players.json`. An entry's `"file"` must name one with a file of its own.
+`rename_constant.py` moves the directory when a constant is renamed. The packer lays the archive out as the game's, the
+files of the sequences, banks, wave archives and streams, each kind in its list's order, so the sources pack it byte
+for byte, and stops with the file's name and line where a source is wrong. `.venv/bin/python
+tools/data/sound_data.py dump extract/b2_us/files data/sound` writes them again.
 
 ### Sequences
 
@@ -393,7 +397,9 @@ bank; `tempo`, `volume`, `expression`, `pan`, `transpose`, `pitch_bend`, `bend_r
 `sub_var`, `mul_var`, `div_var`, `shift_var`, `random_var` and the comparisons `cmp_eq`, `cmp_ge`, `cmp_gt`, `cmp_le`,
 `cmp_lt` and `cmp_ne`; a command after `if` only runs when the last comparison held, after `random` its last argument
 is a random number between the two given, and after `from_var` it is the variable given. `.byte` keeps data that no
-track reaches. `sseq.py`'s commands table has every command with its byte and arguments.
+track reaches, `;` starts a comment, and `rest 5 @2` keeps a wait that the game stored in more bytes than it needs.
+The assembler checks that every track ends with `end` or a `jump`, closes the loops it opens, returns only from a
+`call` and starts only the tracks `alloc_tracks` gives, and names the line where one doesn't. `sseq.py`'s commands table has every command with its byte and arguments.
 
 To add a song or a sound, add its `SEQ_` constant to the end of `sound.txt` and its directory, with a `data.json`
 naming its bank, volume, priorities and player, as a copy of a sequence like it, and its `sequence.s`, written by hand

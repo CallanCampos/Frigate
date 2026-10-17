@@ -104,19 +104,32 @@ def to_wav(wave: dict) -> bytes:
     return b"RIFF" + struct.pack("<I", 4 + len(content)) + b"WAVE" + content
 
 
-def from_wav(wav: bytes) -> tuple[int, int, bytes]:
-    """Returns a WAV's wave format, rate and data, as a wave stores them."""
+# WAVE_FORMAT_EXTENSIBLE, which editors write for PCM too, and the PCM subformat's GUID
+WAVE_FORMAT_EXTENSIBLE = 0xFFFE
+PCM_SUBFORMAT = bytes.fromhex("0100000000001000800000aa00389b71")
+
+
+def wav_chunks(wav: bytes, error: type) -> tuple[int, int, int, int, int, bytes]:
+    """Returns a WAV's format tag (PCM for an extensible PCM file), channels, rate, block size, bits and data."""
     if wav[:4] != b"RIFF" or wav[8:12] != b"WAVE":
-        raise WaveError("not a WAV file")
+        raise error("not a WAV file")
     chunks, position = {}, 12
     while position + 8 <= len(wav):
         kind, size = wav[position:position + 4], struct.unpack_from("<I", wav, position + 4)[0]
         chunks.setdefault(kind, wav[position + 8:position + 8 + size])
         position += 8 + size + size % 2
-    if b"fmt " not in chunks or b"data" not in chunks:
-        raise WaveError("a WAV file needs a fmt and a data chunk")
-    tag, channels, rate, _, block_align, bits = struct.unpack_from("<HHIIHH", chunks[b"fmt "])
-    data = chunks[b"data"]
+    if b"fmt " not in chunks or b"data" not in chunks or len(chunks[b"fmt "]) < 16 or not chunks[b"data"]:
+        raise error("a WAV file needs a fmt chunk and a data chunk with samples")
+    fmt = chunks[b"fmt "]
+    tag, channels, rate, _, block_align, bits = struct.unpack_from("<HHIIHH", fmt)
+    if tag == WAVE_FORMAT_EXTENSIBLE and len(fmt) >= 40 and fmt[24:40] == PCM_SUBFORMAT:
+        tag = WAVE_FORMAT_PCM
+    return tag, channels, rate, block_align, bits, chunks[b"data"]
+
+
+def from_wav(wav: bytes) -> tuple[int, int, bytes]:
+    """Returns a WAV's wave format, rate and data, as a wave stores them."""
+    tag, channels, rate, block_align, bits, data = wav_chunks(wav, WaveError)
     if channels != 1:
         raise WaveError("a wave must be mono")
     if tag == WAVE_FORMAT_PCM and bits == 8:
@@ -124,6 +137,8 @@ def from_wav(wav: bytes) -> tuple[int, int, bytes]:
     if tag == WAVE_FORMAT_PCM and bits == 16:
         return PCM16, rate, data[:len(data) // 2 * 2]
     if tag == WAVE_FORMAT_IMA_ADPCM and bits == 4:
+        if block_align <= 4:
+            raise WaveError("an IMA ADPCM WAV's blocks must be more than their headers")
         blocks = [data[start:start + block_align] for start in range(0, len(data), block_align)]
         joined = bytearray(blocks[0])
         for block in blocks[1:]:

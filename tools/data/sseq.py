@@ -82,6 +82,10 @@ def read_var(data: bytes, position: int) -> tuple[int, int, int]:
 
 
 def var_bytes(value: int, length: int = 0) -> bytes:
+    if not 0 <= value <= 0x0FFFFFFF:
+        raise SequenceError(f"{value} is outside a wait's 0 to {0x0FFFFFFF}")
+    if length > 4:
+        raise SequenceError("a wait is at most 4 bytes")
     groups = [value & 0x7F]
     value >>= 7
     while value:
@@ -208,6 +212,61 @@ def disassemble(sseq: bytes) -> str:
     return "\n".join(lines) + "\n"
 
 
+def validate(statements: list, at: str):
+    """Checks that every track, from track 0 and each open_track, ends with end or a jump, closes the loops it opens,
+    and returns only from a call, and that open_track only starts the tracks alloc_tracks gives."""
+    commands = [(number, what, args) for number, what, args in statements]
+    labels = {args: index for index, (_, what, args) in enumerate(commands) if what == "label"}
+    tracks = 0xFFFF
+    for number, what, args in commands:
+        if what != "label" and what[1] == "alloc_tracks":
+            tracks = int(args[0], 0)
+            break
+
+    def walk(start: int, in_call: bool):
+        pending = [(start, 0)]
+        seen = set()
+        while pending:
+            index, depth = pending.pop()
+            while True:
+                if index >= len(commands):
+                    raise SequenceError(f"{at}line {commands[-1][0]}: a track runs past the end without end or jump")
+                if (index, depth) in seen:
+                    break
+                seen.add((index, depth))
+                number, what, args = commands[index]
+                if what == "label":
+                    index += 1
+                    continue
+                prefix, name = what
+                if name == ".byte":
+                    raise SequenceError(f"{at}line {number}: a track runs into .byte data without end or jump")
+                if name == "open_track" and not tracks >> int(args[0], 0) & 1:
+                    raise SequenceError(f"{at}line {number}: track {args[0]} isn't one alloc_tracks gives")
+                if name == "loop_start":
+                    depth += 1
+                elif name == "loop_end" and prefix != "if":
+                    if not depth:
+                        raise SequenceError(f"{at}line {number}: loop_end without a loop_start")
+                    depth -= 1
+                elif name == "return" and not in_call:
+                    raise SequenceError(f"{at}line {number}: return outside a call")
+                elif name == "jump":
+                    pending.append((labels[args[0]], depth))
+                    if prefix != "if":
+                        break
+                elif name in ("end", "return") and prefix != "if":
+                    break
+                index += 1
+
+    starts = [0] + [labels[args[1]] for _, what, args in commands if what != "label" and what[1] == "open_track"]
+    for start in starts:
+        walk(start, False)
+    for _, what, args in commands:
+        if what != "label" and what[1] == "call":
+            walk(labels[args[0]], True)
+
+
 def assemble(text: str, where: str = "") -> bytes:
     """Returns the sequence of a text."""
     at = f"{where}: " if where else ""
@@ -222,6 +281,8 @@ def assemble(text: str, where: str = "") -> bytes:
         words = line.split(None, 1)
         prefix = None
         if words[0] in ("random", "from_var", "if"):
+            if len(words) < 2:
+                raise SequenceError(f"{at}line {number}: {words[0]} needs a command after it")
             prefix = words[0]
             words = words[1].split(None, 1)
         args = [arg.strip() for arg in words[1].split(",")] if len(words) > 1 else []
@@ -230,8 +291,13 @@ def assemble(text: str, where: str = "") -> bytes:
     def encode(number, prefix, name, args, labels):
         try:
             if name == ".byte":
-                return bytes(int(arg, 0) & 0xFF for arg in args)
+                values = [int(arg, 0) for arg in args]
+                if any(not 0 <= value <= 0xFF for value in values):
+                    raise SequenceError(".byte takes values from 0 to 255")
+                return bytes(values)
             if name == "note":
+                if not args:
+                    raise SequenceError("note takes a key, a velocity and a length")
                 byte, kinds = parse_key(args[0]), NOTE[1][1:]
                 args = args[1:]
                 if not 0 <= byte < 0x80:
@@ -281,6 +347,7 @@ def assemble(text: str, where: str = "") -> bytes:
             position += len(encode(number, what[0], what[1], args, None))
     data = b"".join(encode(number, what[0], what[1], args, labels)
                     for number, what, args in statements if what != "label")
+    validate(statements, at)
     data += bytes(-(HEADER + len(data)) % 4)
     size = HEADER + len(data)
     return (struct.pack("<4sHHIHH", b"SSEQ", 0xFEFF, 0x0100, size, 0x10, 1)
