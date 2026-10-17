@@ -5523,7 +5523,7 @@ data_ov036_021d2164 kind:data(any) addr:0x021d2198
 data_ov036_021d217c kind:data(any) addr:0x021d21b0
 RIPPLE_TASK_VTABLE kind:data(any) addr:0x021d2240
 RIPPLE_ANIM_SPREAD kind:data(any) addr:0x021d2254
-data_ov036_021d2234 kind:data(any) addr:0x021d2268
+SPLASH_TASK_VTABLE kind:data(any) addr:0x021d2268
 data_ov036_021d2248 kind:data(any) addr:0x021d227c
 data_ov036_021d2254 kind:data(any) addr:0x021d2288
 data_ov036_021d2274 kind:data(any) addr:0x021d22a8

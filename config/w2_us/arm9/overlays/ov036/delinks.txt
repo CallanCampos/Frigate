@@ -544,6 +544,7 @@ src/ov036/fldeff_ripple.c:
     .data       start:0x021d54f0 end:0x021d5504
 
 src/ov036/fldeff_splash.c:
+    complete
     .text       start:0x021be9c0 end:0x021beba8
     .rodata     start:0x021d2268 end:0x021d227c
     .data       start:0x021d5504 end:0x021d5514

@@ -39,6 +39,7 @@
 . 0x02006c1c reloc_addend 4
 . 0x02006c3c reloc_addend 4
 . 0x02006c4c reloc_addend 4
+. 0x02007224 reloc_module overlay(331)
 . 0x0200a9e4 reloc_module overlay(331)
 . 0x0200aa04 reloc_module overlay(331)
 . 0x0200aab8 reloc_module overlay(331)
