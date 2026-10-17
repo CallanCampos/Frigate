@@ -50,6 +50,7 @@ BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
 
 // The hardware's divider and square root unit
 #define REG_DIVCNT (*(vu16 *)0x04000280)
+#define REG_DIV_NUMER (*(volatile u64 *)0x04000290)
 #define REG_DIV_NUMER_LO (*(vu32 *)0x04000290)
 #define REG_DIV_NUMER_HI (*(vu32 *)0x04000294)
 #define REG_DIV_DENOM_LO (*(vu32 *)0x04000298)
