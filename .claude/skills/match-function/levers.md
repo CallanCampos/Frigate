@@ -97,6 +97,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
   `cmp rX, #0`: test the pointer as `if (p)`, not against `NULL`. (matching.md: "A pointer compared with `NULL`")
+- A zero kept in a saved register across a call and returned for `FALSE` (`movne r0, r6`), where the original
+  builds `#0`: write every `NULL` test of the pointer in the function as `!p` or `p && ...`, not just one.
+  (matching.md: "every `NULL` test that shares it")
 - A sum used as an index goes to the register of one of its terms unless it has its own variable.
   (matching.md: "array index that is a sum")
 - The operands of `*` are loaded in source order. A product assigned to its own variable gets a new register.
@@ -177,6 +180,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A stack frame for a wide parameter where the original keeps it in registers and computes an expression again after
+  a call (`sub r1, r8, #0xc`): write the expression at each use, not in a local. (matching.md: "written at each use
+  around a call")
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
@@ -262,6 +268,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
+- A static's member loaded above a store through an unknown index into another static, or below it: ARM code
+  moves the load up only when its offset is below half the object's size, and below the size less the offset of a
+  higher member read earlier; a store moves above an access through a pointer by the same bound. (matching.md: "below
+  half the object's size")
+- A table's row offset added to its address before the column (`add r0, table, row*3; ldrb [col, r0]`), where ours
+  adds it to the column: a two-dimensional table indexed `[row][col]`. (matching.md: "A two-dimensional table
+  indexed")
 - A narrow parameter stored to its stack slot at entry, where the original stores it just before a call after
   loading through another pointer parameter: make that parameter `const`. (matching.md: "spill to its stack slot at
   entry")
@@ -518,6 +531,17 @@ text to `grep -n` there. Entries without a key come from later work and still be
   cast around it. (matching.md: "A double negation folds the same way")
 - `rsb #0; add #c` for `c - (a + b)` where ours has one `rsb #c`: a conversion between the negation and the add, as
   NitroSDK's `long` `FX32_ONE` gives. (matching.md: "A negated sum folds")
+- `sub; sub` for `d - last - d` where ours has one `rsb #0`: the difference in a local of the other signedness
+  (`int change = d - last;`). (matching.md: "A difference taken back from its own first operand")
+- `subs` where ours has `sub` for a 32-bit difference of `u64` values: subtract the `u64`s and narrow the result.
+  (matching.md: "A 64-bit difference narrowed")
+- `cmp hi; cmpeq lo` with `bls` on sign-extended `int`s where ours compares signed (`subs; sbcs`): an `int` compared
+  with a sum holding a `u64` constant such as `OS_MilliSecondsToTicks(100)`. (matching.md: "An unsigned 64-bit
+  compare")
+- A constant loaded again and multiplied a second time where ours reuses the product: the two uses differ in
+  signedness (`u32 q` and `(int)q * C`). (matching.md: "does not merge a signed and an unsigned multiply")
+- An array's end as one folded constant (`add #0x5c; add #0x400`) where ours adds the member offset and the size
+  apart: `&p->arr[N]`, not `(u8 *)p->arr + sizeof(p->arr)`. (matching.md: "The end of an array member")
 - `add rN, sp, #0; add rN, rN, #4` for a stack struct's field: pass the struct as words to an inline that indexes them.
   (matching.md: "passed as a packet of words")
 - `mov r0, #imm; cmp rX, r0` where the immediate fits: the limit is a variable set to the constant. (matching.md: "is a
@@ -557,6 +581,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A negated test and its expansion")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
+- A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
+  ... } else { exit }`. (matching.md: "In a loop the `else` lands after the whole body")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
   code was written there. (matching.md: "Identical statements in different branches")
 - A branch to the next instruction comes from cross-jumping a shared tail. (matching.md: "cross-jumping")
