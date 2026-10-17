@@ -578,7 +578,11 @@ Same code, other `sp` offsets or frame size.
   parameters. NitroSDK's `STD_TVSScanf` (`std_string.c`) compared a `BOOL include` with a `u32` bit, which hoisted
   `(u32)include` into such a slot; `u32 include` keeps the declared slot, and so does a `BOOL`-returning bit-test
   inline. Its `radix`, compared as a `u32` and multiplied into a `u64`, has the same temporary, and no spelling tried
-  moved it. `#pragma opt_loop_invariants off` shows the effect, as a diagnostic only.
+  moved it. `#pragma opt_loop_invariants off` shows the effect, as a diagnostic only. The converted copy takes its
+  register after every declared local too: `pokewood_cutin.c`'s `func_ov167_021d5fe8` compares the `s16`
+  `rules->movie` with the table's `u32 movie : 12` bit field, unsigned, and keeps it in `r6`, between the counter in
+  `r5` and `play`, only as `u32 movie = rules->movie;` declared between them (`unsigned long` too). Read in the loop,
+  or into an `s16`, `int` or `s32` local anywhere, it is the converted copy in `r7`, after `play`, 10 bytes off.
 - In NitroSDK's Thumb files built without `-ipa file`, the frame runs from the top down through the back end's
   temporaries, the function-scope locals in declaration order, the block locals in parse order (nested blocks after
   their parent), the loop-invariant temporaries, and the spilled parameters at the bottom, so a block local sits below
@@ -2139,6 +2143,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `mystery.c`'s `Mystery_GetSpriteBottom` reads a sprite's characters a row at a time with
   `tile = (u32 *)charData->rawData + (row * 12 + col) * 8;` in the column loop; read in the innermost loop, the load
   only moves to the column loop, and read in the row loop, the `charData` load is not hoisted.
+- An address that a returning branch inside a loop uses twice, written out at both uses, is merged within the branch
+  and computed again in the branch's own registers; read into a local once there, the branch reuses the parts the
+  loop hoisted. `btl_rec.c`'s `func_ov167_021d46a4` passes and returns the client's actions in its timeout branch
+  through `actions = reader->actions[clientId];`, which loads `clientId << 6` and `reader + 0x18` from the
+  preheader's spill slots as the original does, and also puts those two slots in the original's order; with
+  `reader->actions[clientId]` at both uses it computed them again in `r7` and `r4`, 104 bytes off. A local set at the
+  top of the loop body gets the reuse but not the slot order. The function also matches with the expression written
+  out and its `u8 clientId` parameter as `unsigned long`, which hoists `clientId << 6` first.
 
 - A loop guard kept as an unsigned compare (`cmp r3, #4; bhs`) came from an enum counter tested against
   `NELEMS(table)`, whose `sizeof` makes the comparison unsigned; the enum's own bound gives `bge`. `symbol_save.c`'s

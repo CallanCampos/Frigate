@@ -98,12 +98,14 @@ BOOL func_ov167_021d4674(BtlRecReader *reader, u8 clientId) {
 
 BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, u8 *chapter) {
     u32 *pos;
+    BattleAction *actions;
 
     if (reader->error) {
-        func_ov167_021bdc98(reader->actions[clientId]);
+        actions = reader->actions[clientId];
+        func_ov167_021bdc98(actions);
         *count = 1;
         *chapter = 0;
-        return reader->actions[clientId];
+        return actions;
     }
 
     pos = &reader->pos[clientId];
@@ -142,10 +144,11 @@ BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, 
                 return result;
             }
         } else if (type == BTL_REC_CHUNK_TIMEOUT) {
-            func_ov167_021bdc84(reader->actions[clientId]);
+            actions = reader->actions[clientId];
+            func_ov167_021bdc84(actions);
             *count = 1;
             *chapter = 0;
-            return reader->actions[clientId];
+            return actions;
         } else if (type != BTL_REC_CHUNK_TURN) {
             break;
         }
@@ -155,10 +158,11 @@ BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, 
     }
 
     reader->error = TRUE;
-    func_ov167_021bdc98(reader->actions[clientId]);
+    actions = reader->actions[clientId];
+    func_ov167_021bdc98(actions);
     *count = 1;
     *chapter = 0;
-    return reader->actions[clientId];
+    return actions;
 }
 
 u32 func_ov167_021d481c(BtlRecReader *reader) {
