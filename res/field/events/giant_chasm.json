@@ -1,0 +1,64 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 8073,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 678,
+                "y": 158,
+                "z": 0
+            }
+        },
+        {
+            "script": 8074,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 689,
+                "y": 141,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x04db",
+            "script": 7143,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 693,
+                "z": 147,
+                "y": -65536
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_GIANT_CHASM_2",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 10952,
+                "y": 65504,
+                "z": 2440,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

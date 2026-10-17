@@ -12,12 +12,12 @@ ROOT = Path(__file__).resolve().parents[2]
 # Each archive's list, the prefix of its constants and the directory of the files named after them. A prop bundle and
 # its textures are the same file of their two archives, so they share a list.
 ARCHIVES = {
-    "a/0/0/8": ("map_models", "MAP_MODEL_", "res/map_models"),
-    "a/0/1/4": ("map_texture_sets", "MAP_TEXTURE_SET_", "res/map_texture_sets"),
-    "a/2/2/5": ("field_props_exterior", "FIELD_PROPS_EXTERIOR_", "res/field_prop_models/exterior"),
-    "a/2/2/6": ("field_props_interior", "FIELD_PROPS_INTERIOR_", "res/field_prop_models/interior"),
-    "a/1/7/4": ("field_props_exterior", "FIELD_PROPS_EXTERIOR_", "res/field_prop_textures/exterior"),
-    "a/1/7/5": ("field_props_interior", "FIELD_PROPS_INTERIOR_", "res/field_prop_textures/interior"),
+    "a/0/0/8": ("map_models", "MAP_MODEL_", "res/field/maps/models"),
+    "a/0/1/4": ("map_texture_sets", "MAP_TEXTURE_SET_", "res/field/maps/textures"),
+    "a/2/2/5": ("field_props_exterior", "FIELD_PROPS_EXTERIOR_", "res/field/props/exterior/models"),
+    "a/2/2/6": ("field_props_interior", "FIELD_PROPS_INTERIOR_", "res/field/props/interior/models"),
+    "a/1/7/4": ("field_props_exterior", "FIELD_PROPS_EXTERIOR_", "res/field/props/exterior/textures"),
+    "a/1/7/5": ("field_props_interior", "FIELD_PROPS_INTERIOR_", "res/field/props/interior/textures"),
 }
 
 

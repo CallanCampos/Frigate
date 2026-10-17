@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""The lighting sets in res/lights/, one JSON file per set: dump writes them from the ROM once, and pack builds the
+"""The lighting sets in res/lighting/, one JSON file per set: dump writes them from the ROM once, and pack builds the
 field and battle lighting archives (a/0/6/0 and a/0/6/1) from them, which the build does.
 
-    light_data.py dump extract/b2_us/files res/lights
-    light_data.py pack res/lights FIELD BATTLE
+    light_data.py dump extract/b2_us/files res/lighting
+    light_data.py pack res/lighting FIELD BATTLE
 
 A set is a file of 0x34-byte periods, which FieldLight_FlushCore applies: when it ends, four lights (whether each is on,
 its color and its direction), then the materials' diffuse, ambient, specular and emission colors, the fog's and the
-clear color. The field's sets are res/lights/field/<n>.json, which areas name by their lights, and the battle's
-res/lights/battle/<n>.json, numbered in archive order. lights.schema.json describes the fields.
+clear color. The field's sets are res/lighting/field/<n>.json, which areas name by their lights, and the battle's
+res/lighting/battle/<n>.json, numbered in archive order. lights.schema.json describes the fields.
 """
 import argparse
 import struct
@@ -83,10 +83,10 @@ def pack(root: Path, outputs: list[Path]):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write res/lights/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/lighting/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the lighting archives from res/lights/")
+    pack_parser = commands.add_parser("pack", help="build the lighting archives from res/lighting/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("outputs", type=Path, nargs=2, metavar="ARCHIVE", help="the field and battle archives")
     args = parser.parse_args()

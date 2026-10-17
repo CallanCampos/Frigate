@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""The zone headers in res/zones/, one JSON file per zone: dump writes them from the ROM once, and pack builds the
+"""The zone headers in res/field/zones/, one JSON file per zone: dump writes them from the ROM once, and pack builds the
 archive (a/0/1/2) from them, which the build does.
 
-    zone_data.py dump extract/b2_us/files res/zones
-    zone_data.py pack res/zones ARCHIVE
+    zone_data.py dump extract/b2_us/files res/field/zones
+    zone_data.py pack res/field/zones ARCHIVE
 
-Each zone is res/zones/<zone>.json, named after its constant (black_city.json for ZONE_BLACK_CITY). The archive's
+Each zone is res/field/zones/<zone>.json, named after its constant (black_city.json for ZONE_BLACK_CITY). The archive's
 single entry holds the 615 headers in the order of generated/zones.txt. zone.schema.json describes each field.
 """
 import argparse
@@ -39,7 +39,7 @@ def ordered_zones() -> list[str]:
 
 
 def zone_json(header: bytes) -> dict:
-    # The entities file is the zone's events, res/events/<zone>.json, at its place in res/events/order.json
+    # The entities file is the zone's events, res/field/events/<zone>.json, at its place in res/field/events/order.json
     (map_type, npc_cache, area, matrix, scripts, init_scripts, text, *rest) = HEADER.unpack(header)
     bgm, (encounters, entities, parent, place, env, flags, cam_bound, icon, fly_x, fly_y, fly_z) = rest[:4], rest[4:]
     data = {"$schema": "zone.schema.json", "map_type": map_type, "npc_cache": npc_cache, "area": name("AREA_", area),
@@ -102,7 +102,7 @@ def pack(root: Path, output: Path):
     for zone in ordered_zones():
         path = root / file_name(zone)
         if zone not in events:
-            raise DataError(f"res/events/order.json: {zone} isn't in it")
+            raise DataError(f"res/field/events/order.json: {zone} isn't in it")
         headers.append(zone_bytes(load(path, schema), events.index(zone), label(path)))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(write_narc([b"".join(headers)]))
@@ -111,10 +111,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write res/zones/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/field/zones/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the zone header archive from res/zones/")
+    pack_parser = commands.add_parser("pack", help="build the zone header archive from res/field/zones/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

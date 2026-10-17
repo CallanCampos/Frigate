@@ -4,7 +4,7 @@
     rename_constant.py ZONE_CASTELIA_CITY_12 ZONE_CASTELIA_CITY_NARROW_STREET
 
 The name is replaced as a whole word in the lists and in the tracked sources, headers, data, scripts and docs, and a
-data file or directory named after the constant, such as res/zones/castelia_city_12.json, is renamed with it. A
+data file or directory named after the constant, such as res/field/zones/castelia_city_12.json, is renamed with it. A
 message file's IDs and its header, text/<archive>/<bank>.h, are renamed with it too. The new name must not be taken
 already. Rebuild afterwards: the build checks that nothing still uses the old name.
 """
@@ -33,27 +33,27 @@ NAMED_DATA = [
     ("items", "res/items", "ITEM_", "/"),
     ("abilities", "res/abilities", "ABILITY_", ".json"),
     ("types", "res/types", "TYPE_", ".json"),
-    ("trades", "res/trades", "TRADE_", ".json"),
+    ("trades", "res/field/trades", "TRADE_", ".json"),
     ("trainer_classes", "res/trainers/classes", "TRAINER_CLASS_", ".json"),
     ("natures", "res/natures", "NATURE_", ".json"),
-    ("places", "res/places", "PLACE_", ".json"),
-    ("field_scripts", "res/field_scripts", "SCRIPTS_", ".s"),
-    ("map_matrices", "res/map_matrices", "MAP_MATRIX_", ".json"),
-    ("areas", "res/areas", "AREA_", ".json"),
-    ("map_models", "res/map_models", "MAP_MODEL_", "/"),
-    ("map_texture_sets", "res/map_texture_sets", "MAP_TEXTURE_SET_", "/"),
-    ("field_props_exterior", "res/field_prop_models/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
-    ("field_props_exterior", "res/field_prop_textures/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
-    ("field_props_interior", "res/field_prop_models/interior", "FIELD_PROPS_INTERIOR_", "/"),
-    ("field_props_interior", "res/field_prop_textures/interior", "FIELD_PROPS_INTERIOR_", "/"),
+    ("places", "res/field/places", "PLACE_", ".json"),
+    ("field_scripts", "res/field/scripts", "SCRIPTS_", ".s"),
+    ("map_matrices", "res/field/matrices", "MAP_MATRIX_", ".json"),
+    ("areas", "res/field/areas", "AREA_", ".json"),
+    ("map_models", "res/field/maps/models", "MAP_MODEL_", "/"),
+    ("map_texture_sets", "res/field/maps/textures", "MAP_TEXTURE_SET_", "/"),
+    ("field_props_exterior", "res/field/props/exterior/models", "FIELD_PROPS_EXTERIOR_", "/"),
+    ("field_props_exterior", "res/field/props/exterior/textures", "FIELD_PROPS_EXTERIOR_", "/"),
+    ("field_props_interior", "res/field/props/interior/models", "FIELD_PROPS_INTERIOR_", "/"),
+    ("field_props_interior", "res/field/props/interior/textures", "FIELD_PROPS_INTERIOR_", "/"),
     ("tr_ai_scripts", "res/trainers/ai", "TR_AI_SCRIPT_", ".s"),
     ("text_banks", "res/text/system", "TEXT_BANK_", ".txt"),
     ("script_text_banks", "res/text/script", "SCRIPT_TEXT_", ".txt"),
     ("trainers", "res/trainers/data", "TRAINER_", ".json"),
-    ("encounters", "res/encounters", "ENCOUNTERS_", ".json"),
-    ("zones", "res/zones", "ZONE_", ".json"),
-    ("zones", "res/events", "ZONE_", ".json"),
-    ("obj_codes", "res/field_actors", "OBJ_CODE_", "/"),
+    ("encounters", "res/field/encounters", "ENCOUNTERS_", ".json"),
+    ("zones", "res/field/zones", "ZONE_", ".json"),
+    ("zones", "res/field/events", "ZONE_", ".json"),
+    ("obj_codes", "res/field/actors", "OBJ_CODE_", "/"),
     ("sound", "res/sound/sequences", "SEQ_", "/"),
     ("sound_banks", "res/sound/banks", "BANK_", "/"),
     ("sound_wave_archives", "res/sound/wave_archives", "WAVE_", "/"),
@@ -62,9 +62,9 @@ NAMED_DATA = [
 
 # The textures' directories, and the script that relinks the models that show them
 RELINKS = [
-    ("res/map_texture_sets", "tools/data/map_model_data.py", "res/map_models"),
-    ("res/field_prop_textures/exterior", "tools/data/field_prop_model_data.py", "res/field_prop_models/exterior"),
-    ("res/field_prop_textures/interior", "tools/data/field_prop_model_data.py", "res/field_prop_models/interior"),
+    ("res/field/maps/textures", "tools/data/map_model_data.py", "res/field/maps/models"),
+    ("res/field/props/exterior/textures", "tools/data/field_prop_model_data.py", "res/field/props/exterior/models"),
+    ("res/field/props/interior/textures", "tools/data/field_prop_model_data.py", "res/field/props/interior/models"),
 ]
 
 

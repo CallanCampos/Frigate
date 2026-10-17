@@ -14,9 +14,9 @@ from tools.data.datajson import value  # noqa: E402
 
 
 def find(zone):
-    path = ROOT / "res/zones" / f"{zone}.json"
+    path = ROOT / "res/field/zones" / f"{zone}.json"
     header = json.loads(path.read_text())
-    area_path = ROOT / "res/areas" / (header["area"].removeprefix("AREA_").lower() + ".json")
+    area_path = ROOT / "res/field/areas" / (header["area"].removeprefix("AREA_").lower() + ".json")
     area = json.loads(area_path.read_text())
     print(f"Zone: {path.relative_to(ROOT)}")
     print(f"Area: {area_path.relative_to(ROOT)}")
@@ -28,7 +28,7 @@ def find(zone):
         print(f"Props: {directories(props)[bundle].relative_to(ROOT)}")
         print(f"Prop textures: {directories(textures)[bundle].relative_to(ROOT)}")
     matrix = header["matrix"].removeprefix("MAP_MATRIX_").lower()
-    matrix_path = ROOT / "res/map_matrices" / f"{matrix}.json"
+    matrix_path = ROOT / "res/field/matrices" / f"{matrix}.json"
     if not matrix_path.exists():
         print(f"Map matrix: {header['matrix']} (no named matrix file)")
         return

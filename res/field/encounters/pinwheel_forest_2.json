@@ -1,0 +1,169 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_COTTONEE", 54, 54 ],
+                [ "SPECIES_SWADLOON", 54, 54 ],
+                [ "SPECIES_COTTONEE", 55, 55 ],
+                [ "SPECIES_VIGOROTH", 55, 55 ],
+                [ "SPECIES_COTTONEE", 56, 56 ],
+                [ "SPECIES_WHIRLIPEDE", 55, 55 ],
+                [ "SPECIES_VIGOROTH", 57, 57 ],
+                [ "SPECIES_WHIRLIPEDE", 57, 57 ],
+                [ "SPECIES_COTTONEE", 57, 57 ],
+                [ "SPECIES_SWADLOON", 56, 56 ],
+                [ "SPECIES_COTTONEE", 57, 57 ],
+                [ "SPECIES_SWADLOON", 56, 56 ]
+            ],
+            "white2": [
+                [ "SPECIES_PETILIL", 54, 54 ],
+                [ "SPECIES_SWADLOON", 54, 54 ],
+                [ "SPECIES_PETILIL", 55, 55 ],
+                [ "SPECIES_VIGOROTH", 55, 55 ],
+                [ "SPECIES_PETILIL", 56, 56 ],
+                [ "SPECIES_WHIRLIPEDE", 55, 55 ],
+                [ "SPECIES_VIGOROTH", 57, 57 ],
+                [ "SPECIES_WHIRLIPEDE", 57, 57 ],
+                [ "SPECIES_PETILIL", 57, 57 ],
+                [ "SPECIES_SWADLOON", 56, 56 ],
+                [ "SPECIES_PETILIL", 57, 57 ],
+                [ "SPECIES_SWADLOON", 56, 56 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_COTTONEE", 62, 62 ],
+                [ "SPECIES_SWADLOON", 62, 62 ],
+                [ "SPECIES_COTTONEE", 63, 63 ],
+                [ "SPECIES_VIGOROTH", 63, 63 ],
+                [ "SPECIES_COTTONEE", 64, 64 ],
+                [ "SPECIES_WHIRLIPEDE", 63, 63 ],
+                [ "SPECIES_VIGOROTH", 65, 65 ],
+                [ "SPECIES_WHIRLIPEDE", 65, 65 ],
+                [ "SPECIES_COTTONEE", 65, 65 ],
+                [ "SPECIES_SWADLOON", 64, 64 ],
+                [ "SPECIES_COTTONEE", 65, 65 ],
+                [ "SPECIES_SWADLOON", 64, 64 ]
+            ],
+            "white2": [
+                [ "SPECIES_PETILIL", 62, 62 ],
+                [ "SPECIES_SWADLOON", 62, 62 ],
+                [ "SPECIES_PETILIL", 63, 63 ],
+                [ "SPECIES_VIGOROTH", 63, 63 ],
+                [ "SPECIES_PETILIL", 64, 64 ],
+                [ "SPECIES_WHIRLIPEDE", 63, 63 ],
+                [ "SPECIES_VIGOROTH", 65, 65 ],
+                [ "SPECIES_WHIRLIPEDE", 65, 65 ],
+                [ "SPECIES_PETILIL", 65, 65 ],
+                [ "SPECIES_SWADLOON", 64, 64 ],
+                [ "SPECIES_PETILIL", 65, 65 ],
+                [ "SPECIES_SWADLOON", 64, 64 ]
+            ]
+        },
+        "shaking_grass": {
+            "black2": [
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_AUDINO", 64, 64 ],
+                [ "SPECIES_PANSAGE", 55, 55 ],
+                [ "SPECIES_PANSEAR", 55, 55 ],
+                [ "SPECIES_PANPOUR", 55, 55 ],
+                [ "SPECIES_AUDINO", 56, 56 ],
+                [ "SPECIES_AUDINO", 57, 57 ],
+                [ "SPECIES_SCOLIPEDE", 57, 57 ],
+                [ "SPECIES_SLAKING", 57, 57 ],
+                [ "SPECIES_WHIMSICOTT", 57, 57 ],
+                [ "SPECIES_SLAKING", 57, 57 ],
+                [ "SPECIES_WHIMSICOTT", 57, 57 ]
+            ],
+            "white2": [
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_AUDINO", 54, 54 ],
+                [ "SPECIES_PANSAGE", 55, 55 ],
+                [ "SPECIES_PANSEAR", 55, 55 ],
+                [ "SPECIES_PANPOUR", 55, 55 ],
+                [ "SPECIES_AUDINO", 56, 56 ],
+                [ "SPECIES_AUDINO", 57, 57 ],
+                [ "SPECIES_SCOLIPEDE", 57, 57 ],
+                [ "SPECIES_SLAKING", 57, 57 ],
+                [ "SPECIES_LILLIGANT", 57, 57 ],
+                [ "SPECIES_SLAKING", 57, 57 ],
+                [ "SPECIES_LILLIGANT", 57, 57 ]
+            ]
+        },
+        "surf": {
+            "black2": [
+                [ "SPECIES_BASCULIN", 45, 60 ],
+                [ "SPECIES_MARILL", 45, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ]
+            ],
+            "white2": [
+                [ "SPECIES_BASCULIN", 45, 60, 1 ],
+                [ "SPECIES_MARILL", 45, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ]
+            ]
+        },
+        "rippling_surf": {
+            "black2": [
+                [ "SPECIES_MARILL", 45, 60 ],
+                [ "SPECIES_BASCULIN", 45, 60, 1 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ],
+                [ "SPECIES_AZUMARILL", 50, 60 ],
+                [ "SPECIES_AZUMARILL", 50, 60 ]
+            ],
+            "white2": [
+                [ "SPECIES_MARILL", 45, 60 ],
+                [ "SPECIES_BASCULIN", 45, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ],
+                [ "SPECIES_AZUMARILL", 50, 60 ],
+                [ "SPECIES_AZUMARILL", 50, 60 ]
+            ]
+        },
+        "fishing": {
+            "black2": [
+                [ "SPECIES_GOLDEEN", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ]
+            ],
+            "white2": [
+                [ "SPECIES_GOLDEEN", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60, 1 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ]
+            ]
+        },
+        "rippling_fishing": {
+            "black2": [
+                [ "SPECIES_GOLDEEN", 35, 60 ],
+                [ "SPECIES_BASCULIN", 35, 60, 1 ],
+                [ "SPECIES_SEAKING", 35, 70 ],
+                [ "SPECIES_SEAKING", 45, 70 ],
+                [ "SPECIES_SEAKING", 45, 70 ]
+            ],
+            "white2": [
+                [ "SPECIES_GOLDEEN", 35, 60 ],
+                [ "SPECIES_BASCULIN", 35, 60 ],
+                [ "SPECIES_SEAKING", 35, 70 ],
+                [ "SPECIES_SEAKING", 45, 70 ],
+                [ "SPECIES_SEAKING", 45, 70 ]
+            ]
+        }
+    }
+}

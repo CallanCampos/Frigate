@@ -176,7 +176,7 @@ def library_of(source: Path) -> tuple[str, list[str]] | None:
 # Archives assembled from source, which replace their extracted counterparts in the ROM: the scripts. Each maps its path
 # under files/ to the directory of its members, one assembly file each, in archive order.
 ARCHIVES = {
-    "a/0/5/6": "res/field_scripts",  # Field scripts, see tools/script/field_script.py
+    "a/0/5/6": "res/field/scripts",  # Field scripts, see tools/script/field_script.py
     "a/1/6/9": "res/trainers/ai",  # Trainer AI scripts, see tools/script/tr_ai_script.py
 }
 
@@ -200,28 +200,28 @@ DATA_PACKS = [
     ("tools/data/item_data.py", "res/items", ["a/0/2/4"], False),  # Item data
     ("tools/data/item_icon_data.py", "res/items", ["a/0/2/5"], True),  # Item icons
     # The field actors' models: their table and their sprites' and 3D models' graphics
-    ("tools/data/field_actor_data.py", "res/field_actors", ["a/0/4/7", "a/0/4/8"], False),
+    ("tools/data/field_actor_data.py", "res/field/actors", ["a/0/4/7", "a/0/4/8"], False),
     # Trainers, their parties, and the table of their messages with its offsets
     ("tools/data/trainer_data.py", "res/trainers/data", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
     # Trainer sprites, front and back, and a/0/6/3, a copy of the back sprites
     ("tools/data/trainer_graphics.py", "res/trainers/sprites", ["a/0/7/1", "a/0/7/2", "a/0/6/3"], True),
-    ("tools/data/encounter_data.py", "res/encounters", ["a/1/2/7"], True),  # Wild encounters
-    # Zone headers, which give each zone the number of its events in res/events/order.json
-    ("tools/data/zone_data.py", "res/zones", ["a/0/1/2"], False, ["res/events"]),
-    ("tools/data/trade_data.py", "res/trades", ["a/1/6/3"], False),  # In-game trades
-    ("tools/data/map_matrix_data.py", "res/map_matrices", ["a/0/0/9"], False),  # Map matrices
+    ("tools/data/encounter_data.py", "res/field/encounters", ["a/1/2/7"], True),  # Wild encounters
+    # Zone headers, which give each zone the number of its events in res/field/events/order.json
+    ("tools/data/zone_data.py", "res/field/zones", ["a/0/1/2"], False, ["res/field/events"]),
+    ("tools/data/trade_data.py", "res/field/trades", ["a/1/6/3"], False),  # In-game trades
+    ("tools/data/map_matrix_data.py", "res/field/matrices", ["a/0/0/9"], False),  # Map matrices
     # Map models, whose GLBs show the map texture sets' PNGs, which name the textures they bind
-    ("tools/data/map_model_data.py", "res/map_models", ["a/0/0/8"], True, ["res/map_texture_sets"]),
+    ("tools/data/map_model_data.py", "res/field/maps/models", ["a/0/0/8"], True, ["res/field/maps/textures"]),
     # Field prop models, which their bundles' textures go with in the same way
-    ("tools/data/field_prop_model_data.py", "res/field_prop_models/exterior", ["a/2/2/5"], True,
-     ["res/field_prop_textures/exterior", "res/field_prop_models/field_prop_model.schema.json"]),
-    ("tools/data/field_prop_model_data.py", "res/field_prop_models/interior", ["a/2/2/6"], True,
-     ["res/field_prop_textures/interior", "res/field_prop_models/field_prop_model.schema.json"]),
-    ("tools/data/map_texture_data.py", "res/map_texture_sets", ["a/0/1/4"], True),  # Map texture PNG sources
-    ("tools/data/map_texture_data.py", "res/field_prop_textures/exterior", ["a/1/7/4"], True),
-    ("tools/data/map_texture_data.py", "res/field_prop_textures/interior", ["a/1/7/5"], True),
-    ("tools/data/area_data.py", "res/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
-    ("tools/data/light_data.py", "res/lights", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
+    ("tools/data/field_prop_model_data.py", "res/field/props/exterior/models", ["a/2/2/5"], True,
+     ["res/field/props/exterior/textures", "res/field/props/field_prop_model.schema.json"]),
+    ("tools/data/field_prop_model_data.py", "res/field/props/interior/models", ["a/2/2/6"], True,
+     ["res/field/props/interior/textures", "res/field/props/field_prop_model.schema.json"]),
+    ("tools/data/map_texture_data.py", "res/field/maps/textures", ["a/0/1/4"], True),  # Map texture PNG sources
+    ("tools/data/map_texture_data.py", "res/field/props/exterior/textures", ["a/1/7/4"], True),
+    ("tools/data/map_texture_data.py", "res/field/props/interior/textures", ["a/1/7/5"], True),
+    ("tools/data/area_data.py", "res/field/areas", ["a/0/1/3"], False),  # Areas, a file of records rather than an archive
+    ("tools/data/light_data.py", "res/lighting", ["a/0/6/0", "a/0/6/1"], False),  # Field and battle lighting
     # The town map's places, whose texts are messages of town_map.txt
     ("tools/data/town_map_data.py", "res/town_map", ["a/0/8/5"], True, ["res/text/system/town_map.txt"]),
     # The battle facilities' trainers and Pokémon; the Battle Subway's are also the Trial House's
@@ -238,8 +238,8 @@ DATA_PACKS = [
     ("tools/data/facility_data.py", "res/trainers/facilities/pwt_masters", ["a/2/5/5", "a/2/5/6", "a/2/5/4"], False,
      ["res/trainers/facilities"]),
     ("tools/data/facility_data.py", "res/trainers/facilities/pwt_rental", ["a/2/5/7"], False, ["res/trainers/facilities"]),
-    # The zones' events, in the order of res/events/order.json
-    ("tools/data/event_data.py", "res/events", ["a/1/2/6"], False),
+    # The zones' events, in the order of res/field/events/order.json
+    ("tools/data/event_data.py", "res/field/events", ["a/1/2/6"], False),
 ]
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
 # tutor bits (tools/data/species_data.py). A packer also depends on the modules of tools/ that it imports
@@ -279,7 +279,7 @@ def script_imports(script: str) -> list[str]:
 
 # The data in JSON that the text takes messages from, with \from{...} lines (tools/text/text_sources.py)
 TEXT_DATA_DIRS = ["res/pokemon", "res/moves", "res/items", "res/trainers/data", "res/abilities", "res/types",
-                  "res/trades", "res/trainers/facilities", "res/trainers/classes", "res/natures", "res/places"]
+                  "res/field/trades", "res/trainers/facilities", "res/trainers/classes", "res/natures", "res/field/places"]
 
 # Text archives built from source, by tools/text/text_data.py: each maps its path under files/ to the directory of its
 # message files, one text file each, in archive order

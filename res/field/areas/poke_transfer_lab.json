@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_POKE_TRANSFER_LAB",
+    "texture_set": "MAP_TEXTURE_SET_POKE_TRANSFER_LAB",
+    "srt_animation": 34,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 132,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}
