@@ -46,11 +46,21 @@ void func_ov182_021b80f4(int seq);
 // Reads the console's Wi-Fi settings, and frees them
 void func_ov182_021b77dc(void);
 void func_ov182_021b780c(void);
+// Erases the connections of the console's Wi-Fi settings and makes a new Wi-Fi ID
+void func_ov182_021b7ea0(void);
 
 // Copies row src of the palette to BG palette row dest of the main screen at the next VBlank
 void func_ov182_021b7014(const void *palette, int src, int dest);
 // Loads the sub screen's BG 1 of one of the layouts at the next VBlank
 void func_ov182_021b87d0(int layout);
+
+// A dialog over the main screen with the message (as DWCUtilScreen_Start shows it) and the buttons of a layout.
+// func_ov182_021b8f14 is the button chosen, -2 until one is; func_ov182_021b8eec closes the dialog, and
+// func_ov182_021b8f24 is TRUE until it has closed
+void func_ov182_021b8cf0(int msgIndex, int layout, int flag, int slot, int value);
+void func_ov182_021b8eec(void);
+int func_ov182_021b8f14(void);
+BOOL func_ov182_021b8f24(void);
 
 // The first screens of the connection settings and of the options
 void func_ov182_021b536c(void);

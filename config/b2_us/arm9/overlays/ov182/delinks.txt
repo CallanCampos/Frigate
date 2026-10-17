@@ -205,3 +205,9 @@ lib/dwcutilui/src/dwc_util_main_menu.c:
     .rodata     start:0x021bff94 end:0x021bffd0
     .data       start:0x021c0bec end:0x021c0dd4
     .bss        start:0x021c40bc end:0x021c40c4
+
+lib/dwcutilui/src/dwc_util_info_menu.c:
+    complete
+    .text       start:0x021aeafc end:0x021af25c
+    .data       start:0x021c0dd4 end:0x021c0e58
+    .bss        start:0x021c40c4 end:0x021c40c8
