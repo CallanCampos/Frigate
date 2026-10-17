@@ -1,5 +1,6 @@
 // The DS's two screens as the port draws them (port/gfx/screens.h)
 #include "gfx/screens.h"
+#include "gfx/capture.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/gx_display.h"
@@ -48,6 +49,9 @@ void port_screens_draw_line(int line) {
         }
         port_vram_fill_source(&sSources[engine], engine);
         port_ds2d_render_line(&sSources[engine], engine, line, out);
+        if (engine == 0) {
+            port_capture_draw_line(&sSources[0], line);
+        }
         if (!display.lcdOn) {
             Fill(out, COLOR_BLACK);
         } else if (engine == 1 && !display.enginePowered[1]) {
@@ -58,9 +62,13 @@ void port_screens_draw_line(int line) {
 
 void port_screens_attach(void) {
     memset(sSources, 0, sizeof(sSources));
+    port_capture_reset();
+    // What the screens show before the game draws a line: white, as the firmware leaves them (the engines on with
+    // DISPCNT 0, which melonDS's direct boot gives too). The game starts inside line 0 (port/hal/os), so the first
+    // frame shows this on line 0
     for (int screen = 0; screen < 2; screen++) {
         for (int line = 0; line < PORT_SCREEN_HEIGHT; line++) {
-            Fill(&sScreens[screen][line * PORT_SCREEN_WIDTH], COLOR_BLACK);
+            Fill(&sScreens[screen][line * PORT_SCREEN_WIDTH], COLOR_WHITE);
         }
     }
     port_os_scanline_hook = port_screens_draw_line;

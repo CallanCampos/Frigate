@@ -1,8 +1,9 @@
 // The DS's two screens as the port draws them (PLAN.md §4.5, §4.6). At the start of each visible line the OS core's
 // scanline hook (port/hal/os/port_os.h) draws that line of both 2D engines with the CPU reference renderer
 // (port/gfx/ref/ds2d.h), from the registers, palettes, OAM and VRAM as the game left them (port_vram_fill_source), and
-// sends each engine's line to the screen that POWCNT1 gives it (port/hal/gx/gx_display.h). The program presents the
-// screens at each VBlank, when all 192 lines of the frame are drawn. Plain C types only.
+// sends each engine's line to the screen that POWCNT1 gives it (port/hal/gx/gx_display.h); engine A's line also goes
+// to display capture (port/gfx/capture.h). The program presents the screens at each VBlank, when all 192 lines of the
+// frame are drawn. Plain C types only.
 #ifndef PORT_GFX_SCREENS_H
 #define PORT_GFX_SCREENS_H
 

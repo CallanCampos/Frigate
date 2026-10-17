@@ -89,7 +89,7 @@ void port_ds2d_set_obj_cycle_budget(int cycles, int cycles_hblank_free);
 // Display capture's source A ("Graphics", BG+3D+OBJ after the colour effects, before master brightness) for the line
 // last rendered on engine A, or NULL when that line didn't compose it: it is composed in display mode 1, or in any
 // mode while DISPCAPCNT bit 31 is set. Each pixel has 6-bit channels, red in bits 16-21, green in bits 8-13 and blue
-// in bits 0-5. Capture itself (DISPCAPCNT, the VRAM writes) is not implemented yet; this is where it would read
+// in bits 0-5. Display capture itself (DISPCAPCNT, the VRAM writes) is port/gfx/capture.c, which reads it here
 const uint32_t *port_ds2d_capture_source_a(void);
 
 #endif

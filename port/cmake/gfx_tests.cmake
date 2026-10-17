@@ -1,4 +1,4 @@
-# Tests of the CPU reference 2D renderer (port/gfx/ref), none of which needs a ROM: the unit tests, the same tests
+# Tests of the CPU reference 2D renderer (port/gfx/ref) and display capture, none of which needs a ROM: the unit tests, the same tests
 # under AddressSanitizer and UndefinedBehaviorSanitizer, and the renderer's timing at -O2. Each builds the renderer's
 # sources itself, so that each can have its own flags; the game program gets them through port_gfx
 set(port_gfx_ref_sources "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ref/ds2d.c")
@@ -14,6 +14,21 @@ target_compile_options(port_test_gfx_ds2d_sanitized PRIVATE
     -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
 target_link_options(port_test_gfx_ds2d_sanitized PRIVATE -fsanitize=address,undefined)
 add_test(NAME gfx_ds2d_sanitized COMMAND port_test_gfx_ds2d_sanitized)
+
+# Display capture (port/gfx/capture.c), with the platform layer's VRAM and register services stubbed by the test
+foreach(variant IN ITEMS plain sanitized)
+    set(target port_test_gfx_capture_${variant})
+    add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/gfx/test_capture.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/gfx/capture.c")
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME gfx_capture_${variant} COMMAND ${target})
+endforeach()
 
 # The timing is always measured at -O2, whatever the configuration (a later -O wins). The bench is always built, so
 # that it compiles on every host, but it is a test only with PORT_GFX_TIMING_GATE on: wall-clock limits depend on the
