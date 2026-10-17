@@ -1,0 +1,17 @@
+pbwinput 1
+# The title sequence for the oracle comparison (port/tools/oracle/README.md, "The title sequence"; oracle.py title and
+# title-check): power-on through the boot screens and the Game Freak logo to the opening, the title, and START to the
+# start menu. On game frames, so that each press reaches both programs on the same pass of the game's main loop: the
+# DS's start-up, its loading and its movies, which run on a clock, take it more frames than the port to get anywhere.
+version b2_us
+# A press in the opening, which skips it to the title on both: the pass during which GFL's frame count is 1100 reads it,
+# and the title starts at count 1115 on both
+1100 START
+1101 -
+# The title hides its layers after 1,740 of its frames (count 2877) and shows the 3D on the top screen; START brings
+# them back
+3000 START
+3001 -
+# START leaves for the start menu, which shows from count 3249
+3100 START
+3101 -

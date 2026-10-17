@@ -26,11 +26,57 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: oracle comparisons from power-on to the start menu
+
+- **Upstream:** `e484d5011` (merge of PR #353), as in the last entry.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `check_mwcc_neutral.py`: all 3,140 file and
+  version pairs give the same MWCC token stream as upstream's `e484d5011`.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2, and Black 2 under ASan and UBSan; not pushed,
+  so no CI run.
+- **Tests:** T0 as above. T2: 211 of 211 `ctest` tests pass (2 skipped without the oracle: `oracle_boot`,
+  `oracle_title`), among them the run directory's 65 checks plain and sanitized, `oracle_compare`'s 30 tests, the asm
+  oracle's new products test (4 functions, 32,000 cases each build, every overlap of the arguments, against the ROM's
+  code) and `oracle_title_hashes` (354 frames, 495 screens without 3D against the oracle's hashes). Sanitized:
+  `app_run_dir`, `oracle_compare`, `replay_start_menu`, `oracle_title_hashes` and the smoke test pass; the 3,600 frames
+  of the title sequence give the same hashes as the plain build, with the one misaligned read already known
+  (`g2d_CellAnimation.c:33`, NitroSystem reading packed file data). T4: `oracle.py title`, the port against melonDS
+  1.1 from power-on through the boot screens, the Game Freak logo, the opening skipped with START, the title (3D on the
+  bottom screen, then the top) and START to the start menu: Black 2, 3,581 of 3,600 frames match (1,476 exact at 6
+  bits, 2,105 with 3D within the tolerance), White 2, 3,575 (1,480 and 2,095); the rest are known differences
+  (`port/tools/oracle/README.md`). With no input, Black 2's first 4,185 frames (the whole opening) match. T3, T5's
+  nightly runs, T6, T7 not yet.
+- **Tiers:** unchanged since the last entry (no decomp C changed).
+- **Trap stubs:** unchanged, 581 function stubs and 67 data placeholders; the title sequence's 3,600 frames reach none
+  in either version.
+- **64-bit warnings:** unchanged: the change outside `port/` only adds `#ifndef PLATFORM_PC` guards.
+- **Work done:**
+  - Phase 2's last exit criterion: oracle comparisons pass within tolerance, for both versions
+    (`port/tests/oracle/title_<version>.pbwinput`, `oracle.py title` and `title-check`, ctest `oracle_title` and
+    `oracle_title_hashes`).
+  - The program writes its own run directory for compare.py (`--run-dir`, `--run-screens`, `port/app/run_dir.c`):
+    `frames.tsv` with GFL's frame count and the game frame at every frame hook, PNG files at the frames of a list.
+    `oracle.py port` runs the port once.
+  - A 3D fix: the decomp's `MTX_Concat33`, `MTX_Concat43`, `MTX_Concat44` and `MTX_MultVec43` read an argument after
+    storing over it when the result replaces it, which the original never does, so on a host the title's camera
+    looked elsewhere (`MAT3_RotationEulerZYX`). `port/hal/fx` has versions in the original's order, checked against
+    the ROM's code; game change, Platform; a decomp finding.
+  - compare.py's sequence alignment pairs on the game's frame count across the 3D and takes the nearest match, so the
+    title's 3D pairs with the oracle's after the movies; `--brief`.
+  - Settled with evidence (README, "Game frames and video frames"): START held doesn't skip the opening on melonDS or
+    on the port (a press does, on the same pass on both); the oracle's 242 frames of start-up give oracle frame =
+    port frame + 242 through the boot screens, and game frames part where the game waits on a clock (the movies) and
+    line up again at a press.
+- **Next:** New Game's intro (overlay 294): 64-bit fixes for the particle system's work buffers and for the Pokémon
+  parameter setters, which take pointers as `u32`.
+- **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download Play) only
+  matter from phase 7.
+
 ## 2026-10-17: the title screen and the start menu, natively
 
 - **Upstream:** `e484d5011` (merge of PR #353), which brings the ITCM's ClAct renderers (PR #352, decomp work this
   session did to unblock the title screen).
-- **Port:** `PORT_SHA`.
+- **Port:** `570db24f4`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `check_mwcc_neutral.py`: all 3,140 file and
   version pairs give the same MWCC token stream as upstream's `e484d5011`.
 - **Host build:** arm64 macOS, RelWithDebInfo and unoptimized (`-fgnu89-inline` made the unoptimized build link); CI

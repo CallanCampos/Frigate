@@ -72,3 +72,30 @@ add_test(NAME oracle_boot
             --work "${CMAKE_BINARY_DIR}/oracle-check"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(oracle_boot PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1200)
+
+# The title sequence (port/tests/oracle/title_<version>.pbwinput: the boot screens, the Game Freak logo, the opening
+# skipped with START, the title with its 3D on either screen, START to the start menu), held to the oracle in two ways
+# (port/tools/oracle/README.md, "The title sequence"):
+# - oracle_title_hashes, every build: the port alone, its screens without 3D at the frames that
+#   port/tests/oracle/title_<version>.tsv keeps, against the oracle's hashes there. It proves those screens are the
+#   oracle's at 6 bits a channel, and that the port reaches each moment of the sequence at the same frame as when the
+#   reference was written; it can't judge a screen with 3D, nor the frames between the ones it keeps. Skipped (77)
+#   without the ROM; only for a version that has a reference
+# - oracle_title, with the oracle built: both programs, every frame of the port but the known differences compared, the
+#   3D within compare.py's tolerance; a failure keeps the runs and the difference images and says where. Skipped (77)
+#   without the oracle or the ROM
+if(EXISTS "${port_oracle_tests}/title_${PORT_VERSION}.tsv")
+    add_test(NAME oracle_title_hashes
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" title-check
+                --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --work "${CMAKE_BINARY_DIR}/oracle-title-check"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_title_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 600)
+endif()
+add_test(NAME oracle_title
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" title
+            --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_title PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)

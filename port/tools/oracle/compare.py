@@ -11,7 +11,7 @@ in both runs), image (the offset at which most of the port's frames show exactly
 needs the oracle's PNG files for the frames in reach).
 
     compare.py screens ORACLE PORT [--offset N | --align counter|first-change|image|sequence] [--frames LIST]
-                       [--report DIR] [--depth 6|5] [--tolerance FRACTION] [--pixel-tolerance STEPS]
+                       [--report DIR] [--depth 6|5] [--tolerance FRACTION] [--pixel-tolerance STEPS] [--brief]
     compare.py memory ORACLE PORT [--offset N | --align ...] [--labels A,B,...]
     compare.py align ORACLE PORT
     compare.py hash PNG...
@@ -22,7 +22,7 @@ frame (frames.tsv's top_3d and bottom_3d) passes when few of its pixels differ b
 each pixel a one-pixel shift (rasterizers differ at polygon edges); a screen without 3D must be exact. Without a
 picture on one side, frames.tsv's hashes decide a screen without 3D at 6 bits; any other screen is not compared.
 --report writes, for each frame that isn't exact, an image of the oracle's screens, the port's and the differences
-side by side.
+side by side; --brief lists, and draws, only the frames that don't match.
 
 Exit statuses: 0 when every pair matches, 1 when something differs or couldn't be compared, 2 for bad arguments or
 runs it can't read. Standard library only.
@@ -400,26 +400,71 @@ SEQUENCE_DEPTH = 5
 
 
 def sequence_mapping(oracle: Run, port: Run) -> tuple[dict[int, int], dict[int, str]]:
-    """Pairs each port frame, in order, with the first oracle frame from the last pair's on that shows the same
-    screens (at SEQUENCE_DEPTH where both have PNG files, else by frames.tsv's hashes); a port frame that none shows
-    pairs as far after the last pair as it is (noted "extrapolated")"""
-    depth = SEQUENCE_DEPTH if oracle.captured() else None
+    """Pairs each port frame, in order, with an oracle frame from the last pair's on that shows the same screens (at
+    SEQUENCE_DEPTH when both runs have a PNG file of every frame they list, else by frames.tsv's hashes, which a run
+    with pictures of some frames only has for the others): of those, the nearest to where the port
+    frame is expected, as many game frames after the last pair as it is (the first oracle frame where the counter
+    reaches the value) when both runs have the counter, else as many frames. A port frame that none shows (a screen
+    with 3D, or a difference) pairs with where it is expected, and is noted "extrapolated". While the port's picture
+    stays the same, it is expected from the last pair; once it changes, from the end of the last pair's picture on
+    each, the last port frame and the last oracle frame that showed it: the DS spends more frames than the port on a
+    still picture while it loads or waits on a clock, so what comes after a still starts where the still ends on each.
+    Nearest, not first: a picture the oracle showed earlier (a flash of white, a black screen) isn't taken for a later
+    one when frames in between had no match"""
+    oracle_pictures, port_pictures = set(oracle.captured()), set(port.captured())
+    pictured = oracle_pictures and set(oracle.frames) <= oracle_pictures and set(port.frames) <= port_pictures
+    depth = SEQUENCE_DEPTH if pictured else None
     oracle_keys = picture_keys(oracle, depth)
     port_keys = picture_keys(port, depth)
     by_key: dict[tuple, list[int]] = {}
     for number in sorted(oracle_keys):
         by_key.setdefault(oracle_keys[number], []).append(number)
+    frames_with_counter: dict[int, list[int]] = {}
+    for number in sorted(oracle.frames):
+        value = oracle.frames[number].counter
+        if value is not None:
+            frames_with_counter.setdefault(value, []).append(number)
+
+    def counter(run: Run, number: int) -> int | None:
+        frame = run.frames.get(number)
+        return None if frame is None else frame.counter
+
+    def expected(number: int, anchor: tuple[int, int]) -> int:
+        port_anchor, oracle_anchor = anchor
+        port_count, port_anchor_count = counter(port, number), counter(port, port_anchor)
+        oracle_anchor_count = counter(oracle, oracle_anchor)
+        if None not in (port_count, port_anchor_count, oracle_anchor_count):
+            wanted = oracle_anchor_count + port_count - port_anchor_count
+            # The first frame where the count has the value, after the anchor and before the count starts again
+            for candidate in frames_with_counter.get(wanted, []):
+                if candidate > oracle_anchor:
+                    return candidate
+        return oracle_anchor + number - port_anchor
+
     mapping: dict[int, int] = {}
     notes: dict[int, str] = {}
     last = None
     for number in sorted(port_keys):
-        later = [o for o in by_key.get(port_keys[number], []) if last is None or o >= last[1]]
+        key = port_keys[number]
+        target = None
+        if last is not None:
+            if key == port_keys[last[0]]:
+                anchor = last
+            else:
+                # The end of the oracle's run of frames that show the last pair's picture
+                end = last[1]
+                while oracle_keys.get(end + 1) == oracle_keys[last[1]]:
+                    end += 1
+                anchor = (last[0], end)
+            target = expected(number, anchor)
+        later = [o for o in by_key.get(key, []) if last is None or o >= last[1]]
         if later:
-            mapping[number] = later[0]
-            last = (number, later[0])
-        else:
-            mapping[number] = number if last is None else last[1] + number - last[0]
-            notes[number] = "extrapolated"
+            choice = later[0] if target is None else min(later, key=lambda o: (abs(o - target), o))
+            mapping[number] = choice
+            last = (number, choice)
+            continue
+        notes[number] = "extrapolated"
+        mapping[number] = number if target is None else target
     return mapping, notes
 
 
@@ -624,13 +669,15 @@ def command_screens(args) -> int:
             all_differing += [index + screen * SCREEN_PIXELS for index in differing]
             all_beyond += [index + screen * SCREEN_PIXELS for index in beyond]
         results.append(ScreenResult(port_frame, oracle_frame, three_d, checks, note))
-        if args.report and all_differing:
+        if args.report and all_differing and not (args.brief and results[-1].verdict == "pass"):
             write_report(os.path.join(args.report, f"diff_port{port_frame:06d}_oracle{oracle_frame:06d}.png"), a, b,
                          all_differing, all_beyond)
 
     labels = {"exact": "exact", "pass": "pass", "fail": "FAIL", "unknown": "not compared"}
     print("port   oracle  3D      result")
     for r in results:
+        if args.brief and r.verdict in ("exact", "pass"):
+            continue
         kind = {(False, False): "-", (True, False): "top", (False, True): "bottom", (True, True): "both"}[r.three_d]
         verdict = labels[r.verdict]
         if r.failure:
@@ -643,7 +690,9 @@ def command_screens(args) -> int:
         print(f"{r.port_frame:6d} {r.oracle_frame:6d}  {kind:6s}  {verdict}")
     failed = sum(1 for r in results if r.verdict == "fail")
     unknown = sum(1 for r in results if r.verdict == "unknown")
-    print(f"{len(results) - failed - unknown} of {len(results)} frames match" +
+    exact = sum(1 for r in results if r.verdict == "exact")
+    print(f"{len(results) - failed - unknown} of {len(results)} frames match ({exact} exact, "
+          f"{len(results) - failed - unknown - exact} with 3D within the tolerance)" +
           (f"; {unknown} not compared" if unknown else ""))
     return 1 if failed or unknown else 0
 
@@ -751,6 +800,8 @@ def main(argv: list[str] | None = None) -> int:
     screens = commands.add_parser("screens", help="compare the screens")
     pairing(screens)
     screens.add_argument("--report", help="write difference images here")
+    screens.add_argument("--brief", action="store_true",
+                         help="list, and with --report draw, only the frames that don't match")
     screens.add_argument("--tolerance", type=float, default=DEFAULT_TOLERANCE,
                          help="screens with 3D: the fraction of the screen's pixels allowed beyond the pixel tolerance")
     screens.add_argument("--pixel-tolerance", type=int, default=DEFAULT_PIXEL_TOLERANCE,
