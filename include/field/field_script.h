@@ -252,6 +252,8 @@ BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env);
 BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env);
+// fldeff_ochiba.c: the player sinking into a pile of leaves
+BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env);

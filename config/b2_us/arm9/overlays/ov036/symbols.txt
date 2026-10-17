@@ -5591,7 +5591,7 @@ data_ov036_021d47be kind:data(any) addr:0x021d47be
 data_ov036_021d47c0 kind:data(any) addr:0x021d47c0
 data_ov036_021d4818 kind:data(any) addr:0x021d4818
 data_ov036_021d48e0 kind:data(any) addr:0x021d48e0
-data_ov036_021d48f4 kind:data(any) addr:0x021d48f4
+OCHIBA_TASK_VTABLE kind:data(any) addr:0x021d48f4
 data_ov036_021d4908 kind:data(any) addr:0x021d4908
 data_ov036_021d4920 kind:data(any) addr:0x021d4920
 HABITAT_LIST_HEADERS kind:data(any) addr:0x021d49b8

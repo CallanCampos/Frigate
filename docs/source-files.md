@@ -590,7 +590,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_goout_effect_data.c` | `0x021c8808`–`0x021c8954` | 9 | complete | string at `0x021d5728` |
 | `resort_mapcreate.c` | `0x021c8954`–`0x021c8c34` | 6 | partial | string at `0x021d5744` |
 | `scrcmd_hidden_hollow.c` | `0x021c8c34`–`0x021c944c` | 19 | partial | descriptive |
-| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | partial | string at `0x021d5758` |
+| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | complete | string at `0x021d5758` |
 | `scrcmd_ochiba.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | string at `0x021d5768` |
 
 ### Overlay 50
