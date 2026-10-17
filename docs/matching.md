@@ -706,6 +706,11 @@ Same code, other `sp` offsets or frame size.
   asm's order. G3D's `3dsmax.c` writes `(fx64)result->sinR * offsetS + (fx64)result->cosR * offsetT` in
   `calcTexMtx3dsMaxRT_` for `smull` of `cosR` and `offsetT`, then `smlal` of `sinR` and `offsetS`; its `SR_` and
   `SRT_` and `xsi.c`'s `RT_` and `SRT_` match the same way.
+- A `u64` written to a 64-bit hardware register in one store (`reg_CP_DIV_NUMER = sum;`, `nitro/cp.h`'s
+  `volatile u64`) and the same value written as two 32-bit halves (`(u32)sum`, then `(u32)(sum >> 32)`) keep its low
+  and high words in each other's registers. libVCT's `VCT_FilterFrame` (`vct_dsp.c`) builds its sum of squares in
+  `ip` and `lr`, low and high, as the original does, only with the one store; its denominator stays two 32-bit stores
+  of `count` and 0, since a 64-bit `= count` moves `count` and `minusInput` to other registers.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
@@ -947,14 +952,14 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
-- `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is: `p_sta_sub.c` and
-  `ctvt_talk.c` compile to the same bytes under either, so neither tells an order the scheduler chose from one the
-  code generator did. `#pragma optimization_level 1` does change the order: there `ctvt_talk.c`'s
-  `CtvtTalk_UpdateRecord` stores its call's stack arguments first, then sets `r0` to `r3`, each constant built at its
-  use, while level 2 already gives the order of `-O4`. The `-O4` scheduler reorders that sequence and keeps it where
-  it rates two instructions equal: there the store of `pos` (`str r0, [sp]`) ties with the `0x800`'s `movs r2, #2`,
-  because the `0xc000` built next reuses `r0`, so ours stores first, and the original, which builds the constant
-  first, generated it first. With a one-instruction last argument (`5` for `0xc000`) the same call builds the
+- `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is, and its ARM code:
+  `p_sta_sub.c`, `ctvt_talk.c` and libVCT's ARM `vct_dsp.c` compile to the same bytes under either, so neither tells an
+  order the scheduler chose from one the code generator did. `#pragma optimization_level 1` does change the order: there
+  `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` stores its call's stack arguments first, then sets `r0` to `r3`, each constant
+  built at its use, while level 2 already gives the order of `-O4`. The `-O4` scheduler reorders that sequence and keeps
+  it where it rates two instructions equal: there the store of `pos` (`str r0, [sp]`) ties with the `0x800`'s
+  `movs r2, #2`, because the `0xc000` built next reuses `r0`, so ours stores first, and the original, which builds the
+  constant first, generated it first. With a one-instruction last argument (`5` for `0xc000`) the same call builds the
   constant first.
 - A constant stored through `p + (a - b)` is loaded before the subtraction, into a fresh register. When the original
   subtracts first and then builds the constant in the freed register, the pointer was advanced in a statement of its
@@ -2561,7 +2566,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
   tables defined just above `CtvtDraw_UpdateDraw`, their first user. With every table above the first function the
-  colors sort after the 2-byte tables again.
+  colors sort after the 2-byte tables again. `.data` is written out the same way: libVCT's `vct_dsp.c` has its 16-byte
+  `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
+  above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
+  `VCT_InitEcho`, their only user.
 - Two statics reached from one literal, at `[r0]` and `[r0, #4]`, ask for `-ipa file` before anything else: without it
   each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
   NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics

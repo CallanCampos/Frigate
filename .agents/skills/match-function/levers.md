@@ -40,6 +40,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   local of the other signedness (`int pos = index;`). (matching.md: "A 32-bit parameter passed on the stack")
 - A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build
   the sum with `+=`, one product a statement. (matching.md: "built up with `+=`")
+- A `u64`'s low and high words in each other's registers before it goes to a 64-bit hardware register: write it in
+  one `u64` store, not two 32-bit halves. (matching.md: "64-bit hardware register in one store")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
   with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
@@ -712,8 +714,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The values a function already uses as immediates")
 - Function-local statics are listed last, after the tentative `.bss` statics, by function in reverse order; one in a
   `static inline` is listed where the inline is defined. (matching.md: "joins the size sort at the end of the file")
-- An object at the head of the shared `.rodata`, larger than the ones after it and packed against them: `-ipa
-  function`, which sorts the data waiting at each function on its own; define the tables just before their first user.
+- An object at the head of the shared `.rodata` or `.data`, larger than the ones after it and packed against them:
+  `-ipa function`, which sorts the data waiting at each function on its own; define the tables just before their
+  first user.
   A game file can't take a per-file flag yet. (matching.md: "Under `-ipa function` MWCC writes out")
 - A `static const` whose address is never taken is folded and not emitted. If the original has it, it isn't static.
   An unreferenced word after a file's larger tables is the next file's first object.
@@ -759,7 +762,7 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
 
-`#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb code, so they can't single out the
+`#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb or ARM code, so they can't single out the
 scheduler; `#pragma optimization_level 1` shows each constant built at its use (matching.md: "leave 1.1p1's Thumb
 code as it is").
 
