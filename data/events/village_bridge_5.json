@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 35,
+            "model": "OBJ_CODE_PKMN_BREEDER_F",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 131,
+            "model": "OBJ_CODE_131",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 42,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 316,
+            "model": "OBJ_CODE_316",
             "movement": 44,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 34,
+            "model": "OBJ_CODE_PKMN_BREEDER_M",
             "movement": 15,
             "type": 0,
             "flag": 0,

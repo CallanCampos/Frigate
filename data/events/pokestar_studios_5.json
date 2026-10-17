@@ -155,7 +155,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -174,7 +174,7 @@
         },
         {
             "id": 1,
-            "model": 72,
+            "model": "OBJ_CODE_POLICEMAN",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -193,7 +193,7 @@
         },
         {
             "id": 2,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -212,7 +212,7 @@
         },
         {
             "id": 3,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -231,7 +231,7 @@
         },
         {
             "id": 4,
-            "model": 25,
+            "model": "OBJ_CODE_25",
             "movement": 3,
             "type": 0,
             "flag": 0,

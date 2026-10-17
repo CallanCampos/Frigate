@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -252,7 +252,7 @@
         },
         {
             "id": 3,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -271,7 +271,7 @@
         },
         {
             "id": 4,
-            "model": 153,
+            "model": "OBJ_CODE_PRESCHOOLER_M",
             "movement": 20,
             "type": 1,
             "flag": 0,
@@ -290,7 +290,7 @@
         },
         {
             "id": 5,
-            "model": 154,
+            "model": "OBJ_CODE_PRESCHOOLER_F",
             "movement": 8,
             "type": 1,
             "flag": 0,
@@ -309,7 +309,7 @@
         },
         {
             "id": 6,
-            "model": 23,
+            "model": "OBJ_CODE_NURSERY_AIDE",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -328,7 +328,7 @@
         },
         {
             "id": 7,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 14,
             "type": 1,
             "flag": 0,
@@ -347,7 +347,7 @@
         },
         {
             "id": 8,
-            "model": 37,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 85,
             "type": 2,
             "flag": "EVENT_FLAG_0x038e",
@@ -366,7 +366,7 @@
         },
         {
             "id": 9,
-            "model": 36,
+            "model": "OBJ_CODE_PKMN_RANGER_M",
             "movement": 85,
             "type": 2,
             "flag": "EVENT_FLAG_0x038e",
@@ -385,7 +385,7 @@
         },
         {
             "id": 10,
-            "model": 37,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 85,
             "type": 2,
             "flag": "EVENT_FLAG_0x038e",
@@ -404,7 +404,7 @@
         },
         {
             "id": 11,
-            "model": 36,
+            "model": "OBJ_CODE_PKMN_RANGER_M",
             "movement": 85,
             "type": 2,
             "flag": "EVENT_FLAG_0x038e",
@@ -423,7 +423,7 @@
         },
         {
             "id": 12,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 16,
             "type": 1,
             "flag": 0,
@@ -442,7 +442,7 @@
         },
         {
             "id": 13,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x044f",
@@ -461,7 +461,7 @@
         },
         {
             "id": 14,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0450",
@@ -480,7 +480,7 @@
         },
         {
             "id": 15,
-            "model": 210,
+            "model": "OBJ_CODE_210",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0451",
@@ -499,7 +499,7 @@
         },
         {
             "id": 16,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0452",
@@ -518,7 +518,7 @@
         },
         {
             "id": 17,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0453",
@@ -537,7 +537,7 @@
         },
         {
             "id": 18,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0454",
@@ -556,7 +556,7 @@
         },
         {
             "id": 19,
-            "model": 216,
+            "model": "OBJ_CODE_216",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0455",
@@ -575,7 +575,7 @@
         },
         {
             "id": 20,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0456",
@@ -594,7 +594,7 @@
         },
         {
             "id": 21,
-            "model": 291,
+            "model": "OBJ_CODE_291",
             "movement": 5,
             "type": 0,
             "flag": "EVENT_FLAG_0x02bd",
@@ -613,7 +613,7 @@
         },
         {
             "id": 22,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 5,
             "type": 0,
             "flag": "EVENT_FLAG_0x02be",
@@ -632,7 +632,7 @@
         },
         {
             "id": 23,
-            "model": 223,
+            "model": "OBJ_CODE_223",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02bf",
@@ -651,7 +651,7 @@
         },
         {
             "id": 24,
-            "model": 14,
+            "model": "OBJ_CODE_14",
             "movement": 0,
             "type": 0,
             "flag": 0,

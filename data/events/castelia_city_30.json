@@ -45,7 +45,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 74,
+            "model": "OBJ_CODE_SCIENTIST_F_46",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -64,7 +64,7 @@
         },
         {
             "id": 1,
-            "model": 16,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -83,7 +83,7 @@
         },
         {
             "id": 2,
-            "model": 53,
+            "model": "OBJ_CODE_CLERK_F",
             "movement": 0,
             "type": 0,
             "flag": 0,

@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x03c4",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 345,
+            "model": "OBJ_CODE_345",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03c4",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 346,
+            "model": "OBJ_CODE_346",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 72,
+            "model": "OBJ_CODE_POLICEMAN",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -137,7 +137,7 @@
         },
         {
             "id": 7,
-            "model": 320,
+            "model": "OBJ_CODE_320",
             "movement": 11,
             "type": 0,
             "flag": 0,
@@ -156,7 +156,7 @@
         },
         {
             "id": 8,
-            "model": 53,
+            "model": "OBJ_CODE_CLERK_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -175,7 +175,7 @@
         },
         {
             "id": 9,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -194,7 +194,7 @@
         },
         {
             "id": 10,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -213,7 +213,7 @@
         },
         {
             "id": 11,
-            "model": 72,
+            "model": "OBJ_CODE_POLICEMAN",
             "movement": 0,
             "type": 0,
             "flag": 0,

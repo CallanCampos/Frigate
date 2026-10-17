@@ -35,7 +35,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -54,7 +54,7 @@
         },
         {
             "id": 1,
-            "model": 54,
+            "model": "OBJ_CODE_HARLEQUIN_233",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -73,7 +73,7 @@
         },
         {
             "id": 2,
-            "model": 185,
+            "model": "OBJ_CODE_185",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -92,7 +92,7 @@
         },
         {
             "id": 3,
-            "model": 185,
+            "model": "OBJ_CODE_185",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -111,7 +111,7 @@
         },
         {
             "id": 4,
-            "model": 185,
+            "model": "OBJ_CODE_185",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -130,7 +130,7 @@
         },
         {
             "id": 5,
-            "model": 185,
+            "model": "OBJ_CODE_185",
             "movement": 0,
             "type": 0,
             "flag": 0,

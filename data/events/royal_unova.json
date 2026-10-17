@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 75,
+            "model": "OBJ_CODE_75",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 75,
+            "model": "OBJ_CODE_75",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 75,
+            "model": "OBJ_CODE_75",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 75,
+            "model": "OBJ_CODE_75",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 75,
+            "model": "OBJ_CODE_75",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 29,
             "type": 0,
             "flag": 0,
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 18,
+            "model": "OBJ_CODE_18",
             "movement": 39,
             "type": 0,
             "flag": 0,
@@ -137,7 +137,7 @@
         },
         {
             "id": 7,
-            "model": 14,
+            "model": "OBJ_CODE_14",
             "movement": 43,
             "type": 0,
             "flag": 0,
@@ -156,7 +156,7 @@
         },
         {
             "id": 8,
-            "model": 16,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
             "movement": 28,
             "type": 0,
             "flag": 0,
@@ -175,7 +175,7 @@
         },
         {
             "id": 9,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 18,
             "type": 0,
             "flag": 0,
@@ -194,7 +194,7 @@
         },
         {
             "id": 10,
-            "model": 169,
+            "model": "OBJ_CODE_WORK_07",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -213,7 +213,7 @@
         },
         {
             "id": 11,
-            "model": 170,
+            "model": "OBJ_CODE_WORK_08",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -232,7 +232,7 @@
         },
         {
             "id": 12,
-            "model": 168,
+            "model": "OBJ_CODE_WORK_06",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -251,7 +251,7 @@
         },
         {
             "id": 13,
-            "model": 166,
+            "model": "OBJ_CODE_WORK_04",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -270,7 +270,7 @@
         },
         {
             "id": 14,
-            "model": 165,
+            "model": "OBJ_CODE_WORK_03",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -289,7 +289,7 @@
         },
         {
             "id": 15,
-            "model": 167,
+            "model": "OBJ_CODE_WORK_05",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -308,7 +308,7 @@
         },
         {
             "id": 16,
-            "model": 163,
+            "model": "OBJ_CODE_WORK_01",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -327,7 +327,7 @@
         },
         {
             "id": 17,
-            "model": 164,
+            "model": "OBJ_CODE_WORK_02",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -346,7 +346,7 @@
         },
         {
             "id": 18,
-            "model": 176,
+            "model": "OBJ_CODE_WORK_0E",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -365,7 +365,7 @@
         },
         {
             "id": 19,
-            "model": 175,
+            "model": "OBJ_CODE_WORK_0D",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -384,7 +384,7 @@
         },
         {
             "id": 20,
-            "model": 162,
+            "model": "OBJ_CODE_WORK_00",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -403,7 +403,7 @@
         },
         {
             "id": 21,
-            "model": 174,
+            "model": "OBJ_CODE_WORK_0C",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -422,7 +422,7 @@
         },
         {
             "id": 22,
-            "model": 173,
+            "model": "OBJ_CODE_WORK_0B",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -441,7 +441,7 @@
         },
         {
             "id": 23,
-            "model": 171,
+            "model": "OBJ_CODE_WORK_09",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -460,7 +460,7 @@
         },
         {
             "id": 24,
-            "model": 172,
+            "model": "OBJ_CODE_WORK_0A",
             "movement": 0,
             "type": 0,
             "flag": 0,

@@ -215,7 +215,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04ef",
@@ -234,7 +234,7 @@
         },
         {
             "id": 1,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04f1",
@@ -253,7 +253,7 @@
         },
         {
             "id": 2,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04f2",
@@ -272,7 +272,7 @@
         },
         {
             "id": 3,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04f3",
@@ -291,7 +291,7 @@
         },
         {
             "id": 4,
-            "model": 36,
+            "model": "OBJ_CODE_PKMN_RANGER_M",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -310,7 +310,7 @@
         },
         {
             "id": 5,
-            "model": 47,
+            "model": "OBJ_CODE_BATTLE_GIRL",
             "movement": 7,
             "type": 1,
             "flag": 0,
@@ -329,7 +329,7 @@
         },
         {
             "id": 6,
-            "model": 37,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -348,7 +348,7 @@
         },
         {
             "id": 7,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 7,
             "type": 1,
             "flag": 0,
@@ -367,7 +367,7 @@
         },
         {
             "id": 8,
-            "model": 325,
+            "model": "OBJ_CODE_325",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x0363",
@@ -386,7 +386,7 @@
         },
         {
             "id": 9,
-            "model": 326,
+            "model": "OBJ_CODE_326",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0364",
@@ -405,7 +405,7 @@
         },
         {
             "id": 10,
-            "model": 325,
+            "model": "OBJ_CODE_325",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x0363",
@@ -424,7 +424,7 @@
         },
         {
             "id": 11,
-            "model": 325,
+            "model": "OBJ_CODE_325",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x0363",
@@ -443,7 +443,7 @@
         },
         {
             "id": 12,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0363",

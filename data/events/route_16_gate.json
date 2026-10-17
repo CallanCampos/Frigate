@@ -15,7 +15,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 185,
+            "model": "OBJ_CODE_185",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -34,7 +34,7 @@
         },
         {
             "id": 1,
-            "model": 185,
+            "model": "OBJ_CODE_185",
             "movement": 0,
             "type": 0,
             "flag": 0,

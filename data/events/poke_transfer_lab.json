@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 74,
+            "model": "OBJ_CODE_SCIENTIST_F_46",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 6,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 74,
+            "model": "OBJ_CODE_SCIENTIST_F_46",
             "movement": 17,
             "type": 0,
             "flag": 0,

@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 131,
+            "model": "OBJ_CODE_131",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 32,
+            "model": "OBJ_CODE_VETERAN_M",
             "movement": 0,
             "type": 0,
             "flag": 0,

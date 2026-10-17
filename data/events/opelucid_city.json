@@ -245,7 +245,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 229,
+            "model": "OBJ_CODE_229",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031a",
@@ -264,7 +264,7 @@
         },
         {
             "id": 1,
-            "model": 302,
+            "model": "OBJ_CODE_302",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031b",
@@ -283,7 +283,7 @@
         },
         {
             "id": 2,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031c",
@@ -302,7 +302,7 @@
         },
         {
             "id": 3,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031c",
@@ -321,7 +321,7 @@
         },
         {
             "id": 4,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031c",
@@ -340,7 +340,7 @@
         },
         {
             "id": 5,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031c",
@@ -359,7 +359,7 @@
         },
         {
             "id": 6,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031c",
@@ -378,7 +378,7 @@
         },
         {
             "id": 7,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031c",
@@ -397,7 +397,7 @@
         },
         {
             "id": 8,
-            "model": 182,
+            "model": "OBJ_CODE_182",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031d",
@@ -416,7 +416,7 @@
         },
         {
             "id": 9,
-            "model": 182,
+            "model": "OBJ_CODE_182",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031e",
@@ -435,7 +435,7 @@
         },
         {
             "id": 10,
-            "model": 182,
+            "model": "OBJ_CODE_182",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x031e",
@@ -454,7 +454,7 @@
         },
         {
             "id": 11,
-            "model": 355,
+            "model": "OBJ_CODE_355",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0319",
@@ -473,7 +473,7 @@
         },
         {
             "id": 12,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -492,7 +492,7 @@
         },
         {
             "id": 13,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -511,7 +511,7 @@
         },
         {
             "id": 14,
-            "model": 44,
+            "model": "OBJ_CODE_GENTLEMAN",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -530,7 +530,7 @@
         },
         {
             "id": 15,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -549,7 +549,7 @@
         },
         {
             "id": 16,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -568,7 +568,7 @@
         },
         {
             "id": 17,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -587,7 +587,7 @@
         },
         {
             "id": 18,
-            "model": 162,
+            "model": "OBJ_CODE_WORK_00",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e1",
@@ -606,7 +606,7 @@
         },
         {
             "id": 19,
-            "model": 163,
+            "model": "OBJ_CODE_WORK_01",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x040a",

@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 44,
+            "model": "OBJ_CODE_GENTLEMAN",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 3,
             "type": 0,
             "flag": 0,

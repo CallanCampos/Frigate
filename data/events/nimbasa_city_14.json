@@ -15,7 +15,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -34,7 +34,7 @@
         },
         {
             "id": 1,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 2,
             "type": 0,
             "flag": 0,

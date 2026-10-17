@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 312,
+            "model": "OBJ_CODE_312",
             "movement": 6,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 13,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 318,
+            "model": "OBJ_CODE_318",
             "movement": 44,
             "type": 0,
             "flag": 0,

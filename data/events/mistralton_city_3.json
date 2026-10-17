@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 33,
+            "model": "OBJ_CODE_VETERAN_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 43,
+            "model": "OBJ_CODE_WAITRESS",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 105,
+            "model": "OBJ_CODE_105",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0300",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 249,
+            "model": "OBJ_CODE_249",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0301",
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 228,
+            "model": "OBJ_CODE_228",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02ff",
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 71,
+            "model": "OBJ_CODE_PILOT",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 76,
+            "model": "OBJ_CODE_76",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -137,7 +137,7 @@
         },
         {
             "id": 7,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -156,7 +156,7 @@
         },
         {
             "id": 8,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -175,7 +175,7 @@
         },
         {
             "id": 9,
-            "model": 130,
+            "model": "OBJ_CODE_130",
             "movement": 20,
             "type": 0,
             "flag": 0,
@@ -194,7 +194,7 @@
         },
         {
             "id": 10,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 0,
             "type": 0,
             "flag": 0,

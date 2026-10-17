@@ -95,7 +95,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 37,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
             "movement": 7,
             "type": 1,
             "flag": 0,
@@ -114,7 +114,7 @@
         },
         {
             "id": 1,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04c9",

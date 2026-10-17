@@ -175,7 +175,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x02aa",
@@ -194,7 +194,7 @@
         },
         {
             "id": 1,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x053c",
@@ -213,7 +213,7 @@
         },
         {
             "id": 2,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x053f",
@@ -232,7 +232,7 @@
         },
         {
             "id": 3,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0542",
@@ -251,7 +251,7 @@
         },
         {
             "id": 4,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0546",
@@ -270,7 +270,7 @@
         },
         {
             "id": 5,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -289,7 +289,7 @@
         },
         {
             "id": 6,
-            "model": 32,
+            "model": "OBJ_CODE_VETERAN_M",
             "movement": 9,
             "type": 1,
             "flag": 0,
@@ -308,7 +308,7 @@
         },
         {
             "id": 7,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 8,
             "type": 1,
             "flag": 0,
@@ -327,7 +327,7 @@
         },
         {
             "id": 8,
-            "model": 51,
+            "model": "OBJ_CODE_NURSE",
             "movement": 16,
             "type": 1,
             "flag": 0,
@@ -346,7 +346,7 @@
         },
         {
             "id": 9,
-            "model": 67,
+            "model": "OBJ_CODE_WORKER_44",
             "movement": 7,
             "type": 0,
             "flag": 0,
@@ -365,7 +365,7 @@
         },
         {
             "id": 10,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 10,
             "type": 0,
             "flag": 0,

@@ -55,7 +55,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 187,
+            "model": "OBJ_CODE_187",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -74,7 +74,7 @@
         },
         {
             "id": 1,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -93,7 +93,7 @@
         },
         {
             "id": 2,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -112,7 +112,7 @@
         },
         {
             "id": 3,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -131,7 +131,7 @@
         },
         {
             "id": 4,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -150,7 +150,7 @@
         },
         {
             "id": 5,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -169,7 +169,7 @@
         },
         {
             "id": 6,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -188,7 +188,7 @@
         },
         {
             "id": 7,
-            "model": 227,
+            "model": "OBJ_CODE_227",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03e9",
@@ -207,7 +207,7 @@
         },
         {
             "id": 8,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,

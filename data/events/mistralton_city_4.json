@@ -15,7 +15,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 23,
+            "model": "OBJ_CODE_NURSERY_AIDE",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -34,7 +34,7 @@
         },
         {
             "id": 1,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 3,
             "type": 0,
             "flag": 0,

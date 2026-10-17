@@ -95,7 +95,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -114,7 +114,7 @@
         },
         {
             "id": 1,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x035e",
@@ -133,7 +133,7 @@
         },
         {
             "id": 2,
-            "model": 347,
+            "model": "OBJ_CODE_347",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0381",
@@ -152,7 +152,7 @@
         },
         {
             "id": 3,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0403",
@@ -171,7 +171,7 @@
         },
         {
             "id": 4,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": 0,

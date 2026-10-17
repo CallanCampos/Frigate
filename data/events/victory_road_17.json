@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 8195,
+            "model": "OBJ_CODE_MODEL_3",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": 8195,
+            "model": "OBJ_CODE_MODEL_3",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": 32,
+            "model": "OBJ_CODE_VETERAN_M",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -252,7 +252,7 @@
         },
         {
             "id": 3,
-            "model": 33,
+            "model": "OBJ_CODE_VETERAN_F",
             "movement": 14,
             "type": 1,
             "flag": 0,
@@ -271,7 +271,7 @@
         },
         {
             "id": 4,
-            "model": 30,
+            "model": "OBJ_CODE_ACE_TRAINER_M",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -290,7 +290,7 @@
         },
         {
             "id": 5,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 46,
             "type": 1,
             "flag": 0,
@@ -309,7 +309,7 @@
         },
         {
             "id": 6,
-            "model": 184,
+            "model": "OBJ_CODE_PSYCHIC_F",
             "movement": 9,
             "type": 1,
             "flag": 0,
@@ -328,7 +328,7 @@
         },
         {
             "id": 7,
-            "model": 183,
+            "model": "OBJ_CODE_PSYCHIC_M",
             "movement": 38,
             "type": 1,
             "flag": 0,
@@ -347,7 +347,7 @@
         },
         {
             "id": 8,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0526",

@@ -185,7 +185,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 16,
             "type": 1,
             "flag": 0,
@@ -204,7 +204,7 @@
         },
         {
             "id": 1,
-            "model": 62,
+            "model": "OBJ_CODE_BIKER",
             "movement": 20,
             "type": 13,
             "flag": 0,
@@ -223,7 +223,7 @@
         },
         {
             "id": 2,
-            "model": 62,
+            "model": "OBJ_CODE_BIKER",
             "movement": 44,
             "type": 13,
             "flag": 0,
@@ -242,7 +242,7 @@
         },
         {
             "id": 3,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 7,
             "type": 1,
             "flag": 0,
@@ -261,7 +261,7 @@
         },
         {
             "id": 4,
-            "model": 62,
+            "model": "OBJ_CODE_BIKER",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -280,7 +280,7 @@
         },
         {
             "id": 5,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 17,
             "type": 1,
             "flag": 0,
@@ -299,7 +299,7 @@
         },
         {
             "id": 6,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04eb",
@@ -318,7 +318,7 @@
         },
         {
             "id": 7,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04e9",
@@ -337,7 +337,7 @@
         },
         {
             "id": 8,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04ec",
@@ -356,7 +356,7 @@
         },
         {
             "id": 9,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04ed",
@@ -375,7 +375,7 @@
         },
         {
             "id": 10,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04ea",

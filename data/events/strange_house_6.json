@@ -45,7 +45,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0382",

@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 105,
+            "model": "OBJ_CODE_105",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0395",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 4631,
+            "model": "OBJ_CODE_POKEMON_AZELF",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0394",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 4629,
+            "model": "OBJ_CODE_POKEMON_UXIE",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0394",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 4630,
+            "model": "OBJ_CODE_POKEMON_MESPRIT",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0394",

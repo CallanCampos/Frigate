@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 47,
+            "model": "OBJ_CODE_BATTLE_GIRL",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 30,
+            "model": "OBJ_CODE_ACE_TRAINER_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02ee",

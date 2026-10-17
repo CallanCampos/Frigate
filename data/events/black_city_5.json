@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 77,
+            "model": "OBJ_CODE_77",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03f9",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 77,
+            "model": "OBJ_CODE_77",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03fb",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 77,
+            "model": "OBJ_CODE_77",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03f8",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 77,
+            "model": "OBJ_CODE_77",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03fa",
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 44,
+            "model": "OBJ_CODE_GENTLEMAN",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 25,
+            "model": "OBJ_CODE_25",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -137,7 +137,7 @@
         },
         {
             "id": 7,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -156,7 +156,7 @@
         },
         {
             "id": 8,
-            "model": 26,
+            "model": "OBJ_CODE_POKEFAN_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -175,7 +175,7 @@
         },
         {
             "id": 9,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -194,7 +194,7 @@
         },
         {
             "id": 10,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -213,7 +213,7 @@
         },
         {
             "id": 11,
-            "model": 23,
+            "model": "OBJ_CODE_NURSERY_AIDE",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -232,7 +232,7 @@
         },
         {
             "id": 12,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 0,
             "type": 0,
             "flag": 0,
