@@ -224,3 +224,8 @@ lib/dwc/src/gp/gpiUnique.c:
     complete
     .text       start:0x0217b6e8 end:0x0217b820
     .data       start:0x02188e9c end:0x02188eec
+
+lib/dwc/src/gp/gpiUtility.c:
+    complete
+    .text       start:0x0217b820 end:0x0217bb70
+    .data       start:0x02188eec end:0x02188f9c
