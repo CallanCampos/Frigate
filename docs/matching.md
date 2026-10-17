@@ -444,6 +444,11 @@ Same instructions, registers swapped.
   each use (`add r0, sp, #0x2c; ldrh`), as the original does; `CalcWarpTransferAddend` ("Switching `u32`/`s32`"
   below) is the same case. Its index also needs `(talk->waveX + 1) * size`: with `size` first, its load goes to
   another register and is copied into the `muls`'s.
+- A constant step subtracted from an `fx32` through a pointer was converted to a `long`, the SDK's `fx32`, and the
+  conversion sets the registers: `mcss.c`'s `MCSS_DrawQuad` ends with `*z -= cond ? -0x100L : 0x100L;`. With `int`
+  steps the 0x140 field offset (reloaded, and turned into the 0x100 by `subs #0x40`) and the step go to `r1` and the
+  flag word and `*z` to `r0`, the original's registers swapped. A `long *z` parameter matches as well, but the
+  caller's `fx32` is then passed as another type. `FX32_ONE` is the same case ("`FX32_ONE` is an `int` constant").
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
@@ -602,7 +607,10 @@ Same instructions, registers swapped.
 
 - A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
   declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
-  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there.
+  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there. An
+  expression written at two uses is shared as such a temporary: `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` gets the
+  original's `sp+4`, below its loop's temporaries, with `frame >> FX32_SHIFT` written at both uses, where an
+  `int first` local sits above them.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
   `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
@@ -1212,6 +1220,12 @@ Same instructions, scheduled in another order.
   through `r1` (`ldr r1, =...; ldrsh r3, [r1, r4]`, with `mov r5, r0` in an earlier load's delay) only with one `to`
   local assigned before each of the three; assigned in the first block alone, or in two of the three, it compiled
   like the read in the call, with the copy of `wk` sunk to the `bl`.
+- A sum from a three-register `adds` whose only use is the copy that Thumb's two-operand `adds rd, #imm8` needs
+  is moved down to that copy, across calls and branches and inside loops, with both operands kept live (spilled)
+  to get there. No optimization pragma, -O level or scope stops it; `+ 7` (the three-operand immediate form) or a
+  second use of the sum keeps it where it is written. `arc_tool.c`'s `ArchiveMoveImageTop` writes
+  `fimgOffset = fntbOffset + value;` before a read and `fimgOffset += 8;` after it, and is 4 bytes short for it:
+  the original stores the sum where it is written and adds the 8 to its spill slot.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
   between, where a local of their type is computed where it is written: `g3d_text_draw.c`'s
   `G3DTextDraw_StringToTexture` computes `size` before `GX_BeginLoadTex()`, as the original does, only as a
@@ -1229,6 +1243,15 @@ Same instructions, scheduled in another order.
   only with the table indexed at each use; `const s16 *messages = sFMissionAppDrawMessages;` gives the same registers
   with the load after the spill. A branch that loads the address again from the pool, as one does there, hints that
   no local held it.
+- A pointer local initialized with a global's address, `T *p = &g;`, is copy-propagated into its uses, and the
+  address is then shared in the first saved register free from its first use. Initialized with a member's address
+  (`&s.member`, even at offset 0), through a cast (even to its own type), or held as a `void *`, it stays a
+  variable from its declaration, and when no saved register is free over that whole range it is loaded from the
+  literal pool again at each use rather than spilled. `printsys.c`'s `GFL_TextRendererDrawToBitmap` and
+  `GFL_TextRendererDrawToBitmapEx` load `&g_TextRenderer` again before each call in the original; a
+  `TextRenderer *` local under `#pragma opt_propagation off` matches both, and so does each of those spellings
+  (their row says why none is kept). A pointer local and that pragma tell whether a global's address was held in a
+  local the compiler did not propagate.
 - A local array's element is never loaded again after a call, even once the array's address has been passed to
   another function, so an element loaded both before and after a call (`ldr r1, [r6, r7]` around
   `bl BtlvEffect_GetGauge`) was read through a pointer. `btlv_effvm.c`'s `BtlvEffvm_CmdGauge` matches with
@@ -2093,6 +2116,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is
   `return Mystery_CreateGiftPokemon(gift, heapId, gameData);`, the maker overlay 197 also inlines: written out with
   a result variable and `goto`, the result got a stack slot of its own and the frame grew.
+- A conditional branch to the epilogue beyond Thumb's `b<cond>` range goes through a `b` within range that jumps to
+  the same label. `return;` statements share the return label, while the end of an `if` body and a `break` out of a
+  `switch` jump to the label after that statement, even when both labels end at the same epilogue. An early
+  return that takes the wrong one of two `b` trampolines shows which nearby exits were `return` and which were
+  `break` or the end of an `if`. `printsys.c`'s `func_02022464` matches with `if (stream->paused) { return; }`
+  before its switch, whose `b` the callback's early `return` above it then shares, and `break;` ending its cases;
+  with the switch inside `if (!stream->paused) { ... }` and the running case ending in `return;`, that `bne` took
+  a later `b` the case's `return` had put on the return label.
 - Identical statements in different branches are merged, so a branch that jumps into the middle of another block had
   the same code in the source. For example, `if (a) { x = 3; y = 19; } else { x = 0; y = 19; }` compiles differently
   from `x = a ? 3 : 0; y = 19;`. A run of jumps to one store, as in the start menu's `StartMenu_MoveCursor`, is the
@@ -2367,6 +2398,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
   stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
+- Inside a loop, MWCC rewrites the reads `p[v]`, `p[v + 1]` and `p[v + 2]` of a 32-bit `v` into one `p + v * 4` kept
+  in a register and the offsets 4 and 8 in the loads, whatever the loop's size and whether or not `v` is an induction
+  variable. Either `opt_loop_invariants` or `opt_strength_reduction` does it, so only both pragmas off stop it. A
+  pointer conversion around the element's whole address, `*(f32 *)&words[v + 1]`, hides the address from that pass,
+  and each read keeps its own `(v + 1) << 2`; a cast on the base alone, `((f32 *)buffer)[v + 1]`, or a same-width cast
+  of the index does not. `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` matches so with a `u32 *` buffer of floats,
+  which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
