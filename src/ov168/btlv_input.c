@@ -2499,7 +2499,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
     ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_2);
     func_0204bfd4(work->moveUnit, FALSE);
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4 ? TRUE : FALSE; i++) {
         if (param->moves[i] != MOVE_NONE) {
             HeapID heapId = HEAPID_TAIL(work->heapId);
             type = PML_MoveGetParam(param->moves[i], MOVE_PARAM_TYPE);
