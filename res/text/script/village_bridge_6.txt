@@ -1,0 +1,6 @@
+VillageBridge6_Text_WomanLivingHereGroup = A woman was living here with\na group of Patrat.{be01}\nI wonder where they went.
+VillageBridge6_Text_SeeingWatchyWatchogTv = Seeing Watchy Watchog on TV\nreminds me of those Patrat.
+VillageBridge6_Text_WhyDontWeMove = Why don't we move into this house?{be01}\nThose musicians are always nearby.\nIsn't that nice?
+VillageBridge6_Text_LearnedAllNamesMusicians = I learned all the names\nof the musicians!{be01}\nDerleth, Aickman,\nRusso, and Koontz.
+VillageBridge6_Text_WhatThinkWeveBeen = What do you think? We've been indecisive\nfor two years. Let's live here, shall we?
+VillageBridge6_Text_MaybeWeShouldMove = Maybe we should move in.{be01}\nWe don't even know when the villa\nin Undella Town will be finished...

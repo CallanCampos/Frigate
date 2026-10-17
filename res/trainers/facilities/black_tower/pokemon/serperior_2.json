@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SERPERIOR",
+    "moves": [ "MOVE_LEAF_TORNADO", "MOVE_HIDDEN_POWER", "MOVE_MIRROR_COAT", "MOVE_CAPTIVATE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_SASSY",
+    "item": "ITEM_OCCA_BERRY",
+    "form": 0
+}

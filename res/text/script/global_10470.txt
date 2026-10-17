@@ -1,0 +1,7 @@
+Global10470_Text_ClickSoundReverberates = Click!{be01}\nThe sound reverberates.
+Global10470_Text_DullSoundCameFrom = A dull sound came from far away.
+Global10470_Text_DullSoundEchoed = A dull sound echoed.
+Global10470_Text_DullSoundClose = The dull sound is close!
+Global10470_Text_ItsTorrentWater = It's a torrent of water!
+Global10470_Text_WallMovedCanProceed = The wall moved, and you can proceed now!
+\pad{48}

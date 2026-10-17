@@ -1,9 +1,0 @@
-StatNames_Text_Hp = HP
-StatNames_Text_Attack = Attack
-StatNames_Text_Defense = Defense
-StatNames_Text_Speed = Speed
-StatNames_Text_SpAtk = Sp. Atk
-StatNames_Text_SpDef = Sp. Def
-StatNames_Text_Empty =        \x{ffff}
-StatNames_Text_Empty_2 =      \x{ffff}
-StatNames_Text_Empty_3 =       \x{ffff}

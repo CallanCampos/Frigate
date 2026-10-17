@@ -2,7 +2,7 @@
 #define POKEBW2_CONSTANTS_TOWN_MAP_H
 
 // The pseudo flags the town map asks about besides event flags (func_ov012_02160f74), which the
-// data/town_map/<zone>.json files name
+// res/town_map/<zone>.json files name
 #define TOWNMAP_FLAG_ONE_SHOT_DR 0xf000
 #define TOWNMAP_FLAG_UNITY_TOWER_VISITED 0xf001
 // Set while the Plasma Frigate is at its own place on the map (EVENT_WORK_PLASMA_FRIGATE_LOCATION is 3)

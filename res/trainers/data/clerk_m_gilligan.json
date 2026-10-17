@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Gilligan",
+    "class": "TRAINER_CLASS_CLERK_M_67",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PIDOVE",
+            "form": 0,
+            "level": 17,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I've got to reach my quota.\nThat's why I'm challenging you.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ohhh... I lost, but I've also come up with\na brilliant proposal!"
+        },
+        {
+            "type": 2,
+            "text": "As part of the Battle Company, we office\nworkers have to complete many Pokémon{be00}\nbattles and fulfill our quotas!"
+        }
+    ]
+}

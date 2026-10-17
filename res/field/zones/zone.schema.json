@@ -1,0 +1,96 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A zone's header: res/field/zones/<zone>.json",
+    "description": "One zone's header, 0x30 bytes, which ZoneData_GetHeader returns and the ZoneData_ and GetZone functions read. tools/data/zone_data.py packs them in the order of generated/zones.txt into the single entry of archive a/0/1/2. A string value is the name of a constant from generated/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "map_type", "npc_cache", "area", "matrix", "scripts", "text", "bgm", "encounters", "enc_slot",
+        "parent", "place", "place_display", "weather", "projection", "camera", "transition", "battle_bg", "cycling",
+        "escape_rope", "fly_from", "cycle_surf_bgm", "entralink_warp", "cam_bound", "name_icon", "easy_level", "fly"
+    ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "map_type": { "$ref": "#/$defs/u8", "description": "GetZoneMapType" },
+        "npc_cache": { "$ref": "#/$defs/u8", "description": "The NPC info cache index" },
+        "area": { "type": [ "string", "integer" ], "x-constant": "AREA_", "minimum": 0, "maximum": 65535, "description": "The area, an AREA_* constant (generated/areas.txt): its textures and buildings" },
+        "matrix": { "type": "string", "x-constant": "MAP_MATRIX_", "description": "The map matrix, a MAP_MATRIX_* constant, res/field/matrices/<name>.json" },
+        "scripts": {
+            "type": "string", "x-constant": "SCRIPTS_",
+            "description": "The zone's field script file, a SCRIPTS_* constant, res/field/scripts/<name>.s"
+        },
+        "init_scripts": {
+            "type": "string", "x-constant": "SCRIPTS_",
+            "description": "Left out, as in every zone, it is the script file after scripts, the zone's SCRIPTS_INIT_*; nothing reads it"
+        },
+        "text": {
+            "type": "string", "x-constant": "SCRIPT_TEXT_",
+            "description": "The zone's script message file, a SCRIPT_TEXT_* constant, res/text/script/<name>.txt"
+        },
+        "bgm": {
+            "description": "The music (SEQ_*), or an object with the music of each season",
+            "anyOf": [
+                { "$ref": "#/$defs/sequence" },
+                {
+                    "type": "object", "additionalProperties": false,
+                    "required": [ "spring", "summer", "autumn", "winter" ],
+                    "properties": {
+                        "spring": { "$ref": "#/$defs/sequence" },
+                        "summer": { "$ref": "#/$defs/sequence" },
+                        "autumn": { "$ref": "#/$defs/sequence" },
+                        "winter": { "$ref": "#/$defs/sequence" }
+                    }
+                }
+            ]
+        },
+        "encounters": {
+            "type": [ "string", "null" ], "x-constant": "ENCOUNTERS_",
+            "description": "The wild encounter table, an ENCOUNTERS_* constant, or null for none"
+        },
+        "enc_slot": {
+            "type": "integer", "minimum": 0, "maximum": 7,
+            "description": "The zone's 3-bit slot in a save word, 6 for none"
+        },
+        "parent": { "type": "string", "x-constant": "ZONE_", "description": "The zone this one belongs to, a ZONE_* constant" },
+        "place": {
+            "type": "string", "x-constant": "PLACE_",
+            "description": "The place, a PLACE_* constant, whose name res/field/places/ has"
+        },
+        "place_display": { "type": "integer", "minimum": 0, "maximum": 63, "description": "How the place name is shown" },
+        "weather": { "type": "integer", "minimum": 0, "maximum": 63, "description": "The default weather" },
+        "projection": {
+            "type": "integer", "minimum": 0, "maximum": 7,
+            "description": "ZoneData_GetObjectProjectionMatrixType"
+        },
+        "camera": { "type": "integer", "minimum": 0, "maximum": 127, "description": "The default camera" },
+        "transition": { "type": "integer", "minimum": 0, "maximum": 31, "description": "The effect of entering the map" },
+        "battle_bg": { "type": "integer", "minimum": 0, "maximum": 31, "description": "The battle background" },
+        "cycling": { "type": "boolean", "description": "Whether the zone allows cycling" },
+        "escape_rope": { "type": "boolean", "description": "Whether the zone allows Escape Rope" },
+        "fly_from": { "type": "boolean", "description": "Whether the player can fly from the zone" },
+        "cycle_surf_bgm": { "type": "boolean" },
+        "entralink_warp": { "type": "boolean" },
+        "flag11": {
+            "type": "boolean",
+            "description": "Left out, as in every zone, it is set; nothing reads it"
+        },
+        "cam_bound": { "$ref": "#/$defs/u16", "description": "The camera boundary, 65535 for none" },
+        "name_icon": { "type": "integer", "minimum": 0, "maximum": 8191, "description": "The icon of the place name" },
+        "easy_level": { "type": "integer", "minimum": 0, "maximum": 7, "description": "The level adjustment of Easy Mode" },
+        "fly": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "description": "Where flying lands: a grid position, or a rail position (component, front and side) for a zone with rails",
+            "properties": {
+                "x": { "$ref": "#/$defs/s32" },
+                "y": { "$ref": "#/$defs/s32" },
+                "z": { "$ref": "#/$defs/s32" }
+            }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "s32": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "sequence": { "type": [ "string", "integer" ], "x-constant": "SEQ_", "minimum": 0, "maximum": 65535 }
+    }
+}

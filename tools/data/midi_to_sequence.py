@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Convert a standard MIDI file into a sound sequence's text, sequence.s, to add or replace a song or a sound.
 
-    midi_to_sequence.py SONG.mid data/sound/sequences/bgm/my_song/sequence.s
+    midi_to_sequence.py SONG.mid res/sound/sequences/bgm/my_song/sequence.s
 
 Each MIDI channel that plays notes becomes a track, the first of them track 0, which allocates and opens the others.
 Time is converted to the game's 48 ticks a quarter note. Notes are written as the game's sequences write them: the
@@ -11,7 +11,8 @@ expression (11), modulation depth (1) and pitch bend are kept. A marker named lo
 editors' and DS tools' convention) loop every track from the one to the other; without them the song ends.
 
 Program numbers pick instruments of the sequence's bank (its data.json's "bank"), not General MIDI ones, so set them
-in the MIDI file to the bank's instruments. Check the sequence in the game or an emulator after converting it.
+in the MIDI file to the bank's instruments. A channel without notes is left out, with its controllers, and what is set
+before the loop isn't set again when it loops. Check the sequence in the game or an emulator after converting it.
 """
 import argparse
 import struct
@@ -64,7 +65,7 @@ def read_midi(data: bytes) -> tuple[int, list[tuple[int, int, str, tuple]]]:
                 length, position = read_var(data, position + 1)
                 payload = data[position:position + length]
                 position += length
-                if meta == 0x51:
+                if meta == 0x51 and len(payload) == 3 and int.from_bytes(payload, "big"):
                     events.append((tick, len(events), "tempo", (int.from_bytes(payload, "big"),)))
                 elif meta in (0x06, 0x01):
                     events.append((tick, len(events), "marker", (payload.decode("latin-1").strip().lower(),)))
@@ -112,29 +113,38 @@ def convert(midi: bytes) -> str:
         song_end = loop_end
     lines = []
     for track, channel in enumerate(channels):
-        # Each track's commands at their ticks: settings first, then notes, whose lengths come from their note-offs
+        # Each track's commands at their ticks: settings first, then notes, whose lengths come from their note-offs.
+        # A key played again while it's held is a note of its own, ended by the first note-off; a note still held at
+        # the song's end or its loop's ends there
         timeline: dict[int, list[str]] = {}
-        held: dict[int, tuple[int, int]] = {}
+        held: dict[int, list[tuple[int, int]]] = {}
+
+        def add_note(key: int, start: int, velocity: int, at: int):
+            length = max(1, min(at, song_end) - start)
+            timeline.setdefault(start, []).append(f"note {key_name(key)}, {velocity}, {length}")
+
         for tick, _, kind, values in events:
             at = ticks(tick)
-            if loop_end is not None and at > loop_end:
+            if loop_end is not None and at > loop_end and kind != "off":
                 continue
             if kind == "tempo" and track == 0:
                 timeline.setdefault(at, []).append(f"tempo {round(60_000_000 / values[0])}")
             if kind in ("tempo", "marker") or values[0] != channel:
                 continue
             if kind == "on":
-                held[values[1]] = (at, values[2])
-            elif kind == "off" and values[1] in held:
-                start, velocity = held.pop(values[1])
-                length = max(1, min(at, song_end) - start)
-                timeline.setdefault(start, []).append(f"note {key_name(values[1])}, {velocity}, {length}")
+                held.setdefault(values[1], []).append((at, values[2]))
+            elif kind == "off" and held.get(values[1]):
+                start, velocity = held[values[1]].pop(0)
+                add_note(values[1], start, velocity, at)
             elif kind == "program":
                 timeline.setdefault(at, []).insert(0, f"program {values[1]}")
             elif kind == "control" and values[1] in CONTROLLERS:
                 timeline.setdefault(at, []).insert(0, f"{CONTROLLERS[values[1]]} {values[2]}")
             elif kind == "bend":
                 timeline.setdefault(at, []).insert(0, f"pitch_bend {max(-128, min(127, values[1] // 64))}")
+        for key, notes in held.items():
+            for start, velocity in notes:
+                add_note(key, start, velocity, song_end)
         lines.append(f"track_{track:02d}:")
         if track == 0:
             lines.append(f"    alloc_tracks {sum(1 << number for number in range(len(channels))):#06x}")
@@ -152,6 +162,9 @@ def convert(midi: bytes) -> str:
                 now = at
             lines += [f"    {command}" for command in timeline[at]]
         if loop_start is not None and f"track_{track:02d}_loop:" not in lines:
+            if loop_start > now:
+                lines.append(f"    rest {loop_start - now}")
+                now = loop_start
             lines.append(f"track_{track:02d}_loop:")
         if song_end > now:
             lines.append(f"    rest {song_end - now}")

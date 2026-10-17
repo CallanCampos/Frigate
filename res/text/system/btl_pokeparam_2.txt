@@ -1,0 +1,8 @@
+BtlPokeparam2_Text_Empty = {0201:1}/{0201:2}/{0201:0}
+BtlPokeparam2_Text_Empty_2 =               \x{ffff}
+BtlPokeparam2_Text_Empty_3 =               \x{ffff}
+BtlPokeparam2_Text_WantDisplayMusicalPhoto = Do you want to display your Musical Photo\nin the Musical Theater?
+BtlPokeparam2_Text_Yes = YES
+BtlPokeparam2_Text_No = NO
+BtlPokeparam2_Text_AwaitingOthersDecisionsPlease = Awaiting others' decisions.\nPlease wait...
+\pad{2c}

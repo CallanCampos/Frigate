@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Snow Cloak",
+    "description": "Raises evasion in a\nhailstorm."
+}

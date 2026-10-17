@@ -67,11 +67,11 @@ def write_header(header: Path, text: str):
 
 
 def generate_constants():
-    """Writes the headers that ninja generates, since the sources include them: the constants of data/constants/,
+    """Writes the headers that ninja generates, since the sources include them: the constants of generated/,
     each message file's message IDs, the easy chat words and the embedded binaries, which are zeros without an
     extracted ROM."""
     out_dir = ROOT / GENERATED_INCLUDE_DIR
-    for source in sorted((ROOT / "data" / "constants").glob("*.txt")):
+    for source in sorted((ROOT / "generated").glob("*.txt")):
         write_header(out_dir / "constants" / source.with_suffix(".h").name, generate(source))
     for source_dir in TEXT_ARCHIVES.values():
         for source in sorted((ROOT / source_dir).glob("*.txt")):

@@ -1,0 +1,38 @@
+{
+    "$schema": "players.schema.json",
+    "PLAYER_BGM": {
+        "max_sequences": 1,
+        "channels": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15 ],
+        "heap_size": 0
+    },
+    "PLAYER_SE_SYS": {
+        "max_sequences": 1,
+        "channels": [ 12, 13, 14, 15 ],
+        "heap_size": 10200
+    },
+    "PLAYER_SE_1": {
+        "max_sequences": 1,
+        "channels": [ 12, 13, 14, 15 ],
+        "heap_size": 10200
+    },
+    "PLAYER_SE_2": {
+        "max_sequences": 1,
+        "channels": [ 12, 13, 14, 15 ],
+        "heap_size": 10200
+    },
+    "PLAYER_SE_PSG": {
+        "max_sequences": 1,
+        "channels": [ 11, 12, 13, 15 ],
+        "heap_size": 2000
+    },
+    "PLAYER_SE_3": {
+        "max_sequences": 1,
+        "channels": [ 12, 13, 14, 15 ],
+        "heap_size": 10200
+    },
+    "PLAYER_BGM2": {
+        "max_sequences": 1,
+        "channels": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ],
+        "heap_size": 0
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_RELIC_CASTLE",
+    "type": 2,
+    "radius": 12,
+    "position": {
+        "x": 115,
+        "y": 104
+    },
+    "cursor": {
+        "x": 115,
+        "y": 104
+    },
+    "hit": {
+        "start": {
+            "x": 115,
+            "y": 100
+        },
+        "end": {
+            "x": 115,
+            "y": 108
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": {
+        "black2": "TownMap_Text_AncientRuinsGloriousHistory_2",
+        "white2": "TownMap_Text_AncientRuinsGloriousHistory"
+    },
+    "landmarks": [],
+    "area": {
+        "animation": 1,
+        "x": 107,
+        "y": 96
+    }
+}

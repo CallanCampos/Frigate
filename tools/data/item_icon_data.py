@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""The item icons, in each item's directory of data/items/: dump writes them from the ROM once, and pack builds the
+"""The item icons, in each item's directory of res/items/: dump writes them from the ROM once, and pack builds the
 archive (a/0/2/5) from them, which the build does.
 
-    item_icon_data.py dump extract/b2_us/files data/items
-    item_icon_data.py pack data/items black2|white2 ARCHIVE
+    item_icon_data.py dump extract/b2_us/files res/items
+    item_icon_data.py pack res/items black2|white2 ARCHIVE
 
-The archive's members are the constants of data/constants/item_icons.txt, in its order. An icon (ITEM_ICON_POTION) is
+The archive's members are the constants of generated/item_icons.txt, in its order. An icon (ITEM_ICON_POTION) is
 icon.png, 32 by 32, and a palette (ITEM_ICON_PALETTE_POTION) icon.pal, a JASC palette of 16 colors, 0 transparent, in
-the directory of the item they are named after, data/items/potion/; the Wonder Launcher's list icons
-(ITEM_ICON_POTION_LAUNCHER) are launcher_icon.png and launcher_icon.pal. data/items/shared/ has the icons' Nitro
+the directory of the item they are named after, res/items/potion/; the Wonder Launcher's list icons
+(ITEM_ICON_POTION_LAUNCHER) are launcher_icon.png and launcher_icon.pal. res/items/shared/ has the icons' Nitro
 animations and cells, the return arrow's icon, and the icons that no item shows, in unused_icons/. pml_item.c's tables
 give each item its icon and palette, and an icon can go with several palettes, as the TMs' disc does, so an item can
 have only its icon.pal. An icon's PNG shows it with the palette of the first item that has it, but only its indices

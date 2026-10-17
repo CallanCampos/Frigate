@@ -1,3 +1,0 @@
-BridgeGateGate4_Text_ItsNameSuggestsVillage = As its name suggests, Village Bridge\nis a bridge with a village on it!{be01}\nThat's right! No matter what anyone\nelse says, that's what I think it is!
-BridgeGateGate4_Text_DarkMusiciansVillageBridge = The Dark musicians of\nVillage Bridge aren't too bad...
-\pad{3c}

@@ -67,7 +67,7 @@ every section.
   layout with padding is still the one definition.
 - Headers are grouped like the game's code: `system/` (game system, game data, events), `field/`, `save/`, `gfl/`
   (Game Freak's library), `pml/` (Pokémon data), `battle/`, `demo/` and `constants/`, whose ID lists, such as species
-  and items, are generated from `data/constants/` (see [Constant lists](data.md#constant-lists)). The libraries'
+  and items, are generated from `generated/` (see [Constant lists](data.md#constant-lists)). The libraries'
   headers are in `lib/`, as `lib/nitro/include/nitro/`, `lib/nnsys/include/nnsys/`, `lib/spl/include/spl/`,
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),

@@ -1,0 +1,148 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Zorua",
+    "pokedex": {
+        "category": "Tricky Fox Pokémon",
+        "entry": "It changes so it looks just\nlike its foe, tricks it, and then\nuses that opportunity to flee.",
+        "height": "2'04\"",
+        "weight": "27.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "わるぎつねポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 65,
+        "defense": 40,
+        "speed": 65,
+        "special_attack": 80,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_DARK", "TYPE_DARK" ],
+    "catch_rate": 75,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_ILLUSION", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 66,
+    "height": 7,
+    "weight": 125,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 5, "MOVE_PURSUIT" ],
+            [ 9, "MOVE_FAKE_TEARS" ],
+            [ 13, "MOVE_FURY_SWIPES" ],
+            [ 17, "MOVE_FAINT_ATTACK" ],
+            [ 21, "MOVE_SCARY_FACE" ],
+            [ 25, "MOVE_TAUNT" ],
+            [ 29, "MOVE_FOUL_PLAY" ],
+            [ 33, "MOVE_TORMENT" ],
+            [ 37, "MOVE_AGILITY" ],
+            [ 41, "MOVE_EMBARGO" ],
+            [ 45, "MOVE_PUNISHMENT" ],
+            [ 49, "MOVE_NASTY_PLOT" ],
+            [ 53, "MOVE_IMPRISON" ],
+            [ 57, "MOVE_NIGHT_DAZE" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM04",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM56",
+            "TM59",
+            "TM63",
+            "TM66",
+            "TM67",
+            "TM75",
+            "TM77",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM95",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_BOUNCE",
+            "MOVE_UPROAR",
+            "MOVE_FOUL_PLAY",
+            "MOVE_DARK_PULSE",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_DETECT",
+            "MOVE_CAPTIVATE",
+            "MOVE_DARK_PULSE",
+            "MOVE_SNATCH",
+            "MOVE_MEMENTO",
+            "MOVE_SUCKER_PUNCH",
+            "MOVE_EXTRASENSORY",
+            "MOVE_COUNTER"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_ZOROARK"
+        }
+    ],
+    "regional_dex_number": 151,
+    "baby_species": "SPECIES_ZORUA",
+    "cry_volume": 123
+}

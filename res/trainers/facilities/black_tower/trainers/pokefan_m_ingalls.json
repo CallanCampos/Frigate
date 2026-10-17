@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ingalls",
+    "class": "TRAINER_CLASS_POKEFAN_M",
+    "pokemon": [
+        "lickitung_1",
+        "azumarill_1",
+        "sealeo_1",
+        "wigglytuff_1",
+        "quagsire_1",
+        "noctowl_1",
+        "lanturn_1",
+        "tropius_1",
+        "throh_1",
+        "swalot_1"
+    ]
+}

@@ -1,0 +1,6 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Allen",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_NATE",
+    "pokemon": [ "none_1" ]
+}

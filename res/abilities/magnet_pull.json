@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Magnet Pull",
+    "description": "Prevents Steel-type\nPokémon from escaping."
+}

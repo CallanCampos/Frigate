@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_WEEZING",
+    "moves": [ "MOVE_THUNDERBOLT", "MOVE_WILL_O_WISP", "MOVE_SLUDGE_BOMB", "MOVE_FLAMETHROWER" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_ROCKY_HELMET",
+    "form": 0
+}

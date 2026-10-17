@@ -1,5 +1,0 @@
-{
-    "$schema": "../map_model.schema.json",
-    "texture_set": "MAP_TEXTURE_SET_SHARED_CHIP_COUNTER_4",
-    "transformed": true
-}

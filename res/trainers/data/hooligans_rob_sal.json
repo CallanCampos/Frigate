@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rob & Sal",
+    "class": "TRAINER_CLASS_HOOLIGANS",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 16,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_COTTONEE",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PETILIL",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Hey, hey!\nWe'll take care of you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Rob: My...my cute little Pokémon!{be01}\nSal: My baby lost!"
+        },
+        {
+            "type": 5,
+            "text": "Some cute Pokémon you've got there!{be01}\nYou aren't too shabby\nof a Trainer, either!"
+        },
+        {
+            "type": 6,
+            "text": "Hrmph! I don't want to fight someone\nwho has only got one Pokémon that's{be00}\nready for battle!"
+        },
+        {
+            "type": 7,
+            "text": "Hey, hey, hey! What's wrong?\nAre you lost or something?{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Us bad dudes are getting together\nto boast about our Pokémon!"
+        },
+        {
+            "type": 10,
+            "text": "Come on! You're telling me that you've\nonly got one Pokémon ready for battle?{be01}\nI can't call myself a bad dude if I fight\ntwo against one! It's not fair at all!"
+        }
+    ]
+}

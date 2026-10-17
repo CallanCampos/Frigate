@@ -1,0 +1,8 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {
+            "loop_start": 2776
+        }
+    ]
+}

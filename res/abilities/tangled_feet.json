@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Tangled Feet",
+    "description": "Raises evasion if the\nPokémon is confused."
+}

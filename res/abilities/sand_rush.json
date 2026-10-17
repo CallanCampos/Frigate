@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sand Rush",
+    "description": "Boosts the Pokémon's\nSpeed in a sandstorm."
+}

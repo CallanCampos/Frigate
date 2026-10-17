@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_DRAGONSPIRAL_TOWER_2",
+    "texture_set": "MAP_TEXTURE_SET_DRAGONSPIRAL_TOWER_2",
+    "srt_animation": 0,
+    "pattern_animation": 0,
+    "exterior": true,
+    "lights": 140,
+    "edge_color_table": 0,
+    "actor_material_color": 1
+}

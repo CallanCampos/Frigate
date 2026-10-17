@@ -1,0 +1,177 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Wingull",
+    "pokedex": {
+        "category": "Seagull Pokémon",
+        "entry": "It makes its nest on sheer cliffs.\nRiding the sea breeze, it glides\nup into the expansive skies.",
+        "height": "2'00\"",
+        "weight": "20.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Wingull",
+                "category": "Seagull Pokémon",
+                "entry": "It soars high in the sky, riding on\nupdrafts like a glider. It carries\nfood tucked in its bill.",
+                "height": "2'00\"",
+                "weight": "20.9 lbs."
+            },
+            "fr": {
+                "name": "Goélise",
+                "category": "Pokémon Mouette",
+                "entry": "Il utilise les courants ascendants\npour planer en altitude. Son bec lui\nsert à transporter la nourriture.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "de": {
+                "name": "Wingull",
+                "category": "Seemöwe",
+                "entry": "Es nutzt Aufwinde, um hoch oben in\nden Lüften zu schweben. Es trägt\nFutter in seinem Schnabel umher.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "it": {
+                "name": "Wingull",
+                "category": "Pokémon Gabbiano",
+                "entry": "Si fa trasportare ad alta quota dalle\ncorrenti ascensionali.\nTrasporta il cibo nel becco.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "ko": {
+                "name": "갈모매",
+                "category": "괭이갈매기포켓몬",
+                "entry": "상승 기류를 타고\n글라이더처럼 넓은 하늘을 돌며\n부리로 집은 먹이를 운반한다.",
+                "height": "0.6 m",
+                "weight": "9.5 kg"
+            },
+            "es": {
+                "name": "Wingull",
+                "category": "Pokémon Gaviota",
+                "entry": "Aprovecha las corrientes ascendentes\npara ganar altura. Suele llevar comida\nen el pico.",
+                "height": "0,6 m",
+                "weight": "9,5 kg"
+            },
+            "ja": {
+                "name": "キャモメ",
+                "category": "うみねこポケモン",
+                "entry": "じょうしょう\\x{3000}きりゅうに\\x{3000}のって\nグライダーのように\\x{3000}おおぞらを\\x{3000}まい\nくちばしに\\x{3000}はさんだ\\x{3000}エサをはこぶ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 30,
+        "defense": 30,
+        "speed": 85,
+        "special_attack": 55,
+        "special_defense": 30
+    },
+    "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_KEEN_EYE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RAIN_DISH",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 54,
+    "height": 6,
+    "weight": 95,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 6, "MOVE_SUPERSONIC" ],
+            [ 9, "MOVE_WING_ATTACK" ],
+            [ 14, "MOVE_MIST" ],
+            [ 17, "MOVE_WATER_PULSE" ],
+            [ 22, "MOVE_QUICK_ATTACK" ],
+            [ 26, "MOVE_ROOST" ],
+            [ 30, "MOVE_PURSUIT" ],
+            [ 33, "MOVE_AIR_CUTTER" ],
+            [ 38, "MOVE_AGILITY" ],
+            [ 42, "MOVE_AERIAL_ACE" ],
+            [ 46, "MOVE_AIR_SLASH" ],
+            [ 49, "MOVE_HURRICANE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM55",
+            "TM87",
+            "TM88",
+            "TM89",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TAILWIND",
+            "MOVE_ROOST",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_MIST",
+            "MOVE_TWISTER",
+            "MOVE_AGILITY",
+            "MOVE_GUST",
+            "MOVE_WATER_SPORT",
+            "MOVE_AQUA_RING",
+            "MOVE_KNOCK_OFF",
+            "MOVE_BRINE",
+            "MOVE_ROOST"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 25,
+            "species": "SPECIES_PELIPPER"
+        }
+    ],
+    "regional_dex_number": 212,
+    "baby_species": "SPECIES_WINGULL",
+    "cry_volume": 120
+}

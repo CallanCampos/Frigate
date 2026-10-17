@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GRIMER",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SEVIPER",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Everyone who isn't in Team Plasma is\nan enemy!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "...I hate you!"
+        },
+        {
+            "type": 2,
+            "text": "I hate the world! I don't need a world\nthat doesn't recognize me!{be01}\nThat's why I'll mess with you all as a\nmember of Team Plasma!"
+        }
+    ]
+}

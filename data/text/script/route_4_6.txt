@@ -1,2 +1,0 @@
-Route46_Text_EvenWhenFeelSad = Even when I feel sad, looking at my\nPokémon's cute, round eyes{be00}\nmakes my sad feeling melt away.
-Route46_Text_YipYip = Yip! Yip!

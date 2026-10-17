@@ -1,0 +1,985 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_WB_VS_SETPOKE", null, null, null ],
+    "instruments": [
+        {
+            "program": 29,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+            "wave": 4,
+            "base_key": "B1",
+            "attack": 127,
+            "decay": 125,
+            "sustain": 120,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 52,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+            "wave": 16,
+            "base_key": "Cs4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 120,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 54,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+            "wave": 3,
+            "base_key": "Cs4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 120,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 60,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+            "wave": 17,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 62,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+            "wave": 20,
+            "base_key": "As2",
+            "attack": 127,
+            "decay": 80,
+            "sustain": 1,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 84,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+            "wave": 15,
+            "base_key": "C4",
+            "attack": 90,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 99,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 100,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "C0",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 5,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 126,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 9,
+                    "base_key": "C1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 10,
+                    "base_key": "Cs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 25,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 11,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 1,
+                    "base_key": "E1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 0,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 0,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 27,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 26,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 7,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 7,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 7,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 7,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 8,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 2,
+                    "base_key": "B3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 2,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 2,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 107
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 28,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 27
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 28,
+                    "base_key": "Ds4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 28,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 28,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 28,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 114
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 6,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 14
+                }
+            ]
+        },
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 18,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 19,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 39,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 12,
+                    "base_key": "Cs2",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 13,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 14,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 31,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 23,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 24,
+                    "base_key": "Cs6",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 28,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 21,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 22,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "unused": "7f0000000000000001001d0000004d7f646e7440"
+        },
+        {
+            "program": 26,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_VS_SETPOKE",
+                    "wave": 30,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

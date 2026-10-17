@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Phillip",
+    "class": "TRAINER_CLASS_BIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SKORUPI",
+            "form": 0,
+            "level": 43,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Heheh!\nNobody can beat my speed and fury!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I have lost!\nI am such a loser!"
+        },
+        {
+            "type": 2,
+            "text": "Ahh! Maybe I should just pick up\nmy bike and charge outta here!{be00}\nNo one would doubt how wild I am then!"
+        }
+    ]
+}

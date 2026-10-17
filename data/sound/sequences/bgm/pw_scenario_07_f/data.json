@@ -1,8 +1,0 @@
-{
-    "$schema": "../../../sequence.schema.json",
-    "bank": "BANK_MUS_PW_SCENARIO_07_F",
-    "volume": 80,
-    "channel_priority": 30,
-    "player_priority": 64,
-    "player": "PLAYER_BGM"
-}

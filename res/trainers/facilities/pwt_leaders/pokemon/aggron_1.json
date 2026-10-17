@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_AGGRON",
+    "moves": [ "MOVE_STONE_EDGE", "MOVE_IRON_TAIL", "MOVE_OUTRAGE", "MOVE_THUNDER_WAVE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_CHOPLE_BERRY",
+    "form": 0
+}

@@ -1,0 +1,30 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_BE_SE_31", null, null, null ],
+    "instruments": [
+        {
+            "program": 69,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_BE_SE_31",
+            "wave": 1,
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 99,
+            "sustain": 99,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 90,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_BE_SE_31",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        }
+    ]
+}

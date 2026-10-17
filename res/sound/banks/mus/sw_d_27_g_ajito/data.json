@@ -1,0 +1,78 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_SW_D_27_G_AJITO", null, null, null ],
+    "instruments": [
+        {
+            "program": 1,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_D_27_G_AJITO",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 2,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_D_27_G_AJITO",
+            "wave": 1,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 3,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_D_27_G_AJITO",
+            "wave": 2,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 4,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_D_27_G_AJITO",
+            "wave": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 5,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_D_27_G_AJITO",
+            "wave": 4,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 93,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_D_27_G_AJITO",
+            "wave": 5,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        }
+    ]
+}

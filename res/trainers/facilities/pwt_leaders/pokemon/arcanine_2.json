@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ARCANINE",
+    "moves": [ "MOVE_FLARE_BLITZ", "MOVE_WILD_CHARGE", "MOVE_CLOSE_COMBAT", "MOVE_EXTREME_SPEED" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_LIECHI_BERRY",
+    "form": 0
+}

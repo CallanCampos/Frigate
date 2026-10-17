@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Export and pack Pokémon battle sprites, icons, and footprints.
 
-    pokemon_graphics.py extract data/pokemon
-    pokemon_graphics.py pack data/pokemon black2|white2 OUTPUT...
+    pokemon_graphics.py extract res/pokemon
+    pokemon_graphics.py pack res/pokemon black2|white2 OUTPUT...
 
 Images are indexed PNGs: their pixel indices select colors in the adjacent
 JASC palette. Nitro cell, animation, and other binary resources remain separate
@@ -41,10 +41,10 @@ FORM_FOOTPRINTS = (("giratina", 1), ("shaymin", 1), ("kyurem", 1), ("kyurem", 2)
 
 @lru_cache(maxsize=1)
 def species_names():
-    """Returns the directories of the species of data/constants/species.txt, in order: the national Pokédex's, then
+    """Returns the directories of the species of generated/species.txt, in order: the national Pokédex's, then
     the egg, the bad egg and the Pokéstar Studios species."""
     return [directory(re.match(r"SPECIES_[A-Z0-9_]+", line).group(0))
-            for line in (ROOT / "data/constants/species.txt").read_text().splitlines()
+            for line in (ROOT / "generated/species.txt").read_text().splitlines()
             if line.startswith("SPECIES_")]
 
 
@@ -57,7 +57,7 @@ def national_species():
 @lru_cache(maxsize=2)
 def form_names(musical=False):
     """Returns the species and form of each form sprite group, from its species' forms (sprite_offset and count) in
-    data/pokemon. The musical sprites follow Black and White's species data instead (ARCID_PERSONAL_BW1, a/3/0/2,
+    res/pokemon. The musical sprites follow Black and White's species data instead (ARCID_PERSONAL_BW1, a/3/0/2,
     which MusicalMcss_GetDataIDBase reads), whose offsets differ and which has no source. Forms told apart only by
     their palette (palette_forms, Arceus) have no groups."""
     records = read_narc((EXTRACTED / "a/3/0/2").read_bytes()) if musical else None
@@ -67,7 +67,7 @@ def form_names(musical=False):
             _, sprite_offset, count = struct.unpack_from("<HHB", records[number], 0x1C)
             palette_only = records[number][0x21] >> 7 & 1
         else:
-            data = json.loads((ROOT / "data/pokemon" / species / "data.json").read_text())
+            data = json.loads((ROOT / "res/pokemon" / species / "data.json").read_text())
             sprite_offset, count = data["forms"]["sprite_offset"], data["forms"]["count"]
             palette_only = data["palette_forms"]
         if count <= 1 or palette_only:

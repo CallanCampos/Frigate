@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Synchronize",
-    "description": "Passes a burn, poison,\nor paralysis to the foe."
-}

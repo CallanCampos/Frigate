@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_JELLICENT",
+    "moves": [ "MOVE_RECOVER", "MOVE_SURF", "MOVE_SHADOW_BALL", "MOVE_WILL_O_WISP" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_LEFTOVERS",
+    "form": 0
+}

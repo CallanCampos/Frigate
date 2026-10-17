@@ -1,0 +1,41 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Quinn",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "pokemon": [
+        "torterra_1",
+        "ferrothorn_1",
+        "shuckle_1",
+        "excadrill_1",
+        "hippowdon_1",
+        "tyranitar_1",
+        "garchomp_1",
+        "claydol_2",
+        "gigalith_2",
+        "excadrill_2",
+        "hippowdon_2",
+        "tyranitar_2",
+        "gastrodon_3",
+        "cradily_3",
+        "bastiodon_3",
+        "gigalith_3",
+        "excadrill_3",
+        "aerodactyl_3",
+        "hippowdon_3",
+        "tyranitar_3",
+        "dugtrio_4",
+        "bastiodon_4",
+        "shuckle_4",
+        "excadrill_4",
+        "hippowdon_4",
+        "tyranitar_4",
+        "regirock_1",
+        "landorus_1",
+        "terrakion_4"
+    ],
+    "messages": [
+        "Our lives have plenty of ordinary days.\nI gotta have Pokémon!",
+        "Only Pokémon rescue me\nfrom boring and monotonous days.",
+        "When I look at a special person like you,\nI just melt."
+    ]
+}

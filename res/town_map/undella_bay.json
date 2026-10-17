@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_UNDELLA_BAY",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 230,
+        "y": 61
+    },
+    "cursor": {
+        "x": 230,
+        "y": 61
+    },
+    "hit": {
+        "start": {
+            "x": 230,
+            "y": 57
+        },
+        "end": {
+            "x": 230,
+            "y": 65
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_WorldFamousSeaShining",
+    "landmarks": [],
+    "area": {
+        "animation": 21,
+        "x": 225,
+        "y": 50
+    }
+}

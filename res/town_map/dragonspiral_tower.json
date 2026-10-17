@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_DRAGONSPIRAL_TOWER",
+    "type": 2,
+    "radius": 12,
+    "position": {
+        "x": 66,
+        "y": 31
+    },
+    "cursor": {
+        "x": 66,
+        "y": 31
+    },
+    "hit": {
+        "start": {
+            "x": 66,
+            "y": 27
+        },
+        "end": {
+            "x": 66,
+            "y": 35
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_OldestTowerUnovaRegion",
+    "landmarks": [],
+    "area": {
+        "animation": 1,
+        "x": 58,
+        "y": 23
+    }
+}

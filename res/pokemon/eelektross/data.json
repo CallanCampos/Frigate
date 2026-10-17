@@ -1,0 +1,130 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Eelektross",
+    "pokedex": {
+        "category": "EleFish Pokémon",
+        "entry": "It latches on to prey with its sucker\nmouth, sinking in its fangs and shocking\nthe prey with powerful electricity.",
+        "height": "6'11\"",
+        "weight": "177.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "でんきうおポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 85,
+        "attack": 115,
+        "defense": 80,
+        "speed": 50,
+        "special_attack": 105,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 30,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 3,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 232,
+    "height": 21,
+    "weight": 805,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CRUSH_CLAW" ],
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 1, "MOVE_ACID" ],
+            [ 1, "MOVE_DISCHARGE" ],
+            [ 1, "MOVE_CRUNCH" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM02",
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM57",
+            "TM62",
+            "TM68",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM80",
+            "TM82",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM91",
+            "TM93",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_BOUNCE",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_MAGNET_RISE",
+            "MOVE_SUPERPOWER",
+            "MOVE_AQUA_TAIL",
+            "MOVE_IRON_TAIL",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_GASTRO_ACID",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 179,
+    "baby_species": "SPECIES_TYNAMO",
+    "cry_volume": 120
+}

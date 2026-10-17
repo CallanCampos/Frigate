@@ -1,0 +1,4 @@
+VictoryRoad16_Text_WaitUp = Wait up!{be01}
+VictoryRoad16_Text_IllBattleBeforeTake = {0100:1}: I'll battle with you\nbefore you take on the Pokémon League.{be01}\nThe more Pokémon battles you have,\nthe stronger you get, right?{be01}
+VictoryRoad16_Text_ThanksAccomplishedWhatSet = {0100:1}: {0100:0}!{be01}\nThanks to you, I accomplished what\nI set out to do during my journey!{be01}\nI wish I could've shown you\nmy little sister's huge smile!{be01}\nThis is my thanks!{be01}
+VictoryRoad16_Text_ThinkYoureReallyAmazing = I think you're really amazing!{be01}\nSo become the Champion!{be01}\nGet the proof that you're a Trainer\nyour Pokémon can be proud of!{be01}\nSee you!{be01}

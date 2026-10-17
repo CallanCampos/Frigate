@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Iron Fist",
-    "description": "Boosts the power of\npunching moves."
-}

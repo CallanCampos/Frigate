@@ -1,0 +1,176 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Mismagius",
+    "pokedex": {
+        "category": "Magical Pokémon",
+        "entry": "Its cry sounds like an incantation.\nIt is said the cry may rarely be\nimbued with happiness-giving power.",
+        "height": "2'11\"",
+        "weight": "9.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Mismagius",
+                "category": "Magical Pokémon",
+                "entry": "Its cry sounds like an incantation.\nIt is said the cry may rarely be\nimbued with happiness-giving power.",
+                "height": "2'11\"",
+                "weight": "9.7 lbs."
+            },
+            "fr": {
+                "name": "Magirêve",
+                "category": "Pokémon Magique",
+                "entry": "Pareil à une incantation magique,\nson cri n'est que très rarement\nsource de joie.",
+                "height": "0,9 m",
+                "weight": "4,4 kg"
+            },
+            "de": {
+                "name": "Traunmagil",
+                "category": "Magisch",
+                "entry": "Sein Ruf ähnelt einer Beschwörung.\nMan sagt, dass er manchmal über die\nKraft verfüge, glücklich zu machen.",
+                "height": "0,9 m",
+                "weight": "4,4 kg"
+            },
+            "it": {
+                "name": "Mismagius",
+                "category": "Pokémon Stregone",
+                "entry": "I suoi versi sembrano incantesimi. Pare\nche a volte contengano un potere che\nporta felicità.",
+                "height": "0,9 m",
+                "weight": "4,4 kg"
+            },
+            "ko": {
+                "name": "무우마직",
+                "category": "매지컬포켓몬",
+                "entry": "주문 같은 울음소리지만\n가끔 상대를 행복하게 만드는\n효과도 감춰져 있다고 한다.",
+                "height": "0.9 m",
+                "weight": "4.4 kg"
+            },
+            "es": {
+                "name": "Mismagius",
+                "category": "Pokémon Mágico",
+                "entry": "Sus gritos parecen cánticos. Se dice\nque, en alguna rara ocasión, han\nimbuido felicidad a quien los oía.",
+                "height": "0,9 m",
+                "weight": "4,4 kg"
+            },
+            "ja": {
+                "name": "ムウマージ",
+                "category": "マジカルポケモン",
+                "entry": "じゅもんのような\\x{3000}なきごえだが\nまれに\\x{3000}あいてを\\x{3000}しあわせにする\nこうかも\\x{3000}ひめているという。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff0e}\\x{ff14}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 60,
+        "defense": 60,
+        "speed": 105,
+        "special_attack": 105,
+        "special_defense": 105
+    },
+    "types": [ "TYPE_GHOST", "TYPE_GHOST" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 173,
+    "height": 9,
+    "weight": 44,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LUCKY_CHANT" ],
+            [ 1, "MOVE_MAGICAL_LEAF" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_PSYWAVE" ],
+            [ 1, "MOVE_SPITE" ],
+            [ 1, "MOVE_ASTONISH" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM53",
+            "TM57",
+            "TM61",
+            "TM63",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MISDREAVUS",
+    "cry_volume": 120
+}

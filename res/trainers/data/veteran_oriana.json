@@ -1,0 +1,63 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Oriana",
+    "class": "TRAINER_CLASS_VETERAN_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WORMADAM",
+            "form": 1,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_BUG_BITE", "MOVE_ROCK_BLAST", "MOVE_EARTHQUAKE", "MOVE_SUNNY_DAY" ]
+        },
+        {
+            "species": "SPECIES_MAGCARGO",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FIRE_BLAST", "MOVE_SOLAR_BEAM", "MOVE_ANCIENT_POWER", "MOVE_SHELL_SMASH" ]
+        },
+        {
+            "species": "SPECIES_EXPLOUD",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FIRE_BLAST", "MOVE_HYPER_VOICE", "MOVE_EARTHQUAKE", "MOVE_SUNNY_DAY" ]
+        },
+        {
+            "species": "SPECIES_JUMPLUFF",
+            "form": 0,
+            "level": 66,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_SOLAR_BEAM", "MOVE_ACROBATICS", "MOVE_LEECH_SEED", "MOVE_MEMENTO" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Two years ago I parted ways with\nmy Pokémon...{be01}\nYet in my heart, I've never stopped being\na Pokémon Trainer!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This is the type of defeat that only a\nPokémon Trainer can experience!"
+        },
+        {
+            "type": 2,
+            "text": "Those lives that come into our world\nas Pokémon...{be01}\nFor me, being unsure if they really\nwanted to live with humans, I parted{be00}\nways with my Pokémon.{be01}\nBut as it turns out, the time we spent\ntogether seems to be the best of all."
+        }
+    ]
+}

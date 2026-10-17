@@ -1,6 +1,0 @@
-{
-    "$schema": "trainer_class.schema.json",
-    "name": "Clair",
-    "compress_name": true,
-    "name_with_article": "Clair"
-}

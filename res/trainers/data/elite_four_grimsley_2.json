@@ -1,0 +1,91 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grimsley",
+    "class": "TRAINER_CLASS_ELITE_FOUR_GRIMSLEY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE", "ITEM_FULL_RESTORE", "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 72,
+            "difficulty": 250,
+            "gender": 2,
+            "ability": 2,
+            "item": "ITEM_NORMAL_GEM",
+            "moves": [ "MOVE_SUCKER_PUNCH", "MOVE_FAKE_OUT", "MOVE_AERIAL_ACE", "MOVE_ATTRACT" ]
+        },
+        {
+            "species": "SPECIES_HONCHKROW",
+            "form": 0,
+            "level": 72,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_PSYCHIC", "MOVE_AERIAL_ACE", "MOVE_HAZE" ]
+        },
+        {
+            "species": "SPECIES_SCRAFTY",
+            "form": 0,
+            "level": 72,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_HEAD_SMASH", "MOVE_CRUNCH", "MOVE_HI_JUMP_KICK", "MOVE_POISON_JAB" ]
+        },
+        {
+            "species": "SPECIES_HOUNDOOM",
+            "form": 0,
+            "level": 72,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_THUNDER_FANG", "MOVE_FIRE_BLAST", "MOVE_SLUDGE_BOMB", "MOVE_CRUNCH" ]
+        },
+        {
+            "species": "SPECIES_KROOKODILE",
+            "form": 0,
+            "level": 72,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_ROCK_SLIDE", "MOVE_EARTHQUAKE", "MOVE_CRUNCH", "MOVE_OUTRAGE" ]
+        },
+        {
+            "species": "SPECIES_BISHARP",
+            "form": 0,
+            "level": 74,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_GUILLOTINE", "MOVE_NIGHT_SLASH", "MOVE_X_SCISSOR", "MOVE_AERIAL_ACE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "I never thought you would use that move...\nNot a bad choice at all."
+        },
+        {
+            "type": 19,
+            "text": "Those who give up on themselves\ncan never claim victory!"
+        },
+        {
+            "type": 20,
+            "text": "There's got to be a way to win...\nEven in the most extreme of conditions!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Which Pokémon should I raise?{be01}\nWhich moves should I teach my Pokémon?{be01}\nWhat items should I give my Pokémon?{be01}\nYou need to think everything through very\nthoroughly if you want to win!{be01}\nIn that sense, you're a very\nimpressive battler!"
+        }
+    ]
+}

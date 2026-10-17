@@ -1,0 +1,163 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Manectric",
+    "pokedex": {
+        "category": "Discharge Pokémon",
+        "entry": "It discharges electricity from its\nmane. It creates a thundercloud\noverhead to drop lightning bolts.",
+        "height": "4'11\"",
+        "weight": "88.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Manectric",
+                "category": "Discharge Pokémon",
+                "entry": "It discharges electricity from its\nmane. It creates a thundercloud\noverhead to drop lightning bolts.",
+                "height": "4'11\"",
+                "weight": "88.6 lbs."
+            },
+            "fr": {
+                "name": "Élecsprint",
+                "category": "Pokémon Décharge",
+                "entry": "Il libère l'électricité par sa crinière.\nIl crée un nuage d'orage pour appeler\nla foudre.",
+                "height": "1,5 m",
+                "weight": "40,2 kg"
+            },
+            "de": {
+                "name": "Voltenso",
+                "category": "Entladung",
+                "entry": "Aus seiner Mähne entlädt es Elekt-\nrizität. Es generiert eine Gewitter-\nwolke, aus der es Blitze entlädt.",
+                "height": "1,5 m",
+                "weight": "40,2 kg"
+            },
+            "it": {
+                "name": "Manectric",
+                "category": "Pokémon Scossa",
+                "entry": "Scarica elettricità dalla criniera. Crea\nnubi temporalesche in cielo che fanno\ncadere saette.",
+                "height": "1,5 m",
+                "weight": "40,2 kg"
+            },
+            "ko": {
+                "name": "썬더볼트",
+                "category": "방전포켓몬",
+                "entry": "갈기에서 방전을 하고 있다.\n머리 위에 번개 구름을 만들고\n천둥번개를 떨어뜨려 공격한다.",
+                "height": "1.5 m",
+                "weight": "40.2 kg"
+            },
+            "es": {
+                "name": "Manectric",
+                "category": "Pokémon Descarga",
+                "entry": "Descarga electricidad desde su\nmelena. Crea nubarrones desde\nlos que lanza rayos.",
+                "height": "1,5 m",
+                "weight": "40,2 kg"
+            },
+            "ja": {
+                "name": "ライボルト",
+                "category": "ほうでんポケモン",
+                "entry": "たてがみから\\x{3000}ほうでんしている。\nずじょうに\\x{3000}かみなりぐもを\\x{3000}つくり\nいなずまを\\x{3000}おとして\\x{3000}こうげきする。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff10}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 75,
+        "defense": 60,
+        "speed": 105,
+        "special_attack": 105,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_STATIC", "ABILITY_LIGHTNINGROD" ],
+    "hidden_ability": "ABILITY_MINUS",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 15,
+    "weight": 402,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_FIRE_FANG" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_THUNDER_WAVE" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_HOWL" ],
+            [ 4, "MOVE_THUNDER_WAVE" ],
+            [ 9, "MOVE_LEER" ],
+            [ 12, "MOVE_HOWL" ],
+            [ 17, "MOVE_QUICK_ATTACK" ],
+            [ 20, "MOVE_SPARK" ],
+            [ 25, "MOVE_ODOR_SLEUTH" ],
+            [ 30, "MOVE_BITE" ],
+            [ 37, "MOVE_THUNDER_FANG" ],
+            [ 42, "MOVE_ROAR" ],
+            [ 49, "MOVE_DISCHARGE" ],
+            [ 54, "MOVE_CHARGE" ],
+            [ 61, "MOVE_WILD_CHARGE" ],
+            [ 66, "MOVE_THUNDER" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM35",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM50",
+            "TM57",
+            "TM68",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM95",
+            "HM04"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_UPROAR", "MOVE_MAGNET_RISE", "MOVE_IRON_TAIL", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ELECTRIKE",
+    "cry_volume": 120
+}

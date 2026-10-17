@@ -1,0 +1,130 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 552
+        },
+        {
+            "loop_start": 1400
+        },
+        {
+            "loop_start": 2448
+        },
+        {
+            "loop_start": 1816
+        },
+        {},
+        {
+            "loop_start": 1176
+        },
+        {
+            "loop_start": 1488
+        },
+        {
+            "loop_start": 10312
+        },
+        {
+            "loop_start": 10648
+        },
+        {
+            "loop_start": 912
+        },
+        {
+            "loop_start": 1192,
+            "timer": 758
+        },
+        {
+            "loop_start": 896
+        },
+        {
+            "loop_start": 2456
+        },
+        {
+            "loop_start": 2424
+        },
+        {
+            "loop_start": 1304
+        },
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 776
+        },
+        {
+            "loop_start": 6904
+        },
+        {
+            "loop_start": 6824
+        },
+        {
+            "loop_start": 3336
+        },
+        {},
+        {
+            "loop_start": 9984
+        },
+        {
+            "loop_start": 8552
+        },
+        {
+            "loop_start": 6800
+        },
+        {
+            "loop_start": 5248
+        },
+        {
+            "loop_start": 944
+        },
+        {},
+        {
+            "loop_start": 888
+        },
+        {
+            "loop_start": 2088
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 824
+        },
+        {
+            "loop_start": 1952
+        },
+        {
+            "loop_start": 1896
+        },
+        {
+            "loop_start": 2064
+        },
+        {
+            "loop_start": 2400
+        },
+        {
+            "loop_start": 2584
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 2544
+        },
+        {
+            "loop_start": 2336
+        },
+        {
+            "loop_start": 2048
+        }
+    ]
+}

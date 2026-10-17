@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Export Pokémon cries as WAV plus cry_volume in data.json, and pack the volumes.
 
-    pokemon_cries.py extract data/pokemon
-    pokemon_cries.py pack data/pokemon black2|white2 VOLUME_ARCHIVE
+    pokemon_cries.py extract res/pokemon
+    pokemon_cries.py pack res/pokemon black2|white2 VOLUME_ARCHIVE
 
 The cries' wave archives are packed into the sound archive by sound_data.py, which takes them from cry.wav.
 """

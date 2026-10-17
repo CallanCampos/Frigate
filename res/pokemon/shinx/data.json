@@ -1,0 +1,172 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Shinx",
+    "pokedex": {
+        "category": "Flash Pokémon",
+        "entry": "The extension and contraction of\nits muscles generates electricity.\nIt glows when in trouble.",
+        "height": "1'08\"",
+        "weight": "20.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Shinx",
+                "category": "Flash Pokémon",
+                "entry": "The extension and contraction of\nits muscles generates electricity.\nIt glows when in trouble.",
+                "height": "1'08\"",
+                "weight": "20.9 lbs."
+            },
+            "fr": {
+                "name": "Lixy",
+                "category": "Pokémon Flash",
+                "entry": "Ses muscles génèrent un courant\nélectrique lorsqu'ils travaillent.\nIl s'illumine en cas de danger.",
+                "height": "0,5 m",
+                "weight": "9,5 kg"
+            },
+            "de": {
+                "name": "Sheinux",
+                "category": "Flacker",
+                "entry": "Es erzeugt Elektrizität durch das\nStrecken und Zusammenziehen seiner\nMuskeln. Bei Bedrohung glüht es.",
+                "height": "0,5 m",
+                "weight": "9,5 kg"
+            },
+            "it": {
+                "name": "Shinx",
+                "category": "Pokémon Baleno",
+                "entry": "Produce elettricità contraendo e\nrilassando i muscoli. Quando si sente\nminacciato si illumina.",
+                "height": "0,5 m",
+                "weight": "9,5 kg"
+            },
+            "ko": {
+                "name": "꼬링크",
+                "category": "섬광포켓몬",
+                "entry": "몸을 움직일 때마다 근육이 늘어났다\n줄어들었다 하여 전기가 발생한다.\n궁지에 몰리면 몸이 빛난다.",
+                "height": "0.5 m",
+                "weight": "9.5 kg"
+            },
+            "es": {
+                "name": "Shinx",
+                "category": "Pokémon Flash",
+                "entry": "La extensión y contracción de sus\nmúsculos genera electricidad.\nBrilla cuando está en peligro.",
+                "height": "0,5 m",
+                "weight": "9,5 kg"
+            },
+            "ja": {
+                "name": "コリンク",
+                "category": "せんこうポケモン",
+                "entry": "からだを\\x{3000}うごかすたびに\\x{3000}きんにくが\nのびちぢみして\\x{3000}でんきが\\x{3000}うまれる。\nピンチになると\\x{3000}からだが\\x{3000}かがやく。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 65,
+        "defense": 34,
+        "speed": 45,
+        "special_attack": 40,
+        "special_defense": 34
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 235,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RIVALRY", "ABILITY_INTIMIDATE" ],
+    "hidden_ability": "ABILITY_GUTS",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 53,
+    "height": 5,
+    "weight": 95,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 5, "MOVE_LEER" ],
+            [ 9, "MOVE_CHARGE" ],
+            [ 13, "MOVE_SPARK" ],
+            [ 17, "MOVE_BITE" ],
+            [ 21, "MOVE_ROAR" ],
+            [ 25, "MOVE_SWAGGER" ],
+            [ 29, "MOVE_THUNDER_FANG" ],
+            [ 33, "MOVE_CRUNCH" ],
+            [ 37, "MOVE_SCARY_FACE" ],
+            [ 41, "MOVE_DISCHARGE" ],
+            [ 45, "MOVE_WILD_CHARGE" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM95",
+            "HM04"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_MAGNET_RISE", "MOVE_IRON_TAIL", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_ICE_FANG",
+            "MOVE_FIRE_FANG",
+            "MOVE_THUNDER_FANG",
+            "MOVE_QUICK_ATTACK",
+            "MOVE_HOWL",
+            "MOVE_TAKE_DOWN",
+            "MOVE_NIGHT_SLASH",
+            "MOVE_SHOCK_WAVE",
+            "MOVE_SWIFT",
+            "MOVE_DOUBLE_KICK",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_HELPING_HAND"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 15,
+            "species": "SPECIES_LUXIO"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SHINX",
+    "cry_volume": 120
+}

@@ -1,0 +1,191 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Hypno",
+    "pokedex": {
+        "category": "Hypnosis Pokémon",
+        "entry": "Seeing its swinging pendulum can\ninduce sleep in three seconds,\neven in someone who just woke up.",
+        "height": "5'03\"",
+        "weight": "166.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Hypno",
+                "category": "Hypnosis Pokémon",
+                "entry": "Seeing its swinging pendulum can\ninduce sleep in three seconds,\neven in someone who just woke up.",
+                "height": "5'03\"",
+                "weight": "166.7 lbs."
+            },
+            "fr": {
+                "name": "Hypnomade",
+                "category": "Pokémon Hypnose",
+                "entry": "La vue de son pendule oscillant\nendort en trois secondes, même\nquand on vient de se réveiller.",
+                "height": "1,6 m",
+                "weight": "75,6 kg"
+            },
+            "de": {
+                "name": "Hypno",
+                "category": "Hypnose",
+                "entry": "Ein Blick auf das Pendel versetzt\neinen in 3 Sekunden in Schlaf,\nselbst wenn man gar nicht müde ist.",
+                "height": "1,6 m",
+                "weight": "75,6 kg"
+            },
+            "it": {
+                "name": "Hypno",
+                "category": "Pokémon Ipnosi",
+                "entry": "Con il suo pendolo fa addormentare\nchiunque nel giro di tre secondi,\nanche chi si è appena svegliato.",
+                "height": "1,6 m",
+                "weight": "75,6 kg"
+            },
+            "ko": {
+                "name": "슬리퍼",
+                "category": "최면포켓몬",
+                "entry": "눈앞에서 추를 흔들면\n방금 깨어난 사람도\n3초 후에는 잠들어 버린다.",
+                "height": "1.6 m",
+                "weight": "75.6 kg"
+            },
+            "es": {
+                "name": "Hypno",
+                "category": "Pokémon Hipnosis",
+                "entry": "Mirar su péndulo puede inducir al sueño\nen tres segundos, incluso si acabas\nde despertarte.",
+                "height": "1,6 m",
+                "weight": "75,6 kg"
+            },
+            "ja": {
+                "name": "スリーパー",
+                "category": "さいみんポケモン",
+                "entry": "ふりこを\\x{3000}めのまえで\\x{3000}ゆらされると\nたったいま\\x{3000}めざめたばかりの\\x{3000}ひとも\n\\x{ff13}びょうごには\\x{3000}ねむってしまう。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff15}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 85,
+        "attack": 73,
+        "defense": 70,
+        "speed": 67,
+        "special_attack": 73,
+        "special_defense": 115
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 2
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_INSOMNIA", "ABILITY_FOREWARN" ],
+    "hidden_ability": "ABILITY_INNER_FOCUS",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 169,
+    "height": 16,
+    "weight": 756,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_NIGHTMARE" ],
+            [ 1, "MOVE_SWITCHEROO" ],
+            [ 1, "MOVE_POUND" ],
+            [ 1, "MOVE_HYPNOSIS" ],
+            [ 1, "MOVE_DISABLE" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 5, "MOVE_DISABLE" ],
+            [ 9, "MOVE_CONFUSION" ],
+            [ 13, "MOVE_HEADBUTT" ],
+            [ 17, "MOVE_POISON_GAS" ],
+            [ 21, "MOVE_MEDITATE" ],
+            [ 25, "MOVE_PSYBEAM" ],
+            [ 29, "MOVE_HEADBUTT" ],
+            [ 33, "MOVE_PSYCH_UP" ],
+            [ 37, "MOVE_SYNCHRONOISE" ],
+            [ 41, "MOVE_ZEN_HEADBUTT" ],
+            [ 45, "MOVE_SWAGGER" ],
+            [ 49, "MOVE_PSYCHIC" ],
+            [ 53, "MOVE_NASTY_PLOT" ],
+            [ 57, "MOVE_PSYSHOCK" ],
+            [ 61, "MOVE_FUTURE_SIGHT" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_ROLE_PLAY",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_DROWZEE",
+    "cry_volume": 110
+}

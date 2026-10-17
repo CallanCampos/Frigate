@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Roar of Time",
+    "description": "The user blasts the target with power\nthat distorts even time.\nThe user must rest on the next turn.",
+    "type": "TYPE_DRAGON",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_SPECIAL",
+    "power": 150,
+    "accuracy": 90,
+    "pp": 5,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_RECHARGE_AFTER",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_RECHARGE", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

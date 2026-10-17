@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_SHARED_PC01_30",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_B01_KABE",
+    "srt_animation": null,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 136,
+    "edge_color_table": 7,
+    "actor_material_color": 1
+}

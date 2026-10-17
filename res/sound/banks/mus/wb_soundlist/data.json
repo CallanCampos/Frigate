@@ -1,0 +1,3985 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_WB_SOUNDLIST", null, null, null ],
+    "instruments": [
+        {
+            "program": 84,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 209,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 85,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 110,
+            "base_key": "Cs2",
+            "attack": 127,
+            "decay": 125,
+            "sustain": 120,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 86,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 39,
+            "base_key": "E2",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 87,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 16,
+            "base_key": "Gs4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 88,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 26,
+            "base_key": "G2",
+            "attack": 120,
+            "decay": 100,
+            "sustain": 127,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 93,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 194,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 95,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+            "wave": 61,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 100,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 40,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 101,
+            "type": "psg",
+            "duty": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 102,
+            "type": "psg",
+            "duty": 1,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 103,
+            "type": "psg",
+            "duty": 2,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 104,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 105,
+            "type": "psg",
+            "duty": 4,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 106,
+            "type": "psg",
+            "duty": 5,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 107,
+            "type": "psg",
+            "duty": 6,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 105,
+            "release": 113,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "D1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 154,
+                    "base_key": "D1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 93,
+                    "base_key": "Ds1",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 157,
+                    "base_key": "E1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 159,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 171,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 172,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 173,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 10,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 11,
+                    "base_key": "As1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 113,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 112,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 158,
+                    "base_key": "Cs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 58
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 174,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 94,
+                    "base_key": "Ds2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 175,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 231,
+                    "base_key": "F2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 108,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 233,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 233,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 234,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 109,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 232,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 44,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 41,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 41,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 41,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 27,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 155,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 0,
+                    "release": 115,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 227,
+                    "base_key": "Fs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 58
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 176,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 40,
+                    "base_key": "Gs3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 110
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 42,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 62,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 43,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 62,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 156,
+                    "base_key": "B3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 86
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 17,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 17,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 120,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "Ds4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 24
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 26
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 26
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 22,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 22,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 90,
+                    "release": 120,
+                    "pan": 102
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 120,
+                    "base_key": "Gs4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 107,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 106,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 163,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 25
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 163,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 105
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 23,
+                    "base_key": "Fs5",
+                    "attack": 127,
+                    "decay": 115,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 92,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 91,
+                    "base_key": "Gs5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 111,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 115,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 25
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 227,
+                    "base_key": "As5",
+                    "attack": 127,
+                    "decay": 115,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 264,
+                    "base_key": "B5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 235,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 32
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 236,
+                    "base_key": "Cs6",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 32
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 210,
+                    "base_key": "D6",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 211,
+                    "base_key": "Ds6",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 189,
+                    "base_key": "E6",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 45,
+                    "base_key": "F6",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 19,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 3,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 4,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 5,
+                    "base_key": "C5",
+                    "attack": 120,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 1,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 8,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 9,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 5,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 6,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 7,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 25,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 0,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 1,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 2,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 49,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 14,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 13,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 12,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 15,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 41,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 20,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 126,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 19,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 126,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 18,
+                    "base_key": "B4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 126,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 21,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 126,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 33,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Cs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 26,
+                    "base_key": "G2",
+                    "attack": 120,
+                    "decay": 100,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 25,
+                    "base_key": "E3",
+                    "attack": 120,
+                    "decay": 90,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 24,
+                    "base_key": "C4",
+                    "attack": 120,
+                    "decay": 90,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 63,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 29,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 28,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 31,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 30,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 45,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 34,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 33,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 32,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 24,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 37,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 38,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 36,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 35,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 23,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 57,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 58,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 56,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 55,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 17,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 46,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 47,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 48,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 108,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 190,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 191,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 192,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 193,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 22,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 57,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 58,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 56,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 55,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 3,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 59,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 115,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 60,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 115,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 4,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 59,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 60,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 42,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 67,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 69,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 68,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 66,
+                    "base_key": "B4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 26,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 49,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 50,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 27,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "As1",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 53,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 51,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 54,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 52,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 90,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 70,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 73,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 71,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 74,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 72,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 15,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 75,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 76,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 77,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 79,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 85,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 81,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 87,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 89,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 83,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 90,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 7,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 78,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 84,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 80,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 86,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 82,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 88,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 83,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 90,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 35,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 100,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 101,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 99,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 36,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 95,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 96,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 97,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 98,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 6,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 103,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 102,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 105,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 104,
+                    "base_key": "D5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 99,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 195,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 196,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 197,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C6",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 198,
+                    "base_key": "D5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 199,
+                    "base_key": "D6",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 94,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 200,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 201,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 202,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C6",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 203,
+                    "base_key": "D5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 204,
+                    "base_key": "D6",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 11,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 114,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 115,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 116,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 16,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 117,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 118,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 119,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 20,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 122,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 42,
+                    "sustain": 20,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 123,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 42,
+                    "sustain": 20,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 121,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 42,
+                    "sustain": 20,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 44,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 126,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 125,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 124,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 2,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 138,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 139,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 140,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 141,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 60,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Ds4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 135,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 10,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 137,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 10,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 136,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 10,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 61,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "D4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 128,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 129,
+                    "base_key": "Ds4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 130,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 127,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 62,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "D4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 132,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 133,
+                    "base_key": "Ds4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 134,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 131,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 18,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 142,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 143,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 144,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 47,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 64,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Fs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 63,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds6",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 62,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 65,
+                    "base_key": "F6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 48,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 146,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 145,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 148,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 147,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 34,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 153,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 151,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 150,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 149,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 152,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 50,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 160,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 161,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 162,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 75,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 165,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 164,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 167,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 166,
+                    "base_key": "D5",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 28,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 168,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 170,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 169,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 21,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 179,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 180,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 178,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 177,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 30,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 184,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 182,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 188,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 185,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 31,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 186,
+                    "base_key": "F2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Fs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 183,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 181,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 187,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 29,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 222,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 223,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 70,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 224,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 225,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 226,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 38,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 229,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 228,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 230,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 40,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 239,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 238,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 237,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 39,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 241,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 240,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 242,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 43,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 244,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 243,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 245,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 14,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 247,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 246,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 10,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 248,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 249,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 250,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 32,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 253,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 252,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 251,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 91,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 216,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Fs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 218,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 220,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 212,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 214,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 92,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 217,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Fs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 219,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 221,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 213,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 215,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 89,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 206,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 205,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 208,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 207,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 65,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 254,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 260,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 256,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 262,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 258,
+                    "base_key": "As4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 64,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 255,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 261,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 257,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 263,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 259,
+                    "base_key": "As4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 12,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 266,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 265,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 268,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 267,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 13,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 270,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 269,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 272,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+                    "wave": 271,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

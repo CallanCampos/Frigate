@@ -1,0 +1,38 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Athos",
+    "class": "TRAINER_CLASS_HARLEQUIN_32",
+    "pokemon": [
+        "shiftry_1",
+        "slowking_1",
+        "bronzong_1",
+        "tyranitar_1",
+        "marowak_2",
+        "quagsire_2",
+        "musharna_2",
+        "reuniclus_2",
+        "seismitoad_2",
+        "conkeldurr_2",
+        "dusknoir_2",
+        "forretress_3",
+        "hariyama_3",
+        "cofagrigus_3",
+        "golurk_4",
+        "golem_4",
+        "slowbro_4",
+        "rampardos_4",
+        "bronzong_4",
+        "gigalith_4",
+        "conkeldurr_4",
+        "steelix_4",
+        "exeggutor_4",
+        "hippowdon_4",
+        "dusknoir_4",
+        "rhyperior_4"
+    ],
+    "messages": [
+        "Sorry to keep you waiting.\nYour idol, Harlequin, Harlequin.",
+        "Thank you very much.\nIt was Harlequin, Harlequin.",
+        "It was Harlequin, Harlequin.\nThank you for your support."
+    ]
+}

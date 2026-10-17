@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BRELOOM",
+    "moves": [ "MOVE_PROTECT", "MOVE_LEECH_SEED", "MOVE_SUBSTITUTE", "MOVE_FOCUS_PUNCH" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_TOXIC_ORB",
+    "form": 0
+}

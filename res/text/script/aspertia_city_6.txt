@@ -1,0 +1,6 @@
+AspertiaCity6_Text_WhatKindRelationshipWant = What kind of relationship do you want\nwith the Pokémon you meet?{be01}\nI'm happy just having them by my side!
+AspertiaCity6_Text_SincePokeBallsWere = Since Poké Balls were invented,\nanyone can be with Pokémon!{be01}\nWe take it for granted now, but\nif you think about it, it's amazing!
+AspertiaCity6_Text_WantHavePokemonBattle = I want to have a Pokémon battle soon!
+AspertiaCity6_Text_HeyPokemonWhoaCool = Hey! Is that your Pokémon?\nWhoa! Cool!
+AspertiaCity6_Text_HeyPokemonWhoaCool_2 = Hey! Is that your Pokémon?\nWhoa! Cool!
+\pad{a4}
