@@ -2459,8 +2459,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
-  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, while
-  `dwc_util_main_menu.c`'s message paths, packed one after another, stay arrays.
+  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, and
+  `dwc_util_main_menu.c`'s message paths, each padded to 4 bytes, are literals too.
 - A global that no code refers to can be declared anywhere in the file, after functions too, and where it sits in
   the heapsort's list moves the local initializers around it: `mus_shot_photo.c` declares `MUS_SHOT_PHOTO_UNUSED`
   just before its last function, which gives the original's `.rodata` with no code change.
