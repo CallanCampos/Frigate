@@ -5413,12 +5413,12 @@ sPlaceNameSurfaceSetup kind:data(any) addr:0x021d1144
 sPlaceNameBGSetup kind:data(any) addr:0x021d1154
 data_ov036_021d1140 kind:data(any) addr:0x021d1174
 data_ov036_021d1150 kind:data(any) addr:0x021d1184
-data_ov036_021d1170 kind:data(any) addr:0x021d11a4
+PLACE_NAME_LETTER_POSITIONS kind:data(any) addr:0x021d11a4
 data_ov036_021d11ac kind:data(any) addr:0x021d11e0
 data_ov036_021d11c0 kind:data(any) addr:0x021d11f4
 data_ov036_021d11d4 kind:data(any) addr:0x021d1208
 data_ov036_021d11f8 kind:data(any) addr:0x021d122c
-data_ov036_021d121c kind:data(any) addr:0x021d1250
+PLACE_NAME_LETTER_OPS kind:data(any) addr:0x021d1250
 data_ov036_021d1244 kind:data(any) addr:0x021d1278
 data_ov036_021d125c kind:data(any) addr:0x021d1290
 GIMMICK_OVERLAY_INFO kind:data(any) addr:0x021d12a8
