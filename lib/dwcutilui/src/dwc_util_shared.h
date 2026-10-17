@@ -37,17 +37,24 @@ void func_ov182_021b7c60(const DWCUtilAcResult *result);
 void func_ov182_021b8154(int variant);
 void func_ov182_021b84c0(int variant);
 
-// The utility's message file, which a later file opens
-extern DWCUtilMsg *data_ov182_021c40b8;
-
 // The utility's sound: its start and its end, around the main loop
 void func_ov182_021b8050(void);
 void func_ov182_021b80d4(void);
 // Starts the sound effect, from the utility's sound archive
 void func_ov182_021b80f4(int seq);
 
-// The update function of the utility's first screen
-void func_ov182_021ae574(void);
+// Reads the console's Wi-Fi settings, and frees them
+void func_ov182_021b77dc(void);
+void func_ov182_021b780c(void);
+
+// Copies row src of the palette to BG palette row dest of the main screen at the next VBlank
+void func_ov182_021b7014(const void *palette, int src, int dest);
+// Loads the sub screen's BG 1 of one of the layouts at the next VBlank
+void func_ov182_021b87d0(int layout);
+
+// The first screens of the connection settings and of the options
+void func_ov182_021b536c(void);
+void func_ov182_021af25c(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

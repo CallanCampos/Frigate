@@ -27,3 +27,9 @@ flags = [
     "-nolink",
     "-msgstyle gcc",
 ]
+
+# dwc_util_main_menu.c loads char/jbBgStep1.ncg.l and char/jbBgStep1.ncl.l in two functions, and the ROM has a copy of
+# each for each function, where MWCC shares a file's equal string literals: the file is built with -str noreuse.
+# dwc_util_text.c's two font tables share one string.
+[file_flags]
+"dwc_util_main_menu.c" = ["-str noreuse"]

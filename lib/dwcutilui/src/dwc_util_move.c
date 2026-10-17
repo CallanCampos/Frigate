@@ -1,5 +1,6 @@
 #include "dwc_util_move.h"
 #include "app/download_play_sys.h"
+#include "dwc_util_connection.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_main.h"
 #include "dwc_util_msg_resource.h"

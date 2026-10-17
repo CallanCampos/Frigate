@@ -198,4 +198,10 @@ lib/dwcutilui/src/dwc_util_move.c:
 lib/dwcutilui/src/dwc_util_connection.c:
     complete
     .text       start:0x021ae3d8 end:0x021ae4f4
-    .bss        start:0x021c40b4 end:0x021c40b8
+    .bss        start:0x021c40b4 end:0x021c40bc
+
+lib/dwcutilui/src/dwc_util_main_menu.c:
+    .text       start:0x021ae4f4 end:0x021aeafc
+    .rodata     start:0x021bff94 end:0x021bffd0
+    .data       start:0x021c0bec end:0x021c0dd4
+    .bss        start:0x021c40bc end:0x021c40c4

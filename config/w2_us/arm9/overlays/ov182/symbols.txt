@@ -1197,8 +1197,8 @@ data_ov182_021bff78 kind:data(any) addr:0x021bffb8
 data_ov182_021bff80 kind:data(any) addr:0x021bffc0
 sClientName kind:data(any) addr:0x021bffc8
 data_ov182_021bff94 kind:data(any) addr:0x021bffd4
-data_ov182_021bff98 kind:data(any) addr:0x021bffd8
-data_ov182_021bffa8 kind:data(any) addr:0x021bffe8
+sMainMenuButtonRects kind:data(any) addr:0x021bffd8
+sMainMenuCursorRects kind:data(any) addr:0x021bffe8
 data_ov182_021bffaa kind:data(any) addr:0x021bffea
 data_ov182_021bffac kind:data(any) addr:0x021bffec
 data_ov182_021bffae kind:data(any) addr:0x021bffee
@@ -1377,7 +1377,7 @@ data_ov182_021c0c1c kind:data(any) addr:0x021c0c5c
 data_ov182_021c0c2c kind:data(any) addr:0x021c0c6c
 data_ov182_021c0c3c kind:data(any) addr:0x021c0c7c
 data_ov182_021c0c4c kind:data(any) addr:0x021c0c8c
-data_ov182_021c0c5c kind:data(any) addr:0x021c0c9c
+sMsgPaths kind:data(any) addr:0x021c0c9c
 data_ov182_021c0c78 kind:data(any) addr:0x021c0cb8
 data_ov182_021c0c88 kind:data(any) addr:0x021c0cc8
 data_ov182_021c0c9c kind:data(any) addr:0x021c0cdc
@@ -1625,7 +1625,7 @@ sMsgWork kind:bss addr:0x021c40ec
 sMove kind:bss addr:0x021c40f0
 sStatus kind:bss addr:0x021c40f4
 data_ov182_021c40b8 kind:bss addr:0x021c40f8
-data_ov182_021c40bc kind:bss addr:0x021c40fc
+sMainMenu kind:bss addr:0x021c40fc
 data_ov182_021c40c4 kind:bss addr:0x021c4104
 data_ov182_021c40c8 kind:bss addr:0x021c4108
 data_ov182_021c40d4 kind:bss addr:0x021c4114
