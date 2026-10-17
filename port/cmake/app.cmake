@@ -13,3 +13,17 @@ add_test(NAME replay_start_menu
         --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/start_menu.pbwinput")
 set_tests_properties(replay_start_menu PROPERTIES
     SKIP_RETURN_CODE 66 PASS_REGULAR_EXPRESSION "stopped after 4300 frames" TIMEOUT 120)
+
+# A replay from power-on through the start menu's NEW GAME and the intro (overlay 294) into the opening's 3D flight
+# over Aspertia City (port/tests/replay/new_game.pbwinput), up to just before the field's first script, whose tables
+# have no C yet. The intro takes the start menu's first item, NEW GAME, only without a save, so the replay's save
+# directory is emptied before each run. Without the player's ROM the program exits 66 and the test is skipped
+set(replay_new_game_saves "${CMAKE_CURRENT_BINARY_DIR}/replay_new_game_saves")
+add_test(NAME replay_new_game_clean COMMAND ${CMAKE_COMMAND} -E rm -rf "${replay_new_game_saves}")
+set_tests_properties(replay_new_game_clean PROPERTIES FIXTURES_SETUP replay_new_game_saves)
+add_test(NAME replay_new_game
+    COMMAND ${PORT_PROGRAM} --headless --frames 12000 --watchdog 30 --save-dir "${replay_new_game_saves}"
+        --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game.pbwinput")
+set_tests_properties(replay_new_game PROPERTIES
+    FIXTURES_REQUIRED replay_new_game_saves SKIP_RETURN_CODE 66 PASS_REGULAR_EXPRESSION "stopped after 12000 frames"
+    TIMEOUT 600)

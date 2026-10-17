@@ -26,11 +26,57 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: New Game's intro natively, to the field's first script
+
+- **Upstream:** `e484d5011` (merge of PR #353), as in the last entry; no sync in this task.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `check_mwcc_neutral.py`: 3,138 of 3,140 file and
+  version pairs give the same MWCC token stream as upstream's `e484d5011`. The other two are `src/system/vm.c` in each
+  version, which differs by one cast and is complete, so the SHA1s prove it.
+- **Host build:** arm64 macOS, RelWithDebInfo, and a sanitized build (ASan and UBSan, alignment recoverable). CI not
+  run: the work is on a branch, not pushed.
+- **Tests:** T0 as above. T2: 209 `ctest` tests, 207 pass and 2 are skipped (`asm_oracle` and `oracle_boot`, which need
+  the oracle build), among them the new `replay_new_game`, which plays an input file from power-on through NEW GAME and
+  the intro to video frame 12,000. T5, by hand: the same replay in the sanitized build, to frame 12,100: no ASan error,
+  and from UBSan only the two misaligned reads already known, NitroSystem reading a 2-byte element of a file through a
+  larger struct (`g2d_CellAnimation.c:33`, `g2d_MultiCellAnimation.c:119`). T3 (frame hashes), T4, T6 and T7 not yet.
+- **Tiers:** unchanged since the last entry (no upstream merge, no decomp C added).
+- **Trap stubs:** 574 function stubs (355 in overlay 36, 113 in overlay 11) and 65 data placeholders: DS Protect's seven
+  functions and two data objects are `port/hal/stubs/dsprot.c` now. New Game stops just after video frame 12,060 of
+  `new_game.pbwinput`, on `g_ActiveFieldScriptSubEvents` (overlay 12's .bss), which `ScriptWork_Create` reads as the
+  opening starts the field's first script. Overlay 12's script tables have no C either: `GLOBAL_SCRIPT_TABLE`,
+  `EVCMD_TABLE`, `EVCMD_PERM_TABLE`, `EVCMD_MAX`, `VM_CMP_LUT`, `FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS`. Until this entry
+  no placeholder was protected on macOS: ld64 placed them all before the paddings that were to bracket them, so the
+  first run here read `GLOBAL_SCRIPT_TABLE` as zeros and hung in an assert's error screen.
+- **64-bit warnings:** game / `lib/` on arm64 unchanged: `-Wpointer-to-int-cast` 865 / 184, `-Wvoid-pointer-to-int-cast`
+  49 / 117, `-Wint-to-pointer-cast` 76 / 144, `-Wint-to-void-pointer-cast` 69 / 132. The probe preprocesses without
+  `PLATFORM_PC`, where `uptr` is `u32`, so this task's `uptr` fixes don't show in it.
+- **Work done:**
+  - New Game plays natively from the start menu through the whole intro (overlay 294): Professor Juniper and Minccino
+    with the intro's particle effects, the player's sex, the name entries for the player and the rival, then the
+    opening's season banner and its 3D flight over Aspertia City, which fades out at the player's house.
+  - The particle systems' work comes from the platform layer, twice the size the 13 creating files give for the DS's
+    structs (`port/hal/gfl/particle_work.c`).
+  - Pointers carried in 32-bit values on the way, with each API's siblings: the Pokémon parameter setters (47 call sites
+    in 23 files), NitroSystem's animation callback parameter with ClAct's and MCSS's (14 callbacks), the sound preload
+    handle, the script VM's stack and loaded file; the opening's raw LCDC VRAM address as the SDK's constant.
+  - DS Protect as a genuine cartridge: `port/hal/stubs/dsprot.c`, and the game's own checks of DS Protect's code skipped
+    on hosts. `EventData_Reset`'s placeholder pointer, past an array, worked out without undefined behaviour.
+  - Trap stubs: the data placeholders' range is worked out from where the linker put each one, so every one faults.
+    `--screenshot-every N` writes the screens every N frames, for playtests.
+  - Game changes, all proven neutral, in `port/docs/game-changes.md`; the lessons in a new `port/docs/lessons.md`.
+- **Next:** overlay 12's field script data (the tables above and the .bss), which is decomp work (issue #73 has no
+  active claim) and lets the opening run the field's first script; then overlay 36. Meanwhile, phase 2's oracle
+  comparison, and the intro's. The same 32-bit pointer shape waits further on: `JoinAvenue_GetParam` and
+  `JoinAvenuePerson_SetParam`, `BmpMenuList_GetParam`, and `NameEntryParam`'s `unkC` and `unk10` (`pokemonNameEntry`).
+- **Blockers:** overlay 12's script data stops New Game at the field's first script; overlay 36 (issue #83, claimed by
+  another contributor) gates the overworld after it.
+
 ## 2026-10-17: the title screen and the start menu, natively
 
 - **Upstream:** `e484d5011` (merge of PR #353), which brings the ITCM's ClAct renderers (PR #352, decomp work this
   session did to unblock the title screen).
-- **Port:** `PORT_SHA`.
+- **Port:** `570db24f4`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `check_mwcc_neutral.py`: all 3,140 file and
   version pairs give the same MWCC token stream as upstream's `e484d5011`.
 - **Host build:** arm64 macOS, RelWithDebInfo and unoptimized (`-fgnu89-inline` made the unoptimized build link); CI

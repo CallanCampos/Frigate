@@ -31,7 +31,13 @@ void EventData_Reset(EventData *data) {
     EventData_Clear(data);
     // 0x2200 bytes into the entity file, far past the end of EventData, until LoadZoneEntities points it at the
     // file's init script
+#ifdef PLATFORM_PC
+    // The same address, worked out as a number: a pointer that far past the end of cache is undefined in C, which a
+    // sanitized host build stops on. Nothing reads it before LoadZoneEntities sets it
+    data->initScript = (void *)((uptr)data->cache + 0x2200);
+#else
     data->initScript = data->cache + 0x2200;
+#endif
     data->encLoaded = 0;
     data->encData.fishingEnable = 0;
 }
