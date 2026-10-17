@@ -1,4 +1,17 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_W102_IMMITATE", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_W102_IMMITATE", null, null, null ],
+    "instruments": [
+        {
+            "program": 70,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 40,
+            "release": 127,
+            "pan": 64
+        }
+    ]
 }

@@ -1,4 +1,282 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_PW_SCENARIO_07_L", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_PW_SCENARIO_07_L", null, null, null ],
+    "instruments": [
+        {
+            "program": 33,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Cs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 2,
+                    "base_key": "G2",
+                    "attack": 120,
+                    "decay": 100,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 1,
+                    "base_key": "E3",
+                    "attack": 120,
+                    "decay": 90,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 120,
+                    "decay": 90,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 42,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 6,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 5,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 3,
+                    "base_key": "B4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 35,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 8,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 9,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 7,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 2,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 10,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 11,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 12,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 13,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 30,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 15,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 14,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 17,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 16,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 14,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 19,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_SCENARIO_07_L",
+                    "wave": 18,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

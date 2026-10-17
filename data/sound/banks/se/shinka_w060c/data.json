@@ -1,4 +1,30 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_SHINKA_W060C", null, null, null ]
+    "wave_archives": [ "WAVE_SE_SHINKA_W060C", null, null, null ],
+    "instruments": [
+        {
+            "program": 44,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_SHINKA_W060C",
+            "wave": 1,
+            "base_key": "C4",
+            "attack": 99,
+            "decay": 99,
+            "sustain": 99,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 45,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_SHINKA_W060C",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 99,
+            "decay": 10,
+            "sustain": 0,
+            "release": 80,
+            "pan": 64
+        }
+    ]
 }

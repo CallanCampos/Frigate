@@ -1,4 +1,18 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_FLD_DECIDE", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_FLD_DECIDE", null, null, null ],
+    "instruments": [
+        {
+            "program": 41,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_FLD_DECIDE",
+            "wave": 0,
+            "base_key": "D3",
+            "attack": 127,
+            "decay": 60,
+            "sustain": 1,
+            "release": 120,
+            "pan": 64
+        }
+    ]
 }

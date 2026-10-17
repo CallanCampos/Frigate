@@ -1,4 +1,35 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_W377_INST", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_W377_INST", null, null, null ],
+    "instruments": [
+        {
+            "program": 112,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 124,
+            "decay": 100,
+            "sustain": 80,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 27,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_W377_INST",
+                    "wave": 0,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

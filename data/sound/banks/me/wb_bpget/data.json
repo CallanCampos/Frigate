@@ -1,4 +1,338 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_ME_WB_BPGET", null, null, null ]
+    "wave_archives": [ "WAVE_ME_WB_BPGET", null, null, null ],
+    "instruments": [
+        {
+            "program": 81,
+            "type": "drums",
+            "first_key": "C2",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 8,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 8,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 8,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 8,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 12,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 0,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                }
+            ]
+        },
+        {
+            "program": 17,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 1,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 2,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 3,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 22,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 6,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 7,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 5,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 4,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 28,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 9,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 11,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_BPGET",
+                    "wave": 10,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

@@ -1,4 +1,17 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_GAME_KANRYO", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_GAME_KANRYO", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 100,
+            "decay": 50,
+            "sustain": 127,
+            "release": 125,
+            "pan": 64
+        }
+    ]
 }

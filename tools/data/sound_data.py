@@ -12,7 +12,7 @@ kind and one of its category, the constant's word after its kind's prefix: SEQ_B
 BANK_SE_SW_JUMP banks/se/sw_jump/, BANK_PV001 banks/pv/pv001/ and WAVE_ARC_PMWB_123
 wave_archives/arc/pmwb_123/. Each has data.json, its info
 record, which the schemas in data/sound/ describe, and its file: sequence.s, the sequence's commands as text
-(sseq.py), bank.sbnk, wave_archive.swar or stream.strm. A sequence that plays another's file
+(sseq.py), wave_archive.swar or stream.strm. A bank's data.json also has its instruments (sbnk.py). A sequence that plays another's file
 says so with "file". The Pokémon cries' wave archives, the first
 of wave_archives.txt after its empty first slot, are each species' cry.wav in data/pokemon/ (pokemon_cries.py).
 players.json, groups.json, stream_players.json and streams' are the small kinds' records, by their constants.
@@ -28,6 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tools.data.sdat as sdat  # noqa: E402
 import tools.data.sseq as sseq  # noqa: E402
+from tools.data.sbnk import BankError, read as read_bank, write as write_bank  # noqa: E402
 from tools.data.datajson import DataError, label, load, load_schema, value, write  # noqa: E402
 from tools.data.gen_constants import load as load_list  # noqa: E402
 from tools.data.pokemon_cries import cry_folder, read_wav, wav_bytes  # noqa: E402
@@ -39,7 +40,7 @@ POKEMON = ROOT / "data/pokemon"
 KIND_LISTS = {"sequences": "sound", "sequence_archives": None, "banks": "sound_banks",
               "wave_archives": "sound_wave_archives", "players": "sound_players", "groups": "sound_groups",
               "stream_players": "sound_stream_players", "streams": "sound_streams"}
-FILE_KINDS = {"sequences": (("SEQ_",), "sequence.s"), "banks": (("BANK_",), "bank.sbnk"),
+FILE_KINDS = {"sequences": (("SEQ_",), "sequence.s"), "banks": (("BANK_",), None),
               "wave_archives": (("WAVE_",), "wave_archive.swar"), "streams": (("STRM_",), "stream.strm")}
 SMALL_KINDS = ("players", "groups", "stream_players")
 # The wave archives of the Pokémon cries, the slots after the empty first, and the cries' wave format: PCM8, unlooped
@@ -123,6 +124,12 @@ def dump(files: Path, root: Path):
                     if sseq.assemble(text) != archive["files"][file_id]:
                         raise SystemExit(f"{constant}'s sequence doesn't assemble again from its text")
                     (path / FILE_KINDS[kind][1]).write_text(text)
+                elif kind == "banks":
+                    archives = [None if number == NO_WAVE_ARCHIVE else names["wave_archives"][number]
+                                for number in BANK.unpack(record)[2:]]
+                    data["instruments"] = read_bank(archive["files"][file_id], archives)
+                    if write_bank(data["instruments"], archives) != archive["files"][file_id]:
+                        raise SystemExit(f"{constant}'s bank isn't written again from its instruments")
                 else:
                     (path / FILE_KINDS[kind][1]).write_bytes(archive["files"][file_id])
             if kind == "sequences":
@@ -133,6 +140,8 @@ def dump(files: Path, root: Path):
                 archives = BANK.unpack(record)[2:]
                 data["wave_archives"] = [None if number == NO_WAVE_ARCHIVE else names["wave_archives"][number]
                                          for number in archives]
+                if "instruments" in data:
+                    data["instruments"] = data.pop("instruments")
             elif kind == "streams":
                 _, _, volume, priority, player, _ = STREAM.unpack(record)
                 data.update({"volume": volume, "priority": priority, "player": names["stream_players"][player]})
@@ -205,11 +214,17 @@ def pack(root: Path, output: Path):
                 continue
             path = entry_dir(root, kind, constant)
             data = load(path / "data.json", schema) if (path / "data.json").exists() else {}
-            source = path / FILE_KINDS[kind][1]
+            source = path / (FILE_KINDS[kind][1] or "data.json")
             if "file" not in data:
                 check(source.is_file(), source, "missing")
                 file_ids[constant] = len(files)
-                if kind == "sequences":
+                if kind == "banks":
+                    check("instruments" in data, source, "a bank without \"file\" needs its \"instruments\"")
+                    try:
+                        files.append(write_bank(data["instruments"], data["wave_archives"]))
+                    except BankError as error:
+                        raise DataError(f"{label(source)}: {error}") from None
+                elif kind == "sequences":
                     try:
                         files.append(sseq.assemble(source.read_text(), label(source)))
                     except sseq.SequenceError as error:

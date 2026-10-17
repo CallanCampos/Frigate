@@ -1,4 +1,24 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_FLD_POISON", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_FLD_POISON", null, null, null ],
+    "instruments": [
+        {
+            "program": 17,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_FLD_POISON",
+                    "wave": 0,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

@@ -343,9 +343,9 @@ stream players and streams of `sound_players.txt`, `sound_groups.txt`, `sound_st
 `sound_streams.txt`, whose names are the archive's own symbols. A sequence, bank, wave archive or stream is a
 directory named after its constant, in its kind's directory and its category's, the word after the kind's prefix:
 `SEQ_BGM_T_01` is `data/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `data/sound/banks/se/sw_jump/`, and
-`BANK_PV001` `data/sound/banks/pv/pv001/`. Each has its file, `sequence.s` (see [Sequences](#sequences)), or
-`bank.sbnk`, `wave_archive.swar` or `stream.strm`, Nitro's own formats for now, and a sequence, bank and stream has
-`data.json`, its record of the archive,
+`BANK_PV001` `data/sound/banks/pv/pv001/`. A sequence has its `sequence.s` (see [Sequences](#sequences)), a bank its
+instruments in its `data.json` (see [Banks](#banks)), and a wave archive and a stream their files, `wave_archive.swar`
+and `stream.strm`, Nitro's own formats for now. A sequence, bank and stream has `data.json`, its record of the archive,
 which the schemas in `data/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
 archives, a stream's volume, priority and player. Some entries share a file: 86 sequences play another's, such as the
 placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
@@ -406,6 +406,33 @@ Each MIDI channel with notes becomes a track at the game's 48 ticks a quarter no
 volume, pan, expression, modulation depth and pitch bend come along; markers named `loopStart` and `loopEnd` loop the
 song. A program is an instrument of the sequence's bank, not a General MIDI one, so set the MIDI file's programs to the
 bank's instruments.
+
+### Banks
+
+A bank's `data.json` has its four wave archives and its instruments, in the order of their data, each with the
+program number that a sequence's `program` picks it by:
+
+```json
+{
+    "program": 85,
+    "type": "wave",
+    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+    "wave": 110,
+    "base_key": "Cs2",
+    "attack": 127,
+    "decay": 125,
+    "sustain": 120,
+    "release": 120,
+    "pan": 64
+}
+```
+
+A `wave` instrument plays a wave of one of the bank's wave archives, a `psg` one a square wave of a `duty` from 0 to 7
+and a `noise` one noise, each at its own pitch on its `base_key`, with its envelope (`attack`, `decay`, `sustain`,
+`release`) and `pan`. A `drums` set has an instrument for each key from its `first_key` in its `keys`, and a `split` an
+instrument for each region of keys in its `regions`, each up to its `up_to`. Programs that share an instrument list
+their numbers, an `unused` entry keeps data that no program uses as hex, and `programs` gives a bank more programs than
+its last instrument's. `tools/data/sbnk.py` writes the bank from them byte for byte.
 
 ## Moves
 

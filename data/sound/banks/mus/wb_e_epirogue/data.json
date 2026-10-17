@@ -1,4 +1,54 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_WB_E_EPIROGUE", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_WB_E_EPIROGUE", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_EPIROGUE",
+            "wave": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 100,
+            "pan": 64
+        },
+        {
+            "program": 100,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_EPIROGUE",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 101,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_EPIROGUE",
+            "wave": 1,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 102,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_E_EPIROGUE",
+            "wave": 2,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        }
+    ]
 }

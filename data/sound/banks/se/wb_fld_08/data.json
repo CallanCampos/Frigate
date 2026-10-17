@@ -1,4 +1,16 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_FLD_KUSA_LONG", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_FLD_KUSA_LONG", null, null, null ],
+    "instruments": [
+        {
+            "program": 121,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 110,
+            "decay": 127,
+            "sustain": 60,
+            "release": 120,
+            "pan": 64
+        }
+    ]
 }

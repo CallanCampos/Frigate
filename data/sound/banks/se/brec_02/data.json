@@ -1,4 +1,48 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_BREC_02", null, null, null ]
+    "wave_archives": [ "WAVE_SE_BREC_02", null, null, null ],
+    "instruments": [
+        {
+            "program": 44,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_BREC_02",
+            "wave": 1,
+            "base_key": "C4",
+            "attack": 99,
+            "decay": 99,
+            "sustain": 99,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 56,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_BREC_02",
+            "wave": 2,
+            "base_key": "C3",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 126,
+            "pan": 64
+        },
+        {
+            "program": 3,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_BREC_02",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

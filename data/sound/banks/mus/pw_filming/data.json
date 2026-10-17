@@ -1,4 +1,96 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_PW_FILMING", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_PW_FILMING", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 0,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 1,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 4,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 2,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 5,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 3,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_PW_FILMING",
+                    "wave": 6,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 35,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

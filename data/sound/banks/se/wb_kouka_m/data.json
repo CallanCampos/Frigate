@@ -1,4 +1,28 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_KOUKA_M", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_KOUKA_M", null, null, null ],
+    "instruments": [
+        {
+            "program": 72,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_KOUKA_M",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 99,
+            "decay": 10,
+            "sustain": 40,
+            "release": 112,
+            "pan": 64
+        },
+        {
+            "program": 122,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 100,
+            "sustain": 0,
+            "release": 120,
+            "pan": 64
+        }
+    ]
 }

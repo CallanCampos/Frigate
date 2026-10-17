@@ -1,4 +1,413 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_WB_N_CASTLE_BRIDGE", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_WB_N_CASTLE_BRIDGE", null, null, null ],
+    "instruments": [
+        {
+            "program": 85,
+            "type": "drums",
+            "first_key": "C2",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 14,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 14,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 14,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 14,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 15,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 15,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 12,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 105,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 12,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 105,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 12,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 105,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 12,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 105,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 13,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 65,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 13,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 65,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 13,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 65,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 45
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 3,
+                    "base_key": "Cs3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 40
+                }
+            ]
+        },
+        {
+            "program": 33,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Cs3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 2,
+                    "base_key": "G2",
+                    "attack": 120,
+                    "decay": 100,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 1,
+                    "base_key": "E3",
+                    "attack": 120,
+                    "decay": 90,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 120,
+                    "decay": 90,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 42,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 5,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 7,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 6,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 4,
+                    "base_key": "B4",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 36,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 8,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 9,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 10,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 11,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 30,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 17,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Ds5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 16,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 19,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 18,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 40,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 22,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 21,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_N_CASTLE_BRIDGE",
+                    "wave": 20,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

@@ -1,4 +1,26 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_PASA1", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_PASA1", null, null, null ],
+    "instruments": [
+        {
+            "program": 125,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 50,
+            "decay": 127,
+            "sustain": 80,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 127,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 90,
+            "release": 112,
+            "pan": 64
+        }
+    ]
 }

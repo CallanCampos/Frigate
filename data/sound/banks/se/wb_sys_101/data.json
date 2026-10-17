@@ -1,4 +1,48 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_SYS_101", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_SYS_101", null, null, null ],
+    "instruments": [
+        {
+            "program": 73,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_SYS_101",
+            "wave": 0,
+            "base_key": "C1",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 3,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_SYS_101",
+                    "wave": 1,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_SYS_101",
+                    "wave": 2,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

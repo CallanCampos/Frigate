@@ -1,4 +1,29 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_FLD_DOOR_OPEN", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_FLD_DOOR_OPEN", null, null, null ],
+    "instruments": [
+        {
+            "program": 84,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_FLD_DOOR_OPEN",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 113,
+            "type": "psg",
+            "duty": 0,
+            "base_key": "C4",
+            "attack": 124,
+            "decay": 100,
+            "sustain": 80,
+            "release": 120,
+            "pan": 64
+        }
+    ]
 }

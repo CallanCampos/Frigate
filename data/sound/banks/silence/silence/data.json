@@ -1,4 +1,17 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_WB_SILENCE", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_WB_SILENCE", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "psg",
+            "duty": 0,
+            "base_key": "C4",
+            "attack": 120,
+            "decay": 115,
+            "sustain": 110,
+            "release": 118,
+            "pan": 64
+        }
+    ]
 }

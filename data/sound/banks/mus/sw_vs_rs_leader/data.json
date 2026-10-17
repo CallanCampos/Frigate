@@ -1,4 +1,928 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_SW_VS_RS_LEADER", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_SW_VS_RS_LEADER", null, null, null ],
+    "instruments": [
+        {
+            "program": 43,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 50,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 44,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+            "wave": 19,
+            "base_key": "C4",
+            "attack": 99,
+            "decay": 99,
+            "sustain": 99,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 48,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 40,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 56,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+            "wave": 32,
+            "base_key": "C3",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 126,
+            "pan": 64
+        },
+        {
+            "program": 95,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+            "wave": 13,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 96,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+            "wave": 43,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 39,
+            "type": "drums",
+            "first_key": "G1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 32,
+                    "base_key": "G1",
+                    "attack": 3,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 18,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 120,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 3,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 3,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 3,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 2,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 2,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 2,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 2,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 2,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 3,
+                    "base_key": "A3",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 36
+                }
+            ]
+        },
+        {
+            "program": 40,
+            "type": "drums",
+            "first_key": "F1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 40,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 39,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 42,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 41,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 17,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 126,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 1,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 1,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 17,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 5,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 6,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 7,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 30,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 11,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 8,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 120,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 9,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 10,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 4,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 11,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 12,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 32,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 16,
+                    "base_key": "F3",
+                    "attack": 127,
+                    "decay": 117,
+                    "sustain": 118,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 15,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 117,
+                    "sustain": 118,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 14,
+                    "base_key": "B4",
+                    "attack": 127,
+                    "decay": 117,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 12,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 20,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 21,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 22,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 35,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 24,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 23,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 90,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 26,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 90,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 25,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 70,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 26,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 31,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 29,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 28,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 27,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 30,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 105,
+                    "sustain": 40,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 23,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 36,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "D5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 35,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "B5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 38,
+                    "base_key": "F5",
+                    "attack": 122,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 37,
+                    "base_key": "C6",
+                    "attack": 122,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 22,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 33,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 34,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 41,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 44,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 60,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 45,
+                    "base_key": "D5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 60,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_RS_LEADER",
+                    "wave": 46,
+                    "base_key": "D6",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 60,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

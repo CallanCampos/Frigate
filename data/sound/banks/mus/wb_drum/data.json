@@ -1,4 +1,544 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_WB_DRUM", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_WB_DRUM", null, null, null ],
+    "instruments": [
+        {
+            "program": 90,
+            "type": "drums",
+            "first_key": "C1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 35,
+                    "base_key": "C1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 36,
+                    "base_key": "Cs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 38,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 38,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 39,
+                    "base_key": "E1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 41,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 120
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 32,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 43,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 43,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 42,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 60
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 37,
+                    "base_key": "As1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 40,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 33,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 33,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 34,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 44
+                }
+            ]
+        },
+        {
+            "program": 91,
+            "type": "drums",
+            "first_key": "C1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 4,
+                    "base_key": "C1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 5,
+                    "base_key": "Cs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 9,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 10,
+                    "base_key": "Ds1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 12,
+                    "base_key": "E1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 120
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 14,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 13,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 60
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 11,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 30
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 0,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 6,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 2,
+                    "base_key": "As1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 44
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 3,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 1,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 90
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 7,
+                    "base_key": "Cs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 8,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 90
+                }
+            ]
+        },
+        {
+            "program": 92,
+            "type": "drums",
+            "first_key": "C1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 20,
+                    "base_key": "C1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 21,
+                    "base_key": "Cs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 28,
+                    "base_key": "Ds1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 29,
+                    "base_key": "E1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 30,
+                    "base_key": "F1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 15,
+                    "base_key": "Fs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 24,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 17,
+                    "base_key": "Gs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 70
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 16,
+                    "base_key": "A1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 94
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 19,
+                    "base_key": "As1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 18,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 23,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 25,
+                    "base_key": "Cs2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 26,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 27,
+                    "base_key": "Ds2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_DRUM",
+                    "wave": 31,
+                    "base_key": "E2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 100
+                }
+            ]
+        }
+    ]
 }

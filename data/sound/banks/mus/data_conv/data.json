@@ -1,4 +1,289 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_DATA_CONV", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_DATA_CONV", null, null, null ],
+    "instruments": [
+        {
+            "program": 95,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_DATA_CONV",
+            "wave": 2,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 96,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_DATA_CONV",
+            "wave": 13,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 100,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 40,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "C2",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 12,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 12,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 12,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 12,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 12,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 12,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 10,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 10,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 10,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 10,
+                    "base_key": "Fs2",
+                    "attack": 127,
+                    "decay": 124,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 11,
+                    "base_key": "As2",
+                    "attack": 127,
+                    "decay": 102,
+                    "sustain": 0,
+                    "release": 116,
+                    "pan": 80
+                }
+            ]
+        },
+        {
+            "program": 4,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 1,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 125,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 3,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 6,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 7,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 8,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 5,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_DATA_CONV",
+                    "wave": 9,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 50,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

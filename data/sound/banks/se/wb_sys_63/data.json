@@ -1,4 +1,24 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_WB_SYS_63", null, null, null ]
+    "wave_archives": [ "WAVE_SE_WB_SYS_63", null, null, null ],
+    "instruments": [
+        {
+            "program": 12,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_SYS_63",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 72,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

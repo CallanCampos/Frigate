@@ -1,4 +1,18 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_SW_KYUREON_02_09", null, null, null ]
+    "wave_archives": [ "WAVE_SE_SW_KYUREON_02_09", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_SW_KYUREON_02_09",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 110,
+            "pan": 64
+        }
+    ]
 }

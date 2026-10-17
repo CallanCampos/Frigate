@@ -1,4 +1,784 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_MUS_WB_D_06", null, null, null ]
+    "wave_archives": [ "WAVE_MUS_WB_D_06", null, null, null ],
+    "instruments": [
+        {
+            "program": 62,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_D_06",
+            "wave": 5,
+            "base_key": "E2",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 100,
+            "pan": 64
+        },
+        {
+            "program": 64,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_WB_D_06",
+            "wave": 3,
+            "base_key": "Cs2",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "D1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 22,
+                    "base_key": "D1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 23,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 4,
+                    "base_key": "Cs5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 45,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 2,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 1,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 0,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 100,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "unused": "343c457f00000000010007000000307f6e787440010009000000357f6e7874400100080000003e7f6e787440010006000000477f6e787440"
+        },
+        {
+            "program": 35,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 11,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 12,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 10,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 110,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 71,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G1",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 13,
+                    "base_key": "Ds3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 14,
+                    "base_key": "Ds4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 110,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 34,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 18,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 70,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "A3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 17,
+                    "base_key": "E3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 16,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 15,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 30,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Fs4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 20,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 19,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 70,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_WB_D_06",
+                    "wave": 21,
+                    "base_key": "Ds4",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
 }

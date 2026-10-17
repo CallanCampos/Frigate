@@ -1,4 +1,18 @@
 {
     "$schema": "../../../bank.schema.json",
-    "wave_archives": [ "WAVE_SE_SW_OCHIBA_02", null, null, null ]
+    "wave_archives": [ "WAVE_SE_SW_OCHIBA_02", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_SW_OCHIBA_02",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 90,
+            "decay": 99,
+            "sustain": 99,
+            "release": 125,
+            "pan": 64
+        }
+    ]
 }
