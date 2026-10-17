@@ -109,13 +109,24 @@ target_compile_options(port_hal PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-par
 # dladdr and Dl_info on glibc; port_host.h, force-included first, already pulls in system headers
 target_compile_definitions(port_hal PRIVATE _GNU_SOURCE)
 
+# The renderers and other code that doesn't include the decomp's headers: every C file under gfx/
+file(GLOB_RECURSE port_gfx_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/gfx/*.c")
+if(port_gfx_sources)
+    add_library(port_gfx OBJECT ${port_gfx_sources})
+    target_include_directories(port_gfx PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(port_gfx PRIVATE -std=c11 -Wall -Wextra)
+    set(port_gfx_objects $<TARGET_OBJECTS:port_gfx>)
+    set(port_gfx_targets port_gfx)
+endif()
+
 # Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py)
 add_custom_command(
     OUTPUT "${PORT_GEN}/stubs.c"
     COMMAND "${PORT_PYTHON}" "${REPO_ROOT}/port/tools/gen_stubs.py"
         --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c"
         --objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
-    DEPENDS pokebw2_game port_hal port_app "${REPO_ROOT}/port/tools/gen_stubs.py"
+                  ${port_gfx_objects}
+    DEPENDS pokebw2_game port_hal port_app ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
     WORKING_DIRECTORY "${REPO_ROOT}"
     COMMAND_EXPAND_LISTS
     VERBATIM)
@@ -126,9 +137,17 @@ target_compile_options(port_app PRIVATE -std=c11 -Wall -Wextra)
 target_link_libraries(port_app PRIVATE SDL3::SDL3)
 
 add_executable(${PORT_PROGRAM}
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app> "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app> ${port_gfx_objects}
+    "${PORT_GEN}/stubs.c")
 target_include_directories(${PORT_PROGRAM} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
+
+# Modules' own build rules (per-file definitions, generated inputs): every port/cmake/*.cmake, in name order
+file(GLOB port_cmake_fragments CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/*.cmake")
+list(SORT port_cmake_fragments)
+foreach(fragment IN LISTS port_cmake_fragments)
+    include("${fragment}")
+endforeach()
 
 # Tests (ctest --test-dir build/port). The smoke test passes once the program reaches the game's main(); a trap
 # stub or a placeholder stopping it after that is expected until the platform layer is complete

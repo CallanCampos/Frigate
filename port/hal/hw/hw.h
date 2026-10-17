@@ -28,4 +28,12 @@ typedef struct PortG3Write {
 // The writes logged since the last call, in order, and starts a new log. The pointer is valid until the next call
 const PortG3Write *port_hw_g3_take(size_t *count);
 
+// Logs the words that MI's CPU sends and copies (port/hal/mi) store to a geometry port. The game passes them the
+// port's address, &reg_G3X_GXFIFO or a reg_G3_* register, and evaluating that here logs an entry and gives its value,
+// which holds one word. When dest is that value, of the last entry logged, the entry is taken back and count words from
+// src are logged instead: all to the entry's port when step is 0, or each to the address step bytes after the last
+// one, as an STM stores them (GXFIFO's mirrors, 0x04000400-0x0400043f, are logged as 0x04000400). Returns 1 then;
+// otherwise it logs nothing and returns 0, and dest is memory, for the caller to store to
+int port_hw_g3_send(volatile void *dest, const void *src, uint32_t count, uint32_t step);
+
 #endif // PORT_HAL_HW_H

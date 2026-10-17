@@ -26,11 +26,45 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: phase 0 complete; DS addresses, asm replacements and 64-bit layouts
+
+- **Upstream:** `4aa041311` (merge of PR #348); upstream hasn't moved since this session's sync.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`) after a full `ninja` with this commit's
+  `include/types.h` change; `check_mwcc_neutral.py`, now comparing token streams: all 3,138 file and version pairs give the same MWCC token stream as upstream's `4aa041311`.
+- **Host build:** arm64 macOS and x86-64 Linux build in CI (`port-ci.yml` green), which closes phase 0's exit criteria
+  (links, starts, opens a window, reaches the game's `main()`, both ROMs match, CI green).
+- **Tests:** T0 as above. T2: 4 of 4 `ctest` tests pass: the smoke test, C unit tests of the host MI and FX/MATH/RC4
+  functions, and `asm_oracle`, which runs the ROM's own machine code for each replaced asm function in a test-only CPU
+  emulator and compares it with the host C on thousands of seeded inputs, both versions (it skips without the ROM
+  extract, as in CI). T3–T7 not yet.
+- **Tiers** (`port/tools/progress`, `b1369e48f`): (a) 31,884 functions (77.7%), 2,832,724 bytes (73.6%); (b) 5,538
+  (13.5%), 666,160 bytes (17.3%); (c) 3,596 (8.8%), 351,360 bytes (9.1%), unchanged since 2026-10-16 (overlay 36's C
+  hasn't landed upstream yet).
+- **Trap stubs:** 664 function stubs and 72 data placeholders; the game stops first at `OS_Init`.
+- **64-bit warnings:** not yet counted by the host build.
+- **Work done:**
+  - DS addresses through build-time header translation ([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)):
+    static 16 MiB windows per memory-map region in `port/hal/hw`, accessors for the registers whose accesses act
+    (geometry command log, bit-exact divider and square root, VCOUNT, timers, GXSTAT, matrix readbacks), and
+    `port_hw_g3_send` for SDK copies to the geometry FIFO.
+  - Host C for 38 SDK asm functions (MI copies, fills, compare, swap and LZ decompression; FX matrices; MATH CLZ,
+    QSort, SHA-1 block; RC4), each proven against the ROM's code by `port/tests/asm_oracle`.
+  - `include/types.h`: `u64`, `s64` and `f64` keep the DS's 4-byte alignment on hosts, so structs keep the DS's
+    layout (a bag sort entry stays 12 bytes, so `MATH_QSort` orders equal keys as on the DS; save blocks).
+  - The three phase 0 spikes kept in `port/spikes/` (overlay data sections, VRAM aliasing, fibers); the host build
+    compiles `port/hal` against the decomp's headers with the game's ABI flags, `port/gfx` as its own target, and
+    `port/cmake/*.cmake` fragments.
+- **Next:** phase 1, running as a workflow: the OS core on fibers, the PXI bus and host ARM7 services, the ROM, file
+  system, saves and overlay data resets, VRAM banks, and the CPU 2D renderer, then integration toward the boot logos.
+  Later: fast paths for the byte-wise MI copies (the game's most-called functions), under the same differential tests.
+- **Blockers:** none for phase 1. Overlay 36 (issue #83) still gates phase 3.
+
 ## 2026-10-17: phase 0, the native build links and enters the game's main()
 
 - **Upstream:** `4aa041311` (merge of PR #348), merged in `0f65946be` by this session's sync, which built both ROMs and
   checked both SHA1s.
-- **Port:** `PORT_SHA`.
+- **Port:** `577554b0b`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`) after a full `ninja` with this commit's guards;
   `port/tools/check_mwcc_neutral.py`: all 3,138 file and version pairs preprocess under MWCC exactly as upstream's
   `4aa041311` does.

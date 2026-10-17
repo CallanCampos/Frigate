@@ -6,7 +6,7 @@
 For every C file of src/ and lib/ (or the given ones), and for both versions, it runs MWCC's preprocessor (-EP, the
 same compiler, flags, defines and include paths as the ROM build) on the working tree and on a checkout of BASE
 (default: the upstream commit last merged, `git merge-base HEAD upstream/main`), and compares the outputs with
-whitespace normalized. MWCC never defines PLATFORM_PC, so a change that only adds `#ifdef PLATFORM_PC` branches leaves
+only the spacing between tokens ignored. MWCC never defines PLATFORM_PC, so a change that only adds `#ifdef PLATFORM_PC` branches leaves
 every file's preprocessed text identical: the compiler gets the same input, so it produces the same object, in complete
 and incomplete files alike. That proves a guard-only change neutral for the whole tree at once
 (port/docs/game-changes.md). Any difference is printed with its first differing lines, and the exit status is 1.
@@ -15,8 +15,8 @@ The checkout of BASE is a temporary git worktree, removed at the end. Both trees
 (build/include/generated), which the change doesn't touch.
 """
 import argparse
-import difflib
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -30,8 +30,13 @@ from configure import CC_FLAGS, MWCC_VERSION, VERSIONS, library_of, mwcc_command
 from tools.decomp.compile_all import generate_constants  # noqa: E402
 
 
+# C tokens: string and character literals whole (their spaces matter), identifiers and numbers, and single punctuation
+# characters. Comparing token streams ignores only the spacing between tokens, which the compiler ignores too
+TOKEN = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|[A-Za-z_][A-Za-z0-9_]*|[0-9][A-Za-z0-9_.]*|\S')
+
+
 def preprocess(root: Path, source: str, version: str, generated: Path) -> tuple[int, str]:
-    """MWCC's preprocessed text of one file in one tree, with whitespace collapsed, or its error output."""
+    """MWCC's preprocessed text of one file in one tree as its tokens, one per line, or its error output."""
     library = library_of(ROOT / source)
     compiler, flags = library if library else (MWCC_VERSION, CC_FLAGS)
     include_dirs = ["include", *(p.relative_to(root).as_posix() for p in sorted((root / "lib").glob("*/include")))]
@@ -51,8 +56,8 @@ def preprocess(root: Path, source: str, version: str, generated: Path) -> tuple[
         return proc.returncode, proc.stdout + proc.stderr
     # Each tree's own path appears in #line directives and in __FILE__ strings, as wibo's Windows path
     text = proc.stdout.replace("Z:" + str(root).replace("/", "\\\\"), "<root>")
-    lines = (" ".join(line.split()) for line in text.splitlines() if not line.startswith("#line"))
-    return 0, "\n".join(line for line in lines if line)
+    tokens = (token for line in text.splitlines() if not line.startswith("#line") for token in TOKEN.findall(line))
+    return 0, "\n".join(tokens)
 
 
 def compare(base: Path, source: str, version: str, generated: Path) -> str | None:
@@ -65,8 +70,12 @@ def compare(base: Path, source: str, version: str, generated: Path) -> str | Non
         return f"{source} ({version}): the preprocessor failed: {(head if head_status else old)[:400]}"
     if head == old:
         return None
-    diff = difflib.unified_diff(old.splitlines(), head.splitlines(), "base", "working tree", n=0, lineterm="")
-    return f"{source} ({version}): preprocessed text differs:\n" + "\n".join(list(diff)[2:8])
+    old_tokens, head_tokens = old.splitlines(), head.splitlines()
+    first = next((i for i, (a, b) in enumerate(zip(old_tokens, head_tokens)) if a != b),
+                 min(len(old_tokens), len(head_tokens)))
+    context = slice(max(first - 8, 0), first + 8)
+    return (f"{source} ({version}): the token streams differ at token {first}:\n"
+            f"  base:         {' '.join(old_tokens[context])}\n  working tree: {' '.join(head_tokens[context])}")
 
 
 def main():

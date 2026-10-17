@@ -1,0 +1,8 @@
+# The asm oracle's dependencies (README.md). Test-only: nothing in the port's build or program uses them.
+#   python3 -m venv build/port-venv && build/port-venv/bin/pip install -r port/tests/asm_oracle/requirements.txt
+#
+# Unicorn, the CPU emulator that runs the ROM's original ARM code. The engine is GPLv2 (its repository's COPYING;
+# the Python package's metadata says BSD, the binding's licence); it is installed here unmodified and never linked
+# into, shipped with or committed to the port. 2.1.4 was released on 2025-09-09 and has wheels for macOS (arm64,
+# x86_64), Linux (glibc and musl) and Windows.
+unicorn==2.1.4

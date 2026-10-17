@@ -193,6 +193,20 @@ void *port_hw_gxfifo(void) {
     return log_g3_write(0x04000400);
 }
 
+int port_hw_g3_send(volatile void *dest, const void *src, uint32_t count, uint32_t step) {
+    if (sG3Count == 0 || dest != &sG3Log[sG3Count - 1].value) {
+        return 0;
+    }
+    uint32_t port = sG3Log[--sG3Count].port;
+    for (uint32_t i = 0; i < count; i++) {
+        uint32_t address = port + i * step;
+        uint32_t value;
+        memcpy(&value, (const unsigned char *)src + 4 * i, sizeof(value));
+        *(uint32_t *)log_g3_write(address >= 0x04000400 && address < 0x04000440 ? 0x04000400 : address) = value;
+    }
+    return 1;
+}
+
 const PortG3Write *port_hw_g3_take(size_t *count) {
     free(sG3Taken);
     sG3Taken = sG3Log;
