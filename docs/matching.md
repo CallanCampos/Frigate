@@ -266,6 +266,13 @@ Same instructions, registers swapped.
   are `u16`, as `itemmenu.c`'s caller narrows them; as `u32` it compares a register copy and stores it after.
   The same holds with no narrowing caller to show it: `condition_effects.c`'s `Condition_SetCureMessage` matches
   only with its fourth parameter `u16` (or `u8`), and its one caller passes 0.
+  A local follows the same rule: `btl_client.c`'s `BattleClient_ScExpGain` tests `pos`, a call's result, against 0xff
+  in a register copy before storing it (`mov r1, r0; mov r7, #0x0; str r0, [sp, #0x4]; cmp r1, #0xff`), which only a
+  `u32` or `int` `pos` gives; a `u8 pos` is stored first and reloaded for the compare. The wider local alone narrowed
+  it again at each call to the three `BtlvEffect_*` gauge functions that took `u8 pos`. Their bodies only pass it on
+  to `BtlvGauge_*`'s `int` parameters, so nothing in their code fixes the width, and with them taking `u32 viewPos`,
+  like their neighbours, the function matches. When widening a local adds narrowings at calls, check whether those
+  parameters' narrow types have any evidence before ruling the width out.
 - Loops over an array of structs that test two fields through a pointer to the element, then write the fields as
   `list->entries[i].x` in the body, keep the array's base in a register and the element's address in another, as
   `bag_item.c`'s `BagItemList_Remove` and `BagItemList_GetItem` do; indexing in the test too folds the field offsets.
@@ -583,6 +590,14 @@ Same code, other `sp` offsets or frame size.
   `rules->movie` with the table's `u32 movie : 12` bit field, unsigned, and keeps it in `r6`, between the counter in
   `r5` and `play`, only as `u32 movie = rules->movie;` declared between them (`unsigned long` too). Read in the loop,
   or into an `s16`, `int` or `s32` local anywhere, it is the converted copy in `r7`, after `play`, 10 bytes off.
+  A narrow local passed in the loop to a wider parameter gets the same copy, and two copies can hide each other:
+  `btl_client.c`'s `CheckTrainerHintMsg` compared a `u8 count` with its `u32` counter and passed a `u16 trainerId` to
+  `TrainerMsg_CheckExists`'s `int trainerId` in the hint loop. The two copies took the two slots at the bottom of the
+  frame, swapped against the original's, and changing either type alone only changed which pair was swapped (a
+  `u32 trainerId` stays a copy too). With `u32 count` and `int trainerId` both are named locals, slotted from the top
+  of the frame in declaration order, and the function matches with every local at function scope and `trainerId`
+  declared after `count`. Give each local the type the loop uses it at, and run `tools/decomp/locals.py` again after
+  each type change to see which pair is still swapped.
 - In NitroSDK's Thumb files built without `-ipa file`, the frame runs from the top down through the back end's
   temporaries, the function-scope locals in declaration order, the block locals in parse order (nested blocks after
   their parent), the loop-invariant temporaries, and the spilled parameters at the bottom, so a block local sits below
