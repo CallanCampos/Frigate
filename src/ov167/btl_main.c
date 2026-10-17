@@ -390,7 +390,7 @@ void func_ov167_02199ff0(BtlMainSeq *seq, BtlMainModule *mainModule, BtlSetup *s
     BtlMainSeq_Set(seq, func_ov167_0219a3f4, mainModule);
 }
 
-BOOL func_ov167_0219a004(BtlSetup *setup) {
+u8 func_ov167_0219a004(BtlSetup *setup) {
     switch (setup->battleType) {
     case 0:
         return FALSE;
@@ -520,7 +520,7 @@ void func_ov167_0219a25c(BtlMainModule *mainModule, BtlSetup *setup, u32 arg2) {
 
 BOOL func_ov167_0219a298(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
 
     mainModule->clientCount = 2;
     mainModule->posClientIds[0] = 0;
@@ -576,7 +576,7 @@ BOOL func_ov167_0219a3f4(u32 *state, BtlMainModule *mainModule) {
 
 BOOL func_ov167_0219a448(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
 
     mainModule->playerClientId = 0;
     mainModule->clientCount = 2;
@@ -612,7 +612,7 @@ BOOL func_ov167_0219a448(u32 *state, BtlMainModule *mainModule) {
 
 BOOL func_ov167_0219a5bc(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
     s32 i;
 
     mainModule->playerClientId = 0;
@@ -703,7 +703,7 @@ BOOL func_ov167_0219a5bc(u32 *state, BtlMainModule *mainModule) {
 
 BOOL func_ov167_0219a848(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
 
     mainModule->clientCount = 2;
     mainModule->unk46E = 1;
@@ -741,7 +741,7 @@ BOOL func_ov167_0219a848(u32 *state, BtlMainModule *mainModule) {
 
 BOOL func_ov167_0219a9cc(u32 *state, BtlMainModule *mainModule) {
     BtlSetup *setup = mainModule->setup;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
 
     mainModule->clientCount = 2;
     mainModule->posClientIds[0] = 0;
@@ -1244,7 +1244,7 @@ BOOL func_ov167_0219b3a8(BtlMainModule *mainModule, s32 *state) {
 BOOL func_ov167_0219b4ac(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
     u32 opponent;
     u32 i;
 
@@ -1284,7 +1284,7 @@ BOOL func_ov167_0219b4ac(BtlMainModule *mainModule, s32 *state) {
 BOOL func_ov167_0219b610(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
     u8 posCount = setup->fieldSituation.unk1a == 0 ? 2 : 1;
     u8 ally;
     u32 i;
@@ -1339,7 +1339,7 @@ BOOL func_ov167_0219b610(BtlMainModule *mainModule, s32 *state) {
 BOOL func_ov167_0219b868(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
     u32 opponent;
     u32 i;
 
@@ -1379,7 +1379,7 @@ BOOL func_ov167_0219b868(BtlMainModule *mainModule, s32 *state) {
 BOOL func_ov167_0219b9d4(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u8 clientId = mainModule->playerClientId;
-    u32 unk = func_ov167_0219a004(setup);
+    u8 unk = func_ov167_0219a004(setup);
     u32 i;
 
     if (func_ov167_021b9a70()) {
@@ -2668,11 +2668,11 @@ BattleMon *func_ov167_0219d180(BtlPokeCon *pokeCon, u8 pos) {
     return func_ov167_0219d188(pokeCon, pos);
 }
 
-BattleMon *func_ov167_0219d188(BtlPokeCon *pokeCon, u8 pos) {
+BattleMon *func_ov167_0219d188(const BtlPokeCon *pokeCon, u8 pos) {
     u8 i = pos;
     u8 clientId;
     u8 index;
-    BattleParty *parties;
+    const BattleParty *parties;
     BtlMainModule *mainModule = pokeCon->mainModule;
 
     clientId = BattlePosToClientID(mainModule, pos);
@@ -2880,7 +2880,7 @@ void func_ov167_0219d454(BattleParty *party) {
     }
 }
 
-u8 GetNumMonsInParty(BattleParty *party) {
+u8 GetNumMonsInParty(const BattleParty *party) {
     return party->count;
 }
 
@@ -2918,7 +2918,7 @@ BattleMon *func_ov167_0219d4e4(BattleParty *party, u8 index) {
     return NULL;
 }
 
-BattleMon *GetBattleMonFromParty(BattleParty *party, u8 index) {
+BattleMon *GetBattleMonFromParty(const BattleParty *party, u8 index) {
     if (index < party->count) {
         return party->mons[index];
     }
@@ -3541,7 +3541,7 @@ u8 func_ov167_0219e048(u8 playerClientId, u8 clientId) {
 }
 
 void func_ov167_0219e074(BtlMainModule *mainModule, u32 arg1) {
-    u32 unk;
+    u8 unk;
     u32 i;
 
     unk = func_ov167_0219a004(mainModule->setup);

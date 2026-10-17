@@ -104,11 +104,11 @@ void func_ov167_0219f570(BtlServerFlow *flow) {
     GFL_HeapFree(flow);
 }
 
-u8 func_ov167_0219f588(BtlServerFlow *flow) {
+BOOL func_ov167_0219f588(BtlServerFlow *flow) {
     BtlServerCmdQueue *queue;
     u8 weather;
     u32 clientId;
-    u8 result;
+    BOOL result;
     BtlServerClient *client;
     u32 i;
     BattleMon *mon;
@@ -320,7 +320,12 @@ u32 func_ov167_0219f9d0(BtlServerFlow *flow, u32 i) {
 }
 
 static inline u32 ActionOrder_MakeKey(u16 speed, u8 unk13, u8 unk16, u8 unk22) {
-    return (speed & 0x1fff) | ((unk13 & 7) << 13) | ((unk16 & 0x3f) << 16) | ((unk22 & 7) << 22);
+    return ((unk22 & 7) << 22) | ((unk16 & 0x3f) << 16) | ((unk13 & 7) << 13) | (speed & 0x1fff);
+}
+
+// The move of an entry's fight action, 0 for any other action
+static inline u16 ActionOrder_GetMove(const ActionOrderEntry *entry) {
+    return BattleAction_GetMove(&entry->action);
 }
 
 void func_ov167_0219fb3c(BtlServerFlow *flow, ActionOrderEntry *order, u32 count) {
@@ -328,13 +333,15 @@ void func_ov167_0219fb3c(BtlServerFlow *flow, ActionOrderEntry *order, u32 count
     u32 action;
     u16 move;
     u32 state;
-    u8 unk16;
+    u32 unk16;
+    u16 speed;
 
     for (i = 0; i < count; i++) {
-        order[i].key = (order[i].key & 0xffffe000) | (ServerEvent_CalculateSpeed(flow, order[i].mon, TRUE) & 0x1fff);
+        speed = ServerEvent_CalculateSpeed(flow, order[i].mon, TRUE);
+        order[i].key = (order[i].key & 0xffffe000) | (speed & 0x1fff);
         action = BattleAction_GetAction(&order[i].action);
         if (action == 1) {
-            move = BattleAction_GetMove(&order[i].action);
+            move = ActionOrder_GetMove(&order[i]);
             state = PushState(&flow->actionState, 0x436);
             unk16 = func_ov167_021a0380(flow, move, order[i].mon);
             order[i].key =
@@ -524,12 +531,10 @@ void func_ov167_0219fffc(BtlServerFlow *flow) {
     u32 i;
     u16 move;
     BattleMon *mon;
-    ActionOrderEntry *entry;
 
     state = PushState(&flow->actionState, 0x59b);
     for (i = 0; i < flow->actionOrderCount; i++) {
-        entry = &flow->actionOrder[i];
-        move = BattleAction_GetMove(&entry->action);
+        move = ActionOrder_GetMove(&flow->actionOrder[i]);
         if (move != 0) {
             mon = flow->actionOrder[i].mon;
             if (MoveEvent_AddItem(mon, move, GetBattleMonStat(mon, 0xc))) {
@@ -542,7 +547,7 @@ void func_ov167_0219fffc(BtlServerFlow *flow) {
 }
 
 u8 func_ov167_021a00a4(BtlServerFlow *flow, BtlClientActions *clientActions, ActionOrderEntry *order, u8 max) {
-    u32 speed;
+    u16 speed;
     BattleMon *mon;
     u32 state;
     u8 clientId;
@@ -558,8 +563,7 @@ u8 func_ov167_021a00a4(BtlServerFlow *flow, BtlClientActions *clientActions, Act
     u8 priority;
 
     rotated = FALSE;
-    count = 0;
-    for (clientId = 0; clientId < 4; clientId++) {
+    for (clientId = 0, count = 0; clientId < 4; clientId++) {
         client = func_ov167_0219f260(flow->server, clientId);
         if (client == NULL) {
             continue;
@@ -633,7 +637,7 @@ u8 func_ov167_021a00a4(BtlServerFlow *flow, BtlClientActions *clientActions, Act
             continue;
         }
         if (entry->action.bits.action == 1) {
-            priority = func_ov167_021a0380(flow, BattleAction_GetMove(&order[i].action), mon);
+            priority = func_ov167_021a0380(flow, ActionOrder_GetMove(&order[i]), mon);
         } else if (entry->action.bits.action == 5 || entry->action.bits.action == 7) {
             priority = 7;
         } else {
@@ -1560,7 +1564,7 @@ void func_ov167_021a1940(BtlServerFlow *flow, BattleMon *mon, BattleAction *acti
     u8 cond19;
     u8 cond1a;
     u8 hasDelegate;
-    BOOL usedMove;
+    u8 usedMove;
     u8 moveSlot;
     u8 targetCount;
     u16 move;
@@ -4187,7 +4191,7 @@ u32 func_ov167_021a68fc(BtlServerFlow *flow) {
 
 BOOL func_ov167_021a6914(BtlServerFlow *flow, const BtlFlowMoveParam *param, BattleMon *attacker, BattleMon *target,
                          BOOL showFail) {
-    u32 stat;
+    MoveStatChangeStat stat;
     s32 change;
     BOOL result;
     u32 count;
@@ -4203,8 +4207,8 @@ BOOL func_ov167_021a6914(BtlServerFlow *flow, const BtlFlowMoveParam *param, Bat
     for (i = 0; i < count; i++) {
         changed = FALSE;
         ServerEvent_GetMoveStatChangeValue(flow, param->move, i, attacker, target, &stat, &change);
-        if (stat != 0) {
-            if (stat != 0xa) {
+        if (stat != MOVE_STAT_CHANGE_NONE) {
+            if (stat != MOVE_STAT_CHANGE_ALL) {
                 changed = func_ov167_021a6ab8(flow, attackerId, target, stat, change, attackerId, changed, serial,
                                               showFail, TRUE);
             } else {
@@ -4228,7 +4232,7 @@ BOOL func_ov167_021a6914(BtlServerFlow *flow, const BtlFlowMoveParam *param, Bat
 }
 
 void ServerEvent_GetMoveStatChangeValue(BtlServerFlow *flow, u16 move, u32 index, BattleMon *attacker,
-                                        BattleMon *target, u32 *stat, s32 *change) {
+                                        BattleMon *target, MoveStatChangeStat *stat, s32 *change) {
     u8 multiplier;
 
     *stat = PML_MoveGetStatChangeStage(move, index, change);
@@ -4251,8 +4255,8 @@ void ServerEvent_GetMoveStatChangeValue(BtlServerFlow *flow, u16 move, u32 index
     }
 }
 
-BOOL func_ov167_021a6ab8(BtlServerFlow *flow, u8 monId, BattleMon *mon, u32 stat, s32 change, u8 attackerId,
-                         u16 context, u32 value, BOOL showFail, BOOL flag) {
+BOOL func_ov167_021a6ab8(BtlServerFlow *flow, u8 monId, BattleMon *mon, MoveStatChangeStat stat, s32 change,
+                         u8 attackerId, u16 context, u32 value, BOOL showFail, BOOL flag) {
     BOOL result;
 
     change = ServerEvent_CheckSubstituteInteraction(flow, mon, stat, attackerId, context, change);
@@ -4316,7 +4320,6 @@ void func_ov167_021a6c34(BtlServerFlow *flow, const BtlFlowMoveParam *param, Bat
     while ((target = BtlMonSet_GetNext(targets)) != NULL) {
         BattleMoveEffectState *effect;
 
-        // 021a6914 only reads param, but it matches only with it non-const, and this function only with it const
         if (func_ov167_021a6914(flow, param, mon, target, TRUE)) {
             effect = flow->moveEffect;
             if (!effect->enabled) {
@@ -6067,13 +6070,11 @@ void func_ov167_021a9c70(BtlServerFlow *flow, BtlFlowClientList *list) {
 u32 ServerEvent_InterruptSwitch(BtlServerFlow *flow, BattleMon *mon) {
     u32 i;
     u16 move;
-    ActionOrderEntry *entry;
 
     // Pursuit strikes a mon that is switching out before it leaves
     for (i = 0; i < flow->actionOrderCount; i++) {
         if (flow->actionOrder[i].mon != mon && !flow->actionOrder[i].done) {
-            entry = &flow->actionOrder[i];
-            move = BattleAction_GetMove(&entry->action);
+            move = ActionOrder_GetMove(&flow->actionOrder[i]);
             if (move == MOVE_PURSUIT &&
                 MoveEvent_AddItem(flow->actionOrder[i].mon, move, GetBattleMonStat(flow->actionOrder[i].mon, 0xc))) {
                 flow->actionOrder[i].interrupting = TRUE;
@@ -6087,8 +6088,7 @@ u32 ServerEvent_InterruptSwitch(BtlServerFlow *flow, BattleMon *mon) {
     BattleEventVar_Pop(0x2c3a);
     for (i = 0; i < flow->actionOrderCount; i++) {
         if (flow->actionOrder[i].interrupting) {
-            entry = &flow->actionOrder[i];
-            move = BattleAction_GetMove(&entry->action);
+            move = ActionOrder_GetMove(&flow->actionOrder[i]);
             if (move == MOVE_PURSUIT) {
                 RemoveForce(flow->actionOrder[i].mon, move);
             }

@@ -101,6 +101,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's register.
 - A parameter spilled after a register copy, where the original spills it first: the callers narrow it, so it is a
   `u16` or `u8`. (matching.md: "callers narrow with shifts")
+- A local spilled first and reloaded for its compare, where the original compares a register copy (`mov r1, r0`) and
+  stores it after: the local is word-wide; if widening it adds narrowings at calls, widen the callees' parameters too
+  when nothing in their code fixes the narrow type. (matching.md: "A local follows the same rule")
 - An element's address and the array base in two registers: test the fields through an element pointer and index in
   the body. (matching.md: "pointer to the element")
 - A loop's registers swapped around an array element that is stored, tested and passed on: a `T **slot = &arr[i]`
@@ -172,7 +175,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Values at the bottom of the frame in assignment order, with one among the declared slots: one variable reused by
   several blocks. (matching.md: "assigned anew in several `if` blocks")
 - A local's slot taken by a loop-invariant temporary above the spilled parameters: declare the local with the type the
-  loop compares or combines it at (`u32 include`). (matching.md: "loop-invariant converted copy")
+  loop compares or combines it at (`u32 include`), or passes it at (the callee's `int` parameter). Two such copies
+  can hide each other, so check `locals.py` after each type change. (matching.md: "loop-invariant converted copy")
 - A spilled value in the lowest slot that should be among the declared ones: split a chained assignment `a = b = x`.
   (matching.md: "chained assignment")
 - Block-scoped locals sat above function-scope ones in `particle.c`, where a block-scoped `{0, 0, 0}` initializer and a
@@ -222,12 +226,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
   SDK (an `int` where ours has an enum). (matching.md: "An inline's enum-typed parameter")
 - A stack argument stored after the next argument's setup starts, where the original stores it first, around a
-  spilled local: sweep the local's width together with its callee's return type and `value` local.
-  (matching.md: "A spilled local's width for the rule below")
+  spilled local, or the local's reload placed above stores the original makes first: sweep the local's width
+  together with its callee's return type and `value` local. (matching.md: "A spilled local's width for the rule
+  below")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
+- A narrow parameter stored to its stack slot at entry, where the original stores it just before a call after
+  loading through another pointer parameter: make that parameter `const`. (matching.md: "spill to its stack slot at
+  entry")
 - A NitroSDK parameter struct read late: check the SDK's prototype for a `const` our header lost (`WM_StartScanEx`).
   (matching.md: "lost the SDK's `const`")
 - A parameter's copy and a stored constant in the other order at entry, all else equal: the stored-to fields are
@@ -286,6 +294,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A local of another type than the callee parameters")
 - A spilled reload above another spill's store, where the original stores first: the spilled locals are `u8`
   or `u16`; sweep the widths of several together. (matching.md: "can mean narrow locals")
+- A spilled flag's constant store in a load's delay slot, where the original puts a register copy there: the flag
+  is a `u8`. (matching.md: "A spilled flag's constant store")
+- The `orr`s of a packed value combined in another order: write the `|` chain's terms in the order the original
+  combines them. (matching.md: "An `|` chain is combined")
 - A spilled parameter reloaded on the other side of a call's stack argument stores: sweep the caller's and the
   callee's parameter widths together. (matching.md: "Spilled parameters follow the same rule")
 - Loads moved among a call's stack argument stores with the same instructions and slots: give a local read
@@ -374,6 +386,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A sum truncated to `s16` before a comparison was stored in an `s16` local. (matching.md: "truncates to `s16`")
 - A narrowing again after a clamp is `MATH_CLAMP`, a conditional expression. (matching.md: "narrowed again after it is clamped")
 - A local reloaded from its stack slot before each use can be a `u8` flag, not `volatile`.
+- The reverse: a zero loaded back from a spilled `u8` flag's slot for a later zero store, where the original stores
+  one register again, is a `BOOL` flag, with the return and the caller's parameter it ends in.
+  (matching.md: "The same goes for a returned flag")
+- A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
+  an enum. (matching.md: "tests its stat")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
@@ -401,6 +418,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An element's address formed twice in two shapes, or a field loaded again after an inline read it: the callee or
   the inline takes a `const` pointer, even in another file. (matching.md: "The callee can be in another file"),
   (matching.md: "A field loaded in an inline that takes a `const` pointer")
+- An array element's address formed again from a saved `i * size` just before a field load, where ours keeps the
+  element's address across the body: read the field through a `static inline` taking a `const T *` to the element.
+  (matching.md: "An array element passed whole")
 - `const` table reads at a constant index are folded into immediates; reads in a loop, even an unrolled one, are not.
   An `ldm` into argument registers is a loop over a table. Reads through a pointer to the entry aren't folded either.
   (matching.md: "Reads of a `const` table")
