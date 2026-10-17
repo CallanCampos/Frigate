@@ -155,3 +155,8 @@ lib/dwc/src/gt2/gt2Utility.c:
     .text       start:0x0217ed14 end:0x0217ee90
     .data       start:0x021890e0 end:0x021890f4
     .bss        start:0x02191bbc end:0x02191bec
+
+lib/dwc/src/gp/gp.c:
+    complete
+    .text       start:0x0217241c end:0x02172d68
+    .data       start:0x02187794 end:0x021878c0
