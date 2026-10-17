@@ -43,6 +43,8 @@ SHEET_POSITION = (32, 32)
 SINGLE_SIZE = 80
 SHEET_SIZE = (256, 128)
 COLORS = 16
+# The palettes' GXTexFmt: GX_TEXFMT_PLTT256, though they hold 16 colors, with 0x0A in the upper half
+PALETTE_FORMAT = 0x000A0004
 # The magic of each Nitro file, which the packer checks, so that a wrong file stops the build instead of the game
 MAGIC = {"cells.ncer": b"RECN", "animations.nanr": b"RNAN", "multi_cells.nmcr": b"RCMN",
          "multi_animations.nmar": b"RAMN"}
@@ -108,7 +110,7 @@ def check(condition: bool, path: Path, message: str):
 def build(path: Path, kind: str, colors: list) -> bytes:
     """Returns a sprite's file built from its source."""
     if kind == "palette":
-        return palette_resource(colors)
+        return palette_resource(colors, PALETTE_FORMAT)
     if kind == "single" and not path.exists():
         width = height = SINGLE_SIZE
         pixels = bytes(width * height)

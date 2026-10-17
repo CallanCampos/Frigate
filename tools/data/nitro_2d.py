@@ -101,10 +101,12 @@ def color5(color):
     return tuple(round(axis * 31 / 255) for axis in color)
 
 
-def palette_resource(colors):
-    """Returns a Nitro palette resource (NCLR) of 4-bit colors, with the header the game's palettes have."""
+def palette_resource(colors, fmt, count=None):
+    """Returns a Nitro palette resource (NCLR) of the colors, padded with black to count, whose header gives fmt, the
+    palette's GXTexFmt as the game's file of that kind has it."""
+    colors = list(colors) + [(0, 0, 0)] * ((count or len(colors)) - len(colors))
     data = b"".join(struct.pack("<H", r | g << 5 | b << 10) for r, g, b in map(color5, colors))
-    section = struct.pack("<4sIHHIII", b"TTLP", 0x18 + len(data), 4, 0x0A, 0, len(data), 0x10) + data
+    section = struct.pack("<4sIIIII", b"TTLP", 0x18 + len(data), fmt, 0, len(data), 0x10) + data
     return struct.pack("<4sHHIHH", b"RLCN", 0xFEFF, 0x0100, 0x10 + len(section), 0x10, 1) + section
 
 
@@ -205,14 +207,16 @@ def encode_characters(width, height, pixels, linear=False):
     return bytes(chars)
 
 
-def character_resource(width, height, pixels, linear=False, position=None, objs=None):
-    """Returns a Nitro character resource (NCGR) of 4bpp pixels, tiled, in the OBJs of objs or with linear in rows,
-    and with position, a (width, height) in tiles, the character position section (SOPC) that some resources add."""
+def character_resource(width, height, pixels, linear=False, position=None, objs=None, mapping=0, sized=True):
+    """Returns a Nitro character resource (NCGR) of 4bpp pixels, tiled, in the OBJs of objs or with linear in rows:
+    with position, a (width, height) in tiles, the character position section (SOPC) that some resources add, the OBJ
+    VRAM mapping, and without sized the 0xFFFF size that OBJ characters can have."""
     chars = encode_characters(width, height, pixels, linear)
     if objs:
         chars = obj_reorder(chars, width, objs, reverse=True)
-    sections = [struct.pack("<4sIHHIIIII", b"RAHC", 0x20 + len(chars), height // 8, width // 8, 3, 0, int(linear),
-                            len(chars), 0x18) + chars]
+    tiles = (height // 8, width // 8) if sized else (0xFFFF, 0xFFFF)
+    sections = [struct.pack("<4sIHHIIIII", b"RAHC", 0x20 + len(chars), *tiles, 3, mapping, int(linear), len(chars),
+                            0x18) + chars]
     if position:
         sections.append(struct.pack("<4sIIHH", b"SOPC", 0x10, 0, *position))
     body = b"".join(sections)

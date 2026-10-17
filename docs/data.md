@@ -38,6 +38,7 @@ which documents the format and can write them again.
 | `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
 | `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
+| `a/0/2/5` | `data/items/<item>/` (PNG, palette), `data/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `data/trainer_sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
@@ -403,6 +404,32 @@ outside battle is a `BAG_POCKET_*`, and its battle bag pockets are a list of `BA
 is "a" or "an" by its first letter unless `name_article` says otherwise ("an HP Up", "the Leftovers", none for Honey).
 The 20 unused items, named "???", have constants of their own, as `ITEM_UNUSED_113`. Both versions have the same item
 data.
+
+### Item icons
+
+The item icons' archive (`a/0/2/5`) has a member for each constant of `data/constants/item_icons.txt`, in its order:
+an icon (`ITEM_ICON_*`), 32×32 and 16 colors, or a palette (`ITEM_ICON_PALETTE_*`), its colors in JASC format, 0
+transparent. `ITEM_GRAPHICS_CHARS_AND_PALETTES` in `src/system/pml_item.c` gives each item an icon and a palette, as
+`[ITEM_HYPER_POTION] = { ITEM_ICON_POTION, ITEM_ICON_PALETTE_HYPER_POTION }`, and `LIST_ITEM_GRAPHICS` the Wonder
+Launcher's list icons. Items share them, so each is named after the first item that shows it and is a file of that
+item's directory: `ITEM_ICON_POTION` is `data/items/potion/icon.png`, `ITEM_ICON_PALETTE_HYPER_POTION`
+`data/items/hyper_potion/icon.pal`, and `ITEM_ICON_POTION_LAUNCHER` `data/items/potion/launcher_icon.png` (and
+`.pal`). An item whose icon or palette is another's has no file of its own for it: the Hyper Potion shows the Potion's
+picture in colors of its own, every TM shows TM01's disc, and the 47 items without an icon, `ITEM_NONE` among them,
+show the placeholder in `none/`; `pml_item.c` says whose file an item shows. Editing a shared icon or palette changes
+every item that shows it. `data/items/shared/` has the icons' Nitro cells and animations, which code loads as members
+0 and 1, the return arrow's icon (`return_icon`), and in `unused_icons/` the 53 icons and 48 palettes that no item
+shows, named by their member numbers (`ITEM_ICON_UNUSED_MEMBER_140` is `unused_icons/140.png`).
+
+The palette file sets an icon's colors; its PNG shows it with the palette of the first item that has it, but only the
+PNG's indices count, so edit it in an image editor's indexed mode. To add an icon, add its constants to the end of
+`item_icons.txt`, named after its item, and its files, and give the item them in `pml_item.c`. Renaming an item with
+`rename_constant.py` renames its icons' constants too, and renaming an icon's constant moves its file. The packer
+builds each member from its file, and where that gives the same picture, palette or data as one of the original
+archive's members, it takes the original's bytes (some palettes keep 240 unused colors after their 16), so unchanged
+files pack the archive byte for byte in both versions. Every file must be there and keep its size and 16 colors, and
+the build stops with the file's name otherwise. `.venv/bin/python tools/data/item_icon_data.py dump
+extract/b2_us/files data/items` writes the icons again.
 
 ## Abilities, types, trainer classes, natures and places
 
