@@ -22,18 +22,23 @@
 
 // The C library's string functions that the main module links, not taken from <string.h>: MWCC builds them in place
 // (memset and memcpy of a size it knows, strcpy of a literal, strcmp and strlen) when <string.h> declares them,
-// where the ROM calls them
+// where the ROM calls them. A file whose ROM has them built in place (the memsets of gpiBuddy.c and gpiOperation.c)
+// includes <string.h> before this header instead
+#ifndef POKEBW2_STRING_H
 void *memset(void *dest, int value, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
 void *memmove(void *dest, const void *src, u32 size);
 int memcmp(const void *a, const void *b, u32 size);
 char *strcpy(char *dest, const char *src);
+char *strncpy(char *dest, const char *src, u32 size);
+char *strcat(char *dest, const char *src);
 int strcmp(const char *a, const char *b);
 int strncmp(const char *a, const char *b, u32 size);
 u32 strcspn(const char *s, const char *set);
 u32 strlen(const char *s);
 char *strchr(const char *s, int c);
 char *strstr(const char *s, const char *find);
+#endif
 // The rest is in the C headers above (MSL's)
 
 // What overlay 189's HTTP code (the NHTTP client and the GameSpy HTTP code) calls in the main module and overlay 11.
@@ -105,6 +110,16 @@ void func_ov011_0216e320(void);
 u8 *func_ov011_0217c7ec(u8 *challenge);
 u8 *func_ov011_0217c87c(u8 *response, const u8 *challenge);
 BOOL func_ov011_0217c91c(const u8 *response, const u8 *expected);
+
+// Overlay 11's GameSpy code that GP (dwc/gp.h) calls and that isn't decompiled yet: the time in seconds (also written
+// to *seconds unless it is NULL), a text made lower case in place, the generator of gpiEncodeString (seeded, then a
+// number from low to high) and base 64 (encodeType 1 or 2 picks the alphabet; the decoding writes the length it made)
+int func_ov011_021714a8(int *seconds);
+void func_ov011_0216e2f0(char *text);
+void func_ov011_0216e654(u32 seed);
+int func_ov011_0216e670(int low, int high);
+void func_ov011_0216e720(const char *input, char *output, int inputLength, int *outputLength, int encodeType);
+void func_ov011_0216e878(const void *input, char *output, int inputLength, int encodeType);
 
 // Overlay 11's HTTP client: posts a SOAP message to a URL with the SOAPAction header and calls the function with the
 // answer; returns the request, or 0 when it could not start
