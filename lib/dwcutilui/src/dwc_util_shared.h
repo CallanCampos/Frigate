@@ -42,6 +42,8 @@ void func_ov182_021b8050(void);
 void func_ov182_021b80d4(void);
 // Starts the sound effect, from the utility's sound archive
 void func_ov182_021b80f4(int seq);
+// Stops the music
+void func_ov182_021b8138(void);
 
 // Reads the console's Wi-Fi settings, and frees them
 void func_ov182_021b77dc(void);
