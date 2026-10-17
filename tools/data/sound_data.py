@@ -12,7 +12,8 @@ kind and one of its category, the constant's word after its kind's prefix: SEQ_B
 BANK_SE_SW_JUMP banks/se/sw_jump/, BANK_PV001 banks/pv/pv001/ and WAVE_ARC_PMWB_123
 wave_archives/arc/pmwb_123/. Each has data.json, its info
 record, which the schemas in data/sound/ describe, and its file: sequence.s, the sequence's commands as text
-(sseq.py), wave_archive.swar or stream.strm. A bank's data.json also has its instruments (sbnk.py). A sequence that plays another's file
+(sseq.py), or stream.strm. A bank's data.json also has its instruments (sbnk.py), and a wave archive is its waves,
+000.wav and on, with data.json giving the looped waves' loop starts (swar.py). A sequence that plays another's file
 says so with "file". The Pokémon cries' wave archives, the first
 of wave_archives.txt after its empty first slot, are each species' cry.wav in data/pokemon/ (pokemon_cries.py).
 players.json, groups.json, stream_players.json and streams' are the small kinds' records, by their constants.
@@ -29,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tools.data.sdat as sdat  # noqa: E402
 import tools.data.sseq as sseq  # noqa: E402
 from tools.data.sbnk import BankError, read as read_bank, write as write_bank  # noqa: E402
+import tools.data.swar as swar  # noqa: E402
 from tools.data.datajson import DataError, label, load, load_schema, value, write  # noqa: E402
 from tools.data.gen_constants import load as load_list  # noqa: E402
 from tools.data.pokemon_cries import cry_folder, read_wav, wav_bytes  # noqa: E402
@@ -41,7 +43,7 @@ KIND_LISTS = {"sequences": "sound", "sequence_archives": None, "banks": "sound_b
               "wave_archives": "sound_wave_archives", "players": "sound_players", "groups": "sound_groups",
               "stream_players": "sound_stream_players", "streams": "sound_streams"}
 FILE_KINDS = {"sequences": (("SEQ_",), "sequence.s"), "banks": (("BANK_",), None),
-              "wave_archives": (("WAVE_",), "wave_archive.swar"), "streams": (("STRM_",), "stream.strm")}
+              "wave_archives": (("WAVE_",), None), "streams": (("STRM_",), "stream.strm")}
 SMALL_KINDS = ("players", "groups", "stream_players")
 # The wave archives of the Pokémon cries, the slots after the empty first, and the cries' wave format: PCM8, unlooped
 CRIES = range(1, 691)
@@ -49,6 +51,8 @@ CRY_FORMAT = 0
 # The buffer that the game plays a cry's wave archive from
 CRY_BUFFER = 0x5C30
 TIMER_CLOCK = 16756991
+# The samples in each 4-byte word of a wave's data, by its format
+SAMPLES_PER_WORD = {0: 4, 1: 2, 2: 8}
 SEQUENCE = struct.Struct("<HHHBBBBH")
 BANK = struct.Struct("<HH4H")
 WAVE_ARCHIVE = struct.Struct("<HH")
@@ -124,6 +128,8 @@ def dump(files: Path, root: Path):
                     if sseq.assemble(text) != archive["files"][file_id]:
                         raise SystemExit(f"{constant}'s sequence doesn't assemble again from its text")
                     (path / FILE_KINDS[kind][1]).write_text(text)
+                elif kind == "wave_archives":
+                    data["waves"] = dump_waves(path, archive["files"][file_id], constant)
                 elif kind == "banks":
                     archives = [None if number == NO_WAVE_ARCHIVE else names["wave_archives"][number]
                                 for number in BANK.unpack(record)[2:]]
@@ -173,11 +179,65 @@ def dump(files: Path, root: Path):
     print(f"wrote the sound archive's sources to {root}")
 
 
-def cry_wave(swar: bytes) -> tuple[int, bytes]:
-    fmt, loop, rate, _, start, length = struct.unpack_from("<BBHHHI", swar, 0x40)
-    if fmt != CRY_FORMAT or loop or start or 0x40 + 12 + length * 4 != len(swar):
+def dump_waves(path: Path, archive: bytes, constant: str) -> list[dict]:
+    """Writes a wave archive's waves as WAV files and returns their entries of its data.json."""
+    waves = swar.read(archive)
+    entries = []
+    for number, wave in enumerate(waves):
+        (path / f"{number:03d}.wav").write_bytes(swar.to_wav(wave))
+        entries.append(wave_entry(wave))
+    if pack_waves(path, entries) != archive:
+        raise SystemExit(f"{constant}'s waves don't make its archive again")
+    return entries
+
+
+def wave_entry(wave: dict) -> dict:
+    """Returns what a wave's WAV doesn't say: where its loop starts, in samples, and a timer other than its rate's."""
+    entry = {}
+    if wave["loop"]:
+        start = wave["loop_start"] - (1 if wave["format"] == swar.ADPCM else 0)
+        entry["loop_start"] = start * SAMPLES_PER_WORD[wave["format"]]
+    elif wave["loop_start"] != (1 if wave["format"] == swar.ADPCM else 0):
+        raise SystemExit("an unlooped wave's loop starts where the packer can't write it again")
+    if wave["timer"] != swar.TIMER_CLOCK // wave["rate"]:
+        entry["timer"] = wave["timer"]
+    return entry
+
+
+def pack_waves(path: Path, entries: list) -> bytes:
+    """Returns the wave archive of a directory's WAV files and their entries."""
+    waves = []
+    count = len(entries)
+    check(not (path / f"{count:03d}.wav").exists(), path, f"has more waves than data.json's {count}")
+    for number, entry in enumerate(entries):
+        wav = path / f"{number:03d}.wav"
+        check(wav.is_file(), wav, "missing")
+        try:
+            fmt, rate, data = swar.from_wav(wav.read_bytes())
+        except swar.WaveError as error:
+            raise DataError(f"{label(wav)}: {error}") from None
+        check(4000 <= rate <= 65535, wav, "its sample rate must be from 4000 to 65535")
+        data += bytes(-len(data) % 4)
+        words = len(data) // 4
+        header = 1 if fmt == swar.ADPCM else 0
+        if "loop_start" in entry:
+            check(entry["loop_start"] % SAMPLES_PER_WORD[fmt] == 0, wav,
+                  f"its loop must start on a multiple of {SAMPLES_PER_WORD[fmt]} samples")
+            start = entry["loop_start"] // SAMPLES_PER_WORD[fmt] + header
+            check(start <= words, wav, "its loop starts after its end")
+        else:
+            start = header
+        waves.append({"format": fmt, "loop": int("loop_start" in entry), "rate": rate,
+                      "timer": entry.get("timer", swar.TIMER_CLOCK // rate), "loop_start": start,
+                      "loop_length": words - start, "data": data})
+    return swar.write(waves)
+
+
+def cry_wave(archive: bytes) -> tuple[int, bytes]:
+    fmt, loop, rate, _, start, length = struct.unpack_from("<BBHHHI", archive, 0x40)
+    if fmt != CRY_FORMAT or loop or start or 0x40 + 12 + length * 4 != len(archive):
         raise SystemExit("a cry's wave archive isn't one unlooped PCM8 wave")
-    return rate, swar[0x4C:]
+    return rate, archive[0x4C:]
 
 
 def check(condition: bool, path: Path, message: str):
@@ -218,7 +278,9 @@ def pack(root: Path, output: Path):
             if "file" not in data:
                 check(source.is_file(), source, "missing")
                 file_ids[constant] = len(files)
-                if kind == "banks":
+                if kind == "wave_archives":
+                    files.append(pack_waves(path, data["waves"]))
+                elif kind == "banks":
                     check("instruments" in data, source, "a bank without \"file\" needs its \"instruments\"")
                     try:
                         files.append(write_bank(data["instruments"], data["wave_archives"]))

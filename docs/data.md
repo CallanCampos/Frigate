@@ -344,8 +344,9 @@ stream players and streams of `sound_players.txt`, `sound_groups.txt`, `sound_st
 directory named after its constant, in its kind's directory and its category's, the word after the kind's prefix:
 `SEQ_BGM_T_01` is `data/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `data/sound/banks/se/sw_jump/`, and
 `BANK_PV001` `data/sound/banks/pv/pv001/`. A sequence has its `sequence.s` (see [Sequences](#sequences)), a bank its
-instruments in its `data.json` (see [Banks](#banks)), and a wave archive and a stream their files, `wave_archive.swar`
-and `stream.strm`, Nitro's own formats for now. A sequence, bank and stream has `data.json`, its record of the archive,
+instruments in its `data.json` (see [Banks](#banks)), a wave archive its waves as WAV files (see
+[Wave archives](#wave-archives)), and a stream its file, `stream.strm`, Nitro's own format for now. A sequence, bank
+and stream has `data.json`, its record of the archive,
 which the schemas in `data/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
 archives, a stream's volume, priority and player. Some entries share a file: 86 sequences play another's, such as the
 placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
@@ -433,6 +434,17 @@ and a `noise` one noise, each at its own pitch on its `base_key`, with its envel
 instrument for each region of keys in its `regions`, each up to its `up_to`. Programs that share an instrument list
 their numbers, an `unused` entry keeps data that no program uses as hex, and `programs` gives a bank more programs than
 its last instrument's. `tools/data/sbnk.py` writes the bank from them byte for byte.
+
+### Wave archives
+
+A wave archive is a directory of its waves, the samples that banks' instruments play, `000.wav` and on, in the order
+that instruments number them, and a `data.json` with what a WAV doesn't say: for each wave, an empty object if it plays
+once, or the sample its loop starts at, `"loop_start"`, if it loops to its end, and its `"timer"` where that isn't its
+rate's. The game's waves are IMA ADPCM, and their WAV files keep them so, as IMA ADPCM WAVs that audio editors and
+ffmpeg open, so they pack back byte for byte; a wave larger than a WAV block is in several blocks, each starting with
+the decoder's state there. An edited wave can be saved as 8-bit or 16-bit PCM, which the game plays too, mono at a
+rate from 4000 to 65535; a loop starts on a multiple of 8 samples in IMA ADPCM, 4 in 8-bit and 2 in 16-bit PCM. To add a
+wave, add its WAV after the last and its entry to `waves`, and an instrument that plays it.
 
 ## Moves
 

@@ -1,0 +1,92 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {},
+        {},
+        {
+            "loop_start": 5560
+        },
+        {},
+        {
+            "loop_start": 15344
+        },
+        {
+            "loop_start": 10560
+        },
+        {
+            "loop_start": 9192
+        },
+        {
+            "loop_start": 3184
+        },
+        {
+            "loop_start": 1088
+        },
+        {
+            "loop_start": 2024
+        },
+        {
+            "loop_start": 14016
+        },
+        {
+            "loop_start": 9816
+        },
+        {
+            "loop_start": 9696
+        },
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 4808
+        },
+        {
+            "loop_start": 4704
+        },
+        {},
+        {},
+        {
+            "loop_start": 8696
+        },
+        {
+            "loop_start": 7928
+        },
+        {
+            "loop_start": 6296
+        },
+        {
+            "loop_start": 6432
+        },
+        {
+            "loop_start": 13440
+        },
+        {
+            "loop_start": 2616
+        },
+        {
+            "loop_start": 4288
+        },
+        {
+            "loop_start": 8520
+        },
+        {
+            "loop_start": 9712
+        },
+        {
+            "loop_start": 1280
+        },
+        {
+            "loop_start": 1376
+        },
+        {
+            "loop_start": 1104
+        },
+        {
+            "loop_start": 2336
+        },
+        {
+            "loop_start": 2048
+        }
+    ]
+}
