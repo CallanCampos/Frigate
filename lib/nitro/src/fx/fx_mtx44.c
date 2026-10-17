@@ -48,6 +48,9 @@ asm void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst) {
 
 // clang-format on
 
+// When ab == a, this C reads rows of a after storing over them, where the original reads each row first; on a host
+// that changes the product, so port/hal has a version in the original's order
+#ifndef PLATFORM_PC // port/hal has the host version
 void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab) {
     MtxFx44 tmp;
     MtxFx44 *dst = (ab == b) ? &tmp : ab;
@@ -116,6 +119,7 @@ void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab) {
         *ab = tmp;
     }
 }
+#endif
 
 void MTX_FrustumW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx) {
     fx64 invWidth;

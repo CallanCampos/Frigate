@@ -152,6 +152,9 @@ int MTX_Inverse43(const MtxFx43 *mtx, MtxFx43 *inv) {
     return 0;
 }
 
+// When ab == a, this C reads rows of a after storing over them, where the original reads each row first; on a host
+// that changes the product, so port/hal has a version in the original's order
+#ifndef PLATFORM_PC // port/hal has the host version
 void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab) {
     MtxFx43 tmp;
     MtxFx43 *dst = ab;
@@ -200,7 +203,11 @@ void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab) {
         *dst = tmp;
     }
 }
+#endif
 
+// When dest == vec, this C reads vec after storing over it, where the original reads it first; on a host that changes
+// the result, so port/hal has a version in the original's order
+#ifndef PLATFORM_PC // port/hal has the host version
 void MTX_MultVec43(const VecFx32 *vec, const MtxFx43 *mtx, VecFx32 *dest) {
     dest->x = (fx32)(((fx64)vec->x * mtx->m[0][0] + (fx64)vec->y * mtx->m[1][0] + (fx64)vec->z * mtx->m[2][0]) >>
                      FX32_SHIFT) +
@@ -212,6 +219,7 @@ void MTX_MultVec43(const VecFx32 *vec, const MtxFx43 *mtx, VecFx32 *dest) {
                      FX32_SHIFT) +
               mtx->m[3][2];
 }
+#endif
 
 void MTX_LookAt(const VecFx32 *camPos, const VecFx32 *camUp, const VecFx32 *target, MtxFx43 *mtx) {
     VecFx32 forward;

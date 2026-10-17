@@ -2,8 +2,9 @@
 
 Differential tests that compare a host C function with the ROM's original machine code. The port replaces the
 SDK's assembly routines (`MI_CpuCopy*`, `MI_UncompressLZ8`, `MATH_QSort`, the `MTX_*` asm helpers and the rest of
-[PLAN.md §4.5](../../docs/PLAN.md)) with C in `port/hal`, and each must behave exactly as the original does on every
-input the original accepts: the same return value, the same bytes written, the same handling of odd sizes, alignment,
+[PLAN.md §4.5](../../docs/PLAN.md)), and the few SDK functions whose decomp C a host compiles to something else
+(`MTX_Concat33` and its kin, [decomp-findings.md](../../docs/decomp-findings.md)), with C in `port/hal`, and each must
+behave exactly as the original does on every input the original accepts: the same return value, the same bytes written, the same handling of odd sizes, alignment,
 overlap and zero lengths. These tests run both on the same seeded random inputs and fail at the first difference.
 
 ## What a passing test shows

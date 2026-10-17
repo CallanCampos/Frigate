@@ -1,4 +1,5 @@
-"""The host versions in port/hal of the SDK's assembly in libfx's matrix files (port/hal/fx), libmath
+"""The host versions in port/hal of the SDK's assembly in libfx's matrix files and of its products whose decomp C reads an
+argument after storing over it (port/hal/fx), libmath
 (MATH_CountLeadingZerosFunc, MATH_QSort and sha1_block, port/hal/math) and libcrypto (CRYPTO_RC4Encrypt,
 port/hal/crypto), against the ROM's code.
 
@@ -17,8 +18,8 @@ import struct
 from dataclasses import dataclass
 
 from build import build_library
-from compare import (Callback, Case, Mismatch, Outcome, Ptr, _describe_case, _first_difference, _pad_bytes, main,
-                     run_host, run_original)
+from compare import (Callback, Case, Mismatch, Outcome, Ptr, Signature, _describe_case, _first_difference, _pad_bytes,
+                     main, run_host, run_original)
 from harness import Emulator
 
 SOURCES = [
@@ -112,6 +113,8 @@ def run(function, signature, generate, *, count, seed):
     """compare() for both builds, running the original once per case: generate(rng, lib) returns a Case, or a
     SplitCase for sides that differ. Raises Mismatch at the first difference; returns the number of cases. A trap of
     the sanitizer kills the process, which run_all.py reports as the file failing."""
+    # Parsed once: run_original and run_host take the text, the description of a failing case only the parsed form
+    signature = Signature.parse(signature)
     for index in range(count):
         def make(lib):
             made = generate(random.Random(f"{seed}:{index}"), lib)
@@ -216,6 +219,54 @@ def test_matrix_copies():
         total += run(function, "void(ptr, ptr)", overlapping, count=2000, seed=f"{function}:overlapping")
         total += run(function, "void(ptr, ptr)", identical, count=200, seed=f"{function}:identical")
     return f"{len(COPIES)} functions, {total} cases each build"
+
+
+# Each product whose decomp C reads an argument after storing over it: the sizes of its two arguments and its result
+PRODUCTS = [
+    ("MTX_Concat33", 36, 36, 36),
+    ("MTX_Concat43", 48, 48, 48),
+    ("MTX_Concat44", 64, 64, 64),
+    ("MTX_MultVec43", 12, 48, 12),
+]
+
+
+def fx32_words(rng, size: int) -> bytes:
+    return b"".join(struct.pack("<i", fx32(rng)) for _ in range(size // 4))
+
+
+def test_matrix_products():
+    """The products, apart; with the result over its first argument, its second or both, and with the two arguments
+    the same; and the three overlapping by any number of words."""
+    total = 0
+    for function, first, second, result in PRODUCTS:
+        def separate(rng, lib, first=first, second=second, result=result):
+            offsets = [4 * rng.randrange(8) for _ in range(3)]
+            return Case({"a": fx32_words(rng, offsets[0] + first + 8), "b": fx32_words(rng, offsets[1] + second + 8),
+                         "ab": rng.randbytes(offsets[2] + result + 8)},
+                        [Ptr("a", offsets[0]), Ptr("b", offsets[1]), Ptr("ab", offsets[2])])
+
+        def identical(rng, lib, first=first, second=second):
+            # Which of the three share one place: the result and the first argument, the result and the second, the
+            # two arguments, or all three
+            same = rng.choice(["ab=a", "ab=b", "a=b", "all"])
+            offset = 4 * rng.randrange(8)
+            regions = {"x": fx32_words(rng, offset + max(first, second) + 8),
+                       "y": fx32_words(rng, offset + max(first, second) + 8)}
+            places = {"ab=a": ("x", "y", "x"), "ab=b": ("x", "y", "y"), "a=b": ("x", "x", "y"),
+                      "all": ("x", "x", "x")}[same]
+            return Case(regions, [Ptr(place, offset) for place in places])
+
+        def overlapping(rng, lib):
+            # Each from 20 words before the first to 20 after it, which covers every overlap of the three
+            base = 4 * rng.randrange(20, 24)
+            offsets = [base] + [base + 4 * rng.randrange(-20, 21) for _ in range(2)]
+            return Case({"buf": fx32_words(rng, 320)}, [Ptr("buf", offset) for offset in offsets])
+
+        signature = "void(ptr, ptr, ptr)"
+        total += run(function, signature, separate, count=2000, seed=f"{function}:separate")
+        total += run(function, signature, identical, count=2000, seed=f"{function}:identical")
+        total += run(function, signature, overlapping, count=4000, seed=f"{function}:overlapping")
+    return f"{len(PRODUCTS)} functions, {total} cases each build"
 
 
 # libmath
@@ -514,6 +565,7 @@ if __name__ == "__main__":
     main([
         test_matrix_stores,
         test_matrix_copies,
+        test_matrix_products,
         test_count_leading_zeros,
         test_sha1_block,
         test_qsort_keys,

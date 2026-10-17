@@ -198,6 +198,9 @@ int MAT3_Invert(const MtxFx33 *mtx, MtxFx33 *inv) {
     return 0;
 }
 
+// When ab == a, this C reads rows of a after storing over them, where the original reads each row first; on a host
+// that changes the product, so port/hal has a version in the original's order
+#ifndef PLATFORM_PC // port/hal has the host version
 void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab) {
     MtxFx33 tmp;
     MtxFx33 *dst = ab;
@@ -235,6 +238,7 @@ void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab) {
         *dst = tmp;
     }
 }
+#endif
 
 void MTX_MultVec33(const VecFx32 *vec, const MtxFx33 *mtx, VecFx32 *dest) {
     fx32 x = vec->x;
