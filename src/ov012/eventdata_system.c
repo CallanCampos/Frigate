@@ -539,7 +539,8 @@ void SetBGEntityLocation(EventData *data, u32 index, u16 x, u16 z, u16 y) {
 
 u16 CalcWarpTransferAddend(u32 posWeightBits, u32 warpDirection, BOOL isRail, u32 railParam, u16 span) {
     u32 width;
-    s32 index;
+    // The SDK's s32 is long, which makes the clamp's comparison load the span again from its slot
+    long index;
     s32 direction;
     u32 halfWidth;
     u32 halfSpan;

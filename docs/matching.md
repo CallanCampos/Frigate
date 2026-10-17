@@ -1522,6 +1522,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Two locals initialized to 0 in their declarations share one zero register, so a later `offset += 4` compiles as
   `adds r5, r4, #4` from the counter's zero: `iss_switch_set.c`'s `ISSSwitchSet_LoadArcDataCore` declares `int i = 0;
   u32 offset = 0;`, where `offset = 4` shares the `movs #4` of another argument instead.
+- A float local initialized with a constant at its declaration has that constant built in a saved register at the
+  function's entry, even when the initializer is dead, and a later float literal of the same value is copied from it
+  (`adds r1, r6, #0`) instead of built at its use (`movs r1, #0`). `building_enter_effect.c`'s
+  `func_ov012_02160dc8` declares `f32 zoom = 0.0f;` and assigns `zoom` again before reading it, and
+  `FX32_CONST(1.0f / zoom)`'s rounding test takes its 0.0 from r6, pushed at entry (79 bytes off without the
+  initializer; `= 1.0f` instead shares the `1.0f` of the division). In a minimal loop, `f32 t = 2.0f;` builds 2.0
+  before the loop's guard for a `t * 2.0f` in the body, where without it the constant is built after the guard. An
+  `int` initializer is not kept so: `fx32 scale = 0;` changed nothing in that function.
 - A pointer compared with `NULL`, which is `((void *)0)`, can share a zero that the function keeps in a register for its
   stores, `cmp r0, r5`, where `if (p)` and `if (!p)` compare with `#0`; keeping that zero alive moves other registers
   too. `snd_command.c`'s `SND_CommandInit` stores eight zeros before its calls and matches only with `if (command)`;
@@ -2045,6 +2053,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the base of both its `damage` and `speed` arrays) after the comparison's `BattleRandom` call unless `j` is
   `unsigned long`; with it, global CSE keeps that address from the comparison in a saved register across the call
   and into the swap (`#pragma opt_common_subs off` makes both spellings the same size).
+  `eventdata_system.c`'s `CalcWarpTransferAddend` needs `long index`: compared with a
+  `long`, its `u16` stack parameter `span` is loaded again from its slot for the clamp (`add r0, sp, #0x10; ldrh r0,
+  [r0]; cmp r5, r0`), while `span - width` and `span - 1` share one load; with `s32 index` the comparison uses that
+  load's register too (`cmp r5, r2`) and the function is 4 bytes short.
 
 ## Loops
 
@@ -2486,6 +2498,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   laid out earlier than any surviving reference to it points to code the original linker dead-stripped. A file name
   ahead of a table in `.data` is a file-scope array: `script_command.c` declares `static char sFile[] =
   "script_command.c";` and passes `sFile` to its allocations, as `event_research_radar.c` does.
+- Each literal that code creates gets a `.data` section of its own, placed just before the `.text` of the first
+  function that uses it, so the linker strips a dead function's literals with it and keeps one that a later function
+  shares. A static function is emitted, literals included, whenever a call to it reaches the optimizer, even one the
+  optimizer then removes: a call under `int n = 0; if (n)` or in an `int` zero-trip loop, or the function's address
+  in an unused local. A call the front end drops (`if (0)`, code after `return`, an unsigned `i < 0` loop) leaves it
+  out. A static assert helper called so, before `delivery_beacon.c`'s allocation, gives the game's `""` first but
+  leaves its own code and text, which a dead-stripping link would remove and this build's `-nodead` link keeps.
 - The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
