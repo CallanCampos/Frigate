@@ -781,6 +781,59 @@ static void TestEdgeWalker(void) {
     CHECK_PX(50, 19, 0);
 }
 
+// Values along an edge, interpolated by line from its top vertex whatever its major axis, a line further on for an edge
+// at 45 degrees or flatter that runs outward (melonDS's measurements). Blue is 0 at every vertex but one, where it is
+// 31 (511 to the rasterizer: 31 * 16 + 15); every W is 1.0, so values are linear: a + (b - a) * pos / len rounded down,
+// from the lower end, and the pixel shows the value >> 3.
+// - A (10, 10), B (75, 30), C (10, 30), blue at B: the right edge A-B runs right with slope 65 * (2^18 / 20) = 851955
+//   (3.25 less a little), X-major, so it is a line further on. On line 10 its value is 511 * 1 / 20 = 25 and its run
+//   ends at X 12 (middles 10.5 to 12.5 lie before 13.25); the vertical left edge has 0 at X 10, and across the span of
+//   3 pixels X 11 has 25 * 1 / 3 = 8 (6-bit 1), X 12 has 16 (2). On line 11, 511 * 2 / 20 = 51, the run ends at 15
+//   (before 16.5), a span of 6: X 14 has 51 * 4 / 6 = 34 (4), X 15 has 42 (5). Along X instead, the end's 3 of 65
+//   pixels would give 23 on line 10, and pixel 12 would show 1
+// - The mirror, A (150, 10), B (85, 30), C (150, 30), blue at B: the left edge A-B runs left, X-major, a line further
+//   on: 25 on line 10 at its pixel 147 (the run 147-149, middles after 146.75), the vertical right edge's column 149
+//   with 0 from X 150: X 147 has 25 (3), 148 has 25 * 2 / 3 = 16 (2), 149 has 8 (1)
+// - A (10, 10), B (30, 30), C (10, 30), blue at B: the right edge runs right at 45 degrees, Y-major, its run not drawn,
+//   and still a line further on. On line 12 its pixel is 12 and its value 511 * 3 / 20 = 76: X 11 has 76 * 1 / 3 = 25
+//   (3). On line 20, 511 * 11 / 20 = 281 at pixel 20: X 19 has 281 * 9 / 11 = 229 (28)
+static void TestEdgeInterpolation(void) {
+    static const int32_t triangles[3][3][2] = {
+        { { 10, 10 }, { 75, 30 }, { 10, 30 } },
+        { { 150, 10 }, { 150, 30 }, { 85, 30 } },
+        { { 10, 10 }, { 30, 30 }, { 10, 30 } },
+    };
+    for (int pass = 0; pass < 2; pass++) {
+        Start(pass == 0 ? "edge interpolation (X-major)" : "edge interpolation (45 degrees)");
+        PolygonAttr(ATTR(31, 1));
+        Begin(0);
+        for (int t = pass == 0 ? 0 : 2; t < (pass == 0 ? 2 : 3); t++) {
+            for (int i = 0; i < 3; i++) {
+                int far = t == 1 ? i == 2 : i == 1;
+                Color(far ? Rgb(0, 0, 31) : Rgb(0, 0, 0));
+                Vtx16(SX(triangles[t][i][0]), SY(triangles[t][i][1]), 0);
+            }
+        }
+        Render(0);
+        if (pass == 0) {
+            CHECK_PX(10, 10, OUT(0, 0, 0, 31));
+            CHECK_PX(11, 10, OUT(0, 0, 1, 31));
+            CHECK_PX(12, 10, OUT(0, 0, 2, 31));
+            CHECK_PX(13, 10, 0);
+            CHECK_PX(14, 11, OUT(0, 0, 4, 31));
+            CHECK_PX(15, 11, OUT(0, 0, 5, 31));
+            CHECK_PX(146, 10, 0);
+            CHECK_PX(147, 10, OUT(0, 0, 3, 31));
+            CHECK_PX(148, 10, OUT(0, 0, 2, 31));
+            CHECK_PX(149, 10, OUT(0, 0, 1, 31));
+        } else {
+            CHECK_PX(11, 12, OUT(0, 0, 3, 31));
+            CHECK_PX(12, 12, 0);
+            CHECK_PX(19, 20, OUT(0, 0, 28, 31));
+        }
+    }
+}
+
 // Anti-aliasing (coverage from the walker and the layer beneath, melonDS's measurements). Triangle (10, 10), (10, 40),
 // (40, 10): its right edge runs left at 45 degrees; on line 20 the walker is at 40 - 1 - 10 = 29, the pixel left of the
 // edge's top end (X 30), and at the line's middle the edge is at 29.5, half the pixel: the middle position's part
@@ -1046,6 +1099,7 @@ int main(void) {
     TestShadow();
     TestWireframeAndDot();
     TestEdgeWalker();
+    TestEdgeInterpolation();
     TestAntialias();
     TestAntialiasSharedEdge();
     TestAntialiasEdgeMarking();
