@@ -1,0 +1,49 @@
+# Source files of src/ and lib/ that the host build doesn't compile, because the host provides what they do. One glob
+# pattern per line, relative to the repository, then " # " and the reason. port/tools/gen_host_tree.py reads it, and
+# warns about a pattern that no longer matches a file. A function these files define that game code still calls is
+# provided by port/hal, or by a trap stub until it is (port/tools/gen_stubs.py).
+#
+# A file that is mostly portable C stays compiled instead, with its MWCC asm functions behind #ifndef PLATFORM_PC and
+# host versions in port/hal (port/docs/game-changes.md lists them).
+
+# The C library: the host's libc and libm replace MSL, the Metrowerks runtime (PLAN.md §4.8, rule 8)
+lib/msl/src/* # MSL, replaced by the host's C library
+
+# DS Protect checksums its own ARM code, which never matches natively; port/hal/stubs returns a genuine cartridge's
+# results (PLAN.md §4.5)
+lib/dsprot/src/* # DS Protect, stubbed
+
+# NitroSDK files written in assembly, whose functions port/hal provides in C
+lib/nitro/src/cp/cp_context.c # divider context save, asm; the host divider has no state to save
+lib/nitro/src/gx/gxasm.c # geometry command copies, asm; port/hal/gx
+lib/nitro/src/math/math.c # MATH_* asm helper; port/hal
+lib/nitro/src/math/sha1_block.c # SHA-1 block transform, asm; port/hal
+lib/nitro/src/mi/mi_memory.c # MI_Cpu* copies and fills, asm; port/hal/mi
+lib/nitro/src/mi/mi_swap.c # MI_Swap*, asm (SWP); port/hal/mi
+lib/nitro/src/mi/mi_uncompress.c # MI_Uncompress*, asm; port/hal/mi
+
+# NitroSDK modules bound to the hardware, which port/hal replaces as a whole (PLAN.md §4.5)
+lib/nitro/src/fs/fs_overlay.c # overlay loading; port/hal/fs activates overlays that are always resident
+lib/nitro/src/os/os_alarm.c # alarms run on the host's virtual clock
+lib/nitro/src/os/os_arena.c # the DS memory map's arenas, from linker symbols; host memory replaces them
+lib/nitro/src/os/os_cache.c # CP15 cache operations; no-ops on a host
+lib/nitro/src/os/os_context.c # register context switch; fibers
+lib/nitro/src/os/os_exception.c # ARM exception vectors
+lib/nitro/src/os/os_init.c # boot-time hardware setup
+lib/nitro/src/os/os_protectionRegion.c # CP15 protection regions
+lib/nitro/src/os/os_protectionUnit.c # CP15 protection unit
+lib/nitro/src/os/os_spinLock.c # SWP-based locks between the two CPUs
+lib/nitro/src/os/os_system.c # CPSR interrupt masks, halt
+lib/nitro/src/os/os_tcm.c # CP15 TCM setup
+lib/nitro/src/os/os_terminate_proc.c # halting the CPU
+lib/nitro/src/os/os_vramExclusive.c # the VRAM lock between the CPUs, asm CLZ helper
+lib/nitro/src/rtc/rtc_api.c # the clock chip over SPI; the host clock replaces it
+lib/nitro/src/spi/mic.c # the microphone over SPI; host input or silence
+lib/twl/src/scfg/scfg_proc_itcm.c # DSi CPU clock switch, asm
+lib/twl/src/syscall/syscall_twl_ltd.c # DSi BIOS calls, asm
+
+# Wi-Fi Connection code that doesn't compile natively yet; the port needs it in phase 7 (PLAN.md §5.4)
+lib/dwc/src/ac/dwc_ac_soc.c # pointer-to-integer casts in static initializers
+lib/dwc/src/crypt/crypt.c # big-number asm helpers
+lib/dwc/src/ghttp/ghttpProcess.c # uses MSL's __ctype_map directly
+lib/dwcutil/src/dwc_aoss_ap.c # static definitions after non-static declarations

@@ -26,11 +26,45 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: phase 0, the native build links and enters the game's main()
+
+- **Upstream:** `4aa041311` (merge of PR #348), merged in `0f65946be` by this session's sync, which built both ROMs and
+  checked both SHA1s.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`) after a full `ninja` with this commit's guards;
+  `port/tools/check_mwcc_neutral.py`: all 3,138 file and version pairs preprocess under MWCC exactly as upstream's
+  `4aa041311` does.
+- **Host build:** arm64 macOS, Apple clang, RelWithDebInfo: 1,480 of 1,518 C files of `src/` and `lib/` compile
+  natively (38 are replaced by the platform layer, `port/hal/replaced.txt`) and link into `pokeblack2` (10 MB) with
+  SDL3 3.4.18. Linux and Windows not yet; CI (`port-ci.yml`) builds macOS and Linux from this commit on.
+- **Tests:** T0 as above; T1: builds; T2: the smoke test (`ctest`) passes: the program reaches the game's `main()`.
+  T3–T7 not yet.
+- **Tiers:** not re-measured since 2026-10-16.
+- **Trap stubs:** 692 function stubs and 72 data placeholders. The game stops first at `OS_Init` (called by
+  `SystemInit`), the first SDK module the platform layer replaces.
+- **64-bit warnings:** not yet counted by the host build (silenced there); the compile probe baseline of the
+  2026-10-16 entry stands.
+- **Work done:**
+  - `port/CMakeLists.txt`: the host build, with MWCC's language model (signed char, 16-bit `wchar_t`, wrapping
+    arithmetic, no strict aliasing, zeroed locals) and SDL3 (Homebrew's, or the pinned release).
+  - `port/tools/gen_host_tree.py`: the source list, an `include/` mirror without MSL's C library headers, the generated
+    constants. `port/tools/gen_stubs.py`: a trap stub for each DS function the C references and nothing defines, and a
+    placeholder on a page with no access for each such data object, so the first use is reported by name.
+  - `port/hal/trap.c`, `port/hal/os/memory_map.c`, `port/hal/stubs/unresolved.c`, `port/include/port_host.h`,
+    `port/app/main.c` (SDL3 window, the game on its own thread, `--headless`).
+  - Game changes (`port/docs/game-changes.md`): `OVERLAY_ID(n)` is `n` on a host; `MATH_CountLeadingZeros` uses the
+    compiler's builtin; the 18 MWCC `asm` functions of seven mostly-C NitroSDK files are behind `#ifndef PLATFORM_PC`.
+  - `port/tools/check_mwcc_neutral.py`, which proves a guard-only change neutral for every file at once.
+  - `.github/workflows/port-ci.yml`: the host build and tests on macOS and Linux.
+- **Next:** the phase 0 spikes (overlay data sections, VRAM aliasing, fibers), then phase 1: the platform layer in the
+  order the traps ask for it, starting with `OS_Init`, threads, IRQs, arenas, MI and FX.
+- **Blockers:** none for phase 0 or 1.
+
 ## 2026-10-17: solo project, ad-hoc signing and upstream guards
 
 - **Upstream:** `462e90193` (merge of PR #345), still the last merged. Upstream `main` is now `69e82e80c` (merge of
   PR #347), four commits ahead, and not yet merged by this commit; the next sync merges it.
-- **Port:** `PORT_SHA`.
+- **Port:** `5b1102e5d`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); this commit changes nothing outside `port/` and
   `.github/`.
 - **Host build:** not yet (phase 0).

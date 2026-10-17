@@ -41,6 +41,7 @@ void CRYPTO_RC4Init(CRYPTORC4Context *context, const void *key, u32 key_len) {
 // stored back through the context pointer advanced to s. MWCC can't produce this (it pads the odd register list
 // with r3, among others)
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm void CRYPTO_RC4Encrypt(CRYPTORC4Context *context, const void *in, u32 length, void *out) {
     stmdb sp!, {r4, r5, r6, r7, r8, r9, lr}
     ldrb r7, [r0, #0]
@@ -75,5 +76,6 @@ asm void CRYPTO_RC4Encrypt(CRYPTORC4Context *context, const void *in, u32 length
     strb r6, [r0, #-3]
     ldmia sp!, {r4, r5, r6, r7, r8, r9, pc}
 }
+#endif
 
 // clang-format on

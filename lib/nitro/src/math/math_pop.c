@@ -5,10 +5,12 @@
 // The SDK wrote this in assembly: a CLZ and a return, in ARM, for Thumb code to call.
 #pragma thumb off
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm u32 MATH_CountLeadingZerosFunc(u32 x) {
     clz r0, r0
     bx lr
 }
+#endif
 
 // clang-format on
 #pragma thumb on

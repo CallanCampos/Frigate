@@ -7,6 +7,7 @@
 
 #pragma thumb off
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm void MTX_Identity22_(MtxFx22 *mtx) {
     mov r1, #0
     mov r2, #0x1000
@@ -15,11 +16,13 @@ asm void MTX_Identity22_(MtxFx22 *mtx) {
     stmia r0!, {r1, r2}
     bx lr
 }
+#endif
 
 // clang-format on
 #pragma thumb on
 
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y) {
     stmia r0!, {r1}
     mov r1, #0
@@ -28,10 +31,12 @@ asm void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y) {
     stmia r0!, {r1, r2}
     bx lr
 }
+#endif
 
 // clang-format on
 
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm void MTX_Rot22_(MtxFx22 *mtx, fx32 sin, fx32 cos) {
     str r2, [r0, #0]
     str r1, [r0, #4]
@@ -40,6 +45,7 @@ asm void MTX_Rot22_(MtxFx22 *mtx, fx32 sin, fx32 cos) {
     str r2, [r0, #0xc]
     bx lr
 }
+#endif
 
 // clang-format on
 

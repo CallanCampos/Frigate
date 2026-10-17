@@ -9,6 +9,7 @@
 
 #pragma thumb off
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm void MTX_Identity44_(MtxFx44 *mtx) {
     mov r2, #0x1000
     mov r3, #0
@@ -22,10 +23,12 @@ asm void MTX_Identity44_(MtxFx44 *mtx) {
     stmia r0!, {r1, r2}
     bx lr
 }
+#endif
 
 // clang-format on
 
 // clang-format off
+#ifndef PLATFORM_PC // port/hal has the host version
 asm void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst) {
     ldmia r0!, {r2, r3, ip}
     add r0, r0, #4
@@ -41,6 +44,7 @@ asm void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst) {
     stmia r1!, {r2, r3, ip}
     bx lr
 }
+#endif
 
 // clang-format on
 

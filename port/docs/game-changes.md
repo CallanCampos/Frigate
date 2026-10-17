@@ -34,6 +34,11 @@ under MWCC.
   when in doubt, probe every incomplete file.
 - A **hook** must also expand to nothing or to its bare argument when `PLATFORM_PC` is undefined, and a **platform**
   block must leave the code MWCC compiles as it was; `PLATFORM_PC` is defined only by the host build.
+- A **guard-only** change, one that only adds `#if`/`#ifdef PLATFORM_PC` branches and leaves what MWCC compiles token
+  for token as it was, is proven for every file at once, complete or incomplete, by
+  `.venv/bin/python port/tools/check_mwcc_neutral.py`: MWCC's preprocessed text of every C file, in both versions, is
+  identical to the last merged upstream commit's, so the compiler gets the same input. It replaces the per-file probes
+  for such changes; ninja with both SHA1s still runs.
 
 ## Columns
 
@@ -57,5 +62,6 @@ file keeps what the port needed.
 
 | File | Kind | Guard or macro | Why | MWCC-neutral proof | Commit |
 | --- | --- | --- | --- | --- | --- |
-
-None yet.
+| `include/gfl/overlay.h` | Platform | `#ifdef PLATFORM_PC` around `OVERLAY_ID` | `OVERLAY_ID(n)` is the address of a linker symbol; the host links every overlay into one program, so the ID is `n` | `check_mwcc_neutral.py`, every file, both versions; ninja, both SHA1s | PORT_SHA |
+| `lib/nitro/include/nitro/math.h` | Platform | `#if defined(PLATFORM_PC)` before `#elif defined(__thumb)` | `MATH_CountLeadingZeros` is an MWCC `asm` block; the host counts with `__builtin_clz` | as above | PORT_SHA |
+| `lib/nitro/src/crypto/rc4.c`, `fx/fx_mtx22.c`, `fx/fx_mtx33.c`, `fx/fx_mtx43.c`, `fx/fx_mtx44.c`, `gx/g3x.c`, `math/math_pop.c` | Platform | `#ifndef PLATFORM_PC` around each MWCC `asm` function (18 in all) | MWCC `asm` functions don't compile on a host; `port/hal` provides host versions | as above | PORT_SHA |

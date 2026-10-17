@@ -1,0 +1,54 @@
+name: Port CI
+
+# Builds the native port on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI doesn't
+# have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds both ROMs
+# locally (port/docs/SYNC.md).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: port-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host:
+    name: Host build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-26.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja sdl3
+
+      - name: Install build tools (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build clang
+
+      - name: Configure
+        env:
+          CC: clang
+        run: cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build/port
+
+      - name: Test
+        run: ctest --test-dir build/port --output-on-failure

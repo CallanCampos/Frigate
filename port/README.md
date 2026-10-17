@@ -6,8 +6,25 @@ lives here; the rest of the tree is the decomp, merged from `fuddlesworth/pokebw
 
 ## Building the port
 
-Not yet: the host build arrives in phase 0. Until then the only build is the decomp's ROM build (below), which must
-keep matching after every port change.
+The host build compiles every C file of `src/` and `lib/` with the host's clang into one program, except the files
+[hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are
+trap stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the
+program stops with the name of the first one it reaches. It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or
+later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+
+```sh
+cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build/port
+ctest --test-dir build/port --output-on-failure
+build/port/pokeblack2 --headless
+```
+
+`-DPORT_VERSION=w2_us` builds White 2 (`pokewhite2`). The ROM build (below) stays separate and must keep matching after
+every port change; [tools/check_mwcc_neutral.py](tools/check_mwcc_neutral.py) proves a guard-only change to decomp
+files leaves what MWCC compiles unchanged ([docs/game-changes.md](docs/game-changes.md)).
+
+**Where it stands:** the program links and enters the game's `main()`, which stops at `OS_Init`, the first SDK module
+the platform layer replaces. [docs/STATUS.md](docs/STATUS.md) has the current state.
 
 ## Directory map
 
@@ -18,9 +35,10 @@ planned and appear as their phase starts.
 port/
   README.md              now      this overview
   CLAUDE.md              now      rules for sessions working on the port
-  CMakeLists.txt         phase 0  host build; reads the decomp's file lists from config/
-  app/                   phase 0  main(), SDL3 window, screen layouts, settings file, paths, first-launch ROM setup
-  hal/                   phase 0  host side of the SDK, one directory per SDK module it replaces
+  CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
+  app/                   now      main(), SDL3 window; later screen layouts, settings, paths, first-launch ROM setup
+  include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
+  hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
     os/ fs/ card/ input/ rtc/ pm/ mic/ mi/ fx/ gx/ snd/ stubs/
     replaced.txt                  SDK source files the host build compiles from hal/ instead of lib/
   gfx/                   phase 1  ref/ (CPU reference renderers), ge/ (geometry engine), gpu/ (SDL_GPU), shaders/
@@ -39,15 +57,17 @@ port/
     sync_upstream.sh     now      merge upstream and verify both ROMs and the host build
     bootstrap_checkout.sh now     prepare a new clone or worktree for the ROM build and Claude Code
     hooks/port_guard.py  now      Claude Code hook that refuses writes to upstream and the decomp fork
-    gen_sources.py       phase 0  generated source lists and trap stubs
+    gen_host_tree.py     now      source list, include/ mirror without MSL's libc headers, generated constants
+    gen_stubs.py         now      trap stubs and data placeholders for symbols with no C yet
+    check_mwcc_neutral.py now     proves a guard-only change to decomp files neutral under MWCC (preprocessed text)
     oracle/              phase 1  melonDS test harness (a test tool, never linked into the port)
   docs/                  now      plan, research, sync guide (SYNC.md), status log, ADRs, game-change ledger
   third_party/           phase 0  pinned dependencies (SDL3, Dear ImGui, Lua, minicoro, ...)
 ```
 
 PLAN.md also places sample mods in `mods/examples/` at the repository root (phase 6). Outside `port/`, the port's
-own files are `.github/README.md` and `.github/workflows/port-*.yml` (now `port-sync.yml`, the hourly upstream merge);
-any other change outside `port/`, such as the planned `include/platform.h`, is a game change listed in
+own files are `.github/README.md`, `.github/workflows/port-sync.yml` (the hourly upstream merge) and
+`.github/workflows/port-ci.yml` (the host build and tests); any other change outside `port/` is a game change listed in
 [docs/game-changes.md](docs/game-changes.md).
 
 ## Preparing a checkout

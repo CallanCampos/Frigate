@@ -90,7 +90,13 @@ u32 MATH_CountLeadingZerosFunc(u32 x);
 // The number of set bits
 u8 MATH_CountPopulation(u32 x);
 
-#ifdef __thumb
+#if defined(PLATFORM_PC)
+// The host build has no CLZ asm block; the compiler's builtin counts the same, with zero spelled out since the builtin
+// leaves it undefined and CLZ gives 32
+static inline u32 MATH_CountLeadingZeros(u32 x) {
+    return x == 0 ? 32 : (u32)__builtin_clz(x);
+}
+#elif defined(__thumb)
 static inline u32 MATH_CountLeadingZeros(u32 x) {
     return MATH_CountLeadingZerosFunc(x);
 }
