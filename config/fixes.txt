@@ -1780,6 +1780,7 @@ overlays/ov068 0x021e58e8 reloc_module overlay(129)
 overlays/ov069 0x0217cb1e reloc_module overlay(28)
 overlays/ov070 0x0217d5a4 reloc_addend 4
 overlays/ov070 0x0217f25c reloc_addend 4
+overlays/ov070 0x0217f97c remove_reloc
 overlays/ov070 0x0217fc64 remove_symbol
 overlays/ov071 0x021e8ea6 reloc_module overlay(36)
 overlays/ov074 0x021e90c6 reloc_module overlay(36)

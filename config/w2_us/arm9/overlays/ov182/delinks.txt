@@ -224,3 +224,9 @@ lib/dwcutilui/src/dwc_util_timed_notice.c:
     .text       start:0x021afe2c end:0x021aff7c
     .data       start:0x021c0ef0 end:0x021c0f04
     .bss        start:0x021c411c end:0x021c4120
+
+lib/dwcutilui/src/dwc_util_notice_screen.c:
+    complete
+    .text       start:0x021aff7c end:0x021b01d8
+    .data       start:0x021c0f04 end:0x021c0f18
+    .bss        start:0x021c4120 end:0x021c4124
