@@ -174,6 +174,11 @@ void *FieldEffect_BTrain_Create(FieldEffects *effects, HeapID heapId);
 void FieldEffect_BTrain_Free(FieldEffects *effects, void *data);
 void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId);
 void func_ov036_021c670c(FieldEffects *effects, void *data);
+// fldeff_hide.c: the object an actor hides in, of a kind (0 to 2); the start of its animation and sound; and whether
+// its animation has ended, which it has for a NULL task
+FieldEffectTask *func_ov036_021c67c8(FieldEffects *effects, FieldActor *actor, u32 kind);
+void func_ov036_021c6800(FieldEffectTask *task);
+u16 func_ov036_021c6820(FieldEffectTask *task);
 // The bubbles that rise from an actor in the water
 void func_ov036_021c6934(FieldActor *actor, FieldEffects *effects);
 void *func_ov036_021c696c(FieldEffects *effects, HeapID heapId);

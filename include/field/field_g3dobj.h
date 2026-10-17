@@ -27,6 +27,9 @@ u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u16 resGroupIdx, u16 modelI
 void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *sys, u16 objIdx);
 SRTMatrix *FieldG3DObjSystem_GetObjTransform(FieldG3DObjSystem *sys, u16 objIdx);
 void FieldG3DObjSystem_SetObjPosition(FieldG3DObjSystem *sys, u16 objIdx, const VecFx32 *pos);
+// The frame of one of the object's animations
+void FieldG3DObjSystem_SetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, int anmIdx, fx32 frame);
+fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, u32 anmIdx);
 // Hide the object, or not
 void func_ov036_021c0154(FieldG3DObjSystem *sys, u16 objIdx, BOOL hidden);
 // TRUE until the object's animation ends

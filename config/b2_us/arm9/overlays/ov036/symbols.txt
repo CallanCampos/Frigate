@@ -5562,9 +5562,9 @@ BTRAIN_ANM_DATIDS kind:data(any) addr:0x021d2920
 BATTLE_SUBWAY_TRAIN_EFFECT_DATIDS kind:data(any) addr:0x021d2928
 BTRAIN_TASK_VTABLE kind:data(any) addr:0x021d2938
 BTRAIN_SRT kind:data(any) addr:0x021d294c
-data_ov036_021d2988 kind:data(any) addr:0x021d2988
-data_ov036_021d2994 kind:data(any) addr:0x021d2994
-data_ov036_021d29a0 kind:data(any) addr:0x021d29a0
+HIDE_RES_IDS kind:data(any) addr:0x021d2988
+HIDE_SE_IDS kind:data(any) addr:0x021d2994
+HIDE_TASK_VTABLE kind:data(any) addr:0x021d29a0
 BUBBLE_MDL_INDEX kind:data(any) addr:0x021d29b4
 BUBBLE_ANM_INDICES kind:data(any) addr:0x021d29b8
 BUBBLE_FILE_IDS kind:data(any) addr:0x021d29c0
