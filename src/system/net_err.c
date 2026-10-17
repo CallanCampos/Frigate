@@ -133,10 +133,12 @@ static inline GXWndPlane G2S_GetWndOutsidePlane(void) {
 }
 
 static inline GXWndPlane G2_GetWndOBJInsidePlane(void) {
+    // WINOUT's high byte, the OBJ window's planes: a register, read as the hardware holds it
     return *(volatile GXWndPlane *)((uptr)&reg_G2_WINOUT + 1);
 }
 
 static inline GXWndPlane G2S_GetWndOBJInsidePlane(void) {
+    // The sub engine's WINOUT high byte, the OBJ window's planes: a register, read as the hardware holds it
     return *(volatile GXWndPlane *)((uptr)&reg_G2S_DB_WINOUT + 1);
 }
 

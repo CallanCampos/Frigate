@@ -9,7 +9,6 @@
 
 #ifdef PLATFORM_PC
 // A host's structs are larger than the DS's (pointers are 8 bytes), so the platform layer sizes the heaps
-u32 port_heap_size(u32 index, u32 size, BOOL root);
 #define PORT_HEAP_SIZE(index, size, root) port_heap_size(index, size, root)
 #else
 #define PORT_HEAP_SIZE(index, size, root) size
