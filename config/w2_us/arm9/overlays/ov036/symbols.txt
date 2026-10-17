@@ -5241,8 +5241,8 @@ WEATHER_SURFACE_SETUP kind:data(any) addr:0x021cfb78
 WEATHER_BG_SETUPS kind:data(any) addr:0x021cfb88
 WEATHER_OVERLAYS kind:data(any) addr:0x021cfba0
 data_ov036_021cfb70 kind:data(any) addr:0x021cfba4
-data_ov036_021cfbe4 kind:data(any) addr:0x021cfc18
-data_ov036_021cfbec kind:data(any) addr:0x021cfc20
+WEATHER_OBJ_SETUP kind:data(any) addr:0x021cfc18
+WEATHER_STATE_KINDS kind:data(any) addr:0x021cfc20
 FIELDMAP_CTRL_GRID kind:data(any) addr:0x021cfc30
 PLAYER_SPRITE_MAP kind:data(any) addr:0x021cfc44
 PLAYER_EXSTATE_CHANGE_VTABLE_DIVE kind:data(any) addr:0x021cfc94
