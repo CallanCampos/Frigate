@@ -8,6 +8,7 @@
 #include "dwc_util_gfx_resource.h"
 #include "dwc_util_main.h"
 #include "dwc_util_msg_resource.h"
+#include "dwc_util_option_menu.h"
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"

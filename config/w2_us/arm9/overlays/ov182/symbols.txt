@@ -1204,10 +1204,10 @@ data_ov182_021bffac kind:data(any) addr:0x021bffec
 data_ov182_021bffae kind:data(any) addr:0x021bffee
 data_ov182_021bffb8 kind:data(any) addr:0x021bfff8
 data_ov182_021c0001_w2_us kind:data(any) addr:0x021c0001 ambiguous
-data_ov182_021bffd0 kind:data(any) addr:0x021c0010
-data_ov182_021bffd8 kind:data(any) addr:0x021c0018
+sButtonRows kind:data(any) addr:0x021c0010
+sOptionMenuButtonRects kind:data(any) addr:0x021c0018
 data_ov182_021c001c_w2_us kind:data(any) addr:0x021c001c ambiguous
-data_ov182_021bfff0 kind:data(any) addr:0x021c0030
+sOptionMenuCursorRects kind:data(any) addr:0x021c0030
 data_ov182_021bfff2 kind:data(any) addr:0x021c0032
 data_ov182_021bfff4 kind:data(any) addr:0x021c0034
 data_ov182_021bfff6 kind:data(any) addr:0x021c0036
@@ -1627,7 +1627,7 @@ sStatus kind:bss addr:0x021c40f4
 data_ov182_021c40b8 kind:bss addr:0x021c40f8
 sMainMenu kind:bss addr:0x021c40fc
 sErase kind:bss addr:0x021c4104
-data_ov182_021c40c8 kind:bss addr:0x021c4108
+sOptionMenu kind:bss addr:0x021c4108
 data_ov182_021c40d4 kind:bss addr:0x021c4114
 data_ov182_021c40d8 kind:bss addr:0x021c4118
 data_ov182_021c40dc kind:bss addr:0x021c411c

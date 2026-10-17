@@ -11288,6 +11288,9 @@ overlays/ov182 0x021bff30 sKeypadNavigation
 overlays/ov182 0x021bff88 sClientName
 overlays/ov182 0x021bff98 sMainMenuButtonRects
 overlays/ov182 0x021bffa8 sMainMenuCursorRects
+overlays/ov182 0x021bffd0 sButtonRows
+overlays/ov182 0x021bffd8 sOptionMenuButtonRects
+overlays/ov182 0x021bfff0 sOptionMenuCursorRects
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11338,6 +11341,7 @@ overlays/ov182 0x021c40b0 sMove
 overlays/ov182 0x021c40b4 sStatus
 overlays/ov182 0x021c40bc sMainMenu
 overlays/ov182 0x021c40c4 sErase
+overlays/ov182 0x021c40c8 sOptionMenu
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
