@@ -5,6 +5,7 @@
     .bss        start:0x021db000 end:0x021dda60 kind:bss align:32
 
 src/ov167/btl_main.c:
+    complete
     .text       start:0x021998c0 end:0x0219e3cc
     .rodata     start:0x021d6c24 end:0x021d6cec
     .data       start:0x021dae80 end:0x021dae8c
