@@ -1148,9 +1148,13 @@ Same instructions, scheduled in another order.
   the declarations, linkage, field types, nesting and `#pragma scheduling off` don't change it. A read of the same
   object earlier in the function at a higher offset lowers the bound: the access at offset a moves only while a plus
   the larger of a and that read's offset is below the size, so after `int x = sObj.f[12];` only `f[0]` to `f[3]`
-  move. A store moves above an access through a pointer into another static by the same bound. libVCT's
-  `VCT_DetachSession` (`vct_audio.c`) loads `sAudio.sessionCount`, at 0x20 of the 0x2c-byte `sAudio`, above its
-  `sSlotSessions[slot] = NULL`, which no spelling of the two statements reproduces. Its `EncodeNextFrame`, which
+  move. A store moves above an access through a pointer into another static by the same bound. The store must be in
+  the lower half of its own object as well: after `sArr[2] = 0;` into an `int sArr[12]`, `sObj.f[2]`'s load moves
+  above it, and after `sArr[8] = 0;` it stays below; a store through an unknown index counts as offset 0. libVCT's
+  `VCT_DetachSession` (`vct_audio.c`) loads the session count above its `sSlotSessions[slot] = NULL`, which no
+  spelling gives with the count at 0x20 of a 0x2c-byte `sAudio` struct. With `sAudio`'s fields as separate statics,
+  each at offset 0 of its own object, under `-ipa file` (whose size sort gives the ROM's `.bss` order), the load
+  moves and the function matches, though the file needs a split first (its row). Its `EncodeNextFrame`, which
   reads `sAudio.codec` (0x1c) first, moves the store `sAudio.needsSync = FALSE` (8) above the `packet->codec` store
   into `sSendQueue`, and fields at 4 and 0xc in its place move too, while those at 0x14 and 0x18 stay.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
@@ -1801,6 +1805,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A ternary argument `f(c ? 1 : 0)` compiles to the select form (`movs r0, #1; cmp; beq; movs r0, #0`). A branchy
   original (`bne`; `movs #1`; `b`; `movs #0`) is an `if`/`else` with a call in each branch, as `CtvtTalk_UpdateMain`
   calls `func_0203d564(TRUE)` or `func_0203d564(FALSE)`.
+- MWCC doesn't push a constant multiply into the arms of a select: `&frames[c ? 0 : 2]` with 0x460-byte elements
+  gives `movne r2, #0; moveq r2, #2; mov r0, #0x460; mla`. A select of 0 and an element's size added to a base
+  (`movne r0, #0; moveq r0, #0x460; add r8, r6, r0`) is therefore a ternary of byte offsets in the source, which no
+  index spelling, type or inline gives, as in libVCT's `EncodeNextFrame` and `VCT_SubmitSamples` (`vct_audio.c`, their
+  rows). A ternary of the constants 0 and 1 compiles as a logical not, `moveq #1` before `movne #0`, while other
+  constants keep the source's arm order (`movne #0; moveq #2`).
 - A flag set with `b = TRUE; if (*p != 0) { b = FALSE; }` is live before `*p` is loaded, so `b` and `p` need two
   registers, and a spilled flag is stored twice. `b = (*p == 0) ? TRUE : FALSE;` reads `*p` first, takes `p`'s
   register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
@@ -2456,9 +2466,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `TRUE`/`FALSE`, or `&&` with an operand the front end can't fold, such as `i < 4 && !found` with a local flag. `&& 1`,
   `MIN` of constants, a `static const` or enum bound and every counter type are rotated. In ARM code the 0/1 test still
   compiles to a plain `cmp; blt` at the bottom, so the leading `b` is the only sign of it: libVCT's `VCT_InitAudio`
-  (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE` (its row).
-  As a diagnostic only, `__attribute__((aligned(4)))` on any object a function reads keeps the `b` there too, and
-  changes the function's other optimizations.
+  (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE`, though
+  there the original's `b` comes from an aligned object (next bullet).
+- An explicit alignment (`ATTRIBUTE_ALIGN(4)`, 16 or 32) on any object a function reads, or on a member it reads,
+  keeps every constant-bound loop of the function entered with a `b` to its test, and changes its other optimizations:
+  a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it is otherwise shifted.
+  `volatile`, an aligned struct type or a union do not do it. libVCT's `vct_audio.c` has the original's case:
+  `sSendQueue` is 32-aligned in the ROM (`0x02197a80`, after an 8-byte gap), and the functions that read it keep the
+  leading `b` (`VCT_InitAudio`, `VCT_AttachSession`, `VCT_SubmitSamples`, and `VCT_SendPending`, which also has the
+  `clz` inline below), where every other loop of the file is rotated. Under the attribute `VCT_AttachSession` matches
+  with `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that
+  keep the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a
   `packet = head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `FlushAllQueues` (`vct_audio.c`)
