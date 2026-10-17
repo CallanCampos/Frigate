@@ -63,6 +63,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0005](0005-platform-boundary-as-built.md) | The platform boundary as built | D3, D5, §4.5, §4.7 | accepted |
 | [0006](0006-sound-driver-as-built.md) | The sound driver as built | D8, §4.7 | accepted |
 | [0007](0007-nitrosystem-files-in-host-structs.md) | NitroSystem's 2D files in host structs | D3, D5, §4.5 | accepted |
+| [0008](0008-particle-work-from-the-platform-layer.md) | Particle work from the platform layer | D5, §4.5, §4.8 | accepted |
 
 ## Decisions waiting for an ADR
 

@@ -52,6 +52,14 @@ void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab) {
     MtxFx44 tmp;
     MtxFx44 *dst = (ab == b) ? &tmp : ab;
     fx32 b0, b1, b2, b3;
+#ifdef PLATFORM_PC
+    // The ROM loads each row of a before it stores that row of the product, so a product into a is right on the DS
+    // (MCSSSys_Draw and NitroSystem's SBC make some). This C reads a's row again after storing some of it, so on a host
+    // that product is made in tmp too
+    if (ab == a) {
+        dst = &tmp;
+    }
+#endif
     dst->m[0][0] = (fx32)(((fx64)a->m[0][1] * b->m[1][0] + (fx64)a->m[0][0] * b->m[0][0] +
                            (fx64)a->m[0][2] * b->m[2][0] + (fx64)a->m[0][3] * b->m[3][0]) >>
                           FX32_SHIFT);

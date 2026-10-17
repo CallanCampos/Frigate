@@ -12,6 +12,7 @@
 #include "gfx/screens.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_os.h"
+#include "hal/rom/sha1.h"
 #include "hal/tp/tp_host.h"
 #include <SDL3/SDL.h>
 #include <string.h>
@@ -251,4 +252,30 @@ int port_present_screenshot(const char *path) {
     }
     SDL_DestroySurface(surface);
     return ok;
+}
+
+void port_present_screen_hash(int screen, char hex[41]) {
+    static const char digits[] = "0123456789abcdef";
+    const uint32_t *pixels = port_screens_pixels(screen);
+    uint8_t row[PORT_SCREEN_WIDTH * 3];
+    uint8_t digest[PORT_SHA1_DIGEST_SIZE];
+    PortSha1 sha1;
+
+    port_sha1_init(&sha1);
+    for (int line = 0; line < PORT_SCREEN_HEIGHT; line++) {
+        for (int x = 0; x < PORT_SCREEN_WIDTH; x++) {
+            uint32_t pixel = pixels[line * PORT_SCREEN_WIDTH + x];
+
+            row[x * 3] = (uint8_t)(pixel >> 16);
+            row[x * 3 + 1] = (uint8_t)(pixel >> 8);
+            row[x * 3 + 2] = (uint8_t)pixel;
+        }
+        port_sha1_update(&sha1, row, sizeof(row));
+    }
+    port_sha1_final(&sha1, digest);
+    for (int i = 0; i < PORT_SHA1_DIGEST_SIZE; i++) {
+        hex[i * 2] = digits[digest[i] >> 4];
+        hex[i * 2 + 1] = digits[digest[i] & 15];
+    }
+    hex[40] = '\0';
 }

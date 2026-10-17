@@ -3,6 +3,23 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-17: New Game's intro, after review
+
+- **The decomp's incomplete C can differ from the ROM where only aliasing shows it.** `MTX_Concat44` and its siblings
+  read their first input after storing part of the result; the ROM loads each row first, so the game's products into
+  their own input are right on the DS and wrong on a host, and every test with separate pointers passed. When a
+  library function writes through one pointer and reads through another of the same type, give the asm oracle cases
+  with the pointers equal (`port/tests/asm_oracle/test_fx_decomp.py`), and grep the game for in-place calls.
+- **A replay survives without proving anything** until it checks what the screens show. `--screen-hashes` writes
+  every frame's screens in the oracle's `frames.tsv` format, so the goldens are the oracle's own hashes and a test
+  needs no images (`port/tests/replay/check_screens.py`).
+- **Press in video frames through the boot, and give presses room.** The DS drops frames in the logo movie and at
+  every load, so its game count reaches the title screen about 2,500 passes earlier than the port's: a press keyed
+  to the game count lands on another moment of the title on each (the DS's title had restarted its animation). In
+  video frames both show the title at 3,900, and both take 155 passes from START to the start menu. After that,
+  presses that keep coming (A twice a second) find each program waiting, so an input file plays the same on both
+  however far the DS falls behind.
+
 ## 2026-10-17: New Game's intro
 
 - **ld64 doesn't keep a section's zero-fill objects in the order they are defined.** The trap stubs bracketed the
