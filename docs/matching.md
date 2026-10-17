@@ -935,7 +935,11 @@ Same code, other `sp` offsets or frame size.
   `ctvt_talk.c` compile to the same bytes under either, so neither tells an order the scheduler chose from one the
   code generator did. `#pragma optimization_level 1` does change the order: there `ctvt_talk.c`'s
   `CtvtTalk_UpdateRecord` stores its call's stack arguments first, then sets `r0` to `r3`, each constant built at its
-  use, while level 2 already gives the order of `-O4`.
+  use, while level 2 already gives the order of `-O4`. The `-O4` scheduler reorders that sequence and keeps it where
+  it rates two instructions equal: there the store of `pos` (`str r0, [sp]`) ties with the `0x800`'s `movs r2, #2`,
+  because the `0xc000` built next reuses `r0`, so ours stores first, and the original, which builds the constant
+  first, generated it first. With a one-instruction last argument (`5` for `0xc000`) the same call builds the
+  constant first.
 - A constant stored through `p + (a - b)` is loaded before the subtraction, into a fresh register. When the original
   subtracts first and then builds the constant in the freed register, the pointer was advanced in a statement of its
   own: multiboot's `MB_ReadSegment` (`mb_segment.c`) matched with `patch += (u32)AutoloadCallback -
@@ -1189,6 +1193,12 @@ Same instructions, scheduled in another order.
 - A conditional expression among a call's arguments is evaluated before the plain ones. When the original loads the
   arguments in their order, the conditional one was a local set before the call: the forms page passes `addToDex`
   locals `sex` and `rare` set just before it.
+- An argument that is an inlined function making a call is evaluated before the plain ones too, several of them right
+  to left, while the plain calls among the arguments are made left to right. With `IA()` an inline that returns
+  `A(11)`, `Use4(A(11), B(22), IA(), 1)` makes the inline's call to `A` first, and `Use4(IA(), IB(), C(33), 1)` calls
+  `B`, then `A`, then `C`. So a call made before the calls of earlier arguments was inside an inline helper. In
+  `ctvt_talk.c`'s `CtvtTalk_UpdateRecord`, an inline returning the recorded buffer plus 0x800 builds the constant
+  before the `CtvtMic_GetRecordedSize` call of a later argument, in `r7`, where the plain sum builds it after.
 - An argument that is loaded before a call among the arguments, such as a print queue loaded before
   `BmpWin_GetBitmap(...)` in the same call, was passed to an inlined helper that makes the call, like
   `PrintWindow_Print`. A block-scoped local set from the field before the call does the same: bmp_menu.c's

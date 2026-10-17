@@ -341,6 +341,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   local. (matching.md: "nested in another call's arguments")
 - Arguments loaded in order around a conditional one: that argument was a local set before the call.
   (matching.md: "A conditional expression among a call's arguments")
+- A call among the arguments made before the calls of earlier arguments: it was inside an inline helper, and
+  several such inlines are evaluated right to left. (matching.md: "an inlined function making a call")
 - A plain argument loaded before a call that is another argument: the plain one was in a local.
   (matching.md: "plain argument loaded before")
 - An inline's argument computed and spilled at the inline's entry: the caller passed a local.
