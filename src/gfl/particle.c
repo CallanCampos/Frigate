@@ -115,6 +115,16 @@ ParticleSystem *func_0204f980(void *work, u32 size, BOOL camera, u32 fixPolyID, 
     system->extResource = FALSE;
     MI_CpuFill8(work, 0, size);
     system->workStart = work;
+#ifdef PLATFORM_PC
+    // SPL allocates its manager, emitters, particles and resource tables from the work, and they hold pointers, so on
+    // a host they outgrow the size the caller worked out for the DS (24 emitters of 208 bytes and 200 particles of 80
+    // alone take 20,992 bytes, where the DS's 156 and 68 fit in the intro's 0x4800). The platform layer gives the
+    // system work of its own instead, sized for the host's structs and freed with the system
+    // (port/hal/gfl/particle_work.c). workStart stays the caller's buffer, which func_020500c8 hands back for the
+    // caller to free
+    size = port_particle_work_size(size);
+    work = port_particle_work(id, size);
+#endif
     system->work = work;
     system->workEnd = (u8 *)work + size;
     system->id = id;
@@ -172,6 +182,10 @@ void func_0204fa84(ParticleSystem *system) {
     if (system->camera != NULL) {
         GFL_G3DCameraFree(system->camera);
     }
+#ifdef PLATFORM_PC
+    // The host's own work, which func_0204f980 gave the system in place of the caller's
+    port_particle_work_free(system->id);
+#endif
     GFL_HeapFree(system);
 }
 
@@ -190,7 +204,7 @@ void func_0204fb4c(void) {
 // Takes size bytes of the system's work, rounded up to a word
 static inline void *Particle_Alloc(ParticleSystem *system, u32 size) {
     void *ret = system->work;
-    u32 next = (u32)system->work + size;
+    uptr next = (uptr)system->work + size;
 
     if (next % 4 != 0) {
         next += 4 - next % 4;
