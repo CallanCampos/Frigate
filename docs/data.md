@@ -394,6 +394,19 @@ bank; `tempo`, `volume`, `expression`, `pan`, `transpose`, `pitch_bend`, `bend_r
 is a random number between the two given, and after `from_var` it is the variable given. `.byte` keeps data that no
 track reaches. `sseq.py`'s commands table has every command with its byte and arguments.
 
+To add a song or a sound, add its `SEQ_` constant to the end of `sound.txt` and its directory, with a `data.json`
+naming its bank, volume, priorities and player, as a copy of a sequence like it, and its `sequence.s`, written by hand
+or converted from a MIDI file:
+
+```
+.venv/bin/python tools/data/midi_to_sequence.py SONG.mid data/sound/sequences/bgm/my_song/sequence.s
+```
+
+Each MIDI channel with notes becomes a track at the game's 48 ticks a quarter note, and the tempo, program changes,
+volume, pan, expression, modulation depth and pitch bend come along; markers named `loopStart` and `loopEnd` loop the
+song. A program is an instrument of the sequence's bank, not a General MIDI one, so set the MIDI file's programs to the
+bank's instruments.
+
 ## Moves
 
 Each move has a directory in `data/moves/`, named after its constant (`thunderbolt/` for `MOVE_THUNDERBOLT`), whose
