@@ -146,13 +146,10 @@ static void ScClient_Reset(ScClient *client) {
     memset(client->csid, 0, sizeof(client->csid));
     memset(client->ccid, 0, sizeof(client->ccid));
     // Invalid IDs carry the binary marker 0xDEAD.
-    u8 *csidBytes = (u8 *)client->csid;
-    u8 *ccidBytes = (u8 *)client->ccid;
-
-    csidBytes[0] = 0xde;
-    csidBytes[1] = 0xad;
-    ccidBytes[0] = 0xde;
-    ccidBytes[1] = 0xad;
+    ((u8 *)client->csid)[0] = 0xde;
+    ((u8 *)client->csid)[1] = 0xad;
+    ((u8 *)client->ccid)[0] = 0xde;
+    ((u8 *)client->ccid)[1] = 0xad;
     client->valid = 0;
 }
 

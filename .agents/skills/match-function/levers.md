@@ -247,6 +247,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
   byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
+- `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
+  (matching.md: "`ScClient_Reset` matches")
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - `lsr` then `orr ..., lsl` where the original shifts left first (a halfword swap): swap the operands of the `|`.

@@ -1215,6 +1215,10 @@ Same instructions, scheduled in another order.
   address scheduling from a cast to a byte-array struct. `dwc_competition.c`'s `Sc_PutU16` and `Sc_PutU32` match with
   this character view of the scalar's object representation: the struct copy omits one address instruction in the
   halfword writer and swaps the copy registers in the word writer. Both return `dest + sizeof(swapped)`.
+- `ScClient_Reset` matches with consistent direct unsigned-character views for the ID marker stores,
+  `((u8 *)client->csid)[0] = 0xde;`. Pointer-local views retain the two array bases across stores; direct views
+  recompute each byte address from the client. Both forms write the binary bytes while preserving the fields' `char`
+  string interfaces.
 - A struct assignment loads every field before it stores any, through a pointer that is not `const` too. Two
   fields copied with both loads first, `ldr r2, [r0, #0x10]; ldr r1, [r0, #0x14]; str r2, [r0]`, are one struct
   copied: `KeySystemTween_Update` ends with `tween->pos = tween->end;` for an `{ s32 x, y; }` position.
