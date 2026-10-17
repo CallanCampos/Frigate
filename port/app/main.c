@@ -5,14 +5,16 @@
 // and this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the
 // DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
-//              [--save-dir PATH] [--fixed-time TIME] [--watchdog SECONDS] [--main-arena-size BYTES]
-//              [--vram-backend NAME]
+//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--screenshot-every N] [--audio-dump PATH]
+//              [--input FILE] [--rom PATH] [--save-dir PATH] [--fixed-time TIME] [--watchdog SECONDS]
+//              [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
 //   --screenshot PATH   writes both screens as a PNG (top above bottom) when the run ends: after the last frame of
 //                       --frames N, or when the window is closed
+//   --screenshot-every N also writes them every N frames, for a playtest: to PATH with the frame number before its
+//                       extension (shot.png gives shot-004800.png)
 //   --audio-dump PATH   writes the sound as it is made to a WAV file, with or without --headless
 //   --input FILE        plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h);
 //                       its time line (or the format's default) sets the clock unless --fixed-time is given
@@ -76,8 +78,21 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless", "help",       "frames",   "screenshot",      "audio-dump",   "input",           "rom",
-    "save-dir", "fixed-time", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child",
+    "headless",
+    "help",
+    "frames",
+    "screenshot",
+    "screenshot-every",
+    "audio-dump",
+    "input",
+    "rom",
+    "save-dir",
+    "fixed-time",
+    "watchdog",
+    "main-arena-size",
+    "vram-backend",
+    "heap-scale-root",
+    "heap-scale-child",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -89,6 +104,7 @@ static unsigned sWatchdogSeconds;
 static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
+static unsigned long sScreenshotEvery;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -100,9 +116,10 @@ static const PortHwG3Readbacks sG3Readbacks = {
 
 static void Usage(void) {
     fprintf(stderr,
-            "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH] "
-            "[--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
-            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
+            "usage: %s [--headless] [--frames N] [--screenshot PATH] [--screenshot-every N] [--audio-dump PATH] "
+            "[--input FILE] [--rom PATH] [--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] "
+            "[--main-arena-size BYTES] [--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] "
+            "[--heap-scale-child N]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
 
@@ -226,6 +243,20 @@ static void Pace(void) {
     }
 }
 
+// --screenshot-every's shot of this frame: the path with -FRAME before its extension
+static void WritePeriodicScreenshot(void) {
+    const char *dot = strrchr(sScreenshotPath, '.');
+    const char *slash = strrchr(sScreenshotPath, '/');
+    size_t stem =
+        dot != NULL && (slash == NULL || dot > slash) ? (size_t)(dot - sScreenshotPath) : strlen(sScreenshotPath);
+    char path[4096];
+
+    if (snprintf(path, sizeof(path), "%.*s-%06lu%s", (int)stem, sScreenshotPath, sFrames, sScreenshotPath + stem) <
+        (int)sizeof(path)) {
+        port_present_screenshot(path);
+    }
+}
+
 static void WriteScreenshot(void) {
     if (sScreenshotPath != NULL && !sScreenshotWritten) {
         sScreenshotWritten = 1;
@@ -249,6 +280,9 @@ static void AppFrame(void) {
     if (port_app_present != NULL) {
         port_app_present();
     }
+    if (sScreenshotEvery != 0 && sFrames % sScreenshotEvery == 0) {
+        WritePeriodicScreenshot();
+    }
     if (sFrameLimit != 0 && sFrames >= sFrameLimit) {
         WriteScreenshot();
         port_os_stop();
@@ -261,6 +295,7 @@ static void AppFrame(void) {
 
 int main(int argc, char **argv) {
     long long frames;
+    long long screenshotEvery;
     long long watchdog;
     long long arenaSize;
     const char *audioDump;
@@ -277,9 +312,10 @@ int main(int argc, char **argv) {
     }
     sHeadless = port_app_option("headless") != NULL;
     frames = CountOption("frames", 0, 0);
+    screenshotEvery = CountOption("screenshot-every", 0, 0);
     watchdog = CountOption("watchdog", 0, sHeadless ? DEFAULT_HEADLESS_WATCHDOG : 0);
     arenaSize = CountOption("main-arena-size", 1, 0);
-    if (frames < 0 || watchdog < 0 || arenaSize < 0) {
+    if (frames < 0 || screenshotEvery < 0 || watchdog < 0 || arenaSize < 0) {
         Usage();
         return EXIT_BAD_OPTIONS;
     }
@@ -288,6 +324,12 @@ int main(int argc, char **argv) {
     sScreenshotPath = port_app_option("screenshot");
     if (sScreenshotPath != NULL && *sScreenshotPath == '\0') {
         fprintf(stderr, "port: --screenshot needs a path\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    sScreenshotEvery = (unsigned long)screenshotEvery;
+    if (sScreenshotEvery != 0 && sScreenshotPath == NULL) {
+        fprintf(stderr, "port: --screenshot-every needs --screenshot's path\n");
         Usage();
         return EXIT_BAD_OPTIONS;
     }
