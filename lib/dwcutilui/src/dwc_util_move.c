@@ -74,7 +74,7 @@ void func_ov182_021ae238(void) {
     func_ov182_021ba950();
 }
 
-const void *func_ov182_021ae240(void) {
+const MBUserInfo *func_ov182_021ae240(void) {
     return &sMove->user;
 }
 

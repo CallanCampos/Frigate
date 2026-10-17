@@ -1632,7 +1632,7 @@ sMoveResult kind:bss addr:0x021c4114
 sYes kind:bss addr:0x021c4118
 sFrames kind:bss addr:0x021c411c
 sNoticeScreen kind:bss addr:0x021c4120
-data_ov182_021c40e4 kind:bss addr:0x021c4124
+sPageMove kind:bss addr:0x021c4124
 data_ov182_021c40e8 kind:bss addr:0x021c4128
 data_ov182_021c40ec kind:bss addr:0x021c412c
 data_ov182_021c40f4 kind:bss addr:0x021c4134

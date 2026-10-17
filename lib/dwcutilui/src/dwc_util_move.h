@@ -2,6 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_UTIL_MOVE_H
 
 #include "types.h"
+#include "nitro/mb.h"
 
 // The connection utility's move of the Wi-Fi settings to another console: it offers dwc:/move/child.srl through DS
 // Download Play (app/download_play_sys.h) and reports the flow's progress to a callback, with an event of
@@ -25,6 +26,6 @@ void func_ov182_021ae1d4(void);
 BOOL func_ov182_021ae210(void);
 void func_ov182_021ae224(DWCUtilMoveCallback callback);
 void func_ov182_021ae238(void);
-const void *func_ov182_021ae240(void);
+const MBUserInfo *func_ov182_021ae240(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_MOVE_H

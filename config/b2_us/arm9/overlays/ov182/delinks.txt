@@ -242,3 +242,9 @@ lib/dwcutilui/src/dwc_util_notice_screen.c:
     .text       start:0x021aff3c end:0x021b0198
     .data       start:0x021c0ec4 end:0x021c0ed8
     .bss        start:0x021c40e0 end:0x021c40e4
+
+lib/dwcutilui/src/dwc_util_page_move.c:
+    complete
+    .text       start:0x021b0198 end:0x021b0420
+    .data       start:0x021c0ed8 end:0x021c0eec
+    .bss        start:0x021c40e4 end:0x021c40e8
