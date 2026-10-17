@@ -101,7 +101,7 @@ void *port_symbol_address(const char *name) {
             const ElfW(Sym) *symbol = &symbols[j];
 
             if (symbol->st_shndx == SHN_UNDEF || symbol->st_name >= strtab->sh_size ||
-                ELFW(ST_BIND)(symbol->st_info) == STB_LOCAL || strcmp(names + symbol->st_name, name) != 0) {
+                ELF64_ST_BIND(symbol->st_info) == STB_LOCAL || strcmp(names + symbol->st_name, name) != 0) {
                 continue;
             }
             dl_iterate_phdr(TakeFirst, &base);
