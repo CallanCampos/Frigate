@@ -120,9 +120,13 @@ get host `_Static_assert`s.
   (`gh issue view N -R fuddlesworth/pokebw2 --comments`). If someone holds a claim, the task waits: record the
   blocker in STATUS.md and pick another. Code with no overlay issue (the ITCM, ARM9 main, LTD) has no claim yet. The
   four ITCM ClAct renderers that phase 2 needs are such code.
-- **A port session never writes in the decomp checkout.** It offers the task to the user, who starts a decomp session
-  there; that session works under the root rules (claim, C from the asm, both SHA1s, fork PR) as ordinary decomp
-  work, and nothing it posts mentions the port.
+- **When the port is blocked on missing C, a port session may do the decomp work itself** (the user allowed it on
+  2026-10-17): in its own worktree of the decomp checkout (`~/dev/decomp/pokebw2/.claude/worktrees/...`), never in
+  this clone, on a topic branch from upstream `main`, under the root rules and skills there (claim an overlay's issue
+  first, C from the asm, both SHA1s, `finish-file`, a fork PR), as ordinary decomp work: nothing it commits, comments
+  or posts mentions the port. Work under someone else's active claim stays theirs; the port waits or uses a documented
+  stand-in for a deferred subsystem (`port/hal/dwc/ov011_pending.c`). The C reaches the port by sync once upstream
+  merges it.
 
 ## What native means (PLAN.md §1)
 
