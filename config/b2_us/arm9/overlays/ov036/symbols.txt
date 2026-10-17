@@ -5237,8 +5237,8 @@ data_ov036_021cf9e0 kind:data(any) addr:0x021cf9e0
 data_ov036_021cf9e4 kind:data(any) addr:0x021cf9e4
 data_ov036_021cf9e8 kind:data(any) addr:0x021cf9e8
 data_ov036_021cf9ec kind:data(any) addr:0x021cf9ec
-data_ov036_021cfb44 kind:data(any) addr:0x021cfb44
-data_ov036_021cfb54 kind:data(any) addr:0x021cfb54
+WEATHER_SURFACE_SETUP kind:data(any) addr:0x021cfb44
+WEATHER_BG_SETUPS kind:data(any) addr:0x021cfb54
 WEATHER_OVERLAYS kind:data(any) addr:0x021cfb6c
 data_ov036_021cfb70 kind:data(any) addr:0x021cfb70
 data_ov036_021cfbe4 kind:data(any) addr:0x021cfbe4
@@ -5630,7 +5630,7 @@ data_ov036_021d4e08 kind:data(any) addr:0x021d4e08
 data_ov036_021d4e18 kind:data(any) addr:0x021d4e18
 data_ov036_021d4e28 kind:data(any) addr:0x021d4e28
 data_ov036_021d4e3c kind:data(any) addr:0x021d4e3c
-data_ov036_021d4e4c kind:data(any) addr:0x021d4e4c
+WEATHER_TRANSITION_FUNCS kind:data(any) addr:0x021d4e4c
 data_ov036_021d4e54 kind:data(any) addr:0x021d4e54
 data_ov036_021d4e60 kind:data(any) addr:0x021d4e60
 data_ov036_021d4e70 kind:data(any) addr:0x021d4e70

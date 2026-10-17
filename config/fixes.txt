@@ -1361,6 +1361,8 @@ overlays/ov036 0x021cf9dc section_end src/ov036/field_rail_loader.c:.rodata
 overlays/ov036 0x021cf9dc section_start src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cf9ec section_end src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cf9ec section_start src/ov036/weather.c:.rodata
+overlays/ov036 0x021cfb44 section_start src/ov036/weather.c:.rodata
+overlays/ov036 0x021cfb44 section_end src/ov036/field_subscreen.c:.rodata
 overlays/ov036 0x021cfb74 section_end src/ov036/weather.c:.rodata
 overlays/ov036 0x021cfb84 reloc_module overlay(77)
 overlays/ov036 0x021cfbb4 reloc_module overlay(78)

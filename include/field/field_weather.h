@@ -32,7 +32,19 @@ typedef struct {
 // Main: an entry of the u16 table at sWeatherLightIds, which the weather overlays pass as a sound
 u16 FieldLightStatus_GetWeatherLight(u32 index);
 
-// Overlay 36
+// Overlay 36's weather_task.c: a weather's task, which runs the functions of its data. weather.c creates and frees
+// two, updates them, starts a weather (mode 1 at once, 2 over the other task's) and ends one, and asks whether one is
+// fading
+WeatherTask *func_ov036_021993e0(ClActUnit *unit, FieldCamera *camera, FieldLight *light, FieldFog *fog,
+                                 FieldFogCtrl *fogCtrl, Field3DBg **bgs, FieldSound *fieldSound, u16 season,
+                                 HeapID heapId);
+void func_ov036_02199424(WeatherTask *task);
+void func_ov036_02199434(WeatherTask *task, HeapID heapId);
+void func_ov036_02199618(WeatherTask *task, const WeatherData *data, u8 unk25, u32 fade, u32 mode, u32 ambience,
+                         HeapID heapId);
+void func_ov036_0219967c(WeatherTask *task, u32 fade, u32 mode);
+void func_ov036_021996f4(WeatherTask *task);
+u8 func_ov036_021997dc(WeatherTask *task);
 // The index of the camera's defaults
 u32 func_ov036_02199774(WeatherTask *task);
 void *func_ov036_021997e4(WeatherTask *task);

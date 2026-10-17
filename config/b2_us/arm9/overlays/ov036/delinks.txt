@@ -403,7 +403,7 @@ src/ov036/field_light.c:
 
 src/ov036/field_subscreen.c:
     .text       start:0x02198198 end:0x02198bc0
-    .rodata     start:0x021cf9dc end:0x021cf9ec
+    .rodata     start:0x021cf9dc end:0x021cfb44
     .data       start:0x021d4e28 end:0x021d4e3c
 
 src/ov036/field_3dbg.c:
@@ -412,7 +412,7 @@ src/ov036/field_3dbg.c:
 
 src/ov036/weather.c:
     .text       start:0x02199004 end:0x021993e0
-    .rodata     start:0x021cf9ec end:0x021cfbe4
+    .rodata     start:0x021cfb44 end:0x021cfbe4
     .data       start:0x021d4e4c end:0x021d4e60
 
 src/ov036/weather_task.c:
