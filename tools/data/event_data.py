@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""The zones' events in res/events/, one JSON file per zone, as pokeplatinum's res/field/events/: dump writes them
+"""The zones' events in res/field/events/, one JSON file per zone, as pokeplatinum's res/field/events/: dump writes them
 from the ROM once, and pack builds the archive of the zones' entities (a/1/2/6) from them, which the build does.
 
-    event_data.py dump extract/b2_us/files res/events
-    event_data.py pack res/events ARCHIVE
+    event_data.py dump extract/b2_us/files res/field/events
+    event_data.py pack res/field/events ARCHIVE
 
-A zone's events are res/events/<zone>.json, named after its constant: its background events, such as signs
+A zone's events are res/field/events/<zone>.json, named after its constant: its background events, such as signs
 (ZoneBGEntity), its NPCs (ZoneNPC), its warps (ZoneWarp), its triggers (ZoneTrigger), and its init scripts, a map
-script table that LoadZoneEntities finds after them. Each is at a grid position or on a rail. res/events/order.json
+script table that LoadZoneEntities finds after them. Each is at a grid position or on a rail. res/field/events/order.json
 lists the zones in the order of the archive, which isn't the zones' own, with null where the archive has the game's
 4-byte placeholder; zone_data.py gives each zone's header the number of its events from it. events.schema.json
 describes each field.
@@ -48,7 +48,7 @@ def events_order(root: Path) -> list[str | None]:
     zones = set(ordered_names("zones"))
     named = [zone for zone in order if zone is not None]
     if len(set(named)) != len(named) or set(named) != zones:
-        raise DataError("res/events/order.json: every zone is in it once")
+        raise DataError("res/field/events/order.json: every zone is in it once")
     return order
 
 
@@ -218,10 +218,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write res/events/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/field/events/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the zone entities archive from res/events/")
+    pack_parser = commands.add_parser("pack", help="build the zone entities archive from res/field/events/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

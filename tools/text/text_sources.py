@@ -89,7 +89,7 @@ def trainer_classes() -> list[dict]:
 
 @cache
 def places() -> list[dict]:
-    return validated("places", "res/places", "PLACE_", "place.schema.json")
+    return validated("places", "res/field/places", "PLACE_", "place.schema.json")
 
 
 @cache
@@ -106,7 +106,7 @@ def validated(list_name: str, directory: str, prefix: str, schema_name: str, ski
 
 @cache
 def trades() -> list[dict]:
-    return [read(ROOT / "res/trades" / (name.removeprefix("TRADE_").lower() + ".json")) for name in ordered("trades")]
+    return [read(ROOT / "res/field/trades" / (name.removeprefix("TRADE_").lower() + ".json")) for name in ordered("trades")]
 
 
 @cache

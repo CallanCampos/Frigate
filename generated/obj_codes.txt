@@ -1,6 +1,6 @@
 # Object codes, the models of the field's actors, as zone events and scripts name them: each is a record of
 # ARCID_MMODEL_TBL (a/0/4/7) with its graphics in ARCID_MMODEL_GRA (a/0/4/8), the files of
-# res/field_actors/<code>/ (field_actor_data.py). People and objects are named after the trainer class that most
+# res/field/actors/<code>/ (field_actor_data.py). People and objects are named after the trainer class that most
 # of the trainers the zone events give them have (a one-off script read the events; BIKER, ROUGHNECK and
 # HARLEQUIN_233 also show other classes' trainers), or where the code shows what they are, and numbered otherwise;
 # walking Pokémon (POKEMON_) after the species, sex and form that ARCID_TPOKE gives them; 3D models (MODEL_)

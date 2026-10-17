@@ -301,7 +301,7 @@ def file_names() -> dict[str, dict[int, str]]:
 
     root = Path(__file__).parents[2]
     zone_files = {}
-    for path in (root / "res/zones").glob("*.json"):
+    for path in (root / "res/field/zones").glob("*.json"):
         if path.name.endswith("schema.json"):
             continue
         zone = json.loads(path.read_text())
@@ -315,7 +315,7 @@ def file_names() -> dict[str, dict[int, str]]:
     for entry in json.loads((root / "tools/script/field_commands.json").read_text())["global_scripts"]:
         scripts[entry["file"]] = f"SCRIPTS_GLOBAL_{entry['first']}"
         script_text.setdefault(entry["text_file"], f"SCRIPT_TEXT_GLOBAL_{entry['first']}")
-    field_scripts = sorted(int(path.stem[:4]) for path in (root / "res/field_scripts").glob("*.s"))
+    field_scripts = sorted(int(path.stem[:4]) for path in (root / "res/field/scripts").glob("*.s"))
     for number in field_scripts:
         scripts.setdefault(number, f"SCRIPTS_{number:04d}")
 

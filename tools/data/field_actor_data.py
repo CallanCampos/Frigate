@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""The field's actor models in res/field_actors/: dump writes them from the ROM once, and pack builds the model table
+"""The field's actor models in res/field/actors/: dump writes them from the ROM once, and pack builds the model table
 (a/0/4/7) and the models' graphics (a/0/4/8) from them, which the build does.
 
-    field_actor_data.py dump extract/b2_us/files res/field_actors
-    field_actor_data.py pack res/field_actors TABLE GRAPHICS
+    field_actor_data.py dump extract/b2_us/files res/field/actors
+    field_actor_data.py pack res/field/actors TABLE GRAPHICS
 
 Each object code of generated/obj_codes.txt, which zone events and scripts give an actor, is a directory named
 after it, hero/ for OBJ_CODE_HERO, pokemon/bulbasaur/ for the walking Pokémon's OBJ_CODE_POKEMON_BULBASAUR and

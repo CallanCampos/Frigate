@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""The wild encounters in res/encounters/, one JSON file per encounter table: dump writes them from the ROM once, and
+"""The wild encounters in res/field/encounters/, one JSON file per encounter table: dump writes them from the ROM once, and
 pack builds a version's archive (a/1/2/7) from them, which the build does.
 
-    encounter_data.py dump extract res/encounters    # reads extract/b2_us and extract/w2_us
-    encounter_data.py pack res/encounters black2 ARCHIVE
+    encounter_data.py dump extract res/field/encounters    # reads extract/b2_us and extract/w2_us
+    encounter_data.py pack res/field/encounters black2 ARCHIVE
 
-Each table is res/encounters/<table>.json, named after its constant (castelia_city.json for
+Each table is res/field/encounters/<table>.json, named after its constant (castelia_city.json for
 ENCOUNTERS_CASTELIA_CITY), and the archive has them in the order of generated/encounters.txt, which zone headers
 name them by. Black 2 and White 2 have different encounters in many places: a table's rates, or a group of its slots,
 is either the same for both versions or an object with one for each, { "black2": ..., "white2": ... }.
@@ -136,10 +136,10 @@ def pack(root: Path, version: str, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write res/encounters/ from both extracted versions")
+    dump_parser = commands.add_parser("dump", help="write res/field/encounters/ from both extracted versions")
     dump_parser.add_argument("extract", type=Path, help="the directory with the extracted versions, b2_us and w2_us")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build a version's encounter archive from res/encounters/")
+    pack_parser = commands.add_parser("pack", help="build a version's encounter archive from res/field/encounters/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("version", choices=VERSIONS)
     pack_parser.add_argument("output", type=Path)

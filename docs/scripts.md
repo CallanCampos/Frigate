@@ -60,7 +60,7 @@ unless `--labels` gives names.
 
 ## Field scripts
 
-The field scripts, archive `a/0/5/6`, are built from source in `res/field_scripts/<file>.s`, with the macros in
+The field scripts, archive `a/0/5/6`, are built from source in `res/field/scripts/<file>.s`, with the macros in
 `include/asm/field_script.inc`. Both versions have the same archive. It holds a script file and a map script table for
 each zone, and the global scripts, which zones start by their IDs (from 2000 up). A script file starts with the offsets
 of its scripts, followed by the scripts and their movement data. A map script table lists the scripts that the zone runs

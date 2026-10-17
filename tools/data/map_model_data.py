@@ -3,7 +3,7 @@
 
 Usage: map_model_data.py extract APICULA OUTPUT_DIR [CHUNK_ID ...]
        map_model_data.py relink SOURCE_DIR
-       map_model_data.py pack res/map_models black2|white2 OUTPUT
+       map_model_data.py pack res/field/maps/models black2|white2 OUTPUT
 
 Each map model is a directory named after its constant in generated/map_models.txt, with its GLB, its terrain
 CSVs and its data.json (map_model.schema.json). relink points every GLB's images at its texture set's directory again,
@@ -60,7 +60,7 @@ def models(directory, count):
     folders = directories("a/0/0/8", directory)
     if len(folders) != count:
         raise ValueError(f"a/0/0/8 has {count} map models and map_models.txt {len(folders)}")
-    schema = load_schema(ROOT / "res/map_models/map_model.schema.json")
+    schema = load_schema(ROOT / "res/field/maps/models/map_model.schema.json")
     return [(folder, load(folder / "data.json", schema)) for folder in folders]
 
 
@@ -79,8 +79,8 @@ def model_name(nitro):
 
 
 def image_uri(texture_dir, filename):
-    """Returns a GLB's path to one of its texture set's PNGs, from res/map_models/<model>/."""
-    return f"../../map_texture_sets/{texture_dir.name}/{filename}"
+    """Returns a GLB's path to one of its texture set's PNGs, from res/field/maps/models/<model>/."""
+    return f"../../textures/{texture_dir.name}/{filename}"
 
 
 def dictionary_offsets(data, offset):
@@ -1119,8 +1119,8 @@ def export(apicula, output, selected=None):
     archive = read_narc((ROOT / "extract/b2_us/files/a/0/0/8").read_bytes())
     textures = read_narc((ROOT / "extract/b2_us/files/a/0/1/4").read_bytes())
     output.mkdir(parents=True, exist_ok=True)
-    texture_dirs = directories("a/0/1/4", output.parent / "map_texture_sets")
-    for chunk_id, ((source, data), model_dir) in enumerate(zip(models(ROOT / "res/map_models", len(archive)),
+    texture_dirs = directories("a/0/1/4", output.parent / "textures")
+    for chunk_id, ((source, data), model_dir) in enumerate(zip(models(ROOT / "res/field/maps/models", len(archive)),
                                                                  directories("a/0/0/8", output))):
         if selected is not None and chunk_id not in selected:
             continue

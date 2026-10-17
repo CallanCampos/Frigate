@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_EXTERIOR_SKYARROW_BRIDGE",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_DANSA01A_14",
+    "srt_animation": 36,
+    "pattern_animation": null,
+    "exterior": true,
+    "lights": 149,
+    "edge_color_table": 255,
+    "actor_material_color": 0
+}

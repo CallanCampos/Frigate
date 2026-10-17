@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""The map matrices in res/map_matrices/, one JSON file per matrix: dump writes them from the ROM once, and pack
+"""The map matrices in res/field/matrices/, one JSON file per matrix: dump writes them from the ROM once, and pack
 builds the archive (a/0/0/9) from them, which the build does.
 
-    map_matrix_data.py dump extract/b2_us/files res/map_matrices
-    map_matrix_data.py pack res/map_matrices ARCHIVE
+    map_matrix_data.py dump extract/b2_us/files res/field/matrices
+    map_matrix_data.py pack res/field/matrices ARCHIVE
 
 A matrix is a grid of map cells: its header says whether it also gives each cell's zone, as the overworld's do, then
 its width and height, then each cell's map, a file of the map archive (a/0/0/8, by its MAP_MODEL_* constant in the
 file) or 0xffffffff for none, row by row, then the zones.
-Each matrix is res/map_matrices/<matrix>.json, named after its constant in generated/map_matrices.txt, in whose
+Each matrix is res/field/matrices/<matrix>.json, named after its constant in generated/map_matrices.txt, in whose
 order the archive has them. map_matrix.schema.json describes the fields.
 """
 import argparse
@@ -78,10 +78,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write res/map_matrices/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/field/matrices/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the map matrix archive from res/map_matrices/")
+    pack_parser = commands.add_parser("pack", help="build the map matrix archive from res/field/matrices/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

@@ -1,0 +1,249 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 23,
+                "y": 51,
+                "z": 0
+            }
+        },
+        {
+            "script": 1,
+            "condition": 0,
+            "direction": 3,
+            "grid": {
+                "x": 23,
+                "y": 50,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 24,
+                "y": 26,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 25,
+                "y": 53,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 23,
+                "y": 53,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 23,
+                "y": 41,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 25,
+                "y": 41,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 25,
+                "y": 44,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 22,
+                "y": 31,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 9,
+                "y": 60,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 6,
+                "y": 42,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 5,
+                "y": 41,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 7,
+                "y": 39,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 7,
+                "y": 29,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 7,
+                "y": 26,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 22,
+                "y": 19,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "warp": 0,
+            "unk4": 1,
+            "transition": 36,
+            "grid": {
+                "x": 152,
+                "y": 0,
+                "z": 1016,
+                "width": 6,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_18",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 3,
+            "grid": {
+                "x": 408,
+                "y": 0,
+                "z": 744,
+                "width": 1,
+                "height": 3,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_23",
+            "warp": 0,
+            "unk4": 4,
+            "transition": 3,
+            "grid": {
+                "x": 120,
+                "y": 0,
+                "z": 520,
+                "width": 1,
+                "height": 3,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY_2",
+            "warp": 4,
+            "unk4": 2,
+            "transition": 36,
+            "grid": {
+                "x": 152,
+                "y": 0,
+                "z": 264,
+                "width": 14,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "warp": 13,
+            "unk4": 1,
+            "transition": 36,
+            "grid": {
+                "x": 248,
+                "y": 0,
+                "z": 1016,
+                "width": 8,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 4,
+            "script": 2
+        },
+        {
+            "type": 3,
+            "script": 3
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ],
+            [ "SPECIES_FRILLISH", 5, 15 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_ALOMOMOLA", 5, 15 ],
+            [ "SPECIES_ALOMOMOLA", 5, 15 ],
+            [ "SPECIES_ALOMOMOLA", 5, 15 ],
+            [ "SPECIES_JELLICENT", 5, 15 ],
+            [ "SPECIES_JELLICENT", 5, 15 ]
+        ],
+        "fishing": [
+            [ "SPECIES_FINNEON", 40, 60 ],
+            [ "SPECIES_KRABBY", 40, 60 ],
+            [ "SPECIES_FINNEON", 50, 70 ],
+            [ "SPECIES_QWILFISH", 50, 70 ],
+            [ "SPECIES_QWILFISH", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_KRABBY", 40, 60 ],
+            [ "SPECIES_LUMINEON", 40, 60 ],
+            [ "SPECIES_KINGLER", 50, 70 ],
+            [ "SPECIES_KINGLER", 50, 70 ],
+            [ "SPECIES_KINGLER", 50, 70 ]
+        ]
+    }
+}
