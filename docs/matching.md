@@ -1086,6 +1086,11 @@ Same code, other `sp` offsets or frame size.
   the loaded register to the second read. A read through a `const` pointer is kept apart too, but is loaded again. The
   original's `BtlvMcss_MoveTaskEnd_Circle` and `_Shake` load `work` first while eight siblings of the same C load
   `pos` first; each of these spellings matches them and is only a second path to the field, so they stay rows.
+- A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
+  one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
+  of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy
+  statement was a variable: libVCT's `SuppressEcho` (`vct_dsp.c`) spills its one load of `sEcho.readIndex` and
+  reloads the copy after its index clamp, where the field read at both uses is loaded again.
 - A constant assigned to a spilled local is stored where MWCC likes, but the register that builds it follows where
   the source assigns it: `ctvt_game.c`'s `CtvtGamePlayer_Create` builds `isSelf`'s `TRUE` in `r2`, as the original
   does, only assigned right after the allocation, not at its declaration.
@@ -1282,6 +1287,15 @@ Same instructions, scheduled in another order.
   storing `pos`; the same stores written out load it after.
 - Initializations are scheduled where they are written: `int i = 0;` declared after a call sets `i` after the call,
   while `for (i = 0; ...)` sets it at the loop, after any statements before the loop.
+- A load that the original issues between another load and that load's use, with nothing there depending on it, can
+  be written after the use: the scheduler moves an independent load up into the load-use stall when its address
+  register is free there, while written first it is colored first and takes the register the other load needs. DWC's
+  ADPCM encoders (`vct_adpcm.c`) read the step after the sign test, `step = sVctAdpcmStepTable[index];` below
+  `if (diff < 0) { ... }`: `EncodeAdpcm4`'s second `EncodeSample4` loads the step between the predictor's reload and
+  the `subs` of the difference only so, and with the step read at its declaration the table's address takes the
+  reload's register and the step loads first (10 lines). `EncodeSample3` and `EncodeSample2` read it the same way.
+  Then sweep the declaration order for the colors: `EncodeSample4` matches only with `step` declared before `diff`,
+  which otherwise swaps the step's and the loop bound's registers.
 - Two loop variables zeroed in the other order: zero both in the `for` initializer in the original's order.
   `scrcmd_medal.c`'s `GetHintableMedalCount` zeroes `i` before `count` only as `for (i = 0, count = 0; ...)`; `count`
   initialized at its declaration, or declared first, zeroes it first.
@@ -1858,7 +1872,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   matches with `online = kind != 0 ? TRUE : FALSE;`, after over 400 declaration orders had not. `wipe_sub.c`'s
   `WipeLineRange_Apply` likewise needs `covered = range->covered ? FALSE : TRUE;`, with `covered` a `BOOL` and not a
   `u16`, for the flag to take the freed pointer register `r7`; set in two statements it outranks the temporaries and
-  takes the lowest free scratch register.
+  takes the lowest free scratch register. An `if`/`else` assigning each arm allocates as the ternary does: DWC's
+  `EncodeSample2` (`vct_adpcm.c`) needs `if (code & 1) { vpdiff = step; } else { vpdiff = 0; }`, or the ternary, for
+  `EncodeAdpcm2`'s four loop invariants to take the original's `r4`, `r5`, `ip` and `lr` and leave `r2` to the
+  temporaries; `vpdiff = step; if (!(code & 1)) { vpdiff = 0; }` gives the same `moveq` and is 118 lines off, not 32.
 - A ternary store `*p = c ? a : b` computes the address once and stores after the branches; an `if`/`else` with a
   store in each branch computes the address in each, as `Bitmap_Scroll16` does. At the end of a function each branch
   also gets a copy of the epilogue: G3D's `nsbtp.c` sets the texture's magnification in `SetTexParamaters_` with
@@ -2304,6 +2321,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   into a tail that ends with the store. `CtvtCamera_Draw` sets its BG3 scale with `mtx._00 = FX_Inv(FX32_ONE * 2);
   mtx._11 = FX_Inv(FX32_ONE * 2);` and the same with `FX32_ONE` in the arms of `if (work->zoomed == TRUE)`, and the
   zeros after the join; a `scale` local set in the arms puts the calls in the join's block, above which the zero moves.
+  A literal-pool load goes above a plain store the same way, even with `volatile` stores after both: ARM's list
+  scheduler ranks the load by its latency plus the chain after it, one more than the store, which goes first only
+  with a memory successor of its own. `VCT_FilterFrame` (`vct_dsp.c`) loads the divider's base above its last
+  sample's `strh` in every spelling found, where the original stores first.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -2405,6 +2426,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC 1.1p1 keeps a plain scalar static in a register across a loop and stores it once after, but never a struct
   field: an original that loads a field once and stores it back on each pass copied it to a local. Multiboot's `MB_Init`
   (`mb_wm.c`) came closer with `src = sWmConfig.name;` before its name loop and `sWmConfig.name = src;` inside it.
+- MWCC hoists a static's field load out of a loop into its preheader, below the entry test, unless the loop stores
+  through a pointer: then the field is loaded again on each pass, whatever its type and even when the static's
+  address is never taken. An original that loads it once in such a loop read it into a local, which MWCC loads above
+  the entry test (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`). libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the samples
+  it stores through `s16 *mic` by an `sEcho.attenuation` loaded once only with `shift = sEcho.attenuation;` before
+  the loop; the original's load is below the test, which no spelling found gives.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
