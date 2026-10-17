@@ -168,6 +168,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A loop-invariant field in the register after every declared local, where the original keeps it among them: read it
   into a local of the type the loop compares it at, declared at that place (`u32 movie = rules->movie;` against a
   `u32` bit field). (matching.md: "register after every declared local too")
+- Registers of a scheduled block that no declaration or statement order of the same steps gives: read them as the
+  order the values are defined (`--opt=-O1` shows it unscheduled) and interleave the statements so, as a per-axis
+  save and move. (matching.md: "Registers are colored in the order the source defines")
 - Table addresses reloaded from the pool at each use and a constant built in every copy of an unrolled inline,
   one pushed register short: combine each call's result as soon as it comes (ORed into a `u8` accumulator),
   keeping only values that straddle the stores. (matching.md: "collected before they are combined")
@@ -280,6 +283,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A byte offset added to a pointer, with the offset loaded first and on the left of the `adds`: integer arithmetic on
   the address, `(T *)((u32)p + n)`. (matching.md: "With two loads and no local") For a pixel, the terms in the asm's
   order, each scaled on its own: `(u32)base + x * 2 + y * 512`. (matching.md: "The pointer goes first whatever")
+- A hoisted constant base (a VRAM address) on the left of the `adds` where ours puts it second: hold it in a pointer
+  local and cast it at its use, `void *vram = G2S_GetOBJCharPtr(); (u32)vram + ofs`. (matching.md: "A constant
+  counts as a local only")
 - A call's result stored before a constant (`bl; str r0, [sp, #N]; movs r5, #0`) that ours builds first, unmoved by
   `#pragma scheduling off`: a block boundary. Write the calls with constants in each arm of the `if`/`else` before it,
   not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
@@ -287,6 +293,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   two branch-assigned locals. (matching.md: "A weighted sum")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
   rather than a fresh local. (matching.md: "a fresh local's computation down to its first use")
+- A buffer row or table entry the original computes before a call's stack argument store, which ours folds into the
+  argument after it: set the pointer to the base, then advance it (`src = buf; src += i * size;`), through a
+  parameter that is not `const`. (matching.md: "A row of a buffer")
 - All three values loaded before the stores of a vector: NitroSDK's `VEC_Set`. (matching.md: "`VEC_Set(v, x, y, z)`")
 - One temporary of a vector's computed values in another register, with the stores in the original's order:
   NitroSDK's `VEC_Set`. (matching.md: "Since the values go to")
@@ -441,6 +450,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The same goes for a returned flag")
 - A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
   an enum. (matching.md: "tests its stat")
+- A local array's element loaded again after a call: it was read through a pointer to the element, set in the
+  loop. (matching.md: "A local array's element is never loaded again")
+- An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
+  calls; check the SDK inline's mask (`y2 & 0xff`, not `(u8)y2`). (matching.md: "An `ands` with 0xffff kept")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
@@ -551,8 +564,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A 0/1 flag laid out first value first (`bne; movs #0; b; movs #1`) where every plain spelling loads 1 first: the
   arms are enum constants, with the condition written so the original's first arm comes first.
   (matching.md: "held in an enum type")
-- A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register:
-  default-then-override through a local, `v = 0; if (!cond) { v = 1; }`. (matching.md: "default-then-override")
+- A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register: enum
+  constants for both arms as well. (matching.md: "also has enum constants for both arms")
+- A negated range test whose branch targets differ: write the positive test of the complement, an `||` chain.
+  (matching.md: "A negated test and its expansion")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
 - A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
@@ -802,10 +817,13 @@ code as it is").
 
 Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
 (a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
-restructures it. A function whose loop enters with a `b` to the test at -O4 may be one the original's global
-optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the
-same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which showed it too and came within a
-byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is 0/1").
+restructures it. `opt_common_subs off` alone gives it the original's size too, and with a 0/1 loop test leaves 186
+lines against level 1's 249: its original computes `work + i * 4` and `param + i` again after every call, where ours
+keeps them in registers across the calls. A function whose loop enters with a `b` to the test at -O4 may be one the
+original's global optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and
+`MBGameInfo_SendMembers` show the same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which
+showed it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a
+test whose value is 0/1").
 `#pragma opt_common_subs off` around one function alone matched `btlv_mcss.c`'s `BtlvMcss_MoveTaskEnd_Circle` and
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
