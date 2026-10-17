@@ -1279,6 +1279,15 @@ Same instructions, scheduled in another order.
   storing `pos`; the same stores written out load it after.
 - Initializations are scheduled where they are written: `int i = 0;` declared after a call sets `i` after the call,
   while `for (i = 0; ...)` sets it at the loop, after any statements before the loop.
+- A load that the original issues between another load and that load's use, with nothing there depending on it, can
+  be written after the use: the scheduler moves an independent load up into the load-use stall when its address
+  register is free there, while written first it is colored first and takes the register the other load needs. DWC's
+  ADPCM encoders (`vct_adpcm.c`) read the step after the sign test, `step = sVctAdpcmStepTable[index];` below
+  `if (diff < 0) { ... }`: `EncodeAdpcm4`'s second `EncodeSample4` loads the step between the predictor's reload and
+  the `subs` of the difference only so, and with the step read at its declaration the table's address takes the
+  reload's register and the step loads first (10 lines). `EncodeSample3` and `EncodeSample2` read it the same way.
+  Then sweep the declaration order for the colors: `EncodeSample4` matches only with `step` declared before `diff`,
+  which otherwise swaps the step's and the loop bound's registers.
 - Two loop variables zeroed in the other order: zero both in the `for` initializer in the original's order.
   `scrcmd_medal.c`'s `GetHintableMedalCount` zeroes `i` before `count` only as `for (i = 0, count = 0; ...)`; `count`
   initialized at its declaration, or declared first, zeroes it first.
@@ -1852,7 +1861,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   matches with `online = kind != 0 ? TRUE : FALSE;`, after over 400 declaration orders had not. `wipe_sub.c`'s
   `WipeLineRange_Apply` likewise needs `covered = range->covered ? FALSE : TRUE;`, with `covered` a `BOOL` and not a
   `u16`, for the flag to take the freed pointer register `r7`; set in two statements it outranks the temporaries and
-  takes the lowest free scratch register.
+  takes the lowest free scratch register. An `if`/`else` assigning each arm allocates as the ternary does: DWC's
+  `EncodeSample2` (`vct_adpcm.c`) needs `if (code & 1) { vpdiff = step; } else { vpdiff = 0; }`, or the ternary, for
+  `EncodeAdpcm2`'s four loop invariants to take the original's `r4`, `r5`, `ip` and `lr` and leave `r2` to the
+  temporaries; `vpdiff = step; if (!(code & 1)) { vpdiff = 0; }` gives the same `moveq` and is 118 lines off, not 32.
 - A ternary store `*p = c ? a : b` computes the address once and stores after the branches; an `if`/`else` with a
   store in each branch computes the address in each, as `Bitmap_Scroll16` does. At the end of a function each branch
   also gets a copy of the epilogue: G3D's `nsbtp.c` sets the texture's magnification in `SetTexParamaters_` with

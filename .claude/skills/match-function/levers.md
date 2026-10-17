@@ -115,6 +115,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   asm: write its stores before those constants'. (matching.md: "`CtvtGameTarget_Init` emits")
 - Registers swapped around a flag set `TRUE` and overridden in an `if`, with the instructions already right:
   write it as a ternary, `x = k != 0 ? TRUE : FALSE;`. (matching.md: "the ternary still allocates the")
+- Loop invariants a register off, around a local set by default and overridden in an `if`, with the instructions
+  already right: assign it in both arms of an `if`/`else`, or with a ternary. (matching.md: "An `if`/`else`
+  assigning each arm")
 - A register swap with otherwise identical code, in code that mirrors a sibling function: try that code as a
   `static inline` helper. (matching.md: "Moving code into a `static inline` helper")
 - Chained stores of one constant (`a = b = TRUE`) share a register; separate ones may not.
@@ -272,6 +275,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A spilled flag's constant store right after its `movs`, where the original stores it after the next field store:
   sweep the widths of the block's other spilled locals against their callees' returns. (matching.md: "The local
   whose width matters")
+- A load the original issues between another load and its use, which ours issues ahead of that load: write it after
+  the use, for the scheduler to move up into the stall, then sweep the declaration order for the colors.
+  (matching.md: "into the load-use stall")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
