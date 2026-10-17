@@ -20,7 +20,8 @@ exactly what the ROM holds. The sources come in three kinds:
   JSON, these directories are named after their constants and the lists give their order (see
   [Map model sources](#map-model-sources)).
 - **Indexed PNG, JASC palettes, and WAV**, for each Pokémon's battle sprites, icons, footprints, and cries under
-  `data/pokemon/<species>/`. Nitro cell and animation resources remain as separate binary files next to the images.
+  `data/pokemon/<species>/`, and the trainer sprites under `data/trainer_sprites/`. Nitro cell and animation
+  resources remain as separate binary files next to the images.
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
 by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
@@ -39,6 +40,7 @@ which documents the format and can write them again.
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
+| `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `data/trainer_sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
 | `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
 | `a/0/0/8` | `data/map_models/<model>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
 | `a/2/2/5`, `a/2/2/6` | `data/field_prop_models/{exterior,interior}/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
@@ -473,6 +475,38 @@ Each trainer's constant in `data/constants/trainers.txt`, which the field script
 `TRAINER_YOUNGSTER_JIMMY`, without the class for the story characters, whose class is Pokémon Trainer
 (`TRAINER_CHEREN`), and numbered from `_2` where a class and name repeat, as for rematches (`make_constants.py
 --trainers`). To add a trainer, add its constant to the end of the list and its file.
+
+### Trainer sprites
+
+Each trainer sprite is a directory in `data/trainer_sprites/front/` or `data/trainer_sprites/back/`, named after its
+constant in `data/constants/trainer_sprites.txt` or `trainer_back_sprites.txt`, and the archives (`a/0/7/1`,
+`a/0/7/2`) hold the sprites in the lists' order. A sprite's constant is named after the first trainer class that shows
+it, as `TRAINER_SPRITE_YOUNGSTER`; several classes can share one, such as the Battle Subway's bosses' and their
+classes'. `TRAINER_CLASS_RESOURCES` in `src/system/tr_tool.c` gives each class its front sprite. The 32 classes with a
+back sprite of their own are in `TRAINER_CLASS_BACK_SPRITES`, which has 31 sprites, since two classes share the
+Champion's; any other class shows one of the player's. `a/0/6/3` is a copy of the back sprites' archive, packed from
+the same directories. A sprite's files:
+
+- `single.png`, the 80×80 picture of the trainer that screens outside battle show, such as the trainer card's
+  leaders, which the packer stores as the game's four OBJ blocks. Only 127 front sprites and the rival's back sprite
+  have one: the game's others are empty, and without the file the packer writes an empty one.
+- `sheet.png`, the 256×128 sheet of the parts that the cells put together into the animated battle sprite, so the
+  sheet looks cut up.
+- `normal.pal`, the sprite's 16 colors in JASC format, 0 transparent. The palette file sets the colors; a PNG's own
+  palette only puts back the indices that an image editor reordered on saving, so recolor a sprite in its `.pal`. A
+  color painted in a PNG that the palette doesn't have keeps its index, with the `.pal` file's color, and the build
+  warns about it.
+- `cells.ncer`, `animations.nanr`, `multi_cells.nmcr` and `multi_animations.nmar`, the battle sprite's Nitro cells and
+  animations, uncompressed, which Nitro editors open; the packer compresses the animations as the game loads them.
+- `mcss.bin`, the battle sprite system's data (`mcss.c`), which the game reads as it is stored.
+
+To add a sprite, add its constant to the end of its list and its directory, as a copy of a sprite to start from, and
+give a class the sprite in `TRAINER_CLASS_RESOURCES`, whose `sprite` field is a byte. The packer builds every file from
+its source; where that gives the same picture, palette or data as one of the original archive's files, from the
+version being built, it takes the original's bytes, which keeps the ROM's compression and headers, so an unchanged set
+packs all three archives byte for byte in both versions. Every file but `single.png` must be there, the pictures must
+keep their sizes and the palette its 16 colors, and the build stops with the file's name otherwise. `.venv/bin/python tools/data/trainer_graphics.py dump extract/b2_us/files
+data/trainer_sprites` writes the directories again.
 
 ## Wild encounters
 

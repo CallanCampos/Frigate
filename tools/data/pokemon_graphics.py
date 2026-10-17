@@ -18,7 +18,7 @@ from pathlib import Path
 
 from narc import read_narc, write_narc
 from species_data import directory
-from nitro_2d import (character_pixels, palette_colors, patch_characters, patch_palette,
+from nitro_2d import (character_pixels, palette_colors, palette_indices, patch_characters, patch_palette,
                       read_indexed_png, read_palette, write_indexed_png, write_palette)
 
 
@@ -228,32 +228,6 @@ def current_colors(root, archive_name, archive, index, options):
     colors = read_palette(path)
     bank = options["palette_bank"] if kind == "icons" else 0
     return colors[bank * 16:(bank + 1) * 16]
-
-
-def palette_indices(path, pixels, png_colors, colors):
-    """Returns a PNG's pixels as indices of the sprite's palette: its own indices where the PNG's palette agrees with
-    the sprite's, as exported, or else the sprite's index of the same color, where an editor reordered or compacted
-    the PNG's palette on saving. Index 0 is transparent and stays 0."""
-    def color5(color):
-        return tuple(round(axis * 31 / 255) for axis in color)
-
-    target = [color5(color) for color in colors]
-    mapping = {0: 0}
-    for i in sorted(set(pixels) - {0}):
-        if i >= len(png_colors):
-            raise ValueError(f"{path}: a pixel's index {i} is outside the PNG's palette")
-        color = color5(png_colors[i])
-        if i < len(target) and target[i] == color:
-            mapping[i] = i
-            continue
-        matches = [j for j, other in enumerate(target) if j and other == color]
-        if not matches:
-            raise ValueError(f"{path}: the PNG's color {png_colors[i]} is not in the sprite's palette; change the "
-                             "palette's colors in its .pal file")
-        mapping[i] = matches[0]
-    if all(i == j for i, j in mapping.items()):
-        return pixels
-    return bytes(mapping[i] for i in pixels)
 
 
 def export(root):
