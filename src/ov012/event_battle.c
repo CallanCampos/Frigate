@@ -433,10 +433,16 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         const u32 *code = (const u32 *)DSProt_CallRunChecks1;
         u32 index;
 
+#ifdef PLATFORM_PC
+        // A host's code is its own machine code, never DS Protect's ARM code, so the port skips its checksum
+        // and takes a genuine cartridge's path (lib/dsprot/include/dsprot/dsprot.h)
+        checksum = 0x9f75a8d6;
+#else
         for (shift = 0x25, checksum = 0; shift != 0; shift--) {
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
+#endif
         if (checksum == 0x9f75a8d6) {
             DSProt_CallRunChecks1(&seed, wk);
         } else {
@@ -458,10 +464,16 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         u32 checksum;
         const u32 *code = (const u32 *)DSProt_CallRunChecks3;
 
+#ifdef PLATFORM_PC
+        // A host's code is its own machine code, never DS Protect's ARM code, so the port skips its checksum
+        // and takes a genuine cartridge's path (lib/dsprot/include/dsprot/dsprot.h)
+        checksum = 0x9f75a8d6;
+#else
         for (shift = 0x25, checksum = 0; shift != 0; shift--) {
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
+#endif
         if (checksum == 0x9f75a8d6) {
             DSProt_CallRunChecks3(&seed, wk);
         } else {
