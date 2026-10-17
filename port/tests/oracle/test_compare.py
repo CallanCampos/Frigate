@@ -2,8 +2,8 @@
 """Tests of the oracle's Python side (port/tools/oracle): compare.py's PNG reader and writer, frames.tsv's versions,
 screen comparisons exact and with the 3D tolerance screen by screen, comparisons by hash, frame alignment, memory
 comparisons, symbols.py's map parser and name lookup, and oracle.py's handling of the port's runs (with a stand-in
-program), of the clock, of the title sequence's reference and of a missing oracle or ROM. They make up their own runs
-and need neither melonDS nor a ROM. Standard library only.
+program), of the clock, of the comparison sequences and their references, and of a missing oracle or ROM. They make
+up their own runs and need neither melonDS nor a ROM. Standard library only.
 """
 
 from __future__ import annotations
@@ -478,6 +478,139 @@ class AlignTests(unittest.TestCase):
         self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--align", "sequence"]), 0)
 
 
+class TimedAlignTests(unittest.TestCase):
+    """--align counter with a clock stretch, a lag and the check for pictures no port frame shows, on a made-up boot:
+    a start-up, two still pictures while the game counts passes, a movie that runs on a clock, black, then a title
+    with 3D"""
+
+    @staticmethod
+    def picture(index: int) -> bytearray:
+        image = solid(b"\x00\x00\x00")
+        if index:
+            for y in range(4 * index, 4 * index + 20):
+                for x in range(10, 60):
+                    put(image, x, y, bytes([40 * index, 255 - 40 * index, 128]))
+        return image
+
+    @staticmethod
+    def scene(shade: int) -> bytearray:
+        image = solid(b"\x00\x00\x00")
+        for y in range(192, 300):
+            for x in range(50, 200):
+                put(image, x, y, bytes([shade, 0, shade]))
+        return image
+
+    # The oracle (frame: picture, count): start-up white at count 0 for two frames, A at counts 1 and 2, B for one
+    # pass of two frames, the movie's three pictures for three frames and one pass each, black for two passes, then
+    # the title's 3D. The port counts from its first frame, its pass at B takes one frame, and it shows each movie
+    # picture for two frames and two passes, so that after the movie its count is 3 ahead
+    ORACLE = [("W", 0), ("W", 0), ("A", 1), ("A", 2), ("B", 3), ("B", 3), ("M1", 4), ("M1", 4), ("M1", 4),
+              ("M2", 5), ("M2", 5), ("M2", 5), ("M3", 6), ("M3", 6), ("M3", 6), ("K", 7), ("K", 8), ("S1", 9),
+              ("S2", 10)]
+    PORT = ["W", "A", "A", "B", "M1", "M1", "M2", "M2", "M3", "M3", "K", "K", "S1", "S2"]
+
+    def make(self, oracle_pictures=None, port_pictures=None):
+        runs = Runs(self)
+        images = {"W": solid(b"\xff\xff\xff"), "K": solid(b"\x00\x00\x00"), "A": self.picture(1),
+                  "B": self.picture(2), "M1": self.picture(3), "M2": self.picture(4), "M3": self.picture(5),
+                  "X": self.picture(6), "S1": self.scene(40), "S2": self.scene(80), "S1'": self.scene(48),
+                  "S2'": self.scene(88)}
+        for frame, (name, count) in enumerate(oracle_pictures or self.ORACLE, 1):
+            runs.frame(runs.oracle, frame, images[name], counter=count, three_d=(False, name.startswith("S")))
+        # The port's 3D differs from the oracle's by 2 steps at 6 bits: within the tolerance, never exact
+        for frame, name in enumerate(port_pictures or self.PORT, 1):
+            runs.frame(runs.port, frame, images[name + "'" if name.startswith("S") else name], counter=frame - 1)
+        return runs
+
+    def test_counts_and_a_clock(self):
+        runs = self.make()
+        pairing = compare.counter_mapping(compare.load_run(runs.oracle), compare.load_run(runs.port), set(range(5, 11)))
+        # Frames 1-4 on the count with the lag 0 (port frame 4's count 3 is oracle frame 5, the first of its pass);
+        # the movie by its pictures, each port frame with the oracle frame of its picture nearest where it is expected;
+        # after it, the lag where port frame 11 is expected after the end of M3 on each (port 10, oracle 15): count 7,
+        # oracle frame 16, so the port's count 10 less 7, 3
+        self.assertEqual(pairing.mapping, {1: 1, 2: 3, 3: 4, 4: 5, 5: 7, 6: 9, 7: 10, 8: 12, 9: 13, 10: 15, 11: 16,
+                                           12: 17, 13: 18, 14: 19})
+        self.assertEqual(pairing.timing, [
+            "port frames 1-4: by the counter, lag 0 from power-on",
+            "port frames 5-10: by pictures (the game waits on a clock)",
+            "port frames 11-14: by the counter, lag 3, from where the frame is expected after the end of the last "
+            "picture on each"])
+        self.assertEqual(pairing.breaks, set())
+        self.assertEqual(compare.unshown_frames(compare.load_run(runs.oracle), pairing.mapping, (1, 14)), [])
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--align", "counter", "--clock",
+                                              "5-10"])
+        self.assertEqual(status, 0, out)
+        self.assertIn("14 of 14 frames match (12 exact, 2 with 3D within the tolerance)", out)
+        # Declaring the lag after the clock gives the same pairs, and the frame a break
+        pairing = compare.counter_mapping(compare.load_run(runs.oracle), compare.load_run(runs.port), set(range(5, 11)),
+                                          {11: 3})
+        self.assertEqual(pairing.mapping[11], 16)
+        self.assertEqual(pairing.breaks, {11})
+        self.assertIn("port frames 11-14: by the counter, lag 3, declared where the counts line up again after the "
+                      "clock (oracle frames since the last pair: none, not checked)", pairing.timing)
+        # Without the clock, the movie's frames pair on the count and the port's second frame of M1 (count 5) meets
+        # the oracle's M2
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--align", "counter"])
+        self.assertEqual(status, 1)
+        self.assertIn("     6     10  -       FAIL", out)
+        # --clock and --lag go with --align counter only
+        with self.assertRaises(SystemExit):
+            quiet(compare.main, ["screens", runs.oracle, runs.port, "--align", "sequence", "--clock", "5-10"])
+
+    def test_late_and_skipped_pictures_fail(self):
+        # A held a pass longer, so that B and all after it come a pass late: by pictures in order it passes, on the
+        # count it fails where the game counts passes (port frame 4, count 3, against oracle frame 5's B)
+        late = self.PORT[:3] + ["A"] + self.PORT[3:]
+        runs = self.make(port_pictures=late)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--align", "sequence"]), 0)
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--align", "counter", "--clock",
+                                              "6-11"])
+        self.assertEqual(status, 1)
+        self.assertIn("     4      5  -       FAIL", out)
+        # M2 skipped in the movie: every port frame finds its picture, but no port frame shows oracle frames 10-12
+        skipped = list(self.PORT)
+        skipped[6:8] = ["M3", "M3"]
+        runs = self.make(port_pictures=skipped)
+        for align in (["--align", "sequence"], ["--align", "counter", "--clock", "5-10"]):
+            status, out = captured(compare.main, ["screens", runs.oracle, runs.port, *align])
+            self.assertEqual(status, 1, align)
+            self.assertIn("FAIL: oracle frames 10-12 (count 5): no port frame shows their pictures", out)
+            self.assertIn("14 of 14 frames match", out)
+
+    def test_a_torn_frame_and_known_oracle_frames(self):
+        # The DS's pass at B takes two frames, and a register written partway through the second shows X: a picture
+        # neither program's neighbouring pairs show
+        torn = list(self.ORACLE)
+        torn[5] = ("X", 3)
+        runs = self.make(oracle_pictures=torn)
+        status, out = captured(compare.main, ["screens", runs.oracle, runs.port, "--align", "counter", "--clock",
+                                              "5-10"])
+        self.assertEqual(status, 1)
+        self.assertIn("FAIL: oracle frame 6 (count 3): no port frame shows its pictures", out)
+        self.assertEqual(quiet(compare.main, ["screens", runs.oracle, runs.port, "--align", "counter", "--clock",
+                                              "5-10", "--known-oracle", "6"]), 0)
+        # Only between consecutive port frames within the frames compared, and not across a break
+        oracle_run = compare.load_run(runs.oracle)
+        mapping = {4: 5, 5: 7}
+        self.assertEqual(compare.unshown_frames(oracle_run, mapping, (4, 5)), [6])
+        self.assertEqual(compare.unshown_frames(oracle_run, mapping, (5, 5)), [])
+        self.assertEqual(compare.unshown_frames(oracle_run, mapping, (4, 5), breaks={5}), [])
+        self.assertEqual(compare.unshown_frames(oracle_run, {3: 5, 5: 7}, (3, 5)), [])
+
+    def test_lags(self):
+        self.assertEqual(compare.parse_lags("1109=0,3241=-1"), {1109: 0, 3241: -1})
+        self.assertEqual(compare.parse_lags(None), {})
+        with self.assertRaises(ValueError):
+            compare.parse_lags("1109")
+        # A declared lag within the counted frames: from port frame 3 on, the port's count is the oracle's + 1, so
+        # port frame 3 (count 2) is oracle frame 3 (count 1), and port frame 4 (count 3) is oracle frame 4 (count 2)
+        runs = self.make()
+        pairing = compare.counter_mapping(compare.load_run(runs.oracle), compare.load_run(runs.port), set(), {3: 1})
+        self.assertEqual((pairing.mapping[2], pairing.mapping[3], pairing.mapping[4]), (3, 3, 4))
+        self.assertEqual(pairing.breaks, set())
+
+
 class MemoryTests(unittest.TestCase):
     def test_memory(self):
         runs = Runs(self)
@@ -622,9 +755,15 @@ class OracleScriptTests(unittest.TestCase):
             # Without --time, an input file's time line holds
             self.assertNotIn("--fixed-time", arguments)
             self.assertEqual(arguments[arguments.index("--input") + 1], "x.pbwinput")
-            status, out_text = captured(oracle.main, ["port", "--binary", program, "--out", out, "--frames", "1,10,60"])
+            status, out_text = captured(oracle.main, ["port", "--binary", program, "--out", out, "--frames", "1,10,60",
+                                                      "--dump", "NNS_G3dGlb:612@10", "--dump", "s=*SNDi_SharedWork:16"])
             self.assertEqual(status, 1)
             self.assertIn("no picture of frames 60", out_text)
+            # Each --dump is one of the program's --run-dump
+            with open(record) as f:
+                arguments = f.read().split("\n")
+            self.assertEqual([arguments[i + 1] for i, a in enumerate(arguments) if a == "--run-dump"],
+                             ["NNS_G3dGlb:612@10", "s=*SNDi_SharedWork:16"])
 
     def test_run_passes_the_time_only_when_given(self):
         with tempfile.TemporaryDirectory() as d:
@@ -648,44 +787,93 @@ class OracleScriptTests(unittest.TestCase):
                 else:
                     self.assertEqual(arguments[arguments.index("--time") + 1], expected)
 
-    def test_title_reference(self):
+    def test_sequence_reference(self):
         runs = Runs(self)
         black = solid(b"\x00\x00\x00")
         white = solid(b"\xfc\xfc\xfc")
+        movie = solid(b"\x80\x00\x00")
         scene = bytearray(black)
         for y in range(192, 240):
             for x in range(10, 60):
                 put(scene, x, y, b"\x40\x80\xc0")
-        # The oracle shows black for longer; then white, then a 3D bottom screen
+        # The oracle shows black for longer (its count waits at 0), a frame of a movie on a clock for two frames and
+        # one pass, then white and a 3D bottom screen; the port shows the movie frame for two passes
         for frame in range(1, 6):
             runs.frame(runs.oracle, frame, black, counter=0, three_d=False)
-        runs.frame(runs.oracle, 6, white, counter=1, three_d=False)
-        runs.frame(runs.oracle, 7, scene, counter=2, three_d=(False, True))
-        runs.frame(runs.port, 1, black, counter=0)
-        runs.frame(runs.port, 2, white, counter=1)
-        runs.frame(runs.port, 3, scene, counter=2)
-        saved = oracle.TITLE_SAMPLE, oracle.TITLE_KNOWN
-        oracle.TITLE_SAMPLE, oracle.TITLE_KNOWN = "1-3", {"b2_us": {"2": "a known difference"}}
+        runs.frame(runs.oracle, 6, movie, counter=1, three_d=False)
+        runs.frame(runs.oracle, 7, movie, counter=1, three_d=False)
+        runs.frame(runs.oracle, 8, white, counter=2, three_d=False)
+        runs.frame(runs.oracle, 9, scene, counter=3, three_d=(False, True))
+        for frame, image in enumerate((black, movie, movie, white, scene), 1):
+            runs.frame(runs.port, frame, image, counter=frame - 1)
+        saved = dict(oracle.SEQUENCES)
+        oracle.SEQUENCES["test"] = oracle.Sequence(5, 9, "1-5", "2-3", known={"b2_us": {"4": "a known difference"}})
         try:
-            path = os.path.join(runs.root, "title.tsv")
-            rows = oracle.write_reference(path, "b2_us", compare.load_run(runs.oracle), compare.load_run(runs.port))
+            path = os.path.join(runs.root, "test.tsv")
+            rows = oracle.write_reference(path, "test", "b2_us", compare.load_run(runs.oracle),
+                                          compare.load_run(runs.port))
         finally:
-            oracle.TITLE_SAMPLE, oracle.TITLE_KNOWN = saved
-        self.assertEqual(rows, 2)
+            oracle.SEQUENCES.clear()
+            oracle.SEQUENCES.update(saved)
+        # Port frame 1 pairs on the count (lag 0); 2 and 3, in the clock stretch, with the movie's oracle frames by
+        # their pictures (lag -); 4, left out, and 5 on the count after the clock, with the lag where 4 is expected
+        # after the end of the movie on each (port 3 at count 2, oracle 7 at count 1): the oracle's count 2, so the
+        # lag is 1, and 5 (count 4) is oracle frame 9 (count 3)
+        self.assertEqual(rows, 4)
+        black_top, black_bottom = compare.screen_hashes(bytes(black))
+        movie_top, movie_bottom = compare.screen_hashes(bytes(movie))
+        top, _ = compare.screen_hashes(bytes(scene))
         reference = oracle.load_reference(path)
-        top, bottom = compare.screen_hashes(bytes(scene))
-        self.assertEqual(reference, {1: (1, 0, compare.screen_hashes(bytes(black))[0],
-                                         compare.screen_hashes(bytes(black))[1]),
-                                     3: (7, 2, top, "3d")})
+        self.assertEqual(reference, {1: (1, 0, 0, black_top, black_bottom),
+                                     2: (6, 1, None, movie_top, movie_bottom),
+                                     3: (7, 1, None, movie_top, movie_bottom),
+                                     5: (9, 3, 1, top, "3d")})
+        with open(path) as f:
+            self.assertIn("# Left out, port frames 4: a known difference\n", f.read())
+        # The port's run against it: as it is, nothing fails; a port a pass late fails on the count
+        failures, compared, left, timed = oracle.check_reference(reference, compare.load_run(runs.port))
+        self.assertEqual((failures, compared, left, timed), ([], 7, 1, 2))
+        port_run = compare.load_run(runs.port)
+        port_run.frames[5].counter = 5
+        failures, _, _, _ = oracle.check_reference(reference, port_run)
+        self.assertEqual(failures, ["port frame 5 is at count 5, not 4 (oracle frame 9's count 3 and the lag 1)"])
+        port_run.frames[1].top = "0" * 40
+        failures, _, _, _ = oracle.check_reference(reference, port_run)
+        self.assertIn("port frame 1's top screen isn't oracle frame 1's", failures)
 
-    def test_title_check_skips_without_the_rom(self):
+    def test_sequences_skip_without_the_rom_or_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
-            status = quiet(oracle.main, ["title-check", "--port", os.path.join(d, "port"), "--rom",
-                                         os.path.join(d, "missing.nds")])
-            self.assertEqual(status, oracle.SKIP)
-            status = quiet(oracle.main, ["title", "--port", os.path.join(d, "port"), "--oracle",
-                                         os.path.join(d, "missing")])
-            self.assertEqual(status, oracle.SKIP)
+            for name in oracle.SEQUENCES:
+                status = quiet(oracle.main, ["sequence-check", name, "--port", os.path.join(d, "port"), "--rom",
+                                             os.path.join(d, "missing.nds")])
+                self.assertEqual(status, oracle.SKIP)
+                status = quiet(oracle.main, ["sequence", name, "--port", os.path.join(d, "port"), "--oracle",
+                                             os.path.join(d, "missing")])
+                self.assertEqual(status, oracle.SKIP)
+
+    def test_sequences_declare_what_they_leave_out(self):
+        # Every known difference is a frame list compare.py reads, within the frames each program runs (the state's
+        # within the frames whose state is compared), lags are for versions the repository builds, and every sequence
+        # has an input file for each version
+        for name, sequence in oracle.SEQUENCES.items():
+            self.assertTrue(set(compare.parse_frames(sequence.clock)) <= set(range(1, sequence.port_frames + 1)))
+            for version, lags in sequence.lags.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
+                self.assertTrue(set(compare.parse_lags(lags)) <= set(range(1, sequence.port_frames + 1)))
+            for version, table in sequence.known.items():
+                self.assertTrue(set(oracle.by_frame(table)) <= set(range(1, sequence.port_frames + 1)), name)
+            for version, table in sequence.known_oracle.items():
+                self.assertTrue(set(oracle.by_frame(table)) <= set(range(1, sequence.oracle_frames + 1)), name)
+            if sequence.state_frames:
+                state = set(compare.parse_frames(sequence.state_frames))
+                self.assertTrue(state <= set(range(1, sequence.port_frames + 1)), name)
+                self.assertTrue(set(compare.parse_frames(sequence.state_oracle)) <=
+                                set(range(1, sequence.oracle_frames + 1)), name)
+                for version, table in sequence.known_state.items():
+                    self.assertTrue(set(oracle.by_frame(table)) <= state, name)
+            for version in ("b2_us", "w2_us"):
+                self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
+                    name=name, version=version))), (name, version))
 
     def test_check_skips_without_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:

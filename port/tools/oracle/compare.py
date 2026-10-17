@@ -2,17 +2,20 @@
 """Compares a run of the native port with a run of the melonDS oracle (port/tools/oracle/README.md).
 
 A run is a directory: frame_NNNNNN.png for the frames it captured (both screens, top above bottom, 256x384),
-frames.tsv with a row for each frame it ran (pbw-oracle writes one for every frame; oracle.py port writes one for
-each captured frame), memory.txt with the memory it dumped, and run.txt. Frames pair up by --offset (oracle frame =
-port frame + offset, 0 by default) or by --align: counter (the first frames where the game's own frame count has the
-same value), first-change (the offset between the first frames that aren't blank, which needs every frame up to them
-in both runs), image (the offset at which most of the port's frames show exactly an oracle frame's screens) or sequence
-(each port frame, in order, with the next oracle frame that shows the same pictures at the palettes' depth, which
-needs the oracle's PNG files for the frames in reach).
+frames.tsv with a row for each frame it ran (pbw-oracle and the port's --run-dir write one for every frame),
+memory.txt with the memory it dumped, and run.txt. Frames pair up by --offset (oracle frame = port frame + offset, 0
+by default) or by --align: counter (the oracle frame where the game's own frame count is the port frame's less the
+count lag: 0, else what --lag declares from a port frame on; the port frames of --clock, where the game waits on a
+clock, pair by their pictures as sequence does), first-change (the offset between the first frames that aren't blank,
+which needs every frame up to them in both runs), image (the offset at which most of the port's frames show exactly an
+oracle frame's screens) or sequence (each port frame, in order, with an oracle frame from the last pair's on that
+shows the same pictures at the palettes' depth, whatever the timing).
 
-    compare.py screens ORACLE PORT [--offset N | --align counter|first-change|image|sequence] [--frames LIST]
-                       [--report DIR] [--depth 6|5] [--tolerance FRACTION] [--pixel-tolerance STEPS] [--brief]
-    compare.py memory ORACLE PORT [--offset N | --align ...] [--labels A,B,...]
+    compare.py screens ORACLE PORT [--offset N | --align counter|first-change|image|sequence] [--clock LIST]
+                       [--lag FRAME=N,...] [--frames LIST] [--known-oracle LIST] [--report DIR] [--depth 6|5]
+                       [--tolerance FRACTION] [--pixel-tolerance STEPS] [--brief]
+    compare.py memory ORACLE PORT [--offset N | --align ...] [--clock LIST] [--lag FRAME=N,...] [--frames LIST]
+                      [--labels A,B,...]
     compare.py align ORACLE PORT
     compare.py hash PNG...
 
@@ -21,6 +24,8 @@ palettes' (value >> 3), which leaves out differences in the output's low bit. A 
 frame (frames.tsv's top_3d and bottom_3d) passes when few of its pixels differ by more than a few steps after allowing
 each pixel a one-pixel shift (rasterizers differ at polygon edges); a screen without 3D must be exact. Without a
 picture on one side, frames.tsv's hashes decide a screen without 3D at 6 bits; any other screen is not compared.
+With counter or sequence, every oracle frame between the frames that two consecutive port frames pair with must show
+the screens of one of the two, or be one --known-oracle lists: a picture the port never shows fails.
 --report writes, for each frame that isn't exact, an image of the oracle's screens, the port's and the differences
 side by side; --brief lists, and draws, only the frames that don't match.
 
@@ -399,73 +404,225 @@ def picture_keys(run: Run, depth: int | None) -> dict[int, tuple]:
 SEQUENCE_DEPTH = 5
 
 
-def sequence_mapping(oracle: Run, port: Run) -> tuple[dict[int, int], dict[int, str]]:
-    """Pairs each port frame, in order, with an oracle frame from the last pair's on that shows the same screens (at
-    SEQUENCE_DEPTH when both runs have a PNG file of every frame they list, else by frames.tsv's hashes, which a run
-    with pictures of some frames only has for the others): of those, the nearest to where the port
-    frame is expected, as many game frames after the last pair as it is (the first oracle frame where the counter
-    reaches the value) when both runs have the counter, else as many frames. A port frame that none shows (a screen
-    with 3D, or a difference) pairs with where it is expected, and is noted "extrapolated". While the port's picture
-    stays the same, it is expected from the last pair; once it changes, from the end of the last pair's picture on
-    each, the last port frame and the last oracle frame that showed it: the DS spends more frames than the port on a
-    still picture while it loads or waits on a clock, so what comes after a still starts where the still ends on each.
-    Nearest, not first: a picture the oracle showed earlier (a flash of white, a black screen) isn't taken for a later
-    one when frames in between had no match"""
-    oracle_pictures, port_pictures = set(oracle.captured()), set(port.captured())
-    pictured = oracle_pictures and set(oracle.frames) <= oracle_pictures and set(port.frames) <= port_pictures
-    depth = SEQUENCE_DEPTH if pictured else None
-    oracle_keys = picture_keys(oracle, depth)
-    port_keys = picture_keys(port, depth)
-    by_key: dict[tuple, list[int]] = {}
-    for number in sorted(oracle_keys):
-        by_key.setdefault(oracle_keys[number], []).append(number)
-    frames_with_counter: dict[int, list[int]] = {}
-    for number in sorted(oracle.frames):
-        value = oracle.frames[number].counter
-        if value is not None:
-            frames_with_counter.setdefault(value, []).append(number)
+@dataclass
+class Pairing:
+    """How a port run's frames pair with an oracle run's: the oracle frame of each port frame (mapping), notes on some
+    port frames, the port frames where the counts were lined up again by declaration after a clock (breaks: what the
+    oracle showed between such a frame's pair and the one before isn't checked) and a line for each stretch of port
+    frames saying how it was paired (timing)"""
+    mapping: dict[int, int] = field(default_factory=dict)
+    notes: dict[int, str] = field(default_factory=dict)
+    breaks: set[int] = field(default_factory=set)
+    timing: list[str] = field(default_factory=list)
 
+
+def parse_lags(text: str | None) -> dict[int, int]:
+    """"1109=0,3241=-1": from each port frame on, the port's count less the oracle's"""
+    lags: dict[int, int] = {}
+    for item in (text or "").split(","):
+        if not item:
+            continue
+        frame, _, lag = item.partition("=")
+        if not lag:
+            raise ValueError(f"{item!r} isn't FRAME=LAG")
+        lags[int(frame)] = int(lag)
+    return lags
+
+
+class Aligner:
+    """What both alignments look frames up by: each frame's pictures as a key (at SEQUENCE_DEPTH when both runs have a
+    PNG file of every frame they list, else by frames.tsv's hashes, which a run with pictures of some frames only has
+    for the others), the oracle frames that show each, and the oracle frames with each count"""
+
+    def __init__(self, oracle: Run, port: Run):
+        self.oracle, self.port = oracle, port
+        oracle_pictures, port_pictures = set(oracle.captured()), set(port.captured())
+        pictured = oracle_pictures and set(oracle.frames) <= oracle_pictures and set(port.frames) <= port_pictures
+        depth = SEQUENCE_DEPTH if pictured else None
+        self.oracle_keys = picture_keys(oracle, depth)
+        self.port_keys = picture_keys(port, depth)
+        self.by_key: dict[tuple, list[int]] = {}
+        for number in sorted(self.oracle_keys):
+            self.by_key.setdefault(self.oracle_keys[number], []).append(number)
+        self.with_counter: dict[int, list[int]] = {}
+        for number in sorted(oracle.frames):
+            value = oracle.frames[number].counter
+            if value is not None:
+                self.with_counter.setdefault(value, []).append(number)
+
+    @staticmethod
     def counter(run: Run, number: int) -> int | None:
         frame = run.frames.get(number)
         return None if frame is None else frame.counter
 
-    def expected(number: int, anchor: tuple[int, int]) -> int:
+    def expected(self, number: int, anchor: tuple[int, int]) -> int:
+        """The oracle frame where a port frame is expected: as many game frames after the anchor's oracle frame as it
+        is after the anchor's port frame (the first oracle frame where the count reaches the value) when both runs
+        have the counter, else as many frames"""
         port_anchor, oracle_anchor = anchor
-        port_count, port_anchor_count = counter(port, number), counter(port, port_anchor)
-        oracle_anchor_count = counter(oracle, oracle_anchor)
+        port_count, port_anchor_count = self.counter(self.port, number), self.counter(self.port, port_anchor)
+        oracle_anchor_count = self.counter(self.oracle, oracle_anchor)
         if None not in (port_count, port_anchor_count, oracle_anchor_count):
             wanted = oracle_anchor_count + port_count - port_anchor_count
             # The first frame where the count has the value, after the anchor and before the count starts again
-            for candidate in frames_with_counter.get(wanted, []):
+            for candidate in self.with_counter.get(wanted, []):
                 if candidate > oracle_anchor:
                     return candidate
         return oracle_anchor + number - port_anchor
 
+    def anchor(self, number: int, last: tuple[int, int]) -> tuple[int, int]:
+        """What a port frame is expected from: the last pair while the port's picture stays the same; once it changes,
+        the end of the last pair's picture on each side, the last port frame and the last oracle frame that showed it.
+        The DS spends more frames than the port on a still picture while it loads or waits on a clock, so what comes
+        after a still starts where the still ends on each"""
+        if self.port_keys.get(number) == self.port_keys[last[0]]:
+            return last
+        end = last[1]
+        while self.oracle_keys.get(end + 1) == self.oracle_keys[last[1]]:
+            end += 1
+        return (last[0], end)
+
+    def by_picture(self, number: int, last: tuple[int, int] | None) -> tuple[int, bool]:
+        """A port frame's oracle frame by its pictures, and whether it was extrapolated: of the oracle frames from the
+        last pair's on that show the same screens, the nearest to where the port frame is expected; with none (a
+        screen with 3D, or a difference), where it is expected. Nearest, not first: a picture the oracle showed
+        earlier (a flash of white, a black screen) isn't taken for a later one when frames in between had no match"""
+        target = None if last is None else self.expected(number, self.anchor(number, last))
+        later = [o for o in self.by_key.get(self.port_keys[number], []) if last is None or o >= last[1]]
+        if later:
+            return (later[0] if target is None else min(later, key=lambda o: (abs(o - target), o))), False
+        return (number if target is None else target), True
+
+    def by_counter(self, number: int, lag: int, last: tuple[int, int] | None) -> int | None:
+        """A port frame's oracle frame by the count: the oracle's frames whose count is the port frame's less the lag,
+        the run of them from the last pair's on, at the port frame's place among the port's frames with its count (a
+        pass that takes several frames on both; the oracle's last when its pass took fewer)"""
+        count = self.counter(self.port, number)
+        frames = None if count is None else self.with_counter.get(count - lag)
+        if not frames:
+            return None
+        place = 0
+        while self.counter(self.port, number - 1 - place) == count:
+            place += 1
+        runs: list[list[int]] = []
+        for frame in frames:
+            if runs and frame == runs[-1][-1] + 1:
+                runs[-1].append(frame)
+            else:
+                runs.append([frame])
+        floor = 0 if last is None else last[1]
+        run = next((r for r in runs if r[-1] >= floor), runs[-1])
+        return run[min(place, len(run) - 1)]
+
+
+def sequence_mapping(oracle: Run, port: Run) -> tuple[dict[int, int], dict[int, str]]:
+    """Pairs each port frame, in order, by its pictures (Aligner.by_picture): with an oracle frame from the last
+    pair's on that shows the same screens, the nearest to where it is expected; a port frame that none shows (a screen
+    with 3D, or a difference) pairs with where it is expected, and is noted "extrapolated". It shows that the port
+    shows the oracle's pictures in the same order, whatever the timing"""
+    aligner = Aligner(oracle, port)
     mapping: dict[int, int] = {}
     notes: dict[int, str] = {}
     last = None
-    for number in sorted(port_keys):
-        key = port_keys[number]
-        target = None
-        if last is not None:
-            if key == port_keys[last[0]]:
-                anchor = last
-            else:
-                # The end of the oracle's run of frames that show the last pair's picture
-                end = last[1]
-                while oracle_keys.get(end + 1) == oracle_keys[last[1]]:
-                    end += 1
-                anchor = (last[0], end)
-            target = expected(number, anchor)
-        later = [o for o in by_key.get(key, []) if last is None or o >= last[1]]
-        if later:
-            choice = later[0] if target is None else min(later, key=lambda o: (abs(o - target), o))
-            mapping[number] = choice
+    for number in sorted(aligner.port_keys):
+        choice, extrapolated = aligner.by_picture(number, last)
+        mapping[number] = choice
+        if extrapolated:
+            notes[number] = "extrapolated"
+        else:
             last = (number, choice)
-            continue
-        notes[number] = "extrapolated"
-        mapping[number] = number if target is None else target
     return mapping, notes
+
+
+def counter_mapping(oracle: Run, port: Run, clock: set[int] | None = None,
+                    lags: dict[int, int] | None = None) -> Pairing:
+    """Pairs each port frame with the oracle frame where the game's count, less the count lag, is the port frame's
+    (Aligner.by_counter): the timing the game keeps while it counts passes of its main loop, which a port that shows
+    a picture late or early, or for more or fewer passes, fails. The lag is 0 from power-on, where both programs start
+    the count, and what lags declares from each port frame on. Port frames of clock, where the game waits on a clock
+    and the DS makes fewer, longer passes than the port, pair by their pictures instead (Aligner.by_picture); after
+    them, the lag is the declared one (a press that ends the wait reaches both programs on the same pass, so the counts
+    are the same again; the frame is a break), else the one where the frame is expected from the end of the last
+    picture on each side"""
+    clock = clock or set()
+    lags = lags or {}
+    aligner = Aligner(oracle, port)
+    pairing = Pairing()
+    stretches: list[list] = []  # [first port frame, last port frame, how]
+
+    def stretch(number: int, how: str) -> None:
+        if stretches and stretches[-1][2] == how and stretches[-1][1] == number - 1:
+            stretches[-1][1] = number
+        else:
+            stretches.append([number, number, how])
+
+    lag = 0
+    how_lag = "0 from power-on"
+    last = None
+    in_clock = False
+    for number in sorted(aligner.port_keys):
+        if number in clock:
+            choice, extrapolated = aligner.by_picture(number, last)
+            pairing.mapping[number] = choice
+            if extrapolated:
+                pairing.notes[number] = "extrapolated"
+            else:
+                last = (number, choice)
+            in_clock = True
+            stretch(number, "by pictures (the game waits on a clock)")
+            continue
+        restart = False
+        if number in lags:
+            lag = lags[number]
+            how_lag = f"{lag}, declared"
+            restart = in_clock and last is not None
+        elif in_clock and last is not None:
+            expected = aligner.expected(number, aligner.anchor(number, last))
+            count, oracle_count = aligner.counter(port, number), aligner.counter(oracle, expected)
+            if None not in (count, oracle_count):
+                lag = count - oracle_count
+                how_lag = f"{lag}, from where the frame is expected after the end of the last picture on each"
+        in_clock = False
+        choice = aligner.by_counter(number, lag, last)
+        if restart and choice is not None:
+            pairing.breaks.add(number)
+            skipped = describe_ranges(list(range(last[1] + 1, choice))) or "none"
+            how_lag += (f" where the counts line up again after the clock (oracle frames since the last pair: "
+                        f"{skipped}, not checked)")
+        stretch(number, f"by the counter, lag {how_lag}")
+        if choice is None:
+            count = aligner.counter(port, number)
+            pairing.notes[number] = "no counter" if count is None else f"no oracle frame with count {count - lag}"
+            continue
+        pairing.mapping[number] = choice
+        last = (number, choice)
+    for first, final, how in stretches:
+        frames = f"port frame {first}" if first == final else f"port frames {first}-{final}"
+        pairing.timing.append(f"{frames}: {how}")
+    return pairing
+
+
+def unshown_frames(oracle: Run, mapping: dict[int, int], within: tuple[int, int], breaks: set[int] | None = None,
+                   allowed: set[int] | None = None) -> list[int]:
+    """The oracle frames that show a picture no port frame shows: between the oracle frames of two consecutive port
+    frames (both within the given range of port frames, the second not a break), those whose screens are neither
+    pair's. Frames the DS repeats while a pass takes longer, or while a movie frame stays, show one of the two;
+    a picture the port skips, or a frame the DS tore with a register written partway through it, shows neither.
+    allowed are oracle frames known to have no counterpart"""
+    keys = {number: (frame.top, frame.bottom) for number, frame in oracle.frames.items()}
+    breaks = breaks or set()
+    allowed = allowed or set()
+    first, final = within
+    out = set()
+    for number in range(first, final):
+        after = number + 1
+        if number not in mapping or after not in mapping or after in breaks:
+            continue
+        a, b = mapping[number], mapping[after]
+        for frame in range(a + 1, b):
+            if frame in keys and frame not in allowed and keys[frame] not in (keys.get(a), keys.get(b)):
+                out.add(frame)
+    return sorted(out)
 
 
 def frame_mapping(oracle: Run, port: Run, args):
@@ -474,10 +631,7 @@ def frame_mapping(oracle: Run, port: Run, args):
         mapping, _ = sequence_mapping(oracle, port)
         return mapping.get
     if args.align == "counter":
-        offsets = counter_offsets(oracle, port)
-        if not offsets:
-            raise RunError("no counter values to align on: both runs need frames.tsv's counter column")
-        return lambda frame: frame + offsets[frame] if frame in offsets else None
+        return counter_pairing(oracle, port, args).mapping.get
     if args.align == "first-change":
         a, b = first_change(oracle, complete=True), first_change(port, complete=True)
         if a is None or b is None:
@@ -492,25 +646,35 @@ def frame_mapping(oracle: Run, port: Run, args):
     return lambda frame: frame + args.offset
 
 
-def resolve_pairs(oracle: Run, port: Run, args, with_notes: bool = False):
-    """(port frame, oracle frame) pairs to compare, and with with_notes a note for some port frames"""
+def counter_pairing(oracle: Run, port: Run, args) -> Pairing:
+    """counter_mapping with the command line's --clock and --lag"""
+    if not any(frame.counter is not None for frame in port.frames.values()):
+        raise RunError("no counter values to align on: both runs need frames.tsv's counter column")
+    clock = set(parse_frames(args.clock) or []) if args.clock else set()
+    return counter_mapping(oracle, port, clock, parse_lags(args.lag))
+
+
+def resolve_pairs(oracle: Run, port: Run, args) -> tuple[list[tuple[int, int]], Pairing | None]:
+    """(port frame, oracle frame) pairs to compare, and for the counter and sequence alignments, which pair every
+    frame, the whole pairing"""
     port_frames = sorted(set(port.frames) | set(port.captured()))
     if args.frames:
         wanted = parse_frames(args.frames)
         if wanted is not None:
             port_frames = [f for f in port_frames if f in set(wanted)]
-    notes: dict[int, str] = {}
+    pairing = None
     if args.align == "sequence":
-        table, notes = sequence_mapping(oracle, port)
-        mapping = table.get
-    else:
-        mapping = frame_mapping(oracle, port, args)
+        mapping, notes = sequence_mapping(oracle, port)
+        pairing = Pairing(mapping, notes, set(), ["every port frame: by pictures, whatever the timing"])
+    elif args.align == "counter":
+        pairing = counter_pairing(oracle, port, args)
+    mapping = pairing.mapping.get if pairing else frame_mapping(oracle, port, args)
     pairs = []
     for frame in port_frames:
         target = mapping(frame)
         if target is not None and target >= 1:
             pairs.append((frame, target))
-    return (pairs, notes) if with_notes else pairs
+    return pairs, pairing
 
 
 # Screens
@@ -624,10 +788,18 @@ def describe_screen(check: ScreenCheck) -> str:
 def command_screens(args) -> int:
     oracle = load_run(args.oracle)
     port = load_run(args.port)
-    pairs, notes = resolve_pairs(oracle, port, args, with_notes=True)
+    pairs, pairing = resolve_pairs(oracle, port, args)
     if not pairs:
         print("no frames to compare", file=sys.stderr)
         return 2
+    notes = pairing.notes if pairing else {}
+    unshown: list[int] = []
+    if pairing:
+        for line in pairing.timing:
+            print(line)
+        compared = [frame for frame, _ in pairs]
+        known = set(parse_frames(args.known_oracle) or []) if args.known_oracle else set()
+        unshown = unshown_frames(oracle, pairing.mapping, (compared[0], compared[-1]), pairing.breaks, known)
     if args.report:
         os.makedirs(args.report, exist_ok=True)
     screen_bytes = SCREEN_PIXELS * 3
@@ -688,13 +860,20 @@ def command_screens(args) -> int:
         if r.note:
             verdict += f" [{r.note}]"
         print(f"{r.port_frame:6d} {r.oracle_frame:6d}  {kind:6s}  {verdict}")
+    for first, final in frame_ranges(unshown):
+        counts = sorted({oracle.frames[f].counter for f in range(first, final + 1)} - {None})
+        where = f"oracle frame {first}" if first == final else f"oracle frames {first}-{final}"
+        if counts:
+            where += f" (count {counts[0]})" if len(counts) == 1 else f" (counts {counts[0]}-{counts[-1]})"
+        print(f"FAIL: {where}: no port frame shows {'its' if first == final else 'their'} pictures")
     failed = sum(1 for r in results if r.verdict == "fail")
     unknown = sum(1 for r in results if r.verdict == "unknown")
     exact = sum(1 for r in results if r.verdict == "exact")
     print(f"{len(results) - failed - unknown} of {len(results)} frames match ({exact} exact, "
           f"{len(results) - failed - unknown - exact} with 3D within the tolerance)" +
-          (f"; {unknown} not compared" if unknown else ""))
-    return 1 if failed or unknown else 0
+          (f"; {unknown} not compared" if unknown else "") +
+          (f"; {len(unshown)} oracle frames show pictures no port frame shows" if unshown else ""))
+    return 1 if failed or unknown or unshown else 0
 
 
 # Memory
@@ -765,14 +944,20 @@ def command_align(args) -> int:
     return 0
 
 
-def describe_ranges(frames: list[int], limit: int = 6) -> str:
-    """"249-251, 300, 400-420" for sorted frame numbers"""
+def frame_ranges(frames: list[int]) -> list[tuple[int, int]]:
+    """[(249, 251), (300, 300)] for sorted frame numbers"""
     ranges: list[list[int]] = []
     for frame in frames:
         if ranges and frame == ranges[-1][1] + 1:
             ranges[-1][1] = frame
         else:
             ranges.append([frame, frame])
+    return [(a, b) for a, b in ranges]
+
+
+def describe_ranges(frames: list[int], limit: int = 6) -> str:
+    """"249-251, 300, 400-420" for sorted frame numbers"""
+    ranges = frame_ranges(frames)
     text = ", ".join(f"{a}" if a == b else f"{a}-{b}" for a, b in ranges[:limit])
     return text + (f" and {len(ranges) - limit} more" if len(ranges) > limit else "")
 
@@ -795,6 +980,10 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--offset", type=int, default=0, help="oracle frame = port frame + OFFSET (default 0)")
         p.add_argument("--align", choices=["counter", "first-change", "image", "sequence"],
                        help="find the pairing instead")
+        p.add_argument("--clock", help="--align counter: port frames where the game waits on a clock, which pair by "
+                       "their pictures (a frame list)")
+        p.add_argument("--lag", help="--align counter: FRAME=LAG,...: from port frame FRAME on, the port's count is "
+                       "the oracle's + LAG")
         p.add_argument("--frames", help="only these port frames: N, A-B, A-B/STEP, comma-separated")
 
     screens = commands.add_parser("screens", help="compare the screens")
@@ -808,6 +997,8 @@ def main(argv: list[str] | None = None) -> int:
                          help="screens with 3D: the steps a pixel may differ by")
     screens.add_argument("--depth", type=int, choices=[5, 6], default=6,
                          help="bits a channel to compare: 6, the DS's output (default), or 5, its palettes' colours")
+    screens.add_argument("--known-oracle", help="oracle frames known to have no counterpart on the port (a frame "
+                         "the DS tore), which the check for pictures no port frame shows leaves out")
     memory = commands.add_parser("memory", help="compare the memory dumps by label")
     pairing(memory)
     memory.add_argument("--labels", help="only these labels, comma-separated")
@@ -818,6 +1009,8 @@ def main(argv: list[str] | None = None) -> int:
     hashes.add_argument("png", nargs="+")
 
     args = parser.parse_args(argv)
+    if (getattr(args, "clock", None) or getattr(args, "lag", None)) and args.align != "counter":
+        parser.error("--clock and --lag go with --align counter")
     try:
         if args.command == "screens":
             return command_screens(args)

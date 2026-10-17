@@ -1,0 +1,7 @@
+pbwinput 1
+# The opening sequence for the oracle comparison (port/tools/oracle/README.md, "The comparison sequences"; oracle.py
+# sequence opening): power-on through the boot screens, the Game Freak logo and the whole opening movie to the title
+# and its first frames of 3D, with nothing pressed. A press there would reach the two programs at different points of
+# the movies, which run on a clock, so the title sequence's press skips most of the opening on the DS; this one plays
+# all of it on both.
+version w2_us

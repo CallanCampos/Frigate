@@ -33,40 +33,64 @@ level that doesn't exist yet says "not yet"; no field is left out.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `check_mwcc_neutral.py`: all 3,140 file and
   version pairs give the same MWCC token stream as upstream's `e484d5011`.
 - **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2, and Black 2 under ASan and UBSan; not pushed,
-  so no CI run.
-- **Tests:** T0 as above. T2: 211 of 211 `ctest` tests pass (2 skipped without the oracle: `oracle_boot`,
-  `oracle_title`), among them the run directory's 65 checks plain and sanitized, `oracle_compare`'s 30 tests, the asm
-  oracle's new products test (4 functions, 32,000 cases each build, every overlap of the arguments, against the ROM's
-  code) and `oracle_title_hashes` (354 frames, 495 screens without 3D against the oracle's hashes). Sanitized:
-  `app_run_dir`, `oracle_compare`, `replay_start_menu`, `oracle_title_hashes` and the smoke test pass; the 3,600 frames
-  of the title sequence give the same hashes as the plain build, with the one misaligned read already known
-  (`g2d_CellAnimation.c:33`, NitroSystem reading packed file data). T4: `oracle.py title`, the port against melonDS
-  1.1 from power-on through the boot screens, the Game Freak logo, the opening skipped with START, the title (3D on the
-  bottom screen, then the top) and START to the start menu: Black 2, 3,581 of 3,600 frames match (1,476 exact at 6
-  bits, 2,105 with 3D within the tolerance), White 2, 3,575 (1,480 and 2,095); the rest are known differences
-  (`port/tools/oracle/README.md`). With no input, Black 2's first 4,185 frames (the whole opening) match. T3, T5's
-  nightly runs, T6, T7 not yet.
+  so no CI run (Linux unbuilt: the program now links with `ENABLE_EXPORTS` and `CMAKE_DL_LIBS` there).
+- **Tests:** T0 as above. T2: Black 2, 211 of 214 `ctest` tests pass and 3 are skipped without the oracle
+  (`oracle_boot`, `oracle_opening`, `oracle_title`); White 2, 209 pass, the same 3 are skipped, and 2 fail as they did
+  before this work (`replay_start_menu`, whose input file is Black 2's, and `rom_game_overlays`, on overlay 12's
+  address). Among them:
+  - the run directory's 93 checks, plain and sanitized (memory dumps added), and `oracle_compare`'s 35 tests;
+  - the 3D renderer's 777 checks, 13 of them new on edge interpolation (they fail on the old interpolation);
+  - `hal_replaced_c` (new), and the asm oracle with its products test (4 functions, 32,000 cases each build, every
+    overlap of the arguments, against the ROM's code);
+  - `oracle_opening_hashes` (337 frames and 638 screens without 3D in each version) and `oracle_title_hashes` (400
+    and 393 frames, 544 and 541 screens, 321 and 314 of the frames on the count).
+
+  Sanitized: `app_run_dir`, `oracle_compare`, `replay_start_menu`, `g3d_ds3d`, `g3d_hal`, `hal_replaced_c` and the
+  smoke test pass; both sequences under ASan and UBSan (3,600 and 3,800 frames) give the plain build's hashes and
+  counts at every frame and its `NNS_G3dGlb` where dumped, with the one misaligned read already known
+  (`g2d_CellAnimation.c:33`, NitroSystem reading packed file data). T4: `oracle.py sequence`, the port against
+  melonDS 1.1, every port frame on the game's count (the movies by their pictures in order, no oracle picture
+  skipped) but the known differences, and NNS G3D's state on the count through the title:
+  - opening (power-on to the title's first 274 frames, nothing pressed): Black 2, 3,800 of 3,800 frames match (3,526
+    exact at 6 bits, 274 with 3D within the tolerance); White 2, the same, with the DS's torn first frame of the
+    opening declared; `NNS_G3dGlb` equal at all 274 frames compared in each;
+  - title (the opening skipped with START, the title's 3D on both screens, START to the start menu): Black 2, 3,579
+    of 3,579 compared match (1,474 exact, 2,105 with 3D within the tolerance), 21 known differences left out; White 2,
+    3,572 of 3,572 (1,477 and 2,095), 28 left out; `NNS_G3dGlb` equal at 2,470 of 2,470 frames in each, 15 left out;
+  - 3D beyond the pixel tolerance: a median of 17 pixels a screen in Black 2's title and 7 in White 2's, at most 80 of
+    the 245 allowed (before the rasterizer fix, a median of 79 and at most 172).
+
+  T3, T5's nightly runs, T6, T7 not yet.
 - **Tiers:** unchanged since the last entry (no decomp C changed).
-- **Trap stubs:** unchanged, 581 function stubs and 67 data placeholders; the title sequence's 3,600 frames reach none
-  in either version.
+- **Trap stubs:** unchanged, 581 function stubs and 67 data placeholders; neither sequence reaches one in either
+  version.
 - **64-bit warnings:** unchanged: the change outside `port/` only adds `#ifndef PLATFORM_PC` guards.
 - **Work done:**
-  - Phase 2's last exit criterion: oracle comparisons pass within tolerance, for both versions
-    (`port/tests/oracle/title_<version>.pbwinput`, `oracle.py title` and `title-check`, ctest `oracle_title` and
-    `oracle_title_hashes`).
-  - The program writes its own run directory for compare.py (`--run-dir`, `--run-screens`, `port/app/run_dir.c`):
-    `frames.tsv` with GFL's frame count and the game frame at every frame hook, PNG files at the frames of a list.
-    `oracle.py port` runs the port once.
-  - A 3D fix: the decomp's `MTX_Concat33`, `MTX_Concat43`, `MTX_Concat44` and `MTX_MultVec43` read an argument after
-    storing over it when the result replaces it, which the original never does, so on a host the title's camera
-    looked elsewhere (`MAT3_RotationEulerZYX`). `port/hal/fx` has versions in the original's order, checked against
-    the ROM's code; game change, Platform; a decomp finding.
-  - compare.py's sequence alignment pairs on the game's frame count across the 3D and takes the nearest match, so the
-    title's 3D pairs with the oracle's after the movies; `--brief`.
-  - Settled with evidence (README, "Game frames and video frames"): START held doesn't skip the opening on melonDS or
-    on the port (a press does, on the same pass on both); the oracle's 242 frames of start-up give oracle frame =
-    port frame + 242 through the boot screens, and game frames part where the game waits on a clock (the movies) and
-    line up again at a press.
+  - Phase 2's last exit criterion: oracle comparisons pass within tolerance, for both versions, in two sequences
+    (`port/tests/oracle/<name>_<version>.pbwinput`: opening and title; `oracle.py sequence` and `sequence-check`;
+    ctest `oracle_<name>` and `oracle_<name>_hashes`).
+  - compare.py pairs on the game's count (`--align counter`), the movies by their pictures (`--clock`), with declared
+    count lags (`--lag`), and fails any oracle picture no port frame shows (`--known-oracle` for the DS's torn
+    frames); `--align sequence` alone, which only holds pictures and their order, passed a port that showed pictures
+    late or held a still. The references keep the count each row expects; every known difference is declared, with
+    its evidence in `port/tools/oracle/README.md`.
+  - The program writes its own run directory for compare.py (`--run-dir`, `--run-screens`, `--run-dump`,
+    `port/app/run_dir.c`): `frames.tsv` with GFL's frame count and the game frame at every frame hook, PNG files at
+    the frames of a list, `memory.txt` with globals by name (`dlsym`), through a pointer with `*`. `oracle.py port`
+    runs the port once.
+  - Two 3D fixes. The decomp's `MTX_Concat33`, `MTX_Concat43`, `MTX_Concat44` and `MTX_MultVec43` read an argument
+    after storing over it when the result replaces it, which the original never does, so on a host the title's camera
+    looked elsewhere (`MAT3_RotationEulerZYX`): `port/hal/fx` has versions in the original's order, checked against
+    the ROM's code; game change, Platform; a decomp finding;
+    [ADR 0008](adr/0008-host-versions-of-sdk-c-that-isnt-the-roms.md), amending ADR 0005, says when the HAL may
+    replace SDK C and when the replacement goes (`hal_replaced_c`). And the rasterizer takes values along an edge by
+    line, as melonDS does, not along an X-major edge's run, which had put whole spans' colours a step apart.
+  - Settled with evidence (README, "Game frames and video frames" and "Known differences"): START held doesn't skip
+    the opening on melonDS or on the port (a press does, on the same pass on both); the oracle's start-up gives
+    oracle frame = port frame + 242 from count 5 on through the boot screens, and game frames part where the game
+    waits on a clock (from the black after the copyright screen) and line up again at a press; the DS's camera leads
+    after START (NNS G3D's state a pass ahead), and White 2's cry ends a pass later against the DS's passes because
+    the DS starts it later (traced by the sound driver's shared work on both programs).
 - **Next:** New Game's intro (overlay 294): 64-bit fixes for the particle system's work buffers and for the Pokémon
   parameter setters, which take pointers as `u32`.
 - **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download Play) only
