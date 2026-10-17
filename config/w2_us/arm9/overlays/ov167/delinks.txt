@@ -104,6 +104,7 @@ src/ov167/btlv_scu.c:
     .data       start:0x021dafec end:0x021daff8
 
 src/ov167/btl_rec.c:
+    complete
     .text       start:0x021d45f0 end:0x021d4a5c
     .data       start:0x021daff8 end:0x021db004
 
@@ -126,6 +127,7 @@ src/ov167/btl_field.c:
     .bss        start:0x021dd928 end:0x021ddaa0
 
 src/ov167/pokewood_cutin.c:
+    complete
     .text       start:0x021d5e5c end:0x021d6c64
     .rodata     start:0x021dab2c end:0x021daea4
     .data       start:0x021db020 end:0x021db040

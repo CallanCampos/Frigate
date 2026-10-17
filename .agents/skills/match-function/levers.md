@@ -139,6 +139,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Every register moved by a field that the caller keeps in a saved register after an inline read it, where the
   original loads it again: the inline takes a `const T *`, even from a caller's plain pointer.
   (matching.md: "a `const` pointer from a caller whose")
+- A loop-invariant field in the register after every declared local, where the original keeps it among them: read it
+  into a local of the type the loop compares it at, declared at that place (`u32 movie = rules->movie;` against a
+  `u32` bit field). (matching.md: "register after every declared local too")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -550,6 +553,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A test after a body that is entered from the top and from an earlier branch, in a function that does one box a frame:
   `while (box < n) { ...; break; }`, with a comment. (matching.md: "stops after its first pass")
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
+- A returning branch inside a loop that computes an address again in its own registers, where the original reloads
+  the parts the loop hoisted: read the address into a local once in the branch and use it at both uses.
+  (matching.md: "returning branch inside a loop")
 
 ## Switches
 
