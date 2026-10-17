@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Sunkern",
+    "pokedex": {
+        "category": "Seed Pokémon",
+        "entry": "It suddenly falls out of the sky in\nthe morning. Knowing it's weak, it\nsimply feeds until it evolves.",
+        "height": "1'00\"",
+        "weight": "4.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Sunkern",
+                "category": "Seed Pokémon",
+                "entry": "It suddenly falls out of the sky in\nthe morning. A year after a cold\nsummer, their population explodes.",
+                "height": "1'00\"",
+                "weight": "4.0 lbs."
+            },
+            "fr": {
+                "name": "Tournegrin",
+                "category": "Pokémon Graine",
+                "entry": "Il tombe du ciel sans crier gare en\nmatinée. On en croise énormément\nl'année suivant un été froid.",
+                "height": "0,3 m",
+                "weight": "1,8 kg"
+            },
+            "de": {
+                "name": "Sonnkern",
+                "category": "Samen",
+                "entry": "Morgens fällt es plötzlich aus dem\nHimmel. War der Sommer kalt,\nexplodiert seine Population.",
+                "height": "0,3 m",
+                "weight": "1,8 kg"
+            },
+            "it": {
+                "name": "Sunkern",
+                "category": "Pokémon Seme",
+                "entry": "Cade improvvisamente giù dal cielo\nal mattino. Dopo un'estate fredda,\nla popolazione di Sunkern esplode.",
+                "height": "0,3 m",
+                "weight": "1,8 kg"
+            },
+            "ko": {
+                "name": "해너츠",
+                "category": "씨앗포켓몬",
+                "entry": "어느 날 아침 갑자기 떨어진다.\n여름이 추웠던 다음해에는\n수가 폭발적으로 늘어난다.",
+                "height": "0.3 m",
+                "weight": "1.8 kg"
+            },
+            "es": {
+                "name": "Sunkern",
+                "category": "Pokémon Semilla",
+                "entry": "Cae de repente del cielo por las\nmañanas. Los años de veranos\nsuaves, su número se multiplica.",
+                "height": "0,3 m",
+                "weight": "1,8 kg"
+            },
+            "ja": {
+                "name": "ヒマナッツ",
+                "category": "たねポケモン",
+                "entry": "あるあさ\\x{3000}とつぜん\\x{3000}ふってくる。\nなつが\\x{3000}さむかった\\x{3000}つぎの\\x{3000}としは\nかずが\\x{3000}ばくはつてきに\\x{3000}ふえる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 30,
+        "defense": 30,
+        "speed": 30,
+        "special_attack": 30,
+        "special_defense": 30
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 235,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_SOLAR_POWER" ],
+    "hidden_ability": "ABILITY_EARLY_BIRD",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 36,
+    "height": 3,
+    "weight": 18,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ABSORB" ],
+            [ 1, "MOVE_GROWTH" ],
+            [ 4, "MOVE_INGRAIN" ],
+            [ 7, "MOVE_GRASS_WHISTLE" ],
+            [ 10, "MOVE_MEGA_DRAIN" ],
+            [ 13, "MOVE_LEECH_SEED" ],
+            [ 16, "MOVE_RAZOR_LEAF" ],
+            [ 19, "MOVE_WORRY_SEED" ],
+            [ 22, "MOVE_GIGA_DRAIN" ],
+            [ 25, "MOVE_ENDEAVOR" ],
+            [ 28, "MOVE_SYNTHESIS" ],
+            [ 31, "MOVE_NATURAL_GIFT" ],
+            [ 34, "MOVE_SOLAR_BEAM" ],
+            [ 37, "MOVE_DOUBLE_EDGE" ],
+            [ 40, "MOVE_SUNNY_DAY" ],
+            [ 43, "MOVE_SEED_BOMB" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM70",
+            "TM75",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_UPROAR",
+            "MOVE_EARTH_POWER",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_AFTER_YOU",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_GRASS_WHISTLE",
+            "MOVE_ENCORE",
+            "MOVE_LEECH_SEED",
+            "MOVE_NATURE_POWER",
+            "MOVE_CURSE",
+            "MOVE_HELPING_HAND",
+            "MOVE_INGRAIN",
+            "MOVE_SWEET_SCENT",
+            "MOVE_ENDURE",
+            "MOVE_BIDE",
+            "MOVE_NATURAL_GIFT",
+            "MOVE_MORNING_SUN"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_SUN_STONE",
+            "species": "SPECIES_SUNFLORA"
+        }
+    ],
+    "regional_dex_number": 20,
+    "baby_species": "SPECIES_SUNKERN",
+    "cry_volume": 110
+}

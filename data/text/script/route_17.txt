@@ -1,1 +1,0 @@
-Route17_Text_Route17BewareRapidly = Route 17\nBeware of rapidly flowing water!

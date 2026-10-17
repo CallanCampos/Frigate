@@ -1,6 +1,6 @@
 """The messages that come from the game data in JSON rather than from the text files, as pokeplatinum's text banks come
-from res/: a line `\\from{species.name}` in a file of data/text/ stands for the names of all the species, one per line,
-from data/pokemon/. text_data.py expands these lines when it packs the text.
+from res/: a line `\\from{species.name}` in a file of res/text/ stands for the names of all the species, one per line,
+from res/pokemon/. text_data.py expands these lines when it packs the text.
 
 In the JSON, text is written as in the text files (see text_data.py), except that a line break is a real one ("\\n" in
 the JSON) rather than `\\n`: control codes stay `{TTTT:a,b}`, and other characters `\\x{HHHH}`.
@@ -57,44 +57,44 @@ def species() -> list[dict]:
     """The national Pokédex species' data.json files, in the order of species.txt: the species before SPECIES_EGG,
     which have text (not the forms, nor the egg and the species after it, whose names are lines of their own)."""
     national = load_list("species")["SPECIES_EGG"]
-    return [read(ROOT / "data/pokemon" / name.removeprefix("SPECIES_").lower() / "data.json")
+    return [read(ROOT / "res/pokemon" / name.removeprefix("SPECIES_").lower() / "data.json")
             for name in ordered("species")[:national]]
 
 
 @cache
 def moves() -> list[dict]:
-    return [read(ROOT / "data/moves" / name.removeprefix("MOVE_").lower() / "data.json") for name in ordered("moves")]
+    return [read(ROOT / "res/moves" / name.removeprefix("MOVE_").lower() / "data.json") for name in ordered("moves")]
 
 
 @cache
 def items() -> list[dict]:
-    return [read(ROOT / "data/items" / name.removeprefix("ITEM_").lower() / "data.json") for name in ordered("items")]
+    return [read(ROOT / "res/items" / name.removeprefix("ITEM_").lower() / "data.json") for name in ordered("items")]
 
 
 @cache
 def abilities() -> list[dict]:
-    return validated("abilities", "data/abilities", "ABILITY_", "ability.schema.json")
+    return validated("abilities", "res/abilities", "ABILITY_", "ability.schema.json")
 
 
 @cache
 def types() -> list[dict]:
     # TYPE_NULL, the type of a typeless move, has no name
-    return validated("types", "data/types", "TYPE_", "type.schema.json", skip={"TYPE_NULL"})
+    return validated("types", "res/types", "TYPE_", "type.schema.json", skip={"TYPE_NULL"})
 
 
 @cache
 def trainer_classes() -> list[dict]:
-    return validated("trainer_classes", "data/trainer_classes", "TRAINER_CLASS_", "trainer_class.schema.json")
+    return validated("trainer_classes", "res/trainer_classes", "TRAINER_CLASS_", "trainer_class.schema.json")
 
 
 @cache
 def places() -> list[dict]:
-    return validated("places", "data/places", "PLACE_", "place.schema.json")
+    return validated("places", "res/places", "PLACE_", "place.schema.json")
 
 
 @cache
 def natures() -> list[dict]:
-    return validated("natures", "data/natures", "NATURE_", "nature.schema.json")
+    return validated("natures", "res/natures", "NATURE_", "nature.schema.json")
 
 
 def validated(list_name: str, directory: str, prefix: str, schema_name: str, skip=frozenset()) -> list[dict]:
@@ -106,13 +106,13 @@ def validated(list_name: str, directory: str, prefix: str, schema_name: str, ski
 
 @cache
 def trades() -> list[dict]:
-    return [read(ROOT / "data/trades" / (name.removeprefix("TRADE_").lower() + ".json")) for name in ordered("trades")]
+    return [read(ROOT / "res/trades" / (name.removeprefix("TRADE_").lower() + ".json")) for name in ordered("trades")]
 
 
 @cache
 def trainers() -> dict[str, dict]:
     """The trainers' files by constant, in the order of trainers.txt, without TRAINER_NONE, which has none."""
-    return {name: read(ROOT / "data/trainers" / (name.removeprefix("TRAINER_").lower() + ".json"))
+    return {name: read(ROOT / "res/trainers" / (name.removeprefix("TRAINER_").lower() + ".json"))
             for name in ordered("trainers")[1:]}
 
 
@@ -149,11 +149,11 @@ def item_with_article(data: dict) -> str:
 
 def message_order() -> list[str]:
     """The trainers whose messages the trainer message table has, in its order: the ones of
-    data/trainers/message_order.json, then any other trainer with messages, in ID order."""
-    listed = json.loads((ROOT / "data/trainers/message_order.json").read_text())
+    res/trainers/message_order.json, then any other trainer with messages, in ID order."""
+    listed = json.loads((ROOT / "res/trainers/message_order.json").read_text())
     for name in listed:
         if not trainers().get(name, {}).get("messages"):
-            raise DataError(f"data/trainers/message_order.json: {name} is not a trainer with messages")
+            raise DataError(f"res/trainers/message_order.json: {name} is not a trainer with messages")
     rest = [name for name, data in trainers().items() if data.get("messages") and name not in listed]
     return listed + rest
 

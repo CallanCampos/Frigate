@@ -8,7 +8,7 @@ Usage: field_prop_model_data.py extract APICULA OUTPUT_DIR [BUNDLE [MODEL]]
 The bundle's resource information and animations stay in their original Nitro
 encoding. Each model's editable geometry and materials live in one GLB, next to
 its data.json (field_prop_model.schema.json). Bundles are directories named
-after their constants in data/constants/field_props_{exterior,interior}.txt.
+after their constants in generated/field_props_{exterior,interior}.txt.
 relink points every GLB's images at its bundle's texture directory again, after
 a bundle is renamed.
 """
@@ -135,7 +135,7 @@ def export_one(apicula, model_dir, texture_dir, entry, texture_blob):
 
 
 def image_uri(texture_dir, filename):
-    """Returns a GLB's path to one of its bundle's textures, from data/field_prop_models/<kind>/<bundle>/<model>/."""
+    """Returns a GLB's path to one of its bundle's textures, from res/field_prop_models/<kind>/<bundle>/<model>/."""
     return f"../../../../field_prop_textures/{texture_dir.parent.name}/{texture_dir.name}/{filename}"
 
 

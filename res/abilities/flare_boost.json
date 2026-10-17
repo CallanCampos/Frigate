@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Flare Boost",
+    "description": "Powers up special attacks\nwhen burned."
+}

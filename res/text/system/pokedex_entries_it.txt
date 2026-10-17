@@ -1,0 +1,2 @@
+\from{species.pokedex.it.entry}
+\pad{b0}

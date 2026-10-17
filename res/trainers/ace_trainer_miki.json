@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Miki",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCOLIPEDE",
+            "form": 0,
+            "level": 54,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ARCANINE",
+            "form": 0,
+            "level": 54,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Challenging the Pokémon League, huh?{be01}\nIt's no wonder you might feel a bit\nnervous, but you've just got to believe{be00}\nin your Pokémon and do it!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Am I really going to be all right with only\nthis trifling power...?"
+        },
+        {
+            "type": 2,
+            "text": "When you feel uneasy or afraid, just hug\nyour Pokémon real tight!{be01}\nIf you do that, you'll be fine.\nIt'll just melt away all of your worries!"
+        }
+    ]
+}

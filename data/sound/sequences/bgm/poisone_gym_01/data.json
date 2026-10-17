@@ -1,9 +1,0 @@
-{
-    "$schema": "../../../sequence.schema.json",
-    "file": "SEQ_BGM_POISONE_GYM_00",
-    "bank": "BANK_MUS_SW_GYM_P_01",
-    "volume": 104,
-    "channel_priority": 30,
-    "player_priority": 64,
-    "player": "PLAYER_BGM"
-}

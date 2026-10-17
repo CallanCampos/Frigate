@@ -1,0 +1,179 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Piloswine",
+    "pokedex": {
+        "category": "Swine Pokémon",
+        "entry": "With its excellent sense of smell,\nit's even able to find mushrooms that\nare buried under frozen ground.",
+        "height": "3'07\"",
+        "weight": "123.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Piloswine",
+                "category": "Swine Pokémon",
+                "entry": "Covered by a shaggy coat, it is\nstrong against the cold. Its tusks\nof ice thicken when it snows.",
+                "height": "3'07\"",
+                "weight": "123.0 lbs."
+            },
+            "fr": {
+                "name": "Cochignon",
+                "category": "Pokémon Porc",
+                "entry": "Il est protégé du froid mordant par\nson épais manteau de fourrure. Ses\ncornes sont formées de glace.",
+                "height": "1,1 m",
+                "weight": "55,8 kg"
+            },
+            "de": {
+                "name": "Keifel",
+                "category": "Schwein",
+                "entry": "Schützt sich mit seinem dicken Fell\nvor der Kälte. Seine Stoßzähne aus\nEis werden dicker, wenn es schneit.",
+                "height": "1,1 m",
+                "weight": "55,8 kg"
+            },
+            "it": {
+                "name": "Piloswine",
+                "category": "Pokémon Suino",
+                "entry": "Il suo fitto pelo lo protegge dal freddo.\nHa zanne di ghiaccio che si ispessiscono\nquando nevica.",
+                "height": "1,1 m",
+                "weight": "55,8 kg"
+            },
+            "ko": {
+                "name": "메꾸리",
+                "category": "멧돼지포켓몬",
+                "entry": "긴 털에 뒤덮여 있기에\n추위에도 강하며 얼음 이빨은\n눈이 내리면 더욱 두꺼워진다.",
+                "height": "1.1 m",
+                "weight": "55.8 kg"
+            },
+            "es": {
+                "name": "Piloswine",
+                "category": "Pokémon Puerco",
+                "entry": "Su tupido pelaje le protege del\nfrío. Sus colmillos de hielo se\nendurecen cuando nieva.",
+                "height": "1,1 m",
+                "weight": "55,8 kg"
+            },
+            "ja": {
+                "name": "イノムー",
+                "category": "いのししポケモン",
+                "entry": "ながい\\x{3000}たいもうに\\x{3000}おおわれていて\nさむさに\\x{3000}つよく\\x{3000}こおりの\\x{3000}キバは\nゆきがふると\\x{3000}さらに\\x{3000}ふとくなる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff11}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff15}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 100,
+        "attack": 100,
+        "defense": 80,
+        "speed": 50,
+        "special_attack": 60,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_ICE", "TYPE_GROUND" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_OBLIVIOUS", "ABILITY_SNOW_CLOAK" ],
+    "hidden_ability": "ABILITY_THICK_FAT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 158,
+    "height": 11,
+    "weight": 558,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ANCIENT_POWER" ],
+            [ 1, "MOVE_PECK" ],
+            [ 1, "MOVE_ODOR_SLEUTH" ],
+            [ 1, "MOVE_MUD_SPORT" ],
+            [ 1, "MOVE_POWDER_SNOW" ],
+            [ 5, "MOVE_MUD_SPORT" ],
+            [ 8, "MOVE_POWDER_SNOW" ],
+            [ 11, "MOVE_MUD_SLAP" ],
+            [ 14, "MOVE_ENDURE" ],
+            [ 18, "MOVE_MUD_BOMB" ],
+            [ 21, "MOVE_ICY_WIND" ],
+            [ 24, "MOVE_ICE_FANG" ],
+            [ 28, "MOVE_TAKE_DOWN" ],
+            [ 33, "MOVE_FURY_ATTACK" ],
+            [ 37, "MOVE_MIST" ],
+            [ 41, "MOVE_THRASH" ],
+            [ 46, "MOVE_EARTHQUAKE" ],
+            [ 52, "MOVE_BLIZZARD" ],
+            [ 58, "MOVE_AMNESIA" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM33",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM68",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_EARTH_POWER",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_KNOWS_MOVE",
+            "param": "MOVE_ANCIENT_POWER",
+            "species": "SPECIES_MAMOSWINE"
+        }
+    ],
+    "regional_dex_number": 259,
+    "baby_species": "SPECIES_SWINUB",
+    "cry_volume": 110
+}

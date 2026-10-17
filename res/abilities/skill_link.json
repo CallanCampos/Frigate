@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Skill Link",
+    "description": "Increases the frequency\nof multi-strike moves."
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "William",
+    "class": "TRAINER_CLASS_SCHOOL_KID_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 5,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SHROOMISH",
+            "form": 0,
+            "level": 63,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TANGROWTH",
+            "form": 0,
+            "level": 63,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Real battle is the best way to learn!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I'll learn from losing, as well!"
+        },
+        {
+            "type": 2,
+            "text": "If you're working toward a goal, then\nanything can be a chance to learn!{be01}\n...That's what Cheren said before he\nbecame the Gym Leader."
+        }
+    ]
+}

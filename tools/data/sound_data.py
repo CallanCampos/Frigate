@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""The sound archive (swan_sound_data.sdat) from data/sound/: dump writes the sources from the ROM once, and pack builds
+"""The sound archive (swan_sound_data.sdat) from res/sound/: dump writes the sources from the ROM once, and pack builds
 the archive from them, which the build does.
 
-    sound_data.py dump extract/b2_us/files data/sound
-    sound_data.py pack data/sound ARCHIVE
+    sound_data.py dump extract/b2_us/files res/sound
+    sound_data.py pack res/sound ARCHIVE
 
-The archive's entries are the constants of the sound lists in data/constants/, each list's in its order: sequences
+The archive's entries are the constants of the sound lists in generated/, each list's in its order: sequences
 (sound.txt, SEQ_*), banks (sound_banks.txt), wave archives (sound_wave_archives.txt), players, groups, stream players
 and streams. A sequence, bank, wave archive or stream is a directory named after its constant, in a directory of its
 kind and one of its category, the constant's word after its kind's prefix: SEQ_BGM_T_01 is sequences/bgm/t_01/,
 BANK_SE_SW_JUMP banks/se/sw_jump/, BANK_PV001 banks/pv/pv001/ and WAVE_ARC_PMWB_123
 wave_archives/arc/pmwb_123/. Each has data.json, its info
-record, which the schemas in data/sound/ describe, and its file: sequence.s, the sequence's commands as text
+record, which the schemas in res/sound/ describe, and its file: sequence.s, the sequence's commands as text
 (sseq.py), or stream.wav, the stream's audio (strm.py). A bank's data.json also has its instruments (sbnk.py), and
 a wave archive is its waves, 000.wav and on, with data.json giving the looped waves' loop starts (swar.py). A sequence that plays another's file
 says so with "file". The Pokémon cries' wave archives, the first
-of wave_archives.txt after its empty first slot, are each species' cry.wav in data/pokemon/ (pokemon_cries.py).
+of wave_archives.txt after its empty first slot, are each species' cry.wav in res/pokemon/ (pokemon_cries.py).
 players.json, groups.json, stream_players.json and streams' are the small kinds' records, by their constants.
 
 The archive has the files of the sequences, banks, wave archives and streams, each kind in its list's order, and the
@@ -39,7 +39,7 @@ from tools.data.pokemon_cries import cry_folder, read_wav, wav_bytes  # noqa: E4
 
 ROOT = Path(__file__).resolve().parents[2]
 ARCHIVE = "swan_sound_data.sdat"
-POKEMON = ROOT / "data/pokemon"
+POKEMON = ROOT / "res/pokemon"
 # Each kind's constant list, the prefixes of its constants, its directory and its file's name
 KIND_LISTS = {"sequences": "sound", "sequence_archives": None, "banks": "sound_banks",
               "wave_archives": "sound_wave_archives", "players": "sound_players", "groups": "sound_groups",

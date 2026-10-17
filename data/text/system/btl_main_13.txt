@@ -1,2 +1,0 @@
-\from{moves.description}
-\pad{d6}

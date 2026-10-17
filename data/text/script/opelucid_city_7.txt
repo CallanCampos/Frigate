@@ -1,3 +1,0 @@
-OpelucidCity7_Text_JustBetweenOkUsed = This is just between you and me, OK?\nI used to be part of Team Plasma.{be01}\nBut, I felt like if I were just going\nto do what I was told without thinking,{be00}\nit didn't have to be me doing it.{be01}\nSo I left Team Plasma.{be01}\nDon't tell this story to the guy on the\nopposite side.
-OpelucidCity7_Text_JustBetweenOkIm = This is just between you and me, OK?\nI'm really not very good as a Trainer.{be01}\nSo I think Team Plasma might have the\nright idea when they take Pokémon away{be00}\nfrom weak Trainers.{be01}\nI do feel sorry for the people who were\nrobbed, though.{be01}\nDon't tell this story to the guy on the\nopposite side.
-\pad{36}

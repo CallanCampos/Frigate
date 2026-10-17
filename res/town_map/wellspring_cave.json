@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_WELLSPRING_CAVE",
+    "type": 2,
+    "radius": 12,
+    "position": {
+        "x": 215,
+        "y": 110
+    },
+    "cursor": {
+        "x": 215,
+        "y": 110
+    },
+    "hit": {
+        "start": {
+            "x": 215,
+            "y": 106
+        },
+        "end": {
+            "x": 215,
+            "y": 114
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_UnderwaterPoolGrewFrom",
+    "landmarks": [],
+    "area": {
+        "animation": 1,
+        "x": 207,
+        "y": 101
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BRONZONG",
+    "moves": [ "MOVE_GYRO_BALL", "MOVE_HYPNOSIS", "MOVE_ZEN_HEADBUTT", "MOVE_TRICK_ROOM" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_SASSY",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

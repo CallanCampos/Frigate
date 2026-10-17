@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GARDEVOIR",
+    "moves": [ "MOVE_PSYCHIC", "MOVE_CHARGE_BEAM", "MOVE_ENERGY_BALL", "MOVE_FOCUS_BLAST" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_BRIGHT_POWDER",
+    "form": 0
+}

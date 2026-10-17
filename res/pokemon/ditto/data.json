@@ -1,0 +1,116 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Ditto",
+    "pokedex": {
+        "category": "Transform Pokémon",
+        "entry": "It can reconstitute its entire cellular\nstructure to change into what it sees,\nbut it returns to normal when it relaxes.",
+        "height": "1'00\"",
+        "weight": "8.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Ditto",
+                "category": "Transform Pokémon",
+                "entry": "It has the ability to reconstitute\nits entire cellular structure to\ntransform into whatever it sees.",
+                "height": "1'00\"",
+                "weight": "8.8 lbs."
+            },
+            "fr": {
+                "name": "Métamorph",
+                "category": "Pokémon Morphing",
+                "entry": "Il a la capacité de modifier sa\nstructure cellulaire pour prendre\nl'apparence de ce qu'il voit.",
+                "height": "0,3 m",
+                "weight": "4,0 kg"
+            },
+            "de": {
+                "name": "Ditto",
+                "category": "Transform",
+                "entry": "Es kann seine Zellstruktur so\nverändern, dass es sich in alles\nverwandeln kann, was es sieht.",
+                "height": "0,3 m",
+                "weight": "4,0 kg"
+            },
+            "it": {
+                "name": "Ditto",
+                "category": "Pokémon Mutante",
+                "entry": "Ha la capacità di modificare la sua\nstruttura cellulare per trasformarsi\nin qualsiasi cosa veda.",
+                "height": "0,3 m",
+                "weight": "4,0 kg"
+            },
+            "ko": {
+                "name": "메타몽",
+                "category": "변신포켓몬",
+                "entry": "전신의 세포를 재구성해서\n본 것의 모양과 똑 닮게\n변신하는 능력을 가지고 있다.",
+                "height": "0.3 m",
+                "weight": "4.0 kg"
+            },
+            "es": {
+                "name": "Ditto",
+                "category": "Pokémon Transform.",
+                "entry": "Puede alterar por completo su\nestructura celular para emular\ncualquier objeto que vea.",
+                "height": "0,3 m",
+                "weight": "4,0 kg"
+            },
+            "ja": {
+                "name": "メタモン",
+                "category": "へんしんポケモン",
+                "entry": "ぜんしんの\\x{3000}さいぼうを\\x{3000}くみかえて\nみたものの\\x{3000}かたち\\x{3000}そっくりに\nへんしんする\\x{3000}のうりょくを\\x{3000}もつ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 48,
+        "attack": 48,
+        "defense": 48,
+        "speed": 48,
+        "special_attack": 48,
+        "special_defense": 48
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 35,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_QUICK_POWDER",
+        "rare": "ITEM_METAL_POWDER",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_DITTO", "EGG_GROUP_DITTO" ],
+    "abilities": [ "ABILITY_LIMBER", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_IMPOSTER",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 101,
+    "height": 3,
+    "weight": 40,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TRANSFORM" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 261,
+    "baby_species": "SPECIES_DITTO",
+    "cry_volume": 105
+}

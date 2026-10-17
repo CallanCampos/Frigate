@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Damp",
+    "description": "Prevents the use of\nself-destructing moves."
+}

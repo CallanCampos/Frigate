@@ -1,5 +1,0 @@
-Route9_Text_Route9 = Route 9
-Route9_Text_ShoppingMallNineColorful = Shopping Mall Nine\nColorful and wonderful!
-Route9_Text_TrainerTipsOneKind = Trainer Tips!\n{be01}\nOne kind of Pokémon\ncan have different Abilities.{be01}\nTry to catch Pokémon you've\nalready caught before!
-Route9_Text_TubelineBridgeUnovasFamous = Tubeline Bridge\nUnova's famous railway bridge
-\pad{7e}

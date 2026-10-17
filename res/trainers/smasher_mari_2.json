@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Mari",
+    "class": "TRAINER_CLASS_SMASHER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_POTION",
+    "party": [
+        {
+            "species": "SPECIES_MARILL",
+            "form": 0,
+            "level": 26,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Be in awe of my leg strength, which\nI developed through relentless rallies!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I suppose leg strength doesn't matter\nmuch in a Pokémon battle..."
+        },
+        {
+            "type": 15,
+            "text": "Take this item as a gift!\nBe in awe of it!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Train alongside a speedy Pokémon, and\nleg strength will come to you naturally!"
+        }
+    ]
+}

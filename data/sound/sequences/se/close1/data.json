@@ -1,8 +1,0 @@
-{
-    "$schema": "../../../sequence.schema.json",
-    "bank": "BANK_SE_WB_CLOSE1",
-    "volume": 115,
-    "channel_priority": 114,
-    "player_priority": 64,
-    "player": "PLAYER_SE_SYS"
-}

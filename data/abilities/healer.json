@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Healer",
-    "description": "May heal an ally's status\nconditions."
-}

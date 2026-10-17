@@ -1,7 +1,0 @@
-# Sound groups, the sequences loaded together, with the names that the sound archive's symbols give them, in its order
-# (bootstrapped from the ROM). Each is a slot of swan_sound_data.sdat; data/sound/ has their sources (sound_data.py)
-GROUP_GLOBAL
-GROUP_LCG01
-GROUP_LCG02
-GROUP_KYUREM02_B
-GROUP_KYUREM02_W

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The areas in data/areas/<area>.json: dump writes them from the ROM once, and pack builds the file (a/0/1/3)
+"""The areas in res/areas/<area>.json: dump writes them from the ROM once, and pack builds the file (a/0/1/3)
 from them, which the build does.
 
-    area_data.py dump extract/b2_us/files data/areas
-    area_data.py pack data/areas FILE
+    area_data.py dump extract/b2_us/files res/areas
+    area_data.py pack res/areas FILE
 
 The file is an array of 10-byte records (AreaData), in order: a zone's header names its area by its number, and an area
-with seasons has a record per season after it. Each area is named after its constant in data/constants/areas.txt, in
+with seasons has a record per season after it. Each area is named after its constant in generated/areas.txt, in
 whose order the file has them. An area names its texture set by its MAP_TEXTURE_SET_* constant and its
 props by a FIELD_PROPS_EXTERIOR_* or FIELD_PROPS_INTERIOR_* one, as it is exterior or not, or by number where the archive
 has no such file. area.schema.json describes the fields.
@@ -71,10 +71,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/areas/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/areas/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the area file from data/areas/")
+    pack_parser = commands.add_parser("pack", help="build the area file from res/areas/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

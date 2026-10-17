@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ryan",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SMOOCHUM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KADABRA",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CLAYDOL",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Heavy labor is a breeze when you let a\nPsychic-type Pokémon take care of it!{be01}\nNow I can slack off and take it easy!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh, I see... If a Trainer starts slacking,\nit'll be his or her Pokémon that suffer."
+        },
+        {
+            "type": 2,
+            "text": "A real Worker works together with their\nPokémon!{be01}\nYou cannot just make Pokémon do all the\nwork while you slack off!"
+        }
+    ]
+}

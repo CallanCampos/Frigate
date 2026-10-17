@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 2,
+    "area": "AREA_NACRENE_CITY",
+    "matrix": "MAP_MATRIX_OVERWORLD",
+    "scripts": "SCRIPTS_NACRENE_CITY",
+    "text": "SCRIPT_TEXT_NACRENE_CITY",
+    "bgm": "SEQ_BGM_C_02",
+    "encounters": null,
+    "enc_slot": 0,
+    "parent": "ZONE_NACRENE_CITY",
+    "place": "PLACE_NACRENE_CITY",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 0,
+    "name_icon": 11,
+    "easy_level": 5,
+    "fly": {
+        "x": 637,
+        "y": 0,
+        "z": 599
+    }
+}

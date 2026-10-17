@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sand Veil",
+    "description": "Boosts the Pokémon's\nevasion in a sandstorm."
+}

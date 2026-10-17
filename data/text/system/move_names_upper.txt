@@ -1,2 +1,0 @@
-\from{moves.name_upper}
-\pad{12}

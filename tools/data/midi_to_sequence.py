@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Convert a standard MIDI file into a sound sequence's text, sequence.s, to add or replace a song or a sound.
 
-    midi_to_sequence.py SONG.mid data/sound/sequences/bgm/my_song/sequence.s
+    midi_to_sequence.py SONG.mid res/sound/sequences/bgm/my_song/sequence.s
 
 Each MIDI channel that plays notes becomes a track, the first of them track 0, which allocates and opens the others.
 Time is converted to the game's 48 ticks a quarter note. Notes are written as the game's sequences write them: the

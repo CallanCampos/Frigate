@@ -1,0 +1,172 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Whiscash",
+    "pokedex": {
+        "category": "Whiskers Pokémon",
+        "entry": "It is extremely protective of its\nterritory. If any foe approaches,\nit attacks using vicious tremors.",
+        "height": "2'11\"",
+        "weight": "52.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Whiscash",
+                "category": "Whiskers Pokémon",
+                "entry": "It is extremely protective of its\nterritory. If any foe approaches,\nit attacks using vicious tremors.",
+                "height": "2'11\"",
+                "weight": "52.0 lbs."
+            },
+            "fr": {
+                "name": "Barbicha",
+                "category": "Pokémon Barbillon",
+                "entry": "Il défend férocement son territoire\nen déclenchant des secousses\nterribles.",
+                "height": "0,9 m",
+                "weight": "23,6 kg"
+            },
+            "de": {
+                "name": "Welsar",
+                "category": "Barthaar",
+                "entry": "Es bewacht sein Territorium.\nNähert sich ein Gegner, greift es\nmit heftigen Erschütterungen an.",
+                "height": "0,9 m",
+                "weight": "23,6 kg"
+            },
+            "it": {
+                "name": "Whiscash",
+                "category": "Pokémon Baffetti",
+                "entry": "Ha un senso del territorio molto\nsviluppato. Se un nemico si avvicina,\nscatena forti terremoti.",
+                "height": "0,9 m",
+                "weight": "23,6 kg"
+            },
+            "ko": {
+                "name": "메깅",
+                "category": "수염물고기포켓몬",
+                "entry": "영역 의식이 매우 강하여\n외부의 적이 다가오면 격렬하게\n지면을 울리며 덤벼든다.",
+                "height": "0.9 m",
+                "weight": "23.6 kg"
+            },
+            "es": {
+                "name": "Whiscash",
+                "category": "Pokémon Bigotudo",
+                "entry": "Protege su territorio por encima\nde todo. Si se acerca un enemigo,\nataca con violentas sacudidas.",
+                "height": "0,9 m",
+                "weight": "23,6 kg"
+            },
+            "ja": {
+                "name": "ナマズン",
+                "category": "ひげうおポケモン",
+                "entry": "なわばりいしきが\\x{3000}とても\\x{3000}つよく\nがいてきが\\x{3000}ちかづくと\\x{3000}はげしく\nじめんを\\x{3000}ゆらして\\x{3000}おそいかかる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff13}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 110,
+        "attack": 78,
+        "defense": 73,
+        "speed": 60,
+        "special_attack": 76,
+        "special_defense": 71
+    },
+    "types": [ "TYPE_WATER", "TYPE_GROUND" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_2", "EGG_GROUP_WATER_2" ],
+    "abilities": [ "ABILITY_OBLIVIOUS", "ABILITY_ANTICIPATION" ],
+    "hidden_ability": "ABILITY_HYDRATION",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 164,
+    "height": 9,
+    "weight": 236,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ZEN_HEADBUTT" ],
+            [ 1, "MOVE_TICKLE" ],
+            [ 1, "MOVE_MUD_SLAP" ],
+            [ 1, "MOVE_MUD_SPORT" ],
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 6, "MOVE_MUD_SPORT" ],
+            [ 6, "MOVE_WATER_SPORT" ],
+            [ 10, "MOVE_WATER_GUN" ],
+            [ 14, "MOVE_MUD_BOMB" ],
+            [ 18, "MOVE_AMNESIA" ],
+            [ 22, "MOVE_WATER_PULSE" ],
+            [ 26, "MOVE_MAGNITUDE" ],
+            [ 33, "MOVE_REST" ],
+            [ 33, "MOVE_SNORE" ],
+            [ 39, "MOVE_AQUA_TAIL" ],
+            [ 45, "MOVE_EARTHQUAKE" ],
+            [ 51, "MOVE_FUTURE_SIGHT" ],
+            [ 57, "MOVE_FISSURE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM68",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_BOUNCE",
+            "MOVE_EARTH_POWER",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_BARBOACH",
+    "cry_volume": 120
+}

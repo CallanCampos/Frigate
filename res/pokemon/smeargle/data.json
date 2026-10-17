@@ -1,0 +1,125 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Smeargle",
+    "pokedex": {
+        "category": "Painter Pokémon",
+        "entry": "It marks its territory by using its\ntail like a paintbrush. There are\nmore than 5,000 different marks.",
+        "height": "3'11\"",
+        "weight": "127.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Smeargle",
+                "category": "Painter Pokémon",
+                "entry": "It marks its territory by using its\ntail like a paintbrush. There are\nmore than 5,000 different marks.",
+                "height": "3'11\"",
+                "weight": "127.9 lbs."
+            },
+            "fr": {
+                "name": "Queulorior",
+                "category": "Pokémon Peintre",
+                "entry": "Il marque son territoire en maniant\nsa queue comme un pinceau. On\ndénombre plus de 5 000 marques.",
+                "height": "1,2 m",
+                "weight": "58,0 kg"
+            },
+            "de": {
+                "name": "Farbeagle",
+                "category": "Maler",
+                "entry": "Sein Revier markiert es mit seinem\npinselartigen Schweif. Es kennt mehr\nals 5 000 Markierungen.",
+                "height": "1,2 m",
+                "weight": "58,0 kg"
+            },
+            "it": {
+                "name": "Smeargle",
+                "category": "Pokémon Pittore",
+                "entry": "Delimita il suo territorio usando la coda\ncome se fosse un pennello. Ha lasciato\noltre 5000 segni diversi.",
+                "height": "1,2 m",
+                "weight": "58,0 kg"
+            },
+            "ko": {
+                "name": "루브도",
+                "category": "그림장이포켓몬",
+                "entry": "꼬리를 붓처럼 써서\n영역에 마크를 그린다.\n그 종류는 5000개 이상이다.",
+                "height": "1.2 m",
+                "weight": "58.0 kg"
+            },
+            "es": {
+                "name": "Smeargle",
+                "category": "Pokémon Pintor",
+                "entry": "Marca su territorio usando su cola\na modo de pincel. Ha hecho más\nde 5000 marcas diferentes.",
+                "height": "1,2 m",
+                "weight": "58,0 kg"
+            },
+            "ja": {
+                "name": "ドーブル",
+                "category": "えかきポケモン",
+                "entry": "しっぽを\\x{3000}ふでのように\\x{3000}つかって\nなわばりに\\x{3000}マークを\\x{3000}えがく。\nその\\x{3000}しゅるいは\\x{3000}\\x{ff15}\\x{ff10}\\x{ff10}\\x{ff10}いじょう。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff18}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 20,
+        "defense": 35,
+        "speed": 75,
+        "special_attack": 20,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_OWN_TEMPO", "ABILITY_TECHNICIAN" ],
+    "hidden_ability": "ABILITY_MOODY",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 88,
+    "height": 12,
+    "weight": 580,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SKETCH" ],
+            [ 11, "MOVE_SKETCH" ],
+            [ 21, "MOVE_SKETCH" ],
+            [ 31, "MOVE_SKETCH" ],
+            [ 41, "MOVE_SKETCH" ],
+            [ 51, "MOVE_SKETCH" ],
+            [ 61, "MOVE_SKETCH" ],
+            [ 71, "MOVE_SKETCH" ],
+            [ 81, "MOVE_SKETCH" ],
+            [ 91, "MOVE_SKETCH" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SMEARGLE",
+    "cry_volume": 110
+}

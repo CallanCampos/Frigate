@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_KECLEON",
+    "moves": [ "MOVE_FAKE_OUT", "MOVE_SHADOW_CLAW", "MOVE_RECOVER", "MOVE_SKILL_SWAP" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_GANLON_BERRY",
+    "form": 0
+}

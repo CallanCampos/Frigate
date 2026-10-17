@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The town map's places in data/town_map/<zone>.json: dump writes them from the ROM once, and pack builds their
+"""The town map's places in res/town_map/<zone>.json: dump writes them from the ROM once, and pack builds their
 archive (a/0/8/5) for a version from them, which the build does.
 
-    town_map_data.py dump extract/b2_us/files extract/w2_us/files data/town_map
-    town_map_data.py pack data/town_map black2 ARCHIVE
+    town_map_data.py dump extract/b2_us/files extract/w2_us/files res/town_map
+    town_map_data.py pack res/town_map black2 ARCHIVE
 
 Each place is 27 u16s, which TownMapData_GetParam reads by TOWNMAP_PARAM_*. Its texts are messages of
-data/text/system/town_map.txt by ID; a place whose description differs between the versions gives one per version.
+res/text/system/town_map.txt by ID; a place whose description differs between the versions gives one per version.
 order.json preserves the table's order, and place.schema.json describes each place's fields.
 """
 import argparse
@@ -23,7 +23,7 @@ from tools.text.text_ids import message_numbers  # noqa: E402
 PLACE = struct.Struct("<27H")
 NONE = 0xFFFF
 VERSIONS = ["black2", "white2"]
-TEXT = Path(__file__).parents[2] / "data/text/system/town_map.txt"
+TEXT = Path(__file__).parents[2] / "res/text/system/town_map.txt"
 
 
 def point(x: int, y: int) -> dict:
@@ -130,7 +130,7 @@ def pack(root: Path, game: str, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/town_map/ from both versions' extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/town_map/ from both versions' extracted files")
     dump_parser.add_argument("black2", type=Path, help="Black 2's extracted files/ directory")
     dump_parser.add_argument("white2", type=Path, help="White 2's extracted files/ directory")
     dump_parser.add_argument("output", type=Path)

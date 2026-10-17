@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": "AREA_UNDELLA_BAY",
+    "matrix": "MAP_MATRIX_OVERWORLD_2",
+    "scripts": "SCRIPTS_UNDELLA_TOWN_GATE",
+    "text": "SCRIPT_TEXT_UNDELLA_TOWN_GATE",
+    "bgm": "SEQ_BGM_GATE",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_UNDELLA_TOWN_GATE",
+    "place": "PLACE_UNDELLA_TOWN_2",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 175,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 724,
+        "y": 0,
+        "z": 307
+    }
+}

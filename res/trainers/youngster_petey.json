@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Petey",
+    "class": "TRAINER_CLASS_YOUNGSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 0,
+            "level": 4,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Feel this boiling spirit!\nMy Patrat is gonna amaze you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh, this wilting spirit...\nIt wasn't supposed to end this way..."
+        },
+        {
+            "type": 2,
+            "text": "This indomitable spirit!\nI won't be brought down by losing!{be00}\nMoving forward is all that matters!"
+        }
+    ]
+}

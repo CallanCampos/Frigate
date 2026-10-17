@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""The battle facilities' trainers and Pokémon in data/facilities/<facility>/, as pokeplatinum's res/trainers/frontier/:
+"""The battle facilities' trainers and Pokémon in res/facilities/<facility>/, as pokeplatinum's res/trainers/frontier/:
 dump writes them from the ROM once, and pack builds a facility's archives from them, which the build does.
 
-    facility_data.py dump extract/b2_us/files data/facilities battle_subway
-    facility_data.py pack data/facilities/battle_subway TRAINERS POKEMON [SINGLE_SETS]
+    facility_data.py dump extract/b2_us/files res/facilities battle_subway
+    facility_data.py pack res/facilities/battle_subway TRAINERS POKEMON [SINGLE_SETS]
 
 A facility has a trainers archive, each file a trainer class and the Pokémon sets the trainer picks from, and a
 Pokémon archive, each file a set (BSubwayPokemonData in include/field/battle_facility.h); FACILITIES says which archives
@@ -14,7 +14,7 @@ and message files are a facility's. Its directory holds:
 - pokemon/<set>.json: a set, named after its species and numbered from 1;
 - order.json: the trainers and sets in archive order, which the files' names don't give.
 
-facility.schema.json and set.schema.json, in data/facilities/, describe the fields.
+facility.schema.json and set.schema.json, in res/facilities/, describe the fields.
 """
 import argparse
 import json
@@ -31,7 +31,7 @@ from tools.text.text_sources import to_json  # noqa: E402
 
 SET = struct.Struct("<5HBBHH")
 STATS = ["hp", "attack", "defense", "speed", "special_attack", "special_defense"]
-DATA_DIR = ROOT / "data/facilities"
+DATA_DIR = ROOT / "res/facilities"
 # Each facility: its trainers' and Pokémon archives, the system message files of its trainers' names and messages, how
 # many messages a trainer has (0 for none), and whether the names are stored compressed. The Battle Subway's are also
 # the Trial House's (func_ov012_02162864); the Black Tower's, White Treehollow in White 2, are the trainers' archive
@@ -202,7 +202,7 @@ def main():
     dump_parser.add_argument("output", type=Path)
     dump_parser.add_argument("facility", choices=FACILITIES)
     pack_parser = commands.add_parser("pack", help="build a facility's archives")
-    pack_parser.add_argument("root", type=Path, help="the facility's directory, such as data/facilities/battle_subway")
+    pack_parser.add_argument("root", type=Path, help="the facility's directory, such as res/facilities/battle_subway")
     pack_parser.add_argument("outputs", type=Path, nargs="+", metavar="ARCHIVE",
                              help="the trainers and Pokémon archives, and the single sets' for a facility that has "
                                   "them; only the sets' for a facility of sets only")

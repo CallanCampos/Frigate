@@ -1,0 +1,81 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cynthia",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_CYNTHIA",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SPIRITOMB",
+            "form": 0,
+            "level": 76,
+            "difficulty": 250,
+            "gender": 2,
+            "ability": 0,
+            "moves": [ "MOVE_SHADOW_BALL", "MOVE_DOUBLE_TEAM", "MOVE_DREAM_EATER", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_MILOTIC",
+            "form": 0,
+            "level": 76,
+            "difficulty": 250,
+            "gender": 2,
+            "ability": 0,
+            "moves": [ "MOVE_BLIZZARD", "MOVE_HYDRO_PUMP", "MOVE_ATTRACT", "MOVE_REST" ]
+        },
+        {
+            "species": "SPECIES_TOGEKISS",
+            "form": 0,
+            "level": 76,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_EXTREME_SPEED", "MOVE_AURA_SPHERE", "MOVE_AIR_SLASH", "MOVE_THUNDER_WAVE" ]
+        },
+        {
+            "species": "SPECIES_LUCARIO",
+            "form": 0,
+            "level": 76,
+            "difficulty": 250,
+            "gender": 1,
+            "ability": 2,
+            "moves": [ "MOVE_EXTREME_SPEED", "MOVE_CLOSE_COMBAT", "MOVE_FLASH_CANNON", "MOVE_PSYCHIC" ]
+        },
+        {
+            "species": "SPECIES_GLACEON",
+            "form": 0,
+            "level": 76,
+            "difficulty": 250,
+            "gender": 2,
+            "ability": 0,
+            "moves": [ "MOVE_ICE_BEAM", "MOVE_SHADOW_BALL", "MOVE_SIGNAL_BEAM", "MOVE_BARRIER" ]
+        },
+        {
+            "species": "SPECIES_GARCHOMP",
+            "form": 0,
+            "level": 78,
+            "difficulty": 250,
+            "gender": 2,
+            "ability": 0,
+            "moves": [ "MOVE_DRAGON_RUSH", "MOVE_EARTHQUAKE", "MOVE_STONE_EDGE", "MOVE_FIRE_BLAST" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 19,
+            "text": "When was the last time\nI was driven into a corner like this?"
+        },
+        {
+            "type": 20,
+            "text": "You haven't won yet! I won't let\nsuch a fun battle end so easily!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My heart is pounding so hard because I had\nsuch a heated battle with you.{be01}\nYou are a really great Trainer!!"
+        }
+    ]
+}

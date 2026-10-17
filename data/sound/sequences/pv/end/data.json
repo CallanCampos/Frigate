@@ -1,9 +1,0 @@
-{
-    "$schema": "../../../sequence.schema.json",
-    "file": "SEQ_PV001",
-    "bank": "BANK_PV002",
-    "volume": 0,
-    "channel_priority": 0,
-    "player_priority": 0,
-    "player": "PLAYER_BGM"
-}

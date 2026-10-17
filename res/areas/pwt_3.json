@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_PWT_3",
+    "texture_set": "MAP_TEXTURE_SET_PWT_3",
+    "srt_animation": 28,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 132,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Roar",
+    "description": "The target is scared off and switched.\nIn the wild, a battle against a single\nPokémon ends.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_FORCE_SWITCH",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": -6,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_FORCE_SWITCH",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [
+        "MOVE_FLAG_PROTECT",
+        "MOVE_FLAG_REFLECTABLE",
+        "MOVE_FLAG_MIRROR_MOVE",
+        "MOVE_FLAG_SOUND",
+        "MOVE_FLAG_BYPASS_SUBSTITUTE"
+    ]
+}

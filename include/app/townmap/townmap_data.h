@@ -4,7 +4,7 @@
 #include "types.h"
 #include "gfl/heap.h"
 
-// townmap_data.c: the town map's table of places, archive 85 (data/town_map/<zone>.json), which townmap.c reads and
+// townmap_data.c: the town map's table of places, archive 85 (res/town_map/<zone>.json), which townmap.c reads and
 // overlays 298 (the Pokédex's habitat map), 303 and 308 (a beacon's details) load too. The ROM doesn't name the file;
 // the name is a guess. The function names are ours
 

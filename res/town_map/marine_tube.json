@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_MARINE_TUBE",
+    "type": 1,
+    "radius": 12,
+    "position": {
+        "x": 251,
+        "y": 53
+    },
+    "cursor": {
+        "x": 251,
+        "y": 53
+    },
+    "hit": {
+        "start": {
+            "x": 251,
+            "y": 49
+        },
+        "end": {
+            "x": 251,
+            "y": 57
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_UnderseaTunnelBuiltUsing",
+    "landmarks": [],
+    "area": {
+        "animation": 10,
+        "x": 244,
+        "y": 45
+    }
+}

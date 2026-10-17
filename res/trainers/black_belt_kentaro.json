@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kentaro",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TYROGUE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAKUHITA",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SCRAFTY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I trained and trained like a madman,\nand my Pokémon trained even more!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Yeah! Yeah!\nEven though I lost, I'm energetic!"
+        },
+        {
+            "type": 2,
+            "text": "My Fighting-type Pokémon!\nI train it to smash the challenge rock!"
+        }
+    ]
+}

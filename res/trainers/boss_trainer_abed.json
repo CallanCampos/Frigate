@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Abed",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_ABED",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 53,
+            "difficulty": 32,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SCOPE_LENS",
+            "moves": [ "MOVE_AIR_CUTTER", "MOVE_STEEL_WING", "MOVE_QUICK_ATTACK", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 53,
+            "difficulty": 32,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_QUICK_CLAW",
+            "moves": [ "MOVE_ROCK_BLAST", "MOVE_STEALTH_ROCK", "MOVE_IRON_DEFENSE", "MOVE_PROTECT" ]
+        },
+        {
+            "species": "SPECIES_PAWNIARD",
+            "form": 0,
+            "level": 53,
+            "difficulty": 32,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_MUSCLE_BAND",
+            "moves": [ "MOVE_METAL_CLAW", "MOVE_NIGHT_SLASH", "MOVE_PSYCHO_CUT", "MOVE_ROCK_POLISH" ]
+        }
+    ],
+    "messages": []
+}

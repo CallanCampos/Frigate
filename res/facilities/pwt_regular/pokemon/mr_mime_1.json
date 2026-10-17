@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MR_MIME",
+    "moves": [ "MOVE_COPYCAT", "MOVE_BARRIER", "MOVE_CONFUSION", "MOVE_GRASS_KNOT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_NONE",
+    "form": 0
+}

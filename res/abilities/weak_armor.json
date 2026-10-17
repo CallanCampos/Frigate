@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Weak Armor",
+    "description": "Physical attacks lower\nDefense and raise Speed."
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MUK",
+    "moves": [ "MOVE_SHADOW_SNEAK", "MOVE_POISON_JAB", "MOVE_ACID_ARMOR", "MOVE_FLAMETHROWER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_TOXIC_PLATE",
+    "form": 0
+}

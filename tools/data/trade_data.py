@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The in-game trades in data/trades/, one JSON file per trade: dump writes them from the ROM once, and pack builds the
+"""The in-game trades in res/trades/, one JSON file per trade: dump writes them from the ROM once, and pack builds the
 archive (a/1/6/3) from them, which the build does.
 
-    trade_data.py dump extract/b2_us/files data/trades
-    trade_data.py pack data/trades ARCHIVE
+    trade_data.py dump extract/b2_us/files res/trades
+    trade_data.py pack res/trades ARCHIVE
 
-Each trade is data/trades/<trade>.json, named after its constant (petilil.json for TRADE_PETILIL), and the archive has
-them in the order of data/constants/trades.txt. A trade's file also has the Pokémon's nickname and its trainer's name,
+Each trade is res/trades/<trade>.json, named after its constant (petilil.json for TRADE_PETILIL), and the archive has
+them in the order of generated/trades.txt. A trade's file also has the Pokémon's nickname and its trainer's name,
 which the text file of the trades' names (system message file 37) takes with \\from{trades.names}, two lines per
 trade, in the order the packer gives their message IDs. trade.schema.json describes each field.
 """
@@ -104,10 +104,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/trades/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/trades/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the trade archive from data/trades/")
+    pack_parser = commands.add_parser("pack", help="build the trade archive from res/trades/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

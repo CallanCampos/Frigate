@@ -1,0 +1,109 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_COTTONEE", 47, 47 ],
+                [ "SPECIES_COTTONEE", 47, 47 ],
+                [ "SPECIES_COTTONEE", 48, 48 ],
+                [ "SPECIES_ROSELIA", 48, 48 ],
+                [ "SPECIES_COTTONEE", 49, 49 ],
+                [ "SPECIES_ROSELIA", 49, 49 ],
+                [ "SPECIES_COTTONEE", 50, 50 ],
+                [ "SPECIES_ROSELIA", 50, 50 ],
+                [ "SPECIES_COTTONEE", 50, 50 ],
+                [ "SPECIES_ROSELIA", 50, 50 ],
+                [ "SPECIES_COTTONEE", 50, 50 ],
+                [ "SPECIES_ROSELIA", 50, 50 ]
+            ],
+            "white2": [
+                [ "SPECIES_PETILIL", 47, 47 ],
+                [ "SPECIES_PETILIL", 47, 47 ],
+                [ "SPECIES_PETILIL", 48, 48 ],
+                [ "SPECIES_ROSELIA", 48, 48 ],
+                [ "SPECIES_PETILIL", 49, 49 ],
+                [ "SPECIES_ROSELIA", 49, 49 ],
+                [ "SPECIES_PETILIL", 50, 50 ],
+                [ "SPECIES_ROSELIA", 50, 50 ],
+                [ "SPECIES_PETILIL", 50, 50 ],
+                [ "SPECIES_ROSELIA", 50, 50 ],
+                [ "SPECIES_PETILIL", 50, 50 ],
+                [ "SPECIES_ROSELIA", 50, 50 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_COTTONEE", 52, 52 ],
+                [ "SPECIES_COTTONEE", 52, 52 ],
+                [ "SPECIES_COTTONEE", 53, 53 ],
+                [ "SPECIES_ROSELIA", 53, 53 ],
+                [ "SPECIES_COTTONEE", 54, 54 ],
+                [ "SPECIES_ROSELIA", 54, 54 ],
+                [ "SPECIES_COTTONEE", 55, 55 ],
+                [ "SPECIES_ROSELIA", 55, 55 ],
+                [ "SPECIES_COTTONEE", 55, 55 ],
+                [ "SPECIES_ROSELIA", 55, 55 ],
+                [ "SPECIES_COTTONEE", 55, 55 ],
+                [ "SPECIES_ROSELIA", 55, 55 ]
+            ],
+            "white2": [
+                [ "SPECIES_PETILIL", 52, 52 ],
+                [ "SPECIES_PETILIL", 52, 52 ],
+                [ "SPECIES_PETILIL", 53, 53 ],
+                [ "SPECIES_ROSELIA", 53, 53 ],
+                [ "SPECIES_PETILIL", 54, 54 ],
+                [ "SPECIES_ROSELIA", 54, 54 ],
+                [ "SPECIES_PETILIL", 55, 55 ],
+                [ "SPECIES_ROSELIA", 55, 55 ],
+                [ "SPECIES_PETILIL", 55, 55 ],
+                [ "SPECIES_ROSELIA", 55, 55 ],
+                [ "SPECIES_PETILIL", 55, 55 ],
+                [ "SPECIES_ROSELIA", 55, 55 ]
+            ]
+        },
+        "shaking_grass": {
+            "black2": [
+                [ "SPECIES_AUDINO", 47, 47 ],
+                [ "SPECIES_AUDINO", 47, 47 ],
+                [ "SPECIES_AUDINO", 48, 48 ],
+                [ "SPECIES_AUDINO", 48, 48 ],
+                [ "SPECIES_DUNSPARCE", 49, 49 ],
+                [ "SPECIES_AUDINO", 49, 49 ],
+                [ "SPECIES_AUDINO", 50, 50 ],
+                [ "SPECIES_AUDINO", 50, 50 ],
+                [ "SPECIES_WHIMSICOTT", 50, 50 ],
+                [ "SPECIES_ROSERADE", 50, 50 ],
+                [ "SPECIES_WHIMSICOTT", 50, 50 ],
+                [ "SPECIES_ROSERADE", 50, 50 ]
+            ],
+            "white2": [
+                [ "SPECIES_AUDINO", 47, 47 ],
+                [ "SPECIES_AUDINO", 47, 47 ],
+                [ "SPECIES_AUDINO", 48, 48 ],
+                [ "SPECIES_AUDINO", 48, 48 ],
+                [ "SPECIES_DUNSPARCE", 49, 49 ],
+                [ "SPECIES_AUDINO", 49, 49 ],
+                [ "SPECIES_AUDINO", 50, 50 ],
+                [ "SPECIES_AUDINO", 50, 50 ],
+                [ "SPECIES_LILLIGANT", 50, 50 ],
+                [ "SPECIES_ROSERADE", 50, 50 ],
+                [ "SPECIES_LILLIGANT", 50, 50 ],
+                [ "SPECIES_ROSERADE", 50, 50 ]
+            ]
+        },
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

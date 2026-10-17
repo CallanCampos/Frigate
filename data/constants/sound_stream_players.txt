@@ -1,3 +1,0 @@
-# Sound stream players, which play streams, with the names that the sound archive's symbols give them, in its order
-# (bootstrapped from the ROM). Each is a slot of swan_sound_data.sdat; data/sound/ has their sources (sound_data.py)
-PLAYER_STRM

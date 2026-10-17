@@ -4,9 +4,9 @@ once:
 
     list_text_data.py extract/b2_us/files data
 
-data/abilities/<ability>.json has an ability's name and description, data/types/<type>.json a type's name,
-data/trainer_classes/<class>.json a trainer class's name and name with its article, data/natures/<nature>.json a
-nature's name, and data/places/<place>.json a place's name, named after their constants. They have no archive of their own: the text files take them with
+res/abilities/<ability>.json has an ability's name and description, res/types/<type>.json a type's name,
+res/trainer_classes/<class>.json a trainer class's name and name with its article, res/natures/<nature>.json a
+nature's name, and res/places/<place>.json a place's name, named after their constants. They have no archive of their own: the text files take them with
 \\from{abilities.name} and the like (see text_sources.py), which validates them against their schemas.
 """
 import argparse

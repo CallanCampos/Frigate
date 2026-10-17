@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Elaine",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_LUM_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_ACCELGOR",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KECLEON",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SWALOT",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Pokémon Trainers nurture friendship\nwith their battles!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This feeling of defeat...\nis like a bottomless swamp..."
+        },
+        {
+            "type": 15,
+            "text": "Lum Berries make a great token\nof friendship!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Stay still and listen carefully!\nHear the sounds of nearby Pokémon...{be00}\nthe breath of trees and swamps."
+        }
+    ]
+}

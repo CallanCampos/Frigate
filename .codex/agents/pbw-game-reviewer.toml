@@ -35,7 +35,7 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
 - **Game Freak's code**: GFL's APIs (`include/gfl/`), heap IDs, the proc/task systems, `GFL_ASSERT` (it turns its
   expression into a string in the ROM: its spacing is data), the message banks (`TEXT_BANK_*`, message IDs from
   `text/system/<bank>.h`, never line numbers), archive IDs and `narc_<archive>.txt` constants.
-- **Constants**: items, moves, species, zones, flags, variables, trainers and sounds are lists in `data/constants/`
+- **Constants**: items, moves, species, zones, flags, variables, trainers and sounds are lists in `generated/`
   turned into headers by the build; a number where a constant exists is a finding.
 - **Files**: one source file per original file, named from the ROM's string or descriptively (the guess said in the
   header), functions in address order; a file's own data defined in it from the ROM's bytes, never `extern`.

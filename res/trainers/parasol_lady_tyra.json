@@ -1,0 +1,58 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tyra",
+    "class": "TRAINER_CLASS_PARASOL_LADY",
+    "battle_style": "BTL_STYLE_TRIPLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_RAIN_DANCE", "MOVE_WEATHER_BALL", "MOVE_THUNDER", "MOVE_ICE_BEAM" ]
+        },
+        {
+            "species": "SPECIES_JOLTEON",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_THUNDER", "MOVE_SHADOW_BALL", "MOVE_PIN_MISSILE", "MOVE_DOUBLE_KICK" ]
+        },
+        {
+            "species": "SPECIES_LUDICOLO",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_HYDRO_PUMP", "MOVE_MEGA_DRAIN", "MOVE_UPROAR", "MOVE_ZEN_HEADBUTT" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "Triple Battles use three Pokémon!"
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "If you turn a parasol around,\nit's like a flower blossoming in the rain!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Whee! I'll spin around my parasol and send\nsome water droplets flying your way!"
+        },
+        {
+            "type": 2,
+            "text": "On rainy days, use a parasol,\nwear a coat, or get wet.{be00}\nDo as you like!"
+        }
+    ]
+}

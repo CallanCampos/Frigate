@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Plus",
-    "description": "Ups Sp. Atk if another\nPokémon has Plus or Minus."
-}
