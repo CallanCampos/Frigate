@@ -343,8 +343,9 @@ stream players and streams of `sound_players.txt`, `sound_groups.txt`, `sound_st
 `sound_streams.txt`, whose names are the archive's own symbols. A sequence, bank, wave archive or stream is a
 directory named after its constant, in its kind's directory and its category's, the word after the kind's prefix:
 `SEQ_BGM_T_01` is `data/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `data/sound/banks/se/sw_jump/`, and
-`BANK_PV001` `data/sound/banks/pv/pv001/`. Each has its file, `sequence.sseq`, `bank.sbnk`, `wave_archive.swar` or
-`stream.strm`, Nitro's own formats for now, and a sequence, bank and stream has `data.json`, its record of the archive,
+`BANK_PV001` `data/sound/banks/pv/pv001/`. Each has its file, `sequence.s` (see [Sequences](#sequences)), or
+`bank.sbnk`, `wave_archive.swar` or `stream.strm`, Nitro's own formats for now, and a sequence, bank and stream has
+`data.json`, its record of the archive,
 which the schemas in `data/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
 archives, a stream's volume, priority and player. Some entries share a file: 86 sequences play another's, such as the
 placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
@@ -358,6 +359,40 @@ start from; `rename_constant.py` moves the directory when a constant is renamed.
 the game's, the files of the sequences, banks, wave archives and streams, each kind in its list's order, so the
 sources pack it byte for byte. `.venv/bin/python tools/data/sound_data.py dump extract/b2_us/files data/sound`
 writes them again.
+
+### Sequences
+
+A sequence's `sequence.s` is its commands as text, one a line, in the order of the sequence's data, with labels where
+its tracks start and where jumps and calls go; `tools/data/sseq.py` assembles it into the game's sequence byte for
+byte. Track 0 starts the sequence, allocates the tracks with `alloc_tracks` and starts the others with `open_track`:
+
+```
+track_00:
+    alloc_tracks 0x0c5f
+    open_track 1, track_01
+    ...
+    tempo 87
+    program 47
+    volume 104
+    rest 576
+label_0045:
+    note A5, 120, 113
+    rest 6
+    pitch_bend -5
+    ...
+    jump label_0045
+```
+
+`note KEY, VELOCITY, LENGTH` plays a key, named `C`, `Cs`, `D`, ... `B` and an octave, middle C (60) being `C4` and a
+negative octave `m1`, for a length in ticks, and `rest TICKS` waits. `program` picks an instrument of the sequence's
+bank; `tempo`, `volume`, `expression`, `pan`, `transpose`, `pitch_bend`, `bend_range`, `priority`, `note_wait`, `tie`,
+`portamento`, `portamento_key`, `portamento_time`, `mod_depth`, `mod_speed`, `mod_type`, `mod_range`, `mod_delay`,
+`sweep_pitch`, `attack`, `decay`, `sustain`, `release` and `master_volume` set what their names say; `jump`, `call`,
+`return`, `loop_start`, `loop_end` and `end` steer the track. The variable commands are `set_var`, `add_var`,
+`sub_var`, `mul_var`, `div_var`, `shift_var`, `random_var` and the comparisons `cmp_eq`, `cmp_ge`, `cmp_gt`, `cmp_le`,
+`cmp_lt` and `cmp_ne`; a command after `if` only runs when the last comparison held, after `random` its last argument
+is a random number between the two given, and after `from_var` it is the variable given. `.byte` keeps data that no
+track reaches. `sseq.py`'s commands table has every command with its byte and arguments.
 
 ## Moves
 
