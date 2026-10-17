@@ -545,6 +545,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
   code was written there. (matching.md: "Identical statements in different branches")
 - A branch to the next instruction comes from cross-jumping a shared tail. (matching.md: "cross-jumping")
+- One `bl` shared by an inner arm (which ends in `b` to it) and the outer `else`, where the original has two: the
+  calls were cross-jumped at the `bl` alone; the original's outer then-arm ended in a block of its own.
+  (matching.md: "at different depths")
 - A field loaded again right after a join (`ldr r0, [r7]`) where ours reuses the stored register, with a `b` to a
   `b`: the store was written at the end of both arms. (matching.md: "loaded again right after it")
 - A load at the top of both arms of an `if`/`else`, where ours hoists it between the test and the branch: one
@@ -629,6 +632,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A returning branch inside a loop that computes an address again in its own registers, where the original reloads
   the parts the loop hoisted: read the address into a local once in the branch and use it at both uses.
   (matching.md: "returning branch inside a loop")
+- A loop entered with a `b` to its test at the bottom, where ours is rotated: a 0/1 test, `i < N ? TRUE : FALSE`, a
+  `TRUE`/`FALSE` inline or `&& !found`. In ARM the bottom test is still a plain `cmp; blt`.
+  (matching.md: "has a test whose value is 0/1"), (matching.md: "What keeps the `b`")
+- The same in an outer loop around an inner one: begin its body with the inner loop,
+  `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
+- `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
+  argument after the loop. (matching.md: "A search loop whose normal exit")
 
 ## Switches
 

@@ -851,9 +851,8 @@ static void FlushAllQueues(void) {
     int slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
-        VCTPacket *packet = sQueueHeads[slot];
-
-        while (packet != NULL) {
+        while (sQueueHeads[slot] != NULL) {
+            VCTPacket *packet = sQueueHeads[slot];
             VCTPacket *next = packet->next;
 
             sQueueHeads[slot] = next;
@@ -861,7 +860,6 @@ static void FlushAllQueues(void) {
                 next->prev = NULL;
             }
             VCT_FreePacket(packet);
-            packet = sQueueHeads[slot];
         }
         sQueueTails[slot] = NULL;
         sQueueCounts[slot] = 0;
