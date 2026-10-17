@@ -180,6 +180,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A stack frame for a wide parameter where the original keeps it in registers and computes an expression again after
+  a call (`sub r1, r8, #0xc`): write the expression at each use, not in a local. (matching.md: "written at each use
+  around a call")
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
@@ -266,8 +269,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
 - A static's member loaded above a store through an unknown index into another static, or below it: ARM code
-  moves the load up only when its offset is below half the object's size. (matching.md: "below half the
-  object's size")
+  moves the load up only when its offset is below half the object's size, and below the size less the offset of a
+  higher member read earlier; a store moves above an access through a pointer by the same bound. (matching.md: "below
+  half the object's size")
 - A table's row offset added to its address before the column (`add r0, table, row*3; ldrb [col, r0]`), where ours
   adds it to the column: a two-dimensional table indexed `[row][col]`. (matching.md: "A two-dimensional table
   indexed")
@@ -531,6 +535,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (`int change = d - last;`). (matching.md: "A difference taken back from its own first operand")
 - `subs` where ours has `sub` for a 32-bit difference of `u64` values: subtract the `u64`s and narrow the result.
   (matching.md: "A 64-bit difference narrowed")
+- `cmp hi; cmpeq lo` with `bls` on sign-extended `int`s where ours compares signed (`subs; sbcs`): an `int` compared
+  with a sum holding a `u64` constant such as `OS_MilliSecondsToTicks(100)`. (matching.md: "An unsigned 64-bit
+  compare")
+- A constant loaded again and multiplied a second time where ours reuses the product: the two uses differ in
+  signedness (`u32 q` and `(int)q * C`). (matching.md: "does not merge a signed and an unsigned multiply")
+- An array's end as one folded constant (`add #0x5c; add #0x400`) where ours adds the member offset and the size
+  apart: `&p->arr[N]`, not `(u8 *)p->arr + sizeof(p->arr)`. (matching.md: "The end of an array member")
 - `add rN, sp, #0; add rN, rN, #4` for a stack struct's field: pass the struct as words to an inline that indexes them.
   (matching.md: "passed as a packet of words")
 - `mov r0, #imm; cmp rX, r0` where the immediate fits: the limit is a variable set to the constant. (matching.md: "is a

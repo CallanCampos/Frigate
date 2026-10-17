@@ -260,6 +260,11 @@ Same instructions, registers swapped.
   The base register tells the two apart: `&call->rows[i]` is `call + 0x40 + i * 0x1c`, used with the field's own
   offset (`[r5, #0x14]`), while `call->rows[i].window` written out is `call + i * 0x1c` with the array's offset
   folded in (`[r5, #0x54]`), as in `ctvt_call.c`'s `CtvtCall_Leave` and `CtvtCall_Main`.
+- An expression of a parameter written at each use around a call is computed again after it (`sub r0, r5, #0xc`
+  after the `bl`), with the parameter kept in a saved register; held in a local, the local takes that register and
+  nothing is computed again, but the local can cost a register elsewhere. libVCT's `VCT_HandleVoicePacket`
+  (`vct_audio.c`) writes `size - 0xc` at its three uses around `MI_CpuCopy8`; with an `int dataSize` local in their
+  place, its `u64 now` parameter goes to an 8-byte stack frame and the function is 48 bytes larger.
 - An element address computed before an inline helper's argument calls, and kept in a register while the loop counter
   spills, is the address passed to the helper: `CtvtCall_CreateActor(sys, &call->rows[i].frame, ...)` stores through
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
@@ -1140,9 +1145,14 @@ Same instructions, scheduled in another order.
 - In ARM code a load of a static's member at a constant offset moves above a store through an unknown index into
   another static only when the offset is below half the object's size: with `int f[16]`, `sSlots[slot] = 0;
   sObj.f[7]--;` loads `f[7]` first and `sObj.f[8]--;` loads after the store. The stored array's size, the order of
-  the declarations, linkage, field types, nesting and `#pragma scheduling off` don't change it. libVCT's
+  the declarations, linkage, field types, nesting and `#pragma scheduling off` don't change it. A read of the same
+  object earlier in the function at a higher offset lowers the bound: the access at offset a moves only while a plus
+  the larger of a and that read's offset is below the size, so after `int x = sObj.f[12];` only `f[0]` to `f[3]`
+  move. A store moves above an access through a pointer into another static by the same bound. libVCT's
   `VCT_DetachSession` (`vct_audio.c`) loads `sAudio.sessionCount`, at 0x20 of the 0x2c-byte `sAudio`, above its
-  `sSlotSessions[slot] = NULL`, which no spelling of the two statements reproduces.
+  `sSlotSessions[slot] = NULL`, which no spelling of the two statements reproduces. Its `EncodeNextFrame`, which
+  reads `sAudio.codec` (0x1c) first, moves the store `sAudio.needsSync = FALSE` (8) above the `packet->codec` store
+  into `sSendQueue`, and fields at 4 and 0xc in its place move too, while those at 0x14 and 0x18 stay.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1408,6 +1418,10 @@ Same instructions, scheduled in another order.
 - A 64-bit difference narrowed to 32 bits is a `subs` of the low words, its high word's `sbc` dropped as dead: `u32
   delay = now - packet->arrival;` with `u64` operands, as libVCT's `ReceiveSlot` (`vct_audio.c`) has it, where
   `(u32)now - (u32)packet->arrival` is a `sub`.
+- An unsigned 64-bit compare of sign-extended `int`s (`asr #31` and `adc rX, rZero, rY, asr #31` to widen, then
+  `cmp hi; cmpeq lo` with `bls` or `movhi`), where `(s64)` casts give `subs; sbcs` and a signed condition, is an `int`
+  compared with a sum that holds a `u64` constant, such as NitroSDK's `OS_MilliSecondsToTicks`: libVCT's
+  `UpdateTiming` (`vct_audio.c`) tests `change > (receiver->jitterAverage + 0x8b18) * 2 + OS_MilliSecondsToTicks(100)`.
 - A field's address in a stack struct formed in two steps, `add r1, sp, #0` and then `add r1, r1, #4` (with `ldr r0,
   [sp, #0]` between), where ours folds it into `add r1, sp, #4`, is the struct passed as a packet of words to an inline
   that indexes it. G3D's `NNSi_G3dSendTexSRTMaya`, `NNSi_G3dSendTexSRTSi3d`, `NNSi_G3dSendTexSRT3dsMax` and
@@ -1415,6 +1429,11 @@ Same instructions, scheduled in another order.
   NNS_G3dGeBufferOP_N(packet[0], &packet[1], num - 1); }` called as `sendPacket_((const u32 *)&cmd, sizeof(cmd) /
   sizeof(u32))`, the shape of `gecom.c`'s `NNS_G3dGeSendDL` (`dl[0], dl + 1`). A field's address (`&cmd.modeTexture`,
   `&cmd.op + 1`, a union's `&cmd.words[1]`) or the cast pointer in a local all fold into one `add`.
+- The end of an array member written as an element's address, `&p->samples[N]` or `p->samples + N`, folds the
+  member's offset and the array's size into one constant, which the immediate encoder splits (`add #0x5c; add
+  #0x400` for 0x45c), where `(u8 *)p->samples + sizeof(p->samples)` adds the offset and then the size (`add #0x1c;
+  add #0x440`). libVCT's `VCT_HandleVoicePacket` (`vct_audio.c`) puts a packet's payload at the end of its buffer
+  with `(u8 *)&queued->samples[VCT_FRAME_SAMPLES] - (size - 0xc)`.
 - A `mov r0, #imm; cmp rX, r0` where the immediate would fit the `cmp` is a limit held in a variable, which MWCC
   propagates too late to fold: MSL's `__strtold` compares the hexadecimal digits against `max_digits`, set to
   `MAX_HEX_DIG` where a hexadecimal number starts. A macro, an enum, a `const`, a `static const` or `sizeof` all give
@@ -1907,6 +1926,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the cast `(i + 17) * 2` was spilled and reloaded twice and the frame was 4 bytes larger. The two spilled slots left
   swapped after that (`scroll` and the loop body's `visible`) were fixed by making the block-scoped
   `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
+  A product computed again in a register shows it too: libVCT's `UpdateTiming` (`vct_audio.c`) loads 0x8b18 again
+  and multiplies a second time for `playoutDelay` after the signed `delayFloor = (int)quotient * 0x8b18 - 0x458c`,
+  with `u32 quotient`.
 - A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
   second read through a `static inline` that takes a pointer to `const`: a load through a `const` pointer is a
   different expression from the plain read, so the two are not shared. The Wi-Fi login's `WifiLoginMessage_PrintFrom`
