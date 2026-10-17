@@ -2,8 +2,9 @@
 // screen's hash and blank decision as pbw-oracle and compare.py make them, and the files a run writes: frames.tsv in
 // its version 2, the PNG files of the listed frames, and run.txt while the run goes on and after it. The screen hashes
 // expected are the oracle's own (port/tests/oracle/boot_b2_us.tsv: frame 1 shows both displays off, white, and frame
-// 400 both screens black). The files go in a directory named after the program (argv[0] plus ".tmp"), so that the plain
-// and sanitized builds can run at the same time.
+// 400 both screens black). And memory.txt, from dump specs as --run-dump takes them, over globals of the test that a
+// resolver names. The files go in a directory named after the program (argv[0] plus ".tmp"), so that the plain and
+// sanitized builds can run at the same time.
 
 // POSIX's rmdir, which glibc hides from strict C11
 #define _POSIX_C_SOURCE 200809L
@@ -184,7 +185,7 @@ static char *ReadFile(const char *name) {
 }
 
 static void RemoveDir(void) {
-    static const char *const names[] = { "frames.tsv", "run.txt" };
+    static const char *const names[] = { "frames.tsv", "memory.txt", "run.txt" };
     char path[600];
 
     for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++) {
@@ -286,12 +287,105 @@ static void TestRun(void) {
     CHECK(!port_run_dir_active());
 }
 
+// What --run-dump reads: 16 bytes 00, 11, ... ff, and a pointer into them; the program's globals as the resolver gives
+// them by name
+static uint8_t sBlock[16] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                              0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+static uint8_t *sPointer;
+
+static void *Resolve(const char *name) {
+    if (strcmp(name, "block") == 0) {
+        return sBlock;
+    }
+    if (strcmp(name, "pointer") == 0) {
+        return &sPointer;
+    }
+    return NULL;
+}
+
+static int DumpRejected(const char *spec, const char *message) {
+    char error[256] = "";
+
+    if (port_run_dir_add_dump(spec, Resolve, error, sizeof(error))) {
+        return 0;
+    }
+    if (strstr(error, message) == NULL) {
+        fprintf(stderr, "%s: \"%s\" doesn't say \"%s\"\n", spec, error, message);
+        return 0;
+    }
+    return 1;
+}
+
+static void TestDumps(void) {
+    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
+    const PortRunDirInfo unlimited = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0 };
+    char error[256];
+    char expected[600];
+    char *text;
+
+    RemoveDir();
+    CHECK(DumpRejected("block:4", "needs --run-dir"));
+    CHECK(port_run_dir_open(sDir, NULL, RecordPng, &info));
+    // No dump, no memory.txt
+    text = ReadFile("memory.txt");
+    CHECK(text == NULL);
+    free(text);
+    CHECK(DumpRejected("block", "needs :SIZE"));
+    CHECK(DumpRejected("block:0", "needs :SIZE"));
+    CHECK(DumpRejected("block:0x100001", "needs :SIZE"));
+    CHECK(DumpRejected("block:4x", "needs :SIZE"));
+    CHECK(DumpRejected("block+x:4", "\"x\" isn't an offset"));
+    CHECK(DumpRejected("block+:4", "\"\" isn't an offset"));
+    CHECK(DumpRejected("9block:4", "\"9block\" isn't a symbol"));
+    CHECK(DumpRejected("bl-ock:4", "\"bl-ock\" isn't a symbol"));
+    CHECK(DumpRejected("*:4", "\"\" isn't a symbol"));
+    CHECK(DumpRejected("nothing:4", "no global nothing"));
+    CHECK(DumpRejected("a b=block:4", "without spaces"));
+    CHECK(DumpRejected("=block:4", "without spaces"));
+    CHECK(DumpRejected("block:4@0", "\"0\" isn't N, A-B"));
+
+    // Two bytes from the third at frame 2; where the pointer points, plus one, at frames 1 and 4 (1-4/3); the
+    // pointer's NULL at frame 3, where its dump writes nothing; the run's last frame (4) without a list
+    CHECK(port_run_dir_add_dump("block+2:3@2", Resolve, error, sizeof(error)));
+    CHECK(port_run_dir_add_dump("p=*pointer+0x1:2@1-4/3", Resolve, error, sizeof(error)));
+    CHECK(port_run_dir_add_dump("*pointer:1@3", Resolve, error, sizeof(error)));
+    CHECK(port_run_dir_add_dump("last=block:1", Resolve, error, sizeof(error)));
+    Fill(sTop, 0xffffffffu);
+    Fill(sBottom, 0xffffffffu);
+    for (uint32_t frame = 1; frame <= 4; frame++) {
+        const PortRunDirFrame row = { frame, frame, frame - 1, frame };
+        sPointer = frame == 3 ? NULL : sBlock + 8;
+        CHECK(port_run_dir_frame(&row, sTop, sBottom));
+    }
+    port_run_dir_close(0);
+    snprintf(expected, sizeof(expected),
+             "#pbwmem 1\n"
+             "1 p 0x%llx 2 99aa\n"
+             "2 block+2 0x%llx 3 223344\n"
+             "4 p 0x%llx 2 99aa\n"
+             "4 last 0x%llx 1 00\n",
+             (unsigned long long)(uintptr_t)(sBlock + 9), (unsigned long long)(uintptr_t)(sBlock + 2),
+             (unsigned long long)(uintptr_t)(sBlock + 9), (unsigned long long)(uintptr_t)sBlock);
+    text = ReadFile("memory.txt");
+    CHECK(text != NULL && strcmp(text, expected) == 0);
+    free(text);
+    RemoveDir();
+
+    // Without --frames, a dump needs its list
+    CHECK(port_run_dir_open(sDir, NULL, RecordPng, &unlimited));
+    CHECK(DumpRejected("block:4", "needs --frames"));
+    CHECK(port_run_dir_add_dump("block:4@1", Resolve, error, sizeof(error)));
+    port_run_dir_close(0);
+    RemoveDir();
+}
+
 int main(int argc, char **argv) {
     (void)argc;
     snprintf(sDir, sizeof(sDir), "%s.tmp", argv[0]);
     TestFrameLists();
     TestScreens();
     TestRun();
+    TestDumps();
     if (sFailed != 0) {
         fprintf(stderr, "%d of %d checks failed\n", sFailed, sChecks);
         return 1;

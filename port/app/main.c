@@ -6,8 +6,8 @@
 // DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
 //   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
-//              [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--watchdog SECONDS]
-//              [--main-arena-size BYTES] [--vram-backend NAME]
+//              [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--run-dump SPEC]...
+//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
@@ -24,6 +24,9 @@
 //                       game frame and each screen's hash), and run.txt
 //   --run-screens LIST  the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or
 //                       none, comma-separated, as pbw-oracle's --screens (none by default)
+//   --run-dump SPEC     memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: [LABEL=][*]SYMBOL[+OFFSET]
+//                       :SIZE[@LIST], a global of the program by name (statics aren't visible), * for where the
+//                       pointer there points, at the frames of LIST (the last of --frames by default); repeatable
 //   --watchdog SECONDS  stops with a report and status 73 when a frame takes longer than that in host time: the game
 //                       hangs in a loop that never reaches the platform layer (30 by default with --headless; 0 is
 //                       off, the default with a window)
@@ -62,6 +65,7 @@
 #include <string.h>
 
 #ifndef _WIN32
+#include <dlfcn.h>
 #include <execinfo.h>
 #include <signal.h>
 #include <unistd.h>
@@ -94,6 +98,7 @@ static const char *const sOptions[] = {
     "fixed-time",
     "run-dir",
     "run-screens",
+    "run-dump",
     "watchdog",
     "main-arena-size",
     "vram-backend",
@@ -124,7 +129,8 @@ static void Usage(void) {
     fprintf(stderr,
             "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH] "
             "[--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
-            "[--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend shm|mach-entry|mach-remap|copy] "
+            "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--watchdog SECONDS] [--main-arena-size BYTES] "
+            "[--vram-backend shm|mach-entry|mach-remap|copy] "
             "[--heap-scale-root N] [--heap-scale-child N]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
@@ -290,6 +296,50 @@ static int OpenRunDir(const char *dir, const char *inputPath) {
     return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
 }
 
+// A global of the program for --run-dump, by name: the program exports its globals (an ELF one because it links with
+// --export-dynamic, port/cmake/app.cmake), so the dynamic linker finds them
+static void *ResolveGlobal(const char *name) {
+#ifdef _WIN32
+    (void)name;
+    return NULL;
+#else
+    static void *program;
+
+    if (program == NULL) {
+        program = dlopen(NULL, RTLD_NOW);
+    }
+    return program != NULL ? dlsym(program, name) : NULL;
+#endif
+}
+
+// Every --run-dump, as --run-dump SPEC or --run-dump=SPEC, into the open run directory
+static int AddRunDumps(void) {
+    static const char option[] = "--run-dump";
+    const size_t length = sizeof(option) - 1;
+
+    for (int i = 1; i < sArgc; i++) {
+        const char *spec = NULL;
+        char error[256];
+
+        if (strncmp(sArgv[i], option, length) != 0) {
+            continue;
+        }
+        if (sArgv[i][length] == '=') {
+            spec = sArgv[i] + length + 1;
+        } else if (sArgv[i][length] == '\0' && i + 1 < sArgc && strncmp(sArgv[i + 1], "--", 2) != 0) {
+            spec = sArgv[++i];
+        } else if (sArgv[i][length] != '\0') {
+            continue;
+        }
+        if (spec == NULL || !port_run_dir_add_dump(spec, ResolveGlobal, error, sizeof(error))) {
+            fprintf(stderr, "port: --run-dump %s: %s\n", spec != NULL ? spec : "",
+                    spec != NULL ? error : "needs a spec");
+            return 0;
+        }
+    }
+    return 1;
+}
+
 // The program's frame hook, at each VBlank on the dispatcher's stack: the scanline hook has drawn the frame's 192
 // lines by now. The input taken here is what the game's VBlank work and next frame read
 static void AppFrame(void) {
@@ -372,12 +422,14 @@ int main(int argc, char **argv) {
         }
     }
     runDir = port_app_option("run-dir");
-    if ((runDir != NULL && *runDir == '\0') || (runDir == NULL && port_app_option("run-screens") != NULL)) {
-        fprintf(stderr, "port: --run-dir needs a directory, and --run-screens needs --run-dir\n");
+    if ((runDir != NULL && *runDir == '\0') ||
+        (runDir == NULL && (port_app_option("run-screens") != NULL || port_app_option("run-dump") != NULL))) {
+        fprintf(stderr, "port: --run-dir needs a directory, and --run-screens and --run-dump need --run-dir\n");
         Usage();
         return EXIT_BAD_OPTIONS;
     }
-    if (runDir != NULL && !OpenRunDir(runDir, inputPath)) {
+    if (runDir != NULL && (!OpenRunDir(runDir, inputPath) || !AddRunDumps())) {
+        port_run_dir_close(EXIT_BAD_OPTIONS);
         return EXIT_BAD_OPTIONS;
     }
     if (arenaSize != 0) {

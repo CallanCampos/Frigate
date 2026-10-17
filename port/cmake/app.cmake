@@ -6,6 +6,10 @@ target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${C
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
+# --run-dump looks the game's globals up by name with dlsym: a Mach-O program exports them as it is, an ELF one only
+# when it links with --export-dynamic, which ENABLE_EXPORTS gives
+set_target_properties(${PORT_PROGRAM} PROPERTIES ENABLE_EXPORTS ON)
+target_link_libraries(${PORT_PROGRAM} PRIVATE ${CMAKE_DL_LIBS})
 
 # The run directory's writer (port/app/run_dir.c), plain and under the sanitizers, with the platform layer's SHA-1
 foreach(variant IN ITEMS plain sanitized)

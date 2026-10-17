@@ -1,7 +1,7 @@
 // The port's run directory, for comparing it with the melonDS oracle (port/tools/oracle/README.md, "Run directories"):
 // frames.tsv in its version 2 with a row at every frame hook, both screens as frame_NNNNNN.png at the frames of a list,
-// and run.txt, so that one run of the program gives compare.py every frame it pairs. The program writes it with
-// --run-dir and --run-screens (port/app/main.c). Plain C types only.
+// memory.txt with the memory dumps asked for, and run.txt, so that one run of the program gives compare.py every frame
+// it pairs. The program writes it with --run-dir, --run-screens and --run-dump (port/app/main.c). Plain C types only.
 #ifndef PORT_APP_RUN_DIR_H
 #define PORT_APP_RUN_DIR_H
 
@@ -59,6 +59,17 @@ int port_run_dir_active(void);
 int port_run_dir_frame(const PortRunDirFrame *frame, const uint32_t *top, const uint32_t *bottom);
 // Writes run.txt with the frames completed and the exit status, and closes the files
 void port_run_dir_close(int status);
+
+// A symbol's address in the program, or NULL when it has none
+typedef void *(*PortRunDirResolver)(const char *name);
+
+// Adds a memory dump to the open run directory, from a spec as --run-dump takes it: [LABEL=][*]SYMBOL[+OFFSET]:SIZE
+// [@LIST]. At each frame of LIST (the run's last frame, --frames, when there is none) the dump's SIZE bytes from
+// SYMBOL's address plus OFFSET go to memory.txt in pbw-oracle's format, under LABEL (the spec before its size by
+// default); with *, from the address that the pointer at SYMBOL holds at that frame, plus OFFSET. OFFSET and SIZE are
+// decimal or 0x hexadecimal. The bytes are the host's: a struct with pointers or longs, or padding a host lays out
+// otherwise, differs from the DS's by design. Returns 1, or 0 with a message naming what is wrong
+int port_run_dir_add_dump(const char *spec, PortRunDirResolver resolve, char *error, size_t errorSize);
 
 // The SHA-1 of a screen's RGB bytes as frames.tsv gives it (40 hexadecimal digits and a NUL), and whether the screen
 // is blank: all but 256 of its pixels have one colour (compare.py's BLANK_SLACK)

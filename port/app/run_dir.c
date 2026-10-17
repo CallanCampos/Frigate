@@ -18,12 +18,30 @@
 // The longest frame number a list may name, as pbw-oracle's
 #define MAX_DIGITS 9
 
+// The longest dump --run-dump takes
+#define MAX_DUMP_SIZE (1u << 20)
+
+// A memory dump (--run-dump)
+typedef struct Dump {
+    char *label;
+    const uint8_t *symbol;
+    int follow;      // the bytes are where the pointer at symbol points
+    uint32_t offset; // from the symbol, or from where it points
+    uint32_t size;
+    int lastFrame; // no list: the run's last frame
+    PortFrameList frames;
+    int warnedNull; // the pointer was NULL once, which was said
+} Dump;
+
 static FILE *sFramesTsv;
+static FILE *sMemoryTxt;
 static PortFrameList sScreens;
 static PortRunDirPngWriter sWritePng;
 static PortRunDirInfo sInfo;
 static char *sDir;
 static uint32_t sLastFrame;
+static Dump *sDumps;
+static size_t sDumpCount;
 
 // Frame lists
 
@@ -215,6 +233,216 @@ static void WriteRunTxt(int finished, int status) {
     free(path);
 }
 
+// Memory dumps
+
+// A digit's value in base 10 or 16, or -1
+static int DigitValue(char c, int base) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    }
+    if (base == 16 && c >= 'a' && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    if (base == 16 && c >= 'A' && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    return -1;
+}
+
+// A count in decimal or 0x hexadecimal, no more than max
+static int ParseCount(const char *text, size_t length, uint32_t max, uint32_t *out) {
+    uint64_t value = 0;
+    int base = 10;
+    size_t i = 0;
+
+    if (length > 2 && text[0] == '0' && (text[1] == 'x' || text[1] == 'X')) {
+        base = 16;
+        i = 2;
+    }
+    if (i == length) {
+        return 0;
+    }
+    for (; i < length; i++) {
+        int digit = DigitValue(text[i], base);
+        if (digit < 0) {
+            return 0;
+        }
+        value = value * (uint64_t)base + (uint64_t)digit;
+        if (value > max) {
+            return 0;
+        }
+    }
+    *out = (uint32_t)value;
+    return 1;
+}
+
+// A C identifier
+static int IsSymbol(const char *text, size_t length) {
+    if (length == 0 || (text[0] >= '0' && text[0] <= '9')) {
+        return 0;
+    }
+    for (size_t i = 0; i < length; i++) {
+        char c = text[i];
+        if (!(c == '_' || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static void FreeDump(Dump *dump) {
+    free(dump->label);
+    port_frame_list_free(&dump->frames);
+}
+
+// Split as pbw-oracle's --dump splits it: the list after the last @, the label before the first =, the size after the
+// last :
+int port_run_dir_add_dump(const char *spec, PortRunDirResolver resolve, char *error, size_t errorSize) {
+    const char *end = spec + strlen(spec);
+    const char *at = strrchr(spec, '@');
+    const char *equals;
+    const char *colon;
+    const char *target;
+    const char *plus;
+    char name[256];
+    Dump dump;
+    Dump *grown;
+
+    memset(&dump, 0, sizeof(dump));
+    if (sFramesTsv == NULL) {
+        snprintf(error, errorSize, "needs --run-dir");
+        return 0;
+    }
+    if (at != NULL) {
+        char listError[128];
+        if (!port_frame_list_parse(&dump.frames, at + 1, listError, sizeof(listError))) {
+            snprintf(error, errorSize, "%s", listError);
+            return 0;
+        }
+        end = at;
+    } else if (sInfo.frames == 0) {
+        snprintf(error, errorSize, "without @LIST it dumps at the run's last frame, which needs --frames");
+        return 0;
+    } else {
+        dump.lastFrame = 1;
+    }
+    equals = memchr(spec, '=', (size_t)(end - spec));
+    target = equals != NULL ? equals + 1 : spec;
+    colon = NULL;
+    for (const char *c = target; c < end; c++) {
+        if (*c == ':') {
+            colon = c;
+        }
+    }
+    if (colon == NULL || !ParseCount(colon + 1, (size_t)(end - colon - 1), MAX_DUMP_SIZE, &dump.size) ||
+        dump.size == 0) {
+        snprintf(error, errorSize, "\"%.*s\" needs :SIZE, 1 to %u bytes", (int)(end - spec), spec, MAX_DUMP_SIZE);
+        FreeDump(&dump);
+        return 0;
+    }
+    if (equals != NULL) {
+        dump.label = malloc((size_t)(equals - spec) + 1);
+        if (dump.label != NULL) {
+            memcpy(dump.label, spec, (size_t)(equals - spec));
+            dump.label[equals - spec] = '\0';
+        }
+    } else {
+        dump.label = malloc((size_t)(colon - spec) + 1);
+        if (dump.label != NULL) {
+            memcpy(dump.label, spec, (size_t)(colon - spec));
+            dump.label[colon - spec] = '\0';
+        }
+    }
+    if (dump.label == NULL || dump.label[0] == '\0' || strpbrk(dump.label, " \t\n") != NULL) {
+        snprintf(error, errorSize, "a dump's label is a word without spaces");
+        FreeDump(&dump);
+        return 0;
+    }
+    if (*target == '*') {
+        dump.follow = 1;
+        target++;
+    }
+    plus = memchr(target, '+', (size_t)(colon - target));
+    if (plus != NULL && !ParseCount(plus + 1, (size_t)(colon - plus - 1), UINT32_MAX, &dump.offset)) {
+        snprintf(error, errorSize, "\"%.*s\" isn't an offset", (int)(colon - plus - 1), plus + 1);
+        FreeDump(&dump);
+        return 0;
+    }
+    if (plus == NULL) {
+        plus = colon;
+    }
+    if (!IsSymbol(target, (size_t)(plus - target)) || (size_t)(plus - target) >= sizeof(name)) {
+        snprintf(error, errorSize, "\"%.*s\" isn't a symbol", (int)(plus - target), target);
+        FreeDump(&dump);
+        return 0;
+    }
+    memcpy(name, target, (size_t)(plus - target));
+    name[plus - target] = '\0';
+    dump.symbol = resolve(name);
+    if (dump.symbol == NULL) {
+        snprintf(error, errorSize, "the program has no global %s (statics aren't visible)", name);
+        FreeDump(&dump);
+        return 0;
+    }
+    if (sMemoryTxt == NULL) {
+        char *path = JoinPath("memory.txt");
+        sMemoryTxt = path != NULL ? fopen(path, "w") : NULL;
+        free(path);
+        if (sMemoryTxt == NULL) {
+            snprintf(error, errorSize, "can't write %s/memory.txt", sDir);
+            FreeDump(&dump);
+            return 0;
+        }
+        fprintf(sMemoryTxt, "#pbwmem 1\n");
+    }
+    grown = realloc(sDumps, (sDumpCount + 1) * sizeof(*grown));
+    if (grown == NULL) {
+        snprintf(error, errorSize, "out of memory");
+        FreeDump(&dump);
+        return 0;
+    }
+    sDumps = grown;
+    sDumps[sDumpCount++] = dump;
+    return 1;
+}
+
+// The dumps of a frame, a line each: FRAME LABEL ADDRESS SIZE HEX
+static int WriteDumps(uint32_t frame) {
+    static const char digits[] = "0123456789abcdef";
+
+    for (size_t i = 0; i < sDumpCount; i++) {
+        Dump *dump = &sDumps[i];
+        const uint8_t *from = dump->symbol;
+
+        if (dump->lastFrame ? frame != sInfo.frames : !port_frame_list_contains(&dump->frames, frame)) {
+            continue;
+        }
+        if (dump->follow) {
+            memcpy(&from, dump->symbol, sizeof(from));
+            if (from == NULL) {
+                if (!dump->warnedNull) {
+                    fprintf(stderr, "port: --run-dump %s: the pointer is NULL at frame %u; no dump there\n",
+                            dump->label, frame);
+                    dump->warnedNull = 1;
+                }
+                continue;
+            }
+        }
+        from += dump->offset;
+        fprintf(sMemoryTxt, "%u %s 0x%llx %u ", frame, dump->label, (unsigned long long)(uintptr_t)from, dump->size);
+        for (uint32_t j = 0; j < dump->size; j++) {
+            fputc(digits[from[j] >> 4], sMemoryTxt);
+            fputc(digits[from[j] & 15], sMemoryTxt);
+        }
+        fputc('\n', sMemoryTxt);
+    }
+    if (sMemoryTxt != NULL && fflush(sMemoryTxt) != 0) {
+        fprintf(stderr, "port: --run-dir: can't write %s/memory.txt\n", sDir);
+        return 0;
+    }
+    return 1;
+}
+
 int port_run_dir_open(const char *dir, const char *screens, PortRunDirPngWriter writePng, const PortRunDirInfo *info) {
     char error[160];
     char *path;
@@ -275,6 +503,9 @@ int port_run_dir_frame(const PortRunDirFrame *frame, const uint32_t *top, const 
         return 0;
     }
     sLastFrame = frame->frame;
+    if (!WriteDumps(frame->frame)) {
+        return 0;
+    }
     if (sWritePng != NULL && port_frame_list_contains(&sScreens, frame->frame)) {
         char name[32];
         char *path;
@@ -301,6 +532,16 @@ void port_run_dir_close(int status) {
         fclose(sFramesTsv);
         sFramesTsv = NULL;
     }
+    if (sMemoryTxt != NULL) {
+        fclose(sMemoryTxt);
+        sMemoryTxt = NULL;
+    }
+    for (size_t i = 0; i < sDumpCount; i++) {
+        FreeDump(&sDumps[i]);
+    }
+    free(sDumps);
+    sDumps = NULL;
+    sDumpCount = 0;
     port_frame_list_free(&sScreens);
     free(sDir);
     sDir = NULL;
