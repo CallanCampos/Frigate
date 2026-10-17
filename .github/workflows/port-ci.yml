@@ -38,9 +38,15 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install ninja sdl3
 
+      # SDL3 is built from its pinned release here, which needs the window system's development packages
+      # (https://wiki.libsdl.org/SDL3/README-linux#build-dependencies)
       - name: Install build tools (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y ninja-build clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+            libxi-dev libxss-dev libxtst-dev libxkbcommon-dev libwayland-dev wayland-protocols libegl-dev libgl-dev \
+            libdrm-dev libgbm-dev libasound2-dev libpulse-dev libudev-dev libdbus-1-dev
 
       - name: Configure
         env:
