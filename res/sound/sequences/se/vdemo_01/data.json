@@ -1,0 +1,9 @@
+{
+    "$schema": "../../../sequence.schema.json",
+    "file": "SEQ_SE_FLD_88",
+    "bank": "BANK_SE_WB_YURAN_NAMI2",
+    "volume": 127,
+    "channel_priority": 114,
+    "player_priority": 64,
+    "player": "PLAYER_SE_SYS"
+}

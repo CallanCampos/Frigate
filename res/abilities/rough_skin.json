@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Rough Skin",
+    "description": "Inflicts damage to the\nattacker on contact."
+}

@@ -1,4 +1,0 @@
-Route412_Text_OhBothPokemonFull = Oh! Both you and your Pokémon\nare full of energy!
-Route412_Text_HmmArentBitTired = Hmm? Aren't you a bit tired?\nDon't be shy. Take a rest!
-Route412_Text_Gellooo = Gellooo.
-\pad{f0}

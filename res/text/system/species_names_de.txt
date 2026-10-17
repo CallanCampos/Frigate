@@ -1,0 +1,2 @@
+\from{species.pokedex.de.name}
+\pad{9c}

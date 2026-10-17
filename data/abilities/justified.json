@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Justified",
-    "description": "Raises Attack when hit by\na Dark-type move."
-}

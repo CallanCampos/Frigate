@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SERPERIOR",
+    "moves": [ "MOVE_ATTRACT", "MOVE_LEAF_TORNADO", "MOVE_DRAGON_TAIL", "MOVE_GASTRO_ACID" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_JOLLY",
+    "item": "ITEM_LUM_BERRY",
+    "form": 0
+}

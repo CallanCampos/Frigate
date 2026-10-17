@@ -1221,9 +1221,13 @@ overlays/ov023 0x0216f720 reloc_module overlay(325)
 overlays/ov026 0x0216f926 reloc_module overlay(12)
 overlays/ov028 0x02171cfa reloc_module overlay(69)
 overlays/ov028 0x021723e8 reloc_module overlay(167)
+overlays/ov029 0x02194aa4 section_end lib/dwc/src/vct/vct_audio.c:.text
 overlays/ov029 0x02196fe0 add_reloc load,main,0x02005108
 overlays/ov029 0x0219729c remove_reloc
+overlays/ov029 0x021973e0 section_end lib/dwc/src/vct/vct_audio.c:.data
 overlays/ov029 0x02197424 add_data data_ov029_02197424
+overlays/ov029 0x02198358 section_end lib/dwc/src/vct/vct_audio.c:.bss
+overlays/ov029 0x02198358 section_start lib/dwc/src/vct/vct_buffer.c:.bss
 overlays/ov033 0x02176e82 reloc_module overlay(130)
 overlays/ov033 0x02179218 reloc_module overlay(36)
 overlays/ov033 0x02179246 reloc_module overlay(36)

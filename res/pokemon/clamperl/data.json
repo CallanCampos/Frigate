@@ -1,0 +1,164 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Clamperl",
+    "pokedex": {
+        "category": "Bivalve Pokémon",
+        "entry": "It makes a single pearl during\nits lifetime. The pearl is said\nto amplify psychic power.",
+        "height": "1'04\"",
+        "weight": "115.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Clamperl",
+                "category": "Bivalve Pokémon",
+                "entry": "It makes a single pearl during\nits lifetime. The pearl is said\nto amplify psychic power.",
+                "height": "1'04\"",
+                "weight": "115.7 lbs."
+            },
+            "fr": {
+                "name": "Coquiperl",
+                "category": "Pokémon Bivalve",
+                "entry": "Il ne produit qu'une perle durant\nson existence. On raconte qu'elle\namplifie les pouvoirs psychiques.",
+                "height": "0,4 m",
+                "weight": "52,5 kg"
+            },
+            "de": {
+                "name": "Perlu",
+                "category": "Muschel",
+                "entry": "In seinem Leben erschafft es\neine einzige Perle. Diese soll\nPsycho-Kräfte verstärken.",
+                "height": "0,4 m",
+                "weight": "52,5 kg"
+            },
+            "it": {
+                "name": "Clamperl",
+                "category": "Pokémon Bivalve",
+                "entry": "Crea una sola perla in tutta la sua vita.\nSi dice che questa perla amplifichi\ni poteri psichici.",
+                "height": "0,4 m",
+                "weight": "52,5 kg"
+            },
+            "ko": {
+                "name": "진주몽",
+                "category": "쌍각포켓몬",
+                "entry": "평생동안 하나만 만들게 되는\n진주는 사이코 파워를\n증폭시키는 작용을 한다고 한다.",
+                "height": "0.4 m",
+                "weight": "52.5 kg"
+            },
+            "es": {
+                "name": "Clamperl",
+                "category": "Pokémon Bivalvo",
+                "entry": "Durante toda su vida, crea una\nsola perla que, según se dice,\naumenta los poderes psíquicos.",
+                "height": "0,4 m",
+                "weight": "52,5 kg"
+            },
+            "ja": {
+                "name": "パールル",
+                "category": "\\x{ff12}まいがいポケモン",
+                "entry": "いっしょうに\\x{3000}\\x{ff11}こだけ\\x{3000}つくる\nしんじゅは\\x{3000}サイコパワーを\nぞうふくする\\x{3000}さようが\\x{3000}あるという。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff12}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 64,
+        "defense": 85,
+        "speed": 32,
+        "special_attack": 74,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_BIG_PEARL",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_SHELL_ARMOR", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_RATTLED",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 69,
+    "height": 4,
+    "weight": 525,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CLAMP" ],
+            [ 1, "MOVE_WATER_GUN" ],
+            [ 1, "MOVE_WHIRLPOOL" ],
+            [ 1, "MOVE_IRON_DEFENSE" ],
+            [ 51, "MOVE_SHELL_SMASH" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [ "MOVE_IRON_DEFENSE", "MOVE_ICY_WIND", "MOVE_SNORE", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_REFRESH",
+            "MOVE_MUD_SPORT",
+            "MOVE_BODY_SLAM",
+            "MOVE_SUPERSONIC",
+            "MOVE_BARRIER",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_AQUA_RING",
+            "MOVE_MUDDY_WATER",
+            "MOVE_WATER_PULSE",
+            "MOVE_BRINE",
+            "MOVE_ENDURE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE_WITH_ITEM",
+            "param": "ITEM_DEEP_SEA_TOOTH",
+            "species": "SPECIES_HUNTAIL"
+        },
+        {
+            "method": "EVO_METHOD_TRADE_WITH_ITEM",
+            "param": "ITEM_DEEP_SEA_SCALE",
+            "species": "SPECIES_GOREBYSS"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CLAMPERL",
+    "cry_volume": 120
+}

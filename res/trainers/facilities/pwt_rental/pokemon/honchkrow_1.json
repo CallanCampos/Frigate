@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_HONCHKROW",
+    "moves": [ "MOVE_PSYCHIC", "MOVE_DARK_PULSE", "MOVE_PROTECT", "MOVE_NASTY_PLOT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_QUIET",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

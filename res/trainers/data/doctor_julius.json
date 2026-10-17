@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Julius",
+    "class": "TRAINER_CLASS_DOCTOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL", "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": true,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LEAVANNY",
+            "form": 0,
+            "level": 49,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "If Team Plasma takes over the world,\nthere should be fewer Pokémon injured.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Grr... Tell me! Please!\nJust what is a Pokémon battle?!"
+        },
+        {
+            "type": 13,
+            "text": "Injured Pokémon have both enemies\nand friends!{be01}"
+        },
+        {
+            "type": 14,
+            "text": "Don't you think there will be less war if\nTeam Plasma takes over the world?"
+        }
+    ]
+}

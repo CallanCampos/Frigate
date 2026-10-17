@@ -1,0 +1,185 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Ursaring",
+    "pokedex": {
+        "category": "Hibernator Pokémon",
+        "entry": "In its territory, it leaves\nscratches on trees that bear\ndelicious berries or fruits.",
+        "height": "5'11\"",
+        "weight": "277.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Ursaring",
+                "category": "Hibernator Pokémon",
+                "entry": "In its territory, it leaves\nscratches on trees that bear\ndelicious berries or fruits.",
+                "height": "5'11\"",
+                "weight": "277.3 lbs."
+            },
+            "fr": {
+                "name": "Ursaring",
+                "category": "Pokémon Hibernant",
+                "entry": "Il marque de ses griffes les arbres\nde son territoire qui portent des\nBaies ou des fruits.",
+                "height": "1,8 m",
+                "weight": "125,8 kg"
+            },
+            "de": {
+                "name": "Ursaring",
+                "category": "Schläfer",
+                "entry": "Es durchstreift sein Revier und\nmarkiert Bäume, die Früchte\noder Beeren tragen, mit Kratzern.",
+                "height": "1,8 m",
+                "weight": "125,8 kg"
+            },
+            "it": {
+                "name": "Ursaring",
+                "category": "Pokémon Letargo",
+                "entry": "Nel suo territorio, lascia graffi sugli\nalberi che hanno bacche o frutti\ndeliziosi.",
+                "height": "1,8 m",
+                "weight": "125,8 kg"
+            },
+            "ko": {
+                "name": "링곰",
+                "category": "동면포켓몬",
+                "entry": "영역 내에 있는 맛있는 나무열매나\n과일이 열리는 나무에는\n발톱으로 흔적을 남긴다.",
+                "height": "1.8 m",
+                "weight": "125.8 kg"
+            },
+            "es": {
+                "name": "Ursaring",
+                "category": "Pokémon Hibernante",
+                "entry": "Marca con arañazos los árboles de\nsu territorio que dan bayas y frutas.",
+                "height": "1,8 m",
+                "weight": "125,8 kg"
+            },
+            "ja": {
+                "name": "リングマ",
+                "category": "とうみんポケモン",
+                "entry": "なわばりにある\\x{3000}おいしい\\x{3000}きのみや\nくだものの\\x{3000}なる\\x{3000}き\\x{3000}には\nツメで\\x{3000}きずあとを\\x{3000}つける。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff15}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 130,
+        "defense": 75,
+        "speed": 55,
+        "special_attack": 75,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 60,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_GUTS", "ABILITY_QUICK_FEET" ],
+    "hidden_ability": "ABILITY_UNNERVE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 175,
+    "height": 18,
+    "weight": 1258,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_COVET" ],
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_LICK" ],
+            [ 1, "MOVE_FAKE_TEARS" ],
+            [ 8, "MOVE_FURY_SWIPES" ],
+            [ 15, "MOVE_FAINT_ATTACK" ],
+            [ 22, "MOVE_SWEET_SCENT" ],
+            [ 29, "MOVE_SLASH" ],
+            [ 38, "MOVE_SCARY_FACE" ],
+            [ 47, "MOVE_REST" ],
+            [ 49, "MOVE_SNORE" ],
+            [ 58, "MOVE_THRASH" ],
+            [ 67, "MOVE_HAMMER_ARM" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM65",
+            "TM66",
+            "TM67",
+            "TM68",
+            "TM71",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_LOW_KICK",
+            "MOVE_GUNK_SHOT",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_SUPERPOWER",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TEDDIURSA",
+    "cry_volume": 110
+}

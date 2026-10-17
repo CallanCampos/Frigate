@@ -1,0 +1,35 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Marion",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "pokemon": [
+        "torterra_1",
+        "ferrothorn_1",
+        "shuckle_1",
+        "excadrill_1",
+        "hippowdon_1",
+        "tyranitar_1",
+        "garchomp_1",
+        "claydol_2",
+        "gigalith_2",
+        "excadrill_2",
+        "hippowdon_2",
+        "tyranitar_2",
+        "gastrodon_3",
+        "cradily_3",
+        "gigalith_3",
+        "excadrill_3",
+        "hippowdon_3",
+        "tyranitar_3",
+        "dugtrio_4",
+        "shuckle_4",
+        "excadrill_4",
+        "hippowdon_4",
+        "tyranitar_4"
+    ],
+    "messages": [
+        "I used to be like you.\nI was full of hopes and dreams.",
+        "Dreams are important.\nBut if all you have is your dreamworld...",
+        "Just having hopes and dreams is not enough.\nWhat is important is... Never mind."
+    ]
+}

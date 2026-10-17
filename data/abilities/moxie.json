@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Moxie",
-    "description": "Boosts Attack after\nknocking out any Pokémon."
-}

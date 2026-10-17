@@ -44,7 +44,7 @@ scope, with `descope_reason`, and at least one pass old). "Am I done?" is a quer
 2. Partition the files by area and dispatch the reviewers, at most two at a time (more get the terminal killed;
    set `awaiting_agents: true` while they run): `pbw-game-reviewer` (src/, include/), `pbw-library-reviewer` (lib/),
    `pbw-config-reviewer` (config/, docs/nonmatching-functions.md, docs/source-files.md, docs/matching.md),
-   `pbw-data-reviewer` (data/, tools/data/), `pbw-tools-reviewer` (tools/, CI, .claude/, .agents/, .codex/). Give
+   `pbw-data-reviewer` (res/, tools/data/), `pbw-tools-reviewer` (tools/, CI, .claude/, .agents/, .codex/). Give
    each its files, the baseline, the candidates of step 1 in its area, and for a contributor's work the PRs
    behind the files.
 3. Verify before recording: a reviewer's `HYPOTHESIS` is checked (read the code, probe, grep) before it becomes a

@@ -1,0 +1,6 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ "MAP_MODEL_BATTLE_SUBWAY_M_BSUBWAY03_00_0" ]
+    ]
+}

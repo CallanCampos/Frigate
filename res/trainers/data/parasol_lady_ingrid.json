@@ -1,0 +1,58 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ingrid",
+    "class": "TRAINER_CLASS_PARASOL_LADY",
+    "battle_style": "BTL_STYLE_ROTATION",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_WEATHER_BALL", "MOVE_SUNNY_DAY", "MOVE_SOLAR_BEAM", "MOVE_SCALD" ]
+        },
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_WEATHER_BALL", "MOVE_RAIN_DANCE", "MOVE_THUNDER", "MOVE_ICE_BEAM" ]
+        },
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_WEATHER_BALL", "MOVE_HAIL", "MOVE_HYDRO_PUMP", "MOVE_THUNDERBOLT" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "Rotation Battles are battles\nwith three Pokémon!\\x{ffff}\\x{ffff}\\x{ffff}\\x{ffff}"
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "The splish-splosh sounds! Those were\nyour footsteps, weren't they?{be00}\nSo cute!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You are so strong--too strong to be cute!"
+        },
+        {
+            "type": 2,
+            "text": "According to footstep fortune-telling...{be01}\nThose whose footsteps make a splish and\na splosh are Trainers that Pokémon like."
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+NuvemaTown3_Text_ItsWiiConsoleHas = It's a Wii console!\nIt has a Wii Remote!
+NuvemaTown3_Text_ItsShinyFlatScreen = It's a shiny flat-screen television\nthat someone has been polishing...
+NuvemaTown3_Text_SheetsBedDontHave = The sheets on the bed don't have\na single wrinkle.
+NuvemaTown3_Text_PcDoesntLookLike = This PC doesn't look like it's\nbeen used in a while...
+NuvemaTown3_Text_ItsAwardCompletingUnova = It's an award for completing\nthe Unova Pokédex!
+NuvemaTown3_Text_ItsAwardCompletingNational = It's an award for completing\nthe National Mode Pokédex!
+NuvemaTown3_Text_ItsTrophyProvingDefeated = It's a trophy proving you defeated\nthe Single Master in the Battle Subway!
+NuvemaTown3_Text_ItsTrophyProvingDefeated_2 = It's a trophy proving you defeated\nthe Double Master in the Battle Subway!
+NuvemaTown3_Text_ItsTrophyDefeatingMulti = It's a trophy for defeating\nthe Multi Master in the Battle Subway!
+\pad{fc}

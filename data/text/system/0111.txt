@@ -1,3 +1,0 @@
-Bank0111_Text_Stranger = Stranger
-Bank0111_Text_DayCareCouple = Day-Care Couple
-Bank0111_Text_Breeder = ⒆⒇ Breeder

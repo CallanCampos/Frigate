@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Rename a constant of a list in data/constants/, and every use of it.
+"""Rename a constant of a list in generated/, and every use of it.
 
     rename_constant.py ZONE_CASTELIA_CITY_12 ZONE_CASTELIA_CITY_NARROW_STREET
 
 The name is replaced as a whole word in the lists and in the tracked sources, headers, data, scripts and docs, and a
-data file or directory named after the constant, such as data/zones/castelia_city_12.json, is renamed with it. A
+data file or directory named after the constant, such as res/zones/castelia_city_12.json, is renamed with it. A
 message file's IDs and its header, text/<archive>/<bank>.h, are renamed with it too. The new name must not be taken
 already. Rebuild afterwards: the build checks that nothing still uses the old name.
 """
@@ -16,53 +16,65 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import LISTS_DIR, parse  # noqa: E402
+from tools.data.field_actor_data import directory as field_actor_directory  # noqa: E402
+from tools.data.item_icon_data import member_path as item_icon_path  # noqa: E402
+from tools.data.sound_data import entry_dir as sound_entry_dir  # noqa: E402
 from tools.data.species_data import directory as species_directory  # noqa: E402
 from tools.text.text_data import bank_prefix  # noqa: E402
 
-ROOT = LISTS_DIR.parents[1]
-PATHS = ["data", "src", "include", "lib", "docs", "tools"]
+ROOT = LISTS_DIR.parent
+PATHS = ["res", "generated", "src", "include", "lib", "docs", "tools"]
 SUFFIXES = {".txt", ".s", ".inc", ".c", ".h", ".cpp", ".md", ".py", ".json"}
 # The data named after the constants of a list: the list, the directory, the constants' prefix, and the suffix of each
 # constant's file, or "/" for a directory
 NAMED_DATA = [
-    ("species", "data/pokemon", "SPECIES_", "/"),
-    ("moves", "data/moves", "MOVE_", "/"),
-    ("items", "data/items", "ITEM_", "/"),
-    ("abilities", "data/abilities", "ABILITY_", ".json"),
-    ("types", "data/types", "TYPE_", ".json"),
-    ("trades", "data/trades", "TRADE_", ".json"),
-    ("trainer_classes", "data/trainer_classes", "TRAINER_CLASS_", ".json"),
-    ("natures", "data/natures", "NATURE_", ".json"),
-    ("places", "data/places", "PLACE_", ".json"),
-    ("field_scripts", "data/field_scripts", "SCRIPTS_", ".s"),
-    ("map_matrices", "data/map_matrices", "MAP_MATRIX_", ".json"),
-    ("areas", "data/areas", "AREA_", ".json"),
-    ("map_models", "data/map_models", "MAP_MODEL_", "/"),
-    ("map_texture_sets", "data/map_texture_sets", "MAP_TEXTURE_SET_", "/"),
-    ("field_props_exterior", "data/field_prop_models/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
-    ("field_props_exterior", "data/field_prop_textures/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
-    ("field_props_interior", "data/field_prop_models/interior", "FIELD_PROPS_INTERIOR_", "/"),
-    ("field_props_interior", "data/field_prop_textures/interior", "FIELD_PROPS_INTERIOR_", "/"),
-    ("tr_ai_scripts", "data/tr_ai", "TR_AI_SCRIPT_", ".s"),
-    ("text_banks", "data/text/system", "TEXT_BANK_", ".txt"),
-    ("script_text_banks", "data/text/script", "SCRIPT_TEXT_", ".txt"),
-    ("trainers", "data/trainers", "TRAINER_", ".json"),
-    ("encounters", "data/encounters", "ENCOUNTERS_", ".json"),
-    ("zones", "data/zones", "ZONE_", ".json"),
-    ("zones", "data/events", "ZONE_", ".json"),
+    ("species", "res/pokemon", "SPECIES_", "/"),
+    ("moves", "res/moves", "MOVE_", "/"),
+    ("items", "res/items", "ITEM_", "/"),
+    ("abilities", "res/abilities", "ABILITY_", ".json"),
+    ("types", "res/types", "TYPE_", ".json"),
+    ("trades", "res/trades", "TRADE_", ".json"),
+    ("trainer_classes", "res/trainers/classes", "TRAINER_CLASS_", ".json"),
+    ("natures", "res/natures", "NATURE_", ".json"),
+    ("places", "res/places", "PLACE_", ".json"),
+    ("field_scripts", "res/field_scripts", "SCRIPTS_", ".s"),
+    ("map_matrices", "res/map_matrices", "MAP_MATRIX_", ".json"),
+    ("areas", "res/areas", "AREA_", ".json"),
+    ("map_models", "res/map_models", "MAP_MODEL_", "/"),
+    ("map_texture_sets", "res/map_texture_sets", "MAP_TEXTURE_SET_", "/"),
+    ("field_props_exterior", "res/field_prop_models/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
+    ("field_props_exterior", "res/field_prop_textures/exterior", "FIELD_PROPS_EXTERIOR_", "/"),
+    ("field_props_interior", "res/field_prop_models/interior", "FIELD_PROPS_INTERIOR_", "/"),
+    ("field_props_interior", "res/field_prop_textures/interior", "FIELD_PROPS_INTERIOR_", "/"),
+    ("tr_ai_scripts", "res/trainers/ai", "TR_AI_SCRIPT_", ".s"),
+    ("text_banks", "res/text/system", "TEXT_BANK_", ".txt"),
+    ("script_text_banks", "res/text/script", "SCRIPT_TEXT_", ".txt"),
+    ("trainers", "res/trainers/data", "TRAINER_", ".json"),
+    ("encounters", "res/encounters", "ENCOUNTERS_", ".json"),
+    ("zones", "res/zones", "ZONE_", ".json"),
+    ("zones", "res/events", "ZONE_", ".json"),
+    ("obj_codes", "res/field_actors", "OBJ_CODE_", "/"),
+    ("sound", "res/sound/sequences", "SEQ_", "/"),
+    ("sound_banks", "res/sound/banks", "BANK_", "/"),
+    ("sound_wave_archives", "res/sound/wave_archives", "WAVE_", "/"),
+    ("sound_streams", "res/sound/streams", "STRM_", "/"),
 ]
 
 # The textures' directories, and the script that relinks the models that show them
 RELINKS = [
-    ("data/map_texture_sets", "tools/data/map_model_data.py", "data/map_models"),
-    ("data/field_prop_textures/exterior", "tools/data/field_prop_model_data.py", "data/field_prop_models/exterior"),
-    ("data/field_prop_textures/interior", "tools/data/field_prop_model_data.py", "data/field_prop_models/interior"),
+    ("res/map_texture_sets", "tools/data/map_model_data.py", "res/map_models"),
+    ("res/field_prop_textures/exterior", "tools/data/field_prop_model_data.py", "res/field_prop_models/exterior"),
+    ("res/field_prop_textures/interior", "tools/data/field_prop_model_data.py", "res/field_prop_models/interior"),
 ]
 
 
 def data_path(constant: str, directory: str, prefix: str, suffix: str) -> Path:
     if prefix == "SPECIES_":
         return ROOT / directory / species_directory(constant)
+    if prefix == "OBJ_CODE_":
+        return field_actor_directory(ROOT / directory, constant)
+    if directory.startswith("res/sound/"):
+        return sound_entry_dir(ROOT / "res/sound", directory.removeprefix("res/sound/"), constant)
     return ROOT / directory / (constant.removeprefix(prefix).lower() + ("" if suffix == "/" else suffix))
 
 
@@ -87,10 +99,29 @@ def main():
                     sys.exit(f"{args.new} must start with {prefix}, since its data is named after it")
                 moves.append((old_path, new_path))
 
+    # An item icon's file is named after its constant, in its item's directory or res/items/shared/
+    if args.old in lists[LISTS_DIR / "item_icons.txt"]:
+        old_path, new_path = (item_icon_path(ROOT / "res/items", c) for c in (args.old, args.new))
+        if old_path.exists() and old_path != new_path:
+            if new_path.exists():
+                sys.exit(f"{new_path.relative_to(ROOT)} already exists")
+            if not new_path.parent.is_dir():
+                sys.exit(f"{new_path.parent.relative_to(ROOT)} doesn't exist: an icon's name must be an item's")
+            moves.append((old_path, new_path))
+
+    for old_path, new_path in moves:
+        if new_path.exists():
+            sys.exit(f"{new_path.relative_to(ROOT)} already exists")
+
     # A message file's IDs start with its name, and the code includes its header by the file's name
     renames = [(re.compile(rf"\b{re.escape(args.old)}\b"), args.new)]
+    # An item's icons are named after it and are files of its directory (item_icon_data.py), so they follow it
+    if args.old in lists[LISTS_DIR / "items.txt"]:
+        old_item, new_item = args.old.removeprefix("ITEM_"), args.new.removeprefix("ITEM_")
+        renames.append((re.compile(rf"\b(ITEM_ICON_(?:PALETTE_)?){re.escape(old_item)}(_LAUNCHER)?\b"),
+                        rf"\g<1>{new_item}\g<2>"))
     for old_path, new_path in moves:
-        if old_path.parent.parent == ROOT / "data/text":
+        if old_path.parent.parent == ROOT / "res/text":
             renames.append((re.compile(rf"\b{re.escape(bank_prefix(old_path))}(?=\w)"), bank_prefix(new_path)))
             header = f"text/{old_path.parent.name}/"
             renames.append((re.compile(rf"(?<=[\"<]){re.escape(header + old_path.stem)}\.h(?=[\">])"),

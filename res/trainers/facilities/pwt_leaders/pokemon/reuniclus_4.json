@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_REUNICLUS",
+    "moves": [ "MOVE_TRICK", "MOVE_PSYCHIC", "MOVE_FOCUS_BLAST", "MOVE_RECOVER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_RELAXED",
+    "item": "ITEM_TOXIC_ORB",
+    "form": 0
+}

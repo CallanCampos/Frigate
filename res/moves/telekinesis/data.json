@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Telekinesis",
+    "description": "The user makes the target float with its\npsychic power. The target is easier to\nhit for three turns.",
+    "type": "TYPE_PSYCHIC",
+    "quality": "MOVE_QUALITY_INFLICT",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 15,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": 65535,
+        "chance": 0,
+        "duration": 2,
+        "min_turns": 3,
+        "max_turns": 3
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_TELEKINESIS",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_REFLECTABLE", "MOVE_FLAG_MIRROR_MOVE", "MOVE_FLAG_GRAVITY" ]
+}

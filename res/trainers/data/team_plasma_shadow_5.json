@@ -1,0 +1,46 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Shadow",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_SHADOW",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 45,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BISHARP",
+            "form": 0,
+            "level": 65,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_IRON_HEAD", "MOVE_LOW_SWEEP", "MOVE_SCARY_FACE" ]
+        },
+        {
+            "species": "SPECIES_BISHARP",
+            "form": 0,
+            "level": 65,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_X_SCISSOR", "MOVE_GUILLOTINE", "MOVE_SWORDS_DANCE" ]
+        },
+        {
+            "species": "SPECIES_ABSOL",
+            "form": 0,
+            "level": 67,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_SUCKER_PUNCH", "MOVE_PSYCHO_CUT", "MOVE_X_SCISSOR", "MOVE_AERIAL_ACE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "...So what."
+        }
+    ]
+}

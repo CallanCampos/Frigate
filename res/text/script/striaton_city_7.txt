@@ -1,0 +1,11 @@
+StriatonCity7_Text_OhHaveEightGym = Oh my! You have eight Gym Badges?!\nWhy, you must be very strong!{be01}\nBut, I wonder what would separate\nTrainers who both have eight Badges...
+StriatonCity7_Text_TheresModelWhoIve = There's a model who I've been\na fan of for years!{be01}\nHer name is Elesa,\nand her Pokémon are strong, too!{be01}\nHuh? You've battled with her?\nYou're really something!
+StriatonCity7_Text_GtsLinksWorldFrom = The GTS! It links the world from the\nsecond floor of a Pokémon Center!{be01}\nThe full name of the GTS is the\nGlobal Trade Station!{be01}\nNow in Driftveil City, you can find the\nPokémon World Tournament.{be00}\nIt's the PWT for short!
+StriatonCity7_Text_HiHiLetsPlay = Hi, hi!\nLet's play Pokémon rock-paper-scissors!{be01}\nI'm really good at it!\nI've beaten all of my friends!{be00}\nAre you ready?{be01}\nHere we go!
+StriatonCity7_Text_Rock = Rock
+StriatonCity7_Text_Scissors = Scissors
+StriatonCity7_Text_Paper = Paper
+StriatonCity7_Text_Shoot = Shoot!
+StriatonCity7_Text_WaaaahLostWinStreaks = Waaaah! I lost!\nMy win streak's over... Sniff...{be01}
+StriatonCity7_Text_FunfestMissionHasBeen = The Funfest Mission\n“{0140:0}"{be00}\nhas been added to the Entralink!
+StriatonCity7_Text_UntilFigureOutWay = Until I figure out a way\nto win every time for sure,{be00}\nI won't play anymore!

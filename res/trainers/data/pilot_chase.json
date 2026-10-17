@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Chase",
+    "class": "TRAINER_CLASS_PILOT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DUCKLETT",
+            "form": 0,
+            "level": 36,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SWOOBAT",
+            "form": 0,
+            "level": 36,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "If you can beat me, you'll be able\nto face the Gym Leader...{be01}\nYou're too careless if you think that!\nDon't let your guard down yet!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "How could this be?!\nI wasn't being careless at all!"
+        },
+        {
+            "type": 2,
+            "text": "Landing is the hardest part about\npiloting a plane. You'd better stay{be00}\nalert until the very end!"
+        }
+    ]
+}

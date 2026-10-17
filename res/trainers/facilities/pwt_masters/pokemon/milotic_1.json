@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MILOTIC",
+    "moves": [ "MOVE_SCALD", "MOVE_ICY_WIND", "MOVE_REST", "MOVE_SLEEP_TALK" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_ROCKY_HELMET",
+    "form": 0
+}

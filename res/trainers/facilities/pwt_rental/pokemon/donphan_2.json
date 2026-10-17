@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DONPHAN",
+    "moves": [ "MOVE_ENDEAVOR", "MOVE_FLAIL", "MOVE_ROAR", "MOVE_GIGA_IMPACT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_FOCUS_SASH",
+    "form": 0
+}

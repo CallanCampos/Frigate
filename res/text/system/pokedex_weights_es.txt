@@ -1,0 +1,2 @@
+\from{species.pokedex.es.weight}
+\from{species.pokedex.es.forms.weight}

@@ -1,0 +1,67 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Burgh",
+    "class": "TRAINER_CLASS_LEADER_BURGH",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DWEBBLE",
+            "form": 0,
+            "level": 22,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_STRUGGLE_BUG", "MOVE_ROCK_BLAST", "MOVE_FAINT_ATTACK", "MOVE_ROCK_POLISH" ]
+        },
+        {
+            "species": "SPECIES_SHELMET",
+            "form": 0,
+            "level": 22,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_STRUGGLE_BUG", "MOVE_MEGA_DRAIN", "MOVE_ACID", "MOVE_CURSE" ]
+        },
+        {
+            "species": "SPECIES_KARRABLAST",
+            "form": 0,
+            "level": 22,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_STRUGGLE_BUG", "MOVE_HEADBUTT", "MOVE_AERIAL_ACE", "MOVE_ENDURE" ]
+        },
+        {
+            "species": "SPECIES_LEAVANNY",
+            "form": 0,
+            "level": 24,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_STRUGGLE_BUG", "MOVE_RAZOR_LEAF", "MOVE_AERIAL_ACE", "MOVE_GRASS_WHISTLE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "Lights, please! Time to show you\nwhat Bug-type Pokémon are made of!"
+        },
+        {
+            "type": 19,
+            "text": "Mmm... I've got a bad feeling about this!\nCould I be in trouble?"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Hmm... It's over!\nYou're incredible!"
+        }
+    ]
+}

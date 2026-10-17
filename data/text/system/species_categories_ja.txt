@@ -1,2 +1,0 @@
-\from{species.pokedex.ja.category}
-\pad{62}

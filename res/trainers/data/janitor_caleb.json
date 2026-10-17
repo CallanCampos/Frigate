@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Caleb",
+    "class": "TRAINER_CLASS_JANITOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_GREEN_SHARD",
+    "party": [
+        {
+            "species": "SPECIES_KOFFING",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_WEEZING",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I love sports and Pokémon most of all.{be01}\nHow about a battle?\nThey used to call me the Cleaner!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I could not stop all\nof your Pokémon's attacks..."
+        },
+        {
+            "type": 15,
+            "text": "Can you take this?{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I used to be a Striker.\nI was responsible for scoring goals.{be01}\nNow I am a sweeper.\nI am responsible for sweeping floors."
+        }
+    ]
+}

@@ -19,9 +19,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from configure import (CC_FLAGS, GENERATED_INCLUDE_DIR, INCLUDE_DIRS, MWCC_VERSION, TEXT_ARCHIVES, VERSIONS,  # noqa: E402
-                       download_tools, library_of, mwcc_command)
+from configure import (CC_FLAGS, GENERATED_INCLUDE_DIR, INCLUDE_DIRS, MWCC_VERSION, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
+                       VERSIONS, download_tools, library_of, mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.build import rom_blob  # noqa: E402
 from tools.data.gen_constants import generate  # noqa: E402
 from tools.text import pms_words, text_ids  # noqa: E402
 
@@ -66,15 +67,26 @@ def write_header(header: Path, text: str):
 
 
 def generate_constants():
-    """Writes the headers that ninja generates, since the sources include them: the constants of data/constants/,
-    each message file's message IDs and the easy chat words."""
+    """Writes the headers that ninja generates, since the sources include them: the constants of generated/,
+    each message file's message IDs, the easy chat words and the embedded binaries, which are zeros without an
+    extracted ROM."""
     out_dir = ROOT / GENERATED_INCLUDE_DIR
-    for source in sorted((ROOT / "data" / "constants").glob("*.txt")):
+    for source in sorted((ROOT / "generated").glob("*.txt")):
         write_header(out_dir / "constants" / source.with_suffix(".h").name, generate(source))
     for source_dir in TEXT_ARCHIVES.values():
         for source in sorted((ROOT / source_dir).glob("*.txt")):
             write_header(out_dir / "text" / source.parent.name / source.with_suffix(".h").name, text_ids.header(source))
     write_header(out_dir / "constants" / "pms_words.h", pms_words.header())
+    for include, (module, config_dir, name) in ROM_BLOBS.items():
+        # From any extracted version, as ninja takes it from the first one it builds. Without one, zeros, which never
+        # replace the bytes that ninja wrote
+        version = next((v for v in VERSIONS if (ROOT / "extract" / v / module).exists()), None)
+        if version is None and (out_dir / include).exists():
+            continue
+        version = version or next(iter(VERSIONS))
+        data = rom_blob.blob(ROOT / "extract" / version / module,
+                             ROOT / "config" / version / "arm9" / config_dir / "symbols.txt", name, allow_missing=True)
+        write_header(out_dir / include, rom_blob.initializer(data))
 
 
 def main():

@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Gluttony",
-    "description": "Encourages the early use\nof a held Berry."
-}

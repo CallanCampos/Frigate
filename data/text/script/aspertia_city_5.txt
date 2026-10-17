@@ -1,4 +1,0 @@
-AspertiaCity5_Text_HeyThereGoingHave = Hey there, {0100:0}!{be01}\nGoing to have {0100:1} brag to you\nabout his Pokémon again today?
-AspertiaCity5_Text_HeyThereWhyLook = Hey there, {0100:0}!{be01}\nWhy, look at that! You've got a Pokémon\nwith you! That's great!
-AspertiaCity5_Text_IfHavePokemonCan = If you have a Pokémon with you,\nyou can even walk outside of town!
-AspertiaCity5_Text_TakeGoodCarePokemon = Take good care of your Pokémon!{be01}\nI'm sure that little one will show\nyou a whole new world!

@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Gail",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_GAIL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MILOTIC",
+            "form": 0,
+            "level": 71,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LEFTOVERS",
+            "moves": [ "MOVE_HYDRO_PUMP", "MOVE_DRAGON_TAIL", "MOVE_RECOVER", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_MAMOSWINE",
+            "form": 0,
+            "level": 71,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_LIFE_ORB",
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_ICE_SHARD", "MOVE_SUPERPOWER", "MOVE_STONE_EDGE" ]
+        },
+        {
+            "species": "SPECIES_LUCARIO",
+            "form": 0,
+            "level": 71,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_FOCUS_SASH",
+            "moves": [ "MOVE_EXTREME_SPEED", "MOVE_AURA_SPHERE", "MOVE_DRAGON_PULSE", "MOVE_SWORDS_DANCE" ]
+        }
+    ],
+    "messages": []
+}

@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Edward",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_THROH",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_HITMONTOP",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MACHAMP",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I've overcome my fear of Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Mm-hmm! You really love Pokémon, don't you?"
+        },
+        {
+            "type": 2,
+            "text": "There are people who are afraid of\nPokémon, too.{be00}\nThough everyone seems to forget that."
+        }
+    ]
+}

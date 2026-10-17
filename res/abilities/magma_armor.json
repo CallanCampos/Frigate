@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Magma Armor",
+    "description": "Prevents the Pokémon\nfrom becoming frozen."
+}

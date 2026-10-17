@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": "AREA_CHARGESTONE_CAVE_2",
+    "matrix": "MAP_MATRIX_CHARGESTONE_CAVE_2",
+    "scripts": "SCRIPTS_CHARGESTONE_CAVE_2",
+    "text": "SCRIPT_TEXT_CHARGESTONE_CAVE_2",
+    "bgm": "SEQ_BGM_D_02",
+    "encounters": "ENCOUNTERS_CHARGESTONE_CAVE",
+    "enc_slot": 2,
+    "parent": "ZONE_CHARGESTONE_CAVE",
+    "place": "PLACE_CHARGESTONE_CAVE",
+    "place_display": 3,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 4,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 23,
+    "name_icon": 15,
+    "easy_level": 3,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

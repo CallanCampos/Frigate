@@ -1,0 +1,86 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A wild encounter table: res/encounters/<table>.json",
+    "description": "One entry of the wild encounters (archive a/1/2/7), which zone headers name by its ENCOUNTERS_* constant: one table (EncData) for the whole year, or one for each season, which EncData_Load picks from. tools/data/encounter_data.py packs them in the order of generated/encounters.txt, for each version. A string value is the name of a constant from generated/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "all_year": { "$ref": "#/$defs/season", "description": "The table for the whole year, or else one per season" },
+        "spring": { "$ref": "#/$defs/season" },
+        "summer": { "$ref": "#/$defs/season" },
+        "autumn": { "$ref": "#/$defs/season" },
+        "winter": { "$ref": "#/$defs/season" }
+    },
+    "$defs": {
+        "season": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "rates", "grass", "dark_grass", "shaking_grass", "surf", "rippling_surf", "fishing", "rippling_fishing" ],
+            "description": "Each field is the same for Black 2 and White 2, or an object with one for each: { \"black2\": ..., \"white2\": ... }",
+            "properties": {
+                "rates": {
+                    "anyOf": [ { "$ref": "#/$defs/rates" }, { "$ref": "#/$defs/versioned_rates" } ]
+                },
+                "grass": { "$ref": "#/$defs/group12" },
+                "dark_grass": { "$ref": "#/$defs/group12" },
+                "shaking_grass": { "$ref": "#/$defs/group12" },
+                "surf": { "$ref": "#/$defs/group5" },
+                "rippling_surf": { "$ref": "#/$defs/group5" },
+                "fishing": { "$ref": "#/$defs/group5" },
+                "rippling_fishing": { "$ref": "#/$defs/group5" }
+            }
+        },
+        "rates": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "grass", "dark_grass", "shaking_grass", "surf", "rippling_surf", "fishing", "rippling_fishing", "flags" ],
+            "description": "The encounter rate of each group, 0 for none, and the table's flags (swan's flags and fishingEnable)",
+            "properties": {
+                "grass": { "$ref": "#/$defs/u8" },
+                "dark_grass": { "$ref": "#/$defs/u8" },
+                "shaking_grass": { "$ref": "#/$defs/u8" },
+                "surf": { "$ref": "#/$defs/u8" },
+                "rippling_surf": { "$ref": "#/$defs/u8" },
+                "fishing": { "$ref": "#/$defs/u8" },
+                "rippling_fishing": { "$ref": "#/$defs/u8" },
+                "flags": { "$ref": "#/$defs/u8" }
+            }
+        },
+        "versioned_rates": {
+            "type": "object", "additionalProperties": false, "required": [ "black2", "white2" ],
+            "properties": { "black2": { "$ref": "#/$defs/rates" }, "white2": { "$ref": "#/$defs/rates" } }
+        },
+        "slot": {
+            "type": "array", "minItems": 3, "maxItems": 4,
+            "description": "[ species, lowest level, highest level ], and the form when not 0. An empty slot before a used one is [ \"SPECIES_NONE\", 0, 0 ]",
+            "prefixItems": [
+                { "type": [ "string", "integer" ], "x-constant": "SPECIES_", "minimum": 0, "maximum": 2047 },
+                { "$ref": "#/$defs/u8" },
+                { "$ref": "#/$defs/u8" },
+                { "type": "integer", "minimum": 0, "maximum": 31 }
+            ]
+        },
+        "slots12": { "type": "array", "maxItems": 12, "items": { "$ref": "#/$defs/slot" } },
+        "slots5": { "type": "array", "maxItems": 5, "items": { "$ref": "#/$defs/slot" } },
+        "group12": {
+            "description": "Up to 12 slots; the rest are empty",
+            "anyOf": [
+                { "$ref": "#/$defs/slots12" },
+                {
+                    "type": "object", "additionalProperties": false, "required": [ "black2", "white2" ],
+                    "properties": { "black2": { "$ref": "#/$defs/slots12" }, "white2": { "$ref": "#/$defs/slots12" } }
+                }
+            ]
+        },
+        "group5": {
+            "description": "Up to 5 slots; the rest are empty",
+            "anyOf": [
+                { "$ref": "#/$defs/slots5" },
+                {
+                    "type": "object", "additionalProperties": false, "required": [ "black2", "white2" ],
+                    "properties": { "black2": { "$ref": "#/$defs/slots5" }, "white2": { "$ref": "#/$defs/slots5" } }
+                }
+            ]
+        },
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 }
+    }
+}

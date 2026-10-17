@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Joe & Ross",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_JELLICENT",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 2,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ZEBSTRIKA",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Whoosh! Whoosh!\nI can fight like that!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Joe: Fffffft...\nFffffft, fffffft... The ball needs air.{be01}\nRoss: Faaaault!\nI missed a serve!"
+        },
+        {
+            "type": 5,
+            "text": "They can keep moving\nfor such a long time.{be01}\nSmashers are really great!"
+        },
+        {
+            "type": 6,
+            "text": "Whoosh! Whoosh!"
+        },
+        {
+            "type": 7,
+            "text": "Hah!{be01}\nDid you see my power serve?{be01}\nAnd my Pokémon is\neven stronger!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "The person who controls his serves\ncontrols the game.{be00}\nI will practice my serves a bit more."
+        },
+        {
+            "type": 10,
+            "text": "Hah!"
+        }
+    ]
+}

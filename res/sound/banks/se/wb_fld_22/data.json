@@ -1,0 +1,18 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_FLD_DOOR_AUTO", null, null, null ],
+    "instruments": [
+        {
+            "program": 97,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_FLD_DOOR_AUTO",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        }
+    ]
+}

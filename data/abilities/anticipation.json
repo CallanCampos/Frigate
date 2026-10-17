@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Anticipation",
-    "description": "Senses a foe's\ndangerous moves."
-}

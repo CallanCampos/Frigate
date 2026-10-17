@@ -22,7 +22,7 @@ from tools.text.text_ids import message_count, message_numbers  # noqa: E402
 from tools.text.text_sources import expand  # noqa: E402
 
 ROOT = Path(__file__).parents[2]
-TEXT = ROOT / "data/text/system"
+TEXT = ROOT / "res/text/system"
 # The last word of a category whose file goes on past its words, with padding
 LAST_WORDS = {"SPECIES": "SpeciesNamesUpper_Text_BadEgg"}
 # The categories in word order: their name, their message file, and for one whose words are another constant's, the

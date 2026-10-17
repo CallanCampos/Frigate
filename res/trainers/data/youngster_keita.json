@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Keita",
+    "class": "TRAINER_CLASS_YOUNGSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SLAKOTH",
+            "form": 0,
+            "level": 63,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SLAKING",
+            "form": 0,
+            "level": 63,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My goal is to outperform Gym Leaders!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My Pokémon fought well, didn't they?"
+        },
+        {
+            "type": 2,
+            "text": "When those triplets at Striaton\nRestaurant go back to being Gym Leaders,{be00}\nI'll be the first in line to challenge 'em!"
+        }
+    ]
+}

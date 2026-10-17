@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 11,
+    "npc_cache": 24,
+    "area": "AREA_MARVELOUS_BRIDGE",
+    "matrix": "MAP_MATRIX_MARVELOUS_BRIDGE",
+    "scripts": "SCRIPTS_MARVELOUS_BRIDGE",
+    "text": "SCRIPT_TEXT_MARVELOUS_BRIDGE",
+    "bgm": "SEQ_BGM_H_05",
+    "encounters": "ENCOUNTERS_MARVELOUS_BRIDGE",
+    "enc_slot": 0,
+    "parent": "ZONE_MARVELOUS_BRIDGE",
+    "place": "PLACE_MARVELOUS_BRIDGE",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 26,
+    "transition": 4,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": false,
+    "entralink_warp": true,
+    "cam_bound": 135,
+    "name_icon": 19,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

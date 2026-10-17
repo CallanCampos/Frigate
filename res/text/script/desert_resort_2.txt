@@ -1,0 +1,8 @@
+DesertResort2_Text_CameClearOutDesert = I came clear out to the Desert Resort\nto train, but...{be01}\nIt would be so much easier to\nproceed if I had a Water-type Pokémon...
+DesertResort2_Text_YoureSecondPersonCome = You're the second person to come\nclear out here to talk to me!{be01}\nI'm so moved!\nSo, I'll give you this!{be01}
+DesertResort2_Text_IfPokemonHoldsSoft = If a Pokémon holds this Soft Sand, the\npower of its Ground-type moves goes up!
+DesertResort2_Text_AccordingWhatIveHeard = According to what I've heard, that\nRelic Castle is the ruins of a city built{be00}\nby the hero of old and the dragon{be00}\nPokémon that accompanied the hero.
+DesertResort2_Text_OhSeaSandDont = Oh! A sea of sand! I don't need\nGo-Goggles here!{be01}\nThe Mirage Tower in a desert\nof the Hoenn region has disappeared.{be01}\nUnova's desert is also swallowing\nup the Relic Castle little by little.
+DesertResort2_Text_ExpansiveDesertCastleBuried = An expansive desert and\na castle buried in sand!{be01}\nThere's no doubt about it!\nTreasure is here!{be01}\nIt's been a year since the day my\ninternal treasure detector went off,{be00}\nbut I still haven't found any yet.{be00}\nI'm still following my dream, though...{be01}\nAnd I'm having so much fun\nI can barely stand it!{be01}
+DesertResort2_Text_FunfestMissionHasBeen = The Funfest Mission\n“{0140:0}"{be00}\nhas been added to the Entralink!
+DesertResort2_Text_SpendingEachDayLiving = Spending each day living my dream...\nIs THAT my treasure?!

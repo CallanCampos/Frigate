@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SLOWBRO",
+    "moves": [ "MOVE_SCALD", "MOVE_PSYSHOCK", "MOVE_SLACK_OFF", "MOVE_YAWN" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_APICOT_BERRY",
+    "form": 0
+}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Light Metal",
+    "description": "Halves the Pokémon's\nweight."
+}

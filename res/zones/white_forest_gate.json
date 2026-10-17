@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 4,
+    "npc_cache": 24,
+    "area": "AREA_WHITE_FOREST_GATE",
+    "matrix": "MAP_MATRIX_WHITE_FOREST_GATE",
+    "scripts": "SCRIPTS_WHITE_FOREST_GATE",
+    "text": "SCRIPT_TEXT_WHITE_FOREST_GATE",
+    "bgm": "SEQ_BGM_GATE",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_WHITE_FOREST_GATE",
+    "place": "PLACE_WHITE_FOREST_2",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 24,
+    "transition": 0,
+    "battle_bg": 2,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 225,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

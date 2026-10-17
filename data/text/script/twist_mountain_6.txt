@@ -1,2 +1,0 @@
-TwistMountain6_Text_ItsRockCoveredIce = It's a rock covered with ice.\nTouching it could make you freeze.
-\pad{0c}

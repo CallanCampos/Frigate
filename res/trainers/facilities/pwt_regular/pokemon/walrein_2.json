@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_WALREIN",
+    "moves": [ "MOVE_ICE_BALL", "MOVE_EARTHQUAKE", "MOVE_ENCORE", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_METRONOME",
+    "form": 0
+}

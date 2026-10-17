@@ -1,0 +1,166 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Politoed",
+    "pokedex": {
+        "category": "Frog Pokémon",
+        "entry": "It gathers groups of others as\ntheir leader. Its cries make\nPoliwag obey.",
+        "height": "3'07\"",
+        "weight": "74.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Politoed",
+                "category": "Frog Pokémon",
+                "entry": "It gathers groups of others as\ntheir leader. Its cries make\nPoliwag obey.",
+                "height": "3'07\"",
+                "weight": "74.7 lbs."
+            },
+            "fr": {
+                "name": "Tarpaud",
+                "category": "Pokémon Grenouille",
+                "entry": "Il rassemble ses pairs pour les\ncommander. Il utilise son cri\npour diriger Ptitard.",
+                "height": "1,1 m",
+                "weight": "33,9 kg"
+            },
+            "de": {
+                "name": "Quaxo",
+                "category": "Frosch",
+                "entry": "Es versammelt andere Pokémon\num sich herum und führt sie an.\nQuapsel gehorchen seinem Ruf.",
+                "height": "1,1 m",
+                "weight": "33,9 kg"
+            },
+            "it": {
+                "name": "Politoed",
+                "category": "Pokémon Rana",
+                "entry": "Ama radunare gruppi e atteggiarsi\na capogruppo.\nI suoi versi richiamano Poliwag.",
+                "height": "1,1 m",
+                "weight": "33,9 kg"
+            },
+            "ko": {
+                "name": "왕구리",
+                "category": "개구리포켓몬",
+                "entry": "왕구리를 리더로 해서 그룹이\n만들어진다. 왕구리의 울음소리가\n발챙이들을 따르게 한다.",
+                "height": "1.1 m",
+                "weight": "33.9 kg"
+            },
+            "es": {
+                "name": "Politoed",
+                "category": "Pokémon Rana",
+                "entry": "Agrupa a otros Pokémon para liderarlos.\nLos Poliwag obedecen su voz.",
+                "height": "1,1 m",
+                "weight": "33,9 kg"
+            },
+            "ja": {
+                "name": "ニョロトノ",
+                "category": "かえるポケモン",
+                "entry": "ニョロトノを\\x{3000}リーダーに\\x{3000}グループが\nつくられる。ニョロトノの\\x{3000}なきごえが\nニョロモたちを\\x{3000}したがわせる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff11}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff13}\\x{ff0e}\\x{ff19}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 75,
+        "defense": 75,
+        "speed": 70,
+        "special_attack": 90,
+        "special_defense": 100
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 3
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_KINGS_ROCK",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_WATER_1", "EGG_GROUP_WATER_1" ],
+    "abilities": [ "ABILITY_WATER_ABSORB", "ABILITY_DAMP" ],
+    "hidden_ability": "ABILITY_DRIZZLE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 225,
+    "height": 11,
+    "weight": 339,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BUBBLE_BEAM" ],
+            [ 1, "MOVE_HYPNOSIS" ],
+            [ 1, "MOVE_DOUBLE_SLAP" ],
+            [ 1, "MOVE_PERISH_SONG" ],
+            [ 27, "MOVE_SWAGGER" ],
+            [ 37, "MOVE_BOUNCE" ],
+            [ 48, "MOVE_HYPER_VOICE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM29",
+            "TM31",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM52",
+            "TM55",
+            "TM56",
+            "TM66",
+            "TM68",
+            "TM78",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_BOUNCE",
+            "MOVE_ICE_PUNCH",
+            "MOVE_ICY_WIND",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_POLIWAG",
+    "cry_volume": 110
+}

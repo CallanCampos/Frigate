@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Poison Touch",
-    "description": "May poison targets when a\nPokémon makes contact."
-}

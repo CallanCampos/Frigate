@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dell",
+    "class": "TRAINER_CLASS_POLICEMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_RIOLU",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GROWLITHE",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey, you!\nStop right there!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "There's no stopping you!\nOne might call you unstoppable!"
+        },
+        {
+            "type": 2,
+            "text": "Go all out while you're still young!"
+        }
+    ]
+}

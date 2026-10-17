@@ -1,7 +1,0 @@
-Title3_Text_LetsDressUpProps = Let's Dress Up {0102:0}\nwith Props!
-Title3_Text_LookOk = Is this look OK?
-Title3_Text_WaitingOtherParticipantsDress = Waiting for other participants\nto Dress Up.
-Title3_Text_PropLooksNice = {010a:0}: A Prop that looks\nnice on the {0131:1}.
-Title3_Text_PropsLookNiceWere = Props that look nice on the {0131:0}\nwere sorted at the beginning.
-Title3_Text_OrderPropsRestoredOriginal = The order of Props was\nrestored to the original order.
-Title3_Text_CanPullOutProps = You can pull out Props from the list\nand put them on your Pokémon.

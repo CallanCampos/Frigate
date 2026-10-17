@@ -1,0 +1,49 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Elle",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_RAWST_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_MAGMAR",
+            "form": 0,
+            "level": 54,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FLAMETHROWER", "MOVE_BRICK_BREAK", "MOVE_WILL_O_WISP", "MOVE_FAINT_ATTACK" ]
+        },
+        {
+            "species": "SPECIES_CAMERUPT",
+            "form": 0,
+            "level": 54,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_LAVA_PLUME", "MOVE_ROCK_SLIDE", "MOVE_EARTHQUAKE", "MOVE_WILL_O_WISP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A heated battle is good, but get too hot\nand you might end up getting burned!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Amazing...\nI think I got a bit singed."
+        },
+        {
+            "type": 15,
+            "text": "If you get burned, be sure to use this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Burning competitiveness and cool logic...{be01}\nYou'll need both if you're going to go\nup against the Pokémon League."
+        }
+    ]
+}

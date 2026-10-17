@@ -1,0 +1,54 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Rival",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_RIVAL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_UNFEZANT",
+            "form": 0,
+            "level": 39,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_SCOPE_LENS"
+        },
+        {
+            "species": "SPECIES_SIMIPOUR",
+            "form": 0,
+            "level": 39,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_MYSTIC_WATER"
+        },
+        {
+            "species": "SPECIES_EMBOAR",
+            "form": 0,
+            "level": 41,
+            "difficulty": 150,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_CHARCOAL"
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "Let's do it, partner!"
+        },
+        {
+            "type": 20,
+            "text": "I'm counting on you!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I couldn't even draw out my team's\nreal strength... How pathetic!"
+        }
+    ]
+}

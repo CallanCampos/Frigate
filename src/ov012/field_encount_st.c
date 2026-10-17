@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/encounter.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -139,7 +140,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
         if (IsNPCStrengthRock(objCode) && !func_ov012_0216820c(actorSystem, &position)) {
             action->flags |= 8;
         }
-        if (objCode == 0x6c) {
+        if (objCode == OBJ_CODE_108) {
             action->flags |= 1;
         }
     }

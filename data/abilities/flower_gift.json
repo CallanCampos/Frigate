@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Flower Gift",
-    "description": "Powers up party Pokémon\nwhen it is sunny."
-}

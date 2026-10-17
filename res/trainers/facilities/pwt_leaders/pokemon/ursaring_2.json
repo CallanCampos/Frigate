@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_URSARING",
+    "moves": [ "MOVE_CHIP_AWAY", "MOVE_CRUNCH", "MOVE_REST", "MOVE_COUNTER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

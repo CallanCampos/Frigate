@@ -1,0 +1,334 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 1,
+                "front": 8,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 6,
+                "front": 8,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 6,
+                "front": 18,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 7,
+                "front": 4,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 7,
+                "front": 12,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 7,
+                "front": 22,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 2,
+                "front": 13,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 15,
+                "front": 9,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 15,
+                "front": 22,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 8,
+                "front": 8,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 9,
+                "front": 14,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 9,
+                "front": 30,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 19,
+                "front": 7,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 19,
+                "front": 25,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 11,
+                "front": 0,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 10,
+                "front": 2,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 10,
+                "front": 17,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 3,
+                "front": 1,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 4,
+                "front": 0,
+                "side": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "rail": {
+                "component": 12,
+                "front": 2,
+                "side": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_POKEFAN_M",
+            "movement": 69,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 14,
+                "front": 15,
+                "side": -1
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_LASS",
+            "movement": 69,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 6,
+                "front": 23,
+                "side": 1
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_BACKPACKER_F",
+            "movement": 69,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 3,
+                "front": 6,
+                "side": -1
+            }
+        },
+        {
+            "id": 3,
+            "model": "OBJ_CODE_ACE_TRAINER_M",
+            "movement": 82,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 1
+            },
+            "rail": {
+                "component": 19,
+                "front": 11,
+                "side": 1
+            }
+        },
+        {
+            "id": 4,
+            "model": "OBJ_CODE_BACKERS_M",
+            "movement": 70,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x035a",
+            "script": 5,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "rail": {
+                "component": 8,
+                "front": 0,
+                "side": 1
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_BRIDGE_GATE_2",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 4,
+            "rail": {
+                "component": 13,
+                "front": 0,
+                "side": -2,
+                "front_span": 1,
+                "side_span": 5,
+                "param": 0
+            }
+        },
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 4,
+            "rail": {
+                "component": 12,
+                "front": 4,
+                "side": -2,
+                "front_span": 1,
+                "side_span": 5,
+                "param": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}
