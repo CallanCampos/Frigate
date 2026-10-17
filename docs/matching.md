@@ -88,7 +88,7 @@ tools that show the differences.
   than in locals, and `x2` and `y2` assigned after those stores, in that order. When registers are swapped and no order
   of the computation helps, try writing the `volatile` stores before the arithmetic they don't depend on.
 - Registers are colored in the order the source defines the values, before the scheduler reorders the code, so
-  `compiler_probe.py --opt -O1` shows the coloring in source order (`#pragma scheduling off` changes nothing). Read
+  `compiler_probe.py --opt=-O1` shows the coloring in source order (`#pragma scheduling off` changes nothing). Read
   the original's registers as a definition order: `btlv_effvm.c`'s `BtlvEffvm_InitEmitter` keeps from.x, to.x, from.y
   and to.y of motion type 4's swap in r2, r1, r3 and r7, spills from.z and holds to.z in ip, the order of saving and
   swapping each axis in turn (`x = from.x; from.x = to.x;`, then y and z), with the three sums after. Every save

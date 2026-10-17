@@ -166,7 +166,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   into a local of the type the loop compares it at, declared at that place (`u32 movie = rules->movie;` against a
   `u32` bit field). (matching.md: "register after every declared local too")
 - Registers of a scheduled block that no declaration or statement order of the same steps gives: read them as the
-  order the values are defined (`--opt -O1` shows it unscheduled) and interleave the statements so, as a per-axis
+  order the values are defined (`--opt=-O1` shows it unscheduled) and interleave the statements so, as a per-axis
   save and move. (matching.md: "Registers are colored in the order the source defines")
 - Table addresses reloaded from the pool at each use and a constant built in every copy of an unrolled inline,
   one pushed register short: combine each call's result as soon as it comes (ORed into a `u8` accumulator),
