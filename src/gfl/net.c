@@ -591,7 +591,7 @@ void func_02042e9c(BOOL a0) {
 // Allocates 32-byte aligned memory, keeping the allocation just before it for func_02042ed0
 void *allocConfigDSSoftwareFeature(HeapID heapId, u32 size, const char *file, u16 line) {
     void *mem = GFL_HeapAllocate(heapId, ((size + sizeof(void *) + 32) & ~31) + 32, TRUE, file, line);
-    void **aligned = (void **)(((u32)mem + 32) & ~31);
+    void **aligned = (void **)(((uptr)mem + 32) & ~31);
 
     aligned[-1] = mem;
     return aligned;

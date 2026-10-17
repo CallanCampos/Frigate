@@ -1,0 +1,7 @@
+# NitroSDK DMA files that the host build doesn't compile from lib/, because port/hal/dma/dma.c does their transfers
+# with the CPU at once. Same format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+lib/nitro/src/mi/mi_dma.c # fills and copies through the channels' registers, which cut host pointers to 32 bits
+lib/nitro/src/mi/mi_dma_itcm.c # MIi_DmaSetParameters, which stores a fill's word at the raw DS address 0x040000e0
+lib/nitro/src/mi/mi_dma_card.c # the card data port's continuous DMA; the host's card copies from the ROM file
+lib/nitro/src/mi/mi_dma_gxcommand.c # display lists to the geometry FIFO by DMA, paced by FIFO interrupts

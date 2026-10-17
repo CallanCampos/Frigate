@@ -1,0 +1,4 @@
+# NitroSDK power management files that the host build doesn't compile from lib/, because port/hal/pm provides what
+# they do. Same format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+lib/nitro/src/spi/pm.c # compiled through port/hal/pm/pm_host.c, whose PM_Init writes the exit flag that pm.c defines at a raw DS address to host memory

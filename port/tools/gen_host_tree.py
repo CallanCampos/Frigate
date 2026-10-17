@@ -44,8 +44,10 @@ CAST_ADDRESS = re.compile(r"(\(\s*(?:(?:const|volatile)\s+)*[A-Za-z_][A-Za-z0-9_
                           r"\s*\(?\s*)(0x0[1-9a-aA-A][0-9a-fA-F]{6})\b")
 # A memory-map or register address constant, "#define HW_BG_VRAM 0x06000000", "#define REG_DMA0SAD_ADDR 0x040000b0"
 CONSTANT_ADDRESS = re.compile(r"^(\s*#\s*define\s+(?:HW_[A-Z0-9_]+|REG_[A-Z0-9_]+_ADDR)\s+)(0x0[1-9a-aA-A][0-9a-fA-F]{6})\s*$")
-# A register macro, "#define reg_GX_VCOUNT (*(vu16 *)0x04000006)"
-REGISTER = re.compile(r"^(\s*#\s*define\s+([A-Za-z0-9_]+)\s+\(\*\()(v[us](?:8|16|32|64))(\s*\*\)\s*)(0x[0-9a-fA-F]{8})(\)\s*)$")
+# A register macro, "#define reg_GX_VCOUNT (*(vu16 *)0x04000006)", also with a plain or "volatile" type, as cp.h's
+# "#define reg_CP_DIV_RESULT (*(u64 *)0x040002a0)" has
+REGISTER = re.compile(r"^(\s*#\s*define\s+([A-Za-z0-9_]+)\s+\(\*\()(v[us](?:8|16|32|64)|(?:volatile\s+)?[us](?:8|16|32|64))"
+                      r"(\s*\*\)\s*)(0x[0-9a-fA-F]{8})(\)\s*)$")
 
 # The registers whose accesses must act, by address: the host function that returns the memory a read or write of the
 # register uses. A write-stream function returns a fresh slot for each write, so that each store is seen; a read

@@ -1,0 +1,5 @@
+# NitroSDK CARD files that the host build doesn't compile from lib/, because port/hal/card provides what they do. Same
+# format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+lib/nitro/src/card/card_rom.c # the card's registers and DMA; ROM reads copy from the player's ROM file (port/hal/card/card_rom.c)
+lib/nitro/src/card/card_backup.c # compiled through port/hal/card/card_backup_host.c, which takes the game's buffers as whole pointers (port/hal/card/card_backup_calls.h) and names the page buffer to the host's ARM7

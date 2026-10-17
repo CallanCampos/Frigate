@@ -1374,22 +1374,22 @@ GX_DEFINE_BG_GET_CONTROL(G2S_GetBG3Control256x16Pltt, GXBg23Control256x16Pltt, r
 
 // Sets a BG's affine matrix, its center and its offset. NitroSDK's G2x_SetBGyAffine_
 // swan's gfxRegSetBGTransform
-void G2x_SetBGyAffine_(u32 addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y);
+void G2x_SetBGyAffine_(uptr addr, const MtxFx22 *mtx, int centerX, int centerY, int x, int y);
 
 static inline void G2_SetBG2Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    G2x_SetBGyAffine_((u32)&reg_G2_BG2PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((uptr)&reg_G2_BG2PA, mtx, centerX, centerY, x, y);
 }
 
 static inline void G2_SetBG3Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    G2x_SetBGyAffine_((u32)&reg_G2_BG3PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((uptr)&reg_G2_BG3PA, mtx, centerX, centerY, x, y);
 }
 
 static inline void G2S_SetBG2Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    G2x_SetBGyAffine_((u32)&reg_G2S_DB_BG2PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((uptr)&reg_G2S_DB_BG2PA, mtx, centerX, centerY, x, y);
 }
 
 static inline void G2S_SetBG3Affine(const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
-    G2x_SetBGyAffine_((u32)&reg_G2S_DB_BG3PA, mtx, centerX, centerY, x, y);
+    G2x_SetBGyAffine_((uptr)&reg_G2S_DB_BG3PA, mtx, centerX, centerY, x, y);
 }
 
 // NitroSDK's GX_SetGraphicsMode and GXS_SetGraphicsMode
@@ -1750,8 +1750,8 @@ BOOL GX_IsDispOn(void);             // swan's gfxEngineIsEnabledA
 void GX_DispOff(void);              // swan's gfxEngineDisableA
 // NitroSDK's GXx_SetMasterBrightness_ and GXx_GetMasterBrightness_, which take the address of the register: -16 to 16,
 // 0 for none
-void GXx_SetMasterBrightness_(u32 reg, s32 brightness); // swan's GFXRegSetMasterBrightness
-s32 GXx_GetMasterBrightness_(u32 reg);                  // swan's gfxRegGetMasterBrightness
+void GXx_SetMasterBrightness_(uptr reg, s32 brightness); // swan's GFXRegSetMasterBrightness
+s32 GXx_GetMasterBrightness_(uptr reg);                  // swan's gfxRegGetMasterBrightness
 // NitroSDK's GX_InitGXState (gx_state.c)
 void GX_InitGXState(void); // swan's gfxInitVRAM
 // The lock ID that GX_Init takes for the VRAM banks. NitroSDK's GXi_VRamLockId, swan's g_GfxCartLock
@@ -1766,16 +1766,16 @@ extern u16 GXi_VRamLockId;
 
 // NitroSDK's G2x_SetBlendAlpha_: alpha blending of the planes of plane1 over those of plane2. The sub screen's BLDCNT
 // is at REG_DB_BLDCNT_ADDR
-void G2x_SetBlendAlpha_(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2); // swan's gfxRegSetAlphaBlend
+void G2x_SetBlendAlpha_(uptr reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2); // swan's gfxRegSetAlphaBlend
 // NitroSDK's G2x_SetBlendBrightness_: brightens the planes by a positive brightness or darkens them by a negative one
-void G2x_SetBlendBrightness_(u32 reg, u32 plane, s32 brightness); // swan's gfxRegSetBrightnessBlend
+void G2x_SetBlendBrightness_(uptr reg, u32 plane, s32 brightness); // swan's gfxRegSetBrightnessBlend
 // NitroSDK's G2x_SetBlendBrightnessExt_: the brightness effect, with the alphas that BLDALPHA holds for the planes
 // that it is not applied to
 // swan's gfxRegSetBlend
-void G2x_SetBlendBrightnessExt_(u32 reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness);
+void G2x_SetBlendBrightnessExt_(uptr reg, u32 plane1, u32 plane2, s32 alpha1, s32 alpha2, s32 brightness);
 // NitroSDK's G2x_ChangeBlendBrightness_: changes the brightness effect's level and keeps its planes, turning a
 // brightening into a darkening and back
-void G2x_ChangeBlendBrightness_(u32 reg, s32 brightness); // swan's gfxRegAdjustBrightnessBlend
+void G2x_ChangeBlendBrightness_(uptr reg, s32 brightness); // swan's gfxRegAdjustBrightnessBlend
 
 // NitroSDK libgx's g3imm.c and g3_util.c: matrix commands through the FIFO port, and rotations through the matrix
 // multiplication port

@@ -7,6 +7,14 @@
 #define CHILD_HEAP_COUNT 24
 #define HEAP_INDEX_NONE 0xff
 
+#ifdef PLATFORM_PC
+// A host's structs are larger than the DS's (pointers are 8 bytes), so the platform layer sizes the heaps
+u32 port_heap_size(u32 index, u32 size, BOOL root);
+#define PORT_HEAP_SIZE(index, size, root) port_heap_size(index, size, root)
+#else
+#define PORT_HEAP_SIZE(index, size, root) size
+#endif
+
 typedef struct {
     NNSFndHeapHandle handle;
     // The heap and the memory a child heap is allocated from
@@ -95,10 +103,10 @@ BOOL GFL_HeapMgrInit(const HeapDef *defs, u16 rootCount, u16 maxHeapIds, u32 res
     sHeapMgr.heapCount = heapCount;
     sHeapMgr.lastResult = HEAP_RESULT_OK;
     for (i = 0; i < rootCount; i++) {
-        void *memory = OS_AllocFromArenaLo(OS_ARENA_MAIN, defs[i].size, 4);
+        void *memory = OS_AllocFromArenaLo(OS_ARENA_MAIN, PORT_HEAP_SIZE(i, defs[i].size, TRUE), 4);
 
         if (memory != NULL) {
-            sHeapMgr.heaps[i].handle = NNS_FndCreateExpHeapEx(memory, defs[i].size, 0);
+            sHeapMgr.heaps[i].handle = NNS_FndCreateExpHeapEx(memory, PORT_HEAP_SIZE(i, defs[i].size, TRUE), 0);
             sHeapMgr.indices[i] = i;
         } else {
             sHeapMgr.lastResult = i;
@@ -119,6 +127,9 @@ BOOL GFL_HeapAddChild(HeapID parentHeapId, HeapID heapId, u32 size) {
         alignment = 4;
     }
     heapId &= HEAPID_TAIL_BIT - 1;
+#ifdef PLATFORM_PC
+    size = PORT_HEAP_SIZE(heapId, size, FALSE);
+#endif
     if (sHeapMgr.indices[heapId] != HEAP_INDEX_NONE) {
         sHeapMgr.lastResult = HEAP_RESULT_1;
     } else if ((parent = GFL_HeapGetBase(parentHeapId & (HEAPID_TAIL_BIT - 1))) == NULL) {

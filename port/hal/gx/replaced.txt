@@ -1,0 +1,8 @@
+# NitroSDK GX files that the host build doesn't compile from lib/ because port/hal/gx provides what they do, beyond
+# the ones port/hal/replaced.txt lists (gx_load3d.c, whose host version is port/hal/gx/gx_load3d.c, and gxasm.c, whose
+# is port/hal/gx/gxasm.c). Same format: a glob pattern, " # " and the reason.
+#
+# None so far. The files whose functions port/hal/gx wraps or replaces one by one stay compiled, with those functions
+# renamed port_sdk_<name> by port/cmake/gx.cmake: gx_vramcnt.c, gx_state.c and mi_wram.c (port/hal/gx/vramcnt.c wraps
+# each function to apply VRAMCNT after it), and gx_load2d.c (port/hal/gx/gx_load2d_extpltt.c replaces the main
+# engine's six extended palette functions).

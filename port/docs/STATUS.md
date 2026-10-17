@@ -26,10 +26,46 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: phase 1 platform layer, and the game changes it needs
+
+- **Upstream:** `4aa041311` (merge of PR #348); unchanged.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match; `check_mwcc_neutral.py`: all 3,138 file and version pairs give the same MWCC token stream
+  as upstream's `4aa041311`.
+- **Host build:** arm64 macOS; CI checks macOS and Linux.
+- **Tests:** T0 as above. T2: 144 of 144 `ctest` tests pass (OS scheduler and interrupt scenarios, the 2D renderer's
+  16,318 pixel checks, PXI services, ROM and card, overlay data sections, VRAM banks, DMA, integration, the asm
+  oracle, the smoke test, which now runs the first frame). T3–T7 not yet.
+- **Tiers:** not re-measured (upstream unchanged).
+- **Trap stubs:** 587 function stubs and 69 data placeholders.
+- **64-bit warnings:** not yet counted by the host build.
+- **Work done:**
+  - The phase 1 platform layer ([ADR 0005](adr/0005-platform-boundary-as-built.md)): the OS on fibers with the
+    decomp's own scheduler and a virtual clock (`port/hal/os`); the PXI bus and the ARM7's services (power, touch,
+    firmware settings, reset, cartridge slot, mic, a sound driver); the ROM from the player's dump, the backup chip as an
+    atomic save file, and resident overlays whose statics reset on load (`port/hal/rom`, `card`, `fs`); VRAM banks
+    aliased by page mapping (`port/hal/gx`); DMA done at once (`port/hal/dma`); the CPU 2D renderer (`port/gfx/ref`),
+    screens, input and an SDL window (`port/gfx/screens.c`, `port/app`, `port/hal/input`), `--screenshot`.
+  - Game changes, all proven neutral (`port/docs/game-changes.md`): `uptr`, `sptr` and `ulong32`, and the sites that
+    needed them (NNS FND heaps, `HW_DTCM`, GX register-address parameters, the sound heap, two alignment computations,
+    the RTC date and the misc save block); the heap size hook.
+  - `port/hal/gfl/heap_policy.c` (root heaps x4, child heaps x2, `--heap-scale-root`/`--heap-scale-child`);
+    `port/hal/dwc/ov011_pending.c`, the four overlay 11 symbols DWC's boot-time init reaches before upstream's claim
+    writes them; `port/docs/decomp-findings.md`.
+  - The generator routes `reg_CP_DIV_RESULT` (a plain `u64` register) through its accessor; before, every `FX_Div`
+    returned 0. Crashes outside the trap pages now print their address and a backtrace, on their own signal stack.
+  - In an exploration tree with the remaining fix (below) the game played the boot screens and the whole Game Freak
+    logo movie for 1,100 frames, deterministically, and reached the title screen.
+- **Next:** NitroSystem G2D's in-place relocation (PLAN.md §4.8 rule 5), in progress as a workflow: a relocation
+  registry tied to heap frees and host unpackers for every G2D format, proven on every such file in the ROM. Then the
+  boot logos in the repository build (phase 1's exit), then phase 2.
+- **Blockers:** the repository build crashes in the boot screens (`src/ov162/boot_screens.c`, the first character
+  data), on the G2D relocation above. Overlay 36 (issue #83) still gates phase 3.
+
 ## 2026-10-17: phase 0 complete; DS addresses, asm replacements and 64-bit layouts
 
 - **Upstream:** `4aa041311` (merge of PR #348); upstream hasn't moved since this session's sync.
-- **Port:** `PORT_SHA`.
+- **Port:** `d63819fc5`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`) after a full `ninja` with this commit's
   `include/types.h` change; `check_mwcc_neutral.py`, now comparing token streams: all 3,138 file and version pairs give the same MWCC token stream as upstream's `4aa041311`.
 - **Host build:** arm64 macOS and x86-64 Linux build in CI (`port-ci.yml` green), which closes phase 0's exit criteria

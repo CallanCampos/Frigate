@@ -1,0 +1,5 @@
+# NitroSDK PXI files that the host build doesn't compile from lib/, because port/hal/pxi provides what they do. Same
+# format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+lib/nitro/src/pxi/pxi_fifo.c # the FIFO's registers and the handshake with the ARM7; the host's ARM7 takes and sends words through port/hal/pxi/pxi_fifo.c
+lib/nitro/src/pxi/pxi_init.c # PXI_Init, which port/hal/pxi/pxi_fifo.c has with the rest of the FIFO

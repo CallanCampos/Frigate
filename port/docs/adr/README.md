@@ -60,6 +60,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0002](0002-solo-project-no-upstream-posts.md) | A solo project with no upstream posts | D10, §9 | accepted |
 | [0003](0003-ad-hoc-signing-no-apple-developer-account.md) | Ad-hoc signing, no Apple Developer account | D11, §7, §10 | accepted |
 | [0004](0004-ds-addresses-by-header-translation.md) | DS addresses by build-time header translation | D3, §4.5 | accepted |
+| [0005](0005-platform-boundary-as-built.md) | The platform boundary as built | D3, D5, §4.5, §4.7 | accepted |
 
 ## Decisions waiting for an ADR
 
@@ -70,7 +71,6 @@ changes. Each deserves an ADR when the work it governs starts, or sooner if some
 | Plan | Decision | Write by |
 | --- | --- | --- |
 | D2 | Our own platform layer, not libntr | phase 0 |
-| D3 | Hybrid platform boundary | phase 0 |
 | D4 | Languages, compiler and libraries | phase 0 |
 | D5 | 64-bit native build | phase 0 |
 | D6 | One executable for both versions | phase 5 |

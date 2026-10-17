@@ -1,0 +1,4 @@
+# NitroSDK SND files that the host build doesn't compile from lib/, because port/hal/snd7 provides what they do. Same
+# format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+lib/nitro/src/snd/snd_interface.c # compiled through port/hal/snd7/snd_interface_host.c, which notes the pointers that the commands cut to 32 bits

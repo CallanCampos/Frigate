@@ -51,7 +51,7 @@ void DWCRapCommon_SetSubHeapEx(u32 name, u32 size, u32 minSize, HeapID heapId) {
 
     pDwcRapWork->heapPtrSub = GFL_HeapAllocate(heapId, size - 0x80, FALSE, "dwc_rapcommon.c", 98);
     pDwcRapWork->headHandleSub =
-        NNS_FndCreateExpHeapEx((void *)(((u32)pDwcRapWork->heapPtrSub + 0x1f) & ~0x1f), size - 0xc0, 0);
+        NNS_FndCreateExpHeapEx((void *)(((uptr)pDwcRapWork->heapPtrSub + 0x1f) & ~0x1f), size - 0xc0, 0);
     pDwcRapWork->subName = name;
     NNS_FndSetExpHeapFitMode(pDwcRapWork->headHandleSub, 1);
     NNS_FndSetExpHeapGroup(pDwcRapWork->headHandleSub, 0xea);
@@ -138,7 +138,7 @@ void DWCRapCommon_Create(HeapID heapId, u32 size) {
 
     pDwcRapWork = GFL_HeapAllocate(0, sizeof(DWCRapCommonWork), TRUE, "dwc_rapcommon.c", 332);
     pDwcRapWork->heapPtr = GFL_HeapAllocate(heapId, size - 0x80, FALSE, "dwc_rapcommon.c", 333);
-    pDwcRapWork->heap = NNS_FndCreateExpHeapEx((void *)(((u32)pDwcRapWork->heapPtr + 0x1f) & ~0x1f), size - 0xc0, 0);
+    pDwcRapWork->heap = NNS_FndCreateExpHeapEx((void *)(((uptr)pDwcRapWork->heapPtr + 0x1f) & ~0x1f), size - 0xc0, 0);
     pDwcRapWork->subHeapId = 0;
 }
 

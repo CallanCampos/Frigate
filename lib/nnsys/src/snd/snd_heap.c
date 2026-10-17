@@ -35,7 +35,7 @@ NNSSndHeapHandle NNS_SndHeapCreate(void *startAddress, u32 size) {
     NNSFndHeapHandle handle;
     void *endAddress = (u8 *)startAddress + size;
 
-    startAddress = (void *)ROUND_UP((u32)startAddress, 4);
+    startAddress = (void *)ROUND_UP((uptr)startAddress, 4);
     if (startAddress > endAddress) {
         return NNS_SND_HEAP_INVALID_HANDLE;
     }

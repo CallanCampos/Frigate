@@ -1,0 +1,4 @@
+# NitroSDK NVRAM files that the host build doesn't compile from lib/, because port/hal/nvram provides what they do.
+# Same format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+lib/nitro/src/nvram/nvram.c # compiled through port/hal/nvram/nvram_host.c, which notes the buffers whose 64-bit pointers the commands cut to 32 bits

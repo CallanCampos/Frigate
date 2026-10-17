@@ -16,9 +16,9 @@ typedef enum {
 // The SDK types the date as unsigned long (the game's u32 is unsigned int): RTC_ConvertDateToDay folds the - 1 of its
 // table index into the table's address only for that type
 typedef struct {
-    unsigned long year;
-    unsigned long month;
-    unsigned long day;
+    ulong32 year;
+    ulong32 month;
+    ulong32 day;
     RTCWeek week;
 } RTCDate;
 

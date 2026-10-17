@@ -116,7 +116,7 @@ void GXS_SetGraphicsMode(int bgMode) {
     reg_GXS_DB_DISPCNT = (reg_GXS_DB_DISPCNT & ~REG_GXS_DB_DISPCNT_BGMODE_MASK) | bgMode;
 }
 
-void GXx_SetMasterBrightness_(u32 reg, s32 brightness) {
+void GXx_SetMasterBrightness_(uptr reg, s32 brightness) {
     if (brightness == 0) {
         *(vu16 *)reg = 0;
     } else if (brightness > 0) {
@@ -126,7 +126,7 @@ void GXx_SetMasterBrightness_(u32 reg, s32 brightness) {
     }
 }
 
-s32 GXx_GetMasterBrightness_(u32 reg) {
+s32 GXx_GetMasterBrightness_(uptr reg) {
     u16 mode = *(vu16 *)reg & REG_GX_MASTER_BRIGHT_MODE_MASK;
     if (mode == 0) {
         return 0;

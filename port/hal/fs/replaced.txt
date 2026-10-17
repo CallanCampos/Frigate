@@ -1,0 +1,5 @@
+# NitroSDK FS files that the host build doesn't compile from lib/, because port/hal/fs provides what they do, beyond
+# fs_overlay.c, which port/hal/replaced.txt lists. Same format: a glob pattern, " # " and the reason.
+
+lib/nitro/src/fs/fs_command_default.c # compiled through port/hal/fs/fs_command_default_host.c, which leaves the tables in the ROM and stops at a memory address cut to 32 bits
+lib/nitro/src/fs/fs_memfile.c # compiled through port/hal/fs/fs_memfile_host.c, which reads and writes files over memory through the game's whole pointers

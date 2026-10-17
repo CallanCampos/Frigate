@@ -81,7 +81,7 @@ void OS_SetProtectionRegion(int regionNo, u32 address, u32 size); // swan's SetM
 
 // The start of DTCM, where the linker places the DTCM module
 extern u32 SDK_AUTOLOAD_DTCM_START[];
-#define HW_DTCM ((u32)SDK_AUTOLOAD_DTCM_START)
+#define HW_DTCM ((uptr)SDK_AUTOLOAD_DTCM_START)
 // The interrupt flags that OS_WaitIrq checks, at the end of DTCM
 #define HW_INTR_CHECK_BUF (HW_DTCM + 0x3ff8)
 // The IRQ stack in DTCM: its top, and its end where it would overflow

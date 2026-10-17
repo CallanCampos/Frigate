@@ -1,0 +1,12 @@
+# NitroSDK OS files that the host build doesn't compile from lib/ because port/hal/os provides what they do, beyond the
+# ones port/hal/replaced.txt lists for the whole OS module. Same format: a glob pattern, " # " and the reason.
+
+lib/nitro/src/os/os_thread.c # compiled through port/hal/os/os_thread_host.c, which renames the four functions that truncate 64-bit pointers
+lib/nitro/src/os/os_tick.c # timer 0 runs on the virtual clock (port/hal/os/os_tick.c)
+lib/nitro/src/os/os_interrupt.c # IF's writes acknowledge, and enabling a pending interrupt takes it (port/hal/os/os_interrupt.c)
+lib/nitro/src/os/os_irqTable.c # the DTCM table's contents, and OS_SetIrqCheckFlag's word, which HW_DTCM truncates (port/hal/os/os_irqTable.c)
+lib/nitro/src/os/os_irqHandler.c # OS_WaitIrq's check word, which HW_DTCM truncates (port/hal/os/os_system.c)
+lib/nitro/src/os/os_emulator.c # the console type of a retail DS; the DSi check reads SCFG_A9ROM through a raw address (port/hal/os/os_emulator.c)
+lib/nitro/src/os/os_valarm.c # compiled through port/hal/os/os_valarm_host.c, which sets its statics back for each run
+lib/nitro/src/os/os_reset.c # compiled through port/hal/os/os_reset_host.c, which sets OS_InitReset's flag back for each run
+lib/nitro/src/os/os_alloc.c # compiled through port/hal/os/os_alloc_host.c, whose OS_InitAlloc, OS_CreateHeap and OS_CreateExtraHeap keep whole addresses (the SDK rounds them through u32, and puts the extra heap at the raw 0x02000000)

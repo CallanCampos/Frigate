@@ -1,12 +1,22 @@
 #ifndef POKEBW2_TYPES_H
 #define POKEBW2_TYPES_H
 
+// What differs between the DS and a 64-bit host (PLAN.md §4.8). Each is a macro, not a typedef, so that what MWCC
+// compiles stays token for token as it was
 #ifdef PLATFORM_PC
 // The host build keeps the DS's 4-byte alignment of 64-bit values, so that structs holding them keep the DS's layout:
 // saves, files, and the sizes the game passes as constants. On a typedef the attribute may lower the alignment
 #define PORT_DS_ALIGN_64 __attribute__((aligned(4)))
+// An integer that holds an address: u32 on the DS, as wide as a pointer on a host
+#define uptr __UINTPTR_TYPE__
+#define sptr __INTPTR_TYPE__
+// The DS's unsigned long, 32 bits, for structs that must keep the DS's layout (a host's long can be 64 bits)
+#define ulong32 unsigned int
 #else
 #define PORT_DS_ALIGN_64
+#define uptr u32
+#define sptr s32
+#define ulong32 unsigned long
 #endif
 
 typedef unsigned char u8;

@@ -126,7 +126,9 @@ add_custom_command(
         --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c"
         --objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
                   ${port_gfx_objects}
+    # The objects themselves, not only their targets, so that the stubs follow every recompiled file
     DEPENDS pokebw2_game port_hal port_app ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
+        "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>" ${port_gfx_objects}
     WORKING_DIRECTORY "${REPO_ROOT}"
     COMMAND_EXPAND_LISTS
     VERBATIM)
@@ -149,9 +151,9 @@ foreach(fragment IN LISTS port_cmake_fragments)
     include("${fragment}")
 endforeach()
 
-# Tests (ctest --test-dir build/port). The smoke test passes once the program reaches the game's main(); a trap
-# stub or a placeholder stopping it after that is expected until the platform layer is complete
+# Tests (ctest --test-dir build/port). The smoke test runs the game's first frame: it passes once the program enters
+# the game's main() and the frame ends without a crash (a trap stub stopping it is still accepted)
 enable_testing()
-add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless)
+add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless --frames 1 --watchdog 30)
 set_tests_properties(smoke_reaches_game_main PROPERTIES
     PASS_REGULAR_EXPRESSION "entering the game's main\\(\\)" TIMEOUT 60)

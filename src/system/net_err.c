@@ -133,11 +133,11 @@ static inline GXWndPlane G2S_GetWndOutsidePlane(void) {
 }
 
 static inline GXWndPlane G2_GetWndOBJInsidePlane(void) {
-    return *(volatile GXWndPlane *)((u32)&reg_G2_WINOUT + 1);
+    return *(volatile GXWndPlane *)((uptr)&reg_G2_WINOUT + 1);
 }
 
 static inline GXWndPlane G2S_GetWndOBJInsidePlane(void) {
-    return *(volatile GXWndPlane *)((u32)&reg_G2S_DB_WINOUT + 1);
+    return *(volatile GXWndPlane *)((uptr)&reg_G2S_DB_WINOUT + 1);
 }
 
 // NitroSDK's PAD_Read, as in key.c

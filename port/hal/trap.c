@@ -66,7 +66,12 @@ static void on_fault(int signal, siginfo_t *info, void *context) {
         fflush(stderr);
         _Exit(PORT_TRAP_EXIT_STATUS);
     }
-    // Any other fault is a crash: let the default action report it
+    if (!(address >= port_trap_data_begin && address < port_trap_data_end)) {
+        // Any other fault is a crash: say where, then let the default action end the program as it would have
+        fprintf(stderr, "\nport: crash: signal %d at address %p\n", signal, info->si_addr);
+        print_backtrace();
+        fflush(stderr);
+    }
     struct sigaction action;
     memset(&action, 0, sizeof(action));
     action.sa_handler = SIG_DFL;
@@ -81,10 +86,15 @@ void port_trap_protect_data(void) {
     if (end > begin && mprotect((void *)begin, end - begin, PROT_NONE) != 0) {
         perror("port: mprotect of the data placeholders");
     }
+    // The handler runs on a stack of its own, so that a thread's stack overflowing (the game's threads run on fibers
+    // with guard pages) is still reported
+    static unsigned char altStack[64 * 1024];
+    stack_t stack = { .ss_sp = altStack, .ss_size = sizeof(altStack), .ss_flags = 0 };
+    sigaltstack(&stack, NULL);
     struct sigaction action;
     memset(&action, 0, sizeof(action));
     action.sa_sigaction = on_fault;
-    action.sa_flags = SA_SIGINFO;
+    action.sa_flags = SA_SIGINFO | SA_ONSTACK;
     sigemptyset(&action.sa_mask);
     sigaction(SIGSEGV, &action, NULL);
     sigaction(SIGBUS, &action, NULL);
