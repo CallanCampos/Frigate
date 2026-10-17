@@ -7,3 +7,7 @@ lib/twl/src/scfg/scfg_proc_itcm.c:
 
 lib/nitro/src/mi/mi_dma_itcm.c:
     .text       start:0x01ff8bf0 end:0x01ff8c88
+
+src/gfl/clact_itcm.c:
+    complete
+    .text       start:0x01ff8020 end:0x01ff8bf0

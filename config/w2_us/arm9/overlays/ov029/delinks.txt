@@ -32,5 +32,6 @@ lib/dwc/src/vct/vct_dsp.c:
     .bss        start:0x02198424 end:0x021998cc
 
 lib/dwc/src/vct/vct.c:
+    complete
     .text       start:0x02196ef4 end:0x021971e8
     .bss        start:0x021998cc end:0x02199900

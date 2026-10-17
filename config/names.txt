@@ -1227,6 +1227,9 @@
 . 0x02048aac GFL_MsgDataLoadHeader
 . 0x02048b78 GFL_MsgDataSetDefaultLangID
 . 0x02049288 NNS_G3dGlbFlush
+. 0x0204c2f0 ClActor_GetFlip
+. 0x0204d3bc ClActAnim_Tick
+. 0x0204d46c ClActAnim_SetSpeed
 . 0x0205044c GFL_BMN_Create
 . 0x020504d0 ButtonInit
 . 0x020504dc GFL_BMN_Delete
@@ -3641,6 +3644,9 @@
 dtcm 0x02fe0000 SDK_AUTOLOAD_DTCM_START
 dtcm 0x02fe0020 OS_IRQTable
 dtcm 0x02fe00a0 OSi_IrqThreadQueue
+itcm 0x01ff8318 visibleAnimRenderer
+itcm 0x01ff8610 sharedParamsRenderer
+itcm 0x01ff8900 sharedParamsVisibleAnimRenderer
 itcm 0x01ff8bf0 MIi_DmaSetParameters
 itcm 0x01ff8c88 OS_IrqHandler
 itcm 0x01ff8fac OSi_DoResetSystem
@@ -16491,7 +16497,7 @@ overlays/ov257 0x0219b2a8 CtvtCamera_MoveCoord
 overlays/ov257 0x0219b2e8 CtvtCamera_SetWindow
 overlays/ov257 0x0219b49c CtvtCamera_MarkWindow
 overlays/ov257 0x0219b4ac CtvtCamera_IsWindowMoving
-overlays/ov257 0x0219b4b8 CtvtCamera_SetSize
+overlays/ov257 0x0219b4b8 CtvtCamera_SetEffect
 overlays/ov257 0x0219b4e0 CtvtCamera_StartRecording
 overlays/ov257 0x0219b4fc CtvtCamera_EndRecording
 overlays/ov257 0x0219b524 CtvtCamera_GetCameraSystem
