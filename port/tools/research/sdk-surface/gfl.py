@@ -5,8 +5,8 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-db = pickle.load(open(HERE / "binscan.pkl", "rb"))
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"  # ignored by git; db.py fills it
+db = pickle.load(open(DATA / "binscan.pkl", "rb"))
 F = db["funcs"]
 
 GFX_FAM = re.compile(r"^(GXS?i?_|G2S?i?_|G2x_|GXx_|G3X?i?_|G3[BC]_|NNSi?_G2d|NNSi?_G3d|NNSi?_Gfd|NNS_G3D|SPL|MI_.*GX|DC_)")

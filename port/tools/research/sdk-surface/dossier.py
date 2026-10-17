@@ -5,9 +5,9 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-db = pickle.load(open(HERE / "binscan.pkl", "rb"))
-hw = json.load(open(HERE / "hwscan.json"))
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"  # ignored by git; db.py fills it
+db = pickle.load(open(DATA / "binscan.pkl", "rb"))
+hw = json.load(open(DATA / "hwscan.json"))
 F = db["funcs"]
 
 
@@ -101,4 +101,4 @@ for s in sorted(agg):
         print(f"   C regs: {dict(cmac[s].most_common(14))}")
     if casm[s]:
         print(f"   C asm funcs ({len(casm[s])}): {casm[s][:25]}")
-json.dump(out, open(HERE / "dossier.json", "w"), indent=1)
+json.dump(out, open(DATA / "dossier.json", "w"), indent=1)

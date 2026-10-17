@@ -4,8 +4,8 @@ import pickle
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-db = pickle.load(open(HERE / "binscan.pkl", "rb"))
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"  # ignored by git; db.py fills it
+db = pickle.load(open(DATA / "binscan.pkl", "rb"))
 F = db["funcs"]
 
 A = {  # portable logic: compile natively (asm functions rewritten as C where noted)
@@ -94,7 +94,7 @@ for c in used:
     if F[c]["cls"] in ("B", "B-lite"):
         bf[(F[c]["lib"], Path(F[c]["path"] or "?").stem)].append(F[c]["name"])
 out = {f"{k[0]}:{k[1]}": sorted(v) for k, v in sorted(bf.items())}
-json.dump(out, open(HERE / "b_used.json", "w"), indent=1)
+json.dump(out, open(DATA / "b_used.json", "w"), indent=1)
 for k, v in out.items():
     print(f"  {k} ({len(v)}): {', '.join(v[:14])}{' ...' if len(v) > 14 else ''}")
 

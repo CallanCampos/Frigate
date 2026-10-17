@@ -19,8 +19,9 @@ work, this file wins where the two differ.
   session that finds its worktree without `CLAUDE.local.md` creates it.
 - **gh targets the port.** gh prefers a remote named `upstream` to `origin` and can't ask which one in a Claude
   session, so each clone runs `gh repo set-default CallanCampos/pokebw2-native` (kept in `.git/config`, which
-  worktrees share). Every gh command that writes still names its repository: `-R CallanCampos/pokebw2-native` for the
-  port, and `-R fuddlesworth/pokebw2` only to read or for a post the user approved.
+  worktrees share). Every gh command that writes still names its repository, `-R CallanCampos/pokebw2-native`.
+  `-R fuddlesworth/pokebw2` is only for reads, never for writes (D10,
+  [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
 - **Port work is for Claude Code.** Upstream's `AGENTS.md`, `.agents/` and `.codex/` give Codex the decomp's rules
   and never mention the port, so Codex sessions don't do port work.
 - **Port files live in `port/`**, plus files upstream doesn't have: `.github/workflows/port-*.yml` and
@@ -45,26 +46,31 @@ work, this file wins where the two differ.
 - **Never here:** overlay claims, matching, new decomp source files, config changes (`add_source_file.py`,
   `mark_complete.py`, `rename_symbol.py`, `config_fixes.py`), and edits to `docs/nonmatching-functions.md` or
   `docs/matching.md`. The `decomp-file`, `match-function`, `finish-file` and `record-lesson` skills and the root
-  "Learn" rule belong to the decomp checkout. **Keep going** means the next task of the loop.
+  "Claim an overlay", "Record overlay progress" and "Learn" rules belong to the decomp checkout
+  ([below](#upstream-doesnt-know-about-the-port)). **Keep going** means the next task of the loop.
 - **`fix-build`** helps diagnose a ROM build failure here, but the fix is always to the port's own change (rework or
   revert it), never a config, `delinks.txt`, symbol or rename change. A failure that upstream's `main` shows on its
-  own is a blocker to report (see below), not to fix here.
+  own is recorded as a blocker in STATUS.md and told to the user, never fixed here or reported upstream.
 
 ## Staying in sync ([docs/SYNC.md](docs/SYNC.md))
 
 - **`main` also moves every hour.** The `port-sync` Action (`.github/workflows/port-sync.yml`) merges upstream's
   `main` when the merge is clean and every C file still compiles for both versions. CI has no ROMs, so those merges
   are not SHA1-checked: the T0 run after a session's `git merge origin/main` is what verifies them. A conflict, a
-  compile failure, a change to upstream's workflows or a rewrite of its history leaves `main` alone and opens an
-  `upstream-sync` issue.
+  compile failure, a change to upstream's workflows, a rewrite of its history or, while this repository is public,
+  commits whose messages reference issues (the `references` outcome) leaves `main` alone and opens an `upstream-sync`
+  issue.
 - **Each session starts with `port/tools/sync_upstream.sh`.** It merges upstream on top of what the Action merged,
   builds both ROMs and checks both SHA1s, builds and tests the host side once `port/CMakeLists.txt` exists, and pushes
   only when all of that passes. Upstream lands 150–250 commits a day, so sync before each task and at least daily.
 - **When the script stops**, SYNC.md says what to do. Exit 3 is a merge conflict: resolve it (a file with a row in
   [game-changes.md](docs/game-changes.md) takes upstream's version with the port's change reapplied) and run the
-  script again. Exit 4 means upstream rewrote its history: stop and ask the user before `--allow-rewrite`. An
-  upstream `main` that fails `ninja` on its own is never fixed here: record it as a blocker in STATUS.md, offer an
-  upstream report (the user's OK), and ask the user how to go on meanwhile.
+  script again. Exit 4 means upstream rewrote its history: stop and ask the user before `--allow-rewrite`. Exit 5
+  means the push would carry commits whose messages reference issues while this repository is public
+  ([below](#upstream-doesnt-know-about-the-port)): stop and ask the user before `--allow-references`. If the script
+  says it couldn't read the repository's visibility, which it then treats as public, check `gh auth status`, fix the
+  login and run the script again before asking. An upstream `main` that fails `ninja` on its own is never fixed or
+  reported from here: record it as a blocker in STATUS.md, tell the user, and ask how to go on meanwhile.
 - After a sync that changes upstream's workflows, check with `gh workflow list --all -R CallanCampos/pokebw2-native`
   that `build.yml` is still off. Why the repository works this way is
   [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md).
@@ -86,8 +92,8 @@ work, this file wins where the two differ.
 
 Game code stays the decomp's. Only three kinds of change are allowed outside `port/`:
 
-1. **Matching-neutral portability fixes**, such as `uptr` for a value that carries an address. Each is also offered
-   upstream, with the user's OK.
+1. **Matching-neutral portability fixes**, such as `uptr` for a value that carries an address. They stay in this
+   repository; none is proposed upstream.
 2. **Hook macros** (`PORT_EVENT`, `PORT_SHOULD`) that compile to nothing, or to the bare expression, in the ROM build.
 3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. `include/platform.h` is the only place
    that decides between MWCC and a host.
@@ -110,11 +116,11 @@ get host `_Static_assert`s.
   game function. The HAL's SDK replacements and the ARM7 sound driver are port code by design (PLAN.md §4.5, §4.7).
 - **Writing the missing C is decomp work.** For an overlay, read its `[Decomp] Overlay NNN` issue and comments
   (`gh issue view N -R fuddlesworth/pokebw2 --comments`). If someone holds a claim, the task waits: record the
-  blocker in STATUS.md and pick another. Code with no overlay issue (the ITCM, ARM9 main, LTD) has no claim yet, and
-  opening an issue for it is a public post that needs the user's OK. The four ITCM ClAct renderers that phase 2 needs
-  are such code.
+  blocker in STATUS.md and pick another. Code with no overlay issue (the ITCM, ARM9 main, LTD) has no claim yet. The
+  four ITCM ClAct renderers that phase 2 needs are such code.
 - **A port session never writes in the decomp checkout.** It offers the task to the user, who starts a decomp session
-  there; that session works under the root rules (claim, C from the asm, both SHA1s, fork PR).
+  there; that session works under the root rules (claim, C from the asm, both SHA1s, fork PR) as ordinary decomp
+  work, and nothing it posts mentions the port.
 
 ## What native means (PLAN.md §1)
 
@@ -146,7 +152,8 @@ only when its exit criteria pass on macOS.
   (`PATH=/opt/homebrew/opt/llvm/bin:$PATH`). A full `ninja` takes about 5 minutes and 2.2 GB; exit code 139 is an
   intermittent wibo crash, so run it once more.
 - A new clone or worktree is prepared with `port/tools/bootstrap_checkout.sh`, which links `orig/`, `.venv` and the
-  tools from the decomp checkout, and the Claude Code steps in [README.md](README.md#preparing-a-checkout).
+  tools from the decomp checkout and installs the write guard ([below](#upstream-doesnt-know-about-the-port)), and the
+  Claude Code steps in [README.md](README.md#preparing-a-checkout).
 - Long jobs (`ninja`, the sync, the progress tracker, the compile probe, replays) run with `run_in_background` or
   Monitor, never `sleep`. Never print a whole `.s` file, research report or log; use `grep -n` and `tail`.
 - Write only in your own worktree. If a hook refuses a write, stop and report it; never route around it with the
@@ -155,8 +162,45 @@ only when its exit criteria pass on macOS.
   `sync_upstream.sh` does.
 - Stage files by name, never with `git add -A` or `git add .`, and never use a bare `git stash`.
 
-## Public posts and upstream
+## Upstream doesn't know about the port
 
-- Anything public on `fuddlesworth/pokebw2` (issues, comments, overlay claims, PRs, the portability proposals of
-  PLAN.md §9) needs the user's OK each time. Read-only `gh` is fine. Never push to `upstream`; never force-push.
-- Unlinked C that the port shows behaving differently from the ROM is a decomp bug: offer an upstream report.
+The port is a solo project (PLAN.md D10, [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
+
+- **Never post anything about the port on `fuddlesworth/pokebw2`**: no issues, comments, reactions, pull requests,
+  discussions or proposals, and no mention of the port in decomp PRs or claims made from the decomp checkout. Read-only
+  `gh` against upstream is fine.
+- **Never link upstream issues or pull requests** (`fuddlesworth/pokebw2#NNN` or their URLs) from port issues, pull
+  requests, comments or commit messages: GitHub shows such links on upstream's timelines. Plain `#NNN` text inside
+  committed files is fine. Commit links (`fuddlesworth/pokebw2@<sha>`) are fine.
+- **Port commit messages name only the port's own issues**, as a bare `#N`, and port issues, pull requests and comments
+  should too. They carry no `OWNER/REPO#N` and no issue, pull request or discussion URL of any repository, a third
+  party's included (ds-decomp, SDL): name a third-party issue by its title. GitHub records such a reference on the other
+  repository's issue, and the sync's reference check, which doesn't tell repositories apart, also stops on an
+  unpublished port commit that has one.
+- **Never @-mention upstream's maintainers or contributors** (for example fuddlesworth or mariano54) in port issues,
+  pull requests, comments or commit messages: a mention can notify them.
+- **Upstream's own commit messages can reference issues** (`OWNER/REPO#N`, or an issue, pull request or discussion
+  URL), and pushing such a commit can record a "referenced" event, naming this repository, on that issue. So the sync
+  stops before pushing commits whose messages reference issues, whatever the repository's visibility (a private
+  repository's references still show, without their details): `sync_upstream.sh` exits 5 and the Action reports
+  `references`. Stop and ask the user; only the user decides to run `--allow-references`
+  ([SYNC.md](docs/SYNC.md#commit-messages-that-name-other-repositories)).
+- **The root `CLAUDE.md`'s overlay rules and the decomp skills never run in this clone.** Its "Claim an overlay" and
+  "Record overlay progress" rules and the `decomp-file`, `finish-file` and `match-function` skills post claims and
+  progress comments, with commit links, on upstream's issues; run from this clone, they would post about port commits
+  on upstream. They belong to the decomp checkout.
+- **The write guard is never bypassed.** `port/tools/hooks/port_guard.py` is a PreToolUse hook that
+  `bootstrap_checkout.sh` installs in the clone's `.claude/settings.local.json`. In a worktree, Claude Code 2.1.211 and
+  later read that file from the clone's root (not on Windows), so the hook covers every worktree of the clone, and only
+  a new clone needs bootstrap for it; `.worktreeinclude` also copies the file into new worktrees, as a fallback. If the
+  hook refuses a command, stop and report it; never route around it with another tool or the shell.
+- **Port findings stay here.** Unlinked C that the port shows behaving differently from the ROM is recorded in
+  `port/docs/decomp-findings.md` (created with the first one), and so are PLAN.md §6's equivalence notes; the user
+  decides whether a decomp session fixes a finding as ordinary decomp work.
+- **Never push to `upstream`; never force-push.** `bootstrap_checkout.sh` disables the `upstream` remote's push URL
+  by setting it to `DISABLED-port-never-pushes-upstream`. Run it again whenever `git remote -v` shows another push URL
+  for `upstream`, as it does after the remote is added again. `sync_upstream.sh` runs only in a checkout whose `origin`
+  is `CallanCampos/pokebw2-native`.
+- **macOS builds are ad-hoc signed** (`codesign --force --sign -`) and never notarized: there is no Apple Developer
+  account (PLAN.md D11, [ADR 0003](docs/adr/0003-ad-hoc-signing-no-apple-developer-account.md)). Nothing in the build
+  may need a paid certificate, entitlements that require one, or notarization.

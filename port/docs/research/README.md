@@ -5,6 +5,17 @@ The full reports behind [RESEARCH.md](../RESEARCH.md), written by research agent
 scratch directories inside them refer to that session and no longer exist; the scripts they mention are kept in
 [port/tools](../../tools/).
 
+Where a report's recommendation differs from a decision in [PLAN.md §3](../PLAN.md#3-decisions), the plan wins. D10
+([ADR 0002](../adr/0002-solo-project-no-upstream-posts.md)) replaces the reports' upstream proposals, such as
+[port-landscape.md](port-landscape.md)'s game-code changes that go upstream
+([§7.1](port-landscape.md#71-principles-inferred), principle 1), its screen-size constants
+([§7.6](port-landscape.md#76-rendering-widescreen-and-dual-screens-inferred)), its upstream portability fixes and hook
+sites ([§7.16](port-landscape.md#716-keeping-game-code-close-to-the-decomp-inferred)), and its open questions about
+pokebw2 accepting them ([§7.18](port-landscape.md#718-decisions-to-make-explicitly-inferred)). Nothing is proposed
+upstream; those changes stay in this repository. D11
+([ADR 0003](../adr/0003-ad-hoc-signing-no-apple-developer-account.md)) replaces their Developer ID and notarization
+recommendations: macOS builds are ad-hoc signed and never notarized.
+
 | Report | Covers |
 | --- | --- |
 | [decomp-progress.md](decomp-progress.md) | Tiers of C coverage per module, data and pointer coverage, pace, claims, nonmatching rows |

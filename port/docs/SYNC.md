@@ -46,11 +46,14 @@ repository only. Its first job, `merge`, has a read-only token and keeps no cred
 
 The second job, `publish`, holds the write token and runs none of upstream's code:
 
-8. Makes the same merge on the current `main` and pushes it if the tree outside `port/` is the one that compiled. If
-   `main` moved meanwhile only in `port/`, it merges onto the new `main` and tries again, up to three attempts. If
-   `main` changed outside `port/`, it pushes nothing and leaves the merge to the next run, which compiles again.
+8. Makes the same merge on the current `main` and pushes it if the tree outside `port/` is the one that compiled and
+   no commit that the push adds names an issue in another repository (see
+   [Commit messages that name other repositories](#commit-messages-that-name-other-repositories)). If `main` moved
+   meanwhile only in `port/`, it merges onto the new `main` and tries again, up to three attempts. If `main` changed
+   outside `port/`, it pushes nothing and leaves the merge to the next run, which compiles again.
 9. Writes a job summary: the upstream commits before and after, the conclusions of upstream's own CI for the merged
-   commit, the number merged, the port commits before and after, and whether the tree outside `port/` is upstream's.
+   commit, the number merged, the port commits before and after, whether the tree outside `port/` is upstream's, and
+   the short SHAs of commits that name issues in other repositories or carry a closing keyword.
 10. Opens or updates one issue labeled `upstream-sync` when it is blocked, and closes it at the next sync that gets
     through, naming the merged upstream commit.
 
@@ -64,6 +67,7 @@ The second job, `publish`, holds the write token and runs none of upstream's cod
 | Upstream history rewritten | no | opened or updated | fails when the blocker is new, then succeeds with a warning |
 | Workflow files changed upstream | no | opened or updated | succeeds with a warning |
 | Files outside `port/` differ from upstream | no | opened or updated, kept open | succeeds with a warning |
+| Commits name issues in other repositories | no | opened or updated | fails when the blocker is new, then succeeds with a warning |
 | Push refused although `main` didn't move | no | opened or updated | fails |
 
 A failed scheduled run notifies the person who added the schedule (or last changed its cron line), so a run fails
@@ -116,15 +120,19 @@ Every port session starts with it (PLAN.md §8, step 1):
 port/tools/sync_upstream.sh            # from anywhere in the port clone or one of its worktrees
 ```
 
-It refuses to run with changes to tracked files or a merge in progress, and never stashes. It fast-forwards to
-`origin/main`, checks for a rewrite of upstream's history, merges upstream `main` with the same message and trailer as
-the Action, runs `python3 configure.py b2_us w2_us` and `ninja` (once more if ninja exits 139, wibo's intermittent
-crash), checks both ROM files against `b2_us.sha1` and `w2_us.sha1`, runs the host build and `ctest` once
-`port/CMakeLists.txt` exists, and pushes to `origin main` only when all of that passed. A refused push is fetched,
-merged again, rebuilt only where the new commits change something, and retried, three attempts in all; it never
-force-pushes. At the end it prints the fields of a [STATUS.md](STATUS.md) entry that it knows (upstream and port
-commits, ROM, host build, tests, and any upstream workflow files the push changes); the session adds the rest and
-commits the entry.
+It refuses to run when a URL of `origin` (fetch or push) isn't `CallanCampos/pokebw2-native` as `https://github.com/...`
+or `git@github.com:...`, with or without `.git` (so not the decomp or its fork `CallanCampos/pokebw2`), when tracked
+files have changes, or when a merge is in progress; it never stashes. It adds the `upstream` remote when it is missing,
+and sets that remote's push URL to `DISABLED-port-never-pushes-upstream` whenever it is anything else, as
+`bootstrap_checkout.sh` does, so that a push there fails while fetching still works. It fast-forwards to `origin/main`,
+checks for a rewrite of upstream's history, checks commit messages for issues in other repositories (see
+[below](#commit-messages-that-name-other-repositories)), merges upstream `main` with the same message and trailer as the
+Action, runs `python3 configure.py b2_us w2_us` and `ninja` (once more if ninja exits 139, wibo's intermittent crash),
+checks both ROM files against `b2_us.sha1` and `w2_us.sha1`, runs the host build and `ctest` once `port/CMakeLists.txt`
+exists, and pushes to `origin main` only when all of that passed. A refused push is fetched, merged again, rebuilt only
+where the new commits change something, and retried, three attempts in all; it never force-pushes. At the end it prints
+the fields of a [STATUS.md](STATUS.md) entry that it knows (upstream and port commits, ROM, host build, tests, and any
+upstream workflow files the push changes); the session adds the rest and commits the entry.
 
 | Option | Effect |
 | --- | --- |
@@ -134,12 +142,15 @@ commits the entry.
 | `--metrics` | Also measure the decomp with `port/tools/progress/run_all.sh`. |
 | `--abort-on-conflict` | Abort a conflicting merge instead of leaving it in progress. |
 | `--allow-rewrite` | Merge although upstream rewrote its history (see below). |
+| `--allow-references` | Merge and push although commit messages name issues in other repositories (see below). |
 
 With `--branch`, a worktree on a branch of its own is brought up to `origin/NAME` and pushed there. `--metrics` writes
 to `build/port-metrics`, takes about 5 minutes and needs `extract/`. The script publishes nothing it didn't build:
-`--no-build` never pushes, and no option pushes an unbuilt merge.
+`--no-build` never pushes, and no option pushes an unbuilt merge. Like `--allow-rewrite`, `--allow-references` is the
+user's decision, never a session's.
 
-Exit status: 0 done, 1 failed, 2 bad usage, 3 merge conflict, 4 upstream history rewritten.
+Exit status: 0 done, 1 failed, 2 bad usage or an `origin` that isn't the port repository, 3 merge conflict, 4 upstream
+history rewritten, 5 commit messages name issues in other repositories.
 
 A new clone or worktree needs the ROMs and tools first. `port/tools/bootstrap_checkout.sh [DECOMP_CHECKOUT]` works
 from the decomp checkout (default `~/dev/decomp/pokebw2`) and never replaces an existing file. It links `orig/`,
@@ -170,6 +181,8 @@ to an upstream file made only so that the Action's merge passes.
   [When the port changes game files](#when-the-port-changes-game-files). Each session's local sync publishes
   upstream's changes meanwhile, and the switch described there is due.
 - **Upstream history rewritten.** See below.
+- **Commits name issues in other repositories.** Ask the user; see
+  [Commit messages that name other repositories](#commit-messages-that-name-other-repositories).
 - **Push refused.** The issue quotes git's message. Usually branch protection or a token problem; fix that, then run
   the workflow again with `gh workflow run port-sync.yml -R CallanCampos/pokebw2-native`.
 
@@ -206,6 +219,67 @@ Both tools check for a rewrite before anything else, so they also catch upstream
 usual way to undo an accidental push, although `main` then already contains upstream `main`. There is nothing to
 merge until upstream moves on, so both tools keep reporting the rewrite until then; once upstream has new commits,
 `--allow-rewrite` makes the merge that records the new trailer.
+
+## Commit messages that name other repositories
+
+The port is a solo project, and nothing about it may appear on `fuddlesworth/pokebw2`
+([ADR 0002](adr/0002-solo-project-no-upstream-posts.md)). Upstream's commit messages sometimes name an issue in
+another repository, as `OWNER/REPO#N` or its URL: three in the history up to 2026-10-17, two naming the same pull
+request of `AetiasHax/ds-decomp` and one an issue of upstream itself. When a commit whose message names an issue is
+pushed, GitHub records a `referenced` event on that issue, naming the repository the commit was pushed to [14]. A sync
+that pushes such a commit here could then show this repository on that issue's timeline. The first push of the history
+created no event from this repository (checked on both timelines on 2026-10-17), but GitHub doesn't document why, so
+the tools don't rely on it.
+
+The repository's visibility doesn't change that, only what the reference shows. GitHub's docs say that people who
+can't read a private repository "will see references that contain a minimum of information" [15]: the reference still
+appears, without its details. Since the details depend on the reader's access to this repository, references recorded
+while it is private would show in full to everyone if it were made public again.
+
+So both tools, whatever this repository's visibility, check the messages of the commits that a push would add:
+
+- They look for `[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9]+` and
+  `github\.com/[^/[:space:]]+/[^/[:space:]]+/(issues|pull|discussions)/[0-9]+`, ignoring case, the forms GitHub
+  links [17]. They don't tell repositories apart, so a port commit message names the port's own issues as `#N`.
+- The Action checks exactly the commits its push adds to `main`. The local sync checks the new upstream commits and
+  the clone's own unpublished ones, before it merges and again before each retry.
+- On a match, nothing is merged or pushed. Both record only the commits' short SHAs, oldest first, never the text
+  that matched, because everyone who can read this repository can read the Action's logs, summary and issue. Read a
+  message locally with `git show -s SHA`.
+- The Action reports `references`. Its issue lists the SHAs and is keyed by the oldest one, so the run fails once and
+  then only warns while upstream adds commits on top. The local sync exits 5.
+
+The user decides what happens next; a session never does. A merge can't leave out one upstream commit, so until the
+user decides, upstream's later commits wait too. To accept that the reference may appear on the item's timeline, run
+`port/tools/sync_upstream.sh --allow-references`: it merges, builds, checks and pushes as usual, and the next Action
+run closes the issue.
+
+Making the repository private is not a way around the check: the reference still appears, without its details, and
+the check still runs. It would also reverse the choice of a public repository in
+[PLAN.md §4.1](PLAN.md#41-repository) and [ADR 0001](adr/0001-repository-and-upstream-sync.md), made because GitHub
+Actions minutes are free only for public repositories [18]. A private repository uses the account's minutes: 2,000 a
+month on GitHub Free. GitHub rounds each job up to a whole minute [19], and each hourly run is two jobs, so the sync
+alone uses about 1,500 minutes a month before any compile check, and upstream's Compile and Standards workflows also
+run here on pull requests and on every push to `main` that isn't the Action's. Without a payment method, GitHub blocks
+Actions once the minutes are used up [18], which would stop the hourly sync partway through a month. Such a switch
+needs its own ADR, which would also have to slow the schedule or set up billing.
+
+Text that the Action copies from git, the compiler or upstream's CI into its issue and summary (file names, the end
+of the compile log, git's push message, the names of upstream's checks) is in code blocks, but GitHub's docs don't say
+whether references in code blocks link [17]. So the Action also breaks them up there: `OWNER/REPO#N` gets a
+fullwidth number sign (`＃`), `github.com/OWNER/REPO` becomes `github[.]com/OWNER/REPO`, and `@name` gets a fullwidth
+at sign (`＠`), so that no one upstream is mentioned either.
+
+### Closing keywords
+
+A commit message with a closing keyword and an issue number of its own repository ("fixes #3", "Closes GH-3") closes
+that issue once the commit is on the default branch [16]. Pushed here, an upstream message closes the port's own
+issue with that number instead, which is harmless upstream. No commit in the history up to 2026-10-17 has one:
+upstream's closing keywords are in pull request descriptions, which its merge commits don't copy. So the tools only
+warn, with the short SHAs: the local sync prints a warning, and the Action adds a row to its summary. Reopen a port
+issue that one closed; the `upstream-sync` issue needs nothing, since the next blocked run opens a new one. A bare
+`#N` without a keyword, as in every "Merge pull request #N" commit, can add a reference to the port's own issue or
+pull request `#N`, which stays inside this repository.
 
 ## The Upstream-Commit trailer
 
@@ -252,7 +326,8 @@ the Action proposes merges instead of pushing them:
 
 1. Add `pull-requests: write` to the `publish` job's permissions.
 2. Instead of stopping at differing files, merge upstream into the branch `sync/upstream` (created from `main` when
-   missing) and push that branch, fast-forward only, never forced.
+   missing) and push that branch, fast-forward only, never forced. The reference check covers that push too, with the
+   range it adds to `sync/upstream`.
 3. Open or update one pull request from `sync/upstream` to `main`, with the same summary as the job. Runs of
    `compile.yml` on a pull request that `GITHUB_TOKEN` opened wait for approval [1], so the compile check stays inside
    the sync workflow.
@@ -266,7 +341,7 @@ run code on them [11]. Record the switch in a new ADR that supersedes the push p
 
 ## References
 
-Checked on 2026-10-16.
+Checked on 2026-10-16; 14 to 19 on 2026-10-17.
 
 1. GitHub Docs, [GITHUB_TOKEN](https://docs.github.com/en/actions/concepts/security/github_token): an installation
    access token; events it triggers create no workflow runs, except `workflow_dispatch` and `repository_dispatch`;
@@ -299,3 +374,21 @@ Checked on 2026-10-16.
     default for `GITHUB_TOKEN`, raised only for the jobs that need more.
 13. [actions/create-github-app-token](https://github.com/actions/create-github-app-token): makes a GitHub App
     installation token for the current repository; it expires after one hour.
+14. GitHub Docs, [Issue event types](https://docs.github.com/en/rest/using-the-rest-api/issue-event-types): the
+    `referenced` event, "The issue was referenced from a commit message", whose `commit_repository` "is where that
+    commit was pushed".
+15. GitHub Docs, [Creating an issues-only repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-an-issues-only-repository):
+    references from a private repository to issues in a public one, which people without access see with "a minimum
+    of information" (the reference still appears, without its details); a commit with a closing keyword pushed to the
+    private repository's default branch by someone with write access to both closes the public issue.
+16. GitHub Docs, [Linking a pull request to an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue):
+    the closing keywords (close, closes, closed, fix, fixes, fixed, resolve, resolves, resolved), in pull request
+    descriptions and commit messages; the issue closes when the commit is merged into the default branch.
+17. GitHub Docs, [Autolinked references and URLs](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls):
+    the forms `#26`, `GH-26`, `OWNER/REPO#26` and issue URLs; "references generate a backlink"; autolinked
+    references are not created in files in a repository. It says nothing about code blocks.
+18. GitHub Docs, [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions):
+    free for public repositories on standard GitHub-hosted runners; 2,000 minutes a month on GitHub Free and 3,000 on
+    GitHub Pro; without a valid payment method, usage is blocked once the quota is used up.
+19. GitHub Docs, [Actions runner pricing](https://docs.github.com/en/billing/reference/actions-runner-pricing): each
+    job's minutes and partial minutes are rounded up to the nearest whole minute.

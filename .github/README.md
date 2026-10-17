@@ -46,7 +46,7 @@ The decomp's progress, from upstream's CI:
 All decompilation work and credit belong to [fuddlesworth/pokebw2](https://github.com/fuddlesworth/pokebw2) and its
 contributors. This repository adds `port/` and a few files of its own under `.github/`; everything else is upstream's,
 changed only where [game-changes.md](../port/docs/game-changes.md) lists. The port's changes to game code keep both
-ROMs byte for byte (or sit behind a host-only switch), and the matching-neutral ones are offered upstream.
+ROMs byte for byte (or sit behind a host-only switch).
 
 ## Building
 
@@ -56,11 +56,13 @@ build yet; that is phase 0.
 
 ## For decomp contributors
 
-Decompilation and matching happen upstream. Claim overlays, open pull requests and report decomp issues at
-[fuddlesworth/pokebw2](https://github.com/fuddlesworth/pokebw2), following its
-[CONTRIBUTING.md](../CONTRIBUTING.md). What merges there reaches this repository at the next sync. Issues and pull
-requests here are for the port only. The issue and pull request templates are upstream's; file decomp claims and
-build problems at [fuddlesworth/pokebw2](https://github.com/fuddlesworth/pokebw2/issues).
+Decompilation and matching happen upstream: decomp claims and contributions go to
+[fuddlesworth/pokebw2](https://github.com/fuddlesworth/pokebw2), following its [CONTRIBUTING.md](../CONTRIBUTING.md).
+What merges there reaches this repository at the next sync.
+
+Problems with this repository, including building it, go in
+[this repository's issues](https://github.com/CallanCampos/pokebw2-native/issues). Its issue and pull request
+templates are upstream's, written for decomp work; a port issue or pull request ignores their decomp checklists.
 
 ## Legal
 

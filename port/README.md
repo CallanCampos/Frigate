@@ -37,7 +37,8 @@ port/
     compile-probe/       now      host-compiler probe: 64-bit warnings and struct layouts
     research/            now      one-off research scripts and the NitroFS SHA1 manifest
     sync_upstream.sh     now      merge upstream and verify both ROMs and the host build
-    bootstrap_checkout.sh now     prepare a new clone or worktree
+    bootstrap_checkout.sh now     prepare a new clone or worktree for the ROM build and Claude Code
+    hooks/port_guard.py  now      Claude Code hook that refuses writes to upstream and the decomp fork
     gen_sources.py       phase 0  generated source lists and trap stubs
     oracle/              phase 1  melonDS test harness (a test tool, never linked into the port)
   docs/                  now      plan, research, sync guide (SYNC.md), status log, ADRs, game-change ledger
@@ -53,7 +54,8 @@ any other change outside `port/`, such as the planned `include/platform.h`, is a
 
 Port work uses its own clone, not the decomp checkout. A clone or worktree needs the decomp's untracked inputs (the
 base ROMs in `orig/`, `.venv` and the downloaded tools), which `port/tools/bootstrap_checkout.sh` links in from a
-decomp checkout. Its header lists its options.
+decomp checkout. The same script sets the checkout up for Claude Code and disables pushes to upstream (below). Its
+header lists its options.
 
 ```sh
 git clone https://github.com/CallanCampos/pokebw2-native.git
@@ -64,12 +66,14 @@ port/tools/bootstrap_checkout.sh
 PATH=/opt/homebrew/opt/llvm/bin:$PATH python3 configure.py && ninja
 ```
 
-Without a decomp checkout, skip the bootstrap script and follow the decomp's [README](../README.md) setup in this
-clone: place your dumps as `orig/baserom_b2_us.nds` and `orig/baserom_w2_us.nds`, create `.venv`, and let
-`configure.py` download the tools.
+Without a decomp checkout, run `port/tools/bootstrap_checkout.sh --no-links`, which does everything but the links,
+and follow the decomp's [README](../README.md) setup in this clone: place your dumps as `orig/baserom_b2_us.nds` and
+`orig/baserom_w2_us.nds`, create `.venv`, and let `configure.py` download the tools.
 
-`gh repo set-default` matters because gh otherwise prefers the `upstream` remote, so a plain `gh issue create` would
-post on the decomp. The setting is kept in `.git/config`, which worktrees share.
+Add the `upstream` remote before running the script: the script sets its push URL to
+`DISABLED-port-never-pushes-upstream`, so a push there fails while fetching still works. `gh repo set-default` matters
+because gh otherwise prefers the `upstream` remote, so a plain `gh issue create` would post on the decomp. Both are
+kept in `.git/config`, which worktrees share, and the script says when either is missing.
 
 `ninja` builds both ROMs and checks both SHA1s, as in the decomp's README. It takes about 5 minutes. ROM dumps are
 your own and are never committed.
@@ -77,20 +81,93 @@ your own and are never committed.
 ### For Claude Code sessions
 
 Port work is done by Claude Code sessions under [CLAUDE.md](CLAUDE.md). Claude Code would load that file only once a
-session reads something under `port/`, and the root `CLAUDE.md` alone sends a session to decomp work. Make the port's
-rules load at startup, once per clone, from its root:
+session reads something under `port/`, and the root `CLAUDE.md` alone sends a session to decomp work, whose skills
+post claims and progress on upstream's issues. `bootstrap_checkout.sh` sets each checkout up so that the port's rules
+load at startup and a session can't write upstream:
+
+- `CLAUDE.local.md` holds `@port/CLAUDE.md`, so the port's rules load at startup.
+- `.claude/settings.local.json` registers the write guard (below) as a `PreToolUse` hook for Bash, Monitor and the
+  desktop app's terminal panel (`mcp__terminal__run_in_terminal`), which types commands into the user's own shell.
+- `.worktreeinclude` lists both files, so Claude Code copies them into each worktree it creates: `claude --worktree`,
+  subagent worktrees and desktop app sessions. It copies only files that git ignores. The tree's `.gitignore` ignores
+  `.claude/settings.local.json`, and the script adds `/CLAUDE.local.md` and `/.worktreeinclude` to `info/exclude` in
+  the git directory that worktrees share.
+
+Run the script in the clone's root, where desktop app worktree sessions take their settings and hooks from, and in
+each worktree made with `git worktree add`. It never replaces a file: it adds what is missing, replaces only the hook
+an earlier version of it registered, and prints the hook to add by hand when `.claude/settings.local.json` isn't JSON
+it can rewrite. Run it again after pulling a change to the hook. Also add one line to the clone's auto memory
+(`/memory`), which all its worktrees share: "This clone is the native port; read port/CLAUDE.md before anything
+else." Codex isn't set up for port work: upstream's `AGENTS.md` gives it the decomp's rules only.
+
+The hook runs `port_guard.py` from the session's own checkout (`$CLAUDE_PROJECT_DIR`), else from the clone's main
+worktree, because a worktree checked out at `upstream/main` or at a port commit older than the guard doesn't have it.
+When neither has it, the hook refuses every command on purpose, with a message that says so: a session whose commands
+the guard can't check gets no shell. Checking out the port's `main` in the clone's root ends that.
+
+By hand, the script's Claude Code and remote steps are these, from the checkout's root:
 
 ```sh
-printf '@port/CLAUDE.md\n' > CLAUDE.local.md
-printf 'CLAUDE.local.md\n' > .worktreeinclude
-printf '/.worktreeinclude\n' >> .git/info/exclude
+printf '@port/CLAUDE.md\n' >> CLAUDE.local.md
+printf 'CLAUDE.local.md\n.claude/settings.local.json\n' >> .worktreeinclude
+printf '/CLAUDE.local.md\n/.worktreeinclude\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
+git remote set-url --push upstream DISABLED-port-never-pushes-upstream
 ```
 
-`bootstrap_checkout.sh` already keeps `CLAUDE.local.md` out of git through `.git/info/exclude`. `.worktreeinclude`
-makes Claude Code copy that file into each worktree it creates; in a worktree made another way, run the first line
-there too. Also add one line to the clone's auto memory (`/memory`), which all its worktrees share: "This clone is
-the native port; read port/CLAUDE.md before anything else." Codex isn't set up for port work: upstream's `AGENTS.md`
-gives it the decomp's rules only.
+and this hook in `.claude/settings.local.json`, merged with what the file already has. Its command is one line, the
+same as in the script:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Monitor|mcp__terminal__run_in_terminal",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "d=${CLAUDE_PROJECT_DIR:-.}; for r in \"$d\" \"$(git -C \"$d\" worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')\"; do [ -f \"$r/port/tools/hooks/port_guard.py\" ] && exec python3 \"$r/port/tools/hooks/port_guard.py\"; done; echo \"port_guard: port/tools/hooks/port_guard.py is neither in $d nor in the clone's main worktree, so no command can be checked. Check out the port's main branch in the clone's root, or start the session in a checkout that has port/.\" >&2; exit 2",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### The write guard
+
+`port/tools/hooks/port_guard.py` refuses a Bash, Monitor or terminal panel command that would write to
+`fuddlesworth/pokebw2` or to the decomp fork `CallanCampos/pokebw2`, link an upstream issue from the port, or
+@-mention upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)):
+
+- a gh subcommand that writes (create, comment, close, edit, merge, review, fork, transfer and the rest) when `-R`,
+  `GH_REPO` or a repository or URL argument names either repository, or when it names none and gh's default here
+  isn't the port; the text of a body, title or comment isn't taken for the repository written to;
+- `gh api` with a method other than GET, or with fields or `--input`, on a path in either repository or on
+  `{owner}/{repo}` that resolves to one; a `curl` that writes to either repository through the API;
+- any GraphQL mutation, through `gh api graphql` or `curl`, because its target can't be told from the command, and a
+  GraphQL query the guard can't see: one from a pipe, from a file it can't read, or built by the shell (`$(...)`, or a
+  `$NAME` that isn't one of the query's own variables). Inline queries, quoted here-documents and readable files pass;
+- `git push` to the `upstream` or `fork` remote, to a URL of either repository, or to a remote that pushes to one,
+  including the branch's push remote when the command names none, and URLs that `git -c`, `git config` or
+  `git remote` set earlier in the same command;
+- a `git push` to GitHub that would add commits whose messages name an issue, pull request or discussion of any
+  repository (`OWNER/REPO#N` or its URL), as `sync_upstream.sh` refuses them with exit status 5. The commits are those
+  the pushed refs reach and the remote's tracking refs don't, with what a `git merge`, `rebase`, `reset`, `checkout`
+  or `pull` earlier in the same command brings in. Each would record a reference to the port on that item's timeline;
+- a gh write whose text links an upstream issue or pull request (`fuddlesworth/pokebw2#N` or its URL), and a
+  `git commit`, `merge`, `cherry-pick` or `revert` whose message names an issue, pull request or discussion of any
+  repository, including messages taken from other commits (`-C`, `--squash`, the picked commits);
+- a gh write or commit message that @-mentions one of upstream's people: its human contributors as of 2026-10-17
+  (`UPSTREAM_PEOPLE` in the script, fuddlesworth and mariano54 among them), since a mention can notify them.
+
+Reads pass, and so does text that only mentions these names, such as a grep, an echo or a local file: the guard splits
+the command as a shell would, here-documents, `$(...)`, `bash -c` and `find -exec` included, and checks a write's own
+text, the files it reads and its here-document. It sees only the command, the files it names and the repository's
+commits, so a script that runs gh or git itself isn't checked; it backs up CLAUDE.md's rules and doesn't replace them.
+`python3 port/tools/hooks/port_guard.py --self-test` runs its test cases.
 
 ## Syncing with the decomp
 

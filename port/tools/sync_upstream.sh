@@ -13,17 +13,28 @@
 #   --metrics            also run port/tools/progress/run_all.sh into build/port-metrics
 #   --abort-on-conflict  abort a conflicting merge instead of leaving it in progress
 #   --allow-rewrite      merge although upstream rewrote its history (decide first, see SYNC.md)
+#   --allow-references   merge and push although commit messages name issues, pull requests or discussions in other
+#                        repositories (the user decides first, see SYNC.md)
 #   -h, --help           show this text
 #
 # What it does:
-#   1. Goes to the top of the clone. Requires origin (the port repository) and upstream (fuddlesworth/pokebw2,
-#      added when missing), no merge in progress and no changes to tracked files. It never stashes.
+#   1. Goes to the top of the clone. Requires origin to be CallanCampos/pokebw2-native (https://github.com/... or
+#      git@github.com:..., with or without .git; not the decomp or its fork CallanCampos/pokebw2), upstream to be
+#      fuddlesworth/pokebw2 (added when missing), no merge in progress and no changes to tracked files. It never
+#      stashes. It sets upstream's push URL to DISABLED-port-never-pushes-upstream when it is anything else, as
+#      bootstrap_checkout.sh does, so that a push there fails while fetching still works.
 #   2. Fetches both and brings HEAD up to origin/NAME: a fast-forward, or a merge when HEAD has commits of its own,
 #      which are then published too.
 #   3. Merges upstream/main with the message "Merge upstream fuddlesworth/pokebw2@<short>" and an
 #      "Upstream-Commit: <sha>" trailer, as the Action does. A conflict stops the script with the merge in progress:
 #      resolve the files, `git add` them, `git commit --no-edit --cleanup=strip`, and run the script again. A rewrite
 #      of upstream's history (the last merged upstream commit no longer on upstream main) stops it before any merge.
+#      So does a commit that the push would add whose message names an issue, pull request or discussion in another
+#      repository (OWNER/REPO#N or its github.com URL), whatever the port repository's visibility: GitHub could show a
+#      reference from this repository on that item's timeline, without its details while the repository is private.
+#      Only the commits' short SHAs are printed.
+#      Messages with a closing keyword and a bare issue number ("fixes #3") only get a warning: on main they close
+#      the port's own issue with that number.
 #   4. Runs `python3 configure.py b2_us w2_us` and `ninja` (once more when ninja exits 139, wibo's intermittent
 #      crash). ninja checks every module and both SHA1s; the script then checks both ROM files against b2_us.sha1
 #      and w2_us.sha1 itself, so that a build with nothing to do also proves them.
@@ -33,13 +44,25 @@
 #      force-pushes.
 #   7. Prints a summary block for port/docs/STATUS.md, which names any upstream workflow files the push changes.
 #
-# Exit status: 0 done, 1 failed, 2 bad usage, 3 merge conflict, 4 upstream history rewritten.
+# Exit status: 0 done, 1 failed, 2 bad usage or an origin that isn't the port repository, 3 merge conflict, 4 upstream
+# history rewritten, 5 commit messages name issues in other repositories.
 set -euo pipefail
 
+PORT_REPO=CallanCampos/pokebw2-native
 UPSTREAM_REPO=fuddlesworth/pokebw2
 UPSTREAM_URL=https://github.com/fuddlesworth/pokebw2.git
+# The port never pushes upstream (ADR 0002): the upstream remote's push URL is this name, which no push can reach. The
+# same value as in bootstrap_checkout.sh.
+UPSTREAM_PUSH_DISABLED=DISABLED-port-never-pushes-upstream
 UPSTREAM_BRANCH=main
 PYTHON=${PYTHON:-python3}
+
+# A commit message that names an issue, pull request or discussion in another repository, in one of the forms GitHub
+# links: OWNER/REPO#N, or its github.com URL. The same patterns as in .github/workflows/port-sync.yml.
+REFERENCE_SHORT='[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[0-9]+'
+REFERENCE_URL='github\.com/[^/[:space:]]+/[^/[:space:]]+/(issues|pull|discussions)/[0-9]+'
+# A closing keyword with an issue of the same repository ("fixes #3", "Closes: GH-3")
+CLOSING='(^|[^[:alnum:]_])(close[sd]?|fix(e[sd])?|resolve[sd]?):?[[:space:]]+(#|GH-)[0-9]+'
 
 branch=main
 build=1
@@ -47,6 +70,7 @@ push=1
 metrics=0
 abort_on_conflict=0
 allow_rewrite=0
+allow_references=0
 
 usage() {
     awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"
@@ -79,6 +103,7 @@ while [ $# -gt 0 ]; do
         --metrics) metrics=1; shift ;;
         --abort-on-conflict) abort_on_conflict=1; shift ;;
         --allow-rewrite) allow_rewrite=1; shift ;;
+        --allow-references) allow_references=1; shift ;;
         -h | --help) usage; exit 0 ;;
         *) usage >&2; die 2 "unknown option: $1" ;;
     esac
@@ -98,19 +123,60 @@ is_upstream_url() {
     return 1
 }
 
+# The port repository on GitHub, over https or ssh, with or without .git. GitHub names are case-insensitive.
+is_port_url() {
+    local url
+    url=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+    case "$url" in
+        https://github.com/callancampos/pokebw2-native | https://github.com/callancampos/pokebw2-native.git | \
+            https://github.com/callancampos/pokebw2-native/ | \
+            git@github.com:callancampos/pokebw2-native | git@github.com:callancampos/pokebw2-native.git | \
+            ssh://git@github.com/callancampos/pokebw2-native | ssh://git@github.com/callancampos/pokebw2-native.git)
+            return 0
+            ;;
+    esac
+    return 1
+}
+
 # --- 1. Checks -------------------------------------------------------------------------------------------------------
 
-origin_url=$(git remote get-url origin 2>/dev/null) || die 1 "there is no origin remote; it must be the port repository"
-if is_upstream_url "$origin_url"; then
-    die 1 "origin is $origin_url, the decomp itself. Run this in the port clone, whose origin is the port" \
-        "repository. Decomp work goes upstream from the decomp checkout through the fork."
-fi
-port_repo=$(printf '%s\n' "$origin_url" | sed -e 's#^.*github\.com[:/]##' -e 's#\.git$##' -e 's#/$##')
-if upstream_url=$(git remote get-url upstream 2>/dev/null); then
-    is_upstream_url "$upstream_url" || die 1 "the upstream remote is $upstream_url, not $UPSTREAM_REPO"
+# Every URL configured for origin, for fetching and pushing, must be the port repository: the reference check below
+# asks GitHub about that repository, and a push anywhere else (the decomp, or the fork CallanCampos/pokebw2, which is in
+# upstream's fork network) would publish the port there. The URLs are checked as configured; url.*.insteadOf
+# rewrites in the git configuration are not looked at.
+git config --get remote.origin.url >/dev/null 2>&1 ||
+    die 2 "there is no origin remote; it must be $PORT_REPO (https://github.com/$PORT_REPO.git)"
+origin_urls=$({ git config --get-all remote.origin.url; git config --get-all remote.origin.pushurl || true; })
+while IFS= read -r origin_url; do
+    [ -n "$origin_url" ] || continue
+    is_port_url "$origin_url" && continue
+    case "$(printf '%s' "$origin_url" | tr '[:upper:]' '[:lower:]')" in
+        *[/:]fuddlesworth/pokebw2 | *[/:]fuddlesworth/pokebw2.git | *[/:]fuddlesworth/pokebw2/ | \
+            *[/:]callancampos/pokebw2 | *[/:]callancampos/pokebw2.git | *[/:]callancampos/pokebw2/)
+            die 2 "origin is $origin_url, the decomp or its fork, so this looks like the decomp checkout. Run this" \
+                "in the port clone, whose origin is $PORT_REPO."
+            ;;
+    esac
+    die 2 "origin is $origin_url; it must be $PORT_REPO (https://github.com/$PORT_REPO.git or" \
+        "git@github.com:$PORT_REPO.git)"
+done <<EOF
+$origin_urls
+EOF
+if upstream_urls=$(git remote get-url --all upstream 2>/dev/null); then
+    while IFS= read -r upstream_url; do
+        is_upstream_url "$upstream_url" || die 1 "the upstream remote is $upstream_url, not $UPSTREAM_REPO"
+    done <<EOF
+$upstream_urls
+EOF
 else
     say "Adding the upstream remote, $UPSTREAM_URL"
     git remote add upstream "$UPSTREAM_URL"
+fi
+# Also when the remote was added by hand or before bootstrap_checkout.sh ran. A push URL replaces the fetch URL for
+# pushes only, so fetching is unchanged.
+if [ "$(git config --get-all remote.upstream.pushurl || true)" != "$UPSTREAM_PUSH_DISABLED" ]; then
+    say "Setting the upstream remote's push URL to $UPSTREAM_PUSH_DISABLED: the port never pushes there"
+    git config --replace-all remote.upstream.pushurl "$UPSTREAM_PUSH_DISABLED"
 fi
 if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
     die 1 "a merge is in progress. Resolve it and run 'git commit --no-edit --cleanup=strip' (or" \
@@ -153,6 +219,7 @@ summary() {
         0) ;;
         3) outcome="stopped at a merge conflict" ;;
         4) outcome="stopped: upstream rewrote its history" ;;
+        5) outcome="stopped: commit messages name issues in other repositories" ;;
         *) outcome="FAILED (exit status $status)" ;;
     esac
     upstream_now=$(git rev-parse --short=9 "$upstream_ref" 2>/dev/null || echo unknown)
@@ -175,7 +242,7 @@ summary() {
     printf -- '- **Tiers:** %s\n' "$metrics_result"
     if [ -n "$workflow_changes" ]; then
         printf -- '- **Upstream workflows changed:** %s. Once pushed, check `gh workflow list --all -R %s`:' \
-            "$workflow_changes" "$port_repo"
+            "$workflow_changes" "$PORT_REPO"
         printf ' `build.yml` must still be disabled; ask the user before disabling any other workflow\n'
     fi
     printf -- '----\nsync_upstream: %s\n' "$outcome"
@@ -242,6 +309,37 @@ last_upstream() {
 own_merge=""
 own_merge_parent=""
 
+# Stops before a merge whose push would add commits that name an issue, pull request or discussion in another
+# repository: GitHub records such a reference on the target's timeline, naming the repository the commit was pushed to
+# (port/docs/SYNC.md, ADR 0002). People who can't read a private repository still see the reference, without its
+# details, so the check runs whatever the port repository's visibility, and only the user's --allow-references lets
+# such commits through. The range is every commit that the push would add to origin/NAME: the new upstream commits and
+# HEAD's own. Only short SHAs are printed, never the text that matched.
+check_references() {
+    local upstream=$1 found count closing
+    found=$(git rev-list -i -E --reverse --abbrev-commit --abbrev=9 --grep="$REFERENCE_SHORT" \
+        --grep="$REFERENCE_URL" "$upstream" HEAD --not "$origin_ref" | paste -sd ' ' -)
+    closing=$(git rev-list -i -E --reverse --abbrev-commit --abbrev=9 --grep="$CLOSING" \
+        "$upstream" HEAD --not "$origin_ref" | paste -sd ' ' -)
+    if [ -n "$closing" ]; then
+        say "Warning: these commits name an issue of this repository after a closing keyword (\"fixes #3\"). Once" \
+            "they are on main, GitHub closes the port's own issue with that number, if it is open; reopen it then:" \
+            "$closing"
+    fi
+    [ -n "$found" ] || return 0
+    count=$(printf '%s\n' $found | wc -l | tr -d ' ')
+    if [ "$allow_references" = 1 ]; then
+        say "$count commits that the push would add name issues, pull requests or discussions in other repositories;" \
+            "merging anyway (--allow-references): $found"
+        return 0
+    fi
+    die 5 "$count commits that the push would add name issues, pull requests or discussions in other repositories:" \
+        "$found. Pushed to $PORT_REPO, they could put a reference from it on those items' timelines, with its" \
+        "details while the repository is public and without them while it is private. Stopped before merging." \
+        "Stop and ask the user, who alone decides whether to run this again with --allow-references; see 'Commit" \
+        "messages that name other repositories' in port/docs/SYNC.md."
+}
+
 merge_upstream() {
     local upstream last count short message_file
     upstream=$(git rev-parse "$upstream_ref")
@@ -257,6 +355,8 @@ merge_upstream() {
                 "port/docs/SYNC.md, then run again with --allow-rewrite if a merge is right."
         fi
     fi
+    # Also when upstream is already merged here but not yet pushed
+    check_references "$upstream"
     if git merge-base --is-ancestor "$upstream" HEAD; then
         say "Upstream $UPSTREAM_REPO@$(git rev-parse --short=9 "$upstream") is already merged"
         return 0

@@ -1,13 +1,16 @@
 """Build a database of every function, its owning source file/library, and the call/reference graph
-for pokebw2 (b2_us). Read-only over the repository; writes a pickle into the scratchpad."""
+for pokebw2 (b2_us). Reads the repository REPO and writes db.pkl to build/port-research/sdk-surface/ of the checkout
+that holds this script, which git ignores; the other scripts here read and write there too. Run this first.
+Usage: db.py [REPO], where REPO defaults to the checkout that holds this script."""
 import bisect
 import pickle
 import re
 import sys
 from pathlib import Path
 
-W = Path("/Users/cjcampos/dev/decomp/pokebw2/.claude/worktrees/desktop-subagent-inspection-3190ba")
-OUT = Path(__file__).parent / "db.pkl"
+W = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[4]
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"
+OUT = DATA / "db.pkl"
 CFG = W / "config/b2_us/arm9"
 EXT = W / "extract/b2_us"
 
@@ -209,6 +212,7 @@ def main():
             if callee is None or db["funcs"][callee]["addr"] != target:
                 continue  # data reference
             db["edges"].append((caller, callee, r["kind"], mname, r["frm"]))
+    DATA.mkdir(parents=True, exist_ok=True)
     with open(OUT, "wb") as fh:
         pickle.dump(db, fh)
     print("funcs", len(db["funcs"]), "edges", len(db["edges"]))

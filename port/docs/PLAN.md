@@ -51,7 +51,8 @@ Full detail in [RESEARCH.md §1–4](RESEARCH.md#1-state-of-the-decomp).
 | D7 | **Saves stay byte-compatible with the DS** (raw 512 KiB image, works with melonDS `.sav` and cartridge dumps); port and mod data go in a sidecar file | Recommended |
 | D8 | **Sound:** keep the ARM9 sound libraries as C; replace the ARM7 driver with host C written from the ARM7's own asm (sequencer and channel logic) plus our own mixer | Recommended |
 | D9 | **Mods first-class:** layered file system, data registries, hook macros that compile away in the ROM build, settings registry, Lua; built-in features use the same API | Recommended |
-| D10 | **Upstream relations:** propose matching-neutral portability conventions (and later the hook macros) to `fuddlesworth/pokebw2` | **Needs your OK** before any public post |
+| D10 | **A solo project:** nothing about the port is posted on `fuddlesworth/pokebw2` (no issues, comments, pull requests or proposals); port changes stay in this repository | **Decided** 2026-10-17 (§9, [ADR 0002](adr/0002-solo-project-no-upstream-posts.md)) |
+| D11 | **No Apple Developer account:** macOS builds are ad-hoc signed and never notarized | **Decided** 2026-10-17 (§7 phase 5, §10, [ADR 0003](adr/0003-ad-hoc-signing-no-apple-developer-account.md)) |
 
 ### Why not libntr
 
@@ -85,25 +86,26 @@ alternatives are in [ADR 0001](adr/0001-repository-and-upstream-sync.md).
   top of it, both described in [SYNC.md](SYNC.md):
   1. An hourly GitHub Action (`port-sync.yml`) merges upstream `main` into the port's `main` when the merge is clean
      and every C file still compiles for both versions. CI has no ROMs, so it can't check the SHA1s. A conflict, a
-     compile failure, an upstream workflow change (which the Action's token can't push), a rewrite of upstream's
-     history or a refused push leaves `main` as it was and opens or updates an `upstream-sync` issue for the local
-     sync to resolve.
+     compile failure, an upstream workflow change (which the Action's token can't push), game files that differ from
+     upstream, a rewrite of upstream's history, commits whose messages name issues in other repositories while this
+     repository is public (§9), or a refused push leaves `main` as it was and opens or updates an `upstream-sync`
+     issue for the local sync to resolve.
   2. Every port session starts with the local sync, [`port/tools/sync_upstream.sh`](../tools/sync_upstream.sh),
      which merges upstream and verifies the merge with the ROM build and both SHA1s before anything is pushed
      (§8 step 1).
 - **Game code stays the decomp's.** Changes outside `port/` are limited to: (1) portability fixes that compile to the
-  same bytes under MWCC, which we also offer upstream; (2) hook macros that compile to nothing in the ROM build;
-  (3) rare `#ifdef PLATFORM_PC` blocks, each listed in `port/docs/game-changes.md`. Shipwright's lesson is that an
-  edited snapshot of a decomp drifts until it needs scripts to find its differences; we never copy decomp files.
-  Decomp work itself (matching, new source files, config changes, overlay claims) never happens in this repository
-  (§9).
+  same bytes under MWCC; (2) hook macros that compile to nothing in the ROM build; (3) rare `#ifdef PLATFORM_PC`
+  blocks. Each is listed in `port/docs/game-changes.md`. Shipwright's lesson is that an edited snapshot of a decomp
+  drifts until it needs scripts to find its differences; we never copy decomp files. Decomp work itself (matching,
+  new source files, config changes, overlay claims) never happens in this repository (§9).
 - **Why not a branch of the existing fork:** `CallanCampos/pokebw2` carries the decomp PR branches, GitHub allows an
   account only one fork of a repository, and a port needs its own issues and releases.
-- **Why not in upstream straight away:** upstream's rules are about matching, and port work would slow its reviews.
-  If the maintainers want the port in-tree later, `port/` moves over unchanged.
+- **Why not in upstream:** the port is a solo project (D10). Upstream isn't told about it, and nothing from it is
+  proposed there.
 - **Visibility:** public, so GitHub Actions minutes are free, macOS runners included
   ([tech-stack.md](research/tech-stack.md)). The tree holds no ROM data beyond what upstream already publishes in
-  `data/`.
+  `data/`. Going private would end the free minutes and needs its own ADR
+  ([ADR 0002](adr/0002-solo-project-no-upstream-posts.md), Consequences).
 
 ### 4.2 Layers
 
@@ -210,7 +212,7 @@ mods/examples/           sample mods, one per extension point
   or write registers (used at 1,569 game sites) compile unchanged. Registers whose writes act (geometry command ports
   and FIFO, divider and sqrt, DMA, capture start, interrupt acknowledge) become function calls. The few raw literal
   addresses in game code (5 outside comments at `0c2bbee9d`, among them `0x06800000` in `event_mapchange.c` and
-  `0x050005e2` in `cg_help.c`) become SDK constants (a matching-neutral change to offer upstream).
+  `0x050005e2` in `cg_help.c`) become SDK constants (a matching-neutral change).
 - **VRAM mapping by page aliasing:** each bank is one block of shared memory mapped into every view (LCDC, BG, OBJ,
   texture, palette) it is assigned to, using `mach_vm_remap` on macOS, `memfd`/`mmap` on Linux and `MapViewOfFile` on
   Windows. Pointers from `G2_GetBG0CharPtr()` then behave exactly as on the DS, writes through one view are visible in
@@ -346,9 +348,9 @@ It lands after the GPU 2D compositor, field first, then battle.
 ### 5.3 Randomizer
 
 Built in, configured by settings, with the seed in the save sidecar. It writes to the data registries and VFS (species
-data, learnsets, evolutions, trainers, encounters, Hidden Grottoes, items, shops, TMs and tutors) and uses hooks for what
-UPR does with code patches (starters, intro Pokémon, guaranteed catch, fast text). Randomized ROMs from UPR keep working
-through the VFS and the in-code table reader. Archipelago support can come later through events.
+data, learnsets, evolutions, trainers, encounters, Hidden Grottoes, items, shops, TMs and tutors) and uses hooks for
+what UPR does with code patches (starters, intro Pokémon, guaranteed catch, fast text). Randomized ROMs from UPR keep
+working through the VFS and the in-code table reader. Archipelago support can come later through events.
 
 ### 5.4 Multiplayer
 
@@ -385,8 +387,8 @@ Testing is how we know the port is the game. Each level runs automatically, from
   runs at 30 Hz and the DS drops frames under load, inputs are aligned on game-logic frames (a frame counter read from
   RAM) rather than video frames. Building it is part of phase 1.
 - **Equivalence of unlinked C:** the 747 KB of C that the ROM doesn't link (and the 442 nonmatching rows) are where the
-  port can be wrong while the ROM is right. Oracle state comparisons are the main check, and we add an "equivalent:
-  yes/no/unknown" note for rows we prove, offered upstream.
+  port can be wrong while the ROM is right. Oracle state comparisons are the main check, and we keep an "equivalent:
+  yes/no/unknown" note for each row we check in `port/docs/decomp-findings.md` (§9).
 - **Determinism** is required for T3 and T4: fibers instead of preemptive threads, a virtual clock, the RTC fixed in
   tests, and RNG seeded from the same inputs as the DS.
 
@@ -417,8 +419,8 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
 
 ### Phase 2: title screen and start menu (M2)
 
-- Sprites (the four ITCM ClAct renderers need C: unless someone upstream takes them first, we write them in the
-  decomp checkout and send them upstream through the fork, §9).
+- Sprites (the four ITCM ClAct renderers need C: unless someone else claims them first, a decomp session that the user
+  starts writes them in the decomp checkout as ordinary decomp work, §9).
 - Geometry engine, GPU 3D rasterizer, capture.
 - The sound driver: sequences, banks, waves, the title stream.
 - **Exit:** the title screen runs with music and 3D, the start menu responds, oracle comparisons pass within tolerance.
@@ -438,13 +440,15 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
 ### Phase 5: the whole game, hardened
 
 - Story progression through replay routes, each kept as a regression test; sanitizer-clean replays; 60 fps with
-  headroom; controller support; one executable for both versions; `.app` and DMG packaging.
+  headroom; controller support; one executable for both versions; an ad-hoc signed `.app` in a DMG, with "Open
+  Anyway" instructions (no notarization, D11).
 - Windows and Linux builds in CI.
 - **Exit:** the story can be finished on Black 2 and White 2; a private release candidate.
 
 ### Phase 6: enhancement and mod platform
 
-- VFS layers and mod manifests, settings registry and ImGui menus, hook bus and Lua with generated bindings, sample mods.
+- VFS layers and mod manifests, settings registry and ImGui menus, hook bus and Lua with generated bindings, sample
+  mods.
 - High internal 3D resolution, the GPU 2D compositor, widescreen (field, then battle), fast-forward, quality-of-life.
 - The built-in randomizer.
 - **Exit:** widescreen field play, a randomized run, and each sample mod working from a fresh install.
@@ -473,8 +477,7 @@ Sessions working toward this plan follow one loop, so progress is measurable and
 4. **Verify** with the replay and oracle tests, and by running the app and looking at screenshots for anything visual.
 5. **Record:** the status log, an architecture decision record for each non-obvious choice, every game-code change in
    `port/docs/game-changes.md`, and lessons in the port's docs.
-6. **Publish** to the port repository; never push to upstream. Upstream contributions go through the decomp's fork
-   and PR flow, and public posts need your OK.
+6. **Publish** to the port repository; never push to upstream, and never post anything about the port there (D10).
 
 ## 9. Working with the decomp
 
@@ -486,38 +489,43 @@ Sessions working toward this plan follow one loop, so progress is measurable and
   `CLAUDE.md`'s "push origin HEAD:main" publishes to the port repository.
 - **What the port needs from the decomp, in order:** overlay 36's C and data (mariano54, #83), including the
   818-pointer tables of `fldmmdl_blact.c`; overlay 12's event-script command tables as C data (674 pointers); the
-  four ITCM ClAct renderers (no issue or owner yet: we can write them in the decomp checkout); overlays 11 and 182
-  for Wi-Fi (#72, #132), only for phase 7. As far as the research found, nothing else blocks phases 0–5.
+  four ITCM ClAct renderers (no issue or owner yet: a decomp session can write them in the decomp checkout as ordinary
+  decomp work); overlays 11 and 182 for Wi-Fi (#72, #132), only for phase 7. As far as the research found, nothing
+  else blocks phases 0–5.
 - **The decomp session keeps its own workflow.** The port never edits decomp files except for the three kinds of
   change in §4.1, and never competes with an overlay claim.
-- **Proposals for upstream, with your OK:** the `include/platform.h` switch and the `uptr` typedef (identical code
-  under MWCC, so the ROM build proves it), a `check_style.py` rule against new `(u32)` casts of pointers in `src/`,
-  `_Static_assert`s on save and file structs, SDK constants instead of raw VRAM addresses,
-  named screen-size constants, an "equivalent" column in `docs/nonmatching-functions.md`, a host-clang compile check in
-  CI, and later the no-op hook macros. The README already names a native port as the long-term goal, and
-  `docs/porting-notes.md` records porting assumptions, so these fit upstream's direction.
-- **Port findings go back:** when the oracle shows that unlinked C behaves differently from the ROM, that is a decomp
-  bug, reported upstream.
+- **Nothing about the port goes upstream (D10).** No issues, comments, pull requests or proposals on
+  `fuddlesworth/pokebw2` mention the port, and the portability conventions of §4.8 stay in this repository. Decomp work
+  that the port needs is done by decomp sessions as ordinary decomp work, and what they post never mentions the port.
+  Port issues, pull requests and commit messages here never link upstream issues or pull requests (`#NNN` with the
+  owner, or their URLs), because GitHub would show those links on upstream's timelines, and never @-mention upstream's
+  maintainers or contributors, because a mention can notify them. Port commit messages name only the port's own issues,
+  as a bare `#N`, and port issues, pull requests and comments should too: no `OWNER/REPO#N` and no issue, pull request
+  or discussion URL of any repository, a third party's included. A third-party issue is named by its title. Whatever the
+  repository's visibility, both syncs also stop before pushing commits whose messages reference issues
+  (`sync_upstream.sh` exit 5, the Action's `references` outcome), and only the user decides to push them with
+  `--allow-references`.
+- **Port findings stay here:** when the oracle shows that unlinked C behaves differently from the ROM, the finding goes
+  in `port/docs/decomp-findings.md`. You decide whether a decomp session fixes it, as ordinary decomp work.
 
 ## 10. Risks
 
 | Risk | Mitigation |
 | --- | --- |
 | 64-bit layout bugs surface one crash at a time, as in the Platinum port | compiler warnings as a metric, size asserts, ASan/UBSan replays, oracle state checks |
-| Unlinked C that compiles but behaves differently from the ROM | oracle comparisons by symbol, reported upstream |
+| Unlinked C that compiles but behaves differently from the ROM | oracle comparisons by symbol, recorded in `port/docs/decomp-findings.md` |
 | DS 3D rules on a GPU (edge marking, depth tolerance, translucency, shadows) | CPU geometry engine, oracle images with tolerance, a CPU rasterizer as a later accuracy mode |
 | Display capture and dual-screen 3D at high resolution | full-resolution capture textures, lazy downsampling |
 | Lag frames and 30 Hz logic make oracle comparisons drift | align on game-logic frames |
 | Port changes break the matching build | T0 on every commit, `PLATFORM_PC` only, a list of every game-code change |
 | Widescreen needs scene-by-scene work | field first, following a proven design; margins filled elsewhere |
 | SDL_GPU limits and the untagged SDL_shadercross | pinned commit, offline shader compilation, sokol_gfx as fallback |
-| Gatekeeper friction without a Developer ID | ad-hoc signing with instructions; notarize if you get an Apple Developer account |
+| Gatekeeper friction without notarization (D11) | ad-hoc signed builds with "Open Anyway" instructions, and building from source documented as the first-class path |
 | Upstream churn (renames, file moves) | generated source lists and bindings, hourly merges, a ROM-verified sync at the start of every session |
 
 ## 11. Decisions for you
 
-D1, the repository, was decided on 2026-10-16 (§4.1). Still open:
+D1, the repository, was decided on 2026-10-16 (§4.1); D10 (no upstream posts) and D11 (no Apple Developer account) on
+2026-10-17. Still open:
 
-1. **Upstream (D10):** may I open an issue on `fuddlesworth/pokebw2` proposing the portability conventions in §9?
-2. **Scope check:** the definition of "native" in §1, with an emulator used only as a test oracle.
-3. **Apple Developer ID:** worth USD 99 a year for notarized releases, or ad-hoc signing for now?
+1. **Scope check:** the definition of "native" in §1, with an emulator used only as a test oracle.

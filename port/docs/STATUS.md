@@ -26,10 +26,50 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: solo project, ad-hoc signing and upstream guards
+
+- **Upstream:** `462e90193` (merge of PR #345), still the last merged. Upstream `main` is now `69e82e80c` (merge of
+  PR #347), four commits ahead, and not yet merged by this commit; the next sync merges it.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); this commit changes nothing outside `port/` and
+  `.github/`.
+- **Host build:** not yet (phase 0).
+- **Tests:** T0 as above; T1–T7 not yet.
+- **Tiers:** not re-measured; no upstream commit has been merged since the 2026-10-16 entry.
+- **Trap stubs:** not yet.
+- **64-bit warnings:** not yet from a host build; the compile probe baseline in the 2026-10-16 entry stands.
+- **Work done:**
+  - Two decisions by the user: the port is a solo project, so nothing about it is posted on `fuddlesworth/pokebw2`
+    and its portability changes stay here (D10, [ADR 0002](adr/0002-solo-project-no-upstream-posts.md), which amends
+    [ADR 0001](adr/0001-repository-and-upstream-sync.md)); and there is no Apple Developer account, so macOS builds
+    are ad-hoc signed and never notarized (D11, [ADR 0003](adr/0003-ad-hoc-signing-no-apple-developer-account.md)).
+  - The reference guard: whatever the repository's visibility, `port/tools/sync_upstream.sh` stops with exit code 5
+    and the `port-sync` Action with the `references` outcome before pushing commits whose messages reference issues;
+    `--allow-references` pushes them once the user agrees. The sync also checks strictly that `origin` is
+    `CallanCampos/pokebw2-native`.
+  - The write guard: `port/tools/hooks/port_guard.py`, a PreToolUse hook that `port/tools/bootstrap_checkout.sh`
+    installs in the clone's `.claude/settings.local.json`, which Claude Code also reads in the clone's worktrees. The
+    same script sets the `upstream` remote's push URL to `DISABLED-port-never-pushes-upstream`.
+  - `port/CLAUDE.md`: `gh` writes only to the port, no @-mentions of upstream's people, port commit messages name
+    only the port's own issues, and the root `CLAUDE.md`'s overlay claim and progress
+    rules and the `decomp-file`, `finish-file` and `match-function` skills never run in the port clone. The plan,
+    ADRs, landing page, game-change ledger and research index say the same. The scripts in
+    `port/tools/research/sdk-surface/` take the repository as an argument, or find it from their own location,
+    instead of a hardcoded worktree path, and write their outputs to `build/port-research/sdk-surface/`, which git
+    ignores.
+  - No branch of the decomp checkout holds the port commit `0835ef06c` any more, so no decomp session there can push
+    it upstream. The `port-sync` Action was paused while these guards were written and is re-enabled after this push.
+- **Next:** the session sync with `port/tools/sync_upstream.sh`, merging `69e82e80c` (none of its four new commits
+  references an issue), then phase 0: CMake skeleton with SDL3, generated source lists and trap stubs,
+  `include/platform.h`, the overlay `.data`/`.bss` spike, then the first arm64 macOS link.
+- **Blockers:** none for phase 0. Overlay 36 (issue #83, claimed by mariano54) still gates phase 3. The four ITCM
+  ClAct renderers (phase 2) have no owner; writing them is ordinary decomp work for a decomp session, which the user
+  starts. D10, which the 2026-10-16 entry listed as waiting, is decided.
+
 ## 2026-10-17: local clone and first syncs
 
 - **Upstream:** `462e90193` (merge of PR #345); unchanged since the repository was created.
-- **Port:** `PORT_SHA`.
+- **Port:** `ecb9e5f65`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), from the first run of
   `port/tools/sync_upstream.sh` in the new clone, which configured from scratch (downloading wibo, sjiswrap and dsd
   v0.12.1-dsi.4) and built both ROMs. 22 compiler warnings, the same upstream ov036 ones as before.

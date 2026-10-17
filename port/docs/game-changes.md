@@ -8,8 +8,8 @@ upstream merge can conflict with. A change outside `port/` without a row here is
 ## The three allowed kinds
 
 1. **Neutral:** a portability fix that compiles to the same bytes under MWCC, such as `uptr` for a value that carries
-   an address, or an SDK constant in place of a raw VRAM address. Each is also offered upstream, with the user's OK
-   for the post.
+   an address, or an SDK constant in place of a raw VRAM address. It stays in this repository: the port is a solo
+   project and proposes nothing upstream ([ADR 0002](adr/0002-solo-project-no-upstream-posts.md)).
 2. **Hook:** a hook macro (`PORT_EVENT`, `PORT_SHOULD`) that compiles to nothing, or to the bare expression, in the
    ROM build.
 3. **Platform:** an `#ifdef PLATFORM_PC` block, used rarely and commented in the code. `include/platform.h` is the only
@@ -44,16 +44,18 @@ under MWCC.
 | Guard or macro | The macro, typedef or `#ifdef` that carries the change |
 | Why | What breaks on a host without it, in one line |
 | MWCC-neutral proof | For every kind: "ninja, both SHA1s" for complete files; the probe result for incomplete files, every including one for a header |
-| Offered upstream | "no" (Hook and Platform rows by default), "to offer", or the upstream PR or issue number once the user OKs the post |
 | Commit | The port commit that made the change, short SHA. A row is committed with its change, so it can't name that commit: write `PORT_SHA`, and the next commit to this file replaces it with the SHA from `git log -1 --format=%h -- port/docs/game-changes.md`, run before committing |
 
-When upstream takes a change, the row stays, with "merged upstream in #NNN" under Offered upstream, so the history of
-what the port needed is kept. When a sync conflicts with a row's change, resolve it by taking upstream's version and
-reapplying the change, then update the row's commit.
+When a sync conflicts with a row's change, resolve it by taking upstream's version and reapplying the change, at the
+code's new place if upstream moved it, then update the row's commit. When upstream makes the same change on its own,
+git usually merges it without a conflict, so nothing flags it and no tool drops the row. So after each of its syncs, a
+session deletes every row whose files all match upstream again (`git diff upstream/main -- FILE` prints nothing), in
+its next commit; on a conflict, [SYNC.md](SYNC.md#resolving-conflicts), step 3, drops it. The git history of this
+file keeps what the port needed.
 
 ## Changes
 
-| File | Kind | Guard or macro | Why | MWCC-neutral proof | Offered upstream | Commit |
-| --- | --- | --- | --- | --- | --- | --- |
+| File | Kind | Guard or macro | Why | MWCC-neutral proof | Commit |
+| --- | --- | --- | --- | --- | --- |
 
 None yet.

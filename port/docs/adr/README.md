@@ -20,8 +20,8 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
 - Files are `NNNN-short-title.md`: four digits, then the title in lowercase words joined by hyphens.
 - Numbers are given in the order ADRs are written, starting at 0001, and never reused. The decisions below that are
   waiting for an ADR take the next free number when someone writes them.
-- An accepted ADR isn't rewritten. Only its status line changes, to "superseded by NNNN" when a later ADR replaces
-  it. Typos and broken links may be fixed.
+- An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
+  it, or to "accepted; amended by NNNN" when a later ADR changes part of it. Typos and broken links may be fixed.
 - Each ADR gets a row in the index below in the same commit.
 
 ## Template
@@ -29,9 +29,9 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
 ```markdown
 # NNNN: Title
 
-- **Status:** proposed | accepted | rejected | superseded by NNNN
+- **Status:** proposed | accepted | accepted; amended by NNNN | rejected | superseded by NNNN
 - **Date:** YYYY-MM-DD
-- **Plan:** the PLAN.md section or decision (D1–D10) it settles
+- **Plan:** the PLAN.md section or decision (D1–D11) it settles
 - **Upstream:** the `fuddlesworth/pokebw2` commit it was decided against
 
 ## Context
@@ -56,7 +56,9 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 
 | ADR | Decision | Plan | Status |
 | --- | --- | --- | --- |
-| [0001](0001-repository-and-upstream-sync.md) | Repository and upstream sync | D1, §4.1 | accepted |
+| [0001](0001-repository-and-upstream-sync.md) | Repository and upstream sync | D1, §4.1 | accepted; amended by [0002](0002-solo-project-no-upstream-posts.md) |
+| [0002](0002-solo-project-no-upstream-posts.md) | A solo project with no upstream posts | D10, §9 | accepted |
+| [0003](0003-ad-hoc-signing-no-apple-developer-account.md) | Ad-hoc signing, no Apple Developer account | D11, §7, §10 | accepted |
 
 ## Decisions waiting for an ADR
 
@@ -74,4 +76,3 @@ changes. Each deserves an ADR when the work it governs starts, or sooner if some
 | D7 | DS-compatible saves with a sidecar file | phase 1 |
 | D8 | Host sound driver from the ARM7's asm | phase 2 |
 | D9 | Mods as a first-class design | phase 0 (hook macros), phase 6 (the rest) |
-| D10 | Upstream relations | when the user OKs the proposal |

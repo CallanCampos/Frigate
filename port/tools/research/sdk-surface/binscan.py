@@ -5,8 +5,8 @@ import struct
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-db = pickle.load(open(HERE / "db.pkl", "rb"))
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"  # ignored by git; db.py fills it
+db = pickle.load(open(DATA / "db.pkl", "rb"))
 
 
 def io_block(v):
@@ -185,7 +185,7 @@ for f in db["funcs"]:
             addrs.add(v)
     f["hw"] = dict(regions=dict(regs), addrs=sorted(addrs), swi=r["swi"], cp15=r["cp15"], psr=r["psr"])
 
-pickle.dump(db, open(HERE / "binscan.pkl", "wb"))
+pickle.dump(db, open(DATA / "binscan.pkl", "wb"))
 
 # aggregate per lib
 agg = defaultdict(lambda: dict(n=0, hw=0, regions=Counter(), swi=Counter(), cp15=0, psr=0, cp15f=0, psrf=0))

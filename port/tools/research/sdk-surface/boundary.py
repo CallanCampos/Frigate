@@ -5,8 +5,8 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-db = pickle.load(open(HERE / "binscan.pkl", "rb"))
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"  # ignored by git; db.py fills it
+db = pickle.load(open(DATA / "binscan.pkl", "rb"))
 F = db["funcs"]
 
 
@@ -67,7 +67,7 @@ offline = [c for c, u in used.items() if any(not (l in net) for l in u["callers"
 only_net = [c for c, u in used.items() if all(l in net for l in u["callers"])]
 print("reached from non-network code:", len(offline), " only from network libs:", len(only_net))
 json.dump(sorted((F[c]["name"], F[c]["lib"], used[c]["sites"], dict(used[c]["callers"])) for c in used),
-          open(HERE / "sdk_used.json", "w"), indent=0)
+          open(DATA / "sdk_used.json", "w"), indent=0)
 
 # NNS: functions of NitroSystem reached from game
 nns = defaultdict(set)

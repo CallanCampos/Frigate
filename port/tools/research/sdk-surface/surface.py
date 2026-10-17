@@ -1,4 +1,5 @@
-"""Game-side surface: which library functions game code (src/) calls or references, by family."""
+"""Game-side surface: which library functions game code (src/) calls or references, by family.
+Usage: surface.py [REPO], where REPO defaults to the checkout that holds this script."""
 import json
 import pickle
 import re
@@ -6,9 +7,9 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-W = Path("/Users/cjcampos/dev/decomp/pokebw2/.claude/worktrees/desktop-subagent-inspection-3190ba")
-db = pickle.load(open(HERE / "binscan.pkl", "rb"))
+DATA = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"  # ignored by git; db.py fills it
+W = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[4]
+db = pickle.load(open(DATA / "binscan.pkl", "rb"))
 F = db["funcs"]
 
 FAMILIES = [
@@ -92,4 +93,4 @@ out = {}
 for fm, a in fam.items():
     lst = sorted(a["funcs"], key=lambda c: -len(callee_sites[c]))
     out[fm] = [(F[c]["name"], len(callee_sites[c]), F[c]["lib"], F[c]["name"] in TOK) for c in lst]
-json.dump(out, open(HERE / "surface.json", "w"), indent=1)
+json.dump(out, open(DATA / "surface.json", "w"), indent=1)

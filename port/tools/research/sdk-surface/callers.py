@@ -1,6 +1,7 @@
 import pickle,sys,re
 from collections import defaultdict, Counter
-db=pickle.load(open("binscan.pkl","rb"))
+from pathlib import Path
+db=pickle.load(open(Path(__file__).resolve().parents[4]/"build/port-research/sdk-surface/binscan.pkl","rb"))
 F=db["funcs"]
 pat=re.compile(sys.argv[1])
 res=defaultdict(list)

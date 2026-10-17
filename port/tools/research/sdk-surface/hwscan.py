@@ -1,13 +1,15 @@
 """Scan C sources and headers for hardware access: register macros, raw hardware addresses, asm, SVC, CP15.
-Writes hwscan.json with per-file findings and prints a per-library summary."""
+Reads the repository REPO, writes hwscan.json with per-file findings to build/port-research/sdk-surface/ of the
+checkout that holds this script (ignored by git), and prints a per-library summary.
+Usage: hwscan.py [REPO], where REPO defaults to the checkout that holds this script."""
 import json
 import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-W = Path("/Users/cjcampos/dev/decomp/pokebw2/.claude/worktrees/desktop-subagent-inspection-3190ba")
-OUT = Path(__file__).parent
+W = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parents[4] / "build/port-research/sdk-surface"
 
 files = [p for p in list(W.glob("src/**/*.c")) + list(W.glob("lib/**/*.c")) + list(W.glob("lib/**/*.h")) + list(W.glob("include/**/*.h"))]
 
@@ -116,6 +118,7 @@ for p in files:
                             asm_funcs=res["asm_funcs"], asm_blocks=res["asm_blocks"], cp15=res["cp15"],
                             swi=[list(s) for s in res["swi"]], msr=res["msr"])
 
+OUT.mkdir(parents=True, exist_ok=True)
 json.dump(dict(macros={k: [hex(v[0]), v[1], v[2]] for k, v in macros.items()}, files=results),
           open(OUT / "hwscan.json", "w"), indent=1)
 print("macros", len(macros), "files with findings", len(results))
