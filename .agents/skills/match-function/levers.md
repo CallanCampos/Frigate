@@ -687,6 +687,14 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Small unreferenced objects at the start of a file's shared `.rodata` (ahead of its smallest referenced table) are
   function-local `static const`s, which are emitted even when their reads are folded or absent. (matching.md:
   "function-local `static const` is emitted")
+- An "unreferenced global" there whose values a function uses as immediates is several scalars of that function, one
+  per value (`ctvt_game_cam.c`'s crop, four `u16`); their count orders equal-size initializers anywhere in the file.
+  (matching.md: "The values a function already uses as immediates")
+- Function-local statics are listed last, after the tentative `.bss` statics, by function in reverse order; one in a
+  `static inline` is listed where the inline is defined. (matching.md: "joins the size sort at the end of the file")
+- An object at the head of the shared `.rodata`, larger than the ones after it and packed against them: `-ipa
+  function`, which sorts the data waiting at each function on its own; define the tables just before their first user.
+  A game file can't take a per-file flag yet. (matching.md: "Under `-ipa function` MWCC writes out")
 - A `static const` whose address is never taken is folded and not emitted. If the original has it, it isn't static.
   An unreferenced word after a file's larger tables is the next file's first object.
   (matching.md: "whose address is never taken")

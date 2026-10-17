@@ -81,6 +81,7 @@ src/ov257/ctvt_game.c:
     .bss        start:0x021b3db0 end:0x021b3dc8
 
 src/ov257/ctvt_game_cam.c:
+    complete
     .text       start:0x021a80cc end:0x021a9740
     .rodata     start:0x021b2278 end:0x021b22bc
     .data       start:0x021b26d4 end:0x021b26e4

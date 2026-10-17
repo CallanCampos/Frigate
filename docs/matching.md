@@ -2488,6 +2488,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   built with `-ipa function` (`file_flags` in `lib/nnsys/library.toml`), while the other sound files are reached from
   one base and need `-ipa file`. A struct that looks like another file's extern, or a gap in `.bss` that seems to need
   a stand-in function, is the first thing to try this on.
+- Under `-ipa function` MWCC writes out the data waiting to be emitted each time it emits a function, and sorts each
+  batch by size on its own, so an object defined above the first function comes out ahead of every table defined below
+  it, whatever their sizes. A function's local initializers go out with it in declaration order, and a `static inline`
+  definition doesn't end a batch. The tell is an object at the head of a file's shared `.rodata`, out of size order and
+  packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
+  `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
+  tables defined just above `CtvtDraw_UpdateDraw`, their first user. With every table above the first function the
+  colors sort after the 2-byte tables again.
 - Two statics reached from one literal, at `[r0]` and `[r0, #4]`, ask for `-ipa file` before anything else: without it
   each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
   NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics
@@ -2828,15 +2836,21 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ones. The `08 08 08` at the head of `gimmick_pokewood_poster.c`'s `.rodata` is not one unreferenced 3-byte global
   but three one-byte objects in the packed section (function-local `static const u8` whose reads fold): the bytes are
   the same, and three objects listed after the name tables are what sorts the 12-byte string literals into the ROM's
-  order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope
-  one is dropped; a used `.bss` static joins the sort, an unused one does not.
-- A function-local `static` joins the size sort at the end of the file, after every local initializer, grouped by
-  function: the functions come in reverse order, each with its statics in declaration order. Unused ones are still
-  emitted and sorted, and a `00` in the packed section can be such a static of 0 rather than padding. So these
-  statics reorder equal-size local initializers anywhere in the file: overlay 311's `un_select.c` keeps its two
-  windows' background color in function-local `static const u8 backColor = 15;` (the `0f 0f` at the head of its
-  `.rodata`), and its five 24-byte `UnSelectActorTemplate` initializers come out in the ROM's order only with
-  `sUnSelectListTouch` defined first among the file's tables. Overlay 207's `p_sta_sub.c`, whose 17 12-byte
+  order. A function-local `static const` scalar stays in the packed section although its reads fold, a file-scope one is
+  dropped; a used `.bss` static joins the sort, an unused one does not. The values a function already uses as immediates
+  tell whose they are: the 8 bytes `{ 32, 64, 128, 128 }` at the head of overlay 257's `ctvt_game_cam.c`, taken for an
+  unreferenced `u16` global, are `CtvtGameCamCamera_TakePicture`'s crop as four `static const u16` (`x`, `y`, `width`,
+  `height`), and as four objects at the end of the list they put the file's three equal 16-byte local initializers in
+  the ROM's order, which no placement of the global, the prompt table or the DSP flag did.
+- A function-local `static` joins the size sort at the end of the file, after every local initializer and after the
+  tentative `.bss` statics (`ctvt_game.c`'s model checks only with `sCtvtGameRand` listed before its function-local
+  statics), grouped by function: the functions come in reverse order, each with its statics in declaration order. One in
+  a `static inline` is listed where the inline is defined instead, as `ctvt_game_cam.c`'s DSP busy flag was when moved
+  into `DSP_Scaling`. Unused ones are still emitted and sorted, and a `00` in the packed section can be such a static of
+  0 rather than padding. So these statics reorder equal-size local initializers anywhere in the file: overlay 311's
+  `un_select.c` keeps its two windows' background color in function-local `static const u8 backColor = 15;` (the `0f 0f`
+  at the head of its `.rodata`), and its five 24-byte `UnSelectActorTemplate` initializers come out in the ROM's order
+  only with `sUnSelectListTouch` defined first among the file's tables. Overlay 207's `p_sta_sub.c`, whose 17 12-byte
   initializers no declaration order had reproduced, matches with four: `turnShift = FX32_CONST(25)` in
   `PStaSub_Main`, `iconY = 127` and `defaultSequence = 0` in `PStaSub_CreateActors`, `spinRange = 0x1800` in
   `PStaSub_AnimCircle` (the `7f 00 00 18 00 90 01 00` that nothing reads), and its icon tables defined just before
