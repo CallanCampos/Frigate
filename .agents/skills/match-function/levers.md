@@ -165,6 +165,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A loop-invariant field in the register after every declared local, where the original keeps it among them: read it
   into a local of the type the loop compares it at, declared at that place (`u32 movie = rules->movie;` against a
   `u32` bit field). (matching.md: "register after every declared local too")
+- Table addresses reloaded from the pool at each use and a constant built in every copy of an unrolled inline,
+  one pushed register short: combine each call's result as soon as it comes (ORed into a `u8` accumulator),
+  keeping only values that straddle the stores. (matching.md: "collected before they are combined")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -366,6 +369,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A static table's address loaded into a saved register at entry after a parameter's spill, where the original
   loads it first: drop the pointer local aliasing the table and index the table at each use.
   (matching.md: "A static table's address that MWCC gathers")
+- A walking pointer's one `add` placed right after its last access, where ours adds at the loop's end: read it with
+  `*p++` at each access, not `p[k]` and `p += n`. (matching.md: "fold into the offsets of its accesses")
 - Constant stores in descending order: one chained assignment written from the first element to the last.
   (matching.md: "A longer chain also stores from the right")
 - Calls packed into one word with a kept bit, the bit tested before the calls and spilled: the calls into locals,
@@ -512,6 +517,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "`<string.h>`'s `strncmp`")
 - A dot product's translation added after the shift, 8 bytes larger in one expression: `+=` in a statement of its
   own; a sum of two products can need the one expression instead. (matching.md: "adds each translation")
+- An `and #0xff` on each `u8` result of an inline before the caller shifts or ORs it: the inline's local is an `int`
+  that the `u8` return narrows; a `u8` local drops it. (matching.md: "An `and #0xff` on each result")
+- An `and` before an inline's table load in some inlined copies only: those calls mask their argument, and the
+  inline indexes with the bare parameter. (matching.md: "in some inlined copies and not in others")
 
 ## Branches and block layout
 

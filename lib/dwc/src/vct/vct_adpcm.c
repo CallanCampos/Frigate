@@ -74,17 +74,17 @@ static inline s16 DecodeSample4(VCTAdpcmState *state, int code) {
 }
 
 static inline s16 DecodeSample3(VCTAdpcmState *state, int code) {
+    int predictor = state->predictor;
     int index = state->stepIndex;
     int step = sVctAdpcmStepTable[index];
-    int predictor = state->predictor;
     int diff = step >> 2;
     s16 sample;
 
-    if (code & 1) {
-        diff += step >> 1;
-    }
     if (code & 2) {
         diff += step;
+    }
+    if (code & 1) {
+        diff += step >> 1;
     }
     if (code & 4) {
         predictor -= diff;
@@ -97,7 +97,7 @@ static inline s16 DecodeSample3(VCTAdpcmState *state, int code) {
             predictor = 0x7fff;
         }
     }
-    ADVANCE_STEP_INDEX(index, sIndexAdjust3[code & 7]);
+    ADVANCE_STEP_INDEX(index, sIndexAdjust3[code]);
     state->stepIndex = index;
     sample = predictor;
     state->predictor = sample;
@@ -183,12 +183,14 @@ static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input) {
 }
 
 static inline u8 EncodeSample3(VCTAdpcmState *state, s16 input) {
-    int index = state->stepIndex;
-    int step = sVctAdpcmStepTable[index];
+    // The order of these declarations sets the locals' registers
     int predictor = state->predictor;
-    int diff = input - predictor;
     int vpdiff;
-    u8 code;
+    int step;
+    int index = state->stepIndex;
+    int diff = input - predictor;
+    int code;
+    int sample;
 
     if (diff < 0) {
         code = 4;
@@ -196,6 +198,7 @@ static inline u8 EncodeSample3(VCTAdpcmState *state, s16 input) {
     } else {
         code = 0;
     }
+    step = sVctAdpcmStepTable[index];
     if (diff >= step) {
         code |= 2;
         diff -= step;
@@ -213,15 +216,15 @@ static inline u8 EncodeSample3(VCTAdpcmState *state, s16 input) {
     if (code & 4) {
         vpdiff = -vpdiff;
     }
-    predictor += vpdiff;
-    if (predictor < -0x8000) {
-        predictor = -0x8000;
+    sample = predictor + vpdiff;
+    if (sample < -0x8000) {
+        sample = -0x8000;
     }
-    if (predictor > 0x7fff) {
-        predictor = 0x7fff;
+    if (sample > 0x7fff) {
+        sample = 0x7fff;
     }
     ADVANCE_STEP_INDEX(index, sIndexAdjust3[code]);
-    state->predictor = predictor;
+    state->predictor = sample;
     state->stepIndex = index;
     return code;
 }
@@ -309,26 +312,26 @@ static void DecodeAdpcm3(u8 *src, s16 *dst, u32 count, VCTAdpcmState *state) {
     }
 }
 
-// Encodes count samples to 3-bit codes
+// Encodes count samples to 3-bit codes, eight samples to a group of three bytes, the first sample in the top bits. The
+// codes of the third and sixth samples straddle two bytes.
 static void EncodeAdpcm3(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count / 8; i++) {
-        u8 c6, c7;
-        u8 c0 = EncodeSample3(state, src[0]);
-        u8 c1 = EncodeSample3(state, src[1]);
-        u8 c2 = EncodeSample3(state, src[2]);
-        u8 c3 = EncodeSample3(state, src[3]);
-        u8 c4 = EncodeSample3(state, src[4]);
-        u8 c5 = EncodeSample3(state, src[5]);
+        u8 byte;
+        u8 c2, c5;
 
-        dst[0] = (c0 << 5) | (c1 << 2) | (c2 >> 1);
-        dst[1] = (c2 << 7) | (c3 << 4) | (c4 << 1) | (c5 >> 2);
-        c6 = EncodeSample3(state, src[6]);
-        c7 = EncodeSample3(state, src[7]);
-        dst[2] = (c5 << 6) | (c6 << 3) | c7;
-        src += 8;
-        dst += 3;
+        byte = EncodeSample3(state, *src++) << 5;
+        byte |= EncodeSample3(state, *src++) << 2;
+        c2 = EncodeSample3(state, *src++);
+        *dst++ = byte | (c2 >> 1);
+        byte = EncodeSample3(state, *src++) << 4;
+        byte |= EncodeSample3(state, *src++) << 1;
+        c5 = EncodeSample3(state, *src++);
+        *dst++ = byte | (c2 << 7) | (c5 >> 2);
+        byte = EncodeSample3(state, *src++) << 3;
+        byte |= EncodeSample3(state, *src++);
+        *dst++ = byte | (c5 << 6);
     }
 }
 

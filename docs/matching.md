@@ -26,6 +26,13 @@ tools that show the differences.
   taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
   difference late in r7.
+- Results of an unrolled run of inline calls that are all collected before they are combined stay live together and
+  take the registers the loop's invariants need. DWC's `EncodeAdpcm3` (`vct_adpcm.c`) packs eight 3-bit codes into
+  three bytes and matches only with each code ORed into a `u8 byte` as soon as it is computed, keeping just the two
+  codes that straddle bytes (`c2`, `c5`). With all eight kept as `c0` to `c7`, ours reloads both tables' addresses from
+  the pool at each of their 16 uses and builds the constant 4 in each copy, where the original pushes one register
+  more and keeps the tables in `r4`/`r2` and the 4 in `fp` for the whole loop. `EncodeAdpcm2` gets the original's
+  frame and hoisted tables the same way, ORing its four codes into one `u8` with `|=` as they come.
 - A value passed to a `static inline` stays in a register across the inline's stores, where a field read again at
   each use (`cb->aid`) is reloaded after each store: multiboot's `MBComm_OnWmEvent` (`mb_comm.c`) matches with its
   disconnect step as an inline taking the aid.
@@ -979,6 +986,11 @@ Same code, other `sp` offsets or frame size.
   p -= 2;` but allocate and schedule differently: DWC's `EncodeWindows` (`crypt.c`) only gets the original's
   registers (a hoisted constant in fp) and order in the post-decrement form. A chained `current = low = *next++;`
   likewise puts the load ahead of the next comparison, where a separate `current = low;` later does not.
+- The steps of a pointer walked with `*p++` through one loop pass fold into the offsets of its accesses and one `add`
+  right after the last access, where `p[k]` with `p += n` at the end of the body puts the `add` at the loop's end.
+  DWC's `EncodeAdpcm3` (`vct_adpcm.c`) matches only with each sample read as `EncodeSample3(state, *src++)` and each
+  byte stored with `*dst++ =`, which add 0x10 to `src` after the eighth sample's load and 3 to `dst` after the third
+  store; `EncodeAdpcm4` gets its `add r1, r1, #4` into the second sample's block the same way.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
   `readSize = FS_ReadFile(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
@@ -1421,6 +1433,11 @@ Same instructions, scheduled in another order.
 - A narrowing the original does where nothing calls for it can be an inline returning a wider type into a narrow
   local: `br_sidebar.c`'s moves set their `s8 dir` from `static inline int BrSidebar_GetDir(BOOL dir)`, which
   narrows right after the choice in one function and at the use in the other, as the original does.
+- An `and #0xff` on each result of an inline returning `u8`, before the caller shifts or ORs it, comes from an `int`
+  local that the return type narrows. DWC's ADPCM encoders (`vct_adpcm.c`) return their codes so: `EncodeSample3`
+  matches with `int code` and a `u8` return, which gives `EncodeAdpcm3` the original's `and #0xff; lsl #k; and #0xff`
+  for each code, and `EncodeAdpcm2` and `EncodeAdpcm4` reach the original's size with the same change. A `u8 code`
+  returned as `u8` has nothing to narrow, and each function comes out short by those `and`s.
 - `&p[i].field` computes `p + i * size + offset`, and `&p->array[i].field` computes `(p + offset) + i * size` with
   an extra `mov`, so the order shows where an array starts: `event_bsubway.c`'s `func_ov012_0216657c` reads a
   leader's message at 0x18 of each 0x22-byte entry of an array at offset 0, not in entries of an array at 0x18.
@@ -1773,6 +1790,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   which only shows in the pool bytes (`InfoWin_Update`).
 - An index masked with `lsl #24; lsr #22` at its use is a `BOOL` passed through a `u8` parameter of an inline
   (`InfoWin_GetSignalColors(u8 on)`).
+- An `and` before an inline's table load in some inlined copies and not in others is a mask written in those calls'
+  arguments, sunk to the load. DWC's `DecodeAdpcm3` (`vct_adpcm.c`) passes `b0 >> 5`, `(b0 >> 2) & 7` and
+  `((b0 << 1) & 7) | (b1 >> 7)` to `DecodeSample3`, and the original has an `and #7` before reading `sIndexAdjust3`
+  only in the copies whose argument is masked as a whole. Indexing `sIndexAdjust3[code & 7]` in the inline as well
+  masks every copy, keeps the masked value live and rebuilds the third call's OR, 4 bytes short with every register
+  moved; the bare `[code]` matches.
 - A constant choice passed to a `u16` parameter without narrowing is `u16 v; if (...) v = A; else v = B;`; a ternary
   keeps the `lsl`/`lsr` (actor_tool.c's `ActorTool_LoadPalettesFade`).
 - A loop that copies its index each pass (`adds r3, r2, #0`) has a `u32` index against an `int` bound
