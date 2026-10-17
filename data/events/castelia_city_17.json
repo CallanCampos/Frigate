@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0464",
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 12,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 69,
+            "model": "OBJ_CODE_JANITOR",
             "movement": 14,
             "type": 0,
             "flag": 0,

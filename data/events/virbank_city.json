@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 359,
+            "model": "OBJ_CODE_359",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d6",
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": 224,
+            "model": "OBJ_CODE_224",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d6",
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 5,
             "type": 0,
             "flag": 0,
@@ -252,7 +252,7 @@
         },
         {
             "id": 3,
-            "model": 155,
+            "model": "OBJ_CODE_WORKER_26",
             "movement": 4,
             "type": 0,
             "flag": 0,
@@ -271,7 +271,7 @@
         },
         {
             "id": 4,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -290,7 +290,7 @@
         },
         {
             "id": 5,
-            "model": 297,
+            "model": "OBJ_CODE_297",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -309,7 +309,7 @@
         },
         {
             "id": 6,
-            "model": 358,
+            "model": "OBJ_CODE_358",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d5",
@@ -328,7 +328,7 @@
         },
         {
             "id": 7,
-            "model": 224,
+            "model": "OBJ_CODE_224",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d4",
@@ -347,7 +347,7 @@
         },
         {
             "id": 8,
-            "model": 291,
+            "model": "OBJ_CODE_291",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d4",
@@ -366,7 +366,7 @@
         },
         {
             "id": 9,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d4",
@@ -385,7 +385,7 @@
         },
         {
             "id": 10,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d4",
@@ -404,7 +404,7 @@
         },
         {
             "id": 11,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d4",
@@ -423,7 +423,7 @@
         },
         {
             "id": 12,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x045c",
@@ -442,7 +442,7 @@
         },
         {
             "id": 13,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -461,7 +461,7 @@
         },
         {
             "id": 14,
-            "model": 305,
+            "model": "OBJ_CODE_305",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -480,7 +480,7 @@
         },
         {
             "id": 15,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -499,7 +499,7 @@
         },
         {
             "id": 16,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -518,7 +518,7 @@
         },
         {
             "id": 17,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -537,7 +537,7 @@
         },
         {
             "id": 18,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 3,
             "type": 0,
             "flag": 0,

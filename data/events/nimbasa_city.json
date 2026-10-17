@@ -245,7 +245,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fa",
@@ -264,7 +264,7 @@
         },
         {
             "id": 1,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fa",
@@ -283,7 +283,7 @@
         },
         {
             "id": 2,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fa",
@@ -302,7 +302,7 @@
         },
         {
             "id": 3,
-            "model": 291,
+            "model": "OBJ_CODE_291",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02f9",
@@ -321,7 +321,7 @@
         },
         {
             "id": 4,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fa",
@@ -340,7 +340,7 @@
         },
         {
             "id": 5,
-            "model": 162,
+            "model": "OBJ_CODE_WORK_00",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fc",
@@ -359,7 +359,7 @@
         },
         {
             "id": 6,
-            "model": 207,
+            "model": "OBJ_CODE_207",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fc",
@@ -378,7 +378,7 @@
         },
         {
             "id": 7,
-            "model": 107,
+            "model": "OBJ_CODE_107",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02fc",
@@ -397,7 +397,7 @@
         },
         {
             "id": 8,
-            "model": 309,
+            "model": "OBJ_CODE_309",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x0361",
@@ -416,7 +416,7 @@
         },
         {
             "id": 9,
-            "model": 68,
+            "model": "OBJ_CODE_DEPOT_AGENT",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0360",
@@ -435,7 +435,7 @@
         },
         {
             "id": 10,
-            "model": 59,
+            "model": "OBJ_CODE_LINEBACKER",
             "movement": 13,
             "type": 0,
             "flag": 0,
@@ -454,7 +454,7 @@
         },
         {
             "id": 11,
-            "model": 54,
+            "model": "OBJ_CODE_HARLEQUIN_233",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -473,7 +473,7 @@
         },
         {
             "id": 12,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 38,
             "type": 0,
             "flag": 0,
@@ -492,7 +492,7 @@
         },
         {
             "id": 13,
-            "model": 25,
+            "model": "OBJ_CODE_25",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -511,7 +511,7 @@
         },
         {
             "id": 14,
-            "model": 49,
+            "model": "OBJ_CODE_BACKPACKER_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -530,7 +530,7 @@
         },
         {
             "id": 15,
-            "model": 16,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -549,7 +549,7 @@
         },
         {
             "id": 16,
-            "model": 310,
+            "model": "OBJ_CODE_310",
             "movement": 21,
             "type": 0,
             "flag": 0,
@@ -568,7 +568,7 @@
         },
         {
             "id": 17,
-            "model": 9,
+            "model": "OBJ_CODE_TWINS",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -587,7 +587,7 @@
         },
         {
             "id": 18,
-            "model": 26,
+            "model": "OBJ_CODE_POKEFAN_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -606,7 +606,7 @@
         },
         {
             "id": 19,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0409",

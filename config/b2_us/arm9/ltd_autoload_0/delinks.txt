@@ -87,3 +87,11 @@ lib/twl/src/syscall/syscall_twl_ltd.c:
 lib/twl/src/card/card_rom_twl.c:
     .ltdmain    start:0x027674a0 end:0x02767674
     .bss        start:0x0276aee0 end:0x0276af74
+
+lib/twl/src/dsp/dsp_g711_image.c:
+    complete
+    .rodata     start:0x02707fcc end:0x0272ecec
+
+lib/twl/src/dsp/dsp_graphics_image.c:
+    complete
+    .rodata     start:0x0272ecec end:0x02767480

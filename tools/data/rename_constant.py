@@ -16,6 +16,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import LISTS_DIR, parse  # noqa: E402
+from tools.data.field_actor_data import directory as field_actor_directory  # noqa: E402
+from tools.data.item_icon_data import member_path as item_icon_path  # noqa: E402
 from tools.data.species_data import directory as species_directory  # noqa: E402
 from tools.text.text_data import bank_prefix  # noqa: E402
 
@@ -50,6 +52,7 @@ NAMED_DATA = [
     ("encounters", "data/encounters", "ENCOUNTERS_", ".json"),
     ("zones", "data/zones", "ZONE_", ".json"),
     ("zones", "data/events", "ZONE_", ".json"),
+    ("obj_codes", "data/field_actors", "OBJ_CODE_", "/"),
 ]
 
 # The textures' directories, and the script that relinks the models that show them
@@ -63,6 +66,8 @@ RELINKS = [
 def data_path(constant: str, directory: str, prefix: str, suffix: str) -> Path:
     if prefix == "SPECIES_":
         return ROOT / directory / species_directory(constant)
+    if prefix == "OBJ_CODE_":
+        return field_actor_directory(ROOT / directory, constant)
     return ROOT / directory / (constant.removeprefix(prefix).lower() + ("" if suffix == "/" else suffix))
 
 
@@ -87,8 +92,27 @@ def main():
                     sys.exit(f"{args.new} must start with {prefix}, since its data is named after it")
                 moves.append((old_path, new_path))
 
+    # An item icon's file is named after its constant, in its item's directory or data/items/shared/
+    if args.old in lists[LISTS_DIR / "item_icons.txt"]:
+        old_path, new_path = (item_icon_path(ROOT / "data/items", c) for c in (args.old, args.new))
+        if old_path.exists() and old_path != new_path:
+            if new_path.exists():
+                sys.exit(f"{new_path.relative_to(ROOT)} already exists")
+            if not new_path.parent.is_dir():
+                sys.exit(f"{new_path.parent.relative_to(ROOT)} doesn't exist: an icon's name must be an item's")
+            moves.append((old_path, new_path))
+
+    for old_path, new_path in moves:
+        if new_path.exists():
+            sys.exit(f"{new_path.relative_to(ROOT)} already exists")
+
     # A message file's IDs start with its name, and the code includes its header by the file's name
     renames = [(re.compile(rf"\b{re.escape(args.old)}\b"), args.new)]
+    # An item's icons are named after it and are files of its directory (item_icon_data.py), so they follow it
+    if args.old in lists[LISTS_DIR / "items.txt"]:
+        old_item, new_item = args.old.removeprefix("ITEM_"), args.new.removeprefix("ITEM_")
+        renames.append((re.compile(rf"\b(ITEM_ICON_(?:PALETTE_)?){re.escape(old_item)}(_LAUNCHER)?\b"),
+                        rf"\g<1>{new_item}\g<2>"))
     for old_path, new_path in moves:
         if old_path.parent.parent == ROOT / "data/text":
             renames.append((re.compile(rf"\b{re.escape(bank_prefix(old_path))}(?=\w)"), bank_prefix(new_path)))

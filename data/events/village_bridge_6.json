@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 19,
+            "model": "OBJ_CODE_19",
             "movement": 7,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 23,
+            "model": "OBJ_CODE_NURSERY_AIDE",
             "movement": 3,
             "type": 0,
             "flag": 0,

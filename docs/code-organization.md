@@ -54,6 +54,12 @@ every section.
   refer to them, and how well each boundary between two functions keeps every section's data references in file
   order and the calls inside one file.
   `docs/source-files.md` lists every overlay's files with the evidence for their names (`source_files.py --markdown`).
+- A binary that the game embeds as it is, and that no compiler of ours can build, is a `const u8` array whose
+  initializer includes the bytes from the base ROM. That covers the DSi DSP's TeakLite programs in the LTD autoload,
+  `lib/twl/src/dsp/dsp_g711_image.c` and `dsp_graphics_image.c`. `ROM_BLOBS` in `configure.py` names each include file
+  under `rom/` of the generated headers with its module and symbol, and `tools/build/rom_blob.py` writes it from the
+  extracted module, with the symbol's address and size from `symbols.txt`. The bytes are never committed. Without a
+  ROM, `compile_all.py` writes zeros of the same size.
 - `struct_decls.h` declares every struct type once, as `typedef struct Name Name;`. The header of the module that
   owns a struct defines its layout when that is known (`struct Name { ... };`, without another typedef), and other
   code only uses pointers to it. A struct that only one file uses, such as an event's work, is defined in that file.

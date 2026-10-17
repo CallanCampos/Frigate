@@ -128,7 +128,8 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask);
 static const u8 sFrameSizes[VCT_CODEC_MAX][2] = { { 8, 0 }, { 8, 0 }, { 2, 4 }, { 3, 4 }, { 4, 4 } };
 
 // How many packets to send in each of the ticks that follow a frame, in a row for each number of machines to send to
-static const u8 sSendSchedule[22] = { 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 3, 0 };
+static const u8 sSendSchedule[7][3] = { { 1, 0, 0 }, { 1, 1, 0 }, { 1, 1, 1 }, { 1, 1, 2 },
+                                        { 1, 2, 2 }, { 2, 2, 2 }, { 2, 2, 3 } };
 
 // Whether to leave out frames with no voice in them
 static int sVadEnabled = TRUE;
@@ -254,9 +255,9 @@ void VCT_DetachSession(VCTSession *session) {
 
 // Hands a frame of the microphone's samples to the library to send, returning whether it took it
 BOOL VCT_SubmitSamples(void *samples, int size) {
-    int i;
-    BOOL hasSender = FALSE;
     VCTVoicePacket *packet;
+    u32 i;
+    BOOL hasSender = FALSE;
 
     if (size != sAudio.frameBytes) {
         return FALSE;
@@ -273,7 +274,7 @@ BOOL VCT_SubmitSamples(void *samples, int size) {
     if (!hasSender) {
         return FALSE;
     }
-    packet = (sSendQueue.writeIndex & 1) ? &sSendQueue.frames[0] : &sSendQueue.frames[1];
+    packet = &sSendQueue.frames[(sSendQueue.writeIndex & 1) ? 0 : 1];
     packet->magic = VCT_PACKET_MAGIC;
     if (sAudio.codec >= VCT_CODEC_ADPCM2) {
         MIi_CpuCopyFast(samples, &packet->payload[4], size);
@@ -300,56 +301,57 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
         now = OS_GetTick();
         packet = PeekQueue(slot);
 
-        if (packet == NULL) {
-            receiver->queuedCount = count;
-            return FALSE;
-        }
-        if (packet->playTime > now + 0x34) {
-            more = FALSE;
-            if (packet->silence == 0 && receiver->held != NULL) {
-                receiver->playedCount++;
-                MIi_CpuCopyFast(receiver->held->data, dst, size);
-                VCT_FreePacket(receiver->held);
-                receiver->held = NULL;
-                if (heardMask != NULL) {
-                    *heardMask |= 1 << packet->aid;
+        if (packet != NULL) {
+            if (packet->playTime > now + 0x34) {
+                more = FALSE;
+                if (packet->silence == 0 && receiver->held != NULL) {
+                    receiver->playedCount++;
+                    MIi_CpuCopyFast(receiver->held->data, dst, size);
+                    VCT_FreePacket(receiver->held);
+                    receiver->held = NULL;
+                    if (heardMask != NULL) {
+                        *heardMask |= 1 << packet->aid;
+                    }
+                    return TRUE;
                 }
-                return TRUE;
+                return FALSE;
             }
-            return FALSE;
-        }
-        if (now > packet->playTime + 0x8b4c) {
-            receiver->lastPlayedSequence = packet->sequence;
-            count = SetHeld(receiver, packet);
-            PeekQueue(slot);
-            more = FALSE;
-        } else {
-            u32 lastSequence = receiver->lastPlayedSequence;
-
-            if (lastSequence + 1 != packet->sequence && lastSequence != 0 && lastSequence <= packet->sequence) {
-                if (packet->silence == 0) {
-                    receiver->lostCount++;
-                }
-            }
-            receiver->lastPlayedSequence = packet->sequence;
-            if (more && receiver->unk70 != 0) {
+            if (now > packet->playTime + 0x8b4c) {
+                receiver->lastPlayedSequence = packet->sequence;
                 count = SetHeld(receiver, packet);
                 PeekQueue(slot);
-                receiver->unk70--;
+                more = FALSE;
             } else {
-                u32 delay = (u32)now - (u32)packet->arrival;
-                u32 smoothed = delay + ((u32)(delay - receiver->lastDelay - delay) >> 4);
-
-                receiver->lastDelay = delay;
-                receiver->avgDelayCopy = smoothed;
-                receiver->avgDelay = smoothed;
-                MIi_CpuCopyFast(packet->data, dst, size);
-                SetHeld(receiver, packet);
-                if (heardMask != NULL) {
-                    *heardMask |= 1 << packet->aid;
+                if (receiver->lastPlayedSequence + 1 != packet->sequence && receiver->lastPlayedSequence != 0 &&
+                    receiver->lastPlayedSequence <= packet->sequence) {
+                    if (packet->silence == 0) {
+                        receiver->lostCount++;
+                    }
                 }
-                return TRUE;
+                receiver->lastPlayedSequence = packet->sequence;
+                if (more && receiver->unk70 != 0) {
+                    count = SetHeld(receiver, packet);
+                    PeekQueue(slot);
+                    receiver->unk70--;
+                } else {
+                    u32 delay = now - packet->arrival;
+                    int change = delay - receiver->lastDelay;
+                    u32 smoothed = delay + ((change - delay) >> 4);
+
+                    receiver->lastDelay = delay;
+                    receiver->avgDelayCopy = smoothed;
+                    receiver->avgDelay = smoothed;
+                    MIi_CpuCopyFast(packet->data, dst, size);
+                    SetHeld(receiver, packet);
+                    if (heardMask != NULL) {
+                        *heardMask |= 1 << packet->aid;
+                    }
+                    return TRUE;
+                }
             }
+        } else {
+            receiver->queuedCount = count;
+            return FALSE;
         }
     }
     if (receiver->held != NULL) {
@@ -429,12 +431,12 @@ void VCT_SetEchoCancel(BOOL enabled) {
 
 // Codes the frame waiting in the send queue, returning the packet or NULL if there is none or it is silent
 static VCTVoicePacket *EncodeNextFrame(void) {
-    VCTCodec codec = sAudio.codec;
-    u32 queued = sSendQueue.writeIndex - sSendQueue.readIndex;
-    VCTVoicePacket *packet;
     u8 *samples;
+    VCTVoicePacket *packet;
     u32 energy;
     u32 rms;
+    u32 queued = sSendQueue.writeIndex - sSendQueue.readIndex;
+    VCTCodec codec = sAudio.codec;
 
     if (queued > 1) {
         sSendQueue.readIndex = sSendQueue.writeIndex - 1;
@@ -443,7 +445,7 @@ static VCTVoicePacket *EncodeNextFrame(void) {
     if (queued == 0) {
         return NULL;
     }
-    packet = (sSendQueue.readIndex & 1) ? &sSendQueue.frames[0] : &sSendQueue.frames[1];
+    packet = &sSendQueue.frames[(sSendQueue.readIndex & 1) ? 0 : 1];
     samples = packet->payload;
     if (codec >= VCT_CODEC_ADPCM2) {
         samples += 4;
@@ -505,11 +507,10 @@ static VCTVoicePacket *EncodeNextFrame(void) {
 
 // Takes in a voice packet of the machine with the given ID, returning whether it has been queued
 BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now) {
-    VCTReceiver *receiver = NULL;
     VCTPacket *queued;
-    int i;
+    VCTReceiver *receiver = NULL;
+    u32 i;
     int codec;
-    int dataSize;
     u8 *data;
 
     if (sAudio.sessionCount == 0) {
@@ -553,18 +554,17 @@ BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now) {
             FlushAllQueues();
             FreeAllActive();
             queued = VCT_AllocPacket();
-            if (queued == NULL) {
-                return FALSE;
-            }
+        }
+        if (queued == NULL) {
+            return FALSE;
         }
     }
-    dataSize = size - 0xc;
-    data = (u8 *)queued->samples + sizeof(queued->samples) - dataSize;
-    MI_CpuCopy8(packet->payload, data, dataSize);
+    data = (u8 *)&queued->samples[VCT_FRAME_SAMPLES] - (size - 0xc);
+    MI_CpuCopy8(packet->payload, data, size - 0xc);
     queued->slot = receiver->slot;
     queued->codec = codec;
     queued->data = data;
-    queued->dataSize = dataSize;
+    queued->dataSize = size - 0xc;
     queued->arrival = now;
     queued->aid = aid;
     queued->silence = packet->codec & 0x80;
@@ -620,16 +620,16 @@ BOOL VCT_SendPending(void) {
     if (sAudio.sessionCount == 0) {
         return TRUE;
     }
-    if (sSendQueue.sending == NULL) {
+    if (!sSendQueue.sending) {
         sSendQueue.sending = EncodeNextFrame();
-        if (sSendQueue.sending != NULL && sAudio.echoCancel != 0) {
+        if (sSendQueue.sending && sAudio.echoCancel) {
             return FALSE;
         }
         return TRUE;
     }
     sends = 1;
     if (gVCTSettings.mode == 2) {
-        sends = sSendSchedule[sSendQueue.scheduleRow * 3 + sSendQueue.scheduleColumn++];
+        sends = sSendSchedule[sSendQueue.scheduleRow][sSendQueue.scheduleColumn++];
     }
     for (i = 0; i < sends; i++) {
         int leading = MATH_CountLeadingZeros(sSendQueue.pendingMask);
@@ -758,6 +758,19 @@ static int RemoveActive(VCTPacket *packet) {
     return sActiveCounts[packet->slot];
 }
 
+// Finds the segment of a mu-law magnitude, as search() does in the public-domain G.711 code whose table and constants
+// these are
+static inline int SearchSegment(int value, const int *table, int size) {
+    int i;
+
+    for (i = 0; i < size; i++) {
+        if (value <= *table++) {
+            return i;
+        }
+    }
+    return size;
+}
+
 // Codes samples as 8-bit mu-law
 static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
     u32 i;
@@ -766,7 +779,6 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
         int segment;
         int sign;
         int sample = src[i] >> 2;
-        const int *end = sSegmentEnds;
 
         if (sample < 0) {
             sign = 0x7f;
@@ -777,15 +789,12 @@ static void EncodeMulaw(u8 *dst, s16 *src, u32 count) {
         if (sample > 0x1fdf) {
             sample = 0x1fdf;
         }
-        for (segment = 0; segment < 8; segment++) {
-            if (sample + 0x21 <= *end++) {
-                break;
-            }
-        }
+        sample += 0x21;
+        segment = SearchSegment(sample, sSegmentEnds, 8);
         if (segment >= 8) {
             dst[i] = sign ^ 0x7f;
         } else {
-            dst[i] = ((segment << 4) | (((sample + 0x21) >> (segment + 1)) & 0xf)) ^ sign;
+            dst[i] = ((segment << 4) | ((sample >> (segment + 1)) & 0xf)) ^ sign;
         }
     }
 }
@@ -851,9 +860,8 @@ static void FlushAllQueues(void) {
     int slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
-        VCTPacket *packet = sQueueHeads[slot];
-
-        while (packet != NULL) {
+        while (sQueueHeads[slot] != NULL) {
+            VCTPacket *packet = sQueueHeads[slot];
             VCTPacket *next = packet->next;
 
             sQueueHeads[slot] = next;
@@ -861,7 +869,6 @@ static void FlushAllQueues(void) {
                 next->prev = NULL;
             }
             VCT_FreePacket(packet);
-            packet = sQueueHeads[slot];
         }
         sQueueTails[slot] = NULL;
         sQueueCounts[slot] = 0;
@@ -1030,11 +1037,9 @@ static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequenc
 // track of how much the delay between the two wanders so as to widen or narrow the margin the playing is kept behind.
 // Returns FALSE for a packet that is a repeat, out of range or too late or early to be of use
 static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
-    int trend = 0;
-    u32 tickDelta;
-    u32 arrivalDelta;
+    u64 tickDelta;
     int skew;
-    u64 playTime;
+    int trend = 0;
     u64 now;
 
     if (receiver->needsReset) {
@@ -1071,8 +1076,7 @@ static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
         receiver->warmup = 0;
     }
     tickDelta = (packet->timestamp - receiver->firstTimestamp) << 6;
-    arrivalDelta = (u32)packet->arrival - (u32)receiver->firstArrival;
-    skew = tickDelta - arrivalDelta;
+    skew = tickDelta - (packet->arrival - receiver->firstArrival);
     if (receiver->lastSkew == 0 || packet->silence != 0) {
         receiver->lastSkew = skew;
     } else {
@@ -1082,7 +1086,7 @@ static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
             change = -change;
         }
         receiver->lastSkew = skew;
-        if ((s64)change > (s64)((receiver->jitterAverage + 0x8b18) * 2) + 0xcc8d) {
+        if (change > (receiver->jitterAverage + 0x8b18) * 2 + OS_MilliSecondsToTicks(100)) {
             receiver->burstCount = change / 0x8b18 + 2;
         }
         if (receiver->burstCount <= 0) {
@@ -1090,8 +1094,7 @@ static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
             receiver->unk18 = receiver->jitterAverage;
         }
     }
-    playTime = (u64)tickDelta + receiver->firstArrival + receiver->playoutDelay;
-    packet->playTime = playTime;
+    packet->playTime = tickDelta + receiver->firstArrival + receiver->playoutDelay;
     now = OS_GetTick();
     if (packet->playTime + 0x8b18 < now) {
         return FALSE;
@@ -1100,11 +1103,10 @@ static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
         return FALSE;
     }
     if (receiver->burstCount <= 0) {
-        int average = receiver->jitterAverage;
-        int scaled = average * 3;
-        int quotient = scaled / 0x8b18;
+        int scaled = receiver->jitterAverage * 3;
+        u32 quotient = scaled / 0x8b18;
 
-        if ((u32)scaled > receiver->delayCeiling) {
+        if (scaled > receiver->delayCeiling) {
             receiver->delayCeiling = (quotient + 1) * 0x8b18 + 0x134df;
             receiver->delayFloor = receiver->delayCeiling - 0xd0a4;
             receiver->playoutDelay = quotient * 0x8b18 + 0x134df;
@@ -1113,7 +1115,7 @@ static BOOL UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
             receiver->belowCount++;
             if (receiver->belowCount > 0x46) {
                 receiver->delayCeiling = (quotient + 1) * 0x8b18 + 0x134df;
-                receiver->delayFloor = quotient * 0x8b18 - 0x458c;
+                receiver->delayFloor = (int)quotient * 0x8b18 - 0x458c;
                 if (receiver->delayFloor < 0) {
                     receiver->delayFloor = 0;
                 }

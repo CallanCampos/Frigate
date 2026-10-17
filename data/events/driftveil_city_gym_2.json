@@ -35,7 +35,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 76,
+            "model": "OBJ_CODE_76",
             "movement": 0,
             "type": 0,
             "flag": 0,

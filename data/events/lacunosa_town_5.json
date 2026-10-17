@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 84,
+            "model": "OBJ_CODE_PARASOL_LADY",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x0312",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04d9",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 52,
+            "model": "OBJ_CODE_CLERK_M_67",
             "movement": 13,
             "type": 0,
             "flag": "EVENT_FLAG_0x0312",

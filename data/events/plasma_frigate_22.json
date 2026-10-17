@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d0",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 2,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d0",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0509",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 66,
+            "model": "OBJ_CODE_BAKER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d1",
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d1",
@@ -118,7 +118,7 @@
         },
         {
             "id": 6,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -137,7 +137,7 @@
         },
         {
             "id": 7,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d0",
@@ -156,7 +156,7 @@
         },
         {
             "id": 8,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d0",

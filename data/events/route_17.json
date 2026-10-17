@@ -155,7 +155,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 63,
+            "model": "OBJ_CODE_FISHERMAN",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -174,7 +174,7 @@
         },
         {
             "id": 1,
-            "model": 63,
+            "model": "OBJ_CODE_FISHERMAN",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -193,7 +193,7 @@
         },
         {
             "id": 2,
-            "model": 41,
+            "model": "OBJ_CODE_SWIMMER_F",
             "movement": 16,
             "type": 1,
             "flag": 0,
@@ -212,7 +212,7 @@
         },
         {
             "id": 3,
-            "model": 40,
+            "model": "OBJ_CODE_SWIMMER_M",
             "movement": 20,
             "type": 1,
             "flag": 0,
@@ -231,7 +231,7 @@
         },
         {
             "id": 4,
-            "model": 40,
+            "model": "OBJ_CODE_SWIMMER_M",
             "movement": 20,
             "type": 5,
             "flag": 0,
@@ -250,7 +250,7 @@
         },
         {
             "id": 5,
-            "model": 41,
+            "model": "OBJ_CODE_SWIMMER_F",
             "movement": 13,
             "type": 1,
             "flag": 0,
@@ -269,7 +269,7 @@
         },
         {
             "id": 6,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0582",
@@ -288,7 +288,7 @@
         },
         {
             "id": 7,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0583",
@@ -307,7 +307,7 @@
         },
         {
             "id": 8,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0584",

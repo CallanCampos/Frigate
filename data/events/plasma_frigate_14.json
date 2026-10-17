@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 13,
             "type": 1,
             "flag": "EVENT_FLAG_0x03d0",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 4,
             "type": 1,
             "flag": "EVENT_FLAG_0x03d0",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 294,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d1",
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 305,
+            "model": "OBJ_CODE_305",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d1",

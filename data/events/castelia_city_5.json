@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 43,
+            "model": "OBJ_CODE_WAITRESS",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 52,
+            "model": "OBJ_CODE_CLERK_M_67",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0303",
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 24,
+            "model": "OBJ_CODE_POKEFAN_M",
             "movement": 16,
             "type": 0,
             "flag": "EVENT_FLAG_0x0302",
@@ -82,7 +82,7 @@
         },
         {
             "id": 3,
-            "model": 53,
+            "model": "OBJ_CODE_CLERK_F",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0302",
@@ -101,7 +101,7 @@
         },
         {
             "id": 4,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0302",
@@ -120,7 +120,7 @@
         },
         {
             "id": 5,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0302",
@@ -139,7 +139,7 @@
         },
         {
             "id": 6,
-            "model": 52,
+            "model": "OBJ_CODE_CLERK_M_67",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0302",

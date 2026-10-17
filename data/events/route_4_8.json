@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 14,
             "type": 0,
             "flag": 0,

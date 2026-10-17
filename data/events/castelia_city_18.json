@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 12,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 325,
+            "model": "OBJ_CODE_325",
             "movement": 14,
             "type": 0,
             "flag": 0,
@@ -82,7 +82,7 @@
         },
         {
             "id": 3,
-            "model": 53,
+            "model": "OBJ_CODE_CLERK_F",
             "movement": 3,
             "type": 0,
             "flag": 0,

@@ -145,7 +145,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0565",
@@ -164,7 +164,7 @@
         },
         {
             "id": 1,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0569",
@@ -183,7 +183,7 @@
         },
         {
             "id": 2,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 14,
             "type": 1,
             "flag": 0,
@@ -202,7 +202,7 @@
         },
         {
             "id": 3,
-            "model": 47,
+            "model": "OBJ_CODE_BATTLE_GIRL",
             "movement": 20,
             "type": 1,
             "flag": 0,

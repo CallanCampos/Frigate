@@ -225,7 +225,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 291,
+            "model": "OBJ_CODE_291",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0324",
@@ -244,7 +244,7 @@
         },
         {
             "id": 1,
-            "model": 230,
+            "model": "OBJ_CODE_230",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x0325",
@@ -263,7 +263,7 @@
         },
         {
             "id": 2,
-            "model": 17,
+            "model": "OBJ_CODE_LADY",
             "movement": 43,
             "type": 0,
             "flag": "EVENT_FLAG_0x0326",
@@ -282,7 +282,7 @@
         },
         {
             "id": 3,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 42,
             "type": 0,
             "flag": "EVENT_FLAG_0x0327",
@@ -301,7 +301,7 @@
         },
         {
             "id": 4,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04f7",
@@ -320,7 +320,7 @@
         },
         {
             "id": 5,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0328",
@@ -339,7 +339,7 @@
         },
         {
             "id": 6,
-            "model": 32,
+            "model": "OBJ_CODE_VETERAN_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03d9",
@@ -358,7 +358,7 @@
         },
         {
             "id": 7,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x04f0",
@@ -377,7 +377,7 @@
         },
         {
             "id": 8,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 1,
             "flag": "EVENT_FLAG_0x057c",
@@ -396,7 +396,7 @@
         },
         {
             "id": 9,
-            "model": 25,
+            "model": "OBJ_CODE_25",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -415,7 +415,7 @@
         },
         {
             "id": 10,
-            "model": 41,
+            "model": "OBJ_CODE_SWIMMER_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -434,7 +434,7 @@
         },
         {
             "id": 11,
-            "model": 41,
+            "model": "OBJ_CODE_SWIMMER_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -453,7 +453,7 @@
         },
         {
             "id": 12,
-            "model": 17,
+            "model": "OBJ_CODE_LADY",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -472,7 +472,7 @@
         },
         {
             "id": 13,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -491,7 +491,7 @@
         },
         {
             "id": 14,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -510,7 +510,7 @@
         },
         {
             "id": 15,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03f0",

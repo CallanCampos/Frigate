@@ -155,7 +155,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -174,7 +174,7 @@
         },
         {
             "id": 1,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -193,7 +193,7 @@
         },
         {
             "id": 2,
-            "model": 28,
+            "model": "OBJ_CODE_ARTIST",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -212,7 +212,7 @@
         },
         {
             "id": 3,
-            "model": 14,
+            "model": "OBJ_CODE_14",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -231,7 +231,7 @@
         },
         {
             "id": 4,
-            "model": 312,
+            "model": "OBJ_CODE_312",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -250,7 +250,7 @@
         },
         {
             "id": 5,
-            "model": 29,
+            "model": "OBJ_CODE_29",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -269,7 +269,7 @@
         },
         {
             "id": 6,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -288,7 +288,7 @@
         },
         {
             "id": 7,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0578",
@@ -307,7 +307,7 @@
         },
         {
             "id": 8,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x057d",
@@ -326,7 +326,7 @@
         },
         {
             "id": 9,
-            "model": 29,
+            "model": "OBJ_CODE_29",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -345,7 +345,7 @@
         },
         {
             "id": 10,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": 0,

@@ -105,7 +105,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 69,
             "type": 0,
             "flag": 0,
@@ -124,7 +124,7 @@
         },
         {
             "id": 1,
-            "model": 45,
+            "model": "OBJ_CODE_SOCIALITE",
             "movement": 81,
             "type": 0,
             "flag": 0,
@@ -143,7 +143,7 @@
         },
         {
             "id": 2,
-            "model": 65,
+            "model": "OBJ_CODE_65",
             "movement": 69,
             "type": 0,
             "flag": 0,
@@ -162,7 +162,7 @@
         },
         {
             "id": 3,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 81,
             "type": 0,
             "flag": 0,
@@ -181,7 +181,7 @@
         },
         {
             "id": 4,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 81,
             "type": 0,
             "flag": "EVENT_FLAG_0x035f",
@@ -200,7 +200,7 @@
         },
         {
             "id": 5,
-            "model": 20,
+            "model": "OBJ_CODE_BACKERS_M",
             "movement": 81,
             "type": 0,
             "flag": 0,
@@ -219,7 +219,7 @@
         },
         {
             "id": 6,
-            "model": 58,
+            "model": "OBJ_CODE_STRIKER",
             "movement": 69,
             "type": 0,
             "flag": 0,

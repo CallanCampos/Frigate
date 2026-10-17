@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 17,
+            "model": "OBJ_CODE_LADY",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0380",
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x037f",
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 187,
+            "model": "OBJ_CODE_187",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -80,7 +80,7 @@
         },
         {
             "id": 4,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 38,
             "type": 0,
             "flag": 0,
@@ -99,7 +99,7 @@
         },
         {
             "id": 5,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 3,
             "type": 0,
             "flag": 0,

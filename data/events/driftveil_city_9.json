@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 21,
+            "model": "OBJ_CODE_21",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 128,
+            "model": "OBJ_CODE_128",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -82,7 +82,7 @@
         },
         {
             "id": 3,
-            "model": 184,
+            "model": "OBJ_CODE_PSYCHIC_F",
             "movement": 16,
             "type": 0,
             "flag": 0,

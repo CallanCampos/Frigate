@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 48,
+            "model": "OBJ_CODE_BACKPACKER_M",
             "movement": 15,
             "type": 1,
             "flag": 0,

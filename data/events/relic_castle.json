@@ -145,7 +145,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 183,
+            "model": "OBJ_CODE_PSYCHIC_M",
             "movement": 16,
             "type": 1,
             "flag": 0,
@@ -164,7 +164,7 @@
         },
         {
             "id": 1,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 0,
             "type": 0,
             "flag": 0,

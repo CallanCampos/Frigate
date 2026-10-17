@@ -87,6 +87,13 @@ tools that show the differences.
   the stores of the packed matrix written first, the matrix read through `mtx->_00` and the others at each use rather
   than in locals, and `x2` and `y2` assigned after those stores, in that order. When registers are swapped and no order
   of the computation helps, try writing the `volatile` stores before the arithmetic they don't depend on.
+- Registers are colored in the order the source defines the values, before the scheduler reorders the code, so
+  `compiler_probe.py --opt=-O1` shows the coloring in source order (`#pragma scheduling off` changes nothing). Read
+  the original's registers as a definition order: `btlv_effvm.c`'s `BtlvEffvm_InitEmitter` keeps from.x, to.x, from.y
+  and to.y of motion type 4's swap in r2, r1, r3 and r7, spills from.z and holds to.z in ip, the order of saving and
+  swapping each axis in turn (`x = from.x; from.x = to.x;`, then y and z), with the three sums after. Every save
+  first, then every move, is 29 to 35 bytes off. The sums match only as `to.x = x + from.x` (`adds rD, rFrom, rTo`):
+  `to.x += x` and `x + to.x` put the operands the other way round, though from.x and to.x hold the same value there.
 - A parameter the original copies to a saved register at entry and changes there in place is walked by the source
   itself, not copied to a local: `arrow.c`'s `Arrow_SetPathCore` steps `startX -= PIECE_SIZE` rather than an
   `x = startX - PIECE_SIZE`. A parameter copied to another register at entry (`mov r3, r1`), with a value derived
@@ -253,6 +260,11 @@ Same instructions, registers swapped.
   The base register tells the two apart: `&call->rows[i]` is `call + 0x40 + i * 0x1c`, used with the field's own
   offset (`[r5, #0x14]`), while `call->rows[i].window` written out is `call + i * 0x1c` with the array's offset
   folded in (`[r5, #0x54]`), as in `ctvt_call.c`'s `CtvtCall_Leave` and `CtvtCall_Main`.
+- An expression of a parameter written at each use around a call is computed again after it (`sub r0, r5, #0xc`
+  after the `bl`), with the parameter kept in a saved register; held in a local, the local takes that register and
+  nothing is computed again, but the local can cost a register elsewhere. libVCT's `VCT_HandleVoicePacket`
+  (`vct_audio.c`) writes `size - 0xc` at its three uses around `MI_CpuCopy8`; with an `int dataSize` local in their
+  place, its `u64 now` parameter goes to an 8-byte stack frame and the function is 48 bytes larger.
 - An element address computed before an inline helper's argument calls, and kept in a register while the loop counter
   spills, is the address passed to the helper: `CtvtCall_CreateActor(sys, &call->rows[i].frame, ...)` stores through
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
@@ -369,6 +381,11 @@ Same instructions, registers swapped.
   `y * 512` first, or `(x + y * 256) * 2`, it doesn't match. A constant term goes on the right whatever the order:
   `0x800 + (u32)p` gives the same `adds` as `(u32)p + 0x800` in `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` and
   `CtvtTalk_Main`.
+  A constant counts as a local only when it is held in a pointer local and cast at its use. `btlv_input.c`'s
+  `BtlvInput_CreateStruggleActor` adds the hoisted OBJ VRAM base first (`adds r2, r7, r2`) with
+  `void *vram = G2S_GetOBJCharPtr();` and `(void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy...baseAddrOfVram[...])`,
+  as `btlv_gauge.c`'s `BtlvGauge_DrawBar` writes it. The base written in place (`HW_DB_OBJ_VRAM`, or `HW_OBJ_VRAM` in
+  the gauge), a `u32 vram` local and the inline called in place put the constant second in both functions.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -1094,6 +1111,11 @@ Same instructions, scheduled in another order.
   sizeof(T)`, is scheduled apart from the same address indexed through a pointer to the table's type: TwlSDK's
   `DSP_LoadPipe` (`dsp_pipe.c`) loads the DSP's base and adds the row before the `cmp` of its scratch-table test only
   with `DSPPipe (*headers)[2] = (DSPPipe (*)[2])sPipeBase;` and `(u32)&headers[port][direction]`.
+- A two-dimensional table indexed `table[row][col]` adds the row's offset to the table's address and then loads at
+  the column plus that (`add r1, r1, r1, lsl #1; add r0, r0, r1; ldrb r5, [r2, r0]`), where a flat `table[row * 3 +
+  col]` adds the row's offset to the column and loads from the table. libVCT's `sSendSchedule` (`vct_audio.c`) is
+  seven rows of three, one for each number of machines to send to, each summing to its row's count, and
+  `VCT_SendPending` matches with `sSendSchedule[sSendQueue.scheduleRow][sSendQueue.scheduleColumn++]`.
 - An OR of two shifts of one value computes its right operand first and folds the left one's shift into the `orr`: `(x
   << 16) | (x >> 16)` is `lsr r1, r0, #16; orr r0, r1, r0, lsl #16`, so the ROM's `lsl` first is `(x >> 16) | (x <<
   16)`, as the DSP's `dsp_audio.c` and `dsp_pipe.c` swap the halves of a word.
@@ -1120,6 +1142,17 @@ Same instructions, scheduled in another order.
   NitroSDK function that takes a pointer to a parameter struct may have lost the SDK's `const` in our header:
   `WM_StartScanEx` (`wm_standard.c`) loads `param->channelList` above its command's first store only with
   `const WMScanExParam *param`, NitroSDK's prototype.
+- In ARM code a load of a static's member at a constant offset moves above a store through an unknown index into
+  another static only when the offset is below half the object's size: with `int f[16]`, `sSlots[slot] = 0;
+  sObj.f[7]--;` loads `f[7]` first and `sObj.f[8]--;` loads after the store. The stored array's size, the order of
+  the declarations, linkage, field types, nesting and `#pragma scheduling off` don't change it. A read of the same
+  object earlier in the function at a higher offset lowers the bound: the access at offset a moves only while a plus
+  the larger of a and that read's offset is below the size, so after `int x = sObj.f[12];` only `f[0]` to `f[3]`
+  move. A store moves above an access through a pointer into another static by the same bound. libVCT's
+  `VCT_DetachSession` (`vct_audio.c`) loads `sAudio.sessionCount`, at 0x20 of the 0x2c-byte `sAudio`, above its
+  `sSlotSessions[slot] = NULL`, which no spelling of the two statements reproduces. Its `EncodeNextFrame`, which
+  reads `sAudio.codec` (0x1c) first, moves the store `sAudio.needsSync = FALSE` (8) above the `packet->codec` store
+  into `sSendQueue`, and fields at 4 and 0xc in its place move too, while those at 0x14 and 0x18 stay.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1191,6 +1224,14 @@ Same instructions, scheduled in another order.
   only with the table indexed at each use; `const s16 *messages = sFMissionAppDrawMessages;` gives the same registers
   with the load after the spill. A branch that loads the address again from the pool, as one does there, hints that
   no local held it.
+- A local array's element is never loaded again after a call, even once the array's address has been passed to
+  another function, so an element loaded both before and after a call (`ldr r1, [r6, r7]` around
+  `bl BtlvEffect_GetGauge`) was read through a pointer. `btlv_effvm.c`'s `BtlvEffvm_CmdGauge` matches with
+  `pos = &positions[i];` set in its loop and read twice; MWCC then gathers `&positions` into `r6` at entry, ahead of
+  the parameter spill, as with the static table above. A function-scope `int *pos = positions;` gives the reload too,
+  but is set after the spill and takes over the array's other uses, such as a call argument the original builds
+  afresh with `add r2, sp, #0x10`. The same function needs `offset.x = mode == 2 ? 128 : -16;`: as an `if`/`else`,
+  the two stores keep `&offset` in a saved register and spill `i * 4`.
 - A struct assignment loads every field before it stores any, through a pointer that is not `const` too. Two
   fields copied with both loads first, `ldr r2, [r0, #0x10]; ldr r1, [r0, #0x14]; str r2, [r0]`, are one struct
   copied: `KeySystemTween_Update` ends with `tween->pos = tween->end;` for an `{ s32 x, y; }` position.
@@ -1369,6 +1410,18 @@ Same instructions, scheduled in another order.
   which has the two instructions in `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, wrote `-(sinR + cosR) + FX32_ONE`, and
   matches so under scratch copies of the SDK's typedefs; with this checkout's `int` `fx32` both functions stay 4 bytes
   short. The negation in a statement of its own (`sum = a + b; sum = -sum;`) keeps the two as well.
+- A difference taken back from its own first operand folds too: `d + ((d - last - d) >> 4)`, or the same with
+  `d - last` in a `u32` local, compiles to `rsb r0, r0, #0`. The two `sub`s stay when the local has the other
+  signedness, `int change = d - last;`, or when a store to `last` comes between the local and its use. libVCT's
+  `ReceiveSlot` (`vct_audio.c`) smooths its delay with `int change = delay - receiver->lastDelay;` and `delay +
+  ((change - delay) >> 4)`, the form of the `change` of `UpdateTiming` in the same file.
+- A 64-bit difference narrowed to 32 bits is a `subs` of the low words, its high word's `sbc` dropped as dead: `u32
+  delay = now - packet->arrival;` with `u64` operands, as libVCT's `ReceiveSlot` (`vct_audio.c`) has it, where
+  `(u32)now - (u32)packet->arrival` is a `sub`.
+- An unsigned 64-bit compare of sign-extended `int`s (`asr #31` and `adc rX, rZero, rY, asr #31` to widen, then
+  `cmp hi; cmpeq lo` with `bls` or `movhi`), where `(s64)` casts give `subs; sbcs` and a signed condition, is an `int`
+  compared with a sum that holds a `u64` constant, such as NitroSDK's `OS_MilliSecondsToTicks`: libVCT's
+  `UpdateTiming` (`vct_audio.c`) tests `change > (receiver->jitterAverage + 0x8b18) * 2 + OS_MilliSecondsToTicks(100)`.
 - A field's address in a stack struct formed in two steps, `add r1, sp, #0` and then `add r1, r1, #4` (with `ldr r0,
   [sp, #0]` between), where ours folds it into `add r1, sp, #4`, is the struct passed as a packet of words to an inline
   that indexes it. G3D's `NNSi_G3dSendTexSRTMaya`, `NNSi_G3dSendTexSRTSi3d`, `NNSi_G3dSendTexSRT3dsMax` and
@@ -1376,6 +1429,11 @@ Same instructions, scheduled in another order.
   NNS_G3dGeBufferOP_N(packet[0], &packet[1], num - 1); }` called as `sendPacket_((const u32 *)&cmd, sizeof(cmd) /
   sizeof(u32))`, the shape of `gecom.c`'s `NNS_G3dGeSendDL` (`dl[0], dl + 1`). A field's address (`&cmd.modeTexture`,
   `&cmd.op + 1`, a union's `&cmd.words[1]`) or the cast pointer in a local all fold into one `add`.
+- The end of an array member written as an element's address, `&p->samples[N]` or `p->samples + N`, folds the
+  member's offset and the array's size into one constant, which the immediate encoder splits (`add #0x5c; add
+  #0x400` for 0x45c), where `(u8 *)p->samples + sizeof(p->samples)` adds the offset and then the size (`add #0x1c;
+  add #0x440`). libVCT's `VCT_HandleVoicePacket` (`vct_audio.c`) puts a packet's payload at the end of its buffer
+  with `(u8 *)&queued->samples[VCT_FRAME_SAMPLES] - (size - 0xc)`.
 - A `mov r0, #imm; cmp rX, r0` where the immediate would fit the `cmp` is a limit held in a variable, which MWCC
   propagates too late to fold: MSL's `__strtold` compares the hexadecimal digits against `max_digits`, set to
   `MAX_HEX_DIG` where a hexadecimal number starts. A macro, an enum, a `const`, a `static const` or `sizeof` all give
@@ -1392,6 +1450,12 @@ Same instructions, scheduled in another order.
   the use, keeps `lsls #1` and `lsls #0x10; lsrs #0x10` apart. A `u16` local or parameter and `& 0xffff` fold too.
   Multiboot's `MBGameInfo_Build` (`mb_gameinfo.c`) matched with `nameSize = MBGameInfo_CountChars(name) *
   sizeof(u16);` and `(u16)nameSize` in the copy.
+- An `ands` with 0xffff kept before a `strh`, its mask built at run time (`movs r5, #0xff; lsls; orrs`) and shared
+  by two stores, is one packed-byte expression in two inline calls: MWCC holds the expression's constants in
+  registers across both before it folds them, where a lone store folds the mask away. `btlv_effvm.c`'s
+  `BtlvEffvm_WindowTask` writes its window bounds with `G2_SetWnd0Position` and `G2_SetWnd1Position`, which match
+  only in NitroSDK's own form, `((y1 << 8) & 0xff00) | (y2 & 0xff)`; with `(u8)y2` the mask folds, and no direct
+  store to `reg_G2_WIN0V` keeps it. When an SDK inline won't give the original's code, compare it with the SDK's text.
 - Two loops in a row that share one counter can swap the second loop's counter with another local; a counter of its
   own, declared before that local, fixes it where no declaration order with the shared one does
   (`MBGameInfo_SendMembers`, `mb_gameinfo.c`).
@@ -1703,7 +1767,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A pointer compared with `NULL`, which is `((void *)0)`, can share a zero that the function keeps in a register for its
   stores, `cmp r0, r5`, where `if (p)` and `if (!p)` compare with `#0`; keeping that zero alive moves other registers
   too. `snd_command.c`'s `SND_CommandInit` stores eight zeros before its calls and matches only with `if (command)`;
-  `wm_system.c`'s `WmInit` and `nvram.c`'s callbacks need the same.
+  `wm_system.c`'s `WmInit` and `nvram.c`'s callbacks need the same. The zero can also be kept in a saved register
+  across a call and returned for a `FALSE` (`movne r0, r6`), and then every `NULL` test that shares it has to go:
+  libVCT's `VCT_SendPending` (`vct_audio.c`) tests `sSendQueue.sending` before and after its `EncodeNextFrame` call
+  and matches only with both tests written `!p` and `p && ...`; either one left against `NULL` keeps the zero.
 - A value moved into an argument register just before a call, and used for nothing else, is an argument the prototype
   is missing. `GFL_SEPlayKeepVol` takes the sound's player as well as the sound. The value can be narrowed for it:
   `CtvtComm_RecvPacket` narrows `packet->value` into r1 (`lsls`/`lsrs #24`) but compares the unnarrowed value with
@@ -1859,6 +1926,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the cast `(i + 17) * 2` was spilled and reloaded twice and the frame was 4 bytes larger. The two spilled slots left
   swapped after that (`scroll` and the loop body's `visible`) were fixed by making the block-scoped
   `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
+  A product computed again in a register shows it too: libVCT's `UpdateTiming` (`vct_audio.c`) loads 0x8b18 again
+  and multiplies a second time for `playoutDelay` after the signed `delayFloor = (int)quotient * 0x8b18 - 0x458c`,
+  with `u32 quotient`.
 - A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
   second read through a `static inline` that takes a pointer to `const`: a load through a `const` pointer is a
   different expression from the plain read, so the two are not shared. The Wi-Fi login's `WifiLoginMessage_PrintFrom`
@@ -1871,7 +1941,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   address into the argument: the pointer was set to the table and then advanced, a local with two assignments that is
   not moved to its use. `PkwdBook_LoadPoster` matches with `const PkwdBookLoad *screen = sPkwdBookPosterScreens;` at
   the top and `screen += graphicIdx;` before each call. An inline helper taking `&table[i]`, entry pointers at any
-  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".)
+  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".) A row of a buffer
+  shows it too: `btlv_input.c`'s `BtlvInput_LoadTypePalette` loads the buffer and computes the row before it stores
+  the size argument, and keeps the size, shared with the `mul`, in `r0`. It matches with `src = work->typePalBuf;
+  src += palette * 0x80;` before each `PaletteFade_LoadData`, and only with a non-`const` `work`: with `const`, the
+  first call's store moved above the buffer's load (the reverse case under "Loads through a pointer are not moved").
 - A shifted index that the original computes again after a loop, where ours reuses the loop's, is the same index in
   another type: MWCC shares `palette << 5` only between uses of one type. The World Tournament list's
   `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
@@ -1992,13 +2066,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
   `BOOL shown1 = view->page == slot / 4;` and `shown2` likewise: declared first, `shown1` takes the `r1` that
   holds `slot / 4` and gets the branches, as in the original.
-- A `cond ? 0 : 1` whose 0 the original takes from an existing register while 1 comes from a register it keeps 1 in
-  throughout inverts the branch polarity under every ternary spelling; `btlv_effvm.c`'s
-  `BtlvEffvm_GetDefenderPositions` needs the default-then-override form through a local,
-  `side = 0; if (!(wk->attacker & 1)) { side = 1; }`.
+- A `cond ? 0 : 1` whose 0 the original takes from an existing register and whose 1 from a register it keeps 1 in
+  throughout (`bne; adds r4, r5`, where `int` arms give `beq; adds r5, r4`) also has enum constants for both arms:
+  `btlv_effvm.c`'s `BtlvEffvm_GetDefenderPositions` stores
+  `(wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY` into its `int` array. One enum arm,
+  a cast of the whole ternary, or the condition inverted stays 5 bytes off.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
-  on, where `if (!f()) { return FALSE; } n++;` puts it before.
+  on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just
+  before the rotated loop's bottom test: libVCT's `ReceiveSlot` (`vct_audio.c`) has its empty-queue exit there and
+  matches with the body wrapped as `if (packet != NULL) { ... } else { receiver->queuedCount = count; return FALSE; }`.
 - Every `return` gets its own epilogue. Failures that all branch to one block that sets a saved register and jumps
   to a shared `mov r0, rN` exit can be a `static inline`'s early returns, which inlining turns into stores to one
   result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is
@@ -2046,6 +2123,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   at the end of both arms of an `if` is merged the same way: `p_sta_sub.c`'s `PStaSub_AnimSwipeX` stores the bounce
   and calls `PStaSub_SetBounce` in each arm, and the `else` passes the zero left from the vector's initializer; one
   call after the `if` drops the `b`.
+- Two calls to one function at different depths, one ending an arm of an inner `if`/`else` and one in the outer
+  `else`, are cross-jumped at the `bl` alone, even when their argument moves are in different orders: the inner arm
+  ends in `b` to the outer copy's `bl`. Neither the callee's spelling, the tests' polarity nor nesting the tests
+  keeps them apart. The original's separate `bl; b exit` in libVCT's `VCT_ReadSamples` (`vct_audio.c`) came back
+  only with a statement ending the outer then-arm that emits nothing but keeps its block, `heard = received;` between
+  two flags that share a register, which only shapes code there (its row).
 - A load that both arms of an `if`/`else` begin with is hoisted above the branch, between the test and the `beq`.
   When the original loads it first in each arm, after the branch, one arm began with another statement that the
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
@@ -2132,6 +2215,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the original puts an `if`'s then-block after the else path, write the condition negated with the bodies
   swapped: brightness.c's `BrightnessData_Step` matches with the long advance body first and `done = TRUE` in the
   `else`, for both its tests.
+- A negated test and its expansion by De Morgan's laws compile to different branch targets: `btlv_effvm.c`'s
+  `BtlvEffvm_InitEmitter` branches to the body when `angle` is below 0x2000 (`blo`) and on to the 0xe000 test when it
+  is at most 0x6000 (`bls`) only as `angle < 0x2000 || (angle > 0x6000 && angle < 0xa000) || angle > 0xe000`;
+  `!((angle >= 0x2000 && angle <= 0x6000) || (angle >= 0xa000 && angle <= 0xe000))` is 2 bytes off.
 - A test of a value against a few nearby constants returned as `return x == a || x == b || x == c;` compiles to a bit
   test, `sub; cmp #range; bhi; mov #1; lsl; tst #mask`, while the same test as an `if`, or as a `switch` that returns or
   sets a flag, compiles to compares. `itemmenu.c`'s `ItemMenu_IsRepel` returns the expression for its three repels.
@@ -2365,6 +2452,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
   `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
   `i < 8`, and an inline with `return kind < N;`, are both rotated.
+- What keeps the `b` is control flow in the condition that only the optimizer removes: a `?:`, an inline returning
+  `TRUE`/`FALSE`, or `&&` with an operand the front end can't fold, such as `i < 4 && !found` with a local flag. `&& 1`,
+  `MIN` of constants, a `static const` or enum bound and every counter type are rotated. In ARM code the 0/1 test still
+  compiles to a plain `cmp; blt` at the bottom, so the leading `b` is the only sign of it: libVCT's `VCT_InitAudio`
+  (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE` (its row).
+  As a diagnostic only, `__attribute__((aligned(4)))` on any object a function reads keeps the `b` there too, and
+  changes the function's other optimizations.
+- A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
+  `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a
+  `packet = head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `FlushAllQueues` (`vct_audio.c`)
+  matches as `while (sQueueHeads[slot] != NULL) { VCTPacket *packet = sQueueHeads[slot]; ... }` at the top of its slot
+  loop, where `packet` loaded before the `while` and again at the end of its body gave the rotated loop.
+- A search loop whose normal exit sets the counter's register to the bound before testing it (`mov r5, #8` falling
+  into `cmp r5, #8`) is an inline that returns the counter from inside the loop and its `size` argument after it. A
+  loop with `break` written in place leaves the counter as it is. The inline also walks its table with a
+  post-incremented pointer (`ldr r8, [fp], #4`) from `value <= *table++`. libVCT's `EncodeMulaw` (`vct_audio.c`) reaches
+  its size only with G.711's `search(val, table, size)` as a `static inline` (its row).
 
 ## Switches
 

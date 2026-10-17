@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 94,
+            "model": "OBJ_CODE_94",
             "movement": 0,
             "type": 0,
             "flag": 0,

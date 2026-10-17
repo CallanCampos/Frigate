@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 196,
+            "model": "OBJ_CODE_196",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x03c6",

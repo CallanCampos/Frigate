@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 187,
+            "model": "OBJ_CODE_187",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -82,7 +82,7 @@
         },
         {
             "id": 3,
-            "model": 303,
+            "model": "OBJ_CODE_303",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -101,7 +101,7 @@
         },
         {
             "id": 4,
-            "model": 226,
+            "model": "OBJ_CODE_226",
             "movement": 0,
             "type": 0,
             "flag": 0,
