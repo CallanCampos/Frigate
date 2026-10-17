@@ -3050,6 +3050,7 @@ overlays/ov257 0x021b18c4 add_data data_ov257_021b18c4
 overlays/ov257 0x021b19ac add_data data_ov257_021b19ac
 overlays/ov257 0x021b1a08 add_data data_ov257_021b1a08
 overlays/ov257 0x021b1aa8 add_data data_ov257_021b1aa8
+overlays/ov257 0x021b2120 remove_reloc
 overlays/ov257 0x021b21f4 section_end src/ov257/ctvt_game.c:.rodata
 overlays/ov257 0x021b21f8 remove_symbol
 overlays/ov257 0x021b21fc remove_symbol
