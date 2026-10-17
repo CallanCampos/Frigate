@@ -1310,6 +1310,12 @@ Same instructions, scheduled in another order.
 - MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
   one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
   parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
+- Two `mvns` in a row, a complement of a complement, come the same way from an inline that complements its parameter,
+  called with one already applied: the ITCM's ClAct renderers (`clact_itcm.c`) clear the flags an actor doesn't
+  overwrite with NitroSystem's `NNS_G2dSetRendererOverwriteDisable(&renderer->renderer, ~overwrite)`, whose body is
+  `rend->overwriteEnableFlag &= ~flag`. The parameter's type keeps them: with the SDK's enum
+  `NNSG2dRendererOverwriteParam`, or a `u32`, both stay, while an `int` parameter folds them as above, and so does
+  `&= ~~overwrite` written in place, which leaves each of the four renderers 4 bytes short.
 - A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
   `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
   task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
