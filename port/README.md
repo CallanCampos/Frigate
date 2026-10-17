@@ -26,6 +26,25 @@ files leaves what MWCC compiles unchanged ([docs/game-changes.md](docs/game-chan
 **Where it stands:** the program links and enters the game's `main()`, which stops at `OS_Init`, the first SDK module
 the platform layer replaces. [docs/STATUS.md](docs/STATUS.md) has the current state.
 
+### Controls
+
+The keyboard, by key position, and any gamepad at the same time. A gamepad's face buttons work by position, as on the
+DS, which is a Nintendo pad's layout: the DS's A is the right face button whatever its label (B on an Xbox pad, Circle
+on a PlayStation pad). The program names each pad's buttons, by the labels SDL reports, when the pad connects.
+
+| DS | Keyboard | Gamepad |
+| --- | --- | --- |
+| A, B, X, Y | X, Z, S, A | right, bottom, top and left face buttons |
+| L, R | Q, W | left and right shoulder buttons |
+| Start, Select | Return; Right Shift or Backspace | start; back (View, Share or minus) |
+| D-pad | arrow keys | D-pad, and the left stick past half its travel, diagonals included |
+| Touch screen | the left mouse button on the bottom screen | |
+
+Pads can come and go while the game runs. With several, the first to press something drives the game until it lets go
+of everything; then the next to press something takes over. [app/present.c](app/present.c)'s header has the same
+table, and the gamepad's controls are one table in [app/gamepad.c](app/gamepad.c) that a settings file will be able
+to replace.
+
 ## Directory map
 
 The layout from [PLAN.md §4.3](docs/PLAN.md#43-directory-structure). Entries marked **now** exist; the rest are
@@ -36,7 +55,8 @@ port/
   README.md              now      this overview
   CLAUDE.md              now      rules for sessions working on the port
   CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
-  app/                   now      main(), SDL3 window; later screen layouts, settings, paths, first-launch ROM setup
+  app/                   now      main(), SDL3 window, gamepads; later screen layouts, settings, paths, first-launch
+                                  ROM setup
   include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
   hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
     os/ pxi/ hw/ gx/ dma/ mi/ fx/ math/ crypto/ rom/ card/ fs/ nvram/ rtc/ pm/ tp/ mic/ ctrdg/ reset/ input/

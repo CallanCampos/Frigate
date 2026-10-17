@@ -1,10 +1,10 @@
-# The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the run directory
-# for the oracle's comparisons with the symbol lookup its memory dumps use, and input replays with the oracle's input
-# file reader (port/tools/oracle/pbwinput.c, plain C11). The screens they show are drawn by port/gfx/screens.c, which
-# the port_gfx target builds.
-target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
+# The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the gamepads, the
+# run directory for the oracle's comparisons with the symbol lookup its memory dumps use, and input replays with the
+# oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The screens they show are drawn by
+# port/gfx/screens.c, which the port_gfx target builds.
+target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c" "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
 # --run-dump finds the game's globals by name (port/app/symbols.c) without exporting them: dlsym on macOS, the program's
@@ -32,6 +32,24 @@ foreach(variant IN ITEMS plain sanitized)
         target_link_options(${target} PRIVATE -fsanitize=address,undefined)
     endif()
     add_test(NAME app_run_dir_${variant} COMMAND ${target})
+endforeach()
+
+# The gamepads (port/app/gamepad.c), plain and under the sanitizers: the mapping, the stick's dead zone and the pad that
+# drives, then SDL's virtual joysticks as pads that come and go, so that no device is needed
+foreach(variant IN ITEMS plain sanitized)
+    set(target port_test_gamepad_${variant})
+    add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_gamepad.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c")
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
+    target_link_libraries(${target} PRIVATE SDL3::SDL3)
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME app_gamepad_${variant} COMMAND ${target})
+    set_tests_properties(app_gamepad_${variant} PROPERTIES TIMEOUT 60)
 endforeach()
 
 # A replay from power-on through the title screen into the start menu (port/tests/replay/start_menu.pbwinput). It

@@ -2,13 +2,26 @@
 // streaming texture drawn by SDL's 2D renderer, stacked and letterboxed to the window, scaled by nearest neighbour.
 // PLAN.md §4.6's other layouts and filters come later.
 //
-// The default controls, by key position (scancodes, so the same on every keyboard layout):
-//   D-pad    arrow keys                A  X        B  Z        X  S        Y  A
-//   L        Q                         R  W        Start  Return           Select  Right Shift or Backspace
-//   touch    the left mouse button on the bottom screen, held and dragged
-// and on a gamepad, by position, as on the DS: east A, south B, north X, west Y, the shoulders L and R, start and back
-// Start and Select, the D-pad or the left stick the D-pad.
+// The default controls. The keyboard, by key position (scancodes, so the same on every keyboard layout), and any
+// gamepad at the same time; the gamepad's buttons by position, as on the DS, which is a Nintendo pad's layout:
+//
+//   DS button   keyboard                     gamepad (Xbox label; PlayStation label)
+//   A           X                            right face button (B; Circle)
+//   B           Z                            bottom face button (A; Cross)
+//   X           S                            top face button (Y; Triangle)
+//   Y           A                            left face button (X; Square)
+//   L, R        Q, W                         left and right shoulder buttons
+//   Start       Return                       start (Menu; Options; plus on a Nintendo pad)
+//   Select      Right Shift or Backspace     back (View; Share or Create; minus on a Nintendo pad)
+//   D-pad       arrow keys                   D-pad, and the left stick beyond half its travel, diagonals included
+//   touch       the left mouse button on the bottom screen, held and dragged
+//
+// Pads can be connected and disconnected while the game runs, and several can be connected: the first that presses
+// something drives the game until it lets go of everything, and then the next to press something takes over. Each pad
+// says when it connects which of its buttons, by the labels SDL reports, are the DS's A, B, X and Y. The gamepad's
+// controls are one table, port_gamepad_default_map (port/app/gamepad.c), which a settings file can replace.
 #include "app/present.h"
+#include "app/gamepad.h"
 #include "gfx/screens.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_os.h"
@@ -19,18 +32,11 @@
 #define STACKED_HEIGHT (PORT_SCREEN_HEIGHT * 2)
 // The window's size at first: each DS pixel two points wide
 #define WINDOW_SCALE 2
-// How far the left stick must lean to press a direction of the D-pad, of 32767
-#define STICK_THRESHOLD 16384
 
 typedef struct KeyBinding {
     SDL_Scancode scancode;
     uint32_t button;
 } KeyBinding;
-
-typedef struct PadBinding {
-    SDL_GamepadButton pad;
-    uint32_t button;
-} PadBinding;
 
 static const KeyBinding sKeyBindings[] = {
     { SDL_SCANCODE_X, PORT_INPUT_A },
@@ -48,19 +54,9 @@ static const KeyBinding sKeyBindings[] = {
     { SDL_SCANCODE_RIGHT, PORT_INPUT_RIGHT },
 };
 
-static const PadBinding sPadBindings[] = {
-    { SDL_GAMEPAD_BUTTON_EAST, PORT_INPUT_A },          { SDL_GAMEPAD_BUTTON_SOUTH, PORT_INPUT_B },
-    { SDL_GAMEPAD_BUTTON_NORTH, PORT_INPUT_X },         { SDL_GAMEPAD_BUTTON_WEST, PORT_INPUT_Y },
-    { SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, PORT_INPUT_L }, { SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, PORT_INPUT_R },
-    { SDL_GAMEPAD_BUTTON_START, PORT_INPUT_START },     { SDL_GAMEPAD_BUTTON_BACK, PORT_INPUT_SELECT },
-    { SDL_GAMEPAD_BUTTON_DPAD_UP, PORT_INPUT_UP },      { SDL_GAMEPAD_BUTTON_DPAD_DOWN, PORT_INPUT_DOWN },
-    { SDL_GAMEPAD_BUTTON_DPAD_LEFT, PORT_INPUT_LEFT },  { SDL_GAMEPAD_BUTTON_DPAD_RIGHT, PORT_INPUT_RIGHT },
-};
-
 static SDL_Window *sWindow;
 static SDL_Renderer *sRenderer;
 static SDL_Texture *sTexture;
-static SDL_Gamepad *sGamepad;
 // The touch: a press of the left button that began on the bottom screen, until the button is let go
 static bool sTouching;
 
@@ -94,14 +90,13 @@ int port_present_open(void) {
         return 0;
     }
     SDL_SetTextureScaleMode(sTexture, SDL_SCALEMODE_NEAREST);
+    // The pads connected now; those that come later arrive as events
+    port_gamepads_open();
     return 1;
 }
 
 void port_present_close(void) {
-    if (sGamepad != NULL) {
-        SDL_CloseGamepad(sGamepad);
-        sGamepad = NULL;
-    }
+    port_gamepads_close();
     if (sTexture != NULL) {
         SDL_DestroyTexture(sTexture);
         sTexture = NULL;
@@ -140,15 +135,9 @@ static void HandleEvent(const SDL_Event *event) {
         port_os_stop();
         break;
     case SDL_EVENT_GAMEPAD_ADDED:
-        if (sGamepad == NULL) {
-            sGamepad = SDL_OpenGamepad(event->gdevice.which);
-        }
-        break;
     case SDL_EVENT_GAMEPAD_REMOVED:
-        if (sGamepad != NULL && SDL_GetGamepadID(sGamepad) == event->gdevice.which) {
-            SDL_CloseGamepad(sGamepad);
-            sGamepad = NULL;
-        }
+    case SDL_EVENT_GAMEPAD_REMAPPED:
+        port_gamepads_event(event);
         break;
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
         if (event->button.button == SDL_BUTTON_LEFT && BottomScreenPoint(event->button.x, event->button.y, &x, &y)) {
@@ -165,31 +154,17 @@ static void HandleEvent(const SDL_Event *event) {
     }
 }
 
+// The buttons held on the keyboard and on the pad that drives the game, together
 static uint32_t HeldButtons(void) {
     const bool *keys = SDL_GetKeyboardState(NULL);
     uint32_t held = 0;
-    size_t i;
 
-    for (i = 0; i < SDL_arraysize(sKeyBindings); i++) {
+    for (size_t i = 0; i < SDL_arraysize(sKeyBindings); i++) {
         if (keys[sKeyBindings[i].scancode]) {
             held |= sKeyBindings[i].button;
         }
     }
-    if (sGamepad != NULL) {
-        Sint16 stickX = SDL_GetGamepadAxis(sGamepad, SDL_GAMEPAD_AXIS_LEFTX);
-        Sint16 stickY = SDL_GetGamepadAxis(sGamepad, SDL_GAMEPAD_AXIS_LEFTY);
-
-        for (i = 0; i < SDL_arraysize(sPadBindings); i++) {
-            if (SDL_GetGamepadButton(sGamepad, sPadBindings[i].pad)) {
-                held |= sPadBindings[i].button;
-            }
-        }
-        held |= stickX <= -STICK_THRESHOLD ? PORT_INPUT_LEFT : 0;
-        held |= stickX >= STICK_THRESHOLD ? PORT_INPUT_RIGHT : 0;
-        held |= stickY <= -STICK_THRESHOLD ? PORT_INPUT_UP : 0;
-        held |= stickY >= STICK_THRESHOLD ? PORT_INPUT_DOWN : 0;
-    }
-    return held;
+    return held | port_gamepads_held();
 }
 
 void port_present_poll(void) {
