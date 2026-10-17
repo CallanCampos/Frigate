@@ -39,7 +39,8 @@ port/
   app/                   now      main(), SDL3 window; later screen layouts, settings, paths, first-launch ROM setup
   include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
   hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
-    os/ fs/ card/ input/ rtc/ pm/ mic/ mi/ fx/ gx/ snd/ stubs/
+    os/ pxi/ hw/ gx/ dma/ mi/ fx/ math/ crypto/ rom/ card/ fs/ nvram/ rtc/ pm/ tp/ mic/ ctrdg/ reset/ input/
+    snd7/ (the ARM7's sound driver) nnsys/ (NitroSystem: 2D files in host structs) gfl/ dwc/ stubs/
     replaced.txt                  SDK source files the host build compiles from hal/ instead of lib/
   gfx/                   phase 1  ref/ (CPU reference renderers), ge/ (geometry engine), gpu/ (SDL_GPU), shaders/
   audio/                 phase 2  SDL3 audio output, resampling, mic input

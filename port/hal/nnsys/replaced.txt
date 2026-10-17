@@ -1,0 +1,8 @@
+# NitroSystem files that the host build doesn't compile from lib/, because port/hal/nnsys provides what they do. Same
+# format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
+#
+# None. The files whose functions port/hal/nnsys wraps or replaces stay compiled, with those functions renamed
+# port_sdk_<name> by port/cmake/nnsys.cmake: expheap.c, frameheap.c and unitheap.c (port/hal/nnsys/fnd_hooks.c wraps
+# every function that frees memory, to release the relocated trees in it), and the G2D loaders g2d_NCG_load.c,
+# g2d_NCL_load.c, g2d_NCE_load.c, g2d_NMC_load.c, g2d_NAN_load.c, g2d_NFT_load.c and g2d_Load.c (port/hal/nnsys/
+# g2d_load.c replaces every function that relocates a file in place with one that builds host structs).
