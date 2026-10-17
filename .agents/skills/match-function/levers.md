@@ -64,6 +64,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   one register, a copy of the store in each branch splits it. (matching.md: "group of assignments")
 - An update written in both branches of an `if`/`else` (`nbits--;` twice) is merged into one instruction but
   allocated like two assignments, which can swap registers. (matching.md: "update written in both branches")
+- A loaded field and its masked value swapped (`ldrb r3; and r2, r3, #0xf0` where the original loads into `r2`): read
+  the field in the later test through a second pointer to the same data, such as the typed view the code passes on.
+  (matching.md: "A field and a value derived from it")
+- A constant stored from `r0`, built after the first parameter's last use, where ours builds it early in another
+  register: the function returns that constant, though no caller reads it. (matching.md: "A leaf function that
+  builds a constant")
 - A pointer local to a struct's element costs a callee-saved register; index the element at each use instead.
   (matching.md: "A pointer local to an element")
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate differently, as do `count = 1; arr[0] = x;` and the
@@ -399,6 +405,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A large offset derived from an earlier one (`subs r6, #0x80`) where the original builds it fresh (`movs; lsls`):
   a join just before it, or a pointer local to the earlier member, initialized at its declaration at the top.
   (matching.md: "rebuilt at each use in a scratch register")
+- `-1` and `-2` derived from a table's row stride (`sub r2, r1, #0xc`) where the original builds them fresh (`mvn`):
+  read the element in each arm of an `if`/`else` rather than picking the table into a pointer local first.
+  (matching.md: "Small constants are derived the same way")
 - A struct local's member addressed afresh at each access (`add r1, sp, #0x64; str r0, [r1]`) where ours uses
   `[sp, #0x64]` and a saved register: a pointer local to the member, set at its declaration. (matching.md: "A pointer
   to a member of a struct local")
@@ -525,6 +534,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
   code was written there. (matching.md: "Identical statements in different branches")
 - A branch to the next instruction comes from cross-jumping a shared tail. (matching.md: "cross-jumping")
+- A field loaded again right after a join (`ldr r0, [r7]`) where ours reuses the stored register, with a `b` to a
+  `b`: the store was written at the end of both arms. (matching.md: "loaded again right after it")
 - A load at the top of both arms of an `if`/`else`, where ours hoists it between the test and the branch: one
   arm began with another statement, as `destPixel--;`.
   (matching.md: "A load that both arms of an `if`/`else` begin with")
