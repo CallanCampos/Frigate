@@ -118,7 +118,7 @@ static void PML_UtilSetNPokemonMetData(BoxPkm *pkm, u32 placeName, HeapID heapId
     PML_PkmSyncOriginGame(pkm);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, MSG_FILE_MEMO, heapId);
     name = GFL_MsgDataLoadStrbufNew(msgData, MEMO_N_NAME);
-    PML_PkmSetParam(pkm, PKM_PARAM_OT_NAME, (u32)name);
+    PML_PkmSetParam(pkm, PKM_PARAM_OT_NAME, (uptr)name);
     PML_PkmSetParam(pkm, PKM_PARAM_OT_GENDER, GENDER_MALE);
     PML_PkmSetParam(pkm, PKM_PARAM_ID, N_TRAINER_ID);
     GFL_StrBufFree(name);
@@ -171,7 +171,7 @@ static void PML_PkmSetOT(BoxPkm *pkm, PlayerInfo *playerInfo, HeapID heapId) {
     u32 id = getIDAsUInt(playerInfo);
     u32 gender = getTrainerGender(playerInfo);
 
-    PML_PkmSetParam(pkm, PKM_PARAM_OT_NAME, (u32)name);
+    PML_PkmSetParam(pkm, PKM_PARAM_OT_NAME, (uptr)name);
     PML_PkmSetParam(pkm, PKM_PARAM_OT_GENDER, gender);
     PML_PkmSetParam(pkm, PKM_PARAM_ID, id);
     GFL_StrBufFree(name);

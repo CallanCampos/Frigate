@@ -124,7 +124,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             RecordAddOne(records, 0x54);
             func_02038bc8(0x1f);
             textCopy(playerInfo->name, wk->name);
-            PokeParty_SetParam(prm->pkm, PKM_PARAM_OT_NAME, (u32)wk->name);
+            PokeParty_SetParam(prm->pkm, PKM_PARAM_OT_NAME, (uptr)wk->name);
             if (PokeParty_GetPkmCount(party) >= PokeParty_GetCapacity(party)) {
                 box = BoxSaveAccessor_GetLastOpenedBox(boxes);
                 slot = 0;
@@ -194,7 +194,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
                 oldName = GFL_StrBufCreate(32, wk->heapId);
                 func_ov012_02165afc(wk->nameEntry, wk->name);
                 PokeParty_GetParam(prm->pkm, PKM_PARAM_NICKNAME, oldName);
-                PokeParty_SetParam(prm->pkm, PKM_PARAM_NICKNAME, (u32)wk->name);
+                PokeParty_SetParam(prm->pkm, PKM_PARAM_NICKNAME, (uptr)wk->name);
                 if (func_ov012_02165b10(wk->nameEntry, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(prm->gameData), 0x1e);
                 }

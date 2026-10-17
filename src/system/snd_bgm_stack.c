@@ -184,7 +184,7 @@ BOOL func_02005aa8(void) {
     return TRUE;
 }
 
-u32 func_02005af4(const u32 *seqs, u32 count) {
+uptr func_02005af4(const u32 *seqs, u32 count) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
     BGMStackPreload *preload;
     s32 level = entry->baseLevel;
@@ -198,10 +198,10 @@ u32 func_02005af4(const u32 *seqs, u32 count) {
     preload->count = count;
     preload->level = level;
     BGMStack_InitEntry(NNS_SndHeapSaveState(*sBGMStack.heap));
-    return (u32)preload;
+    return (uptr)preload;
 }
 
-void func_02005b60(u32 handle) {
+void func_02005b60(uptr handle) {
     s32 level = ((BGMStackPreload *)handle)->level;
 
     BGMStack_FreeEntry();

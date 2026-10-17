@@ -155,7 +155,7 @@ typedef enum {
 u32 PokeParty_GetParam(const PartyPkm *pkm, PkmField param, void *buffer);
 u32 PokeParty_GetNature(PartyPkm *pkm);
 // A field that is not a number takes a pointer to its value
-void PokeParty_SetParam(PartyPkm *pkm, PkmField param, u32 value);
+void PokeParty_SetParam(PartyPkm *pkm, PkmField param, uptr value);
 u32 GetStatusCond(PartyPkm *pkm);
 void PokeParty_SetStatusCond(PartyPkm *pkm, u32 status);
 u8 PokeParty_GetSex(PartyPkm *pkm);
@@ -201,7 +201,7 @@ void PML_PkmSetMove(BoxPkm *pkm, u16 move, u8 slot);
 // 1 raised, -1 lowered, 0 neither
 s8 statAffectedByNature(u8 nature, u32 stat);
 // Allocates a party Pokémon made from a boxed one
-void PML_PkmSetParam(BoxPkm *pkm, u32 param, u32 value);
+void PML_PkmSetParam(BoxPkm *pkm, u32 param, uptr value);
 // The size of a Pokémon's data
 u32 PokeParty_GetPkmRawSize(void);
 // The size of a boxed Pokémon's data

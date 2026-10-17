@@ -27,7 +27,7 @@ typedef struct {
 } MCSSLoadInfo;
 
 // Called with the callback's parameter and the animation's frame
-typedef void (*MCSSAnimationCallback)(u32 param, fx32 frame);
+typedef void (*MCSSAnimationCallback)(uptr param, fx32 frame);
 
 // A sprite's characters and palette on their way to VRAM, which a task loads in the V-blank. A palette that the
 // system blends has no files: its palette data and colors are allocated
@@ -85,7 +85,7 @@ void MCSS_ResumeAnimation(MCSS *mcss);
 void MCSS_Hide(MCSS *mcss);
 void MCSS_Show(MCSS *mcss);
 // Sets the callback that runs when the sprite's animation reaches its last frame
-void MCSS_SetAnimationEndCallback(MCSS *mcss, u32 param, MCSSAnimationCallback callback, u32 unused);
+void MCSS_SetAnimationEndCallback(MCSS *mcss, uptr param, MCSSAnimationCallback callback, u32 unused);
 // Alpha from 0 to 31
 void MCSS_SetAlpha(MCSS *mcss, u8 alpha);
 void MCSS_SetAnimation(MCSS *mcss, u32 animation);

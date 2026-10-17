@@ -1079,7 +1079,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
         if (PokeParty_GetParam(wk->pkm, PKM_PARAM_ITEM, NULL) == 0) {
             MailData *mail = func_020097f4(wk->param->unk08, 0, wk->param->unk6C, wk->heapId);
 
-            PokeParty_SetParam(wk->pkm, PKM_PARAM_MAIL, (u32)mail);
+            PokeParty_SetParam(wk->pkm, PKM_PARAM_MAIL, (uptr)mail);
             GFL_HeapFree(mail);
             PokeParty_SetParam(wk->pkm, PKM_PARAM_ITEM, wk->param->item);
             func_020097d0(wk->param->unk08, 0, wk->param->unk6C);
@@ -1594,9 +1594,9 @@ static void func_ov165_0219c36c(PokeListWork *wk, PartyPkm *from, PartyPkm *to, 
         MailData *blank = CreateMailData(wk->heapId);
 
         PokeParty_GetParam(from, PKM_PARAM_MAIL, mail);
-        PokeParty_SetParam(to, PKM_PARAM_MAIL, (u32)mail);
+        PokeParty_SetParam(to, PKM_PARAM_MAIL, (uptr)mail);
         PokeParty_SetParam(to, PKM_PARAM_ITEM, item);
-        PokeParty_SetParam(from, PKM_PARAM_MAIL, (u32)blank);
+        PokeParty_SetParam(from, PKM_PARAM_MAIL, (uptr)blank);
         PokeParty_SetParam(from, PKM_PARAM_ITEM, 0);
         GFL_HeapFree(blank);
         GFL_HeapFree(mail);
@@ -1615,22 +1615,22 @@ static void func_ov165_0219c3e8(PokeListWork *wk, PartyPkm *pkmA, PartyPkm *pkmB
     } else if (PML_ItemIsMail(itemA) == TRUE && PML_ItemIsMail(itemB) == FALSE) {
         PokeParty_GetParam(pkmA, PKM_PARAM_MAIL, mailA);
         PokeParty_SetParam(pkmB, PKM_PARAM_ITEM, itemA);
-        PokeParty_SetParam(pkmB, PKM_PARAM_MAIL, (u32)mailA);
-        PokeParty_SetParam(pkmA, PKM_PARAM_MAIL, (u32)blank);
+        PokeParty_SetParam(pkmB, PKM_PARAM_MAIL, (uptr)mailA);
+        PokeParty_SetParam(pkmA, PKM_PARAM_MAIL, (uptr)blank);
         PokeParty_SetParam(pkmA, PKM_PARAM_ITEM, itemB);
     } else if (PML_ItemIsMail(itemA) == FALSE && PML_ItemIsMail(itemB) == TRUE) {
         PokeParty_GetParam(pkmB, PKM_PARAM_MAIL, mailB);
         PokeParty_SetParam(pkmA, PKM_PARAM_ITEM, itemB);
-        PokeParty_SetParam(pkmA, PKM_PARAM_MAIL, (u32)mailB);
-        PokeParty_SetParam(pkmB, PKM_PARAM_MAIL, (u32)blank);
+        PokeParty_SetParam(pkmA, PKM_PARAM_MAIL, (uptr)mailB);
+        PokeParty_SetParam(pkmB, PKM_PARAM_MAIL, (uptr)blank);
         PokeParty_SetParam(pkmB, PKM_PARAM_ITEM, itemA);
     } else if (PML_ItemIsMail(itemA) == TRUE && PML_ItemIsMail(itemB) == TRUE) {
         PokeParty_GetParam(pkmA, PKM_PARAM_MAIL, mailA);
         PokeParty_GetParam(pkmB, PKM_PARAM_MAIL, mailB);
         PokeParty_SetParam(pkmA, PKM_PARAM_ITEM, itemB);
-        PokeParty_SetParam(pkmA, PKM_PARAM_MAIL, (u32)mailB);
+        PokeParty_SetParam(pkmA, PKM_PARAM_MAIL, (uptr)mailB);
         PokeParty_SetParam(pkmB, PKM_PARAM_ITEM, itemA);
-        PokeParty_SetParam(pkmB, PKM_PARAM_MAIL, (u32)mailA);
+        PokeParty_SetParam(pkmB, PKM_PARAM_MAIL, (uptr)mailA);
     }
     GFL_HeapFree(blank);
     GFL_HeapFree(mailB);

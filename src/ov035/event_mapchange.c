@@ -154,7 +154,7 @@ GameEventReturnCode EventMapChangeBlackout_Callback(GameEvent *event, u32 *state
 
 static inline void ClearLCDCVram(void) {
     GX_SetBankForLCDC(0x1ff);
-    MIi_CpuClearFast(0, (void *)0x06800000, 0xa4000);
+    MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, HW_LCDC_VRAM_SIZE);
     GX_DisableBankForLCDC();
 }
 

@@ -56,7 +56,7 @@ BOOL MailTool_GiveMail(MailParam *param, PartyPkm *pkm) {
     if (!MailTool_IsWritten(param)) {
         return FALSE;
     }
-    PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (u32)param->mail);
+    PokeParty_SetParam(pkm, PKM_PARAM_MAIL, (uptr)param->mail);
     return TRUE;
 }
 

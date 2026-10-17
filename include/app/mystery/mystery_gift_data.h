@@ -177,7 +177,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
         return NULL;
     }
     if (poke->nickname[0] != GFL_StrBufGetTerminator()) {
-        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)poke->nickname);
+        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (uptr)poke->nickname);
     }
     value = poke->nature;
     if (value == 0xff) {
@@ -191,9 +191,9 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
         return NULL;
     }
     if (poke->otName[0] == GFL_StrBufGetTerminator()) {
-        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GetPlayerName(GetGameDataPlayerInfo(gameData)));
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (uptr)GetPlayerName(GetGameDataPlayerInfo(gameData)));
     } else {
-        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)poke->otName);
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (uptr)poke->otName);
     }
     if (poke->otGender <= 2) {
         PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, poke->otGender);
@@ -203,7 +203,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
     if (poke->isEgg) {
         PokeParty_SetParam(pkm, PKM_PARAM_IS_EGG, TRUE);
         name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
-        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
+        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (uptr)name);
         GFL_StrBufFree(name);
         PokeParty_SetParam(pkm, PKM_PARAM_HAPPINESS, 10);
     }

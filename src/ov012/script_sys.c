@@ -374,7 +374,7 @@ VM *FieldScript_CreateVM(HeapID heapId, ScriptWork *work, u16 zoneId, u16 script
     vm = VM_Create(heapId, &param);
     VM_ChangeEnv(vm, env);
     scriptOffset = FieldScript_ResolveSCRID(zoneId, scriptId, &fileId, &msgArcId, &msgFileNo);
-    vm->unk38 = (u32)FieldScript_LoadData(fileId, heapId);
+    vm->unk38 = (uptr)FieldScript_LoadData(fileId, heapId);
     workSize -= 0x41;
     if (!reduced && msgFileNo != workSize) {
         SetFieldScriptEnvMsgData(env, msgArcId, msgFileNo);

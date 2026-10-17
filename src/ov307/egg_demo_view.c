@@ -98,7 +98,7 @@ static void EggDemoView_AddMcss(EggDemoView *view);
 static void EggDemoView_RemoveMcss(EggDemoView *view);
 static void EggDemoView_HideMcss(EggDemoView *view);
 static void EggDemoView_SetAnimation(EggDemoView *view, u32 animation, BOOL stopAtEnd);
-static void EggDemoView_OnAnimationEnd(u32 param, fx32 frame);
+static void EggDemoView_OnAnimationEnd(uptr param, fx32 frame);
 static void EggDemoView_UpdateAlpha(EggDemoView *view);
 static void EggDemoView_FadeToWhite(EggDemoView *view);
 static BOOL EggDemoView_IsFadeDone(EggDemoView *view);
@@ -461,7 +461,7 @@ static void EggDemoView_SetAnimation(EggDemoView *view, u32 animation, BOOL stop
     NNS_G2dRestartMCAnimation(mcAnim);
     MCSS_ResumeAnimation(view->mcss);
     if (stopAtEnd) {
-        NNS_G2dSetAnimCtrlCallBackFunctor(&mcAnim->animCtrl, NNS_G2D_ANMCALLBACKTYPE_LAST_FRM, (u32)view,
+        NNS_G2dSetAnimCtrlCallBackFunctor(&mcAnim->animCtrl, NNS_G2D_ANMCALLBACKTYPE_LAST_FRM, (uptr)view,
                                           EggDemoView_OnAnimationEnd);
         view->animationEnded = FALSE;
     } else {
@@ -469,7 +469,7 @@ static void EggDemoView_SetAnimation(EggDemoView *view, u32 animation, BOOL stop
     }
 }
 
-static void EggDemoView_OnAnimationEnd(u32 param, fx32 frame) {
+static void EggDemoView_OnAnimationEnd(uptr param, fx32 frame) {
     EggDemoView *view = (EggDemoView *)param;
 
     MCSS_PauseAnimation(view->mcss);

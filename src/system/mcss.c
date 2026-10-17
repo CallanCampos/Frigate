@@ -795,7 +795,7 @@ u8 func_0201ae00(MCSS *mcss) {
     return mcss->binTail->unk1;
 }
 
-void MCSS_SetAnimationEndCallback(MCSS *mcss, u32 param, MCSSAnimationCallback callback, u32 unused) {
+void MCSS_SetAnimationEndCallback(MCSS *mcss, uptr param, MCSSAnimationCallback callback, u32 unused) {
     NNS_G2dSetAnimCtrlCallBackFunctor(&mcss->mcAnim.animCtrl, 1, param, callback);
 }
 

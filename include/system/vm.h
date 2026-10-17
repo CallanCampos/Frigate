@@ -40,12 +40,13 @@ struct VM {
     u8 cmpResult;
     VMCommand native;
     const u8 *pc;
-    u32 *stack;
+    // Values and the return addresses of VM_Call
+    uptr *stack;
     u32 *work;
     void *env;
     VMVerifier verifier;
     void *verifierArg;
-    u32 unk38;
+    uptr unk38;
     // The work and then the stack follow
 };
 
@@ -67,8 +68,8 @@ static inline u8 VM_Read8(VM *vm) {
 
 u16 VM_Read16(VM *vm);
 u32 VM_Read32(VM *vm);
-void VM_StackPush(VM *vm, u32 value);
-u32 VM_StackPop(VM *vm);
+void VM_StackPush(VM *vm, uptr value);
+uptr VM_StackPop(VM *vm);
 void VM_Jump(VM *vm, const u8 *pc);
 void VM_Call(VM *vm, const u8 *pc);
 void VM_Return(VM *vm);

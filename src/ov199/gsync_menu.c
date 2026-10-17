@@ -141,7 +141,7 @@ static void GSyncMenu_BrightenPalettes(u16 (*palettes)[16], const u16 *add, int 
 static void GSyncMenu_StateFadeOut(GSyncMenuWork *wk);
 static void GSyncMenu_StateWifiSettingsAnswer(GSyncMenuWork *wk);
 static void GSyncMenu_StateWifiSettingsYesNo(GSyncMenuWork *wk);
-static void GSyncMenu_OnButtonAnimEnd(u32 param, fx32 frame);
+static void GSyncMenu_OnButtonAnimEnd(uptr param, fx32 frame);
 static void GSyncMenu_StateWaitButtonAnim(GSyncMenuWork *wk);
 static void GSyncMenu_CreateButtons(int count, const u32 *msgIds, GSyncMenuWork *wk, GSyncMenuWinRect *rects,
                                     const s32 *centerX, const s32 *centerY);
@@ -377,7 +377,7 @@ static void GSyncMenu_StateWifiSettingsYesNo(GSyncMenuWork *wk) {
 }
 
 // Called by the touched button's actor once its animation ends
-static void GSyncMenu_OnButtonAnimEnd(u32 param, fx32 frame) {
+static void GSyncMenu_OnButtonAnimEnd(uptr param, fx32 frame) {
     GSyncMenuWork *wk = (GSyncMenuWork *)param;
 
     func_0204c5bc(wk->actors[wk->selected]);
@@ -605,7 +605,7 @@ static void GSyncMenu_StatePressButton(GSyncMenuWork *wk) {
     ClActorCallback callback;
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = GSyncMenu_OnButtonAnimEnd;
     func_0204c520(wk->actors[wk->selected], TRUE);
     func_0204c5b0(wk->actors[wk->selected], &callback);

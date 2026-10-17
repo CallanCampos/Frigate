@@ -1048,7 +1048,7 @@ static void EventPokewood_ShowCastNames(BtlSetup *setup, HeapID heapId) {
                     member->shownSpecies <= POKEWOOD_CAST_SPECIES_LAST) {
                     StrBuf *name = GFL_MsgDataLoadStrbufNew(msgData, member->shownSpecies - POKEWOOD_CAST_MSG_OFFSET);
 
-                    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
+                    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (uptr)name);
                     GFL_StrBufFree(name);
                 }
             }

@@ -346,7 +346,7 @@ void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 pla
     for (i = 0; i < 6; i++) {
         pkm = PokeParty_GetPkm(sys->partyC4, i);
         PokeParty_SetupMetData(pkm, 0, playerInfo, placeName, heapId);
-        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (u32)name);
+        PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (uptr)name);
         PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, 0);
         PokeParty_SetParam(pkm, PKM_PARAM_ID, 41122);
     }

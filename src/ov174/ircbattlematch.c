@@ -273,8 +273,8 @@ static void IrcBattleMatch_StateWaitFriendFull(IrcBattleMatch *work);
 static void IrcBattleMatch_StateShowWaitMessage(IrcBattleMatch *work);
 static void IrcBattleMatch_StateQuitAnswerWaiting(IrcBattleMatch *work);
 static void IrcBattleMatch_StateShowQuitPromptWaiting(IrcBattleMatch *work);
-static void IrcBattleMatch_OnLeaderAnimEnd(u32 param, fx32 frame);
-static void IrcBattleMatch_OnPartnerAnimEnd(u32 param, fx32 frame);
+static void IrcBattleMatch_OnLeaderAnimEnd(uptr param, fx32 frame);
+static void IrcBattleMatch_OnPartnerAnimEnd(uptr param, fx32 frame);
 static void IrcBattleMatch_StateShowMismatch(IrcBattleMatch *work);
 static void IrcBattleMatch_UpdateLinkChange(IrcBattleMatch *work);
 static void IrcBattleMatch_StateConnectLoop(IrcBattleMatch *work);
@@ -1520,7 +1520,7 @@ static void IrcBattleMatch_StateShowQuitPromptWaiting(IrcBattleMatch *work) {
     IrcBattleMatch_SetState(work, IrcBattleMatch_StateQuitAnswerWaiting);
 }
 
-static void IrcBattleMatch_OnLeaderAnimEnd(u32 param, fx32 frame) {
+static void IrcBattleMatch_OnLeaderAnimEnd(uptr param, fx32 frame) {
     IrcBattleMatch *work = (IrcBattleMatch *)param;
     u16 sequence = func_0204c4a0(work->actors[0]);
 
@@ -1538,7 +1538,7 @@ static void IrcBattleMatch_OnLeaderAnimEnd(u32 param, fx32 frame) {
     }
 }
 
-static void IrcBattleMatch_OnPartnerAnimEnd(u32 param, fx32 frame) {
+static void IrcBattleMatch_OnPartnerAnimEnd(uptr param, fx32 frame) {
     IrcBattleMatch *work = (IrcBattleMatch *)param;
     u16 sequence = func_0204c4a0(work->actors[2]);
 
@@ -1589,7 +1589,7 @@ static void IrcBattleMatch_UpdateLinkChange(IrcBattleMatch *work) {
         IrcBattleMatch_FreeActor(work, 3);
         if (work->linked != 0) {
             callback.type = CLACT_CALLBACK_LAST_FRAME;
-            callback.param = (u32)work;
+            callback.param = (uptr)work;
             callback.func = IrcBattleMatch_OnLeaderAnimEnd;
             func_0204c5b0(work->actors[0], &callback);
             callback.func = IrcBattleMatch_OnPartnerAnimEnd;

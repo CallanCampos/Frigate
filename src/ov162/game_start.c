@@ -87,7 +87,7 @@ typedef struct {
     NameEntryParam *nameEntryParam;
     SaveControlIntr *saveTask;
     GameProcManager *procManager;
-    u32 preloadedSeqs;
+    uptr preloadedSeqs;
     u8 unk3C[0x18];
     u32 pokeVoice;
     // The new game's player and config, which are copied into the save at the end

@@ -263,7 +263,7 @@ static void WbtBattle_MakePartyPkm(PartyPkm *pkm, const WbtDownloadedPokemon *sr
     PokeParty_SetNature(pkm, src->nature);
     nickname = GFL_StrBufCreate(11, heapId);
     GFL_StrBufLoadFixedString(nickname, src->nickname, 11);
-    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)nickname);
+    PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (uptr)nickname);
     GFL_StrBufFree(nickname);
     PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, src->ball);
     PokeParty_RecalcStats(pkm);

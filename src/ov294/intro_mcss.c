@@ -25,7 +25,7 @@ struct IntroMcss {
     u32 idleTimer;
 };
 
-static void IntroMcss_OnAnimationEnd(u32 param, fx32 frame);
+static void IntroMcss_OnAnimationEnd(uptr param, fx32 frame);
 
 static const VecFx32 sScale = { FX32_CONST(16), FX32_CONST(16), FX32_ONE };
 // Pokémon face the other way
@@ -68,7 +68,7 @@ void IntroMcss_Add(IntroMcss *mcss, fx32 x, fx32 y, fx32 z, const MCSSLoadInfo *
     MCSS_SetScale(mcss->sprites[index].mcss, &scale);
     mcss->sprites[index].animationEnded = FALSE;
     mcss->sprites[index].restartAtEnd = TRUE;
-    MCSS_SetAnimationEndCallback(mcss->sprites[index].mcss, (u32)&mcss->sprites[index], IntroMcss_OnAnimationEnd, 0);
+    MCSS_SetAnimationEndCallback(mcss->sprites[index].mcss, (uptr)&mcss->sprites[index], IntroMcss_OnAnimationEnd, 0);
 }
 
 void IntroMcss_AddPokemon(IntroMcss *mcss, fx32 x, fx32 y, fx32 z, u32 species, u8 index) {
@@ -84,7 +84,7 @@ void IntroMcss_AddPokemon(IntroMcss *mcss, fx32 x, fx32 y, fx32 z, u32 species, 
     mcss->sprites[index].animationEnded = FALSE;
     mcss->sprites[index].restartAtEnd = TRUE;
     mcss->idleTimer = GFL_RandomMTRange(5) * 20 + 200;
-    MCSS_SetAnimationEndCallback(mcss->sprites[index].mcss, (u32)&mcss->sprites[index], IntroMcss_OnAnimationEnd, 0);
+    MCSS_SetAnimationEndCallback(mcss->sprites[index].mcss, (uptr)&mcss->sprites[index], IntroMcss_OnAnimationEnd, 0);
 }
 
 void IntroMcss_SetVisible(IntroMcss *mcss, BOOL visible, u8 index) {
@@ -100,7 +100,7 @@ void IntroMcss_SetAnimation(IntroMcss *mcss, u8 index, u32 animation, BOOL resta
     MCSS_ResumeAnimation(mcss->sprites[index].mcss);
     mcss->sprites[index].animationEnded = FALSE;
     mcss->sprites[index].restartAtEnd = restartAtEnd;
-    MCSS_SetAnimationEndCallback(mcss->sprites[index].mcss, (u32)&mcss->sprites[index], IntroMcss_OnAnimationEnd, 0);
+    MCSS_SetAnimationEndCallback(mcss->sprites[index].mcss, (uptr)&mcss->sprites[index], IntroMcss_OnAnimationEnd, 0);
 }
 
 BOOL IntroMcss_IsAnimationEnded(IntroMcss *mcss, u8 index) {
@@ -127,7 +127,7 @@ void func_ov294_021a3798(IntroMcss *mcss, u8 index, BOOL a2) {
     }
 }
 
-static void IntroMcss_OnAnimationEnd(u32 param, fx32 frame) {
+static void IntroMcss_OnAnimationEnd(uptr param, fx32 frame) {
     IntroSprite *sprite = (IntroSprite *)param;
 
     sprite->animationEnded = TRUE;

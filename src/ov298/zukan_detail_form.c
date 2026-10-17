@@ -367,7 +367,7 @@ static void ZukanDetailForm_InitSpriteAnim(SpriteAnim *anim, int sprite, ZukanDe
 static void ZukanDetailForm_PlaySpriteAnim(Sprite *sprite);
 static void ZukanDetailForm_StopSpriteAnim(Sprite *sprite);
 static void ZukanDetailForm_UpdateSprite(Sprite *sprite);
-static void ZukanDetailForm_SpriteAnimEnd(u32 param, fx32 frame);
+static void ZukanDetailForm_SpriteAnimEnd(uptr param, fx32 frame);
 static void ZukanDetailForm_Turn(ZukanDetailFormParam *param, ZukanDetailFormWork *wk, ZukanDetailCommon *common);
 static void ZukanDetailForm_LoadIconResources(ZukanDetailFormParam *param, ZukanDetailFormWork *wk,
                                               ZukanDetailCommon *common);
@@ -1524,7 +1524,7 @@ static void ZukanDetailForm_CreateSprite(Sprite *sprite, HeapID heapId, MCSSSyst
     sprite->mcss = ZukanDetailForm_AddMCSS(system, species, form, sex, rare, a6, back, personality);
     sprite->anim = GFL_HeapAllocate(heapId, sizeof(SpriteAnim), TRUE, "zukan_detail_form.c", 2737);
     NNS_G2dSetAnimCtrlCallBackFunctor(&func_0201adc4(sprite->mcss)->animCtrl, NNS_G2D_ANMCALLBACKTYPE_LAST_FRM,
-                                      (u32)sprite->anim, ZukanDetailForm_SpriteAnimEnd);
+                                      (uptr)sprite->anim, ZukanDetailForm_SpriteAnimEnd);
     ZukanDetailForm_InitSpritePositions(sprite->pos, species, form, sex, rare, a6, back, personality);
 }
 
@@ -1575,7 +1575,7 @@ static void ZukanDetailForm_UpdateSprite(Sprite *sprite) {
     }
 }
 
-static void ZukanDetailForm_SpriteAnimEnd(u32 param, fx32 frame) {
+static void ZukanDetailForm_SpriteAnimEnd(uptr param, fx32 frame) {
     SpriteAnim *anim = (SpriteAnim *)param;
     ZukanDetailFormWork *wk = anim->wk;
 

@@ -372,7 +372,7 @@ GameEvent *LoadTradedPokemonBattleStats(GameSystem *gsys, Field *field, u32 a2, 
             PokeParty_SetParam(pkm, 0x71, TRUE);
             PokeParty_SetParam(pkm, PKM_PARAM_ABILITY, TradedPokemonSave_GetAbility(block, index));
         }
-        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (u32)TradedPokemonSave_GetNickname(block, index));
+        PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME_RAW, (uptr)TradedPokemonSave_GetNickname(block, index));
         setChangedPkmSpecies(pkm, (u16)species);
         PokeParty_SetDefaultMoves(pkm);
     }

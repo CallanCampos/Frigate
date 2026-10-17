@@ -322,7 +322,7 @@ void FieldEncount_CreateWildPkm(PartyPkm *pkm, EncountManager *manager, WildPkmP
         }
     }
     PokeParty_SetParam(pkm, PKM_PARAM_OT_GENDER, getTrainerGender(manager->playerInfo));
-    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (u32)GetPlayerName(manager->playerInfo));
+    PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME_RAW, (uptr)GetPlayerName(manager->playerInfo));
     if (manager->synchronize) {
         PokeParty_SetParam(pkm, PKM_PARAM_NATURE, manager->leadNature);
     }
