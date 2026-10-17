@@ -16491,7 +16491,7 @@ overlays/ov257 0x0219b2a8 CtvtCamera_MoveCoord
 overlays/ov257 0x0219b2e8 CtvtCamera_SetWindow
 overlays/ov257 0x0219b49c CtvtCamera_MarkWindow
 overlays/ov257 0x0219b4ac CtvtCamera_IsWindowMoving
-overlays/ov257 0x0219b4b8 CtvtCamera_SetSize
+overlays/ov257 0x0219b4b8 CtvtCamera_SetEffect
 overlays/ov257 0x0219b4e0 CtvtCamera_StartRecording
 overlays/ov257 0x0219b4fc CtvtCamera_EndRecording
 overlays/ov257 0x0219b524 CtvtCamera_GetCameraSystem

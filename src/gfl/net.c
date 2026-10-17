@@ -321,7 +321,7 @@ int func_02042a78(void) {
     return func_02040474();
 }
 
-BOOL func_02042a80(int netId) {
+BOOL func_02042a80(u8 netId) {
     if (func_02042e78() == NULL) {
         return FALSE;
     }

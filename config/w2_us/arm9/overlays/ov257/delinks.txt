@@ -17,6 +17,7 @@ src/ov257/ima_adpcm.c:
     .bss        start:0x021b3da4 end:0x021b3dac
 
 src/ov257/draw_system.c:
+    complete
     .text       start:0x0219a590 end:0x0219a890
     .rodata     start:0x021af8f0 end:0x021b1900
     .data       start:0x021b25f0 end:0x021b2600
@@ -28,6 +29,7 @@ src/ov257/ctvt_mic.c:
     .bss        start:0x021b3dac end:0x021b3db0
 
 src/ov257/ctvt_camera.c:
+    complete
     .text       start:0x0219a890 end:0x0219b5f8
     .rodata     start:0x021b1900 end:0x021b192c
     .data       start:0x021b2600 end:0x021b2638
@@ -55,6 +57,7 @@ src/ov257/ctvt_game_balloon.c:
     .data       start:0x021b26c0 end:0x021b26d4
 
 src/ov257/ctvt_call.c:
+    complete
     .text       start:0x021a0b00 end:0x021a22f8
     .rodata     start:0x021b1adc end:0x021b1ae4
     .data       start:0x021b2698 end:0x021b26a4
@@ -66,6 +69,7 @@ src/ov257/ctvt_game_cam_graphic.c:
     .data       start:0x021b26e4 end:0x021b26fc
 
 src/ov257/comm_tvt_sys.c:
+    complete
     .text       start:0x021a9910 end:0x021ab018
     .rodata     start:0x021b2478 end:0x021b2580
     .data       start:0x021b26fc end:0x021b2718
@@ -77,12 +81,14 @@ src/ov257/ctvt_game.c:
     .bss        start:0x021b3db0 end:0x021b3dc8
 
 src/ov257/ctvt_game_cam.c:
+    complete
     .text       start:0x021a80cc end:0x021a9740
     .rodata     start:0x021b2278 end:0x021b22bc
     .data       start:0x021b26d4 end:0x021b26e4
     .bss        start:0x021b3dc8 end:0x021b3dcc
 
 src/ov257/ctvt_game_target.c:
+    complete
     .text       start:0x021a765c end:0x021a790c
     .rodata     start:0x021b2230 end:0x021b2254
 
