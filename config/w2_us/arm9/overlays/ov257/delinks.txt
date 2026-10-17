@@ -55,6 +55,7 @@ src/ov257/ctvt_game_balloon.c:
     .data       start:0x021b26c0 end:0x021b26d4
 
 src/ov257/ctvt_call.c:
+    complete
     .text       start:0x021a0b00 end:0x021a22f8
     .rodata     start:0x021b1adc end:0x021b1ae4
     .data       start:0x021b2698 end:0x021b26a4
@@ -83,6 +84,7 @@ src/ov257/ctvt_game_cam.c:
     .bss        start:0x021b3dc8 end:0x021b3dcc
 
 src/ov257/ctvt_game_target.c:
+    complete
     .text       start:0x021a765c end:0x021a790c
     .rodata     start:0x021b2230 end:0x021b2254
 

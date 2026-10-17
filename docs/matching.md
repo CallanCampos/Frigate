@@ -61,10 +61,14 @@ tools that show the differences.
   `wipe_sub.c`'s `WipeRectWork_Init` matches only with `work->isOut = param->isOut;` last, after `work->wnd`, right
   before the call that reads `work->isOut` again. In the struct's order the zero and `isOut` share `r0` and the
   window's load can't lead. A `try_variants.py` sweep of all 5040 orders of its seven statements took about 8 minutes
-  on 8 copies. When one stored value is a call's result, sweep the orders with the result in a local: written as
-  `thread->id = OSi_GetUnusedThreadId();`, the store is tied to the call, which has to come first. NitroSDK's
-  `OS_CreateThread` matches with `u32 id = OSi_GetUnusedThreadId();` and the stores of `priority`, `state`, `id` and
-  `profiler` in that order, which the scheduler puts back in the original's.
+  on 8 copies. `ctvt_game_target.c`'s `CtvtGameTarget_Init` emits its translation's zero stores after `depth`,
+  `alpha` and `fadeFrames`, as the original does, but matches only with them written before `depth = 2`, right
+  after `MTX_Identity33_` sets the rotation: the shared 0 is then live across the 2 and the 31 and gets `r2`, built
+  right after the call, where written after `alpha = 31` it reuses the 31's `r1`. When one stored value is a call's
+  result, sweep the orders with the result in a local: written as `thread->id = OSi_GetUnusedThreadId();`, the store
+  is tied to the call, which has to come first. NitroSDK's `OS_CreateThread` matches with
+  `u32 id = OSi_GetUnusedThreadId();` and the stores of `priority`, `state`, `id` and `profiler` in that order, which
+  the scheduler puts back in the original's.
 - Independent loads also take registers by their source order. SPL's `SPLDraw_Billboard` (`1.2/base`) reads the
   header's `aspectRatio` and `scaleAnimDir` right after setting `header`, before the alpha arithmetic, which moves the
   resource and header pointers from `r0` to `r4` and `r5`. It also sets the polygon attributes through NitroSDK's
@@ -599,7 +603,11 @@ Same code, other `sp` offsets or frame size.
   `u32 trainerId` stays a copy too). With `u32 count` and `int trainerId` both are named locals, slotted from the top
   of the frame in declaration order, and the function matches with every local at function scope and `trainerId`
   declared after `count`. Give each local the type the loop uses it at, and run `tools/decomp/locals.py` again after
-  each type change to see which pair is still swapped.
+  each type change to see which pair is still swapped. The wider type can be the callee's prototype:
+  `ctvt_game_cam.c`'s `CtvtGameCamExchange_Start` passes its `u8 netId` counter to `func_02042a80` on every pass and
+  keeps it in `r4`, ahead of `slot`, only with that function taking `u8 netId`; with the old `int netId` the counter
+  was the converted copy in `r5`, after `slot`. A `u16` or `u32` parameter matched too, but the function's other
+  callers pass their `int` counters as `(u8)i`, which a `u8` parameter explains.
 - In NitroSDK's Thumb files built without `-ipa file`, the frame runs from the top down through the back end's
   temporaries, the function-scope locals in declaration order, the block locals in parse order (nested blocks after
   their parent), the loop-invariant temporaries, and the spilled parameters at the bottom, so a block local sits below
@@ -738,7 +746,11 @@ Same code, other `sp` offsets or frame size.
   loads that zero back from the flag's slot for the second store, where the original stores one register three
   times. It matches as a `BOOL` local returned as `BOOL`, and its caller `func_ov167_0219e608` then matches only
   with `func_ov167_0219f000`, which it passes the result to, taking a `BOOL` too, since a `u8` parameter there
-  narrows the argument.
+  narrows the argument. The local whose width matters need not be the one whose store moves: `ctvt_call.c`'s
+  `CtvtCall_Scan` stores its spilled `found = TRUE` after the `stale = FALSE` field store, where the original does,
+  only with `u8 service = func_ov030_02173b78(i);`, the callee's return type and that of the `gameServiceId` field it
+  is compared with. As a `u32`, the flag's store follows its `movs r0, #1` at once, and no width of `found` itself
+  moves it. When a flag's store is misplaced, sweep the block's other spilled locals against their callees' returns.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
@@ -1008,7 +1020,11 @@ Same instructions, scheduled in another order.
   conversion, and every register at the start changed.
 - NitroSDK's inline `VEC_Set(v, x, y, z)` evaluates all three values before its first store, where three field
   assignments interleave each load with its store: G3D's `NNS_G3DRenderFuncSetBillboardMatrix2` (`sbc.c`) loads and
-  negates `y->x` before it loads `y->y` only as `VEC_Set(xAxis, yAxis->y, -yAxis->x, 0)`.
+  negates `y->x` before it loads `y->y` only as `VEC_Set(xAxis, yAxis->y, -yAxis->x, 0)`. Since the values go to
+  temporaries first, the registers can change where the stores' order doesn't: `ctvt_game.c`'s
+  `CtvtGame_LaunchTarget` stores z, x and y in that order either way, and builds the `FX32_CONST(128)` of x in `r3`,
+  as the original does, only as `VEC_Set(&target->srt.translation, x * FX32_ONE - FX32_CONST(128), ...)`; three
+  field assignments build it in `r1`.
 - A loop that walks a parameter pointer reuses the `while` test's load of `*p` in the body. An original that loads `*p`
   again at the top of the body and reuses that load walked a local copy: NitroSDK's `STD_TVSNPrintf` (`std_sprintf.c`)
   reads its format through `const char *s = fmt;`.
@@ -2451,6 +2467,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   8-bit value shifted (0xa90 = 0xa9 << 4) is built with `movs`/`lsls`, and one that isn't (0xea8) goes to the pool, so
   a layout off by 0x418 showed as one extra instruction in six small functions of `download_play_sys.c`. Rebuilding
   the struct from the asm's offsets matched 18 of the file's 20 functions at once.
+- Lines at the end of a same-size diff that `--align` shows as odd instructions (`add sp, #0`, `.byte 0xff`) are the
+  literal pool: decode the words before counting the difference as registers. `ctvt_game.c`'s
+  `CtvtGame_LaunchTarget` was documented as 6 bytes of a register swap, but 4 of them were its start position's
+  `FX32_CONST(-15)` and `FX32_CONST(-5)` (0xffff1000, 0xffffb000) where the ROM has 0xfff10000 and 0xfffb0000,
+  `FX32_CONST(-240)` and `FX32_CONST(-80)`.
 - A constant that the ROM loads from the literal pool, with no relocation in `relocs.txt`, where MWCC would fold it or
   build it with `mov` and `lsl`, is a linker symbol: NitroSDK takes its stack sizes, the extended arena's start and the
   overlay count from the linker script. Declared `extern u8 SYM[]` and cast where it is used, `(u32)SDK_IRQ_STACKSIZE`,

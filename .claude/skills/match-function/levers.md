@@ -69,6 +69,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   function already has")
 - A narrow local colored after every declared one, whatever its declaration's place, when it is only used widened:
   declare it `int`. (matching.md: "only ever used widened")
+- A narrow loop counter colored after a later-declared local, passed on every pass to an `int` parameter: give the
+  callee the counter's type when its other callers cast to it. (matching.md: "The wider type can be the callee's
+  prototype")
 - Registers of a scheduled function swapped although every order of the computation was tried: write the `volatile`
   stores first, and read fields at each use. (matching.md: "registers still follow the source order")
 - A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
@@ -87,6 +90,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Where a flag is first set decides which register builds its zero. The register a shared zero gets follows statement
   order, and stores of 0 before a loop take the zero of the variable its initializer sets first, as in
   `for (i = 0, count = 0; ...)`. (matching.md: "Where a flag is first set")
+- A shared zero built in a fresh register right after a call, ahead of constants whose stores it follows in the
+  asm: write its stores before those constants'. (matching.md: "`CtvtGameTarget_Init` emits")
 - Registers swapped around a flag set `TRUE` and overridden in an `if`, with the instructions already right:
   write it as a ternary, `x = k != 0 ? TRUE : FALSE;`. (matching.md: "the ternary still allocates the")
 - A register swap with otherwise identical code, in code that mirrors a sibling function: try that code as a
@@ -229,6 +234,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   spilled local, or the local's reload placed above stores the original makes first: sweep the local's width
   together with its callee's return type and `value` local. (matching.md: "A spilled local's width for the rule
   below")
+- A spilled flag's constant store right after its `movs`, where the original stores it after the next field store:
+  sweep the widths of the block's other spilled locals against their callees' returns. (matching.md: "The local
+  whose width matters")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
@@ -249,6 +257,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
   rather than a fresh local. (matching.md: "a fresh local's computation down to its first use")
 - All three values loaded before the stores of a vector: NitroSDK's `VEC_Set`. (matching.md: "`VEC_Set(v, x, y, z)`")
+- One temporary of a vector's computed values in another register, with the stores in the original's order:
+  NitroSDK's `VEC_Set`. (matching.md: "Since the values go to")
 - `*p` loaded again at the top of a loop's body: walk a local copy of the parameter. (matching.md: "walks a parameter
   pointer")
 - An address into another processor's table scheduled differently: index it through a pointer to the table's type.
@@ -627,6 +637,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
+  wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
   only some of them, preserving the original element offsets; `wipe_sub.c`'s line patterns match at 0, 0x10, 0x20
   and 0x28 this way. (matching.md: "One initialized array retains entries")

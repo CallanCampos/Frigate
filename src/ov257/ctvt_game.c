@@ -3001,7 +3001,7 @@ static AppTaskMenu *CtvtGame_CreateCancelMenu(CommTvtWork *sys, CtvtGame *game) 
 }
 
 static void CtvtGame_LaunchTarget(CtvtGame *game, CtvtGameTarget *target, u16 scene) {
-    fx32 x;
+    u16 x;
     fx32 speed;
     u16 angle;
     VecFx32 dir;
@@ -3013,10 +3013,9 @@ static void CtvtGame_LaunchTarget(CtvtGame *game, CtvtGameTarget *target, u16 sc
     target->alpha = 31;
     target->scene = scene;
     target->frame = game->frame;
-    x = (u16)(game->lastColumn * 64 + CtvtGame_Rand(64)) * FX32_ONE;
-    target->srt.translation.z = FX32_CONST(-5) * (4 - target->depth);
-    target->srt.translation.x = x - FX32_CONST(128);
-    target->srt.translation.y = FX32_CONST(-15);
+    x = game->lastColumn * 64 + CtvtGame_Rand(64);
+    VEC_Set(&target->srt.translation, x * FX32_ONE - FX32_CONST(128), FX32_CONST(-240),
+            FX32_CONST(-80) * (4 - target->depth));
     target->srt.scale.z = target->srt.scale.y = target->srt.scale.x = (target->depth << 9) + 0x700;
     speed = (CtvtGame_Rand(2) + 1) * 0xa00;
     dir.x = 0;
