@@ -52,6 +52,7 @@
 #include "app/present.h"
 #include "app/replay.h"
 #include "app/run_dir.h"
+#include "app/symbols.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
@@ -71,7 +72,6 @@
 #include <string.h>
 
 #ifndef _WIN32
-#include <dlfcn.h>
 #include <execinfo.h>
 #include <signal.h>
 #include <unistd.h>
@@ -317,22 +317,6 @@ static int OpenRunDir(const char *dir, const char *inputPath) {
     return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
 }
 
-// A global of the program for --run-dump, by name: the program exports its globals (an ELF one because it links with
-// --export-dynamic, port/cmake/app.cmake), so the dynamic linker finds them
-static void *ResolveGlobal(const char *name) {
-#ifdef _WIN32
-    (void)name;
-    return NULL;
-#else
-    static void *program;
-
-    if (program == NULL) {
-        program = dlopen(NULL, RTLD_NOW);
-    }
-    return program != NULL ? dlsym(program, name) : NULL;
-#endif
-}
-
 // Every --run-dump, as --run-dump SPEC or --run-dump=SPEC, into the open run directory
 static int AddRunDumps(void) {
     static const char option[] = "--run-dump";
@@ -352,7 +336,7 @@ static int AddRunDumps(void) {
         } else if (sArgv[i][length] != '\0') {
             continue;
         }
-        if (spec == NULL || !port_run_dir_add_dump(spec, ResolveGlobal, error, sizeof(error))) {
+        if (spec == NULL || !port_run_dir_add_dump(spec, port_symbol_address, error, sizeof(error))) {
             fprintf(stderr, "port: --run-dump %s: %s\n", spec != NULL ? spec : "",
                     spec != NULL ? error : "needs a spec");
             return 0;

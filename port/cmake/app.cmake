@@ -2,14 +2,21 @@
 # hashes, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The screens
 # they show are drawn by port/gfx/screens.c, which the port_gfx target builds.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
-# --run-dump looks the game's globals up by name with dlsym: a Mach-O program exports them as it is, an ELF one only
-# when it links with --export-dynamic, which ENABLE_EXPORTS gives
-set_target_properties(${PORT_PROGRAM} PROPERTIES ENABLE_EXPORTS ON)
+# --run-dump finds the game's globals by name (port/app/symbols.c) without exporting them: dlsym on macOS, the program's
+# own symbol table on Linux
 target_link_libraries(${PORT_PROGRAM} PRIVATE ${CMAKE_DL_LIBS})
+
+# The symbol lookup, on the test program's own symbols
+add_executable(port_test_symbols "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_symbols.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c")
+target_include_directories(port_test_symbols PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_options(port_test_symbols PRIVATE -std=c11 -Wall -Wextra -Werror)
+target_link_libraries(port_test_symbols PRIVATE ${CMAKE_DL_LIBS})
+add_test(NAME app_symbols COMMAND port_test_symbols)
 
 # The run directory's writer (port/app/run_dir.c), plain and under the sanitizers, with the platform layer's SHA-1
 foreach(variant IN ITEMS plain sanitized)
