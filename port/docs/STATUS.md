@@ -26,11 +26,38 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: local clone and first syncs
+
+- **Upstream:** `462e90193` (merge of PR #345); unchanged since the repository was created.
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), from the first run of
+  `port/tools/sync_upstream.sh` in the new clone, which configured from scratch (downloading wibo, sjiswrap and dsd
+  v0.12.1-dsi.4) and built both ROMs. 22 compiler warnings, the same upstream ov036 ones as before.
+- **Host build:** not yet (phase 0).
+- **Tests:** T0 as above; T1–T7 not yet.
+- **Tiers:** not re-measured; upstream hasn't moved since the 2026-10-16 entry.
+- **Trap stubs:** not yet.
+- **64-bit warnings:** not yet from a host build; the compile probe baseline in the 2026-10-16 entry stands.
+- **Work done:**
+  - The public repository `CallanCampos/pokebw2-native` exists with upstream's full history and the port commit
+    `0835ef06c`. Upstream's `build.yml` is disabled here (it needs upstream's ROM deploy key); `compile.yml` and
+    `standards.yml` pass on `main`.
+  - The `port-sync` Action ran once by hand and reported upstream already merged. Its merge path runs at the next
+    upstream push.
+  - The local clone `~/dev/decomp/pokebw2-native` is set up: `origin` is the port, `upstream` is the decomp, gh's
+    default repository is the port, `port/tools/bootstrap_checkout.sh` linked the inputs from the decomp checkout,
+    and `CLAUDE.local.md` (`@port/CLAUDE.md`) with `.worktreeinclude` loads the port rules in every session.
+  - `port/tools/sync_upstream.sh` ran end to end on the real build: fetch, already-merged check, configure, ninja,
+    both SHA1s, nothing to push.
+- **Next:** phase 0 — CMake skeleton with SDL3, generated source lists and trap stubs, `include/platform.h`, the
+  overlay `.data`/`.bss` spike, then the first arm64 macOS link.
+- **Blockers:** none for phase 0. Overlay 36 (issue #83, claimed by mariano54) still gates phase 3.
+
 ## 2026-10-16: repository created, research and plan complete
 
 - **Upstream:** `462e90193` (merge of PR #345). The repository was created from upstream's full history at this
   commit.
-- **Port:** `PORT_SHA` (to be filled with the port commit).
+- **Port:** `0835ef06c`.
 - **ROM:** both SHA1s match (Black 2 `e51e6dfb…`, White 2 `b5d7490b…`), full `ninja` on `462e90193` with `port/`
   present. 22 MWCC "function has no prototype" warnings, all in upstream's new `src/ov036/field_g3dobj.c` and
   `src/ov036/fld_wipe_3dobj.c`, none from the port.
