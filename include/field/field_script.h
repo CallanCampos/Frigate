@@ -245,6 +245,11 @@ BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env);
 BOOL s01C9_NDemoStart(VM *vm, FieldScriptEnv *env);
 BOOL s01CA_NDemoEnd(VM *vm, FieldScriptEnv *env);
 BOOL s01CB_NDemoReadyTalkMotion(VM *vm, FieldScriptEnv *env);
+// fldeff_iaigiri.c: the League's lift, the beacon commands, the Pass Power that ran out and its flash
+BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env);
+BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env);
 
 BOOL s02CF_PokeDexCheckHabitatList(VM *vm, FieldScriptEnv *env);
 BOOL func_ov036_021c9a40(VM *vm, FieldScriptEnv *env);
