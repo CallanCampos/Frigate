@@ -7,6 +7,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Every register moved, with a constant built and spilled at its first use (`movs r2, #7; str r2, [sp, #0xc]`) and a
+  select that overwrites it later: a ternary argument whose arm is that constant. Write the call in each arm of an
+  `if`/`else`. (matching.md: "A ternary whose arm is a constant")
 - Zeros loaded from a stack slot at each use and a constant hoisted into a saved register, where ours uses `movs`:
   move a later loop into a `static inline` that counts with its own parameter, passed that constant.
   (matching.md: "A constant held in a stack slot")
@@ -251,7 +254,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A store order that no sweep reaches, with one value a call's result: hold the result in a local and sweep again.
   (matching.md: "When one stored value is a call's result")
 - A byte offset added to a pointer, with the offset loaded first and on the left of the `adds`: integer arithmetic on
-  the address, `(T *)((u32)p + n)`. (matching.md: "With two loads and no local")
+  the address, `(T *)((u32)p + n)`. (matching.md: "With two loads and no local") For a pixel, the terms in the asm's
+  order, each scaled on its own: `(u32)base + x * 2 + y * 512`. (matching.md: "The pointer goes first whatever")
+- A call's result stored before a constant (`bl; str r0, [sp, #N]; movs r5, #0`) that ours builds first, unmoved by
+  `#pragma scheduling off`: a block boundary. Write the calls with constants in each arm of the `if`/`else` before it,
+  not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
@@ -536,6 +543,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   expression has no `b`. (matching.md: "assigns one field a constant in each branch")
 - A `b` to a `b` where the original jumps straight to shared code: write the call after the `if`/`else` in
   each branch. (matching.md: "A `b` to a `b`")
+- A spilled argument reloaded at a join for one call (`ldr r0, [sp, #N]`) that the original passes from `r0`: the
+  call was written at the end of every arm of the chain. (matching.md: "call written once after a chain of arms")
 - `f(x ? a : b)` against two calls in `if`/`else`, which are merged into one call with a `beq; b` layout.
   (matching.md: "picked by branches")
 - A `return` inside `for (;;)` leaves a dead `bx lr`, which the original counts as padding.
@@ -583,6 +592,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A test after a body that is entered from the top and from an earlier branch, in a function that does one box a frame:
   `while (box < n) { ...; break; }`, with a comment. (matching.md: "stops after its first pass")
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
+- Stores of a spilled copy after the loop's guard, in the preheader, where ours stores it at the computation: copy
+  after the last branch before the loop, and give the loop's `fx32`/`s32` locals the SDK's `long`.
+  (matching.md: "A spilled copy of a value that the original stores")
 - A returning branch inside a loop that computes an address again in its own registers, where the original reloads
   the parts the loop hoisted: read the address into a local once in the branch and use it at both uses.
   (matching.md: "returning branch inside a loop")

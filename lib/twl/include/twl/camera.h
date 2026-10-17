@@ -48,6 +48,11 @@ typedef enum {
 
 typedef enum {
     CAMERA_EFFECT_NONE,
+    CAMERA_EFFECT_MONO,
+    CAMERA_EFFECT_SEPIA,
+    CAMERA_EFFECT_NEGATIVE,
+    CAMERA_EFFECT_NEGAFILM,
+    CAMERA_EFFECT_SEPIA01,
 } CAMERAEffect;
 
 typedef enum {

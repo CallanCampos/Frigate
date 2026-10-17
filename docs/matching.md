@@ -345,7 +345,12 @@ Same instructions, registers swapped.
   second reusing the first's sum, as `btlv_gauge.c` writes its offsets. `(u8 *)work->sound[1] + size1` gives
   `adds r1, r1, r7`. With two loads and no local, the value loaded into a fresh register goes on the left: NitroSDK's
   `WM_ReadMPData` (`wm_sync.c`) steps through its buffer with `(const WMMpRecvData *)((u32)datap[i - 1] +
-  recvBuf->entrySize)`, where the byte-pointer sum swapped the two registers.
+  recvBuf->entrySize)`, where the byte-pointer sum swapped the two registers. The pointer goes first whatever the
+  source order (`y * 256 + (x + buf)`) and whatever it points to (`u8 *`, `void *`), while an integer sum of a call's
+  result keeps its terms in the order written, each scaled on its own: `ctvt_draw.c`'s `CtvtDraw_UpdateStroke` reads
+  the color picker's pixels at `(u16 *)((u32)G2_GetBG2ScrPtr() + x * 2 + y * 512)`, `adds r7, r1, r0` with `x * 2` on
+  the left and then `ldrh r3, [r6, r7]` with `y * 512` in `r6`, as `ctvt_camera.c` writes its BG3 offsets. With
+  `y * 512` first, or `(x + y * 256) * 2`, it doesn't match.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -2002,11 +2007,21 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `b` to a `b`, where the original branches straight to the shared code, is a call written after an inner
   `if`/`else` that the original has in each branch. MWCC merges the copies with the later one but the jump
   from the first branch then targets the end of the second: the summary screen's `PStaSkill_HandleForgetKeys`
-  matches with `GFL_SndSEPlay(SEQ_SE_DECIDE1);` at the end of both branches of its `move == MOVE_NONE` test.
+  matches with `GFL_SndSEPlay(SEQ_SE_DECIDE1);` at the end of both branches of its `move == MOVE_NONE` test. The same
+  call written once after a chain of arms reloads a spilled argument from its slot at the join (`ldr r0, [sp, #0x18]`)
+  where the original passes it straight from `r0`, since each merged copy is in the block that computed it.
+  `ctvt_camera.c`'s `CtvtCamera_Draw` flushes the picture it picked with `DC_FlushRange` at the end of all five arms
+  of its source chain, the four no-camera arms with their constant sizes. With fewer copies, one in the camera arm and
+  one after the no-camera arms or one after each of their zoom halves, it stays 130 bytes off or grows by 8.
 - A call whose one argument differs by branch, such as the BG map's file ID, is written out in full in each branch:
   `if (c) { LoadMap(..., FileId(0x16a), ...); } else { LoadMap(..., FileId(0x169), ...); }`. MWCC merges the identical
   tails, but a `file` local or a ternary argument allocates the registers differently, by 25 lines in
-  `btlv_input.c`'s standby-to-moves task.
+  `btlv_input.c`'s standby-to-moves task. A ternary whose arm is a constant the function already passes elsewhere
+  takes that constant's register: `comm_tvt_sys.c`'s `CommTvt_LoadResources` reads its gendered palette with
+  `GFL_G2DIOReadNCLRArc(sys->arc, 7, ...)` and `(sys->arc, 6, ...)` in the arms of an `if`/`else`, as its first
+  palette load is written. As `male ? 7 : 6` the 7 joined the four earlier 7s (the first palette's file and BG 7's
+  three loads), which MWCC then built and spilled at their first use (`movs r2, #7; str r2, [sp, #0xc]`) for the
+  select to overwrite with 6, and every register of the function moved (185 lines).
 - An `if`/`else` that assigns one field a constant in each branch can still end in one store after the branches, with
   `b` over the else branch, as the trade's key cursor wraps its row to 2 or 4 in `pokemontrade_proc.c`. The
   conditional expression gives `mov`, a conditional branch over a second `mov`, and no `b`.
@@ -2049,6 +2064,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `if (button == BUTTON_QUIT) { cancel } else { decide }` and has `update = TRUE; appBar->decided = TRUE;` at the end
   of both arms of the outer `if`, and likewise `AppTaskMenuWin_SetActive(wins[button ^ 1], FALSE)` at the end of
   both arms of `if (appBar->decided)`, which gives the `1` a register shared with the arm's `TRUE`.
+- Within one block MWCC builds a constant above the store of a call's result. A call's result stored before the
+  constant (`bl FX_Inv; str r0, [sp, #0x44]; movs r5, #0`), which `#pragma scheduling off` doesn't change, marks a block
+  boundary there: the calls were written in each arm of the `if`/`else` before it, and cross-jumping merged the arms
+  into a tail that ends with the store. `CtvtCamera_Draw` sets its BG3 scale with `mtx._00 = FX_Inv(FX32_ONE * 2);
+  mtx._11 = FX_Inv(FX32_ONE * 2);` and the same with `FX32_ONE` in the arms of `if (work->zoomed == TRUE)`, and the
+  zeros after the join; a `scale` local set in the arms puts the calls in the join's block, above which the zero moves.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -2198,6 +2219,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `i = 0` is set before the multiplies and takes the register of a pointer that is dead by then, and the other
   invariant takes the later stack slot. `g3d_text_draw.c`'s `G3DTextDraw_BitmapTiledToLinear` matches so, 2 bytes
   shorter than with an `int size` local.
+- A spilled copy of a value that the original stores in the loop's preheader, after the guard's `ble`, where ours
+  stores it right after computing the value, was copied after the last branch before the loop, and the loop reads it
+  in a sum with a `long`. `draw_system.c`'s `DrawSystem_DrawLine` computes its pen's corner into `left` and `top`,
+  picks its edges with two ternaries, then sets `lastX = left; lastY = top;` just before the `for`, with its steps,
+  offsets and counter as `long`, the SDK's `fx32` and `s32`; the loop computes `left + (offsetX >> FX32_SHIFT)`. With
+  this checkout's `int` `fx32`, or the copies chained before the ternaries (`lastX = left = ...`), the stores stay
+  at the computation, and with an `int` counter the slots rotate. A copy made in the guard's own block becomes a
+  preheader store; an `if` or a ternary in between keeps it where it is written. An explicit `if (steps > 0)` around a
+  `do`/`while` with the copies inside also matches (`Flake_Add`), but there `steps` is never below 1.
 
 - A test that the original places after its body, entered from the top as well as from an earlier branch, is a loop
   that stops after its first pass: `while (box < n) { ...; break; }`. The trade does one box a frame this way in

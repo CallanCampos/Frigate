@@ -17,6 +17,7 @@ src/ov257/ima_adpcm.c:
     .bss        start:0x021b3d64 end:0x021b3d6c
 
 src/ov257/draw_system.c:
+    complete
     .text       start:0x0219a550 end:0x0219a850
     .rodata     start:0x021af8b4 end:0x021b18c4
     .data       start:0x021b25b0 end:0x021b25c0
@@ -28,6 +29,7 @@ src/ov257/ctvt_mic.c:
     .bss        start:0x021b3d6c end:0x021b3d70
 
 src/ov257/ctvt_camera.c:
+    complete
     .text       start:0x0219a850 end:0x0219b5b8
     .rodata     start:0x021b18c4 end:0x021b18f0
     .data       start:0x021b25c0 end:0x021b25f8
@@ -67,6 +69,7 @@ src/ov257/ctvt_game_cam_graphic.c:
     .data       start:0x021b26a4 end:0x021b26bc
 
 src/ov257/comm_tvt_sys.c:
+    complete
     .text       start:0x021a98d4 end:0x021aafdc
     .rodata     start:0x021b243c end:0x021b2544
     .data       start:0x021b26bc end:0x021b26d8

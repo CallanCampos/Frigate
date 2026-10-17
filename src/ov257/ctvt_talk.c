@@ -856,13 +856,13 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DSI_VGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NONE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DS_LCD);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_SEPIA01);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_DOWN) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_QVGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_MONO);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_CIF);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NEGATIVE);
         }
     }
 

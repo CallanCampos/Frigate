@@ -523,13 +523,13 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         CtvtCamera *camera = CommTvt_GetCamera(sys);
 
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_UP) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DSI_VGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NONE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_DS_LCD);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_SEPIA01);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_DOWN) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_QVGA);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_MONO);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
-            CtvtCamera_SetSize(sys, camera, CAMERA_SIZE_CIF);
+            CtvtCamera_SetEffect(sys, camera, CAMERA_EFFECT_NEGATIVE);
         }
     }
     if (CommTvt_GetSelfIndex(sys) == 0 && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_L) &&
@@ -768,14 +768,14 @@ static void CtvtDraw_UpdateStroke(CommTvtWork *sys, CtvtDraw *draw) {
     }
     if (func_0203da48() == TRUE && draw->inputHandled == FALSE) {
         if (draw->tool == DRAW_TOOL_PICK) {
-            u16 *screen = (u16 *)G2_GetBG2ScrPtr() + y * 256 + x;
+            u16 *screen = (u16 *)((u32)G2_GetBG2ScrPtr() + x * 2 + y * 512);
             u16 *camera;
 
             G2_GetBG3ScrPtr();
             if (CommTvt_IsZoomed(sys) == TRUE) {
-                camera = (u16 *)G2_GetBG3ScrPtr() + (y / 2) * 256 + x / 2;
+                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + (x / 2) * 2 + (y / 2) * 512);
             } else {
-                camera = (u16 *)G2_GetBG3ScrPtr() + y * 256 + x;
+                camera = (u16 *)((u32)G2_GetBG3ScrPtr() + x * 2 + y * 512);
             }
             if (*screen & CTVT_DRAW_OPAQUE) {
                 draw->color = *screen;
