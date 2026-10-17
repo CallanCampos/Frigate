@@ -5558,10 +5558,10 @@ data_ov036_021d25f8 kind:data(any) addr:0x021d25f8
 data_ov036_021d25fc kind:data(any) addr:0x021d25fc
 SPECIAL_TRAINER_BGM kind:data(any) addr:0x021d28e4
 SPECIAL_TRAINER_ENCEFF kind:data(any) addr:0x021d2900
-data_ov036_021d2920 kind:data(any) addr:0x021d2920
+BTRAIN_ANM_DATIDS kind:data(any) addr:0x021d2920
 BATTLE_SUBWAY_TRAIN_EFFECT_DATIDS kind:data(any) addr:0x021d2928
-data_ov036_021d2938 kind:data(any) addr:0x021d2938
-data_ov036_021d294c kind:data(any) addr:0x021d294c
+BTRAIN_TASK_VTABLE kind:data(any) addr:0x021d2938
+BTRAIN_SRT kind:data(any) addr:0x021d294c
 data_ov036_021d2988 kind:data(any) addr:0x021d2988
 data_ov036_021d2994 kind:data(any) addr:0x021d2994
 data_ov036_021d29a0 kind:data(any) addr:0x021d29a0
