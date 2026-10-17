@@ -3,7 +3,33 @@
 The game keeps most of its data in NARC archives under `files/a/`, one numbered file per entry. The archives that are
 built from source have their sources in `res/`, and the build packs each archive from them and checks that it matches
 the original, so editing an entry is as easy as editing its file, and the matching build proves that the sources say
-exactly what the ROM holds. The sources come in three kinds:
+exactly what the ROM holds. `res/` is grouped by what the data is, as pokeplatinum's is, and each entity has a
+directory or file of its own, named after its constant in the lists of `generated/`, which the build also turns into
+the C code's headers:
+
+```
+res/
+  pokemon/<species>/        data, text, battle sprites, icon, footprint, cry
+  moves/<move>/             data and text
+  items/<item>/             data, text and icon; shared/ for the icons' cells, animations and unused icons
+  abilities/  natures/  types/
+  trainers/
+    data/<trainer>.json     record and party
+    classes/  sprites/{front,back}/<sprite>/  ai/  facilities/<facility>/
+  field/
+    zones/  events/  encounters/  scripts/  areas/  matrices/
+    maps/{models,textures}/
+    props/{exterior,interior}/{models,textures}/
+    actors/                 the overworld's people and objects, with pokemon/ and models/ for its Pokémon and 3D models
+    trades/  places/
+  lighting/{field,battle}/
+  town_map/
+  sound/{sequences,banks,wave_archives,streams}/
+  text/{system,script}/
+generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
+```
+
+The sources come in these kinds:
 
 - **JSON data**, as pokeplatinum's `res/`: one file per entity, such as `res/pokemon/bulbasaur/data.json`, with a
   JSON schema beside it that documents every field and that editors use for completion and checking. A script packs
