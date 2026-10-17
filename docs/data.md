@@ -569,7 +569,7 @@ numbering the ones that repeat, as the second copies of Unova's places.
 ## Trainers
 
 Each trainer is `res/trainers/data/<trainer>.json`, named after its constant (`elite_four_shauntal.json` for
-`TRAINER_ELITE_FOUR_SHAUNTAL`), as pokeplatinum's `res/trainers/data/data/`. It holds the trainer's record (`a/0/9/1`) and
+`TRAINER_ELITE_FOUR_SHAUNTAL`), as pokeplatinum's `res/trainers/data/`. It holds the trainer's record (`a/0/9/1`) and
 its party (`a/0/9/2`), and `tools/data/trainer_data.py pack` builds both archives in the order of
 `generated/trainers.txt`. `res/trainers/data/trainer.schema.json` documents each field.
 
@@ -744,7 +744,7 @@ are null for random ones. The field scripts name the trades they start, as `Fiel
 ## Battle facilities
 
 A battle facility's trainers and the Pokémon sets they pick from are in `res/trainers/facilities/<facility>/`, as
-pokeplatinum's `res/trainers/data/frontier/`: `trainers/<trainer>.json` has a trainer's class, its sets by name, and its
+pokeplatinum's `res/trainers/frontier/`: `trainers/<trainer>.json` has a trainer's class, its sets by name, and its
 name and messages, which the text takes (see [Text](#text)); `pokemon/<set>.json` is a set (`BSubwayPokemonData` in
 `include/field/battle_facility.h`), named after its species and numbered from 1, as `gengar_4.json`; and `order.json`
 lists both in archive order. `tools/data/facility_data.py pack` builds the facility's trainers and Pokémon

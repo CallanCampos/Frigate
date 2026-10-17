@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The trainers in res/trainers/data/, one JSON file per trainer with its party, as pokeplatinum's res/trainers/data/data/: dump
+"""The trainers in res/trainers/data/, one JSON file per trainer with its party, as pokeplatinum's res/trainers/data/: dump
 writes them from the ROM once, and pack builds the trainer (a/0/9/1) and party (a/0/9/2) archives from them, which the
 build does.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The battle facilities' trainers and Pokémon in res/trainers/facilities/<facility>/, as pokeplatinum's res/trainers/data/frontier/:
+"""The battle facilities' trainers and Pokémon in res/trainers/facilities/<facility>/, as pokeplatinum's res/trainers/frontier/:
 dump writes them from the ROM once, and pack builds a facility's archives from them, which the build does.
 
     facility_data.py dump extract/b2_us/files res/trainers/facilities battle_subway
