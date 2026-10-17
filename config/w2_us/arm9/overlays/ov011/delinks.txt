@@ -165,3 +165,8 @@ lib/dwc/src/gp/gpi.c:
     complete
     .text       start:0x02172da8 end:0x02173544
     .data       start:0x02187900 end:0x02187a14
+
+lib/dwc/src/gp/gpiBuddy.c:
+    complete
+    .text       start:0x02173544 end:0x02174e14
+    .data       start:0x02187a14 end:0x02187c9c
