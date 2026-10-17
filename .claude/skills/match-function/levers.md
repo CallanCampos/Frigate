@@ -304,6 +304,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A call's result stored before a constant (`bl; str r0, [sp, #N]; movs r5, #0`) that ours builds first, unmoved by
   `#pragma scheduling off`: a block boundary. Write the calls with constants in each arm of the `if`/`else` before it,
   not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
+- A literal-pool load (an I/O base) that ours places above a store the original makes first: a block boundary, as
+  above; no spelling inside one block moves it. (matching.md: "A literal-pool load goes above a plain store")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
@@ -436,6 +438,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
   twice. (matching.md: "chained assignment to fields")
+- A field loaded again after an `if`, where the original keeps one load (or spills it and reloads the copy): no
+  reuse reaches past a join, so the source held it in a variable. (matching.md: "reused into an `if`'s body")
 - A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
   recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
   (matching.md: "assigned just before the call")
@@ -666,6 +670,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `do`/`while`, `if (i < size) do ... while (++i < size)`. (matching.md: "At `-O2,p` no loop is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
   unsigned and keeps the loop. (matching.md: "loop that runs once")
+- A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
+  once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
