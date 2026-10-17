@@ -444,6 +444,11 @@ Same instructions, registers swapped.
   each use (`add r0, sp, #0x2c; ldrh`), as the original does; `CalcWarpTransferAddend` ("Switching `u32`/`s32`"
   below) is the same case. Its index also needs `(talk->waveX + 1) * size`: with `size` first, its load goes to
   another register and is copied into the `muls`'s.
+- A constant step subtracted from an `fx32` through a pointer was converted to a `long`, the SDK's `fx32`, and the
+  conversion sets the registers: `mcss.c`'s `MCSS_DrawQuad` ends with `*z -= cond ? -0x100L : 0x100L;`. With `int`
+  steps the 0x140 field offset (reloaded, and turned into the 0x100 by `subs #0x40`) and the step go to `r1` and the
+  flag word and `*z` to `r0`, the original's registers swapped. A `long *z` parameter matches as well, but the
+  caller's `fx32` is then passed as another type. `FX32_ONE` is the same case ("`FX32_ONE` is an `int` constant").
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
@@ -602,7 +607,10 @@ Same instructions, registers swapped.
 
 - A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
   declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
-  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there.
+  `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there. An
+  expression written at two uses is shared as such a temporary: `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` gets the
+  original's `sp+4`, below its loop's temporaries, with `frame >> FX32_SHIFT` written at both uses, where an
+  `int first` local sits above them.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
   `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
@@ -2378,6 +2386,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
   stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
+- Inside a loop, MWCC rewrites the reads `p[v]`, `p[v + 1]` and `p[v + 2]` of a 32-bit `v` into one `p + v * 4` kept
+  in a register and the offsets 4 and 8 in the loads, whatever the loop's size and whether or not `v` is an induction
+  variable. Either `opt_loop_invariants` or `opt_strength_reduction` does it, so only both pragmas off stop it. A
+  pointer conversion around the element's whole address, `*(f32 *)&words[v + 1]`, hides the address from that pass,
+  and each read keeps its own `(v + 1) << 2`; a cast on the base alone, `((f32 *)buffer)[v + 1]`, or a same-width cast
+  of the index does not. `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` matches so with a `u32 *` buffer of floats,
+  which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
