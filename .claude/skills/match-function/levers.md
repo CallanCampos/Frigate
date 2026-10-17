@@ -322,6 +322,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A longer chain also stores from the right")
 - Calls packed into one word with a kept bit, the bit tested before the calls and spilled: the calls into locals,
   then the packing. (matching.md: "packed into one word")
+- A field read in an `if`'s condition and its body loaded ahead of the condition's other loads, where the original
+  loads in tree order and reuses the register: global CSE merged the reads; only a second pointer path to the field
+  or `opt_common_subs off` keeps them apart. (matching.md: "is a global common subexpression, loaded into a")
 
 ## An instruction too many or too few
 
@@ -338,6 +341,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
+- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, not a bit field, which
+  loads its whole container and shifts twice. (matching.md: "A bit field is loaded at its container's width")
 - A signed `/ 2` narrowed in separate steps before a loop (`asrs #1; lsls #0x10; asrs #0x10`, ours `lsls #0xf`):
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
@@ -660,7 +665,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 ## Diagnostic switches (not for committed code)
 
 These narrow down which optimization causes a difference, after which you look for the C spelling. They come from
-sm64ds-decomp's catalogue for another mwccarm build, so they are untested here:
+sm64ds-decomp's catalogue for another mwccarm build; the cases below are the ones tested here:
 - `#pragma opt_common_subs off`
 - `#pragma opt_strength_reduction off`
 - `#pragma optimize_for_size on`
@@ -672,6 +677,10 @@ restructures it. A function whose loop enters with a `b` to the test at -O4 may 
 optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the
 same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which showed it too and came within a
 byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is 0/1").
+`#pragma opt_common_subs off` around one function alone matched `btlv_mcss.c`'s `BtlvMcss_MoveTaskEnd_Circle` and
+`_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
+`opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
+subexpression, loaded into a").
 
 An empty `if (a && b && c) {}` (three operands or more; two are removed early) or a discarded ternary statement
 splits the block where it stands and emits nothing. When a register or CSE difference looks like a missing block
