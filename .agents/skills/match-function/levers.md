@@ -174,6 +174,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Table addresses reloaded from the pool at each use and a constant built in every copy of an unrolled inline,
   one pushed register short: combine each call's result as soon as it comes (ORed into a `u8` accumulator),
   keeping only values that straddle the stores. (matching.md: "collected before they are combined")
+- A global's address loaded from the pool again before each call, where ours keeps it in a saved register: a
+  pointer local MWCC did not propagate. Check with a local and `#pragma opt_propagation off`, then look for the
+  spelling (a member's address, a cast). (matching.md: "is copy-propagated into its uses, and the")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -400,6 +403,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A field read in an `if`'s condition and its body loaded ahead of the condition's other loads, where the original
   loads in tree order and reuses the register: global CSE merged the reads; only a second pointer path to the field
   or `opt_common_subs off` keeps them apart. (matching.md: "is a global common subexpression, loaded into a")
+- A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
+  calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
+  sum or another immediate keeps it in place, no pragma does. (matching.md: "whose only use is the copy")
 
 ## An instruction too many or too few
 
@@ -598,7 +604,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "`bne next; b hide`")
 - Early `return FALSE`s go to one shared tail only when the C has one trailing return (an `if`/`else if` chain, or a
   `result` variable, or an inlined function: see the next line). A return that branches to the wrong one of two equal
-  `b end` trampolines can be `goto end`.
+  `b end` trampolines: change which nearby exits are `return` and which are `break` or the end of an `if`.
+  (matching.md: "goes through a `b` within range")
 - Failures that set a saved register to 0 and jump to one `mov r0, rN` exit, where a `result` variable gets a stack
   slot: the body is a `static inline` called by a one-line wrapper. (matching.md: "Every `return` gets its own
   epilogue")
