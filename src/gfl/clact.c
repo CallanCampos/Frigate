@@ -1,6 +1,7 @@
 #include "types.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
+#include "gfl/clact_itcm.h"
 #include "gfl/graphics.h"
 #include "gfl/gx_layers.h"
 #include "gfl/heap.h"
@@ -20,15 +21,7 @@
 // Positions that are not relative to a surface of the renderer
 #define CLACT_SURFACE_NONE 0xffff
 
-// How an actor animates: a cell animation, one whose characters are transferred to VRAM as it plays, or a multi-cell
-// animation
-enum {
-    CLACT_ANIM_CELL,
-    CLACT_ANIM_VRAM_TRANSFER,
-    CLACT_ANIM_MULTICELL,
-};
-
-typedef struct {
+struct ClActCharRes {
     NNSG2dImageProxy proxy;
     void *data;
     // The characters a VRAM transfer cell animation sends from
@@ -39,21 +32,21 @@ typedef struct {
     u32 extData : 1;
     u32 size : 30;
     u32 free : 1;
-} ClActCharRes;
+};
 
-typedef struct {
+struct ClActPlttRes {
     NNSG2dImagePaletteProxy proxy;
     u32 size : 31;
     u32 free : 1;
-} ClActPlttRes;
+};
 
-typedef struct {
+struct ClActCellAnimRes {
     void *cellFile;
     void *animFile;
     NNSG2dCellDataBank *cells;
     NNSG2dAnimBankData *anims;
     BOOL free;
-} ClActCellAnimRes;
+};
 
 typedef struct {
     u16 charCount;
@@ -66,78 +59,17 @@ typedef struct {
 } ClActResManSetup;
 
 typedef struct {
-    VRAMMan *vmanMain;
-    VRAMMan *vmanSub;
-    ClActCharRes *chars;
-    ClActPlttRes *pltts;
-    ClActCellAnimRes *cellAnims;
-    u16 charCount;
-    u16 plttCount;
-    u16 cellAnimCount;
-    u16 unk1A;
-    u16 offsetMain;
-    u16 offsetSub;
-} ClActResMan;
-
-typedef struct {
-    NNSG2dOamManagerInstance man;
-    BOOL active;
-} ClActOamMan;
-
-struct ClActRenderer {
-    NNSG2dRendererInstance renderer;
-    NNSG2dRenderSurface *surfaces;
-    u16 surfaceCount;
-    u16 unk9E;
-};
-
-typedef struct {
     NNSG2dOamRegisterFunction oamRegister;
     NNSG2dAffineRegisterFunction affineRegister;
     NNSG2dRndCellCullingFunction culling;
 } ClActSurfaceFuncs;
 
 // A transfer of a VRAM transfer cell animation's characters, at the vertical blank
-typedef struct {
+struct ClActTransferTask {
     void *src;
     u32 dst;
     u32 size;
     u32 screen;
-} ClActTransferTask;
-
-typedef struct {
-    NNSG2dCellTransferState *states;
-    ClActTransferTask *tasks;
-    u32 count;
-    BOOL active;
-} ClActTransfer;
-
-struct ClActSys {
-    ClActOamMan oamMans[2];
-    ClActRenderer renderer;
-    ClActTransfer transfer;
-    // What the OAMs' palettes are offset or set to
-    u16 palettes[2];
-    u32 paletteMode;
-    BOOL updating;
-    BOOL oamReady;
-    ClActUnit *units;
-    ClActResMan res;
-};
-
-struct ClActUnit {
-    ClActor *actors;
-    // The actors in use, as a list sorted by priority
-    ClActor *actorList;
-    ClActRenderer *renderer;
-    u16 count;
-    u8 rendererType : 4;
-    u8 active : 1;
-    u8 unk5 : 1;
-    u8 unk6 : 1;
-    u8 priority;
-    ClActUnit *next;
-    ClActUnit *prev;
 };
 
 // The resources an actor is made with
@@ -152,54 +84,6 @@ typedef struct {
     NNSG2dAnimBankData *mcAnims;
     NNSG2dCharacterData *transferChar;
 } ClActResSetup;
-
-struct ClActAnim {
-    u32 type;
-    NNSG2dCellDataBank *cells;
-    NNSG2dAnimBankData *anims;
-    union {
-        struct {
-            NNSG2dCellAnimation cellAnim;
-            u32 transferHandle;
-        };
-        struct {
-            NNSG2dMultiCellAnimation mcAnim;
-            NNSG2dMultiCellDataBank *mcBank;
-            NNSG2dAnimBankData *mcAnims;
-            void *mcWork;
-        };
-    };
-};
-
-struct ClActor {
-    ClActor *next;
-    ClActor *prev;
-    ClActUnit *unit;
-    ClActorPos pos;
-    ClActorPos affineCenter;
-    ClActorScale scale;
-    NNSG2dImageProxy imgProxy;
-    NNSG2dImagePaletteProxy pltProxy;
-    fx32 unk54;
-    u16 rotation;
-    u16 sequence;
-    u16 charIdx;
-    u16 plttIdx;
-    u32 priority : 8;
-    u32 unk60_8 : 4;
-    u32 palette : 4;
-    u32 bgPriority : 2;
-    u32 affineMode : 2;
-    u32 flip : 2;
-    u32 objMode : 2;
-    u32 unk60_24 : 1;
-    u32 unk60_25 : 1;
-    u32 visible : 1;
-    u32 playMode : 4;
-    u32 unk60_31 : 1;
-    u32 unk64_0 : 1;
-    ClActAnim anim;
-};
 
 // What the renderers pass the culling callback of a surface for each OAM, which sets skip when it is out of view
 typedef struct {
@@ -417,9 +301,9 @@ static void (*sAnimRestartFuncs[3])(ClActAnim *anim) = {
 const ClActSysSetup data_02093f24 = { 0, 0, 0, 192, 4, 124, 4, 124, 0, 32, 32, 32, 32, 16, 16 };
 static void (*renderers[4])(ClActUnit *unit) = {
     mainRenderer,
-    func_01ff8318,
-    func_01ff8610,
-    func_01ff8900,
+    visibleAnimRenderer,
+    sharedParamsRenderer,
+    sharedParamsVisibleAnimRenderer,
 };
 // The surfaces of the system's renderer, at the positions ClActSys_Create is given
 static ClActSurfaceSetup sSurfaceSetups[2] = {
@@ -817,11 +701,11 @@ BOOL func_0204bfe8(ClActUnit *unit) {
 }
 
 void func_0204bff0(ClActUnit *unit, BOOL a1) {
-    unit->unk5 = a1;
+    unit->visibleAnimOnly = a1;
 }
 
 void func_0204c004(ClActUnit *unit, BOOL a1) {
-    unit->unk6 = a1;
+    unit->sharedParams = a1;
 }
 
 void func_0204c018(ClActUnit *unit, ClActRenderer *renderer) {
@@ -992,7 +876,7 @@ void func_0204c2b0(ClActor *actor, u32 axis, BOOL flip) {
     }
 }
 
-BOOL func_0204c2f0(ClActor *actor, u32 axis) {
+BOOL ClActor_GetFlip(ClActor *actor, u32 axis) {
     BOOL flip = FALSE;
 
     if (axis == 0) {
@@ -1008,11 +892,11 @@ BOOL func_0204c2f0(ClActor *actor, u32 axis) {
 void func_0204c318(ClActor *actor, u32 mode) {
     actor->objMode = mode;
     if (mode == GX_OAM_MODE_NORMAL) {
-        if (actor->unk60_8 & 8) {
-            actor->unk60_8 ^= 8;
+        if (actor->overwrite & NNS_G2D_RND_OVERWRITE_OBJMODE) {
+            actor->overwrite ^= NNS_G2D_RND_OVERWRITE_OBJMODE;
         }
     } else {
-        actor->unk60_8 |= 8;
+        actor->overwrite |= NNS_G2D_RND_OVERWRITE_OBJMODE;
     }
 }
 
@@ -1022,7 +906,7 @@ u32 func_0204c370(ClActor *actor) {
 
 void func_0204c378(ClActor *actor, u32 palette, u32 a2) {
     actor->palette = palette;
-    actor->unk60_31 = a2;
+    actor->paletteMode = a2;
 }
 
 u8 func_0204c39c(ClActor *actor) {
@@ -1101,8 +985,8 @@ void func_0204c4d4(ClActor *actor, fx32 time) {
 }
 
 void func_0204c4e0(ClActor *actor, fx32 speed) {
-    func_0204d46c(&actor->anim, speed);
-    func_0204d3bc(&actor->anim, FX32_ONE);
+    ClActAnim_SetSpeed(&actor->anim, speed);
+    ClActAnim_Tick(&actor->anim, FX32_ONE);
 }
 
 fx32 func_0204c4f8(ClActor *actor) {
@@ -1118,15 +1002,15 @@ u16 func_0204c510(ClActor *actor) {
 }
 
 void func_0204c520(ClActor *actor, BOOL a1) {
-    actor->unk60_25 = a1;
+    actor->autoAnim = a1;
 }
 
 BOOL func_0204c534(ClActor *actor) {
-    return actor->unk60_25;
+    return actor->autoAnim;
 }
 
 void func_0204c53c(ClActor *actor, fx32 a1) {
-    actor->unk54 = a1;
+    actor->autoAnimSpeed = a1;
 }
 
 void func_0204c540(ClActor *actor) {
@@ -1169,9 +1053,9 @@ void func_0204c5bc(ClActor *actor) {
 
 void func_0204c5c8(ClActor *actor, BOOL a1) {
     if (a1) {
-        actor->unk64_0 = 0;
+        actor->cellOnly = 0;
     } else {
-        actor->unk64_0 = 1;
+        actor->cellOnly = 1;
     }
 }
 
@@ -1231,7 +1115,7 @@ static void func_0204c690(void) {
     if (unit != NULL) {
         do {
             if (unit->active && unit->actorList != NULL) {
-                renderers[unit->unk5 + unit->unk6 * 2](unit);
+                renderers[unit->visibleAnimOnly + unit->sharedParams * 2](unit);
             }
             unit = unit->next;
         } while (unit != g_ClActSys->units);
@@ -1336,7 +1220,7 @@ static void func_0204c800(ClActRenderer *renderer, const ClActSurfaceSetup *setu
         NNS_G2dAddRendererTargetSurface(&renderer->renderer, &renderer->surfaces[i]);
     }
     if (renderer->surfaceCount == 1) {
-        renderer->unk9E = 2;
+        renderer->opzHint = NNS_G2D_RDR_OPZHINT_LOCK_PARAMS;
     }
 }
 
@@ -1716,13 +1600,13 @@ static ClActor *func_0204d020(ClActor *tail, u8 priority) {
 
 static void func_0204d040(ClActor *actor) {
     MI_CpuFill8(actor, 0, sizeof(ClActor));
-    actor->unk54 = FX32_ONE;
+    actor->autoAnimSpeed = FX32_ONE;
     NNS_G2dInitImageProxy(&actor->imgProxy);
     NNS_G2dInitImagePaletteProxy(&actor->pltProxy);
     actor->scale.x = FX32_ONE;
-    actor->unk60_8 |= 1;
+    actor->overwrite |= NNS_G2D_RND_OVERWRITE_PRIORITY;
     actor->scale.y = FX32_ONE;
-    actor->unk60_31 = 0;
+    actor->paletteMode = 0;
     actor->affineMode = 0;
 }
 
@@ -1881,10 +1765,10 @@ static void setSeqToMultiCellAnim(ClActAnim *anim, u16 sequence) {
 
 static void func_0204d3a4(ClActAnim *anim, fx32 time) {
     func_0204d3f4(anim)->currentTime = time;
-    func_0204d3bc(anim, 0);
+    ClActAnim_Tick(anim, 0);
 }
 
-void func_0204d3bc(ClActAnim *anim, fx32 frames) {
+void ClActAnim_Tick(ClActAnim *anim, fx32 frames) {
     sAnimTickFuncs[anim->type](anim, frames);
 }
 
@@ -1948,7 +1832,7 @@ static void func_0204d460(ClActAnim *anim, u16 frame) {
     NNS_G2dSetMCAnimationCurrentFrame(&anim->mcAnim, frame);
 }
 
-void func_0204d46c(ClActAnim *anim, fx32 speed) {
+void ClActAnim_SetSpeed(ClActAnim *anim, fx32 speed) {
     sAnimSetSpeedFuncs[anim->type](anim, speed);
 }
 
