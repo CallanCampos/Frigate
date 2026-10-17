@@ -255,9 +255,9 @@ void VCT_DetachSession(VCTSession *session) {
 
 // Hands a frame of the microphone's samples to the library to send, returning whether it took it
 BOOL VCT_SubmitSamples(void *samples, int size) {
-    int i;
-    BOOL hasSender = FALSE;
     VCTVoicePacket *packet;
+    u32 i;
+    BOOL hasSender = FALSE;
 
     if (size != sAudio.frameBytes) {
         return FALSE;
@@ -274,7 +274,7 @@ BOOL VCT_SubmitSamples(void *samples, int size) {
     if (!hasSender) {
         return FALSE;
     }
-    packet = (sSendQueue.writeIndex & 1) ? &sSendQueue.frames[0] : &sSendQueue.frames[1];
+    packet = &sSendQueue.frames[(sSendQueue.writeIndex & 1) ? 0 : 1];
     packet->magic = VCT_PACKET_MAGIC;
     if (sAudio.codec >= VCT_CODEC_ADPCM2) {
         MIi_CpuCopyFast(samples, &packet->payload[4], size);
