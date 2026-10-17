@@ -178,24 +178,6 @@ typedef BOOL (*FieldScriptCommand)(VM *vm, FieldScriptEnv *env);
 extern const FieldScriptCommand EVCMD_TABLE[];
 extern const u32 EVCMD_MAX;
 
-struct GlobalScriptEntry {
-    u16 start;
-    u16 end;
-    u16 fileId;
-    u16 msgArcId;
-    u16 msgFileNo;
-};
-
-extern const GlobalScriptEntry GLOBAL_SCRIPT_TABLE[60];
-
-struct OpcodePermissions {
-    u8 level0 : 1;
-    u8 level1 : 1;
-    u8 level2 : 1;
-};
-
-extern const struct OpcodePermissions EVCMD_PERM_TABLE[];
-
 u32 FieldScript_IsVMFeatureSetReduced(u32 featureLevel);
 BOOL FieldScript_CheckSCRID(u16 scriptId);
 u32 FieldScript_ResolveSCRID(u32 zoneId, u16 scriptId, u16 *fileId, u16 *msgArcId, u16 *msgFileNo);
@@ -236,7 +218,6 @@ BOOL s0010_VMStackPushFlag(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02159c80(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02159c90(VM *vm, FieldScriptEnv *env);
 BOOL func_ov012_02159cd8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159cf8(GameSystem **gsysPtr);
 BOOL func_ov012_02159d10(VM *vm, FieldScriptEnv *env);
 // scrcmd_phrase_select.c and scrcmd_weather.c
 BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env);
@@ -291,7 +272,6 @@ BOOL s0013_WorkOr(VM *vm, FieldScriptEnv *env);
 BOOL s0028_WorkSetConst(VM *vm, FieldScriptEnv *env);
 BOOL s0029_WorkGet(VM *vm, FieldScriptEnv *env);
 BOOL s002A_WorkSet(VM *vm, FieldScriptEnv *env);
-extern const u8 VM_CMP_LUT[][3];
 BOOL s001D_RTEndGlobal(VM *vm, FieldScriptEnv *env);
 BOOL s001E_VMJump(VM *vm, FieldScriptEnv *env);
 BOOL s001F_VMJumpIf(VM *vm, FieldScriptEnv *env);
@@ -316,6 +296,8 @@ typedef struct {
 typedef BOOL (*FieldScriptSubEventFinishFunc)(FinishScriptSubEventsWork *work, u32 *state);
 
 extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15];
+// scrcmd_network.c: tries to boot the game's communication again
+BOOL func_ov012_02159cf8(FinishScriptSubEventsWork *work, u32 *state);
 // scrcmd_ndemo.c
 BOOL FieldScriptSubEventFinish_NDemo(FinishScriptSubEventsWork *work, u32 *state);
 
@@ -338,7 +320,6 @@ void ScriptWork_SetActorAnmProc(ScriptWork *work, FieldActorAnmProc *proc);
 void ScriptWork_SetStadiumTrainers(ScriptWork *work, void *trainers);
 void *ScriptWork_GetStadiumTrainers(ScriptWork *work);
 void *ScriptWork_GetTrainerState(ScriptWork *work, int index);
-extern u32 g_ActiveFieldScriptSubEvents;
 void FieldScriptSubEvent_ResetAll(void);
 void FieldScriptSubEvent_Register(int id);
 void FieldScriptSubEvent_Unregister(int id);
@@ -409,5 +390,13 @@ void AddItemToListMenu(FieldScriptEnv *env, u32 a1, u32 message, u32 value, StrB
 // Overlay 36: show a message, and have the script wait for it
 BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);
 BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4);
+
+// Script commands of overlay 36's fldeff_iaigiri.c, enceff.c and fldeff_ochiba.c, which are not written yet
+BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env);
+BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env);
+BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env);
+BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

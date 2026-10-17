@@ -59,6 +59,7 @@ src/ov012/intrude_work.c:
 src/ov012/script_sys.c:
     complete
     .text       start:0x0215366c end:0x02153da4
+    .rodata     start:0x0216af98 end:0x0216b4e4
     .data       start:0x0216e190 end:0x0216e1b4
 
 src/ov012/script_work.c:
@@ -69,10 +70,12 @@ src/ov012/script_work.c:
 src/ov012/script_sub_event.c:
     complete
     .text       start:0x02154070 end:0x02154180
+    .bss        start:0x0216e640 end:0x0216e644
 
 src/ov012/scrcmd_vm.c:
     complete
     .text       start:0x02154180 end:0x02154948
+    .rodata     start:0x0216b4e4 end:0x0216c104
 
 src/ov012/script_plugin.c:
     complete
