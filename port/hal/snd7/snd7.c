@@ -1,688 +1,693 @@
-// The host ARM7's sound driver for phase 1: a null driver (PXI tag SOUND), which takes every command of the decomp's
-// NitroSDK SND (lib/nitro/src/snd) and plays no sound. The real driver, written from the ARM7's code, comes in phase 2
-// (PLAN.md §4.7); until then this one keeps the ARM9's side going as the game expects:
-//   - every packet is done as soon as the ARM9 sends it: the shared work's count of finished packets
-//     (finishedCommandTag) moves on before PXI_SendWordByFifo returns, so SND_RecvCommandReply, SND_WaitForCommandProc
-//     and SND_AllocCommand never wait;
-//   - a sequence plays from the command that prepares it until it ends or is stopped: its player's bit is set in the
-//     shared work's playerStatus, and its tick counter runs. When it ends comes from its data: a timing-only reading of
-//     the sequence (waits, notes that wait, tempo, jumps, calls, loops, variables, tracks it opens), at the DS's rate
-//     of a driver update every 2728 * 64 cycles and a tick each time the tempo adds up to 240. A sequence whose tracks
-//     all reach their end (0xff) ends there, so a jingle that the game waits for ends when it would; one that loops
-//     plays until it is stopped, as the background music does. A sequence whose data the host can't find (see below)
-//     plays for a second;
-//   - channels never play, so channelStatus stays 0: a wave the game plays (cries, streams) has ended as soon as the
-//     game looks, and NNS_SndWaveOutWaitForChannelStop's busy loop ends at once;
-//   - the alarms (SND_SetupAlarm, which the stream player uses) go off on the virtual clock, each a word to the ARM9
-//     with the alarm's number and ID, as the DS's driver sends them;
-//   - SND_ReadDriverInfo gets a driver state with no tracks.
-// The driver's work at each VBlank (port_snd7_frame) runs the updates and alarms of the time since the last one.
+// The host ARM7's sound driver (PXI tag SOUND): TwlSDK's SND driver as the ARM7 runs it, in C written from the ARM7's
+// code (port/hal/snd7/snd7_internal.h lists its files and functions), and the sound unit it drives (snd7_hw.c), whose
+// samples go to the host's audio (port_snd7_set_output, snd7_output.h).
+//
+// The DS's driver is a thread (SndThread, 0x038006ac) that waits for a message: a periodic OS alarm every 2728 ticks
+// of 64 cycles (191.9 a second, the first 0x10000 ticks after the driver starts) or the ARM9's wake-up word (0). For
+// each it runs, in order, SND_UpdateExChannel (the register writes the last run owed the channels), SND_CommandProc
+// (the packets of commands the ARM9 sent), SND_SeqMain and SND_ExChannelMain (which move the sequences and the
+// envelopes on only at a periodic run), SND_UpdateSharedWork (the channels' and capture units' status for the ARM9)
+// and SND_CalcRandom. Here:
+//   - time is the virtual clock (port_os_cycles). The driver catches up to it (Advance) at each VBlank
+//     (port_snd7_frame) and whenever the ARM9 sends a word, running in their order the periodic runs, the alarms and
+//     the mixer's samples (one each 1024 cycles, 32,728.5 a second) that fall before it; so the samples and the
+//     driver's state are the same on every run, whenever the host looks;
+//   - a packet's commands run as soon as the ARM9 sends it, and the shared work's count of finished packets
+//     (finishedCommandTag) moves on before PXI_SendWordByFifo returns, as the ARM9's busy waits need
+//     (SND_RecvCommandReply, SND_WaitForCommandProc, SND_AllocCommand). The DS runs them at its next run, after that
+//     run's SND_UpdateExChannel; here they run before it. A wake-up word runs a run that isn't periodic at once;
+//   - so the ARM9 finds a packet done as soon as it has sent it, where the DS's finds it waiting until the driver's
+//     next run, and the waits that wake the driver for that run (SND_WaitForCommandProc after a flush, SND_AllocCommand
+//     with no command left) would never send the word. Each run draws from SND_CalcRandom's generator, which the
+//     whole driver shares, so a run missing would change every random note after it. The host's
+//     SND_WaitForCommandProc (snd_command_host.c) sends the word whenever the DS's driver would still hold the packet,
+//     which snd7_holds_packet tells from the count of finished packets at the driver's last run; SND_AllocCommand's
+//     wake-up, with all 256 commands sent, isn't modelled;
+//   - the alarms (SND_SetupAlarm, which the stream player uses) are the ARM7's OS alarms on the virtual clock, each
+//     sending the ARM9 its number and ID; their handler's count of words still to send covers a full FIFO (16 words
+//     waiting in the ARM9's), as on the DS.
 //
 // Pointers: the packet's word carries the low 26 bits of the address of its first command, and the commands carry
 // pointers in 32-bit arguments, which a 64-bit host cuts. The packet is always the ARM9's queue's ready list
 // (SNDi_Queue.readyHead) when it is sent, and the shared work the one SNDi_SharedWork points to, so those two are
-// taken from the ARM9's variables after a check of the bits. A sequence's data, the driver state's buffer and the
-// start of a range of data that goes are found with port_pxi_noted_pointer, from the pointers that the host's
-// snd_interface.c noted under the sound's tag when it queued the commands. A sequence is read only inside the memory
-// it was found in: a jump, call or track whose offset leads out of it ends the track there.
+// taken from the ARM9's variables after a check of the bits. A sequence and its bank, a channel's wave, the driver
+// state's buffer and the start of a range of data that goes are found with port_pxi_noted_pointer, from the pointers
+// that the host's snd_interface.c noted under the sound's tag when it queued the commands. The waves and wave archives
+// that banks link to are found by the handles of the host's snd_bank.c (snd_bank_host.c).
 #include "hal/os/port_os.h"
 #include "hal/pxi/arm7.h"
 #include "hal/pxi/pxi_bus.h"
+#include "hal/snd7/snd7_internal.h"
+#include "hal/snd7/snd7_output.h"
 #include "nitro/pxi.h"
-#include "nitro/snd.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-// The driver's update: every 2728 ticks of 64 cycles (NitroSDK's SND_PROC_INTERVAL), 191.95 times a second
-#define SND7_UPDATE_CYCLES (2728u * 64u)
-// The sequencer's tempo: a tick each time the tempo, scaled by the player's ratio (256 is 1), adds up to 240; a
-// sequence starts at 120
-#define SND7_TICK_THRESHOLD 240
-#define SND7_DEFAULT_TEMPO 120
-#define SND7_TEMPO_RATIO_ONE 256
-// The alarms' ticks are the ARM7's OS ticks, 64 cycles each
-#define SND7_ALARM_TICK_CYCLES 64u
-// How long a sequence whose data can't be read plays: a second of updates
-#define SND7_UNKNOWN_SEQUENCE_UPDATES 192
-// A track's calls and loops nest 3 deep; a track that runs this many commands without a wait ends
-#define SND7_TRACK_STACK_DEPTH 3
-#define SND7_TRACK_COMMAND_BUDGET 4096
-// A player's parameter that the driver keeps: the tempo ratio (SND_SetPlayerTempoRatio's offset)
-#define SND7_PLAYER_PARAM_TEMPO_RATIO 0x1a
-// At most this many words an alarm sends in one VBlank, so that a short period can't flood the FIFO
-#define SND7_ALARM_FIRES_MAX 64
+// The DS's commands that the decomp's snd.h doesn't name
+#define COMMAND_START_SEQ 0
+#define COMMAND_SKIP_SEQ 5
+#define COMMAND_PLAYER_LOCAL_VAR 0xa
+#define COMMAND_PLAYER_GLOBAL_VAR 0xb
+#define COMMAND_SETUP_CHANNEL_PSG 0xf
+#define COMMAND_SETUP_CHANNEL_NOISE 0x10
+#define COMMAND_SETUP_CAPTURE 0x11
+#define COMMAND_SURROUND_DECAY 0x16
+#define COMMAND_STOP_UNLOCKED_CHANNEL 0x1c
 
-typedef struct Snd7Track {
-    BOOL active;
-    const u8 *pos;
-    s32 wait;
-    BOOL noteWait;
-    BOOL compare;
-    u32 depth;
-    const u8 *stack[SND7_TRACK_STACK_DEPTH];
-    u8 loops[SND7_TRACK_STACK_DEPTH];
-} Snd7Track;
+// The ARM7's address of its work (SNDi_Work), which SND_ReadDriverInfo's state carries for its links
+#define WORK_ADDRESS 0x03809fbc
 
-typedef struct Snd7Player {
-    BOOL active;  // prepared or started, until it ends or is stopped: its bit in playerStatus
-    BOOL started; // SND_StartPreparedSeq came
-    BOOL paused;
-    u32 number;
-    // The sequence's data: its base (NULL when it can't be read), the end of the memory it is in, and the low 32 bits
-    // of its base as the ARM9 sent it, for SND_InvalidateSeqData
-    const u8 *base;
-    const u8 *end;
-    u32 base32;
-    u32 updatesLeft; // for a sequence that can't be read
-    u32 tempo;
-    u32 tempoRatio;
-    u32 tempoCounter;
-    u32 ticks;
-    Snd7Track tracks[SND_PLAYER_TRACK_MAX];
-} Snd7Player;
+// The words that the ARM9's receive FIFO holds
+#define FIFO_DEPTH 16
 
-typedef struct Snd7Alarm {
-    BOOL running;
-    u32 tick;
-    u32 period;
-    u8 id;
-    u64 due;
-} Snd7Alarm;
+// The samples kept for the output until the next VBlank: room for two frames' at first, more when the clock runs
+// further between VBlanks
+#define OUTPUT_FRAMES_INITIAL 2048
+
+SNDSharedWork *snd7_shared;
 
 static struct {
-    SNDSharedWork *work;
-    Snd7Player players[SND_PLAYER_MAX];
-    Snd7Alarm alarms[SND_ALARM_MAX];
-    u64 lastUpdate;
-    // The things reported once a run: a packet or shared work that isn't the ARM9's, data that can't be found
+    BOOL booted;
+    // The virtual clock's cycle the driver has run to, and the next mixer sample and periodic run
+    u64 now;
+    u64 nextSample;
+    BOOL timerRunning;
+    u64 nextUpdate;
+    u64 samples;
+    // The output, and the samples made since it was last given them. They go to it only from port_snd7_frame (the
+    // host's stack at a VBlank), never from inside the ARM9's call that sent a word, which runs on a thread's fiber
+    PortSnd7Output output;
+    void *outputUser;
+    s16 *buffer;
+    u32 bufferFrames;
+    u32 buffered;
+    // The shared work's count of finished packets at the driver's last run: the packets the DS's driver would have run
+    u32 runTag;
+    // The things reported once a run: a packet that isn't the ARM9's, data that can't be found
     BOOL reportedPacket;
-    BOOL reportedSequence;
-    BOOL reportedInfo;
+    BOOL reportedPointer;
 } sSnd;
 
-// The shared work's view of a player
+// Memory the ARM9 gave the driver
 
-static void WriteStatus(void) {
-    u32 status = 0;
-    int i;
+const u8 *snd7_memory_end(const void *pointer) {
+    const u8 *end = NULL;
 
-    if (sSnd.work == NULL) {
-        return;
+    if (pointer == NULL || port_pxi_pointer((u32)(uintptr_t)pointer, &end) != pointer) {
+        return NULL;
     }
-    for (i = 0; i < SND_PLAYER_MAX; i++) {
-        if (sSnd.players[i].active) {
-            status |= 1u << i;
+    return end;
+}
+
+const u8 *snd7_resolve(u32 address, const u8 **end) {
+    const u8 *pointer;
+
+    *end = NULL;
+    if (address == 0) {
+        return NULL;
+    }
+    if (address & SND7_HANDLE_FLAG) {
+        pointer = snd7_handle_pointer(address);
+        if (pointer != NULL) {
+            *end = snd7_memory_end(pointer);
+            return pointer;
         }
     }
-    sSnd.work->playerStatus = status;
-    sSnd.work->channelStatus = 0;
-    sSnd.work->captureStatus = 0;
+    return port_pxi_pointer(address, end);
 }
 
-static void EndPlayer(Snd7Player *player) {
-    player->active = FALSE;
-    player->started = FALSE;
-    WriteStatus();
-}
-
-// A sequence variable: 0-15 the player's own, 16-31 the global ones, all in the shared work as the ARM9 sees them
-static vs16 *Variable(const Snd7Player *player, u32 number) {
-    static vs16 sScratch;
-
-    if (sSnd.work == NULL || number >= 2 * SND_PLAYER_VARIABLE_MAX) {
-        sScratch = SND_VARIABLE_UNSET;
-        return &sScratch;
-    }
-    if (number < SND_PLAYER_VARIABLE_MAX) {
-        return &sSnd.work->player[player->number].variable[number];
-    }
-    return &sSnd.work->globalVariable[number - SND_PLAYER_VARIABLE_MAX];
-}
-
-// The timing-only sequencer
-
-// How a command's last argument is read: its own type, or as the random or variable prefix before it says
-enum {
-    ARG_U8,
-    ARG_S16,
-    ARG_VARIABLE_LENGTH,
-    ARG_RANDOM,
-    ARG_FROM_VARIABLE,
-};
-
-// The sequence's data at offset from its base, or NULL when that is outside the memory it is in
-static const u8 *DataAt(const Snd7Player *player, u32 offset) {
-    return offset < (uintptr_t)player->end - (uintptr_t)player->base ? player->base + offset : NULL;
-}
-
-static BOOL Fetch(const Snd7Player *player, Snd7Track *track, u32 bytes, u32 *value) {
-    u32 i;
-
-    *value = 0;
-    if (track->pos < player->base || track->pos > player->end || (uintptr_t)(player->end - track->pos) < bytes) {
+BOOL snd7_read_bytes(const u8 *start, const u8 *end, u32 offset, void *dst, u32 size) {
+    if (start == NULL) {
         return FALSE;
     }
-    for (i = 0; i < bytes; i++) {
-        *value |= (u32)*track->pos++ << (8 * i);
+    if (end != NULL && (u64)offset + size > (u64)((uintptr_t)end - (uintptr_t)start)) {
+        return FALSE;
     }
+    memcpy(dst, (const u8 *)((uintptr_t)start + offset), size);
     return TRUE;
 }
 
-static BOOL FetchArgument(const Snd7Player *player, Snd7Track *track, int type, s32 *value) {
-    u32 raw;
-    u32 high;
+u32 snd7_read32(const u8 *start, const u8 *end, u32 offset, BOOL *ok) {
+    u8 bytes[4];
+
+    if (!snd7_read_bytes(start, end, offset, bytes, 4)) {
+        *ok = FALSE;
+        return 0;
+    }
+    return (u32)bytes[0] | (u32)bytes[1] << 8 | (u32)bytes[2] << 16 | (u32)bytes[3] << 24;
+}
+
+// A pointer a command carries in 32 bits, found among the ARM9's notes (NULL and a report when it isn't)
+static const u8 *CommandPointer(u32 address, const u8 **end) {
+    const u8 *pointer;
+
+    *end = NULL;
+    if (address == 0) {
+        return NULL;
+    }
+    pointer = port_pxi_noted_pointer(PXI_FIFO_TAG_SOUND, address, end);
+    if (pointer == NULL) {
+        // Noted without a size outside the arena and static data (constant data): no bound, as on the DS
+        pointer = port_pxi_noted_pointer(PXI_FIFO_TAG_SOUND, address, NULL);
+        *end = NULL;
+    }
+    if (pointer == NULL && !sSnd.reportedPointer) {
+        fprintf(stderr, "port: sound: an address the ARM9 sent, %#x, can't be found in host memory\n", address);
+        sSnd.reportedPointer = TRUE;
+    }
+    return pointer;
+}
+
+// The alarms (snd_alarm.c, 0x03803208-0x03803404), on the ARM7's OS alarms
+
+// The ARM7's OS tick now, in cycles of the virtual clock
+static u64 TickCycles(u64 cycles) {
+    return cycles / SND7_OS_TICK_CYCLES * SND7_OS_TICK_CYCLES;
+}
+
+static void AlarmInit(void) {
     int i;
 
-    switch (type) {
-    case ARG_U8:
-        if (!Fetch(player, track, 1, &raw)) {
-            return FALSE;
-        }
-        *value = (s32)raw;
-        return TRUE;
-    case ARG_S16:
-        if (!Fetch(player, track, 2, &raw)) {
-            return FALSE;
-        }
-        *value = (s16)raw;
-        return TRUE;
-    case ARG_VARIABLE_LENGTH:
-        *value = 0;
-        for (i = 0; i < 4; i++) {
-            if (!Fetch(player, track, 1, &raw)) {
-                return FALSE;
-            }
-            *value = (*value << 7) | (s32)(raw & 0x7f);
-            if (!(raw & 0x80)) {
-                break;
-            }
-        }
-        return TRUE;
-    case ARG_RANDOM:
-        // The driver's random value between the two; the middle, which is deterministic and as likely a length
-        if (!Fetch(player, track, 2, &raw) || !Fetch(player, track, 2, &high)) {
-            return FALSE;
-        }
-        *value = ((s16)raw + (s16)high) / 2;
-        return TRUE;
-    default:
-        if (!Fetch(player, track, 1, &raw)) {
-            return FALSE;
-        }
-        *value = *Variable(player, raw);
-        return TRUE;
+    for (i = 0; i < SND7_ALARM_NUM; i++) {
+        snd7_work.alarm[i].enable = 0;
+        snd7_work.alarm[i].id = 0;
+        snd7_work.alarm[i].armed = FALSE;
     }
 }
 
-// The shift command's value: to the left by a positive argument, to the right by a negative one, as the ARM's shifts
-// by a register do it, which take the amount from the register's low byte and give 0 to the left and the sign to the
-// right for an amount of 32 or more
-static s32 ShiftVariable(s32 value, s32 argument) {
-    u32 amount;
+// SND_SetupAlarm (0x03803234)
+static void SetupAlarm(int alarmNo, u32 tick, u32 period, u32 id) {
+    Snd7Alarm *alarm = &snd7_work.alarm[alarmNo];
 
-    if (argument >= 0) {
-        amount = (u32)argument & 0xff;
-        return amount >= 32 ? 0 : (s32)((u32)value << amount);
+    if (alarm->enable) {
+        alarm->armed = FALSE;
+        alarm->enable = 0;
     }
-    amount = (0u - (u32)argument) & 0xff;
-    if (amount >= 32) {
-        return value < 0 ? -1 : 0;
-    }
-    return value >> amount;
+    alarm->tick = tick;
+    alarm->period = period;
+    alarm->id = (u8)id;
+    alarm->count = 0;
 }
 
-static void VariableCommand(const Snd7Player *player, Snd7Track *track, u32 command, u32 number, s32 argument) {
-    vs16 *variable = Variable(player, number);
-    s32 value = *variable;
+// SND_StartAlarm (0x03803298): at tick from now, then each period if it has one
+static void StartAlarm(int alarmNo) {
+    Snd7Alarm *alarm = &snd7_work.alarm[alarmNo];
 
-    switch (command) {
-    case 0xb0:
-        *variable = (s16)argument;
-        break;
-    case 0xb1:
-        *variable = (s16)(value + argument);
-        break;
-    case 0xb2:
-        *variable = (s16)(value - argument);
-        break;
-    case 0xb3:
-        *variable = (s16)(value * argument);
-        break;
-    case 0xb4:
-        if (argument != 0) {
-            *variable = (s16)(value / argument);
-        }
-        break;
-    case 0xb5:
-        *variable = (s16)ShiftVariable(value, argument);
-        break;
-    case 0xb6:
-        *variable = (s16)(argument / 2);
-        break;
-    case 0xb8:
-        track->compare = value == argument;
-        break;
-    case 0xb9:
-        track->compare = value >= argument;
-        break;
-    case 0xba:
-        track->compare = value > argument;
-        break;
-    case 0xbb:
-        track->compare = value <= argument;
-        break;
-    case 0xbc:
-        track->compare = value < argument;
-        break;
-    case 0xbd:
-        track->compare = value != argument;
-        break;
+    if (alarm->enable) {
+        alarm->armed = FALSE;
+        alarm->enable = 0;
+    }
+    alarm->handlerArg = (u32)alarmNo | (u32)alarm->id << 8;
+    alarm->armed = TRUE;
+    alarm->periodic = alarm->period != 0;
+    alarm->due = TickCycles(sSnd.now) + alarm->tick * SND7_OS_TICK_CYCLES;
+    alarm->enable = 1;
+}
+
+// SND_StopAlarm (0x0380334c): a new ID, so that the ARM9 ignores a word of the old one on its way
+static void StopAlarm(int alarmNo) {
+    Snd7Alarm *alarm = &snd7_work.alarm[alarmNo];
+
+    if (alarm->enable) {
+        alarm->armed = FALSE;
+        alarm->id++;
+        alarm->enable = 0;
     }
 }
 
-// Opens a track at offset; one whose start is outside the sequence's memory stays closed
-static void StartTrack(Snd7Player *player, u32 number, u32 offset) {
-    Snd7Track *track = &player->tracks[number];
-    const u8 *start = DataAt(player, offset);
+// The alarm's handler (0x0380338c): the alarm's number and ID to the ARM9, with the ones a full FIFO held back
+static void AlarmHandler(Snd7Alarm *alarm) {
+    u32 arg = alarm->handlerArg;
 
-    memset(track, 0, sizeof(*track));
-    if (start == NULL) {
+    if (((arg >> 8) & 0xff) != alarm->id) {
         return;
     }
-    track->active = TRUE;
-    track->pos = start;
-    track->noteWait = TRUE;
-    track->compare = TRUE;
-}
-
-// Runs the track's commands until one makes it wait. FALSE when it ended
-static BOOL RunTrack(Snd7Player *player, Snd7Track *track) {
-    int budget = SND7_TRACK_COMMAND_BUDGET;
-
-    while (track->wait == 0) {
-        u32 command;
-        u32 value;
-        s32 argument;
-        BOOL execute = TRUE;
-        int type = -1;
-
-        if (--budget == 0 || !Fetch(player, track, 1, &command)) {
-            return FALSE;
-        }
-        if (command == 0xa2) {
-            execute = track->compare;
-            if (!Fetch(player, track, 1, &command)) {
-                return FALSE;
-            }
-        }
-        if (command == 0xa0 || command == 0xa1) {
-            type = command == 0xa0 ? ARG_RANDOM : ARG_FROM_VARIABLE;
-            if (!Fetch(player, track, 1, &command)) {
-                return FALSE;
-            }
-        }
-        if (command < 0x80) {
-            // A note: its velocity, then its length, which it waits for in the note-wait mode
-            if (!Fetch(player, track, 1, &value) ||
-                !FetchArgument(player, track, type < 0 ? ARG_VARIABLE_LENGTH : type, &argument)) {
-                return FALSE;
-            }
-            if (execute && track->noteWait) {
-                track->wait = argument > 0 ? argument : 0;
-            }
-            continue;
-        }
-        switch (command & 0xf0) {
-        case 0x80:
-            // A wait, or a program change
-            if (!FetchArgument(player, track, type < 0 ? ARG_VARIABLE_LENGTH : type, &argument)) {
-                return FALSE;
-            }
-            if (execute && command == 0x80) {
-                track->wait = argument > 0 ? argument : 0;
-            }
-            break;
-        case 0x90:
-            if (command == 0x93) {
-                // Opens a track: its number, then where it starts
-                u32 offset;
-
-                if (!Fetch(player, track, 1, &value) || !Fetch(player, track, 3, &offset)) {
-                    return FALSE;
-                }
-                if (execute && value < SND_PLAYER_TRACK_MAX && &player->tracks[value] != track) {
-                    StartTrack(player, value, offset);
-                }
-            } else if (command == 0x94 || command == 0x95) {
-                // A jump or a call: where to, which must be inside the sequence's memory
-                const u8 *target;
-
-                if (!Fetch(player, track, 3, &value)) {
-                    return FALSE;
-                }
-                if (!execute) {
-                    break;
-                }
-                target = DataAt(player, value);
-                if (target == NULL) {
-                    return FALSE;
-                }
-                if (command == 0x95) {
-                    if (track->depth == SND7_TRACK_STACK_DEPTH) {
-                        break;
-                    }
-                    track->stack[track->depth] = track->pos;
-                    track->loops[track->depth] = 0;
-                    track->depth++;
-                }
-                track->pos = target;
-            } else {
-                return FALSE;
-            }
-            break;
-        case 0xb0:
-            if (!Fetch(player, track, 1, &value) ||
-                !FetchArgument(player, track, type < 0 ? ARG_S16 : type, &argument)) {
-                return FALSE;
-            }
-            if (execute) {
-                VariableCommand(player, track, command, value, argument);
-            }
-            break;
-        case 0xc0:
-        case 0xd0:
-            if (!FetchArgument(player, track, type < 0 ? ARG_U8 : type, &argument)) {
-                return FALSE;
-            }
-            if (!execute) {
-                break;
-            }
-            if (command == 0xc7) {
-                track->noteWait = argument != 0;
-            } else if (command == 0xd4 && track->depth < SND7_TRACK_STACK_DEPTH) {
-                // A loop's start, with its count (0 loops for good)
-                track->stack[track->depth] = track->pos;
-                track->loops[track->depth] = (u8)argument;
-                track->depth++;
-            }
-            break;
-        case 0xe0:
-            if (!FetchArgument(player, track, type < 0 ? ARG_S16 : type, &argument)) {
-                return FALSE;
-            }
-            if (execute && command == 0xe1) {
-                player->tempo = argument > 0 ? (u32)argument : 0;
-            }
-            break;
-        case 0xf0:
-            if (command == 0xfc) {
-                // A loop's end: back to its start until its count runs out
-                if (execute && track->depth != 0) {
-                    u8 count = track->loops[track->depth - 1];
-
-                    if (count != 0 && --count == 0) {
-                        track->depth--;
-                        break;
-                    }
-                    track->loops[track->depth - 1] = count;
-                    track->pos = track->stack[track->depth - 1];
-                }
-            } else if (command == 0xfd) {
-                if (execute && track->depth != 0) {
-                    track->depth--;
-                    track->pos = track->stack[track->depth];
-                }
-            } else if (command == 0xfe) {
-                if (!Fetch(player, track, 2, &value)) {
-                    return FALSE;
-                }
-            } else if (command == 0xff) {
-                if (execute) {
-                    return FALSE;
-                }
-            } else {
-                return FALSE;
-            }
-            break;
-        default:
-            return FALSE;
-        }
+    if (alarm->count < 0xff) {
+        alarm->count++;
     }
-    return TRUE;
-}
-
-// A tick of the track: its wait runs down, then it runs on. FALSE when it ended
-static BOOL TickTrack(Snd7Player *player, Snd7Track *track) {
-    if (track->wait > 0) {
-        track->wait--;
-        if (track->wait > 0) {
-            return TRUE;
-        }
-    }
-    return RunTrack(player, track);
-}
-
-static void UpdatePlayer(Snd7Player *player) {
-    int i;
-
-    if (!player->active || !player->started || player->paused) {
-        return;
-    }
-    if (player->base == NULL) {
-        if (player->updatesLeft == 0 || --player->updatesLeft == 0) {
-            EndPlayer(player);
-        }
-        return;
-    }
-    while (player->tempoCounter >= SND7_TICK_THRESHOLD) {
-        BOOL playing = FALSE;
-
-        player->tempoCounter -= SND7_TICK_THRESHOLD;
-        for (i = 0; i < SND_PLAYER_TRACK_MAX; i++) {
-            Snd7Track *track = &player->tracks[i];
-
-            if (track->active && !TickTrack(player, track)) {
-                track->active = FALSE;
-            }
-            playing |= track->active;
-        }
-        player->ticks++;
-        if (sSnd.work != NULL) {
-            sSnd.work->player[player->number].tickCounter = player->ticks;
-        }
-        if (!playing) {
-            EndPlayer(player);
+    while (alarm->count != 0) {
+        if (port_pxi_pending() >= FIFO_DEPTH) {
             return;
         }
+        port_pxi_reply(PXI_FIFO_TAG_SOUND, arg, FALSE);
+        alarm->count--;
     }
-    player->tempoCounter += player->tempo * player->tempoRatio / SND7_TEMPO_RATIO_ONE;
 }
 
-// The commands
-
-static void PrepareSequence(u32 number, u32 base32, u32 offset) {
-    Snd7Player *player = &sSnd.players[number];
-    const u8 *end = NULL;
-    const u8 *base = port_pxi_noted_pointer(PXI_FIFO_TAG_SOUND, base32, &end);
-
-    memset(player, 0, sizeof(*player));
-    player->active = TRUE;
-    player->number = number;
-    player->base32 = base32;
-    player->tempo = SND7_DEFAULT_TEMPO;
-    player->tempoRatio = SND7_TEMPO_RATIO_ONE;
-    player->tempoCounter = SND7_TICK_THRESHOLD;
-    // A new sequence starts with its tick count at 0 and its own variables unset
-    if (sSnd.work != NULL) {
-        int i;
-
-        sSnd.work->player[number].tickCounter = 0;
-        for (i = 0; i < SND_PLAYER_VARIABLE_MAX; i++) {
-            sSnd.work->player[number].variable[i] = SND_VARIABLE_UNSET;
-        }
-    }
-    if (base == NULL || offset >= (u64)(end - base)) {
-        if (!sSnd.reportedSequence) {
-            fprintf(stderr,
-                    "port: sound: a sequence's data at %#x can't be found in host memory; it plays for a "
-                    "second\n",
-                    base32);
-            sSnd.reportedSequence = TRUE;
-        }
-        player->updatesLeft = SND7_UNKNOWN_SEQUENCE_UPDATES;
+static void FireAlarm(Snd7Alarm *alarm) {
+    if (alarm->periodic) {
+        alarm->due += alarm->period * SND7_OS_TICK_CYCLES;
     } else {
-        player->base = base;
-        player->end = end;
-        // A sequence of several tracks starts with the ones it allocates (0xfe, a mask), which it opens itself
-        StartTrack(player, 0, offset);
-        if (base[offset] == 0xfe) {
-            u32 allocated;
-
-            Fetch(player, &player->tracks[0], 3, &allocated);
-        }
+        alarm->armed = FALSE;
     }
-    WriteStatus();
+    AlarmHandler(alarm);
 }
 
-// SND_ReadDriverInfo's state: no player has a track
-static void ReadDriverInfo(u32 address) {
-    const u8 *end = NULL;
-    SNDDriverInfo *info = port_pxi_noted_pointer(PXI_FIFO_TAG_SOUND, address, &end);
+// The interval timer (SND_StartIntervalTimer 0x03800610 and SND_StopIntervalTimer 0x03800658)
+void snd7_start_interval_timer(void) {
+    sSnd.timerRunning = TRUE;
+    sSnd.nextUpdate = TickCycles(sSnd.now) + (u64)SND7_FIRST_UPDATE_TICKS * SND7_OS_TICK_CYCLES;
+}
+
+void snd7_stop_interval_timer(void) {
+    sSnd.timerRunning = FALSE;
+}
+
+// The thread
+
+// SND_UpdateSharedWork (0x03803180)
+static void UpdateSharedWork(void) {
+    u32 channelStatus = 0;
+    u32 captureStatus = 0;
     int i;
 
-    if (info == NULL || (u64)(end - (const u8 *)info) < sizeof(*info)) {
-        if (!sSnd.reportedInfo) {
-            fprintf(stderr, "port: sound: the buffer of SND_ReadDriverInfo at %#x can't be found in host memory\n",
-                    address);
-            sSnd.reportedInfo = TRUE;
-        }
+    if (snd7_shared == NULL) {
         return;
     }
-    memset(info, 0, sizeof(*info));
-    for (i = 0; i < SND_PLAYER_MAX; i++) {
-        memset(info->player[i].trackIndex, SND_TRACK_INDEX_NONE, sizeof(info->player[i].trackIndex));
+    for (i = 0; i < SND7_CHANNEL_NUM; i++) {
+        if (snd7_is_channel_active(i)) {
+            channelStatus |= 1u << i;
+        }
     }
+    if (snd7_is_capture_active(0)) {
+        captureStatus |= 1;
+    }
+    if (snd7_is_capture_active(1)) {
+        captureStatus |= 2;
+    }
+    snd7_shared->channelStatus = (u16)channelStatus;
+    snd7_shared->captureStatus = (u16)captureStatus;
 }
 
-// SND_InvalidateSeqData: the players whose sequence starts in the range stop, as the data goes. The range's start is
-// the host pointer that snd_interface_host.c noted, and the players' bases are compared with it as host pointers; a
-// player whose data wasn't found, or a start that wasn't noted, is compared by the low 32 bits, across a range that may
-// wrap around at 4 GiB as a host's can
-static void InvalidateSequences(u32 start32, u32 end32) {
-    const u8 *start = port_pxi_noted_pointer(PXI_FIFO_TAG_SOUND, start32, NULL);
-    u32 size = end32 - start32;
-    int i;
+// One pass of SndThread's loop. Its SND_CommandProc has nothing to do: the packets ran when they came, and count as the
+// DS's would from here
+static void RunThread(BOOL doPeriodicProc) {
+    if (snd7_shared != NULL) {
+        sSnd.runTag = snd7_shared->finishedCommandTag;
+    }
+    snd7_update_exchannel();
+    snd7_seq_main(doPeriodicProc);
+    snd7_exchannel_main(doPeriodicProc);
+    UpdateSharedWork();
+    (void)snd7_calc_random();
+}
 
-    for (i = 0; i < SND_PLAYER_MAX; i++) {
-        Snd7Player *player = &sSnd.players[i];
-        BOOL inRange;
+static void FlushOutput(void) {
+    if (sSnd.buffered != 0 && sSnd.output != NULL) {
+        sSnd.output(sSnd.buffer, sSnd.buffered, sSnd.outputUser);
+    }
+    sSnd.buffered = 0;
+}
 
-        if (!player->active) {
-            continue;
+// The mixer's next sample, kept for the output
+static void Mix(void) {
+    if (sSnd.buffered == sSnd.bufferFrames) {
+        u32 frames = sSnd.bufferFrames != 0 ? sSnd.bufferFrames * 2 : OUTPUT_FRAMES_INITIAL;
+        s16 *buffer = realloc(sSnd.buffer, (size_t)frames * 2 * sizeof(*buffer));
+
+        if (buffer == NULL) {
+            fprintf(stderr, "port: sound: no memory for the output's samples\n");
+            abort();
         }
-        if (start != NULL && player->base != NULL) {
-            inRange = (uintptr_t)player->base - (uintptr_t)start < size;
+        sSnd.buffer = buffer;
+        sSnd.bufferFrames = frames;
+    }
+    snd7_hw_mix(&sSnd.buffer[sSnd.buffered * 2]);
+    sSnd.buffered++;
+    sSnd.samples++;
+}
+
+// The driver and the sound unit up to the virtual clock's cycle: the mixer's samples, the periodic runs and the
+// alarms, in the order they fall (at the same cycle: the sample, the run, then the alarms by number)
+static void Advance(u64 cycles) {
+    if (!sSnd.booted || cycles <= sSnd.now) {
+        return;
+    }
+    for (;;) {
+        u64 next = sSnd.nextSample;
+        int event = -2;
+        int i;
+
+        if (sSnd.timerRunning && sSnd.nextUpdate < next) {
+            next = sSnd.nextUpdate;
+            event = -1;
+        }
+        for (i = 0; i < SND7_ALARM_NUM; i++) {
+            if (snd7_work.alarm[i].armed && snd7_work.alarm[i].due < next) {
+                next = snd7_work.alarm[i].due;
+                event = i;
+            }
+        }
+        if (next > cycles) {
+            break;
+        }
+        // An alarm started for no ticks is due at the tick it started in, which may be before now
+        if (next > sSnd.now) {
+            sSnd.now = next;
+        }
+        if (event == -2) {
+            Mix();
+            sSnd.nextSample += SND7_CYCLES_PER_SAMPLE;
+        } else if (event == -1) {
+            sSnd.nextUpdate += (u64)SND7_UPDATE_TICKS * SND7_OS_TICK_CYCLES;
+            RunThread(TRUE);
         } else {
-            inRange = player->base32 - start32 < size;
+            FireAlarm(&snd7_work.alarm[event]);
         }
-        if (inRange) {
-            EndPlayer(player);
+    }
+    sSnd.now = cycles;
+}
+
+// The commands (SND_CommandProc, 0x03803450)
+
+// SND_ReadDriverInfo: the driver's state in the decomp's SNDDriverInfo. The DS copies its work as it is; the host
+// fills the fields that the ARM9 reads (SND_ReadTrackInfo): the players' tracks, the tracks' parameters with their
+// first 0x24 bytes as the DS has them, and the channels with their links as ARM7 addresses, which SND_ReadTrackInfo
+// turns into offsets in the state from arm7Address. The decomp's state has room for 20 tracks of the driver's 32 (a
+// guess at its layout): the tracks go into it in the order of the players and their tracks, and those past 20 read as
+// none
+static const SNDDriverChannel *ChannelLink(const SNDDriverInfo *info, const Snd7ExChannel *channel) {
+    if (channel == NULL) {
+        return NULL;
+    }
+    return (const SNDDriverChannel *)(uintptr_t)(info->arm7Address +
+                                                 (u32)((uintptr_t)&info->channel[channel->myNo] - (uintptr_t)info));
+}
+
+void snd7_read_driver_info(SNDDriverInfo *info) {
+    u8 slot[SND7_TRACK_NUM];
+    u32 tracks = 0;
+    u32 locked = snd7_get_locked_channel(0);
+    int i;
+    int j;
+
+    memset(info, 0, sizeof(*info));
+    memset(slot, SND_TRACK_INDEX_NONE, sizeof(slot));
+    info->arm7Address = WORK_ADDRESS;
+    for (i = 0; i < SND7_CHANNEL_NUM; i++) {
+        info->channel[i].myNo = (u8)i;
+        info->channel[i].next = ChannelLink(info, snd7_work.channel[i].nextLink);
+    }
+    for (i = 0; i < SND7_PLAYER_NUM; i++) {
+        const Snd7Player *player = &snd7_work.player[i];
+
+        memcpy(info->player[i].unk_00, player, sizeof(info->player[i].unk_00));
+        memcpy(info->player[i].unk_18, &player->tempo, 8);
+        for (j = 0; j < SND7_PLAYER_TRACK_NUM; j++) {
+            u8 trackNo = player->tracks[j];
+
+            info->player[i].trackIndex[j] = SND_TRACK_INDEX_NONE;
+            if (trackNo >= SND7_TRACK_NUM) {
+                continue;
+            }
+            if (slot[trackNo] == SND_TRACK_INDEX_NONE && tracks < NELEMS(info->track)) {
+                const Snd7Track *track = &snd7_work.track[trackNo];
+                SNDDriverTrack *infoTrack = &info->track[tracks];
+
+                memcpy(infoTrack, track, SND7_TRACK_PARAM_SIZE);
+                infoTrack->channel = ChannelLink(info, track->channelList);
+                slot[trackNo] = (u8)tracks++;
+            }
+            info->player[i].trackIndex[j] = slot[trackNo];
+        }
+    }
+    memcpy(info->unk_11c4, &locked, sizeof(locked));
+}
+
+static void ForChannels(u32 mask, void (*apply)(int chNo, u32 a, u32 b), u32 a, u32 b) {
+    int i;
+
+    for (i = 0; i < SND7_CHANNEL_NUM && mask != 0; i++, mask >>= 1) {
+        if (mask & 1) {
+            apply(i, a, b);
         }
     }
 }
 
-static void StartAlarms(u32 mask) {
-    u64 now = port_os_cycles();
+static void ApplyTimer(int chNo, u32 timer, u32 unused) {
+    snd7_set_channel_timer(chNo, (int)timer);
+}
+
+static void ApplyVolume(int chNo, u32 volume, u32 shift) {
+    snd7_set_channel_volume(chNo, (int)volume, (int)shift);
+}
+
+static void ApplyPan(int chNo, u32 pan, u32 unused) {
+    snd7_set_channel_pan(chNo, (int)pan);
+}
+
+static void ApplyStart(int chNo, u32 unused, u32 unused2) {
+    snd7_start_channel(chNo);
+}
+
+static void ApplyStop(int chNo, u32 flags, u32 unused) {
+    snd7_stop_channel(chNo, (s32)flags);
+}
+
+// SND_StartTimer and SND_StopTimer: the channels, capture units and alarms of the masks start or stop together
+static void StartTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask) {
     int i;
 
-    for (i = 0; i < SND_ALARM_MAX; i++) {
-        if (mask & (1u << i)) {
-            Snd7Alarm *alarm = &sSnd.alarms[i];
-
-            alarm->running = TRUE;
-            alarm->due = now + (u64)(alarm->tick != 0 ? alarm->tick : 1) * SND7_ALARM_TICK_CYCLES;
+    ForChannels(chBitMask, ApplyStart, 0, 0);
+    snd7_start_capture(capBitMask);
+    for (i = 0; i < SND7_ALARM_NUM && alarmBitMask != 0; i++, alarmBitMask >>= 1) {
+        if (alarmBitMask & 1) {
+            StartAlarm(i);
         }
+    }
+    UpdateSharedWork();
+}
+
+static void StopTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags) {
+    int i;
+
+    for (i = 0; i < SND7_ALARM_NUM && alarmBitMask != 0; i++, alarmBitMask >>= 1) {
+        if (alarmBitMask & 1) {
+            StopAlarm(i);
+        }
+    }
+    ForChannels(chBitMask, ApplyStop, flags, 0);
+    snd7_stop_capture(capBitMask);
+    UpdateSharedWork();
+}
+
+// A sequence and its bank: the sequence's memory, and the bank's (its file, when the ARM9 noted its size)
+static void StartSequence(const SNDCommand *command, BOOL start) {
+    const u8 *seqEnd;
+    const u8 *bankEnd;
+    const u8 *seqBase = CommandPointer(command->arg[1], &seqEnd);
+    const u8 *bank = CommandPointer(command->arg[3], &bankEnd);
+    int playerNo = (int)command->arg[0];
+
+    if (start) {
+        snd7_start_seq(playerNo, seqBase, seqEnd, command->arg[2], bank, bankEnd);
+    } else {
+        snd7_prepare_seq(playerNo, seqBase, seqEnd, command->arg[2], bank, bankEnd);
     }
 }
 
-static void StopAlarms(u32 mask) {
-    int i;
+// A range the ARM9 invalidates, from its noted start
+static void Invalidate(const SNDCommand *command) {
+    const u8 *end;
+    const u8 *start = port_pxi_noted_pointer(PXI_FIFO_TAG_SOUND, command->arg[0], &end);
+    u32 size = command->arg[1] - command->arg[0];
 
-    for (i = 0; i < SND_ALARM_MAX; i++) {
-        if (mask & (1u << i)) {
-            sSnd.alarms[i].running = FALSE;
-        }
+    if (start != NULL) {
+        end = (const u8 *)((uintptr_t)start + size);
     }
+    switch (command->id) {
+    case SND_COMMAND_INVALIDATE_SEQ:
+        snd7_invalidate_seq(start, end, command->arg[0], command->arg[1]);
+        break;
+    case SND_COMMAND_INVALIDATE_BANK:
+        snd7_invalidate_bank(start, end, command->arg[0], command->arg[1]);
+        break;
+    default:
+        if (start != NULL) {
+            snd7_invalidate_wave(start, end);
+        }
+        break;
+    }
+}
+
+static BOOL ValidPlayer(u32 playerNo) {
+    return playerNo < SND7_PLAYER_NUM;
 }
 
 static void Execute(const SNDCommand *command) {
-    u32 number = command->arg[0];
+    u32 arg0 = command->arg[0];
+    u32 arg1 = command->arg[1];
+    u32 arg2 = command->arg[2];
+    u32 arg3 = command->arg[3];
 
     switch (command->id) {
-    case SND_COMMAND_SHARED_WORK:
-        if (SNDi_SharedWork != NULL && (u32)(uintptr_t)SNDi_SharedWork == command->arg[0]) {
-            sSnd.work = SNDi_SharedWork;
-            WriteStatus();
-        }
-        break;
+    case COMMAND_START_SEQ:
     case SND_COMMAND_PREPARE_SEQ:
-        if (number < SND_PLAYER_MAX) {
-            PrepareSequence(number, command->arg[1], command->arg[2]);
-        }
-        break;
-    case SND_COMMAND_START_PREPARED_SEQ:
-        if (number < SND_PLAYER_MAX && sSnd.players[number].active) {
-            sSnd.players[number].started = TRUE;
+        if (ValidPlayer(arg0)) {
+            StartSequence(command, command->id == COMMAND_START_SEQ);
         }
         break;
     case SND_COMMAND_STOP_SEQ:
-        if (number < SND_PLAYER_MAX) {
-            EndPlayer(&sSnd.players[number]);
+        if (ValidPlayer(arg0)) {
+            snd7_stop_seq((int)arg0);
+        }
+        break;
+    case SND_COMMAND_START_PREPARED_SEQ:
+        if (ValidPlayer(arg0)) {
+            snd7_start_prepared_seq((int)arg0);
         }
         break;
     case SND_COMMAND_PAUSE_SEQ:
-        if (number < SND_PLAYER_MAX) {
-            sSnd.players[number].paused = command->arg[1] != 0;
+        if (ValidPlayer(arg0)) {
+            snd7_pause_seq((int)arg0, (BOOL)arg1);
+        }
+        break;
+    case COMMAND_SKIP_SEQ:
+        if (ValidPlayer(arg0)) {
+            snd7_skip_seq((int)arg0, arg1);
         }
         break;
     case SND_COMMAND_PLAYER_PARAM:
-        if (number < SND_PLAYER_MAX && command->arg[1] == SND7_PLAYER_PARAM_TEMPO_RATIO) {
-            sSnd.players[number].tempoRatio = command->arg[2] & 0xffff;
+        if (ValidPlayer(arg0)) {
+            snd7_set_player_param((int)arg0, arg1, arg2, (int)arg3);
         }
         break;
-    case SND_COMMAND_INVALIDATE_SEQ:
-        InvalidateSequences(command->arg[0], command->arg[1]);
+    case SND_COMMAND_TRACK_PARAM:
+        if (ValidPlayer(arg0 & 0xffffff)) {
+            snd7_set_track_param((int)(arg0 & 0xffffff), arg1, arg2, arg3, (int)(arg0 >> 24));
+        }
         break;
-    case SND_COMMAND_SETUP_ALARM:
-        if (number < SND_ALARM_MAX) {
-            Snd7Alarm *alarm = &sSnd.alarms[number];
-
-            alarm->running = FALSE;
-            alarm->tick = command->arg[1];
-            alarm->period = command->arg[2];
-            alarm->id = (u8)command->arg[3];
+    case SND_COMMAND_MUTE_TRACK:
+        if (ValidPlayer(arg0)) {
+            snd7_set_track_mute((int)arg0, arg1, (int)arg2);
+        }
+        break;
+    case SND_COMMAND_ALLOCATABLE_CHANNEL:
+        if (ValidPlayer(arg0)) {
+            snd7_set_track_allocatable_channel((int)arg0, arg1, arg2);
+        }
+        break;
+    case COMMAND_PLAYER_LOCAL_VAR:
+        if (snd7_shared != NULL && ValidPlayer(arg0) && arg1 < SND_PLAYER_VARIABLE_MAX) {
+            snd7_shared->player[arg0].variable[arg1] = (s16)arg2;
+        }
+        break;
+    case COMMAND_PLAYER_GLOBAL_VAR:
+        if (snd7_shared != NULL && arg0 < SND_PLAYER_VARIABLE_MAX) {
+            snd7_shared->globalVariable[arg0] = (s16)arg1;
         }
         break;
     case SND_COMMAND_START_TIMER:
-        StartAlarms(command->arg[2]);
+        StartTimer(arg0, arg1, arg2);
         break;
     case SND_COMMAND_STOP_TIMER:
-        StopAlarms(command->arg[2]);
+        StopTimer(arg0, arg1, arg2, arg3);
         break;
-    case SND_COMMAND_READ_DRIVER_INFO:
-        ReadDriverInfo(command->arg[0]);
+    case SND_COMMAND_SETUP_CHANNEL_PCM: {
+        // The channel and timer; the address; the loop's length, the volume and shift; the loop's start, the pan, the
+        // format and the loop mode. The DS keeps 27 bits of the address; the host looks its 32 up
+        const u8 *end;
+        const u8 *data = CommandPointer(arg1, &end);
+
+        if ((arg0 & 0xffff) < SND7_CHANNEL_NUM) {
+            snd7_setup_channel_pcm((int)(arg0 & 0xffff), data, end, (int)((arg3 >> 24) & 3), (int)((arg3 >> 26) & 3),
+                                   (int)(arg3 & 0xffff), (int)(arg2 & 0x3fffff), (int)((arg2 >> 24) & 0x7f),
+                                   (int)((arg2 >> 22) & 3), (int)(arg0 >> 16), (int)((arg3 >> 16) & 0x7f));
+        }
         break;
+    }
+    case COMMAND_SETUP_CHANNEL_PSG:
+        if (arg0 < SND7_CHANNEL_NUM) {
+            snd7_setup_channel_psg((int)arg0, (int)arg3, (int)(arg1 & 0x7f), (int)((arg1 >> 8) & 3),
+                                   (int)((arg2 >> 8) & 0xffff), (int)(arg2 & 0x7f));
+        }
+        break;
+    case COMMAND_SETUP_CHANNEL_NOISE:
+        if (arg0 < SND7_CHANNEL_NUM) {
+            snd7_setup_channel_noise((int)arg0, (int)(arg1 & 0x7f), (int)((arg1 >> 8) & 3), (int)((arg2 >> 8) & 0xffff),
+                                     (int)(arg2 & 0x7f));
+        }
+        break;
+    case COMMAND_SETUP_CAPTURE:
+        snd7_setup_capture((int)((arg2 >> 31) & 1), (int)((arg2 >> 30) & 1), arg0, (int)arg1, (arg2 >> 29) & 1,
+                           (int)((arg2 >> 28) & 1), (int)((arg2 >> 27) & 1));
+        break;
+    case SND_COMMAND_SETUP_ALARM:
+        if (arg0 < SND7_ALARM_NUM) {
+            SetupAlarm((int)arg0, arg1, arg2, arg3);
+        }
+        break;
+    case SND_COMMAND_CHANNEL_TIMER:
+        ForChannels(arg0, ApplyTimer, arg1, 0);
+        break;
+    case SND_COMMAND_CHANNEL_VOLUME:
+        ForChannels(arg0, ApplyVolume, arg1, arg2);
+        break;
+    case SND_COMMAND_CHANNEL_PAN:
+        ForChannels(arg0, ApplyPan, arg1, 0);
+        break;
+    case COMMAND_SURROUND_DECAY:
+        snd7_set_surround_decay((int)arg0);
+        break;
+    case SND_COMMAND_MASTER_VOLUME:
+        snd7_set_master_volume((int)arg0);
+        break;
+    case SND_COMMAND_MASTER_PAN:
+        snd7_set_master_pan((int)arg0);
+        break;
+    case SND_COMMAND_OUTPUT_SELECTOR:
+        snd7_set_output_selector((int)arg0, (int)arg1, (int)arg2, (int)arg3);
+        break;
+    case SND_COMMAND_LOCK_CHANNEL:
+        snd7_lock_channel(arg0, arg1);
+        break;
+    case SND_COMMAND_UNLOCK_CHANNEL:
+        snd7_unlock_channel(arg0, arg1);
+        break;
+    case COMMAND_STOP_UNLOCKED_CHANNEL:
+        snd7_stop_unlocked_channel(arg0, arg1);
+        break;
+    case SND_COMMAND_SHARED_WORK:
+        if (arg0 == 0) {
+            snd7_shared = NULL;
+        } else if (SNDi_SharedWork != NULL && (u32)(uintptr_t)SNDi_SharedWork == arg0) {
+            snd7_shared = SNDi_SharedWork;
+        } else {
+            const u8 *end;
+
+            snd7_shared = (SNDSharedWork *)port_pxi_pointer(arg0, &end);
+        }
+        break;
+    case SND_COMMAND_INVALIDATE_SEQ:
+    case SND_COMMAND_INVALIDATE_BANK:
+    case SND_COMMAND_INVALIDATE_WAVE:
+        Invalidate(command);
+        break;
+    case SND_COMMAND_READ_DRIVER_INFO: {
+        const u8 *end;
+        SNDDriverInfo *info = (SNDDriverInfo *)CommandPointer(arg0, &end);
+
+        if (info != NULL && (end == NULL || (u64)((uintptr_t)end - (uintptr_t)info) >= sizeof(*info))) {
+            snd7_read_driver_info(info);
+        }
+        break;
+    }
     default:
-        // The tracks' and channels' settings, the master volume and pan, the banks and waves: nothing plays
         break;
     }
 }
 
-// A word of the ARM9: 0 asks the driver to look at its packets, which it has done already; any other is a packet
+// A word of the ARM9: 0 wakes the thread for a run that isn't periodic; any other is a packet, whose commands run now
 static void SoundService(u32 tag, u32 data, BOOL err) {
     const SNDCommand *command = SNDi_Queue.readyHead;
 
-    if (err || data == 0) {
+    if (err) {
+        return;
+    }
+    Advance(port_os_cycles());
+    if (data == 0) {
+        RunThread(FALSE);
         return;
     }
     if (command == NULL || ((u32)(uintptr_t)command & PORT_PXI_DATA_MASK) != data) {
@@ -696,45 +701,76 @@ static void SoundService(u32 tag, u32 data, BOOL err) {
     for (; command != NULL; command = command->next) {
         Execute(command);
     }
-    if (sSnd.work != NULL) {
-        sSnd.work->finishedCommandTag++;
+    if (snd7_shared != NULL) {
+        snd7_shared->finishedCommandTag++;
     }
 }
 
-void port_snd7_start(void) {
+// Whether the DS's driver would still hold the ARM9's packet with the tag (SND_IsFinishedCommandTag's numbering, the
+// shared work's count of finished packets), unrun, at the virtual clock's cycle: the host has run it, but the driver
+// hasn't made a run since it came
+BOOL snd7_holds_packet(u32 tag) {
+    if (!sSnd.booted || snd7_shared == NULL) {
+        return FALSE;
+    }
+    Advance(port_os_cycles());
+    return (s32)(tag - sSnd.runTag) > 0 && (s32)(snd7_shared->finishedCommandTag - tag) >= 0;
+}
+
+// The driver's start at the cycle: SND_Init's (SND_CommandInit's shared work) and SndThread's (the channels, players,
+// alarms, the output on at full master volume, and the interval timer)
+static void Boot(u64 cycles) {
+    PortSnd7Output output = sSnd.output;
+    void *outputUser = sSnd.outputUser;
+    s16 *buffer = sSnd.buffer;
+    u32 bufferFrames = sSnd.bufferFrames;
+
     memset(&sSnd, 0, sizeof(sSnd));
-    sSnd.lastUpdate = port_os_cycles();
+    memset(&snd7_work, 0, sizeof(snd7_work));
+    sSnd.output = output;
+    sSnd.outputUser = outputUser;
+    sSnd.buffer = buffer;
+    sSnd.bufferFrames = bufferFrames;
+    snd7_shared = NULL;
+    snd7_set_random(0x12345678);
+    snd7_hw_reset();
+    sSnd.booted = TRUE;
+    sSnd.now = cycles;
+    sSnd.nextSample = cycles;
+    snd7_exchannel_init();
+    snd7_seq_init();
+    AlarmInit();
+    snd7_enable();
+    snd7_set_output_selector(0, 0, 0, 0);
+    snd7_set_master_volume(127);
+    snd7_start_interval_timer();
+}
+
+void port_snd7_start(void) {
+    Boot(port_os_cycles());
     port_pxi_register_service(PXI_FIFO_TAG_SOUND, SoundService);
 }
 
 void port_snd7_frame(u64 cycles) {
-    int i;
+    Advance(cycles);
+    FlushOutput();
+}
 
-    if (cycles < sSnd.lastUpdate) {
-        sSnd.lastUpdate = cycles;
-    }
-    while (cycles - sSnd.lastUpdate >= SND7_UPDATE_CYCLES) {
-        sSnd.lastUpdate += SND7_UPDATE_CYCLES;
-        for (i = 0; i < SND_PLAYER_MAX; i++) {
-            UpdatePlayer(&sSnd.players[i]);
-        }
-    }
-    for (i = 0; i < SND_ALARM_MAX; i++) {
-        Snd7Alarm *alarm = &sSnd.alarms[i];
-        int fires = 0;
+void port_snd7_boot_at(uint64_t cycles) {
+    Boot(cycles);
+}
 
-        while (alarm->running && alarm->due <= cycles && fires < SND7_ALARM_FIRES_MAX) {
-            port_pxi_reply(PXI_FIFO_TAG_SOUND, (u32)i | ((u32)alarm->id << 8), FALSE);
-            fires++;
-            if (alarm->period == 0) {
-                alarm->running = FALSE;
-            } else {
-                alarm->due += (u64)alarm->period * SND7_ALARM_TICK_CYCLES;
-            }
-        }
-        if (alarm->running && alarm->due <= cycles) {
-            // The rest of a period too short for a frame's words
-            alarm->due = cycles + (u64)alarm->period * SND7_ALARM_TICK_CYCLES;
-        }
-    }
+void port_snd7_advance(uint64_t cycles) {
+    Advance(cycles);
+    FlushOutput();
+}
+
+void port_snd7_set_output(PortSnd7Output output, void *user) {
+    FlushOutput();
+    sSnd.output = output;
+    sSnd.outputUser = user;
+}
+
+uint64_t port_snd7_samples(void) {
+    return sSnd.samples;
 }

@@ -786,7 +786,9 @@ static void TestSndInit(void) {
 }
 
 // Sequences in static memory, as the game's sound heap is: a wait of 96 ticks (a second at 120) and the end; a loop
-// of waits; and three tracks that the first opens, the longest of which waits 144 ticks
+// of waits; and three tracks that the first opens, the longest of which waits 144 ticks. The driver's first periodic
+// update comes 0x10000 ticks of 64 cycles (7.5 frames) after it starts, and a player's tick counter doesn't count the
+// tick it ends on
 static u8 sSeqEnds[] = { 0xe1, 120, 0, 0x80, 96, 0xff };
 static u8 sSeqLoops[] = { 0x80, 10, 0x94, 0, 0, 0 };
 static u8 sSeqTracks[] = {
@@ -856,8 +858,8 @@ static void TestSndSequenceEnds(void) {
         WaitFrames(1);
     }
     Log("ended after %u frames, %u ticks", port_os_frame() - start, SND_GetPlayerTickCounter(3));
-    CHECK(port_os_frame() - start >= 60 && port_os_frame() - start <= 62);
-    CHECK(SND_GetPlayerTickCounter(3) == 97);
+    CHECK(port_os_frame() - start >= 67 && port_os_frame() - start <= 69);
+    CHECK(SND_GetPlayerTickCounter(3) == 96);
 }
 
 static void TestSndSequenceLoops(void) {
@@ -893,8 +895,8 @@ static void TestSndSequenceTracks(void) {
     }
     // Track 2's three waits of 48 ticks: 1.5 s
     Log("ended after %u frames, %u ticks", port_os_frame() - start, SND_GetPlayerTickCounter(1));
-    CHECK(SND_GetPlayerTickCounter(1) == 145);
-    CHECK(port_os_frame() - start >= 90 && port_os_frame() - start <= 92);
+    CHECK(SND_GetPlayerTickCounter(1) == 144);
+    CHECK(port_os_frame() - start >= 97 && port_os_frame() - start <= 99);
 }
 
 static void TestSndSequenceVariables(void) {
@@ -906,13 +908,13 @@ static void TestSndSequenceVariables(void) {
     StartSequence(2, sSeqVariables, 0);
     start = port_os_frame();
     CHECK(SNDi_SharedWork->player[2].variable[0] == SND_VARIABLE_UNSET);
-    WaitFrames(1);
+    WaitFrames(8);
     CHECK(SNDi_SharedWork->player[2].variable[0] == 3);
     while (SND_GetPlayerStatus() != 0 && port_os_frame() - start < 120) {
         WaitFrames(1);
     }
     Log("ended after %u frames, %u ticks", port_os_frame() - start, SND_GetPlayerTickCounter(2));
-    CHECK(SND_GetPlayerTickCounter(2) == 73);
+    CHECK(SND_GetPlayerTickCounter(2) == 72);
     CHECK(SNDi_SharedWork->player[2].variable[0] == 0);
 }
 
@@ -952,29 +954,42 @@ static void TestSndSequenceOutside(void) {
     }
     Log("ended after %u frames, %u ticks", port_os_frame() - start, SND_GetPlayerTickCounter(5));
     CHECK(SND_GetPlayerStatus() == 0);
-    CHECK(SND_GetPlayerTickCounter(5) == 11);
+    CHECK(SND_GetPlayerTickCounter(5) == 10);
 }
 
-// SND_InvalidateSeqData stops the players whose sequence starts in the range, and no other
-static void TestSndInvalidate(void) {
+static void InvalidateSeq(const void *start, const void *end, u32 flushFlags) {
     u32 tag;
 
+    SND_InvalidateSeqData(start, end);
+    tag = SND_GetCurrentCommandTag();
+    SND_FlushCommand(flushFlags);
+    SND_WaitForCommandProc(tag);
+}
+
+// SND_InvalidateSeqData stops the players with a track reading in the range, and no other. The DS's driver compares a
+// track's position with both ends of the range inclusively (SND_InvalidateSeq's cmp and cmpls), so the byte at the end
+// counts too: a range given as its data's end, one past the last byte, also stops a track that reads the next object's
+// first byte. Here sSeqLoops follows sSeqEnds in an optimized build, so all of sSeqEnds, end included, stops player 0
+// as it would on the DS; the test's ranges don't depend on where the compiler puts the arrays. Two frames in, each
+// track still reads its sequence's first byte (the driver's first periodic update comes at 7.5). The driver's
+// playerStatus follows at its next run: the wake-up that SND_WaitForCommandProc sends while the driver holds the
+// packet, as the DS's does, or SND_COMMAND_IMMEDIATE's
+static void TestSndInvalidate(void) {
     Boot();
     SND_Init();
     StartSequence(0, sSeqLoops, 0);
     StartSequence(1, sSeqVariables, 0);
     WaitFrames(2);
     CHECK(SND_GetPlayerStatus() == 3);
-    SND_InvalidateSeqData(sSeqEnds, sSeqEnds + sizeof(sSeqEnds));
-    tag = SND_GetCurrentCommandTag();
-    SND_FlushCommand(SND_COMMAND_BLOCK);
-    SND_WaitForCommandProc(tag);
+    // sSeqEnds up to its last byte: no track reads there
+    InvalidateSeq(sSeqEnds, sSeqEnds + sizeof(sSeqEnds) - 1, SND_COMMAND_BLOCK);
     CHECK(SND_GetPlayerStatus() == 3);
-    SND_InvalidateSeqData(sSeqLoops, sSeqLoops + sizeof(sSeqLoops));
-    tag = SND_GetCurrentCommandTag();
-    SND_FlushCommand(SND_COMMAND_BLOCK);
-    SND_WaitForCommandProc(tag);
+    // An empty range at player 0's position: its end counts, so player 0 stops and player 1 plays on
+    InvalidateSeq(sSeqLoops, sSeqLoops, SND_COMMAND_BLOCK);
     CHECK(SND_GetPlayerStatus() == 2);
+    // All of player 1's sequence
+    InvalidateSeq(sSeqVariables, sSeqVariables + sizeof(sSeqVariables), SND_COMMAND_BLOCK | SND_COMMAND_IMMEDIATE);
+    CHECK(SND_GetPlayerStatus() == 0);
 }
 
 static int sAlarms;
@@ -1004,19 +1019,25 @@ static void TestSndAlarm(void) {
 
 static SNDDriverInfo sDriverInfo;
 
+// The driver's state: a player that never played has the zeros the ARM7's work starts with (track 0 for each of its
+// tracks, as on the DS); one that plays has its tracks, and a track's channel
 static void TestSndDriverInfo(void) {
     SNDTrackInfo track;
     u32 tag;
 
     Boot();
     SND_Init();
+    StartSequence(3, sSeqEnds, 0);
+    WaitFrames(8);
     SND_ReadDriverInfo(&sDriverInfo);
     tag = SND_GetCurrentCommandTag();
     SND_FlushCommand(SND_COMMAND_BLOCK);
     SND_WaitForCommandProc(tag);
-    CHECK(sDriverInfo.player[0].trackIndex[0] == SND_TRACK_INDEX_NONE);
-    CHECK(sDriverInfo.player[15].trackIndex[15] == SND_TRACK_INDEX_NONE);
-    CHECK(!SND_ReadTrackInfo(&sDriverInfo, 0, 0, &track));
+    CHECK(sDriverInfo.player[0].trackIndex[0] == 0);
+    CHECK(sDriverInfo.player[3].trackIndex[1] == SND_TRACK_INDEX_NONE);
+    CHECK(SND_ReadTrackInfo(&sDriverInfo, 3, 0, &track));
+    CHECK(track.volume == 127 && track.pan == 64 && track.chCount == 0);
+    CHECK(!SND_ReadTrackInfo(&sDriverInfo, 3, 1, &track));
 }
 
 typedef struct Test {

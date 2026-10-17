@@ -2,3 +2,5 @@
 # format as port/hal/replaced.txt: a glob pattern, " # " and the reason.
 
 lib/nitro/src/snd/snd_interface.c # compiled through port/hal/snd7/snd_interface_host.c, which notes the pointers that the commands cut to 32 bits
+lib/nitro/src/snd/snd_bank.c # banks and wave archives keep ARM9 addresses in 32-bit fields that snd.h declares as pointers; port/hal/snd7/snd_bank_host.c keeps the files' layout with handles
+lib/nitro/src/snd/snd_command.c # compiled through port/hal/snd7/snd_command_host.c, whose SND_WaitForCommandProc wakes the host ARM7 when the DS's would

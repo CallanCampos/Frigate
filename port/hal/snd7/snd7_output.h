@@ -1,0 +1,34 @@
+// The sound that the host ARM7's sound unit produces (port/hal/snd7), for the host's audio (port/audio) and tests.
+// Plain C types only, so that files outside the platform layer can include it.
+//
+// The sound unit makes one stereo sample each 1024 cycles of the virtual clock (port_os_cycles), as the DS's mixer
+// does: every 512 ticks of its sound clock, which is half the 33,514,000 Hz bus clock, so 32,728.515625 samples a
+// second. The samples follow game time, not the host's: they are made as the virtual clock passes them (at each
+// VBlank, and when the ARM9 sends the driver a command), so the same run gives the same samples.
+#ifndef PORT_HAL_SND7_SND7_OUTPUT_H
+#define PORT_HAL_SND7_SND7_OUTPUT_H
+
+#include <stdint.h>
+
+#define PORT_SND7_CYCLES_PER_SAMPLE 1024u
+// The rate as a whole number of samples a second, for a consumer that needs one (an SDL audio stream, a WAV header):
+// 0.515625 below the exact rate, 16 parts per million
+#define PORT_SND7_SAMPLE_RATE 32728
+#define PORT_SND7_CHANNELS 2
+
+// Where the samples go: count stereo frames, left then right, of signed 16 bits. Called at each VBlank with the frames
+// made since the last (from the OS's frame hook, on the host's stack, never from a thread's fiber), from
+// port_snd7_advance, and from port_snd7_set_output with the frames the last output hadn't had; the frames are only
+// valid during the call. NULL drops them. One output at a time
+typedef void (*PortSnd7Output)(const int16_t *frames, uint32_t count, void *user);
+void port_snd7_set_output(PortSnd7Output output, void *user);
+
+// The frames made since the driver started
+uint64_t port_snd7_samples(void);
+
+// For tests that drive the sound unit without the OS: the driver starts at a cycle of their own clock, and runs to
+// another (as port_snd7_frame does at a VBlank, giving the output what it made)
+void port_snd7_boot_at(uint64_t cycles);
+void port_snd7_advance(uint64_t cycles);
+
+#endif // PORT_HAL_SND7_SND7_OUTPUT_H
