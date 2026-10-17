@@ -89,6 +89,9 @@ add_library(pokebw2_game OBJECT ${game_sources})
 target_link_libraries(pokebw2_game PRIVATE port_decomp_env)
 target_compile_options(pokebw2_game PRIVATE
     -std=gnu99
+    # MWCC's inline: a function defined `inline` without `static` (ov194's BackupMail) is also an external definition,
+    # which C99 would leave to another file, so an unoptimized build that doesn't inline the calls fails to link
+    -fgnu89-inline
     # See port_decomp_env: the decomp drops const and volatile where the original did
     -Wno-incompatible-pointer-types-discards-qualifiers
     # The 64-bit warnings are counted by port/tools/compile-probe; here they only make noise
