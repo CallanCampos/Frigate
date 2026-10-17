@@ -162,8 +162,8 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_UpdateVoiceIcon(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_UpdateSpeed(CommTvtWork *sys, CtvtTalk *talk);
-static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, u8 x0, u8 y0, u8 x1, u8 y1, int color);
-static void CtvtTalk_PutWavePixel(u8 *pixels, u8 x, u8 y, int color);
+static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, u8 x0, u8 y0, u8 x1, u8 y1, u8 color);
+static void CtvtTalk_PutWavePixel(u8 *pixels, u8 x, u8 y, u8 color);
 static void CtvtTalk_PrintMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgId);
 static void CtvtTalk_PrintCountdown(CommTvtWork *sys, CtvtTalk *talk, u32 msgId, int count);
 static void CtvtTalk_PrintGameMessage(CommTvtWork *sys, CtvtTalk *talk, u32 msgId, StrBuf *name, u16 frames);
@@ -171,7 +171,7 @@ static void CtvtTalk_AskExit(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk);
 static BOOL CtvtTalk_CheckDisconnect(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_ResetWave(CommTvtWork *sys, CtvtTalk *talk);
-static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, int color, int pos, u16 size);
+static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, long pos, u16 size);
 static BOOL CtvtTalk_IsTalkButtonTouched(CommTvtWork *sys, CtvtTalk *talk, BOOL held);
 static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk);
@@ -1136,13 +1136,14 @@ static void CtvtTalk_UpdateSpeed(CommTvtWork *sys, CtvtTalk *talk) {
     }
 }
 
-static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, u8 x0, u8 y0, u8 x1, u8 y1, int color) {
+static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, u8 x0, u8 y0, u8 x1, u8 y1, u8 color) {
     int dx = MATH_ABS(x0 - x1);
     int dy = MATH_ABS(y0 - y1);
     int steps;
-    fx32 stepX, stepY;
-    fx32 offsetX, offsetY;
-    int i;
+    // The SDK's fx32 and s32 are long, which copies y0 for the loop after the loop's guard
+    long stepX, stepY;
+    long offsetX, offsetY;
+    long i;
 
     steps = (dx > dy ? dx : dy) + 1;
     stepX = FX32_CONST(x1 - x0) / steps;
@@ -1157,7 +1158,7 @@ static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, 
 }
 
 // The waveform's window is 16 x 8 tiles of 4bpp, two pixels to a byte
-static void CtvtTalk_PutWavePixel(u8 *pixels, u8 x, u8 y, int color) {
+static void CtvtTalk_PutWavePixel(u8 *pixels, u8 x, u8 y, u8 color) {
     u8 px = x % 8;
     u8 pos = px % 4;
     u16 *tile = (u16 *)(pixels + (u16)(x / 8 + (y / 8) * 16) * 32);
@@ -1335,7 +1336,8 @@ static void CtvtTalk_ResetWave(CommTvtWork *sys, CtvtTalk *talk) {
     GFL_BitmapFill(BmpWin_GetBitmap(talk->waveWindow), 0);
 }
 
-static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, int color, int pos, u16 size) {
+// `pos` is a long, the SDK's s32, which leaves `size` in its stack slot and `color` in a saved register
+static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, long pos, u16 size) {
     u32 end;
     u8 *pixels;
     BOOL drawn;
@@ -1348,7 +1350,7 @@ static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *sampl
     pixels = GFL_BitmapGetPixelData(BmpWin_GetBitmap(talk->waveWindow));
     drawn = FALSE;
     while (talk->waveX < end) {
-        y = (samples[(size * (talk->waveX + 1) / 128) / 2] + 0x8000) * 64 / 0x10000;
+        y = (samples[((talk->waveX + 1) * size / 128) / 2] + 0x8000) * 64 / 0x10000;
         if (talk->waveX < 11 && y < 32 - sWaveEdges[talk->waveX - 3]) {
             y = 32 - sWaveEdges[talk->waveX - 3];
         }

@@ -350,7 +350,9 @@ Same instructions, registers swapped.
   result keeps its terms in the order written, each scaled on its own: `ctvt_draw.c`'s `CtvtDraw_UpdateStroke` reads
   the color picker's pixels at `(u16 *)((u32)G2_GetBG2ScrPtr() + x * 2 + y * 512)`, `adds r7, r1, r0` with `x * 2` on
   the left and then `ldrh r3, [r6, r7]` with `y * 512` in `r6`, as `ctvt_camera.c` writes its BG3 offsets. With
-  `y * 512` first, or `(x + y * 256) * 2`, it doesn't match.
+  `y * 512` first, or `(x + y * 256) * 2`, it doesn't match. A constant term goes on the right whatever the order:
+  `0x800 + (u32)p` gives the same `adds` as `(u32)p + 0x800` in `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` and
+  `CtvtTalk_Main`.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -402,6 +404,13 @@ Same instructions, registers swapped.
   gives every register the original's. A plain copy of the same type folds back into the parameter; a `const`
   copy, or a copy of another width, works only when both uses go through it. The prototype in the header can stay
   without the `const`, which isn't part of the function's type.
+  Two uses that widen it the same way share one conversion instead, which MWCC keeps in a saved register:
+  `ctvt_talk.c`'s `CtvtTalk_DrawWave` widens its `u16 size` to `int` in `123 * pos / size` and in its loop's sample
+  index, and with `int pos` holds `size` in `r5`, pushes `r3` and moves `color` to a new slot. With `long pos`, the
+  SDK's `s32`, the division widens `size` to a `long`, the conversions differ, and `size` is read from its slot at
+  each use (`add r0, sp, #0x2c; ldrh`), as the original does; `CalcWarpTransferAddend` ("Switching `u32`/`s32`"
+  below) is the same case. Its index also needs `(talk->waveX + 1) * size`: with `size` first, its load goes to
+  another register and is copied into the `muls`'s.
 - A nested loop whose counter and hoisted row pointer sit in each other's registers may reuse an earlier loop's
   counter. The Pokéstar record monitor's `PkwdRecordMonitor_LoadBG` runs three `for (i = 0; ...)` loops over its load
   tables and then adds a palette to three screen pages. With counters of their own (`page`, `y`, `x`) the row counter
@@ -537,6 +546,12 @@ Same instructions, registers swapped.
   each, with all three needed. To find a one-node change, first bring the function one node short of the edge (there
   by turning two variable arguments into constants), then try each respelling on top of that: a change too small to
   show from the starting source flips the immediates there.
+  A function with calls and joins after the constant's first use doesn't follow a node count. `ctvt_talk.c`'s
+  `CtvtTalk_Enter` sets its `1` in `r7` after the zoom button's `if`/`else`, and the original copies it from the
+  talk button's `func_0204c124` on. There padding before that join never moved the edge, 40 field stores after it
+  (about 200 nodes) never produced a copy, and added calls moved the first copy in jumps: a seventh actor creation
+  put it one use late, 19 to 23 calls put it at later uses, and 24 to 39 removed every copy. The badge gate's edge,
+  in a function without such joins, moves by one padding call as described.
 - A reload of a spilled parameter that trades places with a constant, at the same size, can be a free width
   conversion to a wider callee parameter: the GTS Negotiations screen's `GtsNegoDisp_DimPalettes` passed a `u16 vram`
   to `PaletteFade_BlendBuffer`'s `u32 buffer`, which emits nothing but moves the reload. The palette fade's five
@@ -916,6 +931,11 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is: `p_sta_sub.c` and
+  `ctvt_talk.c` compile to the same bytes under either, so neither tells an order the scheduler chose from one the
+  code generator did. `#pragma optimization_level 1` does change the order: there `ctvt_talk.c`'s
+  `CtvtTalk_UpdateRecord` stores its call's stack arguments first, then sets `r0` to `r3`, each constant built at its
+  use, while level 2 already gives the order of `-O4`.
 - A constant stored through `p + (a - b)` is loaded before the subtraction, into a fresh register. When the original
   subtracts first and then builds the constant in the freed register, the pointer was advanced in a statement of its
   own: multiboot's `MB_ReadSegment` (`mb_segment.c`) matched with `patch += (u32)AutoloadCallback -
@@ -1190,10 +1210,14 @@ Same instructions, scheduled in another order.
   `GFL_BGSysFillScrArea` does.
   This isn't the whole rule: `fld_btl_inst_tool.c`'s `SetupTrialHouseBattle` loads its count at entry, as the
   original does, only as an `int`, the type its callees take, and at its uses as a `u32`. Whether the parameter's
-  type matches its uses' seems to count too. A pointer goes to a callee-saved register at entry only when its uses
-  weigh about 4, where a use as the base of `->` or `*` weighs 2 and a plain use, an argument or a copy, weighs 1; a
-  dereference through a cast weighs 1, and so does passing it to a `static inline` that takes a `const T *`. A
-  lighter pointer is reloaded from its stack slot at each use, with nearby uses sharing a load. The same file's
+  type matches its uses' counts too: `ctvt_talk.c`'s `CtvtTalk_DrawWaveLine` passes its `color` stack parameter on to
+  `CtvtTalk_PutWavePixel` in its loop, and loads it at entry when both take the same type, in the loop's preheader
+  when they differ (`int` against `u32` or `long`). Only a narrow type in both, `u8` there, gives the original's
+  entry, with the register parameters stored before `color` is loaded and stored back; an `int color` is loaded
+  first. A pointer goes to a callee-saved register at entry only when its uses weigh about 4, where a use as the base
+  of `->` or `*` weighs 2 and a plain use, an argument or a copy, weighs 1; a dereference through a cast weighs 1,
+  and so does passing it to a `static inline` that takes a `const T *`. A lighter pointer is reloaded from its stack
+  slot at each use, with nearby uses sharing a load. `fld_btl_inst_tool.c`'s
   `func_ov012_02162068` reloads its `trainer` (`ldr r2, [sp, #0x3c]`) as the original does once its dereferences go
   through `SetTrialHouseTrainer`, an inline taking `const BSubwayTrainer *trainer`; with a non-`const` parameter the
   inline is transparent and `trainer` keeps its register.
@@ -2228,6 +2252,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   at the computation, and with an `int` counter the slots rotate. A copy made in the guard's own block becomes a
   preheader store; an `if` or a ternary in between keeps it where it is written. An explicit `if (steps > 0)` around a
   `do`/`while` with the copies inside also matches (`Flake_Add`), but there `steps` is never below 1.
+  A narrow stack parameter read in the loop's `long` sum is copied the same way: `ctvt_talk.c`'s
+  `CtvtTalk_DrawWaveLine` computes `y0 + (offsetY >> FX32_SHIFT)` for its `u8 y0`, and with `long` steps, offsets
+  and counter MWCC copies `y0` to its slot in the preheader, while `dy` and `stepY` share one load of it in `r5`. With
+  `int` ones the copy is stored at entry, 2 bytes short. There an `int` counter matches too.
 
 - A test that the original places after its body, entered from the top as well as from an earlier branch, is a loop
   that stops after its first pass: `while (box < n) { ...; break; }`. The trade does one box a frame this way in

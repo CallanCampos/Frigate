@@ -16,7 +16,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A constant copied from a saved register (`adds r1, r7, #0`) at uses where the original writes the immediate, or the
   reverse: the hoisted-constant budget. Give a statement before the first copy one more (or one fewer) named step, or
   declare locals `int` instead of `u32` (one node each); test one node short of the edge.
-  (matching.md: "within a budget")
+  (matching.md: "within a budget") Past a join followed by calls, field stores don't move the edge and calls move it
+  in jumps. (matching.md: "doesn't follow a node count")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
 - An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
@@ -29,6 +30,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   by a field")
 - A narrow stack parameter read from its slot at each use where the original loads it into a saved register at
   entry: declare the parameter `const`. (matching.md: "A narrow stack parameter used twice")
+- The reverse, a narrow stack parameter held in a saved register (with another parameter moved to a new slot) where
+  the original reads it from its slot at each use: its uses share one conversion; give one of them a `long` operand,
+  the SDK's `s32`. (matching.md: "share one conversion")
 - An index kept in two registers (copied after a division and again before a multiply) where ours keeps one: a
   `const` struct parameter with its pointer field read at each use. (matching.md: "A pointer field read through a
   `const` parameter")
@@ -304,6 +308,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - One load of a struct's pointer field for two stores through it, where ours reloads: an inline helper taking the
   pointer. (matching.md: "Two stores through a pointer")
 - A parameter passed on the stack is loaded at entry, unless it is an `int` or `s32`. (matching.md: "passed on the stack is loaded")
+  One passed on to a callee is loaded at entry only when both take the same type, and a narrow one after the
+  register parameters are stored. (matching.md: "counts too")
 - A spilled index parameter's multiply scheduled apart from the original's, which no statement order fixes:
   widen the parameter from `u16` to `int` in the prototype. (matching.md: "width of a spilled index parameter")
 - A local's arithmetic done at its first use, past a call, where the original does it where written: give the
@@ -594,7 +600,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
 - Stores of a spilled copy after the loop's guard, in the preheader, where ours stores it at the computation: copy
   after the last branch before the loop, and give the loop's `fx32`/`s32` locals the SDK's `long`.
-  (matching.md: "A spilled copy of a value that the original stores")
+  (matching.md: "A spilled copy of a value that the original stores") A narrow stack parameter read in the loop's
+  sum is copied the same way. (matching.md: "A narrow stack parameter read in the loop's")
 - A returning branch inside a loop that computes an address again in its own registers, where the original reloads
   the parts the loop hoisted: read the address into a local once in the branch and use it at both uses.
   (matching.md: "returning branch inside a loop")
@@ -738,6 +745,10 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 - `#pragma opt_strength_reduction off`
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
+
+`#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb code, so they can't single out the
+scheduler; `#pragma optimization_level 1` shows each constant built at its use (matching.md: "leave 1.1p1's Thumb
+code as it is").
 
 Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
 (a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
