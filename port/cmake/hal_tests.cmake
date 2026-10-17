@@ -23,7 +23,7 @@ if(NOT EXISTS "${asm_oracle_python}")
     set(asm_oracle_python python3)
 endif()
 add_test(NAME asm_oracle
-    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${asm_oracle_python}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests/asm_oracle/run_all.py"
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "ASM_ORACLE_BUILD_DIR=${CMAKE_BINARY_DIR}"
+        "${asm_oracle_python}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/asm_oracle/run_all.py"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(asm_oracle PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)

@@ -482,7 +482,13 @@ host_build() {
     command -v cmake >/dev/null 2>&1 || die 1 "port/CMakeLists.txt exists but cmake is not installed"
     host_result="FAILED"
     say "Host build in build/port"
-    cmake -S port -B build/port || die 1 "cmake could not configure port/"
+    # A new build directory uses Ninja, which the ROM build needs anyway, so that the asm oracle can read its flags; an
+    # existing one keeps its generator, which CMake won't change
+    if [ -f build/port/CMakeCache.txt ]; then
+        cmake -S port -B build/port || die 1 "cmake could not configure port/"
+    else
+        cmake -S port -B build/port -G Ninja || die 1 "cmake could not configure port/"
+    fi
     cmake --build build/port --parallel || die 1 "the host build failed"
     host_result="built (build/port)"
     tests_result="FAILED"

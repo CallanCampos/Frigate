@@ -4,11 +4,12 @@ the compiler, flags, include paths and defines of the host build, and loads it w
     lib = build_library("mi_memory", ["port/hal/mi/mi_memory.c"])
     copy = lib.function("MI_CpuCopy8", None, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint32)
 
-The flags come from the configured host build (build/port, made by cmake -S port -B build/port -G Ninja), so they
-follow port/CMakeLists.txt without a copy here: a decomp file gets the flags its own build statement has, any other
+The flags come from a configured host build made with the Ninja generator: the one ctest runs the tests from
+(ASM_ORACLE_BUILD_DIR), else build/port (cmake -S port -B build/port -G Ninja), so they follow port/CMakeLists.txt
+without a copy here: a decomp file gets the flags its own build statement has, any other
 file gets the game's (pokebw2_game's most common set: the language model, include paths, -D PLATFORM_PC and the
 version's define), and a file under port/ or the wrapper also gets port_hal's include paths and options after them.
-The library goes to build/port-tests/<name>_<version>/.
+The library goes to asm-oracle/<name>_<version>/ in that build directory.
 
 A symbol that the files reference and neither define nor find in the host's C library gets a stub, so that a file can
 be tested without everything it calls: a function stub reports its name and aborts the process, and a data symbol is
@@ -32,8 +33,8 @@ from pathlib import Path
 
 from harness import REPO, SYMBOL_LINE, default_version
 
-HOST_BUILD = REPO / "build" / "port"
-OUTPUT = REPO / "build" / "port-tests"
+HOST_BUILD = Path(os.environ.get("ASM_ORACLE_BUILD_DIR", REPO / "build" / "port")).resolve()
+OUTPUT = HOST_BUILD / "asm-oracle"
 VERSION_DEFINES = {"b2_us": "BLACK2", "w2_us": "WHITE2"}
 GAME_TARGET = "pokebw2_game"
 HAL_TARGET = "port_hal"
@@ -71,7 +72,7 @@ class HostBuild:
     def __init__(self, build_dir: Path = HOST_BUILD):
         ninja = build_dir / "build.ninja"
         if not ninja.exists():
-            raise BuildError(f"{ninja.relative_to(REPO)} is missing: configure the host build first "
+            raise BuildError(f"{ninja} is missing: the host build must be configured, with the Ninja generator "
                              f"(cmake -S port -B build/port -G Ninja)")
         self.compiler = self._read_compiler(build_dir)
         self.by_source: dict[str, CompileSettings] = {}
@@ -227,8 +228,8 @@ def build_library(name: str, sources: list[str | Path], *, wrapper: str | None =
                   extra_flags: list[str] | tuple[str, ...] = (), base: bool = True,
                   host_build: HostBuild | None = None) -> HostLibrary:
     """Compiles the sources (paths relative to the repository, or absolute) and the wrapper's C text, if any, into
-    build/port-tests/<name>_<version>/lib<name> and loads it. With base, the files of BASE_SOURCES that exist are
-    added: the host memory that every file reaches through port_host.h. Warnings are printed; errors raise
+    asm-oracle/<name>_<version>/lib<name> in the host build and loads it. With base, the files of BASE_SOURCES that
+    exist are added: the host memory that every file reaches through port_host.h. Warnings are printed; errors raise
     BuildError."""
     if not re.fullmatch(r"[A-Za-z0-9_]+", name):
         raise ValueError(f"library name {name!r} must be an identifier")

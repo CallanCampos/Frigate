@@ -54,7 +54,9 @@ build/port-venv/bin/python port/tests/asm_oracle/test_selftest.py         # one 
 
 `run_all.py` runs each `test_*.py` in its own process (a crash in host C fails that file only) and exits 0 when all
 pass, 1 when one fails, and 77 (skipped) when `extract/<version>` is missing, as on CI, or when it runs without
-Unicorn, outside the virtual environment. Libraries are built in `build/port-tests/<name>_<version>/`.
+Unicorn, outside the virtual environment, or when the host build it takes its compile flags from isn't a Ninja build:
+ctest passes its own build directory (`ASM_ORACLE_BUILD_DIR`); run by hand, it reads `build/port`. Libraries are built
+in `asm-oracle/<name>_<version>/` in that build directory.
 
 A failure prints the case and the first difference, and how to run that case alone:
 
