@@ -1,0 +1,47 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A field actor's model: data/field_actors/<code>/data.json",
+    "description": "An object code's record of the field actors' model table (archive a/0/4/7, FieldActorConfig in include/field/field_actor.h, with swan's names), which tools/data/field_actor_data.py packs in the order of data/constants/obj_codes.txt. Its graphics are the directory's sprite.png and sprite.pal, or model.nsbmd, which the packer puts in a/0/4/8 and gives the record the place of.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "type", "scene_node_type", "shadow", "footprint_type", "reflections", "billboard_size", "sprite_atlas_size",
+        "sprite_controller_type", "gender", "collision", "offset"
+    ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "type": {
+            "enum": [ "none", "sprite", "model" ],
+            "description": "The actor's graphics (entityType): none, a sprite of sprite.png's frames, or a 3D model"
+        },
+        "model": {
+            "type": "string", "x-constant": "OBJ_CODE_",
+            "description": "For a model, the object code whose model.nsbmd it shows, when it has none of its own"
+        },
+        "scene_node_type": { "$ref": "#/$defs/u8", "description": "sceneNodeType" },
+        "shadow": { "type": "boolean", "description": "Whether the actor casts a shadow (enableShadow)" },
+        "footprint_type": { "$ref": "#/$defs/u8", "description": "The footprints it leaves (footprintType)" },
+        "reflections": { "type": "boolean", "description": "Whether water reflects it (enableReflections)" },
+        "billboard_size": { "$ref": "#/$defs/u8", "description": "billboardSize" },
+        "sprite_atlas_size": { "$ref": "#/$defs/u8", "description": "spriteAtlasSize" },
+        "sprite_controller_type": { "$ref": "#/$defs/u8", "description": "How its frames are animated (spriteControllerType)" },
+        "gender": {
+            "enum": [ "GENDER_MALE", "GENDER_FEMALE", null ], "x-constant": "GENDER_",
+            "description": "The actor's sex, null for none"
+        },
+        "collision": {
+            "type": "object", "additionalProperties": false, "required": [ "width", "height" ],
+            "description": "The tiles the actor takes (collWidth, collHeight)",
+            "properties": { "width": { "$ref": "#/$defs/u8" }, "height": { "$ref": "#/$defs/u8" } }
+        },
+        "offset": {
+            "type": "object", "additionalProperties": false, "required": [ "x", "y", "z" ],
+            "description": "Where it is drawn from its place (wPosOffsetX, Y and Z)",
+            "properties": { "x": { "$ref": "#/$defs/s8" }, "y": { "$ref": "#/$defs/s8" }, "z": { "$ref": "#/$defs/s8" } }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "s8": { "type": "integer", "minimum": -128, "maximum": 127 }
+    }
+}

@@ -205,7 +205,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 187,
+            "model": "OBJ_CODE_187",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -224,7 +224,7 @@
         },
         {
             "id": 1,
-            "model": 16,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -243,7 +243,7 @@
         },
         {
             "id": 2,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 17,
             "type": 0,
             "flag": 0,

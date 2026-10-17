@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 68,
+            "model": "OBJ_CODE_DEPOT_AGENT",
             "movement": 3,
             "type": 0,
             "flag": 0,

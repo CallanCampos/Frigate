@@ -15,7 +15,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 61,
+            "model": "OBJ_CODE_ROUGHNECK",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -34,7 +34,7 @@
         },
         {
             "id": 1,
-            "model": 43,
+            "model": "OBJ_CODE_WAITRESS",
             "movement": 3,
             "type": 0,
             "flag": 0,

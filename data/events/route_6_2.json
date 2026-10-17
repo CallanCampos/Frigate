@@ -75,7 +75,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 223,
+            "model": "OBJ_CODE_223",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0307",
@@ -94,7 +94,7 @@
         },
         {
             "id": 1,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -113,7 +113,7 @@
         },
         {
             "id": 2,
-            "model": 219,
+            "model": "OBJ_CODE_219",
             "movement": 43,
             "type": 0,
             "flag": 0,
@@ -132,7 +132,7 @@
         },
         {
             "id": 3,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -151,7 +151,7 @@
         },
         {
             "id": 4,
-            "model": 74,
+            "model": "OBJ_CODE_SCIENTIST_F_46",
             "movement": 14,
             "type": 0,
             "flag": 0,
@@ -170,7 +170,7 @@
         },
         {
             "id": 5,
-            "model": 217,
+            "model": "OBJ_CODE_217",
             "movement": 44,
             "type": 0,
             "flag": 0,
@@ -189,7 +189,7 @@
         },
         {
             "id": 6,
-            "model": 220,
+            "model": "OBJ_CODE_220",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -208,7 +208,7 @@
         },
         {
             "id": 7,
-            "model": 218,
+            "model": "OBJ_CODE_218",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -227,7 +227,7 @@
         },
         {
             "id": 8,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 14,
             "type": 0,
             "flag": 0,
@@ -246,7 +246,7 @@
         },
         {
             "id": 9,
-            "model": 84,
+            "model": "OBJ_CODE_PARASOL_LADY",
             "movement": 15,
             "type": 0,
             "flag": 0,

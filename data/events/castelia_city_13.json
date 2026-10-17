@@ -35,7 +35,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -54,7 +54,7 @@
         },
         {
             "id": 1,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -73,7 +73,7 @@
         },
         {
             "id": 2,
-            "model": 17,
+            "model": "OBJ_CODE_LADY",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -92,7 +92,7 @@
         },
         {
             "id": 3,
-            "model": 10,
+            "model": "OBJ_CODE_10",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x027d",
@@ -111,7 +111,7 @@
         },
         {
             "id": 4,
-            "model": 12,
+            "model": "OBJ_CODE_SCHOOL_KID_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x027e",
@@ -130,7 +130,7 @@
         },
         {
             "id": 5,
-            "model": 14,
+            "model": "OBJ_CODE_14",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x027f",
@@ -149,7 +149,7 @@
         },
         {
             "id": 6,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0280",
@@ -168,7 +168,7 @@
         },
         {
             "id": 7,
-            "model": 13,
+            "model": "OBJ_CODE_RICH_BOY",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0281",
@@ -187,7 +187,7 @@
         },
         {
             "id": 8,
-            "model": 18,
+            "model": "OBJ_CODE_18",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0282",
@@ -206,7 +206,7 @@
         },
         {
             "id": 9,
-            "model": 16,
+            "model": "OBJ_CODE_SCHOOL_KID_F",
             "movement": 15,
             "type": 0,
             "flag": "EVENT_FLAG_0x0283",
@@ -225,7 +225,7 @@
         },
         {
             "id": 10,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -244,7 +244,7 @@
         },
         {
             "id": 11,
-            "model": 19,
+            "model": "OBJ_CODE_19",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -263,7 +263,7 @@
         },
         {
             "id": 12,
-            "model": 54,
+            "model": "OBJ_CODE_HARLEQUIN_233",
             "movement": 0,
             "type": 0,
             "flag": 0,

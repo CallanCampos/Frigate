@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 47,
+            "model": "OBJ_CODE_BATTLE_GIRL",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 312,
+            "model": "OBJ_CODE_312",
             "movement": 38,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0462",

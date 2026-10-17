@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 64,
+            "model": "OBJ_CODE_HIKER",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 31,
+            "model": "OBJ_CODE_ACE_TRAINER_F",
             "movement": 2,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 162,
+            "model": "OBJ_CODE_WORK_00",
             "movement": 42,
             "type": 0,
             "flag": 0,
@@ -61,7 +61,7 @@
         },
         {
             "id": 3,
-            "model": 163,
+            "model": "OBJ_CODE_WORK_01",
             "movement": 41,
             "type": 0,
             "flag": 0,

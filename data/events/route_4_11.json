@@ -4,7 +4,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 14,
+            "model": "OBJ_CODE_14",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": 73,
+            "model": "OBJ_CODE_SCIENTIST_M_52",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -42,7 +42,7 @@
         },
         {
             "id": 2,
-            "model": 46,
+            "model": "OBJ_CODE_BLACK_BELT",
             "movement": 14,
             "type": 0,
             "flag": 0,

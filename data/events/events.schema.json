@@ -29,7 +29,10 @@
                 "required": [ "id", "model", "movement", "type", "flag", "script", "direction", "params", "area" ],
                 "properties": {
                     "id": { "$ref": "#/$defs/u16", "description": "The NPC's ID in the zone, which scripts use" },
-                    "model": { "$ref": "#/$defs/u16", "description": "Its overworld model" },
+                    "model": {
+                        "type": [ "string", "integer" ], "x-constant": "OBJ_CODE_", "minimum": 0, "maximum": 65535,
+                        "description": "Its model, an OBJ_CODE_* constant (data/field_actors/)"
+                    },
                     "movement": { "$ref": "#/$defs/u16", "description": "How it moves, its move code" },
                     "type": { "$ref": "#/$defs/u16", "description": "What kind of event it is, such as a trainer" },
                     "flag": {

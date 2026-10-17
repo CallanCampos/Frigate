@@ -225,7 +225,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 291,
+            "model": "OBJ_CODE_291",
             "movement": 3,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d9",
@@ -244,7 +244,7 @@
         },
         {
             "id": 1,
-            "model": 34,
+            "model": "OBJ_CODE_PKMN_BREEDER_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d7",
@@ -263,7 +263,7 @@
         },
         {
             "id": 2,
-            "model": 35,
+            "model": "OBJ_CODE_PKMN_BREEDER_F",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d7",
@@ -282,7 +282,7 @@
         },
         {
             "id": 3,
-            "model": 307,
+            "model": "OBJ_CODE_307",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -301,7 +301,7 @@
         },
         {
             "id": 4,
-            "model": 15,
+            "model": "OBJ_CODE_LASS",
             "movement": 42,
             "type": 6,
             "flag": 0,
@@ -320,7 +320,7 @@
         },
         {
             "id": 5,
-            "model": 69,
+            "model": "OBJ_CODE_JANITOR",
             "movement": 15,
             "type": 1,
             "flag": 0,
@@ -339,7 +339,7 @@
         },
         {
             "id": 6,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 3,
             "type": 1,
             "flag": 0,
@@ -358,7 +358,7 @@
         },
         {
             "id": 7,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x0459",
@@ -377,7 +377,7 @@
         },
         {
             "id": 8,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x045a",
@@ -396,7 +396,7 @@
         },
         {
             "id": 9,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x045b",
@@ -415,7 +415,7 @@
         },
         {
             "id": 10,
-            "model": 307,
+            "model": "OBJ_CODE_307",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d7",
@@ -434,7 +434,7 @@
         },
         {
             "id": 11,
-            "model": 363,
+            "model": "OBJ_CODE_363",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -453,7 +453,7 @@
         },
         {
             "id": 12,
-            "model": 363,
+            "model": "OBJ_CODE_363",
             "movement": 40,
             "type": 0,
             "flag": 0,
@@ -472,7 +472,7 @@
         },
         {
             "id": 13,
-            "model": 363,
+            "model": "OBJ_CODE_363",
             "movement": 39,
             "type": 0,
             "flag": 0,
@@ -491,7 +491,7 @@
         },
         {
             "id": 14,
-            "model": 363,
+            "model": "OBJ_CODE_363",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -510,7 +510,7 @@
         },
         {
             "id": 15,
-            "model": 363,
+            "model": "OBJ_CODE_363",
             "movement": 3,
             "type": 0,
             "flag": 0,
@@ -529,7 +529,7 @@
         },
         {
             "id": 16,
-            "model": 293,
+            "model": "OBJ_CODE_TEAM_PLASMA_GRUNT_M",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x02d8",

@@ -215,7 +215,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 184,
+            "model": "OBJ_CODE_PSYCHIC_F",
             "movement": 8,
             "type": 1,
             "flag": 0,
@@ -234,7 +234,7 @@
         },
         {
             "id": 1,
-            "model": 183,
+            "model": "OBJ_CODE_PSYCHIC_M",
             "movement": 13,
             "type": 1,
             "flag": 0,
@@ -253,7 +253,7 @@
         },
         {
             "id": 2,
-            "model": 110,
+            "model": "OBJ_CODE_110",
             "movement": 0,
             "type": 0,
             "flag": "EVENT_FLAG_0x058a",

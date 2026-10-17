@@ -25,7 +25,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 33,
+            "model": "OBJ_CODE_VETERAN_F",
             "movement": 15,
             "type": 0,
             "flag": 0,
@@ -44,7 +44,7 @@
         },
         {
             "id": 1,
-            "model": 314,
+            "model": "OBJ_CODE_314",
             "movement": 20,
             "type": 0,
             "flag": 0,
@@ -63,7 +63,7 @@
         },
         {
             "id": 2,
-            "model": 22,
+            "model": "OBJ_CODE_BACKERS_F",
             "movement": 14,
             "type": 0,
             "flag": 0,
@@ -82,7 +82,7 @@
         },
         {
             "id": 3,
-            "model": 11,
+            "model": "OBJ_CODE_YOUNGSTER",
             "movement": 16,
             "type": 0,
             "flag": 0,

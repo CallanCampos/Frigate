@@ -15,7 +15,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": 76,
+            "model": "OBJ_CODE_76",
             "movement": 16,
             "type": 0,
             "flag": 0,
@@ -34,7 +34,7 @@
         },
         {
             "id": 1,
-            "model": 25,
+            "model": "OBJ_CODE_25",
             "movement": 17,
             "type": 0,
             "flag": 0,
@@ -53,7 +53,7 @@
         },
         {
             "id": 2,
-            "model": 249,
+            "model": "OBJ_CODE_249",
             "movement": 14,
             "type": 0,
             "flag": "EVENT_FLAG_0x032e",
@@ -72,7 +72,7 @@
         },
         {
             "id": 3,
-            "model": 54,
+            "model": "OBJ_CODE_HARLEQUIN_233",
             "movement": 0,
             "type": 0,
             "flag": 0,

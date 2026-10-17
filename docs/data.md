@@ -38,6 +38,7 @@ which documents the format and can write them again.
 | `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
 | `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
+| `a/0/2/5` | `data/items/<item>/` (PNG, palette), `data/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
 | `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
 | `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
 | `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `data/trainer_sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
@@ -49,6 +50,7 @@ which documents the format and can write them again.
 | `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
 | `a/0/1/3` | `data/areas/<area>.json` | Area records | `tools/data/area_data.py` |
 | `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
+| `a/0/4/7`, `a/0/4/8` | `data/field_actors/<code>/` (JSON, PNG, palette, Nitro model) | The field actors' models: their table and graphics | `tools/data/field_actor_data.py` |
 | `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
 | `a/2/1/2`, `a/2/1/1` | `data/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
@@ -403,6 +405,32 @@ outside battle is a `BAG_POCKET_*`, and its battle bag pockets are a list of `BA
 is "a" or "an" by its first letter unless `name_article` says otherwise ("an HP Up", "the Leftovers", none for Honey).
 The 20 unused items, named "???", have constants of their own, as `ITEM_UNUSED_113`. Both versions have the same item
 data.
+
+### Item icons
+
+The item icons' archive (`a/0/2/5`) has a member for each constant of `data/constants/item_icons.txt`, in its order:
+an icon (`ITEM_ICON_*`), 32×32 and 16 colors, or a palette (`ITEM_ICON_PALETTE_*`), its colors in JASC format, 0
+transparent. `ITEM_GRAPHICS_CHARS_AND_PALETTES` in `src/system/pml_item.c` gives each item an icon and a palette, as
+`[ITEM_HYPER_POTION] = { ITEM_ICON_POTION, ITEM_ICON_PALETTE_HYPER_POTION }`, and `LIST_ITEM_GRAPHICS` the Wonder
+Launcher's list icons. Items share them, so each is named after the first item that shows it and is a file of that
+item's directory: `ITEM_ICON_POTION` is `data/items/potion/icon.png`, `ITEM_ICON_PALETTE_HYPER_POTION`
+`data/items/hyper_potion/icon.pal`, and `ITEM_ICON_POTION_LAUNCHER` `data/items/potion/launcher_icon.png` (and
+`.pal`). An item whose icon or palette is another's has no file of its own for it: the Hyper Potion shows the Potion's
+picture in colors of its own, every TM shows TM01's disc, and the 47 items without an icon, `ITEM_NONE` among them,
+show the placeholder in `none/`; `pml_item.c` says whose file an item shows. Editing a shared icon or palette changes
+every item that shows it. `data/items/shared/` has the icons' Nitro cells and animations, which code loads as members
+0 and 1, the return arrow's icon (`return_icon`), and in `unused_icons/` the 53 icons and 48 palettes that no item
+shows, named by their member numbers (`ITEM_ICON_UNUSED_MEMBER_140` is `unused_icons/140.png`).
+
+The palette file sets an icon's colors; its PNG shows it with the palette of the first item that has it, but only the
+PNG's indices count, so edit it in an image editor's indexed mode. To add an icon, add its constants to the end of
+`item_icons.txt`, named after its item, and its files, and give the item them in `pml_item.c`. Renaming an item with
+`rename_constant.py` renames its icons' constants too, and renaming an icon's constant moves its file. The packer
+builds each member from its file, and where that gives the same picture, palette or data as one of the original
+archive's members, it takes the original's bytes (some palettes keep 240 unused colors after their 16), so unchanged
+files pack the archive byte for byte in both versions. Every file must be there and keep its size and 16 colors, and
+the build stops with the file's name otherwise. `.venv/bin/python tools/data/item_icon_data.py dump
+extract/b2_us/files data/items` writes the icons again.
 
 ## Abilities, types, trainer classes, natures and places
 
@@ -770,6 +798,38 @@ show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 ```
 
 `data/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
+
+## Field actors
+
+The field's actors are the people, Pokémon and objects that zones and scripts put on the map. Each one's model is an
+object code, a constant of `data/constants/obj_codes.txt`, which the zones' events give their NPCs as `"model":
+"OBJ_CODE_YOUNGSTER"`, and each object code is a directory of `data/field_actors/`: `hero/` for `OBJ_CODE_HERO`,
+`pokemon/bulbasaur/` for the walking Pokémon's `OBJ_CODE_POKEMON_BULBASAUR`, and `models/0/` for the 3D models'
+`OBJ_CODE_MODEL_0`. Its `data.json` is its record of the model table (`a/0/4/7`, `FieldActorConfig` in
+`include/field/field_actor.h`, with swan's names), which `field_actor.schema.json` documents: whether it is a sprite,
+a 3D model or nothing to draw, its shadow, footprints, reflections, sizes, sex, collision and drawing offset. Its
+graphics go in the graphics archive (`a/0/4/8`):
+
+- a sprite has `sprite.png`, its frames side by side, each a square 32 or 64 pixels wide, as the hero's 24 frames of
+  facing and walking, and `sprite.pal`, its 16 colors in JASC format, 0 transparent. The palette file sets
+  the colors; a PNG's own palette only puts back the indices that an image editor reordered on saving.
+- a 3D model has `model.nsbmd`, a Nitro model, unless its `data.json`'s `"model"` names the object code whose model it
+  shows.
+
+People and objects are named after the trainer class that most of the trainers the zones' events give them have
+(`OBJ_CODE_BIKER`, `OBJ_CODE_ROUGHNECK` and `OBJ_CODE_HARLEQUIN_233` also show other classes'), or where the code
+shows what they are (`OBJ_CODE_HERO`, `OBJ_CODE_STRENGTH_ROCK`, `OBJ_CODE_WORK_00` and on, which stand for the
+code in a work value), and are numbered otherwise, as `OBJ_CODE_80`: name them with `rename_constant.py` as they are
+identified, which moves their directories. Walking Pokémon are named after the species, sex and form that the walking
+Pokémon's table (`a/2/0/8`) gives them. The table has the codes in the list's order; the graphics archive has the 3D
+models and then the sprites, each in the order of the codes that show them, and the packer writes each code's place
+in it into the table. To add an actor, add its constant to the list, with a value of its own, and its directory, as a
+copy of one to start from. Two places in the code still load sprites by their place in the graphics archive, the
+Funfest Missions' player icons (`sFMissionViewPlayerModels`) and an entrant's default sprite in `wbt_setup.c`, so adding a 3D model moves the sprites those name. Only a 3D model has a `model.nsbmd` or a
+`"model"`, and the code it names must have a `model.nsbmd` of its own.
+`tools/data/field_actor_data.py` writes the sprites' texture sets as the game's are, so the sources pack both archives
+byte for byte; `.venv/bin/python tools/data/field_actor_data.py dump extract/b2_us/files data/field_actors` writes
+them again.
 
 ## Zone events
 
