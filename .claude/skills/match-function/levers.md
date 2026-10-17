@@ -244,10 +244,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "When one stored value is a call's result")
 - A byte offset added to a pointer, with the offset loaded first and on the left of the `adds`: integer arithmetic on
   the address, `(T *)((u32)p + n)`. (matching.md: "With two loads and no local")
+- A hoisted constant base (a VRAM address) on the left of the `adds` where ours puts it second: hold it in a pointer
+  local and cast it at its use, `void *vram = G2S_GetOBJCharPtr(); (u32)vram + ofs`. (matching.md: "A constant
+  counts as a local only")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
   rather than a fresh local. (matching.md: "a fresh local's computation down to its first use")
+- A buffer row or table entry the original computes before a call's stack argument store, which ours folds into the
+  argument after it: set the pointer to the base, then advance it (`src = buf; src += i * size;`), through a
+  parameter that is not `const`. (matching.md: "A row of a buffer")
 - All three values loaded before the stores of a vector: NitroSDK's `VEC_Set`. (matching.md: "`VEC_Set(v, x, y, z)`")
 - `*p` loaded again at the top of a loop's body: walk a local copy of the parameter. (matching.md: "walks a parameter
   pointer")
@@ -709,10 +715,13 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 
 Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_input.c`'s `BtlvInput_DrawMoveTiles`
 (a loop entered with a `b` to its bottom test, the hoisted-constant spill slots, the `i`/`work` registers) where -O4
-restructures it. A function whose loop enters with a `b` to the test at -O4 may be one the original's global
-optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the
-same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which showed it too and came within a
-byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is 0/1").
+restructures it. `opt_common_subs off` alone gives it the original's size too, and with a 0/1 loop test leaves 186
+lines against level 1's 249: its original computes `work + i * 4` and `param + i` again after every call, where ours
+keeps them in registers across the calls. A function whose loop enters with a `b` to the test at -O4 may be one the
+original's global optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and
+`MBGameInfo_SendMembers` show the same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which
+showed it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a
+test whose value is 0/1").
 `#pragma opt_common_subs off` around one function alone matched `btlv_mcss.c`'s `BtlvMcss_MoveTaskEnd_Circle` and
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common

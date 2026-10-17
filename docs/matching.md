@@ -342,6 +342,11 @@ Same instructions, registers swapped.
   `adds r1, r1, r7`. With two loads and no local, the value loaded into a fresh register goes on the left: NitroSDK's
   `WM_ReadMPData` (`wm_sync.c`) steps through its buffer with `(const WMMpRecvData *)((u32)datap[i - 1] +
   recvBuf->entrySize)`, where the byte-pointer sum swapped the two registers.
+  A constant counts as a local only when it is held in a pointer local and cast at its use. `btlv_input.c`'s
+  `BtlvInput_CreateStruggleActor` adds the hoisted OBJ VRAM base first (`adds r2, r7, r2`) with
+  `void *vram = G2S_GetOBJCharPtr();` and `(void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy...baseAddrOfVram[...])`,
+  as `btlv_gauge.c`'s `BtlvGauge_DrawBar` writes it. The base written in place (`HW_DB_OBJ_VRAM`, or `HW_OBJ_VRAM` in
+  the gauge), a `u32 vram` local and the inline called in place put the constant second in both functions.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -1766,7 +1771,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   address into the argument: the pointer was set to the table and then advanced, a local with two assignments that is
   not moved to its use. `PkwdBook_LoadPoster` matches with `const PkwdBookLoad *screen = sPkwdBookPosterScreens;` at
   the top and `screen += graphicIdx;` before each call. An inline helper taking `&table[i]`, entry pointers at any
-  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".)
+  scope and fileId locals all compiled like the sunk form. (Another case of "build it in steps".) A row of a buffer
+  shows it too: `btlv_input.c`'s `BtlvInput_LoadTypePalette` loads the buffer and computes the row before it stores
+  the size argument, and keeps the size, shared with the `mul`, in `r0`. It matches with `src = work->typePalBuf;
+  src += palette * 0x80;` before each `PaletteFade_LoadData`, and only with a non-`const` `work`: with `const`, the
+  first call's store moved above the buffer's load (the reverse case under "Loads through a pointer are not moved").
 - A shifted index that the original computes again after a loop, where ours reuses the loop's, is the same index in
   another type: MWCC shares `palette << 5` only between uses of one type. The World Tournament list's
   `WbtList_SetPaletteGray` runs its gray loop in a `static inline` taking `u32 palette` while the function has
