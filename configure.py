@@ -193,8 +193,9 @@ DATA_PACKS = [
      ["a/0/1/6", "a/0/1/8", "a/0/1/9", "a/0/2/0", "a/0/1/7", "a/1/2/4"], False),
     ("tools/data/pokemon_graphics.py", "data/pokemon",
      ["a/0/0/4", "a/0/0/7", "a/0/5/1", "a/1/6/5", "a/2/2/9"], True),
-    ("tools/data/pokemon_cries.py", "data/pokemon",
-     ["swan_sound_data.sdat", "a/1/9/1"], True),
+    ("tools/data/pokemon_cries.py", "data/pokemon", ["a/1/9/1"], True),  # The cries' volumes
+    # The sound archive: sequences, banks, wave archives, players, groups and streams, and the Pokémon's cries
+    ("tools/data/sound_data.py", "data/sound", ["swan_sound_data.sdat"], False, ["data/pokemon"]),
     ("tools/data/move_data.py", "data/moves", ["a/0/2/1"], False),  # Move data
     ("tools/data/item_data.py", "data/items", ["a/0/2/4"], False),  # Item data
     ("tools/data/item_icon_data.py", "data/items", ["a/0/2/5"], True),  # Item icons

@@ -35,7 +35,8 @@ which documents the format and can write them again.
 | `a/0/1/6`, `a/0/1/8`, `a/0/1/9`, `a/0/2/0`, `a/1/2/4` | `data/pokemon/` (JSON) | Species data, level-up moves, evolutions, baby species, egg moves | `tools/data/species_data.py` |
 | `a/0/1/7` | `data/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
 | `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `data/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
-| `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
+| `a/1/9/1` | `data/pokemon/<species>/data.json` (`cry_volume`) | The Pokémon cries' playback volumes | `tools/data/pokemon_cries.py` |
+| `swan_sound_data.sdat` | `data/sound/`, `data/pokemon/<species>/cry.wav` | The sound archive: sequences, banks, wave archives, players, groups, streams and the Pokémon cries | `tools/data/sound_data.py` |
 | `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
 | `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
 | `a/0/2/5` | `data/items/<item>/` (PNG, palette), `data/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
@@ -326,10 +327,37 @@ it has one. `egg/` holds the egg's sprites and icon, which every egg shows, and 
 `cry_volume` in each species' `data.json` is the game's 0–127 playback volume; the egg, the bad egg and the
 Pokéstar Studios species have cries and volumes of their own too (`pm_voice.c`). Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
 volume.
-The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
-`.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
-`.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs them automatically.
-An unchanged source set reproduces all seven original graphics and sound archives byte for byte.
+A cry's wave archive must fit the game's 0x5c30-byte buffer. The sound archive takes the cries from `cry.wav` (see
+[Sound](#sound)). Extract the graphics again with `.venv/bin/python tools/data/pokemon_graphics.py extract
+data/pokemon` and the cries with `.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs
+them automatically. An unchanged source set reproduces the original graphics archives, the volumes and the cries byte
+for byte.
+
+## Sound
+
+The sound archive, `swan_sound_data.sdat`, the same in both versions, is built from `data/sound/` by
+`tools/data/sound_data.py`. Its entries are the constants of its lists in `data/constants/`, each in its list's order:
+the sequences of `sound.txt` (`SEQ_BGM_*` music, `SEQ_SE_*` sound effects, `SEQ_ME_*` jingles), the banks of
+instruments of `sound_banks.txt`, the wave archives of samples of `sound_wave_archives.txt`, and the players, groups,
+stream players and streams of `sound_players.txt`, `sound_groups.txt`, `sound_stream_players.txt` and
+`sound_streams.txt`, whose names are the archive's own symbols. A sequence, bank, wave archive or stream is a
+directory named after its constant, in its kind's directory and its category's, the word after the kind's prefix:
+`SEQ_BGM_T_01` is `data/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `data/sound/banks/se/sw_jump/`, and
+`BANK_PV001` `data/sound/banks/pv/pv001/`. Each has its file, `sequence.sseq`, `bank.sbnk`, `wave_archive.swar` or
+`stream.strm`, Nitro's own formats for now, and a sequence, bank and stream has `data.json`, its record of the archive,
+which the schemas in `data/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
+archives, a stream's volume, priority and player. Some entries share a file: 86 sequences play another's, such as the
+placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
+`"file"`, naming the one whose file it uses. `players.json`, `stream_players.json` and
+`groups.json` hold the small kinds' records by their constants. The Pokémon cries' wave archives, the 690 after the
+empty first slot of `sound_wave_archives.txt`, are each species' `cry.wav` (see
+[Pokémon graphics and cries](#pokémon-graphics-and-cries)).
+
+To add a sequence, bank, wave archive or stream, add its constant to its list and its directory, as a copy of one to
+start from; `rename_constant.py` moves the directory when a constant is renamed. The packer lays the archive out as
+the game's, the files of the sequences, banks, wave archives and streams, each kind in its list's order, so the
+sources pack it byte for byte. `.venv/bin/python tools/data/sound_data.py dump extract/b2_us/files data/sound`
+writes them again.
 
 ## Moves
 

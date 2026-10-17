@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import LISTS_DIR, parse  # noqa: E402
 from tools.data.field_actor_data import directory as field_actor_directory  # noqa: E402
 from tools.data.item_icon_data import member_path as item_icon_path  # noqa: E402
+from tools.data.sound_data import entry_dir as sound_entry_dir  # noqa: E402
 from tools.data.species_data import directory as species_directory  # noqa: E402
 from tools.text.text_data import bank_prefix  # noqa: E402
 
@@ -53,6 +54,10 @@ NAMED_DATA = [
     ("zones", "data/zones", "ZONE_", ".json"),
     ("zones", "data/events", "ZONE_", ".json"),
     ("obj_codes", "data/field_actors", "OBJ_CODE_", "/"),
+    ("sound", "data/sound/sequences", "SEQ_", "/"),
+    ("sound_banks", "data/sound/banks", "BANK_", "/"),
+    ("sound_wave_archives", "data/sound/wave_archives", "WAVE_", "/"),
+    ("sound_streams", "data/sound/streams", "STRM_", "/"),
 ]
 
 # The textures' directories, and the script that relinks the models that show them
@@ -68,6 +73,8 @@ def data_path(constant: str, directory: str, prefix: str, suffix: str) -> Path:
         return ROOT / directory / species_directory(constant)
     if prefix == "OBJ_CODE_":
         return field_actor_directory(ROOT / directory, constant)
+    if directory.startswith("data/sound/"):
+        return sound_entry_dir(ROOT / "data/sound", directory.removeprefix("data/sound/"), constant)
     return ROOT / directory / (constant.removeprefix(prefix).lower() + ("" if suffix == "/" else suffix))
 
 

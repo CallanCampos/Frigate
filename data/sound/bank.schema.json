@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A sound bank: data/sound/banks/<category>/<name>/data.json",
+    "description": "A bank's info record in the sound archive (swan_sound_data.sdat), which tools/data/sound_data.py packs in the order of data/constants/sound_banks.txt. Its file is bank.sbnk beside it, unless file names the bank whose file it uses.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "wave_archives" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "file": { "type": "string", "x-constant": "BANK_", "description": "The bank whose file this one uses, when it has none of its own" },
+        "wave_archives": {
+            "type": "array", "minItems": 4, "maxItems": 4,
+            "items": { "type": [ "string", "null" ], "x-constant": "WAVE_" },
+            "description": "The four wave archives whose samples its instruments play, null for none"
+        }
+    }
+}
