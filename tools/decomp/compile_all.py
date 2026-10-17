@@ -19,8 +19,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from configure import (CC_FLAGS, GENERATED_INCLUDE_DIR, INCLUDE_DIRS, MWCC_VERSION, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
-                       VERSIONS, download_tools, library_of, mwcc_command)
+from configure import (GENERATED_INCLUDE_DIR, INCLUDE_DIRS, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
+                       VERSIONS, download_tools, source_compiler, mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.build import rom_blob  # noqa: E402
 from tools.data.gen_constants import generate  # noqa: E402
@@ -40,10 +40,10 @@ class CompileResult:
 
 def compile_file(source: Path, version: str, out_dir: Path) -> CompileResult:
     """Compiles one file, retaining its exit status and both diagnostic streams."""
-    library = library_of(source)
-    compiler, flags = library if library else (MWCC_VERSION, CC_FLAGS)
+    settings = source_compiler(source)
+    compiler, flags = settings.compiler, settings.flags
     env = os.environ.copy()
-    if library:
+    if settings.is_library:
         # Match configure.py's library rules: older compilers require this system include path.
         env["MWCIncludes"] = "."
     obj = out_dir / version / source.with_suffix(".o")

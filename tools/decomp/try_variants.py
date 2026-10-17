@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from configure import MWCC_VERSION  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.compiler_probe import lib_compiler  # noqa: E402
+from tools.decomp.compiler_probe import probe_defaults  # noqa: E402
 
 
 def definition_span(source: str, name: str) -> tuple[int, int]:
@@ -82,8 +82,8 @@ def main():
     args = parser.parse_args()
 
     if args.compiler is None:
-        lib = lib_compiler(args.source)
-        args.compiler = lib[0] if lib else MWCC_VERSION.removeprefix("dsi/")
+        compiler, _ = probe_defaults(args.source)
+        args.compiler = compiler or MWCC_VERSION.removeprefix("dsi/")
     original = args.source.read_text()
     variants = [v.strip() for path in args.variants for v in path.read_text().split("=====") if v.strip()]
 

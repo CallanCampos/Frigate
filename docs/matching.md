@@ -2771,8 +2771,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   definition doesn't end a batch. The tell is an object at the head of a file's shared `.rodata`, out of size order and
   packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
-  tables defined just above `CtvtDraw_UpdateDraw`, their first user. With every table above the first function the
-  colors sort after the 2-byte tables again. `.data` is written out the same way: libVCT's `vct_dsp.c` has its 16-byte
+  tables defined just above `CtvtDraw_UpdateDraw`, their first user (`config/compiler_flags.toml` records the flag).
+  With every table above the first function the colors sort after the 2-byte tables again. `.data` is written out
+  the same way: libVCT's `vct_dsp.c` has its 16-byte
   `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
   above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
   `VCT_InitEcho`, their only user.
