@@ -9,16 +9,26 @@
 
 // Every block starts with its head, rounded up to the cache line
 #define HEAP_ALIGN 32
+#ifdef PLATFORM_PC
+// A host's head, with its pointers and pointer-wide data, is larger than the DS's 32 bytes; the data starts after it
+#define BLOCK_HEAD_SIZE ((u32)ROUND_UP(sizeof(SndHeapBlock), HEAP_ALIGN))
+#else
 #define BLOCK_HEAD_SIZE 32
+#endif
 #define ROUND_UP(value, alignment) (((value) + ((alignment) - 1)) & ~((alignment) - 1))
 
 typedef struct SndHeapBlock {
     NNSFndLink link;
     u32 size;
     NNSSndHeapDisposeCallback callback;
-    u32 data1;
-    u32 data2;
+    uptr data1;
+    uptr data2;
 } SndHeapBlock;
+
+#ifdef PLATFORM_PC
+_Static_assert(BLOCK_HEAD_SIZE >= sizeof(SndHeapBlock) && BLOCK_HEAD_SIZE % HEAP_ALIGN == 0,
+               "a block's data starts after its head, at the heap's alignment");
+#endif
 
 typedef struct SndHeapSection {
     NNSFndList blockList;
@@ -83,7 +93,7 @@ void NNS_SndHeapClear(NNSSndHeapHandle heap) {
     NewSection(heap);
 }
 
-void *NNS_SndHeapAlloc(NNSSndHeapHandle heap, u32 size, NNSSndHeapDisposeCallback callback, u32 data1, u32 data2) {
+void *NNS_SndHeapAlloc(NNSSndHeapHandle heap, u32 size, NNSSndHeapDisposeCallback callback, uptr data1, uptr data2) {
     SndHeapSection *section;
     SndHeapBlock *block =
         NNS_FndAllocFromFrmHeapEx(heap->handle, ROUND_UP(size, HEAP_ALIGN) + BLOCK_HEAD_SIZE, HEAP_ALIGN);

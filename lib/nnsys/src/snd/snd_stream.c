@@ -183,7 +183,7 @@ static void AlarmCallback(void *arg) {
 
 // A pointer moved on by a byte offset, an inline in the style of NitroSystem's FND; the name is a guess
 static inline void *AddU32ToPtr(void *ptr, u32 val) {
-    return (void *)((u32)ptr + val);
+    return (void *)((uptr)ptr + val);
 }
 
 static void StrmCallback(NNSSndStrm *stream, NNSSndStrmCallbackStatus status) {

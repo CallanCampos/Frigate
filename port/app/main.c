@@ -3,15 +3,16 @@
 // and its SDK threads on fibers, and the platform's own work on the dispatcher's stack: the scanline hook, which draws
 // each line of both screens (port/gfx/screens.c), and at each VBlank the geometry engine's swap (port/gfx/ge/ge_hal.h)
 // and this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the
-// DS's 59.8261 frames a second.
+// DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--rom PATH] [--save-dir PATH] [--fixed-time TIME]
-//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--rom PATH] [--save-dir PATH]
+//              [--fixed-time TIME] [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
 //
-//   --headless          runs without a window and without pacing, for tests and CI
+//   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
 //   --screenshot PATH   writes both screens as a PNG (top above bottom) when the run ends: after the last frame of
 //                       --frames N, or when the window is closed
+//   --audio-dump PATH   writes the sound as it is made to a WAV file, with or without --headless
 //   --rom PATH          the player's ROM (port/hal/rom)
 //   --save-dir PATH     where saves go (port/hal/card)
 //   --fixed-time TIME   the clock's time at boot, "YYYY-MM-DD HH:MM:SS", moving with the virtual clock (port/hal/rtc)
@@ -32,6 +33,7 @@
 #define _DEFAULT_SOURCE
 
 #include "app/present.h"
+#include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
 #include "hal/hw/hw.h"
@@ -69,17 +71,8 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless",
-    "help",
-    "frames",
-    "screenshot",
-    "rom",
-    "save-dir",
-    "fixed-time",
-    "watchdog",
-    "main-arena-size",
-    "vram-backend",
-    "heap-scale-root",
+    "headless",         "help",       "frames",   "screenshot",      "audio-dump",   "rom",
+    "save-dir",         "fixed-time", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root",
     "heap-scale-child",
 };
 
@@ -102,11 +95,12 @@ static const PortHwG3Readbacks sG3Readbacks = {
 };
 
 static void Usage(void) {
-    fprintf(stderr,
-            "usage: %s [--headless] [--frames N] [--screenshot PATH] [--rom PATH] [--save-dir PATH] "
-            "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
-            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
-            sArgc > 0 ? sArgv[0] : "pokeblack2");
+    fprintf(
+        stderr,
+        "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--rom PATH] [--save-dir PATH] "
+        "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
+        "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
+        sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
 
 static int IsKnownOption(const char *name, size_t length) {
@@ -262,6 +256,7 @@ int main(int argc, char **argv) {
     long long frames;
     long long watchdog;
     long long arenaSize;
+    const char *audioDump;
     PortOsResult result;
     int status = 0;
 
@@ -288,6 +283,12 @@ int main(int argc, char **argv) {
         Usage();
         return EXIT_BAD_OPTIONS;
     }
+    audioDump = port_app_option("audio-dump");
+    if (audioDump != NULL && *audioDump == '\0') {
+        fprintf(stderr, "port: --audio-dump needs a path\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
     }
@@ -300,6 +301,17 @@ int main(int argc, char **argv) {
         }
         sWindowOpen = 1;
         port_app_present = port_present_frame;
+        // The sound device; a host without one runs the game silently, so its absence only gets port_audio_open's
+        // message
+        port_audio_open();
+    }
+    // The WAV dump asked for, with or without a device: a path that can't be written is a bad option
+    if (audioDump != NULL && !port_audio_dump_open(audioDump)) {
+        port_audio_close();
+        if (sWindowOpen) {
+            port_present_close();
+        }
+        return EXIT_BAD_OPTIONS;
     }
     // Nothing pressed, the lid open and the pen up, as the game's first reads must see; then the screens' line drawing
     port_input_set(0, 0);
@@ -332,6 +344,9 @@ int main(int argc, char **argv) {
 
     // A run that ended before its frame count (the window closed, a deadlock) still leaves its last frame
     WriteScreenshot();
+    // The device and the dump's WAV header; a run that stops the process itself (a trap, OS_Terminate) never gets here,
+    // so its dump keeps the header it was opened with, which counts no samples
+    port_audio_close();
     if (sWindowOpen) {
         port_present_close();
     }
