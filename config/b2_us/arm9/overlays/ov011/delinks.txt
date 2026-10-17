@@ -160,3 +160,8 @@ lib/dwc/src/gp/gp.c:
     complete
     .text       start:0x0217241c end:0x02172d68
     .data       start:0x02187794 end:0x021878c0
+
+lib/dwc/src/gp/gpi.c:
+    complete
+    .text       start:0x02172d68 end:0x02173504
+    .data       start:0x021878c0 end:0x021879d4
