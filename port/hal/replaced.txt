@@ -4,7 +4,8 @@
 # provided by port/hal, or by a trap stub until it is (port/tools/gen_stubs.py).
 #
 # A file that is mostly portable C stays compiled instead, with its MWCC asm functions behind #ifndef PLATFORM_PC and
-# host versions in port/hal (port/docs/game-changes.md lists them).
+# host versions in port/hal (port/docs/game-changes.md lists them), and so do the functions of its C that the ROM
+# doesn't link and that give other results than the ROM's code (port/docs/adr/0008, port/tests/hal/check_replaced_c.py).
 
 # The C library: the host's libc and libm replace MSL, the Metrowerks runtime (PLAN.md §4.8, rule 8)
 lib/msl/src/* # MSL, replaced by the host's C library

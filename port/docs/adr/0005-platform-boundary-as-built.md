@@ -1,6 +1,6 @@
 # 0005: The platform boundary as built
 
-- **Status:** accepted
+- **Status:** accepted; amended by [0008](0008-host-versions-of-sdk-c-that-isnt-the-roms.md)
 - **Date:** 2026-10-17
 - **Plan:** D3, D5, §4.5, §4.7
 - **Upstream:** `4aa041311` (merge of PR #348)

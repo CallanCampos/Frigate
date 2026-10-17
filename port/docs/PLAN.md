@@ -226,8 +226,10 @@ mods/examples/           sample mods, one per extension point
   overlay restores its `.data` from a snapshot taken at startup and zeroes its `.bss`, which reproduces the DS's reload
   semantics generically; the Platinum port skipped this and patched cases by hand.
 - **Math and memory:** DMA is `memcpy`; the hardware divider and square root become bit-exact C; the 20 `asm` MI
-  routines (copy, fill, swap and `MI_UncompressLZ8`) and the 15 `asm` FX matrix helpers get C versions; MSL's
-  soft-float runtime is replaced by the host's.
+  routines (copy, fill, swap and `MI_UncompressLZ8`) and the 15 `asm` FX matrix helpers get C versions, and so do the
+  FX matrix products whose unlinked decomp C differs from the ROM's code
+  ([ADR 0008](adr/0008-host-versions-of-sdk-c-that-isnt-the-roms.md)); MSL's soft-float runtime is replaced by the
+  host's.
 - **Heaps:** the game keeps its own GFL heaps over a host arena, which reproduces the DS's tolerance of small overruns.
   Pointer-bearing structs grow on 64-bit, so heap sizes are scaled on hosts by measurement (each heap reports its
   high-water mark in debug builds), not blindly doubled as the Platinum port did. An ASan build maps the GFL

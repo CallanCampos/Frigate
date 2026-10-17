@@ -1,7 +1,6 @@
-"""The host versions in port/hal of the SDK's assembly in libfx's matrix files and of its products whose decomp C reads an
-argument after storing over it (port/hal/fx), libmath
-(MATH_CountLeadingZerosFunc, MATH_QSort and sha1_block, port/hal/math) and libcrypto (CRYPTO_RC4Encrypt,
-port/hal/crypto), against the ROM's code.
+"""The host versions in port/hal of the SDK's assembly in libfx's matrix files and of its products whose decomp C reads
+an argument after storing over it (port/hal/fx, ADR 0008), libmath (MATH_CountLeadingZerosFunc, MATH_QSort and
+sha1_block, port/hal/math) and libcrypto (CRYPTO_RC4Encrypt, port/hal/crypto), against the ROM's code.
 
 Every function runs on thousands of seeded random inputs, built twice: with the game's flags, as build.py gives a port/
 file, and again with strict aliasing on, signed overflow undefined, the undefined behaviour sanitizer trapping and

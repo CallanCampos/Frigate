@@ -60,9 +60,10 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0002](0002-solo-project-no-upstream-posts.md) | A solo project with no upstream posts | D10, §9 | accepted |
 | [0003](0003-ad-hoc-signing-no-apple-developer-account.md) | Ad-hoc signing, no Apple Developer account | D11, §7, §10 | accepted |
 | [0004](0004-ds-addresses-by-header-translation.md) | DS addresses by build-time header translation | D3, §4.5 | accepted |
-| [0005](0005-platform-boundary-as-built.md) | The platform boundary as built | D3, D5, §4.5, §4.7 | accepted |
+| [0005](0005-platform-boundary-as-built.md) | The platform boundary as built | D3, D5, §4.5, §4.7 | accepted; amended by [0008](0008-host-versions-of-sdk-c-that-isnt-the-roms.md) |
 | [0006](0006-sound-driver-as-built.md) | The sound driver as built | D8, §4.7 | accepted |
 | [0007](0007-nitrosystem-files-in-host-structs.md) | NitroSystem's 2D files in host structs | D3, D5, §4.5 | accepted |
+| [0008](0008-host-versions-of-sdk-c-that-isnt-the-roms.md) | Host versions of SDK C that isn't the ROM's | D3, §4.5 | accepted |
 
 ## Decisions waiting for an ADR
 
