@@ -177,7 +177,7 @@ def library_of(source: Path) -> tuple[str, list[str]] | None:
 # under files/ to the directory of its members, one assembly file each, in archive order.
 ARCHIVES = {
     "a/0/5/6": "res/field_scripts",  # Field scripts, see tools/script/field_script.py
-    "a/1/6/9": "res/tr_ai",  # Trainer AI scripts, see tools/script/tr_ai_script.py
+    "a/1/6/9": "res/trainers/ai",  # Trainer AI scripts, see tools/script/tr_ai_script.py
 }
 
 # The constant list that names and orders each assembled archive's files, and the prefix of its constants
@@ -202,9 +202,9 @@ DATA_PACKS = [
     # The field actors' models: their table and their sprites' and 3D models' graphics
     ("tools/data/field_actor_data.py", "res/field_actors", ["a/0/4/7", "a/0/4/8"], False),
     # Trainers, their parties, and the table of their messages with its offsets
-    ("tools/data/trainer_data.py", "res/trainers", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
+    ("tools/data/trainer_data.py", "res/trainers/data", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
     # Trainer sprites, front and back, and a/0/6/3, a copy of the back sprites
-    ("tools/data/trainer_graphics.py", "res/trainer_sprites", ["a/0/7/1", "a/0/7/2", "a/0/6/3"], True),
+    ("tools/data/trainer_graphics.py", "res/trainers/sprites", ["a/0/7/1", "a/0/7/2", "a/0/6/3"], True),
     ("tools/data/encounter_data.py", "res/encounters", ["a/1/2/7"], True),  # Wild encounters
     # Zone headers, which give each zone the number of its events in res/events/order.json
     ("tools/data/zone_data.py", "res/zones", ["a/0/1/2"], False, ["res/events"]),
@@ -225,19 +225,19 @@ DATA_PACKS = [
     # The town map's places, whose texts are messages of town_map.txt
     ("tools/data/town_map_data.py", "res/town_map", ["a/0/8/5"], True, ["res/text/system/town_map.txt"]),
     # The battle facilities' trainers and Pokémon; the Battle Subway's are also the Trial House's
-    ("tools/data/facility_data.py", "res/facilities/battle_subway", ["a/2/1/2", "a/2/1/1"], False,
-     ["res/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/battle_subway", ["a/2/1/2", "a/2/1/1"], False,
+     ["res/trainers/facilities"]),
     # The Black Tower, White Treehollow in White 2
-    ("tools/data/facility_data.py", "res/facilities/black_tower", ["a/2/6/2", "a/2/6/1"], False,
-     ["res/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/black_tower", ["a/2/6/2", "a/2/6/1"], False,
+     ["res/trainers/facilities"]),
     # The Pokémon World Tournament's three pools of trainers, each with the single sets' archive, and its rental sets
-    ("tools/data/facility_data.py", "res/facilities/pwt_regular", ["a/2/4/9", "a/2/5/0", "a/2/4/8"], False,
-     ["res/facilities"]),
-    ("tools/data/facility_data.py", "res/facilities/pwt_leaders", ["a/2/5/2", "a/2/5/3", "a/2/5/1"], False,
-     ["res/facilities"]),
-    ("tools/data/facility_data.py", "res/facilities/pwt_masters", ["a/2/5/5", "a/2/5/6", "a/2/5/4"], False,
-     ["res/facilities"]),
-    ("tools/data/facility_data.py", "res/facilities/pwt_rental", ["a/2/5/7"], False, ["res/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_regular", ["a/2/4/9", "a/2/5/0", "a/2/4/8"], False,
+     ["res/trainers/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_leaders", ["a/2/5/2", "a/2/5/3", "a/2/5/1"], False,
+     ["res/trainers/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_masters", ["a/2/5/5", "a/2/5/6", "a/2/5/4"], False,
+     ["res/trainers/facilities"]),
+    ("tools/data/facility_data.py", "res/trainers/facilities/pwt_rental", ["a/2/5/7"], False, ["res/trainers/facilities"]),
     # The zones' events, in the order of res/events/order.json
     ("tools/data/event_data.py", "res/events", ["a/1/2/6"], False),
 ]
@@ -278,8 +278,8 @@ def script_imports(script: str) -> list[str]:
     return sorted(found)
 
 # The data in JSON that the text takes messages from, with \from{...} lines (tools/text/text_sources.py)
-TEXT_DATA_DIRS = ["res/pokemon", "res/moves", "res/items", "res/trainers", "res/abilities", "res/types",
-                  "res/trades", "res/facilities", "res/trainer_classes", "res/natures", "res/places"]
+TEXT_DATA_DIRS = ["res/pokemon", "res/moves", "res/items", "res/trainers/data", "res/abilities", "res/types",
+                  "res/trades", "res/trainers/facilities", "res/trainers/classes", "res/natures", "res/places"]
 
 # Text archives built from source, by tools/text/text_data.py: each maps its path under files/ to the directory of its
 # message files, one text file each, in archive order

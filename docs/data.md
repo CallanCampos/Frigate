@@ -20,7 +20,7 @@ exactly what the ROM holds. The sources come in three kinds:
   JSON, these directories are named after their constants and the lists give their order (see
   [Map model sources](#map-model-sources)).
 - **Indexed PNG, JASC palettes, and WAV**, for each Pokémon's battle sprites, icons, footprints, and cries under
-  `res/pokemon/<species>/`, and the trainer sprites under `res/trainer_sprites/`. Nitro cell and animation
+  `res/pokemon/<species>/`, and the trainer sprites under `res/trainers/sprites/`. Nitro cell and animation
   resources remain as separate binary files next to the images.
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
@@ -41,8 +41,8 @@ which documents the format and can write them again.
 | `a/0/2/4` | `res/items/` (JSON) | Item data | `tools/data/item_data.py` |
 | `a/0/2/5` | `res/items/<item>/` (PNG, palette), `res/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
 | `a/0/5/6` | `res/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
-| `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `res/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
-| `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `res/trainer_sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
+| `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `res/trainers/data/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
+| `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `res/trainers/sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
 | `a/0/0/9` | `res/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
 | `a/0/0/8` | `res/map_models/<model>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
 | `a/2/2/5`, `a/2/2/6` | `res/field_prop_models/{exterior,interior}/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
@@ -54,10 +54,10 @@ which documents the format and can write them again.
 | `a/0/4/7`, `a/0/4/8` | `res/field_actors/<code>/` (JSON, PNG, palette, Nitro model) | The field actors' models: their table and graphics | `tools/data/field_actor_data.py` |
 | `a/1/2/7` | `res/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
 | `a/1/6/3` | `res/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
-| `a/2/1/2`, `a/2/1/1` | `res/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
-| `a/2/6/2`, `a/2/6/1` | `res/facilities/black_tower/` (JSON) | Black Tower and White Treehollow trainers and Pokémon | `tools/data/facility_data.py` |
-| `a/2/4/8` to `a/2/5/7` | `res/facilities/pwt_*/` (JSON) | Pokémon World Tournament trainers, Pokémon and rental Pokémon | `tools/data/facility_data.py` |
-| `a/1/6/9` | `res/tr_ai/` | Trainer AI scripts, see [Scripts](scripts.md) | `tools/script/tr_ai_script.py` |
+| `a/2/1/2`, `a/2/1/1` | `res/trainers/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
+| `a/2/6/2`, `a/2/6/1` | `res/trainers/facilities/black_tower/` (JSON) | Black Tower and White Treehollow trainers and Pokémon | `tools/data/facility_data.py` |
+| `a/2/4/8` to `a/2/5/7` | `res/trainers/facilities/pwt_*/` (JSON) | Pokémon World Tournament trainers, Pokémon and rental Pokémon | `tools/data/facility_data.py` |
+| `a/1/6/9` | `res/trainers/ai/` | Trainer AI scripts, see [Scripts](scripts.md) | `tools/script/tr_ai_script.py` |
 
 The text archives are packed by `text_data.py` from text files rather than assembled; `configure.py` lists them in
 `TEXT_ARCHIVES`.
@@ -559,7 +559,7 @@ An ability's text is `res/abilities/<ability>.json`, its name and description, a
 its name, named after their constants and in the order of their lists. What they do is the code's, so they have no
 archive: only the text takes them (see [Text](#text)), and `tools/text/text_sources.py` validates them against
 `ability.schema.json` and `type.schema.json`. `TYPE_NULL`, the type of a typeless move, has no name and no file. A
-trainer class's text, `res/trainer_classes/<class>.json`, is its name and its name with an article, which the game
+trainer class's text, `res/trainers/classes/<class>.json`, is its name and its name with an article, which the game
 writes by hand ("a Twin" for Twins, none for the Gym Leaders), a nature's, `res/natures/<nature>.json`, its name,
 and a place's, `res/places/<place>.json`, its name. Zone headers name their place by its constant in
 `generated/places.txt` (`PLACE_ASPERTIA_CITY`), which `make_constants.py --places` named after the place names,
@@ -568,10 +568,10 @@ numbering the ones that repeat, as the second copies of Unova's places.
 
 ## Trainers
 
-Each trainer is `res/trainers/<trainer>.json`, named after its constant (`elite_four_shauntal.json` for
-`TRAINER_ELITE_FOUR_SHAUNTAL`), as pokeplatinum's `res/trainers/data/`. It holds the trainer's record (`a/0/9/1`) and
+Each trainer is `res/trainers/data/<trainer>.json`, named after its constant (`elite_four_shauntal.json` for
+`TRAINER_ELITE_FOUR_SHAUNTAL`), as pokeplatinum's `res/trainers/data/data/`. It holds the trainer's record (`a/0/9/1`) and
 its party (`a/0/9/2`), and `tools/data/trainer_data.py pack` builds both archives in the order of
-`generated/trainers.txt`. `res/trainers/trainer.schema.json` documents each field.
+`generated/trainers.txt`. `res/trainers/data/trainer.schema.json` documents each field.
 
 ```json
 {
@@ -610,7 +610,7 @@ its party (`a/0/9/2`), and `tools/data/trainer_data.py pack` builds both archive
 A trainer's `name` and `messages` go into the text (see [Text](#text)). The messages are also the trainer message table
 (`a/0/8/9`), which pairs each with its trainer and type (0 before the battle, 1 when the trainer loses, 8 when it wins,
 and other moments by number), and its offsets for each trainer (`a/0/9/0`), which `TrainerMsg_Load` reads; the packer
-writes both, with the trainers in the order of `res/trainers/message_order.json`, then any others that have messages. A
+writes both, with the trainers in the order of `res/trainers/data/message_order.json`, then any others that have messages. A
 party either gives every Pokémon an `item` or none, and `moves` or none; the packer sets the record's party kind
 (`PARTY_ITEMS`, `PARTY_MOVES`) from that, and a Pokémon without moves gets the moves of its level. `ai_flags` are the
 trainer AI scripts to run (`AI_FLAG_*`, see [Scripts](scripts.md)), `money` a multiplier of the prize money and `reward`
@@ -627,7 +627,7 @@ Each trainer's constant in `generated/trainers.txt`, which the field scripts use
 
 ### Trainer sprites
 
-Each trainer sprite is a directory in `res/trainer_sprites/front/` or `res/trainer_sprites/back/`, named after its
+Each trainer sprite is a directory in `res/trainers/sprites/front/` or `res/trainers/sprites/back/`, named after its
 constant in `generated/trainer_sprites.txt` or `trainer_back_sprites.txt`, and the archives (`a/0/7/1`,
 `a/0/7/2`) hold the sprites in the lists' order. A sprite's constant is named after the first trainer class that shows
 it, as `TRAINER_SPRITE_YOUNGSTER`; several classes can share one, such as the Battle Subway's bosses' and their
@@ -655,7 +655,7 @@ its source; where that gives the same picture, palette or data as one of the ori
 version being built, it takes the original's bytes, which keeps the ROM's compression and headers, so an unchanged set
 packs all three archives byte for byte in both versions. Every file but `single.png` must be there, the pictures must
 keep their sizes and the palette its 16 colors, and the build stops with the file's name otherwise. `.venv/bin/python tools/data/trainer_graphics.py dump extract/b2_us/files
-res/trainer_sprites` writes the directories again.
+res/trainers/sprites` writes the directories again.
 
 ## Wild encounters
 
@@ -743,12 +743,12 @@ are null for random ones. The field scripts name the trades they start, as `Fiel
 
 ## Battle facilities
 
-A battle facility's trainers and the Pokémon sets they pick from are in `res/facilities/<facility>/`, as
-pokeplatinum's `res/trainers/frontier/`: `trainers/<trainer>.json` has a trainer's class, its sets by name, and its
+A battle facility's trainers and the Pokémon sets they pick from are in `res/trainers/facilities/<facility>/`, as
+pokeplatinum's `res/trainers/data/frontier/`: `trainers/<trainer>.json` has a trainer's class, its sets by name, and its
 name and messages, which the text takes (see [Text](#text)); `pokemon/<set>.json` is a set (`BSubwayPokemonData` in
 `include/field/battle_facility.h`), named after its species and numbered from 1, as `gengar_4.json`; and `order.json`
 lists both in archive order. `tools/data/facility_data.py pack` builds the facility's trainers and Pokémon
-archives, and `res/facilities/facility.schema.json` and `set.schema.json` document the fields.
+archives, and `res/trainers/facilities/facility.schema.json` and `set.schema.json` document the fields.
 
 `FACILITIES` in `facility_data.py` says which archives and message files are a facility's: the Battle Subway (`a/2/1/2`
 and `a/2/1/1`, whose trainers' names are system message file 15 and their three messages each file 376), which the Trial

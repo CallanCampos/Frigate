@@ -8,7 +8,7 @@ followed by 32-bit arguments; the argument layout of every command comes from it
     tr_ai_script.py disasm ARCHIVE OUTPUT_DIR      # write one .s file per script
 
 The .s files go through the C preprocessor, so that they can use the constants in include/constants, and assemble
-back to the original bytes. The scripts in res/tr_ai are edited by hand since, so disassembling is for reference.
+back to the original bytes. The scripts in res/trainers/ai are edited by hand since, so disassembling is for reference.
 """
 import argparse
 import json

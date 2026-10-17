@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "A trainer class: res/trainer_classes/<class>.json",
+    "title": "A trainer class: res/trainers/classes/<class>.json",
     "description": "A trainer class's text, in the order of generated/trainer_classes.txt. The text files take it with \\from{trainer_classes.name} and \\from{trainer_classes.name_with_article} (tools/text/text_sources.py).",
     "type": "object",
     "additionalProperties": false,

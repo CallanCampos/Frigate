@@ -5,7 +5,7 @@ once:
     list_text_data.py extract/b2_us/files data
 
 res/abilities/<ability>.json has an ability's name and description, res/types/<type>.json a type's name,
-res/trainer_classes/<class>.json a trainer class's name and name with its article, res/natures/<nature>.json a
+res/trainers/classes/<class>.json a trainer class's name and name with its article, res/natures/<nature>.json a
 nature's name, and res/places/<place>.json a place's name, named after their constants. They have no archive of their own: the text files take them with
 \\from{abilities.name} and the like (see text_sources.py), which validates them against their schemas.
 """

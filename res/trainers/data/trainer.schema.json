@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "A trainer: res/trainers/<trainer>.json",
+    "title": "A trainer: res/trainers/data/<trainer>.json",
     "description": "A trainer's record (archive a/0/9/1, 20 bytes) and its party (a/0/9/2). tools/data/trainer_data.py packs them in the order of generated/trainers.txt. A string value is the name of a constant from generated/ or include/constants/.",
     "type": "object",
     "additionalProperties": false,
@@ -31,7 +31,7 @@
         "reward": { "$ref": "#/$defs/item", "description": "An item given after the battle" },
         "messages": {
             "type": "array",
-            "description": "What the trainer says, in order: lines of system message file 381, which the text files take with \\from{trainers.messages}, and the trainer message table pairs with the trainer and their type. res/trainers/message_order.json gives the order of the trainers in the table",
+            "description": "What the trainer says, in order: lines of system message file 381, which the text files take with \\from{trainers.messages}, and the trainer message table pairs with the trainer and their type. res/trainers/data/message_order.json gives the order of the trainers in the table",
             "items": {
                 "type": "object", "additionalProperties": false, "required": [ "type", "text" ],
                 "properties": {

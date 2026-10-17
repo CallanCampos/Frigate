@@ -5,7 +5,7 @@ musicals. Scripts are files in the ROM's NARC archives. Each command is a 16-bit
 
 The trainer AI scripts are built from source. Archive `a/1/6/9` holds 14 scripts, one per AI flag, which run in turn
 for each flag the trainer has: flag bit N runs script N (`AI_FLAG_*` in `include/constants/tr_ai.h`). They are
-written in `res/tr_ai/NN_name.s`, numbered by their flag bit, with the macros in
+written in `res/trainers/ai/NN_name.s`, numbered by their flag bit, with the macros in
 `include/asm/tr_ai.inc`, in the style of [pokeplatinum](https://github.com/pret/pokeplatinum)'s trainer AI. This
 game's scripts grew out of Gen 4's, so most commands, routines and labels are the same as pokeplatinum's, and share
 their names. Gen 5's additions, such as the handlers of the new move effects, are named in the same style. Each

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "A battle facility's Pokémon set: res/facilities/<facility>/pokemon/<set>.json",
+    "title": "A battle facility's Pokémon set: res/trainers/facilities/<facility>/pokemon/<set>.json",
     "description": "A set a facility's trainers pick from (BSubwayPokemonData in include/field/battle_facility.h), named after its species and numbered from 1. tools/data/facility_data.py packs them in the order of the facility's order.json. A string value is the name of a constant from generated/ or include/constants/.",
     "type": "object",
     "additionalProperties": false,

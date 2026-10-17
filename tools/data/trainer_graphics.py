@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""The trainer sprites in res/trainer_sprites/: dump writes them from the ROM once, and pack builds the archives from
+"""The trainer sprites in res/trainers/sprites/: dump writes them from the ROM once, and pack builds the archives from
 them, which the build does.
 
-    trainer_graphics.py dump extract/b2_us/files res/trainer_sprites
-    trainer_graphics.py pack res/trainer_sprites black2|white2 FRONT BACK BACK_COPY
+    trainer_graphics.py dump extract/b2_us/files res/trainers/sprites
+    trainer_graphics.py pack res/trainers/sprites black2|white2 FRONT BACK BACK_COPY
 
 A sprite is a directory, front/<sprite>/ or back/<sprite>/, named after its constant in trainer_sprites.txt or
 trainer_back_sprites.txt, and the archives (a/0/7/1, a/0/7/2) have the sprites in the order of those lists, eight

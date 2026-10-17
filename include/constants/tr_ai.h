@@ -3,7 +3,7 @@
 
 // Constants of the trainer AI scripts, see src/ov170/tr_ai.c. Names follow pokeplatinum's where the command is the same
 
-// The AI flags of a trainer. Each flag runs the script with its bit number, res/tr_ai/NN_*.s
+// The AI flags of a trainer. Each flag runs the script with its bit number, res/trainers/ai/NN_*.s
 #define AI_FLAG_BASIC (1 << 0)
 #define AI_FLAG_EVAL_ATTACK (1 << 1)
 #define AI_FLAG_EXPERT (1 << 2)

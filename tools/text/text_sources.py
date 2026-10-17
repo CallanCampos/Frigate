@@ -84,7 +84,7 @@ def types() -> list[dict]:
 
 @cache
 def trainer_classes() -> list[dict]:
-    return validated("trainer_classes", "res/trainer_classes", "TRAINER_CLASS_", "trainer_class.schema.json")
+    return validated("trainer_classes", "res/trainers/classes", "TRAINER_CLASS_", "trainer_class.schema.json")
 
 
 @cache
@@ -112,7 +112,7 @@ def trades() -> list[dict]:
 @cache
 def trainers() -> dict[str, dict]:
     """The trainers' files by constant, in the order of trainers.txt, without TRAINER_NONE, which has none."""
-    return {name: read(ROOT / "res/trainers" / (name.removeprefix("TRAINER_").lower() + ".json"))
+    return {name: read(ROOT / "res/trainers/data" / (name.removeprefix("TRAINER_").lower() + ".json"))
             for name in ordered("trainers")[1:]}
 
 
@@ -149,11 +149,11 @@ def item_with_article(data: dict) -> str:
 
 def message_order() -> list[str]:
     """The trainers whose messages the trainer message table has, in its order: the ones of
-    res/trainers/message_order.json, then any other trainer with messages, in ID order."""
-    listed = json.loads((ROOT / "res/trainers/message_order.json").read_text())
+    res/trainers/data/message_order.json, then any other trainer with messages, in ID order."""
+    listed = json.loads((ROOT / "res/trainers/data/message_order.json").read_text())
     for name in listed:
         if not trainers().get(name, {}).get("messages"):
-            raise DataError(f"res/trainers/message_order.json: {name} is not a trainer with messages")
+            raise DataError(f"res/trainers/data/message_order.json: {name} is not a trainer with messages")
     rest = [name for name, data in trainers().items() if data.get("messages") and name not in listed]
     return listed + rest
 
