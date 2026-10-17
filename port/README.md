@@ -45,6 +45,59 @@ of everything; then the next to press something takes over. [app/present.c](app/
 table, and the gamepad's controls are one table in [app/gamepad.c](app/gamepad.c) that a settings file will be able
 to replace.
 
+### The macOS app
+
+On macOS the host build also makes the program as an app, signed ad hoc and never notarized: there is no Apple
+Developer account ([ADR 0003](docs/adr/0003-ad-hoc-signing-no-apple-developer-account.md)). The app is made locally
+only; the port's compiled game code is never uploaded or distributed.
+
+```sh
+cmake --build build/port --target pokeblack2_app     # build/port/pokeblack2.app
+port/tools/package_macos.sh                           # build/port/pokeblack2-0.0.N.dmg, with the app
+```
+
+- `-DPORT_VERSION=w2_us` makes `pokewhite2.app`, and `-DPORT_MACOS_APP=ON` makes the app with every build.
+  [app/macos/make_app.sh](app/macos/make_app.sh) builds it from the program the build linked: the program, the
+  libraries it loads from outside macOS (Homebrew's SDL3) in `Contents/Frameworks`, and an `Info.plist` from
+  [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where each of its values comes from. It signs the
+  whole app with `codesign --force --deep --sign -` and checks it with `codesign --verify --deep --strict`.
+- **Change the bundle identifier.** It is `com.example.pokebw2-native.pokeblack2`, a placeholder: configure with
+  `-DPORT_MACOS_BUNDLE_ID_PREFIX=` and a reverse-DNS name of a domain of your own (`io.github.<you>.pokebw2-native`,
+  for example). macOS keeps an app's preferences and permissions under it.
+- The version comes from git: `0.0.N`, N being the number of commits built, and the commit in `PortSourceRevision`.
+  The minimum macOS is the one the program and the libraries in the app were built for; with Homebrew's SDL3 that is
+  the macOS Homebrew built SDL3 for.
+- `package_macos.sh` puts the app and a link to `/Applications` in a compressed disk image, then checks the image, the
+  app's signature in it, and that it holds no ROM or other game file. `--out PATH` puts it elsewhere, never in a
+  tracked part of the repository. Its header lists its options.
+
+**The ROM.** The app holds no ROM and no game data. It finds yours as the program does
+([hal/rom](hal/rom/port_rom.h)): `--rom PATH`, then the `POKEBW2_ROM` environment variable, then the `orig/` of the
+checkout the app was built in (`orig/baserom_b2_us.nds`, or `orig/baserom_w2_us.nds` for White 2). So an app built
+from your checkout opens from the Finder with the ROM you placed for the ROM build, as long as the checkout stays
+where it is (the program holds that checkout's path). Otherwise give the path when you open it:
+
+```sh
+open -a build/port/pokeblack2.app --args --rom ~/Games/pokeblack2.nds
+open -a build/port/pokeblack2.app --env POKEBW2_ROM=$HOME/Games/pokeblack2.nds
+build/port/pokeblack2.app/Contents/MacOS/pokeblack2 --rom ~/Games/pokeblack2.nds
+```
+
+The app takes the program's options after `--args`. Without a ROM it quits at once with status 66 and says why on
+the terminal, so a Finder launch shows nothing. Saves go to `~/Library/Application Support/pokebw2-native/`
+(`IREO.sav` for Black 2, `IRDO.sav` for White 2) unless `--save-dir` says otherwise.
+
+**Gatekeeper.** An app built on your own Mac opens normally. One that came from elsewhere (a download, or a disk image
+copied from another Mac) is quarantined, and macOS 15 and later block it until you allow it once:
+
+1. Open the app. macOS says it can't verify it; click **Done**.
+2. Open **System Settings → Privacy & Security** and scroll to **Security**, where it says the app "was blocked to
+   protect your Mac". Click **Open Anyway** (it shows for about an hour after the blocked launch).
+3. Confirm with **Open Anyway** and your password or Touch ID.
+
+From then on the app opens normally. On macOS 14 and earlier, Control-clicking the app and choosing **Open** does the
+same. Do this only for an app whose source you trust.
+
 ## Directory map
 
 The layout from [PLAN.md §4.3](docs/PLAN.md#43-directory-structure). Entries marked **now** exist; the rest are
@@ -55,8 +108,8 @@ port/
   README.md              now      this overview
   CLAUDE.md              now      rules for sessions working on the port
   CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
-  app/                   now      main(), SDL3 window, gamepads; later screen layouts, settings, paths, first-launch
-                                  ROM setup
+  app/                   now      main(), SDL3 window, gamepads, macos/ (the app's Info.plist and build script);
+                                  later screen layouts, settings, paths, first-launch ROM setup
   include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
   hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
     os/ pxi/ hw/ gx/ dma/ mi/ fx/ math/ crypto/ rom/ card/ fs/ nvram/ rtc/ pm/ tp/ mic/ ctrdg/ reset/ input/
@@ -76,6 +129,7 @@ port/
     compile-probe/       now      host-compiler probe: 64-bit warnings and struct layouts
     research/            now      one-off research scripts and the NitroFS SHA1 manifest
     sync_upstream.sh     now      merge upstream and verify both ROMs and the host build
+    package_macos.sh     now      the macOS app, signed ad hoc, in a disk image
     bootstrap_checkout.sh now     prepare a new clone or worktree for the ROM build and Claude Code
     hooks/port_guard.py  now      Claude Code hook that refuses writes to upstream and the decomp fork
     gen_host_tree.py     now      source list, include/ mirror without MSL's libc headers, generated constants

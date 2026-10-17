@@ -65,6 +65,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0007](0007-nitrosystem-files-in-host-structs.md) | NitroSystem's 2D files in host structs | D3, D5, §4.5 | accepted |
 | [0008](0008-particle-work-from-the-platform-layer.md) | Particle work from the platform layer | D5, §4.5, §4.8 | accepted |
 | [0009](0009-gamepads-by-position-one-pad-at-a-time.md) | Gamepads by position, one pad at a time | §4.5, §7 | accepted |
+| [0010](0010-macos-app-as-a-signed-copy-of-the-program.md) | The macOS app as a signed copy of the program | D11, §7 | accepted |
 
 ## Decisions waiting for an ADR
 

@@ -26,6 +26,49 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: gamepads, and the macOS app in a disk image
+
+- **Upstream:** `615939e25`, as merged into the port's `main` by `e1b68f578`.
+- **Port:** `PORT_SHA`, on the branch `port-controller-pkg` from `f52dad0b2` (not yet merged or pushed).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). Nothing outside `port/` changed but
+  `.github/workflows/port-ci.yml`, a port file, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS: Black 2 RelWithDebInfo and its app, Black 2 under ASan and UBSan, White 2
+  RelWithDebInfo and its app; not pushed, so no CI run (Linux unbuilt).
+- **Tests:** T0 as above. T2: Black 2, 217 of 220 `ctest` tests pass and 3 are skipped without the oracle
+  (`oracle_boot`, `oracle_opening`, `oracle_title`), among them the new `app_gamepad_plain` and `app_gamepad_sanitized`
+  (382 checks each: the stick's dead zone and sectors, the map by position and by label, the pad that drives, the
+  description, and SDL's virtual joysticks as pads that come and go). Sanitized (`build/port-asan`): the app,
+  integration, smoke and `replay_start_menu` tests, 17 of 17, and a windowed run of 90 frames. White 2's tests not
+  run. T3: `replay_start_menu` and `replay_new_game` pass (among the 217). The app, each version:
+  `codesign --verify --deep --strict` passes; its program, run from inside the app with `--headless --frames 300 --rom
+  orig/baserom_<version>.nds`, loads the app's own SDL3 and stops after 300 frames; Black 2's picture at frame 300 is
+  the plain program's, also when launched through LaunchServices (`open`, the ROM from the checkout's `orig/`) and
+  from the mounted disk image; `spctl --assess` rejects it, as Gatekeeper does any app that isn't notarized. The disk
+  images verify (`hdiutil verify`) and hold the app and a link to `/Applications` only. T4, T5's nightly runs, T6, T7
+  not yet.
+- **Tiers:** unchanged since the last entry (no decomp C changed).
+- **Trap stubs:** unchanged, 581 function stubs and 67 data placeholders.
+- **64-bit warnings:** unchanged (no game or `lib/` code changed).
+- **Work done:** phase 5's controller support and macOS packaging.
+  - Gamepads through SDL3's gamepad API (`port/app/gamepad.c`,
+    [ADR 0009](adr/0009-gamepads-by-position-one-pad-at-a-time.md)): every pad connected, hot-plugged and remapped;
+    the DS's A, B, X and Y by position (a Nintendo pad's layout), L and R on the shoulders, Start and Select, the D-pad
+    and the left stick as the D-pad with a circular dead zone of half its travel; one pad drives at a time; one table,
+    `PortGamepadMap`, for a settings file to replace. Each pad names its DS buttons by SDL's labels when it connects.
+    The keyboard works at the same time. The controls are in `port/app/present.c`'s header and port/README.md.
+  - The macOS app ([ADR 0010](adr/0010-macos-app-as-a-signed-copy-of-the-program.md)): the target
+    `pokeblack2_app` (`pokewhite2_app` for White 2; `-DPORT_MACOS_APP=ON` builds it every time) copies the program into
+    `<program>.app` with Homebrew's SDL3 in `Contents/Frameworks` and an Info.plist (a placeholder bundle identifier,
+    `com.example.pokebw2-native.<program>`, the version from git, the minimum macOS from the binaries, high DPI, a game
+    category with Game Mode), and signs it ad hoc. `port/tools/package_macos.sh` makes the disk image and checks it.
+    port/README.md says where the ROM goes and how to get past Gatekeeper ("Open Anyway"). CI builds the app on its
+    macOS runner and uploads nothing.
+- **Next:** as the last entry (overlay 12's field script data, upstream). For the app: a first-launch ROM picker,
+  since a Finder launch without a ROM quits with its reason on stderr only; an app for older macOS (the pinned SDL3
+  built statically with a deployment target, not tried yet).
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-17: oracle comparisons from power-on to the start menu
 
 - **Upstream:** `e484d5011` (merge of PR #353), as in the last entry.

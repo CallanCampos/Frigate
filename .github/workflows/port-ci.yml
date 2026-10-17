@@ -58,3 +58,9 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build/port --output-on-failure
+
+      # The macOS app, made and signed ad hoc as port/README.md says, with its signature checked by the script. It stays
+      # on the runner: the port's compiled game code is never uploaded
+      - name: Build the macOS app
+        if: runner.os == 'macOS'
+        run: cmake --build build/port --target pokeblack2_app
