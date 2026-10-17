@@ -199,6 +199,8 @@ DATA_PACKS = [
     ("tools/data/item_data.py", "data/items", ["a/0/2/4"], False),  # Item data
     # Trainers, their parties, and the table of their messages with its offsets
     ("tools/data/trainer_data.py", "data/trainers", ["a/0/9/1", "a/0/9/2", "a/0/8/9", "a/0/9/0"], False),
+    # Trainer sprites, front and back, and a/0/6/3, a copy of the back sprites
+    ("tools/data/trainer_graphics.py", "data/trainer_sprites", ["a/0/7/1", "a/0/7/2", "a/0/6/3"], True),
     ("tools/data/encounter_data.py", "data/encounters", ["a/1/2/7"], True),  # Wild encounters
     # Zone headers, which give each zone the number of its events in data/events/order.json
     ("tools/data/zone_data.py", "data/zones", ["a/0/1/2"], False, ["data/events"]),
