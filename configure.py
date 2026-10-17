@@ -155,6 +155,15 @@ LIBRARIES = load_libraries()
 GENERATED_INCLUDE_DIR = "build/include/generated"
 INCLUDE_DIRS = ["include", *(p.relative_to(ROOT).as_posix() for p in sorted(LIB_DIR.glob("*/include"))),
                 GENERATED_INCLUDE_DIR]
+# Binaries that the game embeds as they are, which no compiler of ours can build: the DSP's programs. The build takes
+# their bytes from the base ROM (tools/build/rom_blob.py) into an include file under rom/ of the generated headers, which
+# the source file that defines the array includes as its initializer. Each maps that include file to the extracted
+# module, the module's config directory and the array's symbol. Both versions have the same bytes, so they come from
+# the first version built, and the other version's SHA1 check covers its own.
+ROM_BLOBS = {
+    "rom/dsp/dsp_g711_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_G711Image"),
+    "rom/dsp/dsp_graphics_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_GraphicsImage"),
+}
 
 
 def library_of(source: Path) -> tuple[str, list[str]] | None:
@@ -705,6 +714,15 @@ def main():
     n.build([pms_words_header], "pms_words", [f"data/text/system/{file}.txt" for _, file, _ in PMS_WORD_CATEGORIES],
             implicit=["tools/text/pms_words.py", *text_tools, *from_data])
     constant_headers.append(pms_words_header)
+    # The embedded binaries, from the first version's extracted ROM
+    n.rule("rom_blob", "$python tools/build/rom_blob.py $module $in $name $out", "Generating $out", restat="1")
+    for include, (module, config_dir, name) in ROM_BLOBS.items():
+        output = Path(GENERATED_INCLUDE_DIR) / include
+        symbols = Path("config") / versions[0] / "arm9" / config_dir / "symbols.txt"
+        n.build([output], "rom_blob", [symbols],
+                implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
+                variables={"module": str(Path("extract") / versions[0] / module), "name": name})
+        constant_headers.append(output)
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []
