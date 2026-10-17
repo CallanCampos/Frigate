@@ -1094,6 +1094,11 @@ Same instructions, scheduled in another order.
   sizeof(T)`, is scheduled apart from the same address indexed through a pointer to the table's type: TwlSDK's
   `DSP_LoadPipe` (`dsp_pipe.c`) loads the DSP's base and adds the row before the `cmp` of its scratch-table test only
   with `DSPPipe (*headers)[2] = (DSPPipe (*)[2])sPipeBase;` and `(u32)&headers[port][direction]`.
+- A two-dimensional table indexed `table[row][col]` adds the row's offset to the table's address and then loads at
+  the column plus that (`add r1, r1, r1, lsl #1; add r0, r0, r1; ldrb r5, [r2, r0]`), where a flat `table[row * 3 +
+  col]` adds the row's offset to the column and loads from the table. libVCT's `sSendSchedule` (`vct_audio.c`) is
+  seven rows of three, one for each number of machines to send to, each summing to its row's count, and
+  `VCT_SendPending` matches with `sSendSchedule[sSendQueue.scheduleRow][sSendQueue.scheduleColumn++]`.
 - An OR of two shifts of one value computes its right operand first and folds the left one's shift into the `orr`: `(x
   << 16) | (x >> 16)` is `lsr r1, r0, #16; orr r0, r1, r0, lsl #16`, so the ROM's `lsl` first is `(x >> 16) | (x <<
   16)`, as the DSP's `dsp_audio.c` and `dsp_pipe.c` swap the halves of a word.
@@ -1120,6 +1125,12 @@ Same instructions, scheduled in another order.
   NitroSDK function that takes a pointer to a parameter struct may have lost the SDK's `const` in our header:
   `WM_StartScanEx` (`wm_standard.c`) loads `param->channelList` above its command's first store only with
   `const WMScanExParam *param`, NitroSDK's prototype.
+- In ARM code a load of a static's member at a constant offset moves above a store through an unknown index into
+  another static only when the offset is below half the object's size: with `int f[16]`, `sSlots[slot] = 0;
+  sObj.f[7]--;` loads `f[7]` first and `sObj.f[8]--;` loads after the store. The stored array's size, the order of
+  the declarations, linkage, field types, nesting and `#pragma scheduling off` don't change it. libVCT's
+  `VCT_DetachSession` (`vct_audio.c`) loads `sAudio.sessionCount`, at 0x20 of the 0x2c-byte `sAudio`, above its
+  `sSlotSessions[slot] = NULL`, which no spelling of the two statements reproduces.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1369,6 +1380,14 @@ Same instructions, scheduled in another order.
   which has the two instructions in `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, wrote `-(sinR + cosR) + FX32_ONE`, and
   matches so under scratch copies of the SDK's typedefs; with this checkout's `int` `fx32` both functions stay 4 bytes
   short. The negation in a statement of its own (`sum = a + b; sum = -sum;`) keeps the two as well.
+- A difference taken back from its own first operand folds too: `d + ((d - last - d) >> 4)`, or the same with
+  `d - last` in a `u32` local, compiles to `rsb r0, r0, #0`. The two `sub`s stay when the local has the other
+  signedness, `int change = d - last;`, or when a store to `last` comes between the local and its use. libVCT's
+  `ReceiveSlot` (`vct_audio.c`) smooths its delay with `int change = delay - receiver->lastDelay;` and `delay +
+  ((change - delay) >> 4)`, the form of the `change` of `UpdateTiming` in the same file.
+- A 64-bit difference narrowed to 32 bits is a `subs` of the low words, its high word's `sbc` dropped as dead: `u32
+  delay = now - packet->arrival;` with `u64` operands, as libVCT's `ReceiveSlot` (`vct_audio.c`) has it, where
+  `(u32)now - (u32)packet->arrival` is a `sub`.
 - A field's address in a stack struct formed in two steps, `add r1, sp, #0` and then `add r1, r1, #4` (with `ldr r0,
   [sp, #0]` between), where ours folds it into `add r1, sp, #4`, is the struct passed as a packet of words to an inline
   that indexes it. G3D's `NNSi_G3dSendTexSRTMaya`, `NNSi_G3dSendTexSRTSi3d`, `NNSi_G3dSendTexSRT3dsMax` and
@@ -1703,7 +1722,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A pointer compared with `NULL`, which is `((void *)0)`, can share a zero that the function keeps in a register for its
   stores, `cmp r0, r5`, where `if (p)` and `if (!p)` compare with `#0`; keeping that zero alive moves other registers
   too. `snd_command.c`'s `SND_CommandInit` stores eight zeros before its calls and matches only with `if (command)`;
-  `wm_system.c`'s `WmInit` and `nvram.c`'s callbacks need the same.
+  `wm_system.c`'s `WmInit` and `nvram.c`'s callbacks need the same. The zero can also be kept in a saved register
+  across a call and returned for a `FALSE` (`movne r0, r6`), and then every `NULL` test that shares it has to go:
+  libVCT's `VCT_SendPending` (`vct_audio.c`) tests `sSendQueue.sending` before and after its `EncodeNextFrame` call
+  and matches only with both tests written `!p` and `p && ...`; either one left against `NULL` keeps the zero.
 - A value moved into an argument register just before a call, and used for nothing else, is an argument the prototype
   is missing. `GFL_SEPlayKeepVol` takes the sound's player as well as the sound. The value can be narrowed for it:
   `CtvtComm_RecvPacket` narrows `packet->value` into r1 (`lsls`/`lsrs #24`) but compares the unnarrowed value with
@@ -1998,7 +2020,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `side = 0; if (!(wk->attacker & 1)) { side = 1; }`.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
-  on, where `if (!f()) { return FALSE; } n++;` puts it before.
+  on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just
+  before the rotated loop's bottom test: libVCT's `ReceiveSlot` (`vct_audio.c`) has its empty-queue exit there and
+  matches with the body wrapped as `if (packet != NULL) { ... } else { receiver->queuedCount = count; return FALSE; }`.
 - Every `return` gets its own epilogue. Failures that all branch to one block that sets a saved register and jumps
   to a shared `mov r0, rN` exit can be a `static inline`'s early returns, which inlining turns into stores to one
   result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is

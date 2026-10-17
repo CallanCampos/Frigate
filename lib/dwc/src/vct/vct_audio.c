@@ -128,7 +128,8 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask);
 static const u8 sFrameSizes[VCT_CODEC_MAX][2] = { { 8, 0 }, { 8, 0 }, { 2, 4 }, { 3, 4 }, { 4, 4 } };
 
 // How many packets to send in each of the ticks that follow a frame, in a row for each number of machines to send to
-static const u8 sSendSchedule[22] = { 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 3, 0 };
+static const u8 sSendSchedule[7][3] = { { 1, 0, 0 }, { 1, 1, 0 }, { 1, 1, 1 }, { 1, 1, 2 },
+                                        { 1, 2, 2 }, { 2, 2, 2 }, { 2, 2, 3 } };
 
 // Whether to leave out frames with no voice in them
 static int sVadEnabled = TRUE;
@@ -300,56 +301,57 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
         now = OS_GetTick();
         packet = PeekQueue(slot);
 
-        if (packet == NULL) {
-            receiver->queuedCount = count;
-            return FALSE;
-        }
-        if (packet->playTime > now + 0x34) {
-            more = FALSE;
-            if (packet->silence == 0 && receiver->held != NULL) {
-                receiver->playedCount++;
-                MIi_CpuCopyFast(receiver->held->data, dst, size);
-                VCT_FreePacket(receiver->held);
-                receiver->held = NULL;
-                if (heardMask != NULL) {
-                    *heardMask |= 1 << packet->aid;
+        if (packet != NULL) {
+            if (packet->playTime > now + 0x34) {
+                more = FALSE;
+                if (packet->silence == 0 && receiver->held != NULL) {
+                    receiver->playedCount++;
+                    MIi_CpuCopyFast(receiver->held->data, dst, size);
+                    VCT_FreePacket(receiver->held);
+                    receiver->held = NULL;
+                    if (heardMask != NULL) {
+                        *heardMask |= 1 << packet->aid;
+                    }
+                    return TRUE;
                 }
-                return TRUE;
+                return FALSE;
             }
-            return FALSE;
-        }
-        if (now > packet->playTime + 0x8b4c) {
-            receiver->lastPlayedSequence = packet->sequence;
-            count = SetHeld(receiver, packet);
-            PeekQueue(slot);
-            more = FALSE;
-        } else {
-            u32 lastSequence = receiver->lastPlayedSequence;
-
-            if (lastSequence + 1 != packet->sequence && lastSequence != 0 && lastSequence <= packet->sequence) {
-                if (packet->silence == 0) {
-                    receiver->lostCount++;
-                }
-            }
-            receiver->lastPlayedSequence = packet->sequence;
-            if (more && receiver->unk70 != 0) {
+            if (now > packet->playTime + 0x8b4c) {
+                receiver->lastPlayedSequence = packet->sequence;
                 count = SetHeld(receiver, packet);
                 PeekQueue(slot);
-                receiver->unk70--;
+                more = FALSE;
             } else {
-                u32 delay = (u32)now - (u32)packet->arrival;
-                u32 smoothed = delay + ((u32)(delay - receiver->lastDelay - delay) >> 4);
-
-                receiver->lastDelay = delay;
-                receiver->avgDelayCopy = smoothed;
-                receiver->avgDelay = smoothed;
-                MIi_CpuCopyFast(packet->data, dst, size);
-                SetHeld(receiver, packet);
-                if (heardMask != NULL) {
-                    *heardMask |= 1 << packet->aid;
+                if (receiver->lastPlayedSequence + 1 != packet->sequence && receiver->lastPlayedSequence != 0 &&
+                    receiver->lastPlayedSequence <= packet->sequence) {
+                    if (packet->silence == 0) {
+                        receiver->lostCount++;
+                    }
                 }
-                return TRUE;
+                receiver->lastPlayedSequence = packet->sequence;
+                if (more && receiver->unk70 != 0) {
+                    count = SetHeld(receiver, packet);
+                    PeekQueue(slot);
+                    receiver->unk70--;
+                } else {
+                    u32 delay = now - packet->arrival;
+                    int change = delay - receiver->lastDelay;
+                    u32 smoothed = delay + ((change - delay) >> 4);
+
+                    receiver->lastDelay = delay;
+                    receiver->avgDelayCopy = smoothed;
+                    receiver->avgDelay = smoothed;
+                    MIi_CpuCopyFast(packet->data, dst, size);
+                    SetHeld(receiver, packet);
+                    if (heardMask != NULL) {
+                        *heardMask |= 1 << packet->aid;
+                    }
+                    return TRUE;
+                }
             }
+        } else {
+            receiver->queuedCount = count;
+            return FALSE;
         }
     }
     if (receiver->held != NULL) {
@@ -429,12 +431,12 @@ void VCT_SetEchoCancel(BOOL enabled) {
 
 // Codes the frame waiting in the send queue, returning the packet or NULL if there is none or it is silent
 static VCTVoicePacket *EncodeNextFrame(void) {
-    VCTCodec codec = sAudio.codec;
-    u32 queued = sSendQueue.writeIndex - sSendQueue.readIndex;
-    VCTVoicePacket *packet;
     u8 *samples;
+    VCTVoicePacket *packet;
     u32 energy;
     u32 rms;
+    u32 queued = sSendQueue.writeIndex - sSendQueue.readIndex;
+    VCTCodec codec = sAudio.codec;
 
     if (queued > 1) {
         sSendQueue.readIndex = sSendQueue.writeIndex - 1;
@@ -443,7 +445,7 @@ static VCTVoicePacket *EncodeNextFrame(void) {
     if (queued == 0) {
         return NULL;
     }
-    packet = (sSendQueue.readIndex & 1) ? &sSendQueue.frames[0] : &sSendQueue.frames[1];
+    packet = &sSendQueue.frames[(sSendQueue.readIndex & 1) ? 0 : 1];
     samples = packet->payload;
     if (codec >= VCT_CODEC_ADPCM2) {
         samples += 4;
@@ -620,16 +622,16 @@ BOOL VCT_SendPending(void) {
     if (sAudio.sessionCount == 0) {
         return TRUE;
     }
-    if (sSendQueue.sending == NULL) {
+    if (!sSendQueue.sending) {
         sSendQueue.sending = EncodeNextFrame();
-        if (sSendQueue.sending != NULL && sAudio.echoCancel != 0) {
+        if (sSendQueue.sending && sAudio.echoCancel) {
             return FALSE;
         }
         return TRUE;
     }
     sends = 1;
     if (gVCTSettings.mode == 2) {
-        sends = sSendSchedule[sSendQueue.scheduleRow * 3 + sSendQueue.scheduleColumn++];
+        sends = sSendSchedule[sSendQueue.scheduleRow][sSendQueue.scheduleColumn++];
     }
     for (i = 0; i < sends; i++) {
         int leading = MATH_CountLeadingZeros(sSendQueue.pendingMask);
