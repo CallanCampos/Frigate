@@ -1630,7 +1630,7 @@ sErase kind:bss addr:0x021c4104
 sOptionMenu kind:bss addr:0x021c4108
 data_ov182_021c40d4 kind:bss addr:0x021c4114
 data_ov182_021c40d8 kind:bss addr:0x021c4118
-data_ov182_021c40dc kind:bss addr:0x021c411c
+sFrames kind:bss addr:0x021c411c
 data_ov182_021c40e0 kind:bss addr:0x021c4120
 data_ov182_021c40e4 kind:bss addr:0x021c4124
 data_ov182_021c40e8 kind:bss addr:0x021c4128

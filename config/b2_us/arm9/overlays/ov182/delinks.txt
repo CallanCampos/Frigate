@@ -218,3 +218,9 @@ lib/dwcutilui/src/dwc_util_option_menu.c:
     .rodata     start:0x021bffd0 end:0x021c0038
     .data       start:0x021c0e58 end:0x021c0e88
     .bss        start:0x021c40c8 end:0x021c40d4
+
+lib/dwcutilui/src/dwc_util_timed_notice.c:
+    complete
+    .text       start:0x021afdec end:0x021aff3c
+    .data       start:0x021c0eb0 end:0x021c0ec4
+    .bss        start:0x021c40dc end:0x021c40e0

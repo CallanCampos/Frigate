@@ -11342,6 +11342,7 @@ overlays/ov182 0x021c40b4 sStatus
 overlays/ov182 0x021c40bc sMainMenu
 overlays/ov182 0x021c40c4 sErase
 overlays/ov182 0x021c40c8 sOptionMenu
+overlays/ov182 0x021c40dc sFrames
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
