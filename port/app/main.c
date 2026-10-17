@@ -6,7 +6,8 @@
 // DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
 //   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--screenshot-every N] [--screen-hashes PATH]
-//              [--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] [--fixed-time TIME]
+//              [--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR]
+//              [--run-screens LIST] [--run-dump SPEC]...
 //              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
@@ -24,6 +25,14 @@
 //   --rom PATH          the player's ROM (port/hal/rom)
 //   --save-dir PATH     where saves go (port/hal/card)
 //   --fixed-time TIME   the clock's time at boot, "YYYY-MM-DD HH:MM:SS", moving with the virtual clock (port/hal/rtc)
+//   --run-dir DIR       writes a run directory for the melonDS oracle's compare.py (port/app/run_dir.h): frames.tsv
+//                       with a row at every frame (the video frame, NitroSDK's VBlank count, GFL's frame count, the
+//                       game frame and each screen's hash), and run.txt
+//   --run-screens LIST  the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or
+//                       none, comma-separated, as pbw-oracle's --screens (none by default)
+//   --run-dump SPEC     memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: [LABEL=][*]SYMBOL[+OFFSET]
+//                       :SIZE[@LIST], a global of the program by name (statics aren't visible), * for where the
+//                       pointer there points, at the frames of LIST (the last of --frames by default); repeatable
 //   --watchdog SECONDS  stops with a report and status 73 when a frame takes longer than that in host time: the game
 //                       hangs in a loop that never reaches the platform layer (30 by default with --headless; 0 is
 //                       off, the default with a window)
@@ -42,6 +51,7 @@
 
 #include "app/present.h"
 #include "app/replay.h"
+#include "app/run_dir.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
@@ -61,6 +71,7 @@
 #include <string.h>
 
 #ifndef _WIN32
+#include <dlfcn.h>
 #include <execinfo.h>
 #include <signal.h>
 #include <unistd.h>
@@ -82,9 +93,9 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless",         "help",       "frames",          "screenshot",   "screenshot-every",
-    "screen-hashes",    "audio-dump", "input",           "rom",          "save-dir",
-    "fixed-time",       "watchdog",   "main-arena-size", "vram-backend", "heap-scale-root",
+    "headless",         "help",     "frames",   "screenshot",      "screenshot-every", "screen-hashes",
+    "audio-dump",       "input",    "rom",      "save-dir",        "fixed-time",       "run-dir",
+    "run-screens",      "run-dump", "watchdog", "main-arena-size", "vram-backend",     "heap-scale-root",
     "heap-scale-child",
 };
 
@@ -99,6 +110,7 @@ static const char *sScreenshotPath;
 static int sScreenshotWritten;
 static unsigned long sScreenshotEvery;
 static FILE *sScreenHashes;
+static int sRunDirFailed;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -112,7 +124,8 @@ static void Usage(void) {
     fprintf(stderr,
             "usage: %s [--headless] [--frames N] [--screenshot PATH] [--screenshot-every N] [--screen-hashes PATH] "
             "[--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] "
-            "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
+            "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
+            "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--watchdog SECONDS] [--main-arena-size BYTES] "
             "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
@@ -272,6 +285,82 @@ static void WriteScreenshot(void) {
     }
 }
 
+// The run directory's row of this frame, with its PNG file if --run-screens has it. NitroSDK's VBlank count is the
+// OS core's count of VBlanks, which the port's ARM7 side keeps in the shared memory at the VBlank itself
+static void RunDirFrame(void) {
+    PortRunDirFrame frame;
+
+    frame.frame = (uint32_t)sFrames;
+    frame.vblank = port_os_frame();
+    frame.counter = port_gfl_frame_count();
+    frame.gameFrame = port_replay_game_frame();
+    if (!port_run_dir_frame(&frame, port_screens_pixels(PORT_SCREEN_TOP), port_screens_pixels(PORT_SCREEN_BOTTOM))) {
+        sRunDirFailed = 1;
+        port_os_stop();
+    }
+}
+
+// Opens --run-dir with what run.txt says of the run: the clock's time is --fixed-time's, else the input file's (or the
+// format's default), else the host's
+static int OpenRunDir(const char *dir, const char *inputPath) {
+    const char *program = strrchr(sArgv[0], '/');
+    const char *rom = port_app_option("rom");
+    const char *time = port_app_option("fixed-time");
+    PortRunDirInfo info;
+
+    info.program = program != NULL ? program + 1 : sArgv[0];
+    info.rom = rom != NULL ? rom : port_rom_default_path();
+    info.time = time != NULL ? time : inputPath != NULL ? port_replay_time() : "host";
+    info.input = inputPath;
+    info.inputFrames = port_replay_frames();
+    info.frames = (uint32_t)sFrameLimit;
+    return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
+}
+
+// A global of the program for --run-dump, by name: the program exports its globals (an ELF one because it links with
+// --export-dynamic, port/cmake/app.cmake), so the dynamic linker finds them
+static void *ResolveGlobal(const char *name) {
+#ifdef _WIN32
+    (void)name;
+    return NULL;
+#else
+    static void *program;
+
+    if (program == NULL) {
+        program = dlopen(NULL, RTLD_NOW);
+    }
+    return program != NULL ? dlsym(program, name) : NULL;
+#endif
+}
+
+// Every --run-dump, as --run-dump SPEC or --run-dump=SPEC, into the open run directory
+static int AddRunDumps(void) {
+    static const char option[] = "--run-dump";
+    const size_t length = sizeof(option) - 1;
+
+    for (int i = 1; i < sArgc; i++) {
+        const char *spec = NULL;
+        char error[256];
+
+        if (strncmp(sArgv[i], option, length) != 0) {
+            continue;
+        }
+        if (sArgv[i][length] == '=') {
+            spec = sArgv[i] + length + 1;
+        } else if (sArgv[i][length] == '\0' && i + 1 < sArgc && strncmp(sArgv[i + 1], "--", 2) != 0) {
+            spec = sArgv[++i];
+        } else if (sArgv[i][length] != '\0') {
+            continue;
+        }
+        if (spec == NULL || !port_run_dir_add_dump(spec, ResolveGlobal, error, sizeof(error))) {
+            fprintf(stderr, "port: --run-dump %s: %s\n", spec != NULL ? spec : "",
+                    spec != NULL ? error : "needs a spec");
+            return 0;
+        }
+    }
+    return 1;
+}
+
 // The program's frame hook, at each VBlank on the dispatcher's stack: the scanline hook has drawn the frame's 192
 // lines by now. The input taken here is what the game's VBlank work and next frame read
 static void AppFrame(void) {
@@ -279,9 +368,10 @@ static void AppFrame(void) {
     if (sWindowOpen) {
         port_present_poll();
     }
-    // A replay's input replaces what the window took
-    if (port_replay_active()) {
-        port_replay_vblank((uint32_t)sFrames);
+    // The game clock, and a replay's input in place of what the window took
+    port_replay_vblank((uint32_t)sFrames);
+    if (port_run_dir_active()) {
+        RunDirFrame();
     }
     if (port_app_present != NULL) {
         port_app_present();
@@ -310,6 +400,7 @@ int main(int argc, char **argv) {
     const char *audioDump;
     const char *inputPath;
     const char *screenHashes;
+    const char *runDir;
     PortOsResult result;
     int status = 0;
 
@@ -379,6 +470,17 @@ int main(int argc, char **argv) {
             return EXIT_BAD_OPTIONS;
         }
     }
+    runDir = port_app_option("run-dir");
+    if ((runDir != NULL && *runDir == '\0') ||
+        (runDir == NULL && (port_app_option("run-screens") != NULL || port_app_option("run-dump") != NULL))) {
+        fprintf(stderr, "port: --run-dir needs a directory, and --run-screens and --run-dump need --run-dir\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    if (runDir != NULL && (!OpenRunDir(runDir, inputPath) || !AddRunDumps())) {
+        port_run_dir_close(EXIT_BAD_OPTIONS);
+        return EXIT_BAD_OPTIONS;
+    }
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
     }
@@ -441,6 +543,10 @@ int main(int argc, char **argv) {
     // The device and the dump's WAV header; a run that stops the process itself (a trap, OS_Terminate) never gets here,
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
+    if (sRunDirFailed) {
+        status = 1;
+    }
+    port_run_dir_close(status);
     port_replay_close();
     if (sScreenHashes != NULL) {
         fclose(sScreenHashes);

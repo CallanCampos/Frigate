@@ -7,8 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
+// The file's input, empty without one, and the game clock, which runs either way for the run directory's game frames
+// (port/app/run_dir.h); zero-initialised, as pbw_input_init and pbw_game_clock_init leave them
 static PbwInput sInput;
 static PbwGameClock sClock;
+static uint32_t sGameFrame = 1;
 static int sActive;
 
 int port_replay_open(const char *path) {
@@ -24,7 +27,6 @@ int port_replay_open(const char *path) {
         pbw_input_free(&sInput);
         return 0;
     }
-    pbw_game_clock_init(&sClock);
     sActive = 1;
     return 1;
 }
@@ -39,6 +41,13 @@ const char *port_replay_time(void) {
 
 const char *port_replay_version(void) {
     return sActive && sInput.version[0] != '\0' ? sInput.version : NULL;
+}
+
+const char *port_replay_frames(void) {
+    if (!sActive) {
+        return NULL;
+    }
+    return sInput.frames == PBW_INPUT_VIDEO_FRAMES ? "video" : "game";
 }
 
 // The buttons and lid where the game reads them, and the touch where the ARM7's touch service samples it. The input
@@ -56,9 +65,17 @@ void port_replay_start(void) {
 
 void port_replay_vblank(uint32_t videoFrame) {
     uint32_t frame = pbw_input_frame_at_vblank(&sInput, &sClock, videoFrame, port_gfl_frame_count());
-    PbwInputState state = pbw_input_state(&sInput, frame);
+    PbwInputState state;
 
-    Apply(&state);
+    sGameFrame = sClock.frames + 1;
+    if (sActive) {
+        state = pbw_input_state(&sInput, frame);
+        Apply(&state);
+    }
+}
+
+uint32_t port_replay_game_frame(void) {
+    return sGameFrame;
 }
 
 void port_replay_close(void) {

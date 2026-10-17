@@ -377,7 +377,9 @@ typedef struct Side {
 // vertical is Y-major and has one pixel on each line; a flatter one is X-major and crosses a run of pixels on each
 // line. The walker keeps a position that starts at an offset (EdgeStart) and grows by the slope at each line; its pixel
 // is that many whole pixels from the top vertex, rightward or leftward, kept within the columns between the two
-// vertices. Values along the edge are interpolated along the major axis (the port's choice)
+// vertices. Values along the edge are interpolated by line, from its top vertex to its bottom one, whatever its major
+// axis; an edge at 45 degrees or flatter that runs outward (a left edge running left, a right edge running right)
+// interpolates as if it began a line higher (melonDS's measurements)
 typedef struct Edge {
     const Vertex *v0;
     const Vertex *v1;
@@ -387,14 +389,15 @@ typedef struct Edge {
     int32_t xMax;
     int32_t adx;
     int32_t dy;
-    int32_t slope; // 0 for a vertical edge (or one with no height)
-    int32_t len;   // the major axis' length
-    int negative;  // runs to the left
+    int32_t slope;  // 0 for a vertical edge (or one with no height)
+    int32_t interp; // the lines its values are interpolated from above y0: 0, or 1 when it begins a line higher
+    int negative;   // runs to the left
     int xMajor;
     Persp persp;
 } Edge;
 
-static void EdgeSetup(Edge *e, const Vertex *v0, const Vertex *v1) {
+// right: the edge is the polygon's right side
+static void EdgeSetup(Edge *e, const Vertex *v0, const Vertex *v1, int right) {
     int32_t dx = v1->x - v0->x;
     int32_t dy = v1->y - v0->y;
     int32_t adx = dx < 0 ? -dx : dx;
@@ -415,8 +418,8 @@ static void EdgeSetup(Edge *e, const Vertex *v0, const Vertex *v1) {
         e->slope = adx * (POS_ONE / dy);
     }
     e->xMajor = e->slope > POS_ONE;
-    e->len = e->xMajor ? adx : (dy > 0 ? dy : 0);
-    PerspSetup(&e->persp, e->len, v0->w, v1->w, 1);
+    e->interp = e->slope >= POS_ONE && right != e->negative;
+    PerspSetup(&e->persp, dy > 0 ? dy : 0, v0->w, v1->w, 1);
 }
 
 // Where the walker's position starts. On each line its pixel is, for a Y-major edge, the one the edge is in at the
@@ -513,14 +516,15 @@ static uint32_t RunCoverage(const EdgeLine *l, int right, int32_t k) {
     return part > FULL_COVERAGE ? FULL_COVERAGE : part;
 }
 
-// The edge's values on line y, at the span's end x for an X-major edge. Z-buffer depth is interpolated linearly in
-// screen space and everything else perspective-correctly, W-buffer depth included
-static void EdgeValues(const Frame *f, const Edge *e, int32_t y, int32_t x, Side *s) {
+// The edge's values on line y. Z-buffer depth is interpolated linearly in screen space and everything else
+// perspective-correctly, W-buffer depth included
+static void EdgeValues(const Frame *f, const Edge *e, int32_t y, Side *s) {
     const Vertex *a = e->v0;
     const Vertex *b = e->v1;
-    int32_t pos = e->xMajor ? (e->negative ? e->x0 - x : x - e->x0) : y - e->y0;
-    pos = pos < 0 ? 0 : pos > e->len ? e->len : pos;
-    if (e->len == 0) {
+    int32_t len = e->persp.len;
+    int32_t pos = y - e->y0 + e->interp;
+    pos = pos < 0 ? 0 : pos > len ? len : pos;
+    if (len <= 0) {
         s->w = a->w;
         s->depth = a->depth;
         memcpy(s->a, a->a, sizeof(s->a));
@@ -528,15 +532,15 @@ static void EdgeValues(const Frame *f, const Edge *e, int32_t y, int32_t x, Side
     }
     if (e->persp.linear) {
         s->w = a->w;
-        s->depth = LinearValue(a->depth, b->depth, pos, e->len);
+        s->depth = LinearValue(a->depth, b->depth, pos, len);
         for (int i = 0; i < VALUES; i++) {
-            s->a[i] = LinearValue(a->a[i], b->a[i], pos, e->len);
+            s->a[i] = LinearValue(a->a[i], b->a[i], pos, len);
         }
         return;
     }
     int32_t factor = PerspFactor(&e->persp, pos);
     s->w = PerspValue(a->w, b->w, factor, 9);
-    s->depth = f->wBuffer ? PerspValue(a->depth, b->depth, factor, 9) : LinearValue(a->depth, b->depth, pos, e->len);
+    s->depth = f->wBuffer ? PerspValue(a->depth, b->depth, factor, 9) : LinearValue(a->depth, b->depth, pos, len);
     for (int i = 0; i < VALUES; i++) {
         s->a[i] = PerspValue(a->a[i], b->a[i], factor, 9);
     }
@@ -759,8 +763,8 @@ static void DrawSpan(Frame *f, const Poly *poly, int32_t y, const Span *span, ui
     if (x0 >= x1) {
         return;
     }
-    EdgeValues(f, span->el, y, left, &sl);
-    EdgeValues(f, span->er, y, end, &sr);
+    EdgeValues(f, span->el, y, &sl);
+    EdgeValues(f, span->er, y, &sr);
     PerspSetup(&persp, len, sl.w, sr.w, 0);
     depthLinear = persp.linear || !f->wBuffer;
     if (persp.linear) {
@@ -908,8 +912,8 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
             l = v[i].x < v[l].x ? i : l;
             r = v[i].x > v[r].x ? i : r;
         }
-        EdgeSetup(&el, &v[l], &v[l]);
-        EdgeSetup(&er, &v[r], &v[r]);
+        EdgeSetup(&el, &v[l], &v[l], 0);
+        EdgeSetup(&er, &v[r], &v[r], 1);
         lNext = l;
         rNext = r;
     } else {
@@ -921,8 +925,8 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
         }
         lNext = (l + stepLeft) % n;
         rNext = (r + stepRight) % n;
-        EdgeSetup(&el, &v[l], &v[lNext]);
-        EdgeSetup(&er, &v[r], &v[rNext]);
+        EdgeSetup(&el, &v[l], &v[lNext], 0);
+        EdgeSetup(&er, &v[r], &v[rNext], 1);
     }
 
     for (int32_t y = yTop; y < yEnd && y < HEIGHT; y++) {
@@ -934,7 +938,7 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
                 moved = 1;
             }
             if (moved) {
-                EdgeSetup(&el, &v[l], &v[lNext]);
+                EdgeSetup(&el, &v[l], &v[lNext], 0);
             }
             moved = 0;
             for (int k = 0; k < n && v[rNext].y <= y; k++) {
@@ -943,7 +947,7 @@ static void DrawPolygon(Frame *f, const PortGePolygon *p) {
                 moved = 1;
             }
             if (moved) {
-                EdgeSetup(&er, &v[r], &v[rNext]);
+                EdgeSetup(&er, &v[r], &v[rNext], 1);
             }
         }
         int64_t posL = EdgePos(&el, y, 0);

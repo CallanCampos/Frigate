@@ -72,3 +72,37 @@ add_test(NAME oracle_boot
             --work "${CMAKE_BINARY_DIR}/oracle-check"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(oracle_boot PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1200)
+
+# The comparison sequences (port/tools/oracle/README.md, "The comparison sequences"), each an input file
+# port/tests/oracle/<name>_<version>.pbwinput: opening, power-on through the boot screens, the Game Freak logo and the
+# whole opening to the title's first frames with nothing pressed; title, the opening skipped with START, the title with
+# its 3D on either screen and START to the start menu. Each is held to the oracle in two ways:
+# - oracle_<name>_hashes, every build: the port alone against port/tests/oracle/<name>_<version>.tsv, the oracle's
+#   hashes at the frames it keeps. Where the game counts passes, it proves the port reaches each of those frames at
+#   the oracle's count (plus the declared lag) and that its screens without 3D are the oracle's there at 6 bits a
+#   channel; where the game waits on a clock (the movies), that the port shows the oracle's pictures at the frames it
+#   showed them when the reference was written. It can't judge a screen with 3D, the game's state, nor the frames
+#   between the ones it keeps. Skipped (77) without the ROM; only for a version that has a reference
+# - oracle_<name>, with the oracle built: both programs, every frame of the port but the known differences compared,
+#   on the game's count (by their pictures in the movies), the 3D within compare.py's tolerance, with every picture
+#   the oracle shows between two of the port's frames shown by one of them, and NNS G3D's state compared on the count
+#   at the frames the sequence names. It can't time the movies: there the DS's passes take 3 to 5 frames by its CPU's
+#   load, so only the pictures and their order are held. A failure keeps the runs and the difference images and says
+#   where. Skipped (77) without the oracle or the ROM
+foreach(sequence IN ITEMS opening title)
+    if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
+        add_test(NAME oracle_${sequence}_hashes
+            COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+                "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" sequence-check ${sequence}
+                    --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                    --work "${CMAKE_BINARY_DIR}/oracle-${sequence}-check"
+            WORKING_DIRECTORY "${REPO_ROOT}")
+        set_tests_properties(oracle_${sequence}_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 600)
+    endif()
+    add_test(NAME oracle_${sequence}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" sequence ${sequence}
+                --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
+endforeach()

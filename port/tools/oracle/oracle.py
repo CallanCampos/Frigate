@@ -3,19 +3,29 @@
 
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--no-counter]
-    oracle.py port --binary BIN --out DIR --frames LIST [--time TIME] [--version b2_us] [--rom PATH]
+    oracle.py port --binary BIN --out DIR --frames LIST [--input FILE] [--dump SPEC]... [--time TIME] [--version b2_us]
+                   [--rom PATH]
     oracle.py boot --out DIR [--port BIN] [--frames LIST] [--version b2_us]
+    oracle.py sequence NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
+    oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
     oracle.py check --oracle BIN [--version b2_us] [--work DIR] [--update]
 
 run calls pbw-oracle with the repository's defaults: the version's ROM in orig/, its symbols from config/, the
 statics of the ROM build's link map (symbols.py), and GFL's frame count (sVBlankCount) as the counter for aligning
 frames and for input files on game frames. It passes --time only when given one, so that pbw-oracle takes an input
-file's time line, else its default. port runs the port's program once for each frame of LIST (it writes one
-screenshot a run, at its last frame), each from power-on with a blank save and a fixed clock (--time, else the
-default: the port has no input file to take one from yet), and writes a run directory in the oracle's format. boot
-does both for the boot sequence and compares them by sequence (compare.py), at the DS's 6 bits and at the palettes'
-5. check is the ctest test: the oracle runs the boot sequence twice with the same results, and its screens match the
-hashes in port/tests/oracle/boot_<version>.tsv; it exits 77 without the oracle or the ROM.
+file's time line, else its default. port runs the port's program once from power-on with a blank save, to the last
+frame of LIST, and has it write its run directory (--run-dir): frames.tsv for every frame, a PNG file for each frame of
+LIST, memory.txt with the --dump specs (the program's --run-dump: globals by name, with a size, * through a pointer).
+Its clock is --time, else the input file's, else the default. boot does both for the boot sequence and compares
+them on the game's count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
+sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
+opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
+menu), and compares every frame the same way but the known differences; with --update it writes
+port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
+that input file and checks its counts and its screens without 3D against that reference. check is the oracle's ctest
+test: the oracle runs the boot sequence twice with the same results, and its screens match the hashes in
+port/tests/oracle/boot_<version>.tsv. sequence and check exit 77 without the oracle or the ROM, sequence-check without
+the ROM.
 
 Standard library only.
 """
@@ -29,6 +39,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass, field
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -49,6 +60,83 @@ BOOT_MARGIN = 400
 CHECK_FRAMES = 500
 CHECK_SCREENS = "1,60,120,249,250,260,300,360,400,450,500"
 SKIP = 77
+# The comparison sequences (README.md, "The comparison sequences"), each an input file on game frames for each version,
+# port/tests/oracle/<name>_<version>.pbwinput, and a reference that holds the port to the oracle's screens without the
+# oracle (sequence-check), port/tests/oracle/<name>_<version>.tsv
+SEQUENCE_INPUT = os.path.join("port", "tests", "oracle", "{name}_{version}.pbwinput")
+SEQUENCE_REFERENCE = os.path.join("port", "tests", "oracle", "{name}_{version}.tsv")
+
+
+@dataclass(frozen=True)
+class Sequence:
+    """How a sequence is run and compared. port_frames and oracle_frames: how far each program runs (the DS takes
+    hundreds of frames more to get as far). sample: the port frames whose screens the reference keeps. clock: the port
+    frames where the game waits on a clock, which pair by their pictures (compare.py --clock); everywhere else frames
+    pair on the game's count. lags: by version, the count lags declared (compare.py --lag). known: by version, the port
+    frames whose screens differ from the oracle's by construction, left out of the comparison and the reference, and
+    known_oracle the oracle frames that no port frame can show; each with why (README.md, "Known differences").
+    state_frames: the port frames whose game state (STATE) is compared with the oracle's at the frames they pair with,
+    which state_oracle, the oracle frames dumped, covers; known_state, by version, the port frames whose state differs
+    by construction, with why"""
+    port_frames: int
+    oracle_frames: int
+    sample: str
+    clock: str
+    lags: dict[str, str] = field(default_factory=dict)
+    known: dict[str, dict[str, str]] = field(default_factory=dict)
+    known_oracle: dict[str, dict[str, str]] = field(default_factory=dict)
+    state_frames: str = ""
+    state_oracle: str = ""
+    known_state: dict[str, dict[str, str]] = field(default_factory=dict)
+
+
+# The game state the sequences compare by symbol, with its size: NNS G3D's global state (glbstate.c), the projection,
+# the camera and the matrices it makes of them, 612 bytes without a pointer, so the same on a host as on the DS
+STATE = (("NNS_G3dGlb", 0x264),)
+
+
+# The known differences, by kind (README.md, "Known differences")
+TORN_OPENING = "the opening's first frame, written partway through the DS's frame: black above line 77"
+TORN_HIDE = "the title hides its layers partway through the DS's frame; on the port, from the frame's first line"
+TORN_BACK = "START brings the layers back partway through the DS's frame; on the port, from the frame's first line"
+TORN_START = ("START whitens the screens partway through the second frame of the DS's pass, which took two; on the "
+              "port, from the first line of the pass's frame")
+CAMERA = "the DS's pass at START took two frames, so its camera, stepped by VBlanks, leads Kyurem's animation a step"
+CRY = "the DS starts Kyurem's cry later against its passes, so the title fades out a pass later there"
+SEQUENCES = {
+    # Power-on, the boot screens, the Game Freak logo and the whole opening to the title and its first 274 frames of
+    # 3D, nothing pressed: the movies run from port frame 313 (count 312) to the title, at port frame 3527 in both
+    # versions
+    "opening": Sequence(
+        port_frames=3800,
+        oracle_frames=4300,
+        sample="1-3800/12,3520-3540",
+        clock="313-3526",
+        known_oracle={"w2_us": {"1283": TORN_OPENING}},
+        state_frames="3527-3800",
+        state_oracle="3700-4300",
+    ),
+    # START at game frame 1100 skips the opening, which holds its frame until count 1107 on both programs (port frame
+    # 1108): the counts line up again after it. The title hides its layers at count 2877, START at 3000 brings them
+    # back, START at 3100 goes to the start menu
+    "title": Sequence(
+        port_frames=3600,
+        oracle_frames=5700,
+        sample="1-3600/12,1096-1120,2870-2885,2996-3010,3096-3135,3215-3250",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY},
+        },
+        known_oracle={"b2_us": {"4943": TORN_START}, "w2_us": {"1283": TORN_OPENING, "4875": TORN_START}},
+        state_frames="1116-3600",
+        state_oracle="2800-5700",
+        known_state={"b2_us": {"3110-3124": CAMERA}, "w2_us": {"3110-3124": CAMERA}},
+    ),
+}
+REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
 
 
 def rom_path(version: str, given: str | None) -> str:
@@ -115,47 +203,54 @@ def command_run(args) -> int:
     return run_oracle(args, args.out, args.frames, args.screens, args.dump)
 
 
-def run_port(binary: str, out: str, frames: list[int], version: str, rom: str, time: str,
-             timeout: int = 600) -> dict[int, str]:
-    """Runs the port once for each frame; returns each frame's outcome ("ok", or why there is no screenshot)"""
+def port_time(args) -> str | None:
+    """The clock the port starts with: --time, else an input file's time line (the port reads it), else the default"""
+    if args.time:
+        return args.time
+    return None if getattr(args, "input", None) else DEFAULT_TIME
+
+
+def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: str | None,
+             input_path: str | None = None, timeout: int = 1200,
+             dumps: list[str] | None = None) -> tuple[int | None, str]:
+    """Runs the port's program once, from power-on with a blank save, for frames frames, writing its run directory
+    in out (--run-dir): frames.tsv for every frame it ran, a PNG file for each frame of screens (a frame list,
+    "none" or "all") and memory.txt with the dumps (--run-dump specs). Returns its exit status (None when it timed
+    out) and its last message about why it stopped"""
     os.makedirs(out, exist_ok=True)
-    outcomes = {}
-    rows = []
-    for frame in frames:
-        png = os.path.join(out, compare.FRAME_FILE.format(frame))
-        if os.path.exists(png):
-            os.remove(png)
-        saves = tempfile.mkdtemp(prefix="saves-", dir=out)
-        command = [binary, "--headless", "--frames", str(frame), "--screenshot", png, "--rom", rom,
-                   "--save-dir", saves, "--fixed-time", time]
-        try:
-            done = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
-            status = done.returncode
-            log = done.stderr + done.stdout
-        except subprocess.TimeoutExpired:
-            status = None
-            log = "timed out"
-        finally:
-            shutil.rmtree(saves, ignore_errors=True)
-        if status == 0 and os.path.exists(png):
-            outcomes[frame] = "ok"
-            rows.append(compare.frame_from_png(frame, png))
-        else:
-            if os.path.exists(png):
-                # The run ended before its frame: the picture is of another frame
-                os.rename(png, png[:-4] + ".early.png")
-            reason = next((line.strip() for line in log.splitlines() if line.strip().startswith("port: ")
-                           and "entering" not in line), "")
-            outcomes[frame] = f"exit {status}: {reason}" if reason else f"exit {status}"
-    compare.write_frames_tsv(os.path.join(out, "frames.tsv"), rows)
-    with open(os.path.join(out, "run.txt"), "w") as f:
-        f.write("#pbwrun 1\n")
-        f.write(f"program: {binary}\n")
-        f.write(f"rom: {rom}\n")
-        f.write(f"time: {time}\n")
-        for frame in frames:
-            f.write(f"frame {frame}: {outcomes[frame]}\n")
-    return outcomes
+    # A picture left from another run would pass for this one's
+    for name in os.listdir(out):
+        if name.startswith("frame_") and name.endswith(".png"):
+            os.remove(os.path.join(out, name))
+    saves = tempfile.mkdtemp(prefix="saves-", dir=out)
+    command = [binary, "--headless", "--frames", str(frames), "--rom", rom, "--save-dir", saves, "--run-dir", out,
+               "--run-screens", screens]
+    if time:
+        command += ["--fixed-time", time]
+    if input_path:
+        command += ["--input", input_path]
+    for spec in dumps or []:
+        command += ["--run-dump", spec]
+    try:
+        done = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
+        status = done.returncode
+        log = done.stderr + done.stdout
+    except subprocess.TimeoutExpired:
+        status = None
+        log = "timed out"
+    finally:
+        shutil.rmtree(saves, ignore_errors=True)
+    # Its own lines start with "port: ", after the time and process that SDL_Log puts first on some hosts
+    reasons = [line[line.index("port: "):].strip() for line in log.splitlines()
+               if "port: " in line and "entering" not in line and "port: rom:" not in line]
+    return status, reasons[-1] if reasons else ""
+
+
+def describe_port_run(status: int | None, message: str, frames: int, out: str) -> str:
+    run = compare.load_run(out)
+    ran = max(run.frames) if run.frames else 0
+    what = "timed out" if status is None else f"exit {status}"
+    return f"{what} after {ran} of {frames} frames" + (f": {message}" if message and status != 0 else "")
 
 
 def command_port(args) -> int:
@@ -163,11 +258,15 @@ def command_port(args) -> int:
     if frames is None:
         print("oracle.py: port needs a list of frames, not all", file=sys.stderr)
         return 2
-    outcomes = run_port(args.binary, args.out, frames, args.version, rom_path(args.version, args.rom),
-                        args.time or DEFAULT_TIME)
-    for frame, outcome in outcomes.items():
-        print(f"port frame {frame}: {outcome}")
-    return 0 if all(o == "ok" for o in outcomes.values()) else 1
+    last = max(frames)
+    status, message = run_port(args.binary, args.out, last, args.frames, rom_path(args.version, args.rom),
+                               port_time(args), args.input, dumps=args.dump)
+    print(f"port: {describe_port_run(status, message, last, args.out)}")
+    run = compare.load_run(args.out)
+    missing = [frame for frame in frames if run.png(frame) is None]
+    if missing:
+        print(f"port: no picture of frames {compare.describe_ranges(missing)}")
+    return 0 if status == 0 and not missing else 1
 
 
 def command_boot(args) -> int:
@@ -184,18 +283,20 @@ def command_boot(args) -> int:
     if not args.port:
         return 0
     port_dir = os.path.join(args.out, "port")
-    outcomes = run_port(args.port, port_dir, frames, args.version, rom_path(args.version, args.rom),
-                        args.time or DEFAULT_TIME)
-    for frame, outcome in outcomes.items():
-        print(f"port frame {frame}: {outcome}")
+    status, message = run_port(args.port, port_dir, max(frames), args.frames, rom_path(args.version, args.rom),
+                               port_time(args))
+    print(f"port: {describe_port_run(status, message, max(frames), port_dir)}")
     if not compare.load_run(port_dir).frames:
         print("the port reached none of the frames")
         return 1
     report = os.path.join(args.out, "report")
-    print("\nby sequence, at the DS's 6 bits:")
-    six = compare.main(["screens", oracle_dir, port_dir, "--align", "sequence", "--report", report])
-    print("\nby sequence, at the palettes' 5 bits:")
-    five = compare.main(["screens", oracle_dir, port_dir, "--align", "sequence", "--depth", "5"])
+    # The boot screens pair on the count, the movies from the Game Freak logo on by their pictures, as the opening
+    # sequence does
+    align = ["--align", "counter", "--clock", SEQUENCES["opening"].clock]
+    print("\nat the DS's 6 bits:")
+    six = compare.main(["screens", oracle_dir, port_dir, *align, "--report", report])
+    print("\nat the palettes' 5 bits:")
+    five = compare.main(["screens", oracle_dir, port_dir, *align, "--depth", "5"])
     return max(six, five)
 
 
@@ -281,6 +382,211 @@ def command_check(args) -> int:
     return 0
 
 
+def by_frame(table: dict[str, str]) -> dict[int, str]:
+    """{"3112-3129": why} as {3112: why, 3113: why, ...}"""
+    out = {}
+    for frames, why in table.items():
+        for frame in compare.parse_frames(frames):
+            out[frame] = why
+    return out
+
+
+def load_reference(path: str) -> dict[int, tuple[int, int | None, int | None, str, str]]:
+    """<name>_<version>.tsv: for each port frame it keeps, the oracle frame it pairs with, the oracle's frame count
+    there, the count lag (None where the frame pairs by its pictures), and the oracle's hash of each screen, or "3d"
+    for a screen that shows 3D"""
+    rows = {}
+    header = None
+    with open(path) as f:
+        for number, line in enumerate(f, 1):
+            line = line.rstrip("\n")
+            if not line or line.startswith("#"):
+                continue
+            cells = line.split("\t")
+            if header is None:
+                header = cells
+                if header != REFERENCE_COLUMNS:
+                    raise compare.RunError(f"{path}:{number}: expected the columns {' '.join(REFERENCE_COLUMNS)}")
+                continue
+            if len(cells) != len(REFERENCE_COLUMNS):
+                raise compare.RunError(f"{path}:{number}: expected {len(REFERENCE_COLUMNS)} columns")
+            rows[int(cells[0])] = (int(cells[1]), compare.optional_int(cells[2]), compare.optional_int(cells[3]),
+                                   cells[4], cells[5])
+    return rows
+
+
+def write_reference(path: str, name: str, version: str, oracle_run: compare.Run, port_run: compare.Run) -> int:
+    """Writes <name>_<version>.tsv from a comparison's runs: for the sampled port frames that aren't known differences,
+    the oracle frame the comparison pairs each with. Where the game counts passes that is the oracle frame at the
+    port's count less the lag, which comes from the oracle and the declared lags; in a clock stretch it is the oracle
+    frame that shows the port frame's pictures. Returns the number of rows"""
+    sequence = SEQUENCES[name]
+    clock = set(compare.parse_frames(sequence.clock))
+    pairing = compare.counter_mapping(oracle_run, port_run, clock, compare.parse_lags(sequence.lags.get(version)))
+    known = by_frame(sequence.known.get(version, {}))
+    # Where the frames pair on the count, the lag between them
+    lags = {}
+    for frame, target in pairing.mapping.items():
+        mine, theirs = port_run.frames.get(frame), oracle_run.frames.get(target)
+        if frame not in clock and mine and theirs and None not in (mine.counter, theirs.counter):
+            lags[frame] = mine.counter - theirs.counter
+    melonds = oracle_run.info.get("melonds", "?")
+    count = 0
+    with open(path, "w") as f:
+        f.write(f"# pbw-oracle's screens on {SEQUENCE_INPUT.format(name=name, version=version)} (melonDS {melonds}),\n"
+                "# at the oracle frames that compare.py --align counter pairs with the port frames listed: where the\n"
+                "# game counts passes (lag is a number), the oracle frame whose count is the port's less the lag; in\n"
+                f"# a clock stretch (port frames {sequence.clock}, lag -), the one that shows the port frame's\n"
+                "# pictures. The SHA-1 of each screen's RGB bytes, or 3d for a screen that shows 3D, which only the\n"
+                "# oracle comparison can judge, and GFL's frame count there. Hashes only. Written by oracle.py\n"
+                f"# sequence {name} --update; checked by oracle.py sequence-check {name}.\n")
+        for frames, why in sequence.known.get(version, {}).items():
+            f.write(f"# Left out, port frames {frames}: {why}\n")
+        f.write("\t".join(REFERENCE_COLUMNS) + "\n")
+        for frame in compare.parse_frames(sequence.sample):
+            target = pairing.mapping.get(frame)
+            row = oracle_run.frames.get(target) if target is not None else None
+            if frame in known or row is None:
+                continue
+            counter = "-" if row.counter is None else row.counter
+            lag_cell = lags.get(frame, "-")
+            top = "3d" if row.top_3d else row.top
+            bottom = "3d" if row.bottom_3d else row.bottom
+            f.write(f"{frame}\t{target}\t{counter}\t{lag_cell}\t{top}\t{bottom}\n")
+            count += 1
+    return count
+
+
+def sequence_paths(args) -> tuple[str, str, str]:
+    """The sequence's input file and reference for the version, and the ROM"""
+    return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=args.name, version=args.version)),
+            os.path.join(REPO_ROOT, SEQUENCE_REFERENCE.format(name=args.name, version=args.version)),
+            rom_path(args.version, args.rom))
+
+
+def command_sequence(args) -> int:
+    sequence = SEQUENCES[args.name]
+    input_path, reference, rom = sequence_paths(args)
+    binary = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(binary):
+        print(f"oracle.py sequence: skipped: no oracle at {binary} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    reason = rom_matches(args.version, rom)
+    if reason:
+        print(f"oracle.py sequence: skipped: {reason}")
+        return SKIP
+    if not os.path.exists(input_path):
+        print(f"oracle.py sequence: no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}")
+        return 1
+    args.oracle = binary
+    args.input = input_path
+    work = args.out or tempfile.mkdtemp(prefix=f"oracle-{args.name}-")
+    oracle_dir = os.path.join(work, "oracle")
+    port_dir = os.path.join(work, "port")
+    shutil.rmtree(oracle_dir, ignore_errors=True)
+    oracle_dumps = [f"{name}:{size}@{sequence.state_oracle}" for name, size in STATE] if sequence.state_frames else []
+    port_dumps = [f"{name}:{size}@{sequence.state_frames}" for name, size in STATE] if sequence.state_frames else []
+    status = run_oracle(args, oracle_dir, sequence.oracle_frames, "all", oracle_dumps, quiet=True)
+    if status != 0:
+        print(f"oracle.py sequence: the oracle failed (status {status})")
+        return 1
+    status, message = run_port(args.port, port_dir, sequence.port_frames, "all", rom, args.time, input_path,
+                               dumps=port_dumps)
+    print(f"port: {describe_port_run(status, message, sequence.port_frames, port_dir)}")
+    if status != 0:
+        return 1
+    known = by_frame(sequence.known.get(args.version, {}))
+    compared = [frame for frame in range(1, sequence.port_frames + 1) if frame not in known]
+    align = ["--align", "counter", "--clock", sequence.clock]
+    if sequence.lags.get(args.version):
+        align += ["--lag", sequence.lags[args.version]]
+    command = ["screens", oracle_dir, port_dir, *align, "--brief", "--frames", ",".join(str(f) for f in compared),
+               "--report", os.path.join(work, "report")]
+    known_oracle = sequence.known_oracle.get(args.version, {})
+    if known_oracle:
+        command += ["--known-oracle", ",".join(known_oracle)]
+    result = compare.main(command)
+    for frames, why in sequence.known.get(args.version, {}).items():
+        print(f"left out, port frames {frames}: {why}")
+    for frames, why in known_oracle.items():
+        print(f"no counterpart, oracle frames {frames}: {why}")
+    if sequence.state_frames:
+        known_state = by_frame(sequence.known_state.get(args.version, {}))
+        state = [f for f in compare.parse_frames(sequence.state_frames) if f not in known_state]
+        print(f"\nthe game's state ({', '.join(name for name, _ in STATE)}) at port frames {sequence.state_frames}, "
+              "on the count:")
+        result = max(result, compare.main(["memory", oracle_dir, port_dir, *align,
+                                           "--frames", ",".join(str(f) for f in state)]))
+        for frames, why in sequence.known_state.get(args.version, {}).items():
+            print(f"state left out, port frames {frames}: {why}")
+    if args.update:
+        if result != 0:
+            print("oracle.py sequence: the comparison failed; the reference stays as it was")
+        else:
+            rows = write_reference(reference, args.name, args.version, compare.load_run(oracle_dir),
+                                   compare.load_run(port_dir))
+            print(f"wrote {rows} frames to {os.path.relpath(reference, REPO_ROOT)}")
+    if not args.out:
+        if result == 0:
+            shutil.rmtree(work, ignore_errors=True)
+        else:
+            print(f"the runs and the difference images are in {work}")
+    return result
+
+
+def check_reference(rows: dict[int, tuple[int, int | None, int | None, str, str]],
+                    port_run: compare.Run) -> tuple[list[str], int, int, int]:
+    """A port run against a reference's rows: what fails, and how many screens without 3D were compared, how many
+    with 3D were left to the oracle comparison, and how many rows pair on the count"""
+    failures = []
+    compared = left = timed = 0
+    for frame, (oracle_frame, counter, lag, top, bottom) in sorted(rows.items()):
+        mine = port_run.frames.get(frame)
+        if mine is None:
+            failures.append(f"port frame {frame} has no row")
+            continue
+        # Where the game counts passes, the port is at the oracle frame's count plus the lag
+        if lag is not None and counter is not None:
+            timed += 1
+            if mine.counter != counter + lag:
+                failures.append(f"port frame {frame} is at count {mine.counter}, not {counter + lag} (oracle frame "
+                                f"{oracle_frame}'s count {counter} and the lag {lag})")
+        for name, wanted, have in (("top", top, mine.top), ("bottom", bottom, mine.bottom)):
+            if wanted == "3d":
+                left += 1
+                continue
+            compared += 1
+            if wanted != have:
+                failures.append(f"port frame {frame}'s {name} screen isn't oracle frame {oracle_frame}'s")
+    return failures, compared, left, timed
+
+
+def command_sequence_check(args) -> int:
+    sequence = SEQUENCES[args.name]
+    input_path, reference, rom = sequence_paths(args)
+    reason = rom_matches(args.version, rom)
+    if reason:
+        print(f"oracle.py sequence-check: skipped: {reason}")
+        return SKIP
+    if not os.path.exists(reference):
+        print(f"oracle.py sequence-check: no reference {os.path.relpath(reference, REPO_ROOT)} for {args.version}")
+        return 1
+    rows = load_reference(reference)
+    work = args.work or tempfile.mkdtemp(prefix=f"oracle-{args.name}-check-")
+    status, message = run_port(args.port, work, sequence.port_frames, "none", rom, args.time, input_path)
+    print(f"port: {describe_port_run(status, message, sequence.port_frames, work)}")
+    if status != 0:
+        return 1
+    failures, compared, left, timed = check_reference(rows, compare.load_run(work))
+    for line in failures:
+        print(f"FAIL: {line}")
+    print(f"{len(rows)} frames, {timed} of them on the count: {len(failures)} failures; {compared} screens without 3D "
+          f"compared, {left} with 3D left to the oracle comparison (oracle.py sequence {args.name})")
+    if not args.work:
+        shutil.rmtree(work, ignore_errors=True)
+    return 1 if failures else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -303,11 +609,14 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--dump", action="append")
     run.add_argument("--no-counter", action="store_true")
 
-    port = commands.add_parser("port", help="run the port once for each frame and collect its screenshots")
+    port = commands.add_parser("port", help="run the port and write its run directory")
     common(port, oracle=False)
     port.add_argument("--binary", required=True, help="the port's program (pokeblack2 or pokewhite2)")
     port.add_argument("--out", required=True)
-    port.add_argument("--frames", required=True)
+    port.add_argument("--frames", required=True, help="the frames to write as PNG; the run goes to the last")
+    port.add_argument("--input")
+    port.add_argument("--dump", action="append", help="memory to dump, as the program's --run-dump takes it: "
+                      "[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST], a global by name")
 
     boot = commands.add_parser("boot", help="the boot sequence on the oracle and, with --port, the port")
     common(boot)
@@ -320,6 +629,19 @@ def main(argv: list[str] | None = None) -> int:
     check.add_argument("--work", help="keep the runs here")
     check.add_argument("--update", action="store_true", help="write the boot hashes instead of checking them")
 
+    sequence = commands.add_parser("sequence", help="a comparison sequence on the oracle and the port, compared")
+    sequence.add_argument("name", choices=sorted(SEQUENCES))
+    common(sequence)
+    sequence.add_argument("--port", required=True, help="the port's program")
+    sequence.add_argument("--out", help="keep the runs and the difference images here")
+    sequence.add_argument("--update", action="store_true", help="write the reference from a comparison that passes")
+
+    sequence_check = commands.add_parser("sequence-check", help="the port on a sequence against its reference")
+    sequence_check.add_argument("name", choices=sorted(SEQUENCES))
+    common(sequence_check, oracle=False)
+    sequence_check.add_argument("--port", required=True, help="the port's program")
+    sequence_check.add_argument("--work", help="keep the port's run here")
+
     args = parser.parse_args(argv)
     try:
         if args.command == "run":
@@ -328,6 +650,10 @@ def main(argv: list[str] | None = None) -> int:
             return command_port(args)
         if args.command == "boot":
             return command_boot(args)
+        if args.command == "sequence":
+            return command_sequence(args)
+        if args.command == "sequence-check":
+            return command_sequence_check(args)
         return command_check(args)
     except (compare.RunError, OSError, ValueError) as error:
         print(f"oracle.py: {error}", file=sys.stderr)
