@@ -10,6 +10,7 @@
 #include "dwc_util_main.h"
 #include "dwc_util_main_menu.h"
 #include "dwc_util_oam_buf.h"
+#include "dwc_util_prompt_yes_no.h"
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"

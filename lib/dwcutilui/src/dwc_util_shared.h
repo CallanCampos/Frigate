@@ -66,8 +66,6 @@ BOOL func_ov182_021b8f24(void);
 
 // The first screen of the connection settings
 void func_ov182_021b536c(void);
-// The confirmation before the move of the settings to another console
-void func_ov182_021afba4(void);
 // The move of the settings to another console
 void func_ov182_021b043c(void);
 

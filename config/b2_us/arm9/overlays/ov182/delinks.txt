@@ -225,6 +225,12 @@ lib/dwcutilui/src/dwc_util_top_menu.c:
     .data       start:0x021c0e88 end:0x021c0e9c
     .bss        start:0x021c40d4 end:0x021c40d8
 
+lib/dwcutilui/src/dwc_util_prompt_yes_no.c:
+    complete
+    .text       start:0x021afba4 end:0x021afdec
+    .data       start:0x021c0e9c end:0x021c0eb0
+    .bss        start:0x021c40d8 end:0x021c40dc
+
 lib/dwcutilui/src/dwc_util_timed_notice.c:
     complete
     .text       start:0x021afdec end:0x021aff3c
