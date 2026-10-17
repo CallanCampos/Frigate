@@ -104,7 +104,9 @@ file still links the original object, so the ROM build proves nothing about its 
 incomplete file that includes the header. [game-changes.md](docs/game-changes.md) has the steps.
 
 Each gets a row in game-changes.md in the same commit. Never copy a decomp file into `port/` to change it; source
-lists are generated from `config/`, never kept by hand. `BUGFIX` stays off, so gameplay matches the reference, but
+lists are generated from `config/`, never kept by hand. The one sanctioned transformation is the build-time host
+variant of a header that names DS addresses ([ADR 0004](docs/adr/0004-ds-addresses-by-header-translation.md)): it is
+generated into `build/` at every configure, never committed or edited; change the generator instead. `BUGFIX` stays off, so gameplay matches the reference, but
 memory-safety bugs (out-of-bounds writes, use after free) are fixed under `PLATFORM_PC`, each with a comment, because
 64-bit layouts move what they hit. No new `long`; structs on disk, on the wire or in the save stay pointer-free and
 get host `_Static_assert`s.

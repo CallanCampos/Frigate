@@ -59,6 +59,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0001](0001-repository-and-upstream-sync.md) | Repository and upstream sync | D1, §4.1 | accepted; amended by [0002](0002-solo-project-no-upstream-posts.md) |
 | [0002](0002-solo-project-no-upstream-posts.md) | A solo project with no upstream posts | D10, §9 | accepted |
 | [0003](0003-ad-hoc-signing-no-apple-developer-account.md) | Ad-hoc signing, no Apple Developer account | D11, §7, §10 | accepted |
+| [0004](0004-ds-addresses-by-header-translation.md) | DS addresses by build-time header translation | D3, §4.5 | accepted |
 
 ## Decisions waiting for an ADR
 

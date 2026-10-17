@@ -15,6 +15,8 @@ lib/dsprot/src/* # DS Protect, stubbed
 
 # NitroSDK files written in assembly, whose functions port/hal provides in C
 lib/nitro/src/cp/cp_context.c # divider context save, asm; the host divider has no state to save
+lib/nitro/src/gx/gx_load3d.c # texture and texture palette uploads, which keep VRAM addresses shifted right by 12 in a
+# table; port/hal/gx loads them for the 3D renderer
 lib/nitro/src/gx/gxasm.c # geometry command copies, asm; port/hal/gx
 lib/nitro/src/math/math.c # MATH_* asm helper; port/hal
 lib/nitro/src/math/sha1_block.c # SHA-1 block transform, asm; port/hal

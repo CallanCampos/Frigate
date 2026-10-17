@@ -4,6 +4,7 @@
 //   pokeblack2 [--headless]
 //
 // --headless runs the game on this thread without a window, for tests and CI.
+#include "hal/hw/hw.h"
 #include "hal/trap.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -35,6 +36,7 @@ int main(int argc, char **argv) {
         }
     }
 
+    port_hw_init();
     port_trap_protect_data();
 
     if (headless) {

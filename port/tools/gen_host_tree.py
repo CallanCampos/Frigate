@@ -8,6 +8,11 @@ It writes:
     build/include/generated as compile_all.py does, since the sources include them;
   - include/: a mirror of the decomp's include/ made of symbolic links, without the C library headers the decomp
     keeps there for MWCC (stdio.h, string.h and the rest), so that the host's own C library headers are found instead;
+  - hwinclude/: host variants of the headers that name DS hardware addresses, found ahead of the originals on the
+    include path. Each DS address in them goes through PORT_HW_ADDR(), which port/include/port_host.h maps into the
+    host memory that port/hal/hw provides; the registers whose reads or writes must act (the geometry command ports,
+    the divider's results, VCOUNT, ...) go through the accessor that HW_REGISTER_POLICY names. Nothing else in a
+    header changes, and the variants are made again from upstream's headers at every configure (ADR 0004);
   - sources.txt: every C file of src/ and lib/ that the host build compiles, one path per line, relative to the
     repository: all of them except the files port/hal/replaced.txt lists.
 
@@ -16,6 +21,7 @@ Files are rewritten only when their contents change, so that CMake rebuilds only
 import argparse
 import fnmatch
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -28,6 +34,97 @@ LIBC_HEADERS = {
     "ctype.h", "errno.h", "float.h", "limits.h", "locale.h", "math.h", "stdarg.h", "stddef.h", "stdio.h",
     "stdlib.h", "string.h", "wchar.h",
 }
+
+
+# DS hardware and memory map addresses: 0x01000000 (ITCM) up to the end of the GBA slot's space
+HW_ADDRESS = re.compile(r"\b(0x0[1-9a-aA-A][0-9a-fA-F]{6})\b")
+# A literal address right after a pointer cast, "(vu32 *)0x04000000", "(volatile u64 *)0x04000290", or opening an
+# expression after one, "(vu16 *)(0x04004320 + (n) * 8)"
+CAST_ADDRESS = re.compile(r"(\(\s*(?:(?:const|volatile)\s+)*[A-Za-z_][A-Za-z0-9_]*(?:\s+(?:const|volatile))*\s*\*\s*\)"
+                          r"\s*\(?\s*)(0x0[1-9a-aA-A][0-9a-fA-F]{6})\b")
+# A memory-map or register address constant, "#define HW_BG_VRAM 0x06000000", "#define REG_DMA0SAD_ADDR 0x040000b0"
+CONSTANT_ADDRESS = re.compile(r"^(\s*#\s*define\s+(?:HW_[A-Z0-9_]+|REG_[A-Z0-9_]+_ADDR)\s+)(0x0[1-9a-aA-A][0-9a-fA-F]{6})\s*$")
+# A register macro, "#define reg_GX_VCOUNT (*(vu16 *)0x04000006)"
+REGISTER = re.compile(r"^(\s*#\s*define\s+([A-Za-z0-9_]+)\s+\(\*\()(v[us](?:8|16|32|64))(\s*\*\)\s*)(0x[0-9a-fA-F]{8})(\)\s*)$")
+
+# The registers whose accesses must act, by address: the host function that returns the memory a read or write of the
+# register uses. A write-stream function returns a fresh slot for each write, so that each store is seen; a read
+# function computes the value the hardware would hold now (port/hal/hw).
+HW_REGISTER_POLICY = {
+    0x04000006: "port_hw_vcount",  # VCOUNT: the scanline being drawn
+    0x04000100: "port_hw_timer_counter0",  # TM0CNT_L: the counter as read
+    0x04000104: "port_hw_timer_counter1",  # TM1CNT_L
+    0x040002a0: "port_hw_div_result",  # DIV_RESULT: the quotient of DIV_NUMER by DIV_DENOM in DIVCNT's mode
+    0x040002a8: "port_hw_divrem_result",  # DIVREM_RESULT: the remainder
+    0x040002b4: "port_hw_sqrt_result",  # SQRT_RESULT: the square root of SQRT_PARAM in SQRTCNT's mode
+    0x04000400: "port_hw_gxfifo",  # GXFIFO: packed geometry commands, one word per write
+    0x04000600: "port_hw_gxstat",  # GXSTAT: the geometry engine's status
+    0x04000604: "port_hw_ram_count",  # RAM_COUNT: polygons and vertices in the current frame
+    0x04000606: "port_hw_vtxram_count",  # VTXRAM_COUNT
+    0x04000640: "port_hw_clipmtx_result",  # CLIPMTX_RESULT: the current clip matrix, 16 words
+    0x04000680: "port_hw_vecmtx_result",  # VECMTX_RESULT: the current directional vector matrix, 9 words
+}
+# The geometry command ports: every write is one command parameter for the geometry engine
+G3_PORTS = range(0x04000440, 0x04000600)
+
+
+def translate_header(text: str) -> tuple[str, int]:
+    """The host variant of a header's text, and how many addresses it translated."""
+    count = 0
+    lines = []
+    for line in text.split("\n"):
+        register = REGISTER.match(line)
+        if register:
+            head, name, width, cast, address, tail = register.groups()
+            value = int(address, 16)
+            accessor = HW_REGISTER_POLICY.get(value)
+            if accessor is None and value in G3_PORTS:
+                accessor = "port_hw_g3_port"
+            if accessor == "port_hw_g3_port":
+                line = f"{head}{width}{cast}port_hw_g3_port({address}){tail}"
+            elif accessor:
+                line = f"{head}{width}{cast}{accessor}(){tail}"
+            elif HW_ADDRESS.fullmatch(address):
+                line = f"{head}{width}{cast}PORT_HW_ADDR({address}){tail}"
+            count += 1
+            lines.append(line)
+            continue
+        constant = CONSTANT_ADDRESS.match(line)
+        if constant:
+            line = f"{constant.group(1)}PORT_HW_ADDR({constant.group(2)})"
+            count += 1
+        elif not line.lstrip().startswith("//"):
+            line, n = CAST_ADDRESS.subn(lambda m: f"{m.group(1)}PORT_HW_ADDR({m.group(2)})", line)
+            count += n
+        lines.append(line)
+    return "\n".join(lines), count
+
+
+def translate_hw_headers(out: Path) -> list[str]:
+    """Writes the host variants of every header that names a DS address into out, keeping each header's path below
+    its include directory, removes stale variants, and returns a line per translated header for the report."""
+    roots = [ROOT / "include", *sorted(p for p in (ROOT / "lib").glob("*/include") if p.parent.name != "msl")]
+    wanted, report = set(), []
+    for root in roots:
+        for header in sorted(root.rglob("*.h")):
+            if header.name in LIBC_HEADERS and root == ROOT / "include":
+                continue
+            text = header.read_text()
+            if not HW_ADDRESS.search(text):
+                continue
+            translated, count = translate_header(text)
+            if count == 0:
+                continue
+            relative = header.relative_to(root)
+            note = f"// Generated by port/tools/gen_host_tree.py from {header.relative_to(ROOT).as_posix()}; don't edit.\n"
+            write_if_changed(out / relative, note + translated)
+            wanted.add(relative)
+            report.append(f"{header.relative_to(ROOT).as_posix()}: {count} addresses")
+    if out.exists():
+        for stale in out.rglob("*.h"):
+            if stale.relative_to(out) not in wanted:
+                stale.unlink()
+    return report
 
 
 def write_if_changed(path: Path, text: str):
@@ -93,6 +190,7 @@ def main():
 
     generate_constants()
     mirror_include(out / "include")
+    write_if_changed(out / "hwinclude.txt", "".join(f"{line}\n" for line in translate_hw_headers(out / "hwinclude")))
     write_if_changed(out / "sources.txt", "".join(f"{source}\n" for source in list_sources()))
 
 

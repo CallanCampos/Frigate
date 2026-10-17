@@ -42,7 +42,8 @@ if(NOT gen_result EQUAL 0)
 endif()
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${REPO_ROOT}/port/hal/replaced.txt" "${REPO_ROOT}/port/tools/gen_host_tree.py")
-file(GLOB_RECURSE port_watched CONFIGURE_DEPENDS "${REPO_ROOT}/src/*.c" "${REPO_ROOT}/lib/*.c" "${REPO_ROOT}/include/*")
+file(GLOB_RECURSE port_watched CONFIGURE_DEPENDS
+    "${REPO_ROOT}/src/*.c" "${REPO_ROOT}/lib/*.c" "${REPO_ROOT}/lib/*.h" "${REPO_ROOT}/include/*")
 file(STRINGS "${PORT_GEN}/sources.txt" game_sources_relative)
 list(TRANSFORM game_sources_relative PREPEND "${REPO_ROOT}/" OUTPUT_VARIABLE game_sources)
 
@@ -69,8 +70,9 @@ endif()
 add_library(pokebw2_game OBJECT ${game_sources})
 target_compile_definitions(pokebw2_game PRIVATE PLATFORM_PC ${PORT_VERSION_DEFINE})
 file(GLOB library_includes LIST_DIRECTORIES true "${REPO_ROOT}/lib/*/include")
+# The host variants of the headers that name DS addresses come first (ADR 0004)
 target_include_directories(pokebw2_game PRIVATE
-    "${PORT_GEN}/include" ${library_includes} "${REPO_ROOT}/build/include/generated")
+    "${PORT_GEN}/hwinclude" "${PORT_GEN}/include" ${library_includes} "${REPO_ROOT}/build/include/generated")
 target_compile_options(pokebw2_game PRIVATE
     -std=gnu99 -fsigned-char -fshort-wchar -fwrapv -fno-strict-aliasing -ffp-contract=off
     -ftrivial-auto-var-init=zero -fno-common
@@ -89,10 +91,11 @@ set_source_files_properties("${REPO_ROOT}/src/system/main.c" PROPERTIES COMPILE_
 
 # The platform layer
 add_library(port_hal OBJECT
+    hal/hw/hw.c
     hal/os/memory_map.c
     hal/stubs/unresolved.c
     hal/trap.c)
-target_include_directories(port_hal PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(port_hal PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_hal PRIVATE -std=c11 -Wall -Wextra)
 
 # Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py)
