@@ -120,7 +120,9 @@ tools that show the differences.
 - A leaf function that builds a constant in `r0` and an address in `r1`, where ours swaps them, returns that
   constant: a `void` function puts the address in `r0`, whose parameter is dead. The multiboot parent's
   `OnWirelessDone` callbacks match as `BOOL` functions that set their flag and `return TRUE;`, though the wireless
-  helper ignores the result.
+  helper ignores the result. libVCT's `InitControlPacket` (`vct_session.c`) stores its zeros from `r0`, built after
+  `session->aid`, the first parameter's last use, and loads its bytes into `r2`, only as an `int` function ending
+  `return 0;`, which no caller reads; as `void` it builds the zero early in `r2` and loads the bytes into `ip`.
 Same instructions, registers swapped.
 
 - Register allocation follows the declaration order of locals, so try reordering declarations when registers are
@@ -158,6 +160,13 @@ Same instructions, registers swapped.
   takes its place in the declaration order: DWC's `DWCAc_FindSimilarCandidate` (`dwc_ac.c`) gets `i`, `selected`, `work`
   and `count` in `r6` to `r9` only with `int selected` declared second and assigned after the declarations, while an
   `s16` or `u8` `selected` stays in `r9` under every order.
+- A field and a value derived from it, both live (`type` and `type & 0xf0`), are colored derived value first, into
+  the lower free register, when every test reads the field through one pointer or one local, whatever their types,
+  declaration order or uses. A later test that reads the field through a second pointer to the same data still
+  shares the one load, but the field then takes the lower register. libVCT's `DispatchPacket` (`vct.c`) gets the
+  original's `ldrb r2, [r7, #4]; and r3, r2, #0xf0` only with `VCTVoicePacket *voice = data;` for the voice test and
+  `VCTControlPacket *control = data;`, the view it passes to `VCT_HandleControlPacket`, for the control test. In small
+  functions a second pointer of the same type does the same.
 - A variable gets a register or stack slot for each group of assignments that reach the same uses, so a variable
   that is assigned in two branches and stored once after them stays in one register, while a copy of the store in
   each branch lets the two assignments go to different places.
@@ -697,6 +706,11 @@ Same code, other `sp` offsets or frame size.
   asm's order. G3D's `3dsmax.c` writes `(fx64)result->sinR * offsetS + (fx64)result->cosR * offsetT` in
   `calcTexMtx3dsMaxRT_` for `smull` of `cosR` and `offsetT`, then `smlal` of `sinR` and `offsetS`; its `SR_` and
   `SRT_` and `xsi.c`'s `RT_` and `SRT_` match the same way.
+- A `u64` written to a 64-bit hardware register in one store (`reg_CP_DIV_NUMER = sum;`, `nitro/cp.h`'s
+  `volatile u64`) and the same value written as two 32-bit halves (`(u32)sum`, then `(u32)(sum >> 32)`) keep its low
+  and high words in each other's registers. libVCT's `VCT_FilterFrame` (`vct_dsp.c`) builds its sum of squares in
+  `ip` and `lr`, low and high, as the original does, only with the one store; its denominator stays two 32-bit stores
+  of `count` and 0, since a 64-bit `= count` moves `count` and `minusInput` to other registers.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
@@ -724,7 +738,14 @@ Same code, other `sp` offsets or frame size.
   reached from two places, as after an `if` without `else`, an `if`/`else`, `||` or an inline with two returns. Empty
   `if`s, dead stores and one-pass loops are removed before that and don't stop it. Where the original builds an
   offset fresh (`movs r0, #0x73; lsls`), look for such a join just before it, or for a pointer local to the nearby
-  member that the derivation starts from.
+  member that the derivation starts from. Small constants are derived the same way in ARM code: libVCT's
+  `CheckTransition` and `ReplyTransition` (`vct_session.c`) read a row of one of two tables of 11 columns, picked by
+  the mode. With the table picked into a pointer local (a ternary, or a default reassigned in an `if`), the join
+  comes before the row's `mla`, and the `-1`, `-2` and `-3` compared with the entry are derived from the stride
+  (`sub r2, r1, #0xc`). The original builds them fresh (`mvn r1, #0`, then `sub r1, r1, #1` for `-2`) and matches with
+  `next = sCheckTableMode1[session->state][column];` and `next = sCheckTableOther[...][column];` in the two arms of
+  an `if (gVCTSettings.mode == 1)`/`else`, which puts the join after the load; cross-jumping still merges the arms
+  into one `mla` and an `ldrne` of the table's address.
 - A pointer local to a member at a large offset, initialized at its declaration at the top of the function, is
   rebuilt at each use in a scratch register (`movs r1, #0x93; lsls r1, #2; adds r1, r5, r1`), and MWCC derives no
   later offset from it. The same address written as `&wk->member` at each use, or a pointer assigned just before its
@@ -931,14 +952,14 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
-- `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is: `p_sta_sub.c` and
-  `ctvt_talk.c` compile to the same bytes under either, so neither tells an order the scheduler chose from one the
-  code generator did. `#pragma optimization_level 1` does change the order: there `ctvt_talk.c`'s
-  `CtvtTalk_UpdateRecord` stores its call's stack arguments first, then sets `r0` to `r3`, each constant built at its
-  use, while level 2 already gives the order of `-O4`. The `-O4` scheduler reorders that sequence and keeps it where
-  it rates two instructions equal: there the store of `pos` (`str r0, [sp]`) ties with the `0x800`'s `movs r2, #2`,
-  because the `0xc000` built next reuses `r0`, so ours stores first, and the original, which builds the constant
-  first, generated it first. With a one-instruction last argument (`5` for `0xc000`) the same call builds the
+- `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is, and its ARM code:
+  `p_sta_sub.c`, `ctvt_talk.c` and libVCT's ARM `vct_dsp.c` compile to the same bytes under either, so neither tells an
+  order the scheduler chose from one the code generator did. `#pragma optimization_level 1` does change the order: there
+  `ctvt_talk.c`'s `CtvtTalk_UpdateRecord` stores its call's stack arguments first, then sets `r0` to `r3`, each constant
+  built at its use, while level 2 already gives the order of `-O4`. The `-O4` scheduler reorders that sequence and keeps
+  it where it rates two instructions equal: there the store of `pos` (`str r0, [sp]`) ties with the `0x800`'s
+  `movs r2, #2`, because the `0xc000` built next reuses `r0`, so ours stores first, and the original, which builds the
+  constant first, generated it first. With a one-instruction last argument (`5` for `0xc000`) the same call builds the
   constant first.
 - A constant stored through `p + (a - b)` is loaded before the subtraction, into a fresh register. When the original
   subtracts first and then builds the constant in the freed register, the pointer was advanced in a statement of its
@@ -1365,6 +1386,12 @@ Same instructions, scheduled in another order.
 - MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
   one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
   parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
+- Two `mvns` in a row, a complement of a complement, come the same way from an inline that complements its parameter,
+  called with one already applied: the ITCM's ClAct renderers (`clact_itcm.c`) clear the flags an actor doesn't
+  overwrite with NitroSystem's `NNS_G2dSetRendererOverwriteDisable(&renderer->renderer, ~overwrite)`, whose body is
+  `rend->overwriteEnableFlag &= ~flag`. The parameter's type keeps them: with the SDK's enum
+  `NNSG2dRendererOverwriteParam`, or a `u32`, both stay, while an `int` parameter folds them as above, and so does
+  `&= ~~overwrite` written in place, which leaves each of the four renderers 4 bytes short.
 - A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
   `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
   task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
@@ -1974,7 +2001,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   call:`, is the call written in both branches: overlay 185's `PMSIView_CmdWordWinToCategory` matches only with
   `if (mode == 0) { f(flag); } else { if (search) { flag = TRUE; } f(flag); }`. Writing the call once after the `if`
   also swapped the registers of `flag` and `search`. Two `b`s in a row to one shared block are the same: MSL's
-  `__strtold` reads the next character with `c = fetch();` in both arms of its hexadecimal digits' `if`.
+  `__strtold` reads the next character with `c = fetch();` in both arms of its hexadecimal digits' `if`. So is a
+  field stored before a join and loaded again right after it (`ldr r0, [r7]` before a compare), where one store in
+  the same block reuses its register: libVCT's `HandleHostPacket` (`vct_session.c`) writes `result->event =
+  GetEvent(packet, host); result->session = host; host->state = next;` at the end of both arms, as its sibling
+  `HandlePeerPacket` writes them on each path, and tests `result->event == 10` after the `if`/`else`. The then-arm's
+  copy is cross-jumped away, leaving a `b` to a `b` into the else-arm's copy, and `host = &sSessionPool.host;`,
+  assigned in each arm before the `ReplyTransition` call, gives the original's `ldr r5` of the address in each arm.
 - A range or equality test that ends in `b store` while its other arm is `mov rN, #const; b store` is the store
   written in both arms, `if (x >= 20 && x <= 23) { wk->pos = x; } else { wk->pos = 22; }`: the then-arm's store is
   cross-jumped into the shared one and only its `b` is left. The phrase input's `PMSInput_CategoryKeyInitial` writes
@@ -2533,7 +2566,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
   tables defined just above `CtvtDraw_UpdateDraw`, their first user. With every table above the first function the
-  colors sort after the 2-byte tables again.
+  colors sort after the 2-byte tables again. `.data` is written out the same way: libVCT's `vct_dsp.c` has its 16-byte
+  `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
+  above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
+  `VCT_InitEcho`, their only user.
 - Two statics reached from one literal, at `[r0]` and `[r0, #4]`, ask for `-ipa file` before anything else: without it
   each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
   NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics

@@ -115,9 +115,12 @@ typedef u16 GXRgb;
 // A window's effect enable, above its planes
 #define GX_WND_EFFECT_SHIFT 5
 
-#define GX_OAM_MODE_NORMAL 0
-#define GX_OAM_MODE_XLU 1
-#define GX_OAM_MODE_BITMAPOBJ 3
+typedef enum {
+    GX_OAM_MODE_NORMAL = 0,
+    GX_OAM_MODE_XLU = 1,
+    GX_OAM_MODE_OBJWND = 2,
+    GX_OAM_MODE_BITMAPOBJ = 3,
+} GXOamMode;
 
 // OAM attributes. Bitmap OBJ take an alpha in place of a palette
 typedef union {

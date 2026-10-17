@@ -40,6 +40,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   local of the other signedness (`int pos = index;`). (matching.md: "A 32-bit parameter passed on the stack")
 - A 64-bit sum of products in other registers, or an `ldm` of two fields where the original has two `ldr`: build
   the sum with `+=`, one product a statement. (matching.md: "built up with `+=`")
+- A `u64`'s low and high words in each other's registers before it goes to a 64-bit hardware register: write it in
+  one `u64` store, not two 32-bit halves. (matching.md: "64-bit hardware register in one store")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
   with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
@@ -64,6 +66,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   one register, a copy of the store in each branch splits it. (matching.md: "group of assignments")
 - An update written in both branches of an `if`/`else` (`nbits--;` twice) is merged into one instruction but
   allocated like two assignments, which can swap registers. (matching.md: "update written in both branches")
+- A loaded field and its masked value swapped (`ldrb r3; and r2, r3, #0xf0` where the original loads into `r2`): read
+  the field in the later test through a second pointer to the same data, such as the typed view the code passes on.
+  (matching.md: "A field and a value derived from it")
+- A constant stored from `r0`, built after the first parameter's last use, where ours builds it early in another
+  register: the function returns that constant, though no caller reads it. (matching.md: "A leaf function that
+  builds a constant")
 - A pointer local to a struct's element costs a callee-saved register; index the element at each use instead.
   (matching.md: "A pointer local to an element")
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate differently, as do `count = 1; arr[0] = x;` and the
@@ -399,6 +407,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A large offset derived from an earlier one (`subs r6, #0x80`) where the original builds it fresh (`movs; lsls`):
   a join just before it, or a pointer local to the earlier member, initialized at its declaration at the top.
   (matching.md: "rebuilt at each use in a scratch register")
+- `-1` and `-2` derived from a table's row stride (`sub r2, r1, #0xc`) where the original builds them fresh (`mvn`):
+  read the element in each arm of an `if`/`else` rather than picking the table into a pointer local first.
+  (matching.md: "Small constants are derived the same way")
 - A struct local's member addressed afresh at each access (`add r1, sp, #0x64; str r0, [r1]`) where ours uses
   `[sp, #0x64]` and a saved register: a pointer local to the member, set at its declaration. (matching.md: "A pointer
   to a member of a struct local")
@@ -525,6 +536,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
   code was written there. (matching.md: "Identical statements in different branches")
 - A branch to the next instruction comes from cross-jumping a shared tail. (matching.md: "cross-jumping")
+- A field loaded again right after a join (`ldr r0, [r7]`) where ours reuses the stored register, with a `b` to a
+  `b`: the store was written at the end of both arms. (matching.md: "loaded again right after it")
 - A load at the top of both arms of an `if`/`else`, where ours hoists it between the test and the branch: one
   arm began with another statement, as `destPixel--;`.
   (matching.md: "A load that both arms of an `if`/`else` begin with")
@@ -701,8 +714,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The values a function already uses as immediates")
 - Function-local statics are listed last, after the tentative `.bss` statics, by function in reverse order; one in a
   `static inline` is listed where the inline is defined. (matching.md: "joins the size sort at the end of the file")
-- An object at the head of the shared `.rodata`, larger than the ones after it and packed against them: `-ipa
-  function`, which sorts the data waiting at each function on its own; define the tables just before their first user.
+- An object at the head of the shared `.rodata` or `.data`, larger than the ones after it and packed against them:
+  `-ipa function`, which sorts the data waiting at each function on its own; define the tables just before their
+  first user.
   A game file can't take a per-file flag yet. (matching.md: "Under `-ipa function` MWCC writes out")
 - A `static const` whose address is never taken is folded and not emitted. If the original has it, it isn't static.
   An unreferenced word after a file's larger tables is the next file's first object.
@@ -748,7 +762,7 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
 
-`#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb code, so they can't single out the
+`#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb or ARM code, so they can't single out the
 scheduler; `#pragma optimization_level 1` shows each constant built at its use (matching.md: "leave 1.1p1's Thumb
 code as it is").
 
