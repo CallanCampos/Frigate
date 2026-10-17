@@ -1148,11 +1148,16 @@ Same instructions, scheduled in another order.
   the declarations, linkage, field types, nesting and `#pragma scheduling off` don't change it. A read of the same
   object earlier in the function at a higher offset lowers the bound: the access at offset a moves only while a plus
   the larger of a and that read's offset is below the size, so after `int x = sObj.f[12];` only `f[0]` to `f[3]`
-  move. A store moves above an access through a pointer into another static by the same bound. libVCT's
-  `VCT_DetachSession` (`vct_audio.c`) loads `sAudio.sessionCount`, at 0x20 of the 0x2c-byte `sAudio`, above its
-  `sSlotSessions[slot] = NULL`, which no spelling of the two statements reproduces. Its `EncodeNextFrame`, which
-  reads `sAudio.codec` (0x1c) first, moves the store `sAudio.needsSync = FALSE` (8) above the `packet->codec` store
-  into `sSendQueue`, and fields at 4 and 0xc in its place move too, while those at 0x14 and 0x18 stay.
+  move. A store moves above an access through a pointer into another static by the same bound. The store must be in
+  the lower half of its own object as well: after `sArr[2] = 0;` into an `int sArr[12]`, `sObj.f[2]`'s load moves
+  above it, and after `sArr[8] = 0;` it stays below; a store through an unknown index counts as offset 0. libVCT's
+  `VCT_DetachSession` (`vct_audio.c`) loads the session count above its `sSlotSessions[slot] = NULL`, which no
+  spelling gives with the count at 0x20 of a 0x2c-byte `sAudio` struct. With `sAudio`'s fields as separate statics,
+  each at offset 0 of its own object, under `-ipa file` (whose size sort gives the ROM's `.bss` order), the load
+  moves and the function matches. Its `EncodeNextFrame`, which reads the codec (0x1c) first, moved the store
+  `sAudio.needsSync = FALSE` (8) above the `packet->codec` store into the send queue while it was a field, and
+  fields at 4 and 0xc in its place moved too, while those at 0x14 and 0x18 stayed; the static `sNeedsSync` stays
+  last, as in the original.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1421,7 +1426,8 @@ Same instructions, scheduled in another order.
 - An unsigned 64-bit compare of sign-extended `int`s (`asr #31` and `adc rX, rZero, rY, asr #31` to widen, then
   `cmp hi; cmpeq lo` with `bls` or `movhi`), where `(s64)` casts give `subs; sbcs` and a signed condition, is an `int`
   compared with a sum that holds a `u64` constant, such as NitroSDK's `OS_MilliSecondsToTicks`: libVCT's
-  `UpdateTiming` (`vct_audio.c`) tests `change > (receiver->jitterAverage + 0x8b18) * 2 + OS_MilliSecondsToTicks(100)`.
+  `VCT_UpdateTiming` (`vct_buffer.c`) tests `change > (receiver->jitterAverage + 0x8b18) * 2 +
+  OS_MilliSecondsToTicks(100)`.
 - A field's address in a stack struct formed in two steps, `add r1, sp, #0` and then `add r1, r1, #4` (with `ldr r0,
   [sp, #0]` between), where ours folds it into `add r1, sp, #4`, is the struct passed as a packet of words to an inline
   that indexes it. G3D's `NNSi_G3dSendTexSRTMaya`, `NNSi_G3dSendTexSRTSi3d`, `NNSi_G3dSendTexSRT3dsMax` and
@@ -1801,6 +1807,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A ternary argument `f(c ? 1 : 0)` compiles to the select form (`movs r0, #1; cmp; beq; movs r0, #0`). A branchy
   original (`bne`; `movs #1`; `b`; `movs #0`) is an `if`/`else` with a call in each branch, as `CtvtTalk_UpdateMain`
   calls `func_0203d564(TRUE)` or `func_0203d564(FALSE)`.
+- MWCC doesn't push a constant multiply into the arms of a select: `&frames[c ? 0 : 2]` with 0x460-byte elements gives
+  `movne r2, #0; moveq r2, #2; mov r0, #0x460; mla`. A select of 0 and an element's size added to a base (`movne r0, #0;
+  moveq r0, #0x460; add r8, r6, r0`) is therefore a ternary of byte offsets in the source, which no index spelling, type
+  or inline gives, as in libVCT's `EncodeNextFrame` and `VCT_SubmitSamples` (`vct_audio.c`, their rows), which match
+  whole with it. A ternary of the constants 0 and 1 compiles as a logical not, `moveq #1` before `movne #0`, while other
+  constants keep the source's arm order (`movne #0; moveq #2`).
 - A flag set with `b = TRUE; if (*p != 0) { b = FALSE; }` is live before `*p` is loaded, so `b` and `p` need two
   registers, and a spilled flag is stored twice. `b = (*p == 0) ? TRUE : FALSE;` reads `*p` first, takes `p`'s
   register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
@@ -1926,7 +1938,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the cast `(i + 17) * 2` was spilled and reloaded twice and the frame was 4 bytes larger. The two spilled slots left
   swapped after that (`scroll` and the loop body's `visible`) were fixed by making the block-scoped
   `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
-  A product computed again in a register shows it too: libVCT's `UpdateTiming` (`vct_audio.c`) loads 0x8b18 again
+  A product computed again in a register shows it too: libVCT's `VCT_UpdateTiming` (`vct_buffer.c`) loads 0x8b18 again
   and multiplies a second time for `playoutDelay` after the signed `delayFloor = (int)quotient * 0x8b18 - 0x458c`,
   with `u32 quotient`.
 - A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
@@ -2456,19 +2468,29 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `TRUE`/`FALSE`, or `&&` with an operand the front end can't fold, such as `i < 4 && !found` with a local flag. `&& 1`,
   `MIN` of constants, a `static const` or enum bound and every counter type are rotated. In ARM code the 0/1 test still
   compiles to a plain `cmp; blt` at the bottom, so the leading `b` is the only sign of it: libVCT's `VCT_InitAudio`
-  (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE` (its row).
-  As a diagnostic only, `__attribute__((aligned(4)))` on any object a function reads keeps the `b` there too, and
-  changes the function's other optimizations.
+  (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE`, though
+  there the original's `b` comes from an aligned object (next bullet).
+- An explicit alignment (`ATTRIBUTE_ALIGN(4)`, 16 or 32) on any object a function reads, or on a member it reads,
+  keeps every constant-bound loop of the function entered with a `b` to its test, and changes its other optimizations:
+  a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it is otherwise shifted.
+  `volatile`, an aligned struct type or a union do not do it, and an `extern` declaration with the attribute does it
+  as the definition does. libVCT's `vct_audio.c` has the original's case: its static `sSendQueue` is 32-aligned in the
+  ROM (`0x02197a80`, after an 8-byte gap), and the functions that read it keep the leading `b` (`VCT_InitAudio`,
+  `VCT_AttachSession`, `VCT_SubmitSamples`, and `VCT_SendPending`, which also has the `clz` inline below), where every
+  other loop of the file is rotated. The file compiles to the same code with the queue as another file's global,
+  declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
+  `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
+  the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
-  `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a
-  `packet = head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `FlushAllQueues` (`vct_audio.c`)
-  matches as `while (sQueueHeads[slot] != NULL) { VCTPacket *packet = sQueueHeads[slot]; ... }` at the top of its slot
-  loop, where `packet` loaded before the `while` and again at the end of its body gave the rotated loop.
-- A search loop whose normal exit sets the counter's register to the bound before testing it (`mov r5, #8` falling
-  into `cmp r5, #8`) is an inline that returns the counter from inside the loop and its `size` argument after it. A
-  loop with `break` written in place leaves the counter as it is. The inline also walks its table with a
-  post-incremented pointer (`ldr r8, [fp], #4`) from `value <= *table++`. libVCT's `EncodeMulaw` (`vct_audio.c`) reaches
-  its size only with G.711's `search(val, table, size)` as a `static inline` (its row).
+  `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =
+  head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `VCT_FlushAllQueues` (`vct_buffer.c`) matches
+  as `while (sQueueHeads[slot] != NULL) { VCTPacket *packet = sQueueHeads[slot]; ... }` at the top of its slot loop,
+  where `packet` loaded before the `while` and again at the end of its body gave the rotated loop.
+- A search loop whose normal exit sets the counter's register to the bound before testing it (`mov r5, #8` falling into
+  `cmp r5, #8`) is an inline that returns the counter from inside the loop and its `size` argument after it. A loop with
+  `break` written in place leaves the counter as it is. The inline also walks its table with a post-incremented pointer
+  (`ldr r8, [fp], #4`) from `value <= *table++`. libVCT's `VCT_EncodeMulaw` (`vct_buffer.c`) reaches its size only with
+  G.711's `search(val, table, size)` as a `static inline` (its row).
 
 ## Switches
 
@@ -2938,7 +2960,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   on a 32-byte boundary, so a gap in the ROM's `.bss` before a 32-aligned object can be the end of the previous file:
   NitroSDK's `snd_command.c` starts at `0x0214c700` with its 32-aligned command array, and the queue before the gap is
   `nitro_snd_main.c`'s global `SNDi_Queue`. The alignment can change code as well: the loop that links that array's free
-  list keeps its `b` to the test only with the array aligned.
+  list keeps its `b` to the test only with the array aligned. Under `-ipa file`, though, an object of 64 bytes or more
+  gets a `.bss` section of its own, with its own alignment, so a gap before a 32-aligned object can be inside one file:
+  libVCT's `vct_audio.c` has its pooled scalars, `sReceivers` and `sMixBuffer` from `0x02197444`, then its 32-aligned
+  `sSendQueue` at `0x02197a80`, 8 bytes after `sMixBuffer`, in a fourth section. Where the next file starts then shows
+  in its code: `vct_buffer.c`'s functions reach each of their statics from a literal of its own, where `vct_audio.c`'s
+  share one base.
 - Sections start 4-aligned at link time (`ALIGNALL(4)` in the LCF), whatever their own alignment: pms_data.c's
   12-entry `u16` initializer after 0x16 bytes of shared `.rodata` sits at +0x18, not +0x16.
 - The same small table in the `.rodata` of several files of one overlay, each file with its own copy of the same
@@ -2951,6 +2978,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   order of their tables gives the ROM's layout. A lone table ahead of the sorted run still means another file in
   front (`oekaki_comm.c`). A global initialized to zero (`int x = 0;`) goes to `.bss` too but counts where it is
   defined: one before `wifibattlematch_net_fields.c`'s tables moves their strings as a `const` scalar there does.
+  Several tentative definitions enter the list in the reverse of their declarations: `vct_audio.c`'s fifteen `.bss`
+  statics (eleven scalars, built with `-ipa file`) come out as the model predicts only when they are given to
+  `rodata_order.py` last to first, after the file's tables and `.data` word, and the declaration order of the scalars
+  that the model then finds for the ROM's layout compiles to it.
 - A `const` on a pointer parameter lets MWCC hoist loads through it above later byte stores: the hit tests of
   `beacon_view.c` match only with a non-const `BeaconViewTouch *`, and the accessors of
   `fmission_log_accessor_fv.c` only with non-const entries.

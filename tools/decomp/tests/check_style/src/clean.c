@@ -9,6 +9,9 @@ int Clean_Public(int value);
 // Written by the interrupt handler while the loop waits
 static volatile int sReady;
 
+// A global defined with an alignment, which is not a prototype
+u32 gCleanAligned ATTRIBUTE_ALIGN(32);
+
 typedef volatile u16 vu16_alias;
 #define REG_TEST (*(volatile u16 *)0x04000000)
 #define STEP(x)                                                                                                        \

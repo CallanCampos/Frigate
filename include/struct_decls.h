@@ -649,7 +649,6 @@ typedef struct UnionGroup UnionGroup;
 typedef struct UnionSystem UnionSystem;
 typedef struct UnityTowerSurveySave UnityTowerSurveySave;
 typedef struct VCTAdpcmState VCTAdpcmState;
-typedef struct VCTAudio VCTAudio;
 typedef struct VCTCapture VCTCapture;
 typedef struct VCTConfig VCTConfig;
 typedef struct VCTControlPacket VCTControlPacket;

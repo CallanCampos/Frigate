@@ -270,8 +270,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `const` parameter. (matching.md: "unless the pointee is `const`")
 - A static's member loaded above a store through an unknown index into another static, or below it: ARM code
   moves the load up only when its offset is below half the object's size, and below the size less the offset of a
-  higher member read earlier; a store moves above an access through a pointer by the same bound. (matching.md: "below
-  half the object's size")
+  higher member read earlier; a store moves above an access through a pointer by the same bound. The store, too, must
+  be in the lower half of its own object; an unknown index counts as 0. (matching.md: "below half the object's size")
+- A struct field's load above an indexed store that its offset can't give: the fields are separate statics, each at
+  offset 0 of its own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its
+  own object")
 - A table's row offset added to its address before the column (`add r0, table, row*3; ldrb [col, r0]`), where ours
   adds it to the column: a two-dimensional table indexed `[row][col]`. (matching.md: "A two-dimensional table
   indexed")
@@ -558,6 +561,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   that the `u8` return narrows; a `u8` local drops it. (matching.md: "An `and #0xff` on each result")
 - An `and` before an inline's table load in some inlined copies only: those calls mask their argument, and the
   inline indexes with the bare parameter. (matching.md: "in some inlined copies and not in others")
+- `movne rN, #0; moveq rN, #size; add` where ours selects an index and multiplies (`mla`): MWCC never pushes the
+  multiply into a select's arms, so the source selected byte offsets. `moveq #1; movne #0` is `c ? 0 : 1`.
+  (matching.md: "into the arms of a select")
 
 ## Branches and block layout
 
@@ -676,6 +682,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A loop entered with a `b` to its test at the bottom, where ours is rotated: a 0/1 test, `i < N ? TRUE : FALSE`, a
   `TRUE`/`FALSE` inline or `&& !found`. In ARM the bottom test is still a plain `cmp; blt`.
   (matching.md: "has a test whose value is 0/1"), (matching.md: "What keeps the `b`")
+- The same `b` in every function that reads one object, where the file's other loops are rotated: the object has an
+  explicit alignment, as a 32-aligned address in the ROM shows; another file's object takes it on its `extern`
+  declaration. (matching.md: "An explicit alignment")
 - The same in an outer loop around an inner one: begin its body with the inner loop,
   `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
 - `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
@@ -715,6 +724,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
+- A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
+  alignment. (matching.md: "An explicit alignment")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
   off")
 - `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. A bare inlined `clz` in ARM library code is
@@ -796,8 +807,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
   symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
-- A gap in `.bss` before a 32-aligned object: the previous file ends there. (matching.md: "makes its file's whole
-  `.bss` section 32-aligned")
+- A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
+  gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
+  32-aligned")
 
 ## Function order and presence
 

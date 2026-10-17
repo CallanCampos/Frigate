@@ -22,7 +22,10 @@ Pipe the output through `head` or `grep`; for a big overlay, use the `boundary-s
   the file's section range", the range is short of an object: extend it, or, if the object belongs to the next file,
   fix the next boundary. `config_fixes.py add-data` adds an object nothing references, so the one before doesn't
   seem to run on.
-- **Statics:** two files' `.bss` statics are addressed from separate bases, which shows a boundary.
+- **Statics:** two files' `.bss` statics are addressed from separate bases, which shows a boundary. A gap before a
+  32-aligned object can end a file, or fall inside one built with `-ipa file`, which gives each object of 64 bytes or
+  more a section of its own: libVCT's `vct_audio.c` ends with its 32-aligned `sSendQueue`, after such a gap
+  (`docs/matching.md`, "makes its file's whole `.bss` section 32-aligned").
 - **Sizes:** MWCC sorts a file's static data by size (`docs/matching.md`, "Static data is sorted by size"), so a run of
   `.rodata` that gets smaller marks a boundary. `btl_server_flow_sub.c`'s 184-byte item effects followed by a 118-byte
   and a 96-byte table split off `btl_handler_work.c` and `btl_server_cmd.c`, whose users confirmed it. It moves `.text`
