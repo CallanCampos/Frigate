@@ -145,6 +145,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A loop-invariant field in the register after every declared local, where the original keeps it among them: read it
   into a local of the type the loop compares it at, declared at that place (`u32 movie = rules->movie;` against a
   `u32` bit field). (matching.md: "register after every declared local too")
+- Registers of a scheduled block that no declaration or statement order of the same steps gives: read them as the
+  order the values are defined (`--opt -O1` shows it unscheduled) and interleave the statements so, as a per-axis
+  save and move. (matching.md: "Registers are colored in the order the source defines")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -397,6 +400,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The same goes for a returned flag")
 - A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
   an enum. (matching.md: "tests its stat")
+- A local array's element loaded again after a call: it was read through a pointer to the element, set in the
+  loop. (matching.md: "A local array's element is never loaded again")
+- An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
+  calls; check the SDK inline's mask (`y2 & 0xff`, not `(u8)y2`). (matching.md: "An `ands` with 0xffff kept")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
@@ -499,8 +506,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A 0/1 flag laid out first value first (`bne; movs #0; b; movs #1`) where every plain spelling loads 1 first: the
   arms are enum constants, with the condition written so the original's first arm comes first.
   (matching.md: "held in an enum type")
-- A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register:
-  default-then-override through a local, `v = 0; if (!cond) { v = 1; }`. (matching.md: "default-then-override")
+- A `? 0 : 1` with inverted branch polarity whose 1 the original takes from a long-lived constant register: enum
+  constants for both arms as well. (matching.md: "also has enum constants for both arms")
+- A negated range test whose branch targets differ: write the positive test of the complement, an `||` chain.
+  (matching.md: "A negated test and its expansion")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
 - Identical statements in different branches are merged, so a jump into the middle of another block means the same
