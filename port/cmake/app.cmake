@@ -29,27 +29,34 @@ endforeach()
 # A replay from power-on through the title screen into the start menu (port/tests/replay/start_menu.pbwinput). It
 # needs the player's ROM: without one the program exits 66 and the test is skipped. It takes about 40 s of CPU in an
 # unoptimized build and a few in an optimized one; the limit is wall-clock time, which a loaded machine stretches
+# A save would change the start menu, so the replay has a save directory of its own, emptied before each run
+set(replay_start_menu_saves "${CMAKE_CURRENT_BINARY_DIR}/replay_start_menu_saves")
+add_test(NAME replay_start_menu_clean COMMAND ${CMAKE_COMMAND} -E rm -rf "${replay_start_menu_saves}")
+set_tests_properties(replay_start_menu_clean PROPERTIES FIXTURES_SETUP replay_start_menu_saves)
 add_test(NAME replay_start_menu
-    COMMAND ${PORT_PROGRAM} --headless --frames 4300 --watchdog 30
+    COMMAND ${PORT_PROGRAM} --headless --frames 4300 --watchdog 30 --save-dir "${replay_start_menu_saves}"
         --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/start_menu.pbwinput")
-set_tests_properties(replay_start_menu PROPERTIES
+set_tests_properties(replay_start_menu PROPERTIES FIXTURES_REQUIRED replay_start_menu_saves
     SKIP_RETURN_CODE 66 PASS_REGULAR_EXPRESSION "stopped after 4300 frames" TIMEOUT 900)
 
-# A replay from power-on through the start menu's NEW GAME and the intro (overlay 294) into the opening's 3D flight
-# over Aspertia City (port/tests/replay/new_game.pbwinput), up to just before the field's first script, whose tables
-# have no C yet: a test of level T3. check_screens.py runs it with --screen-hashes and checks that it shows, each within
-# a range of frames, nine screens from the start menu to the opening's season banner exactly as the DS does, by the
-# oracle's hashes of them (port/tests/replay/new_game.screens.tsv), and that it runs all its frames. The intro takes
-# the start menu's first item, NEW GAME, only without a save, so the replay's save directory is emptied before each
-# run. Without the player's ROM the program exits 66 and the test is skipped
-set(replay_new_game_saves "${CMAKE_CURRENT_BINARY_DIR}/replay_new_game_saves")
-add_test(NAME replay_new_game_clean COMMAND ${CMAKE_COMMAND} -E rm -rf "${replay_new_game_saves}")
-set_tests_properties(replay_new_game_clean PROPERTIES FIXTURES_SETUP replay_new_game_saves)
-add_test(NAME replay_new_game
-    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_screens.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game.screens.tsv" --
-        $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 10600 --watchdog 30 --save-dir "${replay_new_game_saves}"
-        --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game.pbwinput")
-set_tests_properties(replay_new_game PROPERTIES
-    FIXTURES_REQUIRED replay_new_game_saves SKIP_RETURN_CODE 66 TIMEOUT 1800)
+# Black 2 only: the screens it checks are the oracle's hashes of Black 2's
+if(PORT_VERSION STREQUAL "b2_us")
+    # A replay from power-on through the start menu's NEW GAME and the intro (overlay 294) into the opening's 3D flight
+    # over Aspertia City (port/tests/replay/new_game.pbwinput), up to just before the field's first script, whose tables
+    # have no C yet: a test of level T3. check_screens.py runs it with --screen-hashes and checks that it shows, each
+    # within a range of frames, nine screens from the start menu to the opening's season banner exactly as the DS does,
+    # by the oracle's hashes of them (port/tests/replay/new_game.screens.tsv), and that it runs all its frames. The
+    # intro takes the start menu's first item, NEW GAME, only without a save, so the replay's save directory is emptied
+    # before each run. Without the player's ROM the program exits 66 and the test is skipped
+    set(replay_new_game_saves "${CMAKE_CURRENT_BINARY_DIR}/replay_new_game_saves")
+    add_test(NAME replay_new_game_clean COMMAND ${CMAKE_COMMAND} -E rm -rf "${replay_new_game_saves}")
+    set_tests_properties(replay_new_game_clean PROPERTIES FIXTURES_SETUP replay_new_game_saves)
+    add_test(NAME replay_new_game
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_screens.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game.screens.tsv" --
+            $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 10600 --watchdog 30 --save-dir "${replay_new_game_saves}"
+            --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/new_game.pbwinput")
+    set_tests_properties(replay_new_game PROPERTIES
+        FIXTURES_REQUIRED replay_new_game_saves SKIP_RETURN_CODE 66 TIMEOUT 1800)
+endif()

@@ -1,8 +1,7 @@
 pbwinput 1
 # From power-on through the boot screens and the opening movie to the title screen, START, and the start menu
-# (port/cmake/app.cmake's replay_start_menu). Video frames, so that the press lands on the title screen however many
-# passes the movie takes
-version b2_us
+# (port/cmake/app.cmake's replay_start_menu), in either version. Video frames, so that the press lands on the title
+# screen however many passes the movie takes
 frames video
 3900 START
 3910 -

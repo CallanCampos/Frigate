@@ -241,7 +241,11 @@ static void OverlayMain(void) {
     }
     Check(!FS_LoadOverlayInfo(&info, MI_PROCESSOR_ARM9, id), "past the table there are none");
     FS_LoadOverlayInfo(&info, MI_PROCESSOR_ARM9, 12);
+#ifdef WHITE2
+    Check((u32)(uintptr_t)info.ramAddress == 0x02150400, "overlay 12 loads where the field core does");
+#else
     Check((u32)(uintptr_t)info.ramAddress == 0x021503c0, "overlay 12 loads where the field core does");
+#endif
 
     // A real overlay's statics in their sections
     overlay = port_ovsec_get(36);
