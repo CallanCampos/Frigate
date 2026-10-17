@@ -190,3 +190,8 @@ lib/dwc/src/gp/gpiInfo.c:
     complete
     .text       start:0x021768cc end:0x02177d00
     .data       start:0x0218826c end:0x02188554
+
+lib/dwc/src/gp/gpiKeys.c:
+    complete
+    .text       start:0x02177d00 end:0x021780c4
+    .data       start:0x02188554 end:0x021885cc
