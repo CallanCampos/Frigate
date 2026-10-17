@@ -87,7 +87,7 @@ struct VersionCode {
 };
 constexpr VersionCode VERSION_CODES[] = { { "b2_us", "IREO" }, { "w2_us", "IRDO" } };
 
-const char *const DEFAULT_TIME = "2012-10-07 12:00:00";
+const char *const DEFAULT_TIME = PBW_INPUT_DEFAULT_TIME;
 
 int sLogThreshold = melonDS::Platform::LogLevel::Warn;
 

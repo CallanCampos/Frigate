@@ -26,10 +26,52 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: the title screen and the start menu, natively
+
+- **Upstream:** `e484d5011` (merge of PR #353), which brings the ITCM's ClAct renderers (PR #352, decomp work this
+  session did to unblock the title screen).
+- **Port:** `PORT_SHA`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `check_mwcc_neutral.py`: all 3,140 file and
+  version pairs give the same MWCC token stream as upstream's `e484d5011`.
+- **Host build:** arm64 macOS, RelWithDebInfo and unoptimized (`-fgnu89-inline` made the unoptimized build link); CI
+  green on macOS and Linux for every commit pushed.
+- **Tests:** T0 as above. T2: 207 of 207 `ctest` tests pass, among them the 3D engine's (1,400 hand-derived checks,
+  plain and sanitized), the sound driver's 31 and its two ROM scenarios (all 1,390 sequences), the G2D loaders' ROM
+  equivalence (every one of the 30,078 G2D files of each ROM against a simulation of the DS's unpack), display capture,
+  and `replay_start_menu`, which plays an input file from power-on to the start menu. T4: the melonDS oracle builds on
+  request (`-DPORT_BUILD_ORACLE=ON`); a comparison of the boot sequence before this entry's renderer fix matched 33 of 33
+  sampled frames at 5 bits per channel, and 11 of 11 at 6 bits in a scratch build with this entry's fix. T3, T5-T7 not yet.
+- **Tiers:** (a) 32,093 functions, 2,859,042 code bytes (74.3%); (b) 5,333, 642,866 bytes; (c) 3,592, 348,336 bytes
+  (9.0%). Since the research measurement: (a) +209 functions and 26,318 bytes, (c) -3,024 bytes, the ITCM renderers.
+- **Trap stubs:** 581 function stubs (355 in overlay 36, 113 in overlay 11) and 67 data placeholders. The game runs
+  4,400 frames to the title screen, and through START to the start menu, without reaching one.
+- **64-bit warnings:** game / `lib/` on arm64: `-Wpointer-to-int-cast` 865 / 184, `-Wvoid-pointer-to-int-cast` 49 /
+  117, `-Wint-to-pointer-cast` 76 / 144, `-Wint-to-void-pointer-cast` 69 / 132 (`port/tools/compile-probe`); as in the
+  research measurement but for three void-pointer casts in new upstream C.
+- **Work done:**
+  - Phase 1's exit, the boot logos in the repository build, and most of phase 2: the boot screens, the Game Freak logo,
+    the opening movie and the title screen with its 3D Black Kyurem play as on the DS, and the start menu responds.
+  - NitroSystem's 2D files in host structs with a registry tied to heap frees
+    ([ADR 0007](adr/0007-nitrosystem-files-in-host-structs.md)); the DS's geometry engine and a CPU 3D renderer;
+    display capture; the ARM7's sound driver in host C with SDL3 audio output and `--audio-dump`
+    ([ADR 0006](adr/0006-sound-driver-as-built.md)); the melonDS test oracle (`port/tools/oracle`); `--input` replays
+    in the oracle's input format, counting game frames by GFL's own frame count.
+  - Game changes, all proven neutral (`port/docs/game-changes.md`): the sound archive's file table, wave archive links
+    and the sound heap's data as 32-bit handles or `uptr`; GFL's allocation head padded to 32 bytes on hosts. NNS FND's
+    heaps are aligned for 64-bit structs by the platform layer: a strict ASan and UBSan build runs the 4,400 frames with
+    two misaligned reads left, both NitroSystem reading packed file data.
+  - The 2D renderer follows melonDS 1.1 in ignoring a colour's bit 15; the overlay-sections check accepts a program
+    whose `__eh_frame` ld64 dropped.
+- **Next:** phase 2's oracle comparison through the start menu with one input file for both programs, then New Game's
+  intro (overlay 294): 64-bit fixes for the particle system's work buffers and for the Pokémon parameter setters,
+  which take pointers as `u32`.
+- **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download Play) only
+  matter from phase 7.
+
 ## 2026-10-17: phase 1 platform layer, and the game changes it needs
 
 - **Upstream:** `4aa041311` (merge of PR #348); unchanged.
-- **Port:** `PORT_SHA`.
+- **Port:** `e49c96554`.
 - **ROM:** both SHA1s match; `check_mwcc_neutral.py`: all 3,138 file and version pairs give the same MWCC token stream
   as upstream's `4aa041311`.
 - **Host build:** arm64 macOS; CI checks macOS and Linux.

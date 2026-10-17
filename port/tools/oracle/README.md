@@ -6,7 +6,8 @@ file, writing both screens and named memory at chosen frames. `compare.py` compa
 
 It is a **test tool only**. It is never linked into or shipped with the port
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on request, and nothing under `port/` other than this directory, its
-tests and its CMake fragment refers to it. melonDS is GPL-3.0, as this repository is; the oracle links melonDS's core
+tests and its CMake fragment refers to it, except the input file reader (`pbwinput.c`, plain C with no melonDS), which
+the port compiles for its replays (`port/app/replay.c`). melonDS is GPL-3.0, as this repository is; the oracle links melonDS's core
 and is GPL-3.0 with it. melonDS is fetched at build time, pinned to a release, and never committed.
 
 | File | What it is |
@@ -265,7 +266,8 @@ What the port needs to compare itself frame by frame:
 - **Its own run directory**: a `frames.tsv` row at each frame hook with the logic counter (the value
   `GFL_VBlankUpdate` keeps in `sVBlankCount`) and the game frame, and PNGs at the frames of a list, so that one run
   gives every frame instead of `oracle.py port`'s run per frame.
-- **Replays**: `--input FILE` read with `pbwinput.c` and one `PbwGameClock` for the run (`pbw_game_clock_init`).
+- **Replays** (done: `port/app/replay.c`, GFL's frame count read through `port/hal/gfl/gfl_use_host.c`): `--input FILE`
+  read with `pbwinput.c` and one `PbwGameClock` for the run (`pbw_game_clock_init`).
   Before the game starts, apply `pbw_input_state(&input, 1)`. At the frame hook of each frame, read GFL's frame count
   (`sVBlankCount`, a static of `src/system/gfl_use.c`: the port needs a host-side way to read it, its address in the
   host build or a count of `GFL_VBlankUpdate`'s calls kept outside the decomp) and apply

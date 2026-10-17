@@ -5,14 +5,17 @@
 // and this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the
 // DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--rom PATH] [--save-dir PATH]
-//              [--fixed-time TIME] [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
+//              [--save-dir PATH] [--fixed-time TIME] [--watchdog SECONDS] [--main-arena-size BYTES]
+//              [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
 //   --screenshot PATH   writes both screens as a PNG (top above bottom) when the run ends: after the last frame of
 //                       --frames N, or when the window is closed
 //   --audio-dump PATH   writes the sound as it is made to a WAV file, with or without --headless
+//   --input FILE        plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h);
+//                       its time line (or the format's default) sets the clock unless --fixed-time is given
 //   --rom PATH          the player's ROM (port/hal/rom)
 //   --save-dir PATH     where saves go (port/hal/card)
 //   --fixed-time TIME   the clock's time at boot, "YYYY-MM-DD HH:MM:SS", moving with the virtual clock (port/hal/rtc)
@@ -33,6 +36,7 @@
 #define _DEFAULT_SOURCE
 
 #include "app/present.h"
+#include "app/replay.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
@@ -41,6 +45,7 @@
 #include "hal/os/port_app.h"
 #include "hal/os/port_os.h"
 #include "hal/rom/port_rom.h"
+#include "hal/rtc/rtc_host.h"
 #include "hal/trap.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -71,9 +76,8 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless",         "help",       "frames",   "screenshot",      "audio-dump",   "rom",
-    "save-dir",         "fixed-time", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root",
-    "heap-scale-child",
+    "headless", "help",       "frames",   "screenshot",      "audio-dump",   "input",           "rom",
+    "save-dir", "fixed-time", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -95,12 +99,11 @@ static const PortHwG3Readbacks sG3Readbacks = {
 };
 
 static void Usage(void) {
-    fprintf(
-        stderr,
-        "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--rom PATH] [--save-dir PATH] "
-        "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
-        "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
-        sArgc > 0 ? sArgv[0] : "pokeblack2");
+    fprintf(stderr,
+            "usage: %s [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH] "
+            "[--save-dir PATH] [--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--watchdog SECONDS] [--main-arena-size BYTES] "
+            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
+            sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
 
 static int IsKnownOption(const char *name, size_t length) {
@@ -239,6 +242,10 @@ static void AppFrame(void) {
     if (sWindowOpen) {
         port_present_poll();
     }
+    // A replay's input replaces what the window took
+    if (port_replay_active()) {
+        port_replay_vblank((uint32_t)sFrames);
+    }
     if (port_app_present != NULL) {
         port_app_present();
     }
@@ -257,6 +264,7 @@ int main(int argc, char **argv) {
     long long watchdog;
     long long arenaSize;
     const char *audioDump;
+    const char *inputPath;
     PortOsResult result;
     int status = 0;
 
@@ -289,6 +297,23 @@ int main(int argc, char **argv) {
         Usage();
         return EXIT_BAD_OPTIONS;
     }
+    inputPath = port_app_option("input");
+    if (inputPath != NULL && *inputPath == '\0') {
+        fprintf(stderr, "port: --input needs a file\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    if (inputPath != NULL) {
+        if (!port_replay_open(inputPath)) {
+            return EXIT_BAD_OPTIONS;
+        }
+        // The file's time is the clock's unless --fixed-time says otherwise (port/hal/rtc reads that at boot)
+        if (port_app_option("fixed-time") == NULL && !port_rtc_set_fixed_time(port_replay_time())) {
+            fprintf(stderr, "port: --input %s: its time \"%s\" isn't a time the clock can hold\n", inputPath,
+                    port_replay_time());
+            return EXIT_BAD_OPTIONS;
+        }
+    }
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
     }
@@ -313,8 +338,12 @@ int main(int argc, char **argv) {
         }
         return EXIT_BAD_OPTIONS;
     }
-    // Nothing pressed, the lid open and the pen up, as the game's first reads must see; then the screens' line drawing
+    // Nothing pressed, the lid open and the pen up, as the game's first reads must see, or a replay's first frame; then
+    // the screens' line drawing
     port_input_set(0, 0);
+    if (port_replay_active()) {
+        port_replay_start();
+    }
     port_screens_attach();
     // The geometry engine at power-on, now that the I/O registers exist, its readback registers, and its swap at each
     // VBlank
@@ -347,6 +376,7 @@ int main(int argc, char **argv) {
     // The device and the dump's WAV header; a run that stops the process itself (a trap, OS_Terminate) never gets here,
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
+    port_replay_close();
     if (sWindowOpen) {
         port_present_close();
     }

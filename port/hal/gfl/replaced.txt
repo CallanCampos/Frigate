@@ -1,0 +1,4 @@
+# Game files that the host build doesn't compile from src/ because port/hal/gfl compiles them itself. Same format as
+# port/hal/replaced.txt: a glob pattern, " # " and the reason.
+
+src/system/gfl_use.c # compiled through port/hal/gfl/gfl_use_host.c, which reads GFL's frame count for input replays

@@ -43,6 +43,9 @@ extern "C" {
 #define PBW_INPUT_TOUCH_WIDTH 256
 #define PBW_INPUT_TOUCH_HEIGHT 192
 
+// The real-time clock at power-on for a run whose file has no "time" line and that isn't given one
+#define PBW_INPUT_DEFAULT_TIME "2012-10-07 12:00:00"
+
 // The longest frame number a file may name, so that every frame fits in 32 bits with room to add
 #define PBW_INPUT_MAX_FRAME 100000000u
 
