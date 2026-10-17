@@ -127,7 +127,7 @@ void func_ov036_021a2364(EncountSystem *system);
 void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32 style, u32 partnerId, u32 trainerId,
                               u32 trainerId2, HeapID heapId);
 // The battle's encounter effect and music, against the wild species or the trainer
-void EventBattleCall_DecideEnvWild(u32 species, u32 form, u32 a2, BOOL a3, Field *field, u32 *encEffect, u16 *bgm);
+void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field *field, u32 *encEffect, u16 *bgm);
 void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffect, u16 *bgm);
 
 void EncountSystem_CancelPhenomenon(EncountSystem *encountSystem);

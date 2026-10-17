@@ -512,6 +512,14 @@ in both versions.
   keeps the `0x021cf3a8` `section_end`/`section_start` lines and replays the fixes in address order. The file stays
   incomplete until the boundary can be recorded.
 
+- `src/ov036/enceff.c` (overlay 36) matches every function in both versions, but linked complete it fails the module
+  check: its registered `.rodata` holds `ENC_EFFECT_CONTROLLERS` (760 bytes, at `0x021d25ec` / `0x021d2620`) before
+  `SPECIAL_TRAINER_BGM` and `SPECIAL_TRAINER_ENCEFF` (28 and 32 bytes), and MWCC gives the table a section of its own
+  after the one the two small tables share, whether the table is static, global or local to `EncEff_StartEvent`, or
+  the small ones are local to `EventBattleCall_DecideEnvTrainer`; `rodata_order.py` finds no declaration order for it.
+  The table may be another file's, data with no code between `comm_entry_menu.c` and `enceff.c`. The file stays
+  incomplete until that layout is found.
+
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file
