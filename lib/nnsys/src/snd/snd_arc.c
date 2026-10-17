@@ -7,9 +7,9 @@
 // NNS_SndArcGetFileAddress; the other names are NitroSystem's by their code, and the file name is a guess
 
 static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag);
-static void InfoDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
-static void FatDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
-static void SymbolDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
+static void InfoDisposeCallback(void *mem, u32 size, uptr data1, uptr data2);
+static void FatDisposeCallback(void *mem, u32 size, uptr data1, uptr data2);
+static void SymbolDisposeCallback(void *mem, u32 size, uptr data1, uptr data2);
 
 static NNSSndArc *sCurrent;
 
@@ -55,7 +55,7 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
     }
 
     if (heap != NNS_SND_HEAP_INVALID_HANDLE) {
-        arc->info = NNS_SndHeapAlloc(heap, arc->header.infoSize, InfoDisposeCallback, (u32)arc, 0);
+        arc->info = NNS_SndHeapAlloc(heap, arc->header.infoSize, InfoDisposeCallback, (uptr)arc, 0);
         if (arc->info == NULL) {
             return FALSE;
         }
@@ -67,7 +67,7 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
             return FALSE;
         }
 
-        arc->fat = NNS_SndHeapAlloc(heap, arc->header.fatSize, FatDisposeCallback, (u32)arc, 0);
+        arc->fat = NNS_SndHeapAlloc(heap, arc->header.fatSize, FatDisposeCallback, (uptr)arc, 0);
         if (arc->fat == NULL) {
             return FALSE;
         }
@@ -80,7 +80,7 @@ static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag)
         }
 
         if (symbolLoadFlag && arc->header.symbolDataSize != 0) {
-            arc->symbol = NNS_SndHeapAlloc(heap, arc->header.symbolDataSize, SymbolDisposeCallback, (u32)arc, 0);
+            arc->symbol = NNS_SndHeapAlloc(heap, arc->header.symbolDataSize, SymbolDisposeCallback, (uptr)arc, 0);
             if (arc->symbol == NULL) {
                 return FALSE;
             }
@@ -110,7 +110,12 @@ void NNS_SndArcInitOnMemory(NNSSndArc *arc, void *data) {
     for (i = 0; i < arc->fat->count; i++) {
         NNSSndArcFileInfo *file = &arc->fat->files[i];
 
+#ifdef PLATFORM_PC
+        // A host keeps the address as a handle (snd_internal.h)
+        file->mem = port_snd_handle(GetAddress(data, file->offset));
+#else
         file->mem = GetAddress(data, file->offset);
+#endif
     }
 
     arc->file_open = FALSE;
@@ -263,30 +268,40 @@ const void *NNS_SndArcGetFileAddress(u32 fileId) {
     if (fileId >= fat->count) {
         return NULL;
     }
+#ifdef PLATFORM_PC
+    // A host keeps the address as a handle (snd_internal.h)
+    return port_snd_pointer(fat->files[fileId].mem);
+#else
     return fat->files[fileId].mem;
+#endif
 }
 
 void NNS_SndArcSetFileAddress(u32 fileId, const void *address) {
+#ifdef PLATFORM_PC
+    // A host keeps the address as a handle (snd_internal.h)
+    sCurrent->fat->files[fileId].mem = port_snd_handle(address);
+#else
     sCurrent->fat->files[fileId].mem = address;
+#endif
 }
 
 void NNS_SndArcSetLoadBlockSize(int size) {
     sCurrent->loadBlockSize = size;
 }
 
-static void InfoDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
+static void InfoDisposeCallback(void *mem, u32 size, uptr data1, uptr data2) {
     NNSSndArc *arc = (NNSSndArc *)data1;
 
     arc->info = NULL;
 }
 
-static void FatDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
+static void FatDisposeCallback(void *mem, u32 size, uptr data1, uptr data2) {
     NNSSndArc *arc = (NNSSndArc *)data1;
 
     arc->fat = NULL;
 }
 
-static void SymbolDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
+static void SymbolDisposeCallback(void *mem, u32 size, uptr data1, uptr data2) {
     NNSSndArc *arc = (NNSSndArc *)data1;
 
     arc->symbol = NULL;

@@ -150,7 +150,7 @@ static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player);
 static StrmCommand *PopCommand(NNSFndList *list);
 static StrmCommand *AllocCommand(void);
 static void FreeCommand(StrmCommand *command);
-static void HeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
+static void HeapDisposeCallback(void *mem, u32 size, uptr data1, uptr data2);
 static void ArcStrmCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
                             NNSSndStrmFormat format, void *arg);
 static void StartNextStrm(NNSSndArcStrmPlayer *player);
@@ -245,7 +245,7 @@ static BOOL SetupPlayers(NNSSndHeapHandle heap) {
 
         if (heap != NNS_SND_HEAP_INVALID_HANDLE) {
             u32 size = player->numChannels * STRM_BUFFER_SIZE_PER_CH;
-            void *buffer = NNS_SndHeapAlloc(heap, size, HeapDisposeCallback, (u32)player, 0);
+            void *buffer = NNS_SndHeapAlloc(heap, size, HeapDisposeCallback, (uptr)player, 0);
 
             if (buffer == NULL) {
                 return FALSE;
@@ -613,7 +613,7 @@ static void FreeCommand(StrmCommand *command) {
 }
 
 // The sound heap frees a player's buffer
-static void HeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
+static void HeapDisposeCallback(void *mem, u32 size, uptr data1, uptr data2) {
     NNSSndArcStrmPlayer *player = (NNSSndArcStrmPlayer *)data1;
 
     if (mem != player->buffer) {

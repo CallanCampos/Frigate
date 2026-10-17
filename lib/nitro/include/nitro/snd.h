@@ -145,11 +145,19 @@ typedef struct SNDWaveData SNDWaveData;
 typedef struct SNDWaveArc SNDWaveArc;
 typedef struct SNDWaveArcLink SNDWaveArcLink;
 
+// The links below are 32-bit words of the files, which the ARM7 reads too. A host pointer is wider and would move
+// every field after them, so on a host each holds a 32-bit handle of its pointer (port_snd_handle) and the files keep
+// the DS's layout
+
 // A wave archive: its waves' offsets in the file. Loaded in the heap, the table holds the waves' addresses
 struct SNDWaveArc {
     SNDBinaryFileHeader fileHeader;
     SNDBinaryBlockHeader blockHeader;
+#ifdef PLATFORM_PC
+    u32 topLink; // the banks that use this archive, as a handle
+#else
     SNDWaveArcLink *topLink; // the banks that use this archive
+#endif
     u32 reserved[7];
     u32 waveCount;
     u32 offsetTable[];
@@ -157,8 +165,14 @@ struct SNDWaveArc {
 
 // A bank's slot for one of its wave archives, chained in the archive's list of users
 struct SNDWaveArcLink {
+#ifdef PLATFORM_PC
+    // The archive's handle and the next slot's
+    u32 waveArc;
+    u32 next;
+#else
     SNDWaveArc *waveArc;
     SNDWaveArcLink *next;
+#endif
 };
 
 #define SND_BANK_WAVEARC_MAX 4
@@ -171,6 +185,11 @@ typedef struct SNDBankData {
     u32 instCount;
     u32 instOffset[];
 } SNDBankData;
+
+#ifdef PLATFORM_PC
+_Static_assert(sizeof(SNDWaveArc) == 0x3c && sizeof(SNDWaveArcLink) == 8 && sizeof(SNDBankData) == 0x3c,
+               "the wave archive's and the bank's heads keep the DS's layout");
+#endif
 
 // The kinds of program of a bank. A drum set and a key split hold instruments of their own
 #define SND_INST_INVALID 0

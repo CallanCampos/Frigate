@@ -41,7 +41,7 @@ static void InsertPrioList(NNSSndSeqPlayer *seqPlayer);
 static void ForceStopSeq(NNSSndSeqPlayer *seqPlayer);
 static NNSSndSeqPlayer *AllocSeqPlayer(int prio);
 static void ShutdownPlayer(NNSSndSeqPlayer *seqPlayer);
-static void PlayerHeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
+static void PlayerHeapDisposeCallback(void *mem, u32 size, uptr data1, uptr data2);
 static void SetPlayerPriority(NNSSndSeqPlayer *seqPlayer, int prio);
 
 static NNSFndList sFreeList;
@@ -494,7 +494,7 @@ static void ShutdownPlayer(NNSSndSeqPlayer *seqPlayer) {
 }
 
 // A player's heap is disposed of with the sound heap it was made in
-static void PlayerHeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
+static void PlayerHeapDisposeCallback(void *mem, u32 size, uptr data1, uptr data2) {
     NNSSndPlayerHeap *playerHeap = mem;
 
     if (playerHeap->heap == NULL) {

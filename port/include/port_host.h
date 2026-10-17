@@ -48,4 +48,10 @@ void *port_hw_vecmtx_result(void);
 // (port/hal/gfl/heap_policy.c). The arguments are u32, u32 and BOOL
 unsigned int port_heap_size(unsigned int index, unsigned int size, int root);
 
+// The 32-bit handles that sound data keeps in place of a host pointer where the DS keeps an ARM9 address in a 32-bit
+// field of a file (port/hal/snd7/snd_handle.h): NitroSystem's file table (lib/nnsys/src/snd/snd_internal.h) and the
+// links of wave archives and banks (lib/nitro/include/nitro/snd.h). 0 is NULL both ways
+uint32_t port_snd_handle(const void *pointer);
+void *port_snd_pointer(uint32_t handle);
+
 #endif // PORT_HOST_H

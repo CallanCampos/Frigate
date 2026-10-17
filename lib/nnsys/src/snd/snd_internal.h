@@ -61,9 +61,19 @@ typedef struct NNSSndArcInfo {
 typedef struct NNSSndArcFileInfo {
     u32 offset;
     u32 size;
+#ifdef PLATFORM_PC
+    // The file table is read from the archive as it is, in entries of 16 bytes, and a host pointer would move every
+    // entry after the first, so the host keeps the file's address in the word as a 32-bit handle (port_snd_handle)
+    u32 mem;
+#else
     const void *mem;
+#endif
     u32 reserved;
 } NNSSndArcFileInfo;
+
+#ifdef PLATFORM_PC
+_Static_assert(sizeof(NNSSndArcFileInfo) == 0x10, "the archive's file table keeps the DS's entries");
+#endif
 
 typedef struct NNSSndArcFat {
     SNDBinaryBlockHeader blockHeader;

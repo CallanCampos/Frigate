@@ -229,12 +229,12 @@ typedef struct NNSSndArc {
 #define NNS_SND_HEAP_INVALID_HANDLE NULL
 
 // Called with a block's memory and size and the two values it was allocated with, before the block is freed
-typedef void (*NNSSndHeapDisposeCallback)(void *mem, u32 size, u32 data1, u32 data2);
+typedef void (*NNSSndHeapDisposeCallback)(void *mem, u32 size, uptr data1, uptr data2);
 
 NNSSndHeapHandle NNS_SndHeapCreate(void *startAddress, u32 size);
 void NNS_SndHeapDestroy(NNSSndHeapHandle heap);
 void NNS_SndHeapClear(NNSSndHeapHandle heap);
-void *NNS_SndHeapAlloc(NNSSndHeapHandle heap, u32 size, NNSSndHeapDisposeCallback callback, u32 data1, u32 data2);
+void *NNS_SndHeapAlloc(NNSSndHeapHandle heap, u32 size, NNSSndHeapDisposeCallback callback, uptr data1, uptr data2);
 int NNS_SndHeapSaveState(NNSSndHeapHandle heap);
 void NNS_SndHeapLoadState(NNSSndHeapHandle heap, int level);
 int NNS_SndHeapGetCurrentLevel(NNSSndHeapHandle heap);

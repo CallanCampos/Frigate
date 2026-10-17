@@ -4,16 +4,16 @@
 // ARM7 reads, and they keep ARM9 addresses in 32-bit fields: a bank's four slots link to their archive and to the next
 // bank's slot that uses it, an archive links to the first such slot, and a wave the sound heap loads by itself has its
 // address in the archive's table in place of its offset in the file (an offset is below 0x02000000, an address of main
-// memory above it). The decomp's snd.h declares the links as pointers, which on a 64-bit host are 8 bytes and move
+// memory above it). The DS's snd.h declares the links as pointers, which on a 64-bit host would be 8 bytes and move
 // every field after them.
 //
 // So these functions keep the files' own layout, field by field at the DS's offsets, and put in each 32-bit field a
 // handle (snd7_handle): 0x80000000 and the index of the host pointer in a table, which the host's ARM7 resolves
 // (snd7_handle_pointer). A handle is never taken for an offset, since it is above 0x02000000, and is the same for the
-// same pointer. The ARM7 reads the same fields. NitroSystem's loader, which reads a wave archive's waveCount and
-// offsetTable itself, needs snd.h's link fields to be 32 bits on the host too (port/docs/game-changes.md once that
-// change is made); until then its own reads of a wave archive are 4 bytes off. The handles are also the game's to use
-// (snd_handle.h), for NitroSystem's file table, which keeps file addresses the same way.
+// same pointer. The ARM7 reads the same fields. On a host the decomp's snd.h declares the link fields as 32-bit words
+// too (port/docs/game-changes.md), so NitroSystem's loader and the game, which read a wave archive's waveCount and
+// offsetTable themselves, find them at the DS's offsets. The handles are also the game's to use (snd_handle.h, and
+// port_host.h for the decomp's files), for NitroSystem's file table, which keeps file addresses the same way.
 #include "hal/pxi/pxi_bus.h"
 #include "hal/snd7/snd7_internal.h"
 #include "hal/snd7/snd_handle.h"
