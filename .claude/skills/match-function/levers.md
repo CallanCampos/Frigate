@@ -101,6 +101,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's register.
 - A parameter spilled after a register copy, where the original spills it first: the callers narrow it, so it is a
   `u16` or `u8`. (matching.md: "callers narrow with shifts")
+- A local spilled first and reloaded for its compare, where the original compares a register copy (`mov r1, r0`) and
+  stores it after: the local is word-wide; if widening it adds narrowings at calls, widen the callees' parameters too
+  when nothing in their code fixes the narrow type. (matching.md: "A local follows the same rule")
 - An element's address and the array base in two registers: test the fields through an element pointer and index in
   the body. (matching.md: "pointer to the element")
 - A loop's registers swapped around an array element that is stored, tested and passed on: a `T **slot = &arr[i]`
@@ -172,7 +175,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Values at the bottom of the frame in assignment order, with one among the declared slots: one variable reused by
   several blocks. (matching.md: "assigned anew in several `if` blocks")
 - A local's slot taken by a loop-invariant temporary above the spilled parameters: declare the local with the type the
-  loop compares or combines it at (`u32 include`). (matching.md: "loop-invariant converted copy")
+  loop compares or combines it at (`u32 include`), or passes it at (the callee's `int` parameter). Two such copies
+  can hide each other, so check `locals.py` after each type change. (matching.md: "loop-invariant converted copy")
 - A spilled value in the lowest slot that should be among the declared ones: split a chained assignment `a = b = x`.
   (matching.md: "chained assignment")
 - Block-scoped locals sat above function-scope ones in `particle.c`, where a block-scoped `{0, 0, 0}` initializer and a
