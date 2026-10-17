@@ -195,10 +195,11 @@ static uint32_t Vram32(const uint8_t *const *slots, uint32_t address) {
 }
 
 // A 15-bit colour as the 2D engine's 18-bit colour. GBATEK says the LCDs have 6 bits per channel but not how 15-bit
-// colours widen; melonDS measured c * 2 for red and blue and c * 2 plus bit 15 for green
+// colours widen; melonDS 1.1, the oracle, widens each channel as c * 2 and ignores bit 15 (its older green low bit from
+// bit 15 is commented out), and the boot sequence's frames match it at 6 bits only that way
 static uint32_t Color18(uint16_t color) {
     uint32_t r = (color & 0x1Fu) << 1;
-    uint32_t g = ((color >> 5) & 0x1Fu) << 1 | (uint32_t)(color >> 15);
+    uint32_t g = ((color >> 5) & 0x1Fu) << 1;
     uint32_t b = ((color >> 10) & 0x1Fu) << 1;
     return r << 16 | g << 8 | b;
 }

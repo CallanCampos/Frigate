@@ -1,9 +1,9 @@
 // Unit tests of port/gfx/ref, the CPU reference 2D renderer. Each test builds registers, VRAM, palettes and OAM by
 // hand for one feature and checks exact pixels. The expected values are worked out by hand in the comments, from
 // GBATEK's rules and, where ds2d.c says it follows melonDS's measurements, from those; none comes from running the
-// renderer. Colours: a 15-bit channel c5 enters the engine as 6-bit c5 * 2 (green adds bit 15), and OUT6() widens the
-// 6-bit result as the output does, (c6 << 2) | (c6 >> 4). No ROM is needed. It prints each failure and returns nonzero
-// if there was one.
+// renderer. Colours: a 15-bit channel c5 enters the engine as 6-bit c5 * 2 (bit 15 is ignored, as melonDS 1.1 does),
+// and OUT6() widens the 6-bit result as the output does, (c6 << 2) | (c6 >> 4). No ROM is needed. It prints each
+// failure and returns nonzero if there was one.
 #include "gfx/ref/ds2d.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -178,9 +178,9 @@ static void TestBackdropAndConversion(void) {
     BgPal(0, 0x7FFF);    // white: 62 per channel, widened to 0xFB
     Line(0);
     ExpectRange("15-bit white is 0xFB", 0, 255, 0xFFFBFBFBu);
-    BgPal(0, 0x83E0); // green 31 with bit 15: 62 + 1 = 63
+    BgPal(0, 0x83E0); // green 31 with bit 15: still 62
     Line(1);
-    ExpectRange("bit 15 is green's low bit", 0, 255, 0xFF00FF00u);
+    ExpectRange("bit 15 doesn't reach green", 0, 255, 0xFF00FB00u);
     BgPal(0, 0x0001); // red 1 -> 2 -> 8
     Line(2);
     ExpectRange("red 1", 0, 255, 0xFF080000u);
@@ -799,9 +799,9 @@ static void TestExtended(void) {
     Put16(s->bg, 0x8002, 0x001F);
     Put16(s->bg, 0x8004, 0xFFFF);
     Frame(0);
-    Expect("direct colour", 0, OUT6(62, 1, 0));
+    Expect("direct colour", 0, OUT6(62, 0, 0));
     Expect("direct colour alpha 0", 1, BLACK);
-    Expect("direct colour", 2, OUT6(62, 63, 62));
+    Expect("direct colour", 2, OUT6(62, 62, 62));
     // Wrap around (BG3CNT bit 13) from X 254: dots 0 and 1 are x 254 and 255, dot 2 x 256, which wraps to 0; without
     // it, dot 2 is outside
     Put16(s->bg, 0x8000 + 254 * 2, 0x8000 | Rgb(1, 0, 0));
@@ -809,12 +809,12 @@ static void TestExtended(void) {
     Io16(0x0E, 0x84 | 2 << 8 | 1 << 14 | 1 << 13);
     Io32(0x38, 254 << 8);
     Frame(0);
-    Expect("direct colour wrap", 0, OUT6(2, 1, 0));
-    Expect("direct colour wrap", 1, OUT6(4, 1, 0));
-    Expect("direct colour wrap", 2, OUT6(62, 1, 0));
+    Expect("direct colour wrap", 0, OUT6(2, 0, 0));
+    Expect("direct colour wrap", 1, OUT6(4, 0, 0));
+    Expect("direct colour wrap", 2, OUT6(62, 0, 0));
     Io16(0x0E, 0x84 | 2 << 8 | 1 << 14);
     Frame(0);
-    Expect("direct colour no wrap", 1, OUT6(4, 1, 0));
+    Expect("direct colour no wrap", 1, OUT6(4, 0, 0));
     ExpectRange("direct colour no wrap", 2, 255, BLACK);
 
     // 512x256 256-colour bitmap wraps at 512 with BG3CNT bit 13
@@ -1324,8 +1324,8 @@ static void TestObjBitmap(void) {
     unsigned x;
 
     // 8x8 bitmap OBJ, tile 0x31, alpha 15. 2D 128 dots wide: (0x31 & 0xF) * 0x10 + (0x31 & ~0xF) * 0x80 = 0x1810,
-    // rows 256 bytes apart. Dot x of row 0 is red x + 1, dot 3 has alpha 0. Bitmap dots have bit 15 set, so green
-    // gets its low bit: 6-bit green 1
+    // rows 256 bytes apart. Dot x of row 0 is red x + 1, dot 3 has alpha 0. Bitmap dots have bit 15 set, their
+    // alpha, which doesn't reach the colour
     Setup(0);
     Io32(0x00, 0x11000);
     for (x = 0; x < 8; x++) {
@@ -1335,24 +1335,24 @@ static void TestObjBitmap(void) {
     SetObj(0, 3 << 10, 0, 0x31 | 15 << 12);
     Frame(0);
     for (x = 0; x < 8; x++) {
-        Expect("bitmap OBJ 2D 128", (int)x, x == 3 ? BLACK : OUT6(2 * (x + 1), 1, 0));
+        Expect("bitmap OBJ 2D 128", (int)x, x == 3 ? BLACK : OUT6(2 * (x + 1), 0, 0));
     }
     Expect("bitmap OBJ 2D 128", 8, BLACK);
     Line(1);
-    Expect("bitmap OBJ 2D 128 row 1", 2, OUT6(0, 7, 0));
+    Expect("bitmap OBJ 2D 128 row 1", 2, OUT6(0, 6, 0));
     // Hflip: dot x shows dot 7 - x, so dot 4 is the transparent dot 3
     SetObj(0, 3 << 10, 1 << 12, 0x31 | 15 << 12);
     Frame(0);
     for (x = 0; x < 8; x++) {
-        Expect("bitmap OBJ hflip", (int)x, x == 4 ? BLACK : OUT6(2 * (8 - x), 1, 0));
+        Expect("bitmap OBJ hflip", (int)x, x == 4 ? BLACK : OUT6(2 * (8 - x), 0, 0));
     }
     // Vflip: line 0 shows row 7, whose dot 0 is blue 5, and line 6 row 1
     Put16(s->obj, 0x1810 + 7 * 256, 0x8000 | Rgb(0, 0, 5));
     SetObj(0, 3 << 10, 1 << 13, 0x31 | 15 << 12);
     Frame(0);
-    Expect("bitmap OBJ vflip", 0, OUT6(0, 1, 10));
+    Expect("bitmap OBJ vflip", 0, OUT6(0, 0, 10));
     Frame(6);
-    Expect("bitmap OBJ vflip row 1", 2, OUT6(0, 7, 0));
+    Expect("bitmap OBJ vflip row 1", 2, OUT6(0, 6, 0));
     SetObj(0, 3 << 10, 0, 0x31 | 15 << 12);
 
     // 2D 256 dots wide: (0x31 & 0x1F) * 0x10 + (0x31 & ~0x1F) * 0x80 = 0x1110, rows 512 bytes apart
@@ -1360,19 +1360,19 @@ static void TestObjBitmap(void) {
     Put16(s->obj, 0x1110, 0x8000 | Rgb(0, 0, 9));
     Put16(s->obj, 0x1110 + 512 + 2, 0x8000 | Rgb(0, 0, 10));
     Frame(1);
-    Expect("bitmap OBJ 2D 256 row 1", 1, OUT6(0, 1, 20));
+    Expect("bitmap OBJ 2D 256 row 1", 1, OUT6(0, 0, 20));
     Frame(0);
-    Expect("bitmap OBJ 2D 256", 0, OUT6(0, 1, 18));
+    Expect("bitmap OBJ 2D 256", 0, OUT6(0, 0, 18));
     // 1D, 128-byte boundary: 0x31 * 128 = 0x1880, rows 16 bytes apart
     Io32(0x00, 0x11040);
     Put16(s->obj, 0x1880 + 16 + 4, 0x8000 | Rgb(11, 0, 0));
     Frame(1);
-    Expect("bitmap OBJ 1D 128", 2, OUT6(22, 1, 0));
+    Expect("bitmap OBJ 1D 128", 2, OUT6(22, 0, 0));
     // 1D, 256-byte boundary: 0x31 * 256 = 0x3100
     Io32(0x00, 0x11040 | 1 << 22);
     Put16(s->obj, 0x3100, 0x8000 | Rgb(12, 0, 0));
     Frame(0);
-    Expect("bitmap OBJ 1D 256", 0, OUT6(24, 1, 0));
+    Expect("bitmap OBJ 1D 256", 0, OUT6(24, 0, 0));
     // Alpha 0: not drawn
     SetObj(0, 3 << 10, 0, 0x31);
     Frame(0);
@@ -1381,7 +1381,7 @@ static void TestObjBitmap(void) {
     SetObjAffine(0, 0x100, 0, 0, 0x100);
     SetObj(0, 3 << 10 | 0x100, 0, 0x31 | 15 << 12);
     Frame(0);
-    Expect("bitmap OBJ affine", 0, OUT6(24, 1, 0));
+    Expect("bitmap OBJ affine", 0, OUT6(24, 0, 0));
 
     // Engine B has no 256-byte bitmap boundary: 0x31 * 128 = 0x1880
     Setup(1);
@@ -1389,10 +1389,9 @@ static void TestObjBitmap(void) {
     Put16(s->obj, 0x1880, 0x8000 | Rgb(13, 0, 0));
     SetObj(0, 3 << 10, 0, 0x31 | 15 << 12);
     Line(0);
-    Expect("engine B bitmap OBJ 1D", 0, OUT6(26, 1, 0));
+    Expect("engine B bitmap OBJ 1D", 0, OUT6(26, 0, 0));
 
-    // Alpha 7 is EVA 8, EVB 8 over a 2nd target: red 62 over the blue backdrop 62 gives (504 >> 4) = 31 each, and
-    // the dot's green 1 gives (8 + 8) >> 4 = 1
+    // Alpha 7 is EVA 8, EVB 8 over a 2nd target: red 62 over the blue backdrop 62 gives (504 >> 4) = 31 each
     Setup(0);
     Io32(0x00, 0x11040);
     Put16(s->obj, 0x1880, 0x8000 | Rgb(31, 0, 0));
@@ -1400,14 +1399,14 @@ static void TestObjBitmap(void) {
     SetObj(0, 3 << 10, 0, 0x31 | 7 << 12);
     Io16(0x50, 0x2000);
     Line(0);
-    Expect("bitmap OBJ alpha blend", 0, OUT6(31, 1, 31));
+    Expect("bitmap OBJ alpha blend", 0, OUT6(31, 0, 31));
     Io16(0x50, 0x0000);
     Frame(0);
-    Expect("bitmap OBJ no 2nd target", 0, OUT6(62, 1, 0));
-    SetObj(0, 3 << 10, 0, 0x31 | 15 << 12); // alpha 15 is EVA 16, EVB 0: (62 * 16 + 8) >> 4 = 62, (16 + 8) >> 4 = 1
+    Expect("bitmap OBJ no 2nd target", 0, OUT6(62, 0, 0));
+    SetObj(0, 3 << 10, 0, 0x31 | 15 << 12); // alpha 15 is EVA 16, EVB 0: (62 * 16 + 8) >> 4 = 62
     Io16(0x50, 0x2000);
     Frame(0);
-    Expect("bitmap OBJ alpha 15", 0, OUT6(62, 1, 0));
+    Expect("bitmap OBJ alpha 15", 0, OUT6(62, 0, 0));
 }
 
 static void TestObjWindow(void) {
