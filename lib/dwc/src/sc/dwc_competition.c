@@ -30,15 +30,6 @@ typedef struct ScReportHeader {
     u32 teamRecordSize;
 } ScReportHeader;
 
-// A number as it is put in the buffer, whose places aren't aligned
-typedef struct ScWire16 {
-    u8 data[2];
-} ScWire16;
-
-typedef struct ScWire32 {
-    u8 data[4];
-} ScWire32;
-
 // The last eight bytes of a GUID
 typedef struct ScGuidTail {
     u8 data[8];
@@ -154,10 +145,14 @@ static void ScClient_Reset(ScClient *client) {
     ScClient_End(client);
     memset(client->csid, 0, sizeof(client->csid));
     memset(client->ccid, 0, sizeof(client->ccid));
-    client->csid[0] = 0xde;
-    client->csid[1] = 0xad;
-    client->ccid[0] = 0xde;
-    client->ccid[1] = 0xad;
+    // Invalid IDs carry the binary marker 0xDEAD.
+    u8 *csidBytes = (u8 *)client->csid;
+    u8 *ccidBytes = (u8 *)client->ccid;
+
+    csidBytes[0] = 0xde;
+    csidBytes[1] = 0xad;
+    ccidBytes[0] = 0xde;
+    ccidBytes[1] = 0xad;
     client->valid = 0;
 }
 
@@ -278,7 +273,7 @@ int ScClient_SubmitReport(ScClient *client, ScReport *report, int authoritative,
     HashContext context;
     u8 *digest;
     u8 *clear;
-    int i;
+    u32 i;
 
     if (client == NULL) {
         return 2;
@@ -338,7 +333,7 @@ int ScReport_Finish(ScReport *report, int flag, int value) {
 
 int ScReport_SetPlayer(ScReport *report, int index, const char *id, int key, int result, int profileId,
                        const AuthCertificate *certificate, void *unused) {
-    int error = 0;
+    SCResult error = SCResult_NO_ERROR;
     int add = TRUE;
     u32 i;
 
@@ -574,18 +569,25 @@ static u8 *Sc_PutByte(u8 *dest, int value) {
     return dest + 1;
 }
 
+// The report cursor can be unaligned; copy the swapped scalar as bytes.
 static u8 *Sc_PutU16(u8 *dest, s16 value) {
     u16 swapped = Sc_SwapU16(value);
+    const u8 *bytes = (const u8 *)&swapped;
 
-    *(ScWire16 *)dest = *(ScWire16 *)&swapped;
-    return dest + sizeof(ScWire16);
+    dest[0] = bytes[0];
+    dest[1] = bytes[1];
+    return dest + sizeof(swapped);
 }
 
 static u8 *Sc_PutU32(u8 *dest, u32 value) {
     u32 swapped = Sc_SwapU32(value);
+    const u8 *bytes = (const u8 *)&swapped;
 
-    *(ScWire32 *)dest = *(ScWire32 *)&swapped;
-    return dest + sizeof(ScWire32);
+    dest[0] = bytes[0];
+    dest[1] = bytes[1];
+    dest[2] = bytes[2];
+    dest[3] = bytes[3];
+    return dest + sizeof(swapped);
 }
 
 static u8 *Sc_PutGuid(u8 *dest, const char *text) {
@@ -681,43 +683,41 @@ static int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertific
 static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader, void *userData) {
     ScClient *client = userData;
     int result;
-    char ccid[0xff];
     char csid[0xff];
+    char ccid[0xff];
     ScClientFunc func;
     int error = 7;
 
     if (client->ready) {
         if (status == 0) {
             result = 0;
-            if (func_ov011_02170d18(reader)) {
-                if (!func_ov011_02170d28(reader, "CreateSessionResponse") &&
-                    !func_ov011_02170d28(reader, "CreateMatchlessSessionResponse")) {
-                    error = 9;
-                }
-            } else {
+            if (!func_ov011_02170d18(reader)) {
+                error = 9;
+            } else if (!func_ov011_02170d28(reader, "CreateSessionResponse") &&
+                       !func_ov011_02170d28(reader, "CreateMatchlessSessionResponse")) {
                 error = 9;
             }
             if (!func_ov011_02170d28(reader, "CreateSessionResult") &&
                 !func_ov011_02170d28(reader, "CreateMatchlessSessionResult")) {
                 error = 9;
             }
-            if (func_ov011_02171090(reader, "result", &result)) {
+            if (!func_ov011_02171090(reader, "result", &result)) {
+                error = 9;
+            } else {
                 if (error != 9) {
                     if (result == 0) {
-                        if (func_ov011_02170e90(reader, "csid", csid, sizeof(csid)) &&
-                            func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
+                        if (!func_ov011_02170e90(reader, "csid", csid, sizeof(csid)) ||
+                            !func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
+                            error = 9;
+                        } else {
                             ScClient_CopyCsid(client->self, csid);
                             ScClient_CopyCcid(client->self, ccid);
                             error = 0;
-                        } else {
-                            error = 9;
                         }
                     } else {
                         error = 9;
                     }
                 }
-            } else {
-                error = 9;
             }
         }
         func = client->createSessionFunc;
