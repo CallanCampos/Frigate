@@ -42,8 +42,9 @@ ones included. The data that the sanitizers' instrumentation adds to a file is n
 UBSan's check data (l___unnamed_N), ASan's ODR indicators, names and registration flag (___odr_asan_gen_*,
 ___asan_gen_*, ____asan_globals_registered), and the assembler's section markers (ltmpN).
 
-"image" runs as a test after the link: the linked program must have the sections "check" counted, so that a new ld64
-that merges, renames or makes sections differently shows up. Only the standard library is used.
+"image" runs as a test after the link: the linked program must have the sections "check" counted, less any that ld64
+may leave out (MAY_VANISH), so that a new ld64 that merges, renames or makes sections differently shows up. Only the
+standard library is used.
 """
 import argparse
 import os
@@ -177,6 +178,12 @@ OUTPUT_NAME = {
     ("__DATA", "__mod_init_func"): ("__TEXT", "__init_offsets"),
     ("__DATA", "__mod_term_func"): ("__DATA_CONST", "__mod_term_func"),
 }
+
+# Input sections that ld64 may leave out of the program: it turns DWARF unwind information into compact unwind entries
+# where it can, and keeps __eh_frame only when some frame needs DWARF (an unoptimized build linking compiler-rt's
+# __divti3 drops it, an optimized one keeps it). The check counts them, which is safe for a limit; the image check
+# accepts the program without them
+MAY_VANISH = {("__TEXT", "__eh_frame")}
 
 OVERLAY_SECTION = re.compile(r"^__ov\d{3}(?:_[db])?$")
 # ld64 resolves section$start$SEG$SECT and section$end$SEG$SECT to a section's bounds, and makes the section, empty,
@@ -401,7 +408,7 @@ def check(args: argparse.Namespace) -> None:
     print(f"gen_overlay_sections check: {os.path.basename(args.out)}: {len(sections)} sections ({overlay} for "
           f"overlays) of the {args.limit} a Mach-O image allows; the overlay budget is {args.overlay_budget}")
     with open(args.out, "w") as f:
-        f.write(f"sections {len(sections)}\noverlay_sections {overlay}\n")
+        f.write(f"sections {len(sections)}\noverlay_sections {overlay}\nmay_vanish {len(sections & MAY_VANISH)}\n")
     if len(sections) > args.limit:
         fail(f"the link would have {len(sections)} sections, more than the {args.limit} a Mach-O image can hold "
              "(nlist's n_sect is one byte). ld64 wouldn't say so: past the limit it fails with unrelated errors "
@@ -441,9 +448,10 @@ def image(args: argparse.Namespace) -> None:
             predicted[key] = int(value)
     print(f"gen_overlay_sections image: {len(sections)} sections ({overlay} for overlays); predicted "
           f"{predicted.get('sections')} ({predicted.get('overlay_sections')})")
-    if len(sections) != predicted.get("sections") or overlay != predicted.get("overlay_sections"):
+    fewest = predicted.get("sections", 0) - predicted.get("may_vanish", 0)
+    if not fewest <= len(sections) <= predicted.get("sections", 0) or overlay != predicted.get("overlay_sections"):
         fail("the program's sections differ from the count before the link: ld64 merges, renames or makes sections "
-             "differently than the check knows (OUTPUT_NAME, SYNTHESIZED)")
+             "differently than the check knows (OUTPUT_NAME, SYNTHESIZED, MAY_VANISH)")
 
 
 def main() -> None:
