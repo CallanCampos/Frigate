@@ -133,12 +133,13 @@ static inline s16 DecodeSample2(VCTAdpcmState *state, int code) {
 
 static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input) {
     int index = state->stepIndex;
-    int predictor = state->predictor;
-    int diff = input - predictor;
-    int step = sVctAdpcmStepTable[index];
+    int predictor;
+    int diff;
+    int code;
     int vpdiff;
-    u8 code;
+    int step = sVctAdpcmStepTable[index];
 
+    diff = input - state->predictor;
     if (diff < 0) {
         code = 8;
         diff = -diff;
@@ -169,7 +170,7 @@ static inline u8 EncodeSample4(VCTAdpcmState *state, s16 input) {
     if (code & 8) {
         vpdiff = -vpdiff;
     }
-    predictor += vpdiff;
+    predictor = state->predictor + vpdiff;
     if (predictor < -0x8000) {
         predictor = -0x8000;
     }
@@ -282,11 +283,10 @@ static void EncodeAdpcm4(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state) {
     u32 i;
 
     for (i = 0; i < count / 2; i++) {
-        u8 low = EncodeSample4(state, src[0]);
-        u8 high = EncodeSample4(state, src[1]);
+        u8 low = EncodeSample4(state, *src++);
+        u8 high = EncodeSample4(state, *src++);
 
         *dst++ = low | (u8)(high << 4);
-        src += 2;
     }
 }
 
