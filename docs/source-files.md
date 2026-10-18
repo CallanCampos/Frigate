@@ -2154,7 +2154,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ctvt_mic.c` | `0x0219ef4c`–`0x0219f234` | 24 | complete | string at `0x021b261c` |
 | `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | complete | string at `0x021b264c` |
 | `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | partial | string at `0x021b2658` |
-| `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | partial | string at `0x021b2674` |
+| `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | complete | string at `0x021b2674` |
 | `ctvt_game_target.c` | `0x021a7620`–`0x021a78d0` | 6 | partial | descriptive |
 | `ctvt_game_balloon.c` | `0x021a78d0`–`0x021a8090` | 12 | complete | string at `0x021b2680` |
 | `ctvt_game_cam.c` | `0x021a8090`–`0x021a9704` | 67 | partial | string at `0x021b2694` |
