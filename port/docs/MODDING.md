@@ -133,12 +133,15 @@ which of these it was:
 - **The game stopped itself (status 71, 74).** `OS_Terminate` (71) or a reset, `OS_ResetSystem` (74), which Frigate
   can't do in place yet. Status 71 also comes from a DMA call that the host's card never makes
   (`port: dma: MIi_CardDmaCopy32 was called`), a Frigate bug.
-- **A check of the platform layer failed (an abort, SIGABRT).** A message such as `port: os: ...`, `port: fiber: ...`
-  or `port: PXI: ...` before it: something the platform layer relies on didn't hold. That is a Frigate bug; report it
-  with the message and how to get there (an input file, `--input`, makes it repeatable).
-- **A crash (SIGSEGV, SIGBUS).** `port: crash: signal N at address ...` and a backtrace: a real crash, in the game's C
-  or Frigate's. Run it again in the sanitizer build, whose commands are at the top of
-  [../cmake/os.cmake](../cmake/os.cmake), to see where memory went wrong; a game bug that a 64-bit layout made worse is
+- **A check of the platform layer failed (an abort: SIGABRT, or status 3 on Windows).** A message such as
+  `port: os: ...`, `port: fiber: ...` or `port: PXI: ...` before it: something the platform layer relies on didn't hold.
+  That is a Frigate bug; report it with the message and how to get there (an input file, `--input`, makes it
+  repeatable).
+- **A crash (SIGSEGV, SIGBUS; on Windows an exception's status).** `port: crash: signal N at address ...` (on Windows
+  `port: crash: exception 0xc0000005 at address ...`) and a backtrace: a real crash, in the game's C or Frigate's. Run
+  it again in the sanitizer build on macOS or Linux, whose commands are at the top of
+  [../cmake/os.cmake](../cmake/os.cmake), to see where memory went wrong (Windows has none set up yet,
+  [ADR 0013](adr/0013-windows-build-with-msys2-clang64.md)); a game bug that a 64-bit layout made worse is
   fixed under `PLATFORM_PC` ([below](#changing-the-games-code-here)).
 - **Bad options (status 2).** An option the program doesn't know (`port: unknown option ...`) or a value it can't
   use, with the usage after it: among them a run directory, WAV dump or sound trace that can't be opened, and a
@@ -177,8 +180,10 @@ the DS and can be compared with it. The exception is memory safety: an out-of-bo
 64-bit layout turns into a different, worse bug, is fixed under `PLATFORM_PC` with a comment.
 
 **For an experiment of your own**, any change to `src/` builds into Frigate: change the C, `cmake --build build/port`,
-and run. Such a change usually breaks the ROM build's SHA1s, so it can't land in this repository, and a change to a
-struct that is saved changes the save; until the mod platform exists, that is how to try an idea.
+and run, on macOS, Linux or Windows ([../README.md](../README.md#quick-start) and its
+[Building on Windows](../README.md#building-on-windows) have the steps). Such a change usually breaks the ROM build's
+SHA1s, so it can't land in this repository, and a change to a struct that is saved changes the save; until the mod
+platform exists, that is how to try an idea.
 
 ## Adding a program option
 
@@ -199,7 +204,8 @@ A settings file, and menus to change settings in the program, come with the mod 
 ## Testing a change
 
 - **The tests:** `ctest --test-dir build/port -j4 --output-on-failure` runs every test the build has
-  ([../tests/README.md](../tests/README.md)); the ones that need the player's ROM skip without it.
+  ([../tests/README.md](../tests/README.md)); the ones that need the player's ROM skip without it, and on Windows the
+  VRAM aliasing's `gx_*_shm` tests and `card_backup_linked_save` skip too.
 - **Replays:** an input file (`--input FILE`, the `pbwinput 1` text format in
   [../tools/oracle/README.md](../tools/oracle/README.md#input-files)) gives the game the same buttons and touches at the
   same moments every run. With `--fixed-time` (or the file's own `time` line) a run is deterministic, since nothing in
@@ -210,7 +216,8 @@ A settings file, and menus to change settings in the program, come with the mod 
   screens and memory frame by frame ([../tools/oracle/README.md](../tools/oracle/README.md)), and `sound.py` their
   sound: the ARM7 sound driver's state run by run, and the mixed output (a stream and a cry to the bit, the music by
   its envelope and levels; [Sound](../tools/oracle/README.md#sound)). It tells a change that should keep the game as it
-  was from one that didn't.
+  was from one that didn't. It counts the game's frames with the ROM build's link map, so it runs where the ROM build
+  does, on macOS and Linux, not on Windows.
 
 ## What the mod platform will add
 

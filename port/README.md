@@ -69,8 +69,8 @@ that need your ROM skip without it, and take it from `FRIGATE_ROM` or `orig/base
 ```sh
 pacman -S --needed git mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-cmake mingw-w64-clang-x86_64-ninja \
     mingw-w64-clang-x86_64-sdl3 mingw-w64-clang-x86_64-python
-git clone -c core.autocrlf=false https://github.com/CallanCampos/pokebw2-native.git   # its files keep their "\n"
-cd pokebw2-native
+git clone -c core.autocrlf=false https://github.com/CallanCampos/Frigate.git   # its files keep their "\n"
+cd Frigate
 export PYTHONUTF8=1                                                      # the decomp's text is UTF-8
 CC=clang cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build/port

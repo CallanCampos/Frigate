@@ -22,7 +22,8 @@ Nothing runs or translates the ROM's ARM code: the ROM is only where the game's 
  ══                ══ lib/: NitroSDK and TwlSDK, NitroSystem, SPL, DWC and the rest, compiled unchanged
  ── the SDK surface ─ the SDK functions, registers and fixed addresses the platform layer takes over
  ── port/hal ──────── the platform layer: threads and time, memory map, VRAM, DMA, files and overlays, the ROM and
- │                    saves, the ARM7's services (sound, touch, clock, power, firmware), input, stubs
+ │                    saves, the ARM7's services (sound, touch, clock, power, firmware), input, stubs, and
+ │                    hal/host, the operating system's services where macOS, Linux and Windows differ
  ── SDL3 ──────────── window, renderer, input devices, audio stream
 ```
 
@@ -30,7 +31,7 @@ Nothing runs or translates the ROM's ARM code: the ROM is only where the game's 
 | --- | --- | --- | --- |
 | The decomp's C | `src/`, `lib/`, `include/` (upstream's) | The game and its libraries, as upstream writes them; the host build compiles every C file, matching or not, except the ones the platform layer replaces ([../hal/replaced.txt](../hal/replaced.txt)). The game's `main()` is renamed `NitroMain` | the SDK surface; and, in the host build only, the test launcher's seam, a `PLATFORM_PC` block of `src/ov035/event_mapchange.c` that calls into `port_launcher` ([../include/port_host.h](../include/port_host.h)) |
 | The SDK surface | the boundary between `lib/` and `port/hal` | What the game's C reaches that a host doesn't have: NitroSDK's assembly, its hardware-bound files (CPU state, interrupts, timers, DMA, card), the DS's fixed addresses and registers, and the ARM7 behind the PXI FIFO. Everything else of the SDK stays the decomp's C ([ADR 0005](adr/0005-platform-boundary-as-built.md)) | — |
-| The platform layer | [port/hal](../hal/README.md) | Host C for that surface, one directory per SDK module or ARM7 service, compiled against the decomp's headers | the decomp's headers, the host's C library |
+| The platform layer | [port/hal](../hal/README.md) | Host C for that surface, one directory per SDK module or ARM7 service, compiled against the decomp's headers | the decomp's headers, the host's C library, and the operating system through [port/hal/host](../hal/host/host.h) (pages, faults, backtraces, the watchdog), one file a host |
 | The renderers and sound output | [port/gfx](../gfx/README.md), [port/audio](../audio/README.md) | What the display hardware and the speakers make of the state the game leaves; plain C, without the decomp's headers | the platform layer's plain-C interfaces |
 | The program | [port/app](../app/README.md) | `main()`, the options, the window, the controls, presentation and pacing, replays, the oracle's run directory and the sound driver's trace, and the test launcher (`--launch`), which opens the field menu's apps for the tests through the game's own app call and so includes the decomp's headers | everything above, SDL3 |
 | SDL3 | an installed SDL3 3.4, or the pinned release | Window, renderer, input devices, audio stream | — |
