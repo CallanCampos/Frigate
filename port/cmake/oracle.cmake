@@ -125,7 +125,9 @@ foreach(sequence IN ITEMS opening title continue continue_starter)
                     --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
                     --work "${CMAKE_BINARY_DIR}/oracle-${sequence}-check"
             WORKING_DIRECTORY "${REPO_ROOT}")
-        set_tests_properties(oracle_${sequence}_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 600)
+        # A few minutes on an idle machine; a loaded one, or a slow CI runner, takes several times that (the title's
+        # check passed 600 s at a load average of 60), so the limit only catches a run that hangs
+        set_tests_properties(oracle_${sequence}_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1800)
     endif()
     add_test(NAME oracle_${sequence}
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
