@@ -27,12 +27,14 @@ The user named the port Frigate on 2026-10-18, in the line of community ports su
   `PORT_ROM_ENVIRONMENT_VARIABLE` in [hal/rom/port_rom.h](hal/rom/port_rom.h). Comments and documents name them too,
   and change with them.
 - **Its artwork is in [assets/branding](assets/branding/README.md)**: the logo of the landing page and the READMEs,
-  and the app icons that the macOS app and the window on Linux and Windows are built from. Every file there is drawn
-  by the directory's `tools/frigate_logo.py`, so a change to the artwork is a change to that script, rendered again
-  with `tools/render.py` on a Mac and committed with the SVGs and PNGs it writes (the test `assets_branding` checks
-  that the SVGs match the script, and that the small images' PNGs hold their pixels). The icons' 16 and 32 px images
-  are drawn pixel by pixel in that script, not scaled. Nothing the build makes from the icons (the `.icns`, the
-  window's bitmaps) is committed.
+  and the app icons that the macOS app and the window on Linux and Windows are built from. Its ship is Frigate's own
+  drawing of the Plasma Frigate, the games' flying ship that the port is named after: the drawing is Frigate's and the
+  design the games' owners', as the directory's README says, so no text calls the art free of the games' designs.
+  Every file there is drawn by the directory's `tools/frigate_logo.py`, so a change to the artwork is a change to that
+  script, rendered again with `tools/render.py` on a Mac and committed with the SVGs and PNGs it writes (the test
+  `assets_branding` checks that the SVGs match the script, and that the small images' PNGs hold their pixels). The
+  icons' 16 and 32 px images are drawn pixel by pixel in that script, not scaled. Nothing the build makes from the
+  icons (the `.icns`, the window's bitmaps) is committed.
 - **The layer keeps its own names:** the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables and
   `port_*` targets, `pokebw2_game` (the decomp's code), `pbw-oracle` and the `pbwinput` format, the `port-*.yml`
   workflows and the "port:" prefix of the program's messages. The repository stays `CallanCampos/pokebw2-native`

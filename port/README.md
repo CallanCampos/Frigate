@@ -166,9 +166,9 @@ port/tools/package_macos.sh                             # build/port/Frigate Bla
   nothing in the app loads a library from outside macOS and the app, signs the whole app with
   `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and starts the program from
   the app once (`--help`) to see that it loads.
-- **The icon** is Frigate's ship on Black 2's dark plate or White 2's light one. The build makes the `.icns` from the
-  version's 1024 px master and its 16 and 32 px images, drawn pixel by pixel for their size, in
-  [assets/branding](assets/branding/README.md), with `sips` and `iconutil`
+- **The icon** is Frigate's ship, its drawing of the games' Plasma Frigate, on Black 2's dark plate or White 2's light
+  one. The build makes the `.icns` from the version's 1024 px master and its 16 and 32 px images, drawn pixel by pixel
+  for their size, in [assets/branding](assets/branding/README.md), with `sips` and `iconutil`
   ([app/macos/make_icns.sh](app/macos/make_icns.sh)), never committed; on Linux and Windows the window shows the same
   icon ([app/window_icon.c](app/window_icon.c)).
 - **The bundle identifier** is `io.github.callancampos.frigate.black2` (`.white2` for White 2). macOS keeps an app's

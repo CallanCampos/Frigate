@@ -29,7 +29,8 @@ level that doesn't exist yet says "not yet"; no field is left out.
 ## 2026-10-18: Frigate's identity and guides, reviewed and fixed
 
 - **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `aad2ce8df`.
+- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `aad2ce8df`: `de76726d2` (the review's fixes), then the
+  logo's ship redrawn as the Plasma Frigate.
 - **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed, so no game-changes row.
 - **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, in the last entry's build directories, configured
   again: no warning. Not pushed, so no CI run.
@@ -48,6 +49,11 @@ level that doesn't exist yet says "not yet"; no field is left out.
     `CFBundleName` Frigate, `CFBundleDisplayName` "Frigate Black 2", `io.github.callancampos.frigate.black2` and the
     About text from `port_app.h`, passes `plutil -lint` and `codesign --verify --deep --strict`, and its `.icns` holds
     the ten images.
+  - After the ship's redraw, from clean build directories: Black 2, all 239 `ctest` tests pass again, White 2, all
+    237, none skipped; in each, `assets_branding` (469 checks), `app_make_app` (47) and `app_window_icon_plain` and
+    `_sanitized` (32 each). Both apps, built again with `package_macos.sh`, carry the new ship: their `.icns`, unpacked
+    with `iconutil`, holds the drawn 16 and 32 px images and the master scaled above them. Every new PNG was looked at:
+    the 16 and 32 px images enlarged, the 1024 px masters, and the logos on light and dark.
   - T5's nightly runs and T7 not yet.
 - **Tiers:** not measured: no game code changed.
 - **Trap stubs:** 624 function stubs in each version, as in the last entry.
@@ -63,11 +69,22 @@ level that doesn't exist yet says "not yet"; no field is left out.
     `io.github.callancampos.frigate` with a message (`port/app/macos/bundle_id.cmake`), and `make_app.sh` refuses any
     `com.example` identifier. A prefix of one's own is kept.
   - **Small icons.** The icons' 16 and 32 px images are drawn pixel by pixel in `frigate_logo.py` (`SHIP_16`,
-    `SHIP_32`): whole-pixel masts, yards and sails, the jib and gunports at 32 px, and a 35% ink edge on White 2's
-    plate. The `.icns` takes them for its 16 and 32 px images (`make_icns.sh MASTER SMALL16 SMALL32 OUT`); the window
-    on Linux and Windows gets the 32 px one drawn with its plate filling the square, and the master at 64 px as its
-    alternate for 200% (`gen_window_icon WINDOW MASTER OUT`, `SDL_AddSurfaceAlternateImage`). Twelve new files in
-    `port/assets/branding`: six SVGs and their PNGs.
+    `SHIP_32`), with a 35% ink edge on White 2's plate. The `.icns` takes them for its 16 and 32 px images
+    (`make_icns.sh MASTER SMALL16 SMALL32 OUT`); the window on Linux and Windows gets the 32 px one drawn with its plate
+    filling the square, and the master at 64 px as its alternate for 200% (`gen_window_icon WINDOW MASTER OUT`,
+    `SDL_AddSurfaceAlternateImage`). Twelve new files in `port/assets/branding`: six SVGs and their PNGs.
+  - **The ship is the Plasma Frigate.** The user asked for the logo's ship to be redrawn as the games' own Plasma
+    Frigate, the ship Frigate is named after, keeping the style, and accepted the design: one main mast with its square
+    sails as a grid of three tiers of four panels, two swept jibs over a long ram, a tall sail at the stern, a domed
+    tower on the poop, a fin under the bow, and an outrigger pontoon on struts, in the same palette, plates and
+    wordmark (`frigate_logo.py`, and every SVG and PNG rendered again by `render.py`; the lockup keeps its 1200 x 333).
+    The 16 and 32 px images are drawn again for it, pixel by pixel: at 32 px the sails as twelve panels two pixels
+    wide, the mast and pennant, the stern sail and the tower, the jibs over the ram, the hull with five ports and the
+    pontoon on three struts; at 16 px the sails as two columns of three panels, the stern sail, the jibs, the ram, the
+    hull and the pontoon on two struts. The branding README says what the ship depicts and that its design belongs to
+    Nintendo, Game Freak, Creatures and The Pokémon Company, in place of the claim that nothing in it came from the
+    game; the landing page's license line, port/README.md's icon, the assets guide and port/CLAUDE.md's artwork rule
+    say the same, and `make_icns.sh`'s comment no longer speaks of masts.
   - **The guides, corrected:** the frame's first step (the game puts its sound loader to sleep for the VBlank wait),
     the boot's `port_hw_init`, SDL's audio thread, the exit statuses (1, signals, 71 from a DMA misuse), the boundary
     rules (where `replaced.txt` lists what, what the asm oracle covers), the feature map (the touch tests, the font

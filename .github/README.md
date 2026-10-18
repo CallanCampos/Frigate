@@ -88,5 +88,6 @@ your own dump at runtime. The tree carries upstream's `res/`, about 119,000 file
 Frigate is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.
 
 The [GNU GPL v3.0](../LICENSE) license, as upstream, covers the contributors' work and grants no rights to Nintendo's
-data or trademarks. Frigate's logo and icons are original artwork under the same license
-([port/assets/branding](../port/assets/branding/README.md#license)).
+data or trademarks. Frigate's logo and icons are its own drawing of the Plasma Frigate, the games' flying ship that
+Frigate is named after, under the same license, which covers the drawing and not the ship's design: that belongs to
+the games' owners ([port/assets/branding](../port/assets/branding/README.md#license)).

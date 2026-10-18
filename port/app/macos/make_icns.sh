@@ -9,9 +9,9 @@
 #
 # The .icns holds the ten images of a macOS icon set, 16 to 512 points at 1x and 2x (16 to 1024 pixels), and iconutil
 # packs them. The 16 and 32 pixel images are the small ones drawn for their size, pixel by pixel (icon-<version>-16.png
-# and -32.png), since a scaled ship loses its masts there: SMALL16 is the 16 point image, and SMALL32 both the 16 point
-# image at 2x and the 32 point one. The others are scaled from the 1024 x 1024 master by sips. Each must be a PNG of its
-# size with an alpha channel (port/assets/branding/README.md says how they are rendered).
+# and -32.png), since a scaled ship blurs its sails and loses its ram there: SMALL16 is the 16 point image, and SMALL32
+# both the 16 point image at 2x and the 32 point one. The others are scaled from the 1024 x 1024 master by sips. Each
+# must be a PNG of its size with an alpha channel (port/assets/branding/README.md says how they are rendered).
 # port/tests/app/test_make_app.sh tests it.
 set -eu
 

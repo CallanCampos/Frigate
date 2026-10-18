@@ -14,16 +14,35 @@
 
 Frigate's mark, logo and app icons: the logo at the top of the landing page and the READMEs, and the icons of
 `Frigate Black 2.app` and `Frigate White 2.app` and of the program's window on Linux and Windows. Every file is drawn
-as code by [tools/frigate_logo.py](tools/frigate_logo.py), so a change is a change to that script. Nothing here comes
-from the game: no Pokémon, no Nintendo artwork and no file of the ROM.
+as code by [tools/frigate_logo.py](tools/frigate_logo.py), so a change is a change to that script.
+
+The ship is a stylized depiction of the Plasma Frigate, Team Plasma's flying ship in Pokémon Black 2 and White 2, which
+the port is named after. It is drawn as original flat shapes in this tree, from the ship's parts and proportions as
+the games show them; it is not traced or copied from any image, and it carries no emblem, logo, lettering, character
+or Pokémon, and nothing from the ROM. Pokémon, and the designs of its games, including this ship's, belong to
+Nintendo, Game Freak, Creatures and The Pokémon Company. Frigate is a fan project, not affiliated with or endorsed by
+them.
 
 ## The design
 
-Frigate's mark is a three-masted frigate drawn flat: a steel-blue rig over a hull with its gunport stripe cut out, so
-the stripe shows whatever the ship sits on. On White 2's icon that gives the classic black hull with a white chequered
-stripe; on Black 2's, the reverse, a white hull with black gunports: the plate carries the version, and the ship is its
-negative. The cold steel blue nods to the games' icy theme, and the FRIGATE wordmark is drawn from geometric shapes,
-the ends of its bars filled forward like the jib. The ship sails to the right.
+Frigate's mark is the Plasma Frigate drawn flat, in profile, with the parts that tell it from any other tall ship:
+
+- one main mast with its square sails set as a single grid of panels, three tiers of four, the feet of each tier
+  bellied by the wind, and a pennant at the truck;
+- two swept jibs, nested like a pair of blades, over a long ram that runs on from the deck, the bow sweeping up into
+  it in one curve like a beak;
+- a tall, narrow sail on a short mast at the very stern, and forward of it, on the raised stern deck, a round tower
+  with a dome, the deck stepping down from it to the main deck in a curve;
+- a swept fin under the bow, and the outrigger pontoon slung below the keel on raked struts, with sky between, its
+  thruster cone parted from its tail: the ship flies.
+
+The rig and the fittings are steel blue, standing for the games' white canvas and cyan fittings, over a hull with its
+strake of five ports cut out, so the strake shows whatever the ship sits on. On White 2's icon that gives a black hull
+whose six light runs between the ports make a white chequered stripe; on Black 2's, the reverse, a white hull with five
+black ports: the plate carries the version, and the ship is its negative. The cold steel blue nods to the games' icy
+theme, and the FRIGATE wordmark is drawn from geometric shapes, the ends of its bars filled forward like a sail. The
+ship sails to the right, the games' ship seen from its other side, so that in the logo its ram points at the
+wordmark.
 
 ## Files
 
@@ -35,7 +54,7 @@ the ends of its bars filled forward like the jib. The ship sails to the right.
 | `mark.svg`, `mark-dark.svg` | The ship alone, for light and for dark backgrounds | Square places: an avatar, a favicon |
 | `icon-black2.svg`, `icon-white2.svg` | The app icons: the ship on Black 2's dark plate or White 2's light one, on Apple's 1024 px macOS icon grid | The sources of the two masters below |
 | `icon-black2-1024.png`, `icon-white2-1024.png` | The icons' 1024 x 1024 masters, transparent outside the plate | The build: `PORT_APP_ICON` in [CMakeLists.txt](../../CMakeLists.txt) picks the version's, and [How the build uses the icons](#how-the-build-uses-the-icons) says what is made from it |
-| `icon-black2-16.svg`, `icon-black2-32.svg`, `icon-white2-16.svg`, `icon-white2-32.svg` | The icons' 16 and 32 px images, drawn pixel by pixel for their size on Apple's grid: the ship with whole-pixel masts, yards and sails (two tiers and no jib or gunports at 16 px), and a stronger edge on White 2's plate | The sources of the PNGs below |
+| `icon-black2-16.svg`, `icon-black2-32.svg`, `icon-white2-16.svg`, `icon-white2-32.svg` | The icons' 16 and 32 px images, drawn pixel by pixel for their size on Apple's grid: the ship with its sails as whole-pixel panels (three tiers of four at 32 px, of two at 16 px), the stern sail, the jibs over the ram, the hull (its ports at 32 px) and the pontoon on its struts, and a stronger edge on White 2's plate | The sources of the PNGs below |
 | `icon-black2-16.png`, `icon-black2-32.png`, `icon-white2-16.png`, `icon-white2-32.png` | Those images rendered at their size | The `.icns`'s 16 and 32 px images (`PORT_APP_ICON_16` and `_32`) |
 | `window-black2.svg`, `window-white2.svg` | The 32 px image again with its plate filling the square, as icons on Linux and Windows do | The source of the PNGs below |
 | `window-black2-32.png`, `window-white2-32.png` | Those rendered at 32 px | The window's icon on Linux and Windows (`PORT_WINDOW_ICON`) |
@@ -52,9 +71,9 @@ alone, plus one gradient on each icon's plate: no text, fonts or images, so GitH
 | Name | Hex | Used for | Contrast |
 | --- | --- | --- | --- |
 | Ink | `#10151C` | The hull and the wordmark on light backgrounds | 18:1 on white |
-| Steel | `#4A7FB0` | The rig (masts, sails, jib and pennant) on light backgrounds | 4.2:1 on white |
+| Steel | `#4A7FB0` | The rig and fittings (masts, sails, jibs, pennant, the tower's dome, the bow fin, the pontoon and its struts) on light backgrounds | 4.2:1 on white |
 | Snow | `#F1F5F9` | The hull and the wordmark on dark backgrounds | 17:1 on `#0D1117` |
-| Ice | `#9DC0E0` | The rig on dark backgrounds | 10:1 on `#0D1117` |
+| Ice | `#9DC0E0` | The rig and fittings on dark backgrounds | 10:1 on `#0D1117` |
 
 Black 2's plate runs from `#1C2431` at the top to `#0D1117` and carries the dark-background ship; White 2's runs from
 `#FFFFFF` to `#E3E9F0`, with a faint 2 px edge of ink at 12% just inside it so that it keeps its shape on white, and
@@ -74,9 +93,12 @@ GitHub does, use both:
 ```
 
 `mark.svg` is for light backgrounds only, and `mark-dark.svg` for dark ones. The logo reads down to about 160 px wide.
-The icons read as a three-masted ship at every size: from 64 px up scaled from the master, and at 32 and 16 px drawn
-for their size. Use the files as they are: a new
-colour or shape belongs in `frigate_logo.py`, so that every file keeps the same drawing.
+The mark is plainly the Plasma Frigate from 64 px up, where the icons are the master scaled. At 32 and 16 px they are
+drawn for their size, with the sail block wider than the master's so that its panels part on whole pixels: at 32 px
+the gridded sails on their mast with the pennant, the stern sail and the tower, the jibs over the ram, the hull with
+its ports and the pontoon on its struts; at 16 px the sails in two columns of panels, the stern sail, the jibs, the ram,
+the hull and the pontoon. Use the files as they are: a new colour or shape belongs in `frigate_logo.py`, so that every
+file keeps the same drawing.
 
 ## How the build uses the icons
 
@@ -122,19 +144,25 @@ the app holds it; `app_window_icon_plain` and `_sanitized` check the window's bi
 
 ## License
 
-The artwork is part of this repository and under its license, the [GNU GPL v3.0](../../../LICENSE): it is original
-work made for Frigate, drawn as code in this tree, and nothing in it needed another license. In the GPL's terms, its
-source is `tools/frigate_logo.py` with the SVGs it writes; the PNGs are renders of them. The icons' plate follows
-Apple's macOS icon grid, the rounded square that macOS app icons share. The license covers the artwork, not a name: a
-build that isn't Frigate's, such as a fork under another name, should carry its own name and icon, as it takes its own
-bundle identifier ([port/README.md](../../README.md#the-macos-app)).
+The drawing is part of this repository and under its license, the [GNU GPL v3.0](../../../LICENSE): it was made for
+Frigate, as code in this tree. In the GPL's terms, its source is `tools/frigate_logo.py` with the SVGs it writes; the
+PNGs are renders of them. The license covers our drawing only, not what it depicts: the Plasma Frigate is a design
+from Pokémon Black 2 and White 2, and it and the games' names belong to Nintendo, Game Freak, Creatures and The Pokémon
+Company, with which Frigate is not affiliated. The icons' plate follows Apple's macOS icon grid, the rounded square
+that macOS app icons share. Nor does the license cover a name: a build that isn't Frigate's, such as a fork under
+another name, should carry its own name and icon, as it takes its own bundle identifier
+([port/README.md](../../README.md#the-macos-app)).
 
 ## Known limits
 
 - The 64 px images, the `.icns`'s 32 point image at 2x and the window's for 200%, are still the master scaled; they
-  read as a three-masted ship, but a drawing for 64 px would be crisper.
+  read as the Plasma Frigate, but its panels' seams, struts and ports blur there, and a drawing for 64 px would be
+  crisper.
 - macOS 26 shows icons from a plain `.icns` inside a dark plate of its own at 16 and 32 px, as it does other apps'
   `.icns` icons; from 64 px up it shows Frigate's plate as drawn. An Icon Composer icon (macOS 26's layered format,
   with the plate, the rig and the hull as layers) would avoid that.
-- No trademark search was made. Tall ships are a common symbol; what sets this one apart is the cut-out stripe, the
-  curved feet of the sails and the blue rig over a dark or light hull.
+- The mark depicts a ship designed for the games, not a generic tall ship, so it is not free of the games'
+  intellectual property: it is a fan project's depiction of it, as the name Frigate is a reference to it. No
+  trademark search was made.
+- The pontoon is our simplification of the games' outriggers, which are wide plates with tubes close under the hull;
+  in profile it can read as a seaplane's float.

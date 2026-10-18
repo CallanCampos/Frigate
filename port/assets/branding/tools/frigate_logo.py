@@ -1,15 +1,20 @@
 """Writes Frigate's logo set: the mark, the horizontal logo for light and for dark pages, and the two app icons.
 
-The mark is a three-masted frigate drawn flat on a 96-unit grid: three masts carrying a course, a topsail and a
-topgallant each, their feet bellied by the wind, a jib, a pennant at the main truck, and a hull whose gunport strake
-is cut out of it, so the strake takes the colour of whatever the ship sits on. On a dark hull (light pages, White 2's
-icon) the strake's light runs between the gunports are cut, giving a frigate's black-and-white chequered side; on a
-light hull (dark pages, Black 2's icon) the gunports themselves are cut. The wordmark FRIGATE is drawn as paths; the
-forward ends of its bars belly like the jib.
+The mark is the Plasma Frigate, the flying ship of Pokémon Black 2 and White 2 that the port is named after, drawn as
+flat shapes of our own in profile on a 96-unit grid, sailing to the right: one main mast carrying a single tall stack
+of square sails, three tiers of four panels with their feet bellied by the wind, and a pennant at its truck; two
+swept jibs nested over a long ram that runs on from the deck; a tall sail on a short mast at the very stern; a domed
+round tower on the raised stern deck, which steps down to the main deck in a curve; a swept fin under the bow; and an
+outrigger pontoon slung below the keel on raked struts, with sky between, a thruster cone parted from its tail. The rig
+and the fittings are one colour, the hull, ram and tower another, and the hull's port strake is cut out of it, so the
+strake takes the colour of whatever the ship sits on. On a dark hull (light pages, White 2's icon) the six light runs
+between the strake's five ports are cut, giving a chequered side; on a light hull (dark pages, Black 2's icon) the
+five ports themselves are cut. The wordmark FRIGATE is drawn as paths; the forward ends of its bars belly like a sail.
 
-At 16 and 32 pixels a scaled drawing loses its masts and its yards, so the icons' small images are drawn for their size,
-pixel by pixel (SHIP_16 and SHIP_32 below): the same ship with whole-pixel masts, yards and sails, a jib and gunports
-where the pixels allow, on the same plate, with a stronger edge on White 2's light plate.
+At 16 and 32 pixels a scaled drawing blurs its sails into one smudge and loses its ram and the sky under the keel, so
+the icons' small images are drawn for their size, pixel by pixel (SHIP_16 and SHIP_32 below): the same ship with
+whole-pixel sails, hull and pontoon, the sails' panels and the strake's ports where the pixels allow, on the same
+plate, with a stronger edge on White 2's light plate.
 
 It writes the twelve SVGs of port/assets/branding, whose README says what each is for: the mark (mark.svg,
 mark-dark.svg), the logo of the landing page and the READMEs (logo.svg, logo-dark.svg), the app icons that the macOS app
@@ -28,8 +33,8 @@ import sys
 # Palette
 INK = "#10151C"  # hull and wordmark on light pages
 SNOW = "#F1F5F9"  # hull and wordmark on dark pages
-STEEL = "#4A7FB0"  # the rig (masts, sails, jib, pennant) on light pages
-ICE = "#9DC0E0"  # the rig on dark pages
+STEEL = "#4A7FB0"  # the rig and fittings (masts, sails, pennant, dome, fin, pontoon, struts) on light pages
+ICE = "#9DC0E0"  # the rig and fittings on dark pages
 
 LIGHT = dict(rig=STEEL, hull=INK, word=INK, strake="runs")
 DARK = dict(rig=ICE, hull=SNOW, word=SNOW, strake="ports")
@@ -40,73 +45,203 @@ def n(v):
     return "0" if s in ("-0", "") else s
 
 
+def p(x, y):
+    return f"{n(x)} {n(y)}"
+
+
+def poly(*pts):
+    """A closed path through the points, with H and V where a side is level or upright."""
+    d = f"M{p(*pts[0])}"
+    x0, y0 = pts[0]
+    for x, y in pts[1:]:
+        d += f"H{n(x)}" if n(y) == n(y0) else f"V{n(y)}" if n(x) == n(x0) else f"L{p(x, y)}"
+        x0, y0 = x, y
+    return d + "Z"
+
+
+def quad(a, k, b, t):
+    """The point at t on the quadratic curve from a through control k to b."""
+    return tuple((1 - t) ** 2 * u + 2 * (1 - t) * t * v + t * t * w for u, v, w in zip(a, k, b))
+
+
+def quad_ctrl(a, k, b, t0, t1):
+    """The control point of the quadratic curve's piece from t0 to t1."""
+    return tuple((1 - t0) * (1 - t1) * u + ((1 - t0) * t1 + t0 * (1 - t1)) * v + t0 * t1 * w
+                 for u, v, w in zip(a, k, b))
+
+
 # ---------------------------------------------------------------------------------------------------------------
-# The mark, on a 96 grid. DX and DY centre the artwork in the square, a unit above the middle (optical centre).
-DX, DY = -1, 3
-DECK, KEEL = 66 + DY, 84 + DY
-SAIL_FOOT = DECK - 6  # the gap between the courses and the deck
-TIER_H = (16, 13, 10)  # course, topsail, topgallant
-TAPER = (1.0, 0.86, 0.72, 0.58)  # sail width at each yard, from the course's foot up
-TIER_GAP = 3.5  # the yards show as gaps
-BELLY = 1.6  # how far each foot curves below its corners
-MAST_W = 1.7
-MASTS = ((17, 14, 0.82), (38.5, 19, 1.0), (61.5, 17, 0.92))  # mizzen, main, fore: centre x, course width, scale
-PORTS, PORT = 6, 3.5  # gunports and their size
+# The mark, on a 96 grid, y down, the bow to the right. The ship spans x 4.6 to 91.2 and y 9 to 87, centred on
+# (48, 48). The level edges that matter at small sizes (the poop, the main deck, the strake, the keel, the heads of the
+# sails and the pontoon's underside) lie on the 3-unit grid of a 32 px render.
+DECK, KEEL = 63, 78  # the main deck and the keel: a hull 15 deep
+POOP = 60  # the raised stern deck
+STERN, STERN_FOOT = 7.5, 12  # the stern's corner at the poop, and where its rake meets the keel
+BREAK = 26  # the poop's forward edge, from which it steps down to the main deck in a curve 4 long
+STEM, RAM_TIP, RAM_ROOT = 72, (91.2, 61.5), 65.6  # the stem head on the deck, the ram's point, its root's underside
+BOW_KEEL = 52  # where the bow's sweep up into the ram leaves the keel
+STRAKE, STRAKE_FROM, STRAKE_TO, PORTS, PORT = (66, 69), 15, 63.5, 5, 3.5  # top and bottom, ends, ports, port width
+
+# The tower on the poop: a shoulder, a drum on it and a round dome as wide as the drum.
+TOWER_X = 18.2
+SHOULDER, DRUM, DOME_R = (10.4, 2), (8.4, 3), 4.2  # (width, height) of each step, and the dome's radius
+
+# The main mast and its sails: three tiers of four panels, as (foot, head, foot width, head width) with y at the
+# corners; each foot bellies 1.3 below its corners at the middle, and open seams 1.2 wide part the panels.
+MAIN, MAST_W, TRUCK = 42.5, 1.7, 9
+TIERS = ((60, 48, 27, 26), (44, 33, 25.6, 24.6), (29, 18, 24.2, 22.6))
+BELLY, SEAM = 1.3, 1.2
+PENNANT = (13, 3, 6)  # length past the mast, the drop of its tip, and its depth at the mast
+
+# The stern sail: its luff on the short mast, the head at the mast's top, its foot level and its leech bowed a little.
+MIZZEN, MIZZEN_TOP, STERN_SAIL_FOOT, CLEW, LEECH_BOW = 10.5, 30, 52, 4.6, 1.2
+
+# The jibs, nested blades swept back from points over the ram, their heads at half the mast's height: the upper one
+# the larger, its point nearly at the ram's tip; the lower one's luff runs parallel to the upper one's foot, JIB_GAP
+# below it, and its point stays clear of the ram.
+JIB_HI = dict(head=(63.5, 38), clew=(65, 53), tack=(89, 58.5), sag=3.4)
+JIB_LO = dict(clew=(67.6, 59.8), point_x=84.5, sag=1.1)
+JIB_GAP = 2.6
+
+# The pontoon below the keel, with sky between: an ogive nose forward, a thruster cone aft parted from its tail.
+PONTOON = (82, 87)  # top and bottom
+PONTOON_X = (25.2, 29.3, 30, 57.5, 66.5)  # cone tip, cone base, tail, the nose's shoulder and its tip
+STRUTS, STRUT_W, STRUT_RAKE = (36, 45.5, 55), 2.4, 4.6  # roots on the keel, width, how far aft each foot lands
+
+# The bow fin, swept forward and down from under the beak: its root inside the hull, its point, and where its
+# trailing edge returns into the hull.
+FIN = (0.28, (78.5, 77.5), 0.64, (69, 76.4))  # where its edges leave the bow, its point, the trailing edge's control
 
 
-def sail(cx, top, bot, w_top, w_bot, belly):
-    l0, r0, l1, r1 = cx - w_top / 2, cx + w_top / 2, cx - w_bot / 2, cx + w_bot / 2
-    return f"M{n(l0)} {n(top)}H{n(r0)}L{n(r1)} {n(bot)}Q{n(cx)} {n(bot + 2 * belly)} {n(l1)} {n(bot)}Z"
+def cubic(a, b, c, d, t):
+    """The point at t on the cubic curve a-b-c-d."""
+    s = 1 - t
+    return tuple(s ** 3 * u + 3 * s * s * t * v + 3 * s * t * t * w + t ** 3 * z for u, v, w, z in zip(a, b, c, d))
+
+
+def bow_curve():
+    """The bow's underside: from the ram's underside at the stem, one curve down and aft to the keel."""
+    return (STEM, RAM_ROOT), (68.4, 66.4), (63, KEEL), (BOW_KEEL, KEEL)
+
+
+def tier(foot, head, wf, wh):
+    """One tier of the main sails as four panels with open seams between them. The tier's foot is one quadratic
+    curve bellied below its corners; each panel's foot is its share of that curve."""
+    a, k, b = (MAIN - wf / 2, foot), (MAIN, foot + 2 * BELLY), (MAIN + wf / 2, foot)
+    d = ""
+    for i in range(4):
+        f0 = i / 4 + (SEAM / 2 / wf if i else 0)
+        f1 = (i + 1) / 4 - (SEAM / 2 / wf if i < 3 else 0)
+        h0 = MAIN - wh / 2 + wh * i / 4 + (SEAM / 2 if i else 0)
+        h1 = MAIN - wh / 2 + wh * (i + 1) / 4 - (SEAM / 2 if i < 3 else 0)
+        fx, fy = quad(a, k, b, f1)
+        side = f"V{n(fy)}" if n(fx) == n(h1) else f"L{p(fx, fy)}"
+        d += f"M{p(h0, head)}H{n(h1)}{side}Q{p(*quad_ctrl(a, k, b, f0, f1))} {p(*quad(a, k, b, f0))}Z"
+    return d
+
+
+def offset_quad(a, k, b, dist):
+    """The quadratic curve a-k-b moved by dist along its chord's normal (downward for a curve drawn forward)."""
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    ln = (dx * dx + dy * dy) ** 0.5
+    nx, ny = -dy / ln * dist, dx / ln * dist
+    return [(x + nx, y + ny) for x, y in (a, k, b)]
+
+
+def jibs():
+    """The two jibs, each pointed forward with its foot drawn up in a concave curve back to the clew and its aft edge
+    upright. The upper one's luff runs straight from its head down to its point; the lower one's is the upper one's
+    foot moved down by the gap, so the band between them is even."""
+    h, c, t = JIB_HI["head"], JIB_HI["clew"], JIB_HI["tack"]
+    mx, my = (c[0] + t[0]) / 2, (c[1] + t[1]) / 2
+    k = (mx, my - JIB_HI["sag"])
+    upper = f"M{p(*h)}L{p(*t)}Q{p(*k)} {p(*c)}Z"
+    # The upper foot, moved down: its piece between the lower jib's clew and point is the lower jib's luff.
+    a2, k2, b2 = offset_quad(c, k, t, JIB_GAP)
+    c2 = JIB_LO["clew"]
+
+    def x_at(target):  # the curve's parameter where it reaches x = target
+        lo, hi = 0.0, 1.0
+        for _ in range(40):
+            mid = (lo + hi) / 2
+            lo, hi = (mid, hi) if quad(a2, k2, b2, mid)[0] < target else (lo, mid)
+        return lo
+
+    s0, s1 = x_at(c2[0]), x_at(JIB_LO["point_x"])
+    head2, point2 = quad(a2, k2, b2, s0), quad(a2, k2, b2, s1)
+    luff_k = quad_ctrl(a2, k2, b2, s0, s1)
+    fm = ((c2[0] + point2[0]) / 2, (c2[1] + point2[1]) / 2 - JIB_LO["sag"])
+    lower = f"M{p(*head2)}Q{p(*luff_k)} {p(*point2)}Q{p(*fm)} {p(*c2)}Z"
+    return upper + lower
 
 
 def mark_parts(strake):
     """The mark's paths, back to front, as (comment, role, d, holes): role names the colour (rig or hull), and
     holes says the path cuts holes with the even-odd rule."""
-    sails, heads = [], []
-    for cx, w, sc in MASTS:
-        cx += DX
-        y = SAIL_FOOT
-        for i, h in enumerate(TIER_H):
-            top = y - h * sc
-            sails.append(sail(cx, top, y, w * TAPER[i + 1], w * TAPER[i], BELLY * sc))
-            y = top - TIER_GAP
-        heads.append((cx, y + TIER_GAP, w))
-    (zx, ztop, _), (mx, mtop, _), (fx, ftop, fw) = heads
-    # Masts, from inside the hull to a short head above each topgallant; the main's carries the pennant.
-    masts = ""
-    for cx, top in ((zx, ztop - 3), (mx, mtop - 10), (fx, ftop - 3)):
-        masts += f"M{n(cx - MAST_W / 2)} {n(top)}h{n(MAST_W)}V{n(DECK + 1)}h{n(-MAST_W)}Z"
-    # Jib: from below the fore topgallant to the bowsprit's end, its forward edge bellied.
-    jx = fx + fw / 2 + 4
-    jib = f"M{n(jx)} {n(ftop + 2)}Q{n(jx + 13)} {n(ftop + 22)} {n(92 + DX)} {n(SAIL_FOOT)}H{n(jx)}Z"
-    # Pennant flying forward from the main truck.
-    px = mx + MAST_W / 2
-    pennant = f"M{n(px)} {n(mtop - 9)}L{n(px + 13)} {n(mtop - 6)}L{n(px)} {n(mtop - 3)}Z"
-    # Hull: raked stern, round bow, and the gunport strake cut out of it.
-    r = KEEL - DECK
-    hull = f"M{n(6 + DX)} {n(DECK)}H{n(90 + DX)}A{n(r)} {n(r)} 0 0 1 {n(90 + DX - r)} {n(KEEL)}H{n(12 + DX)}Z"
-    y0, x0, x1 = DECK + 4, 12.5 + DX, 84 + DX
-    run = (x1 - x0 - PORTS * PORT) / (PORTS + 1)
+    # The main mast shows only below and above the sails: from the deck to the course, and from the top tier to the
+    # truck. Inside the block the sails hide it, so the middle seam and the gaps between the tiers stay open like the
+    # others and the grid reads as four even columns (a mast drawn in the gaps alone looked dashed down the middle).
+    m0, m1 = MAIN - MAST_W / 2, MAIN + MAST_W / 2
+    spans = [(DECK + 1, TIERS[0][0] + BELLY), (TIERS[2][1], TRUCK)]
+    masts = "".join(poly((m0, a), (m1, a), (m1, b), (m0, b)) for a, b in spans)
+
+    sails = "".join(tier(*t) for t in TIERS)
+
+    # The stern sail and its short mast in one: the mast up from inside the poop, the sail's foot level out past the
+    # stern, the leech bowed a little up to the head at the mast's top, forward corner.
+    z0, z1 = MIZZEN - MAST_W / 2, MIZZEN + MAST_W / 2
+    lk = ((CLEW + z1) / 2 - LEECH_BOW * 0.95, (STERN_SAIL_FOOT + MIZZEN_TOP) / 2 - LEECH_BOW * 0.3)
+    stern = (f"M{p(z1, MIZZEN_TOP)}V{n(POOP + 1)}H{n(z0)}V{n(STERN_SAIL_FOOT)}H{n(CLEW)}"
+             f"Q{p(*lk)} {p(z1, MIZZEN_TOP)}Z")
+    pl, pd, ph = PENNANT
+    pennant = poly((MAIN, TRUCK + 1), (m1 + pl, TRUCK + 1 + pd), (MAIN, TRUCK + 1 + ph))
+    # The dome: a half circle as wide as the drum, its foot running down into the drum, which the hull paints over.
+    drum_top = POOP - SHOULDER[1] - DRUM[1]
+    r = DOME_R
+    dome = (f"M{p(TOWER_X - r, drum_top + 1)}V{n(drum_top)}A{n(r)} {n(r)} 0 0 1 {p(TOWER_X + r, drum_top)}"
+            f"V{n(drum_top + 1)}Z")
+
+    # The pontoon: an ogive nose forward, the body, and aft of a cut the thruster cone.
+    top, bot = PONTOON
+    mid = (top + bot) / 2
+    tip, cone, tail, shoulder, nose = PONTOON_X
+    reach = (nose - shoulder) * 0.72
+    pontoon = (f"M{p(tail, top)}H{n(shoulder)}Q{p(shoulder + reach, top)} {p(nose, mid)}"
+               f"Q{p(shoulder + reach, bot)} {p(shoulder, bot)}H{n(tail)}Z")
+    ch = (bot - top) / 2 - 0.3
+    pontoon += poly((cone, mid - ch), (cone, mid + ch), (tip, mid))
+    struts = "".join(poly((x, KEEL - 1), (x + STRUT_W, KEEL - 1), (x + STRUT_W - STRUT_RAKE, top + 0.5),
+                          (x - STRUT_RAKE, top + 0.5)) for x in STRUTS)
+    ta, point, tb, ctrl = FIN
+    (ax, ay), (bx, by) = cubic(*bow_curve(), ta), cubic(*bow_curve(), tb)
+    fin = f"M{p(ax - 1, ay - 0.5)}L{p(*point)}Q{p(*ctrl)} {p(bx - 0.5, by - 1)}Z"
+
+    # The hull, in one path: the raked stern, the poop with the tower's shoulder and drum, its curved step down to
+    # the main deck, the ram, the bow sweeping back under it to the keel, and the strake cut out.
+    sx, sh = SHOULDER[0] / 2, POOP - SHOULDER[1]
+    dx = DRUM[0] / 2
+    b0, b1, b2, b3 = bow_curve()
+    hull = (f"M{p(STERN, POOP)}H{n(TOWER_X - sx)}V{n(sh)}H{n(TOWER_X - dx)}V{n(drum_top)}H{n(TOWER_X + dx)}"
+            f"V{n(sh)}H{n(TOWER_X + sx)}V{n(POOP)}H{n(BREAK)}Q{p(BREAK, DECK)} {p(BREAK + 4, DECK)}"
+            f"H{n(STEM)}L{p(*RAM_TIP)}L{p(*b0)}C{p(*b1)} {p(*b2)} {p(*b3)}H{n(STERN_FOOT)}Z")
+    s0, s1 = STRAKE
+    run = (STRAKE_TO - STRAKE_FROM - PORTS * PORT) / (PORTS + 1)
     if strake == "runs":
-        holes = [(x0 + i * (run + PORT), run) for i in range(PORTS + 1)]
-        what = "hull, with the strake's light runs between its gunports cut out"
+        holes = [(STRAKE_FROM + i * (run + PORT), run) for i in range(PORTS + 1)]
+        what = "the six light runs between its five ports cut out of it"
     else:
-        holes = [(x0 + run + i * (run + PORT), PORT) for i in range(PORTS)]
-        what = "hull, with its gunports cut out"
+        holes = [(STRAKE_FROM + run + i * (run + PORT), PORT) for i in range(PORTS)]
+        what = "its five ports cut out of it"
     for x, w in holes:
-        hull += f"M{n(x)} {n(y0)}h{n(w)}v{n(PORT)}h{n(-w)}Z"
+        hull += poly((x, s0), (x + w, s0), (x + w, s1), (x, s1))
     return [
-        ("masts, in the colour of the canvas they carry", "rig", masts, False),
-        ("sails: mizzen, main and fore, each a course, a topsail and a topgallant", "rig", "".join(sails), False),
-        ("jib and pennant", "rig", jib + pennant, False),
-        (what, "hull", hull, True),
+        ("the main mast, below and above its sails", "rig", masts, False),
+        ("the main sails: three tiers of four panels", "rig", sails, False),
+        ("the jibs, the stern sail on its short mast, the pennant and the tower's dome", "rig",
+         jibs() + stern + pennant + dome, False),
+        ("the pontoon with its thruster cone, its struts and the bow fin", "rig", struts + pontoon + fin, False),
+        (f"the hull with the poop, the tower's shoulder and drum and the ram, {what}", "hull", hull, True),
     ]
-
-
-def art_top():
-    """The top of the artwork: the main truck."""
-    d = mark_parts("runs")[0][2]
-    return min(float(v) for v in re.findall(r"M[\d.]+ ([\d.]+)", d))
 
 
 def mark_paths(colours, indent="  "):
@@ -202,20 +337,23 @@ def write(out, name, text):
 
 def write_mark(out, name, colours, page):
     write(out, name, svg("0 0 96 96", "Frigate", [
-        f"Frigate's mark for {page} pages: a three-masted frigate, flat, on a 96 grid.",
+        f"Frigate's mark for {page} pages: the Plasma Frigate in profile, flat, on a 96 grid.",
     ], mark_paths(colours)))
 
 
 CAP = 36  # the wordmark's cap height beside the 96-unit mark
-GAP = 20  # from the jib's foot to the F
+GAP_TO_F = 20  # from the ram's tip to the F
+# The lockup's frame on the 96 grid, kept from the first mark (a three-master from its main truck to its keel), so
+# that the view and logo.png's 1200 x 333 stay as they were; the ship (y 9 to 87) sits inside it.
+FRAME_TOP, FRAME_BOTTOM, FRAME_LEFT, FRAME_RIGHT = 7, 87, 5, 91
 
 
 def write_logo(out, name, colours, page):
-    top, bottom = art_top(), KEEL
+    top, bottom = FRAME_TOP, FRAME_BOTTOM
     margin = 4
     baseline = (top + bottom) / 2 + CAP / 2  # the caps centred on the ship
-    paths, right = wordmark(92 + DX + GAP, baseline, CAP)
-    left = 6 + DX - margin
+    paths, right = wordmark(FRAME_RIGHT + GAP_TO_F, baseline, CAP)
+    left = FRAME_LEFT - margin
     view = f"{n(left)} {n(top - margin)} {n(right + margin - left)} {n(bottom - top + 2 * margin)}"
     body = mark_paths(colours)
     body.append("  <!-- FRIGATE -->")
@@ -264,44 +402,53 @@ def write_icon(out, name, title, colours, stops, hairline):
 
 
 # ---------------------------------------------------------------------------------------------------------------
-# The small images, drawn pixel by pixel. Each string is a row of pixels: r is the rig (the masts, the sails, whose
-# tiers the rows between them part as the yards do, the jib and the pennant), h the hull, and on the gunport strake u is
-# a light run and p a gunport, which the version's hull cuts as the mark's does (Black 2's hull cuts its ports, White
-# 2's its runs); a dot is the plate.
-# The mark's proportions on a whole-pixel grid: the main mast tallest with its pennant flying forward (right), the
-# mizzen aft and the fore with the jib before it, the courses' feet a row above the deck, the stern raked and the bow
-# rounded. The 16 px ship keeps two tiers of sail a mast and no jib or gunports, which 16 pixels can't hold apart.
+# The small images, drawn pixel by pixel. Each string is a row of pixels: r is the rig and the fittings (the masts, the
+# sails, the jibs, the stern sail, the pennant, the tower's dome, the pontoon and its struts), h the hull (with the
+# poop, the tower's drum and the ram), and on the port strake u is a light run and p a port, which the version's hull
+# cuts as the mark's does (Black 2's hull cuts its ports, White 2's its runs); a dot is the plate.
+# The mark on a whole-pixel grid, its sail block drawn larger so that its panels can part. At 32 px: the main sails as
+# three tiers of four panels two pixels wide, with the open seam down the middle where the mast is hidden and a row
+# between the tiers for the yards, the mast showing below the course and at the truck, with the pennant flying forward
+# (right); the stern sail on its short mast, and the tower's dome on its drum on the raised poop; the two jibs over the
+# ram, which runs on from the deck a row deep; the hull with its five ports between six runs, the stern raked and the
+# bow sweeping back under the ram; and the pontoon on three struts, with the row below the keel open. The 16 px ship
+# keeps the block as two columns of three panels, the stern sail, the jibs, the ram, two rows of hull and the pontoon
+# on two struts, and drops the pennant, the tower and the ports, which 16 pixels can't hold apart.
 SHIP_16 = (
-    ".....rr....",
-    "....rrr..r.",
-    ".r..rrr.rrr",
-    ".r...r...r.",
-    "rrr.rrr.rrr",
-    "rrr.rrr.rrr",
-    "rrr.rrr.rrr",
-    ".r...r...r.",
-    "hhhhhhhhhhh",
-    ".hhhhhhhh..",
+    "...rr.rr....",
+    "...rr.rr....",
+    ".r..........",
+    "rr.rr.rr.r..",
+    "rr.rr.rr.rr.",
+    "rr.......rrr",
+    ".r.rr.rr....",
+    ".hhrr.rr.rr.",
+    ".hhhhhhhhhhh",
+    "..hhhhhhh...",
+    "....r..r....",
+    "...rrrrrr...",
 )
 SHIP_32 = (
-    ".........rrrr.........",
-    ".........rr...........",
-    "........rrr....r......",
-    "...r....rrr...rrr.....",
-    "..rrr....r....rrr..r..",
-    "..rrr..rrrrr...r...r..",
-    "...r...rrrrr.rrrrr.rr.",
-    "..rrr..rrrrr.rrrrr.rr.",
-    "..rrr....r...rrrrr.rr.",
-    "...r...rrrrr...r...rrr",
-    ".rrrrr.rrrrr.rrrrr.rrr",
-    ".rrrrr.rrrrr.rrrrr.rrr",
-    ".rrrrr.rrrrr.rrrrr.rrr",
-    "...r.....r.....r......",
-    "hhhhhhhhhhhhhhhhhhhh..",
-    "huupuupuupuupuupuuuh..",
-    ".hhhhhhhhhhhhhhhhhh...",
-    "..hhhhhhhhhhhhhhh.....",
+    "............rrrr........",
+    "............rr..........",
+    ".......rr.rr.rr.rr......",
+    ".......rr.rr.rr.rr......",
+    ".......rr.rr.rr.rr......",
+    "..r.....................",
+    ".rr....rr.rr.rr.rr......",
+    ".rr....rr.rr.rr.rr.r....",
+    ".rr....rr.rr.rr.rr.rr...",
+    "rrr................rrr..",
+    "rrr....rr.rr.rr.rr.rrrr.",
+    "..r.r..rr.rr.rr.rr...rr.",
+    "..rhhh.rr.rr.rr.rr....r.",
+    ".hhhhhh.....r......rrr..",
+    ".hhhhhhhhhhhhhhhhhhhhhhh",
+    ".hhhhupupupupupuhhhh....",
+    "..hhhhhhhhhhhhhhhhh.....",
+    "..hhhhhhhhhhhhhh........",
+    "........r..r..r.........",
+    "......rrrrrrrrrrr.......",
 )
 SMALL_EDGE = 0.35  # the opacity of the one-pixel ink edge inside White 2's small plates
 
@@ -362,7 +509,7 @@ def write_small_icon(out, name, title, colours, stops, edge, size, plate, sprite
         body.append("  <!-- the plate's edge -->")
         body.append(f'  <path fill="none" stroke="{INK}" stroke-opacity="{n(edge)}" stroke-width="{1 / k:.4f}" '
                     f'transform="{transform}" d="{PLATE}"/>')
-    body.append("  <!-- the ship, pixel by pixel: the rig, then the hull with its strake -->")
+    body.append("  <!-- the ship, pixel by pixel: the rig and fittings, then the hull with its strake -->")
     body.append(f'  <path fill="{colours["rig"]}" d="{sprite_rows(sprite, rig, ox, oy)}"/>')
     body.append(f'  <path fill="{colours["hull"]}" d="{sprite_rows(sprite, hull, ox, oy)}"/>')
     where = "on Apple's macOS grid" if plate[0] > 0 else "with the plate filling the square, for the window"
