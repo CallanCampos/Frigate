@@ -11,6 +11,7 @@ src/ov029/dwc_rap_vchat.c:
     .bss        start:0x02197440 end:0x02197444
 
 lib/dwc/src/vct/vct_adpcm.c:
+    complete
     .text       start:0x02192ae8 end:0x02193cb0
     .rodata     start:0x021971a8 end:0x02197278
 

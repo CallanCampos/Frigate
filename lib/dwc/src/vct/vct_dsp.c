@@ -200,10 +200,11 @@ void VCT_InitCapture(void) {
 u32 VCT_FilterFrame(s16 *samples, int bytes) {
     s16 input = samples[0];
     u32 count = (u32)bytes >> 1;
-    int minusInput = -(input * 0xe9f);
+    int scaled = input * 0xe9f;
+    int minusInput = -scaled;
     u32 i;
     u64 sum;
-    int output = ((input * 0xe9f) + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
+    int output = (scaled + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
 
     sum = output * output;
     sEcho.highpassOutput = output;
@@ -221,8 +222,7 @@ u32 VCT_FilterFrame(s16 *samples, int bytes) {
     sEcho.highpassOutput = output;
     *(samples + count - 1) = output;
     REG_DIVCNT = 1;
-    REG_DIV_NUMER_LO = (u32)sum;
-    REG_DIV_NUMER_HI = (u32)(sum >> 32);
+    REG_DIV_NUMER = sum;
     REG_DIV_DENOM_LO = count;
     REG_DIV_DENOM_HI = 0;
     while (REG_DIVCNT & REG_DIVCNT_BUSY) {

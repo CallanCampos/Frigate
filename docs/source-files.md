@@ -363,7 +363,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | complete | descriptive |
-| `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | partial | descriptive |
+| `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | complete | descriptive |
 | `vct_audio.c` | `0x02193cb0`–`0x02194aa4` | 14 | partial | descriptive |
 | `vct_buffer.c` | `0x02194aa4`–`0x021956d4` | 25 | partial | descriptive |
 | `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | partial | descriptive |
@@ -2152,7 +2152,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ctvt_comm.c` | `0x0219b5b8`–`0x0219cd74` | 69 | complete | string at `0x021b25f8` |
 | `ctvt_talk.c` | `0x0219cd74`–`0x0219ef4c` | 40 | partial | string at `0x021b2604` |
 | `ctvt_mic.c` | `0x0219ef4c`–`0x0219f234` | 24 | complete | string at `0x021b261c` |
-| `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | partial | string at `0x021b264c` |
+| `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | complete | string at `0x021b264c` |
 | `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | partial | string at `0x021b2658` |
 | `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | partial | string at `0x021b2674` |
 | `ctvt_game_target.c` | `0x021a7620`–`0x021a78d0` | 6 | partial | descriptive |
