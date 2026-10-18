@@ -26,6 +26,81 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: gamepads, and the macOS app in a disk image
+
+- **Upstream:** `615939e25`, as merged into the port's `main` by `e1b68f578`.
+- **Port:** `PORT_SHA`, on the branch `port-controller-pkg` from `f52dad0b2` (not yet merged or pushed): the work in
+  `78758202d` and `c424bf45c`, and the fixes from two reviews of it in `01240f928` and `31814aaf2`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `ninja` has no work after the commits. Nothing
+  outside `port/` changed but `.github/workflows/port-ci.yml`, a port file, so no game-changes row and no
+  `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, at `31814aaf2`: Black 2 RelWithDebInfo and its app, Black 2 under ASan and UBSan (the
+  alignment check recoverable), White 2 RelWithDebInfo and its app; not pushed, so no CI run (Linux unbuilt).
+- **Tests:** T0 as above. Every result below is from `31814aaf2` with nothing uncommitted (the apps say version
+  `0.0.2544`, revision `31814aaf2f46`); the proofs this entry first gave for the launch through LaunchServices, the disk
+  image and all of White 2 were from apps built before the work was committed (`0.0.2540` and `0.0.2541`, `-dirty`), and
+  are replaced.
+  - T2: Black 2, 220 of 223 `ctest` tests pass and 3 are skipped without the oracle (`oracle_boot`, `oracle_opening`,
+    `oracle_title`); White 2, 218 of 221 pass and the same 3 are skipped, `replay_start_menu` and `rom_game_overlays`
+    among the passes (the last entry had them failing in White 2). New: `app_gamepad_plain` and `app_gamepad_sanitized`
+    (424 checks each: the stick's dead zone, sectors and hysteresis, the map by position and by label, the pad that
+    drives, the description, and SDL's virtual joysticks as pads that come and go, a noisy desk pad and nine pads at
+    once), and on macOS `app_make_app` (19 checks), `app_message_log` (11) and `app_package_macos_out` (13).
+  - Sanitized (`build/port-asan`): the app, integration, smoke and `replay_start_menu` tests, 20 of 20, and a windowed
+    run of 120 frames with SDL's dummy video and sound drivers, with no report.
+  - T3: `replay_start_menu` and `replay_new_game` pass (among the 220).
+  - The app, each version: `codesign --verify --deep --strict` passes (ad hoc, no team, no hardened runtime); its
+    program, run from inside the app with `--headless --frames 300 --rom orig/baserom_<version>.nds`, loads the app's
+    own SDL3 (`DYLD_PRINT_LIBRARIES`) and stops after 300 frames, with the plain program's picture at frame 300
+    (`d66b7bf8`, the same picture in both versions), also from the mounted disk image. Black 2's, opened through
+    LaunchServices (`open -n -W --env HOME=<scratch>`, headless, no `--rom`), finds the checkout's ROM, shows the same
+    picture and writes its messages to `<scratch>/Library/Logs/pokebw2-native/pokeblack2.log`; `spctl --assess`
+    rejects it, as Gatekeeper does any app that isn't notarized. The disk images verify (`hdiutil verify`) and hold
+    the app and a link to `/Applications` only. `package_macos.sh` refuses an image path in another repository and
+    takes one under an ignored directory or outside every work tree.
+  - T4, T5's nightly runs, T6, T7 not yet.
+- **Tiers** (`port/tools/progress`, upstream `615939e25`): (a) 32,231 functions, 2,881,954 code bytes (74.9%); (b)
+  5,195, 619,954 bytes; (c) 3,592, 348,336 bytes (9.0%). Since the last entry that measured them ("the title screen and
+  the start menu", `e484d5011`): (a) +138 functions and 22,912 bytes, from (b); (c) unchanged. The change is upstream's
+  matching merged by `e1b68f578`; the entries since then called the tiers unchanged without measuring them.
+- **Trap stubs:** 574 function stubs and 63 data placeholders (`gen_stubs`, each build above), down from the 581 and 67
+  the last entry carried over unmeasured, by the same upstream C. Overlay 12's script data, which New Game stops on,
+  are still placeholders; the two replays reach none.
+- **64-bit warnings:** game / `lib/` on arm64 (`port/tools/compile-probe`, its arm64 host pass at `615939e25`):
+  `-Wpointer-to-int-cast` 865 / 184, `-Wvoid-pointer-to-int-cast` 52 / 117, `-Wint-to-pointer-cast` 76 / 144,
+  `-Wint-to-void-pointer-cast` 69 / 132. The game's `-Wvoid-pointer-to-int-cast` rose by 3 since the last measurement
+  (49): `src/ov168/btlv_input.c` lines 3021, 3025 and 3029, `(u32)vram` in upstream's newly matched battle code, merged
+  by `e1b68f578` before this branch. This branch changes no game or `lib/` code.
+- **Work done:** phase 5's controller support and macOS packaging.
+  - Gamepads through SDL3's gamepad API (`port/app/gamepad.c`,
+    [ADR 0009](adr/0009-gamepads-by-position-one-pad-at-a-time.md)): every pad connected, hot-plugged and remapped
+    (eight open at once, a ninth opened when a place frees); the DS's A, B, X and Y by position (a Nintendo pad's
+    layout), L and R on the shoulders, Start and Select, the D-pad and the left stick as the D-pad with a circular dead
+    zone of half its travel and hysteresis at the dead zone's edge and at the sectors' edges; one pad drives at a time;
+    one table, `PortGamepadMap`, for a settings file to replace. Each pad names its DS buttons by SDL's labels when it
+    connects. The keyboard works at the same time. The controls are in `port/app/present.c`'s header and
+    port/README.md.
+  - The macOS app ([ADR 0010](adr/0010-macos-app-as-a-signed-copy-of-the-program.md)): the target
+    `pokeblack2_app` (`pokewhite2_app` for White 2; `-DPORT_MACOS_APP=ON` builds it every time) copies the program into
+    `<program>.app` with the libraries it loads from outside macOS in `Contents/Frameworks`, however they are named
+    (absolute, `@rpath`, `@loader_path`, `@executable_path`), and an Info.plist (a placeholder bundle identifier,
+    `com.example.pokebw2-native.<program>`, the version from git, the minimum macOS from the binaries, high DPI, a game
+    category with Game Mode); checks that the app loads nothing from outside macOS and itself, signs it ad hoc, and
+    starts its program once. Opened from the Finder, the program writes its messages to
+    `~/Library/Logs/pokebw2-native/<program>.log` and shows a missing or refused ROM in an alert
+    (`port/app/message_log.c`, `port_app_fatal_notice`). `port/tools/package_macos.sh` makes the disk image, checks it,
+    and refuses a path that git would track in any work tree. port/README.md says where the ROM goes, where the log is,
+    and how to get past Gatekeeper ("Open Anyway"). CI builds the app on its macOS runner and uploads nothing.
+  - The reviews' fixes, each with a test: make_app.sh had left a program that loads SDL3 by `@rpath` with no library and
+    no search path, signed and verified but unable to start; the stick flickered at the dead zone's and the sectors'
+    edges (30 presses in 60 frames of noise; now one); a ninth pad was dropped for good; a Finder launch lost every
+    reason it stopped; `package_macos.sh` accepted an image path in another work tree.
+- **Next:** as the last entry (overlay 12's field script data, upstream). For the app: a first-launch ROM picker; an app
+  for older macOS (the pinned SDL3 built statically with a deployment target, not tried yet). The 3 new 64-bit
+  warnings in `btlv_input.c` want a portability fix (`uptr`) once phase 4 reaches the battle screens.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-17: oracle comparisons from power-on to the start menu
 
 - **Upstream:** `e484d5011` (merge of PR #353), as in the last entry.

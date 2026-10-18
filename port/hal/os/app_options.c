@@ -1,4 +1,4 @@
-// The program's options and its presentation hook (port_app.h), kept in the platform layer rather than in the program
+// The program's options and its hooks (port_app.h), kept in the platform layer rather than in the program
 // (port/app/main.c), so that the modules that read them link into every executable that has the platform layer.
 #include "hal/os/port_app.h"
 #include <string.h>
@@ -9,6 +9,7 @@ static const char *const *sFlags;
 static size_t sFlagCount;
 
 void (*port_app_present)(void);
+void (*port_app_fatal_notice)(const char *message);
 
 void port_app_set_arguments(int argc, char **argv, const char *const *flags, size_t flagCount) {
     sArgc = argc;
