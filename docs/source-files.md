@@ -563,7 +563,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | complete | descriptive |
 | `field_g3dobj.c` | `0x021bfe88`–`0x021c05d4` | 30 | complete | string at `0x021d54f0` |
 | `fieldmap_tcb_camera_zoom.c` | `0x021c05d4`–`0x021c0870` | 6 | partial | string at `0x021d5500` |
-| `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | partial | string at `0x021d551c` |
+| `field_task.c` | `0x021c0870`–`0x021c0914` | 11 | complete | string at `0x021d551c` |
 | `field_task_manager.c` | `0x021c0914`–`0x021c1bc4` | 52 | partial | string at `0x021d552c` |
 | `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | complete | string at `0x021d5544` |
 | `fieldskill_mapeff.c` | `0x021c1d88`–`0x021c1e30` | 9 | complete | string at `0x021d5554` |
