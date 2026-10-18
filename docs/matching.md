@@ -3065,7 +3065,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   size`), `os_arena.c` (`SDK_MAINEX_ARENA_LO`, 0x0d000000) and `fs_overlay.c` (`__OVERLAY_COUNT`) need. dsd's linker
   script defines `__OVERLAY_COUNT`, and the build adds the stack sizes and the arena's start from
   `config/linker_symbols.toml` (`docs/configs.md`, "Linker symbols"). Another such symbol goes there, with its value
-  read from both versions' pool words, before the file that reads it can link.
+  read from both versions' pool words, before the file that reads it can link. The probe masks relocated words, so it
+  can't tell which symbol a pool slot holds: only the link checks that.
 - A file-scope static that a function both passes by address and reads or writes directly gets two literals with
   the same address: the access goes through one (`ldr r0, =obj; strh r1, [r0, #0xe]`) and the pointer passed on
   through the other, where an `extern` object's address is loaded once and kept in a register, 4 bytes shorter. Two
