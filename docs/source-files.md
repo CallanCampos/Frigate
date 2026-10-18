@@ -2233,7 +2233,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `sake_storage.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
 | `sake_records.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
-| `dwc_competition.c` | `0x021bda1c`–`0x021beaa0` | 55 | partial | descriptive |
+| `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
+| `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | partial | descriptive |
 | `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 

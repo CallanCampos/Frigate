@@ -439,17 +439,6 @@ in both versions.
   The table may be another file's, data with no code between `comm_entry_menu.c` and `enceff.c`. The file stays
   incomplete until that layout is found.
 
-- `lib/dwc/src/sc/dwc_competition.c` (overlay 260) matches every function in both versions, but linked complete it
-  fails the module check: the ROM's `.data` has `sCompetitionNamespaces` (at `0x021c12cc` / `0x021c130c`) right after
-  `Sc_PutGuid`'s literals and before its own string, and ours has the string first and the table after it, since a
-  table defined between functions has its strings laid out ahead of it. A global table, a `[1]` table, a non-`const`
-  element type, a tentative or `extern` declaration at the top, a named `char` array for the string and the table
-  above `Sc_PutGuid` all keep the string first; `const char *const` folds the table away, and `-ipa file` puts the
-  table before its string but at the head of the file's `.data`. The part from `ScClient_Begin` (`0x021be474` /
-  `0x021be4b4`) to the end, the SOAP requests, compiled on its own with the table above its first function, lays out
-  the ROM's `.data` from the table to the file's end, so that part is evidently an original file of its own. The file
-  stays incomplete until it is split there.
-
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file
