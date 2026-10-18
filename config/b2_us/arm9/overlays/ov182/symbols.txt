@@ -1223,8 +1223,8 @@ data_ov182_021c0070 kind:data(any) addr:0x021c0070
 data_ov182_021c0094 kind:data(any) addr:0x021c0094
 data_ov182_021c00ac kind:data(any) addr:0x021c00ac
 data_ov182_021c00c8 kind:data(any) addr:0x021c00c8
-data_ov182_021c00cc kind:data(any) addr:0x021c00cc
-data_ov182_021c00d2 kind:data(any) addr:0x021c00d2
+sWepKeyboardRowY kind:data(any) addr:0x021c00cc
+sWepKeyboardColumnX kind:data(any) addr:0x021c00d2
 data_ov182_021c00e4 kind:data(any) addr:0x021c00e4
 data_ov182_021c00ec kind:data(any) addr:0x021c00ec
 data_ov182_021c00f4 kind:data(any) addr:0x021c00f4
@@ -1638,7 +1638,7 @@ sPageStep3 kind:bss addr:0x021c40ec
 sPageMulti4Frames kind:bss addr:0x021c40f4
 sApListPos kind:bss addr:0x021c40f8
 sApList kind:bss addr:0x021c40fc
-data_ov182_021c4100 kind:bss addr:0x021c4100
+sWepKeyboard kind:bss addr:0x021c4100
 data_ov182_021c4104 kind:bss addr:0x021c4104
 data_ov182_021c4108 kind:bss addr:0x021c4108
 data_ov182_021c410c kind:bss addr:0x021c410c

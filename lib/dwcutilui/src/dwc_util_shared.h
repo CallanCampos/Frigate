@@ -76,8 +76,10 @@ struct DWCUtilApEntry {
 // Stops the scan for access points and frees it, and the access points it found and their count
 void func_ov182_021b74f4(void);
 int func_ov182_021b7630(DWCUtilApEntry **entries);
-// Takes the SSID into the connection being edited
+// Copies the SSID of the connection being edited, and takes an SSID or a WEP key into it
+void func_ov182_021b7a08(u8 *ssid);
 void func_ov182_021b7854(const u8 *ssid);
+void func_ov182_021b7874(const u8 *key);
 // Makes the connection of the console's Wi-Fi settings the one being edited
 void func_ov182_021b7b20(int index);
 
@@ -105,8 +107,8 @@ void func_ov182_021b5bb8(void);
 void func_ov182_021b6588(void);
 // The screen of the button above the list of access points
 void func_ov182_021b5000(void);
-// The keyboard of a WEP key
-void func_ov182_021b19f4(void);
+// The settings of a connection
+void func_ov182_021b2d48(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

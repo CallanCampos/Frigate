@@ -273,3 +273,10 @@ lib/dwcutilui/src/dwc_util_page_ap_list.c:
     .rodata     start:0x021c0038 end:0x021c00c8
     .data       start:0x021c0f58 end:0x021c0f70
     .bss        start:0x021c40f8 end:0x021c4100
+
+lib/dwcutilui/src/dwc_util_wep_keyboard.c:
+    complete
+    .text       start:0x021b19f4 end:0x021b2120
+    .rodata     start:0x021c00c8 end:0x021c00ec
+    .data       start:0x021c0f70 end:0x021c0fe8
+    .bss        start:0x021c4100 end:0x021c4104
