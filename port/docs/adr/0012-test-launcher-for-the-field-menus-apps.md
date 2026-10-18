@@ -26,21 +26,35 @@ events), so writing its process table alone would not open the field.
 - **A test launcher, off by default.** `--launch APP[@COUNT][,APP[@COUNT]]...` (`port/app/launcher.c`,
   `launcher_spec.c`) names apps of the field menu (`party`, `pokedex`, `bag`, `card`, `summary`). When a continued
   game asks for the field, the launcher chains its own event in place of `EventFieldOpen` and opens each app in turn,
-  when GFL's frame count reaches COUNT (at once without one), then asks the program to stop with status 0, or 2 when
-  the save's field menu wouldn't offer an app (event flags 0x961 and 0x962, read from `src/ov036/field_menu.c`'s
-  `FieldMenu_GetMenuType`, not called). Without `--launch` nothing changes: a continued game stops on the trap.
-- **It stands in for one thing: the menu asking for an app.** It fills the app call's input and work as
-  `EventFieldMenu_Create` and `EventFieldAppCall_Create` fill them, but for the two calls that need the field
-  (`PlayerActionPerms_Create`, `CalcPlayerActionPossibilities`): every field action is blocked and the possibilities
-  are zero, so no field event can follow. It then runs `EventFieldAppCall`'s three field-free states (11: create the
-  param and queue the proc; 12: wait for it; 13: read the result, open the next app it asks for or free the param),
-  one pass each, through the game's own table and functions. Before the apps it does what the menu's choice by a key
-  and the field's close do, through the game's own setters: `func_0203d564(FALSE)` (`field_menu.c:709`, after
-  `EventFieldMenu_Create`'s TRUE), `GameData_SetLastSubscreen(gameData, 1)` (the subscreen the field frees,
-  `fieldmap.c:632`: the menu's, which `event_field_menu.c:91` changes to) and `UnloadFieldGlueOverlay()`
-  (`src/system/field_event.c:86`). The oracle shows both values at the bag's first frame: the UI's touch flag 0 (1
-  while the menu was open), the last subscreen 1 (0 before the menu). It reports each app's result and event type on
-  stderr instead of opening the field again; event types 2, 3 and 5, which need the field, end the launch.
+  when GFL's frame count reaches COUNT (at once without one), then asks the program to stop. Without `--launch`
+  nothing changes: a continued game stops on the trap.
+- **It stands in for three things, each through the game's own functions and setters**, with their effects read from
+  overlay 36's C, never called:
+  - **The menu's offer and its choice.** It opens only the apps the save's field menu offers: the kind of menu
+    `FieldMenu_GetMenuType` gives (`src/ov036/field_menu.c:480-496`: the Union Room's, the Royal Unova's, a season's
+    change, no Pokémon by event flag 0x961, no Pokédex by 0x962, the Black Tower's) from the same zone functions,
+    event flags and `GameData` it asks, and the items its table gives each kind (`data_ov036_021d0054`; the Black
+    Tower's has no BAG). Before each app it sets the UI's touch flag FALSE (`func_0203d564`), as the menu's choice of
+    an item by a key does (`field_menu.c:709`, after `EventFieldMenu_Create`'s TRUE), whatever the last app left it
+    at.
+  - **The field's close.** Before each app it records the menu's subscreen as the last one
+    (`GameData_SetLastSubscreen(gameData, 1)`), and once it unloads overlay 35 (`UnloadFieldGlueOverlay()`,
+    `src/system/field_event.c:86`). The game records what `FieldSubscreen_Free` returns (`fieldmap.c:632`), overlay
+    36's code; the launcher's 1 is a constant, the menu's subscreen (`event_field_menu.c:91` changes to it). The
+    oracle shows both values at the bag's first frame: the UI's touch flag 0 (1 while the menu was open), the last
+    subscreen 1 (0 before the menu).
+  - **The app call's field-free states.** It fills the app call's input and work as `EventFieldMenu_Create` and
+    `EventFieldAppCall_Create` fill them, but for the two calls that need the field (`PlayerActionPerms_Create`,
+    `CalcPlayerActionPossibilities`): every field action is blocked and the possibilities are zero, so no field event
+    can follow. It then runs `EventFieldAppCall`'s three field-free states (11: create the param and queue the proc;
+    12: wait for it; 13: read the result, open the next app it asks for or free the param), one pass each, through
+    the game's own table and functions. It reports each app's result and event type on stderr instead of opening the
+    field again.
+- **Its exit status says whether the launch finished** (`port/app/launcher.h`): 0 when every app opened and closed,
+  each showing the menu again or closing it (event type 0 or 1); 1 when it didn't: the run ended first (`--frames`, a
+  closed window), the game never asked for the field, the launcher stepped aside, or an app wanted the field (an app
+  that runs in it, or event type 2, 3 or 5, which end the launch); 2 when the save's field menu doesn't offer an app,
+  before anything opens. A trap or another stop keeps its own status.
 - **The seam** is a guard-only `#ifdef PLATFORM_PC` block before state 2's two unchanged lines in
   `src/ov035/event_mapchange.c` (a Platform row of [game-changes.md](../game-changes.md)): MWCC sees the same tokens,
   which `check_mwcc_neutral.py` proves for every file in both versions. The state stays at 2: the launcher's event
@@ -81,9 +95,10 @@ events), so writing its process table alone would not open the field.
 - The apps run natively and are compared with melonDS app screen by app screen (`oracle_launch_*`). As built, the bag,
   the trainer card and the party list with its Pokémon's menu show on the port pass for pass as on the oracle, from
   their first frame to their last; the summary's background is a step behind (it scrolls by VBlanks, which the DS
-  spends loading it), and the Pokédex stops on a trap (`NNSi_objSizeWTbl`, ARM9 main's NitroSystem G2D, no C yet). What the field
-  leaves in VRAM, palettes, OAM, the random numbers and the clock before an app opens, the launcher can't give: such a
-  difference is declared with its cause, never hidden by a changed hash.
+  spends loading it), and the Pokédex stops on a trap some 395 passes after it opens, still in its opening
+  (`NNSi_objSizeWTbl`, ARM9 main's NitroSystem G2D, no C yet): only a Pokédex closed before then runs through. What
+  the field leaves in VRAM, palettes, OAM, the random numbers and the clock before an app opens, the launcher can't
+  give: such a difference is declared with its cause, never hidden by a changed hash.
 - It stretches the exception: `ov011_pending.c` gives overlay 11's effect, while the launcher replaces a menu the
   player can't reach. It is a test tool, off by default, and the user decides whether it stays.
 - **Retirement**, when the gate steps aside (the field opens): delete `port/app/launcher.c`, `launcher_spec.c`,

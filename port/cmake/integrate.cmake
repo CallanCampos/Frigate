@@ -1,7 +1,7 @@
 # Phase 1's integration tests (port/tests/integrate): the host DMA, the OS allocator's whole addresses and the main
 # arena, the buttons and lid, the screens drawn by the scanline hook and the PNG screenshot, Frigate's test launcher
 # when it is off, each run as the game's main() would on the whole program's objects; and the program's own option
-# checks.
+# checks, with the launcher's exit statuses (tests/app/check_exit.py).
 enable_testing()
 add_executable(port_integrate_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/test_integrate.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c"
@@ -25,12 +25,24 @@ endforeach()
 add_test(NAME integrate_unknown_option COMMAND ${PORT_PROGRAM} --headless --no-such-option)
 set_tests_properties(integrate_unknown_option PROPERTIES WILL_FAIL TRUE TIMEOUT 30)
 
-# And a --launch that names no app Frigate's test launcher opens (port/app/launcher_spec.c), before the game starts
-add_test(NAME integrate_launch_bad_option COMMAND ${PORT_PROGRAM} --headless --launch nosuchapp
-    --save-dir "${CMAKE_CURRENT_BINARY_DIR}/launch_bad_option_saves")
-set_tests_properties(integrate_launch_bad_option PROPERTIES TIMEOUT 30
-    PASS_REGULAR_EXPRESSION "--launch nosuchapp: \"nosuchapp\" isn't an app the launcher opens"
-    FAIL_REGULAR_EXPRESSION "entering the game's main")
+# And a --launch that names no app Frigate's test launcher opens (port/app/launcher_spec.c): status 2 before the game
+# starts. check_exit.py checks the status, which a PASS_REGULAR_EXPRESSION would ignore
+add_test(NAME integrate_launch_bad_option
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 2 --fresh-save-dir
+            --expect "--launch nosuchapp: \"nosuchapp\" isn't an app the launcher opens"
+            --reject "entering the game's main"
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --launch nosuchapp)
+set_tests_properties(integrate_launch_bad_option PROPERTIES TIMEOUT 30)
+
+# A launch that never starts is a failure: without a save there is no CONTINUE, so the game never asks for the field,
+# and the run ends with status 1 and says so (port/app/launcher.h). Skipped (77) without the player's ROM (status 66)
+add_test(NAME integrate_launch_never_asked
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_exit.py" --status 1 --skip-status 66 --fresh-save-dir
+            --expect "--launch: the game never asked for the field, so no app was opened"
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 300 --watchdog 30 --launch bag)
+set_tests_properties(integrate_launch_never_asked PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 300)
 
 # The boot to the logos, once the game gets there (port/docs/STATUS.md): 120 frames, where the Nintendo and The Pokémon
 # Company screen shows, and a screenshot of it. Off until the game changes that the boot needs are in; it needs the

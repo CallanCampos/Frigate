@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the test launcher, after review
+
+- **ctest's `PASS_REGULAR_EXPRESSION` ignores the exit status.** A test with one passes on its output alone, so a
+  test of a status runs the program through a checker that compares it (`port/tests/app/check_exit.py`, or
+  `check_launch_smoke.py --status`).
+- **A tool that stops short must say so in its status.** The launcher ended a run that never opened an app, or never
+  opened the last one, with status 0; only the report lines that the oracle checks compared kept the tests honest.
+  Status 0 now means every app opened and closed, and a run that ended first says what never did.
+- **A stand-in does each thing the original does each time, not once.** The field menu's choice by a key sets the
+  touch flag before every app; the launcher set it before the first only, and an app closed by a touch left it set
+  for the next one, whose screen then differed. Read where a value is set in the code it stands in for, per call.
+
 ## 2026-10-18: the field menu's apps against the oracle
 
 - **Align an app on its first frame, measured on both programs, not on its press.** The DS takes a different number

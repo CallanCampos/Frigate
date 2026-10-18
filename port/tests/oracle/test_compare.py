@@ -877,8 +877,11 @@ class LaunchTests(unittest.TestCase):
                        "lines": [report] if lines is None else lines, "writes_save": writes_save}, f)
 
     def launch(self) -> tuple[int, str]:
+        # The runs go in the test's own directory: a failed check keeps its runs, which would stay in the system's
+        # temporary directory otherwise
         return captured(oracle.main, ["launch", "route", "--oracle", self.oracle_program, "--port", self.port_program,
-                                      "--save-cache", self.cache, "--rom", self.rom])
+                                      "--save-cache", self.cache, "--rom", self.rom,
+                                      "--out", os.path.join(self.dir.name, "runs")])
 
     def test_a_route_that_matches(self):
         status, text = self.launch()

@@ -26,10 +26,50 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the test launcher after review: an unfinished launch fails, the menu's kinds, the touch flag per app
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `265a6bbe9`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 252 `ctest` tests pass, the oracle's included (461 s), 4 new:
+  `integrate_launch_never_asked` (no save, so no CONTINUE: status 1, and the run says so), `launch_unfinished`
+  (`field_menus`' presses with `--frames 4400`, so the card never opens: status 1), `launch_not_offered` (the party
+  list from the first save, whose menu is type 3: status 2) and `launch_touch_then_party` (the card closed by a touch
+  on its return button, then the party list, which shows the `party_menus` route's oracle screen at count 4250);
+  `integrate_launch_bad_option` checks its status, 2, through `tests/app/check_exit.py`; `app_launcher_spec_*` check
+  the kinds of menu against `field_menu.c` read by hand; `integrate_launcher_off` checks that the launcher leaves the
+  status alone. Against the program before this commit, `launch_unfinished` fails (status 0, no line about the card)
+  and `launch_touch_then_party` fails (the party list's bottom screen `70ab6892` at count 4250, not the oracle's
+  `47ea70c7`). `oracle_launch_field_menus`, `oracle_launch_party_menus` and `launch_summary_standalone` pass as
+  before. White 2: all 248 pass but `oracle_continue_starter` and `oracle_launch_party_menus`, which skip (no starter
+  save); `oracle_launch_field_menus`, `launch_unfinished`, `launch_not_offered` and `integrate_launch_never_asked`
+  among the passes. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - **The exit status** (`port/app/launcher.h`'s `PORT_LAUNCH_STATUS_*`): a run that ended before the last app closed,
+    a game that never asked for the field and a launch cut short by an event type that needs the field all ended with
+    status 0. Now 0 means every app opened and closed (event type 0 or 1), 1 that the launch didn't finish, with a
+    line saying what never opened or never closed, and 2 that the save's menu doesn't offer an app.
+  - **The menu's kinds** (`launcher_spec.c`): the launcher asked event flags 0x961 and 0x962 only. It now gives the
+    kind of menu `FieldMenu_GetMenuType` gives, from the same zone functions (ARM9 main's), `GameData` and flags in the
+    same order, and the items its table gives each kind: the Black Tower's and White Treehollow's menu has no BAG.
+  - **The touch flag** is set FALSE before every app, as the menu's choice by a key does, not only before the first.
+  - **Documentation:** ADR 0012's decision names the three things the launcher stands in for, and says its last
+    subscreen is a constant the oracle shows; the README and `main.c` give the statuses and the Pokédex's trap, some
+    395 passes after it opens; the oracle README and the launch entry say that each launched app's first frame is
+    aligned by its `--launch` count, measured on the port, so its timing isn't a check.
+  - `oracle_compare`'s launch tests left the runs of each failed check they make on purpose in the system's temporary
+    directory, some 25 MB a run; they go in the test's own directory now.
+- **Next:** the user's decision on ADR 0012; White 2's starter route; the apps no route reaches yet.
+- **Blockers:** as in the last entry.
+
 ## 2026-10-18: White 2's field menu route on the launcher; its starter save left for a route of its own
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `b0fd1f745`.
+- **Port:** `265a6bbe9`, on the branch `port-launch-adr0012`, after `b0fd1f745`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
 - **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
 - **Tests:** T0 as above. White 2: `oracle_launch_field_menus` passes, 2 of 2 app screens and 621 of 621 counts of the
@@ -68,7 +108,9 @@ level that doesn't exist yet says "not yet"; no field is left out.
   declarations). With the option off nothing changed: `oracle_continue` still stops on `FIELDMAP_PROC_FUNCS` after the
   same frame with the same screens, and the replays pass. T4, the apps against melonDS 1.1 (`oracle.py launch`):
   - `field_menus`, from the first save: the bag and the trainer card, 2 of 2 app screens at the oracle's counts, and
-    621 of 621 counts of their spans (the bag 4046-4323, the card 4588-4930) the oracle's pictures, pass by pass;
+    621 of 621 counts of their spans (the bag 4046-4323, the card 4588-4930) the oracle's pictures, pass by pass (the
+    count of each launched app's first frame is aligned by its `--launch` count, measured on the port: for 2 of the
+    621, and 3 of the 1,491 below, the picture is checked but not when it shows);
   - `party_menus`, from the starter save: the party list, Tepig's menu, back from the summary, the trainer card with
     its Pokédex line and the bag, 5 of 5 app screens, 1,491 of 1,491 counts; left out, the summary (its background,
     scrolled by VBlanks, is about 9 pixels on, from the DS's long loading passes) and the Pokédex (a trap, below);
@@ -88,9 +130,10 @@ level that doesn't exist yet says "not yet"; no field is left out.
     36's code.
   - **The launch checks** (`oracle.py launch`, the oracle README's "The launch checks"): the oracle walks the field
     menu with an input file from a save; the port plays the same file with `--launch` at the counts the oracle opens
-    each app (its first frame less the port's passes to it), and must show every app screen of the route's table at
-    its count, and the oracle's picture at every count of each app. Two routes for Black 2, their input files and
-    tables (hashes only) in `port/tests/oracle`.
+    each app (its first frame on the oracle less the passes the port itself takes to it, so that frame's timing is
+    aligned by construction, not checked), and must show every app screen of the route's table at its count, and the
+    oracle's picture at every count of each app. Two routes for Black 2, their input files and tables (hashes only)
+    in `port/tests/oracle`.
   - **What the field leaves**, measured on the oracle: the UI's touch flag 0 and the last subscreen 1 at an app's first
     frame; the launcher sets both through the game's setters. Nothing else was needed for the apps' pictures.
   - Found on the way: the H-blank interrupt's timing (`0eb7214e2`), which hid the card's opening wipe.

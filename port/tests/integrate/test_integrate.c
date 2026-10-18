@@ -5,6 +5,7 @@
 // the whole program's objects.
 //
 //   port_integrate_tests NAME | all
+#include "app/launcher.h"
 #include "app/present.h"
 #include "app/run_dir.h"
 #include "gfx/screens.h"
@@ -337,9 +338,11 @@ static void TestScreens(void) {
 
 // Frigate's test launcher (port/app/launcher.c, ADR 0012) without --launch: CONTINUE's seam asks it before the field
 // opens (src/ov035/event_mapchange.c), and it must answer 0 without touching the event, so that the field opens as
-// before
+// before; it never stops the run, and leaves the run's exit status alone
 static void TestLauncherOff(void) {
     Check(port_launcher_take_field_open(NULL) == 0, "without --launch the launcher leaves the field to open");
+    Check(!port_launcher_finished(), "without --launch the launcher never stops the run");
+    Check(port_launcher_end() == PORT_LAUNCH_STATUS_DONE, "without --launch the launcher leaves the status at 0");
 }
 
 typedef struct Test {

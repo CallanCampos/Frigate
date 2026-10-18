@@ -1,6 +1,8 @@
 // Tests of Frigate's test launcher's option and of its gate (port/app/launcher_spec.c, port/hal/trap.c; ADR 0012):
-// --launch's parsing, and port_trap_is_placeholder, by which the launcher steps aside once overlay 36's process table
-// has C. The gate runs on a made-up table of placeholders, as port/tools/gen_stubs.py writes one.
+// --launch's parsing, which apps each kind of field menu offers, and port_trap_is_placeholder, by which the launcher
+// steps aside once overlay 36's process table has C. The kinds of menu are checked against src/ov036/field_menu.c's
+// FieldMenu_GetMenuType and its table of items, data_ov036_021d0054, read by hand. The gate runs on a made-up table of
+// placeholders, as port/tools/gen_stubs.py writes one.
 #include "app/launcher_spec.h"
 #include "hal/trap.h"
 #include <stdio.h>
@@ -42,15 +44,15 @@ static void TestNames(void) {
     const PortLaunchApp *app;
 
     app = port_launch_find_app("party", 5);
-    Check(app != NULL && app->appId == 0 && app->flag == 0x961, "party is FIELD_APP_POKELIST, behind flag 0x961");
+    Check(app != NULL && app->appId == 0, "party is FIELD_APP_POKELIST");
     app = port_launch_find_app("pokedex", 7);
-    Check(app != NULL && app->appId == 1 && app->flag == 0x962, "pokedex is FIELD_APP_ZUKAN, behind flag 0x962");
+    Check(app != NULL && app->appId == 1, "pokedex is FIELD_APP_ZUKAN");
     app = port_launch_find_app("bag", 3);
-    Check(app != NULL && app->appId == 2 && app->flag == 0, "bag is FIELD_APP_BAG, always offered");
+    Check(app != NULL && app->appId == 2, "bag is FIELD_APP_BAG");
     app = port_launch_find_app("card", 4);
-    Check(app != NULL && app->appId == 3 && app->flag == 0, "card is FIELD_APP_TRAINER_CARD, always offered");
+    Check(app != NULL && app->appId == 3, "card is FIELD_APP_TRAINER_CARD");
     app = port_launch_find_app("summary", 7);
-    Check(app != NULL && app->appId == 7 && app->flag == 0x961, "summary is FIELD_APP_POKESTATUS, behind 0x961");
+    Check(app != NULL && app->appId == 7, "summary is FIELD_APP_POKESTATUS");
     Check(port_launch_find_app("save", 4) == NULL, "save isn't launched: it needs the field");
     Check(port_launch_find_app("bags", 3) != NULL, "a name is matched on its length");
     Check(port_launch_find_app("ba", 2) == NULL, "a prefix isn't a name");
@@ -91,6 +93,59 @@ static void TestParse(void) {
           "17 apps are refused");
 }
 
+// FieldMenu_GetMenuType's kind of menu for a place given as its six answers, in its order of questions
+static PortLaunchMenu Menu(int unionRoom, int royalUnova, int seasonSync, int hasPokemon, int hasPokedex,
+                           int blackTower) {
+    PortLaunchPlace place = { unionRoom, royalUnova, seasonSync, hasPokemon, hasPokedex, blackTower };
+    return port_launch_menu(&place);
+}
+
+// Whether a kind of menu offers each of party, pokedex, bag, card and summary, as a string of 1s and 0s
+static int Offers(PortLaunchMenu menu, const char *expected) {
+    static const char *const names[] = { "party", "pokedex", "bag", "card", "summary" };
+    char got[6];
+
+    for (int i = 0; i < 5; i++) {
+        got[i] = port_launch_menu_offers(menu, port_launch_find_app(names[i], strlen(names[i]))) ? '1' : '0';
+    }
+    got[5] = '\0';
+    if (strcmp(got, expected) != 0) {
+        printf("  (menu type %d offers %s, not %s)\n", (int)menu, got, expected);
+        return 0;
+    }
+    return 1;
+}
+
+static void TestMenus(void) {
+    // The kinds by their numbers in FieldMenu_GetMenuType
+    Check(Menu(0, 0, 0, 1, 1, 0) == 0, "a save with a Pokémon and the Pokédex gets the full menu, type 0");
+    Check(Menu(1, 0, 0, 1, 1, 0) == 1, "the Union Room's menu is type 1");
+    Check(Menu(0, 0, 0, 1, 0, 0) == 2, "without the Pokédex, type 2");
+    Check(Menu(0, 0, 0, 0, 0, 0) == 3, "without a Pokémon, type 3");
+    Check(Menu(0, 1, 0, 1, 1, 0) == 4, "the Royal Unova's menu is type 4");
+    Check(Menu(0, 0, 1, 1, 1, 0) == 5, "a forced season's change gives type 5");
+    Check(Menu(0, 0, 0, 1, 1, 1) == 6, "the Black Tower's menu is type 6");
+    // Its order: the zone's own menus before the flags, the flags before the Black Tower
+    Check(Menu(1, 0, 0, 0, 0, 0) == 1, "the Union Room's menu even without a Pokémon");
+    Check(Menu(0, 1, 1, 0, 0, 0) == 4, "the Royal Unova's before a season's change and the flags");
+    Check(Menu(0, 0, 1, 0, 0, 0) == 5, "a season's change before the flags");
+    Check(Menu(0, 0, 0, 0, 1, 1) == 3, "no Pokémon before the Black Tower");
+    Check(Menu(0, 0, 0, 1, 0, 1) == 2, "no Pokédex before the Black Tower");
+
+    // Their items (data_ov036_021d0054's rows; items 1 to 4 are POKéMON, POKéDEX, BAG and TRAINER CARD), in the order
+    // party, pokedex, bag, card, summary; the summary goes with POKéMON
+    Check(Offers(0, "11111"), "type 0, items 1 2 3 4 5 6: every app");
+    Check(Offers(1, "11111"), "type 1, items 1 2 3 4 6: every app");
+    Check(Offers(2, "10111"), "type 2, items 1 3 4 5 6: no Pokédex");
+    Check(Offers(3, "00110"), "type 3, items 3 4 5 6: the bag and the card");
+    Check(Offers(4, "11111"), "type 4, items 1 2 3 4 6: every app");
+    Check(Offers(5, "11111"), "type 5, items 1 2 3 4 6: every app");
+    Check(Offers(6, "11011"), "type 6, items 1 2 4 5 6 8: no bag");
+    for (int menu = 0; menu < PORT_LAUNCH_MENU_COUNT; menu++) {
+        Check(port_launch_menu_name((PortLaunchMenu)menu) != NULL, "every kind of menu has a name");
+    }
+}
+
 static void TestGate(void) {
     Check(port_trap_is_placeholder(sProcTable), "a placeholder's first byte is in it");
     Check(port_trap_is_placeholder(sProcTable + sizeof(sProcTable) - 1), "and its last");
@@ -104,6 +159,7 @@ static void TestGate(void) {
 int main(void) {
     TestNames();
     TestParse();
+    TestMenus();
     TestGate();
     printf("launcher_spec: %s\n", sFailed ? "FAIL" : "ok");
     return sFailed;

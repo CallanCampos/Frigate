@@ -1,22 +1,37 @@
-// Reads the --launch option of Frigate's test launcher (launcher_spec.h; port/app/launcher.c opens the field menu's
-// apps by it, ADR 0012). Plain C11.
+// Reads the --launch option of Frigate's test launcher and says which apps the save's field menu offers
+// (launcher_spec.h; port/app/launcher.c opens the field menu's apps by them, ADR 0012). Plain C11.
 #include "app/launcher_spec.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// The field menu's event flags (src/ov036/field_menu.c's FieldMenu_GetMenuType): the player has a Pokémon (without
-// it the menu has no POKéMON item), and the player has the Pokédex (without it, no POKéDEX item)
-#define FLAG_HAS_POKEMON 0x961
-#define FLAG_HAS_POKEDEX 0x962
+// The kinds of menu that have each item: src/ov036/field_menu.c's data_ov036_021d0054 by FieldMenu_GetMenuType's
+// kinds, its items being src/ov012/event_field_menu.c's sFieldMenuAppIds (1 POKéMON, 2 POKéDEX, 3 BAG, 4 TRAINER CARD)
+#define MENU(kind) (1u << PORT_LAUNCH_MENU_##kind)
+#define EVERY_MENU ((1u << PORT_LAUNCH_MENU_COUNT) - 1)
+#define POKEMON_MENUS (EVERY_MENU & ~MENU(NO_POKEMON))
+#define POKEDEX_MENUS (EVERY_MENU & ~MENU(NO_POKEMON) & ~MENU(NO_POKEDEX))
+#define BAG_MENUS (EVERY_MENU & ~MENU(BLACK_TOWER))
+#define CARD_MENUS EVERY_MENU
 
 // The apps, by their index in FIELD_PROC_LINK_LIST (include/field/app_call.h: FIELD_APP_POKELIST 0, FIELD_APP_ZUKAN 1,
 // FIELD_APP_BAG 2, FIELD_APP_TRAINER_CARD 3, FIELD_APP_POKESTATUS 7). The summary is the one the game opens on its own
-// (its param's standalone path in event_field_proclink.c), not through the party list
+// (its param's standalone path in event_field_proclink.c), not through the party list; the menu offers it where it
+// offers the party list
 static const PortLaunchApp sApps[] = {
-    { "party", 0, FLAG_HAS_POKEMON },   { "pokedex", 1, FLAG_HAS_POKEDEX }, { "bag", 2, 0 }, { "card", 3, 0 },
-    { "summary", 7, FLAG_HAS_POKEMON },
+    { "party", 0, POKEMON_MENUS }, { "pokedex", 1, POKEDEX_MENUS }, { "bag", 2, BAG_MENUS },
+    { "card", 3, CARD_MENUS },     { "summary", 7, POKEMON_MENUS },
+};
+
+static const char *const sMenuNames[PORT_LAUNCH_MENU_COUNT] = {
+    "the full menu (type 0)",
+    "the Union Room's menu (type 1), which has no SAVE",
+    "the menu without the Pokédex (type 2, event flag 0x962 clear), which has no POKéDEX",
+    "the menu without a Pokémon (type 3, event flag 0x961 clear), which has no POKéMON and no POKéDEX",
+    "the Royal Unova's menu (type 4), which has no SAVE",
+    "the menu of a season's change (type 5), which has no SAVE",
+    "the Black Tower's and White Treehollow's menu (type 6), which has no BAG",
 };
 
 const PortLaunchApp *port_launch_find_app(const char *name, size_t length) {
@@ -101,4 +116,34 @@ int port_launch_parse(const char *text, PortLaunchSpec *spec, char *error, size_
         }
         start = comma + 1;
     }
+}
+
+PortLaunchMenu port_launch_menu(const PortLaunchPlace *place) {
+    if (place->unionRoom) {
+        return PORT_LAUNCH_MENU_UNION_ROOM;
+    }
+    if (place->royalUnova) {
+        return PORT_LAUNCH_MENU_ROYAL_UNOVA;
+    }
+    if (place->seasonSync) {
+        return PORT_LAUNCH_MENU_SEASON_SYNC;
+    }
+    if (!place->hasPokemon) {
+        return PORT_LAUNCH_MENU_NO_POKEMON;
+    }
+    if (!place->hasPokedex) {
+        return PORT_LAUNCH_MENU_NO_POKEDEX;
+    }
+    if (place->blackTower) {
+        return PORT_LAUNCH_MENU_BLACK_TOWER;
+    }
+    return PORT_LAUNCH_MENU_FULL;
+}
+
+int port_launch_menu_offers(PortLaunchMenu menu, const PortLaunchApp *app) {
+    return (app->menus & (1u << menu)) != 0;
+}
+
+const char *port_launch_menu_name(PortLaunchMenu menu) {
+    return sMenuNames[menu];
 }

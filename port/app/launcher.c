@@ -16,21 +16,36 @@
 // EventFieldAppCall_Create fill them, but for the two calls that need the field (PlayerActionPerms_Create and
 // CalcPlayerActionPossibilities): every field action is blocked and the possibilities are zero, as no field event can
 // follow. It then runs states 11, 12 and 13 as the game has them, one pass each, and reports each app's result instead
-// of opening the field again. Before the apps it does what the menu and the field's close do before an app starts:
-// the menu's choice by a key sets the UI's touch flag to FALSE (func_0203d564), the field's close records the menu's
-// subscreen as the last one (GameData_SetLastSubscreen) and unloads overlay 35 (UnloadFieldGlueOverlay), leaving
-// overlay 12 as the app call has it. The oracle shows both values at the bag's first frame: the touch flag 0 (1 while
-// the menu was open), the last subscreen 1 (0 before the menu). What the field leaves on the screens and in memory
-// (VRAM, palettes, the random numbers) it can't give: the oracle checks declare such differences.
+// of opening the field again.
+//
+// What else it stands in for, through the game's own functions and setters, read from overlay 36's C but never calling
+// it:
+// - the menu's offer: it opens only the apps the save's field menu offers (FieldMenu_GetMenuType's kind of menu, from
+//   the player's zone and two event flags, launcher_spec.c), else nothing, with status 2;
+// - the menu's choice by a key, before each app: the UI's touch flag FALSE (func_0203d564, src/ov036/field_menu.c:709),
+//   whatever the last app left it at (an app closed by a touch sets it TRUE);
+// - the field's close, before each app: the menu's subscreen recorded as the last one (GameData_SetLastSubscreen with
+//   1, a constant: the game records what FieldSubscreen_Free returns, src/ov036/fieldmap.c:632, the subscreen the
+//   field closes, the menu's, which the oracle shows as 1), and once, overlay 35 unloaded (UnloadFieldGlueOverlay),
+//   leaving overlay 12 as the app call has it.
+// The oracle shows both values at the bag's first frame: the touch flag 0 (1 while the menu was open), the last
+// subscreen 1 (0 before the menu). What the field leaves on the screens and in memory (VRAM, palettes, the random
+// numbers) it can't give: the oracle checks declare such differences.
 //
 // It never calls or queues overlay 36's code, which is under another contributor's claim upstream (issue #83). It
 // reads one thing of it: whether FIELDMAP_PROC_FUNCS is still a trap placeholder (port/hal/trap.h). When it isn't, the
 // launcher steps aside with a notice, the field opens as on the DS, and the launcher's tests fail on that notice.
+//
+// The run's exit status says whether the launch finished (launcher.h's PORT_LAUNCH_STATUS_*): 0 when every app opened
+// and closed, 1 when it didn't (the run ended first, CONTINUE never asked for the field, or an app wanted the field), 2
+// when the save's menu doesn't offer an app.
 #include "types.h"
 #include "app/launcher.h"
 #include "app/launcher_spec.h"
 #include "field/app_call.h"
 #include "field/event_game_clear.h"
+#include "field/player_state.h"
+#include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/ui.h"
 #include "hal/gfl/gfl_frame.h"
@@ -44,8 +59,14 @@
 
 // What src/ov012/itemuse_event.c's CheckFieldActionBlocked gives a blocked field action (FIELD_ACTION_BLOCKED)
 #define ACTION_BLOCKED (-1)
-// The field menu's subscreen, which EventFieldMenu_Callback's state 0 changes to (src/ov012/event_field_menu.c:91)
+// The field menu's subscreen, which EventFieldMenu_Callback's state 0 changes to (src/ov012/event_field_menu.c:91), and
+// which the field's close records as the last one
 #define SUBSCREEN_FIELD_MENU 1
+// The event types after which the field menu does something in the field (EventFieldMenu_Callback): 2, a field move; 3,
+// a field event, such as an item's use; 5, a script. 0 shows the menu again, 1 closes it
+#define EVENT_TYPE_FIELD_MOVE 2
+#define EVENT_TYPE_FIELD_EVENT 3
+#define EVENT_TYPE_SCRIPT 5
 // How many apps FIELD_PROC_LINK_LIST has
 #define APP_COUNT 15
 // How many apps one entry's chain of next apps can go through before the report stops naming them
@@ -59,7 +80,7 @@ static const char *const sAppNames[APP_COUNT] = {
 };
 
 typedef enum LauncherState {
-    // The flags the apps need, then what the menu and the field's close do before the first app
+    // Whether the save's field menu offers the apps, then the field's close
     LAUNCHER_START,
     // Until the entry's frame count
     LAUNCHER_WAIT,
@@ -85,8 +106,12 @@ typedef struct LauncherWork {
 static PortLaunchSpec sSpec;
 static int sConfigured;
 static int sFieldAsked;
+static int sSteppedAside;
 static int sFinished;
 static int sStatus;
+// How many entries have closed, and whether the next one's app is open, for the message when a run ends first
+static size_t sClosed;
+static int sOpen;
 
 int port_launcher_configure(const char *spec) {
     char error[200];
@@ -102,18 +127,31 @@ int port_launcher_configure(const char *spec) {
     return 1;
 }
 
-int port_launcher_finished(int *status) {
-    if (sFinished) {
-        *status = sStatus;
-    }
+int port_launcher_finished(void) {
     return sFinished;
 }
 
-void port_launcher_report_unused(void) {
-    if (sConfigured && !sFieldAsked) {
+int port_launcher_end(void) {
+    if (!sConfigured) {
+        return PORT_LAUNCH_STATUS_DONE;
+    }
+    if (sFinished) {
+        return sStatus;
+    }
+    if (!sFieldAsked) {
         fprintf(stderr, "port: --launch: the game never asked for the field, so no app was opened (the launcher "
                         "starts after CONTINUE)\n");
+    } else if (sSteppedAside) {
+        fprintf(stderr, "port: --launch: no app was opened: the launcher stepped aside\n");
+    } else {
+        fprintf(stderr, "port: --launch: the run ended before the launch did:");
+        for (size_t i = sClosed; i < sSpec.count; i++) {
+            fprintf(stderr, "%s %s %s", i == sClosed ? "" : ",", sSpec.entries[i].app->name,
+                    i == sClosed && sOpen ? "still open" : "not opened");
+        }
+        fprintf(stderr, "\n");
     }
+    return PORT_LAUNCH_STATUS_UNFINISHED;
 }
 
 static void Finish(int status) {
@@ -147,25 +185,37 @@ static void StartEntry(LauncherWork *launch, GameEvent *event, size_t entry) {
     for (int i = 0; i < PLAYER_ACTION_COUNT; i++) {
         PlayerActionPerms_SetActionBlocked(&work->perms, (u32)i, ACTION_BLOCKED);
     }
-    // The field's close records the subscreen it frees, the menu's, before each app (src/ov036/fieldmap.c:632)
+    // The menu's choice of the app by a key (src/ov036/field_menu.c:709, after EventFieldMenu_Create's TRUE in
+    // src/ov012/event_field_menu.c), whatever the last app left the flag at, and the field's close, which records the
+    // subscreen it frees, the menu's (src/ov036/fieldmap.c:632)
+    func_0203d564(FALSE);
     GameData_SetLastSubscreen(GSYS_GetGameData(input->gameSystem), SUBSCREEN_FIELD_MENU);
 
     launch->entry = entry;
     launch->chainLength = 0;
 }
 
-// Whether the save has what the field menu needs to offer each app (src/ov036/field_menu.c's FieldMenu_GetMenuType,
-// read, not called); says which is missing
-static int SaveOffersApps(GameData *gameData) {
+// Whether the field menu the save gets offers each app: the kind of menu FieldMenu_GetMenuType gives
+// (src/ov036/field_menu.c:480-496, read, not called) from what it asks, as FieldMenu_Create asks it; says which isn't
+static int SaveOffersApps(GameSystem *gsys) {
+    GameData *gameData = GSYS_GetGameData(gsys);
     EventWork *eventWork = GameData_GetEventWork(gameData);
+    u16 zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
+    PortLaunchPlace place;
+    PortLaunchMenu menu;
 
+    place.unionRoom = GetZoneIsUnionRoom(zoneId) || IsZone150Or151(zoneId);
+    place.royalUnova = IsZoneRoyalUnova(zoneId) != FALSE;
+    place.seasonSync = GameData_IsForceSeasonSync(gameData) != FALSE;
+    place.hasPokemon = EventWork_FlagGet(eventWork, 0x961) != FALSE;
+    place.hasPokedex = EventWork_FlagGet(eventWork, 0x962) != FALSE;
+    place.blackTower = IsZoneBlackTowerOrWhiteTreehollow(zoneId) != FALSE;
+    menu = port_launch_menu(&place);
     for (size_t i = 0; i < sSpec.count; i++) {
         const PortLaunchApp *app = sSpec.entries[i].app;
-        if (app->flag != 0 && !EventWork_FlagGet(eventWork, (u16)app->flag)) {
-            fprintf(stderr,
-                    "port: --launch: %s: the field menu doesn't offer it in this save (event flag 0x%x is "
-                    "clear: %s)\n",
-                    app->name, app->flag, app->flag == 0x961 ? "no Pokémon yet" : "no Pokédex yet");
+        if (!port_launch_menu_offers(menu, app)) {
+            fprintf(stderr, "port: --launch: %s: the field menu doesn't offer it in this save, which gets %s\n",
+                    app->name, port_launch_menu_name(menu));
             return 0;
         }
     }
@@ -192,14 +242,12 @@ static GameEventReturnCode Launcher_Callback(GameEvent *event, u32 *state, void 
 
     switch (*state) {
     case LAUNCHER_START:
-        if (!SaveOffersApps(GSYS_GetGameData(gsys))) {
-            Finish(2);
+        if (!SaveOffersApps(gsys)) {
+            Finish(PORT_LAUNCH_STATUS_NOT_OFFERED);
             *state = LAUNCHER_DONE;
             break;
         }
-        // The field menu's choice by a key (src/ov036/field_menu.c:709, after EventFieldMenu_Create's TRUE in
-        // src/ov012/event_field_menu.c), and the field's close (src/system/field_event.c:86)
-        func_0203d564(FALSE);
+        // The field's close (src/system/field_event.c:86)
         UnloadFieldGlueOverlay();
         StartEntry(launch, event, 0);
         *state = LAUNCHER_WAIT;
@@ -218,7 +266,7 @@ static GameEventReturnCode Launcher_Callback(GameEvent *event, u32 *state, void 
         if (FIELD_PROC_LINK_LIST[work->appId].functions == NULL) {
             fprintf(stderr, "port: --launch: %s asked for %s, which runs in the field: the launcher stops here\n",
                     sSpec.entries[launch->entry].app->name, sAppNames[work->appId]);
-            Finish(1);
+            Finish(PORT_LAUNCH_STATUS_UNFINISHED);
             *state = LAUNCHER_DONE;
             break;
         }
@@ -234,6 +282,7 @@ static GameEventReturnCode Launcher_Callback(GameEvent *event, u32 *state, void 
         if (launch->chainLength < CHAIN_MAX) {
             launch->chain[launch->chainLength++] = work->appId;
         }
+        sOpen = 1;
         *state = LAUNCHER_RUNNING;
         break;
     case LAUNCHER_RUNNING:
@@ -260,18 +309,21 @@ static GameEventReturnCode Launcher_Callback(GameEvent *event, u32 *state, void 
             work->appParam = NULL;
         }
         Report(launch, port_gfl_frame_count());
-        // The field menu acts on event types 2 (a field move), 3 (a field event, such as an item's use) and 5 (a
-        // script) in the field, which the launcher can't open; 0 shows the menu again and 1 closes it
-        if (launch->input.eventType == 2 || launch->input.eventType == 3 || launch->input.eventType == 5) {
+        sClosed = launch->entry + 1;
+        sOpen = 0;
+        // What the field menu does next in the field, the launcher can't do: the launch ends there, unfinished, the
+        // DS's next steps not taken
+        if (launch->input.eventType == EVENT_TYPE_FIELD_MOVE || launch->input.eventType == EVENT_TYPE_FIELD_EVENT ||
+            launch->input.eventType == EVENT_TYPE_SCRIPT) {
             fprintf(stderr, "port: --launch: event type %u needs the field: the launcher stops here\n",
                     (unsigned)launch->input.eventType);
-            Finish(0);
+            Finish(PORT_LAUNCH_STATUS_UNFINISHED);
             *state = LAUNCHER_DONE;
         } else if (launch->entry + 1 < sSpec.count) {
             StartEntry(launch, event, launch->entry + 1);
             *state = LAUNCHER_WAIT;
         } else {
-            Finish(0);
+            Finish(PORT_LAUNCH_STATUS_DONE);
             *state = LAUNCHER_DONE;
         }
         break;
@@ -291,6 +343,7 @@ int port_launcher_take_field_open(struct GameEvent *event) {
     if (!port_trap_is_placeholder(&FIELDMAP_PROC_FUNCS)) {
         fprintf(stderr, "port: --launch steps aside: overlay 36's FIELDMAP_PROC_FUNCS has C, so the field opens as on "
                         "the DS; retire the launcher (ADR 0012)\n");
+        sSteppedAside = 1;
         return 0;
     }
     // On HEAPID_GAMEEVENT, as every event (src/system/game_event.c)
