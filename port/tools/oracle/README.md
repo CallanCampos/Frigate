@@ -385,6 +385,22 @@ of the 245 allowed, nearly all on polygon edges (their coverage and fill). Insid
 didn't until the rasterizer took the values along an edge by line, as melonDS does, where it had taken them along an
 X-major edge's run, which put whole spans' colours a step apart (before, a median of 79 and at most 172).
 
+## Saves
+
+**The format.** A save of BW2 is the cartridge's backup chip, a 4 Mbit flash, and melonDS's `.sav` of the game and
+the port's save file (`port/hal/card/port_card.h`) are both that chip's 524,288 bytes, with nothing before or after
+them, so a save moves between the two by copying the file under the other's name. The evidence, in the pinned melonDS
+1.1's sources (`<build>/_deps/melonds-1.1-src/src`):
+
+- `ROMList.cpp` gives the game codes `IREO` (`0x4F455249`) and `IRDO` (`0x4F445249`) save type 6, and
+  `NDSCart.cpp`'s `CartRetail` makes type 6 a flash (`SRAMType` 3) of `512*1024` bytes (`sramlengths`). A save of
+  that length becomes the chip's memory as it is; one of another length is cut, or padded with 0xff, without a word.
+- The frontend reads the whole `.sav` as that memory (`EmuInstance.cpp`, the cart's `SRAM`) and writes the memory to
+  the `.sav` whole after a write (`SaveManager.cpp`). melonDS names the file after the ROM's, next to it or in its
+  save folder; the port names its own after the game code (`IREO.sav`, `IRDO.sav`) in its save directory.
+- `pbw-oracle --save` hands melonDS a file's bytes the same way, and `--save-out` writes `GetNDSSave()`, the same
+  memory, so a save the oracle writes is a melonDS `.sav`.
+
 ## Integration
 
 What the port needs to compare itself frame by frame:

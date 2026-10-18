@@ -3,7 +3,9 @@
 // the INIT handshake, the identification of the 4 Mbit flash, the flash's reads, page writes, programs, verifies and
 // erases on the command block, memory the ARM7 can't reach, and the save file: written whole and atomically, once a
 // frame passes without a write or every 60 frames of writes, read back, and never overwritten when it isn't an image;
-// a write that fails is reported once and tried again every 60 frames. Needs no ROM.
+// a write that fails is reported once and tried again every 60 frames. Then other programs' files: a save as melonDS
+// writes it goes through the card layer and back to the file byte for byte, another chip's save and DeSmuME's .dsv are
+// refused with what they are, and a melonDS save under the ROM's name is pointed out. Needs no ROM.
 //
 //   port_card_backup_tests NAME | all
 #include "hal/card/card_internal.h"
@@ -415,6 +417,247 @@ static int TestBadFile(void) {
     return 1;
 }
 
+// --- Files of other programs --------------------------------------------------------------------------------------
+
+// The save directory of the test's save file, made
+static void MakeSaveDirectory(char *dir, size_t size) {
+    snprintf(dir, size, "%s", sSavePath);
+    *strrchr(dir, '/') = '\0';
+    *strrchr(dir, '/') = '\0';
+    mkdir(dir, 0755);
+    snprintf(dir + strlen(dir), size - strlen(dir), "/save");
+    mkdir(dir, 0755);
+}
+
+// Writes a file of size bytes, each byte made by a function of its offset
+static void WriteFile(const char *path, long size, u8 (*byte)(long offset)) {
+    FILE *file = fopen(path, "wb");
+    long i;
+
+    Check(file != NULL, "a file the test makes");
+    if (file == NULL) {
+        return;
+    }
+    for (i = 0; i < size; i++) {
+        fputc(byte(i), file);
+    }
+    fclose(file);
+}
+
+// What a save of the game looks like to the card layer: data in the first 0x4c000 bytes, where BW2 keeps its two
+// copies of the main save, and the rest of the chip erased. The data is a sequence of no meaning that no two offsets
+// share by chance (each 32-bit word of it a step of a linear congruential generator), so that a byte moved, lost or
+// added shows
+static u8 SaveByte(long offset) {
+    u32 word = (u32)(offset / 4) * 1103515245u + 12345u;
+
+    return offset < 0x4c000 ? (u8)(word >> (offset % 4 * 8)) : 0xff;
+}
+
+static u8 ZeroByte(long offset) {
+    (void)offset;
+    return 0;
+}
+
+// The file's bytes, or NULL when it isn't size bytes long
+static u8 *ReadFile(const char *path, long size) {
+    u8 *contents = malloc((size_t)size + 1);
+    FILE *file = fopen(path, "rb");
+    size_t read = 0;
+
+    if (file != NULL) {
+        read = fread(contents, 1, (size_t)size + 1, file);
+        fclose(file);
+    }
+    if (read != (size_t)size) {
+        free(contents);
+        return NULL;
+    }
+    return contents;
+}
+
+// A save another program wrote, as melonDS writes its .sav (the chip's 524,288 bytes and nothing else), in the save
+// directory under the game's name: the game reads it byte for byte through the ARM7's service; the file isn't written
+// while the game only reads; the game's page writes and programs reach the file in place, which stays 524,288 bytes
+// with every other byte as it was; and the next start reads the file back as it was left
+static int TestRoundTrip(void) {
+    char dir[600];
+    struct stat before;
+    struct stat after;
+    u8 *original;
+    u8 *expected;
+    u8 *contents;
+    u8 *image;
+    u32 address;
+    u32 i;
+    int frame;
+    int mismatches = 0;
+
+    Start("round_trip");
+    MakeSaveDirectory(dir, sizeof(dir));
+    WriteFile(sSavePath, PORT_CARD_BACKUP_SIZE, SaveByte);
+    original = ReadFile(sSavePath, PORT_CARD_BACKUP_SIZE);
+    Check(original != NULL && original[0x4bfff] == SaveByte(0x4bfff) && original[0x4c000] == 0xff,
+          "the other program's save is in place");
+    if (original == NULL) {
+        return 1;
+    }
+    Check(stat(sSavePath, &before) == 0, "the save file's state before the run");
+    port_card_set_save_path(sSavePath);
+    IdentifyFlash();
+
+    // The whole chip, read a page at a time as card_backup.c reads it, is the file
+    for (address = 0; address < PORT_CARD_BACKUP_SIZE; address += PORT_CARD_PAGE_SIZE) {
+        memset(sPageBuffer, 0x5a, sizeof(sPageBuffer));
+        sArg.src = address;
+        sArg.dst = PageAddress();
+        sArg.len = PORT_CARD_PAGE_SIZE;
+        if (Request(CARD_REQ_READ_BACKUP) != CARD_RESULT_SUCCESS ||
+            memcmp(sPageBuffer, original + address, PORT_CARD_PAGE_SIZE) != 0) {
+            mismatches++;
+        }
+    }
+    Check(mismatches == 0, "every page reads as the file has it");
+    for (frame = 0; frame < 3 * 60; frame++) {
+        sFrameHook();
+    }
+    Check(stat(sSavePath, &after) == 0 && after.st_ino == before.st_ino && after.st_size == before.st_size,
+          "a save the game only reads isn't written");
+
+    // A page write at the start of the backup copy (0x26000), the last page of the chip, and a program of one byte,
+    // which only clears bits: 0x3c & 0xf0
+    expected = malloc(PORT_CARD_BACKUP_SIZE);
+    memcpy(expected, original, PORT_CARD_BACKUP_SIZE);
+    for (i = 0; i < PORT_CARD_PAGE_SIZE; i++) {
+        sPageBuffer[i] = (u8)(0x80 + i);
+        expected[0x26000 + i] = (u8)(0x80 + i);
+        expected[PORT_CARD_BACKUP_SIZE - PORT_CARD_PAGE_SIZE + i] = (u8)(0x80 + i);
+    }
+    sArg.src = PageAddress();
+    sArg.len = PORT_CARD_PAGE_SIZE;
+    sArg.dst = 0x26000;
+    Check(Request(CARD_REQ_WRITE_BACKUP) == CARD_RESULT_SUCCESS, "a page write");
+    sArg.dst = PORT_CARD_BACKUP_SIZE - PORT_CARD_PAGE_SIZE;
+    Check(Request(CARD_REQ_WRITE_BACKUP) == CARD_RESULT_SUCCESS, "a write of the last page");
+    image = port_card_backup_image();
+    image[0x1000] = 0x3c;
+    expected[0x1000] = 0x30;
+    sPageBuffer[0] = 0xf0;
+    sArg.dst = 0x1000;
+    sArg.len = 1;
+    Check(Request(CARD_REQ_PROGRAM_BACKUP) == CARD_RESULT_SUCCESS, "a program");
+    sFrameHook();
+    sFrameHook();
+    contents = ReadFile(sSavePath, PORT_CARD_BACKUP_SIZE);
+    Check(contents != NULL, "the file is still the chip's 524,288 bytes, with nothing before or after them");
+    Check(contents != NULL && memcmp(contents, expected, PORT_CARD_BACKUP_SIZE) == 0,
+          "it holds the writes, and every other byte as it was");
+
+    // The next start reads it back
+    port_card_set_save_path(sSavePath);
+    Check(memcmp(port_card_backup_image(), expected, PORT_CARD_BACKUP_SIZE) == 0, "the next start reads the file");
+    free(contents);
+    free(expected);
+    free(original);
+    Finish();
+    return 0;
+}
+
+// A file of another chip's size or DeSmuME's .dsv is never overwritten: the program stops (status 65) with a message
+// that says what the file seems to be, which the tests' registrations expect
+static int RefuseFile(long size, u8 (*byte)(long offset), const char *end) {
+    char dir[600];
+    FILE *file;
+
+    Start("refuse");
+    atexit(Finish);
+    MakeSaveDirectory(dir, sizeof(dir));
+    WriteFile(sSavePath, size, byte);
+    if (end != NULL) {
+        file = fopen(sSavePath, "ab");
+        Check(file != NULL, "the file's end");
+        if (file != NULL) {
+            fputs(end, file);
+            fclose(file);
+        }
+    }
+    port_card_set_save_path(sSavePath);
+    port_card_backup_image();
+    printf("  the program went on\n");
+    return 1;
+}
+
+// A save of a 512 Kbit EEPROM, 64 KiB
+static int TestRefuseEeprom(void) {
+    return RefuseFile(0x10000, ZeroByte, NULL);
+}
+
+// DeSmuME's .dsv: the chip, then DeSmuME's footer, which ends with its mark (only the mark matters here)
+static int TestRefuseDsv(void) {
+    return RefuseFile(PORT_CARD_BACKUP_SIZE, SaveByte, "|<--Snip above here: a footer of the test's|-DESMUME SAVE-|");
+}
+
+// Without the game's file, a .sav file of the image's size under another name in the save directory, such as a
+// melonDS save named after the ROM, is named with how to play it; the game starts with a blank backup and the files
+// stay as they were. Files of the port's own naming (the other version's game code), of other sizes or other
+// extensions aren't named
+static int TestOtherSaves(void) {
+    char other[16];
+    const char *names[4] = { "Pokemon Black 2 (USA).SAV", other, "small.sav", "image.bin" };
+    char dir[600];
+    char path[700];
+    char log[700];
+    char line[2048];
+    int named[4] = { 0 };
+    int lines = 0;
+    int saved;
+    u8 *image;
+    u32 i;
+    FILE *file;
+
+    snprintf(other, sizeof(other), "%s.sav", strcmp(port_rom_manifest_game_code, "IREO") == 0 ? "IRDO" : "IREO");
+    Start("other_saves");
+    MakeSaveDirectory(dir, sizeof(dir));
+    for (i = 0; i < 4; i++) {
+        snprintf(path, sizeof(path), "%s/%s", dir, names[i]);
+        WriteFile(path, i == 2 ? 100 : PORT_CARD_BACKUP_SIZE, SaveByte);
+    }
+    snprintf(log, sizeof(log), "%s.log", dir);
+    fflush(stderr);
+    saved = dup(2);
+    Check(freopen(log, "w", stderr) != NULL, "stderr goes to the test's log");
+    port_card_set_save_path(sSavePath);
+    image = port_card_backup_image();
+    fflush(stderr);
+    dup2(saved, 2);
+    close(saved);
+
+    file = fopen(log, "r");
+    while (file != NULL && fgets(line, sizeof(line), file) != NULL) {
+        lines++;
+        for (i = 0; i < 4; i++) {
+            named[i] += strstr(line, names[i]) != NULL;
+        }
+    }
+    if (file != NULL) {
+        fclose(file);
+    }
+    remove(log);
+    Check(lines == 1 && named[0] == 1, "the melonDS save is named, once");
+    Check(named[1] == 0 && named[2] == 0 && named[3] == 0, "and no other file");
+    for (i = 0; i < PORT_CARD_BACKUP_SIZE && image[i] == 0xff; i++) {
+    }
+    Check(i == PORT_CARD_BACKUP_SIZE, "the game starts with a blank backup");
+    Check(FileSize(sSavePath) < 0, "and nothing is written for it");
+    for (i = 0; i < 4; i++) {
+        snprintf(path, sizeof(path), "%s/%s", dir, names[i]);
+        Check(FileSize(path) == (i == 2 ? 100 : PORT_CARD_BACKUP_SIZE), "the files stay as they were");
+        remove(path);
+    }
+    Finish();
+    return 0;
+}
+
 // The save directory: --save-dir, else the user's
 static int TestSavePath(void) {
     static char program[] = "test";
@@ -443,18 +686,31 @@ typedef struct Test {
 } Test;
 
 static const Test sTests[] = {
-    { "init", TestInit },          { "identify", TestIdentify },
-    { "flash", TestFlash },        { "unreachable", TestUnreachable },
-    { "save_file", TestSaveFile }, { "write_failure", TestWriteFailure },
-    { "save_path", TestSavePath }, { "bad_file", TestBadFile },
+    { "init", TestInit },
+    { "identify", TestIdentify },
+    { "flash", TestFlash },
+    { "unreachable", TestUnreachable },
+    { "save_file", TestSaveFile },
+    { "write_failure", TestWriteFailure },
+    { "round_trip", TestRoundTrip },
+    { "other_saves", TestOtherSaves },
+    { "save_path", TestSavePath },
+    { "bad_file", TestBadFile },
+    { "refuse_eeprom", TestRefuseEeprom },
+    { "refuse_dsv", TestRefuseDsv },
 };
+
+// The tests that end the program, which "all" leaves out
+static int IsStopping(int (*run)(void)) {
+    return run == TestBadFile || run == TestRefuseEeprom || run == TestRefuseDsv;
+}
 
 int main(int argc, char **argv) {
     int all = argc < 2 || strcmp(argv[1], "all") == 0;
     int ran = 0;
 
     for (size_t i = 0; i < sizeof(sTests) / sizeof(sTests[0]); i++) {
-        if (all ? sTests[i].run == TestBadFile : strcmp(argv[1], sTests[i].name) != 0) {
+        if (all ? IsStopping(sTests[i].run) : strcmp(argv[1], sTests[i].name) != 0) {
             continue;
         }
         printf("%s\n", sTests[i].name);

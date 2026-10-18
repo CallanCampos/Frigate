@@ -143,13 +143,22 @@ add_executable(port_card_backup_tests
 target_link_libraries(port_card_backup_tests PRIVATE port_decomp_env)
 target_include_directories(port_card_backup_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_card_backup_tests PRIVATE ${port_rom_test_options})
-foreach(test init identify flash unreachable save_file write_failure save_path)
+foreach(test init identify flash unreachable save_file write_failure round_trip other_saves save_path)
     add_test(NAME card_backup_${test} COMMAND port_card_backup_tests ${test})
     set_tests_properties(card_backup_${test} PROPERTIES TIMEOUT 60)
 endforeach()
+# The files the program refuses, each in a process of its own, since the program stops: with what the file seems to be
 add_test(NAME card_backup_bad_file COMMAND port_card_backup_tests bad_file)
 set_tests_properties(card_backup_bad_file PROPERTIES TIMEOUT 60
-    PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes" FAIL_REGULAR_EXPRESSION "went on")
+    PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it is 10 bytes;" FAIL_REGULAR_EXPRESSION "went on")
+add_test(NAME card_backup_refuse_eeprom COMMAND port_card_backup_tests refuse_eeprom)
+set_tests_properties(card_backup_refuse_eeprom PROPERTIES TIMEOUT 60
+    PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it is 65536 bytes, the save of a 512 Kbit EEPROM"
+    FAIL_REGULAR_EXPRESSION "went on")
+add_test(NAME card_backup_refuse_dsv COMMAND port_card_backup_tests refuse_dsv)
+set_tests_properties(card_backup_refuse_dsv PROPERTIES TIMEOUT 60
+    PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it ends with DeSmuME's footer"
+    FAIL_REGULAR_EXPRESSION "went on")
 
 # The file system, the card's ROM reads, the overlays and the backup as the game links them: each scenario on the whole
 # program's objects, with a main() of its own, in a process of its own (the SDK's libraries initialize once a process)
