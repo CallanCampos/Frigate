@@ -568,7 +568,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_flash.c` | `0x021c1bc4`–`0x021c1d88` | 18 | complete | string at `0x021d5544` |
 | `fieldskill_mapeff.c` | `0x021c1d88`–`0x021c1e30` | 9 | complete | string at `0x021d5554` |
 | `fld_wipe_3dobj.c` | `0x021c1e30`–`0x021c2080` | 7 | complete | string at `0x021d5568` |
-| `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | partial | string at `0x021d557c` |
+| `pleasure_boat.c` | `0x021c2080`–`0x021c229c` | 12 | complete | string at `0x021d557c` |
 | `field_slope_slip.c` | `0x021c229c`–`0x021c24b4` | 14 | complete | descriptive |
 | `field_water_current.c` | `0x021c24b4`–`0x021c2788` | 18 | complete | descriptive |
 | `fldeff_d06denki.c` | `0x021c2788`–`0x021c2cbc` | 23 | complete | string at `0x021d558c` |
