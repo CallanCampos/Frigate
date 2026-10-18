@@ -45,13 +45,16 @@ The decomp's progress, from upstream's CI:
 
 | Document | Covers |
 | --- | --- |
+| [Developer overview](../port/README.md) | Building, running and testing Frigate, the map of `port/`, preparing a checkout, syncing |
+| [Architecture](../port/docs/ARCHITECTURE.md) | The layers, how a frame runs, the boundary rules, and the map from each part of the game to its code and tests |
+| [Modding](../port/docs/MODDING.md) | Where the game's logic and data live, how to change and test them, and what the planned mod platform adds |
 | [Plan](../port/docs/PLAN.md) | Goals, architecture, mod design, testing, roadmap, decisions |
-| [Research](../port/docs/RESEARCH.md) | The decomp's state, other ports, modding, technology ([reports](../port/docs/research/)) |
-| [Upstream sync](../port/docs/SYNC.md) | How this repository follows the decomp; the reasons are in [ADR 0001](../port/docs/adr/0001-repository-and-upstream-sync.md) |
 | [Status](../port/docs/STATUS.md) | Progress log |
 | [Game changes](../port/docs/game-changes.md) | Every change the port makes outside `port/` |
-| [Developer overview](../port/README.md) | Building and running Frigate, the layout of `port/`, preparing a checkout, syncing |
+| [Upstream sync](../port/docs/SYNC.md) | How this repository follows the decomp; the reasons are in [ADR 0001](../port/docs/adr/0001-repository-and-upstream-sync.md) |
+| [Research](../port/docs/RESEARCH.md) | The decomp's state, other ports, modding, technology ([reports](../port/docs/research/)) |
 | [Artwork](../port/assets/branding/README.md) | Frigate's logo and app icons: the files, their colours, how the build uses them and how to change them |
+| [All documents](../port/docs/README.md) | Every document, one line each |
 
 ## Relation to pokebw2
 
@@ -64,7 +67,7 @@ ROMs byte for byte (or sit behind a host-only switch).
 
 The decomp builds here exactly as upstream: see the [README](../README.md) and [build details](../docs/building.md).
 `python3 configure.py && ninja` rebuilds both ROMs from your own dumps and checks both SHA1s. Frigate builds with
-CMake, as [port/README.md](../port/README.md#building-frigate) says: `frigate-black2` and `frigate-white2`, and on macOS
+CMake, as [port/README.md](../port/README.md#quick-start) says: `frigate-black2` and `frigate-white2`, and on macOS
 `Frigate Black 2.app` and `Frigate White 2.app`, which you build yourself from your own checkout.
 
 ## For decomp contributors
@@ -80,9 +83,9 @@ templates are upstream's, written for decomp work; a port issue or pull request 
 ## Legal
 
 No ROMs are included, and none will be. Frigate's builds ship no ROM, ROM files or game assets: Frigate reads them from
-your own dump at runtime. The tree carries upstream's `data/`, about 99,500 files converted from the game (text, game
-tables, map models and textures, scripts); Frigate's builds never ship it, and Frigate adds no game data. Frigate is not
-affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.
+your own dump at runtime. The tree carries upstream's `res/`, about 119,000 files, most of them converted from the game
+(text, game tables, map models and textures, scripts); Frigate's builds never ship it, and Frigate adds no game data.
+Frigate is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.
 
 The [GNU GPL v3.0](../LICENSE) license, as upstream, covers the contributors' work and grants no rights to Nintendo's
 data or trademarks. Frigate's logo and icons are original artwork under the same license

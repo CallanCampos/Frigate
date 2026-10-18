@@ -5,36 +5,92 @@
   </picture>
 </p>
 
-# port/
+# Frigate
 
 **Frigate** is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; you
-supply your own ROM. It compiles the decomp's C in this same tree with the platform layer in this directory:
-everything the port adds lives here, and the rest of the tree is the decomp, merged from `fuddlesworth/pokebw2`. The
-plan of record is [docs/PLAN.md](docs/PLAN.md), and the rules for working here are in [CLAUDE.md](CLAUDE.md). Frigate
-is not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.
+supply your own ROM. Frigate is not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.
 
-## Building Frigate
+This directory, `port/`, is Frigate's code. The rest of the repository is the decomp, merged from
+`fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
+doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
-The host build compiles every C file of `src/` and `lib/` with the host's clang into one program, except the files
-[hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are
-trap stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the
-program stops with the name of the first one it reaches. It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or
-later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu, with
+sound, frame for frame against melonDS; New Game's intro runs to the field's first script, and CONTINUE loads a save up
+to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there).
+[docs/STATUS.md](docs/STATUS.md) has the current state.
+
+## Quick start
+
+Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux too. It needs CMake 3.28 or later,
+Ninja, clang, Python 3.11 or later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+Running the game needs your own dump of the ROM. A clone needs the decomp's untracked inputs first:
+[Preparing a checkout](#preparing-a-checkout) has the steps, and places your dumps as `orig/baserom_b2_us.nds` and
+`orig/baserom_w2_us.nds`.
 
 ```sh
-cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cmake --build build/port
-ctest --test-dir build/port --output-on-failure
-build/port/frigate-black2 --headless
+cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo   # configure (Black 2)
+cmake --build build/port                                                 # build build/port/frigate-black2
+build/port/frigate-black2                                                # play, with orig/baserom_b2_us.nds
+build/port/frigate-black2 --rom ~/Games/black2.nds                       # or with a ROM elsewhere
+ctest --test-dir build/port -j4 --output-on-failure                      # test
 ```
 
-`-DPORT_VERSION=w2_us` builds White 2 (`frigate-white2`). The ROM build (below) stays separate and must keep matching
-after every port change; [tools/check_mwcc_neutral.py](tools/check_mwcc_neutral.py) proves a guard-only change to decomp
-files leaves what MWCC compiles unchanged ([docs/game-changes.md](docs/game-changes.md)).
+- **White 2** is a build directory of its own: `cmake -S port -B build/port-w2 -G Ninja -DPORT_VERSION=w2_us`, which
+  makes `frigate-white2`. The other options are in [cmake/README.md](cmake/README.md#options).
+- **The program's options** are in `frigate-black2 --help` and at the top of [app/main.c](app/main.c): `--headless` runs
+  without a window or pacing, `--frames N` stops after N frames, `--screenshot PATH` writes both screens at the end,
+  `--save-dir PATH` keeps the saves elsewhere, `--input FILE` plays a replay.
+- **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
+- **The ROM build stays as upstream's:** `python3 configure.py && ninja` rebuilds both ROMs from your dumps and checks
+  both SHA1s. Every change to this repository ends with it, since Frigate's changes must leave the ROMs byte for byte
+  ([CLAUDE.md](CLAUDE.md#how-the-root-rules-apply-here)).
 
-**Where it stands:** the game boots natively through its logos, the title screen and the start menu, with sound;
-New Game's intro runs to the field's first script, and CONTINUE loads a save up to the field, which waits for the
-decomp's overlay 36 (a trap stub stops the game there). [docs/STATUS.md](docs/STATUS.md) has the current state.
+The host build compiles every C file of `src/` and `lib/` with the host's clang into one program, except the files
+[hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are trap
+stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the program
+stops with the name of the first one it reaches.
+
+## Directory map
+
+Each directory has a guide that lists its files: what each does, the part of the game it touches and its tests.
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) shows how they fit together.
+
+| Directory | What it is | Guide |
+| --- | --- | --- |
+| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory, the macOS app's scripts | [app/README.md](app/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves, sound, touch, the clock, power, input) | [hal/README.md](hal/README.md) |
+| `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
+| `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
+| `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
+| `cmake/` | The host build's fragments, one per module, with its tests, and the build's options | [cmake/README.md](cmake/README.md) |
+| `tests/` | Unit, integration, replay and oracle tests, one directory per module | [tests/README.md](tests/README.md) |
+| `tools/` | The build's generators, the upstream sync, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
+| `assets/` | Files that aren't code and never game data: Frigate's logo and app icons | [assets/README.md](assets/README.md) |
+| `spikes/` | Phase 0's experiments, frozen; the live code took their answers | [spikes/README.md](spikes/README.md) |
+| `docs/` | The plan, the architecture, modding, the status log, the decisions, the research | [docs/README.md](docs/README.md) |
+| [CMakeLists.txt](CMakeLists.txt) | The host build: the decomp's C and `port/` linked into one program | |
+| [CLAUDE.md](CLAUDE.md) | The rules for working on Frigate | |
+
+[PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
+`third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
+`port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
+(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests); any other change outside
+`port/` is a game change listed in [docs/game-changes.md](docs/game-changes.md).
+
+## Where to go next
+
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md):** the layers, how a frame runs, the rules at the boundaries, and the
+  feature map from each part of the game to its code and tests.
+- **[docs/MODDING.md](docs/MODDING.md):** where the game's logic and data live, how to find and change the code for a
+  feature, and what the planned mod platform will add.
+- **[docs/GLOSSARY.md](docs/GLOSSARY.md):** the DS's, the SDK's and Frigate's words.
+- **[CLAUDE.md](CLAUDE.md):** the rules for every change: where to work, changes outside `port/`
+  ([docs/game-changes.md](docs/game-changes.md)), testing, keeping up with upstream.
+- **[docs/PLAN.md](docs/PLAN.md):** the plan of record, with the roadmap; **[docs/STATUS.md](docs/STATUS.md):** where
+  Frigate stands, newest first.
+- **[docs/README.md](docs/README.md):** every document, one line each.
+
+## Playing
 
 ### Controls
 
@@ -56,6 +112,33 @@ With several, the first to press something drives the game until it lets go of e
 something takes over. Eight are open at once; a ninth waits until one of them is disconnected.
 [app/present.c](app/present.c)'s header has the same table, and the gamepad's controls are one table in
 [app/gamepad.c](app/gamepad.c) that a settings file will be able to replace.
+
+### Saves
+
+The game's save is the cartridge's 4 Mbit flash chip, kept as a file of its 524,288 bytes in the save directory
+(`--save-dir PATH`, else `~/Library/Application Support/Frigate` on macOS, `~/.local/share/Frigate` (or
+`$XDG_DATA_HOME/Frigate`) on Linux, `%APPDATA%\Frigate` on Windows), named after the ROM's game code: `IREO.sav` for
+Black 2 (US), `IRDO.sav` for White 2 (US). It is the same file as melonDS's `.sav` of the game and a cartridge dump's,
+byte for byte:
+
+- **From melonDS:** copy its `.sav` (named after the ROM's file, next to the ROM or in melonDS's save folder) into the
+  save directory as `IREO.sav` or `IRDO.sav`. Copied under its own name, the port points it out and doesn't use it.
+- **To melonDS:** copy `IREO.sav` or `IRDO.sav` next to the ROM under the ROM's name with `.sav` (`Pokemon Black 2.nds`
+  takes `Pokemon Black 2.sav`), or into melonDS's save folder.
+- **One save for both** (macOS and Linux): make `IREO.sav` or `IRDO.sav` a symbolic link to melonDS's `.sav`. The port
+  reads that file and writes the game's saves into it, and the link stays a link.
+
+A file of another size is refused, never overwritten, with what it seems to be: another chip's save by its size,
+DeSmuME's `.dsv`, which has DeSmuME's own data after the image, this chip's image padded with 0xff (keep its first
+524,288 bytes), or a directory. The port writes the file whole, through a temporary file renamed over it, a frame
+after the game's writes end, and never writes a save the game only reads.
+
+A save also holds the console it was last played on: its clock offset and MAC address. The port's console has offset 0,
+as melonDS's does, so saves move between the two as they are. A save from a DS whose owner once set its clock holds
+another offset: on CONTINUE the game then takes the clock for changed, as on that DS after a change of its clock, and
+starts a day's wait for its daily events; the next save takes the port's console. Taking the save's console on import
+instead is still to come (PLAN.md's D7 sidecar). [hal/card/port_card.h](hal/card/port_card.h) has the details and the
+oracle's README the evidence ([tools/oracle/README.md](tools/oracle/README.md#saves)).
 
 ### The macOS app
 
@@ -126,84 +209,6 @@ copied from another Mac) is quarantined, and macOS 15 and later block it until y
 
 From then on the app opens normally. On macOS 14 and earlier, Control-clicking the app and choosing **Open** does the
 same. Do this only for an app whose source you trust.
-
-## Saves
-
-The game's save is the cartridge's 4 Mbit flash chip, kept as a file of its 524,288 bytes in the save directory
-(`--save-dir PATH`, else `~/Library/Application Support/Frigate` on macOS, `~/.local/share/Frigate` (or
-`$XDG_DATA_HOME/Frigate`) on Linux, `%APPDATA%\Frigate` on Windows), named after the ROM's game code: `IREO.sav` for
-Black 2 (US), `IRDO.sav` for White 2 (US). It is the same file as melonDS's `.sav` of the game and a cartridge dump's,
-byte for byte:
-
-- **From melonDS:** copy its `.sav` (named after the ROM's file, next to the ROM or in melonDS's save folder) into the
-  save directory as `IREO.sav` or `IRDO.sav`. Copied under its own name, the port points it out and doesn't use it.
-- **To melonDS:** copy `IREO.sav` or `IRDO.sav` next to the ROM under the ROM's name with `.sav` (`Pokemon Black 2.nds`
-  takes `Pokemon Black 2.sav`), or into melonDS's save folder.
-- **One save for both** (macOS and Linux): make `IREO.sav` or `IRDO.sav` a symbolic link to melonDS's `.sav`. The port
-  reads that file and writes the game's saves into it, and the link stays a link.
-
-A file of another size is refused, never overwritten, with what it seems to be: another chip's save by its size,
-DeSmuME's `.dsv`, which has DeSmuME's own data after the image, this chip's image padded with 0xff (keep its first
-524,288 bytes), or a directory. The port writes the file whole, through a temporary file renamed over it, a frame
-after the game's writes end, and never writes a save the game only reads.
-
-A save also holds the console it was last played on: its clock offset and MAC address. The port's console has offset 0,
-as melonDS's does, so saves move between the two as they are. A save from a DS whose owner once set its clock holds
-another offset: on CONTINUE the game then takes the clock for changed, as on that DS after a change of its clock, and
-starts a day's wait for its daily events; the next save takes the port's console. Taking the save's console on import
-instead is still to come (PLAN.md's D7 sidecar). [hal/card/port_card.h](hal/card/port_card.h) has the details and the
-oracle's README the evidence ([tools/oracle/README.md](tools/oracle/README.md#saves)).
-
-## Directory map
-
-The layout from [PLAN.md §4.3](docs/PLAN.md#43-directory-structure). Entries marked **now** exist; the rest are
-planned and appear as their phase starts.
-
-```
-port/
-  README.md              now      this overview
-  CLAUDE.md              now      rules for sessions working on the port
-  CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
-  app/                   now      main(), SDL3 window and its icon, gamepads, macos/ (the app's Info.plist and the
-                                  scripts that make its icon and build it); see app/README.md. Later screen layouts,
-                                  settings, paths, first-launch ROM setup
-  assets/                now      files that aren't code, never game data (see assets/README.md)
-    branding/            now      Frigate's mark, logo and app icons, drawn by tools/frigate_logo.py
-  include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
-  hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
-    os/ pxi/ hw/ gx/ dma/ mi/ fx/ math/ crypto/ rom/ card/ fs/ nvram/ rtc/ pm/ tp/ mic/ ctrdg/ reset/ input/
-    snd7/ (the ARM7's sound driver) nnsys/ (NitroSystem: 2D files in host structs) gfl/ dwc/ stubs/
-    replaced.txt                  SDK source files the host build compiles from hal/ instead of lib/
-  gfx/                   phase 1  ref/ (CPU reference renderers), ge/ (geometry engine), gpu/ (SDL_GPU), shaders/
-  audio/                 phase 2  SDL3 audio output, resampling, mic input
-  vfs/                   phase 1  ROM reader, SHA1 manifest, layered mounts, NARC member overrides
-  save/                  phase 4  save image plus sidecar JSON for port and mod data
-  mod/                   phase 6  mod loader, manifest, hook bus, events, data registries, Lua runtime
-  features/              phase 6  built-in enhancements: widescreen/ randomizer/ fastforward/ hd/ qol/
-  net/                   phase 7  GFL network device over UDP, LAN discovery, relay client
-  ui/                    phase 6  ImGui menus and debug views
-  tests/                 phase 1  unit tests, replay tests, golden hashes, oracle comparisons
-  tools/                 now      measurement scripts, sync and bootstrap scripts (see tools/README.md)
-    progress/            now      port readiness of the decomp: tiers per function, data, pace, claims
-    compile-probe/       now      host-compiler probe: 64-bit warnings and struct layouts
-    research/            now      one-off research scripts and the NitroFS SHA1 manifest
-    sync_upstream.sh     now      merge upstream and verify both ROMs and the host build
-    package_macos.sh     now      the macOS app, signed ad hoc, in a disk image
-    bootstrap_checkout.sh now     prepare a new clone or worktree for the ROM build and Claude Code
-    hooks/port_guard.py  now      Claude Code hook that refuses writes to upstream and the decomp fork
-    gen_host_tree.py     now      source list, include/ mirror without MSL's libc headers, generated constants
-    gen_stubs.py         now      trap stubs and data placeholders for symbols with no C yet
-    gen_window_icon.c    now      the window's icon on Linux and Windows, from the version's icon master
-    check_mwcc_neutral.py now     proves a guard-only change to decomp files neutral under MWCC (preprocessed text)
-    oracle/              phase 1  melonDS test harness (a test tool, never linked into the port)
-  docs/                  now      plan, research, sync guide (SYNC.md), status log, ADRs, game-change ledger
-  third_party/           phase 0  pinned dependencies (SDL3, Dear ImGui, Lua, minicoro, ...)
-```
-
-PLAN.md also places sample mods in `mods/examples/` at the repository root (phase 6). Outside `port/`, the port's
-own files are `.github/README.md`, `.github/workflows/port-sync.yml` (the hourly upstream merge) and
-`.github/workflows/port-ci.yml` (the host build and tests); any other change outside `port/` is a game change listed in
-[docs/game-changes.md](docs/game-changes.md).
 
 ## Preparing a checkout
 
@@ -340,16 +345,3 @@ when one stops.
 
 Why the repository works this way is [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md). Record each local sync
 in [docs/STATUS.md](docs/STATUS.md).
-
-## Documents
-
-| Document | Covers |
-| --- | --- |
-| [docs/PLAN.md](docs/PLAN.md) | Goals, architecture, mod design, testing, roadmap: the plan of record |
-| [docs/RESEARCH.md](docs/RESEARCH.md) | Findings behind the plan; full reports in [docs/research/](docs/research/README.md) |
-| [docs/SYNC.md](docs/SYNC.md) | How the port follows upstream: the hourly Action, the local sync, conflicts |
-| [docs/STATUS.md](docs/STATUS.md) | Status log, newest first, one entry per local sync or finished task |
-| [docs/game-changes.md](docs/game-changes.md) | Every change the port makes outside `port/` |
-| [docs/adr/](docs/adr/README.md) | Architecture decision records |
-| [tools/README.md](tools/README.md) | The measurement scripts and how to run them |
-| [CLAUDE.md](CLAUDE.md) | Rules for Claude sessions working on the port |

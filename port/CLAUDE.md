@@ -46,7 +46,14 @@ the game each piece touches, for the modders who come later.
   it does without opening another.
 - **A new module gets its row in its directory's guide and in the architecture map**, in the same commit as the
   module: the guide is the directory's `README.md` (created with the directory's first module where there is none
-  yet), and the architecture map is [README.md](README.md)'s directory map.
+  yet), and the architecture map is the feature map of [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#feature-map), in
+  the row of the game functionality the module serves. A new directory also gets its line in [README.md](README.md)'s
+  directory map, a new document its line in [docs/README.md](docs/README.md), and a new term its row in
+  [docs/GLOSSARY.md](docs/GLOSSARY.md).
+- **Where a reader starts:** [README.md](README.md) (the front door and the directory map),
+  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (the layers, a frame, the feature map) and
+  [docs/MODDING.md](docs/MODDING.md) (changing the game today, and the mod platform to come). Keep them true when the
+  code they describe changes.
 
 ## Where to work
 

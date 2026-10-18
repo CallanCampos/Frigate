@@ -26,10 +26,66 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Frigate's code mapped for modders
+
+- **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
+- **Port:** `260640953` (the files' comments) and `PORT_SHA` (the guides, with this entry), on the branch
+  `frigate-identity`, after `687134df4`.
+- **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed but the port's own
+  `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, in the last entry's build directories. The comment
+  of `port_host.h`, which every decomp file includes, recompiled all of the decomp's C: no warning in port code; the
+  decomp's own files give 263, the same in each version (`-Wswitch` and the like), which only a full rebuild of them
+  shows. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6: Black 2, all 237 `ctest` tests pass (`ctest -j4`, 369 s, the oracle's included), none skipped;
+    White 2, all 235 (360 s), none skipped. No test changed.
+  - The documents: every relative link of the Markdown files this task touched resolves, anchors as GitHub makes
+    them included, and every test name, repository path and file name the new documents cite exists (checked by
+    script). The code changes are comments only (every changed line of C and CMake is a comment; the Python files
+    only gained docstrings and still parse). clang-format 23.1.3 is clean on every changed C file but four spike
+    files, which were not formatted before and have the same count of differences after.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version, as in the last entry.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** the user asked that Frigate's code be easy for modders and new developers to find their way in; this
+  task maps it, from a survey of the tree.
+  - port/README.md is the front door: what Frigate is, where it stands, a quick start (build, run, test, White 2, the
+    options, the ROM build), a directory map with one line and one guide per directory, and where to go next. The
+    controls, saves, the macOS app, preparing a checkout and syncing follow as they were; the planned layout of
+    PLAN.md §4.3 is one line.
+  - New in port/docs: ARCHITECTURE.md (the layers, the build, the boot, one frame with the threads and the frame hooks
+    in their order, the exit statuses, the boundary rules with their ADRs, and the feature map from each part of the
+    game to the decomp's files, the port's modules and the tests), MODDING.md (where the game lives, that the checked
+    ROM keeps data mods for the file layers to come, finding a feature's code, the three kinds of game change,
+    adding an option, testing with replays and the oracle, and what phase 6 will add, marked as not built),
+    GLOSSARY.md and README.md, the index of every document.
+  - Directory guides for `hal/` (a row per module with the SDK module it replaces, the four ways a decomp file is
+    adapted, the names, and the headers named apart from their files), `gfx/`, `audio/`, `include/`, `cmake/` (every
+    build option), `tests/` (which tests need the ROM) and `spikes/`; `tools/` is rewritten to cover every tool, and
+    `app/` has a tests column. Each spike's README and each spike copy of live code say they are frozen.
+  - Every C, header, Python, shell and CMake file under `port/` opens with what it does and the part of the game it
+    touches: the short or missing headers are written, the research scripts' docstrings among them (`manifest.py` wrote
+    the NitroFS manifest every build reads), stale comments corrected (`arm7.c`'s null sound driver, `hw.c`'s timers and
+    VRAM windows, `os_init.c`, `main.c`'s usage, `present.c`, `tp_host.h`, `integrate.cmake`, `CMakeLists.txt`'s
+    options, `port_os.h`'s frame hooks, now in their real order), and the long functions the survey found uncommented
+    commented, except the sound driver's `Execute`, left to the sound track working in `hal/snd7`.
+  - port/CLAUDE.md: the architecture map of the readability rule is ARCHITECTURE.md's feature map; a new directory,
+    document or term also gets its line in the directory map, the documents' index or the glossary. The landing page
+    links the new documents and its legal note names upstream's `res/`, which replaced `data/`.
+  - Found: port/CLAUDE.md, PLAN.md §4.8 and game-changes.md name `include/platform.h` as the one header that decides
+    between MWCC and a host, but there is no such file: the host build defines `PLATFORM_PC` on the compiler's command
+    line (`port_decomp_env`, port/CMakeLists.txt). The new documents say so; the rule's text is unchanged.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
+  sound driver's and the launcher's modules get their rows in the guides and the feature map when they merge.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-18: Frigate's logo and icons
 
 - **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `a92bb98d9`.
+- **Port:** `687134df4`, on the branch `frigate-identity`, after `a92bb98d9`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). Nothing outside `port/` changed but the port's own
   `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.
 - **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, reconfigured in the last entry's build directories,
