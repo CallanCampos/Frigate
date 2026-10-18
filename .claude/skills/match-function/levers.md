@@ -285,7 +285,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A static's member loaded above a store through an unknown index into another static, or below it: ARM code
   moves the load up only when its offset is below half the object's size, and below the size less the offset of a
   higher member read earlier; a store moves above an access through a pointer by the same bound. The store, too, must
-  be in the lower half of its own object; an unknown index counts as 0. (matching.md: "below half the object's size")
+  be in the lower half of its own object; an unknown index counts as 0. A store kept below one through a pointer, as
+  in the original, can need its field in the upper half of a smaller struct. (matching.md: "below half the object's
+  size")
 - A struct field's load above an indexed store that its offset can't give: the fields are separate statics, each at
   offset 0 of its own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its
   own object")

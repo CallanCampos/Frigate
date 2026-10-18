@@ -1170,7 +1170,10 @@ Same instructions, scheduled in another order.
   moves and the function matches. Its `EncodeNextFrame`, which reads the codec (0x1c) first, moved the store
   `sAudio.needsSync = FALSE` (8) above the `packet->codec` store into the send queue while it was a field, and
   fields at 4 and 0xc in its place moved too, while those at 0x14 and 0x18 stayed; the static `sNeedsSync` stays
-  last, as in the original.
+  last, as in the original. `VCT_InitSessions` (`vct_session.c`) keeps its zero store into `sSessionState.mask`
+  (offset 4) below the store through the free list's last link only with the state an 8-byte struct of `count` and
+  `mask` and the request time a `u64` static beside it, which `-ipa file` pools right after the state; with the time
+  as the state's third field, the store moves above the link's.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -2763,7 +2766,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
   apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`, and
-  `dwc_auth.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent.
+  `dwc_auth.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent. libVCT's `vct_session.c` has its four
+  66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With

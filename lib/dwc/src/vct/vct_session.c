@@ -24,8 +24,6 @@ struct VCTSessionState {
     // How many machines are in the voice chat, and which
     int count;
     u32 mask;
-    // When the last request was sent, or 0
-    u64 requestTime;
 };
 
 static VCTSession *AllocFromPool(u8 aid);
@@ -56,6 +54,11 @@ static const u8 sDirectEvents[7] = { 7, 12, 2, 3, 9, 2, 0 };
 // What a control packet does to a machine in each state (a row each), by the command (a column each: those of a
 // broadcast packet, then those of a direct one): the next state, -1 to take no notice, or -2 to refuse. The first two
 // tables are for when the packet is a reply, the others for when it is a request, one of each for the first mode.
+static const s8 sReplyTableMode1[6][11] = {
+    { 4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0 },
+    { -2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1 },  { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1 },
+    { -2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1 },
+};
 static const s8 sReplyTableOther[6][11] = {
     { -2, -2, -2, 3, -1, -1, 0, -1, -1, -1, -1 },   { -2, -2, -2, -3, -1, 2, 0, 0, 0, -1, 0 },
     { -2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1 }, { -2, 0, -2, -3, -1, -1, -1, -1, -1, -1, -1 },
@@ -71,16 +74,13 @@ static const s8 sCheckTableOther[6][11] = {
     { -2, 5, -2, -2, -1, -2, 0, -2, -2, -2, -2 }, { -2, -2, -2, -2, -1, -2, 0, -2, -2, -2, -2 },
     { -2, -2, -2, -2, -1, 3, 0, 0, 0, -2, 0 },    { -2, -2, -2, -2, -1, 0, 0, -2, -2, 0, -2 },
 };
-static const s8 sReplyTableMode1[6][11] = {
-    { 4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0 },
-    { -2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1 },  { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1 },
-    { -2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1 },
-};
 
 // How long to wait for an answer, in clock ticks
 static u64 sRequestTimeout = 15709687;
 
 static VCTSessionPool sSessionPool;
+// When the last request was sent, or 0
+static u64 sRequestTime;
 static VCTSessionState sSessionState;
 
 VCTSession *VCT_AllocSession(u8 aid) {
@@ -273,13 +273,13 @@ void VCT_CheckTimeout(void) {
     if (gVCTSettings.unkC == 0) {
         return;
     }
-    if (sSessionState.requestTime == 0) {
+    if (sRequestTime == 0) {
         return;
     }
-    if (now - sSessionState.requestTime <= sRequestTimeout) {
+    if (now - sRequestTime <= sRequestTimeout) {
         return;
     }
-    sSessionState.requestTime = 0;
+    sRequestTime = 0;
     sSessionPool.host.active = 0;
     sSessionPool.host.state = 0;
     BroadcastCommand(0);
@@ -625,10 +625,10 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
     }
     if (result->event == 10) {
         BroadcastCommand(1);
-        sSessionState.requestTime = OS_GetTick();
+        sRequestTime = OS_GetTick();
     } else {
         BroadcastCommand(0);
-        sSessionState.requestTime = 0;
+        sRequestTime = 0;
     }
     return TRUE;
 }
