@@ -179,8 +179,8 @@ set_tests_properties(card_backup_refuse_directory PROPERTIES TIMEOUT 60
 # infrared chip (port/hal/card/card_spi.c) as the game links them: each scenario on the whole program's objects, with
 # a main() of its own, in a process of its own (the SDK's libraries initialize once a process)
 add_executable(port_rom_tests
-    tests/rom/test_rom.c $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    tests/rom/test_rom.c $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher>
+    ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_rom_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_rom_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_rom_tests PRIVATE ${port_rom_test_options})

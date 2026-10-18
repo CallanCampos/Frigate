@@ -26,10 +26,44 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Frigate's test launcher for the field menu's apps (ADR 0012, proposed), on a branch of its own
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `cc281af40` (`port-launch`). The branch waits for
+  the user's decision on ADR 0012 and isn't pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `src/ov035/event_mapchange.c` gets a guard-only
+  block (a Platform row of `game-changes.md`): `check_mwcc_neutral.py` finds 3,142 of 3,146 file and version pairs
+  identical to `045e97b90`, this file among them, the other four being `src/system/vm.c`'s and
+  `src/ov012/event_field_proclink.c`'s Neutral rows.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** measured on this code as first committed (`9be56a819`, the same code with port/CLAUDE.md's and PLAN.md's
+  lines about the launcher): T0 as above. Black 2: all 245 `ctest` tests pass, the oracle's included, 4 new:
+  `app_launcher_spec_plain` and `_sanitized` (the option's parsing, and the gate on a made-up table of placeholders),
+  `integrate_launcher_off` (without `--launch` the seam returns 0 before touching its event) and
+  `integrate_launch_bad_option`; `app_run_dir` checks run.txt's launch line. White 2: all 243 pass but
+  `oracle_continue_starter`, which skips (no starter save for White 2). Without `--launch` nothing changes:
+  `oracle_continue` stops on `FIELDMAP_PROC_FUNCS` at the same frame with the same screens, and the replays pass. By
+  hand, `--launch bag` from the first save shows the oracle's empty bag. T3's long runs, T5's nightly runs and T7 not
+  yet.
+- **Tiers:** not measured: no decomp C changed but the guard-only block.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version. A continued game without
+  `--launch` still stops on `FIELDMAP_PROC_FUNCS` (overlay 36).
+- **64-bit warnings:** unchanged: the game change is a block MWCC never sees.
+- **Work done:** Frigate's test launcher ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md), proposed;
+  `port/app/launcher.c`, `launcher_spec.c`): `--launch APP[@COUNT],...` opens the field menu's apps (the party list,
+  the Pokédex, the bag, the trainer card, the summary) after CONTINUE, in place of the field, whose process table
+  (overlay 36) has no C and is under another contributor's claim. It runs the app call's field-free states through
+  the game's own table and functions, and reports each app's result; it steps aside once `FIELDMAP_PROC_FUNCS` has C.
+  The seam is a guard-only block in `EventFieldContinue_Callback`'s state 2. Neither port/CLAUDE.md nor PLAN.md names
+  the launcher until the user accepts the ADR (its "On acceptance").
+- **Next:** the apps against melonDS through the launcher (the next entry).
+- **Blockers:** the user's decision on ADR 0012; overlay 36 (issue #83, another contributor's active claim) and
+  overlay 12's script data, as in the last entry.
+
 ## 2026-10-18: after review: the commits that stand alone, without the test launcher; the H-blank cycle's source
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch`, after `0eb7214e2`.
+- **Port:** `cc281af40`, on the branch `port-launch`, after `0eb7214e2`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
 - **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
 - **Tests:** T0 as above. Black 2: all 241 `ctest` tests pass, the oracle's included (`ctest -j4`, 977 s on a loaded

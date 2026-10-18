@@ -35,6 +35,24 @@ foreach(variant IN ITEMS plain sanitized)
     add_test(NAME app_run_dir_${variant} COMMAND ${target})
 endforeach()
 
+# Frigate's test launcher's option and its gate (port/app/launcher_spec.c, and port/hal/trap.c's
+# port_trap_is_placeholder on a made-up table of placeholders), plain and under the sanitizers
+foreach(variant IN ITEMS plain sanitized)
+    set(target port_test_launcher_spec_${variant})
+    add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_launcher_spec.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/launcher_spec.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/trap.c")
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
+    # trap.c's dladdr and signals, which glibc hides from strict C11
+    target_compile_definitions(${target} PRIVATE _GNU_SOURCE)
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME app_launcher_spec_${variant} COMMAND ${target})
+endforeach()
+
 # The gamepads (port/app/gamepad.c), plain and under the sanitizers: the mapping, the stick's dead zone and the pad that
 # drives, then SDL's virtual joysticks as pads that come and go, so that no device is needed
 foreach(variant IN ITEMS plain sanitized)

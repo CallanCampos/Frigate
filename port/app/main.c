@@ -7,7 +7,7 @@
 //
 //   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
 //              [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--run-dump SPEC]...
-//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME] [--launch APP[@COUNT],...]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
@@ -32,6 +32,11 @@
 //                       off, the default with a window)
 //   --main-arena-size B the host's main memory arena, in bytes (a K or M suffix multiplies)
 //   --vram-backend NAME how VRAM banks are mapped: shm, mach-entry, mach-remap or copy (port/hal/gx/vram.h)
+//   --launch APP[@COUNT],...
+//                       Frigate's test launcher (port/app/launcher.h, ADR 0012): after CONTINUE, opens the field menu's
+//                       apps (party, pokedex, bag, card, summary) in place of the field, whose code (overlay 36) has no
+//                       C yet, each when GFL's frame count reaches COUNT (at once without one), then stops: status 0
+//                       when each app opened and closed, 2 when the save's field menu doesn't offer one
 //
 // The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
 // program writes its messages to ~/Library/Logs/pokebw2-native/<program>.log instead (port/app/message_log.h).
@@ -44,6 +49,7 @@
 // POSIX's signals and alarm() for the watchdog, which glibc hides from strict C11 (the target's -std=c11)
 #define _DEFAULT_SOURCE
 
+#include "app/launcher.h"
 #include "app/message_log.h"
 #include "app/present.h"
 #include "app/replay.h"
@@ -106,6 +112,7 @@ static const char *const sOptions[] = {
     "vram-backend",
     "heap-scale-root",
     "heap-scale-child",
+    "launch",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -118,6 +125,9 @@ static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
 static int sRunDirFailed;
+// Frigate's test launcher: whether it asked the program to stop, and the exit status it gave
+static int sLauncherDone;
+static int sLauncherStatus;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -133,7 +143,8 @@ static void Usage(void) {
             "[--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] "
             "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
             "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--watchdog SECONDS] [--main-arena-size BYTES] "
-            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
+            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N] "
+            "[--launch APP[@COUNT],...]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
 
@@ -295,6 +306,7 @@ static int OpenRunDir(const char *dir, const char *inputPath) {
     info.input = inputPath;
     info.inputFrames = port_replay_frames();
     info.frames = (uint32_t)sFrameLimit;
+    info.launch = port_app_option("launch");
     return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
 }
 
@@ -343,6 +355,11 @@ static void AppFrame(void) {
     }
     if (sFrameLimit != 0 && sFrames >= sFrameLimit) {
         WriteScreenshot();
+        port_os_stop();
+    }
+    // Frigate's test launcher, once its last app closed
+    if (!sLauncherDone && port_launcher_finished(&sLauncherStatus)) {
+        sLauncherDone = 1;
         port_os_stop();
     }
     if (!sHeadless) {
@@ -427,6 +444,12 @@ int main(int argc, char **argv) {
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
     }
+    // A list the launcher can't open is a bad option, before the game starts
+    if (!port_launcher_configure(port_app_option("launch"))) {
+        port_run_dir_close(EXIT_BAD_OPTIONS);
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
 
     port_hw_init();
     port_trap_protect_data();
@@ -488,6 +511,10 @@ int main(int argc, char **argv) {
     port_audio_close();
     if (sRunDirFailed) {
         status = 1;
+    }
+    port_launcher_report_unused();
+    if (sLauncherDone && status == 0) {
+        status = sLauncherStatus;
     }
     port_run_dir_close(status);
     port_replay_close();

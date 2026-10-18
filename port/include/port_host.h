@@ -47,6 +47,13 @@ void *port_hw_vecmtx_result(void);
 void *port_hw_auxspicnt(void);
 void *port_hw_auxspidata(void);
 
+// Frigate's test launcher (--launch, port/app/launcher.c, ADR 0012), which CONTINUE's event asks before it opens the
+// field (src/ov035/event_mapchange.c): 1 when the launcher chained its own event to open the field menu's apps in
+// place of the field, 0 (always, without --launch) to open the field. The tag is declared here, at file scope, so that
+// it is the game's struct GameEvent and not one local to the prototype
+struct GameEvent;
+int port_launcher_take_field_open(struct GameEvent *event);
+
 // The size the host gives one of the game's heaps (src/gfl/heapsys.c), larger than the DS's for 64-bit structs
 // (port/hal/gfl/heap_policy.c). The arguments are u32, u32 and BOOL
 unsigned int port_heap_size(unsigned int index, unsigned int size, int root);

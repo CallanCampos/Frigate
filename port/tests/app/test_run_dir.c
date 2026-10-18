@@ -223,7 +223,7 @@ static void TestRun(void) {
                                       "input_frames: -\n"
                                       "counter: sVBlankCount\n"
                                       "status: 0\n";
-    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
+    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, NULL };
     const PortRunDirFrame frames[] = { { 1, 1, 0, 1 }, { 2, 2, 1, 2 }, { 3, 3, 1, 2 }, { 4, 4, 2, 3 } };
     char expected[sizeof(tsvHead) + sizeof(rows)];
     char wanted[600];
@@ -264,6 +264,14 @@ static void TestRun(void) {
     CHECK(port_run_dir_frame(&frames[0], sTop, sBottom));
     text = ReadFile("frames.tsv");
     CHECK(text != NULL && strcmp(text, expected) == 0);
+    free(text);
+
+    // Frigate's test launcher's --launch, when the run has one, gets a line of its own
+    const PortRunDirInfo launched = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, "bag@4200" };
+    CHECK(port_run_dir_open(sDir, "none", RecordPng, &launched));
+    port_run_dir_close(0);
+    text = ReadFile("run.txt");
+    CHECK(text != NULL && strstr(text, "input_frames: -\nlaunch: bag@4200\ncounter: sVBlankCount\n") != NULL);
     free(text);
 
     // Opening again starts the files anew; a PNG file that can't be written fails the frame
@@ -317,8 +325,8 @@ static int DumpRejected(const char *spec, const char *message) {
 }
 
 static void TestDumps(void) {
-    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
-    const PortRunDirInfo unlimited = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0 };
+    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, NULL };
+    const PortRunDirInfo unlimited = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0, NULL };
     char error[256];
     char expected[600];
     char *text;

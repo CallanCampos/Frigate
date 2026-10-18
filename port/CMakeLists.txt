@@ -128,10 +128,11 @@ add_custom_command(
     COMMAND "${PORT_PYTHON}" "${REPO_ROOT}/port/tools/gen_stubs.py"
         --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c"
         --objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
-                  ${port_gfx_objects}
+                  "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects}
     # The objects themselves, not only their targets, so that the stubs follow every recompiled file
-    DEPENDS pokebw2_game port_hal port_app ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
-        "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>" ${port_gfx_objects}
+    DEPENDS pokebw2_game port_hal port_app port_launcher ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
+        "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
+        "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects}
     WORKING_DIRECTORY "${REPO_ROOT}"
     COMMAND_EXPAND_LISTS
     VERBATIM)
@@ -141,9 +142,17 @@ target_include_directories(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_app PRIVATE -std=c11 -Wall -Wextra)
 target_link_libraries(port_app PRIVATE SDL3::SDL3)
 
+# Frigate's test launcher (port/app/launcher.c, ADR 0012): --launch opens the field menu's apps after CONTINUE while
+# overlay 36 has no C. It includes the decomp's headers, so it is a library of its own with their environment, and the
+# game's seam in src/ov035/event_mapchange.c calls it, so every program that links the game's objects links it too
+add_library(port_launcher OBJECT app/launcher.c app/launcher_spec.c)
+target_link_libraries(port_launcher PRIVATE port_decomp_env)
+target_include_directories(port_launcher PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_options(port_launcher PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
+
 add_executable(${PORT_PROGRAM}
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_app>
+    $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_include_directories(${PORT_PROGRAM} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${PORT_PROGRAM} PRIVATE SDL3::SDL3)
 

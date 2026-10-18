@@ -26,6 +26,21 @@ files leaves what MWCC compiles unchanged ([docs/game-changes.md](docs/game-chan
 **Where it stands:** the program links and enters the game's `main()`, which stops at `OS_Init`, the first SDK module
 the platform layer replaces. [docs/STATUS.md](docs/STATUS.md) has the current state.
 
+### The test launcher
+
+A continued game stops when it asks for the field, whose code (overlay 36) has no C yet. For tests, Frigate's test
+launcher opens the field menu's apps there instead, in order, each when GFL's frame count reaches its COUNT (at once
+without one), then stops with status 0 (2 when the save's field menu doesn't offer an app):
+
+```sh
+build/port/pokeblack2 --save-dir SAVES --launch bag,card            # the bag, then the trainer card, after CONTINUE
+build/port/pokeblack2 --save-dir SAVES --launch party@4044,card@6974 --input FILE --headless
+```
+
+The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. Without `--launch`
+nothing changes. [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it
+goes; `oracle.py launch` checks the apps against melonDS through it ([tools/oracle/README.md](tools/oracle/README.md)).
+
 ### Controls
 
 The keyboard, by key position, and any gamepad at the same time. A gamepad's face buttons work by position, as on the
@@ -146,7 +161,8 @@ port/
   README.md              now      this overview
   CLAUDE.md              now      rules for sessions working on the port
   CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
-  app/                   now      main(), SDL3 window, gamepads, macos/ (the app's Info.plist and build script);
+  app/                   now      main(), SDL3 window, gamepads, the test launcher (--launch), macos/ (the app's
+                                  Info.plist and build script);
                                   later screen layouts, settings, paths, first-launch ROM setup
   include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
   hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs

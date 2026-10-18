@@ -72,6 +72,11 @@ static const PortTrapSymbol *find_data_symbol(const unsigned char *address, size
     return NULL;
 }
 
+int port_trap_is_placeholder(const void *address) {
+    size_t offset;
+    return find_data_symbol(address, &offset) != NULL;
+}
+
 static void on_fault(int signal, siginfo_t *info, void *context) {
     (void)context;
     const unsigned char *address = info->si_addr;
