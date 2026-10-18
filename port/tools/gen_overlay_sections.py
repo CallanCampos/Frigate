@@ -33,7 +33,7 @@ message that names the cause past the limit, or past the budget of overlay secti
 configurations with the most sections (Debug, sanitizers, coverage). It does so for each slice the link makes: those of
 the program's own objects, the first inputs, with the macOS each is built for, since the sections ld64 makes and the
 names it gives depend on the architecture and the deployment target (link_rules). A universal program, the macOS
-distribution build's arm64 and x86_64 for macOS 11.0 (port/docs/adr/0013-universal-macos-app-for-macos-11.md), is
+distribution build's arm64 and x86_64 for macOS 11.0 (port/docs/adr/0015-universal-macos-app-for-macos-11.md), is
 checked slice by slice, and the inputs' universal files are read a slice at a time. LLVM bitcode (LTO) is refused: its
 sections are chosen at link time, and the spike's range check isn't carried over.
 

@@ -19,7 +19,7 @@
 #   --about TEXT         what the About window says under the name (NSHumanReadableCopyright): what Frigate is and that
 #                        it is not affiliated with the game's owners (port/hal/os/port_app.h)
 #   --archs "ARCH ..."   the architectures the app is for (CMAKE_OSX_ARCHITECTURES; arm64 x86_64 for the distribution
-#                        build, ADR 0013), separated by blanks, commas or semicolons: every binary of the app must have
+#                        build, ADR 0015), separated by blanks, commas or semicolons: every binary of the app must have
 #                        a slice for each. Without it, any slices do
 #   --minimum VERSION    the oldest macOS the app is for (CMAKE_OSX_DEPLOYMENT_TARGET; 11.0 for the distribution build),
 #                        its LSMinimumSystemVersion: no slice of any binary of the app may be built for a newer one.

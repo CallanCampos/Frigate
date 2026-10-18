@@ -8,7 +8,7 @@
 # combined gives it one section, with its zeroed statics in the file (-fno-zero-initialized-in-bss), for when the
 # split layout's sections no longer fit Mach-O's 255. On macOS a step before the link of every program that links the
 # game's objects (the game and the tests that link it, whichever fragment adds them) counts the sections, of each slice
-# of a universal program (the distribution build's, ADR 0013), and stops a link that would pass 255, or the budget of
+# of a universal program (the distribution build's, ADR 0015), and stops a link that would pass 255, or the budget of
 # 150 overlay sections, with a message that names the cause; it also stops one whose objects put a writable static of
 # an overlay file outside its overlay's sections, where no reset would find it (a leak). After the link, a test per
 # program compares each slice's sections with the prediction, by name.

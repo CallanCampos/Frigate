@@ -16,8 +16,15 @@ FetchContent_MakeAvailable(minicoro)
 target_include_directories(port_hal SYSTEM PRIVATE "${minicoro_SOURCE_DIR}")
 
 set(port_os_dir "${CMAKE_CURRENT_SOURCE_DIR}/hal/os")
-# minicoro's own ASan annotations miss the switches back to the host stack; fiber.c annotates instead
-set_source_files_properties("${port_os_dir}/mco_impl.c" PROPERTIES COMPILE_OPTIONS "-fno-sanitize=address;-w")
+# minicoro's own ASan annotations miss the switches back to the host stack; fiber.c annotates instead. Its code is all
+# in minicoro.h, a system header through port_hal's include path above, which keeps its warnings out. That would also
+# keep out the macOS availability check (port/CMakeLists.txt, ADR 0015), so a build with a deployment target compiles
+# minicoro's implementation as a header of its own: it gives no warning under port_hal's -Wall -Wextra
+set(port_os_mco_options -fno-sanitize=address)
+if(APPLE AND CMAKE_OSX_DEPLOYMENT_TARGET)
+    list(APPEND port_os_mco_options --no-system-header-prefix=minicoro.h)
+endif()
+set_source_files_properties("${port_os_dir}/mco_impl.c" PROPERTIES COMPILE_OPTIONS "${port_os_mco_options}")
 # The decomp's os_thread.c, compiled through the host file: its four renamed DS functions still truncate pointers
 # (they never run), and OS_DisableScheduler's unset result at 0xffffffff nested locks is the SDK's own
 set_source_files_properties("${port_os_dir}/os_thread_host.c" PROPERTIES COMPILE_OPTIONS

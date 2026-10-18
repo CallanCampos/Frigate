@@ -11,7 +11,8 @@ Most tests need nothing but the build. The ones that need the player's ROM (`ori
 `rom_*` ones, `nnsys_g2d_rom_equivalence`, `snd_rom_*`, the `replay_*` tests, `integrate_launch_never_asked` and the
 `oracle_*` and `launch_*` tests that run the game. `asm_oracle` also needs the extracted ROM, its own Python
 environment and a host build directory configured with `-G Ninja`, whose `build.ninja` it reads the game's flags from
-(it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup)), and the
+(it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup), and on macOS
+in one with no slice for its Python's architecture, such as an x86_64 build on Apple Silicon), and the
 `oracle_*` tests that run melonDS need the oracle, built with `-DPORT_BUILD_ORACLE=ON`
 ([../tools/oracle/README.md](../tools/oracle/README.md)), as do the test launcher's `launch_*` tests, which start from
 saves the oracle makes (`oracle_saves`). The oracle counts game frames with the ROM build's link map

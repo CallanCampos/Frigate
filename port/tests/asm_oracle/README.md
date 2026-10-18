@@ -66,7 +66,10 @@ build/port-venv/bin/python port/tests/asm_oracle/test_selftest.py         # one 
 pass, 1 when one fails, and 77 (skipped) when `extract/<version>` is missing, as on CI, or when it runs without
 Unicorn, outside the virtual environment, or when the host build it takes its compile flags from isn't a Ninja build:
 ctest passes its own build directory (`ASM_ORACLE_BUILD_DIR`); run by hand, it reads `build/port`. Libraries are built
-in `asm-oracle/<name>_<version>/` in that build directory.
+in `asm-oracle/<name>_<version>/` in that build directory. On macOS a library has the build's slices (its `-arch`
+flags), and the tests check the one their Python runs, since they load it into their own process: the macOS
+distribution build's arm64 slice on Apple Silicon ([ADR 0015](../../docs/adr/0015-universal-macos-app-for-macos-11.md)),
+and a build with no slice for that Python, such as an x86_64 one there, skips.
 
 A failure prints the case and the first difference, and how to run that case alone:
 

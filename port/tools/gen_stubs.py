@@ -28,7 +28,7 @@ PLACEHOLDER_MAX = 0x10000
 PAGE = 0x4000  # The largest page size of the hosts (Apple Silicon), so the protection is page-exact everywhere
 MACHO = sys.platform == "darwin"
 # The paddings' alignment, a page: 16 KiB, but 4 KiB in an x86_64 Mach-O program (the macOS app's Intel slice, ADR
-# 0013), whose linker holds a section's alignment to its 4 KiB page and warns at more. The stubs file is compiled once
+# 0015), whose linker holds a section's alignment to its 4 KiB page and warns at more. The stubs file is compiled once
 # for every slice of a universal program, so the preprocessor chooses
 PAGE_ALIGNMENT = [
     "#if defined(__APPLE__) && defined(__x86_64__)",

@@ -15,7 +15,7 @@
 // The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned, so that the VRAM banks can be mapped into region
 // 0x06's window by pages (port/hal/gx/vram.c). They are zero-filled memory the system commits only when touched. The
 // alignment is 16 KiB, Apple Silicon's page and the largest of the hosts, except in an x86_64 Mach-O program (the
-// macOS app's Intel slice, ADR 0013), whose linker holds a section's alignment to its 4 KiB page and warns at more
+// macOS app's Intel slice, ADR 0015), whose linker holds a section's alignment to its 4 KiB page and warns at more
 #define REGION_SIZE (1u << 24)
 #if defined(__APPLE__) && defined(__x86_64__)
 #define REGION_STORAGE __attribute__((aligned(4096)))

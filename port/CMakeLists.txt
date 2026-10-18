@@ -12,12 +12,15 @@
 # are in the fragments of port/cmake/, included at the end, and port/cmake/README.md lists them all.
 cmake_minimum_required(VERSION 3.28)
 
-# The macOS build for other Macs than the one that builds it (ADR 0013): one universal program, arm64 and x86_64, for
+# The macOS build for other Macs than the one that builds it (ADR 0015): one universal program, arm64 and x86_64, for
 # macOS 11.0 and later, with the pinned SDL3 built along for the same target and linked statically, never an installed
 # one (Homebrew's is built for the macOS Homebrew builds on, and for one architecture). The deployment target and the
 # architectures must be set before project(), which checks the compiler with them; a value given on the command line,
 # or already in the cache, stays. A development build sets neither, so it is built for the machine it is built on. One
-# build directory per kind: build/port-dist is the one port/tools/package_macos.sh --distribution configures
+# build directory per kind: build/port-dist is the one port/tools/package_macos.sh --distribution configures. A
+# directory once configured with the option keeps its architectures, its deployment target and its fetched SDL3 in the
+# cache, so turning the option off there stops the configure instead of building a development build for 11.0 that
+# would link an installed SDL3 of one architecture
 option(PORT_MACOS_DISTRIBUTION
     "macOS: a universal (arm64 and x86_64) build for macOS 11.0 and later, with the pinned SDL3 linked statically" OFF)
 if(PORT_MACOS_DISTRIBUTION)
@@ -27,6 +30,11 @@ if(PORT_MACOS_DISTRIBUTION)
     if(NOT CMAKE_OSX_ARCHITECTURES)
         set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "The architectures of the program's slices" FORCE)
     endif()
+    set(PORT_MACOS_DISTRIBUTION_DIRECTORY ON CACHE INTERNAL "This directory was configured as the distribution build")
+elseif(PORT_MACOS_DISTRIBUTION_DIRECTORY)
+    message(FATAL_ERROR "${CMAKE_BINARY_DIR} was configured as the macOS distribution build "
+        "(-DPORT_MACOS_DISTRIBUTION=ON), whose architectures, deployment target and SDL3 stay in its cache; configure "
+        "the development build in a directory of its own (cmake -S port -B build/port), or keep the option on here")
 endif()
 
 # The product's name, description and disclaimer, which port/hal/os/port_app.h sets for the C (port/CLAUDE.md, "The
@@ -155,11 +163,16 @@ if(NOT SDL3_FOUND)
 endif()
 
 # A macOS build for an older macOS than the SDK's (a deployment target, such as the distribution build's 11.0): a call
-# to an API newer than the target, which would stop the program on the older macOS, fails the build instead. Every
-# target defined from here on gets it, the game's, the platform layer's, the program's and the tests'; SDL3 above
-# guards its own calls
+# to an API newer than the target, which would stop the program on the older macOS (or, weakly imported, call a null
+# pointer there), fails the build instead. Every target defined from here on gets it, the game's, the platform layer's,
+# the program's and the tests'; and so does SDL3 when it is built along, the only code of the program that calls
+# AppKit, Metal, GameController and CoreHaptics: it guards its newer calls itself, and the check holds every pinned
+# release to that, C and Objective-C (ADR 0015). An installed SDL3 is a development build's, built for its own macOS
 if(APPLE AND CMAKE_OSX_DEPLOYMENT_TARGET)
     add_compile_options(-Werror=unguarded-availability)
+    if(TARGET SDL3-static)
+        target_compile_options(SDL3-static PRIVATE -Werror=unguarded-availability)
+    endif()
 endif()
 
 # What every file that includes the decomp's headers needs, the decomp's own C and the platform layer alike: MWCC's

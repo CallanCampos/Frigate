@@ -15,9 +15,10 @@
 # again. Its icon must be the .icns given, with the ten images of a macOS icon set (the 16 and 32 pixel ones the small
 # images drawn for their size), and its Info.plist must hold the names, the identifier and the About text as given.
 #
-# A universal program, arm64 and x86_64 for macOS 11.0 as the distribution build makes it (ADR 0013), with a universal
+# A universal program, arm64 and x86_64 for macOS 11.0 as the distribution build makes it (ADR 0015), with a universal
 # library: the app of both slices, its LSMinimumSystemVersion --minimum's, the program started as each slice this Mac
-# runs; and the refusals of --archs and --minimum: a program or a library without a slice the app is for, and a library
+# runs; check_app.sh on that app, which reads each slice's signature and compares versions part by part (11 is 11.0);
+# and the refusals of --archs and --minimum: a program or a library without a slice the app is for, and a library
 # built for a newer macOS than the app's.
 set -u
 
@@ -28,6 +29,7 @@ master=$4
 small16=$5
 small32=$6
 script="$repo/port/app/macos/make_app.sh"
+check_app="$repo/port/app/macos/check_app.sh"
 make_icns="$repo/port/app/macos/make_icns.sh"
 plist="$repo/port/app/macos/Info.plist.in"
 checks=0
@@ -243,6 +245,27 @@ for slice in arm64 x86_64; do
         expect "a universal program: runs as $slice" "$(arch "-$slice" "$app/Contents/MacOS/uniprog")" 11
     fi
 done
+# check_app.sh on it: both slices, each signed ad hoc on its own, for macOS 11.0 however it is written, and not 12.0
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 11.0 >"$work/check" 2>&1
+expect "check_app.sh on the universal app: status" $? 0
+for slice in arm64 x86_64; do
+    expect "check_app.sh: the $slice slice's own signature" \
+        "$(grep -c "Uni.app ($slice): .*CodeDirectory .*flags=0x2(adhoc).* Signature=adhoc" "$work/check")" 1
+done
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 11 >"$work/check" 2>&1
+expect "check_app.sh with --minimum 11: status" $? 0
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 12.0 >"$work/check" 2>&1
+expect "check_app.sh with --minimum 12.0: status" $? 1
+expect "check_app.sh with --minimum 12.0: the slices and the Info.plist" "$(grep -c '^FAIL' "$work/check")" 3
+rm -rf "$app"
+
+# --minimum written 11, as CMake takes it: LSMinimumSystemVersion 11, which check_app.sh takes for 11.0
+expect "--minimum 11: status" \
+    "$(make_app "$work/uni/uniprog" "$app" "" "" --archs "arm64 x86_64" --minimum 11)" 0
+expect "--minimum 11: LSMinimumSystemVersion" \
+    "$(plutil -extract LSMinimumSystemVersion raw -o - "$app/Contents/Info.plist")" 11
+"$check_app" "$app" --archs "arm64 x86_64" --minimum 11.0 >"$work/check" 2>&1
+expect "--minimum 11: check_app.sh with --minimum 11.0" $? 0
 rm -rf "$app"
 
 # The same app with --archs in CMake's own spelling, a list with a semicolon

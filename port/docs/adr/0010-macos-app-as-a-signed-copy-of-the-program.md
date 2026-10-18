@@ -9,7 +9,7 @@
   `frigate-black2`, the app `Frigate Black 2.app` with the bundle identifier `io.github.callancampos.frigate.black2`,
   the ROM's variable `FRIGATE_ROM` and the log `~/Library/Logs/Frigate/<program>.log` (port/CLAUDE.md).
 - **Note (2026-10-18):** the app for older Macs that its consequences leave untried is the distribution build of
-  [ADR 0013](0013-universal-macos-app-for-macos-11.md) (proposed).
+  [ADR 0015](0015-universal-macos-app-for-macos-11.md) (proposed).
 
 ## Context
 

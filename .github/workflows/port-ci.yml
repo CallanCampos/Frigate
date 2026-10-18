@@ -5,9 +5,9 @@ name: Frigate CI
 # both ROMs locally (port/docs/SYNC.md). The tests that need the player's ROM skip here.
 #
 # Two jobs: the development build on macOS and Linux (host), as port/README.md's quick start makes it, and the macOS
-# distribution build (macos-distribution, ADR 0013), one universal app, arm64 and x86_64, for macOS 11.0 and later, made
-# and tested on Apple Silicon and on Intel. Each job builds its own copy and uploads nothing: the port's compiled game
-# code is never uploaded (port/CLAUDE.md).
+# distribution build (macos-distribution, ADR 0015), one universal app, arm64 and x86_64, for macOS 11.0 and later, made
+# and tested on Apple Silicon and on Intel, with macOS 26 and with macOS 15, the oldest runners that aren't deprecated.
+# Each job builds its own copy and uploads nothing: the port's compiled game code is never uploaded (port/CLAUDE.md).
 on:
   push:
     branches: [main]
@@ -75,9 +75,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Apple Silicon, whose image has Rosetta, so the app's x86_64 slice starts there too; and Intel, where ctest
-        # runs every test on the x86_64 slices natively
-        os: [macos-26, macos-26-intel]
+        # Apple Silicon, whose images install Rosetta (runner-images' arm64 templates run install-rosetta.sh), so the
+        # app's x86_64 slice starts there too; and Intel, where ctest runs the tests that don't need the ROM on the
+        # x86_64 slices natively. macOS 26 and 15 each, so that the app built for 11.0 also runs on a macOS older than
+        # the SDK it is built with; macos-14 is deprecated, and its image has no Xcode 26, which needs macOS 15.6
+        os: [macos-26, macos-26-intel, macos-15, macos-15-intel]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     steps:
@@ -93,6 +95,31 @@ jobs:
       - name: Install build tools
         run: brew install ninja
 
+      # The macOS 15 images default to Xcode 16.4; the newest Xcode 26 there links as the one overlay_sections_image_*'s
+      # rules were measured with (port/tools/gen_overlay_sections.py), and its SDK is the one the macOS 26 runners build
+      # with, or close to it
+      - name: Use Xcode 26
+        if: startsWith(matrix.os, 'macos-15')
+        run: |
+          xcode=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$xcode" ]; then
+            echo "::error::the ${{ matrix.os }} image has no Xcode 26 (its readme of 2026-10-18 lists 26.0.1 to 26.3)"
+            exit 1
+          fi
+          echo "DEVELOPER_DIR=$xcode/Contents/Developer" >>"$GITHUB_ENV"
+          echo "$xcode: SDK $(DEVELOPER_DIR=$xcode/Contents/Developer xcrun --show-sdk-version)"
+
+      # Apple Silicon must run the x86_64 slice too, which needs Rosetta: checked before the build, so that an image
+      # without it stops here and says so. Installing it would accept Apple's licence on the runner, which isn't done
+      - name: Check for Rosetta
+        if: runner.arch == 'ARM64'
+        run: |
+          if ! arch -x86_64 /usr/bin/true; then
+            echo "::error::the ${{ matrix.os }} image has no Rosetta, so the app's x86_64 slice can't start here"
+            exit 1
+          fi
+          echo "Rosetta runs x86_64 code on ${{ matrix.os }}"
+
       - name: Configure
         env:
           CC: clang
@@ -102,7 +129,8 @@ jobs:
         run: cmake --build build/port-dist
 
       # ctest runs each program as the runner's own slice: arm64 on Apple Silicon, x86_64 on Intel. app_slices checks
-      # the program's slices and macOS from its load commands
+      # the program's slices and macOS from its load commands; the tests that need the ROM skip, app_universal_slices
+      # among them
       - name: Test
         run: ctest --test-dir build/port-dist --output-on-failure
 
@@ -118,5 +146,5 @@ jobs:
       - name: Check the app
         run: |
           every=
-          if [ "$(uname -m)" = arm64 ]; then every=--run-every-slice; fi
+          if [ "${{ runner.arch }}" = ARM64 ]; then every=--run-every-slice; fi
           port/app/macos/check_app.sh "build/port-dist/Frigate Black 2.app" --archs "arm64 x86_64" --minimum 11.0 $every

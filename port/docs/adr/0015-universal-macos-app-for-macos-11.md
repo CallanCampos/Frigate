@@ -1,4 +1,4 @@
-# 0013: A universal macOS app for macOS 11, with the pinned SDL3 linked statically
+# 0015: A universal macOS app for macOS 11, with the pinned SDL3 linked statically
 
 - **Status:** proposed
 - **Date:** 2026-10-18
@@ -48,15 +48,18 @@ Rosetta installed; the STATUS.md entry of that day has the runs):
   10.15, Zelda64Recompiled 1.2.2 universal for 11.0, sm64coopdx v1.5.1 as separate ARM (11) and Intel (10.15) builds.
   Those with a real minimum build or install SDL for their target rather than take Homebrew's.
 - **Apple** says macOS 26 is the last release for Intel Macs, and keeps Rosetta whole through macOS 27.
-- Nothing older than this Mac's macOS 26 can be run here: GitHub's oldest macOS runner is macOS 14 (deprecated), and
-  there is no virtual machine.
+- Nothing older than this Mac's macOS 26 can be run on it: there is no virtual machine. GitHub's macOS 15 runners,
+  `macos-15` (Apple Silicon) and `macos-15-intel`, aren't deprecated (runner-images' README of 2026-10-18), run macOS
+  15.7.9 and have Xcode 26.0.1 to 26.3 beside their default 16.4, and their arm64 image installs Rosetta as the macOS
+  26 one does. `macos-14` is deprecated, and its image can't have Xcode 26, which needs macOS 15.6.
 
 ## Decision
 
 - **A distribution build** for other Macs than the one that builds it: `-DPORT_MACOS_DISTRIBUTION=ON`, in a build
   directory of its own (`build/port-dist`; `port/tools/package_macos.sh --distribution` configures it, builds it and
   makes the disk image in one command). Before `project()` it sets `CMAKE_OSX_ARCHITECTURES` to `arm64;x86_64` and
-  `CMAKE_OSX_DEPLOYMENT_TARGET` to 11.0 when the cache has neither, and it always builds SDL3's pinned release,
+  `CMAKE_OSX_DEPLOYMENT_TARGET` to 11.0 when the cache has neither (a directory configured with it refuses to be
+  configured without it, since both stay in its cache), and it always builds SDL3's pinned release,
   statically, for the same target and architectures, never an installed SDL3, and without SDL3's libusb support, which
   otherwise opens Homebrew's libusb at run time when the builder's Mac has it (the app loads nothing from outside
   macOS, as ADR 0010 has it). A development build is unchanged: built for the machine and the SDK, with Homebrew's
@@ -65,8 +68,11 @@ Rosetta installed; the STATUS.md entry of that day has the runs):
   serves every Mac.
 - **macOS 11.0 for both slices**: arm64's floor and the SDK's recommendation, every Apple Silicon Mac and the Intel Macs
   that run Big Sur.
-- **An API newer than the target fails the build**: every target the port defines gets
-  `-Werror=unguarded-availability` whenever a deployment target is set (`port/CMakeLists.txt`); SDL3 guards its own.
+- **An API newer than the target fails the build**: every target the port defines, and SDL3 when it is built along,
+  gets `-Werror=unguarded-availability` whenever a deployment target is set (`port/CMakeLists.txt`). SDL3 guards its
+  newer calls itself, and the check holds each pinned release to it. Warnings, this one included, are off in system
+  headers, so minicoro's implementation, all in its header, is compiled as a header of its own then
+  (`port/cmake/os.cmake`); the decomp's headers, system headers too, call nothing of macOS.
 - **The tools follow the slices**: `gen_overlay_sections.py` predicts and checks each slice, with the link format of
   its architecture and macOS (taken from the program's own objects), and compares each slice's sections by name;
   `make_app.sh` reads every slice (`otool -arch all`), takes `--archs` and `--minimum` from the build, refuses a binary
@@ -78,10 +84,14 @@ Rosetta installed; the STATUS.md entry of that day has the runs):
   the hardened runtime, or a slice that doesn't start. The test `app_slices` runs it on the program of every macOS
   build; `app_universal_slices` runs both slices of a universal program for 900 frames and requires the same frames
   (skipped without Rosetta or the ROM). CI's `macos-distribution` job builds and tests the distribution build on
-  `macos-26` (Apple Silicon) and `macos-26-intel` (Intel, where ctest runs every test on x86_64), makes the app and its
-  disk image with `package_macos.sh --distribution`, and runs `check_app.sh` on the app, every slice started.
+  macOS 26 and 15, Apple Silicon and Intel each (`macos-26`, `macos-26-intel`, `macos-15` and `macos-15-intel`, on 15
+  with its newest Xcode 26), where ctest runs the tests that don't need the ROM (on x86_64 natively on Intel), makes the
+  app and its disk image with `package_macos.sh --distribution`, and runs `check_app.sh` on the app, every slice
+  started on Apple Silicon, after checking that Rosetta is there. `port/tools/ctest_one_slice.sh` runs a universal
+  build's whole suite as one slice, the x86_64 one under Rosetta on Apple Silicon.
 - **What the documents claim** is what was run: built for macOS 11 and later, tested on macOS 26 on Apple Silicon, the
-  x86_64 slice under Rosetta (and natively on CI's Intel runner, once the job has run). Nothing below 26 has been run.
+  x86_64 slice under Rosetta. CI's job is set up to run it on macOS 15 and 26, on Apple Silicon and Intel; the
+  documents say it has run there only once it has. Nothing below macOS 26 has run it yet.
 - **Nothing changes in what is distributed.** The app is still made locally, and CI uploads nothing
   (port/README.md); the distribution build makes an app that other Macs can open, and whether Frigate ever offers
   downloads stays the user's decision. A downloaded app opened from the Finder finds no ROM, so a first-launch ROM
@@ -111,9 +121,14 @@ Rosetta installed; the STATUS.md entry of that day has the runs):
   `gen_overlay_sections.py`'s rules say where each came from.
 - Locally, Homebrew's `cmake`, `ctest`, `ninja` and the `.venv` Python are arm64 only, so ctest on a universal tree runs
   the arm64 slices; the x86_64 slice runs through `app_slices` (`--help`), `app_universal_slices` and `make_app.sh`,
-  through the whole suite only with the executables thinned to x86_64 (the STATUS.md entry has the commands), and on
-  CI's Intel runner natively.
-- macOS 11 to 15 are untested. The build's availability check covers the port's code alone; SDL3's was checked once,
-  for 3.4.18, so a new pinned release wants the same check (the STATUS.md entry says how) or a try on an older macOS.
+  through the whole suite with `port/tools/ctest_one_slice.sh --arch x86_64`, which thins the executables for the run,
+  and on CI's Intel runners natively. `asm_oracle` loads its library into the arm64 Python, so it checks the arm64 code.
+- macOS 11 to 14 are untested, and 15 is tested only once CI's job has run. The availability check covers the port's
+  code, minicoro's and SDL3's, so a new pinned SDL3 that calls a newer API unguarded fails the build; what stays
+  outside it is the system headers, macOS's own and the decomp's.
+- The distribution app holds the builder's paths: the checkout's, which the program keeps to find the ROM of `orig/`
+  (`port/hal/rom`), and every object's in the debug map of each slice, which name the builder's home folder. ADR 0010's
+  caveat stands: a build meant for other people is made from a neutral path, and stripped, before any public download,
+  which stays the user's decision.
 - Revisit when Apple drops Rosetta (after macOS 27; then the x86_64 slice can be tested only on Intel), when Xcode no
   longer builds for 11.0, or when the user decides about downloads.

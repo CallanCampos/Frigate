@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the universal macOS app, after review
+
+- **`-Werror=` doesn't survive `-w` or `-Wno-everything`, in either order, nor a system header.** With Apple clang 21,
+  a call to a macOS 26 API at a target of 11.0 compiles, and is weakly imported, under
+  `-Werror=unguarded-availability -Wno-everything -Werror=unguarded-availability`, and inside a header found through
+  `-isystem` (CMake's `SYSTEM` include directories). To hold a header-only library to the check, compile its
+  implementation with `--no-system-header-prefix=NAME.h` and no `-w`, as `port/cmake/os.cmake` does for minicoro. Test
+  such a probe with the build's compiler (`/usr/bin/cc`): Homebrew's clang, first on this Mac's `PATH`, uses the
+  Command Line Tools' older SDK, where a macOS 26 function isn't declared at all.
+- **`codesign -d` reads one slice too**, the Mac's own: give `--arch` for each slice of a universal program.
+- **Write down where a claim about CI came from, and look again before relying on it**: "the oldest runner is macOS 14,
+  deprecated" was true and still led to testing nothing older than 26, while macOS 15's runners, not deprecated, have
+  Xcode 26 beside their default.
+
 ## 2026-10-18: the universal macOS app
 
 - **`otool`, `nm` and the like read one slice of a universal file**, the Mac's own, unless told otherwise: make_app.sh

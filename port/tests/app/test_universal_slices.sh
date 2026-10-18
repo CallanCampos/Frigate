@@ -1,6 +1,6 @@
 #!/bin/sh
 # The test app_universal_slices (port/cmake/macos_app.cmake): a universal program's slices run the game the same (the
-# macOS distribution build's arm64 and x86_64, ADR 0013). Each slice runs (arch -ARCH) for FRAMES frames, 900 by
+# macOS distribution build's arm64 and x86_64, ADR 0015). Each slice runs (arch -ARCH) for FRAMES frames, 900 by
 # default, which take the game from power-on through the logos and the opening's first scenes, headless, with
 # --fixed-time and a save directory and run directory of its own, and the runs' frames.tsv (port/app/run_dir.c: a row a
 # frame, with both screens' hashes) must be the same byte for byte: the x86_64 slice draws every frame the arm64 one

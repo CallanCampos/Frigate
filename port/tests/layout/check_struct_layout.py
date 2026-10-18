@@ -9,7 +9,7 @@ agree on the DS (port/docs/game-changes.md has the trainer card's case).
 It reads each source file's object's debug information with llvm-dwarfdump (the RelWithDebInfo and Debug builds have
 it) and compares the offsets of the named members of the typedef STRUCT. No offset is written here: the objects must
 agree with each other, and the header's object (the last file named) is the reference. A universal object (the macOS
-distribution build's, arm64 and x86_64, ADR 0013) is read slice by slice, each against the same slice of the
+distribution build's, arm64 and x86_64, ADR 0015) is read slice by slice, each against the same slice of the
 reference. Exits 77 (skipped) without llvm-dwarfdump or without debug information. Standard library only.
 """
 

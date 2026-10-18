@@ -5,12 +5,16 @@
 
 Exits 0 when every test file passes, 1 when one fails (or crashes), and 77 (skipped) when the oracle can't run here:
 the ROM isn't extracted in extract/<version> (CI has no ROM), Unicorn isn't installed, which means this isn't the
-oracle's virtual environment (README.md, "Setup"), or the host build it takes its flags from (ASM_ORACLE_BUILD_DIR,
-else build/port) wasn't made with the Ninja generator. A test file exits 77 itself to skip.
+oracle's virtual environment (README.md, "Setup"), the host build it takes its flags from (ASM_ORACLE_BUILD_DIR,
+else build/port) wasn't made with the Ninja generator, or, on macOS, that build has no slice for this Python's
+architecture (an x86_64 build on Apple Silicon): the tests load the host library into this process, so they check the
+slice this Python runs. A test file exits 77 itself to skip.
 """
 
 import argparse
 import os
+import platform
+import re
 import subprocess
 import sys
 import time
@@ -45,6 +49,15 @@ def main():
     build_dir = Path(os.environ.get("ASM_ORACLE_BUILD_DIR", HERE.parents[2] / "build" / "port"))
     if not (build_dir / "build.ninja").exists():
         print(f"asm_oracle: skipped: {build_dir} isn't a host build made with the Ninja generator")
+        sys.exit(SKIP)
+    # On macOS, the architectures the build is for (CMAKE_OSX_ARCHITECTURES; none set, this Mac's)
+    cache = build_dir / "CMakeCache.txt"
+    text = cache.read_text() if cache.exists() else ""
+    found = re.search(r"^CMAKE_OSX_ARCHITECTURES:\w+=(.*)$", text, re.MULTILINE)
+    archs = found.group(1).split(";") if found and found.group(1).strip() else []
+    if sys.platform == "darwin" and archs and platform.machine() not in archs:
+        print(f"asm_oracle: skipped: {build_dir} is built for {' '.join(archs)}, and this Python runs "
+              f"{platform.machine()}: the tests load the host library into this process")
         sys.exit(SKIP)
 
     tests = sorted(p for p in HERE.glob("test_*.py") if args.pattern in p.name)

@@ -50,7 +50,7 @@ add_custom_command(OUTPUT "${port_app_icns}"
     VERBATIM)
 
 # What the app is built for, when the build says (the distribution build, PORT_MACOS_DISTRIBUTION, says both: arm64 and
-# x86_64, macOS 11.0; ADR 0013): make_app.sh refuses a binary without a slice for each architecture, or with a slice
+# x86_64, macOS 11.0; ADR 0015): make_app.sh refuses a binary without a slice for each architecture, or with a slice
 # for a newer macOS, and LSMinimumSystemVersion is the deployment target. A development build gives neither, and the
 # app is for the slices and the macOS its binaries were built for
 string(REPLACE ";" " " port_app_archs "${CMAKE_OSX_ARCHITECTURES}")
@@ -102,7 +102,7 @@ add_test(NAME app_message_log
 set_tests_properties(app_message_log PROPERTIES TIMEOUT 120)
 
 # The program's slices and the macOS each is built for, from its load commands, against the build's architectures and
-# deployment target (the distribution build's arm64 and x86_64 for macOS 11.0, ADR 0013; a development build's one
+# deployment target (the distribution build's arm64 and x86_64 for macOS 11.0, ADR 0015; a development build's one
 # slice, this Mac's), and that it starts as each slice this Mac runs (port/app/macos/check_app.sh, which CI also runs
 # on the finished app)
 add_test(NAME app_slices

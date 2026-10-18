@@ -1,7 +1,7 @@
 #!/bin/sh
 # Tests that port/tools/package_macos.sh refuses to write the disk image where git would take it into a repository: in
 # this repository, in another one, through a link, and in one whose directories for the image don't exist yet; and its
-# refusals of the distribution build's options (ADR 0013): --distribution on a build directory configured without
+# refusals of the distribution build's options (ADR 0015): --distribution on a build directory configured without
 # PORT_MACOS_DISTRIBUTION, or for another game than --version's, and --version without --distribution or with a game
 # that isn't one. Each refusal comes before anything is built, configured or written, so the test builds nothing: the
 # distribution cases use build directories of a CMakeCache.txt alone.

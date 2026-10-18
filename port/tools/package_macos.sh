@@ -14,7 +14,7 @@
 #   --out PATH       the disk image (by default DIR/<app> <version>.dmg, "Frigate Black 2 0.0.N.dmg"). A path in a git
 #                    work tree, this one or another, must be one git ignores, such as one under build/, so that the
 #                    image is never committed
-#   --distribution   the app for other Macs than this one, in one command (ADR 0013): one universal program, arm64 and
+#   --distribution   the app for other Macs than this one, in one command (ADR 0015): one universal program, arm64 and
 #                    x86_64, for macOS 11.0 and later, with the pinned SDL3 built along and linked statically. DIR is
 #                    build/port-dist by default (build/port-dist-w2 for White 2), and the script configures it with
 #                    -DPORT_MACOS_DISTRIBUTION=ON when it isn't configured yet; one configured without it is refused
@@ -109,8 +109,9 @@ cache_value() {
     sed -n "s/^$1:[A-Z]*=//p" "$build_dir/CMakeCache.txt"
 }
 
-# The distribution build: configured here when it isn't yet, refused when it was configured as another build. Its
-# configuration builds SDL3's pinned release, so the first one takes a few minutes
+# The distribution build: configured here when it isn't yet, refused when it was configured as another build. The first
+# configure downloads SDL3's pinned release from GitHub (it needs the network) and configures it; the build compiles it
+# for both slices along with everything else
 if [ -n "$distribution" ]; then
     if [ ! -f "$build_dir/CMakeCache.txt" ]; then
         cmake -S "$repo/port" -B "$build_dir" -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_MACOS_DISTRIBUTION=ON \
@@ -172,8 +173,24 @@ trap 'exit 130' INT TERM
 mkdir "$work/image"
 ditto "$app" "$work/image/$app_name.app"
 ln -s /Applications "$work/image/Applications"
-rm -f "$out"
-hdiutil create -quiet -volname "$app_name" -srcfolder "$work/image" -fs HFS+ -format UDZO "$out"
+# hdiutil create fails now and then for no reason of the image's ("Resource busy", on GitHub's macOS runners above all),
+# so it gets three tries, a few seconds apart, before its last message stops the script
+attempt=1
+while :; do
+    rm -f "$out"
+    if made=$(hdiutil create -quiet -volname "$app_name" -srcfolder "$work/image" -fs HFS+ -format UDZO "$out" \
+        2>&1); then
+        break
+    fi
+    if [ "$attempt" -ge 3 ]; then
+        printf '%s\n' "$made" >&2
+        echo "package_macos.sh: hdiutil create failed $attempt times" >&2
+        exit 1
+    fi
+    echo "package_macos.sh: hdiutil create failed (try $attempt of 3), trying again: $made" >&2
+    attempt=$((attempt + 1))
+    sleep 5
+done
 
 # The checks: the image's checksums, the app's signature as it is in the image, the slices and the minimum macOS the
 # build was configured for (make_app.sh checked every binary already; this is the app as it is in the image), and
@@ -191,7 +208,14 @@ for wanted in $archs; do
 done
 app_minimum=$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' \
     "$mount_point/$app_name.app/Contents/Info.plist")
-if [ -n "$minimum" ] && [ "$app_minimum" != "$minimum" ]; then
+# The two versions compare part by part, as make_app.sh's do: 11 is 11.0
+same_version() {
+    printf '%s %s\n' "$1" "$2" | awk '{
+        n = split($1, a, "."); m = split($2, b, ".")
+        for (i = 1; i <= 3; i++) if (((i <= n) ? a[i] + 0 : 0) != ((i <= m) ? b[i] + 0 : 0)) exit 1
+        exit 0 }'
+}
+if [ -n "$minimum" ] && ! same_version "$app_minimum" "$minimum"; then
     echo "package_macos.sh: the app says macOS $app_minimum or later; the build is for $minimum" >&2
     exit 1
 fi

@@ -14,6 +14,10 @@ The library goes to asm-oracle/<name>_<version>/ in that build directory.
 A symbol that the files reference and neither define nor find in the host's C library gets a stub, so that a file can
 be tested without everything it calls: a function stub reports its name and aborts the process, and a data symbol is
 a zeroed placeholder. Give the files that define what the tested functions really call.
+
+On macOS the library has the build's slices (the architectures and macOS of its -arch and -mmacosx-version-min
+flags, which the stubs and the link take too), and the tests check the one their Python runs: run_all.py skips a
+build with no slice for it, such as an x86_64 build on Apple Silicon, whose Python is arm64 (ADR 0015).
 """
 
 from __future__ import annotations
@@ -66,6 +70,18 @@ def _unescape(text: str) -> str:
     return re.sub(r"\$([ :$\n])", r"\1", text)
 
 
+def _target_flags(flags: tuple[str, ...]) -> list[str]:
+    """What a macOS build is built for, from its flags: each -arch (CMAKE_OSX_ARCHITECTURES), -isysroot and
+    -mmacosx-version-min (CMAKE_OSX_DEPLOYMENT_TARGET), so that the stubs and the library get the objects' slices."""
+    kept: list[str] = []
+    for index, flag in enumerate(flags):
+        if flag in ("-arch", "-isysroot") and index + 1 < len(flags):
+            kept += [flag, flags[index + 1]]
+        elif flag.startswith("-mmacosx-version-min="):
+            kept.append(flag)
+    return kept
+
+
 class HostBuild:
     """The compile settings of the configured host build, read from build/port/build.ninja."""
 
@@ -110,6 +126,7 @@ class HostBuild:
             raise BuildError(f"no {GAME_TARGET} compile statements in {ninja}")
         for target, settings in per_target.items():
             self.target_default[target] = collections.Counter(settings).most_common(1)[0][0]
+        self.target_flags = _target_flags(self.target_default[GAME_TARGET].flags)
 
     @staticmethod
     def _read_compiler(build_dir: Path) -> str:
@@ -270,14 +287,14 @@ def build_library(name: str, sources: list[str | Path], *, wrapper: str | None =
     stub_path = out / "stubs.c"
     stub_path.write_text(_stub_source(unresolved, version))
     stub_obj = out / "obj" / "stubs.o"
-    command = [host.compiler, "-std=c11", "-w", *([] if WINDOWS else ["-fPIC"]), "-c", str(stub_path), "-o",
-               str(stub_obj)]
+    command = [host.compiler, "-std=c11", "-w", *host.target_flags, *([] if WINDOWS else ["-fPIC"]), "-c",
+               str(stub_path), "-o", str(stub_obj)]
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode != 0:
         raise BuildError(f"compiling the stubs failed:\n{result.stderr}")
 
     library = out / f"lib{name}{LIBRARY_SUFFIX}"
-    link = [host.compiler, "-shared", "-o", str(library), *map(str, objects), str(stub_obj)]
+    link = [host.compiler, "-shared", *host.target_flags, "-o", str(library), *map(str, objects), str(stub_obj)]
     if WINDOWS:
         # A DLL exports nothing by default: export every symbol the files define
         exports = out / "exports.def"

@@ -1,13 +1,14 @@
 #!/bin/sh
-# Checks what a macOS build of Frigate is built for, as another Mac will meet it (ADR 0013): the program alone (the test
+# Checks what a macOS build of Frigate is built for, as another Mac will meet it (ADR 0015): the program alone (the test
 # app_slices, port/cmake/macos_app.cmake) or the app made from it ("Frigate Black 2.app", CI's macOS distribution job in
 # .github/workflows/port-ci.yml, after port/tools/package_macos.sh --distribution). It prints what each binary's load
 # commands say, slice by slice (LC_BUILD_VERSION's platform, minos and SDK), and fails when:
 #   - a binary has no slice for an architecture of --archs, or the program has a slice of another one;
 #   - a slice is for another platform than macOS, the program's for another macOS than --minimum (it is linked for
-#     exactly that one), or a library's for a newer one;
+#     exactly that one), or a library's for a newer one; versions compare part by part, so 11 is 11.0;
 #   - for an app: its LSMinimumSystemVersion isn't --minimum; a binary loads a library from outside macOS and the app;
-#     its signature fails codesign's strict check, isn't ad hoc, or turns on the hardened runtime (ADR 0003);
+#     its signature fails codesign's strict check, or a slice of its program isn't signed ad hoc or turns on the
+#     hardened runtime (ADR 0003; codesign -d reads one slice, so each is read with --arch);
 #   - the program doesn't start (--help) as each of its slices this Mac runs, or, with --run-every-slice, as every one
 #     of them (an x86_64 slice on Apple Silicon needs Rosetta; an arm64 one never runs on an Intel Mac).
 #
@@ -79,13 +80,18 @@ if [ ! -f "$program" ]; then
     exit 2
 fi
 
-# Whether version $1 is newer than $2, part by part
+# Whether version $1 is newer than $2, part by part, as make_app.sh compares them
 newer() {
     printf '%s %s\n' "$1" "$2" | awk '{
         n = split($1, a, "."); m = split($2, b, ".")
         for (i = 1; i <= 3; i++) { x = (i <= n) ? a[i] + 0 : 0; y = (i <= m) ? b[i] + 0 : 0
             if (x != y) exit !(x > y) }
         exit 1 }'
+}
+
+# Whether versions $1 and $2 are the same, part by part (11 and 11.0 are): neither is newer than the other
+same_version() {
+    ! newer "$1" "$2" && ! newer "$2" "$1"
 }
 
 # One slice of a binary: "PLATFORM MINOS SDK" from LC_BUILD_VERSION (otool gives the platform as its number, 1 for
@@ -114,7 +120,7 @@ report=$(printf '%s\n' "$binaries" | while IFS= read -r binary; do
         echo "$binary ($slice): platform $1, minos $2, sdk $3"
         if [ "$1" != MACOS ]; then
             echo "FAIL: $binary's $slice slice is for $1, not macOS"
-        elif [ -n "$minimum" ] && [ "$binary" = "$program" ] && [ "$2" != "$minimum" ]; then
+        elif [ -n "$minimum" ] && [ "$binary" = "$program" ] && ! same_version "$2" "$minimum"; then
             echo "FAIL: the program's $slice slice is built for macOS $2, not $minimum"
         elif [ -n "$minimum" ] && newer "$2" "$minimum"; then
             echo "FAIL: $binary's $slice slice is built for macOS $2, newer than $minimum"
@@ -136,7 +142,7 @@ failures=$((failures + $(printf '%s\n' "$report" | grep -c '^FAIL')))
 if [ -n "$plist" ]; then
     app_minimum=$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$plist" 2>/dev/null)
     echo "$path: LSMinimumSystemVersion ${app_minimum:-none}"
-    if [ -n "$minimum" ] && [ "$app_minimum" != "$minimum" ]; then
+    if [ -n "$minimum" ] && { [ -z "$app_minimum" ] || ! same_version "$app_minimum" "$minimum"; }; then
         fail "the app's LSMinimumSystemVersion is ${app_minimum:-none}, not $minimum"
     fi
     if [ -d "$path/Contents/Frameworks" ]; then
@@ -160,12 +166,16 @@ if [ -n "$plist" ]; then
     if ! codesign --verify --deep --strict "$path" 2>/dev/null; then
         fail "the app's signature fails codesign --verify --deep --strict"
     fi
-    signature=$(codesign -dv "$path" 2>&1)
-    echo "$path: $(printf '%s\n' "$signature" | grep -E '^(Signature|CodeDirectory)' | paste -sd' ' -)"
-    printf '%s\n' "$signature" | grep -qx 'Signature=adhoc' || fail "the app isn't signed ad hoc"
-    if printf '%s\n' "$signature" | grep '^CodeDirectory' | grep -q 'runtime'; then
-        fail "the app's signature turns on the hardened runtime, which ADR 0003 leaves off"
-    fi
+    # Each slice of the program has its own signature (its own CodeDirectory), and codesign -d shows only the one it is
+    # asked for, this Mac's by default
+    for slice in $(lipo -archs "$program"); do
+        signature=$(codesign -dv --arch "$slice" "$path" 2>&1)
+        echo "$path ($slice): $(printf '%s\n' "$signature" | grep -E '^(Signature|CodeDirectory)' | paste -sd' ' -)"
+        printf '%s\n' "$signature" | grep -qx 'Signature=adhoc' || fail "the app's $slice slice isn't signed ad hoc"
+        if printf '%s\n' "$signature" | grep '^CodeDirectory' | grep -q 'runtime'; then
+            fail "the app's $slice slice turns on the hardened runtime, which ADR 0003 leaves off"
+        fi
+    done
 fi
 
 # The program starts as each slice (--help returns before anything opens). Its output is kept, not sent to /dev/null:
