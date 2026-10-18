@@ -4,17 +4,25 @@
     gen_stubs.py --version b2_us --out build/port/gen/stubs.c --objects-file OBJECTS.txt [--nm NM] [--compiler CC]
 
 It reads the symbols that the given objects define and the ones they reference (the objects are listed one a line in
-OBJECTS.txt, or given with --objects OBJ...: a Windows command line can't hold 1,700 paths), and for each referenced
-symbol that no object defines and the host's C library doesn't provide, but that the ROM has
+OBJECTS.txt, or given with --objects OBJ...: a Windows command line can't hold their some 1,600 paths), and for each
+referenced symbol that no object defines and the host's C library doesn't provide, but that the ROM has
 (config/<version>/arm9/**/symbols.txt):
   - a function gets a stub that calls port_trap_function(), which names it, its caller and the backtrace, then stops;
   - a data object gets a placeholder in a section that port_trap_protect_data() makes inaccessible at startup, so the
     first access is reported by name rather than reading zeros.
 A referenced symbol that is in neither the objects, the host's C library nor the ROM is left for the linker to report.
-The list shrinks as upstream writes C and as port/hal implements the platform layer. A summary goes to stderr.
+The list shrinks as upstream writes C and as port/hal implements the platform layer. A summary goes to stderr. The
+generated file takes its page alignment and section from the host's headers (port/hal/host/host.h), so that the
+target, not this script's interpreter, decides them.
 
-What the host's C library provides is what this process can find in it (macOS and Linux), or, with --compiler (the
-Windows build), what the libraries that the compiler driver links into every program define, read with --nm.
+What the host's C library provides is what this process can find in it through ctypes (macOS and Linux), and, with
+--compiler (Linux and Windows), what the libraries that the compiler driver links into every program define, read
+with --nm: glibc keeps atexit in libc_nonshared.a, linked into each program and hidden from ctypes, and Windows'
+Python has no ctypes view of its process's C library. A function of standard C is never stubbed: if no lookup finds
+one the objects reference, the script fails rather than let a trap stand in for the C library (the platform layer
+calls it too: backup.c's atexit). And since the decomp's wide strings are 16-bit (-fshort-wchar) while only Windows'
+C library's wchar_t is, a wide-character function the objects call is a warning: the build keeps the compiler from
+turning the decomp's loops into such calls (-fno-builtin-wcslen, port/CMakeLists.txt).
 """
 import argparse
 import ctypes
@@ -31,12 +39,37 @@ IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Placeholders get room beyond the DS size, since host layouts of structs with pointers are larger
 PLACEHOLDER_SCALE = 2
 PLACEHOLDER_MAX = 0x10000
-# The largest page size of the hosts (Apple Silicon), so the protection is page-exact everywhere; Windows' 4 KiB pages
-# there, since COFF aligns no object beyond 8 KiB
-PAGE = 0x1000 if sys.platform == "win32" else 0x4000
+# nm prints Mach-O's symbols with a leading underscore; the objects are this machine's, which builds for itself
 MACHO = sys.platform == "darwin"
 # A quoted argument of the compiler driver's -### output, with its backslashes and quotes escaped
 DRIVER_ARGUMENT = re.compile(r'"((?:[^"\\]|\\.)*)"')
+
+# The functions of standard C (C11's library, but for its complex numbers, threads and Annex K), which every hosted C
+# library has, so that none is ever stubbed, though the ROM has MSL's of the same names. The wide-character ones take
+# the host's wchar_t, which is 16-bit as the decomp's is on Windows only
+MATH_C = """acos asin atan atan2 cos sin tan acosh asinh atanh cosh sinh tanh exp exp2 expm1 frexp ilogb ldexp log
+    log10 log1p log2 logb modf scalbn scalbln cbrt fabs hypot pow sqrt erf erfc lgamma tgamma ceil floor nearbyint rint
+    lrint llrint round lround llround trunc fmod remainder remquo copysign nan nextafter nexttoward fdim fmax fmin
+    fma""".split()
+WIDE_C = set("""fwprintf fwscanf swprintf swscanf vfwprintf vfwscanf vswprintf vswscanf vwprintf vwscanf wprintf wscanf
+    fgetwc fgetws fputwc fputws fwide getwc getwchar putwc putwchar ungetwc wcstod wcstof wcstold wcstol wcstoll
+    wcstoul wcstoull wcscpy wcsncpy wmemcpy wmemmove wcscat wcsncat wcscmp wcscoll wcsncmp wcsxfrm wmemcmp wcschr
+    wcscspn wcspbrk wcsrchr wcsspn wcsstr wcstok wmemchr wcslen wmemset wcsftime btowc wctob mbsinit mbrlen mbrtowc
+    wcrtomb mbsrtowcs wcsrtombs mbtowc wctomb mbstowcs wcstombs iswalnum iswalpha iswblank iswcntrl iswdigit iswgraph
+    iswlower iswprint iswpunct iswspace iswupper iswxdigit iswctype wctype towlower towupper towctrans wctrans
+    wcstoimax wcstoumax""".split())
+STANDARD_C = WIDE_C | {name + suffix for name in MATH_C for suffix in ("", "f", "l")} | set("""isalnum isalpha
+    isblank iscntrl isdigit isgraph islower isprint ispunct isspace isupper isxdigit tolower toupper feclearexcept
+    fegetexceptflag feraiseexcept fesetexceptflag fetestexcept fegetround fesetround fegetenv feholdexcept fesetenv
+    feupdateenv imaxabs imaxdiv strtoimax strtoumax setlocale localeconv longjmp signal raise remove rename tmpfile
+    tmpnam fclose fflush fopen freopen setbuf setvbuf fprintf fscanf printf scanf snprintf sprintf sscanf vfprintf
+    vfscanf vprintf vscanf vsnprintf vsprintf vsscanf fgetc fgets fputc fputs getc getchar gets putc putchar puts
+    ungetc fread fwrite fgetpos fseek fsetpos ftell rewind clearerr feof ferror perror atof atoi atol atoll strtod
+    strtof strtold strtol strtoll strtoul strtoull rand srand aligned_alloc calloc free malloc realloc abort atexit
+    at_quick_exit exit _Exit getenv quick_exit system bsearch qsort abs labs llabs div ldiv lldiv mblen memcpy memmove
+    strcpy strncpy strcat strncat memcmp strcmp strcoll strncmp strxfrm memchr strchr strcspn strpbrk strrchr strspn
+    strstr strtok memset strerror strlen clock difftime mktime time asctime ctime gmtime localtime strftime
+    timespec_get""".split())
 
 
 def load_ds_symbols(version: str) -> dict[str, dict]:
@@ -88,11 +121,22 @@ def read_object_symbols(objects: list[str], nm: str) -> tuple[set[str], set[str]
     return defined, undefined - defined
 
 
-def host_provides(name: str, libc) -> bool:
-    if isinstance(libc, set):
-        return name in libc
+def process_library():
+    """This process's C library through ctypes, where ctypes has a view of it (macOS and Linux), else None."""
     try:
-        getattr(libc, name)
+        return ctypes.CDLL(None)
+    except (OSError, TypeError):
+        return None
+
+
+def host_provides(name: str, process, libraries: set[str]) -> bool:
+    """Whether the host's C library has name: in the driver's libraries, or in this process through ctypes."""
+    if name in libraries:
+        return True
+    if process is None:
+        return False
+    try:
+        getattr(process, name)
         return True
     except AttributeError:
         return False
@@ -112,17 +156,42 @@ def driver_libraries(compiler: str) -> list[str]:
     libraries = []
     for argument in arguments:
         if argument.startswith("-l"):
-            name = argument[2:]
-            found = next((directory / candidate for directory in directories
-                          for candidate in (f"lib{name}.dll.a", f"lib{name}.a", f"{name}.lib")
-                          if (directory / candidate).is_file()), None)
-            if found is not None:
-                libraries.append(str(found))
+            libraries += find_library(argument[2:], directories)
         elif argument.endswith((".a", ".lib")) and Path(argument).is_file():
             libraries.append(argument)
     if not libraries:
         sys.exit(f"gen_stubs: {compiler} -### named no library of the C runtime: {link or result.stderr}")
     return list(dict.fromkeys(libraries))
+
+
+def find_library(name: str, directories: list[Path]) -> list[str]:
+    """The archives the linker takes for -lname, searching the directories in order as it does: an import library or a
+    static one, or the archives that a shared library's linker script adds (glibc's libc.so is one: libc.so.6, whose
+    exports ctypes sees, and libc_nonshared.a, whose atexit it doesn't). A shared library itself adds nothing here."""
+    for directory in directories:
+        for candidate in (f"lib{name}.dll.a", f"lib{name}.so", f"lib{name}.a", f"{name}.lib"):
+            path = directory / candidate
+            if not path.is_file():
+                continue
+            if candidate.endswith(".so"):
+                return script_archives(path, directories)
+            return [str(path)]
+    return []
+
+
+def script_archives(path: Path, directories: list[Path]) -> list[str]:
+    """The archives a linker script names (GROUP ( ... libc_nonshared.a ... )), or none for a shared library."""
+    with open(path, "rb") as file:
+        if file.read(4) == b"\x7fELF":
+            return []
+    archives = []
+    for token in re.findall(r"[^\s()]+\.a\b", path.read_text(errors="replace")):
+        archive = Path(token.lstrip("="))
+        if not archive.is_absolute():
+            archive = next((directory / token for directory in directories if (directory / token).is_file()), archive)
+        if archive.is_file():
+            archives.append(str(archive))
+    return archives
 
 
 def library_symbols(libraries: list[str], nm: str) -> set[str]:
@@ -143,24 +212,30 @@ def c_string(text: str) -> str:
 
 
 def write_stubs(out: Path, functions: list[tuple[str, dict]], data: list[tuple[str, dict]]):
-    section = '"__DATA,__porttrap"' if MACHO else '".porttrap"'
     lines = [
         "// Generated by port/tools/gen_stubs.py from the objects of the host build; don't edit.",
+        "#include \"hal/host/host.h\"",
         "#include \"hal/trap.h\"",
         "",
-        f"#define PORT_TRAP_DATA __attribute__((section({section}), aligned(16), used))",
-        f"#define PORT_TRAP_PAGE __attribute__((section({section}), aligned({PAGE:#x}), used))",
+        "// The placeholders' own section, whose paddings start and end a page of the host's (port/hal/host/host.h)",
+        "#ifdef __APPLE__",
+        "#define PORT_TRAP_SECTION \"__DATA,__porttrap\"",
+        "#else",
+        "#define PORT_TRAP_SECTION \".porttrap\"",
+        "#endif",
+        "#define PORT_TRAP_DATA __attribute__((section(PORT_TRAP_SECTION), aligned(16), used))",
+        "#define PORT_TRAP_PAGE __attribute__((section(PORT_TRAP_SECTION), aligned(PORT_HOST_PAGE_ALIGNMENT), used))",
         "",
     ]
     for name, info in functions:
         lines.append(f"static const PortTrapSymbol s_{name} = {{{c_string(name)}, {info['address']:#010x}, "
                      f"{info['size']:#x}, {c_string(info['module'])}}};")
         lines.append(f"void {name}(void) {{ port_trap_function(&s_{name}, __builtin_return_address(0)); }}")
-    lines += ["", f"PORT_TRAP_PAGE unsigned char port_trap_padding_begin[{PAGE:#x}];"]
+    lines += ["", "PORT_TRAP_PAGE unsigned char port_trap_padding_begin[PORT_HOST_PAGE_ALIGNMENT];"]
     for name, info in data:
         size = min(max(info["size"], 4) * PLACEHOLDER_SCALE, PLACEHOLDER_MAX)
         lines.append(f"PORT_TRAP_DATA unsigned char {name}[{size:#x}];")
-    lines += [f"PORT_TRAP_PAGE unsigned char port_trap_padding_end[{PAGE:#x}];", ""]
+    lines += ["PORT_TRAP_PAGE unsigned char port_trap_padding_end[PORT_HOST_PAGE_ALIGNMENT];", ""]
     lines.append("const PortTrapSymbol port_trap_data_symbols[] = {")
     for name, info in data:
         size = min(max(info["size"], 4) * PLACEHOLDER_SCALE, PLACEHOLDER_MAX)
@@ -173,7 +248,7 @@ def write_stubs(out: Path, functions: list[tuple[str, dict]], data: list[tuple[s
     lines.append("};")
     lines.append(f"const size_t port_trap_data_count = {len(data)};")
     lines.append("unsigned char *const port_trap_data_begin = port_trap_padding_begin;")
-    lines.append(f"unsigned char *const port_trap_data_end = port_trap_padding_end + {PAGE:#x};")
+    lines.append("unsigned char *const port_trap_data_end = port_trap_padding_end + PORT_HOST_PAGE_ALIGNMENT;")
     text = "\n".join(lines) + "\n"
     if not out.exists() or out.read_text() != text:
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -187,7 +262,8 @@ def main():
     parser.add_argument("--objects", nargs="+", default=[])
     parser.add_argument("--objects-file", type=Path, help="a file that lists the objects, one a line")
     parser.add_argument("--nm", default="nm", help="the nm to read the objects with")
-    parser.add_argument("--compiler", help="the compiler driver whose libraries provide the C library (Windows)")
+    parser.add_argument("--compiler",
+                        help="the compiler driver whose libraries provide the C library too (Linux and Windows)")
     args = parser.parse_args()
 
     objects = list(args.objects)
@@ -197,23 +273,34 @@ def main():
         sys.exit("gen_stubs: no objects")
     ds = load_ds_symbols(args.version)
     defined, undefined = read_object_symbols(objects, args.nm)
-    if args.compiler is not None:
-        libc = library_symbols(driver_libraries(args.compiler), args.nm)
-    else:
-        libc = ctypes.CDLL(None)
+    process = process_library()
+    libraries = library_symbols(driver_libraries(args.compiler), args.nm) if args.compiler is not None else set()
+    if process is None and not libraries:
+        sys.exit("gen_stubs: no view of the host's C library: give --compiler and --nm (Windows)")
     functions, data, unknown, provided = [], [], [], []
     for name in sorted(undefined):
         info = ds.get(name)
         if info is None or not IDENTIFIER.match(name) or keyword.iskeyword(name):
             # A Windows object names a library's function by its import, __imp_NAME
             library_name = name.removeprefix("__imp_")
-            if not host_provides(library_name, libc) and not library_name.startswith(("SDL_", "port_")):
+            if (not host_provides(library_name, process, libraries) and
+                    not library_name.startswith(("SDL_", "port_"))):
                 unknown.append(name)
             continue
-        if host_provides(name, libc):
+        if host_provides(name, process, libraries):
             provided.append(name)
             continue
         (functions if info["function"] else data).append((name, info))
+    standard = sorted(name for name, _ in functions + data if name in STANDARD_C)
+    if standard:
+        sys.exit(f"gen_stubs: the objects reference {', '.join(standard)}, of standard C, which no lookup found in the "
+                 "host's C library; a trap stub would stand in for it (give --compiler and --nm, or see why the "
+                 "lookup misses it)")
+    wide = sorted({name.removeprefix("__imp_") for name in undefined} & WIDE_C)
+    if wide:
+        print(f"gen_stubs: warning: the objects call the host C library's {', '.join(wide)}, whose wchar_t only "
+              "Windows' shares with the decomp's 16-bit wide strings (-fshort-wchar); -fno-builtin-NAME in "
+              "port/CMakeLists.txt keeps the compiler from turning a loop into such a call", file=sys.stderr)
     data.sort(key=lambda item: (item[1]["module"], item[1]["address"]))
     write_stubs(args.out, functions, data)
     print(f"gen_stubs: {len(functions)} function stubs, {len(data)} data placeholders, "

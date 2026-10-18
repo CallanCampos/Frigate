@@ -78,10 +78,12 @@ endif()
 get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 set(PORT_GEN "${CMAKE_CURRENT_BINARY_DIR}/gen")
 
-# The repository's virtual environment when there is one (it has the decomp's Python packages), else any Python 3
+# The repository's virtual environment when there is one (it has the decomp's Python packages), else any Python 3: on
+# Windows the one on PATH first, the CLANG64 shell's own (port/README.md), before any the registry names
 if(EXISTS "${REPO_ROOT}/.venv/bin/python")
     set(PORT_PYTHON "${REPO_ROOT}/.venv/bin/python")
 else()
+    set(Python3_FIND_REGISTRY LAST)
     find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
     set(PORT_PYTHON "${Python3_EXECUTABLE}")
 endif()
@@ -105,6 +107,13 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${REPO_ROOT}/port/hal/replaced.txt" "${REPO_ROOT}/port/tools/gen_host_tree.py")
 file(GLOB_RECURSE port_watched CONFIGURE_DEPENDS
     "${REPO_ROOT}/src/*.c" "${REPO_ROOT}/lib/*.c" "${REPO_ROOT}/lib/*.h" "${REPO_ROOT}/include/*")
+# Where the include/ mirror is copies (Windows without the right to make links), a header's change reaches the build
+# only through a configure, which copies it again: every header is then a configure dependency
+file(STRINGS "${PORT_GEN}/include_mirror.txt" port_include_mirror)
+if(port_include_mirror STREQUAL "copies")
+    file(GLOB_RECURSE port_include_headers "${REPO_ROOT}/include/*")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${port_include_headers})
+endif()
 file(STRINGS "${PORT_GEN}/sources.txt" game_sources_relative)
 list(TRANSFORM game_sources_relative PREPEND "${REPO_ROOT}/" OUTPUT_VARIABLE game_sources)
 
@@ -129,15 +138,18 @@ endif()
 # language model (signed char, int-sized enums, 16-bit wchar_t, wrapping signed arithmetic, no strict aliasing since
 # the code puns types, no float contraction, and zeroed locals, since uninitialized reads gave deterministic values on
 # the DS; PLAN.md §4.4), the version, and the include path with the host variants of the headers that name DS
-# addresses first (ADR 0004). The decomp's headers are system headers here, so their warnings stay out of port code
+# addresses first (ADR 0004). The decomp's headers are system headers here, so their warnings stay out of port code.
+# With 16-bit wchar_t, clang would turn a loop that counts a u16 string (NitroSDK's MBGameInfo_CountChars, GameSpy's
+# Gt2_WStrLen) into a call of the C library's wcslen, whose wchar_t is 32-bit on macOS and Linux: -fno-builtin-wcslen
+# keeps the loop, on every host (port/tools/gen_stubs.py warns of any such call)
 add_library(port_decomp_env INTERFACE)
 target_compile_definitions(port_decomp_env INTERFACE PLATFORM_PC ${PORT_VERSION_DEFINE})
 file(GLOB library_includes LIST_DIRECTORIES true "${REPO_ROOT}/lib/*/include")
 target_include_directories(port_decomp_env SYSTEM INTERFACE
     "${PORT_GEN}/hwinclude" "${PORT_GEN}/include" ${library_includes} "${REPO_ROOT}/build/include/generated")
 target_compile_options(port_decomp_env INTERFACE
-    -fsigned-char -fshort-wchar -fwrapv -fno-strict-aliasing -ffp-contract=off -ftrivial-auto-var-init=zero
-    -fno-common
+    -fsigned-char -fshort-wchar -fno-builtin-wcslen -fwrapv -fno-strict-aliasing -ffp-contract=off
+    -ftrivial-auto-var-init=zero -fno-common
     "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/include/port_host.h"
     # The decomp declares C library functions itself (DWC's ext.h), which the macOS headers' fortify macros rename
     -D_FORTIFY_SOURCE=0
@@ -166,7 +178,8 @@ set_source_files_properties("${REPO_ROOT}/src/system/main.c" PROPERTIES COMPILE_
 # their own add them
 set(port_host_sources
     "${CMAKE_CURRENT_SOURCE_DIR}/hal/host/host_posix.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/host/host_windows.c")
-# glibc's dladdr and dl_iterate_phdr, defined ahead of the decomp's forced include, whose headers come first
+# glibc's dladdr and dl_iterate_phdr: _GNU_SOURCE on the command line, so that it comes ahead of the decomp's forced
+# include, whose system headers come first, in every target that compiles the file
 set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/hal/host/host_posix.c" PROPERTIES
     COMPILE_DEFINITIONS _GNU_SOURCE)
 # Windows gives the main thread 1 MiB of stack, where macOS and Linux give 8 MiB; the dispatcher, the interrupt
@@ -184,7 +197,8 @@ add_library(port_hal OBJECT ${port_hal_sources})
 target_link_libraries(port_hal PRIVATE port_decomp_env)
 target_include_directories(port_hal PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_hal PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
-# dladdr and Dl_info on glibc; port_host.h, force-included first, already pulls in system headers
+# glibc's memfd_create for the VRAM's aliasing (hal/gx/vram_os.c), on the command line since port_host.h, force-included
+# first, already pulls in system headers
 target_compile_definitions(port_hal PRIVATE _GNU_SOURCE)
 
 # The renderers and other code that doesn't include the decomp's headers: every C file under gfx/
@@ -198,15 +212,16 @@ if(port_gfx_sources)
 endif()
 
 # Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py). The
-# objects' paths go in a file, one a line: on a command line, their 190 KB would pass Windows' limit of 32 KB. On
-# Windows the compiler driver's libraries say what the C library provides, read with the toolchain's nm
+# objects' paths go in a file, one a line: on a command line, their 190 KB would pass Windows' limit of 32 KB. On Linux
+# and Windows the compiler driver's libraries say what the C library provides too, read with the toolchain's nm (glibc
+# keeps atexit in libc_nonshared.a, where Python's ctypes doesn't see it; Windows' Python has no such view at all)
 set(port_stubs_objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
     "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects})
 file(GENERATE OUTPUT "${PORT_GEN}/stubs_objects.txt" CONTENT "$<JOIN:${port_stubs_objects},\n>\n")
 set(port_stubs_host_options "")
-if(WIN32)
+if(NOT APPLE)
     if(NOT CMAKE_NM)
-        message(FATAL_ERROR "No nm was found for port/tools/gen_stubs.py; the toolchain's llvm-nm is the one it needs")
+        message(FATAL_ERROR "No nm was found for port/tools/gen_stubs.py; the toolchain's nm is the one it needs")
     endif()
     set(port_stubs_host_options --nm "${CMAKE_NM}" --compiler "${CMAKE_C_COMPILER}")
 endif()
@@ -249,6 +264,25 @@ list(SORT port_cmake_fragments)
 foreach(fragment IN LISTS port_cmake_fragments)
     include("${fragment}")
 endforeach()
+
+# Windows: every program of the build, the game's and the tests', carries port/app/windows/utf8.manifest, which makes
+# UTF-8 its code page, so that its arguments, the C library's file calls and SDL's paths agree on a name that isn't
+# ASCII. The resource script, written here, names the manifest by its path
+if(WIN32)
+    enable_language(RC)
+    set(port_manifest "${CMAKE_CURRENT_SOURCE_DIR}/app/windows/utf8.manifest")
+    set(port_manifest_rc "${PORT_GEN}/utf8_manifest.rc")
+    file(CONFIGURE OUTPUT "${port_manifest_rc}" CONTENT "1 24 \"${port_manifest}\"\n")
+    add_library(port_windows_manifest OBJECT "${port_manifest_rc}")
+    set_property(SOURCE "${port_manifest_rc}" APPEND PROPERTY OBJECT_DEPENDS "${port_manifest}")
+    get_property(port_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(target IN LISTS port_targets)
+        get_target_property(type ${target} TYPE)
+        if(type STREQUAL "EXECUTABLE")
+            target_sources(${target} PRIVATE $<TARGET_OBJECTS:port_windows_manifest>)
+        endif()
+    endforeach()
+endif()
 
 # Tests (ctest --test-dir build/port). The smoke test runs the game's first frame: it passes once the program enters
 # the game's main() and the frame ends without a crash (a trap stub stopping it is still accepted). Like every test that
