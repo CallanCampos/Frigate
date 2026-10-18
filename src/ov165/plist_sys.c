@@ -118,20 +118,15 @@ static void PokeList_MessageDoneDemo(PokeListWork *wk);
 static void PokeList_SetHeldItem(PokeListWork *wk, PartyPkm *pkm, u16 item);
 static u16 PokeList_GetBagCount(PokeListWork *wk, u16 item);
 
-static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(128) };
-static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
-static const VecFx32 sCameraTarget = { 0, 0, 0 };
-
-static const BGSysLCDConfig sLCDConfig = { 1, 0, 0, 0 };
-
-static const BGSetup sBG5Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 4, 0x8000, 1, 1, 0, 0 };
-static const BGSetup sBG6Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xd, 2, 0x8000, 1, 2, 0, 0 };
-static const BGSetup sBG7Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xc, 0, 0x6000, 1, 3, 0, 0 };
+// BG 0's setup, which PokeList_CreateBG0 uses, also after plist_demo.c's 3D demo. It is at file scope, ahead of the
+// other BGs' setups (statics of PokeList_InitGraphics): only there does the ROM's .rodata come out in its order
 static const BGSetup sBG0Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 0, 0, 0, 0 };
-static const BGSetup sBG1Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xa, 2, 0x8000, 0, 1, 0, 0 };
-static const BGSetup sBG2Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xc, 4, 0x8000, 0, 2, 1, 0 };
-static const BGSetup sBG3Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 0, 0x5000, 1, 3, 0, 0 };
-static const BGSetup sBG4Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 1, 0, 0, 0 };
+
+// The moves outside battle, by the index of their check in CheckAllowHidenEvent
+static const u16 sHidenMoves[] = {
+    MOVE_CUT, MOVE_SURF,        MOVE_WATERFALL, MOVE_STRENGTH, MOVE_FLY,        MOVE_FLASH,      MOVE_TELEPORT,
+    MOVE_DIG, MOVE_SWEET_SCENT, MOVE_CHATTER,   MOVE_DIVE,     MOVE_MILK_DRINK, MOVE_SOFTBOILED,
+};
 
 BOOL PokeList_Init(PokeListWork *wk) {
     u8 count = PokeParty_GetPkmCount(wk->param->party);
@@ -411,6 +406,7 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         }
     }
     {
+        static const u16 angleStep = 0x400;
         u16 glowColors[3] = { 0x7ff4, 0x7fff, 0x7be9 };
         u16 baseColors[3] = { 0x4a0a, 0x5ef7, 0x4140 };
         u8 i;
@@ -418,10 +414,10 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         fx32 ratio;
 
         if (wk->glowPaused == FALSE) {
-            if (wk->glowAngle + 0x400 >= 0x10000) {
-                wk->glowAngle = wk->glowAngle + 0x400 - 0x10000;
+            if (wk->glowAngle + angleStep >= 0x10000) {
+                wk->glowAngle = wk->glowAngle + angleStep - 0x10000;
             } else {
-                wk->glowAngle = wk->glowAngle + 0x400;
+                wk->glowAngle = wk->glowAngle + angleStep;
             }
         } else {
             wk->glowAngle = 0xc000;
@@ -463,6 +459,14 @@ static void PokeList_VBlank(TCB *tcb, void *data) {
 }
 
 static void PokeList_InitGraphics(PokeListWork *wk) {
+    static const BGSysLCDConfig sLCDConfig = { 1, 0, 0, 0 };
+    static const BGSetup sBG1Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xa, 2, 0x8000, 0, 1, 0, 0 };
+    static const BGSetup sBG2Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xc, 4, 0x8000, 0, 2, 1, 0 };
+    static const BGSetup sBG3Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 0, 0x5000, 1, 3, 0, 0 };
+    static const BGSetup sBG4Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 1, 0, 0, 0 };
+    static const BGSetup sBG5Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 4, 0x8000, 1, 1, 0, 0 };
+    static const BGSetup sBG6Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xd, 2, 0x8000, 1, 2, 0, 0 };
+    static const BGSetup sBG7Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xc, 0, 0x6000, 1, 3, 0, 0 };
     BGSysVRAMConfig vramConfig = {
         GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
         GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_NONE,        GX_VRAM_SUB_OBJEXTPLTT_NONE,
@@ -514,6 +518,14 @@ void PokeList_CreateBG0(PokeListWork *wk) {
 }
 
 void PokeList_Init3D(PokeListWork *wk) {
+    static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(128) };
+    static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
+    static const VecFx32 sCameraTarget = { 0, 0, 0 };
+    // Black for all eight edge colors, the table G3X_SetEdgeColorTable would load for the edge marking turned on below
+    // (our reading of its size and place). Nothing loads it, but MWCC still emits an unread function-local static: it
+    // is the 16 zero bytes after sLCDConfig in the ROM's .rodata
+    static const GXRgb sEdgeColors[8] = { 0 };
+
     GX_SetGraphicsMode(1, 0, 1);
     GFL_G3DSysCreate(FALSE, 1, FALSE, 1, 0, wk->heapId, NULL);
     G2_SetBG0Priority(0);
@@ -1760,8 +1772,8 @@ static void func_ov165_0219c820(PokeListWork *wk) {
 
 // Moves the cursor with the keys, and takes A, B, X and Y
 static void func_ov165_0219c87c(PokeListWork *wk) {
-    static const u8 sUpFromButtonsTwo[] = { 0, 0, 2, 2, 4, 4 };
     static const u8 sUpFromButtons[] = { 0, 1, 1, 3, 3, 5 };
+    static const u8 sUpFromButtonsTwo[] = { 0, 0, 2, 2, 4, 4 };
     u32 trg = GCTX_HIDGetPressedKeys();
     u32 rep = GCTX_HIDGetTypedKeys();
 
@@ -2092,12 +2104,6 @@ static void func_ov165_0219cf70(PokeListWork *wk) {
     GFL_BGSysFillScrAsync(0, 0);
     wk->touch = func_0203d554();
 }
-
-// The moves outside battle, by the index of their check in CheckAllowHidenEvent
-static const u16 sHidenMoves[] = {
-    MOVE_CUT, MOVE_SURF,        MOVE_WATERFALL, MOVE_STRENGTH, MOVE_FLY,        MOVE_FLASH,      MOVE_TELEPORT,
-    MOVE_DIG, MOVE_SWEET_SCENT, MOVE_CHATTER,   MOVE_DIVE,     MOVE_MILK_DRINK, MOVE_SOFTBOILED,
-};
 
 // Does what the menu item picked does
 static void PokeList_DoMenuItem(PokeListWork *wk) {

@@ -853,6 +853,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An "unreferenced global" there whose values a function uses as immediates is several scalars of that function, one
   per value (`ctvt_game_cam.c`'s crop, four `u16`); their count orders equal-size initializers anywhere in the file.
   (matching.md: "The values a function already uses as immediates")
+- Unread 16 zero bytes among the shared `.rodata` of a file that sets up 3D: a function-local
+  `static const GXRgb edgeColors[8]` in the function that turns edge marking on (`plist_sys.c`). (matching.md:
+  "its function shows what it is")
 - Function-local statics are listed last, after the tentative `.bss` statics, by function in reverse order; one in a
   `static inline` is listed where the inline is defined. (matching.md: "joins the size sort at the end of the file")
 - An object at the head of the shared `.rodata` or `.data`, larger than the ones after it and packed against them:

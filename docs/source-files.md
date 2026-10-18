@@ -1512,7 +1512,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `pokelist.c` | `0x02199a00`–`0x02199b88` | 4 | complete | descriptive |
-| `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | partial | descriptive |
+| `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | complete | descriptive |
 | `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | complete | string at `0x021a4cec` |
 | `plist_message.c` | `0x0219f5ec`–`0x0219fae8` | 23 | complete | string at `0x021a4cfc` |
 | `plist_menu.c` | `0x0219fae8`–`0x0219fef0` | 14 | complete | string at `0x021a4d0c` |

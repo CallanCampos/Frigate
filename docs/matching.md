@@ -3096,6 +3096,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a file's shared `.rodata` are such locals: `win_record.c` has its two columns' x (`{ 0, 144 }`) in
   `WinRecord_PrintItemAt` and its BG scroll's speed and wrap (`{ 0x40, 0x2000 }`) in `WinRecord_ScrollBG`, read as
   `add r2, #0x40`, and a 12-byte table that nothing reads, 4-aligned, so it is declared as `u32`s.
+- Such a static can sit anywhere in the shared section, sorted by its size, and its function shows what it is.
+  Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`: they are
+  `static const GXRgb sEdgeColors[8]`, the eight colors of `G3X_SetEdgeColorTable`, in `PokeList_Init3D`, which turns
+  edge marking on but never loads the table. With the cameras as statics of the same function, the BG setups as
+  statics of `PokeList_InitGraphics` in BG order (only BG 0's, shared with `PokeList_CreateBG0`, at file scope) and
+  the glow's step as a `static const u16`, its whole `.rodata` is the ROM's. Overlay 194's `pokemontrade_2d.c` has the
+  same unread 16 zero bytes, which fit just before its 3D setup.
 - A `static const` variable whose address is never taken is folded into the code and not emitted. If the original has
   it anyway, it is not `static`: a global that no code refers to gets a section of its own, laid out by size with the
   rest. An object laid out ahead of smaller ones is in a file of its own, linked first, as overlay 65's command table
