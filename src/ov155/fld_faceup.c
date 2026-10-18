@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_script.h"
 #include "field/fld_faceup.h"
@@ -21,9 +22,6 @@
 
 // The face-up (the file name is the ROM's): a close-up of a character's face over the field. The face is on BG 2 and
 // its eyes and mouth on BG 3, where two animations write the frames' map entries, which a VBlank task loads
-
-// The face-up's archive, a/1/8/4 (not in swan)
-#define ARCID_FLD_FACEUP 184
 
 // The script sub event of the message that the mouth moves with (scrcmd_work.c tests it as well)
 #define SCRIPT_SUB_EVENT_MSG 3

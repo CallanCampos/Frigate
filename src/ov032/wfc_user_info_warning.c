@@ -29,8 +29,7 @@
 #define MSG_USER_INFO_ERASED 16
 #define MSG_USER_INFO_ERASED_DSI 42
 
-// The archive of the window's graphics (save_error.c's), and its files
-#define ARCID_ERROR_WINDOW_GRA 22
+// The files of the window's graphics in ARCID_ERROR_WINDOW_GRA (save_error.c's)
 #define ERROR_WINDOW_GRA_PLTT 0
 #define ERROR_WINDOW_GRA_CHAR 1
 #define ERROR_WINDOW_GRA_SCRN 2

@@ -176,7 +176,7 @@ void func_ov194_021c2c64(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c2c84(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     int screen;
 
     if (PokemonTrade_IsNegoType(wk)) {
@@ -200,7 +200,7 @@ void func_ov194_021c2d0c(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c2d34(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 12, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
@@ -210,7 +210,7 @@ void func_ov194_021c2d74(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c2d78(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 17, 4, 0, 0xc0, wk->heapId);
     wk->bg7Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 13, 7, 0, FALSE, wk->heapId);
@@ -253,7 +253,7 @@ void func_ov194_021c2e6c(PokemonTradeWork *wk) {
 
 void func_ov194_021c2ef0(PokemonTradeWork *wk, int side, int page) {
     u32 screens[] = { 27, 28 };
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, screens[page], 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     if (side) {
@@ -336,10 +336,10 @@ void func_ov194_021c30b8(PokemonTradeWork *wk) {
 static void func_ov194_021c3128(PokemonTradeWork *wk, u32 chars) {
     int i;
 
-    wk->stripScreens[0] = GFL_ArcSysReadHeapNew(0x67, 14, wk->heapId);
-    wk->stripScreens[1] = GFL_ArcSysReadHeapNew(0x67, 15, wk->heapId);
-    wk->stripScreens[2] = GFL_ArcSysReadHeapNew(0x67, 25, wk->heapId);
-    wk->stripScreens[3] = GFL_ArcSysReadHeapNew(0x67, 26, wk->heapId);
+    wk->stripScreens[0] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 14, wk->heapId);
+    wk->stripScreens[1] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 15, wk->heapId);
+    wk->stripScreens[2] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 25, wk->heapId);
+    wk->stripScreens[3] = GFL_ArcSysReadHeapNew(ARCID_POKEMONTRADE, 26, wk->heapId);
     for (i = 0; i < SCREEN_WIDTH * 24; i++) {
         wk->stripScreens[0][SCREEN_CELLS + i] += CHAR_POS(chars);
         wk->stripScreens[1][SCREEN_CELLS + i] += CHAR_POS(chars);
@@ -1003,14 +1003,14 @@ void func_ov194_021c4088(PokemonTradeWork *wk, BOOL other) {
         GFL_BGSysCreateBG(7, &setup, BGMODE_EXTENDED);
     }
     if (!other) {
-        arc = GFL_ArcSysCreateFileHandle(0x68, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE_DEMO, wk->heapId);
         GFL_G2DIOLoadArcNCLRDefault(arc, 5, 6, 0x6000, 0, wk->heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 4, 7, 0, 0, FALSE, wk->heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 6, 7, 0, 0, FALSE, wk->heapId);
         GFL_BGSysMoveBG(7, BG_MOVE_SET_X, 0);
         GFL_ArcToolFree(arc);
     } else {
-        arc = GFL_ArcSysCreateFileHandle(0x69, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE_2D, wk->heapId);
         GFL_G2DIOLoadArcNCLRDefault(arc, 1, 6, 0x6000, 0, wk->heapId);
         GFL_BGSysLoadArcNCGRStatic(arc, 0, 7, 0, 0, FALSE, wk->heapId);
         loadBGScrToVramByFileNoReserveNegAlign(arc, 2, 7, 0, 0, FALSE, wk->heapId);
@@ -1257,7 +1257,7 @@ void func_ov194_021c45ec(int config) {
 // Loads the sprites of the upper screen once
 void func_ov194_021c4600(PokemonTradeWork *wk) {
     if (wk->objRes[TRADE_OBJRES_CHAR_MAIN] == 0) {
-        ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+        ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
         wk->objRes[TRADE_OBJRES_CHAR_MAIN] = func_0204b81c(arc, 21, FALSE, CLACT_VRAM_MAIN, wk->heapId);
         wk->objRes[TRADE_OBJRES_PLTT_MAIN] = func_0204bbb8(arc, 18, CLACT_VRAM_MAIN, 0xc0, 0, 6, wk->heapId);
@@ -1280,7 +1280,7 @@ void func_ov194_021c466c(PokemonTradeWork *wk) {
 // Loads the sprites of the lower screen, and shows the one at the bottom of the strip
 void func_ov194_021c46a4(PokemonTradeWork *wk) {
     ClActorSetup setup;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     wk->objRes[TRADE_OBJRES_CHAR_SUB] = func_0204b81c(arc, 24, FALSE, CLACT_VRAM_SUB, wk->heapId);
     wk->objRes[TRADE_OBJRES_PLTT_SUB] = func_0204bbb8(arc, 18, CLACT_VRAM_SUB, 0xc0, 0, 6, wk->heapId);
@@ -1298,7 +1298,7 @@ void func_ov194_021c46a4(PokemonTradeWork *wk) {
 }
 
 void func_ov194_021c475c(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 29, 2, 0, CHAR_POS(wk->bg2Chars), 0, FALSE, wk->heapId);
     GFL_ArcToolFree(arc);
@@ -1422,7 +1422,7 @@ void func_ov194_021c4a68(PokemonTradeWork *wk) {
 
     GFL_BGSysSetBGEnabled(4, FALSE);
     GFL_BGSysSetBGEnabled(6, FALSE);
-    arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 16, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_BGSysQueueScrLoad(4);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_X, -4);
@@ -2037,7 +2037,7 @@ void func_ov194_021c5994(PokemonTradeWork *wk) {
     ArcTool *arc;
 
     wk->cursorImage = LoadCursorImageEndOfHeap(6, 15, 0, wk->heapId);
-    arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     wk->bg5Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 13, 5, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 7, 4, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 7, 5, 0, CHAR_POS(wk->bg5Chars), 0, FALSE, wk->heapId);
@@ -2077,7 +2077,7 @@ void func_ov194_021c5abc(PokemonTradeWork *wk) {
         { 96, 32 }, { 104, 64 }, { 104, 112 }, { 104, 160 }, { 224, 32 }, { 232, 64 }, { 232, 112 }, { 232, 160 },
     };
     ClActorSetup setup;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     int i;
 
     wk->negoPanelPltt = func_0204bbb8(arc, 0, CLACT_VRAM_SUB, 0x1c0, 0, 1, wk->heapId);
@@ -2151,7 +2151,7 @@ void func_ov194_021c5c80(PokemonTradeWork *wk) {
 
 // Shows the background of a side's panel on the sub screen
 void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x67, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
     NNSG2dScreenData *screen;
     void *file;
     u16 *cells;

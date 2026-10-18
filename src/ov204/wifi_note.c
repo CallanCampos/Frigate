@@ -59,9 +59,6 @@
 // same five screens: the menu, the friend roster, the name and code entry, the player's own code and a friend's
 // record. Our names
 
-// The archive of the screen's graphics
-#define ARCID_WIFI_NOTE 62
-
 // The screens, the mode of the work
 enum {
     WIFI_NOTE_MODE_SELECT,

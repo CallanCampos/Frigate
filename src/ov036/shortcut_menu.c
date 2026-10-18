@@ -134,7 +134,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID hea
     GFL_BGSysFillChar(BG, 0, 1, 0);
     work->unit = func_0204bf1c(8, 0, heapId);
 
-    arc = GFL_ArcSysCreateFileHandle(0x81, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_SHORTCUT_MENU, heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0x160, 0x40, heapId);
     work->palette = func_0204bbb8(arc, 4, 0, 0x40, 0, 1, heapId);
     work->chars = func_0204b81c(arc, 3, FALSE, 0, heapId);

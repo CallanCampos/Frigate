@@ -1191,7 +1191,7 @@ static void ShopUI_LoadG2D(ShopUIWork *wk) {
     ArcTool *arc;
 
     G2_BlendNone();
-    arc = GFL_ArcSysCreateFileHandle(53, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_SCRCMD_SHOP, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, 0, 0, 0x60, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 0, 2, 100, 0, FALSE, wk->heapId);
     if (wk->listMode == SHOP_LIST_MOVES) {
@@ -1213,7 +1213,7 @@ static void ShopUI_FreeBG(ShopUIWork *wk) {
 }
 
 static void ShopUI_CreateCellActors(ShopUIWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(53, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SCRCMD_SHOP, wk->heapId);
 
     wk->res[0].palette = func_0204bbb8(arc, 11, 0, 0, 0, 1, wk->heapId);
     wk->res[0].chars = func_0204b81c(arc, 8, 0, 0, wk->heapId);

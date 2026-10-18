@@ -4,6 +4,7 @@
 #include "battle/b_bag_main.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_finger_cursor.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/clact.h"
@@ -158,7 +159,7 @@ static void BBagObj_LoadItemIconPalette(BBagWork *wk, u16 item, u32 row) {
 }
 
 static void BBagObj_LoadGaugeRes(BBagWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(98, HEAPID_TAIL(wk->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_BAG, HEAPID_TAIL(wk->param->heapId));
 
     wk->charRes[7] = func_0204b81c(arc, 14, TRUE, CLACT_VRAM_SUB, wk->param->heapId);
     wk->plttRes[7] = func_0204bba0(arc, 15, CLACT_VRAM_SUB, 0xe0, wk->param->heapId);
@@ -169,7 +170,7 @@ static void BBagObj_LoadGaugeRes(BBagWork *wk) {
 
 static void BBagObj_LoadCursorRes(BBagWork *wk) {
     NNSG2dPaletteData *palette;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(wk->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(wk->param->heapId));
     void *file;
 
     wk->charRes[8] = func_0204b81c(arc, 424, FALSE, CLACT_VRAM_SUB, wk->param->heapId);

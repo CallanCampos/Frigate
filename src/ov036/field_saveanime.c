@@ -1,6 +1,7 @@
 // The icon that shows over the player while the game saves, which animates on a background layer. The name is the
 // ROM's own, from GFL_HeapAllocate's file argument.
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_effect.h"
@@ -88,10 +89,10 @@ void func_ov036_021c6d3c(void *effect) {
 }
 
 static void func_ov036_021c6d58(FieldSaveAnime *anime, HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0xc5, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_SAVEANIME, heapId);
     u32 gender = getTrainerGender(GetGameDataPlayerInfo(GSYS_GetGameData(Field_GetGameSystem(anime->field))));
 
-    anime->bitmap = GFL_G2DIOLoadBitmap(0xc5, 0, FALSE, heapId);
+    anime->bitmap = GFL_G2DIOLoadBitmap(ARCID_FIELD_SAVEANIME, 0, FALSE, heapId);
     GFL_G2DIOLoadArcNCLR(arc, 1, 0, SAVE_ANIME_PALETTE_OFFSETS[gender] << 5, 0x120, 0x20, heapId);
     GFL_ArcToolFree(arc);
 }

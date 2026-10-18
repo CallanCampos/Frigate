@@ -302,7 +302,7 @@ CtvtGameCam *CtvtGameCam_Create(HeapID heapId, BOOL cameraEnabled, int type, u8 
         u32 fileId = files[character];
 
         for (i = 0; i < 3; i++) {
-            cam->pictures[i] = GFL_ArcSysReadHeapNewLZ(242, i + fileId, FALSE, heapId);
+            cam->pictures[i] = GFL_ArcSysReadHeapNewLZ(ARCID_CTVT_GAME_CAM, i + fileId, FALSE, heapId);
         }
     }
     for (i = 0; i < 3; i++) {
@@ -330,7 +330,7 @@ void CtvtGameCam_Delete(CtvtGameCam *cam) {
 }
 
 static void CtvtGameCam_LoadBG(HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(242, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME_CAM, heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 3, 0, 0, 0, FALSE, heapId);
@@ -352,7 +352,7 @@ static void CtvtGameCam_FreeBG(void) {
 }
 
 static void CtvtGameCamActors_Init(CtvtGameCamActors *clact, ClActUnit *unit, HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(242, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME_CAM, heapId);
     ClActorSetup setup;
 
     clact->resources[0] = func_0204bc48(arc, 1, 2, 0, heapId);
@@ -584,7 +584,7 @@ static BOOL CtvtGameCamCamera_IsShutterSoundPlaying(CtvtGameCamCamera *camera) {
 }
 
 static void CtvtGameCamRoulette_Init(CtvtGameCamRoulette *roulette, HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(242, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME_CAM, heapId);
 
     roulette->pictures[0] = GFL_ArcToolReadHeapNewLZ(arc, 9, FALSE, heapId);
     roulette->pictures[1] = GFL_ArcToolReadHeapNewLZ(arc, 12, FALSE, heapId);
@@ -1039,7 +1039,7 @@ static void CtvtGameCam_SeqRouletteIntro(CtvtGameCamSeq *seq, int *state, CtvtGa
     for (i = 3; i < 7; i++) {
         func_0204c124(CtvtGameCamActors_GetActor(&task->clact, i), TRUE);
     }
-    arc = GFL_ArcSysCreateFileHandle(242, task->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME_CAM, task->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 4, 0, 0, task->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 2, 4, 0, 0, FALSE, task->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 5, 4, 0, 0, FALSE, task->heapId);
@@ -1139,7 +1139,8 @@ static void CtvtGameCam_SeqRoulette(CtvtGameCamSeq *seq, int *state, CtvtGameCam
         u8 i;
 
         for (i = 0; i < 3; i++) {
-            void *picture = GFL_ArcSysReadHeapNewLZ(242, i + files[task->roulette.cursor], FALSE, task->heapId);
+            void *picture =
+                GFL_ArcSysReadHeapNewLZ(ARCID_CTVT_GAME_CAM, i + files[task->roulette.cursor], FALSE, task->heapId);
 
             CtvtGameCam_LoadMainPicture(i * 72 + 24, 20, 64, 64, picture);
             GFL_HeapFree(picture);

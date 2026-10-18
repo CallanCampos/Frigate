@@ -49,10 +49,6 @@
 // it or, when the screen was opened to make room, to remove it; its details list the cast and the box office. Named
 // after the ROM's "pkwd_selectscreen.c" (the other file of the overlay is pkwd_selectscreen_graphic.c)
 
-// The archives of the touch bar's page arrows, as in townmap_grh.c, and of the screen's marks
-#define ARCID_TOWNMAP_GRA 84
-#define ARCID_PKWD_SELECTSCREEN_OBJ 100
-
 #define SCREEN_COUNT 8
 #define PAGE_SIZE 4
 #define CAST_COUNT 6
@@ -686,7 +682,7 @@ static void PkwdSelectScreen_UpdateMenu(AppTaskMenu *menu) {
 }
 
 static void PkwdSelectScreen_LoadNewMarkRes(PkwdSelectScreenWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_SELECTSCREEN_OBJ, HEAPID_PKWD_SELECTSCREEN);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, HEAPID_PKWD_SELECTSCREEN);
 
     wk->newRes.chars = func_0204b81c(arc, 21, FALSE, 0, HEAPID_PKWD_SELECTSCREEN);
     wk->newRes.palette = func_0204bbb8(arc, 2, 0, 5 * 0x20, 0, 1, HEAPID_PKWD_SELECTSCREEN);
@@ -740,7 +736,7 @@ static void PkwdSelectScreen_FreeNewMarks(PkwdSelectScreenWork *wk) {
 }
 
 static void PkwdSelectScreen_LoadMarkRes(PkwdSelectScreenWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_SELECTSCREEN_OBJ, HEAPID_PKWD_SELECTSCREEN);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, HEAPID_PKWD_SELECTSCREEN);
 
     wk->markRes.chars = func_0204b81c(arc, 21, FALSE, 1, HEAPID_PKWD_SELECTSCREEN);
     wk->markRes.palette = func_0204bbb8(arc, 2, 1, 0, 0, 3, HEAPID_PKWD_SELECTSCREEN);

@@ -38,8 +38,6 @@
 // The archives of the medal screens. Our names; the archives hold, in order, each medal's picture data, the screen's BG
 // graphics and its cell actors' graphics
 #define ARCID_MEDAL_INFO_MEDAL_DATA 235
-#define ARCID_MEDAL_INFO_BG 237
-#define ARCID_MEDAL_INFO_OBJ 238
 
 // The BGs, in the order of sMedalInfoBGSetups
 enum {
@@ -459,7 +457,7 @@ static void MedalInfoViewer_ChangeEntry(MedalInfoViewer *viewer) {
         } else {
             MedalInfoViewer_PrintNoMedal(viewer);
         }
-        arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_BG, viewer->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_VIEWER, viewer->heapId);
         if (viewer->hasMedal == TRUE) {
             loadBGScrToVramByFileNoReserveNegAlign(arc, 5, MedalInfoViewer_GetBG(MEDAL_INFO_BG_PANEL), 0, 0, FALSE,
                                                    viewer->heapId);
@@ -557,7 +555,7 @@ static void MedalInfoViewer_BGInit(MedalInfoViewer *viewer) {
         GFL_BGSysCreateBG(sMedalInfoBGSetups[i].bg, &sMedalInfoBGSetups[i].setup, sMedalInfoBGSetups[i].mode);
         GFL_BGSysSetBGEnabled(sMedalInfoBGSetups[i].bg, TRUE);
     }
-    bgArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_BG, heapId);
+    bgArc = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_VIEWER, heapId);
     commonArc = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
     if (viewer->param->mode != MEDAL_INFO_VIEWER_MODE_LIST) {
         rank = viewer->entry->rank;
@@ -752,7 +750,7 @@ static void MedalInfoViewer_ClActInit(MedalInfoViewer *viewer) {
 
     res = viewer->res;
     arcs[1] = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
-    arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL_INFO_OBJ, heapId);
+    arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL, heapId);
     res[0].cellAnims = func_0204bde0(arcs[0], 2, 3, heapId);
     res[0].palette = func_0204bbb8(arcs[0], 0, CLACT_VRAM_BOTH, 0, 0, 6, heapId);
     res[0].chars = func_0204b81c(arcs[0], 1, FALSE, CLACT_VRAM_BOTH, heapId);

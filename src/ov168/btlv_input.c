@@ -639,7 +639,7 @@ static void BtlvInput_CoreTask(TCB *tcb, void *data) {
 
 static void BtlvInput_InitGraphics(BtlvInput *work) {
     GFL_BGSysSetLCDConfigForEngine(&data_ov168_021f3648, BGSYS_ENGINE_SUB);
-    work->arc = GFL_ArcSysCreateFileHandle(11, work->heapId);
+    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, work->heapId);
     work->moveUnit = func_0204bf1c(4, 2, work->heapId);
     work->pokeUnit = func_0204bf1c(12, 2, work->heapId);
     work->cursorUnit = func_0204bf1c(6, 0, work->heapId);
@@ -2537,7 +2537,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
         } else {
             palette = 463;
         }
-        palBuf = GFL_G2DIOReadNCLR(11, palette, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, palette, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x90, 0x20);
         GFL_HeapFree(palBuf);
     }
@@ -2600,12 +2600,12 @@ static void BtlvInput_DrawTargetPanels(BtlvInput *work, BtlvInputScreenTask *tas
 
     count = (work->rule == 2) ? 3 : 2;
     for (i = 0; i < count; i++) {
-        palBuf = GFL_G2DIOReadNCLR(11, 481, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 481, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
     for (; i < count * 2; i++) {
-        palBuf = GFL_G2DIOReadNCLR(11, 482, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 482, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }

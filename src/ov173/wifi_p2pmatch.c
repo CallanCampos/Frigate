@@ -67,8 +67,8 @@
 #include "system/union_view.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
-#include "text/system/wifi_p2pmatch.h"
 #include "text/system/wifi_error.h"
+#include "text/system/wifi_p2pmatch.h"
 
 // The Wi-Fi Club's match board: the room where the player meets the friends who are online, the friend list of the
 // lower screen, and the states of calling a friend, of choosing what to play and of leaving for the game. The ROM has
@@ -1518,10 +1518,12 @@ static int WifiP2PMatch_GetStatusMessage(u32 status, u32 gameMode, u32 *color) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     {
         int msgs[] = {
-            WifiP2pmatch_Text_StandingBy, WifiP2pmatch_Text_StandingBy,   WifiP2pmatch_Text_StandingBy, WifiP2pmatch_Text_Talking,
-            WifiP2pmatch_Text_VoiceChat,  WifiP2pmatch_Text_Xtransceiver, WifiP2pmatch_Text_Trade,      WifiP2pmatch_Text_Single,
-            WifiP2pmatch_Text_Single,     WifiP2pmatch_Text_Double,       WifiP2pmatch_Text_Double,     WifiP2pmatch_Text_Triple,
-            WifiP2pmatch_Text_Triple,     WifiP2pmatch_Text_Rotation,     WifiP2pmatch_Text_Rotation,   WifiP2pmatch_Text_Empty_30,
+            WifiP2pmatch_Text_StandingBy, WifiP2pmatch_Text_StandingBy, WifiP2pmatch_Text_StandingBy,
+            WifiP2pmatch_Text_Talking,    WifiP2pmatch_Text_VoiceChat,  WifiP2pmatch_Text_Xtransceiver,
+            WifiP2pmatch_Text_Trade,      WifiP2pmatch_Text_Single,     WifiP2pmatch_Text_Single,
+            WifiP2pmatch_Text_Double,     WifiP2pmatch_Text_Double,     WifiP2pmatch_Text_Triple,
+            WifiP2pmatch_Text_Triple,     WifiP2pmatch_Text_Rotation,   WifiP2pmatch_Text_Rotation,
+            WifiP2pmatch_Text_Empty_30,
         };
 
         if (gameMode > WIFIP2PMATCH_GAMEMODE_MAX) {
@@ -2050,7 +2052,8 @@ static int WifiP2PMatch_StateGameModeKeyWait(WIFIP2PMATCH_WORK *wk, int seq) {
 
 // States 0x4b to 0x4d: the child is asked whether to play what the parent chose; the parent waits
 static int WifiP2PMatch_AskGameMode(WIFIP2PMATCH_WORK *wk, int seq) {
-    u32 msgs[] = { WifiP2pmatch_Text_WouldLikeTalkUsing, WifiP2pmatch_Text_WouldLikeTalkUsing_2, WifiP2pmatch_Text_Trade_2 };
+    u32 msgs[] = { WifiP2pmatch_Text_WouldLikeTalkUsing, WifiP2pmatch_Text_WouldLikeTalkUsing_2,
+                   WifiP2pmatch_Text_Trade_2 };
 
     if (!func_02042bc4()) {
         WifiP2PMatch_SetFriendNameWord(wk, wk->friendNo - 1);
@@ -3488,7 +3491,7 @@ static void WifiP2PMatch_GraphicInit(WIFIP2PMATCH_WORK *wk) {
     GFL_BGSysSetEnabledBGsB(0);
     GX_SetVisiblePlane(0);
     GXS_SetVisiblePlane(0);
-    arc = GFL_ArcSysCreateFileHandle(0x20, WIFIP2PMATCH_HEAP);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFIP2PMATCH, WIFIP2PMATCH_HEAP);
     wk->wordSet = GFL_WordSetSystemCreateDefault(WIFIP2PMATCH_HEAP);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_P2PMATCH, WIFIP2PMATCH_HEAP);
     wk->sysMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_ERROR, WIFIP2PMATCH_HEAP);

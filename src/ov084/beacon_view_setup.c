@@ -58,10 +58,6 @@
 // The beacon view's work: what it takes from the game, its graphics, windows and actors, and the events that leave
 // the view for another screen. Named by the ROM's "beacon_view_setup.c"; the functions' names are ours
 
-// The view's graphics, and the trainers' sprites
-#define ARCID_BEACON_VIEW 171
-#define ARCID_BEACON_VIEW_TRAINER 31
-
 // What the event waits for before it hands over
 #define EVENT_WAIT_BUTTON 0
 #define EVENT_WAIT_TASKS 1
@@ -140,7 +136,7 @@ BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent) {
     work->heapId = HEAPID_FIELD_MENU;
     work->resHeapId = HEAPID_FIELDMAP;
     work->tmpHeapId = HEAPID_FIELD_MENU | HEAPID_TAIL_BIT;
-    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON_VIEW, work->heapId);
+    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BEACON, work->heapId);
     BeaconView_InitData(work);
     BeaconView_InitSystems(work);
     BeaconView_InitBG(work, work->arc);
@@ -525,7 +521,7 @@ static void BeaconView_FreeMenu(BeaconViewWork *work) {
 
 static void BeaconView_LoadResources(BeaconViewWork *work, ArcTool *arc) {
     int i;
-    ArcTool *trainerArc = GFL_ArcSysCreateFileHandle(ARCID_BEACON_VIEW_TRAINER, work->tmpHeapId);
+    ArcTool *trainerArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, work->tmpHeapId);
 
     {
         BeaconViewResSetup setup = { { { 1, 0 }, { 1, 1 }, { 1, 2 } } };

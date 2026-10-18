@@ -295,7 +295,7 @@ static void Report_ReleaseBGs(void) {
 }
 
 static void Report_LoadGraphics(HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(193, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_REPORT, heapId);
 
     // Each version has its own palette
 #ifdef BLACK2
@@ -481,7 +481,7 @@ static void Report_CreateActors(ReportScreen *wk) {
     wk->cellAnims[0] = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(arc);
 
-    arc = GFL_ArcSysCreateFileHandle(193, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_REPORT, wk->heapId);
     wk->chars[REPORT_BAR_FIRST] = func_0204b81c(arc, 4, TRUE, CLACT_VRAM_SUB, wk->heapId);
     wk->palettes[1] = func_0204bbb8(arc, 5, CLACT_VRAM_SUB, 0x60, 0, 1, wk->heapId);
     wk->cellAnims[1] = func_0204bde0(arc, 6, 7, wk->heapId);

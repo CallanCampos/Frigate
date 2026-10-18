@@ -55,7 +55,6 @@
 // ROM names only the overlay's other file, "pkwd_book_graphic.c", so the name of this one is our guess
 
 // The archives of the screen's graphics and of the movies' data, as in pkwd_selectscreen.c and event_pokewood.c
-#define ARCID_PKWD_BOOK_GRA 100
 #define ARCID_POKEWOOD_MOVIE 269
 
 #define MOVIE_COUNT 41
@@ -982,7 +981,7 @@ static void PkwdBook_InitScreen(PkwdBookWork *wk) {
         wk->paletteFiles[i] = NULL;
         wk->textPaletteFiles[i] = NULL;
     }
-    wk->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD_BOOK_GRA, 42, wk->heapId);
+    wk->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD, 42, wk->heapId);
     wk->msgData[MSG_LINES] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEWOOD_LINES, wk->heapId);
     wk->msgData[MSG_SCRIPT] = NULL;
     wk->msgData[MSG_TRAINER_CLASSES] =
@@ -998,7 +997,7 @@ static void PkwdBook_InitScreen(PkwdBookWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 6, PALTYPE_SUB_BG, 10 * 0x20, 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 15, PALTYPE_SUB_BG, 13 * 0x20, 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
     PkwdBook_CreateWindows(wk, FALSE, PAGE_LIST);
@@ -1086,7 +1085,7 @@ static void PkwdBook_LoadGraphics(PkwdBookWork *wk) {
     u16 *screenBuf;
     int i;
     int page;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     for (i = 0; i < LOAD_COUNT_MAX; palette++, i++) {
         if (palette->target == 0xff) {
@@ -1154,7 +1153,7 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         void *screenFile;
         void *charFile;
 
-        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
         screen += graphicIdx;
         screenFile = GFL_G2DIOReadNSCRArc(arc, screen->fileId, FALSE, &screenData, wk->heapId);
         GFL_BGSysBufferScrDefault(2, screenData->rawData, 0x800);
@@ -1167,7 +1166,7 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         GFL_HeapFree(screenFile);
         GFL_HeapFree(charFile);
     } else {
-        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
         chars += graphicIdx;
         GFL_BGSysLoadArcNCGRStatic(arc, chars->fileId, chars->target, chars->offset, 0, FALSE, wk->heapId);
         screen += graphicIdx;
@@ -1277,7 +1276,7 @@ static void PkwdBook_SetTrainer(PkwdBookWork *wk, u32 trainerClass) {
 }
 
 static void PkwdBook_LoadActorResources(PkwdBookWork *wk, u32 surface, const PkwdBookActorRes *res) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     PkwdBookGraphic_GetClActUnit(wk->graphic);
     wk->resources.slots[res->palette.slot] =
@@ -2536,7 +2535,7 @@ static void PkwdBook_TransferSeriesPalette(PkwdBookWork *wk, u32 series) {
 }
 
 static void PkwdBook_LoadSeriesPalettes(PkwdBookWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     int i;
 
     for (i = 0; i < SERIES_COUNT; i++) {
@@ -2587,7 +2586,7 @@ static void PkwdBook_CreateList(PkwdBookWork *wk) {
 
     setup.work = wk;
     PkwdBook_FreeList(wk);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_BOOK_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 20, 6, 0, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_SUB_BG, 0, 0x20, wk->heapId);
     setup.callbacks = &sPkwdBookListCallbacks;

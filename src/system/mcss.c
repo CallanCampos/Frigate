@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/heap.h"
@@ -142,7 +143,6 @@ struct MCSS {
 };
 
 // The shadows' palette, and where it goes in texture palette VRAM
-#define MCSS_SHADOW_ARCID 11
 #define MCSS_SHADOW_PLTT 355
 #define MCSS_SHADOW_PLTT_ADDR 0x1100
 
@@ -190,7 +190,7 @@ MCSSSystem *MCSSSys_Create(u32 capacity, HeapID heapId) {
     load->system = system;
     load->plttProxy = &system->shadowPltt;
     load->plttAddr = MCSS_SHADOW_PLTT_ADDR;
-    load->plttFile = GFL_G2DIOReadNCLR(MCSS_SHADOW_ARCID, MCSS_SHADOW_PLTT, &load->pltt, HEAPID_TAIL(heapId));
+    load->plttFile = GFL_G2DIOReadNCLR(ARCID_BTLV, MCSS_SHADOW_PLTT, &load->pltt, HEAPID_TAIL(heapId));
     system->shadowTcb = GFL_VBlankTCBAdd(MCSS_LoadTask, load, 0);
     return system;
 }

@@ -60,10 +60,6 @@
 #define OVERLAY_EVENT_PASS_POWER OVERLAY_ID(14)
 #define OVERLAY_FIELD_PASS_POWER OVERLAY_ID(156)
 
-// The archives of the view's graphics and of the players' icons
-#define ARCID_FMISSION_VIEW 259
-#define ARCID_FMISSION_VIEW_ICON 31
-
 // What the view's event does before it hands over to the screen's event
 enum {
     // Shows a button pressed, and waits for its animation
@@ -482,7 +478,7 @@ static void FMissionViewSetup_FreeMenu(FMissionView *view) {
 }
 
 static void FMissionViewSetup_LoadResources(FMissionView *view, ArcTool *arc) {
-    ArcTool *iconArc = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_VIEW_ICON, view->tmpHeapId);
+    ArcTool *iconArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, view->tmpHeapId);
     int i;
 
     {

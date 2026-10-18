@@ -24,9 +24,6 @@
 // The code input screen's graphics. The ROM has no name for this file; "codein_disp.c" is a guess from pokeplatinum,
 // whose code input screen has the same three files. Our names
 
-// The archive of the screen's graphics
-#define ARCID_CODEIN 58
-
 // The digits' animations: the ten large digits after an empty place, then the same small. The bar follows
 #define SEQ_SMALL 11
 #define SEQ_BAR 22

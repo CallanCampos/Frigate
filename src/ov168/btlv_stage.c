@@ -5,6 +5,7 @@
 #include "battle/btlv_stage.h"
 #include "types.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/g3d.h"
 #include "gfl/graphics.h"
@@ -93,14 +94,14 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
 
     // A rotation battle has its own ground, the same for both sides
     if (rule == 3) {
-        stage->models[0] = GFL_G3DSysReadArcSysResource(11, 0x161);
-        stage->models[1] = GFL_G3DSysReadArcSysResource(11, 0x161);
+        stage->models[0] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, 0x161);
+        stage->models[1] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, 0x161);
     } else if (data[stageId].resources[0][variant * 2] != 0xffff) {
-        stage->models[0] = GFL_G3DSysReadArcSysResource(11, data[stageId].resources[0][variant * 2]);
-        stage->models[1] = GFL_G3DSysReadArcSysResource(11, data[stageId].resources[0][variant * 2 + 1]);
+        stage->models[0] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, data[stageId].resources[0][variant * 2]);
+        stage->models[1] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, data[stageId].resources[0][variant * 2 + 1]);
     } else {
-        stage->models[0] = GFL_G3DSysReadArcSysResource(11, data[stageId].resources[0][0]);
-        stage->models[1] = GFL_G3DSysReadArcSysResource(11, data[stageId].resources[0][1]);
+        stage->models[0] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, data[stageId].resources[0][0]);
+        stage->models[1] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, data[stageId].resources[0][1]);
         variant = 0;
     }
     GFL_G3DResUploadTexData(stage->models[0]);
@@ -113,7 +114,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
         stage->anmCount = 1;
         stage->anmResCount = 1;
         stage->anmResources[0] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(void *), TRUE, "btlv_stage.c", 0xd6);
-        stage->anmResources[0][0] = GFL_G3DSysReadArcSysResource(11, 0x162);
+        stage->anmResources[0][0] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, 0x162);
         for (i = 0; i < 2; i++) {
             stage->anmObjs[i] = GFL_HeapAllocate(stage->heapId, 3 * sizeof(void *), TRUE, "btlv_stage.c", 0xdb);
             stage->anms[i] = GFL_HeapAllocate(stage->heapId, sizeof(BtlvStageAnm), TRUE, "btlv_stage.c", 0xdc);
@@ -135,7 +136,7 @@ BtlvStage *BtlvStage_Create(u32 rule, u32 stageId, u8 variant, HeapID heapId, u3
             if (data[stageId].resources[i][variant * 2] != 0xffff) {
                 for (j = 0; j < 2; j++) {
                     stage->anmResources[j][anm] =
-                        GFL_G3DSysReadArcSysResource(11, data[stageId].resources[i][variant * 2 + j]);
+                        GFL_G3DSysReadArcSysResource(ARCID_BTLV, data[stageId].resources[i][variant * 2 + j]);
                     stage->anmObjs[j][anm] = GFL_G3DAnmCreate(stage->mdls[j], stage->anmResources[j][anm], 0);
                     stage->anms[j][anm].mode = 0;
                 }

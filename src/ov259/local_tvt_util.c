@@ -223,7 +223,7 @@ LocalTvtBG *LocalTvtBG_Create(GameData *gameData, HeapID heapId, u32 unk04) {
     LocalTvtBG *bg = GFL_HeapAllocate(heapId, sizeof(LocalTvtBG), TRUE, "local_tvt_util.c", 126);
     BOOL isMale = TRUE;
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT_COMMON, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, heapId);
 
     if (getTrainerGender(playerInfo) != GENDER_MALE) {
         isMale = FALSE;
@@ -374,7 +374,7 @@ LocalTvtMenu *LocalTvtMenu_Create(const LocalTvtMenuSetup *setup, HeapID heapId)
 
     menu->setup = *setup;
     menu->selected = setup->cursor;
-    arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_LOCAL_TVT, heapId);
     GFL_BGSysClearCharCore(BG_SUB_WINDOW, 0x20, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 122, BG_SUB_WINDOW, 1, 0, FALSE, heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 121, &paletteData, heapId);
@@ -601,7 +601,7 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
     GFL_BGSysSetBGEnabled(BG_SUB_PANEL, FALSE);
     GFL_BGSysSetBGEnabled(BG_SUB_BACK, FALSE);
     GFL_BGSysSetBGEnabled(BG_SUB_WINDOW, FALSE);
-    arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_LOCAL_TVT, heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 123, &paletteData, heapId);
     colors = paletteData->rawData;
     MI_CpuCopy8(&colors[0], select->palette, sizeof(select->palette));
