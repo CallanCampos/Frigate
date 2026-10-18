@@ -1063,9 +1063,10 @@ POKEDEX_TRAP = ("the Pokédex stops the port on NNSi_objSizeWTbl (ARM9 main, 0x0
 LAUNCHES = {
     # From the first save (no Pokémon, no Pokédex): X opens the field menu, A on BAG opens the bag, its items pocket
     # empty, B closes it; RIGHT and A open the trainer card, B closes it; B closes the menu. The bag's first frame shows
-    # at count 4046 on the oracle and two passes after its opening on the port, the card's at 4588 and four passes after
-    "field_menus": Launch("first_save", 7400, 5000, {"b2_us": "bag@4044,card@4584"}, (0, 0),
-                          spans={"b2_us": "4046-4323,4588-4930"}),
+    # at count 4046 on the oracle and two passes after its opening on the port, the card's at 4588 and four passes
+    # after, in both versions
+    "field_menus": Launch("first_save", 7400, 5000, {"b2_us": "bag@4044,card@4584", "w2_us": "bag@4044,card@4584"},
+                          (0, 0), spans={"b2_us": "4046-4323,4588-4930", "w2_us": "4046-4323,4588-4930"}),
     # From the starter save (Tepig, the Pokédex): the party list, Tepig's menu, its summary and back, the Pokédex and
     # Tepig's entry, the trainer card with its Pokédex line, and the bag. The party list's first frame shows at count
     # 4046 on the oracle (two passes after its opening on the port), the card's at 6978 (four), the bag's at 7675 (two);

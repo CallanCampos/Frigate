@@ -570,6 +570,7 @@ The launcher sets both through the game's setters. Nothing else was needed: the 
 | --- | --- | --- | --- | --- |
 | `field_menus` | `first_save` | `bag@4044,card@4584` | 2 of 2 | 621 of 621 counts: the bag (4046-4323) and the card (4588-4930) |
 | `party_menus` | `starter_save` | `party@4044,card@6974,bag@7673` | 5 of 5, 4 left out | 1,491 of 1,491 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
+| `field_menus`, White 2 | `first_save` | `bag@4044,card@4584`, as in Black 2 | 2 of 2 | 621 of 621 counts, the same spans |
 
 Left out of `party_menus`, with their reasons in `LAUNCHES`:
 
@@ -581,8 +582,10 @@ Left out of `party_menus`, with their reasons in `LAUNCHES`:
 - **The Pokédex** (its 3 rows): the port stops on `NNSi_objSizeWTbl` (ARM9 main, `0x020942b0`), NitroSystem G2D's
   table of object widths, which has no C yet, so the route doesn't launch it.
 
-White 2 has no route yet: its starter save isn't measured (the Black 2 route's walk goes astray in White 2), so its
-tests skip.
+White 2 has `field_menus`, measured again on its own oracle: the same counts and spans, the bag's screens the same as
+Black 2's, the menu's and the card's bottom screens White 2's own. It has no `party_menus` yet: its starter save isn't
+measured (the Black 2 route's walk goes astray in White 2: the player ends in front of the Trainers' School with no
+Pokémon), so that test and `oracle_continue_starter` skip with the reason.
 
 ## Integration
 

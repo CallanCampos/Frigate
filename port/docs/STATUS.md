@@ -26,10 +26,37 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: White 2's field menu route on the launcher; its starter save left for a route of its own
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `b0fd1f745`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. White 2: `oracle_launch_field_menus` passes, 2 of 2 app screens and 621 of 621 counts of the
+  bag's and the card's spans the oracle's, with Black 2's counts and spans, measured again on White 2's oracle (the
+  rows at Black 2's counts show the same screens, White 2's menu and card in its own colours on the bottom screen);
+  `oracle_compare` (50) and `oracle_saves` pass; `oracle_launch_party_menus` skips (no starter save). Black 2: all 248
+  `ctest` tests pass, as in the last entry. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - White 2's `field_menus` route: Black 2's input file with `version w2_us`, its table of the oracle's hashes at the
+    same labelled counts (`port/tests/oracle/launch_field_menus_w2_us.*`), and the route's `--launch` and spans for
+    White 2 in `LAUNCHES`.
+  - White 2's starter save, from Black 2's starter route on White 2's first save, went astray: at frame 17,000 the
+    player stands in front of the Trainers' School with no Pokémon, the save holding 0x40a1 = 1 and neither flag
+    0x961 nor 0x962. White 2 stays out of `starter_save` and `party_menus` until it has a route of its own, and its
+    tests that need them skip with the reason.
+  - `decomp-findings.md`: `src/ov165/plist_sys.c` (incomplete, two nonmatching rows) runs on the port, equivalent as
+    observed on the paths the party route takes.
+- **Next:** the user's decision on ADR 0012; White 2's starter route; the apps no route reaches yet.
+- **Blockers:** as in the last entry.
+
 ## 2026-10-18: the field menu's apps natively, through a test launcher, checked against melonDS pass by pass
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `b8b52f420` (the launcher, ADR 0012, proposed).
+- **Port:** `b0fd1f745`, on the branch `port-launch-adr0012`, after `b8b52f420` (the launcher, ADR 0012, proposed).
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `b8b52f420` adds a guard-only block to
   `src/ov035/event_mapchange.c` (a Platform row): `check_mwcc_neutral.py` finds 3,142 of 3,146 file and version pairs
   identical to `045e97b90`, this file among them, the other four being `vm.c`'s and `event_field_proclink.c`'s Neutral
