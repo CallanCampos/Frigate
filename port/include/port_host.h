@@ -43,6 +43,9 @@ void *port_hw_ram_count(void);
 void *port_hw_vtxram_count(void);
 void *port_hw_clipmtx_result(void);
 void *port_hw_vecmtx_result(void);
+// The card slot's SPI bus and the infrared chip on it (port/hal/card/card_spi.h)
+void *port_hw_auxspicnt(void);
+void *port_hw_auxspidata(void);
 
 // The size the host gives one of the game's heaps (src/gfl/heapsys.c), larger than the DS's for 64-bit structs
 // (port/hal/gfl/heap_policy.c). The arguments are u32, u32 and BOOL

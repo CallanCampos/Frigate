@@ -56,6 +56,8 @@ HW_REGISTER_POLICY = {
     0x04000006: "port_hw_vcount",  # VCOUNT: the scanline being drawn
     0x04000100: "port_hw_timer_counter0",  # TM0CNT_L: the counter as read
     0x04000104: "port_hw_timer_counter1",  # TM1CNT_L
+    0x040001a0: "port_hw_auxspicnt",  # AUXSPICNT: the card slot's SPI bus, with its infrared chip (port/hal/card)
+    0x040001a2: "port_hw_auxspidata",  # AUXSPIDATA: a byte sent to the chip, or its answer
     0x040002a0: "port_hw_div_result",  # DIV_RESULT: the quotient of DIV_NUMER by DIV_DENOM in DIVCNT's mode
     0x040002a8: "port_hw_divrem_result",  # DIVREM_RESULT: the remainder
     0x040002b4: "port_hw_sqrt_result",  # SQRT_RESULT: the square root of SQRT_PARAM in SQRTCNT's mode

@@ -236,8 +236,10 @@ mods/examples/           sample mods, one per extension point
   melonDS `.sav` and DeSmuME `.dsv`, adopting the save's RTC offset and MAC on import.
 - **Input:** SDL3 keyboard and gamepads map to the DS buttons; mouse and touch map to the touch panel through the
   inverse of the current screen layout; everything is remappable.
-- **Stubs:** DS Protect (overlays 165 and 337) and the IR chip check (overlay 338) return genuine-cartridge results;
-  DSi mode reports FALSE; Download Play, wireless and Wi-Fi are stubbed until phase 7.
+- **Stubs:** DS Protect (overlays 165 and 337) passes as a genuine cartridge's does; the IR chip check (overlay 338)
+  runs the game's own code against a model of the card's SPI bus and infrared chip, which answers as a genuine chip
+  does ([ADR 0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md)); DSi mode reports FALSE; Download Play,
+  wireless and Wi-Fi are stubbed until phase 7.
 
 ### 4.6 Renderers
 

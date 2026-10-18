@@ -26,6 +26,50 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the card's infrared chip on the SPI registers: the genuine-card check passes as on melonDS
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch` from `5ad9a1e1d`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed, so no
+  `check_mwcc_neutral.py` run and no row in `game-changes.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 237 `ctest` tests pass, the oracle's included (`ctest -j4`, 419 s), 3 of them
+  new: `hal_card_spi_plain` and `hal_card_spi_sanitized` (the model against melonDS 1.1's `NDSCartSlot` and
+  `CartRetailIR` functions and GBATEK: the genuine check's two exchanges, receive's length 0, send, an unknown command,
+  the slot or its SPI bus off, the deselect when bit 13 is cleared while held, the busy bit, a byte sent equal to the
+  last answer, the low byte), and `rom_game_ir_genuine_card` (the game's own `IrCheck_IsGenuineCard` on the whole
+  program's objects returns TRUE twice, as the check passes on melonDS). Mutation: without the two lines of
+  `HW_REGISTER_POLICY`, `rom_game_ir_genuine_card` fails. T4 unchanged: `oracle_continue`, `oracle_opening`,
+  `oracle_title` and `oracle_port_save` pass, as do `replay_new_game`, `replay_start_menu` and `replay_same_save`.
+  By hand, Black 2 under lldb from the oracle's first save through CONTINUE to the field's trap: `func_0202d6a8` and
+  `IrCheck_IsGenuineCard` run once, `GameBeaconSys_HideNewHBlank` never (it ran from the HBlank task list before), and
+  the save is unchanged. White 2: the 16 `card_backup` tests, `hal_card_spi_*`, `rom_game_ir_genuine_card`,
+  `smoke_reaches_game_main` and `replay_same_save` pass; `oracle.py sequence continue` 3,407 of 3,407 (1,312 exact,
+  2,095 with 3D within the tolerance), as in the last entry. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: this task changed no decomp C.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version, against the last entry's 574 and 63:
+  the change is upstream's, merged by `5ad9a1e1d`, which had no entry. A continued game still stops on
+  `FIELDMAP_PROC_FUNCS` (overlay 36).
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - **The card's infrared chip** ([ADR 0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md),
+    `port/hal/card/card_spi.c`). AUXSPICNT and AUXSPIDATA were plain memory, so AUXSPIDATA read back the last byte
+    written, 0, and the game's genuine-card check (`src/ov338/ir_check.c`) failed at every CONTINUE and NEW GAME:
+    the game then left `GameBeaconSys_HideNewHBlank` in the HBlank task list for good, and would skip the experience
+    of a faint in battle. The two registers are now accessors (`port_hw_auxspicnt`, `port_hw_auxspidata`) that model
+    the bus and the chip as melonDS 1.1 does, so the game's own C runs and passes, and the infrared library
+    (`lib/irc`, overlay 31) has a chip to talk to; PLAN.md §4.5's stub of the check is dropped. An accessor can't tell
+    a load from a store, so each call resolves the store made through the memory the previous call returned:
+    AUXSPIDATA's cell keeps a marker in its upper byte that a store clears, a documented deviation (a 16-bit read sees
+    it where the hardware gives 0; every reader keeps the low byte).
+  - `decomp-findings.md`: `ir_check.c` runs on the port, equivalent as observed; `buildSeed` hashes its digest buffer
+    before writing it (stack bytes on the DS, zero on a host), so the boot's and each battle's random numbers can't
+    match the oracle's.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed: the trainer card's param layout, saves with
+  a party made by the oracle, and a test launcher for the apps (ADR 0012, proposed).
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as in the last
+  entry.
+
 ## 2026-10-17: saves, after review: the same save at every run, and the port's save checked on melonDS
 
 - **Upstream:** `615939e25`, as in the last entry; no sync in this task.

@@ -3,6 +3,18 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the card's infrared chip
+
+- **A register accessor can't tell a load from a store.** `port_hw_*` returns the memory the access uses before the
+  access happens, so a register whose writes act has to be resolved at the next access: compare the cell with what
+  it held, and when a store may write the value the cell already holds, give the cell a marker that every store
+  clears. `ir_check.c` sends 0 right after reading the answer 0; comparing values alone lost that byte and the check
+  failed. Each store is preceded by its own accessor call, so at most one is pending and resolving it at the next call
+  is exact (`port/hal/card/card_spi.c`).
+- **Plain memory for a register the game polls fails quietly.** AUXSPIDATA read back the last byte written, the
+  genuine-card check failed, and nothing stopped: the game only installed an HBlank task for good and would have
+  skipped battle experience. A breakpoint on the game's check against the oracle's outcome found it, not a test.
+
 ## 2026-10-17: saves with melonDS, after review
 
 - **A function's address used as a number is host state.** DWC adds `(u32)OS_GetTick`, the function's address, to the
