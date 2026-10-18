@@ -68,3 +68,26 @@ if(PORT_VERSION STREQUAL "b2_us")
     set_tests_properties(replay_new_game PROPERTIES
         FIXTURES_REQUIRED replay_new_game_saves SKIP_RETURN_CODE 66 TIMEOUT 1800)
 endif()
+
+# The port's saves depend only on the input file and the clock it names (T3, T6): New Game's formatting of the blank
+# backup, done by frame 5600 as first_save_<version>.pbwinput starts it (port/tests/oracle), run twice, each run with a
+# save directory of its own, writes the same save byte for byte (port/tests/replay/check_same_save.py). The console's
+# pending Wi-Fi ID that New Game copies into both copies of the main save is the oracle's, which DWC makes from the
+# clock and the DS's address of OS_GetTick: a host's address, which moves at every launch, once made each run's save
+# different (port/include/port_host.h). Without the player's ROM the program exits 66 and the test is skipped
+# The save file is named after the ROM's game code (port/hal/card/port_card.h); the ID's 8 bytes are the oracle's
+if(PORT_VERSION STREQUAL "b2_us")
+    set(replay_same_save_file IREO.sav)
+    set(replay_same_save_wifi_id 280c0000f2a0b315)
+else()
+    set(replay_same_save_file IRDO.sav)
+    set(replay_same_save_wifi_id 69080000f2a0b3ff)
+endif()
+add_test(NAME replay_same_save
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/replay/check_same_save.py"
+        --expect "${replay_same_save_file}:0x1aa04:${replay_same_save_wifi_id}"
+        --expect "${replay_same_save_file}:0x40a04:${replay_same_save_wifi_id}" --
+        $<TARGET_FILE:${PORT_PROGRAM}> --headless --frames 5600 --watchdog 30
+        --input "${CMAKE_CURRENT_SOURCE_DIR}/tests/oracle/first_save_${PORT_VERSION}.pbwinput")
+set_tests_properties(replay_same_save PROPERTIES SKIP_RETURN_CODE 66 TIMEOUT 1200)

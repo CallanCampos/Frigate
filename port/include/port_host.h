@@ -60,4 +60,15 @@ void port_particle_work_free(unsigned int id);
 uint32_t port_snd_handle(const void *pointer);
 void *port_snd_pointer(uint32_t handle);
 
+// The DS's address of OS_GetTick as the ARM9's code takes it, bit 0 set for a Thumb function: OS_GetTick's address in
+// config/<version>/arm9/symbols.txt, and the word in the ROM's two literal pools of lib/dwc/src/bm/util_wifiidtool.c
+// (0x020572f0 and 0x0205751c in Black 2, 0x0205731c and 0x02057548 in White 2). DWC adds the function's address to the
+// seed of the console's pending Wi-Fi ID where it meant the tick count (that file's BUG), and the ID goes into the
+// save; a host function's address moves at every launch
+#ifdef WHITE2
+#define PORT_DS_OS_GETTICK_ADDRESS 0x0207bb39u
+#else
+#define PORT_DS_OS_GETTICK_ADDRESS 0x0207bb0du
+#endif
+
 #endif // PORT_HOST_H
