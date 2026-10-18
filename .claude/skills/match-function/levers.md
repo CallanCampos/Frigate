@@ -437,7 +437,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   then the packing. (matching.md: "packed into one word")
 - A field read in an `if`'s condition and its body loaded ahead of the condition's other loads, where the original
   loads in tree order and reuses the register: global CSE merged the reads; only a second pointer path to the field
-  or `opt_common_subs off` keeps them apart. (matching.md: "is a global common subexpression, loaded into a")
+  (a cast, not `(*p).f`) or `opt_common_subs off` keeps them apart. (matching.md: "is a global common
+  subexpression, loaded into a")
 - A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
   calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
   sum that isn't a copy (`f(x + 4)`, not `f(x)`) or another immediate keeps it in place, no pragma does, and each
@@ -458,8 +459,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
-- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, not a bit field, which
-  loads its whole container and shifts twice. (matching.md: "A bit field is loaded at its container's width")
+- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, not a bit field or a
+  shifted or masked `u16`, which load the whole container (`ldrh`); a `_Bool` tests with `cmp` too. (matching.md:
+  "A bit field is loaded at its container's width")
 - A signed `/ 2` narrowed in separate steps before a loop (`asrs #1; lsls #0x10; asrs #0x10`, ours `lsls #0xf`):
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value

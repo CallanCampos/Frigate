@@ -1107,7 +1107,8 @@ Same code, other `sp` offsets or frame size.
   `pos` before `work`. When one of the reads goes through another pointer expression (a `static inline` given the
   address of a nested struct that holds the field, a cast, even to the pointer's own type, or a `void *` alias), or
   under `#pragma opt_common_subs off`, the condition loads in tree order, `work` first, and the back end still hands
-  the loaded register to the second read. A read through a `const` pointer is kept apart too, but is loaded again. The
+  the loaded register to the second read. `(*task).pos` is no other path: it is the same expression as `task->pos`
+  and shares the temporary. A read through a `const` pointer is kept apart too, but is loaded again. The
   original's `BtlvMcss_MoveTaskEnd_Circle` and `_Shake` load `work` first while eight siblings of the same C load
   `pos` first; each of these spellings matches them and is only a second path to the field, so they stay rows.
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
@@ -1708,10 +1709,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   result, which `|` would fold away: `screentex.c`'s bank switch, where the test is always true.
 - A bit field is loaded at its container's width, never narrowed to `ldrb` even for a field inside one byte, and is
   extracted with a pair of shifts before a test (`ldrh; lsls #0x10; lsrs #0x18` for the high byte of a `u16`, `ldr;
-  lsls #1; lsrs #1` for a `u32 :31`); a `u32` bit field after a `u8` member starts a new word. So a lone `lsls rX, rX,
+  lsls #1; lsrs #1` for a `u32 :31`); a `u32` bit field after a `u8` member starts a new word. A plain `u16` field
+  shifted or masked down to one byte is loaded whole too: `flags >> 8` is `ldrh; asrs #8; beq`, `flags & 0xff00` an
+  `ldrh` and a `tst` of the built mask, and `flags & 0xff` `ldrh; lsls #0x18; lsrs #0x18`. So a lone `lsls rX, rX,
   #n` between an `ldrb` and its `beq` is a doubling in the source, `x * 2`, `x << 1` or `x + x`, where a plain byte
-  test, through any type, cast or inline, is `cmp r0, #0`: `btlv_effect.c`'s `BtlvEffect_Init` tests its background's
-  seasonal flag with `ldrb r0, [r0, #1]; lsls r0, r0, #1; beq`, the only such test in either binary (a row).
+  test, through any type (`_Bool` included), cast or inline, is `cmp r0, #0`: `btlv_effect.c`'s `BtlvEffect_Init`
+  tests its background's seasonal flag with `ldrb r0, [r0, #1]; lsls r0, r0, #1; beq`, the only such test in either
+  binary (a row).
 - Masks written with `~` clear bits with `bic`. The game's `and` with a constant such as `0xef` is `x &= (u8)~FLAG`.
   In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
   so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
