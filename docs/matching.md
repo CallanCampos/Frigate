@@ -8,6 +8,10 @@ tools that show the differences.
 
 ## Registers
 
+- A handle parameter cast inside, `SOCL_Connect(int s, ...) { SOCLSocket *socket = (SOCLSocket *)s;`, and a `void *`
+  parameter cast to a block-scoped typed pointer where it is used (`SOC_RecvFrom`'s `SocAddrIn *addr = from;`) are
+  allocated differently from typed parameters: NitroWiFi's `SOCL_Connect` (8 bytes) and `SOC_RecvFrom` (20 bytes)
+  match only so, as the SDK declares them.
 - A macro that assigns, `NNSi_G2dUnpackOffset(ptr, base)` (`ptr = ptr + base`), with its result assigned again,
   `ptr = NNSi_G2dUnpackOffset(ptr, base)`, as NitroSystem writes it at some sites, computes the index's shift before
   the array's base and swaps the registers of an `[rn, rm]` address: `NNS_G2dUnpackNAN`'s `pContent` and
@@ -649,6 +653,13 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- A `static inline` accessor that returns a field cast to another type (`return (SOCLRecvPipe *)socket->recv_pipe;`)
+  reverses the stack slots of the locals spilled around its result. NitroWiFi's `SOCLi_ReadCallBack` gets the
+  original's slots only with the field typed as the SDK has it (`SOCLRecvPipe *recv_pipe`) and read directly (27 bytes
+  to 21, and a match with the SDK's `volatile cps_read_len`). The SDK's command callbacks take `void *arg` and cast it
+  to their command's struct (`SOCLiCommandRead *cpacket = arg;`) under a common header: that refactor changed no
+  function by itself but is what the two typed fields needed. After such a refactor, retry a `volatile` that a row
+  says no matching function needed.
 - The rounds of a hash written as statements, `a += F(b, c, d) + x + t; a = b + ROTL(a, s);`, spill differently from
   one expression per round: GameSpy's `MD5Transform` (NitroWiFi's `ssl/md5.c`) matches with statement macros and an
   `int` counter, 0x310 against 0x338 otherwise (`u32 j` leaves 4 bytes).
@@ -1584,6 +1595,9 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A difference with a 64-bit constant, `wait > CPS_ACK_DELAY - waited` where `CPS_ACK_DELAY` is a `u64` tick count,
+  compares in 64 bits, and `wait = (u32)CPS_ACK_DELAY - waited` then computes the difference again in 32 bits rather
+  than reusing it, as NitroWiFi's `CPSi_SendDelayedAcks` does (13 bytes otherwise).
 - A narrowing cast on a 64-bit field before a mask, `(u32)context->length & 63`, keeps the low word in a register
   of its own, which the original, masking the `u64` itself, reuses for the 0 stored next: libmath's
   `MATH_MD5GetHash` is 13 bytes off with the cast. In `MATH_MD5Update` a source pointer set from `data` at the top
@@ -2784,7 +2798,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `case 2: if (OS_IsRunOnTwl()) { result = ...; break; } default: result = 7;`, which gives the original's one
   block, where an `if`/`else` that sets 7 itself adds a block (`WCM_SearchAsyncWithParams`, 12 bytes, and five more).
   An empty `case 3:` stacked on `default:`, the case whose warning the SDK compiles out, is what fixes
-  `WCM_StartupStep2` and four more steps.
+  `WCM_StartupStep2` and four more steps: the empty labels set the jump table's range and the order of the compares.
+  `case 3: case 4: default:`, the SDK's release build of its warning cases, matched 13 more of WCM's callbacks
+  (`WCM_OnConnectStatus`, `WCM_OnResetComplete` and others).
 - A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
   `if`s gives: GameSpy's `ghiSendBufferedData` (`ghttpBuffer.c`, overlay 189) matches only as `case -1: return FALSE;`
   written before `case -2: return TRUE;`. A final `if (!f()) return 0; return 1;` always puts the `return 1`
@@ -2989,6 +3005,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Data and sections
 
+- A local array with an initializer goes in a `.rodata` section of its own, ahead of the file's shared one; a struct
+  of the same bytes copied from a static gives the same inline `ldrb`/`strb` pairs and keeps the static in declaration
+  order in the shared section. NitroWiFi's `WCM_FindVendorIE` matches, with the file's `.rodata`, only with its OUI as
+  a `WCMVendorOui` struct copied from a static.
 - Data that the ROM sorts among the others but that only another object's initializer points to is a global: as a
   `static const`, MWCC lays it out after the whole size-sorted list. DWC's `crypt.c` keeps a constant big number 1
   (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they

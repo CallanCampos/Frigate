@@ -43,14 +43,17 @@ lib/nitrowifi/src/soc/socl_create.c:
     .text       start:0x02156200 end:0x021564cc
 
 lib/nitrowifi/src/soc/socl_bind.c:
+    complete
     .text       start:0x021564cc end:0x021566d8
     .data       start:0x02185474 end:0x02185478
 
 lib/nitrowifi/src/soc/socl_read.c:
+    complete
     .text       start:0x021566d8 end:0x02156d8c
     .bss        start:0x0218dc44 end:0x0218dc4c
 
 lib/nitrowifi/src/soc/socl_write.c:
+    complete
     .text       start:0x02156d8c end:0x0215724c
 
 lib/nitrowifi/src/soc/socl_shutdown.c:

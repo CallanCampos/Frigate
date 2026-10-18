@@ -42,7 +42,7 @@ int SOCL_GetStatus(SOCLSocket *socket) {
 
 // How much a read could take now: the next datagram's size for UDP, the buffered data for TCP
 static int SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket) {
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     int size = 0;
 
     if (pipe != NULL) {

@@ -41,6 +41,9 @@ enum {
 // A WCM_Init's work, and the configuration that WCM_StartupAsync starts with
 #define WCM_WORK_SIZE 0x2300
 
+// The bytes of an access point's description that an AP list entry keeps (WCM_PointApList's result)
+#define WCM_APLIST_SIZE 192
+
 // The configuration is consumed during startup. Its writable AP-list buffer is borrowed until replaced or Finish.
 // WCM aligns the buffer upward to four bytes, subtracts the skipped bytes, and clears the usable region.
 // At least 12 aligned bytes are needed for the AP-list header.

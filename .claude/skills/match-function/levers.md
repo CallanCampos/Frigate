@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)
+  and cast it inside. (matching.md: "A handle parameter cast inside")
 - An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result
   again, `p = NNSi_G2dUnpackOffset(p, base)`. (matching.md: "A macro that assigns")
 - Rows of a matrix product whose registers rotate: the row of `a` in locals and a destination pointer of its own.
@@ -209,6 +211,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
+  (matching.md: "A `static inline` accessor that returns a field cast")
 - A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
   (matching.md: "The rounds of a hash written as statements")
 - A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
@@ -790,6 +794,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Switches
 
+- A switch's compares or jump table off by one case: stack the SDK's empty warning cases on `default:`
+  (`case 3: case 4: default:`). (matching.md: "the empty labels set the jump table's range")
 - An extra block that sets the default's value in a case: let the case fall through into `default`, and stack an
   empty case on `default:` where the SDK compiled out a warning. (matching.md: "A case that falls through")
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
@@ -848,6 +854,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- A local array initializer's bytes in a `.rodata` section of their own: copy a struct from a static instead.
+  (matching.md: "A local array with an initializer goes in a `.rodata` section of its own")
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
   it a zero initializer (`= 0`, `= NULL`, `= { 0 }`); one the ROM has in `.data` takes `#pragma explicit_zero_data on`.
   (matching.md: "the same holds for zero")

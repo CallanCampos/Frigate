@@ -39,11 +39,15 @@ typedef struct SOCLUdpPacket {
 // The receive pipe, 0x114 bytes
 typedef struct SOCLRecvPipe {
     SOCLCommandPipe base;
-    int cps_read_len;       // What the reads have taken from CPS's receive buffer and not yet consumed
+    // What the reads have taken from CPS's receive buffer and not yet consumed. volatile: the pipe's thread and the
+    // readers both change it, and SOCLi_ReadCallBack's load of it is not moved (ntrtwl's NitroWiFi has it volatile too)
+    volatile int cps_read_len;
     u16 rcvbuf_consume_min; // From SOCLSocketParam: how much to take before CPS_SocConsume
     s8 peek;                // Suppresses UDP dequeue/CPS offset advances; SSL command reads ignore it
     u8 unk_ff;
-    SOCLUdpPacket *udp_tail; // The datagrams that came in, oldest first
+    // The datagrams that came in, oldest first. volatile: CPS's callback appends while readers take them, and
+    // SOCLi_UdpRecvCallback loads the tail again for its store (ntrtwl's NitroWiFi has it volatile too)
+    SOCLUdpPacket *volatile udp_tail;
     SOCLUdpPacket *udp_head;
     u16 udp_queued;         // The bytes of datagram data they hold
     u16 udp_queued_max;     // From SOCLSocketParam's rcvpipe_unk_e
@@ -80,9 +84,9 @@ typedef struct SOCLSocket {
     SOCLSocketBuffer rcvbuf_aux;
     SOCLSocketBuffer sndbuf_aux;
     u8 unk_6c[0x34];
-    SOCLCommandPipe *recv_pipe;
-    SOCLCommandPipe *send_pipe;
-    int result; // What the last command packet returned
+    SOCLRecvPipe *recv_pipe; // 0xa0, NULL for a socket that does not read
+    SOCLSendPipe *send_pipe; // A UDP socket's is the UDP send socket's
+    int result;              // What the last command packet returned
     // SOCLI_STATE_*. volatile: the command pipes' threads change it while callers test it, and the original reloads it
     // for each test, with no call or store in between (SOCL_GetStatus loads it twice in a row)
     volatile s16 state;
@@ -93,16 +97,6 @@ typedef struct SOCLSocket {
     CPSInAddr remote_ip;
     struct SOCLSocket *next; // The next socket of the list it is in
 } SOCLSocket;
-
-// The receive pipe of a socket that has one (every socket that reads)
-static inline SOCLRecvPipe *SOCLi_GetRecvPipe(const SOCLSocket *socket) {
-    return (SOCLRecvPipe *)socket->recv_pipe;
-}
-
-// The send pipe of a socket that has one (a UDP socket's is the UDP send socket's)
-static inline SOCLSendPipe *SOCLi_GetSendPipe(const SOCLSocket *socket) {
-    return (SOCLSendPipe *)socket->send_pipe;
-}
 
 // socl_startup.c: the socket that sends every UDP socket's datagrams
 extern SOCLSocket *SOCLiUDPSendSocket;
@@ -153,46 +147,80 @@ static inline BOOL SOCLi_SocketIsTCP(const SOCLSocket *socket) {
     return tcp;
 }
 
-struct SOCLCommandPacket;
-typedef int (*SOCLCommandHandler)(struct SOCLCommandPacket *packet);
+// A command's handler, run by the pipe's thread: it takes the packet and reads it as its own command's struct
+typedef int (*SOCLCommandHandler)(void *arg);
 
-// A command for a socket's pipe, 0x2c bytes: the handler, run by the pipe's thread, with its arguments after the
-// header
-typedef struct SOCLCommandPacket {
+// The command packets, in the shape of ntrtwl's NitroWiFi: every command starts with this 0x10-byte header and its
+// arguments follow it. The type names are ntrtwl's (SOCLiCommand*); the fields keep the names this code gave them.
+typedef struct SOCLiCommandHeader {
     SOCLCommandHandler handler;
     SOCLSocket *socket;
     OSMessageQueue *reply_queue; // Borrowed caller-stack result queue for mode 1, NULL otherwise
     s8 socket_flag;
     s8 flag_block; // Exactly 1 waits for the result; bit 0 blocks queue admission (writes use 3 or 0)
-    u8 unk_0e[2];
-    union {
-        struct {
-            u16 local_port;
-            u16 remote_port;
-            CPSInAddr remote_ip;
-        } bind;
-        struct {
-            u8 *buf;
-            int len;
-            u16 *remote_port; // Optional peer outputs, filled according to the selected receive path
-            CPSInAddr *remote_ip;
-        } read;
-        struct {
-            u8 *buf1; // Owned send-ring slices used by the queued callback, not application storage
-            int len1; // Slice byte counts; buf2 is the wrapped part, not an application-buffer pointer
-            u8 *buf2;
-            int len2;
-            u16 write_end; // The pipe's write position after this data
-            u8 unk_22[2];
-            u16 local_port; // For a UDP packet, the datagram's ports and address
-            u16 remote_port;
-            CPSInAddr remote_ip; // 0 for TCP
-        } write;
-        struct {
-            void *info; // Borrowed connection retained by CPS; NULL detaches without freeing/resetting it
-        } ssl;
-        u8 raw[0x1c];
-    } args;
+    u8 padding[2];
+} SOCLiCommandHeader;
+
+typedef struct SOCLiCommandCreateSocket {
+    SOCLiCommandHeader h;
+} SOCLiCommandCreateSocket;
+
+typedef struct SOCLiCommandBind {
+    SOCLiCommandHeader h;
+    u16 local_port;
+    u16 remote_port;
+    CPSInAddr remote_ip;
+} SOCLiCommandBind;
+
+typedef struct SOCLiCommandRead {
+    SOCLiCommandHeader h;
+    u8 *buf;
+    int len;
+    u16 *remote_port; // Optional peer outputs, filled according to the selected receive path
+    CPSInAddr *remote_ip;
+} SOCLiCommandRead;
+
+typedef struct SOCLiCommandConsume {
+    SOCLiCommandHeader h;
+} SOCLiCommandConsume;
+
+typedef struct SOCLiCommandWrite {
+    SOCLiCommandHeader h;
+    u8 *buf1; // Owned send-ring slices used by the queued callback, not application storage
+    int len1; // Slice byte counts; buf2 is the wrapped part, not an application-buffer pointer
+    u8 *buf2;
+    int len2;
+    u16 write_end; // The pipe's write position after this data
+    u8 padding[2];
+    u16 local_port; // For a UDP packet, the datagram's ports and address
+    u16 remote_port;
+    CPSInAddr remote_ip; // 0 for TCP
+} SOCLiCommandWrite;
+
+typedef struct SOCLiCommandShutdown {
+    SOCLiCommandHeader h;
+} SOCLiCommandShutdown;
+
+typedef struct SOCLiCommandClose {
+    SOCLiCommandHeader h;
+} SOCLiCommandClose;
+
+typedef struct SOCLiCommandEnableSsl {
+    SOCLiCommandHeader h;
+    void *info; // Borrowed connection retained by CPS; NULL detaches without freeing/resetting it
+} SOCLiCommandEnableSsl;
+
+// A command for a socket's pipe: the pool's packets are all the size of the largest command, 0x2c bytes (the write)
+typedef union SOCLCommandPacket {
+    SOCLiCommandHeader h;
+    SOCLiCommandCreateSocket create_socket;
+    SOCLiCommandBind bind;
+    SOCLiCommandRead read;
+    SOCLiCommandConsume consume;
+    SOCLiCommandWrite write;
+    SOCLiCommandShutdown shutdown;
+    SOCLiCommandClose close;
+    SOCLiCommandEnableSsl enable_ssl;
 } SOCLCommandPacket;
 
 // socl_command.c
@@ -212,7 +240,7 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue);
 // socl_bind.c
 // SOCL ports/IP scalars are in host order; SOC wrappers convert their network-order address fields.
 int SOCL_Bind(SOCLSocket *socket, u16 local_port);
-int SOCL_Connect(SOCLSocket *socket, u16 remote_port, CPSInAddr remote_ip);
+int SOCL_Connect(int s, u16 remote_port, CPSInAddr remote_ip);
 
 // socl_write.c
 // Copies caller payload into the send ring before queue admission; caller storage is not retained after return.
