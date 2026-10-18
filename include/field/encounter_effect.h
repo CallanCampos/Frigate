@@ -51,7 +51,7 @@ struct EncEffGridParam {
 void func_ov036_021c5ea0(EncEff *effect);
 // Loads overlay 148 alone, for the effects that draw the captured screen themselves
 void func_ov036_021c5ebc(EncEff *effect);
-void *EncEff_AllocWorkArea(EncEff *effect, u32 id, u32 size);
+void *EncEff_AllocWorkArea(EncEff *effect, u32 size, HeapID heapId);
 void *EncEff_GetWorkArea(EncEff *effect);
 void *EncEff_GetEventData(EncEff *effect);
 void *Field_Get3DCi(Field *field);

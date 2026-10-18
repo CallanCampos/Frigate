@@ -23,6 +23,7 @@ src/ov214/worldtrade_demo.c:
     .data       start:0x021e2c2c end:0x021e2c64
 
 src/ov214/worldtrade_deposit.c:
+    complete
     .text       start:0x021d621c end:0x021d7808
     .rodata     start:0x021e1df8 end:0x021e2138
     .data       start:0x021e2c64 end:0x021e2d5c
