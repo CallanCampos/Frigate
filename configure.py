@@ -19,6 +19,7 @@ import tempfile
 import tomllib
 import urllib.request
 import zipfile
+from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
@@ -126,8 +127,8 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
     return libraries
 
 
-# Files of a library built with other flags than the rest of it, from file_flags in its library.toml: each flag
-# replaces the library's flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb",
+# Per-source overrides from library.toml and config/compiler_flags.toml: each flag
+# replaces the default flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb",
 # "-O2,p" replaces "-O4,p")
 FILE_FLAGS: dict[str, list[str]] = {}
 
@@ -142,13 +143,47 @@ def flag_option(flag: str) -> str:
 
 
 def file_flags(source: Path, flags: list[str]) -> list[str]:
-    """Returns the flags of a library's source file: the library's, with the file's own in place of the same options."""
-    overrides = FILE_FLAGS.get((ROOT / source).resolve().relative_to(ROOT).as_posix(), [])
+    """Returns source defaults with the file's overrides in place of the same options."""
+    try:
+        relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return list(flags)
+    overrides = FILE_FLAGS.get(relative, [])
     options = {flag_option(flag) for flag in overrides}
     return [flag for flag in flags if flag_option(flag) not in options] + overrides
 
 
+def load_source_flags(path: Path) -> dict[str, list[str]]:
+    """Loads game source overrides; library overrides stay in their library.toml files."""
+    with path.open("rb") as stream:
+        manifest = tomllib.load(stream)
+    if set(manifest) - {"file_flags"}:
+        raise ValueError(f"{path}: unknown compiler settings")
+    overrides = manifest.get("file_flags", {})
+    if not isinstance(overrides, dict):
+        raise ValueError(f"{path}: file_flags must be a table")
+    for source, flags in overrides.items():
+        relative = Path(source)
+        if (not relative.parts or relative.is_absolute() or relative.as_posix() != source or ".." in relative.parts
+                or relative.parts[0] != "src" or relative.suffix != ".c"
+                or not (ROOT / relative).is_file()
+                or (ROOT / relative).resolve().relative_to(ROOT).as_posix() != source):
+            raise ValueError(f"{path}: invalid game source path {source!r}")
+        if (not isinstance(flags, list) or any(not isinstance(flag, str) or not flag.strip()
+                or not flag.startswith("-") for flag in flags)):
+            raise ValueError(f"{path}: {source}: flags must be nonempty option strings")
+        for flag in flags:
+            words = shlex.split(flag)
+            if any(word.startswith("-") for word in words[1:]):
+                raise ValueError(f"{path}: {source}: each flag must set one option")
+        options = [flag_option(flag) for flag in flags]
+        if len(set(options)) != len(options):
+            raise ValueError(f"{path}: {source}: repeated compiler option")
+    return overrides
+
+
 LIBRARIES = load_libraries()
+FILE_FLAGS.update(load_source_flags(ROOT / "config/compiler_flags.toml"))
 # Header search path of every source file, the game's and the libraries': the game's headers, each library's public
 # headers, and the headers the build generates from the constant lists in generated/ (see
 # tools/data/gen_constants.py). A library's private headers sit beside its sources.
@@ -168,9 +203,27 @@ ROM_BLOBS = {
 
 def library_of(source: Path) -> tuple[str, list[str]] | None:
     """Returns the compiler and flags of the library a source file belongs to, or None for the game's own code."""
-    relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    try:
+        relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return None
     library = next((library for prefix, library in LIBRARIES.items() if relative.startswith(prefix)), None)
     return (library[0], file_flags(source, library[1])) if library else None
+
+
+@dataclass(frozen=True)
+class SourceCompiler:
+    compiler: str
+    flags: tuple[str, ...]
+    is_library: bool
+
+
+def source_compiler(source: Path) -> SourceCompiler:
+    """Returns effective build settings without changing library membership for game files."""
+    library = library_of(source)
+    if library:
+        return SourceCompiler(library[0], tuple(library[1]), True)
+    return SourceCompiler(MWCC_VERSION, tuple(file_flags(source, CC_FLAGS)), False)
 
 
 # Archives assembled from source, which replace their extracted counterparts in the ROM: the scripts. Each maps its path
@@ -482,9 +535,7 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             obj = build_dir / source.with_suffix(".o")
             rule = next((f"mwcc_{i}" for i, lib in enumerate(LIBRARIES) if str(source).startswith(lib)), "mwcc")
             variables = {"defines": defines, "dep": obj.with_suffix(".d")}
-            library = library_of(source)
-            if library:
-                variables["flags"] = " ".join(library[1])
+            variables["flags"] = " ".join(source_compiler(source).flags)
             n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
             compiled.append(obj)
         objects.append(f["object_to_link"])
@@ -647,7 +698,7 @@ def main():
     n.rule("delink", "$dsd delink --config-path $config", "Delinking $config")
     n.rule("lcf", "$dsd lcf --config-path $config", "Generating linker script for $config")
     # mwccarm writes the dependency file next to the object, with Windows paths that fix_depfile.py converts
-    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} {' '.join(CC_FLAGS)} "
+    n.rule("mwcc", f"mkdir -p $$(dirname $out) && $wine $sjiswrap {shlex.quote(str(mwcc))} $flags "
            "$defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep", "Compiling $in",
            depfile="$dep", deps="gcc")
     # The older compilers (SPL's 1.2/base) warn when MWCIncludes, their system include path, isn't set. The code finds its
@@ -739,7 +790,7 @@ def main():
 
     # objdiff.json covers one version, the primary one if it is being built
     objdiff_version = versions[0]
-    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py"],
+    n.build(["objdiff.json"], "objdiff_config", configs, implicit=["tools/build/objdiff_config.py", "configure.py", "config/compiler_flags.toml"],
             variables={"version": objdiff_version})
     n.build(["report"], "phony", [Path("build") / objdiff_version / "report.json"])
     n.build(["progress"], "phony", [f"{objdiff_version}_progress"])
@@ -751,7 +802,7 @@ def main():
     data_dirs = sorted({str(p.relative_to(ROOT)) for d in source_dirs for p in [ROOT / d, *(ROOT / d).rglob("*")]
                         if p.is_dir()})
     n.build(["build.ninja"], "configure", ["configure.py"],
-            implicit=[*configs, *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
+            implicit=[*configs, "config/compiler_flags.toml", *(str(p.relative_to(ROOT)) for p in sorted(LIB_DIR.glob("*/library.toml"))),
                       *data_dirs])
     sources = sorted(str(p.relative_to(ROOT)) for pattern in ("src/**/*.c", "lib/*/src/**/*.[ch]", "include/**/*.h",
                                                                "lib/*/include/**/*.h") for p in ROOT.glob(pattern))

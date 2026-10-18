@@ -398,12 +398,12 @@ static const u8 data_ov167_021d6e50[0x60] = {
 void func_ov167_021b1434(BtlServerCmdQueue *que, u32 event, ...) {
     va_list list;
     u8 format;
-    u32 count;
     u32 i;
+    u32 count;
 
-    va_start(list, event);
     format = data_ov167_021d6e50[event];
     count = format & 0xf;
+    va_start(list, event);
     for (i = 0; i < count; i++) {
         sCmdArgs[i] = va_arg(list, u32);
     }

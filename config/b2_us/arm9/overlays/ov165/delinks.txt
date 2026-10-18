@@ -74,6 +74,7 @@ lib/dsprot/src/dsprot_detect.c:
     .ctor       start:0x021a4cd4 end:0x021a4cd8
 
 lib/dsprot/src/dsprot_cipher_entry.c:
+    complete
     .rodata     start:0x021a4cac end:0x021a4cb4
 
 lib/dsprot/src/dsprot_cipher.c:

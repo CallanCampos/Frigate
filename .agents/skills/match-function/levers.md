@@ -262,6 +262,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
+  byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
+- `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
+  (matching.md: "`ScClient_Reset` matches")
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - `lsr` then `orr ..., lsl` where the original shifts left first (a halfword swap): swap the operands of the `|`.
@@ -489,7 +493,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
-  a sum that adds a counter known to be 0, has an enum counter. (matching.md: "enum type")
+  a sum that adds a counter known to be 0, has an enum counter. `ScReport_SetPlayer` keeps its known-zero error
+  test with the real `SCResult` type. (matching.md: "enum type")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
   (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
   `p->size = size; p->size -= 0x20;`. (matching.md: "reduced at run time before a field store")
@@ -591,6 +596,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
+  (matching.md: "`ScClient_OnCreateSession` keeps")
 - A combined `&&` camera check moves a copied parameter, where the original has two false branches with the same
   call: nest the checks and write that call in both false arms. (matching.md: "tests `cameraEnabled` first")
 - A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
@@ -669,6 +676,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- `ScClient_SubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
+  (matching.md: "`ScClient_SubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
   it as a counter times the step. (matching.md: "A loop offset that starts at 0")
 - A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2p2): put it last

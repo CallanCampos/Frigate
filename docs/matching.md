@@ -1268,6 +1268,14 @@ Same instructions, scheduled in another order.
   but is set after the spill and takes over the array's other uses, such as a call argument the original builds
   afresh with `add r2, sp, #0x10`. The same function needs `offset.x = mode == 2 ? 128 : -16;`: as an `if`/`else`,
   the two stores keep `&offset` in a saved register and spill `i * 4`.
+- A swapped scalar serialized through `const u8 *bytes = (const u8 *)&swapped;` and fixed byte stores gives different
+  address scheduling from a cast to a byte-array struct. `dwc_competition.c`'s `Sc_PutU16` and `Sc_PutU32` match with
+  this character view of the scalar's object representation: the struct copy omits one address instruction in the
+  halfword writer and swaps the copy registers in the word writer. Both return `dest + sizeof(swapped)`.
+- `ScClient_Reset` matches with consistent direct unsigned-character views for the ID marker stores,
+  `((u8 *)client->csid)[0] = 0xde;`. Pointer-local views retain the two array bases across stores; direct views
+  recompute each byte address from the client. Both forms write the binary bytes while preserving the fields' `char`
+  string interfaces.
 - A struct assignment loads every field before it stores any, through a pointer that is not `const` too. Two
   fields copied with both loads first, `ldr r2, [r0, #0x10]; ldr r1, [r0, #0x14]; str r2, [r0]`, are one struct
   copied: `KeySystemTween_Update` ends with `tween->pos = tween->end;` for an `{ s32 x, y; }` position.
@@ -1678,7 +1686,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
   so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
   its register setters both ways, as the ROM has them. In Thumb both are an `ands` with a pool word.
-- MWCC doesn't propagate constants into a variable of an enum type. A loop that still checks its bound before the
+- MWCC doesn't propagate constants into a variable of an enum type. `dwc_competition.c`'s `ScReport_SetPlayer`
+  retains the comparison with 0 before its first player setter only with `SCResult error = SCResult_NO_ERROR;`.
+  The [GameSpy SCResult reference](https://documentation.help/GameSpy-SDK/SCResult.html) supplies its names and values.
+  A loop that still checks its bound before the
   first pass, as `for (p = 80; p <= 83; p++)` does in the Join Avenue's commands, or a sum that still adds a counter
   known to be 0, as the Battle Subway's loop over its music switches does, has an enum counter. Nor does it move an
   enum local's value into its one use: `btl_rec.c`'s `func_ov167_021d4674` computes a chunk's type from its header
@@ -2278,6 +2289,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the original puts an `if`'s then-block after the else path, write the condition negated with the bodies
   swapped: brightness.c's `BrightnessData_Step` matches with the long advance body first and `done = TRUE` in the
   `else`, for both its tests.
+  `dwc_competition.c`'s `ScClient_OnCreateSession` keeps its three `bne; b` pairs with failure-first SOAP-begin,
+  result-read and ID-read tests; the ID test is `!readCsid || !readCcid` with success in the `else`. Its `csid` array
+  also precedes `ccid` in the declarations to recover their stack slots.
 - A negated test and its expansion by De Morgan's laws compile to different branch targets: `btlv_effvm.c`'s
   `BtlvEffvm_InitEmitter` branches to the body when `angle` is below 0x2000 (`blo`) and on to the 0xe000 test when it
   is at most 0x6000 (`bls`) only as `angle < 0x2000 || (angle > 0x6000 && angle < 0xa000) || angle > 0xe000`;
@@ -2443,6 +2457,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2p2).
 - A loop counted with `!=` tests with `beq` before the loop and `bne` at its end, where `<` gives `bls` and `blo`:
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
+- `dwc_competition.c`'s `ScClient_SubmitReport` needs a `u32` counter for its 16-byte digest clear,
+  `for (i = 0x10; i != 0; i--)`: the unsigned form ends with `subs; bne`, while an `int` counter adds `cmp; bgt`.
+  Changing only the signed loop to `do`/`while` does not recover the original test.
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return` inside, as the Join Avenue's walks through its data are.
 - At `-O2,p` no loop is rotated: a `for` or `while` loop is entered with a `b` to its test at the end, as the loops of
@@ -2747,7 +2764,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declares them, and `strcpy` of a string literal as a loop that copies two bytes a pass (`ldrb [r3, #1]; ldrb [r3],
   #2; subs; strb; strb; bne`, and the last byte); the same prototypes from any other header leave a call.
   `include/string.h` (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s
-  `memset` of a `VCTSession`), `ghttpEncryption.c` and `poke_net.c`, declares the C library's string functions in its
+  `memset` of a `VCTSession`) and `ghttpEncryption.c`, declares the C library's string functions in its
   own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does TWL-DWC's
   `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops. `strcmp` and `strlen` stay
   calls either way, but the code around them changes: with `<string.h>`, NitroWiFi's `SSLi_FindNamedParam` (`ssl.c`)
@@ -2757,7 +2774,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declaration it sees: `<string.h>` included after `dwc/ext.h`'s prototypes still leaves a call. `dwc_auth.c`
   includes it first (`dwc/ext.h` takes its `size_t`), and its `Auth_OnResponse` then clears the 0x5a4-byte result in
   place, as the ROM does, while its `memcpy` of a 0x104-byte `BigNum` stays a call, also as in the ROM: a call to
-  `memcpy` in the ROM doesn't rule `<string.h>` out.
+  `memcpy` in the ROM doesn't rule `<string.h>` out. `poke_net.c` also includes `<string.h>` first: its
+  `POKE_NET_Release` clears the 0x138-byte authentication structure in place, while its variable-size copies remain
+  calls. The other functions retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
@@ -2790,8 +2809,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   definition doesn't end a batch. The tell is an object at the head of a file's shared `.rodata`, out of size order and
   packed against the next with no 4-byte gap: overlay 257's `ctvt_draw.c` starts with the 10 unread bytes of
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
-  tables defined just above `CtvtDraw_UpdateDraw`, their first user. With every table above the first function the
-  colors sort after the 2-byte tables again. `.data` is written out the same way: libVCT's `vct_dsp.c` has its 16-byte
+  tables defined just above `CtvtDraw_UpdateDraw`, their first user (`config/compiler_flags.toml` records the flag).
+  With every table above the first function the colors sort after the 2-byte tables again. `.data` is written out
+  the same way: libVCT's `vct_dsp.c` has its 16-byte
   `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
   above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
   `VCT_InitEcho`, their only user.
