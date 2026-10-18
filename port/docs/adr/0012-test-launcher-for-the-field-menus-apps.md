@@ -10,6 +10,8 @@
   ARCHITECTURE.md's feature map and layers, GLOSSARY.md's test launcher, MODDING.md's "Reaching the field menu's
   apps", port/CLAUDE.md's and PLAN.md's sentences, the oracle README's launch checks, `oracle.py`'s `launch` and
   `port --launch`, `check_launch_smoke.py`, and the run directory's `launch:` line.
+- **Note (2026-10-18):** the Pokédex's trap in the Consequences is gone since the port's `1f0c184f6` (upstream's C of
+  `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl`): `party_menus` launches the Pokédex, and it matches the oracle.
 
 ## Context
 

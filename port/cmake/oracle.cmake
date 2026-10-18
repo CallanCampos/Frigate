@@ -2,9 +2,9 @@
 # run of the game to melonDS's: the screens and memory of the boot, the opening, the title and start menu, CONTINUE and
 # a save; the saves made on the oracle from saves (the first save, and the starter save with a Pokémon and the
 # Pokédex), which the sequences and launch checks start from; the field menu's apps (the bag, the trainer card, the
-# party list and the summary) through Frigate's test launcher (ADR 0012), and the launcher's own exit statuses; and the
-# sound of the opening and the title (the ARM7 sound driver run by run; its output: a stream and a cry to the bit, the
-# music by its envelope and levels).
+# party list, the summary and the Pokédex) through Frigate's test launcher (ADR 0012), and the launcher's own exit
+# statuses; and the sound of the opening and the title (the ARM7 sound driver run by run; its output: a stream and a
+# cry to the bit, the music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
 # compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test
@@ -145,9 +145,9 @@ set_tests_properties(oracle_continue oracle_continue_starter PROPERTIES FIXTURES
 # (port/tests/oracle/launch_<route>_<version>.pbwinput), the port plays the same file from the same save with --launch
 # at the oracle's counts; the oracle's app screens (launch_<route>_<version>.screens.tsv) must show on the port at their
 # counts, and every pass of each app the oracle's. field_menus starts from the first save (the bag, the trainer card),
-# party_menus from the starter save (the party list and its Pokémon's menu, the card with the Pokédex line, the bag;
-# the route's summary and Pokédex are known differences, left out: the oracle README's "The launch checks"). Skipped
-# (77) without the oracle or the ROM, or for a version the route isn't measured in
+# party_menus from the starter save (the party list and its Pokémon's menu, the Pokédex and Tepig's entry, the card
+# with the Pokédex line, the bag; the route's summary is a known difference, left out: the oracle README's "The launch
+# checks"). Skipped (77) without the oracle or the ROM, or for a version the route isn't measured in
 foreach(route IN ITEMS field_menus party_menus)
     add_test(NAME oracle_launch_${route}
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1

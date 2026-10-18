@@ -19,8 +19,8 @@ for frame against melonDS, with its sound held to melonDS's too: the sound drive
 cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and CONTINUE
 loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there). Meanwhile
 Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag and the trainer card
-match melonDS pass for pass in both versions, and the party list in Black 2 so far. [docs/STATUS.md](docs/STATUS.md) has
-the current state.
+match melonDS pass for pass in both versions, and the party list and the Pokédex in Black 2 so far.
+[docs/STATUS.md](docs/STATUS.md) has the current state.
 
 ## Quick start
 
@@ -66,9 +66,8 @@ build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, t
 build/port/frigate-black2 --save-dir SAVES --launch party@4044,card@6974 --input FILE --headless
 ```
 
-The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. The Pokédex stops the
-program on a trap some 395 passes after it opens, still in its opening (`NNSi_objSizeWTbl`, NitroSystem's G2D, has no
-C yet), so only a Pokédex closed before then runs through. Without `--launch` nothing changes.
+The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. Without `--launch`
+nothing changes.
 
 Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run ended first, the game
 never asked for the field, the launcher stepped aside because the field's process table has C, or an app wanted the

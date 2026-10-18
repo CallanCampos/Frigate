@@ -100,8 +100,7 @@ build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --head
   and after the last the program stops, saying how each closed (its result and event type). `APP@COUNT` opens an app
   when GFL's frame count reaches COUNT, which lines it up with an input file's presses; without one it opens at once.
 - **What it can't do:** an app that wants the field (a field move, an item used in the field) ends the launch with
-  status 1, and the Pokédex stops on a trap some 395 passes after it opens (`NNSi_objSizeWTbl`, NitroSystem's G2D, has
-  no C yet). What the field leaves behind before an app opens (VRAM, palettes, the random numbers) isn't there.
+  status 1. What the field leaves behind before an app opens (VRAM, palettes, the random numbers) isn't there.
 - **It is a test tool**, off without the option, and it goes once overlay 36 lands. The tests use it to hold each app
   to melonDS's route through the real field menu, pass by pass (`oracle.py launch`,
   [../tools/oracle/README.md](../tools/oracle/README.md#the-launch-checks)).

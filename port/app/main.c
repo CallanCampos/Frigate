@@ -119,10 +119,7 @@ static const Option sOptions[] = {
       "the launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped aside "
       "because the field's process table has C, or an app wanted the field), 2 when the list isn't one it can read or "
       "the save's field menu doesn't offer an app. A status of the run's own comes first, such as a trap's 70, a "
-      "deadlock's 72, the watchdog's 73 or a 1 of its own (any other cause of 1 below). The Pokédex stops on a trap "
-      "some 395 "
-      "passes after it opens (NitroSystem's NNSi_objSizeWTbl has no C yet), so only a Pokédex closed before then "
-      "runs through" },
+      "deadlock's 72, the watchdog's 73 or a 1 of its own (any other cause of 1 below)" },
 };
 
 // What each exit status means, after the options in --help; port/docs/ARCHITECTURE.md, "How a run ends", has the same

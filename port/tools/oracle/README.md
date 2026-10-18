@@ -723,9 +723,10 @@ Both programs play the same presses; inside an app they reach both on the same p
 count. The presses for the field and its menu reach nothing on the port. **The counts** in `--launch` come from both
 programs: each is the app's first frame on the oracle (from its `frames.tsv`, the first picture after the field's fade
 to black) less the passes the port itself takes from opening the app to its first frame, measured on the port with
-`--launch APP` at once (2 for the bag and the party list, 4 for the trainer card). So each launched app's first frame
-is aligned by construction: its picture is checked, its timing isn't. Every later pass is a check of both, and so is
-every app a launched app opens (the party list's summary, and the party list again after it). The slack is 0.
+`--launch APP` at once (2 for the bag and the party list, 4 for the trainer card and the Pokédex). So each launched
+app's first frame is aligned by construction: its picture is checked, its timing isn't. Every later pass is a check of
+both, and so is every app a launched app opens (the party list's summary, and the party list again after it). The slack
+is 0.
 
 **What the field leaves** before an app, measured on the oracle at the bag's first frame by two-pass dumps (the oracle
 is deterministic: `g_GameSystem` at `0x021410f4`, its `GameData` at `0x0223b330`, `gfl/ui.c`'s `sSystemUI` at
@@ -736,21 +737,19 @@ The launcher sets both through the game's setters. Nothing else was needed: the 
 | Route | Save | `--launch` (Black 2) | App screens | Pass by pass |
 | --- | --- | --- | --- | --- |
 | `field_menus` | `first_save` | `bag@4044,card@4584` | 2 of 2 | 621 of 621 counts: the bag (4046-4323) and the card (4588-4930) |
-| `party_menus` | `starter_save` | `party@4044,card@6974,bag@7673` | 5 of 5, 4 left out | 1,491 of 1,491 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
+| `party_menus` | `starter_save` | `party@4044,pokedex@5473,card@6974,bag@7673` | 8 of 8, 1 left out | 2,639 of 2,639 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the Pokédex, its Unova list and Tepig's entry (5477-6624), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
 | `field_menus`, White 2 | `first_save` | `bag@4044,card@4584`, as in Black 2 | 2 of 2 | 621 of 621 counts, the same spans |
 
 The pass-by-pass totals count each launched app's first frame, whose count its `--launch` count aligns: for 2 of the
-621 in `field_menus` and 3 of the 1,491 in `party_menus`, the picture is checked but not when it shows.
+621 in `field_menus` and 4 of the 2,639 in `party_menus`, the picture is checked but not when it shows.
 
-Left out of `party_menus`, with their reasons in `LAUNCHES`:
+Left out of `party_menus`, with its reason in `LAUNCHES` (`SUMMARY_SCROLL`):
 
 - **The summary** (counts 4533-4821): it scrolls its background a pixel every 4 VBlanks since it started
   (`PStatus_Main`, `src/ov207/p_sta_sys.c:263-271`), and the DS spends some 37 VBlanks more than passes loading it
   (count 4530 alone takes 30 frames), so its background is about 9 pixels further on throughout; the rest of its
   screens are the port's. A frame the DS drops where the game steps by VBlanks, as the title's camera
   ([Known differences](#known-differences-from-the-hardware)).
-- **The Pokédex** (its 3 rows): the port stops on `NNSi_objSizeWTbl` (ARM9 main, `0x020942b0`), NitroSystem G2D's
-  table of object widths, which has no C yet, so the route doesn't launch it.
 
 White 2 has `field_menus`, measured again on its own oracle: the same counts and spans, the bag's screens the same as
 Black 2's, the menu's and the card's bottom screens White 2's own. It has no `party_menus` yet: its starter save isn't

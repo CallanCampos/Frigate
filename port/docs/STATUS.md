@@ -26,12 +26,92 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the Pokédex runs and matches melonDS, thanks to the decomp's NitroSystem tables
+
+- **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`, which brought
+  upstream's C of NitroSystem G2D's `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl` (`e6dcf9b89`, PR #371,
+  `lib/nnsys/src/g2d/g2d_OAM.c`); no sync in this task.
+- **Port:** `92b9778ac`, on the branch `port-pokedex` from `2da26e048`, merged into `main` after `334077ba7`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, a full build in the
+  worktree). This task changes only `port/` and `.github/README.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo, `build/port` (Black 2) and `build/port-w2` (White 2), both Ninja, from
+  scratch, then again after `main.c`'s `--help` text changed: no errors, 263 warnings in each, as before, none of them
+  of the pointer and integer size kinds. The oracle is `build/verify-tree`'s `pbw-oracle`, copied into both builds'
+  `oracle/` (no oracle source changed), and the saves its `oracle-saves`. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T4, `oracle.py launch party_menus` (Black 2) with the Pokédex launched: 8 of 8 app screens at the oracle's counts
+    (the party list, Tepig's menu, the party list after the summary, the Pokédex's Unova list, Tepig's entry, the list
+    after it, the card, the bag), 2,639 of 2,639 counts of the apps' spans the oracle's pictures (1,148 of them the
+    Pokédex's, 5477-6624: its opening, the list, Tepig's entry, the list again and its close to black), the 19 rows of
+    the table held to the oracle's run; the launcher reports event type 0 after each of the four apps (the Pokédex:
+    opened at count 5473, closed at 6630, result 0), and the save is unchanged. Only the summary's row and span stay
+    left out (`SUMMARY_SCROLL`).
+  - T2, T3, T4, T6, Black 2, `ctest -j4` with the oracle: 266 of 267 pass (2,961 s), none skipped, under a load
+    average of 60 to 110 from the other tracks' runs; `asm_oracle` timed out at its 900 s there (520 s in
+    `build/verify-tree`'s last full run) and passes on its own through `ctest` (221 s), so all 267 pass.
+    `oracle_launch_party_menus` passes as above, and `oracle_launch_field_menus`, `launch_summary_standalone`,
+    `launch_touch_then_party`, `launch_unfinished`, `launch_not_offered`, `oracle_compare` (the route's declarations:
+    four apps, four event types, the known rows among the table's) and `app_about` (`--help`'s `--launch` text) pass
+    with it. The saves came from the build's cache, copied from `build/verify-tree`, whose SHA-1s are the ones
+    `oracle.py` keeps. After the review's fixes, which touch only documents, `ctest -j4` again: 266 of 267 (2,290 s,
+    none skipped; `oracle_launch_party_menus` 832 s), `asm_oracle` again past its 900 s under a load average of 70 to
+    94, and passing on its own (433 s).
+  - White 2, the tests this change touches, `ctest -j3`: `app_about`, `integrate_launch_bad_option`,
+    `integrate_launch_never_asked`, `oracle_compare`, `oracle_saves`, `oracle_launch_field_menus` (2 of 2, 621 of 621),
+    `launch_unfinished` and `launch_not_offered` pass; `oracle_launch_party_menus` skips as before (`SAVES` keeps no
+    SHA-1 of `starter_save` for White 2).
+  - Every run passed `--save-dir`; `~/Library/Application Support/Frigate` doesn't exist. clang-format 23.1.3 is clean
+    on `main.c`. T5's nightly runs and T7 not yet.
+- **Tiers** (`port/tools/progress`, upstream `993e6c49b`): (a) 32,723 functions, 2,962,822 code bytes (77.0%); (b)
+  5,036, 561,554 bytes; (c) 3,259, 325,868 bytes (8.5%). Since the last entry's upstream, `cf8ded4c2`, which that
+  entry didn't measure (`progress.py --rev` measures it here, and gives `aae2a03f6`'s recorded numbers back exactly):
+  (a) +439 functions and 66,018 bytes; (b) 106 functions and 43,550 bytes fewer; (c) 333 functions and 22,468 bytes
+  fewer, down from 9.0%. All of it is upstream's C merged by `1f0c184f6`; this task changes no decomp C.
+- **Trap stubs:** 512 function stubs and 46 data placeholders in each version (`gen_stubs`, each build above), from 624
+  and 48 at the last entry: upstream's code merged by `1f0c184f6`, the two data placeholders gone being
+  `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl`, on which the Pokédex stopped. A continued game without `--launch` still
+  stops on `FIELDMAP_PROC_FUNCS`.
+- **64-bit warnings:** none of the pointer and integer size kinds among the host build's 263 warnings, in each version;
+  no game or `lib/` code changed in this task.
+- **Work done:**
+  - **The Pokédex in `party_menus`.** The route's `--launch` is now `party@4044,pokedex@5473,card@6974,bag@7673`, the
+    apps in the oracle's order, with four event types and the Pokédex's span. The count is the oracle's: on its run
+    (`launch_party_menus_b2_us.pbwinput` from the starter save), the field fades to black by count 5468 and the
+    Pokédex's first picture shows at count 5477 (oracle frame 7682); the port takes 4 passes from opening the Pokédex
+    to its first frame (`--launch pokedex@4044` shows it at count 4048, the same picture, `66252ee3`/`aa6f48fc`), so
+    it opens at 5473. Its span ends at count 6624, the first black after it closes (oracle frame 8920; the field menu
+    shows again at 6650). The DS spends 9 frames on count 5476 and 17 on count 5868, loading, yet every count of the
+    span shows the oracle's picture on the port: unlike the summary's background, nothing the Pokédex shows moves by
+    VBlanks, so no known difference was needed and no port bug turned up. Nothing was regenerated: the table's hashes
+    are the oracle's, as committed.
+  - **`POKEDEX_TRAP`** is gone from `oracle.py`, with its three known rows, and the trap from the documents that
+    described it: the README's `--launch` section, `--help`'s `--launch` text in `main.c`, ARCHITECTURE.md's feature
+    map row (the Pokédex with Tepig's entry is melonDS's pass for pass), MODDING.md's "What it can't do", the oracle
+    README's launch checks (the table, the measured passes, the first frames aligned by construction, and what is
+    left out), the route's input file and table comments, and `oracle.cmake`'s. ADR 0012 gets a dated note in its
+    header, as the ADR rules allow, and its text is left as accepted; the older STATUS entries keep their words. The
+    landing page and the README say that the Pokédex matches melonDS in Black 2 with the party list, and the tests
+    guide names it among the oracle's apps.
+  - **Equivalence notes** ([decomp-findings.md](decomp-findings.md), PLAN.md §6) for the unlinked C the Pokédex now
+    runs: `lib/nnsys/src/g2d/g2d_OAM.c` and `g2d_RendererCore.c`, both incomplete. The size tables hold the ROM's 48
+    bytes in both versions. A trace of `party_menus` under lldb shows the game reading them only in the Pokédex, through
+    `DrawCellToSurface2D_`'s horizontal flip, from count 5869 in Tepig's entry. The nonmatching
+    `NNS_G2dApplyOamManagerToHW`, `NNS_G2dGetNewOamManagerInstanceAsFastTransferMode` and `DrawCellToSurface2D_` run in
+    every app of the route, so they are equivalent as observed; `SetAffinedOamPosition_` never runs there and stays
+    unknown.
+- **Next:** White 2's starter route, so that `party_menus` and `continue_starter` run in White 2; the apps no route
+  reaches yet (the town map, the Xtransceiver, the medal box, the options); a save with an adventure made by the port,
+  once overlay 36 lets it into the field; for the sound, a comparison sequence where a player plays on the game's
+  count.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: upstream's matched libfx merged, and the divider's results read through the HAL however cp.h names them
 
 - **Upstream:** `026351ef7` (40 commits after `6ca74421c`: overlay 11's GameSpy GP, overlay 36's script commands, the
   last libfx and libmath functions matched, NitroSystem G3D/G2D readers), merged by `4fee9b918` after `6ca74421c`'s
   `4e9685c0e`.
-- **Port:** `PORT_SHA`, on `port-integrate` after the rename's commits (`c1ae95c3e`, `7a7bedf8f`), the hash checks' longer
+- **Port:** `2a06b6b82`, on `port-integrate` after the rename's commits (`c1ae95c3e`, `7a7bedf8f`), the hash checks' longer
   limit (`e67b54f28`), the merges and `3338cab12` (libfx's ledger).
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `check_mwcc_neutral.py --base 026351ef7` on the four
   libfx files: 8 of 8 preprocess identically.
@@ -58,7 +138,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
 ## 2026-10-18: the repository renamed CallanCampos/Frigate: the sync's guards, the scripts and the documents
 
 - **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `2da26e048`: `c1ae95c3e` (the rename), then the
+- **Port:** `7a7bedf8f`, on the branch `port-integrate` from `main` at `2da26e048`: `c1ae95c3e` (the rename), then the
   review's fixes with this entry; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`), at `c1ae95c3e` and
   again with the review's fixes. No file that the ROM build reads changed, so ninja had only the two ROM checks to run.
