@@ -299,8 +299,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - An inline's loads with a field's offset folded in (`[r, #4 + k]`), where the original adds the row to a base
-  hoisted before the loop and reads `[base, row]`, then `[r, #k]`: the inline takes `const void *` and casts at each
-  read, as WCM's `WCM_CompareBytes`. (matching.md: "keeps the argument one address")
+  hoisted before the loop and reads `[base, row]`, then `[r, #k]`: the inline takes that argument as a `const void *`
+  and casts at each read, a lever its comment should name. (matching.md: "keeps the argument one address")
 - `lsr` then `orr ..., lsl` where the original shifts left first (a halfword swap): swap the operands of the `|`.
   (matching.md: "An OR of two shifts of one value")
 - An inlined SDK call whose packed value is built in another order: check the inline's parameter types against the
@@ -774,7 +774,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "takes a pragma's name")
 - Values the original builds before a loop and reuses after it, where ours computes them again: they were locals;
   arithmetic on a `u16` hoisted out of the loop, or out of a loop its entry test can skip, is not reused, nor is
-  an inline's when its parameters' type is not the variable's.
+  an inline's unless the variable and the parameters are both `int` or both `u32`.
   (matching.md: "Arithmetic on a `u16` hoisted out of a loop")
 - A loop that adds each row to a member's address hoisted ahead of it (`add r2, base, row; ldrb [r2, byte]`), where
   ours regroups as `(p + row) + (offset + byte)`: a pointer set to the member and stepped, `list = p->arr; list +=

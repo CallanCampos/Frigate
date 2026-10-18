@@ -152,11 +152,11 @@ static int DWCAc_FindCandidate(const WMBssDesc *bss, DWCAcSearchWork *work) {
     return -1;
 }
 
-// Whether two BSSIDs are the same, compared as untyped bytes, as WCM's WCM_CompareBytes compares them
-static inline BOOL DWCAc_IsSameBssid(const void *a, const void *b) {
-    return ((const u8 *)a)[0] == ((const u8 *)b)[0] && ((const u8 *)a)[1] == ((const u8 *)b)[1] &&
-           ((const u8 *)a)[2] == ((const u8 *)b)[2] && ((const u8 *)a)[3] == ((const u8 *)b)[3] &&
-           ((const u8 *)a)[4] == ((const u8 *)b)[4] && ((const u8 *)a)[5] == ((const u8 *)b)[5];
+// Whether two BSSIDs are the same. The candidate's is passed as a `const void *`: as a `const u8 *`, MWCC folds the
+// list entry's offset into each byte's load, which the original doesn't
+static inline BOOL DWCAc_IsSameBssid(const u8 *a, const void *b) {
+    return a[0] == ((const u8 *)b)[0] && a[1] == ((const u8 *)b)[1] && a[2] == ((const u8 *)b)[2] &&
+           a[3] == ((const u8 *)b)[3] && a[4] == ((const u8 *)b)[4] && a[5] == ((const u8 *)b)[5];
 }
 
 // Puts the beacon among the candidates, as a new one or in place of the one it matches, and gives its place: the last

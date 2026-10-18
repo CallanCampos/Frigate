@@ -1505,11 +1505,12 @@ Same instructions, scheduled in another order.
   included, shifts it in place and lets the load move above the parameter's copy: `resonance_resort_data.c`'s
   `JoinAvenuePerson_AddVisitorData` writes `JoinAvenueData *data = person->data; data += visitor->dataIndex;` inside
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
-  In a loop the stepped pointer keeps the member's address one value, hoisted ahead of the loop: `pokedex.c`'s
-  `addToDex` clears each kind's bit through `u8 *list = pokedex->shown; list += i * POKEDEX_SPECIES_BYTES;`, which
-  adds the row to `pokedex + 0x1ac` before indexing by the byte (`add r2, r1, r2; ldrb r5, [r2, r0]`) as the original
-  does, while every spelling in one expression (`pokedex->shown + i * N`, `&pokedex->shown[i * N]`) regroups as
-  `(pokedex + i * 0x54) + (0x1ac + byte)`, 12 bytes longer.
+  In a loop the stepped pointer keeps the member's address one value, hoisted ahead of the loop. For `pokedex.c`'s
+  `addToDex`, which still doesn't match (its row), a variant that clears each kind's bit through
+  `u8 *list = pokedex->shown; list += i * POKEDEX_SPECIES_BYTES;` adds the row to `pokedex + 0x1ac` before indexing by
+  the byte (`add r2, r1, r2; ldrb r5, [r2, r0]`) as the original does, while every spelling in one expression
+  (`pokedex->shown + i * N`, `&pokedex->shown[i * N]`) regroups as `(pokedex + i * 0x54) + (0x1ac + byte)` and is
+  longer.
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is the address of
   `p[i].field` that MWCC shares between two accesses: common-subexpression elimination builds it as `p + 4` indexed
   by `i << 3`. When the two accesses are reads merged into one load, -O4 propagates that address back into the load
@@ -1704,10 +1705,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   indexed element passed to it has the field's offset folded into each of the inline's loads (`[r, #4 + k]`). A
   `const void *` parameter, read as `((const u8 *)b)[k]`, keeps the argument one address: DWC's `DWCAc_AddCandidate`
   (`dwc_ac_wcm.c`) hoists `&work->candidates[0].bssid` out of its loop and adds the row to it (`add r10, r0, r9;
-  ldrb r0, [r0, r9]`, then `[r10, #1]` to `[r10, #5]`) only with `DWCAc_IsSameBssid` taking two `const void *`, as
-  WCM's `WCM_CompareBytes` takes its bytes. A `const u8 *bssid` local gives the same addressing but turns the
-  inline's `&&` chain into predicated `cmpeq`s. `pokedex.c`'s `ClearBit(void *bits, u16 index)` keeps
-  `pokedex->shownForms + 0xb` whole the same way, where a `u8 *` parameter regroups it around the byte index.
+  ldrb r0, [r0, r9]`, then `[r10, #1]` to `[r10, #5]`) only with `DWCAc_IsSameBssid` taking the candidate's BSSID as a
+  `const void *`; the other BSSID stays a `const u8 *`. Two `const u8 *`, the NitroSDK's pointer-sum form of the
+  compare included, give 0x178 against 0x188, and a `const u8 *bssid` local gives the same addressing but turns the
+  inline's `&&` chain into predicated `cmpeq`s. The parameter's type is the lever here, and the inline's comment says
+  so. A `ClearBit(void *bits, u16 index)` tried for `pokedex.c`'s `addToDex` keeps `pokedex->shownForms + 0xb` whole
+  the same way, where a `u8 *` parameter regroups it around the byte index.
 
 - `field += value` on an `s16` field with an `int` value narrows the value first and shares the narrowed copy between
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its
@@ -2720,8 +2723,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the body or passed to an inline, is computed again by code after the loop, even after a `do`/`while`, where a
   hoisted field address (`pokedex->shown`) and a value kept in a local are reused. On an `int` it is reused after a
   loop that can't be skipped (a `do`/`while` or a constant bound) and computed again only after a loop whose entry
-  test can skip it. Passed to an inline, it is reused only when the variable has the parameters' type: an `int bit`
-  given to `int` parameters is reused, and a `u16`, `u32`, `s16` or `long` one is computed again.
+  test can skip it. Passed to an inline, it is reused only for an `int` or `u32` variable given to parameters of that
+  type: an `int bit` given to `int` parameters is reused, a `u16`, `u32`, `s16` or `long` one given to `int`
+  parameters is computed again, and so is a `u16` or `s16` given to parameters of its own type.
   `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
   them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
   inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters,
@@ -3000,22 +3004,22 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loops keep their `b` to the test instead of being rotated, an element's address is added again at each access, and
   `~*p & (*p - 1)` loads `*p` twice, as in the ROM, where a call in its place rotates the loops and shares the adds.
 - MWCC builds `memcpy` and `memset` of a size it knows in place, without the call, when a header named `string.h`
-  declares them, and `strcpy` of a string literal as a loop that copies two bytes a pass (`ldrb [r3, #1]; ldrb [r3],
-  #2; subs; strb; strb; bne`, and the last byte); the same prototypes from any other header leave a call.
-  `include/string.h` (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s
-  `memset` of a `VCTSession`) and `ghttpEncryption.c`, declares the C library's string functions in its
-  own header (`dwc/ext.h`) and doesn't include `<string.h>`. MSL's own files include it, and so does TWL-DWC's
-  `dwc_init.c`, whose `DWCi_Init` copies the stats server's host name with those loops. `strcmp` and `strlen` stay
-  calls either way, but the code around them changes: with `<string.h>`, NitroWiFi's `SSLi_FindNamedParam` (`ssl.c`)
-  keeps `name` in r7 where the ROM spills it to `[sp]`, so `ssl_internal.h` declares them itself. DWC's
-  `DWCAc_AddCandidate` (`dwc_ac_wcm.c`) comes closer with `<string.h>`'s `strncmp`, which lets MWCC hoist the loads
-  through its `const` parameter and the loop's bases out of the loop that calls it. MWCC goes by the first
-  declaration it sees: `<string.h>` included after `dwc/ext.h`'s prototypes still leaves a call. `dwc_auth.c`
-  includes it first (`dwc/ext.h` takes its `size_t`), and its `Auth_OnResponse` then clears the 0x5a4-byte result in
-  place, as the ROM does, while its `memcpy` of a 0x104-byte `BigNum` stays a call, also as in the ROM: a call to
-  `memcpy` in the ROM doesn't rule `<string.h>` out. `poke_net.c` also includes `<string.h>` first: its
-  `POKE_NET_Release` clears the 0x138-byte authentication structure in place, while its variable-size copies remain
-  calls. The other functions retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference.
+  declares them, and `strcpy` of a string literal as a loop that copies two bytes a pass (`ldrb [r3, #1]; ldrb [r3], #2;
+  subs; strb; strb; bne`, and the last byte); the same prototypes from any other header leave a call. `include/string.h`
+  (MSL's) does it, so code whose ROM calls them, such as DWC's `vct_session.c` (`InitSession`'s `memset` of a
+  `VCTSession`) and `ghttpEncryption.c`, declares the C library's string functions in its own header (`dwc/ext.h`) and
+  doesn't include `<string.h>`. MSL's own files include it, and so does TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies
+  the stats server's host name with those loops. `strcmp` and `strlen` stay calls either way, but the code around them
+  changes: with `<string.h>`, NitroWiFi's `SSLi_FindNamedParam` (`ssl.c`) keeps `name` in r7 where the ROM spills it to
+  `[sp]`, so `ssl_internal.h` declares them itself. DWC's `DWCAc_AddCandidate` (`dwc_ac_wcm.c`) came closer with
+  `<string.h>`'s `strncmp` before it matched, which lets MWCC hoist the loads through its `const` parameter and the
+  loop's bases out of the loop that calls it. MWCC goes by the first declaration it sees: `<string.h>` included after
+  `dwc/ext.h`'s prototypes still leaves a call. `dwc_auth.c` includes it first (`dwc/ext.h` takes its `size_t`), and its
+  `Auth_OnResponse` then clears the 0x5a4-byte result in place, as the ROM does, while its `memcpy` of a 0x104-byte
+  `BigNum` stays a call, also as in the ROM: a call to `memcpy` in the ROM doesn't rule `<string.h>` out. `poke_net.c`
+  also includes `<string.h>` first: its `POKE_NET_Release` clears the 0x138-byte authentication structure in place,
+  while its variable-size copies remain calls. The other functions retain their matches, apart from
+  `POKE_NET_Connecting`'s documented scheduling difference.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
