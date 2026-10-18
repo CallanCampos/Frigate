@@ -413,9 +413,9 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
     {
         u16 glowColors[3] = { 0x7ff4, 0x7fff, 0x7be9 };
         u16 baseColors[3] = { 0x4a0a, 0x5ef7, 0x4140 };
-        fx32 ratio;
         u8 i;
         u8 j;
+        fx32 ratio;
 
         if (wk->glowPaused == FALSE) {
             if (wk->glowAngle + 0x400 >= 0x10000) {
@@ -429,23 +429,21 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         ratio = (FX_SinIdx(wk->glowAngle) + FX32_ONE) / 2;
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
-                u8 glowG = (glowColors[j] & 0x3e0) >> 5;
-                s8 dg = ((u8)((baseColors[j] & 0x3e0) >> 5) - glowG) * ratio >> FX32_SHIFT;
-                u8 glowR = glowColors[j] & 0x1f;
-                u8 glowB = (glowColors[j] & 0x7c00) >> 10;
-                s8 db = ((u8)((baseColors[j] & 0x7c00) >> 10) - glowB) * ratio >> FX32_SHIFT;
-                s8 dr = ((u8)(baseColors[j] & 0x1f) - glowR) * ratio >> FX32_SHIFT;
-                s32 value;
-                u8 r;
-                u8 g;
-                u8 b;
+                u16 glow = glowColors[j];
+                u16 base = baseColors[j];
+                u8 glowR = glow & 0x1f;
+                u8 glowG = (glow & 0x3e0) >> 5;
+                u8 glowB = (glow & 0x7c00) >> 10;
+                u8 baseR = base & 0x1f;
+                u8 baseG = (base & 0x3e0) >> 5;
+                u8 baseB = (base & 0x7c00) >> 10;
+                s8 dr = (baseR - glowR) * ratio >> FX32_SHIFT;
+                s8 dg = (baseG - glowG) * ratio >> FX32_SHIFT;
+                s8 db = (baseB - glowB) * ratio >> FX32_SHIFT;
+                u8 r = MATH_CLAMP(glowR + dr, 0, 31);
+                u8 g = MATH_CLAMP(glowG + dg, 0, 31);
+                u8 b = MATH_CLAMP(glowB + db, 0, 31);
 
-                value = glowR + dr;
-                r = value > 31 ? 31 : value < 0 ? 0 : value;
-                value = glowG + dg;
-                g = value > 31 ? 31 : value < 0 ? 0 : value;
-                value = glowB + db;
-                b = value > 31 ? 31 : value < 0 ? 0 : value;
                 wk->colors[i][2 + j] = GX_RGB(r, g, b);
             }
         }
@@ -2328,8 +2326,8 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                         func_ov165_0219cdd8(wk, wk->cursorPos);
                         func_ov165_0219ce34(wk, wk->cursorPos);
                         wk->selectPos2 = wk->cursorPos;
-                        wk->state = 4;
                         wk->pkm = NULL;
+                        wk->state = 4;
                         wk->showShortcutButtons = FALSE;
                         PokeListMessage_Open(wk, wk->message, 0);
                         PokeListMessage_Print(wk, wk->message, 0x11);
@@ -2353,7 +2351,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                     break;
                 case 3:
                     PokeListMessage_CreateWordSet(wk, wk->message);
-                    PokeListMessage_SetMoveName(wk, wk->message, 0, sHidenMoves[hiden - 11]);
+                    PokeListMessage_SetMoveName(wk, wk->message, 0, *(sHidenMoves + hiden - 11));
                     PokeList_ShowMessage(wk, 0xab, TRUE, PokeList_MessageDoneSelect);
                     PokeListMessage_FreeWordSet(wk, wk->message);
                     break;
