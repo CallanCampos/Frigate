@@ -2415,7 +2415,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the original puts an `if`'s then-block after the else path, write the condition negated with the bodies
   swapped: brightness.c's `BrightnessData_Step` matches with the long advance body first and `done = TRUE` in the
   `else`, for both its tests.
-  `dwc_competition.c`'s `ScClient_OnCreateSession` keeps its three `bne; b` pairs with failure-first SOAP-begin,
+  `dwc_competition_soap.c`'s `ScClient_OnCreateSession` keeps its three `bne; b` pairs with failure-first SOAP-begin,
   result-read and ID-read tests; the ID test is `!readCsid || !readCcid` with success in the `else`. Its `csid` array
   also precedes `ccid` in the declarations to recover their stack slots.
 - A negated test and its expansion by De Morgan's laws compile to different branch targets: `btlv_effvm.c`'s
@@ -3199,9 +3199,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Under `-ipa function`, a table initialized with string literals comes before its strings only when it is defined
   above the file's first function; defined between functions, it has its strings laid out ahead of it, whether it is
   `static` or global, sized or not, declared earlier or not. A table right before its own strings in the middle of a
-  file's `.data` is therefore the first data of another original file. Overlay 260's `dwc_competition.c` has
-  `sCompetitionNamespaces` before its namespace string, after `Sc_PutGuid`'s literals, and the part from
-  `ScClient_Begin` on, compiled on its own with the table at its top, lays out the ROM's `.data` from there to the end.
+  file's `.data` is therefore the first data of another original file. Overlay 260's `sCompetitionNamespaces` is
+  before its namespace string, after `Sc_PutGuid`'s literals: it starts `dwc_competition_soap.c`, from `ScClient_Begin`
+  on, with the table above the file's first function, and the overlay links only when `dwc_competition.c` is split there.
 - The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
