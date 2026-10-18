@@ -9,7 +9,8 @@
   - The bundle identifier is PORT_MACOS_BUNDLE_ID_PREFIX (CMake; io.github.callancampos.frigate) followed by the
     version's black2 or white2.
   - NSHumanReadableCopyright, which the About window shows under the name, says what Frigate is and that it is not
-    affiliated with the game's owners.
+    affiliated with the game's owners: PORT_PRODUCT_DESCRIPTION and PORT_PRODUCT_DISCLAIMER of port/hal/os/port_app.h,
+    which --help prints too.
   - CFBundleIconFile is the app's icon, Contents/Resources/AppIcon.icns, which make_app.sh copies from the .icns that
     make_icns.sh makes of the version's master in port/assets/branding (Black 2's dark plate, White 2's light one).
   - The versions come from git: CFBundleVersion is the number of commits up to the one built, which only grows along
@@ -59,7 +60,7 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; you supply your own ROM. Not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.</string>
+	<string>@ABOUT@</string>
 	<key>PortSourceRevision</key>
 	<string>@REVISION@</string>
 </dict>

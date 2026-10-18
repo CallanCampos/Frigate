@@ -1,7 +1,8 @@
 """Writes the spec of the contact sheet of Frigate's artwork (port/assets/branding) for sheet.swift: the logos on
-GitHub's light and dark backgrounds at three widths, the icons and marks large, and every icon and mark at 128, 64, 32
+GitHub's light and dark backgrounds at three widths, the icons and marks large, every icon and mark at 128, 64, 32
 and 16 px on a light and a dark desktop, with 32 and 16 px also enlarged unsmoothed (4x and 8x) to show the actual
-pixels. render.py --sheet runs it.
+pixels, and the small images drawn pixel by pixel (the .icns's 16 and 32 px, the window's 32 px) at their size and
+enlarged 8x. render.py --sheet runs it.
 
 usage: contact.py DIR SPEC_OUT
 """
@@ -69,5 +70,18 @@ for bg, fg, mark in (("F4F5F7", "6E7781", "mark.svg"), ("1E1F22", "8B949E", "mar
         x += 128 + pad
         rows.append(f"img {d}/{name} {x} {top} 128 128 8")
         y += h
+
+# The small images drawn for their size, at that size and enlarged to 128 px unsmoothed, on a light and a dark desktop.
+for bg, fg in (("F4F5F7", "6E7781"), ("1E1F22", "8B949E")):
+    h = 40 + 128 + 2 * pad + label
+    rows.append(f"rect 0 {y} {W} {h} {bg}")
+    caption("icon-*-16.svg, icon-*-32.svg, window-*.svg: at their size, and enlarged", y, fg)
+    top, x = y + pad + label, pad
+    for name, s in (("icon-black2-16.svg", 16), ("icon-white2-16.svg", 16), ("icon-black2-32.svg", 32),
+                    ("icon-white2-32.svg", 32), ("window-black2.svg", 32), ("window-white2.svg", 32)):
+        rows.append(f"img {d}/{name} {x} {top} {s} {s}")
+        rows.append(f"img {d}/{name} {x} {top + 40} 128 128 {128 // s}")
+        x += 128 + pad
+    y += h
 
 open(out, "w").write("\n".join([f"canvas {W} {y} none"] + rows) + "\n")

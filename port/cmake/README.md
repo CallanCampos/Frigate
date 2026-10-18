@@ -8,7 +8,7 @@ module's build and tests are read in one place.
 
 | Fragment | What it adds | Game functionality it serves | Tests it defines |
 | --- | --- | --- | --- |
-| [app.cmake](app.cmake) | The rest of the program's own files (`port_app` starts with `app/main.c`): the window, gamepads, the macOS log, replays, the run directory and symbol lookup, the oracle's input file reader; the window icon's generator; the replay tests | The window, the controls, replays | `app_window_icon_*`, `app_symbols`, `app_run_dir_*`, `app_gamepad_*`, `replay_start_menu(_clean)`, `replay_new_game(_clean)` (Black 2), `replay_same_save` |
+| [app.cmake](app.cmake) | The rest of the program's own files (`port_app` starts with `app/main.c`): the window, gamepads, the macOS log, replays, the run directory and symbol lookup, the oracle's input file reader; the window icon's generator; the replay tests | The window, the controls, replays | `app_window_icon_*`, `app_about`, `app_symbols`, `app_run_dir_*`, `app_gamepad_*`, `replay_start_menu(_clean)`, `replay_new_game(_clean)` (Black 2), `replay_same_save` |
 | [assets.cmake](assets.cmake) | The check of Frigate's artwork ([../assets/branding](../assets/branding/README.md)) | None: the program's look | `assets_branding` |
 | [fx_tests.cmake](fx_tests.cmake) | The decomp's libfx C built for a test | 3D maths (cameras, models) | `fx_libfx` |
 | [g3d.cmake](g3d.cmake) | The geometry engine and 3D renderer's tests, plain and sanitized, and their timing gate | 3D scenes | `g3d_ge*`, `g3d_ds3d*`, `g3d_hal*`, `g3d_timing` |
@@ -16,7 +16,7 @@ module's build and tests are read in one place.
 | [gx.cmake](gx.cmake) | The `port_sdk_` renames of `gx_vramcnt.c`, `gx_state.c`, `mi_wram.c` and `gx_load2d.c`, which [../hal/gx](../hal/README.md#the-modules) wraps | VRAM banks, palette loads | `gx_*` |
 | [hal_tests.cmake](hal_tests.cmake) | The known-vector tests of the SDK's assembly in C, and the asm oracle (which skips without the extracted ROM and `build/port-venv`) | Copies, fills, decompression, matrices, sorting, SHA-1, RC4 | `hal_mi`, `hal_fx`, `asm_oracle` |
 | [integrate.cmake](integrate.cmake) | Scenarios on the whole program's objects, and the option checks | DMA, the allocator, input, the screens | `integrate_*` |
-| [macos_app.cmake](macos_app.cmake) | The macOS app's target `<program>_app`, its names, icon and bundle identifier | None: the program as an app | `app_make_app`, `app_message_log`, `app_package_macos_out` |
+| [macos_app.cmake](macos_app.cmake) | The macOS app's target `<program>_app`, its names, icon and bundle identifier (whose prefix is in [../app/macos/bundle_id.cmake](../app/macos/bundle_id.cmake)) | None: the program as an app | `app_make_app`, `app_bundle_id`, `app_message_log`, `app_package_macos_out` |
 | [nnsys.cmake](nnsys.cmake) | The `port_sdk_` renames of NitroSystem's FND heap frees and G2D loaders, which [../hal/nnsys](../hal/README.md#the-modules) replaces | Sprites, cells, animations, fonts, heaps | `nnsys_*` |
 | [oracle.cmake](oracle.cmake) | The melonDS test oracle as an external project (only with `PORT_BUILD_ORACLE`), and its tests | Every screen, held against melonDS | `oracle_*` |
 | [os.cmake](os.cmake) | minicoro, the OS core's per-file options and stack probes | Threads, interrupts, timing | `os_*` |
@@ -34,7 +34,7 @@ Each is given at configure time, `cmake -S port -B build/port -DNAME=VALUE`.
 | `PORT_VERSION` | `b2_us` | [../CMakeLists.txt](../CMakeLists.txt) | The game: `b2_us` (Black 2, `frigate-black2`) or `w2_us` (White 2, `frigate-white2`). One build directory per version |
 | `PORT_FETCH_SDL3` | `ON` | [../CMakeLists.txt](../CMakeLists.txt) | Builds SDL3's pinned release when no installed SDL3 3.4 is found |
 | `PORT_MACOS_APP` | `OFF` | [macos_app.cmake](macos_app.cmake) | Makes the macOS app with every build, not only with its target |
-| `PORT_MACOS_BUNDLE_ID_PREFIX` | `io.github.callancampos.frigate` | [macos_app.cmake](macos_app.cmake) | The app's bundle identifier before `.black2` or `.white2`; a build that isn't Frigate's gives its own |
+| `PORT_MACOS_BUNDLE_ID_PREFIX` | `io.github.callancampos.frigate` | [../app/macos/bundle_id.cmake](../app/macos/bundle_id.cmake) | The app's bundle identifier before `.black2` or `.white2`; a build that isn't Frigate's gives its own. A build directory's old placeholder, `com.example.pokebw2-native`, is moved to the default |
 | `PORT_BUILD_ORACLE` | `OFF` | [oracle.cmake](oracle.cmake) | Fetches melonDS and builds the test oracle, `pbw-oracle` |
 | `PORT_ORACLE_SANITIZE` | `OFF` | [oracle.cmake](oracle.cmake) | Builds the oracle's own sources with AddressSanitizer and UndefinedBehaviorSanitizer |
 | `PORT_OVSEC_LAYOUT` | `split` | [overlay_sections.cmake](overlay_sections.cmake) | `split` (data and bss sections apart) or `combined` (one section per overlay) |

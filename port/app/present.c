@@ -24,7 +24,7 @@
 // waits for a free place): the first that presses something drives the game until it lets go of everything, and then
 // the next to press something takes over. Each pad says when it connects which of its buttons, by the labels SDL
 // reports, are the DS's A, B, X and Y. The gamepad's controls are one table, port_gamepad_default_map
-// (port/app/gamepad.c), which a settings file can replace.
+// (port/app/gamepad.c), which a settings file will be able to replace through port_gamepads_set_map (none is read yet).
 #include "app/present.h"
 #include "app/gamepad.h"
 #include "app/window_icon.h"

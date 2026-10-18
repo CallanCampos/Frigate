@@ -50,7 +50,53 @@ the same. So Frigate runs C that no hash has proven: where it behaves differentl
   such as `func_0204f980`, marks a function nobody has named yet.
 - **Run the game to the point you care about** and look: `--screenshot PATH` writes both screens when the run ends,
   `--run-dir DIR --run-dump LABEL=SYMBOL:SIZE@FRAMES` writes a global's memory at chosen frames, and a run that reaches
-  code with no C stops with that function's name, address and caller.
+  code with no C stops with that function's name, address and caller ([below](#when-the-game-stops)).
+
+**A worked example, the bag.** The field's bag is a process, `BAG_PROC_FUNCTIONS` in `src/ov142/itemmenu.c` (its init,
+main and exit functions); what it draws, its backgrounds, windows, sprites and the item list, is in
+`src/ov142/itemmenu_disp.c`; and the Free Space pocket's list, with its sorting, is in `src/ov142/bag_item.c`. The bag
+in battle is another overlay's: `src/ov286/b_bag_main.c` and the other `b_bag_*.c` files there. To change what the bag
+shows, change those files' C: which items a pocket lists, in what order, which message each line uses. The words
+themselves are the ROM's message data, which a C change can pick between but not rewrite until the layered file system
+exists. And none of it can be seen yet: the bag opens from the field, which stops at overlay 36.
+
+## When the game stops
+
+A run ends with an exit status ([ARCHITECTURE.md](ARCHITECTURE.md#how-a-run-ends) has the table) and, unless it ended
+normally, a message on stderr (in `~/Library/Logs/Frigate/<program>.log` for an app opened from the Finder) that says
+which of these it was:
+
+- **Code or data with no C yet (status 70).** The game reached a function or data object that the decomp hasn't
+  written, a trap stub ([../hal/trap.h](../hal/trap.h)), and stopped:
+
+  ```
+  port: the game called NAME (MODULE, 0xADDRESS), which has no C yet
+    called from CALLER+0xOFFSET
+  port: the game accessed NAME+0xOFFSET (MODULE, 0xADDRESS, SIZE bytes), which has no C yet
+  ```
+
+  Each is followed by a backtrace. This is not a Frigate bug: it is the edge of the decomp. The message names the
+  symbol, its overlay as `ovNNN` (or `main`), and its address in the ROM's memory map, such as
+  `ActorMsgWin_CheckAndCreate (ov036, 0x02188798)`. To find where it belongs, look the name up in `config/<version>/arm9/**/symbols.txt`, and the address
+  in the overlay's `delinks.txt` (`config/<version>/arm9/overlays/ovNNN/delinks.txt`, or `config/<version>/arm9/` for
+  main), whose ranges say which source file holds it; no range holding it means nobody has written that part yet.
+  [docs/source-files.md](../../docs/source-files.md) gives each file's status, and the overlay's `[Decomp] Overlay NNN`
+  issue on upstream's tracker says who is working on it. Then wait for upstream and Frigate's hourly sync, or write the
+  C as decomp work, in a checkout of the decomp under its own rules. Never write a stand-in in `port/` to get past it
+  ([../CLAUDE.md](../CLAUDE.md#code-that-isnt-c-yet)).
+- **The game stopped itself (status 71, 74).** `OS_Terminate` (71) or a reset, `OS_ResetSystem` (74), which Frigate
+  can't do in place yet. Status 71 also comes from a DMA call that the host's card never makes
+  (`port: dma: MIi_CardDmaCopy32 was called`), a Frigate bug.
+- **A check of the platform layer failed (an abort, SIGABRT).** A message such as `port: os: ...`, `port: fiber: ...`
+  or `port: PXI: ...` before it: something the platform layer relies on didn't hold. That is a Frigate bug; report it
+  with the message and how to get there (an input file, `--input`, makes it repeatable).
+- **A crash (SIGSEGV, SIGBUS).** `port: crash: signal N at address ...` and a backtrace: a real crash, in the game's C
+  or Frigate's. Run it again in the sanitizer build, whose commands are at the top of
+  [../cmake/os.cmake](../cmake/os.cmake), to see where memory went wrong; a game bug that a 64-bit layout made worse is
+  fixed under `PLATFORM_PC` ([below](#changing-the-games-code-here)).
+- **Status 1, 65, 66, 67, 72, 73.** The program couldn't go on, and the message says why: the window didn't open, the
+  host ran out of memory, a save it can't use (65), no usable ROM (66), the PXI bus's arena check (67), every thread
+  waiting for good (72), or the watchdog (73).
 
 ## Changing the game's code here
 
@@ -63,7 +109,10 @@ kinds of change land:
 2. **Hook:** a hook macro that compiles to nothing, or to the bare expression, in the ROM build (`PORT_EVENT`,
    `PORT_SHOULD`). None exists yet; the first comes with the mod platform.
 3. **Platform:** an `#ifdef PLATFORM_PC` block, with a comment saying why. `PLATFORM_PC` is defined only by the host
-   build, so the ROM build never sees the block.
+   build, on the compiler's command line (`port_decomp_env` in [../CMakeLists.txt](../CMakeLists.txt)), so the ROM
+   build never sees the block. The rules name `include/platform.h` as the one header that decides between MWCC and a
+   host; it doesn't exist yet, and the headers that need the host's way branch on `PLATFORM_PC` themselves, each listed
+   in [game-changes.md](game-changes.md).
 
 Each needs proof that MWCC's output didn't change: `python3 configure.py && ninja` with both SHA1s for complete files,
 `port/tools/check_mwcc_neutral.py` for a change that only adds `#ifdef PLATFORM_PC` branches, and the decomp's
@@ -130,6 +179,16 @@ Three features will be built on the same platform:
 
 - **Widescreen** ([PLAN.md §5.2](PLAN.md#52-widescreen)): the 3D scenes widened through the projection and the field's
   camera, with more of the map streamed in, 2D kept centred, field first, then battles. It needs the GPU renderers.
+  The files it touches:
+  - the game's: `GFL_G3DSysMtxSetProjection` in `src/gfl/g3d_system.c` and the screens that set their own projection
+    through it (`src/ov194/pokemontrade_3d.c` and others), the field's camera in `FieldG3D_Init` and its map streaming
+    in `MAP_CONFIGS`, both in `src/ov036/fieldmap.c`, and the battle camera in `src/ov168/btlv_camera.c`;
+  - Frigate's: the screens' width and buffers (`PORT_SCREEN_WIDTH` in [../gfx/screens.h](../gfx/screens.h)), the 3D
+    frame's (`PORT_DS3D_WIDTH` in [../gfx/ref/ds3d.h](../gfx/ref/ds3d.h)), the geometry engine's viewport and clip
+    matrix in [../gfx/ge/ge.c](../gfx/ge/ge.c), where PLAN's alternative scales the clip matrix's X instead of
+    editing the game, the 2D engines in [../gfx/ref/ds2d.c](../gfx/ref/ds2d.c), kept at 256 and centred, and the
+    window in [../app/present.c](../app/present.c): its logical size, the letterbox, and `BottomScreenPoint`, which
+    maps the mouse to the touch screen and must follow any change of layout.
 - **Randomizer** ([PLAN.md §5.3](PLAN.md#53-randomizer)): built in, configured by settings, writing to the registries
   and the file layers, with its seed in the save's sidecar.
 - **Multiplayer** ([PLAN.md §5.4](PLAN.md#54-multiplayer), phase 7): the game's own wireless protocol carried over the

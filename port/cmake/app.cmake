@@ -14,28 +14,30 @@ target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}
 target_link_libraries(${PORT_PROGRAM} PRIVATE ${CMAKE_DL_LIBS})
 
 # The window's icon on Linux and Windows (port/app/window_icon.c). port/tools/gen_window_icon.c, built for the machine
-# that builds, makes a 64 px bitmap of the version's app icon (PORT_APP_ICON, port/assets/branding) into a C file when
-# the master changes, and the program carries that bitmap instead of the master. On macOS the window sets none: the
+# that builds, makes two bitmaps into a C file when the artwork changes: the version's 32 px window icon, drawn pixel by
+# pixel (PORT_WINDOW_ICON, port/assets/branding), as it is, and its app icon's master (PORT_APP_ICON) scaled to 64 px
+# for a display at 200%; the program carries those bitmaps instead of the PNGs. On macOS the window sets none: the
 # app's icon is the Dock's (port/cmake/macos_app.cmake)
 set(port_window_icon_c "${PORT_GEN}/window_icon_pixels.c")
 add_executable(port_gen_window_icon "${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_window_icon.c")
 target_compile_options(port_gen_window_icon PRIVATE -std=c11 -Wall -Wextra -Werror)
 target_link_libraries(port_gen_window_icon PRIVATE SDL3::SDL3)
 add_custom_command(OUTPUT "${port_window_icon_c}"
-    COMMAND port_gen_window_icon "${PORT_APP_ICON}" "${port_window_icon_c}" 64
-    DEPENDS port_gen_window_icon "${PORT_APP_ICON}"
-    COMMENT "Making the window's icon from the app icon's master"
+    COMMAND port_gen_window_icon "${PORT_WINDOW_ICON}" "${PORT_APP_ICON}" "${port_window_icon_c}"
+    DEPENDS port_gen_window_icon "${PORT_WINDOW_ICON}" "${PORT_APP_ICON}"
+    COMMENT "Making the window's icon from the artwork"
     VERBATIM)
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/window_icon.c" "${port_window_icon_c}")
 
-# The window's icon, plain and under the sanitizers: the bitmap is the version's, with its plate filling the square, and
-# giving it to a window of SDL's dummy video driver goes through (port/tests/app/test_window_icon.c)
+# The window's icon, plain and under the sanitizers: the 32 px bitmap is the window icon drawn for it, pixel for pixel,
+# the 64 px one its alternate for 200%, both the version's with the plate filling the square, and giving the icon to a
+# window of SDL's dummy video driver goes through (port/tests/app/test_window_icon.c)
 foreach(variant IN ITEMS plain sanitized)
     set(target port_test_window_icon_${variant})
     add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_window_icon.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/app/window_icon.c" "${port_window_icon_c}")
     target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-    target_compile_definitions(${target} PRIVATE ${PORT_VERSION_DEFINE})
+    target_compile_definitions(${target} PRIVATE ${PORT_VERSION_DEFINE} "PORT_WINDOW_ICON_PNG=\"${PORT_WINDOW_ICON}\"")
     target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
     target_link_libraries(${target} PRIVATE SDL3::SDL3)
     if(variant STREQUAL "sanitized")
@@ -46,6 +48,15 @@ foreach(variant IN ITEMS plain sanitized)
     add_test(NAME app_window_icon_${variant} COMMAND ${target})
     set_tests_properties(app_window_icon_${variant} PROPERTIES TIMEOUT 60)
 endforeach()
+
+# --help's first lines against the product's names that the build read from port/hal/os/port_app.h, which the macOS
+# app's names and About window use too (port/tests/app/check_about.cmake)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/app_about_expected.txt"
+    "${PORT_PRODUCT_NAME} — ${PORT_GAME_NAME}\n${PORT_PRODUCT_DESCRIPTION}\n${PORT_PRODUCT_DISCLAIMER}\n\n")
+add_test(NAME app_about COMMAND "${CMAKE_COMMAND}" "-DPROGRAM=$<TARGET_FILE:${PORT_PROGRAM}>"
+    "-DEXPECTED=${CMAKE_CURRENT_BINARY_DIR}/app_about_expected.txt" "-DSAVE_DIR=${CMAKE_CURRENT_BINARY_DIR}/app_about_saves"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_about.cmake")
+set_tests_properties(app_about PROPERTIES TIMEOUT 60)
 
 # The symbol lookup, on the test program's own symbols
 add_executable(port_test_symbols "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_symbols.c"

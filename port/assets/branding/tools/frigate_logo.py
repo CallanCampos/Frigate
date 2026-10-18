@@ -7,11 +7,17 @@ icon) the strake's light runs between the gunports are cut, giving a frigate's b
 light hull (dark pages, Black 2's icon) the gunports themselves are cut. The wordmark FRIGATE is drawn as paths; the
 forward ends of its bars belly like the jib.
 
-It writes the six SVGs of port/assets/branding, whose README says what each is for: the mark (mark.svg, mark-dark.svg),
-the logo of the landing page and the READMEs (logo.svg, logo-dark.svg), and the app icons that the macOS app and the
-window on Linux and Windows show, through their PNG masters (icon-black2.svg, icon-white2.svg). The SVGs are committed
-as it writes them, and the test assets_branding (port/tests/assets/test_branding.py) checks that they still are;
-render.py runs it and renders the PNGs.
+At 16 and 32 pixels a scaled drawing loses its masts and its yards, so the icons' small images are drawn for their size,
+pixel by pixel (SHIP_16 and SHIP_32 below): the same ship with whole-pixel masts, yards and sails, a jib and gunports
+where the pixels allow, on the same plate, with a stronger edge on White 2's light plate.
+
+It writes the twelve SVGs of port/assets/branding, whose README says what each is for: the mark (mark.svg,
+mark-dark.svg), the logo of the landing page and the READMEs (logo.svg, logo-dark.svg), the app icons that the macOS app
+and the window on Linux and Windows show, through their PNG masters (icon-black2.svg, icon-white2.svg), the macOS
+icon's small images (icon-black2-16.svg, icon-black2-32.svg and White 2's), and the window's 32 px icon, whose plate
+fills its square (window-black2.svg, window-white2.svg). The SVGs are committed as it writes them, and the test
+assets_branding (port/tests/assets/test_branding.py) checks that they still are, and that the small PNGs hold the
+sprites' pixels; render.py runs it and renders the PNGs.
 
 usage: python3 port/assets/branding/tools/frigate_logo.py OUTDIR
 """
@@ -257,6 +263,114 @@ def write_icon(out, name, title, colours, stops, hairline):
     ], body))
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# The small images, drawn pixel by pixel. Each string is a row of pixels: r is the rig (the masts, the sails, whose
+# tiers the rows between them part as the yards do, the jib and the pennant), h the hull, and on the gunport strake u is
+# a light run and p a gunport, which the version's hull cuts as the mark's does (Black 2's hull cuts its ports, White
+# 2's its runs); a dot is the plate.
+# The mark's proportions on a whole-pixel grid: the main mast tallest with its pennant flying forward (right), the
+# mizzen aft and the fore with the jib before it, the courses' feet a row above the deck, the stern raked and the bow
+# rounded. The 16 px ship keeps two tiers of sail a mast and no jib or gunports, which 16 pixels can't hold apart.
+SHIP_16 = (
+    ".....rr....",
+    "....rrr..r.",
+    ".r..rrr.rrr",
+    ".r...r...r.",
+    "rrr.rrr.rrr",
+    "rrr.rrr.rrr",
+    "rrr.rrr.rrr",
+    ".r...r...r.",
+    "hhhhhhhhhhh",
+    ".hhhhhhhh..",
+)
+SHIP_32 = (
+    ".........rrrr.........",
+    ".........rr...........",
+    "........rrr....r......",
+    "...r....rrr...rrr.....",
+    "..rrr....r....rrr..r..",
+    "..rrr..rrrrr...r...r..",
+    "...r...rrrrr.rrrrr.rr.",
+    "..rrr..rrrrr.rrrrr.rr.",
+    "..rrr....r...rrrrr.rr.",
+    "...r...rrrrr...r...rrr",
+    ".rrrrr.rrrrr.rrrrr.rrr",
+    ".rrrrr.rrrrr.rrrrr.rrr",
+    ".rrrrr.rrrrr.rrrrr.rrr",
+    "...r.....r.....r......",
+    "hhhhhhhhhhhhhhhhhhhh..",
+    "huupuupuupuupuupuuuh..",
+    ".hhhhhhhhhhhhhhhhhh...",
+    "..hhhhhhhhhhhhhhh.....",
+)
+SMALL_EDGE = 0.35  # the opacity of the one-pixel ink edge inside White 2's small plates
+
+
+def sprite_cells(colours):
+    """Which of a sprite's letters take the rig's colour and which the hull's: the strake's runs or its ports go with
+    the hull, and the others are cut, showing the plate."""
+    return "r", "hu" if colours["strake"] == "ports" else "hp"
+
+
+def sprite_rows(sprite, letters, ox, oy):
+    """A path of whole-pixel rectangles, one for each run of the letters along a row, offset by (ox, oy)."""
+    d = ""
+    for y, row in enumerate(sprite):
+        x = 0
+        while x < len(row):
+            if row[x] not in letters:
+                x += 1
+                continue
+            x0 = x
+            while x < len(row) and row[x] in letters:
+                x += 1
+            d += f"M{ox + x0} {oy + y}h{x - x0}v1h{x0 - x}Z"
+    return d
+
+
+def sprite_origin(sprite, size):
+    """Where a sprite sits on a size-pixel image: centred, on whole pixels."""
+    return (size - len(sprite[0])) // 2, (size - len(sprite)) // 2
+
+
+def plate_transform(x0, x1):
+    """The transform that puts the 1024 grid's plate (100 to 924) on [x0, x1] of the image, both ways."""
+    k = (x1 - x0) / 824
+    offset = f"{x0 - 100 * k:.4f}".rstrip("0").rstrip(".")
+    return f"translate({offset} {offset}) scale({k:.6f})", k
+
+
+def write_small_icon(out, name, title, colours, stops, edge, size, plate, sprite):
+    """A small image of an icon: the plate from plate[0] to plate[1] pixels, on Apple's grid for the macOS icon's or
+    filling the square for the window's, and the sprite on it, on whole pixels."""
+    ox, oy = sprite_origin(sprite, size)
+    rig, hull = sprite_cells(colours)
+    transform, _ = plate_transform(*plate)
+    body = [
+        "  <defs>",
+        '    <linearGradient id="plate" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">',
+        f'      <stop offset="0" stop-color="{stops[0]}"/>',
+        f'      <stop offset="1" stop-color="{stops[1]}"/>',
+        "    </linearGradient>",
+        "  </defs>",
+        "  <!-- plate -->",
+        f'  <path fill="url(#plate)" transform="{transform}" d="{PLATE}"/>',
+    ]
+    if edge:
+        # One pixel of ink just inside the plate, so that the light plate keeps its shape on white at this size
+        transform, k = plate_transform(plate[0] + 0.5, plate[1] - 0.5)
+        body.append("  <!-- the plate's edge -->")
+        body.append(f'  <path fill="none" stroke="{INK}" stroke-opacity="{n(edge)}" stroke-width="{1 / k:.4f}" '
+                    f'transform="{transform}" d="{PLATE}"/>')
+    body.append("  <!-- the ship, pixel by pixel: the rig, then the hull with its strake -->")
+    body.append(f'  <path fill="{colours["rig"]}" d="{sprite_rows(sprite, rig, ox, oy)}"/>')
+    body.append(f'  <path fill="{colours["hull"]}" d="{sprite_rows(sprite, hull, ox, oy)}"/>')
+    where = "on Apple's macOS grid" if plate[0] > 0 else "with the plate filling the square, for the window"
+    write(out, name, svg(f"0 0 {size} {size}", title, [
+        f"{title}: the icon's {size} px image, drawn pixel by pixel, {where}.",
+    ], body))
+
+
 def main():
     out = sys.argv[1]
     os.makedirs(out, exist_ok=True)
@@ -264,8 +378,15 @@ def main():
     write_mark(out, "mark-dark.svg", DARK, "dark")
     write_logo(out, "logo.svg", LIGHT, "light")
     write_logo(out, "logo-dark.svg", DARK, "dark")
-    write_icon(out, "icon-black2.svg", "Frigate Black 2", DARK, ("#1C2431", "#0D1117"), False)
-    write_icon(out, "icon-white2.svg", "Frigate White 2", LIGHT, ("#FFFFFF", "#E3E9F0"), True)
+    versions = (("black2", "Frigate Black 2", DARK, ("#1C2431", "#0D1117"), False),
+                ("white2", "Frigate White 2", LIGHT, ("#FFFFFF", "#E3E9F0"), True))
+    for version, title, colours, stops, light in versions:
+        write_icon(out, f"icon-{version}.svg", title, colours, stops, light)
+        edge = SMALL_EDGE if light else None
+        for size, sprite in ((16, SHIP_16), (32, SHIP_32)):
+            grid = (100 * size / 1024, 924 * size / 1024)
+            write_small_icon(out, f"icon-{version}-{size}.svg", title, colours, stops, edge, size, grid, sprite)
+        write_small_icon(out, f"window-{version}.svg", title, colours, stops, edge, 32, (0, 32), SHIP_32)
 
 
 main()

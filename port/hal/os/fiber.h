@@ -1,6 +1,7 @@
 // Fibers: a stack and a saved context each, all switched on the one host thread that runs the game. The model is
 // asymmetric: only the host's own stack (the dispatcher's, in core.c) resumes a fiber, and a fiber only yields back to
-// it. The OS layer turns that into the SDK's thread switches. From the reviewed spike, port/spikes/os-fibers.
+// it. The OS layer turns that into the SDK's thread switches. From the reviewed spike, port/spikes/os-fibers. Plain C
+// types only, so that the program can include it (port/app/message_log.c shows its alert only off the fibers).
 #ifndef PORT_HAL_OS_FIBER_H
 #define PORT_HAL_OS_FIBER_H
 

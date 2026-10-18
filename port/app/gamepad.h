@@ -1,9 +1,10 @@
 // Gamepads as the DS's buttons (port/app/gamepad.c), through SDL3's gamepad API: every connected pad is open, pads come
 // and go while the game runs, and one of them at a time drives the game. What each control does is one table, a
-// PortGamepadMap, which a settings file can replace (port_gamepads_set_map); port_gamepad_default_map is the DS's own
-// layout. The mapping, the left stick's dead zone and the choice of the pad that drives are plain functions of their
-// inputs, so the tests run them without a device (port/tests/app/test_gamepad.c). Everything runs on the program's one
-// thread, from the window's event loop (port/app/present.c).
+// PortGamepadMap, which a settings file will be able to replace through port_gamepads_set_map (none is read yet);
+// port_gamepad_default_map is the DS's own layout. The mapping, the left stick's dead zone and the choice of the pad
+// that drives are plain functions of their inputs, so the tests run them without a device
+// (port/tests/app/test_gamepad.c). Everything runs on the program's one thread, from the window's event loop
+// (port/app/present.c).
 #ifndef PORT_APP_GAMEPAD_H
 #define PORT_APP_GAMEPAD_H
 

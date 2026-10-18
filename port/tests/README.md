@@ -15,9 +15,9 @@ A skipped test says so in ctest's summary.
 
 | Directory | What it tests | Game functionality covered | Tests |
 | --- | --- | --- | --- |
-| [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon; the macOS app's scripts and log, with stand-in programs | The controls; the oracle's comparisons; the app | `app_*` |
+| [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read; the macOS app's scripts, bundle identifier and log, with stand-in programs and projects | The controls; the oracle's comparisons; the app | `app_*` |
 | [asm_oracle/](asm_oracle/README.md) | The C that replaces the SDK's assembly, against the ROM's own machine code run in Unicorn (a test tool only) on seeded random inputs | Copies, fills, decompression, matrices, sorting, SHA-1, RC4 | `asm_oracle` |
-| [assets/](assets) | Frigate's artwork as committed: each SVG is what its generator writes, and the PNG masters' sizes | None: the program's look | `assets_branding` |
+| [assets/](assets) | Frigate's artwork as committed: each SVG is what its generator writes, the PNG masters' sizes, and the small images' ships pixel for pixel | None: the program's look | `assets_branding` |
 | [fx/](fx) | The decomp's libfx C as the host compiles it | 3D maths | `fx_libfx` |
 | [g3d/](g3d) | The geometry engine and the CPU 3D renderer, against values worked out by hand from GBATEK; the program glue against fakes; timing | Every 3D scene | `g3d_*` |
 | [gfx/](gfx) | The CPU 2D renderer and display capture, against pixels worked out by hand; timing | Every 2D screen, capture | `gfx_*` |

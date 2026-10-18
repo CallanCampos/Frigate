@@ -10,10 +10,20 @@
 
 #include <stddef.h>
 
-// The product's name, as the player sees it: the window's title (port/app/present.c), --help (port/app/main.c), and
-// the folders of the saves (port/hal/card/backup.c) and of an app's log (port/app/message_log.c). The build's names,
-// the programs' and the macOS app's, are in port/CMakeLists.txt and port/cmake/macos_app.cmake
+// The product as the player sees it, set here and nowhere else: the build reads these three macros from this file
+// (port_product_string in port/CMakeLists.txt), so each stays a plain string literal or several, without escapes.
+// - PORT_PRODUCT_NAME: the window's title (port/app/present.c), --help's first line (port/app/main.c), the folders of
+//   the saves (port/hal/card/backup.c) and of an app's log (port/app/message_log.c), and in the build the macOS app's
+//   names, its file's and its disk image's (port/cmake/macos_app.cmake);
+// - PORT_PRODUCT_DESCRIPTION and PORT_PRODUCT_DISCLAIMER: what --help and the macOS app's About window
+//   (port/app/macos/Info.plist.in) say Frigate is, and that it is not affiliated with the game's owners.
+// The programs' names and the games' are at the top of port/CMakeLists.txt. The test app_about checks that --help says
+// what the build read
 #define PORT_PRODUCT_NAME "Frigate"
+#define PORT_PRODUCT_DESCRIPTION                                                                                       \
+    "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; you supply your "  \
+    "own ROM."
+#define PORT_PRODUCT_DISCLAIMER "Not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company."
 
 // Records the program's arguments and the names of its flags, the options that never take a value. Both arrays must
 // stay as they are while the program runs (main's argv, and a static table)

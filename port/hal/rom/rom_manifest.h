@@ -1,7 +1,8 @@
 // What the port knows of the ROM it was built for, written at configure time by port/cmake/rom.cmake into the build's
 // rom_manifest.c: the version's game code and name, the SHA-1 of the dump the decomp builds (from <version>.sha1), the
 // size and SHA-1 of its ARM9 overlay table (from rom.cmake), and the size and SHA-1 of every NitroFS file (from
-// port/tools/research/assets/nitrofs_manifest.json). Hashes only: nothing of the game itself.
+// port/tools/research/assets/nitrofs_manifest.json). Hashes only: nothing of the game itself. Plain C types only, so
+// that the program (port/app: the window's title, --help, the log) can include it.
 #ifndef PORT_HAL_ROM_ROM_MANIFEST_H
 #define PORT_HAL_ROM_ROM_MANIFEST_H
 

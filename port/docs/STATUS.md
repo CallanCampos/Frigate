@@ -26,10 +26,70 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Frigate's identity and guides, reviewed and fixed
+
+- **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `aad2ce8df`.
+- **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed, so no game-changes row.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, in the last entry's build directories, configured
+  again: no warning. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6: Black 2, all 239 `ctest` tests pass (`ctest -j4`, the oracle's included), none skipped; White 2,
+    all 237, none skipped. New: `app_about` (`--help` says the product's name, description and disclaimer
+    exactly as the build read them from `port_app.h`) and `app_bundle_id` (the bundle identifier's prefix, configured
+    alone: Frigate's by default, an old build directory's placeholder moved to it, a builder's own kept). Extended:
+    `app_make_app` (the About text with XML's and sed's special characters, a `com.example` identifier refused, the
+    `.icns`'s 16 and 32 px images the drawn ones), `app_window_icon_*` (the 32 px bitmap the drawn window icon pixel
+    for pixel, the 64 px one its alternate) and `assets_branding` (the twelve SVGs, and each small PNG's ship pixel for
+    pixel). `app_bundle_id` fails without the move (3 of its 12 checks), `app_about` on a wrong expectation, and
+    `assets_branding` on a 16 px image scaled from the master (2 checks).
+  - Every relative link of the Markdown files under `port/` and `.github/README.md` resolves (checked by script).
+    clang-format 23.1.3 is clean on every changed C file. Black 2's app, built again from this tree, reads back
+    `CFBundleName` Frigate, `CFBundleDisplayName` "Frigate Black 2", `io.github.callancampos.frigate.black2` and the
+    About text from `port_app.h`, passes `plutil -lint` and `codesign --verify --deep --strict`, and its `.icns` holds
+    the ten images.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs in each version, as in the last entry.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** two reviews of the rename, the artwork and the guides, and a fix for each finding they confirmed.
+  - **Names written once.** The product's name, description and disclaimer are `PORT_PRODUCT_NAME`,
+    `PORT_PRODUCT_DESCRIPTION` and `PORT_PRODUCT_DISCLAIMER` in `port/hal/os/port_app.h`, which `port/CMakeLists.txt`
+    now reads (`port_product_string`) for `project()`, the macOS app's names and its About window (Info.plist's
+    `@ABOUT@`, filled by `make_app.sh --about`, which now escapes its text fields for XML and sed). `--help` prints the
+    same macros. port/CLAUDE.md's rule says where each name is set.
+  - **Old build directories.** A build directory configured before the rename cached the placeholder bundle-identifier
+    prefix `com.example.pokebw2-native`, which the new default never replaced: configuring it again now moves it to
+    `io.github.callancampos.frigate` with a message (`port/app/macos/bundle_id.cmake`), and `make_app.sh` refuses any
+    `com.example` identifier. A prefix of one's own is kept.
+  - **Small icons.** The icons' 16 and 32 px images are drawn pixel by pixel in `frigate_logo.py` (`SHIP_16`,
+    `SHIP_32`): whole-pixel masts, yards and sails, the jib and gunports at 32 px, and a 35% ink edge on White 2's
+    plate. The `.icns` takes them for its 16 and 32 px images (`make_icns.sh MASTER SMALL16 SMALL32 OUT`); the window
+    on Linux and Windows gets the 32 px one drawn with its plate filling the square, and the master at 64 px as its
+    alternate for 200% (`gen_window_icon WINDOW MASTER OUT`, `SDL_AddSurfaceAlternateImage`). Twelve new files in
+    `port/assets/branding`: six SVGs and their PNGs.
+  - **The guides, corrected:** the frame's first step (the game puts its sound loader to sleep for the VBlank wait),
+    the boot's `port_hw_init`, SDL's audio thread, the exit statuses (1, signals, 71 from a DMA misuse), the boundary
+    rules (where `replaced.txt` lists what, what the asm oracle covers), the feature map (the touch tests, the font
+    path, the file chain, the window and its icon, and every module in a row: `hal/crypto`, `hal/ctrdg`, `hal/trap.c`,
+    `gen_stubs.py`, `gen_host_tree.py`), the hal guide's file counts, the "settings file" wording, the glossary's
+    "upstream", and the "Plain C types only" marker on the three headers `port/app` includes that lacked it.
+  - **The guides, extended:** MODDING.md gains "When the game stops" (each way a run ends, the trap messages, and what
+    to do about a trap), the bag as a worked example of finding code, the files a widescreen mod touches, and a note
+    that `include/platform.h` doesn't exist. port/hal/README.md lists every file of every module. The compile probe's
+    `overlay.h` shim has its header, and its README lists its files. README says the window can be resized.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
+  sound driver's and the launcher's modules get their rows in the guides and the feature map when they merge.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7. A decision for the user: port/CLAUDE.md, PLAN.md §4.8 and game-changes.md name
+  `include/platform.h` as the one header that decides between MWCC and a host, which doesn't exist (`PLATFORM_PC`
+  comes from the compiler's command line); rewording the rule or creating the header is the user's call, and
+  MODDING.md says so meanwhile.
+
 ## 2026-10-18: Frigate's code mapped for modders
 
 - **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
-- **Port:** `260640953` (the files' comments) and `PORT_SHA` (the guides, with this entry), on the branch
+- **Port:** `260640953` (the files' comments) and `aad2ce8df` (the guides, with this entry), on the branch
   `frigate-identity`, after `687134df4`.
 - **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed but the port's own
   `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.

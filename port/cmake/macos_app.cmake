@@ -12,13 +12,13 @@ if(NOT APPLE)
 endif()
 
 option(PORT_MACOS_APP "Build the macOS app with every build, not only as the target <program>_app" OFF)
-# The bundle identifier is this prefix and the version's own word, black2 or white2. A build of your own that isn't
-# Frigate's can take a reverse-DNS name of a domain of yours: macOS keeps an app's preferences and permissions under it
-set(PORT_MACOS_BUNDLE_ID_PREFIX "io.github.callancampos.frigate" CACHE STRING
-    "The macOS app's bundle identifier, before the version's black2 or white2")
+# The bundle identifier is PORT_MACOS_BUNDLE_ID_PREFIX and the version's own word, black2 or white2
+include("${CMAKE_CURRENT_SOURCE_DIR}/app/macos/bundle_id.cmake")
 
-# The app's names (Info.plist.in says where each shows): the product's (CFBundleName, PORT_PRODUCT_NAME), the app's
-# own, which is also its file's and its disk image's (CFBundleDisplayName), and the bundle identifier's last word
+# The app's names (Info.plist.in says where each shows): the product's (CFBundleName, PORT_PRODUCT_NAME, which
+# port/CMakeLists.txt reads from port/hal/os/port_app.h), the app's own, which is also its file's and its disk image's
+# (CFBundleDisplayName), and the bundle identifier's last word. The About window says what Frigate is and that it is not
+# affiliated with the game's owners, from the same header (PORT_PRODUCT_DESCRIPTION and PORT_PRODUCT_DISCLAIMER)
 if(PORT_VERSION STREQUAL "b2_us")
     set(port_app_name "${PORT_PRODUCT_NAME} Black 2")
     set(port_app_id_suffix black2)
@@ -36,12 +36,15 @@ else()
     set(port_app_all)
 endif()
 
-# The app's icon: the version's 1024 px master (PORT_APP_ICON, port/assets/branding) as an .icns, made by sips and
-# iconutil (port/app/macos/make_icns.sh) when the master changes, never committed
+# The app's icon: the version's 1024 px master (PORT_APP_ICON, port/assets/branding), scaled, and its 16 and 32 px images
+# drawn for their size (PORT_APP_ICON_16 and _32), as an .icns made by sips and iconutil (port/app/macos/make_icns.sh)
+# when the artwork changes, never committed
 set(port_app_icns "${CMAKE_CURRENT_BINARY_DIR}/${PORT_PROGRAM}.icns")
 add_custom_command(OUTPUT "${port_app_icns}"
-    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_icns.sh" "${PORT_APP_ICON}" "${port_app_icns}"
-    DEPENDS "${PORT_APP_ICON}" "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_icns.sh"
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_icns.sh" "${PORT_APP_ICON}" "${PORT_APP_ICON_16}"
+        "${PORT_APP_ICON_32}" "${port_app_icns}"
+    DEPENDS "${PORT_APP_ICON}" "${PORT_APP_ICON_16}" "${PORT_APP_ICON_32}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_icns.sh"
     COMMENT "Making ${PORT_PROGRAM}.icns, the app's icon"
     VERBATIM)
 
@@ -51,7 +54,8 @@ add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
         --program "$<TARGET_FILE:${PORT_PROGRAM}>" --app "${port_app_bundle}"
         --plist "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/Info.plist.in" --icon "${port_app_icns}"
         --bundle-id "${PORT_MACOS_BUNDLE_ID_PREFIX}.${port_app_id_suffix}" --name "${PORT_PRODUCT_NAME}"
-        --display-name "${port_app_name}" --repo "${REPO_ROOT}"
+        --display-name "${port_app_name}" --about "${PORT_PRODUCT_DESCRIPTION} ${PORT_PRODUCT_DISCLAIMER}"
+        --repo "${REPO_ROOT}"
     DEPENDS "${port_app_icns}"
     BYPRODUCTS "${port_app_bundle}/Contents/MacOS/${PORT_PROGRAM}" "${port_app_bundle}/Contents/Info.plist"
         "${port_app_bundle}/Contents/Resources/AppIcon.icns"
@@ -59,11 +63,21 @@ add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
     VERBATIM)
 add_dependencies(${PORT_PROGRAM}_app ${PORT_PROGRAM})
 
+# The bundle identifier's prefix (port/app/macos/bundle_id.cmake), configured alone: Frigate's by default, the
+# placeholder of a build directory from before the name moved to Frigate's, a builder's own kept
+# (port/tests/app/test_bundle_id.sh)
+add_test(NAME app_bundle_id
+    COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_bundle_id.sh" "${CMAKE_COMMAND}" "${CMAKE_GENERATOR}"
+        "${CMAKE_MAKE_PROGRAM}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/bundle_id"
+        "${CMAKE_CURRENT_BINARY_DIR}/test_bundle_id")
+set_tests_properties(app_bundle_id PROPERTIES TIMEOUT 120)
+
 # make_app.sh on small programs made at test time, whose libraries are named by every kind of install name dyld knows,
 # with the version's icon made by make_icns.sh, and both scripts' refusals (port/tests/app/test_make_app.sh)
 add_test(NAME app_make_app
     COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_make_app.sh" "${CMAKE_C_COMPILER}"
-        "${CMAKE_CURRENT_BINARY_DIR}/test_make_app" "${REPO_ROOT}" "${PORT_APP_ICON}")
+        "${CMAKE_CURRENT_BINARY_DIR}/test_make_app" "${REPO_ROOT}" "${PORT_APP_ICON}" "${PORT_APP_ICON_16}"
+        "${PORT_APP_ICON_32}")
 set_tests_properties(app_make_app PROPERTIES TIMEOUT 300)
 
 # The log of an app opened from the Finder (port/app/message_log.c): the program copied into a stand-in app and run with

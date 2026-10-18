@@ -17,15 +17,22 @@ The user named the port Frigate on 2026-10-18, in the line of community ports su
   `Frigate Black 2.app` and `Frigate White 2.app` (`CFBundleName` Frigate, bundle identifiers
   `io.github.callancampos.frigate.black2` and `.white2`) and their disk images; the window's title, "Frigate — Pokémon
   Black 2"; the folders of the saves and logs (`~/Library/Application Support/Frigate`, `~/Library/Logs/Frigate`, and
-  `Frigate` under the user's data folder on Linux and Windows); and the `FRIGATE_ROM` variable. Each name is set in one
-  place: `PORT_PRODUCT_NAME` in [hal/os/port_app.h](hal/os/port_app.h) for the C, and the top of
-  [CMakeLists.txt](CMakeLists.txt) and [cmake/macos_app.cmake](cmake/macos_app.cmake) for the build.
+  `Frigate` under the user's data folder on Linux and Windows); and the `FRIGATE_ROM` variable. Each is written once.
+  The product's name, its one-line description and the not-affiliated line are `PORT_PRODUCT_NAME`,
+  `PORT_PRODUCT_DESCRIPTION` and `PORT_PRODUCT_DISCLAIMER` in [hal/os/port_app.h](hal/os/port_app.h), which the build
+  reads from there for the macOS app's names and About window (the test `app_about` checks that `--help` says what the
+  build read). The programs' names, the games' and the icons are at the top of [CMakeLists.txt](CMakeLists.txt); the
+  macOS app's names, made from the product's, are in [cmake/macos_app.cmake](cmake/macos_app.cmake), and its bundle
+  identifier's prefix in [app/macos/bundle_id.cmake](app/macos/bundle_id.cmake); the ROM's variable is
+  `PORT_ROM_ENVIRONMENT_VARIABLE` in [hal/rom/port_rom.h](hal/rom/port_rom.h). Comments and documents name them too,
+  and change with them.
 - **Its artwork is in [assets/branding](assets/branding/README.md)**: the logo of the landing page and the READMEs,
   and the app icons that the macOS app and the window on Linux and Windows are built from. Every file there is drawn
   by the directory's `tools/frigate_logo.py`, so a change to the artwork is a change to that script, rendered again
   with `tools/render.py` on a Mac and committed with the SVGs and PNGs it writes (the test `assets_branding` checks
-  that the SVGs match the script). Nothing the build makes from the icons (the `.icns`, the window's bitmap) is
-  committed.
+  that the SVGs match the script, and that the small images' PNGs hold their pixels). The icons' 16 and 32 px images
+  are drawn pixel by pixel in that script, not scaled. Nothing the build makes from the icons (the `.icns`, the
+  window's bitmaps) is committed.
 - **The layer keeps its own names:** the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables and
   `port_*` targets, `pokebw2_game` (the decomp's code), `pbw-oracle` and the `pbwinput` format, the `port-*.yml`
   workflows and the "port:" prefix of the program's messages. The repository stays `CallanCampos/pokebw2-native`

@@ -134,13 +134,10 @@ static const PortHwG3Readbacks sG3Readbacks = {
 };
 
 // What --help says before the usage: the product, the game this program runs, and that it is a fan project
+// (port/hal/os/port_app.h)
 static void About(void) {
-    fprintf(stderr,
-            "%s — %s\n"
-            "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; "
-            "you supply your own ROM.\n"
-            "Not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.\n\n",
-            PORT_PRODUCT_NAME, port_rom_manifest_game);
+    fprintf(stderr, "%s — %s\n%s\n%s\n\n", PORT_PRODUCT_NAME, port_rom_manifest_game, PORT_PRODUCT_DESCRIPTION,
+            PORT_PRODUCT_DISCLAIMER);
 }
 
 static void Usage(void) {

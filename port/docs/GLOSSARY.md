@@ -9,7 +9,7 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | --- | --- |
 | **Frigate** | The native PC port of Pokémon Black 2 and White 2 built from the pokebw2 decompilation, in `port/` of this repository; its programs are `frigate-black2` and `frigate-white2` |
 | **The port, the layer** | Frigate's code, as opposed to the decomp's. Its internal names keep the word: the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables, the `port:` prefix of the program's messages |
-| **The decomp, upstream** | pokebw2 (`fuddlesworth/pokebw2`), the decompilation this repository follows: everything outside `port/` is its, merged every hour ([SYNC.md](SYNC.md)) |
+| **The decomp, upstream** | pokebw2 (`fuddlesworth/pokebw2`), the decompilation this repository follows, merged every hour ([SYNC.md](SYNC.md)): everything outside `port/` is its, except Frigate's three files there, `.github/README.md` and the two `.github/workflows/port-*.yml` |
 | **ROM build, host build** | The ROM build (`configure.py` and `ninja`, with MWCC) rebuilds both ROMs from the decomp and checks their SHA1s; the host build (CMake in `port/`, with clang) makes Frigate. Both build from the same tree |
 | **MWCC, matching** | Metrowerks CodeWarrior, the DS's C compiler. A matching function is C that MWCC compiles to the ROM's exact bytes; matching is upstream's work |
 | **Complete, incomplete file** | A decomp file whose every function matches is marked complete in its `delinks.txt` and links into the ROM; an incomplete one still links the original code, so the ROM build proves nothing about its C. Frigate compiles both |
@@ -72,7 +72,7 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | **Trap stub, data placeholder** | A generated stand-in for a DS function or data object that has no C yet: reaching it stops the program with its name and status 70 ([../hal/trap.c](../hal/trap.c), [../tools/gen_stubs.py](../tools/gen_stubs.py)) |
 | **`replaced.txt`, `*_host.c`, `port_sdk_*`** | The three ways the platform layer takes over a decomp file: leaving it out, compiling it through a host file, or renaming its functions ([../hal/README.md](../hal/README.md#how-a-decomp-file-is-adapted)) |
 | **`PORT_HW_ADDR`, hwinclude** | The build's translation of the SDK headers' DS addresses into host memory windows ([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)) |
-| **Plain C types only** | A header that `port/app` and `port/gfx`, which never include the decomp's headers, can include |
+| **Plain C types only** | What a header of the platform layer says when it includes none of the decomp's headers, so that `port/app`, `port/gfx` and `port/audio`, which never include them, can include it |
 | **Oracle** | melonDS running the player's ROM headless (`pbw-oracle`, [../tools/oracle](../tools/oracle/README.md)): the reference Frigate is compared with, a test tool only. The asm oracle ([../tests/asm_oracle](../tests/asm_oracle/README.md)) is the same idea for single functions, with Unicorn |
 | **pbwinput, run directory** | The input file format that the oracle and Frigate's replays share, and the directory a run writes for comparison (`frames.tsv`, screens, memory dumps) |
 | **Game frame, video frame** | A pass of the game's main loop (GFL's frame count) and a VBlank. The field runs at 30 passes a second, so the two differ |

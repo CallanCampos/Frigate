@@ -1,11 +1,20 @@
+// The compile probe's stand-in for the decomp's include/gfl/overlay.h, for the "arm64 + shim" pass of run_all.sh
+// (probe.py with -I shim/include), which compiles every game file as a 64-bit host would with the shim's fixes: overlay
+// loading (GFL_OvlLoad, GFL_OvlManagerInit), where OVERLAY_ID(n) is the overlay's number itself, as in the host build
+// (include/gfl/overlay.h under PLATFORM_PC), so that an overlay ID is a constant and not the address of a linker
+// symbol, which a 64-bit pointer can't carry in a u32. It is a copy of the header from before the host build gave it
+// that PLATFORM_PC branch (port/docs/game-changes.md), kept as the probe's metrics were measured with it
+// (port/docs/research/compile-probe.md).
 #ifndef POKEBW2_GFL_OVERLAY_H
 #define POKEBW2_GFL_OVERLAY_H
 
 #include "types.h"
 #include "gfl/heap.h"
 
-// The linker script defines OVERLAY_<n>_ID for every overlay, so that overlay IDs in the code are relocations
-#define OVERLAY_ID(n) ((u32)(n)) /* host shim: overlay IDs are plain numbers */
+// In the ROM build the linker script defines OVERLAY_<n>_ID for every overlay and OVERLAY_ID(n) names it, so that
+// overlay IDs in the code are relocations. Here OVERLAY_ID(n) is the number; the declarations below stay for code that
+// names an OVERLAY_<n>_ID itself
+#define OVERLAY_ID(n) ((u32)(n))
 // For procs in the main program, which need no overlay
 #define OVERLAY_NONE (-1)
 

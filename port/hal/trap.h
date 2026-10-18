@@ -3,6 +3,7 @@
 // build's gen/stubs.c): a function stub calls port_trap_function, which names the function, its address and its caller
 // and stops the program with status 70; a data placeholder sits on a page with no access, so the first read or write
 // is named the same way. The first trap a run reaches is the next piece of C the game needs (port/docs/STATUS.md).
+// Plain C types only, so that the program (port/app/main.c) and the generated stubs can include it.
 #ifndef PORT_HAL_TRAP_H
 #define PORT_HAL_TRAP_H
 

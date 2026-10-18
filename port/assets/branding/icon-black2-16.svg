@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" role="img">
+  <title>Frigate Black 2</title>
+  <!-- Frigate Black 2: the icon's 16 px image, drawn pixel by pixel, on Apple's macOS grid. -->
+  <defs>
+    <linearGradient id="plate" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1C2431"/>
+      <stop offset="1" stop-color="#0D1117"/>
+    </linearGradient>
+  </defs>
+  <!-- plate -->
+  <path fill="url(#plate)" transform="translate(0 0) scale(0.015625)" d="M383.41 100H640.59C722.19 100 763 100 799.79 112.14L806.92 113.89C854.88 131.34 892.66 169.12 910.11 217.08L911.86 224.21C924 261 924 301.81 924 383.41V640.59C924 722.19 924 763 911.86 799.79L910.11 806.92C892.66 854.88 854.88 892.66 806.92 910.11L799.79 911.86C763 924 722.19 924 640.59 924H383.41C301.81 924 261 924 224.21 911.86L217.08 910.11C169.12 892.66 131.34 854.88 113.89 806.92L112.14 799.79C100 763 100 722.19 100 640.59V383.41C100 301.81 100 261 112.14 224.21L113.89 217.08C131.34 169.12 169.12 131.34 217.08 113.89L224.21 112.14C261 100 301.81 100 383.41 100Z"/>
+  <!-- the ship, pixel by pixel: the rig, then the hull with its strake -->
+  <path fill="#9DC0E0" d="M7 3h2v1h-2ZM6 4h3v1h-3ZM11 4h1v1h-1ZM3 5h1v1h-1ZM6 5h3v1h-3ZM10 5h3v1h-3ZM3 6h1v1h-1ZM7 6h1v1h-1ZM11 6h1v1h-1ZM2 7h3v1h-3ZM6 7h3v1h-3ZM10 7h3v1h-3ZM2 8h3v1h-3ZM6 8h3v1h-3ZM10 8h3v1h-3ZM2 9h3v1h-3ZM6 9h3v1h-3ZM10 9h3v1h-3ZM3 10h1v1h-1ZM7 10h1v1h-1ZM11 10h1v1h-1Z"/>
+  <path fill="#F1F5F9" d="M2 11h11v1h-11ZM3 12h8v1h-8Z"/>
+</svg>

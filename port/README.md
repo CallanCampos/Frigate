@@ -52,7 +52,9 @@ stops with the name of the first one it reaches.
 
 ## Directory map
 
-Each directory has a guide that lists its files: what each does, the part of the game it touches and its tests.
+Each directory has a guide: what each of its files does (for `tests/`, each test directory), the part of the game it
+touches and its tests. A subdirectory with a guide of its own (the oracle, the compile probe, the asm oracle, each
+spike, the artwork) lists its files there.
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) shows how they fit together.
 
 | Directory | What it is | Guide |
@@ -113,6 +115,9 @@ something takes over. Eight are open at once; a ninth waits until one of them is
 [app/present.c](app/present.c)'s header has the same table, and the gamepad's controls are one table in
 [app/gamepad.c](app/gamepad.c) that a settings file will be able to replace.
 
+The window opens at twice the DS's size, the top screen above the bottom one, and can be resized to any size: the
+screens keep their shape, letterboxed, and are scaled by nearest neighbour, without smoothing.
+
 ### Saves
 
 The game's save is the cartridge's 4 Mbit flash chip, kept as a file of its 524,288 bytes in the save directory
@@ -162,12 +167,16 @@ port/tools/package_macos.sh                             # build/port/Frigate Bla
   `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and starts the program from
   the app once (`--help`) to see that it loads.
 - **The icon** is Frigate's ship on Black 2's dark plate or White 2's light one. The build makes the `.icns` from the
-  version's 1024 px master in [assets/branding](assets/branding/README.md) with `sips` and `iconutil`
+  version's 1024 px master and its 16 and 32 px images, drawn pixel by pixel for their size, in
+  [assets/branding](assets/branding/README.md), with `sips` and `iconutil`
   ([app/macos/make_icns.sh](app/macos/make_icns.sh)), never committed; on Linux and Windows the window shows the same
   icon ([app/window_icon.c](app/window_icon.c)).
 - **The bundle identifier** is `io.github.callancampos.frigate.black2` (`.white2` for White 2). macOS keeps an app's
   preferences and permissions under it. A build of your own that isn't Frigate's (a fork under another name) takes a
-  reverse-DNS name of a domain of yours with `-DPORT_MACOS_BUNDLE_ID_PREFIX=`.
+  reverse-DNS name of a domain of yours with `-DPORT_MACOS_BUNDLE_ID_PREFIX=`. A build directory configured before the
+  port was named Frigate held the placeholder `com.example.pokebw2-native`; configuring it again moves that to
+  Frigate's prefix ([app/macos/bundle_id.cmake](app/macos/bundle_id.cmake)), and `make_app.sh` refuses any
+  `com.example` identifier.
 - The version comes from git: `0.0.N`, N being the number of commits built, and the commit in `PortSourceRevision`.
   The minimum macOS is the one the program and the libraries in the app were built for; with Homebrew's SDL3 that is
   the macOS Homebrew built SDL3 for.

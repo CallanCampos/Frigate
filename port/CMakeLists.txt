@@ -10,18 +10,48 @@
 # Options: -DPORT_VERSION=b2_us|w2_us (default b2_us) and -DPORT_FETCH_SDL3 here; the others are in the fragments of
 # port/cmake/, included at the end, and port/cmake/README.md lists them all.
 cmake_minimum_required(VERSION 3.28)
+
+# The product's name, description and disclaimer, which port/hal/os/port_app.h sets for the C (port/CLAUDE.md, "The
+# port is Frigate"): the build reads them from there, so that each is written once. Sets the variable of the macro's
+# name to its string, the literals that follow `#define NAME` joined as C joins them
+function(port_product_string name)
+    set(header "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/port_app.h")
+    # A literal, and what may come between two: blanks, and a line's end after a backslash
+    set(literal "\"[^\"\n]*\"")
+    set(between "[ \t]*(\\\\\n[ \t]*)?")
+    file(READ "${header}" text ENCODING UTF-8)
+    string(REGEX MATCH "#define ${name}[ \t]+(\\\\\n[ \t]*)?${literal}(${between}${literal})*" value "${text}")
+    if(value STREQUAL "")
+        message(FATAL_ERROR "${header} doesn't define ${name} as a string")
+    endif()
+    # Without the #define and the outer quotes, and with the quotes and blanks between the literals taken out (no list
+    # operations, since the text may hold semicolons)
+    string(REGEX REPLACE "^#define ${name}[ \t]+(\\\\\n[ \t]*)?\"" "" value "${value}")
+    string(REGEX REPLACE "\"${between}\"" "" value "${value}")
+    string(REGEX REPLACE "\"$" "" value "${value}")
+    if(value MATCHES "\\\\")
+        message(FATAL_ERROR "${name} in ${header} has an escape, which the build doesn't read; write it plainly")
+    endif()
+    set(${name} "${value}" PARENT_SCOPE)
+endfunction()
+port_product_string(PORT_PRODUCT_NAME)
+port_product_string(PORT_PRODUCT_DESCRIPTION)
+port_product_string(PORT_PRODUCT_DISCLAIMER)
+
 project(frigate
-    DESCRIPTION "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation"
+    DESCRIPTION "${PORT_PRODUCT_DESCRIPTION}"
     HOMEPAGE_URL "https://github.com/CallanCampos/pokebw2-native"
     LANGUAGES C)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/port_app.h")
 
-# The names the player sees. The product is Frigate (port/CLAUDE.md); the C code has the same name as PORT_PRODUCT_NAME
-# in port/hal/os/port_app.h, and the macOS app's names are in port/cmake/macos_app.cmake. Each version is its own
-# program: frigate-black2 or frigate-white2, built from the same sources with the decomp's BLACK2 or WHITE2 defined,
-# and PORT_GAME_NAME is the game it runs, as the window's title and the ROM's messages name it. PORT_APP_ICON is the
-# version's icon, Frigate's ship on Black 2's dark plate or White 2's light one (port/assets/branding): the macOS app's
-# (port/cmake/macos_app.cmake) and the window's on Linux and Windows (port/cmake/app.cmake) are made from it
-set(PORT_PRODUCT_NAME "Frigate")
+# The names the player sees. The product is Frigate, PORT_PRODUCT_NAME above; the macOS app's names are made from it in
+# port/cmake/macos_app.cmake. Each version is its own program: frigate-black2 or frigate-white2, built from the same
+# sources with the decomp's BLACK2 or WHITE2 defined, and PORT_GAME_NAME is the game it runs, as the window's title and
+# the ROM's messages name it. PORT_APP_ICON is the version's icon, Frigate's ship on Black 2's dark plate or White 2's
+# light one (port/assets/branding), as its 1024 px master, and PORT_APP_ICON_16 and _32 its small images, drawn pixel by
+# pixel for their size: the macOS app's icon is made from the three (port/cmake/macos_app.cmake). PORT_WINDOW_ICON is
+# the window's 32 px icon on Linux and Windows, whose plate fills its square, made with the master at twice its size
+# (port/cmake/app.cmake)
 set(PORT_VERSION "b2_us" CACHE STRING "The game version to build: b2_us (Black 2) or w2_us (White 2)")
 set_property(CACHE PORT_VERSION PROPERTY STRINGS b2_us w2_us)
 if(PORT_VERSION STREQUAL "b2_us")
@@ -29,11 +59,17 @@ if(PORT_VERSION STREQUAL "b2_us")
     set(PORT_PROGRAM frigate-black2)
     set(PORT_GAME_NAME "Pokémon Black 2")
     set(PORT_APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-black2-1024.png")
+    set(PORT_APP_ICON_16 "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-black2-16.png")
+    set(PORT_APP_ICON_32 "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-black2-32.png")
+    set(PORT_WINDOW_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/window-black2-32.png")
 elseif(PORT_VERSION STREQUAL "w2_us")
     set(PORT_VERSION_DEFINE WHITE2)
     set(PORT_PROGRAM frigate-white2)
     set(PORT_GAME_NAME "Pokémon White 2")
     set(PORT_APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-white2-1024.png")
+    set(PORT_APP_ICON_16 "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-white2-16.png")
+    set(PORT_APP_ICON_32 "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-white2-32.png")
+    set(PORT_WINDOW_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/window-white2-32.png")
 else()
     message(FATAL_ERROR "PORT_VERSION must be b2_us or w2_us, not ${PORT_VERSION}")
 endif()
