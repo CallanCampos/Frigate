@@ -850,6 +850,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Small unreferenced objects at the start of a file's shared `.rodata` (ahead of its smallest referenced table) are
   function-local `static const`s, which are emitted even when their reads are folded or absent. (matching.md:
   "function-local `static const` is emitted")
+- An unread `{ 0, FX32_ONE, 0 }` or 16 zero bytes beside the camera vectors: the camera setup's up vector and
+  `GXRgb[8]` edge colors, function-local statics of the function that creates the camera. (matching.md: "camera
+  setup's up vector and edge colors")
 - An "unreferenced global" there whose values a function uses as immediates is several scalars of that function, one
   per value (`ctvt_game_cam.c`'s crop, four `u16`); their count orders equal-size initializers anywhere in the file.
   (matching.md: "The values a function already uses as immediates")
