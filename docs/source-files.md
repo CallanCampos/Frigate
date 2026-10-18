@@ -471,7 +471,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_map_chunk_rd.c` | `0x0218ab60`–`0x0218adac` | 2 | complete | descriptive |
 | `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | partial | string at `0x021d4bc0` |
 | `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | partial | string at `0x021d4bd0` |
-| `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | partial | descriptive |
+| `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
 | `ctalkmsgwin.c` | `0x0218b1f8`–`0x0218d0f4` | 56 | partial | string at `0x021d4c23` |
 | `ircbattlemenu.c` | `0x0218d0f4`–`0x0218ed18` | 63 | partial | string at `0x021d4d24` |
 | `fldmmdl_acmd.c` | `0x0218ed18`–`0x02193680` | 430 | partial | string at `0x021d4d40` |
@@ -522,7 +522,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | partial | descriptive |
 | `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
-| `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | partial | descriptive |
+| `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
 | `scrcmd_buildmodel.c` | `0x021ab73c`–`0x021abb48` | 18 | complete | descriptive |
 | `scrcmd_place_name.c` | `0x021abb48`–`0x021abb70` | 1 | complete | descriptive |
 | `scrcmd_shop.c` | `0x021abb70`–`0x021adc6c` | 53 | partial | string at `0x021d51cc` |

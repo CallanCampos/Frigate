@@ -96,6 +96,8 @@ struct FestMissionEntry {
 
 void *Field_GetFesGimmick(Field *field);
 BOOL FesGimmick_IsCurrent(void *gimmick, u32 type);
+// Whether the Hidden Grotto has a Funfest mission
+BOOL hollowFesMissions(void *gimmick, u32 id);
 // Whether the Funfest mission keeps phenomena off the tile
 BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height);
 // Changes the party of a Funfest mission's battle, when gimmick 5 is current

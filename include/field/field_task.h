@@ -16,7 +16,10 @@ typedef BOOL (*FieldTaskCallback)(void *data);
 // Allocates dataSize bytes of data for the task
 FieldTask *FieldTask_Create(HeapID heapId, u32 dataSize, FieldTaskCallback callback);
 void *FieldTask_GetData(FieldTask *task);
+FieldTaskCallback FieldTask_GetCallback(FieldTask *task);
 void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, u32 a2);
+// Whether a task with the callback is running
+BOOL FieldTaskManager_CheckCallbackRegistered(FieldTaskManager *mgr, FieldTaskCallback callback);
 FieldTask *FieldActorSpinTask_CreatePlayerAccel(Field *field, u32 duration, u32 direction);
 FieldTask *FieldActorSpinTask_CreatePlayer(Field *field, u32 duration, u32 direction);
 // Overlay 36's field_task_manager.c, not written yet: the player's spin slowing down to face dir, a wait of
