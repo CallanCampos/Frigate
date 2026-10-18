@@ -15,11 +15,13 @@ void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags) {
 
     dma = &MI_DMA_REGS[dmaNo];
     if (flags & MI_DMA_SET_FILL32) {
-        ((vu32 *)MI_DMA_FILL_DATA_ADDR)[dmaNo] = src;
-        src = MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32);
+        vu32 *fill = (vu32 *)(MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32));
+        *fill = src;
+        src = (u32)fill;
     } else if (flags & MI_DMA_SET_FILL16) {
-        ((vu16 *)MI_DMA_FILL_DATA_ADDR)[dmaNo * 2] = src;
-        src = MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32);
+        vu16 *fill = (vu16 *)(MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32));
+        *fill = (u16)src;
+        src = (u32)fill;
     }
 
     dma->src = src;

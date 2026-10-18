@@ -114,7 +114,11 @@ enum {
 };
 
 GFLBitmap *g_TextRendererTempBitmap;
-TextRenderer g_TextRenderer;
+// The explicit alignment is a guess, from the code of GFL_TextRendererDrawToBitmap and GFL_TextRendererDrawToBitmapEx,
+// which load the renderer's address from the pool again before each call: MWCC turns a pointer local set to a
+// global's address back into the address, shared in a saved register, unless the global has an explicit alignment
+// (docs/matching.md). An alignment of 1, 2 or 4 gives the same code and layout, and the address allows nothing above 4.
+TextRenderer g_TextRenderer ATTRIBUTE_ALIGN(4);
 
 static void func_02021cb0(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf);
 static void GFL_TextRndBind(TextRenderer *renderer, Font *font, GFLBitmap *bitmap, s16 x, s16 y);
@@ -340,16 +344,20 @@ static void func_02021cb0(PrintQueue *queue, TextRenderer *renderer, const StrBu
 }
 
 void GFL_TextRendererDrawToBitmap(GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font) {
+    TextRenderer *renderer = &g_TextRenderer;
+
     GFL_StrBufGetStringPtr(strbuf);
-    GFL_TextRndBind(&g_TextRenderer, font, bitmap, x, y);
-    GFL_TextRndDrawStrBuf(&g_TextRenderer, strbuf);
+    GFL_TextRndBind(renderer, font, bitmap, x, y);
+    GFL_TextRndDrawStrBuf(renderer, strbuf);
 }
 
 void GFL_TextRendererDrawToBitmapEx(GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font, u16 color) {
+    TextRenderer *renderer = &g_TextRenderer;
+
     GFL_StrBufGetStringPtr(strbuf);
-    GFL_TextRndBind(&g_TextRenderer, font, bitmap, x, y);
-    GFL_TextRndSetDefaultColor(&g_TextRenderer, color);
-    GFL_TextRndDrawStrBuf(&g_TextRenderer, strbuf);
+    GFL_TextRndBind(renderer, font, bitmap, x, y);
+    GFL_TextRndSetDefaultColor(renderer, color);
+    GFL_TextRndDrawStrBuf(renderer, strbuf);
 }
 
 static void GFL_TextRndBind(TextRenderer *renderer, Font *font, GFLBitmap *bitmap, s16 x, s16 y) {

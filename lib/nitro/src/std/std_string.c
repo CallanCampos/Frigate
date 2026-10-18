@@ -269,7 +269,7 @@ static void STDi_FillBitset(u32 *bitset, u32 from, u32 to) {
 // STD_TVSScanf: reads the text as the format says and returns how many values it stored, or -1 if the text ended before
 // the first conversion read anything. A conversion that fails ends the scan
 int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
-    // Declared in the order of the original's stack slots, the highest first, which ours differ from (see nonmatching)
+    // Declared in the order of the original's stack slots, the highest first
     const char *textStart = src;
     BOOL matched = FALSE;
     u64 value;
@@ -280,18 +280,18 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
     BOOL range;
     char *setDst;
     int radix;
-    int c;
     int count = 0;
     int width;
-    int fmtChar;
     char *dst;
     u8 prev;
     u32 set[8];
     char ch;
     char conv;
 
-    while ((fmtChar = *fmt) != '\0') {
-        if (STDi_IsSpace(fmtChar)) {
+    while (*fmt != '\0') {
+        int c = *fmt;
+
+        if (STDi_IsSpace(c)) {
             while (STDi_IsSpace(*fmt)) {
                 fmt++;
             }
@@ -300,11 +300,11 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             }
             continue;
         }
-        if (fmtChar != '%') {
-            if (fmtChar != *src) {
+        if (c != '%') {
+            if (c != *src) {
                 break;
             }
-            if (STD_IsSjisLeadByte(fmtChar)) {
+            if (STD_IsSjisLeadByte(c)) {
                 src++;
                 // BUG: compares the second byte of the text with the first byte of the format character, and moves
                 // on in the format by one byte only
@@ -314,7 +314,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
                     break;
                 }
 #else
-                if (fmtChar != *src) {
+                if (c != *src) {
                     break;
                 }
 #endif
@@ -324,7 +324,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             continue;
         }
         if (fmt[1] == '%') {
-            if (fmtChar != *src) {
+            if (c != *src) {
                 break;
             }
             fmt += 2;
@@ -404,6 +404,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         case '[':
             goto scanSet;
         default:
+            // style-ok: goto-return leaves the loop from inside the switch, for the one exit its breaks reach
             goto finish;
         }
 
@@ -498,22 +499,20 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             dstStart = dst;
         }
         if (conv == 's') {
-            int sc;
-
             if (width == 0) {
                 width = 0x7fffffff;
             }
-            sc = *src;
-            while (STDi_IsSpace(sc)) {
+            c = *src;
+            while (STDi_IsSpace(c)) {
                 src++;
-                sc = *src;
+                c = *src;
             }
-            while (sc != '\0' && !STDi_IsSpace(sc) && width > 0) {
+            while (c != '\0' && !STDi_IsSpace(c) && width > 0) {
                 if (dst != NULL) {
-                    *dst++ = sc;
+                    *dst++ = c;
                 }
                 src++;
-                sc = *src;
+                c = *src;
                 width--;
             }
             if (dst != dstStart) {
@@ -604,8 +603,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
                 break;
             }
             if (setDst != NULL) {
-                *setDst = ch;
-                setDst++;
+                *setDst++ = ch;
             }
             src++;
             ch = *src;
@@ -617,8 +615,5 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         continue;
     }
 finish:
-    if (*src == '\0' && !matched) {
-        count = -1;
-    }
-    return count;
+    return *src == '\0' && !matched ? -1 : count;
 }
