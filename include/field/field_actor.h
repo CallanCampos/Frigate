@@ -461,6 +461,8 @@ u32 CheckMMSysFlag(MMSys *system, u32 flag);
 // Resets a strength boulder's saved position in a zone
 void func_ov012_02168258(MMSys *system, u16 zoneId, u16 uid);
 void func_ov036_0218eff4(FieldActor *actor);
+// Overlay 36's fldmmdl_acmd.c, not written yet: moves the actor's billboard to the actor's position
+void func_ov036_0218ee08(FieldActor *actor);
 void func_ov036_021925a4(FieldActor *actor);
 BOOL func_ov036_021925ac(FieldActor *actor);
 void SetActorInitedPositionRail(FieldActor *actor, const RailPosition *position);
