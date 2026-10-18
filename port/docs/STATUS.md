@@ -26,10 +26,314 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the test launcher after review: an unfinished launch fails, the menu's kinds, the touch flag per app
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `b4c0fdc68`, on the branch `port-launch-adr0012`, after `265a6bbe9`; the launcher track (`port-launch`
+  and `port-launch-adr0012`) merged into `main` after Frigate's identity and the sound (`e7187b168`).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 252 `ctest` tests pass, the oracle's included (461 s), 4 new:
+  `integrate_launch_never_asked` (no save, so no CONTINUE: status 1, and the run says so), `launch_unfinished`
+  (`field_menus`' presses with `--frames 4400`, so the card never opens: status 1), `launch_not_offered` (the party
+  list from the first save, whose menu is type 3: status 2) and `launch_touch_then_party` (the card closed by a touch
+  on its return button, then the party list, which shows the `party_menus` route's oracle screen at count 4250);
+  `integrate_launch_bad_option` checks its status, 2, through `tests/app/check_exit.py`; `app_launcher_spec_*` check
+  the kinds of menu against `field_menu.c` read by hand; `integrate_launcher_off` checks that the launcher leaves the
+  status alone. Against the program before this commit, `launch_unfinished` fails (status 0, no line about the card)
+  and `launch_touch_then_party` fails (the party list's bottom screen `70ab6892` at count 4250, not the oracle's
+  `47ea70c7`). `oracle_launch_field_menus`, `oracle_launch_party_menus` and `launch_summary_standalone` pass as
+  before. White 2: all 248 pass but `oracle_continue_starter` and `oracle_launch_party_menus`, which skip (no starter
+  save); `oracle_launch_field_menus`, `launch_unfinished`, `launch_not_offered` and `integrate_launch_never_asked`
+  among the passes. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - **The exit status** (`port/app/launcher.h`'s `PORT_LAUNCH_STATUS_*`): a run that ended before the last app closed,
+    a game that never asked for the field and a launch cut short by an event type that needs the field all ended with
+    status 0. Now 0 means every app opened and closed (event type 0 or 1), 1 that the launch didn't finish, with a
+    line saying what never opened or never closed, and 2 that the save's menu doesn't offer an app.
+  - **The menu's kinds** (`launcher_spec.c`): the launcher asked event flags 0x961 and 0x962 only. It now gives the
+    kind of menu `FieldMenu_GetMenuType` gives, from the same zone functions (ARM9 main's), `GameData` and flags in the
+    same order, and the items its table gives each kind: the Black Tower's and White Treehollow's menu has no BAG.
+  - **The touch flag** is set FALSE before every app, as the menu's choice by a key does, not only before the first.
+  - **Documentation:** ADR 0012's decision names the three things the launcher stands in for, and says its last
+    subscreen is a constant the oracle shows; the README and `main.c` give the statuses and the Pokédex's trap, some
+    395 passes after it opens; the oracle README and the launch entry say that each launched app's first frame is
+    aligned by its `--launch` count, measured on the port, so its timing isn't a check.
+  - `oracle_compare`'s launch tests left the runs of each failed check they make on purpose in the system's temporary
+    directory, some 25 MB a run; they go in the test's own directory now.
+- **Next:** the user's decision on ADR 0012; White 2's starter route; the apps no route reaches yet.
+- **Blockers:** as in the last entry.
+
+## 2026-10-18: White 2's field menu route on the launcher; its starter save left for a route of its own
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `265a6bbe9`, on the branch `port-launch-adr0012`, after `b0fd1f745`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. White 2: `oracle_launch_field_menus` passes, 2 of 2 app screens and 621 of 621 counts of the
+  bag's and the card's spans the oracle's, with Black 2's counts and spans, measured again on White 2's oracle (the
+  rows at Black 2's counts show the same screens, White 2's menu and card in its own colours on the bottom screen);
+  `oracle_compare` (50) and `oracle_saves` pass; `oracle_launch_party_menus` skips (no starter save). Black 2: all 248
+  `ctest` tests pass, as in the last entry. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - White 2's `field_menus` route: Black 2's input file with `version w2_us`, its table of the oracle's hashes at the
+    same labelled counts (`port/tests/oracle/launch_field_menus_w2_us.*`), and the route's `--launch` and spans for
+    White 2 in `LAUNCHES`.
+  - White 2's starter save, from Black 2's starter route on White 2's first save, went astray: at frame 17,000 the
+    player stands in front of the Trainers' School with no Pokémon, the save holding 0x40a1 = 1 and neither flag
+    0x961 nor 0x962. White 2 stays out of `starter_save` and `party_menus` until it has a route of its own, and its
+    tests that need them skip with the reason.
+  - `decomp-findings.md`: `src/ov165/plist_sys.c` (incomplete, two nonmatching rows) runs on the port, equivalent as
+    observed on the paths the party route takes.
+- **Next:** the user's decision on ADR 0012; White 2's starter route; the apps no route reaches yet.
+- **Blockers:** as in the last entry.
+
+## 2026-10-18: the field menu's apps natively, through a test launcher, checked against melonDS pass by pass
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `b0fd1f745`, on the branch `port-launch-adr0012`, after `b8b52f420` (the launcher, ADR 0012, proposed).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `b8b52f420` adds a guard-only block to
+  `src/ov035/event_mapchange.c` (a Platform row): `check_mwcc_neutral.py` finds 3,142 of 3,146 file and version pairs
+  identical to `045e97b90`, this file among them, the other four being `vm.c`'s and `event_field_proclink.c`'s Neutral
+  rows. This commit changes no game file.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 248 `ctest` tests pass, the oracle's included, 3 new over the last entry:
+  `oracle_launch_field_menus`, `oracle_launch_party_menus` and `launch_summary_standalone`;
+  `oracle_compare` has 50 tests (7 new: the launch check with stand-ins for both programs, and the routes'
+  declarations). With the option off nothing changed: `oracle_continue` still stops on `FIELDMAP_PROC_FUNCS` after the
+  same frame with the same screens, and the replays pass. T4, the apps against melonDS 1.1 (`oracle.py launch`):
+  - `field_menus`, from the first save: the bag and the trainer card, 2 of 2 app screens at the oracle's counts, and
+    621 of 621 counts of their spans (the bag 4046-4323, the card 4588-4930) the oracle's pictures, pass by pass (the
+    count of each launched app's first frame is aligned by its `--launch` count, measured on the port: for 2 of the
+    621, and 3 of the 1,491 below, the picture is checked but not when it shows);
+  - `party_menus`, from the starter save: the party list, Tepig's menu, back from the summary, the trainer card with
+    its Pokédex line and the bag, 5 of 5 app screens, 1,491 of 1,491 counts; left out, the summary (its background,
+    scrolled by VBlanks, is about 9 pixels on, from the DS's long loading passes) and the Pokédex (a trap, below);
+  - the launcher reports event type 0 after every app, as the oracle's menu shows again, and the saves are unchanged.
+  `launch_summary_standalone`: the summary as the game opens it without the party list, closed with B, no trap.
+  White 2: all its tests pass or skip; the launch checks and `oracle_continue_starter` skip (no starter save and no
+  route measured for White 2). T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed beyond the seam's guard.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version. With `--launch`, the Pokédex
+  stops on `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, `0x020942b0`, with `NNSi_objSizeHTbl` at `0x02094298`: the
+  48 bytes of `.rodata` no delinks entry covers); without it, a continued game stops on `FIELDMAP_PROC_FUNCS` as before.
+- **64-bit warnings:** unchanged: the game change is a `PLATFORM_PC` branch.
+- **Work done:**
+  - **The launcher** (`b8b52f420`, the last entry; [ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md),
+    proposed: it waits on this branch for the user's decision). `--launch APP[@COUNT],...` opens the field menu's apps
+    where CONTINUE asks for the field, through overlay 12's app call as the game has it, and never touches overlay
+    36's code.
+  - **The launch checks** (`oracle.py launch`, the oracle README's "The launch checks"): the oracle walks the field
+    menu with an input file from a save; the port plays the same file with `--launch` at the counts the oracle opens
+    each app (its first frame on the oracle less the passes the port itself takes to it, so that frame's timing is
+    aligned by construction, not checked), and must show every app screen of the route's table at its count, and the
+    oracle's picture at every count of each app. Two routes for Black 2, their input files and tables (hashes only)
+    in `port/tests/oracle`.
+  - **What the field leaves**, measured on the oracle: the UI's touch flag 0 and the last subscreen 1 at an app's first
+    frame; the launcher sets both through the game's setters. Nothing else was needed for the apps' pictures.
+  - Found on the way: the H-blank interrupt's timing (`0eb7214e2`), which hid the card's opening wipe.
+  - White 2's starter save: the Black 2 route's input, run on White 2's first save, goes astray (the player ends in
+    front of the Trainers' School with no Pokémon; the save has 0x40a1 = 1), so White 2 is left out of the starter
+    save and the launch routes until it has a route of its own.
+- **Next:** the user's decision on ADR 0012; White 2's routes; the apps the routes don't reach yet (options, the town
+  map, the Xtransceiver, the medal box); battles, which wait on overlay 36 and `data_ov167_021d7490`.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim): the field, the field menu, SAVE and Retire
+  from it, and every battle event. `NNSi_objSizeWTbl` and `NNSi_objSizeHTbl` (ARM9 main, NitroSystem G2D, no overlay
+  issue and so no claim): the Pokédex, and any flipped or affine cell. `data_ov167_021d7490` (overlay 167, issue #120):
+  the first move of any battle. Overlay 12's script data, as before.
+## 2026-10-18: Frigate's test launcher for the field menu's apps (ADR 0012, proposed), on a branch of its own
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `b8b52f420`, on the branch `port-launch-adr0012`, after `cc281af40` (`port-launch`). The branch waits for
+  the user's decision on ADR 0012 and isn't pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `src/ov035/event_mapchange.c` gets a guard-only
+  block (a Platform row of `game-changes.md`): `check_mwcc_neutral.py` finds 3,142 of 3,146 file and version pairs
+  identical to `045e97b90`, this file among them, the other four being `src/system/vm.c`'s and
+  `src/ov012/event_field_proclink.c`'s Neutral rows.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** measured on this code as first committed (`9be56a819`, the same code with port/CLAUDE.md's and PLAN.md's
+  lines about the launcher): T0 as above. Black 2: all 245 `ctest` tests pass, the oracle's included, 4 new:
+  `app_launcher_spec_plain` and `_sanitized` (the option's parsing, and the gate on a made-up table of placeholders),
+  `integrate_launcher_off` (without `--launch` the seam returns 0 before touching its event) and
+  `integrate_launch_bad_option`; `app_run_dir` checks run.txt's launch line. White 2: all 243 pass but
+  `oracle_continue_starter`, which skips (no starter save for White 2). Without `--launch` nothing changes:
+  `oracle_continue` stops on `FIELDMAP_PROC_FUNCS` at the same frame with the same screens, and the replays pass. By
+  hand, `--launch bag` from the first save shows the oracle's empty bag. T3's long runs, T5's nightly runs and T7 not
+  yet.
+- **Tiers:** not measured: no decomp C changed but the guard-only block.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version. A continued game without
+  `--launch` still stops on `FIELDMAP_PROC_FUNCS` (overlay 36).
+- **64-bit warnings:** unchanged: the game change is a block MWCC never sees.
+- **Work done:** Frigate's test launcher ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md), proposed;
+  `port/app/launcher.c`, `launcher_spec.c`): `--launch APP[@COUNT],...` opens the field menu's apps (the party list,
+  the Pokédex, the bag, the trainer card, the summary) after CONTINUE, in place of the field, whose process table
+  (overlay 36) has no C and is under another contributor's claim. It runs the app call's field-free states through
+  the game's own table and functions, and reports each app's result; it steps aside once `FIELDMAP_PROC_FUNCS` has C.
+  The seam is a guard-only block in `EventFieldContinue_Callback`'s state 2. Neither port/CLAUDE.md nor PLAN.md names
+  the launcher until the user accepts the ADR (its "On acceptance").
+- **Next:** the apps against melonDS through the launcher (the next entry).
+- **Blockers:** the user's decision on ADR 0012; overlay 36 (issue #83, another contributor's active claim) and
+  overlay 12's script data, as in the last entry.
+
+## 2026-10-18: after review: the commits that stand alone, without the test launcher; the H-blank cycle's source
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `cc281af40`, on the branch `port-launch`, after `0eb7214e2`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 241 `ctest` tests pass, the oracle's included (`ctest -j4`, 977 s on a loaded
+  machine): `oracle_opening`, `oracle_title`, `oracle_continue`, `oracle_continue_starter` and `oracle_port_save` among
+  them, a continued game still stopping on `FIELDMAP_PROC_FUNCS`. White 2: rebuilt (`core.c`'s comment is shared code);
+  its 60 OS, card, infrared, layout and `replay_same_save` tests pass, `os_hblank_flag_in_handler` among them. T3's long
+  runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - **The test launcher waits for its ADR.** The design asked for the user's acceptance of ADR 0012, which reads
+    port/CLAUDE.md's exception for a deferred subsystem's documented stand-in, before the launcher landed; its three
+    commits had landed here anyway, with a port/CLAUDE.md sentence naming it as a documented stand-in. They now wait on
+    the branch `port-launch-adr0012`, which isn't pushed, and this branch ends with the commits that stand alone: the
+    infrared chip, the trainer card's param, the saves made from saves and the H-blank fix.
+  - The entries of those commits no longer lean on the launcher: the H-blank entry says the bug was found by comparing
+    every pass of the card's opening with the oracle's, and their "Next" lines name the apps, not the launcher.
+  - **The H-blank cycle's source** (`port/hal/os/core.c`, `lessons.md`): GBATEK's 1606 cycles into the line, for the
+    interrupt and the flag; melonDS 1.1 takes both at 1584 (`HBLANK_CYCLES`), 22 cycles earlier. What the game sees,
+    the two together, holds at either, so the port keeps GBATEK's.
+  - `oracle.py`'s docstring had two lines over 120 columns; `game-changes.md`'s trainer card row names its commit,
+    `014fe956c`.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed, by ADR 0012's launcher if the user accepts
+  it; White 2's starter route.
+- **Blockers:** the user's decision on ADR 0012 (a test launcher for the field menu's apps, on the branch
+  `port-launch-adr0012`); overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as
+  in the last entry.
+
+## 2026-10-18: the H-blank interrupt when DISPSTAT shows the H-blank: the screen wipes that cover lines one by one
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `0eb7214e2`, on the branch `port-launch`, after `f7aa43045`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 241 `ctest` tests pass, the oracle's included (424 s), 1 new:
+  `os_hblank_flag_in_handler` (an H-blank handler reads DISPSTAT's H-blank flag set: 192 of 192 lines; 0 of 192 with
+  the interrupt at its old cycle, 1536). White 2: all 239 pass, the oracle's included (382 s), but
+  `oracle_continue_starter`, which skips (no starter save for White 2 yet). T4 unchanged: `oracle_opening`,
+  `oracle_title`, `oracle_continue`, `oracle_continue_starter` and `oracle_port_save` pass in Black 2, and the first
+  four's White 2 counterparts; the replays pass. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:** the port's OS core took the H-blank interrupt 1536 cycles into a line and set DISPSTAT's H-blank flag
+  at 1606 (`port/hal/os/core.c`); its handlers take no time, so a handler read the flag clear. melonDS raises the
+  interrupt as it sets the flag (`GPU::StartHBlank`), and the screen wipes' H-blank function writes the window planes
+  only while `GX_IsHBlank()` (`src/system/wipe_sub.c`'s `WipeLineWnd_HBlank`), so the wipes that cover or uncover the
+  screens line by line were never drawn: the trainer card's opening went from black to the card at once, where the DS
+  reveals its top screen and then its bottom one 32 lines a pass. The interrupt is now taken at 1606, with the flag.
+  Found by comparing every pass of the trainer card's opening with the oracle's: with the change, the card's opening
+  on the port is the oracle's pass for pass (14 passes of the two wipes, by their hashes). The cycle is GBATEK's;
+  melonDS 1.1 takes both at 1584, and what the game sees, the two together, holds at either.
+- **Next:** as in the last entry.
+- **Blockers:** as in the last entry.
+
+## 2026-10-18: saves made from saves (the first Pokémon), and the start menu's Pokédex line against the oracle
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `f7aa43045`, on the branch `port-launch`, after `014fe956c` (the trainer card's param from its header).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), after each of the two commits. `014fe956c` changed
+  `src/ov012/event_field_proclink.c`, complete in both versions, so the ROM build is its proof (a Neutral row in
+  `game-changes.md`); this commit changes no game file.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 240 `ctest` tests pass, the oracle's included (`ctest -j4`, 465 s), 3 new:
+  `layout_trainer_card_param` (`014fe956c`: the trainer card's param has the same layout in the app call's object as
+  in the card's, by their debug information; it fails on the old objects, 0x14 and 0x18 against 0x20 and 0x24),
+  `oracle_saves` (makes `first_save` and `starter_save` into `<build>/oracle-saves`, or reuses them while their SHA-1s
+  are the ones kept: 0.5 s with both cached) and `oracle_continue_starter`; `oracle_compare` has 43 tests (2 new: saves
+  made from saves and the cache, with a stand-in oracle; a sequence whose save a version doesn't keep is skipped; the
+  declarations extended to chains). T4: `oracle_continue_starter` 3,415 of 3,415 compared frames match (1,310 exact,
+  2,105 with 3D within the tolerance), with continue's known differences: the start menu with the starter save's
+  saved game, its Pokédex line (Pokédex: 1, time 0:04) among it, exact at the DS's 6 bits; the port then stops on
+  `FIELDMAP_PROC_FUNCS` after frame 3,436, as from the first save. White 2: `oracle_compare`, `oracle_saves` (which
+  made White 2's `first_save` from a blank backup, 97 s, and left `starter_save` out: no SHA-1 for White 2 yet),
+  `oracle_continue` pass, `oracle_continue_starter` skips with that reason; `layout_trainer_card_param` and the card
+  and backup tests pass. The saves on the oracle: `first_save` `a7a58889e239`, `starter_save` `ce71fe0b8c1d` (three
+  runs, the research's two and this one; Tepig, level 5, 135 experience, by a decoder of Gen 5's encoding, its checksum
+  valid; event flags 0x961 and 0x962 set, variables 0x40a1 = 4 and 0x4030 = 1; 2,086 bytes from `first_save`) and
+  `route19_save` `826bc561a328` (two runs; Tepig, level 6, 229 experience). T3's long runs, T5's nightly runs and T7
+  not yet.
+- **Tiers:** not measured: no decomp C changed beyond one file's include.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: the game change removes a typedef and adds an include.
+- **Work done:**
+  - **The trainer card's param** (`014fe956c`, Neutral): `src/ov012/event_field_proclink.c` declared its own
+    `TrainerCardParam`, the same as the header's on the DS but not on a host, where the card's result was read from
+    `gameData`'s high half and `appParam` written over `canEdit`. It includes `include/field/trcard_sys.h` now.
+  - **Saves made from saves** (`oracle.py`): a save in `SAVES` names the save it starts from; each step of a chain is
+    made in order and held to its SHA-1. `--save-cache DIR` keeps the saves as `NAME_VERSION.sav` and reuses one only
+    while its SHA-1 is the one kept. Two new saves, Black 2: `starter_save` (from `first_save`, 17,000 frames: the
+    story to the Aspertia City lookout, Tepig and the Pokédex, then SAVE) and `route19_save` (from `starter_save`,
+    28,600 frames: Hugh's battle and the scenes to Route 19's grass, for the battles, run by no test). Their input
+    files are in `port/tests/oracle`; the saves are made at test time and never committed.
+  - **continue_starter**: continue's presses from the starter save (`Sequence.input` names the sequence whose input
+    file a sequence plays), a check of the start menu's Pokédex line, which the last entries named as next.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed, which needs a way to open them without the
+  field and the user's decision on it, and White 2's starter save.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as in the last
+  entry.
+
+## 2026-10-18: the card's infrared chip on the SPI registers: the genuine-card check passes as on melonDS
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `1ba3ab56f`, on the branch `port-launch` from `5ad9a1e1d`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed, so no
+  `check_mwcc_neutral.py` run and no row in `game-changes.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 237 `ctest` tests pass, the oracle's included (`ctest -j4`, 419 s), 3 of them
+  new: `hal_card_spi_plain` and `hal_card_spi_sanitized` (the model against melonDS 1.1's `NDSCartSlot` and
+  `CartRetailIR` functions and GBATEK: the genuine check's two exchanges, receive's length 0, send, an unknown command,
+  the slot or its SPI bus off, the deselect when bit 13 is cleared while held, the busy bit, a byte sent equal to the
+  last answer, the low byte), and `rom_game_ir_genuine_card` (the game's own `IrCheck_IsGenuineCard` on the whole
+  program's objects returns TRUE twice, as the check passes on melonDS). Mutation: without the two lines of
+  `HW_REGISTER_POLICY`, `rom_game_ir_genuine_card` fails. T4 unchanged: `oracle_continue`, `oracle_opening`,
+  `oracle_title` and `oracle_port_save` pass, as do `replay_new_game`, `replay_start_menu` and `replay_same_save`.
+  By hand, Black 2 under lldb from the oracle's first save through CONTINUE to the field's trap: `func_0202d6a8` and
+  `IrCheck_IsGenuineCard` run once, `GameBeaconSys_HideNewHBlank` never (it ran from the HBlank task list before), and
+  the save is unchanged. White 2: the 16 `card_backup` tests, `hal_card_spi_*`, `rom_game_ir_genuine_card`,
+  `smoke_reaches_game_main` and `replay_same_save` pass; `oracle.py sequence continue` 3,407 of 3,407 (1,312 exact,
+  2,095 with 3D within the tolerance), as in the last entry. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: this task changed no decomp C.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version, against the last entry's 574 and 63:
+  the change is upstream's, merged by `5ad9a1e1d`, which had no entry. A continued game still stops on
+  `FIELDMAP_PROC_FUNCS` (overlay 36).
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - **The card's infrared chip** ([ADR 0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md),
+    `port/hal/card/card_spi.c`). AUXSPICNT and AUXSPIDATA were plain memory, so AUXSPIDATA read back the last byte
+    written, 0, and the game's genuine-card check (`src/ov338/ir_check.c`) failed at every CONTINUE and NEW GAME:
+    the game then left `GameBeaconSys_HideNewHBlank` in the HBlank task list for good, and would skip the experience
+    of a faint in battle. The two registers are now accessors (`port_hw_auxspicnt`, `port_hw_auxspidata`) that model
+    the bus and the chip as melonDS 1.1 does, so the game's own C runs and passes, and the infrared library
+    (`lib/irc`, overlay 31) has a chip to talk to; PLAN.md §4.5's stub of the check is dropped. An accessor can't tell
+    a load from a store, so each call resolves the store made through the memory the previous call returned:
+    AUXSPIDATA's cell keeps a marker in its upper byte that a store clears, a documented deviation (a 16-bit read sees
+    it where the hardware gives 0; every reader keeps the low byte).
+  - `decomp-findings.md`: `ir_check.c` runs on the port, equivalent as observed; `buildSeed` hashes its digest buffer
+    before writing it (stack bytes on the DS, zero on a host), so the boot's and each battle's random numbers can't
+    match the oracle's.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed: the trainer card's param layout, saves with
+  a party made by the oracle, and a way to open the apps without the field, which needs the user's decision.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as in the last
+  entry.
+
 ## 2026-10-18: Frigate and the sound, merged and reviewed: the sound track under Frigate's names and guides
 
 - **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `65ea798fb`: `a389e6d9b` (the merge of
+- **Port:** `e7187b168`, on the branch `port-integrate` from `main` at `65ea798fb`: `a389e6d9b` (the merge of
   `frigate-identity` after the sound's branch, `a8beb72c5`, and the upstream sync `65ea798fb`), then `bd915af7b` (the
   sound track under Frigate's rules), then the fixes from the review of those two; not pushed yet.
 - **ROM:** both SHA1s match (`python3 configure.py && ninja`), at the merge, at `bd915af7b` and at this commit. Nothing

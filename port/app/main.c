@@ -8,7 +8,7 @@
 //   frigate-black2 [--help] [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE]
 //                  [--rom PATH] [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST]
 //                  [--run-dump SPEC]... [--sound-trace PATH] [--watchdog SECONDS] [--main-arena-size BYTES]
-//                  [--vram-backend NAME] [--heap-scale-root N] [--heap-scale-child N]
+//                  [--vram-backend NAME] [--heap-scale-root N] [--heap-scale-child N] [--launch APP[@COUNT],...]
 //
 //   --help              prints what Frigate is and this usage, then exits
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
@@ -39,20 +39,30 @@
 //   --heap-scale-root N, --heap-scale-child N
 //                       how many times their DS size the game's root heaps and child heaps get, 1 to 64 (4 and 2 by
 //                       default, port/hal/gfl/heap_policy.c)
+//   --launch APP[@COUNT],...
+//                       Frigate's test launcher (port/app/launcher.h, ADR 0012): after CONTINUE, opens the field menu's
+//                       apps (party, pokedex, bag, card, summary) in place of the field, whose code (overlay 36) has no
+//                       C yet, each when GFL's frame count reaches COUNT (at once without one), then stops: status 0
+//                       when each app opened and closed, 1 when the launch didn't finish (the run ended first, the game
+//                       never asked for the field, or an app wanted the field), 2 when the save's field menu doesn't
+//                       offer an app. The Pokédex stops on a trap some 395 passes after it opens (NitroSystem's
+//                       NNSi_objSizeWTbl has no C yet), so only a Pokédex closed before then runs through
 //
 // The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
 // program writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 //
 // Exit statuses: 0 when the run ends normally, 1 when it can't go on (the window didn't open, a write to the run
 // directory or the sound trace failed, or a module ran out of memory or found a build that can't work, each with a
-// "port:" line), 2 for bad options, 70 when the game reaches code or data with no C (port/hal/trap.c), 71 when it stops
-// itself (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog, 74 when the game resets the console
+// "port:" line) or when --launch's launch didn't finish, 2 for bad options (and for a --launch app the save's field
+// menu doesn't offer), 70 when the game reaches code or data with no C (port/hal/trap.c), 71 when it stops itself
+// (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog, 74 when the game resets the console
 // (OS_ResetSystem), which the port can't do in place yet; the modules' own: 65 (a save file the port can't use), 66 (no
 // usable ROM), 67 (the PXI bus's arena check). port/docs/ARCHITECTURE.md, "How a run ends", has the table.
 
 // POSIX's signals and alarm() for the watchdog, which glibc hides from strict C11 (the target's -std=c11)
 #define _DEFAULT_SOURCE
 
+#include "app/launcher.h"
 #include "app/message_log.h"
 #include "app/present.h"
 #include "app/replay.h"
@@ -100,9 +110,9 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless",    "help",     "frames",          "screenshot",   "audio-dump",      "input",
-    "rom",         "save-dir", "fixed-time",      "run-dir",      "run-screens",     "run-dump",
-    "sound-trace", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child",
+    "headless",        "help",         "frames",          "screenshot",       "audio-dump", "input",       "rom",
+    "save-dir",        "fixed-time",   "run-dir",         "run-screens",      "run-dump",   "sound-trace", "watchdog",
+    "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child", "launch",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -115,6 +125,8 @@ static unsigned long sFrames;
 static const char *sScreenshotPath;
 static int sScreenshotWritten;
 static int sRunDirFailed;
+// Frigate's test launcher: whether it asked the program to stop
+static int sLauncherDone;
 static int sWindowOpen;
 // Pacing: the host time of the first paced frame, and the frames since
 static Uint64 sPaceStartNs;
@@ -138,7 +150,8 @@ static void Usage(void) {
             "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
             "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--sound-trace PATH] [--watchdog SECONDS] "
             "[--main-arena-size BYTES] "
-            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
+            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N] "
+            "[--launch APP[@COUNT],...]\n",
             sArgc > 0 ? sArgv[0] : "frigate");
 }
 
@@ -300,6 +313,7 @@ static int OpenRunDir(const char *dir, const char *inputPath) {
     info.input = inputPath;
     info.inputFrames = port_replay_frames();
     info.frames = (uint32_t)sFrameLimit;
+    info.launch = port_app_option("launch");
     return port_run_dir_open(dir, port_app_option("run-screens"), port_present_screenshot, &info);
 }
 
@@ -350,6 +364,11 @@ static void AppFrame(void) {
         WriteScreenshot();
         port_os_stop();
     }
+    // Frigate's test launcher, once its last app closed
+    if (!sLauncherDone && port_launcher_finished()) {
+        sLauncherDone = 1;
+        port_os_stop();
+    }
     if (!sHeadless) {
         Pace();
     }
@@ -366,6 +385,7 @@ int main(int argc, char **argv) {
     const char *runDir;
     PortOsResult result;
     int status = 0;
+    int launchStatus;
     // Before anything is written: an app opened from the Finder writes its messages to a log (port/app/message_log.h)
     const char *logPath = port_message_log_open();
 
@@ -442,6 +462,12 @@ int main(int argc, char **argv) {
     if (arenaSize != 0) {
         port_os_set_main_arena_size((size_t)arenaSize);
     }
+    // A list the launcher can't open is a bad option, before the game starts
+    if (!port_launcher_configure(port_app_option("launch"))) {
+        port_run_dir_close(EXIT_BAD_OPTIONS);
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
 
     port_hw_init();
     port_trap_protect_data();
@@ -510,6 +536,11 @@ int main(int argc, char **argv) {
     port_audio_close();
     if (!port_sound_trace_close() || sRunDirFailed) {
         status = 1;
+    }
+    // Frigate's test launcher's status, when nothing else went wrong: whether the launch finished
+    launchStatus = port_launcher_end();
+    if (status == 0) {
+        status = launchStatus;
     }
     port_run_dir_close(status);
     port_replay_close();

@@ -1,0 +1,57 @@
+pbwinput 1
+# The field menu's apps from the starter save (oracle.py launch party_menus; README.md, "The launch checks"). Both
+# programs play this file from the same save (Tepig, level 5, in the party; the Pokedex): the continue sequence's
+# presses take CONTINUE into the field at the Aspertia City lookout on the oracle, where X opens the field menu with
+# every item: POKEMON, POKEDEX, BAG, the trainer card, SAVE and OPTIONS (FieldMenu_GetMenuType's type 0,
+# src/ov036/field_menu.c). Then the party, Tepig's menu and its summary, the Pokedex and Tepig's entry, the trainer card
+# and the bag, each closed with B. The port, whose field has no C yet, opens the party list, the card and the bag with
+# Frigate's test launcher (--launch party@4044,card@6974,bag@7673) at the counts they open on the oracle, so that the
+# presses inside each app reach both on the same pass; the Pokedex, which stops the port on a trap, isn't launched, and
+# the presses for the field, its menu and the Pokedex reach nothing on the port. On game frames. Black 2.
+version b2_us
+1100 START  # START in the opening skips it to the title (count 1115 on both)
+1101 -
+3000 START  # START brings back the layers the title hid at count 2877
+3001 -
+3100 START  # START leaves for the start menu, which shows from count 3249
+3101 -
+3400 A  # CONTINUE: the lookout, from count 3605
+3401 -
+3900 X  # X: the field menu slides in on the bottom screen
+3906 -
+3960 DOWN  # the first key shows the cursor, on POKEMON (slot 0)
+3966 -
+4000 A  # A: the party ("Choose a Pokemon.", Tepig 21/21)
+4006 -
+4300 A  # A: Tepig's menu (SUMMARY, SWITCH, ITEM, QUIT)
+4306 -
+4500 A  # A: Tepig's summary (from count 4533)
+4506 -
+4800 B  # B: back to the party
+4806 -
+5100 B  # B: back to the field menu, the cursor on POKEMON
+5106 -
+5400 RIGHT  # RIGHT: the cursor on POKEDEX
+5406 -
+5430 A  # A: the Pokedex (its opening until about count 5870), the Unova list, seen 1, obtained 1
+5436 -
+6000 A  # A: Tepig's entry (from count 6036)
+6006 -
+6300 B  # B: back to the list
+6306 -
+6600 B  # B: back to the field menu, the cursor on POKEDEX (count 6650)
+6606 -
+6900 DOWN  # DOWN: the cursor on the trainer card
+6906 -
+6930 A  # A: the trainer card, with its Pokedex line now
+6936 -
+7300 B  # B: back to the field menu (count 7357)
+7306 -
+7600 LEFT  # LEFT: the cursor on BAG
+7606 -
+7630 A  # A: the bag, its items pocket empty, from count 7680
+7636 -
+8000 B  # B: back to the field menu
+8006 -
+8300 B  # B: the menu closes
+8306 -

@@ -1,4 +1,5 @@
-# Tests of the platform layer's host versions of the SDK's asm functions (port/hal/mi, fx, math, crypto):
+# Tests of the platform layer's host versions of the SDK's asm functions (port/hal/mi, fx, math, crypto) and of the
+# card's SPI bus (port/hal/card/card_spi.c):
 # - C unit tests with known vectors, which need no ROM and run everywhere, CI included;
 # - the differential tests of port/tests/asm_oracle, which run the ROM's own machine code in a test-only CPU emulator
 #   and compare. They need the extracted ROM, build/port-venv and a build directory made with the Ninja generator,
@@ -16,6 +17,21 @@ add_executable(test_hal_fx tests/hal/test_fx.c ${hal_test_fx_sources} hal/hw/hw.
 target_link_libraries(test_hal_fx PRIVATE port_decomp_env)
 target_include_directories(test_hal_fx PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME hal_fx COMMAND test_hal_fx)
+
+# The card slot's SPI bus and its infrared chip (port/hal/card/card_spi.c) against melonDS's and GBATEK's behaviour,
+# plain and under the sanitizers: plain C, without the decomp's headers
+foreach(variant IN ITEMS plain sanitized)
+    set(target test_hal_card_spi_${variant})
+    add_executable(${target} tests/hal/test_card_spi.c hal/card/card_spi.c)
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME hal_card_spi_${variant} COMMAND ${target})
+endforeach()
 
 # run_all.py itself exits 77 when the venv is missing, so any Python 3 can start it
 set(asm_oracle_python "${REPO_ROOT}/build/port-venv/bin/python")

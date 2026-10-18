@@ -26,6 +26,10 @@ typedef struct PortTrapSymbol {
 // Called by a function stub: the game called a DS function that has no C yet. Reports it with the caller and stops
 _Noreturn void port_trap_function(const PortTrapSymbol *symbol, void *caller);
 
+// Whether an address lies in one of the data placeholders, DS data that has no C yet. Frigate's test launcher asks it
+// of overlay 36's FIELDMAP_PROC_FUNCS, and steps aside once that table has C (port/app/launcher.c, ADR 0012)
+int port_trap_is_placeholder(const void *address);
+
 // Makes the data placeholders inaccessible, so that the first access to DS data with no C yet is reported by name
 // instead of reading zeros. Called once at startup, before the game runs
 void port_trap_protect_data(void);

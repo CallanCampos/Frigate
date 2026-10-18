@@ -43,7 +43,8 @@ endif()
 enable_testing()
 add_executable(port_os_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/os/test_os.c"
-    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
+    $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher> ${port_gfx_objects}
+    "${PORT_GEN}/stubs.c")
 target_link_libraries(port_os_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_os_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_os_tests PRIVATE -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
@@ -54,10 +55,10 @@ endif()
 set(port_os_scenarios
     wakeup_preempts yield_order queue_wake_order join_destructor mutex message_queue vblank_and_alarms
     irq_wakeup_deferred irq_while_disabled busy_wait_preempted scheduler_lock destroy_and_recreate kill_thread
-    switch_callback hblank_lines hblank_main_loop dispstat_gates_blanks frame_hooks_on_host_stack timed_work
-    irq_on_switch_in
-    async_completion waits request_irq scanline_hook display_registers timers_and_tick stop_from_frame_hook arenas
-    locks console deadlock determinism boot_cpsr destroy_many wait_vcount0 valarm_each_run)
+    switch_callback hblank_lines hblank_main_loop hblank_flag_in_handler dispstat_gates_blanks
+    frame_hooks_on_host_stack timed_work irq_on_switch_in async_completion waits request_irq scanline_hook
+    display_registers timers_and_tick stop_from_frame_hook arenas locks console deadlock determinism boot_cpsr
+    destroy_many wait_vcount0 valarm_each_run)
 foreach(scenario IN LISTS port_os_scenarios)
     add_test(NAME os_${scenario} COMMAND port_os_tests ${scenario})
     set_tests_properties(os_${scenario} PROPERTIES TIMEOUT 60)

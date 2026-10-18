@@ -339,6 +339,13 @@ GameEventReturnCode EventFieldContinue_Callback(GameEvent *event, u32 *state, vo
         (*state)++;
         break;
     case 2:
+#ifdef PLATFORM_PC
+        // Frigate's test launcher (--launch, port/app/launcher.c, ADR 0012) can open the field menu's apps here in
+        // place of the field, whose process table (overlay 36) has no C yet. Without --launch it returns FALSE
+        if (port_launcher_take_field_open(event)) {
+            break;
+        }
+#endif
         GameEvent_ChainNext(event, EventFieldOpen_Create(gsys));
         (*state)++;
         break;

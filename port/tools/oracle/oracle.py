@@ -4,14 +4,15 @@
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]
     oracle.py port --binary BIN --out DIR --frames LIST [--input FILE] [--dump SPEC]... [--time TIME] [--version b2_us]
-                   [--rom PATH] [--save FILE] [--save-out FILE]
-    oracle.py save NAME --out FILE [--oracle BIN] [--version b2_us] [--work DIR]
+                   [--rom PATH] [--save FILE] [--save-out FILE] [--launch SPEC]
+    oracle.py save NAME... [--out FILE] [--save-cache DIR] [--oracle BIN] [--version b2_us] [--work DIR]
     oracle.py port-save --port BIN [--oracle BIN] [--version b2_us] [--work DIR]
     oracle.py boot --out DIR [--port BIN] [--frames LIST] [--version b2_us]
-    oracle.py sequence NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
+    oracle.py sequence NAME --port BIN [--out DIR] [--update] [--save-cache DIR] [--oracle BIN] [--version b2_us]
     oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
     oracle.py sound NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
     oracle.py sound-check NAME --port BIN [--work DIR] [--version b2_us]
+    oracle.py launch NAME --port BIN [--out DIR] [--save-cache DIR] [--oracle BIN] [--version b2_us]
     oracle.py check --oracle BIN [--version b2_us] [--work DIR] [--update]
 
 run calls pbw-oracle with the repository's defaults: the version's ROM in orig/, its symbols from config/, the
@@ -23,26 +24,36 @@ LIST, memory.txt with the --dump specs (the program's --run-dump: globals by nam
 Its clock is --time, else the input file's, else the default. Both take --save FILE, the save memory at power-on (the
 port's copy of it is the save directory's file, named after the ROM's game code, as the port names its saves), and
 --save-out FILE, the save memory when the run ends (the blank chip, 0xff, when the game never wrote one). save makes
-one of the saves the sequences start from on the oracle (SAVES: first_save, power-on through New Game into the field
-and the field menu's SAVE), writes it to FILE and checks it against the SHA-1 kept for it. port-save takes a save the
-other way: the port's New Game writes one, and the oracle boots it to the start menu frame for frame as it boots its own
-save of the same moment, without writing either, and the console's Wi-Fi ID that New Game copied into it is the
-oracle's. boot does both for the boot sequence and compares them on the game's
-count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
+saves the sequences start from on the oracle (SAVES: first_save, power-on through New Game into the field and the field
+menu's SAVE; starter_save, first_save's CONTINUE through the story to the first Pokémon and SAVE; route19_save, the
+starter save's CONTINUE through Hugh's battle to the grass of Route 19), each from the save it names as its start or a
+blank one, and checks each step against the SHA-1 kept for it; it writes one save to FILE, or with --save-cache every
+save into DIR as NAME_VERSION.sav, where a later run reuses a file only while its SHA-1 is still the one kept.
+port-save takes a save the other way: the port's New Game writes one, and the oracle boots it to the start menu frame
+for frame as it boots its own save of the same moment, without writing either, and the console's Wi-Fi ID that New
+Game copied into it is the oracle's. boot does both for the boot sequence and compares them on the game's count, the
+movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
-menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to), from the save the
-sequence names, made first on the oracle, and compares every frame the same way but the known differences, up to the
-frame where the port stops when the sequence allows it to stop on code with no C yet; with --update it writes
+menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
+continue's presses from starter_save's, whose start menu shows the Pokédex), from the save the sequence names, made
+first on the oracle (or taken from --save-cache), and compares every frame the same way but the known differences, up
+to the frame where the port stops when the sequence allows it to stop on code with no C yet; with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
 that input file and checks its counts and its screens without 3D against that reference. sound runs both programs
 on a sequence with their sound traces and WAV dumps (--sound-trace, --audio-dump) and compares the sound driver's state
 run by run, what the ARM9 sees of it frame by frame, and the sound by segment (sound.py, SOUND); with --update it
 writes port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics. sound-check runs the port
-alone and checks it against that reference. check is the oracle's ctest test: the oracle runs the boot sequence twice
-with the same results (its screens, sound trace and WAV dump), and its screens match the hashes in
-port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound and check exit 77 without the oracle or the ROM,
-sequence-check and sound-check without the ROM.
+alone and checks it against that reference. launch checks the field menu's apps on Frigate's test launcher (LAUNCHES,
+README.md's "The launch checks"): the oracle reaches each app through the field with an input file,
+port/tests/oracle/launch_<name>_<version>.pbwinput, from a save; the port plays the same file from the same save with
+--launch, which opens each app at the oracle's count in place of the field (ADR 0012); every app screen of
+port/tests/oracle/launch_<name>_<version>.screens.tsv, the oracle's hashes, must show on the port at the oracle's
+count, every pass of each app's span a picture the oracle shows at that count, the launcher's reports must give the
+event types declared, and the save must stay as it was. check is the oracle's ctest test: the oracle runs the boot
+sequence twice with the same results (its screens, sound trace and WAV dump), and its screens match the hashes in
+port/tests/oracle/boot_<version>.tsv. save, port-save, sequence, sound, launch and check exit 77 without the oracle or
+the ROM, sequence-check and sound-check without the ROM.
 
 Standard library only.
 """
@@ -109,6 +120,8 @@ class Sequence:
     known_state: dict[str, dict[str, str]] = field(default_factory=dict)
     # The save both programs start from, a SAVES name; none for a blank save
     save: str = ""
+    # The sequence whose input file it plays, when it isn't its own (port/tests/oracle/<input>_<version>.pbwinput)
+    input: str = ""
     # The port frame from which the port may stop on a trap stub (TRAP_STATUS), the trap it may stop on (a regular
     # expression its message must match: the function or data with no C yet), and why. The frames it ran are compared,
     # and the run passes if it got that far and stopped on that trap; another trap is a failure, so the sequence says
@@ -191,6 +204,26 @@ SEQUENCES = {
         stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
         stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
     ),
+    # continue's presses from starter_save's save: the start menu's saved game now has the Pokédex line (Pokédex: 1,
+    # time 0:04), and CONTINUE goes to the Aspertia City lookout, where the port stops on the same trap
+    "continue_starter": Sequence(
+        port_frames=3600,
+        oracle_frames=6000,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
+        save="starter_save",
+        input="continue",
+        stop_from=3425,
+        stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
+        stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
+    ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
 # The exit status of a port run that reached a function or data with no C yet (port/hal/trap.c)
@@ -201,12 +234,15 @@ BACKUP_SIZE = 0x80000
 
 @dataclass(frozen=True)
 class SaveMaker:
-    """A save made on the oracle, from power-on with a blank save, by the input file
-    port/tests/oracle/<name>_<version>.pbwinput (SEQUENCE_INPUT's place): frames, how many frames the oracle runs;
-    sha1, by version, the SHA-1 of the save memory it writes at the end, which is the same at every run (the oracle is
-    deterministic), so that what the sequences start from is the save that was examined (README.md, "Saves")"""
+    """A save made on the oracle, from power-on, by the input file port/tests/oracle/<name>_<version>.pbwinput
+    (SEQUENCE_INPUT's place): frames, how many frames the oracle runs; sha1, by version, the SHA-1 of the save memory
+    it writes at the end, which is the same at every run (the oracle is deterministic), so that what the sequences
+    start from is the save that was examined (README.md, "Saves"); start, the SAVES name of the save the oracle starts
+    from, made (or taken from the cache) and checked first, else a blank backup. A version without a SHA-1 has no such
+    save"""
     frames: int
     sha1: dict[str, str] = field(default_factory=dict)
+    start: str = ""
 
 
 SAVES = {
@@ -215,6 +251,13 @@ SAVES = {
     # first save
     "first_save": SaveMaker(18800, {"b2_us": "a7a58889e2399d1f6a0b4c0f5600748dd139449e",
                                     "w2_us": "479529f98b29cdd852502360aeb33531ca111d7f"}),
+    # first_save's CONTINUE, then the story from the player's room to the Aspertia City lookout: Mom's and Hugh's
+    # scenes, Bianca's two talks, the middle ball (Tepig, level 5), NO to the nickname, the Pokédex, and the field
+    # menu's SAVE. Event flags 0x961 (a Pokémon) and 0x962 (the Pokédex) are set, so the field menu has every item
+    "starter_save": SaveMaker(17000, {"b2_us": "ce71fe0b8c1d93436d62678400d1e0722632b67e"}, start="first_save"),
+    # starter_save's CONTINUE, Hugh's trainer battle (Tepig grows to level 6), the Pokémon Center's scene, Mom's, the
+    # gate's gift and Bianca's catching lesson, then SAVE beside Route 19's grass: for battles, which no test runs yet
+    "route19_save": SaveMaker(28600, {"b2_us": "826bc561a328d1943d6435b9bdae7f0abc6fd3e8"}, start="starter_save"),
 }
 
 # How each sequence's sound is compared (sound.py, README.md "Sound"): its segments of port frames, each with the range
@@ -340,14 +383,16 @@ def rom_game_code(path: str) -> str:
 def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: str | None,
              input_path: str | None = None, timeout: int = 1200, dumps: list[str] | None = None,
              save: str | None = None, save_out: str | None = None, audio: str | None = None,
-             trace: str | None = None) -> tuple[int | None, str]:
+             trace: str | None = None, launch: str | None = None,
+             log: list[str] | None = None) -> tuple[int | None, str]:
     """Runs the port's program once, from power-on with a blank save or with the save memory in the file save, for
     frames frames, writing its run directory in out (--run-dir): frames.tsv for every frame it ran, a PNG file for each
     frame of screens (a frame list, "none" or "all") and memory.txt with the dumps (--run-dump specs), and with audio
     and trace its WAV dump and sound trace (--audio-dump, --sound-trace). The save directory is a new one, given the
     save as the port names its saves (the game code and .sav); save_out gets the save memory the run left there, which
-    is the blank chip when the game neither had a save nor wrote one, never a file of an earlier run. Returns its exit
-    status (None when it timed out) and its last message about why it stopped"""
+    is the blank chip when the game neither had a save nor wrote one, never a file of an earlier run. launch is
+    Frigate's test launcher's --launch, if any. Returns its exit status (None when it timed out) and its last message
+    about why it stopped; log, if given, gets every line it wrote"""
     os.makedirs(out, exist_ok=True)
     if save_out and os.path.exists(save_out):
         os.remove(save_out)
@@ -371,13 +416,15 @@ def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: s
         command += ["--audio-dump", audio]
     if trace:
         command += ["--sound-trace", trace]
+    if launch:
+        command += ["--launch", launch]
     try:
         done = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
         status = done.returncode
-        log = done.stderr + done.stdout
+        output = done.stderr + done.stdout
     except subprocess.TimeoutExpired:
         status = None
-        log = "timed out"
+        output = "timed out"
     finally:
         if save_file and save_out:
             if os.path.exists(save_file):
@@ -389,8 +436,10 @@ def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: s
                 print(f"port: the run left no save file, so {save_out} is the blank chip ({BACKUP_SIZE} bytes of 0xff)")
         shutil.rmtree(saves, ignore_errors=True)
     # Its own lines start with "port: ", after the time and process that SDL_Log puts first on some hosts
-    reasons = [line[line.index("port: "):].strip() for line in log.splitlines()
+    reasons = [line[line.index("port: "):].strip() for line in output.splitlines()
                if "port: " in line and "entering" not in line and "port: rom:" not in line]
+    if log is not None:
+        log[:] = output.splitlines()
     return status, reasons[-1] if reasons else ""
 
 
@@ -408,7 +457,8 @@ def command_port(args) -> int:
         return 2
     last = max(frames)
     status, message = run_port(args.binary, args.out, last, args.frames, rom_path(args.version, args.rom),
-                               port_time(args), args.input, dumps=args.dump, save=args.save, save_out=args.save_out)
+                               port_time(args), args.input, dumps=args.dump, save=args.save, save_out=args.save_out,
+                               launch=args.launch)
     print(f"port: {describe_port_run(status, message, last, args.out)}")
     run = compare.load_run(args.out)
     missing = [frame for frame in frames if run.png(frame) is None]
@@ -424,17 +474,75 @@ def file_sha1(path: str) -> str:
     return digest.hexdigest()
 
 
-def make_save(args, name: str, out: str, work: str) -> str | None:
+def save_chain(name: str) -> list[str]:
+    """The saves a save is made from, the first made first, ending with it; a ValueError for a start SAVES doesn't
+    have or a chain that comes back on itself"""
+    chain = []
+    while name:
+        if name in chain:
+            raise ValueError(f"the saves {' -> '.join(reversed(chain + [name]))} start from each other")
+        if name not in SAVES:
+            raise ValueError(f"no save {name} in SAVES")
+        chain.append(name)
+        name = SAVES[name].start
+    return list(reversed(chain))
+
+
+def save_kept(name: str, version: str) -> str | None:
+    """None when every save of the chain has a SHA-1 for the version, else which hasn't"""
+    for link in save_chain(name):
+        if version not in SAVES[link].sha1:
+            return f"SAVES keeps no SHA-1 of {link} for {version}"
+    return None
+
+
+def cached_save(cache: str, name: str, version: str) -> str:
+    return os.path.join(cache, f"{name}_{version}.sav")
+
+
+def make_save(args, name: str, out: str, work: str, cache: str | None = None) -> str | None:
     """Makes the save SAVES[name] on the oracle (args.oracle, args.version, args.rom), writing the save memory to out,
-    with the oracle's run directory in work. Returns None, or why the save isn't the one kept: the oracle failed, or
-    its SHA-1 isn't the one SAVES has for the version (which it reports, for a version that has none yet)"""
+    with the oracle's runs in work. A save that starts from another is made from it, the start made first (or taken
+    from cache, a directory of NAME_VERSION.sav files, while its SHA-1 is the one kept), each step checked. Returns
+    None, or why the save isn't the one kept: the oracle failed, or a SHA-1 isn't the one SAVES has for the version
+    (which it reports, for a version that has none yet)"""
+    start = None
+    if SAVES[name].start:
+        start, reason = obtain_save(args, SAVES[name].start, work, cache)
+        if reason:
+            return f"{SAVES[name].start}, which {name} starts from: {reason}"
+    return run_save_maker(args, name, out, os.path.join(work, name), start)
+
+
+def obtain_save(args, name: str, work: str, cache: str | None) -> tuple[str | None, str | None]:
+    """A save SAVES has, as a file: cache's, if it holds it with the SHA-1 kept, else made (into cache, if given, else
+    into work). Returns its path, or None and why it couldn't be made"""
+    wanted = SAVES[name].sha1.get(args.version)
+    if cache:
+        path = cached_save(cache, name, args.version)
+        if wanted and os.path.exists(path) and file_sha1(path) == wanted:
+            print(f"{name}: reused {path}, SHA-1 {wanted}")
+            return path, None
+        os.makedirs(cache, exist_ok=True)
+    else:
+        path = os.path.join(work, f"{name}.sav")
+    reason = make_save(args, name, path, work, cache)
+    if reason:
+        if os.path.exists(path):
+            os.remove(path)
+        return None, reason
+    return path, None
+
+
+def run_save_maker(args, name: str, out: str, work: str, start: str | None) -> str | None:
+    """One step of a chain: the oracle plays the save's input file from the start save (a blank backup without one)"""
     maker = SAVES[name]
     input_path = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=name, version=args.version))
     if not os.path.exists(input_path):
         return f"no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}"
     made = argparse.Namespace(**vars(args))
     made.input = input_path
-    made.save = None
+    made.save = start
     made.save_out = out
     shutil.rmtree(work, ignore_errors=True)
     if os.path.exists(out):
@@ -462,16 +570,35 @@ def command_save(args) -> int:
     if reason:
         print(f"oracle.py save: skipped: {reason}")
         return SKIP
+    if not args.out and not args.save_cache:
+        print("oracle.py save: name where the save goes, --out FILE or --save-cache DIR")
+        return 2
+    if args.out and len(args.names) != 1:
+        print("oracle.py save: --out takes one save; --save-cache takes several")
+        return 2
     args.oracle = binary
-    work = args.work or tempfile.mkdtemp(prefix=f"oracle-save-{args.name}-")
-    reason = make_save(args, args.name, args.out, work)
-    if reason:
-        print(f"oracle.py save: {reason}")
-        return 1
+    work = args.work or tempfile.mkdtemp(prefix="oracle-save-")
+    status = 0
+    for name in args.names:
+        # Into the cache, a save this version doesn't keep is left out with why, so that one list of saves serves both
+        # versions; to --out it is made all the same, and its SHA-1 reported, for a version that has none yet
+        kept = save_kept(name, args.version)
+        if kept and not args.out:
+            print(f"oracle.py save: {name}: left out: {kept}")
+            continue
+        if args.out:
+            reason = make_save(args, name, args.out, work, args.save_cache)
+            where = args.out
+        else:
+            where, reason = obtain_save(args, name, work, args.save_cache)
+        if reason:
+            print(f"oracle.py save: {name}: {reason}")
+            status = 1
+            continue
+        print(f"{name}: {where}")
     if not args.work:
         shutil.rmtree(work, ignore_errors=True)
-    print(f"wrote {args.out}")
-    return 0
+    return status
 
 
 # The port's save on the oracle (README.md, "Saves"), the way from the port to melonDS. Both programs play first_save's
@@ -814,8 +941,10 @@ def write_reference(path: str, name: str, version: str, oracle_run: compare.Run,
 
 
 def sequence_paths(args) -> tuple[str, str, str]:
-    """The sequence's input file and reference for the version, and the ROM"""
-    return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=args.name, version=args.version)),
+    """The sequence's input file (its own, or the one of the sequence it names) and reference for the version, and the
+    ROM"""
+    played = SEQUENCES[args.name].input or args.name
+    return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=played, version=args.version)),
             os.path.join(REPO_ROOT, SEQUENCE_REFERENCE.format(name=args.name, version=args.version)),
             rom_path(args.version, args.rom))
 
@@ -838,6 +967,10 @@ def command_sequence(args) -> int:
     if reason:
         print(f"oracle.py sequence: skipped: {reason}")
         return SKIP
+    reason = save_kept(sequence.save, args.version) if sequence.save else None
+    if reason:
+        print(f"oracle.py sequence: skipped: {reason}, so the oracle can't make the save the sequence starts from")
+        return SKIP
     if not os.path.exists(input_path):
         print(f"oracle.py sequence: no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}")
         return 1
@@ -849,8 +982,7 @@ def command_sequence(args) -> int:
     # The save both start from, made on the oracle first
     args.save = None
     if sequence.save:
-        args.save = os.path.join(work, f"{sequence.save}.sav")
-        reason = make_save(args, sequence.save, args.save, os.path.join(work, sequence.save))
+        args.save, reason = obtain_save(args, sequence.save, work, args.save_cache)
         if reason:
             print(f"oracle.py sequence: {sequence.save}: {reason}")
             return 1
@@ -1074,6 +1206,314 @@ def command_sound_check(args) -> int:
     return 1 if failures else 0
 
 
+# Frigate's test launcher's checks (README.md, "The launch checks"; ADR 0012). The oracle opens the field menu's apps
+# from the field; the port, whose field (overlay 36) has no C, plays the same input file with --launch, which opens each
+# app at the count it opens on the oracle. A route's table keeps the oracle's hashes of its labelled screens; its app
+# rows are the ones the port must show
+LAUNCH_INPUT = os.path.join("port", "tests", "oracle", "launch_{name}_{version}.pbwinput")
+LAUNCH_SCREENS = os.path.join("port", "tests", "oracle", "launch_{name}_{version}.screens.tsv")
+LAUNCH_COLUMNS = ["label", "oracle_frame", "count", "game_frame", "top_3d", "bottom_3d", "top", "bottom", "where"]
+# A launcher's report: "port: --launch: bag: opened at count 4044, closed at count 4326: result 0, event type 0"
+LAUNCH_REPORT = re.compile(r"port: --launch: (\w+)(?:, then [\w ,]+)?: opened at count (\d+), closed at count (\d+): "
+                           r"result (\d+), event type (\d+)")
+LAUNCH_STEPS_ASIDE = "--launch steps aside"
+
+
+@dataclass(frozen=True)
+class Launch:
+    """How a launch route is run and checked. save: the SAVES name both programs start from. oracle_frames and
+    port_frames: how far each runs. spec: by version, the port's --launch, each app at the count where the oracle's
+    first frame of it shows less the passes the port takes from opening an app to its first frame (README.md says how
+    they were measured). events: the event type the launcher must report for each app, in order, the one the oracle's
+    field menu acts on (0 when it shows the menu again). spans: by version, the counts from each app's first frame to
+    the black after it closes, on the oracle: at each of them every picture the port shows must be one the oracle shows
+    at that count (screens without 3D by their hashes). slack: how many counts away from the oracle's a row may show on
+    the port. known: by version, app rows whose screens differ by construction, with why; known_spans, the counts of
+    spans that do"""
+    save: str
+    oracle_frames: int
+    port_frames: int
+    spec: dict[str, str]
+    events: tuple[int, ...]
+    spans: dict[str, str] = field(default_factory=dict)
+    slack: int = 0
+    known: dict[str, dict[str, str]] = field(default_factory=dict)
+    known_spans: dict[str, dict[str, str]] = field(default_factory=dict)
+
+
+# The known differences of the launch routes
+SUMMARY_SCROLL = ("the summary scrolls its background a pixel every 4 VBlanks since it started (PStatus_Main, "
+                  "src/ov207/p_sta_sys.c:263-271), and the DS spends some 37 VBlanks more than passes loading it "
+                  "(counts 4526-4531, 4530 alone 30 frames): its background is about 9 pixels further on throughout")
+POKEDEX_TRAP = ("the Pokédex stops the port on NNSi_objSizeWTbl (ARM9 main, 0x020942b0), NitroSystem G2D's table of "
+                "object widths, which has no C yet: the launcher doesn't open it, so its rows have no counterpart")
+LAUNCHES = {
+    # From the first save (no Pokémon, no Pokédex): X opens the field menu, A on BAG opens the bag, its items pocket
+    # empty, B closes it; RIGHT and A open the trainer card, B closes it; B closes the menu. The bag's first frame shows
+    # at count 4046 on the oracle and two passes after its opening on the port, the card's at 4588 and four passes
+    # after, in both versions
+    "field_menus": Launch("first_save", 7400, 5000, {"b2_us": "bag@4044,card@4584", "w2_us": "bag@4044,card@4584"},
+                          (0, 0), spans={"b2_us": "4046-4323,4588-4930", "w2_us": "4046-4323,4588-4930"}),
+    # From the starter save (Tepig, the Pokédex): the party list, Tepig's menu, its summary and back, the Pokédex and
+    # Tepig's entry, the trainer card with its Pokédex line, and the bag. The party list's first frame shows at count
+    # 4046 on the oracle (two passes after its opening on the port), the card's at 6978 (four), the bag's at 7675 (two);
+    # the Pokédex isn't launched (POKEDEX_TRAP), so the port shows black meanwhile
+    "party_menus": Launch("starter_save", 11100, 8400, {"b2_us": "party@4044,card@6974,bag@7673"}, (0, 0, 0),
+                          spans={"b2_us": "4046-5123,6978-7330,7675-8023"},
+                          known={"b2_us": {"summary": SUMMARY_SCROLL, "pokedex": POKEDEX_TRAP,
+                                           "pokedex_entry": POKEDEX_TRAP, "pokedex_after_entry": POKEDEX_TRAP}},
+                          known_spans={"b2_us": {"4533-4821": SUMMARY_SCROLL}}),
+}
+
+
+@dataclass(frozen=True)
+class LaunchRow:
+    label: str
+    oracle_frame: int
+    count: int
+    top_3d: bool
+    bottom_3d: bool
+    top: str
+    bottom: str
+    app: bool
+
+
+def load_launch_rows(path: str) -> list[LaunchRow]:
+    """A route's table: after comment lines, a header (LAUNCH_COLUMNS) and a row per labelled screen"""
+    rows = []
+    header = None
+    with open(path) as f:
+        for line in f:
+            line = line.rstrip("\n")
+            if not line or line.startswith("#"):
+                continue
+            fields = line.split("\t")
+            if header is None:
+                if fields != LAUNCH_COLUMNS:
+                    raise ValueError(f"{path}: the header isn't {' '.join(LAUNCH_COLUMNS)}")
+                header = fields
+                continue
+            if len(fields) != len(LAUNCH_COLUMNS) or fields[8] not in ("app", "field"):
+                raise ValueError(f"{path}: a row isn't {len(LAUNCH_COLUMNS)} columns ending with app or field: {line}")
+            rows.append(LaunchRow(fields[0], int(fields[1]), int(fields[2]), fields[4] == "1", fields[5] == "1",
+                                  fields[6], fields[7], fields[8] == "app"))
+    return rows
+
+
+def launch_paths(args) -> tuple[str, str]:
+    return (os.path.join(REPO_ROOT, LAUNCH_INPUT.format(name=args.name, version=args.version)),
+            os.path.join(REPO_ROOT, LAUNCH_SCREENS.format(name=args.name, version=args.version)))
+
+
+def check_oracle_rows(rows: list[LaunchRow], run: compare.Run) -> list[str]:
+    """Every row is the oracle's own: its frame is at its count and shows its hashes"""
+    failures = []
+    for row in rows:
+        frame = run.frames.get(row.oracle_frame)
+        if frame is None:
+            failures.append(f"{row.label}: the oracle has no frame {row.oracle_frame}")
+        elif (frame.counter, frame.top, frame.bottom) != (row.count, row.top, row.bottom):
+            failures.append(f"{row.label}: oracle frame {row.oracle_frame} isn't the row's (count {frame.counter}, "
+                            f"top {frame.top[:8]}, bottom {frame.bottom[:8]})")
+    return failures
+
+
+def port_frames_at(run: compare.Run, count: int, slack: int) -> list[int]:
+    return [number for number, frame in sorted(run.frames.items())
+            if frame.counter is not None and abs(frame.counter - count) <= slack]
+
+
+def match_app_row(row: LaunchRow, run: compare.Run, pictures: compare.Run | None, slack: int, after: int,
+                  oracle_png: str | None) -> tuple[int | None, str]:
+    """The first port frame after after, within the row's counts, that shows the row's screens: by hash for a screen
+    without 3D, within compare.py's tolerance for one with 3D (its picture, from pictures, the run that wrote them,
+    against the oracle's). Returns the frame, or None and why"""
+    candidates = [number for number in port_frames_at(run, row.count, slack) if number > after]
+    if not candidates:
+        return None, f"no port frame at counts {row.count - slack}-{row.count + slack} after frame {after}"
+    seen = []
+    for number in candidates:
+        frame = run.frames[number]
+        ok = True
+        for name, three_d, wanted, have in (("top", row.top_3d, row.top, frame.top),
+                                             ("bottom", row.bottom_3d, row.bottom, frame.bottom)):
+            if wanted == have:
+                continue
+            if not three_d:
+                ok = False
+                break
+            port_png = pictures.png(number) if pictures is not None else None
+            if port_png is None or oracle_png is None:
+                ok = False
+                break
+            screen = 0 if name == "top" else 1
+            oracle_rgb = compare.read_png(oracle_png)[2]
+            port_rgb = compare.read_png(port_png)[2]
+            size = compare.SCREEN_PIXELS * 3
+            _, beyond = compare.compare_screen(oracle_rgb[screen * size:(screen + 1) * size],
+                                               port_rgb[screen * size:(screen + 1) * size],
+                                               compare.DEFAULT_PIXEL_TOLERANCE)
+            if len(beyond) > compare.DEFAULT_TOLERANCE * compare.SCREEN_PIXELS:
+                ok = False
+                break
+        if ok:
+            return number, ""
+        seen.append(f"{number} (count {frame.counter}, top {frame.top[:8]}, bottom {frame.bottom[:8]})")
+    return None, f"the port's frames at its counts show other screens: {', '.join(seen[:4])}"
+
+
+def check_spans(oracle_run: compare.Run, port_run: compare.Run, spans: str, known: set[int]) -> tuple[list[str], int]:
+    """At each count of the spans but the known ones, every picture the port shows is one the oracle shows at that
+    count, a screen with 3D in the oracle's frame left out, and the port shows at least one: the failures, and how many
+    counts were checked"""
+    def by_count(run: compare.Run) -> dict[int, list[compare.Frame]]:
+        frames: dict[int, list[compare.Frame]] = {}
+        for number in sorted(run.frames):
+            frame = run.frames[number]
+            if frame.counter is not None:
+                frames.setdefault(frame.counter, []).append(frame)
+        return frames
+
+    oracle, port = by_count(oracle_run), by_count(port_run)
+    failures = []
+    checked = 0
+    for count in compare.parse_frames(spans) or []:
+        if count in known:
+            continue
+        checked += 1
+        if not port.get(count):
+            failures.append(f"count {count}: the port shows no frame at it")
+            continue
+        for frame in port[count]:
+            if not any((theirs.top_3d or theirs.top == frame.top)
+                       and (theirs.bottom_3d or theirs.bottom == frame.bottom) for theirs in oracle.get(count, [])):
+                failures.append(f"count {count}: port frame {frame.frame} (top {frame.top[:8]}, bottom "
+                                f"{frame.bottom[:8]}) is no picture the oracle shows at that count")
+    return failures, checked
+
+
+def check_launch_reports(lines: list[str], launch: Launch) -> list[str]:
+    """The launcher's lines: one report per app with the event type declared, and no step aside"""
+    failures = []
+    if any(LAUNCH_STEPS_ASIDE in line for line in lines):
+        failures.append("the launcher stepped aside: overlay 36's FIELDMAP_PROC_FUNCS has C, so retire the launcher "
+                        "and turn this route into a sequence (ADR 0012)")
+    reports = [match for match in (LAUNCH_REPORT.search(line) for line in lines) if match]
+    events = tuple(int(match.group(5)) for match in reports)
+    for match in reports:
+        print(f"port: {match.group(0)[len('port: '):]}")
+    if events != launch.events:
+        failures.append(f"the launcher reported event types {events}, not {launch.events}")
+    return failures
+
+
+def command_launch(args) -> int:
+    launch = LAUNCHES[args.name]
+    input_path, screens_path = launch_paths(args)
+    rom = rom_path(args.version, args.rom)
+    binary = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(binary):
+        print(f"oracle.py launch: skipped: no oracle at {binary} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    reason = rom_matches(args.version, rom)
+    if reason:
+        print(f"oracle.py launch: skipped: {reason}")
+        return SKIP
+    reason = save_kept(launch.save, args.version)
+    if reason is None and args.version not in launch.spec:
+        reason = f"the route has no --launch for {args.version}"
+    if reason is None and not (os.path.exists(input_path) and os.path.exists(screens_path)):
+        reason = f"no input file or table for {args.version}"
+    if reason:
+        print(f"oracle.py launch: skipped: {reason}")
+        return SKIP
+    args.oracle = binary
+    rows = load_launch_rows(screens_path)
+    known = launch.known.get(args.version, {})
+    work = args.out or tempfile.mkdtemp(prefix=f"oracle-launch-{args.name}-")
+    oracle_dir = os.path.join(work, "oracle")
+    port_dir = os.path.join(work, "port")
+    shutil.rmtree(oracle_dir, ignore_errors=True)
+    save, reason = obtain_save(args, launch.save, work, args.save_cache)
+    if reason:
+        print(f"oracle.py launch: {launch.save}: {reason}")
+        return 1
+    failures = []
+
+    # The oracle on the route, with pictures of the rows with 3D only
+    args.input = input_path
+    args.save = save
+    pictures = ",".join(str(row.oracle_frame) for row in rows if row.app and (row.top_3d or row.bottom_3d)) or "none"
+    status = run_oracle(args, oracle_dir, launch.oracle_frames, pictures, quiet=True)
+    if status != 0:
+        print(f"oracle.py launch: the oracle failed (status {status})")
+        return 1
+    oracle_run = compare.load_run(oracle_dir)
+    failures += check_oracle_rows(rows, oracle_run)
+
+    # The port: once for every frame's hashes, again for pictures of the frames where a row with 3D may show
+    lines: list[str] = []
+    save_after = os.path.join(work, "port_save_after.sav")
+    status, message = run_port(args.port, port_dir, launch.port_frames, "none", rom, args.time, input_path, save=save,
+                               save_out=save_after, launch=launch.spec[args.version], log=lines)
+    port_run = compare.load_run(port_dir)
+    print(f"port: {describe_port_run(status, message, launch.port_frames, port_dir)}")
+    if status != 0:
+        failures.append(f"the port's run ended with status {status}: {message}")
+    three_d = [row for row in rows if row.app and (row.top_3d or row.bottom_3d) and row.label not in known]
+    pictures = None
+    if three_d and status == 0:
+        # The port is deterministic, so the second run's frames are the first's
+        frames = sorted({number for row in three_d for number in port_frames_at(port_run, row.count, launch.slack)})
+        if frames:
+            pictures_dir = os.path.join(work, "port_pictures")
+            status, message = run_port(args.port, pictures_dir, max(frames), ",".join(str(f) for f in frames), rom,
+                                       args.time, input_path, save=save, launch=launch.spec[args.version])
+            pictures = compare.load_run(pictures_dir)
+    failures += check_launch_reports(lines, launch)
+    if file_sha1(save_after) != file_sha1(save):
+        failures.append("the port's run changed the save")
+
+    # Each app row, in order, at its count
+    after = 0
+    matched = 0
+    for row in rows:
+        if not row.app:
+            continue
+        if row.label in known:
+            print(f"left out, {row.label}: {known[row.label]}")
+            continue
+        number, why = match_app_row(row, port_run, pictures, launch.slack, after, oracle_run.png(row.oracle_frame))
+        if number is None:
+            failures.append(f"{row.label} (oracle frame {row.oracle_frame}, count {row.count}): {why}")
+            continue
+        after = number
+        matched += 1
+        print(f"{row.label}: oracle frame {row.oracle_frame}, port frame {number}, count {row.count}")
+    apps = sum(1 for row in rows if row.app and row.label not in known)
+
+    # Every pass of each app's span
+    known_spans = launch.known_spans.get(args.version, {})
+    span_failures, checked = check_spans(oracle_run, port_run, launch.spans.get(args.version, ""),
+                                         set(by_frame(known_spans)))
+    for counts, why in known_spans.items():
+        print(f"left out, counts {counts}: {why}")
+    failures += span_failures[:20]
+    if len(span_failures) > 20:
+        failures.append(f"and {len(span_failures) - 20} more counts")
+    for line in failures:
+        print(f"FAIL: {line}")
+    failed_counts = len({line.split(":")[0] for line in span_failures})
+    print(f"{matched} of {apps} app screens shown on the port at the oracle's counts; {checked - failed_counts} of "
+          f"{checked} counts of the apps' spans the oracle's; {len(rows)} rows of the oracle's held to its run")
+    if not args.out:
+        if not failures:
+            shutil.rmtree(work, ignore_errors=True)
+        else:
+            print(f"the runs are in {work}")
+    return 1 if failures else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -1107,12 +1547,15 @@ def main(argv: list[str] | None = None) -> int:
                       "[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST], a global by name")
     port.add_argument("--save", help="the save memory at power-on (blank otherwise), a .sav as melonDS writes it")
     port.add_argument("--save-out", help="where to copy the save memory the run leaves")
+    port.add_argument("--launch", help="Frigate's test launcher: the field menu's apps to open after CONTINUE, "
+                      "APP[@COUNT],... (ADR 0012)")
 
-    save = commands.add_parser("save", help="make one of the saves the sequences start from, on the oracle")
-    save.add_argument("name", choices=sorted(SAVES))
+    save = commands.add_parser("save", help="make saves the sequences start from, on the oracle")
+    save.add_argument("names", nargs="+", choices=sorted(SAVES), metavar="NAME")
     common(save)
-    save.add_argument("--out", required=True, help="where to write the save memory")
-    save.add_argument("--work", help="keep the oracle's run here")
+    save.add_argument("--out", help="where to write the save memory (one save)")
+    save.add_argument("--save-cache", help="make or reuse each save, and the saves it starts from, in this directory")
+    save.add_argument("--work", help="keep the oracle's runs here")
 
     port_save = commands.add_parser("port-save", help="the port's New Game save booted on the oracle, against the "
                                     "oracle's own save of that moment")
@@ -1137,6 +1580,16 @@ def main(argv: list[str] | None = None) -> int:
     sequence.add_argument("--port", required=True, help="the port's program")
     sequence.add_argument("--out", help="keep the runs and the difference images here")
     sequence.add_argument("--update", action="store_true", help="write the reference from a comparison that passes")
+    sequence.add_argument("--save-cache", help="take the save the sequence starts from from this directory, or make "
+                          "it there (oracle.py save --save-cache)")
+
+    launch = commands.add_parser("launch", help="the field menu's apps on the oracle and on the port's test launcher")
+    launch.add_argument("name", choices=sorted(LAUNCHES))
+    common(launch)
+    launch.add_argument("--port", required=True, help="the port's program")
+    launch.add_argument("--out", help="keep the runs here")
+    launch.add_argument("--save-cache", help="take the save the route starts from from this directory, or make it "
+                        "there (oracle.py save --save-cache)")
 
     sequence_check = commands.add_parser("sequence-check", help="the port on a sequence against its reference")
     sequence_check.add_argument("name", choices=sorted(SEQUENCES))
@@ -1178,6 +1631,8 @@ def main(argv: list[str] | None = None) -> int:
             return command_sound(args)
         if args.command == "sound-check":
             return command_sound_check(args)
+        if args.command == "launch":
+            return command_launch(args)
         return command_check(args)
     except (compare.RunError, OSError, ValueError) as error:
         print(f"oracle.py: {error}", file=sys.stderr)

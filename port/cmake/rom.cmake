@@ -175,18 +175,19 @@ set_tests_properties(card_backup_refuse_directory PROPERTIES TIMEOUT 60
     PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it is a directory;"
     FAIL_REGULAR_EXPRESSION "went on")
 
-# The file system, the card's ROM reads, the overlays and the backup as the game links them: each scenario on the whole
-# program's objects, with a main() of its own, in a process of its own (the SDK's libraries initialize once a process)
+# The file system, the card's ROM reads, the overlays, the backup and the game's genuine-card check against the card's
+# infrared chip (port/hal/card/card_spi.c) as the game links them: each scenario on the whole program's objects, with
+# a main() of its own, in a process of its own (the SDK's libraries initialize once a process)
 add_executable(port_rom_tests
-    tests/rom/test_rom.c $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects}
-    "${PORT_GEN}/stubs.c")
+    tests/rom/test_rom.c $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> $<TARGET_OBJECTS:port_launcher>
+    ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_rom_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_rom_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
 target_compile_options(port_rom_tests PRIVATE ${port_rom_test_options})
 if(port_os_stack_probes)
     target_compile_options(port_rom_tests PRIVATE ${port_os_stack_probes})
 endif()
-foreach(test file_system card_read overlays backup memory_files)
+foreach(test file_system card_read overlays backup memory_files ir_genuine_card)
     add_test(NAME rom_game_${test} COMMAND port_rom_tests ${test})
     set_tests_properties(rom_game_${test} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 120)
 endforeach()

@@ -358,8 +358,8 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Three input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, compared with
-`--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
+Three input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by four
+sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
   its first 274 frames of 3D on the bottom screen. The port runs 3,800 frames, the oracle 4,300. The game counts passes
@@ -378,8 +378,12 @@ Three input files on game frames for each version, `port/tests/oracle/<name>_<ve
   black, on the trap stub the sequence names (`stop_trap`, a pattern of the trap's message): overlay 36's
   `FIELDMAP_PROC_FUNCS`, in the field's first frames (below). A stop on any other trap fails, so the sequence says
   which gap it stops on and changes when the decomp fills it.
+- **continue_starter**: continue's input file from the starter save ([below](#saves)): the start menu's saved game has
+  the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout. The port stops on the same
+  trap. White 2 has no starter save measured yet, so its test skips with the reason.
 
-Each is two ctest tests, but continue, whose save only the oracle can make, has only the first:
+Each is two ctest tests, but continue and continue_starter, whose saves only the oracle can make, have only the
+first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -408,6 +412,7 @@ Results, every port frame but the known differences:
 | title, White 2 | 3,600 | 3,572 | 1,477 | 2,095 | 28 port frames, oracle frames 1283, 4875 | 2,470 of 2,470, 15 left out |
 | continue, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
 | continue, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
+| continue_starter, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
@@ -504,6 +509,32 @@ game." and closes the menu at frame 18,653. The file holds the main save twice, 
 bytes at `0x7f000`. It is the same at every run, so `oracle.py`'s `SAVES` keeps its SHA-1 (Black 2 `a7a58889e239`, White
 2 `479529f98b29`) and a sequence that starts from it fails if the oracle, the input file or the ROM gives another save.
 It is made at test time and never committed.
+
+**Saves made from saves.** A save in `SAVES` can name the save it starts from (`start`): `oracle.py` makes or takes
+that one first, checks its SHA-1, and gives it to the oracle with `--save` for the next input file. Each step is held
+to its own SHA-1, so a chain is the same at every run or fails at the step that changed. Black 2 has two, measured
+with the pinned melonDS; White 2's are still to be measured, and its tests that need them skip with the reason:
+
+- **The starter save** (`starter_save`, from `first_save`, `port/tests/oracle/starter_save_b2_us.pbwinput`, 17,000
+  frames, SHA-1 `ce71fe0b8c1d`): CONTINUE as the continue sequence presses it, then the story from the player's room:
+  Mom's scene, out of the house, Hugh's scene, a detour west of the Trainers' School (a sign blocks x = 37), up x = 54
+  and west along z = 725 to the stairs, up to Bianca at the lookout (36, 710) and through both her talks. A at Bianca
+  takes the middle ball, Tepig; B, mashed, answers NO to the nickname and takes the Pokédex; then the field menu's
+  SAVE. Decoded by hand in Gen 5's format, with a valid checksum: Tepig, level 5, 135 experience, 21/21 HP; event flags
+  0x961 (a Pokémon) and 0x962 (the Pokédex), the city's story variable 0x40a1 at 4, the starter variable 0x4030 at 1.
+  The game writes it by frame 16,400 and the menu closes at 16,874; the two copies of the main save are the same, and
+  2,086 bytes differ from `first_save`. It costs about 2.5 minutes at a load average near 10.
+- **The Route 19 save** (`route19_save`, from `starter_save`, 28,600 frames, SHA-1 `826bc561a328`): Hugh's trainer
+  battle (FIGHT, Tackle: Tepig grows to level 6, 229 experience), the Pokémon Center's scene, Mom's, the gate's gift
+  and Bianca's catching lesson, B through each, then SAVE beside the grass at (56, 696). It is for the battles, which
+  no test runs yet.
+
+`oracle.py save NAME... --save-cache DIR` makes each save into DIR as `NAME_VERSION.sav`, with the saves it starts
+from, and a later run takes a file from there only while its SHA-1 is still the one kept: anything else is made again.
+`--out FILE` writes one save, made fresh. ctest's `oracle_saves` test makes `first_save` and `starter_save` into
+`<build>/oracle-saves` before the sequences that start from them (a fixture), so they cost their oracle runs once a
+build tree; without `--save-cache`, as before, every save is made fresh. Nothing the game writes is committed: only
+the input files and the SHA-1s.
 
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,
@@ -664,6 +695,65 @@ Each sequence is two ctest tests:
   and WAV dump, against the reference: each play's runs (none missing, none extra, no play the oracle doesn't have),
   every run's state, each record in the frame whose VBlank comes next, the statuses, the segments' envelopes and levels,
   and the samples to the bit (wherever the loudest point's hash is, within two frames). Skipped (77) without the ROM.
+
+## The launch checks
+
+The field menu's apps against melonDS while the port has no field ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)):
+the oracle opens each app from the field menu, where the port's continued game stops on overlay 36's trap; the port
+opens the same apps with Frigate's test launcher (`--launch`, [port/app/launcher.c](../../app/launcher.c)) at the
+counts the oracle opens them. `oracle.py launch NAME --port BIN [--save-cache DIR]`, ctest `oracle_launch_<NAME>`,
+checks a route (`oracle.py`'s `LAUNCHES`):
+
+1. its save, from the cache or made on the oracle ([Saves](#saves));
+2. the oracle on `port/tests/oracle/launch_<name>_<version>.pbwinput`: every row of
+   `launch_<name>_<version>.screens.tsv`, the oracle's labelled screens (hashes only), is at its frame with its count
+   and its hashes;
+3. the port with the same save, the same input file and the route's `--launch`: every app row (`where` is `app`;
+   `field` rows are the field's and its menu's, the oracle's only) shows on the port at the row's count, screens
+   without 3D by their hashes at the DS's 6 bits, a screen with 3D within compare.py's tolerance from pictures of
+   those frames only; and at every count of each app's span, from its first frame to the black after it closes, every
+   picture the port shows is one the oracle shows at that count;
+4. the launcher's report of each app gives the event type declared (0: the oracle's menu shows again), and no notice
+   says the launcher stepped aside;
+5. the port leaves the save as it was.
+
+Both programs play the same presses; inside an app they reach both on the same pass, since the app opens at the same
+count. The presses for the field and its menu reach nothing on the port. **The counts** in `--launch` come from both
+programs: each is the app's first frame on the oracle (from its `frames.tsv`, the first picture after the field's fade
+to black) less the passes the port itself takes from opening the app to its first frame, measured on the port with
+`--launch APP` at once (2 for the bag and the party list, 4 for the trainer card). So each launched app's first frame
+is aligned by construction: its picture is checked, its timing isn't. Every later pass is a check of both, and so is
+every app a launched app opens (the party list's summary, and the party list again after it). The slack is 0.
+
+**What the field leaves** before an app, measured on the oracle at the bag's first frame by two-pass dumps (the oracle
+is deterministic: `g_GameSystem` at `0x021410f4`, its `GameData` at `0x0223b330`, `gfl/ui.c`'s `sSystemUI` at
+`0x021ff920` in Black 2): the UI's touch flag (`SystemUI.usingTouch`, +0x3c) is 0, set by the menu's choice by a key
+after the menu set it to 1; the last subscreen (`GameData`, +0x1ca) is 1, the menu's, which the field's close records.
+The launcher sets both through the game's setters. Nothing else was needed: the apps' pictures are the oracle's.
+
+| Route | Save | `--launch` (Black 2) | App screens | Pass by pass |
+| --- | --- | --- | --- | --- |
+| `field_menus` | `first_save` | `bag@4044,card@4584` | 2 of 2 | 621 of 621 counts: the bag (4046-4323) and the card (4588-4930) |
+| `party_menus` | `starter_save` | `party@4044,card@6974,bag@7673` | 5 of 5, 4 left out | 1,491 of 1,491 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
+| `field_menus`, White 2 | `first_save` | `bag@4044,card@4584`, as in Black 2 | 2 of 2 | 621 of 621 counts, the same spans |
+
+The pass-by-pass totals count each launched app's first frame, whose count its `--launch` count aligns: for 2 of the
+621 in `field_menus` and 3 of the 1,491 in `party_menus`, the picture is checked but not when it shows.
+
+Left out of `party_menus`, with their reasons in `LAUNCHES`:
+
+- **The summary** (counts 4533-4821): it scrolls its background a pixel every 4 VBlanks since it started
+  (`PStatus_Main`, `src/ov207/p_sta_sys.c:263-271`), and the DS spends some 37 VBlanks more than passes loading it
+  (count 4530 alone takes 30 frames), so its background is about 9 pixels further on throughout; the rest of its
+  screens are the port's. A frame the DS drops where the game steps by VBlanks, as the title's camera
+  ([Known differences](#known-differences-from-the-hardware)).
+- **The Pokédex** (its 3 rows): the port stops on `NNSi_objSizeWTbl` (ARM9 main, `0x020942b0`), NitroSystem G2D's
+  table of object widths, which has no C yet, so the route doesn't launch it.
+
+White 2 has `field_menus`, measured again on its own oracle: the same counts and spans, the bag's screens the same as
+Black 2's, the menu's and the card's bottom screens White 2's own. It has no `party_menus` yet: its starter save isn't
+measured (the Black 2 route's walk goes astray in White 2: the player ends in front of the Trainers' School with no
+Pokémon), so that test and `oracle_continue_starter` skip with the reason.
 
 ## Integration
 

@@ -101,9 +101,20 @@ set_tests_properties(oracle_boot PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1200)
 #   where. Skipped (77) without the oracle or the ROM
 # The continue sequence starts from a save that the oracle makes first, from power-on through New Game into the field
 # and its SAVE (oracle.py save first_save, checked against the SHA-1 oracle.py keeps): the start menu's CONTINUE with
-# the saved game, then the field, where the port stops on overlay 36 for now. Only the oracle can make its save, so it
-# has no reference and no _hashes test
-foreach(sequence IN ITEMS opening title continue)
+# the saved game, then the field, where the port stops on overlay 36 for now. continue_starter plays the same presses
+# from the starter save, made from the first save's CONTINUE through the story to the first Pokémon, whose start menu
+# shows the Pokédex line. Only the oracle can make their saves, so they have no reference and no _hashes test; the
+# oracle_saves test makes the saves into the build tree first (a fixture), where a later run reuses each while its
+# SHA-1 is still the one oracle.py keeps
+set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
+add_test(NAME oracle_saves
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" save first_save starter_save
+            --oracle "${port_oracle_binary}" --version "${PORT_VERSION}" --save-cache "${port_oracle_saves}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+# Each save from scratch runs the oracle some 18,000 frames
+set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600 FIXTURES_SETUP oracle_saves)
+foreach(sequence IN ITEMS opening title continue continue_starter)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -117,11 +128,92 @@ foreach(sequence IN ITEMS opening title continue)
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
             "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" sequence ${sequence}
                 --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --save-cache "${port_oracle_saves}"
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
 endforeach()
-# Making the save first runs the oracle 18,800 frames more
-set_tests_properties(oracle_continue PROPERTIES TIMEOUT 3600)
+# The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
+set_tests_properties(oracle_continue oracle_continue_starter PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
+
+# The field menu's apps on Frigate's test launcher (ADR 0012) against the oracle (oracle.py launch, README.md's "The
+# launch checks"): the oracle reaches each app through the field and its menu with the route's input file
+# (port/tests/oracle/launch_<route>_<version>.pbwinput), the port plays the same file from the same save with --launch
+# at the oracle's counts; the oracle's app screens (launch_<route>_<version>.screens.tsv) must show on the port at their
+# counts, and every pass of each app the oracle's. field_menus starts from the first save (the bag, the trainer card),
+# party_menus from the starter save (the party list, its summary, the card with the Pokédex line, the bag). Skipped
+# (77) without the oracle or the ROM, or for a version the route isn't measured in
+foreach(route IN ITEMS field_menus party_menus)
+    add_test(NAME oracle_launch_${route}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" launch ${route}
+                --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --save-cache "${port_oracle_saves}"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_launch_${route} PROPERTIES
+        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 3600)
+endforeach()
+
+# The launcher on the port alone, from the starter save the oracle made: --launch summary opens Tepig's summary as the
+# game does without the party list, and B closes it, without a trap and without writing the save. Black 2 only, since
+# White 2 has no starter save yet; skipped (77) without the save (no oracle) or the ROM
+if(PORT_VERSION STREQUAL "b2_us")
+    add_test(NAME launch_summary_standalone
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+                --save "${port_oracle_saves}/starter_save_b2_us.sav" --save-name IREO.sav
+                --expect "--launch: summary: opened at count [0-9]+, closed at count [0-9]+: result 0, event type 0"
+                -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4200 --watchdog 30
+                --input "${port_oracle_tests}/launch_summary_b2_us.pbwinput" --launch summary
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(launch_summary_standalone PROPERTIES
+        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+
+    # Each app opens as the field menu's choice by a key leaves it, whatever the app before it did: here the trainer
+    # card closed by a touch, which sets the UI's touch flag, then the party list, which must show the oracle's party
+    # list of the party_menus route at count 4250 (opened by a key there), not the one a touch leaves (its bottom
+    # screen differs). Black 2 only, from the starter save
+    add_test(NAME launch_touch_then_party
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+                --save "${port_oracle_saves}/starter_save_b2_us.sav" --save-name IREO.sav
+                --expect "--launch: party: opened at count 4044, closed at count [0-9]+: result 0, event type 0"
+                --table "${port_oracle_tests}/launch_party_menus_b2_us.screens.tsv" --show party
+                -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4500 --watchdog 30
+                --input "${port_oracle_tests}/launch_touch_card_b2_us.pbwinput" --launch card,party@4044
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(launch_touch_then_party PROPERTIES
+        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+endif()
+
+# The launcher's other exit statuses (port/app/launcher.h), from the first save the oracle made, in both versions:
+# - launch_unfinished: field_menus' presses with --frames short of the card's count, so the bag opens and closes but
+#   the card never opens: status 1, and the run says so;
+# - launch_not_offered: the party list from a save without a Pokémon, whose field menu (type 3, event flag 0x961
+#   clear) has no POKéMON item, as the oracle's menu on that save shows: status 2 before anything opens.
+# Skipped (77) without the save (no oracle) or the ROM
+if(PORT_VERSION STREQUAL "b2_us")
+    set(port_launch_save_name IREO.sav)
+else()
+    set(port_launch_save_name IRDO.sav)
+endif()
+add_test(NAME launch_unfinished
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+            --save "${port_oracle_saves}/first_save_${PORT_VERSION}.sav" --save-name ${port_launch_save_name} --status 1
+            --expect "--launch: the run ended before the launch did: card not opened"
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4400 --watchdog 30
+            --input "${port_oracle_tests}/launch_field_menus_${PORT_VERSION}.pbwinput" --launch bag@4044,card@4584
+    WORKING_DIRECTORY "${REPO_ROOT}")
+add_test(NAME launch_not_offered
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+            --save "${port_oracle_saves}/first_save_${PORT_VERSION}.sav" --save-name ${port_launch_save_name} --status 2
+            --expect "--launch: party: the field menu doesn't offer it in this save, which gets the menu without a Pok"
+            -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 3700 --watchdog 30
+            --input "${port_oracle_tests}/launch_field_menus_${PORT_VERSION}.pbwinput" --launch party
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(launch_unfinished launch_not_offered PROPERTIES
+    FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
 
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the

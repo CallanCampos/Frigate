@@ -3,6 +3,56 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the test launcher, after review
+
+- **ctest's `PASS_REGULAR_EXPRESSION` ignores the exit status.** A test with one passes on its output alone, so a
+  test of a status runs the program through a checker that compares it (`port/tests/app/check_exit.py`, or
+  `check_launch_smoke.py --status`).
+- **A tool that stops short must say so in its status.** The launcher ended a run that never opened an app, or never
+  opened the last one, with status 0; only the report lines that the oracle checks compared kept the tests honest.
+  Status 0 now means every app opened and closed, and a run that ended first says what never did.
+- **A stand-in does each thing the original does each time, not once.** The field menu's choice by a key sets the
+  touch flag before every app; the launcher set it before the first only, and an app closed by a touch left it set
+  for the next one, whose screen then differed. Read where a value is set in the code it stands in for, per call.
+
+## 2026-10-18: the field menu's apps against the oracle
+
+- **Align an app on its first frame, measured on both programs, not on its press.** The DS takes a different number
+  of passes than the port to close the field and load an app; opening the app on the port at the oracle's first app
+  frame's count less the port's own passes to its first frame lines up every later pass, and then a press inside the
+  app reaches both on the same pass. The bag, the card and the party list then match pass for pass.
+- **Check every pass of an app, not only its labelled screens.** The labelled rows of the trainer card matched while
+  its opening wipe was missing; the span check (every picture the port shows at a count is one the oracle shows there)
+  found it.
+- **A screen that steps by VBlanks parts from the oracle wherever the DS takes long passes.** The summary scrolls its
+  background by `OS_GetVBlankCount()`, and the DS loads it in a pass of 30 frames: its background stays some pixels
+  ahead. Look for the VBlank count in the code before suspecting the renderer.
+- **A route made for one version doesn't walk the other.** The starter route's input, written on Black 2's oracle,
+  goes astray on White 2's: each version needs its own measured route.
+
+## 2026-10-18: the H-blank interrupt and its flag
+
+- **An interrupt handler that takes no time sees the hardware as it was when the interrupt came.** The port raised
+  the H-blank interrupt 70 cycles before DISPSTAT's H-blank flag, where melonDS sets both at once. The game's line
+  wipe checks `GX_IsHBlank()` before each window write, so on the port it never wrote one, quietly: the screens went
+  from black to the picture. A flag and the interrupt it describes belong at the same moment on a host, whose handlers
+  run in no time. The moment is GBATEK's 1606 cycles into the line; melonDS 1.1 uses 1584 for both, which the game
+  can't tell apart.
+- **A missing transition shows only frame by frame.** The trainer card's screens were right before and after its
+  opening; only comparing every pass of the opening with the oracle's showed the wipe missing.
+
+## 2026-10-18: the card's infrared chip
+
+- **A register accessor can't tell a load from a store.** `port_hw_*` returns the memory the access uses before the
+  access happens, so a register whose writes act has to be resolved at the next access: compare the cell with what
+  it held, and when a store may write the value the cell already holds, give the cell a marker that every store
+  clears. `ir_check.c` sends 0 right after reading the answer 0; comparing values alone lost that byte and the check
+  failed. Each store is preceded by its own accessor call, so at most one is pending and resolving it at the next call
+  is exact (`port/hal/card/card_spi.c`).
+- **Plain memory for a register the game polls fails quietly.** AUXSPIDATA read back the last byte written, the
+  genuine-card check failed, and nothing stopped: the game only installed an HBlank task for good and would have
+  skipped battle experience. A breakpoint on the game's check against the oracle's outcome found it, not a test.
+
 ## 2026-10-18: the sound against the oracle, after review
 
 - **A counter the hardware reloads keeps counting through a write to its reload.** The channel's timer was modelled as

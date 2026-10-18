@@ -74,6 +74,11 @@ static const PortTrapSymbol *find_data_symbol(const unsigned char *address, size
     return NULL;
 }
 
+int port_trap_is_placeholder(const void *address) {
+    size_t offset;
+    return find_data_symbol(address, &offset) != NULL;
+}
+
 // The fault handler: an access to a data placeholder is a trap, reported by the placeholder's name and offset, with a
 // backtrace, and the program ends with PORT_TRAP_EXIT_STATUS; any other fault is a crash, reported the same way
 // before the signal's default action ends the program

@@ -1,8 +1,9 @@
 // Tests of the ROM, the card and the file system as the game links them (port/hal/rom, port/hal/card, port/hal/fs over
-// the decomp's own FS and CARD libraries), each run on the OS core as the game's main() would run, after the part of
-// OS_Init that they need: the PXI bus and the host's ARM7, the arenas, the locks, the threads and the alarms. Each runs
-// in a process of its own, since the SDK's libraries initialize once per process (CARD_Init, FS_Init). They need the
-// player's ROM and skip (77) without it.
+// the decomp's own FS and CARD libraries), and of the game's genuine-card check against the card's infrared chip
+// (src/ov338/ir_check.c over port/hal/card/card_spi.c), each run on the OS core as the game's main() would run, after
+// the part of OS_Init that they need: the PXI bus and the host's ARM7, the arenas, the locks, the threads and the
+// alarms. Each runs in a process of its own, since the SDK's libraries initialize once per process (CARD_Init,
+// FS_Init). They need the player's ROM and skip (77) without it.
 //
 //   port_rom_tests NAME
 #include "battle/btl_event.h"
@@ -20,6 +21,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
+#include "system/ir_check.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -478,6 +480,20 @@ static void MemoryFilesMain(void) {
     free(heap);
 }
 
+// The game's genuine-card check (src/ov338/ir_check.c), which runs at every CONTINUE and NEW GAME
+// (src/system/game_beacon.c's func_0202d6a8) and when a Pokémon faints in a wild or trainer battle
+// (src/ov167/btl_main.c's func_ov167_0219bdfc), against the card's infrared chip on the SPI registers
+// (port/hal/card/card_spi.c). It takes the card's backup lock, which CARD_Init (through FS_Init) sets up. The check
+// passes on melonDS, which the oracle runs: after CONTINUE, the oracle's HBlank task list holds no task, where a failed
+// check would leave GameBeaconSys_HideNewHBlank in it for good, and battles there give experience
+static void IrGenuineCardMain(void) {
+    u32 tableSize;
+
+    StartFileSystem(&tableSize);
+    Check(IrCheck_IsGenuineCard() == TRUE, "the game's check finds the card genuine, as on melonDS");
+    Check(IrCheck_IsGenuineCard() == TRUE, "and again");
+}
+
 typedef struct Test {
     const char *name;
     void (*run)(void);
@@ -490,6 +506,7 @@ static const Test sTests[] = {
     { "backup", BackupMain },
     { "backup_cut_pointer", BackupCutPointerMain },
     { "memory_files", MemoryFilesMain },
+    { "ir_genuine_card", IrGenuineCardMain },
 };
 
 int main(int argc, char **argv) {

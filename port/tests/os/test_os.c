@@ -574,6 +574,36 @@ static void TestHBlankMainLoop(void) {
                "frame 3: 263 hblanks, main switched in 261 times");
 }
 
+// What an H-blank handler reads: DISPSTAT's H-blank flag is set when the H-blank interrupt is taken, as melonDS sets
+// both at once (GPU::StartHBlank). The screen wipes' H-blank function writes the window planes only while
+// GX_IsHBlank() (src/system/wipe_sub.c's WipeLineWnd_HBlank), so with the flag still clear the trainer card's opening
+// wipe was never drawn: the screens went from black to the card at once
+static int sHBlankFlagCount;
+
+static void HBlankFlagHandler(void) {
+    sLineCount++;
+    if (GX_IsHBlank()) {
+        sHBlankFlagCount++;
+    }
+}
+
+static void HBlankFlagVBlankHandler(void) {
+    Log("vblank: %d of %d hblank handlers saw the flag", sHBlankFlagCount, sLineCount);
+    port_os_set_irq_check_flag(OS_IE_V_BLANK);
+}
+
+static void TestHBlankFlagInHandler(void) {
+    Boot(HBlankFlagVBlankHandler);
+    sLineCount = 0;
+    sHBlankFlagCount = 0;
+    OS_SetIrqFunction(OS_IE_H_BLANK, HBlankFlagHandler);
+    OS_EnableIrqMask(OS_IE_H_BLANK);
+    GX_HBlankIntr(TRUE);
+    OS_WaitIrq(TRUE, OS_IE_V_BLANK);
+    GX_HBlankIntr(FALSE);
+    EXPECT_LOG("vblank: 192 of 192 hblank handlers saw the flag");
+}
+
 static void VCountHandler(void) {
     Log("vcount at line %u (dispstat %#x)", port_os_vcount(), reg_GX_DISPSTAT);
 }
@@ -1350,6 +1380,7 @@ static const Test sTests[] = {
     { "switch_callback", TestSwitchCallback },
     { "hblank_lines", TestHBlankLines },
     { "hblank_main_loop", TestHBlankMainLoop },
+    { "hblank_flag_in_handler", TestHBlankFlagInHandler },
     { "dispstat_gates_blanks", TestDispStatGatesBlanks },
     { "frame_hooks_on_host_stack", TestFrameHooksOnHostStack },
     { "timed_work", TestTimedWork },
