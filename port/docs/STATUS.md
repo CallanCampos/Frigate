@@ -26,10 +26,90 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the launcher track's merge after review: --help's options and statuses, and the documents as built
+
+- **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
+  entry; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `b1ca0c257`. No
+  game file changed: game-changes.md's one edit marks `event_mapchange.c`'s second row "(again)".
+- **Host build:** arm64 macOS, RelWithDebInfo, `build/port-n` (Black 2) and `build/port-w2` (White 2), both Ninja,
+  built again from `b1ca0c257`: 10 C files each (`main.c`, the launcher, the OS core and its test, which changed), with
+  no warning; the decomp's C didn't change, so its 263 warnings (the last entry) stand. The oracle, `build/oracle`, had
+  nothing to rebuild (no oracle source changed), and its `pbw-oracle` is the one in both builds' `oracle/`. Not pushed,
+  so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 on `b1ca0c257`, the two builds at once, `ctest -j4` each, with the oracle in both: Black 2, all 267
+    `ctest` tests pass (980 s), none skipped; White 2, 261 of 263 pass (884 s), and `oracle_continue_starter` and
+    `oracle_launch_party_menus` skip as before, since `SAVES` keeps no SHA-1 of `starter_save` for White 2. The saves
+    came from each build's cache, whose SHA-1s are still the ones `oracle.py` keeps, so `oracle_saves` reused them
+    (1.3 s). `oracle_launch_field_menus` passes in both versions (2 of 2 app screens at the oracle's counts, 621 of 621
+    counts of the apps' spans the oracle's), `oracle_launch_party_menus` in Black 2 (5 of 5, 1,491 of 1,491).
+    `app_about` now also checks that `--help` describes each of the 19 options of its usage and that its `--launch`
+    names the apps the launcher names (party, pokedex, bag, card, summary); fed a `--help` without `--rom`'s line, or
+    without one of the apps, it fails. The tests left `~/Library` alone.
+  - The apps: `package_macos.sh` makes `Frigate Black 2.app` and `Frigate White 2.app` and their disk images, `Frigate
+    Black 2 0.0.2662.dmg` and `Frigate White 2 0.0.2662.dmg` (5.5 MB each), from `b1ca0c257` (revision
+    `b1ca0c257163`, clean). `plutil -lint` passes and reads the names, identifiers, programs and icon as in the last
+    entry; `hdiutil verify` and `codesign --verify --deep --strict` on each app and on the app in its mounted image
+    pass. Each app's program runs 300 frames headless (`--save-dir` a scratch directory), status 0, and its `--help`
+    opens with the name, the description and the disclaimer, then the usage, 19 options and the exit statuses.
+  - Every relative link of the Markdown files under `port/` and `.github/README.md` resolves, anchors as GitHub makes
+    them included (checked by script). clang-format 23.1.3 is clean on the five C files changed.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version (`gen_stubs`, each build above), as in
+  the last entry.
+- **64-bit warnings:** not measured: no game or `lib/` code changed. The last entry's field gave the host build's 263
+  warnings, which are of other kinds; it now says not measured too, with why.
+- **Work done:** the two reviews of the launcher track's merge (`859e4c1cf` to `bfe72cd2b`), each finding checked
+  against the code and fixed in `b1ca0c257` or this entry, but one.
+  - **`--help`** printed only the usage line, though the README sends readers to it for the options, and its comment
+    in `main.c` said `--frames` always exits with status 0. The options and exit statuses are now tables in `main.c`,
+    `sOptions` (name, value, whether it repeats, what it does) and `sExitStatuses`, which the usage, `--help` and the
+    option check all read, and `main.c`'s header points to them; `--frames` says the status can be another, such as an
+    unfinished launch's 1. `app_about` tests it, and MODDING.md's steps for a new option say where it goes.
+  - **The exit statuses** read the same in `main.c`, `launcher.h`, the README and MODDING.md: a status of the run's
+    own comes before the launcher's, such as a trap's 70, a deadlock's 72, the watchdog's 73 or a 1 of its own;
+    MODDING.md's "When the game stops" has a status 2 bullet (bad options, or a `--launch` app the save's menu doesn't
+    offer); `launcher.h`'s status comment ends before `PORT_LAUNCH_STATUS_DONE`'s.
+  - **ARCHITECTURE.md**: the plain-C rule names the test launcher as `port/app`'s one exception, and the layer table
+    the decomp's seam into it; the touch screen's row has `launch_touch_then_party`, whose input file touches the
+    card's return button; the field's row says a continued game stops on `FIELDMAP_PROC_FUNCS`, data with no C, with
+    `oracle_continue_starter`; the saves' row says which saves the tests start from.
+  - **MODDING.md**: the commands that make a save on the oracle run as written (`python3`, since `oracle.py` isn't
+    executable, as no Python tool of the port is), link to the oracle's Building section, and give White 2's first
+    save; the game's stop at the field names `FIELDMAP_PROC_FUNCS`.
+  - **Facts**: the menu without a BAG is the Black Tower's or the White Treehollow's (README, MODDING, the app guide,
+    `launcher_spec.h`); the README and the landing page say that the party list matches melonDS in Black 2 so far;
+    GLOSSARY.md, ARCHITECTURE.md and the tests guide say that `oracle_saves` makes the first and the starter save, and
+    that the Route 19 save is made on request, for battles, with no test yet; the party_menus table and
+    `oracle.cmake` say that the summary's row is left out of the check.
+  - **Words**: GLOSSARY.md folds "H-blank, DISPSTAT's flags" into its VBlank and HBlank row, and HBlank is spelled one
+    way in the living documents and the port's comments (lessons.md's dated entry keeps its words); a row for game
+    events and event types; the documents' index names the test launcher and the oracle's sound and launch checks;
+    game-changes.md marks `event_mapchange.c`'s second row "(again)"; `check_struct_layout.py`'s usage prints its line
+    continuation (a raw docstring; no other Python file of the port has the problem).
+  - **ADR 0012** gets a one-line note: accepted at the merge, so "On acceptance" is done and its "Until then" no longer
+    holds, and what retiring the launcher also removes from the documents and tools.
+  - **The last entry**: its Port field names `bfe72cd2b`, its 64-bit warnings field says not measured instead of the
+    host build's count of every kind, and it says who accepted ADR 0012 and that the user's acceptance is wanted.
+  - **Not changed**: the merge's subject, "Merge port-launch", though its second parent is `port-launch-adr0012`
+    (`b4c0fdc68`), which holds `port-launch`: the message was the integration task's, the last entry names the branch
+    rightly, and rewording it would rewrite every later commit, whose SHAs the records cite.
+- **Next:** as in the last entry: White 2's starter route, so that `party_menus` and `continue_starter` run in White 2;
+  the apps no route reaches yet (the Pokédex past its trap); a save with an adventure made by the port, once overlay 36
+  lets it into the field; for the sound, a comparison sequence where a player plays on the game's count.
+- **Blockers:** the user's acceptance of ADR 0012, which changes port/CLAUDE.md's rule on stand-ins and which the ADR
+  had waited for: `port-integrate` isn't published before the user gives it, and without it `d7849a158` is reverted.
+  Overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the launcher's
+  retirement (ADR 0012); `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, no C yet) stops the Pokédex; overlays 11 and
+  182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the launcher track merged under Frigate's rules, and ADR 0012 accepted
 
 - **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `e7187b168`: `859e4c1cf` (the merge of
+- **Port:** `bfe72cd2b`, on the branch `port-integrate` from `main` at `e7187b168`: `859e4c1cf` (the merge of
   `port-launch-adr0012`, which holds `port-launch`), then `d7849a158` (ADR 0012 accepted), `1249408e1` (the launcher
   track under Frigate's rules) and `0b51e6acf` (exit status 1's every cause), then this entry; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`), at the merge and at
@@ -78,7 +158,10 @@ level that doesn't exist yet says "not yet"; no field is left out.
 - **Tiers:** not measured: the only decomp changes are the launcher track's two rows, measured on its branch.
 - **Trap stubs:** 624 function stubs and 48 data placeholders in each version (`gen_stubs`, each build above), as in
   the launcher track's and Frigate's entries.
-- **64-bit warnings:** 263 in each version, as above (193 in `src/`, 70 in `lib/`), unchanged from Frigate's entries.
+- **64-bit warnings:** not measured: the compile probe didn't run. The merge's game changes are the launcher's seam, a
+  `PLATFORM_PC` block MWCC never sees, and `event_field_proclink.c`'s typedef removal, in a complete file. The host
+  build's 263 warnings (Host build above) are other kinds, `-Wswitch` and `-Wpointer-sign` among them: the game's
+  target turns the pointer/int warnings off, which `port/tools/compile-probe` counts.
 - **Work done:** the launcher track, `port-launch` (the cartridge's infrared chip, saves made from saves on the oracle,
   the H-blank interrupt with DISPSTAT's flag) and `port-launch-adr0012` (the test launcher and its routes), merged into
   `main` after Frigate's identity and the sound, which it never saw.
@@ -90,11 +173,13 @@ level that doesn't exist yet says "not yet"; no field is left out.
     sides' sections, the launcher's lessons first), port/README.md (Frigate's directory map) and this file: the
     launcher track's eight entries above Frigate's, the last naming `b4c0fdc68`, Frigate's last naming `e7187b168`;
     game-changes.md's `event_mapchange.c` row names `b8b52f420`.
-  - **ADR 0012 accepted** (`d7849a158`). The port's developer accepts it, as every earlier ADR: its status is
-    accepted, and its "On acceptance" section is done: port/CLAUDE.md's "Code that isn't C yet" names the launcher,
-    after `ov011_pending.c`, as the other documented stand-in (test-only, off by default, while overlay 36 is
-    claimed), and PLAN.md's phase 4 says that until overlay 36 lands the field menu's apps are tested through it
-    against the oracle's route through the field menu. The ADR index says accepted.
+  - **ADR 0012 accepted** (`d7849a158`), in this integration, on its task's instructions. The ADR's status had waited
+    for the user's acceptance, since it reads port/CLAUDE.md's rule on stand-ins, and no record in this repository says
+    that the user gave it: the user confirms it before `port-integrate` is published, or `d7849a158` is reverted (the
+    next entry's Blockers). Its status is accepted, and its "On acceptance" section is done: port/CLAUDE.md's "Code that
+    isn't C yet" names the launcher, after `ov011_pending.c`, as the other documented stand-in (test-only, off by
+    default, while overlay 36 is claimed), and PLAN.md's phase 4 says that until overlay 36 lands the field menu's apps
+    are tested through it against the oracle's route through the field menu. The ADR index says accepted.
   - **The launcher track under Frigate's rules** (`1249408e1`). Names: the README's `--launch` examples and the run
     directory's test run `frigate-black2`; nothing else the track wrote had an old name. The README's test launcher
     section moves from "Playing" to the quick start, whose options list `--launch`; the README's and the landing page's
