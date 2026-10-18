@@ -222,7 +222,7 @@ static BOOL func_ov011_0217d61c(GTI2Connection *connection, const u8 *data, int 
         return FALSE;
     }
     if (connection->initialMessage != NULL) {
-        func_ov011_0216ddfc(connection->initialMessage);
+        gsifree(connection->initialMessage);
         connection->initialMessage = NULL;
     }
     connection->state = 1;
@@ -258,7 +258,7 @@ static BOOL func_ov011_0217d6b4(GTI2Connection *connection, const u8 *data, int 
     }
     connection->state = 4;
     if (func_ov011_0217ca30(connection->socket, connection, connection->ip, connection->port,
-                            func_ov011_0216e324() - connection->challengeTime, data + 32, length - 32)) {
+                            current_time() - connection->challengeTime, data + 32, length - 32)) {
         return TRUE;
     }
     return FALSE;
@@ -455,7 +455,7 @@ restart:
 static void func_ov011_0217da7c(GTI2Connection *connection) {
     if (!connection->pendingAck) {
         connection->pendingAck = TRUE;
-        connection->pendingAckTime = func_ov011_0216e324();
+        connection->pendingAckTime = current_time();
     }
 }
 
@@ -576,7 +576,7 @@ static BOOL func_ov011_0217dc74(GTI2Connection *connection, const u8 *data, int 
     dest[1] = src[1];
     dest[2] = src[2];
     dest[3] = src[3];
-    if (func_ov011_0217cbbc(connection, func_ov011_0216e324() - sendTime)) {
+    if (func_ov011_0217cbbc(connection, current_time() - sendTime)) {
         return TRUE;
     }
     return FALSE;
@@ -731,7 +731,7 @@ BOOL func_ov011_0217df34(GTI2Socket *socket, u32 ip, u16 port) {
         return TRUE;
     }
     if (connection->state == 0) {
-        if (connection->timeout == 0 || func_ov011_0216e324() - connection->startTime < connection->timeout) {
+        if (connection->timeout == 0 || current_time() - connection->startTime < connection->timeout) {
             return TRUE;
         }
         if (!func_ov011_0217d3d8(connection, 6, 1)) {
@@ -766,12 +766,12 @@ BOOL func_ov011_0217e020(GTI2Socket *socket) {
     int length;
     int error;
 
-    if (func_ov011_0216e10c(socket->handle) != 0) {
+    if (CanReceiveOnSocket(socket->handle) != 0) {
         do {
             addressSize = sizeof(address);
-            length = func_ov011_0216df00(socket->handle, buffer, sizeof(buffer), 0, &address, &addressSize);
+            length = recvfrom(socket->handle, buffer, sizeof(buffer), 0, &address, &addressSize);
             if (length == -1) {
-                error = func_ov011_0216dfa8(socket->handle);
+                error = GOAGetLastError(socket->handle);
                 if (error == -15) {
                     if (!func_ov011_0217df34(socket, address.addr, GTI2_SWAP16(address.port))) {
                         return FALSE;
@@ -789,7 +789,7 @@ BOOL func_ov011_0217e020(GTI2Socket *socket) {
                     return FALSE;
                 }
             }
-        } while (func_ov011_0216e10c(socket->handle));
+        } while (CanReceiveOnSocket(socket->handle));
     }
     return TRUE;
 }
@@ -802,7 +802,7 @@ static BOOL func_ov011_0217e140(GTI2Connection *connection, u16 sequence, int le
     message.offset = connection->outgoing.length;
     message.length = length;
     message.serialNumber = sequence;
-    message.sendTime = func_ov011_0216e324();
+    message.sendTime = current_time();
     count = func_ov011_02171588(connection->outgoingMessages);
     func_ov011_021715a4(connection->outgoingMessages, &message);
     return count + 1 == func_ov011_02171588(connection->outgoingMessages);

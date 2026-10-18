@@ -121,16 +121,16 @@ void ScClient_SetServers(int server) {
 }
 
 static int ScClient_Alloc(ScClient **client) {
-    if (data_ov011_02190698 == 1) {
+    if (__GSIACResult == 1) {
         if (sCompetitionUrl[0] == '\0') {
             OS_SNPrintf(sCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                        data_ov011_0219069c);
+                        __GSIACGamename);
         }
     } else {
         return 1;
     }
-    *client = func_ov011_0216dddc(sizeof(ScClient));
+    *client = gsimalloc(sizeof(ScClient));
     if (*client == NULL) {
         return 5;
     }
@@ -178,15 +178,15 @@ static void ScClient_CopyCcid(ScClient *client, const char *ccid) {
 }
 
 static char *ScClient_BuildUrl(void) {
-    if (data_ov011_02190698 == 1) {
+    if (__GSIACResult == 1) {
         if (sCompetitionUrl[0] == '\0') {
             OS_SNPrintf(sCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                        data_ov011_0219069c);
+                        __GSIACGamename);
         }
         return sCompetitionUrl;
     }
-    func_ov011_0216cca8(0, 3, 1, "No availability\r\n");
+    gsDebugFormat(0, 3, 1, "No availability\r\n");
     return NULL;
 }
 
@@ -217,7 +217,7 @@ int ScClient_Destroy(ScClient *client) {
     }
     if (client->valid != 0) {
         ScClient_Reset(client);
-        func_ov011_0216ddfc(client);
+        gsifree(client);
     }
     return 0;
 }
@@ -395,14 +395,14 @@ static int ScReport_Create(const char *csid, int version, int playerNum, int tea
     teamSize = playerNum * 0x10;
     playerSize = teamSize + playerNum * 4;
 
-    created = func_ov011_0216dddc(sizeof(ScReport));
+    created = gsimalloc(sizeof(ScReport));
     if (created == NULL) {
         return 5;
     }
     memset(created, 0, sizeof(ScReport));
-    header = func_ov011_0216dddc(0x10000);
+    header = gsimalloc(0x10000);
     if (header == NULL) {
-        func_ov011_0216ddfc(created);
+        gsifree(created);
         return 5;
     }
     memset(header, 0, 0x10000);
@@ -430,12 +430,12 @@ static int ScReport_Destroy(ScReport *report) {
     report->groupOffset = 0;
     report->keyNum = 0;
     report->unk_0c = 0;
-    func_ov011_0216ddfc(report->buffer);
+    gsifree(report->buffer);
     report->buffer = NULL;
     report->bufferSize = 0;
     report->unk_118 = 0;
     report->used = 0;
-    func_ov011_0216ddfc(report);
+    gsifree(report);
     return 0;
 }
 
@@ -616,7 +616,7 @@ static u8 *Sc_PutGuid(u8 *dest, const char *text) {
 static const char *sCompetitionNamespaces[] = { "gsc=\"http://gamespy.net/competition/\"" };
 
 static int ScClient_Begin(ScClient *client, ScClient *self) {
-    if (func_ov011_0216c9f4() != 0) {
+    if (gsCoreIsShutdown() != 0) {
         return 4;
     }
     client->self = self;
@@ -648,7 +648,7 @@ static void ScClient_End(ScClient *client) {
 }
 
 static void ScClient_RunLibrary(ScClient *client) {
-    func_ov011_0216c910(0);
+    gsCoreThink(0);
 }
 
 static int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *certificate, AuthKeys *keys,
@@ -658,23 +658,23 @@ static int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertific
     if (client->createSessionBusy != 0) {
         return 6;
     }
-    writer = func_ov011_0216fbf8(sCompetitionNamespaces, 1);
+    writer = gsXmlCreateStreamWriter(sCompetitionNamespaces, 1);
     if (writer == NULL) {
         return 5;
     }
-    if (!func_ov011_02170614(writer, "gsc", "CreateSession") || !func_ov011_02170614(writer, "gsc", "certificate") ||
-        !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate") ||
-        !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
-        !func_ov011_02170818(writer, "gsc", "gameid", gameId) || !func_ov011_02170660(writer, "gsc", "CreateSession") ||
-        !func_ov011_0216fea8(writer)) {
-        func_ov011_0216fe64(writer);
+    if (!gsXmlWriteOpenTag(writer, "gsc", "CreateSession") || !gsXmlWriteOpenTag(writer, "gsc", "certificate") ||
+        !Auth_WriteCertificate(certificate, "gsc", writer) || !gsXmlWriteCloseTag(writer, "gsc", "certificate") ||
+        !gsXmlWriteHexBinaryElement(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
+        !gsXmlWriteIntElement(writer, "gsc", "gameid", gameId) || !gsXmlWriteCloseTag(writer, "gsc", "CreateSession") ||
+        !gsXmlCloseWriter(writer)) {
+        gsXmlFreeWriter(writer);
         return 7;
     }
     client->createSessionFunc = func;
     client->createSessionData = userData;
     client->createSessionBusy = 1;
-    func_ov011_0216ea4c(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/CreateSession\"", writer,
-                        ScClient_OnCreateSession, client);
+    gsiExecuteSoap(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/CreateSession\"", writer,
+                   ScClient_OnCreateSession, client);
     return 0;
 }
 
@@ -689,23 +689,23 @@ static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader,
     if (client->ready) {
         if (status == 0) {
             result = 0;
-            if (func_ov011_02170d18(reader)) {
-                if (!func_ov011_02170d28(reader, "CreateSessionResponse") &&
-                    !func_ov011_02170d28(reader, "CreateMatchlessSessionResponse")) {
+            if (gsXmlMoveToStart(reader)) {
+                if (!gsXmlMoveToNext(reader, "CreateSessionResponse") &&
+                    !gsXmlMoveToNext(reader, "CreateMatchlessSessionResponse")) {
                     error = 9;
                 }
             } else {
                 error = 9;
             }
-            if (!func_ov011_02170d28(reader, "CreateSessionResult") &&
-                !func_ov011_02170d28(reader, "CreateMatchlessSessionResult")) {
+            if (!gsXmlMoveToNext(reader, "CreateSessionResult") &&
+                !gsXmlMoveToNext(reader, "CreateMatchlessSessionResult")) {
                 error = 9;
             }
-            if (func_ov011_02171090(reader, "result", &result)) {
+            if (gsXmlReadChildAsInt(reader, "result", &result)) {
                 if (error != 9) {
                     if (result == 0) {
-                        if (func_ov011_02170e90(reader, "csid", csid, sizeof(csid)) &&
-                            func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
+                        if (gsXmlReadChildAsStringNT(reader, "csid", csid, sizeof(csid)) &&
+                            gsXmlReadChildAsStringNT(reader, "ccid", ccid, sizeof(ccid))) {
                             ScClient_CopyCsid(client->self, csid);
                             ScClient_CopyCcid(client->self, ccid);
                             error = 0;
@@ -738,26 +738,26 @@ static int ScClient_PostReportIntention(ScClient *client, int gameId, const char
     if (client->reportIntentionBusy != 0) {
         return 6;
     }
-    writer = func_ov011_0216fbf8(sCompetitionNamespaces, 1);
+    writer = gsXmlCreateStreamWriter(sCompetitionNamespaces, 1);
     if (writer == NULL) {
         return 5;
     }
-    if (!func_ov011_02170614(writer, "gsc", "SetReportIntention") ||
-        !func_ov011_02170614(writer, "gsc", "certificate") || !Auth_WriteCertificate(certificate, "gsc", writer) ||
-        !func_ov011_02170660(writer, "gsc", "certificate") ||
-        !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
-        !func_ov011_021706b8(writer, "gsc", "csid", csid) || !func_ov011_021706b8(writer, "gsc", "ccid", ccid) ||
-        !func_ov011_02170818(writer, "gsc", "gameid", gameId) ||
-        !func_ov011_02170818(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
-        !func_ov011_02170660(writer, "gsc", "SetReportIntention") || !func_ov011_0216fea8(writer)) {
-        func_ov011_0216fe64(writer);
+    if (!gsXmlWriteOpenTag(writer, "gsc", "SetReportIntention") || !gsXmlWriteOpenTag(writer, "gsc", "certificate") ||
+        !Auth_WriteCertificate(certificate, "gsc", writer) || !gsXmlWriteCloseTag(writer, "gsc", "certificate") ||
+        !gsXmlWriteHexBinaryElement(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
+        !gsXmlWriteStringElement(writer, "gsc", "csid", csid) ||
+        !gsXmlWriteStringElement(writer, "gsc", "ccid", ccid) ||
+        !gsXmlWriteIntElement(writer, "gsc", "gameid", gameId) ||
+        !gsXmlWriteIntElement(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
+        !gsXmlWriteCloseTag(writer, "gsc", "SetReportIntention") || !gsXmlCloseWriter(writer)) {
+        gsXmlFreeWriter(writer);
         return 7;
     }
     client->reportIntentionFunc = func;
     client->reportIntentionData = userData;
     client->reportIntentionBusy = 1;
-    func_ov011_0216ea4c(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/SetReportIntention\"", writer,
-                        ScClient_OnReportIntention, client);
+    gsiExecuteSoap(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/SetReportIntention\"", writer,
+                   ScClient_OnReportIntention, client);
     return 0;
 }
 
@@ -772,10 +772,10 @@ static void ScClient_OnReportIntention(int status, int unused, SoapReader *reade
         if (status == 0) {
             error = 0;
             result = 0;
-            if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "SetReportIntentionResponse") ||
-                !func_ov011_02170d28(reader, "SetReportIntentionResult") ||
-                !func_ov011_02171090(reader, "result", &result) ||
-                !func_ov011_02170e90(reader, "ccid", ccid, sizeof(ccid))) {
+            if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "SetReportIntentionResponse") ||
+                !gsXmlMoveToNext(reader, "SetReportIntentionResult") ||
+                !gsXmlReadChildAsInt(reader, "result", &result) ||
+                !gsXmlReadChildAsStringNT(reader, "ccid", ccid, sizeof(ccid))) {
                 error = 9;
             } else if (result == 0) {
                 ScClient_CopyCcid(client->self, ccid);
@@ -812,18 +812,19 @@ static int ScClient_PostReport(ScClient *client, int gameId, const char *csid, c
     if (report->used < sizeof(ScReportHeader)) {
         return 12;
     }
-    writer = func_ov011_0216fbf8(sCompetitionNamespaces, 1);
+    writer = gsXmlCreateStreamWriter(sCompetitionNamespaces, 1);
     if (writer == NULL) {
         return 5;
     }
-    if (!func_ov011_02170614(writer, "gsc", "SubmitReport") || !func_ov011_02170614(writer, "gsc", "certificate") ||
-        !Auth_WriteCertificate(certificate, "gsc", writer) || !func_ov011_02170660(writer, "gsc", "certificate") ||
-        !func_ov011_0217090c(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
-        !func_ov011_021706b8(writer, "gsc", "csid", csid) || !func_ov011_021706b8(writer, "gsc", "ccid", ccid) ||
-        !func_ov011_02170818(writer, "gsc", "gameid", gameId) ||
-        !func_ov011_02170818(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
-        !func_ov011_02170660(writer, "gsc", "SubmitReport") || !func_ov011_0216fea8(writer)) {
-        func_ov011_0216fe64(writer);
+    if (!gsXmlWriteOpenTag(writer, "gsc", "SubmitReport") || !gsXmlWriteOpenTag(writer, "gsc", "certificate") ||
+        !Auth_WriteCertificate(certificate, "gsc", writer) || !gsXmlWriteCloseTag(writer, "gsc", "certificate") ||
+        !gsXmlWriteHexBinaryElement(writer, "gsc", "proof", keys->proof, sizeof(keys->proof)) ||
+        !gsXmlWriteStringElement(writer, "gsc", "csid", csid) ||
+        !gsXmlWriteStringElement(writer, "gsc", "ccid", ccid) ||
+        !gsXmlWriteIntElement(writer, "gsc", "gameid", gameId) ||
+        !gsXmlWriteIntElement(writer, "gsc", "authoritative", authoritative ? 1 : 0) ||
+        !gsXmlWriteCloseTag(writer, "gsc", "SubmitReport") || !gsXmlCloseWriter(writer)) {
+        gsXmlFreeWriter(writer);
         return 5;
     }
     client->report = report->buffer;
@@ -831,8 +832,8 @@ static int ScClient_PostReport(ScClient *client, int gameId, const char *csid, c
     client->submitReportFunc = func;
     client->submitReportData = userData;
     client->submitReportBusy = 1;
-    func_ov011_0216eae0(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/SubmitReport\"", writer,
-                        ScClient_OnSubmitReport, ScClient_PutReportForm, client);
+    gsiExecuteSoapCustom(sCompetitionUrl, "SOAPAction: \"http://gamespy.net/competition/SubmitReport\"", writer,
+                         ScClient_OnSubmitReport, ScClient_PutReportForm, client);
     return 0;
 }
 
@@ -846,8 +847,8 @@ static void ScClient_OnSubmitReport(int status, int unused, SoapReader *reader, 
         if (status == 0) {
             error = 0;
             result = 0;
-            if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "SubmitReportResponse") ||
-                !func_ov011_02170d28(reader, "SubmitReportResult") || !func_ov011_02171090(reader, "result", &result)) {
+            if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "SubmitReportResponse") ||
+                !gsXmlMoveToNext(reader, "SubmitReportResult") || !gsXmlReadChildAsInt(reader, "result", &result)) {
                 error = 9;
             } else if (result != 0) {
                 if (result == 7) {

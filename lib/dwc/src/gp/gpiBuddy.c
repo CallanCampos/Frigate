@@ -72,7 +72,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
     }
     profileid = atol(buffer);
     if (!gpiValueForKey(input, "\\date\\", buffer, 0x1000)) {
-        date = func_ov011_021714a8(NULL);
+        date = gsiTimeInSec(NULL);
     } else {
         date = atol(buffer);
     }
@@ -82,7 +82,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
 
         callback = iconnection->callbacks[3];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvBuddyMessageArg));
+            arg = gsimalloc(sizeof(GPRecvBuddyMessageArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -90,7 +90,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
             if (!gpiValueForKey(input, "\\msg\\", buffer, 0x1000)) {
                 GPI_BAD_MESSAGE(connection);
             }
-            arg->message = func_ov011_0216dddc(strlen(buffer) + 1);
+            arg->message = gsimalloc(strlen(buffer) + 1);
             if (arg->message == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -110,7 +110,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
 
         callback = iconnection->callbacks[4];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvBuddyUTMArg));
+            arg = gsimalloc(sizeof(GPRecvBuddyUTMArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -118,7 +118,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
             if (!gpiValueForKey(input, "\\msg\\", buffer, 0x1000)) {
                 GPI_BAD_MESSAGE(connection);
             }
-            arg->message = func_ov011_0216dddc(strlen(buffer) + 1);
+            arg->message = gsimalloc(strlen(buffer) + 1);
             if (arg->message == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -152,13 +152,13 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
         if (strlen(str + 8) != 0x20) {
             GPI_BAD_MESSAGE(connection);
         }
-        func_ov011_0216ddfc(profile->authSig);
+        gsifree(profile->authSig);
         profile->authSig = NULL;
-        profile->authSig = func_ov011_0216e2c8(str + 8);
+        profile->authSig = goastrdup(str + 8);
         profile->requestCount++;
         callback = iconnection->callbacks[1];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvBuddyRequestArg));
+            arg = gsimalloc(sizeof(GPRecvBuddyRequestArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -178,7 +178,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
 
         callback = iconnection->callbacks[7];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvBuddyAuthArg));
+            arg = gsimalloc(sizeof(GPRecvBuddyAuthArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -197,7 +197,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
 
         callback = iconnection->callbacks[8];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvBuddyRevokeArg));
+            arg = gsimalloc(sizeof(GPRecvBuddyRevokeArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -221,14 +221,14 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
             return 1;
         }
         if (iconnection->connectState == GPI_CONNECTED && profile->deleted) {
-            func_ov011_0216cca8(1, 4, 2,
-                                "Deliberately ignoring Buddy Message Status update from profile id [%i], "
-                                "\t\t\t\tbecause could not be found in the local buddy list. It must have been "
-                                "removed \n",
-                                profileid);
+            gsDebugFormat(1, 4, 2,
+                          "Deliberately ignoring Buddy Message Status update from profile id [%i], "
+                          "\t\t\t\tbecause could not be found in the local buddy list. It must have been "
+                          "removed \n",
+                          profileid);
         } else if (!profile->blocked) {
             if (profile->buddyStatus == NULL) {
-                profile->buddyStatus = func_ov011_0216dddc(sizeof(GPIBuddyStatus));
+                profile->buddyStatus = gsimalloc(sizeof(GPIBuddyStatus));
                 if (profile->buddyStatus == NULL) {
                     gpiSetErrorString(connection, "Out of memory.");
                     return 1;
@@ -250,22 +250,22 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
                 GPI_BAD_MESSAGE(connection);
             }
             buddyStatus->status = atol(intValue);
-            func_ov011_0216ddfc(buddyStatus->statusString);
+            gsifree(buddyStatus->statusString);
             buddyStatus->statusString = NULL;
             if (!gpiValueForKey(buffer, "|ss|", strTemp, 0x100)) {
                 strTemp[0] = '\0';
             }
-            buddyStatus->statusString = func_ov011_0216e2c8(strTemp);
+            buddyStatus->statusString = goastrdup(strTemp);
             if (buddyStatus->statusString == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
             }
-            func_ov011_0216ddfc(buddyStatus->locationString);
+            gsifree(buddyStatus->locationString);
             buddyStatus->locationString = NULL;
             if (!gpiValueForKey(buffer, "|ls|", strTemp, 0x100)) {
                 strTemp[0] = '\0';
             }
-            buddyStatus->locationString = func_ov011_0216e2c8(strTemp);
+            buddyStatus->locationString = goastrdup(strTemp);
             if (buddyStatus->locationString == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -287,7 +287,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
             }
             callback = iconnection->callbacks[2];
             if (callback.callback != NULL) {
-                arg = func_ov011_0216dddc(sizeof(GPRecvBuddyStatusArg));
+                arg = gsimalloc(sizeof(GPRecvBuddyStatusArg));
                 if (arg == NULL) {
                     gpiSetErrorString(connection, "Out of memory.");
                     return 1;
@@ -327,14 +327,14 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
         }
         callback = iconnection->callbacks[5];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvGameInviteArg));
+            arg = gsimalloc(sizeof(GPRecvGameInviteArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
             }
             arg->profile = profileid;
             arg->productID = productID;
-            func_ov011_0216ee7c(arg->location, strTemp, sizeof(arg->location));
+            gsiSafeStrcpyA(arg->location, strTemp, sizeof(arg->location));
             result = gpiAddCallback(connection, callback, arg, NULL, GPI_ADD_NORMAL);
             if (result != 0) {
                 return result;
@@ -363,7 +363,7 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
     GPIConnection *iconnection;
 
     iconnection = *connection;
-    date = func_ov011_021714a8(NULL);
+    date = gsiTimeInSec(NULL);
     if (!gpiValueForKey(input, "\\profile\\", buffer, 0x400)) {
         GPI_BAD_MESSAGE(connection);
     }
@@ -376,7 +376,7 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
     if (!profile->blocked && !profile->deleted) {
         buddyStatusInfo = profile->buddyStatusInfo;
         if (buddyStatusInfo == NULL) {
-            profile->buddyStatusInfo = func_ov011_0216dddc(sizeof(GPIBuddyStatusInfo));
+            profile->buddyStatusInfo = gsimalloc(sizeof(GPIBuddyStatusInfo));
             if (profile->buddyStatusInfo == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -428,30 +428,30 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
             GPI_BAD_MESSAGE(connection);
         }
         buddyStatusInfo->sessionFlags = atol(buffer);
-        func_ov011_0216ddfc(buddyStatusInfo->richStatus);
+        gsifree(buddyStatusInfo->richStatus);
         buddyStatusInfo->richStatus = NULL;
         if (!gpiValueForKey(input, "\\rstatus\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->richStatus = func_ov011_0216e2c8(buffer);
-        func_ov011_0216ddfc(buddyStatusInfo->gameType);
+        buddyStatusInfo->richStatus = goastrdup(buffer);
+        gsifree(buddyStatusInfo->gameType);
         buddyStatusInfo->gameType = NULL;
         if (!gpiValueForKey(input, "\\gameType\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->gameType = func_ov011_0216e2c8(buffer);
-        func_ov011_0216ddfc(buddyStatusInfo->gameVariant);
+        buddyStatusInfo->gameType = goastrdup(buffer);
+        gsifree(buddyStatusInfo->gameVariant);
         buddyStatusInfo->gameVariant = NULL;
         if (!gpiValueForKey(input, "\\gameVnt\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->gameVariant = func_ov011_0216e2c8(buffer);
-        func_ov011_0216ddfc(buddyStatusInfo->gameMapName);
+        buddyStatusInfo->gameVariant = goastrdup(buffer);
+        gsifree(buddyStatusInfo->gameMapName);
         buddyStatusInfo->gameMapName = NULL;
         if (!gpiValueForKey(input, "\\gameMn\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->gameMapName = func_ov011_0216e2c8(buffer);
+        buddyStatusInfo->gameMapName = goastrdup(buffer);
         if (!gpiValueForKey(input, "\\product\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
@@ -462,7 +462,7 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
         buddyStatusInfo->quietModeFlags = atol(buffer);
         callback = iconnection->callbacks[2];
         if (callback.callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPRecvBuddyStatusArg));
+            arg = gsimalloc(sizeof(GPRecvBuddyStatusArg));
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -523,7 +523,7 @@ int gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
         }
-        profile->buddyStatus = func_ov011_0216dddc(sizeof(GPIBuddyStatus));
+        profile->buddyStatus = gsimalloc(sizeof(GPIBuddyStatus));
         if (profile->buddyStatus == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -620,7 +620,7 @@ int gpiBuddyHandleKeyRequest(GPConnection *connection, GPIPeer *peer) {
         return result;
     }
     if (strcmp(message, "") != 0) {
-        func_ov011_0216ddfc(message);
+        gsifree(message);
     }
     return 0;
 }
@@ -663,7 +663,7 @@ int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer
             return 0;
         }
         if (op->state == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
-            arg = func_ov011_0216dddc(sizeof(GPGetBuddyStatusInfoKeysArg));
+            arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
             callbackNone.callback = op->callback;
             callbackNone.param = op->userData;
             arg->keys = NULL;
@@ -690,7 +690,7 @@ int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer
                 return 0;
             }
             if (op->state == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
-                arg = func_ov011_0216dddc(sizeof(GPGetBuddyStatusInfoKeysArg));
+                arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
                 callbackEmpty.callback = op->callback;
                 callbackEmpty.param = op->userData;
                 arg->keys = NULL;
@@ -701,16 +701,16 @@ int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer
                 gpiPeerRemoveOp(peer, op);
             }
         } else {
-            keys = func_ov011_0216dddc(numKeys * sizeof(char *));
-            values = func_ov011_0216dddc(numKeys * sizeof(char *));
+            keys = gsimalloc(numKeys * sizeof(char *));
+            values = gsimalloc(numKeys * sizeof(char *));
             for (i = 0; i < numKeys; i++) {
                 gpiReadKeyAndValue(connection, buffer, &index, key, value);
-                func_ov011_0216e720(key, keyDecoded, strlen(key), &decodedLength, 2);
+                B64Decode(key, keyDecoded, strlen(key), &decodedLength, 2);
                 keyDecoded[decodedLength] = '\0';
-                func_ov011_0216e720(value, valueDecoded, strlen(value), &decodedLength, 2);
+                B64Decode(value, valueDecoded, strlen(value), &decodedLength, 2);
                 valueDecoded[decodedLength] = '\0';
-                keys[i] = func_ov011_0216e2c8(keyDecoded);
-                values[i] = func_ov011_0216e2c8(valueDecoded);
+                keys[i] = goastrdup(keyDecoded);
+                values[i] = goastrdup(valueDecoded);
                 if (gpiStatusInfoGetKey(connection, profile->buddyStatusInfo->extendedInfoKeys, keyDecoded,
                                         &keyValue) == 0 &&
                     keyValue == NULL) {
@@ -726,7 +726,7 @@ int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer
                 return 0;
             }
             if (op->state == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
-                arg = func_ov011_0216dddc(sizeof(GPGetBuddyStatusInfoKeysArg));
+                arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
                 callbackKeys.callback = op->callback;
                 callbackKeys.param = op->userData;
                 arg->numKeys = numKeys;
@@ -760,7 +760,7 @@ int gpiAuthBuddyRequest(GPConnection *connection, int profile) {
     }
     pProfile->requestCount--;
     if (!iconnection->infoCaching && pProfile->requestCount <= 0) {
-        func_ov011_0216ddfc(pProfile->authSig);
+        gsifree(pProfile->authSig);
         pProfile->authSig = NULL;
         if (gpiCanFreeProfile(pProfile)) {
             gpiRemoveProfile(connection, pProfile);
@@ -804,11 +804,11 @@ int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest
     buddyStatus = pProfile->buddyStatus;
     if (buddyStatus != NULL) {
         index = buddyStatus->buddyIndex;
-        func_ov011_0216ddfc(buddyStatus->statusString);
+        gsifree(buddyStatus->statusString);
         pProfile->buddyStatus->statusString = NULL;
-        func_ov011_0216ddfc(pProfile->buddyStatus->locationString);
+        gsifree(pProfile->buddyStatus->locationString);
         pProfile->buddyStatus->locationString = NULL;
-        func_ov011_0216ddfc(pProfile->buddyStatus);
+        gsifree(pProfile->buddyStatus);
         pProfile->buddyStatus = NULL;
         iconnection->profileList.numBuddies--;
         gpiProfileMap(connection, gpiFixBuddyIndices, (void *)index);
@@ -816,13 +816,13 @@ int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest
     buddyStatusInfo = pProfile->buddyStatusInfo;
     if (buddyStatusInfo != NULL) {
         index = buddyStatusInfo->buddyIndex;
-        func_ov011_0216ddfc(buddyStatusInfo->richStatus);
+        gsifree(buddyStatusInfo->richStatus);
         pProfile->buddyStatusInfo->richStatus = NULL;
-        func_ov011_0216ddfc(pProfile->buddyStatusInfo->gameType);
+        gsifree(pProfile->buddyStatusInfo->gameType);
         pProfile->buddyStatusInfo->gameType = NULL;
-        func_ov011_0216ddfc(pProfile->buddyStatusInfo->gameVariant);
+        gsifree(pProfile->buddyStatusInfo->gameVariant);
         pProfile->buddyStatusInfo->gameVariant = NULL;
-        func_ov011_0216ddfc(pProfile->buddyStatusInfo->gameMapName);
+        gsifree(pProfile->buddyStatusInfo->gameMapName);
         pProfile->buddyStatusInfo->gameMapName = NULL;
         // BUG: the status info is freed and its pointer cleared before its keys are, so the keys are read through
         // NULL and never freed
@@ -831,10 +831,10 @@ int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest
             func_ov011_02171558(pProfile->buddyStatusInfo->extendedInfoKeys);
             pProfile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
-        func_ov011_0216ddfc(pProfile->buddyStatusInfo);
+        gsifree(pProfile->buddyStatusInfo);
         pProfile->buddyStatusInfo = NULL;
 #else
-        func_ov011_0216ddfc(pProfile->buddyStatusInfo);
+        gsifree(pProfile->buddyStatusInfo);
         pProfile->buddyStatusInfo = NULL;
         if (pProfile->buddyStatusInfo->extendedInfoKeys != NULL) {
             func_ov011_02171558(pProfile->buddyStatusInfo->extendedInfoKeys);

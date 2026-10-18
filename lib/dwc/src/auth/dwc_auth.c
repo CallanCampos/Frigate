@@ -31,10 +31,10 @@ static const char *sAuthNamespaces[] = { "ns1=\"http://gamespy.net/AuthService/\
 char gAuthUrl[128];
 
 static BOOL Auth_PrepareUrl(void) {
-    if (data_ov011_02190698 == 1) {
+    if (__GSIACResult == 1) {
         if (gAuthUrl[0] == '\0') {
             OS_SNPrintf(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                        data_ov011_0219069c);
+                        __GSIACGamename);
         }
         return TRUE;
     }
@@ -42,14 +42,14 @@ static BOOL Auth_PrepareUrl(void) {
 }
 
 char *Auth_GetUrl(void) {
-    if (data_ov011_02190698 == 1) {
+    if (__GSIACResult == 1) {
         if (gAuthUrl[0] == '\0') {
             OS_SNPrintf(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                        data_ov011_0219069c);
+                        __GSIACGamename);
         }
         return gAuthUrl;
     }
-    func_ov011_0216cca8(0, 3, 1, "No availability\r\n");
+    gsDebugFormat(0, 3, 1, "No availability\r\n");
     return NULL;
 }
 
@@ -59,19 +59,19 @@ static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *us
     HashContext context;
 
     if (status == 0) {
-        if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, "LoginRemoteAuthResult") ||
-            !func_ov011_02171090(reader, "responseCode", &result.responseCode)) {
+        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "LoginRemoteAuthResult") ||
+            !gsXmlReadChildAsInt(reader, "responseCode", &result.responseCode)) {
             result.error = AUTH_ERROR_BAD_RESPONSE;
         } else if (result.responseCode != 0) {
             result.error = 7;
-        } else if (!func_ov011_02170db8(reader, "certificate") || !Auth_ReadCertificate(&result.certificate, reader) ||
-                   !func_ov011_02170d70(reader) ||
-                   !func_ov011_02171330(reader, "peerkeyprivate", &result.keys.privateKey)) {
+        } else if (!gsXmlMoveToChild(reader, "certificate") || !Auth_ReadCertificate(&result.certificate, reader) ||
+                   !gsXmlMoveToParent(reader) ||
+                   !gsXmlReadChildAsLargeInt(reader, "peerkeyprivate", &result.keys.privateKey)) {
             result.error = AUTH_ERROR_BAD_RESPONSE;
         } else {
             memcpy(&result.keys.modulus, &result.certificate.peerKeyModulus, sizeof(BigNum));
             func_ov011_021719fc(&context);
-            func_ov011_0216dd04(&result.keys.privateKey, &context);
+            gsLargeIntAddToMD5(&result.keys.privateKey, &context);
             func_ov011_02171a9c(result.keys.proof, &context);
             result.certificate.valid = Auth_CheckCertificate(&result.certificate);
             if (!result.certificate.valid) {
@@ -86,7 +86,7 @@ static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *us
     if (request->func != NULL) {
         request->func(status, &result, request->userData);
     }
-    func_ov011_0216ddfc(request);
+    gsifree(request);
 }
 
 int wsLoginRemoteAuth(int partnerCode, int namespaceId, const char *authToken, const char *challenge,
@@ -97,29 +97,29 @@ int wsLoginRemoteAuth(int partnerCode, int namespaceId, const char *authToken, c
     if (!Auth_PrepareUrl()) {
         return AUTH_ERROR_NOT_AVAILABLE;
     }
-    request = func_ov011_0216dddc(sizeof(AuthRequest));
+    request = gsimalloc(sizeof(AuthRequest));
     if (request == NULL) {
         return AUTH_ERROR_NO_MEMORY;
     }
     request->func = func;
     request->userData = userData;
-    writer = func_ov011_0216fbf8(sAuthNamespaces, 1);
+    writer = gsXmlCreateStreamWriter(sAuthNamespaces, 1);
     if (writer == NULL) {
         return AUTH_ERROR_NO_MEMORY;
     }
-    if (!func_ov011_02170614(writer, "ns1", "LoginRemoteAuth") || !func_ov011_02170818(writer, "ns1", "version", 1) ||
-        !func_ov011_02170818(writer, "ns1", "partnercode", partnerCode) ||
-        !func_ov011_02170818(writer, "ns1", "namespaceid", namespaceId) ||
-        !func_ov011_021706b8(writer, "ns1", "authtoken", authToken) ||
-        !func_ov011_021706b8(writer, "ns1", "challenge", challenge) ||
-        !func_ov011_02170660(writer, "ns1", "LoginRemoteAuth") || !func_ov011_0216fea8(writer)) {
-        func_ov011_0216fe64(writer);
+    if (!gsXmlWriteOpenTag(writer, "ns1", "LoginRemoteAuth") || !gsXmlWriteIntElement(writer, "ns1", "version", 1) ||
+        !gsXmlWriteIntElement(writer, "ns1", "partnercode", partnerCode) ||
+        !gsXmlWriteIntElement(writer, "ns1", "namespaceid", namespaceId) ||
+        !gsXmlWriteStringElement(writer, "ns1", "authtoken", authToken) ||
+        !gsXmlWriteStringElement(writer, "ns1", "challenge", challenge) ||
+        !gsXmlWriteCloseTag(writer, "ns1", "LoginRemoteAuth") || !gsXmlCloseWriter(writer)) {
+        gsXmlFreeWriter(writer);
         return AUTH_ERROR_NO_MEMORY;
     }
-    if (func_ov011_0216ea4c(gAuthUrl, "SOAPAction: \"http://gamespy.net/AuthService/LoginRemoteAuth\"", writer,
-                            Auth_OnResponse, request) == NULL) {
-        func_ov011_0216fe64(writer);
-        func_ov011_0216ddfc(request);
+    if (gsiExecuteSoap(gAuthUrl, "SOAPAction: \"http://gamespy.net/AuthService/LoginRemoteAuth\"", writer,
+                       Auth_OnResponse, request) == NULL) {
+        gsXmlFreeWriter(writer);
+        gsifree(request);
         return AUTH_ERROR_NO_MEMORY;
     }
     return 0;
@@ -153,34 +153,36 @@ BOOL Auth_CheckCertificate(AuthCertificate *certificate) {
     func_ov011_02171a24(&context, certificate->profileNick, strlen(certificate->profileNick));
     func_ov011_02171a24(&context, certificate->uniqueNick, strlen(certificate->uniqueNick));
     func_ov011_02171a24(&context, certificate->cdkeyHash, strlen(certificate->cdkeyHash));
-    func_ov011_0216dd04(&certificate->peerKeyModulus, &context);
-    func_ov011_0216dd04(&certificate->peerKeyExponent, &context);
+    gsLargeIntAddToMD5(&certificate->peerKeyModulus, &context);
+    gsLargeIntAddToMD5(&certificate->peerKeyExponent, &context);
     func_ov011_02171a24(&context, certificate->serverData, sizeof(certificate->serverData));
     func_ov011_02171a9c(digest, &context);
-    func_ov011_0216dc38(&key.modulus, sPublicKeyModulus);
-    func_ov011_0216dc38(&key.exponent, sPublicKeyExponent);
-    if (func_ov011_0216cac0(&key, digest, sizeof(digest), certificate->signature, sizeof(certificate->signature)) !=
-        0) {
+    gsLargeIntSetFromHexString(&key.modulus, sPublicKeyModulus);
+    gsLargeIntSetFromHexString(&key.exponent, sPublicKeyExponent);
+    if (gsCryptRSAVerifySignedHash(&key, digest, sizeof(digest), certificate->signature,
+                                   sizeof(certificate->signature)) != 0) {
         return FALSE;
     }
     return TRUE;
 }
 
 BOOL Auth_WriteCertificate(const AuthCertificate *certificate, const char *prefix, SoapWriter *writer) {
-    if (!func_ov011_02170818(writer, prefix, "length", certificate->length) ||
-        !func_ov011_02170818(writer, prefix, "version", certificate->version) ||
-        !func_ov011_02170818(writer, prefix, "partnercode", certificate->partnerCode) ||
-        !func_ov011_02170818(writer, prefix, "namespaceid", certificate->namespaceId) ||
-        !func_ov011_02170818(writer, prefix, "userid", certificate->userId) ||
-        !func_ov011_02170818(writer, prefix, "profileid", certificate->profileId) ||
-        !func_ov011_02170818(writer, prefix, "expiretime", certificate->expireTime) ||
-        !func_ov011_0217071c(writer, prefix, "profilenick", certificate->profileNick) ||
-        !func_ov011_0217071c(writer, prefix, "uniquenick", certificate->uniqueNick) ||
-        !func_ov011_0217071c(writer, prefix, "cdkeyhash", certificate->cdkeyHash) ||
-        !func_ov011_02170a80(writer, prefix, "peerkeymodulus", &certificate->peerKeyModulus) ||
-        !func_ov011_02170a80(writer, prefix, "peerkeyexponent", &certificate->peerKeyExponent) ||
-        !func_ov011_0217090c(writer, prefix, "serverdata", certificate->serverData, sizeof(certificate->serverData)) ||
-        !func_ov011_0217090c(writer, prefix, "signature", certificate->signature, sizeof(certificate->signature))) {
+    if (!gsXmlWriteIntElement(writer, prefix, "length", certificate->length) ||
+        !gsXmlWriteIntElement(writer, prefix, "version", certificate->version) ||
+        !gsXmlWriteIntElement(writer, prefix, "partnercode", certificate->partnerCode) ||
+        !gsXmlWriteIntElement(writer, prefix, "namespaceid", certificate->namespaceId) ||
+        !gsXmlWriteIntElement(writer, prefix, "userid", certificate->userId) ||
+        !gsXmlWriteIntElement(writer, prefix, "profileid", certificate->profileId) ||
+        !gsXmlWriteIntElement(writer, prefix, "expiretime", certificate->expireTime) ||
+        !gsXmlWriteAsciiStringElement(writer, prefix, "profilenick", certificate->profileNick) ||
+        !gsXmlWriteAsciiStringElement(writer, prefix, "uniquenick", certificate->uniqueNick) ||
+        !gsXmlWriteAsciiStringElement(writer, prefix, "cdkeyhash", certificate->cdkeyHash) ||
+        !gsXmlWriteLargeIntElement(writer, prefix, "peerkeymodulus", &certificate->peerKeyModulus) ||
+        !gsXmlWriteLargeIntElement(writer, prefix, "peerkeyexponent", &certificate->peerKeyExponent) ||
+        !gsXmlWriteHexBinaryElement(writer, prefix, "serverdata", certificate->serverData,
+                                    sizeof(certificate->serverData)) ||
+        !gsXmlWriteHexBinaryElement(writer, prefix, "signature", certificate->signature,
+                                    sizeof(certificate->signature))) {
         return FALSE;
     }
     return TRUE;
@@ -190,22 +192,24 @@ static BOOL Auth_ReadCertificate(AuthCertificate *certificate, SoapReader *reade
     int size;
     char text[0x101];
 
-    if (!func_ov011_02171090(reader, "length", &certificate->length) ||
-        !func_ov011_02171090(reader, "version", &certificate->version) ||
-        !func_ov011_02171090(reader, "partnercode", &certificate->partnerCode) ||
-        !func_ov011_02171090(reader, "namespaceid", &certificate->namespaceId) ||
-        !func_ov011_02171090(reader, "userid", &certificate->userId) ||
-        !func_ov011_02171090(reader, "profileid", &certificate->profileId) ||
-        !func_ov011_02171090(reader, "expiretime", &certificate->expireTime) ||
-        !func_ov011_02170e90(reader, "profilenick", certificate->profileNick, sizeof(certificate->profileNick)) ||
-        !func_ov011_02170e90(reader, "uniquenick", certificate->uniqueNick, sizeof(certificate->uniqueNick)) ||
-        !func_ov011_02170e90(reader, "cdkeyhash", certificate->cdkeyHash, sizeof(certificate->cdkeyHash)) ||
-        !func_ov011_02170e90(reader, "peerkeymodulus", text, sizeof(text)) ||
-        !func_ov011_0216dc38(&certificate->peerKeyModulus, text) ||
-        !func_ov011_02170e90(reader, "peerkeyexponent", text, sizeof(text)) ||
-        !func_ov011_0216dc38(&certificate->peerKeyExponent, text) ||
-        !func_ov011_02170ed8(reader, "serverdata", certificate->serverData, sizeof(certificate->serverData), &size) ||
-        !func_ov011_02170ed8(reader, "signature", certificate->signature, sizeof(certificate->signature), &size)) {
+    if (!gsXmlReadChildAsInt(reader, "length", &certificate->length) ||
+        !gsXmlReadChildAsInt(reader, "version", &certificate->version) ||
+        !gsXmlReadChildAsInt(reader, "partnercode", &certificate->partnerCode) ||
+        !gsXmlReadChildAsInt(reader, "namespaceid", &certificate->namespaceId) ||
+        !gsXmlReadChildAsInt(reader, "userid", &certificate->userId) ||
+        !gsXmlReadChildAsInt(reader, "profileid", &certificate->profileId) ||
+        !gsXmlReadChildAsInt(reader, "expiretime", &certificate->expireTime) ||
+        !gsXmlReadChildAsStringNT(reader, "profilenick", certificate->profileNick, sizeof(certificate->profileNick)) ||
+        !gsXmlReadChildAsStringNT(reader, "uniquenick", certificate->uniqueNick, sizeof(certificate->uniqueNick)) ||
+        !gsXmlReadChildAsStringNT(reader, "cdkeyhash", certificate->cdkeyHash, sizeof(certificate->cdkeyHash)) ||
+        !gsXmlReadChildAsStringNT(reader, "peerkeymodulus", text, sizeof(text)) ||
+        !gsLargeIntSetFromHexString(&certificate->peerKeyModulus, text) ||
+        !gsXmlReadChildAsStringNT(reader, "peerkeyexponent", text, sizeof(text)) ||
+        !gsLargeIntSetFromHexString(&certificate->peerKeyExponent, text) ||
+        !gsXmlReadChildAsHexBinary(reader, "serverdata", certificate->serverData, sizeof(certificate->serverData),
+                                   &size) ||
+        !gsXmlReadChildAsHexBinary(reader, "signature", certificate->signature, sizeof(certificate->signature),
+                                   &size)) {
         return FALSE;
     }
     return TRUE;

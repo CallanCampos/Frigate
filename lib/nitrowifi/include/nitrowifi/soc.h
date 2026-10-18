@@ -90,6 +90,12 @@ typedef struct SocAddrIn {
     u16 port;
     u32 addr;
 } SocAddrIn;
+// A socket address of any family, which an address in network order (SocAddrIn) is one of
+typedef struct SocSockAddr {
+    u8 len;
+    u8 family;
+    u8 data[6];
+} SocSockAddr;
 typedef struct SocHostEnt {
     char *name;
     char **aliases;
@@ -188,6 +194,12 @@ int SOCL_Startup(SOCLConfig *config);
 extern SOCLConfig *SOCLiConfigPtr;
 // The wait between CPS's yields, which DWC's AC sets to 4 before SOC_Startup
 extern u32 SOCLiYieldWait;
+// TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
+// (gsiCloseSocketSecure, SOC_Close's caller in DWC's GameSpy code, asks it after a failed close; no counterpart in
+// pokediamond's NitroWiFi)
+BOOL SOCL_IsNotClosing(int socket);
+// The address of the host (socl_cleanup.c), which DWC's GameSpy code also gives as the local host's
+CPSInAddr SOCL_GetHostID(void);
 // Asks the sockets to close; SOCL_EINPROGRESS (nonzero) while it has not finished
 int SOCL_CalmDown(void);
 // Reads param synchronously without retaining its pointer. Owned buffer/pipe storage is in the socket allocation;

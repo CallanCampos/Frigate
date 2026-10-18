@@ -10,9 +10,9 @@ static int gpiStatusInfoKeyCompFunc(const void *elem1, const void *elem2);
 void gpiStatusInfoKeyFree(void *element) {
     GPIKey *key = element;
 
-    func_ov011_0216ddfc(key->keyName);
+    gsifree(key->keyName);
     key->keyName = NULL;
-    func_ov011_0216ddfc(key->keyValue);
+    gsifree(key->keyValue);
     key->keyValue = NULL;
 }
 
@@ -51,8 +51,8 @@ int gpiStatusInfoAddKey(GPConnection *connection, DArray *keys, const char *keyN
         gpiSetErrorString(connection, "Invalid key value");
         return 2;
     }
-    key.keyName = func_ov011_0216e2c8(keyName);
-    key.keyValue = func_ov011_0216e2c8(keyValue);
+    key.keyName = goastrdup(keyName);
+    key.keyValue = goastrdup(keyValue);
     func_ov011_02171600(keys, &key, gpiStatusInfoKeyCompFunc);
     return 0;
 }
@@ -66,14 +66,14 @@ int gpiStatusInfoSetKey(GPConnection *connection, DArray *keys, const char *keyN
         gpiSetErrorString(connection, "Invalid key name");
         return 2;
     }
-    key.keyName = func_ov011_0216e2c8(keyName);
+    key.keyName = goastrdup(keyName);
     index = func_ov011_021716ac(keys, &key, gpiStatusInfoKeyCompFunc, 0, 1);
     if (index != -1) {
         found = func_ov011_0217158c(keys, index);
-        func_ov011_0216ddfc(found->keyValue);
-        found->keyValue = func_ov011_0216e2c8(newValue);
+        gsifree(found->keyValue);
+        found->keyValue = goastrdup(newValue);
     }
-    func_ov011_0216ddfc(key.keyName);
+    gsifree(key.keyName);
     key.keyName = NULL;
     return 0;
 }
@@ -86,12 +86,12 @@ int gpiStatusInfoGetKey(GPConnection *connection, DArray *keys, const char *keyN
         gpiSetErrorString(connection, "Invalid key name");
         return 2;
     }
-    key.keyName = func_ov011_0216e2c8(keyName);
+    key.keyName = goastrdup(keyName);
     index = func_ov011_021716ac(keys, &key, gpiStatusInfoKeyCompFunc, 0, 1);
     if (index != -1) {
         *keyValue = ((GPIKey *)func_ov011_0217158c(keys, index))->keyValue;
     }
-    func_ov011_0216ddfc(key.keyName);
+    gsifree(key.keyName);
     key.keyName = NULL;
     return 0;
 }
@@ -120,9 +120,9 @@ int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
         value = key->keyValue;
         len += nameLength + 2 + GPI_B64_LENGTH((u32)strlen(value));
     }
-    *buffer = func_ov011_0216dddc(len + strlen(keysHeader) + 1);
+    *buffer = gsimalloc(len + strlen(keysHeader) + 1);
     if (*buffer == NULL) {
-        func_ov011_0216cca8(1, 2, 1, "gpiSaveKeysToBuffer: buffer Out of memory.");
+        gsDebugFormat(1, 2, 1, "gpiSaveKeysToBuffer: buffer Out of memory.");
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
     }
@@ -132,13 +132,13 @@ int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
         strcat(pos, "\\");
         pos++;
         name = key->keyName;
-        func_ov011_0216e878(name, pos, strlen(name), 2);
+        B64Encode(name, pos, strlen(name), 2);
         name = key->keyName;
         pos += GPI_B64_LENGTH((u32)strlen(name));
         strcat(pos, "\\");
         pos++;
         value = key->keyValue;
-        func_ov011_0216e878(value, pos, strlen(value), 2);
+        B64Encode(value, pos, strlen(value), 2);
         value = key->keyValue;
         pos += GPI_B64_LENGTH((u32)strlen(value));
     }
