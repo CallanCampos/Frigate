@@ -29,56 +29,86 @@ level that doesn't exist yet says "not yet"; no field is left out.
 ## 2026-10-17: the sound against the oracle
 
 - **Upstream:** `aae2a03f6` (merge of PR #361), as merged into the port's `main` by `f5f498a89`.
-- **Port:** `PORT_SHA`, on the branch `port-sound-oracle` from `4a0fa7d89` (not yet merged or pushed).
-- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `ninja` has no work after the commits. Nothing
-  outside `port/` changed, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Port:** `PORT_SHA`, on the branch `port-sound-oracle` from `4a0fa7d89` (not yet merged or pushed): the work in
+  `4e0509a8c` and `8bc14a893`, and the fixes from two reviews of it in the commit after them (2026-10-18).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `python3 configure.py && ninja` after the fixes
+  only checks the two ROMs. Nothing outside `port/` changed, so no game-changes row and no `check_mwcc_neutral.py`
+  run.
 - **Host build:** arm64 macOS, RelWithDebInfo, Black 2 and White 2; the oracle (`port/tools/oracle`, melonDS 1.1)
-  Release. Not pushed, so no CI run (Linux unbuilt).
-- **Tests:** T0 as above. T2: Black 2, 232 of 232 `ctest` tests pass; White 2, 230 of 230 (the oracle built from
-  this branch and put in each build's `oracle/`, so no oracle test skips). New: `oracle_sound_tool` (24 tests of
-  `sound.py` on made-up traces and dumps), `os_timed_work`, `snd_fifo`, `snd_pxi_alarm_timing` (each alarm's handler
-  at its cycle; without the fix every one comes at the VBlank), `snd_trace_layout`; `oracle_boot` now also holds the
-  oracle's WAV dump and sound trace to determinism and their timing. T4: `oracle_sound_opening` and
-  `oracle_sound_title` in both versions (below), and their port-only checks `oracle_sound_<name>_hashes` (9,639 and
-  1,957 runs, 75 and 354 frames of status, 3 segments each, 1 and 2 of them to the bit); the screen sequences
-  `oracle_opening` and `oracle_title` still pass in both versions. T3: `replay_start_menu` and `replay_new_game` pass
-  (among the 232). T5, T6, T7 not yet; no sanitized run on this branch.
+  Release, built from this branch and put in each build's `oracle/`. Not pushed, so no CI run (Linux unbuilt).
+- **Tests:** T0 as above. T2, full runs after the last change, with the oracle built from this branch in each build's
+  `oracle/`, so no oracle test skips: Black 2, 233 of 233 `ctest` tests pass; White 2, 231 of 231. New:
+  `oracle_sound_tool` (38 tests of `sound.py` on made-up traces and dumps), `os_timed_work`, `snd_fifo`,
+  `snd_pxi_alarm_timing` (each alarm's handler at its cycle, and an alarm for no ticks at once; without the fixes they
+  come at the VBlank), `snd_timer_write` (a write to SOUNDxTMR mid-note, worked out by hand from GBATEK's and
+  melonDS's timer; it fails on the timer as first built), `snd_trace_layout`; `oracle_boot` now also holds the
+  oracle's WAV dump and sound trace to determinism and their timing, each record in the frame whose VBlank comes
+  next. `snd_rom_sequences` is a change detector: its hashes are the port's own, made again for the new sound unit,
+  and say nothing about fidelity. T4: `oracle_sound_opening` and `oracle_sound_title` in both versions (below), and
+  their port-only checks `oracle_sound_<name>_hashes` (9,639 and 1,957 runs with each play's runs, 75 and 355 frames
+  of status, White 2 354, 3 segments each, 1 and 2 of them to the bit); the screen sequences `oracle_opening` and
+  `oracle_title` still pass in both versions. T3: `replay_start_menu` and, in Black 2, `replay_new_game` pass (among
+  the T2 tests). T5, T6, T7 not yet: the fidelity review's ASan and UBSan run of the `snd_` scenarios and both
+  sequences, at `2ecc85a85` (the same tree as `8bc14a893`), was clean but for the known `g2d_CellAnimation.c:33`
+  misalignment; the fixes after it haven't run sanitized.
 - **Tiers** (`port/tools/progress`, upstream `aae2a03f6`): (a) 32,254 functions, 2,892,792 code bytes (75.1%); (b)
   5,172, 609,116 bytes; (c) 3,592, 348,336 bytes (9.0%). Since the last entry (`615939e25`): (a) +23 functions and
   10,838 bytes, from (b); (c) unchanged. Upstream's matching, merged by `f5f498a89`; this branch changes no decomp C.
 - **Trap stubs:** 624 function stubs and 56 data placeholders in both versions (`gen_stubs`, each build above), from
   574 and 63 at `615939e25`: upstream's C since then (overlay 12's data among it) references more functions it doesn't
   define yet. Neither sequence reaches one.
-- **64-bit warnings:** not measured again: this branch changes no game or `lib/` code (the last measurement, at
-  `615939e25`, stands for the decomp's side).
+- **64-bit warnings:** game / `lib/` on arm64 (`port/tools/compile-probe`, its arm64 host pass, at this branch's base
+  `4a0fa7d89`, whose `src/`, `lib/` and `include/` the branch doesn't change): `-Wpointer-to-int-cast` 865 / 184,
+  `-Wvoid-pointer-to-int-cast` 52 / 117, `-Wint-to-pointer-cast` 76 / 144, `-Wint-to-void-pointer-cast` 69 / 132, the
+  same as at `615939e25`. That pass doesn't define `PLATFORM_PC`, where `uptr` is `u32`, so it still counts the three
+  `btlv_input.c` casts that `4a0fa7d89` made `uptr`; upstream's merge added none.
 - **Work done:** T4 for the sound (ADR 0006's "Revisit the output's 16-bit scaling against the oracle"),
   [port/tools/oracle/README.md, "Sound"](../tools/oracle/README.md#sound).
   - The oracle writes melonDS's mixed output sample by sample (`--audio-dump`, before melonDS resamples it) and the
     ARM7 sound driver's state after each run of its thread (`--sound-trace`, `sndtrace.h`: the driver's work in the
     DS's layout, read from the ARM7's WRAM once its thread waits again); the port writes the same trace
     (`--sound-trace`, `port/app/sound_trace.c`, `port_snd7_trace_record`). `sound.py` compares them: each play of
-    each player by the sequence's own clock (the periodic runs since its start), field by field; what the ARM9 sees
-    of the driver as each frame ends where the game counts passes; and the sound by segment (envelope correlation,
-    RMS, peak, samples at full scale; streams and cries to the bit). `oracle.py sound` and `sound-check`, ctest
-    `oracle_sound_<name>` and `oracle_sound_<name>_hashes`, with references for both sequences in both versions.
-  - Results: every run paired is equal, field by field (opening: 9,639 runs and 6,279,801 fields in each version;
-    title: 1,957 and 636,043 before START's press); every frame on the count but the declared ones is equal or a run
-    apart (opening: 579 of 579 equal; title: 2,791 equal and 1 a run apart of 2,792 in Black 2, 2,789 and 2 of 2,791
-    in White 2, the DS's long loading passes and Kyurem's cry left out); the title's stream and the cry are melonDS's
-    to the bit (2,170,736 and 117,070 samples), the sequences' music within its envelope (correlation 0.989, RMS
-    within 0.05%), its notes starting in the same mixer sample as on the DS or up to 4 later (the DS's ARM7 writes
-    its registers some way into a run).
+    each player by the sequence's own clock (the periodic runs since its start), field by field, with every run on
+    both programs (a play that ends earlier or later fails); what the ARM9 sees of the driver as each frame's VBlank
+    comes, where the game counts passes; and the sound by segment (envelope correlation, RMS, peak, samples at full
+    scale and in which seconds, the share of samples equal at the best offset; streams and cries to the bit).
+    `oracle.py sound` and `sound-check`, ctest `oracle_sound_<name>` and `oracle_sound_<name>_hashes`, with
+    references for both sequences in both versions.
+  - Results: every run paired is equal, field by field, and no run is on one program only (opening: 9,639 runs and
+    6,279,801 fields in each version; title: 1,957 and 636,043 up to START's press, after which 4,940 of the DS's
+    runs of the opening's music and 26 of the port's are left out, White 2 4,706 and 26); every frame on the count
+    but the declared ones is equal or a run apart (opening: 579 of 579 equal; title: 2,791 equal and 1 a run apart of
+    2,792 in Black 2, 2,790 of 2,790 in White 2, the DS's long loading passes and Kyurem's cry left out). No frame on
+    the count has a player active, so the frames hold the locks, alarms, shared work and the ARM9's own channels, and
+    the run-by-run comparison holds the players and tracks. The title's stream and the cry are melonDS's to the bit
+    (2,170,736 and 117,070 samples); the sequences' music matches in its envelope (correlation 0.989, RMS within
+    0.05%) but not to the sample: the DS's notes start 1 to 5 mixer samples after its periodic alarm (Black 2's
+    opening music: 43, 232, 147, 8 and 3 notes), the port's in the first, so 15.6% of the music's samples are the
+    DS's at the best offset (White 2 10.3%) and 89.8% of the logo's (36.2%).
   - Fixes from the comparison: the sound alarms are the OS core's timed work (`port_os_set_timed_work`, new), so
     their words reach the ARM9 when they go off; lazily at the VBlank, two or three came together and NitroSystem's
     stream player dropped a block every 7 frames or so, playing silence and falling 27 frames behind the DS's music
     in 420. The sound unit has melonDS's start delays (3 timer steps for PCM, 11 for IMA-ADPCM, 1 for a square wave
     or noise), its 8-word FIFO, the channel's step before the mixer's sample, GBATEK's mixer widths and 127 counting
     as 128; and the lock words' addresses in `snd7_exchannel.c`'s comment are the right way round.
+  - Fixes from the reviews (2026-10-18): a channel's timer counts on through a write to SOUNDxTMR and reloads at its
+    next overflow, as the hardware and melonDS do, where it had counted each step from its start against the current
+    period, which moved a note's phase whenever an LFO, a sweep or a bend changed its pitch (most of the opening's
+    notes; it changed 0.8% of the music's samples and, of the six ROM sequences that `snd_rom_sequences` plays, only
+    the Pokemon Center's music); an alarm for no ticks goes off at once, not at the next VBlank; `sound.py` fails a
+    run or a play on one program only, inside a window up to the press, and the references keep each play's runs; the
+    oracle stamps a record with the frame whose VBlank comes next (melonDS's frame runs on to line 262), which
+    `oracle_boot` checks on the oracle's traces and `sound-check` on the port's, and which turned up White 2's port
+    frame 3214 (the cry still playing on the DS, now declared) and made Black 2's 3218 a run apart; the trace has the
+    sample by which a periodic run began, so note starts are measured from each program's alarm, not from the
+    earliest; and the docs say the output is 16 bits on the DS's 10-bit scale, not 10 bits.
   - The clipping in the opening's music is the game's: melonDS clips it in the same seconds, as often (Black 2:
-    2,277 samples at full scale on the oracle, 2,271 on the port, at most 440 and 421 a second; White 2: 2,301 and
-    2,271), on the same scale (the DS's 10 bits times 64). The port had 2,007 before 127 counted as 128.
-- **Next:** as the last entry (overlay 12's field script data, upstream). For the sound: a comparison sequence that
-  plays sound effects and a cry through the field once phase 3 reaches it.
+    2,277 samples at full scale on the oracle, 2,271 on the port, in seconds 24 to 57, at most 440 and 421 a second;
+    White 2: 2,301 and 2,271, at most 434 and 421), on the same scale: 16 bits on the scale of the DS's 10 bits times
+    64, neither program cutting the low 6 bits. The port had 2,007 before 127 counted as 128.
+- **Next:** as the last entry (overlay 12's field script data, upstream). For the sound: a comparison sequence where a
+  player plays on the game's count (sound effects and a cry through the field once phase 3 reaches it), so that the
+  frame-by-frame status holds a player's state too.
 - **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
   Play) only matter from phase 7.
 

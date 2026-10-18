@@ -1,8 +1,11 @@
 #pbwsound 1
 # pbw-oracle's sound on port/tests/oracle/title_w2_us.pbwinput (melonDS 1.1),
 # at the port's frames and runs that oracle.py sound title pairs them with: the oracle's values only,
-# hashes and statistics, never sound. play: a player's play, by the periodic runs since its start, the SHA-1
-# of the oracle's states of those runs (sound.py's player_state); status: what the ARM9 sees of the driver as
+# hashes and statistics, never sound. limit: the game's count from which the plays aren't compared;
+# plays: how many plays each player starts before it; window: a play's runs that the port must have, and
+# the first run left out at the limit (- for the whole play, so that it must end where the oracle's
+# does); play: a player's play, by the periodic runs since its start, the SHA-1 of the oracle's
+# states of those runs (sound.py's player_state); status: what the ARM9 sees of the driver as
 # the port frame ends, at the oracle frame it pairs with on the count; segment: a segment's lag (oracle
 # frame = port frame + lag) and the oracle's RMS, peak and samples at full scale; envelope: the oracle's
 # RMS by blocks of 4 frames; probe and exact: the SHA-1 of the oracle's samples at the loudest point and
@@ -10,8 +13,13 @@
 # checked by oracle.py sound-check title.
 # Status left out, port frames 1112-1114: the DS's passes at counts 1111 and 1113 take 2 and 46 frames while it loads the title, so on the count the port has locked the stream's channels and started it before the DS (until then their registers are what the opening's music, stopped at a different point on each, left)
 # Status left out, port frames 3101: the DS starts Kyurem's cry a frame later against its passes (README.md, Known differences)
+# Status left out, port frames 3214: Kyurem's cry, which the DS starts later against its passes, ends later too: as this frame ends, the DS's channel still plays it and the port's has stopped (README.md, Known differences)
 # Status left out, port frames 3216: the title sees Kyurem's cry end a pass later on the DS (README.md, Known differences), and unlocks its channel a pass later
 kind	a	b	c	value
+limit	1100	-	-	-
+plays	0	1	-	-
+plays	1	1	-	-
+window	0	0	-	1-1688
 play	0	0	1-64	3332bbcedab7db7256abb92e93a78c4262518efd
 play	0	0	65-128	84526d82f76fde0ec1966fce0338e37648350ad3
 play	0	0	129-192	e6dc007c0ead93ebe2015b34fcfd6db057a34a6b
@@ -39,6 +47,7 @@ play	0	0	1473-1536	01b20fe0978763cd07c1f51316f50f530e6d172b
 play	0	0	1537-1600	d334b95812253a0b7486eddf57df6d4598f939d0
 play	0	0	1601-1664	8c44507d1c833ccdf9be47f814f97227b6f7d612
 play	0	0	1665-1688	3e3f1845b39399844e85e5d17a0b7b006b9c3027
+window	1	0	270	1-269
 play	1	0	1-64	51f9bbc69ff8c2bf2a829fea9f9545f9403de763
 play	1	0	65-128	b730cd334c8b6e57d20a39007403e3b861156204
 play	1	0	129-192	d9fb22538cc0d8b9bb22f075f54a127c9296b161
@@ -333,6 +342,7 @@ status	3080	4853	-	b188edf2bbf05e22
 status	3088	4861	-	b188edf2bbf05e22
 status	3096	4869	-	b188edf2bbf05e22
 status	3102	4876	-	7e4403e15113172b
+status	3103	4877	-	3c9556cc6cf854ac
 status	3104	4878	-	ac96dde114c7fbf2
 status	3112	4886	-	ac96dde114c7fbf2
 status	3120	4894	-	ac96dde114c7fbf2

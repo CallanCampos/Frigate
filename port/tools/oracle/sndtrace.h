@@ -22,14 +22,22 @@
 #define PBW_SNDTRACE_RECORD_SIZE 0x14c0
 
 // A record's fields, by offset
-#define PBW_SNDTRACE_CYCLE 0x00   // u64: the bus clock's cycles since power-on (the port: since its main())
-#define PBW_SNDTRACE_FRAME 0x08   // u32: the video frame the run fell in, from 1 (frame N ends with the N-th VBlank)
+// u64: the bus clock's cycles since power-on (the port: since its main())
+#define PBW_SNDTRACE_CYCLE 0x00
+// u32: the video frame the run fell in, from 1: frame N ends with the N-th VBlank, and a run at a VBlank's cycle
+// comes after it
+#define PBW_SNDTRACE_FRAME 0x08
 #define PBW_SNDTRACE_COUNTER 0x0c // u32: GFL's frame count (sVBlankCount) then
 #define PBW_SNDTRACE_SEED 0x10    // u32: the driver's random generator (SND_CalcRandom's state) after the run
 #define PBW_SNDTRACE_PERIODS 0x14 // u32: the periodic runs the record covers: 1 for a periodic run, 0 for a wake-up
 #define PBW_SNDTRACE_LOCK 0x18    // u32: the channels locked (SND_LockChannel), and those locked weakly
 #define PBW_SNDTRACE_WEAK_LOCK 0x1c
-#define PBW_SNDTRACE_CNT 0x20      // u32[16]: SOUNDxCNT: volume, shift, hold, pan, duty, repeat, format, start
+#define PBW_SNDTRACE_CNT 0x20 // u32[16]: SOUNDxCNT: volume, shift, hold, pan, duty, repeat, format, start
+// u32: the mixer sample by which the driver's last periodic run had begun, counted as PBW_SNDTRACE_START_MIX is: on
+// the DS the first sample after its alarm went off (the alarm's fire time moved on), on the port the first sample after
+// the run, which takes no time. A channel the run starts takes its start in that sample on the port, and as many
+// samples later on the DS as the ARM7 took to write its registers
+#define PBW_SNDTRACE_RUN_MIX 0x60
 #define PBW_SNDTRACE_WORK 0x80     // the driver's work (SNDi_Work at 0x03809fbc on the DS)
 #define PBW_SNDTRACE_SHARED 0x1200 // the shared work (SNDSharedWork), zeros before the ARM9 gives one
 // u32[16]: the mixer sample at which each channel's sound last started, counted from the program's first (the WAV

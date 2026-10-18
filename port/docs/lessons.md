@@ -3,6 +3,19 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the sound against the oracle, after review
+
+- **A counter the hardware reloads keeps counting through a write to its reload.** The channel's timer was modelled as
+  a count from the current step compared with the current period, which is the same until the driver changes the
+  period mid-note (an LFO, a sweep, a bend: most of the opening's notes); then the note's phase moved. Model the
+  counter as the hardware has it (count up from the reload, reload at the overflow), and test a write mid-count.
+- **A comparison that only looks at what pairs can't fail on what's missing.** The runs were paired by their count
+  and every pair was equal, but a play that ended early or late on the port would have passed: count what is on one
+  side only, inside a window both sides cover, and fail on it.
+- **melonDS's frame isn't the DS's.** `RunFrame` runs lines 0 to 262 and the VBlank comes at 192, so a state stamped
+  with melonDS's frame number is up to 71 lines past the VBlank the port's frame ends with. Stamp by the VBlank, and
+  say how many compared frames hold what the check is meant to see (here none had a player active).
+
 ## 2026-10-17: the sound against the oracle
 
 - **A host whose CPU takes no time changes who wins a race the DS's CPU time decides.** The ARM7's alarms ran lazily
@@ -18,8 +31,9 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   sound unit's start delay.
 - **Sample-exact audio needs the reference's own hardware model**, down to its quirks: melonDS starts a PCM sound on
   the third timer step, reads through an 8-word FIFO and counts a volume of 127 as 128. With those, a stream and a cry
-  matched melonDS to the bit, which makes their hashes a test; the sequences can't, since the DS's register writes
-  come up to 4 mixer samples into a run, so they are held by their envelopes.
+  matched melonDS to the bit, which makes their hashes a test. The sequences don't, and the reason was measured, not
+  assumed: the DS's register writes come 1 to 5 mixer samples after its alarm, the port's in the first, so they are
+  held by their envelopes.
 
 ## 2026-10-17: New Game's intro, after review
 

@@ -556,6 +556,7 @@ class Oracle {
     uint8_t Peek(uint32_t address);
     uint32_t Peek32(uint32_t address);
     uint32_t Peek7_32(uint32_t address);
+    uint64_t PeekAlarmFire();
     bool WriteFrame(uint32_t frame);
     void TraceRun();
     bool WriteAudio();
@@ -598,9 +599,12 @@ class Oracle {
 
     // The sampler (OnSample): the frame being run, the mixer's samples since the last frame was written and how many
     // the WAV file has, and the sound trace: SNDi_SharedWork's address, the driver's random generator and periodic
-    // alarm at its last record
+    // alarm at its last record, the periodic alarm's fire time at the last sample and the sample by which it last went
+    // off
     uint32_t frame_ = 0;
     uint32_t mixes_ = 0;
+    uint64_t sampleFire_ = 0;
+    uint32_t runMix_ = 0;
     uint32_t channelCnt_[PBW_SNDTRACE_CHANNELS] = {};
     uint32_t startMix_[PBW_SNDTRACE_CHANNELS] = {};
     FILE *audio_ = nullptr;
@@ -860,6 +864,12 @@ uint32_t Oracle::Peek7_32(uint32_t address) {
            static_cast<uint32_t>(wram[(at + 3) & (nds_->ARM7WRAMSize - 1)]) << 24;
 }
 
+// The fire tick of the sound driver's periodic alarm: 0 until its thread starts it
+uint64_t Oracle::PeekAlarmFire() {
+    return static_cast<uint64_t>(Peek7_32(SND_ALARM_FIRE_ADDRESS)) |
+           static_cast<uint64_t>(Peek7_32(SND_ALARM_FIRE_ADDRESS + 4)) << 32;
+}
+
 // After each of the mixer's samples, every 1024 cycles: the sample for --audio-dump, and the sound driver's state for
 // --sound-trace. Then the next, after the mixer's next sample
 void Oracle::OnSample() {
@@ -870,6 +880,15 @@ void Oracle::OnSample() {
         samples_.push_back(last[1]);
     }
     if (trace_ != nullptr) {
+        // The periodic alarm went off since the last sample when its fire time moved on: the driver's run has begun
+        uint64_t fire = PeekAlarmFire();
+
+        if (fire != sampleFire_) {
+            if (sampleFire_ != 0) {
+                runMix_ = mixes_;
+            }
+            sampleFire_ = fire;
+        }
         // A channel whose start bit came on since the last sample started its sound in this one (melonDS takes the
         // start at the next sample after the write)
         for (uint32_t i = 0; i < PBW_SNDTRACE_CHANNELS; i++) {
@@ -902,8 +921,7 @@ void Oracle::TraceRun() {
         return;
     }
     seed = Peek7_32(SND_RANDOM_ADDRESS);
-    fire = static_cast<uint64_t>(Peek7_32(SND_ALARM_FIRE_ADDRESS)) |
-           static_cast<uint64_t>(Peek7_32(SND_ALARM_FIRE_ADDRESS + 4)) << 32;
+    fire = PeekAlarmFire();
     if (fire == 0 || !traceStarted_) {
         traceStarted_ = fire != 0;
         traceSeed_ = seed;
@@ -922,10 +940,13 @@ void Oracle::TraceRun() {
     std::fill(record_.begin(), record_.end(), 0);
     // The sampler's own time, which is the mixer sample's it follows
     pbw_sndtrace_put64(&record_[PBW_SNDTRACE_CYCLE], nds_->SchedList[SAMPLER_EVENT].Timestamp);
-    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_FRAME], frame_);
+    // The frame whose VBlank comes next: frame N ends with its VBlank, on line 192 of melonDS's frame N, which runs on
+    // to line 262, so a record after that VBlank belongs to frame N + 1, as on the port
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_FRAME], vblankSeen_ ? frame_ + 1 : frame_);
     pbw_sndtrace_put32(&record_[PBW_SNDTRACE_COUNTER], haveCounter_ ? Peek32(counterAddress_) : 0);
     pbw_sndtrace_put32(&record_[PBW_SNDTRACE_SEED], seed);
     pbw_sndtrace_put32(&record_[PBW_SNDTRACE_PERIODS], static_cast<uint32_t>(periods));
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_RUN_MIX], runMix_);
     pbw_sndtrace_put32(&record_[PBW_SNDTRACE_LOCK], Peek7_32(SND_LOCK_ADDRESS));
     pbw_sndtrace_put32(&record_[PBW_SNDTRACE_WEAK_LOCK], Peek7_32(SND_WEAK_LOCK_ADDRESS));
     for (uint32_t i = 0; i < PBW_SNDTRACE_CHANNELS; i++) {

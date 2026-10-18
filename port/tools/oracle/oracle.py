@@ -155,6 +155,8 @@ LOADING = ("the DS's passes at counts 1111 and 1113 take 2 and 46 frames while i
            "port has locked the stream's channels and started it before the DS (until then their registers are what "
            "the opening's music, stopped at a different point on each, left)")
 SOUND_CRY = "the DS starts Kyurem's cry a frame later against its passes (README.md, Known differences)"
+SOUND_CRY_PLAYS = ("Kyurem's cry, which the DS starts later against its passes, ends later too: as this frame ends, "
+                   "the DS's channel still plays it and the port's has stopped (README.md, Known differences)")
 SOUND_CRY_END = ("the title sees Kyurem's cry end a pass later on the DS (README.md, Known differences), and unlocks "
                  "its channel a pass later")
 SOUND = {
@@ -173,7 +175,7 @@ SOUND = {
             sound.Segment("cry", 3104, 3210, 1750, 1950, exact=True),
         ),
         known={"b2_us": {"1112-1114": LOADING, "3101": SOUND_CRY},
-               "w2_us": {"1112-1114": LOADING, "3101": SOUND_CRY, "3216": SOUND_CRY_END}},
+               "w2_us": {"1112-1114": LOADING, "3101": SOUND_CRY, "3214": SOUND_CRY_PLAYS, "3216": SOUND_CRY_END}},
     ),
 }
 SOUND_REFERENCE = os.path.join("port", "tests", "oracle", "sound_{name}_{version}.tsv")
@@ -351,7 +353,7 @@ def command_boot(args) -> int:
 def check_sound_outputs(run: str) -> int:
     """The oracle's sound trace and WAV dump of the boot: a sample each 1024 cycles from power-on, and every periodic
     run of the sound driver, 2728 ticks of 64 cycles apart, in the records (a record covers the runs since the last,
-    seen once the driver's thread waits again). Returns the failures"""
+    seen once the driver's thread waits again), each in the frame whose VBlank comes next. Returns the failures"""
     trace, audio = sound.run_files(run)
     failed = 0
     _, samples = sound.load_wav(audio)
@@ -365,6 +367,11 @@ def check_sound_outputs(run: str) -> int:
     elapsed = (periodic[-1].cycle - periodic[0].cycle) / (2728 * 64) if len(periodic) > 1 else 0
     if len(periodic) < CHECK_FRAMES * 2 or abs(runs - elapsed) > 2:
         print(f"FAIL: the sound trace has {runs} periodic runs in {elapsed:.1f} periods of the driver")
+        failed += 1
+    wrong = sound.misstamped(records)
+    if wrong:
+        print(f"FAIL: records of the sound trace not in the frame whose VBlank comes next: {len(wrong)} (the first: "
+              f"record {wrong[0]}, cycle {records[wrong[0]].cycle}, frame {records[wrong[0]].frame})")
         failed += 1
     return failed
 
@@ -712,9 +719,12 @@ def command_sound(args) -> int:
             description = (
                 f"pbw-oracle's sound on {SEQUENCE_INPUT.format(name=args.name, version=args.version)} (melonDS "
                 f"{melonds}),\nat the port's frames and runs that oracle.py sound {args.name} pairs them with: the "
-                "oracle's values only,\nhashes and statistics, never sound. play: a player's play, by the periodic "
-                "runs since its start, the SHA-1\nof the oracle's states of those runs (sound.py's player_state); "
-                "status: what the ARM9 sees of the driver as\nthe port frame ends, at the oracle frame it pairs with "
+                "oracle's values only,\nhashes and statistics, never sound. limit: the game's count from which the "
+                "plays aren't compared;\nplays: how many plays each player starts before it; window: a play's runs "
+                "that the port must have, and\nthe first run left out at the limit (- for the whole play, so that it "
+                "must end where the oracle's\ndoes); play: a player's play, by the periodic runs since its start, the "
+                "SHA-1 of the oracle's\nstates of those runs (sound.py's player_state); status: what the ARM9 sees of "
+                "the driver as\nthe port frame ends, at the oracle frame it pairs with "
                 "on the count; segment: a segment's lag (oracle\nframe = port frame + lag) and the oracle's RMS, "
                 "peak and samples at full scale; envelope: the oracle's\nRMS by blocks of 4 frames; probe and exact: "
                 "the SHA-1 of the oracle's samples at the loudest point and\nover the segment, at the port's samples "

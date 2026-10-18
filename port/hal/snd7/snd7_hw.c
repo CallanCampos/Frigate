@@ -5,7 +5,9 @@
 //
 // The unit as GBATEK describes it:
 //   - a channel's timer counts the sound clock (half the ARM7's bus clock) up from SOUNDxTMR, and each time it
-//     overflows the channel moves on to its next sample, so a sample lasts 0x10000 - TMR ticks;
+//     overflows the channel moves on to its next sample and the timer goes on from SOUNDxTMR, so a sample lasts
+//     0x10000 - TMR ticks. A write to SOUNDxTMR leaves the running count alone: the new value counts from the next
+//     overflow, so a channel's pitch changes (an LFO's, a sweep's, a bend's) take effect at its next step;
 //   - SOUNDxCNT: volume (bits 0-6), the data shift (bits 8-9: 0, 1, 2 or 4 bits to the right), hold (15), pan (16-22,
 //     0 left, 64 center, 127 right), the PSG duty (24-26), the repeat mode (27-28: manual, loop, one-shot), the format
 //     (29-30: PCM8, PCM16, IMA-ADPCM, PSG/noise) and start (31), which the channel clears when a one-shot sound ends.
@@ -34,10 +36,12 @@
 //     its fraction. GBATEK gives those widths, and melonDS, the port's oracle, has them, with a volume, pan or master
 //     volume of 127 counting as 128. SOUNDCNT bit 15 enables the output and the channels: while it is clear they don't
 //     move on.
-// The DS turns the result into 10 bits for its PWM output, clipped; this unit keeps 16 bits, the 10 bits times 64 as
-// melonDS gives them, so that a channel at full volume and center pan is about half the range, clipped at the same
-// level. The capture units' registers are kept (SND_SetupCapture, their start and status) but they capture nothing:
-// Black 2 and White 2 never start them.
+// The DS turns the result into 10 bits for its PWM output, clipped. This unit outputs the 16 bits that melonDS outputs
+// by default: on the scale of the DS's 10 bits times 64, so that a channel at full volume and center pan is about
+// half the range, and clipped at the same level (-0x8000 to 0x7fff), but with the 6 low bits kept, where the DS's
+// output has none (melonDS drops them only when told to, and the oracle doesn't tell it). The capture units'
+// registers are kept (SND_SetupCapture, their start and status) but they capture nothing: Black 2 and White 2 never
+// start them.
 //
 // A channel's samples are read through host pointers: SOUNDxSAD is a host pointer and the end of the memory it is in,
 // and a channel reads 0 past that end.
@@ -79,12 +83,12 @@ typedef struct HwChannel {
     u16 tmr;
     u16 pnt;
     u32 len;
-    // The sound being played: its samples, the loop's first sample, the current one, the sound clock's ticks towards
-    // the next, and the current sample's value
+    // The sound being played: its samples, the loop's first sample, the current one, the channel's timer (from
+    // SOUNDxTMR up, a step at 0x10000), and the current sample's value
     u32 total;
     u32 loopStart;
     u32 index;
-    u32 counter;
+    u32 timer;
     s32 sample;
     // A sound too short to play: the channel stays busy, silent and still
     BOOL hung;
@@ -316,7 +320,6 @@ static void StartSound(HwChannel *channel) {
     u32 words = channel->pnt + channel->len;
 
     channel->index = 0;
-    channel->counter = 0;
     channel->loopSaved = FALSE;
     channel->hung = FALSE;
     channel->sample = 0;
@@ -423,20 +426,20 @@ void snd7_hw_mix(s16 out[2]) {
         s32 pan;
 
         // The channel moves on by one mixer period, and the mixer takes the sample it is on then. A sound that just
-        // started fills its FIFO first
+        // started fills its FIFO and loads its timer from SOUNDxTMR first. Each overflow reloads the timer from
+        // SOUNDxTMR as it is then
         if ((channel->cnt & SND7_CNT_START) && !channel->hung) {
-            u32 period = 0x10000u - channel->tmr;
-
             if (!channel->primed) {
                 if (Format(channel) != SND7_FORMAT_PSG) {
                     FifoPrime(channel);
                 }
+                channel->timer = channel->tmr;
                 channel->primed = TRUE;
             }
 
-            channel->counter += SND7_SOUND_TICKS_PER_SAMPLE;
-            while (channel->counter >= period && (channel->cnt & SND7_CNT_START)) {
-                channel->counter -= period;
+            channel->timer += SND7_SOUND_TICKS_PER_SAMPLE;
+            while ((channel->timer >> 16) != 0 && (channel->cnt & SND7_CNT_START)) {
+                channel->timer = channel->tmr + (channel->timer - 0x10000u);
                 NextSample(channel, i);
             }
         }

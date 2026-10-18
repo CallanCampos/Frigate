@@ -9,10 +9,12 @@ Both programs write two things for it:
   passes take longer), so states pair by the sequence's own clock: a play of a player (from its start to its stop) on
   the oracle pairs with the same play on the port, and their records with the same count of periodic runs since the
   start. At each pair the player, its tracks (by their place in the player), their channels (in their lists' order)
-  and the sound unit's registers of those channels are compared field by field. Frame by frame, where the game counts
-  passes, what the ARM9 sees of the driver as each frame ends (the shared work's players and channels, the locks, the
-  alarms, the tick counts, the registers of the channels the ARM9 drives itself) is compared on the frames that
-  compare.py pairs.
+  and the sound unit's registers of those channels are compared field by field, and a run that only one program has
+  fails (a play that ends earlier or later), up to the run where a press that reaches the two programs at different
+  points of the sequence cuts it. Frame by frame, where the game counts passes, what the ARM9 sees of the driver as
+  each frame's VBlank comes (the shared work's players and channels, the locks, the alarms, the tick counts, the
+  registers of the channels the ARM9 drives itself) is compared on the frames that compare.py pairs, with how many of
+  them have a player active.
 - A WAV file of the mixed output (--audio-dump): 16-bit stereo, one sample each 1024 cycles. A segment of the port's
   frames is measured against the oracle's by envelope: each frame's RMS (560,190 cycles, 547.06 samples), lined up at
   the lag (oracle frame = port frame + lag) where the two correlate best, and the RMS, peak and samples at full scale
@@ -35,6 +37,7 @@ import array
 import hashlib
 import json
 import math
+import operator
 import os
 import struct
 import sys
@@ -55,6 +58,7 @@ OFF_PERIODS = 0x14
 OFF_LOCK = 0x18
 OFF_WEAK_LOCK = 0x1C
 OFF_CNT = 0x20
+OFF_RUN_MIX = 0x60
 OFF_WORK = 0x80
 OFF_SHARED = 0x1200
 OFF_START_MIX = 0x1480
@@ -74,8 +78,10 @@ TRACK_NONE = 0xFF
 PLAYER_ACTIVE = 0x01
 CNT_START = 0x80000000
 
-# The DS's clocks: 2130 cycles a line, 263 lines a frame; a mixer sample each 1024 cycles
+# The DS's clocks: 2130 cycles a line, 263 lines a frame, the VBlank at line 192 (the first frame starts at cycle 0
+# on both programs); a mixer sample each 1024 cycles
 CYCLES_PER_FRAME = 2130 * 263
+FIRST_VBLANK_CYCLE = 2130 * 192
 CYCLES_PER_SAMPLE = 1024
 SAMPLES_PER_FRAME = CYCLES_PER_FRAME / CYCLES_PER_SAMPLE
 FULL_SCALE = 0x7FFF
@@ -89,9 +95,12 @@ CLIPPED_TOLERANCE = 0.10
 CLIPPED_SLACK = 32
 ENVELOPE_BLOCK = 4
 PROBE_SAMPLES = 512
-# A note start the oracle sees within this many mixer samples of the port's, against the most common offset, is the
-# same note (one further is a start the oracle's sampler can't see: a channel stopped and started between two samples)
-NOTE_WINDOW = 16
+# The window, in stereo samples, over which a segment that isn't to the bit finds the sample offset where most of its
+# samples are the oracle's, and how far from that the whole segment is tried; the DS mixer's rate, which gives the
+# seconds of a run
+EQUAL_WINDOW = 4096
+EQUAL_REACH = 4
+SAMPLE_RATE = 33513982 / 2 / 512
 
 
 # Traces
@@ -132,6 +141,10 @@ class Record:
 
     def start_mix(self, channel: int) -> int:
         return self.u32(OFF_START_MIX + channel * 4)
+
+    @property
+    def run_mix(self) -> int:
+        return self.u32(OFF_RUN_MIX)
 
     def work(self, offset: int, size: int) -> bytes:
         return self.data[OFF_WORK + offset:OFF_WORK + offset + size]
@@ -378,22 +391,64 @@ def find_plays(records: list[Record], player: int) -> list[Play]:
     return plays
 
 
-def paired_runs(oracle: list[Record], port: list[Record], a: Play, b: Play,
-                before_count: int | None) -> tuple[list[tuple[int, int, int]], int]:
-    """The runs of two plays that pair, (count, oracle record, port record), while the game's count is below
-    before_count on both; and how many pairs that left out"""
-    port_runs = dict(b.runs)
-    pairs = []
-    left = 0
-    for count, oracle_index in a.runs:
-        port_index = port_runs.get(count)
-        if port_index is None:
-            continue
-        if before_count is not None and max(oracle[oracle_index].counter, port[port_index].counter) >= before_count:
-            left += 1
-            continue
-        pairs.append((count, oracle_index, port_index))
-    return pairs, left
+def count_limit(records: list[Record], play: Play, before_count: int | None) -> int | None:
+    """The play's first count of periodic runs at which the game's count has reached before_count, or None"""
+    if before_count is None:
+        return None
+    for count, index in play.runs:
+        if records[index].counter >= before_count:
+            return count
+    return None
+
+
+def covered_counts(records: list[Record], play: Play) -> set[int]:
+    """The counts that a record of several periodic runs stands for besides its own: the oracle's ARM7 was busy
+    through the earlier ones, so it has no state of them"""
+    out: set[int] = set()
+    for count, index in play.runs:
+        out.update(range(count - records[index].periods + 1, count))
+    return out
+
+
+@dataclass
+class RunPairing:
+    """How two plays' runs pair. The comparable window is the counts below the first count at which either program's
+    game count reached the limit (a press that reaches them at different points of the sequence), or the whole plays.
+    Inside it every run must be on both, but for a port run that an oracle record of several runs stands for"""
+    pairs: list[tuple[int, int, int]]  # (count, oracle record, port record)
+    window: int | None  # the first count left out, or None for the whole plays
+    oracle_only: list[int]  # counts inside the window that only the oracle has
+    port_only: list[int]  # counts inside the window that only the port has, an oracle record standing for none
+    covered: list[int]  # port counts inside the window that an oracle record of several runs stands for
+    left_oracle: int  # runs from the window on, left out
+    left_port: int
+    oracle_last: int  # the plays' last counts
+    port_last: int
+
+    @property
+    def expected(self) -> list[int]:
+        """The counts inside the window that the port must have: the oracle's own and those its records stand for"""
+        return sorted({count for count, _, _ in self.pairs} | set(self.oracle_only) | set(self.covered))
+
+
+def paired_runs(oracle: list[Record], port: list[Record], a: Play, b: Play, before_count: int | None) -> RunPairing:
+    limits = [c for c in (count_limit(oracle, a, before_count), count_limit(port, b, before_count)) if c is not None]
+    window = min(limits) if limits else None
+    a_runs = {c: i for c, i in a.runs if window is None or c < window}
+    b_runs = {c: i for c, i in b.runs if window is None or c < window}
+    covered = covered_counts(oracle, a)
+    port_only = sorted(set(b_runs) - set(a_runs))
+    return RunPairing(
+        pairs=[(c, a_runs[c], b_runs[c]) for c in sorted(a_runs) if c in b_runs],
+        window=window,
+        oracle_only=sorted(set(a_runs) - set(b_runs)),
+        port_only=[c for c in port_only if c not in covered],
+        covered=[c for c in port_only if c in covered],
+        left_oracle=len(a.runs) - len(a_runs),
+        left_port=len(b.runs) - len(b_runs),
+        oracle_last=a.runs[-1][0] if a.runs else 0,
+        port_last=b.runs[-1][0] if b.runs else 0,
+    )
 
 
 @dataclass
@@ -409,14 +464,18 @@ class PlayResult:
     # field name -> [runs, first run, oracle value, port value]
     differences: dict[str, list] = field(default_factory=dict)
     first_unequal: int | None = None
-    left: int = 0
+    pairing: RunPairing | None = None
     only: str = ""  # "oracle" or "port" for a play the other doesn't have
-    # The play's notes: the mixer sample that took each one's start on the port, and the oracle's for the same note
-    starts: dict[int, int] = field(default_factory=dict)
+    # The notes a periodic run of the play started: the mixer sample that took each one's start on the port ->
+    # (the oracle's for the same note, and how many samples after its run had begun)
+    starts: dict[int, tuple[int, int]] = field(default_factory=dict)
 
 
-def note_starts(oracle_record: Record, port_record: Record, player: int, starts: dict[int, int]) -> None:
-    """The start samples of the notes on the player's channels, paired by the track's place and the channel's"""
+def note_starts(oracle_record: Record, port_record: Record, player: int, starts: dict[int, tuple[int, int]]) -> None:
+    """The notes on the player's channels that the pair's periodic run started, paired by the track's place and the
+    channel's. The port, whose runs take no time, takes a start in the sample after the run (the record's run_mix);
+    the DS as many samples after the one by which its run had begun as its ARM7 took to write the channel's
+    registers. A note the port started in an earlier run, or a wake-up's, is left: its run isn't the record's"""
     def channels(record: Record) -> dict[tuple[int, int], int]:
         out = {}
         for j, t in enumerate(record.player_raw(player)[0x08:0x18]):
@@ -429,8 +488,8 @@ def note_starts(oracle_record: Record, port_record: Record, player: int, starts:
 
     left = channels(oracle_record)
     for key, port_start in channels(port_record).items():
-        if key in left and port_start not in starts:
-            starts[port_start] = left[key]
+        if key in left and port_start == port_record.run_mix and port_start not in starts:
+            starts[port_start] = (left[key], left[key] - oracle_record.run_mix)
 
 
 def compare_plays(oracle: list[Record], port: list[Record], before_count: int | None = None,
@@ -453,8 +512,8 @@ def compare_plays(oracle: list[Record], port: list[Record], before_count: int | 
             a, b = a_plays[index], b_plays[index]
             result = PlayResult(player, index, (oracle[a.start].frame, oracle[a.end].frame),
                                 (port[b.start].frame, port[b.end].frame))
-            pairs, result.left = paired_runs(oracle, port, a, b, before_count)
-            for count, oracle_index, port_index in pairs:
+            result.pairing = paired_runs(oracle, port, a, b, before_count)
+            for count, oracle_index, port_index in result.pairing.pairs:
                 note_starts(oracle[oracle_index], port[port_index], player, result.starts)
                 left = player_state(oracle[oracle_index], player)
                 right = player_state(port[port_index], player)
@@ -478,21 +537,29 @@ def compare_plays(oracle: list[Record], port: list[Record], before_count: int | 
     return results
 
 
-def describe_starts(starts: dict[int, int]) -> str:
-    """How the oracle's note starts sit against the port's: from the earliest of the most common group, how many come
-    that many mixer samples later"""
-    offsets = [o - p for p, o in starts.items()]
-    if not offsets:
-        return "none"
-    common = max(set(offsets), key=offsets.count)
-    near = [d for d in offsets if abs(d - common) <= NOTE_WINDOW]
-    base = min(near)
+def start_delays(starts: dict[int, tuple[int, int]]) -> tuple[dict[int, int], int]:
+    """How many of the notes the DS started each number of mixer samples after its run had begun, and how many have
+    no start on the oracle after that (a channel stopped and started again between two of the oracle's samples, which
+    its sampler can't see)"""
     spread: dict[int, int] = {}
-    for d in near:
-        spread[d - base] = spread.get(d - base, 0) + 1
-    shown = ", ".join(f"{n} at +{d}" for d, n in sorted(spread.items()))
-    unseen = len(offsets) - len(near)
-    return (f"{len(near)} paired, by the mixer sample that took their start against the earliest: {shown}"
+    unseen = 0
+    for _, delay in starts.values():
+        if delay < 0:
+            unseen += 1
+        else:
+            spread[delay] = spread.get(delay, 0) + 1
+    return spread, unseen
+
+
+def describe_starts(starts: dict[int, tuple[int, int]]) -> str:
+    """When the notes that periodic runs started took their start: on the port in the sample after the run, on the DS
+    the given number of samples after the one by which its run had begun"""
+    if not starts:
+        return "none"
+    spread, unseen = start_delays(starts)
+    shown = ", ".join(f"{n} at {d}" for d, n in sorted(spread.items()))
+    return (f"{sum(spread.values())} started by a periodic run, each on the port in the mixer sample after its run; on "
+            f"the DS, by how many samples after the one by which its run had begun: {shown or 'none'}"
             + (f"; {unseen} restarts the oracle's sampler can't see" if unseen else ""))
 
 
@@ -500,11 +567,24 @@ def describe_play(r: PlayResult, show: int) -> list[str]:
     if r.only:
         frames = r.oracle_frames if r.only == "oracle" else r.port_frames
         return [f"player {r.player} play {r.play}: only on the {r.only} (frames {frames[0]}-{frames[1]})"]
+    p = r.pairing
     lines = [f"player {r.player} play {r.play}: oracle frames {r.oracle_frames[0]}-{r.oracle_frames[1]}, port "
              f"{r.port_frames[0]}-{r.port_frames[1]}: {r.pairs} runs paired, {r.equal} equal; fields "
              f"{r.fields_equal} of {r.fields} equal" + (f", the first unequal at run {r.first_unequal}"
-                                                       if r.first_unequal is not None else "")
-             + (f"; {r.left} runs after the count limit left out" if r.left else "")]
+                                                       if r.first_unequal is not None else "")]
+    if p.window is None:
+        lines.append(f"    compared whole: the last run {p.oracle_last} on the oracle, {p.port_last} on the port")
+    else:
+        lines.append(f"    compared to run {p.window - 1}, where the count limit comes on the first of the two "
+                     f"(the last run {p.oracle_last} on the oracle, {p.port_last} on the port); left out from run "
+                     f"{p.window} on: {p.left_oracle} runs of the oracle, {p.left_port} of the port")
+    if p.covered:
+        lines.append(f"    {len(p.covered)} runs of the port that an oracle record of several runs stands for: "
+                     f"{run_list(p.covered)}")
+    if p.oracle_only:
+        lines.append(f"    {len(p.oracle_only)} runs only on the oracle: {run_list(p.oracle_only)}")
+    if p.port_only:
+        lines.append(f"    {len(p.port_only)} runs only on the port: {run_list(p.port_only)}")
     if r.starts:
         lines.append(f"    notes: {describe_starts(r.starts)}")
     shown = sorted(r.differences.items(), key=lambda item: (item[1][1], item[0]))
@@ -539,6 +619,26 @@ def status_of(record: Record) -> dict:
     }
 
 
+def frame_after(cycle: int) -> int:
+    """The frame whose VBlank comes next after a cycle, from 1 (frame N ends with the N-th VBlank)"""
+    if cycle < FIRST_VBLANK_CYCLE:
+        return 1
+    return (cycle - FIRST_VBLANK_CYCLE) // CYCLES_PER_FRAME + 2
+
+
+def misstamped(records: list[Record]) -> list[int]:
+    """The records whose frame isn't the one whose VBlank comes next after their cycle, which frame_states needs.
+    A record at a VBlank's own cycle may count on either side of it (the oracle's sampler, at the same timestamp as
+    its VBlank event, runs first; the port counts a run there after the VBlank), so those aren't checked"""
+    out = []
+    for index, record in enumerate(records):
+        at_vblank = (record.cycle >= FIRST_VBLANK_CYCLE
+                     and (record.cycle - FIRST_VBLANK_CYCLE) % CYCLES_PER_FRAME == 0)
+        if not at_vblank and record.frame != frame_after(record.cycle):
+            out.append(index)
+    return out
+
+
 def frame_states(records: list[Record]) -> dict[int, int]:
     """Each frame's last record, which is the driver as the frame's VBlank comes; a frame with no run of its own has
     the one before's"""
@@ -563,6 +663,10 @@ class FrameResult:
     unequal: list = field(default_factory=list)  # (port frame, oracle frame, {field: (oracle, port)})
     # The pairs equal at their frame ends: (port frame, oracle frame, oracle record)
     pairs: list = field(default_factory=list)
+    # What the compared frames hold: how many have a player active (on either program), so that their status holds its
+    # tick count, and how many different statuses they have between them
+    with_player: int = 0
+    statuses: int = 0
 
 
 def frame_pairs(oracle_run: compare.Run, port_run: compare.Run, clock: str | None,
@@ -583,6 +687,7 @@ def compare_frames(oracle: list[Record], port: list[Record], pairs: list[tuple[i
     known = known or set()
     oracle_states = frame_states(oracle)
     port_states = frame_states(port)
+    seen = set()
     for port_frame, oracle_frame in pairs:
         port_index = port_states.get(port_frame)
         oracle_index = oracle_states.get(oracle_frame)
@@ -594,6 +699,9 @@ def compare_frames(oracle: list[Record], port: list[Record], pairs: list[tuple[i
         result.compared += 1
         a = status_of(port[port_index])
         b = status_of(oracle[oracle_index])
+        if a["players"] or b["players"]:
+            result.with_player += 1
+        seen.add(json.dumps(b, sort_keys=True))
         if a == b:
             result.equal += 1
             result.pairs.append((port_frame, oracle_frame, oracle_index))
@@ -604,6 +712,7 @@ def compare_frames(oracle: list[Record], port: list[Record], pairs: list[tuple[i
             result.run_apart += 1
             continue
         result.unequal.append((port_frame, oracle_frame, {n: (b[n], a[n]) for n in a if a[n] != b[n]}))
+    result.statuses = len(seen)
     return result
 
 
@@ -728,9 +837,13 @@ class SegmentResult:
     oracle: Level = field(default_factory=Level)
     port: Level = field(default_factory=Level)
     blocks: list[float] = field(default_factory=list)  # the oracle's envelope at the lag, by blocks of frames
-    offset: int | None = None  # exact: oracle sample = port sample + offset
+    # oracle sample = port sample + offset: for an exact segment where the loudest point's samples are the oracle's,
+    # else where most of them are; and how many of the segment's samples are the oracle's there
+    offset: int | None = None
     identical: int = 0
     samples: int = 0
+    # The samples at full scale in each second of the port's run (its WAV dump), the oracle's at the offset
+    clipped_seconds: tuple[dict[int, int], dict[int, int]] = ({}, {})
     failures: list[str] = field(default_factory=list)
 
 
@@ -746,6 +859,41 @@ def find_offset(oracle: array.array, port: array.array, port_start: int, guess: 
             if start >= 0 and oracle[start:start + len(probe)] == probe:
                 return offset
     return None
+
+
+def most_equal_offset(oracle: array.array, port: array.array, port_start: int, guess: int,
+                      reach: int) -> tuple[int, int]:
+    """The offset near guess at which most of the port's EQUAL_WINDOW samples from port_start are the oracle's, and
+    how many are"""
+    probe = port[port_start * 2:(port_start + EQUAL_WINDOW) * 2]
+    best = (guess, -1)
+    for offset in range(guess - reach, guess + reach + 1):
+        start = (port_start + offset) * 2
+        if start < 0:
+            continue
+        equal = sum(map(operator.eq, probe, oracle[start:start + len(probe)]))
+        if equal > best[1]:
+            best = (offset, equal)
+    return best
+
+
+def equal_samples(oracle: array.array, port: array.array, start: int, end: int, offset: int) -> int:
+    """How many of the port's stereo samples start to end (left and right apart) are the oracle's at the offset"""
+    if start + offset < 0:
+        return 0
+    return sum(map(operator.eq, port[start * 2:end * 2], oracle[(start + offset) * 2:(end + offset) * 2]))
+
+
+def clipped_seconds(samples: array.array, start: int, end: int, offset: int = 0) -> dict[int, int]:
+    """How many of the stereo samples start to end (left and right apart) are at full scale in each second of the
+    port's run, the samples being at the port's sample + offset"""
+    out: dict[int, int] = {}
+    window = samples[max(start, 0) * 2:max(end, 0) * 2]
+    for k, v in enumerate(window):
+        if v >= FULL_SCALE or v <= -FULL_SCALE:
+            second = int((max(start, 0) + k // 2 - offset) / SAMPLE_RATE)
+            out[second] = out.get(second, 0) + 1
+    return out
 
 
 def loudest_probe(samples: array.array, first: int, last: int) -> int:
@@ -784,21 +932,31 @@ def compare_segment(oracle: array.array, port: array.array, segment: Segment) ->
     if result.correlation < ENVELOPE_CORRELATION:
         result.failures.append(f"the envelopes correlate {result.correlation:.4f} at best (lag {result.lag})")
     check_levels(result.oracle, result.port, result.failures)
+    probe = loudest_probe(port, segment.first, segment.last)
+    guess = int(round(result.lag * SAMPLES_PER_FRAME))
+    reach = int(2 * SAMPLES_PER_FRAME)
+    start, _ = frame_samples(segment.first)
+    _, end = frame_samples(segment.last)
+    result.samples = (end - start) * 2
     if segment.exact:
-        probe = loudest_probe(port, segment.first, segment.last)
-        guess = int(round(result.lag * SAMPLES_PER_FRAME))
-        result.offset = find_offset(oracle, port, probe, guess, int(2 * SAMPLES_PER_FRAME))
-        start, _ = frame_samples(segment.first)
-        _, end = frame_samples(segment.last)
-        result.samples = (end - start) * 2
+        result.offset = find_offset(oracle, port, probe, guess, reach)
         if result.offset is None:
             result.failures.append("no offset gives the oracle's samples at the loudest point")
-        else:
-            theirs = oracle[(start + result.offset) * 2:(end + result.offset) * 2]
-            result.identical = sum(1 for a, b in zip(port[start * 2:end * 2], theirs) if a == b)
-            if result.identical != result.samples:
-                result.failures.append(f"{result.samples - result.identical} of {result.samples} samples aren't the "
-                                       "oracle's")
+    else:
+        # The notes of a sequence start a few samples apart on the two programs, so the offset where most of the
+        # window's samples are equal needn't be the segment's: the segment's best near it
+        near, _ = most_equal_offset(oracle, port, probe, guess, reach)
+        result.offset = max(range(near - EQUAL_REACH, near + EQUAL_REACH + 1),
+                            key=lambda offset: (equal_samples(oracle, port, start, end, offset), -abs(offset - near)))
+    if result.offset is not None:
+        result.identical = equal_samples(oracle, port, start, end, result.offset)
+        if segment.exact and result.identical != result.samples:
+            result.failures.append(f"{result.samples - result.identical} of {result.samples} samples aren't the "
+                                   "oracle's")
+    if result.oracle.clipped or result.port.clipped:
+        shift = result.offset if result.offset is not None else guess
+        result.clipped_seconds = (clipped_seconds(oracle, start + shift, end + shift, shift),
+                                  clipped_seconds(port, start, end))
     return result
 
 
@@ -819,6 +977,16 @@ def describe_segment(r: SegmentResult) -> str:
     if s.exact:
         text += (f"; {r.identical} of {r.samples} samples the oracle's" if r.offset is not None
                  else "; no sample offset found")
+    elif r.offset is not None and r.samples:
+        text += (f"; {r.identical} of {r.samples} samples ({100 * r.identical / r.samples:.1f}%) the oracle's at the "
+                 f"sample offset where most are (oracle = port + {r.offset})")
+    oracle_seconds, port_seconds = r.clipped_seconds
+    if oracle_seconds or port_seconds:
+        seconds = sorted(set(oracle_seconds) | set(port_seconds))
+        top = [max(table.items(), key=lambda item: (item[1], -item[0])) if table else (0, 0)
+               for table in (oracle_seconds, port_seconds)]
+        text += (f"; at full scale in seconds {seconds[0]}-{seconds[-1]} of the port's run, at most {top[0][1]} in a "
+                 f"second on the oracle (second {top[0][0]}) and {top[1][1]} on the port (second {top[1][0]})")
     return text
 
 
@@ -868,17 +1036,19 @@ def compare_runs(oracle_dir: str, port_dir: str, spec: SoundSpec, version: str, 
     for r in plays:
         for line in describe_play(r, show):
             print(f"  {line}")
-        if r.only:
-            comparison.failures.append(f"player {r.player}'s play {r.play} is only on the {r.only}")
-        elif r.equal != r.pairs or r.pairs == 0:
-            comparison.failures.append(f"player {r.player}'s play {r.play}: {r.pairs - r.equal} of {r.pairs} runs "
-                                       "differ")
+        comparison.failures += play_failures(r)
+    paired = [r for r in plays if not r.only]
     total = sum(r.pairs for r in plays)
     print(f"  {total} runs paired, {sum(r.equal for r in plays)} equal; "
-          f"{sum(r.fields_equal for r in plays)} of {sum(r.fields for r in plays)} fields")
-    print(f"What the ARM9 sees of the driver as each frame ends, where the game counts passes: {frames.compared} "
-          f"frames compared, {frames.equal} equal, {frames.run_apart} equal a run apart, {len(frames.unequal)} "
-          f"unequal; {frames.known} left out")
+          f"{sum(r.fields_equal for r in plays)} of {sum(r.fields for r in plays)} fields; runs on one side only "
+          f"inside the plays' windows: {sum(len(r.pairing.oracle_only) for r in paired)} on the oracle, "
+          f"{sum(len(r.pairing.port_only) for r in paired)} on the port; left out after the count limit: "
+          f"{sum(r.pairing.left_oracle for r in paired)} of the oracle's runs, "
+          f"{sum(r.pairing.left_port for r in paired)} of the port's")
+    print(f"What the ARM9 sees of the driver as each frame's VBlank comes, where the game counts passes: "
+          f"{frames.compared} frames compared, {frames.equal} equal, {frames.run_apart} equal a run apart, "
+          f"{len(frames.unequal)} unequal; {frames.known} left out. {frames.with_player} of the compared frames have a "
+          f"player active, and they have {frames.statuses} different statuses between them on the oracle")
     for frames_text, why in spec.known.get(version, {}).items():
         print(f"  left out, port frames {frames_text}: {why}")
     for port_frame, oracle_frame, fields in frames.unequal[:show]:
@@ -894,6 +1064,21 @@ def compare_runs(oracle_dir: str, port_dir: str, spec: SoundSpec, version: str, 
     return comparison
 
 
+def play_failures(r: PlayResult) -> list[str]:
+    """What fails a play's comparison: a play on one side only, a run that differs, or a run inside the window that
+    one side doesn't have (a play that ends earlier or later, or misses a run)"""
+    if r.only:
+        return [f"player {r.player}'s play {r.play} is only on the {r.only}"]
+    out = []
+    if r.equal != r.pairs or r.pairs == 0:
+        out.append(f"player {r.player}'s play {r.play}: {r.pairs - r.equal} of {r.pairs} runs differ")
+    if r.pairing.oracle_only:
+        out.append(f"player {r.player}'s play {r.play}: runs {run_list(r.pairing.oracle_only)} are only on the oracle")
+    if r.pairing.port_only:
+        out.append(f"player {r.player}'s play {r.play}: runs {run_list(r.pairing.port_only)} are only on the port")
+    return out
+
+
 def known_frames(spec: SoundSpec, version: str) -> list[int]:
     out = []
     for frames_text in spec.known.get(version, {}):
@@ -904,6 +1089,17 @@ def known_frames(spec: SoundSpec, version: str) -> list[int]:
 def run_list(counts: list[int]) -> str:
     """[0, 1, 2, 5] as "0-2,5" """
     return ",".join(f"{a}" if a == b else f"{a}-{b}" for a, b in compare.frame_ranges(counts)) if counts else "-"
+
+
+def parse_runs(text: str) -> list[int]:
+    """run_list's text back: "0-2,5" as [0, 1, 2, 5], "-" as []"""
+    if text == "-":
+        return []
+    out = []
+    for item in text.split(","):
+        first, _, last = item.partition("-")
+        out.extend(range(int(first), int(last or first) + 1))
+    return out
 
 
 def chunk_digest(records: list[Record], player: int, indices: list[int]) -> str:
@@ -931,13 +1127,23 @@ def write_reference(path: str, comparison: Comparison, oracle_dir: str, port_dir
     _, oracle_samples = load_wav(oracle_wav)
     _, port_samples = load_wav(port_wav)
     rows = []
-    # Plays: the oracle's states, PLAY_CHUNK paired runs to a row
+    # The count limit, each player's plays that start before it, and each play's window: the oracle's runs the port
+    # must have, and the first count left out ("-" for the whole play, whose last run the port's must then be)
+    rows.append(("limit", spec.before_count if spec.before_count is not None else "-", "-", "-", "-"))
+    for player in range(PLAYER_COUNT):
+        plays = [p for p in find_plays(oracle, player)
+                 if spec.before_count is None or oracle[p.start].counter < spec.before_count]
+        if plays:
+            rows.append(("plays", player, len(plays), "-", "-"))
     for r in comparison.plays:
         a = find_plays(oracle, r.player)[r.play]
         b = find_plays(port, r.player)[r.play]
-        pairs, _ = paired_runs(oracle, port, a, b, spec.before_count)
-        for at in range(0, len(pairs), PLAY_CHUNK):
-            chunk = pairs[at:at + PLAY_CHUNK]
+        pairing = paired_runs(oracle, port, a, b, spec.before_count)
+        rows.append(("window", r.player, r.play, pairing.window if pairing.window is not None else "-",
+                     run_list(pairing.expected)))
+        # Plays: the oracle's states, PLAY_CHUNK paired runs to a row
+        for at in range(0, len(pairing.pairs), PLAY_CHUNK):
+            chunk = pairing.pairs[at:at + PLAY_CHUNK]
             counts = [count for count, _, _ in chunk]
             rows.append(("play", r.player, r.play, run_list(counts),
                          chunk_digest(oracle, r.player, [o for _, o, _ in chunk])))
@@ -1011,24 +1217,49 @@ def check_reference(path: str, port_dir: str) -> tuple[list[str], dict[str, int]
     _, samples = load_wav(port_wav)
     rows = load_reference(path)
     failures: list[str] = []
-    counts = {"runs": 0, "frames": 0, "segments": 0, "blocks": 0, "exact": 0}
+    counts = {"runs": 0, "plays": 0, "frames": 0, "segments": 0, "blocks": 0, "exact": 0}
     plays: dict[int, list[Play]] = {}
     port_states = frame_states(port)
+    wrong = misstamped(port)
+    if wrong:
+        failures.append(f"records of the port's trace not in the frame whose VBlank comes next: {len(wrong)}, the "
+                        f"first {wrong[0]}")
+    before_count: int | None = None
+    listed: dict[int, int] = {}
     segments: dict[str, tuple[int, int, int, Level]] = {}
     blocks: dict[str, list[tuple[int, float]]] = {}
     probes: dict[str, tuple[int, int, str]] = {}
     for kind, a, b, c, value in rows:
-        if kind == "play":
+        if kind == "limit":
+            before_count = int(a) if a != "-" else None
+        elif kind == "plays":
+            listed[int(a)] = int(b)
+        elif kind == "window":
             player, play = int(a), int(b)
             found = plays.setdefault(player, find_plays(port, player))
+            counts["plays"] += 1
             if play >= len(found):
                 failures.append(f"player {player} has no play {play} on the port")
                 continue
+            window = int(c) if c != "-" else None
+            have = {count for count, _ in found[play].runs if window is None or count < window}
+            want = set(parse_runs(value))
+            where = f" before run {window}" if window is not None else ""
+            if want - have:
+                failures.append(f"player {player}'s play {play} has no runs {run_list(sorted(want - have))} on the "
+                                f"port{where}")
+            if have - want:
+                failures.append(f"player {player}'s play {play} has runs {run_list(sorted(have - want))} on the port "
+                                f"that the oracle doesn't{where}")
+        elif kind == "play":
+            player, play = int(a), int(b)
+            found = plays.setdefault(player, find_plays(port, player))
+            if play >= len(found):
+                continue
             by_count = dict(found[play].runs)
-            counts_wanted = compare.parse_frames(c) if c != "-" else []
-            missing = [n for n in counts_wanted if n not in by_count]
-            if missing:
-                failures.append(f"player {player}'s play {play} has no runs {run_list(missing)} on the port")
+            counts_wanted = parse_runs(c)
+            # A run the port doesn't have fails at the play's window
+            if any(n not in by_count for n in counts_wanted):
                 continue
             counts["runs"] += len(counts_wanted)
             if chunk_digest(port, player, [by_count[n] for n in counts_wanted]) != value:
@@ -1071,6 +1302,13 @@ def check_reference(path: str, port_dir: str) -> tuple[list[str], dict[str, int]
             elif sample_hash(samples, start + found, end - start) != value:
                 failures.append(f"{a}: the port's samples {start + found}-{end + found} aren't the oracle's "
                                 f"(oracle samples from {start + offset})")
+    # A play on the port that the oracle doesn't have, for any player, before the count limit
+    for player in range(PLAYER_COUNT):
+        found = [p for p in plays.setdefault(player, find_plays(port, player))
+                 if before_count is None or port[p.start].counter < before_count]
+        if len(found) > listed.get(player, 0):
+            failures.append(f"player {player} has {len(found)} plays on the port, the oracle "
+                            f"{listed.get(player, 0)}")
     for name, (first, last, lag, want) in segments.items():
         counts["segments"] += 1
         have = level(samples, first, last)
@@ -1100,7 +1338,10 @@ def command_state(args) -> int:
     equal = sum(r.equal for r in results)
     print(f"total: {pairs} runs paired, {equal} equal; fields {sum(r.fields_equal for r in results)} of "
           f"{sum(r.fields for r in results)} equal")
-    return 0 if equal == pairs and not any(r.only for r in results) else 1
+    failures = [failure for r in results for failure in play_failures(r)]
+    for failure in failures:
+        print(f"FAIL: {failure}")
+    return 1 if failures else 0
 
 
 def command_frames(args) -> int:
@@ -1109,7 +1350,8 @@ def command_frames(args) -> int:
     pairs = frame_pairs(compare.load_run(args.oracle_run), compare.load_run(args.port_run), args.clock, args.lag)
     result = compare_frames(oracle, port, pairs)
     print(f"{result.compared} frames compared on the game's count: {result.equal} equal, {result.run_apart} equal a "
-          f"run apart, {len(result.unequal)} unequal")
+          f"run apart, {len(result.unequal)} unequal; {result.with_player} with a player active, {result.statuses} "
+          "different statuses on the oracle")
     for port_frame, oracle_frame, fields in result.unequal[:args.show]:
         print(f"    port frame {port_frame} (oracle {oracle_frame}): "
               + "; ".join(f"{n}: oracle {v[0]}, port {v[1]}" for n, v in fields.items()))

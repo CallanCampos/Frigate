@@ -592,6 +592,37 @@ static void TestPsgDuty(void) {
     CHECK_EQ(peek.sample, 0);
 }
 
+// A timer write while the channel plays counts from the channel's next step: the timer runs on from where it is and
+// reloads from SOUNDxTMR at each overflow (GBATEK; melonDS's SPUChannel::Run), so a pitch change (an LFO's, a sweep's,
+// a bend's) doesn't move the step the channel is in. A square wave at duty 3 (low for its steps 0-3, high for 4-7)
+// and a period of 1536 ticks (3 mixer samples): its timer starts at 0x10000 - 1536 at the first mixer sample, so it
+// steps at samples 3 (its first sample, step 0) and 6 (step 1). After sample 7 the timer is 512 ticks into step 1;
+// a period of 512 then counts from the overflow at sample 9, one step a sample: steps 2, 3, 4 at samples 9, 10, 11,
+// high from 11 to 14, step 0 again at 15. That overflow leaves the timer at 0x10000 - 512; a period of 1536 then
+// counts from the overflow at sample 16 (step 1): steps 2, 3, 4 at samples 19, 22, 25, high from 25. A count from
+// the step's start compared with the new period would have stepped twice at sample 8 and gone high at 9
+static void TestTimerWrite(void) {
+    static const int sHigh[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+    Snd7HwPeek peek;
+    s16 out[2];
+    int i;
+
+    BootDriver();
+    snd7_setup_channel_psg(8, 3, 127, 0, 1536, 64);
+    snd7_start_channel(8);
+    for (i = 0; i < (int)NELEMS(sHigh); i++) {
+        if (i == 7) {
+            snd7_set_channel_timer(8, 512);
+        } else if (i == 15) {
+            snd7_set_channel_timer(8, 1536);
+        }
+        snd7_hw_mix(out);
+        snd7_hw_peek(8, &peek);
+        // Samples 1 and 2 (i 0 and 1) come before the first step
+        CHECK_EQ(peek.sample, i < 2 ? 0 : sHigh[i] ? 0x7fff : -0x7fff);
+    }
+}
+
 // The noise channel's 15-bit register from 0x7fff: 14 ones drop out (low, with 0x6000 in), then 14 zeros (high), then a
 // one; and the sequence repeats every 32767 steps
 static void TestNoise(void) {
@@ -1475,6 +1506,7 @@ static void AlarmHandler(void *arg) {
 static void TestPxiAlarmTiming(void) {
     u64 start;
     u64 end;
+    u64 nextTick;
     u32 tag;
     int i;
 
@@ -1500,6 +1532,21 @@ static void TestPxiAlarmTiming(void) {
     i = sAlarmCalls;
     WaitFrames(2);
     CHECK_EQ(sAlarmCalls, i);
+
+    // An alarm for no ticks is due at the tick the packet runs in, which has begun: it goes off at once, as the DS's OS
+    // alarm does when its moment has passed, and its word comes before the clock reaches the next tick, not at the
+    // VBlank
+    sAlarmCalls = 0;
+    SND_SetupAlarm(0, 0, 0, AlarmHandler, NULL);
+    SND_StartTimer(0, 0, 1, 0);
+    tag = SND_GetCurrentCommandTag();
+    start = port_os_cycles();
+    nextTick = start / SND7_OS_TICK_CYCLES * SND7_OS_TICK_CYCLES + SND7_OS_TICK_CYCLES;
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
+    WaitFrames(2);
+    CHECK_EQ(sAlarmCalls, 1);
+    CHECK(sAlarmCycles[0] >= start && sAlarmCycles[0] < nextTick);
 }
 
 static u32 Get32(const u8 *at);
@@ -1550,6 +1597,11 @@ static void TestTraceLayout(void) {
     CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_CNT + 4 * 4), peek.cnt);
     CHECK(peek.cnt & SND7_CNT_START);
     CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_START_MIX + 4 * 4), peek.startMix);
+    // The second run (at cycle FIRST_UPDATE + UPDATE_CYCLES, the driver booted at 0) started the note's channel, so
+    // its start and the run are both the first mixer sample after the run: the samples at cycles 0, 1024 and on, up to
+    // the run's cycle, come before it
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_RUN_MIX), (FIRST_UPDATE + UPDATE_CYCLES) / SND7_CYCLES_PER_SAMPLE + 1);
+    CHECK_EQ(peek.startMix, (FIRST_UPDATE + UPDATE_CYCLES) / SND7_CYCLES_PER_SAMPLE + 1);
     CHECK_EQ(work[PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE], 1);
     CHECK_EQ(work[PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 1], 7);
     CHECK_EQ(work[PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 2], 3);
@@ -1905,10 +1957,13 @@ static u64 PlayRomSequence(const Sdat *sdat, const char *name, u32 seconds, BOOL
     return sSound.hash;
 }
 
-// The sequences and their sound's hashes over their first seconds: the driver's output, which must not change unless
-// the driver does (then the hashes are made again, PORT_SND_VERBOSE printing them, with the change's reason). Made
-// again when the sound unit took the start delays, the FIFO and the mixer's widths that the oracle comparison holds
-// it to (oracle.py sound, port/tools/oracle/README.md)
+// The sequences and their sound's hashes over their first seconds: the driver's own output, a change detector and not
+// a check that the sound is right. The hashes come from the port, so this test passes by construction for the driver
+// that made them; it says only that the sound changed, which must not happen unless the driver does (then the hashes
+// are made again, PORT_SND_VERBOSE printing them, with the change's reason). What holds the sound to the DS's is the
+// oracle comparison (ctest oracle_sound_<name> and oracle_sound_<name>_hashes, port/tools/oracle/README.md, "Sound").
+// Made again when the sound unit took the start delays, the FIFO and the mixer's widths, and when a channel's timer
+// kept counting through a write to SOUNDxTMR (of these, only the Pokemon Center's music changed)
 typedef struct RomCase {
     const char *name;
     u32 seconds;
@@ -1916,7 +1971,7 @@ typedef struct RomCase {
 } RomCase;
 
 static const RomCase sRomCases[] = {
-    { "SEQ_BGM_TITLE", 20, 0x2f3a99f334b53708ull }, { "SEQ_BGM_POKECEN", 20, 0x78c286a974890270ull },
+    { "SEQ_BGM_TITLE", 20, 0x2f3a99f334b53708ull }, { "SEQ_BGM_POKECEN", 20, 0xab77cde8c83fb7efull },
     { "SEQ_BGM_WIN1", 10, 0x4b67712741207190ull },  { "SEQ_ME_ITEM", 5, 0x8950af946568bbd8ull },
     { "SEQ_SE_DECIDE1", 2, 0x1146aad3c9209021ull }, { "SEQ_SE_SELECT1", 2, 0xf369ff9b59a06e31ull },
 };
@@ -2012,6 +2067,7 @@ static const Test sTests[] = {
     { "short_sound", TestShortSound },
     { "fifo", TestFifo },
     { "psg_duty", TestPsgDuty },
+    { "timer_write", TestTimerWrite },
     { "noise", TestNoise },
     { "mixer", TestMixer },
     { "calc_timer", TestCalcTimer },

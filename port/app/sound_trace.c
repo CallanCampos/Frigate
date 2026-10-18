@@ -16,12 +16,14 @@ static int sFailed;
 static uint8_t sRecord[PBW_SNDTRACE_RECORD_SIZE];
 
 // The frame a cycle falls in, from 1: the driver runs lazily, up to the virtual clock, so the OS's count of VBlanks
-// can already be past the run's
+// can already be past the run's. A run at a VBlank's cycle comes after it: the OS core raises the VBlank before
+// anything else at its cycle runs (the ARM7's catch-up in the frame hook, the ARM9's pass), as the oracle's frame
+// moves on at its VBlank
 static uint32_t FrameOf(uint64_t cycle) {
-    if (cycle <= FIRST_VBLANK_CYCLE) {
+    if (cycle < FIRST_VBLANK_CYCLE) {
         return 1;
     }
-    return (uint32_t)((cycle - FIRST_VBLANK_CYCLE - 1) / PORT_OS_CYCLES_PER_FRAME) + 2;
+    return (uint32_t)((cycle - FIRST_VBLANK_CYCLE) / PORT_OS_CYCLES_PER_FRAME) + 2;
 }
 
 static void Record(int periodic, void *user) {

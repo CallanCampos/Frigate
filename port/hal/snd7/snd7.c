@@ -89,6 +89,8 @@ static struct {
     u32 buffered;
     // The shared work's count of finished packets at the driver's last run: the packets the DS's driver would have run
     u32 runTag;
+    // The mixer sample after the last periodic run, for the trace (PBW_SNDTRACE_RUN_MIX)
+    u32 runMix;
     // The things reported once a run: a packet that isn't the ARM9's, data that can't be found
     BOOL reportedPacket;
     BOOL reportedPointer;
@@ -316,6 +318,9 @@ static void UpdateSharedWork(void) {
 // One pass of SndThread's loop. Its SND_CommandProc has nothing to do: the packets ran when they came, and count as the
 // DS's would from here
 static void RunThread(BOOL doPeriodicProc) {
+    if (doPeriodicProc) {
+        sSnd.runMix = (u32)sSnd.samples;
+    }
     if (snd7_shared != NULL) {
         sSnd.runTag = snd7_shared->finishedCommandTag;
     }
@@ -355,9 +360,11 @@ static void Mix(void) {
 }
 
 // The driver and the sound unit up to the virtual clock's cycle: the mixer's samples, the periodic runs and the
-// alarms, in the order they fall (at the same cycle: the sample, the run, then the alarms by number)
+// alarms, in the order they fall (at the same cycle: the sample, the run, then the alarms by number). At the cycle it
+// last ran to, only an alarm started since can be due: one started for no ticks, which goes off at once, as the DS's
+// OS alarm does when its moment has passed
 static void Advance(u64 cycles) {
-    if (!sSnd.booted || cycles <= sSnd.now) {
+    if (!sSnd.booted || cycles < sSnd.now) {
         return;
     }
     for (;;) {
@@ -549,6 +556,7 @@ void port_snd7_trace_record(uint8_t *record, int periodic) {
     pbw_sndtrace_put64(record + PBW_SNDTRACE_CYCLE, sSnd.now);
     pbw_sndtrace_put32(record + PBW_SNDTRACE_SEED, snd7_random_state());
     pbw_sndtrace_put32(record + PBW_SNDTRACE_PERIODS, periodic ? 1 : 0);
+    pbw_sndtrace_put32(record + PBW_SNDTRACE_RUN_MIX, sSnd.runMix);
     pbw_sndtrace_put32(record + PBW_SNDTRACE_LOCK, snd7_get_locked_channel(0));
     pbw_sndtrace_put32(record + PBW_SNDTRACE_WEAK_LOCK, snd7_get_locked_channel(1));
     for (i = 0; i < SND7_CHANNEL_NUM; i++) {

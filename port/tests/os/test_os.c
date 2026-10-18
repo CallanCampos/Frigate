@@ -639,11 +639,6 @@ static void TestFrameHooksOnHostStack(void) {
                "vblank 3 (irq mode 1, line 192)", "main waited");
 }
 
-// A module's timed work (port_os_set_timed_work, as the ARM7's sound alarms use it) runs on the host's stack when the
-// clock reaches its moment, as an event of the clock, so that an interrupt it requests (timer 3's here, which the OS
-// doesn't use) is taken there: here while main
-// waits for the VBlank, at line 50 (the moment, moved there from line 20) and, set again from the work, at line 100. A
-// moment cancelled with UINT64_MAX never comes, and one already past comes at once
 // Timer 3's interrupt, which the decomp's os.h doesn't name
 #define TIMER3_IRQ (OS_IE_TIMER0 << 3)
 
@@ -665,6 +660,11 @@ static void CancelledWork(void) {
     Log("cancelled work");
 }
 
+// A module's timed work (port_os_set_timed_work, as the ARM7's sound alarms use it) runs on the host's stack when the
+// clock reaches its moment, as an event of the clock, so that an interrupt it requests (timer 3's here, which the OS
+// doesn't use) is taken there: while main waits for the VBlank, at line 50 (the moment, moved there from line 20) and,
+// set again from the work, at line 100. A moment cancelled with UINT64_MAX never comes, and one already past comes at
+// once
 static void TestTimedWork(void) {
     Boot(LoggingVBlankHandler);
     OS_SetIrqFunction(TIMER3_IRQ, TimedWorkHandler);

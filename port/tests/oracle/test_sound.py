@@ -29,11 +29,13 @@ PERIOD = 2728 * 64
 
 
 def record(cycle: int, frame: int, counter: int = 0, periods: int = 1, players=None, tracks=None, channels=None,
-           player_status: int = 0, ticks=None, locks=(0, 0), cnt=None, start_mix=None, alarms=None) -> bytes:
+           player_status: int = 0, ticks=None, locks=(0, 0), cnt=None, start_mix=None, alarms=None,
+           run_mix: int = 0) -> bytes:
     """A sound trace's record: players {number: (flags, tempo, tempoCounter, [track numbers])}, tracks
     {number: (wait, position, [channel numbers])}, channels {number: (envStatus, volume, timer)}"""
     data = bytearray(sound.RECORD_SIZE)
     struct.pack_into("<QIIII", data, 0, cycle, frame, counter, 0x12345678, periods)
+    struct.pack_into("<I", data, sound.OFF_RUN_MIX, run_mix)
     struct.pack_into("<II", data, sound.OFF_LOCK, *locks)
     for c, value in (cnt or {}).items():
         struct.pack_into("<I", data, sound.OFF_CNT + c * 4, value)
@@ -98,21 +100,29 @@ def write_wav(path: str, samples: list[int]) -> None:
         f.write(b"data" + struct.pack("<I", len(body)) + body)
 
 
-def play_records(start_frame: int, runs: int, offset_cycles: int = 0, wait_change: dict | None = None,
-                 counter_base: int = 0, start_mix_shift: int = 0) -> list[bytes]:
+def run_cycle(frame: int, slot: int) -> int:
+    """The cycle of a frame's run in a made-up trace: three a frame, PERIOD apart, after the VBlank that the frame
+    before ends with, so that each record is in the frame whose VBlank comes next"""
+    return sound.FIRST_VBLANK_CYCLE + (frame - 2) * sound.CYCLES_PER_FRAME + 1 + slot * PERIOD
+
+
+def play_records(start_frame: int, runs: int, wait_change: dict | None = None, counter_base: int = 0,
+                 mix_base: int = 1000, start_delay: int = 0) -> list[bytes]:
     """A player 0 playing a track 3 with a channel 2: one periodic run a record, three a frame, from start_frame. The
-    track's wait counts down each run, its position moves on every 4 runs, and a note starts every 8"""
-    out = [record(offset_cycles, start_frame - 1)]
+    track's wait counts down each run, its position moves on every 4 runs, and a note starts at run 1 and every 8th:
+    in the mixer sample start_delay after the one by which its run had begun (171 samples a run from mix_base)"""
+    out = [record(run_cycle(start_frame - 1, 0), start_frame - 1)]
     for k in range(1, runs + 1):
         wait = 100 - k
         if wait_change and k in wait_change:
             wait = wait_change[k]
         frame = start_frame + (k - 1) // 3
-        out.append(record(offset_cycles + k * PERIOD, frame, counter=counter_base + frame,
+        note = max(k // 8 * 8, 1)
+        out.append(record(run_cycle(frame, (k - 1) % 3), frame, counter=counter_base + frame,
                           players={0: (3, 120, (k * 120) % 240, [3])}, tracks={3: (wait, k // 4 * 3, [2])},
                           channels={2: (2, 100 + k % 5, 0xFC00)}, player_status=1, ticks={0: k // 2},
-                          start_mix={2: 1000 + k // 8 * 1400 + start_mix_shift}))
-    out.append(record(offset_cycles + (runs + 1) * PERIOD, start_frame + runs // 3 + 1))
+                          start_mix={2: mix_base + note * 171 + start_delay}, run_mix=mix_base + k * 171))
+    out.append(record(run_cycle(start_frame + runs // 3 + 1, 0), start_frame + runs // 3 + 1))
     return out
 
 
@@ -183,13 +193,13 @@ class PlayTests(unittest.TestCase):
 
     def test_a_start_over_an_active_player_is_a_new_play(self):
         first = play_records(10, 6)
-        second = play_records(20, 6, offset_cycles=8 * PERIOD)
+        second = play_records(20, 6)
         plays = sound.find_plays(self.trace("a", first[:-1] + second[1:]), 0)
         self.assertEqual(len(plays), 2)
 
     def test_the_same_plays_at_other_moments_are_equal(self):
-        oracle = self.trace("o", play_records(600, 60, offset_cycles=12345678, counter_base=-250))
-        port = self.trace("p", play_records(350, 60, offset_cycles=4194304))
+        oracle = self.trace("o", play_records(600, 60, counter_base=-250))
+        port = self.trace("p", play_records(350, 60))
         results = sound.compare_plays(oracle, port)
         self.assertEqual(len(results), 1)
         self.assertEqual((results[0].pairs, results[0].equal), (60, 60))
@@ -215,16 +225,70 @@ class PlayTests(unittest.TestCase):
         port = self.trace("p", play_records(350, 30, counter_base=-250))
         # Both reach count 107 at run 22 (frame 607 on the oracle, 357 on the port): the difference at run 25 is past it
         result = sound.compare_plays(oracle, port, before_count=107)[0]
-        self.assertEqual(result.pairs + result.left, 30)
-        self.assertEqual(result.equal, result.pairs)
-        self.assertGreater(result.left, 0)
+        self.assertEqual((result.pairing.window, result.pairs, result.equal), (22, 21, 21))
+        self.assertEqual((result.pairing.left_oracle, result.pairing.left_port), (9, 9))
+        self.assertEqual(sound.play_failures(result), [])
 
-    def test_note_starts_pair_and_spread(self):
-        oracle = self.trace("o", play_records(600, 40, start_mix_shift=200000))
+    def test_the_count_limit_comes_first_on_either_program(self):
+        # The press reaches the port 3 frames (9 runs) into the play and the oracle 6 frames in: from the port's run 10
+        # on, the oracle's runs have nothing to pair with, and are left out, not missing
+        oracle = self.trace("o", play_records(600, 40, counter_base=-500))
+        port = self.trace("p", play_records(350, 40, counter_base=-247))
+        result = sound.compare_plays(oracle, port, before_count=106)[0]
+        self.assertEqual((result.pairing.window, result.pairs), (10, 9))
+        self.assertEqual((result.pairing.left_oracle, result.pairing.left_port), (31, 31))
+        self.assertEqual(sound.play_failures(result), [])
+
+    def test_a_play_that_ends_early_on_the_port_fails(self):
+        oracle = self.trace("o", play_records(600, 40))
+        port = self.trace("p", play_records(350, 35))
+        result = sound.compare_plays(oracle, port)[0]
+        self.assertEqual((result.pairs, result.equal), (35, 35))
+        self.assertEqual(result.pairing.oracle_only, [36, 37, 38, 39, 40])
+        self.assertEqual(sound.play_failures(result), ["player 0's play 0: runs 36-40 are only on the oracle"])
+
+    def test_a_play_that_ends_late_on_the_port_fails(self):
+        oracle = self.trace("o", play_records(600, 40))
+        port = self.trace("p", play_records(350, 44))
+        result = sound.compare_plays(oracle, port)[0]
+        self.assertEqual(result.pairing.port_only, [41, 42, 43, 44])
+        self.assertEqual(sound.play_failures(result), ["player 0's play 0: runs 41-44 are only on the port"])
+
+    def test_a_run_that_a_record_of_two_stands_for_isnt_missing(self):
+        # The oracle's ARM7 busy over runs 3 and 4: one record of both, with run 4's state. The port's run 3 has
+        # nothing to pair with, but isn't extra
+        records = play_records(600, 6)
+        both = bytearray(records[4])
+        struct.pack_into("<I", both, sound.OFF_PERIODS, 2)
+        merged = records[:3] + [bytes(both)] + records[5:]
+        result = sound.compare_plays(self.trace("o", merged), self.trace("p", play_records(350, 6)))[0]
+        self.assertEqual((result.pairing.covered, result.pairing.port_only, result.pairs), ([3], [], 5))
+        self.assertEqual(sound.play_failures(result), [])
+
+    def test_the_state_command_fails_on_a_play_cut_short(self):
+        oracle = os.path.join(self.root, "o")
+        port = os.path.join(self.root, "p")
+        write_trace(oracle, play_records(600, 40))
+        write_trace(port, play_records(350, 38))
+        self.assertEqual(quiet(sound.main, ["state", oracle, port]), 1)
+        write_trace(port, play_records(350, 40))
+        self.assertEqual(quiet(sound.main, ["state", oracle, port]), 0)
+
+    def test_note_starts_by_their_delay_after_the_run(self):
+        oracle = self.trace("o", play_records(600, 40, mix_base=200000, start_delay=3))
         port = self.trace("p", play_records(350, 40))
         result = sound.compare_plays(oracle, port)[0]
-        self.assertEqual(set(o - p for p, o in result.starts.items()), {200000})
-        self.assertIn("6 at +0", sound.describe_starts(result.starts))
+        # The notes of runs 1, 8, 16, 24, 32 and 40, each on the port in the sample after its run
+        self.assertEqual(sorted(result.starts), [1000 + k * 171 for k in (1, 8, 16, 24, 32, 40)])
+        self.assertEqual(sound.start_delays(result.starts), ({3: 6}, 0))
+        self.assertIn("6 at 3", sound.describe_starts(result.starts))
+
+    def test_a_start_before_the_run_is_one_the_sampler_missed(self):
+        oracle = self.trace("o", play_records(600, 16, start_delay=-1))
+        port = self.trace("p", play_records(350, 16))
+        result = sound.compare_plays(oracle, port)[0]
+        self.assertEqual(sound.start_delays(result.starts), ({}, 3))
+        self.assertIn("3 restarts the oracle's sampler can't see", sound.describe_starts(result.starts))
 
 
 class FrameTests(unittest.TestCase):
@@ -251,6 +315,9 @@ class FrameTests(unittest.TestCase):
         port = self.trace("p", self.statuses({7: 1}))
         result = sound.compare_frames(oracle, port, [(f, f) for f in range(1, 11)])
         self.assertEqual((result.compared, result.equal), (10, 10))
+        # The player is active from run 7, in frame 3, whose last run is 8: frames 3-10 hold its tick count, and the
+        # frames have two statuses between them
+        self.assertEqual((result.with_player, result.statuses), (8, 2))
 
     def test_a_change_a_run_apart(self):
         # The change comes in the last run of frame 3 on one, the first of frame 4 on the other
@@ -267,6 +334,25 @@ class FrameTests(unittest.TestCase):
         self.assertEqual([frame for frame, _, _ in result.unequal], [3])
         # The player's status, and with it its tick count among the active players'
         self.assertEqual(list(result.unequal[0][2]), ["players", "ticks"])
+
+
+class StampTests(unittest.TestCase):
+    def test_a_record_belongs_to_the_frame_whose_vblank_comes_next(self):
+        vblank = sound.FIRST_VBLANK_CYCLE
+        frame = sound.CYCLES_PER_FRAME
+        self.assertEqual([sound.frame_after(c) for c in (0, vblank - 1, vblank, vblank + frame - 1, vblank + frame)],
+                         [1, 1, 2, 2, 3])
+
+    def test_a_record_stamped_by_melonds_frame_is_found(self):
+        vblank = sound.FIRST_VBLANK_CYCLE
+        frame = sound.CYCLES_PER_FRAME
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "t")
+            # Frame 2: before its VBlank, then (wrongly) after it, as melonDS's frame counts lines 192-262; then a
+            # record at frame 3's VBlank's own cycle, which may go either way
+            write_trace(path, [record(vblank + 100, 2), record(vblank + frame + 100, 2),
+                               record(vblank + frame, 2), record(vblank + frame, 3)])
+            self.assertEqual(sound.misstamped(sound.load_trace(path)), [1])
 
 
 class AudioTests(unittest.TestCase):
@@ -293,6 +379,33 @@ class AudioTests(unittest.TestCase):
         samples = array.array("h", [0x7FFF, -0x8000, 100, -0x7FFF] * 300)
         self.assertEqual(sound.level(samples, 1, 2).clipped, 900)
 
+    def test_a_segment_not_to_the_bit_finds_where_most_samples_agree(self):
+        port = array.array("h", tone(200, 20, 9000))
+        lead = 1234
+        oracle = array.array("h", [0] * (2 * lead)) + port
+        # Every 10th stereo sample of the oracle's differs, as a note that starts a sample apart would make it
+        for n in range(lead, len(oracle) // 2, 10):
+            oracle[2 * n] += 1
+        result = sound.compare_segment(oracle, port, sound.Segment("s", 30, 150, 0, 6))
+        self.assertEqual(result.failures, [])
+        self.assertEqual(result.offset, lead)
+        self.assertAlmostEqual(result.identical / result.samples, 0.95, delta=0.001)
+        self.assertIn("(95.0%) the oracle's at the sample offset where most are", sound.describe_segment(result))
+
+    def test_full_scale_by_second(self):
+        rate = int(sound.SAMPLE_RATE)
+        samples = array.array("h", [0] * (2 * 3 * rate))
+        # Three samples at full scale in second 0, one (left and right) in second 2
+        samples[10] = 0x7FFF
+        samples[11] = -0x8000
+        samples[200] = 0x7FFF
+        samples[2 * (2 * rate + 5)] = 0x7FFF
+        samples[2 * (2 * rate + 5) + 1] = -0x7FFF
+        self.assertEqual(sound.clipped_seconds(samples, 0, 3 * rate), {0: 3, 2: 2})
+        # The same samples 100 later, counted in the port's seconds
+        later = array.array("h", [0] * 200) + samples
+        self.assertEqual(sound.clipped_seconds(later, 100, 3 * rate + 100, 100), {0: 3, 2: 2})
+
     def test_wav_round_trip(self):
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, "a.wav")
@@ -315,12 +428,18 @@ class ReferenceTests(unittest.TestCase):
 
     SPEC = sound.SoundSpec(segments=(sound.Segment("tone", 285, 380, 20, 40, exact=True),))
 
-    def write(self, d) -> str:
+    def write(self, d, statuses: bool = True) -> str:
         comparison = quiet(sound.compare_runs, d.oracle, d.port, self.SPEC, "b2_us", None, None)
         self.assertEqual(comparison.failures, [])
         path = os.path.join(d.root, "reference.tsv")
         self.assertGreater(sound.write_reference(path, comparison, d.oracle, d.port, self.SPEC, "b2_us", "a test"),
                            0)
+        if not statuses:
+            # As where the play's frames aren't on the game's count (the opening's movies): only its runs hold it
+            with open(path) as f:
+                lines = [line for line in f if not line.startswith("status\t")]
+            with open(path, "w") as f:
+                f.writelines(lines)
         return path
 
     def test_the_port_that_wrote_it_passes(self):
@@ -339,6 +458,43 @@ class ReferenceTests(unittest.TestCase):
         failures, _ = sound.check_reference(path, d.port)
         self.assertEqual(len(failures), 1)
         self.assertIn("runs 65-128", failures[0])
+
+    def test_a_play_that_ends_late_fails(self):
+        d = self.make()
+        path = self.write(d, statuses=False)
+        write_trace(os.path.join(d.port, "sound.trace"), play_records(270, 245))
+        failures, _ = sound.check_reference(path, d.port)
+        self.assertEqual(failures, ["player 0's play 0 has runs 241-245 on the port that the oracle doesn't"])
+
+    def test_a_play_that_ends_early_fails(self):
+        d = self.make()
+        path = self.write(d, statuses=False)
+        write_trace(os.path.join(d.port, "sound.trace"), play_records(270, 230))
+        failures, _ = sound.check_reference(path, d.port)
+        self.assertEqual(failures, ["player 0's play 0 has no runs 231-240 on the port"])
+
+    def test_a_play_the_oracle_doesnt_have_fails(self):
+        d = self.make()
+        path = self.write(d, statuses=False)
+        # The same play, then a second one from a start over the active player
+        first = play_records(270, 240)
+        second = play_records(352, 10)
+        write_trace(os.path.join(d.port, "sound.trace"), first[:-1] + second[1:])
+        failures, _ = sound.check_reference(path, d.port)
+        self.assertEqual(failures, ["player 0 has 2 plays on the port, the oracle 1"])
+
+    def test_a_record_in_the_wrong_frame_fails(self):
+        d = self.make()
+        path = self.write(d, statuses=False)
+        records = play_records(270, 240)
+        # Run 100's record stamped with the frame after its VBlank's, as melonDS's own frame number would
+        wrong = bytearray(records[100])
+        struct.pack_into("<I", wrong, sound.OFF_FRAME, struct.unpack_from("<I", wrong, sound.OFF_FRAME)[0] + 1)
+        records[100] = bytes(wrong)
+        write_trace(os.path.join(d.port, "sound.trace"), records)
+        failures, _ = sound.check_reference(path, d.port)
+        self.assertEqual(failures, ["records of the port's trace not in the frame whose VBlank comes next: 1, the "
+                                    "first 100"])
 
     def test_sound_that_differs_fails(self):
         d = self.make()
