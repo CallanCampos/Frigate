@@ -60,9 +60,11 @@ port/tools/package_macos.sh                           # build/port/pokeblack2-0.
 
 - `-DPORT_VERSION=w2_us` makes `pokewhite2.app`, and `-DPORT_MACOS_APP=ON` makes the app with every build.
   [app/macos/make_app.sh](app/macos/make_app.sh) builds it from the program the build linked: the program, the
-  libraries it loads from outside macOS (Homebrew's SDL3) in `Contents/Frameworks`, and an `Info.plist` from
-  [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where each of its values comes from. It signs the
-  whole app with `codesign --force --deep --sign -` and checks it with `codesign --verify --deep --strict`.
+  libraries it loads from outside macOS (Homebrew's SDL3, or an SDL3 installed with its `@rpath` name) in
+  `Contents/Frameworks`, and an `Info.plist` from [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where
+  each of its values comes from. It checks that nothing in the app loads a library from outside macOS and the app,
+  signs the whole app with `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and
+  starts the program from the app once (`--help`) to see that it loads.
 - **Change the bundle identifier.** It is `com.example.pokebw2-native.pokeblack2`, a placeholder: configure with
   `-DPORT_MACOS_BUNDLE_ID_PREFIX=` and a reverse-DNS name of a domain of your own (`io.github.<you>.pokebw2-native`,
   for example). macOS keeps an app's preferences and permissions under it.
@@ -70,8 +72,9 @@ port/tools/package_macos.sh                           # build/port/pokeblack2-0.
   The minimum macOS is the one the program and the libraries in the app were built for; with Homebrew's SDL3 that is
   the macOS Homebrew built SDL3 for.
 - `package_macos.sh` puts the app and a link to `/Applications` in a compressed disk image, then checks the image, the
-  app's signature in it, and that it holds no ROM or other game file. `--out PATH` puts it elsewhere, never in a
-  tracked part of the repository. Its header lists its options.
+  app's signature in it, and that it holds no ROM or other game file. `--out PATH` puts it elsewhere, but never where
+  git would take it into a repository, this one or another (only under an ignored directory such as `build/`, or
+  outside every work tree). Its header lists its options.
 
 **The ROM.** The app holds no ROM and no game data. It finds yours as the program does
 ([hal/rom](hal/rom/port_rom.h)): `--rom PATH`, then the `POKEBW2_ROM` environment variable, then the `orig/` of the
@@ -80,14 +83,21 @@ from your checkout opens from the Finder with the ROM you placed for the ROM bui
 where it is (the program holds that checkout's path). Otherwise give the path when you open it:
 
 ```sh
-open -a build/port/pokeblack2.app --args --rom ~/Games/pokeblack2.nds
-open -a build/port/pokeblack2.app --env POKEBW2_ROM=$HOME/Games/pokeblack2.nds
+open -n -a build/port/pokeblack2.app --args --rom ~/Games/pokeblack2.nds
+open -n -a build/port/pokeblack2.app --env POKEBW2_ROM=$HOME/Games/pokeblack2.nds
 build/port/pokeblack2.app/Contents/MacOS/pokeblack2 --rom ~/Games/pokeblack2.nds
 ```
 
-The app takes the program's options after `--args`. Without a ROM it quits at once with status 66 and says why on
-the terminal, so a Finder launch shows nothing. Saves go to `~/Library/Application Support/pokebw2-native/`
+The app takes the program's options after `--args`. `-n` starts a new copy: without it, `open` only brings a copy that
+is already running to the front, and the options are lost. Saves go to `~/Library/Application Support/pokebw2-native/`
 (`IREO.sav` for Black 2, `IRDO.sav` for White 2) unless `--save-dir` says otherwise.
+
+**When the app stops.** Opened from the Finder or the Dock, the app has no terminal, so the program writes its messages
+to `~/Library/Logs/pokebw2-native/pokeblack2.log` (`pokewhite2.log`), emptied at each launch; Console shows it under Log
+Reports. Without a ROM it can use, the app says why in an alert and quits. Any other stop closes the app with no alert,
+and the log says why: a save file it can't use (one that isn't the 512 KiB the game's flash holds), the game reaching
+code that has no C yet (a trap stub, the commonest today), the game stopping or resetting itself, or a crash. Run from a
+terminal, or with `open --stderr PATH`, the messages go there instead.
 
 **Gatekeeper.** An app built on your own Mac opens normally. One that came from elsewhere (a download, or a disk image
 copied from another Mac) is quarantined, and macOS 15 and later block it until you allow it once:

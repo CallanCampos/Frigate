@@ -502,23 +502,34 @@ const char *port_rom_default_path(void) {
     return NULL;
 }
 
+// Stops the program for want of a ROM it can use: the reason goes to stderr, and to the player through the program's
+// notice when it has one (port_app.h)
+static _Noreturn void StopWithoutRom(const char *reason) {
+    fprintf(stderr, "port: rom: %s\n", reason);
+    if (port_app_fatal_notice != NULL) {
+        port_app_fatal_notice(reason);
+    }
+    exit(PORT_ROM_EXIT_STATUS);
+}
+
 void port_rom_boot(void) {
     if (sRom.data == NULL) {
         char message[1024];
+        char reason[1536];
         const char *path = port_rom_default_path();
         PortRomVerdict verdict;
 
         if (path == NULL) {
-            fprintf(stderr,
-                    "port: rom: no ROM. Give the path of your dump of %s (game code %s) with --rom PATH, or in the "
-                    "POKEBW2_ROM environment variable\n",
-                    port_rom_manifest_title, port_rom_manifest_game_code);
-            exit(PORT_ROM_EXIT_STATUS);
+            snprintf(reason, sizeof(reason),
+                     "no ROM. Give the path of your dump of %s (game code %s) with --rom PATH, or in the POKEBW2_ROM "
+                     "environment variable",
+                     port_rom_manifest_title, port_rom_manifest_game_code);
+            StopWithoutRom(reason);
         }
         verdict = port_rom_open(path, message, sizeof(message));
         if (verdict == PORT_ROM_REFUSED) {
-            fprintf(stderr, "port: rom: %s: %s\n", path, message);
-            exit(PORT_ROM_EXIT_STATUS);
+            snprintf(reason, sizeof(reason), "%s: %s", path, message);
+            StopWithoutRom(reason);
         }
         if (verdict == PORT_ROM_EXACT) {
             fprintf(stderr, "port: rom: %s: %s, the dump the decomp builds\n", path, port_rom_manifest_title);

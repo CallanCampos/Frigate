@@ -33,7 +33,8 @@
 //   --main-arena-size B the host's main memory arena, in bytes (a K or M suffix multiplies)
 //   --vram-backend NAME how VRAM banks are mapped: shm, mach-entry, mach-remap or copy (port/hal/gx/vram.h)
 //
-// The controls are in port/app/present.c.
+// The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
+// program writes its messages to ~/Library/Logs/pokebw2-native/<program>.log instead (port/app/message_log.h).
 //
 // Exit statuses: 0 when the run ends normally, 2 for bad options, 70 when the game reaches code or data with no C
 // (port/hal/trap.c), 71 when it stops itself (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog,
@@ -43,6 +44,7 @@
 // POSIX's signals and alarm() for the watchdog, which glibc hides from strict C11 (the target's -std=c11)
 #define _DEFAULT_SOURCE
 
+#include "app/message_log.h"
 #include "app/present.h"
 #include "app/replay.h"
 #include "app/run_dir.h"
@@ -358,6 +360,8 @@ int main(int argc, char **argv) {
     const char *runDir;
     PortOsResult result;
     int status = 0;
+    // Before anything is written: an app opened from the Finder writes its messages to a log (port/app/message_log.h)
+    const char *logPath = port_message_log_open();
 
     sArgc = argc;
     sArgv = argv;
@@ -367,6 +371,10 @@ int main(int argc, char **argv) {
         return port_app_option("help") != NULL ? 0 : EXIT_BAD_OPTIONS;
     }
     sHeadless = port_app_option("headless") != NULL;
+    // And it shows the reason for a stop the player can act on, with a window, since nobody reads its log at once
+    if (logPath != NULL && !sHeadless) {
+        port_app_fatal_notice = port_message_log_alert;
+    }
     frames = CountOption("frames", 0, 0);
     watchdog = CountOption("watchdog", 0, sHeadless ? DEFAULT_HEADLESS_WATCHDOG : 0);
     arenaSize = CountOption("main-arena-size", 1, 0);

@@ -8,8 +8,8 @@
 #   port/tools/package_macos.sh [--build-dir DIR] [--out PATH]
 #
 #   --build-dir DIR  a host build configured with CMake (build/port by default); its PORT_VERSION picks the program
-#   --out PATH       the disk image (DIR/<program>-<version>.dmg by default). A path in the repository must be one git
-#                    ignores, such as one under build/, so that the image is never committed
+#   --out PATH       the disk image (DIR/<program>-<version>.dmg by default). A path in a git work tree, this one or
+#                    another, must be one git ignores, such as one under build/, so that the image is never committed
 set -eu
 
 repo=$(cd "$(dirname "$0")/../.." && pwd)
@@ -44,20 +44,26 @@ if [ ! -f "$build_dir/CMakeCache.txt" ]; then
     exit 2
 fi
 
-# Makes $out absolute and refuses a path in the repository that git would track
+# Makes $out absolute and refuses a path that git would track, in this repository or in any other (the clone this
+# worktree sits in, say): the image goes only where no git add takes it, under an ignored directory such as build/ or
+# outside every work tree. Git looks from the nearest directory of the path that exists, through any links
 check_out() {
     case "$out" in
     /*) ;;
     *) out="$(pwd)/$out" ;;
     esac
-    case "$out" in
-    "$repo"/*)
-        if ! git -C "$repo" check-ignore -q "$out"; then
-            echo "package_macos.sh: $out is in the repository and git doesn't ignore it; put the image under build/" >&2
-            exit 2
-        fi
-        ;;
-    esac
+    existing=$(dirname "$out")
+    while [ ! -d "$existing" ]; do
+        existing=$(dirname "$existing")
+    done
+    rest=${out#"$existing"/}
+    existing=$(cd "$existing" && pwd -P)
+    if [ "$(git -C "$existing" rev-parse --is-inside-work-tree 2>/dev/null)" = true ] &&
+        ! git -C "$existing" check-ignore -q "$existing/$rest"; then
+        echo "package_macos.sh: $out is in the git work tree $(git -C "$existing" rev-parse --show-toplevel), and git" \
+            "doesn't ignore it; put the image under build/ or outside every repository" >&2
+        exit 2
+    fi
 }
 if [ -n "$out" ]; then
     check_out

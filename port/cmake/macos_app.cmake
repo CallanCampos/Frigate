@@ -4,7 +4,8 @@
 #
 #   cmake --build build/port --target pokeblack2_app        (pokewhite2_app with -DPORT_VERSION=w2_us)
 #
-# -DPORT_MACOS_APP=ON makes it part of every build. port/tools/package_macos.sh puts it in a disk image.
+# -DPORT_MACOS_APP=ON makes it part of every build. port/tools/package_macos.sh puts it in a disk image. The tests of
+# make_app.sh and of the log an app opened from the Finder writes are here too, since both are macOS's alone.
 if(NOT APPLE)
     return()
 endif()
@@ -37,3 +38,24 @@ add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
     COMMENT "Building and signing ${PORT_PROGRAM}.app"
     VERBATIM)
 add_dependencies(${PORT_PROGRAM}_app ${PORT_PROGRAM})
+
+# make_app.sh on small programs made at test time, whose libraries are named by every kind of install name dyld knows,
+# and its refusals (port/tests/app/test_make_app.sh)
+add_test(NAME app_make_app
+    COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_make_app.sh" "${CMAKE_C_COMPILER}"
+        "${CMAKE_CURRENT_BINARY_DIR}/test_make_app" "${REPO_ROOT}")
+set_tests_properties(app_make_app PROPERTIES TIMEOUT 300)
+
+# The log of an app opened from the Finder (port/app/message_log.c): the program copied into a stand-in app and run with
+# stderr on /dev/null, as LaunchServices runs it, under a home of its own (port/tests/app/test_message_log.sh)
+add_test(NAME app_message_log
+    COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_message_log.sh" $<TARGET_FILE:${PORT_PROGRAM}>
+        "${CMAKE_CURRENT_BINARY_DIR}/test_message_log")
+set_tests_properties(app_message_log PROPERTIES TIMEOUT 120)
+
+# package_macos.sh's refusals of an image path that git would take into a repository, which come before it builds
+# anything (port/tests/app/test_package_macos.sh)
+add_test(NAME app_package_macos_out
+    COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_package_macos.sh" "${REPO_ROOT}" "${CMAKE_BINARY_DIR}"
+        "${CMAKE_CURRENT_BINARY_DIR}/test_package_macos")
+set_tests_properties(app_package_macos_out PROPERTIES TIMEOUT 60)

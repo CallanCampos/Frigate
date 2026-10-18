@@ -1,9 +1,10 @@
-// The program's options and its presentation hook, for every module of the platform layer (port/hal, port/gfx) and the
-// program itself. The program (port/app/main.c) records its arguments before it runs the game, and a module reads the
-// option it needs with port_app_option; the renderer's integration sets port_app_present, which the program's frame
-// hook calls at each VBlank. They live in port_hal (app_options.c), so that every executable that links the platform
-// layer has them, the OS tests included; one that records no arguments reads every option as absent. Plain C types
-// only, like port_os.h, so that files without the decomp's headers can include it.
+// The program's options and its hooks, for every module of the platform layer (port/hal, port/gfx) and the program
+// itself. The program (port/app/main.c) records its arguments before it runs the game, and a module reads the option
+// it needs with port_app_option; the renderer's integration sets port_app_present, which the program's frame hook
+// calls at each VBlank; the program sets port_app_fatal_notice for a player who can't see stderr. They live in port_hal
+// (app_options.c), so that every executable that links the platform layer has them, the OS tests included; one that
+// records no arguments reads every option as absent. Plain C types only, like port_os.h, so that files without the
+// decomp's headers can include it.
 #ifndef PORT_HAL_OS_PORT_APP_H
 #define PORT_HAL_OS_PORT_APP_H
 
@@ -21,5 +22,10 @@ int port_app_is_flag(const char *name, size_t length);
 // The renderer's presentation of a frame, called by the program's frame hook on the host's stack at each VBlank; NULL
 // until the renderer's integration sets it
 extern void (*port_app_present)(void);
+
+// Tells the player why the program stops, for a stop they can act on (no ROM, a ROM the port refuses): a module calls
+// it with its message, which it has written to stderr already, just before it stops the program. NULL unless the
+// program sets it, which it does when nobody sees stderr (an app opened from the Finder, port/app/message_log.h)
+extern void (*port_app_fatal_notice)(const char *message);
 
 #endif // PORT_HAL_OS_PORT_APP_H
