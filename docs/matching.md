@@ -1453,13 +1453,22 @@ Same instructions, scheduled in another order.
   included, shifts it in place and lets the load move above the parameter's copy: `resonance_resort_data.c`'s
   `JoinAvenuePerson_AddVisitorData` writes `JoinAvenueData *data = person->data; data += visitor->dataIndex;` inside
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
-- A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is MWCC's address
-  of `p[i].field` when two accesses share it, `p` is a pointer variable and its first common-subexpression pass did
-  not merge them, as in `f[i].b += v`. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
-  compiles like `p[i].f`, index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`), and so do
-  other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
-  (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
-  `touch[touched].action` twice with the original's offset first, and no natural spelling of it is known (see its row).
+- A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is the address of
+  `p[i].field` that MWCC shares between two accesses: common-subexpression elimination builds it as `p + 4` indexed
+  by `i << 3`. When the two accesses are reads merged into one load, -O4 propagates that address back into the load
+  in a later pass (level 3 does not), index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`),
+  so the shape survives only where the address keeps a second use. That is a read-modify-write (`f[i].b += v`, or
+  `list->table[i].f--` through a loaded base, as in `bgwinfrm.c`'s `BGWinFrame_MoveStep` and `heapsys.c`'s
+  `GFL_HeapAllocateCore`), two stores to one element, or a store in the other arm of the `if` whose condition reads
+  it: overlay 143's `MonolithPower_Equip` reads the array member `screen->state->equipped[slot]` in its condition and
+  again as an argument with the offset first (`adds r0, #8; ldrb r1, [r0, r7]`) because its `else` stores to it, and
+  the same reads without that `else` index first. Two merged reads also keep the offset first under
+  `#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3`, where a single read still
+  indexes first. Overlay 139's `UpdateScroll` reads `touch[touched].action` twice with the original's offset first and
+  no other use of the address, and matches byte for byte with any of the three pragmas around it alone, so its pair
+  was merged late; the only C known to do that reassigns the table local between the reads, which does nothing (see
+  its row). The front end folds the offset out of the index otherwise: `(&p->f)[i * 2]` compiles like `p[i].f`, and
+  so do other field types, `const`, a nested struct and a one-element array member.
   An array member's offset goes the same way: two reads of `data->entries[i].type` with a store between give
   `adds r1, r0, #0; adds r1, #0x18; ldr r1, [r1, r4]`, and with `const` data a later pass drops the second load.
   A pointer local such as `entries = data->entries` is kept, not folded into `data`, once it has a use in a later
@@ -2641,7 +2650,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   other loop of the file is rotated. The file compiles to the same code with the queue as another file's global,
   declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
   `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
-  the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
+  the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows). In
+  overlay 139's `UpdateScroll` the attribute on any object or member the function reads also keeps the two reads of
+  `list->dragDelta` in the arms of an `||` from being merged (4 bytes more), and leaves its index-first table read
+  as it is (Instruction order: "that MWCC shares between two accesses").
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =
   head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `VCT_FlushAllQueues` (`vct_buffer.c`) matches
