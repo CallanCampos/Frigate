@@ -316,6 +316,7 @@ src/ov036/sound_obj.c:
     .data       start:0x021d54d4 end:0x021d54e0
 
 src/ov036/event_name_entry.c:
+    complete
     .text       start:0x021bf914 end:0x021bfe88
 
 src/ov036/shortcut_menu.c:
