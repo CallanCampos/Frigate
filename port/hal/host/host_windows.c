@@ -13,7 +13,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "hal/host/host.h"
-#include <windows.h>
 #include <direct.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -21,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 // The top of a fiber's guard, next to its stack: one guard page, whose first touch raises a fault, then pages left
 // writable under it. The system delivers the fault on the overflowing stack, writing its exception frame below the
@@ -403,8 +403,8 @@ static void TakeFault(const EXCEPTION_POINTERS *info) {
     sFaultContext = *info->ContextRecord;
     sFaultCode = record->ExceptionCode;
     // An access violation's, an in-page error's and a guard page's second parameter is the address accessed
-    sFaultAddress = record->NumberParameters >= 2 ? (const void *)record->ExceptionInformation[1]
-                                                  : record->ExceptionAddress;
+    sFaultAddress =
+        record->NumberParameters >= 2 ? (const void *)record->ExceptionInformation[1] : record->ExceptionAddress;
 }
 
 // The report, on the fault stack, as a signal handler on its alternate stack: the handler, then the end of the program

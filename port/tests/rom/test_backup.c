@@ -11,8 +11,8 @@
 //
 //   port_card_backup_tests NAME | all
 #include "hal/card/card_internal.h"
-#include "hal/host/host.h"
 #include "hal/card/port_card.h"
+#include "hal/host/host.h"
 #include "hal/os/port_app.h"
 #include "hal/pxi/pxi_bus.h"
 #include "hal/rom/rom_manifest.h"
@@ -331,6 +331,8 @@ static int TestWriteFailure(void) {
     char dir[600];
     char log[600];
     char line[1024];
+    char probe[700];
+    char expected[256];
     int saved;
     int failures = 0;
     int recoveries = 0;
@@ -352,6 +354,16 @@ static int TestWriteFailure(void) {
     if (file != NULL) {
         fclose(file);
     }
+    // The error a file there gets, which the message must give: "Not a directory" on macOS and Linux, Windows' own
+    snprintf(probe, sizeof(probe), "%s/probe", dir);
+    errno = 0;
+    file = fopen(probe, "wb");
+    Check(file == NULL, "nothing can be made in the save directory's place");
+    if (file != NULL) {
+        fclose(file);
+        remove(probe);
+    }
+    snprintf(expected, sizeof(expected), "%s", strerror(errno));
 
     // stderr to a file of the test's, for the messages
     fflush(stderr);
@@ -383,7 +395,7 @@ static int TestWriteFailure(void) {
     file = fopen(log, "r");
     while (file != NULL && fgets(line, sizeof(line), file) != NULL) {
         failures += strstr(line, "can't write") != NULL;
-        reason += strstr(line, "Not a directory") != NULL;
+        reason += strstr(line, expected) != NULL;
         recoveries += strstr(line, "port: card: wrote") != NULL;
     }
     if (file != NULL) {
@@ -816,6 +828,10 @@ static int TestLinkedSave(void) {
     return 0;
 }
 
+static int StartsWith(const char *text, const char *start) {
+    return start != NULL && strncmp(text, start, strlen(start)) == 0;
+}
+
 // The save directory: --save-dir, else the user's
 static int TestSavePath(void) {
     static char program[] = "test";
@@ -830,9 +846,12 @@ static int TestSavePath(void) {
     Check(strcmp(port_card_save_path(), expected) == 0, "--save-dir names the directory");
     port_app_set_arguments(1, without, NULL, 0);
     port_card_set_save_path(NULL);
-    Check(strstr(port_card_save_path(), "/" PORT_PRODUCT_NAME "/") != NULL, "else the user's own, named Frigate");
-    Check(getenv("HOME") == NULL || strncmp(port_card_save_path(), getenv("HOME"), strlen(getenv("HOME"))) == 0 ||
-              getenv("XDG_DATA_HOME") != NULL,
+    Check(strstr(port_card_save_path(), "/" PORT_PRODUCT_NAME "/") != NULL ||
+              strstr(port_card_save_path(), "\\" PORT_PRODUCT_NAME "/") != NULL,
+          "else the user's own, named Frigate");
+    // In the home directory on macOS and Linux, in the user's application data on Windows (port_card.h)
+    Check(getenv("HOME") == NULL || StartsWith(port_card_save_path(), getenv("HOME")) ||
+              StartsWith(port_card_save_path(), getenv("APPDATA")) || getenv("XDG_DATA_HOME") != NULL,
           "under the home directory");
     port_app_set_arguments(0, NULL, NULL, 0);
     return 0;

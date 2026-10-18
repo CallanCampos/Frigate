@@ -1084,7 +1084,6 @@ static void PrintLog(void) {
     }
 }
 
-
 int main(int argc, char **argv) {
     const char *name = argc > 1 ? argv[1] : "";
     size_t i;
