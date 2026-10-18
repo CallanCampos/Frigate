@@ -260,3 +260,9 @@ lib/dwcutilui/src/dwc_util_page_step3.c:
     .text       start:0x021b06d8 end:0x021b0ad0
     .data       start:0x021c0f00 end:0x021c0f44
     .bss        start:0x021c40ec end:0x021c40f4
+
+lib/dwcutilui/src/dwc_util_page_multi4.c:
+    complete
+    .text       start:0x021b0ad0 end:0x021b0c28
+    .data       start:0x021c0f44 end:0x021c0f58
+    .bss        start:0x021c40f4 end:0x021c40f8

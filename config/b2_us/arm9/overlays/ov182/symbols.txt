@@ -1635,7 +1635,7 @@ sNoticeScreen kind:bss addr:0x021c40e0
 sPageMove kind:bss addr:0x021c40e4
 sMoveWaitEnd kind:bss addr:0x021c40e8
 sPageStep3 kind:bss addr:0x021c40ec
-data_ov182_021c40f4 kind:bss addr:0x021c40f4
+sPageMulti4Frames kind:bss addr:0x021c40f4
 data_ov182_021c40f8 kind:bss addr:0x021c40f8
 data_ov182_021c40fc kind:bss addr:0x021c40fc
 data_ov182_021c4100 kind:bss addr:0x021c4100

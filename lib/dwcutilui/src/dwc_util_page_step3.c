@@ -5,6 +5,7 @@
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
 #include "dwc_util_main.h"
+#include "dwc_util_page_multi4.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_task.h"

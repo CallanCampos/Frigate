@@ -68,8 +68,8 @@ BOOL func_ov182_021b8f24(void);
 void func_ov182_021b536c(void);
 // The choice of the setup of a connection
 void func_ov182_021b5bb8(void);
-// The message after a successful AOSS setup
-void func_ov182_021b0ad0(void);
+// The message before the connection test
+void func_ov182_021b6588(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet
