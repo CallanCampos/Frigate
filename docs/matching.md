@@ -3138,8 +3138,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   setup has the same cameras, a 16-byte `sPStatusEdgeColors` and the LCD config in its `.rodata`. With the cameras
   as statics of the same function, the BG setups as statics of `PokeList_InitGraphics` in BG order (only BG 0's,
   which `PokeList_CreateBG0` uses, at file scope) and the glow's step as a `static const u16`, its whole `.rodata`
-  is the ROM's. Overlay 194's `pokemontrade_2d.c` has another unread 16 zero bytes before its 3D setup, but that
-  setup turns edge marking off.
+  is the ROM's. Overlay 194's `pokemontrade_2d.c` has the same 16 zero bytes beside its cameras though its setup
+  turns edge marking off (below).
+- An unread `{ 0, FX32_ONE, 0 }` or 16 zero bytes beside a file's camera vectors in its shared `.rodata` are
+  probably its camera setup's up vector and edge colors (`GXRgb[8]`), function-local statics of the function that
+  creates the camera. Game Freak's 3D setups declare position, target, up and edge colors together, and overlay 207's
+  `p_sta_sys.c` passes its zero colors to `G3X_SetEdgeColorTable` just before `G3X_EdgeMarking(FALSE)`.
+  `pokemontrade_2d.c`'s `func_ov194_021c43c0` makes the same calls without the table and gives the camera a local
+  copy of up, yet the file's `.rodata` is the original's only with position, target, up and colors all declared in
+  that function, the colors first. Its other bytes that no code loads, `18 48 18 00 04 00 00 00`, are folded scalars
+  at the end of MWCC's list: three `u8` of `func_ov194_021c3770` (24, 24, 72) and a 4 whose function is a guess.
 - A `static const` variable whose address is never taken is folded into the code and not emitted. If the original has
   it anyway, it is not `static`: a global that no code refers to gets a section of its own, laid out by size with the
   rest. An object laid out ahead of smaller ones is in a file of its own, linked first, as overlay 65's command table
