@@ -55,10 +55,11 @@ tools that show the differences.
 - A blend's clamps written into their own narrow locals, `u8 r = MATH_CLAMP(glowR + dr, 0, 31);`, and through one
   wide temporary assigned before each (`value = glowR + dr; r = value > 31 ? 31 : value < 0 ? 0 : value;`) compile
   to different registers and order around them. `plist_sys.c`'s `PokeList_UpdateGlow` matches only the first way,
-  with `u16` locals for the two colors and six `u8` channel locals as the other RGB555 blends write them
-  (`zukan_info.c`); with the shared `s32 value`, every spelling of the rest kept the glow and base colors in swapped
-  registers or came out 4 bytes larger. Its `fx32 ratio`, declared after the two `u8` loop counters, then takes
-  `r4`, as in the original.
+  with six `u8` channel locals as the other RGB555 blends write them (`zukan_info.c`) and `s8` differences (`int`
+  ones are 12 bytes short); with the shared `s32 value`, every spelling of the rest kept the glow and base colors in
+  swapped registers or came out 4 bytes larger. Its `fx32 ratio`, declared after the two `u8` loop counters, then
+  takes `r4`, as in the original (10 bytes off when declared first). The `u16` locals for the two colors and
+  `MATH_CLAMP` rather than a `?:` chain are style: the function matches either way.
 - Compound assignments add in another order than one expression: `mystery_net.c`'s `Mystery_ParseHex` adds the
   shifted value first, as the original does, only as `value <<= 4; value += digit;`, not as
   `value = value * 16 + digit`.
@@ -589,7 +590,10 @@ Same instructions, registers swapped.
 - Whether a zero stored to two fields keeps a saved register can depend on whether the two stores are adjacent.
   `plist_sys.c`'s `PokeList_DoMenuItem` builds its zero with the max HP call's `NULL` (`movs r2, #0; movs r7, #0`)
   and stores `r7` for `wk->pkm = NULL` and `wk->showShortcutButtons = FALSE`, spilling the max HP to `sp+4`, only
-  when another store comes between them (`wk->pkm = NULL; wk->state = 4; wk->showShortcutButtons = FALSE;`).
+  when another store comes between them (`wk->pkm = NULL; wk->state = 4; wk->showShortcutButtons = FALSE;`). The
+  scheduler still stores the state first, as the ROM does (`strb r0, [r4, #0xc]; str r7, [r4, #0x3c]`), so the
+  statement order is a lever here, not the original's order: the file's two other copies of the block write the
+  state first and match.
   Written next to each other, in each order of the block's four stores tried, they leave `r7` to the max HP and the
   zero is built again, with `push {r3-r7, lr}; sub sp, #0x40` for the original's `push {r4-r7, lr}; sub sp, #0x44`,
   which moves every stack offset (over 100 bytes off).
@@ -3097,12 +3101,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `WinRecord_PrintItemAt` and its BG scroll's speed and wrap (`{ 0x40, 0x2000 }`) in `WinRecord_ScrollBG`, read as
   `add r2, #0x40`, and a 12-byte table that nothing reads, 4-aligned, so it is declared as `u32`s.
 - Such a static can sit anywhere in the shared section, sorted by its size, and its function shows what it is.
-  Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`: they are
-  `static const GXRgb sEdgeColors[8]`, the eight colors of `G3X_SetEdgeColorTable`, in `PokeList_Init3D`, which turns
-  edge marking on but never loads the table. With the cameras as statics of the same function, the BG setups as
-  statics of `PokeList_InitGraphics` in BG order (only BG 0's, shared with `PokeList_CreateBG0`, at file scope) and
-  the glow's step as a `static const u16`, its whole `.rodata` is the ROM's. Overlay 194's `pokemontrade_2d.c` has the
-  same unread 16 zero bytes, which fit just before its 3D setup.
+  Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`. They are read
+  as `static const GXRgb sEdgeColors[8]` in `PokeList_Init3D`, which turns edge marking on but never loads a table.
+  The type and name are a guess (a `u32[4]` gives the same ROM), backed by overlay 207's `p_sta_sys.c`, whose 3D
+  setup has the same cameras, a 16-byte `sPStatusEdgeColors` and the LCD config in its `.rodata`. With the cameras
+  as statics of the same function, the BG setups as statics of `PokeList_InitGraphics` in BG order (only BG 0's,
+  which `PokeList_CreateBG0` uses, at file scope) and the glow's step as a `static const u16`, its whole `.rodata`
+  is the ROM's. Overlay 194's `pokemontrade_2d.c` has another unread 16 zero bytes before its 3D setup, but that
+  setup turns edge marking off.
 - A `static const` variable whose address is never taken is folded into the code and not emitted. If the original has
   it anyway, it is not `static`: a global that no code refers to gets a section of its own, laid out by size with the
   rest. An object laid out ahead of smaller ones is in a file of its own, linked first, as overlay 65's command table

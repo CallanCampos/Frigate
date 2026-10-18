@@ -118,8 +118,8 @@ static void PokeList_MessageDoneDemo(PokeListWork *wk);
 static void PokeList_SetHeldItem(PokeListWork *wk, PartyPkm *pkm, u16 item);
 static u16 PokeList_GetBagCount(PokeListWork *wk, u16 item);
 
-// BG 0's setup, which PokeList_CreateBG0 uses, also after plist_demo.c's 3D demo. It is at file scope, ahead of the
-// other BGs' setups (statics of PokeList_InitGraphics): only there does the ROM's .rodata come out in its order
+// BG 0's setup, which PokeList_CreateBG0 builds, again after plist_demo.c's 3D demo. The other BGs' setups are statics
+// of PokeList_InitGraphics; this one is declared ahead of them, and its place there sets its place in .rodata
 static const BGSetup sBG0Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 0, 0, 0, 0 };
 
 // The moves outside battle, by the index of their check in CheckAllowHidenEvent
@@ -406,6 +406,7 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         }
     }
     {
+        // The glow angle's step. Its reads are folded, but a function's static constant stays in .rodata
         static const u16 angleStep = 0x400;
         u16 glowColors[3] = { 0x7ff4, 0x7fff, 0x7be9 };
         u16 baseColors[3] = { 0x4a0a, 0x5ef7, 0x4140 };
@@ -521,9 +522,8 @@ void PokeList_Init3D(PokeListWork *wk) {
     static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(128) };
     static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
     static const VecFx32 sCameraTarget = { 0, 0, 0 };
-    // Black for all eight edge colors, the table G3X_SetEdgeColorTable would load for the edge marking turned on below
-    // (our reading of its size and place). Nothing loads it, but MWCC still emits an unread function-local static: it
-    // is the 16 zero bytes after sLCDConfig in the ROM's .rodata
+    // Nothing reads it, but the original's .rodata has these 16 zero bytes after the LCD config. Its type and name are
+    // a guess: the eight colors that G3X_SetEdgeColorTable takes, for the edge marking turned on below
     static const GXRgb sEdgeColors[8] = { 0 };
 
     GX_SetGraphicsMode(1, 0, 1);
