@@ -127,6 +127,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `static inline` helper. (matching.md: "Moving code into a `static inline` helper")
 - Chained stores of one constant (`a = b = TRUE`) share a register; separate ones may not.
   (matching.md: "Two stores of the same constant")
+- A blend's colors in swapped registers around clamps through one reused wide temporary: clamp each channel straight
+  into its own `u8` with `MATH_CLAMP`. (matching.md: "A blend's clamps written into their own narrow locals")
 - Variables of an inner block are allocated apart from the function's. (matching.md: "declared in an inner block")
 - A zeroed struct passed by value in a loop is copied from another zero variable: declaring it in a block around the
   loop changes which. (matching.md: "zeroed struct a loop passes by value")
@@ -199,6 +201,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
+  of the block's stores between those two. (matching.md: "Whether a zero stored to two fields keeps a saved register")
 - A stack frame for a wide parameter where the original keeps it in registers and computes an expression again after
   a call (`sub r1, r8, #0xc`): write the expression at each use, not in a local. (matching.md: "written at each use
   around a call")
@@ -856,6 +860,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An "unreferenced global" there whose values a function uses as immediates is several scalars of that function, one
   per value (`ctvt_game_cam.c`'s crop, four `u16`); their count orders equal-size initializers anywhere in the file.
   (matching.md: "The values a function already uses as immediates")
+- Unread 16 zero bytes among the shared `.rodata` of a file that sets up 3D: a function-local
+  `static const GXRgb sEdgeColors[8]` in the function that sets up the 3D system (`plist_sys.c`; a guess, backed by
+  overlay 207's `p_sta_sys.c`). (matching.md: "its function shows what it is")
 - Function-local statics are listed last, after the tentative `.bss` statics, by function in reverse order; one in a
   `static inline` is listed where the inline is defined. (matching.md: "joins the size sort at the end of the file")
 - An object at the head of the shared `.rodata` or `.data`, larger than the ones after it and packed against them:
