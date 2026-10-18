@@ -712,8 +712,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   in the `for` increment's comma list. (matching.md: "a `for` loop's comma-separated increment")
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
-- At `-O2,p` (`lib/irc`) loops are not rotated; a guard before the first pass and the test at the end is a guarded
-  `do`/`while`, `if (i < size) do ... while (++i < size)`. (matching.md: "At `-O2,p` no loop is rotated")
+- Loops that `-O2,p` matches where -O4,p rotates or drops them, in some functions of a file: those functions read
+  an aligned object, as `lib/irc`'s do at the game's flags. (matching.md: "At `-O2,p` no loop is rotated")
 - At `-O4,p`, a loop guard whose branch also skips statements after the loop: a guarded `do`/`while` with those
   statements inside the `if`; a `for` inside an `if` tests twice. (matching.md: "where a `for` loop is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
@@ -761,6 +761,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - The same `b` in every function that reads one object, where the file's other loops are rotated: the object has an
   explicit alignment, as a 32-aligned address in the ROM shows; another file's object takes it on its `extern`
   declaration. (matching.md: "An explicit alignment")
+- An empty loop that the original keeps and -O4,p drops: the function reads an aligned object (`lib/irc`'s
+  `IrcLink_IsRecvIgnored`). (matching.md: "An explicit alignment")
 - The same in an outer loop around an inner one: begin its body with the inner loop,
   `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
 - `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
