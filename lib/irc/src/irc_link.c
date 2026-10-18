@@ -140,16 +140,16 @@ BOOL IrcLink_IsLinked(void) {
 }
 
 static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id) {
-    IrcFrameHeader *header = &IrcFrame.header;
+    IrcFrameData *frame = &IrcFrame;
     u8 *dst;
     u8 *raw;
     int i;
     u16 sum;
 
-    header->id = id;
-    header->cmd = cmd;
-    header->sumLo = 0;
-    header->sumHi = 0;
+    frame->header.id = id;
+    frame->header.cmd = cmd;
+    frame->header.sumLo = 0;
+    frame->header.sumHi = 0;
     dst = IrcFrame.data;
     for (i = 0; i < size; i++) {
         *dst++ = *data++;
@@ -157,8 +157,8 @@ static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id) {
     size += sizeof(IrcFrameHeader);
     raw = (u8 *)&IrcFrame;
     sum = IrcLink_Checksum(raw, size);
-    header->sumLo = sum;
-    header->sumHi = sum >> 8;
+    frame->header.sumLo = sum;
+    frame->header.sumHi = sum >> 8;
     for (i = 0; i < size; i++) {
         raw[i] ^= IRC_XOR;
     }
@@ -233,7 +233,7 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
     u16 sum;
 
     if (size == 1) {
-        if (raw[0] == IRC_CMD_PING) {
+        if (frame->header.cmd == IRC_CMD_PING) {
             return TRUE;
         }
         return FALSE;
@@ -261,7 +261,6 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
 
 BOOL IrcLink_Poll(void) {
     IrcFrameData *frame;
-    u8 *raw;
     u8 size = IrcSpi_Recv((u8 *)&IrcFrame);
 
     if (IrcLink_IsRecvIgnored(size)) {
@@ -278,12 +277,11 @@ BOOL IrcLink_Poll(void) {
     }
     IrcLink.tick = OS_GetTick();
     frame = &IrcFrame;
-    raw = (u8 *)&IrcFrame;
-    if (raw[0] < IRC_CMD_MIN) {
+    if (frame->header.cmd < IRC_CMD_MIN) {
         if (!IrcLink.linked) {
             return FALSE;
         }
-        if (raw[1] != IrcLinkIds.local) {
+        if (frame->header.id != IrcLinkIds.local) {
             return FALSE;
         }
     }

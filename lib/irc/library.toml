@@ -3,9 +3,10 @@
 # Nintendo wrote it is not known. It is built with the game's compiler and flags, and both files match whole, their
 # text, pools, .data and .bss, in both versions. Each aligns one object (IrcSpi, IrcFrame): at -O4,p MWCC rotates the
 # loops of a function and drops its empty loops unless the function reads an object with an explicit alignment, and
-# the original's functions that read those two objects keep theirs. Until that was known the library was built at
-# -O2,p, which rotates no loop and keeps empty ones, but there IrcLink_Checksum's loop, which the original rotates
-# (it reads no object), matched only as a guarded do/while, and IrcLink_IsRecvIgnored's test of 2 or 3 as a switch.
+# the original's functions that read those two objects keep theirs. -O2,p, which rotates no loop and keeps empty
+# ones everywhere, gives those without the attribute, but not IrcLink_Checksum's loop, which the original rotates (it
+# reads no object): there it matches only as a guarded do/while, and IrcLink_IsRecvIgnored's test of 2 or 3 as a
+# switch.
 compiler = "dsi/1.1p1"
 flags = [
     "-O4,p",               # Optimize for speed
