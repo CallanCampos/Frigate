@@ -1,3 +1,5 @@
+// The field menu's event (a descriptive name), which opens the app chosen on the touch screen's menu. Names from
+// swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -13,6 +15,11 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
+
+static u32 func_ov012_0215aa68(u32 index);
+static BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg);
+static BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg);
+static BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg);
 
 GameEvent *EventFieldMenu_Create(GameSystem *gsys, Field *field, u16 param) {
     FieldSubscreen *subscreen = Field_GetSubscreen(field);
@@ -156,4 +163,58 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         break;
     }
     return GAMEEVENT_CONTINUE;
+}
+
+// The app each item of the field menu opens, an index of FIELD_PROC_LINK_LIST, or -1 for none
+static const s32 sFieldMenuAppIds[9] = {
+    -1,
+    FIELD_APP_POKELIST,
+    FIELD_APP_ZUKAN,
+    FIELD_APP_BAG,
+    FIELD_APP_TRAINER_CARD,
+    FIELD_APP_SAVE,
+    FIELD_APP_CONFIG,
+    -1,
+    FIELD_APP_INF_DUNGEON_RETIRE,
+};
+
+static u32 func_ov012_0215aa68(u32 index) {
+    return sFieldMenuAppIds[index];
+}
+
+static BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg) {
+    FieldMenuWork *menu = arg;
+    FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
+
+    if (input->eventType == 0) {
+        func_ov036_0219886c(subscreen, menu->unk10);
+    }
+    return TRUE;
+}
+
+static BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg) {
+    return TRUE;
+}
+
+static BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg) {
+    FieldMenuWork *menu = arg;
+    GameData *gameData = GSYS_GetGameData(menu->gameSystem);
+
+    switch (input->eventType) {
+    case 4:
+        GameData_SetLastSubscreen(gameData, 6);
+        break;
+    case 0:
+        GameData_SetLastSubscreen(gameData, 1);
+        break;
+    case 5:
+        GameData_SetLastSubscreen(gameData, 0);
+        break;
+    case 1:
+    case 2:
+    case 3:
+        GameData_SetLastSubscreen(gameData, menu->screenId);
+        break;
+    }
+    return TRUE;
 }

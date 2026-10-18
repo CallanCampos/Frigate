@@ -881,6 +881,7 @@ overlays/ov012 0x02152ba0 reloc_addend 0x60
 overlays/ov012 0x021530f0 reloc_addend 0x60
 overlays/ov012 0x02154828 reloc_module overlay(36)
 overlays/ov012 0x02156ade reloc_module overlay(36)
+overlays/ov012 0x02156fd8 reloc_addend 2
 overlays/ov012 0x02157724 reloc_module overlay(215)
 overlays/ov012 0x02157810 reloc_module overlay(258)
 overlays/ov012 0x02157a10 reloc_module overlay(315)
@@ -904,6 +905,8 @@ overlays/ov012 0x02158c64 overlay_id 211
 overlays/ov012 0x02158c68 overlay_id 210
 overlays/ov012 0x02158c70 reloc_module overlay(211)
 overlays/ov012 0x02158c82 reloc_module overlay(211)
+overlays/ov012 0x02159230 section_end src/ov012/field_encount_st.c:.text
+overlays/ov012 0x02159230 section_start src/ov012/hiden_event.c:.text
 overlays/ov012 0x0215970c reloc_module overlay(36)
 overlays/ov012 0x0215a44c overlay_id 265
 overlays/ov012 0x0215a454 overlay_id 266
@@ -911,6 +914,8 @@ overlays/ov012 0x0215a45c overlay_id 332
 overlays/ov012 0x0215a464 overlay_id 295
 overlays/ov012 0x0215a46c overlay_id 267
 overlays/ov012 0x0215a760 reloc_module overlay(35)
+overlays/ov012 0x0215aad8 section_end src/ov012/event_field_menu.c:.text
+overlays/ov012 0x0215aad8 section_start src/ov012/event_shortcut_menu.c:.text
 overlays/ov012 0x0215b700 reloc_addend 0x10
 overlays/ov012 0x0215b704 reloc_addend 0x8
 overlays/ov012 0x0215b708 reloc_addend 0x14
@@ -1157,6 +1162,13 @@ overlays/ov012 0x0216c2c4 reloc_module overlay(66)
 overlays/ov012 0x0216c2d8 reloc_module overlay(67)
 overlays/ov012 0x0216c911 remove_symbol
 overlays/ov012 0x0216c9a4 add_data REBATTLE_TRAINER_COUNT
+overlays/ov012 0x0216ca04 add_section src/ov012/scrcmd_pokemon.c:.rodata:0x30
+overlays/ov012 0x0216ca1c remove_symbol
+overlays/ov012 0x0216ca34 add_section src/ov012/field_encount_st.c:.rodata:0x40
+overlays/ov012 0x0216ca34 add_data sRoamingZoneGroups
+overlays/ov012 0x0216ca74 section_start src/ov012/hiden_event.c:.rodata
+overlays/ov012 0x0216ca74 add_data data_ov012_0216ca74
+overlays/ov012 0x0216cb74 add_section src/ov012/event_field_menu.c:.rodata:0x24
 overlays/ov012 0x0216cb98 add_section src/ov012/event_field_proclink.c:.rodata:0x168
 overlays/ov012 0x0216cb98 overlay_id 165
 overlays/ov012 0x0216cb9c remove_symbol

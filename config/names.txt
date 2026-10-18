@@ -4449,6 +4449,11 @@ overlays/ov011 0x0218df7c sWcmGlobal
 overlays/ov011 0x02190928 sEngine
 overlays/ov012 0x02160a00 PleasureBoat_Free
 overlays/ov012 0x0216af5c sRibbonParams
+overlays/ov012 0x0216ca04 wf_location
+overlays/ov012 0x0216ca06 stats_list
+overlays/ov012 0x0216ca1a iv_set
+overlays/ov012 0x0216ca74 HIDEN_EVENT_UNUSED
+overlays/ov012 0x0216cb74 sFieldMenuAppIds
 overlays/ov020 0x0216e660 EventPokeSelect_Create
 overlays/ov020 0x0216e6b4 EventMoveTutorPokeSelect_Create
 overlays/ov020 0x0216e714 EventMusicalPokeSelect_Create
