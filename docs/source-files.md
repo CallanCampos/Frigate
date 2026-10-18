@@ -469,7 +469,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_map_chunk_gc.c` | `0x0218a8f8`–`0x0218aa7c` | 3 | complete | descriptive |
 | `field_map_chunk_ng.c` | `0x0218aa7c`–`0x0218ab60` | 2 | complete | descriptive |
 | `field_map_chunk_rd.c` | `0x0218ab60`–`0x0218adac` | 2 | complete | descriptive |
-| `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | partial | string at `0x021d4bc0` |
+| `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | complete | string at `0x021d4bc0` |
 | `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | partial | string at `0x021d4bd0` |
 | `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
 | `ctalkmsgwin.c` | `0x0218b1f8`–`0x0218d0f4` | 56 | partial | string at `0x021d4c23` |
