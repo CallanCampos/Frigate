@@ -60,7 +60,7 @@ stops with the name of the first one it reaches.
 
 Windows builds in [MSYS2](https://www.msys2.org)'s CLANG64 environment: its clang, lld and compiler-rt over the UCRT,
 with its CMake, Ninja, SDL3 and Python, so that the build takes the same GCC-style flags as on macOS and Linux
-([ADR 0013](docs/adr/0013-windows-build-with-msys2-clang64.md), proposed). CI builds it this way on GitHub's Windows
+([ADR 0013](docs/adr/0013-windows-build-with-msys2-clang64.md)). CI builds it this way on GitHub's Windows
 runner and runs every test that needs no ROM, but for the 10 `gx_*_shm` tests (no VRAM aliasing there) and
 `card_backup_linked_save` (no links followed), which skip; a game with your ROM hasn't been run on Windows yet. A clone
 needs nothing from [Preparing a checkout](#preparing-a-checkout) for this build, which reads only the tree: the tests

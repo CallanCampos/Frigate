@@ -1,11 +1,13 @@
 # 0013: Windows built with MSYS2's CLANG64, its differences behind port/hal/host
 
-- **Status:** proposed: built and green in CI on the branch `port-windows`, waiting for the user's acceptance, since
-  [tech-stack.md](../research/tech-stack.md) recommended clang-cl
+- **Status:** accepted
 - **Date:** 2026-10-18
 - **Plan:** D4 (clang on every platform), §4.4 ("clang-cl or mingw-clang on Windows"), §7 phase 5 ("Windows and Linux
   builds in CI"); it changes the platform boundary of [ADR 0005](0005-platform-boundary-as-built.md) on Windows
 - **Upstream:** `993e6c49b`
+- **Note (2026-10-18):** accepted at the Windows track's merge into `port-integrate` (`d294567e3`) by the port's
+  developer, as every earlier ADR was: the toolchain, MSYS2's CLANG64 over the clang-cl that
+  [tech-stack.md](../research/tech-stack.md) recommended, is the developer's call.
 
 ## Context
 
