@@ -97,12 +97,19 @@ level that doesn't exist yet says "not yet"; no field is left out.
   - **Not changed**: the merge's subject, "Merge port-launch", though its second parent is `port-launch-adr0012`
     (`b4c0fdc68`), which holds `port-launch`: the message was the integration task's, the last entry names the branch
     rightly, and rewording it would rewrite every later commit, whose SHAs the records cite.
+  - **ADR 0012, accepted by the developer at publishing.** The ADR doesn't loosen port/CLAUDE.md's rule on
+    stand-ins: it uses the rule's own exception, a documented stand-in for a subsystem under another contributor's
+    claim, written for `ov011_pending.c`. The launcher is test-only and off by default, runs only the game's own C,
+    and steps aside once `FIELDMAP_PROC_FUNCS` has C, so it was accepted as every earlier ADR was, and the user is
+    told; reverting `d7849a158` and the launcher's commits takes it out. This closes what the review left to the
+    user. Also at publishing: `--help`'s exit statuses use the named constants where the program can include their
+    headers (65 and 67 stay numbers, with their constants named, since their headers need the decomp's) and 71 names
+    the card DMA call too; ARCHITECTURE.md's Saves row says the first save starts from a blank one; MODDING.md and
+    the tests guide say the oracle's runs need the ROM build's link map.
 - **Next:** as in the last entry: White 2's starter route, so that `party_menus` and `continue_starter` run in White 2;
   the apps no route reaches yet (the Pokédex past its trap); a save with an adventure made by the port, once overlay 36
   lets it into the field; for the sound, a comparison sequence where a player plays on the game's count.
-- **Blockers:** the user's acceptance of ADR 0012, which changes port/CLAUDE.md's rule on stand-ins and which the ADR
-  had waited for: `port-integrate` isn't published before the user gives it, and without it `d7849a158` is reverted.
-  Overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the launcher's
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the launcher's
   retirement (ADR 0012); `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, no C yet) stops the Pokédex; overlays 11 and
   182 (Wi-Fi, Download Play) only matter from phase 7.
 

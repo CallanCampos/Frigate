@@ -14,7 +14,9 @@ environment and a host build directory configured with `-G Ninja`, whose `build.
 (it skips in a build made with another generator, [asm_oracle/README.md](asm_oracle/README.md#setup)), and the
 `oracle_*` tests that run melonDS need the oracle, built with `-DPORT_BUILD_ORACLE=ON`
 ([../tools/oracle/README.md](../tools/oracle/README.md)), as do the test launcher's `launch_*` tests, which start from
-saves the oracle makes (`oracle_saves`). A skipped test says so in ctest's summary.
+saves the oracle makes (`oracle_saves`). The oracle counts game frames with the ROM build's link map
+(`build/<version>/arm9.o.xMAP`), so those tests need `python3 configure.py && ninja` to have run: without it they fail
+at once ("counts game frames, which need --counter") rather than skip. A skipped test says so in ctest's summary.
 
 | Directory | What it tests | Game functionality covered | Tests |
 | --- | --- | --- | --- |

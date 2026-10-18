@@ -146,14 +146,18 @@ static const ExitStatus sExitStatuses[] = {
       "bad options, among them a run directory, WAV dump or sound trace that can't be opened and a --launch list the "
       "launcher can't read; and a --launch app the save's field menu doesn't offer, found once CONTINUE asks for the "
       "field" },
+    // 65 and 67 are PORT_CARD_EXIT_STATUS (hal/card/port_card.h) and PORT_PXI_EXIT_STATUS (hal/pxi/pxi_bus.h), whose
+    // headers need the decomp's, which this file doesn't include
     { 65, "a save file Frigate can't use (the wrong size, a directory, another emulator's format)" },
-    { 66, "no usable ROM" },
+    { PORT_ROM_EXIT_STATUS, "no usable ROM" },
     { 67, "the PXI bus's arena check" },
-    { 70, "the game reached code or data that has no C yet (port/hal/trap.c), which the message names" },
-    { 71, "the game stopped itself (OS_Terminate)" },
+    { PORT_TRAP_EXIT_STATUS,
+      "the game reached code or data that has no C yet (port/hal/trap.c), which the message names" },
+    { PORT_OS_TERMINATE_STATUS,
+      "the game stopped itself (OS_Terminate); also a DMA call that the host's card never makes (MIi_CardDmaCopy32)" },
     { EXIT_DEADLOCK, "every thread waits for an interrupt that nothing can raise" },
     { EXIT_WATCHDOG, "the watchdog: a frame took longer than --watchdog seconds of host time" },
-    { 74, "the game reset the console (OS_ResetSystem), which Frigate can't do in place yet" },
+    { PORT_OS_RESET_STATUS, "the game reset the console (OS_ResetSystem), which Frigate can't do in place yet" },
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)

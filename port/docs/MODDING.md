@@ -88,7 +88,9 @@ build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --head
   python3 port/tools/oracle/oracle.py save first_save --version w2_us --out SAVES/IRDO.sav       # White 2
   ```
 
-  `--oracle BIN` names `pbw-oracle` when it isn't in `build/port-oracle/oracle/`, and `--rom PATH` the ROM. White 2 has
+  The oracle counts game frames with the ROM build's link map, so run `python3 configure.py && ninja` first: without
+  it the save command stops with "counts game frames, which need --counter". `--oracle BIN` names `pbw-oracle` when
+  it isn't in `build/port-oracle/oracle/`, and `--rom PATH` the ROM. White 2 has
   only the first save so far: its starter save's route isn't measured yet. Without a save there is no CONTINUE, the
   game never asks for the field, and the run ends with status 1.
 - **It opens only what the save's field menu offers**, as the menu decides: no party list or summary without a
