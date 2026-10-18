@@ -55,7 +55,10 @@ end:
 
 **Does not apply when:** the label is a shared cleanup or error exit that frees or resets something (`fail:` in
 `nhttp_request.c`), a retry (`goto retry`), or leaves a search loop to skip its fallback (`goto inserted` in
-`vct_buffer.c`). A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and locals
+`vct_buffer.c`), or jumps forward to a labelled tail block that does real work for several paths and then returns,
+in place of a flag tested at the end (`goto TRANS_INTERP_2` and `goto TRANS_NONINTERP` in NitroSystem's `nsbca.c`,
+where one block averages a pair of stored values and the other reads one). A label whose code only repeats a `return`
+or an epilogue is still the compiler's shared tail. A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and locals
 between its `break`s (`btl_server_flow.c`), never as a wrapper around one statement.
 
 **Checked:** a `goto` whose label is followed by nothing but a `return` or the function's end.
