@@ -1455,7 +1455,10 @@ Same instructions, scheduled in another order.
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is MWCC's address
   of `p[i].field` when two accesses share it, `p` is a pointer variable and its first common-subexpression pass did
-  not merge them, as in `f[i].b += v`. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
+  not merge them, as in `f[i].b += v`. The accesses can be different expressions: `pokewood_savedata.c`'s
+  `func_02011130` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
+  one `save + 0x28` (`add r0, #0x28; ldr r0, [r0, r5]`), and tests `hasRecord` and sets it from one `save + 0x38`, while
+  `isNewRecord`, set once, indexes first. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
   compiles like `p[i].f`, index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`), and so do
   other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
   (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
