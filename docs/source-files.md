@@ -1737,7 +1737,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-180 of 1113 functions are in source files.
+252 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1752,8 +1752,18 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |
+| `dwc_util_fade.c` | `0x021bba6c`–`0x021bbc50` | 7 | complete | descriptive |
+| `dwc_util_text.c` | `0x021bbc50`–`0x021bc1a8` | 15 | partial | descriptive |
 | `dwc_util_display.c` | `0x021bc1a8`–`0x021bc468` | 7 | complete | descriptive |
 | `dwc_util_heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
+| `dwc_util_touch.c` | `0x021bc544`–`0x021bcaac` | 15 | partial | descriptive |
+| `dwc_util_irq.c` | `0x021bcaac`–`0x021bcb3c` | 3 | complete | descriptive |
+| `dwc_util_list.c` | `0x021bcb3c`–`0x021bcbc8` | 6 | complete | descriptive |
+| `dwc_util_oam_buf.c` | `0x021bcbc8`–`0x021bccec` | 6 | complete | descriptive |
+| `dwc_util_vram_alloc.c` | `0x021bccec`–`0x021bcef8` | 3 | complete | descriptive |
+| `dwc_util_string.c` | `0x021bcef8`–`0x021bcf38` | 2 | complete | descriptive |
+| `dwc_util_bank.c` | `0x021bcf38`–`0x021bd0d4` | 5 | complete | descriptive |
+| `dwc_util_task.c` | `0x021bd0d4`–`0x021bd2cc` | 10 | complete | descriptive |
 
 ### Overlay 184
 
