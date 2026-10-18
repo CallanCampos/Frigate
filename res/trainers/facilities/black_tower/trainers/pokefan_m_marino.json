@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Marino",
+    "class": "TRAINER_CLASS_POKEFAN_M",
+    "pokemon": [
+        "nidoqueen_2",
+        "drifblim_2",
+        "seismitoad_2",
+        "wailord_2",
+        "lickilicky_2",
+        "vaporeon_2",
+        "walrein_2",
+        "lapras_2",
+        "snorlax_2",
+        "slaking_2"
+    ]
+}

@@ -1,0 +1,189 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Wigglytuff",
+    "pokedex": {
+        "category": "Balloon Pokémon",
+        "entry": "Its fine fur feels so pleasant,\nthose who accidentally touch it\ncannot take their hands away.",
+        "height": "3'03\"",
+        "weight": "26.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Wigglytuff",
+                "category": "Balloon Pokémon",
+                "entry": "Its fine fur feels sublime to the\ntouch. It can expand its body by\ninhaling air.",
+                "height": "3'03\"",
+                "weight": "26.5 lbs."
+            },
+            "fr": {
+                "name": "Grodoudou",
+                "category": "Pokémon Bouboule",
+                "entry": "Sa fourrure est d'une douceur\nincomparable au toucher. Il\npeut gonfler en aspirant de l'air.",
+                "height": "1,0 m",
+                "weight": "12,0 kg"
+            },
+            "de": {
+                "name": "Knuddeluff",
+                "category": "Ballon",
+                "entry": "Sein feines Fell fühlt sich herrlich\nan. Es kann sich größer machen,\nindem es Luft einatmet.",
+                "height": "1,0 m",
+                "weight": "12,0 kg"
+            },
+            "it": {
+                "name": "Wigglytuff",
+                "category": "Pokémon Pallone",
+                "entry": "Il suo pelo è morbidissimo. Riesce a\ngonfiarsi e a ingrandirsi semplicemente\ninalando aria.",
+                "height": "1,0 m",
+                "weight": "12,0 kg"
+            },
+            "ko": {
+                "name": "푸크린",
+                "category": "풍선포켓몬",
+                "entry": "세밀한 털은 결이 매우 고와\n감촉이 최고로 좋다.\n숨을 들이마셔서 몸을 부풀린다.",
+                "height": "1.0 m",
+                "weight": "12.0 kg"
+            },
+            "es": {
+                "name": "Wigglytuff",
+                "category": "Pokémon Globo",
+                "entry": "Tiene un pelaje muy agradable al tacto.\nPuede hinchar su cuerpo tragando aire.",
+                "height": "1,0 m",
+                "weight": "12,0 kg"
+            },
+            "ja": {
+                "name": "プクリン",
+                "category": "ふうせんポケモン",
+                "entry": "キメこまやかな\\x{3000}たいもうは\nごくじょうの\\x{3000}はだざわり。\nいきを\\x{3000}すいこんで\\x{3000}ふくらむ。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 140,
+        "attack": 70,
+        "defense": 45,
+        "speed": 45,
+        "special_attack": 75,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 50,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 3,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 191,
+    "hatch_cycles": 10,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FAIRY", "EGG_GROUP_FAIRY" ],
+    "abilities": [ "ABILITY_CUTE_CHARM", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_FRISK",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PINK",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 191,
+    "height": 10,
+    "weight": 120,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SING" ],
+            [ 1, "MOVE_DISABLE" ],
+            [ 1, "MOVE_DEFENSE_CURL" ],
+            [ 1, "MOVE_DOUBLE_SLAP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM29",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM33",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM52",
+            "TM56",
+            "TM57",
+            "TM59",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM73",
+            "TM74",
+            "TM77",
+            "TM83",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM93",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_BOUNCE",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_GRAVITY",
+            "MOVE_LAST_RESORT",
+            "MOVE_ICY_WIND",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HEAL_BELL",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_HELPING_HAND",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_ENDEAVOR",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 283,
+    "baby_species": "SPECIES_IGGLYBUFF",
+    "cry_volume": 110
+}

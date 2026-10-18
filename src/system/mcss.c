@@ -455,10 +455,14 @@ void MCSSSys_Draw(MCSSSystem *system) {
 static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 width, fx32 height, fx32 s, fx32 t,
                           const NNSG2dAnimDataSRT *cellSrt, const NNSG2dAnimDataSRT *mcSrt,
                           NNSG2dImagePaletteProxy *shadowPltt, int node, BOOL ortho, fx32 *z, u8 flip) {
+    u8 shadowAlpha;
     fx32 nodeX;
     fx32 nodeY;
+    u32 texCoord0;
+    u32 texCoord1;
+    u32 texCoord2;
+    u32 texCoord3;
     int polygonId;
-    u8 shadowAlpha;
 
     shadowAlpha = mcss->shadowAlpha == MCSS_SHADOW_ALPHA_HALF ? mcss->alpha / 2 : mcss->shadowAlpha;
     if (mcss->alpha == MCSS_ALPHA_MAX || mcss->unk140_31) {
@@ -496,14 +500,19 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
         G3_Translate(-0x100, 0, 0);
         s = FX32_CONST(512) - s - width;
     }
+    // The packed texture coordinates are written again for the shadow's quad
     G3_Begin(GX_BEGIN_QUADS);
-    G3_TexCoord(s, t);
+    texCoord0 = GX_ST(s, t);
+    reg_G3_TEXCOORD = texCoord0;
     G3_Vtx(0, 0, 0);
-    G3_TexCoord(s, t + height);
+    texCoord1 = GX_ST(s, t + height);
+    reg_G3_TEXCOORD = texCoord1;
     G3_Vtx(0, -0x100, 0);
-    G3_TexCoord(s + width, t + height);
+    texCoord2 = GX_ST(s + width, t + height);
+    reg_G3_TEXCOORD = texCoord2;
     G3_Vtx(0x100, -0x100, 0);
-    G3_TexCoord(s + width, t);
+    texCoord3 = GX_ST(s + width, t);
+    reg_G3_TEXCOORD = texCoord3;
     G3_Vtx(0x100, 0, 0);
     G3_End();
     G3_MtxMode(GX_MTXMODE_PROJECTION);
@@ -520,27 +529,28 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
         G3_Translate(x, y, 0);
         G3_Scale(width, height, FX32_ONE);
         G3_Begin(GX_BEGIN_QUADS);
-        G3_TexCoord(s, t);
+        reg_G3_TEXCOORD = texCoord0;
         G3_Vtx(0, 0, 0);
-        G3_TexCoord(s, t + height);
+        reg_G3_TEXCOORD = texCoord1;
         G3_Vtx(0, -0x100, 0);
-        G3_TexCoord(s + width, t + height);
+        reg_G3_TEXCOORD = texCoord2;
         G3_Vtx(0x100, -0x100, 0);
-        G3_TexCoord(s + width, t);
+        reg_G3_TEXCOORD = texCoord3;
         G3_Vtx(0x100, 0, 0);
         G3_End();
     }
 
+    // The constant steps are longs, the type of the SDK's fx32
     if (ortho == FALSE) {
         if (system->cellDepth == 0) {
-            *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100 : 0x100;
+            *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100L : 0x100L;
         } else {
             *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -system->cellDepth : system->cellDepth;
         }
     } else if (system->orthoNear) {
-        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100 : 0x100;
+        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100L : 0x100L;
     } else {
-        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x400 : 0x400;
+        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x400L : 0x400L;
     }
 }
 

@@ -1,0 +1,195 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Murkrow",
+    "pokedex": {
+        "category": "Darkness Pokémon",
+        "entry": "If spotted, it will lure an unwary\nperson into chasing it then lose\nthe pursuer on mountain trails.",
+        "height": "1'08\"",
+        "weight": "4.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Murkrow",
+                "category": "Darkness Pokémon",
+                "entry": "If spotted, it will lure an unwary\nperson into chasing it, then lose\nthe pursuer on mountain trails.",
+                "height": "1'08\"",
+                "weight": "4.6 lbs."
+            },
+            "fr": {
+                "name": "Cornèbre",
+                "category": "Pokémon Obscurité",
+                "entry": "Quand il est en danger, il tente de\nsemer ses poursuivants dans les\nchemins montagneux.",
+                "height": "0,5 m",
+                "weight": "2,1 kg"
+            },
+            "de": {
+                "name": "Kramurx",
+                "category": "Finsternis",
+                "entry": "Wird es entdeckt, lockt es seinen\nVerfolger auf eine Jagd in die\nBerge, wo es ihn dann abschüttelt.",
+                "height": "0,5 m",
+                "weight": "2,1 kg"
+            },
+            "it": {
+                "name": "Murkrow",
+                "category": "Pokémon Oscurità",
+                "entry": "Se individuato, cerca di farsi\ninseguire, per poi far perdere le\nsue tracce su sentieri di montagna.",
+                "height": "0,5 m",
+                "weight": "2,1 kg"
+            },
+            "ko": {
+                "name": "니로우",
+                "category": "어둠포켓몬",
+                "entry": "니로우를 발견했을 때\n조심성 없이 따라가면\n길을 잃고 산중에 혼자 남게 된다.",
+                "height": "0.5 m",
+                "weight": "2.1 kg"
+            },
+            "es": {
+                "name": "Murkrow",
+                "category": "Pokémon Oscuridad",
+                "entry": "Si algún incauto logra detectarlo,\nse verá abocado a perseguirlo\nhasta perderse en las montañas.",
+                "height": "0,5 m",
+                "weight": "2,1 kg"
+            },
+            "ja": {
+                "name": "ヤミカラス",
+                "category": "くらやみポケモン",
+                "entry": "ヤミカラスを\\x{3000}みかけて\\x{3000}ふよういに\nあとを\\x{3000}つけていくと\\x{3000}まよわされ\nやまみちに\\x{3000}おいてけぼりに\\x{3000}される。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff0e}\\x{ff11}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 85,
+        "defense": 42,
+        "speed": 91,
+        "special_attack": 85,
+        "special_defense": 42
+    },
+    "types": [ "TYPE_DARK", "TYPE_FLYING" ],
+    "catch_rate": 30,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_INSOMNIA", "ABILITY_SUPER_LUCK" ],
+    "hidden_ability": "ABILITY_PRANKSTER",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 81,
+    "height": 5,
+    "weight": 21,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PECK" ],
+            [ 1, "MOVE_ASTONISH" ],
+            [ 5, "MOVE_PURSUIT" ],
+            [ 11, "MOVE_HAZE" ],
+            [ 15, "MOVE_WING_ATTACK" ],
+            [ 21, "MOVE_NIGHT_SHADE" ],
+            [ 25, "MOVE_ASSURANCE" ],
+            [ 31, "MOVE_TAUNT" ],
+            [ 35, "MOVE_FAINT_ATTACK" ],
+            [ 41, "MOVE_MEAN_LOOK" ],
+            [ 45, "MOVE_FOUL_PLAY" ],
+            [ 51, "MOVE_TAILWIND" ],
+            [ 55, "MOVE_SUCKER_PUNCH" ],
+            [ 61, "MOVE_TORMENT" ],
+            [ 65, "MOVE_QUASH" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM60",
+            "TM63",
+            "TM66",
+            "TM67",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM88",
+            "TM90",
+            "TM95",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_FOUL_PLAY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_ROOST",
+            "MOVE_SPITE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_WHIRLWIND",
+            "MOVE_DRILL_PECK",
+            "MOVE_MIRROR_MOVE",
+            "MOVE_WING_ATTACK",
+            "MOVE_SKY_ATTACK",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_FEATHER_DANCE",
+            "MOVE_PERISH_SONG",
+            "MOVE_PSYCHO_SHIFT",
+            "MOVE_SCREECH",
+            "MOVE_FAINT_ATTACK",
+            "MOVE_BRAVE_BIRD",
+            "MOVE_ROOST",
+            "MOVE_ASSURANCE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_ITEM",
+            "param": "ITEM_DUSK_STONE",
+            "species": "SPECIES_HONCHKROW"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MURKROW",
+    "cry_volume": 110
+}

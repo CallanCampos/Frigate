@@ -1,0 +1,3 @@
+VirbankGateGate_Text_WelcomePassThroughGate = Welcome! Pass through the gate,\nand you'll arrive at Pokéstar Studios!
+VirbankGateGate_Text_PokestarStudiosPlaceWhere = Pokéstar Studios! That is a place\nwhere you can experience different lives!
+\pad{a2}

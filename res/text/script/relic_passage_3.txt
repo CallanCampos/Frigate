@@ -1,0 +1,2 @@
+RelicPassage3_Text_ImHereCollectingShards = I'm here collecting Shards so that\nI can have my Pokémon be taught moves.{be01}\nThey can be found in the dust clouds,\nbut rarely you'll find a Pokémon instead.
+RelicPassage3_Text_FunfestMissionHasBeen = The Funfest Mission\n“{0140:0}"{be00}\nhas been added to the Entralink.

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Export and pack Pokémon cries as WAV plus cry_volume in data.json.
+"""Export Pokémon cries as WAV plus cry_volume in data.json, and pack the volumes.
 
-    pokemon_cries.py extract data/pokemon
-    pokemon_cries.py pack data/pokemon black2|white2 SDAT VOLUME_ARCHIVE
+    pokemon_cries.py extract res/pokemon
+    pokemon_cries.py pack res/pokemon black2|white2 VOLUME_ARCHIVE
+
+The cries' wave archives are packed into the sound archive by sound_data.py, which takes them from cry.wav.
 """
 
 import io
@@ -94,49 +96,6 @@ def read_wav(path):
     return rate, bytes(max(-128, min(127, round(value / 256))) & 255 for (value,) in signed)
 
 
-def patch_wave(swar, rate, samples):
-    result = bytearray(swar[:struct.unpack_from("<I", swar, 0x3c)[0] + 12])
-    offset = struct.unpack_from("<I", result, 0x3c)[0]
-    result.extend(samples)
-    result.extend(b"\0" * (-len(samples) % 4))
-    if len(result) > 0x5c30:
-        raise ValueError("edited cry exceeds the game's 0x5c30-byte playback buffer")
-    struct.pack_into("<H", result, offset + 2, rate)
-    struct.pack_into("<H", result, offset + 4, round(33513982 / (2 * rate)))
-    struct.pack_into("<I", result, offset + 8, (len(samples) + 3) // 4)
-    struct.pack_into("<I", result, 8, len(result))
-    struct.pack_into("<I", result, 20, len(result) - 16)
-    return bytes(result)
-
-
-def replace_files(data, fat, file_section, entries, changes):
-    if not changes:
-        return data
-    order = sorted(range(len(entries)), key=lambda index: entries[index][0])
-    first = entries[order[0]][0]
-    if first < file_section + 16:
-        raise ValueError("sound files overlap their header")
-    result = bytearray(data[:first])
-    cursor = first
-    for file_id in order:
-        offset, size = entries[file_id]
-        if offset < cursor:
-            raise ValueError("overlapping sound files")
-        if offset != first:
-            result.extend(b"\0" * (-len(result) % 32))
-        new_offset = len(result)
-        member = changes.get(file_id, data[offset:offset + size])
-        result.extend(member)
-        struct.pack_into("<II", result, fat + 12 + 16 * file_id, new_offset, len(member))
-        cursor = offset + size
-    result.extend(data[cursor:])
-    # The FILE block's size is both its own and the header's (at 0x2c), and the archive's total size is at 8
-    struct.pack_into("<I", result, file_section + 4, len(result) - file_section)
-    struct.pack_into("<I", result, 0x2c, len(result) - file_section)
-    struct.pack_into("<I", result, 8, len(result))
-    return bytes(result)
-
-
 def export(root):
     sound = (ROOT / "extract/b2_us/files/swan_sound_data.sdat").read_bytes()
     _, _, entries, cries = sound_tables(sound)
@@ -155,22 +114,8 @@ def export(root):
     print(f"{len(cries)} cries", flush=True)
 
 
-def pack(root, game, sound_output, volume_output):
+def pack(root, game, volume_output):
     version = {"black2": "b2_us", "white2": "w2_us"}[game]
-    sound = (ROOT / "extract" / version / "files/swan_sound_data.sdat").read_bytes()
-    fat, file_section, entries, cries = sound_tables(sound)
-    changes = {}
-    for cry_id, file_id in cries.items():
-        offset, size = entries[file_id]
-        original = sound[offset:offset + size]
-        rate, samples = read_wav(cry_folder(root, cry_id) / "cry.wav")
-        if (rate, samples) != cry_wave(original):
-            changes[file_id] = patch_wave(original, rate, samples)
-    result = replace_files(sound, fat, file_section, entries, changes)
-    target = Path(sound_output)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.unlink(missing_ok=True)
-    target.write_bytes(result)
     volume = read_narc((ROOT / "extract" / version / "files/a/1/9/1").read_bytes())
     for cry_id in range(1, len(volume)):
         path = volume_path(root, cry_id)
@@ -189,7 +134,7 @@ def pack(root, game, sound_output, volume_output):
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "extract":
         export(Path(sys.argv[2]))
-    elif len(sys.argv) == 6 and sys.argv[1] == "pack":
-        pack(Path(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5])
+    elif len(sys.argv) == 5 and sys.argv[1] == "pack":
+        pack(Path(sys.argv[2]), sys.argv[3], sys.argv[4])
     else:
         raise SystemExit(__doc__)

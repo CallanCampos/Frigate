@@ -1,0 +1,188 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Drapion",
+    "pokedex": {
+        "category": "Ogre Scorp Pokémon",
+        "entry": "It takes pride in its strength.\nEven though it can tear foes apart,\nit finishes them off with powerful poison.",
+        "height": "4'03\"",
+        "weight": "135.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Drapion",
+                "category": "Ogre Scorp Pokémon",
+                "entry": "Possessing a sturdy build, it takes\npride in its strength, taking down\nfoes without using toxins.",
+                "height": "4'03\"",
+                "weight": "135.6 lbs."
+            },
+            "fr": {
+                "name": "Drascore",
+                "category": "Pokémon Scorpogre",
+                "entry": "Fier et robuste, il met un point\nd'honneur à battre ses adversaires\nsans utiliser de poison.",
+                "height": "1,3 m",
+                "weight": "61,5 kg"
+            },
+            "de": {
+                "name": "Piondragi",
+                "category": "Ogerskorpion",
+                "entry": "Es ist sehr stolz auf seine Stärke\nund besiegt Gegner auch ohne die\nVerwendung seines Gifts.",
+                "height": "1,3 m",
+                "weight": "61,5 kg"
+            },
+            "it": {
+                "name": "Drapion",
+                "category": "Pokémon Scorpiaccio",
+                "entry": "Dotato di una costituzione robusta, va\norgoglioso della sua forza e abbatte\ni nemici senza usare tossine.",
+                "height": "1,3 m",
+                "weight": "61,5 kg"
+            },
+            "ko": {
+                "name": "드래피온",
+                "category": "요괴전갈포켓몬",
+                "entry": "맹독을 쓰지 않고 자부하는\n힘만으로도 상대를 박살 낼 수\n있는 튼튼한 힘의 소유자다.",
+                "height": "1.3 m",
+                "weight": "61.5 kg"
+            },
+            "es": {
+                "name": "Drapion",
+                "category": "Pokémon Escorpiogro",
+                "entry": "Tiene una complexión muy fuerte\nde la que se enorgullece. Derriba\na sus enemigos sin usar toxinas.",
+                "height": "1,3 m",
+                "weight": "61,5 kg"
+            },
+            "ja": {
+                "name": "ドラピオン",
+                "category": "ばけさそりポケモン",
+                "entry": "もうどくを\\x{3000}つかわなくても\\x{3000}じまんの\nちからで\\x{3000}あいてを\\x{3000}バラバラにする\nがんじょうな\\x{3000}からだの\\x{3000}もちぬし。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 90,
+        "defense": 110,
+        "speed": 95,
+        "special_attack": 60,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_POISON", "TYPE_DARK" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_POISON_BARB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_WATER_3" ],
+    "abilities": [ "ABILITY_BATTLE_ARMOR", "ABILITY_SNIPER" ],
+    "hidden_ability": "ABILITY_KEEN_EYE",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 175,
+    "height": 13,
+    "weight": 615,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_THUNDER_FANG" ],
+            [ 1, "MOVE_ICE_FANG" ],
+            [ 1, "MOVE_FIRE_FANG" ],
+            [ 1, "MOVE_BITE" ],
+            [ 1, "MOVE_POISON_STING" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_KNOCK_OFF" ],
+            [ 5, "MOVE_KNOCK_OFF" ],
+            [ 9, "MOVE_PIN_MISSILE" ],
+            [ 13, "MOVE_ACUPRESSURE" ],
+            [ 16, "MOVE_PURSUIT" ],
+            [ 20, "MOVE_BUG_BITE" ],
+            [ 23, "MOVE_POISON_FANG" ],
+            [ 27, "MOVE_VENOSHOCK" ],
+            [ 30, "MOVE_HONE_CLAWS" ],
+            [ 34, "MOVE_TOXIC_SPIKES" ],
+            [ 38, "MOVE_NIGHT_SLASH" ],
+            [ 43, "MOVE_SCARY_FACE" ],
+            [ 49, "MOVE_CRUNCH" ],
+            [ 57, "MOVE_CROSS_POISON" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM05",
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM36",
+            "TM39",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM54",
+            "TM56",
+            "TM66",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM76",
+            "TM78",
+            "TM80",
+            "TM81",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "TM95",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_AQUA_TAIL",
+            "MOVE_DARK_PULSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 202,
+    "baby_species": "SPECIES_SKORUPI",
+    "cry_volume": 125
+}

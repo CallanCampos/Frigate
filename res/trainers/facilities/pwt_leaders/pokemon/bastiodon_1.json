@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BASTIODON",
+    "moves": [ "MOVE_METAL_BURST", "MOVE_FIRE_BLAST", "MOVE_STEALTH_ROCK", "MOVE_IRON_DEFENSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_SHUCA_BERRY",
+    "form": 0
+}

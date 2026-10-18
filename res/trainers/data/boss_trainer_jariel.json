@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jariel",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_M_161",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ZAPDOS",
+            "form": 0,
+            "level": 80,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LIFE_ORB",
+            "moves": [ "MOVE_THUNDER", "MOVE_HEAT_WAVE", "MOVE_DISCHARGE", "MOVE_ROOST" ]
+        },
+        {
+            "species": "SPECIES_CRESSELIA",
+            "form": 0,
+            "level": 80,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_GANLON_BERRY",
+            "moves": [ "MOVE_PSYCHIC", "MOVE_SUBSTITUTE", "MOVE_MOONLIGHT", "MOVE_CALM_MIND" ]
+        },
+        {
+            "species": "SPECIES_LATIAS",
+            "form": 0,
+            "level": 80,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_WHITE_HERB",
+            "moves": [ "MOVE_DRACO_METEOR", "MOVE_PSYCHIC", "MOVE_ICY_WIND", "MOVE_THUNDERBOLT" ]
+        }
+    ],
+    "messages": []
+}

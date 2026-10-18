@@ -1,2 +1,0 @@
-\from{items.name}
-\pad{74}

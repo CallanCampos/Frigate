@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Charlie",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_PP_UP",
+    "party": [
+        {
+            "species": "SPECIES_GALVANTULA",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TROPIUS",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAMOSWINE",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You chose to speak to me from\namong so many people!{be00}\nYou have a good eye!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You are a worthy opponent!"
+        },
+        {
+            "type": 15,
+            "text": "The way you use moves...\nQuite honestly, I like it!{be01}\nHere, this is for you!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Heehee.{be01}\nEven when I am in the crowd,\npeople can tell I am strong."
+        }
+    ]
+}

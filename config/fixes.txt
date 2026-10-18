@@ -993,6 +993,9 @@ overlays/ov012 0x0216acd8 overlay_id 59
 overlays/ov012 0x0216acdc overlay_id 60
 overlays/ov012 0x0216acf4 overlay_id 60
 overlays/ov012 0x0216acf8 overlay_id 59
+overlays/ov012 0x0216af98 add_section src/ov012/script_sys.c:.rodata:0x54c
+overlays/ov012 0x0216b4e4 add_section src/ov012/scrcmd_vm.c:.rodata:0xc20
+overlays/ov012 0x0216b4fc reloc_module overlay(36)
 overlays/ov012 0x0216b500 reloc_module overlay(36)
 overlays/ov012 0x0216b504 reloc_module overlay(36)
 overlays/ov012 0x0216b508 reloc_module overlay(36)
@@ -1195,6 +1198,7 @@ overlays/ov012 0x0216dd64 reloc_module overlay(186)
 overlays/ov012 0x0216dd68 reloc_module overlay(186)
 overlays/ov012 0x0216e094 remove_symbol
 overlays/ov012 0x0216e170 remove_symbol
+overlays/ov012 0x0216e640 add_section src/ov012/script_sub_event.c:.bss:0x4
 overlays/ov013 0x0216e76c reloc_module overlay(308)
 overlays/ov014 0x0216e8a0 reloc_module overlay(328)
 overlays/ov014 0x0216e8a8 reloc_module overlay(156)
@@ -1221,9 +1225,13 @@ overlays/ov023 0x0216f720 reloc_module overlay(325)
 overlays/ov026 0x0216f926 reloc_module overlay(12)
 overlays/ov028 0x02171cfa reloc_module overlay(69)
 overlays/ov028 0x021723e8 reloc_module overlay(167)
+overlays/ov029 0x02194aa4 section_end lib/dwc/src/vct/vct_audio.c:.text
 overlays/ov029 0x02196fe0 add_reloc load,main,0x02005108
 overlays/ov029 0x0219729c remove_reloc
+overlays/ov029 0x021973e0 section_end lib/dwc/src/vct/vct_audio.c:.data
 overlays/ov029 0x02197424 add_data data_ov029_02197424
+overlays/ov029 0x02198358 section_end lib/dwc/src/vct/vct_audio.c:.bss
+overlays/ov029 0x02198358 section_start lib/dwc/src/vct/vct_buffer.c:.bss
 overlays/ov033 0x02176e82 reloc_module overlay(130)
 overlays/ov033 0x02179218 reloc_module overlay(36)
 overlays/ov033 0x02179246 reloc_module overlay(36)
@@ -3042,6 +3050,7 @@ overlays/ov257 0x021b18c4 add_data data_ov257_021b18c4
 overlays/ov257 0x021b19ac add_data data_ov257_021b19ac
 overlays/ov257 0x021b1a08 add_data data_ov257_021b1a08
 overlays/ov257 0x021b1aa8 add_data data_ov257_021b1aa8
+overlays/ov257 0x021b2120 remove_reloc
 overlays/ov257 0x021b21f4 section_end src/ov257/ctvt_game.c:.rodata
 overlays/ov257 0x021b21f8 remove_symbol
 overlays/ov257 0x021b21fc remove_symbol

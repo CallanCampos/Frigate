@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Rivalry",
+    "description": "Deals more damage to a\nPokémon of same gender."
+}

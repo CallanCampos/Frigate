@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Russel",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_RED_SHARD",
+    "party": [
+        {
+            "species": "SPECIES_GEODUDE",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GRAVELER",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GOLEM",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A Hiker, an athlete,\nand a Pokémon Trainer.{be00}\nDo you know what is important?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Grrrrrrr!\nClearly you know it!"
+        },
+        {
+            "type": 15,
+            "text": "Since you know, I'll give you\nsomething nice!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Prepare thoroughly.\nIf you don't, you can't do anything!"
+        }
+    ]
+}

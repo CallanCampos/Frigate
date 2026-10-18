@@ -1,0 +1,35 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Chelsie",
+    "class": "TRAINER_CLASS_BIKER",
+    "pokemon": [
+        "absol_1",
+        "skuntank_1",
+        "shiftry_1",
+        "froslass_1",
+        "cofagrigus_1",
+        "golurk_1",
+        "spiritomb_1",
+        "scrafty_1",
+        "bisharp_1",
+        "mismagius_1",
+        "drifblim_1",
+        "gengar_1",
+        "houndoom_1",
+        "drapion_1",
+        "honchkrow_1",
+        "krookodile_1",
+        "weavile_1",
+        "zoroark_1",
+        "mandibuzz_1",
+        "chandelure_1",
+        "umbreon_1",
+        "dusknoir_1",
+        "tyranitar_1"
+    ],
+    "messages": [
+        "Like uncooked dough,\nmy Pokémon are sticky!",
+        "Now you're stuck, aren't ya?",
+        "Well, your Pokémon are quite springy, too."
+    ]
+}

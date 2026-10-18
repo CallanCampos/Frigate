@@ -1,0 +1,134 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Bouffalant",
+    "pokedex": {
+        "category": "Bash Buffalo Pokémon",
+        "entry": "They are known to charge so wildly\nthat if a train were to enter their\nterritory, they would send it flying.",
+        "height": "5'03\"",
+        "weight": "208.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ずつきうしポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 95,
+        "attack": 110,
+        "defense": 95,
+        "speed": 55,
+        "special_attack": 40,
+        "special_defense": 95
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RECKLESS", "ABILITY_SAP_SIPPER" ],
+    "hidden_ability": "ABILITY_SOUNDPROOF",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 172,
+    "height": 16,
+    "weight": 946,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PURSUIT" ],
+            [ 1, "MOVE_LEER" ],
+            [ 6, "MOVE_RAGE" ],
+            [ 11, "MOVE_FURY_ATTACK" ],
+            [ 16, "MOVE_HORN_ATTACK" ],
+            [ 21, "MOVE_SCARY_FACE" ],
+            [ 26, "MOVE_REVENGE" ],
+            [ 31, "MOVE_HEAD_CHARGE" ],
+            [ 36, "MOVE_FOCUS_ENERGY" ],
+            [ 41, "MOVE_MEGAHORN" ],
+            [ 46, "MOVE_REVERSAL" ],
+            [ 51, "MOVE_THRASH" ],
+            [ 56, "MOVE_SWORDS_DANCE" ],
+            [ 61, "MOVE_GIGA_IMPACT" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM66",
+            "TM67",
+            "TM68",
+            "TM71",
+            "TM75",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM01",
+            "HM03",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_UPROAR",
+            "MOVE_SUPERPOWER",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_ENDEAVOR",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_STOMP",
+            "MOVE_ROCK_CLIMB",
+            "MOVE_HEADBUTT",
+            "MOVE_SKULL_BASH",
+            "MOVE_MUD_SHOT",
+            "MOVE_MUD_SLAP",
+            "MOVE_IRON_HEAD",
+            "MOVE_AMNESIA"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 269,
+    "baby_species": "SPECIES_BOUFFALANT",
+    "cry_volume": 125
+}

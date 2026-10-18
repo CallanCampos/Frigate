@@ -1,0 +1,11 @@
+# Members of the intro's archive, ARCID_INTRO (a/1/6/8), named once the code shows what they are. The same in both
+# versions.
+
+# Professor Juniper's sprite, as intro_cmd.c loads it (MCSSLoadInfo)
+NARC_INTRO_PROFESSOR_NANR = 24
+NARC_INTRO_PROFESSOR_NCGR = 25
+NARC_INTRO_PROFESSOR_BIN = 26
+NARC_INTRO_PROFESSOR_NCER = 27
+NARC_INTRO_PROFESSOR_NCLR = 28
+NARC_INTRO_PROFESSOR_NMAR = 29
+NARC_INTRO_PROFESSOR_NMCR = 30

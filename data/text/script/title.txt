@@ -1,8 +1,0 @@
-ScriptTitle_Text_Player = {bd02}PLAYER: {0100:0}
-ScriptTitle_Text_DocumentCertifiesHaveMade = {bd02}This document certifies that\n{bd02}you have made the great\n{bd02}achievement of catching all\n{bd02}the Pokémon in the Unova region.
-ScriptTitle_Text_Empty =                                                       \x{ffff}
-ScriptTitle_Text_GameFreakAllStaff = {bd02}GAME FREAK\n{bd02}All the staff
-ScriptTitle_Text_Player_2 = PLAYER: {0100:0}
-ScriptTitle_Text_GameFreakAllStaff_2 = {bd03:0}GAME FREAK\n{bd03:0}All the staff
-ScriptTitle_Text_DocumentCertifiesHaveSuccessfully = This document certifies\nthat you have successfully\ncompleted your\nNational Pokédex.
-\pad{62}

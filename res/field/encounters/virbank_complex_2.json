@@ -1,0 +1,93 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_MAGBY", 10, 10 ],
+                [ "SPECIES_MAGNEMITE", 10, 10 ],
+                [ "SPECIES_PATRAT", 10, 10 ],
+                [ "SPECIES_KOFFING", 10, 10 ],
+                [ "SPECIES_GROWLITHE", 11, 11 ],
+                [ "SPECIES_GROWLITHE", 13, 13 ],
+                [ "SPECIES_MAGBY", 12, 12 ],
+                [ "SPECIES_MAGNEMITE", 12, 12 ],
+                [ "SPECIES_PATRAT", 12, 12 ],
+                [ "SPECIES_KOFFING", 12, 12 ],
+                [ "SPECIES_PATRAT", 13, 13 ],
+                [ "SPECIES_KOFFING", 13, 13 ]
+            ],
+            "white2": [
+                [ "SPECIES_ELEKID", 10, 10 ],
+                [ "SPECIES_MAGNEMITE", 10, 10 ],
+                [ "SPECIES_PATRAT", 10, 10 ],
+                [ "SPECIES_KOFFING", 10, 10 ],
+                [ "SPECIES_GROWLITHE", 11, 11 ],
+                [ "SPECIES_GROWLITHE", 13, 13 ],
+                [ "SPECIES_ELEKID", 12, 12 ],
+                [ "SPECIES_MAGNEMITE", 12, 12 ],
+                [ "SPECIES_PATRAT", 12, 12 ],
+                [ "SPECIES_KOFFING", 12, 12 ],
+                [ "SPECIES_PATRAT", 13, 13 ],
+                [ "SPECIES_KOFFING", 13, 13 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_MAGBY", 11, 11 ],
+                [ "SPECIES_MAGNEMITE", 11, 11 ],
+                [ "SPECIES_PATRAT", 11, 11 ],
+                [ "SPECIES_KOFFING", 11, 11 ],
+                [ "SPECIES_GROWLITHE", 12, 12 ],
+                [ "SPECIES_GROWLITHE", 14, 14 ],
+                [ "SPECIES_MAGBY", 13, 13 ],
+                [ "SPECIES_MAGNEMITE", 13, 13 ],
+                [ "SPECIES_PATRAT", 13, 13 ],
+                [ "SPECIES_KOFFING", 13, 13 ],
+                [ "SPECIES_PATRAT", 14, 14 ],
+                [ "SPECIES_KOFFING", 14, 14 ]
+            ],
+            "white2": [
+                [ "SPECIES_ELEKID", 11, 11 ],
+                [ "SPECIES_MAGNEMITE", 11, 11 ],
+                [ "SPECIES_PATRAT", 11, 11 ],
+                [ "SPECIES_KOFFING", 11, 11 ],
+                [ "SPECIES_GROWLITHE", 12, 12 ],
+                [ "SPECIES_GROWLITHE", 14, 14 ],
+                [ "SPECIES_ELEKID", 13, 13 ],
+                [ "SPECIES_MAGNEMITE", 13, 13 ],
+                [ "SPECIES_PATRAT", 13, 13 ],
+                [ "SPECIES_KOFFING", 13, 13 ],
+                [ "SPECIES_PATRAT", 14, 14 ],
+                [ "SPECIES_KOFFING", 14, 14 ]
+            ]
+        },
+        "shaking_grass": [
+            [ "SPECIES_AUDINO", 10, 10 ],
+            [ "SPECIES_AUDINO", 10, 10 ],
+            [ "SPECIES_AUDINO", 11, 11 ],
+            [ "SPECIES_AUDINO", 11, 11 ],
+            [ "SPECIES_AUDINO", 12, 12 ],
+            [ "SPECIES_AUDINO", 12, 12 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ],
+            [ "SPECIES_AUDINO", 13, 13 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

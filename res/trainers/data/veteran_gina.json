@@ -1,0 +1,58 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Gina",
+    "class": "TRAINER_CLASS_VETERAN_F",
+    "battle_style": "BTL_STYLE_TRIPLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KINGDRA",
+            "form": 0,
+            "level": 68,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_DRAGON_PULSE", "MOVE_HYDRO_PUMP", "MOVE_ICE_BEAM", "MOVE_AGILITY" ]
+        },
+        {
+            "species": "SPECIES_SKARMORY",
+            "form": 0,
+            "level": 68,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_NIGHT_SLASH", "MOVE_STEEL_WING", "MOVE_ROCK_SLIDE", "MOVE_SWORDS_DANCE" ]
+        },
+        {
+            "species": "SPECIES_DONPHAN",
+            "form": 0,
+            "level": 68,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_STONE_EDGE", "MOVE_POISON_JAB", "MOVE_SCARY_FACE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "What's this? You don't seem to have\nthree healthy Pokémon."
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "I may have been a Trainer for a very long\ntime, but I haven't gotten rusty!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I couldn't battle the way I pictured it in\nmy head..."
+        },
+        {
+            "type": 2,
+            "text": "My skills may not be rusty, but it seems\nmy spirit might not be up to snuff...{be00}\nGetting too used to things is frightening."
+        }
+    ]
+}

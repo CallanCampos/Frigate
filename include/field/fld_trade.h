@@ -7,7 +7,7 @@
 #include "struct_decls.h"
 
 // Function and type names from swan; member layout reconstructed from the game code.
-// An in-game trade's offer, a file of archive 163 (data/trades/, packed by tools/data/trade_data.py)
+// An in-game trade's offer, a file of archive 163 (res/field/trades/, packed by tools/data/trade_data.py)
 struct FieldTradeOfferData {
     // The offer's own number in the archive
     u32 index;

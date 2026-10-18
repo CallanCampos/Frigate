@@ -41,6 +41,7 @@ src/ov257/ctvt_comm.c:
     .data       start:0x021b25f8 end:0x021b2604
 
 src/ov257/ctvt_draw.c:
+    complete
     .text       start:0x0219f234 end:0x021a0ac4
     .rodata     start:0x021b1a08 end:0x021b1aa0
     .data       start:0x021b264c end:0x021b2658

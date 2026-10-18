@@ -1,0 +1,173 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Honchkrow",
+    "pokedex": {
+        "category": "Big Boss Pokémon",
+        "entry": "If one utters a deep cry, many\nMurkrow gather quickly. For this,\nit is called “Summoner of Night.\"",
+        "height": "2'11\"",
+        "weight": "60.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Honchkrow",
+                "category": "Big Boss Pokémon",
+                "entry": "If one utters a deep cry, many\nMurkrow gather quickly. For this,\nit is called “Summoner of Night.\"",
+                "height": "2'11\"",
+                "weight": "60.2 lbs."
+            },
+            "fr": {
+                "name": "Corboss",
+                "category": "Pokémon Big Boss",
+                "entry": "Son cri profond peut invoquer une\nmeute de Cornèbre. On l'appelle\n“le crieur de mauvais augure\".",
+                "height": "0,9 m",
+                "weight": "27,3 kg"
+            },
+            "de": {
+                "name": "Kramshef",
+                "category": "Anführer",
+                "entry": "Sein tiefer Ruf lockt andere\nKramurx herbei. Man nennt es\ndaher „Beschwörer der Nacht“.",
+                "height": "0,9 m",
+                "weight": "27,3 kg"
+            },
+            "it": {
+                "name": "Honchkrow",
+                "category": "Pokémon Grancapo",
+                "entry": "Se emette un verso profondo, molti\nMurkrow accorrono all'istante.\nÈ detto “Evocatore della notte\".",
+                "height": "0,9 m",
+                "weight": "27,3 kg"
+            },
+            "ko": {
+                "name": "돈크로우",
+                "category": "큰형님포켓몬",
+                "entry": "돈크로우가 낮은 목소리로 울면\n즉시 니로우가 모여들기에\n밤을 부르는 자라고도 전해진다.",
+                "height": "0.9 m",
+                "weight": "27.3 kg"
+            },
+            "es": {
+                "name": "Honchkrow",
+                "category": "Pokémon Gran Jefe",
+                "entry": "Si uno lanza un grito profundo, los\ndemás acuden. Por eso se le llama\ntambién Invocador de la Noche.",
+                "height": "0,9 m",
+                "weight": "27,3 kg"
+            },
+            "ja": {
+                "name": "ドンカラス",
+                "category": "おおボスポケモン",
+                "entry": "ドンカラスが\\x{3000}ひくいこえで\\x{3000}なくと\nすぐさま\\x{3000}ヤミカラスが\\x{3000}あつまるため\nよるをまねくもの\\x{3000}とも\\x{3000}いわれる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff19}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff17}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 100,
+        "attack": 125,
+        "defense": 52,
+        "speed": 71,
+        "special_attack": 105,
+        "special_defense": 52
+    },
+    "types": [ "TYPE_DARK", "TYPE_FLYING" ],
+    "catch_rate": 30,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_INSOMNIA", "ABILITY_SUPER_LUCK" ],
+    "hidden_ability": "ABILITY_MOXIE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLACK",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 177,
+    "height": 9,
+    "weight": 273,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_ASTONISH" ],
+            [ 1, "MOVE_PURSUIT" ],
+            [ 1, "MOVE_HAZE" ],
+            [ 1, "MOVE_WING_ATTACK" ],
+            [ 25, "MOVE_SWAGGER" ],
+            [ 35, "MOVE_NASTY_PLOT" ],
+            [ 45, "MOVE_FOUL_PLAY" ],
+            [ 55, "MOVE_NIGHT_SLASH" ],
+            [ 65, "MOVE_QUASH" ],
+            [ 75, "MOVE_DARK_PULSE" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM59",
+            "TM60",
+            "TM63",
+            "TM66",
+            "TM67",
+            "TM68",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM88",
+            "TM90",
+            "TM95",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_FOUL_PLAY",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_ROOST",
+            "MOVE_SPITE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MURKROW",
+    "cry_volume": 120
+}

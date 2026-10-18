@@ -638,72 +638,52 @@ static void func_02022464(TCBEx *task, void *data) {
         }
         stream->event = stream->nextEvent;
     }
-    if (!stream->paused) {
-        switch (stream->state) {
-        case PRINT_STREAM_RUNNING:
-            if (stream->scrolling) {
-                // Scrolls the window up a line, 4 pixels a frame
-                if (stream->scrollOffset < 16) {
-                    u16 step = 4;
-                    u16 width;
-                    int height;
+    if (stream->paused) {
+        return;
+    }
+    switch (stream->state) {
+    case PRINT_STREAM_RUNNING:
+        if (stream->scrolling) {
+            // Scrolls the window up a line, 4 pixels a frame
+            if (stream->scrollOffset < 16) {
+                u16 step = 4;
+                u16 width;
+                int height;
 
-                    if (stream->scrollOffset + 4 > 16) {
-                        step = 16 - stream->scrollOffset;
-                    }
-                    stream->scrollOffset += (u8)step;
-                    width = GFL_BitmapGetWidth(stream->bitmap);
-                    height = GFL_BitmapGetHeight(stream->bitmap) - step;
-                    GFL_BitmapCopyArea(stream->bitmap, stream->bitmap, 0, step, 0, 0, width, height, 0xffff);
-                    GFL_BitmapFillArea(stream->bitmap, 0, (s16)height, width, step, stream->backgroundColor);
-                    BmpWin_FlushChar(stream->window);
-                } else {
-                    stream->renderer.x = stream->renderer.startX;
-                    stream->renderer.y = 16;
-                    stream->scrolling = FALSE;
+                if (stream->scrollOffset + 4 > 16) {
+                    step = 16 - stream->scrollOffset;
                 }
-                return;
+                stream->scrollOffset += (u8)step;
+                width = GFL_BitmapGetWidth(stream->bitmap);
+                height = GFL_BitmapGetHeight(stream->bitmap) - step;
+                GFL_BitmapCopyArea(stream->bitmap, stream->bitmap, 0, step, 0, 0, width, height, 0xffff);
+                GFL_BitmapFillArea(stream->bitmap, 0, (s16)height, width, step, stream->backgroundColor);
+                BmpWin_FlushChar(stream->window);
+            } else {
+                stream->renderer.x = stream->renderer.startX;
+                stream->renderer.y = 16;
+                stream->scrolling = FALSE;
             }
-            if (stream->waitTimer == 0) {
-                int chars = stream->fast ? stream->fastCharsPerStep : stream->charsPerStep;
-                int i;
+            break;
+        }
+        if (stream->waitTimer == 0) {
+            int chars = stream->fast ? stream->fastCharsPerStep : stream->charsPerStep;
+            int i;
 
-                if (stream->fastPending) {
-                    func_0202243c(stream);
-                    stream->fastPending = FALSE;
-                }
-                for (i = 0; i < chars; i++) {
-                    const u16 *str = stream->cursor;
+            if (stream->fastPending) {
+                func_0202243c(stream);
+                stream->fastPending = FALSE;
+            }
+            for (i = 0; i < chars; i++) {
+                const u16 *str = stream->cursor;
 
-                    switch (*str) {
-                    case CHAR_EOM:
-                        stream->state = PRINT_STREAM_DONE;
-                        break;
-                    case STRCMD_CHAR:
-                        if (StrCmd_Category(str) == STRCMD_CATEGORY_STREAM) {
-                            func_02022694(stream);
-                            if (stream->callback != NULL) {
-                                stream->callbackWait = stream->callback(stream->event);
-                                if (stream->callbackWait) {
-                                    i = chars;
-                                } else {
-                                    stream->event = stream->nextEvent;
-                                }
-                            }
-                            if (stream->state != PRINT_STREAM_RUNNING || stream->waitTimer != 0) {
-                                i = chars;
-                            }
-                            break;
-                        }
-                        // fallthrough
-                    default:
-                        stream->cursor = GFL_TextRndDrawString(&stream->renderer, str, FALSE);
-                        if (*stream->cursor == CHAR_EOM) {
-                            stream->state = PRINT_STREAM_DONE;
-                        } else if (*stream->cursor != CHAR_NEWLINE) {
-                            stream->waitTimer = stream->fast ? stream->fastWait : stream->wait;
-                        }
-                        BmpWin_FlushChar(stream->window);
+                switch (*str) {
+                case CHAR_EOM:
+                    stream->state = PRINT_STREAM_DONE;
+                    break;
+                case STRCMD_CHAR:
+                    if (StrCmd_Category(str) == STRCMD_CATEGORY_STREAM) {
+                        func_02022694(stream);
                         if (stream->callback != NULL) {
                             stream->callbackWait = stream->callback(stream->event);
                             if (stream->callbackWait) {
@@ -712,31 +692,50 @@ static void func_02022464(TCBEx *task, void *data) {
                                 stream->event = stream->nextEvent;
                             }
                         }
+                        if (stream->state != PRINT_STREAM_RUNNING || stream->waitTimer != 0) {
+                            i = chars;
+                        }
                         break;
                     }
-                }
-            } else {
-                stream->waitTimer--;
-            }
-            return;
-        case PRINT_STREAM_PAUSED:
-            if (stream->continueRequested) {
-                switch (stream->pageMode) {
-                case PRINT_STREAM_PAGE_SCROLL:
-                    stream->scrolling = TRUE;
-                    stream->state = PRINT_STREAM_RUNNING;
-                    return;
-                case PRINT_STREAM_PAGE_CLEAR:
+                    // fallthrough
                 default:
-                    GFL_BitmapFill(stream->bitmap, stream->backgroundColor);
-                    stream->state = PRINT_STREAM_RUNNING;
+                    stream->cursor = GFL_TextRndDrawString(&stream->renderer, str, FALSE);
+                    if (*stream->cursor == CHAR_EOM) {
+                        stream->state = PRINT_STREAM_DONE;
+                    } else if (*stream->cursor != CHAR_NEWLINE) {
+                        stream->waitTimer = stream->fast ? stream->fastWait : stream->wait;
+                    }
+                    BmpWin_FlushChar(stream->window);
+                    if (stream->callback != NULL) {
+                        stream->callbackWait = stream->callback(stream->event);
+                        if (stream->callbackWait) {
+                            i = chars;
+                        } else {
+                            stream->event = stream->nextEvent;
+                        }
+                    }
                     break;
                 }
             }
-            return;
-        default:
-            return;
+        } else {
+            stream->waitTimer--;
         }
+        break;
+    case PRINT_STREAM_PAUSED:
+        if (stream->continueRequested) {
+            switch (stream->pageMode) {
+            case PRINT_STREAM_PAGE_SCROLL:
+                stream->scrolling = TRUE;
+                stream->state = PRINT_STREAM_RUNNING;
+                break;
+            case PRINT_STREAM_PAGE_CLEAR:
+            default:
+                GFL_BitmapFill(stream->bitmap, stream->backgroundColor);
+                stream->state = PRINT_STREAM_RUNNING;
+                break;
+            }
+        }
+        break;
     }
 }
 

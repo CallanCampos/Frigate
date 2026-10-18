@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Blanche",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "pokemon": [
+        "tyrogue_1",
+        "poochyena_1",
+        "swinub_1",
+        "shinx_1",
+        "nidoran_m_1",
+        "lillipup_1",
+        "riolu_1",
+        "ekans_1",
+        "sandile_1",
+        "shuppet_1",
+        "bagon_1",
+        "croagunk_1",
+        "golett_1",
+        "machop_1",
+        "darumaka_1",
+        "goldeen_1",
+        "krabby_1",
+        "drilbur_1",
+        "snover_1",
+        "nuzleaf_1"
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Joyce",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_MUSHARNA",
+            "form": 0,
+            "level": 36,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Indescribable energy\nis flowing to me!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The energy is escaping...\nAww..."
+        },
+        {
+            "type": 2,
+            "text": "The thoughts and wishes of the Pokémon\nthat rest here also provide energy!"
+        }
+    ]
+}

@@ -1,9 +1,0 @@
-Global10270_Text_DeoxysReactingMeteorWould = Deoxys is reacting to the meteor...{be01}\nWould you like to bring the Deoxys\nin your party closer to the meteor?
-Global10270_Text_WhichDeoxysWouldLike = Which Deoxys would you like to\nbring closer to the meteor?{be01}
-Global10270_Text_PokemonNotReactingMeteor = The Pokémon is not reacting\nto the meteor.
-Global10270_Text_EggNotReactingMeteor = The Egg is not reacting\nto the meteor.
-Global10270_Text_HasChangedHaveBalanced = {0102:0} has changed to\nhave balanced stats!
-Global10270_Text_HasChangedHaveSuperior = {0102:0} has changed to\nhave superior stats for attacking!
-Global10270_Text_HasChangedHaveSuperior_2 = {0102:0} has changed to\nhave superior stats when defending!
-Global10270_Text_HasChangedHaveIncreased = {0102:0} has changed\nto have increased Speed!
-Global10270_Text_ThereMeteorFellFrom = There is a meteor that fell from space...

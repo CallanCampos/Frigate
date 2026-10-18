@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Joshua",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_NATE",
+    "pokemon": [ "none_1" ],
+    "messages": [
+        "Have we met or not? I don't remember.\nWell, nice to meet you!",
+        "Yahoo! Ya-hoooooo!\nI won again!",
+        "No way! Nooo way...\nI lost again..."
+    ]
+}

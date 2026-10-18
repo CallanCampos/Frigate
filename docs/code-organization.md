@@ -14,8 +14,11 @@ every section.
 - The C file holds its functions in address order. A function that doesn't match yet stays in the file as the closest
   C found, so objdiff shows how far off it is. Library code built with another compiler can differ: SPL's compiler
   emits a file's functions in reverse source order, so `lib/spl/src/` files hold theirs in reverse address order.
-- `src/` holds the code built with the game's compiler and flags. An overlay's files go in `src/ovNNN/`, and the main
+- `src/` holds the code built with the game's compiler. An overlay's files go in `src/ovNNN/`, and the main
   module's in `src/gfl/` (Game Freak's library) and `src/system/` (the game's own code), mirroring `include/`.
+  The default flags are in `configure.py`; a file whose original code and data require another setting goes in
+  `config/compiler_flags.toml`, as `ctvt_draw.c` needs `-ipa function`. Different flags alone do not make a game
+  source a library. See `docs/configs.md` for the shared compiler settings.
 - `lib/` holds the libraries built apart from the game, as in pret's projects: `lib/<name>/include/` for the public
   headers, `lib/<name>/src/` for the sources and private headers (`lib/spl/src/spl_internal.h`), and
   `lib/<name>/library.toml` for the library's compiler and flags, which `configure.py` and the probe read: `lib/spl/`
@@ -67,7 +70,7 @@ every section.
   layout with padding is still the one definition.
 - Headers are grouped like the game's code: `system/` (game system, game data, events), `field/`, `save/`, `gfl/`
   (Game Freak's library), `pml/` (Pokémon data), `battle/`, `demo/` and `constants/`, whose ID lists, such as species
-  and items, are generated from `data/constants/` (see [Constant lists](data.md#constant-lists)). The libraries'
+  and items, are generated from `generated/` (see [Constant lists](data.md#constant-lists)). The libraries'
   headers are in `lib/`, as `lib/nitro/include/nitro/`, `lib/nnsys/include/nnsys/`, `lib/spl/include/spl/`,
   `lib/dsprot/include/dsprot/`, `lib/dwc/include/dwc/` (Nintendo's Wi-Fi Connection library),
   `lib/nitrowifi/include/nitrowifi/` (NitroWiFi, under DWC), `lib/twl/include/twl/` (TwlSDK),

@@ -1,0 +1,60 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_SYS_88", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_SYS_88",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 100,
+            "pan": 64
+        },
+        {
+            "program": 50,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 70,
+            "sustain": 0,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 113,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 50,
+            "sustain": 0,
+            "release": 125,
+            "pan": 64
+        },
+        {
+            "program": 122,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 100,
+            "sustain": 0,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 123,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 110,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        }
+    ]
+}

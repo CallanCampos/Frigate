@@ -1,0 +1,1 @@
+RelicCastle_Text_ThereTwoThingsIve = There are two things I've learned\nabout quicksand!{be01}\nIf you try to walk through the middle,\nyou'll fall.{be01}\nAnd if you try to run through it,\nyou'll fall.

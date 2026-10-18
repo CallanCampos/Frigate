@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VANILLITE",
+    "moves": [ "MOVE_ICY_WIND", "MOVE_MIRROR_SHOT", "MOVE_MIST", "MOVE_HAIL" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_PETAYA_BERRY",
+    "form": 0
+}

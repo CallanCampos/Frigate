@@ -1,0 +1,2 @@
+GearStation9_Text_ItsSubwayMapUnova = It's a subway map of the Unova region.{be01}
+GearStation9_Text_PlatformTrainAnvilleTown = This is the platform for the train to\nAnville Town.

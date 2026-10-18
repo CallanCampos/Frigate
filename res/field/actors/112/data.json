@@ -1,0 +1,21 @@
+{
+    "$schema": "field_actor.schema.json",
+    "type": "none",
+    "scene_node_type": 0,
+    "shadow": false,
+    "footprint_type": 0,
+    "reflections": false,
+    "billboard_size": 0,
+    "sprite_atlas_size": 0,
+    "sprite_controller_type": 0,
+    "gender": "GENDER_MALE",
+    "collision": {
+        "width": 1,
+        "height": 1
+    },
+    "offset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+    }
+}

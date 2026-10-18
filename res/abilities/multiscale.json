@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Multiscale",
+    "description": "Reduces damage when HP\nis full."
+}

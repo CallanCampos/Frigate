@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Samantha",
+    "class": "TRAINER_CLASS_PRESCHOOLER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [],
+    "heals": false,
+    "money": 1,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DRATINI",
+            "form": 0,
+            "level": 59,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BAGON",
+            "form": 0,
+            "level": 59,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GIBLE",
+            "form": 0,
+            "level": 59,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Instead of a Dragon-type Pokémon, I've\nfound myself a spectacular Trainer!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You were spectacular and, more than that,\nso strong!"
+        },
+        {
+            "type": 2,
+            "text": "I'm going to like Dragon-type Pokémon\nbecause I want to talk to Drayden!"
+        }
+    ]
+}

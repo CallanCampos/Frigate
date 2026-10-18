@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Shane",
+    "class": "TRAINER_CLASS_BACKPACKER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KABUTO",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LILEEP",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CRANIDOS",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CARRACOSTA",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Backpackers are exactly what they\nsound like.{be01}\nThey set out on the road with only\nthe packs on their backs and the Pokémon{be00}\nin their Poké Balls!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I wish I could pack some wins in my\nbackpack, too..."
+        },
+        {
+            "type": 2,
+            "text": "The purpose of the journey is found in\nthose that I meet!{be01}\nIsn't it great to encounter all the\ndifferent Pokémon there are in the world?"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_POLIWRATH",
+    "moves": [ "MOVE_WATERFALL", "MOVE_FOCUS_PUNCH", "MOVE_HYPNOSIS", "MOVE_BULK_UP" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_WATER_GEM",
+    "form": 0
+}

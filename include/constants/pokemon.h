@@ -7,7 +7,7 @@
 // Not from swan: a genderless Pokémon's, which its sprite files treat as male (pokegra.c)
 #define GENDER_UNKNOWN 2
 
-// SPECIES_EGG, the species ID of an egg, follows the national Pokédex (data/constants/species.txt)
+// SPECIES_EGG, the species ID of an egg, follows the national Pokédex (generated/species.txt)
 #include "constants/species.h"
 
 // Fields of a Pokémon, which PokeParty_GetParam and PokeParty_SetParam read and write. Names from swan's PkmField
@@ -149,7 +149,7 @@
 
 // How a Pokémon evolves, the method of its species' evolution table. The evolution demo treats some differently: it
 // removes the held item for the held item methods, makes a Shedinja, and doesn't let an evolution by item be stopped.
-// The names are the usual ones for the values of the evolution tables, which data/evolutions bears out
+// The names are the usual ones for the values of the evolution tables, which res/evolutions bears out
 #define EVO_METHOD_NONE 0
 #define EVO_METHOD_FRIENDSHIP 1
 #define EVO_METHOD_FRIENDSHIP_DAY 2

@@ -1,0 +1,6 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ "MAP_MODEL_OPELUCID_CITY_12_M_OLDBBUILL01_00" ]
+    ]
+}

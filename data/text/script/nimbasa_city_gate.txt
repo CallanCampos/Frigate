@@ -1,4 +1,0 @@
-NimbasaCityGate_Text_Empty =                                                               \x{ffff}
-NimbasaCityGate_Text_Empty_2 =                                                                          \x{ffff}
-NimbasaCityGate_Text_Empty_3 =        \x{ffff}
-NimbasaCityGate_Text_Empty_4 =       \x{ffff}

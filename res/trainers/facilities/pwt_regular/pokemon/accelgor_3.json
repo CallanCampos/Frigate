@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ACCELGOR",
+    "moves": [ "MOVE_U_TURN", "MOVE_BUG_BUZZ", "MOVE_FOCUS_BLAST", "MOVE_FINAL_GAMBIT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_TIMID",
+    "item": "ITEM_FOCUS_SASH",
+    "form": 0
+}

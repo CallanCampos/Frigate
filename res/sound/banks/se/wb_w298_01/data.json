@@ -1,0 +1,35 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_W298_INST", null, null, null ],
+    "instruments": [
+        {
+            "program": 70,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 40,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 10,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_W298_INST",
+                    "wave": 0,
+                    "base_key": "G5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

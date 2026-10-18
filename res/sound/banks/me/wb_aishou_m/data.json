@@ -1,0 +1,167 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_ME_WB_AISHOU_M", null, null, null ],
+    "instruments": [
+        {
+            "program": 100,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 40,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 25,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "A2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 0,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 1,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 2,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "F3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 4,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "As3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 6,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 5,
+                    "base_key": "C4",
+                    "attack": 127,
+                    "decay": 55,
+                    "sustain": 1,
+                    "release": 114,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 16,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 7,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 47,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 3,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 100,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 10,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "Gs5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 8,
+                    "base_key": "C5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_AISHOU_M",
+                    "wave": 9,
+                    "base_key": "C6",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

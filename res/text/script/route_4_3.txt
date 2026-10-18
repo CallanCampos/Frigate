@@ -1,0 +1,4 @@
+Route43_Text_IfFullEnergyCan = If you are that full of energy, you can\ngo anywhere, even in a sandstorm!
+Route43_Text_WhatWornOutOk = What? Are you worn out?\nOK! Then rest here for a minute!
+Route43_Text_Glugluglug = Glugluglug!
+\pad{22}

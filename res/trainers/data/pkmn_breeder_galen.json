@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Galen",
+    "class": "TRAINER_CLASS_PKMN_BREEDER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TRANQUILL",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 24,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I need to practice more as a\nPokémon Breeder.{be00}\nPlease, be my opponent!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I've still got a long way to go...\nI'll be raising my Pokémon!"
+        },
+        {
+            "type": 2,
+            "text": "Thank you so much!{be01}\nI learned a lot from our battle.\nBe my opponent again sometime!"
+        }
+    ]
+}

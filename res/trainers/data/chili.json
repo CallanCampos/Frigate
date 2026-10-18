@@ -1,0 +1,49 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Chili",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_CHILI",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HEATMOR",
+            "form": 0,
+            "level": 65,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_LEFTOVERS",
+            "moves": [ "MOVE_FIRE_BLAST", "MOVE_SUCKER_PUNCH", "MOVE_FOCUS_BLAST", "MOVE_STOCKPILE" ]
+        },
+        {
+            "species": "SPECIES_DARMANITAN",
+            "form": 0,
+            "level": 65,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_MUSCLE_BAND",
+            "moves": [ "MOVE_FLARE_BLITZ", "MOVE_ROCK_SLIDE", "MOVE_HAMMER_ARM", "MOVE_BULK_UP" ]
+        },
+        {
+            "species": "SPECIES_SIMISEAR",
+            "form": 0,
+            "level": 67,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LIFE_ORB",
+            "moves": [ "MOVE_FLAMETHROWER", "MOVE_GRASS_KNOT", "MOVE_CRUNCH", "MOVE_WORK_UP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Chili: Augh! You got me!\nYou and your Pokémon are on fire!"
+        }
+    ]
+}

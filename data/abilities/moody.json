@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Moody",
-    "description": "Raises one stat and\nlowers another."
-}

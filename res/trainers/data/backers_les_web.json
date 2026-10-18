@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Les & Web",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Boom-boom-badum! Ha! Boom-boom-badum!\nListen to the fans' drumbeat!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Les: Thank you for listening to the beat\nof our spirit!{be01}\nWeb: Thank you for listening to the yell\nof our spirit!"
+        },
+        {
+            "type": 5,
+            "text": "Ha, pan-pan-papan, hey-hoo!!\nNext, we will use this rhythm!"
+        },
+        {
+            "type": 6,
+            "text": "Bam-bam-bam! Ha! Bam-bam-bam!\nI see the end coming?"
+        },
+        {
+            "type": 7,
+            "text": "Beep-beep-beep! Ha! Ta-roo Ta-raaa!\nListen to the fans shout!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "Pan, pan-papan, hey-oo!! Right?\nOh, the rhythm is wonderful!"
+        },
+        {
+            "type": 10,
+            "text": "Beep-beep-beep! Ha! Ta-roo ta-raaa!\nListen to the fans shout!"
+        }
+    ]
+}

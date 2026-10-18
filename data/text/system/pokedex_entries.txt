@@ -1,3 +1,0 @@
-\from{species.pokedex.entry}
-PokedexEntries_Text_Empty =
-\from{species.pokedex.forms.entry}

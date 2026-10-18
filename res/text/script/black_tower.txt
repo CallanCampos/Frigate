@@ -1,0 +1,8 @@
+BlackTower_Text_SoaringBlackTowerIts = The soaring Black Tower...\nIt's piercing through the end of the sky.{be01}\nIt's also known as Unova's Challenge.\nIt's an interesting building...
+BlackTower_Text_TheySayArea6 = They say Area 6 is located so high\nthat you cannot see it from{be00}\nthe ground...{be01}\nI wonder how high it is.{be01}\nAs a researcher, I'm very interested.
+BlackTower_Text_HeardClearedAreaTop = I heard that you cleared the\nArea at the top, too...{be01}\nGreat! Literally, you're a person\nabove the clouds!
+BlackTower_Text_SenseStrongPowerIve = I sense strong power\nthat I've never felt before...{be01}\nI can't stop...trembling...{be01}\nI wonder what is hidden\nin this Unova's Challenge?
+BlackTower_Text_WhatPowerItsGetting = What is this power?\nIt's getting stronger and stronger!{be01}\nUh... I'm all tingly inside...{be01}\nUnova's Challenge, the Black Tower...\nWhat kind of secret does it have...?
+BlackTower_Text_WhenHeardClearedAll = When I heard that you cleared all of\nthe Areas, all became clear to me.{be01}\nThe power that I've felt... The power\nthat made me tremble...{be01}\nIt was the potential\nyou possess!
+BlackTower_Text_WhatTrainerNamedBenga = What? That Trainer named Benga is\nAlder's grandson?{be01}\nI should ask Alder in Floccesy Town\nto train me, too.
+\pad{18}

@@ -33,6 +33,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - The reverse, a narrow stack parameter held in a saved register (with another parameter moved to a new slot) where
   the original reads it from its slot at each use: its uses share one conversion; give one of them a `long` operand,
   the SDK's `s32`. (matching.md: "share one conversion")
+- A constant step subtracted through an `fx32 *` (`*z -= c ? -0x100 : 0x100`) with the step and `*z` in each other's
+  registers: `long` constant steps (`0x100L`), as the SDK's `long` `fx32` converts them. (matching.md: "A constant
+  step subtracted")
 - An index kept in two registers (copied after a division and again before a multiply) where ours keeps one: a
   `const` struct parameter with its pointer field read at each use. (matching.md: "A pointer field read through a
   `const` parameter")
@@ -112,6 +115,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   asm: write its stores before those constants'. (matching.md: "`CtvtGameTarget_Init` emits")
 - Registers swapped around a flag set `TRUE` and overridden in an `if`, with the instructions already right:
   write it as a ternary, `x = k != 0 ? TRUE : FALSE;`. (matching.md: "the ternary still allocates the")
+- Loop invariants a register off, around a local set by default and overridden in an `if`, with the instructions
+  already right: assign it in both arms of an `if`/`else`, or with a ternary. (matching.md: "An `if`/`else`
+  assigning each arm")
 - A register swap with otherwise identical code, in code that mirrors a sibling function: try that code as a
   `static inline` helper. (matching.md: "Moving code into a `static inline` helper")
 - Chained stores of one constant (`a = b = TRUE`) share a register; separate ones may not.
@@ -174,6 +180,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Table addresses reloaded from the pool at each use and a constant built in every copy of an unrolled inline,
   one pushed register short: combine each call's result as soon as it comes (ORed into a `u8` accumulator),
   keeping only values that straddle the stores. (matching.md: "collected before they are combined")
+- A global's address loaded from the pool again before each call, where ours keeps it in a saved register: a
+  pointer local MWCC did not propagate. Check with a local and `#pragma opt_propagation off`, then look for the
+  spelling (a member's address, a cast). (matching.md: "is copy-propagated into its uses, and the")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -186,6 +195,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
+- A local slotted above the temporaries where the original's value sits among them: the expression written at each
+  use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
 - A NitroSystem (2.0/sp2p2) function's spill slots in another order: locals are slotted function scope first, then
   the `if` block's, then the `else` block's, then inlines' in reverse; move them to function scope.
   (matching.md: "In NitroSystem's 2.0/sp2p2 code a pointer sum")
@@ -251,6 +262,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
+  byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
+- `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
+  (matching.md: "`ScClient_Reset` matches")
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - `lsr` then `orr ..., lsl` where the original shifts left first (a halfword swap): swap the operands of the `|`.
@@ -264,14 +279,20 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A spilled flag's constant store right after its `movs`, where the original stores it after the next field store:
   sweep the widths of the block's other spilled locals against their callees' returns. (matching.md: "The local
   whose width matters")
+- A load the original issues between another load and its use, which ours issues ahead of that load: write it after
+  the use, for the scheduler to move up into the stall, then sweep the declaration order for the colors.
+  (matching.md: "into the load-use stall")
 - A value computed later than written, at its only use: an enum local stays where it is assigned.
   (matching.md: "enum local's value")
 - A load through a pointer moves above stores only when the pointee is `const`. A load scheduled early points to a
   `const` parameter. (matching.md: "unless the pointee is `const`")
 - A static's member loaded above a store through an unknown index into another static, or below it: ARM code
   moves the load up only when its offset is below half the object's size, and below the size less the offset of a
-  higher member read earlier; a store moves above an access through a pointer by the same bound. (matching.md: "below
-  half the object's size")
+  higher member read earlier; a store moves above an access through a pointer by the same bound. The store, too, must
+  be in the lower half of its own object; an unknown index counts as 0. (matching.md: "below half the object's size")
+- A struct field's load above an indexed store that its offset can't give: the fields are separate statics, each at
+  offset 0 of its own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its
+  own object")
 - A table's row offset added to its address before the column (`add r0, table, row*3; ldrb [col, r0]`), where ours
   adds it to the column: a two-dimensional table indexed `[row][col]`. (matching.md: "A two-dimensional table
   indexed")
@@ -293,6 +314,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A call's result stored before a constant (`bl; str r0, [sp, #N]; movs r5, #0`) that ours builds first, unmoved by
   `#pragma scheduling off`: a block boundary. Write the calls with constants in each arm of the `if`/`else` before it,
   not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
+- A literal-pool load (an I/O base) that ours places above a store the original makes first: a block boundary, as
+  above; no spelling inside one block moves it. (matching.md: "A literal-pool load goes above a plain store")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
@@ -400,6 +423,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A field read in an `if`'s condition and its body loaded ahead of the condition's other loads, where the original
   loads in tree order and reuses the register: global CSE merged the reads; only a second pointer path to the field
   or `opt_common_subs off` keeps them apart. (matching.md: "is a global common subexpression, loaded into a")
+- A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
+  calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
+  sum or another immediate keeps it in place, no pragma does. (matching.md: "whose only use is the copy")
 
 ## An instruction too many or too few
 
@@ -422,6 +448,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
   twice. (matching.md: "chained assignment to fields")
+- A field loaded again after an `if`, where the original keeps one load (or spills it and reloads the copy): no
+  reuse reaches past a join, so the source held it in a variable. (matching.md: "reused into an `if`'s body")
 - A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
   recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
   (matching.md: "assigned just before the call")
@@ -462,7 +490,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
-  a sum that adds a counter known to be 0, has an enum counter. (matching.md: "enum type")
+  a sum that adds a counter known to be 0, has an enum counter. `ScReport_SetPlayer` keeps its known-zero error
+  test with the real `SCResult` type. (matching.md: "enum type")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
   (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
   `p->size = size; p->size -= 0x20;`. (matching.md: "reduced at run time before a field store")
@@ -558,9 +587,14 @@ text to `grep -n` there. Entries without a key come from later work and still be
   that the `u8` return narrows; a `u8` local drops it. (matching.md: "An `and #0xff` on each result")
 - An `and` before an inline's table load in some inlined copies only: those calls mask their argument, and the
   inline indexes with the bare parameter. (matching.md: "in some inlined copies and not in others")
+- `movne rN, #0; moveq rN, #size; add` where ours selects an index and multiplies (`mla`): MWCC never pushes the
+  multiply into a select's arms, so the source selected byte offsets. `moveq #1; movne #0` is `c ? 0 : 1`.
+  (matching.md: "into the arms of a select")
 
 ## Branches and block layout
 
+- `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
+  (matching.md: "`ScClient_OnCreateSession` keeps")
 - A combined `&&` camera check moves a copied parameter, where the original has two false branches with the same
   call: nest the checks and write that call in both false arms. (matching.md: "tests `cameraEnabled` first")
 - A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
@@ -598,7 +632,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "`bne next; b hide`")
 - Early `return FALSE`s go to one shared tail only when the C has one trailing return (an `if`/`else if` chain, or a
   `result` variable, or an inlined function: see the next line). A return that branches to the wrong one of two equal
-  `b end` trampolines can be `goto end`.
+  `b end` trampolines: change which nearby exits are `return` and which are `break` or the end of an `if`.
+  (matching.md: "goes through a `b` within range")
 - Failures that set a saved register to 0 and jump to one `mov r0, rN` exit, where a `result` variable gets a stack
   slot: the body is a `static inline` called by a one-line wrapper. (matching.md: "Every `return` gets its own
   epilogue")
@@ -638,6 +673,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- `ScClient_SubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
+  (matching.md: "`ScClient_SubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
   it as a counter times the step. (matching.md: "A loop offset that starts at 0")
 - A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2p2): put it last
@@ -648,6 +685,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `do`/`while`, `if (i < size) do ... while (++i < size)`. (matching.md: "At `-O2,p` no loop is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
   unsigned and keeps the loop. (matching.md: "loop that runs once")
+- A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
+  once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
@@ -666,6 +705,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A test after a body that is entered from the top and from an earlier branch, in a function that does one box a frame:
   `while (box < n) { ...; break; }`, with a comment. (matching.md: "stops after its first pass")
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
+- `p + v * 4` kept in a register with reads at `#4` and `#8`, where the original computes `(v + k) << 2` for each
+  read: a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), only where the buffer's
+  type calls for one. (matching.md: "hides the address from that pass")
 - Stores of a spilled copy after the loop's guard, in the preheader, where ours stores it at the computation: copy
   after the last branch before the loop, and give the loop's `fx32`/`s32` locals the SDK's `long`.
   (matching.md: "A spilled copy of a value that the original stores") A narrow stack parameter read in the loop's
@@ -676,6 +718,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A loop entered with a `b` to its test at the bottom, where ours is rotated: a 0/1 test, `i < N ? TRUE : FALSE`, a
   `TRUE`/`FALSE` inline or `&& !found`. In ARM the bottom test is still a plain `cmp; blt`.
   (matching.md: "has a test whose value is 0/1"), (matching.md: "What keeps the `b`")
+- The same `b` in every function that reads one object, where the file's other loops are rotated: the object has an
+  explicit alignment, as a 32-aligned address in the ROM shows; another file's object takes it on its `extern`
+  declaration. (matching.md: "An explicit alignment")
 - The same in an outer loop around an inner one: begin its body with the inner loop,
   `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
 - `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
@@ -715,6 +760,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
+- A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
+  alignment. (matching.md: "An explicit alignment")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
   off")
 - `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. A bare inlined `clz` in ARM library code is
@@ -796,8 +843,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   "ask for `-ipa file` before anything else")
 - A constant loaded from the pool with no relocation where MWCC folds it or builds it with `mov`/`lsl`: a linker
   symbol, `extern u8 SYM[]` cast at the use. (matching.md: "is a linker symbol")
-- A gap in `.bss` before a 32-aligned object: the previous file ends there. (matching.md: "makes its file's whole
-  `.bss` section 32-aligned")
+- A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
+  gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
+  32-aligned")
 
 ## Function order and presence
 

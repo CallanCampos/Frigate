@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Storm Drain",
-    "description": "Draws in all Water-type\nmoves to up Sp. Attack."
-}

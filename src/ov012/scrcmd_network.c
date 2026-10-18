@@ -98,10 +98,10 @@ BOOL func_ov012_02159cd8(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02159cf8(GameSystem **gsysPtr) {
+BOOL func_ov012_02159cf8(FinishScriptSubEventsWork *work, u32 *state) {
     GameSystem *gsys;
 
-    gsys = *gsysPtr;
+    gsys = work->gsys;
     func_02016b24(gsys, 0);
     GSYS_TryBootGameComm(gsys);
     return TRUE;

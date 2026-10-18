@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Aqua Ring",
+    "description": "The user envelops itself in a veil made\nof water. It regains some HP on\nevery turn.",
+    "type": "TYPE_WATER",
+    "quality": "MOVE_QUALITY_SPECIAL",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_RESTORE_HP_EVERY_TURN",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_SNATCH" ]
+}

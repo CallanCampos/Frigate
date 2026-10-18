@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Georgia",
+    "class": "TRAINER_CLASS_POKEFAN_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 16,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CUBCHOO",
+            "form": 0,
+            "level": 35,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Oh?\nYou want to have a battle with me?{be01}\nAll right!\nI have a strong Pokémon.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "That's right.\nThe Pokémon is no longer with me."
+        },
+        {
+            "type": 2,
+            "text": "...That's not true.\nAs long as I remember,{be00}\nit will be with me forever."
+        }
+    ]
+}

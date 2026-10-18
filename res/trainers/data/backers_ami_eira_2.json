@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ami & Eira",
+    "class": "TRAINER_CLASS_BACKERS_F",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIMIPOUR",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SIMISEAR",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Hit a home run!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ami: We're slammed.{be01}\nEira: I'm going home."
+        },
+        {
+            "type": 5,
+            "text": "Elesa's fashion sense\nis funky, too."
+        },
+        {
+            "type": 6,
+            "text": "A one-on-two battle is\ntoo funky!"
+        },
+        {
+            "type": 7,
+            "text": "Hey, what does “long ball\" mean?{be01}"
+        },
+        {
+            "type": 9,
+            "text": "What I heard is\nit means a home run.{be01}\n“Homer\" also\nmeans a home run!"
+        },
+        {
+            "type": 10,
+            "text": "We two battle together, so\nyou need two Pokémon!"
+        }
+    ]
+}

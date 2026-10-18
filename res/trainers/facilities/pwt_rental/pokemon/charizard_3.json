@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_CHARIZARD",
+    "moves": [ "MOVE_HEAT_WAVE", "MOVE_ROCK_SLIDE", "MOVE_AIR_SLASH", "MOVE_CRUNCH" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_MILD",
+    "item": "ITEM_CHOICE_SCARF",
+    "form": 0
+}

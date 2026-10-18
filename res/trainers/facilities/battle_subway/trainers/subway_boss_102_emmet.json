@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Emmet",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_102",
+    "pokemon": [ "garbodor_1", "crustle_1", "durant_3", "klinklang_4" ],
+    "messages": [
+        "Hi, do you remember me?\nI am Emmet.{be01}\nI am a Subway Boss.{be01}\nI like Double Battles.{be01}\nI like combinations of\ntwo Pokémon.{be01}\nAnd I like winning\nmore than anything else.{be01}\nThis time, I am really serious.\nReally serious.{be01}\nBecause if a battle is not serious,\nit is not fun.",
+        "I am Emmet.{be01}\nI won against you.\nBut this is not the end.{be01}\nI am sure you will show up\nhere again.{be01}\nI will wait for it and\nwin against you again.{be01}\nBecause I am a\nSubway Boss. I am Emmet.",
+        "I am Emmet.{be01}\nI am a Subway Boss,\nbut I lost against you again.{be01}\nBut I feel good.\nBecause it was very fun!{be01}\nYou want to win, and\nI don't want to lose.{be00}\nThat's real.{be01}\nWhen we clash in battles,\nI feel very excited!"
+    ]
+}

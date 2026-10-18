@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ZAPDOS",
+    "moves": [ "MOVE_CHARGE_BEAM", "MOVE_HEAT_WAVE", "MOVE_DOUBLE_TEAM", "MOVE_ROOST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_BRIGHT_POWDER",
+    "form": 0
+}

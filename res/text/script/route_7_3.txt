@@ -1,0 +1,12 @@
+Route73_Text_UnovaRegionSeeTheres = In the Unova region, you see,\nthere's a Pokémon called Thundurus{be00}\nthat causes thunder, and another called{be00}\nTornadus that causes heavy rain.{be01}\nThey fly around the region lettin' wild\nwinds loose while the rain pounds and{be00}\nthe lightnin' crashes.{be01}\nThey ruin the crops I work so hard\nto raise.
+Route73_Text_LongAgoSharpLookin = Long ago, I was a sharp-lookin' young\nman, and my wife was a fine-lookin' girl.{be00}\nThis is a story from way back then.{be01}\nRight around here, a certain Pokémon\ntaught Tornadus and Thundurus a lesson.{be01}\nFor about 30 years after that, those\ntwo Pokémon kept it calm and quiet.{be01}
+Route73_Text_ThoseTwoPokemonWere = Those two Pokémon were quieted\nby a Pokémon known as Landorus.{be01}\nI remember hearin' that there's a\nshrine built in honor of Landorus{be00}\nsomewhere on Route 14.
+Route73_Text_LongAgoSharpLookin_2 = Long ago, I was a sharp-lookin' young\nman, and my wife was a fine-lookin' girl.{be00}\nThis is a story from way back then.{be01}\nRight around here, a certain Pokémon\ntaught Tornadus and Thundurus a lesson.{be01}\nFor about 30 years after that, those\ntwo Pokémon kept it calm and quiet.{be01}
+Route73_Text_IllShowThemTornadus = I'll show them to you.\nThis is Tornadus.{be01}
+Route73_Text_Thundurus = And this is Thundurus!{be01}
+Route73_Text_TornadusThundurusHaveBeen = Tornadus and Thundurus have been\nregistered in the Pokédex.
+Route73_Text_PokemonWhoQuietedOthers = The Pokémon who quieted the others\nis known as Landorus.{be01}\nFeast yer eyes!{be01}
+Route73_Text_LandorusHasBeenRegistered = Landorus has been registered\nin the Pokédex.
+Route73_Text_OhDearPokemonTeam = Oh, dear. Your Pokémon team...\nIt seems a bit sluggish.{be01}\nRest for just a moment now!{be01}
+Route73_Text_WalkingRaisedWalkwaysMore = Walking on the raised walkways is\nmore tiring than you think, right?
+Route73_Text_SawThemTheirAppearances = I saw them!{be01}\nTheir appearances were totally\ndifferent, but they must be Landorus,{be00}\nTornadus, and Thundurus!
