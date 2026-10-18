@@ -26,10 +26,118 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the macOS distribution build, one universal app for macOS 11 (ADR 0013, proposed)
+
+- **Upstream:** `993e6c49b`, as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-macos-dist` from `main` at `2da26e048`: `97547e7c7` (ADR 0013, proposed),
+  `5c7ade588` (the tools read every slice; x86_64's 4 KiB alignment), `c29bdb182` (`make_app.sh` reads every slice and
+  takes the build's architectures and minimum; `check_app.sh`), then this commit, the distribution build itself and
+  this entry; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) on the final tree.
+  Outside `port/` only the landing page, `.github/README.md`, and the CI workflow, `.github/workflows/port-ci.yml`,
+  changed; no game change.
+- **Host build:** macOS 26.5.1 on an M2, Xcode 26.6 (SDK 26.5, Apple clang 21.0.0), CMake 4.4.4, Black 2,
+  RelWithDebInfo, Ninja, each from scratch in this worktree:
+  - `build/port`, the development build as before: arm64, built for the SDK's macOS (26.0), Homebrew's SDL3 3.4.18.
+    263 warnings, all the decomp's, as in the last entries; none in `port/`.
+  - `build/port-dist`, `-DPORT_MACOS_DISTRIBUTION=ON`: universal, macOS 11.0, SDL3 3.4.18 built along, statically and
+    without libusb. The same 263 warnings in each slice (526), none of them an availability one under
+    `-Werror=unguarded-availability`, and no linker warning: the 20 "reducing alignment" ones of the research are gone.
+    700 MB, against `build/port`'s 230 MB.
+  - `build/port-dist-w2`, White 2's, made from nothing by `port/tools/package_macos.sh --distribution --version w2_us`
+    in 4 min 25 s (configure, SDL3, both slices, the app and its 13 MB image), checked as below, then deleted.
+  - **What the load commands say** (`port/app/macos/check_app.sh` prints them, slice by slice):
+    - the development app, `build/port/Frigate Black 2.app`: the program arm64 only, platform MACOS, minos 26.0, SDK
+      26.5; `Contents/Frameworks/libSDL3.0.dylib`, Homebrew's, arm64 only, minos 26.0; `LSMinimumSystemVersion` 26.0;
+      signed ad hoc. That app opens only on Apple Silicon with macOS 26.
+    - the distribution apps, `Frigate Black 2.app` and `Frigate White 2.app`: one binary each, the program, universal,
+      x86_64 and arm64, each slice platform MACOS, minos 11.0, SDK 26.5 (`LC_BUILD_VERSION`, tool LD 1267.0); no
+      `Contents/Frameworks`; it loads only libSystem, libobjc and the frameworks SDL3 needs, all macOS's own
+      (UniformTypeIdentifiers and CoreHaptics weakly), and SDL3 holds no `dlopen` of libusb any more; an Info.plist
+      `LSMinimumSystemVersion` of 11.0; signed ad hoc (`flags=0x2(adhoc)`), no hardened runtime, and
+      `codesign --verify --deep --strict` passes; `--help` starts as both slices, x86_64 under Rosetta. The program is
+      29 MB (14 MB arm64, 15 MB x86_64), and Black 2's disk image 13 MB.
+  - Not pushed, so no CI run: the new `macos-distribution` job, on `macos-26` and `macos-26-intel`, hasn't run yet.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, with the oracle (`pbw-oracle` and the oracle-made saves copied from the verify tree into each build)
+    and the ROM build's link map, the machine at a load of 50 to 85 from two other tracks:
+    - `build/port`: 268 of 269 pass (2,816 s); `app_universal_slices` skips, the program having one slice.
+    - `build/port-dist` as its arm64 slices (ctest runs each program as this Mac's): all 267 tests of the time passed
+      (1,923 s) before SDL3's libusb change and the two new tests; on the final build all 269 pass (1,343 s),
+      `app_slices` and `app_universal_slices` among them.
+    - `build/port-dist` with its 44 executables thinned to x86_64 (`lipo -thin x86_64`, the universal ones kept aside
+      and put back with their times after, so that nothing relinked), so that ctest's children run under Rosetta: 260 of
+      269 pass (2,930 s), among them the 21 `oracle_*` tests against melonDS, the 4 `launch_*` and 5 `replay_*`, the
+      four `gx_backend_*`, `os_guard_huge_frame` (the stack probes on x86-64) and the 12 `*_sanitized` tests. The 9
+      others fail as they must on a thinned tree, which is not the build's: `app_slices` (one slice, the build is for
+      two) and the 8 `overlay_sections_image_*` (one slice where the check predicted two); `app_universal_slices`
+      skips. `asm_oracle` loads its library into the arm64 Python, so it checks arm64 code only.
+    - Both slices of Black 2's program, 900 headless frames from power-on with `--fixed-time`, with each of the four
+      VRAM backends: the eight `frames.tsv` are the same byte for byte, 153 distinct top screens. `app_universal_slices`
+      does it with the default backend in 14 s, and passes for White 2's too (153 distinct top screens).
+  - The scripts: `test_make_app.sh`, 69 checks (a universal program and library made for 11.0: the app of both, started
+    as both; a library for 13.0 refused with `--minimum 11.0` and taken as the app's minimum without it; a library and a
+    program without a slice refused; `--archs` as a CMake list); `test_package_macos.sh`, 22.
+  - `package_macos.sh --distribution` on the configured `build/port-dist`: 18 s, `Frigate Black 2 0.0.2727.dmg`,
+    `hdiutil verify`, the signature, the slices and the minimum checked in the mounted image.
+  - SDL3's own sources, which the build's `-Werror=unguarded-availability` doesn't reach: each of SDL3's 249 compile
+    commands of `build/port-dist` run again per architecture with `-fsyntax-only -Wno-everything
+    -Wunguarded-availability -Wunguarded-availability-new` (its precompiled headers kept): 498 compiles, none failing,
+    no availability warning. The same flags warn on a test file that calls macOS 12's `isLowPowerModeEnabled` at 11.0.
+  - Every relative link of the Markdown files changed resolves, anchors included (checked by script); clang-format
+    23.1.3 is clean on the two C files changed; `port-ci.yml` parses as YAML.
+  - The tests left `~/Library` alone, but a first version of `check_app.sh` didn't: run on an app, it sent `--help`'s
+    output to `/dev/null`, so the program, finding itself in an app with nowhere to write, wrote its log to
+    `~/Library/Logs/Frigate/frigate-black2.log` (`port/app/message_log.c`), overwriting the one there. It now keeps the
+    output, and a run leaves that file's time unchanged.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 512 function stubs and 46 data placeholders in Black 2 (`gen_stubs`, both builds; the slices define
+  the same symbols), fewer than the 624 and 48 of the last entry's count, since upstream's merge `1f0c184f6` brought C.
+- **64-bit warnings:** not measured: no game or `lib/` code changed (the count of every kind is 263, as above).
+- **Work done:** the app for other Macs, from the research's plan: why it needed macOS 26 (the program built for the
+  SDK's macOS, Homebrew's SDL3 arm64 only and built for 26), the choice of one universal app for macOS 11, its tools
+  and its checks. ADR 0013, proposed.
+  - **The distribution build** (`port/CMakeLists.txt`): `-DPORT_MACOS_DISTRIBUTION=ON` sets `CMAKE_OSX_ARCHITECTURES`
+    `arm64;x86_64` and `CMAKE_OSX_DEPLOYMENT_TARGET` 11.0 before `project()` when the cache has neither, skips the
+    installed SDL3 and builds the pinned release statically without libusb (SDL3's configure had found Homebrew's
+    libusb and built in a `dlopen` of it), and every build with a deployment target fails on an API newer than it.
+    `port/tools/package_macos.sh --distribution [--version w2_us]` configures `build/port-dist` (`-w2`), builds and
+    packages in one command, refuses a directory configured otherwise or for another game, and checks the image's
+    slices and minimum.
+  - **The tools follow the slices** (`5c7ade588`): `gen_overlay_sections.py` predicts and checks each slice, with the
+    link rules of its architecture and deployment target, each measured with a small program for both architectures
+    from macOS 10.13 to 26 (lazy binding below 12 on arm64 and 13 on x86_64, `__DATA_CONST` from 10.15, SDL3's
+    Objective-C, and on arm64 `__objc_stubs` and `__objc_methlist`), and its image test compares by name: arm64
+    predicts and has 119 sections, x86_64 117, 87 of them the overlays' (the development build's program, 100).
+    `check_struct_layout.py` reads a universal object slice by slice. `hw.c` and `gen_stubs.py` align to 4 KiB in an
+    x86_64 Mach-O program; `test_gx.c` checks the views against the host's page.
+  - **The app's scripts** (`c29bdb182`): `make_app.sh` reads every slice, takes `--archs` and `--minimum` from the
+    build and refuses a binary short of a slice or built for a newer macOS, and starts the program as each slice the Mac
+    runs; `check_app.sh` reports and checks an app or a program; `app_slices` and `app_universal_slices` test them.
+  - **CI**: a `macos-distribution` job on `macos-26` and `macos-26-intel` (`brew install ninja` only): configure,
+    build, ctest (natively x86_64 on Intel), `package_macos.sh --distribution`, and `check_app.sh` on the app, every
+    slice started on Apple Silicon. The runner labels are runner-images' README's of 2026-10-18; `macos-14`, the oldest,
+    is deprecated, so it isn't used.
+  - **Documents**: port/README.md's macOS app section (who each app is for, the distribution build in one command,
+    what has been tested, installing on another Mac, Gatekeeper on macOS 15 and later and on 11 to 14),
+    ARCHITECTURE.md's feature map, the app, cmake, tests and tools guides, `Info.plist.in`'s comment, the glossary
+    (universal program and slice, Rosetta, deployment target and minos, distribution build, ad-hoc signature and
+    Gatekeeper), the landing page, ADR 0010's note, and lessons.md.
+- **Next:** for the app, CI's first run of the distribution job (on Intel natively), then the user's decisions: whether
+  Frigate offers downloads at all (port/README.md and `package_macos.sh` say the compiled game code is never uploaded),
+  and, before any, a first-launch ROM picker, since a downloaded app opened from the Finder finds no ROM. Otherwise as
+  the last entry: White 2's starter route, the apps no route reaches yet, a save with an adventure made by the port once
+  overlay 36 lets it into the field.
+- **Blockers:** as the last entry: overlay 36 (issue #83, another contributor's active claim) gates phase 3 and the
+  launcher's retirement; `NNSi_objSizeWTbl` stops the Pokédex; overlays 11 and 182 only matter from phase 7. ADR 0013
+  waits for the user's acceptance; macOS 11 to 15 can't be tried here (no older runner that isn't deprecated, no
+  virtual machine).
+
 ## 2026-10-18: the launcher track's merge after review: --help's options and statuses, and the documents as built
 
 - **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
+- **Port:** `bbfab4c72`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
   entry; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `b1ca0c257`. No
   game file changed: game-changes.md's one edit marks `event_mapchange.c`'s second row "(again)".

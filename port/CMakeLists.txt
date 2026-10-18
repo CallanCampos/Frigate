@@ -8,9 +8,26 @@
 #   cmake --build build/port
 #   ctest --test-dir build/port
 #
-# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us) and -DPORT_FETCH_SDL3 here; the others are in the fragments of
-# port/cmake/, included at the end, and port/cmake/README.md lists them all.
+# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_FETCH_SDL3 and -DPORT_MACOS_DISTRIBUTION here; the others
+# are in the fragments of port/cmake/, included at the end, and port/cmake/README.md lists them all.
 cmake_minimum_required(VERSION 3.28)
+
+# The macOS build for other Macs than the one that builds it (ADR 0013): one universal program, arm64 and x86_64, for
+# macOS 11.0 and later, with the pinned SDL3 built along for the same target and linked statically, never an installed
+# one (Homebrew's is built for the macOS Homebrew builds on, and for one architecture). The deployment target and the
+# architectures must be set before project(), which checks the compiler with them; a value given on the command line,
+# or already in the cache, stays. A development build sets neither, so it is built for the machine it is built on. One
+# build directory per kind: build/port-dist is the one port/tools/package_macos.sh --distribution configures
+option(PORT_MACOS_DISTRIBUTION
+    "macOS: a universal (arm64 and x86_64) build for macOS 11.0 and later, with the pinned SDL3 linked statically" OFF)
+if(PORT_MACOS_DISTRIBUTION)
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "The oldest macOS the program runs on" FORCE)
+    endif()
+    if(NOT CMAKE_OSX_ARCHITECTURES)
+        set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "The architectures of the program's slices" FORCE)
+    endif()
+endif()
 
 # The product's name, description and disclaimer, which port/hal/os/port_app.h sets for the C (port/CLAUDE.md, "The
 # port is Frigate"): the build reads them from there, so that each is written once. Sets the variable of the macro's
@@ -44,6 +61,9 @@ project(frigate
     HOMEPAGE_URL "https://github.com/CallanCampos/pokebw2-native"
     LANGUAGES C)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/port_app.h")
+if(PORT_MACOS_DISTRIBUTION AND NOT APPLE)
+    message(FATAL_ERROR "PORT_MACOS_DISTRIBUTION is the macOS build for other Macs; configure without it here")
+endif()
 
 # The names the player sees. The product is Frigate, PORT_PRODUCT_NAME above; the macOS app's names are made from it in
 # port/cmake/macos_app.cmake. Each version is its own program: frigate-black2 or frigate-white2, built from the same
@@ -102,9 +122,18 @@ file(GLOB_RECURSE port_watched CONFIGURE_DEPENDS
 file(STRINGS "${PORT_GEN}/sources.txt" game_sources_relative)
 list(TRANSFORM game_sources_relative PREPEND "${REPO_ROOT}/" OUTPUT_VARIABLE game_sources)
 
-# SDL3 3.4: an installed one when there is one (Homebrew, a distribution), else the pinned release built along
+# SDL3 3.4: an installed one when there is one (Homebrew, a distribution), else the pinned release built along. The
+# macOS distribution build always builds the pinned release, statically, for its own deployment target and
+# architectures, which CMAKE_OSX_DEPLOYMENT_TARGET and CMAKE_OSX_ARCHITECTURES carry into SDL3's build
 option(PORT_FETCH_SDL3 "Build the pinned SDL3 release when no installed SDL3 3.4 is found" ON)
-find_package(SDL3 3.4 CONFIG QUIET)
+if(PORT_MACOS_DISTRIBUTION)
+    if(NOT PORT_FETCH_SDL3)
+        message(FATAL_ERROR
+            "PORT_MACOS_DISTRIBUTION builds the pinned SDL3 release; configure with -DPORT_FETCH_SDL3=ON")
+    endif()
+else()
+    find_package(SDL3 3.4 CONFIG QUIET)
+endif()
 if(NOT SDL3_FOUND)
     if(NOT PORT_FETCH_SDL3)
         message(FATAL_ERROR "SDL3 3.4 not found; install it, or configure with -DPORT_FETCH_SDL3=ON")
@@ -116,7 +145,21 @@ if(NOT SDL3_FOUND)
     set(SDL_SHARED OFF CACHE BOOL "" FORCE)
     set(SDL_STATIC ON CACHE BOOL "" FORCE)
     set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+    if(PORT_MACOS_DISTRIBUTION)
+        # Without libusb, which SDL3 otherwise opens at run time (dlopen) when the builder's Mac has Homebrew's: an app
+        # for other Macs loads nothing from outside macOS (ADR 0010), and its SDL3 doesn't depend on the builder's Mac.
+        # SDL3 reads gamepads through IOKit and GameController either way
+        set(SDL_HIDAPI_LIBUSB OFF CACHE BOOL "" FORCE)
+    endif()
     FetchContent_MakeAvailable(SDL3)
+endif()
+
+# A macOS build for an older macOS than the SDK's (a deployment target, such as the distribution build's 11.0): a call
+# to an API newer than the target, which would stop the program on the older macOS, fails the build instead. Every
+# target defined from here on gets it, the game's, the platform layer's, the program's and the tests'; SDL3 above
+# guards its own calls
+if(APPLE AND CMAKE_OSX_DEPLOYMENT_TARGET)
+    add_compile_options(-Werror=unguarded-availability)
 endif()
 
 # What every file that includes the decomp's headers needs, the decomp's own C and the platform layer alike: MWCC's

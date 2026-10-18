@@ -2,7 +2,12 @@ name: Frigate CI
 
 # Builds Frigate, the native port, on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI
 # doesn't have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds
-# both ROMs locally (port/docs/SYNC.md).
+# both ROMs locally (port/docs/SYNC.md). The tests that need the player's ROM skip here.
+#
+# Two jobs: the development build on macOS and Linux (host), as port/README.md's quick start makes it, and the macOS
+# distribution build (macos-distribution, ADR 0013), one universal app, arm64 and x86_64, for macOS 11.0 and later, made
+# and tested on Apple Silicon and on Intel. Each job builds its own copy and uploads nothing: the port's compiled game
+# code is never uploaded (port/CLAUDE.md).
 on:
   push:
     branches: [main]
@@ -64,3 +69,54 @@ jobs:
       - name: Build the macOS app
         if: runner.os == 'macOS'
         run: cmake --build build/port --target frigate-black2_app
+
+  macos-distribution:
+    name: macOS distribution build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # Apple Silicon, whose image has Rosetta, so the app's x86_64 slice starts there too; and Intel, where ctest
+        # runs every test on the x86_64 slices natively
+        os: [macos-26, macos-26-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # No sdl3: the distribution build builds SDL3's pinned release for its own target and links it statically
+      - name: Install build tools
+        run: brew install ninja
+
+      - name: Configure
+        env:
+          CC: clang
+        run: cmake -S port -B build/port-dist -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_MACOS_DISTRIBUTION=ON
+
+      - name: Build
+        run: cmake --build build/port-dist
+
+      # ctest runs each program as the runner's own slice: arm64 on Apple Silicon, x86_64 on Intel. app_slices checks
+      # the program's slices and macOS from its load commands
+      - name: Test
+        run: ctest --test-dir build/port-dist --output-on-failure
+
+      # The app and its disk image as port/README.md makes them, in one command; make_app.sh refuses a binary without
+      # both slices or built for a newer macOS than 11.0, and package_macos.sh checks the app in the image. Both stay
+      # on the runner
+      - name: Build the app and its disk image
+        run: port/tools/package_macos.sh --distribution
+
+      # The finished app as another Mac meets it: both slices, macOS 11.0 in every load command and in the Info.plist,
+      # no library from outside macOS, an ad hoc signature without the hardened runtime, and the program starting as
+      # every slice: on Apple Silicon the x86_64 one under Rosetta too, so there every slice must start
+      - name: Check the app
+        run: |
+          every=
+          if [ "$(uname -m)" = arm64 ]; then every=--run-every-slice; fi
+          port/app/macos/check_app.sh "build/port-dist/Frigate Black 2.app" --archs "arm64 x86_64" --minimum 11.0 $every

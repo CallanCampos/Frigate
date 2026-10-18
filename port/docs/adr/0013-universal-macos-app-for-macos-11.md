@@ -25,8 +25,10 @@ Rosetta installed; the STATUS.md entry of that day has the runs):
   through SDL3. Compiled for both architectures at 11.0 with `-Werror=unguarded-availability`, and for x86_64 at 10.13,
   the 1,585 files give no availability diagnostic. minicoro switches fibers with assembly for arm64 and x86-64 System
   V, and the stack probes work on x86-64 (`os_guard_huge_frame`).
-- **SDL3 3.4.18** deploys to "macOS 10.13 and newer" (its `docs/README-macos.md`) and guards its newer calls itself;
-  built statically for 11.0 it brings frameworks that macOS 11 has, UniformTypeIdentifiers and CoreHaptics weakly.
+- **SDL3 3.4.18** deploys to "macOS 10.13 and newer" (its `docs/README-macos.md`) and guards its newer calls itself:
+  its 249 sources, compiled again for each architecture at 11.0 with only the availability warnings on, give none (a
+  call of macOS 12's `isLowPowerModeEnabled` in a test file does). Built statically for 11.0 it brings frameworks that
+  macOS 11 has, UniformTypeIdentifiers and CoreHaptics weakly.
 - **The link changes with the target**, which `port/tools/gen_overlay_sections.py` must know, since it predicts the
   program's sections before the link (Mach-O holds at most 255): ld64 links a program for chained fixups only from macOS
   12.0 on arm64 and 13.0 on x86_64, and below that binds lazily (`__stub_helper`, `__la_symbol_ptr`, a pointer of
@@ -103,15 +105,15 @@ Rosetta installed; the STATUS.md entry of that day has the runs):
 
 ## Consequences
 
-- The distribution build compiles everything twice: the universal program is 29 MB (14 MB arm64, 15 MB x86_64), and
-  the build takes about twice a development build's time and room.
+- The distribution build compiles everything twice, and SDL3 too: the universal program is 29 MB (14 MB arm64, 15 MB
+  x86_64), its disk image 13 MB, and the build directory about 700 MB against a development build's 230 MB.
 - A new Xcode that links differently fails `overlay_sections_image_*`, which names the sections it didn't predict;
   `gen_overlay_sections.py`'s rules say where each came from.
 - Locally, Homebrew's `cmake`, `ctest`, `ninja` and the `.venv` Python are arm64 only, so ctest on a universal tree runs
   the arm64 slices; the x86_64 slice runs through `app_slices` (`--help`), `app_universal_slices` and `make_app.sh`,
   through the whole suite only with the executables thinned to x86_64 (the STATUS.md entry has the commands), and on
   CI's Intel runner natively.
-- macOS 11 to 15 are untested: an unguarded call in SDL3 of an API newer than 11 would show only there, and the
-  availability check covers the port's code alone.
+- macOS 11 to 15 are untested. The build's availability check covers the port's code alone; SDL3's was checked once,
+  for 3.4.18, so a new pinned release wants the same check (the STATUS.md entry says how) or a try on an older macOS.
 - Revisit when Apple drops Rosetta (after macOS 27; then the x86_64 slice can be tested only on Intel), when Xcode no
   longer builds for 11.0, or when the user decides about downloads.

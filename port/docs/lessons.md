@@ -3,6 +3,25 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the universal macOS app
+
+- **`otool`, `nm` and the like read one slice of a universal file**, the Mac's own, unless told otherwise: make_app.sh
+  took its libraries, search paths and minimum macOS from the arm64 slice alone, and gen_overlay_sections.py counted
+  one slice. Read every slice (`otool -arch all`, `llvm-dwarfdump --arch`, a parser that walks the fat header), and
+  check each against the build's architectures.
+- **The deployment target changes what the linker makes**, not only the minos it writes: below macOS 12 on arm64 and
+  13 on x86_64 a program binds lazily, with sections of its own, and a static library with Objective-C brings more on
+  arm64. A tool that predicts a link must take its rules from the target and the architecture, and a test that compares
+  by name, not count, says which rule is missing. Measure each rule with a small program at several targets.
+- **An x86_64 Mach-O program can't align a section past 4 KiB**: ld64 lowers it and only warns, so a 16 KiB-aligned
+  window in a universal build is 16 KiB-aligned on arm64 and by luck on x86_64. Check what the code needs (the host's
+  page), not a constant.
+- **A library fetched and built along takes what the builder's Mac has**: SDL3's configure found Homebrew's libusb and
+  built in a dlopen of it. A build for other Macs turns such options off, so that it doesn't depend on the machine it
+  was made on.
+- **bash 3.2, macOS's `sh`, can't parse a `case` inside `$(...)`** whose patterns lack their opening parenthesis: write
+  `(pattern)` there.
+
 ## 2026-10-18: the test launcher, after review
 
 - **ctest's `PASS_REGULAR_EXPRESSION` ignores the exit status.** A test with one passes on its output alone, so a
