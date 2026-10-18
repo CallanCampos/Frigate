@@ -2871,4 +2871,4 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | partial | descriptive |
+| `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | complete | descriptive |
