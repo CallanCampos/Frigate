@@ -295,3 +295,8 @@ lib/dwc/src/gscommon/gs_screen_print.c:
     .text       start:0x02171420 end:0x0217150c
     .data       start:0x02187790 end:0x02187794
     .bss        start:0x021909a4 end:0x021917a8
+
+lib/dwc/src/gstats/gbucket.c:
+    complete
+    .text       start:0x0217bb70 end:0x0217beec
+    .bss        start:0x021917b0 end:0x021917c0
