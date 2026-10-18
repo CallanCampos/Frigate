@@ -1,0 +1,479 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 1,
+            "condition": 1,
+            "direction": 6,
+            "grid": {
+                "x": 210,
+                "y": 186,
+                "z": 0
+            }
+        },
+        {
+            "script": 3,
+            "condition": 1,
+            "direction": 6,
+            "grid": {
+                "x": 220,
+                "y": 180,
+                "z": 0
+            }
+        },
+        {
+            "script": 2,
+            "condition": 1,
+            "direction": 0,
+            "grid": {
+                "x": 237,
+                "y": 177,
+                "z": 0
+            }
+        },
+        {
+            "script": 8159,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 224,
+                "y": 166,
+                "z": 0
+            }
+        },
+        {
+            "script": 8160,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 196,
+                "y": 187,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 201,
+                "y": 181,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 195,
+                "y": 188,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 192,
+                "y": 181,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 194,
+                "y": 169,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 193,
+                "y": 175,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 192,
+                "y": 172,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 225,
+                "y": 166,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 218,
+                "y": 184,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 221,
+                "y": 176,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 241,
+                "y": 167,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 239,
+                "y": 167,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 237,
+                "y": 168,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 237,
+                "y": 185,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 220,
+                "y": 181,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 218,
+                "y": 177,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 216,
+                "y": 187,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 226,
+                "y": 166,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 215,
+                "y": 183,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 243,
+                "y": 175,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 237,
+                "y": 178,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_PARASOL_LADY",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 4,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 237,
+                "z": 176,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_FISHERMAN",
+            "movement": 16,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0317",
+            "script": 5,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 233,
+                "z": 183,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0528",
+            "script": 7220,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 195,
+                "z": 168,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0529",
+            "script": 7221,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 228,
+                "z": 187,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": "OBJ_CODE_110",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x052a",
+            "script": 7222,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 206,
+                "z": 168,
+                "y": 0
+            }
+        },
+        {
+            "id": 5,
+            "model": "OBJ_CODE_YOUNGSTER",
+            "movement": 20,
+            "type": 4,
+            "flag": 0,
+            "script": 3571,
+            "direction": "DIR_DOWN",
+            "params": [ 1, 3, 0 ],
+            "area": {
+                "width": 0,
+                "height": 5
+            },
+            "grid": {
+                "x": 196,
+                "z": 174,
+                "y": 0
+            }
+        },
+        {
+            "id": 6,
+            "model": "OBJ_CODE_LASS",
+            "movement": 14,
+            "type": 1,
+            "flag": 0,
+            "script": 3572,
+            "direction": "DIR_UP",
+            "params": [ 3, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 220,
+                "z": 177,
+                "y": 0
+            }
+        },
+        {
+            "id": 7,
+            "model": "OBJ_CODE_PARASOL_LADY",
+            "movement": 15,
+            "type": 1,
+            "flag": 0,
+            "script": 3574,
+            "direction": "DIR_DOWN",
+            "params": [ 3, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 230,
+                "z": 168,
+                "y": 0
+            }
+        },
+        {
+            "id": 8,
+            "model": "OBJ_CODE_FISHERMAN",
+            "movement": 16,
+            "type": 1,
+            "flag": 0,
+            "script": 3575,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 218,
+                "z": 170,
+                "y": 0
+            }
+        },
+        {
+            "id": 9,
+            "model": "OBJ_CODE_PARASOL_LADY",
+            "movement": 3,
+            "type": 1,
+            "flag": 0,
+            "script": 3573,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 222,
+                "z": 183,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_BRIDGE_GATE_GATE_2",
+            "warp": 0,
+            "unk4": 3,
+            "transition": 4,
+            "grid": {
+                "x": 3912,
+                "y": 0,
+                "z": 2888,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_MOOR_OF_ICIRRUS",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 3736,
+                "y": 0,
+                "z": 2648,
+                "width": 2,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

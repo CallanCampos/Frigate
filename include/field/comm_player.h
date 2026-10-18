@@ -62,6 +62,7 @@ BOOL func_ov012_0216165c(CommPlayerSys *cps, int index);
 void func_ov012_0216168c(CommPlayerSys *cps, int index, const CommPlayerStatus *status);
 // The player's own state, and whether it changed since it was last sent
 BOOL func_ov012_021616b0(CommPlayerSys *cps, CommPlayerStatus *status);
-u32 func_ov012_021617e8(CommPlayerSys *cps, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5);
+// Whether another player's actor is at a grid position, with its network ID; *index is where to look from
+BOOL func_ov012_021617e8(CommPlayerSys *cps, s16 x, s16 y, s16 z, u32 *netId, u32 *index);
 
 #endif // POKEBW2_FIELD_COMM_PLAYER_H

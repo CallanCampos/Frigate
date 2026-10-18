@@ -1,0 +1,31 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Vadim",
+    "class": "TRAINER_CLASS_POLICEMAN",
+    "pokemon": [
+        "blaziken_2",
+        "infernape_2",
+        "empoleon_2",
+        "emboar_2",
+        "medicham_2",
+        "breloom_2",
+        "forretress_2",
+        "skarmory_2",
+        "hariyama_2",
+        "sawk_2",
+        "throh_2",
+        "durant_2",
+        "scrafty_2",
+        "ferrothorn_2",
+        "toxicroak_2",
+        "bisharp_2",
+        "bastiodon_2",
+        "escavalier_2",
+        "poliwrath_2"
+    ],
+    "messages": [
+        "I was born to work.\nThat is my destiny.",
+        "I will work, work, and work some more.\nI am happy only when I am working.",
+        "As a matter of fact, having battles\nis my job, too."
+    ]
+}

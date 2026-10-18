@@ -1,3 +1,0 @@
-BtlMain12_Text_Slash = /
-BtlMain12_Text_Numerator = {0207:0}
-BtlMain12_Text_Denominator = {0207:0}

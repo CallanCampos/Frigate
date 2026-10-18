@@ -191,7 +191,6 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
     CtvtComm *comm = CommTvt_GetComm(sys);
     u8 i;
     u8 count;
-    fx32 scale;
     int pos;
     int width;
     u32 size;
@@ -251,12 +250,12 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
             if (work->zoomed != CommTvt_IsZoomed(sys)) {
                 work->zoomed = CommTvt_IsZoomed(sys);
                 if (work->zoomed == TRUE) {
-                    scale = FX32_ONE * 2;
+                    mtx._00 = FX_Inv(FX32_ONE * 2);
+                    mtx._11 = FX_Inv(FX32_ONE * 2);
                 } else {
-                    scale = FX32_ONE;
+                    mtx._00 = FX_Inv(FX32_ONE);
+                    mtx._11 = FX_Inv(FX32_ONE);
                 }
-                mtx._00 = FX_Inv(scale);
-                mtx._11 = FX_Inv(scale);
                 mtx._01 = 0;
                 mtx._10 = 0;
                 G2_SetBG3Affine(&mtx, 0, 0, 0, 0);
@@ -304,24 +303,24 @@ void CtvtCamera_Draw(CommTvtWork *sys, CtvtCamera *work) {
                 if (CtvtComm_HasMemberCamera(sys, comm, i) == TRUE && !canPlayerExchangePhotos()) {
                     size = width * height * 2;
                     src = (u32)work->screen + pos * size;
+                    DC_FlushRange((void *)src, size);
                 } else if (zoomed == FALSE) {
                     if (displayMode == CTDM_DOUBLE) {
                         src = (u32)work->noCameraPicture;
-                        size = 0xc000;
+                        DC_FlushRange((void *)src, 0xc000);
                     } else {
                         src = (u32)work->noCameraPicture + 0x3000;
-                        size = 0x6000;
+                        DC_FlushRange((void *)src, 0x6000);
                     }
                 } else {
                     if (displayMode == CTDM_DOUBLE) {
                         src = (u32)work->noCameraPictureZoomed;
-                        size = 0x3000;
+                        DC_FlushRange((void *)src, 0x3000);
                     } else {
                         src = (u32)work->noCameraPictureZoomed + 0xc00;
-                        size = 0x1800;
+                        DC_FlushRange((void *)src, 0x1800);
                     }
                 }
-                DC_FlushRange((void *)src, size);
                 for (row = 0; row < work->windows[i].cur.height; row++) {
                     int y = height - work->windows[i].cur.height + row;
 
@@ -615,9 +614,9 @@ BOOL CtvtCamera_IsWindowMoving(CommTvtWork *sys, CtvtCamera *work, u8 member) {
     return work->windows[member].moving;
 }
 
-void CtvtCamera_SetSize(CommTvtWork *sys, CtvtCamera *work, CAMERASize size) {
+void CtvtCamera_SetEffect(CommTvtWork *sys, CtvtCamera *work, CAMERAEffect effect) {
     if (CommTvt_IsCameraEnabled() == TRUE) {
-        CAMERA_I2CSizeEx(CAMERA_SELECT_BOTH, CAMERA_CONTEXT_BOTH, size);
+        CAMERA_I2CEffectEx(CAMERA_SELECT_BOTH, CAMERA_CONTEXT_BOTH, effect);
     }
 }
 

@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Will-O-Wisp",
+    "description": "The user shoots a sinister, bluish-white\nflame at the target to inflict a burn.",
+    "type": "TYPE_FIRE",
+    "quality": "MOVE_QUALITY_INFLICT",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 75,
+    "pp": 15,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_BURN",
+        "chance": 0,
+        "duration": 1,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_STATUS_BURN",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_REFLECTABLE", "MOVE_FLAG_MIRROR_MOVE" ]
+}

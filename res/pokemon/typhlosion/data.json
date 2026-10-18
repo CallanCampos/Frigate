@@ -1,0 +1,182 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Typhlosion",
+    "pokedex": {
+        "category": "Volcano Pokémon",
+        "entry": "It attacks using blasts of fire.\nIt creates heat shimmers with\nintense fire to hide itself.",
+        "height": "5'07\"",
+        "weight": "175.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Typhlosion",
+                "category": "Volcano Pokémon",
+                "entry": "It attacks using blasts of fire.\nIt creates heat shimmers with\nintense fire to hide itself.",
+                "height": "5'07\"",
+                "weight": "175.3 lbs."
+            },
+            "fr": {
+                "name": "Typhlosion",
+                "category": "Pokémon Volcan",
+                "entry": "Il attaque en projetant des flammes.\nIl se dissimule derrière les vagues\nde chaleur qu'il produit.",
+                "height": "1,7 m",
+                "weight": "79,5 kg"
+            },
+            "de": {
+                "name": "Tornupto",
+                "category": "Vulkan",
+                "entry": "Es greift seine Gegner mit Feuer an.\nDabei entsteht ein Hitzeflimmern, in\ndem es sich versteckt.",
+                "height": "1,7 m",
+                "weight": "79,5 kg"
+            },
+            "it": {
+                "name": "Typhlosion",
+                "category": "Pokémon Vulcano",
+                "entry": "Attacca usando fiamme esplosive. Si cela\nin una scintillante nube di calore creata\ndalle fiamme roventi.",
+                "height": "1,7 m",
+                "weight": "79,5 kg"
+            },
+            "ko": {
+                "name": "블레이범",
+                "category": "화산포켓몬",
+                "entry": "불꽃 폭풍으로 공격한다.\n작열하는 불꽃으로 아지랑이를\n만들어 내어 모습을 감춘다.",
+                "height": "1.7 m",
+                "weight": "79.5 kg"
+            },
+            "es": {
+                "name": "Typhlosion",
+                "category": "Pokémon Volcán",
+                "entry": "Ataca con llamaradas. Con ellas crea\nreflejos de calor para ocultarse.",
+                "height": "1,7 m",
+                "weight": "79,5 kg"
+            },
+            "ja": {
+                "name": "バクフーン",
+                "category": "かざんポケモン",
+                "entry": "ほのおの\\x{3000}ばくふうで\\x{3000}こうげき。\nしゃくねつの\\x{3000}ほのおで\\x{3000}かげろうを\nつくりだし\\x{3000}すがたを\\x{3000}かくす。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff17}\\x{ff19}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 78,
+        "attack": 84,
+        "defense": 78,
+        "speed": 100,
+        "special_attack": 109,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 45,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_BLAZE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_FLASH_FIRE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 240,
+    "height": 17,
+    "weight": 795,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GYRO_BALL" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_SMOKE_SCREEN" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 6, "MOVE_SMOKE_SCREEN" ],
+            [ 10, "MOVE_EMBER" ],
+            [ 13, "MOVE_QUICK_ATTACK" ],
+            [ 20, "MOVE_FLAME_WHEEL" ],
+            [ 24, "MOVE_DEFENSE_CURL" ],
+            [ 31, "MOVE_SWIFT" ],
+            [ 35, "MOVE_FLAME_CHARGE" ],
+            [ 43, "MOVE_LAVA_PLUME" ],
+            [ 48, "MOVE_FLAMETHROWER" ],
+            [ 56, "MOVE_INFERNO" ],
+            [ 61, "MOVE_ROLLOUT" ],
+            [ 69, "MOVE_DOUBLE_EDGE" ],
+            [ 74, "MOVE_ERUPTION" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM50",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM65",
+            "TM68",
+            "TM74",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_FIRE_PLEDGE",
+            "MOVE_BLAST_BURN",
+            "MOVE_COVET",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_CYNDAQUIL",
+    "cry_volume": 110
+}

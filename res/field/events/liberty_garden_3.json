@@ -1,0 +1,43 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_LIBERTY_GARDEN_2",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 56,
+                "y": 0,
+                "z": 168,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 4,
+            "var": "EVENT_WORK_0x400a",
+            "value": 1,
+            "type": 0,
+            "grid": {
+                "x": 3,
+                "z": 9,
+                "width": 3,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": [
+        {
+            "type": 2,
+            "script": 1
+        }
+    ]
+}

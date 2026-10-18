@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Steadfast",
+    "description": "Raises Speed each time\nthe Pokémon flinches."
+}

@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Natural Cure",
-    "description": "All status problems heal\nwhen it switches out."
-}

@@ -1,0 +1,24 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_W288_DORO", null, null, null ],
+    "instruments": [
+        {
+            "program": 63,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_W288_DORO",
+                    "wave": 0,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

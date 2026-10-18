@@ -1,26 +1,53 @@
 # Game data
 
 The game keeps most of its data in NARC archives under `files/a/`, one numbered file per entry. The archives that are
-built from source have their sources in `data/`, and the build packs each archive from them and checks that it matches
+built from source have their sources in `res/`, and the build packs each archive from them and checks that it matches
 the original, so editing an entry is as easy as editing its file, and the matching build proves that the sources say
-exactly what the ROM holds. The sources come in three kinds:
+exactly what the ROM holds. `res/` is grouped by what the data is, as pokeplatinum's is, and each entity has a
+directory or file of its own, named after its constant in the lists of `generated/`, which the build also turns into
+the C code's headers:
 
-- **JSON data**, as pokeplatinum's `res/`: one file per entity, such as `data/pokemon/bulbasaur/data.json`, with a
+```
+res/
+  pokemon/<species>/        data, text, battle sprites, icon, footprint, cry
+  moves/<move>/             data and text
+  items/<item>/             data, text and icon; shared/ for the icons' cells, animations and unused icons
+  abilities/  natures/  types/
+  trainers/
+    data/<trainer>.json     record and party
+    classes/  sprites/{front,back}/<sprite>/  ai/  facilities/<facility>/
+  field/
+    zones/  events/  encounters/  scripts/  areas/  matrices/
+    maps/{models,textures}/
+    props/{exterior,interior}/{models,textures}/
+    actors/                 the overworld's people and objects, with pokemon/ and models/ for its Pokémon and 3D models
+    trades/  places/
+  lighting/{field,battle}/
+  town_map/
+  sound/{sequences,banks,wave_archives,streams}/
+  text/{system,script}/
+generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
+```
+
+The sources come in these kinds:
+
+- **JSON data**, as pokeplatinum's `res/`: one file per entity, such as `res/pokemon/bulbasaur/data.json`, with a
   JSON schema beside it that documents every field and that editors use for completion and checking. A script packs
   the archives from the files (`DATA_PACKS` in `configure.py`), validating each file against its schema and naming
   the file and field of any mistake. Files are ordered by the constant lists, not by their names, so adding an entry
   is adding its constant and its file; the build notices new, removed and renamed files by itself.
 - **Assembly**, for the field and trainer AI scripts, which are code more than data, as pret keeps them: one source
   file per entry, in archive order, assembled with the macros in `include/asm/` (`ARCHIVES` in `configure.py`).
-- **glTF 2.0**, for map models under `data/map_models/<model>/` and field prop models under
-  `data/field_prop_models/`, each with a `data.json`. Their editable mesh and material data is packed back into Nitro
-  models.
-- **PNG**, for map textures under `data/map_texture_sets/<set>/` and field prop textures under
-  `data/field_prop_textures/`. The packer converts edited pixels to each set's original Nitro texture format. Like the
-  JSON, these directories are named after their constants and the lists give their order (see
+- **glTF 2.0**, for map models under `res/field/maps/models/<model>/` and field prop models under
+  `res/field/props/{exterior,interior}/models/`, each with a `data.json`. Their editable mesh and material data is
+  packed back into Nitro models.
+- **PNG**, for map textures under `res/field/maps/textures/<set>/` and field prop textures under
+  `res/field/props/{exterior,interior}/textures/`. The packer converts edited pixels to each set's original Nitro
+  texture format. Like the JSON, these directories are named after their constants and the lists give their order (see
   [Map model sources](#map-model-sources)).
 - **Indexed PNG, JASC palettes, and WAV**, for each Pokémon's battle sprites, icons, footprints, and cries under
-  `data/pokemon/<species>/`. Nitro cell and animation resources remain as separate binary files next to the images.
+  `res/pokemon/<species>/`, and the trainer sprites under `res/trainers/sprites/`. Nitro cell and animation
+  resources remain as separate binary files next to the images.
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
 by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
@@ -28,31 +55,35 @@ which documents the format and can write them again.
 
 | Archive | Sources | Contents | Script |
 | --- | --- | --- | --- |
-| `a/0/0/2` | `data/text/system/` | System messages | `tools/text/text_data.py` |
-| `a/0/0/3` | `data/text/script/` | Script messages | `tools/text/text_data.py` |
-| `a/0/1/2` | `data/zones/` (JSON) | Zone headers | `tools/data/zone_data.py` |
-| `a/0/1/6`, `a/0/1/8`, `a/0/1/9`, `a/0/2/0`, `a/1/2/4` | `data/pokemon/` (JSON) | Species data, level-up moves, evolutions, baby species, egg moves | `tools/data/species_data.py` |
-| `a/0/1/7` | `data/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
-| `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `data/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
-| `swan_sound_data.sdat`, `a/1/9/1` | `data/pokemon/<species>/cry.wav`, `data.json` (`cry_volume`) | Pokémon cries and playback volumes | `tools/data/pokemon_cries.py` |
-| `a/0/2/1` | `data/moves/` (JSON) | Move data | `tools/data/move_data.py` |
-| `a/0/2/4` | `data/items/` (JSON) | Item data | `tools/data/item_data.py` |
-| `a/0/5/6` | `data/field_scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
-| `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `data/trainers/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
-| `a/0/0/9` | `data/map_matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
-| `a/0/0/8` | `data/map_models/<model>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
-| `a/2/2/5`, `a/2/2/6` | `data/field_prop_models/{exterior,interior}/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
-| `a/1/7/4` | `data/field_prop_textures/exterior/<bundle>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
-| `a/1/7/5` | `data/field_prop_textures/interior/<bundle>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
-| `a/0/1/4` | `data/map_texture_sets/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
-| `a/0/1/3` | `data/areas/<area>.json` | Area records | `tools/data/area_data.py` |
-| `a/1/2/6` | `data/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
-| `a/1/2/7` | `data/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
-| `a/1/6/3` | `data/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
-| `a/2/1/2`, `a/2/1/1` | `data/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
-| `a/2/6/2`, `a/2/6/1` | `data/facilities/black_tower/` (JSON) | Black Tower and White Treehollow trainers and Pokémon | `tools/data/facility_data.py` |
-| `a/2/4/8` to `a/2/5/7` | `data/facilities/pwt_*/` (JSON) | Pokémon World Tournament trainers, Pokémon and rental Pokémon | `tools/data/facility_data.py` |
-| `a/1/6/9` | `data/tr_ai/` | Trainer AI scripts, see [Scripts](scripts.md) | `tools/script/tr_ai_script.py` |
+| `a/0/0/2` | `res/text/system/` | System messages | `tools/text/text_data.py` |
+| `a/0/0/3` | `res/text/script/` | Script messages | `tools/text/text_data.py` |
+| `a/0/1/2` | `res/field/zones/` (JSON) | Zone headers | `tools/data/zone_data.py` |
+| `a/0/1/6`, `a/0/1/8`, `a/0/1/9`, `a/0/2/0`, `a/1/2/4` | `res/pokemon/` (JSON) | Species data, level-up moves, evolutions, baby species, egg moves | `tools/data/species_data.py` |
+| `a/0/1/7` | `res/pokemon/growth_rates.csv` | Experience tables of the growth rates | `tools/data/species_data.py` |
+| `a/0/0/4`, `a/0/0/7`, `a/0/5/1`, `a/1/6/5`, `a/2/2/9` | `res/pokemon/<species>/` (PNG, palette, Nitro animation files) | Battle sprites, icons, musical sprites, and footprints | `tools/data/pokemon_graphics.py` |
+| `a/1/9/1` | `res/pokemon/<species>/data.json` (`cry_volume`) | The Pokémon cries' playback volumes | `tools/data/pokemon_cries.py` |
+| `swan_sound_data.sdat` | `res/sound/`, `res/pokemon/<species>/cry.wav` | The sound archive: sequences, banks, wave archives, players, groups, streams and the Pokémon cries | `tools/data/sound_data.py` |
+| `a/0/2/1` | `res/moves/` (JSON) | Move data | `tools/data/move_data.py` |
+| `a/0/2/4` | `res/items/` (JSON) | Item data | `tools/data/item_data.py` |
+| `a/0/2/5` | `res/items/<item>/` (PNG, palette), `res/items/shared/` | Item icons | `tools/data/item_icon_data.py` |
+| `a/0/5/6` | `res/field/scripts/` | Field scripts, see [Scripts](scripts.md#field-scripts) | `tools/script/field_script.py` |
+| `a/0/9/1`, `a/0/9/2`, `a/0/8/9`, `a/0/9/0` | `res/trainers/data/` (JSON) | Trainers, their parties, and the table of their messages | `tools/data/trainer_data.py` |
+| `a/0/7/1`, `a/0/7/2`, `a/0/6/3` | `res/trainers/sprites/{front,back}/<sprite>/` (PNG, palette, Nitro cells and animations) | Trainer sprites, front and back | `tools/data/trainer_graphics.py` |
+| `a/0/0/9` | `res/field/matrices/` (JSON) | Map matrices | `tools/data/map_matrix_data.py` |
+| `a/0/0/8` | `res/field/maps/models/<model>/` (glTF 2.0) | All 1,065 map models | `tools/data/map_model_data.py` |
+| `a/2/2/5`, `a/2/2/6` | `res/field/props/{exterior,interior}/models/<bundle>/<model>/` (glTF 2.0) | Field prop models | `tools/data/field_prop_model_data.py` |
+| `a/1/7/4` | `res/field/props/exterior/textures/<bundle>/` (PNG) | Exterior field prop textures | `tools/data/map_texture_data.py` |
+| `a/1/7/5` | `res/field/props/interior/textures/<bundle>/` (PNG) | Interior field prop textures | `tools/data/map_texture_data.py` |
+| `a/0/1/4` | `res/field/maps/textures/<set>/` (PNG) | All 409 field texture sets | `tools/data/map_texture_data.py` |
+| `a/0/1/3` | `res/field/areas/<area>.json` | Area records | `tools/data/area_data.py` |
+| `a/1/2/6` | `res/field/events/` (JSON) | Zone events: signs, NPCs, warps, triggers and init scripts | `tools/data/event_data.py` |
+| `a/0/4/7`, `a/0/4/8` | `res/field/actors/<code>/` (JSON, PNG, palette, Nitro model) | The field actors' models: their table and graphics | `tools/data/field_actor_data.py` |
+| `a/1/2/7` | `res/field/encounters/` (JSON) | Wild encounters | `tools/data/encounter_data.py` |
+| `a/1/6/3` | `res/field/trades/` (JSON) | In-game trades | `tools/data/trade_data.py` |
+| `a/2/1/2`, `a/2/1/1` | `res/trainers/facilities/battle_subway/` (JSON) | Battle Subway and Trial House trainers and Pokémon | `tools/data/facility_data.py` |
+| `a/2/6/2`, `a/2/6/1` | `res/trainers/facilities/black_tower/` (JSON) | Black Tower and White Treehollow trainers and Pokémon | `tools/data/facility_data.py` |
+| `a/2/4/8` to `a/2/5/7` | `res/trainers/facilities/pwt_*/` (JSON) | Pokémon World Tournament trainers, Pokémon and rental Pokémon | `tools/data/facility_data.py` |
+| `a/1/6/9` | `res/trainers/ai/` | Trainer AI scripts, see [Scripts](scripts.md) | `tools/script/tr_ai_script.py` |
 
 The text archives are packed by `text_data.py` from text files rather than assembled; `configure.py` lists them in
 `TEXT_ARCHIVES`.
@@ -61,7 +92,7 @@ The text archives are packed by `text_data.py` from text files rather than assem
 
 The ID constants that name the game's data, such as species, moves, abilities, items, types, sound sequences, trainer
 classes, trainers, zones, wild encounter tables, in-game trades, natures, places, event flags and event variables, are
-lists in `data/constants/`, one name per line. They are the source of truth: to add one, add it to its list, and to
+lists in `generated/`, one name per line. They are the source of truth: to add one, add it to its list, and to
 rename one, use `tools/data/rename_constant.py OLD NEW`, which renames its uses too, and its data file where the data
 is named after it. The build generates a header from each list, `constants/<list>.h` in `build/include/generated/`,
 which is on the include path, so the C code, the data sources and the scripts all use the same names, and the generated
@@ -107,7 +138,7 @@ named only when the code shows what it is, and the list holds only those, each w
 ## Text
 
 `a/0/0/2` (system messages) and `a/0/0/3` (script messages) hold the game's text, one message file per entry. Their
-sources are `data/text/system/<file>.txt` and `data/text/script/<file>.txt`, UTF-8, with one message per line, in order.
+sources are `res/text/system/<file>.txt` and `res/text/script/<file>.txt`, UTF-8, with one message per line, in order.
 Each line starts with the message's ID, `ID = text`, made of its bank's name and words of the message as unpacking first
 wrote it; the build makes a header of each bank's IDs, `text/system/<bank>.h` or `text/script/<bank>.h`
 (`tools/text/text_ids.py`), so the code and the scripts name messages, and adding or removing a line doesn't change
@@ -170,7 +201,7 @@ text.
 
 The game encrypts each message with a key that depends on its ID, which `text_data.py` applies when packing. The files
 are named after their constants, which give their order in the archive: a system message file after its `TEXT_BANK_*` in
-`data/constants/text_banks.txt` (`species_names.txt` for `TEXT_BANK_SPECIES_NAMES`), and a script message file after its
+`generated/text_banks.txt` (`species_names.txt` for `TEXT_BANK_SPECIES_NAMES`), and a script message file after its
 `SCRIPT_TEXT_*` in `script_text_banks.txt`, which names a zone's after the zone (`black_city.txt`) and a global script
 file's after its first script ID (`global_10885.txt`). A system message file is named after what it holds, which the
 word set function that loads it or its contents show (`move_names.txt`, `natures.txt`), or else after the source file or
@@ -197,10 +228,10 @@ after it everywhere; the input screen's lists are still edited by hand to offer 
 
 ## Species
 
-Each species has a directory in `data/pokemon/`, named after its constant (`bulbasaur/` for `SPECIES_BULBASAUR`), as
+Each species has a directory in `res/pokemon/`, named after its constant (`bulbasaur/` for `SPECIES_BULBASAUR`), as
 pokeplatinum's `res/pokemon/`. Its `data.json` holds everything the game keeps about it in five archives: its record of
 the species data (`a/0/1/6`, the 0x4c bytes that `PML_PersonalGetParam` reads), its level-up moves (`a/0/1/8`), its
-evolutions (`a/0/1/9`), its baby species (`a/0/2/0`) and its egg moves (`a/1/2/4`). `data/pokemon/species.schema.json`
+evolutions (`a/0/1/9`), its baby species (`a/0/2/0`) and its egg moves (`a/1/2/4`). `res/pokemon/species.schema.json`
 documents each field.
 
 ```json
@@ -252,14 +283,14 @@ documents each field.
 
 `tools/data/species_data.py pack` builds the archives, one entry per record, in this order:
 
-- The species of `data/constants/species.txt`, from `SPECIES_NONE` (`none/`, an empty record) to Genesect, then
+- The species of `generated/species.txt`, from `SPECIES_NONE` (`none/`, an empty record) to Genesect, then
   `SPECIES_EGG` and `SPECIES_BAD_EGG` and the 33 Pokéstar Studios species, `SPECIES_POKESTAR_UFO` to
   `SPECIES_POKESTAR_SMEARGLE_2`: the props and costumes of the studio's movies, which the game keeps as species, with
   their own records, sprites, icons and cries (a Steel and Flying UFO with 600 base stats, the doors, the sixteen prop
-  boxes). Not being Pokémon, they are in `data/pokemon/pokestar/<name>/`, such as `pokestar/ufo/`. Their names are lines of `species_names.txt` after the national Pokédex's, as the code names Bad Egg's
+  boxes). Not being Pokémon, they are in `res/pokemon/pokestar/<name>/`, such as `pokestar/ufo/`. Their names are lines of `species_names.txt` after the national Pokédex's, as the code names Bad Egg's
   message, and they have no Pokédex text, so their files have only their records and `cry_volume`.
-- The alternate forms that have records of their own, `data/pokemon/<species>/form_<n>.json`, in the order of
-  `data/pokemon/forms.json`. The packer sets each species' first form record from it, so a species' `forms` only
+- The alternate forms that have records of their own, `res/pokemon/<species>/form_<n>.json`, in the order of
+  `res/pokemon/forms.json`. The packer sets each species' first form record from it, so a species' `forms` only
   gives the number of forms and where their sprites start. Species whose forms only differ in looks, such as Unown,
   have no form records.
 
@@ -278,7 +309,7 @@ Evolutions are a method (`EVO_METHOD_*`), its parameter, and the species evolved
 depends on the method: a level, an item, a move, a species, or another value such as the beauty needed. The level-up
 moves are in the order the game checks them, by level.
 
-The experience tables (`a/0/1/7`) are `data/pokemon/growth_rates.csv`, a row per level from 0 to 100 and a column per
+The experience tables (`a/0/1/7`) are `res/pokemon/growth_rates.csv`, a row per level from 0 to 100 and a column per
 table, headed by its `GROWTH_*` constant; the two after the six rates, headed `EXTRA`, are copies of the first that
 nothing names. Both versions have the same species data.
 
@@ -305,10 +336,10 @@ into sprites using the adjacent `*_cells.ncer` and `*_animations.nanr.lz11` Nitr
 fragmented. Those resources are preserved as separate source files and can be replaced with edited Nitro data.
 
 `icon.png` is a 32×64 two-frame icon, using a bank in
-`data/pokemon/shared/icon_palettes.pal` (the PC boxes use `icon_palettes_box.pal`); the code in
+`res/pokemon/shared/icon_palettes.pal` (the PC boxes use `icon_palettes_box.pal`); the code in
 `src/system/poke_icon.c` picks the bank, and the icons' cells and animations for each OBJ mapping are
 `shared/icon_{cells,animations}_{32k,64k,128k}`. `footprint.png` is a 16×32 character sheet and uses
-`data/pokemon/shared/footprint_palette.pal`, with the cells and animations of `shared/footprint_*_old` for the species
+`res/pokemon/shared/footprint_palette.pal`, with the cells and animations of `shared/footprint_*_old` for the species
 up to Arceus and `shared/footprint_*` for the rest (`zukan_info.c`).
 The older musical sprite archive has its own `musical/` subfolder. Files identical to the regular sprite are omitted
 there; the packer uses the regular file for those entries, so an edit of one shows in both. Sprite forms have
@@ -322,17 +353,137 @@ it has one. `egg/` holds the egg's sprites and icon, which every egg shows, and 
 `cry_volume` in each species' `data.json` is the game's 0–127 playback volume; the egg, the bad egg and the
 Pokéstar Studios species have cries and volumes of their own too (`pm_voice.c`). Forms with a separate cry have a `form_<n>/cry.wav` and use their species'
 volume.
-The other sounds in `swan_sound_data.sdat` retain their original data. Extract the graphics again with
-`.venv/bin/python tools/data/pokemon_graphics.py extract data/pokemon` and the cries with
-`.venv/bin/python tools/data/pokemon_cries.py extract data/pokemon`; the build packs them automatically.
-An unchanged source set reproduces all seven original graphics and sound archives byte for byte.
+A cry's wave archive must fit the game's 0x5c30-byte buffer. The sound archive takes the cries from `cry.wav` (see
+[Sound](#sound)). Extract the graphics again with `.venv/bin/python tools/data/pokemon_graphics.py extract
+res/pokemon` and the cries with `.venv/bin/python tools/data/pokemon_cries.py extract res/pokemon`; the build packs
+them automatically. An unchanged source set reproduces the original graphics archives, the volumes and the cries byte
+for byte.
+
+## Sound
+
+The sound archive, `swan_sound_data.sdat`, the same in both versions, is built from `res/sound/` by
+`tools/data/sound_data.py`. Its entries are the constants of its lists in `generated/`, each in its list's order:
+the sequences of `sound.txt` (`SEQ_BGM_*` music, `SEQ_SE_*` sound effects, `SEQ_ME_*` jingles), the banks of
+instruments of `sound_banks.txt`, the wave archives of samples of `sound_wave_archives.txt`, and the players, groups,
+stream players and streams of `sound_players.txt`, `sound_groups.txt`, `sound_stream_players.txt` and
+`sound_streams.txt`, whose names are the archive's own symbols. A sequence, bank, wave archive or stream is a
+directory named after its constant, in its kind's directory and its category's, the word after the kind's prefix:
+`SEQ_BGM_T_01` is `res/sound/sequences/bgm/t_01/`, `BANK_SE_SW_JUMP` `res/sound/banks/se/sw_jump/`, and
+`BANK_PV001` `res/sound/banks/pv/pv001/`. A sequence has its `sequence.s` (see [Sequences](#sequences)), a bank its
+instruments in its `data.json` (see [Banks](#banks)), a wave archive its waves as WAV files (see
+[Wave archives](#wave-archives)), and a stream its audio, `stream.wav`, such as the title screen's music
+(`streams/title/title/`), 8-bit or 16-bit PCM, mono or stereo, with its loop start in samples in its `data.json` if
+it loops. A sequence, bank and stream has `data.json`, its record of the archive,
+which the schemas in `res/sound/` describe: a sequence's bank, volume, priorities and player, a bank's four wave
+archives, a stream's volume, priority, player, loop and its timer where that isn't its rate's. Some entries share a file: 86 sequences play another's, such as the
+placeholder sequences, and three banks and three wave archives use another's; such an entry's `data.json` has
+`"file"`, naming the one whose file it uses. `players.json`, `stream_players.json` and
+`groups.json` hold the small kinds' records by their constants. The Pokémon cries' wave archives, the 690 after the
+empty first slot of `sound_wave_archives.txt`, are each species' `cry.wav` (see
+[Pokémon graphics and cries](#pokémon-graphics-and-cries)).
+
+To add a sequence, bank, wave archive or stream, add its constant to the end of its list, after its last constant
+(nothing in the decompiled code reads the sequences' `SEQ_SE_END` and the like as limits), and its directory, as
+a copy of one to start from; a new player, group or stream player needs its constant and its entry in
+`players.json`, `groups.json` or `stream_players.json`. An entry's `"file"` must name one with a file of its own.
+`rename_constant.py` moves the directory when a constant is renamed. The packer lays the archive out as the game's, the
+files of the sequences, banks, wave archives and streams, each kind in its list's order, so the sources pack it byte
+for byte, and stops with the file's name and line where a source is wrong. `.venv/bin/python
+tools/data/sound_data.py dump extract/b2_us/files res/sound` writes them again.
+
+### Sequences
+
+A sequence's `sequence.s` is its commands as text, one a line, in the order of the sequence's data, with labels where
+its tracks start and where jumps and calls go; `tools/data/sseq.py` assembles it into the game's sequence byte for
+byte. Track 0 starts the sequence, allocates the tracks with `alloc_tracks` and starts the others with `open_track`:
+
+```
+track_00:
+    alloc_tracks 0x0c5f
+    open_track 1, track_01
+    ...
+    tempo 87
+    program 47
+    volume 104
+    rest 576
+label_0045:
+    note A5, 120, 113
+    rest 6
+    pitch_bend -5
+    ...
+    jump label_0045
+```
+
+`note KEY, VELOCITY, LENGTH` plays a key, named `C`, `Cs`, `D`, ... `B` and an octave, middle C (60) being `C4` and a
+negative octave `m1`, for a length in ticks, and `rest TICKS` waits. `program` picks an instrument of the sequence's
+bank; `tempo`, `volume`, `expression`, `pan`, `transpose`, `pitch_bend`, `bend_range`, `priority`, `note_wait`, `tie`,
+`portamento`, `portamento_key`, `portamento_time`, `mod_depth`, `mod_speed`, `mod_type`, `mod_range`, `mod_delay`,
+`sweep_pitch`, `attack`, `decay`, `sustain`, `release` and `master_volume` set what their names say; `jump`, `call`,
+`return`, `loop_start`, `loop_end` and `end` steer the track. The variable commands are `set_var`, `add_var`,
+`sub_var`, `mul_var`, `div_var`, `shift_var`, `random_var` and the comparisons `cmp_eq`, `cmp_ge`, `cmp_gt`, `cmp_le`,
+`cmp_lt` and `cmp_ne`; a command after `if` only runs when the last comparison held, after `random` its last argument
+is a random number between the two given, and after `from_var` it is the variable given. `.byte` keeps data that no
+track reaches, `;` starts a comment, and `rest 5 @2` keeps a wait that the game stored in more bytes than it needs.
+The assembler checks that every track ends with `end` or a `jump`, closes the loops it opens, returns only from a
+`call` and starts only the tracks `alloc_tracks` gives, and names the line where one doesn't. `sseq.py`'s commands table has every command with its byte and arguments.
+
+To add a song or a sound, add its `SEQ_` constant to the end of `sound.txt` and its directory, with a `data.json`
+naming its bank, volume, priorities and player, as a copy of a sequence like it, and its `sequence.s`, written by hand
+or converted from a MIDI file:
+
+```
+.venv/bin/python tools/data/midi_to_sequence.py SONG.mid res/sound/sequences/bgm/my_song/sequence.s
+```
+
+Each MIDI channel with notes becomes a track at the game's 48 ticks a quarter note, and the tempo, program changes,
+volume, pan, expression, modulation depth and pitch bend come along; markers named `loopStart` and `loopEnd` loop the
+song. A program is an instrument of the sequence's bank, not a General MIDI one, so set the MIDI file's programs to the
+bank's instruments.
+
+### Banks
+
+A bank's `data.json` has its four wave archives and its instruments, in the order of their data, each with the
+program number that a sequence's `program` picks it by:
+
+```json
+{
+    "program": 85,
+    "type": "wave",
+    "wave_archive": "WAVE_MUS_WB_SOUNDLIST",
+    "wave": 110,
+    "base_key": "Cs2",
+    "attack": 127,
+    "decay": 125,
+    "sustain": 120,
+    "release": 120,
+    "pan": 64
+}
+```
+
+A `wave` instrument plays a wave of one of the bank's wave archives, a `psg` one a square wave of a `duty` from 0 to 7
+and a `noise` one noise, each at its own pitch on its `base_key`, with its envelope (`attack`, `decay`, `sustain`,
+`release`) and `pan`. A `drums` set has an instrument for each key from its `first_key` in its `keys`, and a `split` an
+instrument for each region of keys in its `regions`, each up to its `up_to`. Programs that share an instrument list
+their numbers, an `unused` entry keeps data that no program uses as hex, and `programs` gives a bank more programs than
+its last instrument's. `tools/data/sbnk.py` writes the bank from them byte for byte.
+
+### Wave archives
+
+A wave archive is a directory of its waves, the samples that banks' instruments play, `000.wav` and on, in the order
+that instruments number them, and a `data.json` with what a WAV doesn't say: for each wave, an empty object if it plays
+once, or the sample its loop starts at, `"loop_start"`, if it loops to its end, and its `"timer"` where that isn't its
+rate's. The game's waves are IMA ADPCM, and their WAV files keep them so, as IMA ADPCM WAVs that audio editors and
+ffmpeg open, so they pack back byte for byte; a wave larger than a WAV block is in several blocks, each starting with
+the decoder's state there. An edited wave can be saved as 8-bit or 16-bit PCM, which the game plays too, mono at a
+rate from 4000 to 65535; a loop starts on a multiple of 8 samples in IMA ADPCM, 4 in 8-bit and 2 in 16-bit PCM. To add a
+wave, add its WAV after the last and its entry to `waves`, and an instrument that plays it.
 
 ## Moves
 
-Each move has a directory in `data/moves/`, named after its constant (`thunderbolt/` for `MOVE_THUNDERBOLT`), whose
+Each move has a directory in `res/moves/`, named after its constant (`thunderbolt/` for `MOVE_THUNDERBOLT`), whose
 `data.json` is its record of the move data (`a/0/2/1`, the 0x24 bytes that `PML_MoveGetParamCore` reads).
-`tools/data/move_data.py pack` builds the archive in the order of `data/constants/moves.txt`, and
-`data/moves/move.schema.json` documents each field.
+`tools/data/move_data.py pack` builds the archive in the order of `generated/moves.txt`, and
+`res/moves/move.schema.json` documents each field.
 
 ```json
 {
@@ -367,10 +518,10 @@ versions have the same move data. A move's name and description go into the text
 
 ## Items
 
-Each item has a directory in `data/items/`, named after its constant (`potion/` for `ITEM_POTION`), whose `data.json`
+Each item has a directory in `res/items/`, named after its constant (`potion/` for `ITEM_POTION`), whose `data.json`
 is its file of the item data (`a/0/2/4`, the 36 bytes of `ItemData` in `include/pml/item.h`) and its text: its name,
 its name with an article, its plural and its description (see [Text](#text)). `tools/data/item_data.py pack`
-builds the archive in the order of `data/constants/items.txt`, and `data/items/item.schema.json` documents each field.
+builds the archive in the order of `generated/items.txt`, and `res/items/item.schema.json` documents each field.
 
 ```json
 {
@@ -402,25 +553,51 @@ is "a" or "an" by its first letter unless `name_article` says otherwise ("an HP 
 The 20 unused items, named "???", have constants of their own, as `ITEM_UNUSED_113`. Both versions have the same item
 data.
 
+### Item icons
+
+The item icons' archive (`a/0/2/5`) has a member for each constant of `generated/item_icons.txt`, in its order:
+an icon (`ITEM_ICON_*`), 32×32 and 16 colors, or a palette (`ITEM_ICON_PALETTE_*`), its colors in JASC format, 0
+transparent. `ITEM_GRAPHICS_CHARS_AND_PALETTES` in `src/system/pml_item.c` gives each item an icon and a palette, as
+`[ITEM_HYPER_POTION] = { ITEM_ICON_POTION, ITEM_ICON_PALETTE_HYPER_POTION }`, and `LIST_ITEM_GRAPHICS` the Wonder
+Launcher's list icons. Items share them, so each is named after the first item that shows it and is a file of that
+item's directory: `ITEM_ICON_POTION` is `res/items/potion/icon.png`, `ITEM_ICON_PALETTE_HYPER_POTION`
+`res/items/hyper_potion/icon.pal`, and `ITEM_ICON_POTION_LAUNCHER` `res/items/potion/launcher_icon.png` (and
+`.pal`). An item whose icon or palette is another's has no file of its own for it: the Hyper Potion shows the Potion's
+picture in colors of its own, every TM shows TM01's disc, and the 47 items without an icon, `ITEM_NONE` among them,
+show the placeholder in `none/`; `pml_item.c` says whose file an item shows. Editing a shared icon or palette changes
+every item that shows it. `res/items/shared/` has the icons' Nitro cells and animations, which code loads as members
+0 and 1, the return arrow's icon (`return_icon`), and in `unused_icons/` the 53 icons and 48 palettes that no item
+shows, named by their member numbers (`ITEM_ICON_UNUSED_MEMBER_140` is `unused_icons/140.png`).
+
+The palette file sets an icon's colors; its PNG shows it with the palette of the first item that has it, but only the
+PNG's indices count, so edit it in an image editor's indexed mode. To add an icon, add its constants to the end of
+`item_icons.txt`, named after its item, and its files, and give the item them in `pml_item.c`. Renaming an item with
+`rename_constant.py` renames its icons' constants too, and renaming an icon's constant moves its file. The packer
+builds each member from its file, and where that gives the same picture, palette or data as one of the original
+archive's members, it takes the original's bytes (some palettes keep 240 unused colors after their 16), so unchanged
+files pack the archive byte for byte in both versions. Every file must be there and keep its size and 16 colors, and
+the build stops with the file's name otherwise. `.venv/bin/python tools/data/item_icon_data.py dump
+extract/b2_us/files res/items` writes the icons again.
+
 ## Abilities, types, trainer classes, natures and places
 
-An ability's text is `data/abilities/<ability>.json`, its name and description, and a type's `data/types/<type>.json`,
+An ability's text is `res/abilities/<ability>.json`, its name and description, and a type's `res/types/<type>.json`,
 its name, named after their constants and in the order of their lists. What they do is the code's, so they have no
 archive: only the text takes them (see [Text](#text)), and `tools/text/text_sources.py` validates them against
 `ability.schema.json` and `type.schema.json`. `TYPE_NULL`, the type of a typeless move, has no name and no file. A
-trainer class's text, `data/trainer_classes/<class>.json`, is its name and its name with an article, which the game
-writes by hand ("a Twin" for Twins, none for the Gym Leaders), a nature's, `data/natures/<nature>.json`, its name,
-and a place's, `data/places/<place>.json`, its name. Zone headers name their place by its constant in
-`data/constants/places.txt` (`PLACE_ASPERTIA_CITY`), which `make_constants.py --places` named after the place names,
+trainer class's text, `res/trainers/classes/<class>.json`, is its name and its name with an article, which the game
+writes by hand ("a Twin" for Twins, none for the Gym Leaders), a nature's, `res/natures/<nature>.json`, its name,
+and a place's, `res/field/places/<place>.json`, its name. Zone headers name their place by its constant in
+`generated/places.txt` (`PLACE_ASPERTIA_CITY`), which `make_constants.py --places` named after the place names,
 numbering the ones that repeat, as the second copies of Unova's places.
 `tools/text/list_text_data.py` wrote them all from the game's text.
 
 ## Trainers
 
-Each trainer is `data/trainers/<trainer>.json`, named after its constant (`elite_four_shauntal.json` for
+Each trainer is `res/trainers/data/<trainer>.json`, named after its constant (`elite_four_shauntal.json` for
 `TRAINER_ELITE_FOUR_SHAUNTAL`), as pokeplatinum's `res/trainers/data/`. It holds the trainer's record (`a/0/9/1`) and
 its party (`a/0/9/2`), and `tools/data/trainer_data.py pack` builds both archives in the order of
-`data/constants/trainers.txt`. `data/trainers/trainer.schema.json` documents each field.
+`generated/trainers.txt`. `res/trainers/data/trainer.schema.json` documents each field.
 
 ```json
 {
@@ -459,27 +636,59 @@ its party (`a/0/9/2`), and `tools/data/trainer_data.py pack` builds both archive
 A trainer's `name` and `messages` go into the text (see [Text](#text)). The messages are also the trainer message table
 (`a/0/8/9`), which pairs each with its trainer and type (0 before the battle, 1 when the trainer loses, 8 when it wins,
 and other moments by number), and its offsets for each trainer (`a/0/9/0`), which `TrainerMsg_Load` reads; the packer
-writes both, with the trainers in the order of `data/trainers/message_order.json`, then any others that have messages. A
+writes both, with the trainers in the order of `res/trainers/data/message_order.json`, then any others that have messages. A
 party either gives every Pokémon an `item` or none, and `moves` or none; the packer sets the record's party kind
 (`PARTY_ITEMS`, `PARTY_MOVES`) from that, and a Pokémon without moves gets the moves of its level. `ai_flags` are the
 trainer AI scripts to run (`AI_FLAG_*`, see [Scripts](scripts.md)), `money` a multiplier of the prize money and `reward`
 an item given after the battle. A Pokémon's `difficulty` sets its individual values, and `gender` and `ability` pick
-them when not 0. `class` is a `TRAINER_CLASS_*` from `data/constants/trainer_classes.txt`, named after the class's name;
+them when not 0. `class` is a `TRAINER_CLASS_*` from `generated/trainer_classes.txt`, named after the class's name;
 where several classes share one, after their only trainer, their sex or their ID, as `TRAINER_CLASS_SCHOOL_KID_F`
 (`make_constants.py --trainer-classes`). `TRAINER_NONE` has no file: the packer writes the empty placeholder the game
 has for it. Both versions have the same trainers.
 
-Each trainer's constant in `data/constants/trainers.txt`, which the field scripts use, is its class and name, as
+Each trainer's constant in `generated/trainers.txt`, which the field scripts use, is its class and name, as
 `TRAINER_YOUNGSTER_JIMMY`, without the class for the story characters, whose class is Pokémon Trainer
 (`TRAINER_CHEREN`), and numbered from `_2` where a class and name repeat, as for rematches (`make_constants.py
 --trainers`). To add a trainer, add its constant to the end of the list and its file.
 
+### Trainer sprites
+
+Each trainer sprite is a directory in `res/trainers/sprites/front/` or `res/trainers/sprites/back/`, named after its
+constant in `generated/trainer_sprites.txt` or `trainer_back_sprites.txt`, and the archives (`a/0/7/1`,
+`a/0/7/2`) hold the sprites in the lists' order. A sprite's constant is named after the first trainer class that shows
+it, as `TRAINER_SPRITE_YOUNGSTER`; several classes can share one, such as the Battle Subway's bosses' and their
+classes'. `TRAINER_CLASS_RESOURCES` in `src/system/tr_tool.c` gives each class its front sprite. The 32 classes with a
+back sprite of their own are in `TRAINER_CLASS_BACK_SPRITES`, which has 31 sprites, since two classes share the
+Champion's; any other class shows one of the player's. `a/0/6/3` is a copy of the back sprites' archive, packed from
+the same directories. A sprite's files:
+
+- `single.png`, the 80×80 picture of the trainer that screens outside battle show, such as the trainer card's
+  leaders, which the packer stores as the game's four OBJ blocks. Only 127 front sprites and the rival's back sprite
+  have one: the game's others are empty, and without the file the packer writes an empty one.
+- `sheet.png`, the 256×128 sheet of the parts that the cells put together into the animated battle sprite, so the
+  sheet looks cut up.
+- `normal.pal`, the sprite's 16 colors in JASC format, 0 transparent. The palette file sets the colors; a PNG's own
+  palette only puts back the indices that an image editor reordered on saving, so recolor a sprite in its `.pal`. A
+  color painted in a PNG that the palette doesn't have keeps its index, with the `.pal` file's color, and the build
+  warns about it.
+- `cells.ncer`, `animations.nanr`, `multi_cells.nmcr` and `multi_animations.nmar`, the battle sprite's Nitro cells and
+  animations, uncompressed, which Nitro editors open; the packer compresses the animations as the game loads them.
+- `mcss.bin`, the battle sprite system's data (`mcss.c`), which the game reads as it is stored.
+
+To add a sprite, add its constant to the end of its list and its directory, as a copy of a sprite to start from, and
+give a class the sprite in `TRAINER_CLASS_RESOURCES`, whose `sprite` field is a byte. The packer builds every file from
+its source; where that gives the same picture, palette or data as one of the original archive's files, from the
+version being built, it takes the original's bytes, which keeps the ROM's compression and headers, so an unchanged set
+packs all three archives byte for byte in both versions. Every file but `single.png` must be there, the pictures must
+keep their sizes and the palette its 16 colors, and the build stops with the file's name otherwise. `.venv/bin/python tools/data/trainer_graphics.py dump extract/b2_us/files
+res/trainers/sprites` writes the directories again.
+
 ## Wild encounters
 
-Each wild encounter table (`a/1/2/7`, which a zone's header names, `GetZoneEncID`) is `data/encounters/<table>.json`,
-named after its constant in `data/constants/encounters.txt` (`striaton_city.json` for `ENCOUNTERS_STRIATON_CITY`),
+Each wild encounter table (`a/1/2/7`, which a zone's header names, `GetZoneEncID`) is `res/field/encounters/<table>.json`,
+named after its constant in `generated/encounters.txt` (`striaton_city.json` for `ENCOUNTERS_STRIATON_CITY`),
 which names the tables after the place of the first zone that has them. `tools/data/encounter_data.py pack`
-builds each version's archive in the order of the list, and `data/encounters/encounters.schema.json` documents each
+builds each version's archive in the order of the list, and `res/field/encounters/encounters.schema.json` documents each
 field.
 
 Black 2 and White 2 have different encounters in many places. A table's rates, and each group of its slots, is either
@@ -521,9 +730,9 @@ list and its file, and name it in a zone's header.
 
 ## Zone headers
 
-Each zone's header is `data/zones/<zone>.json`, named after its constant (`aspertia_city_gym.json` for
+Each zone's header is `res/field/zones/<zone>.json`, named after its constant (`aspertia_city_gym.json` for
 `ZONE_ASPERTIA_CITY_GYM`). `tools/data/zone_data.py pack` puts the 615 headers, 0x30 bytes each, into the single
-entry of `a/0/1/2` in the order of `data/constants/zones.txt`, and `data/zones/zone.schema.json` documents each field
+entry of `a/0/1/2` in the order of `generated/zones.txt`, and `res/field/zones/zone.schema.json` documents each field
 and the code that reads it.
 
 ```json
@@ -549,23 +758,23 @@ lands. Both versions have the same zone headers.
 
 ## In-game trades
 
-Each in-game trade is `data/trades/<trade>.json`, named after its constant in `data/constants/trades.txt`, which names
+Each in-game trade is `res/field/trades/<trade>.json`, named after its constant in `generated/trades.txt`, which names
 the trades after the species they offer (`petilil.json` for `TRADE_PETILIL`). It holds the offer that
 `EventFieldTrade_CreatePkm` makes the Pokémon from (`a/1/6/3`, `FieldTradeOfferData` in `include/field/fld_trade.h`)
 and the Pokémon's nickname and trainer's name, which the text takes (see [Text](#text)).
 `tools/data/trade_data.py pack` builds the archive in the order of the list, numbering each offer and its two
-names' message IDs from its place, and `data/trades/trade.schema.json` documents each field: the IVs, nature and sex
+names' message IDs from its place, and `res/field/trades/trade.schema.json` documents each field: the IVs, nature and sex
 are null for random ones. The field scripts name the trades they start, as `FieldTradeCheck 0x8022, TRADE_GIGALITH,
 0x8020`. Both versions have the same trades.
 
 ## Battle facilities
 
-A battle facility's trainers and the Pokémon sets they pick from are in `data/facilities/<facility>/`, as
+A battle facility's trainers and the Pokémon sets they pick from are in `res/trainers/facilities/<facility>/`, as
 pokeplatinum's `res/trainers/frontier/`: `trainers/<trainer>.json` has a trainer's class, its sets by name, and its
 name and messages, which the text takes (see [Text](#text)); `pokemon/<set>.json` is a set (`BSubwayPokemonData` in
 `include/field/battle_facility.h`), named after its species and numbered from 1, as `gengar_4.json`; and `order.json`
 lists both in archive order. `tools/data/facility_data.py pack` builds the facility's trainers and Pokémon
-archives, and `data/facilities/facility.schema.json` and `set.schema.json` document the fields.
+archives, and `res/trainers/facilities/facility.schema.json` and `set.schema.json` document the fields.
 
 `FACILITIES` in `facility_data.py` says which archives and message files are a facility's: the Battle Subway (`a/2/1/2`
 and `a/2/1/1`, whose trainers' names are system message file 15 and their three messages each file 376), which the Trial
@@ -587,20 +796,20 @@ they are files of their own that trainers name.
 ## Map model sources
 
 Each file of the field graphics' archives is a directory named after its constant, as the JSON data is, in
-`data/constants/map_models.txt` (`MAP_MODEL_*`, `a/0/0/8`), `map_texture_sets.txt` (`MAP_TEXTURE_SET_*`, `a/0/1/4`),
+`generated/map_models.txt` (`MAP_MODEL_*`, `a/0/0/8`), `map_texture_sets.txt` (`MAP_TEXTURE_SET_*`, `a/0/1/4`),
 and `field_props_exterior.txt` and `field_props_interior.txt` (`FIELD_PROPS_EXTERIOR_*` and `FIELD_PROPS_INTERIOR_*`,
 for both a prop bundle, `a/2/2/5` or `a/2/2/6`, and its textures, `a/1/7/4` or `a/1/7/5`), whose order is the archive's.
-For example, `MAP_MODEL_NACRENE_CITY_6_M_WHOUSE01_00_00` is a house, `data/map_models/nacrene_city_6_m_whouse01_00_00/`.
+For example, `MAP_MODEL_NACRENE_CITY_6_M_WHOUSE01_00_00` is a house, `res/field/maps/models/nacrene_city_6_m_whouse01_00_00/`.
 `make_constants.py --field-graphics` bootstrapped the names: a map model by the place of the map matrices that use it,
 or the overworld's, and the model's own name; a texture set or prop bundle by the place of the zones whose areas use
 it, or else `shared_` and its first texture or model; numbered from `_2` where they repeat. Map matrices name their
 cells' models by these constants, and areas their texture sets and props. Rename one with `rename_constant.py`, which
-also points the GLBs at a renamed texture directory (the packers' `relink` command). Run `.venv/bin/python tools/data/find_graphics.py nacrene_city_7` (or another `data/zones/` filename)
+also points the GLBs at a renamed texture directory (the packers' `relink` command). Run `.venv/bin/python tools/data/find_graphics.py nacrene_city_7` (or another `res/field/zones/` filename)
 to see the map model, map texture set, prop bundle and prop textures used by that zone.
 This is closer to [pokeemerald's per-map directories](https://github.com/pret/pokeemerald/tree/master/data/maps)
 than to [pokeplatinum's numbered binary map data](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/data).
 Like [pokeplatinum's separate texture sets](https://github.com/pret/pokeplatinum/tree/main/res/field/maps/texture_sets),
-shared texture resources belong in separate directories. `data/map_texture_sets/<set>/` holds editable color PNGs
+shared texture resources belong in separate directories. `res/field/maps/textures/<set>/` holds editable color PNGs
 for all 409 texture sets. GLB image paths point to these same PNGs, including resource names containing dots.
 The packer reads the original Nitro resource to recover its texture format and palette association. Edit the PNG
 in Blender or an image editor. The build packs it back
@@ -674,7 +883,7 @@ Adding material slots or draw calls is not yet supported. Every map model contai
 `MDL0` block; its textures come from the shared texture archive.
 
 The exterior and interior field props use separate texture archives. Their PNGs live under
-`data/field_prop_textures/exterior/` and `data/field_prop_textures/interior/`, a directory per prop bundle,
+`res/field/props/exterior/textures/` and `res/field/props/interior/textures/`, a directory per prop bundle,
 named as the bundle is. Editing a PNG repacks its original Nitro texture and shared palette;
 the original Nitro archive supplies the format and palette mapping needed for a byte-matching build.
 The texture size, pixel format and shared palette capacity still constrain edits. The PNGs can be
@@ -694,14 +903,14 @@ changes only its bundle, and the rebuilt model loads in Apicula.
 
 ## Map matrices, areas and lights
 
-A zone's header names its map matrix, `data/map_matrices/<matrix>.json` (`a/0/0/9`), by its constant in
-`data/constants/map_matrices.txt`, which names a matrix after the first zone that uses it, the overworld's
+A zone's header names its map matrix, `res/field/matrices/<matrix>.json` (`a/0/0/9`), by its constant in
+`generated/map_matrices.txt`, which names a matrix after the first zone that uses it, the overworld's
 `MAP_MATRIX_OVERWORLD`. A matrix is a grid of its cells' maps, map models by their `MAP_MODEL_*` constants (null for
 none), row by row,
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
 
-Each area is `data/areas/<area>.json`, named after its constant in `data/constants/areas.txt`, in whose order
+Each area is `res/field/areas/<area>.json`, named after its constant in `generated/areas.txt`, in whose order
 `a/0/1/3` has the records (`AreaData`), which name the graphics that zones share: their props, textures, animations
 (null for none), lights and colors. The props and texture set are named by their constants (see
 [Map model sources](#map-model-sources)), or by number for the few props that the archive doesn't have; the rest are
@@ -710,11 +919,11 @@ file numbers. A zone's header names its area by its constant. The field reads th
 after the first are named `_SUMMER`, `_AUTUMN` and `_WINTER`, and other state for three other ranges
 (`func_02018f60`, `func_02018f78` and `func_02018f90` in `fieldmap.c`), whose records after the zone's are numbered
 from `_2`. An area is named after the first zone whose header names it, and the 81 records that nothing names, by
-their number; `make_constants.py --areas` bootstrapped the list. `data/areas/area.schema.json` describes one record
+their number; `make_constants.py --areas` bootstrapped the list. `res/field/areas/area.schema.json` describes one record
 and `tools/data/area_data.py` packs them. Both versions have the same matrices and areas.
 
-An area's lights are a lighting set, `data/lights/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
-the battles' are `data/lights/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which
+An area's lights are a lighting set, `res/lighting/field/<n>.json` (`a/0/6/0`, `ARCID_LIGHTS_FIELD`), by its number;
+the battles' are `res/lighting/battle/<n>.json` (`a/0/6/1`). A set is the periods of the day, which
 `FieldLight_FlushCore` applies in turn: when each ends (an hour of the season's table and minutes after it), the four
 lights (on or off, color and direction in 4096ths), the materials' diffuse, ambient, specular and emission colors, the
 fog's color and the color the screen clears to. Colors are 0 to 31 per component. `tools/data/light_data.py`
@@ -722,26 +931,58 @@ packs them, and both versions have the same sets.
 
 ## Town map
 
-The town map's places, `data/town_map/<zone>.json` (`a/0/8/5`), form the table that the town map, the Pokédex's habitat
+The town map's places, `res/town_map/<zone>.json` (`a/0/8/5`), form the table that the town map, the Pokédex's habitat
 map and a beacon's details read by `TOWNMAP_PARAM_*` (`include/app/townmap/townmap_data.h`). Each file is named after
-its zone constant, and `data/town_map/order.json` gives the order the code numbers them. Each place has its zone,
+its zone constant, and `res/town_map/order.json` gives the order the code numbers them. Each place has its zone,
 kind, where its marker, cursor and touch area are, whether the player can fly there, the flags that let them and that
 show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 `constants/town_map.h`), its area on the habitat map, and its description and landmarks, messages of
-`data/text/system/town_map.txt` by ID. The versions differ only in a few descriptions, which then give one per version:
+`res/text/system/town_map.txt` by ID. The versions differ only in a few descriptions, which then give one per version:
 
 ```json
 "description": {"black2": "TownMap_Text_ConvenientCityRapidChange", "white2": "TownMap_Text_CityRespectsHistoryValues"},
 "landmarks": ["TownMap_Text_OpelucidCityGym", "TownMap_Text_PokemonCenter_9"],
 ```
 
-`data/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
+`res/town_map/place.schema.json` describes each file, and `tools/data/town_map_data.py` packs them for each version.
+
+## Field actors
+
+The field's actors are the people, Pokémon and objects that zones and scripts put on the map. Each one's model is an
+object code, a constant of `generated/obj_codes.txt`, which the zones' events give their NPCs as `"model":
+"OBJ_CODE_YOUNGSTER"`, and each object code is a directory of `res/field/actors/`: `hero/` for `OBJ_CODE_HERO`,
+`pokemon/bulbasaur/` for the walking Pokémon's `OBJ_CODE_POKEMON_BULBASAUR`, and `models/0/` for the 3D models'
+`OBJ_CODE_MODEL_0`. Its `data.json` is its record of the model table (`a/0/4/7`, `FieldActorConfig` in
+`include/field/field_actor.h`, with swan's names), which `field_actor.schema.json` documents: whether it is a sprite,
+a 3D model or nothing to draw, its shadow, footprints, reflections, sizes, sex, collision and drawing offset. Its
+graphics go in the graphics archive (`a/0/4/8`):
+
+- a sprite has `sprite.png`, its frames side by side, each a square 32 or 64 pixels wide, as the hero's 24 frames of
+  facing and walking, and `sprite.pal`, its 16 colors in JASC format, 0 transparent. The palette file sets
+  the colors; a PNG's own palette only puts back the indices that an image editor reordered on saving.
+- a 3D model has `model.nsbmd`, a Nitro model, unless its `data.json`'s `"model"` names the object code whose model it
+  shows.
+
+People and objects are named after the trainer class that most of the trainers the zones' events give them have
+(`OBJ_CODE_BIKER`, `OBJ_CODE_ROUGHNECK` and `OBJ_CODE_HARLEQUIN_233` also show other classes'), or where the code
+shows what they are (`OBJ_CODE_HERO`, `OBJ_CODE_STRENGTH_ROCK`, `OBJ_CODE_WORK_00` and on, which stand for the
+code in a work value), and are numbered otherwise, as `OBJ_CODE_80`: name them with `rename_constant.py` as they are
+identified, which moves their directories. Walking Pokémon are named after the species, sex and form that the walking
+Pokémon's table (`a/2/0/8`) gives them. The table has the codes in the list's order; the graphics archive has the 3D
+models and then the sprites, each in the order of the codes that show them, and the packer writes each code's place
+in it into the table. To add an actor, add its constant to the list, with a value of its own, and its directory, as a
+copy of one to start from. Two places in the code still load sprites by their place in the graphics archive, the
+Funfest Missions' player icons (`sFMissionViewPlayerModels`) and an entrant's default sprite in `wbt_setup.c`, so adding a 3D model moves the sprites those name. Only a 3D model has a `model.nsbmd` or a
+`"model"`, and the code it names must have a `model.nsbmd` of its own.
+`tools/data/field_actor_data.py` writes the sprites' texture sets as the game's are, so the sources pack both archives
+byte for byte; `.venv/bin/python tools/data/field_actor_data.py dump extract/b2_us/files res/field/actors` writes
+them again.
 
 ## Zone events
 
-Each zone's events are `data/events/<zone>.json`, named after its constant, as pokeplatinum's `res/field/events/`:
+Each zone's events are `res/field/events/<zone>.json`, named after its constant, as pokeplatinum's `res/field/events/`:
 the zone's entities file (`a/1/2/6`), which `LoadZoneEntities` reads. It has the zone's background events, such as
-signs, its NPCs, its warps, its triggers and its init scripts, and `data/events/events.schema.json` documents each
+signs, its NPCs, its warps, its triggers and its init scripts, and `res/field/events/events.schema.json` documents each
 field, with swan's names and layouts (`include/field/zone.h`, `include/field/field_actor.h`).
 
 ```json
@@ -784,6 +1025,6 @@ of that zone it arrives at, and an NPC the direction it faces (`DIR_*`). An NPC'
 are written by name where the constant lists have one, and otherwise as their IDs in hex, as `"0x4176"`, as IDs are
 read; a file can write any ID that way. The init scripts are a map script table (see [Scripts](scripts.md)): a script by
 when it runs, or, for type 1, conditions on variables. A zone's header gives the number of its entities file (`entities`
-in `data/zones/`), and `tools/data/event_data.py pack` puts each zone's events at that number; the numbers in
-`data/events/placeholders.json`, which no zone uses, hold the game's 4-byte placeholder. Both versions have the same
+in `res/field/zones/`), and `tools/data/event_data.py pack` puts each zone's events at that number; the numbers in
+`res/field/events/placeholders.json`, which no zone uses, hold the game's 4-byte placeholder. Both versions have the same
 events.

@@ -1,0 +1,23 @@
+Title10_Text_MedalCollectionGoal = Medal Collection Goal
+Title10_Text_MedalsCollected = Medals Collected
+Title10_Text_HintMedals = Hint Medals
+Title10_Text_Empty = {bd03:24}{0202:0}
+Title10_Text_Empty_2 = {bd03:24}{0202:0}/{0202:1}
+Title10_Text_RegisteringFavoriteMedalWill = Registering your Favorite Medal.\nIt will be shown to other players.
+Title10_Text_Removed = Removed
+Title10_Text_HintMedalCannotRegistered = A Hint Medal cannot be registered\nas your Favorite Medal.
+Title10_Text_HowShouldMedalsDisplayed = How should the Medals\nbe displayed?
+Title10_Text_Browser = Browser
+Title10_Text_Columns = Columns
+Title10_Text_MedalsOnly = Medals Only
+Title10_Text_HintMedalsOnly = Hint Medals Only
+Title10_Text_DisplayByType = Display by Type
+Title10_Text_DisplayByName = Display by Name
+Title10_Text_NewestFirst = Newest First
+Title10_Text_Revert = Revert
+Title10_Text_Back = Back
+Title10_Text_DateObtained = {bd03:24}Date Obtained
+Title10_Text_DateReceived = {bd03:24}Date Received
+Title10_Text_20 = {bd03:24}{0201:1}/{0201:2}/20{0201:0}
+Title10_Text_ManualWedgedInsideMedal = A manual is wedged inside\nthe Medal Box.{be01}\nMedal Box Features{be01}\nPress the A Button when the cursor\nis highlighting a Medal or tap the{be00}\nbox to the right of the name.{be01}\nThat Medal will be registered\nas your Favorite Medal.{be01}\nYour Favorite Medal can be\nshown to other players.{be01}\nPress START or tap the icon in the\nlower left to change how the Medals{be00}\nare shown.
+\pad{da}

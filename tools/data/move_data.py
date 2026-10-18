@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The move data in data/moves/, one JSON file per move, as pokeplatinum's res/moves/: dump writes them from the ROM
+"""The move data in res/moves/, one JSON file per move, as pokeplatinum's res/moves/: dump writes them from the ROM
 once, and pack builds the archive (a/0/2/1) from them, which the build does.
 
-    move_data.py dump extract/b2_us/files data/moves
-    move_data.py pack data/moves ARCHIVE
+    move_data.py dump extract/b2_us/files res/moves
+    move_data.py pack res/moves ARCHIVE
 
-Each move is data/moves/<move>/data.json, named after its constant (pound/ for MOVE_POUND), and the archive has them
-in the order of data/constants/moves.txt. move.schema.json describes each field.
+Each move is res/moves/<move>/data.json, named after its constant (pound/ for MOVE_POUND), and the archive has them
+in the order of generated/moves.txt. move.schema.json describes each field.
 """
 import argparse
 import struct
@@ -117,10 +117,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/moves/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/moves/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the move data archive from data/moves/")
+    pack_parser = commands.add_parser("pack", help="build the move data archive from res/moves/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

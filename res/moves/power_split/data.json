@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Power Split",
+    "description": "The user employs its psychic power to\naverage its Attack and Sp. Atk stats\nwith those of the target's.",
+    "type": "TYPE_PSYCHIC",
+    "quality": "MOVE_QUALITY_SPECIAL",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 10,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_POWER_SPLIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT" ]
+}

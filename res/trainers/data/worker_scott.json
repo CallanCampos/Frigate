@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Scott",
+    "class": "TRAINER_CLASS_WORKER_26",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TIMBURR",
+            "form": 0,
+            "level": 17,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Humans need sewers, but what\nabout Pokémon?{be01}\nTake that question, and take this battle\nchallenge with it!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "There appears to be no barrier between you\nand your Pokémon!"
+        },
+        {
+            "type": 2,
+            "text": "Since we built this sewer, all kinds of\nPokémon have gathered here.{be01}\nIt's like there's no boundary between\nPokémon and people, right?"
+        }
+    ]
+}

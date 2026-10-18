@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kyle",
+    "class": "TRAINER_CLASS_SWIMMER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_WINGULL",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_WINGULL",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You see this enormous puddle?\nThey call it an ocean!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Whoa!\nYou're enormous, too!"
+        },
+        {
+            "type": 2,
+            "text": "Big things are awesome! Why?\nBecause they're big!"
+        }
+    ]
+}

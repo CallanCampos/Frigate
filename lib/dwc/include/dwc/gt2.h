@@ -5,11 +5,9 @@
 
 // Nintendo's wrapper around GameSpy's GT2 (the UDP transport that DWC's matchmaking talks through), named from the
 // only string this module's data pool carries about it: "[Udp Engine] error creating gt2 socket, error code: %d".
-// The real GameSpy GT2 SDK is public (gt2.c/gt2callback.c/gt2aux.c), but no existing decomp has recovered it, and
-// the lower socket layer this file calls (func_ov011_0217d144 and the other func_ov011_0217dNNN addresses declared
-// in dwc/ext.h) is not decompiled either, so every name here is a guess read off this file's own behavior, not the
-// SDK's or swan's; this file's name ("gt2.c") is a guess too. There is one global engine, which is why every public
-// function below takes no socket handle.
+// It builds on GameSpy's GT2 itself (dwc/gt2Main.h). Every name here is a guess read off this file's own behavior,
+// not the SDK's or swan's; this file's name ("gt2.c") is a guess too. There is one global engine, which is why every
+// public function below takes no socket handle.
 
 // Notified once with a code (3 for a socket-wide error) and the engine's or a pending connect's userData
 typedef void (*Gt2EventCallback)(int code, void *userData);

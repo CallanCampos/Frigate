@@ -1,0 +1,4 @@
+LibertyGarden3_Text_VictiniSeemsWantGet = Victini seems to want to get out\nof the Poké Ball...{be00}\nWill you let it out?{be01}
+LibertyGarden3_Text_TaTaTaTah = Ta-ta-ta-tah!
+LibertyGarden3_Text_VictiniHasReturnedIts = Victini has returned to its Poké Ball\nwith an air of satisfaction.
+LibertyGarden3_Text_VictiniSeemsLonelyPoke = Victini seems lonely\nin the Poké Ball...

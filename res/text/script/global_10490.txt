@@ -1,0 +1,11 @@
+Global10490_Text_MovingAroundEnergetically = {0101:0} is\nmoving around energetically!
+Global10490_Text_LooksHappyMeet = {0101:0} looks happy\nto meet {0100:1}!{be01}
+Global10490_Text_SeemsWantJoinS = {0101:0} seems to want\nto join {0100:1}'s party...{be01}
+Global10490_Text_WouldLikeAddPokemon = Would you like to add\nthe Pokémon to your party?
+Global10490_Text_WouldLikeMoveDeepest = Would you like {0101:0}\nto move to the Deepest Clearing?
+Global10490_Text_TheresNoMoreRoom = There's no more room in the Deepest\nClearing, so {0101:0} could not move!
+Global10490_Text_WouldLikeMoveForest = Would you like {0101:0}\nto move to the Forest Clearing?
+Global10490_Text_TheresNoMoreRoom_2 = There's no more room in the Forest\nClearing, so {0101:0} could not move!
+Global10490_Text_MovedDeepestClearing = {0101:0} moved to\nthe Deepest Clearing!{be01}
+Global10490_Text_MovedForestClearing = {0101:0} moved to\nthe Forest Clearing!{be01}
+\pad{d6}

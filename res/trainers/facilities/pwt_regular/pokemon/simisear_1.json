@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SIMISEAR",
+    "moves": [ "MOVE_FLAME_BURST", "MOVE_GRASS_KNOT", "MOVE_DOUBLE_TEAM", "MOVE_THIEF" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_HASTY",
+    "item": "ITEM_NONE",
+    "form": 0
+}

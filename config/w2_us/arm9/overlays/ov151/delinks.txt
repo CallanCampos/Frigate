@@ -4,5 +4,6 @@
     .bss        start:0x021f63c0 end:0x021f63c0 kind:bss align:32
 
 src/ov151/encounter_effect_ripple.c:
+    complete
     .text       start:0x021f5de0 end:0x021f6370
     .rodata     start:0x021f6370 end:0x021f63a0

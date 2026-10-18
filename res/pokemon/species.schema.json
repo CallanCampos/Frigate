@@ -1,0 +1,214 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A species or form: res/pokemon/<species>/data.json or form_<n>.json",
+    "description": "One record of the species data (archive a/0/1/6, the 0x4c bytes that PML_PersonalGetParam reads), with the record's level-up moves (a/0/1/8), evolutions (a/0/1/9) and, for a species, baby species (a/0/2/0). tools/data/species_data.py packs them. A string value is the name of a constant from generated/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "base_stats", "types", "catch_rate", "evolution_stage", "ev_yields", "underground", "held_items",
+        "gender_ratio", "hatch_cycles", "base_friendship", "growth_rate", "egg_groups", "abilities", "hidden_ability",
+        "flee_rate", "forms", "color", "asymmetric", "palette_forms", "base_exp", "height", "weight", "learnset",
+        "evolutions"
+    ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "name": {
+            "type": "string",
+            "description": "The species' name, which the text files take with \\from{species.name}, also in capitals and with its article. National Pokédex species only: forms, the egg, the bad egg and the Pokéstar Studios species have none, whose names are lines of species_names.txt"
+        },
+        "name_article": {
+            "enum": [ "a", "an" ],
+            "description": "The article of the name where it isn't \"an\" before a vowel and \"a\" before anything else, as for Uxie"
+        },
+        "pokedex": {
+            "type": "object", "additionalProperties": false, "required": [ "category", "entry", "height", "weight", "languages" ],
+            "description": "The species' Pokédex text, which the text files take with \\from{species.pokedex.<field>} and the like. Species only",
+            "properties": {
+                "category": { "type": "string", "description": "The category, such as \"Seed Pokémon\"" },
+                "entry": { "type": "string", "description": "The entry, with its line breaks" },
+                "height": { "type": "string", "description": "The height as the Pokédex shows it; the record's height is the number the game uses" },
+                "weight": { "type": "string", "description": "The weight as the Pokédex shows it, rounded as the game's text has it; the record's weight is the number the game uses" },
+                "forms": {
+                    "type": "array",
+                    "description": "The alternate forms' entries, heights and weights, one for each form after the first (forms.count - 1), Unown's and Arceus' too",
+                    "items": {
+                        "type": "object", "additionalProperties": false, "required": [ "entry", "height", "weight" ],
+                        "properties": { "entry": { "type": "string" }, "height": { "type": "string" }, "weight": { "type": "string" } }
+                    }
+                },
+                "languages": {
+                    "type": "object", "additionalProperties": false,
+                    "description": "The Pokédex text the game keeps in other languages, which a Pokémon from a game in that language shows: for the species up to Arceus, and the Japanese category of every species. The heights and weights of Giratina's and Shaymin's alternate forms follow the species' in the files, as their forms",
+                    "properties": {
+                        "en": { "$ref": "#/$defs/language" }, "fr": { "$ref": "#/$defs/language" },
+                        "de": { "$ref": "#/$defs/language" }, "it": { "$ref": "#/$defs/language" },
+                        "ko": { "$ref": "#/$defs/language" }, "es": { "$ref": "#/$defs/language" },
+                        "ja": { "$ref": "#/$defs/language" }
+                    }
+                }
+            }
+        },
+        "base_stats": { "$ref": "#/$defs/stats", "description": "Base stats, 0 to 255 each" },
+        "types": {
+            "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/type" },
+            "description": "The two types, the same twice for a single type"
+        },
+        "catch_rate": { "$ref": "#/$defs/u8" },
+        "evolution_stage": {
+            "$ref": "#/$defs/u8",
+            "description": "1 for a species that doesn't evolve from another, then 2 and 3 along its evolutions"
+        },
+        "ev_yields": {
+            "$ref": "#/$defs/stats",
+            "description": "The effort values that a defeated Pokémon of the species gives, 0 to 3 each"
+        },
+        "underground": {
+            "type": "boolean",
+            "description": "Set only for Diglett and Dugtrio, which live in the ground; the battle animations' script commands test it (overlay 168)"
+        },
+        "held_items": {
+            "type": "object", "additionalProperties": false, "required": [ "common", "rare", "very_rare" ],
+            "description": "The items wild Pokémon of the species hold, from the most to the least common",
+            "properties": {
+                "common": { "$ref": "#/$defs/item" },
+                "rare": { "$ref": "#/$defs/item" },
+                "very_rare": { "$ref": "#/$defs/item" }
+            }
+        },
+        "gender_ratio": {
+            "type": [ "integer", "string" ], "minimum": 0, "maximum": 255, "x-constant": "GENDER_RATIO_",
+            "description": "The chance of a female out of 254, or a GENDER_RATIO_* constant"
+        },
+        "hatch_cycles": { "$ref": "#/$defs/u8" },
+        "base_friendship": { "$ref": "#/$defs/u8" },
+        "growth_rate": { "type": "string", "x-constant": "GROWTH_", "description": "A GROWTH_* constant" },
+        "egg_groups": {
+            "type": "array", "minItems": 2, "maxItems": 2,
+            "items": { "type": "string", "x-constant": "EGG_GROUP_" },
+            "description": "The two egg groups (EGG_GROUP_*), the same twice for one"
+        },
+        "abilities": {
+            "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/ability" },
+            "description": "The two abilities, the second ABILITY_NONE for one"
+        },
+        "hidden_ability": { "$ref": "#/$defs/ability", "description": "The ability from the Dream World" },
+        "flee_rate": { "$ref": "#/$defs/u8" },
+        "cry_volume": {
+            "type": "integer", "minimum": 0, "maximum": 127,
+            "description": "Playback volume from a/1/9/1 for species with a cry; absent for forms and extra personal records"
+        },
+        "forms": {
+            "type": "object", "additionalProperties": false, "required": [ "count", "sprite_offset" ],
+            "description": "The species' forms. Their records follow the order of res/pokemon/forms.json, which the packer sets the record of the first form from; forms that only change the sprite have no record",
+            "properties": {
+                "count": { "$ref": "#/$defs/u8", "description": "The number of forms, 1 for a species without forms" },
+                "sprite_offset": {
+                    "$ref": "#/$defs/u16",
+                    "description": "Where the forms' sprites start among the alternate forms' sprites, 0 for none"
+                }
+            }
+        },
+        "color": { "type": "string", "x-constant": "COLOR_", "description": "The Pokédex color, a COLOR_* constant" },
+        "asymmetric": {
+            "type": "boolean",
+            "description": "Set for the species that don't look the same mirrored, such as Kingler, Zangoose and Absol"
+        },
+        "palette_forms": {
+            "type": "boolean",
+            "description": "Set for a species whose forms only change its palette (Arceus): a form's sprite is a palette rather than files of its own (GetPokemonDataIDBase)"
+        },
+        "base_exp": {
+            "$ref": "#/$defs/u16",
+            "description": "The base of the experience that defeating a Pokémon of the species gives"
+        },
+        "height": { "$ref": "#/$defs/u16", "description": "In tenths of a meter" },
+        "weight": { "$ref": "#/$defs/u16", "description": "In tenths of a kilogram" },
+        "learnset": {
+            "type": "object", "additionalProperties": false, "required": [ "by_level", "by_tm", "by_tutor" ],
+            "properties": {
+                "by_level": {
+                    "type": "array",
+                    "description": "The moves learned by level, as [ level, move ], in the order the game checks them",
+                    "items": {
+                        "type": "array", "minItems": 2, "maxItems": 2,
+                        "prefixItems": [ { "type": "integer", "minimum": 0, "maximum": 100 }, { "$ref": "#/$defs/move" } ]
+                    }
+                },
+                "by_tm": {
+                    "type": "array",
+                    "items": { "type": "string", "pattern": "^(TM(0[1-9]|[1-8][0-9]|9[0-5])|HM0[1-6])$" },
+                    "description": "The TMs (TM01 to TM95) and HMs (HM01 to HM06) the species can learn"
+                },
+                "egg_moves": {
+                    "type": "array", "items": { "$ref": "#/$defs/move" },
+                    "description": "The moves the species' eggs can hatch knowing (a/1/2/4). Species only, and not SPECIES_NONE, whose entry is empty"
+                },
+                "by_tutor": {
+                    "type": "array", "items": { "type": "string", "x-constant": "MOVE_" },
+                    "description": "The moves the species learns from the type move tutor (the pledges, the starters' ultimate moves and Draco Meteor) and the move tutors of Driftveil City, Lentimas Town, Humilau City and Nacrene City, whose lists are their shop tables in src/ov036/scrcmd_shop.c"
+                }
+            }
+        },
+        "evolutions": {
+            "type": "array", "maxItems": 7,
+            "description": "Up to seven evolutions",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "method", "param", "species" ],
+                "properties": {
+                    "method": { "type": "string", "x-constant": "EVO_METHOD_", "description": "An EVO_METHOD_* constant" },
+                    "param": {
+                        "type": [ "integer", "string" ], "minimum": 0, "maximum": 65535,
+                        "description": "Depends on the method: a level, an item, a move, a species, or a value such as the friendship or beauty needed"
+                    },
+                    "species": { "$ref": "#/$defs/species" }
+                }
+            }
+        },
+        "regional_dex_number": {
+            "type": [ "integer", "null" ], "minimum": 0, "maximum": 998,
+            "description": "The number in the Unova Pokédex, from 0 for Victini, or null for a species not in it. The table after the species records (a/0/1/6's last member) holds one for each species, 999 for none: its 301 numbers match the game's Unova Pokédex, #000 to #300. Forms have none"
+        },
+        "baby_species": {
+            "$ref": "#/$defs/species",
+            "description": "The species that hatches from an egg this one lays, its first evolution stage. Forms have none"
+        }
+    },
+    "$defs": {
+        "language": {
+            "type": "object", "additionalProperties": false,
+            "properties": {
+                "name": { "type": "string" }, "category": { "type": "string" }, "entry": { "type": "string" },
+                "height": { "type": "string" }, "weight": { "type": "string" },
+                "forms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object", "additionalProperties": false, "required": [ "height", "weight" ],
+                        "properties": { "height": { "type": "string" }, "weight": { "type": "string" } }
+                    }
+                }
+            }
+        },
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "u16": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "stats": {
+            "type": "object", "additionalProperties": false,
+            "required": [ "hp", "attack", "defense", "speed", "special_attack", "special_defense" ],
+            "properties": {
+                "hp": { "$ref": "#/$defs/u8" },
+                "attack": { "$ref": "#/$defs/u8" },
+                "defense": { "$ref": "#/$defs/u8" },
+                "speed": { "$ref": "#/$defs/u8" },
+                "special_attack": { "$ref": "#/$defs/u8" },
+                "special_defense": { "$ref": "#/$defs/u8" }
+            }
+        },
+        "type": { "type": "string", "x-constant": "TYPE_" },
+        "item": { "type": "string", "x-constant": "ITEM_" },
+        "ability": { "type": "string", "x-constant": "ABILITY_" },
+        "move": { "type": "string", "x-constant": "MOVE_" },
+        "species": {
+            "type": [ "string", "integer" ], "x-constant": "SPECIES_", "minimum": 0, "maximum": 65535,
+            "description": "A SPECIES_* constant"
+        }
+    }
+}

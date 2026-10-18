@@ -1,6 +1,0 @@
-{
-    "$schema": "../../facility.schema.json",
-    "name": "Camellia",
-    "class": "TRAINER_CLASS_PKMN_BREEDER_F",
-    "pokemon": [ "happiny_2", "chansey_2", "blissey_2" ]
-}

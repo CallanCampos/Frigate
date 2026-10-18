@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Azra",
+    "class": "TRAINER_CLASS_BATTLE_GIRL",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GURDURR",
+            "form": 0,
+            "level": 41,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MIENFOO",
+            "form": 0,
+            "level": 41,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You gotta have stamina!{be01}\nBurn the flames of life,\nand never stop moving forward!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I'm out of stamina!"
+        },
+        {
+            "type": 2,
+            "text": "I was just joking about never stopping!{be01}\nYou need to take a break every once\nin a while to rest your mind and body!"
+        }
+    ]
+}

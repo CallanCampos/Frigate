@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_PORYGON2",
+    "moves": [ "MOVE_TRI_ATTACK", "MOVE_PSYCHIC", "MOVE_RECYCLE", "MOVE_RECOVER" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_PETAYA_BERRY",
+    "form": 0
+}

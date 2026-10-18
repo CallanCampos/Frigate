@@ -115,9 +115,12 @@ typedef u16 GXRgb;
 // A window's effect enable, above its planes
 #define GX_WND_EFFECT_SHIFT 5
 
-#define GX_OAM_MODE_NORMAL 0
-#define GX_OAM_MODE_XLU 1
-#define GX_OAM_MODE_BITMAPOBJ 3
+typedef enum {
+    GX_OAM_MODE_NORMAL = 0,
+    GX_OAM_MODE_XLU = 1,
+    GX_OAM_MODE_OBJWND = 2,
+    GX_OAM_MODE_BITMAPOBJ = 3,
+} GXOamMode;
 
 // OAM attributes. Bitmap OBJ take an alpha in place of a palette
 typedef union {
@@ -905,23 +908,23 @@ static inline void G2S_SetWndOutsidePlane(int wnd, BOOL effect) {
 // A window's rectangle, from (x1, y1) to before (x2, y2). NitroSDK's G2_SetWnd0Position, G2_SetWnd1Position and their
 // G2S_ forms
 static inline void G2_SetWnd0Position(int x1, int y1, int x2, int y2) {
-    reg_G2_WIN0H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2_WIN0V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2_WIN0H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2_WIN0V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2_SetWnd1Position(int x1, int y1, int x2, int y2) {
-    reg_G2_WIN1H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2_WIN1V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2_WIN1H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2_WIN1V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2S_SetWnd0Position(int x1, int y1, int x2, int y2) {
-    reg_G2S_DB_WIN0H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2S_DB_WIN0V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2S_DB_WIN0H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2S_DB_WIN0V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2S_SetWnd1Position(int x1, int y1, int x2, int y2) {
-    reg_G2S_DB_WIN1H = (u16)(((x1 << 8) & 0xff00) | (u8)x2);
-    reg_G2S_DB_WIN1V = (u16)(((y1 << 8) & 0xff00) | (u8)y2);
+    reg_G2S_DB_WIN1H = (u16)(((x1 << 8) & 0xff00) | (x2 & 0xff));
+    reg_G2S_DB_WIN1V = (u16)(((y1 << 8) & 0xff00) | (y2 & 0xff));
 }
 
 static inline void G2_BlendNone(void) {

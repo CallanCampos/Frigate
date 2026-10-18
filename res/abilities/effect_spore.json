@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Effect Spore",
+    "description": "Contact may poison or\ncause paralysis or sleep."
+}

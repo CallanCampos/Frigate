@@ -1,0 +1,11 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ingo",
+    "class": "TRAINER_CLASS_SUBWAY_BOSS_102",
+    "pokemon": [ "galvantula_1", "durant_3" ],
+    "messages": [
+        "Let me introduce myself again.\nI am a Subway Boss, Ingo!{be01}\nWell, there is nothing else to say\nfor the person who comes{be00}\nall the way here.{be01}\nLet's have the greatest battle,\nbetter than ever before.",
+        "We, Ingo and Emmet, are a\ntwo-car train.{be01}\nThis time, we were able to work toward\na victory.{be01}\nWell, will you stop here?\nOr will you challenge us again?{be01}\nIt's up to you.\nBut let me say one thing.{be01}\nThere is no terminal called End\nin your life!",
+        "Bravo!!\nReally excellent!{be01}\nThe best combination of\nyou and your Pokémon.{be00}\nIt is incredible!{be01}\nWhen you and someone else combine,\nyour engine powers something special!{be01}\nIf you like, please challenge us\nwith a different combination."
+    ]
+}

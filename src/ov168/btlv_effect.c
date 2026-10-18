@@ -683,16 +683,16 @@ void BtlvEffect_CalcGaugeHPAtOnce(u32 viewPos, s32 hp) {
     BtlvGauge_SetHpAtOnce(sBtlvEffect->gauge, viewPos, hp);
 }
 
-void BtlvEffect_CalcGaugeExp(u8 pos, s32 exp, BattleMon *mon) {
+void BtlvEffect_CalcGaugeExp(u32 viewPos, s32 exp, BattleMon *mon) {
     int level = GetBattleMonStat(mon, BATTLEMON_LEVEL);
 
     if (level < 100) {
-        BtlvGauge_StartExpGain(sBtlvEffect->gauge, pos, exp);
+        BtlvGauge_StartExpGain(sBtlvEffect->gauge, viewPos, exp);
     }
 }
 
-void BtlvEffect_CalcGaugeExpLevelUp(u8 pos, BattleMon *mon) {
-    BtlvGauge_StartLevelUp(sBtlvEffect->gauge, mon, pos);
+void BtlvEffect_CalcGaugeExpLevelUp(u32 viewPos, BattleMon *mon) {
+    BtlvGauge_StartLevelUp(sBtlvEffect->gauge, mon, viewPos);
 }
 
 void BtlvEffect_SetGaugeFlag(void) {
@@ -719,8 +719,8 @@ void BtlvEffect_GaugeAction(u32 viewPos) {
     BtlvGauge_StartShake(sBtlvEffect->gauge, viewPos);
 }
 
-BOOL BtlvEffect_CheckGaugeExist(u8 pos) {
-    return BtlvGauge_IsShown(sBtlvEffect->gauge, pos);
+BOOL BtlvEffect_CheckGaugeExist(u32 viewPos) {
+    return BtlvGauge_IsShown(sBtlvEffect->gauge, viewPos);
 }
 
 BOOL BtlvEffect_GetGaugeStatus(u32 viewPos, u32 *color, u32 *status) {

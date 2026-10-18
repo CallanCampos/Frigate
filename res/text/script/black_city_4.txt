@@ -1,0 +1,2 @@
+BlackCity4_Text_Empty =                                             \x{ffff}
+BlackCity4_Text_Empty_2 =                                                   \x{ffff}

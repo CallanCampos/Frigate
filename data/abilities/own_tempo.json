@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Own Tempo",
-    "description": "Prevents the Pokémon\nfrom becoming confused."
-}

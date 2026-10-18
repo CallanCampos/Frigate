@@ -1,0 +1,8 @@
+{
+    "$schema": "../../../sequence.schema.json",
+    "bank": "BANK_SE_SW_KYUREON_01_02a",
+    "volume": 120,
+    "channel_priority": 104,
+    "player_priority": 64,
+    "player": "PLAYER_SE_SYS"
+}

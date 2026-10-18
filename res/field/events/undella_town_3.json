@@ -1,0 +1,168 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_93",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02ad",
+            "script": 4,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 4,
+                "z": 5,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_215",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02ab",
+            "script": 2,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 5,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_96",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02ac",
+            "script": 3,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 7,
+                "z": 6,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": "OBJ_CODE_224",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02b1",
+            "script": 7,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 8,
+                "z": 5,
+                "y": 0
+            }
+        },
+        {
+            "id": 4,
+            "model": "OBJ_CODE_228",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02af",
+            "script": 5,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 9,
+                "z": 4,
+                "y": 0
+            }
+        },
+        {
+            "id": 5,
+            "model": "OBJ_CODE_226",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02b0",
+            "script": 6,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 10,
+                "z": 5,
+                "y": 0
+            }
+        },
+        {
+            "id": 6,
+            "model": "OBJ_CODE_SOCIALITE",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02ae",
+            "script": 8,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 5,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_UNDELLA_TOWN",
+            "warp": 4,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 88,
+                "y": 0,
+                "z": 152,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": [
+        {
+            "type": 1,
+            "conditions": [
+                {
+                    "var": "EVENT_WORK_0x4098",
+                    "value": 1,
+                    "script": 1
+                }
+            ]
+        }
+    ]
+}

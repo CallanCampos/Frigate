@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Wonder Skin",
+    "description": "Makes status-changing\nmoves more likely to miss."
+}

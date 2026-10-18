@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Brian",
+    "class": "TRAINER_CLASS_DANCER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCRAGGY",
+            "form": 0,
+            "level": 25,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Turn around, and it's my turn. ♪\nTurn around, and it's your turn.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Turn around, turn around, turn around...\nThen turn around some more!"
+        },
+        {
+            "type": 2,
+            "text": "My Pokémon just love participating\nin musicals! They are masters of dance!"
+        }
+    ]
+}

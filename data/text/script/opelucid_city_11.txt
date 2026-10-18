@@ -1,3 +1,0 @@
-OpelucidCity11_Text_WonderIfEliteFour = I wonder if the Elite Four in the\nPokémon League like Pokémon more{be00}\nthan anyone else.{be01}\nIf you don't like Pokémon,\nyou'll never get good at battling, right?
-OpelucidCity11_Text_NeedHaveEightGym = You need to have eight Gym Badges\nto take on the pinnacle of Pokémon,{be00}\nthe Pokémon League!
-OpelucidCity11_Text_Raaah = Raaah!

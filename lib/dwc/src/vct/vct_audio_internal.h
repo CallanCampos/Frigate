@@ -13,7 +13,8 @@ struct VCTVoicePacket {
     u8 codec;
     u16 sequence;
     u32 timestamp;
-    u8 payload[0x454];
+    // The frame, coded in place from its 0x440 bytes of samples, after 4 bytes of state for the ADPCM codecs
+    u8 payload[0x444];
 };
 
 // vct_audio.c: the frames going out and coming in

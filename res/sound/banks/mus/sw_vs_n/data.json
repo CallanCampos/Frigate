@@ -1,0 +1,667 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_MUS_SW_VS_N", null, null, null ],
+    "instruments": [
+        {
+            "program": 9,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_N",
+            "wave": 5,
+            "base_key": "C5",
+            "attack": 127,
+            "decay": 75,
+            "sustain": 1,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 60,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_N",
+            "wave": 4,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 120,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 62,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_N",
+            "wave": 8,
+            "base_key": "As2",
+            "attack": 127,
+            "decay": 80,
+            "sustain": 1,
+            "release": 116,
+            "pan": 64
+        },
+        {
+            "program": 99,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 127,
+            "sustain": 127,
+            "release": 127,
+            "pan": 64
+        },
+        {
+            "program": 100,
+            "type": "noise",
+            "base_key": "C4",
+            "attack": 125,
+            "decay": 127,
+            "sustain": 127,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 110,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_N",
+            "wave": 14,
+            "base_key": "E2",
+            "attack": 127,
+            "decay": 30,
+            "sustain": 1,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 111,
+            "type": "wave",
+            "wave_archive": "WAVE_MUS_SW_VS_N",
+            "wave": 18,
+            "base_key": "E2",
+            "attack": 127,
+            "decay": 30,
+            "sustain": 1,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 80,
+            "type": "drums",
+            "first_key": "Cs1",
+            "keys": [
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 19,
+                    "base_key": "Cs1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 120,
+                    "release": 116,
+                    "pan": 58
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 117
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 13,
+                    "base_key": "E1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 10
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 10
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 22,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 22,
+                    "base_key": "G1",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 124,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 20,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 20,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 12,
+                    "base_key": "B1",
+                    "attack": 127,
+                    "decay": 114,
+                    "sustain": 90,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 6,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 122,
+                    "pan": 38
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "A2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 40
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 2,
+                    "base_key": "B2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 127,
+                    "pan": 46
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 3,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 127,
+                    "pan": 46
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 86
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 86
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 86
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 86
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "D3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 120
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 7,
+                    "base_key": "As3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 50
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "Cs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 64
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 0,
+                    "base_key": "E4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 20
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "Fs4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 0,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 0,
+                    "release": 110,
+                    "pan": 100
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 84
+                },
+                {
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 1,
+                    "base_key": "F4",
+                    "attack": 127,
+                    "decay": 90,
+                    "sustain": 0,
+                    "release": 114,
+                    "pan": 44
+                }
+            ]
+        },
+        {
+            "program": 64,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 16,
+                    "base_key": "D4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 15,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 17,
+                    "base_key": "F5",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 118,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "unused": "7f00000000000000010009000000427f64647440"
+        },
+        {
+            "program": 29,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "B2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 10,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_MUS_SW_VS_N",
+                    "wave": 11,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 125,
+                    "sustain": 120,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "unused": "7f00000000000000010015000000247f7d787840"
+        }
+    ]
+}

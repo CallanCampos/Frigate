@@ -115,7 +115,7 @@ static void func_ov055_021e69b0(WbtSystem *sys, WbtSetup *setup) {
 }
 
 static u8 func_ov055_021e6a14(u32 index) {
-    return data_ov036_021cf1c8[index].unk0[1]->unk0_0;
+    return data_ov036_021cf1c8[index].unk0[1]->face;
 }
 
 static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4) {

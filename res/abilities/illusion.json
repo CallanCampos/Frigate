@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Illusion",
+    "description": "Comes out disguised as\nthe Pokémon in back."
+}

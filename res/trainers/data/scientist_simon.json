@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Simon",
+    "class": "TRAINER_CLASS_SCIENTIST_M_52",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_DEFEND" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_ETHER",
+    "party": [
+        {
+            "species": "SPECIES_STUNKY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MUK",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I wonder if being good at sports\nand being good at battles are related?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It was very helpful..."
+        },
+        {
+            "type": 15,
+            "text": "Ummmm. You are\nquite interesting.{be01}\nPlease have this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Both sports and Pokémon are\nlike a science for me!"
+        }
+    ]
+}

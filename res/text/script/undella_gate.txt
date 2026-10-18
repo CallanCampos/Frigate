@@ -1,0 +1,2 @@
+UndellaGate_Text_LongestRoadUnovaHeard = The longest road in Unova...\nI heard it's Route 13.
+UndellaGate_Text_LoveClearPathBy = I love to clear my path by\nhaving Pokémon use Hidden Moves!

@@ -1,3 +1,0 @@
-IntroBtlServerFlow_Text_MicTest = {bd02}Mic Test
-IntroBtlServerFlow_Text_SaySomethingIntoMicrophone = Say something into\nthe microphone.\nThe Pokémon will start singing\nif it's working.
-IntroBtlServerFlow_Text_Back = BACK

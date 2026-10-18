@@ -154,15 +154,113 @@ void func_ov036_0219634c(FieldActor *actor, u16 *a1, u16 *a2);
 void func_ov036_021963a4(FieldActor *actor, u16 a1, u16 a2);
 // Sets the frame of the model's animation for a time. FALSE if the actor has no model
 BOOL func_ov036_02196b10(FieldActor *actor, u16 time);
-// Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command
+// Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command, and the setting of
+// the field effect it hides in
 BOOL func_ov036_0218ed68(FieldActor *actor);
-// Overlay 36's fldmmdl_blact.c, not written yet: the flag that the billboard actors' load callback sets, their
-// billboard system, and the change of an actor's model to another object code
+void func_ov036_02193110(FieldActor *actor, FieldEffectTask *task);
+// Overlay 36's fldmmdl_blact.c: the freeing of the billboard actors' work, the flag that their load callback sets,
+// their billboard system, and the change of an actor's model to another object code
+void func_ov036_021937a4(MMSys *system);
 u8 func_ov036_0219381c(FieldActor *actor);
-BlActSys *FieldBlAct_GetBlActSys(void *fieldBlAct);
-void FldAct_SwapObjCode(FieldActor *actor, u16 objCode);
-// Overlay 36's field_rail_loader.c, not written yet: sets a flag of the actor's rail billboard work
+BlActSys *FieldBlAct_GetBlActSys(FieldBlAct *blact);
+void FldAct_SwapObjCode(FieldActor *actor, u16 newObjCode);
+// The creation of an actor's billboard actor into *index, and its deletion
+BOOL func_ov036_02193a00(FieldActor *actor, u16 *index);
+void func_ov036_02193ac0(FieldActor *actor, u32 index);
+// The creation of a billboard actor of an object code at a position, into out[1] with the material's flags in out[0],
+// calling back once a material that has to be loaded first is there; its deletion; and the scale of an actor's
+// billboard
+BOOL func_ov036_02193b14(MMSys *system, const FieldActorConfig *config, u16 *out, VecFx32 *pos,
+                         void (*callback)(u16 index, void *data), void *callbackData, u32 lights);
+void func_ov036_02193b7c(MMSys *system, u16 *out);
+void func_ov036_02193bd0(FieldActor *actor, u16 *scaleX, u16 *scaleY);
+// Overlay 36's field_rail_loader.c: sets a flag of the actor's rail billboard work
 void func_ov036_0219690c(FieldActor *actor, BOOL value);
+// The script call of an actor's script; the animation and frame of the billboard actors of object codes 0xd3 and 0xd5,
+// and of 0xdd and 0xde (FALSE without a billboard actor); and whether the billboard actor of object code 0x7b or 0x176
+// has run its animation, with the reset of that animation
+GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, u32 unused1, u32 scriptId, u32 unused3, FieldActor *actor,
+                                        HeapID heapId);
+BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step);
+BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step);
+BOOL func_ov036_02197238(FieldActor *actor);
+void func_ov036_02197288(FieldActor *actor);
+// The functions that run an action command: what to do on the first frame, each frame and at the end
+typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
+
+typedef struct {
+    ActorAcmdFunc start;
+    ActorAcmdFunc update;
+    ActorAcmdFunc end;
+} ActorAcmdFuncs;
+
+// The work of a jump along the rail, which fldmmdl_g3dobj.c's func_ov036_02195354 starts and fld_act_rail.c updates
+typedef struct {
+    s32 speed;
+    s32 progress;
+    u16 step;
+    u16 phase;
+    s8 dir;
+    s8 timer;
+    s8 unkE;
+    s8 height;
+} ActorRailJumpWork;
+
+// Overlay 36's fldmmdl_g3dobj.c: the start, update and end functions of the action commands that the rail actors'
+// tables in fld_act_rail.c name, and the jump along the rail that their start functions begin
+BOOL func_ov036_02194ee8(FieldActor *actor);
+BOOL func_ov036_02194f94(FieldActor *actor);
+BOOL func_ov036_02194fe8(FieldActor *actor);
+BOOL func_ov036_02194ff4(FieldActor *actor);
+BOOL func_ov036_02195004(FieldActor *actor);
+BOOL func_ov036_02195014(FieldActor *actor);
+BOOL func_ov036_02195024(FieldActor *actor);
+BOOL func_ov036_02195034(FieldActor *actor);
+BOOL func_ov036_02195044(FieldActor *actor);
+BOOL func_ov036_02195054(FieldActor *actor);
+BOOL func_ov036_02195064(FieldActor *actor);
+BOOL func_ov036_02195074(FieldActor *actor);
+BOOL func_ov036_02195084(FieldActor *actor);
+BOOL func_ov036_02195094(FieldActor *actor);
+BOOL func_ov036_021950a4(FieldActor *actor);
+BOOL func_ov036_021950b4(FieldActor *actor);
+BOOL func_ov036_021950c4(FieldActor *actor);
+BOOL func_ov036_021950d4(FieldActor *actor);
+BOOL func_ov036_021950e4(FieldActor *actor);
+BOOL func_ov036_021950f4(FieldActor *actor);
+BOOL func_ov036_02195104(FieldActor *actor);
+BOOL func_ov036_02195114(FieldActor *actor);
+BOOL func_ov036_02195124(FieldActor *actor);
+BOOL func_ov036_02195168(FieldActor *actor);
+BOOL func_ov036_0219519c(FieldActor *actor);
+BOOL func_ov036_021951ac(FieldActor *actor);
+BOOL func_ov036_021951bc(FieldActor *actor);
+BOOL func_ov036_021951cc(FieldActor *actor);
+BOOL func_ov036_021951dc(FieldActor *actor);
+BOOL func_ov036_021951ec(FieldActor *actor);
+BOOL func_ov036_021951fc(FieldActor *actor);
+BOOL func_ov036_0219520c(FieldActor *actor);
+BOOL func_ov036_0219521c(FieldActor *actor);
+BOOL func_ov036_0219522c(FieldActor *actor);
+BOOL func_ov036_0219523c(FieldActor *actor);
+BOOL func_ov036_0219524c(FieldActor *actor);
+BOOL func_ov036_0219525c(FieldActor *actor);
+BOOL func_ov036_0219526c(FieldActor *actor);
+BOOL func_ov036_0219527c(FieldActor *actor);
+BOOL func_ov036_0219528c(FieldActor *actor);
+BOOL func_ov036_0219529c(FieldActor *actor);
+BOOL func_ov036_021952ac(FieldActor *actor);
+BOOL func_ov036_021952cc(FieldActor *actor);
+void func_ov036_02195354(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
+// Also fldmmdl_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion of
+// an actor's 3D object, the tile under a rail position, and the direction an actor on the rails faces for a camera
+// angle
+void func_ov036_021946f4(MMSys *system);
+FieldG3DObjSystem *FldAct_GetG3DObjSystem(FieldActor *actor);
+u16 func_ov036_021948a0(FieldActor *actor);
+void func_ov036_021948ec(FieldActor *actor, u16 objIdx);
+u32 func_ov036_02194990(FieldActor *actor, const RailPosition *pos);
+u8 func_ov036_021949a4(FieldActor *actor, int angle);
 // The unit vector of a direction along the actor's rail
 void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest);
 void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest);
@@ -170,16 +268,48 @@ void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest);
 void GetActorRailPos(FieldActor *actor, RailPosition *position);
 void func_ov036_02195928(FieldActor *actor, RailPosition *position);
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position);
+// Overlay 36's fld_act_rail.c: the actor's position as its rail unit holds it, the unit's step, the collision flags of
+// a step in a direction (1 off the rails, 2 a blocked tile, 4 another actor), the first actor on a rail position other
+// than exclude, and the change of the actor's grid position to the one a step ahead
+void func_ov036_02195604(FieldActor *actor, RailPosition *position);
+void func_ov036_02195624(FieldActor *actor);
+void func_ov036_02195640(FieldActor *actor, u16 dir, u32 speed);
+u32 func_ov036_021956e8(FieldActor *actor, u16 dir);
+u32 func_ov036_021956f4(FieldActor *actor, u16 dir, u32 *tile);
+FieldActor *func_ov036_0219584c(MMSys *system, const RailPosition *position, BOOL checkInit, FieldActor *exclude);
+void func_ov036_021959bc(FieldActor *actor, u16 dir);
+// The move codes of the rail actors: their init, update and delete functions
+void func_ov036_02195b1c(FieldActor *actor);
+void func_ov036_02195b28(FieldActor *actor);
+void func_ov036_02195b38(FieldActor *actor);
+void func_ov036_02195b48(FieldActor *actor);
+void func_ov036_02195b58(FieldActor *actor);
+void func_ov036_02195b64(FieldActor *actor);
+void func_ov036_02195b70(FieldActor *actor);
+void func_ov036_02195b7c(FieldActor *actor);
+void func_ov036_02195b88(FieldActor *actor);
+void func_ov036_02195b94(FieldActor *actor);
+void func_ov036_02195ba0(FieldActor *actor);
+void func_ov036_02195bac(FieldActor *actor);
+void func_ov036_02195bb8(FieldActor *actor);
+void func_ov036_02195bc4(FieldActor *actor);
+void func_ov036_02195bd0(FieldActor *actor);
+void func_ov036_02195bdc(FieldActor *actor);
+void func_ov036_02195be4(FieldActor *actor);
+void func_ov036_02195bec(FieldActor *actor);
+void func_ov036_02195bf8(FieldActor *actor);
+void func_ov036_02195c04(FieldActor *actor);
+void func_ov036_02195c0c(FieldActor *actor);
+void func_ov036_02195c14(FieldActor *actor);
+void func_ov036_02195c1c(FieldActor *actor);
+void func_ov036_02195c24(FieldActor *actor);
+// Clears the rail data to no points, with the curves' and cameras' function tables
+void RailDataHandle_Reset(RailDataHandle *handle);
 u32 GetIndexOfObjID(u16 objCode);
 
-// Overlay 36's table that func_ov036_02194650 indexes, by a record's unk9
+// Overlay 36's table that func_ov036_02194650 indexes, by a record's unk9: the animations of the billboard actors
 typedef struct {
-    u16 unk0_0 : 14;
-    u16 unk0_14 : 2;
-} Ov036Unk021cf1c8Entry;
-
-typedef struct {
-    const Ov036Unk021cf1c8Entry *const *unk0;
+    const BlActAnimStep *const *unk0;
     u32 unk4;
 } Ov036Unk021cf1c8;
 

@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Ira",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_M_162",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HYDREIGON",
+            "form": 0,
+            "level": 77,
+            "difficulty": 224,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_CHOPLE_BERRY",
+            "moves": [ "MOVE_OUTRAGE", "MOVE_DARK_PULSE", "MOVE_FIRE_BLAST", "MOVE_EARTHQUAKE" ]
+        },
+        {
+            "species": "SPECIES_ARTICUNO",
+            "form": 0,
+            "level": 77,
+            "difficulty": 224,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_ICE_GEM",
+            "moves": [ "MOVE_FROST_BREATH", "MOVE_ICE_SHARD", "MOVE_SIGNAL_BEAM", "MOVE_ROOST" ]
+        },
+        {
+            "species": "SPECIES_ENTEI",
+            "form": 0,
+            "level": 77,
+            "difficulty": 224,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LIFE_ORB",
+            "moves": [ "MOVE_OVERHEAT", "MOVE_STONE_EDGE", "MOVE_IRON_TAIL", "MOVE_ROAR" ]
+        }
+    ],
+    "messages": []
+}

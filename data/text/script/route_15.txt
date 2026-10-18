@@ -1,4 +1,0 @@
-Route15_Text_Route15 = Route 15
-Route15_Text_Route15_2 = Route 15
-Route15_Text_PokeTransferLabWhats = Poké Transfer Lab\nWhat's Poké Transfer? Come find out!
-Route15_Text_MarvelousBridgeTrulyMarvelous = Marvelous Bridge\nTruly marvelous! And also a bridge!

@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Wesley",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GURDURR",
+            "form": 0,
+            "level": 41,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "This is my path!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This is everyone's path!"
+        },
+        {
+            "type": 2,
+            "text": "Go forth on your path!"
+        }
+    ]
+}

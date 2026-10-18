@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jude",
+    "class": "TRAINER_CLASS_POKEFAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 16,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CLEFAIRY",
+            "form": 0,
+            "level": 35,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "When Pokémon Trainers meet,\nwhat we do is, of course,{be00}\nengage in a Pokémon battle, don't we?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oh no...\nI'm pathetic..."
+        },
+        {
+            "type": 2,
+            "text": "Perhaps I meet people here because of\nguidance from my Pokémon."
+        }
+    ]
+}

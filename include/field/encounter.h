@@ -78,10 +78,6 @@ struct EncData {
 };
 
 extern const char data_ov012_0216e240[];
-extern const u16 ROAMING_POKEMON_ZONES[17];
-// The places in the Abyssal Ruins where Flash and Strength can be used
-extern const HiddenArea ABYSSAL_RUINS_FLASH_ROCK_RADIUS;
-extern const HiddenArea ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS;
 
 BOOL EncData_Load(EncData *encData, ArcTool *arc, u16 zoneId, u8 season);
 EncountState *EncountState_Create(HeapID heapId);
@@ -127,7 +123,7 @@ void func_ov036_021a2364(EncountSystem *system);
 void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32 style, u32 partnerId, u32 trainerId,
                               u32 trainerId2, HeapID heapId);
 // The battle's encounter effect and music, against the wild species or the trainer
-void EventBattleCall_DecideEnvWild(u32 species, u32 form, u32 a2, BOOL a3, Field *field, u32 *encEffect, u16 *bgm);
+void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field *field, u32 *encEffect, u16 *bgm);
 void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffect, u16 *bgm);
 
 void EncountSystem_CancelPhenomenon(EncountSystem *encountSystem);

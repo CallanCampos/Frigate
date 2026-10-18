@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_FORRETRESS",
+    "moves": [ "MOVE_STRUGGLE_BUG", "MOVE_GYRO_BALL", "MOVE_PAIN_SPLIT", "MOVE_STEALTH_ROCK" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_APICOT_BERRY",
+    "form": 0
+}

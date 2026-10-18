@@ -80,3 +80,18 @@ lib/twl/src/dsp/dsp_graphics.c:
     .text       start:0x02707310 end:0x02707628
     .data       start:0x0276aec8 end:0x0276aee0
     .bss        start:0x0276dbdc end:0x0276dd4c
+
+lib/twl/src/syscall/syscall_twl_ltd.c:
+    .ltdmain    start:0x027696e8 end:0x02769930
+
+lib/twl/src/card/card_rom_twl.c:
+    .ltdmain    start:0x027674a0 end:0x02767674
+    .bss        start:0x0276aee0 end:0x0276af74
+
+lib/twl/src/dsp/dsp_g711_image.c:
+    complete
+    .rodata     start:0x02707fcc end:0x0272ecec
+
+lib/twl/src/dsp/dsp_graphics_image.c:
+    complete
+    .rodata     start:0x0272ecec end:0x02767480

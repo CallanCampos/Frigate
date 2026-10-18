@@ -59,7 +59,7 @@ order you write them.
 - Structs: when a work struct or a struct shared by several functions has no layout yet, let the `struct-recovery`
   agent derive it from every access. Small, file-local works can be read off directly.
 - Constants: items, moves, species, types, sounds, trainer classes, trainers, zones, wild encounter tables, event flags
-  and event variables are lists in `data/constants/`, which the build turns into `constants/*.h` headers; add a
+  and event variables are lists in `generated/`, which the build turns into `constants/*.h` headers; add a
   missing one to its list, never to a header, and rename one with `rename_constant.py`, as when a numbered zone turns
   out to be a named room. A member of an archive that the code loads by number goes in `narc_<archive>.txt` once the
   code shows what it is (see `docs/data.md`, Constant lists). `include/constants/` holds the hand-written ones,

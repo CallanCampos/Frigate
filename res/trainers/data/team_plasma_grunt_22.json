@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DEINO",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DEINO",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SNEASEL",
+            "form": 0,
+            "level": 45,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Even if we don't have our hero anymore,\nwe still won't lose!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Plasmaaaa!\nGlory to Team Plasma!"
+        },
+        {
+            "type": 2,
+            "text": "Maybe if Team Plasma can take over the\nUnova region, our king will come back..."
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Sweet Scent",
+    "description": "A sweet scent that lowers the opposing\nteam's evasiveness. It also lures wild\nPokémon if used in grass, etc.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_STAT_CHANGE",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_EVA_DOWN",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_ADJACENT_FOES",
+    "stat_changes": [
+        {
+            "stat": "BATTLEMON_EVASION_STAGE",
+            "stages": -1,
+            "chance": 0
+        }
+    ],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_REFLECTABLE", "MOVE_FLAG_MIRROR_MOVE" ]
+}

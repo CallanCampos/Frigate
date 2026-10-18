@@ -1,0 +1,48 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 7,
+            "dark_grass": 0,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 1
+        },
+        "grass": [
+            [ "SPECIES_BOLDORE", 54, 54 ],
+            [ "SPECIES_DURANT", 54, 54 ],
+            [ "SPECIES_BOLDORE", 55, 55 ],
+            [ "SPECIES_WOOBAT", 54, 54 ],
+            [ "SPECIES_LAIRON", 55, 55 ],
+            [ "SPECIES_NOSEPASS", 55, 55 ],
+            [ "SPECIES_LAIRON", 57, 57 ],
+            [ "SPECIES_NOSEPASS", 57, 57 ],
+            [ "SPECIES_BOLDORE", 56, 56 ],
+            [ "SPECIES_ONIX", 57, 57 ],
+            [ "SPECIES_BOLDORE", 56, 56 ],
+            [ "SPECIES_ONIX", 57, 57 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [
+            [ "SPECIES_EXCADRILL", 54, 54 ],
+            [ "SPECIES_ONIX", 54, 54 ],
+            [ "SPECIES_EXCADRILL", 55, 55 ],
+            [ "SPECIES_EXCADRILL", 55, 55 ],
+            [ "SPECIES_EXCADRILL", 56, 56 ],
+            [ "SPECIES_EXCADRILL", 56, 56 ],
+            [ "SPECIES_EXCADRILL", 57, 57 ],
+            [ "SPECIES_EXCADRILL", 57, 57 ],
+            [ "SPECIES_EXCADRILL", 57, 57 ],
+            [ "SPECIES_STEELIX", 57, 57 ],
+            [ "SPECIES_EXCADRILL", 57, 57 ],
+            [ "SPECIES_STEELIX", 57, 57 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

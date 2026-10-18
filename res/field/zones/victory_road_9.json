@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": "AREA_BLACK_CITY_3",
+    "matrix": "MAP_MATRIX_BLACK_CITY_3",
+    "scripts": "SCRIPTS_VICTORY_ROAD_9",
+    "text": "SCRIPT_TEXT_VICTORY_ROAD_9",
+    "bgm": "SEQ_BGM_D_CHAMPROAD",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_VICTORY_ROAD_2",
+    "place": "PLACE_VICTORY_ROAD",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 5,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": false,
+    "entralink_warp": false,
+    "cam_bound": 44,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

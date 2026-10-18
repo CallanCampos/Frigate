@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_NIMBASA_CITY_14",
+    "texture_set": "MAP_TEXTURE_SET_NIMBASA_CITY_14",
+    "srt_animation": 11,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 132,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}
