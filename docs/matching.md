@@ -8,6 +8,13 @@ tools that show the differences.
 
 ## Registers
 
+- A macro that assigns, `NNSi_G2dUnpackOffset(ptr, base)` (`ptr = ptr + base`), with its result assigned again,
+  `ptr = NNSi_G2dUnpackOffset(ptr, base)`, as NitroSystem writes it at some sites, computes the index's shift before
+  the array's base and swaps the registers of an `[rn, rm]` address: `NNS_G2dUnpackNAN`'s `pContent` and
+  `NNSi_G2dUnpackUserExCellAttrBank`'s `pAttr` stores match only so, and the other sites only without it.
+- A narrow count local changes the arithmetic it feeds: `NNS_G2dGetNewOamManagerInstanceAsFastTransferMode`
+  (`g2d_OAM.c`) matches with `u16 affineNum = num / 4; affineLast = affineFrom + (affineNum - 1)`, and is 88 bytes
+  off with `num / 4 - 1` in the sum.
 - The order of two independent updates in a loop body can decide the coloring of a whole function, even when the
   asm shows them in the other order: the SSP decoder's `func_ov257_021abd84` (`ssp_jpegdec.c`) matches only with
   `l++;` written before `sBitsLeft--;`, though the original emits the decrement first, and no declaration order moves
@@ -2157,6 +2164,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- A block that several branches share, chosen by a flag tested at the end (`BOOL average = FALSE; ... if (average)`),
+  costs a register for the flag and its sets and test: MWCC never threads the constant flag into direct branches, so
+  the push grows and every register shifts (8 bytes in NitroSystem's `getTransData_`, `nsbca.c`, and the game's
+  copy, `RollerCoaster_GetTransData`). Forward gotos to labelled tail blocks (`goto average;`, `goto read;`) give the
+  original's direct branches, laid out in source order, so a plain path that comes after the shared block needs its
+  own `goto read` and label. In the `*Interp_` readers a `plain:` block falling through into `blend:` gives the
+  original's one block of default ratio, multiplier and shift that the interpolating cases skip.
 - `ctvt_game_cam.c`'s `CtvtGameCam_SeqStart` tests `cameraEnabled` first, then calls
   `CommTvt_IsCameraEnabled` in its true arm. Both the inner and outer false arms call
   `CtvtGameCamSeq_Set(seq, CtvtGameCam_SeqRouletteIntro)`. MWCC shares that call's tail but keeps the outer false
