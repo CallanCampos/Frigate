@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-716 of 1688 functions are in source files.
+874 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -123,6 +123,21 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
+| `gp.c` | `0x0217241c`–`0x02172d68` | 21 | complete | descriptive |
+| `gpi.c` | `0x02172d68`–`0x02173504` | 6 | complete | descriptive |
+| `gpiBuddy.c` | `0x02173504`–`0x02174dd4` | 12 | complete | descriptive |
+| `gpiBuffer.c` | `0x02174dd4`–`0x02175458` | 13 | partial | descriptive |
+| `gpiCallback.c` | `0x02175458`–`0x02175750` | 4 | complete | descriptive |
+| `gpiConnect.c` | `0x02175750`–`0x0217688c` | 10 | complete | descriptive |
+| `gpiInfo.c` | `0x0217688c`–`0x02177cc0` | 13 | complete | descriptive |
+| `gpiKeys.c` | `0x02177cc0`–`0x02178084` | 8 | complete | descriptive |
+| `gpiOperation.c` | `0x02178084`–`0x02178458` | 7 | complete | descriptive |
+| `gpiPeer.c` | `0x02178458`–`0x02179220` | 24 | complete | descriptive |
+| `gpiProfile.c` | `0x02179220`–`0x02179834` | 20 | complete | descriptive |
+| `gpiSearch.c` | `0x02179834`–`0x0217b5fc` | 7 | partial | descriptive |
+| `gpiTransfer.c` | `0x0217b5fc`–`0x0217b6a8` | 2 | complete | descriptive |
+| `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
+| `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
