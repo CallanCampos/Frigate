@@ -67,9 +67,9 @@ jobs:
         run: cmake --build build/port --target frigate-black2_app
 
   # Windows, with MSYS2's CLANG64 environment: clang, lld, compiler-rt and the UCRT, with CMake, Ninja and SDL3 from its
-  # packages, so that the build's GCC-style flags are the same as on macOS and Linux (ADR 0013). Only res/text of the
-  # game's data is checked out, which is all the host build reads (port/tools/gen_host_tree.py); git keeps the files'
-  # line endings as they are
+  # packages, so that the build's GCC-style flags are the same as on macOS and Linux (ADR 0013). The game's images,
+  # sounds and models under res/ (68,000 of its 119,000 files) aren't checked out: the host build reads only its text and
+  # the data that the text's headers name (port/tools/gen_host_tree.py). git keeps the files' line endings as they are
   host-windows:
     name: Host build (windows-2025)
     runs-on: windows-2025
@@ -91,8 +91,9 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
-            !/res/
-            /res/text/
+            !/res/**/*.png
+            !/res/**/*.wav
+            !/res/**/*.glb
 
       - name: Set up Python
         uses: actions/setup-python@v7
