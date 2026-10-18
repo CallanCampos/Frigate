@@ -1307,7 +1307,7 @@ data_ov182_021c0538 kind:data(any) addr:0x021c0538
 data_ov182_021c054e kind:data(any) addr:0x021c054e
 data_ov182_021c0550 kind:data(any) addr:0x021c0550
 data_ov182_021c0578 kind:data(any) addr:0x021c0578
-data_ov182_021c0580 kind:data(any) addr:0x021c0580
+sArchiveName kind:data(any) addr:0x021c0580
 data_ov182_021c0584 kind:data(any) addr:0x021c0584
 data_ov182_021c0588 kind:data(any) addr:0x021c0588
 data_ov182_021c058c kind:data(any) addr:0x021c058c
@@ -1668,12 +1668,12 @@ data_ov182_021c4178 kind:bss addr:0x021c4178
 data_ov182_021c417c kind:bss addr:0x021c417c
 gWork kind:bss addr:0x021c4180
 sDownloadPlaySysWork kind:bss addr:0x021c4188
-data_ov182_021c418c kind:bss addr:0x021c418c
-data_ov182_021c4190 kind:bss addr:0x021c4190
-data_ov182_021c4194 kind:bss addr:0x021c4194
+sResource kind:bss addr:0x021c418c
+sScreens kind:bss addr:0x021c4190
+sCells kind:bss addr:0x021c4194
 data_ov182_021c419c kind:bss addr:0x021c419c
 data_ov182_021c41a0 kind:bss addr:0x021c41a0
-data_ov182_021c41a4 kind:bss addr:0x021c41a4
+sHeap kind:bss addr:0x021c41a4
 data_ov182_021c41a8 kind:bss addr:0x021c41a8
 data_ov182_021c41ac kind:bss addr:0x021c41ac
 data_ov182_021c41b0 kind:bss addr:0x021c41b0

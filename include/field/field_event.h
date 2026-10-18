@@ -43,6 +43,9 @@ GameEvent *CallFieldMapEntranceInTransition(GameSystem *gsys, Field *field, u32 
                                             u8 endSeason);
 GameEvent *CallFieldMapEntranceOutTransition(GameSystem *gsys, Field *field, u32 type, u32 a3, u32 a4);
 GameEvent *CallFieldMapEntranceOutTransitionDefault(GameSystem *gsys, Field *field, u32 type, u32 a3);
+// The season banner's event between two seasons, which calls callback with callbackArg
+GameEvent *func_ov036_021b8800(GameSystem *gsys, Field *field, u8 startSeason, u8 endSeason,
+                               void (*callback)(void *arg), void *callbackArg);
 GameEvent *CreateFieldCloseEvent(GameSystem *gsys, Field *field);
 GameEvent *EventDig_Create(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged);
 BOOL EventEntralinkWarpIn_CheckAllowed(GameSystem *gsys);
@@ -82,10 +85,10 @@ GameEvent *EventFieldEffect_Create(GameSystem *gsys, Fld3DCi *ci, u8 effectId);
 // The fade out of the field before flying
 GameEvent *func_ov036_021b8890(GameSystem *gsys, Field *field, u32 a2, u32 a3);
 GameEvent *func_ov036_021b8850(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
-GameEvent *func_ov036_021b95ac(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged, u16 prevSeason,
-                               u16 season);
-GameEvent *func_ov036_021b95e0(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged, u16 prevSeason,
-                               u16 season);
+GameEvent *func_ov036_021b95ac(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
+                               u32 season);
+GameEvent *func_ov036_021b95e0(GameEvent *event, GameSystem *gsys, Field *field, BOOL seasonChanged, u32 prevSeason,
+                               u32 season);
 GameEvent *func_ov036_021b9614(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b9664(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *func_ov036_021b9df8(GameEvent *event, GameSystem *gsys, Field *field);
