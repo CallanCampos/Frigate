@@ -214,8 +214,8 @@ int AossAp_Disconnect(void) {
     return result;
 }
 
-static // Searches for access points and lists them; 0 if it ended well
-    int AossAp_Scan(WifiScanList **list) {
+// Searches for access points and lists them; 0 if it ended well
+static int AossAp_Scan(WifiScanList **list) {
     int result = -1;
     BOOL running = TRUE;
     BOOL started = FALSE;
@@ -320,8 +320,8 @@ static // Searches for access points and lists them; 0 if it ended well
     return result;
 }
 
-static // Connects to the access point; 0 if it did
-    int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *result) {
+// Connects to the access point; 0 if it did
+static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *result) {
     BOOL running = TRUE;
     int status = -1;
     int connected = 0;
