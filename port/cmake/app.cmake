@@ -1,10 +1,12 @@
 # The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the gamepads, the
 # log of an app opened from the Finder, the run directory for the oracle's comparisons with the symbol lookup its memory
-# dumps use, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The
-# screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds.
+# dumps use, the sound driver's trace, and input replays with the oracle's input file reader
+# (port/tools/oracle/pbwinput.c, plain C11). The screens they show are drawn by port/gfx/screens.c, which the port_gfx
+# target builds.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/sound_trace.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")

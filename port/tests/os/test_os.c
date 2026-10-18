@@ -639,6 +639,51 @@ static void TestFrameHooksOnHostStack(void) {
                "vblank 3 (irq mode 1, line 192)", "main waited");
 }
 
+// A module's timed work (port_os_set_timed_work, as the ARM7's sound alarms use it) runs on the host's stack when the
+// clock reaches its moment, as an event of the clock, so that an interrupt it requests (timer 3's here, which the OS
+// doesn't use) is taken there: here while main
+// waits for the VBlank, at line 50 (the moment, moved there from line 20) and, set again from the work, at line 100. A
+// moment cancelled with UINT64_MAX never comes, and one already past comes at once
+// Timer 3's interrupt, which the decomp's os.h doesn't name
+#define TIMER3_IRQ (OS_IE_TIMER0 << 3)
+
+// The SDK calls a timer's function once (OSi_IrqCallback), so it sets itself again
+static void TimedWorkHandler(void) {
+    Log("timer 3 (irq mode %d, line %u)", OS_GetProcMode() == OS_PROCMODE_IRQ, port_os_vcount());
+    OS_SetIrqFunction(TIMER3_IRQ, TimedWorkHandler);
+}
+
+static void TimedWork(void) {
+    Log("work (host stack %d, line %u)", port_fiber_current() == NULL, port_os_vcount());
+    port_os_request_irq(TIMER3_IRQ);
+    if (port_os_vcount() == 50) {
+        port_os_set_timed_work(TimedWork, port_os_cycles() + 50 * PORT_OS_CYCLES_PER_LINE);
+    }
+}
+
+static void CancelledWork(void) {
+    Log("cancelled work");
+}
+
+static void TestTimedWork(void) {
+    Boot(LoggingVBlankHandler);
+    OS_SetIrqFunction(TIMER3_IRQ, TimedWorkHandler);
+    OS_EnableIrqMask(TIMER3_IRQ);
+    port_os_set_timed_work(TimedWork, port_os_cycles() + 20 * PORT_OS_CYCLES_PER_LINE);
+    port_os_set_timed_work(TimedWork, port_os_cycles() + 50 * PORT_OS_CYCLES_PER_LINE);
+    port_os_set_timed_work(CancelledWork, port_os_cycles() + 30 * PORT_OS_CYCLES_PER_LINE);
+    port_os_set_timed_work(CancelledWork, UINT64_MAX);
+    OS_WaitIrq(TRUE, OS_IE_V_BLANK);
+    Log("main waited");
+    port_os_set_timed_work(TimedWork, 0);
+    OS_WaitIrq(TRUE, OS_IE_V_BLANK);
+    Log("main waited again");
+    EXPECT_LOG("work (host stack 1, line 50)", "timer 3 (irq mode 1, line 50)", "work (host stack 1, line 100)",
+               "timer 3 (irq mode 1, line 100)", "vblank 1 (irq mode 1, line 192)", "main waited",
+               "work (host stack 1, line 192)", "timer 3 (irq mode 1, line 192)", "vblank 2 (irq mode 1, line 192)",
+               "main waited again");
+}
+
 // Loading a context whose I bit is clear takes a pending interrupt before the thread's first instruction. Main sets
 // the I bit, a VBlank comes and waits, and main wakes a higher, new thread, whose context starts with the I bit clear:
 // the handler runs before it does
@@ -1305,6 +1350,7 @@ static const Test sTests[] = {
     { "hblank_main_loop", TestHBlankMainLoop },
     { "dispstat_gates_blanks", TestDispStatGatesBlanks },
     { "frame_hooks_on_host_stack", TestFrameHooksOnHostStack },
+    { "timed_work", TestTimedWork },
     { "irq_on_switch_in", TestIrqOnSwitchIn },
     { "async_completion", TestAsyncCompletion },
     { "waits", TestWaits },

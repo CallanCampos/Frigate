@@ -295,6 +295,7 @@ u16 snd7_calc_timer(int timer, int pitch);
 int snd7_sin_idx(int index);
 u16 snd7_calc_random(void);
 void snd7_set_random(u32 seed);
+u32 snd7_random_state(void);
 extern const s16 snd7_decibel_square_table[128];
 extern const u16 snd7_pitch_table[768];
 
@@ -368,7 +369,8 @@ void snd7_stop_capture(u32 capBitMask);
 // The mixer: the sound unit's next sample, left and right, after its channels move on by one mixer period
 void snd7_hw_mix(s16 out[2]);
 
-// A channel's registers and what it plays now, for tests: the sample's index in the sound and its value
+// A channel's registers and what it plays now, for tests and the trace: the sample's index in the sound and its value,
+// and the mixer sample (counted from the unit's reset) whose mixing took the channel's last start first
 typedef struct Snd7HwPeek {
     u32 cnt;
     const u8 *sad;
@@ -377,6 +379,7 @@ typedef struct Snd7HwPeek {
     u32 len;
     u32 index;
     s32 sample;
+    u32 startMix;
 } Snd7HwPeek;
 
 void snd7_hw_peek(int chNo, Snd7HwPeek *peek);

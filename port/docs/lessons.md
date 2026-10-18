@@ -3,6 +3,16 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-17: the sound against the oracle
+
+- **A host whose CPU takes no time changes who wins a race the DS's CPU time decides.** The ARM7's alarms ran lazily
+  (at each VBlank and each word of the ARM9), which is the same state whenever anyone looks, but not the same
+  interrupts: two or three alarms a frame reached the ARM9 together, and NitroSystem's stream player, which drops a
+  queued block when a third arrives before its thread has read one, played a block of silence every 7 frames or so
+  and fell behind the DS's music. Anything the hardware raises as an interrupt on its own clock needs the OS core's
+  timed work (`port_os_set_timed_work`), not a catch-up at the next VBlank. The same instant ARM9 then rewrote a
+  stream's buffer two samples before the channel played them, which the DS's FIFO, read ahead, never sees.
+
 ## 2026-10-17: New Game's intro, after review
 
 - **The decomp's incomplete C can differ from the ROM where only aliasing shows it.** `MTX_Concat44` and its siblings

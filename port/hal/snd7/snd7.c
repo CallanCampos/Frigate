@@ -25,7 +25,11 @@
 //     wake-up, with all 256 commands sent, isn't modelled;
 //   - the alarms (SND_SetupAlarm, which the stream player uses) are the ARM7's OS alarms on the virtual clock, each
 //     sending the ARM9 its number and ID; their handler's count of words still to send covers a full FIFO (16 words
-//     waiting in the ARM9's), as on the DS.
+//     waiting in the ARM9's), as on the DS. The next alarm is the OS core's timed work (port_os_set_timed_work), so
+//     that its word reaches the ARM9 when it goes off, as on the DS, and not with the others of the frame at the
+//     VBlank: NitroSystem's stream player queues a block to read at each alarm and drops the oldest when a third
+//     comes before its thread has read one, which two or three alarms a frame taken together did every 7 frames or
+//     so, playing a block of silence and the rest of the stream a block late.
 //
 // Pointers: the packet's word carries the low 26 bits of the address of its first command, and the commands carry
 // pointers in 32-bit arguments, which a 64-bit host cuts. The packet is always the ARM9's queue's ready list
@@ -40,6 +44,7 @@
 #include "hal/snd7/snd7_internal.h"
 #include "hal/snd7/snd7_output.h"
 #include "nitro/pxi.h"
+#include "tools/oracle/sndtrace.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,6 +92,11 @@ static struct {
     // The things reported once a run: a packet that isn't the ARM9's, data that can't be found
     BOOL reportedPacket;
     BOOL reportedPointer;
+    // The trace, called after each run
+    PortSnd7Trace trace;
+    void *traceUser;
+    // An alarm's moment is the OS core's timed work
+    BOOL alarmScheduled;
 } sSnd;
 
 // Memory the ARM9 gave the driver
@@ -235,6 +245,29 @@ static void AlarmHandler(Snd7Alarm *alarm) {
     }
 }
 
+static void Advance(u64 cycles);
+
+// The OS core's timed work at the next alarm: the driver runs to it, which sends its word
+static void AlarmWork(void) {
+    Advance(port_os_cycles());
+}
+
+// The next alarm's moment for the OS core, or none
+static void ScheduleAlarm(void) {
+    u64 due = UINT64_MAX;
+    int i;
+
+    for (i = 0; i < SND7_ALARM_NUM; i++) {
+        if (snd7_work.alarm[i].armed && snd7_work.alarm[i].due < due) {
+            due = snd7_work.alarm[i].due;
+        }
+    }
+    if (sSnd.alarmScheduled || due != UINT64_MAX) {
+        port_os_set_timed_work(AlarmWork, due);
+        sSnd.alarmScheduled = due != UINT64_MAX;
+    }
+}
+
 static void FireAlarm(Snd7Alarm *alarm) {
     if (alarm->periodic) {
         alarm->due += alarm->period * SND7_OS_TICK_CYCLES;
@@ -291,6 +324,9 @@ static void RunThread(BOOL doPeriodicProc) {
     snd7_exchannel_main(doPeriodicProc);
     UpdateSharedWork();
     (void)snd7_calc_random();
+    if (sSnd.trace != NULL) {
+        sSnd.trace(doPeriodicProc, sSnd.traceUser);
+    }
 }
 
 static void FlushOutput(void) {
@@ -357,6 +393,7 @@ static void Advance(u64 cycles) {
         }
     }
     sSnd.now = cycles;
+    ScheduleAlarm();
 }
 
 // The commands (SND_CommandProc, 0x03803450)
@@ -413,6 +450,118 @@ void snd7_read_driver_info(SNDDriverInfo *info) {
         }
     }
     memcpy(info->unk_11c4, &locked, sizeof(locked));
+}
+
+// The trace (snd7_output.h): the driver's work in the DS's layout (port/tools/oracle/sndtrace.h). The fields that the
+// host keeps as the DS does are copied as they are, which these offsets, from the ARM7's code, hold to: a channel's up
+// to its wave's parameters, a player's up to its bank, a track's up to its sequence
+_Static_assert(offsetof(Snd7ExChannel, envDecay) == 0x10 && offsetof(Snd7ExChannel, volume) == 0x24 &&
+                   offsetof(Snd7ExChannel, lfo) == 0x28 && offsetof(Snd7ExChannel, length) == 0x34 &&
+                   offsetof(Snd7ExChannel, wave) == 0x38 && sizeof(Snd7WaveParam) == SND7_WAVE_PARAM_SIZE &&
+                   offsetof(Snd7ExChannel, data) >= 0x44,
+               "a channel's fields up to its wave's parameters are the DS's");
+_Static_assert(offsetof(Snd7Player, tempo) == 0x18 && offsetof(Snd7Player, bank) >= SND7_PLAYER_PARAM_SIZE,
+               "a player's fields up to its bank are the DS's");
+_Static_assert(offsetof(Snd7Track, wait) == 0x20 && offsetof(Snd7Track, base) >= SND7_TRACK_PARAM_SIZE,
+               "a track's fields up to its sequence are the DS's");
+_Static_assert(sizeof(SNDSharedWork) == PBW_SNDTRACE_SHARED_SIZE, "the shared work is the DS's");
+
+// The ARM7's address of the channel's sequencer callback (0x0380214c), the only one the driver gives a channel
+#define SEQ_CHANNEL_CALLBACK_ADDRESS 0x0380214cu
+
+// A link from the work into itself as the ARM7's address (a channel or a track; NULL is 0), else the pointer's low
+// 32 bits
+static u32 TraceLink(const void *pointer) {
+    uintptr_t at = (uintptr_t)pointer;
+    uintptr_t channels = (uintptr_t)snd7_work.channel;
+    uintptr_t tracks = (uintptr_t)snd7_work.track;
+
+    if (pointer == NULL) {
+        return 0;
+    }
+    if (at >= channels && at < channels + sizeof(snd7_work.channel)) {
+        return PBW_SNDTRACE_WORK_ADDRESS + (u32)((at - channels) / sizeof(Snd7ExChannel)) * PBW_SNDTRACE_CHANNEL_SIZE;
+    }
+    if (at >= tracks && at < tracks + sizeof(snd7_work.track)) {
+        return PBW_SNDTRACE_WORK_ADDRESS + PBW_SNDTRACE_TRACKS +
+               (u32)((at - tracks) / sizeof(Snd7Track)) * PBW_SNDTRACE_TRACK_SIZE;
+    }
+    return (u32)at;
+}
+
+static void TraceWork(u8 *work) {
+    int i;
+    int j;
+
+    for (i = 0; i < SND7_CHANNEL_NUM; i++) {
+        const Snd7ExChannel *channel = &snd7_work.channel[i];
+        u8 *out = work + i * PBW_SNDTRACE_CHANNEL_SIZE;
+
+        memcpy(out, channel, 0x44);
+        // A square wave's duty where a sound's samples are: the DS keeps them in one field
+        pbw_sndtrace_put32(out + 0x44, channel->type == SND7_EXCHANNEL_PSG ? channel->duty : TraceLink(channel->data));
+        pbw_sndtrace_put32(out + 0x48, channel->callback != NULL ? SEQ_CHANNEL_CALLBACK_ADDRESS : 0);
+        pbw_sndtrace_put32(out + 0x4c, TraceLink(channel->callbackData));
+        pbw_sndtrace_put32(out + 0x50, TraceLink(channel->nextLink));
+    }
+    for (i = 0; i < SND7_PLAYER_NUM; i++) {
+        const Snd7Player *player = &snd7_work.player[i];
+        u8 *out = work + PBW_SNDTRACE_PLAYERS + i * PBW_SNDTRACE_PLAYER_SIZE;
+
+        memcpy(out, player, SND7_PLAYER_PARAM_SIZE);
+        pbw_sndtrace_put32(out + 0x20, TraceLink(player->bank));
+    }
+    for (i = 0; i < SND7_TRACK_NUM; i++) {
+        const Snd7Track *track = &snd7_work.track[i];
+        u8 *out = work + PBW_SNDTRACE_TRACKS + i * PBW_SNDTRACE_TRACK_SIZE;
+
+        memcpy(out, track, SND7_TRACK_PARAM_SIZE);
+        pbw_sndtrace_put32(out + 0x24, TraceLink(track->base));
+        pbw_sndtrace_put32(out + 0x28, TraceLink(track->cur));
+        for (j = 0; j < SND7_CALL_STACK_DEPTH; j++) {
+            pbw_sndtrace_put32(out + 0x2c + j * 4, TraceLink(track->callStack[j]));
+            out[0x38 + j] = track->loopCount[j];
+        }
+        out[0x3b] = track->callStackDepth;
+        pbw_sndtrace_put32(out + 0x3c, TraceLink(track->channelList));
+    }
+    for (i = 0; i < SND7_ALARM_NUM; i++) {
+        const Snd7Alarm *alarm = &snd7_work.alarm[i];
+        u8 *out = work + PBW_SNDTRACE_ALARMS + i * PBW_SNDTRACE_ALARM_SIZE;
+
+        out[0] = alarm->enable;
+        out[1] = alarm->id;
+        out[2] = alarm->count;
+        pbw_sndtrace_put64(out + 4, alarm->tick);
+        pbw_sndtrace_put64(out + 0xc, alarm->period);
+    }
+}
+
+void port_snd7_set_trace(PortSnd7Trace trace, void *user) {
+    sSnd.trace = trace;
+    sSnd.traceUser = user;
+}
+
+void port_snd7_trace_record(uint8_t *record, int periodic) {
+    int i;
+
+    memset(record, 0, PBW_SNDTRACE_RECORD_SIZE);
+    pbw_sndtrace_put64(record + PBW_SNDTRACE_CYCLE, sSnd.now);
+    pbw_sndtrace_put32(record + PBW_SNDTRACE_SEED, snd7_random_state());
+    pbw_sndtrace_put32(record + PBW_SNDTRACE_PERIODS, periodic ? 1 : 0);
+    pbw_sndtrace_put32(record + PBW_SNDTRACE_LOCK, snd7_get_locked_channel(0));
+    pbw_sndtrace_put32(record + PBW_SNDTRACE_WEAK_LOCK, snd7_get_locked_channel(1));
+    for (i = 0; i < SND7_CHANNEL_NUM; i++) {
+        Snd7HwPeek peek;
+
+        snd7_hw_peek(i, &peek);
+        pbw_sndtrace_put32(record + PBW_SNDTRACE_CNT + i * 4, peek.cnt);
+        pbw_sndtrace_put32(record + PBW_SNDTRACE_START_MIX + i * 4, peek.startMix);
+    }
+    TraceWork(record + PBW_SNDTRACE_WORK);
+    if (snd7_shared != NULL) {
+        memcpy(record + PBW_SNDTRACE_SHARED, (const void *)snd7_shared, PBW_SNDTRACE_SHARED_SIZE);
+    }
 }
 
 static void ForChannels(u32 mask, void (*apply)(int chNo, u32 a, u32 b), u32 a, u32 b) {
@@ -704,6 +853,8 @@ static void SoundService(u32 tag, u32 data, BOOL err) {
     if (snd7_shared != NULL) {
         snd7_shared->finishedCommandTag++;
     }
+    // The alarms the packet started or stopped
+    ScheduleAlarm();
 }
 
 // Whether the DS's driver would still hold the ARM9's packet with the tag (SND_IsFinishedCommandTag's numbering, the
@@ -724,6 +875,8 @@ static void Boot(u64 cycles) {
     void *outputUser = sSnd.outputUser;
     s16 *buffer = sSnd.buffer;
     u32 bufferFrames = sSnd.bufferFrames;
+    PortSnd7Trace trace = sSnd.trace;
+    void *traceUser = sSnd.traceUser;
 
     memset(&sSnd, 0, sizeof(sSnd));
     memset(&snd7_work, 0, sizeof(snd7_work));
@@ -731,6 +884,8 @@ static void Boot(u64 cycles) {
     sSnd.outputUser = outputUser;
     sSnd.buffer = buffer;
     sSnd.bufferFrames = bufferFrames;
+    sSnd.trace = trace;
+    sSnd.traceUser = traceUser;
     snd7_shared = NULL;
     snd7_set_random(0x12345678);
     snd7_hw_reset();
@@ -744,6 +899,8 @@ static void Boot(u64 cycles) {
     snd7_set_output_selector(0, 0, 0, 0);
     snd7_set_master_volume(127);
     snd7_start_interval_timer();
+    // No alarm yet, whatever an earlier run left with the OS core
+    port_os_set_timed_work(AlarmWork, UINT64_MAX);
 }
 
 void port_snd7_start(void) {

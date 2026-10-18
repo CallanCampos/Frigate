@@ -31,4 +31,13 @@ uint64_t port_snd7_samples(void);
 void port_snd7_boot_at(uint64_t cycles);
 void port_snd7_advance(uint64_t cycles);
 
+// The driver's trace, to compare it with the DS's (port/tools/oracle/sndtrace.h, the program's --sound-trace): trace is
+// called after each run of the driver's thread, periodic or not, wherever the virtual clock passed it (at a VBlank, or
+// in the ARM9's call that sent a word, on a thread's fiber); NULL stops it. port_snd7_trace_record fills a record of
+// PBW_SNDTRACE_RECORD_SIZE bytes with what the driver knows of the run just made: everything but the frame and GFL's
+// frame count, which are the caller's
+typedef void (*PortSnd7Trace)(int periodic, void *user);
+void port_snd7_set_trace(PortSnd7Trace trace, void *user);
+void port_snd7_trace_record(uint8_t *record, int periodic);
+
 #endif // PORT_HAL_SND7_SND7_OUTPUT_H

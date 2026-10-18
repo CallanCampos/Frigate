@@ -6,8 +6,8 @@
 //   - the CPSR: OS_EnableInterrupts, OS_DisableInterrupts, OS_RestoreInterrupts, their IrqAndFiq pair,
 //     OS_GetCpsrIrq and OS_GetProcMode (os_system.c, assembly), and OS_Halt (os_terminate_proc.c, assembly);
 //   - the IRQ handler in ITCM and its thread-switch tail (OS_IrqHandler and func_01ff8ce0, assembly with no C);
-//   - the display's timing (VBlank, HBlank, V-count, VCOUNT and DISPSTAT's flags) and the hardware timers, on a
-//     virtual clock;
+//   - the display's timing (VBlank, HBlank, V-count, VCOUNT and DISPSTAT's flags), the hardware timers and the other
+//     modules' timed work (port_os_set_timed_work), on a virtual clock;
 //   - the dispatcher, which runs on the host's own stack.
 //
 // Each SDK context (the first member of its OSThread) is mapped to a fiber in a side table; the SDK's structs don't
@@ -59,8 +59,9 @@
 
 #define MAX_CONTEXTS 256
 #define INDEX_SIZE 1024
-// The host's work waiting for the dispatcher: lines for the scanline hook, and frames
+// The host's work waiting for the dispatcher: lines for the scanline hook, frames, and timed work (WORK_TIMED - slot)
 #define WORK_FRAME (-1)
+#define WORK_TIMED (-2)
 #define WORK_CAPACITY 1024
 
 // A context of the SDK and the fiber it runs on
@@ -90,7 +91,14 @@ typedef enum EventKind {
     EVENT_LINE,   // the start of a line: VCOUNT, the VBlank at line 192, the V-count match, the scanline hook
     EVENT_HBLANK, // the HBlank interrupt's request
     EVENT_TIMER,  // a timer that interrupts wraps
+    EVENT_TIMED,  // a module's timed work (port_os_set_timed_work)
 } EventKind;
+
+// A module's timed work and its moment, UINT64_MAX while it has none
+typedef struct TimedWork {
+    void (*work)(void);
+    u64 when;
+} TimedWork;
 
 // A hardware timer, counting up from reload by one every prescaler cycles since start, and wrapping to reload
 typedef struct Timer {
@@ -138,6 +146,7 @@ static u32 sWorkHead;
 static u32 sWorkCount;
 static void (*sFrameHooks[PORT_OS_MAX_FRAME_HOOKS])(void);
 static int sFrameHookCount;
+static TimedWork sTimedWork[PORT_OS_MAX_TIMED_WORK];
 
 void (*port_os_scanline_hook)(int line);
 
@@ -383,10 +392,37 @@ static void RunHostWork(void) {
         sWorkCount--;
         if (item == WORK_FRAME) {
             port_os_frame_hooks();
+        } else if (item <= WORK_TIMED) {
+            if (sTimedWork[WORK_TIMED - item].work != NULL) {
+                sTimedWork[WORK_TIMED - item].work();
+            }
         } else if (port_os_scanline_hook != NULL) {
             port_os_scanline_hook(item);
         }
     }
+}
+
+void port_os_set_timed_work(void (*work)(void), uint64_t when) {
+    int free = -1;
+    int i;
+
+    for (i = 0; i < PORT_OS_MAX_TIMED_WORK; i++) {
+        if (sTimedWork[i].work == work) {
+            sTimedWork[i].when = when;
+            return;
+        }
+        if (free < 0 && sTimedWork[i].work == NULL) {
+            free = i;
+        }
+    }
+    if (when == UINT64_MAX) {
+        return;
+    }
+    if (free < 0) {
+        Fatal("too many modules with timed work");
+    }
+    sTimedWork[free].work = work;
+    sTimedWork[free].when = when;
 }
 
 void port_os_frame_hooks(void) {
@@ -439,6 +475,16 @@ static u64 NextEvent(EventKind *kind, int *timerNo) {
             *timerNo = i;
         }
     }
+    for (i = 0; i < PORT_OS_MAX_TIMED_WORK; i++) {
+        // A moment already past comes now
+        u64 at = sTimedWork[i].when > sCycles ? sTimedWork[i].when : sCycles;
+
+        if (sTimedWork[i].work != NULL && sTimedWork[i].when != UINT64_MAX && at < when) {
+            when = at;
+            *kind = EVENT_TIMED;
+            *timerNo = i;
+        }
+    }
     return when;
 }
 
@@ -477,6 +523,11 @@ static void RaiseEvent(EventKind kind, u64 when, int timerNo) {
     case EVENT_TIMER:
         RequestIF(OS_IE_TIMER0 << timerNo);
         sTimers[timerNo].nextWrap += TimerPeriod(&sTimers[timerNo]);
+        break;
+    case EVENT_TIMED:
+        // Its moment is spent; the work sets the next
+        sTimedWork[timerNo].when = UINT64_MAX;
+        QueueWork(WORK_TIMED - timerNo);
         break;
     }
 }
@@ -749,6 +800,7 @@ PortOsResult port_os_run(void (*boot)(void)) {
     sNextHBlank = HBLANK_CYCLE;
     sFrame = 0;
     memset(sTimers, 0, sizeof(sTimers));
+    memset(sTimedWork, 0, sizeof(sTimedWork));
     sWorkHead = 0;
     sWorkCount = 0;
 

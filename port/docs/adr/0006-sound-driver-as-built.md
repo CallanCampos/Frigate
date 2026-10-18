@@ -25,11 +25,19 @@ through the driver's shared random generator, changes every random note after th
   tables (`snd7_tables.c`), and the sound unit the DS has in hardware: 16 channels of PCM8, PCM16, IMA-ADPCM, PSG
   and noise, and the mixer (`snd7_hw.c`). The ARM9 sends the same packets of `SNDCommand`s through the same PXI tag,
   and reads the same shared work (`SNDSharedWork`) and driver state, as on the DS.
+- **The sound unit is melonDS's model of the DS,** which the oracle comparison holds it to: a sound's first sample
+  comes on the channel's third timer step (an IMA-ADPCM sound's on its eleventh, a square wave's or noise's on its
+  first); a channel reads its sound ahead through a FIFO of 8 words, refilled 4 at a time; the channel moves on before
+  the mixer takes its sample; the mixer keeps GBATEK's widths (the fraction's low 10 bits dropped after the pan, the
+  master volume over 128, 8 bits dropped), with a volume, pan or master volume of 127 counting as 128; and the
+  channels stand still while SOUNDCNT's enable is clear.
 - **Time is the virtual clock's.** The driver's periodic run is the DS's OS alarm of 2728 ticks of 64 cycles, the
   first 0x10000 ticks after the driver starts; a wake-up word from the ARM9 runs a run that isn't periodic. The
-  driver catches up to the virtual clock at each VBlank and whenever the ARM9 sends a word, running the periodic
-  runs, alarms and mixer samples that fall before it in order. The same run of the game gives the same driver state
-  and the same samples, whenever the host looks.
+  driver catches up to the virtual clock at each VBlank, whenever the ARM9 sends a word, and at its next alarm
+  (`SND_SetupAlarm`'s, which the stream player uses), which is the OS core's timed work (`port_os_set_timed_work`):
+  the alarm's word reaches the ARM9 when it goes off, as on the DS, so that its interrupt is taken then. In each
+  catch-up the periodic runs, alarms and mixer samples that fall before it run in order. The same run of the game
+  gives the same driver state and the same samples, whenever the host looks.
 - **The output is the DS mixer's rate, 32,728.515625 Hz:** one stereo sample each 1024 cycles (512 ticks of the
   sound clock, half the 33.514 MHz bus clock), signed 16 bits. Samples are made on the game's thread as game time
   passes them and handed to `port/audio` at each VBlank, which queues them on an SDL3 audio stream at 32,728 Hz; SDL
