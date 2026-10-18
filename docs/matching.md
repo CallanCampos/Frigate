@@ -1977,14 +1977,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `u16` local that holds a call's result changes the operand order of a later add with it, and
   `index = first; index += kind;` truncates a `u32` field before the add, where `first + kind` does not
   (`ctvt_game.c`'s `CtvtGameTarget_UpdateHit` and `CtvtGameTarget_Draw`).
-- An `s16` local loaded before an add of two halfwords keeps its load first and gives the sum its register, with
-  the other operand loaded last (`ldrsh r2 = points[1]; ldrsh r1 = points[0]; adds r2, r1, r2`), where
-  `points[0] + points[1]` loads `points[0]` first into the destination. The local holds its place only when it is
-  assigned three times; one assigned once or twice, or an `s32` one, is forward-substituted into its use, as is a
-  fresh local of one assignment holding a partial sum, which then evaluates in its user's statement and reorders the
-  loads. A sum that is its own operand (`partial = point + partial`) stays a statement of its own but is written
-  destination first (`adds r2, r2, r1`), whatever the source order; only a cast on that operand blocks it
-  (`btl_client.c`'s `StudioScore_CalcTotal`, 1 byte short because of that add).
 - `*(data + pos + 1)` adds `pos` once and then loads at `#1`, where `data[pos + 1]` adds `pos + 1` first; and a value
   built in a `u16` local with `|=` and then returned has no final narrowing pair, where a returned `int` expression does
   (`ssp_exifdec.c`'s byte readers). The battle server's command queue reads its halfwords and words the same way,
