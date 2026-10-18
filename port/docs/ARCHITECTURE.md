@@ -40,10 +40,10 @@ links them into one program, `frigate-black2` or `frigate-white2`: `pokebw2_game
 `port_gfx` and `port_app` (with `port/audio` and the oracle's input file reader). At each configure it generates, in
 `build/port/gen` ([../tools/gen_host_tree.py](../tools/gen_host_tree.py)), the source list, an `include/` mirror
 without the decomp's C library headers, and host variants of the SDK headers in which every DS address goes through
-`PORT_HW_ADDR()` ([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)); at each build, a trap stub for every DS function or data
-object the game references that has no C yet ([../tools/gen_stubs.py](../tools/gen_stubs.py)). Every decomp file gets
-[../include/port_host.h](../include/port_host.h) force-included, and is compiled with MWCC's language model: signed
-`char`, int-sized enums, wrapping arithmetic, no strict aliasing, zeroed locals (PLAN.md §4.4).
+`PORT_HW_ADDR()` ([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)); at each build, a trap stub for every DS
+function or data object the game references that has no C yet ([../tools/gen_stubs.py](../tools/gen_stubs.py)). Every
+decomp file gets [../include/port_host.h](../include/port_host.h) force-included, and is compiled with MWCC's language
+model: signed `char`, int-sized enums, wrapping arithmetic, no strict aliasing, zeroed locals (PLAN.md §4.4).
 
 ## How a frame runs
 
@@ -53,9 +53,9 @@ object the game references that has no C yet ([../tools/gen_stubs.py](../tools/g
    [../hal/os/port_app.h](../hal/os/port_app.h)), checks them, and opens the replay and the run directory when asked.
 2. It calls `port_hw_init` ([../hal/hw/hw.h](../hal/hw/hw.h); the DS's memory windows are static arrays, so it has
    nothing to do yet), makes the trap placeholders inaccessible (`port_trap_protect_data`,
-   [../hal/trap.h](../hal/trap.h)), opens the window and the sound device (unless `--headless`), sets the input at rest, attaches the scanline hook ([../gfx/screens.c](../gfx/screens.c)) and the
-   geometry engine ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)), and adds its frame hooks: the 3D swap, then its own
-   `AppFrame`.
+   [../hal/trap.h](../hal/trap.h)), opens the window and the sound device (unless `--headless`), sets the input at rest,
+   attaches the scanline hook ([../gfx/screens.c](../gfx/screens.c)) and the geometry engine
+   ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)), and adds its frame hooks: the 3D swap, then its own `AppFrame`.
 3. It finds, maps and checks the player's ROM (`port_rom_boot`, [../hal/rom](../hal/rom/port_rom.h)) and places what
    the DS's boot leaves in main memory.
 4. **`port_os_run(NitroMain)`** ([../hal/os/core.c](../hal/os/core.c)) resets the OS layer, sets the registers as the

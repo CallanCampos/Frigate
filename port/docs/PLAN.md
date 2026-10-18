@@ -273,7 +273,10 @@ mods/examples/           sample mods, one per extension point
 The C must compile for MWCC (byte-identical ROMs) and for 64-bit hosts. Rules for every change outside `port/`:
 
 1. A change either compiles to the same bytes under MWCC (the ROM build proves it) or sits behind `PLATFORM_PC`.
-   One header (`include/platform.h`, included by `types.h`) is the only place that decides which.
+   What differs between MWCC and a host is defined in one place, `include/types.h`'s `PLATFORM_PC` block (`uptr`,
+   `sptr`, `ulong32` and `PORT_DS_ALIGN_64`, a port change with its rows in `port/docs/game-changes.md`).
+   `PLATFORM_PC` itself is defined only by the host build (`port_decomp_env` in `port/CMakeLists.txt`), never by a
+   header, and the host build force-includes `port/include/port_host.h` into every decomp file.
 2. Base types are already right: `u32`/`s32` are `int` in `include/types.h`, so they stay 32-bit on every host
    (libntr makes them `long` except on Linux and Switch, so they are 64-bit on macOS).
 3. A value that carries an address uses `uptr`/`sptr`: `u32`/`s32` under MWCC (so retyping a parameter changes no DS
@@ -405,6 +408,7 @@ Each phase ends when its exit criteria pass on macOS. Phases overlap where the d
 - CMake skeleton with SDL3; generated source lists; trap stubs; `include/platform.h` with `PLATFORM_PC`, `uptr` and
   the host typedefs; `OVERLAY_ID(n)` → `n` on hosts; `replaced.txt`; the compile probe and progress tracker wired in as
   metrics.
+  (`include/platform.h` was built as `types.h`'s `PLATFORM_PC` block; the host build defines `PLATFORM_PC`: §4.8.)
 - Compile every game and library C file for arm64 macOS and fix the 64-bit sites far enough to link (the 9
   incompatible function-pointer casts, the 5 missing returns and the save-struct typedefs first).
 - Spikes: overlay `.data`/`.bss` sections on Mach-O; VRAM page aliasing on macOS; fibers with DS priority scheduling.

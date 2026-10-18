@@ -154,8 +154,11 @@ Game code stays the decomp's. Only three kinds of change are allowed outside `po
 1. **Matching-neutral portability fixes**, such as `uptr` for a value that carries an address. They stay in this
    repository; none is proposed upstream.
 2. **Hook macros** (`PORT_EVENT`, `PORT_SHOULD`) that compile to nothing, or to the bare expression, in the ROM build.
-3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. `include/platform.h` is the only place
-   that decides between MWCC and a host.
+3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. What differs between MWCC and a host is
+   defined in one place, `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32`, `PORT_DS_ALIGN_64`, a
+   port change with its rows in [game-changes.md](docs/game-changes.md)). `PLATFORM_PC` itself is defined only by the
+   host build (`port_decomp_env` in [CMakeLists.txt](CMakeLists.txt)), never by a header, and the host build
+   force-includes [include/port_host.h](include/port_host.h) into every decomp file.
 
 All three need the same proof that MWCC's output didn't change. The ROM build proves a complete file. An incomplete
 file still links the original object, so the ROM build proves nothing about its C: show with

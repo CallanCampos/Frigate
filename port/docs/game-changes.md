@@ -12,9 +12,12 @@ upstream merge can conflict with. A change outside `port/` without a row here is
    project and proposes nothing upstream ([ADR 0002](adr/0002-solo-project-no-upstream-posts.md)).
 2. **Hook:** a hook macro (`PORT_EVENT`, `PORT_SHOULD`) that compiles to nothing, or to the bare expression, in the
    ROM build.
-3. **Platform:** an `#ifdef PLATFORM_PC` block, used rarely and commented in the code. `include/platform.h` is the only
-   place that decides between MWCC and a host. Memory-safety fixes for documented `// BUG:`s that 64-bit layouts make
-   dangerous are this kind.
+3. **Platform:** an `#ifdef PLATFORM_PC` block, used rarely and commented in the code. What differs between MWCC and
+   a host is defined in one place, `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32` and
+   `PORT_DS_ALIGN_64`, a port change with its rows below). `PLATFORM_PC` itself is defined only by the host build
+   (`port_decomp_env` in [../CMakeLists.txt](../CMakeLists.txt)), never by a header, and the host build force-includes
+   [../include/port_host.h](../include/port_host.h) into every decomp file. Memory-safety fixes for documented
+   `// BUG:`s that 64-bit layouts make dangerous are this kind.
 
 A change that fits none of these doesn't go in.
 
@@ -28,10 +31,10 @@ under MWCC.
   so the ROM build proves nothing about its C. Run
   `.venv/bin/python tools/decomp/compiler_probe.py FILE --compilers 1.1p1 --mismatches` for both versions (add
   `--version w2_us`) before and after, and show that no function's result changed.
-- A **header** change (`include/platform.h` in a common header, a retyped API, a hook macro) changes every file that
-  includes it: ninja proves the complete ones, and the probe runs on every incomplete file that includes the header,
-  directly or through another header, in both versions. After a build, `ninja -t deps` lists each object's headers;
-  when in doubt, probe every incomplete file.
+- A **header** change (a definition in `include/types.h`'s `PLATFORM_PC` block, a retyped API, a hook macro) changes
+  every file that includes it: ninja proves the complete ones, and the probe runs on every incomplete file that includes
+  the header, directly or through another header, in both versions. After a build, `ninja -t deps` lists each object's
+  headers; when in doubt, probe every incomplete file.
 - A **hook** must also expand to nothing or to its bare argument when `PLATFORM_PC` is undefined, and a **platform**
   block must leave the code MWCC compiles as it was; `PLATFORM_PC` is defined only by the host build.
 - A **guard-only** change, one that only adds `#if`/`#ifdef PLATFORM_PC` branches and leaves what MWCC compiles token

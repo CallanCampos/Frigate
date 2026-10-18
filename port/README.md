@@ -52,9 +52,10 @@ stops with the name of the first one it reaches.
 
 ## Directory map
 
-Each directory has a guide: what each of its files does (for `tests/`, each test directory), the part of the game it
-touches and its tests. A subdirectory with a guide of its own (the oracle, the compile probe, the asm oracle, each
-spike, the artwork) lists its files there.
+Each directory has a guide to what its files do, the part of the game each touches and its tests. Most guides list
+every file; some list groups of files instead (`tests/` a row per test directory, `tools/` its measurement scripts by
+directory), whose files' own header comments say the rest, and a subdirectory with a guide of its own (the oracle, the
+compile probe, the asm oracle, each spike, the artwork) lists its files there.
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) shows how they fit together.
 
 | Directory | What it is | Guide |

@@ -29,11 +29,12 @@ level that doesn't exist yet says "not yet"; no field is left out.
 ## 2026-10-18: Frigate's identity and guides, reviewed and fixed
 
 - **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `aad2ce8df`: `de76726d2` (the review's fixes), then the
-  logo's ship redrawn as the Plasma Frigate.
+- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `aad2ce8df`: `de76726d2` (the review's fixes), then
+  `483392fa4` (the logo's ship redrawn as the Plasma Frigate), then the last confirmation's doc notes.
 - **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed, so no game-changes row.
-- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, in the last entry's build directories, configured
-  again: no warning. Not pushed, so no CI run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, from clean build directories: 263 warnings in each
+  version, all in the decomp's `src/` (193) and `lib/` (70), none in `port/`, unchanged from the last entry. Not
+  pushed, so no CI run.
 - **Tests:** T0 as above.
   - T2, T3, T4, T6: Black 2, all 239 `ctest` tests pass (`ctest -j4`, the oracle's included), none skipped; White 2,
     all 237, none skipped. New: `app_about` (`--help` says the product's name, description and disclaimer
@@ -92,16 +93,24 @@ level that doesn't exist yet says "not yet"; no field is left out.
     `gen_stubs.py`, `gen_host_tree.py`), the hal guide's file counts, the "settings file" wording, the glossary's
     "upstream", and the "Plain C types only" marker on the three headers `port/app` includes that lacked it.
   - **The guides, extended:** MODDING.md gains "When the game stops" (each way a run ends, the trap messages, and what
-    to do about a trap), the bag as a worked example of finding code, the files a widescreen mod touches, and a note
-    that `include/platform.h` doesn't exist. port/hal/README.md lists every file of every module. The compile probe's
-    `overlay.h` shim has its header, and its README lists its files. README says the window can be resized.
+    to do about a trap), the bag as a worked example of finding code, and the files a widescreen mod touches.
+    port/hal/README.md lists every file of every module. The compile probe's `overlay.h` shim has its header, and its
+    README lists its files. README says the window can be resized.
+  - **The platform rule, settled.** port/CLAUDE.md's rule 3, PLAN.md §4.8's first rule and game-changes.md (the third
+    kind and header changes) named `include/platform.h`, which was never made, as the one header that decides between
+    MWCC and a host. They now say what is so: what differs between MWCC and a host is defined in one place,
+    `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32`, `PORT_DS_ALIGN_64`, with its game-changes
+    rows), and `PLATFORM_PC` itself is defined only by the host build (`port_decomp_env` in `port/CMakeLists.txt`),
+    never by a header; `port/include/port_host.h` is force-included. PLAN.md's phase 0 list and the compile-probe
+    research, which proposed the header, note that it was built as that block, and MODDING.md says the same in place
+    of its note that the header was missing.
+  - **Doc notes:** ARCHITECTURE.md's build paragraph and boot step 2 and MODDING.md's trap paragraph wrapped at 120
+    columns, and README's directory map says what the guides list: every file in most, and in `tests/` and `tools/`
+    groups of files whose own headers say the rest.
 - **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
   sound driver's and the launcher's modules get their rows in the guides and the feature map when they merge.
 - **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
-  Play) only matter from phase 7. A decision for the user: port/CLAUDE.md, PLAN.md §4.8 and game-changes.md name
-  `include/platform.h` as the one header that decides between MWCC and a host, which doesn't exist (`PLATFORM_PC`
-  comes from the compiler's command line); rewording the rule or creating the header is the user's call, and
-  MODDING.md says so meanwhile.
+  Play) only matter from phase 7.
 
 ## 2026-10-18: Frigate's code mapped for modders
 

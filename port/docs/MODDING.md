@@ -77,9 +77,10 @@ which of these it was:
 
   Each is followed by a backtrace. This is not a Frigate bug: it is the edge of the decomp. The message names the
   symbol, its overlay as `ovNNN` (or `main`), and its address in the ROM's memory map, such as
-  `ActorMsgWin_CheckAndCreate (ov036, 0x02188798)`. To find where it belongs, look the name up in `config/<version>/arm9/**/symbols.txt`, and the address
-  in the overlay's `delinks.txt` (`config/<version>/arm9/overlays/ovNNN/delinks.txt`, or `config/<version>/arm9/` for
-  main), whose ranges say which source file holds it; no range holding it means nobody has written that part yet.
+  `ActorMsgWin_CheckAndCreate (ov036, 0x02188798)`. To find where it belongs, look the name up in
+  `config/<version>/arm9/**/symbols.txt`, and the address in the overlay's `delinks.txt`
+  (`config/<version>/arm9/overlays/ovNNN/delinks.txt`, or `config/<version>/arm9/` for main), whose ranges say which
+  source file holds it; no range holding it means nobody has written that part yet.
   [docs/source-files.md](../../docs/source-files.md) gives each file's status, and the overlay's `[Decomp] Overlay NNN`
   issue on upstream's tracker says who is working on it. Then wait for upstream and Frigate's hourly sync, or write the
   C as decomp work, in a checkout of the decomp under its own rules. Never write a stand-in in `port/` to get past it
@@ -110,9 +111,9 @@ kinds of change land:
    `PORT_SHOULD`). None exists yet; the first comes with the mod platform.
 3. **Platform:** an `#ifdef PLATFORM_PC` block, with a comment saying why. `PLATFORM_PC` is defined only by the host
    build, on the compiler's command line (`port_decomp_env` in [../CMakeLists.txt](../CMakeLists.txt)), so the ROM
-   build never sees the block. The rules name `include/platform.h` as the one header that decides between MWCC and a
-   host; it doesn't exist yet, and the headers that need the host's way branch on `PLATFORM_PC` themselves, each listed
-   in [game-changes.md](game-changes.md).
+   build never sees the block. What differs between MWCC and a host, such as `uptr`, is defined in one place,
+   `include/types.h`'s `PLATFORM_PC` block; any other file branches on `PLATFORM_PC` only where it must, each such
+   change listed in [game-changes.md](game-changes.md).
 
 Each needs proof that MWCC's output didn't change: `python3 configure.py && ninja` with both SHA1s for complete files,
 `port/tools/check_mwcc_neutral.py` for a change that only adds `#ifdef PLATFORM_PC` branches, and the decomp's
