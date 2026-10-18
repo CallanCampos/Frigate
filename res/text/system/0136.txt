@@ -1,0 +1,2 @@
+Bank0136_Text_Xatu = XATU
+Bank0136_Text_Xscissor = XSCISSOR

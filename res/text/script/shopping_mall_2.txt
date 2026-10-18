@@ -1,0 +1,6 @@
+ShoppingMall2_Text_MountainCardboardBoxesTheyre = This mountain of cardboard boxes...{be01}\nThey're all full of electrical appliances\nwe can't sell anymore.{be01}\nThey're just going to waste. I wonder if\nsomeone could put them to good use?
+ShoppingMall2_Text_Empty =                                                    \x{ffff}
+ShoppingMall2_Text_Empty_2 =                                                                                      \x{ffff}
+ShoppingMall2_Text_Empty_3 =                                                                         \x{ffff}
+ShoppingMall2_Text_Empty_4 =                                       \x{ffff}
+ShoppingMall2_Text_Empty_5 =                                   \x{ffff}

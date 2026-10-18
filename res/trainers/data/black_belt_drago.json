@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Drago",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCRAFTY",
+            "form": 0,
+            "level": 47,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The path of karate is the path of\nhumanity...and the path of Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Oof! It is not by chance that you have won!"
+        },
+        {
+            "type": 2,
+            "text": "Winners win because they deserve to win!"
+        }
+    ]
+}

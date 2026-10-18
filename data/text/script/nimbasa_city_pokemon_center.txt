@@ -1,4 +1,0 @@
-NimbasaCityPokemonCenter_Text_HaHaHaaCheck = Ha ha haa! Check the dust clouds\nthat are stirred up inside of caves!{be00}\nThey're chock full of Shards!{be01}\nI've got a pile of them,\nso I'll share with you!{be01}
-NimbasaCityPokemonCenter_Text_ImPrettySureSomewhere = I'm pretty sure somewhere in\nDriftveil City there's an artisan{be00}\nwho will teach your Pokémon moves{be00}\nin exchange for Shards!
-NimbasaCityPokemonCenter_Text_BeauteousMinccinoMetRoute = My beauteous Minccino!\nI met it on Route 5.{be01}\nI'm pretty sure it will be popular\nin musicals!
-NimbasaCityPokemonCenter_Text_Chulululucha = Chulululucha!

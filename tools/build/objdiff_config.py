@@ -12,9 +12,12 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from configure import ENCODING_FLAG, FILE_FLAGS, source_compiler  # noqa: E402
 
 # The libraries of lib/, by directory, for their category names
 LIBRARY_NAMES = {
@@ -101,6 +104,13 @@ def main():
         if source and not (ROOT / source).exists():
             unit.pop("base_path", None)
             unit.pop("scratch", None)
+    # --c-flags remains the default for ordinary units. Game overrides replace those
+    # defaults with effective build flags; scratch contexts are UTF-8, not Shift JIS.
+    for unit in config.get("units", []):
+        source = unit.get("metadata", {}).get("source_path")
+        if source and source.startswith("src/") and source in FILE_FLAGS and "scratch" in unit:
+            settings = source_compiler(Path(source))
+            unit["scratch"]["c_flags"] = " ".join(flag for flag in settings.flags if flag != ENCODING_FLAG)
     categorize(config, args.version)
     args.output.write_text(json.dumps(config, indent=2) + "\n")
 

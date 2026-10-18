@@ -1,2 +1,0 @@
-NuvemaTown5_Text_Empty =                                                                                                          \x{ffff}
-\pad{0c}

@@ -1,0 +1,20 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A trainer class: res/trainers/classes/<class>.json",
+    "description": "A trainer class's text, in the order of generated/trainer_classes.txt. The text files take it with \\from{trainer_classes.name} and \\from{trainer_classes.name_with_article} (tools/text/text_sources.py).",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "name", "name_with_article" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "name": { "type": "string", "description": "The class's name" },
+        "compress_name": {
+            "type": "boolean",
+            "description": "Whether the name is stored compressed, as the game stores some of them; left out, it isn't"
+        },
+        "name_with_article": {
+            "type": "string",
+            "description": "The name with its article, as \"a Youngster\", or as the game has it where it has none, as \"Lenora\", or another form, as \"a Twin\""
+        }
+    }
+}

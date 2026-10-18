@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Adaptability",
+    "description": "Powers up moves of the\nsame type."
+}

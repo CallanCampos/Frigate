@@ -1,0 +1,183 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Hariyama",
+    "pokedex": {
+        "category": "Arm Thrust Pokémon",
+        "entry": "It loves to match power with\nbig-bodied Pokémon. It can knock a\ntruck flying with its arm thrusts.",
+        "height": "7'07\"",
+        "weight": "559.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Hariyama",
+                "category": "Arm Thrust Pokémon",
+                "entry": "It loves to match power with\nbig-bodied Pokémon. It can knock a\ntruck flying with its arm thrusts.",
+                "height": "7'07\"",
+                "weight": "559.5 lbs."
+            },
+            "fr": {
+                "name": "Hariyama",
+                "category": "Pokémon Cogneur",
+                "entry": "Il aime mesurer sa force à celle des\nplus grands Pokémon. Ses coups de\npaume peuvent projeter un camion.",
+                "height": "2,3 m",
+                "weight": "253,8 kg"
+            },
+            "de": {
+                "name": "Hariyama",
+                "category": "Armwurf",
+                "entry": "Es liebt das Kräftemessen mit großen\nPokémon. Mit seinem Armwurf kann\nes LKW durch die Luft werfen.",
+                "height": "2,3 m",
+                "weight": "253,8 kg"
+            },
+            "it": {
+                "name": "Hariyama",
+                "category": "Pokémon Sberletese",
+                "entry": "Ama confrontarsi con Pokémon grossi.\nCon uno dei suo schiaffi, può far\nprendere il volo a un camion.",
+                "height": "2,3 m",
+                "weight": "253,8 kg"
+            },
+            "ko": {
+                "name": "하리뭉",
+                "category": "손바닥치기포켓몬",
+                "entry": "몸집이 큰 포켓몬들과 힘겨루는\n것을 매우 좋아한다. 손바닥치기로\n트럭을 멀리 날려 버린다.",
+                "height": "2.3 m",
+                "weight": "253.8 kg"
+            },
+            "es": {
+                "name": "Hariyama",
+                "category": "Pokémon Empuje",
+                "entry": "Le encanta enfrentarse a Pokémon\ngrandes y probar su fuerza. Sus\nbrazos pueden derribar un camión.",
+                "height": "2,3 m",
+                "weight": "253,8 kg"
+            },
+            "ja": {
+                "name": "ハリテヤマ",
+                "category": "つっぱりポケモン",
+                "entry": "からだの\\x{3000}おおきな\\x{3000}ポケモンたちと\nちからくらべをすることが\\x{3000}だいすき。\nはりてで\\x{3000}トラックを\\x{3000}ふっとばす。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff15}\\x{ff13}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 144,
+        "attack": 120,
+        "defense": 60,
+        "speed": 50,
+        "special_attack": 40,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+    "catch_rate": 200,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_KINGS_ROCK",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FLUCTUATING",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_THICK_FAT", "ABILITY_GUTS" ],
+    "hidden_ability": "ABILITY_SHEER_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 166,
+    "height": 23,
+    "weight": 2538,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_BRINE" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_FOCUS_ENERGY" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 1, "MOVE_ARM_THRUST" ],
+            [ 4, "MOVE_SAND_ATTACK" ],
+            [ 7, "MOVE_ARM_THRUST" ],
+            [ 10, "MOVE_VITAL_THROW" ],
+            [ 13, "MOVE_FAKE_OUT" ],
+            [ 16, "MOVE_WHIRLWIND" ],
+            [ 19, "MOVE_KNOCK_OFF" ],
+            [ 22, "MOVE_SMELLING_SALT" ],
+            [ 27, "MOVE_BELLY_DRUM" ],
+            [ 32, "MOVE_FORCE_PALM" ],
+            [ 37, "MOVE_SEISMIC_TOSS" ],
+            [ 42, "MOVE_WAKE_UP_SLAP" ],
+            [ 47, "MOVE_ENDURE" ],
+            [ 52, "MOVE_CLOSE_COMBAT" ],
+            [ 57, "MOVE_REVERSAL" ],
+            [ 62, "MOVE_HEAVY_SLAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM66",
+            "TM67",
+            "TM68",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM03",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_SUPERPOWER",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MAKUHITA",
+    "cry_volume": 120
+}

@@ -1,0 +1,3 @@
+AccumulaTown4_Text_TripletsStriatonCityOften = The triplets in Striaton City\noften head over to Route 2.{be01}\nThey compete with Trainers and Pokémon,\nso they're really tough!
+AccumulaTown4_Text_JoinAvenueWonderWhat = Join Avenue...\nI wonder what it's like now.{be01}\nAnd Pokéstar Studios!\nWhat movies are playing?
+AccumulaTown4_Text_GuessWhatKnowPokemon = Guess what I know!{be01}\nPokémon can only know four\nmoves at one time!

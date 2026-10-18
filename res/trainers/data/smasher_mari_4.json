@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Mari",
+    "class": "TRAINER_CLASS_SMASHER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_HYPER_POTION",
+    "party": [
+        {
+            "species": "SPECIES_JELLICENT",
+            "form": 0,
+            "level": 48,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My pinpoint smash is as accurate as\nthreading a string through a needle!{be00}\nThink you can handle it?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You happily handle any kind of attack!\nWhat a big heart you have!"
+        },
+        {
+            "type": 15,
+            "text": "I'll show that I have a big heart, too!\nHere, have this item!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "You need to put everything you've\ngot into each and every hit of the ball!{be01}\nTreat each moment of your life as if\nit's a match point!"
+        }
+    ]
+}

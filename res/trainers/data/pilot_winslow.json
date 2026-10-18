@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Winslow",
+    "class": "TRAINER_CLASS_PILOT",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SIGILYPH",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "My Pokémon is stronger than the wind.\nIt's my pride and joy!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It may be stronger than the wind, but my\nPokémon isn't as strong as yours."
+        },
+        {
+            "type": 2,
+            "text": "I became a Pilot so I could soar through\nthe skies alongside my flying Pokémon!"
+        }
+    ]
+}

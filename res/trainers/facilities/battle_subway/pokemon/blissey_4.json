@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_BLISSEY",
+    "moves": [ "MOVE_TOXIC", "MOVE_MINIMIZE", "MOVE_MUD_BOMB", "MOVE_SOFTBOILED" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_CHOPLE_BERRY",
+    "form": 0
+}

@@ -1,0 +1,176 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Regice",
+    "pokedex": {
+        "category": "Iceberg Pokémon",
+        "entry": "Its body is made of ice from the\nice age. It controls frigid air of\n-328 degrees Fahrenheit.",
+        "height": "5'11\"",
+        "weight": "385.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Regice",
+                "category": "Iceberg Pokémon",
+                "entry": "Its body is made of ice from the\nice age. It controls frigid air of\n-328 degrees Fahrenheit.",
+                "height": "5'11\"",
+                "weight": "385.8 lbs."
+            },
+            "fr": {
+                "name": "Regice",
+                "category": "Pokémon Iceberg",
+                "entry": "Son corps est fait de glace datant\nde l'ère glaciaire. Il contrôle un\nair gelé de -200 °C.",
+                "height": "1,8 m",
+                "weight": "175,0 kg"
+            },
+            "de": {
+                "name": "Regice",
+                "category": "Eisberg",
+                "entry": "Sein Körper besteht aus Eis aus der\nEiszeit. Es kontrolliert gefrorene Luft,\ndie minus 200 Grad kalt ist.",
+                "height": "1,8 m",
+                "weight": "175,0 kg"
+            },
+            "it": {
+                "name": "Regice",
+                "category": "Pokémon Iceberg",
+                "entry": "Il suo corpo è costituito da ghiaccio\ndell'era glaciale. Mantiene l'aria\na una temperatura di -200°C.",
+                "height": "1,8 m",
+                "weight": "175,0 kg"
+            },
+            "ko": {
+                "name": "레지아이스",
+                "category": "빙산포켓몬",
+                "entry": "빙하기에 생겨난 얼음으로\n몸이 만들어져 있다. 마이너스\n200도의 냉기를 다룬다.",
+                "height": "1.8 m",
+                "weight": "175.0 kg"
+            },
+            "es": {
+                "name": "Regice",
+                "category": "Pokémon Iceberg",
+                "entry": "Su cuerpo está hecho con hielo\nde la glaciación. Controla aire\ngélido a 200° bajo cero.",
+                "height": "1,8 m",
+                "weight": "175,0 kg"
+            },
+            "ja": {
+                "name": "レジアイス",
+                "category": "ひょうざんポケモン",
+                "entry": "ひょうがきに\\x{3000}できた\\x{3000}こおりで\nからだが\\x{3000}つくられている。マイナス\n\\x{ff12}\\x{ff10}\\x{ff10}どの\\x{3000}れいきを\\x{3000}あやつる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff17}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 50,
+        "defense": 100,
+        "speed": 50,
+        "special_attack": 100,
+        "special_defense": 200
+    },
+    "types": [ "TYPE_ICE", "TYPE_ICE" ],
+    "catch_rate": 3,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 3
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 80,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_CLEAR_BODY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_ICE_BODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 261,
+    "height": 18,
+    "weight": 1750,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_EXPLOSION" ],
+            [ 1, "MOVE_STOMP" ],
+            [ 9, "MOVE_ICY_WIND" ],
+            [ 17, "MOVE_CURSE" ],
+            [ 25, "MOVE_SUPERPOWER" ],
+            [ 33, "MOVE_ANCIENT_POWER" ],
+            [ 41, "MOVE_AMNESIA" ],
+            [ 49, "MOVE_CHARGE_BEAM" ],
+            [ 57, "MOVE_LOCK_ON" ],
+            [ 65, "MOVE_ZAP_CANNON" ],
+            [ 73, "MOVE_ICE_BEAM" ],
+            [ 81, "MOVE_HAMMER_ARM" ],
+            [ 89, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM57",
+            "TM64",
+            "TM68",
+            "TM69",
+            "TM73",
+            "TM77",
+            "TM78",
+            "TM79",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_IRON_HEAD",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_GRAVITY",
+            "MOVE_SUPERPOWER",
+            "MOVE_ICY_WIND",
+            "MOVE_SNORE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_REGICE",
+    "cry_volume": 120
+}

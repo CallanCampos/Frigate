@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Colress",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_COLRESS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 0,
+            "level": 1,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "Come! Satisfy my urge to battle!"
+        },
+        {
+            "type": 19,
+            "text": "Marvelous! I shall believe in my Pokémon!"
+        },
+        {
+            "type": 20,
+            "text": "If-if I'd believed more, could I have\ndrawn out my Pokémon's power?"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The bonds between us... Does the fact that\nwe can't see them make them more real?"
+        }
+    ]
+}

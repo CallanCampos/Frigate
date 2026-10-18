@@ -78,10 +78,6 @@ struct EncData {
 };
 
 extern const char data_ov012_0216e240[];
-extern const u16 ROAMING_POKEMON_ZONES[17];
-// The places in the Abyssal Ruins where Flash and Strength can be used
-extern const HiddenArea ABYSSAL_RUINS_FLASH_ROCK_RADIUS;
-extern const HiddenArea ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS;
 
 BOOL EncData_Load(EncData *encData, ArcTool *arc, u16 zoneId, u8 season);
 EncountState *EncountState_Create(HeapID heapId);

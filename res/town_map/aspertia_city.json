@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_ASPERTIA_CITY",
+    "type": 0,
+    "radius": 12,
+    "position": {
+        "x": 14,
+        "y": 153
+    },
+    "cursor": {
+        "x": 14,
+        "y": 153
+    },
+    "hit": {
+        "start": {
+            "x": 14,
+            "y": 149
+        },
+        "end": {
+            "x": 14,
+            "y": 157
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_ASPERTIA_CITY",
+    "shown_by": null,
+    "description": "TownMap_Text_CityFootHighMountains",
+    "landmarks": [ "TownMap_Text_AspertiaCityGym", "TownMap_Text_TrainersSchool_2", "TownMap_Text_PokemonCenter_15" ],
+    "area": {
+        "animation": 0,
+        "x": 6,
+        "y": 145
+    }
+}

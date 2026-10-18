@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Lightningrod",
-    "description": "Draws in all Electric-type\nmoves to up Sp. Attack."
-}

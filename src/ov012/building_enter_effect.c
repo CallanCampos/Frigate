@@ -19,7 +19,7 @@ static BuildingEnterEffect sEffect;
 
 static void func_ov012_02160dc8(void *data) {
     MtxFx22 mtx;
-    f32 zoom;
+    f32 zoom = 0.0f;
     fx32 scale;
 
     if (reg_GX_DISPSTAT & REG_GX_DISPSTAT_VBLK_MASK) {

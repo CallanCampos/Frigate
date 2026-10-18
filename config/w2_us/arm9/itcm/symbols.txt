@@ -1,7 +1,7 @@
 mainRenderer kind:function(thumb,size=0x2f8) addr:0x01ff8020
-func_01ff8318 kind:function(thumb,size=0x2f8) addr:0x01ff8318
-func_01ff8610 kind:function(thumb,size=0x2f0) addr:0x01ff8610
-func_01ff8900 kind:function(thumb,size=0x2f0) addr:0x01ff8900
+visibleAnimRenderer kind:function(thumb,size=0x2f8) addr:0x01ff8318
+sharedParamsRenderer kind:function(thumb,size=0x2f0) addr:0x01ff8610
+sharedParamsVisibleAnimRenderer kind:function(thumb,size=0x2f0) addr:0x01ff8900
 MIi_DmaSetParameters kind:function(thumb,size=0x98) addr:0x01ff8bf0
 OS_IrqHandler kind:function(arm,size=0x58) addr:0x01ff8c88
 func_01ff8ce0 kind:function(arm,size=0x160) addr:0x01ff8ce0

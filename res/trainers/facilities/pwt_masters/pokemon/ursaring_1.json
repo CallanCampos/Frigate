@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_URSARING",
+    "moves": [ "MOVE_FACADE", "MOVE_SWORDS_DANCE", "MOVE_CRUNCH", "MOVE_ROCK_SLIDE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_JOLLY",
+    "item": "ITEM_TOXIC_ORB",
+    "form": 0
+}

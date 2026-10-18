@@ -1,6 +1,0 @@
-{
-    "$schema": "map_matrix.schema.json",
-    "maps": [
-        [ "MAP_MODEL_CAVE_OF_BEING_M_DUN3301_00_00", "MAP_MODEL_CAVE_OF_BEING_M_DUN3301_01_00" ]
-    ]
-}

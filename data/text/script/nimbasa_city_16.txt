@@ -1,8 +1,0 @@
-NimbasaCity16_Text_IfComparedGlowNimbasa = If I compared the glow of Nimbasa to\nsomething, it would be the sun!{be01}\nYes, the sun!\nIt inspires me to give you this!{be01}
-NimbasaCity16_Text_SunStonesStonesMake = Sun Stones are stones that make certain\nPokémon evolve!{be01}\nI gave it to Petilil as a present!
-NimbasaCity16_Text_SunStonesStonesMake_2 = Sun Stones are stones that make certain\nPokémon evolve!{be01}\nI gave it to Cottonee as a present!
-NimbasaCity16_Text_IfLovePokemonEven = If you love your Pokémon, even if it\nchanges its appearance, you'll stay{be00}\nconnected with your Pokémon.{be01}\nYou and {0101:0} are...{be01}
-NimbasaCity16_Text_VeryConnectedEachOther = Very connected to each other!\nThat's what it looks like to me!
-NimbasaCity16_Text_JustStartingUnderstandEach = Just starting to understand\neach other. That's what it seems like...
-NimbasaCity16_Text_PerhapsCapableBeingMore = Perhaps capable of being more connected.\nI hope you enjoy the changes.
-NimbasaCity16_Text_PokemonEvolveManyDifferent = Pokémon evolve in many different ways.{be01}\nSome evolve by becoming stronger\nthrough battle.{be01}\nOthers evolve when certain items\nare used on them.{be01}\nSome even evolve during Link Trades.{be01}\nIf you ask Professor Juniper, she'll\ntell you anything you need to know!

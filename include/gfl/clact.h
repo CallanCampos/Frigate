@@ -113,6 +113,136 @@ typedef struct {
     NNSG2dAnmCallBackPtr func;
 } ClActorCallback;
 
+// The system's resources and transfers, laid out in clact.c
+typedef struct ClActCharRes ClActCharRes;
+typedef struct ClActPlttRes ClActPlttRes;
+typedef struct ClActCellAnimRes ClActCellAnimRes;
+typedef struct ClActTransferTask ClActTransferTask;
+
+typedef struct {
+    VRAMMan *vmanMain;
+    VRAMMan *vmanSub;
+    ClActCharRes *chars;
+    ClActPlttRes *pltts;
+    ClActCellAnimRes *cellAnims;
+    u16 charCount;
+    u16 plttCount;
+    u16 cellAnimCount;
+    u16 unk1A;
+    u16 offsetMain;
+    u16 offsetSub;
+} ClActResMan;
+
+typedef struct {
+    NNSG2dOamManagerInstance man;
+    BOOL active;
+} ClActOamMan;
+
+struct ClActRenderer {
+    NNSG2dRendererInstance renderer;
+    NNSG2dRenderSurface *surfaces;
+    u16 surfaceCount;
+    // The hint that the renderers begin rendering with, NNS_G2D_RDR_OPZHINT_LOCK_PARAMS with a single surface
+    u16 opzHint;
+};
+
+typedef struct {
+    NNSG2dCellTransferState *states;
+    ClActTransferTask *tasks;
+    u32 count;
+    BOOL active;
+} ClActTransfer;
+
+struct ClActSys {
+    ClActOamMan oamMans[2];
+    ClActRenderer renderer;
+    ClActTransfer transfer;
+    // What the OAMs' palettes are offset or set to, which the renderers set for each actor they draw
+    u16 palettes[2];
+    u32 paletteMode;
+    BOOL updating;
+    BOOL oamReady;
+    ClActUnit *units;
+    ClActResMan res;
+};
+
+struct ClActUnit {
+    ClActor *actors;
+    // The actors in use, as a list sorted by priority
+    ClActor *actorList;
+    ClActRenderer *renderer;
+    u16 count;
+    u8 rendererType : 4;
+    u8 active : 1;
+    // These two pick the unit's renderer (clact_itcm.c): whether only the visible actors' animations advance, and
+    // whether the renderer is set up once, with the first actor's images, attributes and palette, for every actor
+    u8 visibleAnimOnly : 1;
+    u8 sharedParams : 1;
+    u8 priority;
+    ClActUnit *next;
+    ClActUnit *prev;
+};
+
+// How an actor animates: a cell animation, one whose characters are transferred to VRAM as it plays, or a multi-cell
+// animation
+enum {
+    CLACT_ANIM_CELL,
+    CLACT_ANIM_VRAM_TRANSFER,
+    CLACT_ANIM_MULTICELL,
+};
+
+struct ClActAnim {
+    u32 type;
+    NNSG2dCellDataBank *cells;
+    NNSG2dAnimBankData *anims;
+    union {
+        struct {
+            NNSG2dCellAnimation cellAnim;
+            u32 transferHandle;
+        };
+        struct {
+            NNSG2dMultiCellAnimation mcAnim;
+            NNSG2dMultiCellDataBank *mcBank;
+            NNSG2dAnimBankData *mcAnims;
+            void *mcWork;
+        };
+    };
+};
+
+struct ClActor {
+    ClActor *next;
+    ClActor *prev;
+    ClActUnit *unit;
+    ClActorPos pos;
+    ClActorPos affineCenter;
+    ClActorScale scale;
+    NNSG2dImageProxy imgProxy;
+    NNSG2dImagePaletteProxy pltProxy;
+    // How far the renderers advance the animation each frame, with autoAnim
+    fx32 autoAnimSpeed;
+    u16 rotation;
+    u16 sequence;
+    u16 charIdx;
+    u16 plttIdx;
+    u32 priority : 8;
+    // The OAM attributes the renderer overwrites, NNS_G2D_RND_OVERWRITE_*
+    u32 overwrite : 4;
+    u32 palette : 4;
+    u32 bgPriority : 2;
+    u32 affineMode : 2;
+    u32 flip : 2;
+    u32 objMode : 2;
+    u32 mosaic : 1;
+    u32 autoAnim : 1;
+    u32 visible : 1;
+    u32 playMode : 4;
+    // Whether palette is the OAMs' palette rather than an offset to it
+    u32 paletteMode : 1;
+    // Whether the renderers draw only the current cell, without the animation's own transforms
+    u32 cellOnly : 1;
+    ClActAnim anim;
+};
+
 void ClActSys_Create(const ClActSysSetup *setup, const BGSysVRAMConfig *vramConfig, HeapID heapId);
 void func_0204b758(void);
 void func_0204b794(void);
@@ -183,7 +313,7 @@ fx32 func_0204c294(ClActor *actor, u32 axis);
 void func_0204c2a0(ClActor *actor, u16 rotation);
 u16 func_0204c2a8(ClActor *actor);
 void func_0204c2b0(ClActor *actor, u32 axis, BOOL flip);
-BOOL func_0204c2f0(ClActor *actor, u32 axis);
+BOOL ClActor_GetFlip(ClActor *actor, u32 axis);
 // The actor's OBJ mode, GX_OAM_MODE_*
 void func_0204c318(ClActor *actor, u32 mode);
 u32 func_0204c370(ClActor *actor);
@@ -222,18 +352,11 @@ void func_0204c584(ClActor *actor, u32 playMode);
 void func_0204c5b0(ClActor *actor, const ClActorCallback *callback);
 void func_0204c5bc(ClActor *actor);
 void func_0204c5c8(ClActor *actor, BOOL a1);
-// The actor system, which the ITCM reads
+// The actor system, which the renderers of clact_itcm.c read
 extern ClActSys *g_ClActSys;
 
-// The renderers in ITCM (0x01ff8020..0x01ff8bf0), chosen by unk5 and unk6 of the unit. The ITCM has no source file yet,
-// so they are declared here beside the unit they draw
-void mainRenderer(ClActUnit *unit);
-void func_01ff8318(ClActUnit *unit);
-void func_01ff8610(ClActUnit *unit);
-void func_01ff8900(ClActUnit *unit);
-
-// Called from the ITCM
-void func_0204d3bc(ClActAnim *anim, fx32 frames);
-void func_0204d46c(ClActAnim *anim, fx32 speed);
+// Called from the renderers of clact_itcm.c: tick the actor's animation, and set its speed
+void ClActAnim_Tick(ClActAnim *anim, fx32 frames);
+void ClActAnim_SetSpeed(ClActAnim *anim, fx32 speed);
 
 #endif // POKEBW2_GFL_CLACT_H

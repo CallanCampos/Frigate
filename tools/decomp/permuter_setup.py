@@ -23,7 +23,7 @@ import pycparser
 import pycparser.c_generator
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.decomp.compiler_probe import DEFAULT_FLAGS, INCLUDE_DIRS, VERSION_DEFINES, find_function, lib_compiler, load_modules  # noqa: E402
+from tools.decomp.compiler_probe import INCLUDE_DIRS, VERSION_DEFINES, find_function, probe_defaults, load_modules  # noqa: E402
 from tools.decomp.dsd_config import ROOT  # noqa: E402
 from configure import mwcc_command  # noqa: E402
 
@@ -91,9 +91,8 @@ def main():
                     "--add-symbol", f"{args.function}=.data:0,function,global",
                     str(out / "target.bin"), str(out / "target.o")], check=True)
 
-    lib = lib_compiler(ROOT / args.source)
-    name = args.compiler or (lib[0] if lib else "1.1p1")
-    flags = lib[1] if lib else DEFAULT_FLAGS
+    default_compiler, flags = probe_defaults(ROOT / args.source)
+    name = args.compiler or default_compiler or "1.1p1"
     compiler = ROOT / "tools" / "mwccarm" / (name if "/" in name else f"dsi/{name}") / "mwccarm.exe"
     (out / "compile.sh").write_text(
         "#!/bin/sh\n"

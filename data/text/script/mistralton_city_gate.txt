@@ -1,5 +1,0 @@
-MistraltonCityGate_Text_Empty =                                                              \x{ffff}
-MistraltonCityGate_Text_Empty_2 =                                      \x{ffff}
-MistraltonCityGate_Text_Empty_3 =        \x{ffff}
-MistraltonCityGate_Text_Empty_4 =       \x{ffff}
-\pad{02}

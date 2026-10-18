@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_CONKELDURR",
+    "moves": [ "MOVE_HAMMER_ARM", "MOVE_MACH_PUNCH", "MOVE_PAYBACK", "MOVE_STONE_EDGE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_LIFE_ORB",
+    "form": 0
+}

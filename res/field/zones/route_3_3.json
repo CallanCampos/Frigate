@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": "AREA_BLACK_CITY_3",
+    "matrix": "MAP_MATRIX_ROUTE_3_3",
+    "scripts": "SCRIPTS_ROUTE_3_3",
+    "text": "SCRIPT_TEXT_ROUTE_3_3",
+    "bgm": {
+        "spring": "SEQ_BGM_R_B_SP",
+        "summer": "SEQ_BGM_R_B_SU",
+        "autumn": "SEQ_BGM_R_B_AU",
+        "winter": "SEQ_BGM_R_B_WI"
+    },
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_ROUTE_3",
+    "place": "PLACE_ROUTE_3",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 28,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

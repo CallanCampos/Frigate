@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Simple",
-    "description": "The Pokémon is prone to\nwild stat changes."
-}

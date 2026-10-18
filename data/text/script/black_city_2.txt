@@ -1,3 +1,0 @@
-BlackCity2_Text_ListenUpTheresNothing = Listen up!\nThere's nothing wrong with making money!{be01}\nBut there are wrong ways to do it...\nYou have to make money the good way!
-BlackCity2_Text_HowSeriousWillingGet = How serious are you willing to get\nin order to get what you want?
-\pad{16}

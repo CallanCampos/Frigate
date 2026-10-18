@@ -1,4 +1,0 @@
-Route232_Text_YesTeamPokemonCan = Yes! The team of you and your Pokémon\ncan go as far as you want!
-Route232_Text_PokemonNotPerfectCondition = Your Pokémon...\nNot in perfect condition.{be01}\nCome. Don't be so reserved.\nTake a rest!{be01}
-Route232_Text_Chu = Chu!
-Route232_Text_Achoo = Achoo!

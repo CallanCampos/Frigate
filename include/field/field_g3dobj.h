@@ -22,6 +22,8 @@ typedef struct {
 } FieldG3DObjResRequest;
 
 u16 FieldG3DObjSystem_AddResGroup(FieldG3DObjSystem *sys, FieldG3DObjResRequest *req, BOOL preloadTextures);
+u16 FieldG3DObjSystem_AddResGroupCore(FieldG3DObjSystem *sys, FieldG3DObjResRequest *req, BOOL preloadTextures,
+                                      void *postFx);
 void FieldG3DObjSystem_FreeResGroup(FieldG3DObjSystem *sys, u16 resGroupIdx);
 u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u16 resGroupIdx, u16 modelIdxInRes, const VecFx32 *pos);
 void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *sys, u16 objIdx);

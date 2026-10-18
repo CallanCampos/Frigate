@@ -200,10 +200,6 @@ static void CtvtGameCam_SeqRoulette(CtvtGameCamSeq *seq, int *state, CtvtGameCam
 static void CtvtGameCam_SeqRouletteDone(CtvtGameCamSeq *seq, int *state, CtvtGameCamTask *task);
 static void CtvtGameCam_VBlank(TCB *tcb, void *work);
 
-// Not referred to: perhaps the area of the camera's frame that becomes a picture, which CtvtGameCamCamera_TakePicture
-// crops
-const u16 data_ov257_021b223c[4] = { 32, 64, 128, 128 };
-
 // The messages before each picture, by the game's type
 static const u16 sCtvtGameCamPromptMessages[2][3] = {
     { 51, 52, 53 },
@@ -544,9 +540,14 @@ static void CtvtGameCamCamera_Free(CtvtGameCamCamera *camera) {
     func_02042ed0(camera->frame);
 }
 
-// Crops the middle 128 by 128 of the frame and halves it with the DSP into a 64 by 64 picture
+// Crops the middle 128 by 128 of the frame and halves it with the DSP into a 64 by 64 picture. The crop's constants
+// are the first 8 bytes of the file's .rodata, though their reads fold
 static void CtvtGameCamCamera_TakePicture(CtvtGameCamCamera *camera, void *dest, HeapID heapId) {
-    u16 *crop = allocConfigDSSoftwareFeature(heapId, 128 * 128 * 2, "ctvt_game_cam.c", 1241);
+    static const u16 x = 64;
+    static const u16 y = 32;
+    static const u16 width = 128;
+    static const u16 height = 128;
+    u16 *crop = allocConfigDSSoftwareFeature(heapId, width * height * 2, "ctvt_game_cam.c", 1241);
     FSFile file;
     int i;
     f32 scale;
@@ -556,11 +557,11 @@ static void CtvtGameCamCamera_TakePicture(CtvtGameCamCamera *camera, void *dest,
     if (!DSP_LoadGraphics(&file, 0xff, 0xff)) {
         OS_Terminate();
     }
-    for (i = 0; i < 128; i++) {
-        MIi_CpuCopy32((u16 *)camera->frame + (i + 32) * 256 + 64, crop + i * 128, 128 * 2);
+    for (i = 0; i < height; i++) {
+        MIi_CpuCopy32((u16 *)camera->frame + (i + y) * 256 + x, crop + i * width, width * 2);
     }
     scale = 0.5009f;
-    DSP_Scaling(crop, dest, 128, 128, scale, scale, 2);
+    DSP_Scaling(crop, dest, width, height, scale, scale, 2);
     DSP_UnloadGraphics();
     CameraSystem_InitDsp(camera->cameraSystem);
     func_02042ed0(crop);

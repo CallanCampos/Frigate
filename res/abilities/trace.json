@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Trace",
+    "description": "The Pokémon copies a\nfoe's Ability."
+}

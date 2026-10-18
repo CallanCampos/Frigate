@@ -162,14 +162,14 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_proc.c` | `0x021574a4`–`0x02157c20` | 21 | complete | string at `0x0216e208` |
 | `scrcmd_sodateya.c` | `0x02157c20`–`0x021580c4` | 18 | complete | string at `0x0216e218` |
 | `scrcmd_musical.c` | `0x021580c4`–`0x021590ec` | 27 | complete | string at `0x0216e22c` |
-| `field_encount_st.c` | `0x021590ec`–`0x021593fc` | 15 | complete | string at `0x0216e240` |
-| `hiden_event.c` | `0x021593fc`–`0x02159bc0` | 43 | complete | descriptive |
+| `field_encount_st.c` | `0x021590ec`–`0x02159230` | 14 | complete | string at `0x0216e240` |
+| `hiden_event.c` | `0x02159230`–`0x02159bc0` | 44 | complete | descriptive |
 | `scrcmd_network.c` | `0x02159bc0`–`0x02159d54` | 9 | complete | string at `0x0216e254` |
 | `scrcmd_stadium.c` | `0x02159d54`–`0x0215a0b0` | 9 | complete | descriptive |
 | `event_battle_lose.c` | `0x0215a0b0`–`0x0215a19c` | 2 | complete | descriptive |
 | `event_game_clear.c` | `0x0215a19c`–`0x0215a7a4` | 13 | complete | descriptive |
-| `event_field_menu.c` | `0x0215a7a4`–`0x0215aa68` | 3 | complete | descriptive |
-| `event_shortcut_menu.c` | `0x0215aa68`–`0x0215b488` | 17 | complete | string at `0x0216e268` |
+| `event_field_menu.c` | `0x0215a7a4`–`0x0215aad8` | 7 | complete | descriptive |
+| `event_shortcut_menu.c` | `0x0215aad8`–`0x0215b488` | 13 | complete | string at `0x0216e268` |
 | `event_field_proclink.c` | `0x0215b488`–`0x0215c4f8` | 37 | complete | string at `0x0216e280` |
 | `event_save.c` | `0x0215c4f8`–`0x0215c6b0` | 5 | complete | descriptive |
 | `event_action_call.c` | `0x0215c6b0`–`0x0215cb48` | 13 | complete | descriptive |
@@ -363,11 +363,12 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `dwc_rap_vchat.c` | `0x021922c0`–`0x02192ae8` | 19 | complete | descriptive |
-| `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | partial | descriptive |
-| `vct_audio.c` | `0x02193cb0`–`0x021956d4` | 39 | partial | descriptive |
-| `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | partial | descriptive |
+| `vct_adpcm.c` | `0x02192ae8`–`0x02193cb0` | 8 | complete | descriptive |
+| `vct_audio.c` | `0x02193cb0`–`0x02194aa4` | 14 | partial | descriptive |
+| `vct_buffer.c` | `0x02194aa4`–`0x021956d4` | 25 | partial | descriptive |
+| `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | complete | descriptive |
 | `vct_dsp.c` | `0x02196680`–`0x02196eb4` | 14 | partial | descriptive |
-| `vct.c` | `0x02196eb4`–`0x021971a8` | 5 | partial | descriptive |
+| `vct.c` | `0x02196eb4`–`0x021971a8` | 5 | complete | descriptive |
 
 ### Overlay 30
 
@@ -1560,11 +1561,11 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `poke_type_pair.c` | `0x021ce520`–`0x021ce604` | 8 | complete | descriptive |
 | `btlv_core.c` | `0x021ce604`–`0x021d0c24` | 295 | complete | string at `0x021dafa0` |
 | `btlv_scu.c` | `0x021d0c24`–`0x021d45b0` | 124 | complete | string at `0x021dafac` |
-| `btl_rec.c` | `0x021d45b0`–`0x021d4a1c` | 18 | partial | string at `0x021dafb8` |
+| `btl_rec.c` | `0x021d45b0`–`0x021d4a1c` | 18 | complete | string at `0x021dafb8` |
 | `btl_adapter.c` | `0x021d4a1c`–`0x021d4c64` | 17 | complete | string at `0x021dafc4` |
 | `btl_string.c` | `0x021d4c64`–`0x021d5968` | 33 | complete | descriptive |
 | `btl_field.c` | `0x021d5968`–`0x021d5e1c` | 36 | complete | string at `0x021dafd4` |
-| `pokewood_cutin.c` | `0x021d5e1c`–`0x021d6c24` | 48 | partial | string at `0x021dafe0` |
+| `pokewood_cutin.c` | `0x021d5e1c`–`0x021d6c24` | 48 | complete | string at `0x021dafe0` |
 
 ### Overlay 168
 
@@ -1576,7 +1577,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `btlv_field.c` | `0x021de0f0`–`0x021de6b4` | 11 | complete | string at `0x021f3f30` |
 | `btlv_camera.c` | `0x021de6b4`–`0x021dec68` | 13 | complete | string at `0x021f3f40` |
 | `btlv_effect.c` | `0x021dec68`–`0x021e0de4` | 119 | partial | string at `0x021f3f9c` |
-| `btlv_effvm.c` | `0x021e0de4`–`0x021e67b8` | 138 | partial | string at `0x021f4174` |
+| `btlv_effvm.c` | `0x021e0de4`–`0x021e67b8` | 138 | complete | string at `0x021f4174` |
 | `btlv_mcss.c` | `0x021e67b8`–`0x021e982c` | 95 | partial | string at `0x021f4188` |
 | `btlv_clact.c` | `0x021e982c`–`0x021ea2a8` | 23 | complete | string at `0x021f4194` |
 | `btlv_input.c` | `0x021ea2a8`–`0x021ef794` | 127 | partial | string at `0x021f41c8` |
@@ -2151,7 +2152,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ctvt_comm.c` | `0x0219b5b8`–`0x0219cd74` | 69 | complete | string at `0x021b25f8` |
 | `ctvt_talk.c` | `0x0219cd74`–`0x0219ef4c` | 40 | partial | string at `0x021b2604` |
 | `ctvt_mic.c` | `0x0219ef4c`–`0x0219f234` | 24 | complete | string at `0x021b261c` |
-| `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | partial | string at `0x021b264c` |
+| `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | complete | string at `0x021b264c` |
 | `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | partial | string at `0x021b2658` |
 | `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | partial | string at `0x021b2674` |
 | `ctvt_game_target.c` | `0x021a7620`–`0x021a78d0` | 6 | partial | descriptive |

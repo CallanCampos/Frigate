@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Ice Body",
+    "description": "The Pokémon gradually\nregains HP in a hailstorm."
+}

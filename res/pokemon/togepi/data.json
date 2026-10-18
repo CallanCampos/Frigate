@@ -1,0 +1,198 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Togepi",
+    "pokedex": {
+        "category": "Spike Ball Pokémon",
+        "entry": "It transforms the kindness and joy\nof others into happiness, which it\nstores in its shell.",
+        "height": "1'00\"",
+        "weight": "3.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Togepi",
+                "category": "Spike Ball Pokémon",
+                "entry": "It transforms the kindness and joy\nof others into happiness, which it\nstores in its shell.",
+                "height": "1'00\"",
+                "weight": "3.3 lbs."
+            },
+            "fr": {
+                "name": "Togepi",
+                "category": "Pokémon Balle Pic",
+                "entry": "Il transforme les émotions\npositives des autres en bonheur\nqu'il stocke dans sa coquille.",
+                "height": "0,3 m",
+                "weight": "1,5 kg"
+            },
+            "de": {
+                "name": "Togepi",
+                "category": "Zackenball",
+                "entry": "Wandelt die Güte und Freude anderer\nin Glücksgefühle um, die es in seinem\nPanzer speichert.",
+                "height": "0,3 m",
+                "weight": "1,5 kg"
+            },
+            "it": {
+                "name": "Togepi",
+                "category": "Pokémon Pallapunte",
+                "entry": "Trasforma la gentilezza e la gioia degli\naltri in felicità, che immagazzina nel\nsuo guscio.",
+                "height": "0,3 m",
+                "weight": "1,5 kg"
+            },
+            "ko": {
+                "name": "토게피",
+                "category": "바늘알포켓몬",
+                "entry": "모두가 느낀 상냥함과\n기쁨을 행복으로 바꾼다.\n껍질 안에는 행복이 가득.",
+                "height": "0.3 m",
+                "weight": "1.5 kg"
+            },
+            "es": {
+                "name": "Togepi",
+                "category": "Pokémon Bolaclavos",
+                "entry": "Transforma la bondad y la alegría\nde los demás en felicidad y\nla almacena en su cascarón.",
+                "height": "0,3 m",
+                "weight": "1,5 kg"
+            },
+            "ja": {
+                "name": "トゲピー",
+                "category": "はりたまポケモン",
+                "entry": "みんなの\\x{3000}かんじた\\x{3000}やさしさや\nうれしさを\\x{3000}しあわせに\\x{3000}かえている。\nカラのなかは\\x{3000}しあわせ\\x{3000}ばかりだ。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 20,
+        "defense": 65,
+        "speed": 20,
+        "special_attack": 40,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 190,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 10,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_HUSTLE", "ABILITY_SERENE_GRACE" ],
+    "hidden_ability": "ABILITY_SUPER_LUCK",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 49,
+    "height": 3,
+    "weight": 15,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_CHARM" ],
+            [ 5, "MOVE_METRONOME" ],
+            [ 9, "MOVE_SWEET_KISS" ],
+            [ 13, "MOVE_YAWN" ],
+            [ 17, "MOVE_ENCORE" ],
+            [ 21, "MOVE_FOLLOW_ME" ],
+            [ 25, "MOVE_BESTOW" ],
+            [ 29, "MOVE_WISH" ],
+            [ 33, "MOVE_ANCIENT_POWER" ],
+            [ 37, "MOVE_SAFEGUARD" ],
+            [ 41, "MOVE_BATON_PASS" ],
+            [ 45, "MOVE_DOUBLE_EDGE" ],
+            [ 49, "MOVE_LAST_RESORT" ],
+            [ 53, "MOVE_AFTER_YOU" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM56",
+            "TM59",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM83",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_LAST_RESORT",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_AFTER_YOU",
+            "MOVE_TRICK",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_PRESENT",
+            "MOVE_MIRROR_MOVE",
+            "MOVE_PECK",
+            "MOVE_FORESIGHT",
+            "MOVE_FUTURE_SIGHT",
+            "MOVE_NASTY_PLOT",
+            "MOVE_PSYCHO_SHIFT",
+            "MOVE_LUCKY_CHANT",
+            "MOVE_EXTRASENSORY",
+            "MOVE_SECRET_POWER",
+            "MOVE_STORED_POWER",
+            "MOVE_MORNING_SUN"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_FRIENDSHIP",
+            "param": 0,
+            "species": "SPECIES_TOGETIC"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_TOGEPI",
+    "cry_volume": 110
+}

@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Emily",
+    "class": "TRAINER_CLASS_POKEFAN_M",
+    "pokemon": [
+        "nidoqueen_1",
+        "drifblim_1",
+        "seismitoad_1",
+        "wailord_1",
+        "lickilicky_1",
+        "vaporeon_1",
+        "walrein_1",
+        "lapras_1",
+        "snorlax_1",
+        "slaking_1"
+    ]
+}

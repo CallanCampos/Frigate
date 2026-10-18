@@ -1,6 +1,6 @@
 ---
 name: pbw-data-reviewer
-description: "pokebw2 data reviewer. Use for audit partitions and pre-commit reviews of data/ (constant lists, per-entity JSON with schemas, text, graphics sources) and the packers and dumpers in tools/data/ and tools/text/: constant lists instead of numbers or manifests, schemas, stdlib-only packers that the build can run, both versions packed from the version being built, round trips. Hand-offs: build wiring in configure.py to pbw-tools-reviewer."
+description: "pokebw2 data reviewer. Use for audit partitions and pre-commit reviews of res/ (constant lists, per-entity JSON with schemas, text, graphics sources) and the packers and dumpers in tools/data/ and tools/text/: constant lists instead of numbers or manifests, schemas, stdlib-only packers that the build can run, both versions packed from the version being built, round trips. Hand-offs: build wiring in configure.py to pbw-tools-reviewer."
 model: sonnet
 tools: Bash, Read, Grep, Glob
 ---
@@ -35,7 +35,7 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
 - Say plainly what you could not verify.
 
 ## Expertise to apply
-- **Constants**: every ID is a line of a list in `data/constants/` (species, moves, items, zones, areas, map models,
+- **Constants**: every ID is a line of a list in `generated/` (species, moves, items, zones, areas, map models,
   ...), named by its scheme; data refers to them by name; `rename_constant.py` renames a constant and its uses.
 - **Per-entity data**: one JSON per entity with a `$schema`; directories named after their constants; no manifests
   of numbers.

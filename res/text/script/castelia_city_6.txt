@@ -1,0 +1,2 @@
+CasteliaCity6_Text_GameFreak = GAME FREAK
+\pad{0c}

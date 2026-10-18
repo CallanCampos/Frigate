@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Joe & Ross",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ZEBSTRIKA",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ZEBSTRIKA",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "I get excited just by\ncoming to Small Court!!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Joe: I got super excited!{be01}\nRoss: What a thrill!\nIt's taking my breath away!"
+        },
+        {
+            "type": 5,
+            "text": "Just by being here! Just by watching it!\nI get really excited!{be01}\nIf I played a game here,\nI would be extremely excited!"
+        },
+        {
+            "type": 6,
+            "text": "We don't want to have\na one-on-two battle."
+        },
+        {
+            "type": 7,
+            "text": "If we fight in this stadium,\ndon't you think we will understand{be00}\nhow our star players feel?{be01}"
+        },
+        {
+            "type": 9,
+            "text": "We had a battle with Pokémon\nin the stadium...{be01}\nI am happy 'cause I experienced\nwhat star players feel!"
+        },
+        {
+            "type": 10,
+            "text": "One-on-two?\nWe cannot fight like that."
+        }
+    ]
+}

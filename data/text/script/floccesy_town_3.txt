@@ -1,6 +1,0 @@
-FloccesyTown3_Text_EvenIfHaveLot = Even if you have a lot of them,\nitems never weigh you down, eh?{be01}
-FloccesyTown3_Text_BagsSureCoolItems = Bags sure are cool.{be01}\nItems in your Bag are automatically\nsorted by type.
-FloccesyTown3_Text_BiggestCityUnovaCastelia = The biggest city in Unova is Castelia!{be01}\nI want to take the ship from Virbank\nand go play there!
-FloccesyTown3_Text_SunnyDayPatratsFur = On a sunny day, my Patrat's fur\ngets all fluffy!{be00}\nI can't help wanting to pet it!
-FloccesyTown3_Text_Skuwaaa = Skuwaaa!
-\pad{b4}

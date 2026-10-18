@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SEISMITOAD",
+    "moves": [ "MOVE_ROUND", "MOVE_REST", "MOVE_WATER_PULSE", "MOVE_SLUDGE_WAVE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_RASH",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

@@ -1,0 +1,198 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Sentret",
+    "pokedex": {
+        "category": "Scout Pokémon",
+        "entry": "It has a very nervous nature.\nIt stands up high on its tail so it\ncan scan wide areas.",
+        "height": "2'07\"",
+        "weight": "13.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Sentret",
+                "category": "Scout Pokémon",
+                "entry": "It has a very nervous nature.\nIt stands up high on its tail so it\ncan scan wide areas.",
+                "height": "2'07\"",
+                "weight": "13.2 lbs."
+            },
+            "fr": {
+                "name": "Fouinette",
+                "category": "Pokémon Espion",
+                "entry": "Ce Pokémon très nerveux\nprend appui sur sa queue pour\nobserver ses alentours.",
+                "height": "0,8 m",
+                "weight": "6,0 kg"
+            },
+            "de": {
+                "name": "Wiesor",
+                "category": "Späher",
+                "entry": "Ein sehr nervöses Pokémon.\nEs steht auf seinem Schweif und\nbetrachtet seine Umgebung ganz genau.",
+                "height": "0,8 m",
+                "weight": "6,0 kg"
+            },
+            "it": {
+                "name": "Sentret",
+                "category": "Pokémon Esplorante",
+                "entry": "Ha un'indole alquanto nervosa. Sta ritto\nsulla punta della coda per riuscire a\nsorvegliare ampie aree.",
+                "height": "0,8 m",
+                "weight": "6,0 kg"
+            },
+            "ko": {
+                "name": "꼬리선",
+                "category": "망보기포켓몬",
+                "entry": "매우 신경질적인 성격이다.\n멀리까지 볼 수 있도록\n꼬리를 써서 발돋움한다.",
+                "height": "0.8 m",
+                "weight": "6.0 kg"
+            },
+            "es": {
+                "name": "Sentret",
+                "category": "Pokémon Explorador",
+                "entry": "Es de naturaleza nerviosa. Se alza sobre\nsu cola para otear grandes extensiones.",
+                "height": "0,8 m",
+                "weight": "6,0 kg"
+            },
+            "ja": {
+                "name": "オタチ",
+                "category": "みはりポケモン",
+                "entry": "とても\\x{3000}しんけいしつな\\x{3000}せいかく。\nとおくまで\\x{3000}みわたせるように\nしっぽを\\x{3000}つかって\\x{3000}せのびをする。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 35,
+        "attack": 46,
+        "defense": 34,
+        "speed": 20,
+        "special_attack": 35,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 255,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_ORAN_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_RUN_AWAY", "ABILITY_KEEN_EYE" ],
+    "hidden_ability": "ABILITY_FRISK",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 43,
+    "height": 8,
+    "weight": 60,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_FORESIGHT" ],
+            [ 4, "MOVE_DEFENSE_CURL" ],
+            [ 7, "MOVE_QUICK_ATTACK" ],
+            [ 13, "MOVE_FURY_SWIPES" ],
+            [ 16, "MOVE_HELPING_HAND" ],
+            [ 19, "MOVE_FOLLOW_ME" ],
+            [ 25, "MOVE_SLAM" ],
+            [ 28, "MOVE_REST" ],
+            [ 31, "MOVE_SUCKER_PUNCH" ],
+            [ 36, "MOVE_AMNESIA" ],
+            [ 39, "MOVE_BATON_PASS" ],
+            [ 42, "MOVE_ME_FIRST" ],
+            [ 47, "MOVE_HYPER_VOICE" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM56",
+            "TM57",
+            "TM65",
+            "TM67",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "HM01",
+            "HM03"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SUPER_FANG",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_LAST_RESORT",
+            "MOVE_AQUA_TAIL",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_PURSUIT",
+            "MOVE_SLASH",
+            "MOVE_FOCUS_ENERGY",
+            "MOVE_REVERSAL",
+            "MOVE_TRICK",
+            "MOVE_ASSIST",
+            "MOVE_LAST_RESORT",
+            "MOVE_CHARM",
+            "MOVE_COVET",
+            "MOVE_NATURAL_GIFT",
+            "MOVE_IRON_TAIL"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 15,
+            "species": "SPECIES_FURRET"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SENTRET",
+    "cry_volume": 110
+}

@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A sound stream: res/sound/streams/<category>/<name>/data.json",
+    "description": "A stream's info record in the sound archive (swan_sound_data.sdat), which tools/data/sound_data.py packs in the order of generated/sound_streams.txt. Its audio is stream.wav beside it, 8-bit or 16-bit PCM, mono or stereo (tools/data/strm.py).",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "volume", "priority", "player" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "file": { "type": "string", "x-constant": "STRM_", "description": "The stream whose file this one plays" },
+        "volume": { "type": "integer", "minimum": 0, "maximum": 127, "description": "Its volume" },
+        "priority": { "type": "integer", "minimum": 0, "maximum": 255, "description": "Its priority" },
+        "player": { "type": "string", "x-constant": "PLAYER_", "description": "The stream player that plays it" },
+        "loop_start": { "type": "integer", "minimum": 0, "description": "For a stream that loops, the sample its loop starts at; it loops to its end" },
+        "timer": { "type": "integer", "minimum": 0, "maximum": 65535, "description": "The stream's timer, where it isn't its rate's (16756991 divided by the rate, then by 32)" }
+    }
+}

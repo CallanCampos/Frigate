@@ -1,0 +1,132 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Larvesta",
+    "pokedex": {
+        "category": "Torch Pokémon",
+        "entry": "Said to have been born from the sun,\nit spews fire from its horns and encases\nitself in a cocoon of fire when it evolves.",
+        "height": "3'07\"",
+        "weight": "63.5 lbs.",
+        "languages": {
+            "ja": {
+                "category": "たいまつポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 85,
+        "defense": 55,
+        "speed": 60,
+        "special_attack": 50,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_BUG", "TYPE_FIRE" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 40,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_FLAME_BODY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SWARM",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 72,
+    "height": 11,
+    "weight": 288,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_EMBER" ],
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 10, "MOVE_LEECH_LIFE" ],
+            [ 20, "MOVE_TAKE_DOWN" ],
+            [ 30, "MOVE_FLAME_CHARGE" ],
+            [ 40, "MOVE_BUG_BITE" ],
+            [ 50, "MOVE_DOUBLE_EDGE" ],
+            [ 60, "MOVE_FLAME_WHEEL" ],
+            [ 70, "MOVE_BUG_BUZZ" ],
+            [ 80, "MOVE_AMNESIA" ],
+            [ 90, "MOVE_THRASH" ],
+            [ 100, "MOVE_FLARE_BLITZ" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM48",
+            "TM50",
+            "TM59",
+            "TM61",
+            "TM62",
+            "TM76",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM93"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGNET_RISE",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_STRING_SHOT",
+            "MOVE_HARDEN",
+            "MOVE_FORESIGHT",
+            "MOVE_ENDURE",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_MORNING_SUN",
+            "MOVE_MAGNET_RISE"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 59,
+            "species": "SPECIES_VOLCARONA"
+        }
+    ],
+    "regional_dex_number": 171,
+    "baby_species": "SPECIES_LARVESTA",
+    "cry_volume": 125
+}

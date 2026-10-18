@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Slow Start",
-    "description": "Temporarily halves\nAttack and Speed."
-}

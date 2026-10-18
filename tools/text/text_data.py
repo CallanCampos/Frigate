@@ -3,11 +3,11 @@
 editable text files, one per message file, with one message per line. The build packs the text files back into the
 archives and checks that they match.
 
-    text_data.py unpack extract/b2_us/files/a/0/0/2 data/text/system
-    text_data.py pack data/text/system build/b2_us/files/a/0/0/2
+    text_data.py unpack extract/b2_us/files/a/0/0/2 res/text/system
+    text_data.py pack res/text/system build/b2_us/files/a/0/0/2
 
 The files are named after the constants of their archive's list (TEXT_LISTS): a system message file after its
-TEXT_BANK_* in data/constants/text_banks.txt, as species_names.txt, and a script message file after its SCRIPT_TEXT_*
+TEXT_BANK_* in generated/text_banks.txt, as species_names.txt, and a script message file after its SCRIPT_TEXT_*
 in script_text_banks.txt, as black_city.txt; the list gives their order.
 
 The text is UTF-8. In it:

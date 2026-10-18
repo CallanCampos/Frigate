@@ -12,6 +12,25 @@
 typedef struct ScClient ScClient;
 typedef struct ScReport ScReport;
 
+// GameSpy's competition-service result codes.
+typedef enum {
+    SCResult_NO_ERROR = 0,
+    SCResult_NO_AVAILABILITY_CHECK,
+    SCResult_INVALID_PARAMETERS,
+    SCResult_NOT_INITIALIZED,
+    SCResult_CORE_NOT_INITIALIZED,
+    SCResult_OUT_OF_MEMORY,
+    SCResult_CALLBACK_PENDING,
+    SCResult_HTTP_ERROR,
+    SCResult_UNKNOWN_RESPONSE,
+    SCResult_RESPONSE_INVALID,
+    SCResult_REPORT_INCOMPLETE,
+    SCResult_REPORT_INVALID,
+    SCResult_SUBMISSION_FAILED,
+    SCResult_UNKNOWN_ERROR,
+    SCResultMax
+} SCResult;
+
 // Called with the client, the status of the request, the error (0 if none) and the user data
 typedef void (*ScClientFunc)(ScClient *client, int status, int error, void *userData);
 

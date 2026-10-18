@@ -1,0 +1,40 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Pierre",
+    "class": "TRAINER_CLASS_ARTIST",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_ULTRA_BALL",
+    "party": [
+        {
+            "species": "SPECIES_SMEARGLE",
+            "form": 0,
+            "level": 62,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_FIRE_BLAST", "MOVE_BLIZZARD", "MOVE_THUNDER", "MOVE_HURRICANE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The ideal movement of living things,\nsuch pure beauty!{be01}\nAh, let me behold them!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I saw their beauty up close!"
+        },
+        {
+            "type": 15,
+            "text": "This is art!\nHere--a present for you!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "You know, creatures that exert\nall their strength are always beautiful."
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Laura",
+    "class": "TRAINER_CLASS_PARASOL_LADY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 0,
+            "level": 40,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_SUNNY_DAY", "MOVE_HYDRO_PUMP", "MOVE_FIRE_BLAST", "MOVE_BLIZZARD" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A woman standing alone with a parasol\nin one hand at the beach...{be00}\nHi... Please have a battle with me.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The parasol can block ultraviolet rays,\nbut it can't block moves..."
+        },
+        {
+            "type": 2,
+            "text": "I heard a parasol is a must\non the beach...{be00}\nBut I'm the only one who has one?"
+        }
+    ]
+}

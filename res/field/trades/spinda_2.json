@@ -1,0 +1,33 @@
+{
+    "$schema": "trade.schema.json",
+    "nickname": "Spinda",
+    "trainer_name": "Yancy",
+    "species": "SPECIES_SPINDA",
+    "form": 0,
+    "level": 50,
+    "ivs": {
+        "hp": null,
+        "attack": null,
+        "defense": null,
+        "speed": null,
+        "special_attack": null,
+        "special_defense": null
+    },
+    "ability_slot": 2,
+    "nature": null,
+    "sex": null,
+    "trainer_id": 10303,
+    "contest": {
+        "cool": 0,
+        "beauty": 0,
+        "cute": 0,
+        "smart": 0,
+        "tough": 0
+    },
+    "held_item": "ITEM_LAVA_COOKIE",
+    "trainer_gender": "GENDER_FEMALE",
+    "unk54": 0,
+    "region": 2,
+    "wanted_species": "SPECIES_PIKACHU",
+    "wanted_sex": "GENDER_UNKNOWN"
+}

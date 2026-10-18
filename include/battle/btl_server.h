@@ -100,7 +100,7 @@ BOOL func_ov167_0219ee88(BtlServer *server, int *seq);
 void func_ov167_0219eee4(BtlServer *server, const void *data, u32 size);
 void func_ov167_0219ef70(BtlClientActions *clientActions);
 BOOL func_ov167_0219ef74(BtlServer *server, u32 mode, const void *data, u32 size);
-BOOL func_ov167_0219f000(BtlServer *server, u8 value);
+BOOL func_ov167_0219f000(BtlServer *server, BOOL value);
 BOOL func_ov167_0219f02c(BtlServer *server, u8 value, BOOL flag);
 void *func_ov167_0219f054(BtlServer *server, u8 value, BOOL flag, u32 *size);
 void func_ov167_0219f0ac(BtlServer *server);

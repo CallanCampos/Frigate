@@ -1,9 +1,17 @@
+// The hidden moves' events (a descriptive name). CalcPlayerActionPossibilities is placed here as a guess: it fills the
+// PlayerActionPossibilities that this file's checks take and is the only caller of func_ov012_02159b70, but a file of
+// its own between field_encount_st.c and this one would give the same ROM. Names from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/event_chatot.h"
 #include "field/event_fly.h"
 #include "field/event_mapchange.h"
 #include "field/event_sweet_scent.h"
 #include "field/field.h"
+#include "field/field_actor.h"
+#include "field/field_map.h"
+#include "field/field_player.h"
 #include "field/field_script.h"
 #include "field/field_skill_map_eff.h"
 #include "field/field_status.h"
@@ -12,10 +20,96 @@
 #include "field/player_action.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
+#include "nitro/os.h"
 #include "save/event_work.h"
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
+
+// The places in the Abyssal Ruins where Flash and Strength can be used
+static const HiddenArea ABYSSAL_RUINS_FLASH_ROCK_RADIUS = { 14, 26, 1, 2 };
+static const HiddenArea ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS = { 40, 26, 1, 2 };
+
+// Four zero bytes that nothing reads, ahead of the Abyssal Ruins areas. Their type and form are a guess: as a
+// function-local static, or as two u16s, they give the same ROM
+const u32 HIDEN_EVENT_UNUSED = 0;
+
+void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *action) {
+    FieldPlayer *player;
+    FieldActor *actor;
+    u16 objCode;
+    MMSys *actorSystem;
+    VecFx32 position;
+    u32 direction;
+    u32 tileInFront;
+    u32 tileUnder;
+    u16 diveZone;
+    s16 x;
+    s16 y;
+    s16 z;
+
+    MI_CpuFill8(action, 0, sizeof(PlayerActionPossibilities));
+    action->zoneId = Field_GetPlayerStateZoneID(field);
+    action->gsys = Field_GetGameSystem(field);
+    action->field = field;
+    player = Field_GetPlayer(field);
+    action->exState = FieldPlayer_GetExState(player);
+    actor = FieldPlayer_GetActorInFront(player);
+    action->actorInFront = actor;
+    if (actor != NULL) {
+        objCode = FldAct_GetObjCode(actor);
+        actorSystem = Field_GetActorSystem(field);
+        CopyActorWPos(actor, &position);
+        if (IsNPCStrengthRock(objCode) && !func_ov012_0216820c(actorSystem, &position)) {
+            action->flags |= 8;
+        }
+        if (objCode == OBJ_CODE_108) {
+            action->flags |= 1;
+        }
+    }
+    direction = FieldPlayer_GetFaceDir(player);
+    tileUnder = FieldPlayer_GetTileTypeUnder(player);
+    tileInFront = FieldPlayer_GetTileTypeInDir(player, direction);
+    if (CheckSurfHeightAllow(player, direction) == TRUE) {
+        action->flags |= 2;
+    }
+    if (CheckCanInteractWaterfall(player, tileUnder, tileInFront) == TRUE) {
+        action->flags |= 4;
+    }
+    if (GetZoneFlagsEnableFlyFrom(action->zoneId) == TRUE) {
+        action->flags |= 0x10;
+        action->flags |= 0x40;
+    }
+    if (GetZoneFlagsEnableEscapeRope(action->zoneId) == TRUE) {
+        action->flags |= 0x80;
+    }
+    if (FieldStatus_GetFlashPerms(GameData_GetFieldStatus(GSYS_GetGameData(action->gsys))) & 1) {
+        action->flags |= 0x20;
+    }
+    if (GetAbyssalRuinsDiveZoneID(field, &diveZone) == TRUE) {
+        action->flags |= 0x400;
+    }
+    if (IsZoneAbyssalRuinsInside(action->zoneId)) {
+        FieldPlayer_GetGPos(Field_GetPlayer(action->field), &x, &y, &z);
+        if (IsZoneAbyssalRuinsFlashRock(action->zoneId) &&
+            func_ov012_02159b70(&ABYSSAL_RUINS_FLASH_ROCK_RADIUS, x, z, 0xd7, field)) {
+            action->flags |= 0x20;
+        }
+        if (IsZoneAbyssalRuinsStrengthRock(action->zoneId) &&
+            func_ov012_02159b70(&ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS, x, z, 0xd6, field)) {
+            action->flags |= 8;
+        }
+    }
+    if (!func_02018c38(action->zoneId)) {
+        action->flags = 0;
+    } else {
+        action->flags |= 0x100;
+        action->flags |= 0x200;
+    }
+    if (GameData_IsForceSeasonSync(GSYS_GetGameData(action->gsys)) == TRUE) {
+        action->flags = 0;
+    }
+}
 
 // The events of each hidden move, by its kind, and the same in the Abyssal Ruins, where Strength and Flash differ
 const HiddenEventSpec HIDEN_EVENTS_NORMAL[11] = {

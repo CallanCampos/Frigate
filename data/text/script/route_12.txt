@@ -1,3 +1,0 @@
-Route12_Text_Route12 = Route 12
-Route12_Text_Route12_2 = Route 12
-Route12_Text_TrainerTipsTryPressing = Trainer Tips!\n{be01}\nTry pressing SELECT while\norganizing your PC Box.{be01}\nIt'll let you move your Pokémon\naround more easily!{be01}\nThe more Pokémon you deposit,\nthe more Boxes you'll have.

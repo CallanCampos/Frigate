@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lucille",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_PP_UP",
+    "party": [
+        {
+            "species": "SPECIES_JYNX",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_VAPOREON",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_AERODACTYL",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I usually act like an Ace Trainer,\nbut I want to be an ordinary girl,{be00}\nat least when I am here.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I don't want to think about Pokémon\nvery much right now!"
+        },
+        {
+            "type": 15,
+            "text": "If I give you this,\nwill you leave me alone?{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Even as an Ace Trainer, sometimes\nI just want to be an ordinary girl!{be01}\nI want to scream for the cool athletes,\nand enjoy my time."
+        }
+    ]
+}

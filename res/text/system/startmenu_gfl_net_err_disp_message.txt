@@ -1,0 +1,3 @@
+StartmenuGflNetErrDispMessage_Text_CommunicationError = Communication error.
+StartmenuGflNetErrDispMessage_Text_CommunicationErrorPleaseTurn = Communication error.\nPlease turn off the power.
+\pad{3e}

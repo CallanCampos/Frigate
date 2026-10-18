@@ -455,7 +455,7 @@ static void BtlvInput_SetTypeBit(u32 *mask, int bit);
 static void BtlvInput_ApplyTypeMask(BtlvInput *work);
 static void BtlvInput_ShowTypeScreen(BtlvInput *work);
 static void BtlvInput_LoadTypePalettes(BtlvInput *work);
-static void BtlvInput_LoadTypePalette(const BtlvInput *work, int palette);
+static void BtlvInput_LoadTypePalette(BtlvInput *work, int palette);
 static void BtlvInput_UpdateTypePaletteAnim(BtlvInput *work);
 static void BtlvInput_SetTypeAnimIndex(BtlvInput *work, int index);
 static int BtlvInput_PickTypeAnimIndex(BtlvInput *work, int current);
@@ -1932,9 +1932,15 @@ static void BtlvInput_LoadTypePalettes(BtlvInput *work) {
 }
 
 // Loads one of the copied palettes into the fade buffers
-static void BtlvInput_LoadTypePalette(const BtlvInput *work, int palette) {
-    PaletteFade_LoadData(work->paletteFade, work->typePalBuf + palette * 0x80, 3, 0, 0x80);
-    PaletteFade_LoadData(work->paletteFade, work->typePalBuf2 + palette * 0xa0, 1, 0, 0xa0);
+static void BtlvInput_LoadTypePalette(BtlvInput *work, int palette) {
+    const u8 *src;
+
+    src = work->typePalBuf;
+    src += palette * 0x80;
+    PaletteFade_LoadData(work->paletteFade, src, 3, 0, 0x80);
+    src = work->typePalBuf2;
+    src += palette * 0xa0;
+    PaletteFade_LoadData(work->paletteFade, src, 1, 0, 0xa0);
 }
 
 // Animates the type icons' palettes: every 5 frames the next palette of the current step, a new random step when
@@ -2493,7 +2499,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
     ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_2);
     func_0204bfd4(work->moveUnit, FALSE);
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4 ? TRUE : FALSE; i++) {
         if (param->moves[i] != MOVE_NONE) {
             HeapID heapId = HEAPID_TAIL(work->heapId);
             type = PML_MoveGetParam(param->moves[i], MOVE_PARAM_TYPE);
@@ -2984,6 +2990,7 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     GFLBitmap *bitmap;
     u8 *pixels;
     int i;
+    void *vram = G2S_GetOBJCharPtr();
 
     work->actor21c = func_0204c040(work->unit218, work->chars, work->palette, work->cellAnims, &data_ov168_021f35f2, 1,
                                    work->heapId);
@@ -3009,18 +3016,18 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     pixels = GFL_BitmapGetPixelData(bitmap);
     func_0204c40c(work->actor21c, &proxy);
     for (i = 0; i < 4; i++) {
-        MI_CpuCopy16(&pixels[i * 0x1c0],
-                     (void *)(HW_DB_OBJ_VRAM + (0xde + i * 8) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x100);
-        MI_CpuCopy16(&pixels[i * 0x1c0 + 0x100],
-                     (void *)(HW_DB_OBJ_VRAM + (0xfe + i * 4) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x80);
-        MI_CpuCopy16(&pixels[i * 0x1c0 + 0x180],
-                     (void *)(HW_DB_OBJ_VRAM + (0x10e + i * 2) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x40);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0],
+            (void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x100);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0 + 0x100],
+            (void *)((u32)vram + (0xfe + i * 4) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x80);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0 + 0x180],
+            (void *)((u32)vram + (0x10e + i * 2) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x40);
     }
 
     GFL_StrBufFree(strbuf);

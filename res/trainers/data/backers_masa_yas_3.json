@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Masa & Yas",
+    "class": "TRAINER_CLASS_BACKERS_M",
+    "battle_style": "BTL_STYLE_DOUBLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCOLIPEDE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GIGALITH",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": 3,
+            "text": "Look at this buff body!\nAnd the Pokémon that support it!{be01}\nLet's have a Pokémon battle\nto show off my greatness!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Masa: The greatness of basketball...\nI think you got it.{be01}\nYas: Shall we curl up\nlike balls?"
+        },
+        {
+            "type": 5,
+            "text": "The important thing in basketball\nis outstanding teamwork!"
+        },
+        {
+            "type": 6,
+            "text": "Hmph! Hmph!{be01}\nFirst-class athletes\nspeak with their backs."
+        },
+        {
+            "type": 7,
+            "text": "The way the athletes scramble\nfor that ball...{be01}\nI wish they'd fight over me that way!{be01}"
+        },
+        {
+            "type": 9,
+            "text": "From the ball's point of view,\nit's like, please don't fight over me!"
+        },
+        {
+            "type": 10,
+            "text": "The way the athletes scramble\nfor that ball...{be01}\nI wish they'd fight over me that way!"
+        }
+    ]
+}

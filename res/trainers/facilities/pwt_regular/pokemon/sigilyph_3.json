@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SIGILYPH",
+    "moves": [ "MOVE_AIR_SLASH", "MOVE_SYNCHRONOISE", "MOVE_ICE_BEAM", "MOVE_ENERGY_BALL" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_EXPERT_BELT",
+    "form": 0
+}

@@ -7,6 +7,14 @@
 #include "constants/battle.h"
 #include "struct_decls.h"
 
+// The stat that a move's stat change affects, as PML_MoveGetStatChangeStage returns it: one stat from 1, or
+// MOVE_STAT_CHANGE_ALL for the five from attack to speed at once. An enum, which MWCC loads again where it is
+// passed on after tests of it that share one load, as func_ov167_021a6914 does
+typedef enum {
+    MOVE_STAT_CHANGE_NONE = 0,
+    MOVE_STAT_CHANGE_ALL = 10,
+} MoveStatChangeStat;
+
 // The move that a move calls instead of itself, such as Metronome's, and its target
 typedef struct {
     u16 move;
@@ -38,7 +46,7 @@ BtlServerFlow *func_ov167_0219f390(BtlServer *server, BtlMainModule *mainModule,
                                    BtlServerCmdQueue *queue, u32 a4, HeapID heapId);
 void func_ov167_0219f3f8(BtlServerFlow *serverFlow);
 void func_ov167_0219f570(BtlServerFlow *serverFlow);
-u8 func_ov167_0219f588(BtlServerFlow *serverFlow);
+BOOL func_ov167_0219f588(BtlServerFlow *serverFlow);
 void func_ov167_0219f65c(BtlServerFlow *serverFlow);
 u32 func_ov167_0219f66c(BtlServerFlow *serverFlow, BtlClientActions *clientActions);
 void func_ov167_0219f748(BtlServerFlow *serverFlow);
@@ -422,10 +430,10 @@ BOOL func_ov167_021a6914(BtlServerFlow *flow, const BtlFlowMoveParam *param, Bat
                          BOOL showFail);
 u32 func_ov167_021a68fc(BtlServerFlow *flow);
 void ServerEvent_GetMoveStatChangeValue(BtlServerFlow *flow, u16 move, u32 index, BattleMon *attacker,
-                                        BattleMon *target, u32 *stat, s32 *change);
+                                        BattleMon *target, MoveStatChangeStat *stat, s32 *change);
 void func_ov167_021ab3c0(BtlServerFlow *flow, BattleMon *mon, u16 move, u32 stat, s32 change);
-BOOL func_ov167_021a6ab8(BtlServerFlow *flow, u8 monId, BattleMon *mon, u32 stat, s32 change, u8 attackerId,
-                         u16 context, u32 value, BOOL showFail, BOOL flag);
+BOOL func_ov167_021a6ab8(BtlServerFlow *flow, u8 monId, BattleMon *mon, MoveStatChangeStat stat, s32 change,
+                         u8 attackerId, u16 context, u32 value, BOOL showFail, BOOL flag);
 s32 ServerEvent_CheckSubstituteInteraction(BtlServerFlow *flow, BattleMon *mon, u32 stat, u8 attackerId, u16 context,
                                            s32 change);
 void func_ov167_021a9564(BtlServerFlow *flow, BattleMon *mon, u32 stat, s32 change);

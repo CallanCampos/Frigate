@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""The item data in data/items/, one JSON file per item: dump writes them from the ROM once, and pack builds the
+"""The item data in res/items/, one JSON file per item: dump writes them from the ROM once, and pack builds the
 archive (a/0/2/4) from them, which the build does.
 
-    item_data.py dump extract/b2_us/files data/items
-    item_data.py pack data/items ARCHIVE
+    item_data.py dump extract/b2_us/files res/items
+    item_data.py pack res/items ARCHIVE
 
-Each item is data/items/<item>/data.json, named after its constant (master_ball/ for ITEM_MASTER_BALL), and the archive
-has them in the order of data/constants/items.txt. An item's file also holds its name, plural and description, which
+Each item is res/items/<item>/data.json, named after its constant (master_ball/ for ITEM_MASTER_BALL), and the archive
+has them in the order of generated/items.txt. An item's file also holds its name, plural and description, which
 the text files take with \\from{items.name} and the like (see text_sources.py). item.schema.json describes each field.
 """
 import argparse
@@ -168,10 +168,10 @@ def pack(root: Path, output: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/items/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/items/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the item data archive from data/items/")
+    pack_parser = commands.add_parser("pack", help="build the item data archive from res/items/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("output", type=Path)
     args = parser.parse_args()

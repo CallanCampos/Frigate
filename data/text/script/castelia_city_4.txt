@@ -1,9 +1,0 @@
-CasteliaCity4_Text_Empty =                                                    \x{ffff}
-CasteliaCity4_Text_Empty_2 =                        \x{ffff}
-CasteliaCity4_Text_Empty_3 =                                                                 \x{ffff}
-CasteliaCity4_Text_Empty_4 =                                                                                \x{ffff}
-CasteliaCity4_Text_Empty_5 =                                                           \x{ffff}
-CasteliaCity4_Text_NimbasaCityHasPokemon = Nimbasa City has\nthe Pokémon Musical.{be01}\nI've tried it several times.\nSigh. It never seems to go well.{be01}\nBut I'll keep trying until I get\nthe perfect Props for my Pokémon!
-CasteliaCity4_Text_TrainersPokemonMakeAmazing = Trainers and Pokémon make\nan amazing combination!{be01}\nThey were responsible for\nexcavating the ruins on Route 4!
-CasteliaCity4_Text_TrainersPokemonMakeAmazing_2 = Trainers and Pokémon make\nan amazing combination!{be01}\nThey were responsible for the row of\nbrand-new buildings on Route 4!
-CasteliaCity4_Text_Route4Ahead = Route 4 Ahead

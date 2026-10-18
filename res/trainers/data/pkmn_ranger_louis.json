@@ -1,0 +1,39 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Louis",
+    "class": "TRAINER_CLASS_PKMN_RANGER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_CHESTO_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_AMPHAROS",
+            "form": 0,
+            "level": 34,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I am a Pokémon Ranger, here to gather\nup some electric power!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Whoa! Can I still not draw forth my\nelectrifying powers?!"
+        },
+        {
+            "type": 15,
+            "text": "Take this.{be01}"
+        },
+        {
+            "type": 16,
+            "text": "I don't know if it's unfair or just plain\ncool when Pokémon use electricity!"
+        }
+    ]
+}

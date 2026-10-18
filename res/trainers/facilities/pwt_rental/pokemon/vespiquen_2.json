@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VESPIQUEN",
+    "moves": [ "MOVE_ATTACK_ORDER", "MOVE_POWER_GEM", "MOVE_CAPTIVATE", "MOVE_CONFUSE_RAY" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_QUIET",
+    "item": "ITEM_INSECT_PLATE",
+    "form": 0
+}

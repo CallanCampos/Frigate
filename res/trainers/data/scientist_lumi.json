@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lumi",
+    "class": "TRAINER_CLASS_SCIENTIST_F_46",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_SPECIAL" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_JOLTIK",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GOLBAT",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I love this place! The electricity\ncharges up my inspiration!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Aha!\nThat made a lightbulb go on in my head!"
+        },
+        {
+            "type": 2,
+            "text": "When a person moves,\nelectric signals travel in the body!{be01}\nAlso, when a person has an inspiration,\nelectric signals travel to the brain!"
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_PWT",
+    "type": 3,
+    "radius": 12,
+    "position": {
+        "x": 77,
+        "y": 103
+    },
+    "cursor": {
+        "x": 77,
+        "y": 103
+    },
+    "hit": {
+        "start": {
+            "x": 77,
+            "y": 99
+        },
+        "end": {
+            "x": 77,
+            "y": 107
+        },
+        "radius": 8
+    },
+    "fly": true,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": "EVENT_FLAG_ARRIVED_PWT",
+    "shown_by": null,
+    "description": "TownMap_Text_TrainersWhoProudTheir",
+    "landmarks": [ "TownMap_Text_MoveReminder", "TownMap_Text_MoveDeleter", "TownMap_Text_MoveTutor_3" ],
+    "area": {
+        "animation": 1,
+        "x": 67,
+        "y": 95
+    }
+}

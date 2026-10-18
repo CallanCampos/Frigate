@@ -1,0 +1,33 @@
+{
+    "$schema": "trade.schema.json",
+    "nickname": "Snorlax",
+    "trainer_name": "Curtis",
+    "species": "SPECIES_SNORLAX",
+    "form": 0,
+    "level": 50,
+    "ivs": {
+        "hp": null,
+        "attack": null,
+        "defense": null,
+        "speed": null,
+        "special_attack": null,
+        "special_defense": null
+    },
+    "ability_slot": 2,
+    "nature": null,
+    "sex": null,
+    "trainer_id": 54118,
+    "contest": {
+        "cool": 0,
+        "beauty": 0,
+        "cute": 0,
+        "smart": 0,
+        "tough": 0
+    },
+    "held_item": "ITEM_RARE_CANDY",
+    "trainer_gender": "GENDER_MALE",
+    "unk54": 0,
+    "region": 2,
+    "wanted_species": "SPECIES_PIKACHU",
+    "wanted_sex": "GENDER_UNKNOWN"
+}

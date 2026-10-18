@@ -24,7 +24,7 @@
 // the others
 #define TRAINER_CLASS_SPECIAL_COUNT 29
 
-// A trainer's record in ARCID_TRDATA, packed from data/trainers/ by tools/data/trainer_data.py
+// A trainer's record in ARCID_TRDATA, packed from res/trainers/data/ by tools/data/trainer_data.py
 typedef struct {
     u8 partyKind; // PARTY_*
     u8 trainerClass;

@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Early Bird",
-    "description": "The Pokémon awakens\nquickly from sleep."
-}

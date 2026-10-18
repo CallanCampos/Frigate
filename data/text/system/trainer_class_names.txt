@@ -1,2 +1,0 @@
-\from{trainer_classes.name}
-\pad{0c}

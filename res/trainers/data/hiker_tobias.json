@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tobias",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ROGGENROLA",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_TIMBURR",
+            "form": 0,
+            "level": 31,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A lake that spreads beneath the earth...\nAnd the Hiker who waits beside it!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You have seized victory with ease,\nyoung Trainer..."
+        },
+        {
+            "type": 2,
+            "text": "This lake was formed by the water from\nunderground rivers...{be01}\nSuch a clear, flawless blue..."
+        }
+    ]
+}

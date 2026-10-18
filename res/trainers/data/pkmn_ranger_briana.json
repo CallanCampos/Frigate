@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Briana",
+    "class": "TRAINER_CLASS_PKMN_RANGER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_CHESTO_BERRY",
+    "party": [
+        {
+            "species": "SPECIES_MINCCINO",
+            "form": 0,
+            "level": 33,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_EXCADRILL",
+            "form": 0,
+            "level": 33,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "There was a whisper on the wind that told\nme of your coming!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I will become the wind and blow..."
+        },
+        {
+            "type": 15,
+            "text": "Oh! I almost forgot!\nI found some Chesto Berries, so...{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Wind blows into caves when you're\nclose to an entrance or exit."
+        }
+    ]
+}

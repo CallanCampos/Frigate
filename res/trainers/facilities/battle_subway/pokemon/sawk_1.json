@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SAWK",
+    "moves": [ "MOVE_LOW_SWEEP", "MOVE_QUICK_GUARD", "MOVE_RETALIATE", "MOVE_TAUNT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAUGHTY",
+    "item": "ITEM_BLACK_BELT",
+    "form": 0
+}

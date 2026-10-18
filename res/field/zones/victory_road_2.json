@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 12,
+    "npc_cache": 24,
+    "area": "AREA_VICTORY_ROAD_2",
+    "matrix": "MAP_MATRIX_VICTORY_ROAD_2",
+    "scripts": "SCRIPTS_VICTORY_ROAD_2",
+    "text": "SCRIPT_TEXT_VICTORY_ROAD_2",
+    "bgm": "SEQ_BGM_D_CHAMPROAD",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_VICTORY_ROAD",
+    "place": "PLACE_VICTORY_ROAD",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 11,
+    "transition": 0,
+    "battle_bg": 7,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": false,
+    "entralink_warp": true,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 4,
+    "fly": {
+        "x": 0,
+        "y": 5,
+        "z": 0
+    }
+}
