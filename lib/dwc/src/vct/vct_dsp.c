@@ -1,3 +1,4 @@
+#include "nitro/cp.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "vct_dsp_internal.h"
@@ -199,35 +200,33 @@ void VCT_InitCapture(void) {
 // Filters a frame in place with a high-pass filter and returns the mean of the squares of the result
 u32 VCT_FilterFrame(s16 *samples, int bytes) {
     s16 input = samples[0];
-    u32 count = (u32)bytes >> 1;
     int scaled = input * 0xe9f;
     int minusInput = -scaled;
     u32 i;
     u64 sum;
     int output = (scaled + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
 
+    bytes /= sizeof(s16);
     sum = output * output;
     sEcho.highpassOutput = output;
     sEcho.highpassMinusInput = minusInput;
-    for (i = 1; i < count; i++) {
-        int scaled = samples[i] * 0xe9f;
-        int next = scaled + minusInput + output * 0xd3e;
+    i = 1;
+    if (i < bytes) {
+        do {
+            int scaled = samples[i] * 0xe9f;
+            int next = scaled + minusInput + output * 0xd3e;
 
-        samples[i - 1] = output;
-        output = next >> 12;
-        sum += output * output;
-        minusInput = -scaled;
+            samples[i - 1] = output;
+            output = next >> 12;
+            sum += output * output;
+            minusInput = -scaled;
+        } while (++i < bytes);
+        sEcho.highpassMinusInput = minusInput;
+        sEcho.highpassOutput = output;
     }
-    sEcho.highpassMinusInput = minusInput;
-    sEcho.highpassOutput = output;
-    *(samples + count - 1) = output;
-    REG_DIVCNT = 1;
-    REG_DIV_NUMER = sum;
-    REG_DIV_DENOM_LO = count;
-    REG_DIV_DENOM_HI = 0;
-    while (REG_DIVCNT & REG_DIVCNT_BUSY) {
-    }
-    return REG_DIV_RESULT_LO;
+    *(samples + bytes - 1) = output;
+    CP_SetDiv64_32(sum, bytes);
+    return CP_GetDivResult32();
 }
 
 static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
