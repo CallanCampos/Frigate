@@ -379,15 +379,16 @@ static void OnCursorDown(ShortcutMenuApp *work, u16 value, u32 count, u32 *handl
 }
 
 static void ReadInput(ShortcutMenuApp *work) {
-    s32 count;
-    u16 listTop;
-    u16 cursorRow;
-    u16 index;
-    u16 selectIndex;
-    u16 buttonIndex;
-    u16 cursorIndex;
-    u32 handled = FALSE;
     s32 result = BMPMENULIST_NULL;
+    BOOL toggle = FALSE;
+    u32 handled = FALSE;
+    u16 cursorIndex;
+    u16 buttonIndex;
+    u16 selectIndex;
+    u16 index;
+    u16 cursorRow;
+    u16 listTop;
+    s32 count;
 
     func_0203d564(FALSE);
     BmpMenuList_GetCursorIndex(work->list, &cursorIndex);
@@ -417,32 +418,31 @@ static void ReadInput(ShortcutMenuApp *work) {
     }
     if (work->mode == 0) {
         work->input = result;
-    } else if (work->mode == 1 && result != BMPMENULIST_NULL) {
-        if (result != 0) {
-            u8 newIndex;
-
+    } else if (work->mode == 1) {
+        if (result == BMPMENULIST_CANCEL) {
+            toggle = TRUE;
+        } else if (result != BMPMENULIST_NULL) {
             result = BmpMenuList_GetOptionValue(work->list, work->listTop + work->cursorRow);
             BmpMenuList_GetCursorIndex(work->list, &index);
             if (work->scrollDir != 0) {
-                newIndex = 0xff;
+                result = ShortcutSave_MoveItemToIndex(work->shortcut, result, 0xff);
             } else {
-                newIndex = (u8)index;
+                result = ShortcutSave_MoveItemToIndex(work->shortcut, result, (u8)index);
             }
-            result = ShortcutSave_MoveItemToIndex(work->shortcut, result, newIndex);
             FreeList(work, &listTop, &cursorRow);
             if (index - 1 == result) {
                 cursorRow--;
             }
             CreateList(work, listTop, cursorRow, work->heapId);
+            toggle = TRUE;
         }
-        handled = TRUE;
     }
     if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) && work->mode == 0 &&
-        BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT) > 1) {
+        (u32)BmpMenuList_GetParam(work->list, BMPMENULIST_PARAM_COUNT) > 1) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        handled = TRUE;
+        toggle = TRUE;
     }
-    if (handled) {
+    if (toggle) {
         work->mode ^= 1;
         if (work->mode == 0) {
             int i;
@@ -452,7 +452,7 @@ static void ReadInput(ShortcutMenuApp *work) {
                 func_0204c124(work->actors[i], FALSE);
             }
             RedrawHighlight(work->list, FALSE, FALSE);
-        } else {
+        } else if (work->mode == 1) {
             BmpMenuList_GetPos(work->list, &work->listTop, &work->cursorRow);
             work->showActors = TRUE;
         }
@@ -555,7 +555,7 @@ static void CreateList(ShortcutMenuApp *work, u16 listTop, u16 cursorRow, HeapID
 
     work->options = ListMenuCore_CreateOptionList(count, heapId);
     for (i = 0; i < count; i++) {
-        u32 value = ShortcutSave_GetRegistItem(work->shortcut, i);
+        u32 value = ShortcutSave_GetRegistItem(work->shortcut, (u8)i);
 
         ListMenuCore_AppendMsgOption(work->options, work->msgData, value, value, heapId);
     }
