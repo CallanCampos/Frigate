@@ -332,3 +332,7 @@ lib/dwc/src/qr2/qr2.c:
 lib/dwc/src/qr2/qr2regkeys.c:
     .text       start:0x02181ff0 end:0x02182080
     .data       start:0x0218b310 end:0x0218b8bc
+
+lib/dwc/src/serverbrowsing/sb_crypt.c:
+    complete
+    .text       start:0x02182080 end:0x02182260
