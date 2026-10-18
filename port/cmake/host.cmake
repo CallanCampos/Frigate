@@ -1,10 +1,10 @@
-# The host's system (port/hal/host), what differs between macOS, Linux and Windows: its tests (port/tests/host), on
-# the whole program's objects as the program links them (port/hal/trap.c and the trap stubs' placeholders), each
-# scenario in a process of its own: a trap placeholder touched (the game reaching data with no C yet), a crash
-# reported, both again on a fiber with the C library's code making the access (as the game's threads run), a fiber's
-# guard touched and an illegal instruction there, the watchdog going off and kicked, the program's static data (the PXI
-# bus's pointers), files, a folder and an argument whose names aren't ASCII, the environment and private file mappings.
-# None needs a ROM, so every CI job runs them.
+# The host's system (port/hal/host), what differs between macOS, Linux and Windows: its tests (port/tests/host), on the
+# whole program's objects as the program links them (port/hal/trap.c and the trap stubs' placeholders), each scenario in
+# a process of its own: a trap placeholder touched (the game reaching data with no C yet), a crash reported, both again
+# on a fiber with the C library's code making the access (as the game's threads run), a fiber's guard touched and an
+# illegal instruction there, the watchdog going off, kicked and off, the program's static data (the PXI bus's pointers),
+# files, a folder and an argument whose names aren't ASCII, the environment and private file mappings. None needs a ROM,
+# so every CI job runs them.
 enable_testing()
 add_executable(port_host_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/host/test_host.c"
@@ -65,6 +65,10 @@ add_test(NAME host_watchdog_kicked COMMAND port_host_tests watchdog_kicked)
 set_tests_properties(host_watchdog PROPERTIES TIMEOUT 60)
 set_tests_properties(host_watchdog_kicked PROPERTIES TIMEOUT 60
     PASS_REGULAR_EXPRESSION "watchdog_kicked: ok" FAIL_REGULAR_EXPRESSION "went off")
+# 0 seconds turns it off, on every host
+add_test(NAME host_watchdog_off COMMAND port_host_tests watchdog_off)
+set_tests_properties(host_watchdog_off PROPERTIES TIMEOUT 60
+    PASS_REGULAR_EXPRESSION "watchdog_off: ok" FAIL_REGULAR_EXPRESSION "went off")
 
 foreach(scenario IN ITEMS static_data files)
     add_test(NAME host_${scenario} COMMAND port_host_tests ${scenario})

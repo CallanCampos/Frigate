@@ -1,11 +1,11 @@
-// Tests of the host's system (port/hal/host) as the platform layer and the program use it, the same on macOS, Linux
-// and Windows: a trap placeholder touched stops the program with its name and status 70 (port/hal/trap.c), as the game
+// Tests of the host's system (port/hal/host) as the platform layer and the program use it, the same on macOS, Linux and
+// Windows: a trap placeholder touched stops the program with its name and status 70 (port/hal/trap.c), as the game
 // would; a crash is reported with a backtrace before the fault ends the program; the same on a fiber, as the game's
-// threads run (port/hal/os/fiber.c), with the C library's code making the access, and with a fiber's guard touched;
-// the watchdog ends a program that spins, with its message and status, and leaves one alone that kicks it; and the
-// program's static data, directories (one whose name isn't ASCII among them), arguments, environment and private file
-// mappings that the PXI bus (port/hal/pxi/pointer.c), the saves and the tests stand on. The scenarios that end the
-// process run one a process. None needs a ROM.
+// threads run (port/hal/os/fiber.c), with the C library's code making the access, and with a fiber's guard touched; the
+// watchdog ends a program that spins, with its message and status, and leaves one alone that kicks it or that started
+// it with 0 seconds, which turns it off; and the program's static data, directories (one whose name isn't ASCII among
+// them), arguments, environment and private file mappings that the PXI bus (port/hal/pxi/pointer.c), the saves and the
+// tests stand on. The scenarios that end the process run one a process. None needs a ROM.
 //
 //   port_host_tests NAME [ARGUMENT]
 #include "hal/host/host.h"
@@ -173,6 +173,20 @@ static int TestWatchdogKicked(void) {
     return 0;
 }
 
+// A watchdog started with 0 seconds is off, kicked or not: the program runs on past its second (port/hal/host/host.h)
+static int TestWatchdogOff(void) {
+    Uint64 start = SDL_GetTicks();
+
+    port_host_watchdog_start(0, "host test: the watchdog went off, though off\n", WATCHDOG_STATUS);
+    while (SDL_GetTicks() - start < 1500) {
+        SDL_Delay(100);
+    }
+    port_host_watchdog_kick();
+    SDL_Delay(500);
+    printf("watchdog_off: ok\n");
+    return 0;
+}
+
 // The static data holds the program's statics, zeroed or set, and isn't empty
 static int TestStaticData(void) {
     uintptr_t start;
@@ -280,6 +294,7 @@ static const Test sTests[] = {
     { "illegal_instruction_fiber", TestIllegalInstructionFiber },
     { "watchdog", TestWatchdog },
     { "watchdog_kicked", TestWatchdogKicked },
+    { "watchdog_off", TestWatchdogOff },
     { "static_data", TestStaticData },
     { "files", TestFiles },
     { "utf8_argument", TestUtf8Argument },

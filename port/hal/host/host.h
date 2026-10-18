@@ -24,8 +24,9 @@
 
 // --- Memory -------------------------------------------------------------------------------------------------------
 
-// The alignment of a static array that must start a page (port/hal/hw's memory windows): the largest page of the
-// hosts, Apple Silicon's 16 KiB, but Windows' 4 KiB there, since COFF aligns no static object beyond 8 KiB
+// The alignment of a static array that must start a page (port/hal/hw's memory windows, and the paddings around the
+// trap stubs' placeholders that port/tools/gen_stubs.py writes): the largest page of the hosts, Apple Silicon's 16 KiB,
+// but Windows' 4 KiB there, since COFF aligns no static object beyond 8 KiB
 #ifdef _WIN32
 #define PORT_HOST_PAGE_ALIGNMENT 4096
 #else
