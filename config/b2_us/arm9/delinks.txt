@@ -1811,6 +1811,7 @@ lib/dwc/src/wds/wds.c:
     .bss        start:0x02141984 end:0x02141988
 
 lib/dwc/src/ac/dwc_ac_wcm.c:
+    complete
     .text       start:0x02058eb0 end:0x0205975c
     .rodata     start:0x020940dc end:0x020940e0
 
