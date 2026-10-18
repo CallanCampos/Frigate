@@ -22,12 +22,13 @@ typedef enum VCTCodec {
     VCT_CODEC_MAX,
 } VCTCodec;
 
-// The bytes of a slot of the send queue: the largest packet, 0x450 bytes (the 12-byte header, 4 bytes of ADPCM state
-// and a frame of 0x440 bytes), rounded up to the 32-byte cache line
+// The bytes of a slot of the send queue: room for an uncoded frame, 0x450 bytes (the 12-byte header, 4 bytes of
+// ADPCM state and 0x440 bytes of samples), most likely rounded up to 32 bytes so that both slots of the 32-aligned
+// queue start on a cache line
 #define VCT_SEND_SLOT_SIZE 0x460
 
-// The two frames going out: one is filled while the other is sent. Each is built as a packet in a slot of the buffer,
-// and each slot starts on a cache line.
+// The two frames going out: one is filled while the other is sent. Each is built as a packet in a slot of the buffer
+// and coded in place before it is sent.
 struct VCTSendQueue {
     u8 buffer[2 * VCT_SEND_SLOT_SIZE];
     u32 readIndex;

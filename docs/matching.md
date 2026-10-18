@@ -1895,10 +1895,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC doesn't push a constant multiply into the arms of a select: `&frames[c ? 0 : 2]` with 0x460-byte elements gives
   `movne r2, #0; moveq r2, #2; mov r0, #0x460; mla`. A select of 0 and an element's size added to a base (`movne r0, #0;
   moveq r0, #0x460; add r8, r6, r0`) is therefore a ternary of byte offsets in the source, which no index spelling, type
-  or inline gives. Such a select is a raw buffer of bytes cut into slots, each filled as the element through a pointer
-  to it, and a stride that is no struct's natural size but a size rounded up to the 32-byte cache line says the same:
+  or inline gives. When nothing else indexes the elements as a typed array, such a select is a raw buffer of bytes cut
+  into slots, each filled as the element through a pointer to it, and a stride that is no struct's natural size but a
+  size rounded up to 32 bytes says the same:
   libVCT's send queue (`vct_audio.c`) is a 32-aligned `u8 buffer[2 * VCT_SEND_SLOT_SIZE]`, its slot 0x460 bytes, the
-  largest packet (0x450) rounded up, and `EncodeNextFrame` and `VCT_SubmitSamples` match whole with
+  uncoded frame (0x450) rounded up, and `EncodeNextFrame` and `VCT_SubmitSamples` match whole with
   `(VCTVoicePacket *)&sSendQueue.buffer[(sSendQueue.readIndex & 1) ? 0 : VCT_SEND_SLOT_SIZE]`, where an array of
   packets padded to 0x460 kept the `mla`. A ternary of the constants 0 and 1 compiles as a logical not, `moveq #1`
   before `movne #0`, while other constants keep the source's arm order (`movne #0; moveq #2`).
