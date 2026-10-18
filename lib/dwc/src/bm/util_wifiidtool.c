@@ -83,6 +83,10 @@ BOOL DWCBm_MakePendingWifiId(DWCBmWifiIdInfo *info) {
         // BUG: adds the address of the tick function, not the tick count that its call would give
 #ifdef BUGFIX
         seconds += OS_GetTick();
+#elif defined(PLATFORM_PC)
+        // The address the DS adds, which never changes: a host's moves at every launch (ASLR), so the pending ID, and
+        // every save New Game copies it into, would differ from run to run (port/include/port_host.h)
+        seconds += PORT_DS_OS_GETTICK_ADDRESS;
 #else
         seconds += (u32)OS_GetTick;
 #endif
@@ -158,6 +162,10 @@ BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info) {
         // BUG: adds the address of the tick function, not the tick count that its call would give
 #ifdef BUGFIX
         seconds += OS_GetTick();
+#elif defined(PLATFORM_PC)
+        // The address the DS adds, which never changes: a host's moves at every launch (ASLR), so the pending ID, and
+        // every save New Game copies it into, would differ from run to run (port/include/port_host.h)
+        seconds += PORT_DS_OS_GETTICK_ADDRESS;
 #else
         seconds += (u32)OS_GetTick;
 #endif

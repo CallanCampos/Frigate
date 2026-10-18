@@ -55,19 +55,26 @@ compare.py screens build/oracle-runs/boot build/oracle-runs/port --align counter
 oracle.py boot --out build/oracle-runs/both --port build/port/pokeblack2
 oracle.py sequence title --port build/port/pokeblack2 --out build/oracle-runs/title
 oracle.py sequence-check title --port build/port/pokeblack2
+oracle.py save first_save --out build/oracle-runs/first_save.sav
+oracle.py sequence continue --port build/port/pokeblack2 --out build/oracle-runs/continue
 ```
 
-`oracle.py run` calls `pbw-oracle` with the version's ROM (`orig/baserom_b2_us.nds`), its symbols
-(`config/b2_us/arm9`), the statics of the ROM build's link map and GFL's frame count as the counter. It passes `--time`
-only when it is given one, so that an input file's `time` line applies, else the default clock. `oracle.py port` runs
-the port once, from power-on with a blank save, to the last frame of its list, and has it write its own run directory
-(`--run-dir`, [below](#run-directories)) with a picture of each frame of the list (`--run-screens`) and the memory its
-`--dump`s name (`--run-dump`); its clock is `--time`, else `--input`'s file's, else the default. A run that ends early
-(a trap stub, a crash) is reported with the port's message, and the frames it didn't reach have no picture.
-`oracle.py boot` does both for the boot sequence's frames, the oracle 400 frames further with a PNG of every frame,
-and compares them on the count, the movies by their pictures, at 6 bits and at 5. `oracle.py sequence` and
-`sequence-check` are the comparison sequences and their check without the oracle
-([below](#the-comparison-sequences)). `pbw-oracle --help` and the scripts' `-h` list every option.
+`oracle.py run` calls `pbw-oracle` with the version's ROM (`orig/baserom_b2_us.nds`), its symbols (`config/b2_us/arm9`),
+the statics of the ROM build's link map and GFL's frame count as the counter. It passes `--time` only when it is given
+one, so that an input file's `time` line applies, else the default clock. `oracle.py port` runs the port once, from
+power-on with a blank save (unless `--save` gives one), to the last frame of its list, and has it write its own run
+directory (`--run-dir`, [below](#run-directories)) with a picture of each frame of the list (`--run-screens`) and the
+memory its `--dump`s name (`--run-dump`); its clock is `--time`, else `--input`'s file's, else the default. A run that
+ends early (a trap stub, a crash) is reported with the port's message, and the frames it didn't reach have no picture.
+`oracle.py boot` does both for the boot sequence's frames, the oracle 400 frames further with a PNG of every frame, and
+compares them on the count, the movies by their pictures, at 6 bits and at 5. `oracle.py sequence` and `sequence-check`
+are the comparison sequences and their check without the oracle ([below](#the-comparison-sequences)). Both programs take
+`--save FILE`, the save memory at power-on, and `--save-out FILE`, where to write it at the end; the port's run gets a
+new save directory with FILE in it under the ROM's game code (`IREO.sav`, `IRDO.sav`), as the port names its saves, and
+its `--save-out` is the blank chip (524,288 bytes of 0xff) when the game neither had a save nor wrote one, never a file
+left by an earlier run. `oracle.py save NAME` makes one of the saves the sequences start from on the oracle, and
+`oracle.py port-save` boots the port's own save on it ([below](#saves)). `pbw-oracle --help` and the scripts' `-h` list
+every option.
 
 `pbw-oracle`'s options, which `oracle.py run` fills in:
 
@@ -337,7 +344,7 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Two input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, compared with
+Three input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, compared with
 `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
@@ -351,8 +358,14 @@ Two input files on game frames for each version, `port/tests/oracle/<name>_<vers
   The clock runs over port frames 313-1108, and the counts are the same again from 1109 (`--lag 1109=0`). The press
   reaches the DS some 1,500 frames further into the opening than the port, so this sequence leaves most of the
   opening to the other.
+- **continue**: the title's presses from a save, `first_save`'s ([below](#saves)), which the oracle makes first; the
+  start menu then shows CONTINUE with the saved game, and A at game frame 3400 takes CONTINUE into the field. The port
+  runs to 3,600 frames, the oracle 6,000; the port may stop from frame 3425, once the start menu has wiped out to
+  black, on the trap stub the sequence names (`stop_trap`, a pattern of the trap's message): overlay 36's
+  `FIELDMAP_PROC_FUNCS`, in the field's first frames (below). A stop on any other trap fails, so the sequence says
+  which gap it stops on and changes when the decomp fills it.
 
-Each is two ctest tests:
+Each is two ctest tests, but continue, whose save only the oracle can make, has only the first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -379,11 +392,114 @@ Results, every port frame but the known differences:
 | opening, White 2 | 3,800 | 3,800 | 3,526 | 274 | oracle frame 1283 | 274 of 274 |
 | title, Black 2 | 3,600 | 3,579 | 1,474 | 2,105 | 21 port frames, oracle frame 4943 | 2,470 of 2,470, 15 left out |
 | title, White 2 | 3,600 | 3,572 | 1,477 | 2,095 | 28 port frames, oracle frames 1283, 4875 | 2,470 of 2,470, 15 left out |
+| continue, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
+| continue, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
 didn't until the rasterizer took the values along an edge by line, as melonDS does, where it had taken them along an
 X-major edge's run, which put whole spans' colours a step apart (before, a median of 79 and at most 172).
+
+## Saves
+
+**The format.** A save of BW2 is the cartridge's backup chip, a 4 Mbit flash, and melonDS's `.sav` of the game and
+the port's save file (`port/hal/card/port_card.h`) are both that chip's 524,288 bytes, with nothing before or after
+them, so a save moves between the two by copying the file under the other's name. The evidence, in the pinned melonDS
+1.1's sources (`<build>/_deps/melonds-1.1-src/src`):
+
+- `ROMList.cpp` gives the game codes `IREO` (`0x4F455249`) and `IRDO` (`0x4F445249`) save type 6, and
+  `NDSCart.cpp`'s `CartRetail` makes type 6 a flash (`SRAMType` 3) of `512*1024` bytes (`sramlengths`). A save of
+  that length becomes the chip's memory as it is; one of another length is cut, or padded with 0xff, without a word.
+- The frontend reads the whole `.sav` as that memory (`EmuInstance.cpp`, the cart's `SRAM`) and writes the memory to
+  the `.sav` whole after a write (`SaveManager.cpp`). melonDS names the file after the ROM's, next to it or in its
+  save folder; the port names its own after the game code (`IREO.sav`, `IRDO.sav`) in its save directory.
+- `pbw-oracle --save` hands melonDS a file's bytes the same way, and `--save-out` writes `GetNDSSave()`, the same
+  memory, so a save the oracle writes is a melonDS `.sav`.
+
+And by running both programs:
+
+- **melonDS to the port:** `first_save`'s file, which melonDS wrote, continues in the port: the start menu shows its
+  saved game exactly as melonDS does (the continue sequence, above and below). The port leaves a save the game only
+  reads as it was: the file has the same SHA-1 after the run.
+- **The port to melonDS** (`oracle.py port-save`, ctest `oracle_port_save`): both programs play
+  `first_save_<version>.pbwinput`, whose start is New Game as `new_game.pbwinput` plays it, the port 10,600 frames,
+  past New Game's formatting of the blank backup and before the field's first script, the oracle 13,000 frames for
+  its own save of that moment. The oracle then boots each save with `title_<version>.pbwinput`, 5,400 frames: the two
+  runs are the same frame for frame, count and both screens (the start menu with NEW GAME first, no message about a
+  damaged save), and neither save is written. Black 2 and White 2 both pass. A save with an adventure in it waits for
+  the port's field (overlay 36).
+
+**What the two formatted saves differ in**, and why. In Black 2 they differ in 10,712 bytes, 5,356 in each copy of the
+main save and none after `0x4c000`; in White 2 in 10,720. None of it is the format: it is when each program set the
+blocks up, which the game takes from the clock, the VBlank count and the hardware's state. In each copy (Black 2):
+
+- 5,292 bytes in three blocks the game encrypts with a key it seeds with the VBlank count, `(OS_GetVBlankCount() << 8)
+  | OS_GetVBlankCount()`: the mystery gift block at `0x1c800` (`mystery_data.c:391`, 2,695 bytes), the trainer card's
+  records at `0x1da04` (`trainer_card_savedata.c:18`, 472) and the symbol encounters' data at `0x22a00`
+  (`symbol_save.c:39`, 2,125). The port's three seeds are `0x5d4c`, the DS's `0x5959`, `0x5959` and `0x5b5a`: the DS
+  gets to New Game at another count and crosses a VBlank between the blocks.
+- 8 bytes of DWC's user data at `0x1aa00`: the login ID's player ID at `0x1aa0c`, a random number seeded with
+  `OS_GetLowEntropyData` (`dwc_account.c:285`), the timers and the hardware's state at that moment, and DWC's CRC of the
+  user data at `0x1aa3c`.
+- 8 bytes, the day care's egg seed at `0x20ecc` (`GFL_RandomMT`, `daycare_savedata.c:90`).
+- 13 bytes in five other fields that blocks take when New Game sets them up (`0x1fa02`, `0x21200`–`0x21204`,
+  `0x213b7`, `0x24fd8`, `0x2585c`; 16 in White 2), not traced one by one.
+- 35 bytes of checks: the CRC-16 of each of the eight blocks above and the checksum table at `0x25f00` (36 in White 2).
+
+The console's pending Wi-Fi ID, which DWC makes from the clock and the MAC address and New Game copies into the login
+ID (`0x1aa04`, 8 bytes), is the same in both, and `port-save` checks that it is. It wasn't: DWC adds the address of
+`OS_GetTick` to the ID's seed (`util_wifiidtool.c`'s `BUG`), a constant on the DS (`0x0207bb0d`, `0x0207bb39` in
+White 2) and on a host the program's address, which macOS moves at every launch. Every run of the port then wrote
+another save (22 bytes apart: the ID, the CRCs and the checksum tables over it, in both copies), so the 10,718 bytes
+counted before were one run's. The host build
+now adds the DS's address there (`port/docs/game-changes.md`), the port's saves are the same at every run
+(`replay_same_save`, which also holds the ID to the oracle's), and the count above is the same at every run.
+
+The port refuses a file of another size and never overwrites it, with what it seems to be: a size another chip's saves
+have (the sizes of melonDS's other save types), DeSmuME's `.dsv`, which ends with DeSmuME's own footer (its text, six
+32-bit words and the cookie `|-DESMUME SAVE-|`, as DeSmuME's `src/mc.cpp` writes them), this chip's image padded with
+0xff to a larger size (with how to cut it), or a directory. Where the save directory has no file of the game's but a
+`.sav` of the chip's size under another name (a melonDS save copied in as it was named), the port names it and says to
+rename it, unless it is named as the port names the saves of this game's other versions (`IRE?.sav`, `IRD?.sav`). A
+save path that is a symbolic link stays one: the port writes the file it links to.
+
+**The console in the save.** The adventure block (`AdventureSave`) keeps the clock offset, the MAC address and the
+owner's birthday of the console the game was last continued on. CONTINUE checks the offset against the console's
+(`EventFieldContinue_Create` in `event_mapchange.c`, `hasClockNotBeenTampered`), which the port reaches before its trap
+(a breakpoint there stops it on the first save's CONTINUE): another offset takes the path of a changed clock, a day's
+wait for the daily events (`setNewDayForCountdown`), `func_ov012_02164428` on the party and the trainer card's time.
+Then `setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay` writes the console's offset, MAC and birthday over the save's, for the
+next save. The port's firmware and the oracle's are the same console (`port/hal/nvram/nvram7.c`, `oracle.cpp`'s
+`MakeFirmware`: MAC `02:42:57:32:00:01`, owner Player, birthday 6/23, offset 0), so the saves here move without it, and
+melonDS's own generated firmware has offset 0 too. A save from a DS whose owner once set its clock has another offset:
+the port takes it as a changed clock, and the next save carries the port's console, so a dump moved from a DS to the
+port and back takes the changed clock's path on both. PLAN.md asks the import to take on the save's offset and MAC
+instead; with the console's Wi-Fi ID, which the port makes again at every launch since its firmware isn't kept between
+runs, that is the console the D7 sidecar would keep. None of it is built yet, and this path can't be shown in the port
+before overlay 36 lets a continued game into the field.
+
+**The first save** (`oracle.py save first_save`): the oracle plays `port/tests/oracle/first_save_<version>.pbwinput`
+from power-on with a blank save, 18,800 frames: NEW GAME and the intro as `new_game.pbwinput` plays them (the player
+AAAAAAA, the rival HughAAA), the opening's flight into the field in front of the player's house in Aspertia City ("Oh,
+hi!", about frame 13,900), A twice a second through the scripts outside and in the house to the player's room, where the
+player has the field from about frame 15,100, then X for the field menu (BAG, the trainer card, SAVE and OPTIONS before
+the first Pokémon), DOWN twice to SAVE, A, and A on YES: "Would you like to save the game?" shows the saved game
+(Aspertia City, 0 badges, 0:01), the game saves from frame 17,787 to 18,291 (17,788 in White 2), says "AAAAAAA saved the
+game." and closes the menu at frame 18,653. The file holds the main save twice, the same bytes at `0x00000` and
+`0x26000` (the player's name at `0x19404` and `0x3f404`, the rival's at `0x23ba4` and `0x49ba4`), and one page of 256
+bytes at `0x7f000`. It is the same at every run, so `oracle.py`'s `SAVES` keeps its SHA-1 (Black 2 `a7a58889e239`, White
+2 `479529f98b29`) and a sequence that starts from it fails if the oracle, the input file or the ROM gives another save.
+It is made at test time and never committed.
+
+**Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
+LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,
+Time: 0:01 (no Pokédex line: the player has none yet). Black 2's port frames 3,244 to 3,436 (the start menu from frame
+3,250, CONTINUE's press at 3,401, its blink, the wipe out from 3,419 and the black from 3,425) are exact at the DS's 6
+bits on the game's count, and White 2's are with the lag after the cry and one frame at the press (above). The DS
+then loads the field and shows the player in his room; the port stops after frame 3,436, in the black, on
+`FIELDMAP_PROC_FUNCS` (overlay 36's data at `0x021c9eb8` in Black 2, `0x021c9eec` in White 2), the field's process
+table, which has no C yet: overlay 36 (issue #83) is what stops a continued game, before it reaches overlay 12's script
+tables. The sequence holds the stop to that trap by its message.
 
 ## Integration
 
@@ -459,8 +575,13 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
   White 2, before it, so that the title sees the cry end a pass later there and fades out a pass later, and in Black
   2 after it, on the same pass as the port. White 2's fade steps its master brightness at counts 3218, 3221 … on the
   port and 3219, 3222 … on the oracle: port frames 3219-3240, every third, are a step darker than the oracle's at the
-  same count, and from the start menu on (port frame 3241) the port is a pass ahead (`--lag 3241=-1`). To see it (the
-  oracle's shared work is where `SNDi_SharedWork` points, 0x0214c740 in White 2's run):
+  same count, and from the start menu on (port frame 3241) the port is a pass ahead (`--lag 3241=-1`). In the continue
+  sequence the start menu's cursor, which pulses through a cycle of pictures a step at each pass, pulses a step ahead on
+  the port with it, and CONTINUE's press, which both read on the same pass, stops the pulse on the same count, so the
+  counts pair again from port frame 3403 (`--lag 3403=0`). On the press's own frame, port frame 3402 (count 3401), the
+  port shows the step after the DS's last one (its top screen hashes `5e43ed31`), a picture the DS shows elsewhere in
+  the pulse, at counts 3274, 3296, 3338 and 3360 of the same run, but not on that count: a known frame. To see the cry
+  (the oracle's shared work is where `SNDi_SharedWork` points, 0x0214c740 in White 2's run):
 
   ```sh
   oracle.py run --version w2_us --out o --frames 5030 --input port/tests/oracle/title_w2_us.pbwinput \

@@ -110,6 +110,32 @@ copied from another Mac) is quarantined, and macOS 15 and later block it until y
 From then on the app opens normally. On macOS 14 and earlier, Control-clicking the app and choosing **Open** does the
 same. Do this only for an app whose source you trust.
 
+## Saves
+
+The game's save is the cartridge's 4 Mbit flash chip, kept as a file of its 524,288 bytes in the save directory
+(`--save-dir PATH`, else `~/Library/Application Support/pokebw2-native` on macOS, `~/.local/share/pokebw2-native` on
+Linux, `%APPDATA%\pokebw2-native` on Windows), named after the ROM's game code: `IREO.sav` for Black 2 (US),
+`IRDO.sav` for White 2 (US). It is the same file as melonDS's `.sav` of the game and a cartridge dump's, byte for byte:
+
+- **From melonDS:** copy its `.sav` (named after the ROM's file, next to the ROM or in melonDS's save folder) into the
+  save directory as `IREO.sav` or `IRDO.sav`. Copied under its own name, the port points it out and doesn't use it.
+- **To melonDS:** copy `IREO.sav` or `IRDO.sav` next to the ROM under the ROM's name with `.sav` (`Pokemon Black 2.nds`
+  takes `Pokemon Black 2.sav`), or into melonDS's save folder.
+- **One save for both** (macOS and Linux): make `IREO.sav` or `IRDO.sav` a symbolic link to melonDS's `.sav`. The port
+  reads that file and writes the game's saves into it, and the link stays a link.
+
+A file of another size is refused, never overwritten, with what it seems to be: another chip's save by its size,
+DeSmuME's `.dsv`, which has DeSmuME's own data after the image, this chip's image padded with 0xff (keep its first
+524,288 bytes), or a directory. The port writes the file whole, through a temporary file renamed over it, a frame
+after the game's writes end, and never writes a save the game only reads.
+
+A save also holds the console it was last played on: its clock offset and MAC address. The port's console has offset 0,
+as melonDS's does, so saves move between the two as they are. A save from a DS whose owner once set its clock holds
+another offset: on CONTINUE the game then takes the clock for changed, as on that DS after a change of its clock, and
+starts a day's wait for its daily events; the next save takes the port's console. Taking the save's console on import
+instead is still to come (PLAN.md's D7 sidecar). [hal/card/port_card.h](hal/card/port_card.h) has the details and the
+oracle's README the evidence ([tools/oracle/README.md](tools/oracle/README.md#saves)).
+
 ## Directory map
 
 The layout from [PLAN.md §4.3](docs/PLAN.md#43-directory-structure). Entries marked **now** exist; the rest are

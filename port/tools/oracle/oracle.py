@@ -2,9 +2,11 @@
 """Runs the melonDS oracle and the native port the same way, for compare.py (port/tools/oracle/README.md).
 
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
-                  [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--no-counter]
+                  [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]
     oracle.py port --binary BIN --out DIR --frames LIST [--input FILE] [--dump SPEC]... [--time TIME] [--version b2_us]
-                   [--rom PATH]
+                   [--rom PATH] [--save FILE] [--save-out FILE]
+    oracle.py save NAME --out FILE [--oracle BIN] [--version b2_us] [--work DIR]
+    oracle.py port-save --port BIN [--oracle BIN] [--version b2_us] [--work DIR]
     oracle.py boot --out DIR [--port BIN] [--frames LIST] [--version b2_us]
     oracle.py sequence NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
     oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
@@ -16,16 +18,25 @@ frames and for input files on game frames. It passes --time only when given one,
 file's time line, else its default. port runs the port's program once from power-on with a blank save, to the last
 frame of LIST, and has it write its run directory (--run-dir): frames.tsv for every frame, a PNG file for each frame of
 LIST, memory.txt with the --dump specs (the program's --run-dump: globals by name, with a size, * through a pointer).
-Its clock is --time, else the input file's, else the default. boot does both for the boot sequence and compares
-them on the game's count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
+Its clock is --time, else the input file's, else the default. Both take --save FILE, the save memory at power-on (the
+port's copy of it is the save directory's file, named after the ROM's game code, as the port names its saves), and
+--save-out FILE, the save memory when the run ends (the blank chip, 0xff, when the game never wrote one). save makes
+one of the saves the sequences start from on the oracle (SAVES: first_save, power-on through New Game into the field
+and the field menu's SAVE), writes it to FILE and checks it against the SHA-1 kept for it. port-save takes a save the
+other way: the port's New Game writes one, and the oracle boots it to the start menu frame for frame as it boots its own
+save of the same moment, without writing either, and the console's Wi-Fi ID that New Game copied into it is the
+oracle's. boot does both for the boot sequence and compares them on the game's
+count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
-menu), and compares every frame the same way but the known differences; with --update it writes
+menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to), from the save the
+sequence names, made first on the oracle, and compares every frame the same way but the known differences, up to the
+frame where the port stops when the sequence allows it to stop on code with no C yet; with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
 that input file and checks its counts and its screens without 3D against that reference. check is the oracle's ctest
 test: the oracle runs the boot sequence twice with the same results, and its screens match the hashes in
-port/tests/oracle/boot_<version>.tsv. sequence and check exit 77 without the oracle or the ROM, sequence-check without
-the ROM.
+port/tests/oracle/boot_<version>.tsv. save, port-save, sequence and check exit 77 without the oracle or the ROM,
+sequence-check without the ROM.
 
 Standard library only.
 """
@@ -35,6 +46,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -88,6 +100,15 @@ class Sequence:
     state_frames: str = ""
     state_oracle: str = ""
     known_state: dict[str, dict[str, str]] = field(default_factory=dict)
+    # The save both programs start from, a SAVES name; none for a blank save
+    save: str = ""
+    # The port frame from which the port may stop on a trap stub (TRAP_STATUS), the trap it may stop on (a regular
+    # expression its message must match: the function or data with no C yet), and why. The frames it ran are compared,
+    # and the run passes if it got that far and stopped on that trap; another trap is a failure, so the sequence says
+    # which gap it stops on and is updated when the decomp fills it
+    stop_from: int = 0
+    stop_trap: str = ""
+    stop: str = ""
 
 
 # The game state the sequences compare by symbol, with its size: NNS G3D's global state (glbstate.c), the projection,
@@ -103,6 +124,10 @@ TORN_START = ("START whitens the screens partway through the second frame of the
               "port, from the first line of the pass's frame")
 CAMERA = "the DS's pass at START took two frames, so its camera, stepped by VBlanks, leads Kyurem's animation a step"
 CRY = "the DS starts Kyurem's cry later against its passes, so the title fades out a pass later there"
+CURSOR = ("the start menu's cursor pulses a step ahead on the port since the title's cry (the lag of -1), and "
+          "CONTINUE's press, which both read on the same pass, ends the pulse on the same count: on the press's frame "
+          "the port shows the step after the DS's last one, a step the DS shows elsewhere in the pulse (at counts "
+          "3274, 3296, 3338 and 3360 from the first save) but not on that count")
 SEQUENCES = {
     # Power-on, the boot screens, the Game Freak logo and the whole opening to the title and its first 274 frames of
     # 3D, nothing pressed: the movies run from port frame 313 (count 312) to the title, at port frame 3527 in both
@@ -135,8 +160,55 @@ SEQUENCES = {
         state_oracle="2800-5700",
         known_state={"b2_us": {"3110-3124": CAMERA}, "w2_us": {"3110-3124": CAMERA}},
     ),
+    # The title sequence's presses from first_save's save, then A at game frame 3400 on the start menu's CONTINUE,
+    # which now shows the saved game: the player, the place, the badges and the play time (the Pokédex once the
+    # player has one). CONTINUE blinks, the menu wipes out to black from port frame 3425, and the field loads; the port
+    # stops there on overlay 36's field code and data, which have no C yet (stop_from). The title's known differences
+    # are the title sequence's; on the oracle they come 23 frames sooner, since its start-up, which reads the save,
+    # starts the main loop at frame 219 with this save and at 242 with a blank one. In White 2 the press of CONTINUE
+    # brings the counts together again
+    "continue": Sequence(
+        port_frames=3600,
+        oracle_frames=6000,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
+        save="first_save",
+        stop_from=3425,
+        stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
+        stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
+    ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
+# The exit status of a port run that reached a function or data with no C yet (port/hal/trap.c)
+TRAP_STATUS = 70
+# The save memory, BW2's 4 Mbit flash (port/hal/card/port_card.h), as both programs write it
+BACKUP_SIZE = 0x80000
+
+
+@dataclass(frozen=True)
+class SaveMaker:
+    """A save made on the oracle, from power-on with a blank save, by the input file
+    port/tests/oracle/<name>_<version>.pbwinput (SEQUENCE_INPUT's place): frames, how many frames the oracle runs;
+    sha1, by version, the SHA-1 of the save memory it writes at the end, which is the same at every run (the oracle is
+    deterministic), so that what the sequences start from is the save that was examined (README.md, "Saves")"""
+    frames: int
+    sha1: dict[str, str] = field(default_factory=dict)
+
+
+SAVES = {
+    # New Game as new_game.pbwinput plays it (the player AAAAAAA, the rival HughAAA), into the field in front of the
+    # player's house, through the first scripts to the player's room, then the field menu's SAVE: the adventure's
+    # first save
+    "first_save": SaveMaker(18800, {"b2_us": "a7a58889e2399d1f6a0b4c0f5600748dd139449e",
+                                    "w2_us": "479529f98b29cdd852502360aeb33531ca111d7f"}),
+}
 
 
 def rom_path(version: str, given: str | None) -> str:
@@ -194,6 +266,8 @@ def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | Non
         command += ["--input", args.input]
     if getattr(args, "save", None):
         command += ["--save", args.save]
+    if getattr(args, "save_out", None):
+        command += ["--save-out", args.save_out]
     for spec in dumps or []:
         command += ["--dump", spec]
     return subprocess.call(command)
@@ -210,19 +284,34 @@ def port_time(args) -> str | None:
     return None if getattr(args, "input", None) else DEFAULT_TIME
 
 
+def rom_game_code(path: str) -> str:
+    """The ROM header's game code (IREO, IRDO), which the port names its save file after"""
+    with open(path, "rb") as f:
+        f.seek(0x0c)
+        return f.read(4).decode("ascii", "replace")
+
+
 def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: str | None,
-             input_path: str | None = None, timeout: int = 1200,
-             dumps: list[str] | None = None) -> tuple[int | None, str]:
-    """Runs the port's program once, from power-on with a blank save, for frames frames, writing its run directory
-    in out (--run-dir): frames.tsv for every frame it ran, a PNG file for each frame of screens (a frame list,
-    "none" or "all") and memory.txt with the dumps (--run-dump specs). Returns its exit status (None when it timed
-    out) and its last message about why it stopped"""
+             input_path: str | None = None, timeout: int = 1200, dumps: list[str] | None = None,
+             save: str | None = None, save_out: str | None = None) -> tuple[int | None, str]:
+    """Runs the port's program once, from power-on with a blank save or with the save memory in the file save, for
+    frames frames, writing its run directory in out (--run-dir): frames.tsv for every frame it ran, a PNG file for each
+    frame of screens (a frame list, "none" or "all") and memory.txt with the dumps (--run-dump specs). The save
+    directory is a new one, given the save as the port names its saves (the game code and .sav); save_out gets the
+    save memory the run left there, which is the blank chip when the game neither had a save nor wrote one, never a
+    file of an earlier run. Returns its exit status (None when it timed out) and its last message about why it
+    stopped"""
     os.makedirs(out, exist_ok=True)
+    if save_out and os.path.exists(save_out):
+        os.remove(save_out)
     # A picture left from another run would pass for this one's
     for name in os.listdir(out):
         if name.startswith("frame_") and name.endswith(".png"):
             os.remove(os.path.join(out, name))
     saves = tempfile.mkdtemp(prefix="saves-", dir=out)
+    save_file = os.path.join(saves, f"{rom_game_code(rom)}.sav") if save or save_out else None
+    if save:
+        shutil.copyfile(save, save_file)
     command = [binary, "--headless", "--frames", str(frames), "--rom", rom, "--save-dir", saves, "--run-dir", out,
                "--run-screens", screens]
     if time:
@@ -239,6 +328,14 @@ def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: s
         status = None
         log = "timed out"
     finally:
+        if save_file and save_out:
+            if os.path.exists(save_file):
+                shutil.copyfile(save_file, save_out)
+            else:
+                # The port writes its file only once the game writes the chip: until then the chip is erased
+                with open(save_out, "wb") as f:
+                    f.write(b"\xff" * BACKUP_SIZE)
+                print(f"port: the run left no save file, so {save_out} is the blank chip ({BACKUP_SIZE} bytes of 0xff)")
         shutil.rmtree(saves, ignore_errors=True)
     # Its own lines start with "port: ", after the time and process that SDL_Log puts first on some hosts
     reasons = [line[line.index("port: "):].strip() for line in log.splitlines()
@@ -260,13 +357,191 @@ def command_port(args) -> int:
         return 2
     last = max(frames)
     status, message = run_port(args.binary, args.out, last, args.frames, rom_path(args.version, args.rom),
-                               port_time(args), args.input, dumps=args.dump)
+                               port_time(args), args.input, dumps=args.dump, save=args.save, save_out=args.save_out)
     print(f"port: {describe_port_run(status, message, last, args.out)}")
     run = compare.load_run(args.out)
     missing = [frame for frame in frames if run.png(frame) is None]
     if missing:
         print(f"port: no picture of frames {compare.describe_ranges(missing)}")
     return 0 if status == 0 and not missing else 1
+
+
+def file_sha1(path: str) -> str:
+    digest = hashlib.sha1()
+    with open(path, "rb") as f:
+        digest.update(f.read())
+    return digest.hexdigest()
+
+
+def make_save(args, name: str, out: str, work: str) -> str | None:
+    """Makes the save SAVES[name] on the oracle (args.oracle, args.version, args.rom), writing the save memory to out,
+    with the oracle's run directory in work. Returns None, or why the save isn't the one kept: the oracle failed, or
+    its SHA-1 isn't the one SAVES has for the version (which it reports, for a version that has none yet)"""
+    maker = SAVES[name]
+    input_path = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=name, version=args.version))
+    if not os.path.exists(input_path):
+        return f"no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}"
+    made = argparse.Namespace(**vars(args))
+    made.input = input_path
+    made.save = None
+    made.save_out = out
+    shutil.rmtree(work, ignore_errors=True)
+    if os.path.exists(out):
+        os.remove(out)
+    status = run_oracle(made, work, maker.frames, "none", quiet=True)
+    if status != 0 or not os.path.exists(out):
+        return f"the oracle failed (status {status})"
+    size = os.path.getsize(out)
+    digest = file_sha1(out)
+    wanted = maker.sha1.get(args.version)
+    print(f"{name}: {size} bytes of save memory, SHA-1 {digest}")
+    if wanted is None:
+        return f"SAVES has no SHA-1 of {name} for {args.version}; this run's is {digest}"
+    if digest != wanted:
+        return f"the save isn't the one kept ({wanted}): the oracle, the input file or the ROM changed"
+    return None
+
+
+def command_save(args) -> int:
+    binary = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(binary):
+        print(f"oracle.py save: skipped: no oracle at {binary} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    reason = rom_matches(args.version, rom_path(args.version, args.rom))
+    if reason:
+        print(f"oracle.py save: skipped: {reason}")
+        return SKIP
+    args.oracle = binary
+    work = args.work or tempfile.mkdtemp(prefix=f"oracle-save-{args.name}-")
+    reason = make_save(args, args.name, args.out, work)
+    if reason:
+        print(f"oracle.py save: {reason}")
+        return 1
+    if not args.work:
+        shutil.rmtree(work, ignore_errors=True)
+    print(f"wrote {args.out}")
+    return 0
+
+
+# The port's save on the oracle (README.md, "Saves"), the way from the port to melonDS. Both programs play first_save's
+# input file, which starts with New Game as new_game.pbwinput plays it: the port past New Game's formatting of the
+# blank backup, up to the field's first script, which has no C yet; the oracle to the same moment, since the DS reaches
+# each screen later. Then the title sequence's input file boots each program's save on the oracle
+PORT_SAVE_INPUT = "first_save"
+PORT_SAVE_PORT_FRAMES = 10600
+PORT_SAVE_ORACLE_FRAMES = 13000
+PORT_SAVE_BOOT = "title"
+PORT_SAVE_BOOT_FRAMES = 5400
+# The console's pending Wi-Fi ID as New Game copies it into the save, which DWC makes from the clock, the MAC address
+# and the DS's address of OS_GetTick (lib/dwc/src/bm/util_wifiidtool.c): the user ID of the login ID in DWC's user data
+# (save block 30, at 0x1aa00), 8 bytes from 0x1aa04, in each copy of the main save (0x26000 apart). The rest of the two
+# saves differs by when each program formatted the backup (README.md, "Saves")
+WIFI_ID = ((0x1aa04, 8), (0x40a04, 8))
+
+
+def is_blank(path: str) -> bool:
+    with open(path, "rb") as f:
+        return f.read() == b"\xff" * BACKUP_SIZE
+
+
+def compare_boots(port_run: compare.Run, oracle_run: compare.Run) -> tuple[int, str | None]:
+    """How many frames two oracle runs share, and the first where their counts or screens differ (None if none)"""
+    if sorted(port_run.frames) != sorted(oracle_run.frames):
+        return 0, f"the runs have {len(port_run.frames)} and {len(oracle_run.frames)} frames"
+    for frame in sorted(port_run.frames):
+        a = port_run.frames[frame]
+        b = oracle_run.frames[frame]
+        if (a.counter, a.top, a.bottom) != (b.counter, b.top, b.bottom):
+            return frame - 1, (f"frame {frame}: count {a.counter} against {b.counter}, top {a.top[:8]} against "
+                               f"{b.top[:8]}, bottom {a.bottom[:8]} against {b.bottom[:8]}")
+    return len(port_run.frames), None
+
+
+def command_port_save(args) -> int:
+    binary = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(binary):
+        print(f"oracle.py port-save: skipped: no oracle at {binary} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    rom = rom_path(args.version, args.rom)
+    reason = rom_matches(args.version, rom)
+    if reason:
+        print(f"oracle.py port-save: skipped: {reason}")
+        return SKIP
+    args.oracle = binary
+    return port_save(args)
+
+
+def port_save(args) -> int:
+    """port-save's work, with the oracle and the ROM found: returns 0 when the port's save boots on the oracle as the
+    oracle's own does, else 1"""
+    rom = rom_path(args.version, args.rom)
+    input_path = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=PORT_SAVE_INPUT, version=args.version))
+    boot_input = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=PORT_SAVE_BOOT, version=args.version))
+    for path in (input_path, boot_input):
+        if not os.path.exists(path):
+            print(f"oracle.py port-save: no input file {os.path.relpath(path, REPO_ROOT)} for {args.version}")
+            return 1
+    work = args.work or tempfile.mkdtemp(prefix="oracle-port-save-")
+    saves = {"port": os.path.join(work, "port.sav"), "oracle": os.path.join(work, "oracle.sav")}
+
+    # The port's save, which New Game's formatting wrote
+    status, message = run_port(args.port, os.path.join(work, "port"), PORT_SAVE_PORT_FRAMES, "none", rom, args.time,
+                               input_path, save_out=saves["port"])
+    print(f"port: {describe_port_run(status, message, PORT_SAVE_PORT_FRAMES, os.path.join(work, 'port'))}")
+    if status not in (0, TRAP_STATUS) or is_blank(saves["port"]):
+        print("oracle.py port-save: the port's New Game left no save")
+        return 1
+    # The oracle's own save of the same moment
+    made = argparse.Namespace(**vars(args))
+    made.input = input_path
+    made.save = None
+    made.save_out = saves["oracle"]
+    status = run_oracle(made, os.path.join(work, "oracle"), PORT_SAVE_ORACLE_FRAMES, "none", quiet=True)
+    if status != 0 or not os.path.exists(saves["oracle"]):
+        print(f"oracle.py port-save: the oracle failed (status {status})")
+        return 1
+    contents = {}
+    for name, path in saves.items():
+        with open(path, "rb") as f:
+            contents[name] = f.read()
+        print(f"{name}'s save: {len(contents[name])} bytes, SHA-1 {file_sha1(path)}")
+    failed = False
+    for offset, size in WIFI_ID:
+        port_id = contents["port"][offset:offset + size]
+        oracle_id = contents["oracle"][offset:offset + size]
+        if port_id != oracle_id:
+            print(f"the console's Wi-Fi ID at {offset:#x}: the port's {port_id.hex()}, the oracle's {oracle_id.hex()}")
+            failed = True
+    differ = sum(1 for a, b in zip(contents["port"], contents["oracle"]) if a != b)
+    print(f"the saves differ in {differ} bytes; the console's Wi-Fi ID in them is "
+          f"{'not ' if failed else ''}the same")
+
+    # Each save booted on the oracle: the same frames, and neither save written
+    runs = {}
+    for name, path in saves.items():
+        boot = argparse.Namespace(**vars(args))
+        boot.input = boot_input
+        boot.save = path
+        boot.save_out = os.path.join(work, f"{name}-after.sav")
+        out = os.path.join(work, f"boot-{name}")
+        shutil.rmtree(out, ignore_errors=True)
+        status = run_oracle(boot, out, PORT_SAVE_BOOT_FRAMES, "none", quiet=True)
+        if status != 0 or not os.path.exists(boot.save_out):
+            print(f"oracle.py port-save: the oracle failed on the {name}'s save (status {status})")
+            return 1
+        if file_sha1(boot.save_out) != file_sha1(path):
+            print(f"the oracle wrote the {name}'s save while booting it")
+            failed = True
+        runs[name] = compare.load_run(out)
+    same, difference = compare_boots(runs["port"], runs["oracle"])
+    print(f"booted on the oracle: {same} of {len(runs['oracle'].frames)} frames the same (count and both screens)"
+          + (f"; first difference at {difference}" if difference else ""))
+    if difference or failed:
+        print(f"oracle.py port-save: FAIL; the runs are in {work}")
+        return 1
+    if not args.work:
+        shutil.rmtree(work, ignore_errors=True)
+    return 0
 
 
 def command_boot(args) -> int:
@@ -464,6 +739,13 @@ def sequence_paths(args) -> tuple[str, str, str]:
             rom_path(args.version, args.rom))
 
 
+def stop_allowed(sequence: Sequence, status: int | None, last: int, message: str) -> bool:
+    """Whether a port run that didn't end with status 0 ended as the sequence allows: on the trap stub it names (code
+    or data with no C yet), its message matching stop_trap, after the frame from which the sequence allows it"""
+    return (status == TRAP_STATUS and sequence.stop_from > 0 and last >= sequence.stop_from
+            and bool(sequence.stop_trap) and re.search(sequence.stop_trap, message) is not None)
+
+
 def command_sequence(args) -> int:
     sequence = SEQUENCES[args.name]
     input_path, reference, rom = sequence_paths(args)
@@ -479,11 +761,19 @@ def command_sequence(args) -> int:
         print(f"oracle.py sequence: no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}")
         return 1
     args.oracle = binary
-    args.input = input_path
     work = args.out or tempfile.mkdtemp(prefix=f"oracle-{args.name}-")
     oracle_dir = os.path.join(work, "oracle")
     port_dir = os.path.join(work, "port")
     shutil.rmtree(oracle_dir, ignore_errors=True)
+    # The save both start from, made on the oracle first
+    args.save = None
+    if sequence.save:
+        args.save = os.path.join(work, f"{sequence.save}.sav")
+        reason = make_save(args, sequence.save, args.save, os.path.join(work, sequence.save))
+        if reason:
+            print(f"oracle.py sequence: {sequence.save}: {reason}")
+            return 1
+    args.input = input_path
     oracle_dumps = [f"{name}:{size}@{sequence.state_oracle}" for name, size in STATE] if sequence.state_frames else []
     port_dumps = [f"{name}:{size}@{sequence.state_frames}" for name, size in STATE] if sequence.state_frames else []
     status = run_oracle(args, oracle_dir, sequence.oracle_frames, "all", oracle_dumps, quiet=True)
@@ -491,12 +781,20 @@ def command_sequence(args) -> int:
         print(f"oracle.py sequence: the oracle failed (status {status})")
         return 1
     status, message = run_port(args.port, port_dir, sequence.port_frames, "all", rom, args.time, input_path,
-                               dumps=port_dumps)
+                               dumps=port_dumps, save=args.save)
     print(f"port: {describe_port_run(status, message, sequence.port_frames, port_dir)}")
+    port_run = compare.load_run(port_dir)
+    last = max(port_run.frames) if port_run.frames else 0
     if status != 0:
-        return 1
+        if not stop_allowed(sequence, status, last, message):
+            if status == TRAP_STATUS and sequence.stop_trap:
+                print(f"oracle.py sequence: the port didn't stop where the sequence allows, on {sequence.stop_trap} "
+                      f"from frame {sequence.stop_from}: update the sequence if the decomp moved the gap")
+            return 1
+        print(f"the port stopped after frame {last}, where the sequence allows it (from frame {sequence.stop_from}): "
+              f"{sequence.stop}")
     known = by_frame(sequence.known.get(args.version, {}))
-    compared = [frame for frame in range(1, sequence.port_frames + 1) if frame not in known]
+    compared = [frame for frame in range(1, last + 1) if frame not in known]
     align = ["--align", "counter", "--clock", sequence.clock]
     if sequence.lags.get(args.version):
         align += ["--lag", sequence.lags[args.version]]
@@ -520,7 +818,10 @@ def command_sequence(args) -> int:
         for frames, why in sequence.known_state.get(args.version, {}).items():
             print(f"state left out, port frames {frames}: {why}")
     if args.update:
-        if result != 0:
+        if sequence.save:
+            print("oracle.py sequence: no reference for a sequence that starts from a save: only the oracle makes the "
+                  "save, so only this comparison can check the port on it")
+        elif result != 0:
             print("oracle.py sequence: the comparison failed; the reference stays as it was")
         else:
             rows = write_reference(reference, args.name, args.version, compare.load_run(oracle_dir),
@@ -605,7 +906,8 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--frames", type=int, required=True)
     run.add_argument("--screens", default="none")
     run.add_argument("--input")
-    run.add_argument("--save")
+    run.add_argument("--save", help="the save memory at power-on (blank otherwise)")
+    run.add_argument("--save-out", help="where to write the save memory at the end")
     run.add_argument("--dump", action="append")
     run.add_argument("--no-counter", action="store_true")
 
@@ -617,6 +919,20 @@ def main(argv: list[str] | None = None) -> int:
     port.add_argument("--input")
     port.add_argument("--dump", action="append", help="memory to dump, as the program's --run-dump takes it: "
                       "[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST], a global by name")
+    port.add_argument("--save", help="the save memory at power-on (blank otherwise), a .sav as melonDS writes it")
+    port.add_argument("--save-out", help="where to copy the save memory the run leaves")
+
+    save = commands.add_parser("save", help="make one of the saves the sequences start from, on the oracle")
+    save.add_argument("name", choices=sorted(SAVES))
+    common(save)
+    save.add_argument("--out", required=True, help="where to write the save memory")
+    save.add_argument("--work", help="keep the oracle's run here")
+
+    port_save = commands.add_parser("port-save", help="the port's New Game save booted on the oracle, against the "
+                                    "oracle's own save of that moment")
+    common(port_save)
+    port_save.add_argument("--port", required=True, help="the port's program")
+    port_save.add_argument("--work", help="keep the runs and the saves here")
 
     boot = commands.add_parser("boot", help="the boot sequence on the oracle and, with --port, the port")
     common(boot)
@@ -648,6 +964,10 @@ def main(argv: list[str] | None = None) -> int:
             return command_run(args)
         if args.command == "port":
             return command_port(args)
+        if args.command == "save":
+            return command_save(args)
+        if args.command == "port-save":
+            return command_port_save(args)
         if args.command == "boot":
             return command_boot(args)
         if args.command == "sequence":

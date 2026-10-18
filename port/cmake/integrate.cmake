@@ -30,6 +30,7 @@ option(PORT_TEST_BOOT_LOGOS "Test that the game boots to its logo screens" OFF)
 if(PORT_TEST_BOOT_LOGOS)
     add_test(NAME integrate_boot_logos
         COMMAND ${PORT_PROGRAM} --headless --frames 120 --watchdog 20
+                --save-dir "${CMAKE_CURRENT_BINARY_DIR}/boot_logos_saves"
                 --screenshot "${CMAKE_CURRENT_BINARY_DIR}/boot_logos_120.png")
     set_tests_properties(integrate_boot_logos PROPERTIES TIMEOUT 120 SKIP_RETURN_CODE 66
         PASS_REGULAR_EXPRESSION "wrote the screens after frame 120" FAIL_REGULAR_EXPRESSION "has no C yet|watchdog")

@@ -89,7 +89,11 @@ set_tests_properties(oracle_boot PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1200)
 #   at the frames the sequence names. It can't time the movies: there the DS's passes take 3 to 5 frames by its CPU's
 #   load, so only the pictures and their order are held. A failure keeps the runs and the difference images and says
 #   where. Skipped (77) without the oracle or the ROM
-foreach(sequence IN ITEMS opening title)
+# The continue sequence starts from a save that the oracle makes first, from power-on through New Game into the field
+# and its SAVE (oracle.py save first_save, checked against the SHA-1 oracle.py keeps): the start menu's CONTINUE with
+# the saved game, then the field, where the port stops on overlay 36 for now. Only the oracle can make its save, so it
+# has no reference and no _hashes test
+foreach(sequence IN ITEMS opening title continue)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -106,3 +110,16 @@ foreach(sequence IN ITEMS opening title)
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
 endforeach()
+# Making the save first runs the oracle 18,800 frames more
+set_tests_properties(oracle_continue PROPERTIES TIMEOUT 3600)
+
+# The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
+# boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the
+# console's Wi-Fi ID that New Game copied into the save is the oracle's (oracle.py port-save). Skipped (77) without
+# the oracle or the ROM
+add_test(NAME oracle_port_save
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" port-save
+            --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_port_save PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
