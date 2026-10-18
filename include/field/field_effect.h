@@ -9,9 +9,6 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-typedef struct FieldEffects FieldEffects;
-typedef struct FieldEffectTask FieldEffectTask;
-
 void *Field_GetEffectBlAct(Field *field);
 void *Field_GetWildEffectBlAct(Field *field);
 // The saving icon, and showing, hiding and freeing it

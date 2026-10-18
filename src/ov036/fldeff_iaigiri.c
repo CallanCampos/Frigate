@@ -5,6 +5,7 @@
 #include "field/event_league_lift.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
+#include "field/field_move_tcb.h"
 #include "field/field_pass_power.h"
 #include "field/field_script.h"
 #include "field/game_beacon_set.h"
