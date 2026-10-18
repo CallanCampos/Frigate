@@ -15,7 +15,7 @@ Nothing runs or translates the ROM's ARM code: the ROM is only where the game's 
 ```
  the player
  ── port/app ──────── the program: options, the window, keyboard, mouse and gamepads, presenting and pacing,
- │                    replays, the oracle's run directory and sound trace, the macOS app
+ │                    replays, the oracle's run directory and sound trace, the test launcher, the macOS app
  ── port/gfx ──────── renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture
  ── port/audio ────── the sound device and the WAV dump
  ══ the decomp's C ══ src/ (src/system, src/gfl, src/ovNNN): the game, compiled unchanged
@@ -32,18 +32,20 @@ Nothing runs or translates the ROM's ARM code: the ROM is only where the game's 
 | The SDK surface | the boundary between `lib/` and `port/hal` | What the game's C reaches that a host doesn't have: NitroSDK's assembly, its hardware-bound files (CPU state, interrupts, timers, DMA, card), the DS's fixed addresses and registers, and the ARM7 behind the PXI FIFO. Everything else of the SDK stays the decomp's C ([ADR 0005](adr/0005-platform-boundary-as-built.md)) | — |
 | The platform layer | [port/hal](../hal/README.md) | Host C for that surface, one directory per SDK module or ARM7 service, compiled against the decomp's headers | the decomp's headers, the host's C library |
 | The renderers and sound output | [port/gfx](../gfx/README.md), [port/audio](../audio/README.md) | What the display hardware and the speakers make of the state the game leaves; plain C, without the decomp's headers | the platform layer's plain-C interfaces |
-| The program | [port/app](../app/README.md) | `main()`, the options, the window, the controls, presentation and pacing, replays, the oracle's run directory and the sound driver's trace | everything above, SDL3 |
+| The program | [port/app](../app/README.md) | `main()`, the options, the window, the controls, presentation and pacing, replays, the oracle's run directory and the sound driver's trace, and the test launcher (`--launch`), which opens the field menu's apps for the tests through the game's own app call and so includes the decomp's headers | everything above, SDL3 |
 | SDL3 | an installed SDL3 3.4, or the pinned release | Window, renderer, input devices, audio stream | — |
 
-The build ([../CMakeLists.txt](../CMakeLists.txt), [../cmake/](../cmake/README.md)) makes four object libraries and
+The build ([../CMakeLists.txt](../CMakeLists.txt), [../cmake/](../cmake/README.md)) makes five object libraries and
 links them into one program, `frigate-black2` or `frigate-white2`: `pokebw2_game` (the decomp's C), `port_hal`,
-`port_gfx` and `port_app` (with `port/audio` and the oracle's input file reader). At each configure it generates, in
-`build/port/gen` ([../tools/gen_host_tree.py](../tools/gen_host_tree.py)), the source list, an `include/` mirror
-without the decomp's C library headers, and host variants of the SDK headers in which every DS address goes through
-`PORT_HW_ADDR()` ([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)); at each build, a trap stub for every DS
-function or data object the game references that has no C yet ([../tools/gen_stubs.py](../tools/gen_stubs.py)). Every
-decomp file gets [../include/port_host.h](../include/port_host.h) force-included, and is compiled with MWCC's language
-model: signed `char`, int-sized enums, wrapping arithmetic, no strict aliasing, zeroed locals (PLAN.md §4.4).
+`port_gfx`, `port_app` (with `port/audio` and the oracle's input file reader) and `port_launcher` (the test launcher,
+compiled against the decomp's headers, which every program that links the game links too, since the game's seam in
+`src/ov035/event_mapchange.c` calls it). At each configure it generates, in `build/port/gen`
+([../tools/gen_host_tree.py](../tools/gen_host_tree.py)), the source list, an `include/` mirror without the decomp's C
+library headers, and host variants of the SDK headers in which every DS address goes through `PORT_HW_ADDR()`
+([ADR 0004](adr/0004-ds-addresses-by-header-translation.md)); at each build, a trap stub for every DS function or data
+object the game references that has no C yet ([../tools/gen_stubs.py](../tools/gen_stubs.py)). Every decomp file gets
+[../include/port_host.h](../include/port_host.h) force-included, and is compiled with MWCC's language model: signed
+`char`, int-sized enums, wrapping arithmetic, no strict aliasing, zeroed locals (PLAN.md §4.4).
 
 ## How a frame runs
 

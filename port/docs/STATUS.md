@@ -26,6 +26,108 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the launcher track merged under Frigate's rules, and ADR 0012 accepted
+
+- **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `e7187b168`: `859e4c1cf` (the merge of
+  `port-launch-adr0012`, which holds `port-launch`), then `d7849a158` (ADR 0012 accepted), `1249408e1` (the launcher
+  track under Frigate's rules) and `0b51e6acf` (exit status 1's every cause), then this entry; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`), at the merge and at
+  `0b51e6acf`. The merge brings the launcher track's two game changes, rows of game-changes.md: the Neutral row of
+  `src/ov012/event_field_proclink.c` (`014fe956c`, a complete file, so the ROM build is its proof) and the Platform row
+  of `src/ov035/event_mapchange.c` (`b8b52f420`, the launcher's seam, which no longer calls ADR 0012 proposed).
+  `check_mwcc_neutral.py` on the merged tree finds 3,142 of 3,146 file and version pairs identical to `cf8ded4c2`,
+  `event_mapchange.c` among them, the other four being `vm.c`'s and `event_field_proclink.c`'s Neutral rows. The later
+  commits change nothing outside `port/` but the landing page, `.github/README.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo: Black 2 in a new Ninja directory, `build/port-n` (the old `build/port`,
+  made with Unix Makefiles, deleted after), White 2 in `build/port-w2` (Ninja), configured again. The merge, and
+  `port_host.h`'s new header comment after it, rebuilt all of the decomp's C: 263 warnings in each version, all in its
+  `src/` (193) and `lib/` (70), none in `port/`, as in Frigate's entries. The oracle, `build/oracle` (Release, on
+  melonDS 1.1's source in the clone's `build/port-oracle`), rebuilt from the merged sources and copied into each build's
+  `oracle/`. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 on `0b51e6acf`, the two builds at once, `ctest -j4` each, with the oracle in both and both
+    directories Ninja's, so no test skips for want of either: Black 2, all 267 `ctest` tests pass (1,392 s), none
+    skipped, `asm_oracle` among them; White 2, 261 of 263 pass (1,150 s), and `oracle_continue_starter` and
+    `oracle_launch_party_menus` skip, since `SAVES` keeps no SHA-1 of `starter_save` for White 2 (the Black 2 route's
+    walk goes astray there: the launcher track's entries). The saves: Black 2's `first_save` and `starter_save` came
+    from the launcher worktree's cache, whose SHA-1s are the ones `oracle.py` keeps, so `oracle_saves` reused them;
+    White 2's `first_save` was made by `oracle_saves` (188 s) and reused after. `oracle_launch_field_menus` passes in
+    both versions (Black 2: 2 of 2 app screens at the oracle's counts, 621 of 621 counts of the apps' spans the
+    oracle's), `oracle_launch_party_menus` in Black 2 (5 of 5, 1,491 of 1,491); `launch_unfinished` (status 1),
+    `launch_not_offered` (2), `integrate_launch_never_asked` (1), `integrate_launch_bad_option` (2),
+    `integrate_launcher_off`, `app_launcher_spec_*`, `hal_card_spi_*`, `rom_game_ir_genuine_card`,
+    `os_hblank_flag_in_handler` and `layout_trainer_card_param` pass in both, `launch_summary_standalone` and
+    `launch_touch_then_party` in Black 2, and Frigate's and the sound's tests as before (`app_about`, `app_make_app`,
+    `assets_branding`, `oracle_sound_*`). A quick run at the merge, before the later commits, passed all 234 tests but
+    the oracle's, the replays', the asm oracle's and the launch tests.
+  - The apps: `package_macos.sh` makes `Frigate Black 2.app` and `Frigate White 2.app` and their disk images, `Frigate
+    Black 2 0.0.2660.dmg` and `Frigate White 2 0.0.2660.dmg` (5.5 MB each), from `0b51e6acf`'s tree with this entry's
+    edits (revision `0b51e6acfec6-dirty`). `plutil` reads `CFBundleName` Frigate, `CFBundleDisplayName` "Frigate Black
+    2" and "Frigate White 2", `io.github.callancampos.frigate.black2` and `.white2`, `CFBundleExecutable`
+    `frigate-black2` and `frigate-white2` and `CFBundleIconFile` AppIcon; `plutil -lint` passes, and so do `hdiutil
+    verify` and `codesign --verify --deep --strict` on each app and on the app in its mounted image, which holds the
+    app and a link to `/Applications`. Each app's program runs 300 frames headless (`--save-dir` a scratch directory),
+    status 0, and its `--help` opens with the name, the description and the disclaimer and lists `--launch`. Black 2's,
+    from a copy of the oracle's first save with `field_menus`' input and `--launch bag@4044,card@4584`, opens and
+    closes both apps (event type 0), stops after 4,942 frames with status 0, and leaves the save as it was.
+  - Every relative link of the Markdown files under `port/` and `.github/README.md` resolves, anchors as GitHub makes
+    them included (58 files, 1,099 links, checked by script). clang-format 23.1.3 is clean on every C file changed since
+    `e7187b168`: 19 in `port/` and the two decomp files.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: the only decomp changes are the launcher track's two rows, measured on its branch.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version (`gen_stubs`, each build above), as in
+  the launcher track's and Frigate's entries.
+- **64-bit warnings:** 263 in each version, as above (193 in `src/`, 70 in `lib/`), unchanged from Frigate's entries.
+- **Work done:** the launcher track, `port-launch` (the cartridge's infrared chip, saves made from saves on the oracle,
+  the H-blank interrupt with DISPSTAT's flag) and `port-launch-adr0012` (the test launcher and its routes), merged into
+  `main` after Frigate's identity and the sound, which it never saw.
+  - **The merge** (`859e4c1cf`). Ten conflicts, each kept with both sides: `main.c` (Frigate's usage, program name and
+    statuses with the sound's options and `--launch`), `integrate.cmake` (the launcher's objects and option checks
+    beside Frigate's boot test), `os.cmake` (the H-blank's scenario and the sound's timed work), `trap.c`,
+    `test_run_dir.c` (`frigate-black2` with the run directory's launch field), `oracle.py` (the sound and launch
+    commands; `run_port`'s sound trace, WAV dump, `--launch` and log together), the oracle README and lessons.md (both
+    sides' sections, the launcher's lessons first), port/README.md (Frigate's directory map) and this file: the
+    launcher track's eight entries above Frigate's, the last naming `b4c0fdc68`, Frigate's last naming `e7187b168`;
+    game-changes.md's `event_mapchange.c` row names `b8b52f420`.
+  - **ADR 0012 accepted** (`d7849a158`). The port's developer accepts it, as every earlier ADR: its status is
+    accepted, and its "On acceptance" section is done: port/CLAUDE.md's "Code that isn't C yet" names the launcher,
+    after `ov011_pending.c`, as the other documented stand-in (test-only, off by default, while overlay 36 is
+    claimed), and PLAN.md's phase 4 says that until overlay 36 lands the field menu's apps are tested through it
+    against the oracle's route through the field menu. The ADR index says accepted.
+  - **The launcher track under Frigate's rules** (`1249408e1`). Names: the README's `--launch` examples and the run
+    directory's test run `frigate-black2`; nothing else the track wrote had an old name. The README's test launcher
+    section moves from "Playing" to the quick start, whose options list `--launch`; the README's and the landing page's
+    status say that the bag, the trainer card and the party list match melonDS pass for pass through it. Headers:
+    `launcher.h`, `launcher_spec.h` and `card_spi.h` open with what they do before their guards, and the files the
+    track changed name what it added (`CMakeLists.txt`, `run_dir.c` and `.h`, `app.cmake`, `oracle.cmake`,
+    `rom.cmake`, `core.c`, `trap.c` and `.h`, `port_host.h`, `gen_host_tree.py`, `oracle.py`, `test_os.c`,
+    `test_run_dir.c`, `test_compare.py`). Guides: port/app's rows for `launcher.c` and `launcher_spec.c`; port/hal's
+    card module (the SPI bus and the infrared chip, the genuine-card check), `card_spi.c`'s row, the OS core's H-blank
+    and the screen wipes, and the trap's placeholder check; port/include's new declarations; port/tools' and the oracle
+    README's saves and launch checks; port/tests' rows for the launcher's, the card's, the layout and the H-blank
+    tests; port/cmake's fifth object library, `layout_tests.cmake` and the launch tests. ARCHITECTURE.md's feature map
+    has rows for the field menu's apps through the test launcher and for the H-blank and screen wipes, and the saves'
+    and the wireless rows have the saves made on the oracle and the infrared chip with the genuine-card check.
+    GLOSSARY.md has the H-blank and DISPSTAT's flags, the infrared chip and the card's SPI bus, the field menu and app
+    call, the genuine-card check, the test launcher and the saves made on the oracle. MODDING.md says how to reach the
+    field menu's apps with `--launch` while overlay 36 is missing; the documents' index lists ADRs 0011 and 0012.
+  - **Exit status 1** (`0b51e6acf`). The confirmation found more causes of status 1 than `main.c`'s usage and the README
+    gave (a run directory that fails to write during the run, the launcher stepping aside). `main.c`'s usage,
+    `launcher.h`, `launcher.c`'s header, the README's launcher section, ARCHITECTURE.md's run-end table and
+    MODDING.md's "When the game stops" now give the same list: the window, a write to the run directory during the run
+    (which stops it at once) or to the sound trace, a module out of host memory or finding a build that can't work,
+    and a launch that didn't finish (the run ended first, the game never asked for the field, the launcher stepped
+    aside, an app wanted the field); a status of the run's own comes before the launcher's.
+  - **This entry's commit** also names the test launcher in ARCHITECTURE.md's layer diagram, its layers table and its
+    list of object libraries, which the guides' pass missed.
+- **Next:** White 2's starter route, measured on its own oracle, so that `party_menus` and `continue_starter` run in
+  White 2; the apps no route reaches yet (the Pokédex past its trap); a save with an adventure made by the port, once
+  overlay 36 lets it into the field; for the sound, a comparison sequence where a player plays on the game's count.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, no C yet) stops the Pokédex;
+  overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the test launcher after review: an unfinished launch fails, the menu's kinds, the touch flag per app
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
