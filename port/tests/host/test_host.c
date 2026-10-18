@@ -34,8 +34,9 @@ static int sSet = 5;
 // The scenario's argument, after its name
 static const char *sArgument;
 // The C library's memset, through a pointer the compiler can't see through, so that the access is made by the C
-// library's code (outside the program's image, on Windows) rather than by stores the compiler writes in its place
-static void *(*volatile sLibraryMemset)(void *, int, size_t) = memset;
+// library's code (outside the program's image, on Windows) rather than by stores the compiler writes in its place. Set
+// in main(): a function the C library exports may be no constant to initialize a static with
+static void *(*volatile sLibraryMemset)(void *, int, size_t);
 
 static void Check(int ok, const char *what) {
     if (!ok) {
@@ -287,6 +288,7 @@ static const Test sTests[] = {
 int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     sArgument = argc > 2 ? argv[2] : NULL;
+    sLibraryMemset = memset;
     for (size_t i = 0; i < sizeof(sTests) / sizeof(sTests[0]); i++) {
         if (argc > 1 && strcmp(argv[1], sTests[i].name) == 0) {
             return sTests[i].run();

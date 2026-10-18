@@ -11,6 +11,7 @@
 // host stack (mco_impl.c, which is built without ASan), and tells LeakSanitizer to scan the stacks of suspended fibers
 // for pointers. The pages and their protection are the host's (port/hal/host): on Windows the top of the guard is a
 // guard page over pages left writable for the system's exception frame, so that an overflow is still reported there.
+// A fiber's first frame is the last a backtrace walks, so that the report of a trap or crash on a fiber has one.
 #include "hal/os/fiber.h"
 #include "hal/host/host.h"
 
@@ -45,6 +46,10 @@
 // fit a DS stack of at most 16 KiB (all of DTCM), so even with 64-bit pointers and ASan's redzones (2-3 times larger
 // in the spike's measurements) none comes near it. It costs address space only
 #define GUARD_BYTES (64 * 1024)
+// The return address minicoro gives a fiber's first frame (_mco_main's), on the stack's top on x86-64, where it keeps
+// no more than the red zone or the home space above it
+#define MCO_DUMMY_RETURN ((uintptr_t)0xdeaddeaddeaddeadull)
+#define MCO_DUMMY_RETURN_SEARCH 256
 
 struct PortFiber {
     mco_coro *co;
@@ -77,6 +82,24 @@ static void Fatal(const char *what) {
     abort();
 }
 
+// The slot of minicoro's dummy return address, which port_fiber_create sets to 0 so that the fiber's first frame is the
+// last one an unwinder walks: a return address of 0 ends a backtrace. libgcc's unwinder, glibc's backtrace() on Linux,
+// reads the code at a return address it has no unwind table for, looking for a signal's trampoline, so at
+// 0xdeaddeaddeaddead the report of a trap or a crash on a fiber faulted again in its own backtrace, and the program
+// died of SIGSEGV instead of saying what it reached. On arm64 minicoro keeps the address in a register of its context,
+// where macOS's frame-pointer walk never reads it, and there is no slot. Found before a painted stack covers it, and
+// cleared after
+static uintptr_t *DummyReturnSlot(const PortFiber *fiber) {
+    uintptr_t *top = (uintptr_t *)(fiber->stackLow + fiber->stackSize);
+
+    for (uintptr_t *slot = top - MCO_DUMMY_RETURN_SEARCH / sizeof(*slot); slot < top; slot++) {
+        if (*slot == MCO_DUMMY_RETURN) {
+            return slot;
+        }
+    }
+    return NULL;
+}
+
 static void ProtectGuard(unsigned char *p, size_t size) {
     if (port_host_protect_stack_guard(p, size, "port: fiber: the guard's protection") != 0) {
         abort();
@@ -107,6 +130,7 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
     unsigned char *mapping;
     PortFiber *fiber;
     mco_coro *co;
+    uintptr_t *dummyReturn;
 
     stackSize = RoundUp(stackSize, page);
     desc = mco_desc_init(FiberMain, stackSize);
@@ -140,11 +164,15 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
         Fatal("minicoro's block layout changed: the stack is not where the guard expects it");
     }
     fiber->co = co;
+    dummyReturn = DummyReturnSlot(fiber);
     ProtectGuard(fiber->guard, guardSize);
 
     if (sPaint) {
         memset(fiber->stackLow, PAINT_BYTE, stackSize);
         fiber->painted = 1;
+    }
+    if (dummyReturn != NULL) {
+        *dummyReturn = 0;
     }
 #ifdef PORT_LSAN
     // LeakSanitizer scans the stacks and registers of threads, not of fibers: an allocation that only a suspended

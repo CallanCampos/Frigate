@@ -174,19 +174,31 @@ def copy_entry(source: Path, copy: Path):
         copy_file(source, copy)
 
 
-def links_allowed(out: Path) -> bool:
-    """Whether the system lets this account make symbolic links in out, tried once with a link to nothing."""
+def link_target(target: Path, out: Path) -> str:
+    """The relative target of a link in out, with the system's own separator: MSYS2's Python joins paths with "/" in
+    its shells, and Windows doesn't follow a link whose relative target has one."""
+    relative = os.path.relpath(target, out)
+    return relative.replace("/", "\\") if os.name == "nt" else relative
+
+
+def links_allowed(out: Path, sample: Path) -> bool:
+    """Whether this account can make symbolic links in out that the system follows, tried once with a link to
+    sample."""
     probe = out / ".link_probe"
     try:
         if probe.is_symlink() or probe.exists():
             probe.unlink()
-        probe.symlink_to("nothing")
+        probe.symlink_to(link_target(sample, out))
+        followed = probe.is_file()
         probe.unlink()
-        return True
+        if followed:
+            return True
+        reason = "the system doesn't follow them"
     except OSError as error:
-        print(f"gen_host_tree: can't make symbolic links ({error}); copying include/ into {out} instead, again "
-              "whenever a header changes", file=sys.stderr)
-        return False
+        reason = str(error)
+    print(f"gen_host_tree: can't make symbolic links ({reason}); copying include/ into {out} instead, again whenever "
+          "a header changes", file=sys.stderr)
+    return False
 
 
 def mirror_include(out: Path) -> bool:
@@ -198,13 +210,13 @@ def mirror_include(out: Path) -> bool:
     for link in out.iterdir():
         if link.name not in wanted:
             remove_entry(link)
-    copying = not links_allowed(out)
+    copying = not links_allowed(out, source / "types.h")
     for name in sorted(wanted):
         link = out / name
         if copying:
             copy_entry(source / name, link)
             continue
-        target = os.path.relpath(source / name, out)
+        target = link_target(source / name, out)
         if link.is_symlink() and os.readlink(link) == target:
             continue
         if link.is_symlink() or link.exists():
