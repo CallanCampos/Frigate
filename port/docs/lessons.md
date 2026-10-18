@@ -9,7 +9,8 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   the H-blank interrupt 70 cycles before DISPSTAT's H-blank flag, where melonDS sets both at once. The game's line
   wipe checks `GX_IsHBlank()` before each window write, so on the port it never wrote one, quietly: the screens went
   from black to the picture. A flag and the interrupt it describes belong at the same moment on a host, whose handlers
-  run in no time.
+  run in no time. The moment is GBATEK's 1606 cycles into the line; melonDS 1.1 uses 1584 for both, which the game
+  can't tell apart.
 - **A missing transition shows only frame by frame.** The trainer card's screens were right before and after its
   opening; only comparing every pass of the opening with the oracle's showed the wipe missing.
 

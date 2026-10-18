@@ -26,10 +26,43 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: after review: the commits that stand alone, without the test launcher; the H-blank cycle's source
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch`, after `0eb7214e2`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 241 `ctest` tests pass, the oracle's included (`ctest -j4`, 977 s on a loaded
+  machine): `oracle_opening`, `oracle_title`, `oracle_continue`, `oracle_continue_starter` and `oracle_port_save` among
+  them, a continued game still stopping on `FIELDMAP_PROC_FUNCS`. White 2: rebuilt (`core.c`'s comment is shared code);
+  its 60 OS, card, infrared, layout and `replay_same_save` tests pass, `os_hblank_flag_in_handler` among them. T3's long
+  runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:**
+  - **The test launcher waits for its ADR.** The design asked for the user's acceptance of ADR 0012, which reads
+    port/CLAUDE.md's exception for a deferred subsystem's documented stand-in, before the launcher landed; its three
+    commits had landed here anyway, with a port/CLAUDE.md sentence naming it as a documented stand-in. They now wait on
+    the branch `port-launch-adr0012`, which isn't pushed, and this branch ends with the commits that stand alone: the
+    infrared chip, the trainer card's param, the saves made from saves and the H-blank fix.
+  - The entries of those commits no longer lean on the launcher: the H-blank entry says the bug was found by comparing
+    every pass of the card's opening with the oracle's, and their "Next" lines name the apps, not the launcher.
+  - **The H-blank cycle's source** (`port/hal/os/core.c`, `lessons.md`): GBATEK's 1606 cycles into the line, for the
+    interrupt and the flag; melonDS 1.1 takes both at 1584 (`HBLANK_CYCLES`), 22 cycles earlier. What the game sees,
+    the two together, holds at either, so the port keeps GBATEK's.
+  - `oracle.py`'s docstring had two lines over 120 columns; `game-changes.md`'s trainer card row names its commit,
+    `014fe956c`.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed, by ADR 0012's launcher if the user accepts
+  it; White 2's starter route.
+- **Blockers:** the user's decision on ADR 0012 (a test launcher for the field menu's apps, on the branch
+  `port-launch-adr0012`); overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as
+  in the last entry.
+
 ## 2026-10-18: the H-blank interrupt when DISPSTAT shows the H-blank: the screen wipes that cover lines one by one
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch`, after `f7aa43045`.
+- **Port:** `0eb7214e2`, on the branch `port-launch`, after `f7aa43045`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
 - **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
 - **Tests:** T0 as above. Black 2: all 241 `ctest` tests pass, the oracle's included (424 s), 1 new:
@@ -47,8 +80,9 @@ level that doesn't exist yet says "not yet"; no field is left out.
   only while `GX_IsHBlank()` (`src/system/wipe_sub.c`'s `WipeLineWnd_HBlank`), so the wipes that cover or uncover the
   screens line by line were never drawn: the trainer card's opening went from black to the card at once, where the DS
   reveals its top screen and then its bottom one 32 lines a pass. The interrupt is now taken at 1606, with the flag.
-  Found by Frigate's test launcher (the next commit, ADR 0012, proposed): with it, the card's opening on the port is
-  the oracle's pass for pass (14 passes of the two wipes, by their hashes).
+  Found by comparing every pass of the trainer card's opening with the oracle's: with the change, the card's opening
+  on the port is the oracle's pass for pass (14 passes of the two wipes, by their hashes). The cycle is GBATEK's;
+  melonDS 1.1 takes both at 1584, and what the game sees, the two together, holds at either.
 - **Next:** as in the last entry.
 - **Blockers:** as in the last entry.
 
@@ -92,8 +126,8 @@ level that doesn't exist yet says "not yet"; no field is left out.
     files are in `port/tests/oracle`; the saves are made at test time and never committed.
   - **continue_starter**: continue's presses from the starter save (`Sequence.input` names the sequence whose input
     file a sequence plays), a check of the start menu's Pokédex line, which the last entries named as next.
-- **Next:** the field menu's apps on the port while overlay 36 is claimed: a test launcher (ADR 0012, proposed), the
-  apps against the oracle through it, and White 2's starter save.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed, which needs a way to open them without the
+  field and the user's decision on it, and White 2's starter save.
 - **Blockers:** overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as in the last
   entry.
 
@@ -137,7 +171,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
     before writing it (stack bytes on the DS, zero on a host), so the boot's and each battle's random numbers can't
     match the oracle's.
 - **Next:** the field menu's apps on the port while overlay 36 is claimed: the trainer card's param layout, saves with
-  a party made by the oracle, and a test launcher for the apps (ADR 0012, proposed).
+  a party made by the oracle, and a way to open the apps without the field, which needs the user's decision.
 - **Blockers:** overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as in the last
   entry.
 

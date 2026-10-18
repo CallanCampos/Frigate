@@ -25,17 +25,17 @@ saves the sequences start from on the oracle (SAVES: first_save, power-on throug
 menu's SAVE; starter_save, first_save's CONTINUE through the story to the first Pokémon and SAVE; route19_save, the
 starter save's CONTINUE through Hugh's battle to the grass of Route 19), each from the save it names as its start or a
 blank one, and checks each step against the SHA-1 kept for it; it writes one save to FILE, or with --save-cache every
-save into DIR as NAME_VERSION.sav, where a later run reuses a file only while its SHA-1 is still the one kept. port-save takes a save the
-other way: the port's New Game writes one, and the oracle boots it to the start menu frame for frame as it boots its own
-save of the same moment, without writing either, and the console's Wi-Fi ID that New Game copied into it is the
-oracle's. boot does both for the boot sequence and compares them on the game's
-count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
+save into DIR as NAME_VERSION.sav, where a later run reuses a file only while its SHA-1 is still the one kept.
+port-save takes a save the other way: the port's New Game writes one, and the oracle boots it to the start menu frame
+for frame as it boots its own save of the same moment, without writing either, and the console's Wi-Fi ID that New
+Game copied into it is the oracle's. boot does both for the boot sequence and compares them on the game's count, the
+movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
 menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
 continue's presses from starter_save's, whose start menu shows the Pokédex), from the save the sequence names, made
-first on the oracle (or taken from --save-cache), and compares every frame the same way but the known differences, up to the
-frame where the port stops when the sequence allows it to stop on code with no C yet; with --update it writes
+first on the oracle (or taken from --save-cache), and compares every frame the same way but the known differences, up
+to the frame where the port stops when the sequence allows it to stop on code with no C yet; with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
 that input file and checks its counts and its screens without 3D against that reference. check is the oracle's ctest
 test: the oracle runs the boot sequence twice with the same results, and its screens match the hashes in
