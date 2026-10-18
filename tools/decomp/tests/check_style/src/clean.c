@@ -64,3 +64,20 @@ int Clean_Bug(int x) {
     return x;
 #endif
 }
+
+// Forward gotos to labelled tail blocks that do real work for several paths
+void Clean_SharedTails(int *value, const short *values, unsigned frame) {
+    unsigned idx;
+
+    if (frame & 1) {
+        idx = frame >> 1;
+        goto average;
+    }
+    idx = frame >> 1;
+    goto read;
+average:
+    *value = (values[idx] + values[idx + 1]) >> 1;
+    return;
+read:
+    *value = values[idx];
+}

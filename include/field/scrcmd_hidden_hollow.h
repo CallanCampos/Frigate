@@ -1,12 +1,14 @@
 #ifndef POKEBW2_FIELD_SCRCMD_HIDDEN_HOLLOW_H
 #define POKEBW2_FIELD_SCRCMD_HIDDEN_HOLLOW_H
 
-// Overlay 36's scrcmd_hidden_hollow.c (a descriptive name), not written yet: the script commands of the Hidden
-// Grottoes. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Overlay 36's scrcmd_hidden_hollow.c (a descriptive name): the script commands of the Hidden Grottoes. Names from
+// swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
 #include "struct_decls.h"
 
+// Rolls what the grotto holds, and fills it
+void generateHollow(RivalDataSave *data, u32 hollow);
 BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env);
 BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env);
 BOOL s0293_HiddenHollowCallWarpIn(VM *vm, FieldScriptEnv *env);

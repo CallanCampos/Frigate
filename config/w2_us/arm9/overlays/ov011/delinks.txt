@@ -155,3 +155,77 @@ lib/dwc/src/gt2/gt2Utility.c:
     .text       start:0x0217ed54 end:0x0217eed0
     .data       start:0x02189120 end:0x02189134
     .bss        start:0x02191bfc end:0x02191c2c
+
+lib/dwc/src/gp/gp.c:
+    complete
+    .text       start:0x0217245c end:0x02172da8
+    .data       start:0x021877d4 end:0x02187900
+
+lib/dwc/src/gp/gpi.c:
+    complete
+    .text       start:0x02172da8 end:0x02173544
+    .data       start:0x02187900 end:0x02187a14
+
+lib/dwc/src/gp/gpiBuddy.c:
+    complete
+    .text       start:0x02173544 end:0x02174e14
+    .data       start:0x02187a14 end:0x02187c9c
+
+lib/dwc/src/gp/gpiBuffer.c:
+    .text       start:0x02174e14 end:0x02175498
+    .data       start:0x02187c9c end:0x02187d9c
+    .bss        start:0x021917a8 end:0x021917b0
+
+lib/dwc/src/gp/gpiCallback.c:
+    complete
+    .text       start:0x02175498 end:0x02175790
+    .data       start:0x02187d9c end:0x02187dac
+
+lib/dwc/src/gp/gpiConnect.c:
+    complete
+    .text       start:0x02175790 end:0x021768cc
+    .data       start:0x02187dac end:0x0218826c
+
+lib/dwc/src/gp/gpiInfo.c:
+    complete
+    .text       start:0x021768cc end:0x02177d00
+    .data       start:0x0218826c end:0x02188554
+
+lib/dwc/src/gp/gpiKeys.c:
+    complete
+    .text       start:0x02177d00 end:0x021780c4
+    .data       start:0x02188554 end:0x021885cc
+
+lib/dwc/src/gp/gpiOperation.c:
+    complete
+    .text       start:0x021780c4 end:0x02178498
+    .data       start:0x021885cc end:0x02188624
+
+lib/dwc/src/gp/gpiPeer.c:
+    complete
+    .text       start:0x02178498 end:0x02179260
+    .data       start:0x02188624 end:0x021889a4
+
+lib/dwc/src/gp/gpiProfile.c:
+    complete
+    .text       start:0x02179260 end:0x02179874
+    .data       start:0x021889a4 end:0x02188a14
+
+lib/dwc/src/gp/gpiSearch.c:
+    .text       start:0x02179874 end:0x0217b63c
+    .data       start:0x02188a14 end:0x02188e6c
+
+lib/dwc/src/gp/gpiTransfer.c:
+    complete
+    .text       start:0x0217b63c end:0x0217b6e8
+    .data       start:0x02188e6c end:0x02188e9c
+
+lib/dwc/src/gp/gpiUnique.c:
+    complete
+    .text       start:0x0217b6e8 end:0x0217b820
+    .data       start:0x02188e9c end:0x02188eec
+
+lib/dwc/src/gp/gpiUtility.c:
+    complete
+    .text       start:0x0217b820 end:0x0217bb70
+    .data       start:0x02188eec end:0x02188f9c

@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-716 of 1688 functions are in source files.
+874 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -123,6 +123,21 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
+| `gp.c` | `0x0217241c`–`0x02172d68` | 21 | complete | descriptive |
+| `gpi.c` | `0x02172d68`–`0x02173504` | 6 | complete | descriptive |
+| `gpiBuddy.c` | `0x02173504`–`0x02174dd4` | 12 | complete | descriptive |
+| `gpiBuffer.c` | `0x02174dd4`–`0x02175458` | 13 | partial | descriptive |
+| `gpiCallback.c` | `0x02175458`–`0x02175750` | 4 | complete | descriptive |
+| `gpiConnect.c` | `0x02175750`–`0x0217688c` | 10 | complete | descriptive |
+| `gpiInfo.c` | `0x0217688c`–`0x02177cc0` | 13 | complete | descriptive |
+| `gpiKeys.c` | `0x02177cc0`–`0x02178084` | 8 | complete | descriptive |
+| `gpiOperation.c` | `0x02178084`–`0x02178458` | 7 | complete | descriptive |
+| `gpiPeer.c` | `0x02178458`–`0x02179220` | 24 | complete | descriptive |
+| `gpiProfile.c` | `0x02179220`–`0x02179834` | 20 | complete | descriptive |
+| `gpiSearch.c` | `0x02179834`–`0x0217b5fc` | 7 | partial | descriptive |
+| `gpiTransfer.c` | `0x0217b5fc`–`0x0217b6a8` | 2 | complete | descriptive |
+| `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
+| `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
@@ -471,7 +486,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_map_chunk_rd.c` | `0x0218ab60`–`0x0218adac` | 2 | complete | descriptive |
 | `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | partial | string at `0x021d4bc0` |
 | `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | partial | string at `0x021d4bd0` |
-| `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | partial | descriptive |
+| `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
 | `ctalkmsgwin.c` | `0x0218b1f8`–`0x0218d0f4` | 56 | partial | string at `0x021d4c23` |
 | `ircbattlemenu.c` | `0x0218d0f4`–`0x0218ed18` | 63 | partial | string at `0x021d4d24` |
 | `fldmmdl_acmd.c` | `0x0218ed18`–`0x02193680` | 430 | partial | string at `0x021d4d40` |
@@ -522,7 +537,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | partial | descriptive |
 | `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
-| `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | partial | descriptive |
+| `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
 | `scrcmd_buildmodel.c` | `0x021ab73c`–`0x021abb48` | 18 | complete | descriptive |
 | `scrcmd_place_name.c` | `0x021abb48`–`0x021abb70` | 1 | complete | descriptive |
 | `scrcmd_shop.c` | `0x021abb70`–`0x021adc6c` | 53 | partial | string at `0x021d51cc` |

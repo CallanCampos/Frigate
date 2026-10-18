@@ -76,49 +76,39 @@ fx32 VEC_Fx16Mag(const VecFx16 *v) {
 }
 
 void VEC_Normalize(const VecFx32 *src, VecFx32 *dest) {
-    fx64 sum = (fx64)src->x * src->x;
-    sum += (fx64)src->y * src->y;
-    sum += (fx64)src->z * src->z;
-    fx64 invLen;
-    fx32 len;
+    // The squared length, then its inverse times the length
+    fx64 value;
+    s32 len;
 
-    reg_CP_DIVCNT = 2;
-    reg_CP_DIV_NUMER = 0x100000000000000LL;
-    reg_CP_DIV_DENOM = sum;
-    reg_CP_SQRTCNT = 1;
-    reg_CP_SQRT_PARAM = sum << 2;
-    while (reg_CP_SQRTCNT & REG_CP_BUSY_MASK) {
-    }
-    len = reg_CP_SQRT_RESULT;
-    while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
-    }
-    invLen = reg_CP_DIV_RESULT * len;
-    dest->x = (fx32)((invLen * src->x + 0x100000000000LL) >> 45);
-    dest->y = (fx32)((invLen * src->y + 0x100000000000LL) >> 45);
-    dest->z = (fx32)((invLen * src->z + 0x100000000000LL) >> 45);
+    value = (fx64)src->x * src->x;
+    value += (fx64)src->y * src->y;
+    value += (fx64)src->z * src->z;
+    CP_SetDiv64_64(1LL << (FX32_SHIFT + FX32_SHIFT + 32), (u64)value);
+    CP_SetSqrt64((u64)(value << 2));
+    len = (s32)CP_GetSqrtResult32();
+    value = CP_GetDivResult64();
+    value = value * len;
+    dest->x = (fx32)((value * src->x + (1LL << (32 + FX32_SHIFT))) >> (32 + FX32_SHIFT + 1));
+    dest->y = (fx32)((value * src->y + (1LL << (32 + FX32_SHIFT))) >> (32 + FX32_SHIFT + 1));
+    dest->z = (fx32)((value * src->z + (1LL << (32 + FX32_SHIFT))) >> (32 + FX32_SHIFT + 1));
 }
 
 void VEC_Fx16Normalize(const VecFx16 *src, VecFx16 *dest) {
-    fx64 sum = src->x * src->x;
-    sum += src->y * src->y;
-    sum += src->z * src->z;
-    fx64 invLen;
-    fx32 len;
+    // The squared length, then its inverse times the length
+    fx64 value;
+    s32 len;
 
-    reg_CP_DIVCNT = 2;
-    reg_CP_DIV_NUMER = 0x100000000000000LL;
-    reg_CP_DIV_DENOM = sum;
-    reg_CP_SQRTCNT = 1;
-    reg_CP_SQRT_PARAM = sum << 2;
-    while (reg_CP_SQRTCNT & REG_CP_BUSY_MASK) {
-    }
-    len = reg_CP_SQRT_RESULT;
-    while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
-    }
-    invLen = reg_CP_DIV_RESULT * len;
-    dest->x = (fx16)((invLen * src->x + 0x100000000000LL) >> 45);
-    dest->y = (fx16)((invLen * src->y + 0x100000000000LL) >> 45);
-    dest->z = (fx16)((invLen * src->z + 0x100000000000LL) >> 45);
+    value = src->x * src->x;
+    value += src->y * src->y;
+    value += src->z * src->z;
+    CP_SetDiv64_64(1LL << (FX32_SHIFT + FX32_SHIFT + 32), (u64)value);
+    CP_SetSqrt64((u64)(value << 2));
+    len = (s32)CP_GetSqrtResult32();
+    value = CP_GetDivResult64();
+    value = value * len;
+    dest->x = (fx16)((value * src->x + (1LL << (32 + FX32_SHIFT))) >> (32 + FX32_SHIFT + 1));
+    dest->y = (fx16)((value * src->y + (1LL << (32 + FX32_SHIFT))) >> (32 + FX32_SHIFT + 1));
+    dest->z = (fx16)((value * src->z + (1LL << (32 + FX32_SHIFT))) >> (32 + FX32_SHIFT + 1));
 }
 
 void VEC_MultAdd(fx32 scale, const VecFx32 *a, const VecFx32 *b, VecFx32 *dest) {

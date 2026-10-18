@@ -765,6 +765,8 @@ Same code, other `sp` offsets or frame size.
   `smull`/`smlal` chain with different registers, and only the one expression merges the loads of neighbouring fields
   into an `ldm`. libfx's `VEC_Mag`, `VEC_Fx16Mag`, `VEC_Distance` and `VEC_Normalize` match only with `+=`; a rounding
   constant added in 32 bits to the last term (`sum += a->z * b->z + 0x800`) is what `VEC_Fx16DotProduct` needs.
+  libfx's `MTX_MultVec43` adds the translation in a statement of its own, `dest->x += mtx->m[3][0];`, after the
+  product's store, and is 4 bytes short with it in the expression, where MWCC merges two loads into an `ldmib`.
   G3D's `util.c` adds each translation in a statement of its own after the dot product's shift in
   `NNS_G3dWorldPosToScrPos` (`w = (fx32)((...) >> FX32_SHIFT); w += proj->m[3][3];`); in the same expression the
   function is 8 bytes larger. Its sibling `NNS_G3dScrPosToWorldLine`, with sums of two products, needs the opposite: `x
@@ -1120,7 +1122,13 @@ Same code, other `sp` offsets or frame size.
   loads the party and the trainer data into locals before storing either, where reading a stored field back for a
   call gives load, store, load, store. libfx's `MTX_Concat33`, `MTX_Concat43` and `MTX_Concat44` load a column of `b`
   once for two neighbouring products of the result only with the column in locals: every store into the result
-  reloads `b` otherwise, 0x18 to 0x40 bytes in all.
+  reloads `b` otherwise, 0x18 to 0x40 bytes in all. They match only with the row of `a` in locals too, reloaded
+  before each row's products, and the result written through a pointer of its own (`dst = &tmp` or `dst = ab` in an
+  `if`) rather than through `ab` reassigned or a ternary: with `a` read in the products, its loads are scheduled
+  between the stores and the registers rotate (196 bytes in `MTX_Concat33`).
+- Of independent statements that all feed later code, the one written first takes the lower registers. libfx's
+  `MAT3_Invert` and `MTX_Inverse43` compute their three cofactors as `t1`, `t0`, `t2`, not in their index order:
+  with `t0` first, the registers of the first products swap (14 and 16 bytes).
 - A field read in an `if`'s condition and again in its body is a global common subexpression, loaded into a
   temporary ahead of the condition's other loads: `btlv_mcss.c`'s move end callbacks, `if (task->seq ==
   task->work->moveSeq[task->pos]) { task->work->moveTasks &= BtlvEffect_PosBit(task->pos) ^ 0xffffffff; }`, load
@@ -1563,6 +1571,11 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A narrowing cast on a 64-bit field before a mask, `(u32)context->length & 63`, keeps the low word in a register
+  of its own, which the original, masking the `u64` itself, reuses for the 0 stored next: libmath's
+  `MATH_MD5GetHash` is 13 bytes off with the cast. In `MATH_MD5Update` a source pointer set from `data` at the top
+  costs a register for the whole function; the original copies from `data` and sets `src = data + room` only after
+  the first block's transform (31 bytes).
 - `(u16)(n * 2)` in one expression folds into `lsls #0x11; lsrs #0x10`; the product in an `int` or `u32` local, cast at
   the use, keeps `lsls #1` and `lsls #0x10; lsrs #0x10` apart. A `u16` local or parameter and `& 0xffff` fold too.
   Multiboot's `MBGameInfo_Build` (`mb_gameinfo.c`) matched with `nameSize = MBGameInfo_CountChars(name) *
@@ -2418,6 +2431,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loading the divider's base, as the original does, only through NitroSDK's `CP_SetDiv64_32` and
   `CP_GetDivResult32` (`nitro/cp.h`), which write the operands and read the result through plain pointers to the
   registers' addresses; with the `volatile` `reg_CP_*` registers the base's load goes first in every spelling.
+  libfx's `VEC_Normalize` and `VEC_Fx16Normalize` need the same of the square root unit (`CP_SetSqrt64`,
+  `CP_GetSqrtResult32`), and `MTX_FrustumW` and `MTX_PerspectiveW` of the divider's `CP_SetDivImm64_32`: through the
+  `volatile` registers the stores keep their order and can't merge into an `stmib` (4 bytes, or 2 lines).
   A plain store has memory successors when the stores after it are kept in order: stores into one object, or into
   the upper half of a small one. `poke_net.c`'s `POKE_NET_Release` stores `HasSvlToken`, then loads
   `gPOKE_NET_Control`'s address plus 0x200 from the pool, then stores `ServerURL[0]` and, through that address,
@@ -2524,6 +2540,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- A table read in an unrolled loop through a pointer that each read steps (`*sines++`, `x[*index++]`) and the same
+  table indexed (`sines[0]` to `sines[3]`, then `sines += 4`) give different registers and spills. libmath's
+  `md5_transform` matches only stepped, with the message walked by its own pointer in the first round and through
+  the index table, set just before the second round, in the others: indexed, its 712 bytes of registers and spills
+  differ, and the frame is 4 bytes larger.
 - MWCC 1.1p1 keeps a plain scalar static in a register across a loop and stores it once after, but never a struct
   field: an original that loads a field once and stores it back on each pass copied it to a local. Multiboot's `MB_Init`
   (`mb_wm.c`) came closer with `src = sWmConfig.name;` before its name loop and `sWmConfig.name = src;` inside it.
