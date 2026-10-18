@@ -3,6 +3,21 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the field menu's apps against the oracle
+
+- **Align an app on its first frame, measured on both programs, not on its press.** The DS takes a different number
+  of passes than the port to close the field and load an app; opening the app on the port at the oracle's first app
+  frame's count less the port's own passes to its first frame lines up every later pass, and then a press inside the
+  app reaches both on the same pass. The bag, the card and the party list then match pass for pass.
+- **Check every pass of an app, not only its labelled screens.** The labelled rows of the trainer card matched while
+  its opening wipe was missing; the span check (every picture the port shows at a count is one the oracle shows there)
+  found it.
+- **A screen that steps by VBlanks parts from the oracle wherever the DS takes long passes.** The summary scrolls its
+  background by `OS_GetVBlankCount()`, and the DS loads it in a pass of 30 frames: its background stays some pixels
+  ahead. Look for the VBlank count in the code before suspecting the renderer.
+- **A route made for one version doesn't walk the other.** The starter route's input, written on Black 2's oracle,
+  goes astray on White 2's: each version needs its own measured route.
+
 ## 2026-10-18: the H-blank interrupt and its flag
 
 - **An interrupt handler that takes no time sees the hardware as it was when the interrupt came.** The port raised

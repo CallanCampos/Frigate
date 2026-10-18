@@ -125,6 +125,40 @@ endforeach()
 # The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
 set_tests_properties(oracle_continue oracle_continue_starter PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
 
+# The field menu's apps on Frigate's test launcher (ADR 0012) against the oracle (oracle.py launch, README.md's "The
+# launch checks"): the oracle reaches each app through the field and its menu with the route's input file
+# (port/tests/oracle/launch_<route>_<version>.pbwinput), the port plays the same file from the same save with --launch
+# at the oracle's counts; the oracle's app screens (launch_<route>_<version>.screens.tsv) must show on the port at their
+# counts, and every pass of each app the oracle's. field_menus starts from the first save (the bag, the trainer card),
+# party_menus from the starter save (the party list, its summary, the card with the Pokédex line, the bag). Skipped
+# (77) without the oracle or the ROM, or for a version the route isn't measured in
+foreach(route IN ITEMS field_menus party_menus)
+    add_test(NAME oracle_launch_${route}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" launch ${route}
+                --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --save-cache "${port_oracle_saves}"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_launch_${route} PROPERTIES
+        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 3600)
+endforeach()
+
+# The launcher on the port alone, from the starter save the oracle made: --launch summary opens Tepig's summary as the
+# game does without the party list, and B closes it, without a trap and without writing the save. Black 2 only, since
+# White 2 has no starter save yet; skipped (77) without the save (no oracle) or the ROM
+if(PORT_VERSION STREQUAL "b2_us")
+    add_test(NAME launch_summary_standalone
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_tests}/check_launch_smoke.py"
+                --save "${port_oracle_saves}/starter_save_b2_us.sav" --save-name IREO.sav
+                --expect "--launch: summary: opened at count [0-9]+, closed at count [0-9]+: result 0, event type 0"
+                -- "$<TARGET_FILE:${PORT_PROGRAM}>" --headless --frames 4200 --watchdog 30
+                --input "${port_oracle_tests}/launch_summary_b2_us.pbwinput" --launch summary
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(launch_summary_standalone PROPERTIES
+        FIXTURES_REQUIRED oracle_saves SKIP_RETURN_CODE 77 TIMEOUT 900)
+endif()
+
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the
 # console's Wi-Fi ID that New Game copied into the save is the oracle's (oracle.py port-save). Skipped (77) without

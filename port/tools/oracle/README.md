@@ -532,6 +532,58 @@ then loads the field and shows the player in his room; the port stops after fram
 table, which has no C yet: overlay 36 (issue #83) is what stops a continued game, before it reaches overlay 12's script
 tables. The sequence holds the stop to that trap by its message.
 
+## The launch checks
+
+The field menu's apps against melonDS while the port has no field ([ADR 0012](../../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)):
+the oracle opens each app from the field menu, where the port's continued game stops on overlay 36's trap; the port
+opens the same apps with Frigate's test launcher (`--launch`, [port/app/launcher.c](../../app/launcher.c)) at the
+counts the oracle opens them. `oracle.py launch NAME --port BIN [--save-cache DIR]`, ctest `oracle_launch_<NAME>`,
+checks a route (`oracle.py`'s `LAUNCHES`):
+
+1. its save, from the cache or made on the oracle ([Saves](#saves));
+2. the oracle on `port/tests/oracle/launch_<name>_<version>.pbwinput`: every row of
+   `launch_<name>_<version>.screens.tsv`, the oracle's labelled screens (hashes only), is at its frame with its count
+   and its hashes;
+3. the port with the same save, the same input file and the route's `--launch`: every app row (`where` is `app`;
+   `field` rows are the field's and its menu's, the oracle's only) shows on the port at the row's count, screens
+   without 3D by their hashes at the DS's 6 bits, a screen with 3D within compare.py's tolerance from pictures of
+   those frames only; and at every count of each app's span, from its first frame to the black after it closes, every
+   picture the port shows is one the oracle shows at that count;
+4. the launcher's report of each app gives the event type declared (0: the oracle's menu shows again), and no notice
+   says the launcher stepped aside;
+5. the port leaves the save as it was.
+
+Both programs play the same presses; inside an app they reach both on the same pass, since the app opens at the same
+count. The presses for the field and its menu reach nothing on the port. **The counts** in `--launch` are measured, not
+taken from the port: each app's first frame on the oracle (from its `frames.tsv`, the first picture after the field's
+fade to black) less the passes the port takes from opening the app to its first frame (`--launch APP` at once, 2 for
+the bag and the party list, 4 for the trainer card). The first frame is then aligned by construction, and every later
+pass is a check; the slack is 0.
+
+**What the field leaves** before an app, measured on the oracle at the bag's first frame by two-pass dumps (the oracle
+is deterministic: `g_GameSystem` at `0x021410f4`, its `GameData` at `0x0223b330`, `gfl/ui.c`'s `sSystemUI` at
+`0x021ff920` in Black 2): the UI's touch flag (`SystemUI.usingTouch`, +0x3c) is 0, set by the menu's choice by a key
+after the menu set it to 1; the last subscreen (`GameData`, +0x1ca) is 1, the menu's, which the field's close records.
+The launcher sets both through the game's setters. Nothing else was needed: the apps' pictures are the oracle's.
+
+| Route | Save | `--launch` (Black 2) | App screens | Pass by pass |
+| --- | --- | --- | --- | --- |
+| `field_menus` | `first_save` | `bag@4044,card@4584` | 2 of 2 | 621 of 621 counts: the bag (4046-4323) and the card (4588-4930) |
+| `party_menus` | `starter_save` | `party@4044,card@6974,bag@7673` | 5 of 5, 4 left out | 1,491 of 1,491 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
+
+Left out of `party_menus`, with their reasons in `LAUNCHES`:
+
+- **The summary** (counts 4533-4821): it scrolls its background a pixel every 4 VBlanks since it started
+  (`PStatus_Main`, `src/ov207/p_sta_sys.c:263-271`), and the DS spends some 37 VBlanks more than passes loading it
+  (count 4530 alone takes 30 frames), so its background is about 9 pixels further on throughout; the rest of its
+  screens are the port's. A frame the DS drops where the game steps by VBlanks, as the title's camera
+  ([Known differences](#known-differences-from-the-hardware)).
+- **The Pokédex** (its 3 rows): the port stops on `NNSi_objSizeWTbl` (ARM9 main, `0x020942b0`), NitroSystem G2D's
+  table of object widths, which has no C yet, so the route doesn't launch it.
+
+White 2 has no route yet: its starter save isn't measured (the Black 2 route's walk goes astray in White 2), so its
+tests skip.
+
 ## Integration
 
 What the port needs to compare itself frame by frame:

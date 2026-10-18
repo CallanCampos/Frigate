@@ -2,7 +2,8 @@
 """Tests of the oracle's Python side (port/tools/oracle): compare.py's PNG reader and writer, frames.tsv's versions,
 screen comparisons exact and with the 3D tolerance screen by screen, comparisons by hash, frame alignment, memory
 comparisons, symbols.py's map parser and name lookup, and oracle.py's handling of the port's runs (with a stand-in
-program), of the clock, of the comparison sequences and their references, and of a missing oracle or ROM. They make
+program), of the clock, of the comparison sequences and their references, of the launch checks of the field menu's apps
+(with stand-ins for both programs), and of a missing oracle or ROM. They make
 up their own runs and need neither melonDS nor a ROM. Standard library only.
 """
 
@@ -11,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
+import json
 import os
 import re
 import shutil
@@ -736,6 +738,246 @@ def fake_port(directory: str) -> tuple[str, str]:
         f.write(FAKE_PORT.format(python=sys.executable, tools=os.path.abspath(TOOLS), record=record))
     os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
     return program, record
+
+
+# Stand-ins for both programs of a launch check. Each writes a run directory where frame N is at count N - 1 and shows
+# PICTURE(count): the oracle's at every count, the port's but where the setup says otherwise; the oracle writes the
+# save it is given back as --save-out, the port writes its save as the setup says, and prints the launcher's reports
+LAUNCH_PICTURE = """
+def picture(count, noise=0):
+    image = bytearray(b"\\x00\\x00\\x00" * (256 * 384))
+    image[0:3] = bytes([count & 0xff, count >> 8, 7])
+    # The bottom screen's first pixels, which a screen with 3D may draw apart
+    for i in range(noise):
+        at = (256 * 192 + i) * 3
+        image[at:at + 3] = bytes([200, 0, 0])
+    return bytes(image)
+"""
+LAUNCH_ORACLE = """#!{python}
+import json, os, sys
+sys.path.insert(0, {tools!r})
+import compare
+""" + LAUNCH_PICTURE + """
+setup = json.load(open({setup!r}))
+args = sys.argv[1:]
+out = args[args.index("--out") + 1]
+frames = int(args[args.index("--frames") + 1])
+listed = args[args.index("--screens") + 1]
+wanted = set() if listed == "none" else set(compare.parse_frames(listed))
+os.makedirs(out, exist_ok=True)
+rows = []
+for frame in range(1, frames + 1):
+    image = picture(frame - 1)
+    top, bottom = compare.screen_hashes(image)
+    bottom_3d = frame - 1 in setup["bottom_3d"]
+    rows.append(compare.Frame(frame, frame, frame - 1, frame, 1, False, bottom_3d, top, bottom, False, False))
+    if frame in wanted:
+        compare.write_png(os.path.join(out, compare.FRAME_FILE.format(frame)), 256, 384, image)
+compare.write_frames_tsv(os.path.join(out, "frames.tsv"), rows)
+if "--save-out" in args:
+    data = open(args[args.index("--save") + 1], "rb").read() if "--save" in args else b"\\xff"
+    open(args[args.index("--save-out") + 1], "wb").write(data)
+"""
+LAUNCH_PORT = """#!{python}
+import json, os, sys
+sys.path.insert(0, {tools!r})
+import compare
+""" + LAUNCH_PICTURE + """
+setup = json.load(open({setup!r}))
+args = sys.argv[1:]
+open({setup!r} + ".launch", "w").write(args[args.index("--launch") + 1])
+frames = int(args[args.index("--frames") + 1])
+out = args[args.index("--run-dir") + 1]
+listed = args[args.index("--run-screens") + 1]
+wanted = set() if listed == "none" else set(compare.parse_frames(listed))
+saves = args[args.index("--save-dir") + 1]
+if setup["writes_save"]:
+    for name in os.listdir(saves):
+        open(os.path.join(saves, name), "ab").write(b"!")
+rows = []
+for frame in range(1, frames + 1):
+    count = frame - 1
+    shown = count + 1000 if count in setup["differs"] else count
+    image = picture(shown, setup["noise"] if count in setup["bottom_3d"] else 0)
+    top, bottom = compare.screen_hashes(image)
+    rows.append(compare.Frame(frame, frame, count, frame, None, None, None, top, bottom, False, False))
+    if frame in wanted:
+        compare.write_png(os.path.join(out, compare.FRAME_FILE.format(frame)), 256, 384, image)
+compare.write_frames_tsv(os.path.join(out, "frames.tsv"), rows)
+for line in setup["lines"]:
+    sys.stderr.write(line + "\\n")
+sys.stderr.write("port: stopped after %d frames\\n" % frames)
+"""
+
+
+class LaunchTests(unittest.TestCase):
+    """oracle.py launch with stand-ins for both programs, on a made-up route of 60 frames: an app shows from count 10
+    to count 39, its rows at counts 12, 20 (with 3D on the bottom screen) and 30, a field row at count 45"""
+
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        d = self.dir.name
+        self.setup_path = os.path.join(d, "setup.json")
+        self.oracle_program = os.path.join(d, "pbw-oracle")
+        self.port_program = os.path.join(d, "port")
+        for path, text in ((self.oracle_program, LAUNCH_ORACLE), (self.port_program, LAUNCH_PORT)):
+            with open(path, "w") as f:
+                f.write(text.format(python=sys.executable, tools=os.path.abspath(TOOLS), setup=self.setup_path))
+            os.chmod(path, os.stat(path).st_mode | stat.S_IEXEC)
+        # A ROM header with the game code the port names its save after
+        self.rom = os.path.join(d, "rom.nds")
+        with open(self.rom, "wb") as f:
+            f.write(b"POKEMON B2\0\0IREO01" + bytes(0x200))
+        self.save_bytes = b"the route's save"
+        self.cache = os.path.join(d, "cache")
+        os.makedirs(self.cache)
+        with open(os.path.join(self.cache, "first_save_b2_us.sav"), "wb") as f:
+            f.write(self.save_bytes)
+        # The route's input file and table, where the check looks for them
+        self.saved = (dict(oracle.SAVES), dict(oracle.LAUNCHES), oracle.LAUNCH_INPUT, oracle.LAUNCH_SCREENS,
+                      oracle.rom_matches)
+        oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": hashlib.sha1(self.save_bytes).hexdigest()})
+        oracle.LAUNCH_INPUT = os.path.join(d, "launch_{name}_{version}.pbwinput")
+        oracle.LAUNCH_SCREENS = os.path.join(d, "launch_{name}_{version}.screens.tsv")
+        oracle.rom_matches = lambda version, path: None
+        with open(os.path.join(d, "launch_route_b2_us.pbwinput"), "w") as f:
+            f.write("pbwinput 1\n")
+        self.write_table([("app_start", 12, False, "app"), ("app_3d", 20, True, "app"), ("app_end", 30, False, "app"),
+                          ("field", 45, False, "field")])
+        oracle.LAUNCHES["route"] = oracle.Launch("first_save", 60, 60, {"b2_us": "bag@8"}, (0,),
+                                                 spans={"b2_us": "10-39"})
+        self.configure()
+
+    def tearDown(self):
+        oracle.SAVES.clear()
+        oracle.SAVES.update(self.saved[0])
+        oracle.LAUNCHES.clear()
+        oracle.LAUNCHES.update(self.saved[1])
+        oracle.LAUNCH_INPUT, oracle.LAUNCH_SCREENS, oracle.rom_matches = self.saved[2:]
+        self.dir.cleanup()
+
+    def picture_hashes(self, count: int) -> tuple[str, str]:
+        image = bytearray(b"\x00\x00\x00" * (256 * 384))
+        image[0:3] = bytes([count & 0xff, count >> 8, 7])
+        return compare.screen_hashes(bytes(image))
+
+    def write_table(self, rows):
+        lines = ["# a made-up route", "\t".join(oracle.LAUNCH_COLUMNS)]
+        for label, count, bottom_3d, where in rows:
+            top, bottom = self.picture_hashes(count)
+            lines.append("\t".join([label, str(count + 1), str(count), str(count + 1), "0", "1" if bottom_3d else "0",
+                                    top, bottom, where]))
+        with open(os.path.join(self.dir.name, "launch_route_b2_us.screens.tsv"), "w") as f:
+            f.write("\n".join(lines) + "\n")
+
+    def configure(self, differs=(), noise=0, lines=None, writes_save=False):
+        report = "port: --launch: bag: opened at count 8, closed at count 40: result 0, event type 0"
+        with open(self.setup_path, "w") as f:
+            json.dump({"bottom_3d": [20], "differs": list(differs), "noise": noise,
+                       "lines": [report] if lines is None else lines, "writes_save": writes_save}, f)
+
+    def launch(self) -> tuple[int, str]:
+        return captured(oracle.main, ["launch", "route", "--oracle", self.oracle_program, "--port", self.port_program,
+                                      "--save-cache", self.cache, "--rom", self.rom])
+
+    def test_a_route_that_matches(self):
+        status, text = self.launch()
+        self.assertEqual(status, 0, text)
+        self.assertIn("3 of 3 app screens shown on the port at the oracle's counts", text)
+        self.assertIn("30 of 30 counts of the apps' spans the oracle's", text)
+        with open(self.setup_path + ".launch") as f:
+            self.assertEqual(f.read(), "bag@8")
+        # A screen with 3D a few pixels apart is within the tolerance, from both programs' pictures
+        self.configure(noise=20)
+        status, text = self.launch()
+        self.assertEqual(status, 0, text)
+
+    def test_a_picture_the_oracle_doesnt_show(self):
+        # In a span, between the rows: the frame-by-frame check sees it
+        self.configure(differs=[16])
+        status, text = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("count 16: port frame 17", text)
+        # On a row
+        self.configure(differs=[30])
+        status, text = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("app_end (oracle frame 31, count 30)", text)
+        # A screen with 3D too far apart
+        self.configure(noise=1000)
+        status, text = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("app_3d", text)
+
+    def test_known_rows_and_counts(self):
+        self.configure(differs=[20, 21])
+        oracle.LAUNCHES["route"] = oracle.Launch("first_save", 60, 60, {"b2_us": "bag@8"}, (0,),
+                                                 spans={"b2_us": "10-39"}, known={"b2_us": {"app_3d": "why"}},
+                                                 known_spans={"b2_us": {"20-21": "why"}})
+        status, text = self.launch()
+        self.assertEqual(status, 0, text)
+        self.assertIn("2 of 2 app screens", text)
+        self.assertIn("28 of 28 counts", text)
+        self.assertIn("left out, app_3d: why", text)
+
+    def test_the_launchers_reports_and_the_save(self):
+        self.configure(lines=["port: --launch: bag: opened at count 8, closed at count 40: result 1, event type 1"])
+        status, text = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("event types (1,), not (0,)", text)
+        self.configure(lines=["port: --launch steps aside: overlay 36's FIELDMAP_PROC_FUNCS has C, so the field "
+                              "opens as on the DS; retire the launcher (ADR 0012)"])
+        status, text = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("retire the launcher", text)
+        self.configure(writes_save=True)
+        status, text = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("the port's run changed the save", text)
+
+    def test_the_oracles_own_rows(self):
+        # A row that isn't what the oracle shows at its frame fails, whatever the port shows
+        self.write_table([("app_start", 12, False, "app"), ("field", 45, False, "field")])
+        table = os.path.join(self.dir.name, "launch_route_b2_us.screens.tsv")
+        with open(table) as f:
+            text = f.read().replace("\t46\t45\t", "\t47\t45\t")
+        with open(table, "w") as f:
+            f.write(text)
+        status, out = self.launch()
+        self.assertEqual(status, 1)
+        self.assertIn("field: oracle frame 47 isn't the row's", out)
+
+    def test_skips(self):
+        # A version without a --launch, without a save kept, or without the oracle skips with why
+        status, text = captured(oracle.main, ["launch", "route", "--version", "w2_us", "--oracle",
+                                              self.oracle_program, "--port", self.port_program])
+        self.assertEqual(status, oracle.SKIP)
+        self.assertIn("no SHA-1 of first_save for w2_us", text)
+        status, text = captured(oracle.main, ["launch", "route", "--oracle", os.path.join(self.dir.name, "none"),
+                                              "--port", self.port_program])
+        self.assertEqual(status, oracle.SKIP)
+
+    def test_the_routes_declarations(self):
+        # Every route of the repository: its save is one oracle.py makes, its counts and frames are its own, a --launch
+        # names apps the launcher opens, one event type per app, and its files exist for the versions it has a
+        # --launch for, with app rows the known rows name
+        saved = self.saved[1]
+        for name, launch in saved.items():
+            self.assertIn(launch.save, self.saved[0], name)
+            for version, spec in launch.spec.items():
+                entries = spec.split(",")
+                self.assertEqual(len(entries), len(launch.events), name)
+                for entry in entries:
+                    self.assertIn(entry.split("@")[0], ("party", "pokedex", "bag", "card", "summary"), name)
+                directory = os.path.join(oracle.REPO_ROOT, "port", "tests", "oracle")
+                self.assertTrue(os.path.exists(os.path.join(directory, f"launch_{name}_{version}.pbwinput")), name)
+                rows = oracle.load_launch_rows(os.path.join(directory, f"launch_{name}_{version}.screens.tsv"))
+                labels = {row.label for row in rows}
+                self.assertTrue(set(launch.known.get(version, {})) <= labels, name)
+                for row in rows:
+                    self.assertLessEqual(row.oracle_frame, launch.oracle_frames, (name, row.label))
+                self.assertTrue(set(compare.parse_frames(launch.spans[version])) >= set(
+                    oracle.by_frame(launch.known_spans.get(version, {}))), name)
 
 
 class OracleScriptTests(unittest.TestCase):

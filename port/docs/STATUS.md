@@ -26,10 +26,60 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the field menu's apps natively, through a test launcher, checked against melonDS pass by pass
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `b8b52f420` (the launcher, ADR 0012, proposed).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `b8b52f420` adds a guard-only block to
+  `src/ov035/event_mapchange.c` (a Platform row): `check_mwcc_neutral.py` finds 3,142 of 3,146 file and version pairs
+  identical to `045e97b90`, this file among them, the other four being `vm.c`'s and `event_field_proclink.c`'s Neutral
+  rows. This commit changes no game file.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 248 `ctest` tests pass, the oracle's included, 3 new over the last entry:
+  `oracle_launch_field_menus`, `oracle_launch_party_menus` and `launch_summary_standalone`;
+  `oracle_compare` has 50 tests (7 new: the launch check with stand-ins for both programs, and the routes'
+  declarations). With the option off nothing changed: `oracle_continue` still stops on `FIELDMAP_PROC_FUNCS` after the
+  same frame with the same screens, and the replays pass. T4, the apps against melonDS 1.1 (`oracle.py launch`):
+  - `field_menus`, from the first save: the bag and the trainer card, 2 of 2 app screens at the oracle's counts, and
+    621 of 621 counts of their spans (the bag 4046-4323, the card 4588-4930) the oracle's pictures, pass by pass;
+  - `party_menus`, from the starter save: the party list, Tepig's menu, back from the summary, the trainer card with
+    its Pokédex line and the bag, 5 of 5 app screens, 1,491 of 1,491 counts; left out, the summary (its background,
+    scrolled by VBlanks, is about 9 pixels on, from the DS's long loading passes) and the Pokédex (a trap, below);
+  - the launcher reports event type 0 after every app, as the oracle's menu shows again, and the saves are unchanged.
+  `launch_summary_standalone`: the summary as the game opens it without the party list, closed with B, no trap.
+  White 2: all its tests pass or skip; the launch checks and `oracle_continue_starter` skip (no starter save and no
+  route measured for White 2). T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed beyond the seam's guard.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version. With `--launch`, the Pokédex
+  stops on `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, `0x020942b0`, with `NNSi_objSizeHTbl` at `0x02094298`: the
+  48 bytes of `.rodata` no delinks entry covers); without it, a continued game stops on `FIELDMAP_PROC_FUNCS` as before.
+- **64-bit warnings:** unchanged: the game change is a `PLATFORM_PC` branch.
+- **Work done:**
+  - **The launcher** (`b8b52f420`, the last entry; [ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md),
+    proposed: it waits on this branch for the user's decision). `--launch APP[@COUNT],...` opens the field menu's apps
+    where CONTINUE asks for the field, through overlay 12's app call as the game has it, and never touches overlay
+    36's code.
+  - **The launch checks** (`oracle.py launch`, the oracle README's "The launch checks"): the oracle walks the field
+    menu with an input file from a save; the port plays the same file with `--launch` at the counts the oracle opens
+    each app (its first frame less the port's passes to it), and must show every app screen of the route's table at
+    its count, and the oracle's picture at every count of each app. Two routes for Black 2, their input files and
+    tables (hashes only) in `port/tests/oracle`.
+  - **What the field leaves**, measured on the oracle: the UI's touch flag 0 and the last subscreen 1 at an app's first
+    frame; the launcher sets both through the game's setters. Nothing else was needed for the apps' pictures.
+  - Found on the way: the H-blank interrupt's timing (`0eb7214e2`), which hid the card's opening wipe.
+  - White 2's starter save: the Black 2 route's input, run on White 2's first save, goes astray (the player ends in
+    front of the Trainers' School with no Pokémon; the save has 0x40a1 = 1), so White 2 is left out of the starter
+    save and the launch routes until it has a route of its own.
+- **Next:** the user's decision on ADR 0012; White 2's routes; the apps the routes don't reach yet (options, the town
+  map, the Xtransceiver, the medal box); battles, which wait on overlay 36 and `data_ov167_021d7490`.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim): the field, the field menu, SAVE and Retire
+  from it, and every battle event. `NNSi_objSizeWTbl` and `NNSi_objSizeHTbl` (ARM9 main, NitroSystem G2D, no overlay
+  issue and so no claim): the Pokédex, and any flipped or affine cell. `data_ov167_021d7490` (overlay 167, issue #120):
+  the first move of any battle. Overlay 12's script data, as before.
 ## 2026-10-18: Frigate's test launcher for the field menu's apps (ADR 0012, proposed), on a branch of its own
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch-adr0012`, after `cc281af40` (`port-launch`). The branch waits for
+- **Port:** `b8b52f420`, on the branch `port-launch-adr0012`, after `cc281af40` (`port-launch`). The branch waits for
   the user's decision on ADR 0012 and isn't pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `src/ov035/event_mapchange.c` gets a guard-only
   block (a Platform row of `game-changes.md`): `check_mwcc_neutral.py` finds 3,142 of 3,146 file and version pairs
