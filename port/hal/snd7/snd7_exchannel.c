@@ -1,6 +1,7 @@
 // The driver's channels (NitroSDK's snd_exchannel.c and snd_util.c on the ARM7, 0x03800378-0x03801558): what the
-// sequencer and the ARM9 play on the sound unit's 16 channels. A channel is allocated by priority, plays a PCM wave, a
-// PSG square wave or noise, has an envelope (attack, decay, sustain, release), a sweep and an LFO, and takes its
+// sequencer and the ARM9 play on the sound unit's 16 channels, the game's music and sound effects through the
+// sequencer, its streams and cries from the ARM9's own commands. A channel is allocated by priority, plays a PCM wave,
+// a PSG square wave or noise, has an envelope (attack, decay, sustain, release), a sweep and an LFO, and takes its
 // volume, pitch and pan from them and from its track at each update. SND_UpdateExChannel writes what changed to the
 // sound unit's registers at the start of the next update.
 #include "hal/snd7/snd7_internal.h"

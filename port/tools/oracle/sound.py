@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""The port's sound against the melonDS oracle (port/tools/oracle/README.md, "Sound").
+"""Frigate's sound against the melonDS oracle (port/tools/oracle/README.md, "Sound"): the game's music, sound effects
+and cries, as the ARM7 sound driver plays them run by run and the sound unit mixes them sample by sample.
 
 Both programs write two things for it:
 

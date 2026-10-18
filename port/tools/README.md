@@ -31,10 +31,12 @@ build time; their output goes into the build directory, never into the repositor
 
 [oracle/](oracle/README.md) is the melonDS test oracle, `pbw-oracle`: the player's ROM on melonDS's emulation core,
 headless and deterministic, which plays an input file and writes screens and memory for `compare.py` to hold Frigate
-against (test level T4). It is a test tool only, never linked into or shipped with Frigate, and built only with
-`-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run directories), how frames are aligned, the
-comparison sequences, saves and the known differences. `pbwinput.c` and `display3d.c` are plain C11 that the
-program's replays and the tests compile too.
+against (test level T4), and its sound, the mixer's output sample by sample and the ARM7 sound driver's state after
+each run, for `sound.py`. It is a test tool only, never linked into or shipped with Frigate, and built only with
+`-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run directories, sound traces), how frames are
+aligned, the comparison sequences, saves, the sound and the known differences. `pbwinput.c` and `display3d.c` are
+plain C11 that the program's replays and the tests compile too, and `sndtrace.h`, the sound trace's format, is what
+the program's own trace includes (`port/app/sound_trace.c`).
 
 ## Measurement
 

@@ -2,6 +2,8 @@
 // snd_capture.c and snd_global.c write them (the ARM7's 0x037ffd60-0x0380036c, 0x038007b4-0x03800818), and the unit
 // itself, which the DS has in hardware: 16 channels that play PCM8, PCM16 and IMA-ADPCM samples from memory, PSG
 // square waves (channels 8-13) and noise (14 and 15), and the mixer that sums them into the left and right outputs.
+// Every sound the game makes, its music, sound effects and cries, comes out of this unit; the oracle comparison holds
+// its output to melonDS's sample by sample (port/tools/oracle/README.md, "Sound").
 //
 // The unit as GBATEK describes it:
 //   - a channel's timer counts the sound clock (half the ARM7's bus clock) up from SOUNDxTMR, and each time it

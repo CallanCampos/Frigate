@@ -1,6 +1,9 @@
-// The host ARM7's sound driver (PXI tag SOUND): TwlSDK's SND driver as the ARM7 runs it, in C written from the ARM7's
-// code (port/hal/snd7/snd7_internal.h lists its files and functions), and the sound unit it drives (snd7_hw.c), whose
-// samples go to the host's audio (port_snd7_set_output, snd7_output.h).
+// The host ARM7's sound driver (PXI tag SOUND), which plays everything the game plays: its music, sound effects and
+// cries (src/system/snd_sys.c, through NitroSystem's sound players and the ARM9's SND library). It is TwlSDK's SND
+// driver as the ARM7 runs it, in C written from the ARM7's code (port/hal/snd7/snd7_internal.h lists its files and
+// functions), and the sound unit it drives (snd7_hw.c), whose samples go to the host's audio (port_snd7_set_output,
+// snd7_output.h). Its state after each run goes to the sound trace that holds it to melonDS's, run by run
+// (port_snd7_set_trace, port/app/sound_trace.c, port/tools/oracle/README.md "Sound").
 //
 // The DS's driver is a thread (SndThread, 0x038006ac) that waits for a message: a periodic OS alarm every 2728 ticks
 // of 64 cycles (191.9 a second, the first 0x10000 ticks after the driver starts) or the ARM9's wake-up word (0). For
@@ -672,6 +675,12 @@ static BOOL ValidPlayer(u32 playerNo) {
     return playerNo < SND7_PLAYER_NUM;
 }
 
+// One command of the ARM9's packet, as SND_CommandProc's switch (0x03803450) runs it: the sequences' (start, prepare,
+// stop, pause, skip, and the players' and tracks' parameters, mutes, channels and variables), the channels' the ARM9
+// plays itself (a PCM wave, a square wave or noise, their timer, volume and pan, and the timers that start and stop
+// channels, captures and alarms together), the capture units and alarms, the master volume, pan and output, the
+// channel locks, the shared work's address, the ranges of data the ARM9 frees (Invalidate) and the driver's state for
+// SND_ReadDriverInfo. An unknown command, or a player number out of range, does nothing
 static void Execute(const SNDCommand *command) {
     u32 arg0 = command->arg[0];
     u32 arg1 = command->arg[1];

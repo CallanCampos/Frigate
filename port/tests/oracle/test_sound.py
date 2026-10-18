@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Tests of sound.py (port/tools/oracle), the sound comparison, on made-up sound traces (sndtrace.h's records) and WAV
-dumps: plays and their pairing by the sequence's own clock, field differences, the count limit, note starts, the
-status frame by frame with its run apart and its known frames, envelopes, lags and samples to the bit, the reference's
-round trip and what makes its check fail, and oracle.py's sound specs and skips. They need neither melonDS nor a ROM.
+"""Tests of sound.py (port/tools/oracle), the comparison of Frigate's sound (the game's music, sound effects and cries)
+with melonDS's, on made-up sound traces (sndtrace.h's records) and WAV dumps: plays and their pairing by the sequence's
+own clock, field differences, the count limit, note starts, the status frame by frame with its run apart and its known
+frames, envelopes, lags and samples to the bit, the reference's round trip and what makes its check fail, and
+oracle.py's sound specs and skips. They need neither melonDS nor a ROM.
 Standard library only.
 """
 

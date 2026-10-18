@@ -14,9 +14,10 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 `fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
-**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu, with
-sound, frame for frame against melonDS; New Game's intro runs to the field's first script, and CONTINUE loads a save up
-to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there).
+**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu,
+frame for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run and its output
+sample by sample; New Game's intro runs to the field's first script, and CONTINUE loads a save up to the field, which
+waits for the decomp's overlay 36 (a trap stub stops the game there).
 [docs/STATUS.md](docs/STATUS.md) has the current state.
 
 ## Quick start

@@ -1,7 +1,8 @@
 // The platform layer's OS core, for the program (port/app/main.c), the tests and the other HAL modules. It runs the
 // game's main() and every SDK thread on fibers of one host thread, with a dispatcher on the host's own stack that
-// runs interrupt handlers, the virtual clock and the frame and scanline hooks. Plain C types only, so that files
-// without the decomp's headers can include it (u32 is uint32_t and BOOL is int on every host).
+// runs interrupt handlers, the virtual clock, other modules' timed work (the ARM7 sound driver's alarms) and the frame
+// and scanline hooks. Plain C types only, so that files without the decomp's headers can include it (u32 is uint32_t
+// and BOOL is int on every host).
 //
 // The design is the reviewed spike's (port/spikes/os-fibers/README.md): the SDK's own scheduler (os_thread.c,
 // os_mutex.c, os_message.c, os_event.c) decides everything; the HAL replaces only the contexts, the CPSR, the IRQ

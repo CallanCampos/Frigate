@@ -1,7 +1,7 @@
-// Sound traces ("pbwsnd 1"): the state of the ARM7's sound driver after each run of its thread, as the melonDS oracle
-// (pbw-oracle --sound-trace) and the port (--sound-trace) write it, for sound.py to compare. The format is in
-// port/tools/oracle/README.md. This file is plain C11 with no dependency on melonDS or the decomp's headers, so that
-// the port can include it as it is.
+// Sound traces ("pbwsnd 1"): the state of the ARM7's sound driver, which plays the game's music, sound effects and
+// cries, after each run of its thread, as the melonDS oracle (pbw-oracle --sound-trace) and Frigate (--sound-trace,
+// port/app/sound_trace.c) write it, for sound.py to compare. The format is in port/tools/oracle/README.md. This file
+// is plain C11 with no dependency on melonDS or the decomp's headers, so that Frigate can include it as it is.
 //
 // The driver is TwlSDK 5.3's stock SND driver, the same ARM7 binary in Black 2 and White 2. Its thread (SndThread)
 // waits for a message, a periodic alarm every 2728 ticks of 64 cycles or the ARM9's wake-up word, and each run ends

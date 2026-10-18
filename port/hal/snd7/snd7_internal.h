@@ -1,5 +1,5 @@
-// The host ARM7's sound driver (port/hal/snd7): what its files share. Nothing outside port/hal/snd7 and its tests
-// (port/tests/snd) includes it.
+// The host ARM7's sound driver (port/hal/snd7), which plays the game's music, sound effects and cries: what its files
+// share. Nothing outside port/hal/snd7 and its tests (port/tests/snd) includes it.
 //
 // The DS's ARM7 runs TwlSDK 5.3's stock SND driver, which the decomp doesn't have. These files are its C, written from
 // the ARM7's own code (extract/<version>/arm7/arm7.bin; its WRAM autoload at 0x037f8000) and GBATEK's sound chapter.

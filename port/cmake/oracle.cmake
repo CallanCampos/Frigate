@@ -1,8 +1,10 @@
-# The melonDS test oracle (port/tools/oracle, PLAN.md §6 T4) and its tests (port/tests/oracle).
+# The melonDS test oracle (port/tools/oracle, PLAN.md §6 T4) and its tests (port/tests/oracle), which hold Frigate's
+# run of the game to melonDS's: the screens and memory of the boot, the opening, the title and start menu, CONTINUE and
+# a save, and the sound of the opening and the title (the ARM7 sound driver run by run, its output sample by sample).
 #
-# The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c) and
-# compare.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test tool, never
-# part of the port's program (PLAN.md §1): it is built only when the port is configured with -DPORT_BUILD_ORACLE=ON,
+# The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
+# compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test
+# tool, never part of Frigate (PLAN.md §1): it is built only when the port is configured with -DPORT_BUILD_ORACLE=ON,
 # which fetches melonDS's pinned release (port/tools/oracle/melonds.cmake) into the build directory at configure time
 # and builds the oracle as a project of its own (port/tools/oracle/CMakeLists.txt) in <build>/oracle. Normal builds and
 # CI download nothing.

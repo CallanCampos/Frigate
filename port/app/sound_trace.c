@@ -1,4 +1,9 @@
-// The sound driver's trace (port/app/sound_trace.h)
+// The sound driver's trace (--sound-trace FILE, port/app/sound_trace.h): after each run of the host ARM7 sound driver's
+// thread (port/hal/snd7), the record that port_snd7_trace_record fills with the driver's work in the DS's layout,
+// stamped here with the video frame the run fell in and GFL's frame count (port/hal/gfl/gfl_frame.h), goes to the file
+// in the format that pbw-oracle's --sound-trace writes for the DS's (port/tools/oracle/sndtrace.h). It reads the state
+// of the game's music, sound effects and cries and changes nothing; port/tools/oracle/sound.py compares the two
+// programs' traces (port/tools/oracle/README.md, "Sound").
 #include "app/sound_trace.h"
 #include "hal/gfl/gfl_frame.h"
 #include "hal/os/port_os.h"

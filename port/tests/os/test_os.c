@@ -1,7 +1,9 @@
 // Tests of the OS core (port/hal/os): each scenario runs as the game's main() would, as the DS's launcher thread, logs
 // what happens in order and compares the log with the order the DS gives. The scheduler under test is the decomp's own
 // os_thread.c, os_mutex.c and os_message.c, linked as the game links them; the HAL only switches, takes interrupts
-// and keeps time. Most scenarios come from the reviewed spike (port/spikes/os-fibers), adapted to the real layer.
+// and keeps time. Most scenarios come from the reviewed spike (port/spikes/os-fibers), adapted to the real layer. What
+// they cover, every part of the game runs on: the game's main loop and its threads (the card's, the sound loader),
+// VBlank and HBlank, the timers and alarms, and the timed work that the ARM7 sound driver's alarms use.
 //
 //   port_os_tests NAME | all
 //

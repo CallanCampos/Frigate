@@ -2,7 +2,9 @@
 
 The reference the port is held against ([PLAN.md §6](../../docs/PLAN.md#6-verification), test level T4): the player's
 ROM running on [melonDS](https://melonds.kuribo64.net)'s emulation core, headless and deterministic, with an input
-file, writing both screens and named memory at chosen frames. `compare.py` compares those with the port's.
+file, writing both screens and named memory at chosen frames, and the sound: the mixer's output sample by sample and
+the ARM7 sound driver's state after each run of its thread. `compare.py` compares the screens and memory with the
+port's, `sound.py` the sound ([Sound](#sound)).
 
 It is a **test tool only**. It is never linked into or shipped with the port
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on request, and nothing under `port/` other than this directory, its

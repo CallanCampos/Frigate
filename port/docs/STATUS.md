@@ -26,6 +26,78 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Frigate and the sound, merged: the sound track under Frigate's names and guides
+
+- **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `65ea798fb`, after `a389e6d9b`, the merge of
+  `frigate-identity` after the sound's branch (`a8beb72c5`) and the upstream sync `65ea798fb`; not pushed yet.
+- **ROM:** both SHA1s match (`python3 configure.py && ninja`), at the merge and at this commit. Nothing outside `port/`
+  changed but the port's own `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, in the tree's build directories, configured again
+  (their cached placeholder bundle-identifier prefix moved to Frigate's by `bundle_id.cmake`). The merge rebuilt all
+  of the decomp's C: 263 warnings in each version, all in its `src/` (193) and `lib/` (70), none in `port/`, as in
+  Frigate's entries; this commit's changes, comments only in C, rebuilt with none. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, with the oracle built from the sound branch's sources in each build's `oracle/`, so none of the
+    melonDS oracle's tests skips: at the merge, Black 2, 248 of 249 `ctest` tests pass and `asm_oracle` skips (462 s);
+    White 2, all 247 pass (472 s), none skipped. At this commit, the same: Black 2, 248 of 249 pass and `asm_oracle`
+    skips (600 s); White 2, all 247 pass (606 s), none skipped. Each time the two builds ran at once, `ctest -j4` each.
+    No test's checks changed, only their files' comments. `asm_oracle` skips in Black 2's build because that directory
+    was made with Unix Makefiles and the test reads its flags from a Ninja build; run on its own with the flags of a
+    Black 2 directory configured with Ninja for it (and deleted after), its four test files pass; in White 2's build it
+    runs and passes.
+  - The apps: `package_macos.sh` makes `Frigate Black 2.app` and `Frigate White 2.app` and their disk images,
+    `Frigate Black 2 0.0.2644.dmg` and `Frigate White 2 0.0.2644.dmg` (5.5 MB each), from this commit's tree before
+    this entry (revision `a389e6d9b2df-dirty`). `plutil` reads `CFBundleName` Frigate, `CFBundleDisplayName` "Frigate
+    Black 2" and "Frigate White 2", `io.github.callancampos.frigate.black2` and `.white2`, `CFBundleExecutable`
+    `frigate-black2` and `frigate-white2` and `CFBundleIconFile` AppIcon; `plutil -lint` passes, and so does
+    `codesign --verify --deep --strict` on each app and on the app in its mounted image, which holds the app and a
+    link to `/Applications`. Each app's program runs 300 frames headless (`--save-dir` a scratch directory), status 0,
+    and its `--help` opens with the name, the description and the disclaimer; Black 2's, with `--sound-trace`, writes
+    a `pbwsnd 1` trace of 935 records.
+  - Every relative link of the Markdown files under `port/` and `.github/README.md` resolves, anchors as GitHub makes
+    them included (54 files, 981 links, checked by script). clang-format 23.1.3 is clean on every changed C file.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed in this task.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version (`gen_stubs`, each build above), as in
+  Frigate's entries; the sound's entry counted 56 placeholders at its older upstream base (`aae2a03f6`).
+- **64-bit warnings:** not measured: no game or `lib/` code changed in this task.
+- **Work done:** Frigate's branch, which never saw the sound track, merged into `main` after it (`a389e6d9b`), and the
+  sound track brought under Frigate's rules in this commit.
+  - **The merge.** Four conflicts, each kept with both sides' meaning: `main.c`'s usage comment (Frigate's program and
+    `--help` with the sound's `--sound-trace`), `app.cmake`'s header (the window's icon and the sound driver's trace),
+    the oracle README's commands (the sound's on `frigate-black2`), and this file (Frigate's four entries above the
+    sound's, the last naming its commit and the merge). The developer settled the platform rule as it was built
+    (`include/types.h`'s `PLATFORM_PC` block, no `include/platform.h`), so Frigate's last entry says the rule was
+    corrected to what was built and no longer lists it in its Blockers.
+  - **Names.** After the merge the sound track's text had none of the old names but its two `oracle.py sound` commands
+    on `build/port/pokeblack2`, which the merge wrote on `frigate-black2`. Where its headers meant the product, they
+    say Frigate: `sound.py` ("Frigate's sound against the melonDS oracle"), `sndtrace.h` (Frigate writes the trace too
+    and includes the header) and `oracle.cmake` (the oracle is never part of Frigate); `oracle.py`'s summary names
+    `sound.py` beside `compare.py`. The layer's own names stay, as port/CLAUDE.md says (`port_`, `PORT_*`,
+    `pbw-oracle`), and so does the trace format's `pbwsnd`, named as `pbwinput` is.
+  - **Headers.** Every file the sound track added or changed opens with what it does and which part of the game it
+    touches: `port/app/sound_trace.c` (one line before) and `.h`, `sndtrace.h`, `sound.py`, `oracle.cpp` (its
+    `--audio-dump` and `--sound-trace`), `port/hal/snd7`'s changed files (the music, sound effects and cries they play,
+    and the trace), `port_os.h` (timed work), `test_snd.c`, `test_os.c`, `test_sound.py`, `sound.cmake` and
+    `oracle.cmake`. `snd7.c`'s `Execute`, the command switch that Frigate's comment pass left to the sound track, has
+    its comment.
+  - **Guides.** `port/app/README.md` has `sound_trace.c`'s row; `port/hal/README.md` the OS core's timed work (the
+    module's row, `port_os.h`, `core.c`) and the sound driver's alarms, start delays, FIFO and trace (the module's row,
+    `snd7.c`, `snd7_hw.c` and `snd7_output.h`, with the `oracle_sound_*` tests); `port/cmake/README.md`,
+    `port/tools/README.md`, the oracle README's opening and `port/tests/README.md` (the oracle's, the OS's and the
+    sound's rows) the sound comparison. ARCHITECTURE.md: the frame's clock runs timed work (the sound driver's next
+    alarm), the sound driver's row in the threads table, the sound trace among what a run closes and in status 1, and
+    the feature map's sound row: the driver held to melonDS run by run and sample by sample, with `sound_trace.c`,
+    `sound.py` and `sndtrace.h` and the tests that cover it. GLOSSARY.md has "Timed work", "Periodic run, play" and
+    "Sound trace"; MODDING.md's oracle paragraph, port/README.md's and the landing page's status say the sound is held
+    to melonDS too. No document was added, so the documents' index is unchanged.
+- **Next:** as the last entries: a save with an adventure made by the port, once overlay 36 lets it into the field;
+  for the sound, a comparison sequence where a player plays on the game's count. The launcher's modules get their rows
+  in the guides and the feature map when they merge.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-18: Frigate's identity and guides, reviewed and fixed
 
 - **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.

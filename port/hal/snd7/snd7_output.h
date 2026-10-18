@@ -1,5 +1,6 @@
-// The sound that the host ARM7's sound unit produces (port/hal/snd7), for the host's audio (port/audio) and tests.
-// Plain C types only, so that files outside the platform layer can include it.
+// The sound that the host ARM7's sound unit produces (port/hal/snd7), the game's music, sound effects and cries, for
+// the host's audio (port/audio) and tests, and the driver's trace for the comparison with melonDS
+// (port/app/sound_trace.c). Plain C types only, so that files outside the platform layer can include it.
 //
 // The sound unit makes one stereo sample each 1024 cycles of the virtual clock (port_os_cycles), as the DS's mixer
 // does: every 512 ticks of its sound clock, which is half the 33,514,000 Hz bus clock, so 32,728.515625 samples a
@@ -35,9 +36,8 @@ void port_snd7_advance(uint64_t cycles);
 // The driver's trace, to compare it with the DS's (port/tools/oracle/sndtrace.h, the program's --sound-trace): trace is
 // called after each run of the driver's thread, periodic or not, wherever the virtual clock passed it (at a VBlank; in
 // the ARM9's call that sent a word, on a thread's fiber; or at the driver's next alarm, as the OS core's timed work on
-// the host's stack); NULL stops it. port_snd7_trace_record fills a record of
-// PBW_SNDTRACE_RECORD_SIZE bytes with what the driver knows of the run just made: everything but the frame and GFL's
-// frame count, which are the caller's
+// the host's stack); NULL stops it. port_snd7_trace_record fills a record of PBW_SNDTRACE_RECORD_SIZE bytes with what
+// the driver knows of the run just made: everything but the frame and GFL's frame count, which are the caller's
 typedef void (*PortSnd7Trace)(int periodic, void *user);
 void port_snd7_set_trace(PortSnd7Trace trace, void *user);
 void port_snd7_trace_record(uint8_t *record, int periodic);

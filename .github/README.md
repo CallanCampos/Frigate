@@ -20,10 +20,10 @@ that upstream turns into C reaches Frigate at the next sync.
 ## Status
 
 Frigate boots natively through the game's logos, the title screen and the start menu, with sound, and its tests hold it
-frame by frame against melonDS. New Game's intro runs to the field's first script, and CONTINUE loads a save, which
-stays interchangeable with melonDS's, up to the field. The field engine (overlay 36) is still being decompiled upstream;
-code that isn't C yet stops the game with its name. The log, newest entry first, is
-[port/docs/STATUS.md](../port/docs/STATUS.md).
+frame by frame against melonDS, and its sound run by run and sample by sample. New Game's intro runs to the field's
+first script, and CONTINUE loads a save, which stays interchangeable with melonDS's, up to the field. The field engine
+(overlay 36) is still being decompiled upstream; code that isn't C yet stops the game with its name. The log, newest
+entry first, is [port/docs/STATUS.md](../port/docs/STATUS.md).
 
 The decomp's progress, from upstream's CI:
 

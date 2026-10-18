@@ -1,4 +1,6 @@
-// Tests of the host ARM7's sound driver and sound unit (port/hal/snd7) and of the host's audio output (port/audio).
+// Tests of the host ARM7's sound driver and sound unit (port/hal/snd7), which play the game's music, sound effects and
+// cries, and of the host's audio output (port/audio). What holds them to the DS's sound as a whole is the oracle
+// comparison (ctest oracle_sound_<name>, port/tools/oracle/README.md, "Sound").
 //
 //   port_snd_tests NAME
 //

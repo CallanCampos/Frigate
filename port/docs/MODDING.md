@@ -155,8 +155,10 @@ A settings file, and menus to change settings in the program, come with the mod 
   replays in [../tests/replay](../tests/replay) go to the start menu and through New Game's intro.
 - **The oracle:** melonDS running the same ROM with the same input file is the reference. Configure with
   `-DPORT_BUILD_ORACLE=ON`, and `port/tools/oracle/oracle.py` runs both programs and `compare.py` compares their
-  screens and memory frame by frame ([../tools/oracle/README.md](../tools/oracle/README.md)). It tells a change that
-  should keep the game as it was from one that didn't.
+  screens and memory frame by frame ([../tools/oracle/README.md](../tools/oracle/README.md)), and `sound.py` their
+  sound: the ARM7 sound driver's state run by run and the mixed output sample by sample
+  ([Sound](../tools/oracle/README.md#sound)). It tells a change that should keep the game as it was from one that
+  didn't.
 
 ## What the mod platform will add
 
