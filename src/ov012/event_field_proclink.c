@@ -13,6 +13,7 @@
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_sound.h"
+#include "field/hidden_event.h"
 #include "field/itemuse_event.h"
 #include "field/mailsys.h"
 #include "field/mailtool.h"

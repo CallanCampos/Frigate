@@ -1718,7 +1718,7 @@ from:0x02156fee kind:thumb_call to:0x021561b4 module:overlay(12)
 from:0x02156ffc kind:thumb_call to:0x0201cd48 module:main
 from:0x02157002 kind:thumb_call to:0x0201d620 module:main
 from:0x02157014 kind:load to:0x0216ca5a module:overlay(12)
-from:0x02157018 kind:load to:0x0216ca5c module:overlay(12)
+from:0x02157018 kind:load to:0x0216ca5a add:0x2 module:overlay(12)
 from:0x02157022 kind:thumb_call to:0x02154928 module:overlay(12)
 from:0x0215702c kind:thumb_call to:0x02154950 module:overlay(12)
 from:0x02157036 kind:thumb_call to:0x02154950 module:overlay(12)

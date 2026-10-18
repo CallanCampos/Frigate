@@ -1,13 +1,9 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
-#include "constants/obj_codes.h"
+#include "constants/zones.h"
 #include "field/encounter.h"
 #include "field/field.h"
-#include "field/field_actor.h"
-#include "field/field_map.h"
 #include "field/field_player.h"
-#include "field/field_status.h"
-#include "field/hidden_event.h"
-#include "field/player_action.h"
 #include "field/zone.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -15,8 +11,14 @@
 #include "nitro/os.h"
 #include "save/encounter.h"
 #include "system/game_data.h"
-#include "system/game_system.h"
 #include "system/zone_weather.h"
+
+// A group of ROAMING_POKEMON_ZONES's indices. The groups hold indices 0 to 15 once each, but nothing reads them, so
+// what they are for is unknown
+typedef struct {
+    u16 count;
+    u8 indices[4];
+} RoamingZoneGroup;
 
 BOOL EncData_Load(EncData *encData, ArcTool *arc, u16 zoneId, u8 season) {
     u32 fileId;
@@ -85,10 +87,17 @@ void EncountState_SetTerrain(EncountState *state, u32 terrain) {
 void func_ov012_021591f4(GameData *gameData) {
 }
 
+// The routes a roaming Pokémon moves between, by EncountSave's zone clock, and none for the last
+static const u16 ROAMING_POKEMON_ZONES[17] = {
+    ZONE_ROUTE_2,  ZONE_ROUTE_3,  ZONE_ROUTE_4,  ZONE_ROUTE_5,  ZONE_ROUTE_6,  ZONE_ROUTE_7,
+    ZONE_ROUTE_8,  ZONE_ROUTE_9,  ZONE_ROUTE_10, ZONE_ROUTE_11, ZONE_ROUTE_12, ZONE_ROUTE_13,
+    ZONE_ROUTE_14, ZONE_ROUTE_15, ZONE_ROUTE_16, ZONE_ROUTE_18, 0xffff,
+};
+
 u16 EncountSave_GetRoamingPkmZone(EncountSave *save, u8 slot) {
     u32 clock = EncountSave_GetRoamingPkmZoneClock(save, slot);
     if (clock > 16) {
-        return 319;
+        return ZONE_ROUTE_2;
     }
     return ROAMING_POKEMON_ZONES[clock];
 }
@@ -98,6 +107,10 @@ u32 func_ov012_02159218(EncountSave *save) {
 }
 
 void func_ov012_0215921c(GameData *gameData, u8 slot) {
+    // Nothing reads these groups, so which of the empty functions held them is a guess
+    static const RoamingZoneGroup sRoamingZoneGroups[5] = {
+        { 3, { 0, 1, 15 } }, { 3, { 2, 3, 14 } }, { 3, { 4, 5, 6 } }, { 3, { 7, 8, 9 } }, { 4, { 10, 11, 12, 13 } },
+    };
 }
 
 void func_ov012_02159220(GameData *gameData) {
@@ -109,81 +122,4 @@ u32 GetDefaultWeatherValue(GameData *gameData, u16 zoneId) {
 
 BOOL func_ov012_0215922c(GameData *gameData) {
     return FALSE;
-}
-
-void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *action) {
-    FieldPlayer *player;
-    FieldActor *actor;
-    u16 objCode;
-    MMSys *actorSystem;
-    VecFx32 position;
-    u32 direction;
-    u32 tileInFront;
-    u32 tileUnder;
-    u16 diveZone;
-    s16 x;
-    s16 y;
-    s16 z;
-
-    MI_CpuFill8(action, 0, sizeof(PlayerActionPossibilities));
-    action->zoneId = Field_GetPlayerStateZoneID(field);
-    action->gsys = Field_GetGameSystem(field);
-    action->field = field;
-    player = Field_GetPlayer(field);
-    action->exState = FieldPlayer_GetExState(player);
-    actor = FieldPlayer_GetActorInFront(player);
-    action->actorInFront = actor;
-    if (actor != NULL) {
-        objCode = FldAct_GetObjCode(actor);
-        actorSystem = Field_GetActorSystem(field);
-        CopyActorWPos(actor, &position);
-        if (IsNPCStrengthRock(objCode) && !func_ov012_0216820c(actorSystem, &position)) {
-            action->flags |= 8;
-        }
-        if (objCode == OBJ_CODE_108) {
-            action->flags |= 1;
-        }
-    }
-    direction = FieldPlayer_GetFaceDir(player);
-    tileUnder = FieldPlayer_GetTileTypeUnder(player);
-    tileInFront = FieldPlayer_GetTileTypeInDir(player, direction);
-    if (CheckSurfHeightAllow(player, direction) == TRUE) {
-        action->flags |= 2;
-    }
-    if (CheckCanInteractWaterfall(player, tileUnder, tileInFront) == TRUE) {
-        action->flags |= 4;
-    }
-    if (GetZoneFlagsEnableFlyFrom(action->zoneId) == TRUE) {
-        action->flags |= 0x10;
-        action->flags |= 0x40;
-    }
-    if (GetZoneFlagsEnableEscapeRope(action->zoneId) == TRUE) {
-        action->flags |= 0x80;
-    }
-    if (FieldStatus_GetFlashPerms(GameData_GetFieldStatus(GSYS_GetGameData(action->gsys))) & 1) {
-        action->flags |= 0x20;
-    }
-    if (GetAbyssalRuinsDiveZoneID(field, &diveZone) == TRUE) {
-        action->flags |= 0x400;
-    }
-    if (IsZoneAbyssalRuinsInside(action->zoneId)) {
-        FieldPlayer_GetGPos(Field_GetPlayer(action->field), &x, &y, &z);
-        if (IsZoneAbyssalRuinsFlashRock(action->zoneId) &&
-            func_ov012_02159b70(&ABYSSAL_RUINS_FLASH_ROCK_RADIUS, x, z, 0xd7, field)) {
-            action->flags |= 0x20;
-        }
-        if (IsZoneAbyssalRuinsStrengthRock(action->zoneId) &&
-            func_ov012_02159b70(&ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS, x, z, 0xd6, field)) {
-            action->flags |= 8;
-        }
-    }
-    if (!func_02018c38(action->zoneId)) {
-        action->flags = 0;
-    } else {
-        action->flags |= 0x100;
-        action->flags |= 0x200;
-    }
-    if (GameData_IsForceSeasonSync(GSYS_GetGameData(action->gsys)) == TRUE) {
-        action->flags = 0;
-    }
 }
