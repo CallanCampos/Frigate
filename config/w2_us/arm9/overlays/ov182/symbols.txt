@@ -1231,8 +1231,8 @@ data_ov182_021c00ec kind:data(any) addr:0x021c012c
 sAddressEditDigitX kind:data(any) addr:0x021c0134
 data_ov182_021c0100 kind:data(any) addr:0x021c0140
 data_ov182_021c0108 kind:data(any) addr:0x021c0148
-data_ov182_021c0110 kind:data(any) addr:0x021c0150
-data_ov182_021c0120 kind:data(any) addr:0x021c0160
+sErrorFonts kind:data(any) addr:0x021c0150
+sErrorCodePos kind:data(any) addr:0x021c0160
 data_ov182_021c0122 kind:data(any) addr:0x021c0162
 data_ov182_021c013c kind:data(any) addr:0x021c017c
 data_ov182_021c013f kind:data(any) addr:0x021c017f
@@ -1640,7 +1640,7 @@ sApListPos kind:bss addr:0x021c4138
 sApList kind:bss addr:0x021c413c
 sWepKeyboard kind:bss addr:0x021c4140
 sAddressEdit kind:bss addr:0x021c4144
-data_ov182_021c4108 kind:bss addr:0x021c4148
+sErrorCode kind:bss addr:0x021c4148
 data_ov182_021c410c kind:bss addr:0x021c414c
 data_ov182_021c4114 kind:bss addr:0x021c4154
 data_ov182_021c4118 kind:bss addr:0x021c4158

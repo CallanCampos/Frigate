@@ -287,3 +287,10 @@ lib/dwcutilui/src/dwc_util_address_edit.c:
     .rodata     start:0x021c012c end:0x021c0150
     .data       start:0x021c1028 end:0x021c10c8
     .bss        start:0x021c4144 end:0x021c4148
+
+lib/dwcutilui/src/dwc_util_error.c:
+    complete
+    .text       start:0x021b297c end:0x021b2d88
+    .rodata     start:0x021c0150 end:0x021c017c
+    .data       start:0x021c10c8 end:0x021c10e0
+    .bss        start:0x021c4148 end:0x021c414c

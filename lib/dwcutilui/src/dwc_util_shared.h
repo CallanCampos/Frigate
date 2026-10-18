@@ -121,8 +121,9 @@ void func_ov182_021b5bb8(void);
 void func_ov182_021b6588(void);
 // The screen of the button above the list of access points
 void func_ov182_021b5000(void);
-// The settings of a connection
+// The settings of a connection, and the row it starts on
 void func_ov182_021b2d48(void);
+void func_ov182_021b43f8(int row);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet
