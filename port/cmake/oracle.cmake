@@ -143,7 +143,8 @@ set_tests_properties(oracle_continue oracle_continue_starter PROPERTIES FIXTURES
 # (port/tests/oracle/launch_<route>_<version>.pbwinput), the port plays the same file from the same save with --launch
 # at the oracle's counts; the oracle's app screens (launch_<route>_<version>.screens.tsv) must show on the port at their
 # counts, and every pass of each app the oracle's. field_menus starts from the first save (the bag, the trainer card),
-# party_menus from the starter save (the party list, its summary, the card with the Pokédex line, the bag). Skipped
+# party_menus from the starter save (the party list and its Pokémon's menu, the card with the Pokédex line, the bag;
+# the route's summary and Pokédex are known differences, left out: the oracle README's "The launch checks"). Skipped
 # (77) without the oracle or the ROM, or for a version the route isn't measured in
 foreach(route IN ITEMS field_menus party_menus)
     add_test(NAME oracle_launch_${route}

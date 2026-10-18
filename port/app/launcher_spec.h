@@ -70,7 +70,7 @@ const PortLaunchApp *port_launch_find_app(const char *name, size_t length);
 int port_launch_parse(const char *text, PortLaunchSpec *spec, char *error, size_t errorSize);
 
 // The kind of field menu the player gets at place, in FieldMenu_GetMenuType's order: the zone's own menus first, then
-// the flags, then the Black Tower's
+// the flags, then the Black Tower's or White Treehollow's
 PortLaunchMenu port_launch_menu(const PortLaunchPlace *place);
 
 // Whether that kind of menu offers the app (the summary, reached from the party list, wherever POKéMON is)

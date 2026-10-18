@@ -8,11 +8,11 @@ has is the game's whole source, compiled into the program, so a change to the ga
 Two limits shape everything below:
 
 - **Frigate plays as far as the decomp's C goes.** It runs from power-on through the logos, the opening, the title
-  screen, the start menu and New Game's intro, and loads a save up to the field. The field engine (overlay 36) is
-  still being decompiled upstream, and the game stops there with the name of the first function that has no C
-  ([STATUS.md](STATUS.md) has the current state). The overworld, battles and menus past it can't be reached yet, but
-  for the field menu's apps, which Frigate's test launcher opens in the field's place
-  ([below](#reaching-the-field-menus-apps)).
+  screen, the start menu and New Game's intro, and loads a save up to the field. The field engine (overlay 36) is still
+  being decompiled upstream, and the game stops there on the first thing it reaches that has no C, the field's process
+  table `FIELDMAP_PROC_FUNCS`, which the message names ([STATUS.md](STATUS.md) has the current state). The overworld,
+  battles and menus past it can't be reached yet, but for the field menu's apps, which Frigate's test launcher opens in
+  the field's place ([below](#reaching-the-field-menus-apps)).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
@@ -77,14 +77,23 @@ build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --head
 ```
 
 - **It needs a save to continue.** `SAVES` holds `IREO.sav` (Black 2) or `IRDO.sav` (White 2): your own save from a
-  cartridge or melonDS, or one the oracle makes, with the oracle built
-  ([../tools/oracle/README.md](../tools/oracle/README.md#saves)): `port/tools/oracle/oracle.py save starter_save
-  --oracle BIN --out SAVES/IREO.sav` makes the save with Tepig and the Pokédex (Black 2 only), and `first_save` makes
-  one with no Pokémon yet. Without a save there is no CONTINUE, the game never asks for the field, and the run ends with
-  status 1.
+  cartridge or melonDS, or one that the oracle makes once it is built
+  ([../tools/oracle/README.md](../tools/oracle/README.md#building); its [Saves](../tools/oracle/README.md#saves) say
+  what each save holds). From the repository's root, with your ROMs in `orig/` as for the ROM build:
+
+  ```sh
+  mkdir -p SAVES
+  python3 port/tools/oracle/oracle.py save starter_save --out SAVES/IREO.sav        # Black 2, Tepig and the Pokédex
+  python3 port/tools/oracle/oracle.py save first_save --out SAVES/IREO.sav          # Black 2, no Pokémon yet
+  python3 port/tools/oracle/oracle.py save first_save --version w2_us --out SAVES/IRDO.sav       # White 2
+  ```
+
+  `--oracle BIN` names `pbw-oracle` when it isn't in `build/port-oracle/oracle/`, and `--rom PATH` the ROM. White 2 has
+  only the first save so far: its starter save's route isn't measured yet. Without a save there is no CONTINUE, the
+  game never asks for the field, and the run ends with status 1.
 - **It opens only what the save's field menu offers**, as the menu decides: no party list or summary without a
-  Pokémon, no Pokédex without the Pokédex, no bag in the Black Tower's menu. Asking for another ends the run with status
-  2 before anything opens.
+  Pokémon, no Pokédex without the Pokédex, no bag in the Black Tower's or White Treehollow's menu. Asking for another
+  ends the run with status 2 before anything opens.
 - **Each app runs as the game runs it**, with your keys or an input file's presses. When it closes, the next one opens,
   and after the last the program stops, saying how each closed (its result and event type). `APP@COUNT` opens an app
   when GFL's frame count reaches COUNT, which lines it up with an input file's presses; without one it opens at once.
@@ -130,6 +139,11 @@ which of these it was:
   or Frigate's. Run it again in the sanitizer build, whose commands are at the top of
   [../cmake/os.cmake](../cmake/os.cmake), to see where memory went wrong; a game bug that a 64-bit layout made worse is
   fixed under `PLATFORM_PC` ([below](#changing-the-games-code-here)).
+- **Bad options (status 2).** An option the program doesn't know (`port: unknown option ...`) or a value it can't
+  use, with the usage after it: among them a run directory, WAV dump or sound trace that can't be opened, and a
+  `--launch` list the test launcher can't read. A `--launch` app that the save's field menu doesn't offer ends the run
+  with status 2 too, once CONTINUE asks for the field and before any app opens
+  (`port: --launch: APP: the field menu doesn't offer it in this save, ...`). `--help` says what each option takes.
 - **Status 1, 65, 66, 67, 72, 73.** The program couldn't go on, and the message says why: the window didn't open, a
   write to the run directory or the sound trace failed during the run, the host ran out of memory, a module found a
   build that can't work, or the test launcher's launch didn't finish (1); a save it can't use (65), no usable ROM (66),
@@ -169,13 +183,14 @@ struct that is saved changes the save; until the mod platform exists, that is ho
 
 Options are read by the module that needs them, not passed down from `main()`:
 
-1. Add the name to `sOptions` in [../app/main.c](../app/main.c), and to `sFlags` as well if it never takes a value.
-   The program refuses any option not in the list (status 2).
+1. Add it to `sOptions` in [../app/main.c](../app/main.c): its name, its value as the usage shows it (`NULL` if it never
+   takes one, and then its name in `sFlags` as well), whether it can be given again, and what it does, which `--help`
+   prints. The program refuses any option not in the list (status 2).
 2. Read it where it is used with `port_app_option("name")` ([../hal/os/port_app.h](../hal/os/port_app.h)): `NULL` when
    it isn't given, `""` for `--name` alone, else its value. Any module of the platform layer, the renderers or the
    program can call it; [../hal/gfl/heap_policy.c](../hal/gfl/heap_policy.c) is a short example.
-3. Document it in the usage block at the top of [../app/main.c](../app/main.c) and in `Usage()` (what `--help`
-   prints), and in [../README.md](../README.md) if players use it.
+3. Document it in [../README.md](../README.md) if players use it; `--help` already lists it from `sOptions`, and the
+   test `app_about` checks that every option of the usage is described.
 4. Test it: a test that runs the program with the option, in the module's fragment in [../cmake/](../cmake/README.md).
 
 A settings file, and menus to change settings in the program, come with the mod platform.

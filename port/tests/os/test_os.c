@@ -3,7 +3,7 @@
 // os_thread.c, os_mutex.c and os_message.c, linked as the game links them; the HAL only switches, takes interrupts
 // and keeps time. Most scenarios come from the reviewed spike (port/spikes/os-fibers), adapted to the real layer. What
 // they cover, every part of the game runs on: the game's main loop and its threads (the card's, the sound loader),
-// VBlank and HBlank (the HBlank interrupt with DISPSTAT's flag set, which the screen wipes' H-blank function checks),
+// VBlank and HBlank (the HBlank interrupt with DISPSTAT's flag set, which the screen wipes' HBlank function checks),
 // the timers and alarms, and the timed work that the ARM7 sound driver's alarms use.
 //
 //   port_os_tests NAME | all
@@ -575,8 +575,8 @@ static void TestHBlankMainLoop(void) {
                "frame 3: 263 hblanks, main switched in 261 times");
 }
 
-// What an H-blank handler reads: DISPSTAT's H-blank flag is set when the H-blank interrupt is taken, as melonDS sets
-// both at once (GPU::StartHBlank). The screen wipes' H-blank function writes the window planes only while
+// What an HBlank handler reads: DISPSTAT's HBlank flag is set when the HBlank interrupt is taken, as melonDS sets
+// both at once (GPU::StartHBlank). The screen wipes' HBlank function writes the window planes only while
 // GX_IsHBlank() (src/system/wipe_sub.c's WipeLineWnd_HBlank), so with the flag still clear the trainer card's opening
 // wipe was never drawn: the screens went from black to the card at once
 static int sHBlankFlagCount;

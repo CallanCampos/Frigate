@@ -53,7 +53,8 @@ foreach(variant IN ITEMS plain sanitized)
 endforeach()
 
 # --help's first lines against the product's names that the build read from port/hal/os/port_app.h, which the macOS
-# app's names and About window use too (port/tests/app/check_about.cmake)
+# app's names and About window use too; then each option of its usage described, and --launch's apps as the test
+# launcher names them (port/tests/app/check_about.cmake)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/app_about_expected.txt"
     "${PORT_PRODUCT_NAME} — ${PORT_GAME_NAME}\n${PORT_PRODUCT_DESCRIPTION}\n${PORT_PRODUCT_DISCLAIMER}\n\n")
 add_test(NAME app_about COMMAND "${CMAKE_COMMAND}" "-DPROGRAM=$<TARGET_FILE:${PORT_PROGRAM}>"

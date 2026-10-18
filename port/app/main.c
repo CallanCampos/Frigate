@@ -5,67 +5,12 @@
 // this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the DS's
 // 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   frigate-black2 [--help] [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE]
-//                  [--rom PATH] [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST]
-//                  [--run-dump SPEC]... [--sound-trace PATH] [--watchdog SECONDS] [--main-arena-size BYTES]
-//                  [--vram-backend NAME] [--heap-scale-root N] [--heap-scale-child N] [--launch APP[@COUNT],...]
+//   frigate-black2 [--help] [--headless] [--frames N] [--input FILE] [--save-dir PATH] [--launch APP[@COUNT],...] ...
 //
-//   --help              prints what Frigate is and this usage, then exits
-//   --headless          runs without a window, without pacing and without a sound device, for tests and CI
-//   --frames N          runs N frames, then exits with status 0
-//   --screenshot PATH   writes both screens as a PNG (top above bottom) when the run ends: after the last frame of
-//                       --frames N, or when the window is closed
-//   --audio-dump PATH   writes the sound as it is made to a WAV file, with or without --headless
-//   --input FILE        plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h);
-//                       its time line (or the format's default) sets the clock unless --fixed-time is given
-//   --rom PATH          the player's ROM (port/hal/rom)
-//   --save-dir PATH     where saves go (port/hal/card)
-//   --fixed-time TIME   the clock's time at boot, "YYYY-MM-DD HH:MM:SS", moving with the virtual clock (port/hal/rtc)
-//   --run-dir DIR       writes a run directory for the melonDS oracle's compare.py (port/app/run_dir.h): frames.tsv
-//                       with a row at every frame (the video frame, NitroSDK's VBlank count, GFL's frame count, the
-//                       game frame and each screen's hash), and run.txt. One that can't be made is a bad option
-//                       (status 2); a write that fails during the run stops the run with status 1
-//   --run-screens LIST  the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or
-//                       none, comma-separated, as pbw-oracle's --screens (none by default)
-//   --run-dump SPEC     memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: [LABEL=][*]SYMBOL[+OFFSET]
-//                       :SIZE[@LIST], a global of the program by name (statics aren't visible), * for where the
-//                       pointer there points, at the frames of LIST (the last of --frames by default); repeatable
-//   --sound-trace PATH  writes the sound driver's state after each run of its thread, as pbw-oracle's --sound-trace
-//                       does the DS's (port/app/sound_trace.h)
-//   --watchdog SECONDS  stops with a report and status 73 when a frame takes longer than that in host time: the game
-//                       hangs in a loop that never reaches the platform layer (30 by default with --headless; 0 is
-//                       off, the default with a window)
-//   --main-arena-size B the host's main memory arena, in bytes (a K or M suffix multiplies)
-//   --vram-backend NAME how VRAM banks are mapped: shm, mach-entry, mach-remap or copy (port/hal/gx/vram.h)
-//   --heap-scale-root N, --heap-scale-child N
-//                       how many times their DS size the game's root heaps and child heaps get, 1 to 64 (4 and 2 by
-//                       default, port/hal/gfl/heap_policy.c)
-//   --launch APP[@COUNT],...
-//                       Frigate's test launcher (port/app/launcher.h, ADR 0012): after CONTINUE, opens the field menu's
-//                       apps (party, pokedex, bag, card, summary) in place of the field, whose code (overlay 36) has no
-//                       C yet, each when GFL's frame count reaches COUNT (at once without one), then stops: status 0
-//                       when each app opened and closed, 1 when the launch didn't finish (the run ended first, the game
-//                       never asked for the field, the launcher stepped aside because the field's process table has
-//                       C, or an app wanted the field), 2 when the list isn't one it can read or the save's field menu
-//                       doesn't offer an app. A status of the run's own comes first: a trap's 70, or any other cause
-//                       of 1 below. The Pokédex stops on a trap some 395 passes after it opens (NitroSystem's
-//                       NNSi_objSizeWTbl has no C yet), so only a Pokédex closed before then runs through
-//
-// The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
-// program writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
-//
-// Exit statuses: 0 when the run ends normally; 1 when it can't go on or didn't do what it was asked, each cause with a
-// "port:" line: the window didn't open, a write to the run directory failed during the run (a frame's row in
-// frames.tsv, a screen's PNG file or memory.txt, which stops the run at once), a write to the sound trace failed, a
-// module ran out of host memory (an arena, the geometry engine or its command log, the files over memory) or found a
-// build that can't work (no overlay sections, an archive or a file over memory read through an address cut to 32 bits),
-// or --launch's launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped
-// aside, or an app wanted the field: port/app/launcher.h); 2 for bad options (among them a run directory, WAV dump or
-// sound trace that can't be opened, a --launch list the launcher can't read, and a --launch app the save's field menu
-// doesn't offer); 70 when the game reaches code or data with no C (port/hal/trap.c), 71 when it stops itself
-// (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog, 74 when the game resets the console
-// (OS_ResetSystem), which the port can't do in place yet; the modules' own: 65 (a save file the port can't use), 66 (no
-// usable ROM), 67 (the PXI bus's arena check). port/docs/ARCHITECTURE.md, "How a run ends", has the table.
+// Every option is in sOptions below, with what it does, and every exit status in sExitStatuses, with what it means:
+// --help prints both after the usage, and port/docs/ARCHITECTURE.md, "How a run ends", has the statuses' table. The
+// controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the program
+// writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 
 // POSIX's signals and alarm() for the watchdog, which glibc hides from strict C11 (the target's -std=c11)
 #define _DEFAULT_SOURCE
@@ -115,12 +60,100 @@ enum {
     EXIT_WATCHDOG = 73,
 };
 
-// The options that never take a value, and every option the program and its modules know
-static const char *const sFlags[] = { "headless", "help" };
-static const char *const sOptions[] = {
-    "headless",        "help",         "frames",          "screenshot",       "audio-dump", "input",       "rom",
-    "save-dir",        "fixed-time",   "run-dir",         "run-screens",      "run-dump",   "sound-trace", "watchdog",
-    "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child", "launch",
+// Every option the program and its modules know, in the usage's order: its name, its value as the usage shows it
+// (NULL for a flag, which never takes one: sFlags), whether it can be given again, and what --help says it does
+typedef struct Option {
+    const char *name;
+    const char *value;
+    int repeatable;
+    const char *help;
+} Option;
+
+static const char *const sFlags[] = { "help", "headless" };
+static const Option sOptions[] = {
+    { "help", NULL, 0,
+      "prints what Frigate is, the usage, what each option does and what each exit status means, then exits" },
+    { "headless", NULL, 0, "runs without a window, without pacing and without a sound device, for tests and CI" },
+    { "frames", "N", 0,
+      "runs N frames, then ends the run, with status 0 unless an exit status below says otherwise (such as 1 for a "
+      "--launch whose launch didn't finish)" },
+    { "screenshot", "PATH", 0,
+      "writes both screens as a PNG (top above bottom) when the run ends: after the last frame of --frames N, or when "
+      "the window is closed" },
+    { "audio-dump", "PATH", 0, "writes the sound as it is made to a WAV file, with or without --headless" },
+    { "input", "FILE", 0,
+      "plays the buttons, lid and touch of an input file instead of the window's (port/app/replay.h); its time line "
+      "(or the format's default) sets the clock unless --fixed-time is given" },
+    { "rom", "PATH", 0, "the player's ROM (port/hal/rom)" },
+    { "save-dir", "PATH", 0, "where saves go (port/hal/card)" },
+    { "fixed-time", "\"YYYY-MM-DD HH:MM:SS\"", 0,
+      "the clock's time at boot, moving with the virtual clock (port/hal/rtc)" },
+    { "run-dir", "DIR", 0,
+      "writes a run directory for the melonDS oracle's compare.py (port/app/run_dir.h): frames.tsv with a row at every "
+      "frame (the video frame, NitroSDK's VBlank count, GFL's frame count, the game frame and each screen's hash), "
+      "and run.txt. One that can't be made is a bad option (status 2); a write that fails during the run stops the "
+      "run with status 1" },
+    { "run-screens", "LIST", 0,
+      "the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or none, "
+      "comma-separated, as pbw-oracle's --screens (none by default)" },
+    { "run-dump", "[LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]", 1,
+      "memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: a global of the program by name (statics "
+      "aren't visible), * for where the pointer there points, at the frames of LIST (the last of --frames by "
+      "default)" },
+    { "sound-trace", "PATH", 0,
+      "writes the sound driver's state after each run of its thread, as pbw-oracle's --sound-trace does the DS's "
+      "(port/app/sound_trace.h)" },
+    { "watchdog", "SECONDS", 0,
+      "stops with a report and status 73 when a frame takes longer than that in host time: the game hangs in a loop "
+      "that never reaches the platform layer (30 by default with --headless; 0 is off, the default with a window)" },
+    { "main-arena-size", "BYTES", 0, "the host's main memory arena, in bytes (a K or M suffix multiplies)" },
+    { "vram-backend", "shm|mach-entry|mach-remap|copy", 0, "how VRAM banks are mapped (port/hal/gx/vram.h)" },
+    { "heap-scale-root", "N", 0,
+      "how many times their DS size the game's root heaps get, 1 to 64 (4 by default, port/hal/gfl/heap_policy.c)" },
+    { "heap-scale-child", "N", 0,
+      "how many times their DS size the game's child heaps get, 1 to 64 (2 by default, port/hal/gfl/heap_policy.c)" },
+    { "launch", "APP[@COUNT],...", 0,
+      "Frigate's test launcher (port/app/launcher.h, ADR 0012): after CONTINUE, opens the field menu's apps (party, "
+      "pokedex, bag, card, summary) in place of the field, whose code (overlay 36) has no C yet, each when GFL's "
+      "frame count reaches COUNT (at once without one), then stops: status 0 when each app opened and closed, 1 when "
+      "the launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped aside "
+      "because the field's process table has C, or an app wanted the field), 2 when the list isn't one it can read or "
+      "the save's field menu doesn't offer an app. A status of the run's own comes first, such as a trap's 70, a "
+      "deadlock's 72, the watchdog's 73 or a 1 of its own (any other cause of 1 below). The Pokédex stops on a trap "
+      "some 395 "
+      "passes after it opens (NitroSystem's NNSi_objSizeWTbl has no C yet), so only a Pokédex closed before then "
+      "runs through" },
+};
+
+// What each exit status means, after the options in --help; port/docs/ARCHITECTURE.md, "How a run ends", has the same
+// table with where each comes from
+typedef struct ExitStatus {
+    int status;
+    const char *meaning;
+} ExitStatus;
+
+static const ExitStatus sExitStatuses[] = {
+    { 0, "the run ended normally" },
+    { 1,
+      "it can't go on or didn't do what it was asked, each cause with a \"port:\" line: the window didn't open, a "
+      "write to the run directory failed during the run (a frame's row in frames.tsv, a screen's PNG file or "
+      "memory.txt, which stops the run at once), a write to the sound trace failed, a module ran out of host memory "
+      "(an arena, the geometry engine or its command log, the files over memory) or found a build that can't work "
+      "(no overlay sections, an archive or a file over memory read through an address cut to 32 bits), or --launch's "
+      "launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped aside, or "
+      "an app wanted the field: port/app/launcher.h)" },
+    { EXIT_BAD_OPTIONS,
+      "bad options, among them a run directory, WAV dump or sound trace that can't be opened and a --launch list the "
+      "launcher can't read; and a --launch app the save's field menu doesn't offer, found once CONTINUE asks for the "
+      "field" },
+    { 65, "a save file Frigate can't use (the wrong size, a directory, another emulator's format)" },
+    { 66, "no usable ROM" },
+    { 67, "the PXI bus's arena check" },
+    { 70, "the game reached code or data that has no C yet (port/hal/trap.c), which the message names" },
+    { 71, "the game stopped itself (OS_Terminate)" },
+    { EXIT_DEADLOCK, "every thread waits for an interrupt that nothing can raise" },
+    { EXIT_WATCHDOG, "the watchdog: a frame took longer than --watchdog seconds of host time" },
+    { 74, "the game reset the console (OS_ResetSystem), which Frigate can't do in place yet" },
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -144,6 +177,11 @@ static const PortHwG3Readbacks sG3Readbacks = {
     port_g3d_gxstat, port_g3d_ram_count, port_g3d_vtxram_count, port_g3d_clipmtx_result, port_g3d_vecmtx_result,
 };
 
+// --help's width, and the columns at which what an option does and what a status means start
+#define HELP_WIDTH 80
+#define HELP_OPTION_COLUMN 24
+#define HELP_STATUS_COLUMN 8
+
 // What --help says before the usage: the product, the game this program runs, and that it is a fan project
 // (port/hal/os/port_app.h)
 static void About(void) {
@@ -151,21 +189,72 @@ static void About(void) {
             PORT_PRODUCT_DISCLAIMER);
 }
 
+// Writes text from column on (where the cursor is), the words that would go past HELP_WIDTH on further lines from
+// the same column
+static void WriteWrapped(const char *text, int column) {
+    int at = column;
+    int first = 1;
+    while (*text != '\0') {
+        int length = (int)strcspn(text, " ");
+        if (!first && at + 1 + length > HELP_WIDTH) {
+            fprintf(stderr, "\n%*s", column, "");
+            at = column;
+        } else if (!first) {
+            fputc(' ', stderr);
+            at++;
+        }
+        fprintf(stderr, "%.*s", length, text);
+        at += length;
+        first = 0;
+        text += length;
+        text += strspn(text, " ");
+    }
+    fputc('\n', stderr);
+}
+
+// The usage, from sOptions: after a bad option, and in --help
 static void Usage(void) {
-    fprintf(stderr,
-            "usage: %s [--headless] [--frames N] [--screenshot PATH] "
-            "[--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] "
-            "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
-            "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--sound-trace PATH] [--watchdog SECONDS] "
-            "[--main-arena-size BYTES] "
-            "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N] "
-            "[--launch APP[@COUNT],...]\n",
-            sArgc > 0 ? sArgv[0] : "frigate");
+    const char *program = sArgc > 0 ? sArgv[0] : "frigate";
+    int at = fprintf(stderr, "usage: %s", program);
+    for (size_t i = 0; i < sizeof(sOptions) / sizeof(sOptions[0]); i++) {
+        const Option *option = &sOptions[i];
+        char group[96];
+        int length = snprintf(group, sizeof(group), "[--%s%s%s]%s", option->name, option->value != NULL ? " " : "",
+                              option->value != NULL ? option->value : "", option->repeatable ? "..." : "");
+        if (at + 1 + length > HELP_WIDTH) {
+            at = fprintf(stderr, "\n       ") - 1;
+        }
+        at += fprintf(stderr, " %s", group);
+    }
+    fputc('\n', stderr);
+}
+
+// What --help says after the usage: what each option does and what each exit status means
+static void Help(void) {
+    fprintf(stderr, "\noptions:\n");
+    for (size_t i = 0; i < sizeof(sOptions) / sizeof(sOptions[0]); i++) {
+        const Option *option = &sOptions[i];
+        int at = fprintf(stderr, "  --%s%s%s", option->name, option->value != NULL ? " " : "",
+                         option->value != NULL ? option->value : "");
+        // Two spaces at least between the option and what it does, or what it does on a line of its own
+        if (at > HELP_OPTION_COLUMN - 2) {
+            fputc('\n', stderr);
+            at = 0;
+        }
+        fprintf(stderr, "%*s", HELP_OPTION_COLUMN - at, "");
+        WriteWrapped(option->help, HELP_OPTION_COLUMN);
+    }
+    fprintf(stderr, "\nexit statuses:\n");
+    for (size_t i = 0; i < sizeof(sExitStatuses) / sizeof(sExitStatuses[0]); i++) {
+        int at = fprintf(stderr, "  %d", sExitStatuses[i].status);
+        fprintf(stderr, "%*s", HELP_STATUS_COLUMN - at, "");
+        WriteWrapped(sExitStatuses[i].meaning, HELP_STATUS_COLUMN);
+    }
 }
 
 static int IsKnownOption(const char *name, size_t length) {
     for (size_t i = 0; i < sizeof(sOptions) / sizeof(sOptions[0]); i++) {
-        if (strlen(sOptions[i]) == length && strncmp(sOptions[i], name, length) == 0) {
+        if (strlen(sOptions[i].name) == length && strncmp(sOptions[i].name, name, length) == 0) {
             return 1;
         }
     }
@@ -401,11 +490,15 @@ int main(int argc, char **argv) {
     sArgv = argv;
     port_app_set_arguments(argc, argv, sFlags, sizeof(sFlags) / sizeof(sFlags[0]));
     if (!CheckArguments() || port_app_option("help") != NULL) {
-        if (port_app_option("help") != NULL) {
+        const int help = port_app_option("help") != NULL;
+        if (help) {
             About();
         }
         Usage();
-        return port_app_option("help") != NULL ? 0 : EXIT_BAD_OPTIONS;
+        if (help) {
+            Help();
+        }
+        return help ? 0 : EXIT_BAD_OPTIONS;
     }
     sHeadless = port_app_option("headless") != NULL;
     // And it shows the reason for a stop the player can act on, with a window, since nobody reads its log at once

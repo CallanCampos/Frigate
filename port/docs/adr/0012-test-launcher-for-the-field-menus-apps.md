@@ -4,6 +4,12 @@
 - **Date:** 2026-10-18
 - **Plan:** §7 phase 4 (bag, party, Pokédex, summary), §6 (T4); port/CLAUDE.md, "Code that isn't C yet"
 - **Upstream:** `045e97b90` (merged by the port's `5ad9a1e1d`)
+- **Note (2026-10-18):** accepted at the launcher track's merge into `port-integrate` (`859e4c1cf`, then `d7849a158`):
+  the two documents "On acceptance" names now name the launcher, and its "Until then" no longer holds. Retiring the
+  launcher also removes what names it elsewhere: its rows in the app, cmake, hal, include and tests guides,
+  ARCHITECTURE.md's feature map and layers, GLOSSARY.md's test launcher, MODDING.md's "Reaching the field menu's
+  apps", port/CLAUDE.md's and PLAN.md's sentences, the oracle README's launch checks, `oracle.py`'s `launch` and
+  `port --launch`, `check_launch_smoke.py`, and the run directory's `launch:` line.
 
 ## Context
 

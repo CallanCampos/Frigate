@@ -36,7 +36,7 @@
 // is set from line 192 to 261, not in the last line, and the ARM9 sees its HBlank flag 1606 cycles into each line
 // (GBATEK, "DS Video Stuff"). The HBlank interrupt is taken there too: melonDS raises it as it sets the flag
 // (GPU::StartHBlank), and the port's handlers take no time, so a handler taken at 1536 read the flag clear. The screen
-// wipes' H-blank function writes the window planes only while GX_IsHBlank() (src/system/wipe_sub.c's
+// wipes' HBlank function writes the window planes only while GX_IsHBlank() (src/system/wipe_sub.c's
 // WipeLineWnd_HBlank), so the wipes that cover lines one by one were never drawn. The cycle itself is GBATEK's:
 // melonDS 1.1 does both at 1584 (GPU.cpp's HBLANK_CYCLES, 48 + 256 * 6), 22 cycles earlier. What the game sees is that
 // the two come together, which holds at either cycle

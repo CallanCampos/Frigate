@@ -14,12 +14,13 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 `fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
-**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu,
-frame for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run, the title's stream
-and the cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and
-CONTINUE loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there).
-Meanwhile Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag, the trainer
-card and the party list match melonDS pass for pass. [docs/STATUS.md](docs/STATUS.md) has the current state.
+**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu, frame
+for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run, the title's stream and the
+cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and CONTINUE
+loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there). Meanwhile
+Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag and the trainer card
+match melonDS pass for pass in both versions, and the party list in Black 2 so far. [docs/STATUS.md](docs/STATUS.md) has
+the current state.
 
 ## Quick start
 
@@ -39,10 +40,11 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
 
 - **White 2** is a build directory of its own: `cmake -S port -B build/port-w2 -G Ninja -DPORT_VERSION=w2_us`, which
   makes `frigate-white2`. The other options are in [cmake/README.md](cmake/README.md#options).
-- **The program's options** are in `frigate-black2 --help` and at the top of [app/main.c](app/main.c): `--headless` runs
-  without a window or pacing, `--frames N` stops after N frames, `--screenshot PATH` writes both screens at the end,
-  `--save-dir PATH` keeps the saves elsewhere, `--input FILE` plays a replay, and `--launch APPS` opens the field
-  menu's apps for the tests ([the test launcher](#the-test-launcher)).
+- **The program's options** are in `frigate-black2 --help`, which says what each does and what each exit status means,
+  from `sOptions` in [app/main.c](app/main.c): `--headless` runs without a window or pacing, `--frames N` stops after N
+  frames, `--screenshot PATH` writes both screens at the end, `--save-dir PATH` keeps the saves elsewhere,
+  `--input FILE` plays a replay, and `--launch APPS` opens the field menu's apps for the tests
+  ([the test launcher](#the-test-launcher)).
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
 - **The ROM build stays as upstream's:** `python3 configure.py && ninja` rebuilds both ROMs from your dumps and checks
   both SHA1s. Every change to this repository ends with it, since Frigate's changes must leave the ROMs byte for byte
@@ -71,11 +73,11 @@ C yet), so only a Pokédex closed before then runs through. Without `--launch` n
 Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run ended first, the game
 never asked for the field, the launcher stepped aside because the field's process table has C, or an app wanted the
 field); 2 when the `--launch` list isn't one it can read, or when the save's field menu doesn't offer an app, which it
-checks as the menu does (no Pokémon, no Pokédex, the Black Tower's menu without its BAG). The run's own status comes
-first: a trap's 70, or a 1 of the program's own (the window didn't open, a write to the run directory or the sound
-trace failed during the run, a module ran out of host memory or found a build that can't work). Each says why on a
-`port:` line; [app/main.c](app/main.c) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every
-status.
+checks as the menu does (no Pokémon, no Pokédex, the Black Tower's or White Treehollow's menu without its BAG). A status
+of the run's own comes first, such as a trap's 70, a deadlock's 72, the watchdog's 73 or a 1 of the program's own (the
+window didn't open, a write to the run directory or the sound trace failed during the run, a module ran out of host
+memory or found a build that can't work). Each says why on a `port:` line; `--help` (from [app/main.c](app/main.c)) and
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every status.
 
 [docs/MODDING.md](docs/MODDING.md#reaching-the-field-menus-apps) says how to reach a menu with it, and where its saves
 come from; [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes;

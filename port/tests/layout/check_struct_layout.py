@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checks that every game file of the host build that declares a struct gives its members the same offsets: a file that
+r"""Checks that every game file of the host build that declares a struct gives its members the same offsets: a file that
 declares its own copy of a struct whose header has another layout on a host reads the wrong bytes there, though both
 agree on the DS (port/docs/game-changes.md has the trainer card's case).
 

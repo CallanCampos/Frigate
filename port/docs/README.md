@@ -61,7 +61,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 
 | Guide | What it covers |
 | --- | --- |
-| [../app/README.md](../app/README.md) | The program: `main()`, the window, the controls, replays, the run directory, the macOS app's scripts |
+| [../app/README.md](../app/README.md) | The program: `main()` and its options, the window, the controls, replays, the run directory, the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts |
 | [../hal/README.md](../hal/README.md) | The platform layer: one row per module with the SDK module it replaces, how decomp files are adapted, the names |
 | [../gfx/README.md](../gfx/README.md) | The renderers: 2D, the geometry engine, 3D, capture, the scanline hook |
 | [../audio/README.md](../audio/README.md) | The sound output |
@@ -70,7 +70,7 @@ Each directory of `port/` has a guide to its files: what each does, the part of 
 | [../tests/README.md](../tests/README.md) | The tests by directory, which need the ROM, how to write one |
 | [../tests/asm_oracle/README.md](../tests/asm_oracle/README.md) | The differential tests of the SDK's assembly in C against the ROM's code |
 | [../tools/README.md](../tools/README.md) | The generators, the sync, the packaging, the oracle, the measurement scripts |
-| [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, known differences |
+| [../tools/oracle/README.md](../tools/oracle/README.md) | The melonDS oracle: building and running it, input files, run directories, comparing, saves, the sound, the launch checks of the field menu's apps, known differences |
 | [../tools/compile-probe/README.md](../tools/compile-probe/README.md) | The host-compiler probe: 64-bit warnings and struct layouts |
 | [../assets/README.md](../assets/README.md) | Files that aren't code |
 | [../assets/branding/README.md](../assets/branding/README.md) | Frigate's logo and app icons: the files, colours, how the build uses them, how to change them, the license |

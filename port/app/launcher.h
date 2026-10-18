@@ -8,10 +8,11 @@
 #define PORT_APP_LAUNCHER_H
 
 // The exit statuses a run with --launch ends with as far as the launcher goes. The run's own status comes first when it
-// has one (port/app/main.c's list): a trap's 70, a deadlock's 72, the watchdog's 73, or a 1 of its own (the window
-// didn't open, a write to the run directory or the sound trace failed during the run, a module ran out of host memory
-// or found a build that can't work), each said on its own "port:" line. A 1 or 2 is the launcher's when a
-// "port: --launch" line says so
+// has one (port/app/main.c's sExitStatuses), such as a trap's 70, a deadlock's 72, the watchdog's 73 or a 1 of its own
+// (the window didn't open, a write to the run directory or the sound trace failed during the run, a module ran out of
+// host memory or found a build that can't work), each said on its own "port:" line. A 1 or 2 is the launcher's when a
+// "port: --launch" line says so.
+
 // Every app opened and closed, each showing the field menu again or closing it (event type 0 or 1)
 #define PORT_LAUNCH_STATUS_DONE 0
 // The launch didn't finish: the run ended first (--frames, the window closed), the game never asked for the field, the
