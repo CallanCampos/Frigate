@@ -52,6 +52,14 @@ tools that show the differences.
   `clact.c`'s `func_0204ca1c`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which
   also passes a call's result to a setter through a `u8 pp` local rather than a `(u8)` cast.
+- A blend's clamps written into their own narrow locals, `u8 r = MATH_CLAMP(glowR + dr, 0, 31);`, and through one
+  wide temporary assigned before each (`value = glowR + dr; r = value > 31 ? 31 : value < 0 ? 0 : value;`) compile
+  to different registers and order around them. `plist_sys.c`'s `PokeList_UpdateGlow` matches only the first way,
+  with six `u8` channel locals as the other RGB555 blends write them (`zukan_info.c`) and `s8` differences (`int`
+  ones are 12 bytes short); with the shared `s32 value`, every spelling of the rest kept the glow and base colors in
+  swapped registers or came out 4 bytes larger. Its `fx32 ratio`, declared after the two `u8` loop counters, then
+  takes `r4`, as in the original (10 bytes off when declared first). The `u16` locals for the two colors and
+  `MATH_CLAMP` rather than a `?:` chain are style: the function matches either way.
 - Compound assignments add in another order than one expression: `mystery_net.c`'s `Mystery_ParseHex` adds the
   shifted value first, as the original does, only as `value <<= 4; value += digit;`, not as
   `value = value * 16 + digit`.
@@ -579,6 +587,16 @@ Same instructions, registers swapped.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
   to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
+- Whether a zero stored to two fields keeps a saved register can depend on whether the two stores are adjacent.
+  `plist_sys.c`'s `PokeList_DoMenuItem` builds its zero with the max HP call's `NULL` (`movs r2, #0; movs r7, #0`)
+  and stores `r7` for `wk->pkm = NULL` and `wk->showShortcutButtons = FALSE`, spilling the max HP to `sp+4`, only
+  when another store comes between them (`wk->pkm = NULL; wk->state = 4; wk->showShortcutButtons = FALSE;`). The
+  scheduler still stores the state first, as the ROM does (`strb r0, [r4, #0xc]; str r7, [r4, #0x3c]`), so the
+  statement order is a lever here, not the original's order: the file's two other copies of the block write the
+  state first and match.
+  Written next to each other, in each order of the block's four stores tried, they leave `r7` to the max HP and the
+  zero is built again, with `push {r3-r7, lr}; sub sp, #0x40` for the original's `push {r4-r7, lr}; sub sp, #0x44`,
+  which moves every stack offset (over 100 bytes off).
 - **MWCC propagates a hoisted constant as an immediate only within a budget of about 100 IR nodes from the start of
   the function.** A constant that needs a register (for a stack argument, or because it is used often) is written
   as an immediate at each use up to that edge, and as a copy of the register (`mov r3, r7`) at every use past it.
@@ -1623,8 +1641,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   into the table's literal address; `p[i + k]` adds the constant to the index first. Some twenty functions match only
   as pointer sums, so the original wrote them so: `btl_server_cmd.c`'s readers of the command queue
   (`*(que->buffer + que->readPtr + 1)`), the SSP JPEG decoder's EXIF readers, `field_ground_anime.c`,
-  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `strbuf.c`, `startmenu.c` and others. A local
-  `u8 *p = data + pos` read as `p[0]`, `p[1]` doesn't give it either.
+  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
+  literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
+  `p[1]` doesn't give it either.
 
 - `field += value` on an `s16` field with an `int` value narrows the value first and shares the narrowed copy between
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its
@@ -3132,6 +3151,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a file's shared `.rodata` are such locals: `win_record.c` has its two columns' x (`{ 0, 144 }`) in
   `WinRecord_PrintItemAt` and its BG scroll's speed and wrap (`{ 0x40, 0x2000 }`) in `WinRecord_ScrollBG`, read as
   `add r2, #0x40`, and a 12-byte table that nothing reads, 4-aligned, so it is declared as `u32`s.
+- Such a static can sit anywhere in the shared section, sorted by its size, and its function shows what it is.
+  Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`. They are read
+  as `static const GXRgb sEdgeColors[8]` in `PokeList_Init3D`, which turns edge marking on but never loads a table.
+  The type and name are a guess (a `u32[4]` gives the same ROM), backed by overlay 207's `p_sta_sys.c`, whose 3D
+  setup has the same cameras, a 16-byte `sPStatusEdgeColors` and the LCD config in its `.rodata`. With the cameras
+  as statics of the same function, the BG setups as statics of `PokeList_InitGraphics` in BG order (only BG 0's,
+  which `PokeList_CreateBG0` uses, at file scope) and the glow's step as a `static const u16`, its whole `.rodata`
+  is the ROM's. Overlay 194's `pokemontrade_2d.c` has the same 16 zero bytes beside its cameras though its setup
+  turns edge marking off (below).
 - An unread `{ 0, FX32_ONE, 0 }` or 16 zero bytes beside a file's camera vectors in its shared `.rodata` are
   probably its camera setup's up vector and edge colors (`GXRgb[8]`), function-local statics of the function that
   creates the camera. Game Freak's 3D setups declare position, target, up and edge colors together, and overlay 207's
