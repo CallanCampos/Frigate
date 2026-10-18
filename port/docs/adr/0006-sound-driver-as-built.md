@@ -25,11 +25,22 @@ through the driver's shared random generator, changes every random note after th
   tables (`snd7_tables.c`), and the sound unit the DS has in hardware: 16 channels of PCM8, PCM16, IMA-ADPCM, PSG
   and noise, and the mixer (`snd7_hw.c`). The ARM9 sends the same packets of `SNDCommand`s through the same PXI tag,
   and reads the same shared work (`SNDSharedWork`) and driver state, as on the DS.
+- **The sound unit is melonDS's model of the DS,** which the oracle comparison holds it to
+  ([port/tools/oracle/README.md](../../tools/oracle/README.md#sound)): a sound's first sample comes on the channel's
+  third timer step (an IMA-ADPCM sound's on its eleventh, a square wave's or noise's on its first); a channel's timer
+  counts on through a write to SOUNDxTMR, which takes effect at the channel's next step, so that an LFO, a sweep or a
+  bend changes a note's pitch without moving its phase; a channel reads its sound ahead through a FIFO of 8 words,
+  refilled 4 at a time; the channel moves on before the mixer takes its sample; the mixer keeps GBATEK's widths (the
+  fraction's low 10 bits dropped after the pan, the master volume over 128, 8 bits dropped), with a volume, pan or
+  master volume of 127 counting as 128; and the channels stand still while SOUNDCNT's enable is clear.
 - **Time is the virtual clock's.** The driver's periodic run is the DS's OS alarm of 2728 ticks of 64 cycles, the
   first 0x10000 ticks after the driver starts; a wake-up word from the ARM9 runs a run that isn't periodic. The
-  driver catches up to the virtual clock at each VBlank and whenever the ARM9 sends a word, running the periodic
-  runs, alarms and mixer samples that fall before it in order. The same run of the game gives the same driver state
-  and the same samples, whenever the host looks.
+  driver catches up to the virtual clock at each VBlank, whenever the ARM9 sends a word, and at its next alarm
+  (`SND_SetupAlarm`'s, which the stream player uses), which is the OS core's timed work (`port_os_set_timed_work`):
+  the alarm's word reaches the ARM9 when it goes off, as on the DS, so that its interrupt is taken then; an alarm set
+  for no ticks, whose moment has come, goes off at once. In each catch-up the periodic runs, alarms and mixer samples
+  that fall before it run in order. The same run of the game gives the same driver state and the same samples,
+  whenever the host looks.
 - **The output is the DS mixer's rate, 32,728.515625 Hz:** one stereo sample each 1024 cycles (512 ticks of the
   sound clock, half the 33.514 MHz bus clock), signed 16 bits. Samples are made on the game's thread as game time
   passes them and handed to `port/audio` at each VBlank, which queues them on an SDL3 audio stream at 32,728 Hz; SDL
@@ -55,8 +66,24 @@ through the driver's shared random generator, changes every random note after th
     reads whatever is there, and through a 16-byte cache for sequences, which gives the same bytes unless the ARM9
     changes a sequence while it plays;
   - a track that reads 65,536 commands in one tick without waiting ends, where the DS's sound thread would hang;
-  - the mixer keeps 16 bits, scaled so a channel at full volume and center pan is about half the range, and clips,
-    where the DS's output is 10-bit PWM;
+  - the mixer outputs 16 bits, as melonDS does by default: on the scale of the DS's 10 bits times 64, so that a
+    channel at full volume and center pan is about half the range, and clipped at the same level (-0x8000 to 0x7fff),
+    but with the low 6 bits kept, where the DS's 10-bit PWM output has none (neither the port nor the oracle cuts
+    them). The game's music reaches full scale on both (the opening's, up to some 420 samples a second in its loudest
+    seconds);
+  - the driver's runs take no time, where the DS's ARM7 reaches its register writes some way into each run. Measured
+    from the first mixer sample after each program's periodic alarm (the oracle's sound trace has the sample by which
+    the DS's alarm went off), a note that a periodic run starts takes its start in that sample on the port and 1 to 5
+    samples (30 to 150 µs) later on the DS: in the opening's music, of 433 notes in Black 2, 43 one sample later, 232
+    two, 147 three, 8 four and 3 five (White 2: 24, 187, 193, 30 and 3 of 437). Each run's other register writes (the
+    envelopes' volumes) land that much later too. So the sequences' sound matches the DS's in its envelope and levels
+    but not to the sample: at the one sample offset where most agree, 15.6% of the opening's music's samples are the
+    DS's in Black 2 (10.3% in White 2), and 89.8% of the Game Freak logo's (36.2%), whose notes start 1 or 2 samples
+    after their alarm. A stream's and a cry's, which the ARM9 writes and the channel plays at its own timer, match to
+    the bit. The channel timer's phase through a write to SOUNDxTMR (above) was a second cause, found by review and
+    fixed: the fix changed 22,329 of the opening's music's 2,712,326 samples (0.8%), and the samples equal to the DS's
+    at the best offset went from 15.58% to 15.60%, so the note starts and the writes that come with them are what
+    remains;
   - `SND_ReadDriverInfo` fills the fields that the ARM9 reads, in the decomp's guessed layout of the driver's state,
     which differs from the ARM7's ([decomp-findings.md](../decomp-findings.md)).
 - **Not modelled:** the capture units capture nothing (their registers and status are kept; Black 2 and White 2
@@ -85,5 +112,7 @@ through the driver's shared random generator, changes every random note after th
   sound heap bounds.
 - A change to how the ARM9's sound libraries carry pointers needs the matching note or handle, and a game change
   for any further file struct that keeps an address in 32 bits.
-- Revisit the output's 16-bit scaling against the oracle (PLAN.md §6, T4), and the capture units if a game path ever
-  starts them.
+- The output's scaling was revisited against the oracle (PLAN.md §6, T4): the oracle's sound traces and WAV dumps
+  (`oracle.py sound`, ctest `oracle_sound_<name>` and `oracle_sound_<name>_hashes`) hold the driver's state run by run
+  and the sound segment by segment to melonDS's. Revisit the capture units if a game path ever starts them, and a
+  channel's hold, which the port keeps (GBATEK) and melonDS doesn't.

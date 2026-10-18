@@ -5,7 +5,9 @@
 //
 // The unit as GBATEK describes it:
 //   - a channel's timer counts the sound clock (half the ARM7's bus clock) up from SOUNDxTMR, and each time it
-//     overflows the channel moves on to its next sample, so a sample lasts 0x10000 - TMR ticks;
+//     overflows the channel moves on to its next sample and the timer goes on from SOUNDxTMR, so a sample lasts
+//     0x10000 - TMR ticks. A write to SOUNDxTMR leaves the running count alone: the new value counts from the next
+//     overflow, so a channel's pitch changes (an LFO's, a sweep's, a bend's) take effect at its next step;
 //   - SOUNDxCNT: volume (bits 0-6), the data shift (bits 8-9: 0, 1, 2 or 4 bits to the right), hold (15), pan (16-22,
 //     0 left, 64 center, 127 right), the PSG duty (24-26), the repeat mode (27-28: manual, loop, one-shot), the format
 //     (29-30: PCM8, PCM16, IMA-ADPCM, PSG/noise) and start (31), which the channel clears when a one-shot sound ends.
@@ -16,16 +18,30 @@
 //     first time it gets there and set again at each loop;
 //   - a PCM or IMA-ADPCM sound of fewer than 4 words (PNT + LEN) hangs: start stays set and the channel outputs nothing
 //     until the driver clears it;
+//   - a sound starts late: a PCM sound's first sample comes on the channel's third timer step, an IMA-ADPCM sound's on
+//     its eleventh (three, then the header word's eight nibbles), a square wave's or noise's on its first, and the
+//     channel outputs 0 until then;
+//   - a PCM or IMA-ADPCM channel reads its sound ahead of what it plays, through a FIFO of 8 words: 8 when it starts,
+//     then 4 more each time it has 4 or fewer left, wrapping to the loop's start, so that memory the ARM9 rewrites
+//     just ahead of the channel (a stream's buffer) plays as it was. Those two are melonDS's model of the DS
+//     (SPUChannel::Start and its FIFO), which the port's oracle comparison holds the unit to;
 //   - a PSG channel plays 8 steps per period: for a duty of 0 to 6, low for 7 - duty steps and then high for duty + 1,
 //     from the start of the low part; at duty 7 (0%), low throughout. A noise channel shifts a 15-bit register (0x7fff
 //     at the start) right, and outputs low and xors 0x6000 in when a 1 drops out, high when a 0 does. High and low are
 //     +0x7fff and -0x7fff;
-//   - the mixer takes a sample of every channel each 512 sound clock ticks: the sample times the volume, shifted
-//     right by the data shift, times 128 - pan to the left and pan to the right; the channels' sum, or channel 1 and/or
-//     3 alone as SOUNDCNT selects, times the master volume (SOUNDCNT bits 0-6). SOUNDCNT bit 15 enables the output.
-// The DS turns the result into 10 bits for its PWM output; this unit keeps 16 bits, scaled so that a channel at full
-// volume and center pan is about half the range, clipped. The capture units' registers are kept (SND_SetupCapture,
-// their start and status) but they capture nothing: Black 2 and White 2 never start them.
+//   - the mixer takes a sample of every channel each 512 sound clock ticks, after the channels' timers have counted
+//     those ticks: the sample (16 bits) divided by the data shift (16.4 bits), times the volume (16.11), times 128 -
+//     pan to the left and pan to the right with the fraction's low 10 bits dropped (16.8); the channels' sum (20.8), or
+//     channel 1 and/or 3 alone as SOUNDCNT selects, times the master volume (SOUNDCNT bits 0-6) over 128, and without
+//     its fraction. GBATEK gives those widths, and melonDS, the port's oracle, has them, with a volume, pan or master
+//     volume of 127 counting as 128. SOUNDCNT bit 15 enables the output and the channels: while it is clear they don't
+//     move on.
+// The DS turns the result into 10 bits for its PWM output, clipped. This unit outputs the 16 bits that melonDS outputs
+// by default: on the scale of the DS's 10 bits times 64, so that a channel at full volume and center pan is about
+// half the range, and clipped at the same level (-0x8000 to 0x7fff), but with the 6 low bits kept, where the DS's
+// output has none (melonDS drops them only when told to, and the oracle doesn't tell it). The capture units'
+// registers are kept (SND_SetupCapture, their start and status) but they capture nothing: Black 2 and White 2 never
+// start them.
 //
 // A channel's samples are read through host pointers: SOUNDxSAD is a host pointer and the end of the memory it is in,
 // and a channel reads 0 past that end.
@@ -56,6 +72,10 @@
 // The fewest words (PNT + LEN) of a PCM or IMA-ADPCM sound that plays
 #define SOUND_MIN_WORDS 4
 
+// The channels' FIFO: 8 words, read 4 at a time from memory once 4 or fewer are left
+#define FIFO_SIZE 32
+#define FIFO_BURST 16
+
 typedef struct HwChannel {
     u32 cnt;
     const u8 *sad;
@@ -63,15 +83,29 @@ typedef struct HwChannel {
     u16 tmr;
     u16 pnt;
     u32 len;
-    // The sound being played: its samples, the loop's first sample, the current one, the sound clock's ticks towards
-    // the next, and the current sample's value
+    // The sound being played: its samples, the loop's first sample, the current one, the channel's timer (from
+    // SOUNDxTMR up, a step at 0x10000), and the current sample's value
     u32 total;
     u32 loopStart;
     u32 index;
-    u32 counter;
+    u32 timer;
     s32 sample;
     // A sound too short to play: the channel stays busy, silent and still
     BOOL hung;
+    // The timer steps before the sound's first sample, which the channel spends at 0
+    u32 delay;
+    // The FIFO (8 words, as bytes): where the channel reads and writes in it, the bytes it holds, the sound's next byte
+    // to read into it, and whether it was filled at the start (at the first mixer period after it)
+    u8 fifo[FIFO_SIZE];
+    u32 fifoRead;
+    u32 fifoWrite;
+    u32 fifoLevel;
+    u32 fetch;
+    BOOL primed;
+    // IMA-ADPCM: the byte whose two nibbles are being decoded
+    u8 adpcmByte;
+    // The mixer sample whose mixing takes the start first, counted from the unit's reset
+    u32 startMix;
     // IMA-ADPCM: the decoder, and its state at the loop's start
     s32 adpcmValue;
     s32 adpcmIndex;
@@ -96,6 +130,8 @@ static struct {
     s32 surroundDecay;
     u8 orgPan[SND7_CHANNEL_NUM];
     u8 orgVolume[SND7_CHANNEL_NUM];
+    // The mixer's samples since the reset
+    u32 mixes;
 } sHw;
 
 // IMA-ADPCM's tables
@@ -111,8 +147,16 @@ static const s16 sAdpcmStepTable[89] = {
 
 static const s8 sAdpcmIndexTable[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
-// The data shift: how far a channel's samples go to the right
-static const u8 sDataShift[4] = { 0, 1, 2, 4 };
+// The data shift as the mixer applies it: how far a channel's samples go to the left before the volume, from 16
+// bits to 16.4 (a shift of 0, 1, 2 or 4 bits to the right of that)
+static const u8 sDataShift[4] = { 4, 3, 2, 0 };
+
+// The timer steps before a sound's first sample: PCM, IMA-ADPCM (its header word's 8 nibbles after PCM's 3), and a
+// square wave or noise. IMA-ADPCM's header comes from the FIFO on the step after PCM's delay
+#define START_DELAY_PCM 3
+#define START_DELAY_ADPCM 11
+#define START_DELAY_PSG 1
+#define ADPCM_HEADER_DELAY (START_DELAY_ADPCM - START_DELAY_PCM - 1)
 
 void snd7_adpcm_step(int nibble, s32 *value, s32 *index) {
     s32 step = sAdpcmStepTable[*index];
@@ -160,27 +204,91 @@ static u8 ReadByte(const HwChannel *channel, u32 offset) {
     return channel->sad[offset];
 }
 
-// The sample at the channel's index. An IMA-ADPCM sample is the decoder's value after its nibble, so the samples are
-// taken in order, each once
+// 4 words of the sound into the FIFO, from where it has read up to: after the sound's end, from its loop's start, or
+// nothing for a one-shot sound
+static void FifoBurst(HwChannel *channel) {
+    u32 total = (channel->pnt + channel->len) * 4;
+    u32 burst = FIFO_BURST;
+    u32 i;
+
+    if (channel->fetch >= total) {
+        if (((channel->cnt >> 27) & 3) != SND7_REPEAT_LOOP) {
+            return;
+        }
+        channel->fetch = channel->pnt * 4u;
+    }
+    if (channel->fetch + burst > total) {
+        burst = total - channel->fetch;
+    }
+    for (i = 0; i < burst; i++) {
+        channel->fifo[channel->fifoWrite] = ReadByte(channel, channel->fetch + i);
+        channel->fifoWrite = (channel->fifoWrite + 1) % FIFO_SIZE;
+    }
+    channel->fetch += burst;
+    channel->fifoLevel += burst;
+}
+
+// The FIFO's next bytes, little-endian; it reads 4 more words when 4 or fewer are left
+static u32 FifoRead(HwChannel *channel, u32 size) {
+    u32 value = 0;
+    u32 i;
+
+    for (i = 0; i < size; i++) {
+        value |= (u32)channel->fifo[channel->fifoRead] << (8 * i);
+        channel->fifoRead = (channel->fifoRead + 1) % FIFO_SIZE;
+    }
+    channel->fifoLevel = channel->fifoLevel >= size ? channel->fifoLevel - size : 0;
+    if (channel->fifoLevel <= FIFO_BURST) {
+        FifoBurst(channel);
+    }
+    return value;
+}
+
+// The FIFO as the channel starts its sound: 8 words
+static void FifoPrime(HwChannel *channel) {
+    channel->fifoRead = 0;
+    channel->fifoWrite = 0;
+    channel->fifoLevel = 0;
+    channel->fetch = 0;
+    FifoBurst(channel);
+    FifoBurst(channel);
+    channel->primed = TRUE;
+}
+
+// IMA-ADPCM's header word, the first PCM16 value and the table's index, from the FIFO
+static void ReadAdpcmHeader(HwChannel *channel) {
+    u32 header = FifoRead(channel, 4);
+
+    channel->adpcmValue = (s16)header;
+    channel->adpcmIndex = (header >> 16) & 0x7f;
+    if (channel->adpcmIndex > 88) {
+        channel->adpcmIndex = 88;
+    }
+}
+
+// The sample at the channel's index, from the FIFO, which gives the sound's bytes in the order the samples come. An
+// IMA-ADPCM sample is the decoder's value after its nibble, a byte's low one first
 static void FetchSample(HwChannel *channel, int chNo) {
     u32 index = channel->index;
 
     switch (Format(channel)) {
     case SND7_FORMAT_PCM8:
-        channel->sample = (s32)(s8)ReadByte(channel, index) << 8;
+        channel->sample = (s32)(s8)FifoRead(channel, 1) << 8;
         break;
     case SND7_FORMAT_PCM16:
-        channel->sample = (s16)(ReadByte(channel, index * 2) | ReadByte(channel, index * 2 + 1) << 8);
+        channel->sample = (s16)FifoRead(channel, 2);
         break;
     case SND7_FORMAT_ADPCM: {
-        u8 byte = ReadByte(channel, 4 + index / 2);
-
+        if (!(index & 1)) {
+            channel->adpcmByte = (u8)FifoRead(channel, 1);
+        }
         if (index == channel->loopStart && !channel->loopSaved) {
             channel->loopValue = channel->adpcmValue;
             channel->loopIndex = channel->adpcmIndex;
             channel->loopSaved = TRUE;
         }
-        snd7_adpcm_step(index & 1 ? byte >> 4 : byte & 0xf, &channel->adpcmValue, &channel->adpcmIndex);
+        snd7_adpcm_step(index & 1 ? channel->adpcmByte >> 4 : channel->adpcmByte & 0xf, &channel->adpcmValue,
+                        &channel->adpcmIndex);
         channel->sample = channel->adpcmValue;
         break;
     }
@@ -206,52 +314,58 @@ static void FetchSample(HwChannel *channel, int chNo) {
     }
 }
 
-// The start bit went from 0 to 1: the sound starts from its first sample, or hangs when it is too short to play
-static void StartSound(HwChannel *channel, int chNo) {
+// The start bit went from 0 to 1: the sound starts, its first sample after its delay, or hangs when it is too short to
+// play. The FIFO fills at the next mixer period
+static void StartSound(HwChannel *channel) {
     u32 words = channel->pnt + channel->len;
 
     channel->index = 0;
-    channel->counter = 0;
     channel->loopSaved = FALSE;
     channel->hung = FALSE;
+    channel->sample = 0;
+    channel->primed = FALSE;
+    channel->startMix = sHw.mixes;
     if (Format(channel) != SND7_FORMAT_PSG && words < SOUND_MIN_WORDS) {
         channel->hung = TRUE;
-        channel->sample = 0;
         return;
     }
     switch (Format(channel)) {
     case SND7_FORMAT_PCM8:
         channel->total = words * 4;
         channel->loopStart = channel->pnt * 4u;
+        channel->delay = START_DELAY_PCM;
         break;
     case SND7_FORMAT_PCM16:
         channel->total = words * 2;
         channel->loopStart = channel->pnt * 2u;
+        channel->delay = START_DELAY_PCM;
         break;
-    case SND7_FORMAT_ADPCM: {
-        u32 header = ReadByte(channel, 0) | ReadByte(channel, 1) << 8 | ReadByte(channel, 2) << 16;
-
+    case SND7_FORMAT_ADPCM:
         channel->total = (words - 1) * 8;
         channel->loopStart = channel->pnt != 0 ? (channel->pnt - 1u) * 8 : 0;
-        channel->adpcmValue = (s16)header;
-        channel->adpcmIndex = (header >> 16) & 0x7f;
-        if (channel->adpcmIndex > 88) {
-            channel->adpcmIndex = 88;
-        }
+        channel->delay = START_DELAY_ADPCM;
         break;
-    }
     default:
         channel->psgStep = 0;
         channel->lfsr = NOISE_SEED;
         channel->total = 0;
-        FetchSample(channel, chNo);
-        return;
+        channel->delay = START_DELAY_PSG;
+        break;
     }
-    FetchSample(channel, chNo);
 }
 
-// One step of the channel's timer: the next sample, a loop, or the end of a one-shot sound
+// One step of the channel's timer: the next sample, a loop, or the end of a one-shot sound; the first sample at the
+// end of the start's delay
 static void NextSample(HwChannel *channel, int chNo) {
+    if (channel->delay != 0) {
+        channel->delay--;
+        if (channel->delay == ADPCM_HEADER_DELAY && Format(channel) == SND7_FORMAT_ADPCM) {
+            ReadAdpcmHeader(channel);
+        } else if (channel->delay == 0) {
+            FetchSample(channel, chNo);
+        }
+        return;
+    }
     if (Format(channel) == SND7_FORMAT_PSG) {
         channel->psgStep = (channel->psgStep + 1) & 7;
         FetchSample(channel, chNo);
@@ -280,8 +394,13 @@ static void WriteCnt(int chNo, u32 value) {
 
     channel->cnt = value & CNT_WRITABLE;
     if (!(old & SND7_CNT_START) && (channel->cnt & SND7_CNT_START)) {
-        StartSound(channel, chNo);
+        StartSound(channel);
     }
+}
+
+// A volume, pan or master volume of 127 counts as 128
+static s32 Factor(u32 value) {
+    return value == 127 ? 128 : (s32)value;
 }
 
 void snd7_hw_mix(s16 out[2]) {
@@ -293,30 +412,47 @@ void snd7_hw_mix(s16 out[2]) {
     s64 outRight;
     int i;
 
+    sHw.mixes++;
+    if (!(sHw.control & CONTROL_ENABLE)) {
+        out[0] = 0;
+        out[1] = 0;
+        return;
+    }
     for (i = 0; i < SND7_CHANNEL_NUM; i++) {
         HwChannel *channel = &sHw.channel[i];
-        BOOL busy = (channel->cnt & SND7_CNT_START) != 0;
-        s32 sample = busy || (channel->cnt & SND7_CNT_HOLD) ? channel->sample : 0;
-        s32 value = sample * (s32)(channel->cnt & 0x7f);
-        u32 pan = (channel->cnt >> 16) & 0x7f;
+        BOOL busy;
+        s32 sample;
+        s32 value;
+        s32 pan;
 
-        value >>= sDataShift[(channel->cnt >> 8) & 3];
-        left[i] = (s64)value * (128 - pan);
-        right[i] = (s64)value * pan;
+        // The channel moves on by one mixer period, and the mixer takes the sample it is on then. A sound that just
+        // started fills its FIFO and loads its timer from SOUNDxTMR first. Each overflow reloads the timer from
+        // SOUNDxTMR as it is then
+        if ((channel->cnt & SND7_CNT_START) && !channel->hung) {
+            if (!channel->primed) {
+                if (Format(channel) != SND7_FORMAT_PSG) {
+                    FifoPrime(channel);
+                }
+                channel->timer = channel->tmr;
+                channel->primed = TRUE;
+            }
+
+            channel->timer += SND7_SOUND_TICKS_PER_SAMPLE;
+            while ((channel->timer >> 16) != 0 && (channel->cnt & SND7_CNT_START)) {
+                channel->timer = channel->tmr + (channel->timer - 0x10000u);
+                NextSample(channel, i);
+            }
+        }
+        busy = (channel->cnt & SND7_CNT_START) != 0;
+        sample = busy || (channel->cnt & SND7_CNT_HOLD) ? channel->sample : 0;
+        value = sample * (1 << sDataShift[(channel->cnt >> 8) & 3]) * Factor(channel->cnt & 0x7f);
+        pan = Factor((channel->cnt >> 16) & 0x7f);
+        left[i] = (s64)value * (128 - pan) >> 10;
+        right[i] = (s64)value * pan >> 10;
         if (!((i == 1 && (sHw.control & CONTROL_CHANNEL1_BYPASS)) ||
               (i == 3 && (sHw.control & CONTROL_CHANNEL3_BYPASS)))) {
             mixLeft += left[i];
             mixRight += right[i];
-        }
-        // The channel moves on by one mixer period
-        if (busy && !channel->hung) {
-            u32 period = 0x10000u - channel->tmr;
-
-            channel->counter += SND7_SOUND_TICKS_PER_SAMPLE;
-            while (channel->counter >= period && (channel->cnt & SND7_CNT_START)) {
-                channel->counter -= period;
-                NextSample(channel, i);
-            }
         }
     }
     switch (sHw.control & CONTROL_LEFT_MASK) {
@@ -347,13 +483,9 @@ void snd7_hw_mix(s16 out[2]) {
         outRight = right[1] + right[3];
         break;
     }
-    if (!(sHw.control & CONTROL_ENABLE)) {
-        outLeft = 0;
-        outRight = 0;
-    }
-    // The volume, pan and master volume are each 7 bits of fraction
-    outLeft = outLeft * (sHw.masterVolume & 0x7f) >> 21;
-    outRight = outRight * (sHw.masterVolume & 0x7f) >> 21;
+    // The master volume, then the fraction's 8 bits off
+    outLeft = (outLeft * Factor(sHw.masterVolume & 0x7f) >> 7) >> 8;
+    outRight = (outRight * Factor(sHw.masterVolume & 0x7f) >> 7) >> 8;
     out[0] = (s16)(outLeft > 0x7fff ? 0x7fff : outLeft < -0x8000 ? -0x8000 : outLeft);
     out[1] = (s16)(outRight > 0x7fff ? 0x7fff : outRight < -0x8000 ? -0x8000 : outRight);
 }
@@ -373,6 +505,7 @@ void snd7_hw_peek(int chNo, Snd7HwPeek *peek) {
     peek->len = channel->len;
     peek->index = channel->index;
     peek->sample = channel->sample;
+    peek->startMix = channel->startMix;
 }
 
 int snd7_hw_master_volume(void) {

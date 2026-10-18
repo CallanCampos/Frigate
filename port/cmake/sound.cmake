@@ -19,9 +19,10 @@ if(port_os_stack_probes)
 endif()
 
 set(port_snd_scenarios
-    adpcm_decoder adpcm_channel pcm8_loop short_sound psg_duty noise mixer calc_timer alloc lock_stops
-    seq_note seq_params seq_programs seq_envelope seq_tie seq_sweep seq_modulation seq_flow seq_variables seq_mute
-    seq_outside seq_nothing player_controls driver_info bank_host pxi_wave_out pxi_sequence pxi_wake_ups audio_dump)
+    adpcm_decoder adpcm_channel pcm8_loop short_sound fifo psg_duty timer_write noise mixer calc_timer alloc
+    lock_stops seq_note seq_params seq_programs seq_envelope seq_tie seq_sweep seq_modulation seq_flow seq_variables
+    seq_mute seq_outside seq_nothing player_controls driver_info trace_layout bank_host pxi_wave_out pxi_sequence
+    pxi_wake_ups pxi_alarm_timing audio_dump)
 foreach(scenario IN LISTS port_snd_scenarios)
     add_test(NAME snd_${scenario} COMMAND port_snd_tests ${scenario})
     set_tests_properties(snd_${scenario} PROPERTIES TIMEOUT 60 ENVIRONMENT "PORT_SND_TMP=${CMAKE_CURRENT_BINARY_DIR}")

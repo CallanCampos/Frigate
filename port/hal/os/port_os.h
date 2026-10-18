@@ -70,6 +70,13 @@ void port_os_poll_irq(void);
 #define PORT_OS_MAX_FRAME_HOOKS 8
 void port_os_frame_hooks(void);
 void port_os_add_frame_hook(void (*hook)(void));
+// Host work at a moment of the virtual clock, for a module that models hardware whose own clock raises interrupts (the
+// ARM7's sound alarms, port/hal/snd7): once the clock reaches when, the dispatcher calls work on the host's own stack,
+// as an event of the clock like a line's start, so that an interrupt the work requests is taken there and not at the
+// next VBlank. One moment for each function: a later call moves it, and UINT64_MAX cancels it; a moment already past
+// comes at once. Work must not call the SDK. port_os_run forgets every moment
+#define PORT_OS_MAX_TIMED_WORK 4
+void port_os_set_timed_work(void (*work)(void), uint64_t when);
 // The renderer's per-line hook: called on the host's stack for each visible line (0-191) at the start of that line,
 // that is after the HBlank of the line before it has been handled, with the registers as the DS draws the line with.
 // NULL (the default) costs nothing

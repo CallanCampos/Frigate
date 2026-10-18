@@ -7,7 +7,7 @@
 //
 //   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
 //              [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--run-dump SPEC]...
-//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//              [--sound-trace PATH] [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
@@ -27,6 +27,8 @@
 //   --run-dump SPEC     memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: [LABEL=][*]SYMBOL[+OFFSET]
 //                       :SIZE[@LIST], a global of the program by name (statics aren't visible), * for where the
 //                       pointer there points, at the frames of LIST (the last of --frames by default); repeatable
+//   --sound-trace PATH  writes the sound driver's state after each run of its thread, as pbw-oracle's --sound-trace
+//                       does the DS's (port/app/sound_trace.h)
 //   --watchdog SECONDS  stops with a report and status 73 when a frame takes longer than that in host time: the game
 //                       hangs in a loop that never reaches the platform layer (30 by default with --headless; 0 is
 //                       off, the default with a window)
@@ -48,6 +50,7 @@
 #include "app/present.h"
 #include "app/replay.h"
 #include "app/run_dir.h"
+#include "app/sound_trace.h"
 #include "app/symbols.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
@@ -89,23 +92,9 @@ enum {
 // The options that never take a value, and every option the program and its modules know
 static const char *const sFlags[] = { "headless", "help" };
 static const char *const sOptions[] = {
-    "headless",
-    "help",
-    "frames",
-    "screenshot",
-    "audio-dump",
-    "input",
-    "rom",
-    "save-dir",
-    "fixed-time",
-    "run-dir",
-    "run-screens",
-    "run-dump",
-    "watchdog",
-    "main-arena-size",
-    "vram-backend",
-    "heap-scale-root",
-    "heap-scale-child",
+    "headless",    "help",     "frames",          "screenshot",   "audio-dump",      "input",
+    "rom",         "save-dir", "fixed-time",      "run-dir",      "run-screens",     "run-dump",
+    "sound-trace", "watchdog", "main-arena-size", "vram-backend", "heap-scale-root", "heap-scale-child",
 };
 
 // The arguments, which port_app_option reads too (port/hal/os/app_options.c)
@@ -132,7 +121,8 @@ static void Usage(void) {
             "usage: %s [--headless] [--frames N] [--screenshot PATH] "
             "[--audio-dump PATH] [--input FILE] [--rom PATH] [--save-dir PATH] "
             "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
-            "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--watchdog SECONDS] [--main-arena-size BYTES] "
+            "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--sound-trace PATH] [--watchdog SECONDS] "
+            "[--main-arena-size BYTES] "
             "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
             sArgc > 0 ? sArgv[0] : "pokeblack2");
 }
@@ -356,6 +346,7 @@ int main(int argc, char **argv) {
     long long watchdog;
     long long arenaSize;
     const char *audioDump;
+    const char *soundTrace;
     const char *inputPath;
     const char *runDir;
     PortOsResult result;
@@ -393,6 +384,12 @@ int main(int argc, char **argv) {
     audioDump = port_app_option("audio-dump");
     if (audioDump != NULL && *audioDump == '\0') {
         fprintf(stderr, "port: --audio-dump needs a path\n");
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    soundTrace = port_app_option("sound-trace");
+    if (soundTrace != NULL && *soundTrace == '\0') {
+        fprintf(stderr, "port: --sound-trace needs a path\n");
         Usage();
         return EXIT_BAD_OPTIONS;
     }
@@ -448,6 +445,13 @@ int main(int argc, char **argv) {
         }
         return EXIT_BAD_OPTIONS;
     }
+    if (soundTrace != NULL && !port_sound_trace_open(soundTrace)) {
+        port_audio_close();
+        if (sWindowOpen) {
+            port_present_close();
+        }
+        return EXIT_BAD_OPTIONS;
+    }
     // Nothing pressed, the lid open and the pen up, as the game's first reads must see, or a replay's first frame; then
     // the screens' line drawing
     port_input_set(0, 0);
@@ -486,7 +490,7 @@ int main(int argc, char **argv) {
     // The device and the dump's WAV header; a run that stops the process itself (a trap, OS_Terminate) never gets here,
     // so its dump keeps the header it was opened with, which counts no samples
     port_audio_close();
-    if (sRunDirFailed) {
+    if (!port_sound_trace_close() || sRunDirFailed) {
         status = 1;
     }
     port_run_dir_close(status);

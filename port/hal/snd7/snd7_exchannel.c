@@ -17,7 +17,7 @@ static const u8 sAttackTable[19] = { 0, 1, 5, 14, 26, 38, 51, 63, 73, 84, 92, 10
 static const s8 sSinTable[33] = { 0,  6,  12,  19,  25,  31,  37,  43,  49,  54,  60,  65,  71,  76,  81,  85, 90,
                                   94, 98, 102, 106, 109, 112, 115, 117, 120, 122, 123, 125, 126, 126, 127, 127 };
 
-// The channel locks (0x03809f94 and 0x03809f98): a channel in sLockChannel is the ARM9's alone, one in
+// The channel locks (0x03809f98 and 0x03809f94): a channel in sLockChannel is the ARM9's alone, one in
 // sWeakLockChannel can still be allocated by a strong request (a track that has its own allocatable channels)
 static u32 sLockChannel;
 static u32 sWeakLockChannel;
@@ -85,6 +85,10 @@ int snd7_sin_idx(int index) {
 u16 snd7_calc_random(void) {
     sRandomSeed = sRandomSeed * 1664525 + 1013904223;
     return (u16)(sRandomSeed >> 16);
+}
+
+u32 snd7_random_state(void) {
+    return sRandomSeed;
 }
 
 void snd7_set_random(u32 seed) {

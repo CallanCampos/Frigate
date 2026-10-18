@@ -21,6 +21,7 @@
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 #include "nitro/snd.h"
+#include "tools/oracle/sndtrace.h"
 #include <execinfo.h>
 #include <math.h>
 #include <signal.h>
@@ -382,7 +383,9 @@ static void TestAdpcmDecoder(void) {
     CHECK_EQ(index, 0);
 }
 
-// A sound on a channel, as the driver's register functions set it, its samples one by one as the mixer plays them
+// A sound on a channel, as the driver's register functions set it, its samples one by one as the mixer plays them. An
+// IMA-ADPCM sound's first sample comes on the channel's eleventh timer step (3, then the header word's 8 nibbles);
+// at a timer of 512 the channel steps once a mixer sample, before the mixer takes its sample
 static void TestAdpcmChannel(void) {
     Snd7HwPeek peek;
     s16 out[2];
@@ -393,23 +396,30 @@ static void TestAdpcmChannel(void) {
     snd7_setup_channel_pcm(2, sWaveArc + 0x6c, sWaveArc + sizeof(sWaveArc), SND7_FORMAT_ADPCM, SND7_REPEAT_ONESHOT, 1,
                            3, 127, 0, WAVE_TIMER, 64);
     snd7_start_channel(2);
+    for (i = 0; i < 10; i++) {
+        snd7_hw_mix(out);
+        snd7_hw_peek(2, &peek);
+        CHECK_EQ(peek.sample, 0);
+        CHECK_EQ(out[0], 0);
+    }
     for (i = 0; i < 24; i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(2, &peek);
         if (i < 8) {
             CHECK_EQ(peek.sample, sAdpcmExpected[i]);
         }
         CHECK(peek.cnt & SND7_CNT_START);
-        snd7_hw_mix(out);
     }
     // 24 samples (three words after the header), then a one-shot sound ends, and outputs 0 without hold
+    snd7_hw_mix(out);
     snd7_hw_peek(2, &peek);
     CHECK(!(peek.cnt & SND7_CNT_START));
-    snd7_hw_mix(out);
     CHECK_EQ(out[0], 0);
     CHECK_EQ(out[1], 0);
 }
 
-// PCM8 with a loop: 16 samples, then from sample 4 (word 1) again
+// PCM8 with a loop: 16 samples, then from sample 4 (word 1) again. A PCM sound's first sample comes on the channel's
+// third timer step
 static void TestPcm8Loop(void) {
     static const int sExpected[] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125, 115, 105, 95, 50, 60, 70 };
     Snd7HwPeek peek;
@@ -420,18 +430,29 @@ static void TestPcm8Loop(void) {
     BuildWaveArc();
     snd7_setup_channel_pcm(0, sWaveArc + 0x50, NULL, SND7_FORMAT_PCM8, SND7_REPEAT_LOOP, 1, 3, 127, 0, WAVE_TIMER, 0);
     snd7_start_channel(0);
+    for (i = 0; i < 2; i++) {
+        snd7_hw_mix(out);
+        snd7_hw_peek(0, &peek);
+        CHECK_EQ(peek.sample, 0);
+    }
     for (i = 0; i < NELEMS(sExpected); i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(0, &peek);
         CHECK_EQ(peek.sample, sExpected[i] * 256);
-        snd7_hw_mix(out);
     }
-    // At half the rate (a timer of 1024) each sample plays twice
+    // At half the rate (a timer of 1024) the channel steps every other mixer sample, so the first sample comes on the
+    // sixth and each plays twice
     snd7_setup_channel_pcm(0, sWaveArc + 0x50, NULL, SND7_FORMAT_PCM8, SND7_REPEAT_LOOP, 1, 3, 127, 0, 1024, 0);
     snd7_start_channel(0);
+    for (i = 0; i < 5; i++) {
+        snd7_hw_mix(out);
+        snd7_hw_peek(0, &peek);
+        CHECK_EQ(peek.sample, 0);
+    }
     for (i = 0; i < 6; i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(0, &peek);
         CHECK_EQ(peek.sample, sExpected[i / 2] * 256);
-        snd7_hw_mix(out);
     }
 }
 
@@ -475,22 +496,64 @@ static void TestShortSound(void) {
     CHECK(!snd7_is_channel_active(0));
     snd7_hw_mix(out);
     CHECK_EQ(out[0], 0);
-    // 4 words play
+    // 4 words play, from the third timer step
     snd7_setup_channel_pcm(0, sWaveArc + 0x50, NULL, SND7_FORMAT_PCM8, SND7_REPEAT_ONESHOT, 1, 3, 127, 0, WAVE_TIMER,
                            64);
     snd7_start_channel(0);
+    snd7_hw_mix(out);
+    snd7_hw_mix(out);
     for (i = 0; i < 16; i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(0, &peek);
         CHECK(peek.cnt & SND7_CNT_START);
         CHECK_EQ(peek.sample, sPcm8Samples[i] * 256);
-        snd7_hw_mix(out);
     }
+    snd7_hw_mix(out);
     snd7_hw_peek(0, &peek);
     CHECK(!(peek.cnt & SND7_CNT_START));
 }
 
-// A PSG channel at duty 3: 4 low steps then 4 high; the output at volume 127, center pan, master volume 127: the
-// sample (0x7fff high, -0x7fff low) times 127, times 64 of 128 to each side, times 127 of 128: 16128.5, rounded down
+// The channel reads its sound ahead through its FIFO of 8 words: 8 at the first mixer sample after the start, then 4
+// more each time it has 4 or fewer left. A PCM16 sound of 32 samples whose samples 2 to 31 change after the channel
+// played its first two: the FIFO held samples 0 to 15 since the first mixer sample, so 2 to 15 play as they were;
+// 16 to 23 come in when sample 7 leaves 4 words (the 10th mixer sample), 24 to 31 when sample 15 does, both after the
+// change
+static void TestFifo(void) {
+    static s16 sPcm16[32];
+    Snd7HwPeek peek;
+    s16 out[2];
+    int i;
+
+    BootDriver();
+    for (i = 0; i < 32; i++) {
+        sPcm16[i] = (s16)((i + 1) * 100);
+    }
+    snd7_setup_channel_pcm(0, (const u8 *)sPcm16, (const u8 *)(sPcm16 + 32), SND7_FORMAT_PCM16, SND7_REPEAT_ONESHOT, 0,
+                           16, 127, 0, WAVE_TIMER, 64);
+    snd7_start_channel(0);
+    // The third timer step plays sample 0, the fourth sample 1
+    for (i = 0; i < 4; i++) {
+        snd7_hw_mix(out);
+    }
+    snd7_hw_peek(0, &peek);
+    CHECK_EQ(peek.sample, 200);
+    for (i = 2; i < 32; i++) {
+        sPcm16[i] = (s16)(-(i + 1) * 100);
+    }
+    for (i = 2; i < 32; i++) {
+        snd7_hw_mix(out);
+        snd7_hw_peek(0, &peek);
+        CHECK_EQ(peek.sample, i < 16 ? (i + 1) * 100 : -(i + 1) * 100);
+    }
+    snd7_hw_mix(out);
+    snd7_hw_peek(0, &peek);
+    CHECK(!(peek.cnt & SND7_CNT_START));
+}
+
+// A PSG channel at duty 3: 4 low steps then 4 high, from the channel's first timer step; the output at volume 127,
+// center pan, master volume 127, each 127 counting as 128 (GBATEK's mixer widths, as melonDS has them): the sample
+// (0x7fff high, -0x7fff low) times 16 (no data shift) times 128, times 64 with 10 bits dropped (4194176 exactly),
+// times 128 / 128, without 8 bits: 16383.5 and -16383.5, rounded down
 static void TestPsgDuty(void) {
     static const int sHigh[16] = { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1 };
     Snd7HwPeek peek;
@@ -500,11 +563,13 @@ static void TestPsgDuty(void) {
     BootDriver();
     snd7_setup_channel_psg(8, 3, 127, 0, WAVE_TIMER, 64);
     snd7_start_channel(8);
+    snd7_hw_peek(8, &peek);
+    CHECK_EQ(peek.sample, 0);
     for (i = 0; i < 16; i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(8, &peek);
         CHECK_EQ(peek.sample, sHigh[i] ? 0x7fff : -0x7fff);
-        snd7_hw_mix(out);
-        CHECK_EQ(out[0], sHigh[i] ? 16128 : -16129);
+        CHECK_EQ(out[0], sHigh[i] ? 16383 : -16384);
         CHECK_EQ(out[1], out[0]);
     }
     // Duty 7 (0%) is low throughout (GBATEK, "PSG Sound"); duty 0 high one step in 8
@@ -513,17 +578,49 @@ static void TestPsgDuty(void) {
     snd7_start_channel(9);
     snd7_start_channel(10);
     for (i = 0; i < 8; i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(9, &peek);
         CHECK_EQ(peek.sample, -0x7fff);
         snd7_hw_peek(10, &peek);
         CHECK_EQ(peek.sample, i == 7 ? 0x7fff : -0x7fff);
-        snd7_hw_mix(out);
     }
     // A square wave on a channel that has none (0-7) is silent
     snd7_setup_channel_psg(3, 3, 127, 0, WAVE_TIMER, 64);
     snd7_start_channel(3);
+    snd7_hw_mix(out);
     snd7_hw_peek(3, &peek);
     CHECK_EQ(peek.sample, 0);
+}
+
+// A timer write while the channel plays counts from the channel's next step: the timer runs on from where it is and
+// reloads from SOUNDxTMR at each overflow (GBATEK; melonDS's SPUChannel::Run), so a pitch change (an LFO's, a sweep's,
+// a bend's) doesn't move the step the channel is in. A square wave at duty 3 (low for its steps 0-3, high for 4-7)
+// and a period of 1536 ticks (3 mixer samples): its timer starts at 0x10000 - 1536 at the first mixer sample, so it
+// steps at samples 3 (its first sample, step 0) and 6 (step 1). After sample 7 the timer is 512 ticks into step 1;
+// a period of 512 then counts from the overflow at sample 9, one step a sample: steps 2, 3, 4 at samples 9, 10, 11,
+// high from 11 to 14, step 0 again at 15. That overflow leaves the timer at 0x10000 - 512; a period of 1536 then
+// counts from the overflow at sample 16 (step 1): steps 2, 3, 4 at samples 19, 22, 25, high from 25. A count from
+// the step's start compared with the new period would have stepped twice at sample 8 and gone high at 9
+static void TestTimerWrite(void) {
+    static const int sHigh[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+    Snd7HwPeek peek;
+    s16 out[2];
+    int i;
+
+    BootDriver();
+    snd7_setup_channel_psg(8, 3, 127, 0, 1536, 64);
+    snd7_start_channel(8);
+    for (i = 0; i < (int)NELEMS(sHigh); i++) {
+        if (i == 7) {
+            snd7_set_channel_timer(8, 512);
+        } else if (i == 15) {
+            snd7_set_channel_timer(8, 1536);
+        }
+        snd7_hw_mix(out);
+        snd7_hw_peek(8, &peek);
+        // Samples 1 and 2 (i 0 and 1) come before the first step
+        CHECK_EQ(peek.sample, i < 2 ? 0 : sHigh[i] ? 0x7fff : -0x7fff);
+    }
 }
 
 // The noise channel's 15-bit register from 0x7fff: 14 ones drop out (low, with 0x6000 in), then 14 zeros (high), then a
@@ -537,10 +634,13 @@ static void TestNoise(void) {
     BootDriver();
     snd7_setup_channel_noise(14, 127, 0, WAVE_TIMER, 64);
     snd7_start_channel(14);
+    // Silent until the channel's first timer step
+    snd7_hw_peek(14, &peek);
+    CHECK_EQ(peek.sample, 0);
     for (i = 0; i < (int)NELEMS(sSamples); i++) {
+        snd7_hw_mix(out);
         snd7_hw_peek(14, &peek);
         sSamples[i] = peek.sample;
-        snd7_hw_mix(out);
     }
     for (i = 0; i < 29; i++) {
         CHECK_EQ(sSamples[i], i >= 14 && i < 28 ? 0x7fff : -0x7fff);
@@ -548,14 +648,19 @@ static void TestNoise(void) {
     for (i = 0; i < 64; i++) {
         CHECK_EQ(sSamples[32767 + i], sSamples[i]);
     }
-    // Only channels 14 and 15 make noise
+    // Only channels 14 and 15 make noise: 13 plays its square wave
     snd7_setup_channel_noise(13, 127, 0, WAVE_TIMER, 64);
     snd7_start_channel(13);
+    snd7_hw_mix(out);
     snd7_hw_peek(13, &peek);
     CHECK_EQ(peek.sample, -0x7fff);
 }
 
-// The mixer's volume, data shift, pan, master volume and output selector, on a PCM16 sample of 0x4000
+// The mixer's volume, data shift, pan, master volume and output selector, on a PCM16 sample of 0x4000, by GBATEK's
+// widths as melonDS has them: the sample times 16 >> the data shift (0, 1, 2 or 4), times the volume, times 128 - pan
+// to the left and pan to the right with 10 bits dropped; the sum times the master volume over 128, without 8 bits; a
+// volume, pan or master volume of 127 counts as 128. A PCM sound's first sample comes on the channel's third timer
+// step, and at a timer of 512 the channel steps once a mixer sample
 static void TestMixer(void) {
     static const u8 sPcm16[16] = { 0x00, 0x40, 0x00, 0x40, 0x00, 0x40, 0x00, 0x40,
                                    0x00, 0x40, 0x00, 0x40, 0x00, 0x40, 0x00, 0x40 };
@@ -564,42 +669,53 @@ static void TestMixer(void) {
     BootDriver();
     snd7_setup_channel_pcm(0, sPcm16, NULL, SND7_FORMAT_PCM16, SND7_REPEAT_LOOP, 0, 4, 64, 1, WAVE_TIMER, 0);
     snd7_start_channel(0);
-    // 0x4000 * 64 >> 1 = 0x80000; left 128 of 128, right 0; times 127 of 128 at 21 bits of fraction: 4064 and 0
     snd7_hw_mix(out);
-    CHECK_EQ(out[0], 4064);
+    snd7_hw_mix(out);
+    CHECK_EQ(out[0], 0);
+    // 0x4000 * 8 * 64 = 0x800000; left 128, right 0: 0x100000 and 0; the master volume 127, as 128: 4096 and 0
+    snd7_hw_mix(out);
+    CHECK_EQ(out[0], 4096);
     CHECK_EQ(out[1], 0);
+    // Pan 127, as 128: all to the right
     snd7_set_channel_pan(0, 127);
     snd7_hw_mix(out);
-    CHECK_EQ(out[0], 31);
-    CHECK_EQ(out[1], 4032);
-    // A data shift of 3 divides by 16; the master volume 64 halves
+    CHECK_EQ(out[0], 0);
+    CHECK_EQ(out[1], 4096);
+    // A data shift of 3 divides by 16: 0x4000 * 1 * 64 = 0x100000, right 0x20000; the master volume 64 halves: 256
     snd7_set_channel_volume(0, 64, 3);
     snd7_set_master_volume(64);
     snd7_hw_mix(out);
-    CHECK_EQ(out[0], 0x4000 * 64 / 16 * 1 * 64 >> 21);
-    CHECK_EQ(out[1], 0x4000 * 64 / 16 * 127 * 64 >> 21);
+    CHECK_EQ(out[0], 0);
+    CHECK_EQ(out[1], 256);
     // The master pan puts every channel at its value, and gives each its own back at -1
     snd7_set_master_volume(127);
     snd7_set_channel_volume(0, 64, 1);
     snd7_set_master_pan(0);
     snd7_hw_mix(out);
-    CHECK_EQ(out[0], 4064);
+    CHECK_EQ(out[0], 4096);
     snd7_set_master_pan(-1);
     snd7_hw_mix(out);
-    CHECK_EQ(out[1], 4032);
-    // The left output from channel 1 alone, the right from channel 3 alone, and channel 1 out of the mixer
+    CHECK_EQ(out[1], 4096);
+    // The left output from channel 1 alone, the right from channel 3 alone, and channel 1 out of the mixer. Channel 1
+    // at volume 127 and pan 0: 0x4000 * 16 * 128 = 0x2000000, left 0x400000: 16384
     snd7_setup_channel_pcm(1, sPcm16, NULL, SND7_FORMAT_PCM16, SND7_REPEAT_LOOP, 0, 4, 127, 0, WAVE_TIMER, 0);
     snd7_start_channel(1);
     snd7_set_output_selector(1, 2, 1, 0);
     snd7_hw_mix(out);
-    CHECK_EQ(out[0], (s64)0x4000 * 127 * 128 * 127 >> 21);
+    snd7_hw_mix(out);
+    CHECK_EQ(out[0], 0);
+    snd7_hw_mix(out);
+    CHECK_EQ(out[0], 16384);
     CHECK_EQ(out[1], 0);
+    // The mixer without channel 1: channel 0, all to the right
     snd7_set_output_selector(0, 0, 1, 0);
     snd7_hw_mix(out);
-    CHECK_EQ(out[0], 31);
+    CHECK_EQ(out[0], 0);
+    CHECK_EQ(out[1], 4096);
     snd7_disable();
     snd7_hw_mix(out);
     CHECK_EQ(out[0], 0);
+    CHECK_EQ(out[1], 0);
 }
 
 // SND_CalcTimer: a pitch is 64ths of a semitone; an octave doubles or halves the timer. The results are the BIOS
@@ -1273,14 +1389,14 @@ static void TestPxiWaveOut(void) {
     CHECK_EQ(SND_GetChannelStatus(), 1u << 2);
     WaitFrames(12);
     CHECK_EQ(SND_GetChannelStatus(), 0);
-    // The wave's samples reached the output: sample i * 4 at volume 127, center: i * 1024 * 127 * 64 * 127 >> 21
+    // The wave's samples reached the output: sample i * 4 (PCM8, times 256) at volume 127 and master volume 127, both
+    // counting as 128, center: i * 1024 * 16 * 128 * 64 >> 10 >> 8, 512 for i = 1 and 1024 for i = 2
     {
         BOOL found = FALSE;
         u64 frame;
 
         for (frame = 0; frame + 1 < sSound.keptFrames; frame++) {
-            if (sSound.kept[frame * 2] == (s16)((s64)4 * 256 * 127 * 64 * 127 >> 21) &&
-                sSound.kept[frame * 2 + 2] == (s16)((s64)8 * 256 * 127 * 64 * 127 >> 21)) {
+            if (sSound.kept[frame * 2] == 512 && sSound.kept[frame * 2 + 2] == 1024) {
                 found = TRUE;
                 break;
             }
@@ -1367,6 +1483,133 @@ static void TestPxiWakeUps(void) {
     SND_WaitForCommandProc(tag);
     CHECK_EQ(snd7_calc_random(), RandomAfter(4, 1));
     CHECK_EQ(snd7_hw_master_volume(), 120);
+}
+
+// An alarm's word reaches the ARM9 when the alarm goes off, as on the DS, while the ARM9 waits for its VBlanks: the
+// alarm is the OS core's timed work. Started at the tick of the packet's send with a first tick and a period of 1000
+// ticks (64,000 cycles, 8.75 a frame), the alarm's handler runs at each multiple, at that cycle, and not with the
+// others of the frame at the VBlank
+#define ALARM_TICKS 1000u
+#define ALARM_CALLS 64
+
+static u64 sAlarmCycles[ALARM_CALLS];
+static int sAlarmCalls;
+
+static void AlarmHandler(void *arg) {
+    (void)arg;
+    if (sAlarmCalls < ALARM_CALLS) {
+        sAlarmCycles[sAlarmCalls] = port_os_cycles();
+    }
+    sAlarmCalls++;
+}
+
+static void TestPxiAlarmTiming(void) {
+    u64 start;
+    u64 end;
+    u64 nextTick;
+    u32 tag;
+    int i;
+
+    BootOs();
+    SND_Init();
+    sAlarmCalls = 0;
+    SND_SetupAlarm(0, ALARM_TICKS, ALARM_TICKS, AlarmHandler, NULL);
+    SND_StartTimer(0, 0, 1, 0);
+    tag = SND_GetCurrentCommandTag();
+    start = port_os_cycles() / SND7_OS_TICK_CYCLES * SND7_OS_TICK_CYCLES;
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
+    WaitFrames(4);
+    end = port_os_cycles();
+    CHECK_EQ(sAlarmCalls, (int)((end - start) / (ALARM_TICKS * SND7_OS_TICK_CYCLES)));
+    for (i = 0; i < sAlarmCalls && i < ALARM_CALLS; i++) {
+        CHECK_EQ(sAlarmCycles[i], start + (u64)(i + 1) * ALARM_TICKS * SND7_OS_TICK_CYCLES);
+    }
+    SND_StopTimer(0, 0, 1, 0);
+    tag = SND_GetCurrentCommandTag();
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
+    i = sAlarmCalls;
+    WaitFrames(2);
+    CHECK_EQ(sAlarmCalls, i);
+
+    // An alarm for no ticks is due at the tick the packet runs in, which has begun: it goes off at once, as the DS's OS
+    // alarm does when its moment has passed, and its word comes before the clock reaches the next tick, not at the
+    // VBlank
+    sAlarmCalls = 0;
+    SND_SetupAlarm(0, 0, 0, AlarmHandler, NULL);
+    SND_StartTimer(0, 0, 1, 0);
+    tag = SND_GetCurrentCommandTag();
+    start = port_os_cycles();
+    nextTick = start / SND7_OS_TICK_CYCLES * SND7_OS_TICK_CYCLES + SND7_OS_TICK_CYCLES;
+    SND_FlushCommand(SND_COMMAND_BLOCK);
+    SND_WaitForCommandProc(tag);
+    WaitFrames(2);
+    CHECK_EQ(sAlarmCalls, 1);
+    CHECK(sAlarmCycles[0] >= start && sAlarmCycles[0] < nextTick);
+}
+
+static u32 Get32(const u8 *at);
+
+// The trace's record (port/tools/oracle/sndtrace.h): the driver's work in the DS's layout, with the links inside it as
+// the ARM7's addresses, as the oracle's records have it. A note on player 0's track: the player at 0x540, its track,
+// the track's channel list and the channel's callback and track, the channel's SOUNDxCNT, an alarm, the shared work
+static void TestTraceLayout(void) {
+    static u8 sRecord[PBW_SNDTRACE_RECORD_SIZE];
+    const u8 *work = sRecord + PBW_SNDTRACE_WORK;
+    const u8 *player;
+    const u8 *track;
+    const u8 *channel;
+    Snd7HwPeek peek;
+    u8 trackNo;
+
+    BootDriver();
+    BuildData();
+    PlaySequence(0, sSeqNote, sizeof(sSeqNote));
+    RunUpdates(2);
+    snd7_work.alarm[2].enable = 1;
+    snd7_work.alarm[2].id = 7;
+    snd7_work.alarm[2].count = 3;
+    snd7_work.alarm[2].tick = 0x123456789ull;
+    snd7_work.alarm[2].period = 4096;
+    port_snd7_trace_record(sRecord, 1);
+    trackNo = snd7_work.player[0].tracks[0];
+    player = work + PBW_SNDTRACE_PLAYERS;
+    track = work + PBW_SNDTRACE_TRACKS + trackNo * PBW_SNDTRACE_TRACK_SIZE;
+    // The note took channel 4 (seq_note)
+    channel = work + 4 * PBW_SNDTRACE_CHANNEL_SIZE;
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_PERIODS), 1);
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_CYCLE), FIRST_UPDATE + UPDATE_CYCLES);
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_SEED), snd7_random_state());
+    CHECK_EQ(player[0], SND7_PLAYER_ACTIVE | SND7_PLAYER_PREPARED);
+    CHECK_EQ(player[8], trackNo);
+    CHECK_EQ(player[9], SND7_TRACK_NONE);
+    CHECK_EQ(track[0] & SND7_TRACK_ACTIVE, SND7_TRACK_ACTIVE);
+    CHECK_EQ(Get32(track + 0x28) - Get32(track + 0x24), (u32)(Track(0, 0)->cur - Track(0, 0)->base));
+    CHECK_EQ(Get32(track + 0x3c), PBW_SNDTRACE_WORK_ADDRESS + 4 * PBW_SNDTRACE_CHANNEL_SIZE);
+    CHECK_EQ(channel[0], 4);
+    CHECK_EQ(channel[2], SND7_ENV_SUSTAIN);
+    CHECK_EQ(Get32(channel + 0x48), 0x0380214c);
+    CHECK_EQ(Get32(channel + 0x4c),
+             PBW_SNDTRACE_WORK_ADDRESS + PBW_SNDTRACE_TRACKS + trackNo * PBW_SNDTRACE_TRACK_SIZE);
+    CHECK_EQ(Get32(channel + 0x50), 0);
+    snd7_hw_peek(4, &peek);
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_CNT + 4 * 4), peek.cnt);
+    CHECK(peek.cnt & SND7_CNT_START);
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_START_MIX + 4 * 4), peek.startMix);
+    // The second run (at cycle FIRST_UPDATE + UPDATE_CYCLES, the driver booted at 0) started the note's channel, so
+    // its start and the run are both the first mixer sample after the run: the samples at cycles 0, 1024 and on, up to
+    // the run's cycle, come before it
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_RUN_MIX), (FIRST_UPDATE + UPDATE_CYCLES) / SND7_CYCLES_PER_SAMPLE + 1);
+    CHECK_EQ(peek.startMix, (FIRST_UPDATE + UPDATE_CYCLES) / SND7_CYCLES_PER_SAMPLE + 1);
+    CHECK_EQ(work[PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE], 1);
+    CHECK_EQ(work[PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 1], 7);
+    CHECK_EQ(work[PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 2], 3);
+    CHECK_EQ(Get32(work + PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 4), 0x23456789);
+    CHECK_EQ(Get32(work + PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 8), 1);
+    CHECK_EQ(Get32(work + PBW_SNDTRACE_ALARMS + 2 * PBW_SNDTRACE_ALARM_SIZE + 0xc), 4096);
+    CHECK(memcmp(sRecord + PBW_SNDTRACE_SHARED, &sShared, PBW_SNDTRACE_SHARED_SIZE) == 0);
+    CHECK_EQ(Get32(sRecord + PBW_SNDTRACE_SHARED + 4), 1);
 }
 
 // The host's banks and wave archives (snd_bank_host.c): links as handles, the walk over the instruments, the waves
@@ -1714,8 +1957,13 @@ static u64 PlayRomSequence(const Sdat *sdat, const char *name, u32 seconds, BOOL
     return sSound.hash;
 }
 
-// The sequences and their sound's hashes over their first seconds: the driver's output, which must not change unless
-// the driver does (then the hashes are made again, PORT_SND_VERBOSE printing them, with the change's reason)
+// The sequences and their sound's hashes over their first seconds: the driver's own output, a change detector and not
+// a check that the sound is right. The hashes come from the port, so this test passes by construction for the driver
+// that made them; it says only that the sound changed, which must not happen unless the driver does (then the hashes
+// are made again, PORT_SND_VERBOSE printing them, with the change's reason). What holds the sound to the DS's is the
+// oracle comparison (ctest oracle_sound_<name> and oracle_sound_<name>_hashes, port/tools/oracle/README.md, "Sound").
+// Made again when the sound unit took the start delays, the FIFO and the mixer's widths, and when a channel's timer
+// kept counting through a write to SOUNDxTMR (of these, only the Pokemon Center's music changed)
 typedef struct RomCase {
     const char *name;
     u32 seconds;
@@ -1723,9 +1971,9 @@ typedef struct RomCase {
 } RomCase;
 
 static const RomCase sRomCases[] = {
-    { "SEQ_BGM_TITLE", 20, 0x624427502c4ea7d2ull }, { "SEQ_BGM_POKECEN", 20, 0xa6884ffd9f7a676bull },
-    { "SEQ_BGM_WIN1", 10, 0x332d611b70f1e41bull },  { "SEQ_ME_ITEM", 5, 0xec11d0a94fdd0cb2ull },
-    { "SEQ_SE_DECIDE1", 2, 0x783fc13ec2cfb949ull }, { "SEQ_SE_SELECT1", 2, 0x81d2d21896629139ull },
+    { "SEQ_BGM_TITLE", 20, 0x2f3a99f334b53708ull }, { "SEQ_BGM_POKECEN", 20, 0xab77cde8c83fb7efull },
+    { "SEQ_BGM_WIN1", 10, 0x4b67712741207190ull },  { "SEQ_ME_ITEM", 5, 0x8950af946568bbd8ull },
+    { "SEQ_SE_DECIDE1", 2, 0x1146aad3c9209021ull }, { "SEQ_SE_SELECT1", 2, 0xf369ff9b59a06e31ull },
 };
 
 static void TestRomSequences(void) {
@@ -1817,7 +2065,9 @@ static const Test sTests[] = {
     { "adpcm_channel", TestAdpcmChannel },
     { "pcm8_loop", TestPcm8Loop },
     { "short_sound", TestShortSound },
+    { "fifo", TestFifo },
     { "psg_duty", TestPsgDuty },
+    { "timer_write", TestTimerWrite },
     { "noise", TestNoise },
     { "mixer", TestMixer },
     { "calc_timer", TestCalcTimer },
@@ -1841,6 +2091,8 @@ static const Test sTests[] = {
     { "pxi_wave_out", TestPxiWaveOut },
     { "pxi_sequence", TestPxiSequence },
     { "pxi_wake_ups", TestPxiWakeUps },
+    { "pxi_alarm_timing", TestPxiAlarmTiming },
+    { "trace_layout", TestTraceLayout },
     { "audio_dump", TestAudioDump },
     { "rom_sequences", TestRomSequences },
     { "rom_every_sequence", TestRomEverySequence },

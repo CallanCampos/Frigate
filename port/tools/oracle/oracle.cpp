@@ -6,7 +6,7 @@
 //
 //   pbw-oracle --rom PATH --out DIR --frames N [--input FILE] [--screens LIST] [--dump SPEC]... [--config DIR]
 //              [--symbols FILE]... [--counter TARGET] [--time "YYYY-MM-DD HH:MM:SS"] [--save FILE]
-//              [--save-out FILE] [--verbose]
+//              [--save-out FILE] [--audio-dump FILE] [--sound-trace FILE] [--verbose]
 //
 //   --rom PATH       the player's dump (orig/baserom_b2_us.nds)
 //   --out DIR        where the run's files go (created; files of an earlier run there are replaced)
@@ -25,6 +25,11 @@
 //   --time TIME      the real-time clock at power-on; else the input file's; else 2012-10-07 12:00:00
 //   --save FILE      the save memory at power-on (read only); blank (0xFF) otherwise
 //   --save-out FILE  writes the save memory there after the last frame
+//   --audio-dump FILE
+//                    writes the sound unit's mixed output as a WAV file: every sample melonDS's mixer makes, one each
+//                    1024 cycles from power-on, before melonDS resamples it for a sound card
+//   --sound-trace FILE
+//                    writes the ARM7 sound driver's state after each run of its thread (sndtrace.h); needs --config
 //   --verbose        melonDS's own informational log
 //
 // Exit statuses: 0 when every frame ran, 1 for an error writing the results, 2 for bad options (an input file for the
@@ -38,7 +43,9 @@
 #include "pbwinput.h"
 #include "pngout.h"
 #include "sha1/sha1.hpp"
+#include "sndtrace.h"
 #include "symtab.h"
+#include <algorithm>
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -77,6 +84,25 @@ constexpr uint32_t ORACLE_EVENT_VBLANK = 0;
 constexpr uint32_t ORACLE_EVENT_PROBE = 1;
 // NitroSDK's VBlank count, which the ARM7 keeps in the shared memory (HW_VBLANK_COUNT_BUF)
 constexpr uint32_t VBLANK_COUNT_ADDRESS = 0x02fffc3c;
+// The scheduler slot of the sampler, which runs after each of melonDS's mixer samples: another DSi-only device's (the
+// DSP's), which a DS-mode console never registers. Its runs line up with the mixer's (Event_SPU, a lower slot, so the
+// mixer's comes first when both are due)
+constexpr uint32_t SAMPLER_EVENT = melonDS::Event_DSi_DSP;
+// The mixer's rate in a WAV file's whole samples a second: one sample each 1024 cycles of the 33,513,982 Hz system
+// clock is 32,728.498 a second, which the port's dump rounds down the same way (port/hal/snd7/snd7_output.h)
+constexpr uint32_t AUDIO_SAMPLE_RATE = 32728;
+constexpr uint32_t WAV_HEADER_SIZE = 44;
+// The ARM7's sound driver (TwlSDK 5.3's, the same binary in both versions; port/hal/snd7/snd7_internal.h): its random
+// generator's state, which each run of its thread draws from last (SND_CalcRandom, 0x03800574); the fire time of its
+// periodic alarm (the OSAlarm at 0x03809ac4 that SndThread sets, its fire tick at +0xc), which moves on a period of
+// 2728 ticks when the alarm goes off; and the channel locks, the ARM9's alone at 0x03809f98 and those a strong request
+// can still take at 0x03809f94 (SND_LockChannel, 0x03801254)
+constexpr uint32_t SND_RANDOM_ADDRESS = 0x03809360;
+constexpr uint32_t SND_ALARM_FIRE_ADDRESS = 0x03809ad0;
+constexpr uint64_t SND_ALARM_PERIOD = 2728;
+constexpr uint32_t SND_LOCK_ADDRESS = 0x03809f98;
+constexpr uint32_t SND_WEAK_LOCK_ADDRESS = 0x03809f94;
+constexpr uint32_t SND_CHANNEL_REGISTERS = 0x04000400;
 // The extended keys' word in melonDS's KeyInput (EXTKEYIN << 16): the debug button is EXTKEYIN's bit 3
 constexpr uint32_t KEYINPUT_DEBUG_BIT = 1u << (16 + 3);
 // The ROM header's game code (offset 0x0c) of each version an input file can name
@@ -209,6 +235,8 @@ struct Options {
     std::string time;
     std::string save;
     std::string saveOut;
+    std::string audioDump;
+    std::string soundTrace;
     bool verbose = false;
 };
 
@@ -216,7 +244,8 @@ void Usage() {
     std::fprintf(stderr,
                  "usage: pbw-oracle --rom PATH --out DIR --frames N [--input FILE] [--screens LIST] [--dump SPEC]...\n"
                  "                  [--config DIR] [--symbols FILE]... [--counter TARGET]\n"
-                 "                  [--time \"YYYY-MM-DD HH:MM:SS\"] [--save FILE] [--save-out FILE] [--verbose]\n");
+                 "                  [--time \"YYYY-MM-DD HH:MM:SS\"] [--save FILE] [--save-out FILE]\n"
+                 "                  [--audio-dump FILE] [--sound-trace FILE] [--verbose]\n");
 }
 
 bool ParseOptions(int argc, char **argv, Options &options) {
@@ -276,6 +305,10 @@ bool ParseOptions(int argc, char **argv, Options &options) {
             options.save = value;
         } else if (arg == "--save-out") {
             options.saveOut = value;
+        } else if (arg == "--audio-dump") {
+            options.audioDump = value;
+        } else if (arg == "--sound-trace") {
+            options.soundTrace = value;
         } else {
             Fail("unknown option %s", arg.c_str());
             return false;
@@ -425,6 +458,44 @@ std::string Sha1Hex(const uint8_t *data, size_t length) {
     return hex;
 }
 
+// melonDS keeps the sample its mixer just made in a private member (SPU::OutputLastSamples) and hands its samples on
+// only resampled for a sound card (SPU::ReadOutput, through a band-limited synthesis that filters them). The usual
+// access rules don't apply to the names in an explicit instantiation (C++17 [temp.explicit]/12), so one names that
+// member here and gives the oracle a pointer to it, which it reads after each of the mixer's samples
+struct SpuLastSamples {
+    using Type = melonDS::s16 (melonDS::SPU::*)[2];
+    friend Type MemberOf(SpuLastSamples);
+};
+
+template <typename Tag, typename Tag::Type Member> struct ExposeMember {
+    friend typename Tag::Type MemberOf(Tag) {
+        return Member;
+    }
+};
+
+template struct ExposeMember<SpuLastSamples, &melonDS::SPU::OutputLastSamples>;
+
+void Put16(uint8_t *at, uint32_t value) {
+    at[0] = static_cast<uint8_t>(value);
+    at[1] = static_cast<uint8_t>(value >> 8);
+}
+
+// A WAV file's head for dataBytes of 16-bit stereo samples at the mixer's rate, as the port's dump has it
+void WavHeader(uint8_t header[WAV_HEADER_SIZE], uint32_t dataBytes) {
+    std::memcpy(header, "RIFF", 4);
+    pbw_sndtrace_put32(header + 4, WAV_HEADER_SIZE - 8 + dataBytes);
+    std::memcpy(header + 8, "WAVEfmt ", 8);
+    pbw_sndtrace_put32(header + 16, 16);
+    Put16(header + 20, 1);
+    Put16(header + 22, 2);
+    pbw_sndtrace_put32(header + 24, AUDIO_SAMPLE_RATE);
+    pbw_sndtrace_put32(header + 28, AUDIO_SAMPLE_RATE * 4);
+    Put16(header + 32, 4);
+    Put16(header + 34, 16);
+    std::memcpy(header + 36, "data", 4);
+    pbw_sndtrace_put32(header + 40, dataBytes);
+}
+
 // The firmware's user settings as the port's (port/hal/nvram/nvram7.c) has them, so that both run with the same owner,
 // language and MAC address: melonDS's generated firmware with those fields changed. The touch calibration stays
 // melonDS's (it sets its own at each reset)
@@ -474,6 +545,8 @@ class Oracle {
         saveWritten_ = true;
     }
 
+    void OnSample();
+
   private:
     bool Prepare();
     bool Boot();
@@ -482,7 +555,12 @@ class Oracle {
     void SampleDisplay();
     uint8_t Peek(uint32_t address);
     uint32_t Peek32(uint32_t address);
+    uint32_t Peek7_32(uint32_t address);
+    uint64_t PeekAlarmFire();
     bool WriteFrame(uint32_t frame);
+    void TraceRun();
+    bool WriteAudio();
+    bool CloseAudio();
 
     Options options_;
     SymbolTable symbols_;
@@ -518,6 +596,27 @@ class Oracle {
     FILE *framesTsv_ = nullptr;
     FILE *memoryTxt_ = nullptr;
     std::vector<uint8_t> rgb_;
+
+    // The sampler (OnSample): the frame being run, the mixer's samples since the last frame was written and how many
+    // the WAV file has, and the sound trace: SNDi_SharedWork's address, the driver's random generator and periodic
+    // alarm at its last record, the periodic alarm's fire time at the last sample and the sample by which it last went
+    // off
+    uint32_t frame_ = 0;
+    uint32_t mixes_ = 0;
+    uint64_t sampleFire_ = 0;
+    uint32_t runMix_ = 0;
+    uint32_t channelCnt_[PBW_SNDTRACE_CHANNELS] = {};
+    uint32_t startMix_[PBW_SNDTRACE_CHANNELS] = {};
+    FILE *audio_ = nullptr;
+    std::vector<int16_t> samples_;
+    uint64_t audioBytes_ = 0;
+    bool audioFull_ = false;
+    FILE *trace_ = nullptr;
+    uint32_t sharedWorkPointer_ = 0;
+    bool traceStarted_ = false;
+    uint32_t traceSeed_ = 0;
+    uint64_t traceFire_ = 0;
+    std::vector<uint8_t> record_;
 };
 
 int LogThreshold() {
@@ -623,6 +722,32 @@ bool Oracle::Prepare() {
                              "bottom_blank\n");
     std::fprintf(memoryTxt_, "#pbwmem 1\n");
     rgb_.resize(SCREEN_PIXELS * 2 * 3);
+
+    if (!options_.audioDump.empty()) {
+        uint8_t header[WAV_HEADER_SIZE];
+
+        WavHeader(header, 0);
+        audio_ = std::fopen(options_.audioDump.c_str(), "wb");
+        if (audio_ == nullptr || std::fwrite(header, 1, sizeof(header), audio_) != sizeof(header)) {
+            Fail("can't write the audio dump %s", options_.audioDump.c_str());
+            return false;
+        }
+    }
+    if (!options_.soundTrace.empty()) {
+        uint32_t size;
+
+        if (!ResolveTarget("SNDi_SharedWork", symbols_, sharedWorkPointer_, size, error)) {
+            Fail("--sound-trace needs the decomp's symbols (--config) for SNDi_SharedWork: %s", error.c_str());
+            return false;
+        }
+        trace_ = std::fopen(options_.soundTrace.c_str(), "wb");
+        if (trace_ == nullptr ||
+            std::fwrite(PBW_SNDTRACE_MAGIC, 1, PBW_SNDTRACE_MAGIC_SIZE, trace_) != PBW_SNDTRACE_MAGIC_SIZE) {
+            Fail("can't write the sound trace %s", options_.soundTrace.c_str());
+            return false;
+        }
+        record_.resize(PBW_SNDTRACE_RECORD_SIZE);
+    }
     return true;
 }
 
@@ -672,6 +797,13 @@ bool Oracle::Boot() {
     nds_->RegisterEventFuncs(ORACLE_EVENT, this,
                              { [](void *that, melonDS::u32 frame) { static_cast<Oracle *>(that)->OnVBlank(frame); },
                                [](void *that, melonDS::u32 frame) { static_cast<Oracle *>(that)->OnProbe(frame); } });
+    // The sampler, at the mixer's first sample (the reset scheduled it)
+    if (audio_ != nullptr || trace_ != nullptr) {
+        nds_->RegisterEventFuncs(SAMPLER_EVENT, this,
+                                 { [](void *that, melonDS::u32) { static_cast<Oracle *>(that)->OnSample(); } });
+        nds_->SchedList[SAMPLER_EVENT].Timestamp = nds_->SchedList[melonDS::Event_SPU].Timestamp;
+        nds_->ScheduleEvent(SAMPLER_EVENT, true, 0, 0, 0);
+    }
     pbw_game_clock_init(&clock_);
     pbw_display3d_init(&banks_);
     nds_->Start();
@@ -720,6 +852,163 @@ uint8_t Oracle::Peek(uint32_t address) {
 uint32_t Oracle::Peek32(uint32_t address) {
     return static_cast<uint32_t>(Peek(address)) | static_cast<uint32_t>(Peek(address + 1)) << 8 |
            static_cast<uint32_t>(Peek(address + 2)) << 16 | static_cast<uint32_t>(Peek(address + 3)) << 24;
+}
+
+// A word of the ARM7's own WRAM (0x03800000, 64 KiB, mirrored to 0x03ffffff), where its sound driver keeps its work
+uint32_t Oracle::Peek7_32(uint32_t address) {
+    const melonDS::u8 *wram = nds_->ARM7WRAM;
+    uint32_t at = address & (nds_->ARM7WRAMSize - 1);
+
+    return static_cast<uint32_t>(wram[at]) | static_cast<uint32_t>(wram[(at + 1) & (nds_->ARM7WRAMSize - 1)]) << 8 |
+           static_cast<uint32_t>(wram[(at + 2) & (nds_->ARM7WRAMSize - 1)]) << 16 |
+           static_cast<uint32_t>(wram[(at + 3) & (nds_->ARM7WRAMSize - 1)]) << 24;
+}
+
+// The fire tick of the sound driver's periodic alarm: 0 until its thread starts it
+uint64_t Oracle::PeekAlarmFire() {
+    return static_cast<uint64_t>(Peek7_32(SND_ALARM_FIRE_ADDRESS)) |
+           static_cast<uint64_t>(Peek7_32(SND_ALARM_FIRE_ADDRESS + 4)) << 32;
+}
+
+// After each of the mixer's samples, every 1024 cycles: the sample for --audio-dump, and the sound driver's state for
+// --sound-trace. Then the next, after the mixer's next sample
+void Oracle::OnSample() {
+    if (audio_ != nullptr) {
+        const melonDS::s16 *last = nds_->SPU.*MemberOf(SpuLastSamples{});
+
+        samples_.push_back(last[0]);
+        samples_.push_back(last[1]);
+    }
+    if (trace_ != nullptr) {
+        // The periodic alarm went off since the last sample when its fire time moved on: the driver's run has begun
+        uint64_t fire = PeekAlarmFire();
+
+        if (fire != sampleFire_) {
+            if (sampleFire_ != 0) {
+                runMix_ = mixes_;
+            }
+            sampleFire_ = fire;
+        }
+        // A channel whose start bit came on since the last sample started its sound in this one (melonDS takes the
+        // start at the next sample after the write)
+        for (uint32_t i = 0; i < PBW_SNDTRACE_CHANNELS; i++) {
+            uint32_t cnt = nds_->SPU.Read32(SND_CHANNEL_REGISTERS + i * 16);
+
+            if ((cnt & 0x80000000u) && !(channelCnt_[i] & 0x80000000u)) {
+                startMix_[i] = mixes_;
+            }
+            channelCnt_[i] = cnt;
+        }
+        TraceRun();
+    }
+    mixes_++;
+    nds_->SchedList[SAMPLER_EVENT].Timestamp = nds_->SchedList[melonDS::Event_SPU].Timestamp;
+    nds_->ScheduleEvent(SAMPLER_EVENT, true, 0, 0, 0);
+}
+
+// A record of the sound driver's state once its thread has made a run and finished it. Each run draws from the
+// driver's random generator last, so a run has been made when the generator's state moved on; and it is finished
+// when the ARM7 is halted: with nothing else to run, the thread waits for its next message, so its work isn't half
+// updated. A run that comes before the ARM7 halts again (a wake-up word during a periodic run) shares the record of
+// the one before it. The driver's thread has started once its periodic alarm has a fire time
+void Oracle::TraceRun() {
+    uint32_t seed;
+    uint64_t fire;
+    uint64_t periods = 0;
+    uint32_t shared;
+
+    if (!nds_->ARM7.Halted) {
+        return;
+    }
+    seed = Peek7_32(SND_RANDOM_ADDRESS);
+    fire = PeekAlarmFire();
+    if (fire == 0 || !traceStarted_) {
+        traceStarted_ = fire != 0;
+        traceSeed_ = seed;
+        traceFire_ = fire;
+        return;
+    }
+    if (seed == traceSeed_) {
+        return;
+    }
+    if (fire > traceFire_) {
+        periods = (fire - traceFire_) / SND_ALARM_PERIOD;
+    }
+    traceSeed_ = seed;
+    traceFire_ = fire;
+
+    std::fill(record_.begin(), record_.end(), 0);
+    // The sampler's own time, which is the mixer sample's it follows
+    pbw_sndtrace_put64(&record_[PBW_SNDTRACE_CYCLE], nds_->SchedList[SAMPLER_EVENT].Timestamp);
+    // The frame whose VBlank comes next: frame N ends with its VBlank, on line 192 of melonDS's frame N, which runs on
+    // to line 262, so a record after that VBlank belongs to frame N + 1, as on the port
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_FRAME], vblankSeen_ ? frame_ + 1 : frame_);
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_COUNTER], haveCounter_ ? Peek32(counterAddress_) : 0);
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_SEED], seed);
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_PERIODS], static_cast<uint32_t>(periods));
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_RUN_MIX], runMix_);
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_LOCK], Peek7_32(SND_LOCK_ADDRESS));
+    pbw_sndtrace_put32(&record_[PBW_SNDTRACE_WEAK_LOCK], Peek7_32(SND_WEAK_LOCK_ADDRESS));
+    for (uint32_t i = 0; i < PBW_SNDTRACE_CHANNELS; i++) {
+        pbw_sndtrace_put32(&record_[PBW_SNDTRACE_CNT + i * 4], nds_->SPU.Read32(SND_CHANNEL_REGISTERS + i * 16));
+        pbw_sndtrace_put32(&record_[PBW_SNDTRACE_START_MIX + i * 4], startMix_[i]);
+    }
+    for (uint32_t i = 0; i < PBW_SNDTRACE_WORK_SIZE; i += 4) {
+        pbw_sndtrace_put32(&record_[PBW_SNDTRACE_WORK + i], Peek7_32(PBW_SNDTRACE_WORK_ADDRESS + i));
+    }
+    shared = Peek32(sharedWorkPointer_);
+    if (shared != 0 && Readable(shared, PBW_SNDTRACE_SHARED_SIZE)) {
+        for (uint32_t i = 0; i < PBW_SNDTRACE_SHARED_SIZE; i++) {
+            record_[PBW_SNDTRACE_SHARED + i] = Peek(shared + i);
+        }
+    }
+    if (std::fwrite(record_.data(), 1, record_.size(), trace_) != record_.size()) {
+        Fail("can't write the sound trace %s", options_.soundTrace.c_str());
+        std::fclose(trace_);
+        trace_ = nullptr;
+    }
+}
+
+// The mixer's samples since the last frame, into the WAV file, which holds 4 GiB at most
+bool Oracle::WriteAudio() {
+    size_t bytes = samples_.size() * sizeof(int16_t);
+    std::vector<uint8_t> out(bytes);
+
+    if (audio_ == nullptr || audioFull_ || samples_.empty()) {
+        samples_.clear();
+        return true;
+    }
+    if (audioBytes_ + bytes > 0xffffffffull - (WAV_HEADER_SIZE - 8)) {
+        Fail("%s reached the 4 GiB a WAV file holds; the rest isn't written", options_.audioDump.c_str());
+        audioFull_ = true;
+        samples_.clear();
+        return true;
+    }
+    for (size_t i = 0; i < samples_.size(); i++) {
+        Put16(&out[i * 2], static_cast<uint16_t>(samples_[i]));
+    }
+    samples_.clear();
+    audioBytes_ += bytes;
+    return std::fwrite(out.data(), 1, bytes, audio_) == bytes;
+}
+
+// The WAV file's head with the size of what it holds
+bool Oracle::CloseAudio() {
+    uint8_t header[WAV_HEADER_SIZE];
+    bool ok;
+
+    if (audio_ == nullptr) {
+        return true;
+    }
+    ok = WriteAudio();
+    WavHeader(header, static_cast<uint32_t>(audioBytes_));
+    ok = ok && std::fseek(audio_, 0, SEEK_SET) == 0 && std::fwrite(header, 1, sizeof(header), audio_) == sizeof(header);
+    ok = std::fclose(audio_) == 0 && ok;
+    audio_ = nullptr;
+    if (!ok) {
+        Fail("can't write the audio dump %s", options_.audioDump.c_str());
+    }
+    return ok;
 }
 
 // Mid-frame, while the capture unit has DISPCAPCNT's enable latched if it captures this frame: what it captures and
@@ -892,6 +1181,7 @@ int Oracle::Run() {
         vblankSeen_ = false;
         nds_->SchedList[ORACLE_EVENT].Timestamp = lineZero + PROBE_LINE * LINE_CYCLES;
         nds_->ScheduleEvent(ORACLE_EVENT, true, 0, ORACLE_EVENT_PROBE, frame);
+        frame_ = frame;
         nds_->RunFrame();
         if (!vblankSeen_) {
             // Asleep: the frame counts as a game frame, so that a later line can open the lid
@@ -899,7 +1189,7 @@ int Oracle::Run() {
             ApplyInput(pbw_input_frame_asleep(&input_, &clock_, frame));
             gameFrame_ = clock_.frames + 1;
         }
-        if (!WriteFrame(frame)) {
+        if (!WriteFrame(frame) || !WriteAudio()) {
             status = 1;
             break;
         }
@@ -929,6 +1219,8 @@ int Oracle::Run() {
         std::fprintf(run, "counter: %s\n", options_.counter.empty() ? "-" : options_.counter.c_str());
         std::fprintf(run, "save: %s\n", options_.save.empty() ? "-" : options_.save.c_str());
         std::fprintf(run, "save_written: %d\n", saveWritten_ ? 1 : 0);
+        std::fprintf(run, "audio_dump: %s\n", options_.audioDump.empty() ? "-" : options_.audioDump.c_str());
+        std::fprintf(run, "sound_trace: %s\n", options_.soundTrace.empty() ? "-" : options_.soundTrace.c_str());
         std::fprintf(run, "status: %d\n", status);
         std::fclose(run);
     }
@@ -946,6 +1238,13 @@ int Oracle::Run() {
     }
     if (std::fclose(framesTsv_) != 0 || std::fclose(memoryTxt_) != 0) {
         Fail("can't write in %s", options_.out.c_str());
+        status = status != 0 ? status : 1;
+    }
+    if (!CloseAudio()) {
+        status = status != 0 ? status : 1;
+    }
+    if (trace_ != nullptr && std::fclose(trace_) != 0) {
+        Fail("can't write the sound trace %s", options_.soundTrace.c_str());
         status = status != 0 ? status : 1;
     }
     pbw_input_free(&input_);
