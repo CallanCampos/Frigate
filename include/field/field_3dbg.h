@@ -16,11 +16,12 @@ typedef struct {
     u8 polygonId;
 } Field3DBgInit;
 
-// The quad's texture: a file of the archive, its texture parameters and its alpha
+// The quad's texture: a file of the archive, its texture parameters and its alpha. The weathers' data holds two
 typedef struct {
     u16 fileId;
     u8 texParams[6];
     u8 alpha;
+    u8 unk09[3];
 } Field3DBgRes;
 
 Field3DBg *func_ov036_02198bc0(const Field3DBgInit *init, u32 heapId);

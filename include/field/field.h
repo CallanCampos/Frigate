@@ -12,7 +12,7 @@
 
 void BeginContinuePlaceNameDisp(PlaceName *placeName, s32 zoneId);
 void BeginForcePlaceNameDisp(PlaceName *placeName, s32 zoneId);
-void EncEff_StartEvent(EncEff *encEff, GameEvent *event, u32 effect);
+void EncEff_StartEvent(EncEff *encEff, GameEvent *event, s32 effect);
 void FieldG2D_Prepare3DSurface(Field *field);
 void FieldG2D_SetLCDConfig(void);
 FieldActor *FieldPlayer_GetActor(FieldPlayer *player);

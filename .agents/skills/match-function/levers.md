@@ -171,8 +171,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   the original uses the lowest free one (`ldr r1, =...; ldrsh r3, [r1, r4]`): read it into one local that every
   block making the same call assigns. (matching.md: "picks the register of an argument's address")
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`): two accesses
-  to `p[i].f` through a pointer variable that MWCC's first CSE pass did not merge, as in `f[i].b += v`;
-  `(&p->f)[i * 2]` folds back to index first. (matching.md: "its first common-subexpression pass did")
+  to `p[i].f` through a pointer variable that MWCC's first CSE pass did not merge, as in `f[i].b += v`, or a read
+  of the element's first field and a copy into the element; `(&p->f)[i * 2]` folds back to index first.
+  (matching.md: "its first common-subexpression pass did")
 - Every register moved by a field that the caller keeps in a saved register after an inline read it, where the
   original loads it again: the inline takes a `const T *`, even from a caller's plain pointer.
   (matching.md: "a `const` pointer from a caller whose")
@@ -795,6 +796,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   probe masks it. (matching.md: "`_ffltu`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
+- Two `_ull_mul` calls (by 64 from a register, then by 1000) where ours multiplies once by 64000, in one function of a
+  file: ask whether it reads an object with an explicit alignment; a local set twice may then need to be two variables.
+  (matching.md: "keeps a chain of 64-bit constant multiplies apart")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
   off")
 - `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. A bare inlined `clz` in ARM library code is
@@ -852,6 +856,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Small unreferenced objects at the start of a file's shared `.rodata` (ahead of its smallest referenced table) are
   function-local `static const`s, which are emitted even when their reads are folded or absent. (matching.md:
   "function-local `static const` is emitted")
+- An unread `{ 0, FX32_ONE, 0 }` or 16 zero bytes beside the camera vectors: the camera setup's up vector and
+  `GXRgb[8]` edge colors, function-local statics of the function that creates the camera. (matching.md: "camera
+  setup's up vector and edge colors")
 - An "unreferenced global" there whose values a function uses as immediates is several scalars of that function, one
   per value (`ctvt_game_cam.c`'s crop, four `u16`); their count orders equal-size initializers anywhere in the file.
   (matching.md: "The values a function already uses as immediates")
@@ -907,6 +914,9 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 - `#pragma opt_strength_reduction off`
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
+- `#pragma opt_arithtransformation off`, `opt_foldconstants off` and `opt_treetransformation off`, internal names that
+  the manual doesn't list (also as `-flag no-...`): the passes that shift and fold 64-bit constant multiplies; inside a
+  loop `opt_loop_invariants` and `opt_strength_reduction` must be off too (matching.md: "internal pass names")
 
 `#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb or ARM code, so they can't single out the
 scheduler; `#pragma optimization_level 1` shows each constant built at its use (matching.md: "leave 1.1p1's Thumb
@@ -917,10 +927,12 @@ Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_
 restructures it. `opt_common_subs off` alone gives it the original's size too, and with a 0/1 loop test leaves 186
 lines against level 1's 249: its original computes `work + i * 4` and `param + i` again after every call, where ours
 keeps them in registers across the calls. A function whose loop enters with a `b` to the test at -O4 may be one the
-original's global optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and
-`MBGameInfo_SendMembers` show the same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which
-showed it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a
-test whose value is 0/1").
+original's global optimizer gave up on, or one that reads an object with an explicit alignment:
+`WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned
+it), and `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the same symptom in their rows. Ask first whether the
+function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed it too and came
+within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is
+0/1").
 `#pragma opt_common_subs off` around one function alone matched `btlv_mcss.c`'s `BtlvMcss_MoveTaskEnd_Circle` and
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common

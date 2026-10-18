@@ -29,6 +29,7 @@ u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u16 resGroupIdx, u16 modelI
 void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *sys, u16 objIdx);
 SRTMatrix *FieldG3DObjSystem_GetObjTransform(FieldG3DObjSystem *sys, u16 objIdx);
 void FieldG3DObjSystem_SetObjPosition(FieldG3DObjSystem *sys, u16 objIdx, const VecFx32 *pos);
+// The frame of one of the object's animations
 void FieldG3DObjSystem_SetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, int anmIdx, fx32 frame);
 fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, u32 anmIdx);
 // Hide the object, or not
@@ -39,6 +40,7 @@ BOOL FieldG3DObjSystem_StepObjAnmLoop(FieldG3DObjSystem *sys, u16 objIdx, fx32 a
 // Leave the object out of FieldG3DObjSystem_Draw, for its owner to draw with FieldG3DObjSystem_DrawObj, or not
 void func_ov036_021c02b4(FieldG3DObjSystem *sys, u16 objIdx, BOOL flag);
 void FieldG3DObjSystem_DrawObj(FieldG3DObjSystem *sys, u16 objIdx);
+// A flag of the object that its owner sets, and its value
 void func_ov036_021c0304(FieldG3DObjSystem *sys, u16 objIdx, BOOL value);
 u32 func_ov036_021c0320(FieldG3DObjSystem *sys, u16 objIdx);
 void FieldG3DObjResRequest_Clear(FieldG3DObjResRequest *req);
