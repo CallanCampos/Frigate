@@ -40,10 +40,6 @@
 // for the parent. The ROM has no name for the file; it is named after pokeplatinum's guru2_receipt.c, the same screen
 // in Gen 4. Names are ours
 
-#define GURU2_RECEIPT_ARCID 181
-#define GURU2_RECEIPT_OBJ_ARCID 30
-#define GURU2_RECEIPT_TRAINER_ARCID 31
-
 // The proc's sequences
 enum {
     GURU2_RECEIPT_PROC_FADE_IN,
@@ -285,7 +281,7 @@ BOOL Guru2Receipt_Init(GameProc *proc, u32 *state, void *param, void *work) {
         GX_SetVisiblePlane(0);
         GXS_SetVisiblePlane(0);
         GFL_HeapCreateChild(HEAPID_USER, HEAPID_GURU2, 0x80000);
-        arc = GFL_ArcSysCreateFileHandle(GURU2_RECEIPT_ARCID, HEAPID_GURU2);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_GURU2_OBJ, HEAPID_GURU2);
         wk = GFL_ProcInitSubsystem(proc, sizeof(Guru2ReceiptWork), HEAPID_GURU2);
         MI_CpuFill8(wk, 0, sizeof(Guru2ReceiptWork));
         g2p->g2r = wk;
@@ -649,7 +645,7 @@ static const u32 sActorFiles[4][2] = {
 
 static void Guru2Receipt_InitActorSys(Guru2ReceiptWork *wk, ArcTool *unused) {
     int gender = getTrainerGender(GetGameDataPlayerInfo(wk->g2p->param->gameData));
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GURU2_RECEIPT_OBJ_ARCID, HEAPID_GURU2);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_GURU2);
     int i;
 
     ClActSys_Create(&data_02093f08, &sVRAMConfig, HEAPID_GURU2);
@@ -662,7 +658,7 @@ static void Guru2Receipt_InitActorSys(Guru2ReceiptWork *wk, ArcTool *unused) {
     wk->resources[GURU2_RECEIPT_RES_CELL] =
         func_0204bde0(arc, sActorFiles[2][gender], sActorFiles[3][gender], HEAPID_GURU2);
     GFL_ArcToolFree(arc);
-    wk->trainerArc = GFL_ArcSysCreateFileHandle(GURU2_RECEIPT_TRAINER_ARCID, HEAPID_GURU2);
+    wk->trainerArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, HEAPID_GURU2);
 }
 
 static void Guru2Receipt_ExitActorSys(Guru2ReceiptWork *wk) {
@@ -1429,7 +1425,7 @@ static void Guru2Receipt_UpdateActors(Guru2ReceiptWork *wk) {
 }
 
 static void Guru2Receipt_LoadTrainerPalette(Guru2ReceiptWork *wk, ArcTool *arc) {
-    wk->trainerPaletteFile = GFL_G2DIOReadNCLR(GURU2_RECEIPT_TRAINER_ARCID, 0, &wk->trainerPalette, HEAPID_GURU2);
+    wk->trainerPaletteFile = GFL_G2DIOReadNCLR(ARCID_WIFI_UNIONCHAR, 0, &wk->trainerPalette, HEAPID_GURU2);
 }
 
 static void Guru2Receipt_FreeTrainerPalette(Guru2ReceiptWork *wk) {
@@ -1445,7 +1441,7 @@ static void Guru2Receipt_SetActorLook(Guru2ReceiptWork *wk, NNSG2dPaletteData *p
     void *file;
 
     GX_LoadOBJPltt((u8 *)palette->rawData + sLookPalettes[look] * 0x20, id * 0x20, 0x20);
-    file = GFL_G2DIOReadOBJNCGR(GURU2_RECEIPT_TRAINER_ARCID, look + 1, FALSE, &character, HEAPID_GURU2);
+    file = GFL_G2DIOReadOBJNCGR(ARCID_WIFI_UNIONCHAR, look + 1, FALSE, &character, HEAPID_GURU2);
     func_0204ba40(wk->resources[GURU2_RECEIPT_RES_CHAR + id], character);
     GFL_HeapFree(file);
 }

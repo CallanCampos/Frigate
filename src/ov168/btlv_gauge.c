@@ -6,6 +6,7 @@
 #include "battle/btl_main.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "constants/battle.h"
 #include "constants/pokemon.h"
 #include "constants/sound.h"
@@ -188,7 +189,7 @@ BtlvGauge *BtlvGauge_Create(Font *font, u32 mode, HeapID heapId) {
     BtlvGaugeFlashTask *flash;
 
     gauge->heapId = heapId;
-    gauge->arc = GFL_ArcSysCreateFileHandle(11, gauge->heapId);
+    gauge->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, gauge->heapId);
     gauge->unit = func_0204bf1c(40, 0, gauge->heapId);
     gauge->font = font;
     gauge->bgm = GFL_SndBGMGetID();

@@ -38,9 +38,6 @@
 // The backdrop of the Wi-Fi and live competition screens and what they show on it: the digital cards of the players,
 // the other player's card, the icon of the link and the list of the team (the file name is the ROM's own string)
 
-// The archive of the screens' graphics. It has no name yet
-#define ARCID_WIFIBATTLEMATCH 134
-
 #define CARD_WINDOW_MAX 30
 #define CARD_ACTOR_COUNT 22
 #define CARD_PARTY_COUNT 6
@@ -1148,7 +1145,7 @@ static void WifiBattleMatchView_CardFreeIcons(WifiBattleMatchCard *card) {
 }
 
 static void WifiBattleMatchView_CardLoadBadge(WifiBattleMatchCard *card, u32 look, ClActUnit *unit, HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(31, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, heapId);
     ClActorSetup setup;
 
     card->badgePalette =
@@ -1470,7 +1467,7 @@ static void WifiBattleMatchView_PartnerFreeWindows(WifiBattleMatchPartnerCard *c
 
 static void WifiBattleMatchView_PartnerLoadBadge(WifiBattleMatchPartnerCard *card, u32 look, ClActUnit *unit,
                                                  HeapID heapId) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(31, heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, heapId);
     ClActorSetup setup;
 
     card->badgePalette = func_0204bbb8(arc, 0, CLACT_VRAM_MAIN, 320, sBadgePaletteStarts[look], 1, heapId);

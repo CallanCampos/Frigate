@@ -1,0 +1,12 @@
+PmsWordsInitialZ_Text_Zangoose = ZANGOOSE
+PmsWordsInitialZ_Text_Zapcannon = ZAPCANNON
+PmsWordsInitialZ_Text_Zapdos = ZAPDOS
+PmsWordsInitialZ_Text_Zebstrika = ZEBSTRIKA
+PmsWordsInitialZ_Text_Zekrom = ZEKROM
+PmsWordsInitialZ_Text_Zenheadbutt = ZENHEADBUTT
+PmsWordsInitialZ_Text_Zenmode = ZENMODE
+PmsWordsInitialZ_Text_Zigzagoon = ZIGZAGOON
+PmsWordsInitialZ_Text_Zoroark = ZOROARK
+PmsWordsInitialZ_Text_Zorua = ZORUA
+PmsWordsInitialZ_Text_Zubat = ZUBAT
+PmsWordsInitialZ_Text_Zweilous = ZWEILOUS

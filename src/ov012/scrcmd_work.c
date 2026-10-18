@@ -233,7 +233,7 @@ void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 
     MIi_CpuClear32(0, menu->descriptions, sizeof(menu->descriptions));
     if (menu->msgData == NULL) {
         menu->ownsMsgData = TRUE;
-        menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_0410, env->heapId);
+        menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_SCRCMD_WORK, env->heapId);
     }
     menu->options = InitListMenuOptionHeap(32, env->heapId);
 }

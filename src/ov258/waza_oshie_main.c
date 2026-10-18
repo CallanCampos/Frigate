@@ -51,8 +51,6 @@
 // file; "waza_oshie_main.c" is a guess from "waza_oshie.c", the file of overlay 12 that allocates its parameter
 
 #define HEAPID_WAZA_OSHIE 0x4f
-// The screen's graphics
-#define ARCID_WAZA_OSHIE 125
 
 #define WINDOW_COUNT 16
 #define ACTOR_COUNT 14

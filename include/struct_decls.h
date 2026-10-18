@@ -241,6 +241,8 @@ typedef struct DreamWorldSave DreamWorldSave;
 typedef struct DrawCommand DrawCommand;
 typedef struct DrawSystem DrawSystem;
 typedef struct DrawSystemParam DrawSystemParam;
+typedef struct DWCUtilOamNode DWCUtilOamNode;
+typedef struct DWCUtilStack DWCUtilStack;
 typedef struct Elboard Elboard;
 typedef struct ElboardInit ElboardInit;
 typedef struct ElboardMessage ElboardMessage;

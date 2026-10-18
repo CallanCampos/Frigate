@@ -32,9 +32,6 @@
 #define WINDOW_MAX 14
 #define ACTOR_COUNT 4
 
-// The battle's graphics archive, and the one of the actors of the cursor
-#define ARCID_BATTLE_CHOICE 101
-#define ARCID_BATTLE_CURSOR 11
 // The files of the cursor's actors
 #define FILE_CURSOR_PALETTE 0x1a5
 #define FILE_CURSOR_CHARS 0x1a8
@@ -421,7 +418,7 @@ static void BChoiceMain_Init(BChoiceWork *work) {
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->printQueue = func_02021998(work->param->heapId);
-    work->positions = GFL_ArcSysReadHeapNew(ARCID_BATTLE_CHOICE, FILE_POSITIONS, work->param->heapId);
+    work->positions = GFL_ArcSysReadHeapNew(ARCID_B_CHOICE, FILE_POSITIONS, work->param->heapId);
     BChoiceMain_InitBG(work);
     BChoiceMain_LoadGraphics(work, work->layout);
     BChoiceMain_CreateWindows(work, work->layout);
@@ -631,7 +628,7 @@ static void BChoiceMain_LoadGraphics(BChoiceWork *work, int layout) {
     const BChoiceBGLoad *charLoad = sBChoiceCharLoads;
     const BChoiceBGLoad *screenLoad = sBChoiceScreenLoadTables[layout];
     u32 heapId = work->param->heapId;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_CHOICE, HEAPID_TAIL(heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_CHOICE, HEAPID_TAIL(heapId));
 
     for (i = 0; i < 8; i++) {
         if (paletteLoad->type == 0xff) {
@@ -759,7 +756,7 @@ static void BChoiceMain_FreeActors(BChoiceWork *work) {
 }
 
 static void BChoiceMain_LoadActorResources(BChoiceWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BATTLE_CURSOR, HEAPID_TAIL(work->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(work->param->heapId));
 
     work->resources[0] = func_0204bbb8(arc, FILE_CURSOR_PALETTE, 1, 0, 4, 1, work->param->heapId);
     work->resources[2] = func_0204bde0(arc, FILE_CURSOR_CELLS, FILE_CURSOR_ANIMS, work->param->heapId);

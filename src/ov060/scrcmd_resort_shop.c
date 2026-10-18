@@ -1258,7 +1258,7 @@ static void func_ov060_021e71c8(ResortShopWork *wk, u32 mode) {
     ArcTool *arc;
 
     G2_BlendNone();
-    arc = GFL_ArcSysCreateFileHandle(53, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_SCRCMD_SHOP, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, 0, 0, 0x60, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 0, 2, 100, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 2, 2, 0, 100, 0, FALSE, wk->heapId);
@@ -1280,7 +1280,7 @@ static void func_ov060_021e7274(ResortShopWork *wk) {
 }
 
 static void func_ov060_021e7294(ResortShopWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(53, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_SCRCMD_SHOP, wk->heapId);
 
     wk->res[0].palette = func_0204bbb8(arc, 11, 0, 0, 0, 2, wk->heapId);
     wk->res[0].chars = func_0204b81c(arc, 8, 0, 0, wk->heapId);
@@ -1367,7 +1367,7 @@ static void func_ov060_021e75dc(ResortShopWork *wk) {
 }
 
 static void func_ov060_021e7604(ResortShopWork *wk) {
-    wk->iconArc = GFL_ArcSysCreateFileHandle(31, wk->heapId);
+    wk->iconArc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, wk->heapId);
     wk->res[2].palette = func_0204bbb8(wk->iconArc, 0, 0, 64, 2, 1, wk->heapId);
     wk->res[2].chars = func_0204b81c(wk->iconArc, 49, 0, 0, wk->heapId);
     wk->res[2].cellAnims = func_0204bde0(wk->iconArc, 65, 66, wk->heapId);

@@ -1,0 +1,2 @@
+PmsWordsInitialX_Text_Xatu = XATU
+PmsWordsInitialX_Text_Xscissor = XSCISSOR

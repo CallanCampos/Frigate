@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-716 of 1688 functions are in source files.
+874 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -123,6 +123,21 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
+| `gp.c` | `0x0217241c`–`0x02172d68` | 21 | complete | descriptive |
+| `gpi.c` | `0x02172d68`–`0x02173504` | 6 | complete | descriptive |
+| `gpiBuddy.c` | `0x02173504`–`0x02174dd4` | 12 | complete | descriptive |
+| `gpiBuffer.c` | `0x02174dd4`–`0x02175458` | 13 | partial | descriptive |
+| `gpiCallback.c` | `0x02175458`–`0x02175750` | 4 | complete | descriptive |
+| `gpiConnect.c` | `0x02175750`–`0x0217688c` | 10 | complete | descriptive |
+| `gpiInfo.c` | `0x0217688c`–`0x02177cc0` | 13 | complete | descriptive |
+| `gpiKeys.c` | `0x02177cc0`–`0x02178084` | 8 | complete | descriptive |
+| `gpiOperation.c` | `0x02178084`–`0x02178458` | 7 | complete | descriptive |
+| `gpiPeer.c` | `0x02178458`–`0x02179220` | 24 | complete | descriptive |
+| `gpiProfile.c` | `0x02179220`–`0x02179834` | 20 | complete | descriptive |
+| `gpiSearch.c` | `0x02179834`–`0x0217b5fc` | 7 | partial | descriptive |
+| `gpiTransfer.c` | `0x0217b5fc`–`0x0217b6a8` | 2 | complete | descriptive |
+| `gpiUnique.c` | `0x0217b6a8`–`0x0217b7e0` | 2 | complete | descriptive |
+| `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
@@ -1512,7 +1527,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
 | `pokelist.c` | `0x02199a00`–`0x02199b88` | 4 | complete | descriptive |
-| `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | partial | descriptive |
+| `plist_sys.c` | `0x02199b88`–`0x0219e678` | 89 | complete | descriptive |
 | `plist_plate.c` | `0x0219e678`–`0x0219f5ec` | 32 | complete | string at `0x021a4cec` |
 | `plist_message.c` | `0x0219f5ec`–`0x0219fae8` | 23 | complete | string at `0x021a4cfc` |
 | `plist_menu.c` | `0x0219fae8`–`0x0219fef0` | 14 | complete | string at `0x021a4d0c` |
@@ -1722,7 +1737,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-137 of 1113 functions are in source files.
+180 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1734,6 +1749,11 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
 | `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
+| `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
+| `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
+| `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |
+| `dwc_util_display.c` | `0x021bc1a8`–`0x021bc468` | 7 | complete | descriptive |
+| `dwc_util_heap.c` | `0x021bc468`–`0x021bc544` | 6 | complete | descriptive |
 
 ### Overlay 184
 
@@ -1872,7 +1892,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `pokemontrade_message.c` | `0x021bfba4`–`0x021c1918` | 50 | complete | descriptive |
 | `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | complete | string at `0x021c6fc0` |
 | `pokemontrade_touchbar.c` | `0x021c2a24`–`0x021c2b08` | 1 | complete | descriptive |
-| `pokemontrade_2d.c` | `0x021c2b08`–`0x021c6380` | 108 | partial | string at `0x021c7330` |
+| `pokemontrade_2d.c` | `0x021c2b08`–`0x021c6380` | 108 | complete | string at `0x021c7330` |
 
 ### Overlay 195
 
@@ -2063,7 +2083,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `worldtrade.c` | `0x021d3380`–`0x021d3f9c` | 36 | complete | string at `0x021e2a18` |
 | `worldtrade_box.c` | `0x021d3f9c`–`0x021d5c48` | 58 | complete | string at `0x021e2bc0` |
 | `worldtrade_demo.c` | `0x021d5c48`–`0x021d61dc` | 6 | complete | string at `0x021e2bec` |
-| `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | partial | string at `0x021e2ca0` |
+| `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | complete | string at `0x021e2ca0` |
 | `worldtrade_enter.c` | `0x021d77c8`–`0x021d8074` | 30 | complete | string at `0x021e2d34` |
 | `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | complete | string at `0x021e2dd8` |
 | `worldtrade_mypoke.c` | `0x021daeb8`–`0x021dba8c` | 27 | complete | descriptive |
@@ -2154,7 +2174,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ctvt_mic.c` | `0x0219ef4c`–`0x0219f234` | 24 | complete | string at `0x021b261c` |
 | `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | complete | string at `0x021b264c` |
 | `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | partial | string at `0x021b2658` |
-| `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | partial | string at `0x021b2674` |
+| `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | complete | string at `0x021b2674` |
 | `ctvt_game_target.c` | `0x021a7620`–`0x021a78d0` | 6 | partial | descriptive |
 | `ctvt_game_balloon.c` | `0x021a78d0`–`0x021a8090` | 12 | complete | string at `0x021b2680` |
 | `ctvt_game_cam.c` | `0x021a8090`–`0x021a9704` | 67 | partial | string at `0x021b2694` |
@@ -2871,4 +2891,4 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | partial | descriptive |
+| `ir_check.c` | `0x0217c940`–`0x0217cb10` | 6 | complete | descriptive |

@@ -2,6 +2,7 @@
 #include "app/wf2dmap/wf2dmap_judge.h"
 #include "app/wifi_p2pmatchroom.h"
 #include "app/wifi_p2pmatchroom_map.h"
+#include "constants/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
 #include "gfl/heap.h"

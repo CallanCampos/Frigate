@@ -1,4 +1,5 @@
 #include "app/pokelist.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -133,7 +134,7 @@ static void PokeListBattle_FreeUnit(PokeListWork *wk) {
 }
 
 static void PokeListBattle_LoadResources(PokeListWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x4b, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PLIST, wk->heapId);
     ArcTool *iconArc;
     ArcTool *commonArc;
 

@@ -60,7 +60,7 @@
 #include "system/union_view.h"
 #include "system/version.h"
 #include "system/wordset.h"
-#include "text/system/0413.h"
+#include "text/system/wifi_bsubway.h"
 #include "text/system/ability_handlers_btl_main.h"
 
 // The Wi-Fi Battle Subway's screen: its proc, the three things it does with the Battle Subway's server (sending the
@@ -454,7 +454,7 @@ static BOOL WifiBSubway_ProcMain(GameProc *proc, u32 *state, void *param, void *
         break;
     case STATE_CONNECT:
         WifiBSubway_Connect(wk);
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_CommunicatingPleaseStandBy);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_CommunicatingPleaseStandBy);
         WifiBSubwayView_StartWaitIcon(&wk->view);
         (*state)++;
         break;
@@ -968,47 +968,47 @@ static u32 WifiBSubwayError_GetMessage(const WifiBSubwayError *error) {
     if (error->dpwResult < 0) {
         switch (error->dpwResult) {
         case -2:
-            message = Bank0413_Text_UnableConnectWiFi;
+            message = WifiBsubway_Text_UnableConnectWiFi;
             break;
         case -6:
-            message = Bank0413_Text_UnableConnectWiFi_2;
+            message = WifiBsubway_Text_UnableConnectWiFi_2;
             break;
         case -1:
-            message = Bank0413_Text_WiFiTrainVery_2;
+            message = WifiBsubway_Text_WiFiTrainVery_2;
             break;
         case -7:
-            message = Bank0413_Text_WereDisconnectedFromWi_2;
+            message = WifiBsubway_Text_WereDisconnectedFromWi_2;
             break;
         case -4:
-            message = Bank0413_Text_WereDisconnectedFromWi;
+            message = WifiBsubway_Text_WereDisconnectedFromWi;
             break;
         case -3:
-            message = Bank0413_Text_NumberCannotSpecifiedWi;
+            message = WifiBsubway_Text_NumberCannotSpecifiedWi;
             break;
         default:
-            message = Bank0413_Text_CommunicationErrorErrorCode;
+            message = WifiBsubway_Text_CommunicationErrorErrorCode;
             break;
         }
     } else if (error->serverState != 0) {
         switch (error->serverState) {
         case 1:
-            message = Bank0413_Text_WiFiTrainCurrently;
+            message = WifiBsubway_Text_WiFiTrainCurrently;
             break;
         case 2:
-            message = Bank0413_Text_WiFiTrainVery;
+            message = WifiBsubway_Text_WiFiTrainVery;
             break;
         }
     } else if (error->checkError != CHECK_ERROR_NONE) {
         switch (error->checkError) {
         case CHECK_ERROR_POKEMON:
-            message = Bank0413_Text_ThereAppearsProblemPokemon;
+            message = WifiBsubway_Text_ThereAppearsProblemPokemon;
             break;
         case CHECK_ERROR_STATUS:
-            message = Bank0413_Text_ThereAppearsProblemPokemon;
+            message = WifiBsubway_Text_ThereAppearsProblemPokemon;
             break;
         }
     } else if (error->timeout) {
-        message = Bank0413_Text_UnableConnectWiFi;
+        message = WifiBsubway_Text_UnableConnectWiFi;
     }
     return message;
 }
@@ -1143,7 +1143,7 @@ static u32 WifiBSubway_RunMode(WifiBSubwayWork *wk, HeapID heapId) {
 static u32 WifiBSubway_UploadMain(WifiBSubwayWork *wk, HeapID heapId) {
     switch (wk->seq) {
     case 0:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_SendingRecordDataDont);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_SendingRecordDataDont);
         wk->seq++;
         break;
     case 1:
@@ -1186,7 +1186,7 @@ static u32 WifiBSubway_UploadMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 8:
         if (WifiBSubway_WaitSave(wk)) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_DataHasBeenSent);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_DataHasBeenSent);
             wk->seq++;
         }
         break;
@@ -1220,7 +1220,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
         WifiBSubwayView_StopWaitIcon(&wk->view);
         WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetCount(&wk->room),
                                   WifiBSubwayRoom_GetCountDigits(&wk->room));
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_EnterTrainNumber01);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_EnterTrainNumber01);
         wk->seq++;
         break;
     case 3:
@@ -1265,7 +1265,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
                 WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetNumber(&wk->room),
                                           WifiBSubwayRoom_GetCountDigits(&wk->room));
                 WifiBSubwayView_SetNumber(&wk->view, 1, WifiBSubwayRoom_GetRank(&wk->room), 2);
-                WifiBSubwayView_Print(&wk->view, Bank0413_Text_ReceivingDataRankTrain);
+                WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_ReceivingDataRankTrain);
                 WifiBSubwayView_StartWaitIcon(&wk->view);
                 wk->seq++;
             }
@@ -1286,7 +1286,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 11:
         if (WifiBSubway_WaitSave(wk)) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_DataHasBeenReceived);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_DataHasBeenReceived);
             wk->seq++;
         }
         break;
@@ -1298,7 +1298,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 13:
         return MODE_RESULT_END;
     case 14:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_MayNotChallengeTrain);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_MayNotChallengeTrain);
         wk->seq++;
         break;
     case 15:
@@ -1307,7 +1307,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
         }
         break;
     case 16:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_CancelChallenge);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_CancelChallenge);
         wk->seq++;
         break;
     case 17:
@@ -1338,7 +1338,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
     switch (wk->seq) {
     case 0:
         WifiBSubwayView_StopWaitIcon(&wk->view);
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_EnterRankTrain01);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_EnterRankTrain01);
         wk->seq++;
         break;
     case 1:
@@ -1371,7 +1371,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
         if (!GFL_FadeIsRunning()) {
             if (wk->inputNumber >= 1 && wk->inputNumber <= RANK_MAX) {
                 WifiBSubwayRoom_RequestCount(&wk->room, &wk->error, wk->inputNumber);
-                WifiBSubwayView_Print(&wk->view, Bank0413_Text_CommunicatingPleaseStandBy);
+                WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_CommunicatingPleaseStandBy);
                 WifiBSubwayView_StartWaitIcon(&wk->view);
                 wk->seq++;
             } else {
@@ -1384,7 +1384,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
             WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetCount(&wk->room),
                                       WifiBSubwayRoom_GetCountDigits(&wk->room));
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_EnterTrainNumber01_2);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_EnterTrainNumber01_2);
             wk->seq++;
         }
         break;
@@ -1425,7 +1425,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
                 WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetNumber(&wk->room),
                                           WifiBSubwayRoom_GetCountDigits(&wk->room));
                 WifiBSubwayView_SetNumber(&wk->view, 1, WifiBSubwayRoom_GetRank(&wk->room), 2);
-                WifiBSubwayView_Print(&wk->view, Bank0413_Text_ReceivingDataRankTrain);
+                WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_ReceivingDataRankTrain);
                 WifiBSubwayView_StartWaitIcon(&wk->view);
                 wk->seq++;
             }
@@ -1445,7 +1445,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 16:
         if (WifiBSubway_WaitSave(wk)) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_DataHasBeenReceived);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_DataHasBeenReceived);
             wk->seq++;
         }
         break;
@@ -1457,7 +1457,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 18:
         return MODE_RESULT_END;
     case 19:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_WouldLikeCancelData);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_WouldLikeCancelData);
         wk->seq++;
         break;
     case 20:
@@ -1563,7 +1563,7 @@ static void WifiBSubwayView_Init(WifiBSubwayView *view, HeapID heapId) {
     BmpWin_FlushMap(view->window);
     BmpWin_FlushChar(view->window);
     GFL_BGSysQueueScrLoad(MESSAGE_BG);
-    view->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0413, heapId);
+    view->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_BSUBWAY, heapId);
     view->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     view->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     view->message = GFL_StrBufCreate(0x80, heapId);

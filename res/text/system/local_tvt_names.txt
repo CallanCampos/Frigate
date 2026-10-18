@@ -1,0 +1,14 @@
+LocalTvtNames_Text_Empty = {0100:0}
+LocalTvtNames_Text_Empty_2 = {0100:1}
+LocalTvtNames_Text_Cheren = Cheren
+LocalTvtNames_Text_Bianca = Bianca
+LocalTvtNames_Text_Professor = Professor
+LocalTvtNames_Text_Mom = Mom
+LocalTvtNames_Text_Curtis = Curtis
+LocalTvtNames_Text_Yancy = Yancy
+LocalTvtNames_Text_Empty_3 = ???
+LocalTvtNames_Text_Curtis_2 = Curtis
+LocalTvtNames_Text_Yancy_2 = Yancy
+LocalTvtNames_Text_Curtis_3 = Curtis
+LocalTvtNames_Text_Yancy_3 = Yancy
+LocalTvtNames_Text_Empty_4 = {0100:0}

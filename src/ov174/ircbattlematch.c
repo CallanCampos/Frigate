@@ -72,9 +72,6 @@ enum {
 };
 #define IRCMATCH_TIMING_GROUP 12
 
-// The archive of the screen's own graphics (not named: our name would be ours alone)
-#define IRCMATCH_ARCID 28
-
 // The messages of TEXT_BANK_STARTMENU_2 (the infrared menu's, bank 62 of the system messages) that the screen shows
 enum {
     IRCMATCH_MSG_BACK = 2,
@@ -402,7 +399,7 @@ static void IrcBattleMatch_StartWipeOut(IrcBattleMatch *work) {
 }
 
 static void IrcBattleMatch_LoadActorResources(IrcBattleMatch *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(IRCMATCH_ARCID, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_IRCBATTLE, work->heapId);
 
     work->actorChars = func_0204b81c(arc, 7, FALSE, CLACT_VRAM_MAIN, work->heapId);
     work->actorPalette = func_0204bbb8(arc, 3, CLACT_VRAM_MAIN, 0, 0, 3, work->heapId);
@@ -1171,7 +1168,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     work->strbuf = GFL_StrBufCreate(200, work->heapId);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, work->heapId);
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_STARTMENU_2, work->heapId);
-    arc = GFL_ArcSysCreateFileHandle(IRCMATCH_ARCID, work->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_IRCBATTLE, work->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, 0, 0, 0, work->heapId);
     work->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, 6, 0, 0, FALSE, work->heapId);
     if (work->mode != IRCBATTLEMATCH_MODE_MULTI) {
@@ -1213,7 +1210,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     GFL_BGSysSetEnabledBGsA(0x13);
     GFL_BGSysSetEnabledBGsB(0x17);
     work->paletteHeapId = work->heapId;
-    arc = GFL_ArcSysCreateFileHandle(IRCMATCH_ARCID, work->paletteHeapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_IRCBATTLE, work->paletteHeapId);
     paletteFile = GFL_G2DIOReadNCLRArc(arc, 2, &palette, work->paletteHeapId);
     MI_CpuCopy8(palette->rawData, work->palettes, 0x120);
     for (i = 0; i < 9; i++) {

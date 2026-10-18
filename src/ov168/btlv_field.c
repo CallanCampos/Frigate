@@ -5,6 +5,7 @@
 #include "types.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_stage.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
@@ -12,8 +13,7 @@
 #include "nitro/fx.h"
 #include "nnsys/g3d.h"
 
-// The battle's 3D graphics archive, and the archive of the field table
-#define BTLV_FIELD_GRA_ARC 11
+// The archive of the field table
 #define BTLV_FIELD_TABLE_ARC 0x97
 
 #define BTLV_FIELD_RES_NONE 0xffff
@@ -89,9 +89,9 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
     field->heapId = heapId;
     field->fieldId = fieldId;
     if (table[fieldId][0][variant] != BTLV_FIELD_RES_NONE) {
-        field->res = GFL_G3DSysReadArcSysResource(BTLV_FIELD_GRA_ARC, table[fieldId][0][variant]);
+        field->res = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldId][0][variant]);
     } else {
-        field->res = GFL_G3DSysReadArcSysResource(BTLV_FIELD_GRA_ARC, table[fieldId][0][0]);
+        field->res = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldId][0][0]);
     }
     GFL_G3DResUploadTexData(field->res);
 
@@ -111,7 +111,7 @@ BtlvField *BtlvField_Create(BOOL arg0, u8 fieldId, u8 variant, HeapID heapId, u3
             GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(BtlvFieldAnm), TRUE, "btlv_field.c", 0xc2);
         for (i = 1; i < 4; i++) {
             if (table[fieldId][i][variant] != BTLV_FIELD_RES_NONE) {
-                field->anmRes[j] = GFL_G3DSysReadArcSysResource(BTLV_FIELD_GRA_ARC, table[fieldId][i][variant]);
+                field->anmRes[j] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldId][i][variant]);
                 field->anms[j] = GFL_G3DAnmCreate(field->mdl, field->anmRes[j], 0);
                 field->anmParams[j].mode = 0;
                 j++;
@@ -172,7 +172,7 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
     table = GFL_ArcSysReadHeapNew(BTLV_FIELD_TABLE_ARC, 1, HEAPID_TAIL(field->heapId));
     variant = data_ov168_021f2f6c[(fieldParam >> 8) & 0xff];
     if (table[fieldParam & 0xff][0][variant] != BTLV_FIELD_RES_NONE) {
-        field->res = GFL_G3DSysReadArcSysResource(BTLV_FIELD_GRA_ARC, table[fieldParam & 0xff][0][variant]);
+        field->res = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldParam & 0xff][0][variant]);
     }
     GFL_G3DResSetupTexData(field->res);
     field->uploadTask = GFL_VBlankTCBAdd(BtlvField_UploadTexTask, field, 10);
@@ -193,8 +193,7 @@ void BtlvField_Reload(BtlvField *field, s32 fieldParam) {
             GFL_HeapAllocate(field->heapId, field->anmCount * sizeof(BtlvFieldAnm), TRUE, "btlv_field.c", 0x1cc);
         for (i = 1; i < 4; i++) {
             if (table[fieldParam & 0xff][i][variant] != BTLV_FIELD_RES_NONE) {
-                field->anmRes[j] =
-                    GFL_G3DSysReadArcSysResource(BTLV_FIELD_GRA_ARC, table[fieldParam & 0xff][i][variant]);
+                field->anmRes[j] = GFL_G3DSysReadArcSysResource(ARCID_BTLV, table[fieldParam & 0xff][i][variant]);
                 field->anms[j] = GFL_G3DAnmCreate(field->mdl, field->anmRes[j], 0);
                 field->anmParams[j].mode = 0;
                 j++;

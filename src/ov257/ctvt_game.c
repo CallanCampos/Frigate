@@ -6,6 +6,7 @@
 #include "app/comm_tvt/ctvt_game_balloon.h"
 #include "app/comm_tvt/ctvt_game_cam.h"
 #include "app/comm_tvt/ctvt_game_target.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -150,7 +151,7 @@ struct CtvtGame {
     u8 lastColumn;
     u8 lastAngle;
     u8 nextDepth;
-    // Which of sFaceOrders the faces come up in, and where in it
+    // Which of CtvtGame_NextFace's orders the faces come up in, and where in it
     u8 faceOrder;
     u8 faceOrderPos;
     CtvtGameBalloon *balloons[4];
@@ -307,47 +308,124 @@ static void CtvtGamePlayer_ResultTask(TCB *tcb, void *data);
 
 static MATHRandContext32 sCtvtGameRand;
 
-// No code reads these. The game has five bytes here, b1 1e 0c 01 00, in the section that sPumpThresholds shares,
-// which no declaration tried reproduces. They sort before the 3-byte table, so they would be objects of 1 or 2 bytes
-// that some code refers to without reading them; this unreferenced placeholder gets a section of its own instead.
-// Splitting the targets off into ctvt_game_target.c put their bounds table in place but not these bytes, and the
-// objects of equal size are not in the game's order yet
-const u8 data_ov257_021b1aa8[4] = { 0xb1, 0x1e, 0x0c, 0x01 };
+// The tables down to sHitSizes are declared in the order that gives the game's .rodata and .data: MWCC lays them
+// out sorted by size, and where each is declared decides the order of those of equal size, which puts some
+// numbered ones out of order
+static const G3DSceneAnimationSetup sFaceAnimations[] = { { 3, 0 }, { 4, 0 }, { 5, 0 } };
+
+static const G3DSceneResourceSetup sFaceResources3[] = { { 233, 33, 0 }, { 233, 33, 0 }, { 233, 33, 0 },
+                                                         { 233, 47, 0 }, { 233, 58, 0 }, { 233, 48, 0 } };
+static const G3DSceneResourceSetup sFaceResources0[] = { { 233, 30, 0 }, { 233, 30, 0 }, { 233, 30, 0 },
+                                                         { 233, 44, 0 }, { 233, 55, 0 }, { 233, 48, 0 } };
+static const G3DSceneResourceSetup sFaceResources1[] = { { 233, 31, 0 }, { 233, 31, 0 }, { 233, 31, 0 },
+                                                         { 233, 45, 0 }, { 233, 56, 0 }, { 233, 48, 0 } };
+static const G3DSceneResourceSetup sFaceResources2[] = { { 233, 32, 0 }, { 233, 32, 0 }, { 233, 32, 0 },
+                                                         { 233, 46, 0 }, { 233, 57, 0 }, { 233, 48, 0 } };
+
+static const G3DSceneActorSetup sFaceActors[] = {
+    { 0, 0, 0, 0, sFaceAnimations, NELEMS(sFaceAnimations) },
+    { 1, 0, 1, 0, sFaceAnimations, NELEMS(sFaceAnimations) },
+    { 2, 0, 2, 0, sFaceAnimations, NELEMS(sFaceAnimations) },
+};
+
+static const G3DSceneAnimationSetup sTargetAnimations6[] = { { 7, 0 }, { 8, 0 } };
+static const G3DSceneAnimationSetup sTargetAnimations3[] = { { 4, 0 }, { 5, 0 } };
+static const G3DSceneAnimationSetup sTargetAnimations0[] = { { 1, 0 }, { 2, 0 } };
+static const G3DSceneAnimationSetup sTargetAnimations9[] = { { 10, 0 }, { 11, 0 } };
+
+static const G3DSceneActorSetup sTargetActors[] = {
+    { 0, 0, 0, 0, sTargetAnimations0, NELEMS(sTargetAnimations0) },
+    { 3, 0, 3, 0, sTargetAnimations3, NELEMS(sTargetAnimations3) },
+    { 6, 0, 6, 0, sTargetAnimations6, NELEMS(sTargetAnimations6) },
+    { 9, 0, 9, 0, sTargetAnimations9, NELEMS(sTargetAnimations9) },
+};
+
+static const G3DSceneResourceSetup sTargetResources[] = {
+    { 233, 41, 0 }, { 233, 52, 0 }, { 233, 61, 0 }, { 233, 42, 0 }, { 233, 53, 0 }, { 233, 62, 0 },
+    { 233, 39, 0 }, { 233, 50, 0 }, { 233, 59, 0 }, { 233, 40, 0 }, { 233, 51, 0 }, { 233, 60, 0 },
+};
+
+static const G3DSceneSetup sTargetScenes[] = {
+    { sFaceResources0, NELEMS(sFaceResources0), sFaceActors, NELEMS(sFaceActors) },
+    { sFaceResources1, NELEMS(sFaceResources1), sFaceActors, NELEMS(sFaceActors) },
+    { sFaceResources2, NELEMS(sFaceResources2), sFaceActors, NELEMS(sFaceActors) },
+    { sFaceResources3, NELEMS(sFaceResources3), sFaceActors, NELEMS(sFaceActors) },
+    { sTargetResources, NELEMS(sTargetResources), sTargetActors, NELEMS(sTargetActors) },
+};
 
 // How many pumps a balloon takes to reach each stage after the first
 static const u8 sPumpThresholds[] = { 10, 20, 30 };
 
-static const G3DSceneAnimationSetup sResultPopAnimations[] = { { 1, 0 } };
-
-// The width and height of the targets that a touch hits, by their depth
-static const u8 sHitSizes[3][2] = { { 15, 23 }, { 18, 28 }, { 26, 39 } };
-
-static const G3DSceneAnimationSetup sTargetAnimations3[] = { { 4, 0 }, { 5, 0 } };
-static const G3DSceneAnimationSetup sTargetAnimations0[] = { { 1, 0 }, { 2, 0 } };
-
 // Where each member's results go on the top screen, by their place in the call
 static const u8 sResultPositions[4][2] = { { 32, 176 }, { 96, 176 }, { 160, 176 }, { 224, 176 } };
+
 // Where each member's score goes on the sub screen during the game, by their rank
 static const u8 sPlayerPositions[4][2] = { { 112, 25 }, { 120, 59 }, { 128, 93 }, { 136, 127 } };
 
-static const G3DSceneAnimationSetup sTargetAnimations9[] = { { 10, 0 }, { 11, 0 } };
-static const G3DSceneAnimationSetup sTargetAnimations6[] = { { 7, 0 }, { 8, 0 } };
 static const G3DSceneAnimationSetup sBalloonPopAnimations[] = { { 1, 0 }, { 2, 0 } };
-static const G3DSceneAnimationSetup sResultAnimations[] = { { 2, 0 }, { 3, 0 } };
 
-static const VecFx32 sCtvtGameCameraPosition = { 0, 0, FX32_CONST(250) };
-static const VecFx32 sCtvtGameCameraTarget = { 0, 0, 0 };
-
-static const G3DSceneAnimationSetup sFaceAnimations[] = { { 3, 0 }, { 4, 0 }, { 5, 0 } };
-
-static const G3DSceneActorSetup sResultPopActors[] = {
-    { 0, 0, 0, 0, sResultPopAnimations, NELEMS(sResultPopAnimations) },
-};
 static const G3DSceneActorSetup sBalloonPopActors[] = {
     { 0, 0, 0, 0, sBalloonPopAnimations, NELEMS(sBalloonPopAnimations) },
 };
 
+static const G3DSceneResourceSetup sBalloonResources0[] = { { 233, 34, 0 }, { 233, 34, 0 }, { 233, 34, 0 } };
+static const G3DSceneResourceSetup sBalloonResources1[] = { { 233, 35, 0 }, { 233, 35, 0 }, { 233, 35, 0 } };
+static const G3DSceneResourceSetup sBalloonResources2[] = { { 233, 36, 0 }, { 233, 36, 0 }, { 233, 36, 0 } };
+static const G3DSceneResourceSetup sBalloonResources3[] = { { 233, 37, 0 }, { 233, 37, 0 }, { 233, 37, 0 } };
+
+static const G3DSceneActorSetup sBalloonActors[] = {
+    { 0, 0, 0, 0, NULL, 0 },
+    { 1, 0, 1, 0, NULL, 0 },
+    { 2, 0, 2, 0, NULL, 0 },
+};
+
+static const G3DSceneResourceSetup sBalloonPopResources[] = { { 233, 43, 0 }, { 233, 54, 0 }, { 233, 63, 0 } };
+
+static const G3DSceneSetup sBalloonScenes[] = {
+    { sBalloonResources0, NELEMS(sBalloonResources0), sBalloonActors, NELEMS(sBalloonActors) },
+    { sBalloonResources1, NELEMS(sBalloonResources1), sBalloonActors, NELEMS(sBalloonActors) },
+    { sBalloonResources2, NELEMS(sBalloonResources2), sBalloonActors, NELEMS(sBalloonActors) },
+    { sBalloonResources3, NELEMS(sBalloonResources3), sBalloonActors, NELEMS(sBalloonActors) },
+    { sBalloonPopResources, NELEMS(sBalloonPopResources), sBalloonPopActors, NELEMS(sBalloonPopActors) },
+};
+
 static const G3DSceneResourceSetup sResultPopResources[] = { { 233, 38, 0 }, { 233, 49, 0 } };
+
+static const G3DSceneAnimationSetup sResultPopAnimations[] = { { 1, 0 } };
+static const G3DSceneAnimationSetup sResultAnimations[] = { { 2, 0 }, { 3, 0 } };
+
+static const G3DSceneActorSetup sResultActors[] = {
+    { 0, 0, 0, 0, sResultAnimations, NELEMS(sResultAnimations) },
+    { 1, 0, 1, 0, sResultAnimations, NELEMS(sResultAnimations) },
+};
+
+static const G3DSceneActorSetup sResultPopActors[] = {
+    { 0, 0, 0, 0, sResultPopAnimations, NELEMS(sResultPopAnimations) },
+};
+
+static const G3DSceneResourceSetup sResultResources0[] = {
+    { 233, 30, 0 }, { 233, 30, 0 }, { 233, 44, 0 }, { 233, 55, 0 }
+};
+static const G3DSceneResourceSetup sResultResources3[] = {
+    { 233, 33, 0 }, { 233, 33, 0 }, { 233, 47, 0 }, { 233, 58, 0 }
+};
+static const G3DSceneResourceSetup sResultResources1[] = {
+    { 233, 31, 0 }, { 233, 31, 0 }, { 233, 45, 0 }, { 233, 56, 0 }
+};
+static const G3DSceneResourceSetup sResultResources2[] = {
+    { 233, 32, 0 }, { 233, 32, 0 }, { 233, 46, 0 }, { 233, 57, 0 }
+};
+
+static const G3DSceneSetup sResultScenes[] = {
+    { sResultResources0, NELEMS(sResultResources0), sResultActors, NELEMS(sResultActors) },
+    { sResultResources1, NELEMS(sResultResources1), sResultActors, NELEMS(sResultActors) },
+    { sResultResources2, NELEMS(sResultResources2), sResultActors, NELEMS(sResultActors) },
+    { sResultResources3, NELEMS(sResultResources3), sResultActors, NELEMS(sResultActors) },
+    { sResultPopResources, NELEMS(sResultPopResources), sResultPopActors, NELEMS(sResultPopActors) },
+};
+
+// How high the results' puffs rise, by rank
+static fx32 sShotTopYs[] = { FX32_CONST(60), FX32_CONST(30), 0, FX32_CONST(-30) };
 
 static const BGSetup sCtvtGameBG1Setup = {
     0,
@@ -455,112 +533,8 @@ static const BGSetup sCtvtGameBG7Setup = {
     FALSE,
 };
 
-static const G3DSceneActorSetup sResultActors[] = {
-    { 0, 0, 0, 0, sResultAnimations, NELEMS(sResultAnimations) },
-    { 1, 0, 1, 0, sResultAnimations, NELEMS(sResultAnimations) },
-};
-
-// Where the pump's handle is touched: the first four while it is up, the last four while it is down. The first of
-// each, its knob, makes a big pump
-static const TouchRect sPumpRects[] = {
-    { 168, 172, 16, 20 },   { 142, 192, 0, 47 },    { 129, 141, 0, 37 },
-    { 155, 192, 48, 64 },   { 168, 172, 232, 236 }, { 142, 192, 208, 255 },
-    { 155, 192, 192, 207 }, { 129, 144, 217, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
-};
-
-static const G3DSceneResourceSetup sBalloonResources0[] = { { 233, 34, 0 }, { 233, 34, 0 }, { 233, 34, 0 } };
-static const G3DSceneResourceSetup sBalloonResources1[] = { { 233, 35, 0 }, { 233, 35, 0 }, { 233, 35, 0 } };
-static const G3DSceneResourceSetup sBalloonResources2[] = { { 233, 36, 0 }, { 233, 36, 0 }, { 233, 36, 0 } };
-static const G3DSceneResourceSetup sBalloonResources3[] = { { 233, 37, 0 }, { 233, 37, 0 }, { 233, 37, 0 } };
-static const G3DSceneResourceSetup sBalloonPopResources[] = { { 233, 43, 0 }, { 233, 54, 0 }, { 233, 63, 0 } };
-static const G3DSceneResourceSetup sResultResources0[] = {
-    { 233, 30, 0 }, { 233, 30, 0 }, { 233, 44, 0 }, { 233, 55, 0 }
-};
-static const G3DSceneResourceSetup sResultResources1[] = {
-    { 233, 31, 0 }, { 233, 31, 0 }, { 233, 45, 0 }, { 233, 56, 0 }
-};
-
-static const G3DSceneActorSetup sFaceActors[] = {
-    { 0, 0, 0, 0, sFaceAnimations, NELEMS(sFaceAnimations) },
-    { 1, 0, 1, 0, sFaceAnimations, NELEMS(sFaceAnimations) },
-    { 2, 0, 2, 0, sFaceAnimations, NELEMS(sFaceAnimations) },
-};
-
-static const G3DSceneResourceSetup sResultResources2[] = {
-    { 233, 32, 0 }, { 233, 32, 0 }, { 233, 46, 0 }, { 233, 57, 0 }
-};
-
-static const BGSysVRAMConfig sCtvtGameVRAMConfig = {
-    GX_VRAM_BG_128_A, GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
-    GX_VRAM_OBJ_64_E, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
-    GX_VRAM_TEX_0_B,  GX_VRAM_TEXPLTT_0_F,     GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
-};
-
-static const G3DSceneResourceSetup sResultResources3[] = {
-    { 233, 33, 0 }, { 233, 33, 0 }, { 233, 47, 0 }, { 233, 58, 0 }
-};
-
-static const G3DSceneActorSetup sBalloonActors[] = {
-    { 0, 0, 0, 0, NULL, 0 },
-    { 1, 0, 1, 0, NULL, 0 },
-    { 2, 0, 2, 0, NULL, 0 },
-};
-
-static const G3DSceneActorSetup sTargetActors[] = {
-    { 0, 0, 0, 0, sTargetAnimations0, NELEMS(sTargetAnimations0) },
-    { 3, 0, 3, 0, sTargetAnimations3, NELEMS(sTargetAnimations3) },
-    { 6, 0, 6, 0, sTargetAnimations6, NELEMS(sTargetAnimations6) },
-    { 9, 0, 9, 0, sTargetAnimations9, NELEMS(sTargetAnimations9) },
-};
-
-static const G3DSceneResourceSetup sFaceResources0[] = { { 233, 30, 0 }, { 233, 30, 0 }, { 233, 30, 0 },
-                                                         { 233, 44, 0 }, { 233, 55, 0 }, { 233, 48, 0 } };
-static const G3DSceneResourceSetup sFaceResources1[] = { { 233, 31, 0 }, { 233, 31, 0 }, { 233, 31, 0 },
-                                                         { 233, 45, 0 }, { 233, 56, 0 }, { 233, 48, 0 } };
-static const G3DSceneResourceSetup sFaceResources2[] = { { 233, 32, 0 }, { 233, 32, 0 }, { 233, 32, 0 },
-                                                         { 233, 46, 0 }, { 233, 57, 0 }, { 233, 48, 0 } };
-static const G3DSceneResourceSetup sFaceResources3[] = { { 233, 33, 0 }, { 233, 33, 0 }, { 233, 33, 0 },
-                                                         { 233, 47, 0 }, { 233, 58, 0 }, { 233, 48, 0 } };
-
-static const G3DSceneResourceSetup sTargetResources[] = {
-    { 233, 41, 0 }, { 233, 52, 0 }, { 233, 61, 0 }, { 233, 42, 0 }, { 233, 53, 0 }, { 233, 62, 0 },
-    { 233, 39, 0 }, { 233, 50, 0 }, { 233, 59, 0 }, { 233, 40, 0 }, { 233, 51, 0 }, { 233, 60, 0 },
-};
-
-static const G3DSceneSetup sResultScenes[] = {
-    { sResultResources0, NELEMS(sResultResources0), sResultActors, NELEMS(sResultActors) },
-    { sResultResources1, NELEMS(sResultResources1), sResultActors, NELEMS(sResultActors) },
-    { sResultResources2, NELEMS(sResultResources2), sResultActors, NELEMS(sResultActors) },
-    { sResultResources3, NELEMS(sResultResources3), sResultActors, NELEMS(sResultActors) },
-    { sResultPopResources, NELEMS(sResultPopResources), sResultPopActors, NELEMS(sResultPopActors) },
-};
-
-static const G3DSceneSetup sTargetScenes[] = {
-    { sFaceResources0, NELEMS(sFaceResources0), sFaceActors, NELEMS(sFaceActors) },
-    { sFaceResources1, NELEMS(sFaceResources1), sFaceActors, NELEMS(sFaceActors) },
-    { sFaceResources2, NELEMS(sFaceResources2), sFaceActors, NELEMS(sFaceActors) },
-    { sFaceResources3, NELEMS(sFaceResources3), sFaceActors, NELEMS(sFaceActors) },
-    { sTargetResources, NELEMS(sTargetResources), sTargetActors, NELEMS(sTargetActors) },
-};
-
-static const G3DSceneSetup sBalloonScenes[] = {
-    { sBalloonResources0, NELEMS(sBalloonResources0), sBalloonActors, NELEMS(sBalloonActors) },
-    { sBalloonResources1, NELEMS(sBalloonResources1), sBalloonActors, NELEMS(sBalloonActors) },
-    { sBalloonResources2, NELEMS(sBalloonResources2), sBalloonActors, NELEMS(sBalloonActors) },
-    { sBalloonResources3, NELEMS(sBalloonResources3), sBalloonActors, NELEMS(sBalloonActors) },
-    { sBalloonPopResources, NELEMS(sBalloonPopResources), sBalloonPopActors, NELEMS(sBalloonPopActors) },
-};
-
-// The orders that the members' faces come up in, every permutation of the four
-static const u8 sFaceOrders[24][4] = {
-    { 0, 1, 2, 3 }, { 0, 1, 3, 2 }, { 0, 2, 1, 3 }, { 0, 2, 3, 1 }, { 0, 3, 1, 2 }, { 0, 3, 2, 1 },
-    { 1, 0, 2, 3 }, { 1, 0, 3, 2 }, { 1, 2, 0, 3 }, { 1, 2, 3, 0 }, { 1, 3, 0, 2 }, { 1, 3, 2, 0 },
-    { 2, 0, 1, 3 }, { 2, 0, 3, 1 }, { 2, 1, 0, 3 }, { 2, 1, 3, 0 }, { 2, 3, 0, 1 }, { 2, 3, 1, 0 },
-    { 3, 0, 1, 2 }, { 3, 0, 2, 1 }, { 3, 1, 0, 2 }, { 3, 1, 2, 0 }, { 3, 2, 0, 1 }, { 3, 2, 1, 0 },
-};
-
-// How high the results' puffs rise, by rank
-static fx32 sShotTopYs[] = { FX32_CONST(60), FX32_CONST(30), 0, FX32_CONST(-30) };
+// The width and height of the targets that a touch hits, by their depth
+static const u8 sHitSizes[3][2] = { { 15, 23 }, { 18, 28 }, { 26, 39 } };
 
 CtvtGame *CtvtGame_Create(CommTvtWork *sys, HeapID heapId) {
     CtvtGame *game = GFL_HeapAllocate(heapId, sizeof(CtvtGame), TRUE, "ctvt_game.c", 697);
@@ -603,7 +577,8 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
         } else {
             fileId = files[CtvtComm_GetUnk3dc(sys, comm, netId)];
             for (i = 0; i < 3; i++) {
-                game->members[slot].pictures[i] = GFL_ArcSysReadHeapNewLZ(242, i + fileId, FALSE, heapId);
+                game->members[slot].pictures[i] =
+                    GFL_ArcSysReadHeapNewLZ(ARCID_CTVT_GAME_CAM, i + fileId, FALSE, heapId);
             }
         }
         slot++;
@@ -980,6 +955,10 @@ void CtvtGame_SetScores(CtvtGame *game, const CtvtGameData *data) {
 }
 
 void CtvtGame_CountPump(CtvtComm *comm, CtvtGame *game, BOOL big, int netId) {
+    // The pumps that pop a balloon at its last stage, read as an immediate. It is the 30 among the time bar's
+    // constants at the head of the file's .rodata; which function holds it is a guess from the value, since
+    // CtvtGame_InitCommon and CtvtGame_InitResults use 30 too
+    static const u8 popPumps = 30;
     BOOL popped = FALSE;
     u8 amount = 1;
 
@@ -996,7 +975,7 @@ void CtvtGame_CountPump(CtvtComm *comm, CtvtGame *game, BOOL big, int netId) {
             game->stages[netId]++;
             popped = TRUE;
         }
-    } else if (game->pumps[netId] >= 30 && !CtvtGameBalloon_IsBusy(game->balloons[netId])) {
+    } else if (game->pumps[netId] >= popPumps && !CtvtGameBalloon_IsBusy(game->balloons[netId])) {
         game->pumps[netId] = 0;
         game->stages[netId] = 0;
         popped = TRUE;
@@ -1041,7 +1020,7 @@ static void CtvtGame_InitPlay(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
 
     CtvtGame_InitGraphics(game, heapId);
-    arc = GFL_ArcSysCreateFileHandle(233, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME, heapId);
     switch (CtvtGame_GetType(game)) {
     case CTVT_GAME_TYPE_TARGETS:
         CtvtGame_LoadTargetResources(game, heapId, arc);
@@ -1604,17 +1583,17 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 4; i++) {
         CtvtGame_LoadBalloonPictures(game, i, i);
     }
-    GFL_BGSysLoadNCLRDefault(233, 3, 0, 0, 0x60, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 12, 1, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 19, 1, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCLRDefault(233, 7, 4, 0, 0xa0, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 16, 4, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 23, 4, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 17, 7, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 24, 7, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 3, 0, 0, 0x60, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 12, 1, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 19, 1, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 7, 4, 0, 0xa0, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 16, 4, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 23, 4, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 17, 7, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 24, 7, 0, 0, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(7, 0, 0, 32, 24, 3);
     GFL_BGSysLoadScr(7);
-    GFL_BGSysLoadNCLRDefault(233, 2, 4, 0x1a0, 0x20, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 2, 4, 0x1a0, 0x20, heapId);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 0;
@@ -1707,20 +1686,20 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 4; i++) {
         CtvtGame_LoadBalloonPictures(game, i, 0);
     }
-    GFL_BGSysLoadNCLRDefault(233, 4, 0, 0, 0xc0, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 13, 1, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 20, 1, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCLRDefault(233, 7, 4, 0, 0xa0, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 16, 4, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 23, 4, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 17, 7, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 24, 7, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 4, 0, 0, 0xc0, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 13, 1, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 20, 1, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 7, 4, 0, 0xa0, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 16, 4, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 23, 4, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 17, 7, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 24, 7, 0, 0, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(7, 0, 0, 32, 24, 4);
     GFL_BGSysLoadScr(7);
     game->paletteFrame = 0;
-    game->paletteFile = GFL_G2DIOReadNCLR(233, 7, &game->palette, game->heapId);
+    game->paletteFile = GFL_G2DIOReadNCLR(ARCID_CTVT_GAME, 7, &game->palette, game->heapId);
     GFL_BGSysUploadStdPalette(4, (u8 *)game->palette->rawData + 0x20, 0x20, 0);
-    GFL_BGSysLoadNCLRDefault(233, 2, 4, 0x1a0, 0x20, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 2, 4, 0x1a0, 0x20, heapId);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 4;
@@ -1866,9 +1845,9 @@ static void CtvtGame_StartTargets(CommTvtWork *sys, CtvtGame *game) {
         func_0204c124(game->targetSigns[i], TRUE);
         func_0204c56c(game->targetSigns[i]);
     }
-    GFL_BGSysLoadNCLRDefault(233, 5, 0, 0, 0x20, game->heapId);
-    GFL_BGSysLoadNCGRStatic(233, 14, 1, 0, 0, FALSE, game->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 21, 1, 0, 0, FALSE, game->heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 5, 0, 0, 0x20, game->heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 14, 1, 0, 0, FALSE, game->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 21, 1, 0, 0, FALSE, game->heapId);
 }
 
 static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
@@ -1881,9 +1860,9 @@ static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
     func_0204c520(game->pump, TRUE);
     func_0204c124(game->pumpBase, TRUE);
     func_0204c124(game->pumpAir, TRUE);
-    GFL_BGSysLoadNCLRDefault(233, 6, 0, 0, 0xe0, game->heapId);
-    GFL_BGSysLoadNCGRStatic(233, 15, 1, 0, 0, FALSE, game->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 22, 1, 0, 0, FALSE, game->heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 6, 0, 0, 0xe0, game->heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 15, 1, 0, 0, FALSE, game->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 22, 1, 0, 0, FALSE, game->heapId);
 }
 
 static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
@@ -1978,6 +1957,13 @@ static BOOL CtvtGame_UpdateBalloonStart(CommTvtWork *sys, CtvtGame *game) {
 }
 
 static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
+    // Where the pump's handle is touched: the first four while it is up, the last four while it is down. The first of
+    // each, its knob, makes a big pump
+    static const TouchRect sPumpRects[] = {
+        { 168, 172, 16, 20 },   { 142, 192, 0, 47 },    { 129, 141, 0, 37 },
+        { 155, 192, 48, 64 },   { 168, 172, 232, 236 }, { 142, 192, 208, 255 },
+        { 155, 192, 192, 207 }, { 129, 144, 217, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
+    };
     CtvtComm *comm = CommTvt_GetComm(sys);
     u8 selfNetId = func_02042a6c(func_02040440());
     u16 pullSeq;
@@ -2168,10 +2154,10 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     {
         u8 fileId = CtvtGame_GetType(game);
 
-        GFL_BGSysLoadNCLRDefault(233, fileId + 8, 0, 0, 0x80, game->heapId);
+        GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, fileId + 8, 0, 0, 0x80, game->heapId);
     }
-    GFL_BGSysLoadNCGRStatic(233, 18, 1, 0, 0, FALSE, game->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 25, 1, 0, 0, FALSE, game->heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 18, 1, 0, 0, FALSE, game->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 25, 1, 0, 0, FALSE, game->heapId);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 0;
@@ -2616,6 +2602,11 @@ static u32 CtvtGame_Rand(u32 max) {
 }
 
 static void CtvtGame_InitGraphics(CtvtGame *game, HeapID heapId) {
+    static const BGSysVRAMConfig sCtvtGameVRAMConfig = {
+        GX_VRAM_BG_128_A, GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
+        GX_VRAM_OBJ_64_E, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_128_D,       GX_VRAM_SUB_OBJEXTPLTT_NONE,
+        GX_VRAM_TEX_0_B,  GX_VRAM_TEXPLTT_0_G,     GX_OBJVRAMMODE_CHAR_1D_128K, GX_OBJVRAMMODE_CHAR_1D_128K,
+    };
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     GFL_BGSysInitVRAM(GX_VRAM_NONE);
@@ -2757,6 +2748,8 @@ static void CtvtGame_InitBG(const BGSetup *setup, u8 bg, u8 mode) {
 }
 
 static void CtvtGame_Init3D(CtvtGame *game, HeapID heapId) {
+    static const VecFx32 sCtvtGameCameraPosition = { 0, 0, FX32_CONST(250) };
+    static const VecFx32 sCtvtGameCameraTarget = { 0, 0, 0 };
     GFL_G3DSysCreate(FALSE, 1, FALSE, 1, 0, heapId, NULL);
     GFL_G3DSysSetSwapBufferParams(0, 0);
     G3X_SetClearColor(GX_RGB(31, 31, 31), 0, GX_RGB(31, 31, 31), 63, FALSE);
@@ -2912,6 +2905,13 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
 }
 
 static void CtvtGame_DrawTimeBar(CtvtGame *game) {
+    // The bar's frame, read as immediates. A function-local static const is emitted even when its reads fold:
+    // these four and CtvtGame_CountPump's 30 are the bytes b1 1e 0c 01 00 at the head of the file's .rodata, in
+    // the order these declarations sort to. That they are this call's is inferred from its arguments
+    static const u8 barHeight = 12;
+    static const u8 barY = 1;
+    static const u8 barX = 0;
+    static const u8 barWidth = 177;
     GFLBitmap *bitmap = BmpWin_GetBitmap(game->timeWindow);
     u8 width = game->timeLeft * 3;
     u8 color;
@@ -2923,9 +2923,9 @@ static void CtvtGame_DrawTimeBar(CtvtGame *game) {
     } else {
         color = 3;
     }
-    GFL_BitmapFillArea(bitmap, 0, 1, 177, 12, 4);
-    GFL_BitmapFillArea(bitmap, 0, 1, width, 12, color);
-    BmpWin_Transfer(game->timeWindow);
+    GFL_BitmapFillArea(bitmap, barX, barY, barWidth, barHeight, 4);
+    GFL_BitmapFillArea(bitmap, barX, barY, width, barHeight, color);
+    BmpWin_TransferNow(game->timeWindow);
 }
 
 static BOOL CtvtGame_CheckQuit(CommTvtWork *sys, CtvtGame *game) {
@@ -3045,6 +3045,14 @@ static BOOL CtvtGame_AreTargetsGone(CtvtGame *game) {
 }
 
 static u8 CtvtGame_NextFace(CtvtGame *game) {
+    // The orders that the members' faces come up in: every permutation of the four in order, except that the
+    // last two rows are swapped
+    static const u8 sFaceOrders[24][4] = {
+        { 0, 1, 2, 3 }, { 0, 1, 3, 2 }, { 0, 2, 1, 3 }, { 0, 2, 3, 1 }, { 0, 3, 1, 2 }, { 0, 3, 2, 1 },
+        { 1, 0, 2, 3 }, { 1, 0, 3, 2 }, { 1, 2, 0, 3 }, { 1, 2, 3, 0 }, { 1, 3, 0, 2 }, { 1, 3, 2, 0 },
+        { 2, 0, 1, 3 }, { 2, 0, 3, 1 }, { 2, 1, 0, 3 }, { 2, 1, 3, 0 }, { 2, 3, 0, 1 }, { 2, 3, 1, 0 },
+        { 3, 0, 1, 2 }, { 3, 0, 2, 1 }, { 3, 1, 0, 2 }, { 3, 1, 2, 0 }, { 3, 2, 1, 0 }, { 3, 2, 0, 1 },
+    };
     u8 scene = sFaceOrders[game->faceOrder][game->faceOrderPos];
 
     game->faceOrderPos++;
@@ -3097,8 +3105,8 @@ static BOOL CtvtGame_FindTouchedTarget(CtvtGame *game, u16 frame, int x, int y, 
     u8 bestDepth = 0;
     u8 i;
     BOOL inside;
-    u8 width;
-    u8 height;
+    int width;
+    int height;
     int screenX;
     int screenY;
     int dx;

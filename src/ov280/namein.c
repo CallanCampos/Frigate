@@ -52,11 +52,6 @@
 // icon of whatever is being named. Overlay 280, with the graphics of namein_graphic.c and the tables of namein_data.c.
 // The ROM gives this file no name; "namein" follows its siblings. The names are ours
 
-// The archive of the screen's graphics, and two archives of the graphics of some of the icons
-#define ARCID_NAMEIN_GRAPHIC 0x77
-#define ARCID_NAMEIN_ICON_TYPE2 0x1f
-#define ARCID_NAMEIN_ICON_TYPE6 0x53
-
 // How many cell actors the screen has: the name field's, the key highlight's and the selectors'
 #define OBJ_COUNT 24
 // The cell actors of the name field, one for each possible character
@@ -2735,7 +2730,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
         sex = species;
         break;
     case ICON_TYPE_FRIEND:
-        arcId = ARCID_NAMEIN_ICON_TYPE2;
+        arcId = ARCID_WIFI_UNIONCHAR;
         paletteFile = 0;
         paletteStart = sIconPalettes[species];
         charsFile = species + 49;
@@ -2763,7 +2758,7 @@ static void NameEntryIcon_Init(NameEntryIcon *icon, u32 type, u32 species, u32 f
         ownPalette = TRUE;
         break;
     case ICON_TYPE_AVENUE:
-        arcId = ARCID_NAMEIN_ICON_TYPE6;
+        arcId = ARCID_FIELD_PLACE_NAME;
         paletteFile = 14;
         charsFile = 13;
         cellFile = 12;

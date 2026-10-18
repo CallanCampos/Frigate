@@ -56,8 +56,6 @@
 #define COMM_TVT_PALETTE_FRAMES 10
 #define COMM_TVT_OBJ_RESOURCES 11
 
-#define ARC_COMM_TVT 170
-
 enum {
     COMM_TVT_START_WAIT,
     COMM_TVT_START_CALL,
@@ -555,7 +553,7 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
     NNSG2dPaletteData *palette;
     void *file;
 
-    sys->arc = GFL_ArcSysCreateFileHandle(ARC_COMM_TVT, sys->heapId);
+    sys->arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, sys->heapId);
     if (getTrainerGender(player) == GENDER_MALE) {
         GFL_G2DIOLoadArcNCLRDefault(sys->arc, 7, 4, 0, 0xc0, sys->heapId);
     } else {

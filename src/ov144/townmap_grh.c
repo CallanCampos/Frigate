@@ -17,8 +17,6 @@
 // theirs and as the first use of its name shows; the empty VBlank task before it is townmap.c's, which adds it with
 // its own work
 
-#define ARCID_TOWNMAP_GRA 84
-
 // The resources of the map's actors
 enum { TOWNMAP_RES_CHARS, TOWNMAP_RES_CELL_ANIMS, TOWNMAP_RES_PLTT, TOWNMAP_RES_COUNT };
 

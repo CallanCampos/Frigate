@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/wf2dmap/wifi_2dchar.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"

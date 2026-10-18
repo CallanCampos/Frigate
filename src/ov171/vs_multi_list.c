@@ -380,7 +380,7 @@ static void VsMultiList_FreeBG(void) {
 }
 
 static void VsMultiList_LoadBG(VsMultiListWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(99, BG_HEAP);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_PLIST, BG_HEAP);
 
     GFL_BGSysLoadArcNCGRStatic(arc, 18, 2, 0, 0, TRUE, BG_HEAP);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 0, 2, 0, 0, TRUE, BG_HEAP);
