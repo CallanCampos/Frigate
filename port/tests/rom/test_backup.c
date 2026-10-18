@@ -4,8 +4,9 @@
 // erases on the command block, memory the ARM7 can't reach, and the save file: written whole and atomically, once a
 // frame passes without a write or every 60 frames of writes, read back, and never overwritten when it isn't an image;
 // a write that fails is reported once and tried again every 60 frames. Then other programs' files: a save as melonDS
-// writes it goes through the card layer and back to the file byte for byte, another chip's save and DeSmuME's .dsv are
-// refused with what they are, and a melonDS save under the ROM's name is pointed out. Needs no ROM.
+// writes it goes through the card layer and back to the file byte for byte; another chip's save, DeSmuME's .dsv, a
+// padded image and a directory are refused with what they are; a melonDS save under the ROM's name is pointed out; and
+// a save path that is a link to another program's save stays a link while that save gets the writes. Needs no ROM.
 //
 //   port_card_backup_tests NAME | all
 #include "hal/card/card_internal.h"
@@ -563,9 +564,10 @@ static int TestRoundTrip(void) {
     return 0;
 }
 
-// A file of another chip's size or DeSmuME's .dsv is never overwritten: the program stops (status 65) with a message
-// that says what the file seems to be, which the tests' registrations expect
-static int RefuseFile(long size, u8 (*byte)(long offset), const char *end) {
+// A file of another chip's size, DeSmuME's .dsv or a padded image is never overwritten: the program stops (status 65)
+// with a message that says what the file seems to be, which the tests' registrations expect. end, of endSize bytes,
+// goes after the file's size bytes
+static int RefuseFile(long size, u8 (*byte)(long offset), const u8 *end, size_t endSize) {
     char dir[600];
     FILE *file;
 
@@ -577,7 +579,7 @@ static int RefuseFile(long size, u8 (*byte)(long offset), const char *end) {
         file = fopen(sSavePath, "ab");
         Check(file != NULL, "the file's end");
         if (file != NULL) {
-            fputs(end, file);
+            fwrite(end, 1, endSize, file);
             fclose(file);
         }
     }
@@ -589,26 +591,82 @@ static int RefuseFile(long size, u8 (*byte)(long offset), const char *end) {
 
 // A save of a 512 Kbit EEPROM, 64 KiB
 static int TestRefuseEeprom(void) {
-    return RefuseFile(0x10000, ZeroByte, NULL);
+    return RefuseFile(0x10000, ZeroByte, NULL, 0);
 }
 
-// DeSmuME's .dsv: the chip, then DeSmuME's footer, which ends with its mark (only the mark matters here)
+static void PutWord(u8 *at, u32 value) {
+    at[0] = (u8)value;
+    at[1] = (u8)(value >> 8);
+    at[2] = (u8)(value >> 16);
+    at[3] = (u8)(value >> 24);
+}
+
+// DeSmuME's .dsv of this chip: the chip's 524,288 bytes, then the footer as DeSmuME's src/mc.cpp writes it
+// (BackupDevice::ensure): its text, six 32-bit words (the size written, the padded size, the save type, the address
+// size, the memory's size, the footer's version 0) and the cookie
 static int TestRefuseDsv(void) {
-    return RefuseFile(PORT_CARD_BACKUP_SIZE, SaveByte, "|<--Snip above here: a footer of the test's|-DESMUME SAVE-|");
+    static const char text[] = "|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:";
+    static const char cookie[] = "|-DESMUME SAVE-|";
+    static const u32 words[6] = { PORT_CARD_BACKUP_SIZE, PORT_CARD_BACKUP_SIZE, 0, 3, PORT_CARD_BACKUP_SIZE, 0 };
+    u8 footer[sizeof(text) - 1 + sizeof(words) + sizeof(cookie) - 1];
+    size_t i;
+
+    memcpy(footer, text, sizeof(text) - 1);
+    for (i = 0; i < 6; i++) {
+        PutWord(footer + sizeof(text) - 1 + 4 * i, words[i]);
+    }
+    memcpy(footer + sizeof(text) - 1 + sizeof(words), cookie, sizeof(cookie) - 1);
+    return RefuseFile(PORT_CARD_BACKUP_SIZE, SaveByte, footer, sizeof(footer));
+}
+
+// A save of this chip padded with 0xff to 1 MiB, the size of an 8 Mbit flash's save, as a tool that pads saves leaves
+// it: refused, with how to make it the chip's image
+static int TestRefusePadded(void) {
+    static u8 padding[PORT_CARD_BACKUP_SIZE];
+
+    memset(padding, 0xff, sizeof(padding));
+    return RefuseFile(PORT_CARD_BACKUP_SIZE, SaveByte, padding, sizeof(padding));
+}
+
+// The same size with data after the chip's 524,288 bytes: only the size is named, as another chip's
+static int TestRefuseLarger(void) {
+    static u8 rest[PORT_CARD_BACKUP_SIZE];
+
+    memset(rest, 0xff, sizeof(rest));
+    rest[sizeof(rest) - 1] = 0;
+    return RefuseFile(PORT_CARD_BACKUP_SIZE, SaveByte, rest, sizeof(rest));
+}
+
+// A directory at the save path, which some hosts open as a file with a size of its own
+static int TestRefuseDirectory(void) {
+    char dir[600];
+
+    Start("refuse_directory");
+    atexit(Finish);
+    MakeSaveDirectory(dir, sizeof(dir));
+    mkdir(sSavePath, 0755);
+    port_card_set_save_path(sSavePath);
+    port_card_backup_image();
+    printf("  the program went on\n");
+    return 1;
 }
 
 // Without the game's file, a .sav file of the image's size under another name in the save directory, such as a
-// melonDS save named after the ROM, is named with how to play it; the game starts with a blank backup and the files
-// stay as they were. Files of the port's own naming (the other version's game code), of other sizes or other
-// extensions aren't named
+// melonDS save named after the ROM (a title, or a release number), is named with how to play it; the game starts with
+// a blank backup and the files stay as they were. Files named as the port names this game's saves (the other version's
+// game code, another region's), of other sizes or other extensions aren't named
+#define OTHER_FILES 6
 static int TestOtherSaves(void) {
     char other[16];
-    const char *names[4] = { "Pokemon Black 2 (USA).SAV", other, "small.sav", "image.bin" };
+    const char *names[OTHER_FILES] = {
+        "Pokemon Black 2 (USA).SAV", "6149.sav", other, "IREJ.sav", "small.sav", "image.bin"
+    };
+    const int expected[OTHER_FILES] = { 1, 1, 0, 0, 0, 0 };
     char dir[600];
     char path[700];
     char log[700];
     char line[2048];
-    int named[4] = { 0 };
+    int named[OTHER_FILES] = { 0 };
     int lines = 0;
     int saved;
     u8 *image;
@@ -618,9 +676,9 @@ static int TestOtherSaves(void) {
     snprintf(other, sizeof(other), "%s.sav", strcmp(port_rom_manifest_game_code, "IREO") == 0 ? "IRDO" : "IREO");
     Start("other_saves");
     MakeSaveDirectory(dir, sizeof(dir));
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < OTHER_FILES; i++) {
         snprintf(path, sizeof(path), "%s/%s", dir, names[i]);
-        WriteFile(path, i == 2 ? 100 : PORT_CARD_BACKUP_SIZE, SaveByte);
+        WriteFile(path, i == 4 ? 100 : PORT_CARD_BACKUP_SIZE, SaveByte);
     }
     snprintf(log, sizeof(log), "%s.log", dir);
     fflush(stderr);
@@ -635,7 +693,7 @@ static int TestOtherSaves(void) {
     file = fopen(log, "r");
     while (file != NULL && fgets(line, sizeof(line), file) != NULL) {
         lines++;
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < OTHER_FILES; i++) {
             named[i] += strstr(line, names[i]) != NULL;
         }
     }
@@ -643,17 +701,105 @@ static int TestOtherSaves(void) {
         fclose(file);
     }
     remove(log);
-    Check(lines == 1 && named[0] == 1, "the melonDS save is named, once");
-    Check(named[1] == 0 && named[2] == 0 && named[3] == 0, "and no other file");
+    Check(lines == 2, "two files are named");
+    for (i = 0; i < OTHER_FILES; i++) {
+        if (named[i] != expected[i]) {
+            printf("  %s: named %d times\n", names[i], named[i]);
+        }
+        Check(named[i] == expected[i], "each of the melonDS saves is named once, and no other file");
+    }
     for (i = 0; i < PORT_CARD_BACKUP_SIZE && image[i] == 0xff; i++) {
     }
     Check(i == PORT_CARD_BACKUP_SIZE, "the game starts with a blank backup");
     Check(FileSize(sSavePath) < 0, "and nothing is written for it");
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < OTHER_FILES; i++) {
         snprintf(path, sizeof(path), "%s/%s", dir, names[i]);
-        Check(FileSize(path) == (i == 2 ? 100 : PORT_CARD_BACKUP_SIZE), "the files stay as they were");
+        Check(FileSize(path) == (i == 4 ? 100 : PORT_CARD_BACKUP_SIZE), "the files stay as they were");
         remove(path);
     }
+    Finish();
+    return 0;
+}
+
+// A page write of the pattern of seed at address, then the frames that write the image to its file
+static void WritePage(u32 address, u8 seed) {
+    u32 i;
+
+    for (i = 0; i < PORT_CARD_PAGE_SIZE; i++) {
+        sPageBuffer[i] = (u8)(seed + i);
+    }
+    sArg.src = PageAddress();
+    sArg.dst = address;
+    sArg.len = PORT_CARD_PAGE_SIZE;
+    Check(Request(CARD_REQ_WRITE_BACKUP) == CARD_RESULT_SUCCESS, "a page write");
+    sFrameHook();
+    sFrameHook();
+}
+
+// Whether a file holds the pattern of seed at address and nothing else but erased flash or SaveByte's data
+static BOOL HoldsPage(const char *path, u32 address, u8 seed, BOOL saveData) {
+    u8 *contents = ReadFile(path, PORT_CARD_BACKUP_SIZE);
+    BOOL ok = contents != NULL;
+    u32 i;
+
+    for (i = 0; ok && i < PORT_CARD_BACKUP_SIZE; i++) {
+        u8 wanted = i >= address && i < address + PORT_CARD_PAGE_SIZE ? (u8)(seed + i - address)
+                    : saveData                                        ? SaveByte(i)
+                                                                      : 0xff;
+        ok = contents[i] == wanted;
+    }
+    free(contents);
+    return ok;
+}
+
+static BOOL IsLink(const char *path) {
+    struct stat info;
+
+    return lstat(path, &info) == 0 && S_ISLNK(info.st_mode);
+}
+
+// A save path that is a symbolic link to another program's save (melonDS's .sav, linked to keep one save for both
+// programs): the game reads that file, its writes reach it, and the link stays a link with no temporary file left
+// beside either. A relative link to a file not made yet leads to where that file is made
+static int TestLinkedSave(void) {
+    char dir[600];
+    char other[600];
+    char target[700];
+    char temporary[720];
+    char relative[64];
+
+    Start("linked_save");
+    MakeSaveDirectory(dir, sizeof(dir));
+    snprintf(other, sizeof(other), "%s/../melonds", dir);
+    mkdir(other, 0755);
+    snprintf(target, sizeof(target), "%s/Pokemon Black 2.sav", other);
+    WriteFile(target, PORT_CARD_BACKUP_SIZE, SaveByte);
+    Check(symlink(target, sSavePath) == 0, "the save path links to melonDS's save");
+    port_card_set_save_path(sSavePath);
+    IdentifyFlash();
+    Check(port_card_backup_image()[0x100] == SaveByte(0x100), "the game reads the linked file");
+    WritePage(0x26000, 0x40);
+    Check(IsLink(sSavePath), "the save path is still a link");
+    Check(HoldsPage(target, 0x26000, 0x40, TRUE), "the linked file got the write, and keeps every other byte");
+    snprintf(temporary, sizeof(temporary), "%s.tmp", target);
+    Check(FileSize(temporary) < 0, "no temporary file beside it");
+    snprintf(temporary, sizeof(temporary), "%s.tmp", sSavePath);
+    Check(FileSize(temporary) < 0, "nor beside the link");
+    remove(sSavePath);
+    remove(target);
+
+    // A relative link to a file that doesn't exist yet: the first write makes it there
+    snprintf(relative, sizeof(relative), "../melonds/new.sav");
+    snprintf(target, sizeof(target), "%s/new.sav", other);
+    Check(symlink(relative, sSavePath) == 0, "a relative link to a file not made yet");
+    port_card_set_save_path(sSavePath);
+    IdentifyFlash();
+    WritePage(0x100, 0x90);
+    Check(IsLink(sSavePath), "the link stays");
+    Check(HoldsPage(target, 0x100, 0x90, FALSE), "the write made the file it links to");
+    remove(sSavePath);
+    remove(target);
+    rmdir(other);
     Finish();
     return 0;
 }
@@ -694,15 +840,20 @@ static const Test sTests[] = {
     { "write_failure", TestWriteFailure },
     { "round_trip", TestRoundTrip },
     { "other_saves", TestOtherSaves },
+    { "linked_save", TestLinkedSave },
     { "save_path", TestSavePath },
     { "bad_file", TestBadFile },
     { "refuse_eeprom", TestRefuseEeprom },
     { "refuse_dsv", TestRefuseDsv },
+    { "refuse_padded", TestRefusePadded },
+    { "refuse_larger", TestRefuseLarger },
+    { "refuse_directory", TestRefuseDirectory },
 };
 
 // The tests that end the program, which "all" leaves out
 static int IsStopping(int (*run)(void)) {
-    return run == TestBadFile || run == TestRefuseEeprom || run == TestRefuseDsv;
+    return run == TestBadFile || run == TestRefuseEeprom || run == TestRefuseDsv || run == TestRefusePadded ||
+           run == TestRefuseLarger || run == TestRefuseDirectory;
 }
 
 int main(int argc, char **argv) {

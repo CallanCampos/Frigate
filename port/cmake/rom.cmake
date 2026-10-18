@@ -143,21 +143,36 @@ add_executable(port_card_backup_tests
 target_link_libraries(port_card_backup_tests PRIVATE port_decomp_env)
 target_include_directories(port_card_backup_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_card_backup_tests PRIVATE ${port_rom_test_options})
-foreach(test init identify flash unreachable save_file write_failure round_trip other_saves save_path)
+foreach(test init identify flash unreachable save_file write_failure round_trip other_saves linked_save save_path)
     add_test(NAME card_backup_${test} COMMAND port_card_backup_tests ${test})
     set_tests_properties(card_backup_${test} PROPERTIES TIMEOUT 60)
 endforeach()
-# The files the program refuses, each in a process of its own, since the program stops: with what the file seems to be
+# The files the program refuses, each in a process of its own, since the program stops: with what the file seems to be.
+# A size only suggests another chip's save, so the message says it has that size
 add_test(NAME card_backup_bad_file COMMAND port_card_backup_tests bad_file)
 set_tests_properties(card_backup_bad_file PROPERTIES TIMEOUT 60
     PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it is 10 bytes;" FAIL_REGULAR_EXPRESSION "went on")
 add_test(NAME card_backup_refuse_eeprom COMMAND port_card_backup_tests refuse_eeprom)
 set_tests_properties(card_backup_refuse_eeprom PROPERTIES TIMEOUT 60
-    PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it is 65536 bytes, the save of a 512 Kbit EEPROM"
+    PASS_REGULAR_EXPRESSION
+        "isn't a backup image of 524288 bytes.*: it is 65536 bytes, the size of the save of a 512 Kbit EEPROM, another"
     FAIL_REGULAR_EXPRESSION "went on")
 add_test(NAME card_backup_refuse_dsv COMMAND port_card_backup_tests refuse_dsv)
 set_tests_properties(card_backup_refuse_dsv PROPERTIES TIMEOUT 60
     PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it ends with DeSmuME's footer"
+    FAIL_REGULAR_EXPRESSION "went on")
+add_test(NAME card_backup_refuse_padded COMMAND port_card_backup_tests refuse_padded)
+set_tests_properties(card_backup_refuse_padded PROPERTIES TIMEOUT 60
+    PASS_REGULAR_EXPRESSION
+        "it is 1048576 bytes, .*8 Mbit flash, but every byte after the first 524288 is 0xff.*keep only its first 524288"
+    FAIL_REGULAR_EXPRESSION "went on")
+add_test(NAME card_backup_refuse_larger COMMAND port_card_backup_tests refuse_larger)
+set_tests_properties(card_backup_refuse_larger PROPERTIES TIMEOUT 60
+    PASS_REGULAR_EXPRESSION "it is 1048576 bytes, the size of the save of an 8 Mbit flash, another game's chip;"
+    FAIL_REGULAR_EXPRESSION "went on|padded")
+add_test(NAME card_backup_refuse_directory COMMAND port_card_backup_tests refuse_directory)
+set_tests_properties(card_backup_refuse_directory PROPERTIES TIMEOUT 60
+    PASS_REGULAR_EXPRESSION "isn't a backup image of 524288 bytes.*: it is a directory;"
     FAIL_REGULAR_EXPRESSION "went on")
 
 # The file system, the card's ROM reads, the overlays and the backup as the game links them: each scenario on the whole

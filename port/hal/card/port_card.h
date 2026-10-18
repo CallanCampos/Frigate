@@ -13,8 +13,11 @@
 // SaveManager), so a save moves either way by copying the file. Only the names differ: melonDS names a save after the
 // ROM's file, next to it or in its save folder, where the port names it after the game code. A melonDS save of another
 // size is padded with 0xff or cut by melonDS without a word; the port refuses it and never overwrites it, saying what
-// it seems to be (another chip's save by its size, DeSmuME's .dsv by its footer). When the game's file isn't there, a
-// .sav file of the image's size under another name in the same directory is named, with how to play it.
+// it seems to be: a size another chip's saves have, DeSmuME's .dsv by its footer, this chip's image padded with 0xff
+// (with how to cut it), or a directory. When the game's file isn't there, a .sav file of the image's size under another
+// name in the same directory is named, with how to play it, unless it is named as the port names the saves of this
+// game's other versions. The save path may be a symbolic link, to melonDS's .sav to keep one save for both programs:
+// the image is written to the file it links to, and the link stays (not on Windows, where a link is replaced).
 // port/tools/oracle/README.md, "Saves", has the evidence.
 //
 // The save directory: --save-dir PATH, else the user's: ~/Library/Application Support/pokebw2-native on macOS,

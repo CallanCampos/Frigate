@@ -34,6 +34,7 @@
 #include <windows.h>
 #else
 #include <dirent.h>
+#include <limits.h>
 #include <unistd.h>
 #endif
 
@@ -152,17 +153,55 @@ static const struct {
     { 0x800000, "a 64 Mbit NAND" }, { 0x1000000, "a 128 Mbit NAND" }, { 0x4000000, "a 512 Mbit NAND" },
 };
 
-// The last bytes of DeSmuME's save files (.dsv), which put DeSmuME's own data after the chip's image
+// The cookie that ends DeSmuME's save files (.dsv), which put DeSmuME's own footer after the chip's image (padded to
+// a size of DeSmuME's choosing): the text "|<--Snip above here to create a raw sav by excluding this DeSmuME savedata
+// footer:", six 32-bit words (the size written, the padded size, the save type, the address size, the memory's size and
+// the footer's version, 0), then this cookie, as DeSmuME's src/mc.cpp writes it (BackupDevice::ensure,
+// kDesmumeSaveCookie) and checks it (BackupDevice::readFooter)
 #define DESMUME_FOOTER_END "|-DESMUME SAVE-|"
 
-// Stops the program over a save file that isn't an image of the chip, saying what it seems to be: the file is never
-// overwritten. size is the file's, or -1 when it couldn't be measured
-static void RefuseFile(const char *path, FILE *file, long size) {
-    char end[sizeof(DESMUME_FOOTER_END) - 1];
-    char reason[160];
+// Stops the program over a save path that isn't an image of the chip, with why: the file is never overwritten
+static void Refuse(const char *path, const char *reason) {
+    fprintf(stderr,
+            "port: card: %s isn't a backup image of %u bytes (the 4 Mbit flash of %s, as melonDS's .sav of it is): "
+            "%s; move it away, or give another save directory with --save-dir\n",
+            path, (unsigned)PORT_CARD_BACKUP_SIZE, port_rom_manifest_title, reason);
+    exit(PORT_CARD_EXIT_STATUS);
+}
+
+// Whether every byte of the file from offset on reads 0xff, as erased flash and melonDS's padding do
+static BOOL IsErasedFrom(FILE *file, long offset) {
+    uint8_t chunk[4096];
+    size_t read;
     size_t i;
 
-    snprintf(reason, sizeof(reason), "it is %ld bytes", size);
+    if (fseek(file, offset, SEEK_SET) != 0) {
+        return FALSE;
+    }
+    while ((read = fread(chunk, 1, sizeof(chunk), file)) != 0) {
+        for (i = 0; i < read; i++) {
+            if (chunk[i] != 0xff) {
+                return FALSE;
+            }
+        }
+    }
+    return ferror(file) == 0;
+}
+
+// Stops the program over a save file that isn't an image of the chip, saying what it seems to be. The size only
+// suggests it: a size another chip's saves have, the end of DeSmuME's .dsv, or this chip's image with 0xff after it,
+// as a tool that pads saves leaves it. size is the file's, or -1 when it couldn't be measured
+static void RefuseFile(const char *path, FILE *file, long size) {
+    char end[sizeof(DESMUME_FOOTER_END) - 1];
+    char reason[400];
+    const char *chip = NULL;
+    size_t i;
+
+    for (i = 0; i < sizeof(sOtherChips) / sizeof(sOtherChips[0]); i++) {
+        if (size == sOtherChips[i].size) {
+            chip = sOtherChips[i].chip;
+        }
+    }
     if (size < 0) {
         snprintf(reason, sizeof(reason), "its size can't be read");
     } else if (size == PORT_CARD_BACKUP_SIZE) {
@@ -173,19 +212,20 @@ static void RefuseFile(const char *path, FILE *file, long size) {
                fread(end, 1, sizeof(end), file) == sizeof(end) && memcmp(end, DESMUME_FOOTER_END, sizeof(end)) == 0) {
         snprintf(reason, sizeof(reason),
                  "it ends with DeSmuME's footer, so it is a .dsv, the image with DeSmuME's own data after it");
+    } else if (size > PORT_CARD_BACKUP_SIZE && IsErasedFrom(file, PORT_CARD_BACKUP_SIZE)) {
+        snprintf(reason, sizeof(reason),
+                 "it is %ld bytes%s%s, but every byte after the first %u is 0xff, as in an image of this chip padded "
+                 "to that size: if it is one, keep only its first %u bytes",
+                 size, chip != NULL ? ", the size of the save of " : "", chip != NULL ? chip : "",
+                 (unsigned)PORT_CARD_BACKUP_SIZE, (unsigned)PORT_CARD_BACKUP_SIZE);
+    } else if (chip != NULL) {
+        snprintf(reason, sizeof(reason), "it is %ld bytes, the size of the save of %s, another game's chip", size,
+                 chip);
+    } else {
+        snprintf(reason, sizeof(reason), "it is %ld bytes", size);
     }
-    for (i = 0; i < sizeof(sOtherChips) / sizeof(sOtherChips[0]); i++) {
-        if (size == sOtherChips[i].size) {
-            snprintf(reason, sizeof(reason), "it is %ld bytes, the save of %s, another game's chip", size,
-                     sOtherChips[i].chip);
-        }
-    }
-    fprintf(stderr,
-            "port: card: %s isn't a backup image of %u bytes (the 4 Mbit flash of %s, as melonDS's .sav of it is): "
-            "%s; move it away, or give another save directory with --save-dir\n",
-            path, (unsigned)PORT_CARD_BACKUP_SIZE, port_rom_manifest_title, reason);
     fclose(file);
-    exit(PORT_CARD_EXIT_STATUS);
+    Refuse(path, reason);
 }
 
 // Whether name ends with .sav, in any case
@@ -206,16 +246,12 @@ static BOOL HasSaveExtension(const char *name) {
     return TRUE;
 }
 
-// Whether name is a save as the port names its own: a game code of four capital letters and digits, and .sav
+// Whether name is a save as the port names those of this game's versions: the ROM's game code, which is IRE (Black 2)
+// or IRD (White 2) and the region's letter, and .sav. Another version's save is left alone, where any other name of a
+// .sav could be a melonDS save, which takes the ROM file's name, whatever it is (6149.sav, after a release number)
 static BOOL IsPortSaveName(const char *name) {
-    size_t i;
-
-    for (i = 0; i < 4; i++) {
-        if (!((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= '0' && name[i] <= '9'))) {
-            return FALSE;
-        }
-    }
-    return strlen(name) == 8 && HasSaveExtension(name);
+    return strlen(name) == 8 && name[0] == 'I' && name[1] == 'R' && (name[2] == 'E' || name[2] == 'D') &&
+           name[3] >= 'A' && name[3] <= 'Z' && HasSaveExtension(name);
 }
 
 // A file of the save directory that could be this game's save under another name: a .sav file of the image's size.
@@ -232,8 +268,8 @@ static void HintOtherSave(const char *dir, const char *name, int64_t size) {
 }
 
 // When the save file isn't there, the saves of the same size in its directory that the game won't see by their
-// names: a melonDS .sav copied into the save directory keeps the ROM file's name. Files named as the port names its
-// own (a game code, IREO.sav or IRDO.sav) are other games' or the other version's, and are left alone
+// names: a melonDS .sav copied into the save directory keeps the ROM file's name. Files named as the port names the
+// saves of this game's versions (IRDO.sav beside Black 2's IREO.sav) are the other versions', and are left alone
 static void HintOtherSaves(const char *path) {
     char dir[PATH_LENGTH];
     char *separator;
@@ -295,6 +331,7 @@ static void HintOtherSaves(const char *path) {
 uint8_t *port_card_backup_image(void) {
     const char *path;
     FILE *file;
+    struct stat info;
 
     if (sCard.image != NULL) {
         return sCard.image;
@@ -306,6 +343,10 @@ uint8_t *port_card_backup_image(void) {
         exit(PORT_CARD_EXIT_STATUS);
     }
     memset(sCard.image, 0xff, PORT_CARD_BACKUP_SIZE);
+    // A directory opens as a file on some hosts, with the directory's own size
+    if (stat(path, &info) == 0 && (info.st_mode & S_IFMT) == S_IFDIR) {
+        Refuse(path, "it is a directory");
+    }
     file = fopen(path, "rb");
     if (file != NULL) {
         long size = -1;
@@ -331,14 +372,50 @@ static int LastError(void) {
     return errno != 0 ? errno : EIO;
 }
 
+// The file that a write of the image replaces: the save path, or, when it is a symbolic link, the file it links to, so
+// that the link stays a link and its file gets the game's writes (a player may link the port's save to melonDS's .sav
+// to keep one save for both). A link to a file that doesn't exist yet leads to where that file would be. On Windows the
+// path is the file: a link there is replaced, as by any file renamed over it
+static void WriteTarget(const char *path, char *out, size_t size) {
+#ifndef _WIN32
+    struct stat info;
+    char resolved[PATH_MAX];
+    char link[PATH_LENGTH];
+    const char *separator;
+    ssize_t length;
+
+    if (lstat(path, &info) == 0 && S_ISLNK(info.st_mode)) {
+        if (realpath(path, resolved) != NULL) {
+            snprintf(out, size, "%s", resolved);
+            return;
+        }
+        length = readlink(path, link, sizeof(link) - 1);
+        if (length > 0) {
+            link[length] = '\0';
+            separator = strrchr(path, '/');
+            if (link[0] == '/' || separator == NULL) {
+                snprintf(out, size, "%s", link);
+            } else {
+                // A relative link is relative to the link's own directory
+                snprintf(out, size, "%.*s/%s", (int)(separator - path), path, link);
+            }
+            return;
+        }
+    }
+#endif
+    snprintf(out, size, "%s", path);
+}
+
 // Writes the image to a temporary file beside its own, then renames it over the old one, so that the file is always
 // one whole image or the other. Returns 0, or the error of the first call that failed, taken before the temporary
 // file's removal can change errno
-static int WriteImage(const char *path) {
+static int WriteImage(const char *savePath) {
+    char path[PATH_LENGTH];
     char temporary[PATH_LENGTH + 8];
     FILE *file;
     int error = 0;
 
+    WriteTarget(savePath, path, sizeof(path));
     if (snprintf(temporary, sizeof(temporary), "%s.tmp", path) >= (int)sizeof(temporary)) {
         return ENAMETOOLONG;
     }
