@@ -26,6 +26,35 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: upstream's matched libfx merged, and the divider's results read through the HAL however cp.h names them
+
+- **Upstream:** `026351ef7` (40 commits after `6ca74421c`: overlay 11's GameSpy GP, overlay 36's script commands, the
+  last libfx and libmath functions matched, NitroSystem G3D/G2D readers), merged by `4fee9b918` after `6ca74421c`'s
+  `4e9685c0e`.
+- **Port:** `PORT_SHA`, on `port-integrate` after the rename's commits (`c1ae95c3e`, `7a7bedf8f`), the hash checks' longer
+  limit (`e67b54f28`), the merges and `3338cab12` (libfx's ledger).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `check_mwcc_neutral.py --base 026351ef7` on the four
+  libfx files: 8 of 8 preprocess identically.
+- **Host build:** arm64 macOS, `build/port` (Ninja, no build type, as `sync_upstream.sh` makes it), rebuilt.
+- **Tests:** `fx_libfx` with four new checks of `VEC_Normalize` and `VEC_Fx16Normalize` through the translated headers,
+  worked out by hand from GBATEK's divider and square root (all four fail without the fix: zeros); `replay_new_game`,
+  `oracle_title_hashes` and `fx_libfx` pass; the asm oracle's `test_fx_decomp.py` passes on upstream's new libfx
+  (88,500 cases). The full ctest runs at publishing (`sync_upstream.sh`).
+- **Work done:**
+  - **The merge's conflict:** upstream's `MTX_Concat33`, `MTX_Concat43` and `MTX_Concat44` now load each row of `a`
+    before storing it, as the ROM does, so the port's blocks that made a product into `a` in `tmp` are gone;
+    `MTX_MultVec43`'s copy of an in-place vector stays (game-changes.md, decomp-findings.md).
+  - **The regression it exposed:** after the merge the intro drew no MCSS sprite (Professor Juniper, Minccino;
+    `replay_new_game` showed 4 of 9 screens). Bisected by file against a pre-merge binary to upstream's `VEC_Normalize`
+    and cp.h's new inlines, which read the divider's and square root unit's results through `REG_DIV_RESULT_ADDR` and
+    `REG_SQRT_RESULT_ADDR`. `port/tools/gen_host_tree.py` translated those constants as plain memory; it now routes an
+    address constant of a register that acts to the register's function, as it does the register macros, keeping write
+    streams (`REG_GXFIFO_ADDR`) plain addresses. The DWC voice chat's `CP_GetDivResult32` read the same constant.
+  - **Timeouts under load:** the sequences' hash checks get 1800 s (`e67b54f28`); lessons.md has the three lessons.
+- **Next:** as the last entries: phase 5's tracks (sanitizers, the macOS distribution build, Windows) and the
+  Pokédex's launch check (branch `port-pokedex`) merge next.
+- **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld, and the launcher's retirement (ADR 0012).
+
 ## 2026-10-18: the repository renamed CallanCampos/Frigate: the sync's guards, the scripts and the documents
 
 - **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.

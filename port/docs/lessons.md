@@ -3,6 +3,21 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: upstream's matched libfx, and the divider read by its address constant
+
+- **A register that acts when read has to act however the code names it.** The host tree routed the divider's and
+  square root unit's results to `port/hal/hw` through cp.h's register macros (`reg_CP_DIV_RESULT`), but cp.h's address
+  constants (`REG_DIV_RESULT_ADDR`) became plain memory. Nothing read through them until upstream's matched
+  `VEC_Normalize` used new inlines that do: it read zeros, and every MCSS sprite of the intro (Professor Juniper,
+  Minccino) vanished. The generator now routes an address constant like a register macro, write streams aside, and
+  `fx_libfx` normalizes through the translated headers.
+- **The asm oracle proves the C, not the host's hardware.** `test_fx_decomp.py` passed on the new libfx because its
+  harness models the registers itself; what it can't see, a replay's screens did. When an upstream merge breaks a
+  replay, take the merged files back one group at a time against a pre-merge binary's frame: three builds found it.
+- **A test's time limit on a loaded machine measures the machine.** Two ctest runs at a load average of 60 to 110 timed
+  out `oracle_title_hashes` and `asm_oracle` while the same runs alone passed in minutes; read a timeout's own output
+  (an empty run directory, a run still going) before calling it a regression, and size limits for slow runners.
+
 ## 2026-10-18: the test launcher, after review
 
 - **ctest's `PASS_REGULAR_EXPRESSION` ignores the exit status.** A test with one passes on its output alone, so a

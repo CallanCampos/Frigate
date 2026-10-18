@@ -5,7 +5,9 @@
 // own input gives the same result as one into a matrix of its own, and the game relies on it (MCSSSys_Draw, GFL's
 // MAT3_RotationEulerZYX, NitroSystem's SBC and SPL). The expected results are worked out by hand from small whole
 // numbers. port/tests/asm_oracle/test_fx_decomp.py compares the same functions with the ROM's code on random inputs.
-// Exits 0 when every check passes, 1 otherwise.
+// VEC_Normalize and VEC_Fx16Normalize read the DS's divider and square root unit through cp.h's inlines, so they also
+// check the host's translation of those registers (port/tools/gen_host_tree.py, port/hal/hw/hw.c), which the asm
+// oracle's harness doesn't use. Exits 0 when every check passes, 1 otherwise.
 #include "gfl/calctool.h"
 #include "nitro/fx.h"
 #include <stdio.h>
@@ -141,12 +143,41 @@ static void TestEulerRotation(void) {
     CheckWords("MAT3_RotationEulerZYX(90, 90, 90)", WORDS(mtx), rotXYZ, 9);
 }
 
+// The inverse length by the divider (2^56 over the squared length, 64 by 64 bits) times the length by the square root
+// unit (of the squared length times 4), as GBATEK gives both units: (3, 4, 0) is 0.6 and 0.8 of FX32_ONE rounded,
+// 2458 and 3277; (0, 0, -5) is exactly -4096; (1, 1, 1) is 1/sqrt(3), 2365
+static void TestNormalize(void) {
+    static const VecFx32 vec345 = { N(3), N(4), 0 };
+    static const VecFx32 vecZ = { 0, 0, N(-5) };
+    static const VecFx32 vec111 = { N(1), N(1), N(1) };
+    static const fx32 unit345[] = { 2458, 3277, 0 };
+    static const fx32 unitZ[] = { 0, 0, -4096 };
+    static const fx32 unit111[] = { 2365, 2365, 2365 };
+    static const VecFx16 vec345s = { 3 * FX16_ONE, 4 * FX16_ONE, 0 };
+    VecFx32 out;
+    VecFx16 out16;
+    fx32 words16[3];
+
+    VEC_Normalize(&vec345, &out);
+    CheckWords("VEC_Normalize(3, 4, 0)", WORDS(out), unit345, 3);
+    VEC_Normalize(&vecZ, &out);
+    CheckWords("VEC_Normalize(0, 0, -5)", WORDS(out), unitZ, 3);
+    VEC_Normalize(&vec111, &out);
+    CheckWords("VEC_Normalize(1, 1, 1)", WORDS(out), unit111, 3);
+    VEC_Fx16Normalize(&vec345s, &out16);
+    words16[0] = out16.x;
+    words16[1] = out16.y;
+    words16[2] = out16.z;
+    CheckWords("VEC_Fx16Normalize(3, 4, 0)", words16, unit345, 3);
+}
+
 int main(void) {
     TestConcat33();
     TestConcat43();
     TestConcat44();
     TestMultVec();
     TestEulerRotation();
+    TestNormalize();
     if (sFailures != 0) {
         printf("%d checks failed\n", sFailures);
         return 1;

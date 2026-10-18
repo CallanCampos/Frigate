@@ -71,6 +71,11 @@ HW_REGISTER_POLICY = {
 }
 # The geometry command ports: every write is one command parameter for the geometry engine
 G3_PORTS = range(0x04000440, 0x04000600)
+# The registers above that are write streams. A header's address constant for one ("#define REG_GXFIFO_ADDR
+# 0x04000400") stays a plain address, since code passes it on as a place to write to (a DMA's destination); a constant
+# for any other register above reads through its function, as the register macro does ("*(s64 *)REG_DIV_RESULT_ADDR"
+# in cp.h's inlines is the quotient)
+WRITE_STREAMS = {"port_hw_gxfifo"}
 
 
 def translate_header(text: str) -> tuple[str, int]:
@@ -96,7 +101,11 @@ def translate_header(text: str) -> tuple[str, int]:
             continue
         constant = CONSTANT_ADDRESS.match(line)
         if constant:
-            line = f"{constant.group(1)}PORT_HW_ADDR({constant.group(2)})"
+            accessor = HW_REGISTER_POLICY.get(int(constant.group(2), 16))
+            if accessor and accessor not in WRITE_STREAMS:
+                line = f"{constant.group(1)}((void *){accessor}())"
+            else:
+                line = f"{constant.group(1)}PORT_HW_ADDR({constant.group(2)})"
             count += 1
         elif not line.lstrip().startswith("//"):
             line, n = CAST_ADDRESS.subn(lambda m: f"{m.group(1)}PORT_HW_ADDR({m.group(2)})", line)
