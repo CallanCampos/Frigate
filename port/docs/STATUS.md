@@ -53,14 +53,20 @@ level that doesn't exist yet says "not yet"; no field is left out.
     `launch_touch_then_party`, `launch_unfinished`, `launch_not_offered`, `oracle_compare` (the route's declarations:
     four apps, four event types, the known rows among the table's) and `app_about` (`--help`'s `--launch` text) pass
     with it. The saves came from the build's cache, copied from `build/verify-tree`, whose SHA-1s are the ones
-    `oracle.py` keeps.
+    `oracle.py` keeps. After the review's fixes, which touch only documents, `ctest -j4` again: 266 of 267 (2,290 s,
+    none skipped; `oracle_launch_party_menus` 832 s), `asm_oracle` again past its 900 s under a load average of 70 to
+    94, and passing on its own (433 s).
   - White 2, the tests this change touches, `ctest -j3`: `app_about`, `integrate_launch_bad_option`,
     `integrate_launch_never_asked`, `oracle_compare`, `oracle_saves`, `oracle_launch_field_menus` (2 of 2, 621 of 621),
     `launch_unfinished` and `launch_not_offered` pass; `oracle_launch_party_menus` skips as before (`SAVES` keeps no
     SHA-1 of `starter_save` for White 2).
   - Every run passed `--save-dir`; `~/Library/Application Support/Frigate` doesn't exist. clang-format 23.1.3 is clean
     on `main.c`. T5's nightly runs and T7 not yet.
-- **Tiers:** not measured: no decomp change in this task.
+- **Tiers** (`port/tools/progress`, upstream `993e6c49b`): (a) 32,723 functions, 2,962,822 code bytes (77.0%); (b)
+  5,036, 561,554 bytes; (c) 3,259, 325,868 bytes (8.5%). Since the last entry's upstream, `cf8ded4c2`, which that
+  entry didn't measure (`progress.py --rev` measures it here, and gives `aae2a03f6`'s recorded numbers back exactly):
+  (a) +439 functions and 66,018 bytes; (b) 106 functions and 43,550 bytes fewer; (c) 333 functions and 22,468 bytes
+  fewer, down from 9.0%. All of it is upstream's C merged by `1f0c184f6`; this task changes no decomp C.
 - **Trap stubs:** 512 function stubs and 46 data placeholders in each version (`gen_stubs`, each build above), from 624
   and 48 at the last entry: upstream's code merged by `1f0c184f6`, the two data placeholders gone being
   `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl`, on which the Pokédex stopped. A continued game without `--launch` still
@@ -82,9 +88,17 @@ level that doesn't exist yet says "not yet"; no field is left out.
     described it: the README's `--launch` section, `--help`'s `--launch` text in `main.c`, ARCHITECTURE.md's feature
     map row (the Pokédex with Tepig's entry is melonDS's pass for pass), MODDING.md's "What it can't do", the oracle
     README's launch checks (the table, the measured passes, the first frames aligned by construction, and what is
-    left out), the route's input file and table comments, and `oracle.cmake`'s. ADR 0012 gets a dated note under its
-    consequences; the older STATUS entries keep their words. The landing page and the README say that the Pokédex
-    matches melonDS in Black 2 with the party list, and the tests guide names it among the oracle's apps.
+    left out), the route's input file and table comments, and `oracle.cmake`'s. ADR 0012 gets a dated note in its
+    header, as the ADR rules allow, and its text is left as accepted; the older STATUS entries keep their words. The
+    landing page and the README say that the Pokédex matches melonDS in Black 2 with the party list, and the tests
+    guide names it among the oracle's apps.
+  - **Equivalence notes** ([decomp-findings.md](decomp-findings.md), PLAN.md §6) for the unlinked C the Pokédex now
+    runs: `lib/nnsys/src/g2d/g2d_OAM.c` and `g2d_RendererCore.c`, both incomplete. The size tables hold the ROM's 48
+    bytes in both versions. A trace of `party_menus` under lldb shows the game reading them only in the Pokédex, through
+    `DrawCellToSurface2D_`'s horizontal flip, from count 5869 in Tepig's entry. The nonmatching
+    `NNS_G2dApplyOamManagerToHW`, `NNS_G2dGetNewOamManagerInstanceAsFastTransferMode` and `DrawCellToSurface2D_` run in
+    every app of the route, so they are equivalent as observed; `SetAffinedOamPosition_` never runs there and stays
+    unknown.
 - **Next:** White 2's starter route, so that `party_menus` and `continue_starter` run in White 2; the apps no route
   reaches yet (the town map, the Xtransceiver, the medal box, the options); a save with an adventure made by the port,
   once overlay 36 lets it into the field; for the sound, a comparison sequence where a player plays on the game's
