@@ -818,7 +818,7 @@ static int TestSavePath(void) {
     Check(strcmp(port_card_save_path(), expected) == 0, "--save-dir names the directory");
     port_app_set_arguments(1, without, NULL, 0);
     port_card_set_save_path(NULL);
-    Check(strstr(port_card_save_path(), "pokebw2-native/") != NULL, "else the user's own");
+    Check(strstr(port_card_save_path(), "/" PORT_PRODUCT_NAME "/") != NULL, "else the user's own, named Frigate");
     Check(getenv("HOME") == NULL || strncmp(port_card_save_path(), getenv("HOME"), strlen(getenv("HOME"))) == 0 ||
               getenv("XDG_DATA_HOME") != NULL,
           "under the home directory");

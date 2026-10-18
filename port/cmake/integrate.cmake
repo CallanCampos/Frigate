@@ -1,11 +1,12 @@
-# Phase 1's integration tests (port/tests/integrate): the host DMA, the OS allocator's whole addresses and the main
-# arena, the buttons and lid, the screens drawn by the scanline hook and the PNG screenshot, each run as the game's
-# main() would on the whole program's objects; and the program's own option checks.
+# The integration tests (port/tests/integrate), written in phase 1: the host DMA (VRAM and palette uploads, the 3D
+# display lists), the OS allocator's whole addresses and the main arena (the game's heaps), the buttons and lid, the
+# screens drawn by the scanline hook and the PNG screenshot, each run as the game's main() would on the whole program's
+# objects; and the program's own option checks.
 enable_testing()
 add_executable(port_integrate_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/test_integrate.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/window_icon.c"
+    "${PORT_GEN}/window_icon_pixels.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c"
     $<TARGET_OBJECTS:pokebw2_game> $<TARGET_OBJECTS:port_hal> ${port_gfx_objects} "${PORT_GEN}/stubs.c")
 target_link_libraries(port_integrate_tests PRIVATE port_decomp_env SDL3::SDL3)
 target_include_directories(port_integrate_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/..")
@@ -23,9 +24,9 @@ endforeach()
 add_test(NAME integrate_unknown_option COMMAND ${PORT_PROGRAM} --headless --no-such-option)
 set_tests_properties(integrate_unknown_option PROPERTIES WILL_FAIL TRUE TIMEOUT 30)
 
-# The boot to the logos, once the game gets there (port/docs/STATUS.md): 120 frames, where the Nintendo and The Pokémon
-# Company screen shows, and a screenshot of it. Off until the game changes that the boot needs are in; it needs the
-# player's ROM, and skips (status 66) without one
+# The boot to the logos: 120 frames, where the Nintendo and The Pokémon Company screen shows, and a screenshot of it.
+# Off by default, since the replay tests (port/cmake/app.cmake) and the oracle's opening sequence
+# (port/cmake/oracle.cmake) run past the logos already; it needs the player's ROM, and skips (status 66) without one
 option(PORT_TEST_BOOT_LOGOS "Test that the game boots to its logo screens" OFF)
 if(PORT_TEST_BOOT_LOGOS)
     add_test(NAME integrate_boot_logos

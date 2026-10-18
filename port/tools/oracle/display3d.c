@@ -1,4 +1,6 @@
-// Which screens show the 3D engine's output; the rules are in display3d.h, the registers' bits in GBATEK.
+// Which screens show the 3D engine's output in a frame, for the oracle's frames.tsv, so that compare.py compares a
+// screen with 3D within a tolerance and the others exactly; the rules are in display3d.h, the registers' bits in
+// GBATEK.
 #include "display3d.h"
 
 // DISPCNT: the BG mode (bits 0-2), BG0 as the 3D layer (bit 3, engine A), forced blank (bit 7), the layers shown (bits

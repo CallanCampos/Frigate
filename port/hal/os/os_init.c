@@ -1,9 +1,11 @@
 // NitroSDK's OS_Init on the host (os_init.c): the same sequence as the decomp's lib/nitro/src/os/os_init.c, which
-// starts the OS and the libraries that the SDK starts with it. The parts that are the OS's run on the host's versions
-// in port/hal/os; the others (PXI, MI, CTRDG, CARD, PM) are the decomp's C or the HAL's modules for them, and trap
-// stubs until those exist. The DSi's parts are skipped as on a DS, since OS_IsRunOnTwl gives FALSE (the HAL's SCFG
-// registers read 0). The wait for the screen's first line (OSi_WaitVCount0, assembly) waits on the virtual clock, so
-// that OS_Init returns at the start of a frame as on the DS, and the rest of the boot keeps the DS's frame phase.
+// starts the OS and the libraries that the SDK starts with it, first of all in the game's boot (SystemInit,
+// src/system/machine_use.c). The parts that are the OS's run on the host's versions in port/hal/os; the others are the
+// decomp's C or the HAL's modules for them: PXI_Init boots the host ARM7 (port/hal/pxi), CARD_Init the card and its
+// save chip (port/hal/card), PM_Init power management (port/hal/pm). The DSi's parts are skipped as on a DS, since
+// OS_IsRunOnTwl gives FALSE (the HAL's SCFG registers read 0). The wait for the screen's first line (OSi_WaitVCount0,
+// assembly) waits on the virtual clock, so that OS_Init returns at the start of a frame as on the DS, and the rest of
+// the boot keeps the DS's frame phase.
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
 #include "nitro/card.h"

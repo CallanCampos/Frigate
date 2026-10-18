@@ -1,3 +1,12 @@
+"""Writes nitrofs_manifest.json: the size and SHA-1 of every NitroFS file of both versions' ROMs.
+
+    manifest.py REPO OUT.json
+
+For each version it reads the extracted files (extract/<version>/files), the ROM's game code and header CRC from
+orig/baserom_<version>.nds, and the ROM's SHA-1 from <version>.sha1. Every host build reads the manifest it wrote
+(port/cmake/rom.cmake turns it into the ROM manifest), so that Frigate accepts a trimmed or re-padded dump of the
+player's ROM when every file the game reads matches (port/hal/rom/port_rom.h). Hashes only: nothing of the ROM.
+"""
 import sys, os, hashlib, json, struct
 W = sys.argv[1]; out = sys.argv[2]
 man = {}

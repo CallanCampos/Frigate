@@ -1,5 +1,9 @@
 # Spike: the SDK's threads on fibers, with the DS's scheduling
 
+**Frozen.** This spike is a record: its answer is the live OS core, [port/hal/os](../../hal/os/port_os.h) (`core.c`,
+`fiber.c`, `os_thread_host.c`), with its tests in [port/tests/os](../../tests/os/test_os.c). Nothing here is built by
+Frigate's build or CI, and nothing here changes with the live code ([../README.md](../README.md)).
+
 PLAN.md §4.5 ("OS") says SDK threads become fibers run by one scheduler with the DS's priority rules on one host
 thread, with interrupt handlers dispatched where the game waits. This spike checks how much of that the decomp's own
 SDK code can do by itself, and what the host has to supply.

@@ -1,3 +1,12 @@
+"""How much of the ROM's NitroFS the decomp builds from source, from a NitroFS survey.
+
+    coverage.py REPO SURVEY.json
+
+Reads the archive paths that configure.py names (the archives the ROM build packs from res/, and the sound archive)
+and the survey fs_survey.py wrote, and prints the bytes those archives cover, with and without the sound archive,
+and the 25 largest archives not built from source, with their member types. Research of 2026-10-16
+(port/docs/research/assets-arm7-sound.md).
+"""
 import sys, json, ast, re
 W = sys.argv[1]
 src = open(W + '/configure.py').read()

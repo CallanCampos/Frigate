@@ -1,12 +1,23 @@
 #!/bin/sh
 # Builds the macOS app from the program the host build made (port/cmake/macos_app.cmake runs it as the target
-# <program>_app): <program>.app with the program in Contents/MacOS, the libraries it loads from outside macOS (SDL3,
-# when it isn't linked statically) in Contents/Frameworks, and an Info.plist from port/app/macos/Info.plist.in, signed
-# ad hoc (ADR 0003: no Apple Developer account, no notarization, no hardened runtime). The app holds no ROM and no
-# game data: the player's ROM is found as the program finds it (port/hal/rom: --rom, POKEBW2_ROM, then the checkout's
-# orig/ that the build was made from), and saves go where the program puts them (port/hal/card).
+# <program>_app): the app ("Frigate Black 2.app") with the program in Contents/MacOS, the libraries it loads from
+# outside macOS (SDL3, when it isn't linked statically) in Contents/Frameworks, the version's icon in
+# Contents/Resources/AppIcon.icns (made by make_icns.sh from port/assets/branding) and an Info.plist from
+# port/app/macos/Info.plist.in, signed ad hoc (ADR 0003: no Apple Developer account, no notarization, no hardened
+# runtime). The app holds no ROM and no game data: the player's ROM is found as the program finds it (port/hal/rom:
+# --rom, FRIGATE_ROM, then the checkout's orig/ that the build was made from), and saves go where the program puts
+# them (port/hal/card).
 #
-#   make_app.sh --program PATH --app PATH --plist TEMPLATE --bundle-id ID --display-name NAME --repo DIR
+#   make_app.sh --program PATH --app PATH --plist TEMPLATE --icon ICNS --bundle-id ID --name NAME --display-name NAME
+#               --about TEXT --repo DIR
+#
+#   --icon ICNS          the app's icon (CFBundleIconFile), an .icns file
+#   --bundle-id ID       the bundle identifier (CFBundleIdentifier), io.github.callancampos.frigate.black2; a
+#                        com.example one, a placeholder, is refused
+#   --name NAME          the product's name (CFBundleName), Frigate
+#   --display-name NAME  the app's own name (CFBundleDisplayName), Frigate Black 2 or Frigate White 2
+#   --about TEXT         what the About window says under the name (NSHumanReadableCopyright): what Frigate is and that
+#                        it is not affiliated with the game's owners (port/hal/os/port_app.h)
 #
 # Before it signs, it checks that every binary of the app loads nothing from outside macOS and the app, and after, that
 # the program starts from the app (--help). The app is built next to its final path and moved there once it is signed
@@ -16,16 +27,22 @@ set -eu
 program=
 app=
 plist=
+icon=
 bundle_id=
+bundle_name=
 display_name=
+about=
 repo=
 while [ $# -gt 0 ]; do
     case "$1" in
     --program) program=$2 ;;
     --app) app=$2 ;;
     --plist) plist=$2 ;;
+    --icon) icon=$2 ;;
     --bundle-id) bundle_id=$2 ;;
+    --name) bundle_name=$2 ;;
     --display-name) display_name=$2 ;;
+    --about) about=$2 ;;
     --repo) repo=$2 ;;
     *)
         echo "make_app.sh: unknown argument $1" >&2
@@ -34,12 +51,26 @@ while [ $# -gt 0 ]; do
     esac
     shift 2
 done
-for value in "$program" "$app" "$plist" "$bundle_id" "$display_name" "$repo"; do
+for value in "$program" "$app" "$plist" "$icon" "$bundle_id" "$bundle_name" "$display_name" "$about" "$repo"; do
     if [ -z "$value" ]; then
         echo "make_app.sh: every option is needed (see the script's header)" >&2
         exit 2
     fi
 done
+# com.example is the placeholder domain: an identifier there names no one's app (a build directory configured before the
+# port was named Frigate had one, port/app/macos/bundle_id.cmake)
+case "$bundle_id" in
+com.example.*)
+    echo "make_app.sh: $bundle_id is a placeholder bundle identifier; configure the build again" \
+        "(cmake -S port -B DIR) or give PORT_MACOS_BUNDLE_ID_PREFIX a reverse-DNS name of your own" >&2
+    exit 2
+    ;;
+esac
+# An .icns file starts with its type, "icns"
+if [ ! -f "$icon" ] || [ "$(head -c 4 "$icon")" != icns ]; then
+    echo "make_app.sh: $icon isn't an .icns file" >&2
+    exit 2
+fi
 
 name=$(basename "$program")
 staging="$app.partial"
@@ -49,8 +80,10 @@ queue="$staging.queue"
 # A build that fails leaves nothing behind it; one that succeeds has moved the staging app into place by then
 trap 'rm -rf "$staging" "$queue" "$queue.names"' EXIT
 rm -rf "$staging" "$queue"
-mkdir -p "$contents/MacOS" "$frameworks"
+mkdir -p "$contents/MacOS" "$contents/Resources" "$frameworks"
 cp "$program" "$contents/MacOS/$name"
+# The Info.plist's CFBundleIconFile names it
+cp "$icon" "$contents/Resources/AppIcon.icns"
 program_dir=$(cd "$(dirname "$program")" && pwd -P)
 
 # The install names a binary loads, one per line (of every slice of a universal binary), without a library's own id
@@ -259,7 +292,12 @@ fi
 count=$(git -C "$repo" rev-list --count HEAD)
 revision=$(git -C "$repo" describe --always --dirty --abbrev=12)
 
-sed -e "s|@DISPLAY_NAME@|$display_name|" -e "s|@EXECUTABLE@|$name|g" -e "s|@BUNDLE_ID@|$bundle_id|" \
+# The text fields as XML text and as sed's replacements: &, < and > as entities, then \, & and | escaped for sed
+plist_text() {
+    printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' -e 's/[\\&|]/\\&/g'
+}
+sed -e "s|@BUNDLE_NAME@|$(plist_text "$bundle_name")|" -e "s|@DISPLAY_NAME@|$(plist_text "$display_name")|" \
+    -e "s|@ABOUT@|$(plist_text "$about")|" -e "s|@EXECUTABLE@|$name|g" -e "s|@BUNDLE_ID@|$bundle_id|" \
     -e "s|@SHORT_VERSION@|0.0.$count|" -e "s|@BUILD_VERSION@|$count|" -e "s|@MINIMUM_SYSTEM_VERSION@|$minimum|" \
     -e "s|@REVISION@|$revision|" "$plist" >"$contents/Info.plist"
 unfilled=$(grep -o '@[A-Z_]*@' "$contents/Info.plist" | head -1 || true)

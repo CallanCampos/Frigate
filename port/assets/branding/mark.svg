@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img">
+  <title>Frigate</title>
+  <!-- Frigate's mark for light pages: the Plasma Frigate in profile, flat, on a 96 grid. -->
+  <!-- the main mast, below and above its sails -->
+  <path fill="#4A7FB0" d="M41.65 64H43.35V61.3H41.65ZM41.65 18H43.35V9H41.65Z"/>
+  <!-- the main sails: three tiers of four panels -->
+  <path fill="#4A7FB0" d="M29.5 48H35.4L35.15 60.91Q32.08 60.59 29 60ZM36.6 48H41.9V61.3Q39.12 61.27 36.35 61.03ZM43.1 48H48.4L48.65 61.03Q45.88 61.27 43.1 61.3ZM49.6 48H55.5L56 60Q52.92 60.59 49.85 60.91ZM30.2 33H35.75L35.5 44.91Q32.6 44.59 29.7 44ZM36.95 33H41.9V45.3Q39.3 45.27 36.7 45.03ZM43.1 33H48.05L48.3 45.03Q45.7 45.27 43.1 45.3ZM49.25 33H54.8L55.3 44Q52.4 44.59 49.5 44.91ZM31.2 18H36.25L35.85 29.91Q33.12 29.59 30.4 29ZM37.45 18H41.9V30.3Q39.48 30.27 37.05 30.04ZM43.1 18H47.55L47.95 30.04Q45.53 30.27 43.1 30.3ZM48.75 18H53.8L54.6 29Q51.88 29.59 49.15 29.91Z"/>
+  <!-- the jibs, the stern sail on its short mast, the pennant and the tower's dome -->
+  <path fill="#4A7FB0" d="M63.5 38L89 58.5Q77 52.35 65 53ZM67.6 55.48Q76.05 55.66 84.5 59.21Q76.05 58.4 67.6 59.8ZM11.35 30V61H9.65V52H4.6Q6.83 40.64 11.35 30ZM42.5 10L56.35 13L42.5 16ZM14 56V55A4.2 4.2 0 0 1 22.4 55V56Z"/>
+  <!-- the pontoon with its thruster cone, its struts and the bow fin -->
+  <path fill="#4A7FB0" d="M36 77H38.4L33.8 82.5H31.4ZM45.5 77H47.9L43.3 82.5H40.9ZM55 77H57.4L52.8 82.5H50.4ZM30 82H57.5Q63.98 82 66.5 84.5Q63.98 87 57.5 87H30ZM29.3 82.3V86.7L25.2 84.5ZM67.47 67.82L78.5 77.5Q69 76.4 61.38 73.54Z"/>
+  <!-- the hull with the poop, the tower's shoulder and drum and the ram, the six light runs between its five ports cut out of it -->
+  <path fill="#10151C" fill-rule="evenodd" d="M7.5 60H13V58H14V55H22.4V58H23.4V60H26Q26 63 30 63H72L91.2 61.5L72 65.6C68.4 66.4 63 78 52 78H12ZM15 66H20.17V69H15ZM23.67 66H28.83V69H23.67ZM32.33 66H37.5V69H32.33ZM41 66H46.17V69H41ZM49.67 66H54.83V69H49.67ZM58.33 66H63.5V69H58.33Z"/>
+</svg>

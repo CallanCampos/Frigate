@@ -1,3 +1,12 @@
+"""Counts the game code's 64-bit pointer and integer sites of a host probe run that aren't overlay IDs.
+
+    sites_no_overlay.py REPO SITES TOP
+
+SITES is a probe run's list of unique FILE:LINE:COLUMN locations; a site whose line names OVERLAY_ID or an
+OVERLAY_ constant is left out, since the host build makes overlay IDs plain numbers (include/gfl/overlay.h). Prints
+the total and the TOP files with the most sites: the fixes the game's C needs for 64-bit hosts
+(port/docs/research/compile-probe.md).
+"""
 import sys, pathlib, collections, re
 repo = pathlib.Path(sys.argv[1]); c = collections.Counter(); cache = {}
 for loc in open(sys.argv[2]):

@@ -1,3 +1,11 @@
+"""Which NitroFS files differ between Black 2 and White 2.
+
+    diff_versions.py EXTRACT_B2_FILES EXTRACT_W2_FILES
+
+Walks both versions' extracted files (extract/<version>/files), lists the files only one version has, and prints
+each common file whose bytes differ, with how many members differ for a NARC. Research of 2026-10-16
+(port/docs/research/assets-arm7-sound.md), behind the plan of one program for both versions (PLAN.md D6).
+"""
 import sys, os, hashlib, struct
 a, b = sys.argv[1], sys.argv[2]
 def walk(r):

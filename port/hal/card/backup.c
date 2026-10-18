@@ -54,7 +54,8 @@
 #define FLASH_SECTOR_SIZE 0x10000
 // While the game writes, the image goes to disk at least this often, in frames
 #define FLUSH_FRAMES 60
-#define SAVE_DIRECTORY_NAME "pokebw2-native"
+// The save directory's own name, in the user's data folder: the product's (port_app.h)
+#define SAVE_DIRECTORY_NAME PORT_PRODUCT_NAME
 #define PATH_LENGTH 1024
 
 static struct {

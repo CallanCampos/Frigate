@@ -1,4 +1,6 @@
-// The tables of the host ARM7's sound driver (port/hal/snd7).
+// The tables of the host ARM7's sound driver (port/hal/snd7): the decibel table that turns a note's velocity, an
+// envelope's sustain level or a linear volume into the channel's volume, and the BIOS's pitch table, which turns a
+// pitch into a channel's timer. Every note of the game's music and sound effects goes through both.
 #include "hal/snd7/snd7_internal.h"
 
 // NitroSDK's SNDi_DecibelSquareTable (the ARM7's 0x03808e48): the volume in tenths of a decibel of each velocity,

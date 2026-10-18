@@ -66,7 +66,10 @@ void port_os_poll_irq(void);
 
 // The frame. At each VBlank (line 192), before its interrupt is taken, the dispatcher calls port_os_frame_hooks on the
 // host's own stack, never a fiber's, which calls every hook added with port_os_add_frame_hook in the order they were
-// added (presentation, pacing and input in port/app/main.c). Hooks may call port_os_stop and must not call the SDK
+// added. In the program that order is: the geometry engine's swap (port/gfx/ge/ge_hal.c) and the program's own hook
+// (input, presentation, pacing: port/app/main.c), both added before the game runs; then the ARM7's (touch sampling,
+// the sound driver, the microphone: port/hal/pxi/arm7.c), added when OS_Init starts PXI; then the save's
+// (port/hal/card/backup.c), added when it starts the card. Hooks may call port_os_stop and must not call the SDK
 #define PORT_OS_MAX_FRAME_HOOKS 8
 void port_os_frame_hooks(void);
 void port_os_add_frame_hook(void (*hook)(void));

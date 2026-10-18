@@ -286,6 +286,9 @@ static uint32_t Darken(uint32_t a, unsigned evy, unsigned bias) {
     return Gather(c - ((c * evy + LANES(bias)) >> 4 & LANE_MASK(0x3F)));
 }
 
+// Reads an engine's display registers from its I/O block as they are at the start of the line, keeping only the
+// bits the hardware uses: engine B's DISPCNT keeps the bits engine B has (no 3D layer, no VRAM display mode, no
+// character or screen base), and the scroll offsets are 9 bits
 static void ReadRegs(const uint8_t *io, int engine, Regs *regs) {
     int n;
     int i;

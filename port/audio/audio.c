@@ -1,4 +1,6 @@
-// The host's audio output: port/audio/audio.h.
+// The host's audio output (port/audio/audio.h): the music, sound effects and cries that the host ARM7's sound unit
+// (port/hal/snd7) makes at each VBlank, played on the default device through an SDL3 audio stream whose speed follows
+// how much is queued, and written as they are made to a WAV file for --audio-dump.
 #include "audio/audio.h"
 #include "hal/snd7/snd7_output.h"
 #include <SDL3/SDL.h>

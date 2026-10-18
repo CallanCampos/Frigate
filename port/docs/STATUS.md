@@ -26,6 +26,301 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Frigate's identity and guides, reviewed and fixed
+
+- **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
+- **Port:** `094422f4b`, on the branch `frigate-identity`, after `aad2ce8df`, merged into `main` after the sound's
+  branch (`a8beb72c5`) and the upstream sync `65ea798fb`: `de76726d2` (the review's fixes), then `483392fa4` (the
+  logo's ship redrawn as the Plasma Frigate), then `7b9db5d77` (the last confirmation's doc notes), then the fixes from
+  the review of those two in `094422f4b`.
+- **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed but the port's own
+  `.github/README.md`, so no game-changes row.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, from clean build directories: 263 warnings in each
+  version, all in the decomp's `src/` (193) and `lib/` (70), none in `port/`, unchanged from the last entry. Not
+  pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6: Black 2, all 239 `ctest` tests pass (`ctest -j4`, the oracle's included), none skipped; White 2,
+    all 237, none skipped. New: `app_about` (`--help` says the product's name, description and disclaimer
+    exactly as the build read them from `port_app.h`) and `app_bundle_id` (the bundle identifier's prefix, configured
+    alone: Frigate's by default, an old build directory's placeholder moved to it, a builder's own kept). Extended:
+    `app_make_app` (the About text with XML's and sed's special characters, a `com.example` identifier refused, the
+    `.icns`'s 16 and 32 px images the drawn ones), `app_window_icon_*` (the 32 px bitmap the drawn window icon pixel
+    for pixel, the 64 px one its alternate) and `assets_branding` (the twelve SVGs, and each small PNG's ship pixel for
+    pixel). `app_bundle_id` fails without the move (3 of its 12 checks), `app_about` on a wrong expectation, and
+    `assets_branding` on a 16 px image scaled from the master (2 checks).
+  - Every relative link of the Markdown files under `port/` and `.github/README.md` resolves (checked by script).
+    clang-format 23.1.3 is clean on every changed C file. Black 2's app, built again from this tree, reads back
+    `CFBundleName` Frigate, `CFBundleDisplayName` "Frigate Black 2", `io.github.callancampos.frigate.black2` and the
+    About text from `port_app.h`, passes `plutil -lint` and `codesign --verify --deep --strict`, and its `.icns` holds
+    the ten images.
+  - After the ship's redraw, from clean build directories: Black 2, all 239 `ctest` tests pass again, White 2, all
+    237, none skipped; in each, `assets_branding` (469 checks), `app_make_app` (47) and `app_window_icon_plain` and
+    `_sanitized` (32 each). Both apps, built again with `package_macos.sh`, carry the new ship: their `.icns`, unpacked
+    with `iconutil`, holds the drawn 16 and 32 px images and the master scaled above them. Every new PNG was looked at:
+    the 16 and 32 px images enlarged, the 1024 px masters, and the logos on light and dark.
+  - After the redrawn ship's review fixes, in the same build directories: Black 2, all 239 `ctest` tests pass (402 s),
+    White 2, all 237 (336 s), none skipped; in each, `assets_branding` (475 checks: the new clearance check, 12, fails
+    8 of them on the art as it was), `app_make_app` (47) and `app_window_icon_plain` and `_sanitized` (32 each). Every
+    small PNG was looked at enlarged and at its size on light and dark, beside the art as it was; the masters and the
+    logos render byte for byte as before. Both SHA1s match again, and every relative link of the changed Markdown
+    files resolves.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs in each version, as in the last entry.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** two reviews of the rename, the artwork and the guides, and a fix for each finding they confirmed.
+  - **Names written once.** The product's name, description and disclaimer are `PORT_PRODUCT_NAME`,
+    `PORT_PRODUCT_DESCRIPTION` and `PORT_PRODUCT_DISCLAIMER` in `port/hal/os/port_app.h`, which `port/CMakeLists.txt`
+    now reads (`port_product_string`) for `project()`, the macOS app's names and its About window (Info.plist's
+    `@ABOUT@`, filled by `make_app.sh --about`, which now escapes its text fields for XML and sed). `--help` prints the
+    same macros. port/CLAUDE.md's rule says where each name is set.
+  - **Old build directories.** A build directory configured before the rename cached the placeholder bundle-identifier
+    prefix `com.example.pokebw2-native`, which the new default never replaced: configuring it again now moves it to
+    `io.github.callancampos.frigate` with a message (`port/app/macos/bundle_id.cmake`), and `make_app.sh` refuses any
+    `com.example` identifier. A prefix of one's own is kept.
+  - **Small icons.** The icons' 16 and 32 px images are drawn pixel by pixel in `frigate_logo.py` (`SHIP_16`,
+    `SHIP_32`), with a 35% ink edge on White 2's plate. The `.icns` takes them for its 16 and 32 px images
+    (`make_icns.sh MASTER SMALL16 SMALL32 OUT`); the window on Linux and Windows gets the 32 px one drawn with its plate
+    filling the square, and the master at 64 px as its alternate for 200% (`gen_window_icon WINDOW MASTER OUT`,
+    `SDL_AddSurfaceAlternateImage`). Twelve new files in `port/assets/branding`: six SVGs and their PNGs.
+  - **The ship is the Plasma Frigate.** The user asked for the logo's ship to be redrawn as the games' own Plasma
+    Frigate, the ship Frigate is named after, keeping the style, and accepted the design: one main mast with its square
+    sails as a grid of three tiers of four panels, two swept jibs over a long ram, a tall sail at the stern, a domed
+    tower on the poop, a fin under the bow, and an outrigger pontoon on struts, in the same palette, plates and
+    wordmark (`frigate_logo.py`, and every SVG and PNG rendered again by `render.py`; the lockup keeps its 1200 x 333).
+    The 16 and 32 px images are drawn again for it, pixel by pixel: at 32 px the sails as twelve panels two pixels
+    wide, the mast and pennant, the stern sail and the tower, the jibs over the ram, the hull with five ports and the
+    pontoon on three struts; at 16 px the sails as one tall block of two columns under the truck, the stern sail, the
+    jib, the ram, the hull and the pontoon on two struts. The branding README says what the ship depicts and that its
+    design belongs to Nintendo, Game Freak, Creatures and The Pokémon Company, in place of the claim that nothing in it
+    came from the game; the landing page's license line, port/README.md's icon, the assets guide and port/CLAUDE.md's
+    artwork rule say the same, and `make_icns.sh`'s comment no longer speaks of masts.
+  - **The guides, corrected:** the frame's first step (the game puts its sound loader to sleep for the VBlank wait),
+    the boot's `port_hw_init`, SDL's audio thread, the exit statuses (1, signals, 71 from a DMA misuse), the boundary
+    rules (where `replaced.txt` lists what, what the asm oracle covers), the feature map (the touch tests, the font
+    path, the file chain, the window and its icon, and every module in a row: `hal/crypto`, `hal/ctrdg`, `hal/trap.c`,
+    `gen_stubs.py`, `gen_host_tree.py`), the hal guide's file counts, the "settings file" wording, the glossary's
+    "upstream", and the "Plain C types only" marker on the three headers `port/app` includes that lacked it.
+  - **The guides, extended:** MODDING.md gains "When the game stops" (each way a run ends, the trap messages, and what
+    to do about a trap), the bag as a worked example of finding code, and the files a widescreen mod touches.
+    port/hal/README.md lists every file of every module. The compile probe's `overlay.h` shim has its header, and its
+    README lists its files. README says the window can be resized.
+  - **The platform rule, as built.** port/CLAUDE.md's rule 3, PLAN.md §4.8's first rule and game-changes.md (the third
+    kind and header changes) named `include/platform.h`, which was never made, as the one header that decides between
+    MWCC and a host. They now say what was built: the host's types are defined in one place, `include/types.h`'s
+    `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32` and `PORT_DS_ALIGN_64`, with its game-changes rows); any other
+    definition that must differ (`OVERLAY_ID` in `include/gfl/overlay.h`, `HeapBlockHeader`'s padding, NitroSDK's
+    `math.h` and `snd.h`, DS Protect's checked calls) branches on `PLATFORM_PC` in its own header, with its row; and
+    `PLATFORM_PC` itself is defined only by the host build (`port_decomp_env` in `port/CMakeLists.txt`), never by a
+    header, with `port/include/port_host.h` force-included. PLAN.md's phase 0 list and the compile-probe research,
+    which proposed the header, note that it was built as that block (on 2026-10-17); MODDING.md says the same in place
+    of its note that the header was missing; and PLAN.md's libc rule (§4.4, §4.8 rule 8) says what replaced the
+    "platform switch" for the C library headers: the host build's generated `include/` mirror leaves them out. This
+    task corrected the rule to what was built, and the developer has settled it so: the rule names `include/types.h`'s
+    `PLATFORM_PC` block, and no `include/platform.h` is to be made.
+  - **Doc notes:** ARCHITECTURE.md's build paragraph and boot step 2, MODDING.md's trap paragraph, a paragraph of
+    port/CLAUDE.md and two module lines of port/hal/README.md wrapped at 120 columns, and README's directory map says
+    what the guides list: every file in most, and in `tests/` and `tools/` groups of files whose own headers say the
+    rest.
+  - **The redrawn ship's review.** The 16 px ship filled the plate's whole interior, painting over White 2's edge on
+    all four sides and touching Black 2's shaded rim, and its sails, stern sail and jib, all 2 px blocks at a 3 px
+    pitch split by the gaps between the tiers, read as a grid of squares. It is drawn again inside the edge (10 x 10,
+    rows and columns 3 to 12): the sails one tall block of two columns under the truck, with no rows between the tiers,
+    a stern sail a pixel wide, the jib a wedge over the ram, two rows of hull, and the pontoon on two struts. The 32 px
+    ship, 24 pixels wide, touched White 2's edge with its stern sail and its ram: it is 22 wide now (columns 5 to 26),
+    its stern sail a column narrower and its ram a pixel shorter. White 2's small edge is drawn as a filled ring in
+    place of a one-pixel stroke, which AppKit drew with a notch on the window icon's right side (row 10). The branding
+    README's strake sentence says which hull cuts what (White 2's black hull its six runs, Black 2's white hull its
+    five ports), as the generator does. `assets_branding` checks that every small image's ship clears the plate's
+    outermost pixel.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
+  sound driver's and the launcher's modules get their rows in the guides and the feature map when they merge.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
+## 2026-10-18: Frigate's code mapped for modders
+
+- **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
+- **Port:** `260640953` (the files' comments) and `aad2ce8df` (the guides, with this entry), on the branch
+  `frigate-identity`, after `687134df4`.
+- **ROM:** both SHA1s match (`python3 configure.py && ninja`). Nothing outside `port/` changed but the port's own
+  `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, in the last entry's build directories. The comment
+  of `port_host.h`, which every decomp file includes, recompiled all of the decomp's C: no warning in port code; the
+  decomp's own files give 263, the same in each version (`-Wswitch` and the like), which only a full rebuild of them
+  shows. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6: Black 2, all 237 `ctest` tests pass (`ctest -j4`, 369 s, the oracle's included), none skipped;
+    White 2, all 235 (360 s), none skipped. No test changed.
+  - The documents: every relative link of the Markdown files this task touched resolves, anchors as GitHub makes
+    them included, and every test name, repository path and file name the new documents cite exists (checked by
+    script). The code changes are comments only (every changed line of C and CMake is a comment; the Python files
+    only gained docstrings and still parse). clang-format 23.1.3 is clean on every changed C file but four spike
+    files, which were not formatted before and have the same count of differences after.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version, as in the last entry.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** the user asked that Frigate's code be easy for modders and new developers to find their way in; this
+  task maps it, from a survey of the tree.
+  - port/README.md is the front door: what Frigate is, where it stands, a quick start (build, run, test, White 2, the
+    options, the ROM build), a directory map with one line and one guide per directory, and where to go next. The
+    controls, saves, the macOS app, preparing a checkout and syncing follow as they were; the planned layout of
+    PLAN.md §4.3 is one line.
+  - New in port/docs: ARCHITECTURE.md (the layers, the build, the boot, one frame with the threads and the frame hooks
+    in their order, the exit statuses, the boundary rules with their ADRs, and the feature map from each part of the
+    game to the decomp's files, the port's modules and the tests), MODDING.md (where the game lives, that the checked
+    ROM keeps data mods for the file layers to come, finding a feature's code, the three kinds of game change,
+    adding an option, testing with replays and the oracle, and what phase 6 will add, marked as not built),
+    GLOSSARY.md and README.md, the index of every document.
+  - Directory guides for `hal/` (a row per module with the SDK module it replaces, the four ways a decomp file is
+    adapted, the names, and the headers named apart from their files), `gfx/`, `audio/`, `include/`, `cmake/` (every
+    build option), `tests/` (which tests need the ROM) and `spikes/`; `tools/` is rewritten to cover every tool, and
+    `app/` has a tests column. Each spike's README and each spike copy of live code say they are frozen.
+  - Every C, header, Python, shell and CMake file under `port/` opens with what it does and the part of the game it
+    touches: the short or missing headers are written, the research scripts' docstrings among them (`manifest.py` wrote
+    the NitroFS manifest every build reads), stale comments corrected (`arm7.c`'s null sound driver, `hw.c`'s timers and
+    VRAM windows, `os_init.c`, `main.c`'s usage, `present.c`, `tp_host.h`, `integrate.cmake`, `CMakeLists.txt`'s
+    options, `port_os.h`'s frame hooks, now in their real order), and the long functions the survey found uncommented
+    commented, except the sound driver's `Execute`, left to the sound track working in `hal/snd7`.
+  - port/CLAUDE.md: the architecture map of the readability rule is ARCHITECTURE.md's feature map; a new directory,
+    document or term also gets its line in the directory map, the documents' index or the glossary. The landing page
+    links the new documents and its legal note names upstream's `res/`, which replaced `data/`.
+  - Found: port/CLAUDE.md, PLAN.md §4.8 and game-changes.md name `include/platform.h` as the one header that decides
+    between MWCC and a host, but there is no such file: the host build defines `PLATFORM_PC` on the compiler's command
+    line (`port_decomp_env`, port/CMakeLists.txt). The new documents say so; the rule's text is unchanged.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
+  sound driver's and the launcher's modules get their rows in the guides and the feature map when they merge.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
+## 2026-10-18: Frigate's logo and icons
+
+- **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
+- **Port:** `687134df4`, on the branch `frigate-identity`, after `a92bb98d9`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). Nothing outside `port/` changed but the port's own
+  `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, reconfigured in the last entry's build directories,
+  and both apps; not pushed, so no CI run (Linux unbuilt; the window icon's code is compiled on macOS too, and only its
+  `SDL_SetWindowIcon` call is skipped there).
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6: Black 2, all 237 `ctest` tests pass (`ctest -j4`, 270 s, with the oracle's), none skipped; White 2,
+    all 235 (314 s), none skipped. Neither build has a compiler warning. New: `assets_branding` (the six SVGs are what
+    their generator writes, draw with paths alone, and the PNG masters' sizes; 202 checks), `app_window_icon_plain`
+    and `_sanitized` (the window's bitmap is the version's and its plate fills the square, and giving it to a window
+    of SDL's dummy driver goes through; 17 checks), and
+    `app_make_app` now also makes an `.icns` from the version's master with `make_icns.sh`, checks its ten images'
+    sizes, that the app holds it as `Contents/Resources/AppIcon.icns` named by `CFBundleIconFile`, and both scripts'
+    refusals (a 512 px master, a PNG given as the icon): 36 checks.
+  - The apps: `Frigate Black 2.app` and `Frigate White 2.app` hold their version's `AppIcon.icns`, `plutil` reads
+    `CFBundleIconFile` AppIcon, and `codesign --verify --deep --strict` passes. macOS 26.5 shows each app's icon as
+    drawn from 64 px up (`NSWorkspace`'s icon of the app, rendered to PNG and looked at); at 32 and 16 px it puts it
+    inside a dark plate of its own, as it does other apps' plain `.icns` icons (Discord's, OpenMTP's). Each app's
+    program runs 300 frames headless from the app (`--save-dir` a scratch directory), status 0. `package_macos.sh`
+    makes `Frigate Black 2 0.0.2619.dmg` and `Frigate White 2 0.0.2619.dmg` (5.4 MB each, 0.3 MB more for the icon),
+    whose apps hold their icon and pass `codesign --verify --deep --strict` as mounted. The app and image results are
+    from the tree that became this commit (version `0.0.2619`, revision `a92bb98d91c8-dirty`).
+  - The window's 64 px icons, made by `gen_window_icon`, were looked at enlarged: the plate fills the square with clean
+    edges and the three masts read. The landing page's `<picture>` was tried in a browser with the emulated light and
+    dark schemes: each shows its logo.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version, as in the last entry.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** Frigate has its logo and app icons, in `port/assets/branding` with the script that draws them
+  (`tools/frigate_logo.py`), its renderer (`tools/render.py`, AppKit, macOS) and a README: the files, the design, the
+  colours, how the build uses them, how to change them, and their license, the repository's GPL v3.0.
+  - The landing page (`.github/README.md`) and port/README.md open with the logo, `logo.svg` or `logo-dark.svg` by
+    colour scheme in a `<picture>`, above the one-line description and the disclaimer; the landing page's documents
+    table links the artwork.
+  - The macOS app's icon: `PORT_APP_ICON` (port/CMakeLists.txt) is the version's 1024 px master;
+    `port/app/macos/make_icns.sh` makes an `.icns` of it with `sips` and `iconutil` when it changes, never committed,
+    and `make_app.sh --icon` puts it in the app as `Contents/Resources/AppIcon.icns`, which the Info.plist's new
+    `CFBundleIconFile` names. Black 2's app has the dark plate with the white-hulled ship, White 2's the light plate
+    with the black-hulled one.
+  - The window's icon on Linux and Windows: `port/tools/gen_window_icon.c`, built for the machine that builds, trims
+    the master's macOS margin and averages it down to a 64 px bitmap in a generated C file, and
+    `port/app/window_icon.c` gives it to the window (`SDL_SetWindowIcon`). On macOS the window sets none, so the Dock
+    keeps the app's icon.
+  - Directory guides: `port/assets/README.md` and the branding README are new, and so is `port/app/README.md`, the
+    guide of `app/` with a row for each of its files; port/README.md's directory map, PLAN.md §4.3 and
+    `port/tools/README.md` (a new table of the build's generators) have the new files. port/CLAUDE.md says where the
+    artwork lives and that a change to it is a change to its script.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field.
+  Possible follow-ups for the artwork: hand-drawn 16 and 32 px images in the `.icns`, an Icon Composer icon for
+  macOS 26, and a volume icon for the disk image.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
+## 2026-10-18: the port is Frigate
+
+- **Upstream:** `045e97b90` (merge of PR #364), which `main` merged before this task (`5ad9a1e1d`); no sync in this
+  task.
+- **Port:** `61a528143`, on the branch `frigate-identity` from `5ad9a1e1d`; this entry is the commit after it.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), from a clean `build/`. Nothing outside `port/`
+  changed but the port's own `.github/README.md` and `.github/workflows/port-*.yml`, so no game-changes row and no
+  `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo from clean build directories, and the macOS app and
+  disk image of each version; not pushed, so no CI run (Linux unbuilt).
+- **Tests:** T0 as above. The test results are from the tree that became `61a528143`, the apps' from that commit
+  with nothing uncommitted (version `0.0.2618`, revision `61a528143172`).
+  - T2, T3, T4, T6: Black 2, all 234 `ctest` tests pass (`ctest -j4`, with the clone's built `pbw-oracle` copied into
+    `build/port/oracle`), none skipped; `oracle_opening` and `oracle_title` failed at first for want of the ROM build's
+    link map (`build/b2_us/arm9.o.xMAP`, which the ROM build was still writing) and passed on a rerun once it was there.
+    White 2, all 232 pass, none skipped, the oracle's included (`oracle_opening`, `oracle_title`, `oracle_continue`,
+    `oracle_port_save`). On macOS `app_make_app`, `app_message_log` and `app_package_macos_out` pass in both, with the
+    new checks of the Info.plist's names and of `--help`.
+  - The apps: `plutil` reads `CFBundleName` Frigate, `CFBundleDisplayName` Frigate Black 2 and Frigate White 2,
+    `CFBundleIdentifier` `io.github.callancampos.frigate.black2` and `.white2`, `CFBundleExecutable`
+    `frigate-black2` and `frigate-white2`, and the copyright line; `plutil -lint` and
+    `codesign --verify --deep --strict` pass. Each app's program, run from inside the app with `--headless
+    --frames 300 --rom orig/baserom_<version>.nds --save-dir` a scratch directory, loads the app's own SDL3
+    (`DYLD_PRINT_LIBRARIES`), finds the decomp's dump and writes its screens after frame 300, status 0.
+    `package_macos.sh` makes `Frigate Black 2 0.0.2618.dmg` and `Frigate White 2 0.0.2618.dmg` (5.1 MB each), whose
+    volumes are named after the apps and hold the app and a link to `/Applications`.
+  - `--help` prints "Frigate — Pokémon Black 2", the description and the disclaimer before the usage.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version (`gen_stubs`), against the 574 and 63
+  the saves' entry below measured: the difference came with the upstream code `main` merged before this task
+  (`045e97b90`); this task changes no game code.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** the user named the port **Frigate** and asked that the code be easy for modders to read; both are
+  standing rules in port/CLAUDE.md ("The port is Frigate", "Code that modders can read").
+  - What the player sees: the programs are `frigate-black2` and `frigate-white2` (were `pokeblack2`, `pokewhite2`);
+    the window's title is "Frigate — Pokémon Black 2" ("Pokémon White 2"), and so is a no-ROM alert's; `--help` opens
+    with the name, the one-line description and that Frigate is not affiliated with Nintendo, Game Freak, Creatures
+    or The Pokémon Company. Saves go to `~/Library/Application Support/Frigate` (`$XDG_DATA_HOME/Frigate` or
+    `~/.local/share/Frigate` on Linux, `%APPDATA%\Frigate` on Windows) and an app's log to
+    `~/Library/Logs/Frigate/<program>.log` (were `pokebw2-native`; nothing was released, so nothing migrates). The
+    ROM's variable is `FRIGATE_ROM` (was `POKEBW2_ROM`, no fallback), `PORT_ROM_ENVIRONMENT_VARIABLE` in
+    `port/hal/rom/port_rom.h`.
+  - The macOS app is `Frigate Black 2.app` (`Frigate White 2.app`), built by the target `frigate-black2_app`
+    (`frigate-white2_app`): `CFBundleName` Frigate, `CFBundleDisplayName` Frigate Black 2, the bundle identifier
+    `io.github.callancampos.frigate.black2` (`.white2`; was the placeholder `com.example.pokebw2-native.<program>`),
+    and an `NSHumanReadableCopyright` with the description and the disclaimer, which the About window shows.
+    `make_app.sh` takes the product's name as `--name`; `package_macos.sh` reads the app's name and target from the
+    build's cache (`PORT_MACOS_APP_NAME`, `PORT_MACOS_APP_TARGET`) and names the disk image and its volume after the
+    app: `Frigate Black 2 0.0.N.dmg`.
+  - The names live in one place each: `PORT_PRODUCT_NAME` in `port/hal/os/port_app.h` for the C, `PORT_PRODUCT_NAME`,
+    `PORT_PROGRAM` and `PORT_GAME_NAME` at the top of `port/CMakeLists.txt` (`project(frigate)`), the app's names in
+    `port/cmake/macos_app.cmake`. The ROM manifest gained `port_rom_manifest_game` ("Pokémon Black 2"), which the
+    window's title and `--help` use.
+  - CI's workflows show as "Frigate CI" and "Frigate upstream sync"; the landing page (`.github/README.md`),
+    port/README.md, PLAN.md's title and the oracle's tools name Frigate, and say where the port stands today. ADR
+    0010 has a note with the new names; past entries here, the research notes and the ADRs' decisions keep theirs.
+  - Kept, as port/CLAUDE.md says: the layer's names (`port/`, `port_`, `PORT_*`, `port_*` targets, `pokebw2_game`,
+    `pbw-oracle`, `pbwinput`, the `port-*.yml` files, the "port:" prefix of messages), the repository
+    `CallanCampos/pokebw2-native` and its clone's directory, and upstream's own files (its README's "Native port
+    notes", the ROM build's `pokeblack2_us.nds`).
+  - New checks: `app_make_app` reads the app's `CFBundleName`, `CFBundleDisplayName`, `CFBundleIdentifier` and
+    `CFBundleExecutable` back; `app_message_log` checks that `--help` starts with the name and the disclaimer;
+    `card_backup_save_path` checks the save directory's `Frigate`.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
+  landing page's logo and artwork are a separate task, under way.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-17: the sound against the oracle
 
 - **Upstream:** `aae2a03f6` (merge of PR #361), as merged into the port's `main` by `f5f498a89`.

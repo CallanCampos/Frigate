@@ -1,4 +1,5 @@
-// What the oracle's Platform layer (platform.cpp) reports to the program (oracle.cpp).
+// What the oracle's Platform layer (platform.cpp) reports to the program (oracle.cpp): melonDS's log threshold, the
+// emulated console stopping itself, and the game writing its save memory. A test tool only, never part of Frigate.
 #ifndef PORT_TOOLS_ORACLE_ORACLE_H
 #define PORT_TOOLS_ORACLE_ORACLE_H
 

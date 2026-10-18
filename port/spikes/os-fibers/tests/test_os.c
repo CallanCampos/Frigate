@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/tests/os/test_os.c;
+// change that, not this copy.
 // Tests of the SDK's thread semantics on fibers: each one runs a small scenario as the DS's launcher thread, logs
 // what happens in order, and compares the log with the order the DS gives. The scheduler under test is the decomp's
 // own os_thread.c, os_mutex.c and os_message.c; os_host.c only switches.

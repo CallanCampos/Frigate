@@ -1,5 +1,10 @@
 # Spike: per-overlay .data and .bss sections for reload semantics
 
+**Frozen.** This spike is a record: its answer is the live code, [port/hal/fs/ovsec.c](../../hal/fs/ovsec.c),
+[port/tools/gen_overlay_sections.py](../../tools/gen_overlay_sections.py) and
+[port/cmake/overlay_sections.cmake](../../cmake/overlay_sections.cmake). Nothing here is built by Frigate's build or CI,
+and nothing here changes with the live code ([../README.md](../README.md)).
+
 PLAN.md §4.5, "Files and overlays". Measured on 2026-10-17 on an Apple M2, macOS 26.5, and revised the same day
 after a review: the section check now runs before the link, a link-map check finds leaks under LTO, restore costs
 include the first load, and the forced include covers clang-cl and refuses GCC.

@@ -1,4 +1,7 @@
-// The DS's buttons and lid on the host (port/hal/input/port_input.h)
+// The DS's buttons and lid on the host (port/hal/input/port_input.h): the buttons the program reports, from the
+// keyboard, a gamepad or a replay, written where the game's PAD_Read (src/gfl/key.c) reads them: KEYINPUT for A to
+// L, and the ARM7's word in the shared memory for X, Y, the debug button and the lid. Every button press of the game
+// comes through here.
 #include "hal/input/port_input.h"
 #include "nitro/hw.h"
 #include "nitro/os.h"

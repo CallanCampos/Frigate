@@ -1,30 +1,99 @@
-# port/
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo-dark.svg">
+    <img alt="Frigate" src="assets/branding/logo.svg" width="360">
+  </picture>
+</p>
 
-The native port of Pokémon Black 2 and White 2, built from the decomp's C in this same tree. Everything the port adds
-lives here; the rest of the tree is the decomp, merged from `fuddlesworth/pokebw2`. The plan of record is
-[docs/PLAN.md](docs/PLAN.md), and the rules for working here are in [CLAUDE.md](CLAUDE.md).
+# Frigate
 
-## Building the port
+**Frigate** is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; you
+supply your own ROM. Frigate is not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.
 
-The host build compiles every C file of `src/` and `lib/` with the host's clang into one program, except the files
-[hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are
-trap stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the
-program stops with the name of the first one it reaches. It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or
-later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+This directory, `port/`, is Frigate's code. The rest of the repository is the decomp, merged from
+`fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
+doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
+
+**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu, with
+sound, frame for frame against melonDS; New Game's intro runs to the field's first script, and CONTINUE loads a save up
+to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there).
+[docs/STATUS.md](docs/STATUS.md) has the current state.
+
+## Quick start
+
+Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux too. It needs CMake 3.28 or later,
+Ninja, clang, Python 3.11 or later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+Running the game needs your own dump of the ROM. A clone needs the decomp's untracked inputs first:
+[Preparing a checkout](#preparing-a-checkout) has the steps, and places your dumps as `orig/baserom_b2_us.nds` and
+`orig/baserom_w2_us.nds`.
 
 ```sh
-cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cmake --build build/port
-ctest --test-dir build/port --output-on-failure
-build/port/pokeblack2 --headless
+cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo   # configure (Black 2)
+cmake --build build/port                                                 # build build/port/frigate-black2
+build/port/frigate-black2                                                # play, with orig/baserom_b2_us.nds
+build/port/frigate-black2 --rom ~/Games/black2.nds                       # or with a ROM elsewhere
+ctest --test-dir build/port -j4 --output-on-failure                      # test
 ```
 
-`-DPORT_VERSION=w2_us` builds White 2 (`pokewhite2`). The ROM build (below) stays separate and must keep matching after
-every port change; [tools/check_mwcc_neutral.py](tools/check_mwcc_neutral.py) proves a guard-only change to decomp
-files leaves what MWCC compiles unchanged ([docs/game-changes.md](docs/game-changes.md)).
+- **White 2** is a build directory of its own: `cmake -S port -B build/port-w2 -G Ninja -DPORT_VERSION=w2_us`, which
+  makes `frigate-white2`. The other options are in [cmake/README.md](cmake/README.md#options).
+- **The program's options** are in `frigate-black2 --help` and at the top of [app/main.c](app/main.c): `--headless` runs
+  without a window or pacing, `--frames N` stops after N frames, `--screenshot PATH` writes both screens at the end,
+  `--save-dir PATH` keeps the saves elsewhere, `--input FILE` plays a replay.
+- **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
+- **The ROM build stays as upstream's:** `python3 configure.py && ninja` rebuilds both ROMs from your dumps and checks
+  both SHA1s. Every change to this repository ends with it, since Frigate's changes must leave the ROMs byte for byte
+  ([CLAUDE.md](CLAUDE.md#how-the-root-rules-apply-here)).
 
-**Where it stands:** the program links and enters the game's `main()`, which stops at `OS_Init`, the first SDK module
-the platform layer replaces. [docs/STATUS.md](docs/STATUS.md) has the current state.
+The host build compiles every C file of `src/` and `lib/` with the host's clang into one program, except the files
+[hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are trap
+stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the program
+stops with the name of the first one it reaches.
+
+## Directory map
+
+Each directory has a guide to what its files do, the part of the game each touches and its tests. Most guides list
+every file; some list groups of files instead (`tests/` a row per test directory, `tools/` its measurement scripts by
+directory), whose files' own header comments say the rest, and a subdirectory with a guide of its own (the oracle, the
+compile probe, the asm oracle, each spike, the artwork) lists its files there.
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) shows how they fit together.
+
+| Directory | What it is | Guide |
+| --- | --- | --- |
+| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory, the macOS app's scripts | [app/README.md](app/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves, sound, touch, the clock, power, input) | [hal/README.md](hal/README.md) |
+| `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
+| `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
+| `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
+| `cmake/` | The host build's fragments, one per module, with its tests, and the build's options | [cmake/README.md](cmake/README.md) |
+| `tests/` | Unit, integration, replay and oracle tests, one directory per module | [tests/README.md](tests/README.md) |
+| `tools/` | The build's generators, the upstream sync, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
+| `assets/` | Files that aren't code and never game data: Frigate's logo and app icons | [assets/README.md](assets/README.md) |
+| `spikes/` | Phase 0's experiments, frozen; the live code took their answers | [spikes/README.md](spikes/README.md) |
+| `docs/` | The plan, the architecture, modding, the status log, the decisions, the research | [docs/README.md](docs/README.md) |
+| [CMakeLists.txt](CMakeLists.txt) | The host build: the decomp's C and `port/` linked into one program | |
+| [CLAUDE.md](CLAUDE.md) | The rules for working on Frigate | |
+
+[PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
+`third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
+`port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
+(the hourly upstream merge) and `.github/workflows/port-ci.yml` (the host build and tests); any other change outside
+`port/` is a game change listed in [docs/game-changes.md](docs/game-changes.md).
+
+## Where to go next
+
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md):** the layers, how a frame runs, the rules at the boundaries, and the
+  feature map from each part of the game to its code and tests.
+- **[docs/MODDING.md](docs/MODDING.md):** where the game's logic and data live, how to find and change the code for a
+  feature, and what the planned mod platform will add.
+- **[docs/GLOSSARY.md](docs/GLOSSARY.md):** the DS's, the SDK's and Frigate's words.
+- **[CLAUDE.md](CLAUDE.md):** the rules for every change: where to work, changes outside `port/`
+  ([docs/game-changes.md](docs/game-changes.md)), testing, keeping up with upstream.
+- **[docs/PLAN.md](docs/PLAN.md):** the plan of record, with the roadmap; **[docs/STATUS.md](docs/STATUS.md):** where
+  Frigate stands, newest first.
+- **[docs/README.md](docs/README.md):** every document, one line each.
+
+## Playing
 
 ### Controls
 
@@ -47,75 +116,16 @@ something takes over. Eight are open at once; a ninth waits until one of them is
 [app/present.c](app/present.c)'s header has the same table, and the gamepad's controls are one table in
 [app/gamepad.c](app/gamepad.c) that a settings file will be able to replace.
 
-### The macOS app
+The window opens at twice the DS's size, the top screen above the bottom one, and can be resized to any size: the
+screens keep their shape, letterboxed, and are scaled by nearest neighbour, without smoothing.
 
-On macOS the host build also makes the program as an app, signed ad hoc and never notarized: there is no Apple
-Developer account ([ADR 0003](docs/adr/0003-ad-hoc-signing-no-apple-developer-account.md)). The app is made locally
-only; the port's compiled game code is never uploaded or distributed.
-
-```sh
-cmake --build build/port --target pokeblack2_app     # build/port/pokeblack2.app
-port/tools/package_macos.sh                           # build/port/pokeblack2-0.0.N.dmg, with the app
-```
-
-- `-DPORT_VERSION=w2_us` makes `pokewhite2.app`, and `-DPORT_MACOS_APP=ON` makes the app with every build.
-  [app/macos/make_app.sh](app/macos/make_app.sh) builds it from the program the build linked: the program, the
-  libraries it loads from outside macOS (Homebrew's SDL3, or an SDL3 installed with its `@rpath` name) in
-  `Contents/Frameworks`, and an `Info.plist` from [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where
-  each of its values comes from. It checks that nothing in the app loads a library from outside macOS and the app,
-  signs the whole app with `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and
-  starts the program from the app once (`--help`) to see that it loads.
-- **Change the bundle identifier.** It is `com.example.pokebw2-native.pokeblack2`, a placeholder: configure with
-  `-DPORT_MACOS_BUNDLE_ID_PREFIX=` and a reverse-DNS name of a domain of your own (`io.github.<you>.pokebw2-native`,
-  for example). macOS keeps an app's preferences and permissions under it.
-- The version comes from git: `0.0.N`, N being the number of commits built, and the commit in `PortSourceRevision`.
-  The minimum macOS is the one the program and the libraries in the app were built for; with Homebrew's SDL3 that is
-  the macOS Homebrew built SDL3 for.
-- `package_macos.sh` puts the app and a link to `/Applications` in a compressed disk image, then checks the image, the
-  app's signature in it, and that it holds no ROM or other game file. `--out PATH` puts it elsewhere, but never where
-  git would take it into a repository, this one or another (only under an ignored directory such as `build/`, or
-  outside every work tree). Its header lists its options.
-
-**The ROM.** The app holds no ROM and no game data. It finds yours as the program does
-([hal/rom](hal/rom/port_rom.h)): `--rom PATH`, then the `POKEBW2_ROM` environment variable, then the `orig/` of the
-checkout the app was built in (`orig/baserom_b2_us.nds`, or `orig/baserom_w2_us.nds` for White 2). So an app built
-from your checkout opens from the Finder with the ROM you placed for the ROM build, as long as the checkout stays
-where it is (the program holds that checkout's path). Otherwise give the path when you open it:
-
-```sh
-open -n -a build/port/pokeblack2.app --args --rom ~/Games/pokeblack2.nds
-open -n -a build/port/pokeblack2.app --env POKEBW2_ROM=$HOME/Games/pokeblack2.nds
-build/port/pokeblack2.app/Contents/MacOS/pokeblack2 --rom ~/Games/pokeblack2.nds
-```
-
-The app takes the program's options after `--args`. `-n` starts a new copy: without it, `open` only brings a copy that
-is already running to the front, and the options are lost. Saves go to `~/Library/Application Support/pokebw2-native/`
-(`IREO.sav` for Black 2, `IRDO.sav` for White 2) unless `--save-dir` says otherwise.
-
-**When the app stops.** Opened from the Finder or the Dock, the app has no terminal, so the program writes its messages
-to `~/Library/Logs/pokebw2-native/pokeblack2.log` (`pokewhite2.log`), emptied at each launch; Console shows it under Log
-Reports. Without a ROM it can use, the app says why in an alert and quits. Any other stop closes the app with no alert,
-and the log says why: a save file it can't use (one that isn't the 512 KiB the game's flash holds), the game reaching
-code that has no C yet (a trap stub, the commonest today), the game stopping or resetting itself, or a crash. Run from a
-terminal, or with `open --stderr PATH`, the messages go there instead.
-
-**Gatekeeper.** An app built on your own Mac opens normally. One that came from elsewhere (a download, or a disk image
-copied from another Mac) is quarantined, and macOS 15 and later block it until you allow it once:
-
-1. Open the app. macOS says it can't verify it; click **Done**.
-2. Open **System Settings → Privacy & Security** and scroll to **Security**, where it says the app "was blocked to
-   protect your Mac". Click **Open Anyway** (it shows for about an hour after the blocked launch).
-3. Confirm with **Open Anyway** and your password or Touch ID.
-
-From then on the app opens normally. On macOS 14 and earlier, Control-clicking the app and choosing **Open** does the
-same. Do this only for an app whose source you trust.
-
-## Saves
+### Saves
 
 The game's save is the cartridge's 4 Mbit flash chip, kept as a file of its 524,288 bytes in the save directory
-(`--save-dir PATH`, else `~/Library/Application Support/pokebw2-native` on macOS, `~/.local/share/pokebw2-native` on
-Linux, `%APPDATA%\pokebw2-native` on Windows), named after the ROM's game code: `IREO.sav` for Black 2 (US),
-`IRDO.sav` for White 2 (US). It is the same file as melonDS's `.sav` of the game and a cartridge dump's, byte for byte:
+(`--save-dir PATH`, else `~/Library/Application Support/Frigate` on macOS, `~/.local/share/Frigate` (or
+`$XDG_DATA_HOME/Frigate`) on Linux, `%APPDATA%\Frigate` on Windows), named after the ROM's game code: `IREO.sav` for
+Black 2 (US), `IRDO.sav` for White 2 (US). It is the same file as melonDS's `.sav` of the game and a cartridge dump's,
+byte for byte:
 
 - **From melonDS:** copy its `.sav` (named after the ROM's file, next to the ROM or in melonDS's save folder) into the
   save directory as `IREO.sav` or `IRDO.sav`. Copied under its own name, the port points it out and doesn't use it.
@@ -136,52 +146,79 @@ starts a day's wait for its daily events; the next save takes the port's console
 instead is still to come (PLAN.md's D7 sidecar). [hal/card/port_card.h](hal/card/port_card.h) has the details and the
 oracle's README the evidence ([tools/oracle/README.md](tools/oracle/README.md#saves)).
 
-## Directory map
+### The macOS app
 
-The layout from [PLAN.md §4.3](docs/PLAN.md#43-directory-structure). Entries marked **now** exist; the rest are
-planned and appear as their phase starts.
+On macOS the host build also makes the program as an app, signed ad hoc and never notarized: there is no Apple
+Developer account ([ADR 0003](docs/adr/0003-ad-hoc-signing-no-apple-developer-account.md)). The app is made locally
+only; the port's compiled game code is never uploaded or distributed.
 
-```
-port/
-  README.md              now      this overview
-  CLAUDE.md              now      rules for sessions working on the port
-  CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
-  app/                   now      main(), SDL3 window, gamepads, macos/ (the app's Info.plist and build script);
-                                  later screen layouts, settings, paths, first-launch ROM setup
-  include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
-  hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
-    os/ pxi/ hw/ gx/ dma/ mi/ fx/ math/ crypto/ rom/ card/ fs/ nvram/ rtc/ pm/ tp/ mic/ ctrdg/ reset/ input/
-    snd7/ (the ARM7's sound driver) nnsys/ (NitroSystem: 2D files in host structs) gfl/ dwc/ stubs/
-    replaced.txt                  SDK source files the host build compiles from hal/ instead of lib/
-  gfx/                   phase 1  ref/ (CPU reference renderers), ge/ (geometry engine), gpu/ (SDL_GPU), shaders/
-  audio/                 phase 2  SDL3 audio output, resampling, mic input
-  vfs/                   phase 1  ROM reader, SHA1 manifest, layered mounts, NARC member overrides
-  save/                  phase 4  save image plus sidecar JSON for port and mod data
-  mod/                   phase 6  mod loader, manifest, hook bus, events, data registries, Lua runtime
-  features/              phase 6  built-in enhancements: widescreen/ randomizer/ fastforward/ hd/ qol/
-  net/                   phase 7  GFL network device over UDP, LAN discovery, relay client
-  ui/                    phase 6  ImGui menus and debug views
-  tests/                 phase 1  unit tests, replay tests, golden hashes, oracle comparisons
-  tools/                 now      measurement scripts, sync and bootstrap scripts (see tools/README.md)
-    progress/            now      port readiness of the decomp: tiers per function, data, pace, claims
-    compile-probe/       now      host-compiler probe: 64-bit warnings and struct layouts
-    research/            now      one-off research scripts and the NitroFS SHA1 manifest
-    sync_upstream.sh     now      merge upstream and verify both ROMs and the host build
-    package_macos.sh     now      the macOS app, signed ad hoc, in a disk image
-    bootstrap_checkout.sh now     prepare a new clone or worktree for the ROM build and Claude Code
-    hooks/port_guard.py  now      Claude Code hook that refuses writes to upstream and the decomp fork
-    gen_host_tree.py     now      source list, include/ mirror without MSL's libc headers, generated constants
-    gen_stubs.py         now      trap stubs and data placeholders for symbols with no C yet
-    check_mwcc_neutral.py now     proves a guard-only change to decomp files neutral under MWCC (preprocessed text)
-    oracle/              phase 1  melonDS test harness (a test tool, never linked into the port)
-  docs/                  now      plan, research, sync guide (SYNC.md), status log, ADRs, game-change ledger
-  third_party/           phase 0  pinned dependencies (SDL3, Dear ImGui, Lua, minicoro, ...)
+```sh
+cmake --build build/port --target frigate-black2_app   # build/port/Frigate Black 2.app
+port/tools/package_macos.sh                             # build/port/Frigate Black 2 0.0.N.dmg, with the app
 ```
 
-PLAN.md also places sample mods in `mods/examples/` at the repository root (phase 6). Outside `port/`, the port's
-own files are `.github/README.md`, `.github/workflows/port-sync.yml` (the hourly upstream merge) and
-`.github/workflows/port-ci.yml` (the host build and tests); any other change outside `port/` is a game change listed in
-[docs/game-changes.md](docs/game-changes.md).
+- `-DPORT_VERSION=w2_us` makes `Frigate White 2.app` (target `frigate-white2_app`), and `-DPORT_MACOS_APP=ON` makes the
+  app with every build. The menu bar and the About window call it Frigate; the Finder and the Dock, Frigate Black 2 or
+  Frigate White 2.
+  [app/macos/make_app.sh](app/macos/make_app.sh) builds it from the program the build linked: the program, the
+  libraries it loads from outside macOS (Homebrew's SDL3, or an SDL3 installed with its `@rpath` name) in
+  `Contents/Frameworks`, the version's icon in `Contents/Resources/AppIcon.icns`, and an `Info.plist` from
+  [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where each of its values comes from. It checks that
+  nothing in the app loads a library from outside macOS and the app, signs the whole app with
+  `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and starts the program from
+  the app once (`--help`) to see that it loads.
+- **The icon** is Frigate's ship, its drawing of the games' Plasma Frigate, on Black 2's dark plate or White 2's light
+  one. The build makes the `.icns` from the version's 1024 px master and its 16 and 32 px images, drawn pixel by pixel
+  for their size, in [assets/branding](assets/branding/README.md), with `sips` and `iconutil`
+  ([app/macos/make_icns.sh](app/macos/make_icns.sh)), never committed; on Linux and Windows the window shows the same
+  icon ([app/window_icon.c](app/window_icon.c)).
+- **The bundle identifier** is `io.github.callancampos.frigate.black2` (`.white2` for White 2). macOS keeps an app's
+  preferences and permissions under it. A build of your own that isn't Frigate's (a fork under another name) takes a
+  reverse-DNS name of a domain of yours with `-DPORT_MACOS_BUNDLE_ID_PREFIX=`. A build directory configured before the
+  port was named Frigate held the placeholder `com.example.pokebw2-native`; configuring it again moves that to
+  Frigate's prefix ([app/macos/bundle_id.cmake](app/macos/bundle_id.cmake)), and `make_app.sh` refuses any
+  `com.example` identifier.
+- The version comes from git: `0.0.N`, N being the number of commits built, and the commit in `PortSourceRevision`.
+  The minimum macOS is the one the program and the libraries in the app were built for; with Homebrew's SDL3 that is
+  the macOS Homebrew built SDL3 for.
+- `package_macos.sh` puts the app and a link to `/Applications` in a compressed disk image, then checks the image, the
+  app's signature in it, and that it holds no ROM or other game file. `--out PATH` puts it elsewhere, but never where
+  git would take it into a repository, this one or another (only under an ignored directory such as `build/`, or
+  outside every work tree). Its header lists its options.
+
+**The ROM.** The app holds no ROM and no game data. It finds yours as the program does
+([hal/rom](hal/rom/port_rom.h)): `--rom PATH`, then the `FRIGATE_ROM` environment variable, then the `orig/` of the
+checkout the app was built in (`orig/baserom_b2_us.nds`, or `orig/baserom_w2_us.nds` for White 2). So an app built
+from your checkout opens from the Finder with the ROM you placed for the ROM build, as long as the checkout stays
+where it is (the program holds that checkout's path). Otherwise give the path when you open it:
+
+```sh
+open -n -a "build/port/Frigate Black 2.app" --args --rom ~/Games/black2.nds
+open -n -a "build/port/Frigate Black 2.app" --env FRIGATE_ROM=$HOME/Games/black2.nds
+"build/port/Frigate Black 2.app/Contents/MacOS/frigate-black2" --rom ~/Games/black2.nds
+```
+
+The app takes the program's options after `--args`. `-n` starts a new copy: without it, `open` only brings a copy that
+is already running to the front, and the options are lost. Saves go to `~/Library/Application Support/Frigate/`
+(`IREO.sav` for Black 2, `IRDO.sav` for White 2) unless `--save-dir` says otherwise.
+
+**When the app stops.** Opened from the Finder or the Dock, the app has no terminal, so the program writes its messages
+to `~/Library/Logs/Frigate/frigate-black2.log` (`frigate-white2.log`), emptied at each launch; Console shows it under
+Log Reports. Without a ROM it can use, the app says why in an alert and quits. Any other stop closes the app with no
+alert, and the log says why: a save file it can't use (one that isn't the 512 KiB the game's flash holds), the game
+reaching code that has no C yet (a trap stub, the commonest today), the game stopping or resetting itself, or a crash.
+Run from a terminal, or with `open --stderr PATH`, the messages go there instead.
+
+**Gatekeeper.** An app built on your own Mac opens normally. One that came from elsewhere (a download, or a disk image
+copied from another Mac) is quarantined, and macOS 15 and later block it until you allow it once:
+
+1. Open the app. macOS says it can't verify it; click **Done**.
+2. Open **System Settings → Privacy & Security** and scroll to **Security**, where it says the app "was blocked to
+   protect your Mac". Click **Open Anyway** (it shows for about an hour after the blocked launch).
+3. Confirm with **Open Anyway** and your password or Touch ID.
+
+From then on the app opens normally. On macOS 14 and earlier, Control-clicking the app and choosing **Open** does the
+same. Do this only for an app whose source you trust.
 
 ## Preparing a checkout
 
@@ -230,8 +267,8 @@ Run the script in the clone's root, where desktop app worktree sessions take the
 each worktree made with `git worktree add`. It never replaces a file: it adds what is missing, replaces only the hook
 an earlier version of it registered, and prints the hook to add by hand when `.claude/settings.local.json` isn't JSON
 it can rewrite. Run it again after pulling a change to the hook. Also add one line to the clone's auto memory
-(`/memory`), which all its worktrees share: "This clone is the native port; read port/CLAUDE.md before anything
-else." Codex isn't set up for port work: upstream's `AGENTS.md` gives it the decomp's rules only.
+(`/memory`), which all its worktrees share: "This clone is Frigate, the native port; read port/CLAUDE.md before
+anything else." Codex isn't set up for port work: upstream's `AGENTS.md` gives it the decomp's rules only.
 
 The hook runs `port_guard.py` from the session's own checkout (`$CLAUDE_PROJECT_DIR`), else from the clone's main
 worktree, because a worktree checked out at `upstream/main` or at a port commit older than the guard doesn't have it.
@@ -318,16 +355,3 @@ when one stops.
 
 Why the repository works this way is [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md). Record each local sync
 in [docs/STATUS.md](docs/STATUS.md).
-
-## Documents
-
-| Document | Covers |
-| --- | --- |
-| [docs/PLAN.md](docs/PLAN.md) | Goals, architecture, mod design, testing, roadmap: the plan of record |
-| [docs/RESEARCH.md](docs/RESEARCH.md) | Findings behind the plan; full reports in [docs/research/](docs/research/README.md) |
-| [docs/SYNC.md](docs/SYNC.md) | How the port follows upstream: the hourly Action, the local sync, conflicts |
-| [docs/STATUS.md](docs/STATUS.md) | Status log, newest first, one entry per local sync or finished task |
-| [docs/game-changes.md](docs/game-changes.md) | Every change the port makes outside `port/` |
-| [docs/adr/](docs/adr/README.md) | Architecture decision records |
-| [tools/README.md](tools/README.md) | The measurement scripts and how to run them |
-| [CLAUDE.md](CLAUDE.md) | Rules for Claude sessions working on the port |

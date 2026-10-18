@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Runs the melonDS oracle and the native port the same way, for compare.py (port/tools/oracle/README.md).
+"""Runs the melonDS oracle and Frigate's program the same way, for compare.py (port/tools/oracle/README.md).
 
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]
@@ -1099,7 +1099,7 @@ def main(argv: list[str] | None = None) -> int:
 
     port = commands.add_parser("port", help="run the port and write its run directory")
     common(port, oracle=False)
-    port.add_argument("--binary", required=True, help="the port's program (pokeblack2 or pokewhite2)")
+    port.add_argument("--binary", required=True, help="the port's program (frigate-black2 or frigate-white2)")
     port.add_argument("--out", required=True)
     port.add_argument("--frames", required=True, help="the frames to write as PNG; the run goes to the last")
     port.add_argument("--input")

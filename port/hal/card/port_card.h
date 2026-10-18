@@ -20,8 +20,9 @@
 // the image is written to the file it links to, and the link stays (not on Windows, where a link is replaced).
 // port/tools/oracle/README.md, "Saves", has the evidence.
 //
-// The save directory: --save-dir PATH, else the user's: ~/Library/Application Support/pokebw2-native on macOS,
-// $XDG_DATA_HOME/pokebw2-native (or ~/.local/share/pokebw2-native) elsewhere, %APPDATA%\pokebw2-native on Windows.
+// The save directory: --save-dir PATH, else the user's, named after the product (PORT_PRODUCT_NAME, port_app.h):
+// ~/Library/Application Support/Frigate on macOS, $XDG_DATA_HOME/Frigate (or ~/.local/share/Frigate) elsewhere,
+// %APPDATA%\Frigate on Windows.
 // Plain C types only, like port_os.h.
 #ifndef PORT_HAL_CARD_PORT_CARD_H
 #define PORT_HAL_CARD_PORT_CARD_H

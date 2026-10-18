@@ -1,8 +1,9 @@
+// Force-included into every decomp C file of the host build (port/CMakeLists.txt), so all of the game's C sees it: what
+// MWCC provides built in and clang spells differently, the translation of the DS's fixed addresses into host memory,
+// and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes, the particle systems'
+// work, the sound data's handles, the Wi-Fi ID's seed). Nothing here may change what a file means on the DS.
 #ifndef PORT_HOST_H
 #define PORT_HOST_H
-
-// Force-included into every decomp C file of the host build (port/CMakeLists.txt): what MWCC provides built in and
-// clang spells differently. Nothing here may change what a file means on the DS.
 
 // MWCC's memcpy built-in, which the DPW, DWC and POKE_NET libraries call by this name
 #define __memcpy __builtin_memcpy

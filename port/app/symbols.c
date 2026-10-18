@@ -1,4 +1,5 @@
-// The program's globals by name (port/app/symbols.h)
+// The program's globals by name (port/app/symbols.h), so that --run-dump can read any of the game's globals by its
+// decomp name: through dlsym on macOS, through the program's own ELF symbol table on Linux, and not yet on Windows.
 #define _GNU_SOURCE
 #include "app/symbols.h"
 #include <stddef.h>
@@ -41,6 +42,8 @@ static int TakeFirst(struct dl_phdr_info *info, size_t size, void *data) {
 static const ElfW(Ehdr) * sImage;
 static size_t sImageSize;
 
+// Maps the program's own file (/proc/self/exe) read-only, once, to read its ELF symbol table; 0 when it can't, or
+// when the file has no section headers (a stripped program)
 static int MapProgram(void) {
     struct stat st;
     int fd;

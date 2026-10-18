@@ -1,6 +1,8 @@
-// The program's window, presentation and input (port/app/present.h). Phase 1's presentation: the screens in one
-// streaming texture drawn by SDL's 2D renderer, stacked and letterboxed to the window, scaled by nearest neighbour.
-// PLAN.md §4.6's other layouts and filters come later.
+// The program's window, presentation and input (port/app/present.h): what the player sees of the DS's two screens, and
+// how the player presses its buttons and touches its bottom screen. The screens, as port/gfx/screens.c drew them, go
+// into one streaming texture drawn by SDL's 2D renderer, stacked and letterboxed to the window, scaled by nearest
+// neighbour; PLAN.md §4.6's other layouts and filters come later. The keyboard and gamepads become the DS's buttons
+// (port/hal/input), and the left mouse button on the bottom screen its touch screen (port/hal/tp).
 //
 // The default controls. The keyboard, by key position (scancodes, so the same on every keyboard layout), and any
 // gamepad at the same time; the gamepad's buttons by position, as on the DS, which is a Nintendo pad's layout:
@@ -22,14 +24,18 @@
 // waits for a free place): the first that presses something drives the game until it lets go of everything, and then
 // the next to press something takes over. Each pad says when it connects which of its buttons, by the labels SDL
 // reports, are the DS's A, B, X and Y. The gamepad's controls are one table, port_gamepad_default_map
-// (port/app/gamepad.c), which a settings file can replace.
+// (port/app/gamepad.c), which a settings file will be able to replace through port_gamepads_set_map (none is read yet).
 #include "app/present.h"
 #include "app/gamepad.h"
+#include "app/window_icon.h"
 #include "gfx/screens.h"
 #include "hal/input/port_input.h"
+#include "hal/os/port_app.h"
 #include "hal/os/port_os.h"
+#include "hal/rom/rom_manifest.h"
 #include "hal/tp/tp_host.h"
 #include <SDL3/SDL.h>
+#include <stdio.h>
 #include <string.h>
 
 #define STACKED_HEIGHT (PORT_SCREEN_HEIGHT * 2)
@@ -64,17 +70,23 @@ static SDL_Texture *sTexture;
 static bool sTouching;
 
 int port_present_open(void) {
+    char title[128];
+
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
         SDL_Log("port: SDL_Init failed: %s", SDL_GetError());
         return 0;
     }
-    sWindow = SDL_CreateWindow("Pokémon Black 2 and White 2 (native port)", PORT_SCREEN_WIDTH * WINDOW_SCALE,
-                               STACKED_HEIGHT * WINDOW_SCALE, SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE);
+    // The product and the game it runs: "Frigate — Pokémon Black 2"
+    snprintf(title, sizeof(title), "%s — %s", PORT_PRODUCT_NAME, port_rom_manifest_game);
+    sWindow = SDL_CreateWindow(title, PORT_SCREEN_WIDTH * WINDOW_SCALE, STACKED_HEIGHT * WINDOW_SCALE,
+                               SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE);
     if (sWindow == NULL) {
         SDL_Log("port: SDL_CreateWindow failed: %s", SDL_GetError());
         port_present_close();
         return 0;
     }
+    // Frigate's icon for the version, on Linux and Windows (on macOS the app's icon is the Dock's)
+    port_window_icon_set(sWindow);
     sRenderer = SDL_CreateRenderer(sWindow, NULL);
     if (sRenderer == NULL) {
         SDL_Log("port: SDL_CreateRenderer failed: %s", SDL_GetError());
@@ -128,6 +140,10 @@ static bool BottomScreenPoint(float windowX, float windowY, int *x, int *y) {
     return *x >= 0 && *x < PORT_SCREEN_WIDTH && *y >= 0 && *y < PORT_SCREEN_HEIGHT;
 }
 
+// One window event: closing the window stops the game at the next frame hook, a gamepad coming, going or remapped
+// goes to port/app/gamepad.c, and the left mouse button pressed on the bottom screen starts a touch, which lasts until
+// it is released anywhere. The keyboard has no events here: port_present_poll reads its state once a frame. A touch
+// screen works through the mouse events SDL makes of its touches
 static void HandleEvent(const SDL_Event *event) {
     int x;
     int y;

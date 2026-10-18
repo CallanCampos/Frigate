@@ -396,6 +396,8 @@ static u32 StartSampling(const PortArm7SpiCommand *command) {
     return MIC_PXI_RESULT_SUCCESS;
 }
 
+// The MIC tag's callback: collects the ARM9's words into a command, then starts or stops the automatic sampling into
+// the game's buffer (of silence), and answers as the DS's ARM7 answers mic.c
 static void MicService(u32 tag, u32 data, BOOL err) {
     u32 command;
 

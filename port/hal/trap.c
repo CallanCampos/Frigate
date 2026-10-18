@@ -1,5 +1,7 @@
-// Reports the game reaching DS code or data that has no C yet. Function stubs call port_trap_function; data
-// placeholders sit on pages with no access, and the fault handler names the placeholder that was touched.
+// Reports the game reaching DS code or data that has no C yet (trap.h): the part of the game that can't run until
+// upstream writes its C. Function stubs call port_trap_function; data placeholders sit on pages with no access, and the
+// fault handler names the placeholder that was touched. Either way the program stops with status 70, its message naming
+// the symbol, its address and its caller.
 #include "hal/trap.h"
 #include <dlfcn.h>
 #include <execinfo.h>
@@ -72,6 +74,9 @@ static const PortTrapSymbol *find_data_symbol(const unsigned char *address, size
     return NULL;
 }
 
+// The fault handler: an access to a data placeholder is a trap, reported by the placeholder's name and offset, with a
+// backtrace, and the program ends with PORT_TRAP_EXIT_STATUS; any other fault is a crash, reported the same way
+// before the signal's default action ends the program
 static void on_fault(int signal, siginfo_t *info, void *context) {
     (void)context;
     const unsigned char *address = info->si_addr;

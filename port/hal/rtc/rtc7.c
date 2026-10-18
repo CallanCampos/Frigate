@@ -148,6 +148,8 @@ void port_rtc7_store_raw(void) {
         Bcd(now.hour) | (now.hour >= 12 ? 1u << 6 : 0) | Bcd(now.minute) << 8 | Bcd(now.second) << 16;
 }
 
+// The RTC tag's callback: a read leaves the clock's registers in the shared memory, where rtc_api.c reads them; the
+// status write is accepted and ignored; the answer is the command and its result
 static void RtcService(u32 tag, u32 data, BOOL err) {
     u32 command = (data & RTC_PXI_COMMAND_MASK) >> RTC_PXI_COMMAND_SHIFT;
     u32 result = RTC_RESULT_SUCCESS;

@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/gx/vram_os.h; change
+// that, not this copy.
 // The virtual memory calls the aliasing backends need, one set per OS. Everything else in vram.c is plain C
 #ifndef VRAM_OS_H
 #define VRAM_OS_H

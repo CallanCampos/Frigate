@@ -1,4 +1,4 @@
-// The program's options and its hooks, for every module of the platform layer (port/hal, port/gfx) and the program
+// The program's name, options and hooks, for every module of the platform layer (port/hal, port/gfx) and the program
 // itself. The program (port/app/main.c) records its arguments before it runs the game, and a module reads the option
 // it needs with port_app_option; the renderer's integration sets port_app_present, which the program's frame hook
 // calls at each VBlank; the program sets port_app_fatal_notice for a player who can't see stderr. They live in port_hal
@@ -9,6 +9,21 @@
 #define PORT_HAL_OS_PORT_APP_H
 
 #include <stddef.h>
+
+// The product as the player sees it, set here and nowhere else: the build reads these three macros from this file
+// (port_product_string in port/CMakeLists.txt), so each stays a plain string literal or several, without escapes.
+// - PORT_PRODUCT_NAME: the window's title (port/app/present.c), --help's first line (port/app/main.c), the folders of
+//   the saves (port/hal/card/backup.c) and of an app's log (port/app/message_log.c), and in the build the macOS app's
+//   names, its file's and its disk image's (port/cmake/macos_app.cmake);
+// - PORT_PRODUCT_DESCRIPTION and PORT_PRODUCT_DISCLAIMER: what --help and the macOS app's About window
+//   (port/app/macos/Info.plist.in) say Frigate is, and that it is not affiliated with the game's owners.
+// The programs' names and the games' are at the top of port/CMakeLists.txt. The test app_about checks that --help says
+// what the build read
+#define PORT_PRODUCT_NAME "Frigate"
+#define PORT_PRODUCT_DESCRIPTION                                                                                       \
+    "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; you supply your "  \
+    "own ROM."
+#define PORT_PRODUCT_DISCLAIMER "Not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company."
 
 // Records the program's arguments and the names of its flags, the options that never take a value. Both arrays must
 // stay as they are while the program runs (main's argv, and a static table)

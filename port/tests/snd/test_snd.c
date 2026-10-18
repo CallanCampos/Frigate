@@ -7,7 +7,7 @@
 // (port_snd7_boot_at, port_snd7_advance): synthetic banks, wave archives and sequences, with the channels' state
 // checked update by update against values worked out by hand from the driver's arithmetic (port/hal/snd7) and
 // GBATEK's sound unit. The pxi_ scenarios go through the ARM9's SND library and the PXI bus. The rom_ scenarios play
-// sequences of the player's ROM (POKEBW2_ROM, else the repository's orig/baserom_<version>.nds) and compare hashes of
+// sequences of the player's ROM (FRIGATE_ROM, else the repository's orig/baserom_<version>.nds) and compare hashes of
 // the sound; they skip (77) without it. PORT_SND_VERBOSE prints each scenario's log; PORT_SND_WAV=DIR writes the rom_
 // scenarios' sound as WAV files there.
 #include "audio/audio.h"

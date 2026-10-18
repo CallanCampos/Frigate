@@ -1,12 +1,20 @@
-// The host side of the DS's fixed addresses and of the registers whose accesses act (ADR 0004).
+// The DS's memory map on the host (hw.h, ADR 0004): the windows of host memory that PORT_HW_ADDR() turns the DS's
+// fixed addresses into, and the accessors of the registers whose accesses act, which the build's host variants of the
+// SDK headers call instead of reading or writing memory (port/tools/gen_host_tree.py, HW_REGISTER_POLICY): VCOUNT,
+// which the OS core's virtual clock sets; the timer counters; the divider and square root (GBATEK "DS Maths"), which
+// NitroSDK's fixed-point maths uses (lib/nitro/src/fx/fx_cp.c); the geometry command ports and GXFIFO, whose writes are
+// logged for the geometry engine (port/gfx/ge); and the 3D readbacks, which the program attaches to that engine.
+// Every register write and fixed address of the game's code lands here: the screens' registers, palettes, VRAM and OAM
+// that the renderers read, the shared memory the ARM7's services fill, and the 3D commands of everything that draws.
 #include "hal/hw/hw.h"
 #include "include/port_host.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned (16 KiB on Apple Silicon), so that VRAM banks can be
-// mapped into them later. They are zero-filled memory the system commits only when touched
+// The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned (16 KiB on Apple Silicon), so that the VRAM banks can
+// be mapped into region 0x06's window by pages (port/hal/gx/vram.c). They are zero-filled memory the system commits
+// only when touched
 #define REGION_SIZE (1u << 24)
 #define REGION_STORAGE __attribute__((aligned(16384)))
 REGION_STORAGE unsigned char port_hw_mem_01[REGION_SIZE]; // ITCM
@@ -52,8 +60,9 @@ void *port_hw_vcount(void) {
     return &sVCount;
 }
 
-// TM0CNT_L and TM1CNT_L, read as counters. Nothing the boot path needs reads them yet; until the virtual clock drives
-// them (port/hal/os), each read advances them by one, which keeps them deterministic
+// TM0CNT_L and TM1CNT_L, read as counters. The SDK's tick and alarms don't read them: port/hal/os runs timers 0 and 1
+// on the virtual clock (os_tick.c, os_alarm.c, core.c), and nothing else the host build compiles reads a timer's
+// counter. Each read advances the counter by one, which keeps any reader deterministic
 static uint16_t sTimerCounter[2];
 
 void *port_hw_timer_counter0(void) {
@@ -81,6 +90,8 @@ enum {
 static uint64_t sDivResult;
 static uint64_t sDivRemainder;
 
+// Works out both results from DIVCNT's mode and the operands as they are now, by the rules above. Each read of a
+// result calls it, so a read sees the operands written last
 static void divide(void) {
     uint32_t mode = read32(REG_DIVCNT) & 3;
     uint64_t numer64 = read64(REG_DIV_NUMER);

@@ -97,6 +97,8 @@ static void Answer(u32 command, u32 result) {
     port_pxi_reply(PXI_FIFO_TAG_TOUCHPANEL, PORT_ARM7_SPI_ANSWER(command, result), FALSE);
 }
 
+// The TOUCHPANEL tag's callback: collects the ARM9's words into a command, then takes one sample or starts or stops
+// the automatic sampling, and answers as the DS's ARM7 answers tp.c
 static void TpService(u32 tag, u32 data, BOOL err) {
     u32 command;
 

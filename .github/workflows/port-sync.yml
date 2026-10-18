@@ -1,6 +1,6 @@
-name: Port upstream sync
+name: Frigate upstream sync
 
-# Merges fuddlesworth/pokebw2's main into this repository's main every hour, so the port follows the decomp. It runs
+# Merges fuddlesworth/pokebw2's main into this repository's main every hour, so Frigate follows the decomp. It runs
 # only in CallanCampos/pokebw2-native, not in forks of it. CI has no base ROMs, so the merge is checked with the no-ROM
 # compile check of upstream's compile.yml, run inside this workflow because pushes made with GITHUB_TOKEN start no
 # other workflow. Matching is verified locally by port/tools/sync_upstream.sh, which every port session runs first.

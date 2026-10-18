@@ -1,9 +1,68 @@
 # Port rules
 
 This repository, `CallanCampos/pokebw2-native`, is the decomp `fuddlesworth/pokebw2` with its full history, merged
-continuously, plus a native port in `port/`. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the port stands
-is [docs/STATUS.md](docs/STATUS.md). The root `CLAUDE.md` is upstream's and applies here as this file says; for port
-work, this file wins where the two differ.
+continuously, plus Frigate, a native port, in `port/`. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the
+port stands is [docs/STATUS.md](docs/STATUS.md). The root `CLAUDE.md` is upstream's and applies here as this file says;
+for port work, this file wins where the two differ.
+
+## The port is Frigate
+
+The user named the port Frigate on 2026-10-18, in the line of community ports such as Ship of Harkinian.
+
+- **What it is, in one line:** Frigate is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the
+  pokebw2 decompilation; you supply your own ROM. Wherever the name is presented (the landing page `.github/README.md`,
+  [README.md](README.md), the program's `--help`, the macOS app's About window), it also says that Frigate is not
+  affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.
+- **What the player sees is named Frigate:** the programs `frigate-black2` and `frigate-white2`; the apps
+  `Frigate Black 2.app` and `Frigate White 2.app` (`CFBundleName` Frigate, bundle identifiers
+  `io.github.callancampos.frigate.black2` and `.white2`) and their disk images; the window's title, "Frigate — Pokémon
+  Black 2"; the folders of the saves and logs (`~/Library/Application Support/Frigate`, `~/Library/Logs/Frigate`, and
+  `Frigate` under the user's data folder on Linux and Windows); and the `FRIGATE_ROM` variable. Each is written once.
+  The product's name, its one-line description and the not-affiliated line are `PORT_PRODUCT_NAME`,
+  `PORT_PRODUCT_DESCRIPTION` and `PORT_PRODUCT_DISCLAIMER` in [hal/os/port_app.h](hal/os/port_app.h), which the build
+  reads from there for the macOS app's names and About window (the test `app_about` checks that `--help` says what the
+  build read). The programs' names, the games' and the icons are at the top of [CMakeLists.txt](CMakeLists.txt); the
+  macOS app's names, made from the product's, are in [cmake/macos_app.cmake](cmake/macos_app.cmake), and its bundle
+  identifier's prefix in [app/macos/bundle_id.cmake](app/macos/bundle_id.cmake); the ROM's variable is
+  `PORT_ROM_ENVIRONMENT_VARIABLE` in [hal/rom/port_rom.h](hal/rom/port_rom.h). Comments and documents name them too,
+  and change with them.
+- **Its artwork is in [assets/branding](assets/branding/README.md)**: the logo of the landing page and the READMEs,
+  and the app icons that the macOS app and the window on Linux and Windows are built from. Its ship is Frigate's own
+  drawing of the Plasma Frigate, the games' flying ship that the port is named after: the drawing is Frigate's and the
+  design the games' owners', as the directory's README says, so no text calls the art free of the games' designs.
+  Every file there is drawn by the directory's `tools/frigate_logo.py`, so a change to the artwork is a change to that
+  script, rendered again with `tools/render.py` on a Mac and committed with the SVGs and PNGs it writes (the test
+  `assets_branding` checks that the SVGs match the script, and that the small images' PNGs hold their pixels). The
+  icons' 16 and 32 px images are drawn pixel by pixel in that script, not scaled. Nothing the build makes from the
+  icons (the `.icns`, the window's bitmaps) is committed.
+- **The layer keeps its own names:** the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables and
+  `port_*` targets, `pokebw2_game` (the decomp's code), `pbw-oracle` and the `pbwinput` format, the `port-*.yml`
+  workflows and the "port:" prefix of the program's messages. The repository stays `CallanCampos/pokebw2-native`
+  (renaming it is the user's call), and so does the clone's directory.
+- **Living documents say Frigate** where they mean the port as a product; "the port" stays for the code and the layer.
+  Records keep the names of their time: past STATUS.md entries, the research notes in `docs/research/` and RESEARCH.md,
+  and ADR decisions as written (an ADR may get a one-line note).
+
+## Code that modders can read
+
+The user asked that the code be easy for people to read and find their way in: what everything does, and which part of
+the game each piece touches, for the modders who come later.
+
+- **Every port file opens with what it does and which game functionality it touches**: a header comment (a docstring
+  in Python, a comment block in CMake, shell and YAML) that says what the file is for, which part of the game or the DS
+  it serves (the saves, the title screen's 3D, the touch screen, the ARM7's sound driver), and where the code it works
+  with lives (the decomp's files, the SDK module it replaces, its header). A reader who opens any one file knows what
+  it does without opening another.
+- **A new module gets its row in its directory's guide and in the architecture map**, in the same commit as the
+  module: the guide is the directory's `README.md` (created with the directory's first module where there is none
+  yet), and the architecture map is the feature map of [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#feature-map), in
+  the row of the game functionality the module serves. A new directory also gets its line in [README.md](README.md)'s
+  directory map, a new document its line in [docs/README.md](docs/README.md), and a new term its row in
+  [docs/GLOSSARY.md](docs/GLOSSARY.md).
+- **Where a reader starts:** [README.md](README.md) (the front door and the directory map),
+  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (the layers, a frame, the feature map) and
+  [docs/MODDING.md](docs/MODDING.md) (changing the game today, and the mod platform to come). Keep them true when the
+  code they describe changes.
 
 ## Where to work
 
@@ -95,8 +154,14 @@ Game code stays the decomp's. Only three kinds of change are allowed outside `po
 1. **Matching-neutral portability fixes**, such as `uptr` for a value that carries an address. They stay in this
    repository; none is proposed upstream.
 2. **Hook macros** (`PORT_EVENT`, `PORT_SHOULD`) that compile to nothing, or to the bare expression, in the ROM build.
-3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. `include/platform.h` is the only place
-   that decides between MWCC and a host.
+3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. The host's types are defined in one place,
+   `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32` and `PORT_DS_ALIGN_64`, a port change with its
+   rows in [game-changes.md](docs/game-changes.md)). Any other definition that must differ between MWCC and a host
+   branches on `PLATFORM_PC` in its own header, such as `OVERLAY_ID` in `include/gfl/overlay.h`, `HeapBlockHeader`'s
+   padding, NitroSDK's `math.h` and `snd.h` and DS Protect's checked calls, each with its row in game-changes.md.
+   `PLATFORM_PC` itself is defined only by the host build (`port_decomp_env` in [CMakeLists.txt](CMakeLists.txt)),
+   never by a header, and the host build force-includes [port/include/port_host.h](include/port_host.h) into every
+   decomp file.
 
 All three need the same proof that MWCC's output didn't change. The ROM build proves a complete file. An incomplete
 file still links the original object, so the ROM build proves nothing about its C: show with
@@ -106,10 +171,10 @@ incomplete file that includes the header. [game-changes.md](docs/game-changes.md
 Each gets a row in game-changes.md in the same commit. Never copy a decomp file into `port/` to change it; source
 lists are generated from `config/`, never kept by hand. The one sanctioned transformation is the build-time host
 variant of a header that names DS addresses ([ADR 0004](docs/adr/0004-ds-addresses-by-header-translation.md)): it is
-generated into `build/` at every configure, never committed or edited; change the generator instead. `BUGFIX` stays off, so gameplay matches the reference, but
-memory-safety bugs (out-of-bounds writes, use after free) are fixed under `PLATFORM_PC`, each with a comment, because
-64-bit layouts move what they hit. No new `long`; structs on disk, on the wire or in the save stay pointer-free and
-get host `_Static_assert`s.
+generated into `build/` at every configure, never committed or edited; change the generator instead. `BUGFIX` stays
+off, so gameplay matches the reference, but memory-safety bugs (out-of-bounds writes, use after free) are fixed under
+`PLATFORM_PC`, each with a comment, because 64-bit layouts move what they hit. No new `long`; structs on disk, on the
+wire or in the save stay pointer-free and get host `_Static_assert`s.
 
 ## Code that isn't C yet
 

@@ -1,5 +1,9 @@
 # Spike: VRAM bank mapping by page aliasing
 
+**Frozen.** This spike is a record: its answer is the live code, [port/hal/gx](../../hal/gx/vram.h) (`vram.c`,
+`vram_layout.c`, `vram_os.c`), with its tests in [port/tests/gx](../../tests/gx/test_gx.c). Nothing here is built by
+Frigate's build or CI, and nothing here changes with the live code ([../README.md](../README.md)).
+
 PLAN.md §4.5 says each VRAM bank becomes shared memory mapped into every view it is assigned to, with copy-on-remap as
 the fallback where aliasing is awkward. This spike tests that on this Mac and checks Linux and Windows against their
 documentation. A review found several claims of the first version wrong; this version corrects them, and the sections

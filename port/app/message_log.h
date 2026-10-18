@@ -1,8 +1,8 @@
 // Messages of an app opened from the Finder or the Dock (port/app/message_log.c). macOS starts such an app with stderr
 // on /dev/null, so every message of the program and the platform layer, the reason it stops included, would be lost.
-// The program moves stderr and stdout to a log file instead, ~/Library/Logs/pokebw2-native/<program>.log, which
-// Console lists under Log Reports, and shows the reason for a stop that the player can act on (no ROM, or a ROM it
-// refuses) in an alert as well (port_app_fatal_notice, port/hal/os/port_app.h).
+// The program moves stderr and stdout to a log file instead, ~/Library/Logs/Frigate/<program>.log, which Console lists
+// under Log Reports, and shows the reason for a stop that the player can act on (no ROM, or a ROM it refuses) in an
+// alert as well (port_app_fatal_notice, port/hal/os/port_app.h).
 #ifndef PORT_APP_MESSAGE_LOG_H
 #define PORT_APP_MESSAGE_LOG_H
 

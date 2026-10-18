@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/gx/vram.h; change
+// that, not this copy.
 // VRAM bank mapping for the host, the spike of PLAN.md §4.5 "VRAM mapping by page aliasing". The DS has nine VRAM
 // banks, and VRAMCNT puts each one into one place: the LCDC view the CPU reaches at 0x06800000, a 2D engine's BG or OBJ
 // view, or a slot only the GPU reads (texture images, texture palettes, extended palettes). On the host every place is

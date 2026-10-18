@@ -1,3 +1,11 @@
+"""A survey of the ROM's NitroFS: every file, its type, and every NARC's members.
+
+    fs_survey.py EXTRACT_FILES OUT.json
+
+Walks the extracted files (extract/<version>/files), classifies each file and each NARC member by its magic
+(decompressing LZ members), and writes the counts and sizes by type, per archive and overall, to OUT.json, which
+coverage.py reads. Research of 2026-10-16 (port/docs/research/assets-arm7-sound.md).
+"""
 import sys, os, struct, hashlib, collections, json
 
 root = sys.argv[1]

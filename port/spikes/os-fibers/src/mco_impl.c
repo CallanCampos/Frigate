@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/os/mco_impl.c;
+// change that, not this copy.
 // minicoro's implementation, in a file of its own so that a sanitizer build can compile it without AddressSanitizer.
 // minicoro's own ASan annotations assume the resumer is another coroutine: when a fiber yields back to the thread's
 // own stack, it never tells ASan, which then believes the thread still runs on the fiber's stack. LeakSanitizer's

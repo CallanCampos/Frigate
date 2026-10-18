@@ -413,6 +413,8 @@ static void StoreMatrix(PortGe *ge, uint32_t param) {
     }
 }
 
+// MTX_RESTORE: the current matrix of the mode, or the position and vector pair, set back from the stack's entry (as
+// StoreMatrix above says); the clip matrix is worked out again before its next use
 static void RestoreMatrix(PortGe *ge, uint32_t param) {
     uint32_t index = param & 31;
     switch (ge->mtxMode) {
@@ -990,6 +992,10 @@ static void ClearList(PortGeList *list) {
     list->swap_param = 0;
 }
 
+// Runs one geometry command with all its parameters (p, as many as ParamCount gives): the matrix commands, the
+// vertex, colour, normal, texture and lighting state, polygon attributes, BEGIN_VTXS and END_VTXS, SWAP_BUFFERS, the
+// viewport and the box, position and vector tests. Each case follows GBATEK's description of the command, or
+// melonDS's where a comment says so; codes the hardware ignores do nothing
 static void RunCommand(PortGe *ge, uint32_t cmd, const uint32_t *p) {
     int32_t m[16];
 
@@ -1200,6 +1206,8 @@ static void Execute(PortGe *ge) {
 
 // --- The FIFO decoder
 
+// Adds one entry, a command code with one parameter word (0 for a command that takes none), to the queue Execute
+// runs from, growing the queue when it is full: the host has no FIFO limit to stall on
 static void Enqueue(PortGe *ge, uint32_t cmd, uint32_t param) {
     if (ge->tail == ge->capacity) {
         if (ge->head > 0) {
@@ -1241,6 +1249,9 @@ static void NextPacked(PortGe *ge) {
     }
 }
 
+// One logged write: to GXFIFO (and its mirrors), a packed word of up to four command codes or the next parameter of
+// the packed command that waits for one; to a command port (0x04000440 and up), one parameter of that port's command.
+// Writes to undefined ports are dropped
 static void Decode(PortGe *ge, uint32_t port, uint32_t value) {
     if (port >= GXFIFO && port < GXFIFO_END) {
         if (ge->packedLeft == 0) {

@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/os/core.c; change
+// that, not this copy.
 // The host side of the SDK's threads and interrupts (spike). The SDK's scheduler is its own C, compiled unchanged:
 // os_thread.c (through os_thread_host.c), os_mutex.c, os_message.c and os_event.c. This file stands in for what the
 // DS does in assembly or hardware:

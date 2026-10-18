@@ -261,6 +261,8 @@ typedef struct Persp {
     int linear;
 } Persp;
 
+// Prepares the interpolation over len from the end with W w0 to the end with w1, along an edge (edge set) or across
+// a span, by the rules above
 static void PerspSetup(Persp *p, int32_t len, int32_t w0, int32_t w1, int edge) {
     p->len = len;
     p->linear = w0 == w1 && (w0 & (edge ? 0x7e : 0x7f)) == 0;
@@ -283,6 +285,7 @@ static void PerspSetup(Persp *p, int32_t len, int32_t w0, int32_t w1, int edge) 
     }
 }
 
+// The far end's weight at x, in 1 << shift
 static int32_t PerspFactor(const Persp *p, int32_t x) {
     int64_t num = ((int64_t)x * p->w0Num) << p->shift;
     int64_t den = (int64_t)x * p->w0Den + (int64_t)(p->len - x) * p->w1Den;
@@ -317,6 +320,7 @@ typedef struct Lerp {
     int down;
 } Lerp;
 
+// Starts at x of len, from a0 at 0 to a1 at len
 static void LerpStart(Lerp *l, int32_t a0, int32_t a1, int32_t len, int32_t x) {
     int64_t d = a0 <= a1 ? (int64_t)a1 - a0 : (int64_t)a0 - a1;
     int64_t n = d * (a0 <= a1 ? x : len - x);
@@ -328,6 +332,7 @@ static void LerpStart(Lerp *l, int32_t a0, int32_t a1, int32_t len, int32_t x) {
     l->r = (int32_t)(d % len);
 }
 
+// Moves to the next x
 static void LerpStep(Lerp *l) {
     if (!l->down) {
         l->value += l->q;
@@ -741,6 +746,9 @@ typedef struct Span {
     int fillRight;
 } Span;
 
+// Draws one line of a polygon, the span above, on line y: its colour, depth and texture coordinates interpolated
+// across it, each pixel through the depth test, the polygon's mode and the translucency rules. lineEdges says
+// whether y is the polygon's top or bottom line (EDGE_TOP, EDGE_BOTTOM), for the pixels' edge flags and wireframes
 static void DrawSpan(Frame *f, const Poly *poly, int32_t y, const Span *span, uint32_t lineEdges) {
     int32_t left = span->left;
     int32_t end = span->right + 1;
@@ -1150,6 +1158,7 @@ typedef struct FogParams {
     int alphaOnly;
 } FogParams;
 
+// A pixel's colour c with the fog its depth gives, by the rules above
 static uint32_t Fogged(const FogParams *p, uint32_t c, uint32_t depth) {
     const PortDs3dRegs *regs = p->regs;
     uint32_t density;
@@ -1179,6 +1188,8 @@ static uint32_t Fogged(const FogParams *p, uint32_t c, uint32_t depth) {
     return PIXEL(r, g, b, alpha);
 }
 
+// Fogs the whole frame after it is drawn: every pixel with the fog flag, and with anti-aliasing on, the pixel beneath
+// an edge pixel too
 static void Fog(const Frame *f) {
     FogParams p;
     p.regs = &f->src->regs;

@@ -1,3 +1,7 @@
+// The host probe's stand-in for the decomp's include/types.h, for the struct layout runs of run_all.sh
+// (layouts.py with -I shim/include_types): the base types with 64-bit integers aligned to 4 as MWCC aligns them, so
+// that the probe can see which of the game's structs (the save's blocks, the files' records) keep the DS's layout on
+// a 64-bit host once the decomp's typedefs do the same (PLAN.md §4.8, rule 4).
 #ifndef POKEBW2_TYPES_H
 #define POKEBW2_TYPES_H
 

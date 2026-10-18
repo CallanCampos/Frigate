@@ -51,16 +51,16 @@ melonDS would boot through the firmware instead.
 
 ```sh
 oracle.py run --out build/oracle-runs/boot --frames 1400 --screens all
-oracle.py port --binary build/port/pokeblack2 --out build/oracle-runs/port --frames 1,30,60,120,300,600,1000
+oracle.py port --binary build/port/frigate-black2 --out build/oracle-runs/port --frames 1,30,60,120,300,600,1000
 compare.py screens build/oracle-runs/boot build/oracle-runs/port --align counter --clock 313-1000 \
     --report build/oracle-runs/report
-oracle.py boot --out build/oracle-runs/both --port build/port/pokeblack2
-oracle.py sequence title --port build/port/pokeblack2 --out build/oracle-runs/title
-oracle.py sequence-check title --port build/port/pokeblack2
+oracle.py boot --out build/oracle-runs/both --port build/port/frigate-black2
+oracle.py sequence title --port build/port/frigate-black2 --out build/oracle-runs/title
+oracle.py sequence-check title --port build/port/frigate-black2
 oracle.py save first_save --out build/oracle-runs/first_save.sav
-oracle.py sequence continue --port build/port/pokeblack2 --out build/oracle-runs/continue
-oracle.py sound opening --port build/port/pokeblack2 --out build/oracle-runs/sound
-oracle.py sound-check title --port build/port/pokeblack2
+oracle.py sequence continue --port build/port/frigate-black2 --out build/oracle-runs/continue
+oracle.py sound opening --port build/port/frigate-black2 --out build/oracle-runs/sound
+oracle.py sound-check title --port build/port/frigate-black2
 ```
 
 `oracle.py run` calls `pbw-oracle` with the version's ROM (`orig/baserom_b2_us.nds`), its symbols (`config/b2_us/arm9`),
@@ -717,8 +717,8 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
 
   ```sh
   oracle.py run --out o --frames 4990 --input port/tests/oracle/title_b2_us.pbwinput --dump NNS_G3dGlb@4925-4985
-  oracle.py port --binary build/port/pokeblack2 --out p --frames 3140 --input port/tests/oracle/title_b2_us.pbwinput \
-      --dump NNS_G3dGlb:612@3090-3140
+  oracle.py port --binary build/port/frigate-black2 --out p --frames 3140 \
+      --input port/tests/oracle/title_b2_us.pbwinput --dump NNS_G3dGlb:612@3090-3140
   compare.py memory o p --align counter --clock 313-1108 --lag 1109=0
   ```
 
@@ -747,7 +747,7 @@ the screens; `known_oracle`, oracle frames no port frame can show; `known_state`
   ```sh
   oracle.py run --version w2_us --out o --frames 5030 --input port/tests/oracle/title_w2_us.pbwinput \
       --dump SNDi_SharedWork:4@4860 --dump snd=0x0214c740:12@4860-5030
-  oracle.py port --version w2_us --binary build/port-w2/pokewhite2 --out p --frames 3260 \
+  oracle.py port --version w2_us --binary build/port-w2/frigate-white2 --out p --frames 3260 \
       --input port/tests/oracle/title_w2_us.pbwinput --dump 'snd=*SNDi_SharedWork:12@3090-3260'
   ```
 

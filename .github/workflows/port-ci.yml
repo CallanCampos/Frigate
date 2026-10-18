@@ -1,8 +1,8 @@
-name: Port CI
+name: Frigate CI
 
-# Builds the native port on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI doesn't
-# have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds both ROMs
-# locally (port/docs/SYNC.md).
+# Builds Frigate, the native port, on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI
+# doesn't have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds
+# both ROMs locally (port/docs/SYNC.md).
 on:
   push:
     branches: [main]
@@ -63,4 +63,4 @@ jobs:
       # on the runner: the port's compiled game code is never uploaded
       - name: Build the macOS app
         if: runner.os == 'macOS'
-        run: cmake --build build/port --target pokeblack2_app
+        run: cmake --build build/port --target frigate-black2_app

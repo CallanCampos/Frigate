@@ -3,8 +3,16 @@
 <!--
   The macOS app's Info.plist. port/app/macos/make_app.sh fills in the fields between at signs when it builds the app.
 
-  - The bundle identifier is PORT_MACOS_BUNDLE_ID_PREFIX (CMake; a placeholder, com.example.pokebw2-native, until it
-    is changed to a domain of your own) followed by the program's name.
+  - The names (port/cmake/macos_app.cmake): CFBundleName is the product's, Frigate, which the menu bar and the About
+    window show; CFBundleDisplayName is the app's, Frigate Black 2 or Frigate White 2, which the Finder and the Dock
+    show; CFBundleExecutable is the program's file, frigate-black2 or frigate-white2.
+  - The bundle identifier is PORT_MACOS_BUNDLE_ID_PREFIX (CMake; io.github.callancampos.frigate) followed by the
+    version's black2 or white2.
+  - NSHumanReadableCopyright, which the About window shows under the name, says what Frigate is and that it is not
+    affiliated with the game's owners: PORT_PRODUCT_DESCRIPTION and PORT_PRODUCT_DISCLAIMER of port/hal/os/port_app.h,
+    which --help prints too.
+  - CFBundleIconFile is the app's icon, Contents/Resources/AppIcon.icns, which make_app.sh copies from the .icns that
+    make_icns.sh makes of the version's master in port/assets/branding (Black 2's dark plate, White 2's light one).
   - The versions come from git: CFBundleVersion is the number of commits up to the one built, which only grows along
     main, CFBundleShortVersionString is 0.0 and that number, and PortSourceRevision is the commit itself (git describe,
     with -dirty for a build of uncommitted changes).
@@ -27,12 +35,14 @@
 	<string>@DISPLAY_NAME@</string>
 	<key>CFBundleExecutable</key>
 	<string>@EXECUTABLE@</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>@BUNDLE_ID@</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>@EXECUTABLE@</string>
+	<string>@BUNDLE_NAME@</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -49,6 +59,8 @@
 	<true/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>@ABOUT@</string>
 	<key>PortSourceRevision</key>
 	<string>@REVISION@</string>
 </dict>

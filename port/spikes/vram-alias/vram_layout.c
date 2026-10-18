@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/gx/vram_layout.c;
+// change that, not this copy.
 // From VRAMCNT to the slots of every view. The tables are GBATEK's ("DS Memory Control - VRAM"); the mirrors of the
 // small banks are the ones melonDS maps (GPU.cpp, MapVRAM_FG, MapVRAM_H and MapVRAM_I), which PLAN.md's oracle tests
 // compare against

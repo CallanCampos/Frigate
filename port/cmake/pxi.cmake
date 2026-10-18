@@ -1,5 +1,7 @@
 # The PXI bus and the host ARM7's services (port/hal/pxi, pm, tp, nvram, rtc, reset, ctrdg, snd7, mic): the per-file
-# options of the decomp files they compile, and their tests (port/tests/pxi).
+# options of the decomp files they compile, and their tests (port/tests/pxi), which drive the decomp's own ARM9
+# libraries against them: power, touch, the firmware's settings, the clock, reset, the cartridge slot, the microphone
+# and the sound commands.
 
 # The decomp files compiled through host files (pm.c, nvram.c, snd_interface.c): their own code under the platform
 # layer's warnings. Their 64-bit casts are the ones the host files deal with (the pointers they note), and the

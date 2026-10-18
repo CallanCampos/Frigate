@@ -1,15 +1,18 @@
+// The DS's memory map on the host (hw.c, ADR 0004), for the platform layer, the renderers and the program. Each region
+// of the DS memory map, by the top byte of its addresses (0x01 ITCM, 0x02 main memory, 0x03 shared WRAM, 0x04 I/O
+// registers, 0x05 palettes, 0x06 VRAM, 0x07 OAM, 0x08-0x0a the GBA slot), is a 16 MiB window of host memory, so a DS
+// address becomes a host address with PORT_HW_ADDR() (port/include/port_host.h); pages are committed when first
+// touched. The registers whose accesses act (VCOUNT, the divider and square root, the geometry ports and GXFIFO, the 3D
+// readbacks) have accessors in hw.c instead. Everything the game's code writes to the DS's registers and fixed memory
+// is here, for the renderers (port/gfx) to draw from and the geometry engine to run. Plain C types only.
 #ifndef PORT_HAL_HW_H
 #define PORT_HAL_HW_H
 
 #include <stddef.h>
 #include <stdint.h>
 
-// The host memory behind the DS's fixed addresses (ADR 0004). Each region of the DS memory map, by the top byte of its
-// addresses (0x01 ITCM, 0x02 main memory, 0x03 shared WRAM, 0x04 I/O registers, 0x05 palettes, 0x06 VRAM, 0x07 OAM,
-// 0x08-0x0a the GBA slot), is a 16 MiB window of host memory, so a DS address becomes a host address with
-// PORT_HW_ADDR() (port/include/port_host.h). Pages are committed when first touched.
-
-// Prepares the windows; called once at startup, before the game runs. Nothing to do until VRAM banks are mapped
+// Prepares the windows; called once at startup, before the game runs. The windows are static arrays, so there is
+// nothing to do yet: the VRAM banks map themselves into region 0x06's window on first use (port/hal/gx/vram.c)
 void port_hw_init(void);
 
 // The host address of a DS address, for the platform layer's own use

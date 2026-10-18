@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compares a run of the native port with a run of the melonDS oracle (port/tools/oracle/README.md).
+"""Compares a run of Frigate's program with a run of the melonDS oracle (port/tools/oracle/README.md).
 
 A run is a directory: frame_NNNNNN.png for the frames it captured (both screens, top above bottom, 256x384),
 frames.tsv with a row for each frame it ran (pbw-oracle and the port's --run-dir write one for every frame),

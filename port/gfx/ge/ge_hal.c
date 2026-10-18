@@ -1,4 +1,7 @@
-// The geometry engine and the 3D renderer in the running program (ge_hal.h).
+// The geometry engine and the 3D renderer in the running program (ge_hal.h): one engine fed from the platform layer's
+// log of geometry writes (port/hal/hw), the readback registers' values for hw.c's accessors, the swap at each
+// VBlank, and the 3D frame rasterized before line 0 for engine A's BG0. Every 3D scene of the game (the title screen,
+// the field, battles, Pokémon sprites) reaches the screens through here.
 #include "gfx/ge/ge_hal.h"
 #include "gfx/ge/ge.h"
 #include "gfx/ref/ds3d.h"

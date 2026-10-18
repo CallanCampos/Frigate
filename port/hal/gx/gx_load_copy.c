@@ -1,4 +1,6 @@
-// The copy of a GX load (port/hal/gx/gx_internal.h)
+// The copy of a GX load (port/hal/gx/gx_internal.h): the textures, palettes and images that the game's GX loads put
+// into VRAM, copied at once where a CPU store to the bank would go, a slot at a time, with the pages' generations
+// moved on so that the renderers see the change.
 #include "hal/gx/gx_internal.h"
 #include "hal/gx/vram.h"
 #include <string.h>

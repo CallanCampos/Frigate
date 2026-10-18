@@ -1,3 +1,11 @@
+"""Who calls the functions whose names match a pattern, from the binary scan's call graph.
+
+    callers.py REGEX [TOP]
+
+Reads build/port-research/sdk-surface/binscan.pkl (binscan.py) and prints each matching function with its
+callers, their library and file, most frequent first (TOP, 30 by default; * marks an address load rather than a
+call). A query used while choosing the platform layer's boundary (port/docs/research/sdk-surface.md).
+"""
 import pickle,sys,re
 from collections import defaultdict, Counter
 from pathlib import Path

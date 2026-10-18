@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/os/fiber.c; change
+// that, not this copy.
 // Fibers over minicoro. minicoro switches with a few lines of assembly per target (arm64, x86-64 System V, x86-64
 // Windows with the TIB's stack fields) or with Windows fibers. It places a coroutine's header (the coroutine and its
 // saved registers), a storage buffer and the stack in one block, the stack last, growing down towards the storage.

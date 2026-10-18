@@ -1,5 +1,7 @@
 // SHA-1, as FIPS 180-4 defines it (section 6.1): 64-byte blocks, five 32-bit words of state, 80 rounds in four groups
-// of 20, each with its own function and constant, over a message schedule kept as a ring of 16 words.
+// of 20, each with its own function and constant, over a message schedule kept as a ring of 16 words. The platform
+// layer checks the player's ROM and its files with it at startup (port/hal/rom/rom.c), and the run directory hashes
+// the screens with it (port/app/run_dir.c); the game's own SHA-1 is NitroSDK's (port/hal/math/sha1_block.c).
 #include "hal/rom/sha1.h"
 #include <string.h>
 
@@ -32,6 +34,7 @@
 
 #define INPUT(w, t) ((w)[(t)])
 
+// Adds one 64-byte block to the state: the 80 rounds over the block's big-endian words
 static void ProcessBlock(uint32_t state[5], const uint8_t *block) {
     uint32_t w[16];
     uint32_t a = state[0];

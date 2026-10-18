@@ -498,7 +498,7 @@ int main(int argc, char **argv) {
         return 2;
     }
     if (port_rom_default_path() == NULL) {
-        printf("no ROM (POKEBW2_ROM, or the repository's orig/baserom_<version>.nds): skipped\n");
+        printf("no ROM (" PORT_ROM_ENVIRONMENT_VARIABLE ", or the repository's orig/baserom_<version>.nds): skipped\n");
         return SKIP;
     }
     snprintf(sSavePath, sizeof(sSavePath), "%s/port_rom_tests_%d.sav",
