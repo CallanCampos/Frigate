@@ -22,9 +22,14 @@ typedef enum VCTCodec {
     VCT_CODEC_MAX,
 } VCTCodec;
 
-// The two frames going out: one is filled while the other is sent
+// The bytes of a slot of the send queue: the largest packet, 0x450 bytes (the 12-byte header, 4 bytes of ADPCM state
+// and a frame of 0x440 bytes), rounded up to the 32-byte cache line
+#define VCT_SEND_SLOT_SIZE 0x460
+
+// The two frames going out: one is filled while the other is sent. Each is built as a packet in a slot of the buffer,
+// and each slot starts on a cache line.
 struct VCTSendQueue {
-    VCTVoicePacket frames[2];
+    u8 buffer[2 * VCT_SEND_SLOT_SIZE];
     u32 readIndex;
     u32 writeIndex;
     VCTVoicePacket *sending;
@@ -192,7 +197,7 @@ BOOL VCT_SubmitSamples(void *samples, int size) {
     if (!hasSender) {
         return FALSE;
     }
-    packet = &sSendQueue.frames[(sSendQueue.writeIndex & 1) ? 0 : 1];
+    packet = (VCTVoicePacket *)&sSendQueue.buffer[(sSendQueue.writeIndex & 1) ? 0 : VCT_SEND_SLOT_SIZE];
     packet->magic = VCT_PACKET_MAGIC;
     if (sCodec >= VCT_CODEC_ADPCM2) {
         MIi_CpuCopyFast(samples, &packet->payload[4], size);
@@ -363,7 +368,7 @@ static VCTVoicePacket *EncodeNextFrame(void) {
     if (queued == 0) {
         return NULL;
     }
-    packet = &sSendQueue.frames[(sSendQueue.readIndex & 1) ? 0 : 1];
+    packet = (VCTVoicePacket *)&sSendQueue.buffer[(sSendQueue.readIndex & 1) ? 0 : VCT_SEND_SLOT_SIZE];
     samples = packet->payload;
     if (codec >= VCT_CODEC_ADPCM2) {
         samples += 4;

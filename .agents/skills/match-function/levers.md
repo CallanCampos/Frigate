@@ -607,8 +607,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An `and` before an inline's table load in some inlined copies only: those calls mask their argument, and the
   inline indexes with the bare parameter. (matching.md: "in some inlined copies and not in others")
 - `movne rN, #0; moveq rN, #size; add` where ours selects an index and multiplies (`mla`): MWCC never pushes the
-  multiply into a select's arms, so the source selected byte offsets. `moveq #1; movne #0` is `c ? 0 : 1`.
-  (matching.md: "into the arms of a select")
+  multiply into a select's arms, so the source selected byte offsets: a raw `u8` buffer of slots, the slot cast to
+  the element, `(T *)&buf[c ? 0 : SLOT]`, as a stride rounded up to the 32-byte cache line also says. `moveq #1;
+  movne #0` is `c ? 0 : 1`. (matching.md: "into the arms of a select")
 
 ## Branches and block layout
 
