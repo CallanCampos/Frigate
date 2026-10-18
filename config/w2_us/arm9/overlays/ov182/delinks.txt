@@ -63,3 +63,27 @@ src/ov182/download_play_sys.c:
     complete
     .text       start:0x021ba7a8 end:0x021bb1cc
     .bss        start:0x021c41c8 end:0x021c41cc
+lib/dwcutilui/src/dwc_util_rom_resource.c:
+    complete
+    .text       start:0x021bb1cc end:0x021bb4c0
+    .rodata     start:0x021c05c0 end:0x021c05c4
+    .data       start:0x021c1b18 end:0x021c1b44
+    .bss        start:0x021c41cc end:0x021c41d0
+
+lib/dwcutilui/src/dwc_util_oam.c:
+    .text       start:0x021bb4c0 end:0x021bb91c
+    .bss        start:0x021c41d0 end:0x021c41d4
+
+lib/dwcutilui/src/dwc_util_cell.c:
+    complete
+    .text       start:0x021bb91c end:0x021bbaac
+    .bss        start:0x021c41d4 end:0x021c41dc
+
+lib/dwcutilui/src/dwc_util_display.c:
+    complete
+    .text       start:0x021bc1e8 end:0x021bc4a8
+
+lib/dwcutilui/src/dwc_util_heap.c:
+    complete
+    .text       start:0x021bc4a8 end:0x021bc584
+    .bss        start:0x021c41e4 end:0x021c41e8
