@@ -1689,6 +1689,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Two constants applied to a field in one expression are folded into one (`x = x - 0x100 + 1` becomes `subs #0xff`);
   as two statements, `work->winV -= 0x100; work->winV++;`, both operations stay, as `btlv_effvm.c`'s
   `BtlvEffvm_WindowTask` needs (an unsigned `1u` mixed in also keeps them apart, but less naturally).
+- An offset local stepped by statements keeps each step the same way, with its starting constant in a register of its
+  own. GameSpy's competition report (`dwc_competition.c`) reaches a player's key with `u32 offset =
+  sizeof(ScReportHeader); offset += index * 0x14; offset += 0x10;`, so `ScReport_SetPlayerKey` adds the 0x10 last
+  (`add r0, r3, r4; add r0, #0x10`), and `ScReport_SetPlayerId` builds the buffer field's offset 0x124 from the 0x44 it
+  already holds (`add r4, #0xe0`). Written as one expression, `report->buffer + (sizeof(ScReportHeader) + index *
+  0x14 + 0x10)`, the constants fold into 0x54 and `ScReport_SetPlayerId` loads the buffer first; `offset += index *
+  0x14 + 0x10`, `offset = offset + index * 0x14 + 0x10` and a local that starts at `sizeof(ScReportHeader) + index *
+  0x14` don't match either.
 - A chained assignment to fields, `a->x = a->y = value;`, stores `y`, reloads it and stores `x`. When the original
   narrows the value once and stores it to both, the stores were separate statements, as in the PC box's
   `PokeIconChgDataMake`.
@@ -3130,6 +3138,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   in an unused local. A call the front end drops (`if (0)`, code after `return`, an unsigned `i < 0` loop) leaves it
   out. A static assert helper called so, before `delivery_beacon.c`'s allocation, gives the game's `""` first but
   leaves its own code and text, which a dead-stripping link would remove and this build's `-nodead` link keeps.
+- Under `-ipa function`, a table initialized with string literals comes before its strings only when it is defined
+  above the file's first function; defined between functions, it has its strings laid out ahead of it, whether it is
+  `static` or global, sized or not, declared earlier or not. A table right before its own strings in the middle of a
+  file's `.data` is therefore the first data of another original file. Overlay 260's `dwc_competition.c` has
+  `sCompetitionNamespaces` before its namespace string, after `Sc_PutGuid`'s literals, and the part from
+  `ScClient_Begin` on, compiled on its own with the table at its top, lays out the ROM's `.data` from there to the end.
 - The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but

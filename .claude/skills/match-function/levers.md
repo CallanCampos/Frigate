@@ -499,6 +499,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   to a member of a struct local")
 - Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
   them as two statements on the field. (matching.md: "Two constants applied to a field")
+- A header size folded into a record's offset (0x44 and 0x10 as 0x54), or a field offset built fresh where the
+  original derives it from the 0x44 it holds: an offset local that starts at `sizeof(Header)` and takes one `+=` per
+  step. (matching.md: "An offset local stepped by statements")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
   arguments for narrow parameters, so an argument passed without them is for a wider one. (matching.md: "narrows an argument")
 - A parameter passed on to a `u8` parameter without shifts is a `u8` too. (matching.md: "narrows an argument")
@@ -837,6 +840,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
   section of its own, and a static called from code the optimizer removes is still emitted with its literals.
   (matching.md: "Each literal that code creates")
+- A table of string pointers before its own strings, in the middle of a file's `.data`, where ours lays the strings
+  out first: the table starts another original file (under `-ipa function` only a table above a file's first function
+  comes first). (matching.md: "comes before its strings only when")
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
