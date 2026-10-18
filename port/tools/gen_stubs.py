@@ -201,20 +201,27 @@ def main():
         libc = library_symbols(driver_libraries(args.compiler), args.nm)
     else:
         libc = ctypes.CDLL(None)
-    functions, data, unknown = [], [], []
+    functions, data, unknown, provided = [], [], [], []
     for name in sorted(undefined):
         info = ds.get(name)
         if info is None or not IDENTIFIER.match(name) or keyword.iskeyword(name):
-            if not host_provides(name, libc) and not name.startswith(("SDL_", "port_")):
+            # A Windows object names a library's function by its import, __imp_NAME
+            library_name = name.removeprefix("__imp_")
+            if not host_provides(library_name, libc) and not library_name.startswith(("SDL_", "port_")):
                 unknown.append(name)
             continue
         if host_provides(name, libc):
+            provided.append(name)
             continue
         (functions if info["function"] else data).append((name, info))
     data.sort(key=lambda item: (item[1]["module"], item[1]["address"]))
     write_stubs(args.out, functions, data)
     print(f"gen_stubs: {len(functions)} function stubs, {len(data)} data placeholders, "
           f"{len(defined)} symbols defined", file=sys.stderr)
+    # The ROM's functions the host's C library stands in for (memcpy, sprintf and the like): a name a host library
+    # happens to share with a game function would show here
+    print(f"gen_stubs: the host's C library provides {len(provided)} of the ROM's symbols: {', '.join(provided)}",
+          file=sys.stderr)
     if unknown:
         print(f"gen_stubs: {len(unknown)} referenced symbols are in neither the objects, the host's C library nor "
               f"the ROM: {', '.join(unknown[:40])}{' ...' if len(unknown) > 40 else ''}", file=sys.stderr)

@@ -667,7 +667,8 @@ static void TestRtcHostTime(void) {
     RTC_Init();
     CHECK(RTC_GetDateTime(&date, &clock) == RTC_RESULT_SUCCESS);
     now = time(NULL);
-    localtime_r(&now, &local);
+    // Standard C's localtime, which every host has; the test has one thread
+    local = *localtime(&now);
     // The same date unless the host's clock passed midnight in between
     CHECK((date.year == (u32)(local.tm_year - 100) && date.month == (u32)local.tm_mon + 1 &&
            date.day == (u32)local.tm_mday) ||
