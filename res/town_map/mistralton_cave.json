@@ -1,0 +1,37 @@
+{
+    "$schema": "place.schema.json",
+    "zone": "ZONE_MISTRALTON_CAVE",
+    "type": 2,
+    "radius": 12,
+    "position": {
+        "x": 64,
+        "y": 71
+    },
+    "cursor": {
+        "x": 64,
+        "y": 71
+    },
+    "hit": {
+        "start": {
+            "x": 64,
+            "y": 67
+        },
+        "end": {
+            "x": 64,
+            "y": 75
+        },
+        "radius": 8
+    },
+    "fly": false,
+    "unk13": 0,
+    "unk14": 0,
+    "arrival_flag": null,
+    "shown_by": null,
+    "description": "TownMap_Text_ForgottenCaveSealedHints",
+    "landmarks": [],
+    "area": {
+        "animation": 1,
+        "x": 56,
+        "y": 63
+    }
+}

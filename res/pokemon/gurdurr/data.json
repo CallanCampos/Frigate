@@ -1,0 +1,138 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Gurdurr",
+    "pokedex": {
+        "category": "Muscular Pokémon",
+        "entry": "With strengthened bodies,\nthey skillfully wield steel beams\nto take down buildings.",
+        "height": "3'11\"",
+        "weight": "88.2 lbs.",
+        "languages": {
+            "ja": {
+                "category": "きんこつポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 85,
+        "attack": 105,
+        "defense": 85,
+        "speed": 40,
+        "special_attack": 40,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_FIGHTING", "TYPE_FIGHTING" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 2,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_GUTS", "ABILITY_SHEER_FORCE" ],
+    "hidden_ability": "ABILITY_IRON_FIST",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 12,
+    "weight": 400,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POUND" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_FOCUS_ENERGY" ],
+            [ 1, "MOVE_BIDE" ],
+            [ 4, "MOVE_FOCUS_ENERGY" ],
+            [ 8, "MOVE_BIDE" ],
+            [ 12, "MOVE_LOW_KICK" ],
+            [ 16, "MOVE_ROCK_THROW" ],
+            [ 20, "MOVE_WAKE_UP_SLAP" ],
+            [ 24, "MOVE_CHIP_AWAY" ],
+            [ 29, "MOVE_BULK_UP" ],
+            [ 33, "MOVE_ROCK_SLIDE" ],
+            [ 37, "MOVE_DYNAMIC_PUNCH" ],
+            [ 41, "MOVE_SCARY_FACE" ],
+            [ 45, "MOVE_HAMMER_ARM" ],
+            [ 49, "MOVE_STONE_EDGE" ],
+            [ 53, "MOVE_FOCUS_PUNCH" ],
+            [ 57, "MOVE_SUPERPOWER" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM08",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM47",
+            "TM48",
+            "TM52",
+            "TM56",
+            "TM66",
+            "TM67",
+            "TM71",
+            "TM80",
+            "TM83",
+            "TM84",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_LOW_KICK",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_BLOCK",
+            "MOVE_SUPERPOWER",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE",
+            "param": 0,
+            "species": "SPECIES_CONKELDURR"
+        }
+    ],
+    "regional_dex_number": 74,
+    "baby_species": "SPECIES_TIMBURR",
+    "cry_volume": 120
+}

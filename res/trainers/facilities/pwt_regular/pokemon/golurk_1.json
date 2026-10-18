@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GOLURK",
+    "moves": [ "MOVE_SHADOW_PUNCH", "MOVE_IRON_DEFENSE", "MOVE_BULLDOZE", "MOVE_HEAVY_SLAM" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_MUSCLE_BAND",
+    "form": 0
+}

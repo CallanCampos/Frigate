@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VILEPLUME",
+    "moves": [ "MOVE_PETAL_DANCE", "MOVE_STUN_SPORE", "MOVE_TEETER_DANCE", "MOVE_MOONLIGHT" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_PERSIM_BERRY",
+    "form": 0
+}

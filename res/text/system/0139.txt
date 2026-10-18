@@ -1,0 +1,13 @@
+Bank0139_Text_Empty =
+Bank0139_Text_Empty_2 = コンニチハ
+Bank0139_Text_Empty_3 = 안녕하세요
+Bank0139_Text_Byebye = 絵_BYEBYE
+Bank0139_Text_Goodday = 絵_GOODDAY
+Bank0139_Text_Goodluck = 絵_GOODLUCK
+Bank0139_Text_Happy = 絵_HAPPY
+Bank0139_Text_Hello = 絵_HELLO
+Bank0139_Text_Iloveit = 絵_ILOVEIT
+Bank0139_Text_Itsfun = 絵_ITSFUN
+Bank0139_Text_Sorry = 絵_SORRY
+Bank0139_Text_Super = 絵_SUPER♪
+Bank0139_Text_Thankyou = 絵_THANKYOU

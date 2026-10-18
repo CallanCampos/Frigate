@@ -1,0 +1,5 @@
+Bank0012_Text_Yes = YES
+Bank0012_Text_No = NO
+Bank0012_Text_Check = CHECK
+Bank0012_Text_Close = CLOSE
+\pad{3e}

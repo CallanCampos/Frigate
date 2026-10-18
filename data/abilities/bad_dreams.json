@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Bad Dreams",
-    "description": "Reduces a sleeping\nfoe's HP."
-}

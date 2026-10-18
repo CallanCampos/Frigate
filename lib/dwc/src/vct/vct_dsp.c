@@ -1,3 +1,4 @@
+#include "nitro/cp.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "vct_dsp_internal.h"
@@ -38,7 +39,6 @@ struct VCTEcho {
 };
 
 static VCTCapture sCapture = { 0, 0, 15, 0x3fc };
-static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
 
 static s16 sEchoHistory[0x800];
 static s16 sFarEnd[VCT_FRAME_SAMPLES];
@@ -133,6 +133,7 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level) {
     if (sCapture.speaking == 0) {
         u32 sum = 0;
         u32 floor;
+        u32 j;
         int i;
 
         for (i = 0; i < 4; i++) {
@@ -145,8 +146,8 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level) {
         floor = REG_SQRT_RESULT;
         if (rms != 0 && rms >= floor * 2) {
             sum = 0;
-            for (i = 0; i < 4; i++) {
-                sum += sLoudnessHistory[i];
+            for (j = 0; j < 4; j++) {
+                sum += sLoudnessHistory[j];
             }
             REG_SQRTCNT = 0;
             REG_SQRT_PARAM_LO = sum / 4;
@@ -174,18 +175,18 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level) {
         REG_SQRT_PARAM_LO = sum / 4;
         while (REG_SQRTCNT & REG_SQRTCNT_BUSY) {
         }
-        if (REG_SQRT_RESULT > sNoiseFloor.threshold) {
+        if (REG_SQRT_RESULT <= sNoiseFloor.threshold) {
+            sNoiseFloor.quietFrames++;
+            if (sNoiseFloor.quietFrames > sCapture.quietFrameLimit) {
+                sCapture.speaking = 0;
+                sNoiseFloor.quietFrames = 0;
+                sNoiseFloor.index = 0;
+                return 3;
+            }
+        } else {
             sNoiseFloor.quietFrames = 0;
-            return 2;
         }
-        sNoiseFloor.quietFrames++;
-        if (sNoiseFloor.quietFrames <= sCapture.quietFrameLimit) {
-            return 2;
-        }
-        sCapture.speaking = 0;
-        sNoiseFloor.quietFrames = 0;
-        sNoiseFloor.index = 0;
-        return 3;
+        result = 2;
     }
     return result;
 }
@@ -199,36 +200,36 @@ void VCT_InitCapture(void) {
 // Filters a frame in place with a high-pass filter and returns the mean of the squares of the result
 u32 VCT_FilterFrame(s16 *samples, int bytes) {
     s16 input = samples[0];
-    u32 count = (u32)bytes >> 1;
-    int minusInput = -(input * 0xe9f);
+    int scaled = input * 0xe9f;
+    int minusInput = -scaled;
     u32 i;
     u64 sum;
-    int output = ((input * 0xe9f) + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
+    int output = (scaled + sEcho.highpassMinusInput + sEcho.highpassOutput * 0xd3e) >> 12;
 
+    bytes /= sizeof(s16);
     sum = output * output;
     sEcho.highpassOutput = output;
     sEcho.highpassMinusInput = minusInput;
-    for (i = 1; i < count; i++) {
-        int scaled = samples[i] * 0xe9f;
-        int next = scaled + minusInput + output * 0xd3e;
+    i = 1;
+    if (i < bytes) {
+        do {
+            int scaled = samples[i] * 0xe9f;
+            int next = scaled + minusInput + output * 0xd3e;
 
-        samples[i - 1] = output;
-        output = next >> 12;
-        sum += output * output;
-        minusInput = -scaled;
+            samples[i - 1] = output;
+            output = next >> 12;
+            sum += output * output;
+            minusInput = -scaled;
+        } while (++i < bytes);
+        sEcho.highpassMinusInput = minusInput;
+        sEcho.highpassOutput = output;
     }
-    sEcho.highpassMinusInput = minusInput;
-    sEcho.highpassOutput = output;
-    *(samples + count - 1) = output;
-    REG_DIVCNT = 1;
-    REG_DIV_NUMER_LO = (u32)sum;
-    REG_DIV_NUMER_HI = (u32)(sum >> 32);
-    REG_DIV_DENOM_LO = count;
-    REG_DIV_DENOM_HI = 0;
-    while (REG_DIVCNT & REG_DIVCNT_BUSY) {
-    }
-    return REG_DIV_RESULT_LO;
+    *(samples + bytes - 1) = output;
+    CP_SetDiv64_32(sum, bytes);
+    return CP_GetDivResult32();
 }
+
+static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
 
 void VCT_InitEcho(void) {
     const s16 *coeffs = sInitialCoefficients;

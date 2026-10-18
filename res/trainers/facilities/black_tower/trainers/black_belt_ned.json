@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Ned",
+    "class": "TRAINER_CLASS_BLACK_BELT",
+    "pokemon": [
+        "hitmonlee_1",
+        "sawk_1",
+        "staraptor_1",
+        "shiftry_1",
+        "darmanitan_1",
+        "golurk_1",
+        "beartic_1",
+        "stoutland_1",
+        "leavanny_1",
+        "rampardos_1"
+    ]
+}

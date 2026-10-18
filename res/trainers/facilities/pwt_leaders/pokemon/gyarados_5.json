@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GYARADOS",
+    "moves": [ "MOVE_DRAGON_DANCE", "MOVE_ROCK_SLIDE", "MOVE_EARTHQUAKE", "MOVE_REST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CAREFUL",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

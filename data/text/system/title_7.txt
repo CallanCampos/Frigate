@@ -1,8 +1,0 @@
-Title7_Text_ViewCategories = VIEW CATEGORIES
-Title7_Text_ShowAll = SHOW ALL
-Title7_Text_PleaseSelectCategory = Please select a category.
-Title7_Text_PleaseSelectWhatWant = Please select what you want to read.
-Title7_Text_Empty = {0200:0}/{0200:1}
-Title7_Text_Empty_2 =                  \x{ffff}
-Title7_Text_Empty_3 =                  \x{ffff}
-Title7_Text_Empty_4 =                                                                                                                                                                                             \x{ffff}

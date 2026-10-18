@@ -1,0 +1,13 @@
+BtlMain2_Text_HallFame = The Hall of Fame!
+BtlMain2_Text_Empty = {0102:0}
+BtlMain2_Text_Lv = Lv.
+BtlMain2_Text_Empty_2 = {0202:0}
+BtlMain2_Text_LeagueChampionCongratulations = League Champion! Congratulations!
+BtlMain2_Text_Empty_3 = {0100:0}
+BtlMain2_Text_IdNo = ID No. {0204:0}
+BtlMain2_Text_Empty_4 = {0202:0}:{0201:1}
+BtlMain2_Text_Empty_5 =                  \x{ffff}
+BtlMain2_Text_Empty_6 =     \x{ffff}
+BtlMain2_Text_Empty_7 =     \x{ffff}
+BtlMain2_Text_Empty_8 =          \x{ffff}
+\pad{5c}

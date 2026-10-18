@@ -1,0 +1,1 @@
+LacunosaTown4_Text_CourseItsDangerousGo = Of course it's dangerous\nto go out at night.{be01}\nMaybe you should stay inside\nduring the afternoon, too.{be00}\nThen there's no danger at all!

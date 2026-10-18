@@ -1,0 +1,67 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Drayden",
+    "class": "TRAINER_CLASS_LEADER_DRAYDEN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DRUDDIGON",
+            "form": 0,
+            "level": 46,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_DRAGON_TAIL", "MOVE_REVENGE", "MOVE_ROCK_SLIDE", "MOVE_CRUNCH" ]
+        },
+        {
+            "species": "SPECIES_FLYGON",
+            "form": 0,
+            "level": 46,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_DRAGON_TAIL", "MOVE_CRUNCH", "MOVE_EARTH_POWER", "MOVE_ROCK_SLIDE" ]
+        },
+        {
+            "species": "SPECIES_ALTARIA",
+            "form": 0,
+            "level": 46,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_DRAGON_PULSE", "MOVE_COTTON_GUARD", "MOVE_SING", "MOVE_FIRE_BLAST" ]
+        },
+        {
+            "species": "SPECIES_HAXORUS",
+            "form": 0,
+            "level": 48,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SITRUS_BERRY",
+            "moves": [ "MOVE_DRAGON_TAIL", "MOVE_SHADOW_CLAW", "MOVE_X_SCISSOR", "MOVE_DRAGON_DANCE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "Whatever move you chose, it fills me with the\nheat of battle!"
+        },
+        {
+            "type": 19,
+            "text": "My blood burns with even more fire at\nthis age! I've still got some fight in me!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This bitterness that floods me after\na defeat...{be01}\nThe heart that does not succumb to such a\nfeeling is filled with energy and life!"
+        }
+    ]
+}

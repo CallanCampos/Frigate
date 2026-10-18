@@ -22,6 +22,7 @@ void FieldFog_Animate(FieldFog *fog, u32 color, u32 depthShift, u32 duration);
 FieldFog *FieldFog_Create(HeapID heapId);
 void FieldFog_Free(FieldFog *fog);
 void FieldFog_Update(FieldFog *fog);
+BOOL FieldFog_IsAnimationRunning(FieldFog *fog);
 // field_zonefog.c: loads the zone's fog file, delay frames after a request
 FieldFogCtrl *FieldFogCtrl_Create(HeapID heapId);
 void FieldFogCtrl_Free(FieldFogCtrl *ctrl);

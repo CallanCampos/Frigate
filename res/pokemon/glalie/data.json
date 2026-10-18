@@ -1,0 +1,171 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Glalie",
+    "pokedex": {
+        "category": "Face Pokémon",
+        "entry": "It prevents prey from escaping by\ninstantaneously freezing moisture\nin the air.",
+        "height": "4'11\"",
+        "weight": "565.5 lbs.",
+        "languages": {
+            "en": {
+                "name": "Glalie",
+                "category": "Face Pokémon",
+                "entry": "It prevents prey from escaping by\ninstantaneously freezing moisture\nin the air.",
+                "height": "4'11\"",
+                "weight": "565.5 lbs."
+            },
+            "fr": {
+                "name": "Oniglali",
+                "category": "Pokémon Face",
+                "entry": "Il empêche ses proies de prendre\nla fuite en gelant instantanément\nl'humidité de l'air.",
+                "height": "1,5 m",
+                "weight": "256,5 kg"
+            },
+            "de": {
+                "name": "Firnontor",
+                "category": "Antlitz",
+                "entry": "Es verhindert, dass Beute flieht,\nindem es die Feuchtigkeit in der\nLuft augenblicklich einfriert.",
+                "height": "1,5 m",
+                "weight": "256,5 kg"
+            },
+            "it": {
+                "name": "Glalie",
+                "category": "Pokémon Tuttomuso",
+                "entry": "Impedisce alla preda di scappare\ncongelando all'istante l'umidità\nnell'aria.",
+                "height": "1,5 m",
+                "weight": "256,5 kg"
+            },
+            "ko": {
+                "name": "얼음귀신",
+                "category": "얼굴포켓몬",
+                "entry": "공기 중의 수분을\n일순간에 얼려버리는 것으로\n먹이가 도망치지 못하게 한다.",
+                "height": "1.5 m",
+                "weight": "256.5 kg"
+            },
+            "es": {
+                "name": "Glalie",
+                "category": "Pokémon Cara",
+                "entry": "Impide que sus presas se escapen\ncongelando la humedad del aire en\nun instante.",
+                "height": "1,5 m",
+                "weight": "256,5 kg"
+            },
+            "ja": {
+                "name": "オニゴーリ",
+                "category": "がんめんポケモン",
+                "entry": "くうきちゅうの\\x{3000}すいぶんを\nいっしゅんで\\x{3000}こおらせることで\nえものが\\x{3000}にげられないように\\x{3000}する。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff15}\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 80,
+        "attack": 80,
+        "defense": 80,
+        "speed": 80,
+        "special_attack": 80,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_ICE", "TYPE_ICE" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_BABIRI_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FAIRY", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_INNER_FOCUS", "ABILITY_ICE_BODY" ],
+    "hidden_ability": "ABILITY_MOODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 168,
+    "height": 15,
+    "weight": 2565,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_POWDER_SNOW" ],
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_DOUBLE_TEAM" ],
+            [ 1, "MOVE_BITE" ],
+            [ 4, "MOVE_DOUBLE_TEAM" ],
+            [ 10, "MOVE_BITE" ],
+            [ 13, "MOVE_ICY_WIND" ],
+            [ 19, "MOVE_HEADBUTT" ],
+            [ 22, "MOVE_PROTECT" ],
+            [ 28, "MOVE_ICE_FANG" ],
+            [ 31, "MOVE_CRUNCH" ],
+            [ 37, "MOVE_ICE_BEAM" ],
+            [ 40, "MOVE_HAIL" ],
+            [ 51, "MOVE_BLIZZARD" ],
+            [ 59, "MOVE_SHEER_COLD" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM30",
+            "TM32",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM66",
+            "TM68",
+            "TM70",
+            "TM74",
+            "TM78",
+            "TM79",
+            "TM87",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_SUPER_FANG",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_IRON_HEAD",
+            "MOVE_BLOCK",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_SNORE",
+            "MOVE_SPITE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SNORUNT",
+    "cry_volume": 120
+}

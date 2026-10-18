@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 24,
+    "area": "AREA_GIANT_CHASM_2",
+    "matrix": "MAP_MATRIX_ROCK_PEAK_CHAMBER",
+    "scripts": "SCRIPTS_ROCK_PEAK_CHAMBER",
+    "text": "SCRIPT_TEXT_ROCK_PEAK_CHAMBER",
+    "bgm": "SEQ_BGM_SW_D_REGI",
+    "encounters": "ENCOUNTERS_ROCK_PEAK_CHAMBER",
+    "enc_slot": 6,
+    "parent": "ZONE_CLAY_TUNNEL",
+    "place": "PLACE_ROCK_PEAK_CHAMBER",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 4,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 65535,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

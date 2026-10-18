@@ -1,0 +1,10 @@
+HumilauCity4_Text_SomehowCustomersDontCome = Somehow, customers don't come\nto this place.{be01}\nOh! I have an idea!\nYou're a Trainer, aren't you?{be01}\nDo your best and become\nthe Champion!{be01}\nThen, I can advertise this place\nas a room that the Champion visited!
+HumilauCity4_Text_ChoosePlaceOurHoneymoon = To choose this place for our honeymoon.\nThat's the man I chose!
+HumilauCity4_Text_YoureWonderfulPersonCan = You're a wonderful person.\nYou can do things for others.{be01}\nIf such a person rings the bell,\nthe sound should reach here...
+HumilauCity4_Text_IfSoundBellCelestial = If the sound of the bell at the\nCelestial Tower on Route 7 reaches{be00}\nthis room, we can be happy!{be01}\nI heard such a rumor.\nCan I ask you a favor?{be00}\nWill you ring the bell for my wife?
+HumilauCity4_Text_YoureNiceWouldGreat = You're so nice!{be01}\nIt would be great if this world\nwas full of people like you!
+HumilauCity4_Text_OhComePleaseRing = Oh, come on. Please ring the bell\nto make us happy!
+HumilauCity4_Text_WonderIfSoundBell = I wonder if the sound of the bell on\nRoute 7 will reach here.
+HumilauCity4_Text_OhSoundBellDont = Oh, you! As for the sound of the bell,\nI don't think I've heard it yet...{be01}\n...{be01}\nWhat? Did they say such things\nat the Celestial Tower...?{be00}\nWell, putting that aside...{be01}\nHere! This is a thank-you gift!
+HumilauCity4_Text_WishTheirHappiness = I wish for their happiness...
+\pad{02}

@@ -1,0 +1,25 @@
+CasteliaCity22_Text_BeautifulMelodyMakesPeople = A beautiful melody makes people happy.\nA sad melody makes people sorrowful...{be00}\nThat's the power of melodies...
+CasteliaCity22_Text_ScentBroughtRemindedLong = The scent you brought me reminded me of\na long-ago melody from the fringes of my{be00}\nsepia-toned memories.{be01}\nIt was a song my mother loved...\nIt makes me feel so nostalgic.{be01}\nWould you like to hear the melody?{be01}
+CasteliaCity22_Text_MotherOnceToldPokemon = My mother once told me of a Pokémon that\nplayed a melody and danced so lightly{be00}\nthat it filled people's hearts with joy.{be01}\nThen sorrow darkened the entire world,\nand the Pokémon's melody was lost...{be01}\nAt the same time, somewhere,\nsome red shoes were lost...{be01}
+CasteliaCity22_Text_WhenCameThroughDoor = When you came through the door,\nI remembered the melody!{be01}\nAnd the Pokémon that had forgotten how\nto dance began to step lightly once more!{be01}\nYou are the inspiration.\nYou are a mysterious child...
+CasteliaCity22_Text_LetSingRelicSong = Let it sing the Relic Song.{be01}\nAria Forme will become Pirouette Forme,\nand vice versa.
+CasteliaCity22_Text_RememberedRelicSongHad = {0102:0} remembered the\nRelic Song it had forgotten!{be01}
+CasteliaCity22_Text_Empty =                                             \x{ffff}
+CasteliaCity22_Text_Empty_2 =                               \x{ffff}
+CasteliaCity22_Text_Empty_3 =                              \x{ffff}
+CasteliaCity22_Text_Empty_4 =                      \x{ffff}
+CasteliaCity22_Text_Empty_5 =                                                                                       \x{ffff}
+CasteliaCity22_Text_FirstVisitCafeAm = This is your first visit to this café.\nAm I correct?{be01}\nPlease...{be01}
+CasteliaCity22_Text_GiveDearPokemon = Give this to your dear Pokémon.
+CasteliaCity22_Text_CameAllWayHere = You came all the way here.\nEnjoy...
+CasteliaCity22_Text_IveBeenLettingTired = I've been letting my tired mind relax\nin this café this whole time...
+CasteliaCity22_Text_ListenHimPlayingGuitar = Listen to him playing guitar...\nI went back to the home I'd left behind,{be00}\nand my mother cried tears of joy...{be00}\nThat's mothers for you.
+CasteliaCity22_Text_CantChangeFamilyBut = You can't change your family,\nbut you can change how you{be00}\ninteract with one another.{be01}\nStill, that said...
+CasteliaCity22_Text_ThanksMeloettaMemoriesBirthplace = Thanks to you and Meloetta,\nmemories of my birthplace...{be00}\nmemories of when I was little...{be00}\nmemories of singing together after{be00}\nwe finished gathering Berries...{be00}\nAll these memories came flooding back.{be01}
+CasteliaCity22_Text_FunfestMissionHasBeen = The Funfest Mission\n“{0140:0}"{be00}\nhas been added to the Entralink.
+CasteliaCity22_Text_ImGoingHaveFun = I'm going to have fun gathering Berries\nwith the people living in the countryside{be00}\nand the Pokémon I've met here in{be00}\nCastelia City!{be01}\nOf course, I'll be humming\nMeloetta's tune while I gather them!
+CasteliaCity22_Text_Empty_6 =     \x{ffff}
+CasteliaCity22_Text_Empty_7 =     \x{ffff}
+CasteliaCity22_Text_Empty_8 =     \x{ffff}
+CasteliaCity22_Text_PoppedOutPokeBall = {0102:0} popped out of\nthe Poké Ball!{be01}
+\pad{30}

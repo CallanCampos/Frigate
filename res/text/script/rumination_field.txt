@@ -1,0 +1,4 @@
+RuminationField_Text_HappenedAroundWhenHero = This happened around when the hero\nappeared in Opelucid City with the{be00}\nlegendary dragon Pokémon.{be01}
+RuminationField_Text_RightAroundHereWould = Right around here, you would\nhear a very sad cry.{be01}\nThen a bright-green Pokémon would\nrun around like the wind.{be01}
+RuminationField_Text_IveHeardItsCalled = I've heard it's called Virizion, and it\ntook up against humans to protect{be00}\nPokémon from a war between people.{be01}\nIt's apparently a legendary Pokémon.{be01}\nMaybe it was afraid that Team Plasma's\nrising to power would ruin the world and{be00}\nits friends' homes would be destroyed.
+\pad{d0}

@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Manus",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "pokemon": [
+        "forretress_1",
+        "skarmory_1",
+        "torkoal_1",
+        "cofagrigus_1",
+        "durant_1",
+        "golem_1",
+        "ferrothorn_1",
+        "slowbro_1",
+        "weezing_1",
+        "miltank_1"
+    ]
+}

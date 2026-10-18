@@ -318,10 +318,11 @@ void func_ov167_021d5fe4(PokewoodCutin *cutin, BtlvCore *viewCore) {
 // Whether the movie has a cut-in after the scene for its result
 BOOL func_ov167_021d5fe8(const BtlScriptedRules *rules, s8 scene, u8 result, u32 unused) {
     u32 i;
+    u32 movie = rules->movie;
     BOOL play;
 
     for (i = 0; i < NELEMS(sCutins); i++) {
-        if (rules->movie == sCutins[i].movie && scene == sCutins[i].scene) {
+        if (movie == sCutins[i].movie && scene == sCutins[i].scene) {
             play = FALSE;
             switch (sCutins[i].type) {
             case 0:

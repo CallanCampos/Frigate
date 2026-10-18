@@ -97,9 +97,6 @@
 #define ACTOR_INFO_MEDAL 70
 #define ACTOR_COUNT 71
 
-// NitroSDK's GX_OAM_MODE_OBJWND, which nitro/gx.h lacks
-#define OAM_MODE_OBJWND 2
-
 #define MEDAL_ACTOR_COUNT 25
 #define SPARKLE_COUNT 10
 
@@ -734,7 +731,7 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
                           work->resources[RES_MEDAL_CELLS], &windowSetup, 0, heapId);
         func_0204c488(work->actors[j], 0);
         func_0204c124(work->actors[j], TRUE);
-        func_0204c318(work->actors[j], OAM_MODE_OBJWND);
+        func_0204c318(work->actors[j], GX_OAM_MODE_OBJWND);
     }
 
     actorSetup.x = 0x2c;

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sheer Force",
+    "description": "Removes added effects to\nincrease move damage."
+}

@@ -1,0 +1,46 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 80,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_FRILLISH", 30, 45 ],
+            [ "SPECIES_MANTYKE", 30, 45 ],
+            [ "SPECIES_REMORAID", 35, 45 ],
+            [ "SPECIES_FRILLISH", 35, 45 ],
+            [ "SPECIES_FRILLISH", 35, 45 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_JELLICENT", 30, 45 ],
+            [ "SPECIES_ALOMOMOLA", 30, 45 ],
+            [ "SPECIES_MANTINE", 35, 45 ],
+            [ "SPECIES_ALOMOMOLA", 35, 45 ],
+            [ "SPECIES_ALOMOMOLA", 35, 45 ]
+        ],
+        "fishing": [
+            [ "SPECIES_LUVDISC", 40, 60 ],
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_LUVDISC", 50, 70 ],
+            [ "SPECIES_LUVDISC", 50, 70 ],
+            [ "SPECIES_LUVDISC", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_LUVDISC", 40, 60 ],
+            [ "SPECIES_REMORAID", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ]
+        ]
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Iron",
+    "class": "TRAINER_CLASS_ARTIST",
+    "pokemon": [
+        "forretress_2",
+        "spiritomb_2",
+        "drifblim_2",
+        "claydol_2",
+        "bronzong_2",
+        "porygon2_2",
+        "starmie_2",
+        "klinklang_2",
+        "probopass_2",
+        "magnezone_2",
+        "porygon_z_2",
+        "metagross_2"
+    ],
+    "messages": [
+        "Every time a Pokémon uses a move,\nmy heart will tremble!",
+        "Nothing stirs the soul\nmore than Pokémon moves.",
+        "Aha! Pokémon moves are so beautiful!\nI could almost faint!"
+    ]
+}

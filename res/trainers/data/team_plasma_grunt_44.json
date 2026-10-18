@@ -1,0 +1,27 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 0,
+            "level": 14,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Plasmaaaa!\nI lost! This is awful!"
+        }
+    ]
+}

@@ -46,7 +46,12 @@ struct FieldAppCallInput {
 
 // The apps of FIELD_PROC_LINK_LIST, by index
 #define FIELD_APP_POKELIST 0
+#define FIELD_APP_ZUKAN 1
 #define FIELD_APP_BAG 2
+#define FIELD_APP_TRAINER_CARD 3
+#define FIELD_APP_SAVE 4
+#define FIELD_APP_CONFIG 5
+#define FIELD_APP_INF_DUNGEON_RETIRE 6
 #define FIELD_APP_POKESTATUS 7
 #define FIELD_APP_MAIL 10
 #define FIELD_APP_SHINKA_DEMO 11

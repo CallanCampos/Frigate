@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Tabatha",
+    "class": "TRAINER_CLASS_BACKPACKER_M",
+    "pokemon": [
+        "floatzel_2",
+        "accelgor_2",
+        "zebstrika_2",
+        "rapidash_2",
+        "aerodactyl_2",
+        "starmie_2",
+        "jolteon_2",
+        "serperior_2",
+        "sceptile_2",
+        "crobat_2"
+    ]
+}

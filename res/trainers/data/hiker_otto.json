@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Otto",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ARON",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_NOSEPASS",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 1
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "This Hiker wandering the expanses of\nthe world will teach a child like you the{be00}\nharshness of life and the difficulty of{be00}\nPokémon battles!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "The teacher was schooled...\nYou're very strict, aren't you?"
+        },
+        {
+            "type": 2,
+            "text": "Sometimes Pokémon are inside dust clouds!"
+        }
+    ]
+}

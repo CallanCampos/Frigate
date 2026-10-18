@@ -1,0 +1,118 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Swadloon",
+    "pokedex": {
+        "category": "Leaf-Wrapped Pokémon",
+        "entry": "Preferring dark, damp places,\nit spends the entire day eating\nfallen leaves that lie around it.",
+        "height": "1'08\"",
+        "weight": "16.1 lbs.",
+        "languages": {
+            "ja": {
+                "category": "はごもりポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 63,
+        "defense": 90,
+        "speed": 42,
+        "special_attack": 50,
+        "special_defense": 80
+    },
+    "types": [ "TYPE_BUG", "TYPE_GRASS" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_MENTAL_HERB",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_LEAF_GUARD", "ABILITY_CHLOROPHYLL" ],
+    "hidden_ability": "ABILITY_OVERCOAT",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 133,
+    "height": 5,
+    "weight": 73,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GRASS_WHISTLE" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_STRING_SHOT" ],
+            [ 1, "MOVE_BUG_BITE" ],
+            [ 1, "MOVE_RAZOR_LEAF" ],
+            [ 20, "MOVE_PROTECT" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM53",
+            "TM66",
+            "TM70",
+            "TM76",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_SEED_BOMB",
+            "MOVE_MAGIC_COAT",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ELECTROWEB",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_FRIENDSHIP",
+            "param": 0,
+            "species": "SPECIES_LEAVANNY"
+        }
+    ],
+    "regional_dex_number": 18,
+    "baby_species": "SPECIES_SEWADDLE",
+    "cry_volume": 120
+}

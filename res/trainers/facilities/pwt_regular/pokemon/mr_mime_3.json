@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_MR_MIME",
+    "moves": [ "MOVE_PAYBACK", "MOVE_HYPNOSIS", "MOVE_WAKE_UP_SLAP", "MOVE_POWER_SPLIT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_JABOCA_BERRY",
+    "form": 0
+}

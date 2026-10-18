@@ -1,0 +1,162 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Moltres",
+    "pokedex": {
+        "category": "Flame Pokémon",
+        "entry": "One of the legendary bird Pokémon.\nIt is said that its appearance\nindicates the coming of spring.",
+        "height": "6'07\"",
+        "weight": "132.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Moltres",
+                "category": "Flame Pokémon",
+                "entry": "One of the legendary bird Pokémon.\nIt is said that its appearance\nindicates the coming of spring.",
+                "height": "6'07\"",
+                "weight": "132.3 lbs."
+            },
+            "fr": {
+                "name": "Sulfura",
+                "category": "Pokémon Flamme",
+                "entry": "L'un des Pokémon Oiseaux légendaires.\nOn dit que sa venue annonce l'arrivée\ndu printemps.",
+                "height": "2,0 m",
+                "weight": "60,0 kg"
+            },
+            "de": {
+                "name": "Lavados",
+                "category": "Flamme",
+                "entry": "Eines der Legendären Vogel-Pokémon.\nEs wird als Bote des Frühlings\nangesehen.",
+                "height": "2,0 m",
+                "weight": "60,0 kg"
+            },
+            "it": {
+                "name": "Moltres",
+                "category": "Pokémon Fiamma",
+                "entry": "Un Pokémon uccello leggendario.\nSi dice che la sua apparizione preannunci\nl'arrivo della primavera.",
+                "height": "2,0 m",
+                "weight": "60,0 kg"
+            },
+            "ko": {
+                "name": "파이어",
+                "category": "화염포켓몬",
+                "entry": "전설의 새 포켓몬 중의 1마리다.\n파이어가 모습을 보이면\n봄이 찾아온다고 전해진다.",
+                "height": "2.0 m",
+                "weight": "60.0 kg"
+            },
+            "es": {
+                "name": "Moltres",
+                "category": "Pokémon Llama",
+                "entry": "Uno de los legendarios Pokémon pájaro.\nDicen que su presencia anuncia\nla llegada de la primavera.",
+                "height": "2,0 m",
+                "weight": "60,0 kg"
+            },
+            "ja": {
+                "name": "ファイヤー",
+                "category": "かえんポケモン",
+                "entry": "でんせつの\\x{3000}とりポケモンの\\x{3000}\\x{ff11}ぴき。\nファイヤーが\\x{3000}すがたを\\x{3000}みせると\nはるが\\x{3000}おとずれると\\x{3000}いわれている。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 100,
+        "defense": 90,
+        "speed": 90,
+        "special_attack": 125,
+        "special_defense": 85
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FLYING" ],
+    "catch_rate": 3,
+    "evolution_stage": 3,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 3,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": "GENDER_RATIO_GENDERLESS",
+    "hatch_cycles": 80,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_PRESSURE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_FLAME_BODY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 261,
+    "height": 20,
+    "weight": 600,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_WING_ATTACK" ],
+            [ 1, "MOVE_EMBER" ],
+            [ 8, "MOVE_FIRE_SPIN" ],
+            [ 15, "MOVE_AGILITY" ],
+            [ 22, "MOVE_ENDURE" ],
+            [ 29, "MOVE_ANCIENT_POWER" ],
+            [ 36, "MOVE_FLAMETHROWER" ],
+            [ 43, "MOVE_SAFEGUARD" ],
+            [ 50, "MOVE_AIR_SLASH" ],
+            [ 57, "MOVE_ROOST" ],
+            [ 64, "MOVE_HEAT_WAVE" ],
+            [ 71, "MOVE_SOLAR_BEAM" ],
+            [ 78, "MOVE_SKY_ATTACK" ],
+            [ 85, "MOVE_SUNNY_DAY" ],
+            [ 92, "MOVE_HURRICANE" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM40",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM48",
+            "TM50",
+            "TM58",
+            "TM59",
+            "TM61",
+            "TM68",
+            "TM87",
+            "TM88",
+            "TM89",
+            "TM90",
+            "TM94",
+            "HM02"
+        ],
+        "by_tutor": [ "MOVE_SNORE", "MOVE_HEAT_WAVE", "MOVE_TAILWIND", "MOVE_SKY_ATTACK", "MOVE_ROOST", "MOVE_SLEEP_TALK" ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_MOLTRES",
+    "cry_volume": 110
+}

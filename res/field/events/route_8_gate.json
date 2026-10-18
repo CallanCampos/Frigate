@@ -1,0 +1,69 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 8031,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 210,
+                "y": 187,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_185",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 2000,
+            "direction": "DIR_DOWN",
+            "params": [ 2, 1, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 233,
+                "z": 166,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_TUBELINE_BRIDGE_GATE",
+            "warp": 0,
+            "unk4": 0,
+            "transition": 6,
+            "grid": {
+                "x": 3880,
+                "y": 0,
+                "z": 2888,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 2000,
+            "var": 6,
+            "value": 0,
+            "type": 6,
+            "grid": {
+                "x": 233,
+                "z": 166,
+                "width": 2,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": []
+}

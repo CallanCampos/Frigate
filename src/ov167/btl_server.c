@@ -692,7 +692,7 @@ BOOL func_ov167_0219ef74(BtlServer *server, u32 mode, const void *data, u32 size
     return TRUE;
 }
 
-BOOL func_ov167_0219f000(BtlServer *server, u8 value) {
+BOOL func_ov167_0219f000(BtlServer *server, BOOL value) {
     u32 size;
     void *data;
 

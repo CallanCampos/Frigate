@@ -1,0 +1,5 @@
+VillageBridge5_Text_WonderIfVeteranPokemon = I wonder if veteran Pokémon raise\nor train young Pokémon.
+VillageBridge5_Text_WishSomebodyWouldRaise = I wish somebody would raise me like this.\nWith three meals and a nap every day.
+VillageBridge5_Text_Buuuurp = Buuuurp!
+VillageBridge5_Text_FollowDucklett = Follow me, Ducklett!
+VillageBridge5_Text_Quak = Quak!

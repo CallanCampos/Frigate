@@ -1,0 +1,4 @@
+DriftveilCity13_Text_GettingKnowSomeoneCreates = Getting to know someone\ncreates both joy and sorrow.{be01}\nPuns that were funny when you first met\nget old when you hear them all the time.
+DriftveilCity13_Text_GymLeaderNimbasaCity = As the Gym Leader of Nimbasa City,\nElesa has a shockingly packed schedule.{be01}\nThat's what you'd expect\nfrom an electrifying model!
+DriftveilCity13_Text_ThreeYearsAgoTeam = Three years ago, Team Plasma talked me\ninto letting my dear Pokémon go.{be01}\nEver since, I've been staying\nin hotels as I please.{be01}\n...To be honest, I feel lonely,\nbut it's a good thing not to have Pokémon{be00}\nwho'll be left behind and feel sad{be00}\nafter I pass away...
+\pad{34}

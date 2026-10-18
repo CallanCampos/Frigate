@@ -1,0 +1,17 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_HINSHI", null, null, null ],
+    "instruments": [
+        {
+            "program": 115,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 124,
+            "decay": 100,
+            "sustain": 80,
+            "release": 120,
+            "pan": 64
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+Route411_Text_HmmYoureTrainerQuick = Hmm? You're a Trainer with quick eyes!\nI'll give you these!{be01}
+Route411_Text_GoManyPlacesSpeak = Go to many places and\nspeak to many people.{be00}\nThen, good things will happen to you.
+Route411_Text_EveryMondayPokemonFly = Every Monday, Pokémon fly here\nfrom somewhere.
+Route411_Text_IfPokemonReleasedDemonstrate = If Pokémon are released\nand demonstrate their true skills...{be01}\nWill we be used by Pokémon\nand battle for them someday...?

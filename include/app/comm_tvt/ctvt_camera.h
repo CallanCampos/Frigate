@@ -26,7 +26,7 @@ u32 CtvtCamera_GetPictureSize(CommTvtWork *sys, CtvtCamera *work);
 void CtvtCamera_SetWindow(CommTvtWork *sys, CtvtCamera *work, u8 member);
 void CtvtCamera_MarkWindow(CommTvtWork *sys, CtvtCamera *work, u8 member);
 BOOL CtvtCamera_IsWindowMoving(CommTvtWork *sys, CtvtCamera *work, u8 member);
-void CtvtCamera_SetSize(CommTvtWork *sys, CtvtCamera *work, CAMERASize size);
+void CtvtCamera_SetEffect(CommTvtWork *sys, CtvtCamera *work, CAMERAEffect effect);
 void CtvtCamera_StartRecording(CommTvtWork *sys, CtvtCamera *work);
 void CtvtCamera_EndRecording(CommTvtWork *sys, CtvtCamera *work);
 CameraSystem *CtvtCamera_GetCameraSystem(CommTvtWork *sys, CtvtCamera *work);

@@ -1,0 +1,117 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Whimsicott",
+    "pokedex": {
+        "category": "Windveiled Pokémon",
+        "entry": "They appear along with whirlwinds. They\npull pranks, such as moving furniture\nand leaving balls of cotton in homes.",
+        "height": "2'04\"",
+        "weight": "14.6 lbs.",
+        "languages": {
+            "ja": {
+                "category": "かぜかくれポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 60,
+        "attack": 67,
+        "defense": 85,
+        "speed": 116,
+        "special_attack": 77,
+        "special_defense": 75
+    },
+    "types": [ "TYPE_GRASS", "TYPE_GRASS" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_FAIRY" ],
+    "abilities": [ "ABILITY_PRANKSTER", "ABILITY_INFILTRATOR" ],
+    "hidden_ability": "ABILITY_CHLOROPHYLL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 168,
+    "height": 7,
+    "weight": 66,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWTH" ],
+            [ 1, "MOVE_LEECH_SEED" ],
+            [ 1, "MOVE_MEGA_DRAIN" ],
+            [ 1, "MOVE_COTTON_SPORE" ],
+            [ 10, "MOVE_GUST" ],
+            [ 28, "MOVE_TAILWIND" ],
+            [ 46, "MOVE_HURRICANE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM20",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM56",
+            "TM68",
+            "TM70",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 83,
+    "baby_species": "SPECIES_COTTONEE",
+    "cry_volume": 120
+}

@@ -1,0 +1,11 @@
+{
+    "$schema": "area.schema.json",
+    "prop_bundle": "FIELD_PROPS_INTERIOR_ABYSSAL_RUINS",
+    "texture_set": "MAP_TEXTURE_SET_ABYSSAL_RUINS",
+    "srt_animation": 33,
+    "pattern_animation": null,
+    "exterior": false,
+    "lights": 40,
+    "edge_color_table": 1,
+    "actor_material_color": 1
+}

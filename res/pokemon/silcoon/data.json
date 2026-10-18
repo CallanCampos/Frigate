@@ -1,0 +1,123 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Silcoon",
+    "pokedex": {
+        "category": "Cocoon Pokémon",
+        "entry": "It wraps silk around the branches\nof a tree. It drinks rainwater on\nits silk while awaiting evolution.",
+        "height": "2'00\"",
+        "weight": "22.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Silcoon",
+                "category": "Cocoon Pokémon",
+                "entry": "It wraps silk around the branches\nof a tree. It drinks rainwater on\nits silk while awaiting evolution.",
+                "height": "2'00\"",
+                "weight": "22.0 lbs."
+            },
+            "fr": {
+                "name": "Armulys",
+                "category": "Pokémon Cocon",
+                "entry": "Il attend d'évoluer dans son cocon\nde soie accroché aux branches et\nse nourrit d'eau de pluie.",
+                "height": "0,6 m",
+                "weight": "10,0 kg"
+            },
+            "de": {
+                "name": "Schaloko",
+                "category": "Kokon",
+                "entry": "Es bindet sich mit Seide an Äste\nund trinkt Regenwasser, während es\nstarr auf seine Entwicklung wartet.",
+                "height": "0,6 m",
+                "weight": "10,0 kg"
+            },
+            "it": {
+                "name": "Silcoon",
+                "category": "Pokémon Bozzolo",
+                "entry": "Si appende ai rami con fili di seta.\nAspetta l'evoluzione bevendo l'acqua\npiovana che si posa sulla seta.",
+                "height": "0,6 m",
+                "weight": "10,0 kg"
+            },
+            "ko": {
+                "name": "실쿤",
+                "category": "번데기포켓몬",
+                "entry": "실을 나뭇가지에 휘감고 있다.\n실에 붙은 빗물을 마시며\n진화할 때를 기다리고 있다.",
+                "height": "0.6 m",
+                "weight": "10.0 kg"
+            },
+            "es": {
+                "name": "Silcoon",
+                "category": "Pokémon Capullo",
+                "entry": "Se agarra con su seda a las ramas\nde un árbol y espera su evolución\nbebiendo agua de lluvia.",
+                "height": "0,6 m",
+                "weight": "10,0 kg"
+            },
+            "ja": {
+                "name": "カラサリス",
+                "category": "さなぎポケモン",
+                "entry": "いとを\\x{3000}きのえだに\\x{3000}まきつけている。\nいとについた\\x{3000}あまみずを\\x{3000}のみながら\nしんかの\\x{3000}ときを\\x{3000}まっている。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 35,
+        "defense": 55,
+        "speed": 15,
+        "special_attack": 25,
+        "special_defense": 25
+    },
+    "types": [ "TYPE_BUG", "TYPE_BUG" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SHED_SKIN", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SHED_SKIN",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 72,
+    "height": 6,
+    "weight": 100,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HARDEN" ],
+            [ 7, "MOVE_HARDEN" ]
+        ],
+        "by_tm": [],
+        "by_tutor": [ "MOVE_BUG_BITE", "MOVE_IRON_DEFENSE", "MOVE_ELECTROWEB" ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 10,
+            "species": "SPECIES_BEAUTIFLY"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_WURMPLE",
+    "cry_volume": 120
+}

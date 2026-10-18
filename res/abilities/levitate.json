@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Levitate",
+    "description": "Gives full immunity to all\nGround-type moves."
+}

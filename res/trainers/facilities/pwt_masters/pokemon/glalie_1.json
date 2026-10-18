@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GLALIE",
+    "moves": [ "MOVE_BLIZZARD", "MOVE_CRUNCH", "MOVE_ROLLOUT", "MOVE_HAIL" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_ROCK_GEM",
+    "form": 0
+}

@@ -23,11 +23,14 @@ flags = [
     "-msgstyle gcc",
 ]
 
-# libVCT is ARM code; vct.c also reaches its two objects from one base, as -ipa file does
+# libVCT is ARM code; vct.c and vct_audio.c also reach their statics from one base, as -ipa file does (vct_audio.c's
+# .bss is size-sorted, with the u16 first), and vct_session.c has its four 66-byte transition tables 4-aligned in
+# sections of their own, which only -ipa file gives
 [file_flags]
 "vct/vct_adpcm.c" = ["-nothumb"]
-"vct/vct_audio.c" = ["-nothumb"]
-"vct/vct_session.c" = ["-nothumb"]
+"vct/vct_audio.c" = ["-nothumb", "-ipa file"]
+"vct/vct_buffer.c" = ["-nothumb"]
+"vct/vct_session.c" = ["-nothumb", "-ipa file"]
 "vct/vct_dsp.c" = ["-nothumb"]
 "vct/vct.c" = ["-nothumb", "-ipa file"]
 # The signature check (overlay 189) is ARM code like NitroSDK's
@@ -39,6 +42,9 @@ flags = [
 "nhttp/nhttp_thread.c" = ["-ipa file"]
 # So does the file of DWC that wraps the GameSpy HTTP client (overlay 189)
 "ghttp/dwc_ghttp.c" = ["-ipa file"]
+# The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
+# exponent, which only -ipa file gives
+"auth/dwc_auth.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does

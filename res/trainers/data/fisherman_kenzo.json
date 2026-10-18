@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kenzo",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_FRILLISH",
+            "form": 0,
+            "level": 44,
+            "difficulty": 0,
+            "gender": 1,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FRILLISH",
+            "form": 0,
+            "level": 44,
+            "difficulty": 0,
+            "gender": 2,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_FRILLISH",
+            "form": 0,
+            "level": 44,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'll have a battle with you using\nmy freshly caught Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I had no idea how my Pokémon would fight.\nI mean, I caught them just a moment ago!"
+        },
+        {
+            "type": 2,
+            "text": "I may have just caught them, but\nI'll raise them to be strong!{be01}\nOur time together has just begun!"
+        }
+    ]
+}

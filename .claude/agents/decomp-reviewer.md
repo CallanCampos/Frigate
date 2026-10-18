@@ -13,7 +13,7 @@ Read `CLAUDE.md`, `docs/code-standards.md` and `docs/code-organization.md` first
 `.venv/bin/python tools/decomp/check_style.py --diff HEAD FILE` (or `--diff` against what the changes are measured
 from) and read each finding it gives. For a whole area rather than one file, the specialized reviewers in
 `.claude/agents/review/` go deeper: pbw-game-reviewer (src/, include/), pbw-library-reviewer (lib/),
-pbw-config-reviewer (config/ and the decomp docs), pbw-data-reviewer (data/, tools/data), pbw-tools-reviewer (tools,
+pbw-config-reviewer (config/ and the decomp docs), pbw-data-reviewer (res/, tools/data), pbw-tools-reviewer (tools,
 CI, agent config); their "Known bad shapes" lists apply here too. Then read the diff (`git diff` or
 `git diff --cached`, limited to the file, its header and the configs) and the whole source file.
 

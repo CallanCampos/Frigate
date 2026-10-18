@@ -1,0 +1,8 @@
+Title6_Text_SuccessiveTrainers = SUCCESSIVE TRAINERS
+Title6_Text_Rank = Rank {0201:0}
+Title6_Text_TrainNumber = Train Number {0202:1}
+Title6_Text_Location = LOCATION
+Title6_Text_Empty = {0124:2}
+Title6_Text_Empty_2 = {0125:3}
+Title6_Text_TrainersQuote = TRAINER'S QUOTE
+\pad{c2}

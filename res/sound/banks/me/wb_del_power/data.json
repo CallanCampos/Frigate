@@ -1,0 +1,36 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_ME_WB_DEL_POWER", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_DEL_POWER",
+                    "wave": 0,
+                    "base_key": "C4",
+                    "attack": 110,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 110,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_WB_DEL_POWER",
+                    "wave": 1,
+                    "base_key": "F5",
+                    "attack": 110,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 110,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

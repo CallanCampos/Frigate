@@ -1,0 +1,28 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Alberta",
+    "class": "TRAINER_CLASS_SCHOOL_KID_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 5,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_LITWICK",
+            "form": 0,
+            "level": 35,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_FLAME_BURST", "MOVE_NIGHT_SHADE", "MOVE_CONFUSE_RAY", "MOVE_WILL_O_WISP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ahhh! I've got my precious Litwick, so how\ncould I possibly lose?"
+        }
+    ]
+}

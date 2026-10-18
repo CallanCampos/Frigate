@@ -1,0 +1,203 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Dunsparce",
+    "pokedex": {
+        "category": "Land Snake Pokémon",
+        "entry": "It creates mazes in dark locations.\nWhen spotted, it flees into the\nground by digging with its tail.",
+        "height": "4'11\"",
+        "weight": "30.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Dunsparce",
+                "category": "Land Snake Pokémon",
+                "entry": "It digs into the ground with its\ntail and makes a mazelike nest.\nIt can fly just a little.",
+                "height": "4'11\"",
+                "weight": "30.9 lbs."
+            },
+            "fr": {
+                "name": "Insolourdo",
+                "category": "Pokémon Serpent",
+                "entry": "Son nid est un véritable labyrinthe\nqu'il creuse à l'aide de sa queue.\nIl sait à peine voler.",
+                "height": "1,5 m",
+                "weight": "14,0 kg"
+            },
+            "de": {
+                "name": "Dummisel",
+                "category": "Schlange",
+                "entry": "Es gräbt sich mit seinem Schweif in\ndie Erde und baut ein labyrinthartiges\nNest. Es kann kaum fliegen.",
+                "height": "1,5 m",
+                "weight": "14,0 kg"
+            },
+            "it": {
+                "name": "Dunsparce",
+                "category": "Pokémon Terraserpe",
+                "entry": "Scava nel terreno con la coda creando\nuna tana simile a un labirinto.\nSa spiccare brevissimi voli.",
+                "height": "1,5 m",
+                "weight": "14,0 kg"
+            },
+            "ko": {
+                "name": "노고치",
+                "category": "땅뱀포켓몬",
+                "entry": "꼬리로 땅을 파서\n미로 같은 둥지를 만든다.\n날개로 조금 날 수 있다.",
+                "height": "1.5 m",
+                "weight": "14.0 kg"
+            },
+            "es": {
+                "name": "Dunsparce",
+                "category": "Pokémon Serptierra",
+                "entry": "Cava el suelo con su cola para\nconstruir su madriguera. Puede\nvolar distancias cortas.",
+                "height": "1,5 m",
+                "weight": "14,0 kg"
+            },
+            "ja": {
+                "name": "ノコッチ",
+                "category": "つちへびポケモン",
+                "entry": "しっぽで\\x{3000}じめんを\\x{3000}ほって\nめいろのような\\x{3000}すあなを\\x{3000}つくる。\nはねで\\x{3000}すこしだけ\\x{3000}とべる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff14}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 100,
+        "attack": 70,
+        "defense": 70,
+        "speed": 45,
+        "special_attack": 65,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 190,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_SERENE_GRACE", "ABILITY_RUN_AWAY" ],
+    "hidden_ability": "ABILITY_RATTLED",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 145,
+    "height": 15,
+    "weight": 140,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_RAGE" ],
+            [ 1, "MOVE_DEFENSE_CURL" ],
+            [ 4, "MOVE_ROLLOUT" ],
+            [ 7, "MOVE_SPITE" ],
+            [ 10, "MOVE_PURSUIT" ],
+            [ 13, "MOVE_SCREECH" ],
+            [ 16, "MOVE_YAWN" ],
+            [ 19, "MOVE_ANCIENT_POWER" ],
+            [ 22, "MOVE_TAKE_DOWN" ],
+            [ 25, "MOVE_ROOST" ],
+            [ 28, "MOVE_GLARE" ],
+            [ 31, "MOVE_DIG" ],
+            [ 34, "MOVE_DOUBLE_EDGE" ],
+            [ 37, "MOVE_COIL" ],
+            [ 40, "MOVE_ENDURE" ],
+            [ 43, "MOVE_DRILL_RUN" ],
+            [ 46, "MOVE_ENDEAVOR" ],
+            [ 49, "MOVE_FLAIL" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM59",
+            "TM67",
+            "TM73",
+            "TM74",
+            "TM77",
+            "TM78",
+            "TM80",
+            "TM84",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DRILL_RUN",
+            "MOVE_MAGIC_COAT",
+            "MOVE_LAST_RESORT",
+            "MOVE_AQUA_TAIL",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_ROOST",
+            "MOVE_SPITE",
+            "MOVE_ENDEAVOR",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_BIDE",
+            "MOVE_ANCIENT_POWER",
+            "MOVE_BITE",
+            "MOVE_HEADBUTT",
+            "MOVE_ASTONISH",
+            "MOVE_CURSE",
+            "MOVE_TRUMP_CARD",
+            "MOVE_MAGIC_COAT",
+            "MOVE_SNORE",
+            "MOVE_AGILITY",
+            "MOVE_SECRET_POWER",
+            "MOVE_SLEEP_TALK",
+            "MOVE_HEX"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 35,
+    "baby_species": "SPECIES_DUNSPARCE",
+    "cry_volume": 110
+}

@@ -1,0 +1,87 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 10425,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 3,
+                "y": 1,
+                "z": 0
+            }
+        },
+        {
+            "script": 10421,
+            "condition": 0,
+            "direction": 0,
+            "grid": {
+                "x": 2,
+                "y": 1,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_CLERK_M_67",
+            "movement": 15,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 2,
+                "z": 9,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_BATTLE_GIRL",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 2,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 6,
+                "z": 8,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_ARTIST",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 11,
+                "z": 8,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [],
+    "triggers": [],
+    "init_scripts": []
+}

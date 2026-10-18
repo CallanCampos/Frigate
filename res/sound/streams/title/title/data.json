@@ -1,0 +1,6 @@
+{
+    "$schema": "../../../stream.schema.json",
+    "volume": 127,
+    "priority": 64,
+    "player": "PLAYER_STRM"
+}

@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Marie",
+    "class": "TRAINER_CLASS_SCIENTIST_F_46",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_DEFEND" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GULPIN",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GARBODOR",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MAGNEZONE",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Huh? Your Pokémon...\nThey escaped from Poké Transfer?!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Sooorry!\nI took you for someone else!"
+        },
+        {
+            "type": 2,
+            "text": "The Poké Transfer is an amazing device\nthat allows you to transport Pokémon."
+        }
+    ]
+}

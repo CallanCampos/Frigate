@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Guts",
+    "description": "Boosts Attack if there is\na status problem."
+}

@@ -1,0 +1,1 @@
+Bank0410_Text_Empty =         \x{ffff}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_YANMEGA",
+    "moves": [ "MOVE_BUG_BUZZ", "MOVE_PSYCHIC", "MOVE_PROTECT", "MOVE_HYPNOSIS" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_JOLLY",
+    "item": "ITEM_CHARTI_BERRY",
+    "form": 0
+}

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ALTARIA",
+    "moves": [ "MOVE_COTTON_GUARD", "MOVE_ROOST", "MOVE_FLAMETHROWER", "MOVE_DRAGON_PULSE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

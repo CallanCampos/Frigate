@@ -41,6 +41,7 @@ typedef struct {
 extern const HiddenEventSpec HIDEN_EVENTS_NORMAL[11];
 extern const HiddenEventSpec HIDEN_EVENTS_RUINS[11];
 
+void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *action);
 HiddenCheckFunc GetHidenEventCheckFunc(PlayerActionPossibilities *context, u32 kind);
 HiddenCtorFunc GetHidenEventCtorFunc(PlayerActionPossibilities *context, u32 kind);
 u32 CheckAllowHidenEvent(u32 kind, PlayerActionPossibilities *context);

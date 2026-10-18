@@ -1,0 +1,24 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_FLD_SYARARA", null, null, null ],
+    "instruments": [
+        {
+            "program": 15,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_FLD_SYARARA",
+                    "wave": 0,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

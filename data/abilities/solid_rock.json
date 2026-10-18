@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Solid Rock",
-    "description": "Reduces damage from\nsupereffective attacks."
-}

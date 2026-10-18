@@ -1,4 +1,4 @@
-"""Shared code for the game data in JSON (data/pokemon/ and the like): constants by name and by value, validation
+"""Shared code for the game data in JSON (res/pokemon/ and the like): constants by name and by value, validation
 against the data's JSON schemas, and writing JSON the way the sources are laid out.
 
 The packers that build archives from the JSON run under the build's python3, so this uses only the standard library.
@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.data.gen_constants import LISTS_DIR, parse  # noqa: E402
 
-ROOT = LISTS_DIR.parents[1]
+ROOT = LISTS_DIR.parent
 HEADERS_DIR = ROOT / "include" / "constants"
 DEFINE = re.compile(r"^#define (\w+) (.+?)\s*(?://.*)?$", re.MULTILINE)
 EXPRESSION = re.compile(r"[\w\s()<>|+\-*]+")
@@ -21,7 +21,7 @@ EXPRESSION = re.compile(r"[\w\s()<>|+\-*]+")
 
 @cache
 def constants() -> dict[str, int]:
-    """Returns every constant of the lists in data/constants/ and of the hand-written headers in include/constants/,
+    """Returns every constant of the lists in generated/ and of the hand-written headers in include/constants/,
     by name. A header's value can be a number, (1 << N) or another constant."""
     values: dict[str, int] = {}
     for path in sorted(LISTS_DIR.glob("*.txt")):

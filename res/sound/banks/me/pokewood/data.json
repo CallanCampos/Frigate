@@ -1,0 +1,186 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_ME_POKEWOOD", null, null, null ],
+    "instruments": [
+        {
+            "program": 6,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 0,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 5,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "C2",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 4,
+                    "base_key": "C2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 5,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 3,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "E4",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 9,
+                    "base_key": "G3",
+                    "attack": 127,
+                    "decay": 75,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "C5",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 10,
+                    "base_key": "G4",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 8,
+                    "base_key": "E5",
+                    "attack": 127,
+                    "decay": 80,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 7,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 1,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 1,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 2,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 2,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 3,
+                    "base_key": "C3",
+                    "attack": 127,
+                    "decay": 100,
+                    "sustain": 110,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 4,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 6,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 127,
+                    "sustain": 127,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        },
+        {
+            "program": 0,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_ME_POKEWOOD",
+                    "wave": 7,
+                    "base_key": "D2",
+                    "attack": 127,
+                    "decay": 110,
+                    "sustain": 115,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

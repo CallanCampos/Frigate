@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Sand Stream",
-    "description": "The Pokémon summons a\nsandstorm in battle."
-}
