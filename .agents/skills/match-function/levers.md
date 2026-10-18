@@ -793,6 +793,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
+- Two `_ull_mul` calls (by 64 from a register, then by 1000) where ours multiplies once by 64000, in one function of a
+  file: ask whether it reads an object with an explicit alignment; a local set twice may then need to be two variables.
+  (matching.md: "keeps a chain of 64-bit constant multiplies apart")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
   off")
 - `__clz`/`__CLZ`/`__builtin_clz` are not MWCC intrinsics; they call out. A bare inlined `clz` in ARM library code is
@@ -902,6 +905,9 @@ sm64ds-decomp's catalogue for another mwccarm build; the cases below are the one
 - `#pragma opt_strength_reduction off`
 - `#pragma optimize_for_size on`
 - `#pragma opt_propagation off`
+- `#pragma opt_arithtransformation off`, `opt_foldconstants off` and `opt_treetransformation off`, internal names that
+  the manual doesn't list (also as `-flag no-...`): the passes that shift and fold 64-bit constant multiplies; inside a
+  loop `opt_loop_invariants` and `opt_strength_reduction` must be off too (matching.md: "internal pass names")
 
 `#pragma scheduling off` and `peephole off` change nothing in 1.1p1's Thumb or ARM code, so they can't single out the
 scheduler; `#pragma optimization_level 1` shows each constant built at its use (matching.md: "leave 1.1p1's Thumb
