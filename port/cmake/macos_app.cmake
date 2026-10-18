@@ -6,7 +6,8 @@
 #   cmake --build build/port --target frigate-black2_app        (frigate-white2_app with -DPORT_VERSION=w2_us)
 #
 # -DPORT_MACOS_APP=ON makes it part of every build. port/tools/package_macos.sh puts it in a disk image. The tests of
-# make_app.sh and of the log an app opened from the Finder writes are here too, since both are macOS's alone.
+# make_app.sh, of the log an app opened from the Finder writes and of the program's slices are here too, since all are
+# macOS's alone.
 if(NOT APPLE)
     return()
 endif()
@@ -48,6 +49,19 @@ add_custom_command(OUTPUT "${port_app_icns}"
     COMMENT "Making ${PORT_PROGRAM}.icns, the app's icon"
     VERBATIM)
 
+# What the app is built for, when the build says (the distribution build, PORT_MACOS_DISTRIBUTION, says both: arm64 and
+# x86_64, macOS 11.0; ADR 0013): make_app.sh refuses a binary without a slice for each architecture, or with a slice
+# for a newer macOS, and LSMinimumSystemVersion is the deployment target. A development build gives neither, and the
+# app is for the slices and the macOS its binaries were built for
+string(REPLACE ";" " " port_app_archs "${CMAKE_OSX_ARCHITECTURES}")
+set(port_app_targets)
+if(CMAKE_OSX_ARCHITECTURES)
+    list(APPEND port_app_targets --archs "${port_app_archs}")
+endif()
+if(CMAKE_OSX_DEPLOYMENT_TARGET)
+    list(APPEND port_app_targets --minimum "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+endif()
+
 # Made again at each build of the target, since its version is the commit's and the script takes a moment
 add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_app.sh"
@@ -55,7 +69,7 @@ add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
         --plist "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/Info.plist.in" --icon "${port_app_icns}"
         --bundle-id "${PORT_MACOS_BUNDLE_ID_PREFIX}.${port_app_id_suffix}" --name "${PORT_PRODUCT_NAME}"
         --display-name "${port_app_name}" --about "${PORT_PRODUCT_DESCRIPTION} ${PORT_PRODUCT_DISCLAIMER}"
-        --repo "${REPO_ROOT}"
+        --repo "${REPO_ROOT}" ${port_app_targets}
     DEPENDS "${port_app_icns}"
     BYPRODUCTS "${port_app_bundle}/Contents/MacOS/${PORT_PROGRAM}" "${port_app_bundle}/Contents/Info.plist"
         "${port_app_bundle}/Contents/Resources/AppIcon.icns"
@@ -86,6 +100,21 @@ add_test(NAME app_message_log
     COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_message_log.sh" $<TARGET_FILE:${PORT_PROGRAM}>
         "${CMAKE_CURRENT_BINARY_DIR}/test_message_log")
 set_tests_properties(app_message_log PROPERTIES TIMEOUT 120)
+
+# The program's slices and the macOS each is built for, from its load commands, against the build's architectures and
+# deployment target (the distribution build's arm64 and x86_64 for macOS 11.0, ADR 0013; a development build's one
+# slice, this Mac's), and that it starts as each slice this Mac runs (port/app/macos/check_app.sh, which CI also runs
+# on the finished app)
+add_test(NAME app_slices
+    COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/check_app.sh" $<TARGET_FILE:${PORT_PROGRAM}>
+        --archs "${port_app_archs}" --minimum "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+set_tests_properties(app_slices PROPERTIES TIMEOUT 60)
+# A universal program's slices running the opening the same, frame by frame, the x86_64 one under Rosetta on Apple
+# Silicon (port/tests/app/test_universal_slices.sh; it skips without a second slice, without Rosetta or without the ROM)
+add_test(NAME app_universal_slices
+    COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_universal_slices.sh" $<TARGET_FILE:${PORT_PROGRAM}>
+        "${CMAKE_CURRENT_BINARY_DIR}/test_universal_slices")
+set_tests_properties(app_universal_slices PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)
 
 # package_macos.sh's refusals of an image path that git would take into a repository, which come before it builds
 # anything (port/tests/app/test_package_macos.sh)
