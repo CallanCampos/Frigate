@@ -26,6 +26,79 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the Windows track merged under today's names, and ADR 0013 accepted
+
+- **Upstream:** `9b486e486`, as merged into the port's `main` by `334077ba7`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `77263e609`: `d294567e3` (the merge of
+  `port-windows` at `a49a40626`), `f86bca826` (ADR 0013 accepted), `d6fe067d8` (the Windows track under today's
+  names), then this entry; pushed to `port-windows` (a fast-forward from `a49a40626`) for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `d294567e3` and
+  `d6fe067d8`. No game file changed: the Windows track changes only `port/` and Frigate's own `port-ci.yml`.
+- **Host build:**
+  - arm64 macOS, RelWithDebInfo, `build/port-n` (Black 2) and `build/port-w2` (White 2), both Ninja, rebuilt from
+    `d294567e3`: every step again (1,701 each), since the merge brought the Windows track's flags; no errors, 264
+    warnings in each, one more than the Pokédex entry's 263 (not traced: upstream's C merged by `4fee9b918` and
+    `334077ba7` came since, and so did `-fno-builtin-wcslen`), none in `port/` and none of the pointer and integer size
+    kinds. The oracle is `build/oracle`'s `pbw-oracle` in both builds' `oracle/`, and the saves their `oracle-saves`.
+  - CI, `port-ci.yml` dispatched on `port-windows` at `d6fe067d8`: run
+    [39173987503](https://github.com/CallanCampos/Frigate/actions/runs/39173987503), green on all three hosts. Windows
+    built with MSYS2's clang 22.1.8, CMake 4.4.3, Python 3.14.7 and SDL3 3.4.16; 263 warnings there and on Linux, 264
+    on macOS, none in `port/` on any.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 on `d294567e3`, the two builds at once, `ctest -j6` (Black 2) and `ctest -j4` (White 2), with the
+    oracle in both, under a load average of 40 to 180 from the other tracks' runs: Black 2, all 281 pass (2,173 s),
+    none skipped, `oracle_launch_party_menus` (the Pokédex among its apps) in 868 s; White 2, 274 of 277 pass (1,937
+    s), `oracle_continue_starter` and `oracle_launch_party_menus` skip as before (no SHA-1 of White 2's
+    `starter_save`), and `asm_oracle` timed out at its 900 s and passes on its own (270 s), so all that run pass. The
+    host seam's tests (`host_*`, the fiber guards, `app_symbols`, `integrate_overlay_sections`) pass in both, and
+    `fx_libfx`, which checks `VEC_Normalize` through the translated cp.h, too.
+  - CI, run 39173987503: macOS 236 pass and 45 skip of 281; Linux 219 pass and 47 skip of 266; Windows 209 pass and
+    57 skip of 266, the same counts as the Windows track's last run, so main's work since `2da26e048` added no test
+    and lost none on any host; `fx_libfx` passes on all three.
+  - Every run passed `--save-dir`: the tests left `~/Library` alone (its `Frigate` folders were last written at
+    16:33, by White 2's app opened from the Finder, before this task). Every relative link of the Markdown files under
+    `port/` and `.github/README.md` resolves, anchors included (checked by script). clang-format 23.1.3 is clean on
+    the merge's C files; this task's own commits change no C. On Windows nothing with a ROM has run yet (not yet);
+    T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 474 function stubs and 46 data placeholders in each version and on all three CI hosts, from the
+  Pokédex entry's 512 and 46: upstream's C merged by `4fee9b918` and `334077ba7` (among it libfx and libmath, NitroWiFi
+  and DWC), which the last entries didn't count. The host's C library provides 34 of the ROM's symbols on macOS, 35 on
+  Linux and 36 on Windows.
+- **64-bit warnings:** none of the pointer and integer size kinds among the 264 warnings, in each version; no game or
+  `lib/` code changed in this task.
+- **Work done:**
+  - **The merge** (`d294567e3`, `git merge --no-ff origin/port-windows`): two conflicts, both documents, both kept
+    whole. STATUS.md and lessons.md take the Windows track's entries above `main`'s, newest first, and the Windows
+    track's last entry names its commit, `a49a40626`, where it had `PORT_SHA`. Everything else merged clean and keeps
+    both sides: `gen_host_tree.py` routes cp.h's address constants of the registers that act to their functions
+    (`main`) and links the include mirror with the system's separator, or copies it where Windows refuses links
+    (`port-windows`); `CMakeLists.txt` has the repository's new `HOMEPAGE_URL` and Windows' manifest and stack;
+    `main.c` has the seam's watchdog and `--launch`'s text without the Pokédex's trap; the README, ARCHITECTURE.md,
+    PLAN.md and the tests guide have the rename's and the Pokédex's text and the Windows track's.
+  - **ADR 0013 accepted** (`f86bca826`): by the port's developer, as every earlier ADR was, since the toolchain, MSYS2's
+    CLANG64 over the research's clang-cl, is the developer's call. Its status is accepted, with a note saying where;
+    PLAN.md §4.4, the glossary's MSYS2 row, the README's Windows build, the feature map's platform row and ADR 0005's
+    note no longer call it proposed; the ADR index says accepted.
+  - **Today's names** (`d6fe067d8`): the README's Windows build clones `CallanCampos/Frigate` into `Frigate`, the one
+    place the track named the old repository (no workflow or script did). MODDING.md says an experiment builds on
+    macOS, Linux or Windows, an abort's and a crash's status and message on Windows, that the sanitizer build is
+    macOS's and Linux's, which tests skip on Windows, and that the oracle runs where the ROM build does;
+    ARCHITECTURE.md's layers end the platform layer in `hal/host`; the tools guide says what `gen_host_tree.py` and
+    `gen_stubs.py` do on each host. The track's new files already opened with what they do and touch, and had their
+    rows in the hal, app, cmake and tests guides, the directory map, the feature map and the glossary.
+  - **gen_host_tree.py's routing on Windows:** nothing to do. It is header text: the translated cp.h names
+    `((void *)port_hw_div_result())`, a C call that `port_host.h` declares the same on every host, and CI's Windows
+    job passes `fx_libfx`.
+- **Next:** Windows' stage 4, as in the Windows track's entries: a run of the game with a ROM on a Windows machine,
+  sanitizer builds on CLANG64, a build without a console with its log under `%LOCALAPPDATA%\Frigate`, a package, the
+  memory-mapped ROM, ARM64 and VRAM aliasing on Windows; a backtrace on a fiber on Linux arm64. As in the Pokédex
+  entry: White 2's starter route, so that `party_menus` and `continue_starter` run in White 2; the apps no route
+  reaches yet (the town map, the Xtransceiver, the medal box, the options); a save with an adventure made by the port,
+  once overlay 36 lets it into the field; a sound comparison sequence played on the game's count.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: Windows in CI after review: crash reports on fibers and through the C library, UTF-8 names, atexit
 
 - **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.
