@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-1086 of 1688 functions are in source files.
+1090 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -153,6 +153,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gpiUtility.c` | `0x0217b7e0`–`0x0217bb30` | 9 | complete | descriptive |
 | `gbucket.c` | `0x0217bb30`–`0x0217beac` | 14 | complete | descriptive |
 | `gstats.c` | `0x0217beac`–`0x0217c788` | 28 | partial | descriptive |
+| `gt2Auth.c` | `0x0217c788`–`0x0217c944` | 4 | complete | descriptive |
 | `gt2Buffer.c` | `0x0217c944`–`0x0217c9f4` | 6 | complete | descriptive |
 | `gt2Callback.c` | `0x0217c9f4`–`0x0217ce00` | 10 | complete | descriptive |
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
