@@ -77,7 +77,9 @@ class HostBuild:
         self.compiler = self._read_compiler(build_dir)
         self.by_source: dict[str, CompileSettings] = {}
         self.target_default: dict[str, CompileSettings] = {}
-        statement = re.compile(r"^build (.+?): C_COMPILER__(\w+?)_unscanned_\w+ (\S+)")
+        # CMake names the rule C_COMPILER__<target>_unscanned_<build type>, and the build type is empty in a directory
+        # configured without CMAKE_BUILD_TYPE (as port/tools/sync_upstream.sh configures build/port)
+        statement = re.compile(r"^build (.+?): C_COMPILER__(\w+?)_unscanned_\w* (\S+)")
         per_target: dict[str, list[CompileSettings]] = collections.defaultdict(list)
         current: tuple[str, str] | None = None
         variables: dict[str, str] = {}
