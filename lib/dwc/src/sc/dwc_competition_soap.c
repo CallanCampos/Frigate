@@ -4,8 +4,8 @@
 
 // The competition client's SOAP requests: setting up and ending the client's request state, posting the CreateSession,
 // SetReportIntention and SubmitReport messages to the service, and reading their answers. The ROM doesn't name the
-// file; the name is ours. It is a file of its own, after dwc_competition.c: its .data starts with the namespace table,
-// laid out ahead of its string as MWCC does only for a table above a file's first function.
+// file; the name is ours. Its .data starts with the namespace table, which is why it is a file of its own
+// (docs/matching.md). The first three functions have no data of their own, so that they start the file is a guess.
 
 static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader, void *userData);
 static void ScClient_OnReportIntention(int status, int unused, SoapReader *reader, void *userData);

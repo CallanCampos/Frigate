@@ -3178,7 +3178,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `static` or global, sized or not, declared earlier or not. A table right before its own strings in the middle of a
   file's `.data` is therefore the first data of another original file. Overlay 260's `sCompetitionNamespaces` is
   before its namespace string, after `Sc_PutGuid`'s literals: it starts `dwc_competition_soap.c`, from `ScClient_Begin`
-  on, with the table above the file's first function, and the overlay links only with `dwc_competition.c` split there.
+  on, with the table above the file's first function, and the overlay links only when `dwc_competition.c` is split there.
 - The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but

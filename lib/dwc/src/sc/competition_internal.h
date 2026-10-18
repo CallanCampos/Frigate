@@ -1,7 +1,6 @@
 #ifndef POKEBW2_DWC_COMPETITION_INTERNAL_H
 #define POKEBW2_DWC_COMPETITION_INTERNAL_H
 
-#include "types.h"
 #include "dwc/competition.h"
 
 // The parts of the competition client that its two files share (dwc_competition.c and dwc_competition_soap.c)
