@@ -431,13 +431,21 @@ static int ScReport_Destroy(ScReport *report) {
     return 0;
 }
 
+// Each player's record after the header is 0x14 bytes: the 0x10-byte GUID of its connection, then its key
 static int ScReport_SetPlayerId(ScReport *report, int index, const char *id) {
-    Sc_PutGuid(report->buffer + (sizeof(ScReportHeader) + index * 0x14), id);
+    u32 offset = sizeof(ScReportHeader);
+
+    offset += index * 0x14;
+    Sc_PutGuid(report->buffer + offset, id);
     return 0;
 }
 
 static int ScReport_SetPlayerKey(ScReport *report, int index, int key) {
-    Sc_PutU32(report->buffer + (sizeof(ScReportHeader) + index * 0x14 + 0x10), key);
+    u32 offset = sizeof(ScReportHeader);
+
+    offset += index * 0x14;
+    offset += 0x10;
+    Sc_PutU32(report->buffer + offset, key);
     return 0;
 }
 
