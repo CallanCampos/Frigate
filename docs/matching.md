@@ -2630,10 +2630,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names. `country_region.c`'s `Country_IsValidPlace` loops
   while `i < gSelectableCountryCount ? TRUE : FALSE`, a loop that `#pragma optimization_level 1` or `2` also shapes.
-  No enum counter is needed for it in game code: overlay 214's `WorldTrade_NationSortListMake` gets the original's
-  loop entry and registers from `i < num ? TRUE : FALSE` alone. An expression that two of a call's arguments share,
-  as its `first + i` is, becomes a common-subexpression temporary computed before the call's stack arguments are
-  stored, which decides which register loads it; the original computed it after (its row).
+  Before writing one, ask whether the function reads an object with an explicit alignment, which keeps the `b` with a
+  plain test (below): overlay 214's `WorldTrade_NationSortListMake` got the loop entry from `i < num ? TRUE : FALSE`
+  and stayed 18 bytes off, and matches with `i < num` and the table it reads aligned.
 - A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
   `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
   `i < 8`, and an inline with `return kind < N;`, are both rotated.
@@ -2644,8 +2643,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE`, though
   there the original's `b` comes from an aligned object (next bullet).
 - An explicit alignment (`ATTRIBUTE_ALIGN(4)`, 16 or 32) on any object a function reads, or on a member it reads,
-  keeps every constant-bound loop of the function entered with a `b` to its test, and changes its other optimizations:
-  a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it is otherwise shifted.
+  keeps every loop of the function, with a constant or a variable bound, entered with a `b` to its test, and changes
+  its other optimizations: a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it
+  is otherwise shifted.
   `volatile`, an aligned struct type or a union do not do it, and an `extern` declaration with the attribute does it
   as the definition does. libVCT's `vct_audio.c` has the original's case: its static `sSendQueue` is 32-aligned in the
   ROM (`0x02197a80`, after an 8-byte gap), and the functions that read it keep the leading `b` (`VCT_InitAudio`,
@@ -2654,6 +2654,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
   `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
   the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
+  Overlay 214's `WorldTrade_NationSortListMake` fits the same way without address evidence: it reads only
+  `sCountryListTbl`, a `static const u16` table at `0x021e1ff4`, and with an alignment attribute on it a plain
+  `for (i = 0; i < num; i++)` matches, loop entry, registers and the `first + i` its call's arguments share, where a
+  0/1 test left 18 bytes. `ATTRIBUTE_ALIGN(1)`, `(2)` and `(4)` give the same code and `.rodata`, so the attribute
+  does it, not its value (8 and more move the table 4 bytes), and the table before it ends on that boundary, so the
+  ROM can't say whether the original aligned it. The file's other reader of the table matches either way.
 - The same alignment keeps a chain of 64-bit constant multiplies apart: `OS_TicksToMicroSeconds(OS_GetTick() - start)`
   multiplies by 64 and then by 1000 with two `_ull_mul` calls, the 64 and the zero high word set in registers before
   the loop, where it is otherwise one multiply by 64000. `ir_check.c`'s `IrCheck_ReadId` (overlay 338) shows the
