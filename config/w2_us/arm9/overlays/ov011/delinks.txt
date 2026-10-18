@@ -300,3 +300,9 @@ lib/dwc/src/gstats/gbucket.c:
     complete
     .text       start:0x0217bb70 end:0x0217beec
     .bss        start:0x021917b0 end:0x021917c0
+
+lib/dwc/src/gstats/gstats.c:
+    .text       start:0x0217beec end:0x0217c7c8
+    .rodata     start:0x021850e8 end:0x021851f8
+    .data       start:0x02188f9c end:0x021890f0
+    .bss        start:0x021917c0 end:0x02191bfc
