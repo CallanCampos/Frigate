@@ -266,3 +266,7 @@ lib/dwc/src/gscommon/gsPlatformSocket.c:
     .text       start:0x0216de50 end:0x0216e244
     .data       start:0x02186f14 end:0x02186f9c
     .bss        start:0x021908d4 end:0x02190944
+
+lib/dwc/src/gscommon/gsPlatformThread.c:
+    complete
+    .text       start:0x0216e244 end:0x0216e290
