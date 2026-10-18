@@ -310,14 +310,14 @@ does at each run. Without a ROM build there are no statics and no counter.
 The same arguments give the same files on every run: no JIT (the interpreter runs every instruction in order), the
 software 3D renderer on the emulation's thread, the clock fixed at power-on and moved by emulated time only, a blank
 save unless one is given, no host time, no audio device (the sound goes only to `--audio-dump`, sample by sample), and
-no file but the ROM and the given ones (melonDS's local files are refused). The firmware is melonDS's generated one with the owner settings of the port's
-(`port/hal/nvram/nvram7.c`): nickname "Player", colour 11, birthday 6/23, English, MAC `02:42:57:32:00:01`; melonDS
-keeps its own touch calibration. `oracle.py check`, the ctest test `oracle_boot`, runs the first 500 frames twice,
-compares the results (`frames.tsv`, the sound trace and the WAV dump byte for byte), checks that the PNG files and
-`frames.tsv` agree, that the WAV dump has a sample for each 1024 cycles and the trace the driver's periodic runs 2728
-ticks apart, each record in the frame whose VBlank comes next, and compares the screens of 11 frames with `port/tests/oracle/boot_<version>.tsv`, hashes the pinned
-melonDS gives (`oracle.py check --update` writes them). It exits 77 (skipped) without the oracle or without the ROM the
-decomp builds.
+no file but the ROM and the given ones (melonDS's local files are refused). The firmware is melonDS's generated one with
+the owner settings of the port's (`port/hal/nvram/nvram7.c`): nickname "Player", colour 11, birthday 6/23, English, MAC
+`02:42:57:32:00:01`; melonDS keeps its own touch calibration. `oracle.py check`, the ctest test `oracle_boot`, runs the
+first 500 frames twice, compares the results (`frames.tsv`, the sound trace and the WAV dump byte for byte), checks that
+the PNG files and `frames.tsv` agree, that the WAV dump has a sample for each 1024 cycles and the trace the driver's
+periodic runs 2728 ticks apart, each record in the frame whose VBlank comes next, and compares the screens of 11 frames
+with `port/tests/oracle/boot_<version>.tsv`, hashes the pinned melonDS gives (`oracle.py check --update` writes them).
+It exits 77 (skipped) without the oracle or without the ROM the decomp builds.
 
 ## The boot sequence (Black 2, no input, blank save)
 
@@ -540,8 +540,8 @@ Each sequence is two ctest tests:
   the SHA-1 of the oracle's samples over it and at its loudest point. Skipped (77) without the oracle or the ROM.
 - `oracle_sound_<name>_hashes` (`oracle.py sound-check NAME --port BIN`), every build: the port alone, with its trace
   and WAV dump, against the reference: each play's runs (none missing, none extra, no play the oracle doesn't have),
-  every run's state, each record in the frame whose VBlank comes next, the statuses, the segments' envelopes and levels, and the samples to the bit (wherever the
-  loudest point's hash is, within two frames). Skipped (77) without the ROM.
+  every run's state, each record in the frame whose VBlank comes next, the statuses, the segments' envelopes and levels,
+  and the samples to the bit (wherever the loudest point's hash is, within two frames). Skipped (77) without the ROM.
 
 ## Integration
 

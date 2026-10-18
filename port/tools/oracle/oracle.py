@@ -154,7 +154,7 @@ REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
 LOADING = ("the DS's passes at counts 1111 and 1113 take 2 and 46 frames while it loads the title, so on the count the "
            "port has locked the stream's channels and started it before the DS (until then their registers are what "
            "the opening's music, stopped at a different point on each, left)")
-SOUND_CRY = "the DS starts Kyurem's cry a frame later against its passes (README.md, Known differences)"
+SOUND_CRY = "the DS starts Kyurem's cry a pass later (README.md, Known differences)"
 SOUND_CRY_PLAYS = ("Kyurem's cry, which the DS starts later against its passes, ends later too: as this frame ends, "
                    "the DS's channel still plays it and the port's has stopped (README.md, Known differences)")
 SOUND_CRY_END = ("the title sees Kyurem's cry end a pass later on the DS (README.md, Known differences), and unlocks "

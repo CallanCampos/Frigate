@@ -12,7 +12,7 @@
 # over the segment, at the port's samples plus the offset. Written by oracle.py sound title --update;
 # checked by oracle.py sound-check title.
 # Status left out, port frames 1112-1114: the DS's passes at counts 1111 and 1113 take 2 and 46 frames while it loads the title, so on the count the port has locked the stream's channels and started it before the DS (until then their registers are what the opening's music, stopped at a different point on each, left)
-# Status left out, port frames 3101: the DS starts Kyurem's cry a frame later against its passes (README.md, Known differences)
+# Status left out, port frames 3101: the DS starts Kyurem's cry a pass later (README.md, Known differences)
 # Status left out, port frames 3214: Kyurem's cry, which the DS starts later against its passes, ends later too: as this frame ends, the DS's channel still plays it and the port's has stopped (README.md, Known differences)
 # Status left out, port frames 3216: the title sees Kyurem's cry end a pass later on the DS (README.md, Known differences), and unlocks its channel a pass later
 kind	a	b	c	value
