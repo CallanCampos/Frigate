@@ -171,8 +171,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   the original uses the lowest free one (`ldr r1, =...; ldrsh r3, [r1, r4]`): read it into one local that every
   block making the same call assigns. (matching.md: "picks the register of an argument's address")
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`): two accesses
-  to `p[i].f` through a pointer variable that MWCC's first CSE pass did not merge, as in `f[i].b += v`;
-  `(&p->f)[i * 2]` folds back to index first. (matching.md: "its first common-subexpression pass did")
+  to `p[i].f` through a pointer variable that MWCC's first CSE pass did not merge, as in `f[i].b += v`, or a read
+  of the element's first field and a copy into the element; `(&p->f)[i * 2]` folds back to index first.
+  (matching.md: "its first common-subexpression pass did")
 - Every register moved by a field that the caller keeps in a saved register after an inline read it, where the
   original loads it again: the inline takes a `const T *`, even from a caller's plain pointer.
   (matching.md: "a `const` pointer from a caller whose")
