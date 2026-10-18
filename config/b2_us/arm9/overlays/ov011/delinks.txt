@@ -229,3 +229,9 @@ lib/dwc/src/gp/gpiUtility.c:
     complete
     .text       start:0x0217b7e0 end:0x0217bb30
     .data       start:0x02188eac end:0x02188f5c
+
+lib/dwc/src/gscommon/gsAvailable.c:
+    complete
+    .text       start:0x0216c520 end:0x0216c764
+    .data       start:0x02186e7c end:0x02186ea4
+    .bss        start:0x02190698 end:0x02190774
