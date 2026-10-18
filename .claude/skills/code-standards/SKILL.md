@@ -9,7 +9,8 @@ The rules, with their wrong and right forms and when they don't apply, are in
 [docs/code-standards.md](../../../docs/code-standards.md). Read the rule in doubt there. In short:
 
 1. **Control flow as it reads.** No `goto` that only jumps to a return or rebuilds the compiler's shared tails. Not
-   for a shared cleanup or error exit, a retry, or leaving a search loop to skip its fallback.
+   for a shared cleanup or error exit, a retry, leaving a search loop to skip its fallback, or a labelled tail block
+   that does real work for several paths (`goto TRANS_NONINTERP` in `nsbca.c`).
 2. **No meaningless temporaries.** No local that only steers registers, no variable set twice to pick a branch, no
    expression split to stop a fold. Not for a local that names something.
 3. **Macros as written.** No hand-expanded `FX32_CONST`, `NELEMS`, `GX_RGB` or header inline.

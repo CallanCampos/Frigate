@@ -7,7 +7,7 @@
 // socl_ssl.o and the three functions.
 
 static int SOCLi_ExecEnableSslCommand(SOCLSocket *socket, void *ssl);
-static int SOCLi_EnableSslCallBack(SOCLCommandPacket *packet);
+static int SOCLi_EnableSslCallBack(void *arg);
 
 int SOCL_EnableSsl(int sock, void *sslInfo) {
     SOCLSocket *socket = (SOCLSocket *)sock;
@@ -33,18 +33,19 @@ static int SOCLi_ExecEnableSslCommand(SOCLSocket *socket, void *ssl) {
     if (packet == NULL) {
         return SOCL_EMFILE;
     }
-    packet->args.ssl.info = ssl;
+    packet->enable_ssl.info = ssl;
     return SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
 }
 
-static int SOCLi_EnableSslCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+static int SOCLi_EnableSslCallBack(void *arg) {
+    SOCLiCommandEnableSsl *cpacket = (SOCLiCommandEnableSsl *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     CPSSoc *soc = (CPSSoc *)pipe->base.thread.specific[0];
 
     OS_LockMutex(&pipe->base.mutex);
-    if (packet->args.ssl.info != NULL) {
-        soc->con = packet->args.ssl.info;
+    if (cpacket->info != NULL) {
+        soc->con = cpacket->info;
         CPS_SetSsl(TRUE);
         socket->flag = 4;
     } else {

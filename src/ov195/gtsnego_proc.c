@@ -40,7 +40,7 @@
 #include "system/pms.h"
 #include "system/pms_data.h"
 #include "system/wipe.h"
-#include "text/system/0045.h"
+#include "text/system/gtsnego_proc.h"
 #include "text/system/ability_handlers_btl_main.h"
 
 // The network commands, and the timings the machines synchronize on
@@ -487,10 +487,10 @@ static void GtsNego_StateShowPhrase(GtsNegoWork *wk) {
 static void GtsNego_StateWaitPartnerShown(GtsNegoWork *wk) {
     wk->timer--;
     if (wk->timer == 20) {
-        GtsNegoMessage_PrintShort(wk->msg, Bank0045_Text_TradeWillStarted);
+        GtsNegoMessage_PrintShort(wk->msg, GtsnegoProc_Text_TradeWillStarted);
     }
     if (wk->timer == 0) {
-        GtsNegoMessage_PrintHeading(wk->msg, Bank0045_Text_Greetings);
+        GtsNegoMessage_PrintHeading(wk->msg, GtsnegoProc_Text_Greetings);
         GtsNegoMessage_ClearLocation(wk->msg);
         GtsNego_ChangeState(wk, GtsNego_StateShowPhrase, 639);
     }
@@ -709,7 +709,7 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
         func_02042e9c(TRUE);
     }
     GtsNegoMessage_ClearWindow(wk->msg);
-    GtsNegoMessage_PrintShort(wk->msg, Bank0045_Text_GettingInformationFromOther);
+    GtsNegoMessage_PrintShort(wk->msg, GtsnegoProc_Text_GettingInformationFromOther);
     wk->timer = 180;
     GtsNegoMessage_FreeCancelButton(wk->msg);
     GtsNego_ChangeState(wk, GtsNego_StateWaitMatched, 997);
@@ -844,9 +844,9 @@ static void GtsNego_StateWaitSearchPressed(GtsNegoWork *wk) {
         AppTaskMenuWin_Free(wk->button);
         wk->button = NULL;
         GFL_BGSysQueueScrLoad(5);
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_SearchingRightPersonTrade);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_SearchingRightPersonTrade);
         GtsNegoDisp_ShowSearching(wk->disp);
-        GtsNegoMessage_PrintTitle(wk->msg, Bank0045_Text_TradeSearch);
+        GtsNegoMessage_PrintTitle(wk->msg, GtsnegoProc_Text_TradeSearch);
         GtsNegoDisp_SetDim(wk->disp, TRUE, GTSNEGO_DIM_SEARCH);
         wk->param->result = GTSNEGO_RESULT_ANYONE;
         GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
@@ -931,8 +931,8 @@ static void GtsNego_StateOpenSearchMenu(GtsNegoWork *wk) {
     GtsNegoDisp_ShowSearchMenu(wk->disp);
     wk->buttonCallback = GtsNego_OnSearchButton;
     GtsNegoMessage_ShowSearchMenu(wk->msg, GtsNego_OnButton, wk, wk->level, wk->myKind, wk->wantKind);
-    GtsNegoMessage_Print(wk->msg, Bank0045_Text_PleasePressSearchWhen);
-    wk->button = GtsNegoMessage_CreateButton(wk->msg, Bank0045_Text_Search);
+    GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleasePressSearchWhen);
+    wk->button = GtsNegoMessage_CreateButton(wk->msg, GtsnegoProc_Text_Search);
     if (!func_0203d554()) {
         GtsNegoDisp_SetCursor(wk->disp, NULL, wk->searchCursor);
         if (wk->searchCursor == GTSNEGO_CURSOR_SEARCH) {
@@ -1011,7 +1011,7 @@ static void GtsNego_OnCancelButton(u32 button, u32 event, void *work) {
 }
 
 static void GtsNego_StateRecreateFriendButton(GtsNegoWork *wk) {
-    wk->button = GtsNegoMessage_CreateButton(wk->msg, Bank0045_Text_RendezvousAny);
+    wk->button = GtsNegoMessage_CreateButton(wk->msg, GtsnegoProc_Text_RendezvousAny);
     GtsNego_ChangeState(wk, GtsNego_StateFriendList, 1645);
 }
 
@@ -1025,9 +1025,9 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
         TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), GTSNEGO_TOUCHBAR_RETURN, TRUE);
         switch (pos) {
         case 0:
-            GtsNegoMessage_Print(wk->msg, Bank0045_Text_SearchingRightPersonTrade);
+            GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_SearchingRightPersonTrade);
             GtsNegoDisp_ShowSearching(wk->disp);
-            GtsNegoMessage_PrintTitle(wk->msg, Bank0045_Text_TradeSearch);
+            GtsNegoMessage_PrintTitle(wk->msg, GtsnegoProc_Text_TradeSearch);
             wk->level = 0;
             wk->myKind = 0;
             wk->wantKind = 0;
@@ -1036,7 +1036,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
             break;
         case 1:
             GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
-            GtsNegoMessage_Print(wk->msg, Bank0045_Text_PleaseSelectWhoWish);
+            GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectWhoWish);
             if (!func_0203d554()) {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
             } else {
@@ -1061,9 +1061,9 @@ static void GtsNego_StateOpenFriendConfirm(GtsNegoWork *wk) {
 
 static void GtsNego_StatePrintFriendChosen(GtsNegoWork *wk) {
     if (wk->friendIndex == -1) {
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_WillTradeSomeoneHave);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_WillTradeSomeoneHave);
     } else {
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_WillRendezvousPerson);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_WillRendezvousPerson);
     }
     GtsNego_ChangeState(wk, GtsNego_StateOpenFriendConfirm, 1716);
 }
@@ -1303,7 +1303,7 @@ static void GtsNego_StateWaitNoFriends(GtsNegoWork *wk) {
     if (GtsNegoMessage_IsDone(wk->msg)) {
         wk->timer--;
         if (wk->timer <= 0) {
-            GtsNegoMessage_Print(wk->msg, Bank0045_Text_PleaseSelectHowTrade);
+            GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectHowTrade);
             TouchBar_SetVisible(GtsNegoDisp_GetTouchBar(wk->disp), TRUE);
             GtsNego_ChangeState(wk, GtsNego_StateMainMenu, 2101);
             if (!func_0203d554()) {
@@ -1319,13 +1319,13 @@ static void GtsNego_StateOpenFriendList(GtsNegoWork *wk) {
 
     wk->mode = GTSNEGO_MODE_RENDEZVOUS;
     if (count == 0) {
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_HaveNoOneRendezvous);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_HaveNoOneRendezvous);
         wk->timer = 120;
         GtsNego_ChangeState(wk, GtsNego_StateWaitNoFriends, 2133);
         return;
     }
     wk->scroll.count = count;
-    GtsNegoMessage_Print(wk->msg, Bank0045_Text_PleaseSelectWhoWish);
+    GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectWhoWish);
     if (!func_0203d554()) {
         GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
     } else {
@@ -1340,7 +1340,7 @@ static void GtsNego_StateOpenFriendList(GtsNegoWork *wk) {
     GtsNegoMessage_PrintFriends(wk->msg, wk->gameData, wk->scroll.top - 2);
     GtsNegoDisp_SetFriendIcons(wk->disp, wk->gameData, wk->scroll.top - 2);
     GtsNegoDisp_DrawListRows(wk->disp, wk->gameData, wk->scroll.top - 2);
-    wk->button = GtsNegoMessage_CreateButton(wk->msg, Bank0045_Text_RendezvousAny);
+    wk->button = GtsNegoMessage_CreateButton(wk->msg, GtsnegoProc_Text_RendezvousAny);
     GtsNegoDisp_SetKnob(wk->disp, wk->scroll.top + wk->friendCursor - GTSNEGO_CURSOR_FRIEND_1, wk->scroll.count);
     GtsNego_ChangeState(wk, GtsNego_StateFriendList, 2179);
 }
@@ -1366,9 +1366,9 @@ static void GtsNego_StateOpenMainMenu(GtsNegoWork *wk) {
         wk->notEnoughPokemon = TRUE;
     }
     if (!wk->notEnoughPokemon) {
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_PleaseSelectHowTrade);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectHowTrade);
     } else {
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_NeedLeastTwoPokemon);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_NeedLeastTwoPokemon);
     }
     GFL_BGSysSetBGEnabled(4, TRUE);
     GFL_BGSysSetBGEnabled(6, TRUE);
@@ -1422,9 +1422,9 @@ static void GtsNego_StateWaitExitConfirm(GtsNegoWork *wk) {
             break;
         case 1:
             if (!wk->notEnoughPokemon) {
-                GtsNegoMessage_Print(wk->msg, Bank0045_Text_PleaseSelectHowTrade);
+                GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectHowTrade);
             } else {
-                GtsNegoMessage_Print(wk->msg, Bank0045_Text_NeedLeastTwoPokemon);
+                GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_NeedLeastTwoPokemon);
             }
             if (!func_0203d554()) {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, wk->mainCursor);
@@ -1487,7 +1487,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
     TouchBar_Main(GtsNegoDisp_GetTouchBar(wk->disp));
     if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == GTSNEGO_TOUCHBAR_RETURN) {
         wk->timer = 1;
-        GtsNegoMessage_Print(wk->msg, Bank0045_Text_OkDisconnectFromNintendo);
+        GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_OkDisconnectFromNintendo);
         if (func_0203d554() == TRUE) {
             GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
         }
@@ -1528,7 +1528,7 @@ static BOOL GtsNegoProc_Init(GameProc *proc, u32 *state, void *param, void *work
     wk->heapId = HEAPID_GTSNEGO;
     wk->param = negoParam;
     wk->disp = GtsNegoDisp_Create(wk->heapId, negoParam->gameData);
-    wk->msg = GtsNegoMessage_Create(wk->heapId, TEXT_BANK_0045);
+    wk->msg = GtsNegoMessage_Create(wk->heapId, TEXT_BANK_GTSNEGO_PROC);
     wk->gameData = negoParam->gameData;
     wk->save = GameData_GetSaveControl(negoParam->gameData);
     wk->wifiList = GameData_GetWifiList(negoParam->gameData);

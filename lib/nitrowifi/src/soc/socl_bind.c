@@ -8,7 +8,7 @@
 // SOCL_Connect; its other calls from here, such as SOCL_Listen, this version lacks).
 
 static int SOCLi_ExecBindCommand(SOCLSocket *socket);
-static int SOCLi_BindCallBack(SOCLCommandPacket *packet);
+static int SOCLi_BindCallBack(void *arg);
 
 // What SOCL_Connect returns for a connect that is still running and has no error yet
 static s32 SOCLiResultCodeInConnecting = SOCL_EINPROGRESS;
@@ -41,7 +41,8 @@ int SOCL_Bind(SOCLSocket *socket, u16 local_port) {
     return 0;
 }
 
-int SOCL_Connect(SOCLSocket *socket, u16 remote_port, CPSInAddr remote_ip) {
+int SOCL_Connect(int s, u16 remote_port, CPSInAddr remote_ip) {
+    SOCLSocket *socket = (SOCLSocket *)s;
     int result;
 
     if (SOCL_SocketIsInvalid(socket) || (socket->state & SOCLI_STATE_CLOSING)) {
@@ -69,10 +70,7 @@ int SOCL_Connect(SOCLSocket *socket, u16 remote_port, CPSInAddr remote_ip) {
         socket->remote_port = remote_port;
         socket->remote_ip = remote_ip;
         result = SOCLi_ExecBindCommand(socket);
-        if (socket->flag_block == 1 || result < 0) {
-            return result;
-        }
-        return SOCL_EINPROGRESS;
+        return socket->flag_block == 1 || result < 0 ? result : SOCL_EINPROGRESS;
     }
     socket->remote_port = remote_port;
     socket->remote_ip = remote_ip;
@@ -85,22 +83,23 @@ static int SOCLi_ExecBindCommand(SOCLSocket *socket) {
     if (packet == NULL) {
         return SOCL_EMFILE;
     }
-    packet->args.bind.local_port = socket->local_port;
-    packet->args.bind.remote_port = socket->remote_port;
-    packet->args.bind.remote_ip = socket->remote_ip;
+    packet->bind.local_port = socket->local_port;
+    packet->bind.remote_port = socket->remote_port;
+    packet->bind.remote_ip = socket->remote_ip;
     socket->state |= SOCLI_STATE_BINDING;
     return SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
 }
 
-static int SOCLi_BindCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
+static int SOCLi_BindCallBack(void *arg) {
+    SOCLiCommandBind *cpacket = (SOCLiCommandBind *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
     int result = 0;
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
 
     OS_LockMutex(&pipe->base.mutex);
-    CPS_SocBind(packet->args.bind.local_port, packet->args.bind.remote_port, packet->args.bind.remote_ip);
+    CPS_SocBind(cpacket->local_port, cpacket->remote_port, cpacket->remote_ip);
     pipe->cps_read_len = 0;
-    if (packet->socket_flag == 0 || packet->socket_flag == 4) {
+    if (cpacket->h.socket_flag == 0 || cpacket->h.socket_flag == 4) {
         result = CPS_TcpConnect();
     }
     OS_UnlockMutex(&pipe->base.mutex);

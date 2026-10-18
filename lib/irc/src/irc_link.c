@@ -1,6 +1,6 @@
 // Overlay 31, the third of its four files (see net_devirc.c): the link of frames between the two machines. One pings,
 // the other answers, and then they send each other frames that carry a checksum, over the SPI bus of irc_spi.c.
-// Built at -O2,p as part of lib/irc (see its library.toml), whose name is ours.
+// Built with the game's compiler and flags as part of lib/irc, whose name is ours.
 #include "irc/irc_link.h"
 #include "irc_spi.h"
 #include "nitro/os.h"
@@ -69,24 +69,24 @@ static void IrcLink_SetLocalId(u8 id);
 
 static IrcLinkIdData IrcLinkIds = { 0xff, 0xff };
 static IrcLinkData IrcLink;
-static IrcFrameData IrcFrame;
+// Aligned, as the original's IrcLink_SendFrame, IrcLink_IsRecvIgnored and IrcLink_ValidateFrame show: at -O4,p MWCC
+// rotates a function's loops and drops its empty ones unless it reads an object with an explicit alignment, and the
+// frame is the only object IrcLink_SendFrame reads. To what it was aligned is a guess: 4 and 8 both fit its address,
+// right after IrcLink and on an 8-byte boundary but not a 16-byte one.
+static IrcFrameData IrcFrame ATTRIBUTE_ALIGN(4);
 
 static u16 IrcLink_Checksum(const u8 *data, u32 size) {
     u32 sum = 0x80;
-    u32 i = 0;
+    u32 i;
 
-    // The loop is tested before its first pass and then at its end, which at -O2,p takes a guarded do/while: a for
-    // loop is only tested at its end
-    if (i < size) {
-        do {
-            u8 byte = *data++;
+    for (i = 0; i < size; i++) {
+        u8 byte = *data++;
 
-            if (i & 1) {
-                sum += byte;
-            } else {
-                sum += byte << 8;
-            }
-        } while (++i < size);
+        if (i & 1) {
+            sum += byte;
+        } else {
+            sum += byte << 8;
+        }
     }
     sum = (sum >> 16) + (sum & 0xffff);
     sum += sum >> 16;
@@ -140,16 +140,16 @@ BOOL IrcLink_IsLinked(void) {
 }
 
 static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id) {
-    IrcFrameHeader *header = &IrcFrame.header;
+    IrcFrameData *frame = &IrcFrame;
     u8 *dst;
     u8 *raw;
     int i;
     u16 sum;
 
-    header->id = id;
-    header->cmd = cmd;
-    header->sumLo = 0;
-    header->sumHi = 0;
+    frame->header.id = id;
+    frame->header.cmd = cmd;
+    frame->header.sumLo = 0;
+    frame->header.sumHi = 0;
     dst = IrcFrame.data;
     for (i = 0; i < size; i++) {
         *dst++ = *data++;
@@ -157,8 +157,8 @@ static void IrcLink_SendFrame(const u8 *data, u8 size, u8 cmd, u8 id) {
     size += sizeof(IrcFrameHeader);
     raw = (u8 *)&IrcFrame;
     sum = IrcLink_Checksum(raw, size);
-    header->sumLo = sum;
-    header->sumHi = sum >> 8;
+    frame->header.sumLo = sum;
+    frame->header.sumHi = sum >> 8;
     for (i = 0; i < size; i++) {
         raw[i] ^= IRC_XOR;
     }
@@ -170,7 +170,7 @@ static void IrcLink_Finish(int a0) {
     if (IrcLink.linked && !IrcLink.isParent && a0 == 0) {
         IrcLink_SendFrame(NULL, 0, IRC_CMD_CLOSE, IrcLinkIds.local);
     }
-    if (IrcLink.closeCallback != NULL) {
+    if (IrcLink.closeCallback) {
         IrcLink.closeCallback(a0);
     }
     IrcLink_ClearState();
@@ -202,10 +202,8 @@ static BOOL IrcLink_IsRecvIgnored(u8 size) {
         }
         return FALSE;
     }
-    switch (size) {
-    case 2:
-    case 3:
-        // Empty loops, probably of debug output compiled out; -O2,p keeps them where -O4,p drops them
+    if (size == 2 || size == 3) {
+        // Empty loops, probably of debug output compiled out
         for (i = 0; i < 4; i++) {
         }
         for (i = 0; i < size; i++) {
@@ -235,7 +233,7 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
     u16 sum;
 
     if (size == 1) {
-        if (raw[0] == IRC_CMD_PING) {
+        if (frame->header.cmd == IRC_CMD_PING) {
             return TRUE;
         }
         return FALSE;
@@ -263,7 +261,6 @@ static BOOL IrcLink_ValidateFrame(u8 size) {
 
 BOOL IrcLink_Poll(void) {
     IrcFrameData *frame;
-    u8 *raw;
     u8 size = IrcSpi_Recv((u8 *)&IrcFrame);
 
     if (IrcLink_IsRecvIgnored(size)) {
@@ -280,12 +277,11 @@ BOOL IrcLink_Poll(void) {
     }
     IrcLink.tick = OS_GetTick();
     frame = &IrcFrame;
-    raw = (u8 *)&IrcFrame;
-    if (raw[0] < IRC_CMD_MIN) {
+    if (frame->header.cmd < IRC_CMD_MIN) {
         if (!IrcLink.linked) {
             return FALSE;
         }
-        if (raw[1] != IrcLinkIds.local) {
+        if (frame->header.id != IrcLinkIds.local) {
             return FALSE;
         }
     }
@@ -336,7 +332,7 @@ BOOL IrcLink_Poll(void) {
             IrcLink.linked = TRUE;
             IrcLink.resend = FALSE;
             IrcLink.pinging = FALSE;
-            if (IrcLink.connectCallback != NULL) {
+            if (IrcLink.connectCallback) {
                 IrcLink.connectCallback(frame->header.id, 0);
             }
         }

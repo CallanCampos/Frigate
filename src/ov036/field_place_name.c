@@ -434,7 +434,7 @@ void func_ov036_021b53f4(PlaceName *wk, u32 index) {
 }
 
 void func_ov036_021b540c(PlaceName *wk) {
-    wk->arc = GFL_ArcSysCreateFileHandle(0x53, FieldPlaceName_GetHeapID(wk));
+    wk->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_PLACE_NAME, FieldPlaceName_GetHeapID(wk));
 }
 
 void func_ov036_021b5420(PlaceName *wk) {

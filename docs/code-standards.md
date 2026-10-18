@@ -55,7 +55,10 @@ end:
 
 **Does not apply when:** the label is a shared cleanup or error exit that frees or resets something (`fail:` in
 `nhttp_request.c`), a retry (`goto retry`), or leaves a search loop to skip its fallback (`goto inserted` in
-`vct_buffer.c`). A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and locals
+`vct_buffer.c`), or jumps forward to a labelled tail block that does real work for several paths and then returns,
+in place of a flag tested at the end (`goto TRANS_INTERP_2` and `goto TRANS_NONINTERP` in NitroSystem's `nsbca.c`,
+where one block averages a pair of stored values and the other reads one). A label whose code only repeats a `return`
+or an epilogue is still the compiler's shared tail. A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and locals
 between its `break`s (`btl_server_flow.c`), never as a wrapper around one statement.
 
 **Checked:** a `goto` whose label is followed by nothing but a `return` or the function's end.
@@ -200,7 +203,11 @@ in the `#else`. A mistake of an earlier decompilation is just fixed: it isn't th
 tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, since the macro turns the expression into
 a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
 
-**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version.
+**Don't:** put a comment between a declaration's specifiers and the rest (`static // Connects ...` above
+`int AossAp_Connect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
+
+**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version, and a comment
+right after `static`, `inline`, `extern` or `const` that starts a line.
 
 ## 12. Rows of the nonmatching functions
 

@@ -4,6 +4,7 @@
 // whose textures it draws from the Trainers' names and from archive 0x123
 #include "field/wbt_stadium_gimmick.h"
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/field_task.h"
@@ -628,8 +629,8 @@ static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource,
     plttAddr = WbtStadiumGimmick_FindPlttAddr(tex, plttName);
     work->character = NULL;
     work->palette = NULL;
-    work->characterFile = GFL_G2DIOReadBGNCGR(0x123, file * 2, TRUE, &work->character, heapId);
-    work->paletteFile = GFL_G2DIOReadNCLR(0x123, file * 2 + 1, &work->palette, heapId);
+    work->characterFile = GFL_G2DIOReadBGNCGR(ARCID_WBT_STADIUM_GIMMICK, file * 2, TRUE, &work->character, heapId);
+    work->paletteFile = GFL_G2DIOReadNCLR(ARCID_WBT_STADIUM_GIMMICK, file * 2 + 1, &work->palette, heapId);
     src = work->character->rawData;
     pixels = GFL_BitmapGetPixelData(work->bitmap);
     MIi_CpuClear32(0, pixels, 16 * 32);

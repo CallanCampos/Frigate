@@ -112,7 +112,7 @@ PdcMsg *PdcMsg_Create(Font *font, const Config *config, TCBExManager *tcbManager
     msg->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     GFL_BGSysFillScrArea(PDC_MSG_BG, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillChar(PDC_MSG_BG, 0, 1, 0);
-    frameChar = GFL_BGSysLoadNCGRDynamic(11, 0x164, PDC_MSG_BG, 0, FALSE, msg->heapId);
+    frameChar = GFL_BGSysLoadNCGRDynamic(ARCID_BTLV, 0x164, PDC_MSG_BG, 0, FALSE, msg->heapId);
     PaletteFade_LoadNCLREx(BtlvEffect_GetPaletteFade(), 11, 0x165, msg->heapId, 0, 0x20, 0, 0);
     msg->win = BmpWin_CreateDynamic(PDC_MSG_BG, 1, 19, 30, 4, 0, 0);
     BmpWin_FlushMap(msg->win);

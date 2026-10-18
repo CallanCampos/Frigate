@@ -1,0 +1,11 @@
+# NitroSDK's linker symbols whose addresses its code reads as numbers, such as the stack sizes: NitroSDK's linker script
+# defines them, and the ROM has them as plain words in the literal pools that load them. dsd's linker script doesn't,
+# so tools/build/lcf_symbols.py adds them to it as absolute symbols (docs/configs.md). Both versions have these values
+
+# The IRQ stack's size (OS_SetIrqStackChecker, OS_InitThread, OS_GetInitArenaHi, and the start-up gap code: Entry and
+# the functions at 0x02004d50 and 0x02004da0)
+SDK_IRQ_STACKSIZE = 0x800
+# The system stack's size (OS_InitThread, OS_GetInitArenaHi)
+SDK_SYS_STACKSIZE = 0x1800
+# The start of the extended main memory arena on a DSi (OS_GetInitArenaLo)
+SDK_MAINEX_ARENA_LO = 0x0d000000

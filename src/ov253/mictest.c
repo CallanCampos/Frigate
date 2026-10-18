@@ -39,9 +39,6 @@
 // microphone, and the louder, the more the speaker on the screen shakes and the more notes it sends up. The Back
 // button on the lower screen returns to the title screen
 
-// The microphone test's graphics, archive 107
-#define ARCID_MIC_TEST 107
-
 #define BG_COUNT 5
 #define WINDOW_COUNT 3
 #define ACTOR_COUNT 7

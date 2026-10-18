@@ -311,7 +311,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     func_020232d8();
     work->cursorImageChars = LoadCursorImageEndOfHeap(3, 13, 0, work->heapId);
 
-    arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 8, PALTYPE_SUB_BG, 0, 0, work->heapId);
     if (getTrainerGender(work->playerInfo) == 0) {
         GFL_G2DIOLoadArcNCLR(arc, 8, PALTYPE_SUB_BG, 0x20, 0, 0x20, work->heapId);
@@ -384,7 +384,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
         func_0204c5c8(work->typeIcons[i], FALSE);
     }
 
-    arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     work->sortButtonPlt = func_0204bbb8(arc, 39, 0, 0x80, 0, 2, work->heapId);
     work->sortButtonChr = func_0204b81c(arc, 38, FALSE, 0, work->heapId);
     work->sortButtonCel = func_0204bde0(arc, 37, 36, work->heapId);
@@ -641,7 +641,7 @@ void ItemMenuDisp_Update(ItemMenuWork *work) {
 
 // Loads the list's OBJ
 void ItemMenuDisp_LoadListRes(ItemMenuWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     s32 i;
 
     work->rowMarkPlt = func_0204bbb8(arc, 32, 0, 0x1c0, 0, 1, work->heapId);
@@ -1086,7 +1086,7 @@ void ItemMenuDisp_OpenFilterMenu(ItemMenuWork *work, u8 count) {
 
 // Loads the lower screen's frame for a pocket
 void ItemMenuDisp_LoadPocketFrame(ItemMenuWork *work, u32 pocket) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
 
     if (pocket == BAG_POCKET_FREE_SPACE) {
         GFL_G2DIOLoadNSCRAsync(arc, 24, 5, 0, CHAR_POS(work->bg5Chars), 0, FALSE, work->heapId);
@@ -1289,7 +1289,7 @@ void ItemMenuDisp_CloseMenu(ItemMenuWork *work) {
 
 // Draws the quantity picker's frame
 void ItemMenuDisp_DrawQuantityFrame(ItemMenuWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     void *file = GFL_ArcToolReadHeapNewLZ(arc, 35, FALSE, work->heapId);
     NNSG2dScreenData *screen;
     s32 i = 0;

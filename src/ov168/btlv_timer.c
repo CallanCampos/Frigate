@@ -6,6 +6,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_gauge.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -42,7 +43,7 @@ BtlvTimer *BtlvTimer_Create(HeapID heapId) {
     ArcTool *arc;
 
     timer->heapId = heapId;
-    arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(timer->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(timer->heapId));
     timer->units[0] = func_0204bf1c(TIMER_ACTOR_COUNT, 0, timer->heapId);
     timer->units[1] = func_0204bf1c(TIMER_ACTOR_COUNT, 0, timer->heapId);
     timer->chars = func_0204b81c(arc, 0x1ab, FALSE, CLACT_VRAM_MAIN, timer->heapId);

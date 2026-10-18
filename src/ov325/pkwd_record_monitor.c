@@ -41,9 +41,6 @@
 // upper one, the box office record of the movie under the cursor, its cast and its stars. The file has no name
 // string; it is named after the overlay's other file, pkwd_record_monitor_graphic.c (a guess)
 
-// The archive of the screen's graphics, which pkwd_selectscreen.c takes its marks from
-#define ARCID_PKWD_RECORD_MONITOR_GRA 100
-
 // The archive's file of the actors' positions, an x and a y each
 #define POSITIONS_FILE 43
 #define POSITION_COUNT 33
@@ -701,7 +698,7 @@ static void PkwdRecordMonitor_Setup(PkwdRecordMonitorWork *wk) {
         wk->subWindows[i].window = NULL;
         wk->windows[i].window = NULL;
     }
-    wk->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD_RECORD_MONITOR_GRA, POSITIONS_FILE, wk->heapId);
+    wk->positions = GFL_ArcSysReadHeapNew(ARCID_PKWD, POSITIONS_FILE, wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEWOOD_LINES, wk->heapId);
     PkwdRecordMonitor_LoadMovies(wk);
     PkwdRecordMonitor_GetMovie(wk, wk->selected);
@@ -710,7 +707,7 @@ static void PkwdRecordMonitor_Setup(PkwdRecordMonitorWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 6, 4, 10 * 0x20, 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_RECORD_MONITOR_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, 0, 10 * 0x20, 0x20, wk->heapId);
     GFL_ArcToolFree(arc);
     PkwdRecordMonitor_InitActors(wk);
@@ -782,7 +779,7 @@ static void PkwdRecordMonitor_LoadBG(PkwdRecordMonitorWork *wk) {
     s32 i;
     s32 page;
     s32 j;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_RECORD_MONITOR_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     for (i = 0; i < LOAD_MAX; i++) {
         if (palette->target == 0xff) {
@@ -890,7 +887,7 @@ static void PkwdRecordMonitor_SetIcon(PkwdRecordMonitorWork *wk, u32 index, u32 
 }
 
 static void PkwdRecordMonitor_LoadRes(PkwdRecordMonitorWork *wk, u32 vramType, const PkwdRecordMonitorResSetup *setup) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_RECORD_MONITOR_GRA, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
 
     PkwdRecordMonitorGraphic_GetClActUnit(wk->graphic);
     wk->res.all[setup->palette.res] =
@@ -1734,7 +1731,7 @@ static void PkwdRecordMonitor_CreateList(PkwdRecordMonitorWork *wk) {
 
     setup.work = wk;
     PkwdRecordMonitor_FreeList(wk);
-    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD_RECORD_MONITOR_GRA, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 20, 6, 0, 0, FALSE, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 4, 0, 0x20, wk->heapId);
     setup.callbacks = &sPkwdRecordMonitorListCallbacks;

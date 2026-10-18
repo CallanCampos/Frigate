@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_environment.h"
 #include "field/field_exp_obj.h"
@@ -18,8 +19,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_BG 3
-// The archive of the model and the BG's graphics, which has no name yet
-#define GIMMICK_ARCID 0x12f
 // The BG's palette in that archive, one for each version
 #ifdef BLACK2
 #define GIMMICK_BG_NCLR 4
@@ -41,10 +40,10 @@ static void func_ov115_021eee64(GimmickWork *work);
 static void func_ov115_021eee70(FieldExpObjSystem *system, u16 actor);
 
 static const G3DSceneResourceSetup sResources[] = {
-    { GIMMICK_ARCID, 0, 0 },
-    { GIMMICK_ARCID, 1, 0 },
-    { GIMMICK_ARCID, 2, 0 },
-    { GIMMICK_ARCID, 3, 0 },
+    { ARCID_GIMMICK, 0, 0 },
+    { ARCID_GIMMICK, 1, 0 },
+    { ARCID_GIMMICK, 2, 0 },
+    { ARCID_GIMMICK, 3, 0 },
 };
 
 static const G3DSceneAnimationSetup sAnimations[] = { { 1, 0 }, { 2, 0 }, { 3, 0 } };
@@ -119,7 +118,7 @@ static void func_ov115_021eed28(GimmickWork *work) {
 
         GFL_BGSysCreateBG(GIMMICK_BG, &setup, 0);
     }
-    arc = GFL_ArcSysCreateFileHandle(GIMMICK_ARCID, HEAPID_TAIL(heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GIMMICK, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, GIMMICK_BG_NCLR, 0, 0, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 6, GIMMICK_BG, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, GIMMICK_BG, 0, 0, FALSE, heapId);

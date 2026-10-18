@@ -182,7 +182,7 @@ static void BPlistObj_LoadItemIconRes(BPlistWork *wk) {
 }
 
 static void BPlistObj_LoadCursorRes(BPlistWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(wk->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(wk->param->heapId));
 
     wk->charRes[24] = func_0204b81c(arc, 424, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
     wk->plttRes[4] = func_0204bbb8(arc, 421, CLACT_VRAM_SUB, 0x100, 4, 1, wk->param->heapId);

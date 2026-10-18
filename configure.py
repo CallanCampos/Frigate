@@ -25,6 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
 from tools.data.gen_constants import ordered_files  # noqa: E402
+from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
 
 VERSIONS = {
@@ -294,6 +295,9 @@ DATA_PACKS = [
     # The zones' events, in the order of res/field/events/order.json
     ("tools/data/event_data.py", "res/field/events", ["a/1/2/6"], False),
 ]
+# The 2D graphics archives, each a directory of res/graphics/ named after its ARCID_* constant, which gives its file
+DATA_PACKS += [("tools/data/graphics_archive.py", f"res/graphics/{directory.name}", [directory_archive(directory)], True)
+               for directory in sorted(GRAPHICS.iterdir()) if directory.is_dir()]
 # What every packer reads besides its data: the scripts, and the move tutors' tables, which name the species data's
 # tutor bits (tools/data/species_data.py). A packer also depends on the modules of tools/ that it imports
 # (script_imports).
@@ -515,12 +519,16 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             variables={"config": str(arm9_config)})
     n.build([lcf_file, objects_file], "lcf", dsd_configs, implicit=[extract_dir / "config.yaml"],
             variables={"config": str(arm9_config)})
-    link_lcf = lcf_file
+    # NitroSDK's linker symbols, which dsd's linker script doesn't define, see tools/build/lcf_symbols.py
+    link_lcf = build_dir / "arm9_symbols.lcf"
+    n.build([link_lcf], "lcf_symbols", [lcf_file, "config/linker_symbols.toml"],
+            implicit=["tools/build/lcf_symbols.py"])
     if shift:
         # Padding in the linker script moves the code and data after it, see tools/build/shift_lcf.py
-        link_lcf = build_dir / "arm9_shifted.lcf"
-        n.build([link_lcf], "shift_lcf", [lcf_file], implicit=["tools/build/shift_lcf.py"],
+        shifted_lcf = build_dir / "arm9_shifted.lcf"
+        n.build([shifted_lcf], "shift_lcf", [link_lcf], implicit=["tools/build/shift_lcf.py"],
                 variables={"amount": hex(shift)})
+        link_lcf = shifted_lcf
 
     # Source files are listed in delinks.txt by their path. Complete files are linked from the compiled object, and
     # incomplete ones are still compiled so objdiff can compare them.
@@ -708,6 +716,7 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
+    n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Scripts go through the C preprocessor, so that they can include the constant headers

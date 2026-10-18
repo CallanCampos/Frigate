@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc_util.h"
 #include "gfl/clact.h"
@@ -272,10 +273,10 @@ void WorldTrade_SubLcdMatchObjHide(WorldTradeWork *wk) {
 static void SubLcd_FieldObjLoad(WorldTradeWork *wk) {
     int i;
 
-    wk->fieldObjPalBuf = GFL_G2DIOReadNCLR(31, 0, &wk->fieldObjPalData, HEAPID_WORLDTRADE);
+    wk->fieldObjPalBuf = GFL_G2DIOReadNCLR(ARCID_WIFI_UNIONCHAR, 0, &wk->fieldObjPalData, HEAPID_WORLDTRADE);
     for (i = 0; i < 16; i++) {
         wk->fieldObjCharaBuf[i] =
-            GFL_G2DIOReadOBJNCGR(31, 0x31 + i, FALSE, &wk->fieldObjCharaData[i], HEAPID_WORLDTRADE);
+            GFL_G2DIOReadOBJNCGR(ARCID_WIFI_UNIONCHAR, 0x31 + i, FALSE, &wk->fieldObjCharaData[i], HEAPID_WORLDTRADE);
     }
     for (i = 0; i < 16; i++) {
         DC_FlushRange(wk->fieldObjCharaData[i]->rawData, 0x200);

@@ -49,8 +49,9 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
   only where nothing shows a meaning.
 
 ## Known bad shapes to check for
-- A `goto` to a label that only returns, or seven gotos rebuilding the compiler's shared tails
-  (`RollerCoaster_GetTransData`, printsys.c's `func_02022464`).
+- A `goto` to a label that only returns, or gotos rebuilding the compiler's shared tails, where the labels' code
+  only repeats a return or an epilogue (printsys.c's `func_02022464`). A forward goto to a labelled tail block that
+  does real work for several paths is fine (`RollerCoaster_GetTransData`, as NitroSystem's `nsbca.c`).
 - A dummy local for the register allocator: `f32 zero = 0.0f` (building_enter_effect.c), `int side` set to 0 then 1
   instead of a ternary (btlv_effvm.c), a local kept with "fetched and never used" (gimmick_plasma_frigate_deck.c).
 - A macro expanded by hand (`FX32_CONST`), one expression split into two statements to stop a fold

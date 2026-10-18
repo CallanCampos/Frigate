@@ -13,7 +13,7 @@
 #include "gfl/str.h"
 #include "pml/poke_party.h"
 #include "system/wordset.h"
-#include "text/system/0356.h"
+#include "text/system/poke_regulation.h"
 
 // poke_regulation.c, which the ROM names: checks of Pokémon and parties against a regulation, and the regulation's
 // rules as text. Names are not swan's, except PML_PkmIsLegendNational.
@@ -422,13 +422,13 @@ static StrBuf *makeCountText(const Regulation *regulation, WordSet *wordset, Reg
     u32 messageId;
 
     if (regulation->unk2 == 1 && regulation->unk3 == PARTY_SIZE) {
-        messageId = Bank0356_Text_NoRestrictions;
+        messageId = PokeRegulation_Text_NoRestrictions;
     } else if (regulation->unk2 == regulation->unk3) {
-        messageId = Bank0356_Text_Empty;
+        messageId = PokeRegulation_Text_Empty;
     } else if (regulation->unk2 > 1 && regulation->unk3 == PARTY_SIZE) {
-        messageId = Bank0356_Text_More;
+        messageId = PokeRegulation_Text_More;
     } else {
-        messageId = Bank0356_Text_To;
+        messageId = PokeRegulation_Text_To;
     }
     WordSetNumber(wordset, 0, regulation->unk2, 1, 0, TRUE);
     WordSetNumber(wordset, 1, regulation->unk3, 1, 0, TRUE);
@@ -444,19 +444,19 @@ static StrBuf *makeLevelText(const Regulation *regulation, WordSet *wordset, Reg
     u32 messageId;
 
     if (regulation->unk5 == 0) {
-        messageId = Bank0356_Text_NoRestrictions;
+        messageId = PokeRegulation_Text_NoRestrictions;
     } else if (regulation->unk5 == 4) {
-        messageId = Bank0356_Text_Becomes;
+        messageId = PokeRegulation_Text_Becomes;
     } else if (regulation->unk5 == 1) {
-        messageId = Bank0356_Text_Up_2;
+        messageId = PokeRegulation_Text_Up_2;
     } else if (regulation->unk5 == 2) {
-        messageId = Bank0356_Text_Up;
+        messageId = PokeRegulation_Text_Up;
     } else if (regulation->unk5 == 3) {
-        messageId = Bank0356_Text_Becomes_2;
+        messageId = PokeRegulation_Text_Becomes_2;
     } else if (regulation->unk5 == 5) {
-        messageId = Bank0356_Text_Becomes_3;
+        messageId = PokeRegulation_Text_Becomes_3;
     } else {
-        messageId = Bank0356_Text_NoRestrictions;
+        messageId = PokeRegulation_Text_NoRestrictions;
     }
     WordSetNumber(wordset, 0, regulation->unk4, 3, 0, TRUE);
     strbuf = GFL_StrBufCreate(PRINT_MSG_STRBUF_SIZE, heapId);
@@ -476,9 +476,9 @@ static StrBuf *makeSpecialPokemonText(const Regulation *regulation, WordSet *wor
         }
     }
     if (i == sizeof(regulation->unkA)) {
-        messageId = Bank0356_Text_Permitted;
+        messageId = PokeRegulation_Text_Permitted;
     } else {
-        messageId = Bank0356_Text_Banned;
+        messageId = PokeRegulation_Text_Banned;
     }
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
@@ -488,9 +488,9 @@ static StrBuf *makeSamePokemonText(const Regulation *regulation, WordSet *wordse
     u32 messageId;
 
     if (regulation->unk8 == 1) {
-        messageId = Bank0356_Text_Permitted_2;
+        messageId = PokeRegulation_Text_Permitted_2;
     } else {
-        messageId = Bank0356_Text_Banned_2;
+        messageId = PokeRegulation_Text_Banned_2;
     }
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
@@ -500,9 +500,9 @@ static StrBuf *makeSameItemsText(const Regulation *regulation, WordSet *wordset,
     u32 messageId;
 
     if (regulation->unk9 == 1) {
-        messageId = Bank0356_Text_Permitted_3;
+        messageId = PokeRegulation_Text_Permitted_3;
     } else {
-        messageId = Bank0356_Text_Banned_3;
+        messageId = PokeRegulation_Text_Banned_3;
     }
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
@@ -512,11 +512,11 @@ static StrBuf *makeLauncherText(const Regulation *regulation, WordSet *wordset, 
     u32 messageId;
 
     if (printMsg->launcher == 1) {
-        messageId = Bank0356_Text_On;
+        messageId = PokeRegulation_Text_On;
     } else if (printMsg->launcher == 0) {
-        messageId = Bank0356_Text_Off;
+        messageId = PokeRegulation_Text_Off;
     } else {
-        messageId = Bank0356_Text_On;
+        messageId = PokeRegulation_Text_On;
     }
     return GFL_MsgDataLoadStrbufNew(printMsg->msgData, messageId);
 }
@@ -526,7 +526,7 @@ void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, He
     StrBuf *temp;
     int i;
 
-    printMsg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0356, heapId);
+    printMsg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKE_REGULATION, heapId);
     temp = GFL_StrBufCreate(PRINT_MSG_STRBUF_SIZE, heapId);
     // A regulation with 2 leaves the Wonder Launcher to the players
     if (regulation->unkAB == 2) {
@@ -535,7 +535,7 @@ void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, He
         printMsg->launcher = regulation->unkAB;
     }
     for (i = 0; i < PRINT_MSG_RULE_COUNT; i++) {
-        printMsg->rule[i] = GFL_MsgDataLoadStrbufNew(printMsg->msgData, Bank0356_Text_NoPokemon + i);
+        printMsg->rule[i] = GFL_MsgDataLoadStrbufNew(printMsg->msgData, PokeRegulation_Text_NoPokemon + i);
         printMsg->value[i] = sPrintMsgValueFuncs[i](regulation, wordset, printMsg, temp, heapId);
     }
     GFL_StrBufFree(temp);

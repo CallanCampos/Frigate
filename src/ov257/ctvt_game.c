@@ -6,6 +6,7 @@
 #include "app/comm_tvt/ctvt_game_balloon.h"
 #include "app/comm_tvt/ctvt_game_cam.h"
 #include "app/comm_tvt/ctvt_game_target.h"
+#include "constants/arc.h"
 #include "constants/sound.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -576,7 +577,8 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
         } else {
             fileId = files[CtvtComm_GetUnk3dc(sys, comm, netId)];
             for (i = 0; i < 3; i++) {
-                game->members[slot].pictures[i] = GFL_ArcSysReadHeapNewLZ(242, i + fileId, FALSE, heapId);
+                game->members[slot].pictures[i] =
+                    GFL_ArcSysReadHeapNewLZ(ARCID_CTVT_GAME_CAM, i + fileId, FALSE, heapId);
             }
         }
         slot++;
@@ -1018,7 +1020,7 @@ static void CtvtGame_InitPlay(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
 
     CtvtGame_InitGraphics(game, heapId);
-    arc = GFL_ArcSysCreateFileHandle(233, heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_CTVT_GAME, heapId);
     switch (CtvtGame_GetType(game)) {
     case CTVT_GAME_TYPE_TARGETS:
         CtvtGame_LoadTargetResources(game, heapId, arc);
@@ -1581,17 +1583,17 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 4; i++) {
         CtvtGame_LoadBalloonPictures(game, i, i);
     }
-    GFL_BGSysLoadNCLRDefault(233, 3, 0, 0, 0x60, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 12, 1, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 19, 1, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCLRDefault(233, 7, 4, 0, 0xa0, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 16, 4, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 23, 4, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 17, 7, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 24, 7, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 3, 0, 0, 0x60, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 12, 1, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 19, 1, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 7, 4, 0, 0xa0, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 16, 4, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 23, 4, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 17, 7, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 24, 7, 0, 0, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(7, 0, 0, 32, 24, 3);
     GFL_BGSysLoadScr(7);
-    GFL_BGSysLoadNCLRDefault(233, 2, 4, 0x1a0, 0x20, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 2, 4, 0x1a0, 0x20, heapId);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 0;
@@ -1684,20 +1686,20 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 4; i++) {
         CtvtGame_LoadBalloonPictures(game, i, 0);
     }
-    GFL_BGSysLoadNCLRDefault(233, 4, 0, 0, 0xc0, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 13, 1, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 20, 1, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCLRDefault(233, 7, 4, 0, 0xa0, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 16, 4, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 23, 4, 0, 0, FALSE, heapId);
-    GFL_BGSysLoadNCGRStatic(233, 17, 7, 0, 0, FALSE, heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 24, 7, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 4, 0, 0, 0xc0, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 13, 1, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 20, 1, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 7, 4, 0, 0xa0, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 16, 4, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 23, 4, 0, 0, FALSE, heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 17, 7, 0, 0, FALSE, heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 24, 7, 0, 0, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(7, 0, 0, 32, 24, 4);
     GFL_BGSysLoadScr(7);
     game->paletteFrame = 0;
-    game->paletteFile = GFL_G2DIOReadNCLR(233, 7, &game->palette, game->heapId);
+    game->paletteFile = GFL_G2DIOReadNCLR(ARCID_CTVT_GAME, 7, &game->palette, game->heapId);
     GFL_BGSysUploadStdPalette(4, (u8 *)game->palette->rawData + 0x20, 0x20, 0);
-    GFL_BGSysLoadNCLRDefault(233, 2, 4, 0x1a0, 0x20, heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 2, 4, 0x1a0, 0x20, heapId);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 4;
@@ -1843,9 +1845,9 @@ static void CtvtGame_StartTargets(CommTvtWork *sys, CtvtGame *game) {
         func_0204c124(game->targetSigns[i], TRUE);
         func_0204c56c(game->targetSigns[i]);
     }
-    GFL_BGSysLoadNCLRDefault(233, 5, 0, 0, 0x20, game->heapId);
-    GFL_BGSysLoadNCGRStatic(233, 14, 1, 0, 0, FALSE, game->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 21, 1, 0, 0, FALSE, game->heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 5, 0, 0, 0x20, game->heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 14, 1, 0, 0, FALSE, game->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 21, 1, 0, 0, FALSE, game->heapId);
 }
 
 static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
@@ -1858,9 +1860,9 @@ static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
     func_0204c520(game->pump, TRUE);
     func_0204c124(game->pumpBase, TRUE);
     func_0204c124(game->pumpAir, TRUE);
-    GFL_BGSysLoadNCLRDefault(233, 6, 0, 0, 0xe0, game->heapId);
-    GFL_BGSysLoadNCGRStatic(233, 15, 1, 0, 0, FALSE, game->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 22, 1, 0, 0, FALSE, game->heapId);
+    GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 6, 0, 0, 0xe0, game->heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 15, 1, 0, 0, FALSE, game->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 22, 1, 0, 0, FALSE, game->heapId);
 }
 
 static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
@@ -2152,10 +2154,10 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     {
         u8 fileId = CtvtGame_GetType(game);
 
-        GFL_BGSysLoadNCLRDefault(233, fileId + 8, 0, 0, 0x80, game->heapId);
+        GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, fileId + 8, 0, 0, 0x80, game->heapId);
     }
-    GFL_BGSysLoadNCGRStatic(233, 18, 1, 0, 0, FALSE, game->heapId);
-    loadBGScrToVramByNarcNoReserveNegAlign(233, 25, 1, 0, 0, FALSE, game->heapId);
+    GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 18, 1, 0, 0, FALSE, game->heapId);
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 25, 1, 0, 0, FALSE, game->heapId);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 0;

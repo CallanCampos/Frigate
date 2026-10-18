@@ -1,0 +1,22 @@
+PkwdBriefingMovie15_Text_AfterMuchResearchGenius = {bd02}After much research, a genius scientist\n{bd02}and his assistant have finally\n{bd02}completed the temporal transport,\n{bd02}a machine that can travel to the future!
+PkwdBriefingMovie15_Text_TestRunHistoricInvention = {bd02}The test run of this\n{bd02}historic invention\n{bd02}is about to commence...
+PkwdBriefingMovie15_Text_Empty = なし
+PkwdBriefingMovie15_Text_Empty_2 = なし
+PkwdBriefingMovie15_Text_Empty_3 = なし
+PkwdBriefingMovie15_Text_Empty_4 = なし
+PkwdBriefingMovie15_Text_Empty_5 = なし
+PkwdBriefingMovie15_Text_Empty_6 = なし
+PkwdBriefingMovie15_Text_Empty_7 = なし
+PkwdBriefingMovie15_Text_Empty_8 = なし
+PkwdBriefingMovie15_Text_AfterMuchResearchGenius_2 = {bd02}After much research, a genius scientist\n{bd02}and her assistant have finally\n{bd02}completed the temporal transport,\n{bd02}a machine that can go to the future!
+PkwdBriefingMovie15_Text_TestRunHistoricInvention_2 = {bd02}The test run of this\n{bd02}historic invention\n{bd02}is about to commence...
+PkwdBriefingMovie15_Text_Empty_9 = なし
+PkwdBriefingMovie15_Text_Empty_10 = なし
+PkwdBriefingMovie15_Text_Empty_11 = なし
+PkwdBriefingMovie15_Text_Empty_12 = なし
+PkwdBriefingMovie15_Text_Empty_13 = なし
+PkwdBriefingMovie15_Text_Empty_14 = なし
+PkwdBriefingMovie15_Text_Empty_15 = なし
+PkwdBriefingMovie15_Text_Empty_16 = なし
+PkwdBriefingMovie15_Text_Empty_17 = なし
+\pad{a0}

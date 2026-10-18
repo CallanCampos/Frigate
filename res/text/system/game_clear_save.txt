@@ -1,0 +1,7 @@
+GameClearSave_Text_Empty =              \x{ffff}
+GameClearSave_Text_Empty_2 =     \x{ffff}
+GameClearSave_Text_Empty_3 =              \x{ffff}
+GameClearSave_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+GameClearSave_Text_SavedGame = {0100:0} saved the game.
+GameClearSave_Text_ThereAlreadySavedGame = There is already a saved game file.\nIt is impossible to save.
+\pad{ee}

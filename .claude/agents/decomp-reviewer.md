@@ -32,7 +32,7 @@ Check:
 5. **Names:** swan's names kept; our names recorded in `config/names.txt` via `rename_symbol.py`, not hand-edited
    into `symbols.txt`. Guessed file or function names are said to be guessed. There are no `unk` names where swan or
    the code gives one. The file is named from the ROM's string, or descriptively, never with an overlay number.
-6. **Natural C** (docs/code-standards.md): no gotos to a return or to the compiler's shared tails, no dummy locals or
+6. **Natural C** (docs/code-standards.md): no gotos to a return or to the compiler's shared tails (a labelled tail block that does real work for several paths is fine), no dummy locals or
    statements split to steer registers, no hand-expanded macros, no byte-offset casts (a pointer sum of the
    element's own type is fine), no inline asm, no `volatile` without a commented reason, no narrating comments, no
    copied pret code. A function that matches only through one of these keeps the natural C and gets a row, and a

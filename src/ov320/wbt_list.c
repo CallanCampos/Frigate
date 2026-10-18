@@ -38,7 +38,7 @@
 #include "system/text_speed.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
-#include "text/system/0406.h"
+#include "text/system/wbt_list.h"
 
 // The Pokémon World Tournament's list of Trainers: the upper screen's bracket of the eight entrants, which an
 // announcer's messages go through on the lower screen. The ROM has no name for this file; "wbt_list.c" is a guess from
@@ -325,9 +325,9 @@ static const s16 sWbtListTitleX[2] = { 112, 112 };
 static const s16 sWbtListColumnX[2][2] = { { -72, 0 }, { 220, 148 } };
 
 static const WbtListMessages sWbtListMessages[4] = {
-    { Bank0406_Text_The, Bank0406_Text_StartsNow, Bank0406_Text_The, Bank0406_Text_ThesePokemonTrainersWho },
-    { Bank0406_Text_FirstRoundVs, Bank0406_Text_LetsMoveNextBattle, 0, 0 },
-    { Bank0406_Text_SecondRoundVs, Bank0406_Text_WhichTrainerWillWin, 0, 0 },
+    { WbtList_Text_The, WbtList_Text_StartsNow, WbtList_Text_The, WbtList_Text_ThesePokemonTrainersWho },
+    { WbtList_Text_FirstRoundVs, WbtList_Text_LetsMoveNextBattle, 0, 0 },
+    { WbtList_Text_SecondRoundVs, WbtList_Text_WhichTrainerWillWin, 0, 0 },
     { 0, 0, 0, 0 }
 };
 
@@ -439,7 +439,7 @@ static BOOL WbtListProc_Init(GameProc *proc, u32 *state, void *param, void *work
     list->setup = param;
     list->graphic = WbtListGraphic_Create(1, list->heapId);
     list->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, list->heapId);
-    list->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0406, list->heapId);
+    list->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_LIST, list->heapId);
     list->unk7C = NULL;
     list->queue = func_02021998(list->heapId);
     list->tcbManager = GFL_TCBExMgrCreate(list->heapId, list->heapId, 32, 32);
@@ -1487,7 +1487,7 @@ static void WbtList_InitMatches(WbtList *work) {
             work->matches[i].first = work->matches[5].winner;
             work->matches[i].second = work->matches[6].winner;
         }
-        work->matches[i].message = Bank0406_Text_LetsMoveNextBattle;
+        work->matches[i].message = WbtList_Text_LetsMoveNextBattle;
     }
     if (work->mode == MODE_SECOND_ROUND) {
         for (i = 0; i < 2; i++) {
@@ -1511,7 +1511,7 @@ static void WbtList_InitMatches(WbtList *work) {
         i = 10;
         work->matches[i].mask = 1 << work->matches[8].winner;
         work->matches[i].mask |= 1 << work->matches[9].winner;
-        work->matches[i].message = Bank0406_Text_WhichTrainerWillWin;
+        work->matches[i].message = WbtList_Text_WhichTrainerWillWin;
         work->matches[i].first = work->matches[8].winner;
         work->matches[i].second = work->matches[9].winner;
     }

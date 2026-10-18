@@ -1,0 +1,9 @@
+MedalInfoViewer_Text_SMedalRally = {0100:0}'s Medal Rally
+MedalInfoViewer_Text_MedalsReceived = Medals received
+MedalInfoViewer_Text_FavoriteMedal = Favorite Medal
+MedalInfoViewer_Text_Empty = {0135:0}
+MedalInfoViewer_Text_Received = Received
+MedalInfoViewer_Text_20 = {0201:1}/{0201:2}/20{0201:0}
+MedalInfoViewer_Text_Empty_2 = {0202:0}
+MedalInfoViewer_Text_None = None
+\pad{f0}

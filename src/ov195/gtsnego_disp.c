@@ -7,6 +7,7 @@
 #include "app/gtsnego_local.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -27,10 +28,6 @@
 #include "system/blink_palanm.h"
 #include "system/bmp_winframe.h"
 #include "system/palanm.h"
-
-// The archives of the screens' graphics and of the people's icons, which have no names yet
-#define GTSNEGO_ARCID 0x90
-#define GTSNEGO_ARCID_AVATAR 0x1f
 
 #define GTSNEGO_AVATAR_COUNT 16
 #define GTSNEGO_ARROW_COUNT 12
@@ -532,7 +529,7 @@ static void GtsNegoDisp_VBlank(TCB *tcb, void *work) {
 }
 
 static void GtsNegoDisp_LoadGraphics(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     int i = 0;
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, PALTYPE_SUB_BG, 0, 0xc0, disp->heapId);
@@ -558,7 +555,7 @@ static void GtsNegoDisp_LoadGraphics(GtsNegoDisp *disp) {
     disp->blinkSub = BlinkPalAnm_Create(0, 16, 7, disp->heapId);
     BlinkPalAnm_SetPalBufferArcTool(disp->blinkSub, arc, 1, 0, 16);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID_AVATAR, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, disp->heapId);
     for (; i < GTSNEGO_AVATAR_COUNT; i++) {
         disp->res[GTSNEGO_RES_CHAR_AVATAR + i] = func_0204b81c(arc, 1 + i, FALSE, CLACT_VRAM_SUB, disp->heapId);
         disp->res[GTSNEGO_RES_ANIM_AVATAR + i] = func_0204bde0(arc, 17 + i * 2, 18 + i * 2, disp->heapId);
@@ -576,7 +573,7 @@ void GtsNegoDisp_ShowSearchMenu(GtsNegoDisp *disp) {
     ArcTool *arc;
 
     GtsNegoDisp_Dummy(disp, FALSE);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 19, 4, 0, CHAR_POS(disp->subChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 20, 4, 0, CHAR_POS(disp->subChars), 0xc0, FALSE, disp->heapId);
     GFL_ArcToolFree(arc);
@@ -589,7 +586,7 @@ void GtsNegoDisp_ShowSearchMenu(GtsNegoDisp *disp) {
 }
 
 void GtsNegoDisp_HideSearchMenu(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GtsNegoDisp_FreeArrows(disp);
     GFL_BGSysFillScrArea(6, 0, 0, 0, 32, 32, 17);
@@ -761,11 +758,11 @@ void GtsNegoDisp_ShowFriendList(GtsNegoDisp *disp, BOOL scrollable) {
     GtsNegoDisp_FreeTouchBar(disp);
     GtsNegoDisp_CreateTouchBar(disp, 8);
     GtsNegoDisp_Dummy(disp, TRUE);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     disp->listScreenFile = GFL_G2DIOReadNSCRArc(arc, 21, FALSE, &disp->listScreen, disp->heapId);
     GFL_G2DIOLoadArcNCLR(arc, 0, PALTYPE_SUB_OBJ, 0, 0x140, 0x20, disp->heapId);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID_AVATAR, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, disp->heapId);
     GFL_G2DIOLoadArcNCLR(arc, 0, PALTYPE_SUB_OBJ, 0, 0, 0x100, disp->heapId);
     GFL_ArcToolFree(arc);
     GtsNegoDisp_CreateListFooter(disp);
@@ -825,7 +822,7 @@ void GtsNegoDisp_DrawListRows(GtsNegoDisp *disp, GameData *gameData, int top) {
 }
 
 void GtsNegoDisp_LeaveFriendList(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     int i;
 
     for (i = 0; i < GTSNEGO_LIST_ROWS; i++) {
@@ -841,7 +838,7 @@ void GtsNegoDisp_LeaveFriendList(GtsNegoDisp *disp) {
 }
 
 void GtsNegoDisp_HideFriendList(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GtsNegoDisp_FreeListScreen(disp);
     GtsNegoDisp_FreeListActors(disp);
@@ -1212,7 +1209,7 @@ static void GtsNegoDisp_FreeSearchActors(GtsNegoDisp *disp) {
 // Stops the search's trainer on the partner's look
 void GtsNegoDisp_ShowPartner(GtsNegoDisp *disp, int avatar) {
     int sequences[GTSNEGO_AVATAR_COUNT] = { 0, 6, 8, 12, 14, 3, 4, 10, 11, 1, 13, 5, 7, 9, 15, 2 };
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 15, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_ArcToolFree(arc);
@@ -1226,7 +1223,7 @@ void GtsNegoDisp_ShowPartner(GtsNegoDisp *disp, int avatar) {
 }
 
 void GtsNegoDisp_ShowSearching(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 14, 2, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 13, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
@@ -1263,7 +1260,7 @@ void GtsNegoDisp_Reset(GtsNegoDisp *disp) {
     GtsNegoDisp_FreeSearchActors(disp);
     GtsNegoDisp_FreeListActors(disp);
     GtsNegoDisp_FreeArrows(disp);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 12, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 18, 4, 0, CHAR_POS(disp->subChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadArcNCLR(arc, 2, PALTYPE_SUB_OBJ, 0, 0x100, 0x100, disp->heapId);

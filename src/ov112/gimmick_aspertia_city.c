@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_aspertia_city.h"
@@ -19,8 +20,6 @@
 
 #define GIMMICK_WORK_ID 1
 #define GIMMICK_BG 3
-// The archive of the models and the BG's graphics, which has no name yet
-#define GIMMICK_ARCID 0x12f
 // The archive of the models
 #define GIMMICK_MODEL_ARCID 300
 // The BG's palette in that archive, one for each version
@@ -155,7 +154,7 @@ static void func_ov112_021eed60(GimmickWork *work) {
 
         GFL_BGSysCreateBG(GIMMICK_BG, &setup, 0);
     }
-    arc = GFL_ArcSysCreateFileHandle(GIMMICK_ARCID, HEAPID_TAIL(heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GIMMICK, HEAPID_TAIL(heapId));
     GFL_G2DIOLoadArcNCLRDefault(arc, GIMMICK_BG_NCLR, 0, 0, 0, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 6, GIMMICK_BG, 0, 0, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 7, GIMMICK_BG, 0, 0, FALSE, heapId);

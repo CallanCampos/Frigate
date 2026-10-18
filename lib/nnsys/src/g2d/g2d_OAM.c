@@ -54,28 +54,27 @@ static void CpuLoadOAMMain_(const void *src, u32 offset, u32 size) {
     MI_CpuCopy16(src, (void *)(HW_OAM + offset), size);
 }
 
-// Whether every entry of usedBy from from to last is free
 static inline OamBuffer *GetOamBuffer_(NNSG2dOamType type) {
     return &oamBuffers_[type];
 }
 
+// Whether every entry of usedBy from from to last is free
 static inline BOOL IsRegionFree_(const u16 *usedBy, u16 from, u16 last) {
-    const u16 *p;
+    const u16 *p = usedBy + from;
+    const u16 *end = usedBy + last;
 
-    for (p = &usedBy[from]; p <= &usedBy[last]; p++) {
+    while (p <= end) {
         if (*p != OAM_NOT_USED) {
             return FALSE;
         }
+        p++;
     }
     return TRUE;
 }
 
 // Gives the entries from from to last to the manager
-static inline void SetRegion_(NNSG2dOamManagedRegion *region, u16 *usedBy, u16 from, u16 last, u16 managerID) {
-    region->fromIdx = from;
-    region->toIdx = last;
-    region->currentIdx = from;
-    MI_CpuFill16(&usedBy[from], managerID, (last - from + 1) * sizeof(u16));
+static inline void ReserveRegion_(u16 *usedBy, u16 from, u16 last, u16 managerID) {
+    MI_CpuFill16(usedBy + from, managerID, (last - from + 1) * sizeof(u16));
 }
 
 static inline BOOL IsRegionValid_(const NNSG2dOamManagedRegion *region) {
@@ -121,23 +120,38 @@ void NNS_G2dInitOamManagerModule(void) {
 
 BOOL NNS_G2dGetNewOamManagerInstanceAsFastTransferMode(NNSG2dOamManagerInstance *man, u16 from, u16 num,
                                                        NNSG2dOamType type) {
-    u16 last = from + (num - 1);
-    OamBuffer *buffer = &oamBuffers_[type];
+    {
+        u16 *usedBy = GetOamBuffer_(type)->oamUsedBy;
+        u16 last = from + (num - 1);
 
-    if (IsRegionFree_(buffer->oamUsedBy, from, last)) {
-        man->managerID = managerID_++;
-        SetRegion_(&man->managedAttrRegion, buffer->oamUsedBy, from, last, man->managerID);
-    } else {
-        return FALSE;
+        if (IsRegionFree_(usedBy, from, last)) {
+            man->managerID = managerID_++;
+            man->managedAttrRegion.fromIdx = from;
+            man->managedAttrRegion.toIdx = last;
+            man->managedAttrRegion.currentIdx = from;
+            ReserveRegion_(usedBy, from, last, man->managerID);
+        } else {
+            return FALSE;
+        }
     }
-    // Four OAMs hold each affine parameter
-    from = from / 4;
-    last = from + (u16)(num / 4) - 1;
-    if (IsRegionFree_(buffer->affineUsedBy, from, last)) {
-        SetRegion_(&man->managedAffineRegion, buffer->affineUsedBy, from, last, man->managerID);
-    } else {
-        return FALSE;
+
+    {
+        // Four OAMs hold each affine parameter
+        u16 affineFrom = from / 4;
+        u16 affineNum = num / 4;
+        u16 affineLast = affineFrom + (affineNum - 1);
+        u16 *usedBy = GetOamBuffer_(type)->affineUsedBy;
+
+        if (IsRegionFree_(usedBy, affineFrom, affineLast)) {
+            man->managedAffineRegion.fromIdx = affineFrom;
+            man->managedAffineRegion.toIdx = affineLast;
+            man->managedAffineRegion.currentIdx = affineFrom;
+            ReserveRegion_(usedBy, affineFrom, affineLast, man->managerID);
+        } else {
+            return FALSE;
+        }
     }
+
     man->bFastTransferMode = TRUE;
     man->type = type;
     return TRUE;

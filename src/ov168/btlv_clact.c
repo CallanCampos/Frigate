@@ -7,6 +7,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_string.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/bmp.h"
 #include "gfl/clact.h"
@@ -149,7 +150,7 @@ static void BtlvClact_InitGauge(BtlvClact *wk) {
         return;
     }
 
-    arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(wk->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(wk->heapId));
     wk->gauge[0].chars = func_0204b81c(arc, 0x22b, FALSE, CLACT_VRAM_MAIN, wk->heapId);
     wk->gauge[0].palette = func_0204bba0(arc, 0x22a, CLACT_VRAM_MAIN, 0x1a0, wk->heapId);
     wk->gauge[0].cellAnims = func_0204bde0(arc, 0x22c, 0x22d, wk->heapId);
