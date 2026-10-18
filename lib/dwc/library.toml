@@ -41,6 +41,7 @@ flags = [
 "ghttp/dwc_ghttp.c" = ["-ipa file"]
 # GameSpy's NAT detection and negotiation (overlay 11) reach their statics from one base too
 "natneg/NATify.c" = ["-ipa file"]
+"natneg/natneg.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does

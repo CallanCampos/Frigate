@@ -317,3 +317,8 @@ lib/dwc/src/natneg/NATify.c:
     .text       start:0x0217eed0 end:0x0217f4d0
     .data       start:0x02189134 end:0x02189244
     .bss        start:0x02191c2c end:0x02191e78
+
+lib/dwc/src/natneg/natneg.c:
+    .text       start:0x0217f4d0 end:0x021807b4
+    .data       start:0x02189244 end:0x02189dd4
+    .bss        start:0x02191e78 end:0x02192180
