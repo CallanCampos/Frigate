@@ -1,8 +1,8 @@
 # Tests of the platform layer's host versions of the SDK's asm functions (port/hal/mi, fx, math, crypto):
 # - C unit tests with known vectors, which need no ROM and run everywhere, CI included;
 # - the differential tests of port/tests/asm_oracle, which run the ROM's own machine code in a test-only CPU emulator
-#   and compare. They need the extracted ROM and build/port-venv (port/tests/asm_oracle/README.md), and skip (77)
-#   without them.
+#   and compare. They need the extracted ROM, build/port-venv and a build directory made with the Ninja generator,
+#   whose build.ninja gives them the game's flags (port/tests/asm_oracle/README.md), and skip (77) without them.
 file(GLOB hal_test_mi_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/mi/*.c")
 add_executable(test_hal_mi tests/hal/test_mi.c ${hal_test_mi_sources} hal/hw/hw.c)
 target_link_libraries(test_hal_mi PRIVATE port_decomp_env)

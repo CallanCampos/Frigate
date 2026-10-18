@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
-"""Find unions whose direct members mix pointers with integers (type punning that changes meaning at 64-bit).
-Usage: unions.py REPO"""
+"""The decomp's unions whose direct members mix pointers with integers: type punning that means one thing on the DS,
+where both are 32 bits, and another on a 64-bit host.
+
+    unions.py REPO
+
+Scans REPO's include/, src/, lib/*/include/ and lib/*/src/ and prints how many unions there are and where each mixed
+one is defined. run_all.sh writes it to unions.txt (port/docs/research/compile-probe.md, "Struct layout hazards").
+"""
 import re, sys, pathlib
 repo = pathlib.Path(sys.argv[1]); n = 0; mixed = []
 for p in list(repo.glob("include/**/*.h")) + list(repo.glob("src/**/*.[ch]")) + list(repo.glob("lib/*/include/**/*.h")) + list(repo.glob("lib/*/src/**/*.[ch]")):

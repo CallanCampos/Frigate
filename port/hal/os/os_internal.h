@@ -1,5 +1,11 @@
-// What the files of port/hal/os share with each other, in the SDK's types. Nothing outside port/hal/os includes it but
-// its tests (port/tests/os).
+// What the files of port/hal/os share with each other, in the SDK's types: the host's version of NitroSDK's OS module
+// (lib/nitro/src/os, the files in port/hal/os/replaced.txt), on which every thread, interrupt, alarm and timer of the
+// game runs. It has the host's DTCM, where the SDK keeps the interrupt check word and the IRQ stack's magic words; the
+// contexts' side table that core.c keeps for os_thread_host.c, since a 64-bit host can't keep a thread's entry in its
+// context; the reset of each file's state before a run; the interrupt controller (IE, IME, IF), which the VBlank and
+// the timers raise; the hardware timers on the virtual clock, which the SDK's tick count and alarms run on; and the
+// modelled busy loops of OS_GetTick and the SDK's waits. Nothing outside port/hal/os includes it but its tests
+// (port/tests/os).
 #ifndef PORT_HAL_OS_OS_INTERNAL_H
 #define PORT_HAL_OS_OS_INTERNAL_H
 

@@ -363,8 +363,11 @@ Windows, against `windows-stubs/`.
 - `test_vram.c`: the tests.
 - `bench_vram.c`: the timings, with the model of the SDK's bookkeeping.
 - `region_check.c`: the static-region design, run on the host and compiled for Windows.
-- `windows-stubs/`: stand-ins for the four C library headers, for the Windows compile check.
-- `CMakeLists.txt`.
+- `windows-stubs/errno.h`, `stdio.h`, `stdlib.h`, `string.h`: stand-ins for the UCRT's four C library headers that the
+  library includes, declaring only what the spike uses, for the Windows compile check (this Mac has no Windows SDK or
+  MinGW sysroot).
+- `CMakeLists.txt`: the tests, the timings and the region check as ctest tests, and the Windows compile check against
+  `windows-stubs/`.
 
 To build and test:
 

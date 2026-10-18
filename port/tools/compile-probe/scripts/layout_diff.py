@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Compare record layouts between a 32-bit and a 64-bit run. Usage: layout_diff.py REPO L32.tsv L64.tsv OUT.tsv"""
+"""How the game's and the libraries' structs and unions change between two targets: sizes and alignments of every record
+in a 32-bit run (i386 SysV, which matches MWCC's layouts) against another target's (a 64-bit host's, wasm32, the DS's).
+
+    layout_diff.py REPO L32.tsv L64.tsv OUT.tsv
+
+Reads two tables that layouts.py wrote, finds each record's definition in REPO's headers and sources, and writes a row
+per record named once in both (its sizes, alignments, definition and area: src/gfl, src/system, the overlays, each
+lib/ and include/) to OUT.tsv; prints how many were compared and how many change, by area. run_all.sh writes
+layout_mwcc_vs_<target>.tsv and .summary, which check_size_comments.py and ast_file_types.py read
+(port/docs/research/compile-probe.md, "Struct layout hazards").
+"""
 import sys, re, collections, pathlib
 repo = pathlib.Path(sys.argv[1])
 def load(p):

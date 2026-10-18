@@ -43,10 +43,12 @@
 // The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
 // program writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 //
-// Exit statuses: 0 when the run ends normally, 2 for bad options, 70 when the game reaches code or data with no C
-// (port/hal/trap.c), 71 when it stops itself (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog,
-// 74 when the game resets the console (OS_ResetSystem), which the port can't do in place yet; the modules' own: 65 (a
-// save file the port can't use), 66 (no usable ROM), 67 (the PXI bus's arena check).
+// Exit statuses: 0 when the run ends normally, 1 when it can't go on (the window didn't open, a write to the run
+// directory or the sound trace failed, or a module ran out of memory or found a build that can't work, each with a
+// "port:" line), 2 for bad options, 70 when the game reaches code or data with no C (port/hal/trap.c), 71 when it stops
+// itself (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog, 74 when the game resets the console
+// (OS_ResetSystem), which the port can't do in place yet; the modules' own: 65 (a save file the port can't use), 66 (no
+// usable ROM), 67 (the PXI bus's arena check). port/docs/ARCHITECTURE.md, "How a run ends", has the table.
 
 // POSIX's signals and alarm() for the watchdog, which glibc hides from strict C11 (the target's -std=c11)
 #define _DEFAULT_SOURCE

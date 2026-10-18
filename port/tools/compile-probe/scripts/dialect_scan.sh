@@ -1,5 +1,9 @@
 #!/bin/sh
-# Counts MWCC/dialect constructs in src/, lib/, include/. Usage: dialect_scan.sh REPO   (prints "pattern files sites")
+# Counts the constructs of MWCC's dialect in the decomp's C (src/, lib/, include/): asm functions and blocks, pragmas,
+# __declspec and attributes, inline forms, bitfields, anonymous records, __MWERKS__ tests, wide strings, bare long,
+# size_t, va_list, setjmp and the rest, which a host compiler takes differently or not at all.
+#   dialect_scan.sh REPO   (prints "pattern files sites")
+# run_all.sh writes it to dialect_scan.txt (port/docs/research/compile-probe.md, "MWCC-specific syntax").
 cd "$1" || exit 1
 scan() { # label, ERE
   files=$(grep -rlE --include='*.c' --include='*.h' "$2" src lib include | wc -l | tr -d ' ')

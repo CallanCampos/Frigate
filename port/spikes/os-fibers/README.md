@@ -34,6 +34,7 @@ host-side layer is in `src/`:
 | `src/os_thread_host.c` | The unity include of `os_thread.c`, and host versions of `OS_InitThread`, `OS_CreateThread`, `OS_KillThread`, plus a wrapper of `OS_DestroyThread`. |
 | `tests/test_os.c` | 22 scenarios, each run as the launcher thread, logging events and comparing with the order the DS gives. |
 | `tests/bench_os.c` | Switch costs, frame costs, fiber creation cost, stack depths. |
+| `CMakeLists.txt` | The build: minicoro at a pinned commit, the decomp's OS files and `src/` against the decomp's include tree with PLAN.md §4.4's language model, the three test programs and their ctest tests (each scenario, the quick benchmark, the guard faults); `-DOS_FIBERS_SANITIZE=ON` builds them with AddressSanitizer and UBSan. |
 | `tests/crash_os.c` | Overflows of a fiber's stack (small frames, frames larger than a page, a frame larger than the guard), a write past a local array for ASan, and two LeakSanitizer checks. |
 
 The decomp files are compiled with PLAN.md §4.4's language model (`-std=gnu99 -fsigned-char -fwrapv

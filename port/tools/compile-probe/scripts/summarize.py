@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Summarize a probe run. Usage: summarize.py RUNDIR [--sev error|warning] [--flags F1,F2] [--top N] [--examples N]"""
+"""A summary of one pass of the compile probe: how the game's and the libraries' C fares under clang for one target,
+the DS's or a 64-bit host's (port/docs/research/compile-probe.md).
+
+    summarize.py RUNDIR [--sev error|warning] [--flags F1,F2] [--top N] [--examples N] [--files files.tsv]
+
+Reads a pass's status.tsv and diags.tsv (probe.py's, in compile-probe/<pass>/) and prints the files that pass and fail
+by module (src/gfl, src/system, the overlays, each lib/), by completeness when files.tsv (complete_files.py's) is
+given; then the diagnostics of one severity, optionally of some flags, by kind, with their unique sites and files; the
+files and modules where the sites are; and examples. Run by hand on a pass; run_all.sh doesn't.
+"""
 import sys, re, collections, argparse, pathlib
 ap = argparse.ArgumentParser()
 ap.add_argument("run"); ap.add_argument("--sev", default="error"); ap.add_argument("--flags", default="")

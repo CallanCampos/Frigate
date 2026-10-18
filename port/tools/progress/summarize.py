@@ -2,6 +2,9 @@
 """Markdown tables from progress.py output (and optionally compile_check.py output and gh issues).
 
 Usage: python3 summarize.py --in out/b2_us [--compile out/compile_b2_us.tsv] [--issues gh_issues.json] > tables.md
+
+The tables of port/docs/research/decomp-progress.md (by module, by origin, the overlays by missing C, data), which
+run_all.sh writes to tables_<version>.md and all_overlays_b2_us.md.
 """
 import argparse
 import csv

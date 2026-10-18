@@ -4,6 +4,10 @@
 Usage: probe.py REPO OUTDIR NAME -- <clang args...>
 Writes OUTDIR/NAME/diags.tsv (file, status, severity, flag, loc, message) and OUTDIR/NAME/status.tsv.
 The repo is read only: clang runs with -fsyntax-only and writes nothing.
+
+run_all.sh runs it for the DS (ARMv5TE and Thumb), each 64-bit host, wasm32 and i386, and the arm64 passes with
+the MWCC shim and with the undefined-behaviour warnings: how the game's and the libraries' C compiles for each
+(port/docs/research/compile-probe.md, "Baseline compile" and "Host compile").
 """
 import os, re, sys, subprocess, pathlib, concurrent.futures as cf
 

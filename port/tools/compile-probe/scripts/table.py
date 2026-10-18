@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
-"""Unique-location warning counts per flag, game (src+include) vs lib, for several runs, as a markdown table.
-Usage: table.py WORKDIR run1 run2 ..."""
+"""The 64-bit portability warnings of several compile-probe passes side by side: for each warning flag (pointer and int
+casts, 64-to-32 shortening, alignment, library redeclarations and the rest), the unique source locations in the game
+(src/ and include/) and in the libraries (lib/), as a Markdown table with each pass's files compiled.
+
+    table.py WORKDIR PASS...
+
+Reads WORKDIR/<pass>/diags.tsv and status.tsv (probe.py's). run_all.sh puts the table for i386, arm64, x86-64 Windows
+and the arm64 pass with the MWCC shim in metrics.txt: the game's count is the port's 64-bit warning metric, which must
+only go down (port/docs/research/compile-probe.md, "Host compile").
+"""
 import sys, collections, pathlib
 w = pathlib.Path(sys.argv[1]); runs = sys.argv[2:]
 FL = ["-Wpointer-to-int-cast", "-Wvoid-pointer-to-int-cast", "-Wint-to-pointer-cast", "-Wint-to-void-pointer-cast",

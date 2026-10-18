@@ -1,7 +1,12 @@
 """Scan C sources and headers for hardware access: register macros, raw hardware addresses, asm, SVC, CP15.
 Reads the repository REPO, writes hwscan.json with per-file findings to build/port-research/sdk-surface/ of the
 checkout that holds this script (ignored by git), and prints a per-library summary.
-Usage: hwscan.py [REPO], where REPO defaults to the checkout that holds this script."""
+Usage: hwscan.py [REPO], where REPO defaults to the checkout that holds this script.
+
+What the game's and the libraries' C reaches of the DS's hardware without a function between: the C half of the
+boundary research, beside binscan.py's machine-code half; dossier.py reads its JSON
+(port/docs/research/sdk-surface.md, "Direct hardware access from src/ itself").
+"""
 import json
 import re
 import sys

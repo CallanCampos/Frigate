@@ -6,8 +6,8 @@
 // (port_snd7_set_trace, port/app/sound_trace.c, port/tools/oracle/README.md "Sound").
 //
 // The DS's driver is a thread (SndThread, 0x038006ac) that waits for a message: a periodic OS alarm every 2728 ticks
-// of 64 cycles (191.9 a second, the first 0x10000 ticks after the driver starts) or the ARM9's wake-up word (0). For
-// each it runs, in order, SND_UpdateExChannel (the register writes the last run owed the channels), SND_CommandProc
+// of 64 cycles (about 192 a second, the first 0x10000 ticks after the driver starts) or the ARM9's wake-up word (0).
+// For each it runs, in order, SND_UpdateExChannel (the register writes the last run owed the channels), SND_CommandProc
 // (the packets of commands the ARM9 sent), SND_SeqMain and SND_ExChannelMain (which move the sequences and the
 // envelopes on only at a periodic run), SND_UpdateSharedWork (the channels' and capture units' status for the ARM9)
 // and SND_CalcRandom. Here:

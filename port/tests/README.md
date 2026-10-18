@@ -9,8 +9,10 @@ belong to (T0 to T7) are in [../CLAUDE.md](../CLAUDE.md#testing-planmd-6) and
 Most tests need nothing but the build. The ones that need the player's ROM (`orig/baserom_<version>.nds`, or the
 `FRIGATE_ROM` variable) skip without it, so CI, which has no ROM, passes; they are the `rom_game_*` tests, most of the
 `rom_*` ones, `nnsys_g2d_rom_equivalence`, `snd_rom_*`, the `replay_*` tests and the `oracle_*` tests that run the
-game. `asm_oracle` also needs the extracted ROM and its own Python environment, and the `oracle_*` tests that run
-melonDS need the oracle, built with `-DPORT_BUILD_ORACLE=ON` ([../tools/oracle/README.md](../tools/oracle/README.md)).
+game. `asm_oracle` also needs the extracted ROM, its own Python environment and a host build directory configured
+with `-G Ninja`, whose `build.ninja` it reads the game's flags from (it skips in a build made with another generator,
+[asm_oracle/README.md](asm_oracle/README.md#setup)), and the `oracle_*` tests that run melonDS need the oracle, built
+with `-DPORT_BUILD_ORACLE=ON` ([../tools/oracle/README.md](../tools/oracle/README.md)).
 A skipped test says so in ctest's summary.
 
 | Directory | What it tests | Game functionality covered | Tests |

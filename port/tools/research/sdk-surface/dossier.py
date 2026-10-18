@@ -1,4 +1,14 @@
-"""Per library sub-module dossier: size, C coverage, hardware evidence (binary + C), dependencies on PXI/IRQ/DMA/cache."""
+"""A dossier of each library's sub-module (NitroSDK's OS, MI, GX, SND and the rest, NitroSystem's, TwlSDK's): what the
+platform layer would have to know before taking it over.
+
+    dossier.py
+
+Reads build/port-research/sdk-surface/binscan.pkl (binscan.py) and hwscan.json (hwscan.py) and prints, per
+sub-module, its functions and bytes, how many are in complete files, its files, the hardware its machine code reaches
+(regions, CP15, interrupt masking, SWIs), the register macros and asm functions its C has, and its calls into PXI,
+interrupts, DMA and the caches. Writes dossier.json there. Behind the per-module tables of
+port/docs/research/sdk-surface.md ("Library layering").
+"""
 import json
 import pickle
 import re

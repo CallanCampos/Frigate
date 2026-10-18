@@ -3,6 +3,14 @@
 
 Linker veneers (ARM/Thumb interworking stubs of <=12 bytes, named func_ovNNN_*, in ov167) are excluded.
 ov036 files are split into core (needed to boot the field) and deferrable.
+
+    milestones.py WORK REPO
+
+The milestones are the port's slices of the game, from the boot and the logos (M1) through the title and start menu,
+New Game to the overworld, walking and NPCs, a wild battle, saving and loading, to the menus (M7), each with the
+overlays it needs. Reads WORK/funcs.tsv and files.tsv (coverage.py's) and REPO/docs/nonmatching-functions.md, and
+writes WORK/milestones.txt. Research of 2026-10-16 (port/docs/research/engine-boot.md, "Milestone table"), behind the
+phases of port/docs/PLAN.md.
 """
 import os
 import sys

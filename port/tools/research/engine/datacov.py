@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
-"""Data/bss symbols not defined in C: per module, symbols in complete files (defined), in incomplete files
-(defined in the C file or not), and outside any file."""
+"""The game's data and .bss symbols that aren't C yet, per module: what the host build must still stand in for.
+
+    datacov.py REPO WORK
+
+For ARM9 main and each overlay of Black 2 (REPO/config/b2_us/arm9, delinks.txt and symbols.txt), places each data and
+.bss symbol in the source file whose .data, .rodata, .bss or .sbss range holds it, and counts the symbols in complete
+files, the ones in incomplete files that the file's C defines and that it doesn't yet, and the ones in no file. Writes
+WORK/datacov.tsv, a row per module, and prints the totals. The ones that no C defines are what the host build's data
+placeholders stand in for when C refers to them (port/tools/gen_stubs.py). Research of 2026-10-16
+(port/docs/research/engine-boot.md); datacov2.py lists one module's.
+"""
 import os
 import re
 import sys

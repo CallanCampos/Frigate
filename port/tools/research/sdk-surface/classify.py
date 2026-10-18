@@ -1,4 +1,16 @@
-"""Classify every SDK function (NitroSDK, TwlSDK, boot) by its file into A/B/C, and count the used-from-outside surface."""
+"""Which of NitroSDK's and TwlSDK's functions a native port can compile as they are and which it must replace: each SDK
+function classed by its file, A (portable logic, kept), B (touches the hardware: replaced or backed by a host model),
+B-lite (incidental hardware, such as the divider or the arena bounds) or C (irrelevant on a PC: stubbed).
+
+    classify.py
+
+Reads build/port-research/sdk-surface/binscan.pkl (binscan.py), classes every SDK function of Black 2 (NitroSDK,
+TwlSDK, the boot code in main and the ITCM) and prints the counts by class, the functions used from outside the SDK
+by class, and the B and B-lite entry points a host would implement with the A class kept, by module. Writes
+b_used.json there. The classes are those of port/docs/research/sdk-surface.md ("Library layering"); the platform layer
+that was built replaces the SDK's hardware-bound files and keeps the rest of its C (port/hal/replaced.txt,
+port/docs/adr/0005-platform-boundary-as-built.md).
+"""
 import json
 import pickle
 from collections import Counter, defaultdict

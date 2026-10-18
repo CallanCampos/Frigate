@@ -3,6 +3,11 @@
 
 Output: missing_refs.tsv  module  missing_file  n_missing  bytes  referencing_c_files(count)
 and per C file, which missing files it depends on: cfile_deps.tsv
+
+    callers.py REPO WORK
+
+Reads WORK/funcs.tsv (coverage.py's) and REPO's src/ C, for the game's functions still in assembly that its C calls
+into: which files of C wait on which. Research of 2026-10-16 (port/docs/research/engine-boot.md).
 """
 import os
 import re

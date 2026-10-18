@@ -35,20 +35,23 @@ against (test level T4), and its sound, the mixer's output sample by sample and 
 each run, for `sound.py`. It is a test tool only, never linked into or shipped with Frigate, and built only with
 `-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run directories, sound traces), how frames are
 aligned, the comparison sequences, saves, the sound and the known differences. `pbwinput.c` and `display3d.c` are
-plain C11 that the program's replays and the tests compile too, and `sndtrace.h`, the sound trace's format, is what
-the program's own trace includes (`port/app/sound_trace.c`).
+plain C11 that the program's replays and the tests compile too, and `sndtrace.h`, the sound trace's format, is plain
+C11 that Frigate itself includes: the platform layer's sound driver writes its trace with it
+(`port/hal/snd7/snd7.c`), as do the program's `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests
+(`port/tests/snd/test_snd.c`).
 
 ## Measurement
 
-Scripts from the 2026-10-16 research, kept for re-measuring. They read the decomp's tree and write reports.
+Scripts from the 2026-10-16 research, kept for re-measuring. They read the decomp's tree and write reports. Each
+directory's guide has a row per script.
 
 | Directory | Purpose | Run |
 | --- | --- | --- |
-| [progress/](progress/) | Port readiness of the decomp: per-function tiers (complete C, C not linked, no C), data and pointer coverage, both versions, daily history, GitHub claims, nonmatching rows by kind. Re-run at each sync and record the headline in [../docs/STATUS.md](../docs/STATUS.md) | `sh port/tools/progress/run_all.sh <repo> <outdir>` (about 5 minutes; needs `extract/{b2_us,w2_us}` and `.venv`) |
+| [progress/](progress/README.md) | Port readiness of the decomp: per-function tiers (complete C, C not linked, no C), data and pointer coverage, both versions, daily history, GitHub claims, nonmatching rows by kind. Re-run at each sync and record the headline in [../docs/STATUS.md](../docs/STATUS.md) | `sh port/tools/progress/run_all.sh <repo> <outdir>` (about 5 minutes; needs `extract/{b2_us,w2_us}` and `.venv`) |
 | [compile-probe/](compile-probe/README.md) | Host-compiler probe: clang over every C file for the DS target and 64-bit hosts, warning counts by kind and module, struct layouts compared between MWCC and each host ABI. The 64-bit warning count is a port metric that must only go down | see its README |
-| [research/engine/](research/engine/) | Boot-path milestones, overlay base groups, data coverage per file (one-off) | scripts take the repository path |
-| [research/sdk-surface/](research/sdk-surface/) | Library layering, game-side SDK surface, hardware access scan (one-off; `db.py` caches into a scratch directory) | scripts take the repository path |
-| [research/assets/](research/assets/) | NitroFS survey, SDAT survey, version diff, and the NitroFS manifest above | scripts take the extracted ROM's path |
+| [research/engine/](research/README.md#engine-the-games-engine-its-boot-path-and-the-ports-milestones) | Boot-path milestones, overlay base groups, data coverage per file (one-off) | scripts take the repository path |
+| [research/sdk-surface/](research/README.md#sdk-surface-where-the-platform-layers-boundary-sits) | Library layering, game-side SDK surface, hardware access scan (one-off; `db.py` caches into a scratch directory) | scripts take the repository path |
+| [research/assets/](research/README.md#assets-the-roms-files-and-its-sound-archive) | NitroFS survey, SDAT survey, version diff, and the NitroFS manifest above | scripts take the extracted ROM's path |
 
 Requirements: a configured checkout with `extract/` (from `ninja extract/b2_us/config.yaml extract/w2_us/config.yaml`)
 and `build/include/generated` (from `ninja constants_headers`), Homebrew LLVM for the compile probe, and read-only

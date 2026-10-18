@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is
-# port/tools/gen_overlay_sections.py; change that, not this copy.
 """Counts the sections of a Mach-O link that has per-overlay sections, before and after the link.
+
+A frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is
+port/tools/gen_overlay_sections.py; change that, not this copy.
 
     check_sections.py predict --inputs FILE --overlays FILE --out FILE [--limit 255] [--overlay-budget N]
                               [--nm PATH] [--bitcode-extra N]

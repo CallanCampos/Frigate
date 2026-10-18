@@ -15,9 +15,9 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
 **Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu,
-frame for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run and its output
-sample by sample; New Game's intro runs to the field's first script, and CONTINUE loads a save up to the field, which
-waits for the decomp's overlay 36 (a trap stub stops the game there).
+frame for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run, the title's stream
+and the cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and
+CONTINUE loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there).
 [docs/STATUS.md](docs/STATUS.md) has the current state.
 
 ## Quick start
@@ -54,14 +54,14 @@ stops with the name of the first one it reaches.
 ## Directory map
 
 Each directory has a guide to what its files do, the part of the game each touches and its tests. Most guides list
-every file; some list groups of files instead (`tests/` a row per test directory, `tools/` its measurement scripts by
-directory), whose files' own header comments say the rest, and a subdirectory with a guide of its own (the oracle, the
-compile probe, the asm oracle, each spike, the artwork) lists its files there.
+every file; the tests' guide has a row per test directory instead, whose files' own header comments say the rest; and a
+subdirectory with a guide of its own (the oracle, the compile probe, the progress tracker, the research scripts, the
+asm oracle, each spike, the artwork) lists its files there.
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) shows how they fit together.
 
 | Directory | What it is | Guide |
 | --- | --- | --- |
-| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory, the macOS app's scripts | [app/README.md](app/README.md) |
+| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the macOS app's scripts | [app/README.md](app/README.md) |
 | `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves, sound, touch, the clock, power, input) | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |

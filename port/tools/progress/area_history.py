@@ -1,5 +1,15 @@
-"""Tier-c (no C) and tier-b code bytes per area for each day measured by history.py.
-Usage: python3 area_history.py out/history"""
+"""The decomp's code with no C yet (tier c), day by day, in each area of the game that the port's milestones wait on.
+
+    python3 area_history.py OUT/history
+
+Reads the functions.tsv of each day that history.py measured (OUT/history/<date>_<sha>/: progress.py's tiers of
+Black 2's functions, from config/b2_us's symbols.txt and delinks.txt at that day's commit) and prints a Markdown table
+of tier (c)'s code bytes per day and area: ARM9 main, the ITCM, the DSi-only LTD autoload, the overlays that the
+port's milestones need on their own (11, Nintendo Wi-Fi Connection; 12, the field's movement models and event
+scripts; 36, the field engine; 167 and 168, the battle engine and its view; 182, the Wi-Fi settings and Download
+Play; 189, the GTS and the Battle Subway's Wi-Fi), and every other overlay together. run_all.sh writes it to
+area_history.md, for the pace of port/docs/research/decomp-progress.md ("Pace").
+"""
 import csv, sys
 from collections import defaultdict
 from pathlib import Path

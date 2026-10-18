@@ -3,6 +3,9 @@
 
 Usage: python3 history.py --root <repo> [--version b2_us] [--since 2026-09-27] --out out/history
 Writes <out>/<date>_<sha>/ (progress.py output) and <out>/history.tsv.
+
+The pace at which the decomp gives the game C, behind port/docs/research/decomp-progress.md ("Pace"); run_all.sh
+runs it, and area_history.py splits it by area.
 """
 import argparse
 import csv

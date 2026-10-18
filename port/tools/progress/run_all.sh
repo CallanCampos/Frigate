@@ -1,6 +1,11 @@
 #!/bin/sh
-# Re-runs the port-readiness measurement. Usage: sh run_all.sh <repo> [outdir]
-# <repo> must have extract/{b2_us,w2_us} (dsd extract) and .venv; nothing is written under <repo>.
+# Re-runs the port-readiness measurement: how much of the game (ARM9 main, its autoloads and every overlay, both
+# versions) is matching C, C not linked yet, or no C, which says what Frigate compiles from C and what it stubs.
+#   sh run_all.sh <repo> [outdir]
+# <repo> must have extract/{b2_us,w2_us} (dsd extract) and .venv; nothing is written under <repo>. It runs progress.py
+# for both versions, compile_check.py, gh_claims.py on the decomp's overlay issues (read-only gh), summarize.py's
+# tables, history.py and area_history.py, nonmatching_scan.py and ByteMatch's endpoints, into outdir (./out by
+# default). STATUS.md's Tiers line comes from it; the findings are in port/docs/research/decomp-progress.md.
 set -e
 REPO=${1:?repo path}
 HERE=$(cd "$(dirname "$0")" && pwd)

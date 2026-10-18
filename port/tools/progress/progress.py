@@ -13,6 +13,11 @@ Tiers, per function (from symbols.txt) and per data byte (from the delinks secti
     c   no C: c_gap (in no delinks entry), c_nosrc (entry whose source file does not exist), c_partial (an incomplete
         file's range, but the function is not defined in its C)
 Writes <out>/functions.tsv, <out>/files.tsv, <out>/summary.json.
+
+It reads config/<version>/arm9's symbols.txt and delinks.txt, every module's (ARM9 main, the ITCM, the DTCM, the
+autoloads, the LTD autoload, the overlays), the C of src/ and lib/ (cparse.py) and the ROM's bytes for veneers
+(rombytes.py). The tiers say how much of the game the host build compiles from C and how much it stubs
+(port/tools/gen_stubs.py); STATUS.md's Tiers line is its headline (port/docs/research/decomp-progress.md).
 """
 import argparse
 import bisect

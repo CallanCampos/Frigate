@@ -7,6 +7,10 @@ Classes (first match wins, in this order):
   size       a size difference with instruction-level reasons (scheduling, extra or fewer instructions)
   regalloc   register allocation / order only, same size
   other
+
+Reads REPO/docs/nonmatching-functions.md. The semantic rows are the game code whose C the port compiles but that may
+not behave as the ROM does (port/docs/decomp-findings.md records what the port shows); run_all.sh writes the counts to
+nonmatching_classes.txt (port/docs/research/decomp-progress.md, "Nonmatching functions").
 """
 import re
 import sys

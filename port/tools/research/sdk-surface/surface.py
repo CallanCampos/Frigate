@@ -1,5 +1,14 @@
-"""Game-side surface: which library functions game code (src/) calls or references, by family.
-Usage: surface.py [REPO], where REPO defaults to the checkout that holds this script."""
+"""The game's side of the SDK boundary: which library functions the game's code (src/: GFL, src/system and the overlays)
+calls or takes the address of, by family (GX, G2, G3, FS, OS, SND, NitroSystem's modules, DWC and the rest), and how
+many of them its C names.
+
+    surface.py [REPO]
+
+Reads build/port-research/sdk-surface/binscan.pkl (binscan.py) for the calls and pointer references, and REPO's
+src/**/*.c (by default the checkout that holds this script) to tell which callees the C shows. Prints a row per
+family with its functions, call sites, pointer references, callers and the ones named in C, by area, and writes
+surface.json there. Behind port/docs/research/sdk-surface.md ("Game-side surface").
+"""
 import json
 import pickle
 import re

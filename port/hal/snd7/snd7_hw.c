@@ -3,7 +3,8 @@
 // itself, which the DS has in hardware: 16 channels that play PCM8, PCM16 and IMA-ADPCM samples from memory, PSG
 // square waves (channels 8-13) and noise (14 and 15), and the mixer that sums them into the left and right outputs.
 // Every sound the game makes, its music, sound effects and cries, comes out of this unit; the oracle comparison holds
-// its output to melonDS's sample by sample (port/tools/oracle/README.md, "Sound").
+// its output to melonDS's: a stream's and a cry's to the bit, the music's by its envelope and levels, since a note
+// starts 1 to 5 samples later on the DS (port/tools/oracle/README.md, "Sound").
 //
 // The unit as GBATEK describes it:
 //   - a channel's timer counts the sound clock (half the ARM7's bus clock) up from SOUNDxTMR, and each time it

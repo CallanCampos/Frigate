@@ -3,8 +3,9 @@
 The host's sound output: the DS's speakers. The game's sound code (NitroSystem's players and NitroSDK's ARM9 SND
 library, driven by `src/system/snd_sys.c`) compiles unchanged and sends its commands to the ARM7's sound driver, which
 the platform layer has in host C ([../hal/snd7](../hal/README.md#the-modules)). The driver's sound unit makes the
-samples in step with the game, on the game's thread at each VBlank, and hands them to this module, which plays them on
-the default device and can write them to a WAV file.
+samples in step with the game, on the game's thread, as the virtual clock passes them (at each VBlank, at each word
+the ARM9 sends the driver, and at the driver's alarms), and at each VBlank hands that frame's samples to this module,
+which plays them on the default device and can write them to a WAV file.
 
 | File | What it does | Game functionality that depends on it | Tests |
 | --- | --- | --- | --- |

@@ -1,4 +1,14 @@
-"""Quantify the boundary options: NitroSDK/TwlSDK API surface used by everything kept native, by caller layer."""
+"""How much of NitroSDK's and TwlSDK's API the code that a native port keeps would call: the sizes of the boundary
+options of port/docs/research/sdk-surface.md ("Where the platform boundary should sit").
+
+    boundary.py
+
+Reads build/port-research/sdk-surface/binscan.pkl (binscan.py) and counts the SDK functions that code outside the SDK
+reaches (the game, NitroSystem, SPL, DWC, NitroWiFi, the C library), by SDK module and by the caller's layer, and how
+many of them only the network libraries reach; the NitroSystem functions the game reaches; and the SDK functions each
+NitroSystem and SPL module needs. Writes sdk_used.json there. The platform layer that was built replaces the SDK's
+hardware-bound files and keeps the rest of its C (port/docs/adr/0005-platform-boundary-as-built.md).
+"""
 import json
 import pickle
 import re

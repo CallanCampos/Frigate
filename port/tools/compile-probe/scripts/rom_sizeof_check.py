@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
-"""Ground-truth MWCC struct sizes from the ROM: for each `return sizeof(T);` function in src/, read the constant the
-ROM's code returns, then check sizeof(T) under several clang targets with _Static_assert.
-Usage: rom_sizeof_check.py REPO WORKDIR"""
+"""MWCC's own struct sizes, read from the ROM, against clang's for several targets: the evidence that i386 SysV lays out
+the decomp's structs as MWCC does, and so is the reference the 64-bit layouts are compared with.
+
+    rom_sizeof_check.py REPO WORKDIR
+
+For each function of REPO's src/ that only returns sizeof(T) (the save blocks' size functions of the save table, and
+runtime structs such as GameSystem and G3DResource), reads the constant the ROM's code returns from Black 2's
+extracted binaries (extract/b2_us), then compiles a file of _Static_asserts in WORKDIR/sizeof_tu to check sizeof(T)
+for i386, the DS's AAPCS (thumbv5te), wasm32 and arm64. Writes WORKDIR/rom_sizeof_check.tsv; run_all.sh writes the
+summary to rom_sizeof_check.txt (port/docs/research/compile-probe.md, "MWCC layout proxy").
+"""
 import re, sys, pathlib, struct, subprocess, glob, yaml
 repo = pathlib.Path(sys.argv[1]).resolve(); work = pathlib.Path(sys.argv[2]); tmp = work / "sizeof_tu"; tmp.mkdir(exist_ok=True)
 clang = "/opt/homebrew/opt/llvm/bin/clang"

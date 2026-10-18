@@ -1,4 +1,11 @@
-"""Reads original bytes of a module address from extract/<version>/ (decompressed binaries written by dsd extract)."""
+"""The ROM's original bytes at an address of one of its ARM9 modules (main, the ITCM, the DTCM, the autoloads, the
+DSi-only LTD autoload, each overlay), from the decompressed binaries and their YAML files that dsd extract writes to
+extract/<version>/ (arm9/, dsi/, arm9_overlays/).
+
+progress.py reads with it the code of a function that no C defines, so that is_veneer can tell the linker's ARM/Thumb
+interworking and long-branch veneers, which dsd lists as functions but no source file writes, from game code still
+without C. Nothing of the ROM leaves the checkout. Research of 2026-10-16 (port/docs/research/decomp-progress.md).
+"""
 from pathlib import Path
 
 import yaml

@@ -6,21 +6,25 @@ file, writing both screens and named memory at chosen frames, and the sound: the
 the ARM7 sound driver's state after each run of its thread. `compare.py` compares the screens and memory with the
 port's, `sound.py` the sound ([Sound](#sound)).
 
-It is a **test tool only**. It is never linked into or shipped with the port
-([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on request, and nothing under `port/` other than this directory, its
-tests and its CMake fragment refers to it, except the input file reader (`pbwinput.c`, plain C with no melonDS), which
-the port compiles for its replays (`port/app/replay.c`). melonDS is GPL-3.0, as this repository is; the oracle links melonDS's core
-and is GPL-3.0 with it. melonDS is fetched at build time, pinned to a release, and never committed.
+It is a **test tool only**. It is never linked into or shipped with Frigate
+([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
+request, and nothing under `port/` other than this directory, its tests and its CMake fragment refers to it, except two
+files of plain C11 with no melonDS in them. The input file reader (`pbwinput.c`) is compiled into Frigate for its
+replays (`port/app/replay.c`). The sound trace's format (`sndtrace.h`) is included by Frigate's sound driver, which
+writes its work in the DS's layout with it (`port/hal/snd7/snd7.c`, `port_snd7_trace_record`), by Frigate's
+`--sound-trace` (`port/app/sound_trace.c`) and by the sound driver's tests (`port/tests/snd/test_snd.c`).
+melonDS is GPL-3.0, as this repository is; the oracle links melonDS's core and is GPL-3.0 with it. melonDS is fetched
+at build time, pinned to a release, and never committed.
 
 | File | What it is |
 | --- | --- |
-| `oracle.cpp`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core |
+| `oracle.cpp`, `oracle.h`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core: `oracle.cpp` its options and run, `oracle.h` what melonDS's Platform layer (`platform.cpp`) reports to it, `symtab.*` the decomp's symbols for its memory dumps, `pngout.*` the screens' PNG files |
 | `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
 | `oracle.py` | runs the oracle and the port with the repository's defaults; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
-| `sndtrace.h` | the sound trace's format, plain C11, which the port includes for its own trace |
+| `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |
 | `symbols.py` | the decomp's symbols, statics included, for memory dumps |
 | `melonds.cmake` | the pinned melonDS release (tag and SHA-256) |
 | `CMakeLists.txt` | the oracle's own build |

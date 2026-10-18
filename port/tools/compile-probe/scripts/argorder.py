@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
-"""Find calls whose argument list contains two or more calls with side effects (RNG draws, allocations, reads of a
-stream), whose relative order is unspecified in C and may differ between MWCC and clang. Usage: argorder.py REPO"""
+"""Calls in the game's C that pass two or more side-effecting calls as arguments (random draws, allocations, reads of a
+stream), whose order C leaves unspecified: MWCC and clang may evaluate them in different orders, which would change
+the game's random numbers or what it reads.
+
+    argorder.py REPO
+
+Scans REPO's src/**/*.c by pattern and prints the count and the first 15 sites. Not run by run_all.sh; it found none,
+and the one related site, two draws added in one expression, is in port/docs/research/compile-probe.md ("Undefined
+or implementation-defined behavior the DS tolerated", evaluation order).
+"""
 import re, sys, pathlib
 repo = pathlib.Path(sys.argv[1])
 SIDE = re.compile(r"\b(GFL_Random\w*|BattleRandom\w*|\w*Rand(om)?(_Next|Next|Get)?\w*|GFL_HeapAllocate|\w*_Read\w*|\w*Pop\w*|\w*Next\w*)\s*\(")

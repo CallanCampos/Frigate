@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-"""How much of each module's .text is covered by a C source file in the b2_us delinks (complete or not).
-Usage: text_coverage.py REPO"""
+"""How much of the ROM's code the decomp's C files cover, per module: the .text of ARM9 main, the ITCM, the DTCM, the
+autoloads, the DSi-only LTD autoload and the overlays together, in a C file at all and in a complete one.
+
+    text_coverage.py REPO
+
+Reads REPO/config/b2_us/**/delinks.txt (Black 2) and prints the bytes and shares. run_all.sh writes it to
+text_coverage.txt: how much of the game a native build could compile from C at the time
+(port/docs/research/compile-probe.md). port/tools/progress measures the same per function.
+"""
 import re, sys, pathlib, collections
 repo = pathlib.Path(sys.argv[1])
 tot = collections.Counter(); cov = collections.Counter(); covc = collections.Counter()

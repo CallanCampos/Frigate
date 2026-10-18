@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-"""Check '// size: 0x..' comments on struct definitions against clang's 32-bit layout (validates that clang's
-AAPCS layout equals MWCC's for these types). Usage: check_size_comments.py REPO layouts32.tsv layout_diff.tsv"""
+"""The decomp's "// size: 0x..." comments on struct definitions against clang's 32-bit layout of the same types: since
+those sizes are MWCC's, a match shows that clang's 32-bit layout is MWCC's, the reference for the 64-bit comparison.
+
+    check_size_comments.py REPO LAYOUTS32.tsv LAYOUT_DIFF.tsv
+
+Greps REPO's include/, src/ and lib/ for the comments, finds each struct's layout in LAYOUTS32.tsv (layouts.py, i386)
+and whether it grows at 64 bits in LAYOUT_DIFF.tsv (layout_diff.py, arm64), and prints each mismatch and the totals.
+run_all.sh writes it to size_comments.txt (port/docs/research/compile-probe.md, "MWCC layout proxy").
+"""
 import sys, re, pathlib, subprocess
 repo = pathlib.Path(sys.argv[1])
 lay = {}

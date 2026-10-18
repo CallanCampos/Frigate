@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""List source files and whether each is marked complete in config/b2_us delinks. Usage: complete_files.py REPO OUT.tsv"""
+"""Every C file of the decomp (src/ and lib/) with its state in Black 2's configs: complete (matching and linked into
+the ROM), incomplete (registered, still linking the ROM's object) or unregistered.
+
+    complete_files.py REPO OUT.tsv
+
+Reads REPO/config/b2_us/**/delinks.txt and writes a row per file to OUT.tsv (run_all.sh: files.tsv), which
+summarize.py takes to split a pass's results by completeness. The first step of run_all.sh
+(port/docs/research/compile-probe.md).
+"""
 import sys, pathlib, re
 repo = pathlib.Path(sys.argv[1])
 status = {}

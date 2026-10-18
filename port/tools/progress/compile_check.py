@@ -5,6 +5,9 @@ the original file's ranges: functions, code bytes, data bytes per section, and p
 Usage: <repo>/.venv/bin/python compile_check.py --root <repo> [--version b2_us] --out out/compile_b2.tsv [files...]
 Uses the repository's compiler setup (tools/decomp/compiler_probe.py): mwcc via wibo, the library.toml compilers.
 Writes nothing under the repository.
+
+How much of the game's unlinked C (tier b) emits what the ROM has, for the port's readiness tiers; run_all.sh writes
+out/compile_b2_us.tsv, which summarize.py reads (port/docs/research/decomp-progress.md, "Code tiers").
 """
 import argparse
 import shlex

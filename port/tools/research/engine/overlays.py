@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
-"""Overlay table summary: address, sizes, .data/.bss, ctor, coverage, files; and address-sharing groups."""
+"""The game's overlays as the port must load them: each overlay's address, sizes, .data and .bss, static initializers
+and C coverage, and the groups of overlays that share addresses.
+
+    overlays.py REPO WORK
+
+Reads Black 2's overlay table (REPO/extract/b2_us/arm9_overlays/overlays.yaml, written by dsd extract) and the
+coverage that coverage.py wrote to WORK (modules.tsv, files.tsv), and writes to WORK: overlays.tsv (per overlay: its
+base and end, code, .bss and .data sizes, how many static initializers it has, its functions, the share complete and
+with C, the bytes with no C, and its first files), overlay_groups.tsv (the overlays whose address ranges overlap, so
+that only one of a group can be loaded at a time) and overlay_bases.tsv (the overlays at each base address). The DS
+loads an overlay over another at the same address; the host gives each its own memory and has to keep the game's
+loads and unloads meaningful (port/hal/fs). Research of 2026-10-16 (port/docs/research/engine-boot.md, "Overlay
+semantics the port must reproduce").
+"""
 import os
 import re
 import sys

@@ -4,6 +4,10 @@ Not a C parser. It strips comments, string/char literals and preprocessor lines 
 walks the text at brace depth 0. A `{` at depth 0 whose statement ends in `)` and has no top-level `=` is a function
 definition; the defined name is the identifier just before the parameter list. Data definitions are collected as the
 set of identifiers of top-level non-extern, non-typedef declarations (approximate, used only for name lookup).
+
+progress.py uses it to tell which functions and data of an incomplete file its C defines (tier b) and which it
+doesn't yet (tier c), in src/ and lib/ (port/docs/research/decomp-progress.md, "How the configs record source files
+and completeness").
 """
 import re
 

@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
-"""Classify the unique 64-bit hazard sites of a host probe run by the text of the source line.
-Usage: classify64.py REPO RUNDIR [--flags a,b] [--show TAG] [--n N]"""
+"""What the 64-bit hazards of one host pass of the compile probe are: each unique site of a pointer and int cast or a
+64-to-32 shortening in the game's or the libraries' C, classed by its source line (overlay IDs, pointers through a
+u32 parameter of a Get/SetParam-style API, hardware addresses, alignment arithmetic, pointers kept in u32 fields,
+pointer differences, intentional 64-bit truncations).
+
+    classify64.py REPO RUNDIR [--flags F1,F2] [--prefix src/,include/] [--show TAG] [--n N]
+
+Reads RUNDIR/diags.tsv (probe.py's) and the lines it names in REPO, and prints the count of sites and files per class,
+with examples. run_all.sh writes the game's (raw and with the MWCC shim) and the libraries' to classify_*.txt: the
+fixes the C needs on a 64-bit host (port/docs/research/compile-probe.md, "What the game-code sites are").
+"""
 import sys, re, collections, argparse, pathlib
 ap = argparse.ArgumentParser(); ap.add_argument("repo"); ap.add_argument("run")
 ap.add_argument("--flags", default="-Wpointer-to-int-cast,-Wvoid-pointer-to-int-cast,-Wint-to-pointer-cast,-Wint-to-void-pointer-cast,-Wshorten-64-to-32")

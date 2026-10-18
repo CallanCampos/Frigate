@@ -1,4 +1,13 @@
-"""GFL-level boundary: GFL API used by the rest of the game, and graphics calls that bypass GFL."""
+"""Game Freak's library (GFL, src/gfl) as a boundary: which of its functions the rest of the game calls, and which
+graphics calls of the game go around it to NitroSDK's GX and G3 or NitroSystem's G2D, G3D and GFD and SPL directly.
+
+    gfl.py
+
+Reads build/port-research/sdk-surface/binscan.pkl (binscan.py) and prints the GFL functions called from outside GFL
+by family, the graphics functions that src/system and the overlays call directly, the game functions whose machine
+code holds hardware addresses, and how many of those are in complete files. The answer to option (iii) of
+port/docs/research/sdk-surface.md, replacing GFL's graphics wrappers with a modern renderer's calls.
+"""
 import json
 import pickle
 import re

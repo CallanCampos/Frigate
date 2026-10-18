@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
-"""From clang's AST, find the struct types that game code overlays on data loaded from archives/files (the cast of a
-load call's void * result, or the buffer passed to a read-into call), and check them against a 64-bit layout diff.
-Usage: ast_file_types.py REPO layout_diff.tsv OUT.tsv"""
+"""The struct types the game overlays on data it loads from its archives and files, from clang's AST, and whether their
+layout changes on a 64-bit host, where a type with a pointer or a long no longer matches the bytes the ROM holds.
+
+    ast_file_types.py REPO LAYOUT_DIFF.tsv OUT.tsv
+
+Dumps the AST of each of REPO's src/**/*.c (i386, as MWCC lays out; nothing written to the repository), finds the type
+of each cast of a load call's result and of each buffer passed to a read-into call (GFL's archive reads and loads,
+FS_ReadFile, NitroSystem's unpacked-data getters), maps the types to records (typemap.py) and checks them against
+LAYOUT_DIFF.tsv (layout_diff.py, MWCC against arm64). Writes a row per type to OUT.tsv and prints the counts and the
+types that change. run_all.sh writes file_overlay_types.tsv and .txt (port/docs/research/compile-probe.md, "Where the
+layout is assumed").
+"""
 import os, re, sys, subprocess, pathlib, collections, concurrent.futures as cf
 repo = pathlib.Path(sys.argv[1]).resolve()
 diff = {l.split("\t")[0]: l.rstrip("\n").split("\t") for l in open(sys.argv[2])}

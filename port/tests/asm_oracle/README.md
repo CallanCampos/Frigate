@@ -6,6 +6,16 @@ SDK's assembly routines (`MI_CpuCopy*`, `MI_UncompressLZ8`, `MATH_QSort`, the `M
 input the original accepts: the same return value, the same bytes written, the same handling of odd sizes, alignment,
 overlap and zero lengths. These tests run both on the same seeded random inputs and fail at the first difference.
 
+| File | What it is |
+| --- | --- |
+| `test_mi.py` | `port/hal/mi`, NitroSDK's MI copies, fills, sends, swaps and LZ8 decompression that the SDK wrote in assembly (`lib/nitro/src/mi`), on random cases, the ROM's own compressed archives and a geometry command port |
+| `test_fx.py` | `port/hal/fx` (libfx's matrix stores and copies), `port/hal/math` (`MATH_CountLeadingZerosFunc`, `MATH_QSort`, SHA-1's block) and `port/hal/crypto` (`CRYPTO_RC4Encrypt`), built with the game's flags and again with strict ones |
+| `test_fx_decomp.py` | The decomp's own C of libfx's matrix products, scalings and vector arithmetic (`lib/nitro/src/fx`), which the ROM doesn't link yet, with the in-place calls the game makes |
+| `test_selftest.py` | The harness's own test ([below](#the-self-test)) |
+| `run_all.py` | Runs every `test_*.py` in its own process; ctest's `asm_oracle` ([Running](#running)) |
+| `compare.py`, `build.py`, `harness.py` | The comparison, the host library's build and the emulator ([Writing a test](#writing-a-test)) |
+| `requirements.txt` | Unicorn's pinned version, for the oracle's virtual environment ([Setup](#setup)) |
+
 ## What a passing test shows
 
 For every case it ran, the original (run in an emulator) and the host version:

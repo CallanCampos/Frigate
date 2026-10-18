@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
-"""Compile each .c to LLVM IR on stdout (nothing written to the repo) for a host target, record codegen success and
-the external symbols each file defines, and report duplicate definitions that would collide when every overlay is
-linked into one host binary. Usage: symbols_ir.py REPO OUTDIR -- <clang args>"""
+"""Whether every file of the decomp can be linked into one host program, as Frigate links the game: the external
+symbols each file defines, and any that two files define, which would collide there.
+
+    symbols_ir.py REPO OUTDIR -- CLANG_ARGS...
+
+Compiles each .c of REPO's src/ and lib/ to LLVM IR on stdout for a host target (nothing written to the repository),
+records which compile and the external symbols each defines, and writes OUTDIR/codegen_status.tsv and
+OUTDIR/duplicate_symbols.tsv. run_all.sh runs it for arm64 macOS into ir_arm64/ (port/docs/research/compile-probe.md,
+"Where the layout is assumed", cross-TU consistency).
+"""
 import os, re, sys, subprocess, pathlib, collections, concurrent.futures as cf
 repo = pathlib.Path(sys.argv[1]).resolve(); out = pathlib.Path(sys.argv[2]); out.mkdir(parents=True, exist_ok=True)
 args = sys.argv[sys.argv.index("--") + 1:]

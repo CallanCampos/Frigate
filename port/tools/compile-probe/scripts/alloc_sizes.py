@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
-"""Classify the size argument of GFL_HeapAllocate / Field_AllocGimmickWorkBlock / Particle_Alloc / proc work allocs.
-Usage: alloc_sizes.py REPO"""
+"""The game's heap allocations and memory clears and copies whose size is a bare number rather than a sizeof: a block
+sized for the DS's 32-bit pointers is too small on a 64-bit host when the struct it holds has pointers.
+
+    alloc_sizes.py REPO
+
+Scans REPO's src/**/*.c for the size argument of GFL_HeapAllocate, Field_AllocGimmickWorkBlock, GFL_ProcAllocWork and
+GFL_ProcCreateWork (the game's heaps, src/gfl) and of the MI_Cpu clears and copies, memset and memcpy, and prints how
+many sizes use sizeof, a literal, an expression with a literal or something else, with examples of the literals.
+run_all.sh writes it to alloc_sizes.txt (port/docs/research/compile-probe.md, "Where the layout is assumed", the
+literal sizes).
+"""
 import re, sys, pathlib, collections
 repo = pathlib.Path(sys.argv[1])
 FUNCS = {"GFL_HeapAllocate": 1, "Field_AllocGimmickWorkBlock": 1, "GFL_ProcAllocWork": 1, "GFL_ProcAllocWork": 1,

@@ -1,4 +1,13 @@
-"""Summarise per-library function counts, C coverage and edge-category gaps."""
+"""How each library of the ROM is laid out and how much of it is C: function counts, bytes, functions in a source file
+and in complete files, and unnamed functions, per category (game, SDK, the boundary's "edge") and library.
+
+    layout.py [game]
+
+Reads build/port-research/sdk-surface/db.pkl (db.py: every function of Black 2's modules with its library and file,
+from config/b2_us and extract/b2_us) and prints a row per category and library, with the modules it sits in; the game's
+rows only when an argument is given, and the game's totals. A summary from the research behind
+port/docs/research/sdk-surface.md.
+"""
 import pickle
 import sys
 from collections import Counter, defaultdict

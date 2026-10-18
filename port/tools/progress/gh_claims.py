@@ -1,4 +1,15 @@
-"""Summarize [Decomp] Overlay NNN issues and their claims from gh_issues.json (gh issue list ... --json ...)."""
+"""Who has claimed which overlay of the decomp: the open [Decomp] Overlay NNN issues of fuddlesworth/pokebw2 and the
+claims in their comments, which say whose work the game code that the port still waits on is (port/CLAUDE.md, "Code
+that isn't C yet").
+
+    python3 gh_claims.py OUT/gh_issues.json
+
+Reads the issues that run_all.sh fetched read-only (gh issue list --json number,title,state,comments,body,...),
+counts the overlay issues open and closed, and prints a Markdown row for each open one: its number, the overlay, how
+many comments it has, who claims it and since when, who released a claim, and its body's coverage line. A comment is
+a claim or a release by its wording, and each author's newest one counts. run_all.sh writes it to gh_claims.md, for
+port/docs/research/decomp-progress.md ("GitHub tracking"). Nothing is posted.
+"""
 import json, re, sys
 d = json.load(open(sys.argv[1] if len(sys.argv) > 1 else 'gh_issues.json'))
 ov = [i for i in d if i['title'].startswith('[Decomp] Overlay')]

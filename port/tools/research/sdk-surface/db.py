@@ -1,7 +1,12 @@
 """Build a database of every function, its owning source file/library, and the call/reference graph
 for pokebw2 (b2_us). Reads the repository REPO and writes db.pkl to build/port-research/sdk-surface/ of the checkout
 that holds this script, which git ignores; the other scripts here read and write there too. Run this first.
-Usage: db.py [REPO], where REPO defaults to the checkout that holds this script."""
+Usage: db.py [REPO], where REPO defaults to the checkout that holds this script.
+
+Every function of Black 2's modules from config/b2_us (symbols.txt, delinks.txt, relocs.txt) and their binaries
+from extract/b2_us: the base of the platform layer's boundary research (port/docs/research/sdk-surface.md, "How the
+numbers were made").
+"""
 import bisect
 import pickle
 import re

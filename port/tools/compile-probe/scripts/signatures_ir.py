@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
-"""Cross-TU function signature check from LLVM IR (to stdout, nothing written to the repo): for every function, compare
-the signature each TU declares or defines. On the DS a ptr/i32 mismatch is harmless; on a 64-bit host it is an ABI bug.
-Usage: signatures_ir.py REPO OUT.tsv -- <clang args>"""
+"""Functions of the decomp that two files declare or define with different signatures, from LLVM IR: harmless on the
+DS, where a pointer and an int are both 32 bits, and an ABI bug on a 64-bit host that links every file into one
+program.
+
+    signatures_ir.py REPO OUT.tsv -- CLANG_ARGS...
+
+Compiles each .c of REPO's src/ and lib/ to IR on stdout (nothing written to the repository), collects each file's
+declarations and definitions, and writes the functions whose signatures differ to OUT.tsv. run_all.sh runs it for
+arm64 macOS, to signatures_arm64.tsv and .txt (port/docs/research/compile-probe.md, "Where the layout is assumed",
+cross-TU consistency).
+"""
 import re, sys, subprocess, pathlib, collections, concurrent.futures as cf
 repo = pathlib.Path(sys.argv[1]).resolve(); outp = sys.argv[2]
 args = sys.argv[sys.argv.index("--") + 1:]

@@ -5,6 +5,12 @@ Writes:
   funcs.tsv    module name addr size mode file status   (status: complete / c_written / c_missing / no_file)
   files.tsv    module file complete nfuncs bytes n_complete_bytes n_written n_written_bytes n_missing n_missing_bytes
   modules.tsv  module nfuncs bytes complete_funcs complete_bytes written_funcs written_bytes missing_funcs missing_bytes nofile_funcs nofile_bytes data_size bss_size
+
+    coverage.py REPO WORK
+
+Reads Black 2's REPO/config/b2_us/**/delinks.txt and symbols.txt and looks for each function's definition in its
+file's C. The other engine scripts read its tables from WORK (overlays.py, callers.py, milestones.py). Research of
+2026-10-16 (port/docs/research/engine-boot.md, "Coverage in one paragraph" and the overlays' coverage).
 """
 import os
 import re

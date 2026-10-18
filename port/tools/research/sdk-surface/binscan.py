@@ -1,5 +1,17 @@
-"""Heuristic binary scan of every function: literal-pool/immediate hardware addresses, SWI, CP15, MSR/MRS.
-Adds 'hw' info to each function in db.pkl -> binscan.pkl."""
+"""What each function of the ROM touches of the DS's hardware, from its machine code: the first half of the platform
+layer's boundary research (port/docs/research/sdk-surface.md).
+
+    binscan.py
+
+Reads build/port-research/sdk-surface/db.pkl (db.py: every function of Black 2, its library and file, the call graph,
+and each module's binary from extract/b2_us) and scans each function's ARM or Thumb code for the constants it loads
+(PC-relative literals, ARM immediates, Thumb shifted immediates), its SWIs (BIOS calls), CP15 operations (the caches
+and protection unit) and MSR/MRS (interrupt masking). The constants are bucketed into the DS's hardware regions: the
+2D engines, DMA, timers, interrupts, VRAM control, the divider and square root, power, the 3D engine and its FIFO, the
+PXI FIFO to the ARM7, the card, the DSi's SCFG, NDMA, camera and DSP, palettes, VRAM, OAM and the TCMs. Writes
+binscan.pkl, which boundary.py, classify.py, dossier.py, gfl.py, surface.py and callers.py read, and prints the
+counts by library. Base and offset addressing isn't resolved, so the counts are lower bounds.
+"""
 import pickle
 import struct
 from collections import Counter, defaultdict

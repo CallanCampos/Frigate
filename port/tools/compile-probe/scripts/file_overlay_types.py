@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
-"""Find struct types that game code overlays on data read from archives/files, and check whether their layout
-changes on a 64-bit host. Usage: file_overlay_types.py REPO layout_mwcc_vs_arm64.tsv"""
+"""The struct types the game overlays on data it loads from its archives and files (GFL's archive loads, FS_ReadFile,
+NitroSystem's resource getters), and whether their layout changes on a 64-bit host, where a type with a pointer or a
+long no longer matches the bytes on the ROM.
+
+    file_overlay_types.py REPO LAYOUT_DIFF.tsv
+
+Finds the casts and declarations at a load call in REPO's src/ by pattern, maps the type names to records as
+typemap.py does, and prints the types whose layout in LAYOUT_DIFF.tsv (layout_diff.py, MWCC against arm64) changes.
+The first, textual take; run_all.sh runs ast_file_types.py, which reads clang's AST instead
+(port/docs/research/compile-probe.md, "Where the layout is assumed").
+"""
 import re, sys, pathlib, collections
 repo = pathlib.Path(sys.argv[1])
 diff = {}
