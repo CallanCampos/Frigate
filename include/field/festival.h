@@ -106,7 +106,10 @@ void func_ov036_021b67d8(void *gimmick, PokeParty *party);
 u32 func_ov036_021b67bc(void *gimmick);
 void DeleteFunfestActor(void *gimmick, u16 zoneId, u8 actorIndex);
 void func_ov036_021b65e8(void *gimmick);
-void func_ov036_021b6690(void *gimmick);
+BOOL func_ov036_021b6690(void *gimmick);
+// The event of the Funfest mission at a grid or rail position, or NULL
+GameEvent *func_ov036_021b6700(void *gimmick, const VecFx32 *position);
+GameEvent *func_ov036_021b672c(void *gimmick, const RailPosition *position);
 u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
 void *GetFestMissionCfg(LinkFestival *festival);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
