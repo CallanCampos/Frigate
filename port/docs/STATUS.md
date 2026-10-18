@@ -26,10 +26,55 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: saves made from saves (the first Pokémon), and the start menu's Pokédex line against the oracle
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch`, after `014fe956c` (the trainer card's param from its header).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), after each of the two commits. `014fe956c` changed
+  `src/ov012/event_field_proclink.c`, complete in both versions, so the ROM build is its proof (a Neutral row in
+  `game-changes.md`); this commit changes no game file.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 240 `ctest` tests pass, the oracle's included (`ctest -j4`, 465 s), 3 new:
+  `layout_trainer_card_param` (`014fe956c`: the trainer card's param has the same layout in the app call's object as
+  in the card's, by their debug information; it fails on the old objects, 0x14 and 0x18 against 0x20 and 0x24),
+  `oracle_saves` (makes `first_save` and `starter_save` into `<build>/oracle-saves`, or reuses them while their SHA-1s
+  are the ones kept: 0.5 s with both cached) and `oracle_continue_starter`; `oracle_compare` has 43 tests (2 new: saves
+  made from saves and the cache, with a stand-in oracle; a sequence whose save a version doesn't keep is skipped; the
+  declarations extended to chains). T4: `oracle_continue_starter` 3,415 of 3,415 compared frames match (1,310 exact,
+  2,105 with 3D within the tolerance), with continue's known differences: the start menu with the starter save's
+  saved game, its Pokédex line (Pokédex: 1, time 0:04) among it, exact at the DS's 6 bits; the port then stops on
+  `FIELDMAP_PROC_FUNCS` after frame 3,436, as from the first save. White 2: `oracle_compare`, `oracle_saves` (which
+  made White 2's `first_save` from a blank backup, 97 s, and left `starter_save` out: no SHA-1 for White 2 yet),
+  `oracle_continue` pass, `oracle_continue_starter` skips with that reason; `layout_trainer_card_param` and the card
+  and backup tests pass. The saves on the oracle: `first_save` `a7a58889e239`, `starter_save` `ce71fe0b8c1d` (three
+  runs, the research's two and this one; Tepig, level 5, 135 experience, by a decoder of Gen 5's encoding, its checksum
+  valid; event flags 0x961 and 0x962 set, variables 0x40a1 = 4 and 0x4030 = 1; 2,086 bytes from `first_save`) and
+  `route19_save` `826bc561a328` (two runs; Tepig, level 6, 229 experience). T3's long runs, T5's nightly runs and T7
+  not yet.
+- **Tiers:** not measured: no decomp C changed beyond one file's include.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: the game change removes a typedef and adds an include.
+- **Work done:**
+  - **The trainer card's param** (`014fe956c`, Neutral): `src/ov012/event_field_proclink.c` declared its own
+    `TrainerCardParam`, the same as the header's on the DS but not on a host, where the card's result was read from
+    `gameData`'s high half and `appParam` written over `canEdit`. It includes `include/field/trcard_sys.h` now.
+  - **Saves made from saves** (`oracle.py`): a save in `SAVES` names the save it starts from; each step of a chain is
+    made in order and held to its SHA-1. `--save-cache DIR` keeps the saves as `NAME_VERSION.sav` and reuses one only
+    while its SHA-1 is the one kept. Two new saves, Black 2: `starter_save` (from `first_save`, 17,000 frames: the
+    story to the Aspertia City lookout, Tepig and the Pokédex, then SAVE) and `route19_save` (from `starter_save`,
+    28,600 frames: Hugh's battle and the scenes to Route 19's grass, for the battles, run by no test). Their input
+    files are in `port/tests/oracle`; the saves are made at test time and never committed.
+  - **continue_starter**: continue's presses from the starter save (`Sequence.input` names the sequence whose input
+    file a sequence plays), a check of the start menu's Pokédex line, which the last entries named as next.
+- **Next:** the field menu's apps on the port while overlay 36 is claimed: a test launcher (ADR 0012, proposed), the
+  apps against the oracle through it, and White 2's starter save.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) and overlay 12's script data, as in the last
+  entry.
+
 ## 2026-10-18: the card's infrared chip on the SPI registers: the genuine-card check passes as on melonDS
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch` from `5ad9a1e1d`.
+- **Port:** `1ba3ab56f`, on the branch `port-launch` from `5ad9a1e1d`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed, so no
   `check_mwcc_neutral.py` run and no row in `game-changes.md`.
 - **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.

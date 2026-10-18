@@ -5,10 +5,10 @@
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]
     oracle.py port --binary BIN --out DIR --frames LIST [--input FILE] [--dump SPEC]... [--time TIME] [--version b2_us]
                    [--rom PATH] [--save FILE] [--save-out FILE]
-    oracle.py save NAME --out FILE [--oracle BIN] [--version b2_us] [--work DIR]
+    oracle.py save NAME... [--out FILE] [--save-cache DIR] [--oracle BIN] [--version b2_us] [--work DIR]
     oracle.py port-save --port BIN [--oracle BIN] [--version b2_us] [--work DIR]
     oracle.py boot --out DIR [--port BIN] [--frames LIST] [--version b2_us]
-    oracle.py sequence NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
+    oracle.py sequence NAME --port BIN [--out DIR] [--update] [--save-cache DIR] [--oracle BIN] [--version b2_us]
     oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
     oracle.py check --oracle BIN [--version b2_us] [--work DIR] [--update]
 
@@ -21,16 +21,20 @@ LIST, memory.txt with the --dump specs (the program's --run-dump: globals by nam
 Its clock is --time, else the input file's, else the default. Both take --save FILE, the save memory at power-on (the
 port's copy of it is the save directory's file, named after the ROM's game code, as the port names its saves), and
 --save-out FILE, the save memory when the run ends (the blank chip, 0xff, when the game never wrote one). save makes
-one of the saves the sequences start from on the oracle (SAVES: first_save, power-on through New Game into the field
-and the field menu's SAVE), writes it to FILE and checks it against the SHA-1 kept for it. port-save takes a save the
+saves the sequences start from on the oracle (SAVES: first_save, power-on through New Game into the field and the field
+menu's SAVE; starter_save, first_save's CONTINUE through the story to the first Pokémon and SAVE; route19_save, the
+starter save's CONTINUE through Hugh's battle to the grass of Route 19), each from the save it names as its start or a
+blank one, and checks each step against the SHA-1 kept for it; it writes one save to FILE, or with --save-cache every
+save into DIR as NAME_VERSION.sav, where a later run reuses a file only while its SHA-1 is still the one kept. port-save takes a save the
 other way: the port's New Game writes one, and the oracle boots it to the start menu frame for frame as it boots its own
 save of the same moment, without writing either, and the console's Wi-Fi ID that New Game copied into it is the
 oracle's. boot does both for the boot sequence and compares them on the game's
 count, the movies by their pictures (compare.py), at the DS's 6 bits and at the palettes' 5.
 sequence does both on a comparison sequence's input file, port/tests/oracle/<name>_<version>.pbwinput (SEQUENCES:
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
-menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to), from the save the
-sequence names, made first on the oracle, and compares every frame the same way but the known differences, up to the
+menu; continue, the same from first_save's save, the start menu's CONTINUE and the field it goes to; continue_starter,
+continue's presses from starter_save's, whose start menu shows the Pokédex), from the save the sequence names, made
+first on the oracle (or taken from --save-cache), and compares every frame the same way but the known differences, up to the
 frame where the port stops when the sequence allows it to stop on code with no C yet; with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
 that input file and checks its counts and its screens without 3D against that reference. check is the oracle's ctest
@@ -102,6 +106,8 @@ class Sequence:
     known_state: dict[str, dict[str, str]] = field(default_factory=dict)
     # The save both programs start from, a SAVES name; none for a blank save
     save: str = ""
+    # The sequence whose input file it plays, when it isn't its own (port/tests/oracle/<input>_<version>.pbwinput)
+    input: str = ""
     # The port frame from which the port may stop on a trap stub (TRAP_STATUS), the trap it may stop on (a regular
     # expression its message must match: the function or data with no C yet), and why. The frames it ran are compared,
     # and the run passes if it got that far and stopped on that trap; another trap is a failure, so the sequence says
@@ -184,6 +190,26 @@ SEQUENCES = {
         stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
         stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
     ),
+    # continue's presses from starter_save's save: the start menu's saved game now has the Pokédex line (Pokédex: 1,
+    # time 0:04), and CONTINUE goes to the Aspertia City lookout, where the port stops on the same trap
+    "continue_starter": Sequence(
+        port_frames=3600,
+        oracle_frames=6000,
+        sample="",
+        clock="313-1108",
+        lags={"b2_us": "1109=0", "w2_us": "1109=0,3241=-1,3403=0"},
+        known={
+            "b2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3129": CAMERA},
+            "w2_us": {"2878": TORN_HIDE, "3001": TORN_BACK, "3101": TORN_START, "3112-3128": CAMERA,
+                      "3219-3240/3": CRY, "3402": CURSOR},
+        },
+        known_oracle={"b2_us": {"4920": TORN_START}, "w2_us": {"1260": TORN_OPENING, "4852": TORN_START}},
+        save="starter_save",
+        input="continue",
+        stop_from=3425,
+        stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
+        stop="the field after CONTINUE, whose process table, overlay 36's FIELDMAP_PROC_FUNCS, has no C yet",
+    ),
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
 # The exit status of a port run that reached a function or data with no C yet (port/hal/trap.c)
@@ -194,12 +220,15 @@ BACKUP_SIZE = 0x80000
 
 @dataclass(frozen=True)
 class SaveMaker:
-    """A save made on the oracle, from power-on with a blank save, by the input file
-    port/tests/oracle/<name>_<version>.pbwinput (SEQUENCE_INPUT's place): frames, how many frames the oracle runs;
-    sha1, by version, the SHA-1 of the save memory it writes at the end, which is the same at every run (the oracle is
-    deterministic), so that what the sequences start from is the save that was examined (README.md, "Saves")"""
+    """A save made on the oracle, from power-on, by the input file port/tests/oracle/<name>_<version>.pbwinput
+    (SEQUENCE_INPUT's place): frames, how many frames the oracle runs; sha1, by version, the SHA-1 of the save memory
+    it writes at the end, which is the same at every run (the oracle is deterministic), so that what the sequences
+    start from is the save that was examined (README.md, "Saves"); start, the SAVES name of the save the oracle starts
+    from, made (or taken from the cache) and checked first, else a blank backup. A version without a SHA-1 has no such
+    save"""
     frames: int
     sha1: dict[str, str] = field(default_factory=dict)
+    start: str = ""
 
 
 SAVES = {
@@ -208,6 +237,13 @@ SAVES = {
     # first save
     "first_save": SaveMaker(18800, {"b2_us": "a7a58889e2399d1f6a0b4c0f5600748dd139449e",
                                     "w2_us": "479529f98b29cdd852502360aeb33531ca111d7f"}),
+    # first_save's CONTINUE, then the story from the player's room to the Aspertia City lookout: Mom's and Hugh's
+    # scenes, Bianca's two talks, the middle ball (Tepig, level 5), NO to the nickname, the Pokédex, and the field
+    # menu's SAVE. Event flags 0x961 (a Pokémon) and 0x962 (the Pokédex) are set, so the field menu has every item
+    "starter_save": SaveMaker(17000, {"b2_us": "ce71fe0b8c1d93436d62678400d1e0722632b67e"}, start="first_save"),
+    # starter_save's CONTINUE, Hugh's trainer battle (Tepig grows to level 6), the Pokémon Center's scene, Mom's, the
+    # gate's gift and Bianca's catching lesson, then SAVE beside Route 19's grass: for battles, which no test runs yet
+    "route19_save": SaveMaker(28600, {"b2_us": "826bc561a328d1943d6435b9bdae7f0abc6fd3e8"}, start="starter_save"),
 }
 
 
@@ -373,17 +409,75 @@ def file_sha1(path: str) -> str:
     return digest.hexdigest()
 
 
-def make_save(args, name: str, out: str, work: str) -> str | None:
+def save_chain(name: str) -> list[str]:
+    """The saves a save is made from, the first made first, ending with it; a ValueError for a start SAVES doesn't
+    have or a chain that comes back on itself"""
+    chain = []
+    while name:
+        if name in chain:
+            raise ValueError(f"the saves {' -> '.join(reversed(chain + [name]))} start from each other")
+        if name not in SAVES:
+            raise ValueError(f"no save {name} in SAVES")
+        chain.append(name)
+        name = SAVES[name].start
+    return list(reversed(chain))
+
+
+def save_kept(name: str, version: str) -> str | None:
+    """None when every save of the chain has a SHA-1 for the version, else which hasn't"""
+    for link in save_chain(name):
+        if version not in SAVES[link].sha1:
+            return f"SAVES keeps no SHA-1 of {link} for {version}"
+    return None
+
+
+def cached_save(cache: str, name: str, version: str) -> str:
+    return os.path.join(cache, f"{name}_{version}.sav")
+
+
+def make_save(args, name: str, out: str, work: str, cache: str | None = None) -> str | None:
     """Makes the save SAVES[name] on the oracle (args.oracle, args.version, args.rom), writing the save memory to out,
-    with the oracle's run directory in work. Returns None, or why the save isn't the one kept: the oracle failed, or
-    its SHA-1 isn't the one SAVES has for the version (which it reports, for a version that has none yet)"""
+    with the oracle's runs in work. A save that starts from another is made from it, the start made first (or taken
+    from cache, a directory of NAME_VERSION.sav files, while its SHA-1 is the one kept), each step checked. Returns
+    None, or why the save isn't the one kept: the oracle failed, or a SHA-1 isn't the one SAVES has for the version
+    (which it reports, for a version that has none yet)"""
+    start = None
+    if SAVES[name].start:
+        start, reason = obtain_save(args, SAVES[name].start, work, cache)
+        if reason:
+            return f"{SAVES[name].start}, which {name} starts from: {reason}"
+    return run_save_maker(args, name, out, os.path.join(work, name), start)
+
+
+def obtain_save(args, name: str, work: str, cache: str | None) -> tuple[str | None, str | None]:
+    """A save SAVES has, as a file: cache's, if it holds it with the SHA-1 kept, else made (into cache, if given, else
+    into work). Returns its path, or None and why it couldn't be made"""
+    wanted = SAVES[name].sha1.get(args.version)
+    if cache:
+        path = cached_save(cache, name, args.version)
+        if wanted and os.path.exists(path) and file_sha1(path) == wanted:
+            print(f"{name}: reused {path}, SHA-1 {wanted}")
+            return path, None
+        os.makedirs(cache, exist_ok=True)
+    else:
+        path = os.path.join(work, f"{name}.sav")
+    reason = make_save(args, name, path, work, cache)
+    if reason:
+        if os.path.exists(path):
+            os.remove(path)
+        return None, reason
+    return path, None
+
+
+def run_save_maker(args, name: str, out: str, work: str, start: str | None) -> str | None:
+    """One step of a chain: the oracle plays the save's input file from the start save (a blank backup without one)"""
     maker = SAVES[name]
     input_path = os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=name, version=args.version))
     if not os.path.exists(input_path):
         return f"no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}"
     made = argparse.Namespace(**vars(args))
     made.input = input_path
-    made.save = None
+    made.save = start
     made.save_out = out
     shutil.rmtree(work, ignore_errors=True)
     if os.path.exists(out):
@@ -411,16 +505,35 @@ def command_save(args) -> int:
     if reason:
         print(f"oracle.py save: skipped: {reason}")
         return SKIP
+    if not args.out and not args.save_cache:
+        print("oracle.py save: name where the save goes, --out FILE or --save-cache DIR")
+        return 2
+    if args.out and len(args.names) != 1:
+        print("oracle.py save: --out takes one save; --save-cache takes several")
+        return 2
     args.oracle = binary
-    work = args.work or tempfile.mkdtemp(prefix=f"oracle-save-{args.name}-")
-    reason = make_save(args, args.name, args.out, work)
-    if reason:
-        print(f"oracle.py save: {reason}")
-        return 1
+    work = args.work or tempfile.mkdtemp(prefix="oracle-save-")
+    status = 0
+    for name in args.names:
+        # Into the cache, a save this version doesn't keep is left out with why, so that one list of saves serves both
+        # versions; to --out it is made all the same, and its SHA-1 reported, for a version that has none yet
+        kept = save_kept(name, args.version)
+        if kept and not args.out:
+            print(f"oracle.py save: {name}: left out: {kept}")
+            continue
+        if args.out:
+            reason = make_save(args, name, args.out, work, args.save_cache)
+            where = args.out
+        else:
+            where, reason = obtain_save(args, name, work, args.save_cache)
+        if reason:
+            print(f"oracle.py save: {name}: {reason}")
+            status = 1
+            continue
+        print(f"{name}: {where}")
     if not args.work:
         shutil.rmtree(work, ignore_errors=True)
-    print(f"wrote {args.out}")
-    return 0
+    return status
 
 
 # The port's save on the oracle (README.md, "Saves"), the way from the port to melonDS. Both programs play first_save's
@@ -733,8 +846,10 @@ def write_reference(path: str, name: str, version: str, oracle_run: compare.Run,
 
 
 def sequence_paths(args) -> tuple[str, str, str]:
-    """The sequence's input file and reference for the version, and the ROM"""
-    return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=args.name, version=args.version)),
+    """The sequence's input file (its own, or the one of the sequence it names) and reference for the version, and the
+    ROM"""
+    played = SEQUENCES[args.name].input or args.name
+    return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=played, version=args.version)),
             os.path.join(REPO_ROOT, SEQUENCE_REFERENCE.format(name=args.name, version=args.version)),
             rom_path(args.version, args.rom))
 
@@ -757,6 +872,10 @@ def command_sequence(args) -> int:
     if reason:
         print(f"oracle.py sequence: skipped: {reason}")
         return SKIP
+    reason = save_kept(sequence.save, args.version) if sequence.save else None
+    if reason:
+        print(f"oracle.py sequence: skipped: {reason}, so the oracle can't make the save the sequence starts from")
+        return SKIP
     if not os.path.exists(input_path):
         print(f"oracle.py sequence: no input file {os.path.relpath(input_path, REPO_ROOT)} for {args.version}")
         return 1
@@ -768,8 +887,7 @@ def command_sequence(args) -> int:
     # The save both start from, made on the oracle first
     args.save = None
     if sequence.save:
-        args.save = os.path.join(work, f"{sequence.save}.sav")
-        reason = make_save(args, sequence.save, args.save, os.path.join(work, sequence.save))
+        args.save, reason = obtain_save(args, sequence.save, work, args.save_cache)
         if reason:
             print(f"oracle.py sequence: {sequence.save}: {reason}")
             return 1
@@ -922,11 +1040,12 @@ def main(argv: list[str] | None = None) -> int:
     port.add_argument("--save", help="the save memory at power-on (blank otherwise), a .sav as melonDS writes it")
     port.add_argument("--save-out", help="where to copy the save memory the run leaves")
 
-    save = commands.add_parser("save", help="make one of the saves the sequences start from, on the oracle")
-    save.add_argument("name", choices=sorted(SAVES))
+    save = commands.add_parser("save", help="make saves the sequences start from, on the oracle")
+    save.add_argument("names", nargs="+", choices=sorted(SAVES), metavar="NAME")
     common(save)
-    save.add_argument("--out", required=True, help="where to write the save memory")
-    save.add_argument("--work", help="keep the oracle's run here")
+    save.add_argument("--out", help="where to write the save memory (one save)")
+    save.add_argument("--save-cache", help="make or reuse each save, and the saves it starts from, in this directory")
+    save.add_argument("--work", help="keep the oracle's runs here")
 
     port_save = commands.add_parser("port-save", help="the port's New Game save booted on the oracle, against the "
                                     "oracle's own save of that moment")
@@ -951,6 +1070,8 @@ def main(argv: list[str] | None = None) -> int:
     sequence.add_argument("--port", required=True, help="the port's program")
     sequence.add_argument("--out", help="keep the runs and the difference images here")
     sequence.add_argument("--update", action="store_true", help="write the reference from a comparison that passes")
+    sequence.add_argument("--save-cache", help="take the save the sequence starts from from this directory, or make "
+                          "it there (oracle.py save --save-cache)")
 
     sequence_check = commands.add_parser("sequence-check", help="the port on a sequence against its reference")
     sequence_check.add_argument("name", choices=sorted(SEQUENCES))

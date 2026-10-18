@@ -91,9 +91,20 @@ set_tests_properties(oracle_boot PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 1200)
 #   where. Skipped (77) without the oracle or the ROM
 # The continue sequence starts from a save that the oracle makes first, from power-on through New Game into the field
 # and its SAVE (oracle.py save first_save, checked against the SHA-1 oracle.py keeps): the start menu's CONTINUE with
-# the saved game, then the field, where the port stops on overlay 36 for now. Only the oracle can make its save, so it
-# has no reference and no _hashes test
-foreach(sequence IN ITEMS opening title continue)
+# the saved game, then the field, where the port stops on overlay 36 for now. continue_starter plays the same presses
+# from the starter save, made from the first save's CONTINUE through the story to the first Pokémon, whose start menu
+# shows the Pokédex line. Only the oracle can make their saves, so they have no reference and no _hashes test; the
+# oracle_saves test makes the saves into the build tree first (a fixture), where a later run reuses each while its
+# SHA-1 is still the one oracle.py keeps
+set(port_oracle_saves "${CMAKE_BINARY_DIR}/oracle-saves")
+add_test(NAME oracle_saves
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" save first_save starter_save
+            --oracle "${port_oracle_binary}" --version "${PORT_VERSION}" --save-cache "${port_oracle_saves}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+# Each save from scratch runs the oracle some 18,000 frames
+set_tests_properties(oracle_saves PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 3600 FIXTURES_SETUP oracle_saves)
+foreach(sequence IN ITEMS opening title continue continue_starter)
     if(EXISTS "${port_oracle_tests}/${sequence}_${PORT_VERSION}.tsv")
         add_test(NAME oracle_${sequence}_hashes
             COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
@@ -107,11 +118,12 @@ foreach(sequence IN ITEMS opening title continue)
         COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
             "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" sequence ${sequence}
                 --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+                --save-cache "${port_oracle_saves}"
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
 endforeach()
-# Making the save first runs the oracle 18,800 frames more
-set_tests_properties(oracle_continue PROPERTIES TIMEOUT 3600)
+# The sequences from a save take it from oracle_saves; without the cache (a failed fixture) they would make it again
+set_tests_properties(oracle_continue oracle_continue_starter PROPERTIES FIXTURES_REQUIRED oracle_saves TIMEOUT 3600)
 
 # The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
 # boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the

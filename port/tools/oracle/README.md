@@ -344,8 +344,8 @@ that bank in VRAM display mode (`bottom_3d` is 1; the top screen, engine B's log
 
 ## The comparison sequences
 
-Three input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, compared with
-`--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
+Three input files on game frames for each version, `port/tests/oracle/<name>_<version>.pbwinput`, played by four
+sequences, compared with `--align counter`, the movies by their pictures (`oracle.py`'s `SEQUENCES` says how):
 
 - **opening**: nothing pressed. Power-on, the boot screens, the Game Freak logo and the whole opening, the title and
   its first 274 frames of 3D on the bottom screen. The port runs 3,800 frames, the oracle 4,300. The game counts passes
@@ -364,8 +364,12 @@ Three input files on game frames for each version, `port/tests/oracle/<name>_<ve
   black, on the trap stub the sequence names (`stop_trap`, a pattern of the trap's message): overlay 36's
   `FIELDMAP_PROC_FUNCS`, in the field's first frames (below). A stop on any other trap fails, so the sequence says
   which gap it stops on and changes when the decomp fills it.
+- **continue_starter**: continue's input file from the starter save ([below](#saves)): the start menu's saved game has
+  the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout. The port stops on the same
+  trap. White 2 has no starter save measured yet, so its test skips with the reason.
 
-Each is two ctest tests, but continue, whose save only the oracle can make, has only the first:
+Each is two ctest tests, but continue and continue_starter, whose saves only the oracle can make, have only the
+first:
 
 - `oracle_<name>` (`oracle.py sequence NAME --port BIN`), with the oracle built: runs both programs and compares every
   port frame but the known differences ([below](#known-differences-from-the-hardware)): where the game counts passes,
@@ -394,6 +398,7 @@ Results, every port frame but the known differences:
 | title, White 2 | 3,600 | 3,572 | 1,477 | 2,095 | 28 port frames, oracle frames 1283, 4875 | 2,470 of 2,470, 15 left out |
 | continue, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
 | continue, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
+| continue_starter, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
@@ -490,6 +495,32 @@ game." and closes the menu at frame 18,653. The file holds the main save twice, 
 bytes at `0x7f000`. It is the same at every run, so `oracle.py`'s `SAVES` keeps its SHA-1 (Black 2 `a7a58889e239`, White
 2 `479529f98b29`) and a sequence that starts from it fails if the oracle, the input file or the ROM gives another save.
 It is made at test time and never committed.
+
+**Saves made from saves.** A save in `SAVES` can name the save it starts from (`start`): `oracle.py` makes or takes
+that one first, checks its SHA-1, and gives it to the oracle with `--save` for the next input file. Each step is held
+to its own SHA-1, so a chain is the same at every run or fails at the step that changed. Black 2 has two, measured
+with the pinned melonDS; White 2's are still to be measured, and its tests that need them skip with the reason:
+
+- **The starter save** (`starter_save`, from `first_save`, `port/tests/oracle/starter_save_b2_us.pbwinput`, 17,000
+  frames, SHA-1 `ce71fe0b8c1d`): CONTINUE as the continue sequence presses it, then the story from the player's room:
+  Mom's scene, out of the house, Hugh's scene, a detour west of the Trainers' School (a sign blocks x = 37), up x = 54
+  and west along z = 725 to the stairs, up to Bianca at the lookout (36, 710) and through both her talks. A at Bianca
+  takes the middle ball, Tepig; B, mashed, answers NO to the nickname and takes the Pokédex; then the field menu's
+  SAVE. Decoded by hand in Gen 5's format, with a valid checksum: Tepig, level 5, 135 experience, 21/21 HP; event flags
+  0x961 (a Pokémon) and 0x962 (the Pokédex), the city's story variable 0x40a1 at 4, the starter variable 0x4030 at 1.
+  The game writes it by frame 16,400 and the menu closes at 16,874; the two copies of the main save are the same, and
+  2,086 bytes differ from `first_save`. It costs about 2.5 minutes at a load average near 10.
+- **The Route 19 save** (`route19_save`, from `starter_save`, 28,600 frames, SHA-1 `826bc561a328`): Hugh's trainer
+  battle (FIGHT, Tackle: Tepig grows to level 6, 229 experience), the Pokémon Center's scene, Mom's, the gate's gift
+  and Bianca's catching lesson, B through each, then SAVE beside the grass at (56, 696). It is for the battles, which
+  no test runs yet.
+
+`oracle.py save NAME... --save-cache DIR` makes each save into DIR as `NAME_VERSION.sav`, with the saves it starts
+from, and a later run takes a file from there only while its SHA-1 is still the one kept: anything else is made again.
+`--out FILE` writes one save, made fresh. ctest's `oracle_saves` test makes `first_save` and `starter_save` into
+`<build>/oracle-saves` before the sequences that start from them (a fixture), so they cost their oracle runs once a
+build tree; without `--save-cache`, as before, every save is made fresh. Nothing the game writes is committed: only
+the input files and the SHA-1s.
 
 **Continuing it** (the continue sequence): the start menu shows CONTINUE first, then NEW GAME, MYSTERY GIFT, UNOVA
 LINK, NINTENDO WFC SETTINGS and MIC TEST, and the saved game: the player's picture, AAAAAAA, Aspertia City, Badges: 0,

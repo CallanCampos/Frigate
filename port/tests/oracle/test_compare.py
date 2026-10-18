@@ -873,6 +873,109 @@ class OracleScriptTests(unittest.TestCase):
                 oracle.SAVES.clear()
                 oracle.SAVES.update(saved)
 
+    def test_saves_made_from_saves_and_the_cache(self):
+        # A save made from another: the start is made first, from a blank backup, and given to the oracle with --save;
+        # each step is held to its SHA-1. A stand-in for pbw-oracle writes as save memory the input file's name and
+        # what it was given (or "blank"), and counts its runs
+        with tempfile.TemporaryDirectory() as d:
+            program = os.path.join(d, "pbw-oracle")
+            runs = os.path.join(d, "runs")
+            with open(program, "w") as f:
+                f.write(f"#!{sys.executable}\nimport os, sys\nargs = sys.argv[1:]\n"
+                        f"open({runs!r}, 'a').write(os.path.basename(args[args.index('--input') + 1]) + '\\n')\n"
+                        "given = open(args[args.index('--save') + 1], 'rb').read() if '--save' in args else b'blank'\n"
+                        "name = os.path.basename(args[args.index('--input') + 1]).encode()\n"
+                        "open(args[args.index('--save-out') + 1], 'wb').write(name + b':' + given)\n")
+            os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
+
+            def run_count() -> int:
+                if not os.path.exists(runs):
+                    return 0
+                with open(runs) as f:
+                    count = len(f.read().split())
+                os.remove(runs)
+                return count
+
+            first = b"first_save_b2_us.pbwinput:blank"
+            starter = b"starter_save_b2_us.pbwinput:" + first
+            args = argparse.Namespace(oracle=program, version="b2_us", rom=os.path.join(d, "rom.nds"), time=None)
+            saved = dict(oracle.SAVES)
+            try:
+                oracle.SAVES.clear()
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": hashlib.sha1(first).hexdigest()})
+                oracle.SAVES["starter_save"] = oracle.SaveMaker(6, {"b2_us": hashlib.sha1(starter).hexdigest()},
+                                                                start="first_save")
+                self.assertEqual(oracle.save_chain("starter_save"), ["first_save", "starter_save"])
+                # Without a cache, both are made, the start first, and the start goes to the oracle with --save
+                out = os.path.join(d, "starter.sav")
+                self.assertIsNone(quiet(oracle.make_save, args, "starter_save", out, os.path.join(d, "work")))
+                with open(out, "rb") as f:
+                    self.assertEqual(f.read(), starter)
+                self.assertEqual(run_count(), 2)
+                # With a cache, each lands there as NAME_VERSION.sav and is reused while its SHA-1 is the one kept
+                cache = os.path.join(d, "cache")
+                path, reason = quiet(oracle.obtain_save, args, "starter_save", os.path.join(d, "work"), cache)
+                self.assertIsNone(reason)
+                self.assertEqual(path, os.path.join(cache, "starter_save_b2_us.sav"))
+                self.assertTrue(os.path.exists(os.path.join(cache, "first_save_b2_us.sav")))
+                self.assertEqual(run_count(), 2)
+                self.assertEqual(quiet(oracle.obtain_save, args, "starter_save", d, cache), (path, None))
+                self.assertEqual(run_count(), 0)
+                # A cached file that isn't the save kept is made again, from the start, which is still good
+                with open(path, "wb") as f:
+                    f.write(b"another save")
+                self.assertEqual(quiet(oracle.obtain_save, args, "starter_save", d, cache), (path, None))
+                self.assertEqual(run_count(), 1)
+                with open(path, "rb") as f:
+                    self.assertEqual(f.read(), starter)
+                # And a start that isn't is made again before it
+                with open(os.path.join(cache, "first_save_b2_us.sav"), "wb") as f:
+                    f.write(b"another save")
+                os.remove(path)
+                self.assertEqual(quiet(oracle.obtain_save, args, "starter_save", d, cache), (path, None))
+                self.assertEqual(run_count(), 2)
+                # oracle.py save fills the cache with several saves, reusing what is there
+                status, text = captured(oracle.main, ["save", "first_save", "starter_save", "--oracle", program,
+                                                      "--save-cache", cache, "--rom", args.rom])
+                # (no ROM here: skipped before any run)
+                self.assertEqual(status, oracle.SKIP)
+                # A start whose SHA-1 isn't the one kept stops the chain, naming it
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": "0" * 40})
+                reason = quiet(oracle.make_save, args, "starter_save", out, os.path.join(d, "work"))
+                self.assertIn("first_save, which starter_save starts from", reason)
+                self.assertEqual(run_count(), 1)
+                # Without a SHA-1 for the version, a chain isn't kept there
+                self.assertIn("first_save", oracle.save_kept("starter_save", "w2_us"))
+                # A chain that comes back on itself, or a start SAVES hasn't, is refused
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": "0" * 40}, start="starter_save")
+                with self.assertRaises(ValueError):
+                    oracle.save_chain("starter_save")
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": "0" * 40}, start="no_such_save")
+                with self.assertRaises(ValueError):
+                    oracle.save_chain("starter_save")
+            finally:
+                oracle.SAVES.clear()
+                oracle.SAVES.update(saved)
+
+    def test_sequences_skip_a_save_the_version_doesnt_keep(self):
+        # A sequence whose save has no SHA-1 for the version is skipped with why, before the oracle runs
+        with tempfile.TemporaryDirectory() as d:
+            fake = os.path.join(d, "pbw-oracle")
+            open(fake, "w").close()
+            saved = dict(oracle.SAVES)
+            matches = oracle.rom_matches
+            try:
+                oracle.rom_matches = lambda version, path: None
+                oracle.SAVES["starter_save"] = oracle.SaveMaker(6, {"b2_us": "0" * 40}, start="first_save")
+                status, text = captured(oracle.main, ["sequence", "continue_starter", "--version", "w2_us", "--port",
+                                                      os.path.join(d, "port"), "--oracle", fake])
+                self.assertEqual(status, oracle.SKIP)
+                self.assertIn("no SHA-1 of starter_save for w2_us", text)
+            finally:
+                oracle.rom_matches = matches
+                oracle.SAVES.clear()
+                oracle.SAVES.update(saved)
+
     def test_port_save(self):
         # The port's save booted on the oracle against the oracle's own: stand-ins for both programs. The port writes a
         # save with a Wi-Fi ID; the oracle writes its own save of New Game with the ID it is given, and boots any save
@@ -1067,22 +1170,30 @@ class OracleScriptTests(unittest.TestCase):
                                 set(range(1, sequence.oracle_frames + 1)), name)
                 for version, table in sequence.known_state.items():
                     self.assertTrue(set(oracle.by_frame(table)) <= state, name)
+            # It plays its own input file or another sequence's
+            self.assertTrue(not sequence.input or sequence.input in oracle.SEQUENCES, name)
             for version in ("b2_us", "w2_us"):
                 self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
-                    name=name, version=version))), (name, version))
+                    name=sequence.input or name, version=version))), (name, version))
             # A save it starts from is one oracle.py makes; a stop it allows is within the port's frames, with why
             self.assertTrue(not sequence.save or sequence.save in oracle.SAVES, name)
             self.assertTrue(0 <= sequence.stop_from <= sequence.port_frames, name)
             self.assertEqual(bool(sequence.stop_from), bool(sequence.stop), name)
             self.assertEqual(bool(sequence.stop_from), bool(sequence.stop_trap), name)
             re.compile(sequence.stop_trap)
-        # Every save has an input file, and the SHA-1 of what it makes, for each version
+        # Every save starts from a save SAVES has, with no chain that comes back on itself, and has the SHA-1 of what
+        # it makes in Black 2, and an input file for each version it has a SHA-1 for; a version it has one for, its
+        # start has one for too
         for name, maker in oracle.SAVES.items():
             self.assertGreater(maker.frames, 0, name)
-            for version in ("b2_us", "w2_us"):
+            self.assertEqual(oracle.save_chain(name)[-1], name)
+            self.assertIn("b2_us", maker.sha1, name)
+            for version, digest in maker.sha1.items():
+                self.assertIn(version, ("b2_us", "w2_us"))
                 self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
                     name=name, version=version))), (name, version))
-                self.assertRegex(maker.sha1.get(version, ""), "^[0-9a-f]{40}$", (name, version))
+                self.assertRegex(digest, "^[0-9a-f]{40}$", (name, version))
+                self.assertIsNone(oracle.save_kept(name, version), (name, version))
 
     def test_check_skips_without_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
