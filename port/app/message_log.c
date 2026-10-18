@@ -1,6 +1,7 @@
 // The log of an app opened from the Finder or the Dock (port/app/message_log.h)
 #include "app/message_log.h"
 #include "hal/os/fiber.h"
+#include "hal/os/port_app.h"
 #include "hal/rom/rom_manifest.h"
 #include <SDL3/SDL.h>
 #include <stdio.h>
@@ -17,8 +18,8 @@
 #include <unistd.h>
 
 #define APP_EXECUTABLE_DIRECTORY ".app/Contents/MacOS"
-// The directory under ~/Library/Logs, named as the saves' directory under Application Support (port/hal/card)
-#define LOG_DIRECTORY "Library/Logs/pokebw2-native"
+// The directory under ~/Library/Logs: the product's name, as the saves' directory has under Application Support
+#define LOG_DIRECTORY "Library/Logs/" PORT_PRODUCT_NAME
 
 static char sPath[PATH_MAX];
 
@@ -98,13 +99,16 @@ const char *port_message_log_open(void) {
 }
 
 void port_message_log_alert(const char *message) {
+    char title[128];
     char text[2048];
 
     if (port_fiber_current() != NULL) {
         return;
     }
+    // Titled as the window is (port/app/present.c): "Frigate — Pokémon Black 2"
+    snprintf(title, sizeof(title), "%s — %s", PORT_PRODUCT_NAME, port_rom_manifest_game);
     snprintf(text, sizeof(text), "%s\n\nThe program's messages are in %s.", message, sPath);
-    if (!SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, port_rom_manifest_title, text, NULL)) {
+    if (!SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, text, NULL)) {
         fprintf(stderr, "port: the alert didn't show: %s\n", SDL_GetError());
     }
 }

@@ -5,6 +5,9 @@
 - **Plan:** D11, §7 phase 5 (an ad-hoc signed `.app` in a DMG), after
   [ADR 0003](0003-ad-hoc-signing-no-apple-developer-account.md)
 - **Upstream:** `615939e25`
+- **Note (2026-10-18):** the port is now Frigate and the names below are those of the time: the program is
+  `frigate-black2`, the app `Frigate Black 2.app` with the bundle identifier `io.github.callancampos.frigate.black2`,
+  the ROM's variable `FRIGATE_ROM` and the log `~/Library/Logs/Frigate/<program>.log` (port/CLAUDE.md).
 
 ## Context
 

@@ -2,7 +2,7 @@
 // and on variants of it made in a private copy-on-write mapping (a trimmed dump, a changed header, a changed or cut
 // file, a changed overlay table or overlay file, another version), the system area it leaves, the reads past its end
 // and the card's reads. The tests that need the ROM skip with
-// status 77 without it (POKEBW2_ROM, else the repository's orig/baserom_<version>.nds).
+// status 77 without it (FRIGATE_ROM, else the repository's orig/baserom_<version>.nds).
 //
 //   port_rom_unit_tests NAME | all
 #include "hal/os/port_app.h"
@@ -93,7 +93,8 @@ static int MapRom(void) {
     }
     sRomPath = port_rom_default_path();
     if (sRomPath == NULL) {
-        printf("  no ROM (POKEBW2_ROM, or the repository's orig/baserom_%s.nds): skipped\n", port_rom_manifest_version);
+        printf("  no ROM (" PORT_ROM_ENVIRONMENT_VARIABLE ", or the repository's orig/baserom_%s.nds): skipped\n",
+               port_rom_manifest_version);
         return 0;
     }
     fd = open(sRomPath, O_RDONLY);
@@ -370,13 +371,13 @@ static int TestCardReads(void) {
     return 0;
 }
 
-// Where the ROM is looked for: --rom, then POKEBW2_ROM, then the repository's
+// Where the ROM is looked for: --rom, then FRIGATE_ROM, then the repository's
 static int TestDefaultPath(void) {
     static char program[] = "test";
     static char option[] = "--rom=/given/by/option.nds";
     static char *withOption[] = { program, option, NULL };
     static char *without[] = { program, NULL };
-    const char *saved = getenv("POKEBW2_ROM");
+    const char *saved = getenv(PORT_ROM_ENVIRONMENT_VARIABLE);
     char *savedCopy = saved != NULL ? strdup(saved) : NULL;
     const char *path;
 
@@ -384,14 +385,14 @@ static int TestDefaultPath(void) {
     path = port_rom_default_path();
     Check(path != NULL && strcmp(path, "/given/by/option.nds") == 0, "--rom comes first");
     port_app_set_arguments(1, without, NULL, 0);
-    setenv("POKEBW2_ROM", "/given/by/environment.nds", 1);
+    setenv(PORT_ROM_ENVIRONMENT_VARIABLE, "/given/by/environment.nds", 1);
     path = port_rom_default_path();
-    Check(path != NULL && strcmp(path, "/given/by/environment.nds") == 0, "then POKEBW2_ROM");
-    unsetenv("POKEBW2_ROM");
+    Check(path != NULL && strcmp(path, "/given/by/environment.nds") == 0, "then FRIGATE_ROM");
+    unsetenv(PORT_ROM_ENVIRONMENT_VARIABLE);
     path = port_rom_default_path();
     Check(path == NULL || strstr(path, "orig/baserom_") != NULL, "then the repository's, when it is there");
     if (savedCopy != NULL) {
-        setenv("POKEBW2_ROM", savedCopy, 1);
+        setenv(PORT_ROM_ENVIRONMENT_VARIABLE, savedCopy, 1);
         free(savedCopy);
     }
     port_app_set_arguments(0, NULL, NULL, 0);

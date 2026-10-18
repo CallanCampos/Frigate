@@ -1,4 +1,4 @@
-// The program's options and its hooks, for every module of the platform layer (port/hal, port/gfx) and the program
+// The program's name, options and hooks, for every module of the platform layer (port/hal, port/gfx) and the program
 // itself. The program (port/app/main.c) records its arguments before it runs the game, and a module reads the option
 // it needs with port_app_option; the renderer's integration sets port_app_present, which the program's frame hook
 // calls at each VBlank; the program sets port_app_fatal_notice for a player who can't see stderr. They live in port_hal
@@ -9,6 +9,11 @@
 #define PORT_HAL_OS_PORT_APP_H
 
 #include <stddef.h>
+
+// The product's name, as the player sees it: the window's title (port/app/present.c), --help (port/app/main.c), and
+// the folders of the saves (port/hal/card/backup.c) and of an app's log (port/app/message_log.c). The build's names,
+// the programs' and the macOS app's, are in port/CMakeLists.txt and port/cmake/macos_app.cmake
+#define PORT_PRODUCT_NAME "Frigate"
 
 // Records the program's arguments and the names of its flags, the options that never take a value. Both arrays must
 // stay as they are while the program runs (main's argv, and a static table)

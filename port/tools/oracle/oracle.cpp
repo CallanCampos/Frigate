@@ -1,8 +1,8 @@
 // The melonDS test oracle (port/docs/PLAN.md §6, T4): runs the player's ROM on melonDS's emulation core, headless and
-// deterministic, plays an input file, and writes the screens and named memory at chosen frames, for compare.py to
-// hold the native port against. It is a test tool only: it is never linked into or shipped with the port (PLAN.md §1),
-// and it is built only with -DPORT_BUILD_ORACLE=ON (port/cmake/oracle.cmake). README.md in this directory has the
-// formats and how frames line up with the port's.
+// deterministic, plays an input file, and writes the screens and named memory at chosen frames, for compare.py to hold
+// Frigate's program against. It is a test tool only: it is never linked into or shipped with the port (PLAN.md §1), and
+// it is built only with -DPORT_BUILD_ORACLE=ON (port/cmake/oracle.cmake). README.md in this directory has the formats
+// and how frames line up with the port's.
 //
 //   pbw-oracle --rom PATH --out DIR --frames N [--input FILE] [--screens LIST] [--dump SPEC]... [--config DIR]
 //              [--symbols FILE]... [--counter TARGET] [--time "YYYY-MM-DD HH:MM:SS"] [--save FILE]

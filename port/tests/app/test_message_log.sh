@@ -10,7 +10,7 @@ program=$1
 work=$2
 name=$(basename "$program")
 app_program="$work/Test.app/Contents/MacOS/$name"
-log="$work/home/Library/Logs/pokebw2-native/$name.log"
+log="$work/home/Library/Logs/Frigate/$name.log"
 missing="$work/no such rom.nds"
 checks=0
 failures=0
@@ -47,6 +47,8 @@ expect "a second run: the reason once" "$(grep -cF "port: rom: $missing: " "$log
 run "$app_program" --help >/dev/null 2>&1
 expect "--help: status" $? 0
 expect "--help: the usage in the log" "$(grep -c '^usage: ' "$log")" 1
+expect "--help: the product's name first" "$(head -1 "$log" | grep -c '^Frigate — Pokémon ')" 1
+expect "--help: not affiliated" "$(grep -c '^Not affiliated with Nintendo, Game Freak, Creatures' "$log")" 1
 
 # From the app, with stderr on a file: no log, the messages where stderr goes
 rm -f "$log"

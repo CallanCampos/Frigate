@@ -204,7 +204,7 @@ static void TestRun(void) {
                                "3\t3\t1\t2\t-\t-\t-\t" WHITE_HASH "\t" BLACK_HASH "\t1\t1\n"
                                "4\t4\t2\t3\t-\t-\t-\t" WHITE_HASH "\t" BLACK_HASH "\t1\t1\n";
     static const char runningRun[] = "#pbwrun 1\n"
-                                     "program: pokeblack2\n"
+                                     "program: frigate-black2\n"
                                      "rom: rom.nds\n"
                                      "frames: 4\n"
                                      "completed: -\n"
@@ -214,7 +214,7 @@ static void TestRun(void) {
                                      "counter: sVBlankCount\n"
                                      "status: -\n";
     static const char finishedRun[] = "#pbwrun 1\n"
-                                      "program: pokeblack2\n"
+                                      "program: frigate-black2\n"
                                       "rom: rom.nds\n"
                                       "frames: 4\n"
                                       "completed: 4\n"
@@ -223,7 +223,7 @@ static void TestRun(void) {
                                       "input_frames: -\n"
                                       "counter: sVBlankCount\n"
                                       "status: 0\n";
-    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
+    const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
     const PortRunDirFrame frames[] = { { 1, 1, 0, 1 }, { 2, 2, 1, 2 }, { 3, 3, 1, 2 }, { 4, 4, 2, 3 } };
     char expected[sizeof(tsvHead) + sizeof(rows)];
     char wanted[600];
@@ -317,8 +317,8 @@ static int DumpRejected(const char *spec, const char *message) {
 }
 
 static void TestDumps(void) {
-    const PortRunDirInfo info = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
-    const PortRunDirInfo unlimited = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0 };
+    const PortRunDirInfo info = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4 };
+    const PortRunDirInfo unlimited = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 0 };
     char error[256];
     char expected[600];
     char *text;

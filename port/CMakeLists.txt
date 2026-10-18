@@ -1,21 +1,31 @@
-# The native port's host build. The ROM build (configure.py and ninja) stays separate and untouched; this one compiles
-# the same decomp sources with the host's clang into one program, with the platform layer in port/.
+# Frigate's host build. The ROM build (configure.py and ninja) stays separate and untouched; this one compiles the same
+# decomp sources with the host's clang into one program, with the platform layer in port/.
 #
 #   cmake -S port -B build/port -G Ninja
 #   cmake --build build/port
 #
 # Options: -DPORT_VERSION=b2_us|w2_us (default b2_us).
 cmake_minimum_required(VERSION 3.28)
-project(pokebw2_native LANGUAGES C)
+project(frigate
+    DESCRIPTION "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation"
+    HOMEPAGE_URL "https://github.com/CallanCampos/pokebw2-native"
+    LANGUAGES C)
 
+# The names the player sees. The product is Frigate (port/CLAUDE.md); the C code has the same name as PORT_PRODUCT_NAME
+# in port/hal/os/port_app.h, and the macOS app's names are in port/cmake/macos_app.cmake. Each version is its own
+# program: frigate-black2 or frigate-white2, built from the same sources with the decomp's BLACK2 or WHITE2 defined,
+# and PORT_GAME_NAME is the game it runs, as the window's title and the ROM's messages name it
+set(PORT_PRODUCT_NAME "Frigate")
 set(PORT_VERSION "b2_us" CACHE STRING "The game version to build: b2_us (Black 2) or w2_us (White 2)")
 set_property(CACHE PORT_VERSION PROPERTY STRINGS b2_us w2_us)
 if(PORT_VERSION STREQUAL "b2_us")
     set(PORT_VERSION_DEFINE BLACK2)
-    set(PORT_PROGRAM pokeblack2)
+    set(PORT_PROGRAM frigate-black2)
+    set(PORT_GAME_NAME "Pokémon Black 2")
 elseif(PORT_VERSION STREQUAL "w2_us")
     set(PORT_VERSION_DEFINE WHITE2)
-    set(PORT_PROGRAM pokewhite2)
+    set(PORT_PROGRAM frigate-white2)
+    set(PORT_GAME_NAME "Pokémon White 2")
 else()
     message(FATAL_ERROR "PORT_VERSION must be b2_us or w2_us, not ${PORT_VERSION}")
 endif()

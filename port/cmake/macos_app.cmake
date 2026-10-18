@@ -1,8 +1,9 @@
-# The macOS app (PLAN.md phase 5, ADR 0003): the program as <program>.app in the build directory, made by the target
-# <program>_app from the program the build links (port/app/macos/make_app.sh), signed ad hoc and never notarized. It
-# holds the program, the libraries it loads from outside macOS and an Info.plist, and no ROM or game data:
+# The macOS app (PLAN.md phase 5, ADR 0003): the program as "Frigate Black 2.app" ("Frigate White 2.app" with
+# -DPORT_VERSION=w2_us) in the build directory, made by the target <program>_app from the program the build links
+# (port/app/macos/make_app.sh), signed ad hoc and never notarized. It holds the program, the libraries it loads from
+# outside macOS and an Info.plist, and no ROM or game data:
 #
-#   cmake --build build/port --target pokeblack2_app        (pokewhite2_app with -DPORT_VERSION=w2_us)
+#   cmake --build build/port --target frigate-black2_app        (frigate-white2_app with -DPORT_VERSION=w2_us)
 #
 # -DPORT_MACOS_APP=ON makes it part of every build. port/tools/package_macos.sh puts it in a disk image. The tests of
 # make_app.sh and of the log an app opened from the Finder writes are here too, since both are macOS's alone.
@@ -11,16 +12,24 @@ if(NOT APPLE)
 endif()
 
 option(PORT_MACOS_APP "Build the macOS app with every build, not only as the target <program>_app" OFF)
-# A placeholder: change it to a reverse-DNS name of a domain of your own (port/README.md, "The macOS app")
-set(PORT_MACOS_BUNDLE_ID_PREFIX "com.example.pokebw2-native" CACHE STRING
-    "The macOS app's bundle identifier, before the program's name")
+# The bundle identifier is this prefix and the version's own word, black2 or white2. A build of your own that isn't
+# Frigate's can take a reverse-DNS name of a domain of yours: macOS keeps an app's preferences and permissions under it
+set(PORT_MACOS_BUNDLE_ID_PREFIX "io.github.callancampos.frigate" CACHE STRING
+    "The macOS app's bundle identifier, before the version's black2 or white2")
 
+# The app's names (Info.plist.in says where each shows): the product's (CFBundleName, PORT_PRODUCT_NAME), the app's
+# own, which is also its file's and its disk image's (CFBundleDisplayName), and the bundle identifier's last word
 if(PORT_VERSION STREQUAL "b2_us")
-    set(port_app_display_name "Pokémon Black 2 (native port)")
+    set(port_app_name "${PORT_PRODUCT_NAME} Black 2")
+    set(port_app_id_suffix black2)
 else()
-    set(port_app_display_name "Pokémon White 2 (native port)")
+    set(port_app_name "${PORT_PRODUCT_NAME} White 2")
+    set(port_app_id_suffix white2)
 endif()
-set(port_app_bundle "${CMAKE_CURRENT_BINARY_DIR}/${PORT_PROGRAM}.app")
+set(port_app_bundle "${CMAKE_CURRENT_BINARY_DIR}/${port_app_name}.app")
+# For port/tools/package_macos.sh, which reads them from the build's CMakeCache.txt
+set(PORT_MACOS_APP_TARGET "${PORT_PROGRAM}_app" CACHE INTERNAL "The target that builds the macOS app")
+set(PORT_MACOS_APP_NAME "${port_app_name}" CACHE INTERNAL "The macOS app's name, without .app")
 if(PORT_MACOS_APP)
     set(port_app_all ALL)
 else()
@@ -32,10 +41,10 @@ add_custom_target(${PORT_PROGRAM}_app ${port_app_all}
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/make_app.sh"
         --program "$<TARGET_FILE:${PORT_PROGRAM}>" --app "${port_app_bundle}"
         --plist "${CMAKE_CURRENT_SOURCE_DIR}/app/macos/Info.plist.in"
-        --bundle-id "${PORT_MACOS_BUNDLE_ID_PREFIX}.${PORT_PROGRAM}" --display-name "${port_app_display_name}"
-        --repo "${REPO_ROOT}"
+        --bundle-id "${PORT_MACOS_BUNDLE_ID_PREFIX}.${port_app_id_suffix}" --name "${PORT_PRODUCT_NAME}"
+        --display-name "${port_app_name}" --repo "${REPO_ROOT}"
     BYPRODUCTS "${port_app_bundle}/Contents/MacOS/${PORT_PROGRAM}" "${port_app_bundle}/Contents/Info.plist"
-    COMMENT "Building and signing ${PORT_PROGRAM}.app"
+    COMMENT "Building and signing ${port_app_name}.app"
     VERBATIM)
 add_dependencies(${PORT_PROGRAM}_app ${PORT_PROGRAM})
 

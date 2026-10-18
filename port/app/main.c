@@ -1,13 +1,13 @@
-// The native port's entry point: reads the options, opens the window, prepares the platform layer and runs the game's
-// main() (renamed NitroMain by the build) on the OS core (port/hal/os). Everything runs on this one thread: the game
-// and its SDK threads on fibers, and the platform's own work on the dispatcher's stack: the scanline hook, which draws
-// each line of both screens (port/gfx/screens.c), and at each VBlank the geometry engine's swap (port/gfx/ge/ge_hal.h)
-// and this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the
-// DS's 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
+// Frigate's entry point: reads the options, opens the window, prepares the platform layer and runs the game's main()
+// (renamed NitroMain by the build) on the OS core (port/hal/os). Everything runs on this one thread: the game and its
+// SDK threads on fibers, and the platform's own work on the dispatcher's stack: the scanline hook, which draws each
+// line of both screens (port/gfx/screens.c), and at each VBlank the geometry engine's swap (port/gfx/ge/ge_hal.h) and
+// this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the DS's
+// 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   pokeblack2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
-//              [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--run-dump SPEC]...
-//              [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//   frigate-black2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
+//                  [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--run-dump SPEC]...
+//                  [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
 //
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
@@ -34,7 +34,7 @@
 //   --vram-backend NAME how VRAM banks are mapped: shm, mach-entry, mach-remap or copy (port/hal/gx/vram.h)
 //
 // The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
-// program writes its messages to ~/Library/Logs/pokebw2-native/<program>.log instead (port/app/message_log.h).
+// program writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 //
 // Exit statuses: 0 when the run ends normally, 2 for bad options, 70 when the game reaches code or data with no C
 // (port/hal/trap.c), 71 when it stops itself (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog,
@@ -58,6 +58,7 @@
 #include "hal/os/port_app.h"
 #include "hal/os/port_os.h"
 #include "hal/rom/port_rom.h"
+#include "hal/rom/rom_manifest.h"
 #include "hal/rtc/rtc_host.h"
 #include "hal/trap.h"
 #include <SDL3/SDL.h>
@@ -127,6 +128,16 @@ static const PortHwG3Readbacks sG3Readbacks = {
     port_g3d_gxstat, port_g3d_ram_count, port_g3d_vtxram_count, port_g3d_clipmtx_result, port_g3d_vecmtx_result,
 };
 
+// What --help says before the usage: the product, the game this program runs, and that it is a fan project
+static void About(void) {
+    fprintf(stderr,
+            "%s — %s\n"
+            "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; "
+            "you supply your own ROM.\n"
+            "Not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.\n\n",
+            PORT_PRODUCT_NAME, port_rom_manifest_game);
+}
+
 static void Usage(void) {
     fprintf(stderr,
             "usage: %s [--headless] [--frames N] [--screenshot PATH] "
@@ -134,7 +145,7 @@ static void Usage(void) {
             "[--fixed-time \"YYYY-MM-DD HH:MM:SS\"] [--run-dir DIR] [--run-screens LIST] "
             "[--run-dump [LABEL=][*]SYMBOL[+OFFSET]:SIZE[@LIST]]... [--watchdog SECONDS] [--main-arena-size BYTES] "
             "[--vram-backend shm|mach-entry|mach-remap|copy] [--heap-scale-root N] [--heap-scale-child N]\n",
-            sArgc > 0 ? sArgv[0] : "pokeblack2");
+            sArgc > 0 ? sArgv[0] : "frigate");
 }
 
 static int IsKnownOption(const char *name, size_t length) {
@@ -367,6 +378,9 @@ int main(int argc, char **argv) {
     sArgv = argv;
     port_app_set_arguments(argc, argv, sFlags, sizeof(sFlags) / sizeof(sFlags[0]));
     if (!CheckArguments() || port_app_option("help") != NULL) {
+        if (port_app_option("help") != NULL) {
+            About();
+        }
         Usage();
         return port_app_option("help") != NULL ? 0 : EXIT_BAD_OPTIONS;
     }

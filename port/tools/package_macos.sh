@@ -1,15 +1,17 @@
 #!/bin/sh
 # Builds the macOS app and puts it in a disk image (PLAN.md phase 5, ADR 0003): the target <program>_app of a
-# configured host build (port/cmake/macos_app.cmake) makes <program>.app, signed ad hoc, and hdiutil makes a compressed
-# disk image with the app and a link to /Applications to drag it onto. The image is checked before the script ends: it
-# verifies, the app in it passes codesign's strict check, and it holds no ROM, save or other file of the game's. It is
-# only ever made locally: the port's compiled game code is never uploaded or distributed (port/CLAUDE.md).
+# configured host build (port/cmake/macos_app.cmake) makes the app ("Frigate Black 2.app" or "Frigate White 2.app"),
+# signed ad hoc, and hdiutil makes a compressed disk image named after it, with the app and a link to /Applications to
+# drag it onto. The image is checked before the script ends: it verifies, the app in it passes codesign's strict check,
+# and it holds no ROM, save or other file of the game's. It is only ever made locally: the port's compiled game code is
+# never uploaded or distributed (port/CLAUDE.md).
 #
 #   port/tools/package_macos.sh [--build-dir DIR] [--out PATH]
 #
-#   --build-dir DIR  a host build configured with CMake (build/port by default); its PORT_VERSION picks the program
-#   --out PATH       the disk image (DIR/<program>-<version>.dmg by default). A path in a git work tree, this one or
-#                    another, must be one git ignores, such as one under build/, so that the image is never committed
+#   --build-dir DIR  a host build configured with CMake (build/port by default); its PORT_VERSION picks the app
+#   --out PATH       the disk image (by default DIR/<app> <version>.dmg, "Frigate Black 2 0.0.N.dmg"). A path in a git
+#                    work tree, this one or another, must be one git ignores, such as one under build/, so that the
+#                    image is never committed
 set -eu
 
 repo=$(cd "$(dirname "$0")/../.." && pwd)
@@ -69,23 +71,24 @@ if [ -n "$out" ]; then
     check_out
 fi
 
-version_name=$(sed -n 's/^PORT_VERSION:[A-Z]*=//p' "$build_dir/CMakeCache.txt")
-case "$version_name" in
-b2_us) program=pokeblack2 ;;
-w2_us) program=pokewhite2 ;;
-*)
-    echo "package_macos.sh: $build_dir has no PORT_VERSION this script knows ($version_name)" >&2
+# The app's target and name, as port/cmake/macos_app.cmake records them in the build's cache
+cache_value() {
+    sed -n "s/^$1:[A-Z]*=//p" "$build_dir/CMakeCache.txt"
+}
+target=$(cache_value PORT_MACOS_APP_TARGET)
+app_name=$(cache_value PORT_MACOS_APP_NAME)
+if [ -z "$target" ] || [ -z "$app_name" ]; then
+    echo "package_macos.sh: $build_dir doesn't name its macOS app; configure it again:" \
+        "cmake -S port -B $build_dir" >&2
     exit 2
-    ;;
-esac
+fi
 
-cmake --build "$build_dir" --target "${program}_app"
-app="$build_dir/$program.app"
+cmake --build "$build_dir" --target "$target"
+app="$build_dir/$app_name.app"
 plist="$app/Contents/Info.plist"
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")
-display_name=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$plist")
 if [ -z "$out" ]; then
-    out="$build_dir/$program-$version.dmg"
+    out="$build_dir/$app_name $version.dmg"
 fi
 check_out
 mkdir -p "$(dirname "$out")"
@@ -103,16 +106,16 @@ trap 'exit 130' INT TERM
 
 # The image's contents: the app, copied with ditto to keep its signature's extended attributes, and /Applications
 mkdir "$work/image"
-ditto "$app" "$work/image/$program.app"
+ditto "$app" "$work/image/$app_name.app"
 ln -s /Applications "$work/image/Applications"
 rm -f "$out"
-hdiutil create -quiet -volname "$display_name" -srcfolder "$work/image" -fs HFS+ -format UDZO "$out"
+hdiutil create -quiet -volname "$app_name" -srcfolder "$work/image" -fs HFS+ -format UDZO "$out"
 
 # The checks: the image's checksums, the app's signature as it is in the image, and nothing of the game's in it
 hdiutil verify -quiet "$out"
 mkdir "$mount_point"
 hdiutil attach -quiet -readonly -nobrowse -mountpoint "$mount_point" "$out"
-codesign --verify --deep --strict "$mount_point/$program.app"
+codesign --verify --deep --strict "$mount_point/$app_name.app"
 found=$(find "$mount_point" \( -iname '*.nds' -o -iname '*.srl' -o -iname '*.sav' -o -iname '*.dsv' -o -iname '*.narc' \
     -o -iname '*.sdat' \) -print)
 if [ -n "$found" ]; then
@@ -124,4 +127,4 @@ hdiutil detach -quiet "$mount_point"
 rmdir "$mount_point"
 
 size=$(du -h "$out" | cut -f1)
-echo "package_macos.sh: $out ($size): $program.app $version, signed ad hoc"
+echo "package_macos.sh: $out ($size): $app_name.app $version, signed ad hoc"

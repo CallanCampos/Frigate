@@ -489,7 +489,7 @@ const char *port_rom_default_path(void) {
     if (path != NULL && path[0] != '\0') {
         return path;
     }
-    path = getenv("POKEBW2_ROM");
+    path = getenv(PORT_ROM_ENVIRONMENT_VARIABLE);
     if (path != NULL && path[0] != '\0') {
         return path;
     }
@@ -521,9 +521,9 @@ void port_rom_boot(void) {
 
         if (path == NULL) {
             snprintf(reason, sizeof(reason),
-                     "no ROM. Give the path of your dump of %s (game code %s) with --rom PATH, or in the POKEBW2_ROM "
+                     "no ROM. Give the path of your dump of %s (game code %s) with --rom PATH, or in the %s "
                      "environment variable",
-                     port_rom_manifest_title, port_rom_manifest_game_code);
+                     port_rom_manifest_title, port_rom_manifest_game_code, PORT_ROM_ENVIRONMENT_VARIABLE);
             StopWithoutRom(reason);
         }
         verdict = port_rom_open(path, message, sizeof(message));

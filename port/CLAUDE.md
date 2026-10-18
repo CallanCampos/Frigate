@@ -1,9 +1,46 @@
 # Port rules
 
 This repository, `CallanCampos/pokebw2-native`, is the decomp `fuddlesworth/pokebw2` with its full history, merged
-continuously, plus a native port in `port/`. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the port stands
-is [docs/STATUS.md](docs/STATUS.md). The root `CLAUDE.md` is upstream's and applies here as this file says; for port
-work, this file wins where the two differ.
+continuously, plus Frigate, a native port, in `port/`. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the
+port stands is [docs/STATUS.md](docs/STATUS.md). The root `CLAUDE.md` is upstream's and applies here as this file says;
+for port work, this file wins where the two differ.
+
+## The port is Frigate
+
+The user named the port Frigate on 2026-10-18, in the line of community ports such as Ship of Harkinian.
+
+- **What it is, in one line:** Frigate is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the
+  pokebw2 decompilation; you supply your own ROM. Wherever the name is presented (the landing page `.github/README.md`,
+  [README.md](README.md), the program's `--help`, the macOS app's About window), it also says that Frigate is not
+  affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.
+- **What the player sees is named Frigate:** the programs `frigate-black2` and `frigate-white2`; the apps
+  `Frigate Black 2.app` and `Frigate White 2.app` (`CFBundleName` Frigate, bundle identifiers
+  `io.github.callancampos.frigate.black2` and `.white2`) and their disk images; the window's title, "Frigate — Pokémon
+  Black 2"; the folders of the saves and logs (`~/Library/Application Support/Frigate`, `~/Library/Logs/Frigate`, and
+  `Frigate` under the user's data folder on Linux and Windows); and the `FRIGATE_ROM` variable. Each name is set in one
+  place: `PORT_PRODUCT_NAME` in [hal/os/port_app.h](hal/os/port_app.h) for the C, and the top of
+  [CMakeLists.txt](CMakeLists.txt) and [cmake/macos_app.cmake](cmake/macos_app.cmake) for the build.
+- **The layer keeps its own names:** the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables and
+  `port_*` targets, `pokebw2_game` (the decomp's code), `pbw-oracle` and the `pbwinput` format, the `port-*.yml`
+  workflows and the "port:" prefix of the program's messages. The repository stays `CallanCampos/pokebw2-native`
+  (renaming it is the user's call), and so does the clone's directory.
+- **Living documents say Frigate** where they mean the port as a product; "the port" stays for the code and the layer.
+  Records keep the names of their time: past STATUS.md entries, the research notes in `docs/research/` and RESEARCH.md,
+  and ADR decisions as written (an ADR may get a one-line note).
+
+## Code that modders can read
+
+The user asked that the code be easy for people to read and find their way in: what everything does, and which part of
+the game each piece touches, for the modders who come later.
+
+- **Every port file opens with what it does and which game functionality it touches**: a header comment (a docstring
+  in Python, a comment block in CMake, shell and YAML) that says what the file is for, which part of the game or the DS
+  it serves (the saves, the title screen's 3D, the touch screen, the ARM7's sound driver), and where the code it works
+  with lives (the decomp's files, the SDK module it replaces, its header). A reader who opens any one file knows what
+  it does without opening another.
+- **A new module gets its row in its directory's guide and in the architecture map**, in the same commit as the
+  module: the guide is the directory's `README.md` (created with the directory's first module where there is none
+  yet), and the architecture map is [README.md](README.md)'s directory map.
 
 ## Where to work
 

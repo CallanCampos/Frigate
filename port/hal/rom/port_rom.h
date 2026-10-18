@@ -1,5 +1,5 @@
 // The player's ROM, the program's one source of the game's files (PLAN.md §1, §4.5). The ROM is opened once per
-// process from the dump the player gives: --rom PATH, else the POKEBW2_ROM environment variable, else, for
+// process from the dump the player gives: --rom PATH, else the FRIGATE_ROM environment variable, else, for
 // development, orig/baserom_<version>.nds in the repository the program was built from. It is mapped read-only and
 // checked: its game code must be the version the program was built for (IREO for Black 2, IRDO for White 2), and the
 // dump must be the one the decomp builds, by the SHA-1 of the whole file (b2_us.sha1, w2_us.sha1), or, failing that,
@@ -20,6 +20,9 @@
 
 // The exit status of a program that has no usable ROM (sysexits.h's EX_NOINPUT)
 #define PORT_ROM_EXIT_STATUS 66
+
+// The environment variable that names the player's ROM when --rom doesn't
+#define PORT_ROM_ENVIRONMENT_VARIABLE "FRIGATE_ROM"
 
 // How a ROM passed its check
 typedef enum PortRomVerdict {

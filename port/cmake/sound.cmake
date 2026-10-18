@@ -5,7 +5,7 @@
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/audio/audio.c")
 
 # The tests: each scenario on the whole program's objects with a main() of its own, one a process, as port/tests/pxi
-# does, since the ARM9's sound libraries start once a process. The rom_ scenarios need the player's ROM (POKEBW2_ROM,
+# does, since the ARM9's sound libraries start once a process. The rom_ scenarios need the player's ROM (FRIGATE_ROM,
 # else orig/baserom_<version>.nds) and skip (77) without it
 enable_testing()
 add_executable(port_snd_tests

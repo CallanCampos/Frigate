@@ -32,8 +32,8 @@ expect() {
 
 # Builds an app from the program $1 into $2 and prints the script's exit status, its messages in $work/messages
 make_app() {
-    "$script" --program "$1" --app "$2" --plist "$plist" --bundle-id com.example.test.prog --display-name Prog \
-        --repo "$repo" >/dev/null 2>"$work/messages"
+    "$script" --program "$1" --app "$2" --plist "$plist" --bundle-id io.github.callancampos.frigate.test \
+        --name "Test Name" --display-name "Prog App" --repo "$repo" >/dev/null 2>"$work/messages"
     echo $?
 }
 
@@ -83,6 +83,14 @@ expect "the program's search paths" "$(search_paths "$app/Contents/MacOS/prog")"
 expect "libbar's search paths" "$(search_paths "$app/Contents/Frameworks/libbar.dylib")" "@loader_path"
 expect "libbaz's search paths" "$(search_paths "$app/Contents/Frameworks/libbaz.dylib")" ""
 expect "nothing left beside the app" "$(ls "$work/out dir")" "Prog.app"
+# Its Info.plist: the names and the identifier as given, the program's file as the executable
+info() {
+    plutil -extract "$1" raw -o - "$app/Contents/Info.plist"
+}
+expect "CFBundleName" "$(info CFBundleName)" "Test Name"
+expect "CFBundleDisplayName" "$(info CFBundleDisplayName)" "Prog App"
+expect "CFBundleIdentifier" "$(info CFBundleIdentifier)" io.github.callancampos.frigate.test
+expect "CFBundleExecutable" "$(info CFBundleExecutable)" prog
 mv "$app" "$work/Moved.app"
 mv "$work/lib a" "$work/lib a gone"
 mv "$work/lib b" "$work/lib b gone"

@@ -27,9 +27,12 @@
 #include "app/gamepad.h"
 #include "gfx/screens.h"
 #include "hal/input/port_input.h"
+#include "hal/os/port_app.h"
 #include "hal/os/port_os.h"
+#include "hal/rom/rom_manifest.h"
 #include "hal/tp/tp_host.h"
 #include <SDL3/SDL.h>
+#include <stdio.h>
 #include <string.h>
 
 #define STACKED_HEIGHT (PORT_SCREEN_HEIGHT * 2)
@@ -64,12 +67,16 @@ static SDL_Texture *sTexture;
 static bool sTouching;
 
 int port_present_open(void) {
+    char title[128];
+
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
         SDL_Log("port: SDL_Init failed: %s", SDL_GetError());
         return 0;
     }
-    sWindow = SDL_CreateWindow("Pokémon Black 2 and White 2 (native port)", PORT_SCREEN_WIDTH * WINDOW_SCALE,
-                               STACKED_HEIGHT * WINDOW_SCALE, SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE);
+    // The product and the game it runs: "Frigate — Pokémon Black 2"
+    snprintf(title, sizeof(title), "%s — %s", PORT_PRODUCT_NAME, port_rom_manifest_game);
+    sWindow = SDL_CreateWindow(title, PORT_SCREEN_WIDTH * WINDOW_SCALE, STACKED_HEIGHT * WINDOW_SCALE,
+                               SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE);
     if (sWindow == NULL) {
         SDL_Log("port: SDL_CreateWindow failed: %s", SDL_GetError());
         port_present_close();

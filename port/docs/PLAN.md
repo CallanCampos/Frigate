@@ -1,8 +1,8 @@
-# Native port of Pokémon Black 2 and White 2: plan
+# Frigate: plan
 
-How we build a native Mac port (Apple Silicon first) and then Windows and Linux ports of Black 2 and White 2 from the
-pokebw2 decompilation, and how development runs, is tested and keeps up with the decomp. The findings behind each
-decision are in [RESEARCH.md](RESEARCH.md). Written 2026-10-16 against `fuddlesworth/pokebw2` at `0c2bbee9d`; the
+How we build Frigate, a native Mac port (Apple Silicon first) and then Windows and Linux ports of Black 2 and White 2
+from the pokebw2 decompilation, and how development runs, is tested and keeps up with the decomp. The findings behind
+each decision are in [RESEARCH.md](RESEARCH.md). Written 2026-10-16 against `fuddlesworth/pokebw2` at `0c2bbee9d`; the
 numbers are from that commit. The port repository, `CallanCampos/pokebw2-native`, was seeded from upstream `main` at
 `462e90193` (§4.1).
 
