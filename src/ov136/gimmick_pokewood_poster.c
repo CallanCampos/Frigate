@@ -1,6 +1,7 @@
 // The movie posters of Pokéstar Studios (Pokewood). The file's name is descriptive: the overlay has no name string.
 // A model with four poster textures, which show the series of the last four movies filmed, as the save keeps them
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_exp_obj.h"
 #include "field/gimmick_pokewood_poster.h"
@@ -115,8 +116,8 @@ static void func_ov136_021eedc0(void *texResource, const char *texName, const ch
     u32 plttAddr = func_ov136_021eef20(tex, plttName);
     NNSG2dCharacterData *character = NULL;
     NNSG2dPaletteData *palette = NULL;
-    void *characterFile = GFL_G2DIOReadBGNCGR(0x126, image * 2 + 1, TRUE, &character, heapId);
-    void *paletteFile = GFL_G2DIOReadNCLR(0x126, image * 2, &palette, heapId);
+    void *characterFile = GFL_G2DIOReadBGNCGR(ARCID_GIMMICK_POKEWOOD_POSTER, image * 2 + 1, TRUE, &character, heapId);
+    void *paletteFile = GFL_G2DIOReadNCLR(ARCID_GIMMICK_POKEWOOD_POSTER, image * 2, &palette, heapId);
     GFLBitmap *bitmap =
         GFL_BitmapWrap(character->rawData, sTileWidth, sTileHeight, sTilePixels * sTilePixels / 2, heapId);
 

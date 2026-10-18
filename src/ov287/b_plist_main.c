@@ -1056,7 +1056,7 @@ static void BPlistMain_LoadGraphics(BPlistWork *work) {
     NNSG2dScreenData *scrn;
     void *buf;
 
-    arc = GFL_ArcSysCreateFileHandle(99, HEAPID_TAIL(work->param->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_B_PLIST, HEAPID_TAIL(work->param->heapId));
     GFL_BGSysLoadArcNCGRStatic(arc, 18, 7, 0, 0, TRUE, work->param->heapId);
     buf = GFL_G2DIOReadNSCRArc(arc, 16, TRUE, &scrn, work->param->heapId);
     BPlistAnm_CutButtonScrn(work, scrn->rawData);
@@ -1345,7 +1345,7 @@ static void BPlistMain_LoadPageScrn(BPlistWork *work, u8 page) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        buf = GFL_G2DIOReadNSCR(99, data_ov287_021fb50c[page][i], TRUE, &scrn, work->param->heapId);
+        buf = GFL_G2DIOReadNSCR(ARCID_B_PLIST, data_ov287_021fb50c[page][i], TRUE, &scrn, work->param->heapId);
         GFL_BGSysLoadScrAreaAll(i + 6, scrn->rawData, 0, 0, 32, 24);
         GFL_BGSysQueueScrLoad(i + 6);
         GFL_HeapFree(buf);

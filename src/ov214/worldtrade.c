@@ -308,7 +308,7 @@ static void WorldTrade_InitCellActor(WorldTradeWork *wk, const BGSysVRAMConfig *
         cellFile = 0xc;
         plttFile = 4;
     }
-    arc = GFL_ArcSysCreateFileHandle(30, HEAPID_WORLDTRADE);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_WORLDTRADE);
     wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR] =
         func_0204b81c(arc, charFile, FALSE, CLACT_VRAM_SUB, HEAPID_WORLDTRADE);
     wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT] =

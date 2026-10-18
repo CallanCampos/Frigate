@@ -207,7 +207,7 @@ LocalTvtChara *LocalTvtChara_Create(const LocalTvtCharaSetup *setup, HeapID heap
     chara->half = 1;
     chara->seq = CHARA_SEQ_IDLE;
     chara->heapId = heapId;
-    chara->arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT, chara->heapId);
+    chara->arc = GFL_ArcSysCreateFileHandle(ARCID_LOCAL_TVT, chara->heapId);
     chara->nameMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_NAMES, chara->heapId);
     LocalTvtChara_CreateCursor(chara);
     GFL_BGSysSetBGEnabled(0, FALSE);
@@ -740,7 +740,7 @@ static void LocalTvtFace_SetVisible(LocalTvtFace *face, BOOL visible) {
 
 // The cursor that points at the name of the face that talks
 static void LocalTvtChara_CreateCursor(LocalTvtChara *chara) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT_COMMON, chara->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, chara->heapId);
     ClActorSetup setup;
 
     chara->cursorPalette = func_0204bc48(arc, 3, 0, 0, chara->heapId);

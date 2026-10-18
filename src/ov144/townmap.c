@@ -46,8 +46,6 @@
 // this one file, since every part is only reached from the process's functions and its .rodata is a single run. It
 // ends with the empty VBlank task that the process adds, just before townmap_grh.c's TownMapGraphic_Create
 
-#define ARCID_TOWNMAP_GRA 84
-
 // The parameters of the process, which the field's callers allocate (they declare the layout themselves)
 typedef struct {
     // TOWNMAP_MODE_*

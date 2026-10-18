@@ -13,6 +13,7 @@
 #include "battle/btlv_effect.h"
 #include "battle/btlv_gauge.h"
 #include "battle/btlv_mcss.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -1869,8 +1870,8 @@ static BOOL BtlvEffvm_CmdLoadBg(VM *vm, void *env) {
     u32 fileId = VM_Read32(vm);
 
     GFL_BGSysSetBGPriority(3, 1);
-    GFL_BGSysLoadNCGRStatic(94, fileId + 1, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
-    loadBGScrToVramByNarcNoReserveNegAlign(94, fileId, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
+    GFL_BGSysLoadNCGRStatic(ARCID_BTLV_EFFVM_BG, fileId + 1, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_BTLV_EFFVM_BG, fileId, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
     PaletteFade_LoadNCLREx(BtlvEffect_GetPaletteFade(), 94, fileId + 2, HEAPID_TAIL(wk->heapId), 0, 0, 0x80, 0);
     wk->bgX = GFL_BGSysGetBGOffsetX(3);
     wk->bgY = GFL_BGSysGetBGOffsetY(3);
@@ -1919,7 +1920,7 @@ static BOOL BtlvEffvm_CmdBgPalAnim(VM *vm, void *env) {
 
     work->wk = wk;
     work->loops = loops;
-    data = GFL_ArcSysReadHeapNewLZ(231, fileId, FALSE, HEAPID_TAIL(wk->heapId));
+    data = GFL_ArcSysReadHeapNewLZ(ARCID_BTLV_EFFVM_PAL_ANIM, fileId, FALSE, HEAPID_TAIL(wk->heapId));
     work->fileId = fileId + 1;
     palettes = data;
     for (i = 0; *palettes != 0xff; i++) {
@@ -4410,7 +4411,7 @@ static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data) {
             return;
         }
         offset = (work->palettes[work->index] - 8) * 16;
-        file = GFL_G2DIOReadNCLR(231, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
+        file = GFL_G2DIOReadNCLR(ARCID_BTLV_EFFVM_PAL_ANIM, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
         MIi_CpuCopy16((u16 *)palette->rawData + offset,
                       PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 0) + 0x80, 0x20);
         PaletteFade_ApplyPalette(BtlvEffect_GetPaletteFade(), 8, 0);

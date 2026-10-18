@@ -25,6 +25,7 @@ res/
   lighting/{field,battle}/
   town_map/
   sound/{sequences,banks,wave_archives,streams}/
+  graphics/<archive>/       the menus', apps' and screens' 2D graphics, an archive each
   text/{system,script}/
 generated/                  the constant lists: species.txt, items.txt, obj_codes.txt, sound.txt and the others
 ```
@@ -47,7 +48,8 @@ The sources come in these kinds:
   [Map model sources](#map-model-sources)).
 - **Indexed PNG, JASC palettes, and WAV**, for each Pokémon's battle sprites, icons, footprints, and cries under
   `res/pokemon/<species>/`, and the trainer sprites under `res/trainers/sprites/`. Nitro cell and animation
-  resources remain as separate binary files next to the images.
+  resources remain as separate binary files next to the images; and for the 2D graphics of the menus, apps and
+  screens under `res/graphics/<archive>/` (see [2D graphics](#2d-graphics)).
 
 The JSON and assembly sources use the same constants as the C code (see [Constant lists](#constant-lists)): the JSON
 by name, the assembly through the C preprocessor. Each archive has a script that wrote its sources from the original,
@@ -84,6 +86,7 @@ which documents the format and can write them again.
 | `a/2/6/2`, `a/2/6/1` | `res/trainers/facilities/black_tower/` (JSON) | Black Tower and White Treehollow trainers and Pokémon | `tools/data/facility_data.py` |
 | `a/2/4/8` to `a/2/5/7` | `res/trainers/facilities/pwt_*/` (JSON) | Pokémon World Tournament trainers, Pokémon and rental Pokémon | `tools/data/facility_data.py` |
 | `a/1/6/9` | `res/trainers/ai/` | Trainer AI scripts, see [Scripts](scripts.md) | `tools/script/tr_ai_script.py` |
+| `ARCID_*` in `include/constants/arc.h` | `res/graphics/<archive>/` (PNG, palette, Nitro screens, cells and animations) | The 2D graphics of the menus, apps and screens, see [2D graphics](#2d-graphics) | `tools/data/graphics_archive.py` |
 
 The text archives are packed by `text_data.py` from text files rather than assembled; `configure.py` lists them in
 `TEXT_ARCHIVES`.
@@ -1031,3 +1034,37 @@ when it runs, or, for type 1, conditions on variables. A zone's header gives the
 in `res/field/zones/`), and `tools/data/event_data.py pack` puts each zone's events at that number; the numbers in
 `res/field/events/placeholders.json`, which no zone uses, hold the game's 4-byte placeholder. Both versions have the same
 events.
+
+## 2D graphics
+
+The menus, apps and screens keep their 2D graphics in archives of Nitro resources, an archive each: the title screen's,
+the Pokédex's (`ARCID_ZUKAN_GRA`), the box's (`ARCID_BOX2`) and the others. Each is `res/graphics/<archive>/`, named
+after its `ARCID_*` constant in `include/constants/arc.h`, whose number gives the archive's file (`ARCID_TITLE`, 26, is
+`a/0/2/6`); `configure.py` packs a directory for each, 110 of them. An archive that swan doesn't name is named after
+the source file that loads it, or the prefix of an app's files where several load it (`ARCID_BTLV` for the
+`btlv_*.c` files), in the block at the end of `arc.h` with its loaders. Twelve archives with graphics, `a/0/0/0`,
+`a/0/0/1`, `a/0/3/5`, `a/0/4/3`, `a/0/5/4`, `a/0/5/5`, `a/0/6/4`, `a/0/6/7`, `a/1/2/1`, `a/1/4/0`, `a/1/4/1` and
+`a/2/4/6`, have no loader found yet, so no name, and stay as the ROM has them until code that loads them is; the font's
+archive is the font's. The members are files in the archive's order, named after their number in it, or
+after their constant where `generated/narc_<archive>.txt` names them (`professor.png` for `NARC_INTRO_PROFESSOR_NCGR`):
+
+- a character resource (NCGR), the tiles of a screen or the characters of a sprite, is an indexed PNG (`05.png`), 4bpp
+  or 8bpp as the resource is. Its pixels are the palette indices that the game draws, so edit it in indexed mode and
+  keep the palette's order: the packer reads the indices, not the colors. Its colors are only a preview, from the
+  archive's nearest palette, since which palette and which 16-color bank a screen or sprite uses is the code's and the
+  screen's to say. A background's PNG is as wide as the game's tile sheet, and a sprite's characters, which have no
+  size, are drawn in rows of four tiles, as a 32 by 32 OBJ stores them.
+- a palette resource (NCLR) is a JASC palette (`11.pal`), which sets the colors.
+- the rest are the members themselves, decompressed: screens (`.nscr`), which place the tiles, cells (`.ncer`), cell
+  animations (`.nanr`), multi-cells (`.nmcr`, `.nmar`), 3D models and animations (`.nsbmd`, `.nsbca`, `.nsbta`, `.nsbma`,
+  `.nsbtp`, `.nsbtx`) and other data (`.bin`). Tools such as NitroPaint edit them.
+
+`archive.json` lists the members that the game stores LZ-compressed (`{"compressed": {"05.png": "lz10"}}`), which the
+packer compresses again: an edited one as a valid stream of literals, an eighth larger than its data. A member that
+differs between the versions is in `black2/` and `white2/` instead, as eight of the title screen's are. An unchanged
+member packs as the game's own bytes. An edited one keeps the game's header with its new data and sizes: an image may
+change size, which a sized image's character position section follows, and a palette its number of colors, unless it
+has a PCMP section. A new member is the next number's file: a PNG becomes a sized character resource, 8bpp where its
+palette has more than 16 colors and 4bpp otherwise, a `.pal` a palette, and the rest go in as they are.
+`tools/data/graphics_archive.py dump ARCID_TITLE` writes an archive's directory again from both versions' files,
+replacing it and any edits.

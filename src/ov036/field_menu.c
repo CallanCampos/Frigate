@@ -209,7 +209,7 @@ FieldMenu *FieldMenu_Create(HeapID heapId, HeapID tmpHeapId, FieldSubscreen *sub
     menu->printQueue = func_02021998(menu->heapId);
     menu->scrollDirty = FALSE;
     menu->scrollY = 0;
-    arc = GFL_ArcSysCreateFileHandle(0x46, menu->tmpHeapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_MENU, menu->tmpHeapId);
     menuType = FieldMenu_GetMenuType(gameData, menu->eventWork, menu->zoneId);
     menu->menuType = menuType;
     func_ov036_0219ff20(menu, arc, menuType, menu->msgBGSys);

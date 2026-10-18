@@ -790,7 +790,7 @@ static void BBagMain_ExitBG(void) {
 }
 
 static void BBagMain_LoadGraphics(BBagWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(98, HEAPID_TAIL(work->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_BAG, HEAPID_TAIL(work->param->heapId));
 
     GFL_BGSysLoadArcNCGRStatic(arc, 0, 6, 0, 0, TRUE, work->param->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 4, 6, 0, 0, TRUE, work->param->heapId);

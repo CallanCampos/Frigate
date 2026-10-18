@@ -43,8 +43,7 @@
 // The detail screen's habitat map page, which the ROM does not name: the town map on the main screen with the areas
 // where the Pokémon lives in each season, and a cursor to pick a place for the Pokédex's habitat list
 
-// The town map's OBJ graphics, the Pokémon icons, and the habitats, a file per species
-#define ARCID_TOWNMAP_GRA 84
+// The Pokémon icons, and the habitats, a file per species
 #define ARCID_POKEICON 7
 #define ARCID_ZUKAN_AREA 176
 
