@@ -276,8 +276,9 @@ The port is a solo project (PLAN.md D10, [ADR 0002](docs/adr/0002-solo-project-n
 - **Never push to `upstream`; never force-push.** `bootstrap_checkout.sh` disables the `upstream` remote's push URL
   by setting it to `DISABLED-port-never-pushes-upstream`. Run it again whenever `git remote -v` shows another push URL
   for `upstream`, as it does after the remote is added again. `sync_upstream.sh` runs only in a checkout whose `origin`
-  is `CallanCampos/Frigate`; for a clone whose `origin` still has the old name, it prints the `git remote set-url`
-  command that updates it.
+  is `CallanCampos/Frigate`; for a clone whose `origin` still has the old name, it prints the command that updates it.
+  A worktree whose branch predates the rename runs the old script, which asks for the old name: merge `origin/main`
+  there and run it again, never set `origin` back.
 - **macOS builds are ad-hoc signed** (`codesign --force --sign -`) and never notarized: there is no Apple Developer
   account (PLAN.md D11, [ADR 0003](docs/adr/0003-ad-hoc-signing-no-apple-developer-account.md)). Nothing in the build
   may need a paid certificate, entitlements that require one, or notarization.

@@ -21,10 +21,10 @@
 #   1. Goes to the top of the clone. Requires origin to be CallanCampos/Frigate (https://github.com/... or
 #      git@github.com:..., with or without .git; not the decomp or its fork CallanCampos/pokebw2). A clone made before
 #      the repository's rename on 2026-10-18 still has its old name in origin's URL, which is refused too, with the
-#      git remote set-url command that fixes it. Also requires upstream to be fuddlesworth/pokebw2 (added when
-#      missing), no merge in progress and no changes to tracked files. It never stashes. It sets upstream's push URL to
-#      DISABLED-port-never-pushes-upstream when it is anything else, as bootstrap_checkout.sh does, so that a push
-#      there fails while fetching still works.
+#      command that fixes it: git remote set-url, or git config --replace-all when origin has several URLs of that
+#      kind. Also requires upstream to be fuddlesworth/pokebw2 (added when missing), no merge in progress and no
+#      changes to tracked files. It never stashes. It sets upstream's push URL to DISABLED-port-never-pushes-upstream
+#      when it is anything else, as bootstrap_checkout.sh does, so that a push there fails while fetching still works.
 #   2. Fetches both and brings HEAD up to origin/NAME: a fast-forward, or a merge when HEAD has commits of its own,
 #      which are then published too.
 #   3. Merges upstream/main with the message "Merge upstream fuddlesworth/pokebw2@<short>" and an
@@ -152,10 +152,14 @@ is_port_url() {
     is_github_url "$1" "$PORT_REPO"
 }
 
-# Refuses an origin URL that isn't the port repository's. $1 is the URL, $2 is --push for a push URL and empty for a
-# fetch URL, and $3 is how many URLs of that kind origin has: with more than one, the fix names the URL it replaces.
+# Refuses an origin URL that isn't the port repository's. $1 is the URL, $2 its key (url, or pushurl for a push URL)
+# and $3 how many URLs origin has under that key. A URL with the old name that is the only one gets git remote set-url.
+# One among several gets git config --replace-all with that URL as a pattern, escaped, anchored and quoted, because git
+# reads it as an extended regular expression that can match anywhere in a URL. git remote set-url takes such a pattern
+# too, but refuses when it matches more than one URL, as it does for a URL configured twice; --replace-all puts one new
+# URL in place of every match. A URL this function names is one of is_github_url's forms, so it has no quote to escape.
 check_origin_url() {
-    local url=$1 push=$2 count=$3 new fix
+    local url=$1 key=$2 count=$3 new fix
     is_port_url "$url" && return 0
     if is_github_url "$url" "$PORT_REPO_BEFORE_RENAME"; then
         case "$(lower "$url")" in
@@ -163,9 +167,13 @@ check_origin_url() {
             ssh://*) new=ssh://git@github.com/$PORT_REPO.git ;;
             *) new=https://github.com/$PORT_REPO.git ;;
         esac
-        fix="git remote set-url ${push:+$push }origin $new"
         if [ "$count" -gt 1 ]; then
-            fix="$fix $url"
+            fix="git config --replace-all remote.origin.$key $new"
+            fix="$fix '^$(printf '%s' "$url" | sed 's/[].*^$+?(){}|\[]/\\&/g')\$'"
+        elif [ "$key" = pushurl ]; then
+            fix="git remote set-url --push origin $new"
+        else
+            fix="git remote set-url origin $new"
         fi
         die 2 "origin is $url, which names the port repository as it was before the user renamed it $PORT_REPO on" \
             "2026-10-18. GitHub redirects the old name, but origin must name the repository as it is now. Update" \
@@ -193,13 +201,9 @@ git config --get remote.origin.url >/dev/null 2>&1 ||
 for origin_key in url pushurl; do
     origin_urls=$(git config --get-all "remote.origin.$origin_key" || true)
     origin_count=$(printf '%s' "$origin_urls" | grep -c '' || true)
-    origin_push=""
-    if [ "$origin_key" = pushurl ]; then
-        origin_push=--push
-    fi
     while IFS= read -r origin_url; do
         [ -n "$origin_url" ] || continue
-        check_origin_url "$origin_url" "$origin_push" "$origin_count"
+        check_origin_url "$origin_url" "$origin_key" "$origin_count"
     done <<EOF
 $origin_urls
 EOF

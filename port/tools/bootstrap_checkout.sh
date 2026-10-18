@@ -270,8 +270,10 @@ fi
 
 # gh's default repository: port_guard.py lets a gh write without -R through only when it is the port. When
 # gh repo set-default named a remote, gh-resolved is "base" and the repository is that remote's URL. A clone made
-# before the repository was renamed CallanCampos/Frigate (2026-10-18) has the old name in origin's URL until it is
-# updated, so the default it resolves to is the old name.
+# before the repository was renamed CallanCampos/Frigate (2026-10-18) has the old name, CallanCampos/pokebw2-native, in
+# origin's URL until it is updated, so the default it resolves to is the old name: that clone gets the git remote
+# set-url command, in its URL's transport as sync_upstream.sh gives it. Any other default that isn't the port, origin
+# on another repository included, gets gh repo set-default.
 gh_default=$(git -C "$root" config --get-regexp '^remote\..*\.gh-resolved$' || true)
 gh_remote=""
 case "$gh_default" in
@@ -282,18 +284,28 @@ case "$gh_default" in
         gh_default=$(git -C "$root" remote get-url "$gh_remote" 2>/dev/null || true)
         ;;
 esac
-case "$(printf '%s' "$gh_default" | tr '[:upper:]' '[:lower:]')" in
+gh_default_lower=$(printf '%s' "$gh_default" | tr '[:upper:]' '[:lower:]')
+gh_fix="gh repo set-default CallanCampos/Frigate"
+case "$gh_default_lower" in
     *[[:space:]/:]callancampos/frigate | *[[:space:]/:]callancampos/frigate.git | *[[:space:]/:]callancampos/frigate/)
         echo "  gh: the default repository is the port"
         ;;
-    *)
+    *github.com[/:]callancampos/pokebw2-native | *github.com[/:]callancampos/pokebw2-native.git | \
+        *github.com[/:]callancampos/pokebw2-native/)
         if [ "$gh_remote" = origin ]; then
-            echo "  gh: the default repository is origin, whose URL isn't CallanCampos/Frigate's (a clone made" \
-                "before the rename keeps the old name); run" \
-                "git remote set-url origin https://github.com/CallanCampos/Frigate.git"
+            case "$gh_default_lower" in
+                git@*) gh_fix="git remote set-url origin git@github.com:CallanCampos/Frigate.git" ;;
+                ssh://*) gh_fix="git remote set-url origin ssh://git@github.com/CallanCampos/Frigate.git" ;;
+                *) gh_fix="git remote set-url origin https://github.com/CallanCampos/Frigate.git" ;;
+            esac
+            echo "  gh: the default repository is origin, whose URL still has the port's name from before its rename" \
+                "to CallanCampos/Frigate; run $gh_fix"
         else
-            echo "  gh: the default repository isn't the port; run gh repo set-default CallanCampos/Frigate"
+            echo "  gh: the default repository isn't the port; run $gh_fix"
         fi
+        ;;
+    *)
+        echo "  gh: the default repository isn't the port; run $gh_fix"
         ;;
 esac
 

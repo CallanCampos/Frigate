@@ -124,9 +124,13 @@ It refuses to run when a URL of `origin` (fetch or push) isn't `CallanCampos/Fri
 `git@github.com:...`, with or without `.git` (so not the decomp or its fork `CallanCampos/pokebw2`), when tracked files
 have changes, or when a merge is in progress; it never stashes. A clone made before the repository's rename on
 2026-10-18 still has the old name in `origin`'s URL, which GitHub redirects: the script refuses it too and prints the
-command that updates it, such as `git remote set-url origin https://github.com/CallanCampos/Frigate.git`. It adds the
-`upstream` remote when it is missing, and sets that remote's push URL to `DISABLED-port-never-pushes-upstream` whenever
-it is anything else, as `bootstrap_checkout.sh` does, so that a push there fails while fetching still works. It
+command that updates it, such as `git remote set-url origin https://github.com/CallanCampos/Frigate.git`; when `origin`
+has several URLs of that kind, it is `git config --replace-all` instead, naming the URL to replace as an escaped,
+anchored pattern, which `git remote set-url` refuses when the pattern matches more than one URL. A worktree whose branch
+predates the rename still runs the old script, which refuses the new URL and asks for the old name: never set `origin`
+back, but run `git fetch origin && git merge origin/main` there, which brings the current script, and run it again. It
+adds the `upstream` remote when it is missing, and sets that remote's push URL to `DISABLED-port-never-pushes-upstream`
+whenever it is anything else, as `bootstrap_checkout.sh` does, so that a push there fails while fetching still works. It
 fast-forwards to `origin/main`, checks for a rewrite of upstream's history, checks commit messages for issues in other
 repositories (see [below](#commit-messages-that-name-other-repositories)), merges upstream `main` with the same message
 and trailer as the Action, runs `python3 configure.py b2_us w2_us` and `ninja` (once more if ninja exits 139, wibo's
