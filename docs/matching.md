@@ -2234,9 +2234,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Two calls to one function at different depths, one ending an arm of an inner `if`/`else` and one in the outer
   `else`, are cross-jumped at the `bl` alone, even when their argument moves are in different orders: the inner arm
   ends in `b` to the outer copy's `bl`. Neither the callee's spelling, the tests' polarity nor nesting the tests
-  keeps them apart. The original's separate `bl; b exit` in libVCT's `VCT_ReadSamples` (`vct_audio.c`) came back
-  only with a statement ending the outer then-arm that emits nothing but keeps its block, `heard = received;` between
-  two flags that share a register, which only shapes code there (its row).
+  keeps them apart. A statement written after each call, at the end of both outer arms, does: cross-jumping merges
+  that statement's copies instead, the inner `if`'s join keeps a `b` to the shared one, and the calls are never
+  compared. `unity_tower_register.c`'s `UnityTowerSurvey_RegisterVisitor` keeps its inner
+  `UnityTowerVisitors_Remove(visitors, 0)` (`bl; b`) apart from the outer `else`'s so, with
+  `UnityTowerSurvey_AddVisitor` written in both arms, as `ConfigPanelAppBar_Main` keeps its sounds (below), and a
+  ten-line ARM function does the same with any plain statement there. A statement that ends in a conditional branch
+  doesn't: of `if (sEchoCancel) { VCT_SaveFarEnd(dst, size); }` written in both arms only the calls are merged, and
+  each arm keeps its own test. The original's separate `bl; b exit` in libVCT's `VCT_ReadSamples` (`vct_audio.c`),
+  whose next statement is that test, came back only with a statement ending the outer then-arm that emits nothing
+  but keeps its block, `heard = received;` between two flags that share a register, which only shapes code there
+  (its row).
 - A load that both arms of an `if`/`else` begin with is hoisted above the branch, between the test and the `beq`.
   When the original loads it first in each arm, after the branch, one arm began with another statement that the
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
@@ -2364,6 +2372,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loading the divider's base, as the original does, only through NitroSDK's `CP_SetDiv64_32` and
   `CP_GetDivResult32` (`nitro/cp.h`), which write the operands and read the result through plain pointers to the
   registers' addresses; with the `volatile` `reg_CP_*` registers the base's load goes first in every spelling.
+  A plain store has memory successors when the stores after it are kept in order: stores into one object, or into
+  the upper half of a small one. `poke_net.c`'s `POKE_NET_Release` stores `HasSvlToken`, then loads
+  `gPOKE_NET_Control`'s address plus 0x200 from the pool, then stores `ServerURL[0]` and, through that address,
+  `ServerPort`, all three fields of `gPOKE_NET_Control`. libVCT's `VCT_CheckTimeout` (`vct_session.c`) stores the
+  low word of its `u64` `sRequestTime = 0;` before loading `sSessionPool`'s address: the high word's store follows
+  it in the same object and, at 4 of the 8 bytes, stays above the `sSessionPool` stores. `VCT_ResetCapture`
+  (`vct_dsp.c`), whose stores alternate between `sNoiseFloor` and `sCapture`, loads the address first in every
+  natural spelling (its row).
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle

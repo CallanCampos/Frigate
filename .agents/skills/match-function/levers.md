@@ -327,7 +327,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
 - A literal-pool load (an I/O base) that ours places above a store the original makes first: a block boundary, as
   above, or `volatile` register stores after both where the original's are plain, as NitroSDK's divider inlines
-  (`CP_SetDiv64_32`) write them. (matching.md: "A literal-pool load goes above a plain store")
+  (`CP_SetDiv64_32`) write them. A plain store goes first when stores after it stay in order: stores into the same
+  object, or a `u64`'s high word. (matching.md: "A literal-pool load goes above a plain store", "memory successors")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
 - A loop-invariant part of a sum added second (`adds r1, r3, r0`, the counter first) where the original adds it first:
@@ -639,7 +640,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   code was written there. (matching.md: "Identical statements in different branches")
 - A branch to the next instruction comes from cross-jumping a shared tail. (matching.md: "cross-jumping")
 - One `bl` shared by an inner arm (which ends in `b` to it) and the outer `else`, where the original has two: the
-  calls were cross-jumped at the `bl` alone; the original's outer then-arm ended in a block of its own.
+  calls were cross-jumped at the `bl` alone; the original's outer then-arm ended in a block of its own, such as a
+  plain statement written after the call in both outer arms (one ending in a conditional branch doesn't merge).
   (matching.md: "at different depths")
 - A field loaded again right after a join (`ldr r0, [r7]`) where ours reuses the stored register, with a `b` to a
   `b`: the store was written at the end of both arms. (matching.md: "loaded again right after it")
