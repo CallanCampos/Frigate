@@ -8,12 +8,15 @@
   (the window's), the logos 1200 px wide at their SVG's proportions;
 - every small image's PNG holds its SVG's ship pixel for pixel: each pixel of the rig and of the hull, which the SVG
   draws as whole-pixel rectangles, is exactly the artwork's colour and opaque, and no other pixel is, so a render that
-  blurred or moved the ship fails.
+  blurred or moved the ship fails;
+- every small image's ship stays clear of its plate's outermost pixel, the one White 2's edge darkens and Black 2's
+  plate shades off in, so that the edge keeps the plate's shape all round.
 
 Whether the large PNGs show what the SVGs draw needs AppKit: tools/render.py renders them again (README.md).
 
 usage: test_branding.py WORK_DIR   (the CMake test assets_branding, port/cmake/assets.cmake)
 """
+import math
 import os
 import re
 import shutil
@@ -105,6 +108,17 @@ def sprite_cells(svg):
     return ship
 
 
+def plate_inside(svg):
+    """The pixels of a small image's plate inside its outermost pixel, both ways: the plate is the first path, the 1024
+    grid's plate (100 to 924) under a translate and a scale, and its outermost pixel is the one-pixel band inside its
+    outline."""
+    plate = ET.parse(svg).getroot().findall(SVG_NS + "path")[0]
+    offset, _, k = (float(v) for v in re.fullmatch(r"translate\((\S+) (\S+)\) scale\((\S+)\)",
+                                                   plate.get("transform")).groups())
+    first, last = offset + 100 * k, offset + 924 * k
+    return range(math.ceil(first + 1), math.floor(last - 1))
+
+
 def view_box(path):
     with open(path) as f:
         return [float(v) for v in re.search(r'viewBox="([^"]+)"', f.read()).group(1).split()]
@@ -150,10 +164,15 @@ def main():
         if header != (size, size, 8, 6):
             continue
         pixels = png_pixels(os.path.join(BRANDING, name))
+        inside = plate_inside(os.path.join(BRANDING, svg))
         for part, (colour, cells) in zip(("rig", "hull"), sprite_cells(os.path.join(BRANDING, svg))):
+            out = sorted(cell for cell in cells if cell[0] not in inside or cell[1] not in inside)
+            expect(f"{name}: the {part} clears the plate's outermost pixel (rows and columns {inside.start} to "
+                   f"{inside.stop - 1})", not out, f"{len(out)} don't, first {out[:3]}")
             expect(f"{name} draws its {part}", len(cells) > 0)
             wrong = [cell for cell in cells if pixels[cell[1]][cell[0]] != (*colour, 255)]
-            expect(f"{name}: every pixel of the {part} is its colour", not wrong, f"{len(wrong)} aren't, first {wrong[:3]}")
+            expect(f"{name}: every pixel of the {part} is its colour", not wrong,
+                   f"{len(wrong)} aren't, first {wrong[:3]}")
             stray = [(x, y) for y in range(size) for x in range(size)
                      if pixels[y][x] == (*colour, 255) and (x, y) not in cells]
             expect(f"{name}: no other pixel is the {part}'s colour", not stray, f"{len(stray)} are, first {stray[:3]}")

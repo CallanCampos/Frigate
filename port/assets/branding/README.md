@@ -37,9 +37,9 @@ Frigate's mark is the Plasma Frigate drawn flat, in profile, with the parts that
   thruster cone parted from its tail: the ship flies.
 
 The rig and the fittings are steel blue, standing for the games' white canvas and cyan fittings, over a hull with its
-strake of five ports cut out, so the strake shows whatever the ship sits on. On White 2's icon that gives a black hull
-whose six light runs between the ports make a white chequered stripe; on Black 2's, the reverse, a white hull with five
-black ports: the plate carries the version, and the ship is its negative. The cold steel blue nods to the games' icy
+port strake cut out of it, so the strake shows whatever the ship sits on. On White 2's black hull the six runs between
+the five ports are cut, making a white chequered stripe; on Black 2's white hull the five ports themselves are cut, and
+show black: the plate carries the version, and the ship is its negative. The cold steel blue nods to the games' icy
 theme, and the FRIGATE wordmark is drawn from geometric shapes, the ends of its bars filled forward like a sail. The
 ship sails to the right, the games' ship seen from its other side, so that in the logo its ram points at the
 wordmark.
@@ -54,7 +54,7 @@ wordmark.
 | `mark.svg`, `mark-dark.svg` | The ship alone, for light and for dark backgrounds | Square places: an avatar, a favicon |
 | `icon-black2.svg`, `icon-white2.svg` | The app icons: the ship on Black 2's dark plate or White 2's light one, on Apple's 1024 px macOS icon grid | The sources of the two masters below |
 | `icon-black2-1024.png`, `icon-white2-1024.png` | The icons' 1024 x 1024 masters, transparent outside the plate | The build: `PORT_APP_ICON` in [CMakeLists.txt](../../CMakeLists.txt) picks the version's, and [How the build uses the icons](#how-the-build-uses-the-icons) says what is made from it |
-| `icon-black2-16.svg`, `icon-black2-32.svg`, `icon-white2-16.svg`, `icon-white2-32.svg` | The icons' 16 and 32 px images, drawn pixel by pixel for their size on Apple's grid: the ship with its sails as whole-pixel panels (three tiers of four at 32 px, of two at 16 px), the stern sail, the jibs over the ram, the hull (its ports at 32 px) and the pontoon on its struts, and a stronger edge on White 2's plate | The sources of the PNGs below |
+| `icon-black2-16.svg`, `icon-black2-32.svg`, `icon-white2-16.svg`, `icon-white2-32.svg` | The icons' 16 and 32 px images, drawn pixel by pixel for their size on Apple's grid: the ship with its sails as whole-pixel panels (three tiers of four at 32 px; at 16 px one tall block of two columns), the stern sail, the jibs over the ram, the hull (its ports at 32 px) and the pontoon on its struts, a pixel clear of the plate's edge, and a stronger edge on White 2's plate | The sources of the PNGs below |
 | `icon-black2-16.png`, `icon-black2-32.png`, `icon-white2-16.png`, `icon-white2-32.png` | Those images rendered at their size | The `.icns`'s 16 and 32 px images (`PORT_APP_ICON_16` and `_32`) |
 | `window-black2.svg`, `window-white2.svg` | The 32 px image again with its plate filling the square, as icons on Linux and Windows do | The source of the PNGs below |
 | `window-black2-32.png`, `window-white2-32.png` | Those rendered at 32 px | The window's icon on Linux and Windows (`PORT_WINDOW_ICON`) |
@@ -78,7 +78,7 @@ alone, plus one gradient on each icon's plate: no text, fonts or images, so GitH
 Black 2's plate runs from `#1C2431` at the top to `#0D1117` and carries the dark-background ship; White 2's runs from
 `#FFFFFF` to `#E3E9F0`, with a faint 2 px edge of ink at 12% just inside it so that it keeps its shape on white, and
 carries the light-background ship. At 16 and 32 px that edge is a pixel of ink at 35%, so that the plate still shows on
-white.
+white, and the ship stays clear of it, as it does of the shaded rim of Black 2's plate.
 
 ## Using the logo
 
@@ -96,9 +96,9 @@ GitHub does, use both:
 The mark is plainly the Plasma Frigate from 64 px up, where the icons are the master scaled. At 32 and 16 px they are
 drawn for their size, with the sail block wider than the master's so that its panels part on whole pixels: at 32 px
 the gridded sails on their mast with the pennant, the stern sail and the tower, the jibs over the ram, the hull with
-its ports and the pontoon on its struts; at 16 px the sails in two columns of panels, the stern sail, the jibs, the ram,
-the hull and the pontoon. Use the files as they are: a new colour or shape belongs in `frigate_logo.py`, so that every
-file keeps the same drawing.
+its ports and the pontoon on its struts; at 16 px the sails as one tall block of two columns under the truck, with no
+rows between the tiers, the stern sail, the jib, the ram, the hull and the pontoon on its struts. Use the files as they
+are: a new colour or shape belongs in `frigate_logo.py`, so that every file keeps the same drawing.
 
 ## How the build uses the icons
 
@@ -120,8 +120,9 @@ Nothing made from the masters is committed: the build makes it again whenever a 
 
 The tests: `assets_branding` ([tests/assets/test_branding.py](../../tests/assets/test_branding.py)) checks that the
 SVGs are what `frigate_logo.py` writes, that they draw with paths alone, the PNGs' sizes, and that each small image's
-PNG holds its ship pixel for pixel; `app_make_app` checks the `.icns` (its 16 and 32 px images the drawn ones) and that
-the app holds it; `app_window_icon_plain` and `_sanitized` check the window's bitmaps.
+PNG holds its ship pixel for pixel, a pixel clear of the plate's edge; `app_make_app` checks the `.icns` (its 16 and
+32 px images the drawn ones) and that the app holds it; `app_window_icon_plain` and `_sanitized` check the window's
+bitmaps.
 
 ## Changing the artwork
 

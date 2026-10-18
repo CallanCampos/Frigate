@@ -181,8 +181,9 @@ mods/examples/           sample mods, one per extension point
 - **Clang on every platform** (Apple clang on macOS, clang-cl or mingw-clang on Windows, clang on Linux, GCC as an
   extra check): one compiler means one set of layouts and undefined behaviour to verify, and MSVC's `cl` doesn't
   accept the tree's GCC-style `ATTRIBUTE_ALIGN`. On the `windows-msvc` target the tree's own `size_t` typedef
-  (`unsigned long`) also clashes with clang's in 992 files until the libc headers go behind the platform switch
-  (§4.8 rule 8).
+  (`unsigned long`, in `include/stddef.h`) clashed with clang's in 992 files of the compile probe; the host build's
+  generated `include/` mirror leaves the tree's C library headers out, `stddef.h` among them, so the host's `size_t` is
+  the only one (§4.8 rule 8).
 - **Compiler settings that match MWCC's language model:** `-std=gnu99 -fsigned-char` (MWCC's `-char signed`; Linux
   arm64 defaults to unsigned), int-sized enums (never `-fshort-enums`), `-fwrapv`, `-fno-strict-aliasing`
   (mandatory: the code puns types everywhere), `-ffp-contract=off`, no fast-math, `-ftrivial-auto-var-init=zero`
@@ -273,10 +274,13 @@ mods/examples/           sample mods, one per extension point
 The C must compile for MWCC (byte-identical ROMs) and for 64-bit hosts. Rules for every change outside `port/`:
 
 1. A change either compiles to the same bytes under MWCC (the ROM build proves it) or sits behind `PLATFORM_PC`.
-   What differs between MWCC and a host is defined in one place, `include/types.h`'s `PLATFORM_PC` block (`uptr`,
-   `sptr`, `ulong32` and `PORT_DS_ALIGN_64`, a port change with its rows in `port/docs/game-changes.md`).
-   `PLATFORM_PC` itself is defined only by the host build (`port_decomp_env` in `port/CMakeLists.txt`), never by a
-   header, and the host build force-includes `port/include/port_host.h` into every decomp file.
+   The host's types are defined in one place, `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32` and
+   `PORT_DS_ALIGN_64`, a port change with its rows in `port/docs/game-changes.md`). Any other definition that must
+   differ between MWCC and a host branches on `PLATFORM_PC` in its own header, such as `OVERLAY_ID` in
+   `include/gfl/overlay.h`, `HeapBlockHeader`'s padding, NitroSDK's `math.h` and `snd.h` and DS Protect's checked
+   calls, each with its row in game-changes.md. `PLATFORM_PC` itself is defined only by the host build
+   (`port_decomp_env` in `port/CMakeLists.txt`), never by a header, and the host build force-includes
+   `port/include/port_host.h` into every decomp file.
 2. Base types are already right: `u32`/`s32` are `int` in `include/types.h`, so they stay 32-bit on every host
    (libntr makes them `long` except on Linux and Switch, so they are 64-bit on macOS).
 3. A value that carries an address uses `uptr`/`sptr`: `u32`/`s32` under MWCC (so retyping a parameter changes no DS
@@ -290,8 +294,9 @@ The C must compile for MWCC (byte-identical ROMs) and for 64-bit hosts. Rules fo
    bytes stay pristine.
 6. No new `long`: it is 64-bit on macOS and Linux but 32-bit on Windows.
 7. Fixed-size opaque buffers sized for 4-byte pointers are sized from the real struct.
-8. Host builds use the host's libc headers (the tree's `include/` libc headers go behind the platform switch) and only
-   MSL's fdlibm math, for bit-exact results.
+8. Host builds use the host's libc headers (the host build's generated `include/` mirror, made by
+   `port/tools/gen_host_tree.py`, leaves out the decomp's C library headers, so the host's are found) and only MSL's
+   fdlibm math, for bit-exact results.
 
 **Measured starting point** ([RESEARCH.md §9](RESEARCH.md#9-the-native-c-compile-probe)): all 1,170 game files
 compile for arm64 macOS once `OVERLAY_ID(n)` becomes `n` on hosts (700 of the 1,164 truncation sites). The other

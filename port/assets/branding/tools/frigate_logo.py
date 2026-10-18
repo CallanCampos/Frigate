@@ -411,44 +411,46 @@ def write_icon(out, name, title, colours, stops, hairline):
 # between the tiers for the yards, the mast showing below the course and at the truck, with the pennant flying forward
 # (right); the stern sail on its short mast, and the tower's dome on its drum on the raised poop; the two jibs over the
 # ram, which runs on from the deck a row deep; the hull with its five ports between six runs, the stern raked and the
-# bow sweeping back under the ram; and the pontoon on three struts, with the row below the keel open. The 16 px ship
-# keeps the block as two columns of three panels, the stern sail, the jibs, the ram, two rows of hull and the pontoon
-# on two struts, and drops the pennant, the tower and the ports, which 16 pixels can't hold apart.
+# bow sweeping back under the ram; and the pontoon on three struts, with the row below the keel open. At 16 px the sails
+# are one tall block, two columns parted by the open middle seam with the truck above it and no rows between the tiers,
+# so that the block doesn't break into squares; the stern sail is a single pixel's width, the jib a wedge over the ram,
+# the hull two rows and the pontoon short, on two struts. The pennant, the tower and the ports, which 16 pixels can't
+# hold apart, are left out.
+# Each sprite stays clear of its plate's outermost pixel (White 2's edge, the plate's anti-aliased rim on Black 2's): at
+# most 10 x 10 at 16 px and 22 x 20 at 32 px, which the test assets_branding checks.
 SHIP_16 = (
-    "...rr.rr....",
-    "...rr.rr....",
-    ".r..........",
-    "rr.rr.rr.r..",
-    "rr.rr.rr.rr.",
-    "rr.......rrr",
-    ".r.rr.rr....",
-    ".hhrr.rr.rr.",
-    ".hhhhhhhhhhh",
-    "..hhhhhhh...",
-    "....r..r....",
-    "...rrrrrr...",
+    "....r.....",
+    "..rr.rr...",
+    "..rr.rr...",
+    "r.rr.rr.r.",
+    "r.rr.rr.rr",
+    "r.rr.rr...",
+    "hhhhhhhhhh",
+    ".hhhhhhh..",
+    "....r.r...",
+    "...rrrrr..",
 )
 SHIP_32 = (
-    "............rrrr........",
-    "............rr..........",
-    ".......rr.rr.rr.rr......",
-    ".......rr.rr.rr.rr......",
-    ".......rr.rr.rr.rr......",
-    "..r.....................",
-    ".rr....rr.rr.rr.rr......",
-    ".rr....rr.rr.rr.rr.r....",
-    ".rr....rr.rr.rr.rr.rr...",
-    "rrr................rrr..",
-    "rrr....rr.rr.rr.rr.rrrr.",
-    "..r.r..rr.rr.rr.rr...rr.",
-    "..rhhh.rr.rr.rr.rr....r.",
-    ".hhhhhh.....r......rrr..",
-    ".hhhhhhhhhhhhhhhhhhhhhhh",
-    ".hhhhupupupupupuhhhh....",
-    "..hhhhhhhhhhhhhhhhh.....",
-    "..hhhhhhhhhhhhhh........",
-    "........r..r..r.........",
-    "......rrrrrrrrrrr.......",
+    "...........rrrr.......",
+    "...........rr.........",
+    "......rr.rr.rr.rr.....",
+    "......rr.rr.rr.rr.....",
+    "......rr.rr.rr.rr.....",
+    ".r....................",
+    "rr....rr.rr.rr.rr.....",
+    "rr....rr.rr.rr.rr.r...",
+    "rr....rr.rr.rr.rr.rr..",
+    "rr................rrr.",
+    "rr....rr.rr.rr.rr.rrrr",
+    ".r.r..rr.rr.rr.rr...rr",
+    ".rhhh.rr.rr.rr.rr....r",
+    "hhhhhh.....r......rrr.",
+    "hhhhhhhhhhhhhhhhhhhhhh",
+    "hhhhupupupupupuhhhh...",
+    ".hhhhhhhhhhhhhhhhh....",
+    ".hhhhhhhhhhhhhh.......",
+    ".......r..r..r........",
+    ".....rrrrrrrrrrr......",
 )
 SMALL_EDGE = 0.35  # the opacity of the one-pixel ink edge inside White 2's small plates
 
@@ -484,7 +486,19 @@ def plate_transform(x0, x1):
     """The transform that puts the 1024 grid's plate (100 to 924) on [x0, x1] of the image, both ways."""
     k = (x1 - x0) / 824
     offset = f"{x0 - 100 * k:.4f}".rstrip("0").rstrip(".")
-    return f"translate({offset} {offset}) scale({k:.6f})", k
+    return f"translate({offset} {offset}) scale({k:.6f})"
+
+
+def plate_path(x0, x1):
+    """The 1024 grid's plate put on [x0, x1] of the image, both ways, as a path in the image's own coordinates: every
+    number of PLATE is a coordinate, and the plate is placed alike on both axes."""
+    k = (x1 - x0) / 824
+
+    def place(match):
+        s = f"{x0 + (float(match.group()) - 100) * k:.3f}".rstrip("0").rstrip(".")
+        return "0" if s in ("-0", "") else s
+
+    return re.sub(r"\d+(?:\.\d+)?", place, PLATE)
 
 
 def write_small_icon(out, name, title, colours, stops, edge, size, plate, sprite):
@@ -492,7 +506,7 @@ def write_small_icon(out, name, title, colours, stops, edge, size, plate, sprite
     filling the square for the window's, and the sprite on it, on whole pixels."""
     ox, oy = sprite_origin(sprite, size)
     rig, hull = sprite_cells(colours)
-    transform, _ = plate_transform(*plate)
+    transform = plate_transform(*plate)
     body = [
         "  <defs>",
         '    <linearGradient id="plate" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">',
@@ -504,11 +518,13 @@ def write_small_icon(out, name, title, colours, stops, edge, size, plate, sprite
         f'  <path fill="url(#plate)" transform="{transform}" d="{PLATE}"/>',
     ]
     if edge:
-        # One pixel of ink just inside the plate, so that the light plate keeps its shape on white at this size
-        transform, k = plate_transform(plate[0] + 0.5, plate[1] - 0.5)
+        # One pixel of ink just inside the plate, so that the light plate keeps its shape on white at this size: the
+        # ring between the plate and the plate a pixel smaller, filled. (A one-pixel stroke inside the plate drew the
+        # same ring, but AppKit left a notch in it on the window icon's right side, near where a corner's curve meets
+        # the straight side.)
         body.append("  <!-- the plate's edge -->")
-        body.append(f'  <path fill="none" stroke="{INK}" stroke-opacity="{n(edge)}" stroke-width="{1 / k:.4f}" '
-                    f'transform="{transform}" d="{PLATE}"/>')
+        body.append(f'  <path fill="{INK}" fill-opacity="{n(edge)}" fill-rule="evenodd" '
+                    f'd="{plate_path(*plate)}{plate_path(plate[0] + 1, plate[1] - 1)}"/>')
     body.append("  <!-- the ship, pixel by pixel: the rig and fittings, then the hull with its strake -->")
     body.append(f'  <path fill="{colours["rig"]}" d="{sprite_rows(sprite, rig, ox, oy)}"/>')
     body.append(f'  <path fill="{colours["hull"]}" d="{sprite_rows(sprite, hull, ox, oy)}"/>')

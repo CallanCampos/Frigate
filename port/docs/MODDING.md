@@ -111,9 +111,10 @@ kinds of change land:
    `PORT_SHOULD`). None exists yet; the first comes with the mod platform.
 3. **Platform:** an `#ifdef PLATFORM_PC` block, with a comment saying why. `PLATFORM_PC` is defined only by the host
    build, on the compiler's command line (`port_decomp_env` in [../CMakeLists.txt](../CMakeLists.txt)), so the ROM
-   build never sees the block. What differs between MWCC and a host, such as `uptr`, is defined in one place,
-   `include/types.h`'s `PLATFORM_PC` block; any other file branches on `PLATFORM_PC` only where it must, each such
-   change listed in [game-changes.md](game-changes.md).
+   build never sees the block. The host's types, such as `uptr`, are defined in one place, `include/types.h`'s
+   `PLATFORM_PC` block; the other headers that need the host's way, such as `include/gfl/overlay.h` for `OVERLAY_ID`,
+   branch on `PLATFORM_PC` themselves, and so does any other file only where it must, each such change listed in
+   [game-changes.md](game-changes.md).
 
 Each needs proof that MWCC's output didn't change: `python3 configure.py && ninja` with both SHA1s for complete files,
 `port/tools/check_mwcc_neutral.py` for a change that only adds `#ifdef PLATFORM_PC` branches, and the decomp's

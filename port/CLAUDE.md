@@ -154,11 +154,14 @@ Game code stays the decomp's. Only three kinds of change are allowed outside `po
 1. **Matching-neutral portability fixes**, such as `uptr` for a value that carries an address. They stay in this
    repository; none is proposed upstream.
 2. **Hook macros** (`PORT_EVENT`, `PORT_SHOULD`) that compile to nothing, or to the bare expression, in the ROM build.
-3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. What differs between MWCC and a host is
-   defined in one place, `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32`, `PORT_DS_ALIGN_64`, a
-   port change with its rows in [game-changes.md](docs/game-changes.md)). `PLATFORM_PC` itself is defined only by the
-   host build (`port_decomp_env` in [CMakeLists.txt](CMakeLists.txt)), never by a header, and the host build
-   force-includes [include/port_host.h](include/port_host.h) into every decomp file.
+3. **`#ifdef PLATFORM_PC` blocks**, rare, each with a comment saying why. The host's types are defined in one place,
+   `include/types.h`'s `PLATFORM_PC` block (`uptr`, `sptr`, `ulong32` and `PORT_DS_ALIGN_64`, a port change with its
+   rows in [game-changes.md](docs/game-changes.md)). Any other definition that must differ between MWCC and a host
+   branches on `PLATFORM_PC` in its own header, such as `OVERLAY_ID` in `include/gfl/overlay.h`, `HeapBlockHeader`'s
+   padding, NitroSDK's `math.h` and `snd.h` and DS Protect's checked calls, each with its row in game-changes.md.
+   `PLATFORM_PC` itself is defined only by the host build (`port_decomp_env` in [CMakeLists.txt](CMakeLists.txt)),
+   never by a header, and the host build force-includes [port/include/port_host.h](include/port_host.h) into every
+   decomp file.
 
 All three need the same proof that MWCC's output didn't change. The ROM build proves a complete file. An incomplete
 file still links the original object, so the ROM build proves nothing about its C: show with
@@ -168,10 +171,10 @@ incomplete file that includes the header. [game-changes.md](docs/game-changes.md
 Each gets a row in game-changes.md in the same commit. Never copy a decomp file into `port/` to change it; source
 lists are generated from `config/`, never kept by hand. The one sanctioned transformation is the build-time host
 variant of a header that names DS addresses ([ADR 0004](docs/adr/0004-ds-addresses-by-header-translation.md)): it is
-generated into `build/` at every configure, never committed or edited; change the generator instead. `BUGFIX` stays off, so gameplay matches the reference, but
-memory-safety bugs (out-of-bounds writes, use after free) are fixed under `PLATFORM_PC`, each with a comment, because
-64-bit layouts move what they hit. No new `long`; structs on disk, on the wire or in the save stay pointer-free and
-get host `_Static_assert`s.
+generated into `build/` at every configure, never committed or edited; change the generator instead. `BUGFIX` stays
+off, so gameplay matches the reference, but memory-safety bugs (out-of-bounds writes, use after free) are fixed under
+`PLATFORM_PC`, each with a comment, because 64-bit layouts move what they hit. No new `long`; structs on disk, on the
+wire or in the save stay pointer-free and get host `_Static_assert`s.
 
 ## Code that isn't C yet
 

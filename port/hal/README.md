@@ -102,7 +102,8 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [gxasm.c](gx/gxasm.c) | The geometry FIFO's stores that the SDK wrote in assembly |
 | [gx_display.h](gx/gx_display.h), [gx_display.c](gx/gx_display.c) | Which 2D engine feeds which screen, and their power, from POWCNT1 |
 
-**[dma/](dma/dma.c)**, **[mi/](mi/mi_memory.c)**, **[fx/](fx/fx_mtx33.c)**, **[math/](math/math.c)**, **[crypto/](crypto/rc4.c)** — the SDK's assembly in C
+**[dma/](dma/dma.c)**, **[mi/](mi/mi_memory.c)**, **[fx/](fx/fx_mtx33.c)**, **[math/](math/math.c)**,
+**[crypto/](crypto/rc4.c)** — the SDK's assembly in C
 
 | File | What it does |
 | --- | --- |
@@ -155,7 +156,8 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [snd7/snd_bank_host.c](snd7/snd_bank_host.c), [snd7/snd_handle.h](snd7/snd_handle.h) | Banks and wave archives on the ARM9's side, with 32-bit handles for host pointers |
 | [snd7/snd_command_host.c](snd7/snd_command_host.c), [snd7/snd_interface_host.c](snd7/snd_interface_host.c) | The decomp's command queue and driver interface compiled through |
 
-**[input/](input/port_input.h)**, **[nnsys/](nnsys/reloc.h)**, **[gfl/](gfl/heap_policy.c)**, **[dwc/](dwc/ov011_pending.c)**, **[stubs/](stubs/dsprot.c)**
+**[input/](input/port_input.h)**, **[nnsys/](nnsys/reloc.h)**, **[gfl/](gfl/heap_policy.c)**,
+**[dwc/](dwc/ov011_pending.c)**, **[stubs/](stubs/dsprot.c)**
 
 | File | What it does |
 | --- | --- |

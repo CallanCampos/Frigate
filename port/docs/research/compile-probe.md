@@ -380,7 +380,8 @@ incomplete files may still lack functions. Files marked complete cover 71.1%. IT
    (the tree never tests it today) or an explicit `PLATFORM_DS` that configure.py passes. Under MWCC every typedef
    stays exactly as it is. Because `uptr` is the same `u32` (`unsigned int`) type under MWCC, retyping parameters
    changes no codegen. `ninja` verifies both SHA1s on every commit, as it does now.
-   (2026-10-18: built as `include/types.h`'s `PLATFORM_PC` block; the host build defines `PLATFORM_PC`: PLAN.md §4.8.)
+   (Built on 2026-10-17 as `include/types.h`'s `PLATFORM_PC` block, `d63819fc5` and `e49c96554`; the host build
+   defines `PLATFORM_PC`: PLAN.md §4.8.)
 2. **`uptr`/`sptr`** (`u32`/`s32` on DS, `uintptr_t`/`intptr_t` on host) for every value that carries an address.
    Prefer `void *` where the API is internal and the change doesn't alter MWCC output (`void *` vs `u32` parameters can
    change register allocation, so `uptr` is the safe default).
