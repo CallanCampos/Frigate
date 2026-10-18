@@ -925,8 +925,8 @@ Same code, other `sp` offsets or frame size.
 - A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
   returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
   register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key
-  position updates, `func_ov182_021acff0` and its neighbours, and its OAM position setter, `func_ov182_021bb7e0`;
-  they match only when `attr01` is read through `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
+  position updates, `func_ov182_021acff0` and its neighbours; they match only when `attr01` is read through
+  `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
   which returns a one-word struct, as in `(u8)ReadAttr01(sMenu->keyOams[0]).attr01 - 12`. Reading `oam->attr01`
   directly leaves no slot.
 
@@ -3134,8 +3134,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
-  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, while
-  `dwc_util_main_menu.c`'s message paths, packed one after another, stay arrays.
+  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, and
+  `dwc_util_main_menu.c`'s message paths, each padded to 4 bytes, are literals too.
 - A global that no code refers to can be declared anywhere in the file, after functions too, and where it sits in
   the heapsort's list moves the local initializers around it: `mus_shot_photo.c` declares `MUS_SHOT_PHOTO_UNUSED`
   just before its last function, which gives the original's `.rodata` with no code change.
@@ -3369,7 +3369,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   It is about scalars, not only function-local ones: a file-scope `static const` scalar whose address is taken
   joins that end of the list too, after its function's own statics, in the group of the first function to use it
   (each group: the function's statics in declaration order, then the file-scope scalars it first uses, in use
-  order). Arrays and structs, a function-local `static const` array included, are listed where they are defined.
+  order). Arrays and structs, a function-local `static const` array included, are listed where they are defined,
+  and so is a function-local `static` that isn't `const`: overlay 280's `sKeyBlinkStep` (`.data`), moved into
+  `KeyHighlight_Update`, gives the same `.rodata` as at file scope, with the `const` scalars in a later function.
   Overlay 208's `dup_fitting.c` gets the ROM's `.rodata` with its three `BOOL`s passed by address as function-local
   `static const BOOL` and its `{227, 128}` as two `static const u16` scalars of the functions that compare with them;
   as one array no order of its 13 file-scope objects works. About 120 orders of those objects then fit, so the
