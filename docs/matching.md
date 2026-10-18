@@ -1505,6 +1505,11 @@ Same instructions, scheduled in another order.
   included, shifts it in place and lets the load move above the parameter's copy: `resonance_resort_data.c`'s
   `JoinAvenuePerson_AddVisitorData` writes `JoinAvenueData *data = person->data; data += visitor->dataIndex;` inside
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
+  In a loop the stepped pointer keeps the member's address one value, hoisted ahead of the loop: `pokedex.c`'s
+  `addToDex` clears each kind's bit through `u8 *list = pokedex->shown; list += i * POKEDEX_SPECIES_BYTES;`, which
+  adds the row to `pokedex + 0x1ac` before indexing by the byte (`add r2, r1, r2; ldrb r5, [r2, r0]`) as the original
+  does, while every spelling in one expression (`pokedex->shown + i * N`, `&pokedex->shown[i * N]`) regroups as
+  `(pokedex + i * 0x54) + (0x1ac + byte)`, 12 bytes longer.
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is the address of
   `p[i].field` that MWCC shares between two accesses: common-subexpression elimination builds it as `p + 4` indexed
   by `i << 3`. When the two accesses are reads merged into one load, -O4 propagates that address back into the load
@@ -1695,6 +1700,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
   literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
+- An inline's pointer parameter of the argument's own type takes the argument expression itself, so a field of an
+  indexed element passed to it has the field's offset folded into each of the inline's loads (`[r, #4 + k]`). A
+  `const void *` parameter, read as `((const u8 *)b)[k]`, keeps the argument one address: DWC's `DWCAc_AddCandidate`
+  (`dwc_ac_wcm.c`) hoists `&work->candidates[0].bssid` out of its loop and adds the row to it (`add r10, r0, r9;
+  ldrb r0, [r0, r9]`, then `[r10, #1]` to `[r10, #5]`) only with `DWCAc_IsSameBssid` taking two `const void *`, as
+  WCM's `WCM_CompareBytes` takes its bytes. A `const u8 *bssid` local gives the same addressing but turns the
+  inline's `&&` chain into predicated `cmpeq`s. `pokedex.c`'s `ClearBit(void *bits, u16 index)` keeps
+  `pokedex->shownForms + 0xb` whole the same way, where a `u8 *` parameter regroups it around the byte index.
 
 - `field += value` on an `s16` field with an `int` value narrows the value first and shares the narrowed copy between
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its
@@ -2707,9 +2720,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the body or passed to an inline, is computed again by code after the loop, even after a `do`/`while`, where a
   hoisted field address (`pokedex->shown`) and a value kept in a local are reused. On an `int` it is reused after a
   loop that can't be skipped (a `do`/`while` or a constant bound) and computed again only after a loop whose entry
-  test can skip it. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
+  test can skip it. Passed to an inline, it is reused only when the variable has the parameters' type: an `int bit`
+  given to `int` parameters is reused, and a `u16`, `u32`, `s16` or `long` one is computed again.
+  `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
   them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
-  inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters.
+  inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters,
+  and the base comes after every other hoisted value (flag, mask, byte) in every statement order, unless a statement
+  before the loop assigns it to a pointer local.
 
 - A loop guard kept as an unsigned compare (`cmp r3, #4; bhs`) came from an enum counter tested against
   `NELEMS(table)`, whose `sizeof` makes the comparison unsigned; the enum's own bound gives `bge`. `symbol_save.c`'s
