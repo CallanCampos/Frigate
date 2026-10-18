@@ -642,7 +642,7 @@ static void PokeList_ExitText(PokeListWork *wk) {
 }
 
 static void PokeList_LoadResources(PokeListWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x4b, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PLIST, wk->heapId);
     ArcTool *iconArc;
     ArcTool *commonArc;
 

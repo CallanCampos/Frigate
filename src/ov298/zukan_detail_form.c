@@ -1248,7 +1248,7 @@ static void ZukanDetailForm_CreateText(ZukanDetailFormParam *param, ZukanDetailF
         BmpWin_FlushChar(wk->windows[i]);
     }
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW_TITLE, param->heapId);
-    wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0450, param->heapId);
+    wk->formMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZUKAN_DETAIL_FORM, param->heapId);
     wk->formNameTable = GFL_ArcSysReadHeapNewLZGetLen(ARCID_FORM_NAME_TABLE, 0, FALSE, param->heapId, &size);
 
     bitmap = BmpWin_GetBitmap(wk->windows[WINDOW_LABELS]);

@@ -818,7 +818,7 @@ static void func_ov194_021bd06c(PokemonTradeWork *wk) {
         GFL_BGSysSetBGEnabled(3, FALSE);
         func_ov194_021c5244(wk, -1, -1);
         func_ov194_021c0aec(wk, 0);
-        arc = GFL_ArcSysCreateFileHandle(103, wk->heapId);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE, wk->heapId);
         // The library takes the palette offset as a u16, which the prototype doesn't say
         GFL_G2DIOLoadNSCRSync(arc, 11, 2, 0, (u16)wk->bg2Chars, 0, FALSE, wk->heapId);
         GFL_ArcToolFree(arc);

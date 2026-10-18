@@ -11,9 +11,8 @@
 
 #define OVERLAY_BTL_REC_SEL OVERLAY_ID(306)
 
-// The screen's heap and its archive of graphics. Our names
+// The screen's heap. Our name
 #define HEAPID_BTL_REC_SEL 0x75
-#define ARCID_BTL_REC_SEL 185
 
 // What the screen is called with
 typedef struct {

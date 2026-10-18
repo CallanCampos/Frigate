@@ -1,0 +1,9 @@
+PmsWordsInitialQ_Text_Quagsire = QUAGSIRE
+PmsWordsInitialQ_Text_Quash = QUASH
+PmsWordsInitialQ_Text_Quickattack = QUICKATTACK
+PmsWordsInitialQ_Text_Quickfeet = QUICKFEET
+PmsWordsInitialQ_Text_Quickguard = QUICKGUARD
+PmsWordsInitialQ_Text_Quilava = QUILAVA
+PmsWordsInitialQ_Text_Quiverdance = QUIVERDANCE
+PmsWordsInitialQ_Text_Qwilfish = QWILFISH
+\pad{cc}

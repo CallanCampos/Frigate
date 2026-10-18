@@ -18,7 +18,7 @@
 #include "system/printsys.h"
 #include "system/text_speed.h"
 #include "system/wordset.h"
-#include "text/system/0415.h"
+#include "text/system/worldtrade.h"
 #include "worldtrade_local.h"
 
 // The Global Trade Station's helpers over the game's systems: Pokémon copies, window clearing, the text printing
@@ -226,7 +226,7 @@ WorldTradeNumFont *WorldTrade_NumFontCreate(u32 unused0, u32 unused1, u32 unused
     numFont->heapId = heapId;
     numFont->font = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, heapId);
     numFont->printQueue = func_02021998(heapId);
-    numFont->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0415, heapId);
+    numFont->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WORLDTRADE, heapId);
     numFont->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     return numFont;
 }
@@ -259,7 +259,7 @@ void WorldTrade_NumFontPrintNumber(WorldTradeNumFont *numFont, int num, int digi
     StrBuf *format = GFL_StrBufCreate(32, numFont->heapId);
     int i;
 
-    GFL_MsgDataLoadStrbuf(numFont->msgData, Bank0415_Text_Empty_90, format);
+    GFL_MsgDataLoadStrbuf(numFont->msgData, Worldtrade_Text_Empty_90, format);
     WordSetNumber(numFont->wordSet, 0, num, digits, dispType, TRUE);
     GFL_WordSetFormatStrbuf(numFont->wordSet, str, format);
 
@@ -278,7 +278,7 @@ void WorldTrade_NumFontPrintNumber(WorldTradeNumFont *numFont, int num, int digi
 }
 
 void WorldTrade_NumFontPrintSlash(WorldTradeNumFont *numFont, int unused, BmpWin *win, int x, int y) {
-    StrBuf *str = GFL_MsgDataLoadStrbufNew(numFont->msgData, Bank0415_Text_Empty_91);
+    StrBuf *str = GFL_MsgDataLoadStrbufNew(numFont->msgData, Worldtrade_Text_Empty_91);
     int i;
 
     for (i = 0; i < NUM_FONT_ENTRY_COUNT; i++) {

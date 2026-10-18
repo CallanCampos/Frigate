@@ -739,7 +739,7 @@ static void MBParent_DrawTopScreen(MBParentWork *wk) {
         bg = 2;
     }
     GFL_BGSysSetBGEnabled(bg, FALSE);
-    arc = GFL_ArcSysCreateFileHandle(22, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ERROR_WINDOW_GRA, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 4, 0xe0, 0x20, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, 0, 0xe0, 0x20, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 1, bg, 0, 0, FALSE, wk->heapId);

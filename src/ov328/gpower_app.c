@@ -45,8 +45,6 @@
 // guess from its graphic file's, "gpower_app_graphic.c"
 
 #define HEAPID_GPOWER_APP 0xa0
-// The screen's graphics and its table of positions
-#define ARCID_GPOWER_APP 285
 
 #define WINDOW_COUNT 22
 #define BUTTON_COUNT 4

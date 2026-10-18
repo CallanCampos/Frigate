@@ -1,0 +1,6 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ "MAP_MODEL_UNION_ROOM_COLOSSEUM_M_CLOSSEUM01_00" ]
+    ]
+}

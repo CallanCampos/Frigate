@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/trainer_card.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/gx_layers.h"

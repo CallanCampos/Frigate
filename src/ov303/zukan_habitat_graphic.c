@@ -40,7 +40,6 @@
 // kinds of habitat and the touch bar, and the sub screen the map of the region with the area on it
 
 // Not in constants/arc.h
-#define ARCID_TOWNMAP_GRA 84
 #define ARCID_POKEICON 7
 
 #define OVERLAY_UI OVERLAY_ID(139)

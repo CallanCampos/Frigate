@@ -1,6 +1,7 @@
 #include "types.h"
 #include "app/pokemon_trade_local.h"
 #include "app/pokemontrade_ircdemo.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
@@ -148,7 +149,7 @@ void PokemonTradeIrcDemo_ShowActor(PokemonTradeWork *wk) {
 }
 
 void PokemonTradeIrcDemo_LoadResources(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x68, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE_DEMO, wk->heapId);
 
     wk->objRes[TRADE_OBJRES_CHAR_DEMO] = func_0204b81c(arc, 2, FALSE, CLACT_VRAM_MAIN, wk->heapId);
     wk->objRes[TRADE_OBJRES_PLTT_DEMO] = func_0204bbb8(arc, 3, CLACT_VRAM_MAIN, 0xe0, 0, 1, wk->heapId);

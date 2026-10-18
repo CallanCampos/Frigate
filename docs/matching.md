@@ -1105,9 +1105,11 @@ Same code, other `sp` offsets or frame size.
   (`F *f = &G`, which MWCC turns back into direct accesses), stay chained in their written order, so a constant they
   store is built just before its first store. Through a pointer to a member (`&G.header`), a parameter or a cast
   pointer, the stores are told apart by offset and are independent, so the constant can be built ahead of stores
-  written before it. `lib/irc`'s `IrcLink_SendFrame` builds the zero of the checksum bytes, which is also its copy
-  loop's counter, before storing `id` and `cmd` only when it writes the frame's head through
-  `IrcFrameHeader *header = &IrcFrame.header`; through `IrcFrameData *frame = &IrcFrame` the zero follows them. In
+  written before it. An explicit alignment on the global (Loops: "An explicit alignment") also keeps MWCC from
+  turning `F *f = &G` back into direct accesses, and the stores through it are then independent too: `lib/irc`'s
+  `IrcLink_SendFrame`, whose `IrcFrame` is aligned, builds the zero of the checksum bytes, which is also its copy
+  loop's counter, before storing `id` and `cmd` through `IrcFrameData *frame = &IrcFrame` (or a pointer to its
+  `header`), and after them when it stores to `IrcFrame` directly; without the attribute `frame` keeps them chained. In
   NitroSystem's 2.0/sp2p2 code a store to a member of a file static goes through the section's anchor (`ldr r0,
   =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address, stored at 0, 4 and 8, as G3D's billboard
   functions in `sbc.c` have, is a pointer local to the member, `VecFx32 *trans = &sBBCmd.trans;`; a pointer to the whole
@@ -2564,11 +2566,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   Changing only the signed loop to `do`/`while` does not recover the original test.
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return` inside, as the Join Avenue's walks through its data are.
-- At `-O2,p` no loop is rotated: a `for` or `while` loop is entered with a `b` to its test at the end, as the loops of
-  `lib/irc`'s `IrcSpi_Recv`, `IrcSpi_Send` and `IrcLink_SendFrame` are (`-O4,p` rotates all three). A loop there with a
-  guard before its first pass and its test at the end was probably a guarded `do`/`while`: `IrcLink_Checksum` matches
-  as `if (i < size) { do { ... } while (++i < size); }` with `i = 0`, whose unsigned `0 < size` gives the original's
-  `cmp r1, #0; bls`. `if (size != 0)` gives `beq`, and a `for` inside `if (size > 0)` keeps its own `b` to the test.
+- At `-O2,p` no loop is rotated and no empty loop is dropped, in every function: a `for` or `while` loop is entered
+  with a `b` to its test at the end, as at `-O4,p` only in a function that reads an aligned object (below). A loop
+  that the original rotates then matches only as a guarded `do`/`while`: at `-O2,p`, `lib/irc`'s `IrcLink_Checksum`,
+  which reads no object, needs `if (i < size) { do { ... } while (++i < size); }` with `i = 0`, where at `-O4,p` a
+  plain `for` gives it. Loops that `-O2,p` matches and `-O4,p` rotates or drops, in some functions of a file only,
+  ask whether those functions read an aligned object.
 - At `-O4,p`, where a `for` loop is rotated into the same shape, a guard whose branch also skips statements after the
   loop is a guarded `do`/`while` with those statements inside the `if`. libVCT's `VCT_FilterFrame` (`vct_dsp.c`)
   saves its filter's state after the loop only when the loop ran, its `bls` past both stores, and matches as
@@ -2671,9 +2674,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE`, though
   there the original's `b` comes from an aligned object (next bullet).
 - An explicit alignment (`ATTRIBUTE_ALIGN(4)`, 16 or 32) on any object a function reads, or on a member it reads,
-  keeps every loop of the function, with a constant or a variable bound, entered with a `b` to its test, and changes
-  its other optimizations: a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it
-  is otherwise shifted.
+  keeps every loop of the function, with a constant or a variable bound, entered with a `b` to its test, keeps an
+  empty loop that `-O4,p` otherwise drops, and changes its other optimizations: a `u64` divided by 64 stays a call to
+  `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it is otherwise shifted.
   `volatile`, an aligned struct type or a union do not do it, and an `extern` declaration with the attribute does it
   as the definition does. libVCT's `vct_audio.c` has the original's case: its static `sSendQueue` is 32-aligned in the
   ROM (`0x02197a80`, after an 8-byte gap), and the functions that read it keep the leading `b` (`VCT_InitAudio`,
@@ -2682,6 +2685,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
   `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
   the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
+  `lib/irc`'s `IrcLink_IsRecvIgnored` and `IrcLink_ValidateFrame` keep their empty loops, probably of debug output
+  compiled out, because they read `IrcFrame`, the one object that `IrcLink_SendFrame`, whose loops keep their `b`,
+  reads. Under the attribute `IrcLink_Poll` matches with `if (IrcLink.connectCallback)`, while `!= NULL` compares with
+  the zero it has just stored (`cmp r2, r1` for the original's `cmp r2, #0`; An instruction too many or too few:
+  "A pointer compared with `NULL`").
   In overlay 139's `UpdateScroll` the attribute on any object or member the function reads also keeps the two reads
   of `list->dragDelta` in the arms of an `||` from being merged (4 bytes more), and leaves its index-first table read
   as it is (Instruction order: "that MWCC shares between two accesses").
@@ -2697,12 +2705,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   effect: it reads the file's statics by name and keeps both calls in its two waits, while `IrCheck_SendByte` and
   `IrCheck_RecvByte`, which reach the transfer through a pointer, fold theirs. Its layout doesn't show which static is
   aligned, or to what: the overlay's sections start 32-aligned anyway, and 4 to 32 on `sTransfer` all match. The other
-  copy of this driver, `lib/irc/src/irc_spi.c` (overlay 031), agrees: compiled at the game's -O4,p, `IrcSpi_Recv` and
-  `IrcSpi_Send`, the two functions that read `IrcSpi` by name, keep the original's unrotated loops only with an
-  alignment on `IrcSpi`, and no object of that file sits on a 32-byte boundary, so `ir_check.c` aligns `sTransfer` to
-  4. Under the attribute `IrCheck_ReadId` also needs each wait's start tick in a variable of its own, the local of an
-  inline `IrCheck_Wait60us` (the infrared library's `IrcSpi_Wait60us`): one `start` set before both waits swaps two
-  registers (`r4`/`r6`), which it doesn't with the five passes above off.
+  copy of this driver, `lib/irc/src/irc_spi.c` (overlay 031), agrees: `IrcSpi_Recv` and `IrcSpi_Send`, the two
+  functions that read `IrcSpi` by name, keep the original's unrotated loops only with an alignment on an object they
+  read, and `IrcSpi` sits at `0x02176970`, right after the previous file's last object and on a 16-byte boundary but
+  not a 32-byte one, so 4 to 16 fit it, and both files use 4. Under the attribute `IrCheck_ReadId` also needs each
+  wait's start tick in a variable of its own, the local of an inline `IrCheck_Wait60us` (the infrared library's
+  `IrcSpi_Wait60us`): one `start` set before both waits swaps two registers (`r4`/`r6`), which it doesn't with the
+  five passes above off.
   Two `_ull_mul` calls where ours multiplies once, in one function of a file, ask whether it reads an aligned object.
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =

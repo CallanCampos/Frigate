@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/pokemon_trade_local.h"
+#include "constants/arc.h"
 #include "constants/pokemon.h"
 #include "gfl/arc.h"
 #include "gfl/bg_sys.h"
@@ -167,7 +168,7 @@ static void PokemonTradeDemoMiddle_CreateSprite(PokemonTradeWork *wk) {
 
 // Loads the sprite's resources
 static void PokemonTradeDemoMiddle_LoadSprite(PokemonTradeWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x68, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEMONTRADE_DEMO, wk->heapId);
 
     wk->objRes[TRADE_OBJRES_CHAR_DEMO] = func_0204b81c(arc, 2, FALSE, 0, wk->heapId);
     wk->objRes[TRADE_OBJRES_PLTT_DEMO] = func_0204bbb8(arc, 3, 0, 0xe0, 0, 1, wk->heapId);

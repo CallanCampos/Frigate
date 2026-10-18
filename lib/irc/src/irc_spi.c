@@ -1,7 +1,7 @@
 // Overlay 31, the last of its four files (see net_devirc.c): the SPI bus to the card's infrared chip, which it talks
 // to through the backup SPI bus (as src/ov338/ir_check.c does). A transfer is a command byte, 1 to read and 2 to
-// write, and then the bytes, with a pause of 60 microseconds between. Built at -O2,p as part of lib/irc (see its
-// library.toml), whose name is ours.
+// write, and then the bytes, with a pause of 60 microseconds between. Built with the game's compiler and flags as part
+// of lib/irc, whose name is ours.
 #include "irc_spi.h"
 #include "nitro/card.h"
 #include "nitro/hw.h"
@@ -23,7 +23,12 @@ static u8 IrcSpi_SendByte(IrcSpiData *transfer);
 static void IrcSpi_RecvByte(IrcSpiData *transfer);
 
 static u16 IrcLockId = 0xfffd;
-static IrcSpiData IrcSpi;
+// Aligned, as the original's IrcSpi_Recv and IrcSpi_Send show: at -O4,p MWCC rotates a function's loops unless it
+// reads an object with an explicit alignment, and these two, which read IrcSpi by name, keep theirs entered with a
+// branch to the test. Which object was aligned, and to what, is a guess: IrcLockId or both command buffers give the
+// same code, and 4 to 16 all fit IrcSpi's address, right after irc_link.c's frame and on a 16-byte boundary but not
+// a 32-byte one.
+static IrcSpiData IrcSpi ATTRIBUTE_ALIGN(4);
 static u8 IrcReadCmd[0xb8];
 static u8 IrcWriteCmd[0xc8];
 

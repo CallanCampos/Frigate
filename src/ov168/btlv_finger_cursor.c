@@ -5,6 +5,7 @@
 #include "types.h"
 #include "battle/btl_pokeparam.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
@@ -35,7 +36,7 @@ static const ClActorSetupEx data_ov168_021f3ef4 = { { 0, 0, 0, 0, 0 }, { 0, 0 },
 
 BtlvFingerCursor *BtlvFingerCursor_Create(PaletteFade *fade, u32 paletteRow, HeapID heapId) {
     BtlvFingerCursor *cursor = GFL_HeapAllocate(heapId, sizeof(BtlvFingerCursor), TRUE, "btlv_finger_cursor.c", 0x52);
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(heapId));
 
     cursor->heapId = heapId;
     cursor->chars = func_0204b81c(arc, 0x1e7, FALSE, CLACT_VRAM_SUB, heapId);
