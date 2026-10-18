@@ -1,0 +1,8 @@
+LoadBattleTypeTextToStrbuf_Text_SingleBattle = SINGLE BATTLE
+LoadBattleTypeTextToStrbuf_Text_DoubleBattle = DOUBLE BATTLE
+LoadBattleTypeTextToStrbuf_Text_TripleBattle = TRIPLE BATTLE
+LoadBattleTypeTextToStrbuf_Text_RotationBattle = ROTATION BATTLE
+LoadBattleTypeTextToStrbuf_Text_MultiBattle = MULTI BATTLE
+LoadBattleTypeTextToStrbuf_Text_LauncherBattle = LAUNCHER BATTLE
+LoadBattleTypeTextToStrbuf_Text_Empty = デバッグバトル
+\pad{ea}

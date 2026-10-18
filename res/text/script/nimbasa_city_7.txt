@@ -1,0 +1,10 @@
+NimbasaCity7_Text_EverybodyMakesMistakesBut = Everybody makes mistakes.{be01}\nBut goalkeepers cannot afford a mistake,\nbecause they cannot score goals to make{be00}\nup for it.{be01}\nIf one Pokémon on a team makes a\nmistake, however, the other Pokémon{be00}\nand their Trainer can cover for it!
+NimbasaCity7_Text_IfStrikerCatchesTeammates = If a Striker catches a teammate's eye,\nthey understand each other.{be01}\nA Pokémon and its Trainer are the same.\nDon't you agree?
+NimbasaCity7_Text_ReallyStrongTrainersThoroughly = Really strong Trainers thoroughly do\nwhatever they can do!
+NimbasaCity7_Text_SoccerBeautifulFunPokemon = Soccer is beautiful and fun!\nPokémon are also beautiful and fun!
+NimbasaCity7_Text_SoccerPokemonPokemonSoccer = Soccer with Pokémon is Pokémon soccer.\nThe abbreviation is...Poker?{be00}\nNo, wait, that's a fireplace tool.{be00}\nHow about Poccer?
+NimbasaCity7_Text_ThrowSoundPassTeam = Throw a sound pass to a team member!{be01}\nAfter that, to receive a sound pass,\nyou'll need to move swiftly.
+NimbasaCity7_Text_RunRunJustThink = Run! Run!\nJust think about running!
+NimbasaCity7_Text_Squeeskwaa = Squeeskwaa!
+NimbasaCity7_Text_Meep = Meep! ♪
+\pad{4a}

@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Janna",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_F_164",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SUICUNE",
+            "form": 0,
+            "level": 80,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_GANLON_BERRY",
+            "moves": [ "MOVE_HYDRO_PUMP", "MOVE_ICY_WIND", "MOVE_MIRROR_COAT", "MOVE_CALM_MIND" ]
+        },
+        {
+            "species": "SPECIES_HEATRAN",
+            "form": 0,
+            "level": 80,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_AIR_BALLOON",
+            "moves": [ "MOVE_OVERHEAT", "MOVE_EARTHQUAKE", "MOVE_STONE_EDGE", "MOVE_SCARY_FACE" ]
+        },
+        {
+            "species": "SPECIES_LATIOS",
+            "form": 0,
+            "level": 80,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_WHITE_HERB",
+            "moves": [ "MOVE_DRACO_METEOR", "MOVE_PSYCHIC", "MOVE_ICY_WIND", "MOVE_THUNDERBOLT" ]
+        }
+    ],
+    "messages": []
+}

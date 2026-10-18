@@ -1,0 +1,21 @@
+EntreeForest_Text_WelcomeBattleCompetition = Welcome to Battle Competition!
+EntreeForest_Text_ThereTwoKindsBattle = There are two kinds of\nBattle Competitions.{be01}\nOne is the Wi-Fi Competition,\nwhich is held via Nintendo Wi-Fi Connection.{be01}\nThe other is the Live Competition,\nwhich is held at certain events.{be01}\nOnly Pokémon registered in your\nBattle Box can participate.{be01}\nOnce registered, you cannot move\nyour Pokémon to and from your{be00}\nBattle Box.{be01}\nWhen you participate in a competition,\nyour Digital Player ID will be updated.{be00}\nPlease check it.{be01}
+EntreeForest_Text_WiFiCompetition = To the Wi-Fi Competition
+EntreeForest_Text_LiveCompetition = To the Live Competition
+EntreeForest_Text_CheckDigitalPlayerId = Check your Digital Player ID
+EntreeForest_Text_Info = Info
+EntreeForest_Text_Back = Back
+EntreeForest_Text_Participate = Participate
+EntreeForest_Text_ParticipateWiFiCompetition = To participate in the Wi-Fi Competition,\nyou'll need to access the webpage{be00}\nof the Pokémon Global Link to register.{be00}\nhttp://www.pokemon-gl.com{be01}\nPlease check the Pokémon Global Link\nwebpage for the competition regulations,{be00}\nits duration, and other information.{be01}\nPlease bear in mind that if the power is\nturned off during a Wi-Fi Competition or a{be00}\nRandom Matchup, you won't be able to{be00}\nparticipate in a competition for one hour.{be01}
+EntreeForest_Text_WillParticipateWiFi = Will you participate in\nthe Wi-Fi Competition?
+EntreeForest_Text_Empty =                     \x{ffff}
+EntreeForest_Text_Empty_2 =     \x{ffff}
+EntreeForest_Text_Empty_3 =     \x{ffff}
+EntreeForest_Text_CancelParticipation = Cancel participation
+EntreeForest_Text_WillParticipateLiveCompetition = Will you participate in\nthe Live Competition?
+EntreeForest_Text_CanCheckInformationRegarding = You can check the information\nregarding the Live Competition at the{be00}\nPokémon official website:{be00}\nhttp://www.pokemon.com.{be01}\nPlease check the Pokémon official website\nfor the competition regulations,{be00}\nits duration, and other information.{be01}
+EntreeForest_Text_SinceSystemTurnedOff = Since the system was turned off or lost\npower during a Wi-Fi Competition or{be00}\na Random Matchup, you cannot participate{be00}\nin a competition or a Random Matchup{be00}\nfor one hour.{be01}\nPlease come back again\nafter one hour has passed.{be01}
+EntreeForest_Text_SavingDontTurnOff = Saving...\nDon't turn off the power.
+EntreeForest_Text_RecognizeAchievementBattlePresent = To recognize your achievement in battle,\nI present you with these Battle Points.{be01}
+EntreeForest_Text_ReceivedBp = {0100:0} received\n{0201:1} BP!{be01}
+\pad{6a}

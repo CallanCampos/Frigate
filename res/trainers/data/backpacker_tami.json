@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tami",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DRILBUR",
+            "form": 0,
+            "level": 22,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "A desert is like one giant sandbox, right?\nSo come on, let's let our Pokémon play!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Since this is for play, whoever has the most\nfun is the winner!"
+        },
+        {
+            "type": 2,
+            "text": "How about I just make a huge sandcastle\nin the place of that old Relic Castle{be00}\nthat's getting buried?"
+        }
+    ]
+}

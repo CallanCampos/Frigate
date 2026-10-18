@@ -1,0 +1,27 @@
+IcirrusCity_Text_LegendaryPokemonReshiramShared = The legendary Pokémon Reshiram\nshared its wisdom with the hero{be00}\nand defied foes with columns of fire.{be01}\nThe hero and that Pokémon were as\nclose as a parent and child.{be01}\nIt was indeed awe inspiring\nto see them!
+IcirrusCity_Text_LegendaryPokemonZekromShared = The legendary Pokémon Zekrom\nshared its wisdom with the hero{be00}\nand defied foes with fierce lightning.{be01}\nThe hero and that Pokémon were as\nclose as a parent and child.{be01}\nIt was indeed awe inspiring\nto see them!
+IcirrusCity_Text_AlwaysTowerLoomsDisdainful = Always, the tower looms,\ndisdainful of the wind and snow.{be01}\nPerhaps its presence is telling us\nnot to forget dreams and ideals...
+IcirrusCity_Text_LegendaryPokemonGaveHelp = The legendary Pokémon gave help\nto the hero who sought truth.{be00}\nBecause of that, a region was created.{be01}\nThen, when its physical form was lost,\nthe Pokémon became the Light Stone,{be00}\nwaiting patiently for a new hero.{be01}\nThe story I heard when I was little\nturned out to be true.
+IcirrusCity_Text_LegendaryPokemonGaveHelp_2 = The legendary Pokémon gave help\nto the hero who sought ideals.{be00}\nBecause of that, a region was created.{be01}\nThen, when its physical form was lost,\nthe Pokémon became the Dark Stone,{be00}\nwaiting patiently for a new hero.{be01}\nThe story I heard when I was little\nturned out to be true.
+IcirrusCity_Text_BrycenHasBeenSurrounded = Brycen has been surrounded by\nIce-type Pokémon and has trained in the{be00}\nmartial arts ever since he was a child.{be01}\nHe's become an action star\nusing that experience!
+IcirrusCity_Text_TruthIdealsTwoDragons = Truth! Ideals!\nTwo dragons!
+IcirrusCity_Text_WhenOneDividedWorld = When one is divided, ♪\nthe world will broaden. ♪
+IcirrusCity_Text_FusedBySplicersDivided = Fused by splicers.\nDivided by splicers.
+IcirrusCity_Text_TruthIdealsMoveForward = Truth and ideals.\nMove forward hand in hand. ♪
+IcirrusCity_Text_IfWalkWetlandsMight = If you walk in the wetlands, you might\nsurprise wild Pokémon into popping out!
+IcirrusCity_Text_WhenWetlandsFreezeIts = When the wetlands freeze, it's slippery.\nI wonder how wetland Pokémon manage?
+IcirrusCity_Text_CongratulationsGhetsisWontAnything = You...\nCongratulations.{be01}\nGhetsis won't do anything anymore...{be01}\nNo, to be more precise,\nhe can't do anything anymore...{be01}\nThat's why we won't forgive you.\nBattle us!
+IcirrusCity_Text_BattleUs = Battle us!
+IcirrusCity_Text_IllWinOnlyWay = I'll win! That is the only way\nto regain his lost heart!{be01}
+IcirrusCity_Text_NextButDontHave = The next is me...{be01}\nBut you don't have enough Pokémon\nfor a Triple Battle.{be01}\nI'll battle you when the season changes.{be01}
+IcirrusCity_Text_WhatWantWantKeep = What do you want?\nDo you want to keep battling?
+IcirrusCity_Text_BattleGhetsisOnlyProof = Battle for Ghetsis!{be01}\nThat is the only proof\nthat I'm living now.{be01}
+IcirrusCity_Text_SeeWhenSeasonChanges = I see...{be01}\nWhen the season changes,\nI'll battle you.{be01}
+IcirrusCity_Text_NextButDontHave_2 = The next is me...{be01}\nBut you don't have enough Pokémon\nfor a Rotation Battle.{be01}\nI'll battle you when the season changes.{be01}
+IcirrusCity_Text_WhatWantWantKeep_2 = What do you want?\nDo you want to keep battling?
+IcirrusCity_Text_WeShadowTriadWere = We, the Shadow Triad,\nwere, are, and will be the{be00}\nroyal servants of Ghetsis!{be01}
+IcirrusCity_Text_SeeWhenSeasonChanges_2 = I see...{be01}\nWhen the season changes,\nI'll battle you.{be01}
+IcirrusCity_Text_IcirrusCitySkyGlittering = Icirrus City\nSky Glittering with Flowers of Snow
+IcirrusCity_Text_FansEverythingPokemonPokemon = Fans of Everything Pokémon\nThe Pokémon Fan Club
+IcirrusCity_Text_FormerIcirrusCityPokemon = Former Icirrus City\nPokémon Gym
+\pad{ca}

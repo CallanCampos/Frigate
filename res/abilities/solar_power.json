@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Solar Power",
+    "description": "In sunshine, Sp. Atk is\nboosted but HP decreases."
+}

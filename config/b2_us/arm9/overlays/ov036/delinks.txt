@@ -369,23 +369,23 @@ src/ov036/fldmmdl_acmd.c:
 
 src/ov036/fldmmdl_blact.c:
     .text       start:0x02193680 end:0x021946b4
-    .rodata     start:0x021ce3a0 end:0x021cf2e4
+    .rodata     start:0x021ce3a0 end:0x021cf364
     .data       start:0x021d4d50 end:0x021d4d60
 
 src/ov036/fldmmdl_g3dobj.c:
     .text       start:0x021946b4 end:0x02195378
-    .rodata     start:0x021cf2e4 end:0x021cf3a8
+    .rodata     start:0x021cf364 end:0x021cf3a8
     .data       start:0x021d4d60 end:0x021d4d74
 
 src/ov036/fld_act_rail.c:
     .text       start:0x02195378 end:0x02196238
-    .rodata     start:0x021cf3a8 end:0x021cf768
-    .data       start:0x021d4d74 end:0x021d4d98
+    .rodata     start:0x021cf3a8 end:0x021cf7c8
+    .data       start:0x021d4d74 end:0x021d4de8
 
 src/ov036/field_rail_loader.c:
     .text       start:0x02196238 end:0x02197534
-    .rodata     start:0x021cf768 end:0x021cf9dc
-    .data       start:0x021d4d98 end:0x021d4dfc
+    .rodata     start:0x021cf7c8 end:0x021cf9dc
+    .data       start:0x021d4de8 end:0x021d4dfc
 
 src/ov036/field_fog.c:
     complete
@@ -393,6 +393,7 @@ src/ov036/field_fog.c:
     .data       start:0x021d4dfc end:0x021d4e08
 
 src/ov036/field_zonefog.c:
+    complete
     .text       start:0x02197710 end:0x02197820
     .data       start:0x021d4e08 end:0x021d4e18
 
@@ -420,6 +421,7 @@ src/ov036/weather_task.c:
     .data       start:0x021d4e60 end:0x021d4e70
 
 src/ov036/fieldmap_ctrl_grid.c:
+    complete
     .text       start:0x0219a3b4 end:0x0219a47c
     .rodata     start:0x021cfbfc end:0x021cfc10
     .data       start:0x021d4e70 end:0x021d4e88
@@ -435,6 +437,7 @@ src/ov036/field_player_nogrid.c:
     .data       start:0x021d4ec0 end:0x021d4efc
 
 src/ov036/fieldmap_ctrl_nogrid_work.c:
+    complete
     .text       start:0x0219e328 end:0x0219e430
     .rodata     start:0x021cfdf4 end:0x021cfe1c
     .data       start:0x021d4efc end:0x021d4f18
@@ -519,6 +522,7 @@ src/ov036/field_player_grid_event.c:
     .data       start:0x021d5404 end:0x021d5420
 
 src/ov036/fld_particle.c:
+    complete
     .text       start:0x021bb590 end:0x021bb67c
     .rodata     start:0x021d1784 end:0x021d1c80
     .data       start:0x021d5420 end:0x021d5430
@@ -599,6 +603,7 @@ src/ov036/fldeff_d06denki.c:
     .data       start:0x021d558c end:0x021d55a0
 
 src/ov036/land_data_patch.c:
+    complete
     .text       start:0x021c2cbc end:0x021c2ddc
     .data       start:0x021d55a0 end:0x021d55b4
 
@@ -613,6 +618,7 @@ src/ov036/party_select_list.c:
     .data       start:0x021d55d4 end:0x021d5620
 
 src/ov036/field_bbd_color.c:
+    complete
     .text       start:0x021c3c34 end:0x021c3d9c
     .rodata     start:0x021d2540 end:0x021d2560
     .data       start:0x021d5620 end:0x021d5634

@@ -1,4 +1,0 @@
-DriftveilCity8_Text_ImVerySorryPokemon = I'm very sorry.{be01}\nThe Pokémon World Tournament\nwill commence shortly,{be00}\nbut we're still preparing the area.{be01}\nOh, you don't have the Driftveil City\nGym Badge yet?{be01}\nIn that case, how about taking\non the Pokémon Gym first?
-DriftveilCity8_Text_Empty =                                                                                                                                    \x{ffff}
-DriftveilCity8_Text_PokemonWorldTournamentAhead = The Pokémon World Tournament\nis ahead!
-DriftveilCity8_Text_IfKeepWinningGet = If you keep winning, you get BP!\nWhich is to say, you win Battle Points!{be01}\nSo save up lots of BP, and exchange\nthem for great items!

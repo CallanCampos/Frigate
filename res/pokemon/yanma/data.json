@@ -1,0 +1,179 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Yanma",
+    "pokedex": {
+        "category": "Clear Wing Pokémon",
+        "entry": "By flapping its wings at high speed,\nit can fly freely through the air.\nEven sudden stops are no problem.",
+        "height": "3'11\"",
+        "weight": "83.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Yanma",
+                "category": "Clear Wing Pokémon",
+                "entry": "It can hover in one spot by\nflapping its wings at high speed. It\nflits about to guard its territory.",
+                "height": "3'11\"",
+                "weight": "83.8 lbs."
+            },
+            "fr": {
+                "name": "Yanma",
+                "category": "Pokémon Translaile",
+                "entry": "La vitesse de ses ailes lui permet\nun vol stationnaire. Il surveille\nainsi tout son territoire.",
+                "height": "1,2 m",
+                "weight": "38,0 kg"
+            },
+            "de": {
+                "name": "Yanma",
+                "category": "Libelle",
+                "entry": "Schwebt auf der Stelle durch das\nschnelle Schlagen seiner Flügel.\nHat ein Auge auf sein Territorium.",
+                "height": "1,2 m",
+                "weight": "38,0 kg"
+            },
+            "it": {
+                "name": "Yanma",
+                "category": "Pokémon Alachiara",
+                "entry": "Può fermarsi a mezz'aria sbattendo\nvelocemente le ali. Vola di qua e di\nlà per difendere il suo territorio.",
+                "height": "1,2 m",
+                "weight": "38,0 kg"
+            },
+            "ko": {
+                "name": "왕자리",
+                "category": "얇은날개포켓몬",
+                "entry": "날개를 고속으로 퍼덕여\n공중에서 정지한 채로\n자신의 영역을 감시한다.",
+                "height": "1.2 m",
+                "weight": "38.0 kg"
+            },
+            "es": {
+                "name": "Yanma",
+                "category": "Pokémon Ala Clara",
+                "entry": "Puede mantenerse en un punto fijo\ndel aire agitando mucho las alas.\nVigila su territorio sobrevolándolo.",
+                "height": "1,2 m",
+                "weight": "38,0 kg"
+            },
+            "ja": {
+                "name": "ヤンヤンマ",
+                "category": "うすばねポケモン",
+                "entry": "ハネを\\x{3000}こうそくで\\x{3000}はためかせて\nくうちゅうで\\x{3000}ていし\\x{3000}しながら\nじぶんの\\x{3000}なわばりを\\x{3000}みはっている。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff13}\\x{ff18}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 65,
+        "defense": 45,
+        "speed": 95,
+        "special_attack": 75,
+        "special_defense": 45
+    },
+    "types": [ "TYPE_BUG", "TYPE_FLYING" ],
+    "catch_rate": 75,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_WIDE_LENS",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_SPEED_BOOST", "ABILITY_COMPOUNDEYES" ],
+    "hidden_ability": "ABILITY_FRISK",
+    "flee_rate": 120,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 78,
+    "height": 12,
+    "weight": 380,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_FORESIGHT" ],
+            [ 6, "MOVE_QUICK_ATTACK" ],
+            [ 11, "MOVE_DOUBLE_TEAM" ],
+            [ 14, "MOVE_SONIC_BOOM" ],
+            [ 17, "MOVE_DETECT" ],
+            [ 22, "MOVE_SUPERSONIC" ],
+            [ 27, "MOVE_UPROAR" ],
+            [ 30, "MOVE_PURSUIT" ],
+            [ 33, "MOVE_ANCIENT_POWER" ],
+            [ 38, "MOVE_HYPNOSIS" ],
+            [ 43, "MOVE_WING_ATTACK" ],
+            [ 46, "MOVE_SCREECH" ],
+            [ 49, "MOVE_U_TURN" ],
+            [ 54, "MOVE_AIR_SLASH" ],
+            [ 57, "MOVE_BUG_BUZZ" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM70",
+            "TM85",
+            "TM87",
+            "TM89",
+            "TM90"
+        ],
+        "by_tutor": [
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_UPROAR",
+            "MOVE_SNORE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_WHIRLWIND",
+            "MOVE_REVERSAL",
+            "MOVE_LEECH_LIFE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_SILVER_WIND",
+            "MOVE_FEINT",
+            "MOVE_FAINT_ATTACK",
+            "MOVE_PURSUIT",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_SECRET_POWER"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_KNOWS_MOVE",
+            "param": "MOVE_ANCIENT_POWER",
+            "species": "SPECIES_YANMEGA"
+        }
+    ],
+    "regional_dex_number": 286,
+    "baby_species": "SPECIES_YANMA",
+    "cry_volume": 110
+}

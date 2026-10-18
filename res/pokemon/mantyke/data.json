@@ -1,0 +1,174 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Mantyke",
+    "pokedex": {
+        "category": "Kite Pokémon",
+        "entry": "The pattern on its back\nvaries by region. It often\nswims in a school of Remoraid.",
+        "height": "3'03\"",
+        "weight": "143.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Mantyke",
+                "category": "Kite Pokémon",
+                "entry": "People organize tours to see this\nPokémon frolic and skim the tops\nof waves with Remoraid.",
+                "height": "3'03\"",
+                "weight": "143.3 lbs."
+            },
+            "fr": {
+                "name": "Babimanta",
+                "category": "Pokémon Cervolant",
+                "entry": "On organise des excursions pour le\nvoir surfer sur les vagues au côté\ndes Rémoraid.",
+                "height": "1,0 m",
+                "weight": "65,0 kg"
+            },
+            "de": {
+                "name": "Mantirps",
+                "category": "Flugrochen",
+                "entry": "Man organisiert Touren, um diesem\nPokémon zuzusehen, wie es mit\nRemoraid über die Wellen gleitet.",
+                "height": "1,0 m",
+                "weight": "65,0 kg"
+            },
+            "it": {
+                "name": "Mantyke",
+                "category": "Pokémon Aquilone",
+                "entry": "Vengono organizzate escursioni per\nvedere questo Pokémon giocare in\nmezzo alle onde con Remoraid.",
+                "height": "1,0 m",
+                "weight": "65,0 kg"
+            },
+            "ko": {
+                "name": "타만타",
+                "category": "연포켓몬",
+                "entry": "총어와 장난치며\n수면을 뛰어오르는 모습을\n보기 위한 투어가 열린다.",
+                "height": "1.0 m",
+                "weight": "65.0 kg"
+            },
+            "es": {
+                "name": "Mantyke",
+                "category": "Pokémon Milano",
+                "entry": "La gente organiza excursiones para\nver a este Pokémon retozando por\nlas olas con Remoraid.",
+                "height": "1,0 m",
+                "weight": "65,0 kg"
+            },
+            "ja": {
+                "name": "タマンタ",
+                "category": "カイトポケモン",
+                "entry": "テッポウオと\\x{3000}たわむれながら\nすいめんを\\x{3000}はねている\\x{3000}ようすを\nみるための\\x{3000}ツアーが\\x{3000}おこなわれる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 20,
+        "defense": 50,
+        "speed": 50,
+        "special_attack": 60,
+        "special_defense": 120
+    },
+    "types": [ "TYPE_WATER", "TYPE_FLYING" ],
+    "catch_rate": 25,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 1
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_UNDISCOVERED", "EGG_GROUP_UNDISCOVERED" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_WATER_ABSORB" ],
+    "hidden_ability": "ABILITY_WATER_VEIL",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 69,
+    "height": 10,
+    "weight": 650,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_BUBBLE" ],
+            [ 3, "MOVE_SUPERSONIC" ],
+            [ 7, "MOVE_BUBBLE_BEAM" ],
+            [ 11, "MOVE_CONFUSE_RAY" ],
+            [ 14, "MOVE_WING_ATTACK" ],
+            [ 16, "MOVE_HEADBUTT" ],
+            [ 19, "MOVE_WATER_PULSE" ],
+            [ 23, "MOVE_WIDE_GUARD" ],
+            [ 27, "MOVE_TAKE_DOWN" ],
+            [ 32, "MOVE_AGILITY" ],
+            [ 36, "MOVE_AIR_SLASH" ],
+            [ 39, "MOVE_AQUA_RING" ],
+            [ 46, "MOVE_BOUNCE" ],
+            [ 49, "MOVE_HYDRO_PUMP" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM62",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [ "MOVE_SIGNAL_BEAM", "MOVE_BOUNCE", "MOVE_ICY_WIND", "MOVE_SNORE", "MOVE_HELPING_HAND", "MOVE_SLEEP_TALK" ],
+        "egg_moves": [
+            "MOVE_TWISTER",
+            "MOVE_HYDRO_PUMP",
+            "MOVE_HAZE",
+            "MOVE_SLAM",
+            "MOVE_MUD_SPORT",
+            "MOVE_MIRROR_COAT",
+            "MOVE_WATER_SPORT",
+            "MOVE_SPLASH",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_WIDE_GUARD",
+            "MOVE_AMNESIA"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_SPECIES_IN_PARTY",
+            "param": "SPECIES_REMORAID",
+            "species": "SPECIES_MANTINE"
+        }
+    ],
+    "regional_dex_number": 233,
+    "baby_species": "SPECIES_MANTYKE",
+    "cry_volume": 120
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Olesia",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CHINGLING",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_MR_MIME",
+            "form": 0,
+            "level": 62,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Eeek! Why? I foresaw your move,\nand I was running away from you.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Eeek! I foresaw your thoughts,\nbut I lost!"
+        },
+        {
+            "type": 2,
+            "text": "You can't help but to chase after what\nruns and to want what you can't have!"
+        }
+    ]
+}

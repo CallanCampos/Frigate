@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Olya",
+    "class": "TRAINER_CLASS_SOCIALITE",
+    "pokemon": [
+        "aipom_1",
+        "yanma_1",
+        "dugtrio_1",
+        "murkrow_1",
+        "ponyta_1",
+        "raticate_1",
+        "emolga_1",
+        "swellow_1",
+        "fearow_1",
+        "liepard_1"
+    ]
+}

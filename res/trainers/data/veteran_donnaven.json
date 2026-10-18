@@ -1,0 +1,24 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Donnaven",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 60,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 1,
+            "item": "ITEM_METRONOME",
+            "moves": [ "MOVE_LAST_RESORT", "MOVE_THUNDER_WAVE" ]
+        }
+    ],
+    "messages": []
+}

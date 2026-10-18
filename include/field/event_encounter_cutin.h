@@ -7,7 +7,7 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
-GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, void *field3d, u32 selection, u32 param);
+GameEvent *EventFieldEffect_CreateBattleCutin(GameSystem *gsys, Fld3DCi *ci, u32 selection, u32 param);
 
 // The encounter effects' create functions, called with the field
 GameEvent *func_ov146_021f59e0(GameSystem *gsys, Field *field, u32 param);

@@ -1,0 +1,192 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Shieldon",
+    "pokedex": {
+        "category": "Shield Pokémon",
+        "entry": "It is outstandingly armored. As a\nresult, it can eat grass and\nberries without having to fight.",
+        "height": "1'08\"",
+        "weight": "125.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Shieldon",
+                "category": "Shield Pokémon",
+                "entry": "It is outstandingly armored. As a\nresult, it can eat grass and\nberries without having to fight.",
+                "height": "1'08\"",
+                "weight": "125.7 lbs."
+            },
+            "fr": {
+                "name": "Dinoclier",
+                "category": "Pokémon Bouclier",
+                "entry": "Il est si bien protégé qu'il peut\ndéguster Baies et herbe fraîche\nsans craindre de prédateurs.",
+                "height": "0,5 m",
+                "weight": "57,0 kg"
+            },
+            "de": {
+                "name": "Schilterus",
+                "category": "Schutzschild",
+                "entry": "Es ist sehr gut gepanzert und muss\ndaher während des Essens von Gras\nund Beeren keinen Kampf fürchten.",
+                "height": "0,5 m",
+                "weight": "57,0 kg"
+            },
+            "it": {
+                "name": "Shieldon",
+                "category": "Pokémon Schermo",
+                "entry": "Ha una corazza molto spessa. Di\nconseguenza può procurarsi erba\ne bacche senza dover combattere.",
+                "height": "0,5 m",
+                "weight": "57,0 kg"
+            },
+            "ko": {
+                "name": "방패톱스",
+                "category": "실드포켓몬",
+                "entry": "뛰어난 방어력을 지녔다.\n그 덕분에 특별히 다투는 일도 없이\n풀이나 나무열매를 먹으며 지낸다.",
+                "height": "0.5 m",
+                "weight": "57.0 kg"
+            },
+            "es": {
+                "name": "Shieldon",
+                "category": "Pokémon Escudo",
+                "entry": "Gracias a su imponente protección\nfacial, puede comer hierba y bayas\ndonde quiera sin que le molesten.",
+                "height": "0,5 m",
+                "weight": "57,0 kg"
+            },
+            "ja": {
+                "name": "タテトプス",
+                "category": "シールドポケモン",
+                "entry": "ばつぐんの\\x{3000}ぼうぎょりょくを\\x{3000}もつ。\nそのため\\x{3000}とくに\\x{3000}あらそうこともなく\nくさや\\x{3000}きのみを\\x{3000}たべて\\x{3000}すごす。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff17}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 30,
+        "attack": 42,
+        "defense": 118,
+        "speed": 30,
+        "special_attack": 42,
+        "special_defense": 88
+    },
+    "types": [ "TYPE_ROCK", "TYPE_STEEL" ],
+    "catch_rate": 45,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_ERRATIC",
+    "egg_groups": [ "EGG_GROUP_MONSTER", "EGG_GROUP_MONSTER" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SOUNDPROOF",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 70,
+    "height": 5,
+    "weight": 570,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_PROTECT" ],
+            [ 6, "MOVE_TAUNT" ],
+            [ 10, "MOVE_METAL_SOUND" ],
+            [ 15, "MOVE_TAKE_DOWN" ],
+            [ 19, "MOVE_IRON_DEFENSE" ],
+            [ 24, "MOVE_SWAGGER" ],
+            [ 28, "MOVE_ANCIENT_POWER" ],
+            [ 33, "MOVE_ENDURE" ],
+            [ 37, "MOVE_METAL_BURST" ],
+            [ 42, "MOVE_IRON_HEAD" ],
+            [ 46, "MOVE_HEAVY_SLAM" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM23",
+            "TM24",
+            "TM25",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM35",
+            "TM37",
+            "TM38",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM59",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_EARTH_POWER",
+            "MOVE_MAGNET_RISE",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_HEADBUTT",
+            "MOVE_SCARY_FACE",
+            "MOVE_FOCUS_ENERGY",
+            "MOVE_DOUBLE_EDGE",
+            "MOVE_ROCK_BLAST",
+            "MOVE_BODY_SLAM",
+            "MOVE_SCREECH",
+            "MOVE_CURSE",
+            "MOVE_FISSURE",
+            "MOVE_COUNTER",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_WIDE_GUARD"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 30,
+            "species": "SPECIES_BASTIODON"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_SHIELDON",
+    "cry_volume": 120
+}

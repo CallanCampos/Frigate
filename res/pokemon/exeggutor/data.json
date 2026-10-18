@@ -1,0 +1,169 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Exeggutor",
+    "pokedex": {
+        "category": "Coconut Pokémon",
+        "entry": "It is called “The Walking Jungle.\"\nIf a head grows too big, it falls\noff and becomes an Exeggcute.",
+        "height": "6'07\"",
+        "weight": "264.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Exeggutor",
+                "category": "Coconut Pokémon",
+                "entry": "It is called “The Walking Jungle.\"\nIf a head grows too big, it falls\noff and becomes an Exeggcute.",
+                "height": "6'07\"",
+                "weight": "264.6 lbs."
+            },
+            "fr": {
+                "name": "Noadkoko",
+                "category": "Pokémon Fruitpalme",
+                "entry": "On l'appelle “jungle sur pattes\".\nSi une tête devient trop grosse,\nelle tombe et produit un Noeunoeuf.",
+                "height": "2,0 m",
+                "weight": "120,0 kg"
+            },
+            "de": {
+                "name": "Kokowei",
+                "category": "Palmfrucht",
+                "entry": "Man nennt es den „Laufenden Dschungel“.\nWird ein Kopf zu groß, fällt er ab\nund wird zu einem Owei.",
+                "height": "2,0 m",
+                "weight": "120,0 kg"
+            },
+            "it": {
+                "name": "Exeggutor",
+                "category": "Pokémon Nocecocco",
+                "entry": "Noto come “Giungla in moto\". Se\nuna testa diventa troppo grande,\ncade e si trasforma in Exeggcute.",
+                "height": "2,0 m",
+                "weight": "120,0 kg"
+            },
+            "ko": {
+                "name": "나시",
+                "category": "야자열매포켓몬",
+                "entry": "걸어다니는 열대 우림이라고\n불린다. 크게 자란 머리 중 하나가\n땅에 떨어지면 아라리가 된다.",
+                "height": "2.0 m",
+                "weight": "120.0 kg"
+            },
+            "es": {
+                "name": "Exeggutor",
+                "category": "Pokémon Coco",
+                "entry": "Se le llama la Selva Andante. Si una\ncabeza crece demasiado, se cae\ny forma un Exeggcute.",
+                "height": "2,0 m",
+                "weight": "120,0 kg"
+            },
+            "ja": {
+                "name": "ナッシー",
+                "category": "やしのみポケモン",
+                "entry": "あるく\\x{3000}ねったいうりんと\\x{3000}よばれる。\nおおきくなった\\x{3000}あたまの\\x{3000}ひとつが\nじめんに\\x{3000}おちると\\x{3000}タマタマになる。",
+                "height": "\\x{ff12}\\x{ff0e}\\x{ff10}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 95,
+        "attack": 95,
+        "defense": 85,
+        "speed": 55,
+        "special_attack": 125,
+        "special_defense": 65
+    },
+    "types": [ "TYPE_GRASS", "TYPE_PSYCHIC" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_GRASS", "EGG_GROUP_GRASS" ],
+    "abilities": [ "ABILITY_CHLOROPHYLL", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_HARVEST",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 182,
+    "height": 20,
+    "weight": 1200,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SEED_BOMB" ],
+            [ 1, "MOVE_BARRAGE" ],
+            [ 1, "MOVE_HYPNOSIS" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 1, "MOVE_STOMP" ],
+            [ 17, "MOVE_PSYSHOCK" ],
+            [ 27, "MOVE_EGG_BOMB" ],
+            [ 37, "MOVE_WOOD_HAMMER" ],
+            [ 47, "MOVE_LEAF_STORM" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM19",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM29",
+            "TM32",
+            "TM33",
+            "TM36",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM64",
+            "TM68",
+            "TM70",
+            "TM75",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_SEED_BOMB",
+            "MOVE_LOW_KICK",
+            "MOVE_BLOCK",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_SNORE",
+            "MOVE_SYNTHESIS",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_WORRY_SEED",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_EXEGGCUTE",
+    "cry_volume": 110
+}

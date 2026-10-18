@@ -126,3 +126,32 @@ lib/dwc/src/gamespy/md5c.c:
     .text       start:0x02171a3c end:0x0217245c
     .rodata     start:0x021850d4 end:0x021850e8
     .data       start:0x02187794 end:0x021877d4
+
+lib/dwc/src/gt2/gt2Buffer.c:
+    complete
+    .text       start:0x0217c984 end:0x0217ca34
+
+lib/dwc/src/gt2/gt2Callback.c:
+    complete
+    .text       start:0x0217ca34 end:0x0217ce40
+
+lib/dwc/src/gt2/gt2Connection.c:
+    complete
+    .text       start:0x0217ce40 end:0x0217d184
+
+lib/dwc/src/gt2/gt2Main.c:
+    complete
+    .text       start:0x0217d184 end:0x0217d3ec
+
+lib/dwc/src/gt2/gt2Message.c:
+    .text       start:0x0217d3ec end:0x0217e7a8
+    .data       start:0x02189114 end:0x02189120
+
+lib/dwc/src/gt2/gt2Socket.c:
+    .text       start:0x0217e7a8 end:0x0217ed54
+
+lib/dwc/src/gt2/gt2Utility.c:
+    complete
+    .text       start:0x0217ed54 end:0x0217eed0
+    .data       start:0x02189120 end:0x02189134
+    .bss        start:0x02191bfc end:0x02191c2c

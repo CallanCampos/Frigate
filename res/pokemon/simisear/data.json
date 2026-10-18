@@ -1,0 +1,130 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Simisear",
+    "pokedex": {
+        "category": "Ember Pokémon",
+        "entry": "When it gets excited, embers rise\nfrom its head and tail and it gets hot.\nFor some reason, it loves sweets.",
+        "height": "3'03\"",
+        "weight": "61.7 lbs.",
+        "languages": {
+            "ja": {
+                "category": "ひのこポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 98,
+        "defense": 63,
+        "speed": 101,
+        "special_attack": 98,
+        "special_defense": 63
+    },
+    "types": [ "TYPE_FIRE", "TYPE_FIRE" ],
+    "catch_rate": 75,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_ORAN_BERRY",
+        "rare": "ITEM_PASSHO_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_GLUTTONY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_BLAZE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 174,
+    "height": 10,
+    "weight": 280,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_LICK" ],
+            [ 1, "MOVE_FURY_SWIPES" ],
+            [ 1, "MOVE_FLAME_BURST" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM27",
+            "TM28",
+            "TM31",
+            "TM32",
+            "TM35",
+            "TM38",
+            "TM39",
+            "TM41",
+            "TM42",
+            "TM43",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM50",
+            "TM52",
+            "TM56",
+            "TM59",
+            "TM61",
+            "TM62",
+            "TM65",
+            "TM66",
+            "TM68",
+            "TM80",
+            "TM83",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM94",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_LOW_KICK",
+            "MOVE_GUNK_SHOT",
+            "MOVE_UPROAR",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_SUPERPOWER",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_HEAT_WAVE",
+            "MOVE_ROLE_PLAY",
+            "MOVE_HELPING_HAND",
+            "MOVE_ENDEAVOR",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 40,
+    "baby_species": "SPECIES_PANSEAR",
+    "cry_volume": 110
+}

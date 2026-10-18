@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Blaze",
+    "description": "Powers up Fire-type\nmoves in a pinch."
+}

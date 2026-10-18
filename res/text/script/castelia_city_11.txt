@@ -1,0 +1,16 @@
+CasteliaCity11_Text_WelcomeRoyalUnovaScenery = Welcome to the Royal Unova!{be01}\nThe scenery is exhilarating.\nThe battles are exciting.{be01}\nThe ticket is $1,000.\nWould you like to get on board?
+CasteliaCity11_Text_RoyalUnovaLeavesOnce = The Royal Unova leaves once a day.{be01}
+CasteliaCity11_Text_RoyalUnovaOperatesOnly = The Royal Unova operates only in\nthe evening.{be00}\nPlease come back again.
+CasteliaCity11_Text_ImSorryDontHave = I'm sorry, you don't have enough money.\nPlease come back again.
+CasteliaCity11_Text_Ticket1000Would = The ticket is $1,000.\nWould you like to get on board?
+CasteliaCity11_Text_ShipGoesUnderBig = The ship goes under a big bridge called\nthe Skyarrow Bridge in the Unova region,{be00}\nthen turns around at Marvelous Bridge{be00}\nand returns to Castelia City.{be01}\nWhen the whistle blows five times,\nit means we've arrived at the dock.{be01}
+CasteliaCity11_Text_FromDeckWorldFamous = From the deck of the world-famous Royal\nUnova, you can enjoy a spectacular view.{be01}\nAnd the passenger cabins are full of\nTrainers who love to battle.{be01}\nPlease enjoy both the view and\nthe battles!{be01}\nNote that as C-Gears may affect radio\nsignals or instruments in the ship,{be00}\nwe ask that you refrain from using them.{be00}\nThank you.{be01}
+CasteliaCity11_Text_PowerCGearWill = The power of the C-Gear will be turned\noff. Is that OK?
+CasteliaCity11_Text_WeLeavingPortShortly = We are leaving the port shortly.\nBon voyage!{be01}
+CasteliaCity11_Text_CertainlyPleaseComeBack = Certainly.\nPlease come back again.
+CasteliaCity11_Text_ThankSailingUsRoyal = Thank you for sailing with us on the\nRoyal Unova.{be01}\nHave a nice day!
+CasteliaCity11_Text_WeClosedDayPlease = We are closed for the day.\nPlease come again tomorrow.
+CasteliaCity11_Text_CongratulationsYouveDefeatedAll = Congratulations!{be01}\nYou've defeated all the Trainers\non the ship!{be01}\nPlease accept this prize.{be01}
+CasteliaCity11_Text_GetBoard = Get On Board
+CasteliaCity11_Text_AboutShip = About the Ship
+CasteliaCity11_Text_Cancel = Cancel

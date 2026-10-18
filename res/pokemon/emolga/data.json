@@ -1,0 +1,133 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Emolga",
+    "pokedex": {
+        "category": "Sky Squirrel Pokémon",
+        "entry": "It glides on its outstretched membrane\nwhile shocking foes with the electricity\nstored in the pouches on its cheeks.",
+        "height": "1'04\"",
+        "weight": "11.0 lbs.",
+        "languages": {
+            "ja": {
+                "category": "モモンガポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 55,
+        "attack": 75,
+        "defense": 60,
+        "speed": 103,
+        "special_attack": 75,
+        "special_defense": 60
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_FLYING" ],
+    "catch_rate": 200,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_CHERI_BERRY",
+        "rare": "ITEM_CHERI_BERRY",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_STATIC", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_MOTOR_DRIVE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 150,
+    "height": 4,
+    "weight": 50,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_THUNDER_SHOCK" ],
+            [ 4, "MOVE_QUICK_ATTACK" ],
+            [ 7, "MOVE_TAIL_WHIP" ],
+            [ 10, "MOVE_CHARGE" ],
+            [ 13, "MOVE_SPARK" ],
+            [ 16, "MOVE_PURSUIT" ],
+            [ 19, "MOVE_DOUBLE_TEAM" ],
+            [ 22, "MOVE_SHOCK_WAVE" ],
+            [ 26, "MOVE_ELECTRO_BALL" ],
+            [ 30, "MOVE_ACROBATICS" ],
+            [ 34, "MOVE_LIGHT_SCREEN" ],
+            [ 38, "MOVE_ENCORE" ],
+            [ 42, "MOVE_VOLT_SWITCH" ],
+            [ 46, "MOVE_AGILITY" ],
+            [ 50, "MOVE_DISCHARGE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM12",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM56",
+            "TM57",
+            "TM62",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM93",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_LAST_RESORT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TAILWIND",
+            "MOVE_ROOST",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_ROOST",
+            "MOVE_IRON_TAIL",
+            "MOVE_ASTONISH",
+            "MOVE_AIR_SLASH",
+            "MOVE_SHOCK_WAVE",
+            "MOVE_CHARM",
+            "MOVE_COVET",
+            "MOVE_TICKLE",
+            "MOVE_BATON_PASS"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 144,
+    "baby_species": "SPECIES_EMOLGA",
+    "cry_volume": 127
+}

@@ -1,0 +1,30 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_YURAN_KITEKI", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_YURAN_KITEKI",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 70,
+            "decay": 127,
+            "sustain": 127,
+            "release": 110,
+            "pan": 64
+        },
+        {
+            "program": 1,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_YURAN_KITEKI",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 70,
+            "decay": 127,
+            "sustain": 127,
+            "release": 110,
+            "pan": 64
+        }
+    ]
+}

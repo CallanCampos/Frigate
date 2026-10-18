@@ -1,0 +1,47 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_FLD_125", null, null, null ],
+    "instruments": [
+        {
+            "program": 43,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 126,
+            "decay": 100,
+            "sustain": 50,
+            "release": 118,
+            "pan": 64
+        },
+        {
+            "program": 3,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G3",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_FLD_125",
+                    "wave": 0,
+                    "base_key": "A4",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                },
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_FLD_125",
+                    "wave": 1,
+                    "base_key": "A5",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 1,
+                    "release": 116,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

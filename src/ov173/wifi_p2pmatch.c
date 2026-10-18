@@ -5672,6 +5672,7 @@ static void WifiP2PMatch_ResetVChatVolume(void) {
 
 // State 0x24: the menu of a friend who is looking for someone to play with
 static int WifiP2PMatch_StateRecruitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq) {
+    WIFI_STATUS *targetStatus = &wk->targetStatus;
     s32 ret = BmpMenuList_Update(wk->list);
     u32 friendNo;
     MCR_MOVEOBJ *obj;
@@ -5708,7 +5709,7 @@ static int WifiP2PMatch_StateRecruitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq
         break;
     default:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        gameMode = WifiP2PMatch_GetGameMode(wk, &wk->targetStatus);
+        gameMode = WifiP2PMatch_GetGameMode(wk, targetStatus);
         if (gameMode == 5 && !canPlayerExchangePhotos() && isRunningOnDSi()) {
             WifiP2PMatch_PrintMessage(wk, Bank0416_Text_UsesCameraFunctionSend, FALSE);
             wk->seq = WIFIP2PMATCH_SEQ_CONNECT_FRIEND_YES_NO_START;
@@ -5729,7 +5730,7 @@ static int WifiP2PMatch_StateRecruitingFriendMenu(WIFIP2PMATCH_WORK *wk, int seq
             }
         }
         wk->result = 2;
-        if (WIFI_STATUS_GetVChatStatus(&wk->targetStatus) == WIFI_STATUS_GetVChatStatus(wk->myStatus)) {
+        if (WIFI_STATUS_GetVChatStatus(targetStatus) == WIFI_STATUS_GetVChatStatus(wk->myStatus)) {
             wk->seq = WIFIP2PMATCH_SEQ_JOIN_FRIEND;
             break;
         }

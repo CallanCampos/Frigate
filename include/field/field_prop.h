@@ -7,6 +7,16 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
+// A prop of a chunk's or a land data patch's file: where it is, and its models
+struct FieldPropSourceInfo {
+    s32 x;
+    s32 y;
+    s32 z;
+    u16 unkC;
+    u8 highResId;
+    u8 lowResId;
+};
+
 struct FieldPropAreaBounds {
     fx32 minZ;
     fx32 maxZ;

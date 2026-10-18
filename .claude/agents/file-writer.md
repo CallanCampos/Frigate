@@ -18,7 +18,7 @@ without posting another one. If you claimed it yourself, include the issue URL i
 
 Limits:
 - Edit only the given source file and the headers the prompt says you own. A wrong prototype in another header is
-  reported, not fixed. Add a missing constant to its list in `data/constants/` only if the prompt allows it.
+  reported, not fixed. Add a missing constant to its list in `generated/` only if the prompt allows it.
 - Never print a whole `.s` file or doc. Use `tools/decomp/show_func.py` a few functions at a time.
 - Write every function first, then probe the whole file. Give each mismatch at most two rounds of the levers that fit
   its symptom, then leave the closest natural C and move on. The caller decides whether to grind further.

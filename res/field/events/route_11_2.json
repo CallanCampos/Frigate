@@ -1,0 +1,43 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_PKMN_RANGER_F",
+            "movement": 14,
+            "type": 0,
+            "flag": 0,
+            "script": 1,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 7,
+                "z": 3,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_ROUTE_11",
+            "warp": 2,
+            "unk4": 1,
+            "transition": 1,
+            "grid": {
+                "x": 72,
+                "y": 0,
+                "z": 88,
+                "width": 3,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

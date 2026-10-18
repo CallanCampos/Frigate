@@ -2284,18 +2284,26 @@ static BOOL BattleClient_ActionTrainerHint(BtlClient *client, s32 *seq) {
 
 static BOOL CheckTrainerHintMsg(BtlClient *client, u16 *msgId) {
     static const u16 sTrainerHintMsgs[4] = { 0x12, 0x11, 0x13, 0x14 };
+    u32 i;
+    u8 clientId;
+    BattleParty *party;
+    BattleMon *mon;
+    s32 found;
+    u32 count;
+    int trainerId;
+    u32 msg;
+
     if (BtlSetup_GetBattleType(client->mainModule) == 1) {
-        u32 i = 0;
-        u8 clientId = func_ov167_0219c8b8(client->mainModule, 0);
-        u16 trainerId = func_ov167_0219d91c(client->mainModule, clientId);
+        i = 0;
+        clientId = func_ov167_0219c8b8(client->mainModule, 0);
+        trainerId = func_ov167_0219d91c(client->mainModule, clientId);
 
         if (trainerId != 0) {
-            BattleParty *party = GetPartyData(client->pokeCon, clientId);
-            BattleMon *mon = func_ov167_0219d1e8(client->pokeCon, clientId, i);
-            s32 found;
+            party = GetPartyData(client->pokeCon, clientId);
+            mon = func_ov167_0219d1e8(client->pokeCon, clientId, i);
 
             if (IsFainted(mon)) {
-                u8 count = GetClientBattlerCount(client->mainModule, clientId);
+                count = GetClientBattlerCount(client->mainModule, clientId);
                 for (i = 1; i < count; i++) {
                     mon = func_ov167_0219d1e8(client->pokeCon, clientId, i);
                     if (!IsFainted(mon)) {
@@ -2306,7 +2314,7 @@ static BOOL CheckTrainerHintMsg(BtlClient *client, u16 *msgId) {
             found = -1;
             for (i = 0; i < 4; i++) {
                 if (client->hintShown[i] == 0) {
-                    u32 msg = sTrainerHintMsgs[i];
+                    msg = sTrainerHintMsgs[i];
                     if (TrainerMsg_CheckExists(trainerId, msg, client->heapId)) {
                         switch (msg) {
                         case 0x12:
@@ -5450,7 +5458,7 @@ static BOOL BattleClient_ScAddEVs(BtlClient *client, s32 *seq, const u32 *args) 
 static BOOL BattleClient_ScExpGain(BtlClient *client, s32 *seq, const u32 *args) {
     u8 monId = args[0];
     BattleMon *mon = GetPokeParam(client->pokeCon, monId);
-    u8 pos = func_ov167_0219c62c(client->mainModule, client->pokeCon, monId);
+    u32 pos = func_ov167_0219c62c(client->mainModule, client->pokeCon, monId);
     BOOL visible = FALSE;
 
     if (pos != 0xff && BtlvEffect_CheckGaugeExist(pos)) {

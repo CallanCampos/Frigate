@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Generate a constants header from a name list in data/constants/.
+"""Generate a constants header from a name list in generated/.
 
-    gen_constants.py data/constants/species.txt build/include/generated/constants/species.h
+    gen_constants.py generated/species.txt build/include/generated/constants/species.h
 
 The lists are the source of truth for the game's ID constants and are meant to be edited, by hand or by mods. Each
 line is a constant's full name, taking the previous value plus one, or `NAME = value` to set the value (decimal or
@@ -13,7 +13,7 @@ import re
 import sys
 from pathlib import Path
 
-LISTS_DIR = Path(__file__).parents[2] / "data" / "constants"
+LISTS_DIR = Path(__file__).parents[2] / "generated"
 
 
 def parse(path: Path) -> dict[str, int]:
@@ -52,7 +52,7 @@ def ordered_files(name: str, prefix: str, directory: Path, suffix: str) -> list[
 
 
 def load(name: str) -> dict[str, int]:
-    """Returns the constants of data/constants/<name>.txt, for the scripts."""
+    """Returns the constants of generated/<name>.txt, for the scripts."""
     return parse(LISTS_DIR / f"{name}.txt")
 
 
@@ -62,7 +62,7 @@ def generate(source: Path) -> str:
     hexadecimal = any(line.split("=")[-1].strip().startswith("0x")
                       for line in source.read_text().splitlines() if "=" in line.split("#")[0])
     guard = f"POKEBW2_CONSTANTS_{source.stem.upper()}_H"
-    relative = source.resolve().relative_to(LISTS_DIR.parents[1]).as_posix()
+    relative = source.resolve().relative_to(LISTS_DIR.parent).as_posix()
     lines = [
         f"#ifndef {guard}",
         f"#define {guard}",
@@ -84,7 +84,7 @@ def header_text(header: str) -> str:
     path = Path(header)
     if path.parent == Path("constants") and (LISTS_DIR / f"{path.stem}.txt").exists():
         return generate(LISTS_DIR / f"{path.stem}.txt")
-    return (LISTS_DIR.parents[1] / "include" / header).read_text()
+    return (LISTS_DIR.parent / "include" / header).read_text()
 
 
 def constant_names(header: str, prefix: str) -> dict[int, str]:
@@ -121,7 +121,7 @@ def write_header(source: Path, output: Path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("source", type=Path, help="the list, such as data/constants/species.txt")
+    parser.add_argument("source", type=Path, help="the list, such as generated/species.txt")
     parser.add_argument("output", type=Path, help="the header to write")
     args = parser.parse_args()
     write_header(args.source, args.output)

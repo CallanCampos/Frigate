@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Regenerator",
-    "description": "Restores a little HP when\nwithdrawn from battle."
-}

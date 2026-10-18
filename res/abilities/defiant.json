@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Defiant",
+    "description": "When its stats are lowered\nits Attack increases."
+}

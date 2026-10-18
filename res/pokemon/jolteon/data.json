@@ -1,0 +1,173 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Jolteon",
+    "pokedex": {
+        "category": "Lightning Pokémon",
+        "entry": "By storing electricity in its body,\nit can shoot its bristlelike fur\nlike a barrage of missiles.",
+        "height": "2'07\"",
+        "weight": "54.0 lbs.",
+        "languages": {
+            "en": {
+                "name": "Jolteon",
+                "category": "Lightning Pokémon",
+                "entry": "If agitated, it uses electricity to\nstraighten out its fur and launch\nit in small bunches.",
+                "height": "2'07\"",
+                "weight": "54.0 lbs."
+            },
+            "fr": {
+                "name": "Voltali",
+                "category": "Pokémon Orage",
+                "entry": "Face au danger, il fait appel à\nl'électricité pour dresser ses\npoils et lancer des décharges.",
+                "height": "0,8 m",
+                "weight": "24,5 kg"
+            },
+            "de": {
+                "name": "Blitza",
+                "category": "Blitz",
+                "entry": "Bringt man es aus der Ruhe, verwendet\nes Elektrizität, um kleine Knäuel seines\nFells abzufeuern.",
+                "height": "0,8 m",
+                "weight": "24,5 kg"
+            },
+            "it": {
+                "name": "Jolteon",
+                "category": "Pokémon Luminoso",
+                "entry": "Quando si agita, usa l'elettricità\nper rizzare i peli e scagliarli in\npiccoli nugoli.",
+                "height": "0,8 m",
+                "weight": "24,5 kg"
+            },
+            "ko": {
+                "name": "쥬피썬더",
+                "category": "번개포켓몬",
+                "entry": "감정이 날카로워지면\n전기를 띠고 곤두선 털을\n몇 가닥이든 날린다.",
+                "height": "0.8 m",
+                "weight": "24.5 kg"
+            },
+            "es": {
+                "name": "Jolteon",
+                "category": "Pokémon Relámpago",
+                "entry": "Si se agita, usa electricidad para\nconvertir su pelaje en afiladísimas\npúas y dispararlas en racimos.",
+                "height": "0,8 m",
+                "weight": "24,5 kg"
+            },
+            "ja": {
+                "name": "サンダース",
+                "category": "かみなりポケモン",
+                "entry": "かんじょうが\\x{3000}たかぶると\nでんきを\\x{3000}おびて\\x{3000}まっすぐになった\nたいもうを\\x{3000}なんぼんも\\x{3000}とばす。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff14}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 65,
+        "defense": 60,
+        "speed": 130,
+        "special_attack": 110,
+        "special_defense": 95
+    },
+    "types": [ "TYPE_ELECTRIC", "TYPE_ELECTRIC" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 31,
+    "hatch_cycles": 35,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_VOLT_ABSORB", "ABILITY_VOLT_ABSORB" ],
+    "hidden_ability": "ABILITY_QUICK_FEET",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_YELLOW",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 184,
+    "height": 8,
+    "weight": 245,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HELPING_HAND" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 5, "MOVE_SAND_ATTACK" ],
+            [ 9, "MOVE_THUNDER_SHOCK" ],
+            [ 13, "MOVE_QUICK_ATTACK" ],
+            [ 17, "MOVE_DOUBLE_KICK" ],
+            [ 21, "MOVE_THUNDER_FANG" ],
+            [ 25, "MOVE_PIN_MISSILE" ],
+            [ 29, "MOVE_AGILITY" ],
+            [ 33, "MOVE_THUNDER_WAVE" ],
+            [ 37, "MOVE_DISCHARGE" ],
+            [ 41, "MOVE_LAST_RESORT" ],
+            [ 45, "MOVE_THUNDER" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM49",
+            "TM57",
+            "TM67",
+            "TM68",
+            "TM70",
+            "TM72",
+            "TM73",
+            "TM83",
+            "TM87",
+            "TM90",
+            "TM93",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_MAGNET_RISE",
+            "MOVE_LAST_RESORT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_HEAL_BELL",
+            "MOVE_HELPING_HAND",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": 93,
+    "baby_species": "SPECIES_EEVEE",
+    "cry_volume": 110
+}

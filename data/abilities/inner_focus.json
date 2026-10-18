@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Inner Focus",
-    "description": "The Pokémon is protected\nfrom flinching."
-}

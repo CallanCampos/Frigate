@@ -1,0 +1,93 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 4,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": {
+            "black2": [
+                [ "SPECIES_SKORUPI", 31, 31 ],
+                [ "SPECIES_SPOINK", 31, 31 ],
+                [ "SPECIES_TRAPINCH", 32, 32 ],
+                [ "SPECIES_SKORUPI", 33, 33 ],
+                [ "SPECIES_DRIFBLIM", 32, 32 ],
+                [ "SPECIES_DRIFBLIM", 33, 33 ],
+                [ "SPECIES_SKARMORY", 34, 34 ],
+                [ "SPECIES_GRUMPIG", 33, 33 ],
+                [ "SPECIES_TRAPINCH", 34, 34 ],
+                [ "SPECIES_GRUMPIG", 33, 33 ],
+                [ "SPECIES_TRAPINCH", 34, 34 ],
+                [ "SPECIES_GRUMPIG", 33, 33 ]
+            ],
+            "white2": [
+                [ "SPECIES_SKORUPI", 31, 31 ],
+                [ "SPECIES_NUMEL", 31, 31 ],
+                [ "SPECIES_TRAPINCH", 32, 32 ],
+                [ "SPECIES_SKORUPI", 33, 33 ],
+                [ "SPECIES_DRIFBLIM", 32, 32 ],
+                [ "SPECIES_DRIFBLIM", 33, 33 ],
+                [ "SPECIES_SKARMORY", 34, 34 ],
+                [ "SPECIES_CAMERUPT", 33, 33 ],
+                [ "SPECIES_TRAPINCH", 34, 34 ],
+                [ "SPECIES_CAMERUPT", 33, 33 ],
+                [ "SPECIES_TRAPINCH", 34, 34 ],
+                [ "SPECIES_CAMERUPT", 33, 33 ]
+            ]
+        },
+        "dark_grass": {
+            "black2": [
+                [ "SPECIES_SKORUPI", 35, 35 ],
+                [ "SPECIES_GRUMPIG", 35, 35 ],
+                [ "SPECIES_SKARMORY", 36, 36 ],
+                [ "SPECIES_SKORUPI", 37, 37 ],
+                [ "SPECIES_DRIFBLIM", 36, 36 ],
+                [ "SPECIES_DRIFBLIM", 37, 37 ],
+                [ "SPECIES_SKARMORY", 38, 38 ],
+                [ "SPECIES_GRUMPIG", 37, 37 ],
+                [ "SPECIES_VIBRAVA", 38, 38 ],
+                [ "SPECIES_GRUMPIG", 37, 37 ],
+                [ "SPECIES_VIBRAVA", 38, 38 ],
+                [ "SPECIES_GRUMPIG", 37, 37 ]
+            ],
+            "white2": [
+                [ "SPECIES_SKORUPI", 35, 35 ],
+                [ "SPECIES_CAMERUPT", 35, 35 ],
+                [ "SPECIES_SKARMORY", 36, 36 ],
+                [ "SPECIES_SKORUPI", 37, 37 ],
+                [ "SPECIES_DRIFBLIM", 36, 36 ],
+                [ "SPECIES_DRIFBLIM", 37, 37 ],
+                [ "SPECIES_SKARMORY", 38, 38 ],
+                [ "SPECIES_CAMERUPT", 37, 37 ],
+                [ "SPECIES_VIBRAVA", 38, 38 ],
+                [ "SPECIES_CAMERUPT", 37, 37 ],
+                [ "SPECIES_VIBRAVA", 38, 38 ],
+                [ "SPECIES_CAMERUPT", 37, 37 ]
+            ]
+        },
+        "shaking_grass": [
+            [ "SPECIES_AUDINO", 31, 31 ],
+            [ "SPECIES_AUDINO", 31, 31 ],
+            [ "SPECIES_AUDINO", 32, 32 ],
+            [ "SPECIES_AUDINO", 32, 32 ],
+            [ "SPECIES_AUDINO", 33, 33 ],
+            [ "SPECIES_AUDINO", 33, 33 ],
+            [ "SPECIES_AUDINO", 34, 34 ],
+            [ "SPECIES_AUDINO", 34, 34 ],
+            [ "SPECIES_AUDINO", 34, 34 ],
+            [ "SPECIES_AUDINO", 34, 34 ],
+            [ "SPECIES_AUDINO", 34, 34 ],
+            [ "SPECIES_AUDINO", 34, 34 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

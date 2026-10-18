@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DARMANITAN",
+    "moves": [ "MOVE_BELLY_DRUM", "MOVE_EARTHQUAKE", "MOVE_FIRE_PUNCH", "MOVE_YAWN" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_SITRUS_BERRY",
+    "form": 0
+}

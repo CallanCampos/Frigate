@@ -4279,7 +4279,6 @@ from:0x021b20e4 kind:load to:0x021b1ce8 module:overlay(257)
 from:0x021b20ec kind:load to:0x021b1e50 module:overlay(257)
 from:0x021b20f4 kind:load to:0x021b1d0c module:overlay(257)
 from:0x021b20fc kind:load to:0x021b1b30 module:overlay(257)
-from:0x021b2120 kind:load to:0x02030001 module:main
 from:0x021b26bc kind:load to:0x021aaec9 module:overlay(257)
 from:0x021b26c0 kind:load to:0x021aafb1 module:overlay(257)
 from:0x021b26c4 kind:load to:0x021aaf71 module:overlay(257)

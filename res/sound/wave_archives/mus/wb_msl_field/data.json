@@ -1,0 +1,47 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {
+            "loop_start": 6880
+        },
+        {
+            "loop_start": 10712
+        },
+        {
+            "loop_start": 9520
+        },
+        {
+            "loop_start": 12568
+        },
+        {
+            "loop_start": 13856
+        },
+        {
+            "loop_start": 13240
+        },
+        {
+            "loop_start": 11544
+        },
+        {
+            "loop_start": 6824
+        },
+        {
+            "loop_start": 7328
+        },
+        {
+            "loop_start": 12304
+        },
+        {
+            "loop_start": 8696
+        },
+        {
+            "loop_start": 7928
+        },
+        {
+            "loop_start": 6296
+        },
+        {
+            "loop_start": 6432
+        }
+    ]
+}

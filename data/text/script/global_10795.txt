@@ -1,2 +1,0 @@
-Global10795_Text_LookYouveFoundNarrow = Look!\nYou've found a narrow path!{be01}\nWill you follow it?
-\pad{0c}

@@ -1,0 +1,35 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 9,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": [
+            [ "SPECIES_SANDILE", 18, 18 ],
+            [ "SPECIES_DARUMAKA", 18, 18 ],
+            [ "SPECIES_SANDILE", 19, 19 ],
+            [ "SPECIES_DARUMAKA", 19, 19 ],
+            [ "SPECIES_MARACTUS", 19, 19 ],
+            [ "SPECIES_SCRAGGY", 19, 19 ],
+            [ "SPECIES_SANDSHREW", 19, 19 ],
+            [ "SPECIES_DWEBBLE", 19, 19 ],
+            [ "SPECIES_SANDSHREW", 20, 20 ],
+            [ "SPECIES_DWEBBLE", 21, 21 ],
+            [ "SPECIES_SANDSHREW", 20, 20 ],
+            [ "SPECIES_DWEBBLE", 21, 21 ]
+        ],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

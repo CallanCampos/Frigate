@@ -1,0 +1,43 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 1392
+        },
+        {
+            "loop_start": 2216
+        },
+        {
+            "loop_start": 1840
+        },
+        {},
+        {},
+        {
+            "loop_start": 29200
+        },
+        {
+            "loop_start": 2720
+        },
+        {},
+        {},
+        {},
+        {
+            "loop_start": 14392
+        },
+        {
+            "loop_start": 13488
+        },
+        {
+            "loop_start": 8504
+        }
+    ]
+}

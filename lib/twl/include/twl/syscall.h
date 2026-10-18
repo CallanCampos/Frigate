@@ -26,7 +26,7 @@ void SVC_SHA1GetHash(SVCSHA1Context *context, void *digest);
 // The 20-byte HMAC-SHA-1 of bin_len bytes under a key
 void SVC_CalcHMACSHA1(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len);
 
-// syscall_twl.c, the half in the LTD autoload, which nothing has written yet; the wrappers call these cores
+// syscall_twl_ltd.c, the half in the LTD autoload; the wrappers call these cores
 // The cores of SVC_SHA1Init, SVC_SHA1Update and SVC_SHA1GetHash: the first clears the word at 0x60 of the context, and
 // each calls the BIOS (system calls 0x24, 0x25 and 0x26). The last takes the digest after the context, as the BIOS
 // does not

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jeremy",
+    "class": "TRAINER_CLASS_HIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ONIX",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BOLDORE",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It is the way of greeting high in the\nmountains and down in the caves.{be01}\nThat's right! We each get out our\nPokémon, and then we begin!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Farewell...\nFarewell, my victory..."
+        },
+        {
+            "type": 2,
+            "text": "Long ago, Pokémon and people\nlived separately.{be01}\nAnd now we live all together like this...{be01}\nI don't know if it is a good thing or not,\nbut it will surely lead to many changes."
+        }
+    ]
+}

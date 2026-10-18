@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_COTTONEE",
+    "moves": [ "MOVE_GIGA_DRAIN", "MOVE_DOUBLE_TEAM", "MOVE_COTTON_GUARD", "MOVE_LEECH_SEED" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_BIG_ROOT",
+    "form": 0
+}

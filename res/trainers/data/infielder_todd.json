@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Todd",
+    "class": "TRAINER_CLASS_INFIELDER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 25,
+    "reward": "ITEM_IRON",
+    "party": [
+        {
+            "species": "SPECIES_CUBONE",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BISHARP",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Together, my Pokémon and I\nare the world's strongest!!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Wow! I didn't think anyone could\ncatch my blazing fastball!"
+        },
+        {
+            "type": 15,
+            "text": "Try to catch this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "My fastballs are so fast,\nnobody can hit them.{be01}\nVery few can catch my fastballs\nexcept Pokémon."
+        }
+    ]
+}

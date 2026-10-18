@@ -1,0 +1,4 @@
+# CtvtDraw function/data emission and relocated pointers match with per-function IPA
+# when its tables precede their first user; see docs/matching.md.
+[file_flags]
+"src/ov257/ctvt_draw.c" = ["-ipa function"]

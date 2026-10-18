@@ -1,0 +1,59 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Jaye",
+    "class": "TRAINER_CLASS_YOUNGSTER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_KARRABLAST",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SHELMET",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_JOLTIK",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SCOLIPEDE",
+            "form": 0,
+            "level": 37,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I love Bug-type Pokémon, and I love\nbug catching!{be01}\nOf course I looove Pokémon battles, too!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I won't lose to anyone when it comes to bug\ncatching, yet I..."
+        },
+        {
+            "type": 2,
+            "text": "If I catch all of the Bug-type Pokémon in\nthe Unova region, I can get a Bug-type{be00}\nCatcher Medal!{be01}\nThat's what I'm aiming for!"
+        }
+    ]
+}

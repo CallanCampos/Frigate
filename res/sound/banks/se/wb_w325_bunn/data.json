@@ -1,0 +1,29 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_W325_BUNN", null, null, null ],
+    "instruments": [
+        {
+            "program": 0,
+            "type": "psg",
+            "duty": 3,
+            "base_key": "C4",
+            "attack": 100,
+            "decay": 50,
+            "sustain": 0,
+            "release": 120,
+            "pan": 64
+        },
+        {
+            "program": 1,
+            "type": "wave",
+            "wave_archive": "WAVE_SE_WB_W325_BUNN",
+            "wave": 0,
+            "base_key": "C4",
+            "attack": 127,
+            "decay": 127,
+            "sustain": 127,
+            "release": 118,
+            "pan": 64
+        }
+    ]
+}

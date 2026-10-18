@@ -7,15 +7,17 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// What a kind of map's controller does: its type, and making, updating and freeing it
+// What a kind of map's controller does: its type, making, updating and freeing it, and where its player is
 struct FieldmapCtrlVTable {
     u32 typeId;
     void (*create)(Field *field, VecFx32 *pos, u16 dir);
     void (*update)(Field *field, VecFx32 *pos);
     void (*free)(Field *field);
+    VecFx32 *(*getPos)(Field *field);
 };
 
-// The three kinds of controller, which fieldmap.c's table of map kinds lists. Their files are not written yet
+// The three kinds of controller, which fieldmap.c's table of map kinds lists: fieldmap_ctrl_grid.c's, and
+// fieldmap_ctrl_nogrid_work.c's for the rail and the hybrid maps
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_GRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_NOGRID;
 extern const FieldmapCtrlVTable FIELDMAP_CTRL_HYBRID;

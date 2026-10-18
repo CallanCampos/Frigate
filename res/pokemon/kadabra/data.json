@@ -1,0 +1,195 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Kadabra",
+    "pokedex": {
+        "category": "Psi Pokémon",
+        "entry": "It stares at its silver spoon to\nfocus its mind. It emits more alpha\nwaves while doing so.",
+        "height": "4'03\"",
+        "weight": "124.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Kadabra",
+                "category": "Psi Pokémon",
+                "entry": "It stares at its silver spoon to\nfocus its mind. It emits more alpha\nwaves while doing so.",
+                "height": "4'03\"",
+                "weight": "124.6 lbs."
+            },
+            "fr": {
+                "name": "Kadabra",
+                "category": "Pokémon Psy",
+                "entry": "Il fixe sa cuillère d'argent afin de\nconcentrer son esprit et d'émettre\nun maximum d'ondes alpha.",
+                "height": "1,3 m",
+                "weight": "56,5 kg"
+            },
+            "de": {
+                "name": "Kadabra",
+                "category": "Psi",
+                "entry": "Es starrt auf seinen Silberlöffel,\num sich zu konzentrieren. So kann\nes mehr Alphawellen ausstoßen.",
+                "height": "1,3 m",
+                "weight": "56,5 kg"
+            },
+            "it": {
+                "name": "Kadabra",
+                "category": "Pokémon Psico",
+                "entry": "Fissa il suo cucchiaio d'argento per\nconcentrarsi. Così facendo, emette\npiù onde alfa.",
+                "height": "1,3 m",
+                "weight": "56,5 kg"
+            },
+            "ko": {
+                "name": "윤겔라",
+                "category": "초능력포켓몬",
+                "entry": "은 숟가락을 바라보고\n정신을 통일하고 있으면\n발산하는 알파파가 증가한다.",
+                "height": "1.3 m",
+                "weight": "56.5 kg"
+            },
+            "es": {
+                "name": "Kadabra",
+                "category": "Pokémon Psi",
+                "entry": "Mira su cuchara de plata fijamente\npara concentrarse. Mientras lo hace,\nemite más ondas alfa.",
+                "height": "1,3 m",
+                "weight": "56,5 kg"
+            },
+            "ja": {
+                "name": "ユンゲラー",
+                "category": "ねんりきポケモン",
+                "entry": "ぎんのスプーンを\\x{3000}みつめて\nせいしんを\\x{3000}とういつ\\x{3000}していると\nはっさんする\\x{3000}アルファは\\x{3000}がふえる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff13}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff16}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 40,
+        "attack": 35,
+        "defense": 30,
+        "speed": 105,
+        "special_attack": 120,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 100,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_TWISTED_SPOON",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 63,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_HUMANSHAPE", "EGG_GROUP_HUMANSHAPE" ],
+    "abilities": [ "ABILITY_SYNCHRONIZE", "ABILITY_INNER_FOCUS" ],
+    "hidden_ability": "ABILITY_MAGIC_GUARD",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": true,
+    "palette_forms": false,
+    "base_exp": 140,
+    "height": 13,
+    "weight": 565,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TELEPORT" ],
+            [ 1, "MOVE_KINESIS" ],
+            [ 1, "MOVE_CONFUSION" ],
+            [ 16, "MOVE_CONFUSION" ],
+            [ 18, "MOVE_DISABLE" ],
+            [ 22, "MOVE_MIRACLE_EYE" ],
+            [ 24, "MOVE_ALLY_SWITCH" ],
+            [ 28, "MOVE_PSYBEAM" ],
+            [ 30, "MOVE_REFLECT" ],
+            [ 34, "MOVE_TELEKINESIS" ],
+            [ 36, "MOVE_RECOVER" ],
+            [ 40, "MOVE_PSYCHO_CUT" ],
+            [ 42, "MOVE_ROLE_PLAY" ],
+            [ 46, "MOVE_PSYCHIC" ],
+            [ 48, "MOVE_FUTURE_SIGHT" ],
+            [ 52, "MOVE_TRICK" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM51",
+            "TM53",
+            "TM56",
+            "TM57",
+            "TM63",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_FOUL_PLAY",
+            "MOVE_GRAVITY",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_DRAIN_PUNCH",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE",
+            "param": 0,
+            "species": "SPECIES_ALAKAZAM"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_ABRA",
+    "cry_volume": 110
+}

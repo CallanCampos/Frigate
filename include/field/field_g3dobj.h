@@ -10,8 +10,6 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-typedef struct FieldG3DObjSystem FieldG3DObjSystem;
-
 // The archives and files of a resource group
 typedef struct {
     ArcTool *mdlArc;
@@ -24,10 +22,15 @@ typedef struct {
 } FieldG3DObjResRequest;
 
 u16 FieldG3DObjSystem_AddResGroup(FieldG3DObjSystem *sys, FieldG3DObjResRequest *req, BOOL preloadTextures);
+u16 FieldG3DObjSystem_AddResGroupCore(FieldG3DObjSystem *sys, FieldG3DObjResRequest *req, BOOL preloadTextures,
+                                      void *postFx);
 void FieldG3DObjSystem_FreeResGroup(FieldG3DObjSystem *sys, u16 resGroupIdx);
 u16 FieldG3DObjSystem_AddObj(FieldG3DObjSystem *sys, u16 resGroupIdx, u16 modelIdxInRes, const VecFx32 *pos);
 void FieldG3DObjSystem_FreeObj(FieldG3DObjSystem *sys, u16 objIdx);
 SRTMatrix *FieldG3DObjSystem_GetObjTransform(FieldG3DObjSystem *sys, u16 objIdx);
+void FieldG3DObjSystem_SetObjPosition(FieldG3DObjSystem *sys, u16 objIdx, const VecFx32 *pos);
+void FieldG3DObjSystem_SetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, int anmIdx, fx32 frame);
+fx32 FieldG3DObjSystem_GetAnmFrame(FieldG3DObjSystem *sys, u16 objIdx, u32 anmIdx);
 // Hide the object, or not
 void func_ov036_021c0154(FieldG3DObjSystem *sys, u16 objIdx, BOOL hidden);
 // TRUE until the object's animation ends
@@ -36,6 +39,8 @@ BOOL FieldG3DObjSystem_StepObjAnmLoop(FieldG3DObjSystem *sys, u16 objIdx, fx32 a
 // Leave the object out of FieldG3DObjSystem_Draw, for its owner to draw with FieldG3DObjSystem_DrawObj, or not
 void func_ov036_021c02b4(FieldG3DObjSystem *sys, u16 objIdx, BOOL flag);
 void FieldG3DObjSystem_DrawObj(FieldG3DObjSystem *sys, u16 objIdx);
+void func_ov036_021c0304(FieldG3DObjSystem *sys, u16 objIdx, BOOL value);
+u32 func_ov036_021c0320(FieldG3DObjSystem *sys, u16 objIdx);
 void FieldG3DObjResRequest_Clear(FieldG3DObjResRequest *req);
 void FieldG3DObjResRequest_SetModel(FieldG3DObjResRequest *req, ArcTool *arc, u16 datId);
 void FieldG3DObjResRequest_SetAnmArc(FieldG3DObjResRequest *req, ArcTool *arc);

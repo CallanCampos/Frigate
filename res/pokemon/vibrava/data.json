@@ -1,0 +1,179 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Vibrava",
+    "pokedex": {
+        "category": "Vibration Pokémon",
+        "entry": "The ultrasonic waves it generates\nby rubbing its two wings together\ncause severe headaches.",
+        "height": "3'07\"",
+        "weight": "33.7 lbs.",
+        "languages": {
+            "en": {
+                "name": "Vibrava",
+                "category": "Vibration Pokémon",
+                "entry": "It violently shudders its wings,\ngenerating ultrasonic waves to\ninduce headaches in people.",
+                "height": "3'07\"",
+                "weight": "33.7 lbs."
+            },
+            "fr": {
+                "name": "Vibraninf",
+                "category": "Pokémon Vibration",
+                "entry": "Ses violents battements d'ailes\ngénèrent des vagues d'ultrasons\nqui donnent mal au crâne.",
+                "height": "1,1 m",
+                "weight": "15,3 kg"
+            },
+            "de": {
+                "name": "Vibrava",
+                "category": "Vibration",
+                "entry": "Es schlägt wild mit den Flügeln.\nSo entstehen Ultraschallwellen,\ndie Kopfschmerzen verursachen.",
+                "height": "1,1 m",
+                "weight": "15,3 kg"
+            },
+            "it": {
+                "name": "Vibrava",
+                "category": "Pokémon Vibrazione",
+                "entry": "Fa vibrare violentemente le ali\ngenerando onde ultrasoniche che\nprovocano il mal di testa.",
+                "height": "1,1 m",
+                "weight": "15,3 kg"
+            },
+            "ko": {
+                "name": "비브라바",
+                "category": "진동포켓몬",
+                "entry": "날개를 격하게 진동시켜서\n초음파를 낸다. 사람도\n두통을 일으킬 정도로 강력하다.",
+                "height": "1.1 m",
+                "weight": "15.3 kg"
+            },
+            "es": {
+                "name": "Vibrava",
+                "category": "Pokémon Vibrante",
+                "entry": "Agita violentamente sus alas para\ncrear ondas ultrasónicas que\nprovocan dolores de cabeza.",
+                "height": "1,1 m",
+                "weight": "15,3 kg"
+            },
+            "ja": {
+                "name": "ビブラーバ",
+                "category": "しんどうポケモン",
+                "entry": "はねを\\x{3000}はげしく\\x{3000}しんどうさせて\nちょうおんぱを\\x{3000}だす。にんげんも\nずつうを\\x{3000}おこすほど\\x{3000}きょうりょく。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff11}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 50,
+        "attack": 70,
+        "defense": 50,
+        "speed": 70,
+        "special_attack": 50,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_GROUND", "TYPE_DRAGON" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 1,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_BUG", "EGG_GROUP_BUG" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_LEVITATE" ],
+    "hidden_ability": "ABILITY_LEVITATE",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GREEN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 119,
+    "height": 11,
+    "weight": 153,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SONIC_BOOM" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 1, "MOVE_FAINT_ATTACK" ],
+            [ 1, "MOVE_SAND_TOMB" ],
+            [ 4, "MOVE_SAND_ATTACK" ],
+            [ 7, "MOVE_FAINT_ATTACK" ],
+            [ 10, "MOVE_SAND_TOMB" ],
+            [ 13, "MOVE_MUD_SLAP" ],
+            [ 17, "MOVE_BIDE" ],
+            [ 21, "MOVE_BULLDOZE" ],
+            [ 25, "MOVE_ROCK_SLIDE" ],
+            [ 29, "MOVE_SUPERSONIC" ],
+            [ 34, "MOVE_SCREECH" ],
+            [ 35, "MOVE_DRAGON_BREATH" ],
+            [ 39, "MOVE_EARTH_POWER" ],
+            [ 44, "MOVE_SANDSTORM" ],
+            [ 49, "MOVE_HYPER_BEAM" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM21",
+            "TM22",
+            "TM26",
+            "TM27",
+            "TM28",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM76",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM94",
+            "HM02",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_DRACO_METEOR",
+            "MOVE_BUG_BITE",
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_EARTH_POWER",
+            "MOVE_SUPERPOWER",
+            "MOVE_DRAGON_PULSE",
+            "MOVE_SNORE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_ROOST",
+            "MOVE_OUTRAGE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 45,
+            "species": "SPECIES_FLYGON"
+        }
+    ],
+    "regional_dex_number": 122,
+    "baby_species": "SPECIES_TRAPINCH",
+    "cry_volume": 120
+}

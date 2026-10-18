@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Multitype",
+    "description": "Changes type to match\nthe held Plate."
+}

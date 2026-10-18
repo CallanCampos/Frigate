@@ -1,4 +1,5 @@
 #include "types.h"
+#include "constants/obj_codes.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
@@ -22,8 +23,6 @@
 #define OBJ_CODE_NONE 0xffff
 #define BLACT_IDX_NONE 0xffff
 #define PLAYER_ACTOR_ID 0xff
-#define PLAYER_OBJ_CODE_HERO 0xe7
-#define PLAYER_OBJ_CODE_HEROINE 0xf0
 #define DIR_NONE 9
 #define SEQ_NONE 10
 
@@ -90,7 +89,7 @@ static const ExStateChangeFunc data_ov036_021cfc9c[] = { func_ov036_0219b6f4, fu
 static const ExStateChangeFunc data_ov036_021cfc6c[] = { func_ov036_0219b5d8, func_ov036_0219b5f4 };
 
 static const ZoneNPC PLAYER_NPC_TEMPLATE = {
-    PLAYER_ACTOR_ID, PLAYER_OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE,
+    PLAYER_ACTOR_ID, OBJ_CODE_HERO, 0, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, FALSE,
 };
 
 static const ExStateChangeFunc *const PLAYER_EXSTATE_CHANGE_VTABLES[] = {
@@ -371,8 +370,8 @@ static void FieldPlayerCore_ChangeObjCode(FieldPlayerCore *core, u16 objCode) {
     MMSys *mmSys = GetActorMModelSystem(actor);
     u16 currentObjCode = FldAct_GetObjCode(actor);
 
-    if (objCode == PLAYER_OBJ_CODE_HERO || objCode == PLAYER_OBJ_CODE_HEROINE ||
-        currentObjCode == PLAYER_OBJ_CODE_HERO || currentObjCode == PLAYER_OBJ_CODE_HEROINE) {
+    if (objCode == OBJ_CODE_HERO || objCode == OBJ_CODE_HEROINE || currentObjCode == OBJ_CODE_HERO ||
+        currentObjCode == OBJ_CODE_HEROINE) {
         FldAct_SwapObjCode(actor, objCode);
         FldActSys_ForceFullSync(mmSys);
         return;
@@ -398,7 +397,7 @@ static void FieldPlayerCore_InitModelCore(FieldPlayerCore *core, u32 exState) {
 BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core) {
     u16 objCode = FldAct_GetObjCode(FieldPlayerCore_GetActor(core));
 
-    if (objCode == PLAYER_OBJ_CODE_HERO || objCode == PLAYER_OBJ_CODE_HEROINE) {
+    if (objCode == OBJ_CODE_HERO || objCode == OBJ_CODE_HEROINE) {
         return TRUE;
     }
     return FALSE;

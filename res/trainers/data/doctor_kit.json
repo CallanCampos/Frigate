@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kit",
+    "class": "TRAINER_CLASS_DOCTOR",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_HEAL", "ITEM_HYPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": true,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SOLOSIS",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_GOTHITA",
+            "form": 0,
+            "level": 32,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I'll battle Pokémon even if I can't find\na pulse!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "It wasn't just a pulse I couldn't find...\nI couldn't get the prize either..."
+        },
+        {
+            "type": 13,
+            "text": "I may have lost the prize, but I'll still\nmake your Pokémon healthy and hearty!{be01}"
+        },
+        {
+            "type": 14,
+            "text": "To make people healthy,\nDoctors go where they are needed."
+        }
+    ]
+}

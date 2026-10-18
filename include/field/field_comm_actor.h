@@ -9,11 +9,17 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-FldCommActSys *FldCommActSys_Create(u8 a0, MMSys *actorSystem, HeapID heapId, u8 a3);
+FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, u8 a3);
 void FldCommActSys_Free(FldCommActSys *sys);
-void FldCommActSys_CreateActor(FldCommActSys *sys, u32 netId, u16 a2, const u16 *dir, const VecFx32 *pos,
-                               const u32 *a5);
+void FldCommActSys_CreateActor(FldCommActSys *sys, u32 netId, u16 modelId, const u16 *dir, const VecFx32 *pos,
+                               const u32 *hidden);
 void FldCommActSys_DeleteActor(FldCommActSys *sys, u32 netId);
-u32 FldCommActSys_FindActor(FldCommActSys *sys, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5);
+// Whether an actor is at a grid position, with its network ID; *index is the entry to look from, and moves past it
+BOOL FldCommActSys_FindActor(FldCommActSys *sys, s16 x, s16 y, s16 z, u32 *netId, u32 *index);
+// The init, delete and update functions of the move code of these actors, which follow their player's direction,
+// position and visibility
+void func_ov036_0218b044(FieldActor *actor);
+void func_ov036_0218b050(FieldActor *actor);
+void func_ov036_0218b060(FieldActor *actor);
 
 #endif // POKEBW2_FIELD_FIELD_COMM_ACTOR_H

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Aftermath",
+    "description": "Damages the attacker\nlanding the finishing hit."
+}

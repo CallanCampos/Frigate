@@ -1,0 +1,178 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Goldeen",
+    "pokedex": {
+        "category": "Goldfish Pokémon",
+        "entry": "Though it appears very elegant\nwhen swimming with fins unfurled, it\ncan jab powerfully with its horn.",
+        "height": "2'00\"",
+        "weight": "33.1 lbs.",
+        "languages": {
+            "en": {
+                "name": "Goldeen",
+                "category": "Goldfish Pokémon",
+                "entry": "Though it appears very elegant\nwhen swimming with fins unfurled, it\ncan jab powerfully with its horn.",
+                "height": "2'00\"",
+                "weight": "33.1 lbs."
+            },
+            "fr": {
+                "name": "Poissirène",
+                "category": "Pokémon Poisson",
+                "entry": "Malgré son élégance quand il\nnage, ses coups de corne sont\nredoutables.",
+                "height": "0,6 m",
+                "weight": "15,0 kg"
+            },
+            "de": {
+                "name": "Goldini",
+                "category": "Goldfisch",
+                "entry": "Mit ausgebreiteten Flossen wirkt es\nsehr elegant. Kann allerdings auch\nheftig mit seinem Horn zustoßen.",
+                "height": "0,6 m",
+                "weight": "15,0 kg"
+            },
+            "it": {
+                "name": "Goldeen",
+                "category": "Pokémon Pescerosso",
+                "entry": "Anche se è molto elegante quando nuota\na pinne spiegate, può infliggere colpi\npotenti con il suo corno.",
+                "height": "0,6 m",
+                "weight": "15,0 kg"
+            },
+            "ko": {
+                "name": "콘치",
+                "category": "금붕어포켓몬",
+                "entry": "아름다운 지느러미를 살랑거리며\n헤엄치는 모습은 매우 화려하지만\n뿔의 공격은 강력하다.",
+                "height": "0.6 m",
+                "weight": "15.0 kg"
+            },
+            "es": {
+                "name": "Goldeen",
+                "category": "Pokémon Pez Color",
+                "entry": "Resulta muy elegante cuando nada con\nlas aletas desplegadas, pero causa\nestragos con su cuerno.",
+                "height": "0,6 m",
+                "weight": "15,0 kg"
+            },
+            "ja": {
+                "name": "トサキント",
+                "category": "きんぎょポケモン",
+                "entry": "きれいな\\x{3000}ひれを\\x{3000}たなびかせ\nおよぐ\\x{3000}すがたは\\x{3000}とても\\x{3000}かれいだが\nツノの\\x{3000}ひとつきは\\x{3000}きょうりょく。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff15}\\x{ff0e}\\x{ff10}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 67,
+        "defense": 60,
+        "speed": 63,
+        "special_attack": 35,
+        "special_defense": 50
+    },
+    "types": [ "TYPE_WATER", "TYPE_WATER" ],
+    "catch_rate": 225,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_WATER_2", "EGG_GROUP_WATER_2" ],
+    "abilities": [ "ABILITY_SWIFT_SWIM", "ABILITY_WATER_VEIL" ],
+    "hidden_ability": "ABILITY_LIGHTNINGROD",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_RED",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 64,
+    "height": 6,
+    "weight": 150,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_PECK" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_WATER_SPORT" ],
+            [ 7, "MOVE_SUPERSONIC" ],
+            [ 11, "MOVE_HORN_ATTACK" ],
+            [ 17, "MOVE_WATER_PULSE" ],
+            [ 21, "MOVE_FLAIL" ],
+            [ 27, "MOVE_AQUA_RING" ],
+            [ 31, "MOVE_FURY_ATTACK" ],
+            [ 37, "MOVE_WATERFALL" ],
+            [ 41, "MOVE_HORN_DRILL" ],
+            [ 47, "MOVE_AGILITY" ],
+            [ 51, "MOVE_SOAK" ],
+            [ 57, "MOVE_MEGAHORN" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM07",
+            "TM10",
+            "TM13",
+            "TM14",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM55",
+            "TM84",
+            "TM87",
+            "TM90",
+            "HM03",
+            "HM05",
+            "HM06"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_DRILL_RUN",
+            "MOVE_BOUNCE",
+            "MOVE_ICY_WIND",
+            "MOVE_AQUA_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_PSYBEAM",
+            "MOVE_HAZE",
+            "MOVE_HYDRO_PUMP",
+            "MOVE_SLEEP_TALK",
+            "MOVE_MUD_SPORT",
+            "MOVE_MUD_SLAP",
+            "MOVE_AQUA_TAIL",
+            "MOVE_BODY_SLAM",
+            "MOVE_MUD_SHOT",
+            "MOVE_SKULL_BASH",
+            "MOVE_SIGNAL_BEAM"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 33,
+            "species": "SPECIES_SEAKING"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_GOLDEEN",
+    "cry_volume": 115
+}

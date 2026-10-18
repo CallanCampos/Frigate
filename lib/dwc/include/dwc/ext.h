@@ -10,6 +10,7 @@
 #include "system/rtc.h"
 #include <ctype.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 // For CPS's address (CPSMyIp), which is set once the library has started
@@ -22,16 +23,17 @@
 
 // The C library's string functions that the main module links, not taken from <string.h>: MWCC builds them in place
 // (memset and memcpy of a size it knows, strcpy of a literal, strcmp and strlen) when <string.h> declares them,
-// where the ROM calls them
-void *memset(void *dest, int value, u32 size);
-void *memcpy(void *dest, const void *src, u32 size);
-void *memmove(void *dest, const void *src, u32 size);
-int memcmp(const void *a, const void *b, u32 size);
+// where the ROM calls them. MWCC goes by the first declaration it sees, and these have <string.h>'s types, so a file
+// whose ROM builds one in place, as dwc_auth.c's memset, includes <string.h> before this header
+void *memset(void *dest, int value, size_t size);
+void *memcpy(void *dest, const void *src, size_t size);
+void *memmove(void *dest, const void *src, size_t size);
+int memcmp(const void *a, const void *b, size_t size);
 char *strcpy(char *dest, const char *src);
 int strcmp(const char *a, const char *b);
-int strncmp(const char *a, const char *b, u32 size);
-u32 strcspn(const char *s, const char *set);
-u32 strlen(const char *s);
+int strncmp(const char *a, const char *b, size_t size);
+size_t strcspn(const char *s, const char *set);
+size_t strlen(const char *s);
 char *strchr(const char *s, int c);
 char *strstr(const char *s, const char *find);
 // The rest is in the C headers above (MSL's)
@@ -91,42 +93,20 @@ char *func_ov011_0216e2c8(const char *text);
 // Reports an error to the library, with a code, a type, a flag and the text
 void func_ov011_0216cca8(int category, int type, int level, const char *format, ...);
 
-// Overlay 11's lower socket layer, which gt2.c's "Udp Engine" builds on; not decompiled, so these are addresses
-// with a word on what each does, read off gt2.c's callers. An "address" is its own opaque object (not a raw ip),
-// read with the two accessors below
-u32 func_ov011_0217d380(const void *address);
-u16 func_ov011_0217d384(const void *address);
-// Formats an address as text (its ip and port) into buf, and returns buf
-const char *func_ov011_0217ed14(u32 ip, u16 port, char *buf);
-// Creates the socket at socketOut, bound to localAddress, with byte buffer sizes and a socket error callback;
-// returns 0, or an error
-int func_ov011_0217d144(void **socketOut, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
-                        void (*onSocketError)(void *socket));
-// Sets the socket's unknown-message callback
-void func_ov011_0217d3a0(void *socket, BOOL (*callback)(void *unused, u32 ip, u16 port, const void *data, int len));
-// Sets the socket's incoming-connection-attempt callback
-void func_ov011_0217d188(void *socket, void (*callback)(void *unused, void *handle, u32 ip, u16 port,
-                                                        u32 elapsedMilliseconds, const void *data, int len));
-// The socket's own local address, once bound
-u32 func_ov011_0217d388(void *socket);
-u16 func_ov011_0217d38c(void *socket);
-// Shuts the socket down, in two steps
-void func_ov011_0217d158(void *socket);
-void func_ov011_0217d168(void *socket);
-// A connection's state, its biggest message size, closing it and sending a message of size bytes
-int func_ov011_0217d364(void *handle);
-int func_ov011_0217d390(void *handle);
-int func_ov011_0217d394(void *handle);
-int func_ov011_0217d290(void *handle, const void *message, int size, BOOL reliable);
-// Starts a connection attempt with its callback table (attempt result, received, closed, ping, in that order).
-// Writes the handle through outHandle when non-NULL. If blocking, pumps the socket until completion;
-// otherwise returns after starting. Returns the lower connection status.
-int func_ov011_0217d1a0(void *socket, void **outHandle, const char *addrText, const void *message, int length,
-                        u32 timeoutMs, const void *table, BOOL blocking);
-// Accepts a pending connection and installs its callback table; returns FALSE unless it is awaiting acceptance
-BOOL func_ov011_0217d190(void *handle, const void *table);
-// Rejects a pending connection, optionally sending a rejection message
-void func_ov011_0217d198(void *handle, const void *message, int length);
+// Overlay 11's GameSpy code that GT2 (dwc/gt2Main.h) calls and that isn't decompiled yet: the rest of the sockets
+// (close, bind, recvfrom with the size of the address it writes, sendto, getsockname, whether a socket can send now,
+// and the end of the socket library), with addresses as NitroWiFi's SocAddrIn, and gt2Auth.c's challenges: a random
+// challenge of 32 characters, the response to one (both return the buffer) and whether a response is the right one
+int func_ov011_0216de30(int sock);
+int func_ov011_0216de8c(int sock, const void *address, int size);
+int func_ov011_0216df00(int sock, void *buffer, int size, int flags, void *address, int *addressSize);
+int func_ov011_0216df34(int sock, const void *buffer, int size, int flags, const void *address, int addressSize);
+int func_ov011_0216df74(int sock, void *address, int *size);
+int func_ov011_0216e12c(int sock);
+void func_ov011_0216e320(void);
+u8 *func_ov011_0217c7ec(u8 *challenge);
+u8 *func_ov011_0217c87c(u8 *response, const u8 *challenge);
+BOOL func_ov011_0217c91c(const u8 *response, const u8 *expected);
 
 // Overlay 11's HTTP client: posts a SOAP message to a URL with the SOAPAction header and calls the function with the
 // answer; returns the request, or 0 when it could not start

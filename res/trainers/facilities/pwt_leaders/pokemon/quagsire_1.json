@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_QUAGSIRE",
+    "moves": [ "MOVE_AQUA_TAIL", "MOVE_EARTHQUAKE", "MOVE_RAIN_DANCE", "MOVE_CURSE" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_RINDO_BERRY",
+    "form": 0
+}

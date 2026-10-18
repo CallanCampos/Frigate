@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DRUDDIGON",
+    "moves": [ "MOVE_DRAGON_CLAW", "MOVE_NIGHT_SLASH", "MOVE_SLASH", "MOVE_HONE_CLAWS" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_LONELY",
+    "item": "ITEM_SCOPE_LENS",
+    "form": 0
+}

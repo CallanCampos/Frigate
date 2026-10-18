@@ -1,0 +1,7 @@
+PinwheelForest_Text_ForestPathsWereCreated = Forest paths were created by\nthe Pokémon that often walk there.{be01}\nIf you walk the paths, sometimes\nyou can feel like a Pokémon yourself.
+PinwheelForest_Text_YoTravelingTrainerBring = Yo! Traveling Trainer!{be01}\nBring a strong Pokémon\nto smash the challenge rock!
+PinwheelForest_Text_ItsChallengeRockWould = It's a challenge rock.{be01}\nWould you like to have {0102:0}\nsmash the rock?
+PinwheelForest_Text_TriedSmashChallengeRock = {0102:0} tried to smash the\nchallenge rock.{be01}\nA piece of the rock broke away!{be01}
+PinwheelForest_Text_ItsChallengeRock = It's a challenge rock.
+PinwheelForest_Text_PinwheelForestDidRemember = Pinwheel Forest\nDid you remember to pack an Antidote?
+\pad{3a}

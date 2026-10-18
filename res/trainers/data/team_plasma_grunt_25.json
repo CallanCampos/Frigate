@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Grunt",
+    "class": "TRAINER_CLASS_TEAM_PLASMA_GRUNT_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SCRAGGY",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LIEPARD",
+            "form": 0,
+            "level": 46,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Target acquired!\nTermination will now begin!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I was terminated...?\nWhat a Trainer!"
+        },
+        {
+            "type": 2,
+            "text": "We in Team Plasma are trying to keep all\nthe world's Pokémon for ourselves!{be01}\nIf we succeed in doing that, then world\ndomination wouldn't be a stretch!"
+        }
+    ]
+}

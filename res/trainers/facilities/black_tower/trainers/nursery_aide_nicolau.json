@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Nicolau",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "pokemon": [
+        "alomomola_1",
+        "stunfisk_1",
+        "clefable_1",
+        "hariyama_1",
+        "gastrodon_1",
+        "skuntank_1",
+        "exploud_1",
+        "glalie_1",
+        "musharna_1",
+        "kangaskhan_1"
+    ]
+}

@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Shell Armor",
+    "description": "The Pokémon is protected\nagainst critical hits."
+}

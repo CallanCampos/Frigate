@@ -1,0 +1,44 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Frederick",
+    "class": "TRAINER_CLASS_BOSS_TRAINER_FREDERICK",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TOGEKISS",
+            "form": 0,
+            "level": 68,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SALAC_BERRY",
+            "moves": [ "MOVE_AIR_SLASH", "MOVE_AURA_SPHERE", "MOVE_EXTREME_SPEED", "MOVE_ENCORE" ]
+        },
+        {
+            "species": "SPECIES_HERACROSS",
+            "form": 0,
+            "level": 68,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_FLAME_ORB",
+            "moves": [ "MOVE_MEGAHORN", "MOVE_CLOSE_COMBAT", "MOVE_AERIAL_ACE", "MOVE_NIGHT_SLASH" ]
+        },
+        {
+            "species": "SPECIES_RAMPARDOS",
+            "form": 0,
+            "level": 68,
+            "difficulty": 192,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_CHOICE_SCARF",
+            "moves": [ "MOVE_HEAD_SMASH", "MOVE_EARTHQUAKE", "MOVE_ZEN_HEADBUTT", "MOVE_OUTRAGE" ]
+        }
+    ],
+    "messages": []
+}

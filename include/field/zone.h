@@ -158,7 +158,7 @@ s16 GetDirectionVectorCompZ(u32 direction);
 void VecGPosToWPos(s32 x, s32 y, s32 z, VecFx32 *position);
 u16 GetInverseDirection(u32 direction);
 u16 GetDirFromPosToPos(s32 x1, s32 z1, s32 x2, s32 z2);
-u32 func_ov012_0215ed38(u32 direction, u16 angle);
+u8 func_ov012_0215ed38(u32 direction, u16 angle);
 BOOL CheckWarpPositionMatch(const ZoneWarp *warp, const VecFx32 *position);
 BOOL CheckWarpPositionMatchRail(const ZoneWarp *warp, const RailPosition *position);
 BOOL CheckBGPositionMatchRail(const ZoneBGEntity *entity, const RailPosition *position);

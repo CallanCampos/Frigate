@@ -1,3 +1,0 @@
-Route48_Text_HmmYoureTrainerQuick = Hmm? You're a Trainer with quick eyes!\nI'll give you these!{be01}
-Route48_Text_SpeakManyPeopleGood = Speak to many people, and\ngood things will happen to you.
-\pad{92}
