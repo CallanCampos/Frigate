@@ -539,7 +539,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
 | `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
 | `fieldmap_func.c` | `0x021b427c`–`0x021b445c` | 9 | complete | string at `0x021d5290` |
-| `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | partial | descriptive |
+| `union_mine_pms.c` | `0x021b445c`–`0x021b46b0` | 4 | complete | descriptive |
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
 | `fldeff_reflect.c` | `0x021b496c`–`0x021b4eb4` | 15 | partial | string at `0x021d5338` |
 | `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | complete | string at `0x021d534c` |

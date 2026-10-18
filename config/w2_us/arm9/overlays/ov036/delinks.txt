@@ -458,6 +458,7 @@ src/ov036/field_rail.c:
     .data       start:0x021d5270 end:0x021d529c
 
 src/ov036/union_mine_pms.c:
+    complete
     .text       start:0x021b4494 end:0x021b46e8
     .rodata     start:0x021d10ac end:0x021d10b4
     .data       start:0x021d52e0 end:0x021d5364

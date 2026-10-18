@@ -5397,7 +5397,7 @@ data_ov036_021d1004 kind:data(any) addr:0x021d1004
 data_ov036_021d1014 kind:data(any) addr:0x021d1014
 data_ov036_021d1028 kind:data(any) addr:0x021d1028
 data_ov036_021d103c kind:data(any) addr:0x021d103c
-data_ov036_021d1078 kind:data(any) addr:0x021d1078
+NO_MAC kind:data(any) addr:0x021d1078
 data_ov036_021d1080 kind:data(any) addr:0x021d1080
 data_ov036_021d1090 kind:data(any) addr:0x021d1090
 data_ov036_021d10a4 kind:data(any) addr:0x021d10a4
