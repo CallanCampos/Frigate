@@ -1255,11 +1255,12 @@ Same instructions, scheduled in another order.
 - A sum from a three-register `adds` whose only use is the copy that Thumb's two-operand `adds rd, #imm8` needs
   is moved down to that copy, across calls and branches and inside loops, with both operands kept live (spilled)
   to get there. No optimization pragma, -O level or scope stops it; `+ 7` (the three-operand immediate form) or a
-  second use of the sum keeps it where it is written. Uses of the incremented value don't: in
-  `x = a + v; f(0); x += 8; h(x, b); return x + b;` each use gets its own `adds r0, r5, r4; adds r0, #8`. A
-  subtraction, `x = a - v`, stays where it is written, and so does the sum when the +8 is conditional or when an
-  operand is redefined on one path to the same use (`if (b) { a = 0; }`); a redefinition on every path, `a += 12`,
-  goes into a new register and leaves the old value to the moved sum. `arc_tool.c`'s `ArchiveMoveImageTop` writes
+  second use of the sum that is not itself a copy (`f(x + 4)`) keeps it where it is written. A use that is a copy,
+  `f(x)`, doesn't: the argument gets an `adds` of its own and the sum is added again at the +8. Uses of the
+  incremented value don't either: in `x = a + v; f(0); x += 8; h(x, b); return x + b;` each use gets its own
+  `adds r0, r5, r4; adds r0, #8`. A subtraction, `x = a - v`, stays where it is written, and so does the sum when
+  the +8 is conditional or when an operand is redefined on one path to the same use (`if (b) { a = 0; }`); a
+  redefinition on every path, `a += 12`, goes into a new register and leaves the old value to the moved sum. `arc_tool.c`'s `ArchiveMoveImageTop` writes
   `fimgOffset = fntbOffset + value;` before a read and `fimgOffset += 8;` after it, and is 4 bytes short for it:
   the original stores the sum where it is written and adds the 8 to its spill slot.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
@@ -1287,7 +1288,8 @@ Same instructions, scheduled in another order.
   `GFL_TextRendererDrawToBitmapEx` load `&g_TextRenderer` again before each call in the original; a
   `TextRenderer *` local under `#pragma opt_propagation off` matches both, and so does each of those spellings
   (their row says why none is kept). A pointer local and that pragma tell whether a global's address was held in a
-  local the compiler did not propagate.
+  local the compiler did not propagate. The member's address written at each use, `f(&s.member)`, is shared like
+  `&g`: those two functions keep `&sPrintSys.renderer` in `r4` until it initializes a local.
 - A local array's element is never loaded again after a call, even once the array's address has been passed to
   another function, so an element loaded both before and after a call (`ldr r1, [r6, r7]` around
   `bl BtlvEffect_GetGauge`) was read through a pointer. `btlv_effvm.c`'s `BtlvEffvm_CmdGauge` matches with
@@ -2481,6 +2483,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
   It is the cast that hides the address, not a change of type: the same function matches with its `f32 *` buffer
   read as `*(f32 *)&values[v + 1]`, a cast to the type it already has, which is not used either.
+- MWCC's `-flag` takes a pragma's name, so `-flag no-opt_loop_invariants -flag no-opt_strength_reduction` turns the
+  two passes off for a whole file exactly as the two pragmas do, while the `-opt noloopinvariants` and
+  `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
+  `config/compiler_flags.toml` and plain `f32 *` reads, which is not used: nothing but that one loop shows the
+  setting, and the cast above explains the same bytes.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2560,9 +2567,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `reader->actions[clientId]` at both uses it computed them again in `r7` and `r4`, 104 bytes off. A local set at the
   top of the loop body gets the reuse but not the slot order. The function also matches with the expression written
   out and its `u8 clientId` parameter as `unsigned long`, which hoists `clientId << 6` first.
-- Arithmetic hoisted out of a loop, such as `bit >> 3` and `1 << (bit & 7)`, written in the body or passed to an
-  inline, is computed again by code after the loop, where a hoisted field address (`pokedex->shown`) and a value
-  kept in a local are reused. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
+- Arithmetic on a `u16` hoisted out of a loop, such as `bit >> 3` and `1 << (bit & 7)` of a `u16 bit`, written in
+  the body or passed to an inline, is computed again by code after the loop, even after a `do`/`while`, where a
+  hoisted field address (`pokedex->shown`) and a value kept in a local are reused. On an `int` it is reused after a
+  loop that can't be skipped (a `do`/`while` or a constant bound) and computed again only after a loop whose entry
+  test can skip it. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
   them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
   inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters.
 
