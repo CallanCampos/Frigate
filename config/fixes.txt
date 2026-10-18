@@ -535,6 +535,7 @@
 . 0x020941b8 add_data NNSi_FndUnitHeapAllocatorFuncs
 . 0x020941c0 add_data NNSi_FndFrameHeapAllocatorFuncs
 . 0x020941d0 add_data NNSi_FndSystemHeapAllocatorFuncs
+. 0x02094298 add_section lib/nnsys/src/g2d/g2d_OAM.c:.rodata:0x30
 . 0x020942d4 add_data data_020942d4
 . 0x02094364 add_data data_02094364
 . 0x02094384 add_data data_02094384
