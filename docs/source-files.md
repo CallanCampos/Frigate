@@ -522,7 +522,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | partial | descriptive |
 | `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
-| `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | partial | descriptive |
+| `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
 | `scrcmd_buildmodel.c` | `0x021ab73c`–`0x021abb48` | 18 | complete | descriptive |
 | `scrcmd_place_name.c` | `0x021abb48`–`0x021abb70` | 1 | complete | descriptive |
 | `scrcmd_shop.c` | `0x021abb70`–`0x021adc6c` | 53 | partial | string at `0x021d51cc` |

@@ -196,6 +196,7 @@ src/ov036/scrcmd_gym.c:
     .text       start:0x021aad44 end:0x021ab218
 
 src/ov036/scrcmd_fade.c:
+    complete
     .text       start:0x021ab218 end:0x021ab73c
 
 src/ov036/scrcmd_msg.c:
