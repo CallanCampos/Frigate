@@ -30,8 +30,12 @@ n_sect is one byte, and past that ld64 fails with errors that don't name the cau
 the link (one path per line in the inputs file: objects, and static archives, whose members count only when ld64 would
 load them), counts the output sections they bring, plus those the linker makes itself, and stops the link with a
 message that names the cause past the limit, or past the budget of overlay sections, which keeps room for the
-configurations with the most sections (Debug, sanitizers, coverage). LLVM bitcode (LTO) is refused: its sections are
-chosen at link time, and the spike's range check isn't carried over.
+configurations with the most sections (Debug, sanitizers, coverage). It does so for each slice the link makes: those of
+the program's own objects, the first inputs, with the macOS each is built for, since the sections ld64 makes and the
+names it gives depend on the architecture and the deployment target (link_rules). A universal program, the macOS
+distribution build's arm64 and x86_64 for macOS 11.0 (port/docs/adr/0013-universal-macos-app-for-macos-11.md), is
+checked slice by slice, and the inputs' universal files are read a slice at a time. LLVM bitcode (LTO) is refused: its
+sections are chosen at link time, and the spike's range check isn't carried over.
 
 With --overlay-objects (generate's overlay_objects.txt), "check" also looks for leaks among the link's objects, as the
 spike's map check did after the link: a writable object of an overlay file outside its overlay's sections (in
@@ -42,13 +46,14 @@ ones included. The data that the sanitizers' instrumentation adds to a file is n
 UBSan's check data (l___unnamed_N), ASan's ODR indicators, names and registration flag (___odr_asan_gen_*,
 ___asan_gen_*, ____asan_globals_registered), and the assembler's section markers (ltmpN).
 
-"image" runs as a test after the link: the linked program must have the sections "check" counted, less any that ld64
-may leave out (MAY_VANISH), so that a new ld64 that merges, renames or makes sections differently shows up. Only the
-standard library is used.
+"image" runs as a test after the link: each slice of the linked program must have the sections "check" predicted for
+it, by name, less any that ld64 may leave out (MAY_VANISH), and be built for the macOS "check" assumed, so that a new
+ld64 that merges, renames or makes sections differently shows up with the sections' names. "check" writes its
+prediction as JSON, a slice's macOS, sections and overlay sections by architecture. Only the standard library is used.
 """
 import argparse
+import json
 import os
-import platform
 import re
 import struct
 import sys
@@ -154,12 +159,18 @@ def generate(args: argparse.Namespace) -> None:
     write_if_changed(out / "overlay_objects.txt", "".join(objects))
 
 
-# --- check --------------------------------------------------------------------------------------------------------
+# --- check ---------------------------------------------------------------------------------------------------------
 
 MH_MAGIC_64 = 0xFEEDFACF
+# The plain slices (subtype ALL, or x86_64's 3), not arm64e or x86_64h, which this build never makes
 CPU_TYPES = {"arm64": 0x0100000C, "x86_64": 0x01000007}
+PLAIN_SUBTYPES = {"arm64": (0,), "x86_64": (3,)}
+# A universal file's header, with 32-bit or 64-bit offsets
+FAT_MAGICS = {b"\xca\xfe\xba\xbe": False, b"\xca\xfe\xba\xbf": True}
 LC_SEGMENT_64 = 0x19
 LC_SYMTAB = 0x2
+LC_BUILD_VERSION = 0x32
+LC_VERSION_MIN_MACOSX = 0x24
 S_ATTR_DEBUG = 0x02000000
 N_STAB, N_TYPE, N_EXT, N_UNDF, N_SECT = 0xE0, 0x0E, 0x01, 0x0, 0xE
 BITCODE_MAGICS = (b"\xde\xc0\x17\x0b", b"BC\xc0\xde")
@@ -168,7 +179,9 @@ BITCODE_MAGICS = (b"\xde\xc0\x17\x0b", b"BC\xc0\xde")
 # table. Every program here has all three
 SYNTHESIZED = {("__TEXT", "__stubs"), ("__DATA_CONST", "__got"), ("__TEXT", "__unwind_info")}
 
-# Input sections that ld64 (ld-prime, Xcode 15 and later) merges into others or renames, as the spike measured them
+# Input sections that ld64 (ld-prime, Xcode 15 and later) merges into others or renames, as the spike measured them,
+# for a program built for a macOS that loads it with chained fixups (below). The Objective-C sections come with a static
+# SDL3, whose Cocoa code is Objective-C: the lists and constant strings that the runtime only reads go to __DATA_CONST
 OUTPUT_NAME = {
     ("__TEXT", "__literal4"): ("__TEXT", "__const"),
     ("__TEXT", "__literal8"): ("__TEXT", "__const"),
@@ -177,7 +190,33 @@ OUTPUT_NAME = {
     ("__DATA", "__const"): ("__DATA_CONST", "__const"),
     ("__DATA", "__mod_init_func"): ("__TEXT", "__init_offsets"),
     ("__DATA", "__mod_term_func"): ("__DATA_CONST", "__mod_term_func"),
+    ("__DATA", "__cfstring"): ("__DATA_CONST", "__cfstring"),
+    ("__DATA", "__objc_catlist"): ("__DATA_CONST", "__objc_catlist"),
+    ("__DATA", "__objc_nlcatlist"): ("__DATA_CONST", "__objc_nlcatlist"),
+    ("__DATA", "__objc_classlist"): ("__DATA_CONST", "__objc_classlist"),
+    ("__DATA", "__objc_nlclslist"): ("__DATA_CONST", "__objc_nlclslist"),
+    ("__DATA", "__objc_protolist"): ("__DATA_CONST", "__objc_protolist"),
+    ("__DATA", "__objc_imageinfo"): ("__DATA_CONST", "__objc_imageinfo"),
 }
+
+# How the deployment target changes the link (each measured with a small program, Xcode 26.6): dyld loads a program
+# built for arm64 and macOS 12.0 or later, or x86_64 and 13.0 or later, through chained fixups. A program for an older
+# macOS binds its calls lazily instead, through ld64's __stub_helper, __la_symbol_ptr and a pointer of dyld's own in
+# __DATA,__data, and keeps its constructors' pointers in __DATA_CONST,__mod_init_func. Below macOS 10.15 (x86_64 only)
+# there is no __DATA_CONST segment: its sections stay in __DATA
+CHAINED_FIXUPS_SINCE = {"arm64": (12, 0), "x86_64": (13, 0)}
+LAZY_BINDING = {("__TEXT", "__stub_helper"), ("__DATA", "__la_symbol_ptr"), ("__DATA", "__data")}
+DATA_CONST_SINCE = (10, 15)
+
+# Sections that ld64 makes from what the Objective-C code of a slice has (each measured with a small program for both
+# architectures, macOS 10.15 to 26): __objc_stubs, the selector stubs of the objc_msgSend$SELECTOR calls that clang
+# emits on arm64; and on arm64, __objc_methlist, where ld64 moves the method lists of classes, categories and protocols
+# (the __OBJC_$_..._METHODS_... objects of __DATA,__objc_const) in their relative form
+OBJC_STUBS = ("__TEXT", "__objc_stubs")
+OBJC_SELECTOR_STUB = "_objc_msgSend$"
+OBJC_METHOD_LISTS = ("__TEXT", "__objc_methlist")
+OBJC_METHOD_LIST = re.compile(r"^__OBJC_\$_\w*METHODS_")
+RELATIVE_METHOD_LISTS = {"arm64"}
 
 # Input sections that ld64 may leave out of the program: it turns DWARF unwind information into compact unwind entries
 # where it can, and keeps __eh_frame only when some frame needs DWARF (an unoptimized build linking compiler-rt's
@@ -199,28 +238,98 @@ def c_string(field: bytes) -> str:
     return field.split(b"\0", 1)[0].decode("ascii", "replace")
 
 
-def host_slice(data: bytes) -> bytes:
-    """The slice of a universal file for this machine; the compiler's runtime archives are universal."""
-    if data[:4] not in (b"\xca\xfe\xba\xbe", b"\xca\xfe\xba\xbf"):
-        return data
-    wide = data[3] == 0xBF
-    wanted = CPU_TYPES.get(platform.machine())
+def thin_architecture(data: bytes) -> str | None:
+    """The architecture of a thin 64-bit Mach-O file, by its CPU type, if it is one this build knows."""
+    if len(data) < 12 or struct.unpack_from("<I", data, 0)[0] != MH_MAGIC_64:
+        return None
+    cpu, subtype = struct.unpack_from("<iI", data, 4)
+    for name, wanted in CPU_TYPES.items():
+        if cpu == wanted and subtype & 0xFFFFFF in PLAIN_SUBTYPES[name]:
+            return name
+    return None
+
+
+def fat_slices(data: bytes) -> dict[str, bytes] | None:
+    """The plain arm64 and x86_64 slices of a universal file by architecture, or None for a file that isn't one."""
+    if data[:4] not in FAT_MAGICS:
+        return None
+    wide = FAT_MAGICS[data[:4]]
+    slices = {}
     count = struct.unpack_from(">I", data, 4)[0]
     for index in range(count):
         if wide:
             cpu, subtype, offset, size = struct.unpack_from(">iiQQ", data, 8 + 32 * index)
         else:
             cpu, subtype, offset, size = struct.unpack_from(">iiII", data, 8 + 20 * index)
-        # The plain slice (subtype ALL, or x86_64's 3), not arm64e or x86_64h
-        if cpu == wanted and subtype & 0xFFFFFF in (0, 3):
-            return data[offset:offset + size]
-    raise ValueError("no slice for this machine")
+        for name, wanted in CPU_TYPES.items():
+            if cpu == wanted and subtype & 0xFFFFFF in PLAIN_SUBTYPES[name]:
+                slices[name] = data[offset:offset + size]
+    return slices
 
 
-def read_input(path: str) -> tuple[bool, list[tuple[str, bytes]]]:
-    """(whether it is an archive, [(name, contents)]): an object, or every member of a static archive."""
+def architectures(data: bytes) -> list[str]:
+    """The architectures a Mach-O file, universal or thin, has slices for, in this build's order (arm64, x86_64)."""
+    slices = fat_slices(data)
+    if slices is None:
+        thin = thin_architecture(data)
+        return [thin] if thin else []
+    return [name for name in CPU_TYPES if name in slices]
+
+
+def slice_of(data: bytes, architecture: str) -> bytes | None:
+    """What ld64 reads of a file when it links one architecture: that slice of a universal file, a thin file of that
+    architecture or a static archive (whose members say their own) as it is, and nothing of a thin file of another
+    architecture, which ld64 ignores with a warning."""
+    slices = fat_slices(data)
+    if slices is not None:
+        return slices.get(architecture)
+    if data.startswith(b"!<arch>\n") or thin_architecture(data) == architecture:
+        return data
+    return None
+
+
+def minimum_macos(data: bytes) -> tuple[int, int, int] | None:
+    """The macOS a thin Mach-O file was built for: LC_BUILD_VERSION's minos, or LC_VERSION_MIN_MACOSX's version for
+    files built before it; both encode X.Y.Z as xxxx.yy.zz."""
+    ncmds = struct.unpack_from("<I", data, 16)[0]
+    offset = 32
+    for _ in range(ncmds):
+        cmd, cmdsize = struct.unpack_from("<2I", data, offset)
+        if cmd in (LC_BUILD_VERSION, LC_VERSION_MIN_MACOSX):
+            version = struct.unpack_from("<I", data, offset + (12 if cmd == LC_BUILD_VERSION else 8))[0]
+            return version >> 16, (version >> 8) & 0xFF, version & 0xFF
+        offset += cmdsize
+    return None
+
+
+def version_text(version: tuple[int, ...]) -> str:
+    return ".".join(str(part) for part in (version if version[2:] != (0,) else version[:2]))
+
+
+def link_rules(architecture: str, minos: tuple[int, int, int]) -> tuple[set[tuple[str, str]], dict]:
+    """The sections ld64 makes itself and the renames it applies, for a slice of that architecture and macOS."""
+    synthesized = set(SYNTHESIZED)
+    names = dict(OUTPUT_NAME)
+    if minos[:2] < CHAINED_FIXUPS_SINCE[architecture]:
+        synthesized |= LAZY_BINDING
+        names[("__DATA", "__mod_init_func")] = ("__DATA_CONST", "__mod_init_func")
+    if minos[:2] < DATA_CONST_SINCE:
+        synthesized = {("__DATA", section) if segment == "__DATA_CONST" else (segment, section)
+                       for segment, section in synthesized}
+        names = {key: ("__DATA", value[1]) if value[0] == "__DATA_CONST" else value for key, value in names.items()}
+    return synthesized, names
+
+
+def read_input(path: str, architecture: str) -> tuple[bool, list[tuple[str, bytes]]]:
+    """(whether it is an archive, [(name, contents)]): what ld64 reads of an input when it links one architecture, an
+    object's slice or the members of a static archive's slice that are of that architecture (nothing of a thin file
+    of another one). LLVM bitcode has no architecture here and is kept, for Module to refuse."""
     with open(path, "rb") as f:
-        data = host_slice(f.read())
+        data = f.read()
+    if data[:4] not in BITCODE_MAGICS:
+        data = slice_of(data, architecture)
+    if data is None:
+        return False, []
     if not data.startswith(b"!<arch>\n"):
         return False, [(path, data)]
     members = []
@@ -237,13 +346,17 @@ def read_input(path: str) -> tuple[bool, list[tuple[str, bytes]]]:
         offset += 60 + size + (size & 1)
         if name.startswith("__.SYMDEF") or name in ("/", "//", "/SYM64/"):
             continue
+        if body[:4] not in BITCODE_MAGICS:
+            body = slice_of(body, architecture)
+            if body is None:
+                continue
         members.append((f"{path}({name.rstrip('/')})", body))
     return True, members
 
 
 class Module:
-    """One object of the link: its external definitions and references, the output sections it brings, and the symbols
-    it defines in the __DATA segment, local ones included, with their sections."""
+    """One object of the link: its external definitions and references, its input sections (which link_rules names as
+    the program will), and the symbols it defines in the __DATA segment, local ones included, with their sections."""
 
     def __init__(self, name: str, data: bytes):
         self.name = name
@@ -259,8 +372,7 @@ class Module:
         for symbol in self.undefined:
             bound = SECTION_BOUND.match(symbol)
             if bound:
-                key = (bound.group(1), bound.group(2))
-                self.sections.add(OUTPUT_NAME.get(key, key))
+                self.sections.add((bound.group(1), bound.group(2)))
 
     def read(self, data: bytes) -> None:
         """Every section except what ld64 consumes (__LD, compact unwind) or leaves out (debug); a common symbol
@@ -284,7 +396,7 @@ class Module:
                     flags = struct.unpack_from("<I", data, section + 64)[0]
                     if segment in ("__LD", "__DWARF") or flags & S_ATTR_DEBUG:
                         continue
-                    self.sections.add(OUTPUT_NAME.get(key, key))
+                    self.sections.add(key)
             elif cmd == LC_SYMTAB:
                 symtab = struct.unpack_from("<3I", data, offset + 8)
             offset += cmdsize
@@ -315,7 +427,7 @@ class Module:
                 self.undefined.add(name)
 
 
-def load(inputs: list[str]) -> list[Module]:
+def load(inputs: list[str], architecture: str) -> list[Module]:
     """The modules ld64 loads: every object, and each archive member that defines a symbol that the loaded modules
     leave undefined, until none does. Dynamic libraries aren't read, so a member that defines a symbol a dylib also
     has may be counted needlessly (the spike saw it once, with a member that brought no new section)."""
@@ -323,7 +435,7 @@ def load(inputs: list[str]) -> list[Module]:
     for path in inputs:
         if not os.path.exists(path):
             fail(f"missing input {path}")
-        is_archive, members = read_input(path)
+        is_archive, members = read_input(path, architecture)
         (pending if is_archive else loaded).extend(Module(name, data) for name, data in members)
     defined = set().union(*(module.defined for module in loaded)) if loaded else set()
     undefined = (set().union(*(module.undefined for module in loaded)) if loaded else set()) - defined
@@ -360,9 +472,9 @@ def overlay_file(name: str, by_basename: dict[str, list[str]]) -> str | None:
     return None
 
 
-def leaks(modules: list[Module], overlay_objects: str) -> None:
-    """Stops the link when a writable object is outside its overlay's sections, or in an overlay's sections it
-    doesn't belong to."""
+def leaks(modules: list[Module], overlay_objects: str, architecture: str) -> None:
+    """Stops the link when a writable object of a slice is outside its overlay's sections, or in an overlay's sections
+    it doesn't belong to."""
     owners = {}
     by_basename: dict[str, list[str]] = {}
     with open(overlay_objects) as f:
@@ -391,45 +503,93 @@ def leaks(modules: list[Module], overlay_objects: str) -> None:
              "names the leak check reads as CMake makes them (<source path>.o)")
     if problems:
         listed = "\n  ".join(problems[:20]) + (f"\n  and {len(problems) - 20} more" if len(problems) > 20 else "")
-        fail(f"{len(problems)} writable statics outside their overlay's sections, which loading the overlay wouldn't "
-             f"set back (port/hal/fs/ovsec.c):\n  {listed}\nA file-scope compound literal, or a section the forced "
-             "include's pragma doesn't reach, puts one there")
-    print(f"gen_overlay_sections check: no leaks among the objects of {matched} overlay files")
+        fail(f"{len(problems)} writable statics of the {architecture} slice outside their overlay's sections, which "
+             f"loading the overlay wouldn't set back (port/hal/fs/ovsec.c):\n  {listed}\nA file-scope compound "
+             "literal, or a section the forced include's pragma doesn't reach, puts one there")
+    print(f"gen_overlay_sections check: no leaks among the {architecture} objects of {matched} overlay files")
+
+
+def link_slices(inputs: list[str]) -> list[tuple[str, tuple[int, int, int]]]:
+    """The slices the link makes, each with the macOS it is built for: those of the program's own objects, which come
+    first among the inputs and are compiled with the flags the link takes (CMAKE_OSX_ARCHITECTURES and
+    CMAKE_OSX_DEPLOYMENT_TARGET, or the machine's and the SDK's). Every object of the link must have each of them."""
+    slices = None
+    for path in inputs:
+        if not os.path.exists(path):
+            fail(f"missing input {path}")
+        with open(path, "rb") as f:
+            data = f.read()
+        universal = fat_slices(data) or {}
+        if data.startswith(b"!<arch>\n") or data[:4] in BITCODE_MAGICS or any(
+                part.startswith(b"!<arch>\n") for part in universal.values()):
+            continue
+        found = architectures(data)
+        if slices is None:
+            if not found:
+                fail(f"{path} is not an arm64 or x86_64 Mach-O object")
+            slices = []
+            for architecture in found:
+                minos = minimum_macos(slice_of(data, architecture))
+                if minos is None:
+                    fail(f"{path} doesn't say which macOS its {architecture} slice is built for")
+                slices.append((architecture, minos))
+        elif missing := [architecture for architecture, _ in slices if architecture not in found]:
+            fail(f"{path} has no {' or '.join(missing)} slice, which the link makes: an object built for other "
+                 "architectures than the program's own")
+    if slices is None:
+        fail("the link has no object of its own")
+    return slices
 
 
 def check(args: argparse.Namespace) -> None:
+    """Counts each slice's sections, writes them for "image", and stops the link past the limit or the budget, or on a
+    leak, in any slice."""
     with open(args.inputs) as f:
         inputs = [line.strip() for line in f if line.strip()]
-    sections = set(SYNTHESIZED)
-    modules = load(inputs)
-    for module in modules:
-        sections |= module.sections
-    overlay = sum(1 for segment, section in sections if segment == "__DATA" and OVERLAY_SECTION.match(section))
-    print(f"gen_overlay_sections check: {os.path.basename(args.out)}: {len(sections)} sections ({overlay} for "
-          f"overlays) of the {args.limit} a Mach-O image allows; the overlay budget is {args.overlay_budget}")
+    counted = {}
+    for architecture, minos in link_slices(inputs):
+        synthesized, names = link_rules(architecture, minos)
+        modules = load(inputs, architecture)
+        sections = set(synthesized)
+        for module in modules:
+            sections |= {names.get(key, key) for key in module.sections}
+        if any(name.startswith(OBJC_SELECTOR_STUB) for module in modules for name in module.undefined):
+            sections.add(OBJC_STUBS)
+        if architecture in RELATIVE_METHOD_LISTS and any(
+                section == "__objc_const" and OBJC_METHOD_LIST.match(name)
+                for module in modules for name, section in module.data_symbols):
+            sections.add(OBJC_METHOD_LISTS)
+        overlay = sum(1 for segment, section in sections if segment == "__DATA" and OVERLAY_SECTION.match(section))
+        print(f"gen_overlay_sections check: {os.path.basename(args.out)}: {architecture} for macOS "
+              f"{version_text(minos)}: {len(sections)} sections ({overlay} for overlays) of the {args.limit} a Mach-O "
+              f"image allows; the overlay budget is {args.overlay_budget}")
+        counted[architecture] = (minos, sections, overlay, modules)
     with open(args.out, "w") as f:
-        f.write(f"sections {len(sections)}\noverlay_sections {overlay}\nmay_vanish {len(sections & MAY_VANISH)}\n")
-    if len(sections) > args.limit:
-        fail(f"the link would have {len(sections)} sections, more than the {args.limit} a Mach-O image can hold "
-             "(nlist's n_sect is one byte). ld64 wouldn't say so: past the limit it fails with unrelated errors "
-             "(\"ADRP out of range\", \"pointer not aligned\", an assertion in Layout.cpp) or crashes. Build the "
-             "overlays with the combined layout (-DPORT_OVSEC_LAYOUT=combined), one section per overlay")
-    if args.overlay_budget and overlay > args.overlay_budget:
-        fail(f"{overlay} overlay sections, over the budget of {args.overlay_budget}, which keeps room for the "
-             "configuration with the most sections (Debug, -O0, sanitizers, coverage, libraries linked statically). "
-             "Switch to the combined layout (-DPORT_OVSEC_LAYOUT=combined) before the limit is reached")
-    if args.overlay_objects:
-        leaks(modules, args.overlay_objects)
+        json.dump({architecture: {"minos": version_text(minos), "sections": sorted(map(list, sections)),
+                                  "overlay_sections": overlay}
+                   for architecture, (minos, sections, overlay, _) in counted.items()}, f, indent=1)
+        f.write("\n")
+    for architecture, (_, sections, overlay, modules) in counted.items():
+        if len(sections) > args.limit:
+            fail(f"the link's {architecture} slice would have {len(sections)} sections, more than the {args.limit} a "
+                 "Mach-O image can hold (nlist's n_sect is one byte). ld64 wouldn't say so: past the limit it fails "
+                 "with unrelated errors (\"ADRP out of range\", \"pointer not aligned\", an assertion in "
+                 "Layout.cpp) or crashes. Build the overlays with the combined layout (-DPORT_OVSEC_LAYOUT=combined), "
+                 "one section per overlay")
+        if args.overlay_budget and overlay > args.overlay_budget:
+            fail(f"{overlay} overlay sections, over the budget of {args.overlay_budget}, which keeps room for the "
+                 "configuration with the most sections (Debug, -O0, sanitizers, coverage, libraries linked "
+                 "statically). Switch to the combined layout (-DPORT_OVSEC_LAYOUT=combined) before the limit is "
+                 "reached")
+        if args.overlay_objects:
+            leaks(modules, args.overlay_objects, architecture)
 
 
-def image(args: argparse.Namespace) -> None:
-    """Compares the linked program's sections with what "check" predicted before the link, so that a change in ld64's
-    merging or naming of sections shows as a failing test rather than as a wrong count."""
-    with open(args.executable, "rb") as f:
-        data = host_slice(f.read())
+def program_sections(data: bytes, name: str) -> list[tuple[str, str]]:
+    """The sections of a thin Mach-O program, in order."""
     magic, _, _, _, ncmds = struct.unpack_from("<5I", data, 0)
     if magic != MH_MAGIC_64:
-        fail(f"{args.executable} is not a 64-bit Mach-O program")
+        fail(f"{name} is not a 64-bit Mach-O program")
     sections = []
     offset = 32
     for _ in range(ncmds):
@@ -440,18 +600,48 @@ def image(args: argparse.Namespace) -> None:
                 section = offset + 72 + 80 * index
                 sections.append((c_string(data[section + 16:section + 32]), c_string(data[section:section + 16])))
         offset += cmdsize
-    overlay = sum(1 for segment, section in sections if segment == "__DATA" and OVERLAY_SECTION.match(section))
-    predicted = {}
+    return sections
+
+
+def image(args: argparse.Namespace) -> None:
+    """Compares each slice of the linked program with the sections "check" predicted for it before the link, by name,
+    so that a change in ld64's merging, naming or making of sections shows as a failing test that names them rather
+    than as a wrong count."""
+    with open(args.executable, "rb") as f:
+        data = f.read()
     with open(args.predicted) as f:
-        for line in f:
-            key, _, value = line.partition(" ")
-            predicted[key] = int(value)
-    print(f"gen_overlay_sections image: {len(sections)} sections ({overlay} for overlays); predicted "
-          f"{predicted.get('sections')} ({predicted.get('overlay_sections')})")
-    fewest = predicted.get("sections", 0) - predicted.get("may_vanish", 0)
-    if not fewest <= len(sections) <= predicted.get("sections", 0) or overlay != predicted.get("overlay_sections"):
+        predicted = json.load(f)
+    found = architectures(data)
+    if sorted(found) != sorted(predicted):
+        fail(f"the program's slices are {', '.join(found) or 'none'}; the check before the link counted "
+             f"{', '.join(predicted)}")
+    problems = []
+    for architecture in found:
+        thin = slice_of(data, architecture)
+        sections = program_sections(thin, args.executable)
+        expected = predicted[architecture]
+        wanted = {tuple(section) for section in expected["sections"]}
+        overlay = sum(1 for segment, section in sections if segment == "__DATA" and OVERLAY_SECTION.match(section))
+        minos = version_text(minimum_macos(thin) or (0, 0, 0))
+        print(f"gen_overlay_sections image: {architecture} for macOS {minos}: {len(sections)} sections ({overlay} for "
+              f"overlays); predicted {len(wanted)} ({expected['overlay_sections']}) for macOS {expected['minos']}")
+        if minos != expected["minos"]:
+            problems.append(f"{architecture}: the program is built for macOS {minos}, the check counted for "
+                            f"{expected['minos']} (its objects')")
+        missing = sorted(wanted - set(sections) - MAY_VANISH)
+        extra = sorted(set(sections) - wanted)
+        if missing:
+            problems.append(f"{architecture}: predicted but not in the program: "
+                            + ", ".join(",".join(section) for section in missing))
+        if extra:
+            problems.append(f"{architecture}: in the program but not predicted: "
+                            + ", ".join(",".join(section) for section in extra))
+        if overlay != expected["overlay_sections"]:
+            problems.append(f"{architecture}: {overlay} overlay sections, {expected['overlay_sections']} predicted")
+    if problems:
         fail("the program's sections differ from the count before the link: ld64 merges, renames or makes sections "
-             "differently than the check knows (OUTPUT_NAME, SYNTHESIZED, MAY_VANISH)")
+             "differently than the check knows (OUTPUT_NAME, SYNTHESIZED, link_rules, MAY_VANISH):\n  "
+             + "\n  ".join(problems))
 
 
 def main() -> None:
@@ -461,15 +651,15 @@ def main() -> None:
     gen.add_argument("--version", required=True, choices=("b2_us", "w2_us"))
     gen.add_argument("--out", type=Path, required=True)
     gen.add_argument("--layout", choices=("split", "combined"), default="split")
-    chk = commands.add_parser("check", help="count a Mach-O link's sections before it runs")
+    chk = commands.add_parser("check", help="count a Mach-O link's sections, slice by slice, before it runs")
     chk.add_argument("--inputs", required=True, help="a file with the link's inputs, one path per line")
-    chk.add_argument("--out", required=True, help="where to write the counts")
+    chk.add_argument("--out", required=True, help="where to write each slice's predicted sections (JSON)")
     chk.add_argument("--limit", type=int, default=255)
     chk.add_argument("--overlay-budget", type=int, default=150)
     chk.add_argument("--overlay-objects", help="generate's overlay_objects.txt, to look for leaks")
-    img = commands.add_parser("image", help="compare a linked Mach-O program's sections with check's count")
+    img = commands.add_parser("image", help="compare each slice of a linked Mach-O program with check's prediction")
     img.add_argument("executable")
-    img.add_argument("--predicted", required=True, help="the counts check wrote")
+    img.add_argument("--predicted", required=True, help="the predicted sections check wrote")
     args = parser.parse_args()
     if args.command == "generate":
         generate(args)

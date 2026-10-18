@@ -13,6 +13,7 @@
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/gx_display.h"
 #include "hal/gx/vram.h"
+#include "hal/gx/vram_os.h"
 #include "hal/hw/hw.h"
 #include "hal/os/port_os.h"
 #include "nitro/gx.h"
@@ -256,8 +257,12 @@ static void test_views(void) {
     CHECK(lcdc_bank(PORT_VRAM_BANK_E) == (uint8_t *)HW_LCDC_VRAM_E);
     CHECK(lcdc_bank(PORT_VRAM_BANK_I) == (uint8_t *)HW_LCDC_VRAM_I);
     CHECK(port_vram_view(PORT_VRAM_VIEW_LCDC) == port_hw_pointer(0x06800000));
+    // Each view starts a slot of the window and a page of the host, as the aliasing backends map them: the window is
+    // aligned to the host's page, 16 KiB on Apple Silicon but 4 KiB in an x86_64 Mach-O program (port/hal/hw/hw.c)
+    uintptr_t window = (uintptr_t)port_hw_pointer(0x06000000);
     for (int view = 0; view < PORT_VRAM_CPU_VIEW_COUNT; view++) {
-        CHECK((uintptr_t)port_vram_view(view) % PORT_VRAM_SLOT_SIZE == 0);
+        CHECK(((uintptr_t)port_vram_view(view) - window) % PORT_VRAM_SLOT_SIZE == 0);
+        CHECK((uintptr_t)port_vram_view(view) % port_vram_os_page_size() == 0);
     }
 }
 
