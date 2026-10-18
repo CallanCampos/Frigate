@@ -36,6 +36,7 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | **VRAM banks, VRAMCNT, LCDC** | Nine banks of video memory, A to I, that VRAMCNT maps into backgrounds, sprites, textures, palettes, or LCDC, where the CPU reads and writes them directly (0x06800000). [../hal/gx/vram.c](../hal/gx/vram.c) maps them by page aliasing |
 | **DISPCNT, POWCNT1** | The display control register of each engine (mode, layers shown), and the power control register (which engine feeds which screen) |
 | **VBlank, HBlank, VCOUNT** | The vertical blank (lines 192 to 262), when the game swaps buffers and uploads to VRAM; the horizontal blank after each line's 256 dots; the line being drawn. Frigate's virtual clock drives all three |
+| **H-blank, DISPSTAT's flags** | The HBlank as the ARM9 sees it: DISPSTAT's HBlank flag, set 1606 cycles into each line, and the HBlank interrupt, which Frigate takes at the same moment, as melonDS does, so that a handler sees the flag. The screen wipes that cover or uncover the screens line by line write their windows from an H-blank handler only while the flag is set (`src/system/wipe_sub.c`) |
 | **Geometry engine, GXFIFO** | The DS's 3D command processor, fed through command ports and the GXFIFO; it transforms, lights and clips polygons for the rendering engine. [../gfx/ge](../gfx/README.md) models it |
 | **Display capture** | Hardware that writes a composed picture into a VRAM bank, used for motion blur and 3D on both screens ([../gfx/capture.c](../gfx/capture.c)) |
 | **Backup, flash** | The cartridge's save chip, a 4 Mbit (512 KiB) flash in BW2. Frigate keeps it as `IREO.sav` (Black 2) or `IRDO.sav` (White 2), named after the ROM's game code |
@@ -43,6 +44,7 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | **NARC** | Nitro archive: one NitroFS file that holds many numbered members, read by `src/gfl/arc_tool.c` |
 | **SDAT, SSEQ, SBNK, SWAR, STRM** | The sound archive and what it holds: sequences, instrument banks, wave archives, streams |
 | **G2D files: NCGR, NCLR, NCER, NMCR, NANR, NFTR** | NitroSystem's 2D graphics files: characters (tiles), palettes, cells, multi-cells, animations, fonts. The DS relocates them in place; Frigate rebuilds them as host structs ([ADR 0007](adr/0007-nitrosystem-files-in-host-structs.md)) |
+| **Infrared chip, card SPI bus** | BW2's cartridges carry an infrared chip on the card slot's SPI bus, which also reaches the save's flash; the ARM9 drives the bus through `AUXSPICNT` and `AUXSPIDATA`. Frigate models both as melonDS has them ([../hal/card/card_spi.c](../hal/card/card_spi.c), [ADR 0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md)) |
 | **DSi, TWL** | The DSi and its SDK's code name. BW2 runs on both; Frigate is a DS, so every DSi path is skipped |
 
 ## Nintendo's and Game Freak's libraries
@@ -58,6 +60,8 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | **Process (proc)** | A GFL process: a screen or mode with its init, main and exit functions and its overlay (`src/gfl/procsys.c`) |
 | **TCB** | A GFL task (task control block) in a priority list run each frame, each VBlank or each HBlank (`src/gfl/tcb.c`) |
 | **Cell actor (ClAct)** | GFL's sprite system (`src/gfl/clact.c`), which draws NitroSystem cells and animations through OAM |
+| **Field menu, app call** | The menu X opens in the field (overlay 36's `field_menu.c`): POKéMON, POKéDEX, BAG, the trainer card, SAVE and OPTIONS, fewer without a Pokémon or the Pokédex. Each item opens an app, a process of its own overlay, through overlay 12's app call (`EventFieldAppCall`, `src/ov012/event_field_proclink.c`), which closes the field, runs the app and opens the next one it asks for or the field again |
+| **Genuine-card check** | The game's check of the cartridge's infrared chip (`src/ov338/ir_check.c`), at every CONTINUE and NEW GAME and when a Pokémon faints in battle: a chip that doesn't answer its ID hides the C-Gear's new-beacon marks for good and stops battles giving experience. Frigate's model of the chip passes it |
 | **MCSS** | The system that draws Pokémon and trainer sprites from multi-cell animations, in 3D, for battles and other screens (`src/system/mcss.c`) |
 
 ## Frigate's own terms
@@ -80,4 +84,6 @@ and Frigate itself. [ARCHITECTURE.md](ARCHITECTURE.md) shows how the parts fit.
 | **Sound trace** | The ARM7 sound driver's state after each run of its thread, in the DS's layout (`pbwsnd 1`, [../tools/oracle/sndtrace.h](../tools/oracle/sndtrace.h)), which the oracle and Frigate write with `--sound-trace` for `sound.py` to compare |
 | **Game frame, video frame** | A pass of the game's main loop (GFL's frame count) and a VBlank. The field runs at 30 passes a second, so the two differ |
 | **Replay** | A run of the program driven by an input file (`--input`) instead of the player |
+| **Test launcher** | Frigate's `--launch` ([../app/launcher.c](../app/launcher.c), [ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)): when a continued game asks for the field, which has no C yet, it opens the field menu's apps in the field's place, each at a count of GFL's frames, so that the tests can hold them to the oracle's route through the field menu. Test-only and off by default; it steps aside once the field's process table has C |
+| **Saves made on the oracle** | The saves the tests start from, made by melonDS from an input file, each from the save before it (`oracle.py save`, `SAVES`: the first save, the starter save with a Pokémon and the Pokédex, the Route 19 save), and checked against the SHA-1s `oracle.py` keeps; ctest's `oracle_saves` makes them into the build tree, where later runs reuse them |
 | **Game change** | A change Frigate makes outside `port/`, of one of three allowed kinds, each in [game-changes.md](game-changes.md) |

@@ -1,28 +1,30 @@
 # port/cmake/
 
 The host build's fragments. [../CMakeLists.txt](../CMakeLists.txt) sets up what everything shares (the version, the
-generated tree, SDL3, the decomp's language model, the four object libraries `pokebw2_game`, `port_hal`, `port_gfx`
-and `port_app`, the trap stubs and the program) and then includes every `*.cmake` here in name order. Each fragment
-holds one module's build rules (its per-file options, its generated inputs) and the tests of that module, so that a
-module's build and tests are read in one place.
+generated tree, SDL3, the decomp's language model, the five object libraries `pokebw2_game`, `port_hal`, `port_gfx`,
+`port_app` and `port_launcher` (Frigate's test launcher, which every program that links the game links too), the trap
+stubs and the program) and then includes every `*.cmake` here in name order. Each fragment holds one module's build
+rules (its per-file options, its generated inputs) and the tests of that module, so that a module's build and tests
+are read in one place.
 
 | Fragment | What it adds | Game functionality it serves | Tests it defines |
 | --- | --- | --- | --- |
-| [app.cmake](app.cmake) | The rest of the program's own files (`port_app` starts with `app/main.c`): the window, gamepads, the macOS log, replays, the run directory and symbol lookup, the sound driver's trace, the oracle's input file reader; the window icon's generator; the replay tests | The window, the controls, replays, the sound for the oracle (its trace) | `app_window_icon_*`, `app_about`, `app_symbols`, `app_run_dir_*`, `app_gamepad_*`, `replay_start_menu(_clean)`, `replay_new_game(_clean)` (Black 2), `replay_same_save` |
+| [app.cmake](app.cmake) | The rest of the program's own files (`port_app` starts with `app/main.c`): the window, gamepads, the macOS log, replays, the run directory and symbol lookup, the sound driver's trace, the oracle's input file reader; the window icon's generator; the replay tests; the test launcher's option and gate | The window, the controls, replays, the sound for the oracle (its trace), the field menu's items | `app_window_icon_*`, `app_about`, `app_symbols`, `app_run_dir_*`, `app_launcher_spec_*`, `app_gamepad_*`, `replay_start_menu(_clean)`, `replay_new_game(_clean)` (Black 2), `replay_same_save` |
 | [assets.cmake](assets.cmake) | The check of Frigate's artwork ([../assets/branding](../assets/branding/README.md)) | None: the program's look | `assets_branding` |
 | [fx_tests.cmake](fx_tests.cmake) | The decomp's libfx C built for a test | 3D maths (cameras, models) | `fx_libfx` |
 | [g3d.cmake](g3d.cmake) | The geometry engine and 3D renderer's tests, plain and sanitized, and their timing gate | 3D scenes | `g3d_ge*`, `g3d_ds3d*`, `g3d_hal*`, `g3d_timing` |
 | [gfx_tests.cmake](gfx_tests.cmake) | The 2D renderer and capture tests, plain and sanitized, and the renderer's timing gate | 2D screens, capture | `gfx_ds2d*`, `gfx_capture_*`, `gfx_ds2d_timing` |
 | [gx.cmake](gx.cmake) | The `port_sdk_` renames of `gx_vramcnt.c`, `gx_state.c`, `mi_wram.c` and `gx_load2d.c`, which [../hal/gx](../hal/README.md#the-modules) wraps | VRAM banks, palette loads | `gx_*` |
-| [hal_tests.cmake](hal_tests.cmake) | The known-vector tests of the SDK's assembly in C, and the asm oracle (which skips without the extracted ROM, `build/port-venv` or a Ninja build directory) | Copies, fills, decompression, matrices, sorting, SHA-1, RC4 | `hal_mi`, `hal_fx`, `asm_oracle` |
-| [integrate.cmake](integrate.cmake) | Scenarios on the whole program's objects, and the option checks | DMA, the allocator, input, the screens | `integrate_*` |
+| [hal_tests.cmake](hal_tests.cmake) | The known-vector tests of the SDK's assembly in C, the card slot's SPI bus and infrared chip, and the asm oracle (which skips without the extracted ROM, `build/port-venv` or a Ninja build directory) | Copies, fills, decompression, matrices, sorting, SHA-1, RC4; the genuine-card check | `hal_mi`, `hal_fx`, `hal_card_spi_*`, `asm_oracle` |
+| [integrate.cmake](integrate.cmake) | Scenarios on the whole program's objects, and the option checks, the test launcher's exit statuses among them (through `tests/app/check_exit.py`) | DMA, the allocator, input, the screens, CONTINUE without the launcher | `integrate_*` |
+| [layout_tests.cmake](layout_tests.cmake) | Struct layouts that the game's files must agree on in the host build, from the objects' debug information (it skips without `-g` or `llvm-dwarfdump`) | The trainer card's param, shared by the field's app call and the card | `layout_trainer_card_param` |
 | [macos_app.cmake](macos_app.cmake) | The macOS app's target `<program>_app`, its names, icon and bundle identifier (whose prefix is in [../app/macos/bundle_id.cmake](../app/macos/bundle_id.cmake)) | None: the program as an app | `app_make_app`, `app_bundle_id`, `app_message_log`, `app_package_macos_out` |
 | [nnsys.cmake](nnsys.cmake) | The `port_sdk_` renames of NitroSystem's FND heap frees and G2D loaders, which [../hal/nnsys](../hal/README.md#the-modules) replaces | Sprites, cells, animations, fonts, heaps | `nnsys_*` |
-| [oracle.cmake](oracle.cmake) | The melonDS test oracle as an external project (only with `PORT_BUILD_ORACLE`), and its tests: the screens' and the sound's comparisons | Every screen, and the sound, held against melonDS | `oracle_*` |
-| [os.cmake](os.cmake) | minicoro, the OS core's per-file options and stack probes, and its tests | Threads, interrupts, timing | `os_*` |
+| [oracle.cmake](oracle.cmake) | The melonDS test oracle as an external project (only with `PORT_BUILD_ORACLE`), and its tests: the saves made on the oracle (`oracle_saves`, a fixture the others start from), the screens' and the sound's comparisons, the field menu's apps through the test launcher, and the launcher's runs from those saves | Every screen, and the sound, held against melonDS; saves with a Pokémon; the field menu's apps | `oracle_*`, `launch_*` |
+| [os.cmake](os.cmake) | minicoro, the OS core's per-file options and stack probes, and its tests | Threads, interrupts, timing, the HBlank interrupt the screen wipes need | `os_*` |
 | [overlay_sections.cmake](overlay_sections.cmake) | The per-overlay forced includes that put each overlay's writable statics in its own sections, and the link's section check on macOS | Overlays | `overlay_sections_image_*`, `overlay_sections_budget`, `overlay_sections_leaks` |
 | [pxi.cmake](pxi.cmake) | The per-file options of the decomp files the ARM7's services compile through | Everything the ARM7 serves | `pxi_*` |
-| [rom.cmake](rom.cmake) | The ROM manifest (`gen/rom/rom_manifest.c`, from `<version>.sha1` and the NitroFS manifest), the development ROM path, the backup's forced include | Every file read, saves | `rom_*`, `card_backup_*`, `rom_game_*` |
+| [rom.cmake](rom.cmake) | The ROM manifest (`gen/rom/rom_manifest.c`, from `<version>.sha1` and the NitroFS manifest), the development ROM path, the backup's forced include, and the tests of the ROM, the card and the file system as the game links them | Every file read, saves, the genuine-card check | `rom_*`, `card_backup_*`, `rom_game_*` (`rom_game_ir_genuine_card` among them) |
 | [sound.cmake](sound.cmake) | `audio/audio.c` into the program, and the sound driver's and sound unit's tests, one scenario a process | Music, sound effects, cries | `snd_*` |
 
 ## Options

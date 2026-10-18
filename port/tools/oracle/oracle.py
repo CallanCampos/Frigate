@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Runs the melonDS oracle and Frigate's program alike, for compare.py and sound.py (port/tools/oracle/README.md).
+"""Runs the melonDS oracle and Frigate's program alike, for compare.py and sound.py, makes the saves the tests start
+from on the oracle, and checks the field menu's apps through Frigate's test launcher (port/tools/oracle/README.md).
 
     oracle.py run --out DIR --frames N [--screens LIST] [--input FILE] [--dump SPEC]... [--time TIME]
                   [--version b2_us] [--rom PATH] [--oracle BIN] [--save FILE] [--save-out FILE] [--no-counter]

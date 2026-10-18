@@ -11,8 +11,9 @@ It writes:
   - hwinclude/: host variants of the headers that name DS hardware addresses, found ahead of the originals on the
     include path. Each DS address in them goes through PORT_HW_ADDR(), which port/include/port_host.h maps into the
     host memory that port/hal/hw provides; the registers whose reads or writes must act (the geometry command ports,
-    the divider's results, VCOUNT, ...) go through the accessor that HW_REGISTER_POLICY names. Nothing else in a
-    header changes, and the variants are made again from upstream's headers at every configure (ADR 0004);
+    the divider's results, VCOUNT, the card slot's SPI bus with its infrared chip, ...) go through the accessor that
+    HW_REGISTER_POLICY names. Nothing else in a header changes, and the variants are made again from upstream's
+    headers at every configure (ADR 0004);
   - sources.txt: every C file of src/ and lib/ that the host build compiles, one path per line, relative to the
     repository: all of them except the files port/hal/replaced.txt and the modules' port/hal/*/replaced.txt list.
 

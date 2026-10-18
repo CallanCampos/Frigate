@@ -39,6 +39,8 @@ records keep what was decided or found at the time, and are added to, not rewrit
 | [adr/0008](adr/0008-particle-work-from-the-platform-layer.md) | Particle work from the platform layer |
 | [adr/0009](adr/0009-gamepads-by-position-one-pad-at-a-time.md) | Gamepads by position, one pad at a time |
 | [adr/0010](adr/0010-macos-app-as-a-signed-copy-of-the-program.md) | The macOS app as a signed copy of the program |
+| [adr/0011](adr/0011-cartridge-infrared-chip-as-a-register-model.md) | The cartridge's infrared chip as a register model |
+| [adr/0012](adr/0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed |
 | [RESEARCH.md](RESEARCH.md) | The research of 2026-10-16 behind the plan, summarized |
 | [research/README.md](research/README.md) | The full research reports, with what each covers |
 | [research/decomp-progress.md](research/decomp-progress.md) | The decomp's C coverage per module, data and pointer coverage, pace, claims |

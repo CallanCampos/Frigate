@@ -1,7 +1,8 @@
 // The port's run directory (port/app/run_dir.h), in the format pbw-oracle writes and compare.py reads
 // (port/tools/oracle/README.md, "Run directories"): frames.tsv with a row at every frame, the screens of chosen frames
-// as PNG, dumps of the game's globals at chosen frames, and run.txt, so that a run of the game can be held against the
-// melonDS oracle's. It reads the game's memory and screens and changes neither.
+// as PNG, dumps of the game's globals at chosen frames, and run.txt (with the test launcher's --launch when the run has
+// one), so that a run of the game can be held against the melonDS oracle's. It reads the game's memory and screens and
+// changes neither.
 
 // POSIX's mkdir, which glibc hides from strict C11 (the target's -std=c11)
 #define _POSIX_C_SOURCE 200809L

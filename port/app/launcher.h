@@ -1,10 +1,11 @@
+// Frigate's test launcher (launcher.c, ADR 0012): with --launch, a continued game opens the field menu's apps (the
+// party list, the Pokédex, the bag, the trainer card, the summary) in place of the field while the field's code
+// (overlay 36) has no C, for the tests that hold those apps to melonDS. Off without the option. This header is what the
+// program (port/app/main.c) asks of it: the option, when to stop, and the run's exit status. Plain C types only, so
+// that main.c, which doesn't include the decomp's headers, can use it; the game's own seam is declared in
+// port/include/port_host.h.
 #ifndef PORT_APP_LAUNCHER_H
 #define PORT_APP_LAUNCHER_H
-
-// Frigate's test launcher (launcher.c, ADR 0012): with --launch, a continued game opens the field menu's apps in place
-// of the field while the field's code (overlay 36) has no C. Off without the option. Plain C types only, so that
-// main.c, which doesn't include the decomp's headers, can use it; the game's own seam is declared in
-// port/include/port_host.h.
 
 // The exit statuses a run with --launch ends with, when nothing else stopped it (a trap's 70, say)
 // Every app opened and closed, each showing the field menu again or closing it (event type 0 or 1)

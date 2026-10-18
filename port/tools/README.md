@@ -31,14 +31,16 @@ build time; their output goes into the build directory, never into the repositor
 
 [oracle/](oracle/README.md) is the melonDS test oracle, `pbw-oracle`: the player's ROM on melonDS's emulation core,
 headless and deterministic, which plays an input file and writes screens and memory for `compare.py` to hold Frigate
-against (test level T4), and its sound, the mixer's output sample by sample and the ARM7 sound driver's state after
-each run, for `sound.py`. It is a test tool only, never linked into or shipped with Frigate, and built only with
-`-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run directories, sound traces), how frames are
-aligned, the comparison sequences, saves, the sound and the known differences. `pbwinput.c` and `display3d.c` are
-plain C11 that the program's replays and the tests compile too, and `sndtrace.h`, the sound trace's format, is plain
-C11 that Frigate itself includes: the platform layer's sound driver writes its trace with it
-(`port/hal/snd7/snd7.c`), as do the program's `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests
-(`port/tests/snd/test_snd.c`).
+against (test level T4), and its sound, the mixer's output sample by sample and the ARM7 sound driver's state after each
+run, for `sound.py`. It also makes the saves the tests start from (a save with a Pokémon, made from the first save), and
+`oracle.py launch` holds the field menu's apps on Frigate's test launcher to the oracle's route through the field menu
+([ADR 0012](../docs/adr/0012-test-launcher-for-the-field-menus-apps.md)). It is a test tool only, never linked into or
+shipped with Frigate, and built only with `-DPORT_BUILD_ORACLE=ON`. Its README has the formats (input files, run
+directories, sound traces), how frames are aligned, the comparison sequences, saves, the sound and the known
+differences. `pbwinput.c` and `display3d.c` are plain C11 that the program's replays and the tests compile too, and
+`sndtrace.h`, the sound trace's format, is plain C11 that Frigate itself includes: the platform layer's sound driver
+writes its trace with it (`port/hal/snd7/snd7.c`), as do the program's `--sound-trace` (`port/app/sound_trace.c`) and
+the sound driver's tests (`port/tests/snd/test_snd.c`).
 
 ## Measurement
 

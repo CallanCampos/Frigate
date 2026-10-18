@@ -1,7 +1,8 @@
 // Reports the game reaching DS code or data that has no C yet (trap.h): the part of the game that can't run until
 // upstream writes its C. Function stubs call port_trap_function; data placeholders sit on pages with no access, and the
 // fault handler names the placeholder that was touched. Either way the program stops with status 70, its message naming
-// the symbol, its address and its caller.
+// the symbol, its address and its caller. It also tells Frigate's test launcher whether a symbol is still a placeholder
+// (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012).
 #include "hal/trap.h"
 #include <dlfcn.h>
 #include <execinfo.h>

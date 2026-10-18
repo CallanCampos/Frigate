@@ -1,7 +1,10 @@
 # The melonDS test oracle (port/tools/oracle, PLAN.md §6 T4) and its tests (port/tests/oracle), which hold Frigate's
 # run of the game to melonDS's: the screens and memory of the boot, the opening, the title and start menu, CONTINUE and
-# a save, and the sound of the opening and the title (the ARM7 sound driver run by run; its output: a stream and a cry
-# to the bit, the music by its envelope and levels).
+# a save; the saves made on the oracle from saves (the first save, and the starter save with a Pokémon and the
+# Pokédex), which the sequences and launch checks start from; the field menu's apps (the bag, the trainer card, the
+# party list and the summary) through Frigate's test launcher (ADR 0012), and the launcher's own exit statuses; and the
+# sound of the opening and the title (the ARM7 sound driver run by run; its output: a stream and a cry to the bit, the
+# music by its envelope and levels).
 #
 # The input file reader (pbwinput.c, which the port can compile as it is), the per-screen 3D decision (display3d.c),
 # compare.py and sound.py are tested in every build: they need neither melonDS nor a ROM. The oracle itself is a test

@@ -1,10 +1,11 @@
 // Tests of the port's run directory (port/app/run_dir.c): frame lists as pbw-oracle's --screens takes them, each
 // screen's hash and blank decision as pbw-oracle and compare.py make them, and the files a run writes: frames.tsv in
-// its version 2, the PNG files of the listed frames, and run.txt while the run goes on and after it. The screen hashes
-// expected are the oracle's own (port/tests/oracle/boot_b2_us.tsv: frame 1 shows both displays off, white, and frame
-// 400 both screens black). And memory.txt, from dump specs as --run-dump takes them, over globals of the test that a
-// resolver names. The files go in a directory named after the program (argv[0] plus ".tmp"), so that the plain and
-// sanitized builds can run at the same time.
+// its version 2, the PNG files of the listed frames, and run.txt while the run goes on and after it (with the test
+// launcher's --launch line when the run has one). The screen hashes expected are the oracle's own
+// (port/tests/oracle/boot_b2_us.tsv: frame 1 shows both displays off, white, and frame 400 both screens black). And
+// memory.txt, from dump specs as --run-dump takes them, over globals of the test that a resolver names. The files go in
+// a directory named after the program (argv[0] plus ".tmp"), so that the plain and sanitized builds can run at the same
+// time.
 
 // POSIX's rmdir, which glibc hides from strict C11
 #define _POSIX_C_SOURCE 200809L
@@ -267,7 +268,7 @@ static void TestRun(void) {
     free(text);
 
     // Frigate's test launcher's --launch, when the run has one, gets a line of its own
-    const PortRunDirInfo launched = { "pokeblack2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, "bag@4200" };
+    const PortRunDirInfo launched = { "frigate-black2", "rom.nds", "2012-10-07 12:00:00", NULL, "", 4, "bag@4200" };
     CHECK(port_run_dir_open(sDir, "none", RecordPng, &launched));
     port_run_dir_close(0);
     text = ReadFile("run.txt");

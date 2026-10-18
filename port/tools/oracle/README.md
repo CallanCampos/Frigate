@@ -4,7 +4,9 @@ The reference the port is held against ([PLAN.md §6](../../docs/PLAN.md#6-verif
 ROM running on [melonDS](https://melonds.kuribo64.net)'s emulation core, headless and deterministic, with an input
 file, writing both screens and named memory at chosen frames, and the sound: the mixer's output sample by sample and
 the ARM7 sound driver's state after each run of its thread. `compare.py` compares the screens and memory with the
-port's, `sound.py` the sound ([Sound](#sound)).
+port's, `sound.py` the sound ([Sound](#sound)). It also makes the saves the tests start from ([Saves](#saves)), and
+holds the field menu's apps, which Frigate opens through its test launcher while the field has no C, to its own route
+through the field menu ([The launch checks](#the-launch-checks)).
 
 It is a **test tool only**. It is never linked into or shipped with Frigate
 ([PLAN.md §1](../../docs/PLAN.md#1-goal-and-what-native-means)): it is a CMake project of its own, built only on
@@ -21,7 +23,7 @@ at build time, pinned to a release, and never committed.
 | `oracle.cpp`, `oracle.h`, `platform.cpp`, `symtab.*`, `pngout.*` | `pbw-oracle`, the program on melonDS's core: `oracle.cpp` its options and run, `oracle.h` what melonDS's Platform layer (`platform.cpp`) reports to it, `symtab.*` the decomp's symbols for its memory dumps, `pngout.*` the screens' PNG files |
 | `display3d.c`, `display3d.h` | which screens show 3D in a frame, from the display registers; plain C11 |
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
-| `oracle.py` | runs the oracle and the port with the repository's defaults; the ctest check |
+| `oracle.py` | runs the oracle and the port with the repository's defaults; makes the saves the tests start from on the oracle, each from the save before it ([Saves](#saves)); the comparison sequences, the sound's comparison and the launch checks of the field menu's apps through Frigate's test launcher ([The launch checks](#the-launch-checks)); the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
 | `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
 | `sndtrace.h` | the sound trace's format, plain C11, which the port's sound driver (`port/hal/snd7/snd7.c`), its `--sound-trace` (`port/app/sound_trace.c`) and the sound driver's tests include |

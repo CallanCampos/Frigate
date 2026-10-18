@@ -18,7 +18,8 @@ doesn't have, and runs it as a program, with no emulator. The ROM is only where 
 frame for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run, the title's stream
 and the cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and
 CONTINUE loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there).
-[docs/STATUS.md](docs/STATUS.md) has the current state.
+Meanwhile Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag, the trainer
+card and the party list match melonDS pass for pass. [docs/STATUS.md](docs/STATUS.md) has the current state.
 
 ## Quick start
 
@@ -40,7 +41,8 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
   makes `frigate-white2`. The other options are in [cmake/README.md](cmake/README.md#options).
 - **The program's options** are in `frigate-black2 --help` and at the top of [app/main.c](app/main.c): `--headless` runs
   without a window or pacing, `--frames N` stops after N frames, `--screenshot PATH` writes both screens at the end,
-  `--save-dir PATH` keeps the saves elsewhere, `--input FILE` plays a replay.
+  `--save-dir PATH` keeps the saves elsewhere, `--input FILE` plays a replay, and `--launch APPS` opens the field
+  menu's apps for the tests ([the test launcher](#the-test-launcher)).
 - **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
 - **The ROM build stays as upstream's:** `python3 configure.py && ninja` rebuilds both ROMs from your dumps and checks
   both SHA1s. Every change to this repository ends with it, since Frigate's changes must leave the ROMs byte for byte
@@ -50,6 +52,26 @@ The host build compiles every C file of `src/` and `lib/` with the host's clang 
 [hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are trap
 stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the program
 stops with the name of the first one it reaches.
+
+### The test launcher
+
+A continued game stops when it asks for the field, whose code (overlay 36) has no C yet. For tests, Frigate's test
+launcher opens the field menu's apps there instead, in order, each when GFL's frame count reaches its COUNT (at once
+without one), then stops. Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run
+ended first, the game never asked for the field, or an app wanted the field); 2 when the save's field menu doesn't
+offer an app, which it checks as the menu does (no Pokémon, no Pokédex, the Black Tower's menu without its BAG):
+
+```sh
+build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE
+build/port/frigate-black2 --save-dir SAVES --launch party@4044,card@6974 --input FILE --headless
+```
+
+The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. The Pokédex stops the
+program on a trap some 395 passes after it opens, still in its opening (`NNSi_objSizeWTbl`, NitroSystem's G2D, has no
+C yet), so only a Pokédex closed before then runs through. Without `--launch` nothing changes.
+[docs/MODDING.md](docs/MODDING.md#reaching-the-field-menus-apps) says how to reach a menu with it, and where its saves
+come from; [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes;
+`oracle.py launch` checks the apps against melonDS through it ([tools/oracle/README.md](tools/oracle/README.md)).
 
 ## Directory map
 
@@ -61,8 +83,8 @@ asm oracle, each spike, the artwork) lists its files there.
 
 | Directory | What it is | Guide |
 | --- | --- | --- |
-| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the macOS app's scripts | [app/README.md](app/README.md) |
-| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves, sound, touch, the clock, power, input) | [hal/README.md](hal/README.md) |
+| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts | [app/README.md](app/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input) | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
 | `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
@@ -95,25 +117,6 @@ asm oracle, each spike, the artwork) lists its files there.
 - **[docs/README.md](docs/README.md):** every document, one line each.
 
 ## Playing
-
-### The test launcher
-
-A continued game stops when it asks for the field, whose code (overlay 36) has no C yet. For tests, Frigate's test
-launcher opens the field menu's apps there instead, in order, each when GFL's frame count reaches its COUNT (at once
-without one), then stops. Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run
-ended first, the game never asked for the field, or an app wanted the field); 2 when the save's field menu doesn't
-offer an app, which it checks as the menu does (no Pokémon, no Pokédex, the Black Tower's menu without its BAG):
-
-```sh
-build/port/pokeblack2 --save-dir SAVES --launch bag,card            # the bag, then the trainer card, after CONTINUE
-build/port/pokeblack2 --save-dir SAVES --launch party@4044,card@6974 --input FILE --headless
-```
-
-The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. The Pokédex stops the
-program on a trap some 395 passes after it opens, still in its opening (`NNSi_objSizeWTbl`, NitroSystem's G2D, has no
-C yet), so only a Pokédex closed before then runs through. Without `--launch` nothing changes.
-[ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes; `oracle.py
-launch` checks the apps against melonDS through it ([tools/oracle/README.md](tools/oracle/README.md)).
 
 ### Controls
 

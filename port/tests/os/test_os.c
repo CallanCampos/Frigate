@@ -3,7 +3,8 @@
 // os_thread.c, os_mutex.c and os_message.c, linked as the game links them; the HAL only switches, takes interrupts
 // and keeps time. Most scenarios come from the reviewed spike (port/spikes/os-fibers), adapted to the real layer. What
 // they cover, every part of the game runs on: the game's main loop and its threads (the card's, the sound loader),
-// VBlank and HBlank, the timers and alarms, and the timed work that the ARM7 sound driver's alarms use.
+// VBlank and HBlank (the HBlank interrupt with DISPSTAT's flag set, which the screen wipes' H-blank function checks),
+// the timers and alarms, and the timed work that the ARM7 sound driver's alarms use.
 //
 //   port_os_tests NAME | all
 //

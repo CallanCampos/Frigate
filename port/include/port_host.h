@@ -1,7 +1,8 @@
 // Force-included into every decomp C file of the host build (port/CMakeLists.txt), so all of the game's C sees it: what
 // MWCC provides built in and clang spells differently, the translation of the DS's fixed addresses into host memory,
 // and the platform layer's few hooks that decomp files call under PLATFORM_PC (the heaps' sizes, the particle systems'
-// work, the sound data's handles, the Wi-Fi ID's seed). Nothing here may change what a file means on the DS.
+// work, the sound data's handles, the Wi-Fi ID's seed, Frigate's test launcher's seam in CONTINUE's event). Nothing
+// here may change what a file means on the DS.
 #ifndef PORT_HOST_H
 #define PORT_HOST_H
 

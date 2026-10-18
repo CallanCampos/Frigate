@@ -1,7 +1,8 @@
 # Frigate's host build. The ROM build (configure.py and ninja) stays separate and untouched; this one compiles the same
 # decomp sources with the host's clang into one program, frigate-black2 or frigate-white2, with the platform layer in
 # port/: the whole game, from the decomp's src/ and lib/, on port/hal, port/gfx, port/audio and port/app
-# (port/docs/ARCHITECTURE.md).
+# (port/docs/ARCHITECTURE.md), with Frigate's test launcher (port/app/launcher.c, ADR 0012), which opens the field
+# menu's apps for the tests while the field has no C, linked into every program that links the game.
 #
 #   cmake -S port -B build/port -G Ninja
 #   cmake --build build/port

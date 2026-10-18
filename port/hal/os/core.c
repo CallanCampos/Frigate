@@ -6,8 +6,9 @@
 //   - the CPSR: OS_EnableInterrupts, OS_DisableInterrupts, OS_RestoreInterrupts, their IrqAndFiq pair,
 //     OS_GetCpsrIrq and OS_GetProcMode (os_system.c, assembly), and OS_Halt (os_terminate_proc.c, assembly);
 //   - the IRQ handler in ITCM and its thread-switch tail (OS_IrqHandler and func_01ff8ce0, assembly with no C);
-//   - the display's timing (VBlank, HBlank, V-count, VCOUNT and DISPSTAT's flags), the hardware timers and the other
-//     modules' timed work (port_os_set_timed_work), on a virtual clock;
+//   - the display's timing (VBlank, HBlank, V-count, VCOUNT and DISPSTAT's flags, the HBlank interrupt as its flag
+//     sets, which the screen wipes that cover lines one by one need), the hardware timers and the other modules' timed
+//     work (port_os_set_timed_work), on a virtual clock;
 //   - the dispatcher, which runs on the host's own stack.
 //
 // Each SDK context (the first member of its OSThread) is mapped to a fiber in a side table; the SDK's structs don't

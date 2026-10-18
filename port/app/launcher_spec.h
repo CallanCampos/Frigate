@@ -1,6 +1,3 @@
-#ifndef PORT_APP_LAUNCHER_SPEC_H
-#define PORT_APP_LAUNCHER_SPEC_H
-
 // What Frigate's test launcher opens (port/app/launcher.c, ADR 0012): the program's option
 //
 //   --launch APP[@COUNT][,APP[@COUNT]]...
@@ -9,6 +6,9 @@
 // asks for the field, each at the first pass of the game's main loop at which GFL's frame count reaches COUNT (at once
 // without one); and which of them the save's field menu offers. Plain C11 without the decomp's headers, so that it is
 // tested on its own (port/tests/app/test_launcher_spec.c).
+#ifndef PORT_APP_LAUNCHER_SPEC_H
+#define PORT_APP_LAUNCHER_SPEC_H
+
 #include <stddef.h>
 #include <stdint.h>
 

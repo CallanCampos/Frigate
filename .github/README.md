@@ -23,8 +23,9 @@ Frigate boots natively through the game's logos, the title screen and the start 
 frame by frame against melonDS; its sound too: the sound driver run by run, the title's stream and the cry to the bit,
 the music by its envelope and levels. New Game's intro runs to the field's first script, and CONTINUE loads a save,
 which stays interchangeable with melonDS's, up to the field. The field engine (overlay 36) is still being decompiled
-upstream; code that isn't C yet stops the game with its name. The log, newest entry first, is
-[port/docs/STATUS.md](../port/docs/STATUS.md).
+upstream; code that isn't C yet stops the game with its name. Meanwhile a test launcher opens the field menu's apps in
+the field's place, and the bag, the trainer card and the party list match melonDS pass for pass. The log, newest entry
+first, is [port/docs/STATUS.md](../port/docs/STATUS.md).
 
 The decomp's progress, from upstream's CI:
 

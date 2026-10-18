@@ -10,7 +10,9 @@ Two limits shape everything below:
 - **Frigate plays as far as the decomp's C goes.** It runs from power-on through the logos, the opening, the title
   screen, the start menu and New Game's intro, and loads a save up to the field. The field engine (overlay 36) is
   still being decompiled upstream, and the game stops there with the name of the first function that has no C
-  ([STATUS.md](STATUS.md) has the current state). The overworld, battles and menus past it can't be reached yet.
+  ([STATUS.md](STATUS.md) has the current state). The overworld, battles and menus past it can't be reached yet, but
+  for the field menu's apps, which Frigate's test launcher opens in the field's place
+  ([below](#reaching-the-field-menus-apps)).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
@@ -58,7 +60,40 @@ main and exit functions); what it draws, its backgrounds, windows, sprites and t
 in battle is another overlay's: `src/ov286/b_bag_main.c` and the other `b_bag_*.c` files there. To change what the bag
 shows, change those files' C: which items a pocket lists, in what order, which message each line uses. The words
 themselves are the ROM's message data, which a C change can pick between but not rewrite until the layered file system
-exists. And none of it can be seen yet: the bag opens from the field, which stops at overlay 36.
+exists. The bag opens from the field, which stops at overlay 36, so to see a change run it through the test launcher:
+`--launch bag` ([below](#reaching-the-field-menus-apps)).
+
+## Reaching the field menu's apps
+
+The field menu's apps (the party list, a Pokémon's summary, the Pokédex, the bag and the trainer card) open from the
+field, which stops at overlay 36 until upstream writes it. Frigate's test launcher reaches them anyway: with `--launch`,
+a continued game opens the apps you name in the field's place, when CONTINUE asks for the field, through the game's own
+app call ([../app/launcher.c](../app/launcher.c), [ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)):
+
+```sh
+build/port/frigate-black2 --save-dir SAVES --launch bag                # the bag after CONTINUE, then stop
+build/port/frigate-black2 --save-dir SAVES --launch party,card         # the party list, then the trainer card
+build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --headless --screenshot bag.png
+```
+
+- **It needs a save to continue.** `SAVES` holds `IREO.sav` (Black 2) or `IRDO.sav` (White 2): your own save from a
+  cartridge or melonDS, or one the oracle makes, with the oracle built
+  ([../tools/oracle/README.md](../tools/oracle/README.md#saves)): `port/tools/oracle/oracle.py save starter_save
+  --oracle BIN --out SAVES/IREO.sav` makes the save with Tepig and the Pokédex (Black 2 only), and `first_save` makes
+  one with no Pokémon yet. Without a save there is no CONTINUE, the game never asks for the field, and the run ends with
+  status 1.
+- **It opens only what the save's field menu offers**, as the menu decides: no party list or summary without a
+  Pokémon, no Pokédex without the Pokédex, no bag in the Black Tower's menu. Asking for another ends the run with status
+  2 before anything opens.
+- **Each app runs as the game runs it**, with your keys or an input file's presses. When it closes, the next one opens,
+  and after the last the program stops, saying how each closed (its result and event type). `APP@COUNT` opens an app
+  when GFL's frame count reaches COUNT, which lines it up with an input file's presses; without one it opens at once.
+- **What it can't do:** an app that wants the field (a field move, an item used in the field) ends the launch with
+  status 1, and the Pokédex stops on a trap some 395 passes after it opens (`NNSi_objSizeWTbl`, NitroSystem's G2D, has
+  no C yet). What the field leaves behind before an app opens (VRAM, palettes, the random numbers) isn't there.
+- **It is a test tool**, off without the option, and it goes once overlay 36 lands. The tests use it to hold each app
+  to melonDS's route through the real field menu, pass by pass (`oracle.py launch`,
+  [../tools/oracle/README.md](../tools/oracle/README.md#the-launch-checks)).
 
 ## When the game stops
 

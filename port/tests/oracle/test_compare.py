@@ -2,9 +2,10 @@
 """Tests of the oracle's Python side (port/tools/oracle): compare.py's PNG reader and writer, frames.tsv's versions,
 screen comparisons exact and with the 3D tolerance screen by screen, comparisons by hash, frame alignment, memory
 comparisons, symbols.py's map parser and name lookup, and oracle.py's handling of the port's runs (with a stand-in
-program), of the clock, of the comparison sequences and their references, of the launch checks of the field menu's apps
-(with stand-ins for both programs), and of a missing oracle or ROM. They make
-up their own runs and need neither melonDS nor a ROM. Standard library only.
+program), of the clock, of the saves made on the oracle from saves and their cache, of the comparison sequences and
+their references, of the launch checks of the field menu's apps through Frigate's test launcher (with stand-ins for
+both programs), and of a missing oracle or ROM. They make up their own runs and need neither melonDS nor a ROM.
+Standard library only.
 """
 
 from __future__ import annotations

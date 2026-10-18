@@ -1,6 +1,7 @@
 # The ROM, the game card and the file system (port/hal/rom, port/hal/card, port/hal/fs), behind every file the game
-# reads, every overlay it loads and every save: the manifest of the ROM the program is built for, the per-file options
-# of their sources, and their tests (port/tests/rom).
+# reads, every overlay it loads and every save, and the card's infrared chip that the game's genuine-card check asks
+# (port/hal/card/card_spi.c): the manifest of the ROM the program is built for, the per-file options of their sources,
+# and their tests (port/tests/rom).
 
 set(port_rom_dir "${CMAKE_CURRENT_SOURCE_DIR}/hal/rom")
 set(port_card_dir "${CMAKE_CURRENT_SOURCE_DIR}/hal/card")

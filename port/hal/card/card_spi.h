@@ -1,9 +1,8 @@
-#ifndef PORT_HAL_CARD_CARD_SPI_H
-#define PORT_HAL_CARD_CARD_SPI_H
-
 // The game card's SPI bus as the ARM9 sees it, AUXSPICNT (0x040001a0) and AUXSPIDATA (0x040001a2), with the infrared
 // chip that BW2's cartridges have on that bus (card_spi.c, ADR 0011). The game's genuine-card check (overlay 338,
 // src/ov338/ir_check.c) and the infrared library (overlay 31, lib/irc/src/irc_spi.c) talk to it.
+#ifndef PORT_HAL_CARD_CARD_SPI_H
+#define PORT_HAL_CARD_CARD_SPI_H
 
 // What an access to each register uses, as the host variants of the SDK's headers call them for reg_MI_MCCNT0 and
 // reg_MI_MCD0 (port/tools/gen_host_tree.py's HW_REGISTER_POLICY): each call first carries out the store the game made
