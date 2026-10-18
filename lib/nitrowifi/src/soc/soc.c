@@ -136,19 +136,14 @@ SocHostEnt *SOC_GetHostByName(const char *host) {
 }
 
 int SOC_GetSockName(int sock, SocAddrIn *address) {
-    SOCLSocket *socket = (SOCLSocket *)sock;
     CPSInAddr host_ip;
     u32 port;
 
-    if (socket == NULL) {
+    if (sock == 0) {
         return SOCL_ENETRESET;
     }
     host_ip = SOCL_GetHostID();
-    if (socket != NULL) {
-        port = socket->local_port;
-    } else {
-        port = 0;
-    }
+    port = SOCL_GetHostPort(sock);
     if (host_ip == 0) {
         port = 0;
     }

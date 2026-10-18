@@ -12,14 +12,17 @@ static void SOCLi_SetMyIP(void);
 static void SOCLi_DhcpTimeout(void);
 static BOOL SOCL_LinkIsOn(void);
 
+// The explicit zeros and this order lay the globals out as the original's .bss, which the code reaches from one base
+SOCLSocket *SOCLiUDPSendSocket = NULL;
+u32 SOCLiDhcpState = 0;
+CPSInAddr SOCLiRequestedIP = 0;
+u32 SOCLiYieldWait = 0;
+CPSConfig SOCLiCPSConfig = { 0 };
+// SOCLiConfigPtr's NULL is in .data, before the default buffer size
+#pragma explicit_zero_data on
 SOCLConfig *SOCLiConfigPtr = NULL;
+#pragma explicit_zero_data reset
 u32 SOCLiDefaultLanBufferSize = 0x4000;
-
-u32 SOCLiYieldWait;
-CPSInAddr SOCLiRequestedIP;
-u32 SOCLiDhcpState;
-SOCLSocket *SOCLiUDPSendSocket;
-CPSConfig SOCLiCPSConfig;
 
 int SOCL_Startup(SOCLConfig *config) {
     int result;
@@ -49,10 +52,8 @@ static int SOCLi_StartupSOCL(void) {
 }
 
 static void SOCLi_StartupCPS(void) {
-    SOCLConfig *config = SOCLiConfigPtr;
     CPSConfig *cps = &SOCLiCPSConfig;
-    s32 mtu;
-    s32 rwin;
+    SOCLConfig *config = SOCLiConfigPtr;
 
     MI_CpuFill8(cps, 0, sizeof(CPSConfig));
     cps->alloc = config->alloc;
@@ -60,30 +61,38 @@ static void SOCLi_StartupCPS(void) {
     cps->link_is_on = SOCL_LinkIsOn;
     cps->random_seed = 0;
     cps->yield_wait = SOCLiYieldWait;
-    cps->lan_buflen = config->lan_buffer_size ? config->lan_buffer_size : SOCLiDefaultLanBufferSize;
-    cps->lan_buf = config->lan_buffer ? config->lan_buffer : SOCLiConfigPtr->alloc(cps->lan_buflen);
 
-    mtu = config->mtu;
-    if (mtu == 0) {
-        mtu = 576;
+    if (config->lan_buffer_size) {
+        cps->lan_buflen = config->lan_buffer_size;
+    } else {
+        cps->lan_buflen = SOCLiDefaultLanBufferSize;
     }
-    if (mtu > 1500) {
-        mtu = 1500;
-    } else if (mtu < 576) {
-        mtu = 576;
+
+    if (config->lan_buffer) {
+        cps->lan_buf = config->lan_buffer;
+    } else {
+        cps->lan_buf = SOCLiConfigPtr->alloc(cps->lan_buflen);
     }
-    rwin = config->rwin;
-    if (rwin == 0) {
-        rwin = 0x10c0;
+
+    {
+        s32 mtu, rwin;
+
+        mtu = config->mtu ? config->mtu : 576;
+        if (mtu > 1500) {
+            mtu = 1500;
+        } else if (mtu < 576) {
+            mtu = 576;
+        }
+        rwin = config->rwin ? config->rwin : 0x10c0;
+        cps->mymss = mtu - 40;
+        SOCLSocketParamTCP.buffer.rcvbuf_size = rwin;
+        SOCLSocketParamTCP.buffer.rcvbuf_consume_min = cps->mymss * 2;
     }
-    cps->mymss = mtu - 40;
-    SOCLSocketParamTCP.buffer.rcvbuf_size = rwin;
-    SOCLSocketParamTCP.buffer.rcvbuf_consume_min = cps->mymss * 2;
 
     CPSMyIp = 0;
     if (config->use_dhcp) {
-        cps->mode = 0;
         SOCLiDhcpState = SOCLI_DHCP_REQUESTED;
+        cps->mode = 0;
         cps->dhcp_callback = SOCLi_DhcpTimeout;
         cps->requested_ip = SOCLiRequestedIP;
     } else {

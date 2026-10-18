@@ -28,11 +28,13 @@ lib/nitrowifi/src/cps/cps.c:
     .bss        start:0x0218ba0c end:0x0218dbe0
 
 lib/nitrowifi/src/soc/socl_startup.c:
+    complete
     .text       start:0x02155e34 end:0x02156000
     .data       start:0x0218546c end:0x02185474
     .bss        start:0x0218dbe0 end:0x0218dc20
 
 lib/nitrowifi/src/soc/socl_command.c:
+    complete
     .text       start:0x02156000 end:0x02156200
     .bss        start:0x0218dc20 end:0x0218dc44
 
@@ -52,6 +54,7 @@ lib/nitrowifi/src/soc/socl_write.c:
     .text       start:0x02156d8c end:0x0215724c
 
 lib/nitrowifi/src/soc/socl_shutdown.c:
+    complete
     .text       start:0x0215724c end:0x021572f4
 
 lib/nitrowifi/src/soc/socl_close.c:
@@ -63,6 +66,7 @@ lib/nitrowifi/src/soc/socl_cleanup.c:
     .text       start:0x02157620 end:0x02157894
 
 lib/nitrowifi/src/soc/socl_poll.c:
+    complete
     .text       start:0x02157894 end:0x02157978
 
 lib/nitrowifi/src/soc/socl_misc.c:
@@ -89,6 +93,7 @@ lib/nitrowifi/src/ssl/ssl.c:
     .bss        start:0x0218dde8 end:0x0218df74
 
 lib/nitrowifi/src/ssl/md5.c:
+    complete
     .text       start:0x0215a6b4 end:0x0215ab04
     .data       start:0x0218553c end:0x021856bc
 

@@ -49,9 +49,7 @@ static int SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket) {
         s8 mode = socket->flag;
 
         if (mode == 1) {
-            if (pipe->udp_head != NULL) {
-                size = pipe->udp_head->len;
-            }
+            size = pipe->udp_head != NULL ? pipe->udp_head->len : 0;
         } else if (mode == 0 || mode == 4) {
             size = socket->rcvbuf_len - pipe->cps_read_len;
         }

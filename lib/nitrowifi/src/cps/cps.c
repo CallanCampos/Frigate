@@ -256,15 +256,12 @@ static BOOL CPSi_LinkIsOn(void) {
 
 // CPS_Startup
 void CPS_Startup(CPSConfig *config) {
-    u64 seed;
-
     OSi_ReferSymbol(CPSi_Signature);
-    if (config->random_seed) {
-        seed = config->random_seed;
+    if (config->random_seed != 0) {
+        MATH_InitRand32(&CPSiRand, config->random_seed);
     } else {
-        seed = OS_GetTick();
+        MATH_InitRand32(&CPSiRand, OS_GetTick());
     }
-    MATH_InitRand32(&CPSiRand, seed);
     if (config->alloc && config->free) {
         CPSiAlloc = config->alloc;
         CPSiFree = config->free;

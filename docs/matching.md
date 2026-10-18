@@ -649,6 +649,9 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- The rounds of a hash written as statements, `a += F(b, c, d) + x + t; a = b + ROTL(a, s);`, spill differently from
+  one expression per round: GameSpy's `MD5Transform` (NitroWiFi's `ssl/md5.c`) matches with statement macros and an
+  `int` counter, 0x310 against 0x338 otherwise (`u32 j` leaves 4 bytes).
 - A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
   declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
   `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there. An
@@ -1030,6 +1033,9 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- A `volatile` field is loaded in source order and never reused: NitroWiFi's `SOCLi_GetWriteBufferFreeSize` loads
+  `write_pos` before `read_pos`, as the original does, only with `write_pos` `volatile` (the writers move it while the
+  pipe's thread reads it); `read_pos` needs none.
 - `#pragma scheduling off` and `#pragma peephole off` leave 1.1p1's Thumb code as it is, and its ARM code:
   `p_sta_sub.c`, `ctvt_talk.c` and libVCT's ARM `vct_dsp.c` compile to the same bytes under either, so neither tells an
   order the scheduler chose from one the code generator did. `#pragma optimization_level 1` does change the order: there
@@ -2172,6 +2178,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Branches and block layout
 
+- An early exit with its own call, `if (work == NULL) { OS_RestoreInterrupts(irq); return 0; }`, then straight-line
+  code, where one condition (`work != NULL && ...`) with one shared restore is 8 bytes short: NitroWiFi's
+  `WCM_CountApList` and `WCM_ClearApListBuffer`. A `result` local returned once, `result = f(...); return result;`,
+  lays out the blocks differently from `return f(...)`: `SOCLi_ConsumeBuffer` (4 bytes larger without it) and
+  `SOCL_Shutdown`, which sets `result = 0` in an `else`.
 - A block that several branches share, chosen by a flag tested at the end (`BOOL average = FALSE; ... if (average)`),
   costs a register for the flag and its sets and test: MWCC never threads the constant flag into direct branches, so
   the push grows and every register shifts (8 bytes in NitroSystem's `getTransData_`, `nsbca.c`, and the game's
@@ -2769,6 +2780,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Switches
 
+- A case that falls through into `default` shares the default's code: NitroWiFi's WCM calls pick their backend with
+  `case 2: if (OS_IsRunOnTwl()) { result = ...; break; } default: result = 7;`, which gives the original's one
+  block, where an `if`/`else` that sets 7 itself adds a block (`WCM_SearchAsyncWithParams`, 12 bytes, and five more).
+  An empty `case 3:` stacked on `default:`, the case whose warning the SDK compiles out, is what fixes
+  `WCM_StartupStep2` and four more steps.
 - A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
   `if`s gives: GameSpy's `ghiSendBufferedData` (`ghttpBuffer.c`, overlay 189) matches only as `case -1: return FALSE;`
   written before `case -2: return TRUE;`. A final `if (!f()) return 0; return 1;` always puts the `return 1`
@@ -3047,6 +3063,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
   file split at `0x0206f0f0`. In the same way, under `-ipa file`, a static reached through two literals while a
   neighbour in its `.bss` has a literal of its own is pooled alone, in an original file of its own (`nwm.c`'s rows).
+- Under `-ipa function` the same holds for zero: a `.bss` global or static defined with an initializer, `= 0`,
+  `= NULL` or `= { 0 }`, is known to the functions below it, which reach it from one base (`ldr rN, =.bss; [rN, #off]`),
+  where a tentative definition is loaded through a literal of its own. NitroWiFi's `SOCLi_CleanupCommandPacketQueue`
+  (`socl_command.c`) matches only with both of its statics zero-initialized. `#pragma explicit_zero_data on` puts such
+  a definition in `.data` instead: `socl_startup.c`'s `SOCLiConfigPtr = NULL`, which the ROM has in `.data` before
+  the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
+  match (33 bytes to 0x2c off otherwise).
 - The file's `.data` objects take part in MWCC's size sort that orders `.rodata`: `btlv_mcss.c`'s 3-byte idle-wait
   array had to be counted before `rodata_order.py` predicted the layout. So do its `.bss` statics: the object's
   symbol table lists them interleaved with the `.rodata` objects by size, and moving a table moves the statics too.

@@ -50,22 +50,23 @@ int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CP
 
 static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip,
                              int block) {
-    int written = 0;
-    int chunk_max = SOCLi_GetSendPipe(socket)->socket->sndbuf.size;
-    int alloc_len;
+    SOCLSendPipe *pipe = SOCLi_GetSendPipe(socket);
+    int sndbuf_len;
     int write_pos;
+    int alloc_len;
+    int chunk_max;
+    int written = 0;
 
+    sndbuf_len = pipe->socket->sndbuf.size;
     if (socket->flag == 1) {
-        chunk_max -= 0x2a;
-        if (len > chunk_max) {
+        sndbuf_len -= 0x2a;
+        if (len > sndbuf_len) {
             return SOCL_EMSGSIZE;
         }
         chunk_max = len;
     } else {
-        chunk_max -= 0x36;
-        if (len <= chunk_max) {
-            chunk_max = len;
-        }
+        sndbuf_len -= 0x36;
+        chunk_max = MATH_MIN(len, sndbuf_len);
     }
     while (len > 0) {
         alloc_len = SOCLi_AllocWriteBuffer(socket, len, chunk_max, &write_pos, block);
@@ -74,14 +75,14 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 rem
                 return SOCL_EAGAIN;
             }
             buf += alloc_len;
-            written += alloc_len;
             len -= alloc_len;
+            written += alloc_len;
         }
         if (!(block & 1)) {
-            if (alloc_len > 0) {
-                break;
+            if (alloc_len <= 0) {
+                return SOCL_EAGAIN;
             }
-            return SOCL_EAGAIN;
+            break;
         }
     }
     return written;

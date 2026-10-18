@@ -57,7 +57,8 @@ s32 WCM_Init(void *work, s32 size);
 // WCM_Init selects mode 1 (DS). The core also accepts 2 (DSi, requiring 0x4800 bytes), or 0 to use the stored
 // preference or hardware default. Main's direct caller selects mode 2; this parameter is a mode, not a boolean.
 s32 WCM_InitCore(void *work, s32 size, s32 requestedMode);
-void WCM_Finish(void);
+// Releases the work buffer: 0, or 1 when WCM is not initialized or not idle (state 1)
+s32 WCM_Finish(void);
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify);
 s32 WCM_CleanupAsync(void);
 // Either NULL pointer requests a stop; option is ignored on that path.
