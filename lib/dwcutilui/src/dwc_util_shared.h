@@ -66,8 +66,6 @@ BOOL func_ov182_021b8f24(void);
 
 // The first screen of the connection settings
 void func_ov182_021b536c(void);
-// The move of the settings to another console
-void func_ov182_021b043c(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

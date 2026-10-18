@@ -5,6 +5,7 @@
 #include "dwc_util_main.h"
 #include "dwc_util_move.h"
 #include "dwc_util_option_menu.h"
+#include "dwc_util_page_multi5.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_text.h"
