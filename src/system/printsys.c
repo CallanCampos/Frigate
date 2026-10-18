@@ -160,7 +160,10 @@ static inline u16 PrintQueue_Advance(PrintQueue *queue, u16 pos, u16 n) {
 
 static inline const u16 *StrCmd_Skip(const u16 *cmd) {
     if (*cmd == STRCMD_CHAR) {
-        cmd = cmd + 3 + cmd[2];
+        const u16 *end = cmd + 3;
+
+        end += cmd[2];
+        return end;
     }
     return cmd;
 }
@@ -879,13 +882,6 @@ u32 func_020228c0(const StrBuf *strbuf, Font *font, u32 spacing, u32 *widths, u3
 }
 
 // Copies a line of the string, with its commands. Returns whether it has the line
-static inline const u16 *StrCmd_End(const u16 *cmd) {
-    if (*cmd == STRCMD_CHAR) {
-        return cmd + 3 + cmd[2];
-    }
-    return cmd;
-}
-
 BOOL func_02022900(const StrBuf *strbuf, StrBuf *dest, u32 line) {
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
 
@@ -909,7 +905,7 @@ BOOL func_02022900(const StrBuf *strbuf, StrBuf *dest, u32 line) {
             if (*str != STRCMD_CHAR) {
                 GFL_StrBufAppend(dest, *str++);
             } else {
-                const u16 *end = StrCmd_End(str);
+                const u16 *end = StrCmd_Skip(str);
 
                 while (str < end) {
                     GFL_StrBufAppend(dest, *str++);
