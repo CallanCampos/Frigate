@@ -30,9 +30,6 @@ struct FieldFog {
     BOOL dirty;
 };
 
-void FieldFog_SetDefaultTable(FieldFog *fog);
-void FieldFog_AnimateEx(FieldFog *fog, s32 offsetStart, s32 offsetEnd, u32 depthShiftStart, u32 depthShiftEnd,
-                        u16 frameCount);
 BOOL FieldFogAnimation_IsRunning(FieldFogAnimation *animation);
 void FieldFogAnimation_Set(FieldFogAnimation *animation, s32 offsetStart, s32 offsetEnd, u16 depthShiftStart,
                            u16 depthShiftEnd, u16 frameCount);
