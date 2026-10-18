@@ -3,11 +3,12 @@
 #include "nitro/os.h"
 #include "nnsys/g2d.h"
 
-// NitroSystem's g2d_OamManager.c: the OAM managers. Each type of OAM has a buffer of its OAMs and affine parameters,
-// which the managers share out in ranges, and a manager fills its range each frame and sends it to the hardware. The
-// file also defines the OAM size tables that g2d.h's inlines read, which fill the gap before
-// g2d_CellTransferManager.c's .rodata: pokediamond links the OAM manager as one object, g2d_oam.o, whose .rodata is
-// these two tables. The file name is a guess from the functions, and the tables' names are pokediamond's
+// NitroSystem's OAM managers. Each type of OAM has a buffer of its OAMs and affine parameters, which the managers
+// share out in ranges, and a manager fills its range each frame and sends it to the hardware. The file also defines
+// the OAM size tables that g2d.h's inlines read, which fill the gap before g2d_CellTransferManager.c's .rodata:
+// pokediamond links the OAM manager as one object, g2d_oam.o, whose .rodata is these two tables. Its linker file cuts
+// object names at 15 characters (g2d_celltransfe, g2d_oamsoftware), so g2d_oam is the whole name; the case is a guess
+// from NitroSystem's g2d_OAM.h. The tables' names are pokediamond's
 
 #define OAM_NUM 128
 #define AFFINE_NUM 32

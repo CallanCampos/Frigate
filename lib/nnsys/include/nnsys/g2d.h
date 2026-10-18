@@ -749,7 +749,7 @@ static inline void NNS_G2dSetRendererOverwriteDisable(NNSG2dRendererInstance *re
     rend->overwriteEnableFlag &= ~flag;
 }
 
-// The width and height in pixels of each OAM shape and size, by [shape][size] (g2d_OamManager.c). The names are
+// The width and height in pixels of each OAM shape and size, by [shape][size] (g2d_OAM.c). The names are
 // pokediamond's
 extern const u16 NNSi_objSizeWTbl[3][4];
 extern const u16 NNSi_objSizeHTbl[3][4];
