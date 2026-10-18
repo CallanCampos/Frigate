@@ -19,6 +19,7 @@
 #include "field/mailtool.h"
 #include "field/player_action.h"
 #include "field/player_state.h"
+#include "field/trcard_sys.h"
 #include "field/zone.h"
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
@@ -36,13 +37,6 @@
 #include "system/game_system.h"
 
 // The params of the apps that no header describes yet
-
-// The trainer card, which func_ov012_02169b04 allocates
-typedef struct {
-    u8 unk0[0x14];
-    u32 result;
-    s32 appParam;
-} TrainerCardParam;
 
 // The town map
 typedef struct {
