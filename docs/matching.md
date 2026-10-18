@@ -393,6 +393,14 @@ Same instructions, registers swapped.
   `void *vram = G2S_GetOBJCharPtr();` and `(void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy...baseAddrOfVram[...])`,
   as `btlv_gauge.c`'s `BtlvGauge_DrawBar` writes it. The base written in place (`HW_DB_OBJ_VRAM`, or `HW_OBJ_VRAM` in
   the gauge), a `u32 vram` local and the inline called in place put the constant second in both functions.
+- A three-register `adds rD, rN, rM` whose operands both die there gets `rD` from the register of the operand generated
+  last. A spilled local's reload is generated just before its use, after a constant built for the same sum, so a
+  spilled base takes the result: `badge_view.c`'s `BadgeView_AnimatePalette` adds 0x2d8 to its spilled `wk` as
+  `movs r3, #0xb6; ...; ldr r2, [sp]; lsls r3, r3, #2; adds r2, r2, r3`. The constant takes it when the base is a
+  real load (a struct field, a stack parameter, an address-taken or `volatile` local), when the base stays in a saved
+  register, or when the constant is shared in the block or built inside a loop and so rebuilt after the reload, as in
+  DWC's `NHTTPi_SendProcPostDataBinary` (`ldr r3, [sp, #N]; ...; lsls r2, r2, #8; adds r2, r3, r2`). Reduced copies of
+  `ctvt_talk.c`'s `CtvtTalk_Main` give each case, but the function itself has none of them.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -596,7 +604,11 @@ Same instructions, registers swapped.
   talk button's `func_0204c124` on. There padding before that join never moved the edge, 40 field stores after it
   (about 200 nodes) never produced a copy, and added calls moved the first copy in jumps: a seventh actor creation
   put it one use late, 19 to 23 calls put it at later uses, and 24 to 39 removed every copy. The badge gate's edge,
-  in a function without such joins, moves by one padding call as described.
+  in a function without such joins, moves by one padding call as described. Matched code switches in the middle of
+  one block too: `ctvt_game_cam.c`'s `CtvtGameCam_LoadBG` passes its first `MI_CpuFill8`'s 0 as `movs r1, #0` and the
+  second's as `adds r1, r7, #0`. In a copy of it, inline wrappers around the calls and locals for their results never
+  moved the switch, four added calls or one added `GFL_BGSysFillChar` moved it one use earlier, and any `if` before
+  the fills removed the copies.
 - A reload of a spilled parameter that trades places with a constant, at the same size, can be a free width
   conversion to a wider callee parameter: the GTS Negotiations screen's `GtsNegoDisp_DimPalettes` passed a `u16 vram`
   to `PaletteFade_BlendBuffer`'s `u32 buffer`, which emits nothing but moves the reload. The palette fade's five
@@ -2837,7 +2849,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same way: libVCT's `vct_dsp.c` has its 16-byte
   `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
   above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
-  `VCT_InitEcho`, their only user.
+  `VCT_InitEcho`, their only user. The reverse rules the flag out: under `-ipa function` the tables of 64 bytes or
+  more stay in the one shared section, even one defined just above a late function, and each local initializer gets
+  a section of its own in function order, so local initializers sorted by size across functions, between the shared
+  section and the large tables, come only from `-ipa file`, as overlay 257's `ctvt_game.c` has them in both versions.
 - Two statics reached from one literal, at `[r0]` and `[r0, #4]`, ask for `-ipa file` before anything else: without it
   each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
   NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics

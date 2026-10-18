@@ -17,7 +17,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   reverse: the hoisted-constant budget. Give a statement before the first copy one more (or one fewer) named step, or
   declare locals `int` instead of `u32` (one node each); test one node short of the edge.
   (matching.md: "within a budget") Past a join followed by calls, field stores don't move the edge and calls move it
-  in jumps. (matching.md: "doesn't follow a node count")
+  in jumps; inline wrappers and locals for call results don't move it. (matching.md: "doesn't follow a node count")
+- A sum of a spilled base and a constant whose result takes the other operand's register (`adds r2, r3, r2` with the
+  constant in `r2`): the result goes to the operand generated last, and a spilled reload is generated at the add. The
+  constant takes it when the base is a real load (field, stack parameter, address-taken or `volatile` local), stays
+  in a saved register, or the constant is shared in the block or built in a loop. (matching.md: "the register of the
+  operand generated last")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
 - An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
@@ -840,6 +845,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `-ipa function`, which sorts the data waiting at each function on its own; define the tables just before their
   first user.
   A game file can't take a per-file flag yet. (matching.md: "Under `-ipa function` MWCC writes out")
+- Local initializers sorted by size across functions, after the shared section and before the tables of 64 bytes or
+  more, rule `-ipa function` out. (matching.md: "The reverse rules the flag out")
 - A `static const` whose address is never taken is folded and not emitted. If the original has it, it isn't static.
   An unreferenced word after a file's larger tables is the next file's first object.
   (matching.md: "whose address is never taken")
