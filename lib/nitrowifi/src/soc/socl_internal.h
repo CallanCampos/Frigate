@@ -62,7 +62,8 @@ struct SOCLSocket;
 typedef struct SOCLSendPipe {
     SOCLCommandPipe base;
     SOCLSocketBuffer buffer;
-    u16 write_pos;             // Where the next write goes in the buffer (a ring)
+    // Where the next write goes in the buffer (a ring). volatile: the writers move it while the pipe's thread reads it
+    volatile u16 write_pos;
     u16 read_pos;              // How far the pipe's thread has taken data out of it
     OSThreadQueue wait;        // Where a blocking write sleeps until the buffer has room
     struct SOCLSocket *socket; // The socket that owns the pipe (a UDP socket shares the UDP send socket's)
@@ -241,6 +242,14 @@ int SOCL_Cleanup(void);
 CPSInAddr SOCL_Resolve(const char *name);
 CPSInAddr SOCL_InetAtoH(const char *name);
 CPSInAddr SOCL_GetHostID(void);
+
+// The socket's local port, or 0 for no socket
+static inline u16 SOCL_GetHostPort(int sock) {
+    SOCLSocket *socket = (SOCLSocket *)sock;
+
+    return sock ? socket->local_port : 0;
+}
+
 int SOCL_SetResolver(CPSInAddr dns1, CPSInAddr dns2);
 // Shuts CPS down after a failed SOCL_Startup, and in SOCL_Cleanup (no counterpart in pokediamond's NitroWiFi, whose
 // SOCL_Cleanup does it inline; name a guess)

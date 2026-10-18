@@ -209,6 +209,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
+  (matching.md: "The rounds of a hash written as statements")
 - A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
   of the block's stores between those two. (matching.md: "Whether a zero stored to two fields keeps a saved register")
 - A stack frame for a wide parameter where the original keeps it in registers and computes an expression again after
@@ -284,6 +286,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- Two field loads in the other order, with every other instruction right: the field the original loads first may be
+  `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
 - A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
   byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
 - `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
@@ -632,6 +636,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- An early exit 8 bytes short, or a call's result returned through another layout: give the exit its own call
+  and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
   it with fewer registers pushed: forward gotos to labelled tail blocks. (matching.md: "chosen by a flag tested")
 - `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
@@ -784,6 +790,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Switches
 
+- An extra block that sets the default's value in a case: let the case fall through into `default`, and stack an
+  empty case on `default:` where the SDK compiled out a warning. (matching.md: "A case that falls through")
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
 - `case -1:` tested on its own before a jump table the original folds it into (`adds r0, #1; cmp`): the switch is on
   a `u32`; make the value (or the function returning it) signed. (matching.md: "takes `-1` in")
@@ -840,6 +848,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
+  it a zero initializer (`= 0`, `= NULL`, `= { 0 }`); one the ROM has in `.data` takes `#pragma explicit_zero_data on`.
+  (matching.md: "the same holds for zero")
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes

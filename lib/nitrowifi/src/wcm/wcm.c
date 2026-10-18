@@ -138,13 +138,13 @@ struct WCMGlobal {
     void (*sendCompletion)(s32);                               // 0x2c
     u8 ownMac[6];                                              // 0x30
     u8 unk_36[2];
-    u8 rssiSampleCursor; // 0x38, count until full, then 16 | the next ring index
-    u8 rssiSamples[16];  // 0x39
-    u8 unk_49[3];
 };
 
 static WCMAnchor sWcmAnchor;
 static WCMGlobal sWcmGlobal;
+// The last 16 signal samples, a ring, and the count of samples until it is full, then 16 plus the next index
+static u8 sWcmRssiSamples[16];
+static u8 sWcmRssiCursor = 0;
 
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode);
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option);
@@ -194,12 +194,9 @@ s32 WCM_Init(void *work, s32 size) {
 }
 
 s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
-    u32 irq;
-    s32 mode = requestedMode;
-    s32 requiredSize;
-    s32 result;
+    u32 irq = OS_DisableInterrupts();
+    s32 requiredSize = 0;
 
-    irq = OS_DisableInterrupts();
     if (sWcmAnchor.work != NULL) {
         OS_RestoreInterrupts(irq);
         return 1;
@@ -213,13 +210,13 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
         return 1;
     }
     MI_CpuFill8(work, 0, size);
-    if (mode == 0) {
-        mode = sWcmAnchor.preferredMode;
-        if (mode == 0) {
-            mode = WCM_GetDefaultWirelessMode();
+    if (requestedMode == 0) {
+        requestedMode = sWcmAnchor.preferredMode;
+        if (requestedMode == 0) {
+            requestedMode = WCM_GetDefaultWirelessMode();
         }
     }
-    if (!WCM_GetRequiredWorkSize(&requiredSize, mode)) {
+    if (!WCM_GetRequiredWorkSize(&requiredSize, requestedMode)) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
@@ -233,7 +230,7 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
     sWcmAnchor.work->scanChannelTime = 0;
     sWcmAnchor.work->apListLocked = 0;
     sWcmAnchor.work->resetPending = 0;
-    sWcmAnchor.work->wirelessMode = mode;
+    sWcmAnchor.work->wirelessMode = requestedMode;
     WCM_ResetSearchOption();
     WCM_InitOnce();
     if (!OS_IsTickAvailable()) {
@@ -247,22 +244,20 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
     return 0;
 }
 
-void WCM_Finish(void) {
-    u32 irq;
-    WCMWork *work;
+s32 WCM_Finish(void) {
+    u32 irq = OS_DisableInterrupts();
 
-    irq = OS_DisableInterrupts();
-    work = sWcmAnchor.work;
-    if (work == NULL) {
+    if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
-        return;
+        return 1;
     }
-    if (work->state != 1) {
+    if (sWcmAnchor.work->state != 1) {
         OS_RestoreInterrupts(irq);
-        return;
+        return 1;
     }
     sWcmAnchor.work = NULL;
     OS_RestoreInterrupts(irq);
+    return 0;
 }
 
 static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
@@ -284,16 +279,14 @@ static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
 
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
     u32 irq;
-    WCMWork *work;
     s32 result;
 
     irq = OS_DisableInterrupts();
-    work = sWcmAnchor.work;
-    if (work == NULL) {
+    if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
-    switch (work->state) {
+    switch (sWcmAnchor.work->state) {
     case 1:
         WCM_SetConfig(config, notify);
         break;
@@ -309,20 +302,22 @@ s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
     }
 
     if (!WM_GetAllowedChannel()) {
+        // BUG: Returns with interrupts still disabled
+#ifdef BUGFIX
         OS_RestoreInterrupts(irq);
+#endif
         return 5;
     }
-    switch (work->wirelessMode) {
+    switch (sWcmAnchor.work->wirelessMode) {
     case 1:
         result = WCM_StartupStep1();
         break;
     case 2:
         if (OS_IsRunOnTwl()) {
             result = func_02769930();
-        } else {
-            result = 7;
+            break;
         }
-        break;
+        // Mode 2 without DSi hardware is unsupported, like any other mode
     default:
         result = 7;
         break;
@@ -343,14 +338,14 @@ s32 WCM_CleanupAsync(void) {
         return 1;
     }
     switch (work->state) {
-    case 1:
-        OS_RestoreInterrupts(irq);
-        return 0;
     case 3:
         break;
     case 4:
         OS_RestoreInterrupts(irq);
         return 2;
+    case 1:
+        OS_RestoreInterrupts(irq);
+        return 0;
     default:
         OS_RestoreInterrupts(irq);
         return 1;
@@ -363,10 +358,9 @@ s32 WCM_CleanupAsync(void) {
     case 2:
         if (OS_IsRunOnTwl()) {
             result = func_02769a30();
-        } else {
-            result = 7;
+            break;
         }
-        break;
+        // Mode 2 without DSi hardware is unsupported, like any other mode
     default:
         result = 7;
         break;
@@ -400,10 +394,9 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
     case 2:
         if (OS_IsRunOnTwl()) {
             result = func_02769aa4(bssid, essid, option);
-        } else {
-            result = 7;
+            break;
         }
-        break;
+        // Mode 2 without DSi hardware is unsupported, like any other mode
     default:
         result = 7;
         break;
@@ -414,27 +407,28 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
 
 s32 WCM_StopSearchAsync(void) {
     u32 irq = OS_DisableInterrupts();
-    WCMWork *work = sWcmAnchor.work;
-    if (work == NULL) {
+
+    if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
-    switch (work->state) {
-    case 3:
-        OS_RestoreInterrupts(irq);
-        return 0;
+    switch (sWcmAnchor.work->state) {
     case 6:
         WCM_SetState(7);
         sWcmAnchor.work->pendingNotify = WCM_NOTIFY_END_SEARCH;
-        OS_RestoreInterrupts(irq);
-        return 3;
+        break;
     case 7:
         OS_RestoreInterrupts(irq);
         return 2;
+    case 3:
+        OS_RestoreInterrupts(irq);
+        return 0;
     default:
         OS_RestoreInterrupts(irq);
         return 1;
     }
+    OS_RestoreInterrupts(irq);
+    return 3;
 }
 
 s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
@@ -505,10 +499,9 @@ s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
     case 2:
         if (OS_IsRunOnTwl()) {
             result = func_02769b80();
-        } else {
-            result = 7;
+            break;
         }
-        break;
+        // Mode 2 without DSi hardware is unsupported, like any other mode
     default:
         result = 7;
         break;
@@ -518,25 +511,23 @@ s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
 }
 
 s32 WCM_DisconnectAsync(void) {
-    u32 irq;
-    WCMWork *work;
+    u32 irq = OS_DisableInterrupts();
     s32 result = 0;
+    WCMWork *work = sWcmAnchor.work;
 
-    irq = OS_DisableInterrupts();
-    work = sWcmAnchor.work;
     if (work == NULL) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
     switch (work->state) {
-    case 3:
-        OS_RestoreInterrupts(irq);
-        return 0;
     case 9:
         break;
     case 10:
         OS_RestoreInterrupts(irq);
         return 2;
+    case 3:
+        OS_RestoreInterrupts(irq);
+        return 0;
     default:
         OS_RestoreInterrupts(irq);
         return 1;
@@ -553,10 +544,9 @@ s32 WCM_DisconnectAsync(void) {
         case 2:
             if (OS_IsRunOnTwl()) {
                 result = func_02769c70();
-            } else {
-                result = 7;
+                break;
             }
-            break;
+            // Mode 2 without DSi hardware is unsupported, like any other mode
         default:
             result = 7;
             break;
@@ -567,26 +557,23 @@ s32 WCM_DisconnectAsync(void) {
 }
 
 s32 WCM_RestoreIdleAsync(void) {
-    u32 irq;
-    WCMWork *work;
+    u32 irq = OS_DisableInterrupts();
     s32 result = 0;
 
-    irq = OS_DisableInterrupts();
-    work = WCM_GetWork();
-    if (work == NULL) {
+    if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
-    switch (work->state) {
-    case 1:
-        OS_RestoreInterrupts(irq);
-        return 0;
+    switch (sWcmAnchor.work->state) {
     case 13:
         OS_RestoreInterrupts(irq);
         return 2;
+    case 1:
+        OS_RestoreInterrupts(irq);
+        return 0;
     case 6:
         WCM_SetState(13);
-        work->pendingNotify = 9;
+        sWcmAnchor.work->pendingNotify = 9;
         OS_RestoreInterrupts(irq);
         return 3;
     case 3:
@@ -598,21 +585,20 @@ s32 WCM_RestoreIdleAsync(void) {
         return 1;
     }
 
-    if (work->resetPending == 1) {
+    if (sWcmAnchor.work->resetPending == 1) {
         WCM_SetState(13);
-        work->pendingNotify = 9;
+        sWcmAnchor.work->pendingNotify = 9;
     } else {
-        switch (work->wirelessMode) {
+        switch (sWcmAnchor.work->wirelessMode) {
         case 1:
             result = WCM_RestoreIdleStep();
             break;
         case 2:
             if (OS_IsRunOnTwl()) {
                 result = func_02769ce8();
-            } else {
-                result = 7;
+                break;
             }
-            break;
+            // Mode 2 without DSi hardware is unsupported, like any other mode
         default:
             result = 7;
             break;
@@ -638,23 +624,21 @@ s32 WCM_GetState(void) {
 }
 
 s32 WCM_SetSearchOption(u32 option) {
-    u32 irq;
-    WCMWork *work;
+    u32 irq = OS_DisableInterrupts();
     u32 mask = 0;
-    u32 old;
-
-    irq = OS_DisableInterrupts();
-    work = sWcmAnchor.work;
     // BUG: The original reads the search option before checking whether WCM has been initialized.
 #ifdef BUGFIX
-    if (work == NULL) {
+    u32 old;
+
+    if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
         return 0;
     }
-    old = work->searchOption;
+    old = sWcmAnchor.work->searchOption;
 #else
-    old = work->searchOption;
-    if (work == NULL) {
+    u32 old = sWcmAnchor.work->searchOption;
+
+    if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
         return 0;
     }
@@ -677,7 +661,7 @@ s32 WCM_SetSearchOption(u32 option) {
     if (option & 0x800000) {
         mask |= 0x400000;
     }
-    work->searchOption = (old & ~mask) | option;
+    sWcmAnchor.work->searchOption = (old & ~mask) | option;
     OS_RestoreInterrupts(irq);
     return old;
 }
@@ -707,34 +691,28 @@ WCMWork *WCM_GetWork(void) {
 }
 
 static void WCM_SetConfig(WCMConfig *config, WCMNotify notify) {
-    WCMWork *work = sWcmAnchor.work;
-
     if (config == NULL) {
-        work->dmaNo = 3;
-        work->apBuffer = NULL;
-        work->apBufferBytes = 0;
-        work->scanMode = 0;
+        sWcmAnchor.work->dmaNo = 3;
+        sWcmAnchor.work->apBuffer = NULL;
+        sWcmAnchor.work->apBufferBytes = 0;
+        sWcmAnchor.work->scanMode = 0;
     } else {
-        u32 alignmentDelta = (4 - ((u32)config->pbdbuffer & 3)) & 3;
-
-        work->dmaNo = config->dmano & 3;
-        if ((u32)config->nbdbuffer < alignmentDelta + sizeof(WCMApListHeader)) {
-            work->apBuffer = NULL;
-            work->apBufferBytes = 0;
+        sWcmAnchor.work->dmaNo = config->dmano & 3;
+        if (((4 - ((u32)config->pbdbuffer & 3)) % 4) + sizeof(WCMApListHeader) > config->nbdbuffer) {
+            sWcmAnchor.work->apBuffer = NULL;
+            sWcmAnchor.work->apBufferBytes = 0;
         } else {
-            u32 align = ((u32)config->pbdbuffer + 3) & ~3u;
-            u32 byteCount = (u32)config->nbdbuffer - alignmentDelta;
-            work->apBuffer = (void *)align;
-            work->apBufferBytes = byteCount;
-            MI_CpuFill8(work->apBuffer, 0, byteCount);
+            sWcmAnchor.work->apBuffer = (void *)(((u32)config->pbdbuffer + 3) & ~3);
+            sWcmAnchor.work->apBufferBytes = config->nbdbuffer - (4 - ((u32)config->pbdbuffer & 3)) % 4;
+            MI_CpuFill8(sWcmAnchor.work->apBuffer, 0, sWcmAnchor.work->apBufferBytes);
         }
-        work->scanMode = config->nbdmode;
+        sWcmAnchor.work->scanMode = config->nbdmode;
     }
-    work->notify = notify;
+    sWcmAnchor.work->notify = notify;
 }
 
 static void WCM_ResetSearchOption(void) {
-    WCM_GetWork()->searchOption = 0xaaa082;
+    sWcmAnchor.work->searchOption = 0xaaa082;
 }
 
 u16 WCM_PickChannel(s32 channelIndex) {
@@ -815,7 +793,11 @@ void WCM_ClearApListBuffer(void) {
     u32 irq = OS_DisableInterrupts();
     WCMWork *work = WCM_GetWork();
 
-    if (work != NULL && work->apBuffer != NULL && (s32)work->apBufferBytes > 0) {
+    if (work == NULL) {
+        OS_RestoreInterrupts(irq);
+        return;
+    }
+    if (work->apBuffer != NULL && (s32)work->apBufferBytes > 0) {
         MI_CpuFill8(work->apBuffer, 0, work->apBufferBytes);
     }
     OS_RestoreInterrupts(irq);
@@ -825,12 +807,15 @@ s32 WCM_CountApList(void) {
     u32 irq = OS_DisableInterrupts();
     WCMWork *work = WCM_GetWork();
     s32 count = 0;
+    WCMApListHeader *header;
 
-    if (work != NULL) {
-        WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
-        if (header != NULL && work->apBufferBytes > sizeof(WCMApListHeader)) {
-            count = header->count;
-        }
+    if (work == NULL) {
+        OS_RestoreInterrupts(irq);
+        return 0;
+    }
+    header = (WCMApListHeader *)work->apBuffer;
+    if (header != NULL && work->apBufferBytes > sizeof(WCMApListHeader)) {
+        count = header->count;
     }
     OS_RestoreInterrupts(irq);
     return count;
@@ -839,16 +824,20 @@ s32 WCM_CountApList(void) {
 s32 WCM_LockApList(s32 lock) {
     u32 irq = OS_DisableInterrupts();
     WCMWork *work = WCM_GetWork();
-    s32 wasLocked;
 
     if (work == NULL) {
         OS_RestoreInterrupts(irq);
         return 0;
     }
-    wasLocked = (work->apListLocked != 0);
-    work->apListLocked = (lock != 0);
+    if (lock != 0) {
+        lock = work->apListLocked ? 1 : 0;
+        work->apListLocked = 1;
+    } else {
+        lock = work->apListLocked ? 1 : 0;
+        work->apListLocked = 0;
+    }
     OS_RestoreInterrupts(irq);
-    return wasLocked;
+    return lock;
 }
 
 void *WCM_PointApList(u16 index) {
@@ -1134,10 +1123,11 @@ const u8 *WCM_GetConnectedApSsid(u16 *ssidLength) {
     WCMWork *work = WCM_GetWork();
     u32 irq = OS_DisableInterrupts();
 
-    if (work != NULL && work->state == 9 && work->resetPending == 0) {
-        const WMBssDesc *bss = &work->connectBss;
-        length = bss->ssidLength;
-        ssid = bss->ssid;
+    if (work != NULL) {
+        if (work->state == 9 && work->resetPending == 0) {
+            ssid = work->connectBss.ssid;
+            length = work->connectBss.ssidLength;
+        }
     }
     OS_RestoreInterrupts(irq);
     if (ssidLength != NULL) {
@@ -1259,9 +1249,20 @@ s32 WCM_UpdateLinkQuality(void) {
 }
 
 static s32 WCM_RssiToQuality(u32 rssi) {
-    WCMWork *work = WCM_GetWork();
-
-    if (work->wirelessMode == 2) {
+    switch (WCM_GetWork()->wirelessMode) {
+    case 1:
+    default:
+        if (rssi >= 0x1c) {
+            return 3;
+        }
+        if (rssi >= 0x16) {
+            return 2;
+        }
+        if (rssi >= 0x10) {
+            return 1;
+        }
+        return 0;
+    case 2:
         if (rssi >= 0x16) {
             return 3;
         }
@@ -1273,57 +1274,47 @@ static s32 WCM_RssiToQuality(u32 rssi) {
         }
         return 0;
     }
-    if (rssi >= 0x1c) {
-        return 3;
-    }
-    if (rssi >= 0x16) {
-        return 2;
-    }
-    if (rssi >= 0x10) {
-        return 1;
-    }
-    return 0;
 }
 
 static u8 WCM_GetAverageRssi(void) {
     s32 sum = 0;
-    u8 count = sWcmGlobal.rssiSampleCursor;
-    int i;
+    s32 i;
 
-    if (count > 0x10) {
-        for (i = 0; i < 0x10; i++) {
-            sum += sWcmGlobal.rssiSamples[i];
+    if (sWcmRssiCursor > 16) {
+        for (i = 0; i < 16; i++) {
+            sum += sWcmRssiSamples[i];
         }
-        sum /= 0x10;
-    } else if (count != 0) {
-        for (i = 0; i < count; i++) {
-            sum += sWcmGlobal.rssiSamples[i];
+        sum /= 16;
+    } else if (sWcmRssiCursor > 0) {
+        for (i = 0; i < sWcmRssiCursor; i++) {
+            sum += sWcmRssiSamples[i];
         }
-        sum /= count;
+        sum /= sWcmRssiCursor;
     }
-    return sum;
+    return (u8)sum;
 }
 
 // Adds a signal-level sample to the running RSSI average's circular buffer
 // Decodes the receive record's high signal byte. The original arithmetic is mode-dependent;
 // no physical units for the encoded input or the resulting sample have been established.
-void WCM_AddRssiSample(s32 rawSample) {
-    u8 sample;
-    u8 cursor;
-
-    if (WCM_GetWork()->wirelessMode == 2) {
-        sample = (u8)rawSample;
-    } else if (rawSample & 2) {
-        sample = (u8)(rawSample << 2);
-    } else {
-        sample = (u8)((rawSample >> 2) + 25);
+void WCM_AddRssiSample(s32 rssi) {
+    switch (WCM_GetWork()->wirelessMode) {
+    case 2:
+        break;
+    case 1:
+    default:
+        if (rssi & 2) {
+            rssi = (u8)(rssi >> 2);
+        } else {
+            rssi = (u8)(25 + (rssi >> 2));
+        }
+        break;
     }
-    cursor = sWcmGlobal.rssiSampleCursor;
-    sWcmGlobal.rssiSamples[cursor % 16] = sample;
-    if (cursor < 16) {
-        sWcmGlobal.rssiSampleCursor = cursor + 1;
+    sWcmRssiSamples[sWcmRssiCursor % 16] = rssi;
+    if (sWcmRssiCursor >= 16) {
+        sWcmRssiCursor = (u8)(((1 + sWcmRssiCursor) % 16) + 16);
     } else {
-        sWcmGlobal.rssiSampleCursor = 16 + ((cursor + 1) % 16);
+        sWcmRssiCursor++;
     }
 }
 
@@ -1369,13 +1360,16 @@ static s32 WCM_StartupStep2(void) {
     case 2:
         WCM_SetState(4);
         work->pendingNotify = 2;
-        return 3;
+        break;
     case 8:
         return 4;
+    // WM_ERRCODE_ILLEGAL_STATE, whose warning the SDK leaves out of this build
+    case 3:
     default:
         WCM_SetState(0xb);
         return 7;
     }
+    return 3;
 }
 
 static s32 WCM_StartSearchStep(const u8 *bssid, const u8 *essid, u32 option) {
@@ -1400,21 +1394,23 @@ static s32 WCM_StartSearchStep(const u8 *bssid, const u8 *essid, u32 option) {
     case 2:
         WCM_SetState(5);
         work->pendingNotify = 3;
-        return 3;
+        break;
     case 8:
         return 4;
+    // WM_ERRCODE_ILLEGAL_STATE, whose warning the SDK leaves out of this build
+    case 3:
     default:
         WCM_SetState(0xb);
         return 7;
     }
+    return 3;
 }
 
 static s32 WCM_StartConnectStep(void) {
     WCMWork *work = WCM_GetWork();
 
     if (work->state == 3) {
-        WMBssDesc *bss = &work->connectBss;
-        bss->rateSetSupport = bss->rateSetBasic | 3;
+        work->connectBss.rateSetSupport = work->connectBss.rateSetBasic | 3;
     }
     switch (WM_SetLifeTime((WMCallbackFunc)WCM_OnWmControlComplete, 0xffff, 0x50, 0xffff, 0xffff)) {
     case 2:
@@ -1423,6 +1419,8 @@ static s32 WCM_StartConnectStep(void) {
         break;
     case 8:
         return 4;
+    // WM_ERRCODE_ILLEGAL_STATE, whose warning the SDK leaves out of this build
+    case 3:
     default:
         WCM_SetState(0xb);
         return 7;
@@ -1440,6 +1438,8 @@ static s32 WCM_StartDisconnectStep(void) {
         break;
     case 8:
         return 4;
+    // WM_ERRCODE_ILLEGAL_STATE, whose warning the SDK leaves out of this build
+    case 3:
     default:
         WCM_SetState(0xb);
         return 7;
@@ -1480,6 +1480,8 @@ static s32 WCM_RestoreIdleStep(void) {
         break;
     case 8:
         return 4;
+    // WM_ERRCODE_ILLEGAL_STATE, whose warning the SDK leaves out of this build
+    case 3:
     default:
         WCM_SetState(0xb);
         return 7;
@@ -1984,10 +1986,10 @@ static void WCM_BuildScanRequest(const u8 *bssid, const u8 *essid, u32 option) {
     }
     work->scanRequest.maxChannelTime = channelTime;
     work->scanRequest.scanType = ((work->searchOption & 0x300000) != 0x300000);
-    if (bssid != NULL) {
-        MI_CpuCopy8(bssid, work->scanRequest.bssid, 6);
-    } else {
+    if (bssid == NULL) {
         MI_CpuCopy8(WCMiAnyBssid, work->scanRequest.bssid, 6);
+    } else {
+        MI_CpuCopy8(bssid, work->scanRequest.bssid, 6);
     }
     if (essid == NULL || essid == WCMiAnyEssid) {
         MI_CpuCopy8(WCMiAnyEssid, work->scanRequest.ssid, 0x20);

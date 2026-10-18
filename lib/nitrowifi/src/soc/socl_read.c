@@ -285,15 +285,17 @@ static int SOCLi_ReadNoWaitCallBack(SOCLCommandPacket *packet) {
 static int SOCLi_ConsumeBuffer(SOCLSocket *socket) {
     SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
     SOCLCommandPacket *packet;
+    int result;
 
     if (pipe->cps_read_len < pipe->rcvbuf_consume_min) {
         return 0;
     }
     packet = SOCLi_CreateCommandPacket(SOCLi_ConsumeCallBack, socket, 0);
-    if (packet != NULL) {
-        return SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
+    if (packet == NULL) {
+        return SOCL_EMFILE;
     }
-    return SOCL_EMFILE;
+    result = SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
+    return result;
 }
 
 static int SOCLi_ConsumeCallBack(SOCLCommandPacket *packet) {

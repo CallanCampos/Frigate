@@ -4607,6 +4607,8 @@ overlays/ov011 0x0218ddf0 sPool
 overlays/ov011 0x0218de04 sSessionCache
 overlays/ov011 0x0218df74 sWcmAnchor
 overlays/ov011 0x0218df7c sWcmGlobal
+overlays/ov011 0x0218dfb4 sWcmRssiCursor
+overlays/ov011 0x0218dfb5 sWcmRssiSamples
 overlays/ov011 0x02190928 sEngine
 overlays/ov011 0x02191768 sCount
 overlays/ov012 0x02160a00 PleasureBoat_Free

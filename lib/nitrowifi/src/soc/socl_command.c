@@ -8,8 +8,9 @@
 
 static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet);
 
-static SOCLCommandPacket *SOCLiCommandPackets;
-static OSMessageQueue SOCLiCommandPacketQueue;
+// With their explicit zeros the code reaches both from one base, as the original does
+static SOCLCommandPacket *SOCLiCommandPackets = NULL;
+static OSMessageQueue SOCLiCommandPacketQueue = { 0 };
 
 int SOCLi_StartupCommandPacketQueue(u32 max) {
     int packets_offset = (max * sizeof(OSMessage) + 3) & ~3;

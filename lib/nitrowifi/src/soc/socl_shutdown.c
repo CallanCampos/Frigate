@@ -10,6 +10,7 @@ static int SOCLi_ShutdownCallBack(SOCLCommandPacket *packet);
 int SOCL_Shutdown(SOCLSocket *socket) {
     SOCLSendPipe *pipe;
     SOCLCommandPacket *packet;
+    int result;
 
     if (SOCL_SocketIsInvalid(socket)) {
         return SOCL_EINVAL;
@@ -24,12 +25,14 @@ int SOCL_Shutdown(SOCLSocket *socket) {
     pipe = SOCLi_GetSendPipe(socket);
     if (pipe != NULL && pipe->socket != NULL) {
         packet = SOCLi_CreateCommandPacket(SOCLi_ShutdownCallBack, pipe->socket, socket->flag_block);
-        if (packet != NULL) {
-            return SOCLi_ExecCommandPacketInSendPipe(pipe->socket, packet);
+        if (packet == NULL) {
+            return SOCL_EMFILE;
         }
-        return SOCL_EMFILE;
+        result = SOCLi_ExecCommandPacketInSendPipe(pipe->socket, packet);
+    } else {
+        result = 0;
     }
-    return 0;
+    return result;
 }
 
 static int SOCLi_ShutdownCallBack(SOCLCommandPacket *packet) {
