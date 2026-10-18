@@ -6835,10 +6835,15 @@ static s32 StudioScore_CalcTotal(BtlClient *client, BtlClientStudioScore *score)
     BtlSetup *setup = func_ov167_0219e310(client->mainModule);
     s32 total;
     s32 sum;
+    s32 partial;
+    s16 point;
 
-    sum = score->points[1] + score->points[0];
-    sum += score->points[2];
-    sum += score->points[3];
+    point = score->points[1];
+    partial = score->points[0] + point;
+    point = score->points[2];
+    partial = point + partial;
+    point = score->points[3];
+    sum = point + partial;
     if (sum == 0) {
         sum = 1;
     }

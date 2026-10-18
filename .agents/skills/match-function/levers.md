@@ -372,6 +372,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A struct assignment loads every field")
 - Register parameters spilled at entry in another order: try `u8` for flag parameters typed `BOOL`.
   (matching.md: "`u8` flag parameters")
+- A halfword's load first and the sum in its register: an `s16` local assigned three times; a partial sum that is its
+  own operand is written destination first whatever the order. (matching.md: "An `s16` local loaded before an add")
 - The operand order of a product decides which value is loaded first. (matching.md: "operand order of a product")
 - A load through a `const` pointer is reused across stores but not hoisted out of a loop. (matching.md: "reused across stores")
 - Initializations are scheduled where they are written: `int i = 0;` declared after a call against `for (i = 0; ...)`.
