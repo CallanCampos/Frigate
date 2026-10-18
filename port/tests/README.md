@@ -18,6 +18,14 @@ saves the oracle makes (`oracle_saves`). The oracle counts game frames with the 
 (`build/<version>/arm9.o.xMAP`), so those tests need `python3 configure.py && ninja` to have run: without it they fail
 at once ("counts game frames, which need --counter") rather than skip. A skipped test says so in ctest's summary.
 
+Two labels pick tests by what they need ([../CMakeLists.txt](../CMakeLists.txt) gives them from the tests' names, at
+its end): `route`, the tests whose program runs the game from power-on on the player's ROM (the replays, the oracle's
+sequences and the port's checks of their hashes, the test launcher's routes, the smoke test,
+`integrate_launch_never_asked`), and `oracle`, the tests that need the melonDS oracle or the saves it makes. So
+`ctest -L route -LE oracle` runs the routes that need no oracle, and `ctest -LE route` the rest.
+In the sanitized build (`-DPORT_SANITIZE=ON`, [../docs/sanitizers.md](../docs/sanitizers.md)) every test runs under
+AddressSanitizer and UndefinedBehaviorSanitizer, and a report fails it; the routes are that build's T5 runs.
+
 | Directory | What it tests | Game functionality covered | Tests |
 | --- | --- | --- | --- |
 | [app/](app) | The program's own modules: gamepads without a device, the run directory, symbol lookup, the window's icon, `--help` against the names the build read and the options it describes, the test launcher's option and the kinds of field menu (`test_launcher_spec.c`); the macOS app's scripts, bundle identifier and log, with stand-in programs and projects; and `check_exit.py`, which runs the program and checks its exit status, since ctest's `PASS_REGULAR_EXPRESSION` ignores it | The controls; the oracle's comparisons; the field menu's items; the app | `app_*`, and the `integrate_launch_*` and launcher tests that run through `check_exit.py` |

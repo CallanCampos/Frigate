@@ -1,0 +1,26 @@
+# The checks that Frigate's sanitized build (PORT_SANITIZE in port/CMakeLists.txt) leaves out of the game's code: clang
+# reads this file when it compiles (-fsanitize-ignorelist) and emits no check of the section's kind in the functions
+# it names. Each entry is code that is right on every host Frigate runs on, made undefined only by C's rules, and is
+# named as narrowly as clang allows, by the check and the function; port/docs/sanitizers.md has the reports they
+# answer and why each is safe. A defect is never listed here: it is fixed.
+#
+# Syntax: a [section] names a check (-fsanitize=<check>), and fun:<symbol> a function of it, a static one by its plain
+# name. # starts a comment.
+
+# NitroSystem G2D (lib/nnsys/src/g2d/g2d_CellAnimation.c and g2d_MultiCellAnimation.c), the sprites' animations: the
+# current frame's element is read through a pointer to the largest element type, NNSG2dAnimDataSRT, which needs 4-byte
+# alignment, for its first field, the cell's u16 index. An index-only animation's NANR file packs its elements in 2
+# bytes, so the element is only 2-aligned (the pointer points into the file itself): the read is a u16 load from a
+# 2-aligned address, which arm64 and x86-64 make, as the DS's ARM9 does. Reports R1 (every route that reaches the title
+# screen) and R2 (the intro's Professor and Pokemon, New Game)
+[alignment]
+fun:ApplyCurrentAnimResult_
+fun:SetCurrentFrameMultiCell_
+
+# GFL's save data (src/gfl/savedata.c): runSaveBlkInitializers calls each save block's initializer through
+# SaveBlockDef.init, a void (*)(void *), to which src/system/save_table.c casts the 56 initializers, each taking a
+# pointer to its own block type (BoxMainSave_InitBlock and the rest). The call passes one pointer, in the same register
+# whatever its type in every host ABI, and nothing else. Report R3 (every route, at boot; only compilers that emit the
+# function check for C, such as upstream clang 17 and later)
+[function]
+fun:runSaveBlkInitializers

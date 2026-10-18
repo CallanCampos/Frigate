@@ -1,11 +1,9 @@
 # The OS core's build rules (port/hal/os): minicoro for the fibers, the per-file options of its sources, the stack
 # probes that keep the fibers' guard regions effective, and the OS tests (port/tests/os).
 #
-# Sanitizer runs use a build directory of their own, with the flags for every file:
-#   cmake -S port -B build/port-os-asan -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-#         "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer" \
-#         -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined
-# mco_impl.c always builds without ASan (fiber.c makes the switch annotations itself).
+# The sanitized build (-DPORT_SANITIZE=ON, port/CMakeLists.txt and port/docs/sanitizers.md) runs these tests under
+# AddressSanitizer and UndefinedBehaviorSanitizer, and every scenario once more with ASan's fake stacks. mco_impl.c
+# always builds without ASan (fiber.c makes the switch annotations itself).
 
 include(FetchContent)
 # minicoro, pinned to a commit (public domain or MIT-0, one header); the spike's
@@ -73,8 +71,9 @@ add_test(NAME os_guard_small_frames COMMAND port_os_tests guard_small_frames)
 add_test(NAME os_guard_huge_frame COMMAND port_os_tests guard_huge_frame)
 set_tests_properties(os_guard_small_frames os_guard_huge_frame PROPERTIES TIMEOUT 60
     PASS_REGULAR_EXPRESSION "fault in guard page" FAIL_REGULAR_EXPRESSION "fault outside|never:")
-# In a sanitizer build, every scenario again with ASan's fake stacks, which move locals off the fibers' stacks
-if(CMAKE_C_FLAGS MATCHES "-fsanitize=[^ ]*address")
+# In a sanitizer build, every scenario again with ASan's fake stacks, which move locals off the fibers' stacks, and
+# free a fiber's when it dies or is destroyed (port/hal/os/fiber.c)
+if(PORT_SANITIZE OR CMAKE_C_FLAGS MATCHES "-fsanitize=[^ ]*address")
     add_test(NAME os_all_fake_stacks COMMAND port_os_tests all)
     set_tests_properties(os_all_fake_stacks PROPERTIES TIMEOUT 120
         ENVIRONMENT_MODIFICATION "ASAN_OPTIONS=string_append::detect_stack_use_after_return=1")

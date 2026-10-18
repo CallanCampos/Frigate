@@ -9,6 +9,7 @@ The flags come from a configured host build made with the Ninja generator: the o
 without a copy here: a decomp file gets the flags its own build statement has, any other
 file gets the game's (pokebw2_game's most common set: the language model, include paths, -D PLATFORM_PC and the
 version's define), and a file under port/ or the wrapper also gets port_hal's include paths and options after them.
+A sanitized build's -fsanitize options are left out, since the library loads into Python without a sanitizer runtime.
 The library goes to asm-oracle/<name>_<version>/ in that build directory.
 
 A symbol that the files reference and neither define nor find in the host's C library gets a stub, so that a file can
@@ -62,6 +63,11 @@ class CompileSettings:
         return [*self.defines, *self.includes, *self.flags]
 
 
+# The sanitized build's options (PORT_SANITIZE, port/docs/sanitizers.md), which the libraries leave out: they load into
+# a Python that has no sanitizer runtime, and test what the C computes, not how it touches memory
+SANITIZER_FLAGS = ("-fsanitize", "-fno-sanitize")
+
+
 def _unescape(text: str) -> str:
     return re.sub(r"\$([ :$\n])", r"\1", text)
 
@@ -90,7 +96,8 @@ class HostBuild:
             target, source = current
             settings = CompileSettings(tuple(shlex.split(variables.get("DEFINES", ""))),
                                        tuple(shlex.split(variables.get("INCLUDES", ""))),
-                                       tuple(shlex.split(variables.get("FLAGS", ""))))
+                                       tuple(f for f in shlex.split(variables.get("FLAGS", ""))
+                                             if not f.startswith(SANITIZER_FLAGS)))
             per_target[target].append(settings)
             if target == GAME_TARGET:
                 self.by_source[str(Path(source).resolve())] = settings

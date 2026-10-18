@@ -1,8 +1,8 @@
 name: Frigate CI
 
-# Builds Frigate, the native port, on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI
-# doesn't have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds
-# both ROMs locally (port/docs/SYNC.md).
+# Builds Frigate, the native port, on macOS and Linux and runs its tests, plainly (host) and in the sanitized build
+# (sanitize). The ROM build needs the base ROMs, which CI doesn't have; upstream's compile.yml compiles every C file
+# with MWCC instead, and every port session's sync builds both ROMs locally (port/docs/SYNC.md).
 on:
   push:
     branches: [main]
@@ -64,3 +64,54 @@ jobs:
       - name: Build the macOS app
         if: runner.os == 'macOS'
         run: cmake --build build/port --target frigate-black2_app
+
+  # Frigate's sanitized build (port/docs/sanitizers.md): Black 2 under AddressSanitizer and UndefinedBehaviorSanitizer,
+  # every report fatal, with its tests run under them. CI has no ROM, so the routes that need no oracle (ctest -L route
+  # -LE oracle: the replays and the port's checks of the oracle's hashes) skip as they do in the host job, and what
+  # runs is everything else: the OS core's scenarios on the fibers, the platform layer's scenarios on the whole
+  # program's objects, the units. Linux adds what Apple clang lacks: UndefinedBehaviorSanitizer's function check for C,
+  # and LeakSanitizer at every program's exit
+  sanitize:
+    name: Sanitized build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-26.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja sdl3
+
+      - name: Install build tools (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+            libxi-dev libxss-dev libxtst-dev libxkbcommon-dev libwayland-dev wayland-protocols libegl-dev libgl-dev \
+            libdrm-dev libgbm-dev libasound2-dev libpulse-dev libudev-dev libdbus-1-dev
+
+      - name: Configure
+        env:
+          CC: clang
+        run: cmake -S port -B build/port-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_SANITIZE=ON
+
+      - name: Build
+        run: cmake --build build/port-san
+
+      - name: Test, but the routes
+        run: ctest --test-dir build/port-san -LE route --output-on-failure
+
+      # The replays and the port's own runs of the oracle's sequences; those that need the oracle, which CI doesn't
+      # build, are left out
+      - name: The routes that need no oracle, which skip without the ROM
+        run: ctest --test-dir build/port-san -L route -LE oracle --output-on-failure

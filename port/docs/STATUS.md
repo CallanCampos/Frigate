@@ -26,10 +26,81 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the sanitized build, clean on every route of both versions, with the game's heaps under ASan
+
+- **Upstream:** `993e6c49b`, as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-sanitizers` from `main` at `2da26e048`: `3271b7d43` (the OS core's DMA and
+  timer handlers called with their type), `c8eaf91c9` (three memory bugs of the game, fixed under `PLATFORM_PC`),
+  `521d483b2` (the fibers and the trap under the sanitizers), then this commit (the sanitized build, its CI job, the
+  documents and this entry); not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) with the three game
+  changes, two of them in complete files (`arc_util.c`, `gf_font.c`). `check_mwcc_neutral.py` finds 3,176 of 3,180 file
+  and version pairs identical to `993e6c49b`, the three changed files among them (`printsys.c` is incomplete, so this is
+  its proof); the other four are `vm.c`'s and `event_field_proclink.c`'s Neutral rows, as before.
+- **Host build:** arm64 macOS, RelWithDebInfo, Ninja, in `build/`: `port` (Black 2) and `port-w2` (White 2), plain;
+  `port-san` (Black 2) and `port-san-w2` (White 2) with `-DPORT_SANITIZE=ON` under Apple clang 21.0.0; `port-san-llvm`
+  (Black 2) under Homebrew clang 23.1.3; and a survey build with `-DPORT_SANITIZE_RECOVER=ON`, deleted after. The
+  Apple builds give the decomp's 263 warnings and none in `port/` (White 2's plain build compiled every file); the
+  Homebrew build 265, the decomp's and two of clang 23's `-Wunused-but-set-global` in older port code, which Apple
+  clang 21 doesn't give (`hal/dwc/ov011_pending.c`'s `sGameSpyServer`, `tests/rom/test_backup.c`'s `sReplyData`),
+  left as they are. Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4`, with the oracle and its saves in each build: Black 2, all 267 pass (1,399 s);
+    White 2, 261 of 263 pass and the two that need its starter save skip (1,744 s). The tests left `~/Library` alone
+    (`HOME` a scratch directory).
+  - T5, the sanitized build (ASan and UBSan, every report fatal, the game's heaps poisoned): Black 2 under Apple clang,
+    all 268 pass (the plain build's 267 and `os_all_fake_stacks`; 2,463 s), its 24 routes among them, the oracle's
+    comparisons included; White 2, 262 of 264 pass and `oracle_continue_starter` and `oracle_launch_party_menus` skip,
+    as in the plain build (2,771 s), its 20 routes among them; Black 2 under upstream clang 23 with LeakSanitizer
+    (`ASAN_OPTIONS=detect_leaks=1`), which adds the function check: the 244 tests that aren't routes pass (514 s), and
+    so do its 24 routes, with no leak at any run's exit (1,938 s). The start menu's route with LeakSanitizer ends in
+    67 s (it hung for 36 minutes in the survey). A survey build ran Black 2's 18 routes twice: the first round found
+    the game's three memory bugs below, the second, after their fixes, no report.
+  - The asm oracle passes in the sanitized build too (it left the sanitizers' options out of its libraries).
+  - CI's new `sanitize` job: written, not run (not pushed). T7 not yet.
+- **Tiers:** not measured: no new C.
+- **Trap stubs:** 512 function stubs and 46 data placeholders in each version (`gen_stubs`, the plain builds); the
+  sanitized builds have 511, their `lib/twl/src/nwm/nwm.c` no longer referencing `func_02769520`.
+- **64-bit warnings:** not measured by kind; White 2's plain build compiled every file with 263 warnings of every kind,
+  as the last entries, and the three changed game files compile with none.
+- **Work done:** Frigate is sanitizer-clean on every route the tests run, in both versions, from the sanitizer survey
+  of this day (four UBSan reports, R1 to R4, and seven gaps, G1 to G7; [sanitizers.md](sanitizers.md) has each with
+  what was done), and the sanitized build is repeatable
+  ([ADR 0013](adr/0013-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md)).
+  - **`PORT_SANITIZE`** builds every target but SDL3 under `-fsanitize=address,undefined -fno-sanitize-recover=all`
+    with an ignorelist, and `PORT_SANITIZE_RECOVER` lets a survey run go on. The tests carry labels by what they need,
+    `route` and `oracle`, so `ctest -L route -LE oracle` runs the routes that need no oracle. CI's `sanitize` job builds
+    the sanitized Black 2 on macOS and Linux and runs every test that isn't a route, then the routes that need no
+    oracle, which skip without the ROM. `os.cmake`'s header no longer gives a recipe that left alignment fatal.
+  - **R1, R2** (NitroSystem's 2-aligned reads of an animation's cell index through a 4-aligned type) and **R3** (the
+    save data's calls to 56 typed initializers through `void (*)(void *)`): right on every host, left out by
+    `port/cmake/sanitizer_ignorelist.txt`, by check and function, each with its reason. **R4** (`OS_SetIrqFunction`'s
+    cast of a DMA or timer handler to a callback, in Frigate's own OS core): fixed in `os_interrupt.c` and `os_tick.c`.
+  - **G1:** UBSan's reports print ASan's stack, which follows the fibers (`port/hal/os/sanitizers.c`). **G2:** Apple
+    clang emits no function check for C and has no LeakSanitizer: upstream clang locally and CI's Linux job. **G3:** the
+    trap's placeholders become readable at exit, so LeakSanitizer's check ends. **G4:** a suspended fiber's root region
+    is its live frames only. **G5:** a fiber destroyed while suspended has its fake stack freed. **G6:** the game's
+    expanded and frame heaps are poisoned block by block (`fnd_hooks.c`, FND built without ASan). **G7** (UBSan reports
+    a place once) can't be changed and doesn't matter once a report is fatal.
+  - **What G6 found**, three memory bugs of the game that the DS's heap tolerates, fixed under `PLATFORM_PC` with rows
+    in game-changes.md and decomp-findings.md: the copyright screen's load of 0x8000 bytes from a smaller file (H1),
+    the main font's cell a row and a byte too short for its glyph copy (H2), and a write after free when a print
+    stream's task ends (H3).
+  - The documents: [sanitizers.md](sanitizers.md) (running it, reading a report, what Frigate tells the sanitizers,
+    what is left out and why, what it can't see, what it found), the guides (the README, `cmake/`, `tests/`, `hal/`),
+    the feature map's row for the sanitized build, GLOSSARY.md, MODDING.md, PLAN.md §4.5 and §6, and lessons.md.
+- **Next:** as in the last entry: White 2's starter route, so that `party_menus` and `continue_starter` run in White 2;
+  the apps no route reaches yet; a save with an adventure made by the port, once overlay 36 lets it into the field. For
+  T5: the sanitize job's first CI run, Linux's LeakSanitizer and function check included; the `OS_Alloc` heaps under
+  ASan as FND's are; a nightly run of the sanitized routes.
+- **Blockers:** as in the last entry: overlay 36 (issue #83, another contributor's active claim) gates phase 3, the
+  overworld, and the launcher's retirement (ADR 0012); `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, no C yet)
+  stops the Pokédex; overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the launcher track's merge after review: --help's options and statuses, and the documents as built
 
 - **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
+- **Port:** `bbfab4c72`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
   entry; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `b1ca0c257`. No
   game file changed: game-changes.md's one edit marks `event_mapchange.c`'s second row "(again)".

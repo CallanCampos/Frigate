@@ -50,6 +50,19 @@ port_nnsys_rename(lib/nnsys/src/g2d/g2d_NAN_load.c ${port_nnsys_renamed_g2d_nan}
 port_nnsys_rename(lib/nnsys/src/g2d/g2d_NFT_load.c ${port_nnsys_renamed_g2d_nft})
 port_nnsys_rename(lib/nnsys/src/g2d/g2d_Load.c ${port_nnsys_renamed_g2d_load})
 
+# The sanitized build (PORT_SANITIZE): AddressSanitizer sees the blocks of the expanded and frame heaps, which
+# port/hal/nnsys/fnd_hooks.c poisons and unpoisons as they are created, allocated and freed. FND's heaps are compiled
+# without ASan, as a C library's malloc is, since they read and write their own heads and free lists in the poisoned
+# memory between the blocks
+if(PORT_SANITIZE)
+    foreach(source IN ITEMS expheap.c frameheap.c unitheap.c heapcommon.c)
+        set_property(SOURCE "${REPO_ROOT}/lib/nnsys/src/fnd/${source}" APPEND PROPERTY COMPILE_OPTIONS
+            -fno-sanitize=address)
+    endforeach()
+    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/hal/nnsys/fnd_hooks.c" APPEND PROPERTY COMPILE_DEFINITIONS
+        PORT_POISON_HEAPS)
+endif()
+
 # The tests: the loaders on files made by the tests, the registry through FND's heaps, and every G2D file of the
 # player's ROM against a simulation of the DS's unpack (skipped without the ROM), run on the whole program's objects
 enable_testing()

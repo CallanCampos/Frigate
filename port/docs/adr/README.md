@@ -68,6 +68,7 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0010](0010-macos-app-as-a-signed-copy-of-the-program.md) | The macOS app as a signed copy of the program | D11, §7 | accepted |
 | [0011](0011-cartridge-infrared-chip-as-a-register-model.md) | The cartridge's infrared chip as a register model | §4.5, D3 | accepted |
 | [0012](0012-test-launcher-for-the-field-menus-apps.md) | Frigate's test launcher for the field menu's apps while overlay 36 is claimed | §7 phase 4, §6 | accepted |
+| [0013](0013-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted | §4.5, §6, §7 phase 5 | accepted |
 
 ## Decisions waiting for an ADR
 

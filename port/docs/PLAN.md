@@ -232,8 +232,9 @@ mods/examples/           sample mods, one per extension point
   soft-float runtime is replaced by the host's.
 - **Heaps:** the game keeps its own GFL heaps over a host arena, which reproduces the DS's tolerance of small overruns.
   Pointer-bearing structs grow on 64-bit, so heap sizes are scaled on hosts by measurement (each heap reports its
-  high-water mark in debug builds), not blindly doubled as the Platinum port did. An ASan build maps the GFL
-  allocator to `malloc` so overruns are caught instead of tolerated.
+  high-water mark in debug builds), not blindly doubled as the Platinum port did. The sanitized build keeps the
+  game's heaps and poisons the memory between their blocks, so overruns are caught instead of tolerated
+  ([ADR 0013](adr/0013-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md)).
 - **Saves:** a 524,288-byte image per profile with atomic writes (temporary file and rename), import and export of
   melonDS `.sav` and DeSmuME `.dsv`, adopting the save's RTC offset and MAC on import.
 - **Input:** SDL3 keyboard and gamepads map to the DS buttons; mouse and touch map to the touch panel through the
@@ -389,7 +390,7 @@ Testing is how we know the port is the game. Each level runs automatically, from
 | T2 | Unit tests: LZ, NitroFS and VFS, save CRC and slot choice, divider and sqrt bit-exactness, scheduler order, geometry engine maths, 2D renderer golden images from captured display state, SSEQ sequencer against recorded channel state | every commit |
 | T3 | Replay tests: recorded input played on the port with a virtual clock; frame hashes and game-state checkpoints against stored goldens | every commit (short), nightly (long) |
 | T4 | Oracle tests: the same inputs on melonDS with the real ROM; screens compared (2D exactly, 3D within a perceptual tolerance) and game state compared by decomp symbol (position, party, RNG, current proc and overlays) | nightly, and when a milestone closes |
-| T5 | Sanitizers: replays under ASan and UBSan | nightly |
+| T5 | Sanitizers: replays under ASan and UBSan, in the sanitized build (`PORT_SANITIZE`, [sanitizers.md](sanitizers.md)) | nightly; CI's `sanitize` job runs the rest of the tests sanitized on every commit (it has no ROM for the replays) |
 | T6 | Compatibility: saves round-trip with melonDS; ROM verification of good, trimmed and bad dumps | every commit |
 | T7 | Playtests: the app driven by scripted input with screenshots, against each milestone's checklist | at each milestone |
 

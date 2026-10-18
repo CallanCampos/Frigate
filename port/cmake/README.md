@@ -19,9 +19,9 @@ are read in one place.
 | [integrate.cmake](integrate.cmake) | Scenarios on the whole program's objects, and the option checks, the test launcher's exit statuses among them (through `tests/app/check_exit.py`) | DMA, the allocator, input, the screens, CONTINUE without the launcher | `integrate_*` |
 | [layout_tests.cmake](layout_tests.cmake) | Struct layouts that the game's files must agree on in the host build, from the objects' debug information (it skips without `-g` or `llvm-dwarfdump`) | The trainer card's param, shared by the field's app call and the card | `layout_trainer_card_param` |
 | [macos_app.cmake](macos_app.cmake) | The macOS app's target `<program>_app`, its names, icon and bundle identifier (whose prefix is in [../app/macos/bundle_id.cmake](../app/macos/bundle_id.cmake)) | None: the program as an app | `app_make_app`, `app_bundle_id`, `app_message_log`, `app_package_macos_out` |
-| [nnsys.cmake](nnsys.cmake) | The `port_sdk_` renames of NitroSystem's FND heap frees and G2D loaders, which [../hal/nnsys](../hal/README.md#the-modules) replaces | Sprites, cells, animations, fonts, heaps | `nnsys_*` |
+| [nnsys.cmake](nnsys.cmake) | The `port_sdk_` renames of NitroSystem's FND heap frees and G2D loaders, which [../hal/nnsys](../hal/README.md#the-modules) replaces; in the sanitized build, FND's heaps without ASan, so that the wrappers can poison the memory between the game's blocks | Sprites, cells, animations, fonts, heaps | `nnsys_*` |
 | [oracle.cmake](oracle.cmake) | The melonDS test oracle as an external project (only with `PORT_BUILD_ORACLE`), and its tests: the saves made on the oracle (`oracle_saves`, a fixture the others start from), the screens' and the sound's comparisons, the field menu's apps through the test launcher, and the launcher's runs from those saves | Every screen, and the sound, held against melonDS; saves with a Pokémon; the field menu's apps | `oracle_*`, `launch_*` |
-| [os.cmake](os.cmake) | minicoro, the OS core's per-file options and stack probes, and its tests | Threads, interrupts, timing, the HBlank interrupt the screen wipes need | `os_*` |
+| [os.cmake](os.cmake) | minicoro, the OS core's per-file options and stack probes, and its tests, again on ASan's fake stacks in the sanitized build | Threads, interrupts, timing, the HBlank interrupt the screen wipes need | `os_*` |
 | [overlay_sections.cmake](overlay_sections.cmake) | The per-overlay forced includes that put each overlay's writable statics in its own sections, and the link's section check on macOS | Overlays | `overlay_sections_image_*`, `overlay_sections_budget`, `overlay_sections_leaks` |
 | [pxi.cmake](pxi.cmake) | The per-file options of the decomp files the ARM7's services compile through | Everything the ARM7 serves | `pxi_*` |
 | [rom.cmake](rom.cmake) | The ROM manifest (`gen/rom/rom_manifest.c`, from `<version>.sha1` and the NitroFS manifest), the development ROM path, the backup's forced include, and the tests of the ROM, the card and the file system as the game links them | Every file read, saves, the genuine-card check | `rom_*`, `card_backup_*`, `rom_game_*` (`rom_game_ir_genuine_card` among them) |
@@ -35,6 +35,8 @@ Each is given at configure time, `cmake -S port -B build/port -DNAME=VALUE`.
 | --- | --- | --- | --- |
 | `PORT_VERSION` | `b2_us` | [../CMakeLists.txt](../CMakeLists.txt) | The game: `b2_us` (Black 2, `frigate-black2`) or `w2_us` (White 2, `frigate-white2`). One build directory per version |
 | `PORT_FETCH_SDL3` | `ON` | [../CMakeLists.txt](../CMakeLists.txt) | Builds SDL3's pinned release when no installed SDL3 3.4 is found |
+| `PORT_SANITIZE` | `OFF` | [../CMakeLists.txt](../CMakeLists.txt) | The sanitized build: every target but SDL3 under AddressSanitizer and UndefinedBehaviorSanitizer, every report fatal, with [sanitizer_ignorelist.txt](sanitizer_ignorelist.txt)'s checks left out, the game's heaps poisoned ([nnsys.cmake](nnsys.cmake)) and the OS tests run again on fake stacks ([os.cmake](os.cmake)); clang only. [../docs/sanitizers.md](../docs/sanitizers.md) |
+| `PORT_SANITIZE_RECOVER` | `OFF` | [../CMakeLists.txt](../CMakeLists.txt) | With `PORT_SANITIZE`, a run goes on after a report, so that one run lists every report of a route |
 | `PORT_MACOS_APP` | `OFF` | [macos_app.cmake](macos_app.cmake) | Makes the macOS app with every build, not only with its target |
 | `PORT_MACOS_BUNDLE_ID_PREFIX` | `io.github.callancampos.frigate` | [../app/macos/bundle_id.cmake](../app/macos/bundle_id.cmake) | The app's bundle identifier before `.black2` or `.white2`; a build that isn't Frigate's gives its own. A build directory's old placeholder, `com.example.pokebw2-native`, is moved to the default |
 | `PORT_BUILD_ORACLE` | `OFF` | [oracle.cmake](oracle.cmake) | Fetches melonDS and builds the test oracle, `pbw-oracle` |
@@ -45,8 +47,12 @@ Each is given at configure time, `cmake -S port -B build/port -DNAME=VALUE`.
 | `PORT_GFX_TIMING_GATE`, `PORT_GFX_TIMING_LIMIT_US` | `OFF`, `2000` | [gfx_tests.cmake](gfx_tests.cmake) | Runs the 2D renderer's timing as a test, with its limit in microseconds |
 | `PORT_G3D_TIMING_GATE`, `PORT_G3D_TIMING_LIMIT_US` | `OFF`, `5000` | [g3d.cmake](g3d.cmake) | The same for the 3D renderer |
 
-A sanitizer build is a build directory of its own with the flags for every file ([os.cmake](os.cmake)'s header has the
-command).
+The sanitized build is a build directory of its own (`-DPORT_SANITIZE=ON`, in `build/port-san`);
+[sanitizer_ignorelist.txt](sanitizer_ignorelist.txt) lists, for clang, the checks it leaves out of the game's code,
+each with the reason it is safe on a host. The tests carry labels by what they need, given at the end of
+[../CMakeLists.txt](../CMakeLists.txt): `route` (the program runs the game from power-on on the player's ROM) and
+`oracle` (the melonDS oracle or its saves), so that `ctest -L route -LE oracle` runs the routes that need no oracle
+([../tests/README.md](../tests/README.md)).
 
 ## Adding a fragment
 

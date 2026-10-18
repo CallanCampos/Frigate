@@ -8,8 +8,8 @@
 #   cmake --build build/port
 #   ctest --test-dir build/port
 #
-# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us) and -DPORT_FETCH_SDL3 here; the others are in the fragments of
-# port/cmake/, included at the end, and port/cmake/README.md lists them all.
+# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us), -DPORT_FETCH_SDL3 and -DPORT_SANITIZE (the sanitized build)
+# here; the others are in the fragments of port/cmake/, included at the end, and port/cmake/README.md lists them all.
 cmake_minimum_required(VERSION 3.28)
 
 # The product's name, description and disclaimer, which port/hal/os/port_app.h sets for the C (port/CLAUDE.md, "The
@@ -117,6 +117,33 @@ if(NOT SDL3_FOUND)
     set(SDL_STATIC ON CACHE BOOL "" FORCE)
     set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(SDL3)
+endif()
+
+# The sanitized build (port/docs/sanitizers.md): every target from here on, the game, the platform layer, the program
+# and the tests, under AddressSanitizer and UndefinedBehaviorSanitizer, with every report fatal, so that a test that
+# reaches one fails. SDL3, above, stays as it was built. The ignorelist leaves out the checks of the few places where
+# the game is right on every host and only C's rules call it undefined, each said there; port/hal/os/sanitizers.c and
+# port/hal/os/fiber.c tell the runtime about the fibers, and port/hal/nnsys/fnd_hooks.c about the game's heaps. Use a
+# build directory of its own (build/port-san). Apple clang emits no function check for C; upstream clang does
+# PORT_SANITIZE_RECOVER instead lets a run go on after each report, to survey every report of a route in one run
+option(PORT_SANITIZE "Build everything under AddressSanitizer and UndefinedBehaviorSanitizer, every report fatal" OFF)
+option(PORT_SANITIZE_RECOVER "With PORT_SANITIZE, go on after a report instead of stopping, to survey them all" OFF)
+if(PORT_SANITIZE)
+    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "PORT_SANITIZE needs clang, for its ignorelist and runtime, not ${CMAKE_C_COMPILER_ID}")
+    endif()
+    set(PORT_SANITIZE_IGNORELIST "${CMAKE_CURRENT_SOURCE_DIR}/cmake/sanitizer_ignorelist.txt")
+    if(PORT_SANITIZE_RECOVER)
+        # port/hal/os/sanitizers.c sets ASan's halt_on_error=0 then, which needs the recovering checks
+        set(port_sanitize_recover -fsanitize-recover=all)
+        add_compile_definitions(PORT_SANITIZE_RECOVER)
+    else()
+        set(port_sanitize_recover -fno-sanitize-recover=all)
+    endif()
+    add_compile_options(-fsanitize=address,undefined ${port_sanitize_recover} -fno-omit-frame-pointer
+        "-fsanitize-ignorelist=${PORT_SANITIZE_IGNORELIST}")
+    # clang names the ignorelist in each object's dependencies, so Ninja compiles again when it changes
+    add_link_options(-fsanitize=address,undefined)
 endif()
 
 # What every file that includes the decomp's headers needs, the decomp's own C and the platform layer alike: MWCC's
@@ -228,3 +255,27 @@ add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless --frame
     --save-dir "${CMAKE_CURRENT_BINARY_DIR}/smoke_saves")
 set_tests_properties(smoke_reaches_game_main PROPERTIES
     PASS_REGULAR_EXPRESSION "entering the game's main\\(\\)" TIMEOUT 60)
+
+# Labels, so that a part of the tests can be run by what it needs (ctest -L LABEL, or -LE LABEL to leave it out;
+# port/tests/README.md), given here from the tests' names once every test is defined:
+#   route   the program runs the game from power-on on the player's ROM: the replays, the oracle's sequences and the
+#           port's own runs of them, the test launcher's routes, the smoke test (each skips without the ROM). In the
+#           sanitized build these are its routes (port/docs/sanitizers.md)
+#   oracle  needs the melonDS oracle, or the saves it makes (skips without them). The routes that need no oracle are
+#           ctest -L route -LE oracle
+get_property(port_all_tests DIRECTORY PROPERTY TESTS)
+foreach(test IN LISTS port_all_tests)
+    set(labels)
+    if(test MATCHES "^(replay_|launch_|smoke_reaches_game_main$|integrate_(launch_never_asked|boot_logos)$)"
+       OR test MATCHES "^oracle_(opening|title|continue|continue_starter|port_save|launch_[a-z_]+)(_hashes)?$"
+       OR test MATCHES "^oracle_sound_(opening|title)(_hashes)?$")
+        list(APPEND labels route)
+    endif()
+    if((test MATCHES "^(oracle_|launch_)" AND NOT test MATCHES "_hashes$")
+       AND NOT test MATCHES "^oracle_(pbwinput|display3d)_(plain|sanitized)$|^oracle_(compare|sound_tool)$")
+        list(APPEND labels oracle)
+    endif()
+    if(labels)
+        set_property(TEST ${test} APPEND PROPERTY LABELS ${labels})
+    endif()
+endforeach()

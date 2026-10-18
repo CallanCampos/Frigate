@@ -138,9 +138,9 @@ which of these it was:
   or `port: PXI: ...` before it: something the platform layer relies on didn't hold. That is a Frigate bug; report it
   with the message and how to get there (an input file, `--input`, makes it repeatable).
 - **A crash (SIGSEGV, SIGBUS).** `port: crash: signal N at address ...` and a backtrace: a real crash, in the game's C
-  or Frigate's. Run it again in the sanitizer build, whose commands are at the top of
-  [../cmake/os.cmake](../cmake/os.cmake), to see where memory went wrong; a game bug that a 64-bit layout made worse is
-  fixed under `PLATFORM_PC` ([below](#changing-the-games-code-here)).
+  or Frigate's. Run it again in the sanitized build ([sanitizers.md](sanitizers.md)), which stops at the first access
+  that goes wrong, the game's heaps included, and says where; a game bug that a 64-bit layout made worse is fixed
+  under `PLATFORM_PC` ([below](#changing-the-games-code-here)).
 - **Bad options (status 2).** An option the program doesn't know (`port: unknown option ...`) or a value it can't
   use, with the usage after it: among them a run directory, WAV dump or sound trace that can't be opened, and a
   `--launch` list the test launcher can't read. A `--launch` app that the save's field menu doesn't offer ends the run

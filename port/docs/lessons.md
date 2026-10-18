@@ -3,6 +3,28 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the sanitized build
+
+- **Apple clang accepts `-fsanitize=function` for C and emits nothing.** Upstream clang (17 and later) checks every
+  indirect call's function type; Apple clang 21 builds without a check and without a word. Look for
+  `function_type_mismatch` in the program's symbols (`nm`) before trusting a clean run, and run the function check with
+  upstream clang (CI's Linux job does).
+- **UBSan's stack trace stops at the report's frame on a fiber.** It unwinds only within the host thread's own stack
+  and ignores the fiber switches ASan is told about. `__ubsan_on_report` with `__sanitizer_print_stack_trace` prints
+  ASan's, which follows the fiber (`port/hal/os/sanitizers.c`).
+- **LeakSanitizer scans a program's writable data by the protection it was loaded with.** Pages the program made
+  inaccessible later (the trap's data placeholders) are read anyway, and on macOS the check never ended. Make them
+  readable at exit, before the check runs.
+- **ASan sees a game's own allocator as one block.** All of the game's heaps were inside one `calloc`, so an overrun
+  between two of its allocations was invisible. Poison between the blocks in the allocator's wrappers, with the
+  allocator itself built without ASan, and unpoison what the DS gives a block (its size rounded to 4), not the host's
+  rounding. The first run found three of the game's own memory bugs that the DS's heap tolerates.
+- **A survey run reports each place once**, and a place is the access's PC: a shared copy loop (`MIi_DmaCopy32`) or
+  reader reports its first caller's overrun only. Survey in rounds, fixing between them, until a round is clean.
+- **Read the whole report before fixing the line it names.** The font's first report looked like a bit reader's
+  read-ahead of one byte; the cell was in fact a row too short for the copy, which a debugger's look at the font's
+  sizes showed.
+
 ## 2026-10-18: the test launcher, after review
 
 - **ctest's `PASS_REGULAR_EXPRESSION` ignores the exit status.** A test with one passes on its output alone, so a
