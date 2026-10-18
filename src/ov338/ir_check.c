@@ -23,12 +23,23 @@ static u8 IrCheck_SendByte(IrTransfer *transfer);
 static void IrCheck_RecvByte(IrTransfer *transfer);
 
 static u16 sLockId = 0xfffd;
-static IrTransfer sTransfer;
+// MWCC leaves a function's 64-bit constant multiplies apart when it reads an object with an explicit alignment, as
+// the original's IrCheck_ReadId does for its waits' 64 and 1000; lib/irc/src/irc_spi.c, the other copy of this
+// driver, shows the same in IrcSpi_Recv and IrcSpi_Send. Which object was aligned, and to what, is a guess: the
+// sections here start 32-aligned whatever it is, and that copy's data sits at 8- and 16-aligned addresses.
+static IrTransfer sTransfer ATTRIBUTE_ALIGN(4);
 static u8 sSendBuffer[0xd0];
+
+// As the infrared library's IrcSpi_Wait60us (lib/irc/src/irc_spi.c), inlined here
+static inline void IrCheck_Wait60us(void) {
+    u64 start = OS_GetTick();
+
+    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 60) {
+    }
+}
 
 static u8 IrCheck_ReadId(void) {
     u8 id;
-    u64 start;
 
     sTransfer.send = sSendBuffer;
     sTransfer.recv = &id;
@@ -36,16 +47,12 @@ static u8 IrCheck_ReadId(void) {
     CARD_LockBackup(sLockId);
     OS_LockCard(sLockId);
 
-    start = OS_GetTick();
-    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 60) {
-    }
+    IrCheck_Wait60us();
     IrCheck_WaitBusy();
     IrCheck_SetControl(REG_MI_MCCNT0_MODE_MASK | 0x2);
     id = IrCheck_SendByte(&sTransfer);
 
-    start = OS_GetTick();
-    while (OS_TicksToMicroSeconds(OS_GetTick() - start) < 60) {
-    }
+    IrCheck_Wait60us();
     IrCheck_SetControl(0x2);
     IrCheck_RecvByte(&sTransfer);
     IrCheck_WaitBusy();

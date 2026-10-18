@@ -686,7 +686,7 @@ from:0x020071f4 kind:thumb_call to:0x0200af08 module:main
 from:0x0200720a kind:thumb_call to:0x0203ad94 module:main
 from:0x02007216 kind:thumb_call to:0x0203cb80 module:main
 from:0x0200721e kind:thumb_call to:0x0203ce0c module:main
-from:0x02007224 kind:thumb_call to:0x021bea20 module:overlays(36,331)
+from:0x02007224 kind:thumb_call to:0x021bea20 module:overlay(331)
 from:0x0200722a kind:thumb_call to:0x021bed54 module:overlay(331)
 from:0x02007232 kind:thumb_call to:0x021bed60 module:overlays(167,331)
 from:0x0200723a kind:thumb_call to:0x021bee68 module:overlay(331)
