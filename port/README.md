@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo-dark.svg">
+    <img alt="Frigate" src="assets/branding/logo.svg" width="360">
+  </picture>
+</p>
+
 # port/
 
 **Frigate** is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation; you
@@ -66,10 +73,15 @@ port/tools/package_macos.sh                             # build/port/Frigate Bla
   Frigate White 2.
   [app/macos/make_app.sh](app/macos/make_app.sh) builds it from the program the build linked: the program, the
   libraries it loads from outside macOS (Homebrew's SDL3, or an SDL3 installed with its `@rpath` name) in
-  `Contents/Frameworks`, and an `Info.plist` from [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where
-  each of its values comes from. It checks that nothing in the app loads a library from outside macOS and the app,
-  signs the whole app with `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and
-  starts the program from the app once (`--help`) to see that it loads.
+  `Contents/Frameworks`, the version's icon in `Contents/Resources/AppIcon.icns`, and an `Info.plist` from
+  [app/macos/Info.plist.in](app/macos/Info.plist.in), which says where each of its values comes from. It checks that
+  nothing in the app loads a library from outside macOS and the app, signs the whole app with
+  `codesign --force --deep --sign -`, checks it with `codesign --verify --deep --strict`, and starts the program from
+  the app once (`--help`) to see that it loads.
+- **The icon** is Frigate's ship on Black 2's dark plate or White 2's light one. The build makes the `.icns` from the
+  version's 1024 px master in [assets/branding](assets/branding/README.md) with `sips` and `iconutil`
+  ([app/macos/make_icns.sh](app/macos/make_icns.sh)), never committed; on Linux and Windows the window shows the same
+  icon ([app/window_icon.c](app/window_icon.c)).
 - **The bundle identifier** is `io.github.callancampos.frigate.black2` (`.white2` for White 2). macOS keeps an app's
   preferences and permissions under it. A build of your own that isn't Frigate's (a fork under another name) takes a
   reverse-DNS name of a domain of yours with `-DPORT_MACOS_BUNDLE_ID_PREFIX=`.
@@ -152,8 +164,11 @@ port/
   README.md              now      this overview
   CLAUDE.md              now      rules for sessions working on the port
   CMakeLists.txt         now      host build: the decomp's C plus port/, linked into one program, and its tests
-  app/                   now      main(), SDL3 window, gamepads, macos/ (the app's Info.plist and build script);
-                                  later screen layouts, settings, paths, first-launch ROM setup
+  app/                   now      main(), SDL3 window and its icon, gamepads, macos/ (the app's Info.plist and the
+                                  scripts that make its icon and build it); see app/README.md. Later screen layouts,
+                                  settings, paths, first-launch ROM setup
+  assets/                now      files that aren't code, never game data (see assets/README.md)
+    branding/            now      Frigate's mark, logo and app icons, drawn by tools/frigate_logo.py
   include/               now      port_host.h, force-included into the decomp's C on a host (MWCC built-ins)
   hal/                   now      host side of the SDK, one directory per SDK module it replaces; trap.c for stubs
     os/ pxi/ hw/ gx/ dma/ mi/ fx/ math/ crypto/ rom/ card/ fs/ nvram/ rtc/ pm/ tp/ mic/ ctrdg/ reset/ input/
@@ -178,6 +193,7 @@ port/
     hooks/port_guard.py  now      Claude Code hook that refuses writes to upstream and the decomp fork
     gen_host_tree.py     now      source list, include/ mirror without MSL's libc headers, generated constants
     gen_stubs.py         now      trap stubs and data placeholders for symbols with no C yet
+    gen_window_icon.c    now      the window's icon on Linux and Windows, from the version's icon master
     check_mwcc_neutral.py now     proves a guard-only change to decomp files neutral under MWCC (preprocessed text)
     oracle/              phase 1  melonDS test harness (a test tool, never linked into the port)
   docs/                  now      plan, research, sync guide (SYNC.md), status log, ADRs, game-change ledger

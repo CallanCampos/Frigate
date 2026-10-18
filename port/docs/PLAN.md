@@ -136,6 +136,7 @@ port/
   README.md              build and run, for players and developers
   CLAUDE.md              rules for sessions working on the port
   app/                   main(), SDL3 window, screen layouts, settings file, paths, first-launch ROM setup
+  assets/                files that aren't code and never game data: branding/ (Frigate's logo and app icons)
   hal/                   host side of the SDK, one directory per SDK module it replaces
     os/                  fiber scheduler with DS priority semantics, IRQ dispatch, virtual clock, alarms, arenas
     fs/                  NitroFS backend, overlay activation (.data restore, .bss zero)

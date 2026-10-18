@@ -25,6 +25,7 @@
 // (port/app/gamepad.c), which a settings file can replace.
 #include "app/present.h"
 #include "app/gamepad.h"
+#include "app/window_icon.h"
 #include "gfx/screens.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_app.h"
@@ -82,6 +83,8 @@ int port_present_open(void) {
         port_present_close();
         return 0;
     }
+    // Frigate's icon for the version, on Linux and Windows (on macOS the app's icon is the Dock's)
+    port_window_icon_set(sWindow);
     sRenderer = SDL_CreateRenderer(sWindow, NULL);
     if (sRenderer == NULL) {
         SDL_Log("port: SDL_CreateRenderer failed: %s", SDL_GetError());

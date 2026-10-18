@@ -14,7 +14,9 @@ project(frigate
 # The names the player sees. The product is Frigate (port/CLAUDE.md); the C code has the same name as PORT_PRODUCT_NAME
 # in port/hal/os/port_app.h, and the macOS app's names are in port/cmake/macos_app.cmake. Each version is its own
 # program: frigate-black2 or frigate-white2, built from the same sources with the decomp's BLACK2 or WHITE2 defined,
-# and PORT_GAME_NAME is the game it runs, as the window's title and the ROM's messages name it
+# and PORT_GAME_NAME is the game it runs, as the window's title and the ROM's messages name it. PORT_APP_ICON is the
+# version's icon, Frigate's ship on Black 2's dark plate or White 2's light one (port/assets/branding): the macOS app's
+# (port/cmake/macos_app.cmake) and the window's on Linux and Windows (port/cmake/app.cmake) are made from it
 set(PORT_PRODUCT_NAME "Frigate")
 set(PORT_VERSION "b2_us" CACHE STRING "The game version to build: b2_us (Black 2) or w2_us (White 2)")
 set_property(CACHE PORT_VERSION PROPERTY STRINGS b2_us w2_us)
@@ -22,10 +24,12 @@ if(PORT_VERSION STREQUAL "b2_us")
     set(PORT_VERSION_DEFINE BLACK2)
     set(PORT_PROGRAM frigate-black2)
     set(PORT_GAME_NAME "Pokémon Black 2")
+    set(PORT_APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-black2-1024.png")
 elseif(PORT_VERSION STREQUAL "w2_us")
     set(PORT_VERSION_DEFINE WHITE2)
     set(PORT_PROGRAM frigate-white2)
     set(PORT_GAME_NAME "Pokémon White 2")
+    set(PORT_APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/icon-white2-1024.png")
 else()
     message(FATAL_ERROR "PORT_VERSION must be b2_us or w2_us, not ${PORT_VERSION}")
 endif()

@@ -1,4 +1,9 @@
-# Frigate
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../port/assets/branding/logo-dark.svg">
+    <img alt="Frigate" src="../port/assets/branding/logo.svg" width="400">
+  </picture>
+</h1>
 
 Frigate is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the
 [pokebw2](https://github.com/fuddlesworth/pokebw2) decompilation; you supply your own ROM. It targets macOS on Apple
@@ -46,6 +51,7 @@ The decomp's progress, from upstream's CI:
 | [Status](../port/docs/STATUS.md) | Progress log |
 | [Game changes](../port/docs/game-changes.md) | Every change the port makes outside `port/` |
 | [Developer overview](../port/README.md) | Building and running Frigate, the layout of `port/`, preparing a checkout, syncing |
+| [Artwork](../port/assets/branding/README.md) | Frigate's logo and app icons: the files, their colours, how the build uses them and how to change them |
 
 ## Relation to pokebw2
 
@@ -79,4 +85,5 @@ tables, map models and textures, scripts); Frigate's builds never ship it, and F
 affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.
 
 The [GNU GPL v3.0](../LICENSE) license, as upstream, covers the contributors' work and grants no rights to Nintendo's
-data or trademarks.
+data or trademarks. Frigate's logo and icons are original artwork under the same license
+([port/assets/branding](../port/assets/branding/README.md#license)).

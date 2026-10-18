@@ -26,6 +26,64 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Frigate's logo and icons
+
+- **Upstream:** `045e97b90` (merge of PR #364), as in the last entry; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `frigate-identity`, after `a92bb98d9`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). Nothing outside `port/` changed but the port's own
+  `.github/README.md`, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo, reconfigured in the last entry's build directories,
+  and both apps; not pushed, so no CI run (Linux unbuilt; the window icon's code is compiled on macOS too, and only its
+  `SDL_SetWindowIcon` call is skipped there).
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6: Black 2, all 237 `ctest` tests pass (`ctest -j4`, 270 s, with the oracle's), none skipped; White 2,
+    all 235 (314 s), none skipped. Neither build has a compiler warning. New: `assets_branding` (the six SVGs are what
+    their generator writes, draw with paths alone, and the PNG masters' sizes; 202 checks), `app_window_icon_plain`
+    and `_sanitized` (the window's bitmap is the version's and its plate fills the square, and giving it to a window
+    of SDL's dummy driver goes through; 17 checks), and
+    `app_make_app` now also makes an `.icns` from the version's master with `make_icns.sh`, checks its ten images'
+    sizes, that the app holds it as `Contents/Resources/AppIcon.icns` named by `CFBundleIconFile`, and both scripts'
+    refusals (a 512 px master, a PNG given as the icon): 36 checks.
+  - The apps: `Frigate Black 2.app` and `Frigate White 2.app` hold their version's `AppIcon.icns`, `plutil` reads
+    `CFBundleIconFile` AppIcon, and `codesign --verify --deep --strict` passes. macOS 26.5 shows each app's icon as
+    drawn from 64 px up (`NSWorkspace`'s icon of the app, rendered to PNG and looked at); at 32 and 16 px it puts it
+    inside a dark plate of its own, as it does other apps' plain `.icns` icons (Discord's, OpenMTP's). Each app's
+    program runs 300 frames headless from the app (`--save-dir` a scratch directory), status 0. `package_macos.sh`
+    makes `Frigate Black 2 0.0.2619.dmg` and `Frigate White 2 0.0.2619.dmg` (5.4 MB each, 0.3 MB more for the icon),
+    whose apps hold their icon and pass `codesign --verify --deep --strict` as mounted. The app and image results are
+    from the tree that became this commit (version `0.0.2619`, revision `a92bb98d91c8-dirty`).
+  - The window's 64 px icons, made by `gen_window_icon`, were looked at enlarged: the plate fills the square with clean
+    edges and the three masts read. The landing page's `<picture>` was tried in a browser with the emulated light and
+    dark schemes: each shows its logo.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version, as in the last entry.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** Frigate has its logo and app icons, in `port/assets/branding` with the script that draws them
+  (`tools/frigate_logo.py`), its renderer (`tools/render.py`, AppKit, macOS) and a README: the files, the design, the
+  colours, how the build uses them, how to change them, and their license, the repository's GPL v3.0.
+  - The landing page (`.github/README.md`) and port/README.md open with the logo, `logo.svg` or `logo-dark.svg` by
+    colour scheme in a `<picture>`, above the one-line description and the disclaimer; the landing page's documents
+    table links the artwork.
+  - The macOS app's icon: `PORT_APP_ICON` (port/CMakeLists.txt) is the version's 1024 px master;
+    `port/app/macos/make_icns.sh` makes an `.icns` of it with `sips` and `iconutil` when it changes, never committed,
+    and `make_app.sh --icon` puts it in the app as `Contents/Resources/AppIcon.icns`, which the Info.plist's new
+    `CFBundleIconFile` names. Black 2's app has the dark plate with the white-hulled ship, White 2's the light plate
+    with the black-hulled one.
+  - The window's icon on Linux and Windows: `port/tools/gen_window_icon.c`, built for the machine that builds, trims
+    the master's macOS margin and averages it down to a 64 px bitmap in a generated C file, and
+    `port/app/window_icon.c` gives it to the window (`SDL_SetWindowIcon`). On macOS the window sets none, so the Dock
+    keeps the app's icon.
+  - Directory guides: `port/assets/README.md` and the branding README are new, and so is `port/app/README.md`, the
+    guide of `app/` with a row for each of its files; port/README.md's directory map, PLAN.md §4.3 and
+    `port/tools/README.md` (a new table of the build's generators) have the new files. port/CLAUDE.md says where the
+    artwork lives and that a change to it is a change to its script.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field.
+  Possible follow-ups for the artwork: hand-drawn 16 and 32 px images in the `.icns`, an Icon Composer icon for
+  macOS 26, and a volume icon for the disk image.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-18: the port is Frigate
 
 - **Upstream:** `045e97b90` (merge of PR #364), which `main` merged before this task (`5ad9a1e1d`); no sync in this

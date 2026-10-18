@@ -1,8 +1,9 @@
 #!/bin/sh
-# Tests of the macOS app's build script (port/app/macos/make_app.sh) on small programs made here, in directories whose
-# names have spaces: one that loads a library by each kind of install name dyld knows, and the script's refusals.
+# Tests of the macOS app's build scripts on small programs made here, in directories whose names have spaces: the app
+# (port/app/macos/make_app.sh) of one that loads a library by each kind of install name dyld knows, with the version's
+# icon (port/app/macos/make_icns.sh, from its master in port/assets/branding), and both scripts' refusals.
 #
-#   test_make_app.sh CC WORK_DIR REPO
+#   test_make_app.sh CC WORK_DIR REPO ICON_MASTER
 #
 # The program prints bar() + qux() + abs1(): bar() is baz() * 6 and baz() is 7, so 42; qux() is 1 and abs1() is 100,
 # so it prints 143 when every library loads. Its libraries:
@@ -11,13 +12,15 @@
 #   - libqux, by @executable_path, next to the program
 #   - libabs1, by its absolute path, as Homebrew names its libraries
 # The app must hold all four and load them from itself alone: it is moved and the originals taken away before it runs
-# again.
+# again. Its icon must be the .icns given, with the ten images of a macOS icon set.
 set -u
 
 cc=$1
 work=$2
 repo=$3
+master=$4
 script="$repo/port/app/macos/make_app.sh"
+make_icns="$repo/port/app/macos/make_icns.sh"
 plist="$repo/port/app/macos/Info.plist.in"
 checks=0
 failures=0
@@ -30,10 +33,12 @@ expect() {
     fi
 }
 
-# Builds an app from the program $1 into $2 and prints the script's exit status, its messages in $work/messages
+# Builds an app from the program $1 into $2 with the icon $3 (the version's by default) and prints the script's exit
+# status, its messages in $work/messages
 make_app() {
-    "$script" --program "$1" --app "$2" --plist "$plist" --bundle-id io.github.callancampos.frigate.test \
-        --name "Test Name" --display-name "Prog App" --repo "$repo" >/dev/null 2>"$work/messages"
+    "$script" --program "$1" --app "$2" --plist "$plist" --icon "${3:-$icns}" \
+        --bundle-id io.github.callancampos.frigate.test --name "Test Name" --display-name "Prog App" --repo "$repo" \
+        >/dev/null 2>"$work/messages"
     echo $?
 }
 
@@ -73,6 +78,18 @@ EOF
 "$cc" -o "bin x/prog" prog.c -L"lib a" -L"bin x" -lbar -lqux -labs1 "-Wl,-rpath,$work/lib a"
 expect "the program before the app" "$("$work/bin x/prog")" 143
 
+# The icon: the version's master as an .icns, holding the ten images of a macOS icon set at their pixel sizes
+icns="$work/icon dir/App Icon.icns"
+"$make_icns" "$master" "$icns" 2>"$work/messages"
+expect "make_icns.sh's status" $? 0
+iconutil --convert iconset --output "$work/unpacked.iconset" "$icns"
+sizes=$(for image in "$work/unpacked.iconset"/*.png; do
+    printf '%s:%s\n' "$(basename "$image" .png)" \
+        "$(sips -g pixelWidth "$image" | awk '$1 == "pixelWidth:" { print $2 }')"
+done | LC_ALL=C sort | tr '\n' ' ')
+expect "the icon's images" "$sizes" "icon_128x128:128 icon_128x128@2x:256 icon_16x16:16 icon_16x16@2x:32\
+ icon_256x256:256 icon_256x256@2x:512 icon_32x32:32 icon_32x32@2x:64 icon_512x512:512 icon_512x512@2x:1024 "
+
 # The app: its four libraries, its program's output, and only the app's own search paths
 app="$work/out dir/Prog.app"
 expect "make_app.sh's status" "$(make_app "$work/bin x/prog" "$app")" 0
@@ -91,6 +108,9 @@ expect "CFBundleName" "$(info CFBundleName)" "Test Name"
 expect "CFBundleDisplayName" "$(info CFBundleDisplayName)" "Prog App"
 expect "CFBundleIdentifier" "$(info CFBundleIdentifier)" io.github.callancampos.frigate.test
 expect "CFBundleExecutable" "$(info CFBundleExecutable)" prog
+expect "CFBundleIconFile" "$(info CFBundleIconFile)" AppIcon
+cmp -s "$icns" "$app/Contents/Resources/AppIcon.icns"
+expect "the app's icon is the .icns given" $? 0
 mv "$app" "$work/Moved.app"
 mv "$work/lib a" "$work/lib a gone"
 mv "$work/lib b" "$work/lib b gone"
@@ -154,6 +174,18 @@ expect "a program that doesn't start: status" "$(make_app "$work/bin x/bad" "$wo
 expect "a program that doesn't start: message" \
     "$(grep -c "the program doesn't start from the app" "$work/messages")" 1
 expect "a program that doesn't start: nothing made" "$(ls "$work/out dir")" ""
+
+# A master that isn't 1024 x 1024: no .icns
+sips -z 512 512 "$master" --out "$work/small.png" >/dev/null
+"$make_icns" "$work/small.png" "$work/small.icns" 2>"$work/messages"
+expect "a 512 px master: status" $? 1
+expect "a 512 px master: message" "$(grep -c 'must be a 1024 x 1024 PNG with alpha (it is 512 x 512' "$work/messages")" 1
+expect "a 512 px master: nothing made" "$(ls "$work" | grep -c '^small.icns$')" 0
+
+# An icon that isn't an .icns: no app
+expect "a PNG as the icon: status" "$(make_app "$work/bin x/prog" "$work/out dir/Png.app" "$master")" 2
+expect "a PNG as the icon: message" "$(grep -c "isn't an .icns file" "$work/messages")" 1
+expect "a PNG as the icon: nothing made" "$(ls "$work/out dir")" ""
 
 echo "$checks checks, $failures failed"
 [ "$failures" -eq 0 ]

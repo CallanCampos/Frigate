@@ -1,16 +1,51 @@
-# The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the gamepads, the
-# log of an app opened from the Finder, the run directory for the oracle's comparisons with the symbol lookup its memory
-# dumps use, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The
-# screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds.
+# The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the window's icon,
+# the gamepads, the log of an app opened from the Finder, the run directory for the oracle's comparisons with the symbol
+# lookup its memory dumps use, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c,
+# plain C11). The screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
+
 # --run-dump finds the game's globals by name (port/app/symbols.c) without exporting them: dlsym on macOS, the program's
 # own symbol table on Linux
 target_link_libraries(${PORT_PROGRAM} PRIVATE ${CMAKE_DL_LIBS})
+
+# The window's icon on Linux and Windows (port/app/window_icon.c). port/tools/gen_window_icon.c, built for the machine
+# that builds, makes a 64 px bitmap of the version's app icon (PORT_APP_ICON, port/assets/branding) into a C file when
+# the master changes, and the program carries that bitmap instead of the master. On macOS the window sets none: the
+# app's icon is the Dock's (port/cmake/macos_app.cmake)
+set(port_window_icon_c "${PORT_GEN}/window_icon_pixels.c")
+add_executable(port_gen_window_icon "${CMAKE_CURRENT_SOURCE_DIR}/tools/gen_window_icon.c")
+target_compile_options(port_gen_window_icon PRIVATE -std=c11 -Wall -Wextra -Werror)
+target_link_libraries(port_gen_window_icon PRIVATE SDL3::SDL3)
+add_custom_command(OUTPUT "${port_window_icon_c}"
+    COMMAND port_gen_window_icon "${PORT_APP_ICON}" "${port_window_icon_c}" 64
+    DEPENDS port_gen_window_icon "${PORT_APP_ICON}"
+    COMMENT "Making the window's icon from the app icon's master"
+    VERBATIM)
+target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/window_icon.c" "${port_window_icon_c}")
+
+# The window's icon, plain and under the sanitizers: the bitmap is the version's, with its plate filling the square, and
+# giving it to a window of SDL's dummy video driver goes through (port/tests/app/test_window_icon.c)
+foreach(variant IN ITEMS plain sanitized)
+    set(target port_test_window_icon_${variant})
+    add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_window_icon.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/window_icon.c" "${port_window_icon_c}")
+    target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_definitions(${target} PRIVATE ${PORT_VERSION_DEFINE})
+    target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
+    target_link_libraries(${target} PRIVATE SDL3::SDL3)
+    if(variant STREQUAL "sanitized")
+        target_compile_options(${target} PRIVATE
+            -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    endif()
+    add_test(NAME app_window_icon_${variant} COMMAND ${target})
+    set_tests_properties(app_window_icon_${variant} PROPERTIES TIMEOUT 60)
+endforeach()
 
 # The symbol lookup, on the test program's own symbols
 add_executable(port_test_symbols "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_symbols.c"

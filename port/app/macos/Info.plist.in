@@ -10,6 +10,8 @@
     version's black2 or white2.
   - NSHumanReadableCopyright, which the About window shows under the name, says what Frigate is and that it is not
     affiliated with the game's owners.
+  - CFBundleIconFile is the app's icon, Contents/Resources/AppIcon.icns, which make_app.sh copies from the .icns that
+    make_icns.sh makes of the version's master in port/assets/branding (Black 2's dark plate, White 2's light one).
   - The versions come from git: CFBundleVersion is the number of commits up to the one built, which only grows along
     main, CFBundleShortVersionString is 0.0 and that number, and PortSourceRevision is the commit itself (git describe,
     with -dirty for a build of uncommitted changes).
@@ -32,6 +34,8 @@
 	<string>@DISPLAY_NAME@</string>
 	<key>CFBundleExecutable</key>
 	<string>@EXECUTABLE@</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>@BUNDLE_ID@</string>
 	<key>CFBundleInfoDictionaryVersion</key>

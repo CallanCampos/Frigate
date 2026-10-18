@@ -20,6 +20,12 @@ The user named the port Frigate on 2026-10-18, in the line of community ports su
   `Frigate` under the user's data folder on Linux and Windows); and the `FRIGATE_ROM` variable. Each name is set in one
   place: `PORT_PRODUCT_NAME` in [hal/os/port_app.h](hal/os/port_app.h) for the C, and the top of
   [CMakeLists.txt](CMakeLists.txt) and [cmake/macos_app.cmake](cmake/macos_app.cmake) for the build.
+- **Its artwork is in [assets/branding](assets/branding/README.md)**: the logo of the landing page and the READMEs,
+  and the app icons that the macOS app and the window on Linux and Windows are built from. Every file there is drawn
+  by the directory's `tools/frigate_logo.py`, so a change to the artwork is a change to that script, rendered again
+  with `tools/render.py` on a Mac and committed with the SVGs and PNGs it writes (the test `assets_branding` checks
+  that the SVGs match the script). Nothing the build makes from the icons (the `.icns`, the window's bitmap) is
+  committed.
 - **The layer keeps its own names:** the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables and
   `port_*` targets, `pokebw2_game` (the decomp's code), `pbw-oracle` and the `pbwinput` format, the `port-*.yml`
   workflows and the "port:" prefix of the program's messages. The repository stays `CallanCampos/pokebw2-native`

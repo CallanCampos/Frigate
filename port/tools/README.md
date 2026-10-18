@@ -14,3 +14,15 @@ directory outside it (or under an ignored `out/`).
 Requirements: a configured checkout with `extract/` (from `ninja extract/b2_us/config.yaml extract/w2_us/config.yaml`)
 and `build/include/generated` (from `ninja constants_headers`), Homebrew LLVM for the compile probe, and read-only
 `gh` for the claims report.
+
+## Generators the host build runs
+
+The host build (port/CMakeLists.txt and port/cmake/) runs these at configure or build time; their output goes into the
+build directory, never into the repository.
+
+| File | What it makes |
+| --- | --- |
+| `gen_host_tree.py` | The source list, the `include/` mirror without MSL's C library headers, and the generated constants headers |
+| `gen_stubs.py` | Trap stubs and data placeholders for every DS symbol the game references that has no C yet |
+| `gen_overlay_sections.py` | Per-overlay sections for overlay code's writable statics, and the check of a Mach-O link's section count |
+| `gen_window_icon.c` | The window's icon on Linux and Windows: a 64 px bitmap of the version's icon master (`port/assets/branding`), built and run for the machine that builds |
