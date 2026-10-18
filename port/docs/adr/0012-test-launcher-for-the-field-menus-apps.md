@@ -1,7 +1,6 @@
 # 0012: Frigate's test launcher for the field menu's apps while overlay 36 is claimed
 
-- **Status:** proposed (waits for the user's acceptance: it reads [port/CLAUDE.md](../../CLAUDE.md)'s exception for a
-  deferred subsystem's documented stand-in)
+- **Status:** accepted
 - **Date:** 2026-10-18
 - **Plan:** §7 phase 4 (bag, party, Pokédex, summary), §6 (T4); port/CLAUDE.md, "Code that isn't C yet"
 - **Upstream:** `045e97b90` (merged by the port's `5ad9a1e1d`)
