@@ -99,8 +99,11 @@ expand() {
 locate() {
     case "$1" in
     @rpath/*)
-        { search_paths "$2"; search_paths "$program"; } | while IFS= read -r directory; do
-            candidate="$(expand "$directory" "$2")/${1#@rpath/}"
+        # A search path of the binary's own is relative to the binary, and one of the program's to the program
+        { search_paths "$2" | sed 's/^/own /'; search_paths "$program" | sed 's/^/program /'; } |
+        while read -r whose directory; do
+            if [ "$whose" = own ]; then owner=$2; else owner=$program; fi
+            candidate="$(expand "$directory" "$owner")/${1#@rpath/}"
             if is_system "$candidate"; then
                 echo system
                 break

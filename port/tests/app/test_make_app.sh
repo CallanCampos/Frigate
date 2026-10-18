@@ -102,6 +102,31 @@ expect "a missing library: message" \
 expect "a missing library: nothing made" "$(ls "$work/out dir")" ""
 mv "$work/libbaz.away" "$work/lib b/libbaz.dylib"
 
+# A library that only the program's search path finds, a path from @loader_path: dyld takes it from the program, not
+# from the library that loads it, so the app is made from libone in "bin y/lib" loading libtwo there by @rpath
+mkdir -p "$work/bin y/lib"
+printf 'int two(void) { return 5; }\n' >two.c
+printf 'int two(void);\nint one(void) { return two() * 2; }\n' >one.c
+cat >prog3.c <<'EOF'
+#include <stdio.h>
+int one(void);
+int main(int argc, char **argv) {
+    (void)argv;
+    if (argc > 1) {
+        return 0;
+    }
+    printf("%d\n", one());
+    return 0;
+}
+EOF
+"$cc" -dynamiclib -install_name @rpath/libtwo.dylib -o "bin y/lib/libtwo.dylib" two.c
+"$cc" -dynamiclib -install_name @rpath/libone.dylib -o "bin y/lib/libone.dylib" one.c -L"bin y/lib" -ltwo
+"$cc" -o "bin y/prog3" prog3.c -L"bin y/lib" -lone "-Wl,-rpath,@loader_path/lib"
+expect "the program's @loader_path search path, before the app" "$("$work/bin y/prog3")" 10
+expect "the program's @loader_path search path: status" "$(make_app "$work/bin y/prog3" "$work/out dir/Three.app")" 0
+expect "the program's @loader_path search path: the app" "$("$work/out dir/Three.app/Contents/MacOS/prog3")" 10
+rm -rf "$work/out dir/Three.app"
+
 # Two libraries with one file name: no app
 printf 'int qux(void) { return 2; }\n' >qux2.c
 printf 'int qux(void);\nint other(void) { return qux(); }\n' >other.c
