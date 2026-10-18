@@ -172,10 +172,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A table field passed to a call through its own argument register (`ldr r3, =...; ldrsh r3, [r3, r4]`), where
   the original uses the lowest free one (`ldr r1, =...; ldrsh r3, [r1, r4]`): read it into one local that every
   block making the same call assigns. (matching.md: "picks the register of an argument's address")
-- A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`): two accesses
-  to `p[i].f` through a pointer variable that MWCC's first CSE pass did not merge, as in `f[i].b += v`, or a read
-  of the element's first field and a copy into the element; `(&p->f)[i * 2]` folds back to index first.
-  (matching.md: "its first common-subexpression pass did")
+- A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`): the address of
+  `p[i].f` shared by two accesses and kept for a second use, as a read-modify-write (`f[i].b += v`), two stores to
+  one element, a read and a copy into the element, or a store in the `else` of the `if` whose condition reads it
+  (`MonolithPower_Equip`). Two reads merged into one load fold back to index first, as does `(&p->f)[i * 2]`;
+  `#pragma opt_propagation off` keeping them offset first says the original merged them late. (matching.md: "that
+  MWCC shares between two accesses")
 - Every register moved by a field that the caller keeps in a saved register after an inline read it, where the
   original loads it again: the inline takes a `const T *`, even from a caller's plain pointer.
   (matching.md: "a `const` pointer from a caller whose")
@@ -474,6 +476,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   twice. (matching.md: "chained assignment to fields")
 - A field loaded again after an `if`, where the original keeps one load (or spills it and reloads the copy): no
   reuse reaches past a join, so the source held it in a variable. (matching.md: "reused into an `if`'s body")
+- A field loaded again in the second arm of an `||`, where ours shares one load: the function may read an object
+  with an explicit alignment, which kept `UpdateScroll`'s `list->dragDelta` reads apart. (matching.md: "the
+  attribute on any object or member the function reads")
 - A member's address CSE'd into a callee-saved register from a store to a later call's argument, where ours
   recomputes it: a pointer local declared at the top, assigned just before the call — not at its declaration.
   (matching.md: "assigned just before the call")
@@ -944,6 +949,10 @@ within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matc
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
 subexpression, loaded into a").
+`#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3` around one function alone matched
+overlay 139's `UpdateScroll`, a field's offset added before the index for two merged reads, where
+`opt_common_subs off` made it 4 bytes longer and `opt_lifetimes`, `opt_loop_invariants` and `opt_strength_reduction`
+off changed nothing (matching.md: "that MWCC shares between two accesses").
 
 An empty `if (a && b && c) {}` (three operands or more; two are removed early) or a discarded ternary statement
 splits the block where it stands and emits nothing. When a register or CSE difference looks like a missing block
