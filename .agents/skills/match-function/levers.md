@@ -921,10 +921,12 @@ Tested here: `#pragma optimization_level 1` reproduced the whole shape of `btlv_
 restructures it. `opt_common_subs off` alone gives it the original's size too, and with a 0/1 loop test leaves 186
 lines against level 1's 249: its original computes `work + i * 4` and `param + i` again after every call, where ours
 keeps them in registers across the calls. A function whose loop enters with a `b` to the test at -O4 may be one the
-original's global optimizer gave up on; `WorldTrade_NationSortListMake`, `NNS_SndArcStrmInit` and
-`MBGameInfo_SendMembers` show the same symptom in their rows. Try a 0/1 loop test first: `Country_IsValidPlace`, which
-showed it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a
-test whose value is 0/1").
+original's global optimizer gave up on, or one that reads an object with an explicit alignment:
+`WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned
+it), and `NNS_SndArcStrmInit` and `MBGameInfo_SendMembers` show the same symptom in their rows. Ask first whether the
+function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed it too and came
+within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test whose value is
+0/1").
 `#pragma opt_common_subs off` around one function alone matched `btlv_mcss.c`'s `BtlvMcss_MoveTaskEnd_Circle` and
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
