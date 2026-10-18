@@ -119,10 +119,6 @@ struct ScriptOverlayWork {
 extern const char data_ov012_0216e1e4[];
 extern const char data_ov012_0216e208[];
 extern const char data_ov012_0216e1b4[];
-extern const u16 data_ov012_0216ca04[2];
-extern const u8 data_ov012_0216ca06[20];
-extern const u16 data_ov012_0216ca1a[12];
-extern const u16 data_ov012_0216ca1c[12];
 
 ScriptSubwork *InitScriptSubwork(ScriptWork *work, HeapID heapId);
 void func_ov012_021550e4(void *subwork);

@@ -22,6 +22,7 @@ lib/dwc/src/vct/vct_audio.c:
     .bss        start:0x02197444 end:0x02198358
 
 lib/dwc/src/vct/vct_session.c:
+    complete
     .text       start:0x021956d4 end:0x02196680
     .rodata     start:0x02197298 end:0x021973b4
     .data       start:0x02197400 end:0x02197408

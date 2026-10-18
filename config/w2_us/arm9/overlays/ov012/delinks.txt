@@ -117,6 +117,7 @@ src/ov012/scrcmd_game_state.c:
 src/ov012/scrcmd_pokemon.c:
     complete
     .text       start:0x021561b4 end:0x021574e4
+    .rodata     start:0x0216ca44 end:0x0216ca74
     .data       start:0x0216e234 end:0x0216e248
 
 src/ov012/scrcmd_proc.c:
@@ -136,13 +137,14 @@ src/ov012/scrcmd_musical.c:
 
 src/ov012/field_encount_st.c:
     complete
-    .text       start:0x0215912c end:0x0215943c
+    .text       start:0x0215912c end:0x02159270
+    .rodata     start:0x0216ca74 end:0x0216cab4
     .data       start:0x0216e280 end:0x0216e294
 
 src/ov012/hiden_event.c:
     complete
-    .text       start:0x0215943c end:0x02159c00
-    .rodata     start:0x0216cac8 end:0x0216cb78
+    .text       start:0x02159270 end:0x02159c00
+    .rodata     start:0x0216cab4 end:0x0216cb78
 
 src/ov012/scrcmd_network.c:
     complete
@@ -164,11 +166,12 @@ src/ov012/event_game_clear.c:
 
 src/ov012/event_field_menu.c:
     complete
-    .text       start:0x0215a7e4 end:0x0215aaa8
+    .text       start:0x0215a7e4 end:0x0215ab18
+    .rodata     start:0x0216cbb4 end:0x0216cbd8
 
 src/ov012/event_shortcut_menu.c:
     complete
-    .text       start:0x0215aaa8 end:0x0215b4c8
+    .text       start:0x0215ab18 end:0x0215b4c8
     .data       start:0x0216e2a8 end:0x0216e2c0
 
 src/ov012/event_field_proclink.c:

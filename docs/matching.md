@@ -351,6 +351,13 @@ Same instructions, registers swapped.
   `perapvoice.c`'s `PerapVoice_Decode` shifts into a new one (`lsl r5, r5, #0x1c; asr r7, r5, #0x18`). There the
   shift is an expression: an inline returning `sample << 4` from its own `s8 sample = nibble - 8;`. The same inline
   written `sample <<= 4; return sample;` does not match.
+- A pointer an inline advances in two statements and returns from its `if`, `const u16 *end = cmd + 3; end +=
+  cmd[2]; return end;` with `return cmd;` after the `if`, compiles to the instructions of `return cmd + 3 + cmd[2];`
+  but colors its caller's registers in another order. `printsys.c`'s `func_02022900` copies a command with
+  `end = StrCmd_Skip(str)` and needs that body: with it the string stays in `r5` and `end` takes `r4`, and the
+  caller's `end = str` copy lands in the `else` arm, where the inline's test reuses the outer test's flags; with the
+  one expression, `str` takes `r4`, and without the return in the `if`, the copy is made before the test. The
+  helper's ten other uses in the file match with either body.
 - A flag's zero built in the entry block, above the first call, does not mean the flag is declared at the top:
   a `BOOL isNew = FALSE;` declared inside a later block is hoisted there too, and the block is what decides its
   register. `irc_compatible.c`'s `IrcCompatible_CreateParam3` declares it in its `if` block after `isNewTrainer`,
@@ -741,8 +748,8 @@ Same code, other `sp` offsets or frame size.
 - A `u64` written to a 64-bit hardware register in one store (`reg_CP_DIV_NUMER = sum;`, `nitro/cp.h`'s
   `volatile u64`) and the same value written as two 32-bit halves (`(u32)sum`, then `(u32)(sum >> 32)`) keep its low
   and high words in each other's registers. libVCT's `VCT_FilterFrame` (`vct_dsp.c`) builds its sum of squares in
-  `ip` and `lr`, low and high, as the original does, only with the one store; its denominator stays two 32-bit stores
-  of `count` and 0, since a 64-bit `= count` moves `count` and `minusInput` to other registers.
+  `ip` and `lr`, low and high, as the original does, only with the one store, which NitroSDK's `CP_SetDiv64_32`
+  (`nitro/cp.h`) makes for the numerator and the denominator.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
@@ -1001,7 +1008,12 @@ Same code, other `sp` offsets or frame size.
 - A sum of several terms in one expression has its right-hand terms evaluated first; accumulating it in separate
   statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
   (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
-  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
+  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it. In a loop, a loop-invariant part
+  of a sum is hoisted and added second however it is written: `s + x + j` and `j + (s + x)` both give
+  `adds r1, r3, r0`, the counter first. Named in the same block as its use, `int left = s + x; int column = left +
+  j;` or `column = s + x; column += j;`, it is added first (`adds r1, r0, r3`), as the fill of `mcss.c`'s
+  `MCSS_MakeMosaic` is in the original; a local assigned before the loop is not propagated into it and stays on the
+  stack.
 - An `|` chain is combined in the order written, so the order of the original's `orr`s gives the order of the
   terms: `btl_server_flow.c`'s `ActionOrder_MakeKey` packs the action order's key from its highest field down,
   `((unk22 & 7) << 22) | ((unk16 & 0x3f) << 16) | ((unk13 & 7) << 13) | (speed & 0x1fff)`, which both its callers,
@@ -1170,7 +1182,10 @@ Same instructions, scheduled in another order.
   moves and the function matches. Its `EncodeNextFrame`, which reads the codec (0x1c) first, moved the store
   `sAudio.needsSync = FALSE` (8) above the `packet->codec` store into the send queue while it was a field, and
   fields at 4 and 0xc in its place moved too, while those at 0x14 and 0x18 stayed; the static `sNeedsSync` stays
-  last, as in the original.
+  last, as in the original. `VCT_InitSessions` (`vct_session.c`) keeps its zero store into `sSessionState.mask`
+  (offset 4) below the store through the free list's last link only with the state an 8-byte struct of `count` and
+  `mask` and the request time a `u64` static beside it, which `-ipa file` pools right after the state; with the time
+  as the state's third field, the store moves above the link's.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1228,7 +1243,11 @@ Same instructions, scheduled in another order.
 - A sum from a three-register `adds` whose only use is the copy that Thumb's two-operand `adds rd, #imm8` needs
   is moved down to that copy, across calls and branches and inside loops, with both operands kept live (spilled)
   to get there. No optimization pragma, -O level or scope stops it; `+ 7` (the three-operand immediate form) or a
-  second use of the sum keeps it where it is written. `arc_tool.c`'s `ArchiveMoveImageTop` writes
+  second use of the sum keeps it where it is written. Uses of the incremented value don't: in
+  `x = a + v; f(0); x += 8; h(x, b); return x + b;` each use gets its own `adds r0, r5, r4; adds r0, #8`. A
+  subtraction, `x = a - v`, stays where it is written, and so does the sum when the +8 is conditional or when an
+  operand is redefined on one path to the same use (`if (b) { a = 0; }`); a redefinition on every path, `a += 12`,
+  goes into a new register and leaves the old value to the moved sum. `arc_tool.c`'s `ArchiveMoveImageTop` writes
   `fimgOffset = fntbOffset + value;` before a read and `fimgOffset += 8;` after it, and is 4 bytes short for it:
   the original stores the sum where it is written and adds the 8 to its spill slot.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
@@ -2321,10 +2340,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   into a tail that ends with the store. `CtvtCamera_Draw` sets its BG3 scale with `mtx._00 = FX_Inv(FX32_ONE * 2);
   mtx._11 = FX_Inv(FX32_ONE * 2);` and the same with `FX32_ONE` in the arms of `if (work->zoomed == TRUE)`, and the
   zeros after the join; a `scale` local set in the arms puts the calls in the join's block, above which the zero moves.
-  A literal-pool load goes above a plain store the same way, even with `volatile` stores after both: ARM's list
-  scheduler ranks the load by its latency plus the chain after it, one more than the store, which goes first only
-  with a memory successor of its own. `VCT_FilterFrame` (`vct_dsp.c`) loads the divider's base above its last
-  sample's `strh` in every spelling found, where the original stores first.
+  A literal-pool load goes above a plain store the same way when `volatile` stores follow both: ARM's list scheduler
+  ranks the load by its latency plus the chain of `volatile` accesses after it, one more than the store, which goes
+  first only with a memory successor of its own. `VCT_FilterFrame` (`vct_dsp.c`) stores its last sample before
+  loading the divider's base, as the original does, only through NitroSDK's `CP_SetDiv64_32` and
+  `CP_GetDivResult32` (`nitro/cp.h`), which write the operands and read the result through plain pointers to the
+  registers' addresses; with the `volatile` `reg_CP_*` registers the base's load goes first in every spelling.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -2446,6 +2467,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   and each read keeps its own `(v + 1) << 2`; a cast on the base alone, `((f32 *)buffer)[v + 1]`, or a same-width cast
   of the index does not. `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` matches so with a `u32 *` buffer of floats,
   which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
+  It is the cast that hides the address, not a change of type: the same function matches with its `f32 *` buffer
+  read as `*(f32 *)&values[v + 1]`, a cast to the type it already has, which is not used either.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2462,6 +2485,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   guard before its first pass and its test at the end was probably a guarded `do`/`while`: `IrcLink_Checksum` matches
   as `if (i < size) { do { ... } while (++i < size); }` with `i = 0`, whose unsigned `0 < size` gives the original's
   `cmp r1, #0; bls`. `if (size != 0)` gives `beq`, and a `for` inside `if (size > 0)` keeps its own `b` to the test.
+- At `-O4,p`, where a `for` loop is rotated into the same shape, a guard whose branch also skips statements after the
+  loop is a guarded `do`/`while` with those statements inside the `if`. libVCT's `VCT_FilterFrame` (`vct_dsp.c`)
+  saves its filter's state after the loop only when the loop ran, its `bls` past both stores, and matches as
+  `i = 1; if (i < bytes) { do { ... } while (++i < bytes); sEcho.highpassMinusInput = minusInput; ... }`. A `for`
+  followed by the stores puts them after the `bls` target, and a `for` inside `if (bytes > 1)` tests twice.
 - A loop that runs once is unrolled when its counter and bound have the same signedness. `int i; i < NELEMS(x)`
   compares unsigned, so the loop stays, as in the gym files' loops over one-element tables.
 - An address that an inner loop computes from the outer loop's counter, such as `&pieces->pieces[row][col]`, is hoisted
@@ -2520,6 +2548,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `reader->actions[clientId]` at both uses it computed them again in `r7` and `r4`, 104 bytes off. A local set at the
   top of the loop body gets the reuse but not the slot order. The function also matches with the expression written
   out and its `u8 clientId` parameter as `unsigned long`, which hoists `clientId << 6` first.
+- Arithmetic hoisted out of a loop, such as `bit >> 3` and `1 << (bit & 7)`, written in the body or passed to an
+  inline, is computed again by code after the loop, where a hoisted field address (`pokedex->shown`) and a value
+  kept in a local are reused. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
+  them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
+  inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters.
 
 - A loop guard kept as an unsigned compare (`cmp r3, #4; bhs`) came from an enum counter tested against
   `NELEMS(table)`, whose `sizeof` makes the comparison unsigned; the enum's own bound gives `bge`. `symbol_save.c`'s
@@ -2782,7 +2815,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
   apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`, and
-  `dwc_auth.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent.
+  `dwc_auth.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent. libVCT's `vct_session.c` has its four
+  66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
   `[r0, #off]`, shared by every object a function touches) and are dropped when no code reads them. With

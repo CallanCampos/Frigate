@@ -24,12 +24,13 @@ flags = [
 ]
 
 # libVCT is ARM code; vct.c and vct_audio.c also reach their statics from one base, as -ipa file does (vct_audio.c's
-# .bss is size-sorted, with the u16 first)
+# .bss is size-sorted, with the u16 first), and vct_session.c has its four 66-byte transition tables 4-aligned in
+# sections of their own, which only -ipa file gives
 [file_flags]
 "vct/vct_adpcm.c" = ["-nothumb"]
 "vct/vct_audio.c" = ["-nothumb", "-ipa file"]
 "vct/vct_buffer.c" = ["-nothumb"]
-"vct/vct_session.c" = ["-nothumb"]
+"vct/vct_session.c" = ["-nothumb", "-ipa file"]
 "vct/vct_dsp.c" = ["-nothumb"]
 "vct/vct.c" = ["-nothumb", "-ipa file"]
 # The signature check (overlay 189) is ARM code like NitroSDK's

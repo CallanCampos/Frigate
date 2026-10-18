@@ -183,6 +183,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A global's address loaded from the pool again before each call, where ours keeps it in a saved register: a
   pointer local MWCC did not propagate. Check with a local and `#pragma opt_propagation off`, then look for the
   spelling (a member's address, a cast). (matching.md: "is copy-propagated into its uses, and the")
+- A pointer the caller keeps and an end an inline returns swapped between `r4` and `r5`: advance the inline's pointer
+  in two statements and return it from the `if`, `end = cmd + 3; end += cmd[2]; return end;`.
+  (matching.md: "advances in two statements")
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
@@ -289,7 +292,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A static's member loaded above a store through an unknown index into another static, or below it: ARM code
   moves the load up only when its offset is below half the object's size, and below the size less the offset of a
   higher member read earlier; a store moves above an access through a pointer by the same bound. The store, too, must
-  be in the lower half of its own object; an unknown index counts as 0. (matching.md: "below half the object's size")
+  be in the lower half of its own object; an unknown index counts as 0. A store kept below one through a pointer, as
+  in the original, can need its field in the upper half of a smaller struct. (matching.md: "below half the object's
+  size")
 - A struct field's load above an indexed store that its offset can't give: the fields are separate statics, each at
   offset 0 of its own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its
   own object")
@@ -315,9 +320,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `#pragma scheduling off`: a block boundary. Write the calls with constants in each arm of the `if`/`else` before it,
   not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
 - A literal-pool load (an I/O base) that ours places above a store the original makes first: a block boundary, as
-  above; no spelling inside one block moves it. (matching.md: "A literal-pool load goes above a plain store")
+  above, or `volatile` register stores after both where the original's are plain, as NitroSDK's divider inlines
+  (`CP_SetDiv64_32`) write them. (matching.md: "A literal-pool load goes above a plain store")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
+- A loop-invariant part of a sum added second (`adds r1, r3, r0`, the counter first) where the original adds it first:
+  name it in the same block as its use, `int left = s + x; int column = left + j;`. (matching.md: "Named in the same
+  block as its use")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
   rather than a fresh local. (matching.md: "a fresh local's computation down to its first use")
 - A buffer row or table entry the original computes before a call's stack argument store, which ours folds into the
@@ -425,7 +434,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   or `opt_common_subs off` keeps them apart. (matching.md: "is a global common subexpression, loaded into a")
 - A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
   calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
-  sum or another immediate keeps it in place, no pragma does. (matching.md: "whose only use is the copy")
+  sum or another immediate keeps it in place, no pragma does, and each use of the incremented value gets its own
+  copy of the sum. (matching.md: "whose only use is the copy")
 
 ## An instruction too many or too few
 
@@ -683,6 +693,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
 - At `-O2,p` (`lib/irc`) loops are not rotated; a guard before the first pass and the test at the end is a guarded
   `do`/`while`, `if (i < size) do ... while (++i < size)`. (matching.md: "At `-O2,p` no loop is rotated")
+- At `-O4,p`, a loop guard whose branch also skips statements after the loop: a guarded `do`/`while` with those
+  statements inside the `if`; a `for` inside an `if` tests twice. (matching.md: "where a `for` loop is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
@@ -707,7 +719,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A load hoisted one loop level only: it was in the middle loop's body. (matching.md: "middle loop's body")
 - `p + v * 4` kept in a register with reads at `#4` and `#8`, where the original computes `(v + k) << 2` for each
   read: a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), only where the buffer's
-  type calls for one. (matching.md: "hides the address from that pass")
+  type calls for one; even a cast to the element's own type hides it. (matching.md: "hides the address from that
+  pass")
+- Values the original builds before a loop and reuses after it, where ours computes them again: they were locals;
+  arithmetic hoisted out of the loop is not reused. (matching.md: "Arithmetic hoisted out of a loop")
 - Stores of a spilled copy after the loop's guard, in the preheader, where ours stores it at the computation: copy
   after the last branch before the loop, and give the loop's `fx32`/`s32` locals the SDK's `long`.
   (matching.md: "A spilled copy of a value that the original stores") A narrow stack parameter read in the loop's
