@@ -46,7 +46,7 @@ The root's files:
 
 | File | What it does | Tests |
 | --- | --- | --- |
-| [trap.c](trap.c), [trap.h](trap.h) | Trap stubs: a DS function or data object that has no C yet stops the program with its name, its address and its caller (status 70). [../tools/gen_stubs.py](../tools/gen_stubs.py) writes a stub for each at every build; data placeholders sit on pages with no access, and a fault handler names the one touched. `port_trap_is_placeholder` tells Frigate's test launcher ([../app/launcher.c](../app/launcher.c)) whether the field's process table is still one, so that it steps aside once that table has C | `smoke_reaches_game_main`, `oracle_continue` (which stops at the field's first trap), `app_launcher_spec_*` (the placeholder check) |
+| [trap.c](trap.c), [trap.h](trap.h) | Trap stubs: a DS function or data object that has no C yet stops the program with its name, its address and its caller (status 70). [../tools/gen_stubs.py](../tools/gen_stubs.py) writes a stub for each at every build; data placeholders sit on pages with no access (readable again at exit in the sanitized build, for LeakSanitizer's scan), and a fault handler names the one touched. `port_trap_is_placeholder` tells Frigate's test launcher ([../app/launcher.c](../app/launcher.c)) whether the field's process table is still one, so that it steps aside once that table has C | `smoke_reaches_game_main`, `oracle_continue` (which stops at the field's first trap), `app_launcher_spec_*` (the placeholder check) |
 | [replaced.txt](replaced.txt) | The decomp files the host build leaves out, whole modules and asm-only files, each with its reason. A module's own `replaced.txt` lists the rest; [../tools/gen_host_tree.py](../tools/gen_host_tree.py) reads them all | the build |
 
 ## Files of each module
@@ -60,8 +60,8 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | --- | --- |
 | [port_os.h](os/port_os.h) | The OS core's interface for the program, the tests and the other modules: running the game, the frame and scanline hooks, the virtual clock, and timed work at a cycle of it (`port_os_set_timed_work`) |
 | [core.c](os/core.c) | The OS core: the dispatcher, the CPU state (contexts, the CPSR), interrupts at defined points, the halt, the virtual clock's lines, VBlank, the HBlank interrupt as DISPSTAT's HBlank flag sets, and timers, other modules' timed work (the sound driver's next alarm), and the frame and scanline hooks |
-| [fiber.c](os/fiber.c), [fiber.h](os/fiber.h) | Fibers over minicoro, one per SDK thread, switched on the one host thread |
-| [mco_impl.c](os/mco_impl.c) | minicoro's implementation, in a file of its own so that a sanitizer build leaves it uninstrumented |
+| [fiber.c](os/fiber.c), [fiber.h](os/fiber.h) | Fibers over minicoro, one per SDK thread, switched on the one host thread; it tells AddressSanitizer about every switch, frees the fake stack of a fiber destroyed while suspended, and gives LeakSanitizer the live frames of suspended fibers ([../docs/sanitizers.md](../docs/sanitizers.md)) |
+| [mco_impl.c](os/mco_impl.c) | minicoro's implementation, in a file of its own so that a sanitizer build leaves it uninstrumented, and a suspended coroutine's saved stack pointer for fiber.c |
 | [os_thread_host.c](os/os_thread_host.c) | The decomp's `os_thread.c` (the scheduler) compiled through, with the context switch given to the fibers |
 | [os_init.c](os/os_init.c) | `OS_Init`: the SDK's boot sequence (PXI, the card, the tick, alarms) as the decomp's file has it, on the host |
 | [os_interrupt.c](os/os_interrupt.c) | Interrupt handlers and masks (`OS_SetIrqFunction`, IE, IME), with the effects the hardware has; a DMA channel's or timer's handler is called with its own type, where the SDK casts it to a callback |
