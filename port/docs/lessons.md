@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-17: saves with melonDS
+
+- **A save moves the oracle's frame numbers, not its counts.** The DS's start-up reads the save before the main loop
+  starts: with the first save it starts at oracle frame 219, with a blank backup at 242, with a formatted one at 246.
+  Known differences declared by oracle frame (`known_oracle`) move with it, 23 frames sooner for the title's torn
+  frames from the first save; those declared by port frame or count don't.
+- **Make a save on the oracle, keep only its SHA-1.** melonDS is deterministic, so one input file gives the same save
+  memory at every run (`oracle.py save`): a test makes it at run time and checks it against the hash before using
+  it, and nothing the game wrote is committed. Driving the field menu, the first DOWN only shows the cursor, and a
+  press before the save prompt has opened is lost, so give each step room and look at the screens.
+- **A press brings a pass's lag back to 0.** White 2's start menu runs a pass behind on the DS after the title's cry;
+  CONTINUE's press reaches both on the same pass, and from the next frame the counts pair with lag 0 again, but the
+  press's own frame shows the cursor a blink step apart on each.
+
 ## 2026-10-17: New Game's intro, after review
 
 - **The decomp's incomplete C can differ from the ROM where only aliasing shows it.** `MTX_Concat44` and its siblings

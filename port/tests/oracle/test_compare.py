@@ -8,6 +8,8 @@ up their own runs and need neither melonDS nor a ROM. Standard library only.
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import io
 import os
 import shutil
@@ -688,7 +690,8 @@ class SymbolTests(unittest.TestCase):
 
 FAKE_PORT = """#!{python}
 # A stand-in for the port's program: a run directory (--run-dir) with a row for each frame and, for the frames of
-# --run-screens, a picture of the frame's number; it stops at frame 50 as a trap stub would. It records its arguments
+# --run-screens, a picture of the frame's number; it stops at frame 50 as a trap stub would. It records its arguments,
+# and the files of its save directory, each of which it writes back with its bytes reversed, as a game that saves
 import os
 import sys
 sys.path.insert(0, {tools!r})
@@ -696,6 +699,14 @@ import compare
 args = sys.argv[1:]
 with open({record!r}, "w") as f:
     f.write("\\n".join(args))
+saves = args[args.index("--save-dir") + 1]
+with open({record!r} + ".saves", "w") as f:
+    f.write("\\n".join(sorted(os.listdir(saves))))
+for name in os.listdir(saves):
+    with open(os.path.join(saves, name), "rb") as f:
+        data = f.read()
+    with open(os.path.join(saves, name), "wb") as f:
+        f.write(data[::-1])
 frames = int(args[args.index("--frames") + 1])
 out = args[args.index("--run-dir") + 1]
 listed = args[args.index("--run-screens") + 1]
@@ -764,6 +775,98 @@ class OracleScriptTests(unittest.TestCase):
                 arguments = f.read().split("\n")
             self.assertEqual([arguments[i + 1] for i, a in enumerate(arguments) if a == "--run-dump"],
                              ["NNS_G3dGlb:612@10", "s=*SNDi_SharedWork:16"])
+
+    def test_port_runs_with_a_save(self):
+        # The program finds the save in its save directory under the ROM's game code, as it names its own; save_out gets
+        # the save the run leaves (the stand-in's, reversed), and the given file stays as it was
+        with tempfile.TemporaryDirectory() as d:
+            program, record = fake_port(d)
+            rom = os.path.join(d, "rom.nds")
+            with open(rom, "wb") as f:
+                f.write(b"POKEMON B2\0\0IREO01" + bytes(0x200))
+            self.assertEqual(oracle.rom_game_code(rom), "IREO")
+            save = os.path.join(d, "given.sav")
+            with open(save, "wb") as f:
+                f.write(b"\x01\x02\x03")
+            out = os.path.join(d, "run")
+            left = os.path.join(d, "left.sav")
+            status, _ = oracle.run_port(program, out, 10, "none", rom, None, save=save, save_out=left)
+            self.assertEqual(status, 0)
+            with open(record + ".saves") as f:
+                self.assertEqual(f.read(), "IREO.sav")
+            with open(left, "rb") as f:
+                self.assertEqual(f.read(), b"\x03\x02\x01")
+            with open(save, "rb") as f:
+                self.assertEqual(f.read(), b"\x01\x02\x03")
+            self.assertFalse([name for name in os.listdir(out) if name.startswith("saves-")])
+            # Without one, the save directory is empty, and the ROM isn't read
+            status, _ = oracle.run_port(program, out, 10, "none", os.path.join(d, "missing.nds"), None)
+            self.assertEqual(status, 0)
+            with open(record + ".saves") as f:
+                self.assertEqual(f.read(), "")
+            # oracle.py port passes them on
+            os.remove(left)
+            status = quiet(oracle.main, ["port", "--binary", program, "--out", out, "--frames", "1,10", "--rom", rom,
+                                         "--save", save, "--save-out", left])
+            self.assertEqual(status, 0)
+            self.assertTrue(os.path.exists(left))
+
+    def test_sequences_that_may_stop(self):
+        # A run that a trap stub ends passes only from the frame the sequence allows it on; a crash or a timeout never
+        sequence = oracle.Sequence(100, 200, "1-100", "", stop_from=60, stop="the field, which has no C yet")
+        self.assertTrue(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 60))
+        self.assertTrue(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 100))
+        self.assertFalse(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 59))
+        self.assertFalse(oracle.stop_allowed(sequence, 1, 80))
+        self.assertFalse(oracle.stop_allowed(sequence, None, 80))
+        self.assertFalse(oracle.stop_allowed(oracle.Sequence(100, 200, "1-100", ""), oracle.TRAP_STATUS, 80))
+
+    def test_saves_are_held_to_their_sha1(self):
+        with tempfile.TemporaryDirectory() as d:
+            # A stand-in for pbw-oracle that records its arguments and writes the same save memory at every run
+            program = os.path.join(d, "pbw-oracle")
+            with open(program, "w") as f:
+                f.write(f"#!{sys.executable}\nimport sys\nargs = sys.argv[1:]\n"
+                        f"open({os.path.join(d, 'args')!r}, 'w').write('\\n'.join(args))\n"
+                        "open(args[args.index('--save-out') + 1], 'wb').write(b'save memory')\n")
+            os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
+            args = argparse.Namespace(oracle=program, version="b2_us", rom=os.path.join(d, "rom.nds"), time=None)
+            out = os.path.join(d, "made.sav")
+            work = os.path.join(d, "work")
+            saved = dict(oracle.SAVES)
+            try:
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": hashlib.sha1(b"save memory").hexdigest()})
+                self.assertIsNone(quiet(oracle.make_save, args, "first_save", out, work))
+                with open(out, "rb") as f:
+                    self.assertEqual(f.read(), b"save memory")
+                with open(os.path.join(d, "args")) as f:
+                    arguments = f.read().split("\n")
+                self.assertTrue(arguments[arguments.index("--input") + 1].endswith(
+                    os.path.join("port", "tests", "oracle", "first_save_b2_us.pbwinput")))
+                self.assertEqual(arguments[arguments.index("--frames") + 1], "5")
+                self.assertEqual(arguments[arguments.index("--save-out") + 1], out)
+                self.assertNotIn("--save", arguments)
+                # Another save than the one kept, and a version with none kept, fail with the save's SHA-1
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5, {"b2_us": "0" * 40})
+                self.assertIn("isn't the one kept", quiet(oracle.make_save, args, "first_save", out, work))
+                oracle.SAVES["first_save"] = oracle.SaveMaker(5)
+                reason = quiet(oracle.make_save, args, "first_save", out, work)
+                self.assertIn(hashlib.sha1(b"save memory").hexdigest(), reason)
+            finally:
+                oracle.SAVES.clear()
+                oracle.SAVES.update(saved)
+
+    def test_save_skips_without_the_rom_or_the_oracle(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = os.path.join(d, "made.sav")
+            status = quiet(oracle.main, ["save", "first_save", "--out", out, "--oracle", os.path.join(d, "missing")])
+            self.assertEqual(status, oracle.SKIP)
+            fake = os.path.join(d, "pbw-oracle")
+            open(fake, "w").close()
+            status = quiet(oracle.main, ["save", "first_save", "--out", out, "--oracle", fake, "--rom",
+                                         os.path.join(d, "missing.nds")])
+            self.assertEqual(status, oracle.SKIP)
+            self.assertFalse(os.path.exists(out))
 
     def test_run_passes_the_time_only_when_given(self):
         with tempfile.TemporaryDirectory() as d:
@@ -874,6 +977,17 @@ class OracleScriptTests(unittest.TestCase):
             for version in ("b2_us", "w2_us"):
                 self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
                     name=name, version=version))), (name, version))
+            # A save it starts from is one oracle.py makes; a stop it allows is within the port's frames, with why
+            self.assertTrue(not sequence.save or sequence.save in oracle.SAVES, name)
+            self.assertTrue(0 <= sequence.stop_from <= sequence.port_frames, name)
+            self.assertEqual(bool(sequence.stop_from), bool(sequence.stop), name)
+        # Every save has an input file, and the SHA-1 of what it makes, for each version
+        for name, maker in oracle.SAVES.items():
+            self.assertGreater(maker.frames, 0, name)
+            for version in ("b2_us", "w2_us"):
+                self.assertTrue(os.path.exists(os.path.join(oracle.REPO_ROOT, oracle.SEQUENCE_INPUT.format(
+                    name=name, version=version))), (name, version))
+                self.assertRegex(maker.sha1.get(version, ""), "^[0-9a-f]{40}$", (name, version))
 
     def test_check_skips_without_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:

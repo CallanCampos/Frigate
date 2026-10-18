@@ -26,6 +26,63 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: saves with melonDS, and CONTINUE from the oracle's first save
+
+- **Upstream:** `615939e25`, which `main` merged before this task (`e1b68f578`); no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-saves` from `f52dad0b2`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed, so no
+  `check_mwcc_neutral.py` run and no row in `game-changes.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 (everything) and White 2 (the program and the backup tests),
+  and Black 2 under ASan and UBSan (the program and the backup tests). Not pushed, so no CI run.
+- **Tests:** T0 as above. T2: Black 2, 219 of 219 `ctest` tests pass with the four long oracle tests left out
+  (`oracle_boot`, `oracle_opening`, `oracle_title`, `oracle_continue`, run apart), 223 in all; new or extended:
+  `card_backup_round_trip`, `card_backup_other_saves`, `card_backup_refuse_eeprom`, `card_backup_refuse_dsv` and
+  `card_backup_bad_file`'s message, and `oracle_compare`'s 39 tests (4 new: the port's save directory with `--save`
+  and `--save-out`, runs a sequence lets stop on a trap, saves held to their SHA-1, the save command's skips; and the
+  sequences' declarations, saves included). White 2: the
+  12 `card_backup` tests pass. Sanitized: the 12 `card_backup` tests, and the program on the first save through
+  CONTINUE to its trap: no ASan error, from UBSan only the known misaligned read (`g2d_CellAnimation.c:33`), every
+  frame's count and screens those of the plain build, the save file untouched. T6, for the first time: a save of the
+  4 Mbit flash round-trips through the card layer byte for byte (unit), melonDS's save continues in the port and the
+  port's own file boots in melonDS (below). T4: `oracle.py sequence continue`, the port against melonDS 1.1 on the
+  game's count, from power-on with the first save to the port's trap after CONTINUE:
+  - Black 2: 3,415 of 3,415 compared frames match (1,310 exact, 2,105 with 3D within the tolerance), the title's 21
+    known frames and oracle frame 4920 left out; frames 3,244-3,436, the start menu with the saved game, CONTINUE and
+    the wipe out to the field's black, all exact;
+  - White 2: 3,407 of 3,407 (1,312 and 2,095), the title's 28 known frames, port frame 3402 (the cursor's blink at
+    the press, a step apart since the cry's lag) and oracle frames 1260 and 4852 left out.
+
+  T3, T5's nightly runs, T7 not yet.
+- **Tiers:** not measured: this task changed no decomp C.
+- **Trap stubs:** 574 function stubs and 63 data placeholders in each version. A continued game stops after port
+  frame 3,436, in the black after the start menu, on `FIELDMAP_PROC_FUNCS` (overlay 36's .data, `0x021c9eb8` in Black
+  2, `0x021c9eec` in White 2): overlay 36 gates CONTINUE, before overlay 12's script tables, which still stop New Game.
+- **64-bit warnings:** unchanged (no game C changed).
+- **Work done:**
+  - The save format, settled with evidence (`port/tools/oracle/README.md`, "Saves"): the port's file and melonDS's
+    `.sav` of BW2 are both the 4 Mbit flash's 524,288 bytes with nothing before or after; melonDS 1.1 gives `IREO`
+    and `IRDO` save type 6, a 512 KiB flash, and reads and writes the `.sav` whole, padding or cutting another size
+    without a word. Only the names differ (the ROM's file for melonDS, the game code for the port). D7's sidecar isn't
+    needed yet: the port keeps nothing of its own, and the one thing a save would need from it, the console's clock
+    offset, is 0 on the port, the oracle and melonDS's generated firmware alike.
+  - The card layer (`port/hal/card/backup.c`): a file of another size is refused with what it seems to be (another
+    chip's save by melonDS's sizes, DeSmuME's `.dsv` by its footer), and a `.sav` of the chip's size under another
+    name in the save directory, such as a melonDS save copied in as it was, is named with how to play it. The save's
+    names and both directions in `port/README.md`, "Saves".
+  - The oracle makes saves: `oracle.py save first_save` plays `port/tests/oracle/first_save_<version>.pbwinput`, New
+    Game through the intro into the field, the scripts to the player's room and the field menu's SAVE (18,800
+    frames), and checks the save against the SHA-1 `SAVES` keeps; nothing the game wrote is committed. `oracle.py run`
+    and `port` take `--save` and `--save-out`; a sequence can start from a save and allow a trap stub from a frame on.
+  - The continue sequence (`continue_<version>.pbwinput`, ctest `oracle_continue`): the title's presses from the first
+    save and A on CONTINUE.
+  - The port's own save to melonDS: the file the game wrote when New Game formatted the blank backup on the port boots
+    in melonDS to the same 5,400 frames as melonDS's own file of that moment. Lessons in `port/docs/lessons.md`.
+- **Next:** a save with an adventure made by the port, once overlay 36 lets it into the field (phase 4's exit: catch,
+  save, quit, reload; a melonDS save continues in the port and back); import of DeSmuME's `.dsv` and the clock offset
+  a save brings, with D7's sidecar, when a save from another console needs it.
+- **Blockers:** overlay 36 (issue #83) stops CONTINUE at the field's process table and gates the overworld; overlay
+  12's script data stops New Game at the field's first script.
+
 ## 2026-10-17: oracle comparisons from power-on to the start menu
 
 - **Upstream:** `e484d5011` (merge of PR #353), as in the last entry.
