@@ -127,6 +127,7 @@ Frigate runs the game on one host thread.
 | The ARM7's services | inside the ARM9's `PXI_SendWordByFifo` call, on the sender's fiber, and in the ARM7's frame hook | [../hal/pxi/pxi_fifo.c](../hal/pxi/pxi_fifo.c), [../hal/pxi/arm7.c](../hal/pxi/arm7.c) |
 | The sound driver (the DS's ARM7 sound thread) | no thread: it catches up to the virtual clock at each VBlank, when the ARM9 sends it a command, and at its next alarm, which the OS core runs as timed work on the dispatcher's stack | [../hal/snd7/snd7.c](../hal/snd7/snd7.c) |
 | SDL's audio device thread | SDL's own thread, which drains the stream that Frigate fills at each VBlank; no Frigate code runs there (the stream has no callback) | [../audio/audio.c](../audio/audio.c) |
+| The watchdog, on Windows | A thread of its own that waits for each frame's kick and, when one doesn't come in time, reports where the main thread is and ends the program; no game code runs there (macOS and Linux use `SIGALRM`) | [../hal/host/host_windows.c](../hal/host/host_windows.c) |
 
 ### How a run ends
 
@@ -149,7 +150,7 @@ The exit status says why a run ended, as `--help` lists too (`sExitStatuses` in 
 | 72 | Every thread waits for an interrupt that nothing can raise | [../hal/os/core.c](../hal/os/core.c) |
 | 73 | The watchdog: a frame took longer than `--watchdog` seconds of host time | [../app/main.c](../app/main.c) |
 | 74 | The game reset the console (`OS_ResetSystem`), which Frigate can't do in place yet | [../hal/os/os_terminate.c](../hal/os/os_terminate.c) |
-| a signal (`SIGABRT`, `SIGSEGV`, `SIGBUS`) | A check of the platform layer failed (`port: os: ...`, `port: fiber: ...`, `port: PXI: ...` and the like, then `abort()`), or a real crash (`port: crash: signal N at address ...`, with a backtrace) | the module named in the message; [../hal/trap.c](../hal/trap.c) reports crashes |
+| a signal (`SIGABRT`, `SIGSEGV`, `SIGBUS`); on Windows 3 or an exception's status | A check of the platform layer failed (`port: os: ...`, `port: fiber: ...`, `port: PXI: ...` and the like, then `abort()`, which exits with 3 on Windows), or a real crash (`port: crash: signal N at address ...`, on Windows `port: crash: exception 0xc0000005 at address ...` and the exception's status, with a backtrace) | the module named in the message; [../hal/trap.c](../hal/trap.c) reports crashes, through [../hal/host](../hal/host/host.h) |
 
 ## The rules at the boundaries
 

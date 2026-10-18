@@ -7,8 +7,8 @@
 
 Frigate is a native PC port of Pokémon Black 2 and Pokémon White 2, built from the
 [pokebw2](https://github.com/fuddlesworth/pokebw2) decompilation; you supply your own ROM. It targets macOS on Apple
-Silicon first, then Windows and Linux. It is in progress: it plays from power-on through the title screen and the
-start menu, and the overworld waits for the decomp.
+Silicon first, then Windows and Linux, which CI already builds and tests. It is in progress: it plays from power-on
+through the title screen and the start menu, and the overworld waits for the decomp.
 
 Frigate is a fan project, not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.
 
@@ -70,7 +70,8 @@ ROMs byte for byte (or sit behind a host-only switch).
 The decomp builds here exactly as upstream: see the [README](../README.md) and [build details](../docs/building.md).
 `python3 configure.py && ninja` rebuilds both ROMs from your own dumps and checks both SHA1s. Frigate builds with
 CMake, as [port/README.md](../port/README.md#quick-start) says: `frigate-black2` and `frigate-white2`, and on macOS
-`Frigate Black 2.app` and `Frigate White 2.app`, which you build yourself from your own checkout.
+`Frigate Black 2.app` and `Frigate White 2.app`, which you build yourself from your own checkout. On Windows it builds
+in MSYS2's CLANG64 environment ([Building on Windows](../port/README.md#building-on-windows)).
 
 ## For decomp contributors
 

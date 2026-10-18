@@ -24,8 +24,9 @@ the current state.
 
 ## Quick start
 
-Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux too. It needs CMake 3.28 or later,
-Ninja, clang, Python 3.11 or later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux and Windows too
+([Building on Windows](#building-on-windows)). It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or later and
+SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
 Running the game needs your own dump of the ROM. A clone needs the decomp's untracked inputs first:
 [Preparing a checkout](#preparing-a-checkout) has the steps, and places your dumps as `orig/baserom_b2_us.nds` and
 `orig/baserom_w2_us.nds`.
@@ -54,6 +55,35 @@ The host build compiles every C file of `src/` and `lib/` with the host's clang 
 [hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are trap
 stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the program
 stops with the name of the first one it reaches.
+
+### Building on Windows
+
+Windows builds in [MSYS2](https://www.msys2.org)'s CLANG64 environment: its clang, lld and compiler-rt over the UCRT,
+with its CMake, Ninja, SDL3 and Python, so that the build takes the same GCC-style flags as on macOS and Linux
+([ADR 0013](docs/adr/0013-windows-build-with-msys2-clang64.md)). CI builds it on GitHub's Windows runner and runs every
+test that needs no ROM (`port-ci.yml`); a game with your ROM hasn't been run on Windows yet. In the CLANG64 shell:
+
+```sh
+pacman -S --needed mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-cmake mingw-w64-clang-x86_64-ninja \
+    mingw-w64-clang-x86_64-sdl3 mingw-w64-clang-x86_64-python
+git -c core.autocrlf=false clone https://github.com/CallanCampos/pokebw2-native.git   # the files keep their "\n"
+cd pokebw2-native
+export PYTHONUTF8=1                                                      # the decomp's text is UTF-8
+cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build/port
+ctest --test-dir build/port --output-on-failure
+build/port/frigate-black2 --rom /c/Games/black2.nds                      # your dump, wherever it is
+```
+
+- **What differs:** saves are in `%APPDATA%\Frigate`, and a save file that is a symbolic link is replaced by the
+  game's next save rather than followed; the VRAM banks are copied between their views rather than mapped into them by
+  pages (the same pictures, more copying); the program loads MSYS2's `SDL3.dll`, so run it from the CLANG64 shell, or
+  with `C:\msys64\clang64\bin` on `PATH`.
+- **Symbolic links:** the configure links the decomp's `include/` into the build; a Windows account that may not make
+  links (neither an administrator nor in Developer Mode) gets copies instead, made again at each configure, and the
+  configure says so.
+- **The ROM build** (`configure.py` and `ninja`) doesn't run on Windows: the decomp's tools for it are macOS's and
+  Linux's. Nothing Frigate builds needs it, but the oracle's tests, which count the game's frames with its link map.
 
 ### The test launcher
 
