@@ -26,10 +26,36 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the H-blank interrupt when DISPSTAT shows the H-blank: the screen wipes that cover lines one by one
+
+- **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
+- **Port:** `PORT_SHA`, on the branch `port-launch`, after `f7aa43045`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2. Not pushed, so no CI run.
+- **Tests:** T0 as above. Black 2: all 241 `ctest` tests pass, the oracle's included (424 s), 1 new:
+  `os_hblank_flag_in_handler` (an H-blank handler reads DISPSTAT's H-blank flag set: 192 of 192 lines; 0 of 192 with
+  the interrupt at its old cycle, 1536). White 2: all 239 pass, the oracle's included (382 s), but
+  `oracle_continue_starter`, which skips (no starter save for White 2 yet). T4 unchanged: `oracle_opening`,
+  `oracle_title`, `oracle_continue`, `oracle_continue_starter` and `oracle_port_save` pass in Black 2, and the first
+  four's White 2 counterparts; the replays pass. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** unchanged, 624 function stubs and 48 data placeholders in each version.
+- **64-bit warnings:** unchanged: no game file changed.
+- **Work done:** the port's OS core took the H-blank interrupt 1536 cycles into a line and set DISPSTAT's H-blank flag
+  at 1606 (`port/hal/os/core.c`); its handlers take no time, so a handler read the flag clear. melonDS raises the
+  interrupt as it sets the flag (`GPU::StartHBlank`), and the screen wipes' H-blank function writes the window planes
+  only while `GX_IsHBlank()` (`src/system/wipe_sub.c`'s `WipeLineWnd_HBlank`), so the wipes that cover or uncover the
+  screens line by line were never drawn: the trainer card's opening went from black to the card at once, where the DS
+  reveals its top screen and then its bottom one 32 lines a pass. The interrupt is now taken at 1606, with the flag.
+  Found by Frigate's test launcher (the next commit, ADR 0012, proposed): with it, the card's opening on the port is
+  the oracle's pass for pass (14 passes of the two wipes, by their hashes).
+- **Next:** as in the last entry.
+- **Blockers:** as in the last entry.
+
 ## 2026-10-18: saves made from saves (the first Pokémon), and the start menu's Pokédex line against the oracle
 
 - **Upstream:** `045e97b90` (PR #364), merged by `5ad9a1e1d`; no sync, this task doesn't push.
-- **Port:** `PORT_SHA`, on the branch `port-launch`, after `014fe956c` (the trainer card's param from its header).
+- **Port:** `f7aa43045`, on the branch `port-launch`, after `014fe956c` (the trainer card's param from its header).
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), after each of the two commits. `014fe956c` changed
   `src/ov012/event_field_proclink.c`, complete in both versions, so the ROM build is its proof (a Neutral row in
   `game-changes.md`); this commit changes no game file.

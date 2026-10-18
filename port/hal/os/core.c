@@ -31,16 +31,19 @@
 #include <string.h>
 
 // The DS's display timing: 6 cycles a dot, 355 dots a line, 263 lines a frame. The VBlank begins at line 192 and the
-// HBlank interrupt of each line comes after its 256 visible dots; the V-count match at the start of its line.
-// DISPSTAT's VBlank flag is set from line 192 to 261, not in the last line, and the ARM9 sees its HBlank flag 1606
-// cycles into each line (GBATEK, "DS Video Stuff")
+// HBlank of each line after its 256 visible dots; the V-count match at the start of its line. DISPSTAT's VBlank flag
+// is set from line 192 to 261, not in the last line, and the ARM9 sees its HBlank flag 1606 cycles into each line
+// (GBATEK, "DS Video Stuff"). The HBlank interrupt is taken there too: melonDS raises it as it sets the flag
+// (GPU::StartHBlank), and the port's handlers take no time, so a handler taken at 1536 read the flag clear. The screen
+// wipes' H-blank function writes the window planes only while GX_IsHBlank() (src/system/wipe_sub.c's
+// WipeLineWnd_HBlank), so the wipes that cover lines one by one were never drawn
 #define CYCLES_PER_LINE PORT_OS_CYCLES_PER_LINE
 #define LINES_PER_FRAME PORT_OS_LINES_PER_FRAME
 #define CYCLES_PER_FRAME ((u64)PORT_OS_CYCLES_PER_FRAME)
 #define VBLANK_LINE PORT_OS_VISIBLE_LINES
 #define VBLANK_FLAG_END_LINE 262
-#define HBLANK_CYCLE 1536
 #define HBLANK_FLAG_CYCLE 1606
+#define HBLANK_CYCLE HBLANK_FLAG_CYCLE
 // DISPSTAT's V-count flag, which the SDK doesn't name, and its V-count setting: bits 8-15 are the line's low 8 bits,
 // bit 7 its ninth
 #define DISPSTAT_LYC_FLAG 0x0004

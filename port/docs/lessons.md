@@ -3,6 +3,16 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: the H-blank interrupt and its flag
+
+- **An interrupt handler that takes no time sees the hardware as it was when the interrupt came.** The port raised
+  the H-blank interrupt 70 cycles before DISPSTAT's H-blank flag, where melonDS sets both at once. The game's line
+  wipe checks `GX_IsHBlank()` before each window write, so on the port it never wrote one, quietly: the screens went
+  from black to the picture. A flag and the interrupt it describes belong at the same moment on a host, whose handlers
+  run in no time.
+- **A missing transition shows only frame by frame.** The trainer card's screens were right before and after its
+  opening; only comparing every pass of the opening with the oracle's showed the wipe missing.
+
 ## 2026-10-18: the card's infrared chip
 
 - **A register accessor can't tell a load from a store.** `port_hw_*` returns the memory the access uses before the
