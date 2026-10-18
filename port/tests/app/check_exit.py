@@ -3,12 +3,14 @@
 ctest's PASS_REGULAR_EXPRESSION ignores a test's status, so the program's option checks and Frigate's test launcher's
 statuses (port/app/launcher.h, ADR 0012) go through this instead (port/cmake/integrate.cmake).
 
-    check_exit.py --status N [--expect REGEX]... [--reject REGEX]... [--skip-status M]... [--fresh-save-dir]
+    check_exit.py (--status N | --crash) [--expect REGEX]... [--reject REGEX]... [--skip-status M]... [--fresh-save-dir]
                   -- PROGRAM ARG...
 
---fresh-save-dir gives the program a save directory of its own, a new temporary one, removed after. Exits 0 when the
-program ended with status N, its messages (stderr, then stdout) match every --expect and no --reject; 77 (skipped)
-when it ended with a --skip-status (66: no ROM); 1 otherwise. Standard library only.
+--fresh-save-dir gives the program a save directory of its own, a new temporary one, removed after. --crash wants the
+program to end by a crash, as each host ends a crashed program: killed by a signal on macOS and Linux, with an
+exception's status (0xc0000000 and up) on Windows (port/hal/host). Exits 0 when the program ended with status N (or
+crashed), its messages (stderr, then stdout) match every --expect and no --reject; 77 (skipped) when it ended with a
+--skip-status (66: no ROM); 1 otherwise. Standard library only.
 """
 
 from __future__ import annotations
@@ -25,7 +27,9 @@ SKIP = 77
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--status", type=int, required=True, help="the exit status the program must end with")
+    ending = parser.add_mutually_exclusive_group(required=True)
+    ending.add_argument("--status", type=int, help="the exit status the program must end with")
+    ending.add_argument("--crash", action="store_true", help="the program must end by a crash")
     parser.add_argument("--expect", action="append", default=[], help="a pattern its messages must have")
     parser.add_argument("--reject", action="append", default=[], help="a pattern its messages mustn't have")
     parser.add_argument("--skip-status", type=int, action="append", default=[], help="a status that skips the test")
@@ -45,7 +49,9 @@ def main() -> int:
         print(f"check_exit.py: skipped: the program ended with status {done.returncode}")
         return SKIP
     failures = []
-    if done.returncode != args.status:
+    if args.crash and not (done.returncode < 0 or done.returncode >= 0xC0000000):
+        failures.append(f"the program ended with status {done.returncode}, not by a crash")
+    if not args.crash and done.returncode != args.status:
         failures.append(f"the program ended with status {done.returncode}, not {args.status}")
     failures += [f"no message matches {pattern}" for pattern in args.expect if not re.search(pattern, output)]
     failures += [f"a message matches {pattern}" for pattern in args.reject if re.search(pattern, output)]
