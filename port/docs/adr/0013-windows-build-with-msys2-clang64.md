@@ -92,7 +92,10 @@ clang-cl or mingw-clang. A probe of 2026-10-18 (Homebrew clang 23 for `x86_64-w6
   reach, so `backup.c`'s `atexit` was a trap stub there); it lists the ROM's symbols each host's C library provides, so
   that a host function that shares a game function's name would show, never stubs a function of standard C, and takes
   the stubs' page alignment from `host.h`. `-fno-builtin-wcslen` keeps clang from turning the decomp's u16 loops into
-  calls of a `wcslen` whose `wchar_t` is 32-bit on macOS and Linux.
+  calls of a `wcslen` whose `wchar_t` is 32-bit on macOS and Linux. A fiber's first frame has a return address of 0,
+  where minicoro's dummy one made glibc's `backtrace()` fault on x86-64 Linux, so that the report of a trap or crash on
+  a fiber has its backtrace there too; the include mirror's links have Windows' separator, which MSYS2's Python
+  doesn't give them, and become copies when a probe link isn't followed.
   The overlays' COFF bss markers are placed by `#pragma clang section`, and `integrate_overlay_sections` checks on
   every host, with a probe file compiled as an overlay's, that the sections hold a file's statics and that a load sets
   them back. The run directory's files are binary, the artwork's generator writes `"\n"`, and the tests' temporary

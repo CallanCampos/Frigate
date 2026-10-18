@@ -21,6 +21,13 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   compiler driver links, linker scripts included, and never stub a function of standard C.
 - **SDL's arguments are UTF-8 on Windows, the C library's names are the code page's.** A manifest that makes UTF-8
   the process's code page is the one switch that makes `fopen`, `_mkdir`, `getenv`, the `*A` calls and SDL agree.
+- **A fiber's first frame needs a return address of 0.** libgcc's unwinder (glibc's `backtrace()`) reads the code at a
+  return address it has no unwind table for, looking for a signal's trampoline; minicoro's dummy
+  `0xdeaddeaddeaddead` made every backtrace on a fiber fault on x86-64 Linux, so a trap's report from the game died
+  of SIGSEGV. macOS's frame-pointer walk never showed it: run a new crash path's test on every host's CI.
+- **MSYS2's Python writes paths with "/" in its shells.** A symbolic link whose relative target has one isn't followed
+  on Windows; give a link the system's separator, and check that a probe link resolves before trusting links. CI ran a
+  CPython from `setup-python` until the job followed the README, which is how this showed.
 
 ## 2026-10-18: Windows in CI
 

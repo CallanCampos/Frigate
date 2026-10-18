@@ -26,10 +26,81 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Windows in CI after review: crash reports on fibers and through the C library, UTF-8 names, atexit
+
+- **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-windows` (origin's `main` still at `2da26e048`): `d173080f3` (the seam and
+  its tests), `f6689ec6b` (the build: the stubs' lookup, `wcslen`, the manifest, the include copies), `176c67e70` (the
+  Windows save's commit), `d19c6dcd5` (the Windows job and the documents), `29858a3a9` (a fiber's backtrace on Linux,
+  the include links under MSYS2's Python), `29bb942da` (a test of a 0-second watchdog), then this entry; pushed to
+  `port-windows` only, not merged into `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `4785b3ad8`
+  before the work and at `29858a3a9` and `29bb942da`. No game file changed: outside `port/`, only Frigate's own
+  `port-ci.yml`.
+- **Host build:**
+  - arm64 macOS, RelWithDebInfo, Black 2 (the worktree's `build/port`, Ninja): every decomp file again, since
+    `-fno-builtin-wcslen` joined the decomp's flags; no warning in `port/`.
+  - CI, `port-ci.yml` dispatched on `port-windows`: run 39158430166 (`d19c6dcd5`) had macOS green, Windows red (every
+    decomp file's "types.h not found": the include mirror's links, made by MSYS2's Python with "/" in their targets) and
+    Linux red (the three new fiber tests: glibc's backtrace faulted on minicoro's dummy return address); run 39159078044
+    (`29858a3a9`) and 39160792215 (`29bb942da`) are green on all three. The Windows job now builds as the README says,
+    with MSYS2's Python 3.14.7 and SDL3 3.4.16 (unpinned), clang 22.1.8; 262 warnings in the decomp, none in `port/`.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 on macOS, Black 2, `ctest -j4` with the oracle in `build/port/oracle`, at `29858a3a9`: all 280 pass
+    (968 s, none skipped; `asm_oracle` in 448 s, `oracle_saves` reusing the saves of an earlier run). After each step
+    before it, the host, OS guard, backup, launcher, run directory and symbol tests passed on their own, and at
+    `29bb942da` those 46 tests with the GX backends', the overlay sections' and the PXI bus's, `host_watchdog_off` among
+    them.
+  - CI, run 39160792215: Windows 209 pass and 57 skip of 266 (the same skips as before); Linux 219 pass and 47 skip of
+    266; macOS 236 pass and 45 skip of 281. Each host has six new tests: `host_trap_placeholder_fiber`,
+    `host_crash_report_fiber`, `host_guard_fiber`, `host_illegal_instruction_fiber`, `host_watchdog_off` and
+    `host_utf8_argument`, and `host_files` checks a folder whose name isn't ASCII.
+  - On Windows nothing with a ROM has run yet (not yet); T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 512 function stubs and 46 data placeholders on all three hosts: Linux's 513th, `atexit`, which
+  `backup.c` calls at every run's card initialization, is gone (glibc's `libc_nonshared.a`, read through the compiler
+  driver). The host's C library provides 30 of the ROM's symbols on macOS, 31 on Linux, 32 on Windows: `wcslen` is no
+  longer among them, since nothing calls it now.
+- **64-bit warnings:** not measured: no game or `lib/` code changed (`-fno-builtin-wcslen` changes code, not warnings).
+- **Work done:** the two reviews of the Windows work, finding by finding.
+  - **Crash reports on Windows**: the vectored handler, installed before `main()`, takes a memory fault at any address
+    the seam made inaccessible, whatever code touched it (the C library's `memset` on a trap placeholder ended the
+    process unreported), and every fatal exception on a fiber, where the system never reaches the unhandled-exception
+    filter; non-memory exceptions are reported as crashes, and a second fault ends the program with its own status.
+    `check_exit.py --crash` counts every status from 0x80000000 (a guard page's 0x80000001).
+  - **The seam's contract**: `port_host_unmap_file_copy` (Windows' views were never released, and their files never
+    removed); a 0-second watchdog is off on Windows as on POSIX (`host_watchdog_off`); `port_host_write_error`, so that
+    `test_os.c`'s fault handler writes as before the seam, async-signal-safe; host.h says what each half does. The
+    one-line forwarders are gone, `port/app/symbols.c` with them.
+  - **Linux**: `gen_stubs.py` reads what the compiler driver links, linker scripts' archives included, besides `ctypes`,
+    and never stubs a function of standard C, so `atexit` is glibc's again; a fiber's first frame has a return address
+    of 0, so a backtrace on a fiber (every trap's report from the game) no longer faults.
+  - **All hosts**: `-fno-builtin-wcslen` keeps two u16 loops (`MBGameInfo_CountChars`, `Gt2_WStrLen`) from becoming
+    calls of a 32-bit `wcslen` on macOS and Linux, and `gen_stubs.py` warns of any wide-character call; the stubs take
+    their page alignment from `host.h`; `_GNU_SOURCE` comes from one place per build path.
+  - **Windows**: every program carries a manifest that makes UTF-8 its code page (SDL's arguments are UTF-8, the C
+    library's names were the ANSI code page's); the save is committed to the disk before its rename; the include
+    mirror's copies are brought up to date by a configure that any header's change starts; CMake prefers the Python on
+    PATH; the CI job uses MSYS2's own Python and shows the SDL3 package it got.
+  - **Documents**: the README's Windows build (git, `git clone -c core.autocrlf=false`, `CC=clang`, the skips, no
+    Preparing a checkout); the seam's real boundary in hal/README.md, host.h, the glossary and ADR 0013, with each
+    module that keeps a host branch and why; ADR 0013 corrected (SDL3 3.4.16, unpinned) and citing ADR 0005, which gets
+    a note; PLAN.md calls CLANG64 proposed; the feature map and the directory map; lessons.md. The last entry's facts
+    are corrected (SDL3 3.4.16; the POSIX code moved with the same calls, not unchanged).
+- **Next:** the user's acceptance of ADR 0013. Windows' stage 4: a run of the game with a ROM on a Windows machine,
+  sanitizer builds on CLANG64, a build without a console with its log under `%LOCALAPPDATA%\Frigate`, a package, the
+  memory-mapped ROM, ARM64 and VRAM aliasing on Windows. A backtrace on a fiber on Linux arm64, where minicoro keeps the
+  dummy return address in its context rather than on the stack, is untried. actionlint wasn't run on the workflow (not
+  installed here). As in the last entry: White 2's starter route; the apps no route reaches yet; a save with an
+  adventure made by the port, once overlay 36 lets it into the field; a sound comparison sequence played on the game's
+  count.
+- **Blockers:** as in the last entry: overlay 36 (issue #83, another contributor's active claim) gates phase 3 and the
+  launcher's retirement; `NNSi_objSizeWTbl` stops the Pokédex; overlays 11 and 182 only matter from phase 7.
+
 ## 2026-10-18: Windows in CI: Frigate builds with MSYS2's CLANG64 and passes every test that needs no ROM
 
 - **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-windows` from `2da26e048` (origin's `main` had not moved at the end):
+- **Port:** `4785b3ad8`, on the branch `port-windows` from `2da26e048` (origin's `main` had not moved at the end):
   `797c55628` and `f3fde9b43` (the Windows job), `6d913cb93` (the host seam and Windows' half), `14ffc553d` and
   `cd3932d32` (the tests' POSIX expectations), `24bd4a18e` (the host tests), `d5b9aa990` (the documents and ADR 0013),
   then this entry; pushed to `port-windows` only, not merged into `main`.
@@ -40,7 +111,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
   - arm64 macOS, RelWithDebInfo, Black 2 (the worktree's `build/port`, Ninja): from scratch at `797c55628`, then at
     `d5b9aa990` (the port's changed files, with no warning; the decomp's C didn't change, so its warnings stand).
   - CI, `port-ci.yml` dispatched on `port-windows`: macOS 26 and Ubuntu 26.04 as before, and the new Windows job on
-    `windows-2025` with MSYS2's CLANG64 (clang 22.1.8, lld, the UCRT, CMake 4.4.3, Ninja, SDL3 3.4.18, Python 3.12 from
+    `windows-2025` with MSYS2's CLANG64 (clang 22.1.8, lld, the UCRT, CMake 4.4.3, Ninja, SDL3 3.4.16, Python 3.12 from
     `actions/setup-python`): all three green on runs 39148942447 (`cd3932d32`), 39149612934 (`24bd4a18e`) and
     39150122118 (`d5b9aa990`). The Windows build compiles the decomp's 1,473 C files with 262 warnings, of the kinds
     macOS's has (`-Wswitch`, `-Wpointer-sign`, library redeclarations), none in `port/`; a run takes 3 to 5 minutes.
@@ -73,12 +144,14 @@ level that doesn't exist yet says "not yet"; no field is left out.
     kept, `PYTHONUTF8`, and a build with `-k 0`.
   - **The host seam, `port/hal/host`**: what differs between the hosts, one file a host. `host_posix.c` holds the POSIX
     code that `trap.c`, `fiber.c`, `pointer.c`, `os_terminate.c`, `main.c`'s watchdog, `run_dir.c` and `symbols.c` had,
-    moved unchanged; `host_windows.c` is Windows': `VirtualAlloc` and `VirtualProtect`; a vectored handler that moves a
-    fault's report to a stack of its own (with the TEB's bounds), and the unhandled-exception filter for the rest; a
-    fiber's guard topped by one guard page over 12 KiB left writable for the system's exception frame; backtraces by
-    `RtlVirtualUnwind`; names and globals from the COFF symbol table lld keeps; a watchdog thread; the PE image's
-    writable sections; binary stdio and no error dialogs before `main()`. The tests' harnesses (OS, PXI, sound, backup,
-    ROM, integration) use it for their hang reports, faults, temporary files, links and environment.
+    moved with the same calls (a backtrace shows one more frame, one message is worded differently, the run directory's
+    files open in binary mode, and `test_os.c`'s fault handler used stdio, which the next entry undoes);
+    `host_windows.c` is Windows': `VirtualAlloc` and `VirtualProtect`; a vectored handler that moves a fault's report to
+    a stack of its own (with the TEB's bounds), and the unhandled-exception filter for the rest; a fiber's guard topped
+    by one guard page over 12 KiB left writable for the system's exception frame; backtraces by `RtlVirtualUnwind`;
+    names and globals from the COFF symbol table lld keeps; a watchdog thread; the PE image's writable sections; binary
+    stdio and no error dialogs before `main()`. The tests' harnesses (OS, PXI, sound, backup, ROM, integration) use it
+    for their hang reports, faults, temporary files, links and environment.
   - **Windows' fixes**: the memory windows align to 4 KiB there (`PORT_HOST_PAGE_ALIGNMENT`; COFF stops at 8 KiB);
     `gen_stubs.py` reads its 1,582 objects from a list file on every host and, on Windows, asks the compiler driver's
     libraries what the C library provides, read with the toolchain's `nm`; the overlays' COFF bss markers are placed by
