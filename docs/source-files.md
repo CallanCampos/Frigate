@@ -556,8 +556,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_particle.c` | `0x021bb590`–`0x021bb67c` | 8 | complete | string at `0x021d5420` |
 | `fld3d_ci.c` | `0x021bb67c`–`0x021bd2ac` | 54 | partial | string at `0x021d5430` |
 | `sodateya.c` | `0x021bd2ac`–`0x021be790` | 65 | partial | string at `0x021d54a4` |
-| `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | partial | string at `0x021d54b4` |
-| `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | partial | string at `0x021d54c4` |
+| `fldeff_ripple.c` | `0x021be790`–`0x021be988` | 9 | complete | string at `0x021d54b4` |
+| `fldeff_splash.c` | `0x021be988`–`0x021beb70` | 9 | complete | string at `0x021d54c4` |
 | `sound_obj.c` | `0x021beb70`–`0x021bedd8` | 9 | complete | string at `0x021d54d4` |
 | `shortcut_menu.c` | `0x021bedd8`–`0x021bf914` | 24 | partial | string at `0x021d54e0` |
 | `event_name_entry.c` | `0x021bf914`–`0x021bfe88` | 8 | partial | descriptive |
@@ -578,8 +578,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
 | `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
 | `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | partial | string at `0x021d5648` |
-| `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | partial | string at `0x021d5654` |
-| `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | partial | string at `0x021d5664` |
+| `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | complete | string at `0x021d5654` |
+| `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | complete | string at `0x021d5664` |
 | `fldeff_bubble.c` | `0x021c6934`–`0x021c6cc8` | 15 | complete | string at `0x021d56b0` |
 | `field_saveanime.c` | `0x021c6cc8`–`0x021c7028` | 12 | complete | string at `0x021d56c0` |
 | `field_map_chunk_height.c` | `0x021c7028`–`0x021c71d4` | 1 | complete | descriptive |
@@ -591,7 +591,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_goout_effect_data.c` | `0x021c8808`–`0x021c8954` | 9 | complete | string at `0x021d5728` |
 | `resort_mapcreate.c` | `0x021c8954`–`0x021c8c34` | 6 | partial | string at `0x021d5744` |
 | `scrcmd_hidden_hollow.c` | `0x021c8c34`–`0x021c944c` | 19 | partial | descriptive |
-| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | partial | string at `0x021d5758` |
+| `fldeff_ochiba.c` | `0x021c944c`–`0x021c97b8` | 12 | complete | string at `0x021d5758` |
 | `scrcmd_ochiba.c` | `0x021c97b8`–`0x021c9eb8` | 22 | complete | string at `0x021d5768` |
 
 ### Overlay 50

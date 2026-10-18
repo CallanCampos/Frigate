@@ -293,6 +293,8 @@ typedef struct Field Field;
 typedef struct Field3DBg Field3DBg;
 typedef struct FieldAcmdTCB FieldAcmdTCB;
 typedef struct FieldActor FieldActor;
+typedef struct FieldEffects FieldEffects;
+typedef struct FieldEffectTask FieldEffectTask;
 typedef struct FieldActorAnmProc FieldActorAnmProc;
 typedef struct FieldAppCallInput FieldAppCallInput;
 typedef struct FieldAppCallParam FieldAppCallParam;
