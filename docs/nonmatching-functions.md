@@ -506,6 +506,12 @@ in both versions.
   keeps the `0x021cf3a8` `section_end`/`section_start` lines and replays the fixes in address order. The file stays
   incomplete until the boundary can be recorded.
 
+- `lib/dwc/src/qr2/qr2regkeys.c` (overlay 11) matches both its functions in both versions, but its `.data` doesn't: MWCC
+  lays out the key names with a heap sort by size of the reverse of their definitions, and among the strings of
+  7 bytes the ROM's order (`score_`, `team_t`, `skill_`, `region`) is one that the sort gives only with one more
+  initialized object of up to 4 bytes defined after the names, which the ROM's `.data` and `.bss` don't have room for:
+  most likely the later SDK's `qr2_internal_key_list`, whose code the linker stripped. The file stays incomplete.
+
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file

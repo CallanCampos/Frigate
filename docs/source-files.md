@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-1161 of 1688 functions are in source files.
+1163 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -164,6 +164,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
 | `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
 | `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | partial | descriptive |
+| `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
 
 ### Overlay 12
 
