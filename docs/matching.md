@@ -741,8 +741,8 @@ Same code, other `sp` offsets or frame size.
 - A `u64` written to a 64-bit hardware register in one store (`reg_CP_DIV_NUMER = sum;`, `nitro/cp.h`'s
   `volatile u64`) and the same value written as two 32-bit halves (`(u32)sum`, then `(u32)(sum >> 32)`) keep its low
   and high words in each other's registers. libVCT's `VCT_FilterFrame` (`vct_dsp.c`) builds its sum of squares in
-  `ip` and `lr`, low and high, as the original does, only with the one store; its denominator stays two 32-bit stores
-  of `count` and 0, since a 64-bit `= count` moves `count` and `minusInput` to other registers.
+  `ip` and `lr`, low and high, as the original does, only with the one store, which NitroSDK's `CP_SetDiv64_32`
+  (`nitro/cp.h`) makes for the numerator and the denominator.
 - A test of a field right after a store into it reuses the stored register only when the source tests the field
   written to: `tr_tool.c`'s `TrainerUtil_LoadTrainer` tests `trainer->trainerClass` after storing `data->trainerClass`
   there, not `data->trainerClass`.
@@ -2310,10 +2310,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   into a tail that ends with the store. `CtvtCamera_Draw` sets its BG3 scale with `mtx._00 = FX_Inv(FX32_ONE * 2);
   mtx._11 = FX_Inv(FX32_ONE * 2);` and the same with `FX32_ONE` in the arms of `if (work->zoomed == TRUE)`, and the
   zeros after the join; a `scale` local set in the arms puts the calls in the join's block, above which the zero moves.
-  A literal-pool load goes above a plain store the same way, even with `volatile` stores after both: ARM's list
-  scheduler ranks the load by its latency plus the chain after it, one more than the store, which goes first only
-  with a memory successor of its own. `VCT_FilterFrame` (`vct_dsp.c`) loads the divider's base above its last
-  sample's `strh` in every spelling found, where the original stores first.
+  A literal-pool load goes above a plain store the same way when `volatile` stores follow both: ARM's list scheduler
+  ranks the load by its latency plus the chain of `volatile` accesses after it, one more than the store, which goes
+  first only with a memory successor of its own. `VCT_FilterFrame` (`vct_dsp.c`) stores its last sample before
+  loading the divider's base, as the original does, only through NitroSDK's `CP_SetDiv64_32` and
+  `CP_GetDivResult32` (`nitro/cp.h`), which write the operands and read the result through plain pointers to the
+  registers' addresses; with the `volatile` `reg_CP_*` registers the base's load goes first in every spelling.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -2448,6 +2450,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   guard before its first pass and its test at the end was probably a guarded `do`/`while`: `IrcLink_Checksum` matches
   as `if (i < size) { do { ... } while (++i < size); }` with `i = 0`, whose unsigned `0 < size` gives the original's
   `cmp r1, #0; bls`. `if (size != 0)` gives `beq`, and a `for` inside `if (size > 0)` keeps its own `b` to the test.
+- At `-O4,p`, where a `for` loop is rotated into the same shape, a guard whose branch also skips statements after the
+  loop is a guarded `do`/`while` with those statements inside the `if`. libVCT's `VCT_FilterFrame` (`vct_dsp.c`)
+  saves its filter's state after the loop only when the loop ran, its `bls` past both stores, and matches as
+  `i = 1; if (i < bytes) { do { ... } while (++i < bytes); sEcho.highpassMinusInput = minusInput; ... }`. A `for`
+  followed by the stores puts them after the `bls` target, and a `for` inside `if (bytes > 1)` tests twice.
 - A loop that runs once is unrolled when its counter and bound have the same signedness. `int i; i < NELEMS(x)`
   compares unsigned, so the loop stays, as in the gym files' loops over one-element tables.
 - An address that an inner loop computes from the outer loop's counter, such as `&pieces->pieces[row][col]`, is hoisted

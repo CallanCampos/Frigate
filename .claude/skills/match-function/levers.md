@@ -313,7 +313,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `#pragma scheduling off`: a block boundary. Write the calls with constants in each arm of the `if`/`else` before it,
   not through a local set in the arms. (matching.md: "Within one block MWCC builds a constant")
 - A literal-pool load (an I/O base) that ours places above a store the original makes first: a block boundary, as
-  above; no spelling inside one block moves it. (matching.md: "A literal-pool load goes above a plain store")
+  above, or `volatile` register stores after both where the original's are plain, as NitroSDK's divider inlines
+  (`CP_SetDiv64_32`) write them. (matching.md: "A literal-pool load goes above a plain store")
 - `b + 3a` where the original adds `3a` first: read `a` in a statement of its own and `b` at its use, or `a *= 3;` for
   two branch-assigned locals. (matching.md: "A weighted sum")
 - Arithmetic the original does before a call that ours does after it: assign the result back into the same variable
@@ -676,6 +677,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
 - At `-O2,p` (`lib/irc`) loops are not rotated; a guard before the first pass and the test at the end is a guarded
   `do`/`while`, `if (i < size) do ... while (++i < size)`. (matching.md: "At `-O2,p` no loop is rotated")
+- At `-O4,p`, a loop guard whose branch also skips statements after the loop: a guarded `do`/`while` with those
+  statements inside the `if`; a `for` inside an `if` tests twice. (matching.md: "where a `for` loop is rotated")
 - A loop that runs once is unrolled when its counter and bound have the same signedness; `int i < NELEMS(x)` compares
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
