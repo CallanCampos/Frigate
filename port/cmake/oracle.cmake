@@ -37,6 +37,13 @@ add_test(NAME oracle_compare
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(oracle_compare PROPERTIES TIMEOUT 300)
 
+# sound.py, the sound comparison, on made-up sound traces and WAV dumps
+add_test(NAME oracle_sound_tool
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_tests}/test_sound.py"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_sound_tool PROPERTIES TIMEOUT 300)
+
 if(PORT_BUILD_ORACLE)
     include("${port_oracle_dir}/melonds.cmake")
     include(FetchContent)
@@ -105,4 +112,30 @@ foreach(sequence IN ITEMS opening title)
                 --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
         WORKING_DIRECTORY "${REPO_ROOT}")
     set_tests_properties(oracle_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
+endforeach()
+
+# The same sequences' sound (port/tools/oracle/README.md, "Sound"), held to the oracle in two ways too:
+# - oracle_sound_<name>_hashes, every build: the port alone, with its sound trace and WAV dump, against
+#   port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics: the sound driver's state at every
+#   periodic run of each play the comparison pairs, by the sequence's own clock; what the ARM9 sees of the driver as
+#   the frames end where the game counts passes; and by segment the sound's envelope, levels and samples at full
+#   scale, and a stream's and a cry's samples to the bit. Skipped (77) without the ROM; only for a version that has a
+#   reference
+# - oracle_sound_<name>, with the oracle built: both programs, compared the same way. Skipped (77) without the oracle
+#   or the ROM
+foreach(sequence IN ITEMS opening title)
+    if(EXISTS "${port_oracle_tests}/sound_${sequence}_${PORT_VERSION}.tsv")
+        add_test(NAME oracle_sound_${sequence}_hashes
+            COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+                "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" sound-check ${sequence}
+                    --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+            WORKING_DIRECTORY "${REPO_ROOT}")
+        set_tests_properties(oracle_sound_${sequence}_hashes PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)
+    endif()
+    add_test(NAME oracle_sound_${sequence}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+            "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" sound ${sequence}
+                --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+        WORKING_DIRECTORY "${REPO_ROOT}")
+    set_tests_properties(oracle_sound_${sequence} PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
 endforeach()

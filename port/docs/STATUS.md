@@ -26,10 +26,66 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: the sound against the oracle
+
+- **Upstream:** `aae2a03f6` (merge of PR #361), as merged into the port's `main` by `f5f498a89`.
+- **Port:** `PORT_SHA`, on the branch `port-sound-oracle` from `4a0fa7d89` (not yet merged or pushed).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `ninja` has no work after the commits. Nothing
+  outside `port/` changed, so no game-changes row and no `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, RelWithDebInfo, Black 2 and White 2; the oracle (`port/tools/oracle`, melonDS 1.1)
+  Release. Not pushed, so no CI run (Linux unbuilt).
+- **Tests:** T0 as above. T2: Black 2, 232 of 232 `ctest` tests pass; White 2, 230 of 230 (the oracle built from
+  this branch and put in each build's `oracle/`, so no oracle test skips). New: `oracle_sound_tool` (24 tests of
+  `sound.py` on made-up traces and dumps), `os_timed_work`, `snd_fifo`, `snd_pxi_alarm_timing` (each alarm's handler
+  at its cycle; without the fix every one comes at the VBlank), `snd_trace_layout`; `oracle_boot` now also holds the
+  oracle's WAV dump and sound trace to determinism and their timing. T4: `oracle_sound_opening` and
+  `oracle_sound_title` in both versions (below), and their port-only checks `oracle_sound_<name>_hashes` (9,639 and
+  1,957 runs, 75 and 354 frames of status, 3 segments each, 1 and 2 of them to the bit); the screen sequences
+  `oracle_opening` and `oracle_title` still pass in both versions. T3: `replay_start_menu` and `replay_new_game` pass
+  (among the 232). T5, T6, T7 not yet; no sanitized run on this branch.
+- **Tiers** (`port/tools/progress`, upstream `aae2a03f6`): (a) 32,254 functions, 2,892,792 code bytes (75.1%); (b)
+  5,172, 609,116 bytes; (c) 3,592, 348,336 bytes (9.0%). Since the last entry (`615939e25`): (a) +23 functions and
+  10,838 bytes, from (b); (c) unchanged. Upstream's matching, merged by `f5f498a89`; this branch changes no decomp C.
+- **Trap stubs:** 624 function stubs and 56 data placeholders in both versions (`gen_stubs`, each build above), from
+  574 and 63 at `615939e25`: upstream's C since then (overlay 12's data among it) references more functions it doesn't
+  define yet. Neither sequence reaches one.
+- **64-bit warnings:** not measured again: this branch changes no game or `lib/` code (the last measurement, at
+  `615939e25`, stands for the decomp's side).
+- **Work done:** T4 for the sound (ADR 0006's "Revisit the output's 16-bit scaling against the oracle"),
+  [port/tools/oracle/README.md, "Sound"](../tools/oracle/README.md#sound).
+  - The oracle writes melonDS's mixed output sample by sample (`--audio-dump`, before melonDS resamples it) and the
+    ARM7 sound driver's state after each run of its thread (`--sound-trace`, `sndtrace.h`: the driver's work in the
+    DS's layout, read from the ARM7's WRAM once its thread waits again); the port writes the same trace
+    (`--sound-trace`, `port/app/sound_trace.c`, `port_snd7_trace_record`). `sound.py` compares them: each play of
+    each player by the sequence's own clock (the periodic runs since its start), field by field; what the ARM9 sees
+    of the driver as each frame ends where the game counts passes; and the sound by segment (envelope correlation,
+    RMS, peak, samples at full scale; streams and cries to the bit). `oracle.py sound` and `sound-check`, ctest
+    `oracle_sound_<name>` and `oracle_sound_<name>_hashes`, with references for both sequences in both versions.
+  - Results: every run paired is equal, field by field (opening: 9,639 runs and 6,279,801 fields in each version;
+    title: 1,957 and 636,043 before START's press); every frame on the count but the declared ones is equal or a run
+    apart (opening: 579 of 579 equal; title: 2,791 equal and 1 a run apart of 2,792 in Black 2, 2,789 and 2 of 2,791
+    in White 2, the DS's long loading passes and Kyurem's cry left out); the title's stream and the cry are melonDS's
+    to the bit (2,170,736 and 117,070 samples), the sequences' music within its envelope (correlation 0.989, RMS
+    within 0.05%), its notes starting in the same mixer sample as on the DS or up to 4 later (the DS's ARM7 writes
+    its registers some way into a run).
+  - Fixes from the comparison: the sound alarms are the OS core's timed work (`port_os_set_timed_work`, new), so
+    their words reach the ARM9 when they go off; lazily at the VBlank, two or three came together and NitroSystem's
+    stream player dropped a block every 7 frames or so, playing silence and falling 27 frames behind the DS's music
+    in 420. The sound unit has melonDS's start delays (3 timer steps for PCM, 11 for IMA-ADPCM, 1 for a square wave
+    or noise), its 8-word FIFO, the channel's step before the mixer's sample, GBATEK's mixer widths and 127 counting
+    as 128; and the lock words' addresses in `snd7_exchannel.c`'s comment are the right way round.
+  - The clipping in the opening's music is the game's: melonDS clips it in the same seconds, as often (Black 2:
+    2,277 samples at full scale on the oracle, 2,271 on the port, at most 440 and 421 a second; White 2: 2,301 and
+    2,271), on the same scale (the DS's 10 bits times 64). The port had 2,007 before 127 counted as 128.
+- **Next:** as the last entry (overlay 12's field script data, upstream). For the sound: a comparison sequence that
+  plays sound effects and a cry through the field once phase 3 reaches it.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-17: gamepads, and the macOS app in a disk image
 
 - **Upstream:** `615939e25`, as merged into the port's `main` by `e1b68f578`.
-- **Port:** `PORT_SHA`, on the branch `port-controller-pkg` from `f52dad0b2` (not yet merged or pushed): the work in
+- **Port:** `3ad982e8c`, on the branch `port-controller-pkg` from `f52dad0b2` (not yet merged or pushed): the work in
   `78758202d` and `c424bf45c`, and the fixes from two reviews of it in `01240f928` and `31814aaf2`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`); `ninja` has no work after the commits. Nothing
   outside `port/` changed but `.github/workflows/port-ci.yml`, a port file, so no game-changes row and no

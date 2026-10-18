@@ -8,6 +8,8 @@
     oracle.py boot --out DIR [--port BIN] [--frames LIST] [--version b2_us]
     oracle.py sequence NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
     oracle.py sequence-check NAME --port BIN [--work DIR] [--version b2_us]
+    oracle.py sound NAME --port BIN [--out DIR] [--update] [--oracle BIN] [--version b2_us]
+    oracle.py sound-check NAME --port BIN [--work DIR] [--version b2_us]
     oracle.py check --oracle BIN [--version b2_us] [--work DIR] [--update]
 
 run calls pbw-oracle with the repository's defaults: the version's ROM in orig/, its symbols from config/, the
@@ -22,10 +24,14 @@ sequence does both on a comparison sequence's input file, port/tests/oracle/<nam
 opening, power-on to the title with nothing pressed; title, the opening skipped to the title and START to the start
 menu), and compares every frame the same way but the known differences; with --update it writes
 port/tests/oracle/<name>_<version>.tsv, the oracle's hashes at sampled frames. sequence-check runs the port alone on
-that input file and checks its counts and its screens without 3D against that reference. check is the oracle's ctest
-test: the oracle runs the boot sequence twice with the same results, and its screens match the hashes in
-port/tests/oracle/boot_<version>.tsv. sequence and check exit 77 without the oracle or the ROM, sequence-check without
-the ROM.
+that input file and checks its counts and its screens without 3D against that reference. sound runs both programs
+on a sequence with their sound traces and WAV dumps (--sound-trace, --audio-dump) and compares the sound driver's state
+run by run, what the ARM9 sees of it frame by frame, and the sound by segment (sound.py, SOUND); with --update it
+writes port/tests/oracle/sound_<name>_<version>.tsv, the oracle's hashes and statistics. sound-check runs the port
+alone and checks it against that reference. check is the oracle's ctest test: the oracle runs the boot sequence twice
+with the same results (its screens, sound trace and WAV dump), and its screens match the hashes in
+port/tests/oracle/boot_<version>.tsv. sequence, sound and check exit 77 without the oracle or the ROM, sequence-check
+and sound-check without the ROM.
 
 Standard library only.
 """
@@ -45,6 +51,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import compare  # noqa: E402
+import sound  # noqa: E402
 import symbols  # noqa: E402
 
 REPO_ROOT = symbols.REPO_ROOT
@@ -138,6 +145,39 @@ SEQUENCES = {
 }
 REFERENCE_COLUMNS = ["port", "oracle", "counter", "lag", "top", "bottom"]
 
+# How each sequence's sound is compared (sound.py, README.md "Sound"): its segments of port frames, each with the range
+# of lags (oracle frame = port frame + lag) where the oracle's sound may be, exact where the oracle's samples must be
+# the port's to the bit (a stream, a cry: one channel's samples, which the ARM9 starts, at the channel's own timer);
+# the count from which the plays aren't compared (a press reaches the two programs at different points of the
+# opening's music, which the opening sequence compares whole); and by version the port frames whose status differs by
+# construction
+LOADING = ("the DS's passes at counts 1111 and 1113 take 2 and 46 frames while it loads the title, so on the count the "
+           "port has locked the stream's channels and started it before the DS (until then their registers are what "
+           "the opening's music, stopped at a different point on each, left)")
+SOUND_CRY = "the DS starts Kyurem's cry a frame later against its passes (README.md, Known differences)"
+SOUND_CRY_END = ("the title sees Kyurem's cry end a pass later on the DS (README.md, Known differences), and unlocks "
+                 "its channel a pass later")
+SOUND = {
+    "opening": sound.SoundSpec(
+        segments=(
+            sound.Segment("logo", 355, 880, 200, 400),
+            sound.Segment("opening", 1017, 3495, 200, 400),
+            sound.Segment("title", 3530, 3790, 250, 450, exact=True),
+        ),
+    ),
+    "title": sound.SoundSpec(
+        before_count=1100,
+        segments=(
+            sound.Segment("logo", 355, 880, 200, 400),
+            sound.Segment("title", 1116, 3099, 1750, 1950, exact=True),
+            sound.Segment("cry", 3104, 3210, 1750, 1950, exact=True),
+        ),
+        known={"b2_us": {"1112-1114": LOADING, "3101": SOUND_CRY},
+               "w2_us": {"1112-1114": LOADING, "3101": SOUND_CRY, "3216": SOUND_CRY_END}},
+    ),
+}
+SOUND_REFERENCE = os.path.join("port", "tests", "oracle", "sound_{name}_{version}.tsv")
+
 
 def rom_path(version: str, given: str | None) -> str:
     return given or os.path.join(REPO_ROOT, "orig", f"baserom_{version}.nds")
@@ -170,7 +210,7 @@ def statics_file(version: str, directory: str) -> str | None:
 
 
 def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | None = None,
-               quiet: bool = False) -> int:
+               quiet: bool = False, audio: str | None = None, trace: str | None = None) -> int:
     binary = args.oracle or DEFAULT_ORACLE
     if not os.path.exists(binary):
         print(f"oracle.py: no oracle at {binary}; configure the port with -DPORT_BUILD_ORACLE=ON and build",
@@ -196,6 +236,10 @@ def run_oracle(args, out: str, frames: int, screens: str, dumps: list[str] | Non
         command += ["--save", args.save]
     for spec in dumps or []:
         command += ["--dump", spec]
+    if audio:
+        command += ["--audio-dump", audio]
+    if trace:
+        command += ["--sound-trace", trace]
     return subprocess.call(command)
 
 
@@ -211,8 +255,8 @@ def port_time(args) -> str | None:
 
 
 def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: str | None,
-             input_path: str | None = None, timeout: int = 1200,
-             dumps: list[str] | None = None) -> tuple[int | None, str]:
+             input_path: str | None = None, timeout: int = 1200, dumps: list[str] | None = None,
+             audio: str | None = None, trace: str | None = None) -> tuple[int | None, str]:
     """Runs the port's program once, from power-on with a blank save, for frames frames, writing its run directory
     in out (--run-dir): frames.tsv for every frame it ran, a PNG file for each frame of screens (a frame list,
     "none" or "all") and memory.txt with the dumps (--run-dump specs). Returns its exit status (None when it timed
@@ -231,6 +275,10 @@ def run_port(binary: str, out: str, frames: int, screens: str, rom: str, time: s
         command += ["--input", input_path]
     for spec in dumps or []:
         command += ["--run-dump", spec]
+    if audio:
+        command += ["--audio-dump", audio]
+    if trace:
+        command += ["--sound-trace", trace]
     try:
         done = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
         status = done.returncode
@@ -300,6 +348,27 @@ def command_boot(args) -> int:
     return max(six, five)
 
 
+def check_sound_outputs(run: str) -> int:
+    """The oracle's sound trace and WAV dump of the boot: a sample each 1024 cycles from power-on, and every periodic
+    run of the sound driver, 2728 ticks of 64 cycles apart, in the records (a record covers the runs since the last,
+    seen once the driver's thread waits again). Returns the failures"""
+    trace, audio = sound.run_files(run)
+    failed = 0
+    _, samples = sound.load_wav(audio)
+    expected = CHECK_FRAMES * sound.CYCLES_PER_FRAME // sound.CYCLES_PER_SAMPLE
+    if abs(len(samples) // 2 - expected) > 1:
+        print(f"FAIL: the WAV dump has {len(samples) // 2} samples, not {expected}")
+        failed += 1
+    records = sound.load_trace(trace)
+    periodic = [r for r in records if r.periods]
+    runs = sum(r.periods for r in periodic[1:])
+    elapsed = (periodic[-1].cycle - periodic[0].cycle) / (2728 * 64) if len(periodic) > 1 else 0
+    if len(periodic) < CHECK_FRAMES * 2 or abs(runs - elapsed) > 2:
+        print(f"FAIL: the sound trace has {runs} periodic runs in {elapsed:.1f} periods of the driver")
+        failed += 1
+    return failed
+
+
 def command_check(args) -> int:
     binary = args.oracle or DEFAULT_ORACLE
     if not os.path.exists(binary):
@@ -316,16 +385,20 @@ def command_check(args) -> int:
     for name in ("a", "b"):
         out = os.path.join(work, name)
         shutil.rmtree(out, ignore_errors=True)
-        status = run_oracle(args, out, CHECK_FRAMES, CHECK_SCREENS, quiet=True)
+        os.makedirs(out)
+        trace, audio = sound.run_files(out)
+        status = run_oracle(args, out, CHECK_FRAMES, CHECK_SCREENS, quiet=True, audio=audio, trace=trace)
         if status != 0:
             print(f"oracle.py check: the oracle failed (status {status})")
             return 1
         runs.append(compare.load_run(out))
     failed = 0
-    with open(os.path.join(work, "a", "frames.tsv")) as a, open(os.path.join(work, "b", "frames.tsv")) as b:
-        if a.read() != b.read():
-            print("FAIL: two runs of the same boot differ (frames.tsv)")
-            failed += 1
+    for file in ("frames.tsv", *(os.path.basename(path) for path in sound.run_files(work))):
+        with open(os.path.join(work, "a", file), "rb") as a, open(os.path.join(work, "b", file), "rb") as b:
+            if a.read() != b.read():
+                print(f"FAIL: two runs of the same boot differ ({file})")
+                failed += 1
+    failed += check_sound_outputs(os.path.join(work, "a"))
     first = runs[0]
     if len(first.frames) != CHECK_FRAMES:
         print(f"FAIL: {len(first.frames)} frames ran, not {CHECK_FRAMES}")
@@ -587,6 +660,108 @@ def command_sequence_check(args) -> int:
     return 1 if failures else 0
 
 
+def sound_paths(args) -> tuple[str, str, str]:
+    """The sequence's input file and sound reference for the version, and the ROM"""
+    return (os.path.join(REPO_ROOT, SEQUENCE_INPUT.format(name=args.name, version=args.version)),
+            os.path.join(REPO_ROOT, SOUND_REFERENCE.format(name=args.name, version=args.version)),
+            rom_path(args.version, args.rom))
+
+
+def command_sound(args) -> int:
+    sequence = SEQUENCES[args.name]
+    spec = SOUND[args.name]
+    input_path, reference, rom = sound_paths(args)
+    binary = args.oracle or DEFAULT_ORACLE
+    if not os.path.exists(binary):
+        print(f"oracle.py sound: skipped: no oracle at {binary} (configure with -DPORT_BUILD_ORACLE=ON)")
+        return SKIP
+    reason = rom_matches(args.version, rom)
+    if reason:
+        print(f"oracle.py sound: skipped: {reason}")
+        return SKIP
+    args.oracle = binary
+    args.input = input_path
+    work = args.out or tempfile.mkdtemp(prefix=f"oracle-sound-{args.name}-")
+    oracle_dir = os.path.join(work, "oracle")
+    port_dir = os.path.join(work, "port")
+    shutil.rmtree(oracle_dir, ignore_errors=True)
+    os.makedirs(oracle_dir)
+    oracle_trace, oracle_wav = sound.run_files(oracle_dir)
+    status = run_oracle(args, oracle_dir, sequence.oracle_frames, "none", quiet=True, audio=oracle_wav,
+                        trace=oracle_trace)
+    if status != 0:
+        print(f"oracle.py sound: the oracle failed (status {status})")
+        return 1
+    os.makedirs(port_dir, exist_ok=True)
+    port_trace, port_wav = sound.run_files(port_dir)
+    status, message = run_port(args.port, port_dir, sequence.port_frames, "none", rom, args.time, input_path,
+                               audio=port_wav, trace=port_trace)
+    print(f"port: {describe_port_run(status, message, sequence.port_frames, port_dir)}")
+    if status != 0:
+        return 1
+    comparison = sound.compare_runs(oracle_dir, port_dir, spec, args.version, sequence.clock,
+                                    sequence.lags.get(args.version))
+    for failure in comparison.failures:
+        print(f"FAIL: {failure}")
+    result = 1 if comparison.failures else 0
+    if args.update:
+        if result != 0:
+            print("oracle.py sound: the comparison failed; the reference stays as it was")
+        else:
+            melonds = compare.load_run(oracle_dir).info.get("melonds", "?")
+            description = (
+                f"pbw-oracle's sound on {SEQUENCE_INPUT.format(name=args.name, version=args.version)} (melonDS "
+                f"{melonds}),\nat the port's frames and runs that oracle.py sound {args.name} pairs them with: the "
+                "oracle's values only,\nhashes and statistics, never sound. play: a player's play, by the periodic "
+                "runs since its start, the SHA-1\nof the oracle's states of those runs (sound.py's player_state); "
+                "status: what the ARM9 sees of the driver as\nthe port frame ends, at the oracle frame it pairs with "
+                "on the count; segment: a segment's lag (oracle\nframe = port frame + lag) and the oracle's RMS, "
+                "peak and samples at full scale; envelope: the oracle's\nRMS by blocks of 4 frames; probe and exact: "
+                "the SHA-1 of the oracle's samples at the loudest point and\nover the segment, at the port's samples "
+                f"plus the offset. Written by oracle.py sound {args.name} --update;\nchecked by oracle.py sound-check "
+                f"{args.name}.")
+            rows = sound.write_reference(reference, comparison, oracle_dir, port_dir, spec, args.version, description)
+            print(f"wrote {rows} rows to {os.path.relpath(reference, REPO_ROOT)}")
+    if not args.out:
+        if result == 0:
+            shutil.rmtree(work, ignore_errors=True)
+        else:
+            print(f"the runs are in {work}")
+    return result
+
+
+def command_sound_check(args) -> int:
+    sequence = SEQUENCES[args.name]
+    input_path, reference, rom = sound_paths(args)
+    reason = rom_matches(args.version, rom)
+    if reason:
+        print(f"oracle.py sound-check: skipped: {reason}")
+        return SKIP
+    if not os.path.exists(reference):
+        print(f"oracle.py sound-check: no reference {os.path.relpath(reference, REPO_ROOT)} for {args.version}")
+        return 1
+    work = args.work or tempfile.mkdtemp(prefix=f"oracle-sound-{args.name}-check-")
+    os.makedirs(work, exist_ok=True)
+    trace, audio = sound.run_files(work)
+    status, message = run_port(args.port, work, sequence.port_frames, "none", rom, args.time, input_path,
+                               audio=audio, trace=trace)
+    print(f"port: {describe_port_run(status, message, sequence.port_frames, work)}")
+    if status != 0:
+        return 1
+    failures, counts = sound.check_reference(reference, work)
+    for line in failures:
+        print(f"FAIL: {line}")
+    print(f"{counts['runs']} runs of the driver's state, {counts['frames']} frames of its status, {counts['segments']} "
+          f"segments of sound ({counts['blocks']} blocks of envelope, {counts['exact']} to the bit) checked: "
+          f"{len(failures)} failures")
+    if not args.work:
+        if failures:
+            print(f"the port's run is in {work}")
+        else:
+            shutil.rmtree(work, ignore_errors=True)
+    return 1 if failures else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -642,6 +817,20 @@ def main(argv: list[str] | None = None) -> int:
     sequence_check.add_argument("--port", required=True, help="the port's program")
     sequence_check.add_argument("--work", help="keep the port's run here")
 
+    sound_parser = commands.add_parser("sound", help="a sequence's sound on the oracle and the port, compared")
+    sound_parser.add_argument("name", choices=sorted(SOUND))
+    common(sound_parser)
+    sound_parser.add_argument("--port", required=True, help="the port's program")
+    sound_parser.add_argument("--out", help="keep the runs here")
+    sound_parser.add_argument("--update", action="store_true",
+                              help="write the sound reference from a comparison that passes")
+
+    sound_check = commands.add_parser("sound-check", help="the port's sound on a sequence against its reference")
+    sound_check.add_argument("name", choices=sorted(SOUND))
+    common(sound_check, oracle=False)
+    sound_check.add_argument("--port", required=True, help="the port's program")
+    sound_check.add_argument("--work", help="keep the port's run here")
+
     args = parser.parse_args(argv)
     try:
         if args.command == "run":
@@ -654,6 +843,10 @@ def main(argv: list[str] | None = None) -> int:
             return command_sequence(args)
         if args.command == "sequence-check":
             return command_sequence_check(args)
+        if args.command == "sound":
+            return command_sound(args)
+        if args.command == "sound-check":
+            return command_sound_check(args)
         return command_check(args)
     except (compare.RunError, OSError, ValueError) as error:
         print(f"oracle.py: {error}", file=sys.stderr)

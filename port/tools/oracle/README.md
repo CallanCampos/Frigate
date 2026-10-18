@@ -17,6 +17,8 @@ and is GPL-3.0 with it. melonDS is fetched at build time, pinned to a release, a
 | `pbwinput.c`, `pbwinput.h` | the input file reader and writer and the game-frame clock, plain C11, which the port can compile as it is |
 | `oracle.py` | runs the oracle and the port with the repository's defaults; the ctest check |
 | `compare.py` | compares two runs: screens, memory, alignment |
+| `sound.py` | compares two runs' sound: the sound driver's state run by run, what the ARM9 sees of it frame by frame, and the sound by segment ([Sound](#sound)) |
+| `sndtrace.h` | the sound trace's format, plain C11, which the port includes for its own trace |
 | `symbols.py` | the decomp's symbols, statics included, for memory dumps |
 | `melonds.cmake` | the pinned melonDS release (tag and SHA-256) |
 | `CMakeLists.txt` | the oracle's own build |
@@ -55,6 +57,8 @@ compare.py screens build/oracle-runs/boot build/oracle-runs/port --align counter
 oracle.py boot --out build/oracle-runs/both --port build/port/pokeblack2
 oracle.py sequence title --port build/port/pokeblack2 --out build/oracle-runs/title
 oracle.py sequence-check title --port build/port/pokeblack2
+oracle.py sound opening --port build/port/pokeblack2 --out build/oracle-runs/sound
+oracle.py sound-check title --port build/port/pokeblack2
 ```
 
 `oracle.py run` calls `pbw-oracle` with the version's ROM (`orig/baserom_b2_us.nds`), its symbols
@@ -81,6 +85,8 @@ and compares them on the count, the movies by their pictures, at 6 bits and at 5
 | `--counter TARGET` | a 32-bit counter recorded for every frame: GFL's frame count, for alignment and game frames |
 | `--time "YYYY-MM-DD HH:MM:SS"` | the clock at power-on; else the input file's; else `2012-10-07 12:00:00` |
 | `--save FILE`, `--save-out FILE` | the save memory at power-on (blank otherwise), and where to write it at the end |
+| `--audio-dump FILE` | the sound unit's mixed output as a WAV file: every sample melonDS's mixer makes, one each 1024 cycles from power-on, 16-bit stereo, before melonDS resamples it for a sound card ([Sound](#sound)) |
+| `--sound-trace FILE` | the ARM7 sound driver's state after each run of its thread (`sndtrace.h`, [Sound](#sound)); needs `--config` |
 
 A dump's TARGET is a symbol (`sVBlankCount`), `MODULE/NAME` or `FILE.c/NAME` for a name several modules or files have
 (`ov033/sWork`, `gfl_use.c/sWork`), with an optional `+OFFSET`, or an address (`0x0209da64`). Dumps read the ARM9's view
@@ -303,13 +309,15 @@ does at each run. Without a ROM build there are no statics and no counter.
 
 The same arguments give the same files on every run: no JIT (the interpreter runs every instruction in order), the
 software 3D renderer on the emulation's thread, the clock fixed at power-on and moved by emulated time only, a blank
-save unless one is given, no host time, no audio output, and no file but the ROM and the given ones (melonDS's local
-files are refused). The firmware is melonDS's generated one with the owner settings of the port's
+save unless one is given, no host time, no audio device (the sound goes only to `--audio-dump`, sample by sample), and
+no file but the ROM and the given ones (melonDS's local files are refused). The firmware is melonDS's generated one with the owner settings of the port's
 (`port/hal/nvram/nvram7.c`): nickname "Player", colour 11, birthday 6/23, English, MAC `02:42:57:32:00:01`; melonDS
 keeps its own touch calibration. `oracle.py check`, the ctest test `oracle_boot`, runs the first 500 frames twice,
-compares the results, checks that the PNG files and `frames.tsv` agree, and compares the screens of 11 frames with
-`port/tests/oracle/boot_<version>.tsv`, hashes the pinned melonDS gives (`oracle.py check --update` writes them). It
-exits 77 (skipped) without the oracle or without the ROM the decomp builds.
+compares the results (`frames.tsv`, the sound trace and the WAV dump byte for byte), checks that the PNG files and
+`frames.tsv` agree, that the WAV dump has a sample for each 1024 cycles and the trace the driver's periodic runs 2728
+ticks apart, and compares the screens of 11 frames with `port/tests/oracle/boot_<version>.tsv`, hashes the pinned
+melonDS gives (`oracle.py check --update` writes them). It exits 77 (skipped) without the oracle or without the ROM the
+decomp builds.
 
 ## The boot sequence (Black 2, no input, blank save)
 
@@ -385,6 +393,125 @@ of the 245 allowed, nearly all on polygon edges (their coverage and fill). Insid
 didn't until the rasterizer took the values along an edge by line, as melonDS does, where it had taken them along an
 X-major edge's run, which put whole spans' colours a step apart (before, a median of 79 and at most 172).
 
+## Sound
+
+The port's ARM7 sound driver ([port/hal/snd7](../../hal/snd7), [ADR 0006](../../docs/adr/0006-sound-driver-as-built.md))
+held to the DS's, by what each program writes for it:
+
+- **A sound trace** (pbw-oracle's and the port's `--sound-trace FILE`, the format in `sndtrace.h`): a record after each
+  run of the driver's thread, with the driver's work in the DS's layout (`SNDi_Work`, 0x1180 bytes: the 16 channels,
+  16 players, 32 tracks and 8 alarms), the shared work, each channel's SOUNDxCNT and the mixer sample that took its
+  last start, the locks, the random generator, the periodic runs the record covers, the cycle, the frame and GFL's
+  frame count. The oracle reads the ARM7's WRAM: a run has been made when the driver's random generator moved on
+  (each run draws from it last), and it is finished when the ARM7 is halted (its thread waits for its next message),
+  which the oracle checks after each mixer sample; a run that comes before the ARM7 halts again shares the record of
+  the one before it, which the periodic alarm's fire time tells (`periods` 2 or more). The port writes the same
+  layout from its own structures (`port_snd7_trace_record`), with the links inside the work as the ARM7's addresses;
+  addresses of data the ARM9 loaded differ by construction, so a track's place in its sequence is `cur - base`.
+- **A WAV dump** (`--audio-dump FILE`): 16-bit stereo, every sample of the mixer, one each 1024 cycles from power-on
+  (the port: from its driver's start). The oracle takes melonDS's mixer output sample by sample, after each of the
+  mixer's events and before melonDS resamples it for a sound card (`SPU::OutputLastSamples`, which an explicit
+  instantiation names); its SOUNDBIAS is direct boot's 0x200, which melonDS centres on 0. The WAV header says 32,728
+  Hz, as the port's, for 32,728.5.
+
+`sound.py` compares them three ways, which `oracle.py sound NAME` runs on the comparison sequences:
+
+- **The driver's state, run by run.** The driver moves its sequences on at its periodic runs only, and the two
+  programs make those runs at different moments of a frame (the DS's driver starts during the boot the port doesn't
+  take, and its passes take longer), so a state at a VBlank can't be the same by construction. Instead each player's
+  play (from its start to its stop) on the oracle pairs with the same play on the port, and their records with the
+  same count of periodic runs since the start: the player, its tracks by their place in the player (the driver's
+  track numbers depend on the other players), each track's place in its sequence, call stack, parameters and channel
+  list, each channel's envelope, volume, pan, timer, LFO, sweep, wave and SOUNDxCNT, the player's tick count,
+  variables and status. Where a press reaches the two programs at different points of a sequence (START in the
+  opening, `SoundSpec.before_count`), the runs from that count on aren't compared.
+- **Frame by frame**, where the game counts passes (on the frames `compare.py --align counter` pairs; the movies'
+  frames pair by their pictures, which the DS shows late against its clock, and the sound isn't timed by them): what
+  the ARM9 sees of the driver as each frame ends: the shared work's players and channels, the tick counts of the
+  active players, the global variables, the locks, the alarms with their setting, and the SOUNDxCNT of the channels
+  the ARM9 drives itself (a stream's, a cry's). A difference that the other program shows one run earlier or later
+  (the run that made it fell on the other side of the VBlank) counts as equal a run apart.
+- **The sound, by segment of port frames**: each frame's RMS lined up at the lag (oracle frame = port frame + lag)
+  where the two correlate best, which must be 0.97 or more; the segment's RMS and peak within 2%, its samples at full
+  scale within 10% (or 32); and for a stream or a cry, sound the ARM9 writes and a channel plays at its own timer,
+  every sample to the bit at the offset the loudest point gives.
+
+Results (`oracle.py sound`, melonDS 1.1):
+
+| Sequence | Runs paired | Equal | Fields equal | Frames on the count | Equal | A run apart | Left out |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| opening, Black 2 | 9,639 | 9,639 | 6,279,801 of 6,279,801 | 579 | 579 | 0 | none |
+| opening, White 2 | 9,639 | 9,639 | 6,279,801 of 6,279,801 | 579 | 579 | 0 | none |
+| title, Black 2 | 1,957 (26 after the press left out) | 1,957 | 636,043 of 636,043 | 2,792 | 2,791 | 1 | 1112-1114, 3101 |
+| title, White 2 | 1,957 (26 after the press left out) | 1,957 | 636,043 of 636,043 | 2,791 | 2,789 | 2 | 1112-1114, 3101, 3216 |
+
+| Segment (port frames) | Lag | Envelope correlation | RMS, oracle and port | Peak | Samples at full scale | To the bit |
+| --- | --- | --- | --- | --- | --- | --- |
+| opening: the Game Freak logo (355-880), Black 2 | 254 | 0.9892 | 3846.7, 3846.7 | 18601, 18601 | 0, 0 | |
+| opening: the opening's music (1017-3495), Black 2 | 263 | 0.9890 | 6980.3, 6983.7 | 32768, 32768 | 2277, 2271 | |
+| opening: the title's stream (3530-3790), Black 2 | 315 | 0.9962 | 6350.2, 6354.2 | 29483, 29483 | 0, 0 | 285,564 of 285,564 |
+| opening: the opening's music, White 2 | 263 | 0.9890 | 6981.9, 6983.7 | 32768, 32768 | 2301, 2271 | |
+| opening: the title's stream, White 2 | 314 | 0.9987 | 6352.2, 6354.2 | 29483, 29483 | 0, 0 | 285,564 of 285,564 |
+| title: the title's stream (1116-3099), Black 2 | 1841 | 0.9891 | 8328.7, 8329.5 | 32668, 32668 | 0, 0 | 2,170,736 of 2,170,736 |
+| title: Kyurem's cry (3104-3210), Black 2 | 1843 | 0.9993 | 5390.9, 5390.2 | 15240, 15240 | 0, 0 | 117,070 of 117,070 |
+| title: the title's stream, White 2 | 1773 | 0.9872 | 8328.3, 8329.5 | 32668, 32668 | 0, 0 | 2,170,736 of 2,170,736 |
+| title: Kyurem's cry, White 2 | 1775 | 0.9977 | 5999.9, 5998.9 | 15240, 15240 | 0, 0 | 117,070 of 117,070 |
+
+What the comparison found in the port, each fixed in `port/hal` with a test:
+
+- **The stream dropped a block every 7 frames or so.** The driver ran lazily, at each VBlank and each word of the
+  ARM9, so its alarms' words (2.14 a frame at the title stream's 256 samples a block) reached the ARM9 in twos and
+  threes at the VBlank; NitroSystem's stream player queues a block to read at each alarm and drops the oldest when a
+  third comes before its thread has read one (`ArcStrmCallback`), which zeroed a block and played the rest of the
+  stream a block later: the title's music lost 27 frames against the DS's in 420. The next alarm is now the OS core's
+  timed work, so each word comes when its alarm goes off (`snd_pxi_alarm_timing`, `os_timed_work`).
+- **The sound unit started its sounds at once.** On melonDS a PCM sound's first sample comes on the channel's third
+  timer step, an IMA-ADPCM one's on its eleventh, a square wave's or noise's on its first, so a one-shot sound ends that
+  much later: one channel of the Game Freak logo's ended a run earlier on the port. And a channel reads its sound ahead
+  through a FIFO of 8 words, so a stream's buffer rewritten just ahead of the channel plays as it was: the ARM9,
+  which takes no time on the port, rewrote the title stream's blocks two samples before the channel had played them,
+  which played those two samples of every block from the buffer's next round (`snd_fifo`).
+- **The mixer's widths.** melonDS mixes by GBATEK's widths and counts a volume, pan or master volume of 127 as 128;
+  the port's had kept the whole product and 127, 1.6% quieter at full volume (`snd_mixer`, `snd_psg_duty`).
+- The oracle's own first reading had the two lock words the wrong way round (the ARM9's alone are at `0x03809f98`,
+  `SND_LockChannel`), and so did `snd7_exchannel.c`'s comment.
+
+With those, the sound of a stream and of a cry is melonDS's to the bit, and every state the driver goes through in
+the four sequences is the DS's. What stays apart, by construction:
+
+- **Note starts.** The port's runs take no time; the DS's ARM7 reaches its register writes some way into a run. Of
+  the note starts the comparison pairs (the mixer sample that took each start, on both), the oracle's come in the
+  same mixer sample as the port's or up to 4 later (the opening's music in Black 2: 1, 135, 241, 49 and 7 at 0 to 4
+  samples after the earliest; the logo's 12 and 3 at 0 and 1), so the sequences' sound matches in its envelope and
+  levels but not sample by sample (the opening's music: 13.7% of its samples equal). The oracle's sampler can't see a
+  start that comes within one mixer sample of the channel's stop (some 70 in the opening's music); those aren't
+  paired.
+- **The DS's long passes.** While it loads the title (counts 1111 and 1113, passes of 2 and 46 frames) the DS locks
+  the stream's channels and starts the stream at the end of its pass, the port at its start: port frames 1112-1114
+  of the title sequence, whose status is left out.
+- **Kyurem's cry** starts a pass later against the DS's passes (port frame 3101) and, in White 2, ends a pass later
+  for the title, which unlocks its channel a pass later (port frame 3216), as [above](#known-differences-from-the-hardware).
+
+**The clipping in the opening's music is the game's, on the DS's scale.** Both mixers output the DS's 10 bits times
+64, clipped at the same level (a channel at full volume and center pan is half the range), and the opening's music
+reaches it in the same seconds on both: in Black 2, 2,271 samples at full scale on the port and 2,277 on the oracle,
+in seconds 24 to 57 of the port's run, at most 421 in a second on the port and 440 on the oracle (seconds 51 to 53);
+in White 2, 2,271 and 2,301, at most 421 and 453. Before the mixer took melonDS's 127 as 128 the port had 2,007. So
+there was no scaling or saturation to fix beyond that.
+
+Each sequence is two ctest tests:
+
+- `oracle_sound_<name>` (`oracle.py sound NAME --port BIN`), with the oracle built: both programs, compared as above.
+  With `--update` it writes the reference, `port/tests/oracle/sound_<name>_<version>.tsv`, from a comparison that
+  passes: the oracle's values only, as hashes and small statistics: the SHA-1 of the oracle's states of each 64 runs
+  of each play, the hash of its status at every 8th frame and each frame where it changes (of those equal at their
+  ends, not a run apart, which the moment of a run decides), each segment's lag, RMS, peak and samples at full scale
+  and its RMS by blocks of 4 frames, and for a segment to the bit the SHA-1 of the oracle's samples over it and at its
+  loudest point. Skipped (77) without the oracle or the ROM.
+- `oracle_sound_<name>_hashes` (`oracle.py sound-check NAME --port BIN`), every build: the port alone, with its trace
+  and WAV dump, against the reference: every run of the plays, the statuses, the segments' envelopes and levels, and
+  the samples to the bit (wherever the loudest point's hash is, within two frames). Skipped (77) without the ROM.
+
 ## Integration
 
 What the port needs to compare itself frame by frame:
@@ -402,6 +529,9 @@ What the port needs to compare itself frame by frame:
 - **Memory dumps** by name, written as `memory.txt` (done for globals: `--run-dump`, `oracle.py port --dump`). The
   game's statics have no name the program can look up; a static the comparisons need will need the port to export
   its address.
+- **The sound** (done: `--sound-trace`, `port/app/sound_trace.c`, and `--audio-dump`, [Sound](#sound)): the sound
+  driver's state after each run, which no dump at a VBlank can give the DS's of (the driver's runs fall at other
+  moments of the frame on each program), and its samples.
 
 ## Known differences from the hardware
 

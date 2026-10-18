@@ -12,6 +12,14 @@ workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.m
   and fell behind the DS's music. Anything the hardware raises as an interrupt on its own clock needs the OS core's
   timed work (`port_os_set_timed_work`), not a catch-up at the next VBlank. The same instant ARM9 then rewrote a
   stream's buffer two samples before the channel played them, which the DS's FIFO, read ahead, never sees.
+- **Compare a sequencer by its own clock.** The driver's periodic runs fall at different moments of a frame on the two
+  programs, so its state at a VBlank can't match; paired by the count of periodic runs since each play started, every
+  field of every run matched, and the one real difference (a channel ending a run early) pointed straight at the
+  sound unit's start delay.
+- **Sample-exact audio needs the reference's own hardware model**, down to its quirks: melonDS starts a PCM sound on
+  the third timer step, reads through an 8-word FIFO and counts a volume of 127 as 128. With those, a stream and a cry
+  matched melonDS to the bit, which makes their hashes a test; the sequences can't, since the DS's register writes
+  come up to 4 mixer samples into a run, so they are held by their envelopes.
 
 ## 2026-10-17: New Game's intro, after review
 
