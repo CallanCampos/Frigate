@@ -519,12 +519,16 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             variables={"config": str(arm9_config)})
     n.build([lcf_file, objects_file], "lcf", dsd_configs, implicit=[extract_dir / "config.yaml"],
             variables={"config": str(arm9_config)})
-    link_lcf = lcf_file
+    # NitroSDK's linker symbols, which dsd's linker script doesn't define, see tools/build/lcf_symbols.py
+    link_lcf = build_dir / "arm9_symbols.lcf"
+    n.build([link_lcf], "lcf_symbols", [lcf_file, "config/linker_symbols.toml"],
+            implicit=["tools/build/lcf_symbols.py"])
     if shift:
         # Padding in the linker script moves the code and data after it, see tools/build/shift_lcf.py
-        link_lcf = build_dir / "arm9_shifted.lcf"
-        n.build([link_lcf], "shift_lcf", [lcf_file], implicit=["tools/build/shift_lcf.py"],
+        shifted_lcf = build_dir / "arm9_shifted.lcf"
+        n.build([shifted_lcf], "shift_lcf", [link_lcf], implicit=["tools/build/shift_lcf.py"],
                 variables={"amount": hex(shift)})
+        link_lcf = shifted_lcf
 
     # Source files are listed in delinks.txt by their path. Complete files are linked from the compiled object, and
     # incomplete ones are still compiled so objdiff can compare them.
@@ -712,6 +716,7 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
+    n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Scripts go through the C preprocessor, so that they can include the constant headers
