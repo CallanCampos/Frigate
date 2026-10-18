@@ -104,6 +104,10 @@ events), so writing its process table alone would not open the field.
   (`NNSi_objSizeWTbl`, ARM9 main's NitroSystem G2D, no C yet): only a Pokédex closed before then runs through. What
   the field leaves in VRAM, palettes, OAM, the random numbers and the clock before an app opens, the launcher can't
   give: such a difference is declared with its cause, never hidden by a changed hash.
+- **Note (2026-10-18):** the Pokédex no longer stops: upstream's C of `NNSi_objSizeHTbl` and `NNSi_objSizeWTbl`
+  (`lib/nnsys/src/g2d/g2d_OAM.c`, `e6dcf9b89`, merged by the port's `1f0c184f6`) ended its trap, and `party_menus`
+  launches it at the oracle's count, where its opening, the Unova list, Tepig's entry and its close show on the port
+  pass for pass as on the oracle.
 - It stretches the exception: `ov011_pending.c` gives overlay 11's effect, while the launcher replaces a menu the
   player can't reach. It is a test tool, off by default, and the user decides whether it stays.
 - **Retirement**, when the gate steps aside (the field opens): delete `port/app/launcher.c`, `launcher_spec.c`,

@@ -1246,8 +1246,6 @@ class Launch:
 SUMMARY_SCROLL = ("the summary scrolls its background a pixel every 4 VBlanks since it started (PStatus_Main, "
                   "src/ov207/p_sta_sys.c:263-271), and the DS spends some 37 VBlanks more than passes loading it "
                   "(counts 4526-4531, 4530 alone 30 frames): its background is about 9 pixels further on throughout")
-POKEDEX_TRAP = ("the Pokédex stops the port on NNSi_objSizeWTbl (ARM9 main, 0x020942b0), NitroSystem G2D's table of "
-                "object widths, which has no C yet: the launcher doesn't open it, so its rows have no counterpart")
 LAUNCHES = {
     # From the first save (no Pokémon, no Pokédex): X opens the field menu, A on BAG opens the bag, its items pocket
     # empty, B closes it; RIGHT and A open the trainer card, B closes it; B closes the menu. The bag's first frame shows
@@ -1257,12 +1255,11 @@ LAUNCHES = {
                           (0, 0), spans={"b2_us": "4046-4323,4588-4930", "w2_us": "4046-4323,4588-4930"}),
     # From the starter save (Tepig, the Pokédex): the party list, Tepig's menu, its summary and back, the Pokédex and
     # Tepig's entry, the trainer card with its Pokédex line, and the bag. The party list's first frame shows at count
-    # 4046 on the oracle (two passes after its opening on the port), the card's at 6978 (four), the bag's at 7675 (two);
-    # the Pokédex isn't launched (POKEDEX_TRAP), so the port shows black meanwhile
-    "party_menus": Launch("starter_save", 11100, 8400, {"b2_us": "party@4044,card@6974,bag@7673"}, (0, 0, 0),
-                          spans={"b2_us": "4046-5123,6978-7330,7675-8023"},
-                          known={"b2_us": {"summary": SUMMARY_SCROLL, "pokedex": POKEDEX_TRAP,
-                                           "pokedex_entry": POKEDEX_TRAP, "pokedex_after_entry": POKEDEX_TRAP}},
+    # 4046 on the oracle (two passes after its opening on the port), the Pokédex's at 5477 (four), the card's at 6978
+    # (four), the bag's at 7675 (two)
+    "party_menus": Launch("starter_save", 11100, 8400, {"b2_us": "party@4044,pokedex@5473,card@6974,bag@7673"},
+                          (0, 0, 0, 0), spans={"b2_us": "4046-5123,5477-6624,6978-7330,7675-8023"},
+                          known={"b2_us": {"summary": SUMMARY_SCROLL}},
                           known_spans={"b2_us": {"4533-4821": SUMMARY_SCROLL}}),
 }
 

@@ -3,10 +3,9 @@
 # frames.tsv's top and bottom; hashes only). where: app, a screen of an app the port must show at the row's count
 # through Frigate's test launcher (oracle.py launch party_menus); field, a screen of the field or its menu, which the
 # port can't show while overlay 36 has no C, held to the oracle's run only. count is GFL's frame count at oracle_frame,
-# the first frame with that count. The check leaves out four app rows, each a known difference of oracle.py's launch
-# routes (README.md, "The launch checks"): the summary, whose background scrolls by VBlanks, which the DS spends
-# loading it (SUMMARY_SCROLL; its bottom screen shows 3D, bottom_3d), and the Pokédex's three, which the launcher
-# doesn't open since the Pokédex stops the port on a trap (POKEDEX_TRAP).
+# the first frame with that count. The check leaves out one app row, a known difference of oracle.py's launch routes
+# (README.md, "The launch checks"): the summary, whose background scrolls by VBlanks, which the DS spends loading it
+# (SUMMARY_SCROLL; its bottom screen shows 3D, bottom_3d).
 label	oracle_frame	count	game_frame	top_3d	bottom_3d	top	bottom	where
 field	5938	3880	3881	1	0	7d65760c6358bae1695d1f85770b2e57ce13a8a3	a912c9dce413f429be6f7c02f3da738a003e8639	field
 menu	6013	3950	3951	1	0	2d864ea2ea426c3eecaa3fc60faae8f2b45b8941	13f4dbaba8c46afd73e40ed65753987dd65ff5fa	field
