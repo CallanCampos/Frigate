@@ -5361,6 +5361,11 @@ overlays/ov036 0x021d29f4 SAVE_ANIME_STEPS
 overlays/ov036 0x021d4818 HOLLOW_SLOT_CHANCES
 overlays/ov036 0x021d48e0 HOLLOW_MISSION_LEVELS
 overlays/ov036 0x021d48f4 OCHIBA_TASK_VTABLE
+overlays/ov036 0x021d4c34 sIrcMenuBrightenAmounts
+overlays/ov036 0x021d4c54 sWinRects2
+overlays/ov036 0x021d4c74 sIrcMenuVRAMConfig
+overlays/ov036 0x021d4ca4 sWinRects3
+overlays/ov036 0x021d4ce4 sWinRectsA
 overlays/ov036 0x021d4d74 sJumpHeights
 overlays/ov036 0x021d4e4c WEATHER_TRANSITION_FUNCS
 overlays/ov036 0x021d4ec0 sPlayerTemplate

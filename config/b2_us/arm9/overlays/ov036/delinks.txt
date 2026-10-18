@@ -353,12 +353,12 @@ src/ov036/field_comm_actor.c:
     .data       start:0x021d4bd0 end:0x021d4be4
 
 src/ov036/ctalkmsgwin.c:
-    .text       start:0x0218b1f8 end:0x0218d0f4
+    .text       start:0x0218b1f8 end:0x0218d0e8
     .data       start:0x021d4be4 end:0x021d4c34
 
 src/ov036/ircbattlemenu.c:
-    .text       start:0x0218d0f4 end:0x0218ed18
-    .rodata     start:0x021caad8 end:0x021cacf4
+    .text       start:0x0218d0e8 end:0x0218ed18
+    .rodata     start:0x021caad8 end:0x021cacac
     .data       start:0x021d4c34 end:0x021d4d34
 
 src/ov036/field_menu_event.c:
@@ -367,7 +367,7 @@ src/ov036/field_menu_event.c:
 
 src/ov036/fldmmdl_acmd.c:
     .text       start:0x0218ed18 end:0x02193680
-    .rodata     start:0x021cacf4 end:0x021ce3a0
+    .rodata     start:0x021cacac end:0x021ce3a0
     .data       start:0x021d4d34 end:0x021d4d50
 
 src/ov036/fldmmdl_blact.c:

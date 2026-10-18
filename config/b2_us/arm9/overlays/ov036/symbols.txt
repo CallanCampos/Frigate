@@ -5610,11 +5610,11 @@ data_ov036_021d4bd0 kind:data(any) addr:0x021d4bd0
 TALKMSG_WIN_TEX kind:data(any) addr:0x021d4be4
 TALKMSG_WIN_PLT kind:data(any) addr:0x021d4c04
 data_ov036_021d4c24 kind:data(any) addr:0x021d4c24
-data_ov036_021d4c34 kind:data(any) addr:0x021d4c34
-data_ov036_021d4c54 kind:data(any) addr:0x021d4c54
-data_ov036_021d4c74 kind:data(any) addr:0x021d4c74
-data_ov036_021d4ca4 kind:data(any) addr:0x021d4ca4
-data_ov036_021d4ce4 kind:data(any) addr:0x021d4ce4
+sIrcMenuBrightenAmounts kind:data(any) addr:0x021d4c34
+sWinRects2 kind:data(any) addr:0x021d4c54
+sIrcMenuVRAMConfig kind:data(any) addr:0x021d4c74
+sWinRects3 kind:data(any) addr:0x021d4ca4
+sWinRectsA kind:data(any) addr:0x021d4ce4
 data_ov036_021d4d24 kind:data(any) addr:0x021d4d24
 data_ov036_021d4d34 kind:data(any) addr:0x021d4d34
 data_ov036_021d4d40 kind:data(any) addr:0x021d4d40
