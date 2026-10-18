@@ -324,12 +324,6 @@ in both versions.
   `0x02180270` / `0x021802b0`, words of a code address plus 0x2200, then resolves to 0x2200 plus small offsets. They
   stay incomplete until those address-plus-0x2200 references link.
 
-- `lib/nitro/src/os/os_interrupt.c` and `os_arena.c` (ARM9 main) match every function in both versions, but they read
-  NitroSDK's linker symbols `SDK_IRQ_STACKSIZE` (0x800) and `SDK_MAINEX_ARENA_LO` (0x0d000000), which `nitro/os.h`
-  declares as `extern u8 []` and the ROM has as plain literal-pool words, and the linker script that dsd writes doesn't
-  define them. `os_thread.c` needs `SDK_SYS_STACKSIZE` (0x1800) as well, besides its row above. The three files
-  stay incomplete until the build defines these as absolute symbols in both versions.
-
 - `lib/msl/src/fp/fp_fastI.c` (ARM9 main), MSL's soft-float and integer runtime, has a `.text` byte for byte the ROM's
   in both versions, but linked complete it leaves 17 names undefined (`_dadd`, `_ddiv`, `_deq`, `_dflt`, `_dfltu`,
   `_dls`, `_dmul`, `_dneq`, `_dsub`, `_f2d`, `_fflt`, `_ll_mod`, `_ll_mul`, `_ll_shl`, `_ll_udiv`, `_ll_ufrom_d`,

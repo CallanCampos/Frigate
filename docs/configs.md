@@ -21,6 +21,17 @@ Add an override only when both versions' original functions, data and relocation
 linked modules and both ROMs. This manifest describes compilation; it does not change dsd's section ranges or
 relocations. Changes regenerate both the Ninja configuration and objdiff metadata.
 
+## Linker symbols
+
+NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the addresses of symbols that the SDK's linker
+script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's
+linker script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values,
+the same in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the entry point's
+gap code (`Entry`) read, and the start of the DSi's extended main memory arena, which `os_arena.c` reads.
+`tools/build/lcf_symbols.py` adds them after `__OVERLAY_COUNT` as absolute symbols, in
+`build/<version>/arm9_symbols.lcf`, the linker script that the link (or `--shift`'s padding) takes. Another one goes in
+the config when a file that reads it is written, with its value read from the pool word in both versions.
+
 ## Fixing the configs
 
 dsd sometimes cannot tell which overlay a relocation points to, because many overlays share addresses. It then lists

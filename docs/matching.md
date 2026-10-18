@@ -3063,8 +3063,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   overlay count from the linker script. Declared `extern u8 SYM[]` and cast where it is used, `(u32)SDK_IRQ_STACKSIZE`,
   it is a pool load that stays out of the folding, as `os_interrupt.c`'s `OS_SetIrqStackChecker` (`HW_DTCM + 0x3f80 -
   size`), `os_arena.c` (`SDK_MAINEX_ARENA_LO`, 0x0d000000) and `fs_overlay.c` (`__OVERLAY_COUNT`) need. dsd's linker
-  script defines `__OVERLAY_COUNT` but not NitroSDK's own symbols, so a file that reads those links only once the build
-  defines them.
+  script defines `__OVERLAY_COUNT`, and the build adds the stack sizes and the arena's start from
+  `config/linker_symbols.toml` (`docs/configs.md`, "Linker symbols"). Another such symbol goes there, with its value
+  read from both versions' pool words, before the file that reads it can link.
 - A file-scope static that a function both passes by address and reads or writes directly gets two literals with
   the same address: the access goes through one (`ldr r0, =obj; strh r1, [r0, #0xe]`) and the pointer passed on
   through the other, where an `extern` object's address is loaded once and kept in a register, 4 bytes shorter. Two

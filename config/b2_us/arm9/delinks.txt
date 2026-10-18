@@ -2037,6 +2037,7 @@ lib/nitro/src/os/os_irqTable.c:
     .bss        start:0x0214c178 end:0x0214c208
 
 lib/nitro/src/os/os_interrupt.c:
+    complete
     .text       start:0x02079d10 end:0x02079f04
 
 lib/nitro/src/os/os_reset_pxi.c:
@@ -2085,6 +2086,7 @@ lib/nitro/src/os/os_init.c:
     .text       start:0x0207b104 end:0x0207b18c
 
 lib/nitro/src/os/os_arena.c:
+    complete
     .text       start:0x0207b18c end:0x0207b468
     .bss        start:0x0214c4a4 end:0x0214c4ac
 
