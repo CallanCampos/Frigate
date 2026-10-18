@@ -13,8 +13,8 @@ void func_ov182_021adfbc(void (*update)(void));
 void func_ov182_021adfc8(u32 value0, u32 value1);
 // Reads the values that func_ov182_021adfc8 set, into the pointers that aren't NULL
 void func_ov182_021adfd4(u32 *value0, u32 *value1);
-void func_ov182_021adff0(u32 value2, u32 value3);
-void func_ov182_021adffc(u32 *value2, u32 *value3);
+void func_ov182_021adff0(int value2, int value3);
+void func_ov182_021adffc(int *value2, int *value3);
 // The utility's language
 u8 func_ov182_021ae018(void);
 // The starting screen, the low 4 bits of DWC_StartUtility's param

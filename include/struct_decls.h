@@ -240,6 +240,7 @@ typedef struct DreamWorldSave DreamWorldSave;
 typedef struct DrawCommand DrawCommand;
 typedef struct DrawSystem DrawSystem;
 typedef struct DrawSystemParam DrawSystemParam;
+typedef struct DWCUtilApEntry DWCUtilApEntry;
 typedef struct DWCUtilList DWCUtilList;
 typedef struct DWCUtilMsg DWCUtilMsg;
 typedef struct DWCUtilNode DWCUtilNode;

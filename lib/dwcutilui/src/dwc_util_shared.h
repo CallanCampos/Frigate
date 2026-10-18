@@ -64,12 +64,49 @@ void func_ov182_021b8eec(void);
 int func_ov182_021b8f14(void);
 BOOL func_ov182_021b8f24(void);
 
+// An access point that the scan found
+struct DWCUtilApEntry {
+    u8 ssid[32];
+    u8 bssid[6];
+    u16 linkLevel;
+    // 0 for none, 1 for WEP, 2 for a security that the utility can't set
+    u8 security;
+};
+
+// Stops the scan for access points and frees it, and the access points it found and their count
+void func_ov182_021b74f4(void);
+int func_ov182_021b7630(DWCUtilApEntry **entries);
+// Takes the SSID into the connection being edited
+void func_ov182_021b7854(const u8 *ssid);
+// Makes the connection of the console's Wi-Fi settings the one being edited
+void func_ov182_021b7b20(int index);
+
+// A copy of a screen of BG 2 of the main screen, uploaded at the next VBlank once marked
+void func_ov182_021b6f38(const void *screen);
+void func_ov182_021b6f78(void);
+void func_ov182_021b6f98(void);
+
+// The scroll bar of a list: its handle (kind 1 or 2, none for 0) travels range pixels down from x, y. Its event is 1
+// to 3 when the handle is grabbed, dragged and let go, 4 and 6 when an arrow is pressed and 5 and 7 when it is let go
+void func_ov182_021b70a0(int kind, int range, int x, int y, int pos);
+void func_ov182_021b711c(void);
+u8 func_ov182_021b7144(void);
+u8 func_ov182_021b7150(void);
+void func_ov182_021b715c(int pos);
+// Unlocks and locks the scroll bar
+void func_ov182_021b7164(void);
+void func_ov182_021b7174(void);
+
 // The first screen of the connection settings
 void func_ov182_021b536c(void);
 // The choice of the setup of a connection
 void func_ov182_021b5bb8(void);
 // The message before the connection test
 void func_ov182_021b6588(void);
+// The screen of the button above the list of access points
+void func_ov182_021b5000(void);
+// The keyboard of a WEP key
+void func_ov182_021b19f4(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

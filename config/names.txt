@@ -11291,6 +11291,10 @@ overlays/ov182 0x021bffa8 sMainMenuCursorRects
 overlays/ov182 0x021bffd0 sButtonRows
 overlays/ov182 0x021bffd8 sOptionMenuButtonRects
 overlays/ov182 0x021bfff0 sOptionMenuCursorRects
+overlays/ov182 0x021c003c sApListSecurityCells
+overlays/ov182 0x021c003f sApListSignalCells
+overlays/ov182 0x021c0044 sApListRowRects
+overlays/ov182 0x021c006c sApListCursorRects
 overlays/ov182 0x021c0580 sArchiveName
 overlays/ov182 0x021c0590 sBgCharNames
 overlays/ov182 0x021c0594 sBgSizes
@@ -11350,6 +11354,8 @@ overlays/ov182 0x021c40e4 sPageMove
 overlays/ov182 0x021c40e8 sMoveWaitEnd
 overlays/ov182 0x021c40ec sPageStep3
 overlays/ov182 0x021c40f4 sPageMulti4Frames
+overlays/ov182 0x021c40f8 sApListPos
+overlays/ov182 0x021c40fc sApList
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

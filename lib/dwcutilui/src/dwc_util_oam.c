@@ -22,11 +22,6 @@ static inline void DWCUtilOam_GetPosition(const GXOamAttr *oam, int *x, int *y) 
     *y = (u8)oam->attr01;
 }
 
-static inline void DWCUtilOam_SetPosition(GXOamAttr *oam, int x, int y) {
-    oam->attr01 =
-        (oam->attr01 & ~(GX_OAM_ATTR01_X_MASK | GX_OAM_ATTR01_Y_MASK)) | (u8)y | ((x & 0x1ff) << GX_OAM_ATTR01_X_SHIFT);
-}
-
 void func_ov182_021bb480(void) {
     int i;
 

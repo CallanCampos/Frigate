@@ -1214,10 +1214,10 @@ data_ov182_021bfff6 kind:data(any) addr:0x021c0036
 data_ov182_021c0008 kind:data(any) addr:0x021c0048
 data_ov182_021c0020 kind:data(any) addr:0x021c0060
 data_ov182_021c0038 kind:data(any) addr:0x021c0078
-data_ov182_021c003c kind:data(any) addr:0x021c007c
-data_ov182_021c003f kind:data(any) addr:0x021c007f
-data_ov182_021c0044 kind:data(any) addr:0x021c0084
-data_ov182_021c006c kind:data(any) addr:0x021c00ac
+sApListSecurityCells kind:data(any) addr:0x021c007c
+sApListSignalCells kind:data(any) addr:0x021c007f
+sApListRowRects kind:data(any) addr:0x021c0084
+sApListCursorRects kind:data(any) addr:0x021c00ac
 data_ov182_021c006e kind:data(any) addr:0x021c00ae
 data_ov182_021c0070 kind:data(any) addr:0x021c00b0
 data_ov182_021c0094 kind:data(any) addr:0x021c00d4
@@ -1636,8 +1636,8 @@ sPageMove kind:bss addr:0x021c4124
 sMoveWaitEnd kind:bss addr:0x021c4128
 sPageStep3 kind:bss addr:0x021c412c
 sPageMulti4Frames kind:bss addr:0x021c4134
-data_ov182_021c40f8 kind:bss addr:0x021c4138
-data_ov182_021c40fc kind:bss addr:0x021c413c
+sApListPos kind:bss addr:0x021c4138
+sApList kind:bss addr:0x021c413c
 data_ov182_021c4100 kind:bss addr:0x021c4140
 data_ov182_021c4104 kind:bss addr:0x021c4144
 data_ov182_021c4108 kind:bss addr:0x021c4148
