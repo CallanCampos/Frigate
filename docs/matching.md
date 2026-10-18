@@ -351,6 +351,13 @@ Same instructions, registers swapped.
   `perapvoice.c`'s `PerapVoice_Decode` shifts into a new one (`lsl r5, r5, #0x1c; asr r7, r5, #0x18`). There the
   shift is an expression: an inline returning `sample << 4` from its own `s8 sample = nibble - 8;`. The same inline
   written `sample <<= 4; return sample;` does not match.
+- A pointer an inline advances in two statements and returns from its `if`, `const u16 *end = cmd + 3; end +=
+  cmd[2]; return end;` with `return cmd;` after the `if`, compiles to the instructions of `return cmd + 3 + cmd[2];`
+  but colors its caller's registers in another order. `printsys.c`'s `func_02022900` copies a command with
+  `end = StrCmd_Skip(str)` and needs that body: with it the string stays in `r5` and `end` takes `r4`, and the
+  caller's `end = str` copy lands in the `else` arm, where the inline's test reuses the outer test's flags; with the
+  one expression, `str` takes `r4`, and without the return in the `if`, the copy is made before the test. The
+  helper's ten other uses in the file match with either body.
 - A flag's zero built in the entry block, above the first call, does not mean the flag is declared at the top:
   a `BOOL isNew = FALSE;` declared inside a later block is hoisted there too, and the block is what decides its
   register. `irc_compatible.c`'s `IrcCompatible_CreateParam3` declares it in its `if` block after `isNewTrainer`,
@@ -1001,7 +1008,12 @@ Same code, other `sp` offsets or frame size.
 - A sum of several terms in one expression has its right-hand terms evaluated first; accumulating it in separate
   statements (`n += a; n += b;`) evaluates them left to right. NitroSystem's `GetCharIndex1D`
   (`g2d_CharCanvas.c`) matches only with its index summed in four `charNo += ...` statements, after a block-scoped
-  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it.
+  `const u32 lowH = ~maskH;` that MWCC computes on entry to the `else` holding it. In a loop, a loop-invariant part
+  of a sum is hoisted and added second however it is written: `s + x + j` and `j + (s + x)` both give
+  `adds r1, r3, r0`, the counter first. Named in the same block as its use, `int left = s + x; int column = left +
+  j;` or `column = s + x; column += j;`, it is added first (`adds r1, r0, r3`), as the fill of `mcss.c`'s
+  `MCSS_MakeMosaic` is in the original; a local assigned before the loop is not propagated into it and stays on the
+  stack.
 - An `|` chain is combined in the order written, so the order of the original's `orr`s gives the order of the
   terms: `btl_server_flow.c`'s `ActionOrder_MakeKey` packs the action order's key from its highest field down,
   `((unk22 & 7) << 22) | ((unk16 & 0x3f) << 16) | ((unk13 & 7) << 13) | (speed & 0x1fff)`, which both its callers,
@@ -1231,7 +1243,11 @@ Same instructions, scheduled in another order.
 - A sum from a three-register `adds` whose only use is the copy that Thumb's two-operand `adds rd, #imm8` needs
   is moved down to that copy, across calls and branches and inside loops, with both operands kept live (spilled)
   to get there. No optimization pragma, -O level or scope stops it; `+ 7` (the three-operand immediate form) or a
-  second use of the sum keeps it where it is written. `arc_tool.c`'s `ArchiveMoveImageTop` writes
+  second use of the sum keeps it where it is written. Uses of the incremented value don't: in
+  `x = a + v; f(0); x += 8; h(x, b); return x + b;` each use gets its own `adds r0, r5, r4; adds r0, #8`. A
+  subtraction, `x = a - v`, stays where it is written, and so does the sum when the +8 is conditional or when an
+  operand is redefined on one path to the same use (`if (b) { a = 0; }`); a redefinition on every path, `a += 12`,
+  goes into a new register and leaves the old value to the moved sum. `arc_tool.c`'s `ArchiveMoveImageTop` writes
   `fimgOffset = fntbOffset + value;` before a read and `fimgOffset += 8;` after it, and is 4 bytes short for it:
   the original stores the sum where it is written and adds the 8 to its spill slot.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
@@ -2451,6 +2467,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   and each read keeps its own `(v + 1) << 2`; a cast on the base alone, `((f32 *)buffer)[v + 1]`, or a same-width cast
   of the index does not. `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` matches so with a `u32 *` buffer of floats,
   which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
+  It is the cast that hides the address, not a change of type: the same function matches with its `f32 *` buffer
+  read as `*(f32 *)&values[v + 1]`, a cast to the type it already has, which is not used either.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2530,6 +2548,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `reader->actions[clientId]` at both uses it computed them again in `r7` and `r4`, 104 bytes off. A local set at the
   top of the loop body gets the reuse but not the slot order. The function also matches with the expression written
   out and its `u8 clientId` parameter as `unsigned long`, which hoists `clientId << 6` first.
+- Arithmetic hoisted out of a loop, such as `bit >> 3` and `1 << (bit & 7)`, written in the body or passed to an
+  inline, is computed again by code after the loop, where a hoisted field address (`pokedex->shown`) and a value
+  kept in a local are reused. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
+  them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
+  inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters.
 
 - A loop guard kept as an unsigned compare (`cmp r3, #4; bhs`) came from an enum counter tested against
   `NELEMS(table)`, whose `sizeof` makes the comparison unsigned; the enum's own bound gives `bge`. `symbol_save.c`'s
