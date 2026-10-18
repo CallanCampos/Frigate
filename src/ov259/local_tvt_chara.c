@@ -208,7 +208,7 @@ LocalTvtChara *LocalTvtChara_Create(const LocalTvtCharaSetup *setup, HeapID heap
     chara->seq = CHARA_SEQ_IDLE;
     chara->heapId = heapId;
     chara->arc = GFL_ArcSysCreateFileHandle(ARC_LOCAL_TVT, chara->heapId);
-    chara->nameMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0393, chara->heapId);
+    chara->nameMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_NAMES, chara->heapId);
     LocalTvtChara_CreateCursor(chara);
     GFL_BGSysSetBGEnabled(0, FALSE);
     GFL_BGSysSetBGEnabled(3, FALSE);

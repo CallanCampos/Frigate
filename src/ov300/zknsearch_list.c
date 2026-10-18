@@ -10,7 +10,7 @@
 #include "gfl/str.h"
 #include "gfl/touchpanel.h"
 #include "system/printsys.h"
-#include "text/system/0479.h"
+#include "text/system/zknsearch_main.h"
 
 // The lists of the criteria of the Pokédex's search screen: the order, the initial, the type, the color and the shape.
 // The ROM doesn't name this file; zknsearch_list.c is a guess after zknsearch_main.c
@@ -181,7 +181,7 @@ void ZknSearchList_InitOrder(ZknSearchWork *wk) {
     GFL_ArcToolFree(arc);
     for (i = 0; i < ORDER_COUNT; i++) {
         FrameList_AddItem(wk->frameList, 0, i);
-        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0479_Text_Number + i);
+        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, ZknsearchMain_Text_Number + i);
     }
 }
 
@@ -200,7 +200,7 @@ void ZknSearchList_InitInitial(ZknSearchWork *wk) {
     GFL_ArcToolFree(arc);
     for (i = 0; i < INITIAL_COUNT; i++) {
         FrameList_AddItem(wk->frameList, 0, i);
-        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0479_Text_A + i);
+        wk->itemNames[i] = GFL_MsgDataLoadStrbufNew(wk->msgData, ZknsearchMain_Text_A + i);
     }
 }
 
@@ -236,9 +236,9 @@ void ZknSearchList_InitColor(ZknSearchWork *wk) {
     FrameList_LoadScreen(wk->frameList, arc, 99, FALSE, 0);
     FrameList_LoadCursorPalette(wk->frameList, arc, 75, 2, 3);
     GFL_ArcToolFree(arc);
-    for (i = Bank0479_Text_Red; i <= Bank0479_Text_Pink; i++) {
-        FrameList_AddItem(wk->frameList, 0, i - Bank0479_Text_Red);
-        wk->itemNames[i - Bank0479_Text_Red] = GFL_MsgDataLoadStrbufNew(wk->msgData, i);
+    for (i = ZknsearchMain_Text_Red; i <= ZknsearchMain_Text_Pink; i++) {
+        FrameList_AddItem(wk->frameList, 0, i - ZknsearchMain_Text_Red);
+        wk->itemNames[i - ZknsearchMain_Text_Red] = GFL_MsgDataLoadStrbufNew(wk->msgData, i);
     }
 }
 

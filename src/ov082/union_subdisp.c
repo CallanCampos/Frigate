@@ -27,7 +27,7 @@
 #include "system/gf_font.h"
 #include "system/pms_draw.h"
 #include "system/printsys.h"
-#include "text/system/0400.h"
+#include "text/system/union_subdisp.h"
 
 // The Union Room's touch screen, named after the ROM's "union_subdisp.c". Five icons at the bottom pick what the
 // player wants to do, and the three lines above show the Union Room's chat of what the players around say, newest
@@ -308,7 +308,7 @@ static void UnionSubdisp_InitUnit(UnionSubdisp *work) {
     work->unit = func_0204bf1c(12, 5, HEAPID_FIELDMAP);
     work->queue = func_02021998(HEAPID_FIELDMAP);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_FIELDMAP);
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0400, HEAPID_FIELDMAP);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_UNION_SUBDISP, HEAPID_FIELDMAP);
 }
 
 static void UnionSubdisp_FreeUnit(UnionSubdisp *work) {
@@ -567,19 +567,19 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
 
             switch (chat->kind) {
             case UNION_CHAT_KIND_ENTERED:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_IveEnteredUnionRoom);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_IveEnteredUnionRoom);
                 break;
             case UNION_CHAT_KIND_BATTLE:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchBattleIconIf);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchBattleIconIf);
                 break;
             case UNION_CHAT_KIND_TRADE:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchTradeIconIf);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchTradeIconIf);
                 break;
             case UNION_CHAT_KIND_DRAW:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchDrawIconIf);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchDrawIconIf);
                 break;
             case UNION_CHAT_KIND_SPIN_TRADE:
-                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0400_Text_TouchSpinTradeIcon);
+                strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, UnionSubdisp_Text_TouchSpinTradeIcon);
                 break;
             default:
                 return;
@@ -598,10 +598,10 @@ static void UnionSubdisp_DrawLine(UnionSubdisp *work, UnionVisitor *chat, u8 lin
     func_02021c7c(work->queue, BmpWin_GetBitmap(*window), 0, 0, name, work->font, PRINT_COLOR_LINE);
     GFL_StrBufFree(name);
     if (chat->subKind != 0) {
-        u32 message = Bank0400_Text_Friend;
+        u32 message = UnionSubdisp_Text_Friend;
 
         if (chat->subKind != 1) {
-            message = Bank0400_Text_Player;
+            message = UnionSubdisp_Text_Player;
         }
         strbuf = GFL_MsgDataLoadStrbufNew(work->msgData, message);
         func_02021c7c(work->queue, BmpWin_GetBitmap(*window), 0x74, 0, strbuf, work->font, PRINT_COLOR_LINE);

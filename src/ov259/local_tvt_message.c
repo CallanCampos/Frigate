@@ -95,8 +95,8 @@ LocalTvtMessage *LocalTvtMessage_Create(HeapID heapId) {
     LocalTvtMessage *message = GFL_HeapAllocate(heapId, sizeof(LocalTvtMessage), TRUE, "local_tvt_message.c", 108);
 
     message->heapId = heapId;
-    message->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0393, heapId);
-    message->talkMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0384, heapId);
+    message->menuMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_NAMES, heapId);
+    message->talkMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_LOCAL_TVT_TALK, heapId);
     message->pokemonMsgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_11, heapId);
     message->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, message->heapId);
     message->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, message->heapId);

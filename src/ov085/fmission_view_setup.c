@@ -412,7 +412,7 @@ static void FMissionViewSetup_InitSystems(FMissionView *view) {
     view->font = func_ov036_0218799c(Field_GetMsgBGSys(view->field));
     func_020232d8();
     view->wordSet = GFL_WordSetSystemCreateDefault(view->heapId);
-    view->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0040, view->heapId);
+    view->msgData = GFL_MsgSysLoadData(TRUE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_FMISSION_VIEW_SETUP, view->heapId);
     view->tmpStr = GFL_StrBufCreate(217, view->heapId);
     view->message = GFL_StrBufCreate(217, view->heapId);
     view->messageCopy = GFL_StrBufCreate(217, view->heapId);

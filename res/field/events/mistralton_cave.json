@@ -195,7 +195,7 @@
     "npcs": [
         {
             "id": 0,
-            "model": "OBJ_CODE_MODEL_5",
+            "model": "OBJ_CODE_MODEL_BIGROCK2",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -214,7 +214,7 @@
         },
         {
             "id": 1,
-            "model": "OBJ_CODE_MODEL_5",
+            "model": "OBJ_CODE_MODEL_BIGROCK2",
             "movement": 0,
             "type": 0,
             "flag": 0,
@@ -233,7 +233,7 @@
         },
         {
             "id": 2,
-            "model": "OBJ_CODE_MODEL_5",
+            "model": "OBJ_CODE_MODEL_BIGROCK2",
             "movement": 0,
             "type": 0,
             "flag": 0,

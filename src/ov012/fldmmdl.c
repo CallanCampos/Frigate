@@ -2042,7 +2042,7 @@ void func_ov012_02168258(MMSys *system, u16 zoneId, u16 uid) {
 
 BOOL IsNPCStrengthRock(u16 objCode) {
     if (objCode == OBJ_CODE_STRENGTH_ROCK || objCode == OBJ_CODE_MODEL_3 || objCode == OBJ_CODE_MODEL_4 ||
-        objCode == OBJ_CODE_MODEL_5) {
+        objCode == OBJ_CODE_MODEL_BIGROCK2) {
         return TRUE;
     }
     return FALSE;

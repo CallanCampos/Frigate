@@ -7,7 +7,7 @@
 
 Each object code of generated/obj_codes.txt, which zone events and scripts give an actor, is a directory named
 after it, hero/ for OBJ_CODE_HERO, pokemon/bulbasaur/ for the walking Pokémon's OBJ_CODE_POKEMON_BULBASAUR and
-models/0/ for the 3D models' OBJ_CODE_MODEL_0, with its record of the table in data.json, described by
+models/0/ for the 3D models' OBJ_CODE_MODEL_BIGROCK, with its record of the table in data.json, described by
 field_actor.schema.json, and its graphics:
 
 - a sprite (type "sprite") has sprite.png, its frames side by side, each a square 32 or 64 pixels wide, and
