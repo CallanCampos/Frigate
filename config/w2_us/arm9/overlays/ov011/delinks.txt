@@ -277,3 +277,7 @@ lib/dwc/src/gscommon/gsPlatformUtil.c:
     .rodata     start:0x02185090 end:0x021850d4
     .data       start:0x02186f9c end:0x0218703c
     .bss        start:0x02190944 end:0x02190968
+
+lib/dwc/src/gscommon/gsSoap.c:
+    complete
+    .text       start:0x0216ea8c end:0x0216ec98
