@@ -85,6 +85,12 @@ else()
     find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
     set(PORT_PYTHON "${Python3_EXECUTABLE}")
 endif()
+# The decomp's headers and data files are UTF-8, which Python on Windows reads in the ANSI code page unless its UTF-8
+# mode is on: on for the generators that configuring runs. The build's and the tests' scripts read only ASCII, or the
+# environment's PYTHONUTF8 (port/README.md, Windows)
+if(WIN32)
+    set(ENV{PYTHONUTF8} 1)
+endif()
 
 # Generated inputs: the constants headers, the include/ mirror without MSL's C library headers, and the source list.
 # Configuring again picks up new upstream files; CMake does that by itself when the inputs below change.

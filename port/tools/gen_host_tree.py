@@ -6,8 +6,9 @@
 It writes:
   - the headers that ninja generates for the ROM build (data constants, message IDs, easy chat words), into
     build/include/generated as compile_all.py does, since the sources include them;
-  - include/: a mirror of the decomp's include/ made of symbolic links, without the C library headers the decomp
-    keeps there for MWCC (stdio.h, string.h and the rest), so that the host's own C library headers are found instead;
+  - include/: a mirror of the decomp's include/ made of symbolic links (copies, on a Windows account that may not make
+    links), without the C library headers the decomp keeps there for MWCC (stdio.h, string.h and the rest), so that the
+    host's own C library headers are found instead;
   - hwinclude/: host variants of the headers that name DS hardware addresses, found ahead of the originals on the
     include path. Each DS address in them goes through PORT_HW_ADDR(), which port/include/port_host.h maps into the
     host memory that port/hal/hw provides; the registers whose reads or writes must act (the geometry command ports,
@@ -23,6 +24,7 @@ import argparse
 import fnmatch
 import os
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -138,22 +140,58 @@ def write_if_changed(path: Path, text: str):
         path.write_text(text)
 
 
+def remove_entry(path: Path):
+    """Removes a link, a file or a copied directory of the mirror."""
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
+
+
+def copy_entry(source: Path, copy: Path):
+    """Makes copy the same as source, a file or a directory, for a system that refuses symbolic links: Windows without
+    the right to make them (an account that isn't an administrator, without Developer Mode). Files keep their times, so
+    that only the headers that changed upstream rebuild what includes them."""
+    if copy.is_symlink():
+        copy.unlink()
+    if source.is_dir():
+        shutil.copytree(source, copy, dirs_exist_ok=True)
+        stale = {p.relative_to(copy) for p in copy.rglob("*")} - {p.relative_to(source) for p in source.rglob("*")}
+        for path in sorted(stale, key=lambda p: len(p.parts), reverse=True):
+            if (copy / path).exists() or (copy / path).is_symlink():
+                remove_entry(copy / path)
+    else:
+        shutil.copy2(source, copy)
+
+
 def mirror_include(out: Path):
-    """Links every entry of include/ except the C library headers into out, and removes stale links."""
+    """Links every entry of include/ except the C library headers into out, and removes stale links. Where the system
+    refuses symbolic links, the entries are copies instead, made again at every configure."""
     source = ROOT / "include"
     out.mkdir(parents=True, exist_ok=True)
     wanted = {entry.name for entry in source.iterdir() if entry.name not in LIBC_HEADERS}
     for link in out.iterdir():
         if link.name not in wanted:
-            link.unlink()
+            remove_entry(link)
+    copying = False
     for name in sorted(wanted):
         link = out / name
         target = os.path.relpath(source / name, out)
+        if copying:
+            copy_entry(source / name, link)
+            continue
         if link.is_symlink() and os.readlink(link) == target:
             continue
         if link.is_symlink() or link.exists():
-            link.unlink()
-        link.symlink_to(target)
+            remove_entry(link)
+        try:
+            # A link to a directory has to say so on Windows; elsewhere the flag is ignored
+            link.symlink_to(target, target_is_directory=(source / name).is_dir())
+        except OSError as error:
+            print(f"gen_host_tree: can't make symbolic links ({error}); copying include/ into {out} instead",
+                  file=sys.stderr)
+            copying = True
+            copy_entry(source / name, link)
 
 
 def read_replaced() -> list[tuple[str, str]]:

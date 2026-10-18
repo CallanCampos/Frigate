@@ -1,8 +1,9 @@
 name: Frigate CI
 
-# Builds Frigate, the native port, on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI
-# doesn't have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds
-# both ROMs locally (port/docs/SYNC.md).
+# Builds Frigate, the native port, on macOS, Linux and Windows and runs its tests, those that need the player's ROM
+# skipping. The ROM build needs the base ROMs, which CI doesn't have; upstream's compile.yml compiles every C file with
+# MWCC instead, and every port session's sync builds both ROMs locally (port/docs/SYNC.md). Windows builds with MSYS2's
+# CLANG64 toolchain (clang, lld and the UCRT; port/docs/adr/0013-windows-build-with-msys2-clang64.md).
 on:
   push:
     branches: [main]
@@ -64,3 +65,68 @@ jobs:
       - name: Build the macOS app
         if: runner.os == 'macOS'
         run: cmake --build build/port --target frigate-black2_app
+
+  # Windows, with MSYS2's CLANG64 environment: clang, lld, compiler-rt and the UCRT, with CMake, Ninja and SDL3 from its
+  # packages, so that the build's GCC-style flags are the same as on macOS and Linux (ADR 0013). Only res/text of the
+  # game's data is checked out, which is all the host build reads (port/tools/gen_host_tree.py); git keeps the files'
+  # line endings as they are
+  host-windows:
+    name: Host build (windows-2025)
+    runs-on: windows-2025
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      # The decomp's headers and data are UTF-8, and Python reads text in the ANSI code page on Windows without it
+      PYTHONUTF8: "1"
+    steps:
+      - name: Keep line endings
+        shell: pwsh
+        run: git config --global core.autocrlf false
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/res/
+            /res/text/
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # path-type inherit keeps the Python above on PATH, after MSYS2's own directories
+      - name: Install build tools
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANG64
+          update: false
+          path-type: inherit
+          install: >-
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-ninja
+            mingw-w64-clang-x86_64-sdl3
+
+      - name: Show the tools
+        run: |
+          which clang cmake ninja python
+          clang --version
+          cmake --version
+          python --version
+
+      - name: Configure
+        env:
+          CC: clang
+        run: cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      # -k 0 goes on past a file that fails, so that one run shows every file that doesn't compile on Windows
+      - name: Build
+        run: cmake --build build/port -- -k 0
+
+      - name: Test
+        run: ctest --test-dir build/port --output-on-failure
