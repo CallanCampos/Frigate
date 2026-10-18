@@ -19,7 +19,7 @@
 #include "system/printsys.h"
 #include "system/str_tool.h"
 #include "system/wordset.h"
-#include "text/system/0028.h"
+#include "text/system/codein_disp.h"
 
 // The code input screen's graphics. The ROM has no name for this file; "codein_disp.c" is a guess from pokeplatinum,
 // whose code input screen has the same three files. Our names
@@ -444,8 +444,8 @@ void CodeInDisp_AddButtonTexts(CodeInWork *wk) {
 // CodeInDisp_LoadButtonTextPltt loaded is not used, and neither is the position given
 static void CodeInDisp_AddButtonText(CodeInWork *wk, int button, int x, int y, int unused) {
     BmpOamActorSetup setup;
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0028, HEAPID_CODEIN);
-    StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, Bank0028_Text_Back + button);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_CODEIN_DISP, HEAPID_CODEIN);
+    StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, CodeinDisp_Text_Back + button);
     GFLBitmap *bitmap = GFL_BitmapCreate(10, 2, 0x20, HEAPID_CODEIN);
     int width = GFL_FontGetBlockWidth(str, wk->font, 0);
     s16 textX;
@@ -481,7 +481,7 @@ void CodeInDisp_CreateMessageWindow(BmpWin **window, u32 messageId, int bg, int 
 // Draws a message of the screen's text bank, with a number for its "{0}"
 void CodeInDisp_DrawMessage(BmpWin *window, u32 messageId, Font *font, int number) {
     WordSet *wordSet = GFL_WordSetSystemCreateDefault(HEAPID_CODEIN);
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0028, HEAPID_CODEIN);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_CODEIN_DISP, HEAPID_CODEIN);
     StrBuf *format = GFL_MsgDataLoadStrbufNew(msgData, messageId);
     StrBuf *str = GFL_StrBufCreate(88, HEAPID_CODEIN);
 
@@ -500,8 +500,8 @@ void CodeInDisp_DrawMessage(BmpWin *window, u32 messageId, Font *font, int numbe
 // Says that there is no such train or rank
 void CodeInDisp_DrawErrorMessage(BmpWin *window, u32 mode, Font *font, int number) {
     if (mode == CODEIN_MODE_TRAIN) {
-        CodeInDisp_DrawMessage(window, Bank0028_Text_ThereNoSuchTrain, font, number);
+        CodeInDisp_DrawMessage(window, CodeinDisp_Text_ThereNoSuchTrain, font, number);
     } else if (mode == CODEIN_MODE_RANK) {
-        CodeInDisp_DrawMessage(window, Bank0028_Text_ThereNoSuchRank, font, number);
+        CodeInDisp_DrawMessage(window, CodeinDisp_Text_ThereNoSuchRank, font, number);
     }
 }

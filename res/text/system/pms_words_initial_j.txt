@@ -1,0 +1,11 @@
+PmsWordsInitialJ_Text_Jellicent = JELLICENT
+PmsWordsInitialJ_Text_Jigglypuff = JIGGLYPUFF
+PmsWordsInitialJ_Text_Jirachi = JIRACHI
+PmsWordsInitialJ_Text_Job = JOB
+PmsWordsInitialJ_Text_Jolteon = JOLTEON
+PmsWordsInitialJ_Text_Joltik = JOLTIK
+PmsWordsInitialJ_Text_Judgment = JUDGMENT
+PmsWordsInitialJ_Text_Jumpkick = JUMPKICK
+PmsWordsInitialJ_Text_Jumpluff = JUMPLUFF
+PmsWordsInitialJ_Text_Justified = JUSTIFIED
+PmsWordsInitialJ_Text_Jynx = JYNX

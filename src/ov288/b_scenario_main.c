@@ -391,7 +391,7 @@ static void BScenarioMain_Init(BScenarioWork *work) {
     work->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKEWOOD_LINES, work->param->heapId);
     // The films' scripts are the 41 message files from 314
     work->msgData[1] =
-        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0314 + work->scenario, work->param->heapId);
+        GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_B_SCENARIO_MOVIE_00 + work->scenario, work->param->heapId);
     BScenarioMain_InitBG(work);
     BScenarioMain_LoadBG(work);
     BScenarioMain_CountScriptLines(work);

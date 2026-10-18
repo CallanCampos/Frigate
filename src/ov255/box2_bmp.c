@@ -142,7 +142,7 @@ static void func_ov255_021ce0c0(Box2AppWork *app, u32 index, MsgData *msgData, u
 }
 
 static MsgData *func_ov255_021ce130(void) {
-    return GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0014, HEAPID_BOX2_APP);
+    return GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BOX2_BMP, HEAPID_BOX2_APP);
 }
 
 void func_ov255_021ce140(Box2SysWork *syswk) {

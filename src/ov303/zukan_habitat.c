@@ -29,7 +29,7 @@
 #include "system/game_data.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/0362.h"
+#include "text/system/zukan_habitat.h"
 
 // The Pokédex's Habitat List: its process, its sequences and what they show. The ROM has no name for this file;
 // zukan_habitat.c is a guess after zukan.c, which calls the screen the habitat list.
@@ -376,7 +376,7 @@ static ZukanHabitatWork *ZukanHabitat_CreateWork(GameProc *proc, ZukanHabitatLis
 
     MI_CpuFill8(wk, 0, sizeof(ZukanHabitatWork));
     wk->param = param;
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0362, HEAPID_ZUKAN_HABITAT);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZUKAN_HABITAT, HEAPID_ZUKAN_HABITAT);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_HABITAT);
     return wk;
 }
@@ -1144,7 +1144,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
             area = ZukanHabitat_GetArea(wk);
             loadLocationNameToStrbuf(wk->wordSet, 0, ZoneData_GetPlaceNameID(ZukanHabitat_GetArea(wk)->zone));
             strbuf = GFL_StrBufCreate(0x100, HEAPID_ZUKAN_HABITAT);
-            format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0362_Text_YouveRegisteredEveryPokemon);
+            format = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_YouveRegisteredEveryPokemon);
             GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
             func_02010db8(wk->habitat);
             ZukanHabitatGraphic_CreateMessageWindow(&wk->graphic, 10, 5);
@@ -1237,10 +1237,10 @@ static void ZukanHabitat_SeqAllComplete(ZukanHabitatWork *wk) {
     switch (wk->step) {
     case 0:
         if (wk->award == AWARD_CAUGHT) {
-            strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0362_Text_WhenAllPokemonHabitat_2);
+            strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_WhenAllPokemonHabitat_2);
             func_02010db8(wk->habitat);
         } else {
-            strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0362_Text_WhenAllPokemonHabitat);
+            strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_WhenAllPokemonHabitat);
             func_02010db0(wk->habitat);
         }
         ZukanHabitatGraphic_CreateMessageWindow(&wk->graphic, 8, 9);
@@ -1276,7 +1276,7 @@ static void ZukanHabitat_PrintHabitat(ZukanHabitatWork *wk) {
     if (wk->empty == FALSE) {
         message = ZukanHabitat_GetHabitatMessage(wk->type, area->unk8);
     } else {
-        message = Bank0362_Text_NoPokemonLivesHere;
+        message = ZukanHabitat_Text_NoPokemonLivesHere;
     }
     if (area->values[wk->type] == 1) {
         message += wk->season + 1;
@@ -1292,13 +1292,13 @@ static void ZukanHabitat_PrintHabitat(ZukanHabitatWork *wk) {
 
 static u32 ZukanHabitat_GetHabitatMessage(u32 type, u32 land) {
     u32 landMessages[] = {
-        Bank0362_Text_PokemonLivingTallGrass, Bank0362_Text_PokemonLivingSand,    Bank0362_Text_PokemonLivingSwamp,
-        Bank0362_Text_PokemonLivingPlace,     Bank0362_Text_PokemonLivingPlace_2, Bank0362_Text_PokemonLivingLand,
-        Bank0362_Text_NoPokemonLivesHere,
+        ZukanHabitat_Text_PokemonLivingTallGrass, ZukanHabitat_Text_PokemonLivingSand,    ZukanHabitat_Text_PokemonLivingSwamp,
+        ZukanHabitat_Text_PokemonLivingPlace,     ZukanHabitat_Text_PokemonLivingPlace_2, ZukanHabitat_Text_PokemonLivingLand,
+        ZukanHabitat_Text_NoPokemonLivesHere,
     };
 
-    return ZukanHabitat_ChooseMessage(type, land, landMessages, Bank0362_Text_PokemonCatchWhileSurfing,
-                                      Bank0362_Text_PokemonCatchByFishing);
+    return ZukanHabitat_ChooseMessage(type, land, landMessages, ZukanHabitat_Text_PokemonCatchWhileSurfing,
+                                      ZukanHabitat_Text_PokemonCatchByFishing);
 }
 
 static u32 ZukanHabitat_ChooseMessage(u32 type, u32 land, const u32 *landMessages, u32 water, u32 fishing) {
@@ -1315,7 +1315,7 @@ static u32 ZukanHabitat_ChooseMessage(u32 type, u32 land, const u32 *landMessage
 }
 
 static void ZukanHabitat_PrintInfoLabel(ZukanHabitatWork *wk, u16 color) {
-    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0362_Text_Info);
+    StrBuf *strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_Info);
 
     ZukanHabitatGraphic_Print(ZUKAN_HABITAT_WIN_MAIN, strbuf, &wk->graphic, 124, 172, 96, 16, color);
     GFL_StrBufFree(strbuf);
@@ -1331,7 +1331,7 @@ static void ZukanHabitat_PrintAreaName(ZukanHabitatWork *wk) {
 
     loadLocationNameToStrbuf(wk->wordSet, 0, ZoneData_GetPlaceNameID(ZukanHabitat_GetArea(wk)->zone));
     strbuf = GFL_StrBufCreate(0x100, HEAPID_ZUKAN_HABITAT);
-    format = GFL_MsgDataLoadStrbufNew(wk->msgData, Bank0362_Text_Empty_6);
+    format = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_Empty_6);
     GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
     ZukanHabitatGraphic_Print(ZUKAN_HABITAT_WIN_SUB, strbuf, &wk->graphic, 8, 4, 256, 16, PRINT_COLOR(14, 15, 0));
     GFL_StrBufFree(format);

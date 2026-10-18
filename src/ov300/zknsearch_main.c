@@ -27,7 +27,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/0479.h"
+#include "text/system/zknsearch_main.h"
 
 // The Pokédex's search screen: its BGs and graphics, its fades and the touch bar that slides in
 
@@ -51,10 +51,10 @@ static const BGSysVRAMConfig sZknSearchVRAMConfig = {
 
 // The messages of the types, and of none
 static const u16 sZknSearchTypeMsgs[ZKNSEARCH_TYPE_COUNT + 1] = {
-    Bank0479_Text_Normal, Bank0479_Text_Fighting, Bank0479_Text_Flying,   Bank0479_Text_Poison,  Bank0479_Text_Ground,
-    Bank0479_Text_Rock,   Bank0479_Text_Bug,      Bank0479_Text_Ghost,    Bank0479_Text_Steel,   Bank0479_Text_Fire,
-    Bank0479_Text_Water,  Bank0479_Text_Grass,    Bank0479_Text_Electric, Bank0479_Text_Psychic, Bank0479_Text_Ice,
-    Bank0479_Text_Dragon, Bank0479_Text_Dark,     Bank0479_Text_Empty_9,
+    ZknsearchMain_Text_Normal, ZknsearchMain_Text_Fighting, ZknsearchMain_Text_Flying,   ZknsearchMain_Text_Poison,  ZknsearchMain_Text_Ground,
+    ZknsearchMain_Text_Rock,   ZknsearchMain_Text_Bug,      ZknsearchMain_Text_Ghost,    ZknsearchMain_Text_Steel,   ZknsearchMain_Text_Fire,
+    ZknsearchMain_Text_Water,  ZknsearchMain_Text_Grass,    ZknsearchMain_Text_Electric, ZknsearchMain_Text_Psychic, ZknsearchMain_Text_Ice,
+    ZknsearchMain_Text_Dragon, ZknsearchMain_Text_Dark,     ZknsearchMain_Text_Empty_9,
 };
 
 // The shapes in the order of the list
@@ -426,7 +426,7 @@ void ZknSearchMain_ExitWindow(void) {
 }
 
 void ZknSearchMain_InitMsg(ZknSearchWork *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0479, HEAPID_ZUKAN_SEARCH);
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZKNSEARCH_MAIN, HEAPID_ZUKAN_SEARCH);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_SEARCH);
     wk->printQueue = func_02021998(HEAPID_ZUKAN_SEARCH);

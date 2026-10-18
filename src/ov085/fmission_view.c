@@ -25,7 +25,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/0040.h"
+#include "text/system/fmission_view_setup.h"
 
 // The touch screen during a Funfest mission: its sequences, the log's panels and the tasks of its messages. The file's
 // name is a guess, after the ROM's "fmission_view_setup.c". The names are ours
@@ -476,7 +476,7 @@ static BOOL FMissionView_CheckGreeting(FMissionView *view) {
     }
     *changed = 0;
     func_0202437c(view->wordSet, 0, BeaconStatus_GetGreeting(view->beaconStatus), view->gender, 1, 2);
-    FMissionView_ShowMessage(view, Bank0040_Text_Said);
+    FMissionView_ShowMessage(view, FmissionViewSetup_Text_Said);
     return TRUE;
 }
 
@@ -714,7 +714,7 @@ static void FMissionView_DrawMission(FMissionView *view) {
 static void FMissionView_DrawMemberCount(FMissionView *view, int *pending) {
     GFL_BitmapFill(view->wins[FMISSION_VIEW_WIN_MEMBERS].win.bitmap, 13);
     WordSetNumber(view->wordSet, 0, view->memberCount, 3, 1, TRUE);
-    FMissionView_LoadMessage(view, Bank0040_Text_Participants);
+    FMissionView_LoadMessage(view, FmissionViewSetup_Text_Participants);
     BeaconViewWin_PrintEx(&view->wins[FMISSION_VIEW_WIN_MEMBERS].win, view->message, 0, 0, 13, PRINT_COLOR(1, 2, 13),
                           pending, view->printNow, FALSE);
 }
@@ -861,10 +861,10 @@ static void FMissionView_PrintPanel(FMissionView *view, FMissionViewPanel *panel
     panel->look = FMissionLogEntryFV_GetLook(entry);
     func_02015018(entry, panel->strs[0]);
     WordSetNumber(view->wordSet, 0, FMissionLogEntryFV_GetScore(entry), 4, 1, TRUE);
-    GFL_MsgDataLoadStrbuf(view->msgData, Bank0040_Text_Score, view->tmpStr);
+    GFL_MsgDataLoadStrbuf(view->msgData, FmissionViewSetup_Text_Score, view->tmpStr);
     GFL_WordSetFormatStrbuf(view->wordSet, panel->strs[2], view->tmpStr);
     FMissionLogEntryFV_SetWords(entry, view->wordSet, view->heapId);
-    GFL_MsgDataLoadStrbuf(view->msgData, kind + Bank0040_Text_Score, view->tmpStr);
+    GFL_MsgDataLoadStrbuf(view->msgData, kind + FmissionViewSetup_Text_Score, view->tmpStr);
     GFL_WordSetFormatStrbuf(view->wordSet, panel->strs[1], view->tmpStr);
     {
         u16 colors[2] = { PRINT_COLOR(15, 3, 0), PRINT_COLOR(6, 5, 0) };
@@ -1164,7 +1164,7 @@ static void FMissionView_PassPowerTask(TCBEx *task, void *data) {
     }
     switch (offer->seq) {
     case 0:
-        FMissionView_LoadMessage(view, Bank0040_Text_UseActivated);
+        FMissionView_LoadMessage(view, FmissionViewSetup_Text_UseActivated);
         FMissionView_PrintMessage(view, view->message, &offer->wait);
         offer->seq++;
         break;
@@ -1261,7 +1261,7 @@ static void FMissionView_QuitTask(TCBEx *task, void *data) {
     }
     switch (quit->seq) {
     case 0:
-        FMissionView_LoadMessage(view, Bank0040_Text_QuitFunfestMission);
+        FMissionView_LoadMessage(view, FmissionViewSetup_Text_QuitFunfestMission);
         FMissionView_PrintMessage(view, view->message, &quit->wait);
         quit->seq++;
         break;

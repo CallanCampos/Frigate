@@ -23,7 +23,7 @@
         },
         {
             "id": 1,
-            "model": "OBJ_CODE_MODEL_9",
+            "model": "OBJ_CODE_MODEL_CUBE",
             "movement": 0,
             "type": 0,
             "flag": 0,

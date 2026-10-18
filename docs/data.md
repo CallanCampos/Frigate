@@ -205,8 +205,9 @@ are named after their constants, which give their order in the archive: a system
 `SCRIPT_TEXT_*` in `script_text_banks.txt`, which names a zone's after the zone (`black_city.txt`) and a global script
 file's after its first script ID (`global_10885.txt`). A system message file is named after what it holds, which the
 word set function that loads it or its contents show (`move_names.txt`, `natures.txt`), or else after the source file or
-function that loads it (`delete_save.txt`); the others keep their number until they are known (`0001.txt`), as
-`TEXT_BANK_0001`. To rename one, rename its constant with `rename_constant.py`, which renames the file, its message IDs
+function that loads it (`delete_save.txt`, `b_bag_main.txt`), with the index the code picks it by where it loads one of
+a run (`pkwd_briefing_movie_00.txt` for `TEXT_BANK_PKWD_BRIEFING_MOVIE_00`, `TEXT_BANK_PKWD_BRIEFING_MOVIE_00 + movie`);
+the others keep their number until code that loads them is known (`0009.txt` for `TEXT_BANK_0009`). To rename one, rename its constant with `rename_constant.py`, which renames the file, its message IDs
 and its header with it (`TEXT_BANK_0377` to `TEXT_BANK_TOWN_MAP` made `Bank0377_Text_FlyWhere` `TownMap_Text_FlyWhere`).
 Both versions have the same text. The code names a message file by its constant too: `GFL_MsgSysLoadData(FALSE,
 ARCID_SYSTEM_MESSAGE, TEXT_BANK_TRADE_NAMES, heapId)`, from `constants/text_banks.h` and `constants/script_text_banks.h`.
@@ -905,7 +906,8 @@ changes only its bundle, and the rebuilt model loads in Apicula.
 
 A zone's header names its map matrix, `res/field/matrices/<matrix>.json` (`a/0/0/9`), by its constant in
 `generated/map_matrices.txt`, which names a matrix after the first zone that uses it, the overworld's
-`MAP_MATRIX_OVERWORLD`. A matrix is a grid of its cells' maps, map models by their `MAP_MODEL_*` constants (null for
+`MAP_MATRIX_OVERWORLD`, and one that no zone uses after Game Freak's name of its map model (`MAP_MATRIX_M_DUN0403`
+for `MAP_MODEL_M_DUN0403_00_00`). A matrix is a grid of its cells' maps, map models by their `MAP_MODEL_*` constants (null for
 none), row by row,
 and, for the overworld's, of their zones by name; `tools/data/map_matrix_data.py` packs them in the list's order. A
 row stays on one line, so the file reads as the grid.
@@ -951,8 +953,8 @@ show it (an event flag, or a `TOWNMAP_FLAG_*` that the code works out, from
 The field's actors are the people, Pokémon and objects that zones and scripts put on the map. Each one's model is an
 object code, a constant of `generated/obj_codes.txt`, which the zones' events give their NPCs as `"model":
 "OBJ_CODE_YOUNGSTER"`, and each object code is a directory of `res/field/actors/`: `hero/` for `OBJ_CODE_HERO`,
-`pokemon/bulbasaur/` for the walking Pokémon's `OBJ_CODE_POKEMON_BULBASAUR`, and `models/0/` for the 3D models'
-`OBJ_CODE_MODEL_0`. Its `data.json` is its record of the model table (`a/0/4/7`, `FieldActorConfig` in
+`pokemon/bulbasaur/` for the walking Pokémon's `OBJ_CODE_POKEMON_BULBASAUR`, and `models/bigrock/` for the 3D models'
+`OBJ_CODE_MODEL_BIGROCK`. Its `data.json` is its record of the model table (`a/0/4/7`, `FieldActorConfig` in
 `include/field/field_actor.h`, with swan's names), which `field_actor.schema.json` documents: whether it is a sprite,
 a 3D model or nothing to draw, its shadow, footprints, reflections, sizes, sex, collision and drawing offset. Its
 graphics go in the graphics archive (`a/0/4/8`):
@@ -966,7 +968,8 @@ graphics go in the graphics archive (`a/0/4/8`):
 People and objects are named after the trainer class that most of the trainers the zones' events give them have
 (`OBJ_CODE_BIKER`, `OBJ_CODE_ROUGHNECK` and `OBJ_CODE_HARLEQUIN_233` also show other classes'), or where the code
 shows what they are (`OBJ_CODE_HERO`, `OBJ_CODE_STRENGTH_ROCK`, `OBJ_CODE_WORK_00` and on, which stand for the
-code in a work value), and are numbered otherwise, as `OBJ_CODE_80`: name them with `rename_constant.py` as they are
+code in a work value); 3D models are named after the model's own name in its `model.nsbmd` (`OBJ_CODE_MODEL_DRAGON_BONE`
+for `dragon_bone`); and are numbered otherwise, as `OBJ_CODE_80`: name them with `rename_constant.py` as they are
 identified, which moves their directories. Walking Pokémon are named after the species, sex and form that the walking
 Pokémon's table (`a/2/0/8`) gives them. The table has the codes in the list's order; the graphics archive has the 3D
 models and then the sprites, each in the order of the codes that show them, and the packer writes each code's place

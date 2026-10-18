@@ -422,7 +422,7 @@ static BOOL UnionCommand_WarpA(GameSystem *gsys, UnionSystem *unisys, Field *fie
         pos.x = (func_02042a6c(func_02040440()) * 16 + 88) << FX32_SHIFT;
         pos.y = 0;
         pos.z = FX32_CONST(152);
-        *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_150, &pos, 0, FALSE);
+        *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_UNION_ROOM_COLOSSEUM, &pos, 0, FALSE);
     } else {
         return TRUE;
     }
@@ -438,7 +438,7 @@ static BOOL UnionCommand_WarpB(GameSystem *gsys, UnionSystem *unisys, Field *fie
         pos.x = (func_02042a6c(func_02040440()) * 16 + 88) << FX32_SHIFT;
         pos.y = 0;
         pos.z = FX32_CONST(152);
-        *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_151, &pos, 0, FALSE);
+        *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_UNION_ROOM_COLOSSEUM_2, &pos, 0, FALSE);
     } else {
         return TRUE;
     }

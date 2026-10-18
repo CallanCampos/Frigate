@@ -59,7 +59,7 @@ BrRes *BrRes_Init(u32 color, BOOL isUseColor, HeapID heapId) {
     }
 
     p_wk->font = GFL_FontCreate(23, 0, 0, FALSE, heapId);
-    p_wk->msg = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0008, heapId);
+    p_wk->msg = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BR_RES, heapId);
     p_wk->wordset = GFL_WordSetSystemCreate(8, 64, heapId);
     BrRes_LoadCommonPltt(p_wk, CLACT_VRAM_MAIN, heapId);
     BrRes_LoadCommonPltt(p_wk, CLACT_VRAM_SUB, heapId);
