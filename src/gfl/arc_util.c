@@ -45,7 +45,14 @@ static u32 GFL_BGSysLoadNCGRStaticCore(void *file, u32 bg, u32 offset, u32 size,
         if (size == 0) {
             size = character->size;
         }
+#ifdef PLATFORM_PC
+        // A size larger than the file's characters (the copyright screen's 0x8000, src/ov162/boot_screens.c) loads
+        // what follows them in memory too, past the end of the file's heap block, into tiles the screen doesn't show.
+        // The host loads the characters alone (port/docs/sanitizers.md)
+        GFL_BGSysLoadChar(bg, character->rawData, size > character->size ? character->size : size, offset);
+#else
         GFL_BGSysLoadChar(bg, character->rawData, size, offset);
+#endif
     }
     GFL_HeapFree(file);
     return size;

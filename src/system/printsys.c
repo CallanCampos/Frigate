@@ -596,8 +596,18 @@ void func_020223bc(PrintStream *stream) {
 
 void func_020223cc(PrintStream *stream) {
     if (stream->task != NULL) {
+#ifdef PLATFORM_PC
+        // The stream is its task's data, which ending the task frees when the task manager allocated it
+        // (GFL_TCBExMgrAddTask, src/gfl/tcbl.c): the write after it went to freed memory. The host clears the field
+        // first (port/docs/sanitizers.md)
+        TCBEx *task = stream->task;
+
+        stream->task = NULL;
+        GFL_TCBExRequestEnd(task);
+#else
         GFL_TCBExRequestEnd(stream->task);
         stream->task = NULL;
+#endif
     }
 }
 
