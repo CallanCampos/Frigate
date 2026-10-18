@@ -203,7 +203,11 @@ in the `#else`. A mistake of an earlier decompilation is just fixed: it isn't th
 tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, since the macro turns the expression into
 a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
 
-**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version.
+**Don't:** put a comment between a declaration's specifiers and the rest (`static // Connects ...` above
+`int AossAp_Connect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
+
+**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version, and a comment
+right after `static`, `inline`, `extern` or `const` that starts a line.
 
 ## 12. Rows of the nonmatching functions
 

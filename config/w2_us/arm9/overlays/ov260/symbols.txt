@@ -754,7 +754,7 @@ data_ov260_021c20f4 kind:bss addr:0x021c2134 ambiguous
 data_ov260_021c211c kind:bss addr:0x021c215c ambiguous
 data_ov260_021c2234 kind:bss addr:0x021c2274 ambiguous
 data_ov260_021c2390 kind:bss addr:0x021c23d0 ambiguous
-sCompetitionUrl kind:bss addr:0x021c2414
+gCompetitionUrl kind:bss addr:0x021c2414
 sGdb kind:bss addr:0x021c2494
 data_ov260_021c2458 kind:bss addr:0x021c2498
 sGdbRequests kind:bss addr:0x021c24ac

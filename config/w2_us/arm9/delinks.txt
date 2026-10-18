@@ -836,6 +836,7 @@ lib/nnsys/src/gfd/gfd_LinkedListPlttVramMan.c:
     .bss        start:0x02141ab0 end:0x02141ac4
 
 lib/nnsys/src/g2d/g2d_NAN_load.c:
+    complete
     .text       start:0x02060050 end:0x02060154
 
 lib/nnsys/src/g2d/g2d_NCE_load.c:
@@ -859,6 +860,7 @@ lib/nnsys/src/g2d/g2d_NSC_load.c:
     .text       start:0x02060364 end:0x02060384
 
 lib/nnsys/src/g2d/g2d_Load.c:
+    complete
     .text       start:0x02060384 end:0x020603e0
 
 lib/nnsys/src/g2d/g2d_Animation.c:
@@ -1065,6 +1067,7 @@ lib/nnsys/src/g3d/res_struct_accessor_anm.c:
     .text       start:0x020686b8 end:0x02068790
 
 lib/nnsys/src/g3d/nsbca.c:
+    complete
     .text       start:0x02068790 end:0x02069738
     .rodata     start:0x02094484 end:0x020944a8
 
@@ -1073,6 +1076,7 @@ lib/nnsys/src/g3d/nsbma.c:
     .text       start:0x02069738 end:0x02069a44
 
 lib/nnsys/src/g3d/nsbta.c:
+    complete
     .text       start:0x02069a44 end:0x02069d54
 
 lib/nnsys/src/g3d/nsbtp.c:
@@ -1807,6 +1811,7 @@ lib/dwc/src/wds/wds.c:
     .bss        start:0x021419c4 end:0x021419c8
 
 lib/dwc/src/ac/dwc_ac_wcm.c:
+    complete
     .text       start:0x02058edc end:0x02059788
     .rodata     start:0x02094108 end:0x0209410c
 
@@ -2033,6 +2038,7 @@ lib/nitro/src/os/os_irqTable.c:
     .bss        start:0x0214c1b8 end:0x0214c248
 
 lib/nitro/src/os/os_interrupt.c:
+    complete
     .text       start:0x02079d3c end:0x02079f30
 
 lib/nitro/src/os/os_reset_pxi.c:
@@ -2081,6 +2087,7 @@ lib/nitro/src/os/os_init.c:
     .text       start:0x0207b130 end:0x0207b1b8
 
 lib/nitro/src/os/os_arena.c:
+    complete
     .text       start:0x0207b1b8 end:0x0207b494
     .bss        start:0x0214c4e4 end:0x0214c4ec
 

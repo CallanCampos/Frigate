@@ -16,10 +16,10 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
 static u8 *SOCLi_ReadCPSBuffer(SOCLSocket *socket, int *avail, u16 *local_port, u16 *remote_port, CPSInAddr *remote_ip);
 static int SOCLi_ExecReadCommand(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
                                  int block);
-static int SOCLi_ReadCallBack(SOCLCommandPacket *packet);
-static int SOCLi_ReadNoWaitCallBack(SOCLCommandPacket *packet);
+static int SOCLi_ReadCallBack(void *arg);
+static int SOCLi_ReadNoWaitCallBack(void *arg);
 static int SOCLi_ConsumeBuffer(SOCLSocket *socket);
-static int SOCLi_ConsumeCallBack(SOCLCommandPacket *packet);
+static int SOCLi_ConsumeCallBack(void *arg);
 static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket);
 static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int block);
 
@@ -50,7 +50,7 @@ int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSIn
             return SOCL_ENOTCONN;
         }
     }
-    pipe = SOCLi_GetRecvPipe(socket);
+    pipe = socket->recv_pipe;
     if (!(block & 1)) {
         if (!OS_TryLockMutex(&pipe->base.mutex)) {
             return SOCL_EAGAIN;
@@ -65,7 +65,7 @@ int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSIn
 
 static int SOCLi_ReadAndConsumeBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
                                       int block, int flags) {
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     BOOL peek = (flags & SOCLI_READ_PEEK) && pipe != NULL;
     s8 was_peeking;
     int result;
@@ -123,8 +123,8 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
                 result = len;
             }
             MI_CpuCopy(data, buf, len);
-            if (SOCLi_GetRecvPipe(socket)->peek == 0) {
-                SOCLi_GetRecvPipe(socket)->cps_read_len += result;
+            if (socket->recv_pipe->peek == 0) {
+                socket->recv_pipe->cps_read_len += result;
             }
         }
     } else {
@@ -152,7 +152,7 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
 // pipe) and the ports and address of its sender. NULL when there is nothing to read or the connection has gone
 static u8 *SOCLi_ReadCPSBuffer(SOCLSocket *socket, int *avail, u16 *local_port, u16 *remote_port,
                                CPSInAddr *remote_ip) {
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     CPSSoc *soc = (CPSSoc *)pipe->base.thread.specific[0];
     int read_len = pipe->cps_read_len;
     int left = soc->rcvbuf_len - read_len;
@@ -181,36 +181,37 @@ static int SOCLi_ExecReadCommand(SOCLSocket *socket, u8 *buf, int len, u16 *remo
     } else {
         packet = SOCLi_CreateCommandPacket(SOCLi_ReadNoWaitCallBack, socket, 1);
     }
-    packet->args.read.buf = buf;
-    packet->args.read.len = len;
-    packet->args.read.remote_port = remote_port;
-    packet->args.read.remote_ip = remote_ip;
+    packet->read.buf = buf;
+    packet->read.len = len;
+    packet->read.remote_port = remote_port;
+    packet->read.remote_ip = remote_ip;
     return SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
 }
 
-static int SOCLi_ReadCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
-    int len = packet->args.read.len;
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
-    u8 *buf = packet->args.read.buf;
-    u16 *remote_port = packet->args.read.remote_port;
-    CPSInAddr *remote_ip = packet->args.read.remote_ip;
-    int read_len = pipe->cps_read_len;
-    u32 cps_len;
+static int SOCLi_ReadCallBack(void *arg) {
+    SOCLiCommandRead *cpacket = (SOCLiCommandRead *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
+    SOCLRecvPipe *pipe = socket->recv_pipe;
+    u8 *buf = cpacket->buf;
+    int len = cpacket->len;
+    u16 *remote_port = cpacket->remote_port;
+    CPSInAddr *remote_ip = cpacket->remote_ip;
     u8 *data;
+    u32 cps_len;
+    int read_len;
     int result;
 
+    read_len = pipe->cps_read_len;
     while (1) {
         data = CPS_SocRead(&cps_len);
-        if (data != NULL && (int)(cps_len - read_len) <= 0) {
-            if (SOCLi_SocketIsTCP(socket) && ((CPSSoc *)socket)->state != CPS_STT_ESTABLISHED) {
-                data = NULL;
-                break;
-            }
-            OS_Sleep(10);
-            continue;
+        if (data == NULL || (int)cps_len - read_len > 0) {
+            break;
         }
-        break;
+        if (SOCLi_SocketIsTCP(socket) && ((CPSSoc *)socket)->state != CPS_STT_ESTABLISHED) {
+            data = NULL;
+            break;
+        }
+        OS_Sleep(10);
     }
     if (socket->state & SOCLI_STATE_RESET) {
         return SOCL_ECONNRESET;
@@ -241,11 +242,12 @@ static int SOCLi_ReadCallBack(SOCLCommandPacket *packet) {
 }
 
 // The read command for a call that does not wait: it takes what CPS has now
-static int SOCLi_ReadNoWaitCallBack(SOCLCommandPacket *packet) {
-    SOCLSocket *socket = packet->socket;
-    u8 *buf = packet->args.read.buf;
-    int len = packet->args.read.len;
-    int read_len = SOCLi_GetRecvPipe(socket)->cps_read_len;
+static int SOCLi_ReadNoWaitCallBack(void *arg) {
+    SOCLiCommandRead *cpacket = (SOCLiCommandRead *)arg;
+    SOCLSocket *socket = cpacket->h.socket;
+    u8 *buf = cpacket->buf;
+    int len = cpacket->len;
+    int read_len = socket->recv_pipe->cps_read_len;
     s32 length;
     u32 cps_len;
     u8 *data;
@@ -283,25 +285,28 @@ static int SOCLi_ReadNoWaitCallBack(SOCLCommandPacket *packet) {
 }
 
 static int SOCLi_ConsumeBuffer(SOCLSocket *socket) {
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     SOCLCommandPacket *packet;
+    int result;
 
     if (pipe->cps_read_len < pipe->rcvbuf_consume_min) {
         return 0;
     }
     packet = SOCLi_CreateCommandPacket(SOCLi_ConsumeCallBack, socket, 0);
-    if (packet != NULL) {
-        return SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
+    if (packet == NULL) {
+        return SOCL_EMFILE;
     }
-    return SOCL_EMFILE;
+    result = SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
+    return result;
 }
 
-static int SOCLi_ConsumeCallBack(SOCLCommandPacket *packet) {
-    return SOCLi_ConsumeCPSBuffer(packet->socket);
+static int SOCLi_ConsumeCallBack(void *arg) {
+    SOCLiCommandConsume *cpacket = (SOCLiCommandConsume *)arg;
+    return SOCLi_ConsumeCPSBuffer(cpacket->h.socket);
 }
 
 static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket) {
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     u32 irq = OS_DisableInterrupts();
     int consume_len = pipe->cps_read_len;
 
@@ -315,7 +320,7 @@ static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket) {
 
 static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
                                int block) {
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     SOCLUdpPacket *packet;
     u32 irq = OS_DisableInterrupts();
     int result;
@@ -367,8 +372,8 @@ static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote
 
 BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc) {
     SOCLSocket *socket = (SOCLSocket *)soc;
+    SOCLRecvPipe *pipe = socket->recv_pipe;
     SOCLUdpPacket *packet;
-    SOCLRecvPipe *pipe = SOCLi_GetRecvPipe(socket);
     u32 irq = OS_DisableInterrupts();
 
     if (pipe->udp_queued_max >= pipe->udp_queued + len) {
