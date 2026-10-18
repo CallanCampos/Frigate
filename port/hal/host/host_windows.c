@@ -4,10 +4,11 @@
 // program's functions and globals from the COFF symbol table that lld keeps in an unstripped MinGW program, the
 // watchdog as a thread, and the program's static data from the PE image's writable sections. It also sets up every
 // program that links it before main(): stdout and stderr in binary mode, so that "\n" stays "\n" as on macOS and
-// Linux, and no error dialog on a crash or abort(), which would hold a test or a CI run forever. It touches no part of
-// the game: the trap placeholders (port/hal/trap.c), the fibers' guards (port/hal/os/fiber.c), the PXI pointers into
-// static data (port/hal/pxi/pointer.c), --run-dump's globals (port/app/symbols.c) and the watchdog (port/app/main.c)
-// stand on it. macOS and Linux have host_posix.c instead (port/docs/adr/0013).
+// Linux; no error dialog on a crash or abort(), which would hold a test or a CI run forever; and both exception
+// handlers. It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers' guards
+// (port/hal/os/fiber.c), the PXI pointers into static data (port/hal/pxi/pointer.c), --run-dump's globals
+// (port/app/main.c) and the watchdog (port/app/main.c) stand on it. macOS and Linux have host_posix.c instead
+// (port/docs/adr/0013).
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
@@ -53,6 +54,7 @@ static int InImage(uintptr_t address) {
 
 // --- Memory -------------------------------------------------------------------------------------------------------
 
+// VirtualProtect works on these 4 KiB pages, while VirtualAlloc places a mapping at the allocation granularity, 64 KiB
 size_t port_host_page_size(void) {
     static size_t page;
 
@@ -69,13 +71,16 @@ void *port_host_map(size_t size) {
     return VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 }
 
-// A reservation starts at the system's allocation granularity, 64 KiB, so the address is rounded down to it
+// A reservation starts at the system's allocation granularity, 64 KiB, so the address is rounded down to it; NULL when
+// that range is taken
 void *port_host_map_near(uintptr_t address, size_t size) {
     return VirtualAlloc((void *)address, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 }
 
+static void ForgetRegions(void *start, size_t size);
+
 void port_host_unmap(void *start, size_t size) {
-    (void)size;
+    ForgetRegions(start, size);
     VirtualFree(start, 0, MEM_RELEASE);
 }
 
@@ -104,6 +109,86 @@ void *port_host_map_file_copy(const char *path, size_t *size) {
     return view;
 }
 
+// A view of a file is released by unmapping it; VirtualFree releases only what VirtualAlloc made
+void port_host_unmap_file_copy(void *view, size_t size) {
+    (void)size;
+    UnmapViewOfFile(view);
+}
+
+// --- The memory the seam made inaccessible --------------------------------------------------------------------------
+
+// The ranges that port_host_protect_none and port_host_protect_stack_guard made fault: the trap placeholders' pages and
+// the fibers' guards. A fault at an address in one is the port's own, whatever code touched it (the C library's memset
+// and memcpy run outside the program's image); and a thread whose stack, as its TEB has it, starts at the top of a
+// guard runs on that guard's fiber, since minicoro sets the TEB's stack bounds to the fiber's stack (fiber.c puts the
+// stack right above its guard). The vectored handler reads them only when the lock is free: the thread that faults may
+// be the one holding it
+typedef struct HostRegion {
+    uintptr_t start;
+    uintptr_t end;
+    int stackGuard;
+} HostRegion;
+
+static SRWLOCK sRegionsLock = SRWLOCK_INIT;
+static HostRegion *sRegions;
+static size_t sRegionCount;
+static size_t sRegionCapacity;
+
+static void AddRegion(void *start, size_t size, int stackGuard) {
+    AcquireSRWLockExclusive(&sRegionsLock);
+    if (sRegionCount == sRegionCapacity) {
+        size_t capacity = sRegionCapacity == 0 ? 64 : sRegionCapacity * 2;
+        HostRegion *regions = realloc(sRegions, capacity * sizeof(*regions));
+
+        if (regions != NULL) {
+            sRegions = regions;
+            sRegionCapacity = capacity;
+        }
+    }
+    // Without room, a fault there is reported as any other is
+    if (sRegionCount < sRegionCapacity) {
+        sRegions[sRegionCount].start = (uintptr_t)start;
+        sRegions[sRegionCount].end = (uintptr_t)start + size;
+        sRegions[sRegionCount].stackGuard = stackGuard;
+        sRegionCount++;
+    }
+    ReleaseSRWLockExclusive(&sRegionsLock);
+}
+
+// Forgets the regions in pages that are being released, such as a destroyed fiber's guard
+static void ForgetRegions(void *start, size_t size) {
+    uintptr_t low = (uintptr_t)start;
+    uintptr_t high = low + size;
+
+    AcquireSRWLockExclusive(&sRegionsLock);
+    for (size_t i = 0; i < sRegionCount;) {
+        if (sRegions[i].start >= low && sRegions[i].end <= high) {
+            sRegions[i] = sRegions[--sRegionCount];
+        } else {
+            i++;
+        }
+    }
+    ReleaseSRWLockExclusive(&sRegionsLock);
+}
+
+// Whether address is in a region, and whether a stack whose lowest address is stackLow is a fiber's
+static void FindRegions(uintptr_t address, uintptr_t stackLow, int *inRegion, int *onFiber) {
+    *inRegion = 0;
+    *onFiber = 0;
+    if (!TryAcquireSRWLockShared(&sRegionsLock)) {
+        return;
+    }
+    for (size_t i = 0; i < sRegionCount; i++) {
+        if (address >= sRegions[i].start && address < sRegions[i].end) {
+            *inRegion = 1;
+        }
+        if (sRegions[i].stackGuard && sRegions[i].end == stackLow) {
+            *onFiber = 1;
+        }
+    }
+    ReleaseSRWLockShared(&sRegionsLock);
+}
+
 static int Protect(void *start, size_t size, DWORD protection, const char *what) {
     DWORD old;
 
@@ -115,7 +200,11 @@ static int Protect(void *start, size_t size, DWORD protection, const char *what)
 }
 
 int port_host_protect_none(void *start, size_t size, const char *what) {
-    return Protect(start, size, PAGE_NOACCESS, what);
+    if (Protect(start, size, PAGE_NOACCESS, what) != 0) {
+        return -1;
+    }
+    AddRegion(start, size, 0);
+    return 0;
 }
 
 int port_host_protect_stack_guard(void *start, size_t size, const char *what) {
@@ -123,10 +212,12 @@ int port_host_protect_stack_guard(void *start, size_t size, const char *what) {
     size_t tripwire = size < STACK_GUARD_TRIPWIRE ? size : STACK_GUARD_TRIPWIRE;
     size_t landing = size - tripwire < STACK_GUARD_LANDING ? size - tripwire : STACK_GUARD_LANDING;
 
-    if (Protect(start, size - tripwire - landing, PAGE_NOACCESS, what) != 0) {
+    if (Protect(start, size - tripwire - landing, PAGE_NOACCESS, what) != 0 ||
+        Protect(end - tripwire, tripwire, PAGE_READWRITE | PAGE_GUARD, what) != 0) {
         return -1;
     }
-    return Protect(end - tripwire, tripwire, PAGE_READWRITE | PAGE_GUARD, what);
+    AddRegion(start, size, 1);
+    return 0;
 }
 
 // From the first writable section of the image to the end of the last: .data, .bss and the sections between them
@@ -301,9 +392,9 @@ void *port_host_global_address(const char *name) {
 
 // --- Backtraces ---------------------------------------------------------------------------------------------------
 
-// Writes straight to stderr's handle: the watchdog writes while the main thread is suspended, maybe holding the C
-// library's lock of stderr. stderr is unbuffered, so this keeps the order of what the program printed before
-static void WriteError(const char *text) {
+// Straight to stderr's handle: the watchdog writes while the main thread is suspended, maybe holding the C library's
+// lock of stderr. stderr is unbuffered, so this keeps the order of what the program printed before
+void port_host_write_error(const char *text) {
     DWORD written;
 
     WriteFile(GetStdHandle(STD_ERROR_HANDLE), text, (DWORD)strlen(text), &written, NULL);
@@ -346,7 +437,7 @@ static void PrintFrame(int index, DWORD64 pc) {
     } else {
         snprintf(line, sizeof(line), "%-3d 0x%016llx\n", index, (unsigned long long)pc);
     }
-    WriteError(line);
+    port_host_write_error(line);
 }
 
 // The frames from a thread's context outward, by the unwind tables of the image each frame's code is in; a function
@@ -380,13 +471,13 @@ static void PrintFrames(const CONTEXT *start) {
 // --- Faults ---------------------------------------------------------------------------------------------------------
 
 static PortHostFaultHandler sFaultHandler;
-static PVOID sVectoredHandler;
-// The fault being reported: taken once, so that a fault while reporting (a backtrace walking a broken stack) ends the
-// program instead of starting again
+// The exception being reported: taken once, so that a fault while reporting (a backtrace walking a broken stack) ends
+// the program instead of starting again
 static volatile LONG sFaultTaken;
 static int sInFault;
 static CONTEXT sFaultContext;
 static const void *sFaultAddress;
+static const void *sFaultInstruction;
 static DWORD sFaultCode;
 static char sFaultText[32];
 static unsigned char sFaultStack[FAULT_STACK_SIZE] __attribute__((aligned(64)));
@@ -396,48 +487,94 @@ static int IsMemoryFault(DWORD code) {
            code == EXCEPTION_IN_PAGE_ERROR;
 }
 
+// The exceptions that end a program unless a handler takes them: the memory faults and the processor's other faults
+static int IsFatal(DWORD code) {
+    switch (code) {
+    case EXCEPTION_ILLEGAL_INSTRUCTION:
+    case EXCEPTION_PRIV_INSTRUCTION:
+    case EXCEPTION_INT_DIVIDE_BY_ZERO:
+    case EXCEPTION_INT_OVERFLOW:
+    case EXCEPTION_DATATYPE_MISALIGNMENT:
+    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+        return 1;
+    default:
+        return IsMemoryFault(code);
+    }
+}
+
+// An access violation's, an in-page error's and a guard page's second parameter is the address accessed
+static uintptr_t AccessedAddress(const EXCEPTION_RECORD *record) {
+    return record->NumberParameters >= 2 ? (uintptr_t)record->ExceptionInformation[1]
+                                         : (uintptr_t)record->ExceptionAddress;
+}
+
 // Copies what the report needs; no more than that runs on the faulting stack
 static void TakeFault(const EXCEPTION_POINTERS *info) {
     const EXCEPTION_RECORD *record = info->ExceptionRecord;
 
     sFaultContext = *info->ContextRecord;
     sFaultCode = record->ExceptionCode;
-    // An access violation's, an in-page error's and a guard page's second parameter is the address accessed
-    sFaultAddress =
-        record->NumberParameters >= 2 ? (const void *)record->ExceptionInformation[1] : record->ExceptionAddress;
+    sFaultAddress = (const void *)AccessedAddress(record);
+    sFaultInstruction = record->ExceptionAddress;
 }
 
-// The report, on the fault stack, as a signal handler on its alternate stack: the handler, then the end of the program
-// with the exception's status, as an exception nobody handles would end it
-__attribute__((noreturn)) static void RunFaultHandler(void) {
+// The report: a memory fault goes to the program's handler, which names a trap placeholder, when there is one; any
+// other exception is a crash, reported here with a backtrace
+static void Report(void) {
     sInFault = 1;
     snprintf(sFaultText, sizeof(sFaultText), "exception 0x%08lx", (unsigned long)sFaultCode);
-    if (sFaultHandler != NULL) {
+    if (IsMemoryFault(sFaultCode) && sFaultHandler != NULL) {
         sFaultHandler(sFaultAddress, sFaultText);
+    } else {
+        fprintf(stderr, "\nport: crash: %s at address %p\n", sFaultText, sFaultInstruction);
+        port_host_print_backtrace();
     }
     fflush(stderr);
+}
+
+// The report on the fault stack, as a signal handler's on its alternate stack, then the end of the program with the
+// exception's status, as an exception nobody handles would end it
+__attribute__((noreturn)) static void RunFaultHandler(void) {
+    Report();
     TerminateProcess(GetCurrentProcess(), sFaultCode);
     for (;;) {
     }
 }
 
-// A memory fault of the program's own code, or a stack overflow anywhere: the thread goes on in RunFaultHandler on the
-// fault stack, with the thread's stack bounds moved there too, which the system and the stack probes read. A fault in
-// another module's code may be one it handles itself; one it doesn't reaches OnUnhandledException
+// The exceptions reported here, on the fault stack, rather than left to the code's own handlers and then to
+// OnUnhandledException:
+//   - a stack overflow, anywhere;
+//   - a memory fault at an address the seam made inaccessible (a trap placeholder, a fiber's guard), whatever code
+//     touched it: the C library's memcpy and memset, which the game calls, run outside the program's image;
+//   - any fatal exception on a fiber: the system looks for a handler frame by frame up the faulting stack, and a
+//     fiber's frames end at minicoro's entry, never reaching the frame at the bottom of the thread's own stack that
+//     calls the unhandled-exception filter, so the process would end unreported;
+//   - a memory fault of the program's own code, once the program has a fault handler.
+// A fault in another module's code, off the fibers, may be one that module handles itself; one it doesn't reaches
+// OnUnhandledException. The thread goes on in RunFaultHandler on the fault stack, with the TEB's stack bounds moved
+// there too, which the system and the stack probes read
 static LONG CALLBACK OnVectoredException(EXCEPTION_POINTERS *info) {
-    DWORD code = info->ExceptionRecord->ExceptionCode;
+    const EXCEPTION_RECORD *record = info->ExceptionRecord;
+    DWORD code = record->ExceptionCode;
+    int memory = IsMemoryFault(code);
     uintptr_t top = ((uintptr_t)(sFaultStack + sizeof(sFaultStack)) & ~(uintptr_t)15) - 64;
-    NT_TIB *tib;
+    NT_TIB *tib = (NT_TIB *)NtCurrentTeb();
+    int inRegion;
+    int onFiber;
 
-    if (!IsMemoryFault(code) || sFaultHandler == NULL ||
-        (code != EXCEPTION_STACK_OVERFLOW && !InImage((uintptr_t)info->ExceptionRecord->ExceptionAddress))) {
+    if (!IsFatal(code)) {
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+    FindRegions(memory ? AccessedAddress(record) : 0, (uintptr_t)tib->StackLimit, &inRegion, &onFiber);
+    if (code != EXCEPTION_STACK_OVERFLOW && !(memory && inRegion) && !onFiber &&
+        !(memory && sFaultHandler != NULL && InImage((uintptr_t)record->ExceptionAddress))) {
         return EXCEPTION_CONTINUE_SEARCH;
     }
     if (InterlockedExchange(&sFaultTaken, 1) != 0) {
-        TerminateProcess(GetCurrentProcess(), sFaultCode);
+        // Another thread's fault is being reported, or this one faulted while reporting: this exception's own status
+        TerminateProcess(GetCurrentProcess(), code);
     }
     TakeFault(info);
-    tib = (NT_TIB *)NtCurrentTeb();
     tib->StackBase = (void *)(top + 64);
     tib->StackLimit = sFaultStack;
     // As if RunFaultHandler had been called: the return address's slot, with the caller's 32 bytes of home space above
@@ -446,31 +583,19 @@ static LONG CALLBACK OnVectoredException(EXCEPTION_POINTERS *info) {
     return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-// An exception nobody handled: a memory fault goes to the handler, on the faulting stack, which still has room (a stack
-// overflow was taken first); anything else is reported as a crash. Then the program ends with the exception's status
+// An exception nobody handled, on a thread's own stack: reported on the faulting stack, which still has room (a stack
+// overflow was taken first). Then the program ends with the exception's status
 static LONG WINAPI OnUnhandledException(EXCEPTION_POINTERS *info) {
     if (InterlockedExchange(&sFaultTaken, 1) != 0) {
         return EXCEPTION_EXECUTE_HANDLER;
     }
     TakeFault(info);
-    sInFault = 1;
-    snprintf(sFaultText, sizeof(sFaultText), "exception 0x%08lx", (unsigned long)sFaultCode);
-    if (IsMemoryFault(sFaultCode) && sFaultHandler != NULL) {
-        sFaultHandler(sFaultAddress, sFaultText);
-    } else {
-        fprintf(stderr, "\nport: crash: %s at address %p\n", sFaultText, info->ExceptionRecord->ExceptionAddress);
-        port_host_print_backtrace();
-    }
-    fflush(stderr);
+    Report();
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
 void port_host_set_fault_handler(PortHostFaultHandler handler) {
     sFaultHandler = handler;
-    // Last in the list, so that a sanitizer's own handler (ASan maps its shadow memory on faults) runs first
-    if (sVectoredHandler == NULL) {
-        sVectoredHandler = AddVectoredExceptionHandler(0, OnVectoredException);
-    }
 }
 
 void port_host_print_backtrace(void) {
@@ -487,14 +612,16 @@ void port_host_print_backtrace(void) {
 }
 
 // Every program that links the platform layer, before main(): no error dialog, which nobody would close in a test or
-// a CI run (a crash's, a missing file's, abort()'s), crashes reported by OnUnhandledException, and stdout and stderr
-// in binary mode, so that the program's output has the same line ends as on macOS and Linux
+// a CI run (a crash's, a missing file's, abort()'s); the two exception handlers, the vectored one last in the list, so
+// that a sanitizer's own (ASan maps its shadow memory on faults) runs first; and stdout and stderr in binary mode, so
+// that the program's output has the same line ends as on macOS and Linux
 __attribute__((constructor)) static void StartHost(void) {
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
     _setmode(_fileno(stdout), _O_BINARY);
     _setmode(_fileno(stderr), _O_BINARY);
     SetUnhandledExceptionFilter(OnUnhandledException);
+    AddVectoredExceptionHandler(0, OnVectoredException);
 }
 
 // --- The watchdog ---------------------------------------------------------------------------------------------------
@@ -516,7 +643,7 @@ static DWORD WINAPI WatchdogMain(void *argument) {
     // The symbols first, while the main thread runs: reading them allocates, and the main thread could be suspended
     // holding the heap's lock
     LoadSymbols();
-    WriteError(sWatchdogMessage);
+    port_host_write_error(sWatchdogMessage);
     if (SuspendThread(sMainThread) != (DWORD)-1) {
         memset(&context, 0, sizeof(context));
         context.ContextFlags = CONTEXT_FULL;
@@ -528,8 +655,10 @@ static DWORD WINAPI WatchdogMain(void *argument) {
     return 0;
 }
 
+// 0 seconds turns the watchdog off, as alarm(0) does on POSIX: no thread is started, and a running one waits for kicks
+// without a limit
 void port_host_watchdog_start(unsigned seconds, const char *message, int status) {
-    sWatchdogMilliseconds = seconds * 1000;
+    sWatchdogMilliseconds = seconds != 0 ? seconds * 1000 : INFINITE;
     sWatchdogMessage = message;
     sWatchdogStatus = status;
     if (sMainThread == NULL) {
@@ -539,10 +668,10 @@ void port_host_watchdog_start(unsigned seconds, const char *message, int status)
     if (sWatchdogKick == NULL) {
         sWatchdogKick = CreateEventW(NULL, FALSE, FALSE, NULL);
     }
-    if (sWatchdogThread == NULL) {
-        sWatchdogThread = CreateThread(NULL, 64 * 1024, WatchdogMain, NULL, 0, NULL);
-    } else {
+    if (sWatchdogThread != NULL) {
         SetEvent(sWatchdogKick);
+    } else if (seconds != 0) {
+        sWatchdogThread = CreateThread(NULL, 64 * 1024, WatchdogMain, NULL, 0, NULL);
     }
 }
 

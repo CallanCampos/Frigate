@@ -10,10 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void print_backtrace(void) {
-    port_host_print_backtrace();
-}
-
 static void print_caller(void *caller) {
     const char *name;
     uintptr_t offset;
@@ -28,7 +24,7 @@ _Noreturn void port_trap_function(const PortTrapSymbol *symbol, void *caller) {
     fprintf(stderr, "\nport: the game called %s (%s, 0x%08x), which has no C yet\n", symbol->name, symbol->module,
             symbol->address);
     print_caller(caller);
-    print_backtrace();
+    port_host_print_backtrace();
     fflush(stderr);
     _Exit(PORT_TRAP_EXIT_STATUS);
 }
@@ -89,13 +85,13 @@ static void on_fault(const void *fault_address, const char *fault) {
         } else {
             fprintf(stderr, "\nport: the game accessed the padding of the data placeholders at %p\n", fault_address);
         }
-        print_backtrace();
+        port_host_print_backtrace();
         fflush(stderr);
         _Exit(PORT_TRAP_EXIT_STATUS);
     }
     // Any other fault is a crash: say where, then let the fault end the program as it would have
     fprintf(stderr, "\nport: crash: %s at address %p\n", fault, fault_address);
-    print_backtrace();
+    port_host_print_backtrace();
     fflush(stderr);
 }
 

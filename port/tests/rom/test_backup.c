@@ -769,10 +769,6 @@ static BOOL HoldsPage(const char *path, u32 address, u8 seed, BOOL saveData) {
     return ok;
 }
 
-static BOOL IsLink(const char *path) {
-    return port_host_is_symbolic_link(path);
-}
-
 // A save path that is a symbolic link to another program's save (melonDS's .sav, linked to keep one save for both
 // programs): the game reads that file, its writes reach it, and the link stays a link with no temporary file left
 // beside either. A relative link to a file not made yet leads to where that file is made
@@ -803,7 +799,7 @@ static int TestLinkedSave(void) {
     IdentifyFlash();
     Check(port_card_backup_image()[0x100] == SaveByte(0x100), "the game reads the linked file");
     WritePage(0x26000, 0x40);
-    Check(IsLink(sSavePath), "the save path is still a link");
+    Check(port_host_is_symbolic_link(sSavePath), "the save path is still a link");
     Check(HoldsPage(target, 0x26000, 0x40, TRUE), "the linked file got the write, and keeps every other byte");
     snprintf(temporary, sizeof(temporary), "%s.tmp", target);
     Check(FileSize(temporary) < 0, "no temporary file beside it");
@@ -819,7 +815,7 @@ static int TestLinkedSave(void) {
     port_card_set_save_path(sSavePath);
     IdentifyFlash();
     WritePage(0x100, 0x90);
-    Check(IsLink(sSavePath), "the link stays");
+    Check(port_host_is_symbolic_link(sSavePath), "the link stays");
     Check(HoldsPage(target, 0x100, 0x90, FALSE), "the write made the file it links to");
     remove(sSavePath);
     remove(target);

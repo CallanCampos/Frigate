@@ -8,9 +8,10 @@ statuses (port/app/launcher.h, ADR 0012) go through this instead (port/cmake/int
 
 --fresh-save-dir gives the program a save directory of its own, a new temporary one, removed after. --crash wants the
 program to end by a crash, as each host ends a crashed program: killed by a signal on macOS and Linux, with an
-exception's status (0xc0000000 and up) on Windows (port/hal/host). Exits 0 when the program ended with status N (or
-crashed), its messages (stderr, then stdout) match every --expect and no --reject; 77 (skipped) when it ended with a
---skip-status (66: no ROM); 1 otherwise. Standard library only.
+exception's status on Windows (port/hal/host): an error's, 0xc0000000 and up, or a warning's, 0x80000000 and up, such
+as a guard page's 0x80000001. Exits 0 when the program ended with status N (or crashed), its messages (stderr, then
+stdout) match every --expect and no --reject; 77 (skipped) when it ended with a --skip-status (66: no ROM); 1
+otherwise. Standard library only.
 """
 
 from __future__ import annotations
@@ -23,6 +24,8 @@ import sys
 import tempfile
 
 SKIP = 77
+# The lowest exception status Windows ends a crashed program with: the warnings' severity (port/hal/host)
+CRASH_STATUS = 0x80000000
 
 
 def main() -> int:
@@ -49,7 +52,7 @@ def main() -> int:
         print(f"check_exit.py: skipped: the program ended with status {done.returncode}")
         return SKIP
     failures = []
-    if args.crash and not (done.returncode < 0 or done.returncode >= 0xC0000000):
+    if args.crash and not (done.returncode < 0 or done.returncode >= CRASH_STATUS):
         failures.append(f"the program ended with status {done.returncode}, not by a crash")
     if not args.crash and done.returncode != args.status:
         failures.append(f"the program ended with status {done.returncode}, not {args.status}")

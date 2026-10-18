@@ -68,11 +68,6 @@ static size_t sHostSize;
 static void *sHostFakeStack;
 #endif
 
-// VirtualProtect works on 4 KiB pages on Windows, while VirtualAlloc places mappings at 64 KiB
-size_t port_page_size(void) {
-    return port_host_page_size();
-}
-
 static size_t RoundUp(size_t value, size_t align) {
     return (value + align - 1) / align * align;
 }
@@ -82,18 +77,10 @@ static void Fatal(const char *what) {
     abort();
 }
 
-static unsigned char *MapPages(size_t size) {
-    return port_host_map(size);
-}
-
 static void ProtectGuard(unsigned char *p, size_t size) {
     if (port_host_protect_stack_guard(p, size, "port: fiber: the guard's protection") != 0) {
         abort();
     }
-}
-
-static void UnmapPages(unsigned char *p, size_t size) {
-    port_host_unmap(p, size);
 }
 
 // ASan's protocol for each switch: __sanitizer_start_switch_fiber on the old stack, naming the new one, and
@@ -112,7 +99,7 @@ static void FiberMain(mco_coro *co) {
 }
 
 PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
-    size_t page = port_page_size();
+    size_t page = port_host_page_size();
     size_t guardSize = RoundUp(GUARD_BYTES, page);
     mco_desc desc;
     size_t header;
@@ -129,7 +116,7 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
     headerSize = RoundUp(header, page);
 
     // The mapping, from low to high addresses: minicoro's header, the guard, the stack
-    mapping = MapPages(headerSize + guardSize + stackSize);
+    mapping = port_host_map(headerSize + guardSize + stackSize);
     fiber = calloc(1, sizeof(*fiber));
     if (mapping == NULL || fiber == NULL) {
         Fatal("out of memory for a fiber");
@@ -184,7 +171,7 @@ void port_fiber_destroy(PortFiber *fiber) {
     // same addresses would inherit them
     ASAN_UNPOISON_MEMORY_REGION(fiber->stackLow, fiber->stackSize);
 #endif
-    UnmapPages(fiber->mapping, fiber->mappingSize);
+    port_host_unmap(fiber->mapping, fiber->mappingSize);
     free(fiber);
 }
 

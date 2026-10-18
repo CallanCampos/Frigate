@@ -1188,17 +1188,16 @@ static BOOL sGuardHugeFrame;
 static void *sGuardLow;
 static void *sGuardHigh;
 
+// Async-signal-safe: the fault may have come in the middle of a C library call that holds stderr's lock
 static void OnFault(const void *faultAddress, const char *fault) {
     const char *address = faultAddress;
 
     (void)fault;
     if (address >= (char *)sGuardLow && address < (char *)sGuardHigh) {
-        fputs("fault in guard page\n", stderr);
-        fflush(stderr);
+        port_host_write_error("fault in guard page\n");
         _Exit(0);
     }
-    fputs("fault outside the guard page\n", stderr);
-    fflush(stderr);
+    port_host_write_error("fault outside the guard page\n");
     _Exit(1);
 }
 

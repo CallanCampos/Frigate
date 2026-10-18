@@ -3,14 +3,10 @@
 // the program's static data and globals from its own image (Mach-O's __DATA segment and export trie, ELF's linker
 // symbols and symbol table). It touches no part of the game: the trap placeholders (port/hal/trap.c), the fibers'
 // guards (port/hal/os/fiber.c), the PXI pointers into static data (port/hal/pxi/pointer.c), --run-dump's globals
-// (port/app/symbols.c) and the watchdog (port/app/main.c) stand on it. Windows has host_windows.c instead.
+// (port/app/main.c) and the watchdog (port/app/main.c) stand on it. Windows has host_windows.c instead. glibc hides
+// dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs from strict C11, so port/CMakeLists.txt defines
+// _GNU_SOURCE for this file on the command line, ahead of any header (port_host.h, which some targets force-include)
 #ifndef _WIN32
-
-// dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs, which glibc hides from strict C11; the platform
-// layer's own build defines it on the command line, ahead of port_host.h's headers
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
 
 #include "hal/host/host.h"
 #include <dlfcn.h>
@@ -84,6 +80,10 @@ void *port_host_map_file_copy(const char *path, size_t *size) {
     return p;
 }
 
+void port_host_unmap_file_copy(void *view, size_t size) {
+    munmap(view, size);
+}
+
 int port_host_protect_none(void *start, size_t size, const char *what) {
     if (mprotect(start, size, PROT_NONE) != 0) {
         perror(what);
@@ -153,6 +153,11 @@ void port_host_set_fault_handler(PortHostFaultHandler handler) {
     sigemptyset(&action.sa_mask);
     sigaction(SIGSEGV, &action, NULL);
     sigaction(SIGBUS, &action, NULL);
+}
+
+// write(2) is async-signal-safe, and takes no lock of the C library's stderr
+void port_host_write_error(const char *text) {
+    (void)!write(STDERR_FILENO, text, strlen(text));
 }
 
 void port_host_print_backtrace(void) {
@@ -298,12 +303,13 @@ static void OnWatchdog(int signal) {
     int count;
 
     (void)signal;
-    (void)!write(STDERR_FILENO, sWatchdogMessage, strlen(sWatchdogMessage));
+    port_host_write_error(sWatchdogMessage);
     count = backtrace(frames, 64);
     backtrace_symbols_fd(frames, count, STDERR_FILENO);
     _Exit(sWatchdogStatus);
 }
 
+// alarm(0) cancels the alarm, so 0 seconds turns the watchdog off
 void port_host_watchdog_start(unsigned seconds, const char *message, int status) {
     struct sigaction action;
 

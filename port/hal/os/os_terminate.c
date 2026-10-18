@@ -29,10 +29,6 @@ void port_osi_reset_terminate(void) {
     OSi_terminate.isTerminating = FALSE;
 }
 
-static void PrintBacktrace(void) {
-    port_host_print_backtrace();
-}
-
 // NitroSDK's OS_Terminate (swan's sys_exit)
 void OS_Terminate(void) {
     if (OSi_terminate.callback != NULL) {
@@ -62,7 +58,7 @@ void OS_Terminate(void) {
 void OSi_TerminateCore(void) {
     OS_DisableInterrupts();
     fprintf(stderr, "\nport: the game stopped itself (OS_Terminate) at frame %u\n", port_os_frame());
-    PrintBacktrace();
+    port_host_print_backtrace();
     fflush(stderr);
     _Exit(PORT_OS_TERMINATE_STATUS);
 }

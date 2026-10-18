@@ -1,8 +1,10 @@
 # The host's system (port/hal/host), what differs between macOS, Linux and Windows: its tests (port/tests/host), on
 # the whole program's objects as the program links them (port/hal/trap.c and the trap stubs' placeholders), each
 # scenario in a process of its own: a trap placeholder touched (the game reaching data with no C yet), a crash
-# reported, the watchdog going off and kicked, the program's static data (the PXI bus's pointers), and files, the
-# environment and private file mappings. None needs a ROM, so every CI job runs them.
+# reported, both again on a fiber with the C library's code making the access (as the game's threads run), a fiber's
+# guard touched and an illegal instruction there, the watchdog going off and kicked, the program's static data (the PXI
+# bus's pointers), files, a folder and an argument whose names aren't ASCII, the environment and private file mappings.
+# None needs a ROM, so every CI job runs them.
 enable_testing()
 add_executable(port_host_tests
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/host/test_host.c"
@@ -20,6 +22,11 @@ add_test(NAME host_trap_placeholder
         --status 70 --skip-status 77 --expect "port: the game accessed [A-Za-z_][A-Za-z0-9_]*\\+0x0 \\("
         --expect "which has no C yet" --expect "Backtrace:" -- $<TARGET_FILE:port_host_tests> trap_placeholder)
 set_tests_properties(host_trap_placeholder PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 60)
+add_test(NAME host_trap_placeholder_fiber
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}" "${port_host_check_exit}"
+        --status 70 --skip-status 77 --expect "port: the game accessed [A-Za-z_][A-Za-z0-9_]*\\+0x0 \\("
+        --expect "which has no C yet" --expect "Backtrace:" -- $<TARGET_FILE:port_host_tests> trap_placeholder_fiber)
+set_tests_properties(host_trap_placeholder_fiber PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 60)
 
 # A crash: the fault as the host reports it and a backtrace, then the fault ends the program, by a signal or with an
 # exception's status as the host ends a crashed program
@@ -28,6 +35,27 @@ add_test(NAME host_crash_report
         --crash --expect "port: crash: (signal [0-9]+|exception 0x[0-9a-f]+) at address" --expect "Backtrace:"
         -- $<TARGET_FILE:port_host_tests> crash_report)
 set_tests_properties(host_crash_report PROPERTIES TIMEOUT 60)
+
+# The same on a fiber, with the C library's memset making the access: to no memory, and to the top of the fiber's own
+# guard (on Windows a guard page, whose exception's status is a warning's, 0x80000001)
+foreach(scenario IN ITEMS crash_report_fiber guard_fiber)
+    add_test(NAME host_${scenario}
+        COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}" "${port_host_check_exit}"
+            --crash --expect "port: crash: (signal [0-9]+|exception 0x[0-9a-f]+) at address" --expect "Backtrace:"
+            -- $<TARGET_FILE:port_host_tests> ${scenario})
+    set_tests_properties(host_${scenario} PROPERTIES TIMEOUT 60)
+endforeach()
+
+# An illegal instruction on a fiber ends the program on every host; Windows reports every exception nobody handles,
+# where macOS and Linux report memory faults only (port/hal/host/host.h)
+set(port_host_illegal_report "")
+if(WIN32)
+    set(port_host_illegal_report --expect "port: crash: exception 0xc000001d at address" --expect "Backtrace:")
+endif()
+add_test(NAME host_illegal_instruction_fiber
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}" "${port_host_check_exit}"
+        --crash ${port_host_illegal_report} -- $<TARGET_FILE:port_host_tests> illegal_instruction_fiber)
+set_tests_properties(host_illegal_instruction_fiber PROPERTIES TIMEOUT 60)
 
 # The watchdog: its message and its status after a second of spinning; and no report while it is kicked
 add_test(NAME host_watchdog
@@ -42,3 +70,6 @@ foreach(scenario IN ITEMS static_data files)
     add_test(NAME host_${scenario} COMMAND port_host_tests ${scenario})
     set_tests_properties(host_${scenario} PROPERTIES TIMEOUT 60)
 endforeach()
+# An argument that isn't ASCII, as a path given on the command line may be: "Pokémon"
+add_test(NAME host_utf8_argument COMMAND port_host_tests utf8_argument "Pokémon")
+set_tests_properties(host_utf8_argument PROPERTIES TIMEOUT 60)

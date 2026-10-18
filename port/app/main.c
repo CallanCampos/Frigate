@@ -18,7 +18,6 @@
 #include "app/replay.h"
 #include "app/run_dir.h"
 #include "app/sound_trace.h"
-#include "app/symbols.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
@@ -407,7 +406,7 @@ static int AddRunDumps(void) {
         } else if (sArgv[i][length] != '\0') {
             continue;
         }
-        if (spec == NULL || !port_run_dir_add_dump(spec, port_symbol_address, error, sizeof(error))) {
+        if (spec == NULL || !port_run_dir_add_dump(spec, port_host_global_address, error, sizeof(error))) {
             fprintf(stderr, "port: --run-dump %s: %s\n", spec != NULL ? spec : "",
                     spec != NULL ? error : "needs a spec");
             return 0;
