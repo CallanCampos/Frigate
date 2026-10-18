@@ -236,9 +236,8 @@ BOOL s01FB_ItemCollectorCheckGroup(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     u32 size;
-    u32 i;
     ItemCollectorPrice *prices;
-    WordSet *wordSet;
+    u32 i;
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
     HeapID heapId = Field_GetHeapID(fieldWork->field);
@@ -246,8 +245,8 @@ BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
     u16 group = ScriptReadAny(vm, env);
     u16 wordIndex = ScriptReadAny(vm, env);
     u16 digits = ScriptReadAny(vm, env);
+    WordSet *wordSet = ScriptWork_GetWordSet(work);
 
-    wordSet = ScriptWork_GetWordSet(work);
     prices = GFL_ArcSysReadHeapNewLZGetLen(ARC_ITEM_COLLECTOR, ITEM_COLLECTOR_FILES[group], FALSE, HEAPID_TAIL(heapId),
                                            &size);
     size /= sizeof(ItemCollectorPrice);
@@ -263,8 +262,8 @@ BOOL s0236_WordSetLoadItemCollectorPrice(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0237_ItemCollectorSell(VM *vm, FieldScriptEnv *env) {
     u32 size;
-    u32 i;
     ItemCollectorPrice *prices;
+    u32 i;
     GameData *gameData;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
