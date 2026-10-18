@@ -404,7 +404,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         case '[':
             goto scanSet;
         default:
-            // style-ok: goto-return leaves the loop from inside the switch, for the one exit its breaks reach
+            // style-ok: goto-return a break here would only leave the switch, not the loop
             goto finish;
         }
 
@@ -615,5 +615,5 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         continue;
     }
 finish:
-    return *src == '\0' && !matched ? -1 : count;
+    return (*src == '\0' && !matched) ? -1 : count;
 }

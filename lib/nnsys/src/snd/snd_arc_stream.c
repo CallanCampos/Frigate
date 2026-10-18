@@ -191,7 +191,7 @@ static OSMutex sDecodeMutex;
 static StrmCommand sStrmCommands[STRM_COMMAND_NUM];
 // The decoding buffer's explicit alignment is a guess, which the ROM can't show: 4 to 16 fit its address (0x1b0
 // bytes into a section at 0x02149950, so not 32). The card reads blocks into it, and NNS_SndArcStrmInit, which
-// reads it, keeps its loops entered with a branch to the test only with an alignment
+// takes the buffer's address, keeps its loops entered with a branch to the test only with an alignment
 static u32 sDecodeBuffer[STRM_ADPCM_BUFFER_SIZE / sizeof(u32)] ATTRIBUTE_ALIGN(4);
 static NNSSndArcStrmPlayer sPlayers[STRM_PLAYER_NUM];
 static StrmThread sThread;

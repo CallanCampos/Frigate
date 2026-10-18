@@ -3539,8 +3539,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
-  `func_0207e970`, as with six other Thumb functions before a veneer (`MI_Zero36B`, `CameraSystem_SetSize`). A symbol
-  whose size includes the pad makes the probe report identical code as 2 bytes short; its size is set with
+  `func_0207e970`, as with five other Thumb functions before a veneer, such as overlay 257's `CameraSystem_SetSize`.
+  A symbol whose size includes the pad makes the probe report identical code as 2 bytes short; its size is set with
   `config_fixes.py add-function`.
 
 - A library function whose loop stores through a stepped pointer (`strb rX, [r2], #1`) set up after the loop's entry

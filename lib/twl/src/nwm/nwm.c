@@ -147,8 +147,8 @@ static BOOL func_02703c28(void);
 // The data, in memory: sNwmInitialized, sNwm (the system area and the two PM callbacks), sUnloaded (set when the exit
 // callback's unload is done) and sBlockBuf (the block that the command 8 copies for the ARM7). -ipa function lays out
 // the statics defined with an initializer first and the tentative ones after them, in the reverse of their
-// declarations. The flag's initializer also makes it known to the functions below it, which reach it from the base of
-// the file's .bss and pass its address through a literal of its own, as func_02702468 does
+// declarations. The flag's zero initializer gives it a literal of its own for its address, as the original has:
+// func_02702468 reads and stores it through one literal and passes DC_StoreRange its address through another
 static u8 sNwmInitialized = FALSE;
 static u32 sBlockBuf[0x210 / 4];
 static u8 sUnloaded;

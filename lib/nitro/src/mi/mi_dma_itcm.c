@@ -20,7 +20,7 @@ void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags) {
         src = (u32)fill;
     } else if (flags & MI_DMA_SET_FILL16) {
         vu16 *fill = (vu16 *)(MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32));
-        *fill = (u16)src;
+        *fill = src;
         src = (u32)fill;
     }
 
