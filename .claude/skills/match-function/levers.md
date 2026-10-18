@@ -7,6 +7,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result
+  again, `p = NNSi_G2dUnpackOffset(p, base)`. (matching.md: "A macro that assigns")
+- Rows of a matrix product whose registers rotate: the row of `a` in locals and a destination pointer of its own.
+  (matching.md: "They match only with the row of `a` in locals")
+- Two of several independent statements with their registers swapped: write the other one first.
+  (matching.md: "Of independent statements that all feed later code")
 - Every register moved, with a constant built and spilled at its first use (`movs r2, #7; str r2, [sp, #0xc]`) and a
   select that overwrites it later: a ternary argument whose arm is that constant. Write the call in each arm of an
   `if`/`else`. (matching.md: "A ternary whose arm is a constant")
@@ -623,6 +629,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
+  it with fewer registers pushed: forward gotos to labelled tail blocks. (matching.md: "chosen by a flag tested")
 - `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
   (matching.md: "`ScClient_OnCreateSession` keeps")
 - A combined `&&` camera check moves a copied parameter, where the original has two false branches with the same
@@ -704,6 +712,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- An unrolled loop over tables with the wrong registers and spills: step the tables by pointer (`*p++`) instead of
+  indexing them. (matching.md: "A table read in an unrolled loop")
 - `ScClient_SubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
   (matching.md: "`ScClient_SubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write

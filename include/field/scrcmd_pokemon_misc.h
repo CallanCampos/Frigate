@@ -1,9 +1,8 @@
 #ifndef POKEBW2_FIELD_SCRCMD_POKEMON_MISC_H
 #define POKEBW2_FIELD_SCRCMD_POKEMON_MISC_H
 
-// Overlay 36's scrcmd_pokemon_misc.c (a descriptive name), not written yet: script commands of the party's Pokémon,
-// the Pokédex, in-game trades and the move tutors. Names from swan (https://github.com/ds-pokemon-hacking/swan,
-// GPL-3.0)
+// Overlay 36's scrcmd_pokemon_misc.c (a descriptive name): script commands of the party's Pokémon, the Pokédex,
+// in-game trades and the move tutors. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
 #include "struct_decls.h"

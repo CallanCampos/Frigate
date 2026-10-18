@@ -50,76 +50,84 @@ asm void MTX_Copy44To43_(const MtxFx44 *src, MtxFx43 *dst) {
 
 void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab) {
     MtxFx44 tmp;
-    MtxFx44 *dst = (ab == b) ? &tmp : ab;
+    MtxFx44 *dst;
+    fx32 a0, a1, a2, a3;
     fx32 b0, b1, b2, b3;
-#ifdef PLATFORM_PC
-    // The ROM loads each row of a before it stores that row of the product, so a product into a is right on the DS
-    // (MCSSSys_Draw and NitroSystem's SBC make some). This C reads a's row again after storing some of it, so on a host
-    // that product is made in tmp too
-    if (ab == a) {
+
+    if (ab == b) {
         dst = &tmp;
+    } else {
+        dst = ab;
     }
-#endif
-    dst->m[0][0] = (fx32)(((fx64)a->m[0][1] * b->m[1][0] + (fx64)a->m[0][0] * b->m[0][0] +
-                           (fx64)a->m[0][2] * b->m[2][0] + (fx64)a->m[0][3] * b->m[3][0]) >>
-                          FX32_SHIFT);
-    dst->m[0][1] = (fx32)(((fx64)a->m[0][1] * b->m[1][1] + (fx64)a->m[0][0] * b->m[0][1] +
-                           (fx64)a->m[0][2] * b->m[2][1] + (fx64)a->m[0][3] * b->m[3][1]) >>
-                          FX32_SHIFT);
-    dst->m[0][3] = (fx32)(((fx64)a->m[0][1] * b->m[1][3] + (fx64)a->m[0][0] * b->m[0][3] +
-                           (fx64)a->m[0][2] * b->m[2][3] + (fx64)a->m[0][3] * b->m[3][3]) >>
-                          FX32_SHIFT);
+
+    a0 = a->m[0][0];
+    a1 = a->m[0][1];
+    a2 = a->m[0][2];
+    a3 = a->m[0][3];
+    dst->m[0][0] =
+        (fx32)(((fx64)a0 * b->m[0][0] + (fx64)a1 * b->m[1][0] + (fx64)a2 * b->m[2][0] + (fx64)a3 * b->m[3][0]) >>
+               FX32_SHIFT);
+    dst->m[0][1] =
+        (fx32)(((fx64)a0 * b->m[0][1] + (fx64)a1 * b->m[1][1] + (fx64)a2 * b->m[2][1] + (fx64)a3 * b->m[3][1]) >>
+               FX32_SHIFT);
+    dst->m[0][3] =
+        (fx32)(((fx64)a0 * b->m[0][3] + (fx64)a1 * b->m[1][3] + (fx64)a2 * b->m[2][3] + (fx64)a3 * b->m[3][3]) >>
+               FX32_SHIFT);
     b0 = b->m[0][2];
     b1 = b->m[1][2];
     b2 = b->m[2][2];
     b3 = b->m[3][2];
-    dst->m[0][2] =
-        (fx32)(((fx64)a->m[0][1] * b1 + (fx64)a->m[0][0] * b0 + (fx64)a->m[0][2] * b2 + (fx64)a->m[0][3] * b3) >>
+    dst->m[0][2] = (fx32)(((fx64)a0 * b0 + (fx64)a1 * b1 + (fx64)a2 * b2 + (fx64)a3 * b3) >> FX32_SHIFT);
+
+    a0 = a->m[1][0];
+    a1 = a->m[1][1];
+    a2 = a->m[1][2];
+    a3 = a->m[1][3];
+    dst->m[1][2] = (fx32)(((fx64)a0 * b0 + (fx64)a1 * b1 + (fx64)a2 * b2 + (fx64)a3 * b3) >> FX32_SHIFT);
+    dst->m[1][1] =
+        (fx32)(((fx64)a0 * b->m[0][1] + (fx64)a1 * b->m[1][1] + (fx64)a2 * b->m[2][1] + (fx64)a3 * b->m[3][1]) >>
                FX32_SHIFT);
-    dst->m[1][2] =
-        (fx32)(((fx64)a->m[1][1] * b1 + (fx64)a->m[1][0] * b0 + (fx64)a->m[1][2] * b2 + (fx64)a->m[1][3] * b3) >>
+    dst->m[1][3] =
+        (fx32)(((fx64)a0 * b->m[0][3] + (fx64)a1 * b->m[1][3] + (fx64)a2 * b->m[2][3] + (fx64)a3 * b->m[3][3]) >>
                FX32_SHIFT);
-    dst->m[1][1] = (fx32)(((fx64)a->m[1][1] * b->m[1][1] + (fx64)a->m[1][0] * b->m[0][1] +
-                           (fx64)a->m[1][2] * b->m[2][1] + (fx64)a->m[1][3] * b->m[3][1]) >>
-                          FX32_SHIFT);
-    dst->m[1][3] = (fx32)(((fx64)a->m[1][1] * b->m[1][3] + (fx64)a->m[1][0] * b->m[0][3] +
-                           (fx64)a->m[1][2] * b->m[2][3] + (fx64)a->m[1][3] * b->m[3][3]) >>
-                          FX32_SHIFT);
     b0 = b->m[0][0];
     b1 = b->m[1][0];
     b2 = b->m[2][0];
     b3 = b->m[3][0];
-    dst->m[1][0] =
-        (fx32)(((fx64)a->m[1][1] * b1 + (fx64)a->m[1][0] * b0 + (fx64)a->m[1][2] * b2 + (fx64)a->m[1][3] * b3) >>
+    dst->m[1][0] = (fx32)(((fx64)a0 * b0 + (fx64)a1 * b1 + (fx64)a2 * b2 + (fx64)a3 * b3) >> FX32_SHIFT);
+
+    a0 = a->m[2][0];
+    a1 = a->m[2][1];
+    a2 = a->m[2][2];
+    a3 = a->m[2][3];
+    dst->m[2][0] = (fx32)(((fx64)a0 * b0 + (fx64)a1 * b1 + (fx64)a2 * b2 + (fx64)a3 * b3) >> FX32_SHIFT);
+    dst->m[2][1] =
+        (fx32)(((fx64)a0 * b->m[0][1] + (fx64)a1 * b->m[1][1] + (fx64)a2 * b->m[2][1] + (fx64)a3 * b->m[3][1]) >>
                FX32_SHIFT);
-    dst->m[2][0] =
-        (fx32)(((fx64)a->m[2][1] * b1 + (fx64)a->m[2][0] * b0 + (fx64)a->m[2][2] * b2 + (fx64)a->m[2][3] * b3) >>
+    dst->m[2][3] =
+        (fx32)(((fx64)a0 * b->m[0][3] + (fx64)a1 * b->m[1][3] + (fx64)a2 * b->m[2][3] + (fx64)a3 * b->m[3][3]) >>
                FX32_SHIFT);
-    dst->m[2][1] = (fx32)(((fx64)a->m[2][1] * b->m[1][1] + (fx64)a->m[2][0] * b->m[0][1] +
-                           (fx64)a->m[2][2] * b->m[2][1] + (fx64)a->m[2][3] * b->m[3][1]) >>
-                          FX32_SHIFT);
-    dst->m[2][3] = (fx32)(((fx64)a->m[2][1] * b->m[1][3] + (fx64)a->m[2][0] * b->m[0][3] +
-                           (fx64)a->m[2][2] * b->m[2][3] + (fx64)a->m[2][3] * b->m[3][3]) >>
-                          FX32_SHIFT);
     b0 = b->m[0][2];
     b1 = b->m[1][2];
     b2 = b->m[2][2];
     b3 = b->m[3][2];
-    dst->m[2][2] =
-        (fx32)(((fx64)a->m[2][1] * b1 + (fx64)a->m[2][0] * b0 + (fx64)a->m[2][2] * b2 + (fx64)a->m[2][3] * b3) >>
+    dst->m[2][2] = (fx32)(((fx64)a0 * b0 + (fx64)a1 * b1 + (fx64)a2 * b2 + (fx64)a3 * b3) >> FX32_SHIFT);
+
+    a0 = a->m[3][0];
+    a1 = a->m[3][1];
+    a2 = a->m[3][2];
+    a3 = a->m[3][3];
+    dst->m[3][2] = (fx32)(((fx64)a0 * b0 + (fx64)a1 * b1 + (fx64)a2 * b2 + (fx64)a3 * b3) >> FX32_SHIFT);
+    dst->m[3][1] =
+        (fx32)(((fx64)a0 * b->m[0][1] + (fx64)a1 * b->m[1][1] + (fx64)a2 * b->m[2][1] + (fx64)a3 * b->m[3][1]) >>
                FX32_SHIFT);
-    dst->m[3][2] =
-        (fx32)(((fx64)a->m[3][1] * b1 + (fx64)a->m[3][0] * b0 + (fx64)a->m[3][2] * b2 + (fx64)a->m[3][3] * b3) >>
+    dst->m[3][0] =
+        (fx32)(((fx64)a0 * b->m[0][0] + (fx64)a1 * b->m[1][0] + (fx64)a2 * b->m[2][0] + (fx64)a3 * b->m[3][0]) >>
                FX32_SHIFT);
-    dst->m[3][1] = (fx32)(((fx64)a->m[3][1] * b->m[1][1] + (fx64)a->m[3][0] * b->m[0][1] +
-                           (fx64)a->m[3][2] * b->m[2][1] + (fx64)a->m[3][3] * b->m[3][1]) >>
-                          FX32_SHIFT);
-    dst->m[3][3] = (fx32)(((fx64)a->m[3][1] * b->m[1][3] + (fx64)a->m[3][0] * b->m[0][3] +
-                           (fx64)a->m[3][2] * b->m[2][3] + (fx64)a->m[3][3] * b->m[3][3]) >>
-                          FX32_SHIFT);
-    dst->m[3][0] = (fx32)(((fx64)a->m[3][1] * b->m[1][0] + (fx64)a->m[3][0] * b->m[0][0] +
-                           (fx64)a->m[3][2] * b->m[2][0] + (fx64)a->m[3][3] * b->m[3][0]) >>
-                          FX32_SHIFT);
+    dst->m[3][3] =
+        (fx32)(((fx64)a0 * b->m[0][3] + (fx64)a1 * b->m[1][3] + (fx64)a2 * b->m[2][3] + (fx64)a3 * b->m[3][3]) >>
+               FX32_SHIFT);
+
     if (dst == &tmp) {
         *ab = tmp;
     }
@@ -144,15 +152,13 @@ void MTX_FrustumW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, M
     mtx->m[3][1] = 0;
     mtx->m[3][3] = 0;
     invWidth = FX_GetDivResultFx64c();
-    reg_CP_DIV_NUMER = 0x100000000000LL;
-    reg_CP_DIV_DENOM = (u32)(t - b);
+    CP_SetDivImm64_32((u64)FX32_ONE << 32, (u32)(t - b));
     if (scaleW != FX32_ONE) {
         invWidth = invWidth * scaleW / FX32_ONE;
     }
     mtx->m[0][0] = (fx32)((invWidth * n2 + 0x80000000LL) >> 32);
     invHeight = FX_GetDivResultFx64c();
-    reg_CP_DIV_NUMER = 0x100000000000LL;
-    reg_CP_DIV_DENOM = (u32)(n - f);
+    CP_SetDivImm64_32((u64)FX32_ONE << 32, (u32)(n - f));
     if (scaleW != FX32_ONE) {
         invHeight = invHeight * scaleW / FX32_ONE;
     }
@@ -172,8 +178,7 @@ void MTX_PerspectiveW(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, f
     fx64 invDepth;
 
     cot = FX_Div(fovyCos, fovySin);
-    reg_CP_DIV_NUMER = 0x100000000000LL;
-    reg_CP_DIV_DENOM = (u32)(n - f);
+    CP_SetDivImm64_32((u64)FX32_ONE << 32, (u32)(n - f));
     if (scaleW != FX32_ONE) {
         cot = cot * scaleW / FX32_ONE;
     }
@@ -191,8 +196,7 @@ void MTX_PerspectiveW(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, f
     mtx->m[3][1] = 0;
     mtx->m[3][3] = 0;
     invDepth = FX_GetDivResultFx64c();
-    reg_CP_DIV_NUMER = (u64)(u32)cot << 32;
-    reg_CP_DIV_DENOM = (u32)aspect;
+    CP_SetDivImm64_32((u64)cot << 32, (u32)aspect);
     if (scaleW != FX32_ONE) {
         invDepth = invDepth * scaleW / FX32_ONE;
     }

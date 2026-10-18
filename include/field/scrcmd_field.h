@@ -1,8 +1,8 @@
 #ifndef POKEBW2_FIELD_SCRCMD_FIELD_H
 #define POKEBW2_FIELD_SCRCMD_FIELD_H
 
-// Overlay 36's scrcmd_field.c (a descriptive name), not written yet: script commands of the field, such as its
-// subscreen, the records and the TV. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Overlay 36's scrcmd_field.c (a descriptive name): script commands of the field, such as its subscreen, the records
+// and the TV. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
 #include "field/field_script.h"
