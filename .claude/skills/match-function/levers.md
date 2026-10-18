@@ -17,7 +17,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   reverse: the hoisted-constant budget. Give a statement before the first copy one more (or one fewer) named step, or
   declare locals `int` instead of `u32` (one node each); test one node short of the edge.
   (matching.md: "within a budget") Past a join followed by calls, field stores don't move the edge and calls move it
-  in jumps. (matching.md: "doesn't follow a node count")
+  in jumps; inline wrappers and locals for call results don't move it. (matching.md: "doesn't follow a node count")
+- A sum of a spilled base and a constant whose result takes the other operand's register (`adds r2, r3, r2` with the
+  constant in `r2`): the result goes to the operand generated last, and a spilled reload is generated at the add. The
+  constant takes it when the base is a real load (field, stack parameter, address-taken or `volatile` local), stays
+  in a saved register, or the constant is shared in the block or built in a loop. (matching.md: "the register of the
+  operand generated last")
 - A multiply's operand copy in `r4` with the index in `r1`, where the original has the reverse: give the index an
   enum-typed local. (matching.md: "An enum-typed index local stays a variable of its own")
 - An array's address hoisted above an `if` whose arms both read it, where the original builds it in each arm and
@@ -182,7 +187,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   keeping only values that straddle the stores. (matching.md: "collected before they are combined")
 - A global's address loaded from the pool again before each call, where ours keeps it in a saved register: a
   pointer local MWCC did not propagate. Check with a local and `#pragma opt_propagation off`, then look for the
-  spelling (a member's address, a cast). (matching.md: "is copy-propagated into its uses, and the")
+  spelling (a member's address in the local, a cast); `&s.member` written at each call is shared like `&g`.
+  (matching.md: "is copy-propagated into its uses, and the")
 - A pointer the caller keeps and an end an inline returns swapped between `r4` and `r5`: advance the inline's pointer
   in two statements and return it from the `if`, `end = cmd + 3; end += cmd[2]; return end;`.
   (matching.md: "advances in two statements")
@@ -434,8 +440,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   or `opt_common_subs off` keeps them apart. (matching.md: "is a global common subexpression, loaded into a")
 - A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
   calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
-  sum or another immediate keeps it in place, no pragma does, and each use of the incremented value gets its own
-  copy of the sum. (matching.md: "whose only use is the copy")
+  sum that isn't a copy (`f(x + 4)`, not `f(x)`) or another immediate keeps it in place, no pragma does, and each
+  use of the incremented value gets its own copy of the sum. (matching.md: "whose only use is the copy")
 
 ## An instruction too many or too few
 
@@ -721,8 +727,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
   read: a pointer conversion around the element's whole address (`*(f32 *)&words[v + k]`), only where the buffer's
   type calls for one; even a cast to the element's own type hides it. (matching.md: "hides the address from that
   pass")
+- The loop passes off for a whole file, as a test: `-flag no-opt_loop_invariants` and
+  `-flag no-opt_strength_reduction` in `--extra-flags`; the `-opt` sub-options do nothing after `-O4,p`.
+  (matching.md: "takes a pragma's name")
 - Values the original builds before a loop and reuses after it, where ours computes them again: they were locals;
-  arithmetic hoisted out of the loop is not reused. (matching.md: "Arithmetic hoisted out of a loop")
+  arithmetic on a `u16` hoisted out of the loop, or out of a loop its entry test can skip, is not reused.
+  (matching.md: "Arithmetic on a `u16` hoisted out of a loop")
 - Stores of a spilled copy after the loop's guard, in the preheader, where ours stores it at the computation: copy
   after the last branch before the loop, and give the loop's `fx32`/`s32` locals the SDK's `long`.
   (matching.md: "A spilled copy of a value that the original stores") A narrow stack parameter read in the loop's
@@ -838,8 +848,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `static inline` is listed where the inline is defined. (matching.md: "joins the size sort at the end of the file")
 - An object at the head of the shared `.rodata` or `.data`, larger than the ones after it and packed against them:
   `-ipa function`, which sorts the data waiting at each function on its own; define the tables just before their
-  first user.
-  A game file can't take a per-file flag yet. (matching.md: "Under `-ipa function` MWCC writes out")
+  first user, and give the file the flag in `config/compiler_flags.toml`. (matching.md: "Under `-ipa function` MWCC
+  writes out")
+- Local initializers sorted by size across functions, after the shared section and before the tables of 64 bytes or
+  more, rule `-ipa function` out. (matching.md: "The reverse rules the flag out")
 - A `static const` whose address is never taken is folded and not emitted. If the original has it, it isn't static.
   An unreferenced word after a file's larger tables is the next file's first object.
   (matching.md: "whose address is never taken")
