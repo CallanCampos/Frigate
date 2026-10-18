@@ -155,8 +155,10 @@ foreach(fragment IN LISTS port_cmake_fragments)
 endforeach()
 
 # Tests (ctest --test-dir build/port). The smoke test runs the game's first frame: it passes once the program enters
-# the game's main() and the frame ends without a crash (a trap stub stopping it is still accepted)
+# the game's main() and the frame ends without a crash (a trap stub stopping it is still accepted). Like every test that
+# runs the program, it has a save directory in the build tree, never the player's own
 enable_testing()
-add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless --frames 1 --watchdog 30)
+add_test(NAME smoke_reaches_game_main COMMAND ${PORT_PROGRAM} --headless --frames 1 --watchdog 30
+    --save-dir "${CMAKE_CURRENT_BINARY_DIR}/smoke_saves")
 set_tests_properties(smoke_reaches_game_main PROPERTIES
     PASS_REGULAR_EXPRESSION "entering the game's main\\(\\)" TIMEOUT 60)
