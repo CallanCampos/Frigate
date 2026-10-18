@@ -1,4 +1,5 @@
-// The virtual memory calls of the aliasing backends (port/spikes/vram-alias). macOS has three ways to share pages
+// The virtual memory calls of the aliasing backends (port/spikes/vram-alias), which let one VRAM bank, and so every
+// graphic the game has loaded into it, show at each address the DS maps it to. macOS has three ways to share pages
 // between two addresses: a POSIX shared memory object, a Mach named memory entry and mach_vm_remap. Linux has the
 // first, with memfd_create instead of shm_open. Windows would use a pagefile-backed section and placeholders (the
 // spike's README); it isn't written, so there every aliasing backend reports itself unavailable and copying runs

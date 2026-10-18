@@ -1,5 +1,6 @@
-// The virtual memory calls of the aliasing backends, one set per OS (port/spikes/vram-alias). Everything else in
-// vram.c is plain C
+// The virtual memory calls of the aliasing backends, one set per OS (port/spikes/vram-alias): they map the DS's nine
+// VRAM banks, which hold every graphic the game draws (backgrounds, sprites, 3D textures and palettes), at more than
+// one address, as the DS's bank mapping does. Everything else in vram.c is plain C
 #ifndef PORT_HAL_GX_VRAM_OS_H
 #define PORT_HAL_GX_VRAM_OS_H
 

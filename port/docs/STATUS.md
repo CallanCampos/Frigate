@@ -129,12 +129,17 @@ level that doesn't exist yet says "not yet"; no field is left out.
     `os_internal.h` says what the OS module's files share (the DTCM, the contexts' side table, the interrupt controller
     and timers on the virtual clock); the compile probe's `port_shim.h` points to `port/include/port_host.h` in place of
     "a real port would"; and `check_sections.py`'s frozen note is in its docstring.
+  - **The platform rule, settled at publishing.** It stays as built, which closes the decision the entries below and
+    this entry's review left open: the host's types are defined in `include/types.h`'s `PLATFORM_PC` block, a port
+    change with its game-changes row since phase 1, and other headers branch on `PLATFORM_PC` themselves. A separate
+    `include/platform.h` would add a second file outside `port/` for what that block already holds, so PLAN.md §4.8's
+    header is not made; the rules already say so. The VRAM backends' headers (`vram_os.h`, `vram_os.c`) say which
+    graphics they serve, the one header the confirmation found short.
 - **Next:** as the last entries: a save with an adventure made by the port, once overlay 36 lets it into the field; for
   the sound, a comparison sequence where a player plays on the game's count. The launcher's modules get their rows in
   the guides and the feature map when they merge.
 - **Blockers:** overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download Play) only
-  matter from phase 7. A decision for the user, as in Frigate's last entry: keeping the platform rule as built (the
-  host's types in `include/types.h`'s `PLATFORM_PC` block) or creating `include/platform.h` instead.
+  matter from phase 7.
 
 ## 2026-10-18: Frigate's identity and guides, reviewed and fixed
 
