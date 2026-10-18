@@ -479,6 +479,7 @@ typedef enum {
 
 typedef enum {
     GX_BG_SCRBASE_0x0000 = 0,
+    GX_BG_SCRBASE_0x6000 = 12,
     GX_BG_SCRBASE_0xf800 = 31,
 } GXBGScrBase;
 
@@ -1549,19 +1550,19 @@ u32 GX_ResetBankForSubBG(void);             // swan's gfxAcquireBGBanksB
 u32 GX_ResetBankForSubOBJ(void);            // swan's gfxAcquireObjBanksB
 u32 GX_ResetBankForSubBGExtPltt(void);      // swan's gfxAcquireBGExtPltBanksB
 u32 GX_ResetBankForSubOBJExtPltt(void);     // swan's gfxAcquireObjExtPltBanksB
-void GX_DisableBankForBG(void);             // swan's gfxDisableBGBanksA
-void GX_DisableBankForOBJ(void);            // swan's gfxDisableObjBanksA
-void GX_DisableBankForBGExtPltt(void);      // swan's gfxDisableBGExtPltBanksA
-void GX_DisableBankForOBJExtPltt(void);     // swan's gfxDisableObjExtPltBanksA
-void GX_DisableBankForTex(void);            // swan's gfxDisableTextureBanks
-void GX_DisableBankForTexPltt(void);        // swan's gfxDisablePaletteBanks
-void GX_DisableBankForClearImage(void);     // swan's gfxDisableRearPlaneImageBanks
-void GX_DisableBankForARM7(void);           // swan's gfxDisablePlainARM7Banks
-void GX_DisableBankForLCDC(void);           // swan's gfxDisableLCDCBanks
-void GX_DisableBankForSubBG(void);          // swan's gfxDisableBGBanksB
-void GX_DisableBankForSubOBJ(void);         // swan's gfxDisableObjBanksB
-void GX_DisableBankForSubBGExtPltt(void);   // swan's gfxDisableBGExtPltBanksB
-void GX_DisableBankForSubOBJExtPltt(void);  // swan's gfxDisableObjExtPltBanksB
+u32 GX_DisableBankForBG(void);              // swan's gfxDisableBGBanksA
+u32 GX_DisableBankForOBJ(void);             // swan's gfxDisableObjBanksA
+u32 GX_DisableBankForBGExtPltt(void);       // swan's gfxDisableBGExtPltBanksA
+u32 GX_DisableBankForOBJExtPltt(void);      // swan's gfxDisableObjExtPltBanksA
+u32 GX_DisableBankForTex(void);             // swan's gfxDisableTextureBanks
+u32 GX_DisableBankForTexPltt(void);         // swan's gfxDisablePaletteBanks
+u32 GX_DisableBankForClearImage(void);      // swan's gfxDisableRearPlaneImageBanks
+u32 GX_DisableBankForARM7(void);            // swan's gfxDisablePlainARM7Banks
+u32 GX_DisableBankForLCDC(void);            // swan's gfxDisableLCDCBanks
+u32 GX_DisableBankForSubBG(void);           // swan's gfxDisableBGBanksB
+u32 GX_DisableBankForSubOBJ(void);          // swan's gfxDisableObjBanksB
+u32 GX_DisableBankForSubBGExtPltt(void);    // swan's gfxDisableBGExtPltBanksB
+u32 GX_DisableBankForSubOBJExtPltt(void);   // swan's gfxDisableObjExtPltBanksB
 u32 GX_GetBankForLCDC(void);                // swan's gfxGetLCDCBanks
 u32 GX_GetBankForTex(void);                 // swan's gfxGetTextureBanks
 u32 GX_GetBankForOBJExtPltt(void);          // swan's gfxGetObjExtPltBanksA
@@ -1691,6 +1692,10 @@ static inline void GXS_SetOBJVRamModeBmp(GXOBJVRamModeBmp mode) {
 
 static inline void GXS_DispOn(void) {
     reg_GXS_DB_DISPCNT |= REG_GXS_DB_DISPCNT_MODE_MASK;
+}
+
+static inline void GXS_DispOff(void) {
+    reg_GXS_DB_DISPCNT &= ~REG_GXS_DB_DISPCNT_MODE_MASK;
 }
 
 // NitroSDK's G3X_Reset, G3X_InitMtxStack and G3X_GetBoxTestResult. The box test result is 0 when
