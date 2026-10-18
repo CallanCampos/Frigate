@@ -83,16 +83,19 @@ build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --head
 
   ```sh
   mkdir -p SAVES
-  python3 port/tools/oracle/oracle.py save starter_save --out SAVES/IREO.sav        # Black 2, Tepig and the Pokédex
-  python3 port/tools/oracle/oracle.py save first_save --out SAVES/IREO.sav          # Black 2, no Pokémon yet
-  python3 port/tools/oracle/oracle.py save first_save --version w2_us --out SAVES/IRDO.sav       # White 2
+  # Black 2: Tepig and the Pokédex, or no Pokémon yet
+  python3 port/tools/oracle/oracle.py save starter_save --out SAVES/IREO.sav
+  python3 port/tools/oracle/oracle.py save first_save --out SAVES/IREO.sav
+  # White 2: the same two
+  python3 port/tools/oracle/oracle.py save starter_save --version w2_us --out SAVES/IRDO.sav
+  python3 port/tools/oracle/oracle.py save first_save --version w2_us --out SAVES/IRDO.sav
   ```
 
   The oracle counts game frames with the ROM build's link map, so run `python3 configure.py && ninja` first: without
   it the save command stops with "counts game frames, which need --counter". `--oracle BIN` names `pbw-oracle` when
-  it isn't in `build/port-oracle/oracle/`, and `--rom PATH` the ROM. White 2 has
-  only the first save so far: its starter save's route isn't measured yet. Without a save there is no CONTINUE, the
-  game never asks for the field, and the run ends with status 1.
+  it isn't in `build/port-oracle/oracle/`, and `--rom PATH` the ROM. Both versions have both saves; the starter save
+  is made from the first save, so it costs the two oracle runs. Without a save there is no CONTINUE, the game never
+  asks for the field, and the run ends with status 1.
 - **It opens only what the save's field menu offers**, as the menu decides: no party list or summary without a
   Pokémon, no Pokédex without the Pokédex, no bag in the Black Tower's or White Treehollow's menu. Asking for another
   ends the run with status 2 before anything opens.

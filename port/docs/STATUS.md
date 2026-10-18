@@ -26,6 +26,74 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: White 2's starter save, and its party list and Pokédex against melonDS pass for pass
+
+- **Upstream:** `9b486e486`, merged by `334077ba7`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-w2-starter` from `77263e609`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, a full build in the
+  worktree). This task changes only `port/` and `.github/README.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo, `build/port` (Black 2) and `build/port-w2` (White 2), both Ninja, from
+  scratch: no errors, 264 warnings in each (263 at the last entry, built before `334077ba7` merged upstream's
+  `9b486e486`; this task changes no C), none of the pointer and integer size kinds. The oracle is `build/verify-tree`'s
+  `pbw-oracle`, copied into both builds' `oracle/` (no oracle source changed), and the cached saves its `oracle-saves`
+  (White 2's `first_save`, Black 2's two). Not pushed, so no CI run.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, White 2, `ctest -j4` with the oracle: all 265 pass, none skipped (2,402 s, at a load average of 35
+    to 170). New in White 2: `oracle_continue_starter`, 3,407 of 3,407 compared frames match (1,312 exact, 2,095 with
+    3D within the tolerance), with continue's known differences, the start menu's saved game with its Pokédex line
+    among them, then the stop on `FIELDMAP_PROC_FUNCS` after frame 3,436; `oracle_launch_party_menus`, 8 of 8 app
+    screens at the oracle's counts (the summary left out, `SUMMARY_SCROLL`), 2,639 of 2,639 counts of the apps' spans
+    the oracle's pictures, the 19 rows of the table held to the oracle's run, event type 0 after each of the four
+    apps, the save unchanged; `launch_summary_standalone` and `launch_touch_then_party`, which ran in Black 2 only
+    (the party list after a touch shows the White 2 table's party list at count 4250). `oracle_saves` takes both saves
+    from the cache, and `oracle_compare` checks the White 2 entries of `SAVES` and `LAUNCHES` (their input files, the
+    table, the known rows among its labels).
+  - Black 2, the oracle's and the launcher's tests, `ctest -j2 -R 'oracle|launch'`: all 31 pass (3,513 s), with the
+    same results as the last entry (`oracle_continue_starter` 3,415 of 3,415, `oracle_launch_party_menus` 8 of 8 and
+    2,639 of 2,639, `oracle_launch_field_menus` 2 of 2 and 621 of 621). The rest of Black 2's ctest wasn't run: this
+    task changes no code the other tests build.
+  - The starter save on White 2's oracle: SHA-1 `3b9dac231d1f` in three runs (one with traces and pictures, two of
+    `oracle.py save starter_save --version w2_us`, from the cached `first_save`). Every run passed `--save-dir` or
+    `--save`; `~/Library/Application Support/Frigate` doesn't exist. T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** 474 function stubs and 46 data placeholders in each version (`gen_stubs`, each build above), from 512
+  and 46 at the last entry: upstream's code merged by `334077ba7`. A continued game without `--launch` still stops on
+  `FIELDMAP_PROC_FUNCS`.
+- **64-bit warnings:** none of the pointer and integer size kinds among the 264 warnings, in each version.
+- **Work done:**
+  - **Why Black 2's route went astray in White 2.** Traced on White 2's oracle every 5 frames (the player's
+    `PlayerState`, the event variables and flags, the party, the event slot; White 2's heap addresses are Black 2's
+    plus 0x40): Mom's and Hugh's scenes run as in Black 2 within a few counts, then, going up x = 37, the townsperson
+    who wanders around (36, 747) (`aspertia_city.json`'s npc 11, movement 3) steps in front of the player, who stands
+    from count 8124 to 8169; every timed walk after it ends short, and the player ends in front of the Trainers'
+    School.
+  - **White 2's starter route** (`port/tests/oracle/starter_save_w2_us.pbwinput`): Black 2's to (41, 751), then one
+    tile west and up x = 40, out of the walker's reach and eight tiles shorter, along z = 741 to x = 54 and on as
+    Black 2's, its presses from the stairs on 124 frames sooner. The oracle's screens show the story as Black 2's:
+    Hugh's comment, Bianca's talks, Tepig, the Pokédex, and the save's question with Aspertia City, badges 0, Pokédex
+    1, time 0:04. The save, decoded: Tepig, level 5, 135 experience, 22/22 HP, its checksum valid; event flags 0x961
+    and 0x962; the same nonzero event variables as Black 2's save (0x4030 = 1, 0x4043 = 255, 0x40a0 = 1, 0x40a1 = 4,
+    0x40a4 = 1); both copies the same; 2,080 bytes from White 2's `first_save`. `SAVES` keeps its SHA-1.
+  - **White 2's `party_menus`**: Black 2's input file and counts, measured again on White 2's oracle from the new save
+    (`launch_party_menus_w2_us.*`): each app's first frame and the black after it come at Black 2's counts, and the
+    White 2 port takes Black 2's passes to each app's first frame (`--launch APP@4044`: 4046 for the party list and
+    the bag, 4048 for the Pokédex and the card), so `LAUNCHES` gives White 2 Black 2's `--launch` and spans. The
+    table's rows are Black 2's labels at Black 2's counts; the field menu's, the party list's, the summary's and the
+    card's bottom screens are White 2's own. The summary is left out for Black 2's reason, checked in White 2: the DS
+    spends 38 VBlanks more than passes loading it (30 on count 4530), and the port's summary at count 4700 is the
+    oracle's but for its background, which a shift of 9 pixels lines up best. No port bug turned up.
+  - **The launcher's two smoke tests** from the starter save now run in both versions (`oracle.cmake`, with White 2's
+    copies of their input files).
+  - **Documents:** the oracle README's Saves (White 2's starter save, why its route differs), the comparison
+    sequences (continue_starter in both versions, its White 2 row) and the launch checks (the table's White 2 row);
+    MODDING.md's save commands; the tests guide; ARCHITECTURE.md's feature map row, the landing page and the README
+    (the party list and the Pokédex match melonDS in both versions); a lesson on routes and wandering townspeople.
+- **Next:** the apps no route reaches yet (the town map, the Xtransceiver, the medal box, the options); White 2's
+  Route 19 save, for the battles; a save with an adventure made by the port, once overlay 36 lets it into the field;
+  for the sound, a comparison sequence where a player plays on the game's count.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the Pokédex runs and matches melonDS, thanks to the decomp's NitroSystem tables
 
 - **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`, which brought

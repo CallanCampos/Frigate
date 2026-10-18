@@ -1,0 +1,31 @@
+# The field menu's apps from the starter save (launch_party_menus_w2_us.pbwinput): the oracle's labelled screens of
+# the route, pbw-oracle's hashes of the pinned melonDS's output on the player's dump (SHA-1 of each screen's RGB bytes,
+# frames.tsv's top and bottom; hashes only). where: app, a screen of an app the port must show at the row's count
+# through Frigate's test launcher (oracle.py launch party_menus); field, a screen of the field or its menu, which the
+# port can't show while overlay 36 has no C, held to the oracle's run only. count is GFL's frame count at oracle_frame,
+# the first frame with that count. The check leaves out one app row, a known difference of oracle.py's launch routes
+# (README.md, "The launch checks"): the summary, whose background scrolls by VBlanks, which the DS spends loading it
+# (SUMMARY_SCROLL; its bottom screen shows 3D, bottom_3d). White 2: Black 2's labels at Black 2's counts, measured on
+# White 2's oracle from its own starter save, each the same screen, 64 oracle frames sooner. The field's, the Pokedex's
+# and the bag's rows are Black 2's hashes, and so is every top screen but the summary's; the menu's, the party list's,
+# the summary's and the card's bottom screens are White 2's own.
+label	oracle_frame	count	game_frame	top_3d	bottom_3d	top	bottom	where
+field	5874	3880	3881	1	0	7d65760c6358bae1695d1f85770b2e57ce13a8a3	a912c9dce413f429be6f7c02f3da738a003e8639	field
+menu	5949	3950	3951	1	0	2d864ea2ea426c3eecaa3fc60faae8f2b45b8941	a71452825d994e17ed0967ab028a2591707378c5	field
+menu_cursor_pokemon	5989	3990	3991	1	0	3954ec4b0973023fc727a4e2ec60163147992c9e	113b71b6bd970a1b91e4b7df229beceff85d23e4	field
+party	6264	4250	4251	0	0	8e99c447bda6cf4f7a2af10b64fed670fe223d80	2b0a464992a6723b96cf08d8f811d2e16d9bee83	app
+pokemon_menu	6465	4450	4451	0	0	8e99c447bda6cf4f7a2af10b64fed670fe223d80	95c467faf8cc6b1d71ff1001f6d975a425c4072b	app
+summary	6753	4700	4701	0	1	5268c939dd0526a04c5e3811639af98cac2e1750	72c94a7c1c183467b66c721d122bab3459560585	app
+party_after_summary	7118	5050	5051	0	0	8e99c447bda6cf4f7a2af10b64fed670fe223d80	e639ac983492372db993689c4f3ca76862283194	app
+menu_after_party	7432	5300	5301	1	0	e2952699ed8f63643492c112e6999a55f549f94d	a148bc37483bd406ff45c222afdb93bbfc29f752	field
+menu_cursor_pokedex	7552	5420	5421	1	0	a35f51c6f7accb6e0a0f38537731736c71af9016	ac1aa6837938706ab2512d30f21b0350c8a97314	field
+pokedex	8154	5995	5996	0	0	813eeb1469b49523d2478f7c55ef99e5227e9fab	24c5831a528b9f349d59e461012109af23a9086e	app
+pokedex_entry	8415	6200	6201	0	0	2679b72763da26eb0d1ff5ef13672789eaf30fce	9edf920f3331f64c6b1a6dd03de12f3ba2598e45	app
+pokedex_after_entry	8783	6550	6551	0	0	866c263803c4dfd0deb0cce663123952be80e5bd	1e2bf4021a6b72e46dd9fc3633ad81d39a55a21a	app
+menu_after_pokedex	9146	6850	6851	1	0	0b1ff0c681c511c99882d94e945c6ff17753ec4d	dd535c4f021001b01eacd658fd17b4d04c0d2292	field
+card	9549	7230	7231	0	0	bda3899a8bcdd2db31451d43350ccc20be96f547	429040e1e4c7b240a596fcd768b1576c075057b6	app
+menu_after_card	9934	7550	7551	1	0	69db4eb5c7a3da3530f7c1802285c56a6a08dc33	ff6f1540b513540e315479a82dbc3ac30a48b754	field
+menu_cursor_bag	10004	7620	7621	1	0	34f3ef7f75437dddf87e3c5b25655623c4cdf7d0	2f1c872a7fa6fe753f053411175f2ec60d5b6129	field
+bag	10207	7800	7801	0	0	b936acca47df3c855fbdbda367ce56c9c00129cf	1ab533957632aaa1612dc7e5f2be5d66f3c36bd6	app
+menu_after_bag	10720	8250	8251	1	0	c5015b7cefcbd8c7fcb9b0e8043f37ffb534f1ad	27cfc18d6b4012dcc1e8547c374392aeafed3161	field
+field_after	10921	8450	8451	1	0	95a482e10213ba03002e4f763ed423c773ca4e91	a912c9dce413f429be6f7c02f3da738a003e8639	field

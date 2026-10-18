@@ -382,7 +382,7 @@ sequences, compared with `--align counter`, the movies by their pictures (`oracl
   which gap it stops on and changes when the decomp fills it.
 - **continue_starter**: continue's input file from the starter save ([below](#saves)): the start menu's saved game has
   the Pokédex line (Pokédex: 1, time 0:04), and CONTINUE goes to the Aspertia City lookout. The port stops on the same
-  trap. White 2 has no starter save measured yet, so its test skips with the reason.
+  trap, in both versions, each from its own starter save.
 
 Each is two ctest tests, but continue and continue_starter, whose saves only the oracle can make, have only the
 first:
@@ -415,6 +415,7 @@ Results, every port frame but the known differences:
 | continue, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
 | continue, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 | continue_starter, Black 2 | 3,436 (trap) | 3,415 | 1,310 | 2,105 | the title's 21 port frames, oracle frame 4920 | not compared |
+| continue_starter, White 2 | 3,436 (trap) | 3,407 | 1,312 | 2,095 | the title's 28 port frames and 3402, oracle frames 1260, 4852 | not compared |
 
 A screen with 3D has 6 to 17 pixels beyond the pixel tolerance at the median, by sequence and version, and 80 at most
 of the 245 allowed, nearly all on polygon edges (their coverage and fill). Inside polygons the pixels match: they
@@ -515,7 +516,8 @@ It is made at test time and never committed.
 **Saves made from saves.** A save in `SAVES` can name the save it starts from (`start`): `oracle.py` makes or takes
 that one first, checks its SHA-1, and gives it to the oracle with `--save` for the next input file. Each step is held
 to its own SHA-1, so a chain is the same at every run or fails at the step that changed. Black 2 has two, measured
-with the pinned melonDS; White 2's are still to be measured, and its tests that need them skip with the reason:
+with the pinned melonDS, and White 2 the first of them; White 2's Route 19 save, which no test uses, is still to be
+measured:
 
 - **The starter save** (`starter_save`, from `first_save`, `port/tests/oracle/starter_save_b2_us.pbwinput`, 17,000
   frames, SHA-1 `ce71fe0b8c1d`): CONTINUE as the continue sequence presses it, then the story from the player's room:
@@ -526,6 +528,21 @@ with the pinned melonDS; White 2's are still to be measured, and its tests that 
   0x961 (a Pokémon) and 0x962 (the Pokédex), the city's story variable 0x40a1 at 4, the starter variable 0x4030 at 1.
   The game writes it by frame 16,400 and the menu closes at 16,874; the two copies of the main save are the same, and
   2,086 bytes differ from `first_save`. It costs about 2.5 minutes at a load average near 10.
+
+  White 2's (`starter_save_w2_us.pbwinput`, the same 17,000 frames, SHA-1 `3b9dac231d1f`, the same in three runs) stops
+  at the same point by another street. Black 2's input file goes astray in White 2: going up x = 37, the townsperson who
+  wanders around (36, 747) (`res/field/events/aspertia_city.json`, npc 11, movement 3) steps in front of the player, who
+  stands some 30 frames, so each timed walk after it ends short and the player is left in front of the Trainers' School
+  without a Pokémon (0x40a1 at 1). Until then White 2 plays Black 2's story within a few counts (Mom's scene from count
+  3978 against 3979, Hugh's to 7704 against 7708), so White 2's file is Black 2's to (41, 751), then one tile west and
+  up x = 40, out of that walker's reach, along z = 741 to x = 54 and on as Black 2's, eight tiles shorter; the presses
+  from the stairs on are Black 2's, 124 frames sooner. Its screens show the same story: Hugh's comment on the stairs,
+  Bianca's talks, Tepig chosen, the Pokédex, and "Would you like to save the game?" with Aspertia City, badges 0,
+  Pokédex 1, time 0:04. Decoded the same way: Tepig, level 5, 135 experience, 22/22 HP (another personality value than
+  Black 2's), its checksum valid; event flags 0x961 and 0x962; the same event variables as Black 2's save and no other
+  (0x4030 at 1, 0x4043 at 255, 0x40a0 at 1, 0x40a1 at 4, 0x40a4 at 1). The game's passes take two frames or more while
+  it saves, from frame 15,802 to 16,067, and the menu closes at 16,695 (count 14,394); the two copies are the same, and
+  2,080 bytes differ from White 2's `first_save`.
 - **The Route 19 save** (`route19_save`, from `starter_save`, 28,600 frames, SHA-1 `826bc561a328`): Hugh's trainer
   battle (FIGHT, Tackle: Tepig grows to level 6, 229 experience), the Pokémon Center's scene, Mom's, the gate's gift
   and Bianca's catching lesson, B through each, then SAVE beside the grass at (56, 696). It is for the battles, which
@@ -739,6 +756,7 @@ The launcher sets both through the game's setters. Nothing else was needed: the 
 | `field_menus` | `first_save` | `bag@4044,card@4584` | 2 of 2 | 621 of 621 counts: the bag (4046-4323) and the card (4588-4930) |
 | `party_menus` | `starter_save` | `party@4044,pokedex@5473,card@6974,bag@7673` | 8 of 8, 1 left out | 2,639 of 2,639 counts: the party list, Tepig's menu and back (4046-5123 but the summary), the Pokédex, its Unova list and Tepig's entry (5477-6624), the card with its Pokédex line (6978-7330), the bag (7675-8023) |
 | `field_menus`, White 2 | `first_save` | `bag@4044,card@4584`, as in Black 2 | 2 of 2 | 621 of 621 counts, the same spans |
+| `party_menus`, White 2 | `starter_save` | `party@4044,pokedex@5473,card@6974,bag@7673`, as in Black 2 | 8 of 8, 1 left out | 2,639 of 2,639 counts, the same spans |
 
 The pass-by-pass totals count each launched app's first frame, whose count its `--launch` count aligns: for 2 of the
 621 in `field_menus` and 4 of the 2,639 in `party_menus`, the picture is checked but not when it shows.
@@ -751,10 +769,13 @@ Left out of `party_menus`, with its reason in `LAUNCHES` (`SUMMARY_SCROLL`):
   screens are the port's. A frame the DS drops where the game steps by VBlanks, as the title's camera
   ([Known differences](#known-differences-from-the-hardware)).
 
-White 2 has `field_menus`, measured again on its own oracle: the same counts and spans, the bag's screens the same as
-Black 2's, the menu's and the card's bottom screens White 2's own. It has no `party_menus` yet: its starter save isn't
-measured (the Black 2 route's walk goes astray in White 2: the player ends in front of the Trainers' School with no
-Pokémon), so that test and `oracle_continue_starter` skip with the reason.
+White 2 has both routes, measured again on its own oracle with Black 2's presses, each from White 2's own save: every
+app's first frame and the black after it are at Black 2's counts, and the port takes Black 2's passes to each app's
+first frame (`--launch APP@4044` on White 2's port: the party list's and the bag's at 4046, the Pokédex's and the card's
+at 4048), so the routes' `--launch` and spans are Black 2's. The bag's and the Pokédex's screens are Black 2's, the
+field's top screen too; the field menu's, the party list's, the summary's and the card's bottom screens are White 2's
+own, and so is the summary's top. White 2's summary is left out for the same reason: the DS spends 38 VBlanks more than
+passes loading it (30 frames on count 4530 alone, as in Black 2).
 
 ## Integration
 

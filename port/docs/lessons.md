@@ -3,6 +3,16 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: White 2's starter save on the oracle
+
+- **A route of timed walks goes astray where a townsperson wanders.** Black 2's starter route held each direction for
+  as many frames as its tiles take; in White 2 a walker whose area takes in the route (`npcs` with movement 3 in
+  `res/field/events/<zone>.json`, here npc 11 around (36, 747)) stepped in front of the player for some 30 frames, and
+  every walk after it ended short. Its random steps differ between the versions, so a route that works in one isn't
+  proof for the other. Route around the wanderers' areas where the map allows (here x = 40 for x = 37), and trace each
+  run's position every few frames (`PlayerState`, `GameData` + 0x114; in White 2 the heap's addresses are Black 2's
+  plus 0x40) so that a stall shows where it starts, not where the run ends.
+
 ## 2026-10-18: upstream's matched libfx, and the divider read by its address constant
 
 - **A register that acts when read has to act however the code names it.** The host tree routed the divider's and
