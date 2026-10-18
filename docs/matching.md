@@ -1455,7 +1455,10 @@ Same instructions, scheduled in another order.
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is MWCC's address
   of `p[i].field` when two accesses share it, `p` is a pointer variable and its first common-subexpression pass did
-  not merge them, as in `f[i].b += v`. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
+  not merge them, as in `f[i].b += v`. The accesses can be different expressions: `pokewood_savedata.c`'s
+  `func_02011130` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
+  one `save + 0x28` (`add r0, #0x28; ldr r0, [r0, r5]`), and tests `hasRecord` and sets it from one `save + 0x38`, while
+  `isNewRecord`, set once, indexes first. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
   compiles like `p[i].f`, index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`), and so do
   other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
   (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
@@ -2513,6 +2516,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
   `config/compiler_flags.toml` and plain `f32 *` reads, which is not used: nothing but that one loop shows the
   setting, and the cast above explains the same bytes.
+- `-flag` and `#pragma` also take internal pass names that the manual doesn't list and `mwccarm.exe` holds:
+  `opt_arithtransformation` turns a `u64` multiply by a power of two into shifts, and `opt_foldconstants` and
+  `opt_treetransformation` each fold a chain of constant multiplies (with only `opt_arithtransformation` on,
+  `x * 3 * 1000` stays two `_ull_mul` calls). The front end folds none of it: at -O0, `x * 64 * 1000` stays two `_ull_mul` calls, and from -O1 up it is one, whichever `-opt` sub-options are
+  off. As a diagnostic, these three with `opt_loop_invariants` and `opt_strength_reduction` off around `ir_check.c`'s
+  `IrCheck_ReadId` (`#pragma push`, the five, `#pragma pop`) give its code from one `start` local; with any of the
+  five left on, it differs again (the waits fold, or with `opt_arithtransformation` on the 64 becomes shifts). An
+  `asm { nop }` statement in the function leaves the multiplies apart too, and an empty `asm {}` does not. Neither is
+  source; an aligned object the function reads gives the same result from source (below).
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2642,6 +2654,19 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
   `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
   the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
+- The same alignment keeps a chain of 64-bit constant multiplies apart: `OS_TicksToMicroSeconds(OS_GetTick() - start)`
+  multiplies by 64 and then by 1000 with two `_ull_mul` calls, the 64 and the zero high word set in registers before
+  the loop, where it is otherwise one multiply by 64000. `ir_check.c`'s `IrCheck_ReadId` (overlay 338) shows the
+  effect: it reads the file's statics by name and keeps both calls in its two waits, while `IrCheck_SendByte` and
+  `IrCheck_RecvByte`, which reach the transfer through a pointer, fold theirs. Its layout doesn't show which static is
+  aligned, or to what: the overlay's sections start 32-aligned anyway, and 4 to 32 on `sTransfer` all match. The other
+  copy of this driver, `lib/irc/src/irc_spi.c` (overlay 031), agrees: compiled at the game's -O4,p, `IrcSpi_Recv` and
+  `IrcSpi_Send`, the two functions that read `IrcSpi` by name, keep the original's unrotated loops only with an
+  alignment on `IrcSpi`, and no object of that file sits on a 32-byte boundary, so `ir_check.c` aligns `sTransfer` to
+  4. Under the attribute `IrCheck_ReadId` also needs each wait's start tick in a variable of its own, the local of an
+  inline `IrCheck_Wait60us` (the infrared library's `IrcSpi_Wait60us`): one `start` set before both waits swaps two
+  registers (`r4`/`r6`), which it doesn't with the five passes above off.
+  Two `_ull_mul` calls where ours multiplies once, in one function of a file, ask whether it reads an aligned object.
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =
   head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `VCT_FlushAllQueues` (`vct_buffer.c`) matches

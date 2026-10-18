@@ -19,10 +19,14 @@ void FieldFog_SetTable(FieldFog *fog, const u8 *table);
 void FieldFog_Flush(FieldFog *fog);
 u32 FieldFog_GetDepthShift(FieldFog *fog);
 void FieldFog_Animate(FieldFog *fog, u32 color, u32 depthShift, u32 duration);
+// The default densities, rising with depth; an animation between two offsets and depth shifts; and whether one runs
+void FieldFog_SetDefaultTable(FieldFog *fog);
+void FieldFog_AnimateEx(FieldFog *fog, s32 offsetStart, s32 offsetEnd, u32 depthShiftStart, u32 depthShiftEnd,
+                        u16 frameCount);
+BOOL FieldFog_IsAnimationRunning(FieldFog *fog);
 FieldFog *FieldFog_Create(HeapID heapId);
 void FieldFog_Free(FieldFog *fog);
 void FieldFog_Update(FieldFog *fog);
-BOOL FieldFog_IsAnimationRunning(FieldFog *fog);
 // field_zonefog.c: loads the zone's fog file, delay frames after a request
 FieldFogCtrl *FieldFogCtrl_Create(HeapID heapId);
 void FieldFogCtrl_Free(FieldFogCtrl *ctrl);
