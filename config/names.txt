@@ -11348,6 +11348,7 @@ overlays/ov182 0x021c40dc sFrames
 overlays/ov182 0x021c40e0 sNoticeScreen
 overlays/ov182 0x021c40e4 sPageMove
 overlays/ov182 0x021c40e8 sMoveWaitEnd
+overlays/ov182 0x021c40ec sPageStep3
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource

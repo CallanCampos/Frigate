@@ -1714,7 +1714,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-537 of 1113 functions are in source files.
+555 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1745,6 +1745,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_notice_screen.c` | `0x021aff3c`–`0x021b0198` | 12 | complete | descriptive |
 | `dwc_util_page_move.c` | `0x021b0198`–`0x021b0420` | 12 | complete | descriptive |
 | `dwc_util_page_multi5.c` | `0x021b0420`–`0x021b06d8` | 14 | complete | descriptive |
+| `dwc_util_page_step3.c` | `0x021b06d8`–`0x021b0ad0` | 18 | complete | descriptive |
 | `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |

@@ -254,3 +254,9 @@ lib/dwcutilui/src/dwc_util_page_multi5.c:
     .text       start:0x021b0420 end:0x021b06d8
     .data       start:0x021c0eec end:0x021c0f00
     .bss        start:0x021c40e8 end:0x021c40ec
+
+lib/dwcutilui/src/dwc_util_page_step3.c:
+    complete
+    .text       start:0x021b06d8 end:0x021b0ad0
+    .data       start:0x021c0f00 end:0x021c0f44
+    .bss        start:0x021c40ec end:0x021c40f4
