@@ -64,7 +64,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [mco_impl.c](os/mco_impl.c) | minicoro's implementation, in a file of its own so that a sanitizer build leaves it uninstrumented |
 | [os_thread_host.c](os/os_thread_host.c) | The decomp's `os_thread.c` (the scheduler) compiled through, with the context switch given to the fibers |
 | [os_init.c](os/os_init.c) | `OS_Init`: the SDK's boot sequence (PXI, the card, the tick, alarms) as the decomp's file has it, on the host |
-| [os_interrupt.c](os/os_interrupt.c) | Interrupt handlers and masks (`OS_SetIrqFunction`, IE, IME), with the effects the hardware has |
+| [os_interrupt.c](os/os_interrupt.c) | Interrupt handlers and masks (`OS_SetIrqFunction`, IE, IME), with the effects the hardware has; a DMA channel's or timer's handler is called with its own type, where the SDK casts it to a callback |
 | [os_irqTable.c](os/os_irqTable.c) | The interrupt table and the handlers of the interrupts that have callbacks, DTCM data with no C in the decomp |
 | [os_system.c](os/os_system.c) | Waits: `OS_WaitIrq`, the busy loops (`OS_SpinWait`, `SVC_WaitByLoop`) as moves of the virtual clock |
 | [os_tick.c](os/os_tick.c) | The tick counter, on the virtual clock's timer 0 |
