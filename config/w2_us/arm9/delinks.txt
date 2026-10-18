@@ -891,6 +891,7 @@ lib/nnsys/src/g2d/g2d_Image.c:
 
 lib/nnsys/src/g2d/g2d_OamManager.c:
     .text       start:0x0206067c end:0x02060b54
+    .rodata     start:0x020942c4 end:0x020942f4
     .data       start:0x0209b28c end:0x0209b298
     .bss        start:0x02141ac4 end:0x02142a88
 

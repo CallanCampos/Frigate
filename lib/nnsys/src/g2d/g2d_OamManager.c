@@ -4,7 +4,10 @@
 #include "nnsys/g2d.h"
 
 // NitroSystem's g2d_OamManager.c: the OAM managers. Each type of OAM has a buffer of its OAMs and affine parameters,
-// which the managers share out in ranges, and a manager fills its range each frame and sends it to the hardware
+// which the managers share out in ranges, and a manager fills its range each frame and sends it to the hardware. The
+// file also defines the OAM size tables that g2d.h's inlines read, which fill the gap before
+// g2d_CellTransferManager.c's .rodata: pokediamond links the OAM manager as one object, g2d_oam.o, whose .rodata is
+// these two tables. The file name is a guess from the functions, and the tables' names are pokediamond's
 
 #define OAM_NUM 128
 #define AFFINE_NUM 32
@@ -27,6 +30,20 @@ static u16 managerID_;
 static OamBuffer oamBuffers_[NNS_G2D_OAMTYPE_MAX];
 
 static OamLoadFunction loadFunctions_[NNS_G2D_OAMTYPE_SOFTWAREEMULATION + 1] = { CpuLoadOAMMain_, CpuLoadOAMSub_ };
+
+// The width and height in pixels of each OAM shape and size, by [shape][size]. Objects of one size come out in the
+// reverse of their definition order, so the widths are defined first and the ROM has the heights first
+const u16 NNSi_objSizeWTbl[3][4] = {
+    { 8, 16, 32, 64 },  // Square
+    { 16, 32, 32, 64 }, // Wide
+    { 8, 8, 16, 32 },   // Tall
+};
+
+const u16 NNSi_objSizeHTbl[3][4] = {
+    { 8, 16, 32, 64 },  // Square
+    { 8, 8, 16, 32 },   // Wide
+    { 16, 32, 32, 64 }, // Tall
+};
 
 static void CpuLoadOAMSub_(const void *src, u32 offset, u32 size) {
     MI_CpuCopy16(src, (void *)(HW_DB_OAM + offset), size);
