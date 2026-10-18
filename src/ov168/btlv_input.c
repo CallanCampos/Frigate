@@ -3018,15 +3018,15 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     for (i = 0; i < 4; i++) {
         MI_CpuCopy16(
             &pixels[i * 0x1c0],
-            (void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            (void *)((uptr)vram + (0xde + i * 8) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
             0x100);
         MI_CpuCopy16(
             &pixels[i * 0x1c0 + 0x100],
-            (void *)((u32)vram + (0xfe + i * 4) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            (void *)((uptr)vram + (0xfe + i * 4) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
             0x80);
         MI_CpuCopy16(
             &pixels[i * 0x1c0 + 0x180],
-            (void *)((u32)vram + (0x10e + i * 2) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            (void *)((uptr)vram + (0x10e + i * 2) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
             0x40);
     }
 
