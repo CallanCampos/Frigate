@@ -1227,7 +1227,7 @@ sWepKeyboardRowY kind:data(any) addr:0x021c00cc
 sWepKeyboardColumnX kind:data(any) addr:0x021c00d2
 data_ov182_021c00e4 kind:data(any) addr:0x021c00e4
 data_ov182_021c00ec kind:data(any) addr:0x021c00ec
-data_ov182_021c00f4 kind:data(any) addr:0x021c00f4
+sAddressEditDigitX kind:data(any) addr:0x021c00f4
 data_ov182_021c0100 kind:data(any) addr:0x021c0100
 data_ov182_021c0102 kind:data(any) addr:0x021c0102 ambiguous
 data_ov182_021c0108 kind:data(any) addr:0x021c0108
@@ -1639,7 +1639,7 @@ sPageMulti4Frames kind:bss addr:0x021c40f4
 sApListPos kind:bss addr:0x021c40f8
 sApList kind:bss addr:0x021c40fc
 sWepKeyboard kind:bss addr:0x021c4100
-data_ov182_021c4104 kind:bss addr:0x021c4104
+sAddressEdit kind:bss addr:0x021c4104
 data_ov182_021c4108 kind:bss addr:0x021c4108
 data_ov182_021c410c kind:bss addr:0x021c410c
 data_ov182_021c4114 kind:bss addr:0x021c4114

@@ -280,3 +280,10 @@ lib/dwcutilui/src/dwc_util_wep_keyboard.c:
     .rodata     start:0x021c00c8 end:0x021c00ec
     .data       start:0x021c0f70 end:0x021c0fe8
     .bss        start:0x021c4100 end:0x021c4104
+
+lib/dwcutilui/src/dwc_util_address_edit.c:
+    complete
+    .text       start:0x021b2120 end:0x021b293c
+    .rodata     start:0x021c00ec end:0x021c0110
+    .data       start:0x021c0fe8 end:0x021c1088
+    .bss        start:0x021c4104 end:0x021c4108

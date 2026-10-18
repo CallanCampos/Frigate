@@ -80,6 +80,20 @@ int func_ov182_021b7630(DWCUtilApEntry **entries);
 void func_ov182_021b7a08(u8 *ssid);
 void func_ov182_021b7854(const u8 *ssid);
 void func_ov182_021b7874(const u8 *key);
+// The addresses of the connection being edited (its IP address, subnet mask, gateway and two DNS servers) as 12
+// digits, each number right-aligned in three, and back
+void func_ov182_021b7a24(u8 *digits);
+void func_ov182_021b7a50(u8 *digits);
+void func_ov182_021b7a7c(u8 *digits);
+void func_ov182_021b7aac(u8 *digits);
+void func_ov182_021b7adc(u8 *digits);
+void func_ov182_021b7990(const u8 *digits);
+void func_ov182_021b79a8(const u8 *digits);
+void func_ov182_021b79c0(const u8 *digits);
+void func_ov182_021b79d8(const u8 *digits);
+void func_ov182_021b79f0(const u8 *digits);
+// Converts 12 digits to an address
+void func_ov182_021b7ff0(const u8 *digits, u8 *address);
 // Makes the connection of the console's Wi-Fi settings the one being edited
 void func_ov182_021b7b20(int index);
 
