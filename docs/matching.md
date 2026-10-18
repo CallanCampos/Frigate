@@ -2812,7 +2812,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   modulo call `_s32_div_f` for a signed operand and `_u32_div_f` (swan's `__aeabi_uidivmod`) for an unsigned one; a
   `u8` or `u16` promotes to a signed `int`, so `(u8)id % 5u` is the unsigned one, and so is a `u16` divided by a
   `u32`. `wipe_sub.c`'s `WipeLineRange_Apply` divides `(range->end - range->start) * step` signed, its fields being
-  `u8`, where the same difference of two `u32` locals called `_u32_div_f`. Compare the built overlay in
+  `u8`, where the same difference of two `u32` locals called `_u32_div_f`. An integer converted to float calls
+  `__aeabi_i2f` when it is signed and `_ffltu` when it is unsigned, and a `u8` cast straight to `f32` is unsigned:
+  `ctvt_game.c`'s `CtvtGame_FindTouchedTarget` scales by `(f32)width / height` with the hit size in `int` locals. A
+  header inline that calls a sibling of the original's callee hides the same way: its `CtvtGame_DrawTimeBar` ends with
+  `BmpWin_TransferNow` (`GFL_BGSysLoadScr`), not `BmpWin_Transfer`. Compare the built overlay in
   `build/<version>/build` with the original to find it.
 - A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned, and `_ll_sdiv`
   (0x0208d414) when both are signed: `pass_power.c`'s `PassPower_ApplyCapture` divides an `s64 value` by 100. The
@@ -2987,6 +2991,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   violated edge) — and write the file in the forced order that reaches zero. `demo3d_data.c` (overlay 293, 516
   objects, 341 small ones misplaced by every per-demo structure tried) matched this way, with one table left after
   its user and forward-declared. `tools/decomp/rodata_solver.py` runs this search.
+- The forced assignment also searches natural structures, where the solver's free orders come out scrambled: keep
+  each group of tables contiguous (a scene tree, the BG setups), at the top or as function-local statics of its only
+  user, anneal the group order, each tree's order of kinds (resources, animations, actors, then the scenes) and
+  which groups are local, and count only the tables the forced assignment moves into another group and the tables
+  defined after a user. Tables of equal size inside a group may then take any order, which the size sort decides.
+  Overlay 257's `ctvt_game.c`, whose top-of-file and just-above-the-user searches left two 80-byte scene tables
+  swapped, fits with its camera, VRAM config, pump rectangles and face orders as function-local statics and its
+  three scene trees contiguous at the top, with three numbered series out of order. Before counting a layout's
+  difference, compare the tables' bytes too: a file whose `.rodata` was never linked can carry wrong values that
+  no probe sees, as its `GX_VRAM_TEXPLTT_0_F` for `_0_G` and two swapped face orders were.
 - A `static const` table declared inside the one function that reads it is listed where that function is, among
   the local initializers, rather than where file-scope data would be. `pokemontrade_nego.c` lays out its menus' item
   lists in the game's order only with its table of blocking fields declared inside `func_ov194_021bbe60`, and

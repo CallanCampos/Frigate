@@ -790,6 +790,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
+- An integer converted to float calls `__aeabi_i2f` when signed and `_ffltu` when unsigned; a `u8` cast to `f32` is
+  unsigned, so a ROM `__aeabi_i2f` wants an `int` local. The probe masks it. (matching.md: "`_ffltu`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
@@ -842,6 +844,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   fields overwritten")
 - When the prediction is wrong, move one declaration at a time and compare the built sections with the ROM.
   (matching.md: "prediction disagrees")
+- No natural order found, and the size-sequence solver's fits are scrambled: search natural structures (groups
+  contiguous, at the top or local to their only user) with the forced assignment as the cost, letting equal-size
+  tables of a group take any order. (matching.md: "also searches natural structures")
 - `static const` goes in `.rodata`, so a table in `.data` isn't `const`. (matching.md: "`static const` data goes in")
 - Small unreferenced objects at the start of a file's shared `.rodata` (ahead of its smallest referenced table) are
   function-local `static const`s, which are emitted even when their reads are folded or absent. (matching.md:
