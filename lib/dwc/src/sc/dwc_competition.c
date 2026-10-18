@@ -101,20 +101,20 @@ void ScClient_SetServers(int server) {
     case 1:
         OS_SNPrintf(sCompetitionUrl, 128,
                     "https://%s.secure2.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(sCompetitionUrl);
         OS_SNPrintf(gAuthUrl, 128, "https://%s.secure2.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     case 0:
     default:
         OS_SNPrintf(sCompetitionUrl, 128,
                     "https://%s.secure.atlas.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(sCompetitionUrl);
         OS_SNPrintf(gAuthUrl, 128, "https://%s.secure.auth.gs.nintendowifi.net/AuthService/AuthService.asmx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(gAuthUrl);
         break;
     }

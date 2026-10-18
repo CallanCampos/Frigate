@@ -1,5 +1,6 @@
 #include "dwc/gt2Message.h"
 #include "dwc/ext.h"
+#include "dwc/gt2Auth.h"
 #include "dwc/gt2Callback.h"
 #include "dwc/gt2Connection.h"
 #include "dwc/gt2Socket.h"
@@ -185,9 +186,9 @@ static BOOL func_ov011_0217d5ac(GTI2Connection *connection, const u8 *data, int 
         }
         return FALSE;
     }
-    func_ov011_0217c87c(response, data);
-    func_ov011_0217c7ec(challenge);
-    func_ov011_0217c87c(connection->response, challenge);
+    gti2GetResponse(response, data);
+    gti2GetChallenge(challenge);
+    gti2GetResponse(connection->response, challenge);
     if (!func_ov011_0217e30c(connection, response, challenge)) {
         return FALSE;
     }
@@ -211,13 +212,13 @@ static BOOL func_ov011_0217d61c(GTI2Connection *connection, const u8 *data, int 
         }
         return FALSE;
     }
-    if (!func_ov011_0217c91c(data, connection->response)) {
+    if (!gti2CheckResponse(data, connection->response)) {
         if (func_ov011_0217d434(connection)) {
             return TRUE;
         }
         return FALSE;
     }
-    func_ov011_0217c87c(response, data + 32);
+    gti2GetResponse(response, data + 32);
     if (!func_ov011_0217e374(connection, response, connection->initialMessage, connection->initialMessageLength)) {
         return FALSE;
     }
@@ -243,7 +244,7 @@ static BOOL func_ov011_0217d6b4(GTI2Connection *connection, const u8 *data, int 
         }
         return FALSE;
     }
-    if (!func_ov011_0217c91c(data, connection->response)) {
+    if (!gti2CheckResponse(data, connection->response)) {
         if (func_ov011_0217d434(connection)) {
             return TRUE;
         }
