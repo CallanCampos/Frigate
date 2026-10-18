@@ -150,7 +150,7 @@ struct CtvtGame {
     u8 lastColumn;
     u8 lastAngle;
     u8 nextDepth;
-    // Which of sFaceOrders the faces come up in, and where in it
+    // Which of CtvtGame_NextFace's orders the faces come up in, and where in it
     u8 faceOrder;
     u8 faceOrderPos;
     CtvtGameBalloon *balloons[4];
@@ -307,8 +307,9 @@ static void CtvtGamePlayer_ResultTask(TCB *tcb, void *data);
 
 static MATHRandContext32 sCtvtGameRand;
 
-// The tables are declared in the order that gives the game's .rodata: MWCC lays them out sorted by size, and
-// where each is declared decides the order of those of equal size, which puts some numbered ones out of order
+// The tables down to sHitSizes are declared in the order that gives the game's .rodata and .data: MWCC lays them
+// out sorted by size, and where each is declared decides the order of those of equal size, which puts some
+// numbered ones out of order
 static const G3DSceneAnimationSetup sFaceAnimations[] = { { 3, 0 }, { 4, 0 }, { 5, 0 } };
 
 static const G3DSceneResourceSetup sFaceResources3[] = { { 233, 33, 0 }, { 233, 33, 0 }, { 233, 33, 0 },
@@ -396,6 +397,7 @@ static const G3DSceneActorSetup sResultActors[] = {
     { 0, 0, 0, 0, sResultAnimations, NELEMS(sResultAnimations) },
     { 1, 0, 1, 0, sResultAnimations, NELEMS(sResultAnimations) },
 };
+
 static const G3DSceneActorSetup sResultPopActors[] = {
     { 0, 0, 0, 0, sResultPopAnimations, NELEMS(sResultPopAnimations) },
 };
@@ -951,8 +953,9 @@ void CtvtGame_SetScores(CtvtGame *game, const CtvtGameData *data) {
 }
 
 void CtvtGame_CountPump(CtvtComm *comm, CtvtGame *game, BOOL big, int netId) {
-    // The pumps that pop a balloon at its last stage. Its reads fold, but the game's .rodata keeps a 30 among the
-    // time bar's constants, which only a function-local static explains; this is the one use of 30 here, a guess
+    // The pumps that pop a balloon at its last stage, read as an immediate. It is the 30 among the time bar's
+    // constants at the head of the file's .rodata; which function holds it is a guess from the value, since
+    // CtvtGame_InitCommon and CtvtGame_InitResults use 30 too
     static const u8 popPumps = 30;
     BOOL popped = FALSE;
     u8 amount = 1;
@@ -2900,8 +2903,9 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
 }
 
 static void CtvtGame_DrawTimeBar(CtvtGame *game) {
-    // The bar's frame. Their reads fold, but as function-local statics they are the first bytes of the file's
-    // .rodata (b1 1e 0c 01 00, with CtvtGame_CountPump's 30), declared in the order that sorts them so
+    // The bar's frame, read as immediates. A function-local static const is emitted even when its reads fold:
+    // these four and CtvtGame_CountPump's 30 are the bytes b1 1e 0c 01 00 at the head of the file's .rodata, in
+    // the order these declarations sort to. That they are this call's is inferred from its arguments
     static const u8 barHeight = 12;
     static const u8 barY = 1;
     static const u8 barX = 0;
@@ -3039,7 +3043,8 @@ static BOOL CtvtGame_AreTargetsGone(CtvtGame *game) {
 }
 
 static u8 CtvtGame_NextFace(CtvtGame *game) {
-    // The orders that the members' faces come up in: every permutation of the four, the last two swapped
+    // The orders that the members' faces come up in: every permutation of the four in order, except that the
+    // last two rows are swapped
     static const u8 sFaceOrders[24][4] = {
         { 0, 1, 2, 3 }, { 0, 1, 3, 2 }, { 0, 2, 1, 3 }, { 0, 2, 3, 1 }, { 0, 3, 1, 2 }, { 0, 3, 2, 1 },
         { 1, 0, 2, 3 }, { 1, 0, 3, 2 }, { 1, 2, 0, 3 }, { 1, 2, 3, 0 }, { 1, 3, 0, 2 }, { 1, 3, 2, 0 },

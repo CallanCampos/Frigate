@@ -790,8 +790,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
-- An integer converted to float calls `__aeabi_i2f` when signed and `_ffltu` when unsigned; a `u8` cast to `f32` is
-  unsigned, so a ROM `__aeabi_i2f` wants an `int` local. The probe masks it. (matching.md: "`_ffltu`")
+- An integer converted to float calls `__aeabi_i2f` when signed and `_ffltu` when unsigned; a `u8` or `u16`
+  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `__aeabi_i2f` wants an `int` local. The
+  probe masks it. (matching.md: "`_ffltu`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
 - A float one ULP off a round decimal is written with the shortest digits that round to it. (matching.md: "one ULP
