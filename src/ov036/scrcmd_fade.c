@@ -62,7 +62,7 @@ BOOL s01AA_CallSeasonBanner(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
-    u8 season = GameData_GetSeason(gameData);
+    u32 season = GameData_GetSeason(gameData);
 
     ScriptWork_CallEvent(work, CallFieldMapEntranceInTransition(gsys, field, 3, 0, 0, season, season));
     return FALSE;

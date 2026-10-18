@@ -190,7 +190,7 @@ void FieldCameraAnimationController_StartAnimation(FieldCameraAnimationControlle
 // camera at the animation's start
 void FieldCameraAnimationController_FinishCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_CommitSrcCoords(FieldCameraAnimationController *controller);
-GameEvent *EventEvCameraShake_Create(GameSystem *gsys, const FieldEvCameraShake *shake);
+GameEvent *EventEvCameraShake_Create(GameSystem *gsys, FieldEvCameraShake *shake);
 void FieldCamera_CalcTransform(FieldCamera *camera, u16 heldKeys);
 G3DCamera *FieldCamera_GetG3DCamera(FieldCamera *camera);
 void FieldCamera_CoordsGetEyeOffset(FieldCamera *camera, VecFx32 *offset);
