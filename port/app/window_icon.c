@@ -1,5 +1,5 @@
 // The window's icon on Linux and Windows (port/app/window_icon.h), from the bitmap the build made of the version's app
-// icon (port/tools/gen_window_icon.c)
+// icon (port/tools/gen_window_icon.c). It touches no part of the game: it is the program's look in the taskbar.
 #include "app/window_icon.h"
 #include <string.h>
 

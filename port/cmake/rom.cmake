@@ -1,5 +1,6 @@
-# The ROM, the game card and the file system (port/hal/rom, port/hal/card, port/hal/fs): the manifest of the ROM the
-# program is built for, the per-file options of their sources, and their tests (port/tests/rom).
+# The ROM, the game card and the file system (port/hal/rom, port/hal/card, port/hal/fs), behind every file the game
+# reads, every overlay it loads and every save: the manifest of the ROM the program is built for, the per-file options
+# of their sources, and their tests (port/tests/rom).
 
 set(port_rom_dir "${CMAKE_CURRENT_SOURCE_DIR}/hal/rom")
 set(port_card_dir "${CMAKE_CURRENT_SOURCE_DIR}/hal/card")
@@ -93,7 +94,8 @@ target_sources(port_hal PRIVATE "${port_rom_manifest_c}")
 set_property(SOURCE "${port_rom_dir}/rom.c" APPEND PROPERTY COMPILE_DEFINITIONS
     "PORT_ROM_DEV_PATH=\"${REPO_ROOT}/orig/baserom_${PORT_VERSION}.nds\"")
 
-# The ARM7's card services go on the PXI bus once the tree has it (port/hal/card/backup.c)
+# The ARM7's card services go on the PXI bus once the tree has it (port/hal/card/backup.c). The tree has
+# port/hal/pxi, so this is always 1 now, and backup.c's branch for a tree without it is never compiled
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/hal/pxi/pxi_bus.h")
     set(port_card_pxi_bus 1)
 else()

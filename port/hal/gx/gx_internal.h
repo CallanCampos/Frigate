@@ -1,4 +1,6 @@
-// What the GX files of port/hal/gx share
+// What the GX files of port/hal/gx share: the copy behind the texture, texture palette, clear image and extended
+// palette loads (gx_load3d.c, gx_load2d_extpltt.c), which puts the game's graphics into VRAM. Nothing outside
+// port/hal/gx includes it.
 #ifndef PORT_HAL_GX_GX_INTERNAL_H
 #define PORT_HAL_GX_GX_INTERNAL_H
 

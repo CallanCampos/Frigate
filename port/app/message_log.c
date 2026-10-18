@@ -1,4 +1,7 @@
-// The log of an app opened from the Finder or the Dock (port/app/message_log.h)
+// The log of an app opened from the Finder or the Dock (port/app/message_log.h), on macOS only: when macOS gives the
+// app no stderr, the program's messages, the reason it stops included, go to ~/Library/Logs/Frigate/<program>.log,
+// and a stop the player can act on (no ROM, a ROM Frigate refuses) shows an alert as well. It touches no part of the
+// game; it is how a player who opened the app learns why the game stopped.
 #include "app/message_log.h"
 #include "hal/os/fiber.h"
 #include "hal/os/port_app.h"

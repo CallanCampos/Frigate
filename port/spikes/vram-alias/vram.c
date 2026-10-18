@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/gx/vram.c; change
+// that, not this copy.
 // The Vram object: views in one region, a layout from VRAMCNT, and the two ways to apply a new layout. Aliasing maps
 // the bank pages into the slots that changed. Copying keeps each bank page in one place (its first slot in a CPU view,
 // or else its parking page) and moves the bytes when that place changes. The DS never shows a bank in two views at

@@ -1,5 +1,6 @@
-// What the files of port/hal/card share, in the SDK's types. Nothing outside port/hal/card includes it but its tests
-// (port/tests/rom).
+// What the files of port/hal/card share, in the SDK's types: the page buffer that every save read and write of the game
+// passes through between the ARM9's backup commands and the ARM7's service. Nothing outside port/hal/card includes it
+// but its tests (port/tests/rom).
 #ifndef PORT_HAL_CARD_CARD_INTERNAL_H
 #define PORT_HAL_CARD_CARD_INTERNAL_H
 

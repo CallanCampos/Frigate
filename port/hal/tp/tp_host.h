@@ -1,7 +1,8 @@
-// The host's touch screen, for the program's input (port/hal/tp). The program reports where the player touches the
-// DS's bottom screen, from the mouse or a touch screen through the inverse of its screen layout, and the host's ARM7
-// (tp7.c) samples it whenever the game asks, as the DS's ARM7 samples the touch panel. Plain C types only, so that
-// files without the decomp's headers (port/app, port/gfx) can include it.
+// The host's touch screen, for the program's input (port/hal/tp). The program reports where the player touches the DS's
+// bottom screen, from the mouse (a touch screen works through the mouse events SDL makes of its touches) through the
+// inverse of its screen layout (port/app/present.c), and the host's ARM7 (tp7.c) samples it whenever the game asks, as
+// the DS's ARM7 samples the touch panel. Plain C types only, so that files without the decomp's headers (port/app,
+// port/gfx) can include it.
 #ifndef PORT_HAL_TP_TP_HOST_H
 #define PORT_HAL_TP_TP_HOST_H
 

@@ -217,6 +217,9 @@ static void bump_generations(const PortVramLayout *next) {
     }
 }
 
+// Applies VRAMCNT as it now stands: works out the layout of every view, and when it differs from the current one,
+// moves the pages that changed slot with the backend in use and gives them new generations. A mapping call that
+// fails stops the program, since no layout describes the views left behind
 static void apply(void) {
     port_vram_layout_compute(sVram.vramcnt, &sVram.next);
     if (sVram.next.overlaps != 0) {

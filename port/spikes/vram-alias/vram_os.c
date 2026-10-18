@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/gx/vram_os.c; change
+// that, not this copy.
 // The virtual memory calls of the aliasing backends. macOS has all three ways to share pages between two addresses:
 // a POSIX shared memory object, a Mach named memory entry and mach_vm_remap. Linux has the first, with memfd_create
 // instead of shm_open. Windows would use a pagefile-backed section and placeholders (README.md); this spike doesn't

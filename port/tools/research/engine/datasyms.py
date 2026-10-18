@@ -1,3 +1,11 @@
+"""How many overlays have data and .bss symbols, and how many symbols they have.
+
+    datasyms.py REPO
+
+Counts, over Black 2's overlays, the symbols in each overlay's .data and its .bss: the writable statics that the
+host build puts in per-overlay sections, so that loading an overlay sets them back as the DS does
+(port/hal/fs/ovsec.h). Research of 2026-10-16 (port/docs/research/engine-boot.md).
+"""
 import os, re, sys
 W = sys.argv[1]
 base = os.path.join(W, "config/b2_us/arm9/overlays")

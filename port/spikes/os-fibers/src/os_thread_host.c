@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/os/os_thread_host.c;
+// change that, not this copy.
 // The SDK's thread code on a host (spike): the decomp's os_thread.c, compiled as it is, read from its own path. Four
 // of its functions can't run on a 64-bit host as written, so they are renamed out of the way before the include and
 // written again below, in this file so that they can reach os_thread.c's statics:

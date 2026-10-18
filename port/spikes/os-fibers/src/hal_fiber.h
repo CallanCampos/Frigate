@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/os/fiber.h; change
+// that, not this copy.
 // Fibers: a stack and a saved context each, all switched on the one host thread that runs the game. The model is
 // asymmetric: only the host's own stack resumes a fiber, and a fiber only yields back to it. The OS layer on top
 // (os_host.c) turns that into the SDK's thread switches through a dispatcher on the host stack.

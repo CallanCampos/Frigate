@@ -1,10 +1,14 @@
 # Frigate's host build. The ROM build (configure.py and ninja) stays separate and untouched; this one compiles the same
-# decomp sources with the host's clang into one program, with the platform layer in port/.
+# decomp sources with the host's clang into one program, frigate-black2 or frigate-white2, with the platform layer in
+# port/: the whole game, from the decomp's src/ and lib/, on port/hal, port/gfx, port/audio and port/app
+# (port/docs/ARCHITECTURE.md).
 #
 #   cmake -S port -B build/port -G Ninja
 #   cmake --build build/port
+#   ctest --test-dir build/port
 #
-# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us).
+# Options: -DPORT_VERSION=b2_us|w2_us (default b2_us) and -DPORT_FETCH_SDL3 here; the others are in the fragments of
+# port/cmake/, included at the end, and port/cmake/README.md lists them all.
 cmake_minimum_required(VERSION 3.28)
 project(frigate
     DESCRIPTION "A native PC port of Pokémon Black 2 and Pokémon White 2, built from the pokebw2 decompilation"
@@ -150,6 +154,8 @@ add_custom_command(
     COMMAND_EXPAND_LISTS
     VERBATIM)
 
+# The program's own code: main.c here; port/cmake/app.cmake adds the rest of port/app and the oracle's input file reader
+# (port/tools/oracle/pbwinput.c), and port/cmake/sound.cmake adds port/audio
 add_library(port_app OBJECT app/main.c)
 target_include_directories(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_app PRIVATE -std=c11 -Wall -Wextra)

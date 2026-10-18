@@ -1,4 +1,5 @@
-// The decomp's symbols for the oracle's memory dumps; see symtab.h.
+// The decomp's symbols for the oracle's memory dumps (symtab.h): config/<version>/arm9's symbols.txt files and the
+// statics symbols.py adds, so that a dump names the game's globals as the decomp does.
 #include "symtab.h"
 #include <algorithm>
 #include <cstdlib>

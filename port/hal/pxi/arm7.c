@@ -2,8 +2,8 @@
 // copies the user settings into the shared memory before the game starts, the ARM7 component notes what it found in
 // the cartridge slot and reads the clock, and then registers the PXI callbacks of its libraries while the ARM9 waits in
 // PXI_InitFifo. Here the same happens in PXI_InitFifo (pxi_fifo.c), and each service is a file of its own:
-//   NVRAM 4 (nvram7.c, with the user settings), RTC 5 (rtc7.c), TOUCHPANEL 6 (tp7.c), SOUND 7 (snd7.c, a null sound
-//   driver), PM 8 (pm7.c), MIC 9 (mic.c), OS 12 (reset7.c), CTRDG 13 (ctrdg7.c).
+//   NVRAM 4 (nvram7.c, with the user settings), RTC 5 (rtc7.c), TOUCHPANEL 6 (tp7.c), SOUND 7 (port/hal/snd7, the
+//   sound driver), PM 8 (pm7.c), MIC 9 (mic.c), OS 12 (reset7.c), CTRDG 13 (ctrdg7.c).
 // The card's tags (FS 11 and CARD 14) belong to the card's module, and the wireless and DSi ones (WM, NWM, FATFS,
 // CAMERA, SCFG, SNDEX) have no service yet: a word sent with them comes back with the error bit, as from an ARM7 that
 // has no callback for the tag.

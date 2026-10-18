@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/fs/ovsec.h; change
+// that, not this copy.
 #ifndef OVSEC_H
 #define OVSEC_H
 

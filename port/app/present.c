@@ -1,6 +1,8 @@
-// The program's window, presentation and input (port/app/present.h). Phase 1's presentation: the screens in one
-// streaming texture drawn by SDL's 2D renderer, stacked and letterboxed to the window, scaled by nearest neighbour.
-// PLAN.md §4.6's other layouts and filters come later.
+// The program's window, presentation and input (port/app/present.h): what the player sees of the DS's two screens, and
+// how the player presses its buttons and touches its bottom screen. The screens, as port/gfx/screens.c drew them, go
+// into one streaming texture drawn by SDL's 2D renderer, stacked and letterboxed to the window, scaled by nearest
+// neighbour; PLAN.md §4.6's other layouts and filters come later. The keyboard and gamepads become the DS's buttons
+// (port/hal/input), and the left mouse button on the bottom screen its touch screen (port/hal/tp).
 //
 // The default controls. The keyboard, by key position (scancodes, so the same on every keyboard layout), and any
 // gamepad at the same time; the gamepad's buttons by position, as on the DS, which is a Nintendo pad's layout:
@@ -138,6 +140,10 @@ static bool BottomScreenPoint(float windowX, float windowY, int *x, int *y) {
     return *x >= 0 && *x < PORT_SCREEN_WIDTH && *y >= 0 && *y < PORT_SCREEN_HEIGHT;
 }
 
+// One window event: closing the window stops the game at the next frame hook, a gamepad coming, going or remapped
+// goes to port/app/gamepad.c, and the left mouse button pressed on the bottom screen starts a touch, which lasts until
+// it is released anywhere. The keyboard has no events here: port_present_poll reads its state once a frame. A touch
+// screen works through the mouse events SDL makes of its touches
 static void HandleEvent(const SDL_Event *event) {
     int x;
     int y;

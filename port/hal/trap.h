@@ -1,3 +1,8 @@
+// Trap stubs (trap.c): how the program shows which part of the game it can't run yet. Every DS function or data object
+// that the game references and that has no C yet gets a stand-in at each build (port/tools/gen_stubs.py, into the
+// build's gen/stubs.c): a function stub calls port_trap_function, which names the function, its address and its caller
+// and stops the program with status 70; a data placeholder sits on a page with no access, so the first read or write
+// is named the same way. The first trap a run reaches is the next piece of C the game needs (port/docs/STATUS.md).
 #ifndef PORT_HAL_TRAP_H
 #define PORT_HAL_TRAP_H
 

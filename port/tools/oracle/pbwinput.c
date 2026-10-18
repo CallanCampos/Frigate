@@ -1,5 +1,6 @@
-// Input files ("pbwinput 1"), read and written; the format is in port/tools/oracle/README.md and the interface in
-// pbwinput.h.
+// Input files ("pbwinput 1"), read and written: what the player holds on each frame, for the melonDS oracle and for
+// Frigate's replays (port/app/replay.c), which compile this file as it is. The format is in
+// port/tools/oracle/README.md and the interface in pbwinput.h.
 #include "pbwinput.h"
 #include <stdarg.h>
 #include <stdlib.h>

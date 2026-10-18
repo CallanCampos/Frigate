@@ -1,5 +1,7 @@
 // The program's options and its hooks (port_app.h), kept in the platform layer rather than in the program
-// (port/app/main.c), so that the modules that read them link into every executable that has the platform layer.
+// (port/app/main.c), so that the modules that read them link into every executable that has the platform layer. The
+// options set where the ROM and the saves are, the clock's time, the VRAM backend and the heaps' sizes, each read by
+// its own module.
 #include "hal/os/port_app.h"
 #include <string.h>
 

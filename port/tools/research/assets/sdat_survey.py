@@ -1,3 +1,12 @@
+"""A survey of the sound archive (SDAT): its blocks, its files, and its records by kind.
+
+    sdat_survey.py SOUND_DATA.sdat
+
+Prints the archive's blocks and file table, then, for each kind of record (sequences, sequence archives, banks,
+wave archives, players, groups, streams), how many there are with their names, and how sequences split between
+music, sound effects and cries: the material the sound driver plays (port/hal/snd7). Research of 2026-10-16
+(port/docs/research/assets-arm7-sound.md).
+"""
 import sys, struct, collections
 d = open(sys.argv[1], 'rb').read()
 assert d[:4] == b'SDAT'

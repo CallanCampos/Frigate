@@ -1,4 +1,7 @@
-// Display capture (port/gfx/capture.h)
+// Display capture (port/gfx/capture.h): engine A's DISPCAPCNT, which writes a line of engine A's picture, the 3D
+// layer, a VRAM bank or a blend of two into VRAM bank A to D as port/gfx/screens.c draws each line. The game uses it
+// for motion blur, for 3D on both screens (src/gfl/double3Ddisp.c) and for the title screen's picture in VRAM D
+// (src/ov162/title.c).
 #include "gfx/capture.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/vram.h"

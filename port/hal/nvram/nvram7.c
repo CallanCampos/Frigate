@@ -234,6 +234,8 @@ static u32 PageWrite(const PortArm7SpiCommand *command) {
     return NVRAM_RESULT_SUCCESS;
 }
 
+// The NVRAM tag's callback: collects the ARM9's words into a command (port_arm7_spi_collect), then does it on the
+// firmware's flash image and answers with its result, as the DS's ARM7 answers nvram.c
 static void NvramService(u32 tag, u32 data, BOOL err) {
     u32 command;
 

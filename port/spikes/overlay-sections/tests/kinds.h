@@ -1,3 +1,6 @@
+/* The kinds of object with static storage that kinds.c defines and test_kinds.c checks: where each must land
+ * (the overlay's data or bss section, or neither) once its file has an overlay's forced include. Part of the frozen
+ * overlay-sections spike (port/spikes/README.md). */
 #ifndef KINDS_H
 #define KINDS_H
 

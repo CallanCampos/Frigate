@@ -1,5 +1,5 @@
 // Host version of NitroSDK's mi_swap.c (lib/nitro/src/mi/mi_swap.c): MI_SwapWord, which the SDK wrote in assembly for
-// the ARM's SWP instruction.
+// the ARM's SWP instruction. The SDK's spin locks take their lock words with it (lib/nitro/src/os/os_spinLock.c).
 #include "nitro/mi.h"
 
 // Stores data at destp and returns the word that was there. The original does it with SWP, in one step that no

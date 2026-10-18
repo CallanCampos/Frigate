@@ -1,3 +1,11 @@
+"""The sound archive's players and streams, and how many sequences each player plays.
+
+    sdat_players.py SOUND_DATA.sdat
+
+Prints each player's maximum sequences, channel mask and heap size, the stream players, each stream's file, volume,
+priority and player, and the count of sequences per player: what the ARM7's sound driver and NitroSystem's
+players must hold at once (port/hal/snd7). Research of 2026-10-16 (port/docs/research/assets-arm7-sound.md).
+"""
 import sys, struct, collections
 d = open(sys.argv[1], 'rb').read()
 symb_off, symb_size, info_off, info_size, fat_off, fat_size, file_off, file_size = struct.unpack_from('<8I', d, 0x10)

@@ -1,3 +1,12 @@
+"""Data and .bss symbols of one module that an incomplete source file covers but doesn't define in its C yet.
+
+    datacov2.py REPO MODULE        (MODULE: main or an overlay directory, such as ov036)
+
+Reads Black 2's delinks.txt and symbols.txt for the module, and for each data symbol in an incomplete file's
+ranges, looks for its definition in the file's C. Prints the 30 files with the most symbols still missing and the
+symbols outside every file: the game data that becomes trap placeholders on the host (port/tools/gen_stubs.py).
+Research of 2026-10-16 (port/docs/research/engine-boot.md).
+"""
 import os, re, sys
 sys.path.insert(0, os.path.dirname(__file__))
 W, mod = sys.argv[1], sys.argv[2]

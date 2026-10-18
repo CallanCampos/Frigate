@@ -1,3 +1,5 @@
+/* Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/hal/fs/ovsec.c; change
+ * that, not this copy. */
 /*
  * Finds each overlay's data and bss sections, snapshots the data at startup, and resets an overlay the way the DS
  * reloads it. See ovsec.h for the design. The Mach-O path is the tested one; the ELF and COFF paths are compiled

@@ -1,4 +1,7 @@
-// The DS's two screens as the port draws them (port/gfx/screens.h)
+// The DS's two screens as the port draws them (port/gfx/screens.h): the OS core's scanline hook, which draws each
+// visible line of both 2D engines from the state the game left (port/gfx/ref/ds2d.c), sends each line to the screen
+// POWCNT1 gives its engine, feeds engine A's to display capture, and has the 3D frame drawn before line 0. Every
+// screen of the game, raster effects included, is drawn here.
 #include "gfx/screens.h"
 #include "gfx/capture.h"
 #include "gfx/ge/ge_hal.h"

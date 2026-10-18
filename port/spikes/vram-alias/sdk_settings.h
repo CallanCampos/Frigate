@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/tests/gx/sdk_settings.h;
+// change that, not this copy.
 // Every VRAM setting of the SDK, for test_vram.c: for each case of a GX_SetBankFor* switch in
 // lib/nitro/src/gx/gx_vramcnt.c (85 of them) and for GX_SetBankForLCDC of each bank, the VRAMCNT bytes the SDK writes
 // and where each bank page must then be. The writes were taken from gx_vramcnt.c by a script. The places were written

@@ -1,5 +1,5 @@
-# The host's sound: the ARM7's sound driver and sound unit (port/hal/snd7, which the platform layer's glob compiles)
-# and the audio output (port/audio), with their tests (port/tests/snd).
+# The host's sound, the game's music, sound effects and cries: the ARM7's sound driver and sound unit (port/hal/snd7,
+# which the platform layer's glob compiles) and the audio output (port/audio), with their tests (port/tests/snd).
 
 # The audio output is the program's: SDL3's audio stream for the device, and the WAV dump
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/audio/audio.c")

@@ -5,10 +5,12 @@
 // this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the DS's
 // 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
 //
-//   frigate-black2 [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE] [--rom PATH]
-//                  [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST] [--run-dump SPEC]...
-//                  [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//   frigate-black2 [--help] [--headless] [--frames N] [--screenshot PATH] [--audio-dump PATH] [--input FILE]
+//                  [--rom PATH] [--save-dir PATH] [--fixed-time TIME] [--run-dir DIR] [--run-screens LIST]
+//                  [--run-dump SPEC]... [--watchdog SECONDS] [--main-arena-size BYTES] [--vram-backend NAME]
+//                  [--heap-scale-root N] [--heap-scale-child N]
 //
+//   --help              prints what Frigate is and this usage, then exits
 //   --headless          runs without a window, without pacing and without a sound device, for tests and CI
 //   --frames N          runs N frames, then exits with status 0
 //   --screenshot PATH   writes both screens as a PNG (top above bottom) when the run ends: after the last frame of
@@ -32,6 +34,9 @@
 //                       off, the default with a window)
 //   --main-arena-size B the host's main memory arena, in bytes (a K or M suffix multiplies)
 //   --vram-backend NAME how VRAM banks are mapped: shm, mach-entry, mach-remap or copy (port/hal/gx/vram.h)
+//   --heap-scale-root N, --heap-scale-child N
+//                       how many times their DS size the game's root heaps and child heaps get, 1 to 64 (4 and 2 by
+//                       default, port/hal/gfl/heap_policy.c)
 //
 // The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
 // program writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).

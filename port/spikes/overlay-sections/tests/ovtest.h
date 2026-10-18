@@ -1,3 +1,5 @@
+/* The interface of the synthetic overlays that gen_overlays.py generates for the overlay-sections spike's tests and
+ * benchmarks (port/spikes/README.md, frozen). */
 #ifndef OVTEST_H
 #define OVTEST_H
 

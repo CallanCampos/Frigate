@@ -1,3 +1,5 @@
+// Frozen phase-0 spike (port/spikes/README.md), outside Frigate's build: the live code is port/tests/gx/test_gx.c;
+// change that, not this copy.
 // Tests of the VRAM views: the layout against every SDK setting written out from GBATEK, then each backend against
 // what the DS does when a bank moves (and against a reference model, over random VRAMCNT writes and stores). Usage:
 //   test_vram layout

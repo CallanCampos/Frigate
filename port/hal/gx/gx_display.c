@@ -1,4 +1,6 @@
-// What the two screens show (port/hal/gx/gx_display.h)
+// What the two screens show (port/hal/gx/gx_display.h): which 2D engine feeds the top screen and which the bottom, and
+// whether the LCDs and the engines are powered, read from POWCNT1 as the game's GX calls left it, for the screens'
+// line drawing (port/gfx/screens.c). Every screen the game shows goes through this choice.
 #include "hal/gx/gx_display.h"
 #include "hal/hw/hw.h"
 #include <stdint.h>
