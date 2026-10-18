@@ -393,6 +393,14 @@ Same instructions, registers swapped.
   `void *vram = G2S_GetOBJCharPtr();` and `(void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy...baseAddrOfVram[...])`,
   as `btlv_gauge.c`'s `BtlvGauge_DrawBar` writes it. The base written in place (`HW_DB_OBJ_VRAM`, or `HW_OBJ_VRAM` in
   the gauge), a `u32 vram` local and the inline called in place put the constant second in both functions.
+- A three-register `adds rD, rN, rM` whose operands both die there gets `rD` from the register of the operand generated
+  last. A spilled local's reload is generated just before its use, after a constant built for the same sum, so a
+  spilled base takes the result: `badge_view.c`'s `BadgeView_AnimatePalette` adds 0x2d8 to its spilled `wk` as
+  `movs r3, #0xb6; ...; ldr r2, [sp]; lsls r3, r3, #2; adds r2, r2, r3`. The constant takes it when the base is a
+  real load (a struct field, a stack parameter, an address-taken or `volatile` local), when the base stays in a saved
+  register, or when the constant is shared in the block or built inside a loop and so rebuilt after the reload, as in
+  DWC's `NHTTPi_SendProcPostDataBinary` (`ldr r3, [sp, #N]; ...; lsls r2, r2, #8; adds r2, r3, r2`). Reduced copies of
+  `ctvt_talk.c`'s `CtvtTalk_Main` give each case, but the function itself has none of them.
 - A callee whose callers disagree on narrowing only shows once all callers are in view: `wifi_p2pmatch.c`'s
   `WifiP2PMatch_IconWrite` and its sibling take `u8 x, u8 y`, which one caller needed and the others hid. Compare
   every caller's narrowing with the definition before trusting a prototype written from one of them.
@@ -596,7 +604,11 @@ Same instructions, registers swapped.
   talk button's `func_0204c124` on. There padding before that join never moved the edge, 40 field stores after it
   (about 200 nodes) never produced a copy, and added calls moved the first copy in jumps: a seventh actor creation
   put it one use late, 19 to 23 calls put it at later uses, and 24 to 39 removed every copy. The badge gate's edge,
-  in a function without such joins, moves by one padding call as described.
+  in a function without such joins, moves by one padding call as described. Matched code switches in the middle of
+  one block too: `ctvt_game_cam.c`'s `CtvtGameCam_LoadBG` passes its first `MI_CpuFill8`'s 0 as `movs r1, #0` and the
+  second's as `adds r1, r7, #0`. In a copy of it, inline wrappers around the calls and locals for their results never
+  moved the switch, four added calls or one added `GFL_BGSysFillChar` moved it one use earlier, and any `if` before
+  the fills removed the copies.
 - A reload of a spilled parameter that trades places with a constant, at the same size, can be a free width
   conversion to a wider callee parameter: the GTS Negotiations screen's `GtsNegoDisp_DimPalettes` passed a `u16 vram`
   to `PaletteFade_BlendBuffer`'s `u32 buffer`, which emits nothing but moves the reload. The palette fade's five
@@ -1244,11 +1256,12 @@ Same instructions, scheduled in another order.
 - A sum from a three-register `adds` whose only use is the copy that Thumb's two-operand `adds rd, #imm8` needs
   is moved down to that copy, across calls and branches and inside loops, with both operands kept live (spilled)
   to get there. No optimization pragma, -O level or scope stops it; `+ 7` (the three-operand immediate form) or a
-  second use of the sum keeps it where it is written. Uses of the incremented value don't: in
-  `x = a + v; f(0); x += 8; h(x, b); return x + b;` each use gets its own `adds r0, r5, r4; adds r0, #8`. A
-  subtraction, `x = a - v`, stays where it is written, and so does the sum when the +8 is conditional or when an
-  operand is redefined on one path to the same use (`if (b) { a = 0; }`); a redefinition on every path, `a += 12`,
-  goes into a new register and leaves the old value to the moved sum. `arc_tool.c`'s `ArchiveMoveImageTop` writes
+  second use of the sum that is not itself a copy (`f(x + 4)`) keeps it where it is written. A use that is a copy,
+  `f(x)`, doesn't: the argument gets an `adds` of its own and the sum is added again at the +8. Uses of the
+  incremented value don't either: in `x = a + v; f(0); x += 8; h(x, b); return x + b;` each use gets its own
+  `adds r0, r5, r4; adds r0, #8`. A subtraction, `x = a - v`, stays where it is written, and so does the sum when
+  the +8 is conditional or when an operand is redefined on one path to the same use (`if (b) { a = 0; }`); a
+  redefinition on every path, `a += 12`, goes into a new register and leaves the old value to the moved sum. `arc_tool.c`'s `ArchiveMoveImageTop` writes
   `fimgOffset = fntbOffset + value;` before a read and `fimgOffset += 8;` after it, and is 4 bytes short for it:
   the original stores the sum where it is written and adds the 8 to its spill slot.
 - A local of another type than the callee parameters it is passed to is computed at its first use, past a call in
@@ -1276,7 +1289,8 @@ Same instructions, scheduled in another order.
   `GFL_TextRendererDrawToBitmapEx` load `&g_TextRenderer` again before each call in the original; a
   `TextRenderer *` local under `#pragma opt_propagation off` matches both, and so does each of those spellings
   (their row says why none is kept). A pointer local and that pragma tell whether a global's address was held in a
-  local the compiler did not propagate.
+  local the compiler did not propagate. The member's address written at each use, `f(&s.member)`, is shared like
+  `&g`: those two functions keep `&sPrintSys.renderer` in `r4` until it initializes a local.
 - A local array's element is never loaded again after a call, even once the array's address has been passed to
   another function, so an element loaded both before and after a call (`ldr r1, [r6, r7]` around
   `bl BtlvEffect_GetGauge`) was read through a pointer. `btlv_effvm.c`'s `BtlvEffvm_CmdGauge` matches with
@@ -2473,6 +2487,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   which is not used, as nothing else there types the buffer as words: try it where a buffer really holds another type.
   It is the cast that hides the address, not a change of type: the same function matches with its `f32 *` buffer
   read as `*(f32 *)&values[v + 1]`, a cast to the type it already has, which is not used either.
+- MWCC's `-flag` takes a pragma's name, so `-flag no-opt_loop_invariants -flag no-opt_strength_reduction` turns the
+  two passes off for a whole file exactly as the two pragmas do, while the `-opt noloopinvariants` and
+  `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
+  `config/compiler_flags.toml` and plain `f32 *` reads, which is not used: nothing but that one loop shows the
+  setting, and the cast above explains the same bytes.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2552,9 +2571,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `reader->actions[clientId]` at both uses it computed them again in `r7` and `r4`, 104 bytes off. A local set at the
   top of the loop body gets the reuse but not the slot order. The function also matches with the expression written
   out and its `u8 clientId` parameter as `unsigned long`, which hoists `clientId << 6` first.
-- Arithmetic hoisted out of a loop, such as `bit >> 3` and `1 << (bit & 7)`, written in the body or passed to an
-  inline, is computed again by code after the loop, where a hoisted field address (`pokedex->shown`) and a value
-  kept in a local are reused. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
+- Arithmetic on a `u16` hoisted out of a loop, such as `bit >> 3` and `1 << (bit & 7)` of a `u16 bit`, written in
+  the body or passed to an inline, is computed again by code after the loop, even after a `do`/`while`, where a
+  hoisted field address (`pokedex->shown`) and a value kept in a local are reused. On an `int` it is reused after a
+  loop that can't be skipped (a `do`/`while` or a constant bound) and computed again only after a loop whose entry
+  test can skip it. `pokedex.c`'s `addToDex` builds its byte and flag once before its kinds loop and uses
   them again in the six sets after it, so in the original they are locals. In the same loop the mask passed to an
   inline, `flag ^ 0xff`, is hoisted ahead of the loop's base address whatever the order of the inline's parameters.
 
@@ -2841,7 +2862,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the same way: libVCT's `vct_dsp.c` has its 16-byte
   `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
   above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
-  `VCT_InitEcho`, their only user.
+  `VCT_InitEcho`, their only user. The reverse rules the flag out: under `-ipa function` the tables of 64 bytes or
+  more stay in the one shared section, even one defined just above a late function, and each local initializer gets
+  a section of its own in function order, so local initializers sorted by size across functions, between the shared
+  section and the large tables, come only from `-ipa file`, as overlay 257's `ctvt_game.c` has them in both versions.
 - Two statics reached from one literal, at `[r0]` and `[r0, #4]`, ask for `-ipa file` before anything else: without it
   each gets a literal of its own, and with it the SDK's separate statics give the original's code. `rtc_api.c` keeps
   NitroSDK's `rtcInitialized` and `rtcWork`, and TWL-DWC's `dwc_init.c` its started flag and game code, as two statics
