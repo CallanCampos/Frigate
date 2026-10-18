@@ -1,19 +1,18 @@
 # The program's own files besides main.c (port/app): the window, presentation, input and screenshots, the window's icon,
-# the gamepads, the log of an app opened from the Finder, the run directory for the oracle's comparisons with the symbol
-# lookup its memory dumps use, the sound driver's trace, and input replays with the oracle's input file reader
-# (port/tools/oracle/pbwinput.c, plain C11). The screens they show are drawn by port/gfx/screens.c, which the port_gfx
-# target builds. Their tests are here too, with those of Frigate's test launcher's option and gate
-# (port/app/launcher_spec.c, the field menu's apps), whose library, port_launcher, port/CMakeLists.txt builds.
+# the gamepads, the log of an app opened from the Finder, the run directory for the oracle's comparisons, the sound
+# driver's trace, and input replays with the oracle's input file reader (port/tools/oracle/pbwinput.c, plain C11). The
+# screens they show are drawn by port/gfx/screens.c, which the port_gfx target builds. Their tests are here too, with
+# those of Frigate's test launcher's option and gate (port/app/launcher_spec.c, the field menu's apps), whose library,
+# port_launcher, port/CMakeLists.txt builds.
 target_sources(port_app PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app/present.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/gamepad.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/message_log.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/replay.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/app/sound_trace.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/tools/oracle/pbwinput.c")
 # The version an input file's "version" line must name
 target_compile_definitions(port_app PRIVATE "PORT_VERSION_NAME=\"${PORT_VERSION}\"")
 
-# --run-dump finds the game's globals by name (port/app/symbols.c) without exporting them: dlsym on macOS, the program's
-# own symbol table on Linux
+# --run-dump finds the game's globals by name (port_host_global_address, port/hal/host) without exporting them: dlsym on
+# macOS, the program's own symbol table on Linux and Windows
 target_link_libraries(${PORT_PROGRAM} PRIVATE ${CMAKE_DL_LIBS})
 
 # The window's icon on Linux and Windows (port/app/window_icon.c). port/tools/gen_window_icon.c, built for the machine
@@ -62,9 +61,8 @@ add_test(NAME app_about COMMAND "${CMAKE_COMMAND}" "-DPROGRAM=$<TARGET_FILE:${PO
     -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/check_about.cmake")
 set_tests_properties(app_about PROPERTIES TIMEOUT 60)
 
-# The symbol lookup, on the test program's own symbols
-add_executable(port_test_symbols "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_symbols.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/app/symbols.c")
+# The lookup of the program's globals that --run-dump uses (port/hal/host), on the test program's own symbols
+add_executable(port_test_symbols "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_symbols.c" ${port_host_sources})
 target_include_directories(port_test_symbols PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_test_symbols PRIVATE -std=c11 -Wall -Wextra -Werror)
 target_link_libraries(port_test_symbols PRIVATE ${CMAKE_DL_LIBS})
@@ -74,7 +72,7 @@ add_test(NAME app_symbols COMMAND port_test_symbols)
 foreach(variant IN ITEMS plain sanitized)
     set(target port_test_run_dir_${variant})
     add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_run_dir.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/rom/sha1.c")
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/run_dir.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/rom/sha1.c" ${port_host_sources})
     target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
     if(variant STREQUAL "sanitized")
@@ -90,11 +88,9 @@ endforeach()
 foreach(variant IN ITEMS plain sanitized)
     set(target port_test_launcher_spec_${variant})
     add_executable(${target} "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_launcher_spec.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/app/launcher_spec.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/trap.c")
+        "${CMAKE_CURRENT_SOURCE_DIR}/app/launcher_spec.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/trap.c" ${port_host_sources})
     target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_options(${target} PRIVATE -std=c11 -Wall -Wextra -Werror)
-    # trap.c's dladdr and signals, which glibc hides from strict C11
-    target_compile_definitions(${target} PRIVATE _GNU_SOURCE)
     if(variant STREQUAL "sanitized")
         target_compile_options(${target} PRIVATE
             -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)

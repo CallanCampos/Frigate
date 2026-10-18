@@ -13,6 +13,7 @@
 // the sound; they skip (77) without it. PORT_SND_VERBOSE prints each scenario's log; PORT_SND_WAV=DIR writes the rom_
 // scenarios' sound as WAV files there.
 #include "audio/audio.h"
+#include "hal/host/host.h"
 #include "hal/os/port_os.h"
 #include "hal/pxi/arm7.h"
 #include "hal/pxi/pxi_bus.h"
@@ -24,9 +25,7 @@
 #include "nitro/pxi.h"
 #include "nitro/snd.h"
 #include "tools/oracle/sndtrace.h"
-#include <execinfo.h>
 #include <math.h>
-#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -2109,26 +2108,14 @@ static void PrintLog(void) {
     }
 }
 
-static void OnHang(int signal) {
-    static const char message[] = "hang: the scenario didn't end\n";
-    void *frames[64];
-    int count;
-
-    (void)signal;
-    (void)!write(STDERR_FILENO, message, sizeof(message) - 1);
-    count = backtrace(frames, 64);
-    backtrace_symbols_fd(frames, count, STDERR_FILENO);
-    _Exit(3);
-}
-
 int main(int argc, char **argv) {
     const char *name = argc > 1 ? argv[1] : "";
     size_t i;
     PortOsResult result;
 
     setvbuf(stdout, NULL, _IONBF, 0);
-    signal(SIGALRM, OnHang);
-    alarm(strncmp(name, "rom_", 4) == 0 ? 1200 : 50);
+    // A scenario that hangs reports where, before CTest's timeout kills it (the host's watchdog, port/hal/host)
+    port_host_watchdog_start(strncmp(name, "rom_", 4) == 0 ? 1200 : 50, "hang: the scenario didn't end\n", 3);
     for (i = 0; i < NELEMS(sTests); i++) {
         if (strcmp(name, sTests[i].name) == 0) {
             result = port_os_run(sTests[i].main);

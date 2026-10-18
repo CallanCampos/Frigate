@@ -7,6 +7,7 @@
 //
 // One scenario a process, since the libraries start once (PM_Init and the like do nothing the second time).
 // PORT_PXI_VERBOSE prints each scenario's log.
+#include "hal/host/host.h"
 #include "hal/nvram/nvram_settings.h"
 #include "hal/os/port_os.h"
 #include "hal/pxi/arm7.h"
@@ -24,15 +25,11 @@
 #include "nitro/snd.h"
 #include "nitro/svc.h"
 #include "nitro/tp.h"
-#include <execinfo.h>
-#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
 #include <time.h>
-#include <unistd.h>
 
 #define LOG_MAX 256
 #define LOG_LINE 96
@@ -301,22 +298,21 @@ static void TestBusPointer(void) {
 #define OVERLAP_SIZE (1024 * 1024)
 
 static u8 *MapOverlappingBlock(void) {
-    uintptr_t page = (uintptr_t)getpagesize();
+    uintptr_t page = (uintptr_t)port_host_page_size();
     uintptr_t low = LOW32(sStaticBuffer) & ~(page - 1);
     uintptr_t window = (uintptr_t)sStaticBuffer & ~(uintptr_t)0xffffffff;
     uintptr_t k;
 
     for (k = 2; k < 256; k++) {
-        void *block = mmap((void *)(window + (k << 32) + low), OVERLAP_SIZE, PROT_READ | PROT_WRITE,
-                           MAP_PRIVATE | MAP_ANON, -1, 0);
+        void *block = port_host_map_near(window + (k << 32) + low, OVERLAP_SIZE);
 
-        if (block == MAP_FAILED) {
+        if (block == NULL) {
             continue;
         }
         if (!port_pxi_unique_low_bits(block, (u8 *)block + OVERLAP_SIZE)) {
             return block;
         }
-        munmap(block, OVERLAP_SIZE);
+        port_host_unmap(block, OVERLAP_SIZE);
     }
     return NULL;
 }
@@ -671,7 +667,8 @@ static void TestRtcHostTime(void) {
     RTC_Init();
     CHECK(RTC_GetDateTime(&date, &clock) == RTC_RESULT_SUCCESS);
     now = time(NULL);
-    localtime_r(&now, &local);
+    // Standard C's localtime, which every host has; the test has one thread
+    local = *localtime(&now);
     // The same date unless the host's clock passed midnight in between
     CHECK((date.year == (u32)(local.tm_year - 100) && date.month == (u32)local.tm_mon + 1 &&
            date.day == (u32)local.tm_mday) ||
@@ -1087,27 +1084,14 @@ static void PrintLog(void) {
     }
 }
 
-// A scenario that hangs reports where, before CTest's timeout kills it
-static void OnHang(int signal) {
-    static const char message[] = "hang: the scenario didn't end\n";
-    void *frames[64];
-    int count;
-
-    (void)signal;
-    (void)!write(STDERR_FILENO, message, sizeof(message) - 1);
-    count = backtrace(frames, 64);
-    backtrace_symbols_fd(frames, count, STDERR_FILENO);
-    _Exit(3);
-}
-
 int main(int argc, char **argv) {
     const char *name = argc > 1 ? argv[1] : "";
     size_t i;
     PortOsResult result;
 
     setvbuf(stdout, NULL, _IONBF, 0);
-    signal(SIGALRM, OnHang);
-    alarm(50);
+    // A scenario that hangs reports where, before CTest's timeout kills it (the host's watchdog, port/hal/host)
+    port_host_watchdog_start(50, "hang: the scenario didn't end\n", 3);
     if (strcmp(name, "pm_power_off") == 0) {
         result = port_os_run(TestPmPowerOff);
         CHECK(result == PORT_OS_STOPPED);

@@ -49,6 +49,13 @@ function(port_ovsec_source path number)
 endfunction()
 include("${port_ovsec_gen}/overlay_sources.cmake")
 
+# The probe of the test integrate_overlay_sections (port/tests/integrate/ovsec_probe.c): a file of the test program
+# compiled as a file of overlay 162, the title's, whose number the test is given too
+set(PORT_OVSEC_PROBE_OVERLAY 162)
+port_ovsec_source("${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/ovsec_probe.c" ${PORT_OVSEC_PROBE_OVERLAY})
+set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/tests/integrate/test_integrate.c" APPEND PROPERTY
+    COMPILE_DEFINITIONS "PORT_TEST_OVSEC_OVERLAY=${PORT_OVSEC_PROBE_OVERLAY}")
+
 # ovsec.c reads the overlays' list on ELF and COFF, where the sections' bounds are symbols
 target_include_directories(port_hal PRIVATE "${port_ovsec_gen}")
 
@@ -57,6 +64,13 @@ target_include_directories(port_hal PRIVATE "${port_ovsec_gen}")
 # sources name ($<TARGET_OBJECTS:...>), the static libraries it links (a static SDL3 when SDL3 was built here), and the
 # runtime archives the compiler driver adds itself, which "clang -###" names without linking
 if(APPLE)
+    # The overlay files the leak check knows: the game's, and the probe of integrate_overlay_sections, which its test
+    # program compiles as a file of overlay PORT_OVSEC_PROBE_OVERLAY
+    file(READ "${port_ovsec_gen}/overlay_objects.txt" port_ovsec_objects)
+    file(WRITE "${port_ovsec_gen}/checked_objects.txt.new"
+        "${port_ovsec_objects}${PORT_OVSEC_PROBE_OVERLAY} ${PORT_OVSEC_LAYOUT} tests/integrate/ovsec_probe.c\n")
+    configure_file("${port_ovsec_gen}/checked_objects.txt.new" "${port_ovsec_gen}/checked_objects.txt" COPYONLY)
+
     file(WRITE "${port_ovsec_gen}/driver_probe.o" "")
     execute_process(COMMAND "${CMAKE_C_COMPILER}" "-###" driver_probe.o -o driver_probe
         WORKING_DIRECTORY "${port_ovsec_gen}" ERROR_VARIABLE port_ovsec_driver OUTPUT_QUIET)
@@ -112,10 +126,10 @@ if(APPLE)
         add_custom_command(TARGET ${target} PRE_LINK
             COMMAND "${PORT_PYTHON}" "${port_ovsec_tool}" check --inputs "${port_ovsec_gen}/link_inputs_${target}.txt"
                 --out "${port_ovsec_gen}/link_sections_${target}.txt" --overlay-budget "${PORT_OVSEC_BUDGET}"
-                --overlay-objects "${port_ovsec_gen}/overlay_objects.txt"
+                --overlay-objects "${port_ovsec_gen}/checked_objects.txt"
             VERBATIM)
         set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS
-            "${port_ovsec_tool}" "${port_ovsec_gen}/overlay_objects.txt")
+            "${port_ovsec_tool}" "${port_ovsec_gen}/checked_objects.txt")
         add_test(NAME overlay_sections_image_${target}
             COMMAND "${PORT_PYTHON}" "${port_ovsec_tool}" image $<TARGET_FILE:${target}>
                 --predicted "${port_ovsec_gen}/link_sections_${target}.txt")
@@ -144,7 +158,6 @@ if(APPLE)
             --out "${port_ovsec_gen}/budget_test.txt" --overlay-budget 1)
     set_tests_properties(overlay_sections_budget PROPERTIES
         PASS_REGULAR_EXPRESSION "overlay sections, over the budget of 1")
-    file(READ "${port_ovsec_gen}/overlay_objects.txt" port_ovsec_objects)
     file(WRITE "${port_ovsec_gen}/leak_test_objects.txt.new"
         "${port_ovsec_objects}0 ${PORT_OVSEC_LAYOUT} src/gfl/backup_card.c\n")
     configure_file("${port_ovsec_gen}/leak_test_objects.txt.new" "${port_ovsec_gen}/leak_test_objects.txt" COPYONLY)

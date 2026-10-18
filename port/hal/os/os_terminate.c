@@ -6,17 +6,13 @@
 // restart the console. The host ends the program instead: a terminate with PORT_OS_TERMINATE_STATUS and a backtrace,
 // so that tests and players see where the game gave up; a reset with PORT_OS_RESET_STATUS, since the port doesn't
 // restart the game in place yet, and a run that the game reset must not pass for one that ended normally.
+#include "hal/host/host.h"
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
 #include "nitro/os.h"
 #include "twl/fatfs.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifndef _WIN32
-#include <execinfo.h>
-#include <unistd.h>
-#endif
 
 typedef void (*OSTerminateCallback)(void *arg);
 
@@ -31,17 +27,6 @@ void port_osi_reset_terminate(void) {
     OSi_terminate.arg = NULL;
     OSi_terminate.callback = NULL;
     OSi_terminate.isTerminating = FALSE;
-}
-
-static void PrintBacktrace(void) {
-#ifndef _WIN32
-    void *frames[64];
-    int count = backtrace(frames, 64);
-
-    fprintf(stderr, "Backtrace:\n");
-    fflush(stderr);
-    backtrace_symbols_fd(frames, count, STDERR_FILENO);
-#endif
 }
 
 // NitroSDK's OS_Terminate (swan's sys_exit)
@@ -73,7 +58,7 @@ void OS_Terminate(void) {
 void OSi_TerminateCore(void) {
     OS_DisableInterrupts();
     fprintf(stderr, "\nport: the game stopped itself (OS_Terminate) at frame %u\n", port_os_frame());
-    PrintBacktrace();
+    port_host_print_backtrace();
     fflush(stderr);
     _Exit(PORT_OS_TERMINATE_STATUS);
 }

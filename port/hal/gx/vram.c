@@ -15,6 +15,7 @@
 #include "hal/gx/vram.h"
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/vram_os.h"
+#include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/os/port_app.h"
 #include <errno.h>
@@ -249,7 +250,7 @@ int port_vram_backend_available(PortVramBackend backend) {
         return 0;
     }
     // The aliasing backends map pages over the window, which must start on a host page
-    return backend == PORT_VRAM_BACKEND_COPY || (uintptr_t)port_hw_pointer(VRAM_REGION) % port_vram_os_page_size() == 0;
+    return backend == PORT_VRAM_BACKEND_COPY || (uintptr_t)port_hw_pointer(VRAM_REGION) % port_host_page_size() == 0;
 }
 
 void port_vram_shutdown(void) {

@@ -4,6 +4,7 @@
 // first, with memfd_create instead of shm_open. Windows would use a pagefile-backed section and placeholders (the
 // spike's README); it isn't written, so there every aliasing backend reports itself unavailable and copying runs
 #include "hal/gx/vram_os.h"
+#include "hal/host/host.h"
 #include <errno.h>
 #include <stdio.h>
 
@@ -19,16 +20,8 @@
 #include <mach/mach_vm.h>
 #endif
 
-size_t port_vram_os_page_size(void) {
-#if PORT_VRAM_OS_POSIX
-    return (size_t)sysconf(_SC_PAGESIZE);
-#else
-    return 4096;
-#endif
-}
-
 int port_vram_os_backend_available(PortVramBackend backend) {
-    size_t page = port_vram_os_page_size();
+    size_t page = port_host_page_size();
 
     if (backend == PORT_VRAM_BACKEND_COPY) {
         return 1;

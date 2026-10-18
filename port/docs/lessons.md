@@ -3,6 +3,51 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: Windows in CI, after review
+
+- **On Windows, nothing up a fiber's stack reaches the unhandled-exception filter.** The system looks for a handler
+  frame by frame up the faulting stack, and a fiber's frames end at its entry; the filter's frame is at the bottom of
+  the thread's own stack. An exception on a fiber that the vectored handler doesn't take ends the process with no
+  word, so the seam takes every fatal exception there. Test a crash path on a fiber, not only on the main thread.
+- **A fault in the C library's code is outside the program's image.** The game's `memcpy` and `memset` run in
+  `ucrtbase.dll` on Windows, so a handler that takes only its own image's faults misses a trap placeholder touched
+  through them. Decide by the address accessed (the memory the seam protected), not by the code that touched it.
+- **`-fshort-wchar` lets clang turn a u16 loop into the C library's `wcslen`.** The loop-idiom pass recognizes a scan
+  for a 16-bit zero as `wcslen` when `wchar_t` is 16-bit, and on macOS and Linux the library's `wcslen` counts 32-bit
+  units. `-fno-builtin-wcslen` keeps the loop; `gen_stubs.py`'s list of what the host provides is where such a call
+  shows.
+- **`ctypes.CDLL(None)` doesn't see glibc's `libc_nonshared.a`.** `atexit` is linked into each program from it, hidden,
+  so a lookup through Python's process missed it and `backup.c`'s `atexit` became a trap stub on Linux. Read what the
+  compiler driver links, linker scripts included, and never stub a function of standard C.
+- **SDL's arguments are UTF-8 on Windows, the C library's names are the code page's.** A manifest that makes UTF-8
+  the process's code page is the one switch that makes `fopen`, `_mkdir`, `getenv`, the `*A` calls and SDL agree.
+- **A fiber's first frame needs a return address of 0.** libgcc's unwinder (glibc's `backtrace()`) reads the code at a
+  return address it has no unwind table for, looking for a signal's trampoline; minicoro's dummy
+  `0xdeaddeaddeaddead` made every backtrace on a fiber fault on x86-64 Linux, so a trap's report from the game died
+  of SIGSEGV. macOS's frame-pointer walk never showed it: run a new crash path's test on every host's CI.
+- **MSYS2's Python writes paths with "/" in its shells.** A symbolic link whose relative target has one isn't followed
+  on Windows; give a link the system's separator, and check that a probe link resolves before trusting links. CI ran a
+  CPython from `setup-python` until the job followed the README, which is how this showed.
+
+## 2026-10-18: Windows in CI
+
+- **lld groups a COFF program's sections by their contents as well as their names.** A zeroed static given a section
+  by an attribute is initialized data, so its `.bss$...` section went to another output `.bss` than the statics that
+  `#pragma clang section bss` placed, and markers meant to bracket them didn't. Only a run that loads overlays would
+  have noticed; `integrate_overlay_sections` now checks it without a ROM, with a probe file compiled as an overlay's.
+- **ctest fails a test that crashed, whatever `PASS_REGULAR_EXPRESSION` says.** A test of a crash report runs the
+  program through `check_exit.py --crash`, which takes a signal or a Windows exception's status as the ending wanted.
+- **Windows' text mode is a difference of the tests, not only of the program.** The program's `"\n"` became `"\r\n"`
+  (stdout and stderr go to binary mode before `main()` now), the artwork's generator wrote files that no longer matched
+  the committed ones byte for byte, and the oracle's stand-in programs, run by their `#!` line, didn't run at all.
+  Write files that are compared byte for byte in binary mode, or with `newline="\n"`, and give a script a `.cmd`
+  where Windows must run it.
+- **Windows delivers an exception on the faulting stack.** A fiber's guard of pages with no access gets no report on
+  Windows when the stack pointer is already inside it; a guard page over writable pages gives the system room for
+  its exception frame, and the handler then moves to a stack of its own, as a signal handler's `sigaltstack` does.
+- **Read the first CI run's whole build log.** With `-k 0`, one run on a new host lists every file that fails; the
+  decomp's 1,473 files all compiled for Windows the first time, and the 13 failures were the port's own POSIX code.
+
 ## 2026-10-18: upstream's matched libfx, and the divider read by its address constant
 
 - **A register that acts when read has to act however the code names it.** The host tree routed the divider's and

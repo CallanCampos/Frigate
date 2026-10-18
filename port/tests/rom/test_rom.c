@@ -11,6 +11,7 @@
 #include "gfl/backup_card.h"
 #include "hal/card/port_card.h"
 #include "hal/fs/ovsec.h"
+#include "hal/host/host.h"
 #include "hal/os/port_os.h"
 #include "hal/rom/port_rom.h"
 #include "nitro/card.h"
@@ -518,8 +519,7 @@ int main(int argc, char **argv) {
         printf("no ROM (" PORT_ROM_ENVIRONMENT_VARIABLE ", or the repository's orig/baserom_<version>.nds): skipped\n");
         return SKIP;
     }
-    snprintf(sSavePath, sizeof(sSavePath), "%s/port_rom_tests_%d.sav",
-             getenv("TMPDIR") != NULL ? getenv("TMPDIR") : "/tmp", (int)getpid());
+    snprintf(sSavePath, sizeof(sSavePath), "%s/port_rom_tests_%d.sav", port_host_temporary_directory(), (int)getpid());
     for (size_t i = 0; i < sizeof(sTests) / sizeof(sTests[0]); i++) {
         if (strcmp(argv[1], sTests[i].name) == 0) {
             printf("%s\n", sTests[i].name);

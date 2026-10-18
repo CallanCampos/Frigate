@@ -9,8 +9,11 @@
 // doesn't by default (port/cmake/os.cmake). The PortFiber itself lives in the C heap, out of the stack's way. This
 // file also tells AddressSanitizer about every switch, since minicoro's own annotations miss the switches back to the
 // host stack (mco_impl.c, which is built without ASan), and tells LeakSanitizer to scan the stacks of suspended fibers
-// for pointers.
+// for pointers. The pages and their protection are the host's (port/hal/host): on Windows the top of the guard is a
+// guard page over pages left writable for the system's exception frame, so that an overflow is still reported there.
+// A fiber's first frame is the last a backtrace walks, so that the report of a trap or crash on a fiber has one.
 #include "hal/os/fiber.h"
+#include "hal/host/host.h"
 
 #define MCO_NO_MULTITHREAD
 #include "minicoro.h"
@@ -18,13 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <sys/mman.h>
-#include <unistd.h>
-#endif
 
 #if defined(__has_feature)
 #if __has_feature(address_sanitizer)
@@ -50,6 +46,10 @@
 // fit a DS stack of at most 16 KiB (all of DTCM), so even with 64-bit pointers and ASan's redzones (2-3 times larger
 // in the spike's measurements) none comes near it. It costs address space only
 #define GUARD_BYTES (64 * 1024)
+// The return address minicoro gives a fiber's first frame (_mco_main's), on the stack's top on x86-64, where it keeps
+// no more than the red zone or the home space above it
+#define MCO_DUMMY_RETURN ((uintptr_t)0xdeaddeaddeaddeadull)
+#define MCO_DUMMY_RETURN_SEARCH 256
 
 struct PortFiber {
     mco_coro *co;
@@ -73,22 +73,6 @@ static size_t sHostSize;
 static void *sHostFakeStack;
 #endif
 
-size_t port_page_size(void) {
-    static size_t page;
-
-    if (page == 0) {
-#ifdef _WIN32
-        // VirtualProtect works on 4 KiB pages, but VirtualAlloc places mappings at 64 KiB
-        SYSTEM_INFO info;
-        GetSystemInfo(&info);
-        page = info.dwPageSize;
-#else
-        page = (size_t)sysconf(_SC_PAGESIZE);
-#endif
-    }
-    return page;
-}
-
 static size_t RoundUp(size_t value, size_t align) {
     return (value + align - 1) / align * align;
 }
@@ -98,36 +82,28 @@ static void Fatal(const char *what) {
     abort();
 }
 
-static unsigned char *MapPages(size_t size) {
-#ifdef _WIN32
-    // Not built yet: the shape a Windows backend takes
-    return VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-#else
-    void *p = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-    return p == MAP_FAILED ? NULL : p;
-#endif
+// The slot of minicoro's dummy return address, which port_fiber_create sets to 0 so that the fiber's first frame is the
+// last one an unwinder walks: a return address of 0 ends a backtrace. libgcc's unwinder, glibc's backtrace() on Linux,
+// reads the code at a return address it has no unwind table for, looking for a signal's trampoline, so at
+// 0xdeaddeaddeaddead the report of a trap or a crash on a fiber faulted again in its own backtrace, and the program
+// died of SIGSEGV instead of saying what it reached. On arm64 minicoro keeps the address in a register of its context,
+// where macOS's frame-pointer walk never reads it, and there is no slot. Found before a painted stack covers it, and
+// cleared after
+static uintptr_t *DummyReturnSlot(const PortFiber *fiber) {
+    uintptr_t *top = (uintptr_t *)(fiber->stackLow + fiber->stackSize);
+
+    for (uintptr_t *slot = top - MCO_DUMMY_RETURN_SEARCH / sizeof(*slot); slot < top; slot++) {
+        if (*slot == MCO_DUMMY_RETURN) {
+            return slot;
+        }
+    }
+    return NULL;
 }
 
-static void ProtectNone(unsigned char *p, size_t size) {
-#ifdef _WIN32
-    DWORD old;
-    if (!VirtualProtect(p, size, PAGE_NOACCESS, &old)) {
-        Fatal("VirtualProtect failed");
+static void ProtectGuard(unsigned char *p, size_t size) {
+    if (port_host_protect_stack_guard(p, size, "port: fiber: the guard's protection") != 0) {
+        abort();
     }
-#else
-    if (mprotect(p, size, PROT_NONE) != 0) {
-        Fatal("mprotect failed");
-    }
-#endif
-}
-
-static void UnmapPages(unsigned char *p, size_t size) {
-#ifdef _WIN32
-    (void)size;
-    VirtualFree(p, 0, MEM_RELEASE);
-#else
-    munmap(p, size);
-#endif
 }
 
 // ASan's protocol for each switch: __sanitizer_start_switch_fiber on the old stack, naming the new one, and
@@ -146,7 +122,7 @@ static void FiberMain(mco_coro *co) {
 }
 
 PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
-    size_t page = port_page_size();
+    size_t page = port_host_page_size();
     size_t guardSize = RoundUp(GUARD_BYTES, page);
     mco_desc desc;
     size_t header;
@@ -154,6 +130,7 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
     unsigned char *mapping;
     PortFiber *fiber;
     mco_coro *co;
+    uintptr_t *dummyReturn;
 
     stackSize = RoundUp(stackSize, page);
     desc = mco_desc_init(FiberMain, stackSize);
@@ -163,7 +140,7 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
     headerSize = RoundUp(header, page);
 
     // The mapping, from low to high addresses: minicoro's header, the guard, the stack
-    mapping = MapPages(headerSize + guardSize + stackSize);
+    mapping = port_host_map(headerSize + guardSize + stackSize);
     fiber = calloc(1, sizeof(*fiber));
     if (mapping == NULL || fiber == NULL) {
         Fatal("out of memory for a fiber");
@@ -187,11 +164,15 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
         Fatal("minicoro's block layout changed: the stack is not where the guard expects it");
     }
     fiber->co = co;
-    ProtectNone(fiber->guard, guardSize);
+    dummyReturn = DummyReturnSlot(fiber);
+    ProtectGuard(fiber->guard, guardSize);
 
     if (sPaint) {
         memset(fiber->stackLow, PAINT_BYTE, stackSize);
         fiber->painted = 1;
+    }
+    if (dummyReturn != NULL) {
+        *dummyReturn = 0;
     }
 #ifdef PORT_LSAN
     // LeakSanitizer scans the stacks and registers of threads, not of fibers: an allocation that only a suspended
@@ -218,7 +199,7 @@ void port_fiber_destroy(PortFiber *fiber) {
     // same addresses would inherit them
     ASAN_UNPOISON_MEMORY_REGION(fiber->stackLow, fiber->stackSize);
 #endif
-    UnmapPages(fiber->mapping, fiber->mappingSize);
+    port_host_unmap(fiber->mapping, fiber->mappingSize);
     free(fiber);
 }
 

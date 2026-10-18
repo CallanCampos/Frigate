@@ -731,13 +731,25 @@ sys.stderr.write("2026-10-17 12:00:00.000 fakeport[1:2] port: stopped after %d f
 """
 
 
+def stand_in(path: str, text: str) -> str:
+    """Writes a stand-in program, a Python script that its #! line runs, and returns the path to run it by: on Windows,
+    which runs no script by its #! line, a .cmd beside it that runs it with this Python"""
+    with open(path, "w") as f:
+        f.write(text)
+    os.chmod(path, os.stat(path).st_mode | stat.S_IEXEC)
+    if sys.platform != "win32":
+        return path
+    with open(path + ".cmd", "w") as f:
+        f.write(f'@"{sys.executable}" "{path}" %*\n')
+    return path + ".cmd"
+
+
 def fake_port(directory: str) -> tuple[str, str]:
     """The stand-in program, and the file where it records its arguments"""
     program = os.path.join(directory, "fakeport")
     record = os.path.join(directory, "arguments")
-    with open(program, "w") as f:
-        f.write(FAKE_PORT.format(python=sys.executable, tools=os.path.abspath(TOOLS), record=record))
-    os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
+    program = stand_in(program,
+                       FAKE_PORT.format(python=sys.executable, tools=os.path.abspath(TOOLS), record=record))
     return program, record
 
 
@@ -819,12 +831,10 @@ class LaunchTests(unittest.TestCase):
         self.dir = tempfile.TemporaryDirectory()
         d = self.dir.name
         self.setup_path = os.path.join(d, "setup.json")
-        self.oracle_program = os.path.join(d, "pbw-oracle")
-        self.port_program = os.path.join(d, "port")
-        for path, text in ((self.oracle_program, LAUNCH_ORACLE), (self.port_program, LAUNCH_PORT)):
-            with open(path, "w") as f:
-                f.write(text.format(python=sys.executable, tools=os.path.abspath(TOOLS), setup=self.setup_path))
-            os.chmod(path, os.stat(path).st_mode | stat.S_IEXEC)
+        self.oracle_program, self.port_program = (
+            stand_in(os.path.join(d, name), text.format(python=sys.executable, tools=os.path.abspath(TOOLS),
+                                                        setup=self.setup_path))
+            for name, text in (("pbw-oracle", LAUNCH_ORACLE), ("port", LAUNCH_PORT)))
         # A ROM header with the game code the port names its save after
         self.rom = os.path.join(d, "rom.nds")
         with open(self.rom, "wb") as f:
@@ -1087,12 +1097,11 @@ class OracleScriptTests(unittest.TestCase):
     def test_saves_are_held_to_their_sha1(self):
         with tempfile.TemporaryDirectory() as d:
             # A stand-in for pbw-oracle that records its arguments and writes the same save memory at every run
-            program = os.path.join(d, "pbw-oracle")
-            with open(program, "w") as f:
-                f.write(f"#!{sys.executable}\nimport sys\nargs = sys.argv[1:]\n"
-                        f"open({os.path.join(d, 'args')!r}, 'w').write('\\n'.join(args))\n"
-                        "open(args[args.index('--save-out') + 1], 'wb').write(b'save memory')\n")
-            os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
+            program = stand_in(
+                os.path.join(d, "pbw-oracle"),
+                f"#!{sys.executable}\nimport sys\nargs = sys.argv[1:]\n"
+                f"open({os.path.join(d, 'args')!r}, 'w').write('\\n'.join(args))\n"
+                "open(args[args.index('--save-out') + 1], 'wb').write(b'save memory')\n")
             args = argparse.Namespace(oracle=program, version="b2_us", rom=os.path.join(d, "rom.nds"), time=None)
             out = os.path.join(d, "made.sav")
             work = os.path.join(d, "work")
@@ -1124,15 +1133,14 @@ class OracleScriptTests(unittest.TestCase):
         # each step is held to its SHA-1. A stand-in for pbw-oracle writes as save memory the input file's name and
         # what it was given (or "blank"), and counts its runs
         with tempfile.TemporaryDirectory() as d:
-            program = os.path.join(d, "pbw-oracle")
             runs = os.path.join(d, "runs")
-            with open(program, "w") as f:
-                f.write(f"#!{sys.executable}\nimport os, sys\nargs = sys.argv[1:]\n"
-                        f"open({runs!r}, 'a').write(os.path.basename(args[args.index('--input') + 1]) + '\\n')\n"
-                        "given = open(args[args.index('--save') + 1], 'rb').read() if '--save' in args else b'blank'\n"
-                        "name = os.path.basename(args[args.index('--input') + 1]).encode()\n"
-                        "open(args[args.index('--save-out') + 1], 'wb').write(name + b':' + given)\n")
-            os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
+            program = stand_in(
+                os.path.join(d, "pbw-oracle"),
+                f"#!{sys.executable}\nimport os, sys\nargs = sys.argv[1:]\n"
+                f"open({runs!r}, 'a').write(os.path.basename(args[args.index('--input') + 1]) + '\\n')\n"
+                "given = open(args[args.index('--save') + 1], 'rb').read() if '--save' in args else b'blank'\n"
+                "name = os.path.basename(args[args.index('--input') + 1]).encode()\n"
+                "open(args[args.index('--save-out') + 1], 'wb').write(name + b':' + given)\n")
 
             def run_count() -> int:
                 if not os.path.exists(runs):
@@ -1227,31 +1235,29 @@ class OracleScriptTests(unittest.TestCase):
         # save with a Wi-Fi ID; the oracle writes its own save of New Game with the ID it is given, and boots any save
         # to the same frames, rewriting it only when told to
         with tempfile.TemporaryDirectory() as d:
-            port = os.path.join(d, "fakeport")
-            with open(port, "w") as f:
-                f.write(f"#!{sys.executable}\nimport os, sys\nsys.path.insert(0, {os.path.abspath(TOOLS)!r})\n"
-                        "import compare\nargs = sys.argv[1:]\nout = args[args.index('--run-dir') + 1]\n"
-                        "save = bytearray(b'\\xff' * 0x80000)\n"
-                        "save[0x1aa04:0x1aa0c] = save[0x40a04:0x40a0c] = bytes(range(8))\nsave[0x10] = 1\n"
-                        "open(os.path.join(args[args.index('--save-dir') + 1], 'IREO.sav'), 'wb').write(save)\n"
-                        "compare.write_frames_tsv(os.path.join(out, 'frames.tsv'), [compare.Frame(1, 1, 0, 1, None, "
-                        "None, None, 'a' * 40, 'b' * 40, False, False)])\n"
-                        "sys.stderr.write('port: stopped after 1 frames\\n')\n")
-            os.chmod(port, os.stat(port).st_mode | stat.S_IEXEC)
-            oracle_program = os.path.join(d, "pbw-oracle")
-            with open(oracle_program, "w") as f:
-                f.write(f"#!{sys.executable}\nimport os, sys\nsys.path.insert(0, {os.path.abspath(TOOLS)!r})\n"
-                        "import compare\nargs = sys.argv[1:]\nout = args[args.index('--out') + 1]\n"
-                        "frames = int(args[args.index('--frames') + 1])\n"
-                        "if '--save' in args:\n"
-                        "    save = bytearray(open(args[args.index('--save') + 1], 'rb').read())\n"
-                        "    if os.environ.get('FAKE_WRITES'):\n        save[0] ^= 1\n"
-                        "else:\n    save = bytearray(b'\\xff' * 0x80000)\n"
-                        "    save[0x1aa04:0x1aa0c] = save[0x40a04:0x40a0c] = bytes.fromhex(os.environ['FAKE_ID'])\n"
-                        "open(args[args.index('--save-out') + 1], 'wb').write(save)\n"
-                        "compare.write_frames_tsv(os.path.join(out, 'frames.tsv'), [compare.Frame(i, i, i - 1, i, "
-                        "None, None, None, 'c' * 40, 'd' * 40, False, False) for i in range(1, frames + 1)])\n")
-            os.chmod(oracle_program, os.stat(oracle_program).st_mode | stat.S_IEXEC)
+            port = stand_in(
+                os.path.join(d, "fakeport"),
+                f"#!{sys.executable}\nimport os, sys\nsys.path.insert(0, {os.path.abspath(TOOLS)!r})\n"
+                "import compare\nargs = sys.argv[1:]\nout = args[args.index('--run-dir') + 1]\n"
+                "save = bytearray(b'\\xff' * 0x80000)\n"
+                "save[0x1aa04:0x1aa0c] = save[0x40a04:0x40a0c] = bytes(range(8))\nsave[0x10] = 1\n"
+                "open(os.path.join(args[args.index('--save-dir') + 1], 'IREO.sav'), 'wb').write(save)\n"
+                "compare.write_frames_tsv(os.path.join(out, 'frames.tsv'), [compare.Frame(1, 1, 0, 1, None, "
+                "None, None, 'a' * 40, 'b' * 40, False, False)])\n"
+                "sys.stderr.write('port: stopped after 1 frames\\n')\n")
+            oracle_program = stand_in(
+                os.path.join(d, "pbw-oracle"),
+                f"#!{sys.executable}\nimport os, sys\nsys.path.insert(0, {os.path.abspath(TOOLS)!r})\n"
+                "import compare\nargs = sys.argv[1:]\nout = args[args.index('--out') + 1]\n"
+                "frames = int(args[args.index('--frames') + 1])\n"
+                "if '--save' in args:\n"
+                "    save = bytearray(open(args[args.index('--save') + 1], 'rb').read())\n"
+                "    if os.environ.get('FAKE_WRITES'):\n        save[0] ^= 1\n"
+                "else:\n    save = bytearray(b'\\xff' * 0x80000)\n"
+                "    save[0x1aa04:0x1aa0c] = save[0x40a04:0x40a0c] = bytes.fromhex(os.environ['FAKE_ID'])\n"
+                "open(args[args.index('--save-out') + 1], 'wb').write(save)\n"
+                "compare.write_frames_tsv(os.path.join(out, 'frames.tsv'), [compare.Frame(i, i, i - 1, i, "
+                "None, None, None, 'c' * 40, 'd' * 40, False, False) for i in range(1, frames + 1)])\n")
             rom = os.path.join(d, "rom.nds")
             with open(rom, "wb") as f:
                 f.write(b"POKEMON B2\0\0IREO01" + bytes(0x200))
@@ -1313,11 +1319,10 @@ class OracleScriptTests(unittest.TestCase):
     def test_run_passes_the_time_only_when_given(self):
         with tempfile.TemporaryDirectory() as d:
             # A stand-in for pbw-oracle that records its arguments
-            program = os.path.join(d, "pbw-oracle")
-            with open(program, "w") as f:
-                f.write(f"#!{sys.executable}\nimport sys\nopen({os.path.join(d, 'args')!r}, 'w').write("
-                        "'\\n'.join(sys.argv[1:]))\n")
-            os.chmod(program, os.stat(program).st_mode | stat.S_IEXEC)
+            program = stand_in(
+                os.path.join(d, "pbw-oracle"),
+                f"#!{sys.executable}\nimport sys\nopen({os.path.join(d, 'args')!r}, 'w').write("
+                "'\\n'.join(sys.argv[1:]))\n")
             out = os.path.join(d, "run")
             for given, expected in ((None, None), ("2013-05-04 08:30:00", "2013-05-04 08:30:00")):
                 command = ["run", "--oracle", program, "--out", out, "--frames", "1", "--input", "x.pbwinput",

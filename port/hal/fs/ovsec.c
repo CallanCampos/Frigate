@@ -1,6 +1,6 @@
 // The overlays' sections (ovsec.h): finding them, the snapshot, and the reset. The Mach-O path is the one the spike
-// tested and macOS runs; the ELF path builds on Linux, and the COFF path is written from the spike's cross-compiled
-// check, for when Windows is built.
+// tested and macOS runs; the ELF path builds on Linux, and the COFF path on Windows, where integrate_overlay_sections
+// checks that the sections hold an overlay's statics.
 #include "hal/fs/ovsec.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -186,12 +186,20 @@ unsigned port_ovsec_image_section_count(void) {
 
 // COFF: the linker sorts the parts of a grouped section by the name after '$' and drops the suffix, so .data$ovNNNa,
 // .data$ovNNNm (the overlay's statics) and .data$ovNNNz come in that order inside .data. The range is everything
-// between the markers of one byte each, alignment padding included
+// between the markers of one byte each, alignment padding included. lld groups by contents as well as by name, so
+// each marker has the contents of the statics it brackets: the data markers are initialized, and the bss markers are
+// placed by "#pragma clang section bss", as the overlays' own zeroed statics are (gen_overlay_sections.py's forced
+// includes), since a section attribute would make their sections initialized data, another .bss than the statics'
+#define OVSEC_PRAGMA(text) _Pragma(#text)
+#define OVSEC_BSS_MARKER(n, end, name)                                                                                 \
+    OVSEC_PRAGMA(clang section bss = ".bss$ov" #n #end)                                                                \
+    static unsigned char name[1];                                                                                      \
+    OVSEC_PRAGMA(clang section bss = "")
 #define OVSEC_OVERLAY(n, id)                                                                                           \
     __attribute__((section(".data$ov" #n "a"))) static unsigned char sDataBegin##n[1] = { 1 };                         \
     __attribute__((section(".data$ov" #n "z"))) static unsigned char sDataEnd##n[1] = { 1 };                           \
-    __attribute__((section(".bss$ov" #n "a"))) static unsigned char sBssBegin##n[1];                                   \
-    __attribute__((section(".bss$ov" #n "z"))) static unsigned char sBssEnd##n[1];
+    OVSEC_BSS_MARKER(n, a, sBssBegin##n)                                                                               \
+    OVSEC_BSS_MARKER(n, z, sBssEnd##n)
 #include "ovsec_list.h"
 #undef OVSEC_OVERLAY
 

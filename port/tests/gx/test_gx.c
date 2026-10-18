@@ -13,6 +13,7 @@
 #include "gfx/ref/ds2d.h"
 #include "hal/gx/gx_display.h"
 #include "hal/gx/vram.h"
+#include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/os/port_os.h"
 #include "nitro/gx.h"
@@ -256,8 +257,12 @@ static void test_views(void) {
     CHECK(lcdc_bank(PORT_VRAM_BANK_E) == (uint8_t *)HW_LCDC_VRAM_E);
     CHECK(lcdc_bank(PORT_VRAM_BANK_I) == (uint8_t *)HW_LCDC_VRAM_I);
     CHECK(port_vram_view(PORT_VRAM_VIEW_LCDC) == port_hw_pointer(0x06800000));
+    // Each view starts a slot, as aliasing needs, where the host aligns region 0x06's window to a slot (16 KiB);
+    // Windows aligns it to its 4 KiB pages, and copies the banks
     for (int view = 0; view < PORT_VRAM_CPU_VIEW_COUNT; view++) {
-        CHECK((uintptr_t)port_vram_view(view) % PORT_VRAM_SLOT_SIZE == 0);
+        CHECK((uintptr_t)port_vram_view(view) %
+                  (PORT_HOST_PAGE_ALIGNMENT < PORT_VRAM_SLOT_SIZE ? PORT_HOST_PAGE_ALIGNMENT : PORT_VRAM_SLOT_SIZE) ==
+              0);
     }
 }
 

@@ -37,6 +37,4 @@ void port_fiber_set_paint(int enabled);
 void port_fiber_guard_range(const PortFiber *fiber, void **low, void **high);
 void port_fiber_mapping_range(const PortFiber *fiber, void **low, void **high);
 
-size_t port_page_size(void);
-
 #endif // PORT_HAL_OS_FIBER_H

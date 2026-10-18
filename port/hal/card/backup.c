@@ -31,6 +31,7 @@
 
 #ifdef _WIN32
 #include <direct.h>
+#include <io.h>
 #include <windows.h>
 #else
 #include <dirent.h>
@@ -429,7 +430,13 @@ static int WriteImage(const char *savePath) {
     if (fwrite(sCard.image, 1, PORT_CARD_BACKUP_SIZE, file) != PORT_CARD_BACKUP_SIZE || fflush(file) != 0) {
         error = LastError();
     }
-#ifndef _WIN32
+    // The image on the disk before the rename makes it the save, so that a power cut can't leave the new name on a
+    // file without its data. On Windows MOVEFILE_WRITE_THROUGH below flushes only the rename, not the file's data
+#ifdef _WIN32
+    if (error == 0 && _commit(_fileno(file)) != 0) {
+        error = LastError();
+    }
+#else
     if (error == 0 && fsync(fileno(file)) != 0) {
         error = LastError();
     }

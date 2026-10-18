@@ -7,16 +7,17 @@
 // Every register write and fixed address of the game's code lands here: the screens' registers, palettes, VRAM and OAM
 // that the renderers read, the shared memory the ARM7's services fill, and the 3D commands of everything that draws.
 #include "hal/hw/hw.h"
+#include "hal/host/host.h"
 #include "include/port_host.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned (16 KiB on Apple Silicon), so that the VRAM banks can
-// be mapped into region 0x06's window by pages (port/hal/gx/vram.c). They are zero-filled memory the system commits
-// only when touched
+// The windows PORT_HW_ADDR() reads, 16 MiB each and page aligned (16 KiB, Apple Silicon's pages, where the VRAM banks
+// can be mapped into region 0x06's window by pages, port/hal/gx/vram.c; 4 KiB on Windows, which copies the banks
+// instead). They are zero-filled memory the system commits only when touched
 #define REGION_SIZE (1u << 24)
-#define REGION_STORAGE __attribute__((aligned(16384)))
+#define REGION_STORAGE __attribute__((aligned(PORT_HOST_PAGE_ALIGNMENT)))
 REGION_STORAGE unsigned char port_hw_mem_01[REGION_SIZE]; // ITCM
 REGION_STORAGE unsigned char port_hw_mem_02[REGION_SIZE]; // main memory and its system area (0x02fff000)
 REGION_STORAGE unsigned char port_hw_mem_03[REGION_SIZE]; // shared WRAM

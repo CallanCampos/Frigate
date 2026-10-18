@@ -16,6 +16,7 @@
 //     notes that is the pointer or holds it is the answer. A note bounds its buffer, and finds one that is in neither
 //     place (a local on a thread's stack). Each tag keeps its last NOTE_COUNT notes, and only its own services look at
 //     them, so the protocols that note nothing (the card's, the file system's) never get another protocol's buffer.
+#include "hal/host/host.h"
 #include "hal/pxi/arm7.h"
 #include "hal/pxi/pxi_bus.h"
 #include "nitro/os.h"
@@ -24,15 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if defined(__APPLE__)
-#include <mach-o/getsect.h>
-#include <mach-o/ldsyms.h>
-#elif defined(__linux__)
-// The start of the executable's writable data and the end of its .bss, which the GNU and LLVM linkers define
-extern char __data_start[];
-extern char _end[];
-#endif
 
 // How many of the pointers a tag sent last are kept
 #define NOTE_COUNT 64
@@ -67,20 +59,9 @@ static const Region *StaticData(void) {
     if (sData.end != 0) {
         return &sData;
     }
-#if defined(__APPLE__)
-    {
-        unsigned long size = 0;
-        uint8_t *data = getsegmentdata(&_mh_execute_header, "__DATA", &size);
-
-        if (data != NULL) {
-            sData.start = (uintptr_t)data;
-            sData.end = (uintptr_t)data + size;
-        }
-    }
-#elif defined(__linux__)
-    sData.start = (uintptr_t)__data_start;
-    sData.end = (uintptr_t)_end;
-#endif
+    // The executable's writable data, from the host's image: Mach-O's __DATA, ELF's .data and .bss, PE's writable
+    // sections (port/hal/host)
+    port_host_static_data(&sData.start, &sData.end);
     return &sData;
 }
 

@@ -1,23 +1,20 @@
 // Unit tests of port/hal/rom: the host's SHA-1 against FIPS 180's examples, and the ROM's check on the player's dump
-// and on variants of it made in a private copy-on-write mapping (a trimmed dump, a changed header, a changed or cut
-// file, a changed overlay table or overlay file, another version), the system area it leaves, the reads past its end
-// and the card's reads. The tests that need the ROM skip with
-// status 77 without it (FRIGATE_ROM, else the repository's orig/baserom_<version>.nds).
+// and on variants of it made in a private copy-on-write mapping of it (port/hal/host): a trimmed dump, a changed
+// header, a changed or cut file, a changed overlay table or overlay file, another version; the system area it leaves,
+// the reads past its end and the card's reads. The tests that need the ROM skip with status 77 without it
+// (FRIGATE_ROM, else the repository's orig/baserom_<version>.nds).
 //
 //   port_rom_unit_tests NAME | all
+#include "hal/host/host.h"
 #include "hal/os/port_app.h"
 #include "hal/rom/port_rom.h"
 #include "hal/rom/rom_manifest.h"
 #include "hal/rom/sha1.h"
 #include "nitro/hw.h"
 #include "nitro/os.h"
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #define SKIP 77
 
@@ -85,9 +82,6 @@ static size_t sRomSize;
 static const char *sRomPath;
 
 static int MapRom(void) {
-    struct stat info;
-    int fd;
-
     if (sRom != NULL) {
         return 1;
     }
@@ -97,19 +91,11 @@ static int MapRom(void) {
                port_rom_manifest_version);
         return 0;
     }
-    fd = open(sRomPath, O_RDONLY);
-    if (fd < 0 || fstat(fd, &info) != 0) {
-        printf("  can't open %s: skipped\n", sRomPath);
+    sRom = port_host_map_file_copy(sRomPath, &sRomSize);
+    if (sRom == NULL) {
+        printf("  can't open or map %s: skipped\n", sRomPath);
         return 0;
     }
-    sRom = mmap(NULL, (size_t)info.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
-    close(fd);
-    if (sRom == MAP_FAILED) {
-        sRom = NULL;
-        printf("  can't map %s: skipped\n", sRomPath);
-        return 0;
-    }
-    sRomSize = (size_t)info.st_size;
     return 1;
 }
 
@@ -385,14 +371,14 @@ static int TestDefaultPath(void) {
     path = port_rom_default_path();
     Check(path != NULL && strcmp(path, "/given/by/option.nds") == 0, "--rom comes first");
     port_app_set_arguments(1, without, NULL, 0);
-    setenv(PORT_ROM_ENVIRONMENT_VARIABLE, "/given/by/environment.nds", 1);
+    port_host_set_environment(PORT_ROM_ENVIRONMENT_VARIABLE, "/given/by/environment.nds");
     path = port_rom_default_path();
     Check(path != NULL && strcmp(path, "/given/by/environment.nds") == 0, "then FRIGATE_ROM");
-    unsetenv(PORT_ROM_ENVIRONMENT_VARIABLE);
+    port_host_set_environment(PORT_ROM_ENVIRONMENT_VARIABLE, NULL);
     path = port_rom_default_path();
     Check(path == NULL || strstr(path, "orig/baserom_") != NULL, "then the repository's, when it is there");
     if (savedCopy != NULL) {
-        setenv(PORT_ROM_ENVIRONMENT_VARIABLE, savedCopy, 1);
+        port_host_set_environment(PORT_ROM_ENVIRONMENT_VARIABLE, savedCopy);
         free(savedCopy);
     }
     port_app_set_arguments(0, NULL, NULL, 0);

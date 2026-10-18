@@ -12,20 +12,17 @@
 // controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the program
 // writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 
-// POSIX's signals and alarm() for the watchdog, which glibc hides from strict C11 (the target's -std=c11)
-#define _DEFAULT_SOURCE
-
 #include "app/launcher.h"
 #include "app/message_log.h"
 #include "app/present.h"
 #include "app/replay.h"
 #include "app/run_dir.h"
 #include "app/sound_trace.h"
-#include "app/symbols.h"
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
 #include "hal/gfl/gfl_frame.h"
+#include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_app.h"
@@ -40,12 +37,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifndef _WIN32
-#include <execinfo.h>
-#include <signal.h>
-#include <unistd.h>
-#endif
 
 // The game's main(), from src/system/main.c
 void NitroMain(void);
@@ -315,41 +306,19 @@ static long long CountOption(const char *name, int scaled, long long fallback) {
 
 // The watchdog: a frame that takes longer than --watchdog seconds of host time means the game spins in a loop that
 // never reaches the platform layer (a register or a flag that only the hardware would change). It is the only place
-// where host time stops the game, and it only reports
-#ifndef _WIN32
-static void OnWatchdog(int signal) {
-    static const char message[] = "\nport: watchdog: no frame for too long; the game spins where the platform layer "
-                                  "never runs\nBacktrace:\n";
-    void *frames[64];
-    int count;
-
-    (void)signal;
-    (void)!write(STDERR_FILENO, message, sizeof(message) - 1);
-    count = backtrace(frames, 64);
-    backtrace_symbols_fd(frames, count, STDERR_FILENO);
-    _Exit(EXIT_WATCHDOG);
-}
-#endif
-
+// where host time stops the game, and it only reports: the host's watchdog (SIGALRM, or a thread on Windows) prints the
+// message and where the game was, and ends the program with EXIT_WATCHDOG (port/hal/host/host.h)
 static void KickWatchdog(void) {
-#ifndef _WIN32
-    if (sWatchdogSeconds != 0) {
-        alarm(sWatchdogSeconds);
-    }
-#endif
+    port_host_watchdog_kick();
 }
 
 static void StartWatchdog(void) {
-#ifndef _WIN32
     if (sWatchdogSeconds != 0) {
-        struct sigaction action;
-        memset(&action, 0, sizeof(action));
-        action.sa_handler = OnWatchdog;
-        sigemptyset(&action.sa_mask);
-        sigaction(SIGALRM, &action, NULL);
-        KickWatchdog();
+        port_host_watchdog_start(sWatchdogSeconds,
+                                 "\nport: watchdog: no frame for too long; the game spins where the platform layer "
+                                 "never runs\nBacktrace:\n",
+                                 EXIT_WATCHDOG);
     }
-#endif
 }
 
 // Waits until the frame's time on the DS's clock: 560,190 cycles of 33.514 MHz, 16.715 ms. A host that falls more
@@ -434,7 +403,7 @@ static int AddRunDumps(void) {
         } else if (sArgv[i][length] != '\0') {
             continue;
         }
-        if (spec == NULL || !port_run_dir_add_dump(spec, port_symbol_address, error, sizeof(error))) {
+        if (spec == NULL || !port_run_dir_add_dump(spec, port_host_global_address, error, sizeof(error))) {
             fprintf(stderr, "port: --run-dump %s: %s\n", spec != NULL ? spec : "",
                     spec != NULL ? error : "needs a spec");
             return 0;

@@ -1,8 +1,9 @@
 name: Frigate CI
 
-# Builds Frigate, the native port, on macOS and Linux and runs its tests. The ROM build needs the base ROMs, which CI
-# doesn't have; upstream's compile.yml compiles every C file with MWCC instead, and every port session's sync builds
-# both ROMs locally (port/docs/SYNC.md).
+# Builds Frigate, the native port, on macOS, Linux and Windows and runs its tests, those that need the player's ROM
+# skipping. The ROM build needs the base ROMs, which CI doesn't have; upstream's compile.yml compiles every C file with
+# MWCC instead, and every port session's sync builds both ROMs locally (port/docs/SYNC.md). Windows builds with MSYS2's
+# CLANG64 toolchain (clang, lld and the UCRT; port/docs/adr/0013-windows-build-with-msys2-clang64.md).
 on:
   push:
     branches: [main]
@@ -64,3 +65,68 @@ jobs:
       - name: Build the macOS app
         if: runner.os == 'macOS'
         run: cmake --build build/port --target frigate-black2_app
+
+  # Windows, with MSYS2's CLANG64 environment: clang, lld, compiler-rt and the UCRT, with CMake, Ninja, SDL3 and Python
+  # from its packages, as port/README.md tells a player to build, so that the build's GCC-style flags are the same as
+  # on macOS and Linux (ADR 0013). The game's images, sounds and models under res/ (68,000 of its 119,000 files) aren't
+  # checked out: the host build reads only its text and the data that the text's headers name
+  # (port/tools/gen_host_tree.py). git keeps the files' line endings as they are
+  host-windows:
+    name: Host build (windows-2025)
+    runs-on: windows-2025
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      # The decomp's headers and data are UTF-8, and Python reads text in the ANSI code page on Windows without it
+      PYTHONUTF8: "1"
+    steps:
+      - name: Keep line endings
+        shell: pwsh
+        run: git config --global core.autocrlf false
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/res/**/*.png
+            !/res/**/*.wav
+            !/res/**/*.glb
+
+      # MSYS2's current packages, not pinned: the build takes any SDL3 3.4 (3.4.16 on the runner of 2026-10-18), and
+      # the CLANG64 shell's PATH is MSYS2's own, so that its Python is the one CMake finds (port/CMakeLists.txt)
+      - name: Install build tools
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANG64
+          update: false
+          install: >-
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-ninja
+            mingw-w64-clang-x86_64-sdl3
+            mingw-w64-clang-x86_64-python
+
+      - name: Show the tools
+        run: |
+          which clang cmake ninja python
+          clang --version
+          cmake --version
+          python --version
+          pacman -Q mingw-w64-clang-x86_64-sdl3 mingw-w64-clang-x86_64-python
+
+      - name: Configure
+        env:
+          CC: clang
+        run: cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      # -k 0 on Windows alone, the newest host: one run shows every file that doesn't compile there, where a file that
+      # builds on macOS and Linux may not; the other jobs stop at the first failure, as before
+      - name: Build
+        run: cmake --build build/port -- -k 0
+
+      - name: Test
+        run: ctest --test-dir build/port --output-on-failure

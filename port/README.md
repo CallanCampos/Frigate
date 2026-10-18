@@ -24,8 +24,9 @@ match melonDS pass for pass in both versions, and the party list and the Pokéde
 
 ## Quick start
 
-Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux too. It needs CMake 3.28 or later,
-Ninja, clang, Python 3.11 or later and SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
+Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Linux and Windows too
+([Building on Windows](#building-on-windows)). It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or later and
+SDL3 3.4 (Homebrew's `sdl3`; without one, CMake builds the pinned SDL3 release).
 Running the game needs your own dump of the ROM. A clone needs the decomp's untracked inputs first:
 [Preparing a checkout](#preparing-a-checkout) has the steps, and places your dumps as `orig/baserom_b2_us.nds` and
 `orig/baserom_w2_us.nds`.
@@ -54,6 +55,43 @@ The host build compiles every C file of `src/` and `lib/` with the host's clang 
 [hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are trap
 stubs and inaccessible placeholders, generated at each build by [tools/gen_stubs.py](tools/gen_stubs.py): the program
 stops with the name of the first one it reaches.
+
+### Building on Windows
+
+Windows builds in [MSYS2](https://www.msys2.org)'s CLANG64 environment: its clang, lld and compiler-rt over the UCRT,
+with its CMake, Ninja, SDL3 and Python, so that the build takes the same GCC-style flags as on macOS and Linux
+([ADR 0013](docs/adr/0013-windows-build-with-msys2-clang64.md), proposed). CI builds it this way on GitHub's Windows
+runner and runs every test that needs no ROM, but for the 10 `gx_*_shm` tests (no VRAM aliasing there) and
+`card_backup_linked_save` (no links followed), which skip; a game with your ROM hasn't been run on Windows yet. A clone
+needs nothing from [Preparing a checkout](#preparing-a-checkout) for this build, which reads only the tree: the tests
+that need your ROM skip without it, and take it from `FRIGATE_ROM` or `orig/baserom_b2_us.nds`. In the CLANG64 shell:
+
+```sh
+pacman -S --needed git mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-cmake mingw-w64-clang-x86_64-ninja \
+    mingw-w64-clang-x86_64-sdl3 mingw-w64-clang-x86_64-python
+git clone -c core.autocrlf=false https://github.com/CallanCampos/pokebw2-native.git   # its files keep their "\n"
+cd pokebw2-native
+export PYTHONUTF8=1                                                      # the decomp's text is UTF-8
+CC=clang cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build/port
+ctest --test-dir build/port --output-on-failure
+build/port/frigate-black2 --rom /c/Games/black2.nds                      # your dump, wherever it is
+```
+
+- **What differs:** saves are in `%APPDATA%\Frigate`, and a save file that is a symbolic link is replaced by the
+  game's next save rather than followed; the VRAM banks are copied between their views rather than mapped into them by
+  pages (the same pictures, more copying); the ROM is read into memory rather than mapped; the program loads MSYS2's
+  `SDL3.dll`, so run it from the CLANG64 shell, or with `C:\msys64\clang64\bin` on `PATH`.
+- **Names that aren't ASCII:** every program of the build carries a manifest that makes UTF-8 its code page (Windows
+  10 1903 or later, [app/windows/utf8.manifest](app/windows/utf8.manifest)), so a ROM, a save folder or a run directory
+  named with accents works as on macOS and Linux.
+- **Line ends:** `git clone -c` keeps `core.autocrlf=false` in the clone's own configuration, so that later pulls keep
+  each file's `"\n"` too; the tests compare some generated files byte for byte.
+- **Symbolic links:** the configure links the decomp's `include/` into the build; a Windows account that may not make
+  links (neither an administrator nor in Developer Mode) gets copies instead, and the configure says so. Each header is
+  then a configure dependency, so a changed header is copied again by the next build.
+- **The ROM build** (`configure.py` and `ninja`) doesn't run on Windows: the decomp's tools for it are macOS's and
+  Linux's. Nothing Frigate builds needs it, but the oracle's tests, which count the game's frames with its link map.
 
 ### The test launcher
 
@@ -92,8 +130,8 @@ asm oracle, each spike, the artwork) lists its files there.
 
 | Directory | What it is | Guide |
 | --- | --- | --- |
-| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts | [app/README.md](app/README.md) |
-| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input) | [hal/README.md](hal/README.md) |
+| `app/` | The program: `main()` and its options, the SDL3 window, the keyboard, mouse and gamepads, presenting and pacing, replays, the oracle's run directory and the sound driver's trace, the test launcher (`--launch`), the macOS app's scripts, the Windows programs' manifest | [app/README.md](app/README.md) |
+| `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
 | `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |

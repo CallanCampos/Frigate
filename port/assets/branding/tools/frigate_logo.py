@@ -331,7 +331,8 @@ def svg(view, title, comments, body):
 
 
 def write(out, name, text):
-    with open(os.path.join(out, name), "w") as f:
+    # UTF-8 with "\n" line ends on every system, Windows' included, so that the files are the same byte for byte
+    with open(os.path.join(out, name), "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
 
 

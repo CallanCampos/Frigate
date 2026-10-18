@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  The manifest every Windows program of Frigate's build carries, the game's and the tests' (port/CMakeLists.txt embeds
+  it): UTF-8 as the process's code page (Windows 10 1903 and later). The program's arguments come to it in UTF-8 (SDL's
+  WinMain builds them from the wide command line), and so do SDL's paths, while the C library's fopen, _mkdir and getenv
+  and the system's *A calls read a name in the code page; with UTF-8 there, a ROM, a save folder or a run directory
+  whose name isn't ASCII (an accented letter is enough) is the same file to all of them. It touches no part of the
+  game: it is how the platform layer's files (port/hal/rom, port/hal/card, port/app/run_dir.c) find what the player
+  named. The tests host_files and host_utf8_argument check it (port/tests/host).
+-->
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">UTF-8</activeCodePage>
+    </windowsSettings>
+  </application>
+</assembly>

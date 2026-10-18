@@ -38,12 +38,13 @@ def find_dwarfdump() -> str | None:
 
 
 def find_object(objects_dir: str, source: str) -> str | None:
-    """CMake names an object after its source's absolute path below the target's directory"""
-    wanted = "/" + source.replace(os.sep, "/").lstrip("/") + ".o"
+    """CMake names an object after its source's absolute path below the target's directory, with .o, or .obj on
+    Windows"""
+    wanted = "/" + source.replace(os.sep, "/").lstrip("/")
     for root, _, files in os.walk(objects_dir):
         for name in files:
             path = os.path.join(root, name)
-            if path.replace(os.sep, "/").endswith(wanted):
+            if path.replace(os.sep, "/").endswith((wanted + ".o", wanted + ".obj")):
                 return path
     return None
 

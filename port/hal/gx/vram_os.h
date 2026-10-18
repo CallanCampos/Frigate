@@ -15,7 +15,6 @@ typedef struct PortVramOs {
     uint32_t calls;
 } PortVramOs;
 
-size_t port_vram_os_page_size(void);
 int port_vram_os_backend_available(PortVramBackend backend);
 
 // Readable and writable zero pages anywhere, for the views only the GPU reads

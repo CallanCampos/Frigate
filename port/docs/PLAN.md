@@ -182,11 +182,12 @@ mods/examples/           sample mods, one per extension point
   function's name, address and caller, then stops. Running the game shows exactly which missing function is next, and
   the list shrinks as upstream lands C.
 - **Clang on every platform** (Apple clang on macOS, clang-cl or mingw-clang on Windows, clang on Linux, GCC as an
-  extra check): one compiler means one set of layouts and undefined behaviour to verify, and MSVC's `cl` doesn't
-  accept the tree's GCC-style `ATTRIBUTE_ALIGN`. On the `windows-msvc` target the tree's own `size_t` typedef
-  (`unsigned long`, in `include/stddef.h`) clashed with clang's in 992 files of the compile probe; the host build's
-  generated `include/` mirror leaves the tree's C library headers out, `stddef.h` among them, so the host's `size_t` is
-  the only one (§4.8 rule 8).
+  extra check; [ADR 0013](adr/0013-windows-build-with-msys2-clang64.md) proposes mingw-clang, MSYS2's CLANG64, for
+  Windows, waiting for the user's acceptance): one compiler means one set of layouts and undefined behaviour to verify,
+  and MSVC's `cl` doesn't accept the tree's GCC-style `ATTRIBUTE_ALIGN`. On the `windows-msvc` target the tree's own
+  `size_t` typedef (`unsigned long`, in `include/stddef.h`) clashed with clang's in 992 files of the compile probe; the
+  host build's generated `include/` mirror leaves the tree's C library headers out, `stddef.h` among them, so the
+  host's `size_t` is the only one (§4.8 rule 8).
 - **Compiler settings that match MWCC's language model:** `-std=gnu99 -fsigned-char` (MWCC's `-char signed`; Linux
   arm64 defaults to unsigned), int-sized enums (never `-fshort-enums`), `-fwrapv`, `-fno-strict-aliasing`
   (mandatory: the code puns types everywhere), `-ffp-contract=off`, no fast-math, `-ftrivial-auto-var-init=zero`
