@@ -37,8 +37,9 @@
 // launcher steps aside with a notice, the field opens as on the DS, and the launcher's tests fail on that notice.
 //
 // The run's exit status says whether the launch finished (launcher.h's PORT_LAUNCH_STATUS_*): 0 when every app opened
-// and closed, 1 when it didn't (the run ended first, CONTINUE never asked for the field, or an app wanted the field), 2
-// when the save's menu doesn't offer an app.
+// and closed, 1 when it didn't (the run ended first, CONTINUE never asked for the field, the launcher stepped aside, or
+// an app wanted the field), 2 when the save's menu doesn't offer an app. The run's own status, when it has one (a trap,
+// or another cause of 1 that port/app/main.c lists), comes first.
 #include "types.h"
 #include "app/launcher.h"
 #include "app/launcher_spec.h"

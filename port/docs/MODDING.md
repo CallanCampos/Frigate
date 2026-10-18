@@ -130,9 +130,10 @@ which of these it was:
   or Frigate's. Run it again in the sanitizer build, whose commands are at the top of
   [../cmake/os.cmake](../cmake/os.cmake), to see where memory went wrong; a game bug that a 64-bit layout made worse is
   fixed under `PLATFORM_PC` ([below](#changing-the-games-code-here)).
-- **Status 1, 65, 66, 67, 72, 73.** The program couldn't go on, and the message says why: the window didn't open, the
-  host ran out of memory, a save it can't use (65), no usable ROM (66), the PXI bus's arena check (67), every thread
-  waiting for good (72), or the watchdog (73).
+- **Status 1, 65, 66, 67, 72, 73.** The program couldn't go on, and the message says why: the window didn't open, a
+  write to the run directory or the sound trace failed during the run, the host ran out of memory, a module found a
+  build that can't work, or the test launcher's launch didn't finish (1); a save it can't use (65), no usable ROM (66),
+  the PXI bus's arena check (67), every thread waiting for good (72), or the watchdog (73).
 
 ## Changing the game's code here
 

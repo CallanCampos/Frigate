@@ -23,7 +23,8 @@
 //   --fixed-time TIME   the clock's time at boot, "YYYY-MM-DD HH:MM:SS", moving with the virtual clock (port/hal/rtc)
 //   --run-dir DIR       writes a run directory for the melonDS oracle's compare.py (port/app/run_dir.h): frames.tsv
 //                       with a row at every frame (the video frame, NitroSDK's VBlank count, GFL's frame count, the
-//                       game frame and each screen's hash), and run.txt
+//                       game frame and each screen's hash), and run.txt. One that can't be made is a bad option
+//                       (status 2); a write that fails during the run stops the run with status 1
 //   --run-screens LIST  the frames whose screens --run-dir also writes as frame_NNNNNN.png: N, A-B, A-B/STEP, all or
 //                       none, comma-separated, as pbw-oracle's --screens (none by default)
 //   --run-dump SPEC     memory --run-dir also writes to memory.txt, as pbw-oracle's --dump: [LABEL=][*]SYMBOL[+OFFSET]
@@ -44,17 +45,24 @@
 //                       apps (party, pokedex, bag, card, summary) in place of the field, whose code (overlay 36) has no
 //                       C yet, each when GFL's frame count reaches COUNT (at once without one), then stops: status 0
 //                       when each app opened and closed, 1 when the launch didn't finish (the run ended first, the game
-//                       never asked for the field, or an app wanted the field), 2 when the save's field menu doesn't
-//                       offer an app. The Pokédex stops on a trap some 395 passes after it opens (NitroSystem's
+//                       never asked for the field, the launcher stepped aside because the field's process table has
+//                       C, or an app wanted the field), 2 when the list isn't one it can read or the save's field menu
+//                       doesn't offer an app. A status of the run's own comes first: a trap's 70, or any other cause
+//                       of 1 below. The Pokédex stops on a trap some 395 passes after it opens (NitroSystem's
 //                       NNSi_objSizeWTbl has no C yet), so only a Pokédex closed before then runs through
 //
 // The controls are in port/app/present.c. Run from an app with stderr on /dev/null, as the Finder opens it, the
 // program writes its messages to ~/Library/Logs/Frigate/<program>.log instead (port/app/message_log.h).
 //
-// Exit statuses: 0 when the run ends normally, 1 when it can't go on (the window didn't open, a write to the run
-// directory or the sound trace failed, or a module ran out of memory or found a build that can't work, each with a
-// "port:" line) or when --launch's launch didn't finish, 2 for bad options (and for a --launch app the save's field
-// menu doesn't offer), 70 when the game reaches code or data with no C (port/hal/trap.c), 71 when it stops itself
+// Exit statuses: 0 when the run ends normally; 1 when it can't go on or didn't do what it was asked, each cause with a
+// "port:" line: the window didn't open, a write to the run directory failed during the run (a frame's row in
+// frames.tsv, a screen's PNG file or memory.txt, which stops the run at once), a write to the sound trace failed, a
+// module ran out of host memory (an arena, the geometry engine or its command log, the files over memory) or found a
+// build that can't work (no overlay sections, an archive or a file over memory read through an address cut to 32 bits),
+// or --launch's launch didn't finish (the run ended first, the game never asked for the field, the launcher stepped
+// aside, or an app wanted the field: port/app/launcher.h); 2 for bad options (among them a run directory, WAV dump or
+// sound trace that can't be opened, a --launch list the launcher can't read, and a --launch app the save's field menu
+// doesn't offer); 70 when the game reaches code or data with no C (port/hal/trap.c), 71 when it stops itself
 // (OS_Terminate), 72 when every thread waits for good, 73 for the watchdog, 74 when the game resets the console
 // (OS_ResetSystem), which the port can't do in place yet; the modules' own: 65 (a save file the port can't use), 66 (no
 // usable ROM), 67 (the PXI bus's arena check). port/docs/ARCHITECTURE.md, "How a run ends", has the table.

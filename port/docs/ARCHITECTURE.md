@@ -128,16 +128,17 @@ Frigate runs the game on one host thread.
 
 ### How a run ends
 
-`port_os_run` returns when a frame hook stops it (`--frames`, the window closed), when the game's `main()` returns, or
-when every thread waits for good; `main()` then writes the screenshot and closes the sound, the sound trace, the run
-directory, the replay and the window. The exit status says why a run ended;
-[MODDING.md](MODDING.md#when-the-game-stops) says how to read each and what to do about it:
+`port_os_run` returns when a frame hook stops it (`--frames`, the window closed, the test launcher once its launch ends,
+a write to the run directory that failed), when the game's `main()` returns, or when every thread waits for good;
+`main()` then writes the screenshot and closes the sound, the sound trace, the run directory, the replay and the window.
+The exit status says why a run ended; [MODDING.md](MODDING.md#when-the-game-stops) says how to read each and what to do
+about it:
 
 | Status | Why | Where |
 | --- | --- | --- |
 | 0 | The run ended normally | [../app/main.c](../app/main.c) |
-| 1 | The program couldn't go on: the window didn't open, a write to the run directory or the sound trace failed, or the host ran out of memory or found a build that can't work (each says why on a `port:` line) | [../app/main.c](../app/main.c), and the module named in the message |
-| 2 | Bad options | [../app/main.c](../app/main.c) |
+| 1 | The program couldn't go on, each cause with a `port:` line: the window didn't open; a write to the run directory failed during the run (a frame's row, a screen's PNG file or `memory.txt`, which stops the run at once); a write to the sound trace failed; the host ran out of memory (an arena, the geometry engine or its command log, the files over memory) or a module found a build that can't work (no overlay sections, an archive or a file over memory read through an address cut to 32 bits); or `--launch`'s launch didn't finish (the run ended first, the game never asked for the field, the test launcher stepped aside because the field's process table has C, or an app wanted the field) | [../app/main.c](../app/main.c), [../app/launcher.h](../app/launcher.h), and the module named in the message |
+| 2 | Bad options, among them a run directory, WAV dump or sound trace that can't be opened and a `--launch` list the test launcher can't read; and a `--launch` app that the save's field menu doesn't offer | [../app/main.c](../app/main.c), [../app/launcher.h](../app/launcher.h) |
 | 65 | A save file Frigate can't use (the wrong size, a directory, another emulator's format) | [../hal/card](../hal/card/port_card.h) |
 | 66 | No usable ROM | [../hal/rom](../hal/rom/port_rom.h) |
 | 67 | The PXI bus's arena check | [../hal/pxi/pointer.c](../hal/pxi/pointer.c) |

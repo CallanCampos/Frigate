@@ -57,9 +57,7 @@ stops with the name of the first one it reaches.
 
 A continued game stops when it asks for the field, whose code (overlay 36) has no C yet. For tests, Frigate's test
 launcher opens the field menu's apps there instead, in order, each when GFL's frame count reaches its COUNT (at once
-without one), then stops. Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run
-ended first, the game never asked for the field, or an app wanted the field); 2 when the save's field menu doesn't
-offer an app, which it checks as the menu does (no Pokémon, no Pokédex, the Black Tower's menu without its BAG):
+without one), then stops:
 
 ```sh
 build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE
@@ -69,6 +67,16 @@ build/port/frigate-black2 --save-dir SAVES --launch party@4044,card@6974 --input
 The apps are `party`, `pokedex`, `bag`, `card` and `summary`; each closed app prints its result. The Pokédex stops the
 program on a trap some 395 passes after it opens, still in its opening (`NNSi_objSizeWTbl`, NitroSystem's G2D, has no
 C yet), so only a Pokédex closed before then runs through. Without `--launch` nothing changes.
+
+Its exit status: 0 when every app opened and closed; 1 when the launch didn't finish (the run ended first, the game
+never asked for the field, the launcher stepped aside because the field's process table has C, or an app wanted the
+field); 2 when the `--launch` list isn't one it can read, or when the save's field menu doesn't offer an app, which it
+checks as the menu does (no Pokémon, no Pokédex, the Black Tower's menu without its BAG). The run's own status comes
+first: a trap's 70, or a 1 of the program's own (the window didn't open, a write to the run directory or the sound
+trace failed during the run, a module ran out of host memory or found a build that can't work). Each says why on a
+`port:` line; [app/main.c](app/main.c) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#how-a-run-ends) list every
+status.
+
 [docs/MODDING.md](docs/MODDING.md#reaching-the-field-menus-apps) says how to reach a menu with it, and where its saves
 come from; [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md) says why it exists and when it goes;
 `oracle.py launch` checks the apps against melonDS through it ([tools/oracle/README.md](tools/oracle/README.md)).
