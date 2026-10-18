@@ -4607,6 +4607,8 @@ overlays/ov011 0x0218ddf0 sPool
 overlays/ov011 0x0218de04 sSessionCache
 overlays/ov011 0x0218df74 sWcmAnchor
 overlays/ov011 0x0218df7c sWcmGlobal
+overlays/ov011 0x0218dfb4 sWcmRssiCursor
+overlays/ov011 0x0218dfb5 sWcmRssiSamples
 overlays/ov011 0x02190928 sEngine
 overlays/ov011 0x02191768 sCount
 overlays/ov012 0x02160a00 PleasureBoat_Free
@@ -18109,7 +18111,7 @@ overlays/ov260 0x021c1ca8 sSakeDownloadUrl
 overlays/ov260 0x021c1d28 sSakeUploadUrl
 overlays/ov260 0x021c1da8 gSakeStorageUrl
 overlays/ov260 0x021c1e28 sScState
-overlays/ov260 0x021c23d4 sCompetitionUrl
+overlays/ov260 0x021c23d4 gCompetitionUrl
 overlays/ov260 0x021c2454 sGdb
 overlays/ov260 0x021c246c sGdbRequests
 overlays/ov260 0x021c24dc gAuthUrl

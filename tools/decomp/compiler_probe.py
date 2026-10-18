@@ -201,6 +201,7 @@ def main():
     modules = load_modules(args.version)
 
     results: dict[str, dict[str, str]] = {}
+    failed: list[str] = []
     with tempfile.TemporaryDirectory() as tmp:
         for compiler in compilers:
             obj = Path(tmp) / f"{compiler.replace('/', '_')}.o"
@@ -216,7 +217,12 @@ def main():
             ]
             proc = subprocess.run(command, capture_output=True, text=True)
             if proc.returncode != 0:
-                print(f"{compiler}: compile failed\n{proc.stdout}{proc.stderr}")
+                # Every function shows the failure, so that --mismatches can't read it as all matching
+                print(f"{compiler}: compile failed\n{proc.stdout}{proc.stderr}", file=sys.stderr)
+                failed.append(compiler)
+                for name in defined_functions(args.source):
+                    if functions is None or name in functions:
+                        results.setdefault(name, {})[compiler] = "no compile"
                 continue
             compiled = compiled_functions(obj)
             # MWCC drops a static function that nothing references, which would otherwise pass unnoticed
@@ -257,6 +263,7 @@ def main():
         if args.mismatches and all(status == "MATCH" for status in row.values()):
             continue
         print(f"{name:{width}s}  " + "  ".join(f"{row.get(c, '-'):>12s}" for c in compilers))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

@@ -65,8 +65,9 @@ lib/dwc/src/sc/dwc_sc.c:
     .bss        start:0x021c1e28 end:0x021c23d4
 
 lib/dwc/src/sc/dwc_competition.c:
-    .text       start:0x021bda1c end:0x021beaa0
-    .data       start:0x021c10fc end:0x021c1514
+    complete
+    .text       start:0x021bda1c end:0x021be474
+    .data       start:0x021c10fc end:0x021c12cc
     .bss        start:0x021c23d4 end:0x021c2454
 
 lib/dwc/src/gdb/gdb.c:
@@ -79,3 +80,8 @@ lib/dwc/src/auth/dwc_auth.c:
     .rodata     start:0x021bfd38 end:0x021bfe44
     .data       start:0x021c1ab8 end:0x021c1ca0
     .bss        start:0x021c24dc end:0x021c2560
+
+lib/dwc/src/sc/dwc_competition_soap.c:
+    complete
+    .text       start:0x021be474 end:0x021beaa0
+    .data       start:0x021c12cc end:0x021c1514

@@ -139,8 +139,7 @@ static u32 sArpWaits[6] = { 1000, 1500, 2000, 2500, 3000, 3500 };
 #define CPS_SNAP_HEADER ((u8 *)"\xaa\xaa\x03\x00\x00\x00\x08\x00")
 
 // MWCC sorts the file's objects by size before it lays them out, and the order the declarations below are in gives
-// the ROM's layout. The LAN buffer's indices and length and the receiving thread's wait are volatile: the wireless
-// driver's receive callback reads and changes them at interrupt time
+// the ROM's layout
 static u8 sSendFailed;
 static u8 sIpCollision;
 static u16 sMyMss;
@@ -155,10 +154,10 @@ static void (*sScavengerCallback)(void);
 static u32 sLeaseTime;
 static u8 *sLanBuf;
 static u32 sYieldWait;
-static volatile u32 sLanRead;
+static volatile u32 sLanRead; // the receiving thread advances it while the receive callback reads it, at interrupt time
 static BOOL (*sAddressCheck)(void);
 void *(*CPSiAlloc)(u32 size);
-static volatile u32 sLanWrite;
+static volatile u32 sLanWrite; // advanced by the wireless driver's receive callback, at interrupt time
 static u32 sDhcpXid;
 CPSInAddr CPSGatewayIp;
 static CPSInAddr sRequestedIp;
@@ -167,9 +166,9 @@ void (*CPSiFree)(void *ptr);
 CPSInAddr CPSNetMask;
 static CPSInAddr sDhcpServerIp;
 CPSInAddr CPSMyIp;
-static OSThread *volatile sRecvWaiter;
+static OSThread *volatile sRecvWaiter; // read by the receive callback, at interrupt time, to wake the thread
 static BOOL sCalmDown;
-static volatile u32 sLanBufLen;
+static volatile u32 sLanBufLen; // read by the receive callback, at interrupt time, while CPS_Cleanup clears it
 static u8 sMyMac[6];
 CPSInAddr CPSDnsIp[2];
 MATHRandContext32 CPSiRand;
@@ -256,15 +255,12 @@ static BOOL CPSi_LinkIsOn(void) {
 
 // CPS_Startup
 void CPS_Startup(CPSConfig *config) {
-    u64 seed;
-
     OSi_ReferSymbol(CPSi_Signature);
-    if (config->random_seed) {
-        seed = config->random_seed;
+    if (config->random_seed != 0) {
+        MATH_InitRand32(&CPSiRand, config->random_seed);
     } else {
-        seed = OS_GetTick();
+        MATH_InitRand32(&CPSiRand, OS_GetTick());
     }
-    MATH_InitRand32(&CPSiRand, seed);
     if (config->alloc && config->free) {
         CPSiAlloc = config->alloc;
         CPSiFree = config->free;
@@ -674,38 +670,40 @@ static u8 *CPSi_ResolveMac(CPSInAddr ip) {
 
 // CPSi_UpdateArp: refreshes an address's entry, or takes a free or the oldest one for it when add is set
 static void CPSi_UpdateArp(u8 *mac, CPSInAddr ip, BOOL add) {
-    u16 now;
     u32 i;
+    u32 victim;
+    u16 now;
+    u16 oldest;
 
     if (ip == CPS_LOOPBACK_ADDR || ip == CPSMyIp || !CPSi_IsOnLink(ip) || CPSi_IsMulticast(ip)) {
         return;
     }
     now = CPS_NOW();
     for (i = 0; i < CPS_ARP_CACHE_SIZE; i++) {
-        if (sArpCache[i].ip == ip) {
+        if (ip == sArpCache[i].ip) {
             sArpCache[i].time = now;
             MI_CpuCopy(mac, sArpCache[i].mac, 6);
             return;
         }
     }
-    if (add) {
-        u32 victim = 0;
-        u16 oldest = 0;
-
-        for (i = 0; i < CPS_ARP_CACHE_SIZE; i++) {
-            if (sArpCache[i].ip == 0) {
-                victim = i;
-                break;
-            }
-            if ((s16)(now - sArpCache[i].time) > oldest) {
-                oldest = now - sArpCache[i].time;
-                victim = i;
-            }
-        }
-        sArpCache[victim].ip = ip;
-        MI_CpuCopy(mac, sArpCache[victim].mac, 6);
-        sArpCache[victim].time = now;
+    if (!add) {
+        return;
     }
+    oldest = 0;
+    victim = 0;
+    for (i = 0; i < CPS_ARP_CACHE_SIZE; i++) {
+        if (sArpCache[i].ip == 0) {
+            victim = i;
+            break;
+        }
+        if ((s16)(now - sArpCache[i].time) > oldest) {
+            oldest = now - sArpCache[i].time;
+            victim = i;
+        }
+    }
+    sArpCache[victim].ip = ip;
+    MI_CpuCopy(mac, sArpCache[victim].mac, 6);
+    sArpCache[victim].time = now;
 }
 
 // CPSi_SendEther: puts the Ethernet header in front of buf and sends the frame to the next hop
@@ -775,12 +773,16 @@ static void CPSi_SendIp(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u
 
         while (len > CPS_IP_MTU) {
             CPSi_SendIpPacket(buf, 0, p, CPS_IP_MTU, ip, 0x2000 | offset);
-            offset += CPS_IP_MTU / 8;
             p += CPS_IP_MTU;
             len -= CPS_IP_MTU;
+            offset += CPS_IP_MTU / 8;
         }
         if (len != 0) {
-            CPSi_SendIpPacket(buf, 0, p, len, ip, dataLen != 0 ? (0x2000 | offset) : offset);
+            if (dataLen != 0) {
+                CPSi_SendIpPacket(buf, 0, p, len, ip, 0x2000 | offset);
+            } else {
+                CPSi_SendIpPacket(buf, 0, p, len, ip, offset);
+            }
             offset += len / 8;
             len = 0;
         }
@@ -789,9 +791,9 @@ static void CPSi_SendIp(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u
         u32 chunk = CPS_IP_MTU - len;
 
         CPSi_SendIpPacket(buf, len, data, chunk, ip, 0x2000 | offset);
-        offset += CPS_IP_MTU / 8;
         data += chunk;
         dataLen -= chunk;
+        offset += CPS_IP_MTU / 8;
         len = 0;
     }
     if (len + dataLen != 0) {
@@ -1677,9 +1679,6 @@ static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated) {
     CPSInAddr src;
     u32 i;
     u32 end;
-    u16 last;
-    u32 j;
-    u16 covered;
     CPSIpHeader *whole;
 
     *allocated = FALSE;
@@ -1707,7 +1706,7 @@ static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated) {
             return NULL;
         }
         reassembly = free;
-        free->buf = CPSiAlloc(headerLen + CPS_REASSEMBLY_SIZE + sizeof(CPSEtherHeader));
+        free->buf = CPSiAlloc(CPS_REASSEMBLY_SIZE + sizeof(CPSEtherHeader) + headerLen);
         if (free->buf == NULL) {
             return NULL;
         }
@@ -1732,20 +1731,19 @@ static CPSIpHeader *CPSi_Reassemble(CPSIpHeader *ip, BOOL *allocated) {
     reassembly->end[reassembly->count] = end;
     reassembly->count++;
     MI_CpuCopy((u8 *)ip + headerLen, reassembly->data + (offset << 3), len);
-    last = reassembly->last;
-    if (last == 0) {
+    if (reassembly->last == 0) {
         return NULL;
     }
-    covered = 0;
-    for (j = 0; j < reassembly->count;) {
-        if (reassembly->start[j] <= covered && covered < reassembly->end[j]) {
-            covered = reassembly->end[j];
-            j = 0;
+    offset = 0;
+    for (i = 0; i < reassembly->count;) {
+        if (reassembly->start[i] <= offset && offset < reassembly->end[i]) {
+            offset = reassembly->end[i];
+            i = 0;
         } else {
-            j++;
+            i++;
         }
     }
-    if (covered < last) {
+    if (offset < reassembly->last) {
         return NULL;
     }
     whole = (CPSIpHeader *)(reassembly->buf + sizeof(CPSEtherHeader));
@@ -2138,12 +2136,14 @@ void CPS_SocConsume(u32 len) {
 
 // CPSi_TcpSendSegments: sends data in segments while the window lasts, or a byte to probe a closed window
 static u32 CPSi_TcpSendSegments(u8 *data, u32 len, CPSSoc *soc, BOOL probe) {
-    u32 window = 1;
     u32 sent;
+    u32 window;
     u32 segments;
     u32 budget;
 
-    if (!probe) {
+    if (probe) {
+        window = 1;
+    } else {
         window = soc->remote_win;
     }
     segments = soc->segments;
@@ -2531,7 +2531,7 @@ static void CPSi_SendDelayedAcks(void) {
             if (waited >= CPS_ACK_DELAY) {
                 CPSi_SendAck(soc, 1);
             } else if (wait > CPS_ACK_DELAY - waited) {
-                wait = CPS_ACK_DELAY - waited;
+                wait = (u32)CPS_ACK_DELAY - waited;
             }
         }
     }
@@ -2557,8 +2557,6 @@ static void CPSi_AckAlarm(void *arg) {
 
 // CPSi_DhcpMakeMessage: the BOOTP header and the options every message has, returning where the rest go
 static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type) {
-    u8 *option;
-
     MI_CpuFill8(buf, 0, 0xec);
     *(u16 *)buf = 0x101;
     buf[2] = 6;
@@ -2568,24 +2566,25 @@ static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type) {
     *(u16 *)(buf + 0xec) = 0x8263;
     *(u16 *)(buf + 0xee) = 0x6353;
     *(u16 *)(buf + 0xf0) = 0x135;
-    buf[0xf2] = type;
-    buf[0xf3] = 61;
-    buf[0xf4] = 7;
-    buf[0xf5] = 1;
-    MI_CpuCopy(sMyMac, buf + 0xf6, 6);
-    option = buf + 0xfc;
+    buf += 0xf2;
+    *buf++ = type;
+    *buf++ = 61;
+    *buf++ = 7;
+    *buf++ = 1;
+    MI_CpuCopy(sMyMac, buf, 6);
+    buf += 6;
     if (type != DHCP_RELEASE) {
-        option[0] = 12;
-        option[1] = 10;
-        MI_CpuCopy("NintendoDS", option + 2, 10);
-        option[12] = 55;
-        option[13] = 3;
-        option[14] = 1;
-        option[15] = 3;
-        option[16] = 6;
-        option += 17;
+        *buf++ = 12;
+        *buf++ = 10;
+        MI_CpuCopy("NintendoDS", buf, 10);
+        buf += 10;
+        *buf++ = 55;
+        *buf++ = 3;
+        *buf++ = 1;
+        *buf++ = 3;
+        *buf++ = 6;
     }
-    return option;
+    return buf;
 }
 
 // CPSi_Pad: fills the rest of the first size bytes, of which used are taken
@@ -2640,74 +2639,77 @@ static u32 CPSi_DhcpSendRequest(int mode) {
 
 // CPSi_DhcpWait: waits for the answer to a message and takes its options
 static int CPSi_DhcpWait(u32 xid, int try) {
+    u8 *msg;
+    u8 *end;
+    u32 len;
+    u8 code;
     s32 start;
-    s32 timeout;
+    s32 timeout = sDhcpWaits[try] * 7;
     int result;
 
-    timeout = sDhcpWaits[try] * 7;
     start = CPS_NOW();
     result = DHCP_WAIT_NONE;
 
     while (sLinkIsOn() && result == DHCP_WAIT_NONE && CPS_NOW() - start < timeout) {
-        u32 len;
-        u8 *msg;
-
         if (CPS_SocGetLength() == 0) {
             CPSi_Yield();
-            continue;
-        }
-        msg = CPS_SocRead(&len);
-        if (len > 0xf0 && msg[0] == 2 && xid == CPS_GET32(msg + 4) &&
-            !CPSi_MacDiffers((u16 *)(msg + 28), (u16 *)sMyMac)) {
-            CPSInAddr yourIp;
-            u8 *end;
+        } else {
+            msg = CPS_SocRead(&len);
+            if (len > 0xf0 && msg[0] == 2 && xid == CPS_GET32(msg + 4) &&
+                !CPSi_MacDiffers((u16 *)(msg + 28), (u16 *)sMyMac)) {
+                CPSInAddr yourIp;
 
-            result = DHCP_WAIT_OTHER;
-            yourIp = CPS_BE32(msg + 16);
-            end = msg + len;
-            if (msg[0xec] == 0x63 && msg[0xed] == 0x82 && msg[0xee] == 0x53 && msg[0xef] == 0x63) {
-                u8 *option = msg + 0xf0;
-                u32 staticDns = CPSMode & CPS_MODE_STATIC_DNS;
-                u8 code;
+                result = DHCP_WAIT_OTHER;
+                yourIp = CPS_BE32(msg + 16);
+                end = msg + len;
+                msg += 0xec;
+                if (*msg++ == 0x63 && *msg++ == 0x82 && *msg++ == 0x53 && *msg++ == 0x63) {
 
-                while (option < end && (code = *option++) != 0xff) {
-                    if (code == 0) {
-                        continue;
-                    }
-                    switch (code) {
-                    case 1:
-                        CPSNetMask = CPS_BE32(option + 1);
-                        break;
-                    case 3:
-                        CPSGatewayIp = CPS_BE32(option + 1);
-                        break;
-                    case 6:
-                        if (!staticDns) {
-                            CPSDnsIp[1] = option[0] < 8 ? 0 : CPS_BE32(option + 5);
-                            CPSDnsIp[0] = CPS_BE32(option + 1);
+                    while (msg < end && (code = *msg++) != 0xff) {
+                        if (code != 0) {
+                            switch (code) {
+                            case 1:
+                                CPSNetMask = CPS_BE32(msg + 1);
+                                break;
+                            case 3:
+                                CPSGatewayIp = CPS_BE32(msg + 1);
+                                break;
+                            case 6:
+                                if (!(CPSMode & CPS_MODE_STATIC_DNS)) {
+                                    if (msg[0] < 8) {
+                                        CPSDnsIp[1] = 0;
+                                    } else {
+                                        CPSDnsIp[1] = CPS_BE32(msg + 5);
+                                    }
+                                    CPSDnsIp[0] = CPS_BE32(msg + 1);
+                                }
+                                break;
+                            case 51:
+                                sLeaseTime = CPS_BE32(msg + 1);
+                                break;
+                            case 53:
+                                switch (msg[1]) {
+                                case DHCP_OFFER:
+                                    sRequestedIp = yourIp;
+                                    result = DHCP_WAIT_OFFER;
+                                    break;
+                                case DHCP_ACK:
+                                    CPSMyIp = yourIp;
+                                    result = DHCP_WAIT_ACK;
+                                    break;
+                                }
+                                break;
+                            case 54:
+                                sDhcpServerIp = CPS_BE32(msg + 1);
+                                break;
+                            }
+                            msg += msg[0] + 1;
                         }
-                        break;
-                    case 51:
-                        sLeaseTime = CPS_BE32(option + 1);
-                        break;
-                    case 53:
-                        if (option[1] == DHCP_OFFER) {
-                            sRequestedIp = yourIp;
-                            result = DHCP_WAIT_OFFER;
-                        } else if (option[1] == DHCP_ACK) {
-                            CPSMyIp = yourIp;
-                            result = DHCP_WAIT_ACK;
-                        }
-                        break;
-                    case 54:
-                        sDhcpServerIp = CPS_BE32(option + 1);
-                        break;
                     }
-                    option += *option + 1;
                 }
             }
+            CPS_SocConsume(len);
         }
-        CPS_SocConsume(len);
     }
     return result;
 }
@@ -2956,38 +2958,39 @@ static s32 CPSi_DnsLookup(const u8 *name, CPSInAddr server, u16 id) {
 // CPS_Resolve: the address of a name, or of a dotted address, or 0
 CPSInAddr CPS_Resolve(const char *name) {
     s32 result = 0;
-    struct {
-        u8 usable[2];
-        u16 id[2];
-    } servers;
+    u16 id[2];
+    u8 usable[2];
     int round = 0;
     int i;
 
-    servers.id[0] = MATH_Rand32(&CPSiRand, 0x10000);
-    servers.id[1] = MATH_Rand32(&CPSiRand, 0x10000);
+    id[0] = MATH_Rand32(&CPSiRand, 0x10000);
+    id[1] = MATH_Rand32(&CPSiRand, 0x10000);
     if (CPSi_ParseIp((const u8 *)name, (CPSInAddr *)&result)) {
         return result;
     }
-    servers.usable[0] = TRUE;
-    servers.usable[1] = TRUE;
+    usable[0] = TRUE;
+    usable[1] = TRUE;
     for (; round < 3; round++) {
         for (i = 0; i < 2; i++) {
             CPSInAddr hop;
 
-            if (!servers.usable[i]) {
+            if (!usable[i]) {
                 continue;
             }
-            if (CPSDnsIp[i] == 0 || (hop = CPSi_NextHop(CPSDnsIp[i])) == 0 ||
-                (CPSi_LookupMac(hop) == NULL && CPSi_ResolveMac(hop) == NULL)) {
-                servers.usable[i] = FALSE;
+            if (CPSDnsIp[i] == 0 || (hop = CPSi_NextHop(CPSDnsIp[i])) == 0) {
+                usable[i] = FALSE;
                 continue;
             }
-            result = CPSi_DnsLookup((const u8 *)name, CPSDnsIp[i], servers.id[i]);
+            if (CPSi_LookupMac(hop) == NULL && CPSi_ResolveMac(hop) == NULL) {
+                usable[i] = FALSE;
+                continue;
+            }
+            result = CPSi_DnsLookup((const u8 *)name, CPSDnsIp[i], id[i]);
             if (result != 0 && result != -1) {
                 goto done;
             }
             if (result == -1) {
-                servers.usable[i] = FALSE;
+                usable[i] = FALSE;
             }
         }
     }

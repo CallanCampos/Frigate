@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)
+  and cast it inside. (matching.md: "A handle parameter cast inside")
 - An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result
   again, `p = NNSi_G2dUnpackOffset(p, base)`. (matching.md: "A macro that assigns")
 - Rows of a matrix product whose registers rotate: the row of `a` in locals and a destination pointer of its own.
@@ -209,6 +211,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
+  (matching.md: "A `static inline` accessor that returns a field cast")
+- A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
+  (matching.md: "The rounds of a hash written as statements")
 - A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
   of the block's stores between those two. (matching.md: "Whether a zero stored to two fields keeps a saved register")
 - A stack frame for a wide parameter where the original keeps it in registers and computes an expression again after
@@ -284,6 +290,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Instructions in another order (scheduling)
 
+- Two field loads in the other order, with every other instruction right: the field the original loads first may be
+  `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
 - A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
   byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
 - `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
@@ -505,6 +513,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   to a member of a struct local")
 - Two constants on one field folded into one (`subs #0xff` for `- 0x100 + 1`) where the original keeps both: write
   them as two statements on the field. (matching.md: "Two constants applied to a field")
+- A header size folded into a record's offset (0x44 and 0x10 as 0x54), or a field offset built fresh where the
+  original derives it from the 0x44 it holds: an offset local that starts at `sizeof(Header)` and takes one `+=` per
+  step. (matching.md: "An offset local stepped by statements")
 - A narrowing (`lsl`/`lsr` or `asr` pair) comes from a `u8`/`u16`/`s16` local, parameter or return type. A caller narrows
   arguments for narrow parameters, so an argument passed without them is for a wider one. (matching.md: "narrows an argument")
 - A parameter passed on to a `u8` parameter without shifts is a `u8` too. (matching.md: "narrows an argument")
@@ -629,6 +640,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- An early exit 8 bytes short, or a call's result returned through another layout: give the exit its own call
+  and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
   it with fewer registers pushed: forward gotos to labelled tail blocks. (matching.md: "chosen by a flag tested")
 - `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
@@ -781,6 +794,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Switches
 
+- A switch's compares or jump table off by one case: stack the SDK's empty warning cases on `default:`
+  (`case 3: case 4: default:`). (matching.md: "the empty labels set the jump table's range")
+- An extra block that sets the default's value in a case: let the case fall through into `default`, and stack an
+  empty case on `default:` where the SDK compiled out a warning. (matching.md: "A case that falls through")
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
 - `case -1:` tested on its own before a jump table the original folds it into (`adds r0, #1; cmp`): the switch is on
   a `u32`; make the value (or the function returning it) signed. (matching.md: "takes `-1` in")
@@ -837,6 +854,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- A local array initializer's bytes in a `.rodata` section of their own: copy a struct from a static instead.
+  (matching.md: "A local array with an initializer goes in a `.rodata` section of its own")
+- A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
+  it a zero initializer (`= 0`, `= NULL`, `= { 0 }`); one the ROM has in `.data` takes `#pragma explicit_zero_data on`.
+  (matching.md: "the same holds for zero")
 - Odd instructions at the end of a same-size diff (`add sp, #0`, `.byte 0xff`): literal pool words, which can be a
   wrong constant; decode them before blaming registers. (matching.md: "decode the words before counting")
 - Live `.data` statics separated by unused records: one initialized array retains every entry even when code indexes
@@ -847,6 +869,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A literal laid out before every surviving use of it: code the original link dead-stripped. Each code literal has a
   section of its own, and a static called from code the optimizer removes is still emitted with its literals.
   (matching.md: "Each literal that code creates")
+- A table of string pointers before its own strings, in the middle of a file's `.data`, where ours lays the strings
+  out first: the table starts another original file (under `-ipa function` only a table above a file's first function
+  comes first). (matching.md: "comes before its strings only when")
 - Static data is sorted by size by a heapsort. Objects of 64 bytes or more, local initializers and unreferenced
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the

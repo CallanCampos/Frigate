@@ -19,6 +19,7 @@ Rules checked (docs/code-standards.md):
   todo          8   TODO, FIXME or XXX in a comment
   narration     8   a comment that narrates the matching rather than the code
   bug           10  a // BUG: with no #ifdef BUGFIX in the next lines
+  split-decl    11  a comment between a declaration's specifiers and the rest (`static // ...`)
   row           12  a row of docs/nonmatching-functions.md that narrates its history
 """
 import argparse
@@ -125,6 +126,8 @@ def check_c(path, lines):
             if re.match(r"\s*BUG\b", c) and not any(re.search(r"#\s*(if|else).*BUGFIX|#\s*else", l)
                                                      for l in lines[max(0, i - 10):i + 15]):
                 add("bug", "// BUG: with no #ifdef BUGFIX fix after it")
+        if re.match(r"\s*(?:(?:static|inline|extern|const)\s+)*(?:static|inline|extern|const)\s*//", line):
+            add("split-decl", "a comment splits the declaration's specifiers from it: put the comment above")
     for i, name in protos:
         if name not in defined and not allowed(lines, i, "prototype"):
             found.append((i + 1, "prototype", f"`{name}` is another file's: declare it in its owner's header"))

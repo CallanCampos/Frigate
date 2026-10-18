@@ -38,3 +38,8 @@ void Flagged_Comments(int x) {
     // BUG: x is never checked
     OtherFile_Function(x);
 }
+
+static // A comment between the specifiers and the name
+int Flagged_SplitDeclaration(void) {
+    return 0;
+}
