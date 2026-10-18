@@ -26,6 +26,75 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the port is Frigate
+
+- **Upstream:** `045e97b90` (merge of PR #364), which `main` merged before this task (`5ad9a1e1d`); no sync in this
+  task.
+- **Port:** `61a528143`, on the branch `frigate-identity` from `5ad9a1e1d`; this entry is the commit after it.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`), from a clean `build/`. Nothing outside `port/`
+  changed but the port's own `.github/README.md` and `.github/workflows/port-*.yml`, so no game-changes row and no
+  `check_mwcc_neutral.py` run.
+- **Host build:** arm64 macOS, Black 2 and White 2 RelWithDebInfo from clean build directories, and the macOS app and
+  disk image of each version; not pushed, so no CI run (Linux unbuilt).
+- **Tests:** T0 as above. The test results are from the tree that became `61a528143`, the apps' from that commit
+  with nothing uncommitted (version `0.0.2618`, revision `61a528143172`).
+  - T2, T3, T4, T6: Black 2, all 234 `ctest` tests pass (`ctest -j4`, with the clone's built `pbw-oracle` copied into
+    `build/port/oracle`), none skipped; `oracle_opening` and `oracle_title` failed at first for want of the ROM build's
+    link map (`build/b2_us/arm9.o.xMAP`, which the ROM build was still writing) and passed on a rerun once it was there.
+    White 2, all 232 pass, none skipped, the oracle's included (`oracle_opening`, `oracle_title`, `oracle_continue`,
+    `oracle_port_save`). On macOS `app_make_app`, `app_message_log` and `app_package_macos_out` pass in both, with the
+    new checks of the Info.plist's names and of `--help`.
+  - The apps: `plutil` reads `CFBundleName` Frigate, `CFBundleDisplayName` Frigate Black 2 and Frigate White 2,
+    `CFBundleIdentifier` `io.github.callancampos.frigate.black2` and `.white2`, `CFBundleExecutable`
+    `frigate-black2` and `frigate-white2`, and the copyright line; `plutil -lint` and
+    `codesign --verify --deep --strict` pass. Each app's program, run from inside the app with `--headless
+    --frames 300 --rom orig/baserom_<version>.nds --save-dir` a scratch directory, loads the app's own SDL3
+    (`DYLD_PRINT_LIBRARIES`), finds the decomp's dump and writes its screens after frame 300, status 0.
+    `package_macos.sh` makes `Frigate Black 2 0.0.2618.dmg` and `Frigate White 2 0.0.2618.dmg` (5.1 MB each), whose
+    volumes are named after the apps and hold the app and a link to `/Applications`.
+  - `--help` prints "Frigate — Pokémon Black 2", the description and the disclaimer before the usage.
+  - T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no game code changed.
+- **Trap stubs:** 624 function stubs and 48 data placeholders in each version (`gen_stubs`), against the 574 and 63
+  the last entry measured: the difference came with the upstream code `main` merged before this task (`045e97b90`);
+  this task changes no game code.
+- **64-bit warnings:** unchanged: no game or `lib/` code changed.
+- **Work done:** the user named the port **Frigate** and asked that the code be easy for modders to read; both are
+  standing rules in port/CLAUDE.md ("The port is Frigate", "Code that modders can read").
+  - What the player sees: the programs are `frigate-black2` and `frigate-white2` (were `pokeblack2`, `pokewhite2`);
+    the window's title is "Frigate — Pokémon Black 2" ("Pokémon White 2"), and so is a no-ROM alert's; `--help` opens
+    with the name, the one-line description and that Frigate is not affiliated with Nintendo, Game Freak, Creatures
+    or The Pokémon Company. Saves go to `~/Library/Application Support/Frigate` (`$XDG_DATA_HOME/Frigate` or
+    `~/.local/share/Frigate` on Linux, `%APPDATA%\Frigate` on Windows) and an app's log to
+    `~/Library/Logs/Frigate/<program>.log` (were `pokebw2-native`; nothing was released, so nothing migrates). The
+    ROM's variable is `FRIGATE_ROM` (was `POKEBW2_ROM`, no fallback), `PORT_ROM_ENVIRONMENT_VARIABLE` in
+    `port/hal/rom/port_rom.h`.
+  - The macOS app is `Frigate Black 2.app` (`Frigate White 2.app`), built by the target `frigate-black2_app`
+    (`frigate-white2_app`): `CFBundleName` Frigate, `CFBundleDisplayName` Frigate Black 2, the bundle identifier
+    `io.github.callancampos.frigate.black2` (`.white2`; was the placeholder `com.example.pokebw2-native.<program>`),
+    and an `NSHumanReadableCopyright` with the description and the disclaimer, which the About window shows.
+    `make_app.sh` takes the product's name as `--name`; `package_macos.sh` reads the app's name and target from the
+    build's cache (`PORT_MACOS_APP_NAME`, `PORT_MACOS_APP_TARGET`) and names the disk image and its volume after the
+    app: `Frigate Black 2 0.0.N.dmg`.
+  - The names live in one place each: `PORT_PRODUCT_NAME` in `port/hal/os/port_app.h` for the C, `PORT_PRODUCT_NAME`,
+    `PORT_PROGRAM` and `PORT_GAME_NAME` at the top of `port/CMakeLists.txt` (`project(frigate)`), the app's names in
+    `port/cmake/macos_app.cmake`. The ROM manifest gained `port_rom_manifest_game` ("Pokémon Black 2"), which the
+    window's title and `--help` use.
+  - CI's workflows show as "Frigate CI" and "Frigate upstream sync"; the landing page (`.github/README.md`),
+    port/README.md, PLAN.md's title and the oracle's tools name Frigate, and say where the port stands today. ADR
+    0010 has a note with the new names; past entries here, the research notes and the ADRs' decisions keep theirs.
+  - Kept, as port/CLAUDE.md says: the layer's names (`port/`, `port_`, `PORT_*`, `port_*` targets, `pokebw2_game`,
+    `pbw-oracle`, `pbwinput`, the `port-*.yml` files, the "port:" prefix of messages), the repository
+    `CallanCampos/pokebw2-native` and its clone's directory, and upstream's own files (its README's "Native port
+    notes", the ROM build's `pokeblack2_us.nds`).
+  - New checks: `app_make_app` reads the app's `CFBundleName`, `CFBundleDisplayName`, `CFBundleIdentifier` and
+    `CFBundleExecutable` back; `app_message_log` checks that `--help` starts with the name and the disclaimer;
+    `card_backup_save_path` checks the save directory's `Frigate`.
+- **Next:** as the last entry: a save with an adventure made by the port, once overlay 36 lets it into the field. The
+  landing page's logo and artwork are a separate task, under way.
+- **Blockers:** unchanged: overlay 36 (issue #83) gates phase 3, the overworld; overlays 11 and 182 (Wi-Fi, Download
+  Play) only matter from phase 7.
+
 ## 2026-10-17: saves, after review: the same save at every run, and the port's save checked on melonDS
 
 - **Upstream:** `615939e25`, as in the last entry; no sync in this task.
