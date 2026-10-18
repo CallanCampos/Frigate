@@ -55,17 +55,22 @@ void port_gamepad_resolve(const PortGamepadMap *map, const SDL_GamepadButtonLabe
 // direction or diagonal until the stick leans about 4 degrees past its sector's edge
 uint32_t port_gamepad_stick(int x, int y, int deadZone, uint32_t previous);
 
-// A pad's DS buttons now and at the last poll, for port_gamepad_pick
+// A pad's DS buttons now and at the last poll, for port_gamepad_pick, and which of the ones it holds now its stick only
+// drifts into: pressed from near the dead zone's edge, not pushed beyond halfway from there to the end of its travel
 typedef struct PortGamepadState {
     SDL_JoystickID id;
     uint32_t held;
     uint32_t previous;
+    uint32_t drift;
 } PortGamepadState;
 
 // Which pad drives the game, given the one that drove it last (0 for none) and every open pad in the order they were
 // connected: the pad that drove keeps driving while it holds anything; when it holds nothing, the first pad that
-// presses something new (a button it didn't hold at the last poll) takes over. A pad that drove and holds nothing
-// stays the one that drives until another presses something. 0 when no pad has driven, or the one that did is gone
+// presses something new (a button it didn't hold at the last poll) takes over. While the pad that drove is still
+// connected, a stick's drift doesn't take the game from it: a stick resting near the dead zone's edge (a pad on a desk,
+// a worn stick) presses once and holds that press, where a deliberate push goes well past it. A pad that drove and
+// holds nothing stays the one that drives until another presses something. 0 when no pad has driven, or the one that
+// did is gone
 SDL_JoystickID port_gamepad_pick(SDL_JoystickID driver, const PortGamepadState *pads, int count);
 
 // Writes which of the pad's buttons are the DS's A, B, X and Y under press (port_gamepad_resolve), by the labels SDL

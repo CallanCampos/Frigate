@@ -292,7 +292,7 @@ static void TestMapEdges(void) {
 
 static void TestPick(void) {
     // Pads 1 and 2, connected in that order
-    PortGamepadState pads[2] = { { 1, 0, 0 }, { 2, 0, 0 } };
+    PortGamepadState pads[2] = { { 1, 0, 0, 0 }, { 2, 0, 0, 0 } };
 
     Expect("nothing pressed, no pad drives", port_gamepad_pick(0, pads, 2) == 0);
     pads[1].held = PORT_INPUT_A;
@@ -314,12 +314,27 @@ static void TestPick(void) {
     pads[1].held = PORT_INPUT_B;
     Expect("two new presses, no driver: the first connected", port_gamepad_pick(0, pads, 2) == 1);
     Expect("two new presses, the second driver idle: the first connected",
-           port_gamepad_pick(2, (PortGamepadState[]){ { 1, PORT_INPUT_A, 0 }, { 2, 0, 0 } }, 2) == 1);
+           port_gamepad_pick(2, (PortGamepadState[]){ { 1, PORT_INPUT_A, 0, 0 }, { 2, 0, 0, 0 } }, 2) == 1);
     Expect("the driver is gone, nothing new",
-           port_gamepad_pick(2, (PortGamepadState[]){ { 1, PORT_INPUT_B, PORT_INPUT_B } }, 1) == 0);
+           port_gamepad_pick(2, (PortGamepadState[]){ { 1, PORT_INPUT_B, PORT_INPUT_B, 0 } }, 1) == 0);
     Expect("the driver is gone, a new press",
-           port_gamepad_pick(2, (PortGamepadState[]){ { 1, PORT_INPUT_B, 0 } }, 1) == 1);
+           port_gamepad_pick(2, (PortGamepadState[]){ { 1, PORT_INPUT_B, 0, 0 } }, 1) == 1);
     Expect("no pads", port_gamepad_pick(3, pads, 0) == 0);
+
+    // A stick's drift (a press from near the dead zone's edge) doesn't take the game from a pad that is still
+    // connected; a button's press does, and with no pad driving, a drifting stick's starts
+    Expect("a stick's drift, the driver idle",
+           port_gamepad_pick(1, (PortGamepadState[]){ { 1, 0, 0, 0 }, { 2, PORT_INPUT_RIGHT, 0, PORT_INPUT_RIGHT } },
+                             2) == 1);
+    Expect("a stick's drift and a button's press, the driver idle",
+           port_gamepad_pick(
+               1, (PortGamepadState[]){ { 1, 0, 0, 0 }, { 2, PORT_INPUT_RIGHT | PORT_INPUT_A, 0, PORT_INPUT_RIGHT } },
+               2) == 2);
+    Expect("a stick's drift, no pad driving",
+           port_gamepad_pick(0, (PortGamepadState[]){ { 1, 0, 0, 0 }, { 2, PORT_INPUT_UP, 0, PORT_INPUT_UP } }, 2) ==
+               2);
+    Expect("a stick's drift, the driver gone",
+           port_gamepad_pick(1, (PortGamepadState[]){ { 2, PORT_INPUT_UP, 0, PORT_INPUT_UP } }, 1) == 2);
 }
 
 // --- The description ------------------------------------------------------------------------------------------------
@@ -531,6 +546,40 @@ static void TestDeskPad(void) {
     Expect("desk: no pad open", port_gamepads_count() == 0);
 }
 
+// The same desk pad in the other order: the pad in use taps a button and lets go, then the desk pad's stick reaches the
+// edge with nothing held anywhere. A stick's drift doesn't take the game from a pad that is still connected, so the
+// desk pad never drives, and the first pad's next press is the game's
+static void TestDeskPadAfterTap(void) {
+    const SDL_JoystickID a = AttachPad("test pad A", 0, 0);
+    const SDL_JoystickID b = AttachPad("test pad B", 0, 0);
+    SDL_Joystick *padA = SDL_OpenJoystick(a);
+    SDL_Joystick *padB = SDL_OpenJoystick(b);
+    int bDrives = 0;
+    uint32_t held = 0;
+
+    Frame();
+    SDL_SetJoystickVirtualButton(padA, SDL_GAMEPAD_BUTTON_EAST, true);
+    ExpectHeld("desk after a tap: A presses", Frame(), PORT_INPUT_A);
+    SDL_SetJoystickVirtualButton(padA, SDL_GAMEPAD_BUTTON_EAST, false);
+    ExpectHeld("desk after a tap: A lets go", Frame(), 0);
+    for (int f = 0; f < 60; f++) {
+        SDL_SetJoystickVirtualAxis(padB, 0, (Sint16)(16384 + sNoise[f % 16]));
+        held = Frame();
+        bDrives += port_gamepads_driver() == b;
+    }
+    Expect("desk after a tap: B's stick never drives", bDrives == 0);
+    ExpectHeld("desk after a tap: nothing held", held, 0);
+    SDL_SetJoystickVirtualButton(padA, SDL_GAMEPAD_BUTTON_SOUTH, true);
+    ExpectHeld("desk after a tap: A's next press", Frame(), PORT_INPUT_B);
+    Expect("desk after a tap: A drives", port_gamepads_driver() == a);
+
+    SDL_CloseJoystick(padA);
+    SDL_CloseJoystick(padB);
+    SDL_DetachVirtualJoystick(a);
+    SDL_DetachVirtualJoystick(b);
+    Frame();
+}
+
 // Nine pads: eight are open and the ninth waits; when one of the eight goes, the ninth takes its place, without being
 // connected again
 static void TestNinthPad(void) {
@@ -584,6 +633,7 @@ int main(void) {
         port_gamepads_open();
         TestVirtualPads();
         TestDeskPad();
+        TestDeskPadAfterTap();
         TestNinthPad();
         SDL_Quit();
     }

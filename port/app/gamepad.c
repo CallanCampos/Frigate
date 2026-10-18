@@ -158,7 +158,12 @@ SDL_JoystickID port_gamepad_pick(SDL_JoystickID driver, const PortGamepadState *
         }
     }
     for (int i = 0; i < count; i++) {
-        if ((pads[i].held & ~pads[i].previous) != 0) {
+        uint32_t pressed = pads[i].held & ~pads[i].previous;
+
+        if (present) {
+            pressed &= ~pads[i].drift;
+        }
+        if (pressed != 0) {
             return pads[i].id;
         }
     }
@@ -337,6 +342,16 @@ uint32_t port_gamepads_held(void) {
                                           SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTY), map->stickDeadZone,
                                           pad->stick);
             states[i].held |= stick[i];
+        }
+        states[i].drift = 0;
+        if (stick[i] != 0) {
+            const int64_t x = SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTX);
+            const int64_t y = SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTY);
+            const int64_t push = map->stickDeadZone + (SDL_JOYSTICK_AXIS_MAX - map->stickDeadZone) / 2;
+
+            if (x * x + y * y < push * push) {
+                states[i].drift = stick[i];
+            }
         }
     }
     driver = port_gamepad_pick(sDriver, states, sPadCount);

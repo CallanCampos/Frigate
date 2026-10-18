@@ -35,11 +35,12 @@ zone, and a mapping a settings file can replace later.
 - **One pad drives at a time.** Every connected pad is open, up to 8; one connected beyond them waits and is opened
   when one of them is disconnected. The pad that drives keeps driving while it holds anything; once it holds nothing,
   the first pad to press something new (a button it didn't hold at the last poll) takes over. A new press, not a held
-  one, takes over, so a button held, or a stick held near an edge (with the hysteresis above), on another pad doesn't
-  take the game from the one in use once it has pressed. What it doesn't cover: a pad whose button is stuck, or whose
-  stick rests beyond the dead zone (worn far past the 8000 SDL allows), presses once when it connects or when the
-  stick drifts out, and takes the game if the pad in use holds nothing at that moment; holding that press for good, it
-  keeps the game until it is disconnected.
+  one, takes over, so a button held on another pad doesn't take the game from the one in use once it has pressed; and
+  while that pad is connected, a stick's drift doesn't take the game from it either: a stick resting near the dead
+  zone's edge (a pad on a desk, a worn stick) presses once and holds that press, so a stick takes over only when it is
+  pushed beyond halfway from the dead zone's edge to the end of its travel. A drifting stick can still start a pad when
+  none drives. What it doesn't cover: a pad whose button is stuck presses once when it connects, and takes the game if the
+  pad in use holds nothing at that moment; holding that press for good, it keeps the game until it is disconnected.
 - The mapping, the dead zone and its hysteresis, and the choice of the pad are plain functions;
   `port/tests/app/test_gamepad.c` checks them with hand-worked values and drives SDL's virtual joysticks as pads that
   come and go (a desk pad whose stick reads noise at the dead zone's edge, nine pads at once), with SDL's drivers for
