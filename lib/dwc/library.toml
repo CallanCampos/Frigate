@@ -45,6 +45,7 @@ flags = [
 # And two files of GameSpy's server browser (overlay 11): a server's shared texts and null server, and the list's master
 # server and sorted list
 "serverbrowsing/sb_server.c" = ["-ipa file"]
+"serverbrowsing/sb_serverlist.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does

@@ -352,3 +352,9 @@ lib/dwc/src/serverbrowsing/sb_serverbrowsing.c:
     complete
     .text       start:0x02182f64 end:0x021833f8
     .data       start:0x0218b970 end:0x0218b9b0
+
+lib/dwc/src/serverbrowsing/sb_serverlist.c:
+    complete
+    .text       start:0x021833f8 end:0x02184fc8
+    .data       start:0x0218b9b0 end:0x0218ba00
+    .bss        start:0x021922a4 end:0x021922c0
