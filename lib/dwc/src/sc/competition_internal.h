@@ -2,7 +2,6 @@
 #define POKEBW2_DWC_COMPETITION_INTERNAL_H
 
 #include "types.h"
-#include "dwc/auth.h"
 #include "dwc/competition.h"
 
 // The parts of the competition client that its two files share (dwc_competition.c and dwc_competition_soap.c)
@@ -42,8 +41,8 @@ int ScClient_Begin(ScClient *client, ScClient *self);
 void ScClient_End(ScClient *client);
 // Runs the Wi-Fi library's asynchronous process for a frame
 void ScClient_RunLibrary(ScClient *client);
-// Post the three requests' SOAP messages to the service, each returning 0 or an error code; the client's function is
-// called when the answer has been read
+// Each posts a request's SOAP message to the service, returning 0 or an error code; the client's function is called
+// when the answer has been read
 int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *certificate, AuthKeys *keys,
                                ScClientFunc func, int timeout, void *userData);
 int ScClient_PostReportIntention(ScClient *client, int gameId, const char *csid, const char *ccid, int authoritative,

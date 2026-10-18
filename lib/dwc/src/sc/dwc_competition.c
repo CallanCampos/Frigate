@@ -4,9 +4,9 @@
 #include "dwc/md5.h"
 #include "nitro/std.h"
 
-// GameSpy's competition service, as the Wi-Fi library of overlay 260 talks to it: the client, the checks of its three
-// requests, and the report that the game builds. The report's numbers are big-endian, as the service reads them; its
-// first 0x44 bytes are a header. The requests' SOAP messages are in dwc_competition_soap.c. The ROM names neither
+// GameSpy's competition service, as the Wi-Fi library of overlay 260 talks to it: the client, the calls that start its
+// three requests, and the report that the game builds. The report's numbers are big-endian, as the service reads them;
+// its first 0x44 bytes are a header. The requests' SOAP messages are in dwc_competition_soap.c. The ROM names neither
 // file; both names are ours.
 
 // The last eight bytes of a GUID
