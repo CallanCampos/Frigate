@@ -2063,7 +2063,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `worldtrade.c` | `0x021d3380`–`0x021d3f9c` | 36 | complete | string at `0x021e2a18` |
 | `worldtrade_box.c` | `0x021d3f9c`–`0x021d5c48` | 58 | complete | string at `0x021e2bc0` |
 | `worldtrade_demo.c` | `0x021d5c48`–`0x021d61dc` | 6 | complete | string at `0x021e2bec` |
-| `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | partial | string at `0x021e2ca0` |
+| `worldtrade_deposit.c` | `0x021d61dc`–`0x021d77c8` | 59 | complete | string at `0x021e2ca0` |
 | `worldtrade_enter.c` | `0x021d77c8`–`0x021d8074` | 30 | complete | string at `0x021e2d34` |
 | `worldtrade_input.c` | `0x021d8074`–`0x021daeb8` | 74 | complete | string at `0x021e2dd8` |
 | `worldtrade_mypoke.c` | `0x021daeb8`–`0x021dba8c` | 27 | complete | descriptive |

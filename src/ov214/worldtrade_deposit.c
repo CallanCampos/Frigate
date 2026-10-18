@@ -118,18 +118,6 @@ static int Deposit_PokeNameSortListMake(ListMenuOption **menulist, MsgData *mons
                                         u16 *table, u8 *sinou, int num, int select, PokeDexSave *zukan);
 static u32 Deposit_BmpListMain(BmpMenuList *list, u16 *posBackup);
 
-static u16 sNameHeadTable[HEADWORD_NUM + 1] = {
-    0, 112, 184, 253, 315, 392, 463, 595, 637, 649,
-};
-
-// Not referred to
-WorldTradeSelectItem WorldTrade_SexSelectTable[] = {
-    { 0x82, 2 },
-    { 0x83, 0 },
-    { 0x84, 1 },
-    { 0x85, BMPMENULIST_CANCEL },
-};
-
 static int (*sDepositSubSeqTable[])(WorldTradeWork *wk) = {
     Deposit_SubSeqStart,
     Deposit_SubSeqMain,
@@ -150,8 +138,15 @@ static int (*sDepositSubSeqTable[])(WorldTradeWork *wk) = {
     Deposit_SubSeqMessageWait,
 };
 
-// The countries in the order of their names
-static const u16 sCountryListTbl[] = {
+static u16 sNameHeadTable[HEADWORD_NUM + 1] = {
+    0, 112, 184, 253, 315, 392, 463, 595, 637, 649,
+};
+
+// The countries in the order of their names. The explicit alignment is a guess, from the code of
+// WorldTrade_NationSortListMake, which reads the table: MWCC keeps the loop of a function that reads an aligned object
+// entered at its test (docs/matching.md). An alignment of 1, 2 or 4 gives the same code and layout, and the table's
+// address allows nothing above 4.
+static const u16 sCountryListTbl[] ATTRIBUTE_ALIGN(4) = {
     1,   2,   3,   6,   8,   9,   12,  13,  15,  16,  17,  18,  20,  21,  22,  23,  25,  27,  28,  29,  31,  33,
     34,  35,  36,  40,  42,  43,  45,  47,  48,  49,  51,  53,  54,  58,  60,  61,  62,  63,  64,  71,  72,  73,
     74,  76,  79,  80,  81,  82,  83,  84,  85,  87,  88,  90,  91,  92,  93,  94,  95,  96,  98,  99,  101, 102,
@@ -769,6 +764,14 @@ void WorldTrade_WantLevelPrint(BmpWin *win, MsgData *msgManager, int level, int 
     WorldTrade_WantLevelPrint_XY(win, msgManager, level, flag, 0, y, color, tblSelect, print);
 }
 
+// Not referred to
+WorldTradeSelectItem WorldTrade_SexSelectTable[] = {
+    { 0x82, 2 },
+    { 0x83, 0 },
+    { 0x84, 1 },
+    { 0x85, BMPMENULIST_CANCEL },
+};
+
 static const WorldTradeLevelTerm sSearchLevelMinMaxTable[SEARCH_LEVEL_SELECT_NUM] = {
     { 0xad, 0, 0 },   { 0xae, 1, 10 },  { 0xaf, 11, 20 }, { 0xb0, 21, 30 }, { 0xb1, 31, 40 },  { 0xb2, 41, 50 },
     { 0xb3, 51, 60 }, { 0xb4, 61, 70 }, { 0xb5, 71, 80 }, { 0xb6, 81, 90 }, { 0xb7, 91, 100 },
@@ -1091,8 +1094,7 @@ int WorldTrade_NationSortListMake(ListMenuOption **menulist, MsgData *countryNam
     int i;
 
     *menulist = ListMenuCore_CreateOptionList(num, HEAPID_WORLDTRADE);
-    // The loop test is a 0/1 value, which keeps the loop entered at its test (docs/matching.md)
-    for (i = 0; i < num ? TRUE : FALSE; i++) {
+    for (i = 0; i < num; i++) {
         ListMenuCore_AppendMsgOption(*menulist, countryNameManager, sCountryListTbl[first + i], first + i + 1,
                                      HEAPID_WORLDTRADE);
     }
