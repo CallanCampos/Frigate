@@ -1872,7 +1872,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `pokemontrade_message.c` | `0x021bfba4`–`0x021c1918` | 50 | complete | descriptive |
 | `pokemontrade_3d.c` | `0x021c1918`–`0x021c2a24` | 41 | complete | string at `0x021c6fc0` |
 | `pokemontrade_touchbar.c` | `0x021c2a24`–`0x021c2b08` | 1 | complete | descriptive |
-| `pokemontrade_2d.c` | `0x021c2b08`–`0x021c6380` | 108 | partial | string at `0x021c7330` |
+| `pokemontrade_2d.c` | `0x021c2b08`–`0x021c6380` | 108 | complete | string at `0x021c7330` |
 
 ### Overlay 195
 
