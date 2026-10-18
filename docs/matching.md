@@ -52,6 +52,14 @@ tools that show the differences.
   `clact.c`'s `func_0204ca1c`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which
   also passes a call's result to a setter through a `u8 pp` local rather than a `(u8)` cast.
+- A blend's clamps written into their own narrow locals, `u8 r = MATH_CLAMP(glowR + dr, 0, 31);`, and through one
+  wide temporary assigned before each (`value = glowR + dr; r = value > 31 ? 31 : value < 0 ? 0 : value;`) compile
+  to different registers and order around them. `plist_sys.c`'s `PokeList_UpdateGlow` matches only the first way,
+  with six `u8` channel locals as the other RGB555 blends write them (`zukan_info.c`) and `s8` differences (`int`
+  ones are 12 bytes short); with the shared `s32 value`, every spelling of the rest kept the glow and base colors in
+  swapped registers or came out 4 bytes larger. Its `fx32 ratio`, declared after the two `u8` loop counters, then
+  takes `r4`, as in the original (10 bytes off when declared first). The `u16` locals for the two colors and
+  `MATH_CLAMP` rather than a `?:` chain are style: the function matches either way.
 - Compound assignments add in another order than one expression: `mystery_net.c`'s `Mystery_ParseHex` adds the
   shifted value first, as the original does, only as `value <<= 4; value += digit;`, not as
   `value = value * 16 + digit`.
@@ -442,7 +450,7 @@ Same instructions, registers swapped.
   `DrawTextAligned` matches with `int line = 0;`, `lineX = x + lfx * line;` and `line++`.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
-  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
+  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OAM.c` reads its buffers through
   `GetOamBuffer_(NNSG2dOamType type)` returning `&oamBuffers_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
   `NNS_G2dEntryOamManagerOamWithAffineIdx` and both branches of `NNS_G2dResetOamManagerBuffer`. The same helper
   with a `u32` or `int` parameter, a cast to the enum, or an enum-typed field alone keeps the swap.
@@ -579,6 +587,16 @@ Same instructions, registers swapped.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
   to the address + 0x10 in White 2. Check the pool words of both versions before linking a file.
+- Whether a zero stored to two fields keeps a saved register can depend on whether the two stores are adjacent.
+  `plist_sys.c`'s `PokeList_DoMenuItem` builds its zero with the max HP call's `NULL` (`movs r2, #0; movs r7, #0`)
+  and stores `r7` for `wk->pkm = NULL` and `wk->showShortcutButtons = FALSE`, spilling the max HP to `sp+4`, only
+  when another store comes between them (`wk->pkm = NULL; wk->state = 4; wk->showShortcutButtons = FALSE;`). The
+  scheduler still stores the state first, as the ROM does (`strb r0, [r4, #0xc]; str r7, [r4, #0x3c]`), so the
+  statement order is a lever here, not the original's order: the file's two other copies of the block write the
+  state first and match.
+  Written next to each other, in each order of the block's four stores tried, they leave `r7` to the max HP and the
+  zero is built again, with `push {r3-r7, lr}; sub sp, #0x40` for the original's `push {r4-r7, lr}; sub sp, #0x44`,
+  which moves every stack offset (over 100 bytes off).
 - **MWCC propagates a hoisted constant as an immediate only within a budget of about 100 IR nodes from the start of
   the function.** A constant that needs a register (for a stack argument, or because it is used often) is written
   as an immediate at each use up to that edge, and as a copy of the register (`mov r3, r7`) at every use past it.
@@ -1455,7 +1473,10 @@ Same instructions, scheduled in another order.
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is MWCC's address
   of `p[i].field` when two accesses share it, `p` is a pointer variable and its first common-subexpression pass did
-  not merge them, as in `f[i].b += v`. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
+  not merge them, as in `f[i].b += v`. The accesses can be different expressions: `pokewood_savedata.c`'s
+  `func_02011130` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
+  one `save + 0x28` (`add r0, #0x28; ldr r0, [r0, r5]`), and tests `hasRecord` and sets it from one `save + 0x38`, while
+  `isNewRecord`, set once, indexes first. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
   compiles like `p[i].f`, index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`), and so do
   other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
   (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
@@ -1620,8 +1641,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   into the table's literal address; `p[i + k]` adds the constant to the index first. Some twenty functions match only
   as pointer sums, so the original wrote them so: `btl_server_cmd.c`'s readers of the command queue
   (`*(que->buffer + que->readPtr + 1)`), the SSP JPEG decoder's EXIF readers, `field_ground_anime.c`,
-  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `strbuf.c`, `startmenu.c` and others. A local
-  `u8 *p = data + pos` read as `p[0]`, `p[1]` doesn't give it either.
+  `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
+  literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
+  `p[1]` doesn't give it either.
 
 - `field += value` on an `s16` field with an `int` value narrows the value first and shares the narrowed copy between
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its
@@ -2155,7 +2177,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2p2): a
   `u32` return type with `if (c) { return TRUE; } return FALSE;` (`g2d_CellAnimation.c`'s
   `NNS_G2dCellDataBankHasVramTransferData`, which every `BOOL` spelling folds into the test), or a cast,
-  `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OamManager.c`'s `IsCapacityEnough_`, where the `if` form, a
+  `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
   ternary, a plain comparison and a local all fold).
 - A 0/1 choice laid out first value first (`bhs`, `movs r0, #0`, `b`, `movs r0, #1`) is held in an enum type: every
   plain 0/1 spelling (ternary, `if`/`else`, `!`, `== FALSE`, an int local) gives `blo`, `movs r0, #1` first.
@@ -2513,6 +2535,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
   `config/compiler_flags.toml` and plain `f32 *` reads, which is not used: nothing but that one loop shows the
   setting, and the cast above explains the same bytes.
+- `-flag` and `#pragma` also take internal pass names that the manual doesn't list and `mwccarm.exe` holds:
+  `opt_arithtransformation` turns a `u64` multiply by a power of two into shifts, and `opt_foldconstants` and
+  `opt_treetransformation` each fold a chain of constant multiplies (with only `opt_arithtransformation` on,
+  `x * 3 * 1000` stays two `_ull_mul` calls). The front end folds none of it: at -O0, `x * 64 * 1000` stays two `_ull_mul` calls, and from -O1 up it is one, whichever `-opt` sub-options are
+  off. As a diagnostic, these three with `opt_loop_invariants` and `opt_strength_reduction` off around `ir_check.c`'s
+  `IrCheck_ReadId` (`#pragma push`, the five, `#pragma pop`) give its code from one `start` local; with any of the
+  five left on, it differs again (the waits fold, or with `opt_arithtransformation` on the 64 becomes shifts). An
+  `asm { nop }` statement in the function leaves the multiplies apart too, and an empty `asm {}` does not. Neither is
+  source; an aligned object the function reads gives the same result from source (below).
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2618,10 +2649,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names. `country_region.c`'s `Country_IsValidPlace` loops
   while `i < gSelectableCountryCount ? TRUE : FALSE`, a loop that `#pragma optimization_level 1` or `2` also shapes.
-  No enum counter is needed for it in game code: overlay 214's `WorldTrade_NationSortListMake` gets the original's
-  loop entry and registers from `i < num ? TRUE : FALSE` alone. An expression that two of a call's arguments share,
-  as its `first + i` is, becomes a common-subexpression temporary computed before the call's stack arguments are
-  stored, which decides which register loads it; the original computed it after (its row).
+  Before writing one, ask whether the function reads an object with an explicit alignment, which keeps the `b` with a
+  plain test (below): overlay 214's `WorldTrade_NationSortListMake` got the loop entry from `i < num ? TRUE : FALSE`
+  and stayed 18 bytes off, and matches with `i < num` and the table it reads aligned.
 - A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
   `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
   `i < 8`, and an inline with `return kind < N;`, are both rotated.
@@ -2632,8 +2662,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE`, though
   there the original's `b` comes from an aligned object (next bullet).
 - An explicit alignment (`ATTRIBUTE_ALIGN(4)`, 16 or 32) on any object a function reads, or on a member it reads,
-  keeps every constant-bound loop of the function entered with a `b` to its test, and changes its other optimizations:
-  a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it is otherwise shifted.
+  keeps every loop of the function, with a constant or a variable bound, entered with a `b` to its test, and changes
+  its other optimizations: a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it
+  is otherwise shifted.
   `volatile`, an aligned struct type or a union do not do it, and an `extern` declaration with the attribute does it
   as the definition does. libVCT's `vct_audio.c` has the original's case: its static `sSendQueue` is 32-aligned in the
   ROM (`0x02197a80`, after an 8-byte gap), and the functions that read it keep the leading `b` (`VCT_InitAudio`,
@@ -2642,6 +2673,25 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
   `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
   the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
+  Overlay 214's `WorldTrade_NationSortListMake` fits the same way without address evidence: it reads only
+  `sCountryListTbl`, a `static const u16` table at `0x021e1ff4`, and with an alignment attribute on it a plain
+  `for (i = 0; i < num; i++)` matches, loop entry, registers and the `first + i` its call's arguments share, where a
+  0/1 test left 18 bytes. `ATTRIBUTE_ALIGN(1)`, `(2)` and `(4)` give the same code and `.rodata`, so the attribute
+  does it, not its value (8 and more move the table 4 bytes), and the table before it ends on that boundary, so the
+  ROM can't say whether the original aligned it. The file's other reader of the table matches either way.
+- The same alignment keeps a chain of 64-bit constant multiplies apart: `OS_TicksToMicroSeconds(OS_GetTick() - start)`
+  multiplies by 64 and then by 1000 with two `_ull_mul` calls, the 64 and the zero high word set in registers before
+  the loop, where it is otherwise one multiply by 64000. `ir_check.c`'s `IrCheck_ReadId` (overlay 338) shows the
+  effect: it reads the file's statics by name and keeps both calls in its two waits, while `IrCheck_SendByte` and
+  `IrCheck_RecvByte`, which reach the transfer through a pointer, fold theirs. Its layout doesn't show which static is
+  aligned, or to what: the overlay's sections start 32-aligned anyway, and 4 to 32 on `sTransfer` all match. The other
+  copy of this driver, `lib/irc/src/irc_spi.c` (overlay 031), agrees: compiled at the game's -O4,p, `IrcSpi_Recv` and
+  `IrcSpi_Send`, the two functions that read `IrcSpi` by name, keep the original's unrotated loops only with an
+  alignment on `IrcSpi`, and no object of that file sits on a 32-byte boundary, so `ir_check.c` aligns `sTransfer` to
+  4. Under the attribute `IrCheck_ReadId` also needs each wait's start tick in a variable of its own, the local of an
+  inline `IrCheck_Wait60us` (the infrared library's `IrcSpi_Wait60us`): one `start` set before both waits swaps two
+  registers (`r4`/`r6`), which it doesn't with the five passes above off.
+  Two `_ull_mul` calls where ours multiplies once, in one function of a file, ask whether it reads an aligned object.
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =
   head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `VCT_FlushAllQueues` (`vct_buffer.c`) matches
@@ -2812,7 +2862,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   modulo call `_s32_div_f` for a signed operand and `_u32_div_f` (swan's `__aeabi_uidivmod`) for an unsigned one; a
   `u8` or `u16` promotes to a signed `int`, so `(u8)id % 5u` is the unsigned one, and so is a `u16` divided by a
   `u32`. `wipe_sub.c`'s `WipeLineRange_Apply` divides `(range->end - range->start) * step` signed, its fields being
-  `u8`, where the same difference of two `u32` locals called `_u32_div_f`. Compare the built overlay in
+  `u8`, where the same difference of two `u32` locals called `_u32_div_f`. An integer converted to float calls
+  `__aeabi_i2f` (MWCC's `_fflt`) when it is signed and `_ffltu` when it is unsigned, and a `u8` or `u16` converted
+  to `f32`, by a cast or as a float operand, calls `_ffltu`, although it promotes to signed `int` in integer
+  arithmetic: `ctvt_game.c`'s `CtvtGame_FindTouchedTarget` scales by `(f32)width / height` with the hit size in `int`
+  locals. Two header inlines that differ only in the function they call hide the same way: `bmpwin.h`'s
+  `BmpWin_Transfer` and `BmpWin_TransferNow` compile alike except for `GFL_BGSysQueueScrLoad` against
+  `GFL_BGSysLoadScr`, and `ctvt_game.c`'s `CtvtGame_DrawTimeBar` ends with `BmpWin_TransferNow`. Compare the built
+  overlay in
   `build/<version>/build` with the original to find it.
 - A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned, and `_ll_sdiv`
   (0x0208d414) when both are signed: `pass_power.c`'s `PassPower_ApplyCapture` divides an `s64 value` by 100. The
@@ -2987,6 +3044,19 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   violated edge) — and write the file in the forced order that reaches zero. `demo3d_data.c` (overlay 293, 516
   objects, 341 small ones misplaced by every per-demo structure tried) matched this way, with one table left after
   its user and forward-declared. `tools/decomp/rodata_solver.py` runs this search.
+- The forced assignment also searches natural structures, where the solver's free orders come out scrambled. Build
+  the declaration list from a structure: each group of tables (a scene tree, the BG setups) contiguous, at the top
+  in some group order or as function-local statics of its only user, and each tree in some order of its kinds
+  (resources, animations, actors, then the scenes). Heapsort its sizes, give each slot the table the ROM's layout
+  forces on it, and count the slots whose forced table belongs to another group, plus the tables forced after one
+  that points to them. Anneal the structure (group order, which groups are local, each tree's order of kinds) until
+  the count is zero; the tables of one size within a group then take the order the forcing gives them. Overlay
+  257's `ctvt_game.c`, whose top-of-file and just-above-the-user searches left two 80-byte scene tables swapped,
+  fits with its camera, VRAM config, pump rectangles and face orders as function-local statics and its three scene
+  trees contiguous at the top, with three numbered series out of order. The search was a scratch script over
+  `rodata_order.py`'s `heapsort`, not a tool yet. Before counting a layout's
+  difference, compare the tables' bytes too: a file whose `.rodata` was never linked can carry wrong values that
+  no probe sees, as its `GX_VRAM_TEXPLTT_0_F` for `_0_G` and two swapped face orders were.
 - A `static const` table declared inside the one function that reads it is listed where that function is, among
   the local initializers, rather than where file-scope data would be. `pokemontrade_nego.c` lays out its menus' item
   lists in the game's order only with its table of blocking fields declared inside `func_ov194_021bbe60`, and
@@ -3081,6 +3151,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a file's shared `.rodata` are such locals: `win_record.c` has its two columns' x (`{ 0, 144 }`) in
   `WinRecord_PrintItemAt` and its BG scroll's speed and wrap (`{ 0x40, 0x2000 }`) in `WinRecord_ScrollBG`, read as
   `add r2, #0x40`, and a 12-byte table that nothing reads, 4-aligned, so it is declared as `u32`s.
+- Such a static can sit anywhere in the shared section, sorted by its size, and its function shows what it is.
+  Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`. They are read
+  as `static const GXRgb sEdgeColors[8]` in `PokeList_Init3D`, which turns edge marking on but never loads a table.
+  The type and name are a guess (a `u32[4]` gives the same ROM), backed by overlay 207's `p_sta_sys.c`, whose 3D
+  setup has the same cameras, a 16-byte `sPStatusEdgeColors` and the LCD config in its `.rodata`. With the cameras
+  as statics of the same function, the BG setups as statics of `PokeList_InitGraphics` in BG order (only BG 0's,
+  which `PokeList_CreateBG0` uses, at file scope) and the glow's step as a `static const u16`, its whole `.rodata`
+  is the ROM's. Overlay 194's `pokemontrade_2d.c` has the same 16 zero bytes beside its cameras though its setup
+  turns edge marking off (below).
+- An unread `{ 0, FX32_ONE, 0 }` or 16 zero bytes beside a file's camera vectors in its shared `.rodata` are
+  probably its camera setup's up vector and edge colors (`GXRgb[8]`), function-local statics of the function that
+  creates the camera. Game Freak's 3D setups declare position, target, up and edge colors together, and overlay 207's
+  `p_sta_sys.c` passes its zero colors to `G3X_SetEdgeColorTable` just before `G3X_EdgeMarking(FALSE)`.
+  `pokemontrade_2d.c`'s `func_ov194_021c43c0` makes the same calls without the table and gives the camera a local
+  copy of up, yet the file's `.rodata` is the original's only with position, target, up and colors all declared in
+  that function, the colors first. Its other bytes that no code loads, `18 48 18 00 04 00 00 00`, are folded scalars
+  at the end of MWCC's list: three `u8` of `func_ov194_021c3770` (24, 24, 72) and a 4 whose function is a guess.
 - A `static const` variable whose address is never taken is folded into the code and not emitted. If the original has
   it anyway, it is not `static`: a global that no code refers to gets a section of its own, laid out by size with the
   rest. An object laid out ahead of smaller ones is in a file of its own, linked first, as overlay 65's command table

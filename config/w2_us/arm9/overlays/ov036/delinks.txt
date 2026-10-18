@@ -403,7 +403,7 @@ src/ov036/field_light.c:
 
 src/ov036/field_subscreen.c:
     .text       start:0x021981d8 end:0x02198c00
-    .rodata     start:0x021cfa10 end:0x021cfa20
+    .rodata     start:0x021cfa10 end:0x021cfb78
     .data       start:0x021d4e68 end:0x021d4e7c
 
 src/ov036/field_3dbg.c:
@@ -412,7 +412,7 @@ src/ov036/field_3dbg.c:
 
 src/ov036/weather.c:
     .text       start:0x02199044 end:0x02199420
-    .rodata     start:0x021cfa20 end:0x021cfc18
+    .rodata     start:0x021cfb78 end:0x021cfc18
     .data       start:0x021d4e8c end:0x021d4ea0
 
 src/ov036/weather_task.c:
@@ -538,11 +538,13 @@ src/ov036/sodateya.c:
     .data       start:0x021d54e4 end:0x021d54f0
 
 src/ov036/fldeff_ripple.c:
+    complete
     .text       start:0x021be7c8 end:0x021be9c0
     .rodata     start:0x021d2240 end:0x021d2268
     .data       start:0x021d54f0 end:0x021d5504
 
 src/ov036/fldeff_splash.c:
+    complete
     .text       start:0x021be9c0 end:0x021beba8
     .rodata     start:0x021d2268 end:0x021d227c
     .data       start:0x021d5504 end:0x021d5514
@@ -634,11 +636,13 @@ src/ov036/enceff.c:
     .data       start:0x021d5688 end:0x021d5694
 
 src/ov036/fldeff_btrain.c:
+    complete
     .text       start:0x021c64d4 end:0x021c6720
     .rodata     start:0x021d2954 end:0x021d29bc
     .data       start:0x021d5694 end:0x021d56a4
 
 src/ov036/fldeff_hide.c:
+    complete
     .text       start:0x021c6720 end:0x021c696c
     .rodata     start:0x021d29bc end:0x021d29e8
     .data       start:0x021d56a4 end:0x021d56b4
@@ -664,6 +668,7 @@ src/ov036/scrcmd_hidden_hollow.c:
     .rodata     start:0x021d484c end:0x021d4928
 
 src/ov036/fldeff_ochiba.c:
+    complete
     .text       start:0x021c9480 end:0x021c97ec
     .rodata     start:0x021d4928 end:0x021d4954
     .data       start:0x021d5798 end:0x021d57a8

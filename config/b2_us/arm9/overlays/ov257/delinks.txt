@@ -76,6 +76,7 @@ src/ov257/comm_tvt_sys.c:
     .data       start:0x021b26bc end:0x021b26d8
 
 src/ov257/ctvt_game.c:
+    complete
     .text       start:0x021a22bc end:0x021a7620
     .rodata     start:0x021b1aa8 end:0x021b21f4
     .data       start:0x021b2664 end:0x021b2680

@@ -20,8 +20,23 @@ typedef BOOL (*WeatherFunc)(WeatherTask *task, u32 arg, HeapID heapId);
 // Adds count particles
 typedef void (*WeatherSpawnFunc)(WeatherTask *task, int count, HeapID heapId);
 
+// The weather's graphics: its archive, whether it has particles, how many of the two background layers it uses, the
+// files of the particles' characters, palette, cells and cell animations, and each layer's texture, as a
+// field/field_3dbg.h Field3DBgRes
 typedef struct {
-    u16 unk00[20];
+    u16 arcId;
+    u16 hasObjs;
+    u16 bgCount;
+    u16 charsFileId;
+    u16 paletteFileId;
+    u16 cellFileId;
+    u16 cellAnimFileId;
+    u16 bgRes[2][6];
+    u16 unk26;
+} WeatherGraphics;
+
+typedef struct {
+    WeatherGraphics graphics;
     // The size of the work that func_ov036_021997e4 returns
     u32 workSize;
     WeatherFunc funcs[7];
@@ -32,7 +47,19 @@ typedef struct {
 // Main: an entry of the u16 table at sWeatherLightIds, which the weather overlays pass as a sound
 u16 FieldLightStatus_GetWeatherLight(u32 index);
 
-// Overlay 36
+// Overlay 36's weather_task.c: a weather's task, which runs the functions of its data. weather.c creates and frees
+// two, updates them, starts a weather (mode 1 at once, 2 over the other task's) and ends one, and asks whether one is
+// fading
+WeatherTask *func_ov036_021993e0(ClActUnit *unit, FieldCamera *camera, FieldLight *light, FieldFog *fog,
+                                 FieldFogCtrl *fogCtrl, Field3DBg **bgs, FieldSound *fieldSound, u16 season,
+                                 HeapID heapId);
+void func_ov036_02199424(WeatherTask *task);
+void func_ov036_02199434(WeatherTask *task, HeapID heapId);
+void func_ov036_02199618(WeatherTask *task, const WeatherData *data, u8 unk25, u32 fade, u32 mode, u32 ambience,
+                         HeapID heapId);
+void func_ov036_0219967c(WeatherTask *task, u32 fade, u32 mode);
+void func_ov036_021996f4(WeatherTask *task);
+u8 func_ov036_021997dc(WeatherTask *task);
 // The index of the camera's defaults
 u32 func_ov036_02199774(WeatherTask *task);
 void *func_ov036_021997e4(WeatherTask *task);
@@ -49,16 +76,16 @@ BOOL func_ov036_02199868(WeatherTask *task, HeapID heapId);
 BOOL func_ov036_02199874(WeatherTask *task, HeapID heapId);
 void func_ov036_02199880(WeatherTask *task, WeatherSpawnFunc spawn, int count, int a3, int a4, HeapID heapId);
 void func_ov036_02199734(WeatherTask *task, u32 a1, u32 a2);
-void func_ov036_0219975c(WeatherTask *task, u32 a1, u32 a2, u32 a3);
+void func_ov036_0219975c(WeatherTask *task, u16 a1, u32 a2, u32 a3);
 BOOL func_ov036_02199768(WeatherTask *task);
-void func_ov036_02199780(WeatherTask *task, u32 a1, u32 a2);
+void func_ov036_02199780(WeatherTask *task, u16 a1, u16 a2);
 void func_ov036_0219979c(WeatherTask *task, int value, u32 index);
 void func_ov036_021997ac(WeatherTask *task, int value, u32 index);
 void func_ov036_02199740(WeatherTask *task, u32 a1, u32 a2);
 void func_ov036_0219974c(WeatherTask *task, u32 a1);
 void func_ov036_0219990c(WeatherTask *task, u32 a1, u32 a2, u32 a3);
 void func_ov036_02199948(WeatherTask *task, u32 a1);
-void func_ov036_02199958(WeatherTask *task, u32 a1, u32 a2, u32 a3, u32 a4);
+void func_ov036_02199958(WeatherTask *task, u32 a1, u32 a2, int a3, u32 a4);
 void func_ov036_021999bc(WeatherTask *task, u32 a1, u32 a2, u32 a3);
 BOOL func_ov036_021999dc(WeatherTask *task);
 BOOL func_ov036_02199a00(WeatherTask *task);
