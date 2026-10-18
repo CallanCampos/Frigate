@@ -4,6 +4,8 @@
 - **Date:** 2026-10-17
 - **Plan:** D3, D5, §4.5, §4.7
 - **Upstream:** `4aa041311` (merge of PR #348)
+- **Note (2026-10-18):** on Windows ([ADR 0013](0013-windows-build-with-msys2-clang64.md), proposed) the ROM is read
+  into memory rather than mapped, and the VRAM banks are copied between their views rather than aliased.
 
 ## Context
 

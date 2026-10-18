@@ -41,7 +41,7 @@ are in the module's fragment in [../cmake/](../cmake/README.md). A module's test
 | [gfl/](gfl/heap_policy.c) | Hooks into Game Freak's library (`src/gfl`), and `src/system/gfl_use.c` compiled through `gfl_use_host.c` | The host's heap sizes (`port_heap_size`), the particle systems' larger work ([ADR 0008](../docs/adr/0008-particle-work-from-the-platform-layer.md)), and GFL's frame count for replays | Every heap (`src/gfl/heapsys.c`), particles (`src/gfl/particle.c`), input replays | whole-program tests (`replay_*`, `oracle_*`) |
 | [dwc/](dwc/ov011_pending.c) | Overlay 11 functions with no C yet that DWC's initialization reaches | Their offline effect | The boot, which calls `DWC_InitForProduction` (`src/ov011/dwc_rapcommon.c`) | whole-program tests |
 | [stubs/](stubs/dsprot.c) | DS Protect (`lib/dsprot`, overlays 165 and 337), and a call the decomp names by placeholder | The checks pass as on a genuine cartridge; the placeholder call has no effect | The checks in `src/system/game_system.c`, `src/ov012/event_battle.c`, `src/ov035/event_mapchange.c`, `src/ov165/pokelist.c`; `src/system/resh_zek_savedata.c` | whole-program tests |
-| [host/](host/host.h) | No SDK module: the host operating system's services where macOS, Linux and Windows differ ([ADR 0013](../docs/adr/0013-windows-build-with-msys2-clang64.md)) | Pages and their protection, faults on a stack of their own (a trap placeholder touched, a fiber's stack overflowing into its guard, a crash), backtraces and the program's names, the watchdog, directories, the environment and the program's static data; on Windows, binary stdout and stderr and no error dialogs | None directly: the trap stubs, the fibers' guards, the PXI pointers into static data, `--run-dump` and the watchdog stand on it | `host_*`, `os_guard_*`, `app_symbols`, `pxi_bus_arena_overlap`, `integrate_overlay_sections`, the CI's macOS, Linux and Windows jobs |
+| [host/](host/host.h) | No SDK module: the host operating system's services that the platform layer, the program and the tests share where macOS, Linux and Windows differ ([ADR 0013](../docs/adr/0013-windows-build-with-msys2-clang64.md); the modules that keep their own branches are listed [below](#names)) | Pages and their protection, faults on a stack of their own (a trap placeholder touched, by the game's code or the C library's, a fiber's stack overflowing into its guard, a crash, on a fiber too), backtraces and the program's names, writes to stderr that take no lock, the watchdog, directories, the environment and the program's static data; on Windows, binary stdout and stderr, no error dialogs and both exception handlers before `main()` | None directly: the trap stubs, the fibers' guards, the PXI pointers into static data, `--run-dump` and the watchdog stand on it | `host_*`, `os_guard_*`, `app_symbols`, `pxi_bus_arena_overlap`, `integrate_overlay_sections`, the CI's macOS, Linux and Windows jobs |
 
 The root's files:
 
@@ -205,10 +205,24 @@ Every change these patterns need outside `port/` (the `#ifndef PLATFORM_PC` guar
   [../gfx](../gfx/README.md) and [../audio](../audio/README.md), which don't see them, can include it.
 - Public functions are `port_<module>_*`. Inside the OS core, `port_osi_*` (after the SDK's `OSi_`) is shared between
   the files of `os/` only (`os_internal.h`); inside the sound driver, `snd7_*` is shared between the files of `snd7/`.
-- `vram_os.c` in `gx/` holds the host operating system's virtual memory calls; it has nothing to do with `os/`.
-- `host/` holds what else differs between macOS, Linux and Windows, one file a host (`host_posix.c`, `host_windows.c`),
-  each compiled to nothing on the others' hosts. Code elsewhere in `port/` calls it rather than an operating system's
-  API or an `#ifdef` of its own.
+- `vram_os.c` in `gx/` holds the virtual memory calls of the VRAM's aliasing backends; it has nothing to do with `os/`.
+- `host/` holds the operating system's services that the platform layer, the program and the tests share where macOS,
+  Linux and Windows differ, one file a host (`host_posix.c`, `host_windows.c`), each compiled to nothing on the
+  others' hosts: pages, faults, backtraces, names, the watchdog, directories, the environment. Code that needs one
+  calls it rather than an operating system's API. A module whose own feature is a host's keeps its `#ifdef`s, since
+  the seam would only move them ([ADR 0013](../docs/adr/0013-windows-build-with-msys2-clang64.md)):
+  - `card/backup.c`: the saves' folder (`%APPDATA%`, `~/Library/Application Support`, the XDG data folder) and the
+    folders it makes (0755 on macOS and Linux), the atomic replacement (`_commit` and `MoveFileExA`, or `fsync` and
+    `rename`), the listing of its folder for other saves that the game won't see by their names, a path's separators,
+    and links followed on macOS and Linux only;
+  - `gx/vram_os.c`: the aliasing backends, POSIX shared memory and Mach's on macOS, `memfd_create` on Linux, none yet
+    on Windows (its page size is the seam's);
+  - `rom/rom.c`: the dump mapped on macOS and Linux, read into memory on Windows;
+  - `rtc/rtc7.c`: the reentrant local time, `localtime_r` or `localtime_s`;
+  - `fs/ovsec.c`: the overlays' sections, by the object format (Mach-O, ELF, COFF) rather than by the system;
+  - `os/fiber.c`: LeakSanitizer's calls, which Windows' ASan lacks;
+  - `../app/message_log.c` and `../app/window_icon.c`: the macOS app's log, and the window icon that macOS leaves to
+    the Dock.
 
 Some headers are named for the interface rather than the file that implements it:
 

@@ -3,6 +3,25 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: Windows in CI, after review
+
+- **On Windows, nothing up a fiber's stack reaches the unhandled-exception filter.** The system looks for a handler
+  frame by frame up the faulting stack, and a fiber's frames end at its entry; the filter's frame is at the bottom of
+  the thread's own stack. An exception on a fiber that the vectored handler doesn't take ends the process with no
+  word, so the seam takes every fatal exception there. Test a crash path on a fiber, not only on the main thread.
+- **A fault in the C library's code is outside the program's image.** The game's `memcpy` and `memset` run in
+  `ucrtbase.dll` on Windows, so a handler that takes only its own image's faults misses a trap placeholder touched
+  through them. Decide by the address accessed (the memory the seam protected), not by the code that touched it.
+- **`-fshort-wchar` lets clang turn a u16 loop into the C library's `wcslen`.** The loop-idiom pass recognizes a scan
+  for a 16-bit zero as `wcslen` when `wchar_t` is 16-bit, and on macOS and Linux the library's `wcslen` counts 32-bit
+  units. `-fno-builtin-wcslen` keeps the loop; `gen_stubs.py`'s list of what the host provides is where such a call
+  shows.
+- **`ctypes.CDLL(None)` doesn't see glibc's `libc_nonshared.a`.** `atexit` is linked into each program from it, hidden,
+  so a lookup through Python's process missed it and `backup.c`'s `atexit` became a trap stub on Linux. Read what the
+  compiler driver links, linker scripts included, and never stub a function of standard C.
+- **SDL's arguments are UTF-8 on Windows, the C library's names are the code page's.** A manifest that makes UTF-8
+  the process's code page is the one switch that makes `fopen`, `_mkdir`, `getenv`, the `*A` calls and SDL agree.
+
 ## 2026-10-18: Windows in CI
 
 - **lld groups a COFF program's sections by their contents as well as their names.** A zeroed static given a section

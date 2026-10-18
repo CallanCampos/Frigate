@@ -66,10 +66,11 @@ jobs:
         if: runner.os == 'macOS'
         run: cmake --build build/port --target frigate-black2_app
 
-  # Windows, with MSYS2's CLANG64 environment: clang, lld, compiler-rt and the UCRT, with CMake, Ninja and SDL3 from its
-  # packages, so that the build's GCC-style flags are the same as on macOS and Linux (ADR 0013). The game's images,
-  # sounds and models under res/ (68,000 of its 119,000 files) aren't checked out: the host build reads only its text and
-  # the data that the text's headers name (port/tools/gen_host_tree.py). git keeps the files' line endings as they are
+  # Windows, with MSYS2's CLANG64 environment: clang, lld, compiler-rt and the UCRT, with CMake, Ninja, SDL3 and Python
+  # from its packages, as port/README.md tells a player to build, so that the build's GCC-style flags are the same as
+  # on macOS and Linux (ADR 0013). The game's images, sounds and models under res/ (68,000 of its 119,000 files) aren't
+  # checked out: the host build reads only its text and the data that the text's headers name
+  # (port/tools/gen_host_tree.py). git keeps the files' line endings as they are
   host-windows:
     name: Host build (windows-2025)
     runs-on: windows-2025
@@ -95,23 +96,19 @@ jobs:
             !/res/**/*.wav
             !/res/**/*.glb
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-
-      # path-type inherit keeps the Python above on PATH, after MSYS2's own directories
+      # MSYS2's current packages, not pinned: the build takes any SDL3 3.4 (3.4.16 on the runner of 2026-10-18), and
+      # the CLANG64 shell's PATH is MSYS2's own, so that its Python is the one CMake finds (port/CMakeLists.txt)
       - name: Install build tools
         uses: msys2/setup-msys2@v2
         with:
           msystem: CLANG64
           update: false
-          path-type: inherit
           install: >-
             mingw-w64-clang-x86_64-toolchain
             mingw-w64-clang-x86_64-cmake
             mingw-w64-clang-x86_64-ninja
             mingw-w64-clang-x86_64-sdl3
+            mingw-w64-clang-x86_64-python
 
       - name: Show the tools
         run: |
@@ -119,13 +116,15 @@ jobs:
           clang --version
           cmake --version
           python --version
+          pacman -Q mingw-w64-clang-x86_64-sdl3 mingw-w64-clang-x86_64-python
 
       - name: Configure
         env:
           CC: clang
         run: cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-      # -k 0 goes on past a file that fails, so that one run shows every file that doesn't compile on Windows
+      # -k 0 on Windows alone, the newest host: one run shows every file that doesn't compile there, where a file that
+      # builds on macOS and Linux may not; the other jobs stop at the first failure, as before
       - name: Build
         run: cmake --build build/port -- -k 0
 
