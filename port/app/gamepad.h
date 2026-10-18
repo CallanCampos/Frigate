@@ -12,7 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// The most bindings a map holds, and the most pads open at once (more are ignored, with a message)
+// The most bindings a map holds, and the most pads open at once (one connected beyond them waits, with a message, and
+// is opened when one of the open pads is disconnected)
 #define PORT_GAMEPAD_MAX_BINDINGS 32
 #define PORT_GAMEPAD_MAX_PADS 8
 
@@ -29,7 +30,7 @@ typedef struct PortGamepadBinding {
 // What a pad's controls do. The bindings run up to the first whose press is 0; several may press the same DS button,
 // and a button may press several. With leftStickAsDpad, the left stick also presses the D-pad: nothing while it leans
 // less than stickDeadZone (of 32767) from its centre, else the direction or diagonal it leans toward, each of the
-// eight taking a sector of 45 degrees (port_gamepad_stick)
+// eight taking a sector of 45 degrees, with a margin at both edges once it presses (port_gamepad_stick)
 typedef struct PortGamepadMap {
     PortGamepadBinding bindings[PORT_GAMEPAD_MAX_BINDINGS];
     bool leftStickAsDpad;
@@ -48,8 +49,11 @@ void port_gamepad_resolve(const PortGamepadMap *map, const SDL_GamepadButtonLabe
                           uint32_t press[SDL_GAMEPAD_BUTTON_COUNT]);
 
 // The D-pad's buttons (PORT_INPUT_UP, DOWN, LEFT, RIGHT) that a stick at x, y presses (SDL's axes: -32768 up or left,
-// 32767 down or right): none inside the circle of radius deadZone, else the one or two of the sector it leans into
-uint32_t port_gamepad_stick(int x, int y, int deadZone);
+// 32767 down or right), given what it pressed at the last poll (previous; 0 at first). From the centre: none inside
+// the circle of radius deadZone, else the one or two of the sector it leans into. Once it presses, with hysteresis, so
+// that a stick held still at an edge doesn't flicker: none only back inside seven eighths of deadZone, and the same
+// direction or diagonal until the stick leans about 4 degrees past its sector's edge
+uint32_t port_gamepad_stick(int x, int y, int deadZone, uint32_t previous);
 
 // A pad's DS buttons now and at the last poll, for port_gamepad_pick
 typedef struct PortGamepadState {

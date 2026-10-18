@@ -27,13 +27,23 @@ zone, and a mapping a settings file can replace later.
   once (their buttons are ORed).
 - **The stick:** a circular dead zone of half the travel (SDL says a stick at rest reads within about 8000 of 32767),
   then eight sectors of 45 degrees, computed in integers. A per-axis threshold would need a longer push on diagonals.
-- **One pad drives at a time.** Every connected pad is open (up to 8). The pad that drives keeps driving while it holds
-  anything; once it holds nothing, the first pad to press something new (a button it didn't hold at the last poll)
-  takes over. A new press, not a held one, takes over, so a pad left with a button stuck or a drifting stick can't
-  take the game from the one in use.
-- The mapping, the dead zone and the choice of the pad are plain functions; `port/tests/app/test_gamepad.c` checks
-  them with hand-worked values and drives SDL's virtual joysticks as pads that come and go, with SDL's drivers for real
-  pads turned off.
+  Both edges have hysteresis: once the stick presses, it lets go only back inside seven eighths of the dead zone, and
+  it keeps its direction or diagonal until it leans about 4 degrees past its sector's edge (the widened edges are
+  where the tangent is 1/2, 1/3, 2 and 3, so the test stays in integers). A stick held still at an edge reads a few
+  hundred units of noise; without the margins, each wobble across the edge was a new press, which the game's key
+  handling (`src/gfl/key.c`) takes as a new button press and a menu cursor as another step.
+- **One pad drives at a time.** Every connected pad is open, up to 8; one connected beyond them waits and is opened
+  when one of them is disconnected. The pad that drives keeps driving while it holds anything; once it holds nothing,
+  the first pad to press something new (a button it didn't hold at the last poll) takes over. A new press, not a held
+  one, takes over, so a button held, or a stick held near an edge (with the hysteresis above), on another pad doesn't
+  take the game from the one in use once it has pressed. What it doesn't cover: a pad whose button is stuck, or whose
+  stick rests beyond the dead zone (worn far past the 8000 SDL allows), presses once when it connects or when the
+  stick drifts out, and takes the game if the pad in use holds nothing at that moment; holding that press for good, it
+  keeps the game until it is disconnected.
+- The mapping, the dead zone and its hysteresis, and the choice of the pad are plain functions;
+  `port/tests/app/test_gamepad.c` checks them with hand-worked values and drives SDL's virtual joysticks as pads that
+  come and go (a desk pad whose stick reads noise at the dead zone's edge, nine pads at once), with SDL's drivers for
+  real pads turned off.
 
 ## Alternatives
 
@@ -52,4 +62,6 @@ zone, and a mapping a settings file can replace later.
 - The right stick and the triggers, which are axes, do nothing: a map binds buttons and the left stick only. The
   paddles and the guide button do nothing until a map binds them, the touch screen still needs the mouse, and the DS's
   lid has no control.
-- Revisit if two-pad features (local multiplayer through two port instances, phase 7) need pads assigned to players.
+- Revisit if two-pad features (local multiplayer through two port instances, phase 7) need pads assigned to players,
+  or if broken pads (a stuck button, a stick resting far out) turn out common enough to need a calibration at connect
+  or a rule against a press that never lets go.

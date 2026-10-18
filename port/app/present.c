@@ -16,10 +16,13 @@
 //   D-pad       arrow keys                   D-pad, and the left stick beyond half its travel, diagonals included
 //   touch       the left mouse button on the bottom screen, held and dragged
 //
-// Pads can be connected and disconnected while the game runs, and several can be connected: the first that presses
-// something drives the game until it lets go of everything, and then the next to press something takes over. Each pad
-// says when it connects which of its buttons, by the labels SDL reports, are the DS's A, B, X and Y. The gamepad's
-// controls are one table, port_gamepad_default_map (port/app/gamepad.c), which a settings file can replace.
+// The stick presses once past half its travel and lets go back inside seven eighths of that, and it keeps a direction
+// until it leans about 4 degrees into the next one's sector, so that a stick held near an edge doesn't flicker. Pads
+// can be connected and disconnected while the game runs, and several can be connected (eight open at once; a ninth
+// waits for a free place): the first that presses something drives the game until it lets go of everything, and then
+// the next to press something takes over. Each pad says when it connects which of its buttons, by the labels SDL
+// reports, are the DS's A, B, X and Y. The gamepad's controls are one table, port_gamepad_default_map
+// (port/app/gamepad.c), which a settings file can replace.
 #include "app/present.h"
 #include "app/gamepad.h"
 #include "gfx/screens.h"

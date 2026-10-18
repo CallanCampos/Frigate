@@ -40,10 +40,12 @@ on a PlayStation pad). The program names each pad's buttons, by the labels SDL r
 | D-pad | arrow keys | D-pad, and the left stick past half its travel, diagonals included |
 | Touch screen | the left mouse button on the bottom screen | |
 
-Pads can come and go while the game runs. With several, the first to press something drives the game until it lets go
-of everything; then the next to press something takes over. [app/present.c](app/present.c)'s header has the same
-table, and the gamepad's controls are one table in [app/gamepad.c](app/gamepad.c) that a settings file will be able
-to replace.
+The stick lets go only back inside seven eighths of half its travel, and keeps a direction until it leans about 4
+degrees into the next one, so that a stick held near an edge doesn't flicker. Pads can come and go while the game runs.
+With several, the first to press something drives the game until it lets go of everything; then the next to press
+something takes over. Eight are open at once; a ninth waits until one of them is disconnected.
+[app/present.c](app/present.c)'s header has the same table, and the gamepad's controls are one table in
+[app/gamepad.c](app/gamepad.c) that a settings file will be able to replace.
 
 ### The macOS app
 

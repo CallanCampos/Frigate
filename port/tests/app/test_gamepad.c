@@ -1,9 +1,9 @@
-// Tests of the gamepads (port/app/gamepad.h) without a device. The mapping, the stick's dead zone, the choice of the
-// pad that drives and the description are called directly, with labels written out from SDL's own description of each
-// pad family (SDL_gamepad.h, SDL_GamepadButton: Xbox A/B/X/Y, Nintendo Switch B/A/Y/X, GameCube A/X/B/Y, PlayStation
-// Cross/Circle/Square/Triangle at south/east/west/north). Then SDL's virtual joysticks stand in for pads: they are
-// connected and disconnected while the module runs, and their buttons and sticks are set as a player would press them.
-// Every expected value is worked out by hand from the DS's layout (A east, B south, X north, Y west).
+// Tests of the gamepads (port/app/gamepad.h) without a device. The mapping, the stick's dead zone and hysteresis, the
+// choice of the pad that drives and the description are called directly, with labels written out from SDL's own
+// description of each pad family (SDL_gamepad.h, SDL_GamepadButton: Xbox A/B/X/Y, Nintendo Switch B/A/Y/X, GameCube
+// A/X/B/Y, PlayStation Cross/Circle/Square/Triangle at south/east/west/north). Then SDL's virtual joysticks stand in
+// for pads: they are connected and disconnected while the module runs, and their buttons and sticks are set as a player
+// would press them. Every expected value is worked out by hand from the DS's layout (A east, B south, X north, Y west).
 #include "app/gamepad.h"
 #include "hal/input/port_input.h"
 #include <stdio.h>
@@ -36,30 +36,100 @@ static void TestStick(void) {
     const uint32_t left = PORT_INPUT_LEFT;
     const uint32_t right = PORT_INPUT_RIGHT;
 
-    ExpectHeld("stick at rest", port_gamepad_stick(0, 0, 16384), 0);
+    ExpectHeld("stick at rest", port_gamepad_stick(0, 0, 16384, 0), 0);
     // The dead zone is a circle: a point on it is outside
-    ExpectHeld("stick just inside the dead zone", port_gamepad_stick(16383, 0, 16384), 0);
-    ExpectHeld("stick on the dead zone's edge", port_gamepad_stick(16384, 0, 16384), right);
-    ExpectHeld("stick full left", port_gamepad_stick(-32768, 0, 16384), left);
-    ExpectHeld("stick full up", port_gamepad_stick(0, -32768, 16384), up);
-    ExpectHeld("stick full down", port_gamepad_stick(0, 32767, 16384), down);
+    ExpectHeld("stick just inside the dead zone", port_gamepad_stick(16383, 0, 16384, 0), 0);
+    ExpectHeld("stick on the dead zone's edge", port_gamepad_stick(16384, 0, 16384, 0), right);
+    ExpectHeld("stick full left", port_gamepad_stick(-32768, 0, 16384, 0), left);
+    ExpectHeld("stick full up", port_gamepad_stick(0, -32768, 16384, 0), up);
+    ExpectHeld("stick full down", port_gamepad_stick(0, 32767, 16384, 0), down);
     // 45 degrees at full travel, 23170 = 32767 / sqrt(2)
-    ExpectHeld("stick down and right", port_gamepad_stick(23170, 23170, 16384), right | down);
-    ExpectHeld("stick up and left", port_gamepad_stick(-23170, -23170, 16384), left | up);
+    ExpectHeld("stick down and right", port_gamepad_stick(23170, 23170, 16384, 0), right | down);
+    ExpectHeld("stick up and left", port_gamepad_stick(-23170, -23170, 16384, 0), left | up);
     // A diagonal of radius 15556 is inside; one of 16971 is outside, where per-axis thresholds of 16384 press nothing
-    ExpectHeld("stick diagonal inside the dead zone", port_gamepad_stick(11000, 11000, 16384), 0);
-    ExpectHeld("stick diagonal just outside the dead zone", port_gamepad_stick(12000, 12000, 16384), right | down);
+    ExpectHeld("stick diagonal inside the dead zone", port_gamepad_stick(11000, 11000, 16384, 0), 0);
+    ExpectHeld("stick diagonal just outside the dead zone", port_gamepad_stick(12000, 12000, 16384, 0), right | down);
     // The sectors' edges are 22.5 degrees from each axis: atan(12000 / 30000) is 21.8 degrees, atan(13000 / 30000)
     // 23.4, atan(30000 / 13000) 66.6 and atan(30000 / 12000) 68.2
-    ExpectHeld("stick 21.8 degrees below the horizontal", port_gamepad_stick(30000, 12000, 16384), right);
-    ExpectHeld("stick 23.4 degrees below the horizontal", port_gamepad_stick(30000, 13000, 16384), right | down);
-    ExpectHeld("stick 66.6 degrees above the horizontal", port_gamepad_stick(-13000, -30000, 16384), left | up);
-    ExpectHeld("stick 68.2 degrees above the horizontal", port_gamepad_stick(-12000, -30000, 16384), up);
+    ExpectHeld("stick 21.8 degrees below the horizontal", port_gamepad_stick(30000, 12000, 16384, 0), right);
+    ExpectHeld("stick 23.4 degrees below the horizontal", port_gamepad_stick(30000, 13000, 16384, 0), right | down);
+    ExpectHeld("stick 66.6 degrees above the horizontal", port_gamepad_stick(-13000, -30000, 16384, 0), left | up);
+    ExpectHeld("stick 68.2 degrees above the horizontal", port_gamepad_stick(-12000, -30000, 16384, 0), up);
     // Other dead zones
-    ExpectHeld("no dead zone, at rest", port_gamepad_stick(0, 0, 0), 0);
-    ExpectHeld("no dead zone, the least lean", port_gamepad_stick(1, 0, 0), right);
-    ExpectHeld("dead zone 8000, inside", port_gamepad_stick(0, -7999, 8000), 0);
-    ExpectHeld("dead zone 8000, on its edge", port_gamepad_stick(0, -8000, 8000), up);
+    ExpectHeld("no dead zone, at rest", port_gamepad_stick(0, 0, 0, 0), 0);
+    ExpectHeld("no dead zone, the least lean", port_gamepad_stick(1, 0, 0, 0), right);
+    ExpectHeld("dead zone 8000, inside", port_gamepad_stick(0, -7999, 8000, 0), 0);
+    ExpectHeld("dead zone 8000, on its edge", port_gamepad_stick(0, -8000, 8000, 0), up);
+}
+
+// A fixed sequence of the few hundred units of noise a stick held still reads
+static const int sNoise[16] = { 120, -80, 30, -140, 90, -20, 150, -110, 60, -50, 10, -130, 100, -70, 40, -150 };
+
+// How many polls of a stick held at x0 + noise, y0 + noise (each noisy only where its flag is set) press a D-pad
+// button they didn't press at the poll before, over 60 polls fed back as the previous result, and what the last holds
+static int NoisyPresses(int x0, int noisyX, int y0, int noisyY, uint32_t *last) {
+    uint32_t previous = 0;
+    int presses = 0;
+
+    for (int f = 0; f < 60; f++) {
+        const uint32_t held =
+            port_gamepad_stick(x0 + (noisyX ? sNoise[f % 16] : 0), y0 + (noisyY ? sNoise[f % 16] : 0), 16384, previous);
+
+        presses += (held & ~previous) != 0;
+        previous = held;
+    }
+    *last = previous;
+    return presses;
+}
+
+// Once the stick presses, it lets go only inside seven eighths of the dead zone, 14336 of 16384, and keeps its
+// direction until it leans past its sector widened by about 4 degrees: a direction up to ay = ax / 2 (26.57 degrees
+// from it), a diagonal from ay = ax / 3 to ay = 3 ax (18.43 to 71.57 degrees), with ax along the direction
+static void TestStickHysteresis(void) {
+    const uint32_t up = PORT_INPUT_UP;
+    const uint32_t down = PORT_INPUT_DOWN;
+    const uint32_t left = PORT_INPUT_LEFT;
+    const uint32_t right = PORT_INPUT_RIGHT;
+    uint32_t last;
+
+    // The dead zone's edge
+    ExpectHeld("from the centre, inside the dead zone", port_gamepad_stick(16000, 0, 16384, 0), 0);
+    ExpectHeld("held, inside the dead zone, outside the release circle", port_gamepad_stick(16000, 0, 16384, right),
+               right);
+    ExpectHeld("held, on the release circle", port_gamepad_stick(14336, 0, 16384, right), right);
+    ExpectHeld("held, just inside the release circle", port_gamepad_stick(14335, 0, 16384, right), 0);
+    ExpectHeld("held, back at the centre", port_gamepad_stick(0, 0, 16384, up), 0);
+    // 2 * 10138^2 = 205,558,088 is at least 14336^2 = 205,520,896; 2 * 10137^2 = 205,517,538 is less
+    ExpectHeld("a held diagonal, just outside the release circle",
+               port_gamepad_stick(10138, 10138, 16384, right | down), right | down);
+    ExpectHeld("a held diagonal, just inside the release circle", port_gamepad_stick(10137, 10137, 16384, right | down),
+               0);
+    // The edge between right and down-right (22.5 degrees, ay = 12426.4 at ax = 30000)
+    ExpectHeld("held right, at 23.4 degrees", port_gamepad_stick(30000, 13000, 16384, right), right);
+    ExpectHeld("held right, at 26.57 degrees", port_gamepad_stick(30000, 15000, 16384, right), right);
+    ExpectHeld("held right, past 26.57 degrees", port_gamepad_stick(30000, 15001, 16384, right), right | down);
+    ExpectHeld("held down-right, at 21.8 degrees", port_gamepad_stick(30000, 12000, 16384, right | down), right | down);
+    ExpectHeld("held down-right, at 18.43 degrees", port_gamepad_stick(30000, 10000, 16384, right | down),
+               right | down);
+    ExpectHeld("held down-right, below 18.43 degrees", port_gamepad_stick(30000, 9999, 16384, right | down), right);
+    // The edge between up-left and up (67.5 degrees from the horizontal)
+    ExpectHeld("held up-left, at 71.57 degrees", port_gamepad_stick(-10000, -30000, 16384, left | up), left | up);
+    ExpectHeld("held up-left, past 71.57 degrees", port_gamepad_stick(-9999, -30000, 16384, left | up), up);
+    ExpectHeld("held up, at 63.43 degrees", port_gamepad_stick(-15000, -30000, 16384, up), up);
+    ExpectHeld("held up, below 63.43 degrees", port_gamepad_stick(-15001, -30000, 16384, up), left | up);
+    // Elsewhere the sectors are the plain ones
+    ExpectHeld("held right, swung to the left", port_gamepad_stick(-30000, 0, 16384, right), left);
+    ExpectHeld("held down, swung up", port_gamepad_stick(0, -30000, 16384, down), up);
+    ExpectHeld("held left and right, which no stick does", port_gamepad_stick(30000, 0, 16384, left | right), right);
+    ExpectHeld("held right with a button that isn't the stick's",
+               port_gamepad_stick(30000, 0, 16384, right | PORT_INPUT_A), right);
+
+    // Held still at an edge, with noise of 150 units either way: one press, held, where a stick without the margins
+    // would press again at each wobble back across the edge
+    ExpectHeld("noise at the dead zone's edge: presses", (uint32_t)NoisyPresses(16384, 1, 0, 0, &last), 1);
+    ExpectHeld("noise at the dead zone's edge: held", last, right);
+    ExpectHeld("noise at the right and down-right edge: presses", (uint32_t)NoisyPresses(30000, 0, 12426, 1, &last), 1);
+    ExpectHeld("noise at the right and down-right edge: held", last, right | down);
 }
 
 // --- The mapping ----------------------------------------------------------------------------------------------------
@@ -422,10 +492,80 @@ static void TestVirtualPads(void) {
     SDL_CloseJoystick(padP);
     SDL_DetachVirtualJoystick(r);
     SDL_DetachVirtualJoystick(p);
+    // Their removals reach the module, which closed them already
+    Frame();
+}
+
+// A pad that drives, and one on the desk whose stick rests at the dead zone's edge and reads noise there: the desk
+// pad's stick presses RIGHT once, while the other holds a button, and never again, so it never takes the game
+static void TestDeskPad(void) {
+    const SDL_JoystickID a = AttachPad("test pad A", 0, 0);
+    const SDL_JoystickID b = AttachPad("test pad B", 0, 0);
+    SDL_Joystick *padA = SDL_OpenJoystick(a);
+    SDL_Joystick *padB = SDL_OpenJoystick(b);
+    uint32_t held = 0;
+    int bDrives = 0;
+
+    ExpectHeld("desk: two pads connected", Frame(), 0);
+    SDL_SetJoystickVirtualButton(padA, SDL_GAMEPAD_BUTTON_EAST, true);
+    ExpectHeld("desk: A presses its right face button", Frame(), PORT_INPUT_A);
+    SDL_SetJoystickVirtualAxis(padB, 0, (Sint16)(16384 + sNoise[0]));
+    ExpectHeld("desk: B's stick reaches the edge while A holds", Frame(), PORT_INPUT_A);
+    SDL_SetJoystickVirtualButton(padA, SDL_GAMEPAD_BUTTON_EAST, false);
+    for (int f = 1; f < 60; f++) {
+        SDL_SetJoystickVirtualAxis(padB, 0, (Sint16)(16384 + sNoise[f % 16]));
+        held = Frame();
+        bDrives += port_gamepads_driver() == b;
+    }
+    Expect("desk: B never drives while A is idle", bDrives == 0);
+    ExpectHeld("desk: A idle, nothing held", held, 0);
+    SDL_SetJoystickVirtualButton(padA, SDL_GAMEPAD_BUTTON_SOUTH, true);
+    ExpectHeld("desk: A presses its bottom face button", Frame(), PORT_INPUT_B);
+    Expect("desk: A drives", port_gamepads_driver() == a);
+
+    SDL_CloseJoystick(padA);
+    SDL_CloseJoystick(padB);
+    SDL_DetachVirtualJoystick(a);
+    SDL_DetachVirtualJoystick(b);
+    ExpectHeld("desk: both gone", Frame(), 0);
+    Expect("desk: no pad open", port_gamepads_count() == 0);
+}
+
+// Nine pads: eight are open and the ninth waits; when one of the eight goes, the ninth takes its place, without being
+// connected again
+static void TestNinthPad(void) {
+    SDL_JoystickID ids[PORT_GAMEPAD_MAX_PADS + 1];
+    SDL_Joystick *joysticks[PORT_GAMEPAD_MAX_PADS + 1];
+    const int last = PORT_GAMEPAD_MAX_PADS;
+
+    for (int i = 0; i <= last; i++) {
+        char name[32];
+
+        snprintf(name, sizeof(name), "test pad %d", i);
+        ids[i] = AttachPad(name, 0, 0);
+        joysticks[i] = SDL_OpenJoystick(ids[i]);
+    }
+    ExpectHeld("nine pads connected", Frame(), 0);
+    Expect("eight of the nine open", port_gamepads_count() == PORT_GAMEPAD_MAX_PADS);
+    SDL_SetJoystickVirtualButton(joysticks[last], SDL_GAMEPAD_BUTTON_EAST, true);
+    ExpectHeld("the ninth presses while it waits", Frame(), 0);
+    SDL_CloseJoystick(joysticks[0]);
+    SDL_DetachVirtualJoystick(ids[0]);
+    ExpectHeld("the first goes; the ninth, holding its right face button, takes its place", Frame(), PORT_INPUT_A);
+    Expect("eight open again", port_gamepads_count() == PORT_GAMEPAD_MAX_PADS);
+    Expect("the ninth drives", port_gamepads_driver() == ids[last]);
+
+    for (int i = 1; i <= last; i++) {
+        SDL_CloseJoystick(joysticks[i]);
+        SDL_DetachVirtualJoystick(ids[i]);
+    }
+    ExpectHeld("all gone", Frame(), 0);
+    Expect("no pad open", port_gamepads_count() == 0);
 }
 
 int main(void) {
     TestStick();
+    TestStickHysteresis();
     TestDefaultMap();
     TestLabelMap();
     TestMapEdges();
@@ -443,6 +583,8 @@ int main(void) {
     } else {
         port_gamepads_open();
         TestVirtualPads();
+        TestDeskPad();
+        TestNinthPad();
         SDL_Quit();
     }
 

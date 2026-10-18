@@ -1,6 +1,7 @@
 // Gamepads as the DS's buttons (port/app/gamepad.h). Each open pad keeps the DS buttons each of its buttons presses,
-// resolved from the map and the labels SDL reports for it when it is opened or remapped, and the DS buttons it held at
-// the last poll, which tell a new press from a held one when the pads take turns.
+// resolved from the map and the labels SDL reports for it when it is opened or remapped, the D-pad buttons its stick
+// pressed at the last poll, which the stick's hysteresis starts from, and the DS buttons it held at the last poll,
+// which tell a new press from a held one when the pads take turns.
 #include "app/gamepad.h"
 #include "hal/input/port_input.h"
 #include <stdio.h>
@@ -9,6 +10,8 @@
 // SDL says a stick at rest reads within about 8000 of its centre (SDL_gamepad.h, SDL_GamepadAxis); half the travel
 // leaves room for worn sticks and still answers a deliberate push
 #define DEFAULT_STICK_DEAD_ZONE 16384
+
+#define STICK_DIRECTIONS (PORT_INPUT_UP | PORT_INPUT_DOWN | PORT_INPUT_LEFT | PORT_INPUT_RIGHT)
 
 const PortGamepadMap port_gamepad_default_map = {
     .bindings = {
@@ -46,6 +49,7 @@ typedef struct Pad {
     SDL_Gamepad *gamepad;
     SDL_JoystickID id;
     uint32_t press[SDL_GAMEPAD_BUTTON_COUNT];
+    uint32_t stick;
     uint32_t previous;
 } Pad;
 
@@ -78,21 +82,14 @@ void port_gamepad_resolve(const PortGamepadMap *map, const SDL_GamepadButtonLabe
     }
 }
 
-uint32_t port_gamepad_stick(int x, int y, int deadZone) {
-    const int64_t ax = x < 0 ? -(int64_t)x : x;
-    const int64_t ay = y < 0 ? -(int64_t)y : y;
+// The direction or diagonal of the sector a stick leans into, at x, y away from its centre (ax and ay their sizes). A
+// direction is pressed while the stick leans within 67.5 degrees of it, so that each of the four directions and four
+// diagonals has 45 degrees. At an angle t from the horizontal, horizontal is pressed when tan(t) <= tan(67.5) =
+// 1 / (sqrt(2) - 1), which is ax >= (sqrt(2) - 1) ay, that is ax + ay >= sqrt(2) ay, squared to stay in integers
+static uint32_t Sector(int x, int y, int64_t ax, int64_t ay) {
     const int64_t sum = ax + ay;
     uint32_t held = 0;
 
-    if (ax == 0 && ay == 0) {
-        return 0;
-    }
-    if (ax * ax + ay * ay < (int64_t)deadZone * deadZone) {
-        return 0;
-    }
-    // A direction is pressed while the stick leans within 67.5 degrees of it, so that each of the four directions and
-    // four diagonals has 45 degrees. At an angle t from the horizontal, horizontal is pressed when tan(t) <= tan(67.5)
-    // = 1 / (sqrt(2) - 1), which is ax >= (sqrt(2) - 1) ay, that is ax + ay >= sqrt(2) ay, squared to stay in integers
     if (sum * sum >= 2 * ay * ay) {
         held |= x < 0 ? PORT_INPUT_LEFT : PORT_INPUT_RIGHT;
     }
@@ -100,6 +97,53 @@ uint32_t port_gamepad_stick(int x, int y, int deadZone) {
         held |= y < 0 ? PORT_INPUT_UP : PORT_INPUT_DOWN;
     }
     return held;
+}
+
+// Whether a stick at x, y still leans into the sector of held (one direction or diagonal) widened by about 4 degrees
+// each side. The sectors' edges are 22.5 degrees from each axis; widened, a direction keeps ay <= ax / 2 (26.57
+// degrees, tan = 1/2) and a diagonal keeps ax / 3 <= ay <= 3 ax (18.43 to 71.57 degrees, tan = 1/3 and 3), with ax
+// along the direction
+static bool KeepsSector(uint32_t held, int x, int y, int64_t ax, int64_t ay) {
+    const uint32_t horizontal = held & (PORT_INPUT_LEFT | PORT_INPUT_RIGHT);
+    const uint32_t vertical = held & (PORT_INPUT_UP | PORT_INPUT_DOWN);
+
+    if ((horizontal == PORT_INPUT_RIGHT && x <= 0) || (horizontal == PORT_INPUT_LEFT && x >= 0) ||
+        (vertical == PORT_INPUT_DOWN && y <= 0) || (vertical == PORT_INPUT_UP && y >= 0)) {
+        return false;
+    }
+    if (horizontal == PORT_INPUT_LEFT || horizontal == PORT_INPUT_RIGHT) {
+        if (vertical == 0) {
+            return 2 * ay <= ax;
+        }
+        if (vertical == PORT_INPUT_UP || vertical == PORT_INPUT_DOWN) {
+            return 3 * ay >= ax && ay <= 3 * ax;
+        }
+        return false;
+    }
+    return horizontal == 0 && (vertical == PORT_INPUT_UP || vertical == PORT_INPUT_DOWN) && 2 * ax <= ay;
+}
+
+uint32_t port_gamepad_stick(int x, int y, int deadZone, uint32_t previous) {
+    const int64_t ax = x < 0 ? -(int64_t)x : x;
+    const int64_t ay = y < 0 ? -(int64_t)y : y;
+    const int64_t zone = deadZone;
+    const int64_t release = zone - zone / 8;
+
+    previous &= STICK_DIRECTIONS;
+    if (ax == 0 && ay == 0) {
+        return 0;
+    }
+    // From the centre, nothing until the stick reaches the dead zone's edge; once it presses, it lets go only back
+    // inside seven eighths of it, and keeps its direction until it leans past the widened sector. A stick held still
+    // at either edge reads a few hundred units of noise, and without these margins each wobble across the edge would
+    // be a new press to the game
+    if (previous == 0) {
+        return ax * ax + ay * ay < zone * zone ? 0 : Sector(x, y, ax, ay);
+    }
+    if (ax * ax + ay * ay < release * release) {
+        return 0;
+    }
+    return KeepsSector(previous, x, y, ax, ay) ? previous : Sector(x, y, ax, ay);
 }
 
 SDL_JoystickID port_gamepad_pick(SDL_JoystickID driver, const PortGamepadState *pads, int count) {
@@ -190,7 +234,8 @@ static void AddPad(SDL_JoystickID id) {
         return;
     }
     if (sPadCount == PORT_GAMEPAD_MAX_PADS) {
-        SDL_Log("port: gamepad: %d pads are open already; this one is ignored", PORT_GAMEPAD_MAX_PADS);
+        SDL_Log("port: gamepad: %d pads are open already; this one waits until one of them is disconnected",
+                PORT_GAMEPAD_MAX_PADS);
         return;
     }
     gamepad = SDL_OpenGamepad(id);
@@ -204,6 +249,23 @@ static void AddPad(SDL_JoystickID id) {
     pad->id = id;
     ResolvePad(pad);
     DescribePad(pad, "connected");
+}
+
+// Opens every connected pad that isn't open yet, as long as there is room, but the one with the ID gone (0 for none),
+// which SDL may still list while its removal is handled
+static void OpenConnected(SDL_JoystickID gone) {
+    int count = 0;
+    SDL_JoystickID *ids = SDL_GetGamepads(&count);
+
+    if (ids == NULL) {
+        return;
+    }
+    for (int i = 0; i < count && sPadCount < PORT_GAMEPAD_MAX_PADS; i++) {
+        if (ids[i] != gone) {
+            AddPad(ids[i]);
+        }
+    }
+    SDL_free(ids);
 }
 
 static void RemovePad(SDL_JoystickID id) {
@@ -220,19 +282,12 @@ static void RemovePad(SDL_JoystickID id) {
     if (sDriver == id) {
         sDriver = 0;
     }
+    // A pad that was connected while every slot was taken gets this one
+    OpenConnected(id);
 }
 
 void port_gamepads_open(void) {
-    int count = 0;
-    SDL_JoystickID *ids = SDL_GetGamepads(&count);
-
-    if (ids == NULL) {
-        return;
-    }
-    for (int i = 0; i < count; i++) {
-        AddPad(ids[i]);
-    }
-    SDL_free(ids);
+    OpenConnected(0);
 }
 
 bool port_gamepads_event(const SDL_Event *event) {
@@ -261,6 +316,7 @@ bool port_gamepads_event(const SDL_Event *event) {
 uint32_t port_gamepads_held(void) {
     const PortGamepadMap *map = CurrentMap();
     PortGamepadState states[PORT_GAMEPAD_MAX_PADS];
+    uint32_t stick[PORT_GAMEPAD_MAX_PADS];
     SDL_JoystickID driver;
     uint32_t held = 0;
 
@@ -275,14 +331,17 @@ uint32_t port_gamepads_held(void) {
                 states[i].held |= pad->press[b];
             }
         }
+        stick[i] = 0;
         if (map->leftStickAsDpad) {
-            states[i].held |=
-                port_gamepad_stick(SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTX),
-                                   SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTY), map->stickDeadZone);
+            stick[i] = port_gamepad_stick(SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTX),
+                                          SDL_GetGamepadAxis(pad->gamepad, SDL_GAMEPAD_AXIS_LEFTY), map->stickDeadZone,
+                                          pad->stick);
+            states[i].held |= stick[i];
         }
     }
     driver = port_gamepad_pick(sDriver, states, sPadCount);
     for (int i = 0; i < sPadCount; i++) {
+        sPads[i].stick = stick[i];
         sPads[i].previous = states[i].held;
         if (states[i].id == driver) {
             held = states[i].held;
