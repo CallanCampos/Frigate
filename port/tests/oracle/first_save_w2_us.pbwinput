@@ -3,8 +3,9 @@ pbwinput 1
 # from power-on with a blank save through the start menu's NEW GAME and the intro as new_game.pbwinput plays them
 # (port/tests/replay), the player AAAAAAA and the rival HughAAA, into the field in front of the player's house in
 # Aspertia City; through the first scripts there and in the house to the player's room, then the field menu's SAVE.
-# Video frames, as new_game.pbwinput, whose presses this starts with: the oracle alone plays it, and the same file
-# makes the same save on every run (SAVES in oracle.py keeps its SHA-1).
+# Video frames, as new_game.pbwinput, whose presses this starts with: the oracle plays it whole, and the same file
+# makes the same save on every run (SAVES in oracle.py keeps its SHA-1). The port plays its start, New Game, which
+# formats the blank backup, up to the field's first script (oracle.py port-save, ctest replay_same_save).
 version w2_us
 frames video
 # The title, NEW GAME, then A twice a second through the talk, the choices and the name entries, as in

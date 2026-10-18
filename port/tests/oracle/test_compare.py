@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import io
 import os
+import re
 import shutil
 import stat
 import struct
@@ -810,16 +811,32 @@ class OracleScriptTests(unittest.TestCase):
                                          "--save", save, "--save-out", left])
             self.assertEqual(status, 0)
             self.assertTrue(os.path.exists(left))
+            # A run that leaves no save file leaves the blank chip in save_out, never a file of an earlier run
+            with open(left, "wb") as f:
+                f.write(b"STALE")
+            status, _ = quiet(oracle.run_port, program, out, 10, "none", rom, None, None, 1200, None, None, left)
+            self.assertEqual(status, 0)
+            with open(left, "rb") as f:
+                self.assertEqual(f.read(), b"\xff" * 0x80000)
 
     def test_sequences_that_may_stop(self):
-        # A run that a trap stub ends passes only from the frame the sequence allows it on; a crash or a timeout never
-        sequence = oracle.Sequence(100, 200, "1-100", "", stop_from=60, stop="the field, which has no C yet")
-        self.assertTrue(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 60))
-        self.assertTrue(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 100))
-        self.assertFalse(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 59))
-        self.assertFalse(oracle.stop_allowed(sequence, 1, 80))
-        self.assertFalse(oracle.stop_allowed(sequence, None, 80))
-        self.assertFalse(oracle.stop_allowed(oracle.Sequence(100, 200, "1-100", ""), oracle.TRAP_STATUS, 80))
+        # A run that a trap stub ends passes only from the frame the sequence allows it on, and only on the trap it
+        # names; another trap, a crash or a timeout never
+        trap = "port: the game accessed FIELDMAP_PROC_FUNCS+0x0 (ov036, 0x021c9eb8, 24 bytes), which has no C yet"
+        other = "port: the game called func_ov012_0216a000 (ov012, 0x0216a000), which has no C yet"
+        sequence = oracle.Sequence(100, 200, "1-100", "", stop_from=60, stop_trap=r"\bFIELDMAP_PROC_FUNCS\b.*\(ov036, ",
+                                   stop="the field, which has no C yet")
+        self.assertTrue(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 60, trap))
+        self.assertTrue(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 100, trap))
+        self.assertFalse(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 59, trap))
+        self.assertFalse(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 80, other))
+        self.assertFalse(oracle.stop_allowed(sequence, oracle.TRAP_STATUS, 80, ""))
+        self.assertFalse(oracle.stop_allowed(sequence, 1, 80, trap))
+        self.assertFalse(oracle.stop_allowed(sequence, None, 80, trap))
+        self.assertFalse(oracle.stop_allowed(oracle.Sequence(100, 200, "1-100", ""), oracle.TRAP_STATUS, 80, trap))
+        # A sequence that allows a stop names its trap
+        self.assertFalse(oracle.stop_allowed(oracle.Sequence(100, 200, "1-100", "", stop_from=60, stop="why"),
+                                             oracle.TRAP_STATUS, 80, trap))
 
     def test_saves_are_held_to_their_sha1(self):
         with tempfile.TemporaryDirectory() as d:
@@ -855,6 +872,82 @@ class OracleScriptTests(unittest.TestCase):
             finally:
                 oracle.SAVES.clear()
                 oracle.SAVES.update(saved)
+
+    def test_port_save(self):
+        # The port's save booted on the oracle against the oracle's own: stand-ins for both programs. The port writes a
+        # save with a Wi-Fi ID; the oracle writes its own save of New Game with the ID it is given, and boots any save
+        # to the same frames, rewriting it only when told to
+        with tempfile.TemporaryDirectory() as d:
+            port = os.path.join(d, "fakeport")
+            with open(port, "w") as f:
+                f.write(f"#!{sys.executable}\nimport os, sys\nsys.path.insert(0, {os.path.abspath(TOOLS)!r})\n"
+                        "import compare\nargs = sys.argv[1:]\nout = args[args.index('--run-dir') + 1]\n"
+                        "save = bytearray(b'\\xff' * 0x80000)\n"
+                        "save[0x1aa04:0x1aa0c] = save[0x40a04:0x40a0c] = bytes(range(8))\nsave[0x10] = 1\n"
+                        "open(os.path.join(args[args.index('--save-dir') + 1], 'IREO.sav'), 'wb').write(save)\n"
+                        "compare.write_frames_tsv(os.path.join(out, 'frames.tsv'), [compare.Frame(1, 1, 0, 1, None, "
+                        "None, None, 'a' * 40, 'b' * 40, False, False)])\n"
+                        "sys.stderr.write('port: stopped after 1 frames\\n')\n")
+            os.chmod(port, os.stat(port).st_mode | stat.S_IEXEC)
+            oracle_program = os.path.join(d, "pbw-oracle")
+            with open(oracle_program, "w") as f:
+                f.write(f"#!{sys.executable}\nimport os, sys\nsys.path.insert(0, {os.path.abspath(TOOLS)!r})\n"
+                        "import compare\nargs = sys.argv[1:]\nout = args[args.index('--out') + 1]\n"
+                        "frames = int(args[args.index('--frames') + 1])\n"
+                        "if '--save' in args:\n"
+                        "    save = bytearray(open(args[args.index('--save') + 1], 'rb').read())\n"
+                        "    if os.environ.get('FAKE_WRITES'):\n        save[0] ^= 1\n"
+                        "else:\n    save = bytearray(b'\\xff' * 0x80000)\n"
+                        "    save[0x1aa04:0x1aa0c] = save[0x40a04:0x40a0c] = bytes.fromhex(os.environ['FAKE_ID'])\n"
+                        "open(args[args.index('--save-out') + 1], 'wb').write(save)\n"
+                        "compare.write_frames_tsv(os.path.join(out, 'frames.tsv'), [compare.Frame(i, i, i - 1, i, "
+                        "None, None, None, 'c' * 40, 'd' * 40, False, False) for i in range(1, frames + 1)])\n")
+            os.chmod(oracle_program, os.stat(oracle_program).st_mode | stat.S_IEXEC)
+            rom = os.path.join(d, "rom.nds")
+            with open(rom, "wb") as f:
+                f.write(b"POKEMON B2\0\0IREO01" + bytes(0x200))
+            args = argparse.Namespace(oracle=oracle_program, version="b2_us", rom=rom, time=None, port=port,
+                                      work=os.path.join(d, "work"))
+            saved = os.environ.copy()
+            try:
+                os.environ["FAKE_ID"] = bytes(range(8)).hex()
+                status, out_text = captured(oracle.port_save, argparse.Namespace(**vars(args)))
+                self.assertEqual(status, 0, out_text)
+                self.assertIn("the saves differ in 1 bytes; the console's Wi-Fi ID in them is the same", out_text)
+                self.assertIn(f"5400 of 5400 frames the same", out_text)
+                # Another Wi-Fi ID fails, and says where
+                os.environ["FAKE_ID"] = "0011223344556677"
+                status, out_text = captured(oracle.port_save, argparse.Namespace(**vars(args)))
+                self.assertEqual(status, 1)
+                self.assertIn("the console's Wi-Fi ID at 0x1aa04: the port's 0001020304050607, the oracle's "
+                              "0011223344556677", out_text)
+                # So does a save the oracle writes while booting it
+                os.environ["FAKE_ID"] = bytes(range(8)).hex()
+                os.environ["FAKE_WRITES"] = "1"
+                status, out_text = captured(oracle.port_save, argparse.Namespace(**vars(args)))
+                self.assertEqual(status, 1)
+                self.assertIn("the oracle wrote the port's save while booting it", out_text)
+            finally:
+                os.environ.clear()
+                os.environ.update(saved)
+        # Boots that differ are reported at their first different frame
+        a = compare.Run("a", {i: compare.Frame(i, i, i, i, None, None, None, "c" * 40, "d" * 40, False, False)
+                              for i in range(1, 4)})
+        b = compare.Run("b", dict(a.frames))
+        b.frames[3] = compare.Frame(3, 3, 3, 3, None, None, None, "e" * 40, "d" * 40, False, False)
+        self.assertEqual(oracle.compare_boots(a, a), (3, None))
+        self.assertEqual(oracle.compare_boots(a, b)[0], 2)
+        self.assertIn("frame 3", oracle.compare_boots(a, b)[1])
+
+    def test_port_save_skips_without_the_rom_or_the_oracle(self):
+        with tempfile.TemporaryDirectory() as d:
+            status = quiet(oracle.main, ["port-save", "--port", "x", "--oracle", os.path.join(d, "missing")])
+            self.assertEqual(status, oracle.SKIP)
+            fake = os.path.join(d, "pbw-oracle")
+            open(fake, "w").close()
+            status = quiet(oracle.main, ["port-save", "--port", "x", "--oracle", fake, "--rom",
+                                         os.path.join(d, "missing.nds")])
+            self.assertEqual(status, oracle.SKIP)
 
     def test_save_skips_without_the_rom_or_the_oracle(self):
         with tempfile.TemporaryDirectory() as d:
@@ -981,6 +1074,8 @@ class OracleScriptTests(unittest.TestCase):
             self.assertTrue(not sequence.save or sequence.save in oracle.SAVES, name)
             self.assertTrue(0 <= sequence.stop_from <= sequence.port_frames, name)
             self.assertEqual(bool(sequence.stop_from), bool(sequence.stop), name)
+            self.assertEqual(bool(sequence.stop_from), bool(sequence.stop_trap), name)
+            re.compile(sequence.stop_trap)
         # Every save has an input file, and the SHA-1 of what it makes, for each version
         for name, maker in oracle.SAVES.items():
             self.assertGreater(maker.frames, 0, name)

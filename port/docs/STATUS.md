@@ -26,10 +26,76 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-17: saves, after review: the same save at every run, and the port's save checked on melonDS
+
+- **Upstream:** `615939e25`, as in the last entry; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-saves`, after `3d86232c7`. The branch's two earlier commits were rebuilt
+  before any of it was published, so that the first carries the oracle README's format evidence its links point to
+  (`01b182f4b`, `3d86232c7`; their final tree is unchanged).
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). `check_mwcc_neutral.py`: 3,142 of 3,144 file and
+  version pairs preprocess as upstream's `615939e25` does, `util_wifiidtool.c` among them; the other two are
+  `src/system/vm.c`'s Neutral change already in `game-changes.md`.
+- **Host build:** arm64 macOS, RelWithDebInfo for Black 2 and White 2, and Black 2 under ASan and UBSan. Not pushed, so
+  no CI run.
+- **Tests:** T0 as above. Black 2: all 229 `ctest` tests pass, the oracle's included (`ctest -j4`, 345 s), 6 of them
+  new: `replay_same_save`, `card_backup_linked_save`, `card_backup_refuse_padded`, `card_backup_refuse_larger`,
+  `card_backup_refuse_directory` and `oracle_port_save`; `oracle_compare` has 41 tests (2 new: `port-save` with
+  stand-ins for both programs, and its skips; extended: the named stop, the blank `--save-out`, the declarations'
+  `stop_trap`). T4: `oracle_continue` 3,415 of 3,415 frames (1,310 exact, 2,105 with 3D within the tolerance), stopping
+  on `FIELDMAP_PROC_FUNCS` as `stop_trap` requires; `oracle_opening` 3,800 of 3,800 and `oracle_title` 3,579 of 3,579,
+  as before. T6: `oracle_port_save`, 5,400 of 5,400 frames the same, neither save written, the Wi-Fi ID the oracle's,
+  the saves 10,712 bytes apart; `replay_same_save`; the card tests. White 2: the 16 `card_backup` tests and
+  `replay_same_save` pass; `oracle.py sequence continue` 3,407 of 3,407 (1,312 and 2,095) and `oracle.py port-save`
+  5,400 of 5,400, the saves 10,720 bytes apart, run directly. Sanitized (ASan and UBSan, Black 2): the 16 `card_backup`
+  tests with no report, `replay_same_save`, and the program on the first save through CONTINUE to its trap: no ASan
+  error, from UBSan only the known misaligned read (`g2d_CellAnimation.c:33`), its 3,436 frames' counts and screens
+  those of the plain build, the save untouched. Mutations: `replay_same_save` and `oracle.py port-save` fail on the old
+  DWC line (another ID at each launch, `e70c0000f3a0b385` and `e7080000f2a0b385`), `card_backup_linked_save` without the
+  link's resolution, `card_backup_other_saves` with the old name rule. T3's long runs, T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: the one game change is a branch for hosts in an incomplete file.
+- **Trap stubs:** unchanged, 574 function stubs and 63 data placeholders in each version; a continued game still stops
+  on `FIELDMAP_PROC_FUNCS` (overlay 36), which `oracle_continue` now requires by name.
+- **64-bit warnings:** unchanged: the game change is a `PLATFORM_PC` branch, which the compile probe doesn't define.
+- **Work done** (the two reviews of the last entry's work):
+  - **The port's saves differed at every run.** DWC seeds the console's pending Wi-Fi ID with the clock plus the
+    address of `OS_GetTick` (`util_wifiidtool.c`'s `BUG`), a constant on the DS and on a host wherever ASLR loaded the
+    program, and New Game copies the ID into both copies of the save. The host build now adds the DS's address
+    (`PORT_DS_OS_GETTICK_ADDRESS`, `0x0207bb0d` and `0x0207bb39` with the Thumb bit, from the ROM's literal pools):
+    a game change of the Platform kind, row in `game-changes.md`. The port's New Game now writes the same save at every
+    run, with the oracle's Wi-Fi ID (`280c0000f2a0b315` in Black 2, `69080000f2a0b3ff` in White 2): ctest
+    `replay_same_save` runs it twice and holds the ID to the oracle's, and fails on the old code.
+  - **The port to melonDS is a test now**, where the last entry's T6 claim rested on a run by hand: `oracle.py
+    port-save`, ctest `oracle_port_save`, boots the port's New Game save on the oracle against the oracle's own save of
+    that moment, frame for frame, checks that neither is written and that the Wi-Fi ID is the oracle's.
+  - **The two formatted saves' difference, traced** (`port/tools/oracle/README.md`, "Saves"): 10,712 bytes in Black 2
+    (10,720 in White 2), the same at every run, all from when each program set the blocks up: three blocks encrypted
+    with a key seeded by the VBlank count, DWC's player ID from `OS_GetLowEntropyData`, the day care's egg seed, five
+    small fields, and the CRCs over them. The last entry's 10,718 was one run's.
+  - **The card layer** (`port/hal/card/backup.c`): a save path that is a symbolic link stays one (the image goes to the
+    file it links to, so a link to melonDS's `.sav` keeps one save for both programs); a padded image of this chip
+    and a directory are refused with what they are; a size is said to be another chip's save's size, not that save;
+    the hint for a melonDS save under another name leaves out only this game's saves as the port names them
+    (`IRE?.sav`, `IRD?.sav`), so a `6149.sav` is named. The `.dsv` check is DeSmuME's own (`src/mc.cpp`), and its test
+    builds the footer as DeSmuME writes it.
+  - **`oracle.py`:** a sequence that allows a stop names its trap (`stop_trap`), so `oracle_continue` passes only on
+    overlay 36's `FIELDMAP_PROC_FUNCS`; `port --save-out` never leaves an earlier run's file (the blank chip when the
+    game wrote nothing). White 2's known press frame in the continue sequence is described from the oracle's own
+    frames: the cursor's pulse step the port shows there is one the DS shows at counts 3274, 3296, 3338 and 3360.
+  - **The tests' save directories:** `smoke_reaches_game_main` and `integrate_boot_logos` ran the program without
+    `--save-dir`, so with the player's own save directory; they have one in the build tree now.
+  - **D7 corrected:** the save keeps the console's clock offset, MAC and birthday, which CONTINUE checks
+    (`EventFieldContinue_Create`, which the port reaches before its trap) and overwrites with the console's. Saves from
+    the port, the oracle and melonDS's generated firmware move as they are (offset 0), but one from a DS whose clock
+    was set takes the changed clock's path on the port, and back. Taking a save's console on import, with the
+    console's Wi-Fi ID kept between launches, is the sidecar's first job; not built.
+- **Next:** as in the last entry: a save with an adventure once overlay 36 lets the port into the field; then the
+  import of a save's console (D7), DeSmuME's `.dsv`, and a save with the Pokédex for the start menu's last line.
+- **Blockers:** overlay 36 (issue #83) and overlay 12's script data, as in the last entry.
+
 ## 2026-10-17: saves with melonDS, and CONTINUE from the oracle's first save
 
 - **Upstream:** `615939e25`, which `main` merged before this task (`e1b68f578`); no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-saves` from `f52dad0b2`.
+- **Port:** `3d86232c7`, on the branch `port-saves` from `f52dad0b2`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`). No game file changed, so no
   `check_mwcc_neutral.py` run and no row in `game-changes.md`.
 - **Host build:** arm64 macOS, RelWithDebInfo for Black 2 (everything) and White 2 (the program and the backup tests),

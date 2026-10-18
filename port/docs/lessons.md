@@ -3,6 +3,25 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-17: saves with melonDS, after review
+
+- **A function's address used as a number is host state.** DWC adds `(u32)OS_GetTick`, the function's address, to the
+  seed of the console's Wi-Fi ID (a `BUG` the decomp marks); on the DS it is a constant, on a host whatever ASLR made
+  it at launch, so every run wrote another save. Two runs often agree by chance, since the slide reaches only the
+  seed's high bits: hold such a value to the oracle's, not only to a second run (`replay_same_save` does both). A
+  Thumb function's address has bit 0 set (`0x0207bb0d`), as the ROM's literal pool shows.
+- **Count a difference twice before calling it a figure.** "10,718 bytes differ" came from one run of a
+  nondeterministic port; a second run would have shown it move. Diff two runs of the port before diffing the port
+  against the oracle, then sort what is left by cause.
+- **Allow a stop by its trap's name, not by its exit status.** A sequence that let any trap stub pass from a frame on
+  would have kept passing if the port began stopping on another gap; `stop_trap` names the one it stops on.
+- **A rename over a symbolic link replaces the link.** The atomic write (temporary file, then rename) has to resolve
+  the save path first, or a player's link to melonDS's `.sav` silently becomes a file of its own.
+- **Every test that runs the program needs `--save-dir`**, even one that runs a frame: without it the program reads the
+  player's own save directory, and a file there of the wrong size fails the test.
+- **The cursor's pulse is a cycle, so a step is shown at many counts.** Saying the DS "doesn't show" a picture needs
+  the whole run's hashes: White 2's press frame shows a pulse step the DS shows at four other counts of the same run.
+
 ## 2026-10-17: saves with melonDS
 
 - **A save moves the oracle's frame numbers, not its counts.** The DS's start-up reads the save before the main loop

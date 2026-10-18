@@ -112,3 +112,14 @@ foreach(sequence IN ITEMS opening title continue)
 endforeach()
 # Making the save first runs the oracle 18,800 frames more
 set_tests_properties(oracle_continue PROPERTIES TIMEOUT 3600)
+
+# The other way, a save from the port to melonDS (T6): the port's New Game formats the blank backup, and the oracle
+# boots that save to the start menu frame for frame as it boots its own save of the same moment, writing neither; the
+# console's Wi-Fi ID that New Game copied into the save is the oracle's (oracle.py port-save). Skipped (77) without
+# the oracle or the ROM
+add_test(NAME oracle_port_save
+    COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1
+        "${PORT_PYTHON}" "${port_oracle_dir}/oracle.py" port-save
+            --oracle "${port_oracle_binary}" --port "$<TARGET_FILE:${PORT_PROGRAM}>" --version "${PORT_VERSION}"
+    WORKING_DIRECTORY "${REPO_ROOT}")
+set_tests_properties(oracle_port_save PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 2400)
