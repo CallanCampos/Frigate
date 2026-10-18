@@ -450,7 +450,7 @@ Same instructions, registers swapped.
   `DrawTextAligned` matches with `int line = 0;`, `lineX = x + lfx * line;` and `line++`.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
-  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OamManager.c` reads its buffers through
+  `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OAM.c` reads its buffers through
   `GetOamBuffer_(NNSG2dOamType type)` returning `&oamBuffers_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
   `NNS_G2dEntryOamManagerOamWithAffineIdx` and both branches of `NNS_G2dResetOamManagerBuffer`. The same helper
   with a `u32` or `int` parameter, a cast to the enum, or an enum-typed field alone keeps the swap.
@@ -1473,7 +1473,10 @@ Same instructions, scheduled in another order.
   its `if`, and the pointer initialized before the `if` left 12 bytes off.
 - A field's offset added to the base before a register index (`adds r0, r0, #4; ldr r1, [r0, r1]`) is MWCC's address
   of `p[i].field` when two accesses share it, `p` is a pointer variable and its first common-subexpression pass did
-  not merge them, as in `f[i].b += v`. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
+  not merge them, as in `f[i].b += v`. The accesses can be different expressions: `pokewood_savedata.c`'s
+  `func_02011130` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
+  one `save + 0x28` (`add r0, #0x28; ldr r0, [r0, r5]`), and tests `hasRecord` and sets it from one `save + 0x38`, while
+  `isNewRecord`, set once, indexes first. Otherwise the front end folds the offset out of the index: `(&p->f)[i * 2]`
   compiles like `p[i].f`, index first with the offset in the access (`adds r0, r1, r0; ldr r1, [r0, #4]`), and so do
   other field types, `const`, a nested struct and a one-element array member; a base loaded from a field
   (`list->table[i].f`) shares the address but indexes first too. Overlay 139's `UpdateScroll` reads
@@ -2174,7 +2177,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2p2): a
   `u32` return type with `if (c) { return TRUE; } return FALSE;` (`g2d_CellAnimation.c`'s
   `NNS_G2dCellDataBankHasVramTransferData`, which every `BOOL` spelling folds into the test), or a cast,
-  `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OamManager.c`'s `IsCapacityEnough_`, where the `if` form, a
+  `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
   ternary, a plain comparison and a local all fold).
 - A 0/1 choice laid out first value first (`bhs`, `movs r0, #0`, `b`, `movs r0, #1`) is held in an enum type: every
   plain 0/1 spelling (ternary, `if`/`else`, `!`, `== FALSE`, an int local) gives `blo`, `movs r0, #1` first.
@@ -2532,6 +2535,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `-opt nostrength` sub-options after `-O4,p` change nothing. `ica_anime.c` matches whole with the two `-flag`s in
   `config/compiler_flags.toml` and plain `f32 *` reads, which is not used: nothing but that one loop shows the
   setting, and the cast above explains the same bytes.
+- `-flag` and `#pragma` also take internal pass names that the manual doesn't list and `mwccarm.exe` holds:
+  `opt_arithtransformation` turns a `u64` multiply by a power of two into shifts, and `opt_foldconstants` and
+  `opt_treetransformation` each fold a chain of constant multiplies (with only `opt_arithtransformation` on,
+  `x * 3 * 1000` stays two `_ull_mul` calls). The front end folds none of it: at -O0, `x * 64 * 1000` stays two `_ull_mul` calls, and from -O1 up it is one, whichever `-opt` sub-options are
+  off. As a diagnostic, these three with `opt_loop_invariants` and `opt_strength_reduction` off around `ir_check.c`'s
+  `IrCheck_ReadId` (`#pragma push`, the five, `#pragma pop`) give its code from one `start` local; with any of the
+  five left on, it differs again (the waits fold, or with `opt_arithtransformation` on the 64 becomes shifts). An
+  `asm { nop }` statement in the function leaves the multiplies apart too, and an empty `asm {}` does not. Neither is
+  source; an aligned object the function reads gives the same result from source (below).
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
@@ -2637,10 +2649,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   was wrong), and its locals named after the assert strings (`chat`, `write_pos`, `view_no`, `offset`) also made
   `.data` match: the strings give the original's variable names. `country_region.c`'s `Country_IsValidPlace` loops
   while `i < gSelectableCountryCount ? TRUE : FALSE`, a loop that `#pragma optimization_level 1` or `2` also shapes.
-  No enum counter is needed for it in game code: overlay 214's `WorldTrade_NationSortListMake` gets the original's
-  loop entry and registers from `i < num ? TRUE : FALSE` alone. An expression that two of a call's arguments share,
-  as its `first + i` is, becomes a common-subexpression temporary computed before the call's stack arguments are
-  stored, which decides which register loads it; the original computed it after (its row).
+  Before writing one, ask whether the function reads an object with an explicit alignment, which keeps the `b` with a
+  plain test (below): overlay 214's `WorldTrade_NationSortListMake` got the loop entry from `i < num ? TRUE : FALSE`
+  and stayed 18 bytes off, and matches with `i < num` and the table it reads aligned.
 - A loop with a constant bound keeps its `b` to the test when the test is an inline predicate that returns through
   `TRUE`/`FALSE`: `for (i = 0; UnionMsg_IsMenuKind(i); i++)` in the Union Room's `UnionMsg_UpdateRuleMenu`. A plain
   `i < 8`, and an inline with `return kind < N;`, are both rotated.
@@ -2651,8 +2662,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`vct_audio.c`) gets its loop and the loop's setup byte for byte from `i < VCT_SLOT_MAX ? TRUE : FALSE`, though
   there the original's `b` comes from an aligned object (next bullet).
 - An explicit alignment (`ATTRIBUTE_ALIGN(4)`, 16 or 32) on any object a function reads, or on a member it reads,
-  keeps every constant-bound loop of the function entered with a `b` to its test, and changes its other optimizations:
-  a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it is otherwise shifted.
+  keeps every loop of the function, with a constant or a variable bound, entered with a `b` to its test, and changes
+  its other optimizations: a `u64` divided by 64 stays a call to `_ll_udiv` (`mov r2, #0x40; mov r3, #0; bl`) where it
+  is otherwise shifted.
   `volatile`, an aligned struct type or a union do not do it, and an `extern` declaration with the attribute does it
   as the definition does. libVCT's `vct_audio.c` has the original's case: its static `sSendQueue` is 32-aligned in the
   ROM (`0x02197a80`, after an 8-byte gap), and the functions that read it keep the leading `b` (`VCT_InitAudio`,
@@ -2661,6 +2673,25 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declared `extern VCTSendQueue sSendQueue ATTRIBUTE_ALIGN(32);`. Under the attribute `VCT_AttachSession` matches with
   `if (!session)`, while `session == NULL` shares the zero with the return value and is 4 bytes short. Loops that keep
   the `b` only in the functions that read one object therefore ask whether that object is aligned (their rows).
+  Overlay 214's `WorldTrade_NationSortListMake` fits the same way without address evidence: it reads only
+  `sCountryListTbl`, a `static const u16` table at `0x021e1ff4`, and with an alignment attribute on it a plain
+  `for (i = 0; i < num; i++)` matches, loop entry, registers and the `first + i` its call's arguments share, where a
+  0/1 test left 18 bytes. `ATTRIBUTE_ALIGN(1)`, `(2)` and `(4)` give the same code and `.rodata`, so the attribute
+  does it, not its value (8 and more move the table 4 bytes), and the table before it ends on that boundary, so the
+  ROM can't say whether the original aligned it. The file's other reader of the table matches either way.
+- The same alignment keeps a chain of 64-bit constant multiplies apart: `OS_TicksToMicroSeconds(OS_GetTick() - start)`
+  multiplies by 64 and then by 1000 with two `_ull_mul` calls, the 64 and the zero high word set in registers before
+  the loop, where it is otherwise one multiply by 64000. `ir_check.c`'s `IrCheck_ReadId` (overlay 338) shows the
+  effect: it reads the file's statics by name and keeps both calls in its two waits, while `IrCheck_SendByte` and
+  `IrCheck_RecvByte`, which reach the transfer through a pointer, fold theirs. Its layout doesn't show which static is
+  aligned, or to what: the overlay's sections start 32-aligned anyway, and 4 to 32 on `sTransfer` all match. The other
+  copy of this driver, `lib/irc/src/irc_spi.c` (overlay 031), agrees: compiled at the game's -O4,p, `IrcSpi_Recv` and
+  `IrcSpi_Send`, the two functions that read `IrcSpi` by name, keep the original's unrotated loops only with an
+  alignment on `IrcSpi`, and no object of that file sits on a 32-byte boundary, so `ir_check.c` aligns `sTransfer` to
+  4. Under the attribute `IrCheck_ReadId` also needs each wait's start tick in a variable of its own, the local of an
+  inline `IrCheck_Wait60us` (the infrared library's `IrcSpi_Wait60us`): one `start` set before both waits swaps two
+  registers (`r4`/`r6`), which it doesn't with the five passes above off.
+  Two `_ull_mul` calls where ours multiplies once, in one function of a file, ask whether it reads an aligned object.
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =
   head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `VCT_FlushAllQueues` (`vct_buffer.c`) matches
