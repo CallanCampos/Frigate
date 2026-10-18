@@ -79,7 +79,7 @@ Decompilation and matching happen upstream: decomp claims and contributions go t
 What merges there reaches this repository at the next sync.
 
 Problems with this repository, including building it, go in
-[this repository's issues](https://github.com/CallanCampos/pokebw2-native/issues). Its issue and pull request
+[this repository's issues](https://github.com/CallanCampos/Frigate/issues). Its issue and pull request
 templates are upstream's, written for decomp work; a port issue or pull request ignores their decomp checklists.
 
 ## Legal

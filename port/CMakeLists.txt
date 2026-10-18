@@ -41,7 +41,7 @@ port_product_string(PORT_PRODUCT_DISCLAIMER)
 
 project(frigate
     DESCRIPTION "${PORT_PRODUCT_DESCRIPTION}"
-    HOMEPAGE_URL "https://github.com/CallanCampos/pokebw2-native"
+    HOMEPAGE_URL "https://github.com/CallanCampos/Frigate"
     LANGUAGES C)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/os/port_app.h")
 

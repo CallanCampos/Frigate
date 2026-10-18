@@ -28,7 +28,7 @@ The port changes files outside `port/` only in the three ways of PLAN.md §4.1, 
 
 ## The hourly Action
 
-Every hour at minute 23, and on demand with `gh workflow run port-sync.yml -R CallanCampos/pokebw2-native`, in that
+Every hour at minute 23, and on demand with `gh workflow run port-sync.yml -R CallanCampos/Frigate`, in that
 repository only. Its first job, `merge`, has a read-only token and keeps no credentials in its checkout:
 
 1. Checks out `main` with full history and fetches upstream `main`.
@@ -100,17 +100,17 @@ notifies, is the signal.
 - **It can be switched off by inactivity.** In a public repository, GitHub disables scheduled workflows after 60 days
   without repository activity [4][5]. The Action's own pushes are commits, so this should only happen if upstream
   stops for two months, or while the Action has stopped pushing and no session syncs. Turn it back on with
-  `gh workflow enable port-sync.yml -R CallanCampos/pokebw2-native`.
-- **Forks don't run it.** The jobs run only when the repository is `CallanCampos/pokebw2-native`, and GitHub
+  `gh workflow enable port-sync.yml -R CallanCampos/Frigate`.
+- **Forks don't run it.** The jobs run only when the repository is `CallanCampos/Frigate`, and GitHub
   disables scheduled workflows in forks of public repositories by default anyway [5].
-- **Upstream's `build.yml` is disabled here** (`gh workflow disable build.yml -R CallanCampos/pokebw2-native`),
+- **Upstream's `build.yml` is disabled here** (`gh workflow disable build.yml -R CallanCampos/Frigate`),
   since it fetches the ROMs with a deploy key that only upstream has. Disabling, not editing, keeps the file identical
   to upstream's. The disabled state belongs to that one file: a workflow that upstream adds, or `build.yml` under a
   new name, is enabled here as soon as a sync pushes it, and if it needs upstream's secrets it fails on every push.
   The Action's issue lists the workflow files a merge adds or renames and those that use secrets other than
   `GITHUB_TOKEN`.
 - **gh commands name the repository.** gh prefers a remote named `upstream` to `origin`, so every `gh` command here
-  passes `-R CallanCampos/pokebw2-native` (the workflow passes `--repo` and sets `GH_REPO`).
+  passes `-R CallanCampos/Frigate` (the workflow passes `--repo` and sets `GH_REPO`).
 
 ## The local sync
 
@@ -120,19 +120,22 @@ Every port session starts with it (PLAN.md §8, step 1):
 port/tools/sync_upstream.sh            # from anywhere in the port clone or one of its worktrees
 ```
 
-It refuses to run when a URL of `origin` (fetch or push) isn't `CallanCampos/pokebw2-native` as `https://github.com/...`
-or `git@github.com:...`, with or without `.git` (so not the decomp or its fork `CallanCampos/pokebw2`), when tracked
-files have changes, or when a merge is in progress; it never stashes. It adds the `upstream` remote when it is missing,
-and sets that remote's push URL to `DISABLED-port-never-pushes-upstream` whenever it is anything else, as
-`bootstrap_checkout.sh` does, so that a push there fails while fetching still works. It fast-forwards to `origin/main`,
-checks for a rewrite of upstream's history, checks commit messages for issues in other repositories (see
-[below](#commit-messages-that-name-other-repositories)), merges upstream `main` with the same message and trailer as the
-Action, runs `python3 configure.py b2_us w2_us` and `ninja` (once more if ninja exits 139, wibo's intermittent crash),
-checks both ROM files against `b2_us.sha1` and `w2_us.sha1`, runs the host build and `ctest` once `port/CMakeLists.txt`
-exists, and pushes to `origin main` only when all of that passed. A refused push is fetched, merged again, rebuilt only
-where the new commits change something, and retried, three attempts in all; it never force-pushes. At the end it prints
-the fields of a [STATUS.md](STATUS.md) entry that it knows (upstream and port commits, ROM, host build, tests, and any
-upstream workflow files the push changes); the session adds the rest and commits the entry.
+It refuses to run when a URL of `origin` (fetch or push) isn't `CallanCampos/Frigate` as `https://github.com/...` or
+`git@github.com:...`, with or without `.git` (so not the decomp or its fork `CallanCampos/pokebw2`), when tracked files
+have changes, or when a merge is in progress; it never stashes. A clone made before the repository's rename on
+2026-10-18 still has the old name in `origin`'s URL, which GitHub redirects: the script refuses it too and prints the
+command that updates it, such as `git remote set-url origin https://github.com/CallanCampos/Frigate.git`. It adds the
+`upstream` remote when it is missing, and sets that remote's push URL to `DISABLED-port-never-pushes-upstream` whenever
+it is anything else, as `bootstrap_checkout.sh` does, so that a push there fails while fetching still works. It
+fast-forwards to `origin/main`, checks for a rewrite of upstream's history, checks commit messages for issues in other
+repositories (see [below](#commit-messages-that-name-other-repositories)), merges upstream `main` with the same message
+and trailer as the Action, runs `python3 configure.py b2_us w2_us` and `ninja` (once more if ninja exits 139, wibo's
+intermittent crash), checks both ROM files against `b2_us.sha1` and `w2_us.sha1`, runs the host build and `ctest` once
+`port/CMakeLists.txt` exists, and pushes to `origin main` only when all of that passed. A refused push is fetched,
+merged again, rebuilt only where the new commits change something, and retried, three attempts in all; it never
+force-pushes. At the end it prints the fields of a [STATUS.md](STATUS.md) entry that it knows (upstream and port
+commits, ROM, host build, tests, and any upstream workflow files the push changes); the session adds the rest and
+commits the entry.
 
 | Option | Effect |
 | --- | --- |
@@ -168,7 +171,7 @@ The issue says what blocks the sync and what to run. The fix is a local sync, or
 to an upstream file made only so that the Action's merge passes.
 
 - **Workflow files changed upstream.** Run `port/tools/sync_upstream.sh`. Then run
-  `gh workflow list --all -R CallanCampos/pokebw2-native`: `build.yml` must still be disabled. For a workflow that the
+  `gh workflow list --all -R CallanCampos/Frigate`: `build.yml` must still be disabled. For a workflow that the
   issue lists as added or renamed, or as using secrets other than `GITHUB_TOKEN`, ask the user before disabling it:
   `port/CLAUDE.md` allows only `build.yml` to be disabled without asking.
 - **Compile failure.** If upstream `main` itself doesn't compile, wait: the next run after upstream's fix gets
@@ -184,7 +187,7 @@ to an upstream file made only so that the Action's merge passes.
 - **Commits name issues in other repositories.** Ask the user; see
   [Commit messages that name other repositories](#commit-messages-that-name-other-repositories).
 - **Push refused.** The issue quotes git's message. Usually branch protection or a token problem; fix that, then run
-  the workflow again with `gh workflow run port-sync.yml -R CallanCampos/pokebw2-native`.
+  the workflow again with `gh workflow run port-sync.yml -R CallanCampos/Frigate`.
 
 The next hourly run closes the issue once `main` contains upstream `main`, or for differing files, once none differs.
 

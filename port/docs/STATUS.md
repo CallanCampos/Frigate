@@ -26,10 +26,86 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the repository renamed CallanCampos/Frigate: the sync's guards, the scripts and the documents
+
+- **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `2da26e048`; not pushed.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`). No file that the
+  ROM build reads changed, so ninja had only the two ROM checks to run.
+- **Host build:** arm64 macOS, RelWithDebInfo, `build/port-n` (Black 2), Ninja, rebuilt from this tree: CMake re-ran for
+  the project's new `HOMEPAGE_URL` and 1,277 steps rebuilt, exit 0, with `gen_overlay_sections`' checks passing. The
+  rebuild also compiled the C of upstream's `993e6c49b`, merged by `1f0c184f6`, which the last entry's builds predate.
+  White 2's `build/port-w2` not rebuilt: the change is the same for both versions and touches no C. Not pushed, so no CI
+  run.
+- **Tests:** T0 as above.
+  - `port_guard.py --self-test`: 125 of 125 cases pass (77 blocked, 48 allowed), its cases now writing to
+    `CallanCampos/Frigate`; `python3 -m py_compile` is clean, and fed as a hook in this clone, a write with
+    `-R CallanCampos/Frigate` or to `repos/CallanCampos/Frigate` passes and one to upstream is refused.
+  - `sync_upstream.sh`'s origin check, dry, in a throwaway clone (`build/rename-check`, deleted after) whose tracked
+    change stops the script right after the check, before anything is fetched: 30 of 30 cases. The new name passes over
+    https (with and without `.git`, with a trailing slash, in lower case), `git@github.com:` and `ssh://`, with and
+    without `.git`. The old name is refused with exit 2 in all six forms tried, each with the `git remote set-url`
+    command for its own transport; running the printed command, then the script, gets past the check every time. An old
+    push URL gets the `--push` form, and an old URL beside a new one gets the form that names the URL it replaces. The
+    decomp and the fork still get their message, and `CallanCampos/Frigate2`, `someone/Frigate`, `pokebw2-native2` and a
+    non-GitHub host the general one. `--help` prints the header with the new step 1, exit 0.
+  - `bootstrap_checkout.sh`'s gh default check, run alone against throwaway repositories: 8 of 8 cases (the port by URL
+    over https and ssh or by name; origin's old URL, which gets the `git remote set-url` command; a default on the old
+    name, on `upstream`, on a longer name, or none, which get `gh repo set-default CallanCampos/Frigate`).
+  - `bash -n` and `sh -n` on both scripts. actionlint isn't installed on this machine, so not run; both port workflows
+    parse as YAML, and `port-sync.yml`'s two jobs' conditions name `CallanCampos/Frigate`.
+  - Every relative link of the Markdown files under `port/` and `.github/README.md` resolves, anchors as GitHub makes
+    them included: 1,095 links in 58 files (checked by script).
+  - `ctest` not run: this change touches no C, test or target, and nothing reads the project's `HOMEPAGE_URL`. T5's
+    nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 512 function stubs and 46 data placeholders in Black 2 (`gen_stubs`, the rebuild above), 112 and 2
+  fewer than the last entry's: the C that upstream's `993e6c49b` brought, not this change. White 2 not measured.
+- **64-bit warnings:** none of the pointer/int kinds (`-Wint-to-pointer-cast`, `-Wpointer-to-int-cast`,
+  `-Wshorten-64-to-32`, `-Wint-conversion`) in the rebuild above, game and `lib/` alike; its 204 warnings are of other
+  kinds (`-Wswitch` 132, `-Wpointer-sign` 34), and a partial rebuild's total isn't comparable with a full build's.
+- **Work done:** the user had the repository renamed from `CallanCampos/pokebw2-native` to `CallanCampos/Frigate`;
+  GitHub redirects the old URL. Every living reference now names the new one.
+  - **The hourly sync**: `port-sync.yml`'s two jobs run only when `github.repository` is `CallanCampos/Frigate`. Until
+    this is on `main`, the renamed repository's runs skip both jobs, since they compare with the old name.
+  - **`sync_upstream.sh`** requires origin to be `CallanCampos/Frigate`; its matcher takes the repository as an
+    argument. A fetch or push URL with the old name, in any of the forms the check accepts, is refused with exit 2 and
+    the exact command that updates it, in the URL's own transport
+    (`git remote set-url origin https://github.com/CallanCampos/Frigate.git`, `--push` for a push URL), rather than
+    accepted through the redirect. Its header and messages name the new repository.
+  - **`bootstrap_checkout.sh`** reports the port as gh's default only for `CallanCampos/Frigate`, matched as a whole
+    name; when the default is origin and origin's URL isn't the port's, as in a clone made before the rename, it gives
+    the `git remote set-url` command, and otherwise `gh repo set-default CallanCampos/Frigate`.
+  - **`port_guard.py`**: `PORT`, the self-test's `PORT_URL`, its messages and its cases name `CallanCampos/Frigate`; the
+    pattern it uses for a command it can't parse no longer leaves out the old name.
+  - **CMake**: the project's `HOMEPAGE_URL`. **The landing page** links the new repository's issues.
+  - **port/README.md**: the clone steps (`git clone https://github.com/CallanCampos/Frigate.git`, `cd Frigate`,
+    `gh repo set-default CallanCampos/Frigate`), and what a clone made before the rename runs.
+  - **port/CLAUDE.md** says the repository is `CallanCampos/Frigate`, renamed from `pokebw2-native` on 2026-10-18 at the
+    user's request, and drops the sentence that it stays `pokebw2-native`; its remotes, gh commands and the sync's
+    origin rule name the new repository. The port clone on this machine keeps its folder, `~/dev/decomp/pokebw2-native`,
+    for now, as CLAUDE.md, PLAN.md §9 and ADR 0001's note say; a fresh clone's folder is `Frigate`.
+  - **SYNC.md**'s commands and the Action's and the local sync's repository checks, with the old URL's refusal.
+  - **Records**: ADR 0001 and PLAN.md's D1 and §4.1 get a dated one-line note of the rename, their decisions as written;
+    PLAN.md's opening and §9 name the new repository. Older STATUS entries, the research notes, ADR 0010's log folder
+    and the `com.example.pokebw2-native` bundle placeholder that `bundle_id.cmake` migrates (and its tests) are history
+    and stay. `git grep -i pokebw2-native` now finds only those, the clone's folder, CLAUDE.md's rename line and
+    `sync_upstream.sh`'s old name, which its refusal needs.
+  - **The last entry**: its Port field names `bbfab4c72`.
+- **Next:** once this is published, the clone's `origin` moves to `https://github.com/CallanCampos/Frigate.git` and gh's
+  default to `CallanCampos/Frigate` (`sync_upstream.sh` refuses the old URL from this commit on); renaming the clone's
+  folder is the user's call. Then as in the last entry: White 2's starter route, so that `party_menus` and
+  `continue_starter` run in White 2; the apps no route reaches yet (the Pokédex past its trap); a save with an adventure
+  made by the port, once overlay 36 lets it into the field; for the sound, a comparison sequence where a player plays on
+  the game's count.
+- **Blockers:** overlay 36 (issue #83, another contributor's active claim) gates phase 3, the overworld, and the
+  launcher's retirement (ADR 0012); `NNSi_objSizeWTbl` (ARM9 main's NitroSystem G2D, no C yet) stops the Pokédex;
+  overlays 11 and 182 (Wi-Fi, Download Play) only matter from phase 7.
+
 ## 2026-10-18: the launcher track's merge after review: --help's options and statuses, and the documents as built
 
 - **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
+- **Port:** `bbfab4c72`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
   entry; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `b1ca0c257`. No
   game file changed: game-changes.md's one edit marks `event_mapchange.c`'s second row "(again)".

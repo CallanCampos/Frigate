@@ -261,10 +261,10 @@ decomp checkout. The same script sets the checkout up for Claude Code and disabl
 header lists its options.
 
 ```sh
-git clone https://github.com/CallanCampos/pokebw2-native.git
-cd pokebw2-native
+git clone https://github.com/CallanCampos/Frigate.git
+cd Frigate
 git remote add upstream https://github.com/fuddlesworth/pokebw2.git
-gh repo set-default CallanCampos/pokebw2-native
+gh repo set-default CallanCampos/Frigate
 port/tools/bootstrap_checkout.sh
 PATH=/opt/homebrew/opt/llvm/bin:$PATH python3 configure.py && ninja
 ```
@@ -277,6 +277,11 @@ Add the `upstream` remote before running the script: the script sets its push UR
 `DISABLED-port-never-pushes-upstream`, so a push there fails while fetching still works. `gh repo set-default` matters
 because gh otherwise prefers the `upstream` remote, so a plain `gh issue create` would post on the decomp. Both are
 kept in `.git/config`, which worktrees share, and the script says when either is missing.
+
+The repository was renamed `CallanCampos/Frigate` on 2026-10-18. A clone made before keeps the old name in `origin`'s
+URL; GitHub redirects it, but `sync_upstream.sh` refuses such a clone and prints the command that updates it,
+`git remote set-url origin https://github.com/CallanCampos/Frigate.git` (or the `git@github.com:` form). Run
+`gh repo set-default CallanCampos/Frigate` after it. The clone's folder can keep its old name.
 
 `ninja` builds both ROMs and checks both SHA1s, as in the decomp's README. It takes about 5 minutes. ROM dumps are
 your own and are never committed.

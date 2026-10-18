@@ -28,7 +28,7 @@ import subprocess
 import sys
 import tempfile
 
-PORT = "callancampos/pokebw2-native"
+PORT = "callancampos/frigate"
 FORBIDDEN = {
     "fuddlesworth/pokebw2": "upstream (fuddlesworth/pokebw2)",
     "callancampos/pokebw2": "the decomp fork (CallanCampos/pokebw2)",
@@ -68,7 +68,7 @@ REPO_SPEC = re.compile(
     ([\w-]+)/([\w.-]+?)(?:\.git)?(?:/.*)?$"""
 )
 # Only for a command the guard failed to parse: refuse it if it looks like it could write to GitHub
-SUSPECT = re.compile(r"(?i)fuddlesworth|callancampos/pokebw2(?!-native)|\bpush\b|\bgh\b|api\.github\.com")
+SUSPECT = re.compile(r"(?i)fuddlesworth|callancampos/pokebw2|\bpush\b|\bgh\b|api\.github\.com")
 
 # gh's repository-scoped command groups and their read-only subcommands; any other subcommand writes
 GH_READS = {
@@ -736,7 +736,7 @@ class Guard:
             if target is None:
                 self.block(
                     f"`{command}` names no repository, and this checkout's gh default isn't the port; "
-                    "add -R CallanCampos/pokebw2-native"
+                    "add -R CallanCampos/Frigate"
                 )
             elif target.startswith("?"):
                 self.block(f"`{command}` names its repository through a variable ({target[1:]}); write it out")
@@ -806,7 +806,7 @@ class Guard:
             if target is None:
                 self.block(
                     f"`gh api -X {method} {endpoint}` fills {{owner}}/{{repo}} from a default that isn't the port "
-                    "here; write repos/CallanCampos/pokebw2-native"
+                    "here; write repos/CallanCampos/Frigate"
                 )
             elif target in FORBIDDEN:
                 self.block(f"`gh api -X {method} {endpoint}` writes to {FORBIDDEN[target]}")
@@ -861,7 +861,7 @@ class Guard:
             self.document(input_file, texts, unseen)
         advice = (
             "the guard can't tell which repository a mutation changes. Use a gh subcommand with -R "
-            "CallanCampos/pokebw2-native or a REST path under repos/CallanCampos/pokebw2-native; for a read, pass the "
+            "CallanCampos/Frigate or a REST path under repos/CallanCampos/Frigate; for a read, pass the "
             "query inline (-f query='...'), in a quoted here-document or in a file"
         )
         if any(MUTATION.search(text) for text in texts):
@@ -1195,7 +1195,7 @@ MESSAGE = """port_guard refused this command. The port is a solo project: a port
 fuddlesworth/pokebw2 (upstream) or CallanCampos/pokebw2 (the decomp fork), and the port's writes never link
 upstream issues or pull requests or @-mention upstream's people (port/docs/adr/0002-solo-project-no-upstream-posts.md).
 {reasons}
-Port writes name the port: gh ... -R CallanCampos/pokebw2-native, git push origin. Decomp work, claims included,
+Port writes name the port: gh ... -R CallanCampos/Frigate, git push origin. Decomp work, claims included,
 belongs to a session the user starts in the decomp checkout. Stop and tell the user; don't route around this guard."""
 
 
@@ -1228,7 +1228,7 @@ def main():
 
 # --- Self-test ------------------------------------------------------------------------------------------------------
 
-PORT_URL = "https://github.com/CallanCampos/pokebw2-native.git"
+PORT_URL = "https://github.com/CallanCampos/Frigate.git"
 UPSTREAM_URL = "https://github.com/fuddlesworth/pokebw2.git"
 FORK_URL = "git@github.com:CallanCampos/pokebw2.git"
 LINKED = "DWC: list the access points\n\nThe rest of fuddlesworth/pokebw2#315.\n"
@@ -1318,7 +1318,7 @@ def self_test():
             (True, port, "gh pr create --repo=CallanCampos/pokebw2 --fill", {}),
             (True, port, "gh issue comment https://github.com/fuddlesworth/pokebw2/issues/80 --body hi", {}),
             (True, port, "gh pr merge --merge https://github.com/fuddlesworth/pokebw2/pull/3", {}),
-            (True, port, "gh issue transfer 3 fuddlesworth/pokebw2 -R CallanCampos/pokebw2-native", {}),
+            (True, port, "gh issue transfer 3 fuddlesworth/pokebw2 -R CallanCampos/Frigate", {}),
             (True, port, "gh repo fork fuddlesworth/pokebw2 --clone=false", {}),
             (True, port, "gh label create port -R https://github.com/fuddlesworth/pokebw2", {}),
             (True, port, "gh pr review 345 -R fuddlesworth/pokebw2 --approve", {}),
@@ -1326,8 +1326,8 @@ def self_test():
             (True, nodefault, "gh issue create --title t --body b", {}),
             (True, port, "GH_REPO=fuddlesworth/pokebw2 gh issue create -t t -b b", {}),
             (True, port, "export GH_REPO=fuddlesworth/pokebw2; gh pr comment 3 -b hi", {}),
-            (True, nodefault, "GH_REPO=CallanCampos/pokebw2-native; gh issue create -t t -b b", {}),
-            (False, nodefault, "GH_REPO=CallanCampos/pokebw2-native; export GH_REPO; gh issue create -t t", {}),
+            (True, nodefault, "GH_REPO=CallanCampos/Frigate; gh issue create -t t -b b", {}),
+            (False, nodefault, "GH_REPO=CallanCampos/Frigate; export GH_REPO; gh issue create -t t", {}),
             (True, port, "gh release create v1", upstream_env),
             (True, port, "gh issue comment 5 -R \"$REPO\" -b hi", {}),
             (True, port, 'cd "$DECOMP" && gh issue comment 5 -b hi', {}),
@@ -1359,12 +1359,12 @@ def self_test():
             (True, port, "(cd /w/decomp && git push)", {}),
             (True, port, "git -c remote.origin.pushurl=https://github.com/fuddlesworth/pokebw2 push origin main", {}),
             (True, port, "git -c url.https://github.com/fuddlesworth/pokebw2.pushInsteadOf=https://github.com/"
-             "CallanCampos/pokebw2-native push origin main", {}),
+             "CallanCampos/Frigate push origin main", {}),
             (True, port, "git config remote.origin.pushurl https://github.com/fuddlesworth/pokebw2 && git push", {}),
             (True, port, "git config set remote.origin.pushurl git@github.com:CallanCampos/pokebw2.git; "
              "git push origin main", {}),
             (True, port, "git config url.https://github.com/fuddlesworth/pokebw2.pushInsteadOf "
-             "https://github.com/CallanCampos/pokebw2-native && git push origin main", {}),
+             "https://github.com/CallanCampos/Frigate && git push origin main", {}),
             (True, port, "git remote add up2 https://github.com/fuddlesworth/pokebw2 && git push up2 main", {}),
             (True, port, "git push $REMOTE main", {}),
             (True, port, "git remote add -t main up3 https://github.com/CallanCampos/pokebw2 && git push up3", {}),
@@ -1376,13 +1376,13 @@ def self_test():
             (True, port, "cat <<'EOF' | sh\ngit push upstream main\nEOF", {}),
             (True, port, "sudo -u me env GH_REPO=fuddlesworth/pokebw2 gh release create v1", {}),
             (True, port, "ls | xargs -n1 gh issue close -R fuddlesworth/pokebw2", {}),
-            (True, port, "gh pr create -R CallanCampos/pokebw2-native -t t -b 'Follows fuddlesworth/pokebw2#315'", {}),
-            (True, port, f"gh issue create -R CallanCampos/pokebw2-native -t t --body-file {linked}", {}),
-            (True, port, "echo 'Refs fuddlesworth/pokebw2#3' | gh issue create -R CallanCampos/pokebw2-native "
+            (True, port, "gh pr create -R CallanCampos/Frigate -t t -b 'Follows fuddlesworth/pokebw2#315'", {}),
+            (True, port, f"gh issue create -R CallanCampos/Frigate -t t --body-file {linked}", {}),
+            (True, port, "echo 'Refs fuddlesworth/pokebw2#3' | gh issue create -R CallanCampos/Frigate "
              "-t t -F -", {}),
             (True, port, f"cat > {missing} <<'EOF'\nFollows fuddlesworth/pokebw2#315\nEOF\n"
-             f"gh issue create -R CallanCampos/pokebw2-native -t t -F {missing}", {}),
-            (True, port, "gh issue comment 1 -R CallanCampos/pokebw2-native -b 'thanks @fuddlesworth'", {}),
+             f"gh issue create -R CallanCampos/Frigate -t t -F {missing}", {}),
+            (True, port, "gh issue comment 1 -R CallanCampos/Frigate -b 'thanks @fuddlesworth'", {}),
             (True, port, "git commit -m 'Port the renderer (https://github.com/fuddlesworth/pokebw2/pull/345)'", {}),
             (True, port, "git commit -m 'Work around libsdl-org/SDL#1234'", {}),
             (True, port, "git commit -m 'Thanks @Mariano54 for the notes'", {}),
@@ -1403,22 +1403,22 @@ def self_test():
             (False, port, "gh repo clone fuddlesworth/pokebw2 /tmp/x", {}),
             (False, port, "gh co 345 -R fuddlesworth/pokebw2", {}),
             (False, port, "gh search issues pokebw2 --owner fuddlesworth", {}),
-            (False, port, "gh label clone fuddlesworth/pokebw2 -R CallanCampos/pokebw2-native", {}),
-            (False, port, "gh workflow list --all -R CallanCampos/pokebw2-native", {}),
-            (False, port, "R=CallanCampos/pokebw2-native; gh workflow disable build.yml -R $R", {}),
+            (False, port, "gh label clone fuddlesworth/pokebw2 -R CallanCampos/Frigate", {}),
+            (False, port, "gh workflow list --all -R CallanCampos/Frigate", {}),
+            (False, port, "R=CallanCampos/Frigate; gh workflow disable build.yml -R $R", {}),
             (True, port, "R=fuddlesworth/pokebw2; gh pr comment 3 -R \"${R}\" -b hi", {}),
-            (False, port, "gh issue create -R CallanCampos/pokebw2-native -t 'Sync blocked' -b 'upstream fails'", {}),
+            (False, port, "gh issue create -R CallanCampos/Frigate -t 'Sync blocked' -b 'upstream fails'", {}),
             (False, port, "gh issue create --title t --body b", {}),
-            (False, port, "gh pr merge https://github.com/CallanCampos/pokebw2-native/pull/3 --merge", {}),
-            (False, port, f"gh pr create -R CallanCampos/pokebw2-native -t t -F {plain}", {}),
-            (False, port, "gh issue comment 5 -R CallanCampos/pokebw2-native -b "
+            (False, port, "gh pr merge https://github.com/CallanCampos/Frigate/pull/3 --merge", {}),
+            (False, port, f"gh pr create -R CallanCampos/Frigate -t t -F {plain}", {}),
+            (False, port, "gh issue comment 5 -R CallanCampos/Frigate -b "
              "https://github.com/fuddlesworth/pokebw2/commit/462e90193", {}),
-            (False, port, "gh issue create -R CallanCampos/pokebw2-native -t sync -b fuddlesworth/pokebw2", {}),
+            (False, port, "gh issue create -R CallanCampos/Frigate -t sync -b fuddlesworth/pokebw2", {}),
             (False, port, "gh issue view https://github.com/fuddlesworth/pokebw2/issues/315 --json body; "
-             "gh issue create -R CallanCampos/pokebw2-native -t t -b b", {}),
+             "gh issue create -R CallanCampos/Frigate -t t -b b", {}),
             (False, port, "cat > notes.md <<'EOF'\nSee https://github.com/fuddlesworth/pokebw2/issues/315\nEOF\n"
-             "gh issue create -R CallanCampos/pokebw2-native -t t -b b", {}),
-            (False, port, "gh issue comment 1 -R CallanCampos/pokebw2-native -b 'see @port/CLAUDE.md; "
+             "gh issue create -R CallanCampos/Frigate -t t -b b", {}),
+            (False, port, "gh issue comment 1 -R CallanCampos/Frigate -b 'see @port/CLAUDE.md; "
              "x@fuddlesworth.dev'", {}),
             (False, port, "gh api repos/{owner}/{repo}/issues -f title=t", {}),
             (False, port, "gh api repos/fuddlesworth/pokebw2/commits/main/check-runs --jq .total_count", {}),
@@ -1432,7 +1432,7 @@ def self_test():
              "gh api graphql -f query='query{viewer{login}}'", {}),
             (False, port, "curl -s -H \"Authorization: bearer $(gh auth token)\" https://api.github.com/graphql "
              "-d '{\"query\":\"query { viewer { login } }\"}'", {}),
-            (False, port, "gh api repos/CallanCampos/pokebw2-native/issues -f body=fuddlesworth/pokebw2@462e901", {}),
+            (False, port, "gh api repos/CallanCampos/Frigate/issues -f body=fuddlesworth/pokebw2@462e901", {}),
             (False, port, "git push origin HEAD:main", {}),
             (False, port, "git push", {}),
             (False, port, "git push origin main 2>&1 | tail -5", {}),

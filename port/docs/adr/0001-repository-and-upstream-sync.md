@@ -4,6 +4,8 @@
 - **Date:** 2026-10-16
 - **Plan:** D1 and §4.1; §8, step 1
 - **Upstream:** `462e90193` (merge of PR #345)
+- **Note (2026-10-18):** the user renamed the repository `CallanCampos/Frigate`, after the port; GitHub redirects the
+  old name below, and the port clone keeps its folder `~/dev/decomp/pokebw2-native` for now.
 
 ## Context
 

@@ -268,20 +268,34 @@ else
     echo "  upstream: push URL set to $disabled; fetching is unchanged"
 fi
 
-# gh's default repository: port_guard.py lets a gh write without -R through only when it is the port
+# gh's default repository: port_guard.py lets a gh write without -R through only when it is the port. When
+# gh repo set-default named a remote, gh-resolved is "base" and the repository is that remote's URL. A clone made
+# before the repository was renamed CallanCampos/Frigate (2026-10-18) has the old name in origin's URL until it is
+# updated, so the default it resolves to is the old name.
 gh_default=$(git -C "$root" config --get-regexp '^remote\..*\.gh-resolved$' || true)
+gh_remote=""
 case "$gh_default" in
     *" base")
-        remote=${gh_default%% *}
-        remote=${remote#remote.}
-        gh_default=$(git -C "$root" remote get-url "${remote%.gh-resolved}" 2>/dev/null || true)
+        gh_remote=${gh_default%% *}
+        gh_remote=${gh_remote#remote.}
+        gh_remote=${gh_remote%.gh-resolved}
+        gh_default=$(git -C "$root" remote get-url "$gh_remote" 2>/dev/null || true)
         ;;
 esac
-if printf '%s' "$gh_default" | grep -qi 'callancampos/pokebw2-native'; then
-    echo "  gh: the default repository is the port"
-else
-    echo "  gh: the default repository isn't the port; run gh repo set-default CallanCampos/pokebw2-native"
-fi
+case "$(printf '%s' "$gh_default" | tr '[:upper:]' '[:lower:]')" in
+    *[[:space:]/:]callancampos/frigate | *[[:space:]/:]callancampos/frigate.git | *[[:space:]/:]callancampos/frigate/)
+        echo "  gh: the default repository is the port"
+        ;;
+    *)
+        if [ "$gh_remote" = origin ]; then
+            echo "  gh: the default repository is origin, whose URL isn't CallanCampos/Frigate's (a clone made" \
+                "before the rename keeps the old name); run" \
+                "git remote set-url origin https://github.com/CallanCampos/Frigate.git"
+        else
+            echo "  gh: the default repository isn't the port; run gh repo set-default CallanCampos/Frigate"
+        fi
+        ;;
+esac
 
 for version in b2_us w2_us; do
     if [ ! -e "$root/orig/baserom_$version.nds" ]; then

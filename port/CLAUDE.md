@@ -1,7 +1,8 @@
 # Port rules
 
-This repository, `CallanCampos/pokebw2-native`, is the decomp `fuddlesworth/pokebw2` with its full history, merged
-continuously, plus Frigate, a native port, in `port/`. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the
+This repository, `CallanCampos/Frigate`, is the decomp `fuddlesworth/pokebw2` with its full history, merged
+continuously, plus Frigate, a native port, in `port/`. It was renamed from `CallanCampos/pokebw2-native` on 2026-10-18
+at the user's request; GitHub redirects the old name. The plan of record is [docs/PLAN.md](docs/PLAN.md); where the
 port stands is [docs/STATUS.md](docs/STATUS.md). The root `CLAUDE.md` is upstream's and applies here as this file says;
 for port work, this file wins where the two differ.
 
@@ -37,8 +38,9 @@ The user named the port Frigate on 2026-10-18, in the line of community ports su
   icons (the `.icns`, the window's bitmaps) is committed.
 - **The layer keeps its own names:** the `port/` directory, the `port_` C prefix, the `PORT_*` CMake variables and
   `port_*` targets, `pokebw2_game` (the decomp's code), `pbw-oracle` and the `pbwinput` format, the `port-*.yml`
-  workflows and the "port:" prefix of the program's messages. The repository stays `CallanCampos/pokebw2-native`
-  (renaming it is the user's call), and so does the clone's directory.
+  workflows and the "port:" prefix of the program's messages. The repository itself is named Frigate,
+  `CallanCampos/Frigate` ([above](#port-rules)); the port clone on this machine keeps its folder for now
+  ([Where to work](#where-to-work)).
 - **Living documents say Frigate** where they mean the port as a product; "the port" stays for the code and the layer.
   Records keep the names of their time: past STATUS.md entries, the research notes in `docs/research/` and RESEARCH.md,
   and ADR decisions as written (an ADR may get a one-line note).
@@ -66,8 +68,9 @@ the game each piece touches, for the modders who come later.
 
 ## Where to work
 
-- **Port work happens in the port clone**, `~/dev/decomp/pokebw2-native`, and its `.claude/worktrees/*`. Its remotes:
-  `origin` is `CallanCampos/pokebw2-native` (the port), `upstream` is `fuddlesworth/pokebw2` (fetch only).
+- **Port work happens in the port clone**, `~/dev/decomp/pokebw2-native`, and its `.claude/worktrees/*`. The clone
+  keeps that folder for now; a fresh clone's folder is `Frigate`. Its remotes: `origin` is `CallanCampos/Frigate` (the
+  port), `upstream` is `fuddlesworth/pokebw2` (fetch only).
 - **Decomp work happens in the decomp checkout**, `~/dev/decomp/pokebw2` (`origin` is upstream, `fork` is
   `CallanCampos/pokebw2`), under the root rules. Decomp PRs go from its `fork` remote, never from this repository.
   Decomp changes reach the port only by sync. A session in the wrong checkout for its task stops and says so.
@@ -77,8 +80,8 @@ the game each piece touches, for the modders who come later.
   clone's auto memory says to read this file first. [README.md](README.md#preparing-a-checkout) has the steps. A
   session that finds its worktree without `CLAUDE.local.md` creates it.
 - **gh targets the port.** gh prefers a remote named `upstream` to `origin` and can't ask which one in a Claude
-  session, so each clone runs `gh repo set-default CallanCampos/pokebw2-native` (kept in `.git/config`, which
-  worktrees share). Every gh command that writes still names its repository, `-R CallanCampos/pokebw2-native`.
+  session, so each clone runs `gh repo set-default CallanCampos/Frigate` (kept in `.git/config`, which worktrees
+  share). Every gh command that writes still names its repository, `-R CallanCampos/Frigate`.
   `-R fuddlesworth/pokebw2` is only for reads, never for writes (D10,
   [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
 - **Port work is for Claude Code.** Upstream's `AGENTS.md`, `.agents/` and `.codex/` give Codex the decomp's rules
@@ -88,7 +91,7 @@ the game each piece touches, for the modders who come later.
   `README.md`, `CONTRIBUTING.md`, `.gitignore`, `.claude/`, `.agents/`, `.codex/`, upstream's `.github/` templates and
   workflows, `docs/`, `tools/`, `config/`, `configure.py`): every sync would conflict.
 - **Only upstream's `build.yml` is off here**, because it needs the ROM deploy key
-  (`gh workflow disable build.yml -R CallanCampos/pokebw2-native`). Disabling or enabling any other workflow needs the
+  (`gh workflow disable build.yml -R CallanCampos/Frigate`). Disabling or enabling any other workflow needs the
   user's OK. Never disable `compile.yml` or `standards.yml` to make CI pass: fix the change instead.
 - **Upstream's issue and pull request templates** show here unchanged. A port pull request ignores the template's
   decomp checklist and says which test levels ran instead.
@@ -130,7 +133,7 @@ the game each piece touches, for the modders who come later.
   says it couldn't read the repository's visibility, which it then treats as public, check `gh auth status`, fix the
   login and run the script again before asking. An upstream `main` that fails `ninja` on its own is never fixed or
   reported from here: record it as a blocker in STATUS.md, tell the user, and ask how to go on meanwhile.
-- After a sync that changes upstream's workflows, check with `gh workflow list --all -R CallanCampos/pokebw2-native`
+- After a sync that changes upstream's workflows, check with `gh workflow list --all -R CallanCampos/Frigate`
   that `build.yml` is still off. Why the repository works this way is
   [ADR 0001](docs/adr/0001-repository-and-upstream-sync.md).
 
@@ -273,7 +276,8 @@ The port is a solo project (PLAN.md D10, [ADR 0002](docs/adr/0002-solo-project-n
 - **Never push to `upstream`; never force-push.** `bootstrap_checkout.sh` disables the `upstream` remote's push URL
   by setting it to `DISABLED-port-never-pushes-upstream`. Run it again whenever `git remote -v` shows another push URL
   for `upstream`, as it does after the remote is added again. `sync_upstream.sh` runs only in a checkout whose `origin`
-  is `CallanCampos/pokebw2-native`.
+  is `CallanCampos/Frigate`; for a clone whose `origin` still has the old name, it prints the `git remote set-url`
+  command that updates it.
 - **macOS builds are ad-hoc signed** (`codesign --force --sign -`) and never notarized: there is no Apple Developer
   account (PLAN.md D11, [ADR 0003](docs/adr/0003-ad-hoc-signing-no-apple-developer-account.md)). Nothing in the build
   may need a paid certificate, entitlements that require one, or notarization.

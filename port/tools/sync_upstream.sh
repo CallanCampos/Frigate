@@ -18,11 +18,13 @@
 #   -h, --help           show this text
 #
 # What it does:
-#   1. Goes to the top of the clone. Requires origin to be CallanCampos/pokebw2-native (https://github.com/... or
-#      git@github.com:..., with or without .git; not the decomp or its fork CallanCampos/pokebw2), upstream to be
-#      fuddlesworth/pokebw2 (added when missing), no merge in progress and no changes to tracked files. It never
-#      stashes. It sets upstream's push URL to DISABLED-port-never-pushes-upstream when it is anything else, as
-#      bootstrap_checkout.sh does, so that a push there fails while fetching still works.
+#   1. Goes to the top of the clone. Requires origin to be CallanCampos/Frigate (https://github.com/... or
+#      git@github.com:..., with or without .git; not the decomp or its fork CallanCampos/pokebw2). A clone made before
+#      the repository's rename on 2026-10-18 still has its old name in origin's URL, which is refused too, with the
+#      git remote set-url command that fixes it. Also requires upstream to be fuddlesworth/pokebw2 (added when
+#      missing), no merge in progress and no changes to tracked files. It never stashes. It sets upstream's push URL to
+#      DISABLED-port-never-pushes-upstream when it is anything else, as bootstrap_checkout.sh does, so that a push
+#      there fails while fetching still works.
 #   2. Fetches both and brings HEAD up to origin/NAME: a fast-forward, or a merge when HEAD has commits of its own,
 #      which are then published too.
 #   3. Merges upstream/main with the message "Merge upstream fuddlesworth/pokebw2@<short>" and an
@@ -48,7 +50,10 @@
 # history rewritten, 5 commit messages name issues in other repositories.
 set -euo pipefail
 
-PORT_REPO=CallanCampos/pokebw2-native
+PORT_REPO=CallanCampos/Frigate
+# The port repository's name until the user renamed it on 2026-10-18. GitHub redirects it, but an origin that still
+# names it is refused with the command that updates the URL, so that every clone names the repository as it is now.
+PORT_REPO_BEFORE_RENAME=CallanCampos/pokebw2-native
 UPSTREAM_REPO=fuddlesworth/pokebw2
 UPSTREAM_URL=https://github.com/fuddlesworth/pokebw2.git
 # The port never pushes upstream (ADR 0002): the upstream remote's push URL is this name, which no push can reach. The
@@ -123,19 +128,58 @@ is_upstream_url() {
     return 1
 }
 
-# The port repository on GitHub, over https or ssh, with or without .git. GitHub names are case-insensitive.
-is_port_url() {
-    local url
-    url=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+lower() {
+    printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+# Whether the URL $1 is the GitHub repository $2 (OWNER/REPO), over https or ssh, with or without .git. GitHub names
+# are case-insensitive.
+is_github_url() {
+    local url repo
+    url=$(lower "$1")
+    repo=$(lower "$2")
     case "$url" in
-        https://github.com/callancampos/pokebw2-native | https://github.com/callancampos/pokebw2-native.git | \
-            https://github.com/callancampos/pokebw2-native/ | \
-            git@github.com:callancampos/pokebw2-native | git@github.com:callancampos/pokebw2-native.git | \
-            ssh://git@github.com/callancampos/pokebw2-native | ssh://git@github.com/callancampos/pokebw2-native.git)
+        "https://github.com/$repo" | "https://github.com/$repo.git" | "https://github.com/$repo/" | \
+            "git@github.com:$repo" | "git@github.com:$repo.git" | \
+            "ssh://git@github.com/$repo" | "ssh://git@github.com/$repo.git")
             return 0
             ;;
     esac
     return 1
+}
+
+is_port_url() {
+    is_github_url "$1" "$PORT_REPO"
+}
+
+# Refuses an origin URL that isn't the port repository's. $1 is the URL, $2 is --push for a push URL and empty for a
+# fetch URL, and $3 is how many URLs of that kind origin has: with more than one, the fix names the URL it replaces.
+check_origin_url() {
+    local url=$1 push=$2 count=$3 new fix
+    is_port_url "$url" && return 0
+    if is_github_url "$url" "$PORT_REPO_BEFORE_RENAME"; then
+        case "$(lower "$url")" in
+            git@*) new=git@github.com:$PORT_REPO.git ;;
+            ssh://*) new=ssh://git@github.com/$PORT_REPO.git ;;
+            *) new=https://github.com/$PORT_REPO.git ;;
+        esac
+        fix="git remote set-url ${push:+$push }origin $new"
+        if [ "$count" -gt 1 ]; then
+            fix="$fix $url"
+        fi
+        die 2 "origin is $url, which names the port repository as it was before the user renamed it $PORT_REPO on" \
+            "2026-10-18. GitHub redirects the old name, but origin must name the repository as it is now. Update" \
+            "the URL, then run this again:"$'\n'"    $fix"
+    fi
+    case "$(lower "$url")" in
+        *[/:]fuddlesworth/pokebw2 | *[/:]fuddlesworth/pokebw2.git | *[/:]fuddlesworth/pokebw2/ | \
+            *[/:]callancampos/pokebw2 | *[/:]callancampos/pokebw2.git | *[/:]callancampos/pokebw2/)
+            die 2 "origin is $url, the decomp or its fork, so this looks like the decomp checkout. Run this in the" \
+                "port clone, whose origin is $PORT_REPO."
+            ;;
+    esac
+    die 2 "origin is $url; it must be $PORT_REPO (https://github.com/$PORT_REPO.git or" \
+        "git@github.com:$PORT_REPO.git)"
 }
 
 # --- 1. Checks -------------------------------------------------------------------------------------------------------
@@ -146,22 +190,20 @@ is_port_url() {
 # rewrites in the git configuration are not looked at.
 git config --get remote.origin.url >/dev/null 2>&1 ||
     die 2 "there is no origin remote; it must be $PORT_REPO (https://github.com/$PORT_REPO.git)"
-origin_urls=$({ git config --get-all remote.origin.url; git config --get-all remote.origin.pushurl || true; })
-while IFS= read -r origin_url; do
-    [ -n "$origin_url" ] || continue
-    is_port_url "$origin_url" && continue
-    case "$(printf '%s' "$origin_url" | tr '[:upper:]' '[:lower:]')" in
-        *[/:]fuddlesworth/pokebw2 | *[/:]fuddlesworth/pokebw2.git | *[/:]fuddlesworth/pokebw2/ | \
-            *[/:]callancampos/pokebw2 | *[/:]callancampos/pokebw2.git | *[/:]callancampos/pokebw2/)
-            die 2 "origin is $origin_url, the decomp or its fork, so this looks like the decomp checkout. Run this" \
-                "in the port clone, whose origin is $PORT_REPO."
-            ;;
-    esac
-    die 2 "origin is $origin_url; it must be $PORT_REPO (https://github.com/$PORT_REPO.git or" \
-        "git@github.com:$PORT_REPO.git)"
-done <<EOF
+for origin_key in url pushurl; do
+    origin_urls=$(git config --get-all "remote.origin.$origin_key" || true)
+    origin_count=$(printf '%s' "$origin_urls" | grep -c '' || true)
+    origin_push=""
+    if [ "$origin_key" = pushurl ]; then
+        origin_push=--push
+    fi
+    while IFS= read -r origin_url; do
+        [ -n "$origin_url" ] || continue
+        check_origin_url "$origin_url" "$origin_push" "$origin_count"
+    done <<EOF
 $origin_urls
 EOF
+done
 if upstream_urls=$(git remote get-url --all upstream 2>/dev/null); then
     while IFS= read -r upstream_url; do
         is_upstream_url "$upstream_url" || die 1 "the upstream remote is $upstream_url, not $UPSTREAM_REPO"

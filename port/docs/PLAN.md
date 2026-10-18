@@ -3,8 +3,8 @@
 How we build Frigate, a native Mac port (Apple Silicon first) and then Windows and Linux ports of Black 2 and White 2
 from the pokebw2 decompilation, and how development runs, is tested and keeps up with the decomp. The findings behind
 each decision are in [RESEARCH.md](RESEARCH.md). Written 2026-10-16 against `fuddlesworth/pokebw2` at `0c2bbee9d`; the
-numbers are from that commit. The port repository, `CallanCampos/pokebw2-native`, was seeded from upstream `main` at
-`462e90193` (§4.1).
+numbers are from that commit. The port repository, `CallanCampos/Frigate` since 2026-10-18 (D1), was seeded from
+upstream `main` at `462e90193` (§4.1).
 
 ## 1. Goal and what "native" means
 
@@ -42,7 +42,7 @@ Full detail in [RESEARCH.md §1–4](RESEARCH.md#1-state-of-the-decomp).
 
 | # | Decision | Status |
 | --- | --- | --- |
-| D1 | **Repository:** the public repository `CallanCampos/pokebw2-native`, which carries the decomp's full history and merges upstream `main` continuously, with all port code under `port/` | **Decided** 2026-10-16 (§4.1, [ADR 0001](adr/0001-repository-and-upstream-sync.md)) |
+| D1 | **Repository:** the public repository `CallanCampos/pokebw2-native`, which carries the decomp's full history and merges upstream `main` continuously, with all port code under `port/` | **Decided** 2026-10-16 (§4.1, [ADR 0001](adr/0001-repository-and-upstream-sync.md)). Note (2026-10-18): the user renamed the repository `CallanCampos/Frigate` |
 | D2 | **Our own platform layer**, built on pokebw2's own SDK C. libntr is a reference for patterns only | Recommended |
 | D3 | **Hybrid boundary:** game, GFL, NitroSystem and portable SDK C (`gx` included) compile unchanged; 217 SDK entry points get host implementations (48 of them wireless stubs); display state is modelled for the renderers | Recommended |
 | D4 | **Stack:** C for the port, C++ only inside the UI module (Dear ImGui); clang on every platform; SDL3 + SDL_GPU; CMake; Lua 5.4 for mods; ENet + libjuice for networking | Recommended |
@@ -75,6 +75,9 @@ in its resource loaders) and write our own.
 Advance 2 port and sm64-port, so the ROM build keeps verifying both SHA1s in the same tree as the host build. Keeping
 current is a plain `git merge` of upstream's `main`, as the Platinum port does with pret's. The decision and its
 alternatives are in [ADR 0001](adr/0001-repository-and-upstream-sync.md).
+
+**Note (2026-10-18):** the user renamed the repository `CallanCampos/Frigate`, after the port; GitHub redirects the old
+name, and the decision is otherwise unchanged.
 
 - **Port files.** All port code is in `port/`. The only other port files are ones upstream doesn't have:
   `.github/workflows/port-sync.yml` (and later `port-*.yml` workflows) and `.github/README.md`, which GitHub shows as
@@ -498,9 +501,10 @@ Sessions working toward this plan follow one loop, so progress is measurable and
 - **Where decomp work happens.** Decomp work (matching, new source files, config changes, overlay claims) is done
   upstream, from the decomp checkout `/Users/cjcampos/dev/decomp/pokebw2` (`origin` = `fuddlesworth/pokebw2`, `fork` =
   `CallanCampos/pokebw2`) through fork PRs, under the root `CLAUDE.md`. It reaches the port only by sync. Port work is
-  done in the port clone `/Users/cjcampos/dev/decomp/pokebw2-native` (`origin` = `CallanCampos/pokebw2-native`,
-  `upstream` = `fuddlesworth/pokebw2`) and its `.claude/worktrees`, under `port/CLAUDE.md`. In the port clone the root
-  `CLAUDE.md`'s "push origin HEAD:main" publishes to the port repository.
+  done in the port clone `/Users/cjcampos/dev/decomp/pokebw2-native`, which keeps that folder for now (a fresh clone's
+  is `Frigate`), with `origin` = `CallanCampos/Frigate` and `upstream` = `fuddlesworth/pokebw2`, and in its
+  `.claude/worktrees`, under `port/CLAUDE.md`. In the port clone the root `CLAUDE.md`'s "push origin HEAD:main"
+  publishes to the port repository.
 - **What the port needs from the decomp, in order:** overlay 36's C and data (mariano54, #83), including the
   818-pointer tables of `fldmmdl_blact.c`; overlay 12's event-script command tables as C data (674 pointers); the
   four ITCM ClAct renderers (no issue or owner yet: a decomp session can write them in the decomp checkout as ordinary
