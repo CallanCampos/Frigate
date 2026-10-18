@@ -3,6 +3,25 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-18: Windows in CI
+
+- **lld groups a COFF program's sections by their contents as well as their names.** A zeroed static given a section
+  by an attribute is initialized data, so its `.bss$...` section went to another output `.bss` than the statics that
+  `#pragma clang section bss` placed, and markers meant to bracket them didn't. Only a run that loads overlays would
+  have noticed; `integrate_overlay_sections` now checks it without a ROM, with a probe file compiled as an overlay's.
+- **ctest fails a test that crashed, whatever `PASS_REGULAR_EXPRESSION` says.** A test of a crash report runs the
+  program through `check_exit.py --crash`, which takes a signal or a Windows exception's status as the ending wanted.
+- **Windows' text mode is a difference of the tests, not only of the program.** The program's `"\n"` became `"\r\n"`
+  (stdout and stderr go to binary mode before `main()` now), the artwork's generator wrote files that no longer matched
+  the committed ones byte for byte, and the oracle's stand-in programs, run by their `#!` line, didn't run at all.
+  Write files that are compared byte for byte in binary mode, or with `newline="\n"`, and give a script a `.cmd`
+  where Windows must run it.
+- **Windows delivers an exception on the faulting stack.** A fiber's guard of pages with no access gets no report on
+  Windows when the stack pointer is already inside it; a guard page over writable pages gives the system room for
+  its exception frame, and the handler then moves to a stack of its own, as a signal handler's `sigaltstack` does.
+- **Read the first CI run's whole build log.** With `-k 0`, one run on a new host lists every file that fails; the
+  decomp's 1,473 files all compiled for Windows the first time, and the 13 failures were the port's own POSIX code.
+
 ## 2026-10-18: the test launcher, after review
 
 - **ctest's `PASS_REGULAR_EXPRESSION` ignores the exit status.** A test with one passes on its output alone, so a

@@ -9,8 +9,8 @@
 // doesn't by default (port/cmake/os.cmake). The PortFiber itself lives in the C heap, out of the stack's way. This
 // file also tells AddressSanitizer about every switch, since minicoro's own annotations miss the switches back to the
 // host stack (mco_impl.c, which is built without ASan), and tells LeakSanitizer to scan the stacks of suspended fibers
-// for pointers. The pages and their protection are the host's (port/hal/host): on Windows the top of the guard is made
-// of guard pages, so that an overflow is still reported there.
+// for pointers. The pages and their protection are the host's (port/hal/host): on Windows the top of the guard is a
+// guard page over pages left writable for the system's exception frame, so that an overflow is still reported there.
 #include "hal/os/fiber.h"
 #include "hal/host/host.h"
 

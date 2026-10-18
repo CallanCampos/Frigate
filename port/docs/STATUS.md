@@ -26,10 +26,89 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: Windows in CI: Frigate builds with MSYS2's CLANG64 and passes every test that needs no ROM
+
+- **Upstream:** `993e6c49b` (merge of PR #377), as merged into the port's `main` by `1f0c184f6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-windows` from `2da26e048` (origin's `main` had not moved at the end):
+  `797c55628` and `f3fde9b43` (the Windows job), `6d913cb93` (the host seam and Windows' half), `14ffc553d` and
+  `cd3932d32` (the tests' POSIX expectations), `24bd4a18e` (the host tests), `d5b9aa990` (the documents and ADR 0013),
+  then this entry; pushed to `port-windows` only, not merged into `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `2da26e048`
+  before the work and at `d5b9aa990`. No game file changed: outside `port/`, only Frigate's own
+  `.github/workflows/port-ci.yml` and `.github/README.md`.
+- **Host build:**
+  - arm64 macOS, RelWithDebInfo, Black 2 (the worktree's `build/port`, Ninja): from scratch at `797c55628`, then at
+    `d5b9aa990` (the port's changed files, with no warning; the decomp's C didn't change, so its warnings stand).
+  - CI, `port-ci.yml` dispatched on `port-windows`: macOS 26 and Ubuntu 26.04 as before, and the new Windows job on
+    `windows-2025` with MSYS2's CLANG64 (clang 22.1.8, lld, the UCRT, CMake 4.4.3, Ninja, SDL3 3.4.18, Python 3.12 from
+    `actions/setup-python`): all three green on runs 39148942447 (`cd3932d32`), 39149612934 (`24bd4a18e`) and
+    39150122118 (`d5b9aa990`). The Windows build compiles the decomp's 1,473 C files with 262 warnings, of the kinds
+    macOS's has (`-Wswitch`, `-Wpointer-sign`, library redeclarations), none in `port/`; a run takes 3 to 5 minutes.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 on macOS, Black 2, `ctest -j4` with the oracle in `build/port/oracle`: at `797c55628` (the configure
+    changes), 266 of 267 pass and `asm_oracle` timed out at its 900 s while the machine's load passed 100 (other tracks'
+    builds; `oracle_saves` took 1,917 s); at `d5b9aa990`, all 275 pass (2,149 s, none skipped; `asm_oracle` in 600 s,
+    `oracle_saves` reusing the saves of the first run). Between those, each stage's tests ran on their own (the OS, PXI,
+    sound, backup, ROM, GX, run directory, symbols, launcher, integration and host tests, and `oracle_compare`'s 50
+    cases), all passing.
+  - CI, run 39149612934: Windows 203 pass and 57 skip of 260 (the 47 that Linux skips without a ROM but
+    `layout_trainer_card_param`, which CLANG64's `llvm-dwarfdump` lets run, plus the 10 `gx_*_shm`, no aliasing backend
+    there, and `card_backup_linked_save`); Linux 213 pass and 47 skip of 260; macOS 230 pass and 45 skip of 275. Linux's
+    206 passing tests of the last run are 213 with the 7 new ones.
+  - New on every host: `integrate_overlay_sections` (a probe file compiled as overlay 162's: its statics are in the
+    overlay's sections, and a load sets them back) and `host_trap_placeholder`, `host_crash_report`, `host_watchdog`,
+    `host_watchdog_kicked`, `host_static_data`, `host_files` (port/tests/host).
+  - On Windows nothing with a ROM has run yet: the replays, the oracle's comparisons and the game past `main()` need a
+    Windows machine with the player's dump (not yet). T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp change.
+- **Trap stubs:** 512 function stubs and 46 data placeholders on macOS and Windows, 513 and 46 on Linux. `gen_stubs.py`
+  now lists the ROM's symbols each host's C library provides: macOS 31, Windows 33 (`sin` and `cos` besides), Linux 31
+  (with `sin` and `cos`, but without `atexit` and `atol`, which Python's `ctypes` doesn't find in glibc's process; if
+  the game's objects reference them on Linux as on macOS, they are trap stubs there: a finding, under Next).
+- **64-bit warnings:** not measured: no game or `lib/` code changed.
+- **Work done:** PLAN.md phase 5's "Windows and Linux builds in CI", stages 0 to 3 of the Windows plan
+  ([ADR 0013](adr/0013-windows-build-with-msys2-clang64.md), proposed).
+  - **The Windows job** in `port-ci.yml`: MSYS2's CLANG64 through `msys2/setup-msys2`, a checkout without `res/`'s
+    PNG, WAV and glTF files (the text's headers read the JSON data; `res/text` alone wasn't enough), git's line ends
+    kept, `PYTHONUTF8`, and a build with `-k 0`.
+  - **The host seam, `port/hal/host`**: what differs between the hosts, one file a host. `host_posix.c` holds the POSIX
+    code that `trap.c`, `fiber.c`, `pointer.c`, `os_terminate.c`, `main.c`'s watchdog, `run_dir.c` and `symbols.c` had,
+    moved unchanged; `host_windows.c` is Windows': `VirtualAlloc` and `VirtualProtect`; a vectored handler that moves a
+    fault's report to a stack of its own (with the TEB's bounds), and the unhandled-exception filter for the rest; a
+    fiber's guard topped by one guard page over 12 KiB left writable for the system's exception frame; backtraces by
+    `RtlVirtualUnwind`; names and globals from the COFF symbol table lld keeps; a watchdog thread; the PE image's
+    writable sections; binary stdio and no error dialogs before `main()`. The tests' harnesses (OS, PXI, sound, backup,
+    ROM, integration) use it for their hang reports, faults, temporary files, links and environment.
+  - **Windows' fixes**: the memory windows align to 4 KiB there (`PORT_HOST_PAGE_ALIGNMENT`; COFF stops at 8 KiB);
+    `gen_stubs.py` reads its 1,582 objects from a list file on every host and, on Windows, asks the compiler driver's
+    libraries what the C library provides, read with the toolchain's `nm`; the overlays' COFF bss markers are placed by
+    the pragma, as uninitialized data like the statics they bracket (lld had grouped them into another `.bss`); the main
+    thread has 8 MiB of stack; the include mirror's links to directories say so, and become copies where links are
+    refused; `PYTHONUTF8` for the configure's generators.
+  - **Portable fixes**: the run directory's files and the artwork generator's SVGs are written with `"\n"` on every
+    host; the layout test finds `.obj` objects; the oracle's script tests run their stand-ins through a `.cmd` on
+    Windows; `test_pxi.c` uses `localtime`; the backup tests expect the host's own error text and `%APPDATA%`;
+    `card_backup_linked_save` skips on Windows, where the saves follow no links; the GX view check holds the views to
+    the host's alignment; `check_exit.py --crash` for a test whose program must crash, since ctest fails a crashed test
+    whatever its output.
+  - **Documents**: port/README.md's Building on Windows and the landing page; ARCHITECTURE.md's feature map row
+    "macOS, Linux and Windows", Windows' crash statuses and watchdog thread; the guides of `hal/`, `tests/`, `cmake/`
+    and `app/`; the glossary (the host seam, MSYS2's CLANG64); PLAN.md §4.4; lessons.md; ADR 0013 and the indexes.
+- **Next:** the user's acceptance of ADR 0013 (the research had recommended clang-cl). Windows' stage 4: a run of the
+  game with a ROM on a Windows machine (the replays, `oracle_*`), sanitizer builds on CLANG64, a build without a
+  console with its log under `%LOCALAPPDATA%\Frigate`, a UTF-8 manifest for user folders that aren't ASCII, a
+  package, the memory-mapped ROM, ARM64 (minicoro's fiber fallback) and VRAM aliasing on Windows (placeholders,
+  which a run-time region 0x06 would need); and Linux's trap stubs for `atexit` and `atol` (gen_stubs's `ctypes`
+  lookup), to check. As in the last entry: White 2's starter route; the apps no route reaches yet; a save with an
+  adventure made by the port, once overlay 36 lets it into the field; a sound comparison sequence played on the game's
+  count.
+- **Blockers:** as in the last entry: overlay 36 (issue #83, another contributor's active claim) gates phase 3 and the
+  launcher's retirement; `NNSi_objSizeWTbl` stops the Pokédex; overlays 11 and 182 only matter from phase 7.
+
 ## 2026-10-18: the launcher track's merge after review: --help's options and statuses, and the documents as built
 
 - **Upstream:** `cf8ded4c2` (merge of PR #367), as merged into the port's `main` by `65ea798fb`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
+- **Port:** `bbfab4c72`, on the branch `port-integrate` after `bfe72cd2b`: `b1ca0c257` (the reviews' fixes), then this
   entry; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `b1ca0c257`. No
   game file changed: game-changes.md's one edit marks `event_mapchange.c`'s second row "(again)".
