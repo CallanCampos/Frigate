@@ -555,8 +555,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   every register moves: one pointer local per arm, `*fill = src; src = (u32)fill;`. (matching.md: "both writes
   through and then uses")
 - A global's address loaded from the pool again before each call, where ours keeps it in a saved register: a
-  pointer local `T *p = &G;` passed to the calls, with `G` explicitly aligned (`printsys.c`). (matching.md: "loaded
-  from the pool again before each call")
+  pointer local `T *p = &G;` passed to the calls, with `G` explicitly aligned, tells whether the original held the
+  address in a local; it is a diagnostic (`printsys.c`, `os_thread.c`), not kept without other evidence. (matching.md:
+  "loaded from the pool again before each call")
 - A hardware address built with shifts and spilled, where ours loads it from the pool: the SDK inline that returns
   it, such as `G2_GetOBJCharPtr()`. (matching.md: "A hardware address that the original builds with shifts")
 - Stores whose base register is another element than the one written: index the array, or write through a pointer

@@ -1142,14 +1142,14 @@ Same code, other `sp` offsets or frame size.
   `header`), and after them when it stores to `IrcFrame` directly; without the attribute `frame` keeps them chained.
   Such a pointer, passed to several calls, is also loaded from the pool again before each call, where MWCC otherwise
   keeps the global's address in a saved register: `printsys.c`'s `GFL_TextRendererDrawToBitmap` and
-  `GFL_TextRendererDrawToBitmapEx` pass `TextRenderer *renderer = &g_TextRenderer;` with the global aligned, and
-  `#pragma opt_propagation off` gives them the same code. Under `-ipa file` the pointer also reads a pooled static
-  through a literal of its own instead of the section's base (`os_thread.c`'s `OS_IsThreadAvailable`, as a
-  diagnostic). In NitroSystem's 2.0/sp2p2 code a store to a member of a file static goes through the section's anchor
-  (`ldr r0, =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address, stored at 0, 4 and 8, as G3D's
-  billboard functions in `sbc.c` have, is a pointer local to the member, `VecFx32 *trans = &sBBCmd.trans;`; a pointer
-  to the whole object is folded back into anchored stores, and `T *const p = &obj` keeps the pointer but loads it at the
-  declaration.
+  `GFL_TextRendererDrawToBitmapEx` match, as a diagnostic, passing `TextRenderer *renderer = &g_TextRenderer;` with the
+  global aligned, and `#pragma opt_propagation off` gives them the same code. Under `-ipa file` the pointer also reads a
+  pooled static through a literal of its own instead of the section's base (`os_thread.c`'s `OS_IsThreadAvailable`, as a
+  diagnostic). Both rows say why neither is kept. In NitroSystem's 2.0/sp2p2 code a store to a member of a file static
+  goes through the section's anchor (`ldr r0, =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address,
+  stored at 0, 4 and 8, as G3D's billboard functions in `sbc.c` have, is a pointer local to the member,
+  `VecFx32 *trans = &sBBCmd.trans;`; a pointer to the whole object is folded back into anchored stores, and
+  `T *const p = &obj` keeps the pointer but loads it at the declaration.
 - MWCC keeps a load and a store through pointers that may alias in source order. A field the original loads before
   a store is read into a local in a statement before it: `g3d_system.c`'s `GFL_G3DAnmCreate` reads
   `resource->data` before storing `resource` in the animation, and `event_field_proclink.c`'s `func_ov012_0215bb70`
@@ -1348,11 +1348,11 @@ Same instructions, scheduled in another order.
   (`&s.member`, even at offset 0), through a cast (even to its own type), or held as a `void *`, it stays a
   variable from its declaration, and when no saved register is free over that whole range it is loaded from the
   literal pool again at each use rather than spilled. `printsys.c`'s `GFL_TextRendererDrawToBitmap` and
-  `GFL_TextRendererDrawToBitmapEx` load `&g_TextRenderer` again before each call in the original; a
-  `TextRenderer *` local under `#pragma opt_propagation off` matches both, and so does each of those spellings
-  (their row says why none is kept). A pointer local and that pragma tell whether a global's address was held in a
-  local the compiler did not propagate. The member's address written at each use, `f(&s.member)`, is shared like
-  `&g`: those two functions keep `&sPrintSys.renderer` in `r4` until it initializes a local.
+  `GFL_TextRendererDrawToBitmapEx` load `&g_TextRenderer` again before each call in the original; a `TextRenderer *`
+  local under `#pragma opt_propagation off` matches both, and so does each of those spellings or an explicit alignment
+  on the global; their row says why none of them is kept. A pointer local and that pragma tell whether a global's
+  address was held in a local the compiler did not propagate. The member's address written at each use, `f(&s.member)`,
+  is shared like `&g`: those two functions keep `&sPrintSys.renderer` in `r4` until it initializes a local.
 - A local array's element is never loaded again after a call, even once the array's address has been passed to
   another function, so an element loaded both before and after a call (`ldr r1, [r6, r7]` around
   `bl BtlvEffect_GetGauge`) was read through a pointer. `btlv_effvm.c`'s `BtlvEffvm_CmdGauge` matches with

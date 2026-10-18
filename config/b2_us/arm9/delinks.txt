@@ -352,7 +352,6 @@ lib/spl/src/spl_manager.c:
     .text       start:0x02050a40 end:0x02051540
 
 src/system/printsys.c:
-    complete
     .text       start:0x02021974 end:0x02022d58
     .data       start:0x0209a410 end:0x0209a41c
     .bss        start:0x02141418 end:0x02141438
