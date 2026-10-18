@@ -128,7 +128,7 @@ set(port_rom_test_options -std=gnu11 -Wall -Wextra -Wno-unused-parameter)
 # The ROM's check and the system area, on port/hal/rom alone
 add_executable(port_rom_unit_tests
     tests/rom/test_rom_unit.c "${port_rom_dir}/rom.c" "${port_rom_dir}/sha1.c" "${port_rom_manifest_c}"
-    hal/os/app_options.c hal/hw/hw.c)
+    hal/os/app_options.c hal/hw/hw.c ${port_host_sources})
 target_link_libraries(port_rom_unit_tests PRIVATE port_decomp_env)
 target_include_directories(port_rom_unit_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_rom_unit_tests PRIVATE ${port_rom_test_options})
@@ -140,7 +140,8 @@ endforeach()
 
 # The ARM7's backup service, driven word by word through a stand-in PXI bus; no ROM needed
 add_executable(port_card_backup_tests
-    tests/rom/test_backup.c "${port_card_dir}/backup.c" "${port_rom_manifest_c}" hal/os/app_options.c)
+    tests/rom/test_backup.c "${port_card_dir}/backup.c" "${port_rom_manifest_c}" hal/os/app_options.c
+    ${port_host_sources})
 target_link_libraries(port_card_backup_tests PRIVATE port_decomp_env)
 target_include_directories(port_card_backup_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_options(port_card_backup_tests PRIVATE ${port_rom_test_options})
@@ -148,6 +149,8 @@ foreach(test init identify flash unreachable save_file write_failure round_trip 
     add_test(NAME card_backup_${test} COMMAND port_card_backup_tests ${test})
     set_tests_properties(card_backup_${test} PROPERTIES TIMEOUT 60)
 endforeach()
+# A save that is a symbolic link is macOS's and Linux's: the saves follow no links on Windows, where the test skips
+set_tests_properties(card_backup_linked_save PROPERTIES SKIP_RETURN_CODE 77)
 # The files the program refuses, each in a process of its own, since the program stops: with what the file seems to be.
 # A size only suggests another chip's save, so the message says it has that size
 add_test(NAME card_backup_bad_file COMMAND port_card_backup_tests bad_file)

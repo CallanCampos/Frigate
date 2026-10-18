@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 """Writes the trap stubs that let the host build link before every DS function and data object exists as C.
 
-    gen_stubs.py --version b2_us --out build/port/gen/stubs.c --objects OBJ...
+    gen_stubs.py --version b2_us --out build/port/gen/stubs.c --objects-file OBJECTS.txt [--nm NM] [--compiler CC]
 
-It reads the symbols that the given objects define and the ones they reference, and for each referenced symbol that
-no object defines and the host's C library doesn't provide, but that the ROM has (config/<version>/arm9/**/symbols.txt):
+It reads the symbols that the given objects define and the ones they reference (the objects are listed one a line in
+OBJECTS.txt, or given with --objects OBJ...: a Windows command line can't hold 1,700 paths), and for each referenced
+symbol that no object defines and the host's C library doesn't provide, but that the ROM has
+(config/<version>/arm9/**/symbols.txt):
   - a function gets a stub that calls port_trap_function(), which names it, its caller and the backtrace, then stops;
   - a data object gets a placeholder in a section that port_trap_protect_data() makes inaccessible at startup, so the
     first access is reported by name rather than reading zeros.
 A referenced symbol that is in neither the objects, the host's C library nor the ROM is left for the linker to report.
 The list shrinks as upstream writes C and as port/hal implements the platform layer. A summary goes to stderr.
+
+What the host's C library provides is what this process can find in it (macOS and Linux), or, with --compiler (the
+Windows build), what the libraries that the compiler driver links into every program define, read with --nm.
 """
 import argparse
 import ctypes
@@ -17,6 +22,7 @@ import keyword
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,8 +31,12 @@ IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Placeholders get room beyond the DS size, since host layouts of structs with pointers are larger
 PLACEHOLDER_SCALE = 2
 PLACEHOLDER_MAX = 0x10000
-PAGE = 0x4000  # The largest page size of the hosts (Apple Silicon), so the protection is page-exact everywhere
+# The largest page size of the hosts (Apple Silicon), so the protection is page-exact everywhere; Windows' 4 KiB pages
+# there, since COFF aligns no object beyond 8 KiB
+PAGE = 0x1000 if sys.platform == "win32" else 0x4000
 MACHO = sys.platform == "darwin"
+# A quoted argument of the compiler driver's -### output, with its backslashes and quotes escaped
+DRIVER_ARGUMENT = re.compile(r'"((?:[^"\\]|\\.)*)"')
 
 
 def load_ds_symbols(version: str) -> dict[str, dict]:
@@ -59,11 +69,11 @@ def load_ds_symbols(version: str) -> dict[str, dict]:
     return symbols
 
 
-def read_object_symbols(objects: list[str]) -> tuple[set[str], set[str]]:
+def read_object_symbols(objects: list[str], nm: str) -> tuple[set[str], set[str]]:
     """The global symbols the objects define and the ones they reference without defining."""
     defined, undefined = set(), set()
     for start in range(0, len(objects), 200):
-        output = subprocess.run(["nm", "-g", "-P", "-A", *objects[start:start + 200]], capture_output=True,
+        output = subprocess.run([nm, "-g", "-P", "-A", *objects[start:start + 200]], capture_output=True,
                                 text=True, check=True).stdout
         for line in output.splitlines():
             # "<object>: <name> <type> [<value> <size>]"
@@ -79,11 +89,53 @@ def read_object_symbols(objects: list[str]) -> tuple[set[str], set[str]]:
 
 
 def host_provides(name: str, libc) -> bool:
+    if isinstance(libc, set):
+        return name in libc
     try:
         getattr(libc, name)
         return True
     except AttributeError:
         return False
+
+
+def driver_libraries(compiler: str) -> list[str]:
+    """The libraries the compiler driver links into every program (the C runtime, compiler-rt, the system's import
+    libraries), from the link command it prints for a program of one empty object, without running it."""
+    with tempfile.TemporaryDirectory() as tmp:
+        probe = Path(tmp) / "probe.o"
+        probe.write_bytes(b"")
+        result = subprocess.run([compiler, "-###", str(probe), "-o", str(Path(tmp) / "probe.exe")],
+                                capture_output=True, text=True)
+    link = next((line for line in reversed(result.stderr.splitlines()) if "probe.o" in line), "")
+    arguments = [re.sub(r"\\(.)", r"\1", match) for match in DRIVER_ARGUMENT.findall(link)]
+    directories = [Path(argument[2:]) for argument in arguments if argument.startswith("-L")]
+    libraries = []
+    for argument in arguments:
+        if argument.startswith("-l"):
+            name = argument[2:]
+            found = next((directory / candidate for directory in directories
+                          for candidate in (f"lib{name}.dll.a", f"lib{name}.a", f"{name}.lib")
+                          if (directory / candidate).is_file()), None)
+            if found is not None:
+                libraries.append(str(found))
+        elif argument.endswith((".a", ".lib")) and Path(argument).is_file():
+            libraries.append(argument)
+    if not libraries:
+        sys.exit(f"gen_stubs: {compiler} -### named no library of the C runtime: {link or result.stderr}")
+    return list(dict.fromkeys(libraries))
+
+
+def library_symbols(libraries: list[str], nm: str) -> set[str]:
+    """Every global symbol the libraries define, an import library's functions by their own names too."""
+    names = set()
+    output = subprocess.run([nm, "-g", "-P", "-A", "--defined-only", *libraries], capture_output=True, text=True,
+                            check=True).stdout
+    for line in output.splitlines():
+        _, _, rest = line.rpartition(": ")
+        fields = rest.split()
+        if fields:
+            names.add(fields[0].removeprefix("__imp_"))
+    return names
 
 
 def c_string(text: str) -> str:
@@ -132,12 +184,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--version", required=True, choices=["b2_us", "w2_us"])
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--objects", nargs="+", required=True)
+    parser.add_argument("--objects", nargs="+", default=[])
+    parser.add_argument("--objects-file", type=Path, help="a file that lists the objects, one a line")
+    parser.add_argument("--nm", default="nm", help="the nm to read the objects with")
+    parser.add_argument("--compiler", help="the compiler driver whose libraries provide the C library (Windows)")
     args = parser.parse_args()
 
+    objects = list(args.objects)
+    if args.objects_file is not None:
+        objects += [line for line in args.objects_file.read_text().splitlines() if line]
+    if not objects:
+        sys.exit("gen_stubs: no objects")
     ds = load_ds_symbols(args.version)
-    defined, undefined = read_object_symbols(args.objects)
-    libc = ctypes.CDLL(None)
+    defined, undefined = read_object_symbols(objects, args.nm)
+    if args.compiler is not None:
+        libc = library_symbols(driver_libraries(args.compiler), args.nm)
+    else:
+        libc = ctypes.CDLL(None)
     functions, data, unknown = [], [], []
     for name in sorted(undefined):
         info = ds.get(name)

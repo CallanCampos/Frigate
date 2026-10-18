@@ -6,21 +6,27 @@
 // a write that fails is reported once and tried again every 60 frames. Then other programs' files: a save as melonDS
 // writes it goes through the card layer and back to the file byte for byte; another chip's save, DeSmuME's .dsv, a
 // padded image and a directory are refused with what they are; a melonDS save under the ROM's name is pointed out; and
-// a save path that is a link to another program's save stays a link while that save gets the writes. Needs no ROM.
+// a save path that is a link to another program's save stays a link while that save gets the writes (macOS and Linux:
+// the saves follow no links on Windows, where that test skips with status 77). Needs no ROM.
 //
 //   port_card_backup_tests NAME | all
 #include "hal/card/card_internal.h"
+#include "hal/host/host.h"
 #include "hal/card/port_card.h"
 #include "hal/os/port_app.h"
 #include "hal/pxi/pxi_bus.h"
 #include "hal/rom/rom_manifest.h"
 #include "nitro/card.h"
 #include "nitro/pxi.h"
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+// A test that can't run on this host
+#define SKIP_STATUS 77
 
 static int sFailed;
 
@@ -109,8 +115,7 @@ static void Start(const char *name) {
     memset(&cardi_common, 0, sizeof(cardi_common));
     memset(&sArg, 0, sizeof(sArg));
     cardi_common.cmd = &sArg;
-    snprintf(dir, sizeof(dir), "%s/port_card_%s_%d", getenv("TMPDIR") != NULL ? getenv("TMPDIR") : "/tmp", name,
-             (int)getpid());
+    snprintf(dir, sizeof(dir), "%s/port_card_%s_%d", port_host_temporary_directory(), name, (int)getpid());
     snprintf(sSavePath, sizeof(sSavePath), "%s/save/%s.sav", dir, port_rom_manifest_game_code);
     remove(sSavePath);
     port_card_set_save_path(sSavePath);
@@ -340,7 +345,7 @@ static int TestWriteFailure(void) {
     *strrchr(dir, '/') = '\0';
     snprintf(log, sizeof(log), "%s.log", dir);
     *strrchr(dir, '/') = '\0';
-    mkdir(dir, 0755);
+    port_host_make_directory(dir);
     strcat(dir, "/save");
     file = fopen(dir, "wb"); // where the save directory should be
     Check(file != NULL, "a file in the save directory's place");
@@ -403,9 +408,9 @@ static int TestBadFile(void) {
     snprintf(dir, sizeof(dir), "%s", sSavePath);
     *strrchr(dir, '/') = '\0';
     *strrchr(dir, '/') = '\0';
-    mkdir(dir, 0755);
+    port_host_make_directory(dir);
     strcat(dir, "/save");
-    mkdir(dir, 0755);
+    port_host_make_directory(dir);
     file = fopen(sSavePath, "wb");
     Check(file != NULL, "a file of another size");
     if (file != NULL) {
@@ -425,9 +430,9 @@ static void MakeSaveDirectory(char *dir, size_t size) {
     snprintf(dir, size, "%s", sSavePath);
     *strrchr(dir, '/') = '\0';
     *strrchr(dir, '/') = '\0';
-    mkdir(dir, 0755);
+    port_host_make_directory(dir);
     snprintf(dir + strlen(dir), size - strlen(dir), "/save");
-    mkdir(dir, 0755);
+    port_host_make_directory(dir);
 }
 
 // Writes a file of size bytes, each byte made by a function of its offset
@@ -644,7 +649,7 @@ static int TestRefuseDirectory(void) {
     Start("refuse_directory");
     atexit(Finish);
     MakeSaveDirectory(dir, sizeof(dir));
-    mkdir(sSavePath, 0755);
+    port_host_make_directory(sSavePath);
     port_card_set_save_path(sSavePath);
     port_card_backup_image();
     printf("  the program went on\n");
@@ -753,9 +758,7 @@ static BOOL HoldsPage(const char *path, u32 address, u8 seed, BOOL saveData) {
 }
 
 static BOOL IsLink(const char *path) {
-    struct stat info;
-
-    return lstat(path, &info) == 0 && S_ISLNK(info.st_mode);
+    return port_host_is_symbolic_link(path);
 }
 
 // A save path that is a symbolic link to another program's save (melonDS's .sav, linked to keep one save for both
@@ -767,14 +770,23 @@ static int TestLinkedSave(void) {
     char target[700];
     char temporary[720];
     char relative[64];
+    int linked;
 
     Start("linked_save");
     MakeSaveDirectory(dir, sizeof(dir));
     snprintf(other, sizeof(other), "%s/../melonds", dir);
-    mkdir(other, 0755);
+    port_host_make_directory(other);
     snprintf(target, sizeof(target), "%s/Pokemon Black 2.sav", other);
     WriteFile(target, PORT_CARD_BACKUP_SIZE, SaveByte);
-    Check(symlink(target, sSavePath) == 0, "the save path links to melonDS's save");
+    linked = port_host_symbolic_link(target, sSavePath);
+    if (linked != 0 && errno == ENOSYS) {
+        printf("  skipped: the saves follow no symbolic links on this host\n");
+        remove(target);
+        rmdir(other);
+        Finish();
+        return SKIP_STATUS;
+    }
+    Check(linked == 0, "the save path links to melonDS's save");
     port_card_set_save_path(sSavePath);
     IdentifyFlash();
     Check(port_card_backup_image()[0x100] == SaveByte(0x100), "the game reads the linked file");
@@ -791,7 +803,7 @@ static int TestLinkedSave(void) {
     // A relative link to a file that doesn't exist yet: the first write makes it there
     snprintf(relative, sizeof(relative), "../melonds/new.sav");
     snprintf(target, sizeof(target), "%s/new.sav", other);
-    Check(symlink(relative, sSavePath) == 0, "a relative link to a file not made yet");
+    Check(port_host_symbolic_link(relative, sSavePath) == 0, "a relative link to a file not made yet");
     port_card_set_save_path(sSavePath);
     IdentifyFlash();
     WritePage(0x100, 0x90);
@@ -859,6 +871,7 @@ static int IsStopping(int (*run)(void)) {
 int main(int argc, char **argv) {
     int all = argc < 2 || strcmp(argv[1], "all") == 0;
     int ran = 0;
+    int status;
 
     for (size_t i = 0; i < sizeof(sTests) / sizeof(sTests[0]); i++) {
         if (all ? IsStopping(sTests[i].run) : strcmp(argv[1], sTests[i].name) != 0) {
@@ -866,7 +879,11 @@ int main(int argc, char **argv) {
         }
         printf("%s\n", sTests[i].name);
         sFailed = 0;
-        if (sTests[i].run() != 0 || sFailed) {
+        status = sTests[i].run();
+        if (status == SKIP_STATUS && !sFailed && !all) {
+            return SKIP_STATUS;
+        }
+        if ((status != 0 && status != SKIP_STATUS) || sFailed) {
             printf("FAIL %s\n", sTests[i].name);
             return 1;
         }

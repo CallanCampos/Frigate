@@ -41,6 +41,7 @@ are in the module's fragment in [../cmake/](../cmake/README.md). A module's test
 | [gfl/](gfl/heap_policy.c) | Hooks into Game Freak's library (`src/gfl`), and `src/system/gfl_use.c` compiled through `gfl_use_host.c` | The host's heap sizes (`port_heap_size`), the particle systems' larger work ([ADR 0008](../docs/adr/0008-particle-work-from-the-platform-layer.md)), and GFL's frame count for replays | Every heap (`src/gfl/heapsys.c`), particles (`src/gfl/particle.c`), input replays | whole-program tests (`replay_*`, `oracle_*`) |
 | [dwc/](dwc/ov011_pending.c) | Overlay 11 functions with no C yet that DWC's initialization reaches | Their offline effect | The boot, which calls `DWC_InitForProduction` (`src/ov011/dwc_rapcommon.c`) | whole-program tests |
 | [stubs/](stubs/dsprot.c) | DS Protect (`lib/dsprot`, overlays 165 and 337), and a call the decomp names by placeholder | The checks pass as on a genuine cartridge; the placeholder call has no effect | The checks in `src/system/game_system.c`, `src/ov012/event_battle.c`, `src/ov035/event_mapchange.c`, `src/ov165/pokelist.c`; `src/system/resh_zek_savedata.c` | whole-program tests |
+| [host/](host/host.h) | No SDK module: the host operating system's services where macOS, Linux and Windows differ ([ADR 0013](../docs/adr/0013-windows-build-with-msys2-clang64.md)) | Pages and their protection, faults on a stack of their own (a trap placeholder touched, a fiber's stack overflowing into its guard, a crash), backtraces and the program's names, the watchdog, directories, the environment and the program's static data; on Windows, binary stdout and stderr and no error dialogs | None directly: the trap stubs, the fibers' guards, the PXI pointers into static data, `--run-dump` and the watchdog stand on it | `os_guard_*`, `app_symbols`, `pxi_bus_arena_overlap`, `integrate_overlay_sections`, the CI's macOS, Linux and Windows jobs |
 
 The root's files:
 
@@ -173,6 +174,14 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [stubs/dsprot.c](stubs/dsprot.c) | DS Protect's checks, passing as on a genuine cartridge |
 | [stubs/unresolved.c](stubs/unresolved.c) | Calls the decomp names by placeholder, with the effect they have on the DS |
 
+**[host/](host/host.h)** — the host operating system
+
+| File | What it does |
+| --- | --- |
+| [host/host.h](host/host.h) | What the platform layer, the program and the tests ask of the host's system, the same on every host |
+| [host/host_posix.c](host/host_posix.c) | macOS and Linux: `mmap` and `mprotect`, SIGSEGV and SIGBUS on an alternate stack, `backtrace` and `dladdr`, SIGALRM for the watchdog, the image's data and globals (Mach-O's `__DATA` and export trie, ELF's symbols) |
+| [host/host_windows.c](host/host_windows.c) | Windows: `VirtualAlloc` and `VirtualProtect`, a vectored exception handler that moves the report to a stack of its own, the unhandled-exception filter, unwinding by the image's unwind tables, the COFF symbol table, a watchdog thread, the PE image's writable sections; and, before `main()`, binary stdout and stderr and no error dialogs |
+
 ## How a decomp file is adapted
 
 Four patterns, which every module uses:
@@ -197,6 +206,9 @@ Every change these patterns need outside `port/` (the `#ifndef PLATFORM_PC` guar
 - Public functions are `port_<module>_*`. Inside the OS core, `port_osi_*` (after the SDK's `OSi_`) is shared between
   the files of `os/` only (`os_internal.h`); inside the sound driver, `snd7_*` is shared between the files of `snd7/`.
 - `vram_os.c` in `gx/` holds the host operating system's virtual memory calls; it has nothing to do with `os/`.
+- `host/` holds what else differs between macOS, Linux and Windows, one file a host (`host_posix.c`, `host_windows.c`),
+  each compiled to nothing on the others' hosts. Code elsewhere in `port/` calls it rather than an operating system's
+  API or an `#ifdef` of its own.
 
 Some headers are named for the interface rather than the file that implements it:
 
@@ -212,6 +224,7 @@ Some headers are named for the interface rather than the file that implements it
 | [pxi/arm7.h](pxi/arm7.h) (what the ARM7's services share) | `pxi/arm7.c` and each service |
 | [snd7/snd_handle.h](snd7/snd_handle.h) | `snd7/snd_bank_host.c` |
 | [gfl/gfl_frame.h](gfl/gfl_frame.h) | `gfl/gfl_use_host.c` |
+| [host/host.h](host/host.h) (the host's system) | `host/host_posix.c` on macOS and Linux, `host/host_windows.c` on Windows |
 | [../include/port_host.h](../include/port_host.h)'s `port_heap_size` and particle hooks | `gfl/heap_policy.c`, `gfl/particle_work.c` |
 
 ## Adding a module

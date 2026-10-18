@@ -2,29 +2,23 @@
 // upstream writes its C. Function stubs call port_trap_function; data placeholders sit on pages with no access, and the
 // fault handler names the placeholder that was touched. Either way the program stops with status 70, its message naming
 // the symbol, its address and its caller. It also tells Frigate's test launcher whether a symbol is still a placeholder
-// (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012).
+// (port_trap_is_placeholder), so that the launcher steps aside once the field's process table has C (ADR 0012). The
+// host's pages, faults, backtraces and names come from port/hal/host, the same code on every host here.
 #include "hal/trap.h"
-#include <dlfcn.h>
-#include <execinfo.h>
-#include <signal.h>
+#include "hal/host/host.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
-#include <unistd.h>
 
 static void print_backtrace(void) {
-    void *frames[64];
-    int count = backtrace(frames, 64);
-    fprintf(stderr, "Backtrace:\n");
-    backtrace_symbols_fd(frames, count, STDERR_FILENO);
+    port_host_print_backtrace();
 }
 
 static void print_caller(void *caller) {
-    Dl_info info;
-    if (caller != NULL && dladdr(caller, &info) != 0 && info.dli_sname != NULL) {
-        fprintf(stderr, "  called from %s+0x%lx\n", info.dli_sname,
-                (unsigned long)((char *)caller - (char *)info.dli_saddr));
+    const char *name;
+    uintptr_t offset;
+    if (port_host_function_at(caller, &name, &offset)) {
+        fprintf(stderr, "  called from %s+0x%lx\n", name, (unsigned long)offset);
     } else {
         fprintf(stderr, "  called from %p\n", caller);
     }
@@ -82,10 +76,9 @@ int port_trap_is_placeholder(const void *address) {
 
 // The fault handler: an access to a data placeholder is a trap, reported by the placeholder's name and offset, with a
 // backtrace, and the program ends with PORT_TRAP_EXIT_STATUS; any other fault is a crash, reported the same way
-// before the signal's default action ends the program
-static void on_fault(int signal, siginfo_t *info, void *context) {
-    (void)context;
-    const unsigned char *address = info->si_addr;
+// before the fault ends the program as it would have (a signal's default action, an exception's status on Windows)
+static void on_fault(const void *fault_address, const char *fault) {
+    const unsigned char *address = fault_address;
     if (address >= sDataBegin && address < sDataEnd) {
         size_t offset = 0;
         const PortTrapSymbol *symbol = find_data_symbol(address, &offset);
@@ -94,43 +87,27 @@ static void on_fault(int signal, siginfo_t *info, void *context) {
             fprintf(stderr, "\nport: the game accessed %s+0x%zx (%s, 0x%08x, %u bytes), which has no C yet\n",
                     symbol->name, offset, symbol->module, symbol->address, symbol->size);
         } else {
-            fprintf(stderr, "\nport: the game accessed the padding of the data placeholders at %p\n", info->si_addr);
+            fprintf(stderr, "\nport: the game accessed the padding of the data placeholders at %p\n", fault_address);
         }
         print_backtrace();
         fflush(stderr);
         _Exit(PORT_TRAP_EXIT_STATUS);
     }
-    if (!(address >= sDataBegin && address < sDataEnd)) {
-        // Any other fault is a crash: say where, then let the default action end the program as it would have
-        fprintf(stderr, "\nport: crash: signal %d at address %p\n", signal, info->si_addr);
-        print_backtrace();
-        fflush(stderr);
-    }
-    struct sigaction action;
-    memset(&action, 0, sizeof(action));
-    action.sa_handler = SIG_DFL;
-    sigaction(signal, &action, NULL);
-    raise(signal);
+    // Any other fault is a crash: say where, then let the fault end the program as it would have
+    fprintf(stderr, "\nport: crash: %s at address %p\n", fault, fault_address);
+    print_backtrace();
+    fflush(stderr);
 }
 
 void port_trap_protect_data(void) {
-    long page = sysconf(_SC_PAGESIZE);
+    uintptr_t page = (uintptr_t)port_host_page_size();
     find_data_range();
-    uintptr_t begin = ((uintptr_t)sDataBegin + (uintptr_t)page - 1) & ~((uintptr_t)page - 1);
-    uintptr_t end = (uintptr_t)sDataEnd & ~((uintptr_t)page - 1);
-    if (end > begin && mprotect((void *)begin, end - begin, PROT_NONE) != 0) {
-        perror("port: mprotect of the data placeholders");
+    uintptr_t begin = ((uintptr_t)sDataBegin + page - 1) & ~(page - 1);
+    uintptr_t end = (uintptr_t)sDataEnd & ~(page - 1);
+    if (end > begin) {
+        port_host_protect_none((void *)begin, end - begin, "port: the data placeholders' protection");
     }
     // The handler runs on a stack of its own, so that a thread's stack overflowing (the game's threads run on fibers
     // with guard pages) is still reported
-    static unsigned char altStack[64 * 1024];
-    stack_t stack = { .ss_sp = altStack, .ss_size = sizeof(altStack), .ss_flags = 0 };
-    sigaltstack(&stack, NULL);
-    struct sigaction action;
-    memset(&action, 0, sizeof(action));
-    action.sa_sigaction = on_fault;
-    action.sa_flags = SA_SIGINFO | SA_ONSTACK;
-    sigemptyset(&action.sa_mask);
-    sigaction(SIGSEGV, &action, NULL);
-    sigaction(SIGBUS, &action, NULL);
+    port_host_set_fault_handler(on_fault);
 }

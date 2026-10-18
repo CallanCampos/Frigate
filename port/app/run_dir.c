@@ -2,18 +2,15 @@
 // (port/tools/oracle/README.md, "Run directories"): frames.tsv with a row at every frame, the screens of chosen frames
 // as PNG, dumps of the game's globals at chosen frames, and run.txt (with the test launcher's --launch when the run has
 // one), so that a run of the game can be held against the melonDS oracle's. It reads the game's memory and screens and
-// changes neither.
-
-// POSIX's mkdir, which glibc hides from strict C11 (the target's -std=c11)
-#define _POSIX_C_SOURCE 200809L
-
+// changes neither. Its files are written in binary mode, so that their lines end with "\n" on Windows too, as the
+// oracle's do.
 #include "app/run_dir.h"
+#include "hal/host/host.h"
 #include "hal/rom/sha1.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #define SCREEN_PIXELS (256 * 192)
 // A screen is blank when all but this many of its pixels have one colour, as pbw-oracle and compare.py decide it
@@ -210,7 +207,7 @@ static const char *Text(const char *value) {
 // run.txt; finished is 0 while the run goes on, when the frames completed and the status aren't known yet
 static void WriteRunTxt(int finished, int status) {
     char *path = JoinPath("run.txt");
-    FILE *run = path != NULL ? fopen(path, "w") : NULL;
+    FILE *run = path != NULL ? fopen(path, "wb") : NULL;
 
     if (run != NULL) {
         fprintf(run, "#pbwrun 1\n");
@@ -392,7 +389,7 @@ int port_run_dir_add_dump(const char *spec, PortRunDirResolver resolve, char *er
     }
     if (sMemoryTxt == NULL) {
         char *path = JoinPath("memory.txt");
-        sMemoryTxt = path != NULL ? fopen(path, "w") : NULL;
+        sMemoryTxt = path != NULL ? fopen(path, "wb") : NULL;
         free(path);
         if (sMemoryTxt == NULL) {
             snprintf(error, errorSize, "can't write %s/memory.txt", sDir);
@@ -457,7 +454,7 @@ int port_run_dir_open(const char *dir, const char *screens, PortRunDirPngWriter 
         fprintf(stderr, "port: --run-screens: %s\n", error);
         return 0;
     }
-    if (mkdir(dir, 0777) != 0 && errno != EEXIST) {
+    if (port_host_make_directory(dir) != 0 && errno != EEXIST) {
         fprintf(stderr, "port: --run-dir: can't create %s: %s\n", dir, strerror(errno));
         port_frame_list_free(&sScreens);
         return 0;
@@ -469,7 +466,7 @@ int port_run_dir_open(const char *dir, const char *screens, PortRunDirPngWriter 
     }
     strcpy(sDir, dir);
     path = JoinPath("frames.tsv");
-    sFramesTsv = path != NULL ? fopen(path, "w") : NULL;
+    sFramesTsv = path != NULL ? fopen(path, "wb") : NULL;
     if (sFramesTsv == NULL) {
         fprintf(stderr, "port: --run-dir: can't write %s/frames.tsv\n", dir);
         free(path);

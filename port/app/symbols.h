@@ -4,7 +4,7 @@
 #define PORT_APP_SYMBOLS_H
 
 // The address of the program's global object or function called name (its C name), or NULL when the program has no
-// such global (statics aren't visible), when it was stripped, or on a host where this isn't implemented (Windows)
+// such global (statics aren't visible) or when it was stripped
 void *port_symbol_address(const char *name);
 
 #endif // PORT_APP_SYMBOLS_H

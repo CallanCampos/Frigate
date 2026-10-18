@@ -9,20 +9,18 @@
 //   port_os_tests NAME | all
 //
 // PORT_OS_STACK_KIB runs everything on smaller host stacks; PORT_OS_VERBOSE prints every scenario's log.
+#include "hal/host/host.h"
 #include "hal/os/fiber.h"
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
 #include "nitro/svc.h"
-#include <execinfo.h>
-#include <signal.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define LOG_MAX 512
 #define LOG_LINE 80
@@ -1185,40 +1183,27 @@ static u32 HashLog(void) {
 // Overflows of a thread's host stack, which must fault in its fiber's guard region (port/hal/os/fiber.c): frames of
 // 1 KiB each, which step page by page, and one frame larger than the guard and the stack together, which only the
 // stack probes catch (port/cmake/os.cmake). The handler runs on a stack of its own and names where the fault was
+// (port/hal/host)
 static BOOL sGuardHugeFrame;
 static void *sGuardLow;
 static void *sGuardHigh;
 
-static void OnFault(int signal, siginfo_t *info, void *context) {
-    static const char inGuard[] = "fault in guard page\n";
-    static const char outside[] = "fault outside the guard page\n";
-    char *address = info->si_addr;
+static void OnFault(const void *faultAddress, const char *fault) {
+    const char *address = faultAddress;
 
-    (void)signal;
-    (void)context;
+    (void)fault;
     if (address >= (char *)sGuardLow && address < (char *)sGuardHigh) {
-        (void)!write(STDERR_FILENO, inGuard, sizeof(inGuard) - 1);
+        fputs("fault in guard page\n", stderr);
+        fflush(stderr);
         _Exit(0);
     }
-    (void)!write(STDERR_FILENO, outside, sizeof(outside) - 1);
+    fputs("fault outside the guard page\n", stderr);
+    fflush(stderr);
     _Exit(1);
 }
 
 static void InstallFaultHandler(void) {
-    static char altStack[64 * 1024];
-    stack_t stack;
-    struct sigaction action;
-
-    stack.ss_sp = altStack;
-    stack.ss_size = sizeof(altStack);
-    stack.ss_flags = 0;
-    sigaltstack(&stack, NULL);
-    memset(&action, 0, sizeof(action));
-    action.sa_sigaction = OnFault;
-    action.sa_flags = SA_SIGINFO | SA_ONSTACK;
-    sigemptyset(&action.sa_mask);
-    sigaction(SIGSEGV, &action, NULL);
-    sigaction(SIGBUS, &action, NULL);
+    port_host_set_fault_handler(OnFault);
 }
 
 // Not inlined, so that the frames are the ones the test means: OverflowThread's own stays small
@@ -1468,24 +1453,12 @@ static int RunDeterminism(void) {
     return sFailed;
 }
 
-// A scenario that hangs reports where, before CTest's timeout kills it (PORT_OS_HANG_SECONDS, 50 by default)
-static void OnHang(int signal) {
-    static const char message[] = "hang: the scenario didn't end\n";
-    void *frames[64];
-    int count;
-
-    (void)signal;
-    (void)!write(STDERR_FILENO, message, sizeof(message) - 1);
-    count = backtrace(frames, 64);
-    backtrace_symbols_fd(frames, count, STDERR_FILENO);
-    _Exit(3);
-}
-
+// A scenario that hangs reports where, before CTest's timeout kills it (PORT_OS_HANG_SECONDS, 50 by default), and ends
+// with status 3 (the host's watchdog, port/hal/host)
 static void InstallHangReport(void) {
     const char *seconds = getenv("PORT_OS_HANG_SECONDS");
 
-    signal(SIGALRM, OnHang);
-    alarm(seconds != NULL ? (unsigned)atoi(seconds) : 50);
+    port_host_watchdog_start(seconds != NULL ? (unsigned)atoi(seconds) : 50, "hang: the scenario didn't end\n", 3);
 }
 
 int main(int argc, char **argv) {

@@ -1,5 +1,6 @@
 // Tests of the program's symbol lookup (port/app/symbols.h) on this test program's own symbols: on macOS through
-// dlsym, on Linux through the program's ELF symbol table, with no symbol exported in either
+// dlsym, on Linux through the program's ELF symbol table, on Windows through its COFF symbol table, with no symbol
+// exported on Linux or Windows
 #include "app/symbols.h"
 #include <stdio.h>
 

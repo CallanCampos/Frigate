@@ -9,8 +9,10 @@
 // doesn't by default (port/cmake/os.cmake). The PortFiber itself lives in the C heap, out of the stack's way. This
 // file also tells AddressSanitizer about every switch, since minicoro's own annotations miss the switches back to the
 // host stack (mco_impl.c, which is built without ASan), and tells LeakSanitizer to scan the stacks of suspended fibers
-// for pointers.
+// for pointers. The pages and their protection are the host's (port/hal/host): on Windows the top of the guard is made
+// of guard pages, so that an overflow is still reported there.
 #include "hal/os/fiber.h"
+#include "hal/host/host.h"
 
 #define MCO_NO_MULTITHREAD
 #include "minicoro.h"
@@ -18,13 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <sys/mman.h>
-#include <unistd.h>
-#endif
 
 #if defined(__has_feature)
 #if __has_feature(address_sanitizer)
@@ -73,20 +68,9 @@ static size_t sHostSize;
 static void *sHostFakeStack;
 #endif
 
+// VirtualProtect works on 4 KiB pages on Windows, while VirtualAlloc places mappings at 64 KiB
 size_t port_page_size(void) {
-    static size_t page;
-
-    if (page == 0) {
-#ifdef _WIN32
-        // VirtualProtect works on 4 KiB pages, but VirtualAlloc places mappings at 64 KiB
-        SYSTEM_INFO info;
-        GetSystemInfo(&info);
-        page = info.dwPageSize;
-#else
-        page = (size_t)sysconf(_SC_PAGESIZE);
-#endif
-    }
-    return page;
+    return port_host_page_size();
 }
 
 static size_t RoundUp(size_t value, size_t align) {
@@ -99,35 +83,17 @@ static void Fatal(const char *what) {
 }
 
 static unsigned char *MapPages(size_t size) {
-#ifdef _WIN32
-    // Not built yet: the shape a Windows backend takes
-    return VirtualAlloc(NULL, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-#else
-    void *p = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-    return p == MAP_FAILED ? NULL : p;
-#endif
+    return port_host_map(size);
 }
 
-static void ProtectNone(unsigned char *p, size_t size) {
-#ifdef _WIN32
-    DWORD old;
-    if (!VirtualProtect(p, size, PAGE_NOACCESS, &old)) {
-        Fatal("VirtualProtect failed");
+static void ProtectGuard(unsigned char *p, size_t size) {
+    if (port_host_protect_stack_guard(p, size, "port: fiber: the guard's protection") != 0) {
+        abort();
     }
-#else
-    if (mprotect(p, size, PROT_NONE) != 0) {
-        Fatal("mprotect failed");
-    }
-#endif
 }
 
 static void UnmapPages(unsigned char *p, size_t size) {
-#ifdef _WIN32
-    (void)size;
-    VirtualFree(p, 0, MEM_RELEASE);
-#else
-    munmap(p, size);
-#endif
+    port_host_unmap(p, size);
 }
 
 // ASan's protocol for each switch: __sanitizer_start_switch_fiber on the old stack, naming the new one, and
@@ -187,7 +153,7 @@ PortFiber *port_fiber_create(PortFiberFunc func, void *arg, size_t stackSize) {
         Fatal("minicoro's block layout changed: the stack is not where the guard expects it");
     }
     fiber->co = co;
-    ProtectNone(fiber->guard, guardSize);
+    ProtectGuard(fiber->guard, guardSize);
 
     if (sPaint) {
         memset(fiber->stackLow, PAINT_BYTE, stackSize);

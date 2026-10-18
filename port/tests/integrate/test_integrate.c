@@ -1,14 +1,17 @@
 // Tests of phase 1's integration: the host DMA (port/hal/dma), the OS allocator's 64-bit addresses
 // (port/hal/os/os_alloc_host.c) and the main arena's placement, the buttons and lid (port/hal/input), the screens drawn
-// by the scanline hook (port/gfx/screens.c), the PNG screenshot (port/app/present.c) and Frigate's test launcher when
-// it is off (port/app/launcher.c). Each scenario runs as the game's main() would, as the launcher of port_os_run, on
-// the whole program's objects.
+// by the scanline hook (port/gfx/screens.c), the PNG screenshot (port/app/present.c), Frigate's test launcher when it
+// is off (port/app/launcher.c), and the overlays' sections, which a load sets back (port/hal/fs/ovsec.c, with
+// ovsec_probe.c). Each scenario runs as the game's main() would, as the launcher of port_os_run, on the whole
+// program's objects.
 //
 //   port_integrate_tests NAME | all
 #include "app/launcher.h"
 #include "app/present.h"
 #include "app/run_dir.h"
 #include "gfx/screens.h"
+#include "hal/fs/ovsec.h"
+#include "hal/host/host.h"
 #include "hal/hw/hw.h"
 #include "hal/input/port_input.h"
 #include "hal/os/port_os.h"
@@ -297,42 +300,38 @@ static void TestScreens(void) {
               "each line is drawn with the registers as they are at its start");
     }
 
-    // The screenshot of what is shown now: engine A blue from line 96, engine B blue
+    // The screenshot of what is shown now: engine A blue from line 96, engine B blue, in a file of this process's own
     {
-        char path[] = "/tmp/port_integrate_XXXXXX.png";
-        int fd = mkstemps(path, 4);
+        char path[600];
         SDL_Surface *loaded;
         SDL_Surface *argb;
         int ok = 0;
 
-        Check(fd >= 0, "a temporary file");
-        if (fd >= 0) {
-            close(fd);
-            Check(port_present_screenshot(path), "the screenshot is written");
-            loaded = SDL_LoadPNG(path);
-            Check(loaded != NULL && loaded->w == PORT_SCREEN_WIDTH && loaded->h == 2 * PORT_SCREEN_HEIGHT,
-                  "it is a 256x384 PNG");
-            if (loaded != NULL) {
-                argb = SDL_ConvertSurface(loaded, SDL_PIXELFORMAT_ARGB8888);
-                if (argb != NULL) {
-                    ok = 1;
-                    for (int screen = 0; screen < 2 && ok; screen++) {
-                        const uint32_t *pixels = port_screens_pixels(screen);
+        snprintf(path, sizeof(path), "%s/port_integrate_%d.png", port_host_temporary_directory(), (int)getpid());
+        Check(port_present_screenshot(path), "the screenshot is written");
+        loaded = SDL_LoadPNG(path);
+        Check(loaded != NULL && loaded->w == PORT_SCREEN_WIDTH && loaded->h == 2 * PORT_SCREEN_HEIGHT,
+              "it is a 256x384 PNG");
+        if (loaded != NULL) {
+            argb = SDL_ConvertSurface(loaded, SDL_PIXELFORMAT_ARGB8888);
+            if (argb != NULL) {
+                ok = 1;
+                for (int screen = 0; screen < 2 && ok; screen++) {
+                    const uint32_t *pixels = port_screens_pixels(screen);
 
-                        for (int y = 0; y < PORT_SCREEN_HEIGHT && ok; y++) {
-                            const uint8_t *row =
-                                (const uint8_t *)argb->pixels + (size_t)(screen * PORT_SCREEN_HEIGHT + y) * argb->pitch;
+                    for (int y = 0; y < PORT_SCREEN_HEIGHT && ok; y++) {
+                        const uint8_t *row =
+                            (const uint8_t *)argb->pixels + (size_t)(screen * PORT_SCREEN_HEIGHT + y) * argb->pitch;
 
-                            ok = memcmp(row, pixels + y * PORT_SCREEN_WIDTH, PORT_SCREEN_WIDTH * 4) == 0;
-                        }
+                        ok = memcmp(row, pixels + y * PORT_SCREEN_WIDTH, PORT_SCREEN_WIDTH * 4) == 0;
                     }
-                    SDL_DestroySurface(argb);
                 }
-                SDL_DestroySurface(loaded);
+                SDL_DestroySurface(argb);
             }
-            Check(ok, "it holds the top screen above the bottom one, pixel for pixel");
-            unlink(path);
+            SDL_DestroySurface(loaded);
         }
+        Check(ok, "it holds the top screen above the bottom one, pixel for pixel");
+        unlink(path);
     }
 }
 
@@ -350,10 +349,42 @@ typedef struct Test {
     void (*run)(void);
 } Test;
 
+// The overlay sections hold an overlay file's writable statics on this host's object format, and a load sets them back
+// (port/hal/fs/ovsec.c): the zeroed static of ovsec_probe.c, compiled as a file of overlay PORT_TEST_OVSEC_OVERLAY, is
+// in the overlay's bss (its data, in the combined layout), the set one in its data, and a reset zeroes the one and sets
+// the other back. On Windows this is the check that the bss markers bracket the overlay's statics
+extern unsigned char port_test_ovsec_zeroed[16];
+extern unsigned char port_test_ovsec_set[16];
+
+static int InRange(const PortOvsecRange *range, const unsigned char *start, size_t size) {
+    return range->start != NULL && start >= range->start && start + size <= range->start + range->size;
+}
+
+static void TestOverlaySections(void) {
+    const PortOvsecOverlay *overlay;
+
+    Check(port_ovsec_init() > 0, "the program has overlay sections");
+    overlay = port_ovsec_get(PORT_TEST_OVSEC_OVERLAY);
+    Check(overlay != NULL, "the probe's overlay has sections");
+    if (overlay == NULL) {
+        return;
+    }
+    Check(InRange(&overlay->bss, port_test_ovsec_zeroed, sizeof(port_test_ovsec_zeroed)) ||
+              InRange(&overlay->data, port_test_ovsec_zeroed, sizeof(port_test_ovsec_zeroed)),
+          "the zeroed static is in the overlay's sections");
+    Check(InRange(&overlay->data, port_test_ovsec_set, sizeof(port_test_ovsec_set)),
+          "the set static is in the overlay's data");
+    port_test_ovsec_zeroed[5] = 0x5a;
+    port_test_ovsec_set[0] = 0x77;
+    port_ovsec_reset(PORT_TEST_OVSEC_OVERLAY);
+    Check(port_test_ovsec_zeroed[5] == 0, "a load zeroes the zeroed static");
+    Check(port_test_ovsec_set[0] == 1 && port_test_ovsec_set[2] == 3, "and sets the set one back");
+}
+
 static const Test sTests[] = {
     { "dma_copies", TestDmaCopies }, { "dma_async", TestDmaAsync },       { "dma_gx_command", TestDmaGxCommand },
     { "os_alloc", TestOsAlloc },     { "main_arena", TestMainArena },     { "input", TestInput },
-    { "screens", TestScreens },      { "launcher_off", TestLauncherOff },
+    { "screens", TestScreens },      { "launcher_off", TestLauncherOff }, { "overlay_sections", TestOverlaySections },
 };
 
 int main(int argc, char **argv) {

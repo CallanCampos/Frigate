@@ -161,6 +161,20 @@ target_compile_options(pokebw2_game PRIVATE
 # The game's main() becomes NitroMain(), which the platform layer calls on the game's thread
 set_source_files_properties("${REPO_ROOT}/src/system/main.c" PROPERTIES COMPILE_DEFINITIONS "main=NitroMain")
 
+# The host operating system's services (port/hal/host): one file for macOS and Linux and one for Windows, each compiled
+# to nothing on the others. The platform layer compiles them with the rest of hal/; the tests that build a few files of
+# their own add them
+set(port_host_sources
+    "${CMAKE_CURRENT_SOURCE_DIR}/hal/host/host_posix.c" "${CMAKE_CURRENT_SOURCE_DIR}/hal/host/host_windows.c")
+# glibc's dladdr and dl_iterate_phdr, defined ahead of the decomp's forced include, whose headers come first
+set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/hal/host/host_posix.c" PROPERTIES
+    COMPILE_DEFINITIONS _GNU_SOURCE)
+# Windows gives the main thread 1 MiB of stack, where macOS and Linux give 8 MiB; the dispatcher, the interrupt
+# handlers, the frame hooks and the renderers run on it (port/hal/os/core.c)
+if(WIN32)
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--stack,8388608")
+endif()
+
 # The platform layer: every C file under hal/, one directory per SDK module it replaces, compiled against the
 # decomp's headers. A module lists the decomp files it replaces in its own replaced.txt
 file(GLOB_RECURSE port_hal_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/hal/*.c")
@@ -183,17 +197,27 @@ if(port_gfx_sources)
     set(port_gfx_targets port_gfx)
 endif()
 
-# Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py)
+# Trap stubs for every DS symbol the game references that no compiled C defines yet (port/tools/gen_stubs.py). The
+# objects' paths go in a file, one a line: on a command line, their 190 KB would pass Windows' limit of 32 KB. On
+# Windows the compiler driver's libraries say what the C library provides, read with the toolchain's nm
+set(port_stubs_objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
+    "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects})
+file(GENERATE OUTPUT "${PORT_GEN}/stubs_objects.txt" CONTENT "$<JOIN:${port_stubs_objects},\n>\n")
+set(port_stubs_host_options "")
+if(WIN32)
+    if(NOT CMAKE_NM)
+        message(FATAL_ERROR "No nm was found for port/tools/gen_stubs.py; the toolchain's llvm-nm is the one it needs")
+    endif()
+    set(port_stubs_host_options --nm "${CMAKE_NM}" --compiler "${CMAKE_C_COMPILER}")
+endif()
 add_custom_command(
     OUTPUT "${PORT_GEN}/stubs.c"
     COMMAND "${PORT_PYTHON}" "${REPO_ROOT}/port/tools/gen_stubs.py"
-        --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c"
-        --objects "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
-                  "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects}
+        --version "${PORT_VERSION}" --out "${PORT_GEN}/stubs.c" --objects-file "${PORT_GEN}/stubs_objects.txt"
+        ${port_stubs_host_options}
     # The objects themselves, not only their targets, so that the stubs follow every recompiled file
     DEPENDS pokebw2_game port_hal port_app port_launcher ${port_gfx_targets} "${REPO_ROOT}/port/tools/gen_stubs.py"
-        "$<TARGET_OBJECTS:pokebw2_game>" "$<TARGET_OBJECTS:port_hal>" "$<TARGET_OBJECTS:port_app>"
-        "$<TARGET_OBJECTS:port_launcher>" ${port_gfx_objects}
+        "${PORT_GEN}/stubs_objects.txt" ${port_stubs_objects}
     WORKING_DIRECTORY "${REPO_ROOT}"
     COMMAND_EXPAND_LISTS
     VERBATIM)
