@@ -210,7 +210,7 @@ BOOL BeaconView_WaitTimerOrTouch(u8 *timer, u8 bg) {
     return FALSE;
 }
 
-u32 func_ov083_021eab38(const GameBeacon *beacon) {
+u32 BeaconView_GetTypeMsgId(const GameBeacon *beacon) {
     int type = GameBeacon_GetType(beacon);
 
     if (type == 0 || type >= 60) {

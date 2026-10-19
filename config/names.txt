@@ -9058,6 +9058,7 @@ overlays/ov083 0x021ea9ec BeaconViewMenu_Update
 overlays/ov083 0x021eaa68 BeaconViewMenu_WaitFlash
 overlays/ov083 0x021eaaa8 BeaconViewMenu_Close
 overlays/ov083 0x021eaadc BeaconView_WaitTimerOrTouch
+overlays/ov083 0x021eab38 BeaconView_GetTypeMsgId
 overlays/ov083 0x021eab50 BeaconViewOam_Init
 overlays/ov083 0x021eab6c BeaconViewOam_Free
 overlays/ov083 0x021eab90 BeaconViewWin_PrintEx
