@@ -143,7 +143,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gt2Connection.c` | `0x0217ce00`–`0x0217d144` | 14 | complete | descriptive |
 | `gt2Main.c` | `0x0217d144`–`0x0217d3ac` | 22 | complete | descriptive |
 | `gt2Message.c` | `0x0217d3ac`–`0x0217e768` | 51 | partial | descriptive |
-| `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | partial | descriptive |
+| `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 
 ### Overlay 12
@@ -1839,7 +1839,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ghttpCallbacks.c` | `0x021a1980`–`0x021a1a44` | 3 | partial | descriptive |
 | `ghttpCommon.c` | `0x021a1a44`–`0x021a1e0c` | 8 | partial | descriptive |
 | `ghttpConnection.c` | `0x021a1e0c`–`0x021a23d8` | 10 | partial | descriptive |
-| `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | partial | descriptive |
+| `ghttpEncryption.c` | `0x021a23d8`–`0x021a2c50` | 17 | complete | descriptive |
 | `ghttpMain.c` | `0x021a2c50`–`0x021a3074` | 16 | partial | descriptive |
 | `ghttpPost.c` | `0x021a3074`–`0x021a4114` | 21 | partial | descriptive |
 | `ghttpProcess.c` | `0x021a4114`–`0x021a54b4` | 18 | complete | descriptive |

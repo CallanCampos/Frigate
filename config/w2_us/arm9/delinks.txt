@@ -1780,6 +1780,7 @@ lib/dwc/src/bm/util_wifiidtool.c:
     .rodata     start:0x020940dc end:0x02094104
 
 lib/dwc/src/base/dwc_account.c:
+    complete
     .text       start:0x020575fc end:0x020580e4
     .data       start:0x0209b09c end:0x0209b0d0
 
