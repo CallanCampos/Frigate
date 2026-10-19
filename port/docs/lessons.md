@@ -3,6 +3,22 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: the merge of the performance and hygiene tracks
+
+- **`package_macos.sh --distribution` builds the app, not the build's tests.** It builds the app's target alone, so
+  a `ctest` after it runs the test programs of the last full build: in the merge, the x86_64 slice's run failed 11
+  tests, the host test program not knowing the new crash scenarios (`usage: ... NAME`, status 2) and the band test's
+  programs not existing yet ("Not Run"). Build every target (`cmake --build build/port-dist`) before testing a
+  distribution build, as CI's job does.
+- **A tree that `ctest_one_slice.sh` has thinned is not to be built.** The script swaps the build's universal
+  executables for one slice until it ends, and puts the universal ones back with their old times; a `cmake --build` of
+  the same tree meanwhile may link against or replace a thinned file. Run the slices' tests and the build of one tree
+  one after the other, never at once.
+- **A shared machine's load reaches the 3D frame first.** With other sessions holding the load average between 10 and
+  26, the title's frame took 2.66 ms at the median against 1.97 quiet, 0.6 of the 0.7 ms in the 3D frame, whose bands
+  need the performance cores free; the 2D lines and the geometry engine took 0.04 ms more each. To tell a change's
+  cost from the load's, run the build before the change and the one after alternately in the same minutes.
+
 ## 2026-10-19: frame times and the hot paths
 
 - **A replay's least of a few runs removes load that comes and goes, not load that stays.** A replay does the same work

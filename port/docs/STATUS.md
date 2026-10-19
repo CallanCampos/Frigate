@@ -26,10 +26,110 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-19: the performance and hygiene tracks merged: frames with headroom (ADR 0016) and every crash reported
+
+- **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` from `origin/main` at `607ccd1a6`: `8f28c3387` (the merge of
+  `port-perf`), `ac06d887e` (the merge of `port-hygiene`), `6f50f90b4` (ADR 0016 accepted), then this entry; pushed to
+  `port-perf` on origin for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to
+  rebuild) after both merges. No file outside `port/` changed.
+- **Host build:** the last entries' machine (macOS 26.5.1 on an M2 MacBook Air, Xcode 26.6, Apple clang 21.0.0),
+  RelWithDebInfo, Ninja, in the worktree `build/verify-tree`:
+  - `build/port-n` (Black 2), `build/port-w2` (White 2) and `build/port-san` (Black 2, `-DPORT_SANITIZE=ON`) built
+    again, with `build/oracle`'s `pbw-oracle` and the cached saves: only `port/`'s files compiled, with no warning, so
+    each build's count stays 264, the decomp's.
+  - `build/port-dist`, the universal distribution build, by `port/tools/package_macos.sh --distribution`, then every
+    target of it (`cmake --build`): the game compiled again for both slices since its last build, 528 warnings, 264 a
+    slice, the decomp's; none in `port/`. The oracle and Black 2's saves copied in for its x86_64 run.
+  - CI: `port-ci.yml`'s run 39257475500 at `6f50f90b4` on `port-perf`, green on all nine jobs, the first build of
+    either track on Linux and Windows (Tests, below). The runs the last entries left open were green too: 39215654518 at
+    `fe88f07f2` on `port-sanitizers`, and 39218824080 at `607ccd1a6` on `main`. Dispatched again on `port-perf` at
+    this entry's commit, which changes only documents; the next entry gives its result.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4 -LE timing` with the oracle and the cached saves, the two builds at once: Black
+    2, 294 pass and 1 skip of 295 (567 s); White 2, 292 pass and 1 skip of 293 (552 s). Each version's 15 `oracle`
+    tests pass, White 2's starter-save routes among them. Then the timing routes alone, each build after the other:
+    Black 2's 3 and White 2's 2 pass within the 8.36 ms budget. In all, Black 2 297 pass and 1 skip of 298, White 2
+    294 pass and 1 skip of 295; the skip is `app_universal_slices`, which a development build's one slice skips.
+  - The frames after the merge, from those timing routes (headless, each frame the least of 3 runs, the frame without
+    the pacing wait, median and 95th percentile in ms): Black 2's title 2.66, 2.85, the start menu 0.63, 2.65, the
+    party apps 0.74, 1.03, New Game's intro 0.70, 1.01 and flight 2.59, 3.07; White 2's title 2.67, 3.09, start menu
+    0.62, 2.68, party apps 0.74, 1.04. Other sessions' work on this machine kept the load average between 10 and 26 for
+    the whole task, so these are loaded frames, about 0.6 ms over `port-perf`'s quiet ones (the title 1.97, 2.04), all
+    of it in the 3D frame's bands (1.58 ms where the quiet frame took 0.98), which share the cores. The merge changed
+    nothing in them: `port-perf`'s own Black 2 build (`build/wt-perf`) and this one, alternately, 3 runs each with
+    `frame_times.py check`, gave the title 3.67, 3.87 and 3.68, 3.88 at a load of 13 to 16, then 3.33, 3.62 and 2.83,
+    3.26 at 10 to 12.
+  - T5, `build/port-san`, every test, `ctest -j4`, with the oracle and Black 2's saves: 295 pass and 1 skip (the same)
+    of 296 (488 s), its 25 `route` and 15 `oracle` tests among them, the 3D renderer's workers drawing their bands
+    under ASan and UBSan in every route with 3D; `g3d_ds3d_bands` and its sanitized twin pass. No output has a report
+    of the runtime's.
+  - The distribution build: the image (`Frigate Black 2 0.0.2917.dmg`, 13 MB) passes `package_macos.sh`'s checks, and
+    the app passes `check_app.sh --archs "arm64 x86_64" --minimum 11.0 --run-every-slice`. Its arm64 slice holds the
+    ARMv8 SHA instructions (72 in `otool`'s listing), the x86_64 one none, nor x86's own SHA extensions: its SHA-1 is
+    the C rounds, which `sha1.c` compiles wherever the compiler doesn't target the ARMv8 ones. The `app_*` tests, run
+    natively, pass (17, `app_slices` and `app_universal_slices` among them). The x86_64 slice under Rosetta
+    (`ctest_one_slice.sh --arch x86_64`), every test but the timing ones, `-j4`: 284 pass and `app_universal_slices`
+    skips of 285 (1,227 s at a load of about 22), `rom_sha1`, the 25 routes, the 15 `oracle` tests, the new host
+    crash tests and `g3d_ds3d_bands` among them; then its timing routes alone pass, at a load of 16 to 26: the title
+    5.72, 8.00, the start menu 1.45, 5.82, the party apps 1.71, 4.17, New Game's intro 1.76, 3.24 and flight 5.63,
+    7.30, 1.6 to 2.2 times the arm64 slice's under a like load, and not yet a measurement on a quiet machine.
+  - CI, run 39257475500, per job (pass and skip of the tests run; the skips need the ROM, or are another host's):
+
+    | Job | Tests |
+    | --- | --- |
+    | Host build (macos-26) | 249 and 49 of 298 (147 s); the app built |
+    | Host build (ubuntu-26.04) | 231 and 50 of 281 (50 s) |
+    | Host build (windows-2025) | 221 and 60 of 281 (37 s) |
+    | macOS distribution build (macos-26, macos-26-intel, macos-15, macos-15-intel) | 249 and 49 of 298 each (152, 199, 99 and 144 s); the app and its image built and checked, every slice started on Apple Silicon |
+    | Sanitized build (macos-26) | 247 and 25 of 272 (169 s), then the routes without the oracle, 3 and 8 of 11 |
+    | Sanitized build (ubuntu-26.04) | 229 and 26 of 255 (60 s), then 3 and 8 of 11 |
+
+    Windows compiled `host_windows.c`'s clock (its frequency through `InitOnceExecuteOnce`), threads and signals and
+    `EXCEPTION_BREAKPOINT` for the first time, and runs them: `g3d_ds3d_bands` and its sanitized twin, `g3d_hal`,
+    `frame_times_tool`, and the hygiene track's seven crash tests (`host_divide_by_zero`, `host_illegal_instruction`,
+    `host_breakpoint`, each on a fiber too, and `host_trap`, six new and `host_illegal_instruction_fiber` changed)
+    pass there, as on Linux and macOS. `rom_sha1` passes on Linux, Windows and the Intel runners, where the C rounds
+    run. The timing routes skip (77) on every job, which has no ROM: on CI they can't fail, however slow the runner,
+    and nothing needed fixing.
+  - Every run passed `--save-dir`, with `HOME` a scratch directory, and nothing under `~/Library`'s
+    `Application Support/Frigate` or `Logs/Frigate` is newer than 16:33 on 2026-10-18. T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** as the last entries: 457 function stubs and 46 data placeholders in each version.
+- **64-bit warnings:** as the last entries.
+- **Work done:** the integration of the two tracks that branched from `main` at `607ccd1a6`.
+  - **The merge of `port-perf`** (`8f28c3387`), 15 commits: `--frame-times` and `frame_times.py` with the timing
+    routes in optimized builds, the still 3D picture kept, the 3D frame drawn in bands on worker threads, the game's
+    thread at user-interactive QoS, the geometry engine's entries fed straight to its executor, capture a line at a
+    time, the 2D sources kept and their colour effects only where a line can blend, SHA-1 through the ARMv8 SHA
+    instructions, and the Windows clock read once. It merged clean.
+  - **The merge of `port-hygiene`** (`ac06d887e`), 2 commits: SIGFPE, SIGILL and SIGTRAP reported on macOS and Linux
+    with the crashing function named, `EXCEPTION_BREAKPOINT` fatal on Windows, and `package_macos.sh` refusing a
+    sanitized build by any CMake flag. Both tracks had changed the host's seam and the documents; every conflict kept
+    both sides: `host_posix.c`'s header names the crash reports and the clock and threads, `hal/README.md`'s `host/`
+    row and its `host_posix.c` and `host_windows.c` rows name both, and STATUS.md and lessons.md have `port-perf`'s
+    entries, the newer, above `port-hygiene`'s. `host.h`, `host_windows.c`, ARCHITECTURE.md, MODDING.md and the other
+    guides merged clean, and the workers' threads already leave SIGFPE, SIGILL and SIGTRAP unblocked, so a crash on
+    one reaches the same report.
+  - **ADR 0016 accepted** (`6f50f90b4`) by the port's developer at the track's merge, as every earlier ADR: its status
+    line, a note naming the merge, and the index's row.
+  - **The merged entries' `PORT_SHA`:** `port-perf`'s last entry is `db64d5d76` and `port-hygiene`'s `0308587c6`, the
+    commits that wrote them.
+  - lessons.md has the merge's three lessons: a distribution build's tests after every target is built, not after
+    `package_macos.sh` alone (a first x86_64 run, on the test programs of the tree's last full build, failed 11);
+    no build of a tree that `ctest_one_slice.sh` has thinned; and a shared machine's load, which shows in the 3D
+    frame first.
+- **Next:** the frames on a quiet machine, both slices, the x86_64 one under Rosetta measured since the bands; for T5,
+  a nightly run of both versions' sanitized routes and of the x86_64 slice's; then, as the last entries, the apps no
+  route reaches yet, and a save with an adventure made by the port, once overlay 36 lets it into the field.
+- **Blockers:** as the last entries: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
+  to 14 have no runner and no virtual machine here.
+
 ## 2026-10-19: frames with headroom after review: the timing tests only where they can hold, ADR 0016 as the code shares
 
 - **Upstream:** `2825ea75f`, as merged into the port's `main` by `607ccd1a6`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-perf` after `b9eb5d4f1`: `11506d41d` (the timing tests only in an optimized
+- **Port:** `db64d5d76`, on the branch `port-perf` after `b9eb5d4f1`: `11506d41d` (the timing tests only in an optimized
   build, and skipped over their budget under load), then this entry with ADR 0016's corrections and the Windows clock;
   not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at both commits. No
@@ -192,7 +292,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
 ## 2026-10-19: the crash reports and the sanitized build's packaging, after review
 
 - **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-hygiene` after `503080025`; not pushed.
+- **Port:** `0308587c6`, on the branch `port-hygiene` after `503080025`; not pushed.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to
   rebuild). No file outside `port/` changed.
 - **Host build:** the last entry's machine and builds. `build/port` (Black 2), `build/port-w2` (White 2) and
