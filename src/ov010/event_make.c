@@ -16,9 +16,9 @@
 
 #define HEAPID_BATTLE_PROC 0x76
 
-const GameProcFunctions data_ov010_0215039c = { func_ov010_0214ff00, func_ov010_0214ff58, func_ov010_0214ff28 };
+const GameProcFunctions data_ov010_0215039c = { BattleProc_Init, BattleProc_Main, BattleProc_Exit };
 
-BOOL func_ov010_0214ff00(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL BattleProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     BattleProcWork *procWork;
 
     GFL_HeapCreateChild(1, HEAPID_BATTLE_PROC, 0x4000);
@@ -27,7 +27,7 @@ BOOL func_ov010_0214ff00(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
-BOOL func_ov010_0214ff28(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL BattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BattleParam *battle = param;
     BattleProcWork *procWork = work;
 
@@ -40,7 +40,7 @@ BOOL func_ov010_0214ff28(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
-BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     BattleParam *battle = param;
     BattleProcWork *procWork = work;
     BOOL running = GFL_ProcMgrUpdate(procWork->manager);
@@ -258,11 +258,11 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
 GameEvent *eventMakeFunc(GameSystem *gsys, void *data) {
     const EventMakeArgs *args = data;
 
-    return func_ov010_02150310(gsys, args->setup, args->players, args->unk08);
+    return EventMake_Create(gsys, args->setup, args->players, args->unk08);
 }
 
-GameEvent *func_ov010_02150310(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov010_0215033c, sizeof(EventMakeWork));
+GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventMake_Callback, sizeof(EventMakeWork));
     EventMakeWork *work = GameEvent_GetData(event);
 
     work->gsys = gsys;
@@ -272,7 +272,7 @@ GameEvent *func_ov010_02150310(GameSystem *gsys, BtlSetup *setup, BattlePlayers 
     return event;
 }
 
-GameEventReturnCode func_ov010_0215033c(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data) {
     EventMakeWork *work = data;
     GameSystem *gsys = work->gsys;
     BattleParam *param;

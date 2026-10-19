@@ -5370,6 +5370,11 @@ overlays/ov008 0x0214fe7c EventWifiClub_CreateFromArgs
 overlays/ov009 0x0214f500 EventWifiBSubway_CreateFromArgs
 overlays/ov009 0x0214f50c EventWifiBSubway_Create
 overlays/ov009 0x0214f550 EventWifiBSubway_Callback
+overlays/ov010 0x0214ff00 BattleProc_Init
+overlays/ov010 0x0214ff28 BattleProc_Exit
+overlays/ov010 0x0214ff58 BattleProc_Main
+overlays/ov010 0x02150310 EventMake_Create
+overlays/ov010 0x0215033c EventMake_Callback
 overlays/ov011 0x021503c0 NetDevWifi_Prepare
 overlays/ov011 0x021503c8 NetDevWifi_Init
 overlays/ov011 0x02150410 NetDevWifi_Start
