@@ -95,7 +95,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 
 | File | What it does |
 | --- | --- |
-| [vram.h](gx/vram.h), [vram.c](gx/vram.c) | The nine VRAM banks as views of host memory, and applying a new VRAMCNT layout to them |
+| [vram.h](gx/vram.h), [vram.c](gx/vram.c) | The nine VRAM banks as views of host memory, and applying a new VRAMCNT layout to them; the 2D engines' sources at every line, kept from line to line until the layout changes |
 | [vram_layout.c](gx/vram_layout.c) | From VRAMCNT to the slots of every view, as GBATEK and melonDS map them |
 | [vram_os.h](gx/vram_os.h), [vram_os.c](gx/vram_os.c) | The operating system's virtual memory calls that alias the banks' pages |
 | [vramcnt.c](gx/vramcnt.c) | The SDK's `GX_SetBankFor*` functions, wrapped so that the views follow each VRAMCNT write |

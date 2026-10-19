@@ -132,12 +132,12 @@ medians in ms; the last row is the frame without the pacing wait, median and 95t
 | --- | --- | --- | --- | --- | --- | --- |
 | 3D frame | [../gfx/ref/ds3d.c](../gfx/ref/ds3d.c), before line 0, in bands of lines on the game's thread and the workers ([../gfx/workers.c](../gfx/workers.c), 4 bands on an M2): `DrawPixel`, `DrawSpan` and `PerspValue` for every pixel of every polygon (the title's Kyurem is about 1,160 polygons and 170,000 pixels a frame, 3.5 screens), `Texel` and `PaletteRead` for its textures; then edge marking, fog and anti-aliasing over the picture. The DS draws the last list every frame until the next swap; a frame whose list, latched registers and texture memory are all the last picture's keeps that picture instead ([../gfx/ge/ge_hal.c](../gfx/ge/ge_hal.c)), so a still 3D scene costs a comparison of its texture memory | 0.98 | 0 | 0.84 | 0.08 | 0 |
 | Geometry engine | [../gfx/ge/ge.c](../gfx/ge/ge.c): the logged writes decoded and fed straight to the executor (`Decode`, `Feed`; queued only behind a SWAP_BUFFERS that waits for the VBlank), the matrices, lighting and the clipper (`RunCommand`, `Vertex`, `Submit`) | 0.43 | 0 | 0.59 | 0.01 | 0 |
-| 2D lines | [../gfx/ref/ds2d.c](../gfx/ref/ds2d.c) (`Compose`, `DrawTextBg`, `DrawObjs`) and each line's sources, [../hal/gx/vram.c](../hal/gx/vram.c)'s `port_vram_fill_source` | 0.46 | 0.56 | 0.23 | 0.45 | 0.50 |
+| 2D lines | [../gfx/ref/ds2d.c](../gfx/ref/ds2d.c) (`Compose`, `DrawTextBg`, `DrawObjs`) and each line's sources, [../hal/gx/vram.c](../hal/gx/vram.c)'s `port_vram_fill_source`, which keeps them until the VRAM layout changes | 0.42 | 0.53 | 0.19 | 0.41 | 0.46 |
 | Capture | [../gfx/capture.c](../gfx/capture.c), every line while the game captures (the title's picture into VRAM D): a line in one pass of its source mode, written at once | 0.08 | 0 | 0 | 0 | 0 |
 | ARM7 | [../hal/snd7](../hal/snd7/snd7_internal.h): the sound driver catching up and the mixer, at each VBlank and at its alarms | 0.02 | 0.02 | 0.13 | 0.09 | 0.10 |
 | Window | [../app/present.c](../app/present.c): SDL's texture upload and present, about 0.2 ms with a window (none headless) | 0 | 0 | 0 | 0 | 0 |
 | The rest | The game's C on its fibers, the dispatcher, the interrupt handlers, the other frame hooks | 0.08 | 0.04 | 0.09 | 0.05 | 0.04 |
-| The frame | | 2.06, 2.14 | 0.62, 1.96 | 1.89, 2.16 | 0.70, 0.88 | 0.65, 0.79 |
+| The frame | | 2.02, 2.09 | 0.59, 1.90 | 1.85, 2.13 | 0.66, 0.84 | 0.61, 0.75 |
 
 Windowed, paced, the same frames cost about 1.4 times as much: the core slows down while the program sleeps through
 the rest of each frame. The x86_64 slice under Rosetta takes about 1.7 times the arm64 time.

@@ -165,7 +165,8 @@ uint32_t port_vram_texpltt_generation(int page);
 
 // Fills a 2D source (port/gfx/ref/ds2d.h) for engine 0 (A) or 1 (B) from the current mapping: the BG and OBJ slots,
 // the extended palette slots and, for engine A, the LCDC slots (engine B gets NULL there), and the live register,
-// palette and OAM memory of the engine (io, palette, oam). bg0_3d_line is left as it is
+// palette and OAM memory of the engine (io, palette, oam). bg0_3d_line is left as it is. The screens fill both engines'
+// sources at every line, so what the slots give is kept from one fill to the next until the layout changes
 struct PortDs2dSource;
 void port_vram_fill_source(struct PortDs2dSource *src, int engine);
 
