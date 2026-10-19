@@ -6976,6 +6976,8 @@ overlays/ov025 0x02170118 sPeopleSets
 overlays/ov025 0x02170160 FesMissionPeople_Answers
 overlays/ov025 0x021701f0 sShopItems
 overlays/ov026 0x0216f900 FesMissionHollow_Setup
+overlays/ov026 0x0216f9a4 FesMissionHollow_GetPersonObjCode
+overlays/ov026 0x0216f9c0 FesMissionHollow_GetPersonUnk2
 overlays/ov026 0x0216f9dc FesMissionHollow_Shuffle
 overlays/ov026 0x0216fa30 FesMissionHollow_IsActive
 overlays/ov028 0x02170340 UnionComm_Create
