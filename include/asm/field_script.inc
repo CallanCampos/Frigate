@@ -4808,12 +4808,12 @@
 
     // Plugin 9
 
-    // func_ov061_021e5800
+    // BlackTowerCmd_CreateWalls
     .macro Plugin9_Cmd1000
     FieldCommand 1000
     .endm
 
-    // func_ov061_021e5828
+    // BlackTowerCmd_ChangeRoom
     .macro Plugin9_Cmd1001 a0, a1, a2
     FieldCommand 1001
     .2byte \a0
@@ -4821,30 +4821,30 @@
     .2byte \a2
     .endm
 
-    // func_ov061_021e5904
+    // BlackTowerCmd_StartRun
     .macro Plugin9_Cmd1003
     FieldCommand 1003
     .endm
 
-    // func_ov061_021e594c
+    // BlackTowerCmd_GetFloorInArea
     .macro Plugin9_Cmd1004 a0
     FieldCommand 1004
     .2byte \a0
     .endm
 
-    // func_ov061_021e5888
+    // BlackTowerCmd_ChangeFloor
     .macro Plugin9_Cmd1005 a0
     FieldCommand 1005
     .2byte \a0
     .endm
 
-    // func_ov061_021e597c
+    // BlackTowerCmd_GetArea
     .macro Plugin9_Cmd1006 a0
     FieldCommand 1006
     .2byte \a0
     .endm
 
-    // func_ov061_021e59ac
+    // BlackTowerCmd_CallBattleEvent
     .macro Plugin9_Cmd1007
     FieldCommand 1007
     .endm
@@ -4855,7 +4855,7 @@
     .2byte \a0
     .endm
 
-    // func_ov061_021e5aa8
+    // BlackTowerCmd_SetTrainerDefeated
     .macro Plugin9_Cmd1009 a0, a1
     FieldCommand 1009
     .2byte \a0
@@ -4868,14 +4868,14 @@
     .2byte \a0
     .endm
 
-    // func_ov061_021e5af4
+    // BlackTowerCmd_IsTrainerDefeated
     .macro Plugin9_Cmd1011 a0, a1
     FieldCommand 1011
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e5b40
+    // BlackTowerCmd_GetNpcScript
     .macro Plugin9_Cmd1012 a0
     FieldCommand 1012
     .2byte \a0
@@ -4887,41 +4887,41 @@
     .2byte \a0
     .endm
 
-    // func_ov061_021e5c5c
+    // BlackTowerCmd_GetSpecialTrainerFlag
     .macro Plugin9_Cmd1014 a0, a1
     FieldCommand 1014
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e5c04
+    // BlackTowerCmd_SetSpecialTrainerFlag
     .macro Plugin9_Cmd1015 a0, a1
     FieldCommand 1015
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e59ec
+    // BlackTowerCmd_CallDoorEvent
     .macro Plugin9_Cmd1016 a0, a1
     FieldCommand 1016
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e5cb8
+    // BlackTowerCmd_GetGoalFloor
     .macro Plugin9_Cmd1017 a0
     FieldCommand 1017
     .2byte \a0
     .endm
 
-    // func_ov061_021e5d58
+    // BlackTowerCmd_GetTrainerClass
     .macro Plugin9_Cmd1018 a0, a1
     FieldCommand 1018
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e58c4
+    // BlackTowerCmd_SetProgress
     .macro Plugin9_Cmd1019 a0
     FieldCommand 1019
     .2byte \a0
@@ -4939,20 +4939,20 @@
     .2byte \a0
     .endm
 
-    // func_ov061_021e5e08
+    // BlackTowerCmd_GetTrainerId
     .macro Plugin9_Cmd1022 a0, a1
     FieldCommand 1022
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e5e60
+    // BlackTowerCmd_GetVersion
     .macro Plugin9_Cmd1023 a0
     FieldCommand 1023
     .2byte \a0
     .endm
 
-    // func_ov061_021e5e98
+    // BlackTowerCmd_GetInfo
     .macro Plugin9_Cmd1024 a0, a1, a2
     FieldCommand 1024
     .2byte \a0
@@ -4960,43 +4960,43 @@
     .2byte \a2
     .endm
 
-    // func_ov061_021e5a38
+    // BlackTowerCmd_CallMachineEvent
     .macro Plugin9_Cmd1025
     FieldCommand 1025
     .endm
 
-    // func_ov061_021e5fe4
+    // BlackTowerCmd_IsTargetSlot
     .macro Plugin9_Cmd1026 a0, a1
     FieldCommand 1026
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e603c
+    // BlackTowerCmd_GetNpcScriptByResult
     .macro Plugin9_Cmd1027 a0, a1
     FieldCommand 1027
     .2byte \a0
     .2byte \a1
     .endm
 
-    // func_ov061_021e5d0c
+    // BlackTowerCmd_GetRoomNpcCount
     .macro Plugin9_Cmd1028 a0
     FieldCommand 1028
     .2byte \a0
     .endm
 
-    // func_ov061_021e60a8
+    // BlackTowerCmd_HasEarnedMoney
     .macro Plugin9_Cmd1029 a0
     FieldCommand 1029
     .2byte \a0
     .endm
 
-    // func_ov061_021e5a64
+    // BlackTowerCmd_CallLiftEvent
     .macro Plugin9_Cmd1030
     FieldCommand 1030
     .endm
 
-    // func_ov061_021e60f4
+    // BlackTowerCmd_TakeEarnedMoney
     .macro Plugin9_Cmd1031 a0
     FieldCommand 1031
     .2byte \a0
