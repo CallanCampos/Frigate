@@ -91,7 +91,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 11
 
-874 of 1688 functions are in source files.
+1044 of 1688 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -119,7 +119,20 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
+| `gsAvailable.c` | `0x0216c520`–`0x0216c764` | 5 | complete | descriptive |
+| `gsCore.c` | `0x0216c764`–`0x0216cac0` | 11 | complete | descriptive |
+| `gsCrypt.c` | `0x0216cac0`–`0x0216cc2c` | 1 | complete | descriptive |
+| `gsDebug.c` | `0x0216cc2c`–`0x0216cd94` | 5 | complete | descriptive |
+| `gsLargeInt.c` | `0x0216cd94`–`0x0216dd9c` | 18 | partial | descriptive |
+| `gsMemory.c` | `0x0216dd9c`–`0x0216de10` | 8 | complete | descriptive |
+| `gsPlatformSocket.c` | `0x0216de10`–`0x0216e204` | 22 | partial | descriptive |
+| `gsPlatformThread.c` | `0x0216e204`–`0x0216e250` | 6 | complete | descriptive |
+| `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
+| `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
+| `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
 | `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
+| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | partial | descriptive |
+| `gs_screen_print.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |

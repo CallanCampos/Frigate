@@ -3,6 +3,8 @@
 
 #include "types.h"
 #include "dwc/error.h"
+// Overlay 11's base 64 (B64Encode)
+#include "dwc/gsPlatformUtil.h"
 #include "dwc/memfunc.h"
 #include "nitro/math.h"
 #include "nitro/os.h"
@@ -17,9 +19,6 @@ u32 strlen(const char *s);
 char *strncpy(char *dest, const char *src, u32 size);
 int strncmp(const char *a, const char *b, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
-
-// Overlay 11's base64 encoder: encodes size bytes of src into dest, with the alphabet 1 or 2
-void func_ov011_0216e878(const void *src, char *dest, int size, int alphabet);
 
 // The front half of overlay 189: the HTTP client of the game statistics
 // Starts and ends the client, and runs it once; the first starts one more user of it

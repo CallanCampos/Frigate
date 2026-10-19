@@ -23,7 +23,7 @@ int gpiProcessRegisterUniqueNick(GPConnection *connection, GPIOperation *operati
     }
     callback = operation->callback;
     if (callback.callback != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPRegisterUniqueNickResponseArg));
+        arg = gsimalloc(sizeof(GPRegisterUniqueNickResponseArg));
         if (arg == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -54,7 +54,7 @@ int gpiProcessRegisterCdKey(GPConnection *connection, GPIOperation *operation, c
     }
     callback = operation->callback;
     if (callback.callback != NULL) {
-        arg = func_ov011_0216dddc(sizeof(GPRegisterCdKeyResponseArg));
+        arg = gsimalloc(sizeof(GPRegisterCdKeyResponseArg));
         if (arg == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;

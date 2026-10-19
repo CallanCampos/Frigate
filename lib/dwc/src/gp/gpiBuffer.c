@@ -26,7 +26,7 @@ int gpiAppendCharToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, int
 
     if (size == len) {
         size += 0x4000;
-        output = func_ov011_0216ddec(output, size + 1);
+        output = gsirealloc(output, size + 1);
         if (output == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -53,7 +53,7 @@ int gpiAppendStringToBufferLen(GPConnection *connection, GPIBuffer *outputBuffer
     output = outputBuffer->buffer;
     if (size - len < stringLen) {
         size += stringLen >= 0x4000 ? stringLen : 0x4000;
-        output = func_ov011_0216ddec(output, size + 1);
+        output = gsirealloc(output, size + 1);
         if (output == NULL) {
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
@@ -80,12 +80,12 @@ int gpiAppendIntToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, int 
 
 static int gpiSendData(GPConnection *connection, int sock, char *buffer, int bufferLen, BOOL *closed, int *sent,
                        const char *id) {
-    int rcode = func_ov011_0216df24(sock, buffer, bufferLen, 0);
+    int rcode = send(sock, buffer, bufferLen, 0);
     int error;
     char *copy;
 
     if (rcode == -1) {
-        error = func_ov011_0216dfa8(sock);
+        error = GOAGetLastError(sock);
         if (error != -6 && error != -26 && error != -76) {
             if (id[0] == 'P' && id[1] == 'R') {
                 return 3;
@@ -97,15 +97,15 @@ static int gpiSendData(GPConnection *connection, int sock, char *buffer, int buf
         *sent = 0;
         *closed = FALSE;
     } else if (rcode == 0) {
-        func_ov011_0216cca8(1, 0, 16, "SENDXXXX(%s): Connection closed\n", id);
+        gsDebugFormat(1, 0, 16, "SENDXXXX(%s): Connection closed\n", id);
         *sent = 0;
         *closed = TRUE;
     } else {
-        copy = func_ov011_0216dddc(rcode + 1);
+        copy = gsimalloc(rcode + 1);
         memcpy(copy, buffer, rcode);
         copy[rcode] = '\0';
-        func_ov011_0216cca8(1, 0, 32, "SENT%04d(%s): %s\n", sCount.sent++, id, copy);
-        func_ov011_0216ddfc(copy);
+        gsDebugFormat(1, 0, 32, "SENT%04d(%s): %s\n", sCount.sent++, id, copy);
+        gsifree(copy);
         *sent = rcode;
         *closed = FALSE;
     }
@@ -168,7 +168,7 @@ int gpiRecvToBuffer(GPConnection *connection, int sock, GPIBuffer *inputBuffer, 
     do {
         if (len + 0x4000 > size) {
             size = len + 0x4000;
-            buffer = func_ov011_0216ddec(buffer, size + 1);
+            buffer = gsirealloc(buffer, size + 1);
             if (buffer == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
                 return 1;
@@ -176,29 +176,29 @@ int gpiRecvToBuffer(GPConnection *connection, int sock, GPIBuffer *inputBuffer, 
             inputBuffer->buffer = buffer;
             inputBuffer->size = size;
         }
-        rcode = func_ov011_0216def0(sock, buffer + len, size - len, 0);
+        rcode = recv(sock, buffer + len, size - len, 0);
         if (rcode == -1) {
-            error = func_ov011_0216dfa8(sock);
+            error = GOAGetLastError(sock);
             if (error != -6 && error != -26 && error != -76) {
                 gpiSetErrorString(connection, "There was an error reading from a socket.");
                 return 3;
             }
         } else if (rcode == 0) {
             closed = TRUE;
-            func_ov011_0216cca8(1, 0, 16, "RECVXXXX(%s): Connection closed\n", id);
+            gsDebugFormat(1, 0, 16, "RECVXXXX(%s): Connection closed\n", id);
         } else {
-            copy = func_ov011_0216dddc(rcode + 1);
+            copy = gsimalloc(rcode + 1);
             memcpy(copy, buffer + len, rcode);
             copy[rcode] = '\0';
-            func_ov011_0216cca8(1, 0, 32, "RECV%04d(%s): %s\n", sCount.received++, id, copy);
-            func_ov011_0216ddfc(copy);
+            gsDebugFormat(1, 0, 32, "RECV%04d(%s): %s\n", sCount.received++, id, copy);
+            gsifree(copy);
             len += rcode;
             total += rcode;
         }
         buffer[len] = '\0';
     } while (rcode >= 0 && !closed && total < 0x20000);
     if (total != 0) {
-        func_ov011_0216cca8(1, 0, 32, "RECVTOTL(%s): %d\n", id, total);
+        gsDebugFormat(1, 0, 32, "RECVTOTL(%s): %d\n", id, total);
     }
     inputBuffer->buffer = buffer;
     inputBuffer->len = len;

@@ -238,3 +238,69 @@ lib/dwc/src/gp/gpiUtility.c:
     complete
     .text       start:0x0217b820 end:0x0217bb70
     .data       start:0x02188eec end:0x02188f9c
+
+lib/dwc/src/gscommon/gsAvailable.c:
+    complete
+    .text       start:0x0216c560 end:0x0216c7a4
+    .data       start:0x02186ebc end:0x02186ee4
+    .bss        start:0x021906d8 end:0x021907b4
+
+lib/dwc/src/gscommon/gsCore.c:
+    complete
+    .text       start:0x0216c7a4 end:0x0216cb00
+    .bss        start:0x021907b4 end:0x021907e0
+
+lib/dwc/src/gscommon/gsCrypt.c:
+    complete
+    .text       start:0x0216cb00 end:0x0216cc6c
+    .rodata     start:0x0218506c end:0x02185090
+
+lib/dwc/src/gscommon/gsDebug.c:
+    complete
+    .text       start:0x0216cc6c end:0x0216cdd4
+    .data       start:0x02186ee4 end:0x02186ef4
+    .bss        start:0x021907e0 end:0x02190844
+
+lib/dwc/src/gscommon/gsLargeInt.c:
+    .text       start:0x0216cdd4 end:0x0216dddc
+    .data       start:0x02186ef4 end:0x02186f04
+    .bss        start:0x02190844 end:0x021908d4
+
+lib/dwc/src/gscommon/gsMemory.c:
+    complete
+    .text       start:0x0216dddc end:0x0216de50
+    .data       start:0x02186f04 end:0x02186f14
+
+lib/dwc/src/gscommon/gsPlatformSocket.c:
+    .text       start:0x0216de50 end:0x0216e244
+    .data       start:0x02186f14 end:0x02186f9c
+    .bss        start:0x021908d4 end:0x02190944
+
+lib/dwc/src/gscommon/gsPlatformThread.c:
+    complete
+    .text       start:0x0216e244 end:0x0216e290
+
+lib/dwc/src/gscommon/gsPlatformUtil.c:
+    complete
+    .text       start:0x0216e290 end:0x0216ea8c
+    .rodata     start:0x02185090 end:0x021850d4
+    .data       start:0x02186f9c end:0x0218703c
+    .bss        start:0x02190944 end:0x02190968
+
+lib/dwc/src/gscommon/gsSoap.c:
+    complete
+    .text       start:0x0216ea8c end:0x0216ec98
+
+lib/dwc/src/gscommon/gsStringUtil.c:
+    complete
+    .text       start:0x0216ec98 end:0x0216eee8
+
+lib/dwc/src/gscommon/gsXML.c:
+    .text       start:0x0216fc38 end:0x02171420
+    .data       start:0x021874e0 end:0x02187790
+
+lib/dwc/src/gscommon/gs_screen_print.c:
+    complete
+    .text       start:0x02171420 end:0x0217150c
+    .data       start:0x02187790 end:0x02187794
+    .bss        start:0x021909a4 end:0x021917a8
