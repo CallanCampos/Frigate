@@ -626,6 +626,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   compare")
 - A constant loaded again and multiplied a second time where ours reuses the product: the two uses differ in
   signedness (`u32 q` and `(int)q * C`). (matching.md: "does not merge a signed and an unsigned multiply")
+- An index's product computed again where ours shares one: for a `u16` index only an `(int)` or `(long)` use splits
+  it; `(u32)`, `(unsigned long)` and `(u16)` change nothing. (matching.md: "A `u16` index widens as unsigned")
 - An array's end as one folded constant (`add #0x5c; add #0x400`) where ours adds the member offset and the size
   apart: `&p->arr[N]`, not `(u8 *)p->arr + sizeof(p->arr)`. (matching.md: "The end of an array member")
 - `add rN, sp, #0; add rN, rN, #4` for a stack struct's field: pass the struct as words to an inline that indexes them.
