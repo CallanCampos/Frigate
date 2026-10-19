@@ -208,6 +208,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
+- An RC4 swap with the wrong registers: write it through one temporary, and group a masked sum as
+  `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
+  `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
 
 ## Stack slots or frame size
 
@@ -288,6 +291,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   the parameter is narrower than `int` (for a static helper, the type its public caller passes); loop with a
   separate `int` counter. (matching.md: "A register parameter stored at entry and read back from its slot")
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
+- A byte-sized running value kept on the stack and reloaded across calls where ours holds it in a register: declare
+  it `u8`. (matching.md: "A running sum that only ever holds a byte")
 
 ## Instructions in another order (scheduling)
 
@@ -763,6 +768,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
   once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
+- A local struct's address passed to a call in a loop, where the original keeps it in one register: try the order of
+  the independent stores before the loop; a pointer local used only at the call names nothing. (matching.md: "The
+  order of independent stores before a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
@@ -970,6 +978,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
   gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
   32-aligned")
+- A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
+  the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
+  of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
 
 ## Function order and presence
 

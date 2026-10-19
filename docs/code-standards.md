@@ -19,7 +19,9 @@ The others (2, 3) need a reader: the `decomp-reviewer` agent and pull request re
 
 **Do:** return where the function returns, and break out of a loop where the loop ends.
 
-**Don't:** jump to a label that only returns, or to a copy of the compiler's shared tail.
+**Don't:** jump to a label that only returns, or to a copy of the compiler's shared tail, and don't move the loop into
+a `static inline` whose `return` from inside it does the same jump: for the loop below, a helper that returns the
+code at the first nonzero byte and crashes after the loop is that `goto` under another name.
 
 ```c
 /* Wrong: the goto only stands in for a return */

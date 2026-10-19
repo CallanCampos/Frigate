@@ -650,6 +650,16 @@ Same instructions, registers swapped.
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode).
+- An RC4 key schedule's swap written through one temporary, `temp = table[j]; table[j] = table[i]; table[i] =
+  temp;`, and its sum grouped `(table[i] + (j + key[k])) & 0xff`, which gives `add r4, r5, r4` where the flat
+  `j + key[k] + table[i]` swaps the operands, are what DS Protect's `DSProt_Rc4InitMulti` needed. The same library's
+  `DSProt_EncryptCodeMulti` and `DSProt_DecryptCodeMulti` index `src[i + k]` and `*(u32 *)(src + i)` directly, where
+  a named `u8 *in = src + i` took the saved register ahead of the counter, and declare the counter `unsigned long`
+  (see "`u32` is `unsigned int` in our `types.h`"). The encryption's running `u8 sum` is the byte just written,
+  `dest[i + 3] = sum + src[i + 3]; sum = dest[i + 3];`: `sum += src[i + 3]; dest[i + 3] = sum;` and the other
+  spellings with one variable leave 26 bytes of registers. The decryption's bytes go through a `static inline` that
+  returns the xor and stores the encrypted byte into the state, which splits their live ranges so that the first
+  lands in `r7` and the next two in `fp`.
 
 ## Stack slots
 
@@ -1050,6 +1060,10 @@ Same code, other `sp` offsets or frame size.
   without being hoisted itself: the grid transition's `EncEffGrid_Draw` (22 bytes of stack slots) matched with
   `s1 = s + width * FX32_ONE; t1 = t + height * FX32_ONE;` assigned right after `s` and `t`, the far corner's texture
   coordinates. The invariant itself as a local (`w = width * FX32_ONE`) is hoisted under a guard and costs 4 bytes.
+- A running sum that only ever holds a byte, kept on the stack and reloaded from its slot across calls (`ldrne r0,
+  [sp, #0xc]` for a `-1` and the counter started from a reload of it), was a `u8` local in DS Protect's
+  `DSProt_DecryptCodeMulti`: its `u8 sum` gives the original's `push {r3}` frame of 0x10 and its 4 missing bytes,
+  where a `u32 sum` lived in a register.
 
 ## Instruction order
 
@@ -2248,10 +2262,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - I/O registers reached as offsets from one base register (`ldr r0, [sb, #0x1a4]`, `add fp, sb, #0x100000`), with
   the base made by shifting a register that holds 1 (`mov r3, #1; lsl sb, r3, #0x1a`), are not `1 << 26` or a base
   pointer local: MWCC folds both back to a constant and loads each register's address from the literal pool. Only a
-  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, which brought DS Protect's
-  `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x770 to its 0x764 but was judged unnatural and left out of
-  the source. Its header address, which the original computes from the TWL bit, is
-  `(((twl) + 5) << 23) - 0x1a0`; a `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
+  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, which takes DS Protect's
+  `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x770 to between 0x74c and 0x774 against the original's
+  0x764, by how the rest is written, without matching; it was judged unnatural and left out of the source. Its header
+  address, which the original computes from the TWL bit, is `(((twl) + 5) << 23) - 0x1a0`; a
+  `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
 
 ## Branches and block layout
 
@@ -2656,6 +2671,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the entry test (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`). libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the samples
   it stores through `s16 *mic` by an `sEcho.attenuation` loaded once only with `shift = sEcho.attenuation;` before
   the loop; the original's load is below the test, which no spelling found gives.
+- The order of independent stores before a loop can decide whether a local struct's address, passed to a call on
+  every pass, keeps a register across the loop. DS Protect's `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) keep
+  `&args` in a register as the original does with the stores to `args` and `checks[]` interleaved (`args.nop`,
+  `args.tamper`, `checks[0]`, `args.arg0`, `checks[1]`, `args.arg1`, `checks[2]`, `args.failed`, `args.result`);
+  written group by group, 82 bytes differ instead of 71. A `DSProtCheckArgs *p = &args;` used only at the call gets
+  the register too, but names nothing. See the function's row for what still differs.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
@@ -3593,6 +3614,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   as one array no order of its 13 file-scope objects works. About 120 orders of those objects then fit, so the
   file's order is one of them and says so. The compiled object's symbol table lists data objects in their sorted
   order across sections, ties included, which checks a model far better than `--check`.
+- A bias on a data symbol lands in the literal's addend (`SYM + 0x2200` in `.rela.text`) only through element-pointer
+  arithmetic, `&x + 0x2200 / sizeof(u32)` or `arr + 0x880`, as `Func + 0x2200` does for a function; byte arithmetic,
+  `(u32)&x + 0x2200` or `(u8 *)&x + 0x2200`, loads the plain symbol and adds 0x2200 at run time. DS Protect biases its
+  addresses this way and subtracts the bias at run time. The `- 0x2200` stays at run time when the result is the base
+  of a variable index: `DSProt_RunChecks1`'s `(DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200)`, read
+  as `callbacks[index]`, gives the original's `ldr =SYM+0x2200; sub r4, r4, #0x2200`. For a scalar read MWCC folds it
+  back to the plain symbol in every spelling tried (a `u32`, `const` or pointer local, a `static inline`, a macro,
+  `[-0x880]` indexing). The one that keeps it there stores the biased value into `checks[]` and reads it back
+  (`checks[0] = biased; check = checks; index = *(u32 *)(*check++ - 0x2200);`), a store written only to stop MWCC
+  folding the constant, which `docs/code-standards.md` §2 rejects.
 
 ## When nothing moves it
 
