@@ -3,6 +3,19 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: the crash reports of SIGFPE, SIGILL and SIGTRAP, and no disk image of a sanitized build
+
+- **On arm64, `__builtin_trap` is a breakpoint.** It is BRK, SIGTRAP on macOS and Linux, where x86-64's UD2 is SIGILL:
+  the host test named `illegal_instruction_fiber` had raised SIGTRAP on Apple Silicon all along, and a handler that
+  took SIGILL alone would have missed the compiler's own traps there. An illegal instruction on arm64 is UDF.
+- **A test of a division's fault divides two opaque operands.** LLVM turns `1 / x` into a comparison (x when it is 1
+  or -1, else 0), so `1 / volatile_zero` never faulted, even as x86-64 code under Rosetta; `10 / volatile_zero`, with
+  the dividend volatile too, did. And arm64 never faults on a division, so a test that wants SIGFPE there raises it.
+- **A crash's address comes from the saved registers, not `si_addr`.** macOS on Apple Silicon gives a raised signal
+  `si_code` 0, as it gives a breakpoint (and Rosetta gave a raised SIGFPE a division's code, 7), so no code tells a
+  sent signal from a trap there; Linux's `si_addr` is 0 for INT3 and holds the sender's pid for a sent signal. The
+  program counter in the handler's context is right in every case.
+
 ## 2026-10-19: the sanitized build's merge, after review
 
 - **A change to what a function does in every build reaches every description of it.** `port_heap_ds_read_begin`

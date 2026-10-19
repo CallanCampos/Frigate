@@ -66,13 +66,16 @@ ctest --test-dir build/port-san -L route                       # every route, wi
     by the build's flags.
   - The timing gates (`PORT_G3D_TIMING_GATE`, `PORT_GFX_TIMING_GATE`) would time instrumented renderers against the
     plain build's limits: configuring one with `PORT_SANITIZE` is refused.
-  - The macOS app and its disk image built here link the toolchain's ASan runtime: they are for testing, never for
-    giving out.
+  - The macOS app built here links the toolchain's ASan runtime, which
+    [../app/macos/make_app.sh](../app/macos/make_app.sh) copies into it: it is for testing on this Mac, never for
+    giving out. So [../tools/package_macos.sh](../tools/package_macos.sh) refuses to put a sanitized build's app in a
+    disk image (a build configured with `PORT_SANITIZE`, or with `-fsanitize=` in its flags), before it builds
+    anything, and checks that no image it makes holds a sanitizer's runtime (the test `app_package_macos_out`).
   - With `-DPORT_MACOS_DISTRIBUTION=ON`, in a directory of its own (`build/port-san-dist`), both slices are built
     sanitized for macOS 11.0, with SDL3 linked statically and left as it is: ctest runs the Mac's slice, and
     [../tools/ctest_one_slice.sh](../tools/ctest_one_slice.sh) the other, the x86_64 one under Rosetta on Apple
     Silicon, where ASan runs too. That is how the x86_64 code's routes are checked here: CI's Intel runners have no
-    ROM. Its app is a sanitized one, never one to give out.
+    ROM. Its app is a sanitized one, never one to give out, and `package_macos.sh --distribution` refuses it too.
 
 ## Reading a report
 
@@ -98,7 +101,12 @@ ctest --test-dir build/port-san -L route                       # every route, wi
   given to every test through `LSAN_OPTIONS=suppressions=` in the tests' `ENVIRONMENT_MODIFICATION` at the end of
   [../CMakeLists.txt](../CMakeLists.txt). A run that ends on a trap stub or the watchdog leaves through `_Exit` and gets
   no leak check.
-- **A trap** (status 70) or the watchdog (73) end a sanitized run as they end a plain one.
+- **A trap** (status 70) or the watchdog (73) end a sanitized run as they end a plain one, and so does a crash that no
+  check reported first: Frigate's handler of SIGSEGV, SIGBUS, SIGFPE, SIGILL and SIGTRAP
+  ([../hal/host/host.h](../hal/host/host.h)), set at start-up, replaces ASan's own of the first three, so the report is
+  `port: crash: signal N at address ...` with a backtrace, as in the plain build
+  ([MODDING.md](MODDING.md#when-the-game-stops)), and not ASan's `SEGV` or `FPE`. A division by zero is UBSan's to
+  report, at the division, before x86-64 faults on it or arm64 gives 0.
 
 ## What Frigate tells the sanitizers
 
@@ -170,7 +178,7 @@ The sanitizers' reports, and what this build does about each:
 | R2 | `g2d_MultiCellAnimation.c:119`, New Game's intro | The same | The same |
 | R3 | `savedata.c:57`, every route at boot, upstream clang only | A call through `void (*)(void *)` to a typed initializer (above) | Left out by the ignorelist: safe on every host ABI |
 | R4 | `port/hal/os/os_irqTable.c:58`, `os_timed_work`, upstream clang only | Frigate's `OS_SetIrqFunction`, as the SDK's, cast a DMA channel's or timer's handler (`void (void)`) to a callback (`void (void *)`), which `OSi_IrqCallback` called as one | Fixed in Frigate's code: [../hal/os/os_interrupt.c](../hal/os/os_interrupt.c) keeps such a handler with its type and calls it through `CallIrqFunction`, and `OSi_CountUpTick` ([../hal/os/os_tick.c](../hal/os/os_tick.c)) has the SDK's type again |
-| R5 | `src/system/scroll_bar.c:25`, the test launcher's Pokédex (`oracle_launch_party_menus`), both versions: found on the merged tree of 2026-10-19 | `ScrollBar_GetPos` divides by a list's `max`, which is 0 when its rows all fit; the DS's runtime division (`_u32_div_f`) returns the dividend there, and C leaves it undefined: arm64 gives 0, x86-64 faults, and the plain build's x86_64 slice ended with SIGFPE at the Pokédex | Fixed in the game's file under `PLATFORM_PC`, with the DS's result ([game-changes.md](game-changes.md)) |
+| R5 | `src/system/scroll_bar.c:25`, the test launcher's Pokédex (`oracle_launch_party_menus`), both versions: found on the merged tree of 2026-10-19 | `ScrollBar_GetPos` divides by a list's `max`, which is 0 when its rows all fit; the DS's runtime division (`_u32_div_f`) returns the dividend there, and C leaves it undefined: arm64 gives 0, x86-64 faults, and the plain build's x86_64 slice ended with SIGFPE at the Pokédex, unreported then (the host's handler has reported SIGFPE, SIGILL and SIGTRAP since 2026-10-19) | Fixed in the game's file under `PLATFORM_PC`, with the DS's result ([game-changes.md](game-changes.md)) |
 
 What the sanitizers couldn't see or do on the fibers and in the game's heaps, the gaps this build closes or works
 around:

@@ -11,10 +11,12 @@ instead.
 --fresh-save-dir gives the program a save directory of its own, a new temporary one, removed after. --crash wants the
 program to end by a crash, as each host ends a crashed program: killed by a signal on macOS and Linux, with an
 exception's status on Windows (port/hal/host): an error's, 0xc0000000 and up, or a warning's, 0x80000000 and up, such
-as a guard page's 0x80000001. --abort wants it to end by abort(), a check of the platform layer's that failed: killed
-by SIGABRT on macOS and Linux, status 3 on Windows. Exits 0 when the program ended as wanted, its messages (stderr, then
-stdout) match every --expect and no --reject, and hold no sanitizer's report; 77 (skipped) when it ended with a
---skip-status (66: no ROM); 1 otherwise. A sanitizer's report fails the run whatever ending it wants, since none of the
+as a guard page's 0x80000001 or a breakpoint's 0x80000003; and when its messages have the host's crash report,
+"port: crash: signal N" or "port: crash: exception 0xCODE", the crash the report names: killed by signal N, or status
+0xCODE. --abort wants it to end by abort(), a check of the platform layer's that failed: killed by SIGABRT on macOS and
+Linux, status 3 on Windows. Exits 0 when the program ended as wanted, its messages (stderr, then stdout) match every
+--expect and no --reject, and hold no sanitizer's report; 77 (skipped) when it ended with a --skip-status (66: no ROM);
+1 otherwise. A sanitizer's report fails the run whatever ending it wants, since none of the
 runs this checks expects one: in the sanitized build a report aborts the program (port/docs/sanitizers.md), which
 --crash or --abort would otherwise take for the ending it wants. Standard library only.
 """
@@ -36,6 +38,9 @@ CRASH_STATUS = 0x80000000
 # How abort() ends a program: SIGABRT on macOS and Linux; the C runtime's status 3 on Windows, whose dialog the host
 # seam turns off (port/hal/host)
 ABORT_STATUS = 3 if os.name == "nt" else -signal.SIGABRT
+# The host's crash report (port/hal/trap.c, port/hal/host), which names what ended the program: a signal on macOS and
+# Linux, which then kills it, and an exception on Windows, whose code is then its status
+CRASH_REPORT = re.compile(r"port: crash: (?:signal ([0-9]+)|exception 0x([0-9a-fA-F]+))")
 # A sanitizer's report, by the lines the sanitized build's tests fail on (port_check_tests in
 # port/CMakeLists.txt): ctest sees only the lines this prints, so the check is made here too
 SANITIZER_REPORT = re.compile(r"ERROR: (Address|Leak)Sanitizer|SUMMARY: [A-Za-z]+Sanitizer|runtime error: "
@@ -75,6 +80,12 @@ def main() -> int:
     failures = []
     if args.crash and not (done.returncode < 0 or done.returncode >= CRASH_STATUS):
         failures.append(f"the program ended with status {done.returncode}, not by a crash")
+    named = CRASH_REPORT.search(output) if args.crash else None
+    if named:
+        status = -int(named.group(1)) if named.group(1) else int(named.group(2), 16)
+        if done.returncode != status:
+            failures.append(f"the report names {named.group(0)[len('port: crash: '):]}, but the program ended with "
+                            f"status {done.returncode}, not {status}")
     if args.abort and done.returncode != ABORT_STATUS:
         failures.append(f"the program ended with status {done.returncode}, not by abort() ({ABORT_STATUS})")
     if args.status is not None and done.returncode != args.status:

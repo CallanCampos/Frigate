@@ -3,8 +3,10 @@
 # this repository, in another one, through a link, and in one whose directories for the image don't exist yet; and its
 # refusals of the distribution build's options (ADR 0015): --distribution on a build directory configured without
 # PORT_MACOS_DISTRIBUTION, or for another game than --version's, and --version without --distribution or with a game
-# that isn't one. Each refusal comes before anything is built, configured or written, so the test builds nothing: the
-# distribution cases use build directories of a CMakeCache.txt alone.
+# that isn't one; and a sanitized build, whose app carries the sanitizer runtime (port/docs/sanitizers.md), configured
+# with PORT_SANITIZE, with or without --distribution, or with -fsanitize= in its C flags, while one with PORT_SANITIZE
+# off goes on past that check. Each refusal comes before anything is built, configured or written, so the test builds
+# nothing: those cases use build directories of a CMakeCache.txt alone.
 #
 #   test_package_macos.sh REPO BUILD_DIR WORK_DIR
 set -u
@@ -68,7 +70,31 @@ expect "--version without --distribution: status" "$(options --version w2_us --b
 expect "--version without --distribution: message" "$(grep -c "goes with --distribution" "$work/messages")" 1
 expect "--version of no game: status" "$(options --distribution --version b2_eu --build-dir "$work/dist")" 2
 expect "--version of no game: message" "$(grep -c "is b2_us or w2_us, not b2_eu" "$work/messages")" 1
-expect "the refusals built nothing" "$(ls "$work/dev" "$work/dist" | grep -vc -e CMakeCache.txt -e '^$' -e ':$')" 0
+
+# A sanitized build: refused, with or without --distribution and however it was made sanitized, the option read in any
+# case, as CMake reads it. One with PORT_SANITIZE off goes on, to the check of its app's name that a cache of these
+# alone fails
+mkdir -p "$work/san" "$work/san-dist" "$work/san-flags" "$work/plain"
+printf 'PORT_SANITIZE:BOOL=ON\nPORT_VERSION:STRING=b2_us\n' >"$work/san/CMakeCache.txt"
+printf 'PORT_MACOS_DISTRIBUTION:BOOL=ON\nPORT_SANITIZE:BOOL=on\nPORT_VERSION:STRING=b2_us\n' \
+    >"$work/san-dist/CMakeCache.txt"
+printf 'CMAKE_C_FLAGS:STRING=-g -fsanitize=address,undefined\nPORT_VERSION:STRING=b2_us\n' \
+    >"$work/san-flags/CMakeCache.txt"
+printf 'PORT_SANITIZE:BOOL=OFF\nPORT_VERSION:STRING=b2_us\n' >"$work/plain/CMakeCache.txt"
+expect "a sanitized build: status" "$(options --build-dir "$work/san")" 2
+expect "a sanitized build: message" \
+    "$(grep -c "is a sanitized build (-DPORT_SANITIZE=ON): its app carries the sanitizer runtime" "$work/messages")" 1
+expect "a sanitized distribution build: status" "$(options --distribution --build-dir "$work/san-dist")" 2
+expect "a sanitized distribution build: message" \
+    "$(grep -c "is a sanitized build (-DPORT_SANITIZE=ON)" "$work/messages")" 1
+expect "a build sanitized by its flags: status" "$(options --build-dir "$work/san-flags")" 2
+expect "a build sanitized by its flags: message" \
+    "$(grep -c "is a sanitized build (-fsanitize= in CMAKE_C_FLAGS)" "$work/messages")" 1
+expect "a build with PORT_SANITIZE off: status" "$(options --build-dir "$work/plain")" 2
+expect "a build with PORT_SANITIZE off: past the check" \
+    "$(grep -c -e "sanitized build" "$work/messages"),$(grep -c "doesn't name its macOS app" "$work/messages")" 0,1
+expect "the refusals built nothing" "$(ls "$work/dev" "$work/dist" "$work/san" "$work/san-dist" "$work/san-flags" \
+    "$work/plain" | grep -vc -e CMakeCache.txt -e '^$' -e ':$')" 0
 
 echo "$checks checks, $failures failed"
 [ "$failures" -eq 0 ]

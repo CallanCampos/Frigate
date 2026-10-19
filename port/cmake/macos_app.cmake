@@ -5,7 +5,8 @@
 #
 #   cmake --build build/port --target frigate-black2_app        (frigate-white2_app with -DPORT_VERSION=w2_us)
 #
-# -DPORT_MACOS_APP=ON makes it part of every build. port/tools/package_macos.sh puts it in a disk image. The tests of
+# -DPORT_MACOS_APP=ON makes it part of every build. port/tools/package_macos.sh puts it in a disk image, but not a
+# sanitized build's (PORT_SANITIZE), which carries the sanitizer runtime and is for testing on this Mac. The tests of
 # make_app.sh, of the log an app opened from the Finder writes and of the program's slices are here too, since all are
 # macOS's alone.
 if(NOT APPLE)
@@ -116,8 +117,9 @@ add_test(NAME app_universal_slices
         "${CMAKE_CURRENT_BINARY_DIR}/test_universal_slices")
 set_tests_properties(app_universal_slices PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)
 
-# package_macos.sh's refusals of an image path that git would take into a repository, which come before it builds
-# anything (port/tests/app/test_package_macos.sh)
+# package_macos.sh's refusals, which come before it builds anything: an image path that git would take into a
+# repository, the distribution build's options, and a sanitized build, whose app carries the sanitizer runtime
+# (port/tests/app/test_package_macos.sh)
 add_test(NAME app_package_macos_out
     COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_package_macos.sh" "${REPO_ROOT}" "${CMAKE_BINARY_DIR}"
         "${CMAKE_CURRENT_BINARY_DIR}/test_package_macos")

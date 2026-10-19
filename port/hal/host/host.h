@@ -89,11 +89,16 @@ void port_host_static_data(uintptr_t *start, uintptr_t *end);
 typedef void (*PortHostFaultHandler)(const void *address, const char *fault);
 
 // Sets the one handler of memory faults, in place of any earlier one. On macOS and Linux that is every SIGSEGV and
-// SIGBUS, from any code. On Windows it is a memory fault at an address port_host_protect_none or
-// port_host_protect_stack_guard made inaccessible, any memory fault on a fiber or in the program's own code, and one
-// that nothing else handled; Windows also reports, with or without a handler, every exception nobody handles (an
-// illegal instruction, a division by zero, a memory fault without a handler), as "port: crash: exception ... at
-// address ..." with a backtrace, on a fiber too, where the system itself would end the process silently
+// SIGBUS, from any code; from then on the seam also reports, itself, the processor's other faults that end a program,
+// on any stack, a fiber's too: SIGFPE (an integer division by zero, which faults on x86-64; arm64 gives 0 instead),
+// SIGILL (an illegal instruction, x86-64's __builtin_trap among them) and SIGTRAP (a breakpoint, arm64's
+// __builtin_trap among them), as "port: crash: signal N at address ..." with the instruction's address and a
+// backtrace, after which the signal ends the program as it would have. On Windows it is a memory fault at an address
+// port_host_protect_none or port_host_protect_stack_guard made inaccessible, any memory fault on a fiber or in the
+// program's own code, and one that nothing else handled; Windows also reports, with or without a handler, every
+// exception nobody handles (an illegal instruction, a division by zero, a breakpoint, a memory fault without a
+// handler), as "port: crash: exception ... at address ..." with a backtrace, on a fiber too, where the system itself
+// would end the process silently
 void port_host_set_fault_handler(PortHostFaultHandler handler);
 
 // Prints "Backtrace:" and the frames of the running code to stderr, innermost first, each with its function's name

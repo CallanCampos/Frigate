@@ -52,7 +52,8 @@ foreach(variant IN ITEMS plain sanitized)
 endforeach()
 
 # check_exit.py, the checker of the tests of the program's endings (port/tests/app/test_check_exit.py): each ending,
-# met and missed, a skip, and a sanitizer's report, which fails a run whatever ending it wants
+# met and missed, a skip, a crash that its report names and one that it doesn't, and a sanitizer's report, which fails
+# a run whatever ending it wants
 add_test(NAME app_check_exit
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "${PORT_PYTHON}"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/app/test_check_exit.py")
