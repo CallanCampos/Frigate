@@ -26,10 +26,76 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-19: the performance and hygiene merge, reviewed: ADR 0016's acceptance as it was, a timing failure's way out
+
+- **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` after the merge's last entry (`e653f3deb`); pushed to
+  `port-perf` on origin for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to
+  rebuild). No file outside `port/` changed.
+- **Host build:** the last entry's machine and builds. `build/port-n`, `build/port-w2` and `build/port-san` had
+  nothing to compile, since only a Python tool, its test and documents changed, so each build's warnings stay 264, the
+  decomp's. CI: run 39267615088 at `e653f3deb`, which the last entry dispatched, is green on all nine jobs with run
+  39257475500's counts (pass and skip: 249 and 49 of 298 on macOS's host job and each of the four distribution jobs,
+  231 and 50 of 281 on Linux, 221 and 60 of 281 on Windows, the sanitized builds 247 and 25 of 272 on macOS and 229
+  and 26 of 255 on Linux, each then 3 and 8 of 11 routes). Dispatched again at this entry's commit; the next entry
+  gives its result.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6, plain, `ctest -j4 -LE timing` with the oracle and the cached saves, the two builds at once:
+    Black 2, 294 pass and 1 skip of 295 (581 s); White 2, 292 pass and 1 skip of 293 (563 s). Each version's 15
+    `oracle` tests pass, and `frame_times_tool` with its new checks; the skip is `app_universal_slices`, which a
+    development build's one slice skips.
+  - The timing routes alone, each build after the other, pass within the 8.36 ms budget (median and 95th percentile
+    in ms): Black 2's 3, the title 2.83, 2.94, the start menu 0.67, 2.69, the party apps 0.74, 1.06, New Game's intro
+    0.72, 1.04 and flight 2.68, 3.19, at a load average falling from 21 to 10; White 2's 2, the title 2.67, 2.79, the
+    start menu 0.64, 2.38, the party apps 0.76, 1.16, at 10 to 7. In all, Black 2 297 pass and 1 skip of 298, White 2
+    294 pass and 1 skip of 295.
+  - `frame_times_tool`, which checks the new line, passes in `build/port-san` too. T5's routes and the distribution
+    build didn't run again: nothing they build or run changed.
+  - Linux on arm64, which no CI job builds: `port/gfx/workers.c`, which needs only clang's own headers, builds for
+    `aarch64-unknown-linux-gnu` and `aarch64-unknown-linux-musl` (`-ffreestanding -std=c11 -Wall -Wextra -Werror`),
+    its spin's `__builtin_arm_yield` a `yield` each time (3).
+  - Every run passed `--save-dir`, with `HOME` a scratch directory, and nothing under `~/Library`'s
+    `Application Support/Frigate` or `Logs/Frigate` is newer than 16:33 on 2026-10-18. T7 not yet.
+- **Tiers:** not measured: no decomp C changed.
+- **Trap stubs:** as the last entries: 457 function stubs and 46 data placeholders in each version.
+- **64-bit warnings:** as the last entries.
+- **Work done:** the review of the merge found no defect: the conflicts kept every side, the output is the same on
+  `main`'s newest routes and with 1 and 8 render threads, ThreadSanitizer finds no race in the bands, the crash reports
+  pass on every POSIX job, and the SHA-1 fallback hashes the known vectors on x86_64 under Rosetta and on Windows. Its
+  three notes:
+  - **ADR 0016's acceptance, as it happened.** Its note said the port's developer accepted it; the session that merged
+    the track did, on the developer's standing instruction to carry the plan forward, and the developer's messages in
+    that session never mention an ADR. The note now says so: the session accepted it, not the developer in person; the
+    last entry's "by the port's developer" stays as written. ADRs 0013 to 0015, on `main`, have the same words, which
+    their accepted text keeps until the developer says otherwise ([adr/README.md](adr/README.md)).
+  - **A timing failure says what a slower machine does.** The quick start's `ctest -j4` runs the `frame_times_*` tests
+    in an optimized build, and a quiet machine too slow for the 8.36 ms budget fails them rather than skipping them,
+    by design. `frame_times.py check` now ends such a failure with the way out, `ctest -LE timing` or
+    `-DPORT_FRAME_TIME_REPORT_ONLY=ON`, which `test_frame_times.py` checks, and port/README.md's tests line and the
+    tests guide's timing paragraph say it. The x86_64 slice's 8.00 ms under Rosetta, the closest to the budget, was
+    measured at a load of 16 to 26, where an over-budget scene skips; a quiet measurement of that slice is still to
+    come (Next).
+  - **Linux on arm64 is built by no job**, so `host_posix.c`'s branch that reads the program counter
+    (`uc_mcontext.pc`) has only been read. It matches glibc's `mcontext_t` for aarch64, whose `fault_address`, `regs`,
+    `sp`, `pc` and `pstate` have those names under `__USE_MISC`, which the `_GNU_SOURCE` of
+    [port/CMakeLists.txt](../CMakeLists.txt) gives, as Linux x86-64's `REG_RIP` already needs; building it needs Linux's
+    headers, which this machine doesn't have. The workers' spin builds for the host (Tests). A job on GitHub's arm64
+    Linux runners would build the whole port there for the first time, a change to CI's jobs left for the developer
+    (Next).
+  - The last entry's `PORT_SHA` is `e653f3deb`. lessons.md has the review's two lessons: an ADR's note says who
+    accepted it, and a file with only the compiler's own headers builds for a host no job builds.
+- **Next:** as the last entry: the frames on a quiet machine, both slices, the x86_64 one under Rosetta measured since
+  the bands; for T5, a nightly run of both versions' sanitized routes and of the x86_64 slice's; Linux on arm64 in CI,
+  if the developer wants that host; then the apps no route reaches yet, and a save with an adventure made by the port,
+  once overlay 36 lets it into the field.
+- **Blockers:** as the last entries: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
+  to 14 have no runner and no virtual machine here.
+
 ## 2026-10-19: the performance and hygiene tracks merged: frames with headroom (ADR 0016) and every crash reported
 
 - **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `origin/main` at `607ccd1a6`: `8f28c3387` (the merge of
+- **Port:** `e653f3deb`, on the branch `port-integrate` from `origin/main` at `607ccd1a6`: `8f28c3387` (the merge of
   `port-perf`), `ac06d887e` (the merge of `port-hygiene`), `6f50f90b4` (ADR 0016 accepted), then this entry; pushed to
   `port-perf` on origin for CI, not to `main`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to

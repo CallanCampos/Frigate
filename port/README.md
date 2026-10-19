@@ -49,7 +49,9 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
   ([the test launcher](#the-test-launcher)), `--frame-times FILE` writes how long each frame took on this machine, and
   `--render-threads N` draws the 3D frame on N threads (the machine's performance cores by default; the frames are the
   same whatever N).
-- **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)).
+- **The tests** that need your ROM skip without it ([tests/README.md](tests/README.md)). In an optimized build the
+  `frame_times_*` tests hold this machine's frames to a budget, half the DS's frame; on a machine too slow for it,
+  `ctest -LE timing` leaves them out.
 - **How fast it runs:** `--frame-times FILE` writes a row a frame, the frame's host time with and without the pacing
   wait and its parts (the 3D frame, the geometry engine, the 2D lines, capture, the ARM7, the window), and prints the
   median, 95th percentile and most frame; [tools/frame_times.py](tools/frame_times.py) reports runs of a route scene by

@@ -3,6 +3,20 @@
 What port work taught that isn't obvious from the code, newest first. A lesson about MWCC or the decomp's own
 workflow goes in the decomp checkout instead; this file is the port's ([CLAUDE.md](../CLAUDE.md), the iteration loop).
 
+## 2026-10-19: the merge of the performance and hygiene tracks, after review
+
+- **An ADR's note says who accepted it.** ADRs 0013 to 0016 were accepted at their tracks' merges by the sessions that
+  merged them, on the developer's standing instruction to carry the plan forward, and their notes said "by the port's
+  developer", which reads as the developer's own review, though the developer's messages in the session that ran those
+  merges never mention an ADR. A note names who accepted the ADR and on what instruction, and says so when the
+  developer didn't accept it in person, as 0016's does now.
+- **A file that includes only the compiler's own headers can be built for a host no job builds.** No CI job is Linux
+  on arm64, but `port/gfx/workers.c` needs only `stdatomic.h`, `stdint.h` and `stddef.h`, which clang brings for every
+  target, so `clang --target=aarch64-unknown-linux-gnu -ffreestanding -std=c11 -Iport -S port/gfx/workers.c` builds
+  it with no Linux system headers and shows its spin's `yield`. A file that needs the C library's headers, such as
+  `host_posix.c` with `ucontext_t`, needs that system's headers (a sysroot or a runner), so until a job builds it, its
+  branch for that host is only read.
+
 ## 2026-10-19: the merge of the performance and hygiene tracks
 
 - **`package_macos.sh --distribution` builds the app, not the build's tests.** It builds the app's target alone, so

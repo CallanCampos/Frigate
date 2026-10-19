@@ -109,8 +109,11 @@ class FrameTimesTest(unittest.TestCase):
         done = self.run_check("1000,2000,3500", 0, "--budget-ms", "3")
         self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
         self.assertIn("above the budget", done.stdout)
+        # A failure says how a slower machine leaves the timing tests out; a report only doesn't
+        self.assertIn("ctest -LE timing", done.stdout)
         done = self.run_check("1000,2000,3500", 0, "--budget-ms", "3", "--report-only")
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertNotIn("ctest -LE timing", done.stdout)
         # Only the scene's frames count
         done = self.run_check("1000,2000,3500", 0, "--budget-ms", "3", "--scene", "first=1-2")
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)

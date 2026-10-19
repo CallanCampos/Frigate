@@ -70,6 +70,8 @@ over the runs without the pacing wait, is above `PORT_FRAME_TIME_BUDGET_MS` (hal
 They skip such a scene instead when the machine's load average, before a run or after the last, was above its cores:
 other programs had them, so the times measure the machine. Only an optimized build has them (`CMAKE_BUILD_TYPE`
 `Release`, `RelWithDebInfo` or `MinSizeRel`): a Debug build, or one with no build type, runs the frames unoptimized.
+A failure says what a machine too slow for the budget does: `ctest -LE timing` leaves them out, and
+`-DPORT_FRAME_TIME_REPORT_ONLY=ON` makes them report only.
 
 ## Writing a test
 

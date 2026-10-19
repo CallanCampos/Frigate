@@ -17,12 +17,12 @@ included); without --scene the whole run is one.
 check runs PROGRAM ARG... --runs times (3 by default), each with --frame-times and a save directory of its own in
 --work (a temporary directory by default), holding --save under the name --save-name when given, then reports as
 summary does and fails (status 1) when a scene's 95th percentile without the pacing wait is above --budget-ms, unless
---report-only. A scene over the budget skips the check instead (77) when the host's 1-minute load average, read before
-each run and after the last, was above --max-load (the number of cores by default): other programs had the cores, so
-the times measure the machine. A pass stands at any load, and a host without a load average (Windows) never skips.
-It exits 77 too when PROGRAM has no ROM (its status 66) or --save doesn't exist, as the tests' other checks do; a run
-that ends with another status than 0 fails. The timing tests of port/cmake/frame_times.cmake run it. Standard library
-only.
+--report-only, saying how a machine too slow for the budget leaves the timing tests out. A scene over the budget
+skips the check instead (77) when the host's 1-minute load average, read before each run and after the last, was
+above --max-load (the number of cores by default): other programs had the cores, so the times measure the machine. A
+pass stands at any load, and a host without a load average (Windows) never skips. It exits 77 too when PROGRAM has no
+ROM (its status 66) or --save doesn't exist, as the tests' other checks do; a run that ends with another status than
+0 fails. The timing tests of port/cmake/frame_times.cmake run it. Standard library only.
 """
 
 from __future__ import annotations
@@ -172,7 +172,11 @@ def check(args: argparse.Namespace) -> int:
         print(f"frame_times.py: skipped: the load average reached {max(known):.2f}, above {args.max_load:g}, so other "
               f"programs had the cores and the times measure the machine")
         return SKIP
-    return 1 if over and not args.report_only else 0
+    if over and not args.report_only:
+        print("frame_times.py: on a machine too slow for this budget, ctest -LE timing leaves the timing tests out, "
+              "and -DPORT_FRAME_TIME_REPORT_ONLY=ON makes them report only (port/cmake/frame_times.cmake)")
+        return 1
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:

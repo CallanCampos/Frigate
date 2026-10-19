@@ -5,9 +5,11 @@
 - **Plan:** §4.6 (renderers), §7 phase 5 (60 fps with headroom), the boundary rule of one host thread
   ([ARCHITECTURE.md](../ARCHITECTURE.md#the-rules-at-the-boundaries))
 - **Upstream:** `2825ea75f`
-- **Note (2026-10-19):** accepted at the performance track's merge into `port-integrate` (`8f28c3387`) by the port's
-  developer, as every earlier ADR was: threads beside the game's one, which the boundary rule had kept to that one,
-  are the developer's call.
+- **Note (2026-10-19):** accepted at the performance track's merge into `port-integrate` (`8f28c3387`) by the session
+  that merged it, not by the developer in person, on the developer's standing instruction to carry the plan forward,
+  as ADRs 0013 to 0015 were at their tracks' merges. Threads beside the game's one, which the boundary rule had kept to
+  that one, are the developer's call, which a later ADR superseding this one would reverse (`--render-threads 1` draws
+  on the game's thread alone meanwhile).
 
 ## Context
 
