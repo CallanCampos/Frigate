@@ -26,12 +26,25 @@ static inline void DSProt_Tamper(DSProtCheckArgs *args, u32 flag) {
     args->failed = flag;
 }
 
+// Returns `setCode` if the first MAC address has a nonzero byte, and otherwise has the second function run with `flag`
+// and returns `zeroCode`
+static inline u32 DSProt_CheckMacZero(DSProtCheckArgs *args, const u8 *mac, u32 setCode, u32 flag, u32 zeroCode) {
+    int i;
+
+    for (i = 0; i < 6; i++) {
+        if (mac[i] != 0) {
+            return setCode;
+        }
+    }
+    DSProt_Tamper(args, flag);
+    return zeroCode;
+}
+
 // Returns a code that says the machine is not an emulator, and has the second function run if it is
 u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
     u8 mac[6];
     OSOwnerInfo owner;
     int i;
-    int j;
     u32 code;
 
     OS_GetMacAddress(mac);
@@ -45,17 +58,7 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
         DSProt_Tamper(args, 0xfb);
         code = 0xfb;
     } else {
-        for (j = 0; j < 6; j++) {
-            if (mac[j] != 0) {
-                break;
-            }
-        }
-        if (j == 6) {
-            DSProt_Tamper(args, 0xfb);
-            code = 0xfb;
-        } else {
-            code = 0xf1;
-        }
+        code = DSProt_CheckMacZero(args, mac, 0xf1, 0xfb, 0xfb);
     }
     return code * 0xbf;
 }
@@ -65,7 +68,6 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     u8 mac[6];
     OSOwnerInfo owner;
     int i;
-    int j;
     u32 code;
 
     OS_GetMacAddress(mac);
@@ -80,17 +82,7 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
         code = 0xf1;
         args->failed = code + 0xf1;
     } else {
-        for (j = 0; j < 6; j++) {
-            if (mac[j] != 0) {
-                break;
-            }
-        }
-        if (j == 6) {
-            DSProt_Tamper(args, 0x78);
-            code = 0xf1;
-        } else {
-            code = 0xfb;
-        }
+        code = DSProt_CheckMacZero(args, mac, 0xfb, 0x78, 0xf1);
     }
     return code * 0xb5;
 }
@@ -166,11 +158,11 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
 // Reads the same places of the card with the card's registers and through the SDK, and has the second function run if a
 // flashcart gives different data
 u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
-    u32 crcs[20];
     u32 page[128];
+    u32 crcs[20];
+    u32 lockId;
     u32 offset = 0x7000;
     u32 address = 0x1000;
-    u32 lockId;
     u32 i;
 
     lockId = (u16)OS_GetLockID();
@@ -237,11 +229,11 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
 
 // The same, with other codes
 u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
-    u32 crcs[20];
     u32 page[128];
+    u32 crcs[20];
+    u32 lockId;
     u32 offset = 0x7000;
     u32 address = 0x1000;
-    u32 lockId;
     u32 i;
 
     lockId = (u16)OS_GetLockID();
