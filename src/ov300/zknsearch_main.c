@@ -51,10 +51,11 @@ static const BGSysVRAMConfig sZknSearchVRAMConfig = {
 
 // The messages of the types, and of none
 static const u16 sZknSearchTypeMsgs[ZKNSEARCH_TYPE_COUNT + 1] = {
-    ZknsearchMain_Text_Normal, ZknsearchMain_Text_Fighting, ZknsearchMain_Text_Flying,   ZknsearchMain_Text_Poison,  ZknsearchMain_Text_Ground,
-    ZknsearchMain_Text_Rock,   ZknsearchMain_Text_Bug,      ZknsearchMain_Text_Ghost,    ZknsearchMain_Text_Steel,   ZknsearchMain_Text_Fire,
-    ZknsearchMain_Text_Water,  ZknsearchMain_Text_Grass,    ZknsearchMain_Text_Electric, ZknsearchMain_Text_Psychic, ZknsearchMain_Text_Ice,
-    ZknsearchMain_Text_Dragon, ZknsearchMain_Text_Dark,     ZknsearchMain_Text_Empty_9,
+    ZknsearchMain_Text_Normal,   ZknsearchMain_Text_Fighting, ZknsearchMain_Text_Flying, ZknsearchMain_Text_Poison,
+    ZknsearchMain_Text_Ground,   ZknsearchMain_Text_Rock,     ZknsearchMain_Text_Bug,    ZknsearchMain_Text_Ghost,
+    ZknsearchMain_Text_Steel,    ZknsearchMain_Text_Fire,     ZknsearchMain_Text_Water,  ZknsearchMain_Text_Grass,
+    ZknsearchMain_Text_Electric, ZknsearchMain_Text_Psychic,  ZknsearchMain_Text_Ice,    ZknsearchMain_Text_Dragon,
+    ZknsearchMain_Text_Dark,     ZknsearchMain_Text_Empty_9,
 };
 
 // The shapes in the order of the list

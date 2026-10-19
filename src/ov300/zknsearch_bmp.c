@@ -92,7 +92,8 @@ static void ZknSearchBmp_PutLabels(ZknSearchWork *wk) {
                            PRINT_ALIGN_LEFT);
     }
     ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_ORDER_LABEL, ZknsearchMain_Text_Order, 40, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
-    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INITIAL_LABEL, ZknsearchMain_Text_Name, 40, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
+    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INITIAL_LABEL, ZknsearchMain_Text_Name, 40, 4, COLOR_WHITE,
+                       PRINT_ALIGN_CENTER);
     ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TYPE_LABEL, ZknsearchMain_Text_Type, 40, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
     ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_COLOR_LABEL, ZknsearchMain_Text_Color, 40, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
     ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_SHAPE_LABEL, ZknsearchMain_Text_Form, 40, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
@@ -110,16 +111,17 @@ void ZknSearchBmp_PutMain(ZknSearchWork *wk) {
     ZknSearchBmp_PutInfo(wk);
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_ORDER].window), 0);
-    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_ORDER, ZknsearchMain_Text_Number + wk->param->criteria->order, 40, 4, COLOR_WHITE,
-                       PRINT_ALIGN_CENTER);
+    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_ORDER, ZknsearchMain_Text_Number + wk->param->criteria->order, 40, 4,
+                       COLOR_WHITE, PRINT_ALIGN_CENTER);
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_ORDER]);
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_INITIAL].window), 0);
     if (wk->param->criteria->initial == ZKNSEARCH_NONE) {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INITIAL, ZknsearchMain_Text_Empty_30, 8, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
-    } else {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INITIAL, ZknsearchMain_Text_A + wk->param->criteria->initial, 8, 4, COLOR_WHITE,
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INITIAL, ZknsearchMain_Text_Empty_30, 8, 4, COLOR_WHITE,
                            PRINT_ALIGN_CENTER);
+    } else {
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INITIAL, ZknsearchMain_Text_A + wk->param->criteria->initial, 8, 4,
+                           COLOR_WHITE, PRINT_ALIGN_CENTER);
     }
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_INITIAL]);
 
@@ -157,10 +159,11 @@ void ZknSearchBmp_PutMain(ZknSearchWork *wk) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_COLOR].window), 0);
     if (wk->param->criteria->color == ZKNSEARCH_NONE) {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_COLOR, ZknsearchMain_Text_Empty_31, 40, 4, COLOR_WHITE, PRINT_ALIGN_CENTER);
-    } else {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_COLOR, ZknsearchMain_Text_Red + wk->param->criteria->color, 40, 4, COLOR_WHITE,
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_COLOR, ZknsearchMain_Text_Empty_31, 40, 4, COLOR_WHITE,
                            PRINT_ALIGN_CENTER);
+    } else {
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_COLOR, ZknsearchMain_Text_Red + wk->param->criteria->color, 40, 4,
+                           COLOR_WHITE, PRINT_ALIGN_CENTER);
     }
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_COLOR]);
 }
@@ -180,7 +183,8 @@ void ZknSearchBmp_ClearInfo(ZknSearchWork *wk) {
 void ZknSearchBmp_PutOrder(ZknSearchWork *wk) {
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_MODE]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_INFO].window), 0);
-    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INFO, ZknsearchMain_Text_PleaseEnterOrder, 0, 4, COLOR_BLACK, PRINT_ALIGN_LEFT);
+    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INFO, ZknsearchMain_Text_PleaseEnterOrder, 0, 4, COLOR_BLACK,
+                       PRINT_ALIGN_LEFT);
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_INFO]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_TOP_LABEL].window), 0);
     ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_LABEL, ZknsearchMain_Text_Order, 40, 0, COLOR_WHITE, PRINT_ALIGN_CENTER);
@@ -213,7 +217,8 @@ void ZknSearchBmp_PutInitialValue(ZknSearchWork *wk) {
         ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_A + wk->param->criteria->initial, 48, 0,
                            COLOR_WHITE, PRINT_ALIGN_CENTER);
     } else {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Empty_30, 48, 0, COLOR_WHITE, PRINT_ALIGN_CENTER);
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Empty_30, 48, 0, COLOR_WHITE,
+                           PRINT_ALIGN_CENTER);
     }
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_TOP_VALUE]);
 }
@@ -236,13 +241,15 @@ void ZknSearchBmp_PutTypeValue(ZknSearchWork *wk) {
         ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknSearchMain_GetTypeMsg(wk, wk->param->criteria->type1), 48, 0,
                            COLOR_WHITE, PRINT_ALIGN_CENTER);
     } else {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Empty_9, 48, 0, COLOR_WHITE, PRINT_ALIGN_CENTER);
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Empty_9, 48, 0, COLOR_WHITE,
+                           PRINT_ALIGN_CENTER);
     }
     if (wk->param->criteria->type2 != ZKNSEARCH_NONE) {
         ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE2, ZknSearchMain_GetTypeMsg(wk, wk->param->criteria->type2), 48,
                            0, COLOR_WHITE, PRINT_ALIGN_CENTER);
     } else {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE2, ZknsearchMain_Text_Empty_9, 48, 0, COLOR_WHITE, PRINT_ALIGN_CENTER);
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE2, ZknsearchMain_Text_Empty_9, 48, 0, COLOR_WHITE,
+                           PRINT_ALIGN_CENTER);
     }
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_TOP_VALUE]);
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_TOP_VALUE2]);
@@ -251,7 +258,8 @@ void ZknSearchBmp_PutTypeValue(ZknSearchWork *wk) {
 void ZknSearchBmp_PutColor(ZknSearchWork *wk) {
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_MODE]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_INFO].window), 0);
-    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INFO, ZknsearchMain_Text_PleaseEnterColor, 0, 4, COLOR_BLACK, PRINT_ALIGN_LEFT);
+    ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_INFO, ZknsearchMain_Text_PleaseEnterColor, 0, 4, COLOR_BLACK,
+                       PRINT_ALIGN_LEFT);
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_INFO]);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[ZKNSEARCH_WIN_TOP_LABEL].window), 0);
     ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_LABEL, ZknsearchMain_Text_Color, 40, 0, COLOR_WHITE, PRINT_ALIGN_CENTER);
@@ -265,7 +273,8 @@ void ZknSearchBmp_PutColorValue(ZknSearchWork *wk) {
         ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Red + wk->param->criteria->color, 48, 0,
                            COLOR_WHITE, PRINT_ALIGN_CENTER);
     } else {
-        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Empty_31, 48, 0, COLOR_WHITE, PRINT_ALIGN_CENTER);
+        ZknSearchBmp_Print(wk, ZKNSEARCH_WIN_TOP_VALUE, ZknsearchMain_Text_Empty_31, 48, 0, COLOR_WHITE,
+                           PRINT_ALIGN_CENTER);
     }
     ZknSearchBmp_PutWindow(&wk->windows[ZKNSEARCH_WIN_TOP_VALUE]);
 }
