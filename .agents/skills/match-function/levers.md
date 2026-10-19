@@ -480,6 +480,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A constant built by `rsb`/`sub` from a small value already in a register (`mov r0, #5; rsb r0, r0, #0x204`): that
+  value is a local built in steps. (matching.md: "A constant that a local holds and changes in steps")
 - An `and` with a bit-0 bit-field's width mask before an insert that masks again: the source masks the value before the
   store, `d->a = s[0] & 0xf;`. (matching.md: "A mask written before a bit-field store")
 - A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of

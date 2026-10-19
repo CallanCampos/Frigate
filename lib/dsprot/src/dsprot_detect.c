@@ -7,16 +7,16 @@
 // reads the game card's data differently from the real thing. The ROM doesn't name this file; it is named for what it
 // does.
 
-// The card's registers, which the flashcart check reads the ROM through
-#define REG_AUXSPICNT_H (*(vu8 *)0x040001a1)
-#define REG_ROMCTRL (*(vu32 *)0x040001a4)
-#define REG_ROMCMD(n) (*(vu8 *)(0x040001a8 + (n)))
-#define REG_CARD_DATA (*(vu32 *)0x04100010)
-#define REG_SCFG_A9ROM (*(vu8 *)0x04004000)
-
-// The card's ROM control word that the system copied from the header, at 0x027ffe60, or 0x02fffe60 in TWL mode. DS
-// Protect computes the address from the TWL bit instead of choosing between the two.
-#define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)((((twl) + 5) << 23) - 0x1a0))
+// The card's registers, which the flashcart check reads the ROM through, as offsets from the register block at
+// 0x04000000: the original builds that base at run time rather than loading each address
+#define REG_BASE_SHIFT 26
+#define OFFSET_AUXSPICNT_H 0x1a1
+#define OFFSET_ROMCTRL 0x1a4
+#define OFFSET_ROMCMD 0x1a8
+#define OFFSET_EXMEMCNT 0x204
+#define OFFSET_SCFG_A9ROM 0x4000
+#define OFFSET_CARD_DATA 0x100010
+#define REG_ROMCMD(n) (*(vu8 *)(0x04000000 + OFFSET_ROMCMD + (n)))
 
 // Bytes of the first MAC address whose reversed bits an emulator has
 static const u8 sEmulatorMac[6] = { 0xff, 0xf6, 0x40, 0xff, 0xff, 0xce };
@@ -42,16 +42,15 @@ u32 DSProt_CheckEmulator(void) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                break;
+                code = 0xf1;
+                // style-ok: goto-return pret's pokeheartgold DS Protect (mac_owner.c) jumps to its exit the same way
+                goto end;
             }
         }
-        if (j == 6) {
-            DSProt_CallCrash(NULL, NULL);
-            code = 0xfb;
-        } else {
-            code = 0xf1;
-        }
+        DSProt_CallCrash(NULL, NULL);
+        code = 0xfb;
     }
+end:
     return code * 0xbf;
 }
 
@@ -74,66 +73,78 @@ u32 DSProt_Crc32(const u8 *data, u32 size) {
 }
 
 // Reads the 0x200 bytes at a card address with the card's registers, restoring the command registers and the
-// memory controller afterwards. `flag` is the sixth byte of the command.
+// memory controller afterwards. `flag` is the sixth byte of the command. The register block is reached from a base
+// built at run time (1 shifted by 26) and a second pointer to 0x04000000 for the command bytes, the way the original's
+// constants are built.
 static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
-    u16 exmemcnt = reg_MI_EXMEMCNT;
-    u8 savedCommand[8];
-    u32 control;
-    int offset;
+    u32 page;
     int i;
+    u16 exmemcnt = reg_MI_EXMEMCNT;
+    vu8 *regs;
+    int offset;
+    u32 control;
+    u32 header;
+    u8 savedCommand[8];
+    u32 base;
 
+    regs = (vu8 *)0x04000000;
+    base = 1;
+    base <<= REG_BASE_SHIFT;
     reg_MI_EXMEMCNT &= ~0x0800;
-    control = (HW_ROM_HEADER_CARD_CTRL(REG_SCFG_A9ROM & 1) & ~0x07000000) | 0xa1000000;
+    header = 5;
+    header += *(vu8 *)(base + OFFSET_SCFG_A9ROM) & 1;
+    header <<= 18;
+    header -= 13;
+    header <<= 5;
+    control = (*(u32 *)header & ~0x07000000) | 0xa1000000;
     offset = -(int)(address & 0x1ff);
-    while (REG_ROMCTRL & 0x80000000) {
+    while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000) {
     }
-    REG_AUXSPICNT_H = 0x80;
+    *(vu8 *)(base + OFFSET_AUXSPICNT_H) = 0x80;
     for (i = 0; i < 8; i++) {
         savedCommand[i] = REG_ROMCMD(i);
     }
-    if (offset < 0x200) {
-        u32 page = address + offset;
-
+    page = address + offset;
+    while (offset < 0x200) {
+        regs[OFFSET_ROMCMD + 0] = 0xb7;
+        regs[OFFSET_ROMCMD + 1] = page >> 24;
+        regs[OFFSET_ROMCMD + 2] = page >> 16;
+        regs[OFFSET_ROMCMD + 3] = page >> 8;
+        regs[OFFSET_ROMCMD + 4] = page;
+        regs[OFFSET_ROMCMD + 5] = flag;
+        regs[OFFSET_ROMCMD + 6] = 0;
+        regs[OFFSET_ROMCMD + 7] = 0;
+        *(vu32 *)(base + OFFSET_ROMCTRL) = control;
         do {
-            REG_ROMCMD(0) = 0xb7;
-            REG_ROMCMD(1) = page >> 24;
-            REG_ROMCMD(2) = page >> 16;
-            REG_ROMCMD(3) = page >> 8;
-            REG_ROMCMD(4) = page;
-            REG_ROMCMD(5) = flag;
-            REG_ROMCMD(6) = 0;
-            REG_ROMCMD(7) = 0;
-            REG_ROMCTRL = control;
-            do {
-                if (REG_ROMCTRL & 0x800000) {
-                    u32 word = REG_CARD_DATA;
+            if (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x800000) {
+                u32 word = *(vu32 *)(base + OFFSET_CARD_DATA);
 
-                    if (offset >= 0 && offset < 0x200) {
-                        *(u32 *)((u8 *)dest + offset) = word;
-                    }
-                    offset += 4;
+                if (offset >= 0 && offset < 0x200) {
+                    // style-ok: byte-offset the page is a plain word buffer; indexing it by words scales the offset
+                    *(u32 *)((u8 *)dest + offset) = word;
                 }
-            } while (REG_ROMCTRL & 0x80000000);
-            page += 0x200;
-        } while (offset < 0x200);
+                offset += 4;
+            }
+        } while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000);
+        page += 0x200;
     }
     for (i = 0; i < 8; i++) {
         REG_ROMCMD(i) = savedCommand[i];
     }
-    reg_MI_EXMEMCNT = exmemcnt;
+    *(vu16 *)(base + OFFSET_EXMEMCNT) = exmemcnt;
 }
 
 // Reads the same places of the card with the card's registers and through the SDK, and crashes the game if a
 // flashcart gives different data
 u32 DSProt_CheckFlashcart(void) {
-    u32 crcs[20];
     u32 page[128];
+    u32 crcs[20];
+    u16 lockId;
     u32 offset = 0x7000;
     u32 address = 0x1000;
-    u32 lockId;
-    u32 i;
+    int i;
 
-    lockId = (u16)OS_GetLockID();
+    lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
         DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
@@ -195,6 +206,8 @@ u32 DSProt_CheckFlashcart(void) {
     return 0xaa65;
 }
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_Dispatch from the address and word count packed in its
+// last word, then has DSProt_Dispatch decrypt DSProt_CheckFlashcart, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckFlashcart(void) {
     orr ip, pc, pc
@@ -244,6 +257,8 @@ asm u32 DSProt_CallCheckFlashcart(void) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_Dispatch from the address and word count packed in its
+// last word, then has DSProt_Dispatch decrypt DSProt_CheckEmulator, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckEmulator(void) {
     orr ip, pc, pc

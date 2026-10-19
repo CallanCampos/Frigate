@@ -1654,6 +1654,12 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- A constant that a local holds and changes in steps stays live in a register, and MWCC builds other constants that
+  don't fit an immediate from it: DS Protect's card read (`dsprot_detect.c`'s `DSProt_ReadCardRaw`) builds its header
+  address as `header = 5; header += twl & 1; header <<= 18; header -= 13; header <<= 5;`, and then makes the mask
+  0x1ff as `mov r0, #5; rsb r0, r0, #0x204`, as the original does. Written as one expression it leaves no 5 behind,
+  and the mask is `rsb` from a 1. DS Protect builds its constants at run time on purpose, as pret's pokeheartgold has
+  an older version's card read do.
 - A difference with a 64-bit constant, `wait > CPS_ACK_DELAY - waited` where `CPS_ACK_DELAY` is a `u64` tick count,
   compares in 64 bits, and `wait = (u32)CPS_ACK_DELAY - waited` then computes the difference again in 32 bits rather
   than reusing it, as NitroWiFi's `CPSi_SendDelayedAcks` does (13 bytes otherwise).
