@@ -23,7 +23,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
     if (callback.callback != NULL) {
         switch (operation->type) {
         case GPI_CONNECT: {
-            GPConnectResponseArg *arg = func_ov011_0216dddc(sizeof(GPConnectResponseArg));
+            GPConnectResponseArg *arg = gsimalloc(sizeof(GPConnectResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -43,7 +43,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
             break;
         }
         case GPI_NEW_PROFILE: {
-            GPNewProfileResponseArg *arg = func_ov011_0216dddc(sizeof(GPNewProfileResponseArg));
+            GPNewProfileResponseArg *arg = gsimalloc(sizeof(GPNewProfileResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -58,7 +58,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
             break;
         }
         case GPI_DELETE_PROFILE: {
-            GPDeleteProfileResponseArg *arg = func_ov011_0216dddc(sizeof(GPDeleteProfileResponseArg));
+            GPDeleteProfileResponseArg *arg = gsimalloc(sizeof(GPDeleteProfileResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -73,7 +73,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
             break;
         }
         case GPI_GET_INFO: {
-            GPGetInfoResponseArg *arg = func_ov011_0216dddc(sizeof(GPGetInfoResponseArg));
+            GPGetInfoResponseArg *arg = gsimalloc(sizeof(GPGetInfoResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -88,7 +88,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
             break;
         }
         case GPI_PROFILE_SEARCH: {
-            GPProfileSearchResponseArg *arg = func_ov011_0216dddc(sizeof(GPProfileSearchResponseArg));
+            GPProfileSearchResponseArg *arg = gsimalloc(sizeof(GPProfileSearchResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -104,7 +104,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
             break;
         }
         case GPI_REGISTER_UNIQUENICK: {
-            GPRegisterUniqueNickResponseArg *arg = func_ov011_0216dddc(sizeof(GPRegisterUniqueNickResponseArg));
+            GPRegisterUniqueNickResponseArg *arg = gsimalloc(sizeof(GPRegisterUniqueNickResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -119,7 +119,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
             break;
         }
         case GPI_REGISTER_CDKEY: {
-            GPRegisterCdKeyResponseArg *arg = func_ov011_0216dddc(sizeof(GPRegisterCdKeyResponseArg));
+            GPRegisterCdKeyResponseArg *arg = gsimalloc(sizeof(GPRegisterCdKeyResponseArg));
 
             if (arg == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -141,7 +141,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
 int gpiAddOperation(GPConnection *connection, int type, void *data, GPIOperation **op, BOOL blocking,
                     GPCallback callback, void *param) {
     GPIConnection *iconnection = *connection;
-    GPIOperation *operation = func_ov011_0216dddc(sizeof(GPIOperation));
+    GPIOperation *operation = gsimalloc(sizeof(GPIOperation));
 
     if (operation == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
@@ -176,16 +176,16 @@ static void gpiDestroyOperation(GPConnection *connection, GPIOperation *operatio
         GPISearchData *data = operation->data;
 
         iconnection->numSearches--;
-        func_ov011_0216de7c(data->sock, 2);
-        func_ov011_0216de30(data->sock);
-        func_ov011_0216ddfc(data->outputBuffer.buffer);
+        shutdown(data->sock, 2);
+        closesocket(data->sock);
+        gsifree(data->outputBuffer.buffer);
         data->outputBuffer.buffer = NULL;
-        func_ov011_0216ddfc(data->inputBuffer.buffer);
+        gsifree(data->inputBuffer.buffer);
         data->inputBuffer.buffer = NULL;
     }
-    func_ov011_0216ddfc(operation->data);
+    gsifree(operation->data);
     operation->data = NULL;
-    func_ov011_0216ddfc(operation);
+    gsifree(operation);
 }
 
 void gpiRemoveOperation(GPConnection *connection, GPIOperation *operation) {
@@ -264,8 +264,8 @@ int gpiProcessOperation(GPConnection *connection, GPIOperation *operation, const
         result = gpiProcessRegisterCdKey(connection, operation, input);
         break;
     default:
-        func_ov011_0216cca8(1, 4, 1, "gpiProcessOperation was passed an operation with an invalid type (%d)\n",
-                            operation->type);
+        gsDebugFormat(1, 4, 1, "gpiProcessOperation was passed an operation with an invalid type (%d)\n",
+                      operation->type);
         break;
     }
     if (result != 0) {

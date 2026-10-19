@@ -57,4 +57,7 @@ The caller applies your fixes without re-deriving them, so a confident wrong cla
 - A `static asm` function not guarded from clang-format (crypt.c's were mangled into one line).
 - A goto used as an early return (`goto end` in DS Protect's checks) — but a shared cleanup, error or retry label is fine, and so is a labelled tail block that does real work for
   several paths (`goto TRANS_NONINTERP` in `nsbca.c`).
+- A `static inline` written to `return` from inside a loop so that the caller jumps to its shared tail, the forbidden
+  goto under another name, with parameters for each caller's codes (`DSProt_CheckMacZero(args, mac, setCode, flag,
+  zeroCode)` for DS Protect's MAC loop, PR #395).
 """

@@ -782,8 +782,8 @@ archives, and `res/trainers/facilities/facility.schema.json` and `set.schema.jso
 
 `FACILITIES` in `facility_data.py` says which archives and message files are a facility's: the Battle Subway (`a/2/1/2`
 and `a/2/1/1`, whose trainers' names are system message file 15 and their three messages each file 376), which the Trial
-House also uses (`func_ov012_02162864`); the Black Tower, White Treehollow in White 2 (`a/2/6/2` and `a/2/6/1`, which
-`func_ov127_021efeec` reads, with the trainers' names in file 53, stored compressed, and no messages); and the Pokémon
+House also uses (`BtlInst_MakeRomTrainerAndTeam`); the Black Tower, White Treehollow in White 2 (`a/2/6/2` and `a/2/6/1`, which
+`InfinityDungeon_CreateBattleEvent` reads, with the trainers' names in file 53, stored compressed, and no messages); and the Pokémon
 World Tournament. Its tournaments each pick one of three pools of trainers by `WbtTournamentInfo`'s `unk5`, from the
 base archives 248, 251 and 254 (`wbt_tool.c`): `pwt_regular` (Driftveil, Download, Rental and Mix), `pwt_leaders` (the
 Unova, Kanto, Johto, Hoenn and Sinnoh Leaders) and `pwt_masters` (Champions, World Leaders, Type Expert, Rental Master

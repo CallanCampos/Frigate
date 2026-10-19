@@ -49,7 +49,7 @@ static int gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer 
     case GPI_PEER_GETTING_SIG:
         break;
     case GPI_PEER_GOT_SIG:
-        func_ov011_0216cca8(1, 3, 0x1f, "Got the peer signature for profileid: %d\n", peer->profile);
+        gsDebugFormat(1, 3, 0x1f, "Got the peer signature for profileid: %d\n", peer->profile);
         result = gpiPeerStartConnect(connection, peer);
         if (result != 0) {
             return result;
@@ -78,7 +78,7 @@ static int gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer 
                 }
             }
             if (freeSig) {
-                func_ov011_0216ddfc(profile->peerSig);
+                gsifree(profile->peerSig);
                 profile->peerSig = NULL;
                 if (gpiCanFreeProfile(profile)) {
                     gpiRemoveProfile(connection, profile);
@@ -243,7 +243,7 @@ static int gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer) {
         }
     }
     if (peer->inputBuffer.len > 0) {
-        peer->timeout = func_ov011_021714a8(NULL) + 10000;
+        peer->timeout = gsiTimeInSec(NULL) + 10000;
     }
     while (1) {
         result = gpiReadMessageFromBuffer(connection, &peer->inputBuffer, &message, &type, &len);
@@ -255,14 +255,14 @@ static int gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer) {
             case GPI_BM_MESSAGE:
                 callback = iconnection->callbacks[3];
                 if (callback.callback != NULL) {
-                    messageArg = func_ov011_0216dddc(sizeof(GPRecvBuddyMessageArg));
+                    messageArg = gsimalloc(sizeof(GPRecvBuddyMessageArg));
                     if (messageArg == NULL) {
                         gpiSetErrorString(connection, "Out of memory.");
                         return 1;
                     }
                     messageArg->profile = peer->profile;
-                    messageArg->message = func_ov011_0216e2c8(message);
-                    messageArg->date = func_ov011_021714a8(NULL);
+                    messageArg->message = goastrdup(message);
+                    messageArg->date = gsiTimeInSec(NULL);
                     result = gpiAddCallback(connection, callback, messageArg, NULL, GPI_ADD_MESSAGE);
                     if (result != 0) {
                         return result;
@@ -272,14 +272,14 @@ static int gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer) {
             case GPI_BM_UTM:
                 callback = iconnection->callbacks[4];
                 if (callback.callback != NULL) {
-                    utmArg = func_ov011_0216dddc(sizeof(GPRecvBuddyUTMArg));
+                    utmArg = gsimalloc(sizeof(GPRecvBuddyUTMArg));
                     if (utmArg == NULL) {
                         gpiSetErrorString(connection, "Out of memory.");
                         return 1;
                     }
                     utmArg->profile = peer->profile;
-                    utmArg->message = func_ov011_0216e2c8(message);
-                    utmArg->date = func_ov011_021714a8(NULL);
+                    utmArg->message = goastrdup(message);
+                    utmArg->date = gsiTimeInSec(NULL);
                     result = gpiAddCallback(connection, callback, utmArg, NULL, GPI_ADD_MESSAGE);
                     if (result != 0) {
                         return result;
@@ -332,10 +332,10 @@ static void gpiCheckTimedOutPeerOperations(GPConnection *connection, GPIPeer *pe
 
     if (peer != NULL) {
         for (; op != NULL && op != peer->peerOpQueue.last; op = op->next) {
-            if (op->type != 2 && func_ov011_0216e324() > op->timeout && op->callback != NULL) {
+            if (op->type != 2 && current_time() > op->timeout && op->callback != NULL) {
                 // A request for the keys of the buddy's status gets an answer with none
                 if (op->state == GPI_BM_KEYS_REQUEST) {
-                    arg = func_ov011_0216dddc(sizeof(GPGetBuddyStatusInfoKeysArg));
+                    arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
                     callback.callback = op->callback;
                     callback.param = op->userData;
                     arg->keys = NULL;
@@ -344,7 +344,7 @@ static void gpiCheckTimedOutPeerOperations(GPConnection *connection, GPIPeer *pe
                     arg->profile = peer->profile;
                     gpiAddCallback(connection, callback, arg, NULL, GPI_ADD_NORMAL);
                 }
-                func_ov011_0216cca8(1, 4, 8, "Peer operation timed out");
+                gsDebugFormat(1, 4, 8, "Peer operation timed out");
                 gpiPeerRemoveOp(peer, op);
             }
         }
@@ -372,15 +372,15 @@ static int gpiProcessPeer(GPConnection *connection, GPIPeer *peer) {
 }
 
 void gpiDestroyPeer(GPConnection *connection, GPIPeer *peer) {
-    func_ov011_0216ddfc(peer->inputBuffer.buffer);
+    gsifree(peer->inputBuffer.buffer);
     peer->inputBuffer.buffer = NULL;
-    func_ov011_0216ddfc(peer->outputBuffer.buffer);
+    gsifree(peer->outputBuffer.buffer);
     peer->outputBuffer.buffer = NULL;
     if (peer->messages != NULL) {
         func_ov011_02171558(peer->messages);
         peer->messages = NULL;
     }
-    func_ov011_0216ddfc(peer);
+    gsifree(peer);
 }
 
 static void gpiRemovePeer(GPConnection *connection, GPIPeer *peer) {
@@ -396,7 +396,7 @@ static void gpiRemovePeer(GPConnection *connection, GPIPeer *peer) {
         } else {
             for (current = previous->pnext; current != peer; current = current->pnext) {
                 if (current == NULL) {
-                    func_ov011_0216cca8(1, 4, 1, "Tried to remove peer not in list.");
+                    gsDebugFormat(1, 4, 1, "Tried to remove peer not in list.");
                     return;
                 }
                 previous = current;
@@ -427,12 +427,12 @@ int gpiProcessPeers(GPConnection *connection) {
     for (peer = iconnection->peerList; peer != NULL; peer = next) {
         next = peer->pnext;
         if (peer->state == GPI_PEER_DISCONNECTED) {
-            func_ov011_0216cca8(1, 4, 8, "Peer disconnected, pid: %d", peer->profile);
+            gsDebugFormat(1, 4, 8, "Peer disconnected, pid: %d", peer->profile);
             gpiRemovePeer(connection, peer);
         } else {
             result = gpiProcessPeer(connection, peer);
-            if (peer->state == GPI_PEER_DISCONNECTED || result != 0 || func_ov011_021714a8(NULL) > peer->timeout) {
-                func_ov011_0216cca8(1, 4, 8, "Peer disconnected, pid: %d", peer->profile);
+            if (peer->state == GPI_PEER_DISCONNECTED || result != 0 || gsiTimeInSec(NULL) > peer->timeout) {
+                gsDebugFormat(1, 4, 8, "Peer disconnected, pid: %d", peer->profile);
                 gpiRemovePeer(connection, peer);
             }
         }
@@ -470,13 +470,13 @@ static GPIPeer *gpiGetPeerByAddr(const GPConnection *connection, u32 ip, u16 por
 static void gpiFreeMessage(void *element) {
     GPIMessage *message = element;
 
-    func_ov011_0216ddfc(message->buffer.buffer);
+    gsifree(message->buffer.buffer);
     message->buffer.buffer = NULL;
 }
 
 GPIPeer *gpiAddPeer(GPConnection *connection, int profileid, BOOL initiate) {
     GPIConnection *iconnection = *connection;
-    GPIPeer *peer = func_ov011_0216dddc(sizeof(GPIPeer));
+    GPIPeer *peer = gsimalloc(sizeof(GPIPeer));
 
     if (peer == NULL) {
         return NULL;
@@ -485,7 +485,7 @@ GPIPeer *gpiAddPeer(GPConnection *connection, int profileid, BOOL initiate) {
     peer->state = GPI_PEER_NOT_CONNECTED;
     peer->initiated = initiate;
     peer->profile = profileid;
-    peer->timeout = func_ov011_021714a8(NULL) + 10000;
+    peer->timeout = gsiTimeInSec(NULL) + 10000;
     peer->pnext = iconnection->peerList;
     peer->messages = func_ov011_02171514(sizeof(GPIMessage), 0, gpiFreeMessage);
     iconnection->peerList = peer;
@@ -564,7 +564,7 @@ int gpiPeerAddMessage(GPConnection *connection, GPIPeer *peer, int type, const c
             result = gpiAppendStringToBufferLen(connection, &gpiMessage.buffer, message, len);
             if (result == 0 && (result = gpiAppendCharToBuffer(connection, &gpiMessage.buffer, '\0')) == 0) {
                 func_ov011_021715a4(peer->messages, &gpiMessage);
-                peer->timeout = func_ov011_021714a8(NULL) + 10000;
+                peer->timeout = gsiTimeInSec(NULL) + 10000;
                 result = 0;
             }
         }
@@ -602,7 +602,7 @@ int gpiPeerFinishTransferMessage(GPConnection *connection, GPIPeer *peer, const 
     result = gpiSendOrBufferString(connection, peer, buffer);
     if (result == 0 && (result = gpiSendOrBufferStringLen(connection, peer, message, len)) == 0 &&
         (result = gpiSendOrBufferChar(connection, peer, '\0')) == 0) {
-        peer->timeout = func_ov011_021714a8(NULL) + 10000;
+        peer->timeout = gsiTimeInSec(NULL) + 10000;
         result = 0;
     }
     return result;
@@ -615,7 +615,7 @@ void gpiPeerLeftCallback(u32 ip, u16 port, int reason, void *userData) {
         SocInAddr addr;
 
         addr.addr = ip;
-        func_ov011_0216cca8(1, 0, 8, "Peer left: addr: %s:%d, profile: %d\n", SOC_InetNtoA(addr), port, peer->profile);
+        gsDebugFormat(1, 0, 8, "Peer left: addr: %s:%d, profile: %d\n", SOC_InetNtoA(addr), port, peer->profile);
         peer->state = GPI_PEER_DISCONNECTED;
     }
 }
@@ -638,8 +638,8 @@ void gpiPeerMessageCallback(u32 ip, u16 port, const void *data, int len, BOOL re
             peer->ip = ip;
             peer->port = port;
         } else {
-            func_ov011_0216cca8(1, 2, 1, "gpiPeerMessageCallback: out of memory when allocating peer, addr: %s:%d",
-                                SOC_InetNtoA(addr), port);
+            gsDebugFormat(1, 2, 1, "gpiPeerMessageCallback: out of memory when allocating peer, addr: %s:%d",
+                          SOC_InetNtoA(addr), port);
             return;
         }
     }
@@ -648,11 +648,11 @@ void gpiPeerMessageCallback(u32 ip, u16 port, const void *data, int len, BOOL re
     size = peer->inputBuffer.size;
     if (len > size - length) {
         size = length + (len >= 0x4000 ? len : 0x4000);
-        newBuffer = func_ov011_0216ddec(buffer, size + 1);
+        newBuffer = gsirealloc(buffer, size + 1);
         if (newBuffer == NULL) {
-            func_ov011_0216cca8(1, 2, 1, "gpiPeerMessageCallback: out of memory when reallocating buffer, addr: %s:%d",
-                                SOC_InetNtoA(addr), port);
-            func_ov011_0216ddfc(buffer);
+            gsDebugFormat(1, 2, 1, "gpiPeerMessageCallback: out of memory when reallocating buffer, addr: %s:%d",
+                          SOC_InetNtoA(addr), port);
+            gsifree(buffer);
             gpiSetErrorString(connection, "Out of memory.");
             gpiCallErrorCallback(connection, 1, 0);
             return;
@@ -672,13 +672,13 @@ void gpiPeerAcceptedCallback(u32 ip, u16 port, int reason, BOOL rejected, void *
 
     addr.addr = ip;
     if (peer == NULL) {
-        func_ov011_0216cca8(1, 0, 1, "Peer does not exist: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
+        gsDebugFormat(1, 0, 1, "Peer does not exist: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
     } else if (rejected) {
         peer->state = GPI_PEER_DISCONNECTED;
-        func_ov011_0216cca8(1, 0, 8, "Peer Connection rejected: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
+        gsDebugFormat(1, 0, 8, "Peer Connection rejected: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
         return;
     }
-    func_ov011_0216cca8(1, 0, 8, "Peer Connection accepted: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
+    gsDebugFormat(1, 0, 8, "Peer Connection accepted: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
 }
 
 void gpiPeerPingReplyCallback(u32 ip, u16 port, u32 latency, void *userData) {
@@ -686,7 +686,7 @@ void gpiPeerPingReplyCallback(u32 ip, u16 port, u32 latency, void *userData) {
 
 void gpiPeerAddOp(GPIPeer *peer, GPIPeerOp *operation) {
     if (peer == NULL || operation == NULL) {
-        func_ov011_0216cca8(1, 4, 2, "Peer operation not added");
+        gsDebugFormat(1, 4, 2, "Peer operation not added");
         return;
     }
     if (peer->peerOpQueue.first == NULL) {
@@ -701,7 +701,7 @@ void gpiPeerAddOp(GPIPeer *peer, GPIPeerOp *operation) {
         }
         peer->peerOpQueue.last = operation;
     }
-    func_ov011_0216cca8(1, 4, 8, "Peer Operation Added");
+    gsDebugFormat(1, 4, 8, "Peer Operation Added");
 }
 
 void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
@@ -709,11 +709,11 @@ void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
     GPIPeerOp *current;
 
     if (peer == NULL || operation == NULL) {
-        func_ov011_0216cca8(1, 4, 2, "Peer operation not removed");
+        gsDebugFormat(1, 4, 2, "Peer operation not removed");
         return;
     }
     if (peer->peerOpQueue.first == NULL) {
-        func_ov011_0216cca8(1, 4, 2, "Peer operation not removed");
+        gsDebugFormat(1, 4, 2, "Peer operation not removed");
         return;
     }
     previous = peer->peerOpQueue.opList;
@@ -724,13 +724,13 @@ void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
     } else {
         for (current = previous->next; current != operation; current = current->next) {
             if (current == NULL) {
-                func_ov011_0216cca8(1, 4, 1, "Tried to remove peer operation not in list.");
+                gsDebugFormat(1, 4, 1, "Tried to remove peer operation not in list.");
                 return;
             }
             previous = current;
         }
         previous->next = operation->next;
     }
-    func_ov011_0216cca8(1, 4, 8, "Peer operation removed");
-    func_ov011_0216ddfc(operation);
+    gsDebugFormat(1, 4, 8, "Peer operation removed");
+    gsifree(operation);
 }

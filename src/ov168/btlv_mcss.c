@@ -787,7 +787,6 @@ void BtlvMcss_MoveScale(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 fr
     work->scaleTasks |= BtlvEffect_PosBit(pos);
 }
 
-// BUG: the start is MCSS_GetScaleOffset's vector, where the task steps func_0201ac28's (style-ok: bug)
 void BtlvMcss_MoveVec524(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 frames, s32 wait, s32 count) {
     int index = BtlvMcss_GetIndex(work, pos);
     VecFx32 start;
@@ -795,7 +794,12 @@ void BtlvMcss_MoveVec524(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
+    // BUG: the start is MCSS_GetScaleOffset's vector, where the task steps func_0201ac28's
+#ifdef BUGFIX
+    func_0201ac28(work->entries[index].mcss, &start);
+#else
     MCSS_GetScaleOffset(work->entries[index].mcss, &start);
+#endif
     work->unk524Seq[pos]++;
     BtlvMcss_StartMoveTask(work, pos, type, &start, dest, frames, wait, count, BtlvMcss_MoveTask_Vec524,
                            BtlvMcss_MoveTaskEnd_Vec524, FALSE, work->unk524Seq[pos]);
@@ -1825,7 +1829,6 @@ static void BtlvMcss_MoveTask_Circle(TCB *tcb, void *data) {
     }
 }
 
-// NONMATCHING: loads the task's position before its work, where the original loads the work first
 static void BtlvMcss_MoveTaskEnd_Circle(TCB *tcb) {
     BtlvMcssCircle *task = GFL_TCBGetData(tcb);
 
@@ -1873,7 +1876,6 @@ static void BtlvMcss_MoveTask_Shake(TCB *tcb, void *data) {
     }
 }
 
-// NONMATCHING: loads the task's position before its work, where the original loads the work first
 static void BtlvMcss_MoveTaskEnd_Shake(TCB *tcb) {
     BtlvMcssShake *task = GFL_TCBGetData(tcb);
 
