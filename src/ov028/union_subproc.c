@@ -308,7 +308,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         }
         break;
     case 6:
-        if (func_ov069_0217cd64(unisys->alloc.uniapp) == TRUE) {
+        if (UnionApp_IsTurnReceived(unisys->alloc.uniapp) == TRUE) {
             *step = 7;
         }
         break;

@@ -8512,6 +8512,8 @@ overlays/ov069 0x0217cbbc UnionApp_JoinConfirmed
 overlays/ov069 0x0217cc28 UnionApp_CheckProfileLeft
 overlays/ov069 0x0217ccc0 UnionApp_CheckEnteringLeft
 overlays/ov069 0x0217cd4c UnionApp_Enqueue
+overlays/ov069 0x0217cd5c UnionApp_SetTurnReceived
+overlays/ov069 0x0217cd64 UnionApp_IsTurnReceived
 overlays/ov069 0x0217cd68 UnionApp_RequestSendStatus
 overlays/ov069 0x0217cd78 UnionApp_ReceiveStatus
 overlays/ov069 0x0217cd88 UnionApp_RequestSendProfile

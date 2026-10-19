@@ -233,11 +233,11 @@ void UnionApp_Enqueue(UnionApp *app, u8 netId) {
     app->queued |= 1 << netId;
 }
 
-void func_ov069_0217cd5c(UnionApp *app) {
+void UnionApp_SetTurnReceived(UnionApp *app) {
     app->unk12 = TRUE;
 }
 
-u8 func_ov069_0217cd64(UnionApp *app) {
+u8 UnionApp_IsTurnReceived(UnionApp *app) {
     return app->unk12;
 }
 

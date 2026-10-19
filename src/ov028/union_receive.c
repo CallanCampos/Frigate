@@ -292,7 +292,7 @@ void UnionNet_RecvUnkE(int netId, int size, const void *data, void *work, NetHan
         GFL_ASSERT(unisys->alloc.uniapp != NULL);
         return;
     }
-    func_ov069_0217cd5c(unisys->alloc.uniapp);
+    UnionApp_SetTurnReceived(unisys->alloc.uniapp);
 }
 
 BOOL UnionMain_SendUnkE(u8 netId) {
