@@ -2575,7 +2575,7 @@ static GameEventReturnCode CGearSw_EventMain(GameEvent *event, u32 *state, void 
         next = CallIRC(work->gsys, field, NULL, TRUE);
         break;
     case ACTION_TVT:
-        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(17), func_ov017_0216e79c, NULL);
+        next = GameEvent_CreateOverlayDelegate(work->gsys, OVERLAY_ID(17), EventCommTvt_Create, NULL);
         break;
     case ACTION_RADAR:
         next =
