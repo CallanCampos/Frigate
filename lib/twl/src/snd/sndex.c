@@ -72,14 +72,16 @@ typedef struct SndexRequest {
 typedef struct SndexNotify {
     SndexNotifyCallback callback; // 0x0
     void *arg;                    // 0x4
-    u32 unk_8[2];                 // 0x8
+    u32 unk_8[2];                 // 0x8: never read or written in the ROM, but the object is 0x10 bytes
 } SndexNotify;
 
 // The library's state, in the bss. It is separate statics, not one struct: SNDEX_SetIirFilter clears its two flags
-// before it reloads its result only when they are two objects. -ipa file reads and writes them from one base, and its
-// sort by size lays them out from sVolume to sRequest. The statics of the volume belong to the code that sets it
-// before the console sleeps or exits (func_02704e04), which nothing in the game starts: it sends the command 0x84 with
-// sVolume, and again, up to five times, from the callback of its answer
+// before it reloads its result only when they are two objects. -ipa file reads and writes them from one base, and
+// lays them out by its sort by size, so they are defined in the order that gives the ROM's layout, not in address
+// order (sVolume, sFilterBusy, sVolumeRetries, sState, sVolumeCallbackRetries, sVolumePending, sFilterEndSent,
+// sExitInfo, sNotify, sSleepInfo, sRequest). The statics of the volume belong to the code that sets it before the
+// console sleeps or exits (func_02704e04) while sVolumePending is set, which nothing in the game does: it sends the
+// command 0x84 with sVolume, and again, up to five times, from the callback of its answer
 static u8 sVolume;
 static BOOL sFilterEndSent; // the last word of the filter request is on its way
 static BOOL sFilterBusy;    // the filter request is in progress
@@ -87,7 +89,7 @@ static int sVolumeRetries;  // of func_02704e04
 // Volatile because the PXI callback, which runs in the FIFO's interrupt, changes it while a thread looks at it
 static volatile SndexState sState;
 static u32 sVolumeCallbackRetries; // of the callback of the volume request
-static BOOL sVolumePending;        // the volume is being set
+static BOOL sVolumePending;        // the volume is waiting to be set
 static SndexRequest sRequest;
 static SndexNotify sNotify;
 static PMExitCallbackInfo sExitInfo;
