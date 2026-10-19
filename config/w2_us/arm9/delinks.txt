@@ -1780,6 +1780,7 @@ lib/dwc/src/bm/util_wifiidtool.c:
     .rodata     start:0x020940dc end:0x02094104
 
 lib/dwc/src/base/dwc_account.c:
+    complete
     .text       start:0x020575fc end:0x020580e4
     .data       start:0x0209b09c end:0x0209b0d0
 
@@ -1811,6 +1812,7 @@ lib/dwc/src/wds/wds.c:
     .bss        start:0x021419c4 end:0x021419c8
 
 lib/dwc/src/ac/dwc_ac_wcm.c:
+    complete
     .text       start:0x02058edc end:0x02059788
     .rodata     start:0x02094108 end:0x0209410c
 
@@ -2037,6 +2039,7 @@ lib/nitro/src/os/os_irqTable.c:
     .bss        start:0x0214c1b8 end:0x0214c248
 
 lib/nitro/src/os/os_interrupt.c:
+    complete
     .text       start:0x02079d3c end:0x02079f30
 
 lib/nitro/src/os/os_reset_pxi.c:
@@ -2085,6 +2088,7 @@ lib/nitro/src/os/os_init.c:
     .text       start:0x0207b130 end:0x0207b1b8
 
 lib/nitro/src/os/os_arena.c:
+    complete
     .text       start:0x0207b1b8 end:0x0207b494
     .bss        start:0x0214c4e4 end:0x0214c4ec
 
@@ -2264,6 +2268,7 @@ lib/twl/src/scfg/scfg_proc.c:
     .bss        start:0x0214e2c0 end:0x0214e2d8
 
 lib/nitro/src/std/std_string.c:
+    complete
     .text       start:0x0207f7d0 end:0x0208009c
 
 lib/nitro/src/std/std_sprintf.c:

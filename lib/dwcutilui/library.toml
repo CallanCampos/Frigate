@@ -1,6 +1,7 @@
 # The user interface of Nintendo's DWC utility (libdwcutil), the Wi-Fi Connection settings in overlay 182: its screens,
 # its row of selectable objects and their effects, and the helpers under them (its resource archive, heap, OAM
-# allocator, sprite cells and display registers). The name is ours. These files were built with the game's compiler
+# allocator and buffers, sprite cells, fades, text, input, interrupts, lists, OBJ characters, strings, VRAM banks,
+# tasks and display registers). The name is ours. These files were built with the game's compiler
 # and flags, not with the 2.0 that the rest of the utility (lib/dwcutil: dwc_wcm.c and the AOSS files) needs:
 # dwc_util_ui_object.c matches 15 of 15 functions with them against 10 of 15 under 2.0/sp2p2, and -ipa file is what
 # gives DWCUtilUiObject_Destroy its second literal of the object's address.

@@ -11,9 +11,9 @@ void DWCUtilScreen_Reset(void) {
 }
 
 BOOL DWCUtilScreen_Start(void *param, int arg1, int arg2) {
-    void *object;
-    void *work;
-    void *resource;
+    DWCUtilText *text;
+    void *str;
+    u32 flags;
 
     if (sScreenActive) {
         return FALSE;
@@ -21,11 +21,11 @@ BOOL DWCUtilScreen_Start(void *param, int arg1, int arg2) {
 
     func_ov182_021ab67c(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
-    object = func_ov182_021bbdec(1, 0);
-    work = func_ov182_021ae118(data_ov182_021c40b8, param, arg1, arg2);
-    resource = func_ov182_021ab7b4();
-    func_ov182_021bc0a4(object, 0x14, 0, 0xd8, 0x40, 2, resource, work);
-    func_ov182_021bc184(object);
+    text = func_ov182_021bbdec(1, 0);
+    str = func_ov182_021ae118(data_ov182_021c40b8, param, arg1, arg2);
+    flags = func_ov182_021ab7b4();
+    func_ov182_021bc0a4(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
+    func_ov182_021bc184(text);
     sScreenActive = TRUE;
     return TRUE;
 }

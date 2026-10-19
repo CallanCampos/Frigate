@@ -4,8 +4,8 @@
 // The name is descriptive: overlay 182 has no embedded filename for this file.
 typedef struct DWCUtilUiObject {
     void *objects[3];
-    void *task;
-    void *selectTask;
+    DWCUtilTask *task;
+    DWCUtilTask *selectTask;
     u16 counter;
     s8 state;
     u8 variant;
@@ -33,12 +33,12 @@ static const u8 sPosIndex[7][2] = { { 0, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 }, { 1,
 static DWCUtilUiObject *sUiObject;
 
 static void DWCUtilUiObject_SetPosition(int y);
-static void DWCUtilUiObject_Raise(void *task);
-static void DWCUtilUiObject_RaiseDone(void *task);
-static void DWCUtilUiObject_Select(void *task);
-static void DWCUtilUiObject_Lower(void *task);
-static void DWCUtilUiObject_Destroy(void *task);
-static void DWCUtilUiObject_Revert(void *task);
+static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg);
+static void DWCUtilUiObject_RaiseDone(DWCUtilTask *task, void *arg);
+static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg);
+static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg);
+static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg);
+static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg);
 
 void DWCUtilUiObject_Init(int variant) {
     int count = sCounts[variant];
@@ -54,7 +54,7 @@ void DWCUtilUiObject_Init(int variant) {
     sUiObject->objects[2] = func_ov182_021bb97c(0, 1, 1);
     func_ov182_021bb878(sUiObject->objects[2], -1, 1);
     DWCUtilUiObject_SetPosition(0xc0);
-    sUiObject->task = func_ov182_021bd200(0, DWCUtilUiObject_Raise, 0, 0x78);
+    sUiObject->task = func_ov182_021bd200(0, DWCUtilUiObject_Raise, NULL, 0x78);
 }
 
 void DWCUtilUiObject_Exit(void) {
@@ -104,7 +104,7 @@ static void DWCUtilUiObject_SetPosition(int y) {
     }
 }
 
-static void DWCUtilUiObject_Raise(void *task) {
+static void DWCUtilUiObject_Raise(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
@@ -117,7 +117,7 @@ static void DWCUtilUiObject_Raise(void *task) {
     }
 }
 
-static void DWCUtilUiObject_RaiseDone(void *task) {
+static void DWCUtilUiObject_RaiseDone(DWCUtilTask *task, void *arg) {
     sUiObject->state = -1;
     sUiObject->counter++;
     if (sUiObject->counter >= 4) {
@@ -126,7 +126,7 @@ static void DWCUtilUiObject_RaiseDone(void *task) {
     }
 }
 
-static void DWCUtilUiObject_Select(void *task) {
+static void DWCUtilUiObject_Select(DWCUtilTask *task, void *arg) {
     int count = sCounts[sUiObject->variant];
     int i;
     u16 rect[4];
@@ -149,7 +149,7 @@ static void DWCUtilUiObject_Select(void *task) {
             func_ov182_021bb7e0(sUiObject->objects[i], -1, sPositions[sPosIndex[sUiObject->variant][i]].x,
                                 sPositions[sPosIndex[sUiObject->variant][i]].y);
             func_ov182_021bb878(sUiObject->objects[i], -1, 1);
-            sUiObject->selectTask = func_ov182_021bd200(0, DWCUtilUiObject_Revert, 0, 0x6e);
+            sUiObject->selectTask = func_ov182_021bd200(0, DWCUtilUiObject_Revert, NULL, 0x6e);
             sUiObject->state = i;
             return;
         }
@@ -157,7 +157,7 @@ static void DWCUtilUiObject_Select(void *task) {
     sUiObject->state = -1;
 }
 
-static void DWCUtilUiObject_Lower(void *task) {
+static void DWCUtilUiObject_Lower(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
@@ -169,7 +169,7 @@ static void DWCUtilUiObject_Lower(void *task) {
     }
 }
 
-static void DWCUtilUiObject_Destroy(void *task) {
+static void DWCUtilUiObject_Destroy(DWCUtilTask *task, void *arg) {
     int i;
 
     func_ov182_021bd268(0, task);
@@ -185,7 +185,7 @@ static void DWCUtilUiObject_Destroy(void *task) {
     func_ov182_021bc4f0(&sUiObject);
 }
 
-static void DWCUtilUiObject_Revert(void *task) {
+static void DWCUtilUiObject_Revert(DWCUtilTask *task, void *arg) {
     int i;
     int count;
     int resource;

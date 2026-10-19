@@ -87,3 +87,53 @@ lib/dwcutilui/src/dwc_util_heap.c:
     complete
     .text       start:0x021bc468 end:0x021bc544
     .bss        start:0x021c41a4 end:0x021c41a8
+
+lib/dwcutilui/src/dwc_util_fade.c:
+    complete
+    .text       start:0x021bba6c end:0x021bbc50
+    .rodata     start:0x021c0584 end:0x021c0590
+    .bss        start:0x021c419c end:0x021c41a0
+
+lib/dwcutilui/src/dwc_util_text.c:
+    .text       start:0x021bbc50 end:0x021bc1a8
+    .rodata     start:0x021c0590 end:0x021c059c
+    .data       start:0x021c1b04 end:0x021c1b60
+    .bss        start:0x021c41a0 end:0x021c41a4
+
+lib/dwcutilui/src/dwc_util_touch.c:
+    .text       start:0x021bc544 end:0x021bcaac
+    .bss        start:0x021c41a8 end:0x021c41c0
+
+lib/dwcutilui/src/dwc_util_irq.c:
+    complete
+    .text       start:0x021bcaac end:0x021bcb3c
+    .bss        start:0x021c41c0 end:0x021c41c8
+
+lib/dwcutilui/src/dwc_util_list.c:
+    complete
+    .text       start:0x021bcb3c end:0x021bcbc8
+
+lib/dwcutilui/src/dwc_util_oam_buf.c:
+    complete
+    .text       start:0x021bcbc8 end:0x021bccec
+    .bss        start:0x021c41c8 end:0x021c41cc
+
+lib/dwcutilui/src/dwc_util_vram_alloc.c:
+    complete
+    .text       start:0x021bccec end:0x021bcef8
+    .bss        start:0x021c41cc end:0x021c41d0
+
+lib/dwcutilui/src/dwc_util_string.c:
+    complete
+    .text       start:0x021bcef8 end:0x021bcf38
+
+lib/dwcutilui/src/dwc_util_bank.c:
+    complete
+    .text       start:0x021bcf38 end:0x021bd0d4
+    .bss        start:0x021c41d0 end:0x021c4204
+
+lib/dwcutilui/src/dwc_util_task.c:
+    complete
+    .text       start:0x021bd0d4 end:0x021bd2cc
+    .rodata     start:0x021c05a4 end:0x021c05a8
+    .bss        start:0x021c4204 end:0x021c4220

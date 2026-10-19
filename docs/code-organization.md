@@ -37,12 +37,14 @@ every section.
   compiler), `lib/dpw/` (the Global Trade Station's and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
   Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's screens and
-  selectable objects, and the resource, heap, OAM, cell and display helpers under them, built with the game's compiler
-  and flags; the name is ours) and `lib/irc/` (the infrared link, overlay 31's last two files, built with the game's
-  compiler and flags; the name is ours).
-  NitroSDK, TwlSDK and DWC are built with the game's compiler, `dsi/1.1p1`: NitroSDK as ARM code by default, with most
-  of its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the
-  LTD autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
+  selectable objects, and the helpers under them: resources, heap, OAM, cells, fades, text, input, interrupts, lists,
+  OBJ characters, strings, VRAM banks, tasks and display, built with the game's compiler and flags; the name is ours)
+  and `lib/irc/` (the infrared link, overlay 31's last two files, built with the game's compiler and flags; the name
+  is ours).
+  NitroSDK and TwlSDK are built with the game's compiler, `dsi/1.1p1`, and DWC with `dsi/1.2` (only
+  `DWCi_Acc_CreateLoginId` tells them apart, and it matches from 1.2 on): NitroSDK as ARM code by default, with most of
+  its ARM9 main files Thumb through `file_flags`, and TwlSDK and DWC as Thumb by default, with their ARM files (the LTD
+  autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
   `gfd`, ...) are Thumb built with CodeWarrior 2.0. A file built with other flags than the rest of its library is
   listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
   (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names
