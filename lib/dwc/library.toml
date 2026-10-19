@@ -33,7 +33,14 @@ flags = [
 "vct/vct_audio.c" = ["-nothumb", "-ipa file"]
 "vct/vct_buffer.c" = ["-nothumb"]
 "vct/vct_session.c" = ["-nothumb", "-ipa file"]
-"vct/vct_dsp.c" = ["-nothumb"]
+# vct_dsp.c was one file once, but the ROM's range of it is four, each with its own `-ipa file` layout: the `.bss` runs
+# `sPacketPool`; `sNoiseFloor` with `sLoudnessHistory`; and `sEcho` with its arrays and buffers are each sorted by size
+# (the 2-byte `shift` first), which one file's statics could not be. The packet pool and the mixer compile alike with
+# or without it
+"vct/vct_packet_pool.c" = ["-nothumb"]
+"vct/vct_vad.c" = ["-nothumb", "-ipa file"]
+"vct/vct_dsp.c" = ["-nothumb", "-ipa file"]
+"vct/vct_mixer.c" = ["-nothumb"]
 "vct/vct.c" = ["-nothumb", "-ipa file"]
 # The signature check (overlay 189) is ARM code like NitroSDK's
 "crypt/crypt.c" = ["-nothumb"]

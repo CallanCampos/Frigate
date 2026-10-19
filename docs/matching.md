@@ -1203,8 +1203,9 @@ Same code, other `sp` offsets or frame size.
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
   one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
   of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy
-  statement was a variable: libVCT's `SuppressEcho` (`vct_dsp.c`) spills its one load of `sEcho.readIndex` and
-  reloads the copy after its index clamp, where the field read at both uses is loaded again.
+  statement was a variable or an inline: libVCT's `SuppressEcho` (`vct_dsp.c`) spills its one load of the read index
+  and reloads the copy after its index clamp. Written as a per-sample `static inline` that steps two scalar statics
+  (`sCounterIn`, `sCounterOut`), it does the same, where the field of a struct read at both uses is loaded again.
 - A constant assigned to a spilled local is stored where MWCC likes, but the register that builds it follows where
   the source assigns it: `ctvt_game.c`'s `CtvtGamePlayer_Create` builds `isSelf`'s `TRUE` in `r2`, as the original
   does, only assigned right after the allocation, not at its declaration.
@@ -2566,8 +2567,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ServerPort`, all three fields of `gPOKE_NET_Control`. libVCT's `VCT_CheckTimeout` (`vct_session.c`) stores the
   low word of its `u64` `sRequestTime = 0;` before loading `sSessionPool`'s address: the high word's store follows
   it in the same object and, at 4 of the 8 bytes, stays above the `sSessionPool` stores. `VCT_ResetCapture`
-  (`vct_dsp.c`), whose stores alternate between `sNoiseFloor` and `sCapture`, loads the address first in every
-  natural spelling (its row).
+  (`vct_dsp.c`), whose stores alternate between `sNoiseFloor` and `sCapture`, loads the address first
+  while its four fields are members of two structs; as scalar statics in a file of their own built with `-ipa file`
+  (`vct_vad.c`), it matches.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -2675,11 +2677,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   field: an original that loads a field once and stores it back on each pass copied it to a local. Multiboot's `MB_Init`
   (`mb_wm.c`) came closer with `src = sWmConfig.name;` before its name loop and `sWmConfig.name = src;` inside it.
 - MWCC hoists a static's field load out of a loop into its preheader, below the entry test, unless the loop stores
-  through a pointer: then the field is loaded again on each pass, whatever its type and even when the static's
-  address is never taken. An original that loads it once in such a loop read it into a local, which MWCC loads above
-  the entry test (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`). libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the samples
-  it stores through `s16 *mic` by an `sEcho.attenuation` loaded once only with `shift = sEcho.attenuation;` before
-  the loop; the original's load is below the test, which no spelling found gives.
+  through a pointer: then a file-scope static is loaded again on each pass, whatever its type and even when its
+  address is never taken. A function-local `static` is hoisted: libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the
+  samples it stores through `s16 *mic` by `static s16 shift` declared in the function, and loads it once, below the
+  entry test (`cmp r2, #0; addls sp, sp, #0x10; popls; ldrsh r4, [r1]`), as the original does. The same variable at
+  file scope is loaded in the loop, and a local copy of it (`int amount = shift;`) is loaded above the entry test
+  (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`), which is what an original that reads it into a local looks like.
 - The order of independent stores before a loop can decide whether a local struct's address, passed to a call on
   every pass, keeps a register across the loop. DS Protect's `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) keep
   `&args` in a register as the original does with the stores to `args` and `checks[]` interleaved (`args.nop`,
@@ -3127,6 +3130,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
+- A divide by the hardware divider that stores the operands as a `str` pair and reads the result through plain
+  pointers is NitroSDK's `CP_SetDiv64_32` and `CP_GetDivResult32`, not raw `REG_DIV_*` writes. libVCT's `SuppressEcho`
+  (`vct_dsp.c`) with `CP_SetDiv64_32(sum, bytes); gain = CP_GetDivResult32();` is 8 bytes smaller than with the
+  registers written one by one, and matches in the same register allocation as `VCT_FilterFrame`.
 
 ## Data and sections
 
@@ -3167,10 +3174,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
   tables defined just above `CtvtDraw_UpdateDraw`, their first user (`config/compiler_flags.toml` records the flag).
   With every table above the first function the colors sort after the 2-byte tables again. `.data` is written out
-  the same way: libVCT's `vct_dsp.c` has its 16-byte
-  `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
-  above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
-  `VCT_InitEcho`, their only user. The reverse rules the flag out: under `-ipa function` the tables of 64 bytes or
+  the same way: the ROM has the 16-byte `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration
+  order gives in one file while both are defined above the first function. They belong to two files (`vct_vad.c` and
+  `vct_dsp.c`), each laid out on its own, which is why the order looked unreachable.
+  The reverse rules the flag out: under `-ipa function` the tables of 64 bytes or
   more stay in the one shared section, even one defined just above a late function, and each local initializer gets
   a section of its own in function order, so local initializers sorted by size across functions, between the shared
   section and the large tables, come only from `-ipa file`, as overlay 257's `ctvt_game.c` has them in both versions.
@@ -3636,6 +3643,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `[-0x880]` indexing). The one that keeps it there stores the biased value into `checks[]` and reads it back
   (`checks[0] = biased; check = checks; index = *(u32 *)(*check++ - 0x2200);`), a store written only to stop MWCC
   folding the constant, which `docs/code-standards.md` §2 rejects.
+- With `-ipa file` the order of a file's same-size statics in `.bss` is set by their declaration order, but not as that
+  order: the four `int`s and two arrays of the echo filter in `vct_dsp.c` came out in 150 of 2,880 declaration orders
+  with the ROM's layout (`PrevIn`, read index, write index, `PrevOut`, coefficients, taps), and the other orders give
+  other layouts. A layout that the first few orders miss is worth a sweep: write each order to a file and read the
+  object's symbol table (about 8 compiles a second). Observed on `vct_dsp.c` and `vct_vad.c` only; `vct_vad.c`'s
+  libVCT order (`sNoiseThreshold`, `sQuietFrames`, `sNoiseIndex`, `sLoudnessHistory`) was the one that matched. When no
+  order gives a layout, the range may be several files: each file's statics are sorted by size on their own, so a
+  small static (the 2-byte `shift`) starts every run. The ROM's `vct_dsp.c` range is `vct_packet_pool.c`, `vct_vad.c`,
+  `vct_dsp.c` and `vct_mixer.c`; split, `VCT_UpdateVad`, `VCT_ResetCapture` and `SuppressEcho` match, where together no
+  spelling did.
 
 ## When nothing moves it
 

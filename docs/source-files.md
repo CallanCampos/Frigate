@@ -395,7 +395,10 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `vct_audio.c` | `0x02193cb0`–`0x02194aa4` | 14 | partial | descriptive |
 | `vct_buffer.c` | `0x02194aa4`–`0x021956d4` | 25 | partial | descriptive |
 | `vct_session.c` | `0x021956d4`–`0x02196680` | 30 | complete | descriptive |
-| `vct_dsp.c` | `0x02196680`–`0x02196eb4` | 14 | partial | descriptive |
+| `vct_packet_pool.c` | `0x02196680`–`0x021967c0` | 4 | complete | descriptive |
+| `vct_vad.c` | `0x021967c0`–`0x02196a20` | 4 | complete | descriptive |
+| `vct_dsp.c` | `0x02196a20`–`0x02196dcc` | 5 | complete | descriptive |
+| `vct_mixer.c` | `0x02196dcc`–`0x02196eb4` | 1 | complete | descriptive |
 | `vct.c` | `0x02196eb4`–`0x021971a8` | 5 | complete | descriptive |
 
 ### Overlay 30

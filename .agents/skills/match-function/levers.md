@@ -827,6 +827,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `IrcLink_IsRecvIgnored`). (matching.md: "An explicit alignment")
 - `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
   argument after the loop. (matching.md: "A search loop whose normal exit")
+- A static loaded in the loop on each pass where the ROM loads it once below the entry test, with a store through
+  a pointer in the loop: declare the static inside the function. (matching.md: "A function-local `static` is hoisted")
 
 ## Switches
 
@@ -889,6 +891,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   declaration. (matching.md: "goes by the first declaration")
 - Two-bytes-a-pass copy loops (`ldrb [r3, #1]; ldrb [r3], #2`) where ours calls `strcpy` with a literal: take
   `strcpy` from `<string.h>`. (matching.md: "`strcpy` of a string literal")
+- A hardware divide whose operand stores are a `str` pair, 8 bytes smaller than raw `REG_DIV_*` writes: NitroSDK's
+  `CP_SetDiv64_32` and `CP_GetDivResult32`. (matching.md: "A divide by the hardware divider")
 
 ## Data and sections
 
@@ -988,6 +992,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
   the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
   of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
+- `.bss` runs that are each sorted by size, with the same layout unreachable in one file: the range is several
+  files, each with `-ipa file`; and sweep the declaration orders of the statics. (matching.md: "With `-ipa file` the
+  order of a file's same-size statics")
 
 ## Function order and presence
 

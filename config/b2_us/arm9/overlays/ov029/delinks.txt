@@ -29,9 +29,10 @@ lib/dwc/src/vct/vct_session.c:
     .bss        start:0x02198390 end:0x021983e4
 
 lib/dwc/src/vct/vct_dsp.c:
-    .text       start:0x02196680 end:0x02196eb4
-    .data       start:0x02197408 end:0x02197424
-    .bss        start:0x021983e4 end:0x0219988c
+    complete
+    .text       start:0x02196a20 end:0x02196dcc
+    .data       start:0x02197418 end:0x02197424
+    .bss        start:0x02198408 end:0x0219988c
 
 lib/dwc/src/vct/vct.c:
     complete
@@ -42,3 +43,18 @@ lib/dwc/src/vct/vct_buffer.c:
     .text       start:0x02194aa4 end:0x021956d4
     .data       start:0x021973e0 end:0x02197400
     .bss        start:0x02198358 end:0x02198390
+
+lib/dwc/src/vct/vct_packet_pool.c:
+    complete
+    .text       start:0x02196680 end:0x021967c0
+    .bss        start:0x021983e4 end:0x021983ec
+
+lib/dwc/src/vct/vct_vad.c:
+    complete
+    .text       start:0x021967c0 end:0x02196a20
+    .data       start:0x02197408 end:0x02197418
+    .bss        start:0x021983ec end:0x02198408
+
+lib/dwc/src/vct/vct_mixer.c:
+    complete
+    .text       start:0x02196dcc end:0x02196eb4
