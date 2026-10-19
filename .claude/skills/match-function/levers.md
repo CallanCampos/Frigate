@@ -208,6 +208,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
+- An RC4 swap with the wrong registers: write it through one temporary, and group a masked sum as
+  `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
+  `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
 
 ## Stack slots or frame size
 
@@ -288,6 +291,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   the parameter is narrower than `int` (for a static helper, the type its public caller passes); loop with a
   separate `int` counter. (matching.md: "A register parameter stored at entry and read back from its slot")
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
+- A byte-sized running value kept on the stack and reloaded across calls where ours holds it in a register: declare
+  it `u8`. (matching.md: "A running sum that only ever holds a byte")
 
 ## Instructions in another order (scheduling)
 
@@ -760,6 +765,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
   once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
+- A local struct's address passed to a call in a loop, where the original keeps it in one register: try the order of
+  the independent stores before the loop; a pointer local used only at the call names nothing. (matching.md: "The
+  order of independent stores before a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
@@ -967,6 +975,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A gap in `.bss` before a 32-aligned object: the previous file ends there, unless it is built with `-ipa file`, which
   gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
   32-aligned")
+- A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
+  the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
+  of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
 
 ## Function order and presence
 
@@ -1010,7 +1021,12 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row.
+arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row. The lever never applies to a function
+whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
+`addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
+placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the
+literal (`&G.field` as one pool word) and keeps two reads of a field apart, so an original with such a pool word or
+a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `SetAffinedOamPosition_` show.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").
@@ -1018,6 +1034,9 @@ whose value is 0/1").
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
 subexpression, loaded into a").
+They match with `ATTRIBUTE_ALIGN(4)` on their task structs' `work` member, written before the type, with
+no evidence in the ROM that the original aligned it: after the name, the functions that store `work` lose
+other optimizations (matching.md: "Where a member's alignment is written").
 `#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3` around one function alone matched
 overlay 139's `UpdateScroll`, a field's offset added before the index for two merged reads, where
 `opt_common_subs off` made it 4 bytes longer and `opt_lifetimes`, `opt_loop_invariants` and `opt_strength_reduction`

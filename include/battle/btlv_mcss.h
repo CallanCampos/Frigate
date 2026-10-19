@@ -29,36 +29,39 @@ typedef enum {
 #define BTLV_MCSS_FLAG_N_POKEMON (1 << 3)  // one of N's Pokémon
 #define BTLV_MCSS_FLAG_FAMOUS (1 << 4)     // a Pokéstar fame of 4 or more
 
-// A move of a sprite around a circle, which BtlvMcss_MoveCircle copies from pos on into its task
+// A move of a sprite around a circle, which BtlvMcss_MoveCircle copies from pos on into its task. The alignment of
+// work, here and in BtlvMcssShake, is a guess: it changes no layout, only how MWCC compiles accesses through the
+// member, and with it the end callbacks load work before pos, as the original does (docs/matching.md, Loops:
+// "Where a member's alignment is written")
 typedef struct {
-    BtlvMcss *work;   // 0x00
-    s32 pos;          // 0x04
-    s32 mode;         // 0x08  bit 0: the other way round; bits 1-2: the plane, 0: y-z, 1: x-z, 2: x-y
-    u32 start;        // 0x0c  the point of the circle the sprite starts from, 0-3; mirrored for the enemy side
-    fx32 radius1;     // 0x10
-    fx32 radius2;     // 0x14
-    s32 frames;       // 0x18  steps by turn
-    s32 wait;         // 0x1c  frames between steps
-    s32 count;        // 0x20  turns
-    s32 turnWait;     // 0x24  frames to wait after each turn
-    s32 angle;        // 0x28
-    s32 speed;        // 0x2c
-    s32 waitCount;    // 0x30
-    s32 turnWaitLeft; // 0x34
-    u32 seq;          // 0x38  the position's move counter when the task started
+    ATTRIBUTE_ALIGN(4) BtlvMcss *work; // 0x00
+    s32 pos;                           // 0x04
+    s32 mode;                          // 0x08  bit 0: the other way round; bits 1-2: the plane, 0: y-z, 1: x-z, 2: x-y
+    u32 start;                         // 0x0c  the circle point it starts from, 0-3; mirrored for the enemy side
+    fx32 radius1;                      // 0x10
+    fx32 radius2;                      // 0x14
+    s32 frames;                        // 0x18  steps by turn
+    s32 wait;                          // 0x1c  frames between steps
+    s32 count;                         // 0x20  turns
+    s32 turnWait;                      // 0x24  frames to wait after each turn
+    s32 angle;                         // 0x28
+    s32 speed;                         // 0x2c
+    s32 waitCount;                     // 0x30
+    s32 turnWaitLeft;                  // 0x34
+    u32 seq;                           // 0x38  the position's move counter when the task started
 } BtlvMcssCircle;
 
 // A shake of a sprite along an axis by a sine, which BtlvMcss_Shake copies into its task
 typedef struct {
-    BtlvMcss *work; // 0x00
-    s32 pos;        // 0x04
-    VecFx32 start;  // 0x08  the position, read when the shake starts
-    s32 axis;       // 0x14  0: x, otherwise y
-    fx32 angle;     // 0x18  the sine's angle, a 16-bit angle in fx32
-    fx32 speed;     // 0x1c
-    fx32 amplitude; // 0x20
-    s32 frames;     // 0x24
-    u32 seq;        // 0x28  the position's move counter when the task started
+    ATTRIBUTE_ALIGN(4) BtlvMcss *work; // 0x00
+    s32 pos;                           // 0x04
+    VecFx32 start;                     // 0x08  the position, read when the shake starts
+    s32 axis;                          // 0x14  0: x, otherwise y
+    fx32 angle;                        // 0x18  the sine's angle, a 16-bit angle in fx32
+    fx32 speed;                        // 0x1c
+    fx32 amplitude;                    // 0x20
+    s32 frames;                        // 0x24
+    u32 seq;                           // 0x28  the position's move counter when the task started
 } BtlvMcssShake;
 
 BtlvMcss *BtlvMcss_Create(u32 battleStyle, TCBManager *tcbMgr, HeapID heapId);

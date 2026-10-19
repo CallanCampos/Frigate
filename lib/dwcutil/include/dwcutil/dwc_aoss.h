@@ -26,20 +26,25 @@ typedef struct AossResult {
 } AossResult;
 
 // A count or a delay of -1 is the default. In the answer, types has the types that were asked for and found
+// What the client tells the access point about itself
+typedef struct AossClientInfo {
+    u8 version;
+    u8 padding_01;
+    u16 length;     // of data, which ends with a 0
+    u8 data[0x100]; // the access point's name
+} AossClientInfo;
+
 typedef struct AossParam {
-    u16 types;  // 0x000
-    u8 version; // 0x002
-    u8 padding_03;
-    u16 length;        // 0x004: of data, which ends with a 0
-    u8 data[0x100];    // 0x006
-    s16 scanCount;     // 0x106: how many times to search for the access point
-    s16 scanDelay;     // 0x108
-    s16 sendCount;     // 0x10a: how many times to send a packet again
-    s16 sendDelay;     // 0x10c
-    s16 timeout;       // 0x10e: of a reply, in milliseconds
-    u8 mac[6];         // 0x110: of this console
-    u8 error;          // 0x116: why it failed
-    AossResult result; // 0x117
+    u16 types;             // 0x000
+    AossClientInfo client; // 0x002
+    s16 scanCount;         // 0x106: how many times to search for the access point
+    s16 scanDelay;         // 0x108
+    s16 sendCount;         // 0x10a: how many times to send a packet again
+    s16 sendDelay;         // 0x10c
+    s16 timeout;           // 0x10e: of a reply, in milliseconds
+    u8 mac[6];             // 0x110: of this console
+    u8 error;              // 0x116: why it failed
+    AossResult result;     // 0x117
 } AossParam;
 
 // Memory for the client and the Wi-Fi library, from the caller

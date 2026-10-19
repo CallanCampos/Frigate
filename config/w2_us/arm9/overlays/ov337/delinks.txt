@@ -9,6 +9,7 @@ lib/dsprot/src/dsprot_stub_check_multi.c:
     .rodata     start:0x02182430 end:0x02182434
 
 lib/dsprot/src/dsprot_cipher_multi.c:
+    complete
     .text       start:0x0217fd94 end:0x021802ec
     .rodata     start:0x02182434 end:0x02182448
 

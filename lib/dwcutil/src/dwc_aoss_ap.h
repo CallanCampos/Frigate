@@ -2,7 +2,7 @@
 #define POKEBW2_DWCUTIL_DWC_AOSS_AP_H
 
 #include "types.h"
-#include "dwc_aoss.h"
+#include "dwcutil/dwc_aoss.h"
 
 // The access point layer of the AOSS client (dwc_aoss_ap.c): it scans, connects and disconnects through DWC_Wcm_*, one
 // operation at a time, and holds the memory functions that the client allocates with. The ROM names none of it; the

@@ -1,6 +1,7 @@
 #include "dwc_util_text.h"
 #include "dwc_util_cell.h"
 #include "dwc_util_heap.h"
+#include "dwc_util_main.h"
 #include "dwc_util_oam.h"
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_shared.h"

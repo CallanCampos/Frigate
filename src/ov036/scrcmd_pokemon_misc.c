@@ -435,9 +435,7 @@ BOOL s0105_CallPokeNameInput(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u32 slot = ScriptReadAny(vm, env);
 
-    // The script's last argument goes where the event takes its callback
-    ScriptWork_CallEvent(work,
-                         prepareForPokemonNameEntryData(gsys, result, slot, (GameEventCallback)ScriptReadAny(vm, env)));
+    ScriptWork_CallEvent(work, prepareForPokemonNameEntryData(gsys, result, slot, ScriptReadAny(vm, env)));
     return TRUE;
 }
 

@@ -59,7 +59,9 @@ typedef struct {
     GameData *gameData;
     LinkFestival *festival;
     FestMission *mission;
-    u8 unk10[8];
+    // Whether overlay 71, 72 or 73 is loaded for the mission, and which
+    BOOL overlayLoaded;
+    u32 overlayId;
     Field *field;
     MMSys *actors;
     FieldPlayer *player;

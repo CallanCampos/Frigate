@@ -7,7 +7,8 @@
 The name is replaced as a whole word in the lists and in the tracked sources, headers, data, scripts and docs, and a
 data file or directory named after the constant, such as res/field/zones/castelia_city_12.json, is renamed with it. A
 message file's IDs and its header, text/<archive>/<bank>.h, are renamed with it too. The new name must not be taken
-already. Rebuild afterwards: the build checks that nothing still uses the old name.
+already. The C files it changes are formatted again with clang-format, since a longer name can push a line past the
+column limit or move an include. Rebuild afterwards: the build checks that nothing still uses the old name.
 """
 import argparse
 import re
@@ -26,6 +27,8 @@ from tools.text.text_data import bank_prefix  # noqa: E402
 ROOT = LISTS_DIR.parent
 PATHS = ["res", "generated", "src", "include", "lib", "docs", "tools"]
 SUFFIXES = {".txt", ".s", ".inc", ".c", ".h", ".cpp", ".md", ".py", ".json"}
+# The C that the Standards workflow formats with clang-format; tools/ holds the style checker's misformatted fixtures
+FORMATTED = ("src/", "include/", "lib/")
 # The data named after the constants of a list: the list, the directory, the constants' prefix, and the suffix of each
 # constant's file, or "/" for a directory
 NAMED_DATA = [
@@ -158,6 +161,7 @@ def main():
     found = subprocess.run(["git", "grep", "-lzF", *(arg for needle in searches for arg in ("-e", needle)), "--",
                             *PATHS], cwd=ROOT, capture_output=True, text=True).stdout.split("\0")
     changed = 0
+    formatted = []
     for name in filter(None, found):
         path = ROOT / name
         if path.suffix not in SUFFIXES or not path.is_file():
@@ -170,6 +174,8 @@ def main():
         if new_text != text:
             path.write_text(new_text)
             changed += 1
+            if name.startswith(FORMATTED) and path.suffix in {".c", ".h"}:
+                formatted.append(name)
     for old_path, new_path in moves:
         subprocess.run(["git", "mv", str(old_path), str(new_path)], cwd=ROOT, check=True)
         print(f"moved {old_path.relative_to(ROOT)} to {new_path.relative_to(ROOT)}")
@@ -178,7 +184,22 @@ def main():
                if old_path.parent == ROOT / directory}
     for script, models in sorted(relinks):
         subprocess.run([sys.executable, str(ROOT / script), "relink", str(ROOT / models)], cwd=ROOT, check=True)
+    reformat(formatted)
     print(f"renamed {len(pairs)} constant{'s' if len(pairs) > 1 else ''} in {changed} files")
+
+
+def reformat(files):
+    """Format the C files a rename changed with clang-format, as the Standards workflow checks them."""
+    if not files:
+        return
+    try:
+        for start in range(0, len(files), 200):
+            subprocess.run(["clang-format", "-i", *files[start:start + 200]], cwd=ROOT, check=True)
+    except FileNotFoundError:
+        print("clang-format not found: run clang-format 23.1.1 -i on the changed C files before committing",
+              file=sys.stderr)
+        return
+    print(f"formatted {len(files)} C files with clang-format")
 
 
 if __name__ == "__main__":

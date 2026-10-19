@@ -40,8 +40,8 @@
 #include "system/pms.h"
 #include "system/pms_data.h"
 #include "system/wipe.h"
-#include "text/system/gtsnego_proc.h"
 #include "text/system/ability_handlers_btl_main.h"
+#include "text/system/gtsnego_proc.h"
 
 // The network commands, and the timings the machines synchronize on
 #define GTSNEGO_NET_CMD_BASE 0x2200
