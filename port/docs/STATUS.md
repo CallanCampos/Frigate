@@ -26,10 +26,66 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-18: the macOS and White 2 merge after review: each VRAM view checked against the host's page again
+
+- **Upstream:** `81eea95ee` (merge of PR #387), as merged into the port's `main` by `4d0ce54b7`; no sync in this task.
+- **Port:** `PORT_SHA`, on the branch `port-integrate` after `84b7d7f96` (the last entry): `6ce5ab330` (the review's
+  fixes), then this entry; pushed to `port-macos-dist` on origin for CI, not to `main`.
+- **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`) at `6ce5ab330`. No
+  file outside `port/` changed.
+- **Host build:** the last entry's Mac (macOS 26.5.1 on an M2, Xcode 26.6, SDK 26.5, Apple clang 21.0.0),
+  RelWithDebInfo, Ninja:
+  - `build/port-n` (Black 2) and `build/port-w2` (White 2): `port_gx_tests` built again, no error, no warning. The
+    oracle and the saves are the last entry's.
+  - `build/port-dist` and `build/port-dist-w2`, the distribution builds: `package_macos.sh --distribution` and
+    `--distribution --version w2_us` made the apps and their disk images, `Frigate Black 2 0.0.2867.dmg` and
+    `Frigate White 2 0.0.2867.dmg`, 13 MB each; `cmake --build build/port-dist` built the tests' two slices; no warning
+    in `port/`.
+  - CI, `port-ci.yml` dispatched on `port-macos-dist` at `6ce5ab330`: run
+    [39197055618](https://github.com/CallanCampos/Frigate/actions/runs/39197055618) is green on all seven jobs. macOS
+    237 pass and 46 skip of 283; Linux 219 pass and 47 skip of 266; Windows 209 pass and 57 skip of 266; the
+    distribution job, 237 pass and 46 skip of 283 on each of `macos-26`, `macos-15`, `macos-26-intel` and
+    `macos-15-intel`, where `package_macos.sh --distribution` made the app and its image and `check_app.sh` passed it,
+    both slices started on Apple Silicon and the x86_64 one on Intel. 457 function stubs and 46 data placeholders on
+    every host. Warnings: 264 on macOS (the distribution job's 528, two slices), 263 on Linux and Windows, as the last
+    entry, none in `port/`.
+- **Tests:** T0 as above.
+  - T2, T3, T4, T6 with the oracle, `ctest -j4`, the two builds at once at a load average of 15 to 18, at `6ce5ab330`:
+    Black 2, 282 pass and 1 skip of 283 (782 s); White 2, 280 pass and 1 skip of 281 (570 s). The skip is
+    `app_universal_slices`, as in the last entry. The 25 `gx_` tests pass in each.
+  - The distribution build's 37 `gx_` and `host_` tests pass as each slice: arm64 by `ctest`, x86_64 under Rosetta by
+    `ctest_one_slice.sh`, the aliasing backends (`shm`, `mach-entry`, `mach-remap`) running on both. `check_app.sh
+    --archs "arm64 x86_64" --minimum 11.0 --run-every-slice` passes on both apps: both slices for macOS 11.0, no
+    `Contents/Frameworks`, signed ad hoc without the hardened runtime, and both slices start, x86_64 under Rosetta.
+  - Every run passed `--save-dir`, and none wrote under `~/Library`: its `Application Support/Frigate` and
+    `Logs/Frigate` still hold files from 16:33 at the latest. T5's nightly runs and T7 not yet.
+- **Tiers:** not measured: no decomp C changed in this task.
+- **Trap stubs:** 457 function stubs and 46 data placeholders in each version, as the last entry.
+- **64-bit warnings:** none of the pointer and integer size kinds; the counts of other kinds are the last entry's.
+- **Work done** (`6ce5ab330`), the review of the merge's six commits:
+  - **`test_gx.c` checks each view against the page the system reports again.** The merge had folded the mac track's
+    `% port_vram_os_page_size()` into `% PORT_HOST_PAGE_ALIGNMENT`, which shows only that the linker kept `hw.c`'s
+    alignment: on a host whose page is larger than the macro but fits in a slot, the aliasing backends would skip and
+    the game copy the banks with every test passing. `test_views` checks both: the macro, and `port_host_page_size()`
+    wherever a page is no larger than a slot. The review's example, Linux with 64 KiB pages, isn't one of those:
+    there `port/hal/gx/vram_os.c` turns the aliasing backends off whatever the window's alignment (a page larger than
+    a 16 KiB slot can't place F, G, H and I), so the copy backend is the design, and the check leaves it alone rather
+    than fail `gx_backend_copy`. Rosetta reports 4096, as an Intel Mac does (probed with `sysconf` as each slice), so
+    the x86_64 slice holds the check there too. A lesson says why the run-time check stays.
+  - **ADR 0015's CI note** names the job's first run, 39190187078 (red on the Intel runners), and its first green,
+    39191368934, where it named the second as the first.
+  - **The README's distribution steps** say CI starts both slices on Apple Silicon and the x86_64 one on Intel, which
+    can't run arm64, where they said every slice.
+  - **The ADR index keeps 0014** for the sanitized build's ADR, 0013 on `port-sanitizers` until it merges: a reserved
+    row, and a numbering rule saying that the next free number is 0016.
+- **Next:** as the last entry.
+- **Blockers:** as the last entry: overlay 36 (issue #83, another contributor's active claim) gates phase 3; macOS 11
+  to 14 have no runner and no virtual machine here.
+
 ## 2026-10-18: the macOS distribution and White 2 starter tracks merged, ADR 0015 accepted, green on every host
 
 - **Upstream:** `81eea95ee` (merge of PR #387), as merged into the port's `main` by `4d0ce54b7`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` from `main` at `62a4e5e2f`: `4122413bf` (the merge of
+- **Port:** `84b7d7f96`, on the branch `port-integrate` from `main` at `62a4e5e2f`: `4122413bf` (the merge of
   `port-macos-dist`), `b23ccc24f` (ADR 0015 accepted), `b57e219d6` (the mac track's two notes corrected),
   `3dd85670c` (the merge of `port-w2-starter`), `cee1e635d` (`host_trap_placeholder_fiber` on an Intel Mac), then this
   entry; pushed to `port-macos-dist` on origin (new there) for CI, not to `main`.
