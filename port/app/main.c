@@ -3,7 +3,9 @@
 // SDK threads on fibers, and the platform's own work on the dispatcher's stack: the scanline hook, which draws each
 // line of both screens (port/gfx/screens.c), and at each VBlank the geometry engine's swap (port/gfx/ge/ge_hal.h) and
 // this file's frame hook, which takes the player's input, presents the frame (port/app/present.c) and paces to the DS's
-// 59.8261 frames a second. The sound the ARM7's driver makes goes to the default playback device (port/audio).
+// 59.8261 frames a second. Only the 3D renderer's workers run beside it, drawing their bands of the 3D frame's lines
+// (port/gfx/workers.h, --render-threads). The sound the ARM7's driver makes goes to the default playback device
+// (port/audio).
 //
 //   frigate-black2 [--help] [--headless] [--frames N] [--input FILE] [--save-dir PATH] [--launch APP[@COUNT],...] ...
 //
@@ -21,6 +23,7 @@
 #include "audio/audio.h"
 #include "gfx/ge/ge_hal.h"
 #include "gfx/screens.h"
+#include "gfx/workers.h"
 #include "hal/gfl/gfl_frame.h"
 #include "hal/host/host.h"
 #include "hal/hw/hw.h"
@@ -101,6 +104,10 @@ static const Option sOptions[] = {
       "display capture, the ARM7, the window, the pacing wait, the rest); prints the median, 95th percentile and most "
       "of the frames without the wait (port/hal/os/frame_time.h, port/tools/frame_times.py). One that can't be "
       "written is a bad option (status 2)" },
+    { "render-threads", "N", 0,
+      "draws the 3D frame on N threads, this one included, each its share of the lines: 1 to 8, as many as the "
+      "machine has performance cores by default (at most 8); 1 draws it on the game's thread alone. The frames are "
+      "the same whatever N (port/gfx/workers.h)" },
     { "watchdog", "SECONDS", 0,
       "stops with a report and status 73 when a frame takes longer than that in host time: the game hangs in a loop "
       "that never reaches the platform layer (30 by default with --headless; 0 is off, the default with a window)" },
@@ -462,6 +469,7 @@ static void AppFrame(void) {
 
 int main(int argc, char **argv) {
     long long frames;
+    long long renderThreads;
     long long watchdog;
     long long arenaSize;
     const char *audioDump;
@@ -495,9 +503,15 @@ int main(int argc, char **argv) {
         port_app_fatal_notice = port_message_log_alert;
     }
     frames = CountOption("frames", 0, 0);
+    renderThreads = CountOption("render-threads", 0, 0);
     watchdog = CountOption("watchdog", 0, sHeadless ? DEFAULT_HEADLESS_WATCHDOG : 0);
     arenaSize = CountOption("main-arena-size", 1, 0);
-    if (frames < 0 || watchdog < 0 || arenaSize < 0) {
+    if (frames < 0 || renderThreads < 0 || watchdog < 0 || arenaSize < 0) {
+        Usage();
+        return EXIT_BAD_OPTIONS;
+    }
+    if (port_app_option("render-threads") != NULL && (renderThreads < 1 || renderThreads > PORT_WORKERS_MAX)) {
+        fprintf(stderr, "port: --render-threads needs 1 to %d\n", PORT_WORKERS_MAX);
         Usage();
         return EXIT_BAD_OPTIONS;
     }
@@ -567,6 +581,8 @@ int main(int argc, char **argv) {
 
     port_hw_init();
     port_trap_protect_data();
+    // The 3D renderer's workers, which draw nothing but its bands of lines (port/gfx/workers.h); 0 is the default
+    port_workers_start((int)renderThreads);
     if (!sHeadless) {
         if (!port_present_open()) {
             return 1;

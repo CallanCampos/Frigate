@@ -131,6 +131,35 @@ void port_host_watchdog_kick(void);
 // --frame-times (port/hal/os/frame_time.h). Nothing of the game reads it, so a run stays the same
 uint64_t port_host_now_ns(void);
 
+// --- Threads --------------------------------------------------------------------------------------------------------
+
+// Frigate runs the game on one thread; only the renderer's workers run beside it (port/gfx/workers.c), and they run
+// renderer code alone. These are what they need of the host.
+
+// Starts a thread that runs entry(argument) until the program ends, in the class the host gives a program's
+// interactive work (macOS's user-interactive QoS), with the asynchronous signals blocked, so that the watchdog's
+// SIGALRM reaches the game's thread; 0 when it started
+int port_host_thread_start(void (*entry)(void *), void *argument);
+
+// Puts the calling thread in that class: on macOS the user-interactive QoS that an app's main thread gets, which keeps
+// it on the performance cores whatever started the program (a shell, a test); nothing elsewhere
+void port_host_thread_set_interactive(void);
+
+// The processor cores that run a program's interactive work at full speed: macOS's performance cores
+// (hw.perflevel0.physicalcpu, else every core), every online processor elsewhere; at least 1
+int port_host_performance_cores(void);
+
+// A signal threads wait on: a count that port_host_signal_raise adds one to, waking every thread waiting on it, and
+// that port_host_signal_wait waits to see differ from a count the caller saw, so that a raise between the caller's
+// look and its wait isn't lost. port_host_signal_count reads the count without waiting (with acquire order: what the
+// raiser wrote before raising is seen), for a thread that spins a little before it waits. Made once, never freed; NULL
+// when memory runs out
+typedef struct PortHostSignal PortHostSignal;
+PortHostSignal *port_host_signal_create(void);
+unsigned port_host_signal_count(PortHostSignal *signal);
+void port_host_signal_raise(PortHostSignal *signal);
+unsigned port_host_signal_wait(PortHostSignal *signal, unsigned seen);
+
 // --- Files and the environment ---------------------------------------------------------------------------------------
 
 // Makes a directory; 0 when made, -1 with errno set otherwise (EEXIST when there is one already)

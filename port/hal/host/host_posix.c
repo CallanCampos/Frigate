@@ -1,7 +1,8 @@
 // macOS's and Linux's half of the host's services (host.h): pages through mmap and mprotect, faults as SIGSEGV and
 // SIGBUS on an alternate signal stack, backtraces through execinfo, names through dladdr, the watchdog as SIGALRM, and
 // the program's static data and globals from its own image (Mach-O's __DATA segment and export trie, ELF's linker
-// symbols and symbol table), and the monotonic clock. It touches no part of the game: the trap placeholders
+// symbols and symbol table), the monotonic clock, and the renderer's threads (pthreads, at macOS's user-interactive
+// QoS) with their signals (a mutex and a condition variable). It touches no part of the game: the trap placeholders
 // (port/hal/trap.c), the fibers' guards (port/hal/os/fiber.c), the PXI pointers into static data
 // (port/hal/pxi/pointer.c), --run-dump's globals (port/app/main.c) and the watchdog (port/app/main.c) stand on it.
 // Windows has host_windows.c instead. glibc hides dladdr, Dl_info, dl_iterate_phdr, MAP_ANON and the signals' structs
@@ -14,7 +15,9 @@
 #include <errno.h>
 #include <execinfo.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <signal.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +29,8 @@
 #if defined(__APPLE__)
 #include <mach-o/getsect.h>
 #include <mach-o/ldsyms.h>
+#include <pthread/qos.h>
+#include <sys/sysctl.h>
 #elif defined(__linux__)
 #include <elf.h>
 #include <link.h>
@@ -351,6 +356,125 @@ uint64_t port_host_now_ns(void) {
     clock_gettime(CLOCK_MONOTONIC, &now);
     return (uint64_t)now.tv_sec * 1000000000u + (uint64_t)now.tv_nsec;
 #endif
+}
+
+// --- Threads --------------------------------------------------------------------------------------------------------
+
+typedef struct ThreadStart {
+    void (*entry)(void *);
+    void *argument;
+} ThreadStart;
+
+// A new thread blocks the asynchronous signals before anything else, so that the watchdog's SIGALRM and a terminal's
+// signals go to the game's thread, which reports where it is; the faults stay with the thread that makes them
+static void *ThreadMain(void *pointer) {
+    ThreadStart start = *(ThreadStart *)pointer;
+    sigset_t blocked;
+
+    free(pointer);
+    sigfillset(&blocked);
+    sigdelset(&blocked, SIGSEGV);
+    sigdelset(&blocked, SIGBUS);
+    sigdelset(&blocked, SIGFPE);
+    sigdelset(&blocked, SIGILL);
+    sigdelset(&blocked, SIGTRAP);
+    sigdelset(&blocked, SIGABRT);
+    sigdelset(&blocked, SIGSYS);
+    pthread_sigmask(SIG_BLOCK, &blocked, NULL);
+    start.entry(start.argument);
+    return NULL;
+}
+
+int port_host_thread_start(void (*entry)(void *), void *argument) {
+    ThreadStart *start = malloc(sizeof(*start));
+    pthread_attr_t attributes;
+    pthread_t thread;
+    int result;
+
+    if (start == NULL) {
+        return -1;
+    }
+    start->entry = entry;
+    start->argument = argument;
+    pthread_attr_init(&attributes);
+    pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED);
+#if defined(__APPLE__)
+    pthread_attr_set_qos_class_np(&attributes, QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
+    result = pthread_create(&thread, &attributes, ThreadMain, start);
+    pthread_attr_destroy(&attributes);
+    if (result != 0) {
+        free(start);
+        return -1;
+    }
+    return 0;
+}
+
+void port_host_thread_set_interactive(void) {
+#if defined(__APPLE__)
+    pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
+}
+
+int port_host_performance_cores(void) {
+    long cores = 0;
+#if defined(__APPLE__)
+    int count = 0;
+    size_t size = sizeof(count);
+    if (sysctlbyname("hw.perflevel0.physicalcpu", &count, &size, NULL, 0) != 0) {
+        size = sizeof(count);
+        if (sysctlbyname("hw.physicalcpu", &count, &size, NULL, 0) != 0) {
+            count = 0;
+        }
+    }
+    cores = count;
+#endif
+    if (cores <= 0) {
+        cores = sysconf(_SC_NPROCESSORS_ONLN);
+    }
+    return cores > 0 ? (int)cores : 1;
+}
+
+struct PortHostSignal {
+    pthread_mutex_t lock;
+    pthread_cond_t changed;
+    atomic_uint count;
+};
+
+PortHostSignal *port_host_signal_create(void) {
+    PortHostSignal *signal = calloc(1, sizeof(*signal));
+
+    if (signal == NULL) {
+        return NULL;
+    }
+    pthread_mutex_init(&signal->lock, NULL);
+    pthread_cond_init(&signal->changed, NULL);
+    atomic_init(&signal->count, 0);
+    return signal;
+}
+
+unsigned port_host_signal_count(PortHostSignal *signal) {
+    return atomic_load_explicit(&signal->count, memory_order_acquire);
+}
+
+// The count changes under the lock, so that a waiter that saw the old count under it is already waiting when the
+// broadcast comes
+void port_host_signal_raise(PortHostSignal *signal) {
+    pthread_mutex_lock(&signal->lock);
+    atomic_fetch_add_explicit(&signal->count, 1, memory_order_release);
+    pthread_mutex_unlock(&signal->lock);
+    pthread_cond_broadcast(&signal->changed);
+}
+
+unsigned port_host_signal_wait(PortHostSignal *signal, unsigned seen) {
+    unsigned count;
+
+    pthread_mutex_lock(&signal->lock);
+    while ((count = atomic_load_explicit(&signal->count, memory_order_acquire)) == seen) {
+        pthread_cond_wait(&signal->changed, &signal->lock);
+    }
+    pthread_mutex_unlock(&signal->lock);
+    return count;
 }
 
 // --- Files and the environment ---------------------------------------------------------------------------------------

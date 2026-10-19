@@ -45,7 +45,7 @@ report whatever ending it wants. The routes are that build's T5 runs.
 | [asm_oracle/](asm_oracle/README.md) | The C that replaces the SDK's assembly, against the ROM's own machine code run in Unicorn (a test tool only) on seeded random inputs | Copies, fills, decompression, matrices, sorting, SHA-1, RC4 | `asm_oracle` |
 | [assets/](assets) | Frigate's artwork as committed: each SVG is what its generator writes, the PNG masters' sizes, and the small images' ships pixel for pixel | None: the program's look | `assets_branding` |
 | [fx/](fx) | The decomp's libfx C as the host compiles it | 3D maths | `fx_libfx` |
-| [g3d/](g3d) | The geometry engine and the CPU 3D renderer, against values worked out by hand from GBATEK; the program glue against fakes; timing | Every 3D scene | `g3d_*` |
+| [g3d/](g3d) | The geometry engine and the CPU 3D renderer, against values worked out by hand from GBATEK, in one band of lines and in three; the renderer in 2 to 8 bands against one, on random scenes (`g3d_scene.h`, the timing's); the program glue against fakes, the last picture kept among them; timing | Every 3D scene | `g3d_*` |
 | [gfx/](gfx) | The CPU 2D renderer and display capture, against pixels worked out by hand; timing | Every 2D screen, capture | `gfx_*` |
 | [gx/](gx) | VRAM banks in every backend, every VRAM setting of the SDK through the real `gx_vramcnt.c`, the loads, the FIFO | Where every picture's data lives | `gx_*` |
 | [hal/](hal) | The C versions of the SDK's assembly on known vectors; the card slot's SPI bus and its infrared chip against melonDS's and GBATEK's behaviour (`test_card_spi.c`) | as `asm_oracle`; the genuine-card check and the infrared library | `hal_mi`, `hal_fx`, `hal_card_spi_*` |
