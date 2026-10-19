@@ -11955,6 +11955,10 @@ overlays/ov151 0x021f5f54 EncEffRipple_ClearAndDraw
 overlays/ov151 0x021f5f80 EncEffRipple_Draw
 overlays/ov151 0x021f60d0 EncEffRipple_Update
 overlays/ov151 0x021f627c EncEffRipple_InitBlack
+overlays/ov152 0x021f6200 EncEffCells_Create
+overlays/ov152 0x021f623c EncEffCells_CreateGridEvent
+overlays/ov152 0x021f6264 EncEffCells_Update
+overlays/ov152 0x021f62a4 EncEffCells_UpdateCell
 overlays/ov155 0x021f5ab8 EventFaceUpStart_Callback
 overlays/ov155 0x021f5b34 FaceUp_LoadGraphics
 overlays/ov155 0x021f5d20 EventFaceUpEnd_Callback
