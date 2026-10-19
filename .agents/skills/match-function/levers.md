@@ -208,9 +208,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A struct field loaded again for each of several tests in a row, where ours reuses one load: the field is shared
   with other threads and `volatile`. (matching.md: "A field that other threads change")
-- An RC4 swap or any three-way exchange with the wrong registers: write it through one temporary, and group a
-  masked sum as `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that steals the counter's
-  register: index `src[i + k]` directly, with an `unsigned long i`. (matching.md: "An RC4 key schedule's swap")
+- An RC4 swap with the wrong registers: write it through one temporary, and group a masked sum as
+  `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
+  `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
 
 ## Stack slots or frame size
 
@@ -707,9 +707,6 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Failures that set a saved register to 0 and jump to one `mov r0, rN` exit, where a `result` variable gets a stack
   slot: the body is a `static inline` called by a one-line wrapper. (matching.md: "Every `return` gets its own
   epilogue")
-- A search loop's hit sets the result and branches straight to the caller's shared tail, with no count test after
-  the loop (`break` + `if (j == 6)` is 8 bytes long): the loop is in a `static inline` that `return`s the result
-  from inside it. (matching.md: "A search loop whose hit sets the result")
 - A redundant outer `if` gives a doubled `beq`.
 - `v = f(); if (v == x)` and `if (f() == x)` put `cmp`'s operands in opposite orders. (matching.md: "operands of `cmp`")
 - A last test that branches the wrong way (`bne` to the false return for `beq` to the true one): negate the condition
@@ -768,10 +765,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   unsigned and keeps the loop. (matching.md: "loop that runs once")
 - A static's field loaded on each pass of a loop that stores through a pointer, where the original loads it
   once: a local read before the loop. (matching.md: "hoists a static's field load out of a loop")
-- A local struct's address recomputed at each call inside a loop where the original keeps it in one register: check
-  for enough register pressure from elsewhere in the function first, since the hoist comes from that, not from a
-  named pointer alias (which is rejected as naming nothing). (matching.md: "A local struct's address, taken only to
-  pass it as a function argument")
+- A local struct's address passed to a call in a loop, where the original keeps it in one register: try the order of
+  the independent stores before the loop; a pointer local used only at the call names nothing. (matching.md: "The
+  order of independent stores before a loop")
 - `asr`/`ror` division of a parameter the callers pass as `u8` without conversion: a `u8` parameter copied to an
   `s32` local. (matching.md: "copied to an `s32` local")
 - An address or value an inner loop computes from the outer counter alone is hoisted into the inner preheader.
@@ -980,8 +976,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   gives each object of 64 bytes or more a section of its own. (matching.md: "makes its file's whole `.bss` section
   32-aligned")
 - A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
-  the bias in the addend, byte arithmetic adds it at run time, and the subtraction survives folding only through a
-  `static inline` whose result indexes an array. (matching.md: "A bias on a data symbol lands in the literal's addend")
+  the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
+  of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
 
 ## Function order and presence
 

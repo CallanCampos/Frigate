@@ -651,14 +651,15 @@ Same instructions, registers swapped.
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode).
 - An RC4 key schedule's swap written through one temporary, `temp = table[j]; table[j] = table[i]; table[i] =
-  temp;`, lets the two reads of `table[i]` share a register, and the sum grouped `(table[i] + (j + key[k])) & 0xff`
-  gives `add r4, r5, r4` where the flat `j + key[k] + table[i]` swaps the operands: DS Protect's
-  `DSProt_Rc4InitMulti` went from 28 differing lines to a match with those two spellings. In the same library's
-  `DSProt_EncryptCodeMulti` and `DSProt_DecryptCodeMulti`, a named `u8 *in = src + i` took the saved register ahead
-  of the counter; indexing `src[i + k]` and `*(u32 *)(src + i)` directly, with an `unsigned long i`, gives the
-  original's registers, and the running `u8 sum` is `dest[i + 3] = sum + src[i + 3]; sum = dest[i + 3];`. A byte
-  decrypted through a `static inline` that returns the xor and stores the plain byte into the state splits the
-  bytes' live ranges, so the first lands in `r7` and the next two in `fp`.
+  temp;`, and its sum grouped `(table[i] + (j + key[k])) & 0xff`, which gives `add r4, r5, r4` where the flat
+  `j + key[k] + table[i]` swaps the operands, are what DS Protect's `DSProt_Rc4InitMulti` needed. The same library's
+  `DSProt_EncryptCodeMulti` and `DSProt_DecryptCodeMulti` index `src[i + k]` and `*(u32 *)(src + i)` directly, where
+  a named `u8 *in = src + i` took the saved register ahead of the counter, and declare the counter `unsigned long`
+  (see "`u32` is `unsigned int` in our `types.h`"). The encryption's running `u8 sum` is the byte just written,
+  `dest[i + 3] = sum + src[i + 3]; sum = dest[i + 3];`: `sum += src[i + 3]; dest[i + 3] = sum;` and the other
+  spellings with one variable leave 26 bytes of registers. The decryption's bytes go through a `static inline` that
+  returns the xor and stores the encrypted byte into the state, which splits their live ranges so that the first
+  lands in `r7` and the next two in `fp`.
 
 ## Stack slots
 
@@ -1055,9 +1056,9 @@ Same code, other `sp` offsets or frame size.
   `s1 = s + width * FX32_ONE; t1 = t + height * FX32_ONE;` assigned right after `s` and `t`, the far corner's texture
   coordinates. The invariant itself as a local (`w = width * FX32_ONE`) is hoisted under a guard and costs 4 bytes.
 - A running sum that only ever holds a byte, kept on the stack and reloaded from its slot across calls (`ldrne r0,
-  [sp, #0xc]` for a `-1` and the counter started from a reload of it), is a `u8` local: `DSProt_DecryptCodeMulti`'s
-  `u8 sum` gave the original's `push {r3}` frame of 0x10 and its 4 missing bytes, where a `u32 sum` lived in a
-  register.
+  [sp, #0xc]` for a `-1` and the counter started from a reload of it), was a `u8` local in DS Protect's
+  `DSProt_DecryptCodeMulti`: its `u8 sum` gives the original's `push {r3}` frame of 0x10 and its 4 missing bytes,
+  where a `u32 sum` lived in a register.
 
 ## Instruction order
 
@@ -2249,10 +2250,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - I/O registers reached as offsets from one base register (`ldr r0, [sb, #0x1a4]`, `add fp, sb, #0x100000`), with
   the base made by shifting a register that holds 1 (`mov r3, #1; lsl sb, r3, #0x1a`), are not `1 << 26` or a base
   pointer local: MWCC folds both back to a constant and loads each register's address from the literal pool. Only a
-  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, which brought DS Protect's
-  `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x770 to its 0x764 but was judged unnatural and left out of
-  the source. Its header address, which the original computes from the TWL bit, is
-  `(((twl) + 5) << 23) - 0x1a0`; a `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
+  shift that MWCC sees after propagating the value keeps it, `u32 base = 1; base <<= 26;`, which takes DS Protect's
+  `DSProt_CheckFlashcartA` (`dsprot_detect_multi.c`) from 0x770 to between 0x74c and 0x774 against the original's
+  0x764, by how the rest is written, without matching; it was judged unnatural and left out of the source. Its header
+  address, which the original computes from the TWL bit, is `(((twl) + 5) << 23) - 0x1a0`; a
+  `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
 
 ## Branches and block layout
 
@@ -2343,13 +2345,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is
   `return Mystery_CreateGiftPokemon(gift, heapId, gameData);`, the maker overlay 197 also inlines: written out with
   a result variable and `goto`, the result got a stack slot of its own and the frame grew.
-- A search loop whose hit sets the result and branches straight to the function's shared tail, with no test of the
-  loop's count after it (`movne r1, #0xf1; bne <shared multiply>`, then the exhaustion falls into the failure block):
-  the loop is in a `static inline` that `return`s the result from inside it, and the caller assigns the call. A
-  `break` followed by `if (j == 6)` adds `cmp; movne; bne`, 8 bytes, and the `goto` that gives the same bytes is the
-  form `docs/code-standards.md` forbids. DS Protect's `DSProt_CheckEmulatorA`/`B` match through
-  `DSProt_CheckMacZero(args, mac, setCode, flag, zeroCode)`, which returns `setCode` at the first nonzero MAC byte
-  and otherwise tampers and returns `zeroCode`.
 - A conditional branch to the epilogue beyond Thumb's `b<cond>` range goes through a `b` within range that jumps to
   the same label. `return;` statements share the return label, while the end of an `if` body and a `break` out of a
   `switch` jump to the label after that statement, even when both labels end at the same epilogue. An early
@@ -2664,15 +2659,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the entry test (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`). libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the samples
   it stores through `s16 *mic` by an `sEcho.attenuation` loaded once only with `shift = sEcho.attenuation;` before
   the loop; the original's load is below the test, which no spelling found gives.
-- A local struct's address, taken only to pass it as a function argument called on every pass of a loop, is hoisted
-  to a dedicated register across the loop by register pressure, not by naming it: enough live temporaries ahead of
-  the loop (from an unrelated fix elsewhere in the same prologue) make the allocator keep the address in a register
-  across the loop on its own, the same effect a `local *p = &local;` used only at the call gets (MWCC recomputes
-  `&local` at each call otherwise), without a local that corresponds to nothing in the original. DS Protect's
-  `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) hoist `&args` to `fp` across the per-check call this way, once the
-  function has enough live registers from the `callbacks` data-bias fix and the right declaration order for its
-  `args`/`checks[]` field writes; a named pointer local reaches the same hoist alone but is rejected as a local that
-  names nothing, in favor of the declaration order. See the function's row for what still differs.
+- The order of independent stores before a loop can decide whether a local struct's address, passed to a call on
+  every pass, keeps a register across the loop. DS Protect's `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) keep
+  `&args` in a register as the original does with the stores to `args` and `checks[]` interleaved (`args.nop`,
+  `args.tamper`, `checks[0]`, `args.arg0`, `checks[1]`, `args.arg1`, `checks[2]`, `args.failed`, `args.result`);
+  written group by group, 82 bytes differ instead of 71. A `DSProtCheckArgs *p = &args;` used only at the call gets
+  the register too, but names nothing. See the function's row for what still differs.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
   multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
@@ -3612,13 +3604,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   order across sections, ties included, which checks a model far better than `--check`.
 - A bias on a data symbol lands in the literal's addend (`SYM + 0x2200` in `.rela.text`) only through element-pointer
   arithmetic, `&x + 0x2200 / sizeof(u32)` or `arr + 0x880`, as `Func + 0x2200` does for a function; byte arithmetic,
-  `(u32)&x + 0x2200` or `(u8 *)&x + 0x2200`, loads the plain symbol and adds 0x2200 at run time. A `- 0x2200` on that
-  biased value survives only when the value reaches the load after constant folding: a `static inline` that returns
-  `(T *)(biased - 0x2200)` keeps the run-time `sub` when the result indexes an array (DS Protect's callback pair), and
-  folds it away for a scalar read, as does every direct spelling, a `u32`, `const` or pointer local, a macro, or
-  `[-0x880]` indexing. Only a store read back through a walked pointer (`checks[0] = biased; check = checks; index =
-  *(u32 *)(*check++ - 0x2200);`) gives the original's `ldr =SYM+0x2200; sub #0x2000; ldr [#-0x200]` for
-  `DSProt_RunChecks1`, and that is a dead store written to be read back, which `docs/code-standards.md` rejects.
+  `(u32)&x + 0x2200` or `(u8 *)&x + 0x2200`, loads the plain symbol and adds 0x2200 at run time. DS Protect biases its
+  addresses this way and subtracts the bias at run time. The `- 0x2200` stays at run time when the result is the base
+  of a variable index: `DSProt_RunChecks1`'s `(DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200)`, read
+  as `callbacks[index]`, gives the original's `ldr =SYM+0x2200; sub r4, r4, #0x2200`. For a scalar read MWCC folds it
+  back to the plain symbol in every spelling tried (a `u32`, `const` or pointer local, a `static inline`, a macro,
+  `[-0x880]` indexing). The one that keeps it there stores the biased value into `checks[]` and reads it back
+  (`checks[0] = biased; check = checks; index = *(u32 *)(*check++ - 0x2200);`), a store written only to stop MWCC
+  folding the constant, which `docs/code-standards.md` §2 rejects.
 
 ## When nothing moves it
 

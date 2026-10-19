@@ -17,27 +17,13 @@
 // Protect computes the address from the TWL bit instead of choosing between the two.
 #define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)((((twl) + 5) << 23) - 0x1a0))
 
-// Bytes of the first MAC address whose reversed bits an emulator has
+// The MAC address that the check treats as an emulator's, 00:09:bf:00:00:31, with each byte inverted
 static const u8 sEmulatorMacMulti[6] = { 0xff, 0xf6, 0x40, 0xff, 0xff, 0xce };
 
-// Has the game's second function of the pair run with its arguments, and records its result and `flag` for the caller
+// Calls the second function of the pair with the caller's arguments, and records its result and `flag` for the caller
 static inline void DSProt_Tamper(DSProtCheckArgs *args, u32 flag) {
     args->result = args->tamper(args->arg0, args->arg1);
     args->failed = flag;
-}
-
-// Returns `setCode` if the MAC address has a nonzero byte, and otherwise has the second function run with `flag` and
-// returns `zeroCode`
-static inline u32 DSProt_CheckMacZero(DSProtCheckArgs *args, const u8 *mac, u32 setCode, u32 flag, u32 zeroCode) {
-    int i;
-
-    for (i = 0; i < 6; i++) {
-        if (mac[i] != 0) {
-            return setCode;
-        }
-    }
-    DSProt_Tamper(args, flag);
-    return zeroCode;
 }
 
 // Returns a code that says the machine is not an emulator, and has the second function run if it is
@@ -45,6 +31,7 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
     u8 mac[6];
     OSOwnerInfo owner;
     int i;
+    int j;
     u32 code;
 
     OS_GetMacAddress(mac);
@@ -58,7 +45,17 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
         DSProt_Tamper(args, 0xfb);
         code = 0xfb;
     } else {
-        code = DSProt_CheckMacZero(args, mac, 0xf1, 0xfb, 0xfb);
+        for (j = 0; j < 6; j++) {
+            if (mac[j] != 0) {
+                break;
+            }
+        }
+        if (j == 6) {
+            DSProt_Tamper(args, 0xfb);
+            code = 0xfb;
+        } else {
+            code = 0xf1;
+        }
     }
     return code * 0xbf;
 }
@@ -68,6 +65,7 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     u8 mac[6];
     OSOwnerInfo owner;
     int i;
+    int j;
     u32 code;
 
     OS_GetMacAddress(mac);
@@ -78,11 +76,22 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     }
     OS_GetOwnerInfo(&owner);
     if (i == 6 && owner.birthday.month == 1 && owner.birthday.day == 1 && owner.nickNameLength == 0) {
+        // Unlike the other failures, this one records twice its code as the flag
         args->result = args->tamper(args->arg0, args->arg1);
         code = 0xf1;
         args->failed = code + 0xf1;
     } else {
-        code = DSProt_CheckMacZero(args, mac, 0xfb, 0x78, 0xf1);
+        for (j = 0; j < 6; j++) {
+            if (mac[j] != 0) {
+                break;
+            }
+        }
+        if (j == 6) {
+            DSProt_Tamper(args, 0x78);
+            code = 0xf1;
+        } else {
+            code = 0xfb;
+        }
     }
     return code * 0xb5;
 }
@@ -107,7 +116,7 @@ u32 DSProt_Crc32Multi(const u8 *data, u32 size) {
 
 // Reads the 0x200 bytes at a card address with the card's registers, restoring the command registers and the
 // memory controller afterwards. `flag` is the sixth byte of the command.
-static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
+static inline void DSProt_ReadCardRaw(u8 *dest, u32 address, u32 flag) {
     u16 exmemcnt = reg_MI_EXMEMCNT;
     u8 savedCommand[8];
     u32 control;
@@ -141,7 +150,7 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
                     u32 word = REG_CARD_DATA;
 
                     if (offset >= 0 && offset < 0x200) {
-                        *(u32 *)((u8 *)dest + offset) = word;
+                        *(u32 *)(dest + offset) = word;
                     }
                     offset += 4;
                 }
@@ -168,7 +177,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     lockId = (u16)OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw((u8 *)page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -183,7 +192,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     }
     address += 0x1e000;
     for (; i < 8; i++) {
-        DSProt_ReadCardRaw(page, address, 0);
+        DSProt_ReadCardRaw((u8 *)page, address, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -191,7 +200,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     }
     address -= 0x1d000;
     for (; i < 10; i++) {
-        DSProt_ReadCardRaw(page, address, 0x11);
+        DSProt_ReadCardRaw((u8 *)page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 10] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -199,6 +208,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     }
     CARD_UnlockRom(lockId);
     OS_ReleaseLockID(lockId);
+    // Overwrites the last page read
     for (i = 0; i < 128; i++) {
         page[i] = i;
     }
@@ -239,7 +249,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     lockId = (u16)OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw((u8 *)page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -254,7 +264,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     }
     address += 0x1e000;
     for (; i < 8; i++) {
-        DSProt_ReadCardRaw(page, address, 0);
+        DSProt_ReadCardRaw((u8 *)page, address, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -262,7 +272,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     }
     address -= 0x1d000;
     for (; i < 10; i++) {
-        DSProt_ReadCardRaw(page, address, 0x11);
+        DSProt_ReadCardRaw((u8 *)page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 10] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -270,6 +280,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     }
     CARD_UnlockRom(lockId);
     OS_ReleaseLockID(lockId);
+    // Overwrites the last page read
     for (i = 0; i < 128; i++) {
         page[i] = i;
     }
@@ -298,6 +309,8 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     return 0xc127;
 }
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckFlashcartA, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args) {
     orr ip, pc, pc
@@ -347,6 +360,8 @@ asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckFlashcartB, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args) {
     orr ip, pc, pc
@@ -396,6 +411,8 @@ asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckEmulatorA, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckEmulatorA(DSProtCheckArgs *args) {
     orr ip, pc, pc
@@ -445,6 +462,8 @@ asm u32 DSProt_CallCheckEmulatorA(DSProtCheckArgs *args) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckEmulatorB, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckEmulatorB(DSProtCheckArgs *args) {
     orr ip, pc, pc
