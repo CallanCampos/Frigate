@@ -16,13 +16,13 @@ static char sSakeDownloadUrl[128];
 int sakeStartup(Sake **sake) {
     Sake *created;
 
-    if (data_ov011_02190698 != 1) {
+    if (__GSIACResult != 1) {
         return 1;
     }
-    if (func_ov011_0216c9f4() != 0) {
+    if (gsCoreIsShutdown() != 0) {
         return 2;
     }
-    created = func_ov011_0216dddc(sizeof(Sake));
+    created = gsimalloc(sizeof(Sake));
     if (created == NULL) {
         return 3;
     }
@@ -32,7 +32,7 @@ int sakeStartup(Sake **sake) {
 }
 
 void Sake_Free(Sake *sake) {
-    func_ov011_0216ddfc(sake);
+    gsifree(sake);
 }
 
 void Sake_SetGame(Sake *sake, const char *gameName, int gameId, const char *secretKey) {
@@ -71,7 +71,7 @@ static int Sake_StopHttp(Sake *sake, SakeRequest *request) {
     if (sake == NULL || request == NULL || request->type == NULL || request->type->http == NULL) {
         return SAKE_REQUEST_ERROR_NO_INPUT;
     }
-    func_ov011_0216ca68(request->type->http);
+    gsiCoreCancelTask(request->type->http);
     return 0;
 }
 
@@ -163,7 +163,7 @@ static SakeRequest *Sake_AllocRequest(Sake *sake, int kind, void *input, SakeCal
         sake->lastError = SAKE_REQUEST_ERROR_NOT_SET_UP;
         return NULL;
     }
-    request = func_ov011_0216dddc(sizeof(SakeRequest));
+    request = gsimalloc(sizeof(SakeRequest));
     if (request == NULL) {
         sake->lastError = SAKE_REQUEST_ERROR_OUT_OF_MEMORY;
         return NULL;
@@ -178,7 +178,7 @@ static SakeRequest *Sake_AllocRequest(Sake *sake, int kind, void *input, SakeCal
 }
 
 void Sake_FreeRequest(SakeRequest *request) {
-    func_ov011_0216ddfc(request);
+    gsifree(request);
 }
 
 int Sake_GetHttpResultError(int status) {

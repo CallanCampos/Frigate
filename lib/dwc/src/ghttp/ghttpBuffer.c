@@ -13,7 +13,7 @@ BOOL ghiResizeBuffer(GHIBuffer *buffer, int count) {
         return FALSE;
     }
     newSize = buffer->size + count;
-    newData = func_ov011_0216ddec(buffer->data, newSize);
+    newData = gsirealloc(buffer->data, newSize);
     if (newData == NULL) {
         return FALSE;
     }
@@ -80,7 +80,7 @@ BOOL ghiInitFixedBuffer(GHIConnection *connection, GHIBuffer *buffer, char *data
 void ghiFreeBuffer(GHIBuffer *buffer) {
     if (buffer != NULL && buffer->data != NULL) {
         if (!buffer->dontFree) {
-            func_ov011_0216ddfc(buffer->data);
+            gsifree(buffer->data);
         }
         memset(buffer, 0, sizeof(GHIBuffer));
     }
@@ -175,7 +175,7 @@ BOOL ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
             offset += chunk;
             buffer->length = buffer->size - available;
         } else {
-            func_ov011_0216cca8(8, 4, 2, "ghiEncryptDataToBuffer encountered unhandled return code: %d\r\n", result);
+            gsDebugFormat(8, 4, 2, "ghiEncryptDataToBuffer encountered unhandled return code: %d\r\n", result);
             return FALSE;
         }
     } while (offset < size);
@@ -250,13 +250,13 @@ BOOL ghiSendBufferedData(GHIConnection *connection) {
         int sent;
 
         if (connection->encryptor.engine == 0 || connection->encryptor.mode == 1) {
-            int result = func_ov011_0216dfb4(connection->socket, 0, &ready, &failed);
+            int result = GSISocketSelect(connection->socket, 0, &ready, &failed);
 
             if (result == -1 || (result == 1 && failed != 0)) {
                 connection->completed = TRUE;
                 connection->result = 5;
                 if (result == -1) {
-                    connection->socketError = func_ov011_0216dfa8(connection->socket);
+                    connection->socketError = GOAGetLastError(connection->socket);
                 } else {
                     connection->socketError = 0;
                 }

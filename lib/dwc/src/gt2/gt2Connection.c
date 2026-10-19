@@ -41,7 +41,7 @@ int func_ov011_0217ce38(GTI2Connection *connection, const void *message, int len
 
     func_ov011_0217ee60(&message, &length);
     if (length > 0) {
-        connection->initialMessage = func_ov011_0216dddc(length);
+        connection->initialMessage = gsimalloc(length);
         if (connection->initialMessage == NULL) {
             return 1;
         }
@@ -88,7 +88,7 @@ BOOL func_ov011_0217cf18(GTI2Connection *connection, const void *data, int lengt
     if (!func_ov011_0217eb34(connection->socket, connection->ip, connection->port, data, length)) {
         return FALSE;
     }
-    connection->lastSendTime = func_ov011_0216e324();
+    connection->lastSendTime = current_time();
     return TRUE;
 }
 
@@ -197,13 +197,13 @@ void func_ov011_0217d0b4(GTI2Connection *connection) {
 
 void func_ov011_0217d0e8(GTI2Connection *connection) {
     if (connection->initialMessage != NULL) {
-        func_ov011_0216ddfc(connection->initialMessage);
+        gsifree(connection->initialMessage);
     }
     if (connection->incoming.data != NULL) {
-        func_ov011_0216ddfc(connection->incoming.data);
+        gsifree(connection->incoming.data);
     }
     if (connection->outgoing.data != NULL) {
-        func_ov011_0216ddfc(connection->outgoing.data);
+        gsifree(connection->outgoing.data);
     }
     if (connection->incomingMessages != NULL) {
         func_ov011_02171558(connection->incomingMessages);
@@ -217,5 +217,5 @@ void func_ov011_0217d0e8(GTI2Connection *connection) {
     if (connection->receiveFilters != NULL) {
         func_ov011_02171558(connection->receiveFilters);
     }
-    func_ov011_0216ddfc(connection);
+    gsifree(connection);
 }
