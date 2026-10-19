@@ -1172,7 +1172,8 @@ Same code, other `sp` offsets or frame size.
   the loaded register to the second read. `(*task).pos` is no other path: it is the same expression as `task->pos`
   and shares the temporary. A read through a `const` pointer is kept apart too, but is loaded again. The
   original's `BtlvMcss_MoveTaskEnd_Circle` and `_Shake` load `work` first while eight siblings of the same C load
-  `pos` first; each of these spellings matches them and is only a second path to the field, so they stay rows.
+  `pos` first; each of these spellings matches them but is only a second path to the field. What matches them is
+  an alignment on their task structs' `work` member (Loops: "Where a member's alignment is written").
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
   one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
   of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy
@@ -2835,6 +2836,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `IrcSpi_Wait60us`): one `start` set before both waits swaps two registers (`r4`/`r6`), which it doesn't with the
   five passes above off.
   Two `_ull_mul` calls where ours multiplies once, in one function of a file, ask whether it reads an aligned object.
+- Where a member's alignment is written changes what it does. After the name (`BtlvMcss *work ATTRIBUTE_ALIGN(4);`), a
+  store to the member anywhere in a function also turns off other optimizations there: `x == 4 || x == 5` is no longer
+  folded into `subs #4; cmp #1; bhi`, and an element's address (`work + 8` and `index * 0x5c`) is not kept across a
+  struct copy. Written before the type (`ATTRIBUTE_ALIGN(4) BtlvMcss *work;`) or between the type and the `*`, the
+  member is aligned all the same (8 grows the struct), and a load or store through it (`task->work->moveTasks`) turns
+  those optimizations off as above, but a store to the member itself (`task->work = work`) leaves them on. Overlay 168's
+  `btlv_mcss.c` has the case. Its end callbacks `BtlvMcss_MoveTaskEnd_Circle` and `_Shake`, which only read through
+  `task->work`, load `work` before `pos`, as under `#pragma opt_common_subs off` (Instruction order: "is a global common
+  subexpression"), with the attribute on `work` in `BtlvMcssCircle` and `BtlvMcssShake` written either way.
+  `BtlvMcss_MoveCircle` and `BtlvMcss_Shake`, which fill the tasks and store `work`, match only with it before the type.
+  Values 1, 2 and 4 give the same code; 8 and more grow the structs past the sizes they allocate. On `pos` or `seq`
+  instead, the end callbacks match and `BtlvMcss_MoveTask_Circle`, `_Shake`, `BtlvMcss_MoveCircle` and `BtlvMcss_Shake`
+  break; on a member of `BtlvMcss`, the sibling `BtlvMcss_MoveTaskEnd_Position` breaks too, since it reads the same
+  members. The tasks are allocated, so nothing in the ROM shows the alignment: the header says it is a guess.
 - A `for` loop whose body begins with another loop is not rotated either, in ARM and Thumb code: it is entered with a
   `b` to its test at the bottom. A statement before the inner loop, even the `j = 0` of an inner `for` or a `packet =
   head[slot];` that the inner `while` then tests, lets it rotate. libVCT's `VCT_FlushAllQueues` (`vct_buffer.c`) matches

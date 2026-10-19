@@ -1016,6 +1016,9 @@ which showed it too and came within a byte under `optimization_level 1` or `2`, 
 `_Shake`, a field loaded ahead of a condition's other loads, where `opt_propagation`, `opt_lifetimes`,
 `opt_dead_assignments`, `scheduling` and `peephole` off changed nothing (matching.md: "is a global common
 subexpression, loaded into a").
+They match with `ATTRIBUTE_ALIGN(4)` on their task structs' `work` member, written before the type, with
+no evidence in the ROM that the original aligned it: after the name, the functions that store `work` lose
+other optimizations (matching.md: "Where a member's alignment is written").
 `#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3` around one function alone matched
 overlay 139's `UpdateScroll`, a field's offset added before the index for two merged reads, where
 `opt_common_subs off` made it 4 bytes longer and `opt_lifetimes`, `opt_loop_invariants` and `opt_strength_reduction`
