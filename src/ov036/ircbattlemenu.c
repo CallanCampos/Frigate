@@ -571,7 +571,7 @@ static void func_ov036_0218d8c0(IrcMenuWork *wk) {
 }
 
 // Called by the touched button's actor once its animation ends
-static void func_ov036_0218d938(u32 param, fx32 frame) {
+static void func_ov036_0218d938(uptr param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 12) {
@@ -597,7 +597,7 @@ static void func_ov036_0218d9a8(IrcMenuWork *wk) {
     int index = wk->selected;
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = func_ov036_0218d938;
     if (index == 5) {
         index = 0;
@@ -689,7 +689,7 @@ static void func_ov036_0218db28(IrcMenuWork *wk) {
     func_ov036_0218d0ec(wk, func_ov036_0218e0bc, 1083);
 }
 
-static void func_ov036_0218db94(u32 param, fx32 frame) {
+static void func_ov036_0218db94(uptr param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 5) {
@@ -714,7 +714,7 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
         index = 1;
     }
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = func_ov036_0218db94;
     func_0204c520(wk->actors[index], TRUE);
     func_0204c5b0(wk->actors[index], &callback);
@@ -722,7 +722,7 @@ static void func_ov036_0218dbf0(IrcMenuWork *wk) {
     func_ov036_0218d0ec(wk, func_ov036_0218dbec, 1146);
 }
 
-static void func_ov036_0218dc44(u32 param, fx32 frame) {
+static void func_ov036_0218dc44(uptr param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     func_ov036_0218d0ec(wk, func_ov036_0218d7a8, 1155);
@@ -735,7 +735,7 @@ static void func_ov036_0218dc5c(IrcMenuWork *wk) {
     ClActorCallback callback;
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = func_ov036_0218dc44;
     func_0204c520(wk->actors[wk->selected], TRUE);
     func_0204c5b0(wk->actors[wk->selected], &callback);
@@ -781,7 +781,7 @@ static void func_ov036_0218dd30(IrcMenuWork *wk) {
     func_ov036_0218d0ec(wk, func_ov036_0218e0bc, 1237);
 }
 
-static void func_ov036_0218dda0(u32 param, fx32 frame) {
+static void func_ov036_0218dda0(uptr param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->choice == 2) {
@@ -805,7 +805,7 @@ static void func_ov036_0218ddec(IrcMenuWork *wk) {
     int index = indices[wk->choice];
 
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = func_ov036_0218dda0;
     func_0204c520(wk->actors[index], TRUE);
     func_0204c5b0(wk->actors[index], &callback);
@@ -860,7 +860,7 @@ static void func_ov036_0218ded0(IrcMenuWork *wk) {
     func_ov036_0218d0ec(wk, func_ov036_0218de50, 1366);
 }
 
-static void func_ov036_0218df3c(u32 param, fx32 frame) {
+static void func_ov036_0218df3c(uptr param, fx32 frame) {
     IrcMenuWork *wk = (IrcMenuWork *)param;
 
     if (wk->mode == 12) {
@@ -897,7 +897,7 @@ static void func_ov036_0218df98(IrcMenuWork *wk) {
         break;
     }
     callback.type = CLACT_CALLBACK_LAST_FRAME;
-    callback.param = (u32)wk;
+    callback.param = (uptr)wk;
     callback.func = func_ov036_0218df3c;
     func_0204c520(wk->actors[index], TRUE);
     func_0204c5b0(wk->actors[index], &callback);
