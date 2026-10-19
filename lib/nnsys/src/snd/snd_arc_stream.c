@@ -189,12 +189,16 @@ static struct {
 static NNSFndList sFreeCommandList;
 static OSMutex sDecodeMutex;
 static StrmCommand sStrmCommands[STRM_COMMAND_NUM];
-static u32 sDecodeBuffer[STRM_ADPCM_BUFFER_SIZE / sizeof(u32)];
+// The decoding buffer's explicit alignment is a guess, which the ROM can't show: 4 to 16 fit its address (0x1b0
+// bytes into a section at 0x02149950, so not 32). The card reads blocks into it, and NNS_SndArcStrmInit, which
+// takes the buffer's address, keeps its loops entered with a branch to the test only with an alignment
+static u32 sDecodeBuffer[STRM_ADPCM_BUFFER_SIZE / sizeof(u32)] ATTRIBUTE_ALIGN(4);
 static NNSSndArcStrmPlayer sPlayers[STRM_PLAYER_NUM];
 static StrmThread sThread;
 
 void NNS_SndArcStrmInit(u32 threadPrio, NNSSndHeapHandle heap) {
     int i;
+    int playerNo;
 
     if (sArcStrm.initialized) {
         SetupPlayers(heap);
@@ -209,13 +213,13 @@ void NNS_SndArcStrmInit(u32 threadPrio, NNSSndHeapHandle heap) {
     OS_InitMutex(&sDecodeMutex);
     sArcStrm.decodeBuffer = sDecodeBuffer;
 
-    for (i = 0; i < STRM_PLAYER_NUM; i++) {
-        NNSSndArcStrmPlayer *player = &sPlayers[i];
+    for (playerNo = 0; playerNo < STRM_PLAYER_NUM; playerNo++) {
+        NNSSndArcStrmPlayer *player = &sPlayers[playerNo];
 
         player->flags.active = FALSE;
         FS_InitFile(&player->file);
         NNS_SndStrmInit(&player->stream);
-        player->playerNo = i;
+        player->playerNo = playerNo;
         player->numChannels = 0;
         player->buffer = NULL;
         player->bufSize = 0;

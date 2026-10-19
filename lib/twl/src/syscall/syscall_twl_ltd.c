@@ -8,7 +8,7 @@ typedef struct {
     u32 keyLength;
 } SVCHMACSHA1Context;
 
-static void func_02769704(const void *input, void *digest, u32 len);
+static void func_02769704(void *digest, const void *input, u32 len);
 static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyLength);
 static void func_027697e0(SVCHMACSHA1Context *context, const void *input, u32 len);
 static void func_027697fc(SVCHMACSHA1Context *context, void *digest);
@@ -40,7 +40,7 @@ asm void func_027696f8(SVCSHA1Context *context, void *digest) {
 }
 
 // This BIOS entry point needs the one-shot SHA-1 SVC instruction.
-static asm void func_02769704(const void *input, void *digest, u32 len) {
+static asm void func_02769704(void *digest, const void *input, u32 len) {
     swi 0x27
     bx lr
 }
@@ -50,7 +50,6 @@ static asm void func_02769704(const void *input, void *digest, u32 len) {
 
 static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyLength) {
     u8 pad[64];
-    u8 *padPos;
     int i;
 
     if (context == NULL || (keyLength != 0 && key == NULL)) {
@@ -58,19 +57,18 @@ static void func_02769708(SVCHMACSHA1Context *context, const void *key, u32 keyL
     }
 
     if (keyLength > sizeof(context->key)) {
-        func_02769704(key, context->key, keyLength);
+        func_02769704(context->key, key, keyLength);
         context->keyLength = 20;
     } else {
         MI_CpuCopy8(key, context->key, keyLength);
         context->keyLength = keyLength;
     }
 
-    padPos = pad;
     for (i = 0; i < context->keyLength; i++) {
-        *padPos++ = context->key[i] ^ 0x36;
+        pad[i] = context->key[i] ^ 0x36;
     }
     for (; i < 64; i++) {
-        *padPos++ = 0x36;
+        pad[i] = 0x36;
     }
 
     func_027696e8(&context->sha1);
@@ -86,7 +84,6 @@ static void func_027697e0(SVCHMACSHA1Context *context, const void *input, u32 le
 static void func_027697fc(SVCHMACSHA1Context *context, void *digest) {
     u8 pad[64];
     u8 innerHash[20];
-    u8 *padPos;
     int i;
 
     if (context == NULL || digest == NULL) {
@@ -94,12 +91,11 @@ static void func_027697fc(SVCHMACSHA1Context *context, void *digest) {
     }
 
     func_027696f8(&context->sha1, innerHash);
-    padPos = pad;
     for (i = 0; i < context->keyLength; i++) {
-        *padPos++ = context->key[i] ^ 0x5c;
+        pad[i] = context->key[i] ^ 0x5c;
     }
     for (; i < 64; i++) {
-        *padPos++ = 0x5c;
+        pad[i] = 0x5c;
     }
 
     func_027696e8(&context->sha1);

@@ -2268,6 +2268,7 @@ lib/twl/src/scfg/scfg_proc.c:
     .bss        start:0x0214e280 end:0x0214e298
 
 lib/nitro/src/std/std_string.c:
+    complete
     .text       start:0x0207f7a4 end:0x02080070
 
 lib/nitro/src/std/std_sprintf.c:
