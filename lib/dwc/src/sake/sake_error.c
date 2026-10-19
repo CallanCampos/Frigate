@@ -77,13 +77,13 @@ void Sake_OnResponse(int status, int unused, SoapReader *reader, void *userData)
     }
     error = Sake_GetHttpResultError(status);
     if (error == SAKE_RESULT_SUCCESS) {
-        if (!func_ov011_02170d18(reader) || !func_ov011_02170d28(reader, request->type->responseName) ||
-            !func_ov011_02170e90(reader, request->type->resultName, result, sizeof(result))) {
+        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, request->type->responseName) ||
+            !gsXmlReadChildAsStringNT(reader, request->type->resultName, result, sizeof(result))) {
             error = SAKE_RESULT_MALFORMED_RESPONSE;
         } else {
             error = Sake_GetServerError(result);
             if (error == SAKE_RESULT_SUCCESS && request->type->outputSize != 0) {
-                request->output = func_ov011_0216dddc(request->type->outputSize);
+                request->output = gsimalloc(request->type->outputSize);
                 if (request->output != NULL) {
                     request->response = reader;
                     error = request->type->parse(request);
@@ -102,7 +102,7 @@ void Sake_OnResponse(int status, int unused, SoapReader *reader, void *userData)
     if (request->type->freeOutput != NULL) {
         request->type->freeOutput(request);
     }
-    func_ov011_0216ddfc(request->output);
+    gsifree(request->output);
     request->output = NULL;
     Sake_FreeRequest(request);
 }
@@ -115,24 +115,24 @@ int Sake_BuildMessage(SakeRequest *request) {
     if (error != 0) {
         return error;
     }
-    request->writer = func_ov011_0216fbf8(sSakeNamespaceDeclarations, 1);
+    request->writer = gsXmlCreateStreamWriter(sSakeNamespaceDeclarations, 1);
     if (request->writer == NULL) {
         return SAKE_REQUEST_ERROR_OUT_OF_MEMORY;
     }
-    func_ov011_02170614(request->writer, "ns1", request->type->name);
-    func_ov011_02170818(request->writer, "ns1", "gameid", request->sake->gameId);
-    func_ov011_021706b8(request->writer, "ns1", "secretKey", request->sake->secretKey);
-    func_ov011_021706b8(request->writer, "ns1", "loginTicket", request->sake->loginTicket.data);
+    gsXmlWriteOpenTag(request->writer, "ns1", request->type->name);
+    gsXmlWriteIntElement(request->writer, "ns1", "gameid", request->sake->gameId);
+    gsXmlWriteStringElement(request->writer, "ns1", "secretKey", request->sake->secretKey);
+    gsXmlWriteStringElement(request->writer, "ns1", "loginTicket", request->sake->loginTicket.data);
     error = type->build(request);
     if (error != 0) {
-        func_ov011_0216fe64(request->writer);
+        gsXmlFreeWriter(request->writer);
         request->writer = NULL;
         if (type->freeOutput != NULL) {
             type->freeOutput(request);
         }
         return error;
     }
-    func_ov011_02170660(request->writer, "ns1", request->type->name);
-    func_ov011_0216fea8(request->writer);
+    gsXmlWriteCloseTag(request->writer, "ns1", request->type->name);
+    gsXmlCloseWriter(request->writer);
     return 0;
 }

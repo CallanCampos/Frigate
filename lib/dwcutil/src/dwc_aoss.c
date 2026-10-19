@@ -1,4 +1,4 @@
-#include "dwc_aoss.h"
+#include "dwcutil/dwc_aoss.h"
 #include "dwc/ext.h"
 #include "dwc_aoss_ap.h"
 #include "dwc_wcm.h"
@@ -268,8 +268,8 @@ int DWC_Aoss_Start(AossParam *param) {
     int result;
 
     if (param->scanCount == 0 || param->scanCount < -1 || param->scanDelay < -1 || param->sendCount == 0 ||
-        param->sendCount < -1 || param->sendDelay < -1 || param->timeout < -1 || param->length == 0 ||
-        param->length > 0x100 || param->data[param->length - 1] != 0) {
+        param->sendCount < -1 || param->sendDelay < -1 || param->timeout < -1 || param->client.length == 0 ||
+        param->client.length > 0x100 || param->client.data[param->client.length - 1] != 0) {
         result = -1;
     } else {
         result = 0;
@@ -779,10 +779,10 @@ static void Aoss_Begin(AossParam *param) {
     Mem_Fill(sPeerMac, 0, 8);
     sAoss.error = 1;
     Mem_Fill(&sAoss.request, 0, sizeof(AossRequest));
-    sAoss.request.data = param->data;
-    sAoss.request.length = param->length;
+    sAoss.request.data = param->client.data;
+    sAoss.request.length = param->client.length;
     sAoss.request.wanted = param->types & 0xf;
-    sAoss.request.version = param->version;
+    sAoss.request.version = param->client.version;
     sAoss.request.found = 0;
     sAoss.request.addr = AOSS_ROUTER_ADDR;
     sAoss.request.reconnected = 0;

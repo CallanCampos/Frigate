@@ -1,0 +1,262 @@
+// The Funfest's field gimmick: loads the overlay of the festival's current mission when the field starts and hands
+// the mission its calls. The name is the ROM's own, from GFL_HeapAllocate's file argument. Names from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+#include "types.h"
+#include "field/fest_mission_gimmick.h"
+#include "field/fest_mission_hollow.h"
+#include "field/fest_mission_people.h"
+#include "field/fest_mission_sparkle.h"
+#include "field/festival.h"
+#include "field/field.h"
+#include "field/field_effect.h"
+#include "field/field_nogrid_mapper.h"
+#include "field/field_player.h"
+#include "field/rival_select.h"
+#include "gfl/heap.h"
+#include "gfl/overlay.h"
+#include "gfl/std.h"
+#include "save/event_work.h"
+#include "system/fest_mission.h"
+#include "system/game_data.h"
+#include "system/game_system.h"
+
+// The kinds of mission that run on the field, FestMissionHeader's kind
+#define MISSION_FLAGS 2
+#define MISSION_HOLLOW 3
+#define MISSION_SPARKLE 4
+#define MISSION_PEOPLE 5
+
+// The event flags that the first kind of mission clears when it ends
+#define FIRST_MISSION_FLAG 0x3a1
+#define MISSION_FLAG_COUNT 12
+
+static void FesGimmick_SetEnabled(FesGimmick *gimmick, BOOL enabled);
+static void ClearFesEventFlags(FesGimmick *gimmick);
+
+void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId) {
+    FesGimmick *gimmick = GFL_HeapAllocate(heapId, sizeof(FesGimmick), TRUE, "fes_gimmick.c", 74);
+    NoGridMapper *mapper;
+
+    gimmick->gsys = gsys;
+    gimmick->gameData = GSYS_GetGameData(gsys);
+    gimmick->festival = GSYS_GetLinkFestival(gsys);
+    gimmick->mission = GetFestMissionCfg(gimmick->festival);
+    gimmick->work = (FesMissionWork *)LinkFestival_GetEntries(gimmick->festival);
+    gimmick->field = field;
+    gimmick->eventData = GameData_GetEventData(gimmick->gameData);
+    gimmick->eventWork = GameData_GetEventWork(gimmick->gameData);
+    mapper = Field_GetNoGridMapper(field);
+    if (mapper != NULL) {
+        gimmick->railSystem = FieldNoGridMapper_GetRailSystem(mapper);
+    }
+    FesGimmick_SetEnabled(gimmick, TRUE);
+    return gimmick;
+}
+
+void FesGimmick_Free(void *gimmick) {
+    FesGimmick_SetEnabled(gimmick, FALSE);
+    MI_CpuFill8(gimmick, 0, sizeof(FesGimmick));
+    GFL_HeapFree(gimmick);
+}
+
+static void FesGimmick_SetEnabled(FesGimmick *gimmick, BOOL enabled) {
+    if (enabled) {
+        u32 overlayId;
+
+        if (getStatusOfFesMission(gimmick->festival)) {
+            switch (gimmick->mission->header.kind) {
+            case MISSION_SPARKLE:
+                overlayId = OVERLAY_ID(71);
+                break;
+            case MISSION_PEOPLE:
+                overlayId = OVERLAY_ID(72);
+                break;
+            case MISSION_HOLLOW:
+                overlayId = OVERLAY_ID(73);
+                break;
+            default:
+                return;
+            }
+            gimmick->overlayLoaded = TRUE;
+            gimmick->overlayId = overlayId;
+            GFL_OvlLoad(overlayId);
+        }
+    } else if (gimmick->overlayLoaded) {
+        GFL_OvlUnload(gimmick->overlayId);
+        gimmick->overlayLoaded = FALSE;
+    }
+}
+
+void FesGimmick_BindActorSystem(void *gimmick, MMSys *actorSystem) {
+    FesGimmick *fes = gimmick;
+
+    fes->actors = actorSystem;
+    if (getStatusOfFesMission(fes->festival)) {
+        if (fes->mission->header.kind == MISSION_PEOPLE) {
+            func_ov072_021e8be0(fes, fes->work);
+        }
+    }
+}
+
+void FesGimmick_BindPlayer(void *gimmick, void *effects, FieldPlayer *player) {
+    FesGimmick *fes = gimmick;
+
+    fes->effects = effects;
+    fes->player = player;
+    fes->playerActor = FieldPlayer_GetActor(player);
+    fes->unk3C = func_ov036_021a5bb4(fes->effects);
+}
+
+void func_ov036_021b65d4(void *gimmick) {
+    FesGimmick *fes = gimmick;
+
+    if (fes->unk3C != NULL) {
+        func_ov036_021a3a70(fes->unk3C);
+        fes->unk3C = NULL;
+    }
+}
+
+void func_ov036_021b65e8(void *gimmick) {
+    FesGimmick *fes = gimmick;
+
+    if (getStatusOfFesMission(fes->festival)) {
+        MI_CpuFill8(LinkFestival_GetEntries(fes->festival), 0, sizeof(FesMissionWork));
+        switch (fes->mission->header.kind) {
+        case MISSION_FLAGS:
+            ClearFesEventFlags(fes);
+            break;
+        case MISSION_HOLLOW:
+            if (FesMissionHollow_IsActive(gimmick)) {
+                FesMissionHollow_Setup(gimmick);
+            }
+            break;
+        case MISSION_PEOPLE:
+            FesMissionPeople_LoadSpecies(fes, fes->work);
+            break;
+        }
+    }
+}
+
+static void ClearFesEventFlags(FesGimmick *gimmick) {
+    int flag;
+
+    for (flag = FIRST_MISSION_FLAG; flag <= FIRST_MISSION_FLAG + MISSION_FLAG_COUNT - 1; flag++) {
+        EventWork_FlagReset(gimmick->eventWork, flag);
+    }
+}
+
+void func_ov036_021b6660(void *gimmick) {
+    FesGimmick *fes = gimmick;
+
+    if (getStatusOfFesMission(fes->festival)) {
+        switch (fes->mission->header.kind) {
+        case MISSION_SPARKLE:
+            func_ov072_021e8be0(fes, fes->work);
+            break;
+        case MISSION_PEOPLE:
+            func_ov072_021e8bf8(fes, fes->work);
+            break;
+        }
+    }
+}
+
+BOOL func_ov036_021b6690(void *gimmick) {
+    FesGimmick *fes = gimmick;
+    RivalEntry *work = LinkFestival_GetEntries(fes->festival);
+
+    if (!getStatusOfFesMission(fes->festival)) {
+        return FALSE;
+    }
+    switch (fes->mission->header.kind) {
+    case MISSION_SPARKLE:
+        return FestSparkle_End(gimmick, (FestSparkleWork *)work);
+    case MISSION_PEOPLE:
+        return func_ov072_021e8c3c(gimmick, (FesMissionWork *)work);
+    case MISSION_HOLLOW:
+        return func_ov073_021e8c4c(gimmick);
+    default:
+        return FALSE;
+    }
+}
+
+BOOL FesGimmick_IsCurrent(void *gimmick, u32 type) {
+    FesGimmick *fes = gimmick;
+
+    if (getStatusOfFesMission(fes->festival)) {
+        if (fes->mission->header.kind == type) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    return FALSE;
+}
+
+GameEvent *func_ov036_021b6700(void *gimmick, const VecFx32 *position) {
+    FesGimmick *fes = gimmick;
+
+    if (!getStatusOfFesMission(fes->festival)) {
+        return NULL;
+    }
+    if (fes->mission->header.kind == MISSION_SPARKLE) {
+        return FestSparkle_CheckPickUpGrid(gimmick, position);
+    }
+    return NULL;
+}
+
+GameEvent *func_ov036_021b672c(void *gimmick, const RailPosition *position) {
+    FesGimmick *fes = gimmick;
+
+    if (!getStatusOfFesMission(fes->festival)) {
+        return NULL;
+    }
+    if (fes->mission->header.kind == MISSION_SPARKLE) {
+        return FestSparkle_CheckPickUpRail(gimmick, position);
+    }
+    return NULL;
+}
+
+BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height) {
+    FesGimmick *fes = gimmick;
+
+    if (!getStatusOfFesMission(fes->festival)) {
+        return FALSE;
+    }
+    if (fes->mission->header.kind == MISSION_SPARKLE) {
+        return FestSparkle_IsOnTile(gimmick, x, z, height);
+    }
+    return FALSE;
+}
+
+void DeleteFunfestActor(void *gimmick, u16 zoneId, u8 actorIndex) {
+    FesGimmick *fes = gimmick;
+    RivalEntry *work = LinkFestival_GetEntries(fes->festival);
+
+    if (getStatusOfFesMission(fes->festival)) {
+        if (fes->mission->header.kind == MISSION_PEOPLE) {
+            func_ov072_021e8c08(fes, (FesMissionWork *)work, zoneId, actorIndex);
+        }
+    }
+}
+
+u32 func_ov036_021b67bc(void *gimmick) {
+    FesGimmick *fes = gimmick;
+
+    if (FesGimmick_IsCurrent(gimmick, MISSION_PEOPLE)) {
+        return FesMissionPeople_IsOnSale(fes->mission);
+    }
+    return 0;
+}
+
+void func_ov036_021b67d8(void *gimmick, PokeParty *party) {
+    if (FesGimmick_IsCurrent(gimmick, MISSION_PEOPLE)) {
+        func_ov072_021e8c74(gimmick, party);
+    }
+}
+
+BOOL hollowFesMissions(void *gimmick, u32 id) {
+    if (FesGimmick_IsCurrent(gimmick, MISSION_HOLLOW) && FesMissionHollow_IsActive(gimmick) &&
+        func_ov073_021e8d00(gimmick, id) != 10) {
+        return TRUE;
+    }
+    return FALSE;
+}
