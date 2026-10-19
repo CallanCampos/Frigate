@@ -45,7 +45,7 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
         GameEvent_ChainNext(event, transition);
         if (GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm) == 1 &&
             !GameCommSys_IsTransitioning(work->comm)) {
-            func_ov030_02174108(1);
+            NetWhpipe_SetSearchPaused(1);
             work->communicationFlag = 1;
         }
         (*state)++;
@@ -99,7 +99,7 @@ GameEventReturnCode EventFestival_Callback(GameEvent *event, u32 *state, void *d
     }
     case 7:
         if (work->communicationFlag && GFL_NetIsInitialized() == 1 && func_ov036_02180f80(work->comm)) {
-            func_ov030_02174108(0);
+            NetWhpipe_SetSearchPaused(0);
             work->communicationFlag = 0;
         }
         return GAMEEVENT_DONE;

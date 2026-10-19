@@ -205,7 +205,7 @@ static void WH_StateOutStartParent(void *arg) {
             if (_pWmInfo->sDisconnectCallback != NULL) {
                 _pWmInfo->sDisconnectCallback(cb->aid);
             }
-            func_ov030_02174088();
+            NetWhpipe_StopIfLocked();
             NetHandle_Forget(cb->aid);
             NetHandle_RequestReply(cb->aid);
         }

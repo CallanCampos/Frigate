@@ -283,7 +283,7 @@ void UnionComm_Main(u32 *seq, void *param, void *work) {
     }
     if (GFL_NetIsInitialized()) {
         if (unisys->beaconReady == 1) {
-            func_ov030_02173780();
+            NetWhpipe_UpdateGameBeacon();
             unisys->beaconReady = 0;
         }
         UnionComm_ReceiveBeacons(unisys);
@@ -396,7 +396,7 @@ static void UnionComm_ReceiveBeacons(UnionSystem *unisys) {
             if (mac != NULL) {
                 UnionComm_AddBeacon(unisys, beacon, mac);
             }
-            func_ov030_02173bec(i);
+            NetWhpipe_ConsumeBeacon(i);
         }
     }
 }

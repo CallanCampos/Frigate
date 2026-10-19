@@ -799,7 +799,7 @@ static void CtvtCall_Scan(CommTvtWork *sys, CtvtCall *call) {
             if (beacon != NULL) {
                 int slot = CTVT_CALL_NONE;
                 u8 *mac = GFL_NetGetBeaconMac(i);
-                u8 service = func_ov030_02173b78(i);
+                u8 service = NetWhpipe_GetBeaconService(i);
                 BOOL friend;
                 u8 j, k;
 

@@ -225,7 +225,7 @@ static BeaconSearchFound *GameBeaconSearch_ScanBeacons(BeaconSearchWork *work, i
         beacon = GameBeaconSearch_FindJoinableBeacon(work, index);
         if (beacon != NULL) {
             if (beacon->unk2_0) {
-                func_ov030_02173bec(*index);
+                NetWhpipe_ConsumeBeacon(*index);
             } else if (beacon->unk2_1 == 1) {
                 MI_CpuFill8(found, 0, sizeof(BeaconSearchFound));
                 found->type = beacon->type;
@@ -237,7 +237,7 @@ static BeaconSearchFound *GameBeaconSearch_ScanBeacons(BeaconSearchWork *work, i
                 }
             } else if (beacon->unk2_1 == 2) {
                 GameBeaconSys_Receive(&beacon->data);
-                func_ov030_02173bec(*index);
+                NetWhpipe_ConsumeBeacon(*index);
             }
         }
     }
@@ -255,7 +255,7 @@ static BeaconSearchBeacon *GameBeaconSearch_FindJoinableBeacon(BeaconSearchWork 
     BeaconSearchBeacon *beacon;
 
     for (i = 0; i < 16; i++) {
-        type = func_ov030_021740a4(i);
+        type = NetWhpipe_GetBeaconCommandBase(i);
         if (type != 0x35 && type != 3) {
             continue;
         }
@@ -273,7 +273,7 @@ static BeaconSearchBeacon *GameBeaconSearch_FindJoinableBeacon(BeaconSearchWork 
                 best = i;
             }
         } else {
-            func_ov030_02173bec(i);
+            NetWhpipe_ConsumeBeacon(i);
         }
     }
     if (best != -1) {
