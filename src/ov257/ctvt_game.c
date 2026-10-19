@@ -815,7 +815,7 @@ void CtvtGame_LoadBalloonPictures(CtvtGame *game, u8 netId, u8 color) {
         } else {
             src = game->members[slot].pictures[i];
         }
-        NNS_GfdRegisterNewVramTransferTask(0, dest, src, 0x2000);
+        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, dest, src, 0x2000);
     }
 }
 
@@ -2328,7 +2328,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
             } else {
                 src = game->members[slot].pictures[picture];
             }
-            NNS_GfdRegisterNewVramTransferTask(0, dest, src, 0x2000);
+            NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, dest, src, 0x2000);
         }
         if (selfNetId != netId) {
             slot++;

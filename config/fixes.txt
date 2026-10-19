@@ -762,7 +762,11 @@ ltd_autoload_0 0x02704254 reloc_addend 0x4c
 ltd_autoload_0 0x0270430c reloc_addend 0x48
 ltd_autoload_0 0x02704310 reloc_addend 0x40
 ltd_autoload_0 0x02704440 reloc_addend 0x1c
+ltd_autoload_0 0x02704440 remove_reloc
+ltd_autoload_0 0x02704440 add_reloc load,ltd_autoload(0),0x0276c5ac
 ltd_autoload_0 0x02704444 reloc_addend 0x3c
+ltd_autoload_0 0x02704444 remove_reloc
+ltd_autoload_0 0x02704444 add_reloc load,ltd_autoload(0),0x0276c5cc
 ltd_autoload_0 0x027052fc add_function func_027052fc:arm:0x24
 ltd_autoload_0 0x0270531c remove_symbol
 ltd_autoload_0 0x027674a0 add_data CARDi_NdmaInterface
@@ -786,8 +790,18 @@ ltd_autoload_0 0x0276c2fc remove_symbol
 ltd_autoload_0 0x0276c560 remove_symbol
 ltd_autoload_0 0x0276c568 remove_symbol
 ltd_autoload_0 0x0276c56c remove_symbol
+ltd_autoload_0 0x0276c594 add_data sFilterBusy
+ltd_autoload_0 0x0276c598 add_data sVolumeRetries
+ltd_autoload_0 0x0276c59c add_data sState
+ltd_autoload_0 0x0276c5a0 add_data sVolumeCallbackRetries
+ltd_autoload_0 0x0276c5a4 add_data sVolumePending
+ltd_autoload_0 0x0276c5a8 add_data sFilterEndSent
 ltd_autoload_0 0x0276c5ac remove_symbol
+ltd_autoload_0 0x0276c5ac add_data sExitInfo
+ltd_autoload_0 0x0276c5bc add_data sNotify
 ltd_autoload_0 0x0276c5cc remove_symbol
+ltd_autoload_0 0x0276c5cc add_data sSleepInfo
+ltd_autoload_0 0x0276c5dc add_data sRequest
 ltd_autoload_0 0x0276dbe0 add_data sGraphicsAsync
 ltd_autoload_0 0x0276dbe4 add_data sGraphicsCallback
 ltd_autoload_0 0x0276dbe8 add_data sGraphicsBusy

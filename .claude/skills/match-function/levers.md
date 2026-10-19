@@ -326,9 +326,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   be in the lower half of its own object; an unknown index counts as 0. A store kept below one through a pointer, as
   in the original, can need its field in the upper half of a smaller struct. (matching.md: "below half the object's
   size")
-- A struct field's load above an indexed store that its offset can't give: the fields are separate statics, each at
-  offset 0 of its own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its
-  own object")
+- A struct field's load above an indexed store that its offset can't give, or a reload that ours schedules between two
+  stores to fields where the original reloads after both: the fields are separate statics, each at offset 0 of its
+  own object, and a size-sorted `.bss` asks for `-ipa file`. (matching.md: "each at offset 0 of its own object")
 - A table's row offset added to its address before the column (`add r0, table, row*3; ldrb [col, r0]`), where ours
   adds it to the column: a two-dimensional table indexed `[row][col]`. (matching.md: "A two-dimensional table
   indexed")
@@ -626,6 +626,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   compare")
 - A constant loaded again and multiplied a second time where ours reuses the product: the two uses differ in
   signedness (`u32 q` and `(int)q * C`). (matching.md: "does not merge a signed and an unsigned multiply")
+- An index's product computed again where ours shares one: for a `u16` index only an `(int)` or `(long)` use splits
+  it; `(u32)`, `(unsigned long)` and `(u16)` change nothing. (matching.md: "A `u16` index widens as unsigned")
 - An array's end as one folded constant (`add #0x5c; add #0x400`) where ours adds the member offset and the size
   apart: `&p->arr[N]`, not `(u8 *)p->arr + sizeof(p->arr)`. (matching.md: "The end of an array member")
 - `add rN, sp, #0; add rN, rN, #4` for a stack struct's field: pass the struct as words to an inline that indexes them.
@@ -1017,7 +1019,10 @@ subexpression, loaded into a").
 `#pragma opt_propagation off`, `opt_dead_assignments off` or `optimization_level 3` around one function alone matched
 overlay 139's `UpdateScroll`, a field's offset added before the index for two merged reads, where
 `opt_common_subs off` made it 4 bytes longer and `opt_lifetimes`, `opt_loop_invariants` and `opt_strength_reduction`
-off changed nothing (matching.md: "that MWCC shares between two accesses").
+off changed nothing (matching.md: "that MWCC shares between two accesses"). The same three matched overlay 332's
+`CygnusData_GetEntry` with its type stored first (an array member's offset, `data + 0x18` indexed by `r4`), where
+`opt_common_subs off` did not. Both files also match whole at `-O3,p`, with only that function changed; a per-file
+`-O3,p` that nothing else shows is evidence, like the pragma, not a fix.
 
 An empty `if (a && b && c) {}` (three operands or more; two are removed early) or a discarded ternary statement
 splits the block where it stands and emits nothing. When a register or CSE difference looks like a missing block

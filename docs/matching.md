@@ -1260,7 +1260,10 @@ Same instructions, scheduled in another order.
   last, as in the original. `VCT_InitSessions` (`vct_session.c`) keeps its zero store into `sSessionState.mask`
   (offset 4) below the store through the free list's last link only with the state an 8-byte struct of `count` and
   `mask` and the request time a `u64` static beside it, which `-ipa file` pools right after the state; with the time
-  as the state's third field, the store moves above the link's.
+  as the state's third field, the store moves above the link's. The split moves a stack reload too, around stores at
+  constant offsets: TwlSDK's `SNDEX_SetIirFilter` (`sndex.c`) clears two flags and then reloads `result`, a local
+  whose address it passed to `OS_ReceiveMessage`. With the two flags as fields at 0x18 and 4 of a 0x5c-byte struct,
+  the reload goes between the two stores, and with them separate statics it stays after both, as in the original.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
   NitroSDK's `SNDi_InitSharedWork` (`snd_work.c`) copies its parameter to a saved register before it builds the zero it
   stores (`adds r4, r0, #0; movs r1, #0`) only with `SNDSharedWork`'s status words `volatile`, as NitroSDK declares the
@@ -1544,7 +1547,11 @@ Same instructions, scheduled in another order.
   `adds r1, r0, #0; adds r1, #0x18; ldr r1, [r1, r4]`, and with `const` data a later pass drops the second load.
   A pointer local such as `entries = data->entries` is kept, not folded into `data`, once it has a use in a later
   block than its definition, but reads with no store between are merged first. Overlay 332's
-  `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order (see its row).
+  `CygnusData_GetEntry` gets the original's loads this way, with its two stores in the other order. In the original's
+  order (`*type = data->entries[index].type; *id = ...;`) its two reads of the type are merged, and it matches byte
+  for byte only under one of the three pragmas, like `UpdateScroll` (see both rows). Each file also matches whole at
+  `-O3,p`, where only that one function's code differs from `-O4,p` (data and relocations byte-identical), which is
+  not used: nothing else in either file shows the setting, and the files beside them lose functions at `-O3,p`.
 - Two fields of one element of a static table read from the same base, one as `ldr r0, [r1, r2]` and the other
   after `adds r1, r1, r2; ldrb r1, [r1, #4]`, are a plain read and a read through an inline taking an `int` index.
   Written plainly, the second field's offset folds into the table's literal (`sMenuInfo+4`); through an element
@@ -2147,7 +2154,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BOOL visible = FALSE;` a function-level `BOOL visible;` declared first and assigned at the top of the loop body.
   A product computed again in a register shows it too: libVCT's `VCT_UpdateTiming` (`vct_buffer.c`) loads 0x8b18 again
   and multiplies a second time for `playoutDelay` after the signed `delayFloor = (int)quotient * 0x8b18 - 0x458c`,
-  with `u32 quotient`.
+  with `u32 quotient`. A `u16` index widens as unsigned, so a `(u32)`, `(unsigned long)` or `(u16)` cast on one of its
+  subscripts compiles the same as none and shares the others' product, while `(int)` or `(long)` splits it off: with a
+  `u16` stack parameter, `T[(int)i].b` after `T[i].c` loads `i` again and shifts it again. `mystery_album.c`'s
+  `MysteryCardView_DrawCard` recomputes its cursor's `index * 8` that way with `(int)` on the y read, as the original
+  does, but MWCC then also reads `index` from its home slot with `ldr` rather than loading it at entry with `ldrh`, so
+  that cast is not the original's spelling.
 - A field loaded again with no call or store in between, where ours keeps the first load alive across an `if`, is a
   second read through a `static inline` that takes a pointer to `const`: a load through a `const` pointer is a
   different expression from the plain read, so the two are not shared. The Wi-Fi login's `WifiLoginMessage_PrintFrom`
