@@ -8,7 +8,7 @@
 #include "struct_decls.h"
 
 // Rolls what the grotto holds, and fills it
-void generateHollow(RivalDataSave *data, u32 hollow);
+void generateHollow(RivalDataSave *data, u8 hollow);
 BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env);
 BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env);
 BOOL s0293_HiddenHollowCallWarpIn(VM *vm, FieldScriptEnv *env);

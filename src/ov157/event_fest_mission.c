@@ -12,6 +12,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "field/field_sound.h"
 #include "field/townmap_util.h"
 #include "gfl/heap.h"

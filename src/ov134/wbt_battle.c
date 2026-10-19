@@ -12,6 +12,7 @@
 #include "field/battle_facility.h"
 #include "field/bsubway_scr.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/wbt.h"
 #include "gfl/bg_sys.h"

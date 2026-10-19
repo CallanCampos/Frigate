@@ -82,6 +82,15 @@ static void func_ov036_02196080(FieldActor *actor);
 static void func_ov036_021960b8(FieldActor *actor);
 static void func_ov036_021961f8(FieldActor *actor);
 
+// The rail actors' turns and their first action command, done by fldmmdl_g3dobj.c's functions;
+// ACTOR_ACTION_COMMAND_TABLES_RAIL (fldmmdl_movedata.c) lists them with the rest of this file's tables
+const ActorAcmdTurnFuncs data_ov036_021cf374 = { func_ov036_02194f4c, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf37c = { func_ov036_02194f40, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf384 = { func_ov036_02194f28, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf38c = { func_ov036_02194f34, func_ov036_02194ee8 };
+const ActorAcmdTurnFuncs data_ov036_021cf394 = { func_ov036_02194ef8, func_ov036_02194ee8 };
+const ActorAcmdFuncs data_ov036_021cf39c = { func_ov036_021952bc, func_ov036_02195168, func_ov036_02194ee8 };
+
 const ActorAcmdFuncs data_ov036_021cf3a8 = { func_ov036_02195528, func_ov036_02195378, func_ov036_02194ee8 };
 const ActorAcmdFuncs data_ov036_021cf3b4 = { func_ov036_0219519c, func_ov036_02195168, func_ov036_02194ee8 };
 const ActorAcmdFuncs data_ov036_021cf3c0 = { func_ov036_0219526c, func_ov036_02195168, func_ov036_02194ee8 };
@@ -447,12 +456,12 @@ FieldActor *func_ov036_0219584c(MMSys *mmSys, const RailPosition *pos, BOOL chec
     return NULL;
 }
 
-void func_ov036_02195928(FieldActor *actor, RailPosition *position) {
+BOOL func_ov036_02195928(FieldActor *actor, RailPosition *position) {
     ActorRailWork *rail;
 
     FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
     rail = RAIL_WORK(actor);
-    func_ov036_021b0814(rail->unit, ConvDirToRailDir(GetActorFaceDir(actor)), position, NULL);
+    return func_ov036_021b0814(rail->unit, ConvDirToRailDir(GetActorFaceDir(actor)), position, NULL);
 }
 
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position) {

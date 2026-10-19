@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/fld_faceup.h"
 #include "gfl/arc.h"

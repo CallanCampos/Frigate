@@ -1,14 +1,11 @@
-// The encounter effects: the table of every effect's event, which EncEff_StartEvent starts after loading the overlays
-// it needs, and the BGM and effect that a battle picks. The name is the ROM's own, from GFL_HeapAllocate's file
-// argument. Function and table names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The encounter effects: EncEff_StartEvent starts an effect's event from enceff_data.c's table after loading the
+// overlays it needs, and the BGM and effect that a battle picks. The name is the ROM's own, from GFL_HeapAllocate's
+// file argument. Function and table names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "battle/trainer_data.h"
 #include "constants/pokemon.h"
 #include "field/encounter.h"
 #include "field/encounter_effect.h"
-#include "field/encounter_effect_model.h"
-#include "field/encounter_effect_ripple.h"
-#include "field/event_encounter_cutin.h"
 #include "field/field.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
@@ -26,7 +23,6 @@
 #include "system/game_system.h"
 
 #define ENCEFF_OVERLAYS 3
-#define ENCEFF_COUNT 38
 #define MAX_TRAINER_IDS 50
 #define BOXES 24
 
@@ -38,19 +34,6 @@ struct EncEff {
     s32 overlayCount;
     void *workArea;
 };
-
-typedef GameEvent *(*EncEffCreateFunc)(GameSystem *gsys, Field *field, u32 param);
-
-// What it takes to run an effect
-typedef struct {
-    EncEffCreateFunc create;
-    void (*render)(EncEff *effect);
-    // The overlay with the effect's code, or -1 for none
-    s32 overlay;
-    u32 param;
-    // The smallest part of the heap that is free for the effect to run
-    u32 heapSize;
-} EncEffInfo;
 
 // The trainer IDs of the Pokémon that did not come from the player, without repeats
 typedef struct {
@@ -81,47 +64,6 @@ static const u16 SPECIAL_TRAINER_BGM[14] = { 0x46c, 0x46f, 0x479, 0x4ee, 0x46a, 
 static const u8 SPECIAL_TRAINER_ENCEFF[32] = { 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15,
                                                0x16, 0x05, 0x0a, 0x05, 0x18, 0x19, 0x1a, 0x1a, 0x1a, 0x1a, 0x17,
                                                0x1b, 0x1e, 0x1f, 0x05, 0x05, 0x09, 0x09, 0x00, 0x00, 0x00 };
-
-static const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
-    /* 0 */ { (EncEffCreateFunc)EventEncountEffectCutin_Create01, EncEffModel_Render, 149, 1, 0x13010 },
-    /* 1 */ { (EncEffCreateFunc)EncEffModel_CreateModel9, EncEffModel_Render, 149, 1, 0x131a4 },
-    /* 2 */ { (EncEffCreateFunc)EncEffRipple_CreateWhite, EncEffRipple_ClearAndDraw, 151, 1, 0x0 },
-    /* 3 */ { EventEncountEffectCutin_Create25, NULL, 146, 0, 0x1e04 },
-    /* 4 */ { EventEncountEffectCutin_Create26, NULL, 146, 1, 0x14bc8 },
-    /* 5 */ { (EncEffCreateFunc)EncEffModel_CreateModel5, EncEffModel_Render, 149, 1, 0x12fbc },
-    /* 6 */ { EventEncountEffectCutin_Create05, EncEffModel_Render, 149, 1, 0x13b20 },
-    /* 7 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 152, 0, 0x0 },
-    /* 8 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
-    /* 9 */ { (EncEffCreateFunc)EncEffCells_Create, EncEffGrid_ClearAndDraw, 153, 1, 0x0 },
-    /* 10 */ { EventEncountEffectCutin_Create00, NULL, 146, 0, 0xe570 },
-    /* 11 */ { EventEncountEffectCutin_Create01, NULL, 146, 0, 0xe570 },
-    /* 12 */ { EventEncountEffectCutin_Create02, NULL, 146, 0, 0xe570 },
-    /* 13 */ { EventEncountEffectCutin_Create03, NULL, 146, 0, 0xe570 },
-    /* 14 */ { EventEncountEffectCutin_Create04, NULL, 146, 0, 0xe570 },
-    /* 15 */ { EventEncountEffectCutin_Create05, NULL, 146, 0, 0xe570 },
-    /* 16 */ { EventEncountEffectCutin_Create06, NULL, 146, 0, 0xe570 },
-    /* 17 */ { EventEncountEffectCutin_Create07, NULL, 146, 0, 0xe570 },
-    /* 18 */ { EventEncountEffectCutin_Create08, NULL, 146, 0, 0xe570 },
-    /* 19 */ { EventEncountEffectCutin_Create09, NULL, 146, 0, 0x12a68 },
-    /* 20 */ { EventEncountEffectCutin_Create10, NULL, 146, 0, 0x12a68 },
-    /* 21 */ { EventEncountEffectCutin_Create11, NULL, 146, 0, 0x12a68 },
-    /* 22 */ { EventEncountEffectCutin_Create12, NULL, 146, 0, 0x12a68 },
-    /* 23 */ { EventEncountEffectCutin_Create13, NULL, 146, 0, 0x12a68 },
-    /* 24 */ { EventEncountEffectCutin_Create15, NULL, 146, 0, 0xe570 },
-    /* 25 */ { EventEncountEffectCutin_Create14, NULL, 146, 0, 0xe570 },
-    /* 26 */ { EventEncountEffectCutin_Create16, NULL, 146, 0, 0xcf20 },
-    /* 27 */ { EventEncountEffectCutin_Create17, NULL, 146, 0, 0xd530 },
-    /* 28 */ { EventEncountEffectCutin_Create18, NULL, 146, 0, 0xcf20 },
-    /* 29 */ { EventEncountEffectCutin_Create19, NULL, 146, 0, 0xcf20 },
-    /* 30 */ { EventEncountEffectCutin_Create20, NULL, 146, 0, 0xe570 },
-    /* 31 */ { EventEncountEffectCutin_Create21, NULL, 146, 0, 0xe570 },
-    /* 32 */ { (EncEffCreateFunc)EncEffModel_CreateModel1, EncEffModel_Render, 149, 1, 0x132e8 },
-    /* 33 */ { EventEncountEffectCutin_Create22, NULL, 146, 1, 0x80e0 },
-    /* 34 */ { EventEncountEffectCutin_Create23, NULL, 146, 1, 0x619c },
-    /* 35 */ { EventEncountEffectCutin_Create24, NULL, 146, 1, 0xac88 },
-    /* 36 */ { (EncEffCreateFunc)EncEffModel_CreateZoroark, EncEffModel_Render, 149, 1, 0x12dc0 },
-    /* 37 */ { (EncEffCreateFunc)EncEffRipple_CreateBlack, EncEffRipple_ClearAndDraw, 151, 0, 0x0 },
-};
 
 EncEff *EncEff_Create(HeapID heapId, Field *field) {
     EncEff *encEff = GFL_HeapAllocate(heapId, sizeof(EncEff), TRUE, "enceff.c", 110);

@@ -1,6 +1,8 @@
 #include "types.h"
 #include "constants/pokemon.h"
+#include "constants/text_banks.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/union_msg.h"
 #include "gfl/arc.h"
 #include "gfl/clact.h"
@@ -15,6 +17,7 @@
 #include "system/gf_font.h"
 #include "system/poke_icon.h"
 #include "system/wordset.h"
+#include "text/system/0104.h"
 
 #define PARTY_SELECT_LIST_MAX 6
 
@@ -77,7 +80,11 @@ static void func_ov036_021c3aa4(PartySelectList *psl);
 static void func_ov036_021c3abc(PartySelectList *psl, PokeParty *party);
 static void func_ov036_021c3a70(PartySelectList *psl);
 
-static const u32 data_ov036_021d2508[6] = { 0, 0, 1, 1, 2, 2 };
+static const ListMenuRow data_ov036_021d2508[3] = {
+    { Bank0104_Text_Party, { 0 } },
+    { Bank0104_Text_BattleBox, { 1 } },
+    { Bank0104_Text_Cancel, { 2 } },
+};
 static const ListMenuRequest data_ov036_021d2520 = { 3, 3,   0,    0x0d, 0x1000, 0x2f, 0, 1, 0,
                                                      0, 0xc, 0x10, 0x12, 0xb,    0xd,  6, 0 };
 
@@ -412,7 +419,7 @@ static void func_ov036_021c38b4(PartySelectList *psl, u32 mode) {
 static void func_ov036_021c3924(PartySelectList *psl) {
     void *msgBGSys = Field_GetMsgBGSys(psl->field);
 
-    psl->msgData = func_ov036_021879a0(msgBGSys, 0x68);
+    psl->msgData = func_ov036_021879a0(msgBGSys, TEXT_BANK_0104);
     psl->msgBGSys = msgBGSys;
     psl->wordSet = GFL_WordSetSystemCreateDefault(psl->heapId);
 }

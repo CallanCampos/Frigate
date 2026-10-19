@@ -412,19 +412,28 @@ ZoneTrigger *FindTriggerAtPosRail(EventData *data, EventWork *eventWork, const R
     return NULL;
 }
 
-u32 GetTriggerSCRIDAtPosGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u32 direction) {
+u16 GetTriggerSCRIDAtPosGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u32 direction) {
     ZoneTrigger *trigger = FindTriggerAtPosGrid(data, eventWork, position, direction);
-    return trigger != NULL ? trigger->scrId : 0xffff;
+    if (trigger != NULL) {
+        return trigger->scrId;
+    }
+    return 0xffff;
 }
 
-u32 GetSCRIDOfCollidingTriggerAtLocation(EventData *data, EventWork *eventWork, const VecFx32 *position) {
+u16 GetSCRIDOfCollidingTriggerAtLocation(EventData *data, EventWork *eventWork, const VecFx32 *position) {
     ZoneTrigger *trigger = FindCollidingZoneTriggerAtLocation(data, eventWork, position);
-    return trigger != NULL ? trigger->scrId : 0xffff;
+    if (trigger != NULL) {
+        return trigger->scrId;
+    }
+    return 0xffff;
 }
 
-u32 GetTriggerSCRIDAtPosRail(EventData *data, EventWork *eventWork, const RailPosition *position) {
+u16 GetTriggerSCRIDAtPosRail(EventData *data, EventWork *eventWork, const RailPosition *position) {
     ZoneTrigger *trigger = FindTriggerAtPosRail(data, eventWork, position);
-    return trigger != NULL ? trigger->scrId : 0xffff;
+    if (trigger != NULL) {
+        return trigger->scrId;
+    }
+    return 0xffff;
 }
 
 void *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
@@ -432,7 +441,7 @@ void *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
     return data->entities;
 }
 
-s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction) {
+u16 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction) {
     ZoneBGEntity *entity;
     u32 count;
     u16 i;
@@ -498,11 +507,11 @@ s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *pos
     return 0xffff;
 }
 
-s32 CheckProxyEntityEventGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u16 direction) {
+u16 CheckProxyEntityEventGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u16 direction) {
     return CheckProxyEntityEvent(data, eventWork, position, direction);
 }
 
-s32 CheckProxyEntityEventRail(EventData *data, EventWork *eventWork, const RailPosition *position, u16 direction) {
+u16 CheckProxyEntityEventRail(EventData *data, EventWork *eventWork, const RailPosition *position, u16 direction) {
     return CheckProxyEntityEvent(data, eventWork, position, direction);
 }
 

@@ -11,6 +11,7 @@
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_menu.h"
+#include "field/field_msgbg.h"
 #include "field/field_pass_power.h"
 #include "field/fmission_log_accessor_fv.h"
 #include "field/fmission_view.h"
@@ -58,7 +59,6 @@
 
 #define OVERLAY_EVENT_FESTIVAL OVERLAY_ID(21)
 #define OVERLAY_EVENT_PASS_POWER OVERLAY_ID(14)
-#define OVERLAY_FIELD_PASS_POWER OVERLAY_ID(156)
 
 // What the view's event does before it hands over to the screen's event
 enum {

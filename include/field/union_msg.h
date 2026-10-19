@@ -23,14 +23,6 @@ void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, He
 void PokeRegulation_FreePrintMsg(void *rulesText);
 StrBuf *makeStrbufLoadBattleTypeText(Regulation *regulation, HeapID heapId);
 
-// Overlay 36's windows and menus that overlay 34 uses and field.h doesn't declare yet
-void func_ov036_02188b08(void *window);
-void func_ov036_02188b18(void *window, u32 x, u32 y, u32 messageId);
-void func_ov036_02188b44(void *window, u32 x, u32 y, StrBuf *strbuf);
-void func_ov036_02188b70(void *window, u32 x, u16 y, StrBuf *strbuf, u32 color);
-BOOL func_ov036_0218798c(void *msgBGSys);
-ListMenuOption *func_ov036_02187f0c(const void *rows, u32 count, MsgData *msgData, HeapID heapId);
-
 // The message IDs of the Union Room's texts, for a gender (0 or 1) or a language. The tables are of two IDs
 u16 UnionMsg_GetNoReplyMessage(UnionSystem *unisys);
 u16 UnionMsg_GetContactGreetingMessage(u8 gender);

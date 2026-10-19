@@ -2,9 +2,12 @@
 #define POKEBW2_FIELD_FIELD_PASS_POWER_H
 
 #include "types.h"
+#include "gfl/overlay.h"
 #include "struct_decls.h"
 
 // Overlay 156: the field's pass power events. The file's name is a guess; the ROM has no string for it.
+
+#define OVERLAY_FIELD_PASS_POWER OVERLAY_ID(156)
 
 // Activates a pass power and runs its script. args is two u32s: the pass power, and whether it is bought with Pass
 // Orbs (overlay 14's event_pass_power.c, a GameEventProvider)

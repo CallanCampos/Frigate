@@ -869,11 +869,11 @@ void func_ov012_0215ec28(FieldActor *actor) {
     }
 }
 
-s16 GetDirectionVectorCompX(u32 direction) {
+s16 GetDirectionVectorCompX(u16 direction) {
     return DIRECTION_VEC_X[direction];
 }
 
-s16 GetDirectionVectorCompZ(u32 direction) {
+s16 GetDirectionVectorCompZ(u16 direction) {
     return DIRECTION_VEC_Z[direction];
 }
 

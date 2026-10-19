@@ -48,6 +48,24 @@ struct EncEffGridParam {
     BOOL (*cellUpdate)(EncEffCell *cell);
 };
 
+#define ENCEFF_COUNT 38
+
+typedef GameEvent *(*EncEffCreateFunc)(GameSystem *gsys, Field *field, u32 param);
+
+// What it takes to run an effect
+typedef struct {
+    EncEffCreateFunc create;
+    void (*render)(EncEff *effect);
+    // The overlay with the effect's code, or -1 for none
+    s32 overlay;
+    u32 param;
+    // The smallest part of the heap that is free for the effect to run
+    u32 heapSize;
+} EncEffInfo;
+
+// Every encounter effect, by its ID, which EncEff_StartEvent runs
+extern const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT];
+
 void func_ov036_021c5ea0(EncEff *effect);
 // Loads overlay 148 alone, for the effects that draw the captured screen themselves
 void func_ov036_021c5ebc(EncEff *effect);

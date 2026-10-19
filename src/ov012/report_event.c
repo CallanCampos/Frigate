@@ -8,6 +8,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
+#include "field/field_msgbg.h"
 #include "field/field_player.h"
 #include "field/subscreen.h"
 #include "gfl/arc_util.h"

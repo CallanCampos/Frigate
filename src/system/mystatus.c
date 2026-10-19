@@ -93,11 +93,11 @@ void setTrainerGender(PlayerInfo *info, u32 gender) {
     info->gender = gender;
 }
 
-u32 getTrainerGender(PlayerInfo *info) {
+u32 getTrainerGender(const PlayerInfo *info) {
     return info->gender;
 }
 
-u8 func_02008bf4(PlayerInfo *info) {
+u8 func_02008bf4(const PlayerInfo *info) {
     return info->unk1C;
 }
 

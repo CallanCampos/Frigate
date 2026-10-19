@@ -104,7 +104,7 @@ void GymIcirrus_Init(Field *field) {
     for (i = 0; i < SWITCH_COUNT; i++) {
         matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, i);
         matrix->translation = sFirstPositions[i];
-        func_ov036_021b8248(expObj, 0, i, 1);
+        FieldExpObj_SetActorCulling(expObj, 0, i, 1);
         for (j = 0; j < 2; j++) {
             anm = FieldExpObj_GetAnmInfo(expObj, 0, i, j);
             FieldExpObjAnm_SetLooped(anm, FALSE);
@@ -113,7 +113,7 @@ void GymIcirrus_Init(Field *field) {
         model = i + SECOND_MODEL_OFFSET;
         matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, model);
         matrix->translation = sSecondPositions[i];
-        func_ov036_021b8248(expObj, 0, model, 1);
+        FieldExpObj_SetActorCulling(expObj, 0, model, 1);
         for (j = 0; j < 2; j++) {
             anm = FieldExpObj_GetAnmInfo(expObj, 0, model, j);
             FieldExpObjAnm_SetLooped(anm, FALSE);

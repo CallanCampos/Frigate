@@ -500,17 +500,20 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | complete | string at `0x021d4bc0` |
 | `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | partial | string at `0x021d4bd0` |
 | `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
-| `ctalkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | partial | string at `0x021d4c23` |
+| `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | partial | string at `0x021d4c24` |
 | `ircbattlemenu.c` | `0x0218d0e8`–`0x0218ed18` | 65 | partial | string at `0x021d4d24` |
-| `fldmmdl_acmd.c` | `0x0218ed18`–`0x02193680` | 430 | partial | string at `0x021d4d40` |
+| `fldmmdl_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | partial | string at `0x021d4d40` |
+| `fldmmdl_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
+| `fldmmdl_evtype.c` | `0x021925a4`–`0x02192a4c` | 17 | complete | descriptive |
+| `fldmmdl_movecode_pair.c` | `0x02192a4c`–`0x02193680` | 68 | complete | descriptive |
 | `fldmmdl_blact.c` | `0x02193680`–`0x021946b4` | 58 | partial | string at `0x021d4d50` |
-| `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | partial | string at `0x021d4d60` |
+| `fldmmdl_g3dobj.c` | `0x021946b4`–`0x02195378` | 91 | complete | string at `0x021d4d60` |
 | `fld_act_rail.c` | `0x02195378`–`0x02196238` | 74 | partial | descriptive |
 | `field_rail_loader.c` | `0x02196238`–`0x02197534` | 62 | partial | string at `0x021d4de8` |
 | `field_fog.c` | `0x02197534`–`0x02197710` | 22 | complete | string at `0x021d4dfc` |
 | `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | complete | string at `0x021d4e08` |
 | `field_light.c` | `0x02197820`–`0x02198198` | 31 | partial | string at `0x021d4e18` |
-| `field_subscreen.c` | `0x02198198`–`0x02198bc0` | 72 | partial | string at `0x021d4e28` |
+| `field_subscreen.c` | `0x02198198`–`0x02198bc0` | 72 | complete | string at `0x021d4e28` |
 | `field_3dbg.c` | `0x02198bc0`–`0x02199004` | 20 | partial | string at `0x021d4e3c` |
 | `weather.c` | `0x02199004`–`0x021993e0` | 16 | partial | string at `0x021d4e54` |
 | `weather_task.c` | `0x021993e0`–`0x0219a3b4` | 91 | partial | string at `0x021d4e60` |
@@ -571,12 +574,12 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fldeff_footmark.c` | `0x021b46b0`–`0x021b496c` | 10 | complete | string at `0x021d5324` |
 | `fldeff_reflect.c` | `0x021b496c`–`0x021b4eb4` | 15 | partial | string at `0x021d5338` |
 | `field_place_name.c` | `0x021b4eb4`–`0x021b5b7c` | 96 | complete | string at `0x021d534c` |
-| `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | partial | string at `0x021d5360` |
+| `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | complete | string at `0x021d5360` |
 | `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | complete | string at `0x021d5378` |
 | `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | partial | string at `0x021d53b0` |
 | `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | complete | string at `0x021d53c4` |
 | `field_gimmick.c` | `0x021b7f7c`–`0x021b804c` | 4 | complete | descriptive |
-| `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | partial | string at `0x021d53d8` |
+| `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | complete | string at `0x021d53d8` |
 | `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | complete | descriptive |
 | `field_fade.c` | `0x021b9494`–`0x021ba5d0` | 43 | partial | string at `0x021d53e8` |
 | `height_ex.c` | `0x021ba5d0`–`0x021ba81c` | 14 | complete | string at `0x021d53f8` |
@@ -604,8 +607,8 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | partial | string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | partial | string at `0x021d55f8` |
 | `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
-| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
-| `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | partial | string at `0x021d5648` |
+| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | complete | string at `0x021d5634` |
+| `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | complete | string at `0x021d5648` |
 | `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | complete | string at `0x021d5654` |
 | `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | complete | string at `0x021d5664` |
 | `fldeff_bubble.c` | `0x021c6934`–`0x021c6cc8` | 15 | complete | string at `0x021d56b0` |

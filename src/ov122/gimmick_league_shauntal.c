@@ -315,7 +315,7 @@ static void GimmickShauntal_InitModel(FieldExpObjSystem *expObj, u16 model, int 
     matrix->translation.x = FX32_CONST(256);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(256);
-    func_ov036_021b8248(expObj, 0, model, 1);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 1);
     FieldExpObj_SetActorHidden(expObj, 0, model, TRUE);
     for (i = 0; i < animCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);
@@ -375,7 +375,7 @@ static void GimmickShauntal_ShowModel0End(ShauntalRoomWork *work) {
     fx32 lastFrame;
 
     FieldExpObj_SetAnm(work->expObj, 0, MODEL_0, 5, TRUE);
-    lastFrame = func_ov036_021b8580(anm);
+    lastFrame = FieldExpObjAnm_GetLastFrame(anm);
     FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_0, FALSE);
     FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, 5, lastFrame);
 }

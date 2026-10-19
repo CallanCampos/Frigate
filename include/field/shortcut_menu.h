@@ -32,8 +32,6 @@ GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code);
 GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *state, void *data);
 
-void func_ov036_02187834(void);
-void func_ov036_02187888(void);
 void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID heapId, u32 unused);
 void func_ov036_021bf004(void *app);
 u32 func_ov036_021bf198(void *app);

@@ -26,7 +26,7 @@ static const VramLoadFunc pltt_type_lut[] = {
     GXS_LoadBGPltt, GXS_LoadOBJPltt, GXS_LoadBGExtPltt, GXS_LoadOBJExtPltt,
 };
 
-u32 GFL_BGSysLoadNCGRStatic(u32 arcId, u32 fileId, u8 bg, u32 offset, u32 size, BOOL compressed, HeapID heapId) {
+u32 GFL_BGSysLoadNCGRStatic(u32 arcId, u32 fileId, u32 bg, u32 offset, u32 size, BOOL compressed, HeapID heapId) {
     void *file = GFL_ArcSysReadHeapNewLZ(arcId, fileId, compressed, heapId);
 
     return GFL_BGSysLoadNCGRStaticCore(file, bg, offset, size, compressed);

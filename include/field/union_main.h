@@ -110,7 +110,4 @@ BOOL UnionCommand_IsActive(UnionSystem *sys);
 extern const GameProcFunctions OEKAKI_PROC_FUNCTIONS;
 extern const GameProcFunctions GURU2_PROC_FUNCTIONS;
 
-// Overlay 36's, which puts a colosseum player's info into a table of the field's players
-void func_ov036_021c3f34(void *players, u32 netId, const PlayerInfo *info, u8 flag, const u8 *mac);
-
 #endif // POKEBW2_FIELD_UNION_MAIN_H

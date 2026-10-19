@@ -13,6 +13,7 @@
 #include "field/festival.h"
 #include "field/field.h"
 #include "field/field_menu.h"
+#include "field/field_msgbg.h"
 #include "field/field_pass_power.h"
 #include "field/intrude_work.h"
 #include "gfl/arc.h"

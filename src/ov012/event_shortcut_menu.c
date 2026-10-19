@@ -2,6 +2,7 @@
 #include "constants/pokemon.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"
 #include "field/hidden_event.h"
@@ -498,11 +499,13 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
 void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
     GameData *gameData;
     u16 *param;
+    void *msgBGSys;
 
     if (work->app == NULL && work->done == 0) {
         GFL_BGSysSetBGEnabled(1, 0);
-        if (Field_GetMsgBGSys(work->field)) {
-            func_ov036_02187834();
+        msgBGSys = Field_GetMsgBGSys(work->field);
+        if (msgBGSys != NULL) {
+            func_ov036_02187834(msgBGSys);
         }
         gameData = GSYS_GetGameData(work->gameSystem);
         param = GameData_GetShortcutMenuPos(gameData);
@@ -524,8 +527,7 @@ BOOL ShortcutMenu_Close(ShortcutMenuWork *work) {
             }
             break;
         case 1:
-            Field_GetMsgBGSys(work->field);
-            func_ov036_02187888();
+            func_ov036_02187888(Field_GetMsgBGSys(work->field));
             work->state = 2;
             break;
         case 2:

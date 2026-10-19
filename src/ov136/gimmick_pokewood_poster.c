@@ -80,7 +80,7 @@ static void PokewoodPoster_Init(GimmickWork *work) {
         matrix->translation.y = position.y;
         matrix->translation.z = position.z;
     }
-    func_ov036_021b8248(work->expObj, 0, 0, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, 0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, 0, FALSE);
 }
 

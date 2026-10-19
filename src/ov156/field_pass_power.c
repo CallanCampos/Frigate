@@ -5,6 +5,7 @@
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/field_pass_power.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"

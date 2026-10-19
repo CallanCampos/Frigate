@@ -6,6 +6,7 @@
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
 #include "gfl/heap.h"
+#include "gfl/overlay.h"
 #include "gfl/str.h"
 #include "struct_decls.h"
 #include "system/app_taskmenu.h"
@@ -15,6 +16,7 @@
 // What the beacon view's touch screens share, overlay 83, named after the ROM's "beacon_view_common.c": a row of up to
 // three buttons, text printed into a window or a bitmap OAM through the print queue, and the sub screen's BG sliding
 // in and out. Overlays 84 and 85, the beacon view, call these. swan has no names for this overlay; the names are ours
+#define OVERLAY_BEACON_VIEW_COMMON OVERLAY_ID(83)
 
 // A row of two or three buttons at the bottom of the screen, of one of three layouts. Their labels come from system
 // message file 12

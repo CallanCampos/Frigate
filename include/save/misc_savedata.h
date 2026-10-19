@@ -51,7 +51,7 @@ u32 getTypeOfFilledSlot(RivalDataSave *data, u32 hollow);
 void setSlot(RivalDataSave *data, u32 hollow, u16 slot);
 void setGroup(RivalDataSave *data, u32 hollow, u16 group);
 void setHollowStatus(RivalDataSave *data, u32 hollow, BOOL filled);
-BOOL isHollowFilled(RivalDataSave *data, u32 hollow);
+BOOL isHollowFilled(RivalDataSave *data, u8 hollow);
 u8 getSlotNumber(RivalDataSave *data, u32 hollow);
 u8 getGroupNumber(RivalDataSave *data, u32 hollow);
 u8 getHollowGender(RivalDataSave *data, u32 hollow);

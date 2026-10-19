@@ -49,7 +49,7 @@ void CGearSettings_SetPanel(CGearSettings *settings, u32 place, u32 panel);
 u8 CGearSettings_GetPanel(CGearSettings *settings, u32 place);
 void CGearSettings_SetColor(CGearSettings *settings, s32 index, u8 color);
 u8 CGearSettings_GetColor(CGearSettings *settings, s32 index);
-void func_02009910(CGearSettings *settings, u8 value);
+void func_02009910(CGearSettings *settings, u32 value);
 u8 func_02009914(CGearSettings *settings);
 CGearSettings *CGearSettings_GetFromSave(SaveControl *save);
 CGearSettings *CGearSettings_GetFromGameData(GameData *gameData);

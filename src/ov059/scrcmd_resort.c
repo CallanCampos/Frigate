@@ -5,6 +5,7 @@
 #include "constants/version.h"
 #include "field/field.h"
 #include "field/field_actor.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/resort.h"
 #include "field/scrcmd_resort.h"

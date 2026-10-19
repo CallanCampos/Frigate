@@ -68,7 +68,7 @@ void DriftveilLift_Init(Field *field) {
     LoadFieldExpandObjData(system, &sSceneSetup, 0);
 
     FieldExpObj_GetActorMatrixPtr(system, 0, 0)->translation = lift0Position;
-    func_ov036_021b8248(system, 0, 0, 1);
+    FieldExpObj_SetActorCulling(system, 0, 0, 1);
     anm = FieldExpObj_GetAnmInfo(system, 0, 0, 0);
     FieldExpObj_SetAnm(system, 0, 0, 0, TRUE);
     FieldExpObjAnm_SetLooped(anm, TRUE);
@@ -76,7 +76,7 @@ void DriftveilLift_Init(Field *field) {
     DriftveilLift_ResetAnm(system, 0);
 
     FieldExpObj_GetActorMatrixPtr(system, 0, 1)->translation = lift1Position;
-    func_ov036_021b8248(system, 0, 1, 1);
+    FieldExpObj_SetActorCulling(system, 0, 1, 1);
     FieldExpObj_SetActorHidden(system, 0, 1, TRUE);
     anm = FieldExpObj_GetAnmInfo(system, 0, 1, 0);
     FieldExpObj_SetAnm(system, 0, 1, 0, TRUE);

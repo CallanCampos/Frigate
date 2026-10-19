@@ -98,5 +98,7 @@ GameEvent *FieldEventProvider_Grid(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_NoGrid(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_Hybrid(GameSystem *gsys, void *data);
+// How many Pokémon in the party can battle: not Eggs, and not fainted
+u32 func_ov036_02182f90(GameSystem *gsys);
 
 #endif // POKEBW2_FIELD_FIELD_EVENT_H

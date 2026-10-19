@@ -96,10 +96,10 @@ GameEventReturnCode EventFieldMenu_Callback(GameEvent *event, u32 *state, void *
         returnSubscreen = FieldSubscreen_GetReturnSubscreen(Field_GetSubscreen(work->field));
         if (returnSubscreen == 3) {
             work->state = 2;
-            func_ov036_021984e4(Field_GetSubscreen(work->field));
+            FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         } else if (returnSubscreen == 4) {
             work->state = 3;
-            func_ov036_021984e4(Field_GetSubscreen(work->field));
+            FieldSubscreen_ResetReturnSubscreen(Field_GetSubscreen(work->field));
         }
         break;
     case 2:

@@ -154,8 +154,8 @@ void func_ov036_0219634c(FieldActor *actor, u16 *a1, u16 *a2);
 void func_ov036_021963a4(FieldActor *actor, u16 a1, u16 a2);
 // Sets the frame of the model's animation for a time. FALSE if the actor has no model
 BOOL func_ov036_02196b10(FieldActor *actor, u16 time);
-// Overlay 36's fldmmdl_acmd.c, not written yet: whether the actor is free of its action command, and the setting of
-// the field effect it hides in
+// Overlay 36's fldmmdl_acmd.c: whether the actor is free of its action command, and fldmmdl_movecode_pair.c's
+// setting of the field effect it hides in
 BOOL func_ov036_0218ed68(FieldActor *actor);
 void func_ov036_02193110(FieldActor *actor, FieldEffectTask *task);
 // Overlay 36's fldmmdl_blact.c: the freeing of the billboard actors' work, the flag that their load callback sets,
@@ -179,8 +179,8 @@ void func_ov036_0219690c(FieldActor *actor, BOOL value);
 // The script call of an actor's script; the animation and frame of the billboard actors of object codes 0xd3 and 0xd5,
 // and of 0xdd and 0xde (FALSE without a billboard actor); and whether the billboard actor of object code 0x7b or 0x176
 // has run its animation, with the reset of that animation
-GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, u32 unused1, u32 scriptId, u32 unused3, FieldActor *actor,
-                                        HeapID heapId);
+GameEvent *CreatePlayerXActorScriptCall(GameSystem *gsys, Field *field, u32 scriptId, FieldActor *player,
+                                        FieldActor *actor, HeapID heapId);
 BOOL func_ov036_02197060(FieldActor *actor, u16 *anim, u16 *step);
 BOOL func_ov036_021970b8(FieldActor *actor, u16 *anim, u16 *step);
 BOOL func_ov036_02197238(FieldActor *actor);
@@ -193,6 +193,12 @@ typedef struct {
     ActorAcmdFunc update;
     ActorAcmdFunc end;
 } ActorAcmdFuncs;
+
+// An action command that is done in its first frame: what to do then, and at the end
+typedef struct {
+    ActorAcmdFunc start;
+    ActorAcmdFunc end;
+} ActorAcmdTurnFuncs;
 
 // The work of a jump along the rail, which fldmmdl_g3dobj.c's func_ov036_02195354 starts and fld_act_rail.c updates
 typedef struct {
@@ -209,6 +215,11 @@ typedef struct {
 // Overlay 36's fldmmdl_g3dobj.c: the start, update and end functions of the action commands that the rail actors'
 // tables in fld_act_rail.c name, and the jump along the rail that their start functions begin
 BOOL func_ov036_02194ee8(FieldActor *actor);
+BOOL func_ov036_02194ef8(FieldActor *actor);
+BOOL func_ov036_02194f28(FieldActor *actor);
+BOOL func_ov036_02194f34(FieldActor *actor);
+BOOL func_ov036_02194f40(FieldActor *actor);
+BOOL func_ov036_02194f4c(FieldActor *actor);
 BOOL func_ov036_02194f94(FieldActor *actor);
 BOOL func_ov036_02194fe8(FieldActor *actor);
 BOOL func_ov036_02194ff4(FieldActor *actor);
@@ -250,6 +261,7 @@ BOOL func_ov036_0219527c(FieldActor *actor);
 BOOL func_ov036_0219528c(FieldActor *actor);
 BOOL func_ov036_0219529c(FieldActor *actor);
 BOOL func_ov036_021952ac(FieldActor *actor);
+BOOL func_ov036_021952bc(FieldActor *actor);
 BOOL func_ov036_021952cc(FieldActor *actor);
 void func_ov036_02195354(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step);
 // Also fldmmdl_g3dobj.c's: the freeing of the actors' 3D system, their 3D object system, the creation and deletion of
@@ -266,7 +278,7 @@ void func_ov036_02195a78(FieldActor *actor, u32 dir, VecFx16 *dest);
 void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest);
 // The actor's rail position, the one a step ahead of it, and the one a step in a direction, FALSE if there is none
 void GetActorRailPos(FieldActor *actor, RailPosition *position);
-void func_ov036_02195928(FieldActor *actor, RailPosition *position);
+BOOL func_ov036_02195928(FieldActor *actor, RailPosition *position);
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position);
 // Overlay 36's fld_act_rail.c: the actor's position as its rail unit holds it, the unit's step, the collision flags of
 // a step in a direction (1 off the rails, 2 a blocked tile, 4 another actor), the first actor on a rail position other
@@ -340,11 +352,18 @@ FieldG3DMapper *GetMMSysG3DMapper(MMSys *system);
 BOOL GetTerrainAtPosByActor(FieldActor *actor, const VecFx32 *position, MapTerrainBuf *terrain);
 Field *GetMMSysField(MMSys *mmSys);
 // The movement command of a direction in the row of a table that has the command
-u16 GetAcmdForDir(u16 dir, u32 acmd);
+u16 GetAcmdForDir(u16 dir, u16 acmd);
 // The collision flags of the tile next to the actor in a direction
 u32 ActorRouteCollCheckOneTileInDir(FieldActor *actor, u16 dir);
 // Starts a movement command
 void FldAct_SetLocalAcmd(FieldActor *actor, u16 acmd);
+// Starts the movement command of a direction, as GetAcmdForDir finds it for acmd: the move codes hold the command in a
+// u32, which the call narrows again
+static inline void StartDirAcmd(FieldActor *actor, u32 dir, u32 acmd) {
+    u32 result = GetAcmdForDir(dir, acmd);
+
+    FldAct_SetLocalAcmd(actor, result);
+}
 void FldAct_SetAcmd(FieldActor *actor, u16 acmd);
 BOOL FldAct_EndAcmd(FieldActor *actor);
 // Whether the actor's movement command has finished
@@ -414,10 +433,12 @@ BOOL CheckActorMovementFlag(FieldActor *actor, u32 flag);
 u16 GetActorMoveCode(FieldActor *actor);
 s16 GetActorWalkAreaW(FieldActor *actor);
 s16 GetActorWalkAreaH(FieldActor *actor);
-ActorPositionRail *GetNPCRailPosPtrAddr(FieldActor *actor);
+// The work of the actor's move code, which each move code lays out its own way (ActorPositionRail for the rail
+// ones), as it is or cleared to a size
+void *GetNPCRailPosPtrAddr(FieldActor *actor);
 // The rail unit that moves the actor along the rails
 RailUnit *FldAct_GetRailUnit(FieldActor *actor);
-ActorPositionRail *ClearActorPositionBlock(FieldActor *actor, u32 size);
+void *ClearActorPositionBlock(FieldActor *actor, u32 size);
 // Call the move code's unk4 and unk8 functions
 void FldAct_CallMoveInitProc(FieldActor *actor);
 void FldAct_CallMoveProc(FieldActor *actor);
@@ -461,8 +482,10 @@ u32 CheckMMSysFlag(MMSys *system, u32 flag);
 // Resets a strength boulder's saved position in a zone
 void ResetStrengthRockSaveDataPosition(MMSys *system, u16 zoneId, u16 uid);
 void func_ov036_0218eff4(FieldActor *actor);
-// Overlay 36's fldmmdl_acmd.c, not written yet: moves the actor's billboard to the actor's position
+// Overlay 36's fldmmdl_acmd.c: moves the actor's billboard to the actor's position
 void func_ov036_0218ee08(FieldActor *actor);
+// Overlay 36's fldmmdl_evtype.c: runs the init function of the actor's event type, and whether both checks of the
+// type pass
 void func_ov036_021925a4(FieldActor *actor);
 BOOL func_ov036_021925ac(FieldActor *actor);
 void SetActorInitedPositionRail(FieldActor *actor, const RailPosition *position);

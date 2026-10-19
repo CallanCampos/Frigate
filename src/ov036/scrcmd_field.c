@@ -7,6 +7,7 @@
 #include "field/field_actor.h"
 #include "field/field_ambience.h"
 #include "field/field_camera.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/field_task.h"
 #include "field/scrcmd_field.h"

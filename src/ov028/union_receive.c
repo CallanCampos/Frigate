@@ -8,6 +8,7 @@
 #include "constants/zones.h"
 #include "demo/shinka_demo.h"
 #include "field/colosseum.h"
+#include "field/comm_entry_menu.h"
 #include "field/event_colosseum_battle.h"
 #include "field/event_mapchange.h"
 #include "field/field.h"
@@ -186,12 +187,12 @@ void UnionNet_RecvColosseumMember(int netId, int size, const void *data, void *w
     GameData *gameData = GSYS_GetGameData(unisys->param->gsys);
     u8 mac[8];
 
-    if (colosseum == NULL || colosseum->commPlayer == NULL || colosseum->unk178 == NULL) {
+    if (colosseum == NULL || colosseum->commPlayer == NULL || colosseum->entryMenu == NULL) {
         GFL_ASSERT(0);
         return;
     }
     OS_GetMacAddress(mac);
-    func_ov036_021c3f34(colosseum->unk178, netId, GetGameDataPlayerInfo(gameData), ((const u8 *)data)[0x27], mac);
+    CommEntryMenu_AddEntry(colosseum->entryMenu, netId, GetGameDataPlayerInfo(gameData), ((const u8 *)data)[0x27], mac);
 }
 
 void UnionNet_RecvColosseumUnkDE(int netId, int size, const void *data, void *work, NetHandle *handle) {

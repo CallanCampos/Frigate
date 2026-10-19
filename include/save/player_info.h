@@ -28,14 +28,14 @@ u16 *GetPlayerName(PlayerInfo *info);
 // Copies at most n characters of a name, as wcharsncpy does
 void copyName(const u16 *src, u16 *dest, u32 n);
 u32 PlayerInfo_GetSize(void);
-u32 getTrainerGender(PlayerInfo *info);
+u32 getTrainerGender(const PlayerInfo *info);
 u16 getTrainerID(PlayerInfo *info);
 u8 PlayerInfo_GetVersion(PlayerInfo *info);
 u8 TrainerInfo_GetRegion(PlayerInfo *info);
 // The player's GameSpy profile ID
 s32 PlayerInfo_GetProfileId(PlayerInfo *info);
 void PlayerInfo_InitProfileId(PlayerInfo *info, s32 profileId);
-u8 func_02008bf4(PlayerInfo *info);
+u8 func_02008bf4(const PlayerInfo *info);
 u32 getIDAsUInt(PlayerInfo *info);
 void setTrainerGender(PlayerInfo *info, u32 gender);
 PlayerInfo *PlayerInfo_Create(u32 heapId);

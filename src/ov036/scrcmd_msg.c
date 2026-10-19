@@ -10,6 +10,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/player_state.h"
 #include "field/scrcmd_msg.h"
@@ -650,7 +651,7 @@ static BOOL displayText(VM *vm, FieldScriptEnv *env, u32 a2) {
 BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     void *window;
-    u32 row = 1;
+    u16 row = 1;
 
     if (a4 != 1) {
         row = 0x13;

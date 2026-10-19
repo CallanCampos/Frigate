@@ -58,7 +58,7 @@ struct UnionColosseum {
     u8 unk171;
     u8 unk172[4];
     u8 unk176[2];
-    void *unk178; // a table of the field's players (see func_ov036_021c3f34)
+    CommEntryMenu *entryMenu; // the menu that gathers the players for a multi battle
     u8 unk17C[3];
     u8 unk17F;
 };

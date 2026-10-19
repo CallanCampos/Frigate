@@ -78,7 +78,7 @@ void UndergroundRuins_SetAnmEnd(GameSystem *gsys, u16 a1) {
     for (i = 0; i < NELEMS(sAnimations); i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, 0, i);
         FieldExpObj_SetAnm(work->expObj, 0, 0, i, TRUE);
-        lastFrame = func_ov036_021b8580(anm);
+        lastFrame = FieldExpObjAnm_GetLastFrame(anm);
         if (a1 == 1) {
             FieldExpObj_SetAnmFrame(work->expObj, 0, 0, i, lastFrame);
         } else {
@@ -117,7 +117,7 @@ static void UndergroundRuins_LoadScene(GimmickWork *work) {
     matrix->translation.x = FX32_CONST(208);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(32);
-    func_ov036_021b8248(work->expObj, 0, 0, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, 0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, 0, FALSE);
     for (i = 0; i < NELEMS(sAnimations); i++) {
         FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(work->expObj, 0, 0, i);
@@ -133,7 +133,7 @@ static void UndergroundRuins_LoadScene(GimmickWork *work) {
         matrix->translation.x = FX32_CONST(224);
         matrix->translation.y = 0;
         matrix->translation.z = FX32_CONST(112);
-        func_ov036_021b8248(work->expObj, 0, actor, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, actor, 1);
         if (actor == 4) {
             FieldExpObj_SetActorHidden(work->expObj, 0, actor, FALSE);
         } else {

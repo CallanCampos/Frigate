@@ -515,7 +515,7 @@ static void Mistralton_SetStage(Field *field, int stage) {
 
             FieldExpObj_SetActorHidden(work->system, SCENE, actor, FALSE);
             anm = FieldExpObj_GetAnmInfo(work->system, SCENE, actor, 0);
-            if (func_ov036_021b84ec(anm) == TRUE) {
+            if (FieldExpObjAnm_IsPaused(anm) == TRUE) {
                 FieldExpObj_SetAnmFrame(work->system, SCENE, actor, 0, 0);
                 FieldExpObjAnm_SetPaused(anm, FALSE);
             }
@@ -863,7 +863,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         FieldPlayer_GetGPos(data->player, &x, &y, &z);
         if (z == 26) {
             anm = FieldExpObj_GetAnmInfo(work->system, SCENE, ACTOR_DOOR_FIRST, 0);
-            if (func_ov036_021b84ec(anm) == TRUE) {
+            if (FieldExpObjAnm_IsPaused(anm) == TRUE) {
                 FieldExpObj_SetAnmFrame(work->system, SCENE, ACTOR_DOOR_FIRST, 0, 0);
                 FieldExpObjAnm_SetPaused(anm, FALSE);
                 GFL_SndSEPlay(SEQ_SE_GYM_H06);
@@ -871,7 +871,7 @@ static GameEventReturnCode MistraltonCannonEvent_Run(GameEvent *event, u32 *stat
         }
         if (z == 36) {
             anm = FieldExpObj_GetAnmInfo(work->system, SCENE, ACTOR_DOOR_FIRST + 1, 0);
-            if (func_ov036_021b84ec(anm) == TRUE) {
+            if (FieldExpObjAnm_IsPaused(anm) == TRUE) {
                 FieldExpObj_SetAnmFrame(work->system, SCENE, ACTOR_DOOR_FIRST + 1, 0, 0);
                 FieldExpObjAnm_SetPaused(anm, FALSE);
                 GFL_SndSEPlay(SEQ_SE_GYM_H06);
@@ -1071,7 +1071,7 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
     matrix->translation.x = 0;
     matrix->translation.y = 0;
     matrix->translation.z = 0;
-    func_ov036_021b8248(work->system, SCENE, ACTOR_CENTER, TRUE);
+    FieldExpObj_SetActorCulling(work->system, SCENE, ACTOR_CENTER, TRUE);
     FieldExpObj_SetActorHidden(work->system, SCENE, ACTOR_CENTER, FALSE);
     anm = FieldExpObj_GetAnmInfo(work->system, SCENE, ACTOR_CENTER, 0);
     FieldExpObj_SetAnm(work->system, SCENE, ACTOR_CENTER, 0, TRUE);
@@ -1094,7 +1094,7 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
             matrix->translation.x = FX32_CONST(fanPositions[i].x * 16);
             matrix->translation.y = FX32_CONST(fanPositions[i].y * 16);
             matrix->translation.z = FX32_CONST(fanPositions[i].z * 16);
-            func_ov036_021b8248(work->system, SCENE, actor, TRUE);
+            FieldExpObj_SetActorCulling(work->system, SCENE, actor, TRUE);
             FieldExpObj_SetActorHidden(work->system, SCENE, actor, FALSE);
             anm = FieldExpObj_GetAnmInfo(work->system, SCENE, actor, 0);
             FieldExpObj_SetAnm(work->system, SCENE, actor, 0, TRUE);
@@ -1115,7 +1115,7 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
             matrix->translation.x = FX32_CONST(doorPositions[j].x * 16);
             matrix->translation.y = FX32_CONST(doorPositions[j].y * 16);
             matrix->translation.z = FX32_CONST(doorPositions[j].z * 16);
-            func_ov036_021b8248(work->system, SCENE, actor, TRUE);
+            FieldExpObj_SetActorCulling(work->system, SCENE, actor, TRUE);
             FieldExpObj_SetActorHidden(work->system, SCENE, actor, FALSE);
             anm = FieldExpObj_GetAnmInfo(work->system, SCENE, actor, 0);
             FieldExpObj_SetAnm(work->system, SCENE, actor, 0, TRUE);
@@ -1131,7 +1131,7 @@ static void Mistralton_LoadScene(MistraltonWork *work) {
         matrix->translation.x = 0;
         matrix->translation.y = 0;
         matrix->translation.z = 0;
-        func_ov036_021b8248(work->system, SCENE, j, FALSE);
+        FieldExpObj_SetActorCulling(work->system, SCENE, j, FALSE);
         if (j == ACTOR_EFFECT_FIRST || (j == ACTOR_EFFECT_FIRST + 1 && work->stage == 1)) {
             FieldExpObj_SetActorHidden(work->system, SCENE, j, FALSE);
         } else {

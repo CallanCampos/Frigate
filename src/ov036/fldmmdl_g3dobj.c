@@ -33,12 +33,6 @@ typedef struct {
     s16 wait;
 } ActorWaitWork;
 
-// An action command that is done in its first frame: what to do then, and at the end
-typedef struct {
-    ActorAcmdFunc start;
-    ActorAcmdFunc end;
-} ActorAcmdTurnFuncs;
-
 #define RES_NONE 0xffff
 
 static void func_ov036_02194718(ActorG3DSystem *sys, HeapID heapId);
@@ -69,28 +63,14 @@ static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, cons
 static void func_ov036_02194e70(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194eb0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static FieldEffects *FldAct_GetFieldEffects(FieldActor *actor);
-static BOOL func_ov036_02194ef8(FieldActor *actor);
 static void func_ov036_02194f04(FieldActor *actor, u32 dir);
-static BOOL func_ov036_02194f28(FieldActor *actor);
-static BOOL func_ov036_02194f34(FieldActor *actor);
-static BOOL func_ov036_02194f40(FieldActor *actor);
-static BOOL func_ov036_02194f4c(FieldActor *actor);
 static void func_ov036_02194f58(FieldActor *actor, u32 dir, u32 speed, u32 frames);
 static void func_ov036_02195134(FieldActor *actor, u32 dir, u32 speed, u32 frames);
-static BOOL func_ov036_021952bc(FieldActor *actor);
 static void func_ov036_021952dc(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
                                 u32 se);
 
 // The direction an actor on the rails faces, by the sixteenth of a turn from the camera angle to its way along the rail
 static const u8 FACE_DIRS_BY_ANGLE[16] = { 1, 3, 3, 3, 3, 3, 3, 0, 0, 2, 2, 2, 2, 2, 2, 1 };
-
-// The rail actors' action commands of these functions, which fldmmdl_acmd.c's table of action commands lists
-const ActorAcmdTurnFuncs data_ov036_021cf374 = { func_ov036_02194f4c, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf37c = { func_ov036_02194f40, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf384 = { func_ov036_02194f28, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf38c = { func_ov036_02194f34, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf394 = { func_ov036_02194ef8, func_ov036_02194ee8 };
-const ActorAcmdFuncs data_ov036_021cf39c = { func_ov036_021952bc, func_ov036_02195168, func_ov036_02194ee8 };
 
 void FieldActorG3DSystem_Create(MMSys *system, void *g3dObjSystem) {
     HeapID heapId = FldActSys_GetFieldHeapID(system);
@@ -493,7 +473,7 @@ BOOL func_ov036_02194ee8(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02194ef8(FieldActor *actor) {
+BOOL func_ov036_02194ef8(FieldActor *actor) {
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
@@ -505,22 +485,22 @@ static void func_ov036_02194f04(FieldActor *actor, u32 dir) {
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_02194f28(FieldActor *actor) {
+BOOL func_ov036_02194f28(FieldActor *actor) {
     func_ov036_02194f04(actor, DIR_UP);
     return TRUE;
 }
 
-static BOOL func_ov036_02194f34(FieldActor *actor) {
+BOOL func_ov036_02194f34(FieldActor *actor) {
     func_ov036_02194f04(actor, DIR_DOWN);
     return TRUE;
 }
 
-static BOOL func_ov036_02194f40(FieldActor *actor) {
+BOOL func_ov036_02194f40(FieldActor *actor) {
     func_ov036_02194f04(actor, DIR_LEFT);
     return TRUE;
 }
 
-static BOOL func_ov036_02194f4c(FieldActor *actor) {
+BOOL func_ov036_02194f4c(FieldActor *actor) {
     func_ov036_02194f04(actor, DIR_RIGHT);
     return TRUE;
 }
@@ -729,7 +709,7 @@ BOOL func_ov036_021952ac(FieldActor *actor) {
     func_ov036_02195134(actor, 1, 4, 4);
     return TRUE;
 }
-static BOOL func_ov036_021952bc(FieldActor *actor) {
+BOOL func_ov036_021952bc(FieldActor *actor) {
     func_ov036_02195134(actor, 2, 4, 4);
     return TRUE;
 }

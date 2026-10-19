@@ -146,7 +146,7 @@ static void GimmickHumilau_LoadSplash(GimmickWork *work) {
     matrix->translation.x = 0;
     matrix->translation.y = 0;
     matrix->translation.z = 0;
-    func_ov036_021b8248(work->system, 0, 0, 1);
+    FieldExpObj_SetActorCulling(work->system, 0, 0, 1);
     FieldExpObj_SetActorHidden(work->system, 0, 0, TRUE);
     for (i = 0; i < NELEMS(sAnimations); i++) {
         anm = FieldExpObj_GetAnmInfo(work->system, 0, 0, i);

@@ -197,7 +197,8 @@ void GimmickGate_Setup(Field *field) {
     Config_GetKanji(
         (Config *)getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(Field_GetGameSystem(field)))));
     scene = GATE_SCENE_1;
-    LoadFieldExpandObjData(expObj, &sSceneSetups[scene], scene);
+    // Loaded as the expansion objects' scene 1, where the board's functions find it
+    LoadFieldExpandObjData(expObj, &sSceneSetups[scene], 1);
     work = GimmickGate_CreateWork(field);
     GimmickGate_LoadZoneData(work);
     GimmickGate_LoadBoardEntries(work);

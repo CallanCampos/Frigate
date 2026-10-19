@@ -261,7 +261,7 @@ static void InfinityDungeonGimmick_SetupScene(InfinityDungeon *dungeon, Infinity
                 info = FieldExpObj_GetAnmInfo(lift->expObj, 0, lift->actor, anm);
                 FieldExpObjAnm_SetPaused(info, TRUE);
                 if (done == TRUE) {
-                    FieldExpObj_SetAnmFrame(lift->expObj, 0, lift->actor, anm, func_ov036_021b8580(info));
+                    FieldExpObj_SetAnmFrame(lift->expObj, 0, lift->actor, anm, FieldExpObjAnm_GetLastFrame(info));
                 }
             }
         }
@@ -346,7 +346,7 @@ static GameEventReturnCode InfinityDungeonGimmick_DoorEvent(GameEvent *event, u3
         (*state)++;
         break;
     case 1:
-        if ((fx32)func_ov036_021b8520(object->expObj, 0, object->actor, 0) >= endFrame) {
+        if (FieldExpObj_GetAnmFrame(object->expObj, 0, object->actor, 0) >= endFrame) {
             for (anm = 0; anm < SCENE_ANM_COUNT; anm++) {
                 FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(object->expObj, 0, object->actor, anm), TRUE);
             }

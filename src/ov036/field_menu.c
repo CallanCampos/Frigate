@@ -5,6 +5,7 @@
 #include "constants/text_banks.h"
 #include "field/field.h"
 #include "field/field_menu.h"
+#include "field/field_msgbg.h"
 #include "field/player_state.h"
 #include "field/subscreen.h"
 #include "field/zone.h"

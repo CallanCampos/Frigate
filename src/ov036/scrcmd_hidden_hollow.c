@@ -99,7 +99,7 @@ static void func_ov036_021c9394(HollowEventWork *work);
 static void func_ov036_021c93c0(HollowEventWork *work);
 static u32 func_ov036_021c9440(u32 hollow);
 
-void generateHollow(RivalDataSave *data, u32 hollow) {
+void generateHollow(RivalDataSave *data, u8 hollow) {
     u8 slot = 10;
     u8 group = GFL_RandomLC(4);
     u32 volume = PassPower_ApplyGrottoVolume(1);

@@ -142,7 +142,7 @@ static void LeagueCenter_LoadModel(GimmickWork *work) {
     matrix->translation.x = FX32_CONST(512);
     matrix->translation.y = FX32_CONST(768);
     matrix->translation.z = FX32_CONST(-256);
-    func_ov036_021b8248(work->expObj, 0, 0, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, 0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, 0, FALSE);
     for (i = 0; i < NELEMS(sAnimations); i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, 0, i);

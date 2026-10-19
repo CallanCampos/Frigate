@@ -10,6 +10,7 @@
 #include "field/field_environment.h"
 #include "field/field_event.h"
 #include "field/field_fog.h"
+#include "field/field_msgbg.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"

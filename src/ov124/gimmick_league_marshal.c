@@ -235,7 +235,7 @@ static void MarshalRoom_InitModel(FieldExpObjSystem *expObj, u16 model, int anmC
     matrix->translation.x = FX32_CONST(256);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(256);
-    func_ov036_021b8248(expObj, 0, model, 1);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 1);
     FieldExpObj_SetActorHidden(expObj, 0, model, TRUE);
     for (i = 0; i < anmCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);
@@ -273,7 +273,7 @@ static void MarshalRoom_ShowModel0End(MarshalRoomWork *work) {
     for (i = 0; i < 2; i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, i);
         FieldExpObj_SetAnm(work->expObj, 0, MODEL_0, i, TRUE);
-        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, i, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, i, FieldExpObjAnm_GetLastFrame(anm));
     }
 }
 
@@ -286,7 +286,7 @@ static void MarshalRoom_ShowModel1End(MarshalRoomWork *work) {
     for (i = 0; i < 3; i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_1, i);
         FieldExpObj_SetAnm(work->expObj, 0, MODEL_1, i, TRUE);
-        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_1, i, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_1, i, FieldExpObjAnm_GetLastFrame(anm));
     }
 }
 
@@ -307,7 +307,7 @@ static void MarshalRoom_ShowModel3End(MarshalRoomWork *work) {
 
     anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_3, 0);
     FieldExpObj_SetAnm(work->expObj, 0, MODEL_3, 0, TRUE);
-    frame = func_ov036_021b8580(anm);
+    frame = FieldExpObjAnm_GetLastFrame(anm);
     FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_3, FALSE);
     FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_3, 0, frame);
 }

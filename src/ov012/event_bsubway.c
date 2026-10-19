@@ -18,6 +18,7 @@
 #include "field/field_actor.h"
 #include "field/field_camera.h"
 #include "field/field_event.h"
+#include "field/field_msgbg.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
 #include "gfl/msg.h"

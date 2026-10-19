@@ -470,6 +470,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   loads in tree order and reuses the register: global CSE merged the reads; only a second pointer path to the field
   (a cast, not `(*p).f`) or `opt_common_subs off` keeps them apart. (matching.md: "is a global common
   subexpression, loaded into a")
+- A bit test's `movs rX, #1` ahead of the tested field's load, where the original loads first and builds the bit
+  after it: the body sets the same bit; write the body's shift with the other signedness (`mask |= 1U << i`).
+  (matching.md: "A bit tested in an `if`'s condition")
 - A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
   calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
   sum that isn't a copy (`f(x + 4)`, not `f(x)`) or another immediate keeps it in place, no pragma does, and each

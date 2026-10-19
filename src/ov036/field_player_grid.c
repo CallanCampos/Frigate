@@ -993,7 +993,7 @@ static void FieldPlayerGrid_UpdateNormalIdle(FieldPlayerGrid *grid, FieldActor *
 
 // A step, slower when the tile ahead is higher
 static void FieldPlayerGrid_UpdateNormalMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    u32 acmd;
+    u16 acmd;
     BOOL checkHeight = TRUE;
 
     if (input->force == TRUE) {
@@ -1133,7 +1133,7 @@ static void FieldPlayerGrid_UpdateBikeIdle(FieldPlayerGrid *grid, FieldActor *ac
 // A step, slower in deep sand and when the tile ahead is higher
 static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     u32 tileType;
-    u32 acmd;
+    u16 acmd;
     BOOL checkHeight = TRUE;
 
     if (input->force == TRUE) {
@@ -1218,7 +1218,7 @@ static void FieldPlayerGrid_UpdateSurfIdle(FieldPlayerGrid *grid, FieldActor *ac
 }
 
 static void FieldPlayerGrid_UpdateSurfMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    u32 acmd;
+    u16 acmd;
 
     if (input->force == TRUE) {
         acmd = ACMD_WALK_2F;

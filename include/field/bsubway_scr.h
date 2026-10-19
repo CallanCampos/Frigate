@@ -143,7 +143,8 @@ struct BSubwayScrWork {
     u16 sendBuf[BSUBWAY_COMM_BUF_LEN];
     u16 recvBuf[BSUBWAY_COMM_BUF_LEN];
     BSubwayBeacon beacon;
-    void *unk71C;
+    // The menu that gathers the partner of a multi train over the wireless network
+    CommEntryMenu *entryMenu;
     u16 *resultVar;
     // How many of the commands sent have arrived, counting this machine's own
     u8 recvCount;
