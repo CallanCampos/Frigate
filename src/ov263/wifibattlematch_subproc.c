@@ -105,7 +105,7 @@ static BOOL WifiBattleMatchList_Exit(GameProc *proc, u32 *state, void *param, vo
             PokeParty_AddPkm(list->selected, PokeParty_GetPkm(list->party, wk->pokeList.picked[i] - 1));
         }
     }
-    func_ov164_021998c8((NetSyncWork *)&wk->pokeList);
+    NetSync_Exit((NetSyncWork *)&wk->pokeList);
     GFL_OvlUnload(OVERLAY_ID(164));
     FreeGameProcManager(wk->procManager);
     GFL_ProcReleaseSubsystem(proc);
@@ -202,7 +202,7 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
     }
 
     if (!wk->pokeList.unk73) {
-        func_ov164_021998d4((NetSyncWork *)&wk->pokeList);
+        NetSync_Update((NetSyncWork *)&wk->pokeList);
     }
     return FALSE;
 }
@@ -260,7 +260,7 @@ static void WifiBattleMatchList_SetupPokeList(WifiBattleMatchListParam *param, W
         pokeList->timeLeft = 0;
     }
     GFL_OvlLoad(OVERLAY_ID(164));
-    func_ov164_021998c0((NetSyncWork *)pokeList);
+    NetSync_Init((NetSyncWork *)pokeList);
 }
 
 static void WifiBattleMatchList_SetupStatus(WifiBattleMatchListParam *param, WifiBattleMatchListWork *wk,

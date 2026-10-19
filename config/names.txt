@@ -12189,6 +12189,13 @@ overlays/ov162 0x021a1a20 sBootBGSetupSub
 overlays/ov162 0x021a1a40 sBootVRAMConfig
 overlays/ov162 0x021a1a70 DELETE_SAVE_PROC_FUNCTIONS
 overlays/ov162 0x021a1b00 sWaitIcon
+overlays/ov164 0x021998c0 NetSync_Init
+overlays/ov164 0x021998c8 NetSync_Exit
+overlays/ov164 0x021998d4 NetSync_Update
+overlays/ov164 0x02199944 NetSync_Send
+overlays/ov164 0x02199984 NetSync_RecvCallback
+overlays/ov164 0x021999a8 NetSync_StartTiming
+overlays/ov164 0x021999bc NetSync_IsTimingDone
 overlays/ov165 0x02199a00 PokeListProc_Init
 overlays/ov165 0x02199a50 PokeListProc_DeleteHeap
 overlays/ov165 0x02199a64 PokeListProc_Exit

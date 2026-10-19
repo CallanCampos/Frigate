@@ -480,7 +480,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     int i;
 
     if (*step > 2 && *step < 7) {
-        func_ov164_021998d4((NetSyncWork *)param);
+        NetSync_Update((NetSyncWork *)param);
     }
     switch (*step) {
     case 0:
@@ -495,7 +495,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         break;
     case 2:
         GFL_OvlLoad(OVERLAY_ID(164));
-        func_ov164_021998c0((NetSyncWork *)param);
+        NetSync_Init((NetSyncWork *)param);
         (*step)++;
         break;
     case 3:
@@ -533,7 +533,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         *step = 3;
         break;
     case 7:
-        func_ov164_021998c8((NetSyncWork *)param);
+        NetSync_Exit((NetSyncWork *)param);
         GFL_OvlUnload(OVERLAY_ID(164));
         *step = 8;
         break;

@@ -309,7 +309,7 @@ BOOL PokeList_Main(PokeListWork *wk) {
             PokeListMenu_SetButtonPressed(wk->buttons[0], 0);
             if (wk->wasMode1A == TRUE) {
                 // Overlay 164's sync takes the parameters as its work
-                if (func_ov164_02199944((NetSyncWork *)wk->param, 0, 0) == TRUE) {
+                if (NetSync_Send((NetSyncWork *)wk->param, 0, 0) == TRUE) {
                     wk->state = 17;
                     PokeListMenu_FreeButton(wk->buttons[0]);
                     PokeListMenu_FreeButton(wk->buttons[1]);
@@ -337,11 +337,11 @@ BOOL PokeList_Main(PokeListWork *wk) {
         PokeListDemo_End(wk);
         break;
     case 17:
-        func_ov164_021999a8((u32)wk->param, 2);
+        NetSync_StartTiming((u32)wk->param, 2);
         wk->state = 18;
         break;
     case 18:
-        if (func_ov164_021999bc((NetSyncWork *)wk->param, 2) == TRUE) {
+        if (NetSync_IsTimingDone((NetSyncWork *)wk->param, 2) == TRUE) {
             wk->state = 19;
         }
         break;
