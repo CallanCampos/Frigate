@@ -79,6 +79,7 @@ lib/dsprot/src/dsprot_cipher_entry.c:
     .rodata     start:0x021a4cac end:0x021a4cb4
 
 lib/dsprot/src/dsprot_cipher.c:
+    complete
     .text       start:0x021a4484 end:0x021a49dc
     .rodata     start:0x021a4cb4 end:0x021a4cc8
     .ctor       start:0x021a4cd8 end:0x021a4cdc
