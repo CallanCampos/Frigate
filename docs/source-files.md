@@ -1737,7 +1737,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-252 of 1113 functions are in source files.
+372 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1748,6 +1748,17 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
+| `dwc_util_gfx_resource.c` | `0x021ab63c`–`0x021ab7c8` | 7 | complete | descriptive |
+| `dwc_util_button_sprites.c` | `0x021ab7c8`–`0x021ab90c` | 5 | complete | descriptive |
+| `dwc_util_bg_overlay.c` | `0x021ab90c`–`0x021ab9fc` | 6 | complete | descriptive |
+| `dwc_util_link_icon.c` | `0x021ab9fc`–`0x021abb10` | 3 | complete | descriptive |
+| `dwc_util_keyboard.c` | `0x021abb10`–`0x021acd80` | 30 | partial | descriptive |
+| `dwc_util_menu.c` | `0x021acd80`–`0x021ada94` | 28 | partial | descriptive |
+| `dwc_util_aoss_session.c` | `0x021ada94`–`0x021adbc0` | 5 | complete | descriptive |
+| `dwc_util_main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
+| `dwc_util_msg_resource.c` | `0x021ae084`–`0x021ae134` | 6 | complete | descriptive |
+| `dwc_util_move.c` | `0x021ae134`–`0x021ae3d8` | 8 | partial | descriptive |
+| `dwc_util_connection.c` | `0x021ae3d8`–`0x021ae4f4` | 7 | complete | descriptive |
 | `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |

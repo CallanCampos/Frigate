@@ -33,7 +33,7 @@ static DownloadPlaySysWork *sDownloadPlaySysWork;
 // Takes the block the overlay's screens file built, hands the download-play parent its part, and starts the flow
 // out ready: the session's ids and the timer are cleared with the frame areas and the state is set ready, the game
 // registry is copied with the player count it carries, and the console's backup pages are read
-void func_ov182_021ba768(DownloadPlaySysContext *context, const MBGameRegistry *registry) {
+void func_ov182_021ba768(DownloadPlaySysContext *context, const DownloadPlaySysGame *registry) {
     sDownloadPlaySysWork = &context->sys;
     DownloadPlay_SetWork(&context->play);
     sDownloadPlaySysWork->tgid = 0;
