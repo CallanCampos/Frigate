@@ -5387,7 +5387,7 @@
 
     // Plugin 15
 
-    // func_ov067_021e5800
+    // Plugin15Cmd_ShowSplash
     .macro Plugin15_Cmd1000 a0, a1, a2
     FieldCommand 1000
     .2byte \a0
@@ -5395,7 +5395,7 @@
     .2byte \a2
     .endm
 
-    // func_ov067_021e5840
+    // Plugin15Cmd_JumpActorOut
     .macro Plugin15_Cmd1001 a0, a1, a2, a3
     FieldCommand 1001
     .2byte \a0

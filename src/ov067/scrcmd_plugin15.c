@@ -5,7 +5,7 @@
 
 // Script plugin 15 (overlay 67), commands from 1000, of zones 463, 465 and 474, whose gimmick is overlay 113
 
-static BOOL func_ov067_021e5800(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin15Cmd_ShowSplash(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 x = ScriptReadAny(vm, env);
@@ -16,7 +16,7 @@ static BOOL func_ov067_021e5800(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov067_021e5840(VM *vm, FieldScriptEnv *env) {
+static BOOL Plugin15Cmd_JumpActorOut(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 actorId = ScriptReadAny(vm, env);
@@ -33,7 +33,7 @@ static BOOL func_ov067_021e5840(VM *vm, FieldScriptEnv *env) {
 }
 
 const FieldScriptCommand PLUGIN_15_SCRIPT_COMMANDS[] = {
-    func_ov067_021e5800,
-    func_ov067_021e5840,
+    Plugin15Cmd_ShowSplash,
+    Plugin15Cmd_JumpActorOut,
     (FieldScriptCommand)0xFFFFFFFF,
 };

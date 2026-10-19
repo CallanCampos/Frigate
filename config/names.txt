@@ -8486,6 +8486,8 @@ overlays/ov066 0x021e5b00 Plugin14Cmd_PlayDT9Thrown
 overlays/ov066 0x021e5b50 Plugin14Cmd_CallDT9WaitThrownDoneEvent
 overlays/ov066 0x021e5b78 Plugin14Cmd_CallDT9WaitFifthFrameEvent
 overlays/ov066 0x021e5ba0 PLUGIN_14_SCRIPT_COMMANDS
+overlays/ov067 0x021e5800 Plugin15Cmd_ShowSplash
+overlays/ov067 0x021e5840 Plugin15Cmd_JumpActorOut
 overlays/ov067 0x021e58a4 PLUGIN_15_SCRIPT_COMMANDS
 overlays/ov068 0x021e595c PLUGIN_16_SCRIPT_COMMANDS
 overlays/ov069 0x0217c940 UnionApp_Create
