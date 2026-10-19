@@ -1014,7 +1014,7 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         if (link->exchangeDone == 0) {
             link->exchangeDone = WifiBattleMatchNet_ReportMain(link->net, &link->exchangeResult);
             if (link->exchangeDone != 0 && link->exchangeResult != 0) {
-                func_ov262_021c5c94(param->param->gameData, param->battleResult->result);
+                WifiBattleMatch_RecordResult(param->param->gameData, param->battleResult->result);
             }
         }
         if (link->exchangeDone == 1) {
@@ -1134,7 +1134,7 @@ static void WifiBattleMatchLink_TaskRatingResult(WifiBattleMatchTask *task, u32 
         WifiBattleMatchTask_SetReturnSeq(task, 13);
         break;
     case 13:
-        func_ov262_021c5cd4(param->param->gameData, param->battleResult->result);
+        WifiBattleMatch_RecordBattleTime(param->param->gameData, param->battleResult->result);
         WifiBattleMatchMsgBox_Print(link->msgBox, link->msgData, EventFishing_Text_SavingDontTurnOff,
                                     WIFIBATTLEMATCH_MSG_QUEUE_WAIT_ICON);
         *seq = 16;
@@ -1758,7 +1758,7 @@ static void WifiBattleMatchLink_TaskFreeResult(WifiBattleMatchTask *task, u32 *s
     case 6:
         rivalData = getHollow_RivalData(GameData_GetSaveControl(param->param->gameData));
         Misc_AddMetTrainer(rivalData, getIDAsUInt(&param->otherPlayer->info));
-        func_ov262_021c5c94(param->param->gameData, param->battleResult->result);
+        WifiBattleMatch_RecordResult(param->param->gameData, param->battleResult->result);
         WifiBattleMatchNet_ResetEnd(link->net);
         *seq = 7;
         break;
@@ -1789,7 +1789,7 @@ static void WifiBattleMatchLink_TaskFreeResult(WifiBattleMatchTask *task, u32 *s
         *seq = 10;
         break;
     case 10:
-        func_ov262_021c5cd4(param->param->gameData, param->battleResult->result);
+        WifiBattleMatch_RecordBattleTime(param->param->gameData, param->battleResult->result);
         WifiBattleMatchMsgBox_Print(link->msgBox, link->msgData, EventFishing_Text_SavingDontTurnOff,
                                     WIFIBATTLEMATCH_MSG_QUEUE_WAIT_ICON);
         *seq = 13;

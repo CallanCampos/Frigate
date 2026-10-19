@@ -23853,6 +23853,8 @@ overlays/ov262 0x021c5c74 WifiBattleMatchTask_SetFunc
 overlays/ov262 0x021c5c7c WifiBattleMatchTask_End
 overlays/ov262 0x021c5c88 WifiBattleMatchTask_SetReturnSeq
 overlays/ov262 0x021c5c8c WifiBattleMatchTask_ReturnToSeq
+overlays/ov262 0x021c5c94 WifiBattleMatch_RecordResult
+overlays/ov262 0x021c5cd4 WifiBattleMatch_RecordBattleTime
 overlays/ov262 0x021c5eb4 sRows
 overlays/ov263 0x021c2560 WifiBattleMatchList_Init
 overlays/ov263 0x021c25f0 WifiBattleMatchList_Exit

@@ -2021,7 +2021,7 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         if (link->exchangeDone == 0) {
             link->exchangeDone = WifiBattleMatchNet_ReportMain(link->net, &link->exchangeResult);
             if (link->exchangeDone != 0 && link->exchangeResult != 0) {
-                func_ov262_021c5c94(param->param->gameData, param->battleResult->result);
+                WifiBattleMatch_RecordResult(param->param->gameData, param->battleResult->result);
             }
         }
         if (link->exchangeDone == 1) {
@@ -2130,7 +2130,7 @@ static void WifiBattleMatchLink_CompetitionTaskAfterBattle(WifiBattleMatchTask *
         break;
     case 1:
         if (param->result != 2) {
-            func_ov262_021c5cd4(param->param->gameData, param->battleResult->result);
+            WifiBattleMatch_RecordBattleTime(param->param->gameData, param->battleResult->result);
         }
         WifiBattleMatchLink_CompetitionUpdateRecord(link, link->param->unk34);
         GameData_StartSave(param->param->gameData);
