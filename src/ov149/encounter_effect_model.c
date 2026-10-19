@@ -42,23 +42,23 @@ typedef struct EncounterModelWork {
     s32 se;
 } EncounterModelWork;
 
-GameEvent *func_ov149_021f59e0(GameSystem *gsys, Field *field, BOOL white) {
+GameEvent *EncEffModel_CreateModel7(GameSystem *gsys, Field *field, BOOL white) {
     return EncEffModel_Create(gsys, field, 7, 6, white);
 }
 
-GameEvent *func_ov149_021f59f0(GameSystem *gsys, Field *field, BOOL white) {
+GameEvent *EncEffModel_CreateModel9(GameSystem *gsys, Field *field, BOOL white) {
     return EncEffModel_Create(gsys, field, 9, 8, white);
 }
 
-GameEvent *func_ov149_021f5a00(GameSystem *gsys, Field *field, BOOL white) {
+GameEvent *EncEffModel_CreateModel5(GameSystem *gsys, Field *field, BOOL white) {
     return EncEffModel_Create(gsys, field, 5, 4, white);
 }
 
-GameEvent *func_ov149_021f5a10(GameSystem *gsys, Field *field, BOOL white) {
+GameEvent *EncEffModel_CreateModel3(GameSystem *gsys, Field *field, BOOL white) {
     return EncEffModel_Create(gsys, field, 3, 2, white);
 }
 
-GameEvent *func_ov149_021f5a20(GameSystem *gsys, Field *field, BOOL white) {
+GameEvent *EncEffModel_CreateModel1(GameSystem *gsys, Field *field, BOOL white) {
     return EncEffModel_Create(gsys, field, 1, 0, white);
 }
 

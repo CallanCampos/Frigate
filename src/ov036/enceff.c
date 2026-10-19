@@ -84,11 +84,11 @@ static const u8 SPECIAL_TRAINER_ENCEFF[32] = { 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x1
 
 static const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
     /* 0 */ { (EncEffCreateFunc)EventEncountEffectCutin_Create01, EncEffModel_Render, 149, 1, 0x13010 },
-    /* 1 */ { (EncEffCreateFunc)func_ov149_021f59f0, EncEffModel_Render, 149, 1, 0x131a4 },
+    /* 1 */ { (EncEffCreateFunc)EncEffModel_CreateModel9, EncEffModel_Render, 149, 1, 0x131a4 },
     /* 2 */ { (EncEffCreateFunc)EncEffRipple_CreateWhite, EncEffRipple_ClearAndDraw, 151, 1, 0x0 },
     /* 3 */ { EventEncountEffectCutin_Create25, NULL, 146, 0, 0x1e04 },
     /* 4 */ { EventEncountEffectCutin_Create26, NULL, 146, 1, 0x14bc8 },
-    /* 5 */ { (EncEffCreateFunc)func_ov149_021f5a00, EncEffModel_Render, 149, 1, 0x12fbc },
+    /* 5 */ { (EncEffCreateFunc)EncEffModel_CreateModel5, EncEffModel_Render, 149, 1, 0x12fbc },
     /* 6 */ { EventEncountEffectCutin_Create05, EncEffModel_Render, 149, 1, 0x13b20 },
     /* 7 */ { (EncEffCreateFunc)func_ov152_021f6200, EncEffGrid_ClearAndDraw, 152, 0, 0x0 },
     /* 8 */ { (EncEffCreateFunc)func_ov152_021f6200, EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
@@ -115,7 +115,7 @@ static const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
     /* 29 */ { EventEncountEffectCutin_Create19, NULL, 146, 0, 0xcf20 },
     /* 30 */ { EventEncountEffectCutin_Create20, NULL, 146, 0, 0xe570 },
     /* 31 */ { EventEncountEffectCutin_Create21, NULL, 146, 0, 0xe570 },
-    /* 32 */ { (EncEffCreateFunc)func_ov149_021f5a20, EncEffModel_Render, 149, 1, 0x132e8 },
+    /* 32 */ { (EncEffCreateFunc)EncEffModel_CreateModel1, EncEffModel_Render, 149, 1, 0x132e8 },
     /* 33 */ { EventEncountEffectCutin_Create22, NULL, 146, 1, 0x80e0 },
     /* 34 */ { EventEncountEffectCutin_Create23, NULL, 146, 1, 0x619c },
     /* 35 */ { EventEncountEffectCutin_Create24, NULL, 146, 1, 0xac88 },

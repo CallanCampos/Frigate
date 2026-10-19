@@ -11932,6 +11932,11 @@ overlays/ov148 0x021f5c20 EncEffCapture_StartCapture
 overlays/ov148 0x021f5c40 EncEffCapture_CaptureTask
 overlays/ov148 0x021f5c60 EncEffCapture_GetTexKey
 overlays/ov148 0x021f5c98 EncEffCapture_Callback
+overlays/ov149 0x021f59e0 EncEffModel_CreateModel7
+overlays/ov149 0x021f59f0 EncEffModel_CreateModel9
+overlays/ov149 0x021f5a00 EncEffModel_CreateModel5
+overlays/ov149 0x021f5a10 EncEffModel_CreateModel3
+overlays/ov149 0x021f5a20 EncEffModel_CreateModel1
 overlays/ov149 0x021f5a30 EncEffModel_CreateZoroark
 overlays/ov149 0x021f5a58 EncEffModel_Create
 overlays/ov149 0x021f5aa4 EncEffModel_Render
